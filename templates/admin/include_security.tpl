@@ -186,6 +186,10 @@
                     {preference name=http_header_public_key_pins_value}
                 </div>
             </fieldset>
+            <fieldset>
+                <legend class="h3">{tr}.htaccess Security{/tr}{help url="Security"}</legend>
+                {preference name=security_warn_htaccess_mismatch}
+            </fieldset>
         {/tab}
 
         {tab name="{tr}Spam Protection{/tr}"}
@@ -244,6 +248,7 @@
             {preference name=use_load_threshold}
             <div class="adminoptionboxchild" id="use_load_threshold_childcontainer">
                 {preference name=load_threshold}
+                {preference name=load_retry_after}
                 {preference name=site_busy_title}
                 {preference name=site_busy_msg}
                 <div class="col-sm-8 offset-sm-4">

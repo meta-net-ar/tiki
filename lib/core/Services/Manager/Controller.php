@@ -480,7 +480,7 @@ class Services_Manager_Controller
                             'id' => $taskId,
                             'page' => 'manager_create',
                             'status' => tr('Pending'),
-                            'mes' => tr("Your instance creation task (#%0) has been queued successfully and will be executed shortly. You can view the status and output on the <a target='_blank' href='tiki-admin_queued_tasks.php'>Queued Tasks</a> page.", $taskId)
+                            'mes' => tr("Your instance creation task (#%0) has been queued successfully. You can view the status and output on the <a target='_blank' href='tiki-admin_queued_tasks.php'>Queued Tasks</a> page.", $taskId)
                         ]);
                     } else {
                         Feedback::error(tr("Failed to add Instance creation into queue"));

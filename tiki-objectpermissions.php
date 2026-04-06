@@ -33,8 +33,8 @@ $inputConfiguration = [
         'permission_scope_behavior' => 'word',     //post
         ],
         'staticKeyFiltersForArrays' => [
-        'feature_filter'            => 'bool',       //post
-        'group_filter'              => 'bool',       //post
+        'feature_filter'            => 'word',       //post
+        'group_filter'              => 'word',       //post
         'perm'                      => 'word',       //post
         'old_perm'                  => 'word',       //post
         ],

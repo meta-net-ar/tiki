@@ -43,7 +43,19 @@ class Tracker_Field_Kaltura extends \Tracker\Field\AbstractItemField implements 
         $insertId = $this->getInsertId();
 
         if (isset($requestData[$insertId])) {
-            $value = implode(',', $requestData[$insertId]);
+            // Ensure we have an array (single checkbox might be a string)
+            $values = is_array($requestData[$insertId])
+                ? $requestData[$insertId]
+                : [$requestData[$insertId]];
+
+            $flattened = [];
+            array_walk_recursive($values, function ($v) use (&$flattened) {
+                if (is_string($v) || is_numeric($v)) {
+                    $flattened[] = trim((string)$v);
+                }
+            });
+
+            $value = implode(',', array_unique(array_filter($flattened)));
         } elseif (! empty($requestData['old_' . $insertId])) {    // all entries removed
             $value = '';
         } else {
@@ -82,7 +94,9 @@ class Tracker_Field_Kaltura extends \Tracker\Field\AbstractItemField implements 
 
     public function renderOutput($context = [])
     {
-        if ($context['list_mode'] === 'y') {
+        $isListMode = ($context['list_mode'] ?? 'n') === 'y';
+
+        if ($isListMode) {
             $otherParams = $this->getOption('displayParamsForLists', []);
         } else {
             $otherParams = $this->getOption('displayParams', []);
@@ -90,6 +104,16 @@ class Tracker_Field_Kaltura extends \Tracker\Field\AbstractItemField implements 
 
         if ($otherParams) {
             parse_str($otherParams, $otherParams);
+        } else {
+            $otherParams = [];
+        }
+
+        // Set default smaller dimensions for list mode if not specified
+        if ($isListMode && empty($otherParams['width'])) {
+            $otherParams['width'] = 200;
+        }
+        if ($isListMode && empty($otherParams['height'])) {
+            $otherParams['height'] = 120;
         }
 
         include_once 'lib/wiki-plugins/wikiplugin_kaltura.php';
@@ -97,9 +121,15 @@ class Tracker_Field_Kaltura extends \Tracker\Field\AbstractItemField implements 
         $movieIds = array_filter(explode(',', $this->getValue()));
         $output = '';
 
+        if (empty($movieIds)) {
+            return $output;
+        }
+
         foreach ($movieIds as $id) {
             $params = array_merge($otherParams, ['id' => $id]);
+            $output .= '<div class="kaltura-video-item mb-3">';
             $output .= TikiLib::lib('parser')->invokePlugin('kaltura', '', $params);
+            $output .= '</div>';
         }
 
         return $output;

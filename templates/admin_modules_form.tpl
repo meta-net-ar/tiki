@@ -86,7 +86,7 @@
                     {/if}
                 </fieldset>
             {/tab}
-            {if isset($assign_info.type) and $assign_info.type eq 'function'}
+            {if isset($assign_info.params) and !empty($assign_info.params)}
                 {foreach from=$assign_info.params key=sect item=params}
                     {tab name="{$sect|capitalize}" key="{$sect}"}
                         <fieldset id="param_section_{$sect}">

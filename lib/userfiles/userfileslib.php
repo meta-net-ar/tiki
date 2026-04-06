@@ -43,7 +43,7 @@ class UserFilesLib extends TikiLib
     {
         $query = "insert into `tiki_userfiles`(`user`,`name`,`filename`,`filetype`,`filesize`,`data`,`created`,`hits`,`path`)
     values(?,?,?,?,?,?,?,?,?)";
-        $this->query($query, [$user,$name,$filename,$filetype,(int) $filesize,$data,(int) $this->now,0,$path]);
+        $this->query($query, [$user,$name,$filename,$filetype,(int) $filesize,$data,$this->now,0,$path]);
     }
 
     /**

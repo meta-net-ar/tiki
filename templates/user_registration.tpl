@@ -48,6 +48,20 @@
                     $form.find('button[type="submit"], .registerSubmit').prop('disabled', state === true).toggleClass('disabled', state === true);
                 }
 
+                var isFormValid = true;
+                if (typeof $form.validate === 'function') {
+                    if (!$form.data('validator')) {
+                        $form.validate();
+                    }
+                    if (!$form.valid()) {
+                        isFormValid = false;
+                    }
+                }
+                
+                if (!isFormValid) {
+                    return;
+                }
+
                 setSubmitting(true);
 
                 var isWebauthnEnabled = "{{$prefs.auth_webauthn_enabled}}";

@@ -27,6 +27,7 @@ function prefs_payment_list()
             'admin' => 'payment',
             'view' => 'tiki-payment.php',
             'keywords' => 'shopping',
+            'tags' => ['experimental'],
         ],
         'payment_system' => [
             'name' => tra('Payment system'),
@@ -74,6 +75,7 @@ function prefs_payment_list()
             'name' => tra('PayPal environment'),
             'description' => tra('Used to switch between the PayPal sandbox, used for testing and development and the live environment.'),
             'type' => 'list',
+            // @tiki-external-link-ok: PayPal IPN endpoint, requires POST authentication
             'options' => [
                 'https://www.paypal.com/cgi-bin/webscr' => tra('Production'),
                 'https://www.sandbox.paypal.com/cgi-bin/webscr' => tra('Sandbox'),

@@ -31,9 +31,10 @@ class SocialNetworksLib extends LogsLib
     /**
     * @var array   options for Twitter Zend functions
     */
+    // @tiki-external-link-ok: Twitter OAuth base URL, requires authentication
     public $options = [
             'callbackUrl'    => '',
-            'siteUrl'        => 'http://twitter.com/oauth',
+            'siteUrl'        => 'https://api.twitter.com/oauth',
             'consumerKey'    => '',
             'consumerSecret' => '',
     ];
@@ -581,8 +582,8 @@ class SocialNetworksLib extends LogsLib
     *
     * @return int  -1 if the user did not authorize the site with twitter,
     *                          -2, if the message is longer than 140 characters,
-    *                          a negative number corresponding to the HTTP response codes from twitter
-    *                          (http://dev.twitter.com/pages/streaming_api_response_codes)
+                          a negative number corresponding to the HTTP response codes from Twitter
+                          (see X Developer Platform documentation)
     *                              or a positive tweet id of the message
     */
     public function tweet($message, $user, $cutMessage = false)
@@ -878,7 +879,7 @@ class SocialNetworksLib extends LogsLib
     *
     * Note: These codes are maintained for internal logic and compatibility,
     * but Twitter/X no longer uses or documents numerical error codes like those found at
-    * https://dev.twitter.com/docs/streaming-api/response-codes (deprecated).
+    * https://developer.x.com/en/docs/twitter-api (deprecated).
     */
     public function getTwitterTimeline($user, $timelineType = 'public', $search = 'tikiwiki')
     {

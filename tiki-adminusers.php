@@ -310,7 +310,8 @@ if (isset($_REQUEST['batch']) && is_uploaded_file($_FILES['csvlist']['tmp_name']
         $AddUser = false;
     }
     if (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $_REQUEST['login'])) {
-        return tra("Username cannot contain any spaces");
+        $errors[] = tra('Username cannot contain any spaces');
+        $AddUser = false;
     }
     if ($prefs['login_is_email'] == 'y' && ! validate_email($_REQUEST['login'])) {
         $errors[] = tra('Invalid email') . ' ' . $_REQUEST['login'];

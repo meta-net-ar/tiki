@@ -66,7 +66,7 @@
         </div>
     {/if}
 {/if}
-<div id="{$ts.tableid}-div" class="{if $js}table-responsive{/if} ts-wrapperdiv" {if !empty($ts.enabled)}style="visibility:hidden;"{/if}> {*the table-responsive class cuts off dropdown menus *}
+<div id="{$ts.tableid}-div" class="{if $js}table-responsive{/if} ts-wrapperdiv styling-element" {if !empty($ts.enabled)}style="visibility:hidden;"{/if}> {*the table-responsive class cuts off dropdown menus *}
     <table id="{$ts.tableid}" class="table table-striped table-hover table-forum normal m-auto" data-count="{$count|escape}">
         {block name=forumheader}
         <thead>

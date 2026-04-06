@@ -1,10 +1,16 @@
 {strip}
+    {if $prefs.ajax_edit_previews eq 'y' and $field.options_map.previewtabs eq 'y'}
+        {assign var='tracker_previews' value='y'}
+    {else}
+        {assign var='tracker_previews' value='n'}
+    {/if}
+
     {if $field.options_map['wysiwyg'] eq 'y'}
-        {textarea _class='form-control' id=$data.element_id name=$field.ins_id rows=$data.rows onkeyup=$data.keyup _wysiwyg='y' section="trackers"  switcheditor='n' _preview=$prefs.ajax_edit_previews}
+        {textarea _class='form-control' id=$data.element_id name=$field.ins_id rows=$data.rows onkeyup=$data.keyup _wysiwyg='y' section="trackers"  switcheditor='n' _preview=$tracker_previews}
             {$field.page_data}
         {/textarea}
     {else}
-        {textarea _class='form-control' id=$data.element_id name=$field.ins_id _toolbars=$data.toolbar _simple='y' rows=$data.rows onkeyup=$data.keyup _wysiwyg='n' section="trackers"  switcheditor='n' _preview=$prefs.ajax_edit_previews}
+        {textarea _class='form-control' id=$data.element_id name=$field.ins_id _toolbars=$data.toolbar _simple='y' rows=$data.rows onkeyup=$data.keyup _wysiwyg='n' section="trackers"  switcheditor='n' _preview=$tracker_previews}
             {$field.page_data}
         {/textarea}
     {/if}

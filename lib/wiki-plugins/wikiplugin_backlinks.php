@@ -27,7 +27,7 @@ class WikiPluginBackLinks extends PluginsLib
 
     public function getDescription()
     {
-        return wikiplugin_backlinks_help();
+        return wikiplugin_backlinks_info()['description'];
     }
 
     public function getVersion()

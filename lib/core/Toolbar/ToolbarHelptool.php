@@ -2,6 +2,7 @@
 
 namespace Tiki\Lib\core\Toolbar;
 
+use Tiki\Sections;
 use TikiLib;
 
 class ToolbarHelptool extends ToolbarUtilityItem
@@ -73,7 +74,7 @@ class ToolbarHelptool extends ToolbarUtilityItem
 
     public function getWysiwygJs(bool $isMarkdown = false): string
     {
-        global $section;
+        $section = Sections::getCurrentSection();
 
         $servicelib = TikiLib::lib('service');
 
@@ -84,7 +85,7 @@ class ToolbarHelptool extends ToolbarUtilityItem
             $params['wysiwyg'] = 1;
         }
 
-        if ($section == 'sheet') {
+        if (Sections::isCurrentSection(Sections::SECTION_SHEET)) {
             $params['sheet'] = 1;
         }
 

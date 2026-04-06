@@ -10,6 +10,8 @@
 // - Also supports JSON POST for manual curl/debug
 
 require_once __DIR__ . '/tiki-setup.php';
+$access->check_feature('xmpp_feature');
+
 
 $prefslib = TikiLib::lib('prefs');
 $userslib = TikiLib::lib('user');

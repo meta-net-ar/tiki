@@ -75,7 +75,7 @@ function wikiplugin_code_info()
             'colors' => [
                 'required' => false,
                 'name' => tra('Colors'),
-                'description' => tra('Any supported language listed at http://codemirror.net/mode  Pref feature_syntax_highlighter must be true for this to have any effect'),
+                'description' => tra('Any supported language listed at https://codemirror.net/mode/  Pref feature_syntax_highlighter must be true for this to have any effect'),
                 'since' => '17',
                 'filter' => 'text',
                 'options' => $colors,
@@ -172,16 +172,22 @@ function wikiplugin_code($data, $params)
     }
 
     // respect wrap parameter when Codemirror is off and line wrap when Codemirror is on to avoid broken view while JavaScript loads.
-    if ((isset($prefs['feature_syntax_highlighter']) && $prefs['feature_syntax_highlighter'] == 'y') || $wrap == 1) {
+    if ($prefs['feature_syntax_highlighter'] == 'y' || $wrap == 1) {
         $pre_style = 'white-space:pre-wrap;'
 
             // If needed, break words
             . ' overflow-wrap: break-word;' // CSS 3 working draft
             . ' word-wrap: break-word;'; // Original proprietary Microsoft name
 
-        if (is_null($theme) && isset($prefs['feature_syntax_highlighter_theme'])) {
+        if (is_null($theme)) {
             $theme = $prefs['feature_syntax_highlighter_theme'];
         }
+    }
+
+    if ($prefs['feature_syntax_highlighter'] == 'y') {
+        //add codemirror stuff
+        require_once("lib/codemirror_tiki/tiki_codemirror.php");
+        addCodemirror();
     }
 
 

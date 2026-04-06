@@ -51,7 +51,7 @@ return RectorConfig::configure()
         // ensure file system caching is used instead of in-memory
         cacheClass: FileCacheStorage::class,
         // specify a path that works locally as well as on CI job runners
-        cacheDirectory: __DIR__ . '/temp/dev/rector_cache'
+        cacheDirectory: __DIR__ . '/temp/ci/rector_cache'
     )
     //Because tiki uses vendor_bundled as it's main composer instead of the root, we have to do this manually. - benoitg - 2025-12-11
     ->withBootstrapFiles([
@@ -76,7 +76,7 @@ return RectorConfig::configure()
     ])->withSkip([
         // __DIR__ . '/src/SingleFile.php',
         // __DIR__ . '/src/WholeDirectory',
-
+        __DIR__ . '/src/php/external_lib_sources',
         // or use fnmatch
         __DIR__ . '*/vendor/*',
     ])

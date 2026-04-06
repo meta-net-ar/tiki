@@ -14,6 +14,7 @@
             {include file='admin/include_apply_top.tpl'}
         </div>
     </div>
+    <div class="styling-element">
 
     <fieldset id="Categories">
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
@@ -145,6 +146,6 @@
         <legend class="h3">{tr}Structure{/tr}</legend>
             {preference name=feature_wiki_categorize_structure}
     </fieldset>
-
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

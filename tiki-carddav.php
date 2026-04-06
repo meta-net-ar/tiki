@@ -12,6 +12,7 @@ use Tiki\SabreDav\BasicAuth;
 use Tiki\SabreDav\Utilities;
 
 require_once 'tiki-setup.php';
+$access->check_feature('feature_contacts');
 TikiLib::setExternalContext(true);
 
 $authBackend = new BasicAuth();

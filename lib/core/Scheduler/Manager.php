@@ -82,7 +82,18 @@ class Scheduler_Manager
                     continue;
                 }
             } catch (\Scheduler\Exception\CrontimeFormatException $e) {
-                $this->logger->error(sprintf(tra("Skip scheduler %s - %s"), $schedulerTask->name, $e->getMessage()));
+                $errorMessage = sprintf(tra("Skip scheduler %s - %s"), $schedulerTask->name, $e->getMessage());
+                $this->logger->error($errorMessage);
+
+                // Send to GlitchTip/Sentry
+                TikiLib::lib('errortracking')->captureException(
+                    new \Exception($errorMessage),
+                    [
+                        'scheduler.task' => $schedulerTask->name,
+                        'scheduler.id' => $schedulerTask->id,
+                        'error.type' => 'cron_format_exception',
+                    ]
+                );
                 continue;
             }
 
@@ -115,8 +126,18 @@ class Scheduler_Manager
             if (! $this->hasTempFolderOwnership) {
                 $runRecord = $schedLib->start_scheduler_run($schedulerTask->id);
                 $writingPermissionsError = tra('The console command "scheduler:run" refuses to run the task as it is running as a different system user of the owner of tiki files.');
+                $errorMessage  = sprintf(tra("***** Scheduler %s - FAILED *****\n%s"), $schedulerTask->name, $writingPermissionsError);
+                $this->logger->error($errorMessage);
 
-                $this->logger->error(sprintf(tra("***** Scheduler %s - FAILED *****\n%s"), $schedulerTask->name, $writingPermissionsError));
+                // Send to GlitchTip/Sentry
+                TikiLib::lib('errortracking')->captureException(
+                    new \Exception($errorMessage),
+                    [
+                        'scheduler.task' => $schedulerTask->name,
+                        'scheduler.id' => $schedulerTask->id,
+                        'error.type' => 'permission_error',
+                    ]
+                );
                 $schedLib->end_scheduler_run($schedulerTask->id, $runRecord['run_id'], 'failed', $writingPermissionsError);
 
                 continue;
@@ -126,7 +147,19 @@ class Scheduler_Manager
             $result = $schedulerTask->execute();
 
             if ($result['status'] == 'failed') {
-                $this->logger->error(sprintf(tra("***** Scheduler %s - FAILED *****\n%s"), $schedulerTask->name, $result['message']));
+                $errorMessage = sprintf(tra("***** Scheduler %s - FAILED *****\n%s"), $schedulerTask->name, $result['message']);
+                $this->logger->error($errorMessage);
+
+                // Send to GlitchTip/Sentry
+                TikiLib::lib('errortracking')->captureException(
+                    new \Exception($errorMessage),
+                    [
+                        'scheduler.task' => $schedulerTask->name,
+                        'scheduler.id' => $schedulerTask->id,
+                        'error.type' => 'task_execution_failed',
+                    ]
+                );
+
                 if ($tikilib->get_preference('scheduler_notify_on_stalled', 'y')) {
                     $users = Scheduler_Utils::getSchedulerNotificationUsers('scheduler_users_to_notify_on_healed');
 
@@ -150,7 +183,17 @@ class Scheduler_Manager
         $schedulers = $schedLib->get_scheduler($schedulerId, 'active');
 
         if (empty($schedulers) && $schedulerId) {
-            $this->logger->error(tr("Scheduler with id %0 does not exist or is not active", $schedulerId));
+            $errorMessage = sprintf(tr("Scheduler with id %0 does not exist or is not active"), $schedulerId);
+            $this->logger->error($errorMessage);
+
+            // Send to GlitchTip/Sentry
+            TikiLib::lib('errortracking')->captureException(
+                new \Exception($errorMessage),
+                [
+                    'scheduler.id' => $schedulerId,
+                    'error.type' => 'scheduler_not_found',
+                ]
+            );
             return;
         }
 

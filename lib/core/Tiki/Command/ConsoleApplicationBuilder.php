@@ -145,6 +145,7 @@ class ConsoleApplicationBuilder
                 new PackageEnableCommand(),
                 new DailyReportSendCommand(),
                 new FakerCommentsCommand(),
+                new FakerRedactCommand(),
                 new FakerTrackerCommand(),
                 new GalleryMigrateCommand(),
                 new GoalCheckCommand(),
@@ -200,6 +201,7 @@ class ConsoleApplicationBuilder
                 new UsersPasswordCommand(),
                 new UsersTemporaryCommand(),
                 new TokensClearCommand(),
+                new McpTokenCreateCommand(),
                 new CookiesClearCommand(),
                 new StatsCommand(),
                 new MLTrainCommand(),
@@ -209,6 +211,7 @@ class ConsoleApplicationBuilder
                 new SieveFiltersCommand(),
                 new CalendarSyncCommand(),
                 new SchedulerRunCommand(),
+                new SchedulerStatsCommand(),
                 new SchedulerMonitorCommand(),
                 new WebmailUnreadPagesCommand(),
                 new WebmailUnreadGlobalCommand(),
@@ -629,7 +632,7 @@ class ConsoleApplicationBuilder
             try {
                 $utilities = new \Services_Manager_Utilities();
                 $utilities->loadEnv(false);
-            } catch (\TikiManager\Config\Exception\ConfigurationErrorException $e) {
+            } catch (\TikiManager\Config\Exception\ConfigurationErrorException $e) {// @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
                 $commandErrorCode = function (InputInterface $input, OutputInterface $output) use ($e) {
                     $output->writeln('Tiki Manager commands not available at this stage.');
                     $output->writeln('<error>' . $e->getMessage() . '</error>');

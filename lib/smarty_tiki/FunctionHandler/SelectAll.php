@@ -58,8 +58,8 @@ class SelectAll extends Base
             }
             $onclick = ' onclick="' . $onclick . '"';
         }
-
-        return '<input name="switcher' . $id . '" id="clickall' . $id . '" class="form-check-input position-static" type="checkbox"' . $onclick .
+        $names_list = is_array($checkbox_names) ? implode(',', $checkbox_names) : (string)$checkbox_names;
+        return '<input name="switcher' . $id . '" id="clickall' . $id . '" class="form-check-input position-static js-select-all" type="checkbox" data-select-all-target="' . htmlspecialchars($names_list) . '" ' . $onclick .
             (empty($params['label']) ? ' aria-label="' . tra('Select All') . '"' : '') .
             '/>' . "\n" .
             (! empty($params['label']) ? '<label class="form-check-label" for="clickall' . $id . '">' . $params['label'] . "</label>\n" : '');

@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'newsletters';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -55,11 +54,14 @@ $inputConfiguration = [
     ],
 ];
 
-
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_NEWSLETTERS;
+Sections::setCurrentSection($section);
 @ini_set('max_execution_time', 0);
 $prefs['feature_wiki_protect_email'] = 'n'; //not to alter the email
 include_once('lib/newsletters/nllib.php');
+
 $auto_query_args = ['sort_mode', 'offset', 'find', 'nlId', 'cookietab', 'editionId'];
 
 $access->check_feature('feature_newsletters');

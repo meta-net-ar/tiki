@@ -196,9 +196,10 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
         $selected = array_intersect($selected, $this->getIds($categories));
 
         if (isset($requestData[$key])) {
-            $selectedCategoryIds = is_array($requestData[$key]) ? $requestData[$key] : [$requestData[$key]];
-            $selected = array_unique(array_merge($selected, $selectedCategoryIds));
-            $value = implode(',', $selected);
+            $value = $requestData[$key];
+            if (is_array($value)) {
+                $value = implode(',', $value);
+            }
         } elseif (isset($requestData["cat_managed_$key"])) {
             $value = '';
         } elseif ($this->getValue()) {
@@ -207,7 +208,11 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
             $value = implode(',', $selected);
         }
 
-        $selected_categories = array_filter(explode(',', $value), fn ($c) => in_array($c, $selected));
+        $selected_categories = explode(',', $value);
+
+        if (! empty($selected)) {
+            $selected_categories = array_filter($selected_categories, fn ($c) => in_array($c, $selected));
+        }
 
         $data = [
             'value' => $value,
@@ -298,11 +303,17 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
     {
         $selected_categories = $this->getConfiguration('selected_categories');
         $categories = $this->getConfiguration('list');
+        if (! is_array($selected_categories)) {
+            $selected_categories = [];
+        }
+        if (! is_array($categories)) {
+            $categories = [];
+        }
         $ret = [];
         $rendered = empty($context['list_mode']) || $context['list_mode'] !== 'csv';
         foreach ($selected_categories as $categId) {
             foreach ($categories as $category) {
-                if ($category['categId'] == $categId) {
+                if (isset($category['categId']) && $category['categId'] == $categId) {
                     if ($this->getOption('descendants') == 2) {
                         $str = $category['relativePathString'];
                     } else {

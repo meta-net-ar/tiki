@@ -28,9 +28,10 @@ $inputConfiguration = [
     ],
     [ 'catchAllUnset' => null ],
 ];
-
-$section = 'faqs';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FAQS;
+Sections::setCurrentSection($section);
 
 $faqlib = TikiLib::lib('faq');
 

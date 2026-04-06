@@ -129,6 +129,8 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
         $params['notBefore'] = $this->getOption('notBefore') ? '#trackerinput_' . $this->getOption('notBefore') : '';
         $params['notAfter']  = $this->getOption('notAfter') ? '#trackerinput_' . $this->getOption('notAfter') : '';
         $params['timezone'] = TikiLib::lib('tiki')->get_display_timezone();
+        $params['minutestep'] = $this->getValidatedMinuteStep();
+        $params['enforcestep'] = (int) ($this->trackerField->getOption('enforceStep') ?: 0);
 
         return smarty_function_jscalendar($params, $smarty->getEmptyInternalTemplate());
     }

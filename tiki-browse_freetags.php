@@ -8,27 +8,30 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'freetags';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'del'                         => 'int',      //get
-            'itemit'                      => 'int',      //post
-            'typeit'                      => 'word',     //post
-            'tag'                         => 'word',     //post
-            'sort_mode'                   => 'int',      //post
-            'find'                        => 'string',   //post
-            'type'                        => 'word',     //post
-            'old_type'                    => 'word',     //post
-            'user_only'                   => 'bool',     //post
-            'broaden'                     => 'bool',     //post
-            'maxPopular'                  => 'int',      //get
-            'tsort_mode'                  => 'word',     //get
-            'objectId'                    => 'int',      //get
+            'del'                         => 'int',           //get
+            'itemit'                      => 'int',           //post
+            'typeit'                      => 'wordspace',     //post
+            'tag'                         => 'string',        //post
+            'sort_mode'                   => 'word',          //post
+            'find'                        => 'string',        //post
+            'type'                        => 'wordspace',     //post
+            'old_type'                    => 'wordspace',     //post
+            'user_only'                   => 'word',          //post
+            'broaden'                     => 'bool',          //post
+            'maxPopular'                  => 'int',           //get
+            'tsort_mode'                  => 'word',          //get
+            'objectId'                    => 'int',           //get
+            'offset'                      => 'int',           //get
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FREETAGS;
+Sections::setCurrentSection($section);
 $freetaglib = TikiLib::lib('freetag');
 $access->check_feature('feature_freetags');
 $access->check_permission('tiki_p_view_freetags');
@@ -161,7 +164,6 @@ $smarty->assign(
         'directory',
         'faq',
         'file gallery',
-        'image gallery',
         'image',
         'poll',
         'quiz',

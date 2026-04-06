@@ -8,8 +8,6 @@ class Services_File_Utilities
 {
     public function checkTargetGallery($galleryId)
     {
-        global $prefs;
-
         if (! $gal_info = $this->getGallery($galleryId)) {
             throw new Services_Exception(tr('Requested gallery does not exist.'), 404);
         }

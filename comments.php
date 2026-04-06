@@ -30,6 +30,7 @@ $tikilib = TikiLib::lib('tiki');
 $headerlib = TikiLib::lib('header');
 
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Sections;
 
 /*
  * Determine the settings used to display the thread
@@ -90,7 +91,7 @@ if (isset($_REQUEST['comzone'])) {
     }
     if ($comzone_state == 'hide' || $comzone_state == 'c') {
         if ((! isset($_COOKIE['comzone']) || $_COOKIE['comzone'] == 'o') && CookieConsentLib::isCategoryAllowed(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL)) {
-            setcookie('comzone', 'c');
+            CookieConsentLib::tikiSetCookie('comzone', 'c', CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
         }
     }
 } else {
@@ -448,8 +449,7 @@ if ($prefs['feature_contribution'] == 'y') {
     include_once('contribution.php');
 }
 // see if comments are allowed on this specific wiki page
-global $section;
-if ($section == 'wiki page') {
+if (Sections::getCurrentSection() === Sections::SECTION_WIKI_PAGE) {
     if ($prefs['wiki_comments_allow_per_page'] != 'n') {
         global $info;
         if (! empty($info['comments_enabled'])) {

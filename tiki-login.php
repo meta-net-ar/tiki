@@ -413,6 +413,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
         TikiLib::lib('login')->activateSession($user);
 
         $url = $_SESSION['loginfrom'];
+        $_SESSION['login_time'] = time();
 
         // When logging into a multi-lingual Tiki, $_SESSION['loginfrom'] contains the main-language page, and not the translated one
         //  This only applies if feature_best_language and only seems to affect SEFURL
@@ -489,7 +490,7 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
                 }
                 // Go to the group page instead of the referer url if we are in one of those cases :
                 //   - pref 'Go to the group homepage only if logging in from the default homepage' (limitedGoGroupHome) is disabled,
-                //   - referer url (e.g. http://example.com/tiki/tiki-index.php?page=Homepage ) is the homepage (tikiIndex),
+                //   - referer url (e.g. http://example.org/tiki/tiki-index.php?page=Homepage ) is the homepage (tikiIndex),
                 //   - referer url complete path ( e.g. /tiki/tiki-index.php?page=Homepage ) is the homepage,
                 //   - referer url relative path ( e.g. tiki-index.php?page=Homepage ) is the homepage
                 //   - referer url SEF page ( e.g. /tiki/Homepage ) is the homepage

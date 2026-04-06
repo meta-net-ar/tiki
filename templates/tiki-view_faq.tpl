@@ -60,15 +60,6 @@
     {if $faq_info.canSuggest eq 'y' and $tiki_p_suggest_faq eq 'y'}
         {button href="javascript:flip('faqsugg');" _flip_id="faqsugg" _text="{tr}Add Suggestion{/tr}"}
     {/if}
-
-    {if $prefs.feature_faq_comments == 'y'
-        && (($tiki_p_read_comments == 'y'
-        && $comments_count != 0)
-        || $tiki_p_post_comments == 'y'
-        || $tiki_p_edit_comments == 'y')
-    }
-        {include file='comments_button.tpl'}
-    {/if}
 </div>
 
 {if $faq_info.canSuggest eq 'y' and $tiki_p_suggest_faq eq 'y'}
@@ -133,14 +124,15 @@
     </footer>
 {/if}
 
-{if $prefs.feature_faq_comments == 'y'
-&& ($tiki_p_read_comments == 'y'
-|| $tiki_p_post_comments == 'y'
-|| $tiki_p_edit_comments == 'y')}
-    <div id="comment-container" class="my-3 mx-0" data-bs-target="{service controller=comment action=list type=faq objectId=$faqId}"></div>
-    {jq}
-        var id = '#comment-container';
-        $(id).comment_load($(id).data('bs-target'));
-        $(document).on("ajaxComplete", function(){$(id).tiki_popover();});
-    {/jq}
+{if $prefs.feature_faq_comments == 'y' && !empty($faqId)
+    && ($tiki_p_read_comments == 'y'
+    || $tiki_p_post_comments == 'y'
+    || $tiki_p_edit_comments == 'y')}
+    <div id="page-bar" class="btn-group">
+        <span class="button btn-primary"><a id="comment-toggle" href="{service controller=comment action=list type=faq objectId=$faqId}#comment-container">{tr}Comments{/tr}</a></span>
+        {jq}
+            $('#comment-toggle').comment_toggle();
+        {/jq}
+    </div>
+    <div id="comment-container" class="my-3 mx-0"></div>
 {/if}

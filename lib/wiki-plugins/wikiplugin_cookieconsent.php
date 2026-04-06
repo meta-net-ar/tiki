@@ -57,7 +57,7 @@ function wikiplugin_cookieconsent($body, $params)
 
     $class = $params['element_class'];
 
-    if (! CookieConsentLib::checkAllowedCookieCategory(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
+    if (! CookieConsentLib::isCategoryAllowed(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
         $body = '';
         $class .= ($class ? ' ' : '') . $params['no_consent_class'];
     }

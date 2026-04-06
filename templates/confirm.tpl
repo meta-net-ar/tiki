@@ -1,6 +1,6 @@
 {extends $global_extend_layout|default:'internal/ajax.tpl'}
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 {block name="content"}
     <div class="card">

@@ -35,6 +35,7 @@ class Tracker_Field_BarCode extends Tracker_Field_Text
                             'QR_CODE' => tr('QR code'),
                             'EAN_13' => tr('EAN-13'),
                             'CODE_128' => tr('Code 128'),
+                            'UPC' => tr('UPC'),
                             'Auto' => tr('Auto')
                         ],
                     ]
@@ -80,6 +81,9 @@ class Tracker_Field_BarCode extends Tracker_Field_Text
                 }
                 if ($barcode_type == "EAN_13") {
                     $data['image_output'] = $this->generate1DCode("EAN13", intval($value));
+                }
+                if ($barcode_type == "UPC") {
+                    $data['image_output'] = $this->generate1DCode("UPCA", intval($value));
                 }
             }
             return $this->renderTemplate('trackeroutput/barcode.tpl', $context, $data);
@@ -154,6 +158,9 @@ class Tracker_Field_BarCode extends Tracker_Field_Text
         }
         if ($format == "CODE_128") {
             return $validatorslib->validateInput("barcode128");
+        }
+        if ($format == "UPC") {
+            return $validatorslib->validateInput("upc");
         }
         if ($format == "QR_CODE") {
             return strlen($value) > 1 || tra("QR Code very short"); //at least 2characters

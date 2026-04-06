@@ -40,7 +40,7 @@ class WikiPluginTikiDocFromCode extends PluginsLib
     }
     public function getDescription()
     {
-        return wikiplugin_tikidocfromcode_info();
+        return wikiplugin_tikidocfromcode_info()['description'];
     }
     public function run($data, $params)
     {

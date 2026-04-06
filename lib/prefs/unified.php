@@ -374,7 +374,7 @@ function prefs_unified_list()
             'description' => tr("Advanced morphology preprocessors to apply in the Manticore index, comma-separated.  For example libstemmer_en,libstemmer_fr. See Manticore manual for possible values."),
             'type' => 'text',
             'default' => '',
-            'help' => 'https://manual.manticoresearch.com/Creating_an_index/NLP_and_tokenization/Morphology',
+            'help' => 'https://manual.manticoresearch.com/Creating_a_table/NLP_and_tokenization/Morphology',
         ],
         'unified_manticore_always_index' => [
             'name' => tr('Manticore indexed full-text fields'),

@@ -256,7 +256,7 @@
                     {tr}Name{/tr}
                 </label>
                 <div class="col-sm-5">
-                    <input type="text" class="form-control" name="name" id="calendarName" value="{$name|escape}">
+                    <input type="text" class="form-control" name="name" id="calendarName" value="{$name|escape}" maxlength="{$MAX_CALENDAR_NAME_LENGTH}">
                 </div>
                 <div class="checkbox col-sm-3">
                     <input type="checkbox" name="show[calname]" id="showCalnamePopup" class="form-check-input" value="on"{if $show_calname eq 'y'} checked="checked"{/if}>
@@ -270,7 +270,7 @@
                     {tr}Description{/tr}
                 </label>
                 <div class="col-sm-5">
-                    <textarea name="description" rows="5" wrap="virtual" class="form-control" id="calendarDescription">{$description|escape}</textarea>
+                    {textarea name="description" rows="5" wrap="virtual" class="form-control" id="calendarDescription" maxlength="{$MAX_CALENDAR_DESCRIPTION_LENGTH}"}{$description|escape}{/textarea}
                 </div>
                 <div class="checkbox col-sm-3">
                     <input type="checkbox" id="showCalDescriptionPopup" class="form-check-input" name="show[description]" value="on"{if $show_description eq 'y'} checked="checked"{/if}>
@@ -436,18 +436,18 @@
             </label>
             <div class="col-sm-8">
                 <div>
-                    <input type="checkbox" class="form-check-input" id="select-all-days">
+                    <input type="checkbox" class="form-check-input js-select-all" id="select-all-days" data-select-all-target="viewdays[]">
                     <label class="form-check-label me-3" for="select-all-days">
                         {tr}Select all{/tr}
                     </label>
-                    <input type="checkbox" id="select-working-days" class="form-check-input">
+                    <input type="checkbox" id="select-working-days" class="form-check-input js-select-all" data-select-all-target=".js-viewday-working">
                     <label class="form-check-label" for="select-working-days">
                         {tr}Select working days{/tr}
                     </label>
                 </div>
                 {section name="viewdays" start=0 loop=7}
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="viewdays[]" value="{$smarty.section.viewdays.index}" {if !empty($info.viewdays) && in_array($smarty.section.viewdays.index,$info.viewdays)} checked="checked" {/if}>
+                    <input type="checkbox" class="form-check-input js-viewday {if $smarty.section.viewdays.index > 0 && $smarty.section.viewdays.index < 6}js-viewday-working{/if}" name="viewdays[]" value="{$smarty.section.viewdays.index}" {if !empty($info.viewdays) && in_array($smarty.section.viewdays.index,$info.viewdays)} checked="checked" {/if}>
                     <label class="form-check-label">
                         {$days_names[$smarty.section.viewdays.index]}
                     </label>

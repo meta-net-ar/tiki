@@ -157,6 +157,55 @@ class Tracker_Field_ItemsList extends \Tracker\Field\AbstractItemField implement
                             'field' => 'editable'
                         ],
                     ],
+                    'useTransfer' => [
+                        'name' => tr('Use Transfer List'),
+                        'description' => tr('A dual list box will be rendered as input control'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                    ],
+                    'filterable' => [
+                        'name' => tr('Filterable'),
+                        'description' => tr('Allow the user to filter items within the transfer list'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'depends' => [
+                            'field' => 'useTransfer',
+                            'value' => '1'
+                        ],
+                    ],
+                    'filterPlaceholder' => [
+                        'name' => tr('Filter Placeholder'),
+                        'description' => tr('Placeholder text for the filter input'),
+                        'filter' => 'text',
+                        'depends' => [
+                            'field' => 'filterable',
+                            'value' => '1'
+                        ],
+                    ],
+                    'sourceListTitle' => [
+                        'name' => tr('Source List Title'),
+                        'description' => tr('Title for the source list'),
+                        'filter' => 'text',
+                        'depends' => [
+                            'field' => 'useTransfer',
+                            'value' => '1'
+                        ],
+                    ],
+                    'targetListTitle' => [
+                        'name' => tr('Target List Title'),
+                        'description' => tr('Title for the target list'),
+                        'filter' => 'text',
+                        'depends' => [
+                            'field' => 'useTransfer',
+                            'value' => '1'
+                        ],
+                    ],
                     // TODO:
                     /*'addItemWikiTpl' => [
                         'name' => tr('Add Item Template Page'),
@@ -184,7 +233,7 @@ class Tracker_Field_ItemsList extends \Tracker\Field\AbstractItemField implement
         $list = $this->getItemLabels($items);
 
         $ret = [
-            'value' => '',
+            'value' => $requestData[$this->getInsertId()] ?? $items,
             'items' => $list,
         ];
 
@@ -259,6 +308,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
                 'links' => (bool)$this->getOption('linkToItems'),
                 'raw' => (bool)$this->getOption('displayFieldIdThere'),
                 'itemIds' => implode(',', $itemIds),
+                'itemIdsArray' => $itemIds,
                 'items' => $list,
                 'num' => count($list),
                 'itemPermissions' => [],
@@ -272,6 +322,7 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
             } else {
                 $editmode = false;
             }
+            $context['edit_mode'] = $editmode;
             if ($this->getOption('editable') && $editmode) {
                 $trackerThere = Tracker_Definition::get($this->getOption('trackerId'));
                 $fieldThere = $trackerThere->getField($this->getOption('fieldIdThere'));
@@ -295,6 +346,10 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
                     $data['parentItemId'] = $itemData[$this->getOption('fieldIdHere')];
                 }
 
+                if ($this->trackerField->getOption('useTransfer')) {
+                    $data['possibilities'] = $this->getPossibleItemValues();
+                }
+
                 $this->getClickModalJQ();
             }
             return $this->renderTemplate(
@@ -303,6 +358,124 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
                 $data
             );
         }
+    }
+
+    public function handleSave($value, $oldValue)
+    {
+        $oldValue = array_map('intval', $oldValue);
+        $value = array_map('intval', $value);
+        $removing = array_values(array_diff($oldValue, $value));
+        $allValues = array_unique(array_merge($oldValue, $value));
+        foreach ($allValues as $itemId) {
+            $trackerId = $this->trackerField->getOption('trackerId');
+            $definition = Tracker_Definition::get($trackerId);
+            $itemData = Tracker_Item::fromId($itemId)->getData();
+            $fieldId = $this->trackerField->getOption('fieldIdThere');
+            $fieldHandler = $definition->getFieldFactory()->getHandler(
+                $definition->getField($fieldId),
+                $itemData
+            );
+
+            $isRemove = in_array($itemId, $removing);
+
+            if (! $fieldHandler->canHaveMultipleValues()) {
+                if ($isRemove) {
+                    $newValue = '';
+                } else {
+                    $newValue = $this->getItemId();
+                }
+            } elseif ($isRemove) {
+                $newValue = $fieldHandler->removeValue($this->getItemId());
+            } else {
+                $newValue = $fieldHandler->addValue($this->getItemId());
+            }
+
+            TikiLib::lib('trk')->modify_field($itemId, $fieldId, $newValue);
+        }
+        return [
+            'value' => ''
+        ];
+    }
+
+    public function getPossibleItemValues()
+    {
+        if ($displayFieldsList = $this->getDisplayFieldsListArray()) {
+            if ($this->trackerField->getOption('displayFieldsListType') === 'table') {
+                $list = TikiLib::lib('trk')->get_fields_from_fieldslist(
+                    $this->trackerField->getOption('trackerId'),
+                    $displayFieldsList
+                );
+            } else {
+                $list = TikiLib::lib('trk')->concat_all_items_from_fieldslist(
+                    $this->trackerField->getOption('trackerId'),
+                    $displayFieldsList,
+                    $this->trackerField->getOption('status', 'opc'),
+                    ' ',
+                    'csv',
+                    true,
+                    $this->trackerField->getOption('displayFieldIdThereFormat')
+                );
+            }
+        } else {
+            $items = TikiLib::lib('trk')->get_all_items(
+                $this->trackerField->getOption('trackerId'),
+                $this->trackerField->getOption('fieldIdThere'),
+                $this->trackerField->getOption('status', 'opc'),
+                $this->getValue(),
+                'csv'
+            );
+
+            $list = [];
+            $trackerId = $this->trackerField->getOption('trackerId');
+            $definition = Tracker_Definition::get($trackerId);
+            $utilities = new Services_Tracker_Utilities();
+
+            foreach ($items as $itemId => $fieldIdThereValue) {
+                $item = $utilities->getItem($trackerId, $itemId);
+                $list[$itemId] = $utilities->getTitle($definition, $item);
+            }
+        }
+
+        return $list;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDisplayFieldsListArray()
+    {
+        global $user, $tiki_p_admin_trackers;
+
+        $fields = [];
+        $option = $this->trackerField->getOption('displayFieldIdThere');
+        if (! is_array($option)) {
+            $option = [$option];
+        }
+        // filter by user-visible fields
+        $remoteTrackerId = (int) $this->trackerField->getOption('trackerId');
+        $definition = Tracker_Definition::get($remoteTrackerId);
+        if ($definition) {
+            foreach (array_filter($option) as $fieldId) {
+                if (! $definition->hasFieldId($fieldId)) {
+                    Feedback::error(tr('ItemsList field "%0": displayFieldIdThere field ID #%1 not found', $this->getConfiguration('permName'), $fieldId));
+                    $trackerId = $this->getConfiguration('trackerId');
+                    $itemId = $this->getItemId();
+                    trigger_error("ItemsList data integrity error: tracker item {$itemId} in tracker {$trackerId} has an ItemsList pointing to non-existent fieldId {$fieldId} in remote tracker {$remoteTrackerId}");
+                    continue;
+                }
+                $field = $definition->getFieldInfoFromFieldId($fieldId);
+                if (
+                    $field['isPublic'] == 'y' && ($field['isHidden'] == 'n' || $field['isHidden'] == 'c' || $field['isHidden'] == 'p' || $field['isHidden'] == 'a' || $tiki_p_admin_trackers == 'y')
+                    && $field['type'] != 'x' && $field['type'] != 'h' && ($field['type'] != 'p' || $field['options_array'][0] != 'password')
+                    && (empty($field['visibleBy']) or array_intersect(TikiLib::lib('tiki')->get_user_groups($user), $field['visibleBy']) || $tiki_p_admin_trackers == 'y')
+                ) {
+                    $fields[] = $fieldId;
+                }
+            }
+        } else {
+            Feedback::error(tr('ItemsList field "%0": Tracker ID #%1 not found', $this->getConfiguration('permName'), $remoteTrackerId));
+        }
+        return $fields;
     }
 
     public function itemsRequireRefresh($trackerId, $modifiedFields)
@@ -997,7 +1170,7 @@ $(document).on("click", "a.itemslist-btn", $.clickModal({
             itemId: $itemsList.data("itemid"),
             fieldId: $itemsList.data("fieldid"),
             listMode: $itemsList.data("listmode"),
-            mode: "output"
+            mode: "input"
         })
         $.closeModal();
 

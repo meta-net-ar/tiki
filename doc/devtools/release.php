@@ -12,8 +12,6 @@
 // You can also get a detailed help on this script with:
 //    php doc/devtools/release.php --help
 //
-
-use Tiki\Smarty\SmartyTiki;
 use Tiki\TikiInit;
 
 include_once('lib/core/Tiki/TikiInit.php');
@@ -26,15 +24,7 @@ define('CHANGELOG_FILENAME', 'changelog.txt');
 define('CHANGELOG', ROOT . '/' . CHANGELOG_FILENAME);
 define('COPYRIGHTS_FILENAME', 'copyright.txt');
 define('COPYRIGHTS', ROOT . '/' . COPYRIGHTS_FILENAME);
-define('SF_TW_MEMBERS_URL', 'http://sourceforge.net/p/tikiwiki/_members');
-define('DEV_TW_MEMBERS_URL', 'http://dev.tiki.org/getTikiUser.php');
-define('README_FILENAME', 'README');
-define('README', ROOT . '/' . README_FILENAME);
 define('LICENSE_FILENAME', 'license.txt');
-
-define('PIPELINE_STATUS_PASSED', 'passed');
-define('PIPELINE_STATUS_FAILED', 'failed');
-define('PIPELINES_FETCH_AMOUNT', 25);
 
 // Display all errors and warnings, strict level already included in E_ALL in php 8.4
 define('ERROR_REPORTING_LEVEL', E_ALL);
@@ -143,12 +133,6 @@ if (empty($subrelease)) {
     $secdbVersion = "$version$subrelease";
 }
 
-if (! $options['no-readme-update'] && important_step("Update '" . README_FILENAME . "' file")) {
-    update_readme_file($secdbVersion, $version);
-    info('>> ' . README_FILENAME . ' file updated.');
-    important_step('Commit updated ' . README_FILENAME . ' file', true, "[REL] Update " . README_FILENAME . " file for $secdbVersion");
-}
-
 if (! $options['no-lang-update'] && important_step("Update language files")) {
     passthru("$phpCommand console.php translation:getstrings");
     $removeFiles = glob('lang/*/language.php.old');
@@ -180,42 +164,16 @@ if (! $options['no-changelog-update'] && important_step("Update '" . CHANGELOG_F
 $nbCommiters = 0;
 if (! $options['no-copyright-update'] && important_step("Update '" . COPYRIGHTS_FILENAME . "' file (using final version number '$version')")) {
     if ($ucf = update_copyright_file($mainversion . '.0')) {
-        info(
-            "\r>> Copyrights updated: "
-            . ($ucf['newContributors'] == 0 ? 'No new contributor, ' : "+{$ucf['newContributors']} contributor(s), ")
-            . ($ucf['newCommits'] == 0 ? 'No new commit' : "+{$ucf['newCommits']} commit(s)")
-        );
+        info("\r>> Copyrights updated: {$ucf['contributors']} contributors " . "and {$ucf['commits']} commits");
         important_step("Commit new " . COPYRIGHTS_FILENAME, true, "[REL] Update " . COPYRIGHTS_FILENAME . " for $secdbVersion");
     } else {
         error('Copyrights update failed.');
     }
 }
 
-if (! $options['no-check-db'] && important_step("Check Database related files and upgrade scripts")) {
-    $error_msg = '';
-    check_database_files_and_upgrade($mainversion, $error_msg) or error($error_msg . "If you want to disable this checks use --no-check-db\n");
-    info('>> Current database scripts successfully passed the check.');
-}
-
-if (! $options['no-check-php'] && important_step("Check syntax of all PHP files")) {
-    $error_msg = '';
-    $dir = '.';
-    check_php_syntax($dir, $error_msg, $options['no-check-php-warnings']) or error($error_msg);
-    info('>> Current PHP code successfully passed the syntax check.');
-}
-
-if (! $options['no-check-smarty'] && important_step("Check syntax of all Smarty templates")) {
-    $error_msg = '';
-    require_once ROOT . '/lib/core/TikiDb.php';
-    require_once ROOT . '/lib/core/TikiDb/Bridge.php';
-    require_once ROOT . '/lib/language/Language.php';
-    check_smarty_syntax($error_msg);
-    info('>> Current Smarty code successfully passed the syntax check.');
-}
-
 if (! $options['no-secdb'] && important_step("Update SecDB file(s) 'db/tiki-secdb_{$version}_mysql.sql'")) {
     if (updateSecdb($TWV->version)) {
-        important_step("Commit SecDB file changes", true, "[REL] SecDB for $secdbVersion");
+        print "SecDB file has been successfully created\n";
     }
 }
 
@@ -368,7 +326,7 @@ function build_secdb_queries($dir, $version, &$queries, $excludes = [])
         }
         if (is_dir($entry)) {
             // do not descend and no git files
-            if ($e != '..' && $e != '.' && $e != '.git' && $e != '.gitignore' && $entry != ROOT . '/' . TEMP_PATH && $entry != ROOT . '/' . TIKI_VENDOR_CUSTOM_PATH && $entry != ROOT . '/' . TIKI_CUSTOMIZATIONS_SRC_PATH) {
+            if ($e != '..' && $e != '.' && $e != '.git' && $e != '.gitignore' && $e != 'node_modules' && $entry != ROOT . '/' . TEMP_PATH && $entry != ROOT . '/' . TIKI_VENDOR_CUSTOM_PATH && $entry != ROOT . '/' . TIKI_CUSTOMIZATIONS_SRC_PATH) {
                 build_secdb_queries($entry, $version, $queries, $excludes);
             }
         } else {
@@ -467,7 +425,7 @@ function rrmdir($dir)
 
 /**
  *
- * Recursivley deletes specific files or directories
+ * Recursively deletes specific files or directories
  *
  * @param string $src Directory to search through
  * @param array $files An array of file names to delete.
@@ -639,7 +597,7 @@ function build_packages($releaseVersion)
     }
 
     echo "Running node install and build\n";
-    $npmInstall = "cd $sourceDir; npm install --clean-install --engine-strict";
+    $npmInstall = "cd $sourceDir; npm clean-install --engine-strict";
     exec($npmInstall, $npmInstallOutput, $npmInstallExitCode);
     if ($npmInstallExitCode !== 0) {
         error("npm install failed. Exiting.", $npmInstallExitCode);
@@ -736,334 +694,6 @@ function build_packages($releaseVersion)
 }
 
 /**
- * @param $dir
- * @param $entries
- * @param $regexp_pattern
- * @return bool
- */
-function get_files_list($dir, &$entries, $regexp_pattern)
-{
-    $d = dir($dir);
-    while (false !== ($e = $d->read())) {
-        $entry = $dir . '/' . $e;
-        if (is_dir($entry)) {
-            // do not descend and no git files
-            if ($e != '..' && $e != '.' && $e != '.git' && $e != '.gitignore' && $entry != './' . SMARTY_COMPILED_TEMPLATES_PATH && $entry != './' . TIKI_VENDOR_BUNDLED_PATH) {
-                if (! get_files_list($entry, $entries, $regexp_pattern)) {
-                    return false;
-                }
-            }
-        } elseif (preg_match($regexp_pattern, $e) && realpath($entry) != __FILE__) {
-            $entries[] = $entry;
-        }
-    }
-    $d->close();
-    return true;
-}
-
-/**
- * @param $alreadyDone
- * @param $toDo
- * @param $message
- */
-function display_progress_percentage($alreadyDone, $toDo, $message)
-{
-    $onePercent = ceil($toDo / 100);
-    if ($alreadyDone % $onePercent === 0 || $alreadyDone == $toDo) {
-        $percentage = ($alreadyDone >= $toDo - $onePercent) ? 100 : min(100, $alreadyDone / $onePercent);
-        printf("\r$message", $percentage);
-    }
-}
-
-function zone_is_empty()
-{
-    // dummy function to keep smarty happy
-}
-
-/**
- * @param $error_msg
- */
-function check_smarty_syntax(&$error_msg)
-{
-    global $tikidomain, $prefs;
-    $tikidomain = '';
-    // Initialize $prefs with some variables needed by the tra() function and smarty autosave plugin
-    $prefs = [
-        'lang_use_db' => 'n',
-        'language' => 'en',
-        'site_language' => 'en',
-        'feature_ajax' => 'n'
-    ];
-
-    // Load Tiki Smarty
-    $prefs['smarty_compilation'] = 'always';
-    $prefs['smarty_security'] = 'y';
-    $prefs['maxRecords'] = 25;
-    $prefs['log_tpl'] = 'y';
-    $prefs['feature_sefurl_filter'] = 'y';
-    $prefs['site_layout'] = 'basic';
-    require_once 'lib/init/initlib.php';
-    define('TIKI_PATH', getcwd());
-    require_once 'lib/smarty_tiki/prefilter.tr.php';
-    require_once 'lib/smarty_tiki/prefilter.jq.php';
-    require_once 'lib/smarty_tiki/prefilter.log_tpl.php';
-    $smarty = new SmartyTiki();
-    set_error_handler('check_smarty_syntax_error_handler');
-
-    $templates_dir = TIKI_PATH . '/' . SMARTY_TEMPLATES_PATH;
-
-    // tell TikiDb we don't need the database
-    define('DB_TIKI_SETUP', 0);
-
-    $errors_found = false;
-    $entries = [];
-    get_files_list($templates_dir, $entries, '/\.tpl$/');
-
-    $nbEntries = count($entries);
-    for ($i = 0; $i < $nbEntries; $i++) {
-        display_progress_percentage($i, $nbEntries, '%d%% of files passed the Smarty syntax check');
-
-        if (! str_contains($entries[$i], 'tiki-mods.tpl')) {
-            $template_file = substr($entries[$i], strlen($templates_dir) + 1);
-
-            try {
-                $_tpl = $smarty->createTemplate($template_file, null, null, null, false);
-                $_tpl->compileTemplateSource();
-            } catch (Exception $e) {
-                echo color("\nError: " . $e->getMessage(), 'red') . "\n";
-                $errors_found = true;
-            }
-        }
-    }
-    restore_error_handler();
-    @define('DB_TIKI_SETUP', 1);    // suppress notice about redefining a constant TODO better
-
-    echo "\n";
-
-    if ($errors_found) {
-        die('Fix the Smarty errors and try again please.');
-    }
-}
-
-
-/**
- * @param $errno
- * @param $errstr
- * @param string $errfile
- * @param int $errline
- * @param array $errcontext
- */
-function check_smarty_syntax_error_handler($errno, $errstr, $errfile = '', $errline = 0, $errcontext = [])
-{
-    if (! str_contains($errstr, 'filemtime(): stat failed for')) {    // smarty seems to emit these for every file
-        echo "\n" . color($errstr, 'red') . "\n";
-    }
-    return true;
-}
-
-/**
- * @param $dir
- * @param $error_msg
- * @param $hide_php_warnings
- * @return bool
- */
-function check_php_syntax(&$dir, &$error_msg, $hide_php_warnings)
-{
-    global $phpCommand;
-    $checkPhpCommand = $phpCommand . (ERROR_REPORTING_LEVEL > 0 ? ' -d error_reporting=' . (int)ERROR_REPORTING_LEVEL : '');
-
-    $entries = [];
-    get_files_list($dir, $entries, '/\.php$/');
-
-    $nbEntries = count($entries);
-    for ($i = 0; $i < $nbEntries; $i++) {
-        display_progress_percentage($i, $nbEntries, '%d%% of files passed the PHP syntax check');
-        $return_var = 0;
-        $output = null;
-        exec("$checkPhpCommand -l {$entries[$i]} 2>&1", $output, $return_var);
-        $fullOutput = implode("\n", $output);
-
-        if (str_contains($fullOutput, 'Segmentation fault')) {
-            // If php -l command segfaults, wait and retry (it seems to happen quite often on some environments for this command)
-            echo "\r[Retrying due to a Segfault...]";
-            sleep(1);
-            $i--;
-        } elseif ($return_var !== 0) {
-            // Handle PHP errors
-            $fullOutput = trim($fullOutput);
-            $error_msg = ($fullOutput == '') ? "\nPHP Parsing error in '{$entries[$i]}' ($return_var)\n" : "\n$fullOutput";
-            return false;
-        } elseif (! $hide_php_warnings && ($nb_lines = count($output)) > 1 && ! preg_match(THIRD_PARTY_LIBS_PATTERN, $entries[$i])) {
-            // Handle PHP warnings / notices (this just displays a yellow warning, it doesn't return false or an error_msg)
-            // and exclude some third party libs when displaying warnings from the PHP syntax check, because we can't fix it directly by the way.
-            echo "\r";
-            foreach ($output as $k => $line) {
-                // Remove empty lines and last line (because in case of a simple warning, the last line simply says 'No syntax errors...')
-                if (trim($line) == '' || $k == $nb_lines - 1) {
-                    continue;
-                }
-                echo color("$line\n", 'yellow');
-            }
-            display_progress_percentage($i, $nbEntries, '%d%% of files passed the PHP syntax check');
-        }
-        unset($output, $return_var);
-    }
-
-    echo "\n";
-    return true;
-}
-
-/**
- * Check the CI Pipeline for the result of the specific checks regarding the DB structure
- *
- * @param string $mainversion
- * @param string $error_msg
- * @return bool
- */
-function check_database_files_and_upgrade($mainversion, &$error_msg)
-{
-    $gitlabUrl = 'https://gitlab.com';
-    $gitlabRepo = $gitlabUrl . '/tikiwiki/tiki';
-
-    $branchToCheck = $mainversion . '.x';
-
-    $pipeline = gitlabGetLastFinishedPipelineByBranch($gitlabRepo, $branchToCheck);
-
-    if (empty($pipeline)) {
-        echo color('Could not retrieve pipeline information for branch ' . $branchToCheck . "\n", 'red');
-        echo color(
-            'You can check manually using ' . $gitlabRepo . '/pipelines/?scope=branches&format=json&ref=' . $branchToCheck . "\n",
-            'yellow'
-        );
-        $error_msg .= 'Information about the CI pipeline could not be retrieved' . "\n";
-        return false;
-    }
-
-    echo color(
-        'Checking jobs for branch ' . $branchToCheck . ', pipeline: ' . $gitlabUrl . $pipeline['url'] . "\n",
-        'yellow'
-    );
-
-    $jobs = gitlabGetJobStatusByPipeline($gitlabRepo, $pipeline['id']);
-
-    if (empty($pipeline)) {
-        echo color('Could not retrieve jobs information for pipeline ' . $pipeline['id'] . "\n", 'red');
-        echo color('You can check manually using ' . $gitlabUrl . $pipeline['url'] . "\n", 'yellow');
-        $error_msg .= 'Information about jobs in the CI pipeline could not be retrieved' . "\n";
-        return false;
-    }
-
-    $checkList = [
-        'schema-naming-convention' => '1.1.2.1. Check _tiki.sql suffixes',
-        'db-upgrade-' => '1.1.2.2. Structure',
-        'schema-sql-drop' => '1.1.2.3. Drop Table',
-        'sql-engine' => '1.1.2.4. MyISAM',
-        'sql-engine-conversion' => '1.1.2.5. InnoDB',
-    ];
-
-    $allOk = true;
-
-    foreach ($checkList as $checkPrefix => $checkName) {
-        foreach ($jobs['tiki-check'] as $jobName => $job) {
-            if (str_starts_with($jobName, $checkPrefix)) {
-                echo color(
-                    $checkName . ': ' . $job['status'] . ', job: ' . $jobName . ', url: ' . $gitlabUrl . $job['url'] . "\n",
-                    $job['status'] == PIPELINE_STATUS_PASSED ? 'green' : 'red'
-                );
-                if ($job['status'] != PIPELINE_STATUS_PASSED) {
-                    $error_msg .= 'Issues with job ' . $jobName . ' in the CI Pipeline' . "\n";
-                    $allOk = false;
-                }
-            }
-        }
-    }
-
-    return $allOk;
-}
-
-/**
- * Lookup the ID of the last finished pipeline run for
- * a given branch with status 'passed' or 'failed'.
- *
- * @param string $repoUrl Url of the repo in gitlab
- * @param string $branch Branch to use for filtering
- * @param integer $page Page associated with the cycle (recursive lookup)
- * @return array|bool The result or false if error
- */
-function gitlabGetLastFinishedPipelineByBranch($repoUrl, $branch, $page = 1)
-{
-    $lastPipelineByBranch = $repoUrl . '/pipelines/?scope=finished&format=json&per_page=' . PIPELINES_FETCH_AMOUNT . '&page=' . $page . '&ref=' . $branch;
-
-    if (getenv('TEST_GITLAB_PIPELINE')) {
-        $lastPipelineByBranch = getenv('TEST_GITLAB_PIPELINE'); // to allow fake the answer while testing
-    }
-
-    $content = file_get_contents($lastPipelineByBranch);
-    $jsonContent = json_decode($content, true);
-    if (! empty($jsonContent) && empty($jsonContent['pipelines'])) {
-        return [];
-    }
-
-    if (empty($jsonContent)) {
-        return false;
-    }
-
-    $pipeline = array_filter(
-        $jsonContent['pipelines'],
-        function ($pipeline) use ($branch) {
-            return $pipeline['ref']['name'] === $branch &&
-                ($pipeline['details']['status']['text'] === PIPELINE_STATUS_PASSED ||
-                    $pipeline['details']['status']['text'] === PIPELINE_STATUS_FAILED);
-        }
-    );
-
-    if (empty($pipeline)) {
-        if ($page >= 50) {
-            return false;
-        }
-        return gitlabGetLastFinishedPipelineByBranch($repoUrl, $branch, ++$page);
-    }
-
-    $pipeline = reset($pipeline);
-    return ['id' => $pipeline['id'], 'url' => $pipeline['path']];
-}
-
-/**
- * Returns the list of stages and the jobs for each of the stages
- *
- * @param string $repoUrl Url of the repo in gitlab
- * @param string $pipelineId Pipeline ID from where to retrieve the list of jobs
- * @return array|bool The result or false if error
- */
-function gitlabGetJobStatusByPipeline($repoUrl, $pipelineId)
-{
-    $pipelineJobsUrl = $repoUrl . '/pipelines/' . $pipelineId . '?format=json';
-
-    if (getenv('TEST_GITLAB_JOBS')) {
-        $pipelineJobsUrl = getenv('TEST_GITLAB_JOBS'); // to allow fake the answer while testing
-    }
-
-    $content = file_get_contents($pipelineJobsUrl);
-    $jsonContent = json_decode($content, true);
-    if (empty($jsonContent)) {
-        return false;
-    }
-
-    $stages = [];
-    foreach ($jsonContent['details']['stages'] as $stage) {
-        $jobs = [];
-        foreach ($stage['groups'] as $group) {
-            foreach ($group['jobs'] as $job) {
-                $jobs[$job['name']] = ['status' => $job['status']['text'], 'url' => $job['status']['details_path']];
-            }
-        }
-        $stages[$stage['name']] = $jobs;
-    }
-
-    return $stages;
-}
-
-/**
  * @return array|bool
  */
 function get_options()
@@ -1076,16 +706,9 @@ function get_options()
     $options = [
         'howto' => false,
         'help' => false,
-        'http-proxy' => false,
-        'mirror-uri' => false,
         'no-commit' => false,
         'no-check-vcs' => false,
-        'no-check-db' => false,
-        'no-check-php' => false,
-        'no-check-php-warnings' => false,
-        'no-check-smarty' => false,
         'no-first-update' => false,
-        'no-readme-update' => false,
         'no-lang-update' => false,
         'no-changelog-update' => false,
         'no-copyright-update' => false,
@@ -1114,23 +737,6 @@ function get_options()
         if (str_starts_with($arg, '--')) {
             if (($opt = substr($arg, 2)) != '' && isset($options[$opt])) {
                 $options[$opt] = true;
-            } elseif (substr($arg, 2, 11) == 'http-proxy=') {
-                if (($proxy = substr($arg, 13)) != '') {
-                    $options[substr($arg, 2, 10)] = stream_context_create(
-                        [
-                            'http' => [
-                                'proxy' => 'tcp://' . $proxy,
-                                'request_fulluri' => true
-                            ]
-                        ]
-                    );
-                } else {
-                    $options[substr($arg, 2, 10)] = true;
-                }
-            } elseif (substr($arg, 2, 15) == 'mirror-uri=') {
-                if (($uri = substr($arg, 17)) != '') {
-                    $options[substr($arg, 2, 14)] = $uri;
-                }
             } elseif (str_contains($arg, '=')) {
                 $parts = explode('=', substr($arg, 2));
                 if (isset($options[$parts[0]])) {
@@ -1145,10 +751,6 @@ function get_options()
     }
     $_SERVER['argv'] = $argv;
     unset($argv);
-
-    if ($options['http-proxy'] === true) {
-        error("The --http-proxy option need a value. Use it this way: --http-proxy=HOST_DOMAIN:PORT_NUMBER");
-    }
 
     if ($_SERVER['argc'] == 2) {
         $_SERVER['argv'][] = '';
@@ -1361,30 +963,62 @@ EOS;
     return $versionHeader;
 }
 
-/**
- * @param $newVersion
- * @return array|bool
- */
 function update_copyright_file($newVersion)
 {
     if (! is_readable(COPYRIGHTS) || ! is_writable(COPYRIGHTS)) {
         error('The copyright file "' . COPYRIGHTS . '" is not readable or writable.');
     }
-    global $nbCommiters, $nbMembersSf, $options;
-    $nbCommiters = 0;
+    global $nbCommiters;
+
+    // Single git scan (fast)
+    $cmd = 'git log --pretty=format:"%aN||%aE||%at"';
+    $lines = explode("\n", shell_exec($cmd));
+
     $contributors = [];
 
-    $repositoryUri = empty($options['mirror-uri']) ? TIKIVCS : $options['mirror-uri']; //
-    if (str_starts_with($repositoryUri, '/')) {
-        $repositoryUri = 'file://' . $repositoryUri;
+    foreach ($lines as $line) {
+        if (! $line) {
+            continue;
+        }
+
+        list($name, $email, $ts) = explode('||', $line);
+
+        $key = strtolower(trim($email));
+
+        if (! isset($contributors[$key])) {
+            $contributors[$key] = [
+                'Nickname' => $name,
+                'Name' => $name,
+                'FirstTS' => (int)$ts,
+                'LastTS' => (int)$ts,
+                'Number of Commits' => 1,
+            ];
+        } else {
+            $contributors[$key]['Number of Commits']++;
+
+            if ($ts < $contributors[$key]['FirstTS']) {
+                $contributors[$key]['FirstTS'] = (int)$ts;
+            }
+
+            if ($ts > $contributors[$key]['LastTS']) {
+                $contributors[$key]['LastTS'] = (int)$ts;
+            }
+        }
     }
-    $repositoryInfo = get_revision($repositoryUri);
 
-    $oldContributors = parse_copyrights();
-    get_contributors_data($repositoryUri, $contributors, 1, $repositoryInfo);
-    ksort($contributors);
+    // Convert timestamps to readable dates
+    foreach ($contributors as &$c) {
+        $c['First Commit'] = gmdate("Y-m-d", $c['FirstTS']);
+        $c['Last Commit']  = gmdate("Y-m-d", $c['LastTS']);
+        unset($c['FirstTS'], $c['LastTS']);
+    }
+    unset($c);
 
-    $totalContributors = count($contributors);
+    // Sort alphabetically by name
+    uasort($contributors, fn($a, $b) => strcasecmp($a['Name'], $b['Name']));
+
+    $nbCommiters = count($contributors);
+    $totalContributors = $nbCommiters;
     $now = gmdate('Y-m-d');
 
     $copyrights = <<<EOS
@@ -1394,9 +1028,7 @@ Tiki Copyright
 The following list attempts to gather the copyright holders for Tiki
 as of version $newVersion.
 
-Accounts listed below with commits have contributed source code to CVS or SVN.
-Please note that even more people contributed on various other aspects (documentation,
-bug reporting, testing, etc.)
+Accounts listed below with commits have contributed source code.
 
 This is how we implement the Tiki Social Contract.
 http://tiki.org/Social+Contract
@@ -1404,218 +1036,38 @@ http://tiki.org/Social+Contract
 List of members of the Community
 As of $now, the community has:
   * $totalContributors members,
-  * $nbMembersSf members on SourceForge.net,
   * $nbCommiters of those people who made at least one code commit
 
 This list is automatically generated and alphabetically sorted
 from git repository by the following script:
   doc/devtools/release.php
 
-Counting the commits is not as trivial as it may sound. If your number of commits
-seems incorrect, it could be that the script is not detecting them all. This
-has been reported especially for commits early on in the project. Nonetheless,
-the list provides a general idea.
-
 ====================================================================
 
 EOS;
 
-    $return = ['newCommits' => 0, 'newContributors' => 0];
-    foreach ($contributors as $author => $infos) {
-        if (isset($oldContributors[$author])) {
-            if ($oldContributors[$author] != $infos) {
-                // Quickfix to keep old dates which may be different due to which time zone is used
-                if (isset($oldContributors[$author]['First Commit'])) {
-                    $infos['First Commit'] = $oldContributors[$author]['First Commit'];
-                    if (
-                        isset($oldContributors[$author]['Number of Commits']) && isset($oldContributors[$author]['Number of Commits'])
-                        && isset($infos['Number of Commits'])  && $oldContributors[$author]['Number of Commits'] == $infos['Number of Commits']
-                    ) {
-                        $infos['Last Commit'] = $oldContributors[$author]['Last Commit'];
-                    }
-                }
-                if (isset($infos['Number of Commits'])) {
-                    if (isset($oldContributors[$author]['Number of Commits'])) {
-                        $return['newCommits'] += ($infos['Number of Commits'] - $oldContributors[$author]['Number of Commits']);
-                    }
-                }
-            }
-        } else {
-            $return['newContributors']++;
-        }
-        $copyrights .= "\nNickname: $author";
-        $orderedKeys = ['Name', 'First Commit', 'Last Commit', 'Number of Commits', 'SF Role'];
+    foreach ($contributors as $info) {
+        $copyrights .= "\nName: {$info['Nickname']}";
+
+        $orderedKeys = ['Name', 'First Commit', 'Last Commit', 'Number of Commits'];
+
         foreach ($orderedKeys as $k) {
-            if (empty($infos[$k]) || ($k == 'Name' && $infos[$k] == $author)) {
+            if (empty($info[$k]) || ($k === 'Name' && $info[$k] === $info['Nickname'])) {
                 continue;
             }
-            $copyrights .= "\n$k: " . $infos[$k];
+
+            $copyrights .= "\n$k: " . $info[$k];
         }
+
         $copyrights .= "\n";
     }
 
-    return file_put_contents(COPYRIGHTS, $copyrights) ? $return : false;
-}
+    file_put_contents(COPYRIGHTS, $copyrights);
 
-/**
- * @return array|bool
- */
-function parse_copyrights()
-{
-    if (! $copyrights = @file(COPYRIGHTS)) {
-        return false;
-    }
-
-    $return = [];
-    $curNickname = '';
-
-    foreach ($copyrights as $line) {
-        if (empty($line)) {
-            continue;
-        }
-        if (str_starts_with($line, 'Nickname: ')) {
-            $curNickname = rtrim(substr($line, 10));
-            $return[$curNickname] = [];
-        } elseif ($curNickname != '' && ($pos = strpos($line, ':')) !== false) {
-            $return[$curNickname][substr($line, 0, $pos)] = rtrim(substr($line, $pos + 2));
-        }
-    }
-
-    return $return;
-}
-
-/**
- * @param $path
- * @param $contributors
- * @param $minRevision
- * @param $maxRevision
- * @param int $step
- * @return mixed
- */
-function get_contributors_data($path, &$contributors, $minRevision, $maxRevision, $step = 20000)
-{
-    global $nbCommiters, $nbMembersSf;
-    if (empty($contributors)) {
-        get_contributors_sf_data($contributors);
-        info(">> Retrieved members list from Sourceforge.");
-    }
-    $nbMembersSf = count($contributors);
-
-    get_contributors($path, $contributors, $minRevision, $maxRevision, $step);
-    $nbCommiters = count(array_filter($contributors, function ($contributor) {
-        // Get count contributors with commits
-        return count($contributor) > 2;
-    }));
-    return $contributors;
-}
-
-/**
- * @param $contributors
- */
-function get_contributors_sf_data(&$contributors)
-{
-    global $options;
-    $matches = [];
-
-    if (! function_exists('iconv')) {
-        error("PHP 'iconv' function is not available on this system. Impossible to get SF.net data.");
-    }
-
-    $html = $options['http-proxy'] ? file_get_contents(SF_TW_MEMBERS_URL, 0, $options['http-proxy']) : file_get_contents(SF_TW_MEMBERS_URL);
-
-    if (! empty($html) && preg_match('/(<table.*<\/\s*table>)/sim', $html, $matches)) {
-        $usersInfo = [];
-        if (preg_match_all('/<tr[^>]*>' . str_repeat('\s*<td[^>]*>(.*)<\/td>\s*', 3) . '<\/\s*tr>/Usim', $matches[0], $usersInfo, PREG_SET_ORDER)) {
-            foreach ($usersInfo as $k => $userInfo) {
-                $userInfo = array_map('trim', array_map('strip_tags', $userInfo));
-                $user = strtolower($userInfo['2']);
-                if (empty($user)) {
-                    continue;
-                }
-                $contributors[$user] = [
-                    'Name' => html_entity_decode(iconv("ISO-8859-15", "UTF-8", $userInfo['1']), ENT_COMPAT, 'UTF-8'),
-                    'SF Role' => $userInfo['3']
-                ];
-            }
-        }
-    } else {
-        error('Impossible to get SF.net users information. If you need to use a web proxy, try the --http-proxy option.');
-        die;
-    }
-}
-
-/**
- * @param $releaseVersion
- * @param $mainVersion
- * @return bool
- */
-function update_readme_file($releaseVersion, $mainVersion)
-{
-    if (! is_readable(README) || ! is_writable(README)) {
-        error('The README file "' . README . '" is not readable or writable.');
-        die;
-    }
-
-    $year = gmdate('Y');
-    $copyrights_file = COPYRIGHTS_FILENAME;
-    $license_file = LICENSE_FILENAME;
-
-    $majorVersion = substr($mainVersion, 0, strpos($mainVersion, '.'));
-    $release_notes_url = 'http://doc.tiki.org/Tiki' . $majorVersion;
-    // Changed from Tiki 12 to point to http://doc.tiki.org/Tiki12 instead of http://tiki.org/ReleaseNotes30
-
-    $readme = <<<EOF
-Tiki Wiki CMS Groupware
-Version $releaseVersion
-
-Started in 2002, Tiki Wiki CMS Groupware is a web application combining
-the features of a wiki, a content management system (CMS) and groupware.
-It is the Free/Libre and Open Source (FLOSS) web application with the most built-in features, https://tiki.org/Features.
-
-CONTRIBUTING
-
-* Tiki is driven by the contributions of an active community of developers and
-  translators who participate in its development.
-  You can be the next contributor to the Tiki source code or documentation.
-  Please check the Wishlist, https://dev.tiki.org/Wishlist,
-  for bugs or feature requests you can start developing or create new ones if you don't find them listed.
-
-
-DOCUMENTATION
-
-* You have access to a diverse source of support through documentation, forum, events, etc.
-
-* The documentation for $mainVersion version is ever evolving at http://doc.tiki.org.
-  You're encouraged to contribute.
-
-* It is highly recommended that you refer to the online documentation:
-* http://doc.tiki.org/Installation for a setup guide
-
-* Notes about this release are accessible from $release_notes_url
-* Tiki has an active Gitter community, join us at https://gitter.im/tiki-org/community.
-
-INSTALLATION
-
-* There is a file INSTALL in this directory with notes on how to setup and
-  configure Tiki. Again, see http://doc.tiki.org/Installation for the latest install help.
-
-UPGRADES
-
-* Read the online instructions if you want to upgrade your Tiki from a previous release http://doc.tiki.org/Upgrade
-
-COPYRIGHT
-
-Copyright (c) 2002-$year, Luis Argerich, Garland Foster, Eduardo Polidor, et. al.
-Tiki was started under the name tikiwiki by Luis Argerich, Garland Foster, Eduardo Polidor, et. al.
-All Rights Reserved. See $copyrights_file for details and a complete list of authors.
-Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See $license_file for details.
-
-... Have fun!
-
-Note to Tiki developers: update this text through release.php.
-EOF;
-
-    return (bool)file_put_contents(README, $readme);
+    return [
+        'contributors' => $totalContributors,
+        'commits' => count($lines)
+    ];
 }
 
 function display_usage()
@@ -1629,16 +1081,9 @@ Examples:
 Options:
     --howto                   : display the Tiki release HOWTO
     --help                    : display this help
-    --http-proxy=HOST:PORT    : use a http proxy to get copyright data on sourceforge
-    --mirror-uri=URI          : use another repository URI to update the copyrights file (to avoid retrieving data from sourceforge, which is usually slow)
-    --no-commit               : do not commit any changes back to SVN or GIT
+    --no-commit               : do not commit any changes back to GIT
     --no-check-vcs            : do not check if there are uncommitted changes on the checkout used for the release
-    --no-check-db             : do not check database scripts and database upgrades
-    --no-check-php            : do not check syntax of all PHP files
-    --no-check-php-warnings   : do not display PHP warnings and notices during the PHP syntax check
-    --no-check-smarty         : do not check syntax of all Smarty templates
     --no-first-update         : do not vcs update the checkout used for the release as the first step
-    --no-readme-update        : do not update the '" . README_FILENAME . "' file
     --no-lang-update          : do not update lang/*/language.php files
     --no-changelog-update     : do not update the '" . CHANGELOG_FILENAME . "' file
     --no-copyright-update     : do not update the '" . COPYRIGHTS_FILENAME . "' file

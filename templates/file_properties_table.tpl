@@ -1,4 +1,5 @@
 {strip}
+    <div class="styling-element">
 <table class="table">
     {foreach item=prop key=propname from=$fgal_listing_conf}
         {if isset($item.key)}
@@ -61,4 +62,5 @@
         {/if}
     {/foreach}
 </table>
+    </div>
 {/strip}

@@ -55,9 +55,11 @@ $inputConfiguration = [
 ];
 
 // Initialization
-$section = 'wiki page';
 $isHomePage = (! isset($_REQUEST['page']));
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 
 $multilinguallib = TikiLib::lib('multilingual');
 

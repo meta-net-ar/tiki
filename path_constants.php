@@ -99,6 +99,7 @@ const TEMP_CACHE_PATH = 'temp/cache';
 const TEMP_PUBLIC_PATH = 'temp/public';
 const TEMP_MAIL_DEBUG = 'temp/mail_debug';
 const HTMLPURIFIERCACHE_CACHE_PATH = 'temp/cache/HTMLPurifierCache';
+const TEMP_PDFIMG_PATH = 'temp/pdfimg';
 
 const WIKIPLUGINS_SRC_PATH = 'lib/wiki-plugins';
 //Question: where is the string or constant that generates these files?
@@ -192,7 +193,7 @@ const CONVERSEJS_DIST_PATH = 'public/generated/js/vendor_dist/converse.js/dist';
 const FONTAWESOME_CSS_SRC_PATH = 'node_modules/@fortawesome/fontawesome-free/css';
 const FONTAWESOME_CSS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free/css';
 const FONTAWESOME_WEBFONTS_PATH = 'public/generated/js/vendor_dist/@fortawesome/fontawesome-free/webfonts';
-const MINICART_DIST_PATH = 'public/generated/js/vendor_dist/minicart/dist';
+
 const OL_PATH = 'public/generated/js/vendor_dist/ol'; // 'ol' was formerly called 'openlayers'
 const OL_LAYERSWITCHER_DIST_PATH = 'public/generated/js/vendor_dist/ol-layerswitcher/dist';
 const PIVOTTABLE_DIST_PATH = 'vendor_bundled/vendor/nicolaskruchten/pivottable/dist';

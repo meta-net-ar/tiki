@@ -11,22 +11,25 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'parent'                      => 'int',               //post
-            'categId'                     => 'int',               //get
-            'remove'                      => 'int',               //get
-            'update'                      => 'bool',              //get
-            'mutual'                      => 'bool',              //get
-            'add'                         => 'bool',              //get
-            'oldcategId'                  => 'int',               //post
-            'offset'                      => 'int',               //get
-            'find'                        => 'string',            //post
-            'sort_mode'                   => 'string',            //get
+            'parent'                      => 'int',       // post
+            'categId'                     => 'int',       // get
+            'remove'                      => 'bool',      // get
+            'update'                      => 'bool',      // get
+            'mutual'                      => 'word',      // get
+            'add'                         => 'bool',      // get
+            'oldcategId'                  => 'int',       // post
+            'offset'                      => 'int',       // get
+            'find'                        => 'striptags', // post
+            'sort_mode'                   => 'word',       // get
         ],
     ],
 ];
-
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_DIRECTORY;
+Sections::setCurrentSection($section);
 include_once('lib/directory/dirlib.php');
+
 $access->check_feature('feature_directory');
 $access->check_permission('tiki_p_admin_directory_cats');
 // If no parent category then the parent category is 0
@@ -87,7 +90,6 @@ $smarty->assign('categs', $categs);
 $all_categs = $dirlib->dir_get_all_categories(0, -1, 'name_asc', $find);
 $smarty->assign('all_categs', $all_categs);
 // This page should be displayed with Directory section options
-$section = 'directory';
 include_once('tiki-section_options.php');
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

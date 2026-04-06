@@ -229,4 +229,25 @@ class PdoDb extends TikiDb
 
         self::$queryLogHandlerInstalled = true;
     }
+
+    public function beginTransaction(): bool
+    {
+        return $this->db->beginTransaction();
+    }
+
+    public function commit(): bool|null
+    {
+        if ($this->db->inTransaction()) {
+            return $this->db->commit();
+        }
+        return null;
+    }
+
+    public function rollback(): bool|null
+    {
+        if ($this->db->inTransaction()) {
+            return $this->db->rollback();
+        }
+        return null;
+    }
 }

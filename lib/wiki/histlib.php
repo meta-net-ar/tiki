@@ -27,15 +27,13 @@ class HistLib extends TikiLib
         }
         $query = "delete from `tiki_history` where `pageName`=? and `version`=?";
         $result = $this->query($query, [$page,$version]);
-        $res = $this->version_exists($page, $version);
-        if (! $res) {
+        if ($result && $result->numRows() > 0) {
             $logslib = TikiLib::lib('logs');
             $logslib->add_action("Removed version", $page, 'wiki page', "version=$version");
             //get_strings tra("Removed version $version")
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function use_version($page, $version, $comment = '')

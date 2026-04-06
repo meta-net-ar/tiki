@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 /**
  * Parser Library
  *
@@ -142,23 +145,16 @@ class ParserLib extends TikiDb_Bridge
      */
     private function processPluginParams(&$params, $info)
     {
+        // Delegate default application to shared helper (single source of truth)
+        $params = WikiPlugin_Helper::applyParamsDefaults($params, $info);
+
         $missingRequired = [];
         if (isset($info['params'])) {
             foreach ($info['params'] as $key => $param) {
-                // Validate required parameters
                 if (isset($param['required']) && $param['required'] === true) {
                     // Parameter is required and has no default - check if user provided it
-                    if (! isset($param['default']) && ! isset($params[$key])) {
+                    if (! isset($param['default']) && $params[$key] === null) {
                         $missingRequired[] = $key;
-                    }
-                }
-
-                // Apply default if parameter not set
-                if (! isset($params[$key])) {
-                    if (isset($param['default'])) {
-                        $params[$key] = $param['default'];
-                    } else {
-                        $params[$key] = null;
                     }
                 }
             }
@@ -213,7 +209,8 @@ class ParserLib extends TikiDb_Bridge
     {
         // cleaning some user input
         if (! $this->option['wysiwyg']) {
-            $data = str_replace('&', '&amp;', $data);
+            // Only encode ampersands that are not already part of an HTML entity
+            $data = preg_replace('/&(?![a-zA-Z0-9#]+;)/', '&amp;', $data);
         }
 
         // oft-used characters (case insensitive)
@@ -1269,11 +1266,12 @@ class ParserLib extends TikiDb_Bridge
     //*
     public function plugin_is_editable($name, $pluginArgs = null)
     {
-        global $tiki_p_edit, $prefs, $section;
+        global $tiki_p_edit, $prefs;
+        $section = Sections::getCurrentSection();
         $info = $this->plugin_info($name);
         $is_allowed = $this->check_permission_from_plugin_params($pluginArgs);
         // note that for 3.0 the plugin editor only works in wiki pages, but could be extended later
-        return $section == 'wiki page' && $info && ($tiki_p_edit == 'y' || $is_allowed == 'y') && $prefs['wiki_edit_plugin'] == 'y'
+        return Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && $info && ($tiki_p_edit == 'y' || $is_allowed == 'y') && $prefs['wiki_edit_plugin'] == 'y'
             && ! $this->plugin_is_inline($name);
     }
 
@@ -1588,6 +1586,8 @@ class ParserLib extends TikiDb_Bridge
 
     /** Simpler and faster parse than parse_data()
      * This is only called from the parse Smarty modifier, for preference definitions.
+     * Also called in Url.php when parsing the title of a page, to allow wikilinks in titles, but without
+     * allowing plugins or other complex syntax.
      */
     public function parse_data_simple($data)
     {
@@ -1613,8 +1613,9 @@ class ParserLib extends TikiDb_Bridge
                 if ($file) {
                     $fileId = $file['fileId'];
                     $filename = $file['name'];
+                    $type = $file['filetype'];
                     $icon = smarty_function_icon(['name' => 'paperclip'], TikiLib::lib('smarty')->getEmptyInternalTemplate());
-                    return "<span class='badge rounded-pill bg-secondary' role='button' data-file-ref-id='$fileId'>$icon $filename</span>";
+                    return "<span class='badge rounded-pill bg-secondary' role='button' data-file-ref-type='$type' data-file-ref-id='$fileId'>$icon $filename</span>";
                 }
                 return $matches[0];
             }, $data);
@@ -2529,11 +2530,9 @@ class ParserLib extends TikiDb_Bridge
         $data = '';
         $listbeg = [];
         $divdepth = [];
-        $hdr_structure = [];
-        $show_title_level = [];
-        $last_hdr = [];
+        $numbering = [];
+        $counters = [];
         $all_anchors = [];
-        $nb_last_hdr = 0;
         $nb_hdrs = 0;
         $nb_lists = 0;
         $inTable = 0;
@@ -2546,6 +2545,16 @@ class ParserLib extends TikiDb_Bridge
         // loop: process all lines
         $in_paragraph = 0;
         $in_empty_paragraph = 0;
+
+        $min_level = null;
+        foreach ($lines as $line) {
+            if (preg_match('/^(!+)[\+\-]?#/', $line, $m)) {
+                $level = strlen($m[1]);
+                if ($min_level === null || $level < $min_level) {
+                    $min_level = $level;
+                }
+            }
+        }
 
         foreach ($lines as $line) {
             // Add newlines between lines
@@ -2754,75 +2763,55 @@ class ParserLib extends TikiDb_Bridge
                     $hdrlevel = $tikilib->how_many_at_start($line, '!');
 
                     if ($litype == '!' && $hdrlevel > 0 && $hdrlevel <= 6 /* HTML has h1 to h6, but no h7 or above */) { // If the line starts with 1 to 6 exclamation marks ("!")
+                        ++$nb_hdrs;
+                        if (preg_match('/^!+[\+\-]?#\)/', $line)) {
+                            $counters = [];
+                            $line = preg_replace('/(^!+[\+\-]?)(#)\)/', '$1$2', $line);
+                        }
+
+                        $level = $hdrlevel;
+                        $current_title_real_num = '';
+                        $current_title_num = '';
+
                         /*
                          * Handle headings autonumbering syntax (i.e. !#Text, !!#Text, ...)
-                         * Note :
-                         *    this needs to be done even if the current header has no '#'
-                         *    in order to generate the right numbers when they are not specified for every headers.
-                         *    This is the case, for example, when you want to add numbers to headers of level 2 but not to level 1
+                         * Note:
+                         *     this needs to be done even if the current header has no '#'
+                         *     in order to generate the right numbers when they are not specified for every headers.
+                         *     This is the case, for example, when you want to add numbers to headers of level 2 but not to level 1.
                          */
+                        $support_numbering = preg_match('/^!+[\+\-]?#/', $line);
+                        if ($support_numbering) {
+                            // Normalize level (so the lowest becomes level 1)
+                            $relative_level = $level - $min_level + 1;
 
-                        $line_lenght = strlen($line);
-
-                        // Generate an array containing the squeleton of maketoc (based on headers levels)
-                        //   i.e. hdr_structure will contain something lile this :
-                        //     array( 1, 2, 2.1, 2.1.1, 2.1.2, 2.2, ... , X.Y.Z... )
-                        //
-
-                        $hdr_structure[$nb_hdrs] = [];
-
-                        // Generate the number (e.g. 1.2.1.1) of the current title, based on the previous title number :
-                        //   - if the current title deepest level is lesser than (or equal to)
-                        //     the deepest level of the previous title : then we increment the last level number,
-                        //   - else : we simply add new levels with value '1' (only if the previous level number was shown),
-                        //
-                        if ($nb_last_hdr > 0 && $hdrlevel <= $nb_last_hdr) {
-                            $hdr_structure[$nb_hdrs] = array_slice($last_hdr, 0, $hdrlevel);
-                            if (! empty($show_title_level[$hdrlevel]) || ! $need_autonumbering) {
-                                //
-                                // Increment the level number only if :
-                                //     - the last title of the same level number has a displayed number
-                                //  or - no title has a displayed number (no autonumbering)
-                                //
-                                $hdr_structure[$nb_hdrs][$hdrlevel - 1]++;
+                            // Reset deeper levels
+                            for ($i = $relative_level + 1; $i <= 10; $i++) {
+                                unset($counters[$i]);
                             }
-                        } else {
-                            if ($nb_last_hdr > 0) {
-                                $hdr_structure[$nb_hdrs] = $last_hdr;
+
+                            // Increment this level
+                            if (! isset($counters[$relative_level])) {
+                                $counters[$relative_level] = 1;
+                            } else {
+                                $counters[$relative_level]++;
                             }
-                            for ($h = 0; $h < $hdrlevel - $nb_last_hdr; $h++) {
-                                $hdr_structure[$nb_hdrs][$h + $nb_last_hdr] = '1';
+
+                            // Ensure parent levels exist (initialize with 1 if missing)
+                            for ($i = 1; $i < $relative_level; $i++) {
+                                if (! isset($counters[$i])) {
+                                    $counters[$i] = 1;
+                                }
                             }
-                        }
-                        $show_title_level[$hdrlevel] = preg_match('/^!+[\+\-]?#/', $line);
 
-                        // Update last_hdr info for the next header
-                        $last_hdr = $hdr_structure[$nb_hdrs];
-                        $nb_last_hdr = count($last_hdr);
-
-                        if (is_array($last_hdr)) {
-                            $current_title_real_num = implode('.', $last_hdr) . '. ';
-                        } else {
-                            $current_title_real_num = $last_hdr . '. ';
-                        }
-
-                        // Update the current title number to hide all parents levels numbers if the parent has no autonumbering
-                        $hideall = false;
-                        for ($j = $hdrlevel; $j > 0; $j--) {
-                            if ($hideall || empty($show_title_level[$j])) {
-                                unset($hdr_structure[$j - 1]);
-                                $hideall = true;
+                            $numbering = [];
+                            for ($i = 1; $i <= $relative_level; $i++) {
+                                $numbering[] = $counters[$i];
                             }
+
+                            $current_title_num = implode('.', $numbering) . ".";
+                            $current_title_real_num = $current_title_num . ' ';
                         }
-
-                        // Store the title number to use only if it has to be shown (if the '#' char is used)
-                        $current_title_num = '';
-                        if (isset($show_title_level[$hdrlevel]) && isset($hdr_structure[$nb_hdrs])) {
-                            $current_title_num = $show_title_level[$hdrlevel] ? implode('.', $hdr_structure[$nb_hdrs]) . '. ' : '';
-                        }
-
-                        $nb_hdrs++;
-
 
                         // Close open paragraph (lists already closed above)
                         $this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 1, 0, 0);
@@ -2841,7 +2830,10 @@ class ParserLib extends TikiDb_Bridge
                         $anchor = '';
                         $aclose = '';
                         $aclose2 = '';
-                        $addremove = $show_title_level[$hdrlevel] ? 1 : 0; // If needed, also remove '#' sign from title beginning
+                        $addremove = 0;
+                        if ($support_numbering) {
+                            $addremove = 1; // If needed, also remove '#' sign from title beginning
+                        }
 
                         // May be special signs present after '!'s?
                         $divstate = substr($line, $hdrlevel, 1);
@@ -2864,14 +2856,16 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         // Generate the final title text
-                        $title_text_base = substr($line, $hdrlevel + $addremove);
-                        $title_text = $current_title_num . $title_text_base;
+                        $title_text_base_raw = substr($line, $hdrlevel + $addremove);
+                        $title_text_base = $support_numbering ? ltrim($title_text_base_raw) : $title_text_base_raw;
+                        $title_text = $current_title_real_num . $title_text_base;
 
                         // Remove HTML tags from Tiki syntax
                         $title = preg_replace('#\<(.*?)\>#', '', $title_text);
                         $thisid = $this->getCleanAnchor($title, $all_anchors);
 
-                        // Collect TOC entry if any {maketoc} is present on the page
+                        // Collect TOC entry if any {maketoc} is present on the page.
+                        // Generates the skeleton of the TOC (e.g. 1, 2, 2.1, 2.1.1, ...).
                         //if ( $need_maketoc !== false ) {
                         $anch[] = [
                                         'id' => $thisid,
@@ -2882,9 +2876,10 @@ class ParserLib extends TikiDb_Bridge
                                         'title_real_num' => $current_title_real_num
                                         ];
                         //}
-                        global $tiki_p_edit, $section;
+                        global $tiki_p_edit;
+                        $section = Sections::getCurrentSection();
                         if (
-                            $prefs['wiki_edit_section'] === 'y' && $section === 'wiki page' && $tiki_p_edit === 'y' &&
+                            $prefs['wiki_edit_section'] === 'y' && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && $tiki_p_edit === 'y' &&
                                 ( $prefs['wiki_edit_section_level'] == 0 || $hdrlevel <= $prefs['wiki_edit_section_level']) &&
                                 (empty($this->option['print']) || ! $this->option['print']) && ! $this->option['suppress_icons']
                         ) {
@@ -3236,7 +3231,7 @@ class ParserLib extends TikiDb_Bridge
         $data = $new_data . $data;
         // Add icon to edit the text before the first section (if there is some)
         if (
-            $prefs['wiki_edit_section'] === 'y' && isset($section) && $section === 'wiki page' && $tiki_p_edit === 'y' && (empty($this->option['print']) ||
+            $prefs['wiki_edit_section'] === 'y' && isset($section) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && $tiki_p_edit === 'y' && (empty($this->option['print']) ||
                 ! $this->option['print'])  && strpos($data, '<div class="icon_edit_section">') != 0 && ! $this->option['suppress_icons']
         ) {
             $smarty = TikiLib::lib('smarty');

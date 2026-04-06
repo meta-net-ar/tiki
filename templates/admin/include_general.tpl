@@ -175,6 +175,14 @@
                 {preference name=scheduler_keep_logs}
                 {preference name=scheduler_last_run_warning_minutes}
             </fieldset>
+            <fieldset id="SchedulerLogs">
+                <legend>{tr}Scheduler Logs{/tr}</legend>
+                {preference name=scheduledTasksReport}
+                <div class="adminoptionbox scheduledTasksReport_childcontainer last_number_of_hours">
+                    {preference name=scheduledTasksReportHours}
+                </div>
+                {preference name=scheduledTasksReportMaxDays}
+            </fieldset>
             <fieldset>
                 <legend class="h3">{tr}Headless Browser Integration{/tr}</legend>
                 {preference name=headlessbrowser_integration_type}
@@ -185,6 +193,9 @@
             <fieldset id="QueuedTasks">
                 <legend>{tr}Queued Tasks{/tr}</legend>
                 {preference name=feature_queued_tasks}
+                <div class="adminoptionboxchild" id="feature_queued_tasks_childcontainer">
+                    {preference name=queued_tasks_js_processing_disabled}
+                </div>
             </fieldset>
             <fieldset>
                 <legend>{tr}Maintenance{/tr}</legend>
@@ -222,6 +233,13 @@
                     {preference name=proxy_port}
                     {preference name=proxy_user}
                     {preference name=proxy_pass}
+                </div>
+                {preference name=use_rss_proxy}
+                <div class="adminoptionboxchild" id="use_rss_proxy_childcontainer">
+                    {preference name=rssproxy_host}
+                    {preference name=rssproxy_port}
+                    {preference name=rssproxy_user}
+                    {preference name=rssproxy_pass}
                 </div>
                 {preference name=http_skip_frameset}
                 {preference name=feature_loadbalancer}
@@ -374,6 +392,7 @@
                 {preference name=use_load_threshold}
                 <div class="adminoptionboxchild" id="use_load_threshold_childcontainer">
                     {preference name=load_threshold}
+                    {preference name=load_retry_after}
                     {preference name=site_busy_title}
                     {preference name=site_busy_msg}
                 </div>

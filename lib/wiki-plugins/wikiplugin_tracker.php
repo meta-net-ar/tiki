@@ -2095,7 +2095,7 @@ function wikiplugin_tracker($data, $params)
                     } else {
                         $mand = ($isFieldMandatory($f)) ? "&nbsp;<strong class='mandatory_star text-danger tips' title=':" . tra("This field is mandatory") . "'>*</strong>&nbsp;" : '';
 
-                        if (isset($showfielddesc) && $showfielddesc === 'y' && ! empty($f['description'])) {
+                        if (isset($showfieldsdesc) && $showfieldsdesc === 'y' && ! empty($f['description'])) {
                             $desc = $f['descriptionIsParsed'] == 'y' ? TikiLib::lib('parser')->parse_data($f['description']) : htmlspecialchars(tra($f['description']));
                             $desc = '<div class="trackerplugindesc">' . $desc . '</div>';
                         } else {
@@ -2253,7 +2253,7 @@ function wikiplugin_tracker($data, $params)
     <input type="hidden" value="" name="mode_wysiwyg"/>
     <input type="hidden" value="" name="mode_normal"/>
     <div class="edit-zone">
-        <textarea id="ins_fill" name="ins_fill" class="wikiedit form-control" data-syntax="" data-codemirror="" onkeyup="" rows="15" ></textarea>
+        <textarea id="ins_fill" name="ins_fill" class="wikiedit form-control" onkeyup="" rows="15" ></textarea>
     </div>
     <input type="hidden" value="n" name="wysiwyg"/>
     <div name="ins_fill_desc" class="trackerplugindesc" >
@@ -2327,7 +2327,7 @@ FILL;
         }
 
         if (! empty($params['_ajax_form_ins_id'])) {    // save new js in a function for the form init fn
-            $headerlib->add_js(' var ajaxTrackerFormInit_' . $params['_ajax_form_ins_id'] . ' = function() {' . $headerlib->output_js(false) . '}', 10);
+            $headerlib->add_js(' var ajaxTrackerFormInit_' . $params['_ajax_form_ins_id'] . ' = function() {' . $headerlib->outputInlineJS(false) . '}', 10);
 
             // put back the pre-existing js
             $headerlib->js = array_merge($headerlib->js, $old_js['js']);

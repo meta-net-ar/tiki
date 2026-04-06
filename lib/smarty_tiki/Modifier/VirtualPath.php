@@ -11,7 +11,7 @@ class VirtualPath
 {
     public function handle($fileOrPageId, $type = 'file')
     {
-        global $prefs, $base_url;
+        global $base_url;
 
         $filegallib = \TikiLib::lib('filegal');
 

@@ -57,6 +57,7 @@
             {* Need to show site_metatag_robots as real metatags are overridden at runtime *}
 
             {preference name=metatag_robots}
+            {preference name=metatag_robots_txt_apply_directives}
         {/tab}
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}

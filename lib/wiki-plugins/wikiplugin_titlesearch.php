@@ -5,15 +5,12 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-use Tiki\Lib\Wiki\PluginsLib;
-use Tiki\Lib\Wiki\PluginsLibUtil;
-
 function wikiplugin_titlesearch_info()
 {
     return [
         'name' => tra('Title Search'),
         'documentation' => 'PluginTitleSearch',
-        'description' => tra('Search page titles'),
+        'description' => tra('Deprecated: Use PluginListPages instead. Search page titles.'),
         'prefs' => [ 'feature_wiki', 'wikiplugin_titlesearch' ],
         'iconname' => 'search',
         'introduced' => 1,
@@ -21,7 +18,7 @@ function wikiplugin_titlesearch_info()
             'search' => [
                 'required' => true,
                 'name' => tra('Search Criteria'),
-                'description' => tra('Portion of a page name.'),
+                'description' => tra('Portion of a page name. Maps to the "find" parameter in ListPages.'),
                 'since' => '1',
                 'filter' => 'text',
                 'default' => '',
@@ -29,7 +26,7 @@ function wikiplugin_titlesearch_info()
             'info' => [
                 'required' => false,
                 'name' => tra('Information'),
-                'description' => tra('Also show page hits or user'),
+                'description' => tra('Show page hits or user. Note: This is now controlled by wiki_list_hits and wiki_list_user preferences.'),
                 'since' => '1',
                 'filter' => 'alpha',
                 'separator' => '|',
@@ -44,7 +41,7 @@ function wikiplugin_titlesearch_info()
             'exclude' => [
                 'required' => false,
                 'name' => tra('Exclude'),
-                'description' => tra('Pipe-separated list of page names to exclude from results.'),
+                'description' => tra('Pipe-separated list of page names to exclude from results. Maps to "exclude_pages" in ListPages.'),
                 'since' => '1',
                 'filter' => 'text',
                 'separator' => '|',
@@ -66,105 +63,36 @@ function wikiplugin_titlesearch_info()
         ],
     ];
 }
-class WikiPluginTitleSearch extends PluginsLib
-{
-    public $expanded_params = ["exclude", "info"];
-    public function getDescription()
-    {
-        return wikiplugin_titlesearch_help();
-    }
-    public function getDefaultArguments()
-    {
-        return ['exclude' => '',
-            'noheader' => 0,
-            'info' => false,
-            'search' => false,
-                'style' => 'table'
-        ];
-    }
-    public function getName()
-    {
-        return "TitleSearch";
-    }
-    public function getVersion()
-    {
-        return preg_replace("/[Revision: $]/", '', "\$Revision: 1.25 $");
-    }
-    public function run($data, $params)
-    {
-        $tikilib = TikiLib::lib('tiki');
-        $aInfoPreset = array_keys($this->aInfoPresetNames);
-        $exclude = $params['exclude'] ?? '';
-        $params = $this->getParams($params, true);
-        extract($params, EXTR_SKIP);
-        if (! $search) {
-            return $this->error("You have to define a search");
-        }
 
-        // no additional infos in list output
-        if (isset($style) && $style == 'list') {
-            $info = false;
-        }
-
-        //
-        /////////////////////////////////
-        // Create a valid list for $info
-        /////////////////////////////////
-        //
-        if ($info) {
-            $info_temp = [];
-            foreach ($info as $sInfo) {
-                if (in_array(trim($sInfo), $aInfoPreset)) {
-                    $info_temp[] = trim($sInfo);
-                }
-                $info = $info_temp ? $info_temp :
-                false;
-            }
-        } else {
-            $info = false;
-        }
-        //
-        /////////////////////////////////
-        // Process pages
-        /////////////////////////////////
-        //
-        $sOutput = "";
-        $aPages = $tikilib->list_pages(0, -1, 'pageName_desc', $search, null, false);
-        foreach ($aPages["data"] as $idPage => $aPage) {
-            if (! empty($exclude)) {
-                if (in_array($aPage["pageName"], $exclude)) {
-                    unset($aPages["data"][$idPage]);
-                    $aPages["count"]--;
-                }
-            }
-        }
-        //
-        /////////////////////////////////
-        // Start of Output
-        /////////////////////////////////
-        //
-        if (! $noheader) {
-            // Create header
-            $count = $aPages["count"];
-            if (! $count) {
-                $sOutput  .= tra("No pages found for title search") . " '__" . $search . "__'";
-            } elseif ($count == 1) {
-                $sOutput  .= tra("One page found for title search") . " '__" . $search . "__'";
-            } else {
-                $sOutput = "$count " . tra("pages found for title search") . " '__" . $search . "__'";
-            }
-            $sOutput  .= "\n";
-        }
-        if (isset($style) && $style == 'list') {
-            $sOutput .= PluginsLibUtil::createList($aPages["data"]);
-        } else {
-            $sOutput .= PluginsLibUtil::createTable($aPages["data"], $info);
-        }
-        return $sOutput;
-    }
-}
 function wikiplugin_titlesearch($data, $params)
 {
-    $plugin = new WikiPluginTitleSearch();
-    return $plugin->run($data, $params);
+    include_once('lib/wiki-plugins/wikiplugin_listpages.php');
+
+    // Default parameters required by wikiplugin_listpages
+    $listpagesParams = [];
+    $info = wikiplugin_listpages_info();
+    $listpagesParams = WikiPlugin_Helper::applyParamsDefaults($listpagesParams, $info);
+
+    // Force list view (TitleSearch legacy behavior)
+    $listpagesParams['showNameOnly'] = 'y';
+
+    // Map parameters: search -> find
+    if (isset($params['search'])) {
+        $listpagesParams['find'] = $params['search'];
+    }
+
+    // Map parameters: exclude -> exclude_pages
+    if (isset($params['exclude'])) {
+        if (is_array($params['exclude'])) {
+            $listpagesParams['exclude_pages'] = implode('|', $params['exclude']);
+        } else {
+            $listpagesParams['exclude_pages'] = $params['exclude'];
+        }
+    }
+
+    if (isset($params['noheader'])) {
+        $listpagesParams['noheader'] = $params['noheader'];
+    }
+
+    return wikiplugin_listpages($data, $listpagesParams);
 }

@@ -20,7 +20,7 @@ class Email
      * @param null $messageId
      *   The comment message_id
      * @return array
-     *   Return an array with the headers to enable threading or empty array if object not supported.
+     *   Return an array with the headers to enable threading or empty array if object not supported or not found.
      * @throws \Exception
      */
     public static function getEmailThreadHeaders($type, $commentId, $messageId = null)
@@ -39,6 +39,10 @@ class Email
         /** @var \Comments $commentsLib */
         $commentsLib = \TikiLib::lib('comments');
         $comment = $commentsLib->get_comment($commentId, $messageId);
+
+        if (! $comment) {
+            return [];
+        }
 
         $headers = [];
         $parentInfo = [];

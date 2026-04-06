@@ -1,5 +1,6 @@
 {title help="Contribution"}{tr}Admin Contributions{/tr}{/title}
 
+<div class="styling-element">
 {if ! empty($contribution)}
     <h2>{tr}Edit the contribution:{/tr} {$contribution.name|escape}</h2>
     <form enctype="multipart/form-data" action="tiki-admin_contribution.php" method="post">
@@ -146,4 +147,5 @@
             {norecords _colspan=3}
         {/section}
     </table>
+</div>
 </div>

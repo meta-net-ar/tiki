@@ -11,14 +11,14 @@
                             <div class="comment-title">
                                 {$comment.title}
                                 {if $prefs.comments_heading_links eq 'y'}
-                                    <a class="heading-link" aria-label="{tr}Heading link{/tr}" href="{if ($comment.threadId neq $comments_parentId)}#threadId{$comment.threadId}{/if}">{icon name="link"}</a>
+                                    <button type="button" class="heading-link copy-comment-link tips btn btn-link p-0" title="|{tr}Click to copy the comment link{/tr}" aria-label="{tr}Heading link{/tr}" data-thread-id="{if $comment.threadId neq $comments_parentId}threadId{$comment.threadId}{/if}">{icon name="link" _class="me-1"}</button>
                                 {/if}
                             </div>
                         {/if}
                         <div class="comment-info">
                             {tr _0=$comment.userName|userlink}%0{/tr}{if $prefs.comments_threshold_indent neq '0' && $level && $level gte $prefs.comments_threshold_indent}>{tr _0=$repliedTo.userName|userlink}%0{/tr}{/if} <small class="date">{tr _0=$comment.commentDate|tiki_short_datetime}%0{/tr}</small>
                             {if $prefs.comments_heading_links eq 'y' and  $prefs.comments_notitle eq 'y'}
-                                <a class="heading-link" aria-label="{tr}Heading link{/tr}" href="{if ($comment.threadId neq $comments_parentId)}#threadId{$comment.threadId}{/if}">{icon name="link"}</a>
+                                <button type="button" class="heading-link copy-comment-link tips btn btn-link p-0" title="|{tr}Click to copy the comment link{/tr}" aria-label="{tr}Heading link{/tr}" data-thread-id="{if $comment.threadId neq $comments_parentId}threadId{$comment.threadId}{/if}">{icon name="link" _class="me-1"}</button>
                             {/if}
                         </div>
                     </h4>
@@ -26,7 +26,7 @@
                         {if isset($repliedTo) && $repliedTo.parsed && $level >= $prefs.comments_threshold_indent && $prefs.comments_threshold_indent ne 0}
                             <span class="d-flex ps-2 border-start border-5 comment-replied-to">
                                 {$parentExcerpt=$repliedTo.parsed|strip_tags|truncate:15}
-                                {tr _0="<em>$parentExcerpt</em>"}In reply to %0{/tr}
+                                {tr _0="<em class='ms-1'>$parentExcerpt</em>"}In reply to %0{/tr}
                             </span>
                         {/if}
                         {$comment.parsed}
@@ -64,10 +64,14 @@
                             {/if}
                         {/if}
                         {if $comment.userName ne $user and $comment.approved eq 'y' and $allow_vote}
+                            <div class="commentRating d-inline-block ms-3">
                             <form class="commentRatingForm" method="post">
-                                {rating type="comment" id=$comment.threadId}
-                                <input type="hidden" name="id" value="{$comment.threadId}" />
-                                <input type="hidden" name="type" value="comment" />
+                                <fieldset>
+                                    <legend class="fs-6">{tr}Rate this comment:{/tr}</legend>
+                                    {rating type="comment" id=$comment.threadId}
+                                    <input type="hidden" name="id" value="{$comment.threadId}" />
+                                    <input type="hidden" name="type" value="comment" />
+                                </fieldset>
                             </form>
                             {jq}
                                 var crf = $('form.commentRatingForm').on("submit", function() {
@@ -102,7 +106,7 @@
                                 </div>
                             </div>
                         {/if}
-
+                            </div>
                     </div>{* End of comment-footer *}
                 </div>{* End of comment-item *}
                 {if ! $level || $prefs.comments_threshold_indent eq '0' || $level lt $prefs.comments_threshold_indent}

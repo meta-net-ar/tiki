@@ -137,7 +137,7 @@
     {/if}
     <div class="integration_preview">
         {if $code eq 'y'}
-            <div class="codelisting"><pre>{$preview_data|escape:"html"|wordwrap:120:"\n"}</pre></div>
+            <div ><pre class="codelisting">{$preview_data|escape:"html"|wordwrap:120:"\n"}</pre></div>
         {/if}
         {if $html eq 'y'}
                 <div class="integrated-page">{$preview_data}</div>

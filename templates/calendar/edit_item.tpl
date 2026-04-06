@@ -32,7 +32,7 @@
             {if $prefs.calendar_addtogooglecal == 'y'}
                 {wikiplugin _name="addtogooglecal" calitemid=$calitemId}{/wikiplugin}
             {/if}
-            {if $prefilled}
+            {if $hideCalendarSelector}
             <input type="hidden" name="calitem[calendarId]" value="{$calitem.calendarId}">
             {else}
             <div class="mb-3 row">
@@ -78,7 +78,7 @@
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Title{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" required>
+                    <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" maxlength="{$MAX_CALENDAR_EVENT_TITLE_LENGTH}" required>
                 </div>
             </div>
             {if !empty($trackerItems)}
@@ -102,24 +102,6 @@
 
                 </div>
             </div>
-            {if $prefilled}
-            <input type="hidden" name="calitem[end_or_duration]" value="end" id="end_or_duration">
-            <input type="hidden" name="calitem[start]" value="{$calitem.start}">
-            <input type="hidden" name="calitem[end]" value="{$calitem.end}">
-            <input type="hidden" name="exact_start_end" value="1">
-            <div class="row mt-md-3 mb-3 date">
-                <label class="col-form-label col-sm-3">{tr}Start{/tr}</label>
-                <div class="col-sm-7 start">
-                    {$calitem.start|tiki_short_datetime} {$displayTimezone}
-                </div>
-            </div>
-            <div class="row mt-md-3 mb-3 date">
-                <label class="col-form-label col-sm-3">{tr}End{/tr}</label>
-                <div class="col-sm-7 end">
-                    {$calitem.end|tiki_short_datetime} {$displayTimezone}
-                </div>
-            </div>
-            {else}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Recurrence{/tr}</label>
                 <div class="col-sm-9">
@@ -211,12 +193,11 @@
                     </span>
                 {/if}
             </div>
-            {/if}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
                         {strip}
-                            {textarea name="calitem[description]" id="editwiki" cols=40 rows=10 _preview=$prefs.ajax_edit_previews}
+                            {textarea name="calitem[description]" maxlength="{$MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH}" id="editwiki" cols=40 rows=10 _preview=$prefs.ajax_edit_previews}
                             {$calitem.description}
                             {/textarea}
                         {/strip}
@@ -461,11 +442,7 @@
         <div class="submit">
             <input type="hidden" id="act" name="act" value="">
             <input type="submit" class="btn btn-secondary cleanable-false" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false">
-            <input type="submit" class="btn btn-primary cleanable-false {if $prefilled}need-participant{/if}" name="saveitem" value="{tr}Save{/tr}" onclick="needToConfirm=false">
-            {if $tiki_p_add_events eq 'y' and empty($saveas) and not empty($calitemId)}
-                <input type="submit" class="btn btn-secondary cleanable-false" name="saveas" data-alt_controller="calendar" data-alt_action="copy_item"
-                       onclick="needToConfirm=false" value="{tr}Copy to a new event{/tr}">
-            {/if}
+            <input type="submit" class="btn btn-primary cleanable-false {if $requireParticipant}need-participant{/if}" name="saveitem" value="{tr}Save{/tr}" onclick="needToConfirm=false">
             {if $calitemId && ! $recurrence.id}
                 <input type="submit" name="delete" data-alt_controller="calendar" data-alt_action="delete_item"
                        class="btn btn-danger cleanable-false" onclick="needToConfirm=false;" data-bs-dismiss="modal" value="{tr}Delete event{/tr}">

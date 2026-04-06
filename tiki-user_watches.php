@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'      => [
@@ -24,8 +23,11 @@ $inputConfiguration = [
         ],
     ],
 ];
-include_once('tiki-setup.php');
 
+include_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $access->check_user($user);
 $access->check_feature('feature_user_watches');
 
@@ -132,9 +134,8 @@ if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
                 $errors += $result ? 0 : 1;
             } else {
                 $tikilib->remove_user_watch($user, 'new_in_category', '*');
-                /** @var  Tiki\TikiDb\PdoResult $result */
                 $result = $tikilib->add_user_watch($user, 'new_in_category', '*', 'category', "tiki-browse_category.php");
-                $errors += $result && $result->numRows() ? 0 : 1;
+                $errors += $result ? 0 : 1;
             }
             if ($errors) {
                 Feedback::error('Errors encountered in adding category user watches');

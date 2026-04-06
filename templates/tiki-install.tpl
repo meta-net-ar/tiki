@@ -268,7 +268,7 @@
                             {icon name="error"} {tr}Tiki was not able to detect the GD library.{/tr}
                             {/remarksbox}
                         {/if}
-                        <p>{tr}Tiki uses the GD library to process images for the Image Gallery and CAPTCHA support.{/tr}</p>
+                        <p>{tr}Tiki uses the GD library to process images for the File Gallery and CAPTCHA support.{/tr}</p>
                         <form action="tiki-install.php" method="post" >
                             <div class="mb-3 text-center">
                                 <input type="hidden" name="install_step" value="3">

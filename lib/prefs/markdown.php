@@ -58,7 +58,7 @@ function prefs_markdown_list()
                 'vertical' => tra('Vertical'),
                 'tab' => tra('Tab'),
             ],
-            'default' => 'vertical',
+            'default' => 'tab',
             'dependencies' => [
                 'markdown_enabled',
                 'feature_wysiwyg',

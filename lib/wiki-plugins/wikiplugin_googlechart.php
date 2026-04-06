@@ -291,15 +291,15 @@ gapi.analytics.ready(function () {
 function wikiplugin_googlechart_authenticate($credentials_file)
 {
 
-    $client = new Google_Client();
+    $client = new Google_Client(); // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
     $token = isset($_SESSION['ga_access_token']) && $_SESSION['ga_access_token'] ? $_SESSION['ga_access_token'] : false;
 
     if (empty($token) || $token['created'] + 3600 < time()) {   // in v2 it will be $token['expires_in'] but hard coded to 3600 for v1 api
         $data = json_decode(file_get_contents($credentials_file));
 
-        $cred = new Google_Auth_AssertionCredentials(
+        $cred = new Google_Auth_AssertionCredentials( // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
             $data->client_email,
-            [Google_Service_Analytics::ANALYTICS_READONLY],
+            [Google_Service_Analytics::ANALYTICS_READONLY], // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
             $data->private_key
         );
 
@@ -312,7 +312,7 @@ function wikiplugin_googlechart_authenticate($credentials_file)
         $client->setApplicationName("The Networked Planet Test App");
         $client->setAccessType('offline');
 
-        $client->addScope(Google_Service_Analytics::ANALYTICS_READONLY);
+        $client->addScope(Google_Service_Analytics::ANALYTICS_READONLY); // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
 
         $token = $client->getAccessToken();
         $token = json_decode($token, true);

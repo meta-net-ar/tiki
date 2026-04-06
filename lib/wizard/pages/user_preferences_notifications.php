@@ -65,7 +65,7 @@ class UserWizardPreferencesNotifications extends Wizard
 
     public function onContinue($homepageUrl)
     {
-        global $user, $prefs;
+        global $user;
 
         $tikilib = TikiLib::lib('tiki');
 

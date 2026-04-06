@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/vue";
 import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
-import Transfer, { DATA_TEST_ID, DRAG_HANDLER_CLASS } from "../../components/Transfer/Transfer.vue";
-import { ElAlert, ElTransfer } from "element-plus";
+import Transfer, { DATA_TEST_ID } from "../../components/Transfer/Transfer.vue";
+import { ElAlert, ElButton, ElTransfer } from "element-plus";
 import { h } from "vue";
 import Sortable from "sortablejs";
 import ConfigWrapper from "../../components/ConfigWrapper.vue";
@@ -10,8 +10,15 @@ vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
     return {
         ...actual,
-        ElTransfer: vi.fn(),
+        ElTransfer: vi.fn((props, { slots }) =>
+            h(
+                "div",
+                { ...props },
+                props.modelValue.map((key) => slots.default({ option: { key } }))
+            )
+        ),
         ElAlert: vi.fn(),
+        ElButton: vi.fn((props) => h("button", props)),
     };
 });
 
@@ -67,6 +74,9 @@ describe("Transfer", () => {
         // its options should be the selected values
         assertSelectElementToHaveOptions(selectElement, props.defaultValue);
 
+        // options should not render the edit button as showEdit is not set
+        expect(screen.queryByTestId(DATA_TEST_ID.EDIT_ITEM_BUTTON)).not.to.exist;
+
         // el-transfer should be rendered with correct props
         const elTransferData = Object.entries(props.data).map(([key, value]) => ({ key, label: value }));
         expect(ElTransfer).toHaveBeenCalledWith(
@@ -76,7 +86,7 @@ describe("Transfer", () => {
                 "filter-placeholder": props.filterPlaceholder,
                 titles: [props.sourceListTitle, props.targetListTitle],
             }),
-            null
+            expect.any(Object)
         );
 
         expect(ConfigWrapper).toHaveBeenCalledWith(
@@ -167,6 +177,41 @@ describe("Transfer", () => {
             expect(consoleWarnSpy).not.toHaveBeenCalled();
         }
     );
+
+    test("renders an edit button on each item in the target list when showEdit prop is true", () => {
+        render(Transfer, { props: { ...props, showEdit: "true" } });
+
+        const editButtons = screen.getAllByTestId(DATA_TEST_ID.EDIT_ITEM_BUTTON);
+        expect(editButtons).to.have.length(props.defaultValue.length);
+
+        editButtons.forEach(() => {
+            expect(ElButton).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: "primary",
+                    text: true,
+                    icon: expect.objectContaining({ name: "Edit" }),
+                    onClick: expect.any(Function),
+                }),
+                null
+            );
+        });
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
+    });
+
+    test("should correctly handle click event on the 'edit' button for an item in the target list", async () => {
+        const emit = vi.fn();
+
+        render(Transfer, { props: { ...props, showEdit: "true", _emit: emit } });
+        const editButtons = screen.getAllByTestId(DATA_TEST_ID.EDIT_ITEM_BUTTON);
+
+        await Promise.all(editButtons.map((editButton) => fireEvent.click(editButton)));
+
+        props.defaultValue.forEach((key) => {
+            expect(emit).toHaveBeenCalledWith("edit", { value: key });
+        });
+    });
 
     test("should correctly initialize SortableJS when ordering prop is true", async () => {
         ElTransfer = {
@@ -376,7 +421,7 @@ function assertElTransferToBeCalledWith(props) {
             "filter-placeholder": props.filterPlaceholder,
             titles: [props.sourceListTitle, props.targetListTitle],
         }),
-        null
+        expect.any(Object)
     );
 }
 

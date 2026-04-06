@@ -1565,6 +1565,7 @@ class TikiAccessLib extends TikiLib
                 $title = $prefs['site_busy_title'];
                 $error = $prefs['site_busy_msg'];
                 $prefs['site_closed'] = 'y';    // tell the rest of tiki we're closed
+                header('Retry-After: ' . $prefs['load_retry_after']);
 
                 break;
             case 'maintenance':

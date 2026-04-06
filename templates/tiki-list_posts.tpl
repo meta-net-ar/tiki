@@ -5,6 +5,7 @@
     {button href="tiki-blog_post.php" _type="link" class="btn btn-link" _icon_name="create" _text="{tr}New Blog Post{/tr}"}
     {button href="tiki-list_blogs.php" _type="link" class="btn btn-link" _icon_name="list" _text="{tr}List Blogs{/tr}"}
 </div>
+<div class="styling-element">
 {if $posts or ($find ne '')}
     {include file='find.tpl'}
 {/if}
@@ -104,3 +105,4 @@
 {/if}
 
 {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+</div>

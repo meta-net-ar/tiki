@@ -24,7 +24,7 @@ function prefs_bigbluebutton_list()
             'description' => tra('Full URL to the BigBlueButton installation.'),
             'type' => 'text',
             'filter' => 'url',
-            'hint' => tra('http://host.example.com/'),
+            'hint' => tra('http://host.example.org/'),
             'keywords' => 'big blue button web conferencing audio video chat screensharing whiteboard',
             'size' => 40,
             'tags' => ['basic'],
@@ -55,6 +55,16 @@ function prefs_bigbluebutton_list()
             'name' => tr('BigBlueButton dynamic configuration'),
             'description' => tr('Uses the advanced options of BigBlueButton to configure the XML per room.'),
             'keywords' => 'big blue button',
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['advanced', 'experimental'],
+        ],
+        'bigbluebutton_use_iframe' => [
+            'name' => tr('Use iframe to join BigBlueButton meetings'),
+            'description' => tr('If enabled, meetings will be opened inside an iframe instead of a new browser tab. ' .
+                       'Note: The BBB server must allow your Tiki site to embed meetings in an iframe. ' .
+                       'This may require configuring X-Frame-Options or CORS on the BBB server.'),
+            'keywords' => 'big blue button iframe',
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced', 'experimental'],

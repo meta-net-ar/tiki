@@ -3,6 +3,7 @@
 {/block}
 
 {block name="content"}
+    <div class="styling-element">
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <tr>
@@ -98,4 +99,5 @@
             <a class="btn btn-link" href="tiki-mailin.php">{tr}Check Manually Now{/tr}</a>
         </div>
     </form>
+    </div>
 {/block}

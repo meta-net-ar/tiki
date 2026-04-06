@@ -17,7 +17,8 @@
 
 {block name="content"}
     <form class="form save-fields" method="post" action="{service controller=tracker action=save_fields}">
-        <table id="fields" class="table table-responsive table-condensed table-hover">
+    <div class="table-responsive">
+        <table id="fields" class="table table-condensed table-hover">
             <thead>
                 <tr>
                     <th>{select_all checkbox_names="fields[]"}</th>
@@ -59,6 +60,7 @@
             <tbody>
             </tbody>
         </table>
+        </div>
         <div class="mb-3 row">
             <div class="input-group col-sm-6">
                 <select name="action" class="form-control">
@@ -76,15 +78,38 @@
     {jq}
         var trackerId = {{$trackerId|escape}};
         $('.save-fields').on("submit", function () {
-            var form = this, confirmed = false
+            var form = this;
+            var action = $(form.action).val();
 
-            if ($(form.action).val() === 'remove_fields' && validateForm()) {
-                confirmed = confirm(tr('Do you really want to delete the selected fields?'));
-                $(form.confirm).val(confirmed ? '1' : '0');
-
-                if (! confirmed) {
-                    return false;
+            // Internal helper to perform the Ajax submission logic
+            var executeAjax = function () {
+                $.ajax($(form).attr('action'), {
+                    type: 'POST',
+                    data: $(form).serialize(),
+                    dataType: 'json',
+                    success: function () {
+                        $container.tracker_load_fields(trackerId);
+                        if (action === 'remove_fields') {
+                            $.fn.resetFieldsCache();
+                            feedback(tr('Fields successfully removed.'), 'success');
+                        } else if (action === 'save_fields') {
+                            feedback(tr('Fields successfully saved.'), 'success');
+                        }
+                    }
+                });
+            };
+            if (action === 'remove_fields') {
+                if (validateForm()) {
+                    $(form).confirmationDialog({
+                        title: tr('Delete Fields'),
+                        message: tr('Do you really want to delete the selected fields?'),
+                        success: function() {
+                            $(form.confirm).val('1');
+                            executeAjax();
+                        }
+                    });
                 }
+                return false;
             }
 
             if ($(form.action).val() === 'export_fields') {
@@ -99,17 +124,7 @@
                 return false;
 
             } else {
-                $.ajax($(form).attr('action'), {
-                    type: 'POST',
-                    data: $(form).serialize(),
-                    dataType: 'json',
-                    success: function () {
-                        $container.tracker_load_fields(trackerId);
-                        if ($(form.action).val() === 'remove_fields') {
-                            $.fn.resetFieldsCache();
-                        }
-                    }
-                });
+                executeAjax();
             }
             return false;
         });
@@ -224,7 +239,7 @@
 
             // If no checkbox is checked, show an alert and prevent submission
             if (!isChecked) {
-                alert(tr("Please select at least one element."));
+                feedback(tr("Please select at least one element."), "error");
                 return false;
             }
 

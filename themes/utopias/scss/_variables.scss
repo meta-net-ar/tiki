@@ -154,7 +154,7 @@ $navbar-dark-brand-hover-color:     $navbar-dark-active-color; // default
 
 // Dropdowns
 $dropdown-dark-color:               $gray-300;  // default
-$dropdown-dark-bg:                  $gray-800;  // default
+$dropdown-dark-bg:                  $gray-700; // lightened to increase contrast with accordion buttons in admin sidebar - was $gray-800;  // default
 $dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Pagination

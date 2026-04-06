@@ -45,7 +45,7 @@
             <div class="row">
                 <div class="col-lg-12">
                     {preference name=users_prefs_allowMsgs}
-                    {preference name=feature_community_mouseover}
+                    <legend class="h3">{tr}Show users' information on mouseover.{/tr}</legend>
                     <div class="adminoptionboxchild" id="feature_community_mouseover_childcontainer">
                         {preference name=feature_community_mouseover_name}
                         {preference name=feature_community_mouseover_gender}
@@ -56,7 +56,6 @@
                         {preference name=feature_community_mouseover_lastlogin}
                         {preference name=feature_community_mouseover_distance}
                     </div>
-                    {preference name=users_prefs_show_mouseover_user_info}
                     {preference name=feature_contact}
                     <div class="adminoptionboxchild" id="feature_contact_childcontainer">
                         {preference name=contact_anon}

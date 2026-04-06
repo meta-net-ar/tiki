@@ -7,7 +7,7 @@
         </a>
     {*    {button href="tiki-admin_shoutbox_words.php" class="btn btn-primary" _text="{tr}Banned Words{/tr}"} *}
     </div>
-
+<div class="styling-element">
     <h2>{tr}Change shoutbox general settings{/tr}</h2>
     <form action="tiki-shoutbox.php" method="post">
         <div class="form-check">
@@ -93,3 +93,4 @@
 {/section}
 
 {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+</div>

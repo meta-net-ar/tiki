@@ -1,4 +1,3 @@
-
 {
     "name": "tiki/tiki",
     "description": "Tiki Wiki CMS Groupware",
@@ -37,7 +36,7 @@
         "    The tilde (~) operator offers tighter control:",
         "       - ~3.0 allows updates up to <3.1.0 (safe minor & patch updates)",
         "       - ~3.0.0 allows only patch updates (<3.0.1)",
-        "    Recommendation: use version constraints like ~3.0 rather than ~3.0.0,", 
+        "    Recommendation: use version constraints like ~3.0 rather than ~3.0.0,",
         "       Using ~3.0 ensures we continue to receive non-breaking feature improvements without being locked into a specific minor release for an extended period.",
         "    Major version bumps (e.g., from 3.x to 4.x) must be handled explicitly in a dedicated commit.",
         "    This ensures that we are aware of potential breaking changes and can test accordingly.",
@@ -46,6 +45,12 @@
         "    Please follow this convention when adding or updating entries in composer.json dependencies.",
         "",
         "DIRECT PHP PACKAGE DEPENDENCIES NOTES:",
+        "",
+        "  candy-chat/xmpp-prebind-php: ",
+        "    Abandoned package (only dev-master available, last updated in 2015).",
+        "    Used to prebind XMPP sessions in PHP for integration with Converse.js.",
+        "    Currently no actively maintained PHP alternative.",
+        "    Replacing it would require a custom solution or migration to token-based auth",
         "",
         "  garethp/php-ews: ",
         "    Overrides minimum-stability for this Cypht dependency until it releases a stable version.",
@@ -76,6 +81,10 @@
         "    Security critical, aparently uninitialised code",
         "    Should probably be removed. benoitg 2023-05-05",
         "",
+        "  pear/xml_parser:",
+        "    This package is abandoned and no longer maintained. No replacement package was suggested. ",
+        "    We use this in lib/wiki/PageParser.php",
+        "",
         "  sentry/sentry: ",
         "    Provides the Sentry namespace",
         "    Used for our Glitchtip integration to catch PHP errors",
@@ -101,31 +110,19 @@
         "    -  Are not here, but are noteworthy when installed transitively:",
         "      - ABANDONNED packages installed transitively",
         "",
-        "  candy-chat/xmpp-prebind-php: ",
-        "    Abandoned package (only dev-master available, last updated in 2015).",
-        "    Used to prebind XMPP sessions in PHP for integration with Converse.js.",
-        "    Currently no actively maintained PHP alternative.",
-        "    Replacing it would require a custom solution or migration to token-based auth",
-        "",
         "  laminas/laminas-loader: ",
         "    ABANDONNED package.",
         "    Required transitively by laminas/laminas-http but will be solved in 3.0 https://github.com/laminas/laminas-http/pull/110",
-        "",
         "",
         "  laminas/laminas-text:",
         "    Reported as an abandoned package, but it is still required indirectly by laminas/laminas-captcha.",
         "    See https://github.com/laminas/laminas-captcha/issues/41 to track progress on removing this dependency.",
         "",
-        "  montefuscolo/xmpp: ",
-        "    We depend on it with ~0.8.",
+        "  pear/structures_graph:",
+        "    Reported as an abandoned package, but it is still required indirectly by pear/pear.",
         "",
-        "  symfony/polyfill-ctype: ",
-        "    Active package providing ctype_* functions when ext-ctype is not available.",
-        "    Version regression: Tiki 24 uses ^1.27, while Tiki master uses ~1.8.",
-        "    Latest stable is v1.32.0, but constrained to ~1.8 by Symfony 6.4 components:",
-        "    - symfony/filesystem v6.4.13 requires ~1.8",
-        "    - symfony/string v6.4.15 requires ~1.8",
-        "    - symfony/yaml v6.4.18 requires ~1.8",
+        "  pear/xml_util:",
+        "    Reported as an abandoned package, but it is still required indirectly by pear/pear.",
         "",
         "  symfony/*",
         "    Upgrading:  ",
@@ -140,7 +137,7 @@
         "WE DECIDED NOT TO PORT THE JAVASCRIPT BUILD SYSTEM:",
         "  The following libraries have not been ported to the new build system for the following reasons: (for each library, please explains its reasons):",
         "    - 'openannotation/annotator': '>=1.2.10'",
-        "       - Reasons: On NPM, the only release version is 1.2.2, please use this commande npm view annotator versions" ,
+        "       - Reasons: On NPM, the only release version is 1.2.2, please use this commande npm view annotator versions",
         "                  With 1.2.2 version, these files annotator-full.min.js and annotator.min.css are missing",
         "                  After running npm install, we get this warning messages :",
         "                      npm warn EBADENGINE Unsupported engine {",
@@ -156,7 +153,7 @@
         "        - Reasons: We are looking for a replacement: https://dev.tiki.org/Replacement-for-WickedGrid-(jQuery.sheet)",
         "",
         "     - nicolaskruchten/pivottable",
-        "       - Reasons: Unmaintained and we have patches, by the time we need to move all js out of documentroot, the situation is likely to have changes - benoitg - 2025-08-28 ",   
+        "       - Reasons: Unmaintained and we have patches, by the time we need to move all js out of documentroot, the situation is likely to have changes - benoitg - 2025-08-28 ",
         "",
         "     - 'robicch/jquery-gantt': '~6.3'",
         "        - Reasons: Not available on NPM: https://github.com/robicch/jQueryGantt/issues/115",
@@ -172,7 +169,6 @@
         "    A set of sniffs for PHP_CodeSniffer that checks for ",
         "    PHP cross-version compatibility.",
         ""
-
     ],
     "require": {
         "bacon/bacon-qr-code": "~3.0",
@@ -183,7 +179,7 @@
         "chrome-php/chrome": "~1.14",
         "codercat/jwk-to-pem": "~1.1",
         "composer/semver": "~3.4",
-        "cweagans/composer-patches": "~1.7",
+        "cweagans/composer-patches": "~2.0",
         "dragonmantank/cron-expression": "~3.5",
         "ecphp/cas-lib": "~3.0",
         "elliotjreed/disposable-emails-filter": "~4.0",
@@ -200,7 +196,7 @@
         "ext-zip": "*",
         "gam6itko/sparkpost-mailer": "~0.3",
         "garethp/php-ews": "dev-master@dev",
-        "h5p/h5p-core": "~1.27",
+        "h5p/h5p-core": "~1.28",
         "h5p/h5p-editor": "~1.25",
         "henrique-borba/php-sieve-manager": "~1.0",
         "hybridauth/hybridauth": "~3.12",
@@ -222,6 +218,10 @@
         "laminas/laminas-validator": "~2.27",
         "league/commonmark": "~2.8",
         "league/flysystem": "~3.30",
+        "league/flysystem-aws-s3-v3": "~3.30",
+        "league/flysystem-ftp": "~3.30",
+        "league/flysystem-sftp-v3": "~3.30",
+        "league/flysystem-webdav": "~3.30",
         "league/html-to-markdown": "~5.1",
         "league/oauth1-client": "~1.11",
         "league/oauth2-client": "~2.9",
@@ -230,7 +230,8 @@
         "manticoresoftware/manticoresearch-php": "~4.0",
         "matthiasmullie/minify": "~1.3",
         "mautic/api-library": "~3.1",
-        "melbahja/seo": "~2.1",
+        "mcp/sdk": "~0.4",
+        "melbahja/seo": "~3.0",
         "meyfa/php-svg": "~0.16",
         "michelf/php-smartypants": "~1.8",
         "monolog/monolog": "~3.9",
@@ -301,7 +302,7 @@
         "php-webdriver/webdriver": "~1.15",
         "phpcompatibility/php-compatibility": "~10.x-dev",
         "phpcompatibility/phpcompatibility-paragonie": "~2.0@dev",
-        "phpcompatibility/phpcompatibility-passwordcompat":"~2.0@dev",
+        "phpcompatibility/phpcompatibility-passwordcompat": "~2.0@dev",
         "phpcompatibility/phpcompatibility-symfony": "~2.0@dev",
         "phpcsstandards/phpcsutils": "~1.0",
         "phpstan/phpstan": "~2.1",
@@ -316,7 +317,9 @@
         "umakantp/smartylint": "0.1.4-p1"
     },
     "extra": {
-        "patches-file": "../installer/composer-patches/composer-patches.json",
+        "composer-patches": {
+            "patches-file": "../installer/composer-patches/composer-patches.json"
+        },
         "stability-ignore": {
             "_comment": [
                 "Packages with non-standard version constraints that require explanation.",
@@ -383,14 +386,6 @@
                 "reviewer": "Joseph Kausi",
                 "alternatives": "Recommendation: Consider migrating to stable v0.11.0 unless dev-master features are needed",
                 "impact": "Exchange integration may be affected if removed."
-            },
-            "symfony/polyfill-ctype": {
-                "reason": "Provides ctype_* functions when ext-ctype extension is not available.",
-                "mitigation": "Version ~1.8 required by Symfony 6.4 components. Provides fallback functionality.",
-                "reviewed": "2025-08-27",
-                "reviewer": "Joseph Kausi",
-                "alternatives": "No alternatives for ctype function polyfills.",
-                "impact": "Symfony components fail. System likely unusable due to cascading failures."
             }
         }
     },
@@ -400,13 +395,29 @@
     "config": {
         "process-timeout": 5000,
         "bin-dir": "../bin",
-        "_comment": "platform-check CANNOT be enabled, because it would check the ext-* requirements of our dependencies not just ours.  See the workarounds below.  So anything that uses the autoloader, including console.php wouldn't work on a server without ext-soap installed.  Note that platform-check will NOT check the maximum php version anyway, even if we put it in our requires.  In platform, php: The oldest version we support, so composer doesn't pick packages that are incompatible with it (nothing to do with what is checked if we enable platform-check).  On the other hand: ext-*: 0 are workarounds.  ext-ldap is in the require of laminas/laminas-ldap. ext-soap is in the require of laminas/laminas-soap.  We couldn't composer install without this workaround if php-ldap or php-soap aren't installed",
+        "_comment": [
+            "platform-check CANNOT be enabled, because it would check the ext-* requirements of our dependencies not just ours.",
+            "See the workarounds below.  So for example anything that uses the autoloader, including console.php wouldn't work on a server ",
+            "without ext-soap installed.",
+            "Note that platform-check will NOT check the maximum php version anyway, even if we put it in our requires.",
+            "So, in platform, we have: ",
+            "php: The oldest version we support, so composer doesn't pick packages that are incompatible with it (nothing to do with what is checked if we enable platform-check).",
+            "On the other hand: ext-*: 0 are workarounds.",
+            "Ex: ext-ldap is in the require of laminas/laminas-ldap. ",
+            "We couldn't composer install without this workaround if php-ldap isn't installed",
+            "So in platform/ext-*, we have:",
+            "  ext-ldap: Required by laminas/laminas-ldap",
+            "  ext-soap: Required by laminas/laminas-soap",
+            "  ext-sockets: Required by ?",
+            "  ext-ftp:  Required by league/flysystem-ftp"
+        ],
         "platform-check": false,
         "platform": {
             "php": "8.1",
             "ext-ldap": "0",
             "ext-soap": "0",
-            "ext-sockets": "0"
+            "ext-sockets": "0",
+            "ext-ftp": "0"
         },
         "secure-http": false,
         "allow-plugins": {
@@ -415,6 +426,16 @@
             "cweagans/composer-patches": true,
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "php-http/discovery": true
+        },
+        "audit": {
+            "ignore-abandoned": {
+                "candy-chat/xmpp-prebind-php": "Work scheduled for removal next month.",
+                "laminas/laminas-loader": "Required transitively by laminas/laminas-http but will be solved in 3.0 https://github.com/laminas/laminas-http/pull/110",
+                "laminas/laminas-text":  "Reported as an abandoned package, but it is still required indirectly by laminas/laminas-captcha. See https://github.com/laminas/laminas-captcha/issues/41 to track progress on removing this dependency.",
+                "pear/structures_graph": " Reported as an abandoned package, but it is still required indirectly by pear/pear",
+                "pear/xml_parser": "This package is abandoned and no longer maintained. No replacement package was suggested.",
+                "pear/xml_util": " Reported as an abandoned package, but it is still required indirectly by pear/pear"
+            }
         }
     },
     "autoload": {

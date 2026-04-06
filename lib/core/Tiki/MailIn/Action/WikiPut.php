@@ -95,7 +95,6 @@ class WikiPut implements ActionInterface
         $page = $this->getPage($message, true);
 
         if (strlen($page) > 160) {
-            $smarty = TikiLib::lib('smarty');
             $page = smarty_modifier_truncate($page, 159, '...', false, true);
         }
 
@@ -131,7 +130,6 @@ class WikiPut implements ActionInterface
 
                 $structName = $route['structName'];
                 $structure_id = $route['structure_id'];
-                $begin = true;
 
                 $after_ref_id = null;
                 $alias = '';

@@ -193,12 +193,12 @@ trait Services_Manager_Trait
             $output .= "\n\n" . $response['output'];
         }
 
-        $temp_instance = new TikiManager\Application\Instance();
-        $temp_access = new TikiManager\Access\Local($temp_instance);
+        $temp_instance = new TikiManager\Application\Instance();   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
+        $temp_access = new TikiManager\Access\Local($temp_instance);   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
         if (stristr(PHP_OS, 'WIN')) {
-            $discovery = new TikiManager\Application\Discovery\WindowsDiscovery($temp_instance, $temp_access, ['os' => 'WINDOWS']);
+            $discovery = new TikiManager\Application\Discovery\WindowsDiscovery($temp_instance, $temp_access, ['os' => 'WINDOWS']);   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
         } else {
-            $discovery = new TikiManager\Application\Discovery\LinuxDiscovery($temp_instance, $temp_access, ['os' => 'LINUX']);
+            $discovery = new TikiManager\Application\Discovery\LinuxDiscovery($temp_instance, $temp_access, ['os' => 'LINUX']);   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
         }
         list($backup_user, $backup_group, $backup_perm) = $discovery->detectBackupPerm($_ENV['BACKUP_FOLDER']);
 

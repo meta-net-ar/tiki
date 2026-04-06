@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use Tiki\Sections;
 use TikiLib;
 use Language;
 use Services_LanguageCheck_Controller;
@@ -25,7 +26,11 @@ use Exception;
  *    _wysiwyg: force wysiwyg editor
  *    _is_html: parse as html
  *    _preview: add a preview in a tab
- *
+ *    _syntax: Specify syntax to be used.
+ *              If blank then \WikiParser_Parsable::guess_syntax is used.
+ *              Use "none" to make a plain text area
+ *    codemirror: if set to 'true' and feature_syntax_highlighter is enabled,
+ *             initializes the textarea using CodeMirror instead of the default editor.
  * usage: {textarea id='my_area' name='my_area'}{tr}My Text{/tr}{/textarea}
  */
 /**
@@ -74,19 +79,19 @@ class TextArea extends Base
         $params['name'] = $params['name'] ?? 'edit';
         $params['id'] = $params['id'] ?? 'editwiki';
         $params['area_id'] = $params['area_id'] ?? $params['id'];    // legacy param for toolbars?
-        $params['class'] = $params['class'] ?? 'wikiedit form-control check_character_limit';
+        $params['class'] = $params['class'] ?? 'wikiedit form-control';
         $params['comments'] = $params['comments'] ?? 'n';
         $params['autosave'] = $params['autosave'] ?? 'y';
 
         $smarty->assign('textarea_id', $params['id']);
 
-        if (empty($params['syntax'])) { // work out if we have Tiki or Markdown syntax
+        if (empty($params['_syntax'])) { // work out if we have Tiki or Markdown syntax
             $wikiParserParsable = new \WikiParser_Parsable($content);
             $syntaxPluginResult = $wikiParserParsable->guess_syntax($content);// for the toolbars
             if (isset($syntaxPluginResult['syntax'])) {
-                $params['syntax'] = $syntaxPluginResult['syntax'];
+                $params['_syntax'] = $syntaxPluginResult['syntax'];
             } else {
-                $params['syntax'] = 'tiki';
+                $params['_syntax'] = 'tiki';
             }// to pick the editor
             if (isset($syntaxPluginResult['editor']) && empty($content) && empty($params['_wysiwyg'])) {
                 $params['_wysiwyg'] = $syntaxPluginResult['editor'] === 'wysiwyg' ? 'y' : 'n';
@@ -96,7 +101,10 @@ class TextArea extends Base
         //codemirror integration
         if ($prefs['feature_syntax_highlighter'] === 'y') {
             $params['data-codemirror'] = $params['codemirror'] ?? '';
-            $params['data-syntax'] = $params['syntax'];
+            $params['data-syntax'] = $params['_syntax'];
+            //add codemirror stuff
+            require_once("lib/codemirror_tiki/tiki_codemirror.php");
+            addCodemirror();
         }
         //keep params html5 friendly
         unset($params['codemirror']);
@@ -105,14 +113,14 @@ class TextArea extends Base
         $params['_previewConfirmExit'] = $params['_previewConfirmExit'] ?? 'y';
 
         if (empty($params['section'])) {
-            global $section;
-            $params['section'] = $section ?: 'wiki page';
+            $section = Sections::getCurrentSection();
+            $params['section'] = $section ?: Sections::SECTION_WIKI_PAGE;
         } elseif ($params['section'] === 'trackeritem') {
             $params['section'] = 'trackers';
         }
         $html = '';
         $html .= '<input type="hidden" name="mode_wysiwyg" value="" /><input type="hidden" name="mode_normal" value="" />';
-        $html .= '<input type="hidden" name="syntax" value="' . $params['syntax'] . '" />';
+        $html .= '<input type="hidden" name="syntax" value="' . $params['_syntax'] . '" />';
 
         $auto_save_referrer = '';
         $auto_save_warning = '';
@@ -179,7 +187,7 @@ class TextArea extends Base
                 $params['name'] = 'edit';
             }
 
-            if ($params['syntax'] === 'markdown') {
+            if ($params['_syntax'] === 'markdown') {
                 // markdown
                 $tuiOptions = $wysiwyglib->setUpMarkdownEditor($as_id, $content, $params, $auto_save_referrer);
 
@@ -203,8 +211,11 @@ class TextArea extends Base
 
             // setup for wiki editor
 
+            if (empty($params['disabled'])) {
+                unset($params['disabled']);
+            }
+
             $params['rows'] = ! empty($params['rows']) ? $params['rows'] : 20;
-    //      $params['cols'] = !empty($params['cols']) ? $params['cols'] : 80;
 
             $textarea_attributes = '';
             foreach ($params as $k => $v) {
@@ -216,7 +227,7 @@ class TextArea extends Base
             if ($textarea_attributes != '') {
                 $smarty->assign('textarea_attributes', $textarea_attributes);
             }
-            $smarty->assign('textarea_syntax', $params['syntax']);
+            $smarty->assign('textarea_syntax', $params['_syntax']);
             $smarty->assign('objectId', $params['objectId'] ?? null);
             $smarty->assign_by_ref('textareadata', $content);
             $html .= $smarty->fetch('wiki_edit.tpl');
@@ -421,7 +432,7 @@ class TextArea extends Base
             $headerlib->add_jsfile('lib/jquery_tiki/edit_preview.js');
         }
 
-        if ($prefs['markdown_enabled'] === 'y' && ($params['syntax'] === 'tiki' || $params['syntax'] === 'markdown')) {
+        if ($prefs['markdown_enabled'] === 'y' && ($params['_syntax'] === 'tiki' || $params['_syntax'] === 'markdown')) {
             $headerlib->add_js(/** @lang JavaScript */ '
     function addSyntaxPlugin(domId, $form) {
         const $textarea = $("#" + domId),

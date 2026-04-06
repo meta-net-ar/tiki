@@ -8,6 +8,7 @@
 use Tiki\Lib\Wiki\ConvertToTiki9;
 use Tiki\Profiling\Timer;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Sections;
 
 /**
  *
@@ -15,6 +16,7 @@ use Tiki\Lib\CookieConsent\CookieConsentLib;
 class ModLib extends TikiLib
 {
     public $pref_errors = [];
+    private bool $moduleAssignmentMode = false;
 
     // additional module zones added to this array will be exposed to tiki.tpl
     // TODO change modules user interface to enable additional zones
@@ -515,26 +517,46 @@ class ModLib extends TikiLib
     }
 
     /**
-     * @param $module
-     * @return bool
+     * Decide if a module should be shown in the current request context.
+     *
+     * Applies module-level preferences, unified admin backend rules and
+     * various visibility constraints (language, section, page, groups, etc.).
+     * When the unified admin backend is enabled, non-admin modules are
+     * normally hidden on control panel pages. Module assignment mode can
+     * override this so modules can be displayed in the site layout context.
+     *
+     * @param array $module tiki_modules row with parsed params
+     * @return bool true if the module should be displayed
      */
     public function filter_active_module($module)
     {
-        global $section, $page, $prefs, $user;
+        global $page, $prefs, $user;
+        $section = Sections::getCurrentSection();
         $tikilib = TikiLib::lib('tiki');
 
+        if ($prefs['module_' . $module["name"]] != 'y') {
+            return false;
+        }
         if (TikiLib::lib('login')->isSwitched() && isset($_SESSION["keep_login_box_visible"]) && $_SESSION["keep_login_box_visible"] == 'y') {
             if ($module["name"] === "login_box" && (! isset($module["mode"]) || isset($module["mode"]) === "module")) {
                 return true;
             }
         }
-        // Load only the Unified Admin Interface (UAB) specific modules for Admins on admin panels/management pages
+        // Load only Unified Admin Interface specific modules for admins on admin panels.
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
-        $isControlPanel = $section === 'admin';
+        $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN);
 
-        if ($prefs['theme_unified_admin_backend'] === 'y' && $isControlPanel && $module['position'] !== 'admin' && ! $topLogin && ! $footer && ! $topQA) {
+        if (
+            $prefs['theme_unified_admin_backend'] === 'y'
+            && $isControlPanel
+            && ! $this->isModuleAssignmentMode()
+            && $module['position'] !== 'admin'
+            && ! $topLogin
+            && ! $footer
+            && ! $topQA
+        ) {
             return false;
         }
 
@@ -561,14 +583,14 @@ class ModLib extends TikiLib
             return false;
         }
 
-        if (isset($params['nopage']) && isset($page) && isset($section) && $section == 'wiki page') {
+        if (isset($params['nopage']) && isset($page) && isset($section) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE)) {
             if (in_array($page, (array) $params['nopage'])) {
                 return false;
             }
         }
 
         if (isset($params['page'])) {
-            if (! isset($section) || $section != 'wiki page' || ! isset($page)) { // must be in a page
+            if (! isset($section) || ! Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) || ! isset($page)) { // must be in a page
                 return false;
             } elseif (! in_array($page, (array) $params['page'])) {
                 return false;
@@ -613,7 +635,7 @@ class ModLib extends TikiLib
             return false;
         }
 
-        if (isset($params['creator']) && $section == 'wiki page' && isset($page)) {
+        if (isset($params['creator']) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && isset($page)) {
             if (! $page_info = $tikilib->get_page_info($page)) {
                 return false;
             } elseif ($params['creator'] == 'y' && $page_info['creator'] != $user) {
@@ -623,7 +645,7 @@ class ModLib extends TikiLib
             }
         }
 
-        if (isset($params['contributor']) && $section == 'wiki page' && isset($page)) {
+        if (isset($params['contributor']) && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) && isset($page)) {
             if (! $page_info = $tikilib->get_page_info($page)) {
                 return false;
             } else {
@@ -656,7 +678,7 @@ class ModLib extends TikiLib
 
         if ($prefs['cookie_consent_feature'] == 'y' && $prefs['cookie_consent_disable'] !== 'y') {      // check if consent required to show
             if (! empty($params['cookie_consent']) && $params['cookie_consent'] === 'y') {
-                if (! CookieConsentLib::checkAllowedCookieCategory(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
+                if (! CookieConsentLib::isCategoryAllowed(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
                     return false;
                 }
             }
@@ -1142,7 +1164,7 @@ class ModLib extends TikiLib
 
             if (! $cachefile || $this->require_cache_build($mod_reference, $cachefile) || $this->is_admin_mode()) {
                 if ($this->is_admin_mode()) {
-                    $timer = new Timer('module');
+                    $timer = new Timer();
                     $timer->start('module');
                 }
                 if ($info['type'] == "function") { // Use the module name as default module title. This can be overriden later. A module can opt-out of this in favor of a dynamic default title set in the TPL using clear_assign in the main module function. It can also be overwritten in the main module function.
@@ -1242,10 +1264,14 @@ class ModLib extends TikiLib
     }
 
     /**
-     * Returns true if on the admin modules page
+     * Returns true when we are on the Admin Modules screen with permission.
      *
-     * @param bool $ifShowingHiddenModules   - check for $_REQUEST['show_hidden_modules'] as well
+     * Used to detect the modules management context (tiki-admin_modules.php).
+     * When $ifShowingHiddenModules is true, this only returns true if the
+     * request also has show_hidden_modules set, which some modules use to
+     * decide whether to render additional admin-only or placeholder output.
      *
+     * @param bool $ifShowingHiddenModules also require show_hidden_modules in the request
      * @return bool
      */
     public function is_admin_mode($ifShowingHiddenModules = false)
@@ -1258,6 +1284,30 @@ class ModLib extends TikiLib
         }
         return $ok && $tiki_p_admin_modules === 'y' &&
                 strpos($_SERVER["SCRIPT_NAME"], 'tiki-admin_modules.php') !== false;
+    }
+
+    /**
+     * Returns true when the current request is managing module assignments.
+     *
+     * This is used to override normal layout filtering so modules can be
+     * displayed in context on tiki-admin_modules.php.
+     *
+     * @return bool
+     */
+    public function isModuleAssignmentMode()
+    {
+        return $this->moduleAssignmentMode;
+    }
+
+    /**
+     * Enable or disable module assignment mode for the current request.
+     *
+     * @param bool $enabled
+     * @return void
+     */
+    public function setModuleAssignmentMode($enabled)
+    {
+        $this->moduleAssignmentMode = (bool) $enabled;
     }
 
     /**
@@ -1275,7 +1325,7 @@ class ModLib extends TikiLib
             $info = $this->parse($info);
 
             // re-assign module_params for the custom module in case a module plugin is used inside it
-            $smarty->assign_by_ref('module_params', $module_params);
+            $smarty->assign_by_ref('user_module_params', $module_params);
             $smarty->assign('user_title', tra($info['title']));
             $smarty->assign_by_ref('user_data', $info['data']);
             $smarty->assign_by_ref('user_module_name', $info['name']);

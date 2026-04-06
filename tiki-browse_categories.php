@@ -8,27 +8,29 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'categories';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'parentId'                    => 'int',           //get
-            'maxRecords'                  => 'int',           //get
-            'sort_mode'                   => 'word',          //get
-            'type'                        => 'string',        //get
-            'offset'                      => 'int',           //get
-            'find'                        => 'string',        //post
-            'deep'                        => 'string',          //get
-            'watch_event'                 => 'word',          //get
-            'watch_action'                => 'word',          //get
-            'watch_object'                => 'int',           //get
-            'and'                         => 'bool',          //get
-            'plain'                       => 'striptags',     //get
-            'links'                       => 'striptags',     //get
+            'parentId'                    => 'int',           // get
+            'maxRecords'                  => 'int',           // get
+            'sort_mode'                   => 'word',           // get
+            'type'                        => 'wordspace',     // get
+            'offset'                      => 'int',           // get
+            'find'                        => 'string',     // post
+            'deep'                        => 'word',          // get & post
+            'watch_event'                 => 'word',           // get
+            'watch_action'                => 'word',           // get
+            'watch_object'                => 'int',           // get
+            'and'                         => 'bool',          // get
+            'plain'                       => 'striptags',          // get
+            'links'                       => 'striptags',          // get
         ],
     ]
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CATEGORIES;
+Sections::setCurrentSection($section);
 $categlib = TikiLib::lib('categ');
 include_once('lib/tree/BrowseTreeMaker.php');
 $access->check_feature('feature_categories');

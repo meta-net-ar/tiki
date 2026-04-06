@@ -533,7 +533,14 @@ class Tracker_Item
                 // getFieldData expects the value to be in $input['ins_xx']
                 $input[$field['ins_id']] = $input['fields'][$field['permName']];
             }
-            return array_merge($field, $handler->getFieldData($input));
+
+            $out = array_merge($field, $handler->getFieldData($input));
+
+            if (method_exists($handler, 'getAutoSyncInlineEditFieldData')) {
+                $out = array_merge($out, $handler->getAutoSyncInlineEditFieldData($input));
+            }
+
+            return $out;
         }
     }
 

@@ -9,12 +9,80 @@ $.fn.setupEventCalendar = function (
     calendarContainer,
     targetId = "calendar",
     urlEventSource = "tiki-ajax_services.php?controller=calendar&action=list_items",
-    returnUrl = "tiki-calendar.php"
+    returnUrl = "tiki-calendar.php",
+    associatedWikiPage = null
 ) {
+    let isOpeningModal = false;
     this.each(function () {
         const calendarEl = document.getElementById(targetId);
         $(calendarEl).tikiModal(tr("Loading..."));
+        const toTimezoneStableIso = (dateValue) => moment(dateValue).format("YYYY-MM-DD[T]HH:mm:ssZ");
+        const browserTimezone = (() => {
+            try {
+                return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
+            } catch (e) {
+                return null;
+            }
+        })();
+        const toPrefillParamValue = (value) => {
+            if (value === null || typeof value === "undefined") {
+                return null;
+            }
+            if (typeof value === "string") {
+                return value;
+            }
+            if (value instanceof Date && !isNaN(value.getTime())) {
+                return toTimezoneStableIso(value);
+            }
+            return String(value);
+        };
 
+        const openNewEventModal = (startValue, endValue = null) => {
+            if (isOpeningModal) return;
+            const countCals = $(".filtercal ul li").length;
+            if (countCals >= 1 || targetId != "calendar") {
+                isOpeningModal = true;
+                $(calendarEl).tikiModal(" "); // Use the container for the loading overlay
+                const prefillStart = toPrefillParamValue(startValue);
+                if (!prefillStart) {
+                    isOpeningModal = false;
+                    return;
+                }
+
+                const params = {
+                    prefill_start: prefillStart,
+                    modal: 1,
+                    return_url: returnUrl,
+                };
+
+                if (browserTimezone) {
+                    params.prefill_tz = browserTimezone;
+                }
+
+                if (endValue !== null && typeof endValue !== "undefined") {
+                    const prefillEnd = toPrefillParamValue(endValue);
+                    if (prefillEnd) {
+                        params.prefill_end = prefillEnd;
+                    }
+                }
+
+                $.openModal({
+                    title: tr("New event"),
+                    size: "modal-lg",
+                    remote: $.service("calendar", "edit_item", params),
+                    open: function () {
+                        $(calendarEl).tikiModal();
+                        $("form:not(.no-ajax)", this).addClass("no-ajax");
+                        isOpeningModal = false;
+                    },
+                    error: function () {
+                        isOpeningModal = false;
+                    },
+                });
+            } else {
+                location.href = "tiki-calendar.php";
+            }
+        };
         calendarContainer[0] = createCalendar(document.getElementById(targetId), [DayGrid, TimeGrid, Interaction, List], {
             eventTimeFormat: {
                 hour: "numeric",
@@ -31,11 +99,16 @@ $.fn.setupEventCalendar = function (
             },
             editable: true,
             selectable: true,
+            unselectAuto: true,
             eventSources: [{ url: urlEventSource }],
+            select: function (info) {
+                // Handle Drag Selection
+                openNewEventModal(info.startStr ?? info.start, info.endStr ?? info.end);
+            },
             slotMinTime: eventCalendarParams.minHourOfDay,
             slotMaxTime: eventCalendarParams.maxHourOfDay,
             nowIndicator: true,
-            pointer: true,
+            pointer: false,
             buttonText: {
                 today: tr("today"),
                 dayGridMonth: tr("month"),
@@ -55,8 +128,19 @@ $.fn.setupEventCalendar = function (
                     if (!document.getElementById("quarter")) {
                         const ecStart = document.querySelector(".ec-start");
                         const buttonMonthView = document.createElement("div");
+                        const quarterText = tr("Quarter");
+                        const semesterText = tr("Semester");
+                        const oneMonthText = tr("One-Month");
                         buttonMonthView.innerHTML =
-                            '<button class="ec-button" id="one-month">One-Month</button><button class="ec-button" id="quarter">Quarter</button><button class="ec-button" id="semester">Semester</button>';
+                            '<button class="ec-button" id="one-month">' +
+                            oneMonthText +
+                            "</button>" +
+                            '<button class="ec-button" id="quarter">' +
+                            quarterText +
+                            "</button>" +
+                            '<button class="ec-button" id="semester">' +
+                            semesterText +
+                            "</button>";
                         ecStart.appendChild(buttonMonthView);
                     }
 
@@ -181,7 +265,9 @@ $.fn.setupEventCalendar = function (
                     }
                 }
                 const eventTitle = tooltipEscape(event.title);
-                element.attr("title", eventTitle + "|" + event.extendedProps.description);
+                let eventDescription = event.extendedProps.viewable === true ? event.extendedProps.description : "";
+                eventDescription = associatedWikiPage?.[event.id] ? associatedWikiPage[event.id] : eventDescription;
+                element.attr("title", eventTitle + "|" + eventDescription);
                 element.addClass("tips");
                 // surely there's a better way?
                 $(element).parent().tiki_popover();
@@ -210,27 +296,13 @@ $.fn.setupEventCalendar = function (
                 }
             },
             dateClick: function (info) {
-                // Handle date clicks in EventCalendar.
-                // If a date number is clicked, switch to Day View for the selected date.
-                // If any other part of the date cell is clicked, open a form to create a new event.
                 if (info.jsEvent.target.classList.contains("ec-day-head")) {
                     calendarContainer[0].changeView("timeGridDay", info.dateStr);
+                    // Prevent 'select' from firing if we are just switching views
+                    calendarContainer[0].unselect();
                 } else {
-                    let $this = $(info.dayEl).tikiModal(" ");
-                    const countCals = $("#filtercal ul li").length;
-                    if (countCals >= 1 || targetId != "calendar") {
-                        $.openModal({
-                            title: tr("New event"),
-                            size: "modal-lg",
-                            remote: $.service("calendar", "edit_item", { todate: info.date.toUnix(), modal: 1, return_url: returnUrl }),
-                            open: function () {
-                                $this.tikiModal();
-                                $("form:not(.no-ajax)", this).addClass("no-ajax"); // Remove default ajax handling, we replace it
-                            },
-                        });
-                    } else {
-                        location.href = "tiki-calendar.php";
-                    }
+                    // Handle Single Click
+                    openNewEventModal(info.dateStr ?? info.date);
                 }
             },
             eventResize: function (info) {
@@ -349,4 +421,109 @@ $(function () {
         $(".slot-container.date" + $(this).val()).show();
         return false;
     });
+
+    $(document).on("submit", ".filtercal", function (e) {
+        e.preventDefault();
+        const form = this;
+        const url = new URL($(form).attr("action"), window.location.origin);
+
+        const checkboxes = $("input[name='calIds[]']", form);
+        const checked = checkboxes.filter(":checked");
+
+        const pageName = url.searchParams.get("page");
+        // remove existing parameters
+        url.search = "";
+
+        // set page parameter
+        if (pageName) {
+            url.searchParams.set("page", pageName);
+        }
+
+        // show all calendars
+        if (checked.length === checkboxes.length) {
+            url.searchParams.set("allCals", "y");
+            window.location.href = url.toString();
+            return;
+        }
+
+        checked.each(function () {
+            url.searchParams.append("calIds[]", this.value);
+        });
+
+        const todate = $("input[name='todate']", form).val();
+        if (todate) {
+            url.searchParams.set("todate", todate);
+        }
+
+        url.searchParams.set("refresh", "Refresh");
+
+        window.location.href = url.toString();
+    });
 });
+
+$.fn.defineParameterOfMultipleCalendar = function (
+    eventCalendarParams,
+    printingParams,
+    divClassContainer,
+    moduleCalendarFocusdate,
+    linkToFindItemsOfCalendar,
+    associatedWikiPage,
+    returnUrl
+) {
+    let paramOfModuleCalendar = eventCalendarParams;
+
+    /**
+     *Since window.moduleCalendar is a global variable, It’s the one we use to contain all the calendars that are currently being displayed,
+     *I first push an empty array into it as preparation
+     *for the container where the calendar will be placed. I do this initially because I also need to know
+     *the index of the calendar I will be using.
+
+     *After that, I create the node where the calendar will be displayed and set the parameters around the
+     *calendar currently being created.
+     */
+
+    window.moduleCalendar.push([]);
+    let takeLength = window.moduleCalendar.length;
+    const calendarContainer = window.moduleCalendar[takeLength - 1];
+
+    var newNode = $('<div class="calendar"></div>').attr("id", "calendar-" + takeLength);
+    const dateOfChangeCalendar = $('<input type="date" class="form-control date-calendar mt-2 mb-2 w-50" >')
+        .attr("id", "date-calendar-" + takeLength)
+        .attr("value", moduleCalendarFocusdate);
+
+    $(divClassContainer)
+        .eq(takeLength - 1)
+        .append(dateOfChangeCalendar);
+    $(divClassContainer)
+        .eq(takeLength - 1)
+        .append(newNode);
+    paramOfModuleCalendar["initialDate"] = $("#date-calendar" + takeLength).val();
+
+    displayCalendarAndPrintButton(takeLength);
+    dateOfChangeCalendar.on("change", function () {
+        paramOfModuleCalendar["initialDate"] = dateOfChangeCalendar.val();
+        let takeIndex = dateOfChangeCalendar.attr("id").split("-")[2];
+        newNode.empty();
+        displayCalendarAndPrintButton(takeIndex);
+    });
+    function displayCalendarAndPrintButton(takeIndex) {
+        const { pdf_export, pdf_warning, pref_print_pdf_from_url } = printingParams;
+        newNode.setupEventCalendar(
+            paramOfModuleCalendar,
+            calendarContainer,
+            "calendar-" + takeIndex,
+            linkToFindItemsOfCalendar,
+            returnUrl,
+            associatedWikiPage
+        );
+        if (pdf_export == "y" && pdf_warning == "n") {
+            const printButton = $('<a href="#" class="text-end d-none" role="button"> Export as PDF</a>').attr("id", "calendar-pdf-btn-" + takeIndex);
+            $(divClassContainer)
+                .eq(takeIndex - 1)
+                .append(printButton);
+        }
+        if (pref_print_pdf_from_url != "none") {
+            newNode.addEventCalendarPrint("#calendar-pdf-btn-" + takeIndex, calendarContainer);
+        }
+    }
+};

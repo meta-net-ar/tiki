@@ -170,6 +170,15 @@ function wikiplugin_tikimanagerclone($data, $params)
         return;
     }
 
+    $missing = WikiPlugin_Helper::validateRequiredParams('tikimanagerclone', $params);
+
+    if ($missing) {
+        return WikiParser_PluginOutput::error(
+            tra('Error'),
+            tra('Missing required parameter(s): ') . implode(', ', $missing)
+        );
+    }
+
     try {
         $utilities = new Services_Manager_Utilities();
         $utilities->tikiManagerCheck();
@@ -185,7 +194,7 @@ function wikiplugin_tikimanagerclone($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    $instances = TikiManager\Application\Instance::getInstances();
+    $instances = TikiManager\Application\Instance::getInstances();   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
     $source = array_map(function ($i) {
         return $i->id;
     }, array_filter($instances, function ($i) use ($source) {

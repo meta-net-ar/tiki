@@ -19,7 +19,7 @@ To make a new theme (for example, a theme called "abc"), add a new directory abc
 These are the supported theme sub-directories and their contents:
 
 * css/: Contains the theme's .css files (manually editable or compiled from SCSS files).  There may be more than one css file here, but there must be one named abc.css (possibly compiled from scss/abc.css)
-* css/abc.css The theme will be available in the list of themes once a .css file with the parent folder's name.  You can then select it at http://example.com/tiki-admin.php?page=look
+* css/abc.css The theme will be available in the list of themes once a .css file with the parent folder's name.  You can then select it at http://example.org/tiki-admin.php?page=look
 * css/custom.css  This file will be included in tiki if present.  The previous file is still mandatory.  The point of this is (I presume benoitg - 2023-04-04) is to have custom css that is not generated from scss, possibly copied from a javascript library or something similar.
 * favicons/: where you can place your theme-specific favicons (check the Tiki favicon feature)
 * fonts/: contains theme-specific custom fonts (For fonts that are stored locally rather than imported via CSS)

@@ -771,11 +771,17 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
             return;
         }
 
+        // Only process tracker-stored messages; skip regular IMAP messages
+        $list_path = $this->request->post['list_path'] ?? '';
+        if (strpos($list_path, 'tracker_folder_') !== 0) {
+            return;
+        }
+
         $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
         $this->out('images_whitelist', explode(',', $this->user_config->get('images_whitelist_setting')));
 
         $this->out('msg_text_uid', $form['imap_msg_uid']);
-        $this->out('msg_list_path', $this->request->post['list_path']);
+        $this->out('msg_list_path', $list_path);
         $part_num = false;
         if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
             $part_num = $this->request->post['imap_msg_part'];
@@ -785,7 +791,7 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
         }
         $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
 
-        $email = tiki_parse_message($this->request->post['list_path'], $form['imap_msg_uid']);
+        $email = tiki_parse_message($list_path, $form['imap_msg_uid']);
         if (! $email) {
             return;
         }
@@ -852,6 +858,10 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
             $this->out('msg_next_subject', $email['next']['subject']);
         }
         $this->out('show_archive', $email['show_archive']);
+
+        if (preg_match("/tracker_folder_(\d+)_(\d+)/", $this->request->post['list_path'], $m) && $email['is_tiki_tracker_trash_folder']) {
+            $this->out('show_restore', true);
+        }
 
         clear_existing_reply_details($this->session);
         if ($part_num == 0) {
@@ -1039,6 +1049,54 @@ class Hm_Handler_tiki_process_imap_unread extends Hm_Handler_Module
     }
 }
 
+
+class Hm_Handler_tiki_restore_message extends Hm_Handler_Module
+{
+    /**
+     * Restore message from archive or trash to inbox folder
+     */
+    public function process()
+    {
+        list($success, $form) = $this->process_form(['imap_msg_uid', 'list_path']);
+        if ($success) {
+            // Remove archive and deleted flags to restore to inbox
+            tiki_flag_message($form['imap_msg_uid'], 'remove', 'archive');
+            tiki_flag_message($form['imap_msg_uid'], 'remove', 'deleted');
+
+            $path = str_replace('tracker_folder_', '', $form['list_path']);
+            list ($itemId, $fieldId) = explode('_', $path);
+
+            $trk = TikiLib::lib('trk');
+            $item = $trk->get_item_info($itemId);
+            if (! $item) {
+                Hm_Msgs::add('Tracker item not found', 'danger');
+                $this->out('restore_error', true);
+                return;
+            }
+
+            $field = $trk->get_field_info($fieldId);
+            if (! $field) {
+                Hm_Msgs::add('Tracker field not found', 'danger');
+                $this->out('restore_error', true);
+                return;
+            }
+
+            // Move message back to inbox by updating the field value
+            $field['value'] = [
+                'restore' => $form['imap_msg_uid']
+            ];
+
+            $trk->replace_item($item['trackerId'], $item['itemId'], [
+                'data' => [$field]
+            ]);
+
+            Hm_Msgs::add('Message restored to inbox');
+            $this->out('restore_error', false);
+        }
+    }
+}
+
+
 /**
  * Add Move to trackers button
  * @subpackage tiki/output
@@ -1058,6 +1116,20 @@ class Hm_Output_tiki_get_create_item_trackers_output extends Hm_Output_Module
     public function output()
     {
         $res = tiki_move_to_tracker_dropdown($this, 'Create item', 'Select Tracker', 'item_to_trackers', true);
+        $headers = append_to_msg_headers($this->get('msg_headers'), $res);
+        $this->out('msg_headers', $headers, false);
+    }
+}
+
+/**
+ * Add Restore Message button in tracker folders
+ * @subpackage tiki/output
+ */
+class Hm_Output_add_restore_message extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $res = tiki_restore_message($this);
         $headers = append_to_msg_headers($this->get('msg_headers'), $res);
         $this->out('msg_headers', $headers, false);
     }
@@ -1214,6 +1286,180 @@ class Hm_Handler_tiki_load_smtp_is_imap_forward extends Hm_Handler_Module
                 $attached_files[$this->request->get['uid']][] = $new_attachment;
             }
             $this->session->set('uploaded_files', $attached_files);
+        }
+    }
+}
+
+
+/**
+ * Process input from the max per source setting for the Junk page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_trackers_setting extends Hm_Handler_Module
+{
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process()
+    {
+        process_site_setting('trackers_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('trackers_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Starts the Trash section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_trackers_settings extends Hm_Output_Module
+{
+    /**
+     * Settings in this section control the trackers view
+     */
+    protected function output()
+    {
+        return '<tr><td data-target=".trackers_setting" colspan="2" class="settings_subtitle cursor-pointer">' .
+            '<i class="bi bi-database fs-5 me-2"></i>' .
+            $this->trans('Trackers') . '</td></tr>';
+    }
+}
+
+/**
+ * Option for the maximum number of messages per source for the Trackers page
+ * @subpackage core/output
+ */
+class Hm_Output_trackers_source_max_setting extends Hm_Output_Module
+{
+    /**
+     * Processed by Hm_Handler_process_trackers_source_max_setting
+     */
+    protected function output()
+    {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', []);
+        $reset = '';
+        if (array_key_exists('trackers_per_source', $settings)) {
+            $sources = $settings['trackers_per_source'];
+        }
+        if ($sources != 20) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
+        }
+        return '<tr class="trackers_setting"><td><label for="trackers_per_source">' .
+            $this->trans('Max messages per source') . '</label></td>' .
+            '<td><input type="text" class="form-control form-control-sm w-auto" size="2" id="trackers_per_source" name="trackers_per_source" value="' . $this->html_safe($sources) . '" data-default-value="' . DEFAULT_PER_SOURCE . '" />' . $reset . '</td></tr>';
+    }
+}
+
+/**
+ * Option for the "since" date range for the Trackers page
+ * @subpackage core/output
+ */
+class Hm_Output_trackers_since_setting extends Hm_Output_Module
+{
+    /**
+     * Processed by Hm_Handler_process_trackers_since_setting
+     */
+    protected function output()
+    {
+        $since = DEFAULT_SINCE;
+        $settings = $this->get('user_settings', []);
+        if (array_key_exists('trackers_since', $settings) && $settings['trackers_since']) {
+            $since = $settings['trackers_since'];
+        }
+        return '<tr class="trackers_setting"><td><label for="trackers_since">' .
+            $this->trans('Show trackers messages since') . '</label></td>' .
+            '<td>' . message_since_dropdown($since, 'trackers_since', $this) . '</td></tr>';
+    }
+}
+
+/**
+ * Add trackers link to main menu
+ * @subpackage tiki/handler
+ */
+class Hm_Output_combined_trackers_link extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="?page=message_list&list_path=trackers">';
+        if (! $this->get('hide_folder_icons')) {
+            $res .= '<i class="bi bi-database account_icon"></i> ';
+        }
+        $res .= $this->trans('Trackers') . '</a></li>';
+
+        if ($this->format == 'HTML5') {
+            return $res;
+        }
+        $this->concat('formatted_folder_list', $res);
+    }
+}
+
+/**
+ * Load IMAP servers for message list page
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_load_trackers_data_sources extends Hm_Handler_Module
+{
+    public $user_config;
+    /**
+     * Used by trackers view
+     */
+    public function process()
+    {
+        if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'trackers') {
+            $limit = $this->user_config->get('trackers_per_source_setting', DEFAULT_PER_SOURCE);
+            $since = $this->user_config->get('trackers_since_setting', DEFAULT_SINCE);
+
+            $this->out('data_sources', [['hook' => 'ajax_tiki_trackers', 'type' => 'custom', 'params' => []]]);
+            $this->out('list_path', 'trackers');
+            $this->out('mailbox_list_title', ['All Tracker items emails']);
+            $this->out('message_list_since', $since);
+            $this->out('per_source_limit', $limit);
+        }
+    }
+}
+
+/**
+ * Fetch messages for the Groupmail page
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_trackers_fetch_messages extends Hm_Handler_Module
+{
+    public $user_config;
+    public $request;
+    public $session;
+    public $config;
+    /**
+     * Returns all messages for trackers
+     */
+    public function process()
+    {
+        if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'trackers') {
+            $limit = $this->user_config->get('trackers_per_source_setting', DEFAULT_PER_SOURCE);
+            $since = $this->user_config->get('trackers_since_setting', DEFAULT_SINCE);
+            $keyword = $this->request->get['keyword'] ?? '';
+
+            $msg_list = tiki_fetch_tracker_messages('inbox', $limit, $since, $keyword);
+
+            $this->out('trackers_message_list_data', $msg_list);
+        }
+    }
+}
+
+/**
+ * Format message headers for the trackers page
+ * @subpackage imap/output
+ */
+class Hm_Output_filter_trackers_data extends Hm_Output_Module
+{
+    /**
+     * Build ajax response for the trackers message list
+     */
+    protected function output()
+    {
+        if ($this->get('trackers_message_list_data')) {
+            prepare_tracker_message_list($this->get('trackers_message_list_data'), $this, $this->get('list_path'));
+        } else {
+            $this->out('formatted_message_list', []);
         }
     }
 }

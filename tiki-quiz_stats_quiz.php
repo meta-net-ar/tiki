@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'quizzes';
 
 $inputConfiguration = [
     [
@@ -22,8 +21,10 @@ $inputConfiguration = [
         ],
     ],
 ];
-
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_QUIZZES;
+Sections::setCurrentSection($section);
 $quizlib = TikiLib::lib('quiz');
 
 $access->check_feature('feature_quizzes');
@@ -48,17 +49,13 @@ if (isset($_REQUEST["remove"]) && $tiki_p_admin_quizzes == 'y' && $access->check
 if (isset($_REQUEST["clear"]) && $tiki_p_admin_quizzes == 'y' && $access->checkCsrf()) {
     $quizlib->clear_quiz_stats($_REQUEST["clear"]);
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'timestamp_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = $_REQUEST["sort_mode"] ?? 'timestamp_desc';
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 $find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-$channels = $quizlib->list_quiz_stats($_REQUEST["quizId"], $offset, $maxRecords, $sort_mode, $find);
+$channels = $quizlib->list_quiz_stats($_REQUEST["quizId"], $offset, $maxRecords, $sort_mode);
 $smarty->assign_by_ref('pages_count', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 //Get all the statistics for this quiz

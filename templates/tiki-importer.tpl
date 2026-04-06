@@ -16,7 +16,7 @@
     {/remarksbox}
 
     <br>
-    <form method="post" name="chooseSoftware" action="tiki-importer.php" class="d-flex flex-row flex-wrap align-items-center">
+    <form method="post" name="chooseSoftware" action="tiki-importer.php" class="d-flex flex-row flex-wrap align-items-center styling-element">
         <label for="importerClassName" class="me-2">{tr}Select the software to import from:{/tr}</label>
         <select name="importerClassName" id="importerClassName" class="form-control me-2">
             <option value="">{tr}Select...{/tr}</option>
@@ -82,15 +82,15 @@
     {if !empty($importErrors)}
         <br>
         <p><b>{tr}Errors:{/tr}</b></p>
-        <textarea rows="15" cols="100" codemirror="false">{$importErrors}</textarea>
+        <textarea rows="15" cols="100">{$importErrors}</textarea>
     {/if}
     <br><br>
     <p><b>{tr}Importer log:{/tr}</b></p>
-    <textarea rows="15" cols="100" codemirror="false">{$importLog}</textarea>
+    <textarea rows="15" cols="100">{$importLog}</textarea>
 
     {if isset($wordpressUrls)}
         <br><br>
         <p><b>{tr}Suggested .htaccess rules:{/tr}</b></p>
-        <textarea rows="15" cols="100" codemirror="false">{$wordpressUrls}</textarea>
+        <textarea rows="15" cols="100">{$wordpressUrls}</textarea>
     {/if}
 {/if}

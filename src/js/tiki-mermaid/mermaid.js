@@ -1,6 +1,6 @@
 import svgPanZoom from "svg-pan-zoom";
-import mermaid from "mermaid/dist/mermaid.esm.mjs"; //from "mermaid" will resolve to mermaid-core.esm.mjs, which currently doesn't work - benoitg-2025-03-14.
-
+//import mermaid from "mermaid/dist/mermaid.esm.mjs"; //from "mermaid" will resolve to mermaid-core.esm.mjs, which currently doesn't work - benoitg-2025-03-14.
+import mermaid from "mermaid";
 export default function handleMermaid() {
     mermaid.initialize({
         startOnLoad: false,
@@ -18,7 +18,7 @@ export default function handleMermaid() {
     const renderDiagram = async (element) => {
         try {
             let svgElement = await drawDiagram(element);
-            svgElement.style.height = "60vh";
+            svgElement.style.height = "80vh";
             svgElement.style.maxWidth = "100%";
             const mermaidPanZoom = svgPanZoom(svgElement, {
                 zoomEnabled: true,

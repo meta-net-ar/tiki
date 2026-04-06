@@ -59,7 +59,8 @@ abstract class AbstractTrackerField
     public static function getFromTrackerAndId(\Tracker_Definition $trackerDefinition, int $fieldId)
     {
         global $tikilib;
-        $row = $tikilib->getOne("SELECT fieldId, trackerId, name , permName FROM tiki_tracker_fields WHERE fieldId=?", [$fieldId]);
+        $result = $tikilib->query("SELECT fieldId, trackerId, name, permName, options, type FROM tiki_tracker_fields WHERE fieldId=?", [$fieldId]);
+        $row = $result->fetchRow();
         return static::getInstanceFromTrackerAndRow($trackerDefinition, $row);
     }
 
@@ -71,6 +72,10 @@ abstract class AbstractTrackerField
         }
         $itemFieldClass = Tracker_Field_Factory::getTrackerItemFieldClassFromType($fieldRow['type']);
         $class = $itemFieldClass::getTrackerFieldClass();
+        if (! isset($fieldRow['options'])) {
+            throw new \InvalidArgumentException("Field row is missing required 'options' key for field ID: " . $fieldRow['fieldId']);
+        }
+
         $field = $trackerDefinition->getFieldInstanceFromCache($fieldRow['fieldId']);
         if (! $field) {
             $field = new $class($trackerDefinition, $fieldRow);

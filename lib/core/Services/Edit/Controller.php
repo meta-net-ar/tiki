@@ -7,6 +7,7 @@
 
 use Tiki\Lib\core\Toolbar\ToolbarItem;
 use Tiki\Lib\Diff\DiffUtils;
+use Tiki\Sections;
 
 /**
  * Class Services_Edit_Controller
@@ -268,19 +269,11 @@ $(window).on("load", function(){
             ];
         }
 
-        if ($input->markdown->int()) {
+        if ($input->markdown_wysiwyg->int() || $input->markdown->int()) {
             $help_sections[] = [
                 'id' => 'wiki-help',
-                'title' => tr('Mardown Syntax Help'),
+                'title' => tr('Markdown Syntax Help'),
                 'content' => $smarty->fetch('tiki-edit_help_markdown.tpl'),
-            ];
-        }
-
-        if ($input->markdown_wysiwyg->int()) {
-            $help_sections[] = [
-                'id' => 'wiki-help',
-                'title' => tr('Mardown Syntax Help'),
-                'content' => $smarty->fetch('tiki-edit_help_markdown_wysiwyg.tpl'),
             ];
         }
 
@@ -516,6 +509,8 @@ $(window).on("load", function(){
         global $tikilib;
 
         $section = $input->section->wordspace();
+        Sections::setCurrentSection($section);
+
 
         $global = $tikilib->get_preference('toolbar_global');
         $sectionToolbar = preg_split('/,|\||\//', $tikilib->get_preference('toolbar_' . $section, $global));
@@ -562,6 +557,7 @@ $(window).on("load", function(){
         $smarty = TikiLib::lib('smarty');
 
         $section = $input->section->wordspace();
+        Sections::setCurrentSection($section);
         $tools = $input->tools->raw();
 
         $prefName = 'toolbar_' . $section;

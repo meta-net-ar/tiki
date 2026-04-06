@@ -38,7 +38,11 @@ class TrackerFieldPeerTube extends AbstractItemField implements SynchronizableIn
         $insertId = $this->getInsertId();
 
         if (isset($requestData[$insertId])) {
-            $value = implode(',', $requestData[$insertId]);
+            // Ensure we have an array (single checkbox might be a string)
+            $values = is_array($requestData[$insertId])
+                ? $requestData[$insertId]
+                : [$requestData[$insertId]];
+            $value = implode(',', array_unique(array_filter($values)));
         } elseif (! empty($requestData['old_' . $insertId])) { // all entries removed
             $value = '';
         } else {
@@ -64,17 +68,33 @@ class TrackerFieldPeerTube extends AbstractItemField implements SynchronizableIn
             $videoList = [];
         }
 
-        $listedIds = array_values(array_filter(array_map(function ($v) {
+        // Collect all possible identifiers for the returned videos to avoid false positives in extras
+        $knownIds = [];
+        foreach ((array) $videoList as $v) {
             if (is_array($v)) {
-                return $v['id'] ?? $v['uuid'] ?? null;
+                if (isset($v['id'])) {
+                    $knownIds[] = $v['id'];
+                }
+                if (isset($v['uuid'])) {
+                    $knownIds[] = $v['uuid'];
+                }
+                if (isset($v['shortUUID'])) {
+                    $knownIds[] = $v['shortUUID'];
+                }
+            } elseif (is_object($v)) {
+                if (isset($v->id)) {
+                    $knownIds[] = $v->id;
+                }
+                if (isset($v->uuid)) {
+                    $knownIds[] = $v->uuid;
+                }
+                if (isset($v->shortUUID)) {
+                    $knownIds[] = $v->shortUUID;
+                }
             }
-            if (is_object($v)) {
-                return $v->id ?? $v->uuid ?? null;
-            }
-            return null;
-        }, (array) $videoList)));
+        }
 
-        $extras = array_values(array_diff($videos, $listedIds));
+        $extras = array_values(array_diff($videos, $knownIds));
 
         return $this->renderTemplate(
             'trackerinput/peertube.tpl',
@@ -103,9 +123,24 @@ class TrackerFieldPeerTube extends AbstractItemField implements SynchronizableIn
         $videoIds = array_filter(array_map('trim', explode(',', (string) $this->getValue())));
         $out = '';
 
+        if (empty($videoIds)) {
+            return $out;
+        }
+
+        global $prefs;
+        $base = rtrim($prefs['peertube_service_url'] ?? '', '/');
+
+        if (empty($base)) {
+            return $out;
+        }
+
         foreach ($videoIds as $id) {
-            $params = array_merge($otherParams, ['id' => $id]);
-            $out   .= \TikiLib::lib('parser')->invokePlugin('peertube', '', $params);
+            // Convert video ID/UUID to PeerTube URL format: base/w/uuid
+            $videoUrl = $base . '/w/' . $id;
+            $params = array_merge($otherParams, ['url' => $videoUrl]);
+            $out .= '<div class="peertube-video-item mb-3">';
+            $out .= \TikiLib::lib('parser')->invokePlugin('peertube', '', $params);
+            $out .= '</div>';
         }
 
         return $out;

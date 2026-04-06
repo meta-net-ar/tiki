@@ -16,9 +16,9 @@ class QueuedTaskSettings
     private static $statuses = null;
 
     private static $jobTypePageMapping = [
-        'CreateInstance' => 'manager_create',
-        'RebuildIndex' => 'index_rebuild',
-        'PdfGeneration' => 'pdf_generation',
+        'CreateInstanceTask' => 'manager_create',
+        'RebuildIndexTask' => 'index_rebuild',
+        'PdfGenerationTask' => 'pdf_generation',
     ];
 
     /**

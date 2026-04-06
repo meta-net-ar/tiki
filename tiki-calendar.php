@@ -11,29 +11,32 @@
 
 use Tiki\Lib\TikiDate;
 
-$section = 'calendar';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'allCals'               => 'text',              //post
+            'allCals'               => 'bool',              //post
             'refresh'               => 'bool',              //post
-            'find'                  => 'word',              //post
+            'find'                  => 'string',         //post
             'day'                   => 'digits',            //post
             'year'                  => 'digits',            //post
             'mon'                   => 'digits',            //post
-            'generate_availability' => 'digits',            //post
-            'sort_mode'             => 'string',            //get
-            'watch_event'           => 'string',            //post
-            'watch_action'          => 'string',            //post
-            'todate'                => 'string',            //post
-
-        ],'staticKeyFiltersForArrays' => [
-            'calIds'                    => 'int',          //post
+            'generate_availability' => 'bool',              //post
+            'sort_mode'             => 'word',              //get
+            'watch_event'           => 'word',              //post
+            'watch_action'          => 'word',              //post
+            'todate'                => 'int',               //post
+            'viewmode'              => 'word',              //post
+            'calitemId'            => 'int',                //post
+        ],
+        'staticKeyFiltersForArrays'   => [
+            'calIds'                => 'int',               //post
         ],
     ]
 ];
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_CALENDAR;
+Sections::setCurrentSection($section);
 $calendarlib = TikiLib::lib('calendar');
 $categlib = TikiLib::lib('categ');
 include_once('lib/newsletters/nllib.php');
@@ -87,28 +90,16 @@ if (empty($rawcals['data'])) {
     Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
-$minHourOfDay = 12;
-$maxHourOfDay = 12;
-$calendars = [];
-$canEditAnything = false;
+$calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
+$calendarInitialParams['initialView'] = $_REQUEST['viewmode'] ?? 'dayGridMonth';
+$smarty->assign('eventCalendarParams', $calendarInitialParams);
 
-foreach ($rawcals['data'] as $calendar) {
-    $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
-
-    $calendars[$calendar['calendarId']] = $calendar;
-
-    // for week and day views
-    $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-    $startOfDayHour = $startOfDayUnix / 3600;
-    $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
-    $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
-    $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-    $endOfDayHour = $endOfDayUnix / 3600;
-    $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
-    $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
-
-    $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
-}
+$calendars = $calendarInitialParams['calendars'];
+$canEditAnything = $calendarInitialParams['canEditAnything'];
+$minHourOfDay = (int)explode(':', $calendarInitialParams['minHourOfDay'])[0];
+$maxHourOfDay = (int)explode(':', $calendarInitialParams['maxHourOfDay'])[0];
+$startOfDayMinute = (int)explode(':', $calendarInitialParams['minHourOfDay'])[1];
+$endOfDayMinute = (int)explode(':', $calendarInitialParams['maxHourOfDay'])[1];
 
 $rawsubs = $calendarlib->get_subscriptions($user);
 foreach ($rawsubs['data'] as $sub) {
@@ -235,7 +226,7 @@ if (! empty($_REQUEST['generate_availability'])) {
                 continue;
             }
             $ranges[$day] = [
-                [(int)$minHourOfDay, 0], [(int)$maxHourOfDay, 0]
+                [$minHourOfDay, $startOfDayMinute], [$maxHourOfDay, $endOfDayMinute]
             ];
         }
         $busy_list = [];

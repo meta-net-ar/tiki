@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'cms';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -54,6 +53,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $categlib = TikiLib::lib('categ');
 $artlib = TikiLib::lib('art');
 
@@ -163,6 +165,11 @@ $smarty->assign('edit_data', 'n');
 $smarty->assign('emails', '');
 $smarty->assign('userEmail', $userlib->get_user_email($user));
 $smarty->assign('ispublished', '');
+
+$smarty->assign('MAX_ARTICLE_TITLE_LENGTH', ArtLib::MAX_ARTICLE_TITLE_LENGTH);
+$smarty->assign('MAX_ARTICLE_SUBTITLE_LENGTH', ArtLib::MAX_ARTICLE_SUBTITLE_LENGTH);
+$smarty->assign('MAX_ARTICLE_HEADING_LENGTH', ArtLib::MAX_ARTICLE_HEADING_LENGTH);
+$smarty->assign('MAX_ARTICLE_BODY_LENGTH', ArtLib::MAX_ARTICLE_BODY_LENGTH);
 
 // If the articleId is passed then get the article data
 // GGG - You have to check for the actual value of the articleId because it
@@ -512,46 +519,49 @@ if (isset($_REQUEST['save']) && empty($errors)) {
         $isfloat = 'n';
     }
 
-    $imgdata = urldecode($_REQUEST['image_data']);
+    $imgdata = '';
+    $imgname = '';
+    $imgtype = '';
+    $imgsize = 0;
+
+    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+        $filegallib = TikiLib::lib('filegal');
+        try {
+            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+        } catch (Exception $e) {
+            Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
+        }
+        $file_name = $_FILES['userfile1']['name'];
+        $file_tmp_name = $_FILES['userfile1']['tmp_name'];
+        $tmp_dest = $prefs['tmpDir'] . '/' . $file_name . '.tmp';
+        if (! move_uploaded_file($file_tmp_name, $tmp_dest)) {
+            Feedback::errorAndDie(tra('Errors detected'), \Laminas\Http\Response::STATUS_CODE_409);
+        }
+        $fp = fopen($tmp_dest, 'rb');
+        if (! $fp && $_FILES['userfile1']['error']) {
+            Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
+        }
+        $imgdata = fread($fp, filesize($tmp_dest));
+        if (! $imgdata && isset($_FILES['userfile1']['error'])) {
+            Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
+        }
+        fclose($fp);
+        if (is_file($tmp_dest)) {
+            @unlink($tmp_dest);
+        }
+        $imgtype = $_FILES['userfile1']['type'];
+        $imgsize = $_FILES['userfile1']['size'];
+        $imgname = $_FILES['userfile1']['name'];
+    } elseif ($articleId) {
+        $existing = $artlib->get_article($articleId);
+        $imgdata = $existing['image_data'];
+        $imgname = $existing['image_name'];
+        $imgtype = $existing['image_type'];
+        $imgsize = $existing['image_size'];
+    }
 
     if (strlen($imgdata) > 0) {
         $hasImage = 'y';
-    }
-
-    $imgname = $_REQUEST['image_name'];
-    $imgtype = $_REQUEST['image_type'];
-    $imgsize = $_REQUEST['image_size'];
-
-    if (isset($_FILES['userfile1'])) {
-        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-            $filegallib = TikiLib::lib('filegal');
-            try {
-                $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-            } catch (Exception $e) {
-                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
-            }
-            $file_name = $_FILES['userfile1']['name'];
-            $file_tmp_name = $_FILES['userfile1']['tmp_name'];
-            $tmp_dest = $prefs['tmpDir'] . '/' . $file_name . '.tmp';
-            if (! move_uploaded_file($file_tmp_name, $tmp_dest)) {
-                Feedback::errorAndDie(tra('Errors detected'), \Laminas\Http\Response::STATUS_CODE_409);
-            }
-            $fp = fopen($tmp_dest, 'rb');
-            if (! $fp && $_FILES['userfile1']['error']) {
-                Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
-            }
-            $imgdata = fread($fp, filesize($tmp_dest));
-            if (! $imgdata && isset($_FILES['userfile1']['error'])) {
-                Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
-            }
-            fclose($fp);
-            if (is_file($tmp_dest)) {
-                @unlink($tmp_dest);
-            }
-            $imgtype = $_FILES['userfile1']['type'];
-            $imgsize = $_FILES['userfile1']['size'];
-            $imgname = $_FILES['userfile1']['name'];
-        }
     }
 
     // TODO ImageGalleryRemoval23.x replace with a file gallery version
@@ -624,7 +634,6 @@ if (isset($_REQUEST['save']) && empty($errors)) {
             $author = $user;
         }
     }
-
     $_REQUEST['title'] = strip_tags($_REQUEST['title'], '<a><pre><p><img><hr><b><i>');
     $artid = $artlib->replace_article(
         $_REQUEST['title'],

@@ -63,7 +63,7 @@
         {/if}
     {/if}
 
-    <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
+    <div class="{if $js}table-responsive{/if} styling-element"> {*the table-responsive class cuts off dropdown menus *}
         <table class="table table-condensed table-hover table-striped">
             <tr>
                 <th class="id text-center">{self_link _sort_arg='sort_mode' _sort_field='trackerId'}{tr}Id{/tr}{/self_link}

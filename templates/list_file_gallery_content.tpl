@@ -1,7 +1,7 @@
 {if empty($sort_arg)}
     {$sort_arg='sort_mode'}
 {/if}
-<div class="table-responsive">
+<div class="table-responsive styling-element">
     <table class="table">
         <tr>
             {if !empty($files) and $gal_info.show_checked ne 'n' and ($tiki_p_admin_file_galleries eq 'y' or $tiki_p_upload_files eq 'y')}

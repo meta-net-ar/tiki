@@ -81,9 +81,9 @@
                             '<td>' + job.type + '</td>' +
                             '<td>' + statusBadge + '</td>' +
                             '<td>' + result + '</td>' +
-                            '<td class="date">' + job.started_at || '' + '</td>' +
-                            '<td class="date">' + job.ended_at || '' + '</td>' +
-                            '<td class="date">' + job.created_at || '' + '</td>' +
+                            '<td class="date">' + (job.started_at || '') + '</td>' +
+                            '<td class="date">' + (job.ended_at || '') + '</td>' +
+                            '<td class="date">' + (job.created_at || '') + '</td>' +
                         '</tr>';
                     });
                     $('#admin_queued_tasks tbody').html(rows);

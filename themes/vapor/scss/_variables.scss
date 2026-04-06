@@ -14,10 +14,10 @@ $yellow-800: shade-color($yellow, 60%) !default;
 $primary:       $purple; // !default;
 $secondary:     #D917A2; // $pink !default;
 $success:       #068938; // $green !default;
-$info:         #0879BF; // $blue !default;
+$info:          #0879BF; // $blue !default;
 $warning:       #946F00; // $yellow !default;
 $danger:        #E02E3A; // $red !default;
-$light:         #0F6D75; // #11828D; // #44d9e8 !default; Darkened for acceptable contrast behind link color
+$light:         #754AC4; // #0F6D75; // #11828D; // #44d9e8 !default; Darkened for acceptable contrast behind link color
 $dark:          $gray-900; // !default;
 
 //$min-contrast-ratio:   1.2 !default;
@@ -25,6 +25,7 @@ $dark:          $gray-900; // !default;
 // Options
     // Prefix
 $prefix: bs-; // default -- Compiling needs this to be declared
+$enable-dark-mode: false;
 
 // $enable-rounded:              false !default;
 
@@ -54,18 +55,18 @@ $mark-bg:                     $yellow-800;
 $input-bg: #30115e;  // Copied from Bootswatch demo page.
 
 // Navs
-$nav-link-color:                    #000; // var(--#{$prefix}link-color) !default;
-$nav-link-hover-color:              var(--#{$prefix}link-hover-color) !default;
+$nav-link-color:                    var(--#{$prefix}link-color); // !default;
+$nav-link-hover-color:              var(--#{$prefix}link-hover-color); // default;
 
 // Navbar
-$navbar-light-color:                #000;
-$navbar-light-hover-color:          $gray-800;
-$navbar-light-active-color:         $gray-900;
-$navbar-light-disabled-color:       $gray-700;
-//$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .95); // !default;
-//$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8); // !default;
-//$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // !default;
-//$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // !default;
+//$navbar-light-color:                #000;
+//$navbar-light-hover-color:          $gray-800;
+//$navbar-light-active-color:         $gray-900;
+//$navbar-light-disabled-color:       $gray-700;
+$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .95); // !default;
+$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8); // !default;
+$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // !default;
+$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // !default;
 $navbar-light-brand-color:          $navbar-light-active-color; // !default;
 $navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
 
@@ -83,7 +84,7 @@ $tooltip-bg:                        $dark !default;
 // List group
 // Breadcrumbs
 // Code
-$code-color:                        $pink;
+$code-color:                        #FAD6F1; //$pink;
 
 //--------------------------- Tiki SCSS variables
 

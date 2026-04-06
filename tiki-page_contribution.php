@@ -7,7 +7,6 @@
 
 use Tiki\Lib\Wiki\Document;
 
-$section = 'wiki page';
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 $inputConfiguration = [
     [
@@ -25,6 +24,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 $histlib = TikiLib::lib('hist');
 
 $access->check_feature('feature_wiki');

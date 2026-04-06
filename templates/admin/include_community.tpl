@@ -13,7 +13,7 @@
             <fieldset>
                 <legend class="h3">{tr}Community{/tr}{help url="Community"}</legend>
                 {preference name=feature_community_gender}
-                {preference name=feature_community_mouseover}
+                <legend class="h3">{tr}Show users' information on mouseover.{/tr}</legend>
                 <div class="adminoptionboxchild" id="feature_community_mouseover_childcontainer">
                     {preference name=feature_community_mouseover_name}
                     {preference name=feature_community_mouseover_gender}

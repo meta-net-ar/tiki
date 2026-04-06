@@ -98,6 +98,63 @@
                 {/remarksbox}
             {/if}
 
+            {if ! empty($scheduler_failure_logs) }
+                {remarksbox type="error" title="{tr}Scheduler tasks failure logs{/tr}"}
+                    <p>
+                    {if ! empty($prefs.scheduledTasksReport) && $prefs.scheduledTasksReport === 'last_number_of_hours'}
+                        {tr}Nº of tasks failure in last {$prefs.scheduledTasksReportHours} hours:{/tr}
+                        {if ! empty($scheduler_total_count)}
+                            <strong>{$scheduler_failure_count} / {$scheduler_total_count}</strong> ({tr}failures / total executions{/tr})
+                        {else}
+                            <strong>{count($scheduler_failure_logs)}</strong>
+                        {/if}
+                    {else}
+                        {tr}Nº of tasks failure during last execution:{/tr}
+                        <strong>{count($scheduler_failure_logs)}</strong>
+                    {/if}
+                    </p>
+
+                    <strong>{tr}Scheduler tasks with errors:{/tr}</strong>
+                    <ul>
+                        {foreach from=$scheduler_failure_logs item=item}
+                            <li>{$item['name']}</li>
+                        {/foreach}
+                    </ul>
+
+                    <p>
+                        <a target="_blank" href="tiki-admin_schedulers.php">
+                            {tr}View Scheduler Details{/tr}
+                        </a>
+                    </p>
+                {/remarksbox}
+            {/if}
+
+            {if $htaccess_global_warning}
+                {remarksbox type="warning" title="{tr}.htaccess differs from the bundled _htaccess{/tr}"}
+                    <p class="mb-2">
+                        {tr}Your active <code>.htaccess</code> does not match the reference <code>_htaccess</code> shipped with Tiki.{/tr}
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-outline-secondary btn-sm" href="{$htaccessDocsUrl|escape}" target="_blank" rel="noopener">
+                            {tr}How to fix{/tr}
+                        </a>
+                        <a class="btn btn-outline-primary btn-sm" href="tiki-admin_security.php#content" rel="noopener">
+                            {tr}See details in Security panel{/tr}
+                        </a>
+                    </div>
+                    <details class="small mt-2">
+                        <summary>{tr}Technical details{/tr}</summary>
+                        <ul class="list-unstyled mb-0">
+                            <li>{tr}Reference hash:{/tr} <code>{$htaccess_global_warning.reference_hash|escape}</code></li>
+                            <li>{tr}Active hash:{/tr} <code>{$htaccess_global_warning.hash|escape}</code></li>
+                            {if !empty($htaccess_global_warning.details.symlink_target)}
+                                <li>{tr}Symlink target:{/tr} <code>{$htaccess_global_warning.details.symlink_target|escape}</code></li>
+                            {/if}
+                        </ul>
+                    </details>
+                {/remarksbox}
+            {/if}
+
             {if $vendor_autoload_ignored or $vendor_autoload_disabled}
                 {remarksbox type="error" title="{tr}Vendor folder issues{/tr}"}
                     {tr}Your vendor folder contains multiple packages that were normally bundled with Tiki. Since version 17 those libraries were migrated from the folder <strong>vendor</strong> to the folder <strong>vendor_bundled</strong>.{/tr}<br />
@@ -153,7 +210,7 @@
 
             {if !$isSchedulerRunConfigured}
                 {remarksbox type="warning" title="{tr}The Scheduler does not seem to have been executed recently.{/tr}"}
-                    {tr}In most Tiki installations it is useful to have the scheduler configured to execute tasks in the background{/tr}
+                    {tr}In most Tiki installations it is useful to have the scheduler configured to execute tasks in the background.{/tr}
                     {tr}Find out more about the Scheduler at{/tr}
                     <a href="https://doc.tiki.org/Scheduler" class="link" target="_blank">
                         https://doc.tiki.org/Scheduler

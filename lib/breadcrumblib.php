@@ -159,12 +159,12 @@ function _breadcrumb_buildTrail($crumbs, $len = -1, $cnt = -1, $showLinks = true
         }
         $ret = array_filter($ret);
         $wrapped = array_map(function ($crumb) {
-            return '<li class="breadcrumb-item pe-2">' . $crumb . '</li>';
+            return '<li class="breadcrumb-item">' . $crumb . '</li>';
         }, $ret);
         return implode('', $wrapped);
     } else {
         $crumb = _breadcrumb_buildCrumb($crumbs, $cnt, $loclass, $showLinks);
-        return $crumb ? '<li class="breadcrumb-item pe-2">' . $crumb . '</li>' : '';
+        return $crumb ? '<li class="breadcrumb-item">' . $crumb . '</li>' : '';
     }
 }
 
@@ -335,6 +335,10 @@ function _breadcrumb_getTitle($crumbs, $loc)
             }
 
             $ret = '<a class="' . $class . '"' . $metadata . ' title="' . tra("refresh") . '" href="' . $escapedHref . '">';
+        } elseif ($loc == 'page' && $len > 0) {
+            /* current_object() can be unset on wiki view (e.g. section/request not set); without this, the h1 has no link (reported bug). */
+            require_once('tiki-sefurl.php');
+            $ret = '<a class="' . $class . '" title="' . tra("refresh") . '" href="' . filter_out_sefurl($crumbs[$len - 1]->url) . '">';
         } else {
             $ret = '';
         }
@@ -348,7 +352,7 @@ function _breadcrumb_getTitle($crumbs, $loc)
         }
         $ret .= tra("go back to this crumb");
         $ret .= '" accesskey="' . ($cnt);
-        include_once('tiki-sefurl.php');
+        require_once('tiki-sefurl.php');
         $ret .= '" href="' . filter_out_sefurl($crumbs[$len - 1]->url) . '">';
     }
     if ($prefs['feature_breadcrumbs'] == 'n' && $loc == "admin") {

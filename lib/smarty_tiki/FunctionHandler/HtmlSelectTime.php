@@ -41,6 +41,7 @@ class HtmlSelectTime extends Base
         $minute_interval    = 1;
         $second_interval    = 1;
         $hour_minmax        = '0-23';
+        $add_end_minute     = true;
         $tikidate = new TikiDate();
         /* Should the select boxes be part of an array when returned from PHP?
        e.g. setting it to "birthday", would create "birthday[Hour]",
@@ -155,7 +156,8 @@ class HtmlSelectTime extends Base
                 $minutes[] = sprintf('%02d', $all_minutes[$i]);
             }
 
-            if ($minute_interval > 1) {
+            // Add 59 minutes option when using intervals > 1, unless explicitly disabled
+            if ($minute_interval > 1 && $add_end_minute) {
                 $minutes[] = 59;
             }
 

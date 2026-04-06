@@ -142,7 +142,6 @@ class WikiRenderer
         // Need to have showstructs when in more than one struct - for usability reasons
         $structs = $structlib->get_page_structures($this->page);
         $structs_with_perm = [];
-        $children = $structlib->s_get_pages($this->page);
         foreach ($structs as $t_structs) {
             if ($tikilib->user_has_perm_on_object($this->user, $t_structs['pageName'] ?? null, 'wiki page', 'tiki_p_view')) {
                 $structs_with_perm[] = $t_structs;
@@ -203,7 +202,6 @@ class WikiRenderer
             return;
         }
 
-        $tikilib = TikiLib::lib('tiki');
         $multilinguallib = TikiLib::lib('multilingual');
 
         if (! empty($this->info['lang'])) {
@@ -270,7 +268,7 @@ class WikiRenderer
 
     private function setupActions()
     {
-        global $prefs, $tiki_p_edit, $tiki_p_remove, $tiki_p_admin_wiki;
+        global $prefs;
         $wikilib = TikiLib::lib('wiki');
 
         // Verify lock status
@@ -317,9 +315,7 @@ class WikiRenderer
 
     private function setupPage()
     {
-        global $prefs, $user;
-        $wikilib = TikiLib::lib('wiki');
-        $tikilib = TikiLib::lib('tiki');
+        global $prefs;
 
         $this->smartyassign('page', $this->page);
         $this->smartyassign('show_page', 'y');
@@ -518,7 +514,6 @@ class WikiRenderer
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
         $categlib = TikiLib::lib('categ');
-        $userlib = TikiLib::lib('user');
         if ($prefs['feature_user_watches'] != 'y') {
             return;
         }

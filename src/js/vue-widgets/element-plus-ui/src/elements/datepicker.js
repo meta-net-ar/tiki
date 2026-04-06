@@ -7,12 +7,24 @@ customElements.define(
     defineCustomElement(
         (props, ctx) => {
             const internalState = reactive({ ...props });
+            if (internalState.minutestep !== undefined) {
+                internalState.minuteStep = Number(internalState.minutestep);
+            }
+            if (internalState.enforcestep !== undefined) {
+                internalState.enforceStep = Number(internalState.enforcestep);
+            }
 
             watch(
                 () => props,
                 (newProps) => {
                     Object.keys(newProps).forEach((key) => {
                         internalState[key] = newProps[key];
+                        if (key === "minutestep") {
+                            internalState.minuteStep = Number(newProps[key]);
+                        }
+                        if (key === "enforcestep") {
+                            internalState.enforceStep = Number(newProps[key]);
+                        }
                     });
                 },
                 { immediate: true, deep: true }

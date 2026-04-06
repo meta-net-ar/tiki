@@ -22,8 +22,6 @@ class Multilingual_Aligner_UpdateSentences
     //$translation is 1 in case of source modification(H) and 0 in case of target modification(T"), final_diff is carrying end result
     public function DifferencebetweenOriginalFileandModifiedFile($unchangedSource_array, $changedSource_array, $alignments, $translator, $source_lng, $target_lng, $translation)
     {
-        $changed_diff_unchanged = [];
-        $changedSource_translated = [];
         $changed_diff_unchanged = $this->text_diff($unchangedSource_array, $changedSource_array);
         //both files are samea
         if (count($changed_diff_unchanged) == 0) {
@@ -169,10 +167,8 @@ class Multilingual_Aligner_UpdateSentences
             $num++;
         }
         $changed_diff_unchanged = array_values($changed_diff_unchanged);
-        $num = 0;
         while (count($changed_diff_unchanged) > 0) {
             $value = $changed_diff_unchanged[0];
-            $num++;
             $key_value = "";
             $target_lng_array = $alignments->getSentenceInOtherLanguage($value, $source_lng, $key_value, $changed_diff_unchanged, $this->array_search_function($value, $changed_diff_unchanged));  //as two or more target sentences are being considered as one string, here instead of string arrays should be returned
             $key_value = $target_lng_array[0];
@@ -201,7 +197,6 @@ class Multilingual_Aligner_UpdateSentences
                         if ($translation != "NULL") {
                             $changedSource_translated[] = "+" . trim($translation);
                         } else {
-                            //$changedSource_translated[]="+"."no translation is available in french for $temp";
                             $changedSource_translated[] = "+" . "$temp";
                         }
                     } else {
@@ -209,7 +204,6 @@ class Multilingual_Aligner_UpdateSentences
                         if ($translation != "NULL") {
                             $changedSource_translated[] = "+" . trim($translation);
                         } else {
-                                //$changedSource_translated[]="+"."no translation is available in french for $value";
                             $changedSource_translated[] = "+" . "$value";
                         }
                     }

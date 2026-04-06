@@ -306,11 +306,14 @@ function wikiplugin_customsearch($data, $params)
         $offset = (int) $_SESSION["customsearch_$id"]["offset"];
     }
 
+    $autosearchdelay = ! empty($params['autosearchdelay']) ? max(0, (int) $params['autosearchdelay']) : 0;
+    $loadDelay = $autosearchdelay > 0 ? 0 : 1000;
+
     $options = [
         'searchfadetext' => tr('Loading...'),
         'searchfadediv' => $params['searchfadediv'],
         'results' => empty($params['destdiv']) ? "#customsearch_{$id}_results" : "#{$params['destdiv']}",
-        'autosearchdelay' => ! empty($params['autosearchdelay']) ? max(1500, (int) $params['autosearchdelay']) : 0,
+        'autosearchdelay' => $autosearchdelay,
         'searchonload' => (int) $params['searchonload'],
         'requireinput' => (bool) $params['requireinput'],
         'origrequireinput' => (bool) $params['requireinput'],
@@ -347,7 +350,7 @@ var customsearch$id = {
     },
     auto: function () {
     },
-    _executor: delayedExecutor(1000, function (cs) {
+    _executor: delayedExecutor($loadDelay, function (cs) {
         var selector = '#' + cs.options.searchfadediv;
         if (cs.options.searchfadediv.length <= 1 && $(selector).length === 0) {
             selector = '#customsearch_' + cs.id;
@@ -557,6 +560,22 @@ customsearch$id._load = function (receive, params) {
     if (typeof params !== undefined) {
         $.extend(datamap, params);
     }
+    if (datamap.download) {
+        let form = $('<form method=\"post\" action=\"'+$.service('search_customsearch', 'customsearch')+'\"></form>');
+        $.param(datamap).split('&').forEach(function(pair) {
+            let parts = pair.split('=');
+            let name = decodeURIComponent(parts[0]);
+            let value = decodeURIComponent(parts[1] || '');
+            form.append($('<input>').attr({
+                type: 'hidden',
+                name: name,
+                value: value
+            }));
+        });
+        form.appendTo('body').submit();
+        return;
+    }
+
     $.ajax({
         type: 'POST',
         url: $.service('search_customsearch', 'customsearch'),
@@ -585,6 +604,11 @@ customsearch$id.maxRecords = $maxRecords;
 customsearch$id.store_query ='';
 customsearch$id.init();
 $iconinsert;
+$(document).on('submit', '#listexecute-download-wpcs-$id, #listexecute-download-top-wpcs-$id', function(e) {
+    e.preventDefault();
+    customsearch$id._load(null, {download: true});
+    return false;
+});
 $(document).trigger('formSearchReady');
 ";
 
@@ -726,7 +750,7 @@ function cs_design_input($id, $fieldname, $fieldid, $arguments, $default, &$scri
     $script .= "
 (function (id, config, fieldname) {
     var field = $('#' + id);
-    field.on('change', function() {
+    var updateFilter = function () {
 
         var partial = '';
         var value = $(this).val();
@@ -759,10 +783,16 @@ function cs_design_input($id, $fieldname, $fieldid, $arguments, $default, &$scri
 
         customsearch$id.add($(this).attr('id'), filter);
         customsearch$id.offset = 0;
-    });
+    };
+
+    field.on('change', updateFilter);
+
+    if (field.is(':text, input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=password]')) {
+        field.on('input', updateFilter);
+    }
 
     if (config['default'] || $(field).attr('type') === 'hidden') {
-        field.trigger('change');
+        field.change();
     }
 })('$fieldid', " . json_encode($arguments) . ", " . json_encode($fieldname) . ");
 ";

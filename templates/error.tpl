@@ -92,8 +92,10 @@ close();
 
     {* Hide the error navigation on the homepage *}
     {if !isset($page) or $prefs.site_wikiHomePage neq $page}
+        <div class="t_navbar mb-3">
         {button href=$prefs.tikiIndex _type="link" _icon_name="home" _text="{tr}Return to home page{/tr}"}
         {button _type="link" _icon_name="arrow-left" _onclick="javascript:history.back();return false;" _text="{tr}Go back{/tr}" _ajax="n"}
+        </div>
     {/if}
 {/capture}
 

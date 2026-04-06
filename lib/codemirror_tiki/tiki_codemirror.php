@@ -8,7 +8,7 @@
 /**
  * Create codemirror modes in temp - put wiki language upfront.
  */
-function createCodemirrorModes()
+function addCodemirror()
 {
     global $prefs, $tikidomainslash;
     $js = '';
@@ -24,10 +24,6 @@ function createCodemirrorModes()
 test = { mode: function () {}, indentation: function() {} }
 ';  // test is a dummy line to supress exceptions from mode tests in cm 3
 
-        //load modes first
-        //tiki first, where are our priorities!
-        $js .= @file_get_contents("lib/codemirror_tiki/mode/tiki/tiki.js");
-         $css .= @file_get_contents("themes/base_files/feature_css/codemirror_mode_tiki.css");
 
         foreach (glob(CODEMIRROR_DIST_PATH . '/mode/*', GLOB_ONLYDIR) as $dir) {
             foreach (glob($dir . '/*.js', GLOB_NOCHECK) as $jsFile) {
@@ -37,7 +33,7 @@ test = { mode: function () {}, indentation: function() {} }
                         $prefs['tiki_minify_javascript'] !== 'y' ||
                         (
                             // FIXME temporary workaound for errors in codemirror 5.19.0
-                            strpos($jsFile, 'powershell.js') === false && strpos($jsFile, 'swift.js') === false
+                            ! str_contains($jsFile, 'powershell.js') && ! str_contains($jsFile, 'swift.js')
                         )
                     )
                 ) {
@@ -65,10 +61,16 @@ test = { mode: function () {}, indentation: function() {} }
         chmod($cssModes, 0644);
     }
 
-    // creation upfront is ok, but only include them if the feature is enabled. Otherwise we would get js errors bc codemirror itself would be missing
-    if (isset($prefs['feature_syntax_highlighter']) && $prefs['feature_syntax_highlighter'] == 'y') {
-        TikiLib::lib("header")
-            ->add_jsfile($jsModes)
-            ->add_cssfile($cssModes);
-    }
+    //add codemirror stuff
+    TikiLib::lib("header")->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
+        ->add_jsfile_dependency(CODEMIRROR_DIST_PATH . '/lib/codemirror.js')
+        ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/search/searchcursor.js')
+        ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/mode/overlay.js')
+        //add tiki stuff
+        ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css')
+        ->add_jsfile('lib/codemirror_tiki/codemirror_tiki.js')
+        //add interactjs
+        ->add_jsfile(NODE_PUBLIC_DIST_PATH . '/interactjs/dist/interact.min.js')
+        ->add_jsfile($jsModes)
+        ->add_cssfile($cssModes);
 }

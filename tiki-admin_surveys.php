@@ -24,9 +24,11 @@ $inputConfiguration = [
         ],
     ],
 ];
-$section = 'admin';
 require_once('tiki-setup.php');
 include_once('lib/surveys/surveylib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_surveys');
 
 $auto_query_args = [
@@ -159,7 +161,6 @@ $smarty->assign('mins', $mins);
 $cat_type = 'survey';
 $cat_objid = $_REQUEST["surveyId"];
 include_once("categorize_list.php");
-$section = 'surveys';
 include_once('tiki-section_options.php');
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

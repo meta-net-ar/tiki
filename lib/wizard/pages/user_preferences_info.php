@@ -24,7 +24,6 @@ class UserWizardPreferencesInfo extends Wizard
 
     public function isVisible()
     {
-        global  $prefs;
         //return $prefs['feature_userPreferences'] === 'y';
         return true; // hardcoded to true since at least the first page is shown to tell the user that the user
                      // preferences feature is disabled site-wide & he/she might want to ask the site admin to enable it
@@ -72,8 +71,6 @@ class UserWizardPreferencesInfo extends Wizard
         $avatar = $tikilib->get_user_avatar($userwatch);
         $smarty->assign_by_ref('avatar', $avatar);
         $smarty->assign_by_ref('user_prefs', $user_preferences[$userwatch]);
-        $user_information = $tikilib->get_user_preference($userwatch, 'user_information', 'public');
-        $smarty->assign_by_ref('user_information', $user_information);
         $usertrackerId = false;
         $useritemId = false;
         if ($prefs['userTracker'] == 'y') {
@@ -123,6 +120,5 @@ class UserWizardPreferencesInfo extends Wizard
         if (isset($_REQUEST["homePage"])) {
             $tikilib->set_user_preference($userwatch, 'homePage', $_REQUEST["homePage"]);
         }
-        $tikilib->set_user_preference($userwatch, 'user_information', $_REQUEST['user_information']);
     }
 }

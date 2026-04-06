@@ -7,6 +7,7 @@
         </a>
         {include file='admin/include_apply_top.tpl'}
     </div>
+    <div class="styling-element">
     {if $prefs.wysiwyg_htmltowiki neq 'y'}
         {remarksbox type="warning" title="{tr}Page links{/tr}"}{tr}Note that if the SEFURL feature is on, page links created using wysiwyg might not be automatically updated when pages are renamed. This is addressed through the "Use Wiki syntax in WYSIWYG" feature.{/tr}{/remarksbox}
     {/if}
@@ -57,5 +58,6 @@
             {preference name=ajax_autosave}
         </div>
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

@@ -11,12 +11,11 @@ use Tiki\Lib\Theme\ThemeLib;
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
         'userId'                          => 'int',          //post
-        'view_user'                       => 'int',          //post
+        'view_user'                       => 'username',     //post
         'generate'                        => 'bool',         //post
         'tfagenerate'                     => 'bool',         //post
         'new_info'                        => 'bool',         //post
@@ -25,7 +24,6 @@ $inputConfiguration = [
         'country'                         => 'striptags',    //post
         'location'                        => 'striptags',    //post
         'homePage'                        => 'pagename',     //post
-        'user_information'                => 'striptags',    //post
         'new_prefs'                       => 'bool',         //post
         'mytheme'                         => 'striptags',    //post
         'userbreadCrumb'                  => 'digits',       //post
@@ -35,7 +33,6 @@ $inputConfiguration = [
         'display_timezone'                => 'striptags',    //post
         'display_12hr_clock'              => 'bool',         //post
         'diff_versions'                   => 'bool',         //post
-        'show_mouseover_user_info'        => 'bool',         //post
         'remember_closed_rboxes'          => 'bool',         //post
         'email_isPublic'                  => 'bool',         //post
         'mailCharset'                     => 'striptags',    //post
@@ -78,6 +75,9 @@ $inputConfiguration = [
 ];
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $modlib = TikiLib::lib('mod');
 $userprefslib = TikiLib::lib('userprefs');
 $perspectivelib = TikiLib::lib('perspective');
@@ -85,7 +85,7 @@ $perspectivelib = TikiLib::lib('perspective');
 // Get cookie consent user preferences
 $cookieConsentPrefs = CookieConsentLib::getConsentPreferences();
 // Get all the existing cookie categories
-$cookieCategories = CookieConsentLib::getCookieCategories();
+$cookieCategories = CookieConsentLib::getRequestedCookieCategories();
 
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use PragmaRX\Google2FA\Google2FA;
@@ -94,6 +94,7 @@ use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
 use Tiki\Lib\TikiDate;
+use Tiki\TwoFactorAuth\TwoFactorAuth;
 
 // User preferences screen
 if ($prefs['feature_userPreferences'] != 'y' && $prefs['change_password'] != 'y' && $tiki_p_admin_users != 'y') {
@@ -136,7 +137,7 @@ $foo1 = str_replace("tiki-user_preferences", "tiki-editpage", $foo["path"]);
 $foo2 = str_replace("tiki-user_preferences", "tiki-index", $foo["path"]);
 $smarty->assign('url_edit', $tikilib->httpPrefix() . $foo1);
 $smarty->assign('url_visit', $tikilib->httpPrefix() . $foo2);
-$smarty->assign('show_mouseover_user_info', $prefs['show_mouseover_user_info'] ?? $prefs['feature_community_mouseover']);
+
 
 if ($prefs['feature_perspective'] === 'y') {
     $smarty->assign('perspectives', $perspectivelib->list_perspectives());
@@ -178,9 +179,6 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_info"]) && $ac
     if (isset($_POST["homePage"])) {
         $tikilib->set_user_preference($userwatch, 'homePage', $_POST["homePage"]);
     }
-
-    $tikilib->set_user_preference($userwatch, 'user_information', $_POST['user_information']);
-
     TikiLib::events()->trigger(
         'tiki.user.update',
         [
@@ -276,7 +274,13 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
     if (isset($_POST['display_timezone'])) {
         $tikilib->set_user_preference($userwatch, 'display_timezone', $_POST['display_timezone']);
     }
-
+    if (array_key_exists('user_localtimezonesync', $_POST)) {
+        $tikilib->set_user_preference(
+            $userwatch,
+            'user_localtimezonesync',
+            $_POST['user_localtimezonesync'] === 'y' ? 'y' : 'n'
+        );
+    }
     if (isset($_POST['display_12hr_clock']) && $_POST['display_12hr_clock'] == 'on') {
         $tikilib->set_user_preference($userwatch, 'display_12hr_clock', 'y');
         $smarty->assign('display_12hr_clock', 'y');
@@ -290,15 +294,6 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
     } else {
         $tikilib->set_user_preference($userwatch, 'diff_versions', 'n');
         $smarty->assign('diff_versions', 'n');
-    }
-    if ($prefs['feature_community_mouseover'] == 'y') {
-        if (isset($_POST['show_mouseover_user_info']) && $_POST['show_mouseover_user_info'] == 'on') {
-            $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'y');
-            $smarty->assign('show_mouseover_user_info', 'y');
-        } else {
-            $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'n');
-            $smarty->assign('show_mouseover_user_info', 'n');
-        }
     }
 
     $tikilib->set_user_preference($userwatch, 'remember_closed_rboxes', empty($_POST['remember_closed_rboxes']) ? 'n' : 'y');
@@ -476,6 +471,7 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             Feedback::errorAndDie($polerr, \Laminas\Http\Response::STATUS_CODE_400);
         }
         $userlib->change_user_password($userwatch, $_POST["pass1"]);
+        $userlib->update_lastlogin($userwatch);
         if ($prefs['feature_user_encryption'] === 'y') {
             // Notify CryptLib about the login
             $cryptlib = TikiLib::lib('crypt');
@@ -507,7 +503,7 @@ if (
     }
 }
 
-if (isset($_POST['twofactor']) && $access->checkCsrf() && $prefs['twoFactorAuthType'] == 'email2FA') {
+if (isset($_POST['twofactor']) && $access->checkCsrf() && $prefs['twoFactorAuthType'] == TwoFactorAuth::EMAIL_2FA) {
     $tfaSecret = $userlib->update_2_factor_secret($user, 'y');
 }
 
@@ -527,7 +523,7 @@ $smarty->assign('twoFactorSecret', $twoFactorSecret);
 
 $userinfo = $userlib->get_user_info($userwatch);
 $generate = isset($_REQUEST['tfagenerate']) || empty($tfaSecret);
-if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] == 'google2FA') {
+if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] == TwoFactorAuth::TOTP_2FA) {
     $google2fa = new Google2FA();
     if (empty($_SESSION['tfaSecret']) || $_SESSION['tfaSecret'] == $tfaSecret) {
         $_SESSION['tfaSecret'] = $google2fa->generateSecretKey();
@@ -559,15 +555,51 @@ if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] =
     $smarty->assign('imageType', $imageType);
 }
 
-if (isset($_POST['deleteaccount']) && $tiki_p_delete_account == 'y' && $access->checkCsrf(true)) {
-    $userlib->remove_user($userwatch);
+if (isset($_POST['deleteaccount']) && $access->checkCsrf(true)) {
+    if (! isset($_POST['deleteaccountconfirm'])) {
+        $smarty->assign('msg', tra('Please check the confirmation box to delete the account.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Determine the target user explicitly from the POST form data to prevent
+    // mismatch with $userwatch which is derived from $_REQUEST (GET+POST merged).
+    // Never fall back to $user to avoid accidentally deleting the logged-in admin.
+    if (empty($_POST['view_user'])) {
+        $smarty->assign('msg', tra('Invalid request: no target user specified.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    $deleteUser = $_POST['view_user'];
+    if (empty($userlib->user_exists($deleteUser))) {
+        $smarty->assign('msg', tra('Unknown user'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Non-admin users can only delete their own account
+    if ($deleteUser !== $user && $tiki_p_admin_users !== 'y') {
+        $smarty->assign('msg', tra('You do not have permission to delete other accounts.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    if ($deleteUser === $user && $tiki_p_delete_account !== 'y') {
+        $smarty->assign('msg', tra('You do not have permission to delete your own account.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Prevent deletion of the built-in admin account
+    if ($deleteUser === 'admin') {
+        $smarty->assign('msg', tra('The built-in admin account cannot be deleted.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    $userlib->remove_user($deleteUser);
 
     $unifiedsearchlib = TikiLib::lib('unifiedsearch');
-    $unifiedsearchlib->invalidateObject('user', $userwatch);
+    $unifiedsearchlib->invalidateObject('user', $deleteUser);
 
-    if ($user == $userwatch) {
+    if ($user === $deleteUser) {
         header('Location: tiki-logout.php');
-    } elseif ($tiki_p_admin_users == 'y') {
+    } elseif ($tiki_p_admin_users === 'y') {
         header('Location: tiki-adminusers.php');
     } else {
         header("Location: $base_url");
@@ -653,7 +685,6 @@ $smarty->assign_by_ref('avatar', $avatar);
 $mailCharsets = ['utf-8', 'iso-8859-1'];
 $smarty->assign_by_ref('mailCharsets', $mailCharsets);
 $smarty->assign_by_ref('user_prefs', $user_preferences[$userwatch]);
-$tikilib->get_user_preference($userwatch, 'user_information', 'public');
 $tikilib->get_user_preference($userwatch, 'diff_versions', 'n');
 $usertrackerId = false;
 $useritemId = false;

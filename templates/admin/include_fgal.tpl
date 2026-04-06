@@ -108,6 +108,7 @@
                 {preference name='file_galleries_redirect_from_image_gallery'}
                 {preference name='fgal_convert_documents_pdf'}
                 {preference name='fgal_maximum_image_width_preview'}
+                {preference name='fgal_file_max_archives'}
             </fieldset>
 
             <fieldset>
@@ -135,9 +136,15 @@
                 <legend class="h3"> {tr}Settings for Media Alchemyst{/tr}{help url="Media-Alchemyst"}</legend>
                 {preference name=alchemy_ffmpeg_path}
                 {preference name=alchemy_ffprobe_path}
+                {preference name=alchemy_converter_type}
                 {preference name=alchemy_unoconv_path}
                 {preference name=alchemy_unoconv_timeout}
-                {preference name=alchemy_unoconv_port}
+                {if $prefs.alchemy_converter_type === 'unoconv'}
+                    {preference name=alchemy_unoconv_port}
+                {/if}
+                {if $prefs.alchemy_converter_type === 'unoserver'}
+                    {preference name=alchemy_unoserver_port}
+                {/if}
                 {preference name=alchemy_gs_path}
                 {preference name=alchemy_imagine_driver}
             </fieldset>

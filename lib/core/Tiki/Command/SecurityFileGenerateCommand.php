@@ -148,8 +148,8 @@ class SecurityFileGenerateCommand extends Command
                 $output->writeln("<error>Signature key is empty</error>");
                 return false;
             }
-            $gnupg = new gnupg();
-            $gnupg->setsignmode(gnupg::SIG_MODE_CLEAR);
+            $gnupg = new \gnupg();
+            $gnupg->setsignmode(\gnupg::SIG_MODE_CLEAR);
             $gnupg->addsignkey($signatureKey);
             $securityTxtContent = $gnupg->sign($securityTxtContent);
         }

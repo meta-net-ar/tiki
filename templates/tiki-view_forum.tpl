@@ -133,17 +133,23 @@
             </div>
         {/if}
     </div>
-    <div class="breadcrumb">
-        <a class="link" href="{if $prefs.feature_sefurl eq 'y'}forums{else}tiki-forums.php{/if}">{tr}Forums{/tr}</a>
-        {$prefs.site_crumb_seper}
-        {foreach from=$parents item=parent}
-            {if isset($parent.name)}
-                <a class="link" href="{$parent.forumId|sefurl:'forum'}">{$parent.name|escape}</a>
-                {$prefs.site_crumb_seper}
-            {/if}
-        {/foreach}
-        <a class="link" href="{$forumId|sefurl:'forum'}">{$forum_info.name|escape}</a>
-    </div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb"{if $prefs.site_crumb_seper} style="--bs-breadcrumb-divider: '{$prefs.site_crumb_seper|escape:'quotes'}'"{/if}>
+            <li class="breadcrumb-item">
+                <a class="link" href="{if $prefs.feature_sefurl eq 'y'}forums{else}tiki-forums.php{/if}">{tr}Forums{/tr}</a>
+            </li>
+            {foreach from=$parents item=parent}
+                {if isset($parent.name)}
+                    <li class="breadcrumb-item">
+                        <a class="link" href="{$parent.forumId|sefurl:'forum'}">{$parent.name|escape}</a>
+                    </li>
+                {/if}
+            {/foreach}
+            <li class="breadcrumb-item active" aria-current="page">
+                {$forum_info.name|escape}
+            </li>
+        </ol>
+    </nav>
 
     {if $tiki_p_forum_post_topic eq 'y'}
         {if $comment_preview eq 'y'}

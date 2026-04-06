@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -11,11 +11,13 @@
         {accordion_group title="{tr}General{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label for="name">{tr}Name{/tr}</label>
-                <input class="form-control" type="text" name="name" id="name" value="{$info.name|escape}" required="required">
+                <input class="form-control" type="text" name="name" id="name" value="{$info.name|escape}" maxlength="{$MAX_TRACKER_NAME_LENGTH}" required="required">
             </div>
             <div class="mb-3 mx-0">
                 <label for="description">{tr}Description{/tr}</label>
-                <textarea class="form-control" name="description" id="description" cols="40">{$info.description|escape}</textarea>
+                {* if the _syntax param is empty, {textarea} will work out the best one, "none" forces a plain <textarea> to be created *}
+                {$descriptionSyntax = $info.descriptionIsParsed eq 'y' ? '' : 'none'}
+                {textarea class="form-control" name="description" id="description" cols="40" _syntax=$descriptionSyntax}{$info.description|escape}{/textarea}
             </div>
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="descriptionIsParsed" id="descriptionIsParsed" {if $info.descriptionIsParsed eq 'y'}checked="checked"{/if} value="1">
@@ -39,12 +41,10 @@
                         const prefix = $("#fieldPrefix")
                         if (! prefix.val()) {
                             prefix.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
-                            prefix.next('el-input').attr("value", prefix.val());
                         }
                         const permName = $("#permName")
                         if (! permName.val()) {
                             permName.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
-                            permName.next('el-input').attr("value", permName.val());
                         }
                     }
                 });
@@ -83,7 +83,7 @@
                     {tr}Allow comments{/tr}
                 </label>
             </div>
-            <div class="form-check depends" data-on="useComments"
+            <div class="form-check depends" data-on="useComments">
                 <input type="checkbox" class="form-check-input" name="showComments" id="showComments" value="1"
                         {if $info.showComments eq 'y'} checked="checked"{/if}>
                 <label class="form-check-label" for="showComments">
@@ -139,6 +139,45 @@
                     </label>
                 </div>
             {/if}
+        {/accordion_group}
+        {accordion_group title="{tr}Duplication{/tr}" accordion_pos=$accordion_pos}
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="enableDuplicate" id="enableDuplicate" value="1"
+                    {if $info.enableDuplicate eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="enableDuplicate">
+                    {tr}Enable Duplicate Action{/tr}
+                </label>
+            </div>
+            <div class="mb-3 mx-0 depends" data-on="enableDuplicate">
+                <label class="form-label">{tr}Field Duplication Rules{/tr}</label>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>{tr}Field{/tr}</th>
+                                <th>{tr}Action{/tr}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {foreach from=$fields item=field}
+                                <tr>
+                                    <td>{$field.name|escape}</td>
+                                    <td>
+                                        <select name="duplicateRules[{$field.fieldId}]" class="form-select">
+                                            <option value="copy" {if empty($info.val_duplicateRules[$field.fieldId]) or $info.val_duplicateRules[$field.fieldId] eq 'copy'}selected{/if}>{tr}Copy{/tr}</option>
+                                            <option value="clear" {if $info.val_duplicateRules[$field.fieldId] eq 'clear'}selected{/if}>{tr}Clear/Empty{/tr}</option>
+                                            <option value="default" {if $info.val_duplicateRules[$field.fieldId] eq 'default'}selected{/if}>{tr}Set to Default{/tr}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-text">
+                    {tr}Define how each field should be handled when duplicating an item.{/tr}
+                </div>
+            </div>
         {/accordion_group}
         {accordion_group title="{tr}Display{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">

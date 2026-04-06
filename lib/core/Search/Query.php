@@ -14,6 +14,7 @@ class Search_Query implements Search_Query_Interface
     private $weightCalculator = null;
     private $identifierFields = null;
     private $selectionFields = null;
+    private $countOnly = false;
 
     private $postFilter;
     private $processDidYouMean = false;
@@ -69,6 +70,16 @@ class Search_Query implements Search_Query_Interface
     public function getCyphtSearch()
     {
         return $this->cyphtSearch;
+    }
+
+    public function setCountOnly($countOnly = true)
+    {
+        $this->countOnly = (bool) $countOnly;
+    }
+
+    public function isCountOnly()
+    {
+        return $this->countOnly;
     }
 
     public function addObject($type, $objectId)
@@ -398,7 +409,7 @@ class Search_Query implements Search_Query_Interface
             } else {
                 $resultset = $index->find($this, $this->start, $this->count, $multisearchId, $resultFromMultisearch);
             }
-        } catch (Search_Elastic_SortException $e) {
+        } catch (Search_Elastic_SortException) {
             //on sort exception, try again without the sort field
             $this->sortOrder = null;
             $resultset = $index->find($this, $this->start, $this->count);
@@ -446,7 +457,7 @@ class Search_Query implements Search_Query_Interface
 
         $resultset = $this->processReturnOnlyResultsFromList($resultset);
         // Add the list of date fields to the result set
-        foreach ($resultset as $row => $entry) {
+        foreach ($resultset as $entry) {
             $tabDateField = [];
             foreach ($entry as $column => $value) {
                 if ($index->isDateField($column)) {

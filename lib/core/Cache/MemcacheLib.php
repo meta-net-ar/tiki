@@ -259,6 +259,6 @@ class MemcacheLib
                 ($use_md5 ? md5($str_key) : '[' . $str_key . ']');
         }
 
-        throw new InvalidArgumentException("key parameter is neither an array or string");
+        throw new \InvalidArgumentException("key parameter is neither an array or string");
     }
 }

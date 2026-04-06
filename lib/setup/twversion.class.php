@@ -46,7 +46,7 @@ class TWVersion
         $this->branch   = 'trunk';
 
         // Set everything else, including defaults.
-        $this->version  = '30.0vcs';
+        $this->version  = '31.0vcs';
         $this->star     = 'TBA';
         $this->releases = [];
 
@@ -384,6 +384,7 @@ class TWVersion
                 '24.8',
                 '24.9',
                 '24.10',
+                '24.11',
                 '25.0alpha',
                 '25.0beta',
                 '25.0RC1',
@@ -406,6 +407,7 @@ class TWVersion
                 '27.2',
                 '27.3',
                 '27.4',
+                '27.5',
                 '28.0alpha',
                 '28.0beta',
                 '28.0RC1',
@@ -414,10 +416,12 @@ class TWVersion
                 '28.2',
                 '28.3',
                 '28.4',
+                '28.5',
                 '29.0alpha',
                 '29.0beta',
                 '29.0RC1',
                 '29.0',
+                '29.1',
             ];
     }
 
@@ -450,8 +454,6 @@ class TWVersion
             return;
         }
         global $tikilib;
-        $upgrade = 0;
-        $major = 0;
         $velements = explode('.', $this->getBaseVersion());
         // .version contains an ordered list of release numbers, one per line. All minor releases from a same major release are grouped.
         $body = $tikilib->httprequest('tiki.org/' . $this->branch . '.version');
@@ -504,6 +506,7 @@ class TWVersion
         return [
             '24' => '2027-03-31',
             '27' => '2029-02-28',
+            '30' => '2031-03-31',
         ];
     }
 

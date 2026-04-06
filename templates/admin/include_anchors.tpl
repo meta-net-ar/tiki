@@ -487,7 +487,16 @@
                             </div>
                             {* Search Content end*}
 
-                        </div>
+                            {* Collapse Menu Button *}
+                            </div>
+                            <div class="admin-menu-collapser border-top mt-auto">
+                                <a href="#" class="d-block px-4 py-3 fw-semibold text-decoration-none admin-menu-collapse-btn" role="button" aria-label="{tr}Collapse menu{/tr}">
+                                    {icon name="chevron-left" iclass="fa-fw"}
+                                    <span class="ms-1 narrow-hide collapse-text">{tr}Collapse Sidebar{/tr}</span>
+                                    <span class="ms-1 narrow-hide expand-text">{tr}Expand Sidebar{/tr}</span>
+                                </a>
+                            </div>
+
                     </div>
                 </div>
             </div>

@@ -23,7 +23,6 @@ function wikiplugin_comment_info()
                 'filter' => 'text',
                 'options' => [
                     ['text' => tr('Tracker Item'), 'value' => 'trackeritem'],
-                    ['text' => tr('Image Gallery'), 'value' => 'image gallery'],
                     ['text' => tr('Image'), 'value' => 'image'],
                     ['text' => tr('File Gallery'), 'value' => 'file gallery'],
                     ['text' => tr('File'), 'value' => 'file'],

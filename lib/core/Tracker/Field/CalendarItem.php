@@ -130,7 +130,7 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
 
                 if ($this->getOption('datetime') == 'd') {
                     // convert to UTC @12:00am, so we don't depend on user's timezone when displaying later
-                    $start = new TikiDate();
+                    $start = new Tiki\Lib\TikiDate();
                     $start->setDate($value);
                     $start->setTZbyID(TikiLib::lib('tiki')->get_display_timezone());
                     $start->convertTimeToUTC(0, 0, 0);

@@ -1,38 +1,5 @@
-import Editor from "svgedit/dist/editor/Editor.js";
+import Editor from "svgedit";
 import "svgedit/dist/editor/svgedit.css";
-
-$.fn.drawFullscreen = function () {
-    var win = $(window);
-    var me = $(this);
-    me.trigger("saveDraw");
-
-    let fullscreen = $("#svg-fullscreen");
-
-    if (fullscreen.length === 0) {
-        me.data("origParent", me.parent());
-
-        var menuHeight = $("#drawMenu").height();
-        $("body").addClass("full_screen_body");
-        $("body,html").scrollTop(0);
-
-        fullscreen = $('<div id="svg-fullscreen" />').html(me).prependTo("body");
-
-        var fullscreenSvgEdit = fullscreen.find("#svgedit");
-
-        win.on("resize", function () {
-            fullscreen.height(win.height()).width(win.width());
-
-            fullscreenSvgEdit.height(fullscreen.height() - menuHeight);
-        }).trigger("resize");
-    } else {
-        me.data("origParent").append(me);
-        win.off("resize");
-        fullscreen.remove();
-        $("body").removeClass("full_screen_body");
-    }
-
-    return this;
-};
 
 $.fn.replaceDraw = function (o) {
     var me = $(this);
@@ -96,14 +63,6 @@ $.fn.saveDraw = function () {
     return this;
 };
 
-$.fn.saveAndBackDraw = function () {
-    $(this)
-        .saveDraw()
-        .one("savedDraw", function () {
-            window.history.back();
-        });
-};
-
 $.fn.renameDraw = function () {
     var me = $(this);
     var name = me.data("name");
@@ -149,8 +108,8 @@ $.fn.loadDraw = function (o) {
         userExtensions: [],
         canvas_expansion: 2,
         lang: $.lang ? $.lang : "en",
-        imgPath: "node_modules/svgedit/dist/editor/images/",
-        extPath: "node_modules/svgedit/dist/editor/extensions/",
+        imgPath: "public/generated/js/vendor_dist/svgedit/dist/editor/images",
+        extPath: "public/generated/js/vendor_dist/svgedit/dist/editor/extensions/",
     });
     svgEditor.init();
 

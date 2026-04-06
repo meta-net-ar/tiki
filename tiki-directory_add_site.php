@@ -8,28 +8,32 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'directory';
 $inputConfiguration = [
     [
-        'staticKeyFilters'                => [
-            'parent'                         => 'int',               //post
-            'addtocat'                       => 'int',               //get
-            'siteId'                         => 'int',               //post
-            'save'                           => 'bool',              //post
-            'name'                           => 'string',            //post
-            'url'                            => 'url',               //post
-            'siteCats'                       => 'string',            //post
-            'isValid'                        => 'bool',              //post
-            'description'                    => 'xss',               //post
-            'country'                        => 'string',            //post
-            'sort_mode'                      => 'string',            //get
-            'offset'                         => 'int',               //get
-            'find'                           => 'bool',              //get
+        'staticKeyFilters'            => [
+            'parent'                  => 'int',       // post
+            'addtocat'                => 'int',       // get
+            'siteId'                  => 'int',       // post
+            'save'                    => 'bool',      // post
+            'name'                    => 'striptags', // post
+            'url'                     => 'url',       // post
+            'isValid'                 => 'word',      // post
+            'description'             => 'striptags', // post
+            'country'                 => 'string',    // post
+            'sort_mode'               => 'word',      // get
+            'offset'                  => 'int',       // get
+            'find'                    => 'string',    // get
+        ],
+        'staticKeyFiltersForArrays'   => [
+            'siteCats'                => 'int',       // post
         ],
     ],
 ];
 require_once('tiki-setup.php');
 include_once('lib/directory/dirlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_DIRECTORY;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_directory');
 $access->check_permission('tiki_p_submit_link');
 //get_strings tra('Submit a new link')

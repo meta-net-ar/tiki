@@ -1,7 +1,7 @@
 {title url="tiki-edit_structure.php?page_ref_id=$page_ref_id"}{tr}Structure:{/tr} {$structure_name}{/title}
 
 <div class="t_navbar mb-4">
-    {button href="tiki-admin_structures.php" _text="{tr}Structures{/tr}"}
+    {button _class="btn btn-link" href="tiki-admin_structures.php" _text="{tr}Structures{/tr}"}
 </div>
 
 {if $remove eq 'y'}
@@ -72,7 +72,7 @@
         {/foreach}
     {/remarksbox}
 {/if}
-
+<div class="styling-element">
 <div class="admintoclevel" id="topnode_{$page_ref_id}">
     <h2>{tr}Structure Layout{/tr}</h2>
     {if $editable eq 'y'}
@@ -266,3 +266,4 @@
         </form>
     </div>
 {/if}{* end of if structure editable *}
+</div>

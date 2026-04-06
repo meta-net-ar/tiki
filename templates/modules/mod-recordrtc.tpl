@@ -37,3 +37,13 @@
         {/if}
     {/tikimodule}
 {/if}
+
+{* Audio preview *}
+{if isset($show_audio_preview)}
+    <audio style="width: 100%; max-width: 500px" src="{$media_src|escape}" controls></audio>
+{/if}
+
+{* Video preview *}
+{if isset($show_video_preview)}
+    <video style="width: 100%; max-width: 640px" src="{$media_src|escape}" controls></video>
+{/if}

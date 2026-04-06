@@ -15,7 +15,7 @@ class RatingChoice extends Base
 {
     public function handle($params, Template $template)
     {
-        global $prefs, $user;
+        global $prefs;
         $ratinglib = TikiLib::lib('rating');
         $smarty = TikiLib::lib('smarty');
 

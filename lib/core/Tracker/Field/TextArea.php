@@ -97,6 +97,17 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
                         ],
                         'legacy_index' => 7,
                     ],
+                    'previewtabs' => [
+                        'name' => tr('Preview Tabs'),
+                        'description' => tr('Enable edit and preview tabs for this field.'),
+                        'default' => 'n',
+                        'filter' => 'alpha',
+                        'options' => [
+                            'n' => tr('No'),
+                            'y' => tr('Yes'),
+                        ],
+                        'legacy_index' => 9,
+                    ],
 
                 ],
             ],

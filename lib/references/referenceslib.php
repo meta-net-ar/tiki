@@ -114,7 +114,6 @@ class ReferencesLib extends TikiLib
         }
         $biblios = substr($biblios, 0, strlen($biblios) - 1);
 
-        $codes = "'first'" . ',' . 'second';
         $query = "select * from `tiki_page_references` WHERE `biblio_code` IN ($biblios) AND `page_id`=?";
         $result = $this->query($query, [$page]);
 

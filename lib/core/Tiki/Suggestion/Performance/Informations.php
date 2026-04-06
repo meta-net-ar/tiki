@@ -13,7 +13,7 @@ class Informations implements SuggestionRules
     public function parser()
     {
         $message = tra('Performance issues? Take advantage of the performance challenge:');
-        $message .= ' <a target="_blank" title="' . tra('Performance') . '" href="https://tiki.org/Performance-challenge">https://tiki.org/Performance-challenge</a>';
+        $message .= ' <a class="alert-link" target="_blank" title="' . tra('Performance') . '" href="https://tiki.org/Performance-challenge">https://tiki.org/Performance-challenge</a>';
 
         return $message;
     }

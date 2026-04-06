@@ -15,7 +15,7 @@ use Tiki\Package\VendorHelper;
 $inputConfiguration = [
     [
         'staticKeyFilters'             => [
-        'find_other'                   => 'word',              //post
+        'find_other'                   => 'int',               //post
         'galleryId'                    => 'int',               //get
         'parentId'                     => 'int',               //post
         'view'                         => 'word',              //get
@@ -41,7 +41,7 @@ $inputConfiguration = [
         'sortdirection'                => 'word',              //post
         'fname'                        => 'word',              //post
         'fdescription'                 => 'xss',               //post
-        'data'                         => 'none',              //get
+        'data'                         => 'string',            //get
         'quota'                        => 'int',               //post
         'name'                         => 'string',            //post
         'description'                  => 'xss',               //post
@@ -108,6 +108,9 @@ $inputConfiguration = [
         'watch_object'                 => 'word',              //get
         'galleryName'                  => 'word',              //get
         'fgal_actions'                 => 'word',              //get
+        'detach'                        => 'bool',              //get
+        'duplicate'                     => 'bool',              //post
+        'watch_action'                  => 'word',              //get
         ],
         'staticKeyFiltersForArrays' => [
             'cat_categories' => 'digits',
@@ -117,11 +120,10 @@ $inputConfiguration = [
     ],
 ];
 
-
-
-
-$section = 'file_galleries';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FILE_GALLERIES;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_file_galleries');
 $filegallib = TikiLib::lib('filegal');
 $statslib = TikiLib::lib('stats');

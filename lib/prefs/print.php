@@ -323,6 +323,16 @@ function prefs_print_list()
             'tags' => ['advanced'],
             'default' => 'y',
         ],
+        'print_pdf_mpdf_debug' => [
+            'name' => tra('Debug mPDF output'),
+            'description' => tra('Saves a copy of the html sent to mPDF in the temp directory'),
+            'warning' => tra('Does not respect permissions, do not use with production data.'),
+            'hint' => tra('Clear the public cache to remove this and other temporary files.'),
+            'view' => 'temp/public/mpdf_debug_output.html',
+            'type' => 'flag',
+            'tags' => ['advanced'],
+            'default' => 'n',
+        ],
         'print_wiki_authors' => [
             'name' => tra('Print wiki authors'),
             'description' => tra('Include wiki page authors and date in print versions of wiki pages.'),

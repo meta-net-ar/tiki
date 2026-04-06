@@ -51,7 +51,7 @@ function prefs_metatag_list()
             'description' => tra('The latitude and longitude of the physical location of the site. For example "38.898748, -77.037684".'),
             'type' => 'text',
             'size' => '50',
-            'help' => 'http://geotags.com/geo/geotags2.html',
+            'help' => 'https://en.wikipedia.org/wiki/Geotagging',
             'default' => '',
         ],
         'metatag_georegion' => [
@@ -77,6 +77,14 @@ function prefs_metatag_list()
             'help' => 'Robots-Exclusion-Protocol#HTML_META_Directives',
             'size' => '50',
             'default' => '',
+        ],
+        'metatag_robots_txt_apply_directives' => [
+            'name' => tra('Apply robots directives from robots.txt'),
+            'description' => tra('When enabled, Tiki will automatically apply robots meta directives (such as noindex, nofollow, etc.) as both meta tags and X-Robots-Tag HTTP headers to pages that match Disallow rules in robots.txt. This helps prevent search engines from indexing pages that crawlers are told not to visit. Works with SEF URLs - blocking /tiki-index.php will NOT block SEF URLs like /HomePage.'),
+            'type' => 'flag',
+            'help' => 'Robots-Exclusion-Protocol',
+            'default' => 'y',
+            'tags' => ['basic'],
         ],
         'metatag_nositelinkssearchbox' => [
             'name' => tra('Meta no site links searchbox'),

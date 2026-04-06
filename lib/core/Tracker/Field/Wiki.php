@@ -129,6 +129,16 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                             'y' => tr('Yes'),
                         ],
                     ],
+                    'previewtabs' => [
+                        'name' => tr('Preview Tabs'),
+                        'description' => tr('Enable edit and preview tabs for this field.'),
+                        'default' => 'n',
+                        'filter' => 'alpha',
+                        'options' => [
+                            'n' => tr('No'),
+                            'y' => tr('Yes'),
+                        ],
+                    ],
                     'actions' => [
                         'name' => tr('Action Buttons'),
                         'description' => tr('Display wiki page buttons when editing the item.'),

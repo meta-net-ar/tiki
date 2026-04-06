@@ -6,3 +6,41 @@
     --el-input-border-color: var(--bs-danger);
 }
 
+input.form-control {
+    @extend .el-input;
+    @extend .el-input__wrapper;
+    border: none;
+    height: var(--el-input-inner-height);
+
+    &:focus {
+        @extend .is-focus;
+    }
+}
+
+.tiki-admin aside .input-group input.form-control + .btn {
+    padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+}
+
+.input-group {
+    @extend .el-input;
+    @extend .el-input-group;
+}
+
+.input-group .input-group-text {
+    @extend .el-input-group__prepend;
+    border: none;
+}
+
+.input-group input + .input-group-text {
+    @extend .el-input-group__append;
+    border: none;
+}
+
+.input-group input ~ .btn {
+    @extend .el-input-group__append;
+
+    --el-input-border-color: var(--bs-btn-border-color);
+
+    background-color: var(--bs-btn-bg);
+    color: var(--bs-btn-color);
+}

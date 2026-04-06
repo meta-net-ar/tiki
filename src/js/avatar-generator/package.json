@@ -5,8 +5,6 @@
   "author": "Tiki Wiki CMS",
   "license": "LGPL-2.0-only",
   "description": "",
-  "dependencies": {
-    "@dicebear/collection": "^9.2.2",
-    "@dicebear/core": "^9.2.2"
+  "devDependencies": {
   }
 }

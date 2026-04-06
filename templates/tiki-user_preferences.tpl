@@ -171,21 +171,6 @@
                                 value="{$customfields[ir].value}" size="{$customfields[ir].size}"></label>
                         {/if}
                     {/section}
-                    <div class="tiki-form-group row">
-                        <label class="col-form-label col-md-4" for="user_information">
-                            {tr}User Information{/tr}
-                        </label>
-                        <div class="col-md-8">
-                            <select class="form-select" id="user_information" name="user_information">
-                                <option value='private' {if $user_prefs.user_information eq 'private'}selected="selected"{/if}>
-                                    {tr}Private{/tr}
-                                </option>
-                                <option value='public' {if $user_prefs.user_information eq 'public'}selected="selected"{/if}>
-                                    {tr}Public{/tr}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
                     <div class="submit text-center">
                         <input type="submit" class="btn btn-primary" name="new_info" value="{tr}Save changes{/tr}">
                     </div>
@@ -454,20 +439,28 @@
                         </div>
                     </div>
 
+                    <div class="tiki-form-group row">
+                        <label class="col-form-label col-md-4" for="user_localtimezonesync">
+                            {tr}Show a synchronization pop-up when I move to a different timezone.{/tr}
+                        </label>
+                        <div class="col-md-8">
+                            <select id="user_localtimezonesync" name="user_localtimezonesync" class="form-control" >
+                                <option value="n" {if $prefs.user_localtimezonesync eq "n"}selected="selected"{/if}>
+                                    {tr}no{/tr}
+                                </option>
+                                <option value="y" {if $prefs.user_localtimezonesync eq "y"}selected="selected"{/if}>
+                                    {tr}yes{/tr}
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="display_12hr_clock" id="display_12hr_clock" {if $user_prefs.display_12hr_clock eq 'y'}checked="checked"{/if}>
                         <label class="form-check-label" for="display_12hr_clock">
                             {tr}Use 12-hour clock in time selectors{/tr}
                         </label>
                     </div>
-                    {if 1 eq 1 || $prefs.feature_community_mouseover eq 'y'}
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" name="show_mouseover_user_info" id="show_mouseover_user_info" {if $show_mouseover_user_info eq 'y'}checked="checked"{/if}>
-                            <label class="form-check-label" for="show_mouseover_user_info">
-                                {tr}Display info tooltip on mouseover for every user who allows his/her information to be public{/tr}
-                            </label>
-                        </div>
-                    {/if}
 
                     {if $prefs.feature_messages eq 'y' and $tiki_p_messages eq 'y'}
                         <legend>{tr}User Messages{/tr}</legend>
@@ -720,7 +713,7 @@
                 <form action="tiki-user_preferences.php" method="post">
                     {include file='password_jq.tpl'}
                     {ticket}
-                    <input type="hidden" name="view_user" value="{$userwatch|escape}">
+                    {if $userwatch ne $user}<input type="hidden" name="view_user" value="{$userwatch|escape}">{/if}
                         {if $prefs.auth_method neq 'cas' || ($prefs.cas_skip_admin eq 'y' && $user eq 'admin')}
                             {if $prefs.change_password neq 'n' and ($prefs.login_is_email ne 'y' or $userinfo.login eq 'admin')}
                                 {remarksbox type="tip" title="{tr}Information{/tr}" close="n"}
@@ -738,7 +731,8 @@
                                 {tr}Username:{/tr}
                             </label>
                             <div class="col-md-8">
-                                <input type="text" class="form-control" name="username-autocomplete" id="username-autocomplete" disabled="disabled" value="{$userinfo.login|escape}" autocomplete="username">
+                                <input type="hidden" name="username" value="{$userinfo.login|escape}">
+                                <input type="text" class="form-control" id="username-autocomplete" disabled="disabled" value="{$userinfo.login|escape}">
                             </div>
                         </div>
                         {if $prefs.login_is_email eq 'y' and $userinfo.login neq 'admin'}
@@ -806,8 +800,8 @@
             {remarksbox type="error" title="{tr}Two-factor authentication is required{/tr}" close="n"}{tr}Your access to the site is restricted until you enable <strong>Two-factor authentication</strong>. Please enable Two-factor authentication to keep using normally the site.{/tr}{/remarksbox}
         {/if}
         {remarksbox type="tip"}
-            {tr}Two-factor authentication is a security measure that requires an extra code when you log in. 
-            When enabled, Tiki will prompt you for a TOTP code generated by any authenticator app 
+            {tr}Two-factor authentication is a security measure that requires an extra code when you log in.
+            When enabled, Tiki will prompt you for a TOTP code generated by any authenticator app
             (FreeOTP, Authy, Google Authenticator, etc.).{/tr}
         {/remarksbox}
         {if $tfaSecret }
@@ -819,10 +813,10 @@
                         {if $imageType eq 'svg+xml'}
                             {assign var="fileExtension" value="svg"}
                         {else}
-                            {assign var="fileExtension" value="png"} 
+                            {assign var="fileExtension" value="png"}
                         {/if}
                         {capture assign="downloadFileName"}tfa_qr_code.{$fileExtension}{/capture}
-                      
+
 
                         <div class="mt-1 d-flex justify-content-center align-items-center gap-2">
                             <button type="button" class="btn btn-sm btn-secondary" id="downloadQrCode">
@@ -832,7 +826,7 @@
                                 {tr}Show Secret Code{/tr}
                             </button>
                         </div>
-                    
+
                         <div id="secretContainer" class="d-none mt-3 text-center">
                             <strong>{tr}Secret Code:{/tr}</strong>
                             <span id="secretField">{$tfaSecret}</span>
@@ -842,18 +836,18 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-7">
+                    <div class="col-md-7 p-4">
                         <div class="d-flex mt-4">
                             <div class="well">
                                 {tr}Install a soft token authenticator like FreeOTP or Google Authenticator from your application repository and use that app to scan this QR code. More information is available in the documentation.{/tr} <a href="https://en.wikipedia.org/wiki/Comparison_of_OTP_applications" target="_blank">{tr}Learn more about authenticator apps{/tr}</a>
-                                
+
                                 <div class="well mt-3">
                                     {tr}Scan this QR code with your TOTP authenticator app (FreeOTP, Google Authenticator, etc.). For security, consider saving this QR code or secret key as a backup so you can restore it if you lose or change your device.{/tr}
                                 </div>
 
                                 <div style="margin-top: 20px" class="tiki-form-group">
                                     <label for="authCode">{tr}2FA Code{/tr}</label>
-                                    <input type="text" class="form-control" name="tfaPin" id="authCode" placeholder="{tr}Enter the 6-digit code from your authenticator app{/tr}">                                
+                                    <input type="text" class="form-control" name="tfaPin" id="authCode" placeholder="{tr}Enter the 6-digit code from your authenticator app{/tr}">
                                 </div>
                             </div>
                         </div>
@@ -863,7 +857,7 @@
                         </div>
                     </div>
                 </div>
-                
+
             </form>
         {else}
             <form action="tiki-user_preferences.php" method="post">
@@ -883,13 +877,13 @@
     {/if}
     {*Do not give access to tab Account Deletion, if 2FA is required but not enabled by the user, except for the user 'admin'*}
     {if $prefs.twoFactorAuth neq 'y' or $force2FA neq 'y' or ! empty($twoFactorSecret)}
-        {if $tiki_p_delete_account eq 'y' and $userinfo.login neq 'admin'}
+        {if ($tiki_p_delete_account eq 'y' or ($tiki_p_admin_users eq 'y' and $userwatch ne $user)) and $userinfo.login neq 'admin'}
             {tab name="{tr}Account Deletion{/tr}"}
                 <div class="jumbotron text-center">
                     <h2>{tr}Account Deletion{/tr}</h2>
                     <form action="tiki-user_preferences.php" method="post">
                         {ticket}
-                        {if !empty($userwatch)}<input type="hidden" name="view_user" value="{$userwatch|escape}">{/if}
+                        <input type="hidden" name="view_user" value="{$userwatch|escape}">
                         <p>
                             <div class="form-check">
                                 <input type='checkbox' class="form-check-input" name='deleteaccountconfirm' id="deleteaccountconfirm" value='1'>
@@ -899,7 +893,7 @@
                             </div>
                         </p>
                         <p>
-                            <input type="submit" class="btn btn-danger btn-lg" name="deleteaccount" value="{if !empty($userwatch)}{tr}Delete the account:{/tr} {$userwatch|escape}{else}{tr}Delete my account{/tr}{/if}" onclick="confirmPopup('{tr _0=$userwatch|escape}Delete account for %0?{/tr}')">
+                            <input type="submit" class="btn btn-danger btn-lg" name="deleteaccount" value="{if $userwatch ne $user}{tr}Delete the account:{/tr} {$userwatch|escape}{else}{tr}Delete my account{/tr}{/if}" onclick="confirmPopup('{if $userwatch ne $user}{tr _0=$userwatch|escape}Delete account for %0?{/tr}{else}{tr}Delete my account?{/tr}{/if}')">
                         </p>
                     </form>
                 </div>

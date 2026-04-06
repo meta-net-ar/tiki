@@ -55,7 +55,7 @@ class WikiMediawikiTest extends AbstractImporterTestCase
     {
         $this->markTestSkipped('2016-09-26 Skipped as the underlying PEAR is out of date.');
 
-        $tikilib = $this->getMockBuilder(TikiLib::class)
+        $this->getMockBuilder(TikiLib::class)
             ->onlyMethods(['create_page', 'update_page', 'page_exists', 'remove_all_versions'])
             ->getMock();
         $obj = $this->getMockBuilder(WikiMediawiki::class)->onlyMethods(['saveAndDisplayLog'])->getMock();

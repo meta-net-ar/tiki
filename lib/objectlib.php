@@ -40,7 +40,7 @@ class ObjectLib extends TikiLib
      * When creating, if $description is given, use the description, name and URL given as information.
      * Otherwise retrieve it from the object (if $checkHandled is FALSE, fill with empty strings if the object type is not handled).
      * Handled object types: "article", "blog", "calendar", "directory", "faq",
-     * "file", "file gallery", "forum", "image gallery", "poll", "quiz", "tracker", "trackeritem", "wiki page" and "template".
+     * "file", "file gallery", "forum", "poll", "quiz", "tracker", "trackeritem", "wiki page" and "template".
      *
      * Remember to update get_supported_types if this changes
      */
@@ -237,7 +237,6 @@ class ObjectLib extends TikiLib
             'file',
             'file gallery',
             'forum',
-            'image gallery',
             'perspective',
             'poll',
             'quiz',

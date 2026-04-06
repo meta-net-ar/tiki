@@ -277,7 +277,6 @@ class VCSUpdateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $logger = $this->logger;
-        $errors = false;
         $isGit = false;
         $rev = 'HEAD';
         $email = $input->getOption('email');
@@ -315,7 +314,6 @@ class VCSUpdateCommand extends Command
 
             // current time minus number of days specified through lag
             $timestamp = time() - $lag * 60 * 60 * 24;
-            $rev = date('{"Y-m-d H:i"}', $timestamp);
 
             $upstreamBranch = $this->getGitFollowUpBranch();
             $rev = $this->getGitRevision($upstreamBranch, $timestamp);

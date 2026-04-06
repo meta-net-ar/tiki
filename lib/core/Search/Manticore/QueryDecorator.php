@@ -27,8 +27,6 @@ class QueryDecorator extends Decorator
 
     public function __construct(\Manticoresearch\Search $search, Index $index)
     {
-        global $prefs;
-
         parent::__construct($search, $index);
 
         $this->factory = new TypeFactory();
@@ -81,8 +79,6 @@ class QueryDecorator extends Decorator
 
     public function __invoke($callback, $node, $childNodes)
     {
-        global $prefs;
-
         if ($node instanceof ImplicitPhrase) {
             $node = $node->getBasicOperator();
         }
@@ -208,7 +204,7 @@ class QueryDecorator extends Decorator
 
         $this->weights[$this->getNodeField($node)] = $node->getWeight();
 
-        $mapping = $this->index ? $this->index->getFieldMapping($node->getField()) : new stdClass();
+        $mapping = $this->index ? $this->index->getFieldMapping($node->getField()) : new \stdClass();
         if ($mapping && in_array('indexed', $mapping['options'])) {
             $phrase = $this->getTerm($node);
             if ($prefs['unified_search_default_operator'] != 1) {

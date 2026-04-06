@@ -507,9 +507,17 @@ class UnifiedSearchLib
             self::INCREMENT_QUEUE,
             [
                 'object_type' => $type,
-                'object_id' => $objectId
+                'object_id' => $objectId,
             ]
         );
+    }
+
+    public function deleteObject($type, $objectId)
+    {
+        $index = $this->getIndex('data-write');
+        $index = new Search_Index_TypeAnalysisDecorator($index);
+        $indexer = $this->buildIndexer($index);
+        $indexer->removeDocument($type, $objectId);
     }
 
     /**
@@ -1357,6 +1365,12 @@ class UnifiedSearchLib
             throw new Exception('Invalid filter type provided in query. It must be an array.');
         }
 
+        // Support expert sort configuration via meta-parameter
+        if (isset($filter['_sort']) && $filter['_sort']) {
+            $query->setOrder($filter['_sort']);
+            unset($filter['_sort']);
+        }
+
         if (isset($filter['type']) && $filter['type']) {
             $query->filterType($filter['type']);
         }
@@ -1370,13 +1384,7 @@ class UnifiedSearchLib
         }
 
         if (isset($filter['content']) && $filter['content']) {
-            $o = TikiLib::lib('tiki')->get_preference('unified_default_content', ['contents'], true);
-            if (count($o) == 1 && empty($o[0])) {
-                // Use "contents" field by default, if no default is specified
-                $query->filterContent($filter['content'], ['contents']);
-            } else {
-                $query->filterContent($filter['content'], $o);
-            }
+            $query->filterContent($filter['content'], $this->getFilterContentFields());
         }
 
         if (isset($filter['autocomplete']) && $filter['autocomplete']) {
@@ -1424,6 +1432,27 @@ class UnifiedSearchLib
             unset($filter['exact']);
         }
 
+        if (isset($filter['multi'])) {
+            if (
+                isset($filter['multi']['fields']) && is_array($filter['multi']['fields']) &&
+                    isset($filter['multi']['value'])
+            ) {
+                $fields = $filter['multi']['fields'];
+                $value = $filter['multi']['value'];
+
+                foreach ($fields as $k => $v) {
+                    if ($v === 'content') {
+                        unset($fields[$k]);
+                        $fields = array_merge($fields, $this->getFilterContentFields());
+                    }
+                }
+
+                $query->filterContent($value, $fields);
+            }
+
+            unset($filter['multi']);
+        }
+
         if (
             isset($filter['distance']) && is_array($filter['distance']) &&
                     isset($filter['distance']['distance'], $filter['distance']['lat'], $filter['distance']['lon'])
@@ -1457,12 +1486,24 @@ class UnifiedSearchLib
         unset($filter['autocomplete']);
         unset($filter['groups']);
 
+
         foreach ($filter as $key => $value) {
             if ($value) {
                 $query->filterContent($value, $key);
             }
         }
+
         return $query;
+    }
+
+    private function getFilterContentFields()
+    {
+        $fields = TikiLib::lib('tiki')->get_preference('unified_default_content', ['contents'], true);
+        if (count($fields) == 1 && empty($fields[0])) {
+            $fields = ['contents'];
+        }
+
+        return $fields;
     }
 
     public function getFacetProvider()

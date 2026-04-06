@@ -5,7 +5,7 @@
         {button href="tiki-list_articles.php" class="btn btn-info mt-3" _icon_name="list" _text="{tr}List Articles{/tr}"}
     {/if}
 </div>
-
+<div class="styling-element">
 {if $listpages or ($find ne '') or ($types ne '') or ($topics ne '') or ($lang ne '') or ($categId ne '')}
     <div class="row mx-0">
         <div class="col-md-6">
@@ -169,6 +169,7 @@
 
     {pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}
 </form>
+</div>
 {jq}
     var checkboxes = $('.checkboxes');
     checkboxes.on("change", function(){

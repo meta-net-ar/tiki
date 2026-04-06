@@ -99,6 +99,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
                 'modification_date' => $typeFactory->timestamp($item['lastModif']),
                 'creation_date' => $typeFactory->timestamp($item['created']),
                 'contributors' => $typeFactory->multivalue(array_unique([$item['createdBy'], $item['lastModifBy']])),
+                'created_by' => $typeFactory->identifier($item['createdBy']),
                 'date' => $typeFactory->timestamp($item['created']),
 
                 'tracker_status' => $typeFactory->identifier($item['status']),
@@ -143,6 +144,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             'creation_date',
             'date',
             'contributors',
+            'created_by',
 
             'tracker_status',
             'tracker_id',
@@ -176,6 +178,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             'creation_date' => 'timestamp',
             'date' => 'timestamp',
             'contributors' => 'multivalue',
+            'created_by' => 'identifier',
 
             'tracker_status' => 'identifier',
             'tracker_id' => 'identifier',

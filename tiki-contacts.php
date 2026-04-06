@@ -8,30 +8,32 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
-        'staticKeyFilters'                => [
-            'contactId'                   => 'int',          //post
-            'remove'                      => 'int',          //post
-            'save'                        => 'bool',         //post
-            'ext_' . $ext['fieldId']      => 'string',       //post
-            'firstName'                   => 'string',       //post
-            'lastName'                    => 'string',       //post
-            'email'                       => 'email',        //post
-            'nickname'                    => 'email',        //post
-            'groups'                      => 'groupname',    //post
-            'sort_mode'                   => 'word',         //get
-            'offset'                      => 'int',          //get
-            'find'                        => 'string',       //post
-            'maxRecords'                  => 'int',          //get
-            'initial'                     => 'string',       //get
-            'view'                        => 'string',       //get
+        'staticKeyFilters'            => [
+            'contactId'               => 'int',           // post
+            'remove'                  => 'int',           // post
+            'save'                    => 'bool',          // post
+            'firstName'               => 'striptags',     // post
+            'lastName'                => 'striptags',     // post
+            'email'                   => 'email',         // post
+            'nickname'                => 'striptags',     // post
+            'sort_mode'               => 'word',           // get
+            'offset'                  => 'int',           // get
+            'find'                    => 'string',     // post
+            'maxRecords'              => 'int',           // get
+            'initial'                 => 'string',         // get
+            'view'                    => 'striptags',           // get
+        ],
+        'staticKeyFiltersForArrays'   => [
+            'groups'                  => 'groupname',     // post
         ],
     ],
 ];
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_CONTACTS;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_contacts');
 $contactlib = TikiLib::lib('contact');
 
@@ -102,7 +104,11 @@ if (isset($_REQUEST["save"])) {
         Feedback::error($feedback);
     } else {
         $contactlib->replace_contact($_REQUEST["contactId"], $_REQUEST["firstName"], $_REQUEST["lastName"], $_REQUEST["email"], $_REQUEST["nickname"], $user, $_REQUEST['groups'] ?? [], $ext_result);
-        $feedback = sprintf(tra('Contact %s was created.'), $_REQUEST['firstName']);
+        if ($_REQUEST["contactId"]) {
+            $feedback = tr('Contact for %0 %1 was edited.', $_REQUEST['firstName'], $_REQUEST['lastName']);
+        } else {
+            $feedback = tr('Contact for %0 %1 was created.', $_REQUEST['firstName'], $_REQUEST['lastName']);
+        }
         Feedback::success($feedback);
         $info["firstName"] = '';
         $info["lastName"] = '';
@@ -113,7 +119,6 @@ if (isset($_REQUEST["save"])) {
         $smarty->assign('contactId', 0);
     }
 }
-
 $sort_mode = $_REQUEST["sort_mode"] ?? 'email_asc';
 $offset = $_REQUEST["offset"] ?? 0;
 $find = $_REQUEST["find"] ?? '';

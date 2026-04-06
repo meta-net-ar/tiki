@@ -68,6 +68,18 @@ $tiki_timer->start();
 
 require_once('tiki-setup_base.php'); //Starting here composer autoloading is available
 
+if (! empty($user) && isset($_SESSION['login_time'])) {
+    $userInfo = $userlib->get_user_info($user);
+
+    if (! empty($userInfo['pass_confirm']) && $_SESSION['login_time'] < $userInfo['pass_confirm']) {
+        TikiLib::lib('login')->logout();
+        if (! defined('TIKI_CONSOLE') && PHP_SAPI !== 'cli') {
+            header('Location:tiki-login_scr.php');
+        }
+        exit;
+    }
+}
+
 if (version_compare(PHP_VERSION, TIKI_MIN_PHP_VERSION, '<')) {
     if (PHP_SAPI !== 'cli') {                   // if not running a command line version of php, show requirements
         header('location: tiki-install.php');
@@ -194,7 +206,18 @@ if ($prefs['login_multiple_forbidden'] == 'y') {
 
 require_once('lib/setup/cookies.php');
 require_once('lib/setup/user_prefs.php');
-require_once('lib/setup/language.php');
+require_once('lib/core/Sections.php');
+use Tiki\Sections;
+// Initialize language settings after section is set and autoloader is available
+Language::setSectionLanguage();
+
+// Register callback to update language when section changes
+// This ensures that when admin files call Sections::setCurrentSection(),
+// the language is automatically updated (e.g., admin section gets admin language)
+Sections::onSectionChange(function ($section) {
+    Language::setSectionLanguage();
+});
+
 require_once('lib/setup/wiki.php');
 
 $user_groups = $userlib->get_user_groups($user);
@@ -252,6 +275,7 @@ if (! TIKI_API) {
             $prefs['site_closed'] === 'y'
         ) {
             // js disabled, so we need to set the cookies server-side
+            // DRY, this appears to be the default value of initializeConsentPreferences why do we have another copy here?  benoitg - 2026-03-25
             $consent = [
                 'consentGiven' => true,
                 'categories' => [
@@ -262,11 +286,16 @@ if (! TIKI_API) {
                 ],
             ];
             CookieConsentLib::setConsentPreferences($consent);
-            $feature_no_cookie = false;
+            $feature_no_cookie = false;  //This isn't a global here, so this set will have no effect! - benoitg - 2026-03-25
         }
-        // Retrieve the full consent object (This check first the browser and then user cookie consent prefs)
+        // Retrieve the full consent object
         $consent_preferences = CookieConsentLib::initializeConsentPreferences();
 
+        /*
+        I don't understand why CookieConsentLib doesn't deal with this at init.
+        Especially since it's not clearing the cookies for a category if one withdraws consent from
+        tiki-user_preferences.php, so tiki essentially lies in that situation -  benoitg - 2026-03-25
+        */
         if (! $consent_preferences['consentGiven'] || $jitRequest->offsetExists('cookie_consent')) {
             if (! $jitRequest->offsetExists('cookie_consent')) {
                 foreach ($_COOKIE as $k => $v) {
@@ -276,8 +305,7 @@ if (! TIKI_API) {
                 }
             }
             // Get cookie categories
-            $cookie_categories = CookieConsentLib::getCookieCategories();
-            $smarty->assign('cookie_categories', $cookie_categories);
+            $smarty->assign('cookie_categories', CookieConsentLib::getRequestedCookieCategories());
             $cookie_consent_html = $smarty->fetch('cookie_consent.tpl');
         }
     }
@@ -403,13 +431,29 @@ if ($prefs['pwa_feature'] == 'y') { //pwa test propose, pages to cache
     $smarty->assign('pagespwa', json_encode($pages));
 }
 
+$customRobots = null;
 if ($prefs['metatag_robotscustom'] == 'y') {
     if (empty($object)) {
         $object = current_object();
     }
     if ($object && $object['type'] == 'wiki page') {
         $wikilib = TikiLib::lib('wiki');
-        $smarty->assign('metatag_robotscustom', $wikilib->getPageMetatagRobotscustom($object['object']));
+        $customRobots = $wikilib->getPageMetatagRobotscustom($object['object']);
+        if (! empty($customRobots)) {
+            $smarty->assign('metatag_robotscustom', $customRobots);
+            $headerlib->setXRobotsTag($customRobots);
+        }
+    }
+}
+
+// Apply robots directives from robots.txt as meta tags and X-Robots-Tag header.
+if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
+    $robotsFromTxt = $headerlib->getRobots();
+    if (! empty($robotsFromTxt)) {
+        $smarty->assign('metatag_robots', $robotsFromTxt);
+        if (empty($customRobots)) {
+            $headerlib->setXRobotsTag($robotsFromTxt);
+        }
     }
 }
 
@@ -587,23 +631,6 @@ if ($prefs['feature_jquery_zoom'] === 'y') {
 ');
 }
 
-if ($prefs['feature_syntax_highlighter'] == 'y') {
-    //add codemirror stuff
-    $headerlib
-        ->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
-        ->add_jsfile_dependency(CODEMIRROR_DIST_PATH . '/lib/codemirror.js')
-        ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/search/searchcursor.js')
-        ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/mode/overlay.js')
-    //add tiki stuff
-        ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css')
-        ->add_jsfile('lib/codemirror_tiki/codemirror_tiki.js');
-    //add interactjs
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/interactjs/dist/interact.min.js');
-
-    require_once("lib/codemirror_tiki/tiki_codemirror.php");
-    createCodemirrorModes();
-}
-
 if ($prefs['feature_ajax'] === 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-confirm.js');
     $headerlib->add_jsfile('lib/ajax/autosave.js'); // Note that this file is needed even if ajax_autosave is off otherwise wysiwyg won't load.
@@ -665,6 +692,22 @@ if ($prefs['jquery_smartmenus_enable'] == 'y') {
                 nav[indexCurrentNav].classList.add("sm-navbar");
                 nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
                 const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
+                
+                // Enable navigation on parent menu items with children
+                // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
+                // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
+                // Note: Relies on SmartMenus internal class that may change in future versions
+                nav[indexCurrentNav].addEventListener("click", function(e) {
+                    const link = e.target.closest("a.sm-sub-toggler");
+                    if (link && nav[indexCurrentNav].contains(link)) {
+                        const href = link.getAttribute("href");
+                        if (href && href !== "#" && href !== "") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.location.href = href;
+                        }
+                    }
+                });
             }
         }
     ');
@@ -1013,7 +1056,6 @@ if ($prefs['openpgp_gpg_pgpmimemail'] == 'y') {
 //adding pdf creation javascript, used to integrate plugins like tablesorter, trackerfilter with mpdf.
 if ($prefs['print_pdf_from_url'] != 'none') {
     $headerlib->add_jsfile('lib/jquery_tiki/pdf.js');
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . "/html2canvas-pro/dist/html2canvas-pro.min.js", true);
 }
 
 if (file_exists(TIKI_CUSTOMIZATIONS_SETUP_PHP_FILE)) {
@@ -1049,7 +1091,7 @@ if ($prefs['feature_realtime'] == 'y') {
 
 if ($prefs['feature_calendar'] === 'y') {
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/dist/index.css");
-    $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar";');
+    $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar"; window.moduleCalendar = [];');
     $headerlib->add_js_module('import "@jquery-tiki/eventcalendar_to_pdf";');
 }
 
@@ -1062,6 +1104,7 @@ if ($prefs['tiki_monitor_performance'] == 'y') {
 $headerlib->add_js_module('import Sortable from "sortablejs"; window.Sortable = Sortable;');
 
 // Shoelace color picker
+// Why are these in global setup, and unconditional?  color picking is not a frequent user operation - benoitg - 2026-03-09
 $headerlib->add_js_module("import '@shoelace/color-picker';");
 $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/@shoelace-style/shoelace/dist/themes/light.css');
 $headerlib->add_js_module("import { textareaColorpicker } from '@tiki/ui-utils'; textareaColorpicker();");
@@ -1072,8 +1115,9 @@ if ($prefs['feature_elementplus'] == 'y') {
     $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-message.css');
     $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-message-box.css');
     $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-popper.css');
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/element-plus-ui/input-root-css.css');
     $headerlib->add_js_module("import '@vue-widgets/el-file-input';");
-    $headerlib->add_js_module("import { applyInput } from '@vue-widgets/el-input';  applyInput();");
+    $headerlib->add_js_module("import '@vue-widgets/el-input';");
     $headerlib->add_js_module("import { showMessage } from '@vue-widgets/el-message'; window.showMessage = showMessage;");
     if ($prefs['elementplus_select'] == 'y') {
         $headerlib->add_js_module("import { applySelect } from '@vue-widgets/el-select'; applySelect();");
@@ -1087,8 +1131,6 @@ if ($prefs['feature_elementplus'] == 'y') {
 
 $headerlib->add_js_module('import "@jquery-tiki/constants";');
 $headerlib->add_js_module('import "@jquery-tiki/tiki-password";');
-// module allowing you to limit the number of characters allowed in the fields.
-$headerlib->add_js_module('import "@jquery-tiki/tiki-field_limiter";');
 
 $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/summernote/dist/summernote-bs5.min.css');
 
@@ -1096,6 +1138,7 @@ if ($prefs['fgal_use_record_rtc_screen'] == 'y') {
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/moment/min/moment.min.js', true);
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/recordrtc/RecordRTC.js', true);
     $headerlib->add_jsfile('lib/jquery_tiki/recordrtc.js', true);
+    $headerlib->add_cssfile('themes/base_files/feature_css/recordrtc.css');
 }
 // use this to distinguish if tiki-setup has completed, e.g. in smarty lib when including tiki-modules and determining if a redirect must be served or not
 define('TIKI_SETUP_FINISHED', true);

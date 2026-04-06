@@ -11,5 +11,3 @@ customElements.define(
         { styles: [styles] }
     )
 );
-
-export { default as applyInput } from "../utils/applyInput";

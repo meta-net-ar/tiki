@@ -20,7 +20,7 @@ function prefs_global_list($partial = false)
         ],
         'fallbackBaseUrl' => [
             'name' => tra('Fallback for tiki base URL'),
-            'description' => tra('The full URL to the Tiki base URL including protocol, domain and path (example: https://example.com/tiki/), used when the current URL can not be determined, example, when executing from the command line.'),
+            'description' => tra('The full URL to the Tiki base URL including protocol, domain and path (example: https://example.org/tiki/), used when the current URL can not be determined, example, when executing from the command line.'),
             'type' => 'text',
             'default' => '',
             'tags' => ['basic'],
@@ -208,10 +208,10 @@ function prefs_global_list($partial = false)
             'description' => tra('Type of 2FA to be used.'),
             'type' => 'list',
             'options' => [
-                \Tiki\TwoFactorAuth\TwoFactorAuth::GOOGLE_2FA => tra('Google 2FA'),
+                \Tiki\TwoFactorAuth\TwoFactorAuth::TOTP_2FA => tra('Authenticator App (TOTP)'),
                 \Tiki\TwoFactorAuth\TwoFactorAuth::EMAIL_2FA => tra('Email 2FA'),
             ],
-            'default' => \Tiki\TwoFactorAuth\TwoFactorAuth::GOOGLE_2FA,
+            'default' => \Tiki\TwoFactorAuth\TwoFactorAuth::TOTP_2FA,
         ],
         'twoFactorAuthEmailTokenLength' => [
             'name' => tra('Email 2FA Token Length'),
@@ -686,6 +686,42 @@ function prefs_global_list($partial = false)
             'size' => 3,
             'default' => '60',
             'tags' => ['advanced'],
+        ],
+        'scheduledTasksReport' => [
+            'name' => tra('Report when scheduled tasks do not run successfully'),
+            'description' => tr('Scheduler report'),
+            'type' => 'list',
+            'options' => [
+                'do_not_report' => tra('Do not report'),
+                'last_run' => tra('Last Run'),
+                'last_number_of_hours' => tra('Last number of hours')
+            ],
+            'default' => 'last_run',
+            'tags' => ['basic'],
+        ],
+        'scheduledTasksReportHours' => [
+            'name' => tr('Nº of hours'),
+            'description' => tr('Number of hours to show scheduler logs'),
+            'type' => 'text',
+            'size' => 100,
+            'filter' => 'int',
+            'units' => tra('hours'),
+            'default' => 24,
+            'constraints' => [
+                'min' => 1
+            ],
+        ],
+        'scheduledTasksReportMaxDays' => [
+            'name' => tr('Do not report failures older than (days)'),
+            'description' => tr('failure report days'),
+            'type' => 'text',
+            'size' => 5,
+            'filter' => 'int',
+            'units' => tra('Days'),
+            'default' => 30,
+            'constraints' => [
+                'min' => 1
+            ],
         ],
     ];
 }

@@ -7,7 +7,6 @@
 
 use Tiki\Lib\Wiki\WikiLibOutput;
 
-$section = 'wiki page';
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 $inputConfiguration = [
     [
@@ -43,7 +42,11 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 $histlib = TikiLib::lib('hist');
+$wikilib = TikiLib::lib('wiki');
 require_once('lib/wiki/renderlib.php');
 
 $access->check_feature('feature_wiki');
@@ -341,16 +344,20 @@ if (isset($source)) {
     if ($source == '' && isset($rversion)) {
         $source = $rversion;
     }
+    $syntax_type = 'tiki';
     if ($source == $info["version"] || $source == 0) {
         $smarty->assign('sourced', $tikilib->removeInlineSyntaxTags($info["data"]));
         $smarty->assign('source', $info['version']);
+        $syntax_type = $wikilib->getWikiPageSyntaxType($info["data"]);
     } else {
         $version = $histlib->get_version($page, $source);
         if ($version) {
             $smarty->assign('sourced', $tikilib->removeInlineSyntaxTags($version["data"]));
             $smarty->assign('source', $source);
+            $syntax_type = $wikilib->getWikiPageSyntaxType($version["data"]);
         }
     }
+    $smarty->assign('syntax_type', $syntax_type);
 }
 $smarty->assign('preview', false);
 if (isset($preview)) {

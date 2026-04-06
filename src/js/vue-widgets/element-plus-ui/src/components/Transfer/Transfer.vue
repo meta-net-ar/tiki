@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+import { Menu, Edit, Delete } from "@element-plus/icons-vue";
 import Sortable from "sortablejs";
 import ConfigWrapper from '../ConfigWrapper.vue';
 
-const props = defineProps(['data', 'fieldName', 'filterable', 'defaultValue', 'sourceListTitle', 'targetListTitle', 'filterPlaceholder', 'ordering', 'minItems', 'maxItems', 'helperText', 'emitValueChange', 'isInvalid', 'language']);
+const props = defineProps(['data', 'fieldName', 'filterable', 'defaultValue', 'sourceListTitle', 'targetListTitle', 'filterPlaceholder', 'ordering', 'minItems', 'maxItems', 'helperText', 'emitValueChange', 'isInvalid', 'language', 'showEdit', '_emit']);
 const data = typeof props.data === 'string' ? JSON.parse(props.data) : props.data;
 const defaultValue = typeof props.defaultValue === 'string' ? JSON.parse(props.defaultValue) : props.defaultValue;
 
@@ -21,6 +22,7 @@ const infoMessage = computed(() => {
 });
 
 const isInvalid = computed(() => props.isInvalid ? JSON.parse(props.isInvalid): false);
+const showEdit = computed(() => props.showEdit ? JSON.parse(props.showEdit): false);
 
 const handleValueChange = (value, direction) => {
     selected.value = value;
@@ -28,6 +30,10 @@ const handleValueChange = (value, direction) => {
         value,
         direction,
     });
+};
+
+const handleEdit = (value) => {
+    props._emit('edit', { value });
 };
 
 onMounted(() => {
@@ -89,6 +95,7 @@ export const DATA_TEST_ID = {
     HIDDEN_SELECT: `hidden-select-${uniqueId}`,
     TRANSFER_CONTAINER: `transfer-container-${uniqueId}`,
     HELPER_TEXT: `helper-text-${uniqueId}`,
+    EDIT_ITEM_BUTTON: `right-footer-edit-${uniqueId}`,
 };
 </script>
 
@@ -106,6 +113,7 @@ export const DATA_TEST_ID = {
                 <el-transfer v-model="selected" :data="arrayData" :filterable="JSON.parse(filterable)" :titles="[sourceListTitle, targetListTitle]" :filter-placeholder="filterPlaceholder" :target-order="JSON.parse(ordering) ? 'push': 'original'" @change="handleValueChange">
                     <template #default="{ option }">
                         <span :data-key="option.key">{{ option.label }}</span>
+                        <el-button type="primary" :text="true" :icon="Edit" v-if="showEdit && selected.includes(option.key)" @click="() => handleEdit(option.key)" :data-testid="DATA_TEST_ID.EDIT_ITEM_BUTTON"></el-button>
                     </template>
                 </el-transfer>
             </div>

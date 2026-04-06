@@ -110,7 +110,7 @@ class Services_Tracker_Utilities
         }
 
         if (! $options['validate'] || count($errors) == 0) {
-            $newItem = $trklib->replace_item($trackerId, $itemId, ['data' => $fields], $status, 0, $options['bulk_import'], $options['skip_sync'], $options['deleted_files'] ?? [], $options['notify_watchers']);
+            $newItem = $trklib->replace_item($trackerId, $itemId, ['data' => $fields], $status, 0, $options['bulk_import'], $options['skip_sync'], $options['deleted_files'] ?? [], $options['notify_watchers'] ?? null);
             return $newItem;
         }
 
@@ -577,7 +577,7 @@ EXPORT;
     {
         $fields = [];
         foreach ($fieldIds as $fieldId) {
-            $field = $field = $definition->getField($fieldId);
+            $field = $definition->getField($fieldId);
 
             if (! $field) {
                 throw new Services_Exception(tr('Field %0 does not exist in tracker', $fieldId), 404);

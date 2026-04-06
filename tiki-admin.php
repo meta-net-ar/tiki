@@ -8,15 +8,15 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
+require_once('tiki-setup.php');
 use Tiki\Installer\Installer;
 use Tiki\Package\ComposerCli;
 use Tiki\Package\ExtensionManager;
 use Tiki\Suggestion\Rules;
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 
-$section = 'admin';
-
-require_once('tiki-setup.php');
 $adminlib = TikiLib::lib('admin');
 
 $auto_query_args = ['page'];
@@ -504,6 +504,18 @@ if ($prefs['feature_scheduler'] === 'y') {
     $smarty->assign('isSchedulerRunConfigured', true);
 }
 
+if (! empty($prefs['scheduledTasksReport']) && $prefs['scheduledTasksReport'] !== 'do_not_report') {
+    $schedLib = \TikiLib::lib('scheduler');
+    $schedulerFailureLogs = $schedLib->getSchedulerFromLogs('failed');
+    $smarty->assign('scheduler_failure_logs', $schedulerFailureLogs);
+    $smarty->assign('scheduler_failure_count', count($schedulerFailureLogs));
+    // Get total count for ratio display in time_window mode
+    if ($prefs['scheduledTasksReport'] === 'last_number_of_hours') {
+        $allLogs = $schedLib->getSchedulerFromLogs(); // All statuses
+        $smarty->assign('scheduler_total_count', count($allLogs));
+    }
+}
+
 if (! $unifiedsearch->rebuildInProgress()) {
     $searchIndex = [
         'error' => false,
@@ -542,4 +554,19 @@ if (! $unifiedsearch->rebuildInProgress()) {
     $smarty->assign('searchIndex', $searchIndex);
     $smarty->assign('lastLogItems', $lastLogItems);
 }
+
+$htacxGlobal = null;
+if (TikiLib::lib('tiki')->get_preference('security_warn_htaccess_mismatch', 'y') === 'y') {
+    $htacx = (new \Tiki\Security\HtaccessChecker())->run(
+        TIKI_PATH,
+        TIKI_PATH . '/_htaccess',
+        ['server_software' => $_SERVER['SERVER_SOFTWARE'] ?? '']
+    );
+    if ($htacx && ($htacx['status'] ?? '') === \Tiki\Security\HtaccessChecker::STATUS_MISMATCH) {
+        $htacxGlobal = $htacx;
+    }
+}
+$smarty->assign('htaccess_global_warning', $htacxGlobal);
+$smarty->assign('htaccessDocsUrl', 'https://doc.tiki.org/htaccess');
+
 $smarty->display('tiki.tpl');

@@ -42,7 +42,7 @@ function wikiplugin_redirect_info()
             'autologin_remotetiki' => [
                 'required' => false,
                 'name' => tra('Auto login remote Tiki and redirect to page there.'),
-                'description' => tra('Base URL where remote Tiki is located, to auto login to prior to redirection to page there, e.g. https://othertiki.com.'),
+                'description' => tra('Base URL where remote Tiki is located, to auto login to prior to redirection to page there, e.g. https://othertiki.example.org.'),
                 'filter' => 'url',
                 'default' => '',
             ],
@@ -177,7 +177,7 @@ function wikiplugin_redirect($data, $params)
 
 /**
  * This function gets a URL with a token in it so that the user can be redirected that to actually login
- * @param $autologin_remotetiki The remote Tiki base url, e.g. https://remotetiki.com
+ * @param $autologin_remotetiki The remote Tiki base url, e.g. https://remotetiki.example.org
  * @param $redirect_page The pagename of the page on the remote Tiki to redirect to.
  * If not set, user will end up on the default home page on remote Tiki.
  * @return string The URL with the token in it.

@@ -16,8 +16,6 @@ class Reports_Send_EmailBuilder_WikiPageDeleted extends Reports_Send_EmailBuilde
 
     public function getOutput(array $change)
     {
-        $base_url = $change['data']['base_url'];
-
         $output = tr(
             "%0 deleted the wikipage %1",
             "<u>{$change['data']['editUser']}</u>",

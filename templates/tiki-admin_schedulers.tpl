@@ -288,14 +288,14 @@
         <div class="tiki-form-group row">
             <label class="col-sm-2 col-form-label" for="scheduler_name">{tr}Name{/tr} *</label>
             <div class="col-sm-10">
-                <input type="text" id='scheduler_name' class="form-control" name='scheduler_name'
+                <input maxlength="{$MAX_SCHEDULER_NAME_LENGTH}" type="text" id='scheduler_name' class="form-control" name='scheduler_name'
                     value="{$schedulerinfo.name|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-2 col-form-label" for="scheduler_description">{tr}Description{/tr}</label>
             <div class="col-sm-10">
-                <input type="text" id='scheduler_description' class="form-control" name='scheduler_description'
+                <input maxlength="{$MAX_SCHEDULER_DESCRIPTION_LENGTH}" type="text" id='scheduler_description' class="form-control" name='scheduler_description'
                     value="{$schedulerinfo.description|escape}">
             </div>
         </div>
@@ -377,69 +377,69 @@
     </form>
 {/tab}
 
-    <a id="tab3"></a>
-    {if isset($schedulerinfo.id) && $schedulerinfo.id}
-        {tab name="{tr}Scheduler logs{/tr}"}
-            <h2>{tr}Scheduler{/tr} {$schedulerinfo.name|escape} Logs</h2>
-            <h3>{tr}Last {$numOfLogs} Logs{/tr}</h3>
-            <div class="table-responsive">
-                <table class="table normal table-striped table-hover">
-                    <thead>
+<a id="tab3"></a>
+{if isset($schedulerinfo.id) && $schedulerinfo.id}
+    {tab name="{tr}Scheduler logs{/tr}"}
+        <h2>{tr}Scheduler{/tr} {$schedulerinfo.name|escape} Logs</h2>
+        <h3>{tr}Last {$numOfLogs} Logs{/tr}</h3>
+        <div class="table-responsive">
+            <table class="table normal table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Start Time</th>
+                    <th>End Time</th>
+                    <th>Status</th>
+                    <th>Output</th>
+                </tr>
+                </thead>
+                <tbody>
+                {section name=run loop=$schedulerruns}
                     <tr>
-                        <th>ID</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
-                        <th>Status</th>
-                        <th>Output</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {section name=run loop=$schedulerruns}
-                        <tr>
-                            <td>{$schedulerruns[run].id}</td>
-                            <td>
-                                {$schedulerruns[run].start_time|tiki_short_datetime} ({$display_timezone})
+                        <td>{$schedulerruns[run].id}</td>
+                        <td>
+                            {$schedulerruns[run].start_time|tiki_short_datetime:'':'n'} ({$display_timezone})
+                            {if $display_timezone ne 'UTC'}
+                                <br>{$schedulerruns[run].start_time|tiki_short_datetime:'':'n':'UTC'} (UTC)
+                            {/if}
+                        </td>
+                        <td>
+                            {if $schedulerruns[run].end_time ne null}
+                                {$schedulerruns[run].end_time|tiki_short_datetime:'':'n'} ({$display_timezone})
                                 {if $display_timezone ne 'UTC'}
-                                    <br>{$schedulerruns[run].start_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
+                                    <br>{$schedulerruns[run].end_time|tiki_short_datetime:'':'n':'UTC'} (UTC)
                                 {/if}
-                            </td>
-                            <td>
-                                {if $schedulerruns[run].end_time ne null}
-                                    {$schedulerruns[run].end_time|tiki_short_datetime} ({$display_timezone})
-                                    {if $display_timezone ne 'UTC'}
-                                        <br>{$schedulerruns[run].end_time|tiki_short_datetime:'':'y':'UTC'} (UTC)
-                                    {/if}
-                                {/if}
-                            </td>
-                            <td>
-                                {if $schedulerruns[run].status eq 'running'}
-                                    <span class="badge bg-warning">{tr}Running{/tr}</span>
-                                {/if}
-                                {if $schedulerruns[run].status eq 'failed'}
-                                    <span class="badge bg-danger">{tr}Failed{/tr}</span>
+                            {/if}
+                        </td>
+                        <td>
+                            {if $schedulerruns[run].status eq 'running'}
+                                <span class="badge bg-warning">{tr}Running{/tr}</span>
+                            {/if}
+                            {if $schedulerruns[run].status eq 'failed'}
+                                <span class="badge bg-danger">{tr}Failed{/tr}</span>
 
-                                {/if}
-                                {if $schedulerruns[run].status eq 'done'}
-                                    <span class="badge bg-success">{tr}Done{/tr}</span>
-                                {/if}
-                            </td>
-                            <td>
-                                {if isset($schedulerruns[run].can_stop) && $schedulerruns[run].can_stop}
-                                    <a class="btn btn-secondary btn-sm" href="{bootstrap_modal controller=scheduler action=reset schedulerId=$schedulerruns[run].scheduler_id startTime=$schedulerruns[run].start_time}">
-                                    {icon name="undo" _menu_text='y' _menu_icon='y' alt="{tr}Reset{/tr}"}
-                                    </a>
-                                {else}
-                                    {$schedulerruns[run].output|nl2br}
-                                {/if}
-                            </td>
-                        </tr>
-                    {/section}
-                    </tbody>
-                </table>
-            </div>
-            {pagination_links count=$count step=$numrows offset=$offset}tiki-admin_schedulers.php?scheduler={$schedulerinfo.id}&cookietab=3{/pagination_links}
-        {/tab}
-    {/if}
+                            {/if}
+                            {if $schedulerruns[run].status eq 'done'}
+                                <span class="badge bg-success">{tr}Done{/tr}</span>
+                            {/if}
+                        </td>
+                        <td>
+                            {if isset($schedulerruns[run].can_stop) && $schedulerruns[run].can_stop}
+                                <a class="btn btn-secondary btn-sm" href="{bootstrap_modal controller=scheduler action=reset schedulerId=$schedulerruns[run].scheduler_id startTime=$schedulerruns[run].start_time}">
+                                {icon name="undo" _menu_text='y' _menu_icon='y' alt="{tr}Reset{/tr}"}
+                                </a>
+                            {else}
+                                {$schedulerruns[run].output|nl2br}
+                            {/if}
+                        </td>
+                    </tr>
+                {/section}
+                </tbody>
+            </table>
+        </div>
+        {pagination_links count=$count step=$numrows offset=$offset}tiki-admin_schedulers.php?scheduler={$schedulerinfo.id}&cookietab=3{/pagination_links}
+    {/tab}
+{/if}
 
 <a id="tab4"></a>
 {if $jobs|count > 0}

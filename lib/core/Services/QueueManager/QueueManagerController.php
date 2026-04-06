@@ -25,11 +25,16 @@ class QueueManagerController
     public function actionUpdateQueuedJobsLiveStatus($input)
     {
         global $prefs;
-        $response = [];
 
-        if ($prefs['feature_queued_tasks'] !== 'y') {
-            return $response;
+        // Return flag to stop polling if feature is disabled
+        if (($prefs['feature_queued_tasks'] ?? 'n') !== 'y') {
+            return ['disabled' => true];
         }
+
+        $response = [
+            'jobs' => [],
+            'user_active_jobs' => 0,
+        ];
 
         $jobsTobeUpdatedIds = array_column(QueuedTaskBanner::get(), 'id');
 
@@ -37,29 +42,40 @@ class QueueManagerController
             return $response;
         }
 
-        if (! empty($jobsTobeUpdatedIds)) {
-            $jobs = $this->lib->getQueuedTasksByIds(['id', 'status', 'type'], $jobsTobeUpdatedIds);
-            foreach ($jobs as $job) {
-                $tempArray = [];
-                if (! in_array($job['id'], $jobsTobeUpdatedIds)) {
-                    QueuedTaskBanner::clear($job['id']);
-                }
-                $tempArray['id'] = $job['id'];
-                $tempArray['status'] = $job['status'];
-                $tempArray['page'] = QueuedTaskSettings::getPageByJobType($job['type']);
+        $jobs = $this->lib->getQueuedTasksByIds(['id', 'status', 'type'], $jobsTobeUpdatedIds);
+        $foundJobIds = array_column($jobs, 'id');
 
-                // Render the status message using Smarty template
-                $smarty = TikiLib::lib('smarty');
-                $smarty->assign('jobId', $job['id']);
-                $smarty->assign('status', $job['status']);
-                $tempArray['mes'] = $smarty->fetch('queuedtasks/tiki-admin_queued_banner.tpl');
-
-                QueuedTaskBanner::update($job['id'], [
-                    'status' => $job['status'],
-                    'mes' => $tempArray['mes']
-                ]);
-                $response[] = $tempArray;
+        // Clear banners for jobs that no longer exist in the database
+        foreach ($jobsTobeUpdatedIds as $jobId) {
+            if (! in_array($jobId, $foundJobIds)) {
+                QueuedTaskBanner::clear($jobId);
             }
+        }
+
+        foreach ($jobs as $job) {
+            $tempArray = [];
+            $tempArray['id'] = $job['id'];
+            $tempArray['status'] = $job['status'];
+            $tempArray['page'] = QueuedTaskSettings::getPageByJobType($job['type']);
+
+            // Render the status message using Smarty template
+            $smarty = TikiLib::lib('smarty');
+            $smarty->assign('jobId', $job['id']);
+            $smarty->assign('status', $job['status']);
+            $smarty->assign('webProcessingDisabled', ($prefs['queued_tasks_js_processing_disabled'] ?? 'n') === 'y');
+            $tempArray['mes'] = $smarty->fetch('queuedtasks/tiki-admin_queued_banner.tpl');
+
+            // Update session with current status
+            QueuedTaskBanner::update($job['id'], [
+                'status' => $job['status'],
+                'mes' => $tempArray['mes']
+            ]);
+
+            if ($job['status'] === 'Pending' || $job['status'] === 'InProgress') {
+                $response['user_active_jobs']++;
+            }
+
+            $response['jobs'][] = $tempArray;
         }
 
         return $response;
@@ -69,7 +85,13 @@ class QueueManagerController
     {
         global $prefs;
 
-        if ($prefs['feature_queued_tasks'] !== 'y') {
+        // Check if feature is enabled
+        if (($prefs['feature_queued_tasks'] ?? 'n') !== 'y') {
+            return false;
+        }
+
+        // Check if web processing is disabled (use CLI instead)
+        if (($prefs['queued_tasks_js_processing_disabled'] ?? 'n') === 'y') {
             return false;
         }
 

@@ -116,7 +116,7 @@ function wikiplugin_map_info()
                 'name' => tra('Tileset layers'),
                 'description' => tra('Tilesets to use for background layers, comma separated. Tileset groups can be added separated by a tilde character (requires Open Layers v3+, default is the geo_tilesets preference)'),
                 'since' => '20.1',
-                'default' => "86, 134, 200",
+                'default' => '',
                 'filter' => 'text',
                 'advanced' => true,
             ],
@@ -362,12 +362,28 @@ OUT;
 
 function wp_map_plugin_colorpicker($body, $args)
 {
-
     $args->replaceFilter('colors', 'word');
     $colors = array_map('wp_map_color_filter', $args->asArray('colors', ','));
 
-    // Need re-implementing for OpenLayers3+
-    return '';
+    // Filter out empty values
+    $colors = array_filter($colors);
+
+    if (empty($colors)) {
+        // Default color palette if none specified
+        $colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080'];
+    }
+
+    $colorsJson = json_encode(array_values($colors));
+    $title = tra('Color Picker');
+
+    // The colorpicker container stores configuration; JS uses the map container's ID for modal uniqueness
+    return <<<OUT
+<div class="map-colorpicker-container" 
+     data-colorpicker-colors='$colorsJson' 
+     data-colorpicker-title="$title"
+     style="display: none;">
+</div>
+OUT;
 }
 
 function wp_map_color_filter($color)

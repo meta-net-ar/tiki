@@ -38,6 +38,13 @@
             return false;
         }
 
+        var actionUrl = $(form).attr('action');
+        var serialized = $(form).serialize();
+        var fullUrl = actionUrl;
+        if (serialized) {
+            fullUrl += (actionUrl.indexOf('?') === -1 ? '?' : '&') + serialized;
+        }
+        
         $.clickModal({
             title: $(':submit', form).val(),
             success: function (data) {
@@ -46,14 +53,16 @@
                     $(form).closest('.tab, #appframe, body').find('.map-container')[0].modeManager.switchTo("{{$tracker_input.insertMode|escape}}");
                 {{/if}}
 
-                $('.modal').on('hidden.bs.modal', function () {
+                $('.modal').one('hidden.bs.modal', function () {
                     $(form).trigger('cancel');
                     {{if !empty($tracker_input.insertMode)}}
                         $(form).closest('.tab, #appframe, body').find('.map-container')[0].modeManager.switchTo("{{$tracker_input.insertMode|escape}}");
                     {{/if}}
                 });
+                
+                $.closeModal();
             }
-        }, $(form).attr('action') + '&' + $(form).serialize()).call(this, e);
+        }, fullUrl).call(this, e);
     }).each(function () {
         var form = this
             , location = $(this).data('location')

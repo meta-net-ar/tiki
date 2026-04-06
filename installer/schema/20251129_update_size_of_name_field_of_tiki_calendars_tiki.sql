@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_calendars` MODIFY `name` VARCHAR(255) NOT NULL DEFAULT '';

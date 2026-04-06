@@ -20,8 +20,6 @@ define('TIKI_DISPLAY_CONTAINS_PDF', isset($_GET['display']) && str_contains($_GE
 
 use Tiki\Lib\Image\Image;
 use Tiki\Wiki\WikiPaginationUtils;
-
-$section = 'cms';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -35,6 +33,9 @@ $inputConfiguration = [
 ];
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
 
 $access->check_feature('feature_cms_print');

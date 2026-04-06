@@ -37,10 +37,15 @@ class Services_ActivityStream_ManageController
             $rule['status'] = $status;
         }
 
+        $event_graph = TikiLib::events()->getEventGraph();
+
+        // Build Mermaid mindmap data for event graph visualization
+        $event_graph = $this->buildEventGraphData($event_graph['nodes'], $event_graph['edges']);
+
         return [
             'rules' => $rules,
             'ruleTypes' => $this->getRuleTypes(),
-            'event_graph' => TikiLib::events()->getEventGraph(),
+            'event_graph' => $event_graph,
         ];
     }
 
@@ -524,6 +529,73 @@ $customArguments
             return 'enabled';
         } else {
             return 'unknown';
+        }
+    }
+
+    /**
+     * Build Event Graph data in Mermaid mindmap syntax for visualization.
+     * The graph is built based on the events and their relationships (edges) where an edge from event A to event B means that event A is a child of event B in the mindmap hierarchy.
+     * Marmaid mindmap syntax: https://mermaid.ai/open-source/syntax/mindmap.html
+     * @param array $nodes
+     * @param array $edges
+     * @return string
+     */
+    private function buildEventGraphData(array $nodes, array $edges): string
+    {
+        // Build parent->children mapping from edges (from -> to means from is child of to)
+        $childrenMap = [];
+        $parents = [];
+
+        foreach ($edges as $edge) {
+            $from = $edge['from'];
+            $to = $edge['to'];
+
+            if (! isset($childrenMap[$to])) {
+                $childrenMap[$to] = [];
+            }
+            $childrenMap[$to][] = $from;
+            $parents[$from] = $to;
+        }
+
+        // Find root nodes (events that have no parent)
+        $rootNodes = [];
+        foreach ($nodes as $node) {
+            if (! isset($parents[$node])) {
+                $rootNodes[] = $node;
+            }
+        }
+
+        $lines = ['mindmap'];
+        $lines[] = '  root((EVENTS))';
+
+        // Process each root node and build the hierarchy
+        foreach ($rootNodes as $rootNode) {
+            $lines[] = '    ((' . $rootNode . '))';
+            $this->addChildrenToEventGraphData($rootNode, $childrenMap, $lines, 3);
+        }
+
+        return implode("\n", $lines);
+    }
+
+    /**
+     * Recursively add children to mindmap structure
+     * @param string $parentNode
+     * @param array $childrenMap
+     * @param array &$lines
+     * @param int $depth
+     */
+    private function addChildrenToEventGraphData(string $parentNode, array $childrenMap, array &$lines, int $depth): void
+    {
+        if (! isset($childrenMap[$parentNode])) {
+            return;
+        }
+
+        $children = $childrenMap[$parentNode];
+
+        foreach ($children as $child) {
+            $indent = str_repeat('  ', $depth);
+            $lines[] = $indent . $child;
+            $this->addChildrenToEventGraphData($child, $childrenMap, $lines, $depth + 1); // Recursively add children of this child
         }
     }
 }

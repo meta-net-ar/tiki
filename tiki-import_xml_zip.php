@@ -11,7 +11,6 @@
 
 use Tiki\Lib\Wiki\XmlLib;
 
-$section = 'wiki page';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -21,6 +20,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 
 $access->check_feature('feature_wiki');
 $access->check_permission('tiki_p_admin');

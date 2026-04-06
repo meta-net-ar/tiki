@@ -12,6 +12,22 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
 
 class ArtLib extends TikiLib
 {
+    /**
+     * Limit of the title field of the tiki_articles table
+     */
+    public const MAX_ARTICLE_TITLE_LENGTH = 255;
+    /**
+     * Limit of the subtitle field of the tiki_trackers table
+     */
+    public const MAX_ARTICLE_SUBTITLE_LENGTH = 255;
+    /**
+     * Limit of the heading field of the tiki_trackers table
+     */
+    public const MAX_ARTICLE_HEADING_LENGTH = 65535;
+    /**
+     * Limit of the body field of the tiki_trackers table
+     */
+    public const MAX_ARTICLE_BODY_LENGTH = 65535;
     public function approve_submission($subId)
     {
         $data = $this->get_submission($subId);
@@ -231,7 +247,7 @@ class ArtLib extends TikiLib
                 throw new Exception("Failed to update the article with subId: $subId");
             }
         } else {
-            $info['created'] = (int) $this->now;
+            $info['created'] = $this->now;
             $info['nbreads'] = 0;
             $info['votes'] = 0;
             $info['points'] = 0;
@@ -296,10 +312,18 @@ class ArtLib extends TikiLib
 
     public function replace_article($title, $authorName, $topicId, $useImage, $imgname, $imgsize, $imgtype, $imgdata, $heading, $body, $publishDate, $user, $articleId, $image_x, $image_y, $type, $topline = '', $subtitle = '', $linkto = '', $image_caption = '', $image_alt = '', $lang = '', $rating = 0, $isfloat = 'n', $emails = '', $from = '', $list_image_x = '', $list_image_y = '', $ispublished = 'y', $fromurl = false)
     {
-
         $tikilib = TikiLib::lib('tiki');
         $smarty = TikiLib::lib('smarty');
-
+        if (isset($title, $subtitle, $heading, $body)) {
+            $validateTitleFieldLength = Feedback::validateFieldLength("Name", $title, ArtLib::MAX_ARTICLE_TITLE_LENGTH);
+            $validateSubtitleFieldLength = Feedback::validateFieldLength("Subtitle", $subtitle, ArtLib::MAX_ARTICLE_SUBTITLE_LENGTH);
+            $validateHeadingFieldLength = Feedback::validateFieldLength("Heading", $heading, ArtLib::MAX_ARTICLE_HEADING_LENGTH);
+            $validateBodyFieldLength = Feedback::validateFieldLength("Body", $body, ArtLib::MAX_ARTICLE_BODY_LENGTH);
+            if (! $validateTitleFieldLength || ! $validateSubtitleFieldLength || ! $validateHeadingFieldLength || ! $validateBodyFieldLength) {
+                header('location: ' . $_SERVER['REQUEST_URI']);
+                die;
+            }
+        }
         if (empty($imgdata) || $useImage === 'n') { // remove image data if not using it
             $imgdata = '';
         }
@@ -356,7 +380,7 @@ class ArtLib extends TikiLib
             $smarty->assign('mail_old_publish_date', $oldArticle['publishDate']);
             $smarty->assign('mail_old_data', $oldArticle['heading'] . "\n----------------------\n" . $oldArticle['body']);
         } else {
-            $info['created'] = (int) $this->now;
+            $info['created'] = $this->now;
             $info['nbreads'] = 0;
             $info['votes'] = 0;
             $info['points'] = 0;
@@ -492,38 +516,52 @@ class ArtLib extends TikiLib
     public function add_topic($name, $imagename, $imagetype, $imagesize, $imagedata)
     {
         $query = 'insert into `tiki_topics`(`name`,`image_name`,`image_type`,`image_size`,`image_data`,`active`,`created`) values(?,?,?,?,?,?,?)';
-        $result = $this->query($query, [$name, $imagename, $imagetype, (int) $imagesize, $imagedata, 'y', (int) $this->now]);
+        $result = $this->query($query, [$name, $imagename, $imagetype, (int) $imagesize, $imagedata, 'y', $this->now]);
 
-        $query = 'select max(`topicId`) from `tiki_topics` where `created`=? and `name`=?';
-        $topicId = $this->getOne($query, [(int) $this->now, $name]);
+        $topicId = $this->lastInsertId();
         return $topicId;
     }
 
     public function remove_topic($topicId, $all = 0)
     {
-        $query = 'delete from `tiki_topics` where `topicId`=?';
+        try {
+            $this->beginTransaction();
 
-        $result = $this->query($query, [$topicId]);
+            $query = 'delete from `tiki_topics` where `topicId`=?';
 
-        if ($all == 1) {
-            $query = 'delete from `tiki_articles` where `topicId`=?';
-            $result = $this->query($query, [$topicId]);
-        } else {
-            $query = 'update `tiki_articles` set `topicId`=?, `topicName`=? where `topicId`=?';
-            $result = $this->query($query, [null, null, $topicId]);
+            $this->query($query, [$topicId]);
+
+            if ($all == 1) {
+                $query = 'delete from `tiki_articles` where `topicId`=?';
+                $this->query($query, [$topicId]);
+            } else {
+                $query = 'update `tiki_articles` set `topicId`=?, `topicName`=? where `topicId`=?';
+                $this->query($query, [null, null, $topicId]);
+            }
+
+            $this->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->rollBack();
+            return false;
         }
-
-        return true;
     }
 
     public function replace_topic_name($topicId, $name)
     {
-        $query = 'update `tiki_topics` set `name` = ? where `topicId` = ?';
-        $result = $this->query($query, [$name, (int)$topicId]);
+        try {
+            $this->beginTransaction();
+            $query = 'update `tiki_topics` set `name` = ? where `topicId` = ?';
+            $result = $this->query($query, [$name, (int)$topicId]);
 
-        $query = 'update `tiki_articles` set `topicName` = ? where `topicId`= ?';
-        $result = $this->query($query, [$name, (int)$topicId]);
-        return true;
+            $query = 'update `tiki_articles` set `topicName` = ? where `topicId`= ?';
+            $result = $this->query($query, [$name, (int)$topicId]);
+            $this->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->rollBack();
+            return false;
+        }
     }
 
     public function replace_topic_image($topicId, $imagename, $imagetype, $imagesize, $imagedata)

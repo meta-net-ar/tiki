@@ -27,12 +27,16 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
 class Feedback
 {
     /**
-     * Add error feedback
+     * Add error feedback.
      *
-     * This is a specific application of the add function below for errors.
+     * This method stores the error message in the session-based feedback stack.
+     * As a result, the feedback will persist across HTTP redirects and will be
+     * displayed on the next page load via the {feedback} Smarty function.
      *
-     * @param $feedback
-     * @param bool $sendHeaders
+     * This is a specific application of the add() method for errors.
+     *
+     * @param mixed $feedback Error message or feedback array
+     * @param bool $sendHeaders Whether to immediately send feedback headers (AJAX use)
      * @throws Exception
      */
     public static function error($feedback, $sendHeaders = false)
@@ -97,11 +101,31 @@ class Feedback
         $smarty = TikiLib::lib('smarty');
         $smarty->assign('errortype', $httpCode);
         $smarty->assign('msg', $message);
-        http_response_code($httpCode);
+        //This errorAndDie is meant for fatal errors.  Http headers may have already been sent, which would crash the following line.  We want this function to terminate properly even then - benoitg - 2026-01-27
+        if (! headers_sent()) {
+            http_response_code($httpCode);
+        }
         $smarty->display($errorPage);
         die;
     }
-
+    /**
+     * Checks if the number of characters allowed in a field has been exceeded.
+     * Displays an error if this is the case.
+     *
+     * @param string $field_name The name of the field to check.
+     * @param string $field_string The string value of the field.
+     * @param int $max_field_length The maximum allowed length for the field.
+     * @return bool Returns true if the field is valid, false otherwise.
+     */
+    public static function validateFieldLength(string $field_name, string $field_string, int $max_field_length): bool
+    {
+        if (mb_strlen($field_string) > $max_field_length) {
+            $errorMessage = tr("You have exceeded the number of characters allowed (%0 max) for the %1 field", $max_field_length, $field_name);
+            Feedback::error($errorMessage);
+            return false;
+        }
+        return true;
+    }
     /**
      * Add note feedback
      *
@@ -438,7 +462,7 @@ class Feedback
      *
      * @return void
      */
-    public static function showWatchers($watch_event, $object, $extra_event = null)
+    public static function showWatchers(string $watch_event, $object, $extra_event = null)
     {
         global $prefs;
         if ($prefs['feature_user_watches'] === 'y') {

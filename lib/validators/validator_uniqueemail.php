@@ -8,17 +8,11 @@ function validator_uniqueemail($input, $parameter = '', $message = '')
 {
     global $prefs;
     $userlib = TikiLib::lib('user');
+    $tikilib = TikiLib::lib('tiki');
     include_once __DIR__ . '/../../lib/ban/banlib.php';
 
-    $ip = $_SERVER['REMOTE_ADDR'];
-
-    if (! empty($_SERVER['HTTP_CLIENT_IP'])) {
-        $ip = $_SERVER['HTTP_CLIENT_IP'];
-    } elseif (! empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } elseif ($ip == '::1') {
-        $ip = gethostbyname(getHostName());
-    }
+    // Use the secure get_ip_address() method which properly validates reverse proxy headers
+    $ip = $tikilib->get_ip_address();
 
     $ban_message = tra('You are not allow to do such operation, please contact the administrator.');
 

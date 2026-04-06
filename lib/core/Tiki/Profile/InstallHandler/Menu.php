@@ -146,10 +146,7 @@ class Tiki_Profile_InstallHandler_Menu extends Tiki_Profile_InstallHandler
             $data['parse'] = 'n';
         }
 
-        $menulib->replace_menu(0, $data['name'], $data['description'], $type, $data['icon'], $data['use_items_icons'], $data['parse']);
-        $result = $tikilib->query("SELECT MAX(`menuId`) FROM `tiki_menus`");
-        $row = $result->fetchRow();
-        $menuId = reset($row);
+        $menuId = $menulib->replace_menu(0, $data['name'], $data['description'], $type, $data['icon'], $data['use_items_icons'], $data['parse']);
 
         foreach ($data['items'] as $item) {
             $menulib->replace_menu_option($menuId, 0, $item['name'], $item['url'], $item['type'], $item['position'], $item['section'], implode(',', $item['permissions']), implode(',', $item['groups']), $item['level'], $item['icon'] ?? '');

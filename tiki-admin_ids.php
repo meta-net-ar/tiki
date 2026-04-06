@@ -20,6 +20,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
 
 if ($prefs['ids_enabled'] == 'n') {
     $access->display_error('', tra("Tiki IDS is not enabled"), '403', false);

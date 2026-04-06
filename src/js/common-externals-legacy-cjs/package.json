@@ -1,0 +1,17 @@
+{
+  "name": "common-externals-legacy-cjs",
+  "version": "1.0.0",
+  "description": "Shared vendor libraries in CJS format that need to be bundled with tiki",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "swiper": "^11.2.6",
+    "tablesorter": "^2.32.0"
+  },
+  "devDependenciesComment": {
+    "tablesorter": "Doesn't have a ESM version"
+  }
+}
