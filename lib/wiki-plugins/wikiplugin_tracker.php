@@ -822,13 +822,6 @@ function wikiplugin_tracker($data, $params)
         return $smarty->fetch("wiki-plugins/error_tracker.tpl");
     }
 
-    if (! is_array($action)) {
-        $action = $action === null || $action === '' ? [] : [$action];
-    }
-    if (! is_array($action_style)) {
-        $action_style = $action_style === null || $action_style === '' ? [] : [$action_style];
-    }
-
     $dynamicSave = false;
     if (count($action) == 1 && reset($action) == 'NONE') {
         $action = [];
