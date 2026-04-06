@@ -1196,6 +1196,20 @@ class ParserLib extends TikiDb_Bridge
             $args = array_intersect_key($args, $params);
         }
 
+        // HTML decode all string values first (before separator processing)
+        if (! empty($args)) {
+            foreach ($args as $argKey => &$argValue) {
+                if ($argValue !== null && is_string($argValue)) {
+                    $argValue = TikiLib::htmldecode($argValue);
+                }
+            }
+            unset($argValue);
+        }
+
+        if (isset($info['params'])) {
+            $args = WikiPlugin_Helper::applySeparators($args, $info);
+        }
+
         // Apply filters on values individually
         if (! empty($args)) {
             foreach ($args as $argKey => &$argValue) {
@@ -1205,22 +1219,11 @@ class ParserLib extends TikiDb_Bridge
                 $paramInfo = $params[$argKey];
                 $filter = isset($paramInfo['filter']) ? TikiFilter::get($paramInfo['filter']) : $default;
 
-                // Preserve null values (parameters not provided by user)
-                if ($argValue !== null) {
-                    $argValue = TikiLib::htmldecode($argValue);
-                }
-
-                if (isset($paramInfo['separator'])) {
-                    if ($argValue !== null) {
-                        $vals = [];
-                        $vals = $tikilib->array_apply_filter($tikilib->multi_explode($paramInfo['separator'], $argValue), $filter);
-                        $argValue = array_values($vals);
-                    }
-                    // If $argValue is null, leave it as null (don't process separator)
-                } else {
-                    if ($argValue !== null) {
-                        $argValue = $filter->filter($argValue);
-                    }
+                if (is_array($argValue)) {
+                    $argValue = $tikilib->array_apply_filter($argValue, $filter);
+                    $argValue = array_values($argValue);
+                } elseif ($argValue !== null) {
+                    $argValue = $filter->filter($argValue);
                 }
             }
         }
