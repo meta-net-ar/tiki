@@ -14,20 +14,22 @@ use Tiki\Lib\TikiDate;
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'allCals'               => 'text',              //post
+            'allCals'               => 'bool',              //post
             'refresh'               => 'bool',              //post
-            'find'                  => 'word',              //post
+            'find'                  => 'string',         //post
             'day'                   => 'digits',            //post
             'year'                  => 'digits',            //post
             'mon'                   => 'digits',            //post
-            'generate_availability' => 'digits',            //post
-            'sort_mode'             => 'string',            //get
-            'watch_event'           => 'string',            //post
-            'watch_action'          => 'string',            //post
-            'todate'                => 'string',            //post
-
-        ],'staticKeyFiltersForArrays' => [
-            'calIds'                    => 'int',          //post
+            'generate_availability' => 'bool',              //post
+            'sort_mode'             => 'word',              //get
+            'watch_event'           => 'word',              //post
+            'watch_action'          => 'word',              //post
+            'todate'                => 'int',               //post
+            'viewmode'              => 'word',              //post
+            'calitemId'            => 'int',                //post
+        ],
+        'staticKeyFiltersForArrays'   => [
+            'calIds'                => 'int',               //post
         ],
     ]
 ];
