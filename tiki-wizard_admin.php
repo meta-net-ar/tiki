@@ -53,6 +53,7 @@ $useDefaultPrefs = isset($_REQUEST['use-default-prefs']);
 // If $useChangesWizard is set, the "Changes Wizard" should be run. Otherwise the "admin wizard".
 $useChangesWizard = isset($_REQUEST['use-changes-wizard']);
 if ($useDefaultPrefs) {
+   
     // Store the default prefs selection in the wizard bar
     $smarty->assign('useDefaultPrefs', $useDefaultPrefs);
 
@@ -100,8 +101,12 @@ if ($useDefaultPrefs) {
     // require_once('lib/wizard/pages/profiles_completed.php');
     // $pages[] = new AdminWizardProfilesCompleted();
 } elseif ($useChangesWizard) {
+    
     // Store the use Changes Wizard selection in the wizard bar
     $smarty->assign('useChangesWizard', $useChangesWizard);
+
+    require_once('lib/wizard/pages/changes_new_in_30.php');
+    $pages[] = new ChangesWizardNewIn30();
 
     require_once('lib/wizard/pages/changes_new_in_26.php');
     $pages[] = new ChangesWizardNewIn26();
