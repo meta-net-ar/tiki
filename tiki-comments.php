@@ -11,7 +11,9 @@
 
 require_once('tiki-setup.php');
 
-
+$smarty = TikiLib::lib('smarty');
+$access = TikiLib::lib('access');
+$access->check_permission('tiki_p_view');
 
 $headerlib = TikiLib::lib('header');
 $headerlib->add_js_module('
