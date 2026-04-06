@@ -93,13 +93,6 @@
         {/if}
     </div>
     {* show jscalendar if set *}
-    {if $prefs.feature_jscalendar eq 'y'}
-        <div class="jscalrow" style="display: inline-block">
-            <form action="{$myurl}" method="post" name="f">
-                {jscalendar date="$focusdate" id="trig" goto="$jscal_url" align="Bc"}
-            </form>
-        </div>
-    {/if}
 
     {if $user and $prefs.feature_user_watches eq 'y' and isset($category_watched) and $category_watched eq 'y'}
     <div class="categbar">
@@ -121,18 +114,16 @@
         {include file='tiki-calendar_listmode.tpl'}
     {else}
         {jq}
-            const mainCalendarContainer = [window.calendar];
-            $("#calendar").setupFullCalendar({{$fullCalendarParams|json_encode}}, mainCalendarContainer);
-            {{if $prefs.print_pdf_from_url neq 'none'}$("#calendar").addFullCalendarPrint('#calendar-pdf-btn', mainCalendarContainer[0]);{/if}}
+            let today = new Date();
+            var printingParams = {pdf_export: '{{$pdf_export}}', pdf_warning: '{{$pdf_warning}}', pref_print_pdf_from_url: '{{$prefs.print_pdf_from_url}}'};
+            $('.calendar-container').defineParameterOfMultipleCalendar({{$fullCalendarParams|json_encode}}, printingParams, '.calendar-container', today.toISOString().split('T')[0], undefined, undefined, undefined);
         {/jq}
     {/if}
-    {if $pdf_export eq 'y' and $pdf_warning eq 'n'}
-        <a id="calendar-pdf-btn"  href="#" class="text-end d-none">{icon name='pdf'} {tr}Export as PDF{/tr}</a>
-    {/if}
+
     <div id="test"></div>
-    
+
     <div id='currentcalitemId' class='d-none'>{$currentcalitemId}</div>
-    <div id='calendar'></div>
+    <div class='calendar-container'></div>
 </div>
 {if $prefs.feature_jscalendar eq 'y' and $prefs.javascript_enabled eq 'y'}
     {js_insert_icon type="jscalendar"}
