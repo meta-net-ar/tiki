@@ -3284,12 +3284,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "37644a3652eadc30485706afbc3d9f6355dc5ef0"
+                "reference": "920e439ac36c8e78c5ea901c545fb44cb73e1e1b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/37644a3652eadc30485706afbc3d9f6355dc5ef0",
-                "reference": "37644a3652eadc30485706afbc3d9f6355dc5ef0",
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/920e439ac36c8e78c5ea901c545fb44cb73e1e1b",
+                "reference": "920e439ac36c8e78c5ea901c545fb44cb73e1e1b",
                 "shasum": ""
             },
             "require": {
@@ -3306,7 +3306,7 @@
                 "ezyang/htmlpurifier": "^4.17",
                 "garethp/php-ews": "dev-master",
                 "henrique-borba/php-sieve-manager": "^1.0",
-                "league/commonmark": "^2.8.1",
+                "league/commonmark": "^2.8",
                 "monolog/monolog": "^3.0",
                 "php": ">=8.1",
                 "sentry/sdk": "^4.0",
@@ -3367,7 +3367,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "wiki": "https://github.com/cypht-org/cypht/wiki"
             },
-            "time": "2026-04-01T10:32:40+00:00"
+            "time": "2026-04-06T07:02:24+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
