@@ -1,0 +1,349 @@
+ /*! The Trontastic theme option for the jQqui theme */
+/* "-bg" in this file refers to "background color" in keeping with Bootstrap naming conventions. "-bg-path" refers to the path of the background image. */
+/* @import url("../../../../../../../../../themes/default/css/default.css"); */
+@import url("../../tiki-selectors.css");
+
+:root {
+    --tiki-jui-border-radius: 8px;
+
+    /* Component container headers, including card-header, etc. */
+    --tiki-jui-widget-header-color: #222222;
+    --tiki-jui-widget-header-bg-color: #9fda58;
+    --tiki-jui-widget-header-bg-path: url("trontastic/images/ui-bg_gloss-wave_85_9fda58_500x100.png");
+    --tiki-jui-widget-header-bg-path-pagetop: url("../../jqui/options/trontastic/images/ui-bg_gloss-wave_85_9fda58_500x100.png");
+    --tiki-jui-widget-header-bg-path-adminui: url("../images/ui-bg_gloss-wave_85_9fda58_500x100.png");
+    --tiki-jui-widget-header-bg-position: 50% 50%;
+    --tiki-jui-widget-header-border-color: #000;
+    --tiki-jui-widget-header-link-color: #595959;
+
+    /* Component containers including card-body, etc. */
+    --tiki-jui-widget-content-color: var(--bs-body-color);
+    --tiki-jui-widget-content-bg-color: #0a0a0a;
+    --tiki-jui-widget-content-bg-path: url('trontastic/images/ui-bg_gloss-wave_55_000000_500x100.png');
+    --tiki-jui-widget-content-bg-path-pagetop: url('../../jqui/options/trontastic/images/ui-bg_gloss-wave_55_000000_500x100.png');
+    --tiki-jui-widget-content-bg-path-adminui: url('../images/ui-bg_gloss-wave_55_000000_500x100.png');
+    --tiki-jui-widget-content-bg-position: 50% top;
+    --tiki-jui-widget-content-border-color: #696969;
+    --tiki-jui-widget-content-link-color: var(--tiki-jui-state-default-color);
+    --tiki-jui-widget-content-link-hover-color: ;
+    --tiki-jui-widget-content-parent-padding: .2rem;
+
+    /* Interactive elements including buttons, etc. */
+    --tiki-jui-state-default-color: #c7f391; /* btn-primary, etc.*/
+    --tiki-jui-state-default-color-rgba-25: rgba(184, 236, 121, 0.25);
+    --tiki-jui-state-default-bg: #0a0a0a;
+    --tiki-jui-state-default-bg-path: url("trontastic/images/ui-bg_glass_40_0a0a0a_1x400.png");
+    --tiki-jui-state-default-bg-path-adminui: url("../images/ui-bg_glass_40_0a0a0a_1x400.png");
+    --tiki-jui-state-default-bg-position: 50% 50%;
+    --tiki-jui-state-default-border-color: #c7f391a1;
+
+    --tiki-jui-state-hover-color: #96f226;
+    --tiki-jui-state-hover-bg: #000;
+    --tiki-jui-state-hover-bg-path: url("trontastic/images/ui-bg_glass_60_000000_1x400.png");
+    --tiki-jui-state-hover-bg-path-adminui: url("../images/ui-bg_glass_60_000000_1x400.png");
+    --tiki-jui-state-hover-bg-position: 50% 50%;
+    --tiki-jui-state-hover-border-color: #000;
+
+    --tiki-jui-state-active-color: var(--tiki-jui-state-hover-color);
+    --tiki-jui-state-active-bg: var(--tiki-jui-state-hover-bg);
+    --tiki-jui-state-active-bg-path: var(--tiki-jui-state-hover-bg-path);
+    --tiki-jui-state-active-bg-position: var(--tiki-jui-state-hover-bg-position);
+    --tiki-jui-state-active-border-color: #696969;
+
+    --tiki-jui-highlight-color: #030303;
+    --tiki-jui-highlight-link-color: #030303;
+    --tiki-jui-highlight-bg-color: #f1fbe5;
+    --tiki-jui-highlight-bg-path: url("trontastic/images/ui-bg_glass_55_f1fbe5_1x400.png");
+    --tiki-jui-highlight-bg-position: 50% 50%;
+    --tiki-jui-highlight-bg-repeat: repeat-x;
+    --tiki-jui-highlight-border-color:#8cce3b ;
+
+    --tiki-jui-error-color: #74736d;
+    --tiki-jui-error-link-color: #74736d;
+    --tiki-jui-error-bg-color: #f6ecd5;
+    --tiki-jui-error-bg-path: url("trontastic/images/ui-bg_gloss-wave_95_f6ecd5_500x100.png");
+    --tiki-jui-error-bg-position: 50% 50%;
+    --tiki-jui-error-bg-repeat: repeat-x;
+    --tiki-jui-error-border-color: #f1ac88;
+
+    --tiki-jui-widget-font-weight: bold;
+
+    /* Bootstrap and Tiki CSS variables */
+  --bs-border-radius: 0.5rem;
+  /*--bs-border-color: #1E1A16FF;*/
+/*  These need to be scoped by the classes that use them
+--bs-nav-tabs-border-color: var(--bs-border-color);
+  --bs-nav-tabs-link-bg: #020202;
+  --bs-nav-tabs-border-hover-color: #000;
+  --bs-nav-tabs-hover-color: #fff;
+  --bs-nav-tabs-link-hover-color: #fff;
+  --bs-nav-tabs-link-hover-bg: #000;
+  --bs-dropdown-link-active-bg: ; */
+
+    --bs-body-color: #fffdf5;
+    --bs-body-color-rgb: 222, 226, 230;
+    --bs-body-bg: #262626;
+    --bs-body-bg-rgb: 0, 0, 0;
+    --bs-emphasis-color: #fff;
+    --bs-emphasis-color-rgb: rgb(255, 255, 255);
+    --bs-secondary-color: rgba(222, 226, 230, 0.75);
+    --bs-secondary-color-rgb: 222, 226, 230;
+    --bs-secondary-bg: #3b3b3b; /* not default */
+    --bs-secondary-bg-rgb: 52, 58, 64;
+    --bs-tertiary-color: rgba(222, 226, 230, 0.5);
+    --bs-tertiary-color-rgb: 222, 226, 230;
+    --bs-tertiary-bg: rgb(42.5, 47.5, 52.5);
+    --bs-tertiary-bg-rgb: 43, 48, 53;
+    --bs-primary-text-emphasis: rgb(109.8, 168, 253.8);
+    --bs-secondary-text-emphasis: rgb(166.8, 172.2, 177);
+    --bs-success-text-emphasis: rgb(117, 183, 152.4);
+    --bs-info-text-emphasis: rgb(109.8, 223.2, 246);
+    --bs-warning-text-emphasis: rgb(255, 217.8, 106.2);
+    --bs-danger-text-emphasis: rgb(234, 133.8, 143.4);
+    --bs-light-text-emphasis: #f8f9fa;
+    --bs-dark-text-emphasis: #dee2e6;
+    --bs-primary-bg-subtle: rgb(2.6, 22, 50.6);
+    --bs-secondary-bg-subtle: rgb(21.6, 23.4, 25);
+    --bs-success-bg-subtle: rgb(5, 27, 16.8);
+    --bs-info-bg-subtle: #40381e;
+    --bs-warning-bg-subtle: rgb(51, 38.6, 1.4);
+    --bs-danger-bg-subtle: rgb(44, 10.6, 13.8);
+    --bs-light-bg-subtle: #343a40;
+    --bs-dark-bg-subtle: #1a1d20;
+    --bs-primary-border-subtle: rgb(7.8, 66, 151.8);
+    --bs-secondary-border-subtle: rgb(64.8, 70.2, 75);
+    --bs-success-border-subtle: rgb(15, 81, 50.4);
+    --bs-info-border-subtle: rgb(7.8, 121.2, 144);
+    --bs-warning-border-subtle: rgb(153, 115.8, 4.2);
+    --bs-danger-border-subtle: rgb(132, 31.8, 41.4);
+    --bs-light-border-subtle: #495057;
+    --bs-dark-border-subtle: #343a40;
+    --bs-heading-color: inherit;
+    --bs-link-color: var(--tiki-jui-state-default-color);
+    --bs-link-hover-color: var(--tiki-jui-state-hover-color);
+    --bs-link-color-rgb: 128, 128, 211;
+    --bs-link-hover-color-rgb: 139, 185, 254;
+    --bs-code-color: rgb(230.4, 132.6, 181.2);
+    --bs-highlight-color: #dee2e6;
+    --bs-highlight-bg: rgb(102, 77.2, 2.8);
+    --bs-border-color: #434343;
+    --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
+    --bs-accordion-border-color: var(--bs-border-color);
+    --bs-form-valid-color: rgb(117, 183, 152.4);
+    --bs-form-valid-border-color: rgb(117, 183, 152.4);
+    --bs-form-invalid-color: rgb(234, 133.8, 143.4);
+    --bs-form-invalid-border-color: rgb(234, 133.8, 143.4);
+
+    --tiki-nav-tabs-link-color: #b8ec79;
+    --tiki-active-color: var(--bs-link-color);
+    --tiki-active-bg: var(--bs-info-bg-subtle);
+    --tiki-active-border-color: var(--bs-border-color);
+    --tiki-jui-bg-light: gray !important;
+}
+
+/* Pagetop navbars and admin interface */
+.tiki-top-nav-light {
+    --tiki-top-bg: var(--tiki-jui-widget-header-bg-color) var(--tiki-jui-widget-header-bg-path-pagetop) 50% 50% repeat-x;
+    --tiki-top-color: rgba(0, 0, 0, 0.8);
+    --tiki-top-hover-color: rgba(0, 0, 0, 0.7);
+    --tiki-top-text-color: rgba(0, 0, 0, 0.7);
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
+}
+
+.tiki-topbar-nav-light {
+    --tiki-topbar-bg: var(--tiki-jui-bg-widget-content);
+    --tiki-topbar-color: var(--tiki-jui-widget-content-color);
+    --tiki-topbar-hover-color: rgba(0, 0, 0, 0.7);
+    --tiki-topbar-text-color: rgba(0, 0, 0, 0.7);
+}
+
+.tiki:not(.tiki-admin.uab) .tiki-top-nav-dark,
+.tiki-top-nav-dark {
+    --tiki-top-bg: var(--tiki-jui-widget-content-bg-path-pagetop) 50% repeat-x;
+    --tiki-top-color: #fff;
+    --tiki-top-hover-color: #fff;
+    --tiki-top-text-color: #fff;
+    --tiki-site-title-color: var(--tiki-top-color);
+    --tiki-site-subtitle-color: var(--tiki-top-color);
+/*    --tiki-top-border: solid #7e7e7e;
+    --tiki-top-border-width: 0 0 1px 0; */
+}
+
+.tiki-topbar-nav-dark {
+    --tiki-topbar-bg: #131313;
+    --tiki-topbar-color: #fff;
+    --tiki-topbar-hover-color: #fff;
+    --tiki-topbar-text-color: #fff;
+/*    --tiki-topbar-border: solid #7e7e7e;
+    --tiki-topbar-border-width: 1px; */
+}
+
+[data-bs-theme=dark] .tiki-top-nav-light {
+    --tiki-top-bg: var(--tiki-jui-bg-widget-content); /*#212529;*/
+    --tiki-top-color: #fff;
+    --tiki-top-hover-color: #fff;
+    --tiki-top-text-color: #fff;
+    --bs-navbar-brand-color: #fff;
+    --bs-navbar-brand-hover-color: #fff;
+/*    --tiki-top-border: solid #7e7e7e;
+    --tiki-top-border-width: 0 0 1px 0; */
+}
+
+[data-bs-theme=dark] .tiki-topbar-nav-light {
+    --tiki-topbar-bg: #212529;
+    --tiki-topbar-color: #fff;
+    --tiki-topbar-hover-color: #fff;
+    --tiki-topbar-text-color: #fff;
+}
+
+/*:root .tiki .tiki-admin-top-nav-light,*/
+:root .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light,
+:root .tiki .tiki-admin-aside-nav-light {
+    --tiki-admin-top-nav-bg:  var(--tiki-jui-widget-header-bg-color) var(--tiki-jui-widget-header-bg-path-adminui) 50% repeat-x;
+    --tiki-admin-top-nav-color: var(--tiki-jui-widget-header-color);
+    --tiki-admin-top-nav-hover-color: rgba(0, 0, 0, 0.7);
+    --tiki-admin-top-nav-hover-bg: none ;
+    --tiki-admin-aside-nav-bg: var(--tiki-jui-widget-header-bg-path-adminui);
+    --tiki-admin-aside-nav-color: #464646; /*var(--tiki-jui-state-default-color);*/
+    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+    --tiki-admin-dropdown-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path) 50% top repeat-x;
+    --tiki-admin-dropdown-link-color: var(--tiki-jui-widget-content-link-color);
+    --tiki-admin-dropdown-link-hover-color: #464646;
+    --tiki-admin-dropdown-link-hover-bg: var(--tiki-jui-widget-header-bg-color);
+}
+
+:root .tiki .tiki-admin-aside-nav-light,
+:root .tiki .tiki-admin-aside-nav-dark {
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+}
+
+:root .tiki .tiki-admin-aside-nav-light button.accordion-button {
+    color: var(--tiki-jui-state-default-color) !important;
+    background: var(--tiki-jui-state-default-bg) var(--tiki-jui-state-default-bg-path-adminui) 50% 50% repeat-x !important;
+}
+
+:root .tiki .tiki-admin-aside-nav-light button.accordion-button:hover {
+    color: var(--tiki-admin-aside-nav-color) !important;
+    background: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path-adminui) var(--tiki-jui-state-hover-bg-position) repeat-x !important;
+}
+
+/*:root .tiki .tiki-admin-top-nav-dark,*/
+:root .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark,
+:root .tiki .tiki-admin-aside-nav-dark {
+    --tiki-admin-top-nav-bg: var(--tiki-jui-widget-content-bg-path-adminui) 50% repeat-x;
+    --tiki-admin-top-nav-color: var(--tiki-jui-state-default-color);
+    --tiki-admin-top-nav-hover-color: #fff;
+    --tiki-admin-top-nav-hover-bg: #fff;
+    --tiki-admin-aside-nav-bg: #2C2C2C;
+    --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
+    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+    --tiki-admin-dropdown-link-color: #dee2e6;
+    --tiki-admin-dropdown-bg: #1C1C1C;
+    --tiki-admin-dropdown-link-hover-color: var(--bs-body-color);
+    --tiki-admin-dropdown-link-hover-bg: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path-adminui) var(--tiki-jui-state-hover-bg-position) var(--tiki-jui-bg-repeat);
+}
+
+:root .tiki .tiki-admin-aside-nav-dark button.accordion-button {
+    color: var(--tiki-admin-aside-nav-color) !important;
+    background: var(--tiki-admin-aside-nav-bg) !important;
+}
+
+:root .tiki .tiki-admin-aside-nav-dark button.accordion-button:not(.collapsed) {
+    color: var(--tiki-jui-state-active-color) !important;
+    background: var(--tiki-jui-state-active-bg) var(--tiki-jui-state-active-bg-path) var(--tiki-jui-state-active-bg-position);
+}
+
+[data-bs-theme=dark] .tiki .tiki-admin-top-nav-light,
+[data-bs-theme=dark] .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light,
+[data-bs-theme=dark] .tiki .tiki-admin-aside-nav-light {
+    --tiki-admin-top-nav-bg: #212529;
+    --tiki-admin-top-nav-color: #fff;
+    --tiki-admin-top-nav-hover-color: #fff;
+    --tiki-admin-top-nav-hover-bg: #fff;
+    --tiki-admin-aside-nav-bg: #2C2C2C;
+    --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
+    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+    --tiki-admin-dropdown-link-color: #dee2e6;
+    --tiki-admin-dropdown-bg: #1C1C1C;
+    --tiki-admin-dropdown-link-hover-color: var(--bs-body-color);
+    --tiki-admin-dropdown-link-hover-bg: #007BFF;
+}
+
+[data-bs-theme=dark] .tiki .tiki-admin-aside-nav-light button.accordion-button {
+    color: var(--tiki-admin-aside-nav-color) !important;
+    background: var(--tiki-admin-aside-nav-bg) !important;
+}
+
+[data-bs-theme=light] .tiki .tiki-admin-top-nav-dark {
+    --tiki-admin-top-nav-bg: #212529;
+    --tiki-admin-top-nav-color: #fff;
+    --tiki-admin-top-nav-hover-color: #fff;
+    --tiki-admin-top-nav-hover-bg: #fff;
+    --tiki-admin-dropdown-link-color: #dee2e6;
+    --tiki-admin-dropdown-bg: #1C1C1C;
+    --tiki-admin-dropdown-link-hover-color: var(--bs-body-color);
+    --tiki-admin-dropdown-link-hover-bg: #A1D72CFF;
+}
+
+[data-bs-theme=light] .tiki .tiki-admin-aside-nav-dark {
+    --tiki-admin-aside-nav-bg: #2C2C2C;
+    --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
+    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+}
+
+[data-bs-theme=light] .tiki .tiki-admin-aside-nav-dark button.accordion-button {
+    color: var(--tiki-admin-aside-nav-color) !important;
+    background: var(--tiki-admin-aside-nav-bg) !important;
+}
+
+[data-bs-theme=light] .tiki .tiki-admin-aside-nav-dark .accordion-button::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+button.accordion-button {
+    color: var(--tiki-jui-state-default-color) !important;
+    background:  var(--tiki-jui-state-default-bg) var(--tiki-jui-state-default-bg-path) 50% 50% repeat-x; /* var(--tiki-admin-aside-nav-bg) !important; */
+}
+
+.accordion {
+    --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='rgb%28135, 156, 178.2%29' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+/*div:not(.top_modules, .topbar_modules) .bg-light {
+    background-color: #4C4C4C !important;
+}*/
+
+.modal-body .accordion-toggle {
+    color: #000;
+}
+
+/* Alerts - Dark mode */
+[data-bs-theme=dark] .alert.alert-primary,
+[data-bs-theme=dark] .alert.alert-secondary,
+[data-bs-theme=dark] .alert.alert-success,
+[data-bs-theme=dark] .alert.alert-info {
+    --bs-alert-color: var(--tiki-jui-highlight-color); /*var(--bs-primary-text-emphasis);*/
+    background: var(--tiki-jui-widget-header-bg-color) var(--tiki-jui-widget-header-bg-path-adminui);
+    --bs-alert-border-color: var(--tiki-jui-highlight-border-color); /*var(--bs-primary-border-subtle);*/
+    --bs-alert-link-color: var(--tiki-jui-highlight-link-color); /*var(--bs-primary-text-emphasis);*/
+    --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23212529' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='rgb%285.2, 44, 101.2%29' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+[data-bs-theme=dark] .alert.alert-warning,
+[data-bs-theme=dark] .alert.alert-danger {
+    --bs-alert-color: var(--tiki-jui-error-color);
+    /*   --bs-alert-bg: var(--tiki-jui-error-bg);*/
+    /*    --bs-alert-border-color: var(--tiki-jui-error-border-color);*/
+    --bs-alert-link-color: var(--tiki-jui-error-link-color);
+    background: var(--tiki-jui-error-bg) !important;
+    border-width: 2px;
+}
+
+[data-bs-theme=dark] .alert.alert-primary .btn-close {
+    --bs-btn-close-color: #000;
+    --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/%3e%3c/svg%3e");
+}
