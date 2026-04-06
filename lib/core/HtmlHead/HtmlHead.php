@@ -21,18 +21,13 @@ if (function_exists('\filter_out_sefurl') === false) {
     require_once('tiki-sefurl.php');
 }
 
-class HtmlHead
+class HtmlHead extends MetaTags
 {
     protected array $images = [];
-    protected ?string $title = null;
     protected ?string $canonicalPath = null;
     protected ?array $breadcrumbTitle = null;
-    protected ?string $middleSectionTemplate;
+    public ?string $middleSectionTemplate;
 
-    public function __construct()
-    {
-        $this->middleSectionTemplate = TikiLib::lib('smarty')->getTemplateVars('mid');
-    }
 
     public function getPageType(): ?string
     {
@@ -69,9 +64,6 @@ class HtmlHead
 
             case 'tiki-list_file_gallery.tpl':
                 return 'file_gallery';
-
-            default:
-                return 'website';
         }
 
         return null;
@@ -83,7 +75,6 @@ class HtmlHead
         global $gal_info, $description, $title, $prefs;
 
         $desc = '';
-
         if ($section === 'blogs') {
             if (! empty($post_info['parsed_excerpt'])) {
                 $desc = strip_tags($post_info['parsed_excerpt']);
@@ -114,9 +105,9 @@ class HtmlHead
 
         if (empty($desc)) {
             $browserTitle = $this->getBrowserTitle();
-            $sep = ! empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
-            $pageTitle = isset($title) ? $title : '';
-            $desc = $browserTitle . ($browserTitle && $pageTitle ? " $sep " : '') . $pageTitle;
+            $sep          = ! empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
+            $pageTitle    = isset($title) ? $title : '';
+            $desc         = $browserTitle . ($browserTitle && $pageTitle ? " $sep " : '') . $pageTitle;
         }
 
         if (strlen($desc) > 150) {
@@ -166,17 +157,12 @@ class HtmlHead
 
     public function getTitle(): string
     {
-        if ($this->title !== null) {
-            return $this->title;
-        }
-
         global $sswindowtitle, $structure, $structure_path, $aliasname;
         global $tracker_item_main_value, $tagTitle, $title, $arttitle;
         global $thread_info, $forum_info, $categ_info, $userinfo;
         global $tracker_info, $page, $description, $headtitle, $prefs;
 
         $pageTitle = '';
-
         if (! empty($sswindowtitle)) {
             if ($sswindowtitle === 'none') {
                 $pageTitle = '&nbsp;';
@@ -246,8 +232,7 @@ class HtmlHead
             }
         }
 
-        $this->title = $pageTitle;
-        return $this->title;
+         return $pageTitle;
     }
 
 
@@ -357,7 +342,6 @@ class HtmlHead
         global $header_featured_images, $prefs, $hasImage, $topics, $base_url_canonical;
 
         $images = [];
-
         if (! empty($header_featured_images) && is_array($header_featured_images)) {
             $images = $header_featured_images;
         } elseif (
@@ -433,7 +417,6 @@ class HtmlHead
         global $publishDate, $post_info;
 
         $date = null;
-
         if ($this->getPageType() === 'blog_post' && ! empty($post_info['created'])) {
             $date = $post_info['created'];
         } elseif (! empty($publishDate)) {
@@ -448,7 +431,6 @@ class HtmlHead
         global $edit_data, $post_info;
 
         $date = null;
-
         if ($this->getPageType() === 'blog_post' && ! empty($post_info['lastModif'])) {
             $date = $post_info['lastModif'];
         } elseif (! empty($edit_data)) {
@@ -458,97 +440,95 @@ class HtmlHead
         return $date ? date('c', is_numeric($date) ? $date : strtotime($date)) : null;
     }
 
-    public function generate(): string
+    public function autoGenerate(): string
     {
         global $prefs, $base_url_canonical;
 
-        $meta = new MetaTags();
-
-        $meta->title($this->getTitle())
+        $this->title($this->getTitle())
             ->description($this->getDescription())
             ->meta('generator', 'Tiki Wiki CMS Groupware - https://tiki.org');
 
         if (! empty($canonicalPath = $this->getCanonicalPath())) {
-            $meta->canonical($base_url_canonical . $canonicalPath);
-            $meta->url($base_url_canonical . $canonicalPath);
+            $this->canonical($base_url_canonical . $canonicalPath);
+            $this->url($base_url_canonical . $canonicalPath);
         } elseif (! empty($base_url_canonical)) {
-            $meta->url($base_url_canonical);
+            $this->url($base_url_canonical);
         }
 
         if (! empty($base_url_canonical)) {
-            $meta->twitter('domain', $base_url_canonical);
+            $this->twitter('domain', $base_url_canonical);
         }
 
-        $pageType = $this->getPageType();
+        $pageType  = $this->getPageType();
         $isArticle = in_array($pageType, ['article', 'blog_post']);
-        $meta->og('type', $isArticle ? 'article' : 'website');
+        $this->og('type', $isArticle ? 'article' : 'website');
 
         if ($isArticle && ! empty($pubDate = $this->getPublishDate())) {
-            $meta->articleMeta($pubDate, $this->getModifiedDate(), $this->getAuthor());
+            $this->articleMeta($pubDate, $this->getModifiedDate(), $this->getAuthor());
         }
 
         if (! empty($images = $this->getImages())) {
             foreach ($images as $img) {
-                $meta->image($img, 'summary');
+                $this->image($img, 'summary');
             }
         } else {
-            $meta->twitter('card', 'summary');
+            $this->twitter('card', 'summary');
         }
 
         $siteName = ! empty($prefs['socialnetworks_facebook_site_name']) ? $prefs['socialnetworks_facebook_site_name'] : $this->getBrowserTitle();
         if (! empty($siteName)) {
-            $meta->og('site_name', $siteName);
+            $this->og('site_name', $siteName);
         }
 
         $twitterSite = ! empty($prefs['socialnetworks_twitter_site']) ? $prefs['socialnetworks_twitter_site'] : $siteName;
         if (! empty($twitterSite)) {
-            $meta->twitter('site', $twitterSite);
+            $this->twitter('site', $twitterSite);
         }
 
         if (! empty($prefs['socialnetworks_facebook_application_id'])) {
-            $meta->push('meta', ['property' => 'fb:app_id', 'content' => $prefs['socialnetworks_facebook_application_id']]);
+            $this->push('meta', ['property' => 'fb:app_id', 'content' => $prefs['socialnetworks_facebook_application_id']]);
         }
 
         if (! empty($robots = $this->getRobots())) {
-            $meta->robots($robots);
-            $meta->robots($robots, 'googlebot');
+            $this->robots($robots);
+            $this->robots($robots, 'googlebot');
         }
 
         if (! empty($prefs['site_google_analytics_site_ownership'])) {
-            $meta->verification('google', $prefs['site_google_analytics_site_ownership']);
+            $this->verification('google', $prefs['site_google_analytics_site_ownership']);
         }
 
         if (! empty($prefs['metatag_geoposition'])) {
-            $meta->meta('geo.position', $prefs['metatag_geoposition']);
-            $meta->meta('ICBM', str_replace(';', ',', $prefs['metatag_geoposition']));
+            $this->meta('geo.position', $prefs['metatag_geoposition']);
+            $this->meta('ICBM', str_replace(';', ',', $prefs['metatag_geoposition']));
         }
 
         if (! empty($prefs['metatag_georegion'])) {
-            $meta->meta('geo.region', $prefs['metatag_georegion']);
+            $this->meta('geo.region', $prefs['metatag_georegion']);
         }
 
         if (! empty($prefs['metatag_geoplacename'])) {
-            $meta->meta('geo.placename', $prefs['metatag_geoplacename']);
+            $this->meta('geo.placename', $prefs['metatag_geoplacename']);
         }
 
         if (($prefs['metatag_google_notranslate'] ?? 'n') === 'y') {
-            $meta->meta('google', 'notranslate');
+            $this->meta('google', 'notranslate');
         }
 
         if (($prefs['metatag_nositelinkssearchbox'] ?? 'n') === 'y') {
-            $meta->meta('google', 'nositelinkssearchbox');
+            $this->meta('google', 'nositelinkssearchbox');
         }
 
-        $this->addAltLinks($meta);
+        $this->generateAltLinks();
 
         if (($prefs['schema_enable'] ?? 'n') === 'y') {
-            $this->addSchema($meta);
+            $this->generateSchema();
         }
 
-        return (string) $meta;
+        return (string) $this;
     }
 
-    private function addAltLinks($meta): void
+    private function generateAltLinks(): void
     {
         global $prefs, $tiki_p_view, $tiki_p_read_blog, $tiki_p_read_article;
         global $tiki_p_view_file_gallery, $tiki_p_forum_read, $tiki_p_view_directory, $tiki_p_view_calendar;
@@ -576,7 +556,7 @@ class HtmlHead
                 (empty($perm) || $perm === 'y')
             ) {
                 $feedTitle = ! empty($prefs[$titlePref]) ? $prefs[$titlePref] : tra($defaultTitle);
-                $meta->feed("{$url}?ver=" . $ver, 'application/rss+xml', $feedTitle);
+                $this->feed("{$url}?ver=" . $ver, 'application/rss+xml', $feedTitle);
             }
         }
 
@@ -590,7 +570,7 @@ class HtmlHead
                     $baseTitle = ! empty($prefs['feed_tracker_title']) ? $prefs['feed_tracker_title'] : tra('RSS Tracker');
                     $feedTitle = $baseTitle . ' - ' . ($tracker['name'] ?? '');
                     $url = "tiki-tracker_rss.php?ver=" . $ver . "&trackerId=" . $tracker['trackerId'];
-                    $meta->feed($url, 'application/rss+xml', $feedTitle);
+                    $this->feed($url, 'application/rss+xml', $feedTitle);
                 }
             }
         }
@@ -601,7 +581,7 @@ class HtmlHead
                        (! empty($tiki_p_admin_wiki) && $tiki_p_admin_wiki === 'y');
 
             if ($canEdit) {
-                $meta->push('link', [
+                $this->push('link', [
                     'rel' => 'alternate',
                     'type' => 'application/x-wiki',
                     'title' => tra('Edit this page! '),
@@ -612,12 +592,12 @@ class HtmlHead
     }
 
 
-    private function addSchema($meta): void
+    private function generateSchema(): void
     {
         global $prefs, $base_url_canonical, $trail;
 
         $entities = [];
-        $pageUrl = $this->getCanonicalUrl();
+        $pageUrl  = $this->getCanonicalUrl();
         $webPageData = [
             '@id' => "{$pageUrl}#webpage",
             'url' => $pageUrl,
@@ -665,9 +645,9 @@ class HtmlHead
 
         $entities[] = new WebPage($webPageData);
 
-        $pageType = $this->getPageType();
+        $pageType  = $this->getPageType();
+        $postId    = $_REQUEST['postId'] ?? null;
         $articleId = $_REQUEST['articleId'] ?? null;
-        $postId = $_REQUEST['postId'] ?? null;
 
         if (($pageType === 'article' && ! empty($articleId)) || ($pageType === 'blog_post' && ! empty($postId))) {
             $postData = [
@@ -705,8 +685,7 @@ class HtmlHead
         } // TODO: resolve/detect other types.
 
         if (! empty($entities)) {
-            $schema = new Schema(...$entities);
-            $meta->schema($schema);
+            $this->schema(new Schema(...$entities));
         }
     }
 }

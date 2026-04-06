@@ -62,8 +62,6 @@ require_once("path_js_importmap_generator.php");
  */
 class HeaderLib
 {
-    public $title = '';
-
     /**
      * Array of js files arrays or js urls arrays to load
      * key = rank, value = array of filenames with relative path or urls
@@ -143,6 +141,7 @@ class HeaderLib
     public $metatags = [];
     public $linktags = [];
     public $rawhtml = '';
+    public HtmlHead $head;
 
     /* If set to true, any js added through add_jsfile() that has not rank 'external' will be put to rank 'late'
      * Only set once in tiki-setup.php to separate wiki page specific js from common js.
@@ -167,6 +166,8 @@ class HeaderLib
     {
         $smarty = TikiLib::lib('smarty');
         $smarty->assign('headerlib', $this);
+
+        $this->head = new HtmlHead();
     }
 
     private function getOutputCallerInfo()
@@ -223,11 +224,6 @@ class HeaderLib
         return $file;
     }
 
-
-    public function set_title($string)
-    {
-        $this->title = urlencode($string);
-    }
 
     /**
      * Add security headers. By default these headers are not sent.
@@ -744,57 +740,60 @@ class HeaderLib
     /**
      * Returns the raw headers to be output.
      * Once called, the various add functions will throw errors.
+     * @param bool $autoGenerate Auto generate meta tags from page context.
      *
      * @return string The raw output headers
      */
-    public function output_headers(bool $generateHtmlHead = false): string
+    public function output_headers(bool $autoGenerate = false): string
     {
         $this->throwIfHeadersAlreadyOutput();
-        $this->outputHeadersWasStartedBy = $this->getOutputCallerInfo();
+        $this->outputHeadersWasStartedBy   = $this->getOutputCallerInfo();
+        // Middle section template is set after headerlib instance created,
+        // So in order to get the value we have to move it here.
+        $this->head->middleSectionTemplate = TikiLib::lib('smarty')->getTemplateVars('mid');
 
         ksort($this->cssfiles);
         ksort($this->css);
-        ksort($this->rssfeeds);
+
+        if (count($this->metatags)) {
+            foreach ($this->metatags as $n => $m) {
+                if (str_contains($n, "og:")) {
+                    $this->head->push('meta', ['property' => $n,'content' => $m]);
+                    continue;
+                }
+
+                $this->head->meta($n, $m);
+            }
+        }
+
+        if (! is_null($this->linktags) && count($this->linktags)) {
+            foreach ($this->linktags as $link) {
+                $this->head->push('link', $link);
+            }
+        }
+
+        if (count($this->rssfeeds)) {
+            foreach ($this->rssfeeds as $x => $rssf) {
+                foreach ($rssf as $rsstitle => $rssurl) {
+                    $this->head->feed(url: $rssurl, title: $this->convert_cdn($rsstitle));
+                }
+            }
+        }
 
         $back = '';
-        if ($generateHtmlHead) {
-            $back .= (new HtmlHead())->generate() . "\n";
+        if ($autoGenerate) {
+            // this called only in header.tpl
+            $back .= $this->head->autoGenerate() . "\n";
+        } else {
+            $this->head->meta('generator', 'Tiki Wiki CMS Groupware - https://tiki.org');
+            $back .= (string) $this->head . "\n";
         }
 
-        $back .= generateJsImportmapScripts();
-        $back .= "\n";
-        if ($this->title) {
-            $back = '<title>' . \SmartyTiki\Modifier\Escape::apply($this->title) . "</title>\n\n";
-        }
+        $back .= generateJsImportmapScripts() . "\n";
 
         if ($this->rawhtml) {
             $back .= $this->rawhtml;
         }
-
-        if (count($this->metatags)) {
-            foreach ($this->metatags as $n => $m) {
-                // check if the meta name starts with OpenGraph protocol prefix and use property instead of name if true
-                $nameattrib = preg_match('/^og\:/', $n) ? 'property' : 'name';
-                $back .= '<meta ' . $nameattrib . '="' . \SmartyTiki\Modifier\Escape::apply($n) . '" content="' . \SmartyTiki\Modifier\Escape::apply($m) . "\">\n";
-            }
-            $back .= "\n";
-        }
-        if (! is_null($this->linktags) && count($this->linktags)) {
-            foreach ($this->linktags as $link) {
-                $back .= '<link rel="' . $link['rel'] . '" href="' . $link['href'] . '"';
-                if (isset($link['sizes'])) {
-                    $back .= ' sizes="' . $link['sizes'] . '"' ;
-                }
-                if (isset($link['type'])) {
-                    $back .= ' type="' . $link['type'] . '"' ;
-                }
-                if (isset($link['color'])) {
-                    $back .= ' color="' . $link['color'] . '"' ;
-                }
-                $back .= ">\n";
-            }
-        }
-
 
         $back .= $this->output_css_files();
 
@@ -809,15 +808,6 @@ class HeaderLib
             $back .= "-->\n</style>\n";
         }
 
-        if (count($this->rssfeeds)) {
-            foreach ($this->rssfeeds as $x => $rssf) {
-                $back .= "<!-- rss $x -->\n";
-                foreach ($rssf as $rsstitle => $rssurl) {
-                    $back .= "<link rel=\"alternate\" type=\"application/rss+xml\" title=\"" . \SmartyTiki\Modifier\Escape::apply($this->convert_cdn($rsstitle)) . "\" href=\"" . \SmartyTiki\Modifier\Escape::apply($rssurl) . "\">\n";
-                }
-            }
-            $back .= "\n";
-        }
         return $back;
     }
 

@@ -5040,7 +5040,6 @@
         },
         "lib/headerlib.php": {
             "HeaderLib::convert_cdn": true,
-            "HeaderLib::set_title": true,
             "HeaderLib::add_jsfile_dynamic": true,
             "HeaderLib::add_jsfile_cdn": true,
             "HeaderLib::add_jsfile_dependency": true,
