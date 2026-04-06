@@ -1,9 +1,12 @@
 <?php
+
 /**
  * Custom user configuration class. To use this, you must set the USER_CONFIG_TYPE environment variable to 'custom'.
  */
-class Hm_Custom_User_Config extends Hm_Config {
+class Hm_Custom_User_Config extends Hm_Config
+{
     private $username;
+    private $site_config;
 
     /**
      * Load site configuration
