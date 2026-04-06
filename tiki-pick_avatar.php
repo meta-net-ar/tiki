@@ -14,7 +14,7 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
         'showall'                  => 'bool',            //get
-        'view_user'                => 'usename',         //post
+        'view_user'                => 'username',         //post
         'uselib'                   => 'bool',            //post
         'avatar'                   => 'none',            //get
         'reset'                    => 'bool',            //post

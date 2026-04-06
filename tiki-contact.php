@@ -10,12 +10,12 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 $inputConfiguration = [[
     'staticKeyFilters'  => [
-        'send'          => 'bool',      // post
-        'priority'      => 'int',       // post
-        'from'          => 'striptags', // post
-        'subject'       => 'striptags', // post
-        'body'          => 'xss',       // post
-        'to'            => 'email',     // post
+        'send'                 => 'bool',      // post
+        'priority'             => 'int',       // post
+        'from'                 => 'striptags', // post
+        'subject'              => 'striptags', // post
+        'body'                 => 'striptags', // post
+        'to'                   => 'striptags', // post
         'g-recaptcha-response' => 'striptags',
     ],
     'catchAllUnset'     => null
