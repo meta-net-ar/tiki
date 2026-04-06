@@ -25,7 +25,7 @@
     /* Component container headers, including card-header, etc. */
     --tiki-jui-widget-header-color: #222222;
     --tiki-jui-widget-header-bg-color: #cccccc;
-    --tiki-jui-widget-header-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_highlight-soft_75_cccccc_1x100.png');
+    --tiki-jui-widget-header-bg-path: url('..//images/ui-bg_highlight-soft_75_cccccc_1x100.png');
     --tiki-jui-widget-header-bg-position: 50% 50%;
     --tiki-jui-widget-header-border-color: #aaaaaa;
     --tiki-jui-widget-header-link-color: #222222;
@@ -42,29 +42,29 @@
     /* Interactive elements including buttons, etc. */
     --tiki-jui-state-default-color: #555555; /* btn-primary, etc.*/
     --tiki-jui-state-default-bg: #e6e6e6;
-    --tiki-jui-state-default-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png');
-    --tiki-jui-state-default-bg-path-adminui: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png');
+    --tiki-jui-state-default-bg-path: url('../images/ui-bg_glass_75_e6e6e6_1x400.png');
+    --tiki-jui-state-default-bg-path-adminui: url('../images/ui-bg_glass_75_e6e6e6_1x400.png');
     --tiki-jui-state-default-bg-position: 50% 50%;
     --tiki-jui-state-default-border-color: #d3d3d3;
 
     --tiki-jui-state-hover-color: #212121;
     --tiki-jui-state-hover-bg: #dadada;
-    --tiki-jui-state-hover-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_75_dadada_1x400.png');
-    --tiki-jui-state-hover-bg-path-adminui: url('../../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_75_dadada_1x400.png');
+    --tiki-jui-state-hover-bg-path: url('../images/ui-bg_glass_75_dadada_1x400.png');
+    --tiki-jui-state-hover-bg-path-adminui: url('../images/ui-bg_glass_75_dadada_1x400.png');
     --tiki-jui-state-hover-bg-position: 50% 50%;
     --tiki-jui-state-hover-border-color: #d3d3d3;
 
     --tiki-jui-state-active-color: #212121;
     --tiki-jui-state-active-bg: #ffffff;
-    --tiki-jui-state-active-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_65_ffffff_1x400.png');
-    --tiki-jui-state-active-bg-path-adminui: url('../../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_65_ffffff_1x400.png');
+    --tiki-jui-state-active-bg-path: url('../images/ui-bg_glass_65_ffffff_1x400.png');
+    --tiki-jui-state-active-bg-path-adminui: url('../images/ui-bg_glass_65_ffffff_1x400.png');
     --tiki-jui-state-active-bg-position: 50% 50%;
     --tiki-jui-state-active-border-color: #aaaaaa;
 
     --tiki-jui-highlight-color: #363636;
     --tiki-jui-highlight-link-color: #363636;
     --tiki-jui-highlight-bg-color: #fbf9ee;
-    --tiki-jui-highlight-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_55_fbf9ee_1x400.png');
+    --tiki-jui-highlight-bg-path: url('../images/ui-bg_glass_55_fbf9ee_1x400.png');
     --tiki-jui-highlight-bg-position: 50% 50%;
     --tiki-jui-highlight-bg-repeat: repeat;
     --tiki-jui-highlight-border-color: #fcefa1;
@@ -72,7 +72,7 @@
     --tiki-jui-error-color: #cd0a0a;
     --tiki-jui-error-link-color: #cd0a0a;
     --tiki-jui-error-bg-color: #fef1ec;
-    --tiki-jui-error-bg-path: url('../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_95_fef1ec_1x400.png');
+    --tiki-jui-error-bg-path: url('../images/ui-bg_glass_95_fef1ec_1x400.png');
     --tiki-jui-error-bg-position: 50% 50%;
     --tiki-jui-error-bg-repeat: repeat;
     --tiki-jui-error-border-color: #cd0a0a;
@@ -159,7 +159,7 @@
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
-    --tiki-admin-top-nav-bg: var(--tiki-jui-state-default-bg) url('../../../../node_modules/jquery-ui/dist/themes/smoothness/images/ui-bg_glass_75_e6e6e6_1x400.png') var(--tiki-jui-state-default-bg-position) repeat-x;
+    --tiki-admin-top-nav-bg: var(--tiki-jui-state-default-bg) url('../images/ui-bg_glass_75_e6e6e6_1x400.png') var(--tiki-jui-state-default-bg-position) repeat-x;
     --tiki-admin-top-nav-color:  #{$navbar-light-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-dark-hover-color};
     --tiki-admin-top-nav-hover-bg: none ;

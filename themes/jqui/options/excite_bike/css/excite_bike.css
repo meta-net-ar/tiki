@@ -1,0 +1,432 @@
+/*! The Excite Bike theme option for the jQui theme */
+/* "-bg" in this file refers to "background color" in keeping with Bootstrap naming conventions. "-bg-path" refers to the path of the background image. */
+/* @import url("../../../../../../../../../themes/default/css/default.css"); */
+@import url("../../tiki-selectors.css");
+
+/* Oct 19 */
+:root {
+    --tiki-jui-border-radius: 4px;
+
+    /* Component container headers, including card-header, etc. */
+    --tiki-jui-widget-header-color: #A36A00; /* #e69700; */
+    --tiki-jui-widget-header-bg-color: #f9f9f9;
+    --tiki-jui-widget-header-bg-path: url('../../excite_bike/images/ui-bg_highlight-soft_100_f9f9f9_1x100.png');
+    --tiki-jui-widget-header-bg-path-pagetop: url('../../jqui/options/excite_bike/images/ui-bg_highlight-soft_100_f9f9f9_1x100.png');
+    --tiki-jui-widget-header-bg-position: 50% 50%;
+    --tiki-jui-widget-header-border-color: #cccccc;
+    --tiki-jui-widget-header-link-color: #A36A00; /* #e69700; */
+
+    /* Component containers including card-body, etc. */
+    --tiki-jui-widget-content-color: #222222;
+    --tiki-jui-widget-content-bg-color: #eeeeee;
+    --tiki-jui-widget-content-bg-path: url('excite_bike/images/ui-bg_inset-hard_100_eeeeee_1x100.png');
+    --tiki-jui-widget-content-bg-path-adminui: url('../images/ui-bg_inset-hard_100_eeeeee_1x100.png');
+    --tiki-jui-widget-content-bg-position: 50% bottom;
+    --tiki-jui-widget-content-border-color: #ffffff;
+    --tiki-jui-widget-content-link-color: #222222;
+    --tiki-jui-widget-content-link-hover-color: #b24926;
+    --tiki-jui-widget-content-padding: ;
+
+    /* Interactive elements including buttons, etc. */
+    --tiki-jui-state-default-color: #000; /* btn-primary, etc.*/
+    --tiki-jui-state-default-bg: #1484e6;
+    --tiki-jui-state-default-bg-path: url('excite_bike/images/ui-bg_diagonals-thick_22_1484e6_40x40.png');
+    --tiki-jui-state-default-bg-path-adminui: url('../images/ui-bg_diagonals-thick_22_1484e6_40x40.png');
+    --tiki-jui-state-default-bg-position: 50% 50%;
+    --tiki-jui-state-default-border-color: #ffffff;
+
+    --tiki-jui-state-hover-color: #000;
+    --tiki-jui-state-hover-bg: #e69700;
+    --tiki-jui-state-hover-bg-path: url('excite_bike/images/ui-bg_diagonals-thick_20_e69700_40x40.png');
+    --tiki-pagetop-jui-state-hover-bg-path: url('../../jqui/options/excite_bike/images/ui-bg_diagonals-thick_20_e69700_40x40.png');
+    --tiki-jui-state-hover-bg-path-adminui: url('../images/ui-bg_diagonals-thick_20_e69700_40x40.png');
+    --tiki-jui-state-hover-bg-position: 50% 50%;
+    --tiki-jui-state-hover-border-color: #e69700;
+
+    --tiki-jui-state-active-color: var(--tiki-jui-state-hover-color); /* active state same as hover */
+    --tiki-jui-state-active-bg: var(--tiki-jui-state-hover-bg);
+    --tiki-jui-state-active-bg-path: var(--tiki-jui-state-hover-bg-path);
+    --tiki-jui-state-active-bg-path-adminui: var(--tiki-jui-state-hover-bg-path-adminui);
+    --tiki-jui-state-active-bg-position: var(--tiki-jui-state-hover-bg-position);
+    --tiki-jui-state-active-border-color: var(--tiki-jui-state-hover-border-color);
+
+    --tiki-jui-highlight-color: #333333;
+    --tiki-jui-highlight-link-color: #333333;
+    --tiki-jui-highlight-bg-color: #c5ddfc;
+    --tiki-jui-highlight-bg-path: url('excite_bike/images/ui-bg_diagonals-small_25_c5ddfc_40x40.png');
+    --tiki-jui-highlight-bg-position: 50% 50%;
+    --tiki-jui-highlight-bg-repeat: repeat;
+    --tiki-jui-highlight-border-color: #ffffff;
+
+    --tiki-jui-error-color: #ffffff;
+    --tiki-jui-error-link-color: #ffffff;
+    --tiki-jui-error-bg-color: #e69700;
+    --tiki-jui-error-bg-path: url('excite_bike/images/ui-bg_diagonals-thick_20_e69700_40x40.png');
+    --tiki-jui-error-bg-position: 50% 50%;
+    --tiki-jui-error-bg-repeat: repeat;
+    --tiki-jui-error-border-color: #e69700;
+
+    --tiki-jui-widget-font-weight: bold;
+    --tiki-jui-diagonal-bg-dark:  repeating-linear-gradient(
+        135deg,
+        #032B4A,
+        #032B4A 4px,
+        #02253f 4px,
+        #02253f 8px);
+    --tiki-jui-diagonal-bg-light: repeating-linear-gradient(
+        135deg,
+        #cbe0ef,
+        #cbe0ef 4px,
+        #bbddfd 4px,
+        #bbddfd 8px);
+
+    /* Bootstrap and Tiki CSS variables */
+    --bs-body-bg: #fff;
+    --bs-body-color: #000;
+    --bs-link-color: #b24926;
+    --bs-info-bg-subtle: #fff5d6; /* Plugin list in edit help modal */
+    --bs-border-radius: 0;
+    --bs-border-color: #d19405;
+/*    --bs-secondary-bg: #3b3b3b; */
+    --tiki-jui-bg-light: gray !important;
+
+/*    --tiki-nav-tabs-link-color: #4c3000;
+    --tiki-active-color: var(--bs-link-color);
+    --tiki-active-bg: var(--bs-info-bg-subtle);
+    --tiki-active-border-color: var(--bs-border-color);
+    --bs-nav-tabs-border-color: var(--bs-border-color); /* default */
+ /*   --bs-nav-tabs-link-bg: #fece2f;
+    --bs-nav-tabs-border-hover-color: #a45b13;
+    --bs-nav-tabs-hover-color: #381f00;
+    --bs-nav-tabs-link-hover-color: #381f00;
+    --bs-nav-tabs-link-hover-bg: #ffdd57; */
+}
+
+
+[data-bs-theme=dark] {
+    color-scheme: dark;
+    --tiki-jui-widget-header-bg: black;
+    --tiki-jui-widget-content-color: var(--bs-body-color);
+    --tiki-jui-widget-content-bg-color: var(--bs-secondary-bg);
+    --tiki-jui-widget-content-bg-path: ;
+    --tiki-jui-widget-content-link-color: var(--bs-link-color);
+    --tiki-jui-widget-content-link-hover-color: var(--bs-link-hover-color);
+
+
+    --bs-body-color: #fffdf5;
+    --bs-body-color-rgb: 222, 226, 230;
+    --bs-body-bg: #262626;
+    --bs-body-bg-rgb: 0, 0, 0;
+    --bs-emphasis-color: #fff;
+    --bs-emphasis-color-rgb: 255, 255, 255;
+    --bs-secondary-color: rgba(222, 226, 230, 0.75);
+    --bs-secondary-color-rgb: 222, 226, 230;
+    --bs-secondary-bg: #343a40;
+    --bs-secondary-bg-rgb: 52, 58, 64;
+    --bs-tertiary-color: rgba(222, 226, 230, 0.9);
+    --bs-tertiary-color-rgb: 222, 226, 230;
+    --bs-tertiary-bg: rgb(42.5, 47.5, 52.5);
+    --bs-tertiary-bg-rgb: 43, 48, 53;
+    --bs-primary-text-emphasis: rgb(109.8, 168, 253.8);
+    --bs-secondary-text-emphasis: rgb(166.8, 172.2, 177);
+    --bs-success-text-emphasis: rgb(117, 183, 152.4);
+    --bs-info-text-emphasis: rgb(109.8, 223.2, 246);
+    --bs-warning-text-emphasis: rgb(255, 217.8, 106.2);
+    --bs-danger-text-emphasis: rgb(234, 133.8, 143.4);
+    --bs-light-text-emphasis: #f8f9fa;
+    --bs-dark-text-emphasis: #dee2e6;
+    --bs-primary-bg-subtle: rgb(2.6, 22, 50.6);
+    --bs-secondary-bg-subtle: rgb(21.6, 23.4, 25);
+    --bs-success-bg-subtle: rgb(5, 27, 16.8);
+    --bs-info-bg-subtle: #262626; /* Plugin list in edit help modal */
+    --bs-warning-bg-subtle: rgb(51, 38.6, 1.4);
+    --bs-danger-bg-subtle: rgb(44, 10.6, 13.8);
+    --bs-light-bg-subtle: #343a40;
+    --bs-dark-bg-subtle: #1a1d20;
+    --bs-primary-border-subtle: rgb(7.8, 66, 151.8);
+    --bs-secondary-border-subtle: rgb(64.8, 70.2, 75);
+    --bs-success-border-subtle: rgb(15, 81, 50.4);
+    --bs-info-border-subtle: rgb(7.8, 121.2, 144);
+    --bs-warning-border-subtle: rgb(153, 115.8, 4.2);
+    --bs-danger-border-subtle: rgb(132, 31.8, 41.4);
+    --bs-light-border-subtle: #495057;
+    --bs-dark-border-subtle: #343a40;
+    --bs-heading-color: inherit;
+    --bs-link-color: #4EA9F9; /* #4DA9F9; */
+    --bs-link-hover-color: #52ABFCFF;
+    --bs-link-color-rgb: 128, 128, 211;
+    --bs-link-hover-color-rgb: 139, 185, 254;
+    --bs-code-color: rgb(230.4, 132.6, 181.2);
+    --bs-highlight-color: #dee2e6;
+    --bs-highlight-bg: rgb(102, 77.2, 2.8);
+    --bs-border-color: #72777d;
+    --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
+    --bs-form-valid-color: rgb(117, 183, 152.4);
+    --bs-form-valid-border-color: rgb(117, 183, 152.4);
+    --bs-form-invalid-color: rgb(234, 133.8, 143.4);
+    --bs-form-invalid-border-color: rgb(234, 133.8, 143.4);
+    --bs-border-radius: 0.5rem;
+
+    --tiki-jui-widget-content-border-color: #72777d;
+    --tiki-nav-tabs-link-color: #4c3000;
+    --bs-nav-tabs-border-color: var(--bs-border-color); /* default */
+    --bs-nav-tabs-link-bg: #e9a219;
+    --bs-nav-tabs-border-hover-color: #a45b13;
+    --bs-nav-tabs-hover-color: #381f00;
+    --bs-nav-tabs-link-hover-color: #381f00;
+    --bs-nav-tabs-link-hover-bg: #ffdd57;
+}
+
+[data-bs-theme=dark] {
+    & .card {
+        --bs-card-border-color: #72777d;
+    }
+    & .card.blogpost, .article {
+        border: 1px solid #72777d;
+    }
+}
+
+[data-bs-theme=dark] .bg-light {
+    background: var(--bs-nav-tabs-link-bg);
+}
+
+/* Pagetop navbars and admin interface */
+.tiki-top-nav-light {
+    --tiki-top-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path);
+    --tiki-top-color: rgba(var(--bs-emphasis-color-rgb), 0.65);
+    --tiki-top-hover-color: rgba(var(--bs-emphasis-color-rgb), 0.8);
+    --tiki-top-text-color: rgba(var(--bs-emphasis-color-rgb), 0.8);
+    --bs-navbar-brand-color: rgba(var(--bs-emphasis-color-rgb), 1);
+    --bs-navbar-brand-hover-color: rgba(var(--bs-emphasis-color-rgb), 1);
+    --tiki-top-box-shadow: 0px 1px 10px #b0c0d0;
+}
+
+.tiki-topbar-nav-light {
+    --tiki-topbar-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path);
+    --tiki-topbar-color: rgba(var(--bs-emphasis-color-rgb), 0.65);
+    --tiki-topbar-hover-color: rgba(255, 255, 255, 0.75);
+    --tiki-topbar-text-color: rgba(255, 255, 255, 0.75);
+}
+
+.tiki-top-nav-dark {
+    --tiki-top-bg: var(--tiki-jui-diagonal-bg-dark);
+    --tiki-top-color: #e0e0e0;
+    --tiki-top-hover-color: #fff;
+    --tiki-top-text-color: #fff;
+    --bs-navbar-brand-color: #fff;
+    --bs-navbar-brand-hover-color: #fff;
+    --tiki-top-border: solid #7e7e7e;
+    --tiki-top-border-width: 0 0 1px 0;
+}
+
+.tiki-topbar-nav-dark {
+    --tiki-topbar-bg: #032B4A; /* from dark diagonal bg */
+    --tiki-topbar-color: #e0e0e0;
+    --tiki-topbar-hover-color: #fff;
+    --tiki-topbar-text-color: #fff;
+    --tiki-topbar-border: solid #7e7e7e;
+    --tiki-topbar-border-width: 1px;
+}
+
+[data-bs-theme=dark] .tiki-top-nav-light {
+    --tiki-top-bg: var(--tiki-pagetop-jui-state-hover-bg-path);
+    --tiki-top-color: #e0e0e0;
+    --tiki-top-hover-color: #fff;
+    --tiki-top-text-color: #fff;
+    --bs-navbar-brand-color: #fff;
+    --bs-navbar-brand-hover-color: #fff;
+    --tiki-top-border: solid #7e7e7e;
+    --tiki-top-border-width: 0 0 1px 0;
+}
+[data-bs-theme=dark] .tiki-topbar-nav-light {
+    --tiki-topbar-bg: linear-gradient(180deg, rgba(69,69,69,1) 0%, rgba(0,0,0,1) 100%);
+    --tiki-topbar-color: #e0e0e0;
+    --tiki-topbar-hover-color: #fff;
+    --tiki-topbar-text-color: #fff;
+    --tiki-topbar-border: solid #7e7e7e;
+    --tiki-topbar-border-width: 1px;
+}
+
+[data-bs-theme=light] .tiki-top-nav-dark {
+    --tiki-top-bg: var(--tiki-jui-diagonal-bg-dark);
+    --tiki-top-color: #dadada;
+    --tiki-top-hover-color: #fff;
+    --tiki-top-text-color: var(--tiki-top-color);
+    --bs-navbar-brand-color: var(--tiki-top-color);
+    --bs-navbar-brand-hover-color: var(--tiki-top-hover-color);
+}
+[data-bs-theme=light] .tiki-topbar-nav-dark {
+    --tiki-topbar-bg: #032B4A; /* from dark diagonal bg */
+    --tiki-topbar-color: #e0e0e0;
+    --tiki-topbar-hover-color: #fff;
+    --tiki-topbar-text-color: #fff;
+    --tiki-topbar-border: solid #7e7e7e;
+    --tiki-topbar-border-width: 1px;
+}
+
+:root .tiki .tiki-admin-top-nav-light,
+:root .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light,
+:root .tiki .tiki-admin-aside-nav-light {
+    --tiki-admin-top-nav-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path-adminui);
+    --tiki-admin-top-nav-color: rgba(var(--bs-emphasis-color-rgb), 0.65);
+    --tiki-admin-top-nav-hover-color: rgba(255, 255, 255, 0.75);
+    --tiki-admin-top-nav-hover-bg: none ;
+    --tiki-admin-top-box-shadow: 0px 1px 10px #b0c0d0;
+    --tiki-admin-aside-nav-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path);
+    --tiki-admin-aside-nav-color: rgba(var(--bs-emphasis-color-rgb), 0.65);
+    --tiki-admin-aside-nav-hover-color: rgba(255, 255, 255, 0.75);
+    --tiki-admin-dropdown-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path-adminui) var(--tiki-jui-widget-content-bg-position) repeat-x;
+    --tiki-admin-dropdown-link-color: rgba(var(--bs-emphasis-color-rgb), 0.65);
+    --tiki-admin-dropdown-link-hover-color: var(--bs-body-color);
+    --tiki-admin-dropdown-link-hover-bg: var(--bs-tertiary-bg);
+}
+
+/* Admin section left menu accordion buttons, light and dark options */
+:root .tiki .tiki-admin-aside-nav-light button.accordion-button,
+:root .tiki .tiki-admin-aside-nav-dark button.accordion-button{
+    color: var(--tiki-jui-state-default-color) !important;
+    background: var(--tiki-jui-state-default-bg) var(--tiki-jui-state-default-bg-path-adminui) var(--tiki-jui-state-default-bg-position) repeat-x !important;
+}
+
+:root .tiki .tiki-admin-aside-nav-light button.accordion-button:hover,
+:root .tiki .tiki-admin-aside-nav-dark button.accordion-button:hover{
+    color: var(--tiki-admin-aside-nav-color) !important;
+    background: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path-adminui) var(--tiki-jui-state-hover-bg-position) repeat-x !important;
+}
+
+:root .tiki .tiki-admin-top-nav-dark,
+:root .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark,
+:root .tiki .tiki-admin-aside-nav-dark {
+    --tiki-admin-top-nav-bg: var(--tiki-top-bg);
+    --tiki-admin-top-nav-color: white;
+    --tiki-admin-top-nav-hover-color: rgba(255, 255, 255, 0.55);
+    --tiki-admin-top-nav-hover-bg: rgba(255, 255, 255, 0.75);
+    --tiki-admin-top-border: solid #1484e6;
+    --tiki-admin-top-border-width: 0 0 1px 0;
+    --tiki-admin-aside-nav-bg: var(--tiki-top-bg);
+    --tiki-admin-aside-nav-color: #fff;
+    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+    --tiki-admin-dropdown-link-color: #dee2e6;
+    --tiki-admin-dropdown-bg: #343a40;
+    --tiki-admin-dropdown-link-hover-color: #fff;
+    --tiki-admin-dropdown-link-hover-bg: rgba(255, 255, 255, 0.15);
+}
+
+:root .tiki .tiki-admin-aside-nav-dark .nav-link {
+    color: white;
+}
+
+.tiki-admin-aside-nav-dark .admin-menu-collapser a, .tiki-admin aside.admin-nav .navbar-dark .admin-menu-collapser a {
+    --tiki-admin-aside-nav-color: #fff !important;
+}
+
+:root .tiki .tiki-admin-top-nav-dark button.accordion-button,
+:root .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark button.accordion-button,
+:root .tiki .tiki-admin-aside-nav-dark button.accordion-button {
+    color: var(--tiki-jui-state-active-color) !important;
+    background: var(--tiki-jui-state-active-bg) var(--tiki-jui-state-active-bg-path) var(--tiki-jui-state-active-bg-position);
+}
+
+:root .tiki .tiki-admin-top-nav-dark button.accordion-button:not(.collapsed),
+:root .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark button.accordion-button:not(.collapsed),
+:root .tiki .tiki-admin-aside-nav-dark button.accordion-button:not(.collapsed) {
+    color: var(--tiki-jui-state-active-color) !important;
+    background: var(--tiki-jui-state-active-bg) var(--tiki-jui-state-active-bg-path) var(--tiki-jui-state-active-bg-position);
+}
+
+[data-bs-theme=dark] .tiki .tiki-admin-top-nav-light,
+[data-bs-theme=dark] .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light,
+[data-bs-theme=dark] .tiki .tiki-admin-aside-nav-light {
+    --tiki-admin-top-nav-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path-adminui);
+    --tiki-admin-top-nav-color: black;
+    --tiki-admin-top-nav-hover-color: rgba(255, 255, 255, 0.55);
+    --tiki-admin-top-nav-hover-bg: rgba(255, 255, 255, 0.75);
+    --tiki-admin-aside-nav-bg: linear-gradient(to bottom, #e3e3e3 0%, #cccccc 100%);
+    --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
+    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+    --tiki-admin-dropdown-link-color: #dee2e6;
+    --tiki-admin-dropdown-bg: #343a40;
+    --tiki-admin-dropdown-link-hover-color: #fff;
+    --tiki-admin-dropdown-link-hover-bg: rgba(255, 255, 255, 0.15);
+}
+[data-bs-theme=dark] .tiki .tiki-admin-top-nav-light button.accordion-button,
+[data-bs-theme=dark] .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light button.accordion-button,
+[data-bs-theme=dark] .tiki .tiki-admin-aside-nav-light button.accordion-button {
+    color: var(--tiki-admin-aside-nav-color) !important;
+    background: var(--tiki-admin-aside-nav-bg) !important;
+}
+
+[data-bs-theme=light] .tiki .tiki-admin-top-nav-dark,
+[data-bs-theme=light] .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark,
+[data-bs-theme=light] .tiki .tiki-admin-aside-nav-dark {
+    --tiki-admin-top-nav-bg: var(--tiki-jui-diagonal-bg-dark);
+    --tiki-admin-top-nav-color: black;
+    --tiki-admin-top-nav-hover-color: rgba(255, 255, 255, 0.55);
+    --tiki-admin-top-nav-hover-bg: rgba(255, 255, 255, 0.75);
+    --tiki-admin-aside-nav-bg: var(--tiki-admin-top-nav-bg);
+    --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
+    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+    --tiki-admin-dropdown-link-color: #dee2e6;
+    --tiki-admin-dropdown-bg: #343a40;
+    --tiki-admin-dropdown-link-hover-color: #fff;
+    --tiki-admin-dropdown-link-hover-bg: rgba(255, 255, 255, 0.15);
+}
+
+/* Miscellaneous */
+
+[data-bs-theme=dark] {
+    --tiki-card-header-bg: #343a40;
+}
+
+[data-bs-theme=dark] .card-header,
+[data-bs-theme=dark] .modal-header,
+[data-bs-theme=dark] .card.blogpost .card-header {
+/*.ui-widget-header, .ui-button, .card-header,, header.articletitle */
+    background: #032b4a;
+    color: #2e92e9;
+}
+
+[data-bs-theme=dark] .bg-light .nav-link,
+[data-bs-theme=dark] .navbar.bg-light .nav-link {
+    color: #3B3B3B;
+}
+
+:root, [data-bs-theme=light] body {
+    background: var(--tiki-jui-diagonal-bg-light);
+}
+
+[data-bs-theme=dark] body {
+    background: var(--tiki-jui-diagonal-bg-dark);
+}
+
+/* Alerts - Dark mode */
+[data-bs-theme=dark] .alert.alert-primary,
+[data-bs-theme=dark] .alert.alert-secondary,
+[data-bs-theme=dark] .alert.alert-success,
+[data-bs-theme=dark] .alert.alert-info {
+    --bs-alert-color: #1A1A1A; /* var(--tiki-jui-state-default-color);*/
+    background: var(--tiki-jui-state-default-bg) url('../images/ui-bg_diagonals-thick_22_1484e6_40x40.png') /*var(--tiki-jui-state-default-bg-path)*/ var(--tiki-jui-state-default-bg-position);
+    --bs-alert-border-color: var(--tiki-jui-highlight-border-color); /*var(--bs-primary-border-subtle);*/
+    --bs-alert-link-color:#fff; /*var(--tiki-jui-highlight-link-color); var(--bs-primary-text-emphasis);*/
+    --bs-accordion-btn-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23212529' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+    --bs-accordion-btn-active-icon: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='rgb%285.2, 44, 101.2%29' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+[data-bs-theme=dark] .alert.alert-warning,
+[data-bs-theme=dark] .alert.alert-danger {
+    --bs-alert-color: var(--tiki-jui-error-color);
+    /*   --bs-alert-bg: var(--tiki-jui-error-bg);*/
+    /*    --bs-alert-border-color: var(--tiki-jui-error-border-color);*/
+    --bs-alert-link-color: var(--tiki-jui-error-link-color);
+    background: var(--tiki-jui-error-bg) !important;
+    border-width: 2px;
+}
+
+[data-bs-theme=dark] .alert.alert-primary .btn-close {
+    --bs-btn-close-color: #000;
+    --bs-btn-close-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 0 1 1.414 0L8 6.586 14.293.293a1 1 0 1 1 1.414 1.414L9.414 8l6.293 6.293a1 1 0 0 1-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 0 1-1.414-1.414L6.586 8 .293 1.707a1 1 0 0 1 0-1.414'/%3e%3c/svg%3e");
+}
+
+.accordion-toggle {
+    color: var(--bs-heading-color);
+}
