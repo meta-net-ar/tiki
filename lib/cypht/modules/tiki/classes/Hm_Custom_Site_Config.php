@@ -6,6 +6,7 @@
 class Hm_Custom_Site_Config extends Hm_Site_Config_File
 {
     public $user_defaults = [];
+    public $settings_per_page;
 
     public function __construct()
     {

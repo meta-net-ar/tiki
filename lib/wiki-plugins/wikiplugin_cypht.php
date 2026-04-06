@@ -330,7 +330,7 @@ function wikiplugin_cypht($data, $params)
 
     $_SESSION[$session_prefix]['page_id'] = $tikilib->get_page_id_from_name($page);
 
-    require_once $tikipath . '/lib/cypht/integration/classes.php';
+    require_once  'vendor_bundled/vendor/cypht-org/cypht/index.php';
 
     if (empty($_SESSION[$session_prefix]['request_key'])) {
         $_SESSION[$session_prefix]['request_key'] = Hm_Crypt::unique_id();
@@ -345,8 +345,8 @@ function wikiplugin_cypht($data, $params)
     $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
 
     /* get configuration */
-    $config = new Tiki_Hm_Site_Config_File([], $session_prefix, $settings_per_page);
-    $environment->define_default_constants($config);
+    $config->settings_per_page = $settings_per_page;
+    $config->initSession($session_prefix);
 
     // merge existing configuration with plugin params for smtp/imap servers
     if (! empty($params['imap_server']) && ! empty($params['imap_username']) && ! empty($params['imap_password'])) {
@@ -420,7 +420,13 @@ function wikiplugin_cypht($data, $params)
     }
 
     /* process the request */
-    $dispatcher = new Tiki_Hm_Dispatch($config, $_GET['page'] == $page);
+    $dispatcher = $config->triggerInit();
+
+    if ($dispatcher->request->format == 'Hm_Format_JSON') {
+        echo $dispatcher->output;
+        trigger_error("JSON response: " . $dispatcher->output, E_USER_NOTICE);
+        exit;
+    }
 
     if (! empty($_SESSION[$session_prefix]['user_data']['debug_mode_setting'])) {
         $msgs = Hm_Debug::get();
