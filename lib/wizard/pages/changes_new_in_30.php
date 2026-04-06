@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Wizard\Pages;
 
-require_once('lib/wizard/wizard.php');
 use Wizard;
 
 /**
