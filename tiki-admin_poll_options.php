@@ -15,8 +15,8 @@ $inputConfiguration = [
              'optionId'                  => 'int',            //post
              'remove'                    => 'int',            //post
              'save'                      => 'bool',           //post
-             'title'                     => 'words',          //post
-             'position'                  => 'words',          //post
+             'title'                     => 'word',          //post
+             'position'                  => 'word',          //post
         ],
     ],
 ];
