@@ -33,6 +33,12 @@ class Captcha
     public $captcha = '';
 
     /**
+     * Error message set by case-sensitive validation
+     * @var string|null
+     */
+    private $caseSensitiveError = null;
+
+    /**
      * Class constructor: decides whether to create an instance of
      * Laminas\Captcha\Image or Laminas\Captcha\ReCaptcha or Captcha_Question
      *
@@ -241,6 +247,35 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
                 $captchaInput = $jitPost->captcha->asArray();
             }
 
+            // Pre-load the captcha word directly from the PHP session and set it
+            // on the captcha instance before calling isValid(). This ensures
+            // getWord() returns the correct word without creating a new session
+            // Container internally (which can interfere with hop/expiration metadata).
+            $captchaId = $captchaInput['id'] ?? '';
+            $sessionWord = null;
+            if ($captchaId) {
+                $sessionNs = 'Laminas_Form_Captcha_' . $captchaId;
+                if (isset($_SESSION[$sessionNs])) {
+                    $data = $_SESSION[$sessionNs];
+                    if (is_array($data) || $data instanceof \ArrayAccess) {
+                        $sessionWord = $data['word'] ?? null;
+                    }
+                }
+            }
+
+            // Enforce case-sensitive comparison. Laminas lowercases the input
+            // before comparing, so we reject early if the case doesn't match.
+            $userInput = $captchaInput['input'] ?? '';
+            if ($sessionWord !== null && $userInput !== $sessionWord) {
+                $this->caseSensitiveError = tra('You have mistyped the anti-bot verification code. Please try again.');
+                return false;
+            }
+
+            \Closure::bind(function () use ($sessionWord) {
+                $this->word = $sessionWord;
+                $this->session = null;
+            }, $this->captcha, \Laminas\Captcha\AbstractWord::class)();
+
             return $this->captcha->isValid($captchaInput);
         }
     }
@@ -288,6 +323,11 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
      */
     public function getErrors()
     {
+        if ($this->caseSensitiveError !== null) {
+            $error = $this->caseSensitiveError;
+            $this->caseSensitiveError = null;
+            return $error;
+        }
         return implode('<br />', $this->captcha->getMessages());
     }
 
