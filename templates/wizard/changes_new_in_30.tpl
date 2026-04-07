@@ -22,7 +22,7 @@
             <legend>{tr}Infrastructure & Core{/tr}</legend>
             <ul>
                 <li>{tr}Background job queue for asynchronous task execution{/tr}</li>
-                <li>{tr}Modernized authentication and configuration systems{/tr}</li>
+                <li>{tr}Refactored admin page language and section handling{/tr}</li>
                 <li>{tr}Support for modern PHP environments (including PHP 8.4+){/tr}</li>
             </ul>
         </fieldset>
@@ -30,28 +30,43 @@
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}User Interface & UX{/tr}</legend>
             <ul>
-                <li>{tr}Improved admin interface and navigation{/tr}</li>
-                <li>{tr}Responsive UI improvements and better mobile experience{/tr}</li>
-                <li>{tr}Enhanced modals, menus, and notifications{/tr}</li>
-                <li>{tr}New theme improvements (including Tikiben layout){/tr}</li>
+                <li>{tr}Tikiben theme with new bento-style layout{/tr}</li>
+                <li>{tr}Collapsible sidebar restored in admin{/tr}</li>
+                <li>{tr}Improved modals with resizable windows{/tr}</li>
+                <li>{tr}Better mobile dropdown positioning{/tr}</li>
+                <li>{tr}User info tooltips enabled by default{/tr}</li>
             </ul>
         </fieldset>
 
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}Editors{/tr}</legend>
             <ul>
-                <li>{tr}Improved Markdown and editing experience{/tr}</li>
-                <li>{tr}Integration of grammar tools (LanguageTool){/tr}</li>
-                <li>{tr}New and enhanced editors (ToastUI, Summernote){/tr}</li>
+                <li>{tr}Markdown editor improvements with extended help{/tr}</li>
+                <li>{tr}Summernote integration with LanguageTool{/tr}</li>
+                <li>{tr}New ToastUI editor support{/tr}</li>
             </ul>
         </fieldset>
 
         <fieldset class="mb-3 w-100 clearfix featurelist">
-            <legend>{tr}Integrations{/tr}</legend>
+            <legend>{tr}New External Integrations{/tr}</legend>
             <ul>
-                <li>{tr}BigBlueButton and PeerTube integration{/tr}</li>
-                <li>{tr}CryptPad support for document collaboration{/tr}</li>
-                <li>{tr}Improved XMPP / Converse.js integration{/tr}</li>
+                <li>{tr}CryptPad integration for collaborative Office document editing{/tr}</li>
+                <li>{tr}PeerTube integration for decentralized video hosting{/tr}</li>
+                <li>{tr}Prosody and Converse.js integration with Tiki as identity provider{/tr}</li>
+                <li>{tr}BigBlueButton integration for online meetings{/tr}</li>
+            </ul>
+        </fieldset>
+
+        <fieldset class="mb-3 w-100 clearfix featurelist">
+            <legend>{tr}New Wiki Plugins{/tr}</legend>
+            <ul>
+                <li>{tr}Lottie plugin for displaying animations{/tr}</li>
+                <li>{tr}Model3DViewer plugin for 3D objects{/tr}</li>
+                <li>{tr}FancyLink plugin for rich link previews{/tr}</li>
+                <li>{tr}Mermaid diagrams support for workflows and charts{/tr}</li>
+                <li>{tr}YouTube plugin with responsive video support{/tr}</li>
+                <li>{tr}PluginImg Reflection Update{/tr}</li>
+                 <li>{tr}Sublist Plugin: Memory Optimization with limitfields{/tr}</li>
             </ul>
         </fieldset>
 
@@ -59,35 +74,21 @@
             <legend>{tr}Security{/tr}</legend>
             <ul>
                 <li>{tr}Two-Factor Authentication (2FA){/tr}</li>
-                <li>{tr}Improved password reset security{/tr}</li>
                 <li>{tr}Brute-force protection (experimental){/tr}</li>
-                <li>{tr}Enhanced HTTP security headers and access control{/tr}</li>
+                <li>{tr}Improved password reset with cryptographic tokens{/tr}</li>
+                <li>{tr}Extended HTTP security headers and CORS support{/tr}</li>
+                <li>{tr}Usernames cannot contain spaces{/tr}</li>
             </ul>
         </fieldset>
 
         <fieldset class="mb-3 w-100 clearfix featurelist">
-            <legend>{tr}Developers & API{/tr}</legend>
+            <legend>{tr}Developers & Technical Improvements{/tr}</legend>
             <ul>
-                <li>{tr}Improved API and object categorization{/tr}</li>
-                <li>{tr}Mermaid support for diagrams{/tr}</li>
-                <li>{tr}CI improvements and static analysis (PHPStan){/tr}</li>
-                <li>{tr}Modern build system (Node.js 24 support){/tr}</li>
+                <li>{tr}Mermaid diagrams used for transitions and visualizations{/tr}</li>
+                <li>{tr}PHPStan static analysis integrated into CI{/tr}</li>
+                <li>{tr}Node.js 24 support in build system{/tr}</li>
+                <li>{tr}Git commit information available in admin panel{/tr}</li>
             </ul>
-        </fieldset>
-
-        <fieldset class="mb-3 w-100 clearfix featurelist">
-            <legend>{tr}Notable Settings{/tr}</legend>
-            {preference name=url_fragment_format}
-        </fieldset>
-        <fieldset class="mb-3 w-100 clearfix featurelist">
-        <legend>{tr}Key Settings{/tr}</legend>
-
-        {preference name=url_fragment_format}
-        {preference name=feature_wysiwyg}
-        {preference name=feature_ajax}
-        {preference name=feature_two_factor_auth}
-        {preference name=feature_file_galleries}
-
         </fieldset>
 
         <i>
