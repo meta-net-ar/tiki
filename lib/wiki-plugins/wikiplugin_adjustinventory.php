@@ -8,7 +8,7 @@ function wikiplugin_adjustinventory_info()
 {
     return [
         'name' => tra('Adjust Inventory'),
-        'documentation' => tra('PluginAdjustInventory'),
+        'documentation' => 'PluginAdjustInventory',
         'description' => tra('Adjust the inventory level of a product'),
         'prefs' => [ 'wikiplugin_adjustinventory', 'payment_feature' ],
         'filter' => 'wikicontent',
