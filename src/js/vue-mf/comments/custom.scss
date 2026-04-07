@@ -69,7 +69,8 @@
 }
 
 .message-body:hover + .row > .thread-replies > .message-body > .t-left-border {
-    border: 0.15rem solid rgba(13,110,254,0.5) !important;
+    border-bottom: 0.15rem solid rgba(13,110,254,0.5) !important;
+    border-left: 0.15rem solid rgba(13,110,254,0.5) !important;
 }
 
 .bottom-line {
@@ -109,8 +110,9 @@
     position: absolute;
     height: 36px;
     width: 48px;
-    border: 1px solid rgba(167, 167, 167, 0.3);
-    border-radius: 10.5px;
+    border-bottom: 1px solid rgba(167, 167, 167, 0.3);
+    border-left: 1px solid rgba(167, 167, 167, 0.3);
+    border-bottom-left-radius: 10.5px;
     left: 12px;
     top: -24px;
     z-index: 1;
@@ -134,6 +136,11 @@
     opacity: 1;
     visibility: visible;
     transition: visibility 0s, opacity 0.7s linear;
+}
+
+.message-body:hover {
+    background: #F0F7FF !important;
+    z-index: 3;
 }
 
 .d-thread-button-block, .d-thread-button-block .btn {

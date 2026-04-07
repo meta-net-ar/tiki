@@ -46,7 +46,7 @@ export default {
 
 <template>
     <div :id="'body-'+item.messageId" class="message-body card-body text-start">
-        <div :class="[{'t-left-border-background' : item.parentId !== 0}]"></div>
+        <!-- div :class="[{'t-left-border-background' : item.parentId !== 0}]"></div -->
         <div :class="[{'t-left-border' : item.parentId !== 0}]"></div>
         <div :id="'border-'+item.messageId" class="thread-border"></div>
         <p class="small">
