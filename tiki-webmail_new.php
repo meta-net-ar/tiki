@@ -19,6 +19,13 @@ $dispatcher = $config->triggerInit();
 
 $response = $dispatcher->output;
 
+if (! empty($_SESSION['cypht']['user_data']['debug_mode_setting'])) {
+    $msgs = Hm_Debug::get();
+    foreach ($msgs as $msg) {
+        TikiLib::lib('logs')->add_log('cypht', $msg);
+    }
+}
+
 if ($dispatcher->request->format == 'Hm_Format_JSON') {
     echo $response;
     exit;
