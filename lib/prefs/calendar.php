@@ -33,7 +33,7 @@ function prefs_calendar_list()
                 'semester' => tra('Semester'),
                 'year' => tra('Year'),
             ],
-            'default' => 'month',
+            'default' => 'week',
             'tags' => ['basic'],
         ],
         'calendar_list_begins_focus' => [

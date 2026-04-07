@@ -184,7 +184,7 @@ class CalendarLib extends TikiLib
             'minHourOfDay'     => $minHourOfDay,
             'maxHourOfDay'     => $maxHourOfDay,
             'slotDuration'     => '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT),
-            'initialDate'      => date("Y-m-d"),
+            'initialDate'      => TikiLib::date_format('%Y-%m-%d'),
             'canEditAnything' => $canEditAnything,
             'calendars' => $calendars,
         ];
