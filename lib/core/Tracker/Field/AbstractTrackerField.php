@@ -157,4 +157,14 @@ abstract class AbstractTrackerField
             return $this->options->getParam($key, $default);
         }
     }
+    /**
+     * Check if a tracker field accepts only one value
+     *
+     * @return bool Returns true if the field accepts only one value; otherwise, returns false.
+     */
+    public function singleValueOnly(): bool
+    {
+        $inputType = $this->getOption('inputtype');
+        return in_array($inputType, ['d', 'radio'], true);
+    }
 }
