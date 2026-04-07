@@ -5,9 +5,18 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+namespace test\Tiki\Lib\wiki;
+
+use HeaderLib;
+use TestableTikiLib;
+use TikiLib;
+use TikiTestCase;
+use UsersLib;
+use WikiParser_PluginOutput;
+
 require_once(__DIR__ . '/../../wiki-plugins/wikiplugin_model3dviewer.php');
 
-class WikiPlugin_Model3DViewerTest extends TikiTestCase
+class Model3DViewerTest extends TikiTestCase
 {
     public $overrideLibs;
     public $headerlib;
