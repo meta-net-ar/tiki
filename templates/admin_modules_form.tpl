@@ -154,8 +154,8 @@
                     {self_link um_edit=$assign_name cookietab="2" _anchor="editcreate"}{tr}Edit custom module{/tr} {icon name="next"}{/self_link}
                 </div>
             {/if}
-        <div class="d-flex justify-content-center submit-container">
-            <input type="submit" class="btn btn-secondary me-2" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false;">
+        <div class="d-flex justify-content-center submit-container mt-2">
+            {button edit_assign=0 cookietab=2 _type="secondary" _class="me-2" href="#assign" _auto_args="edit_assign,cookietab" _text="{tr}Preview{/tr}"}
             <input type="submit" class="btn btn-primary" name="assign" value="{tr}Assign{/tr}" onclick="needToConfirm=false;">
         </div>
     {/tabset}
