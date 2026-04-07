@@ -32,7 +32,6 @@
         {include file='tiki-ajax_header.tpl'}
     {/if}
     <a class="btn btn-info btn-lg skipnav" href="#col1" role="button">{tr}Skip to main content{/tr}</a>
-    {block name=module_header}{/block}
     {if !isset($smarty.session.fullscreen) || isset($smarty.session.fullscreen) && $smarty.session.fullscreen ne 'y'}
         {if $prefs.theme_unified_admin_backend neq 'y' or $smarty.server.SCRIPT_NAME|strpos:'tiki-admin.php' === false}            
             <header
@@ -44,6 +43,7 @@
         {/if}
     {/if}
     <div class="middle_outer" id="middle_outer">
+        {block name=module_header}{/block}
         {if !isset($smarty.session.fullscreen) && $smarty.session.fullscreen ne 'y'}
             {if $prefs.theme_unified_admin_backend eq 'y' && $smarty.server.SCRIPT_NAME eq $url_path|cat:'tiki-admin.php'}
                 {modulelist zone=top class="top_modules uab top navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant} w-100 mb-sm" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
