@@ -32,8 +32,12 @@ class WikiPlugin_Model3DViewerTest extends TikiTestCase
         $this->originalTikiDomain = $tikidomain ?? null;
 
         $this->headerlib = new HeaderLib();
-        $this->filegallib = $this->createMock(FileGalLib::class);
-        $this->userlib = $this->createMock(UsersLib::class);
+        $this->filegallib = $this->getMockBuilder(\Tiki\Lib\Filegals\FileGalLib::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->userlib = $this->getMockBuilder(UsersLib::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->overrideLibs = new TestableTikiLib();
         $this->overrideLibs->overrideLibs([

@@ -272,7 +272,7 @@ function wikiplugin_model3dviewer($data, $params)
         $absolute_links = true;
     }
 
-    $params['model3dviewer_src'] = resolve_model3dviewer_src($params, $absolute_links, $fileInfo['basename']);
+    $params['model3dviewer_src'] = resolve_model3dviewer_src($params, $absolute_links, $fileInfo['basename'] ?? 'model.stl');
 
     if (empty($params['model3dviewer_src'])) {
         return WikiParser_PluginOutput::error(tr('Plugin Model3DViewer'), tr('Missing or invalid source.'));
