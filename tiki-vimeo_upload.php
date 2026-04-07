@@ -13,7 +13,7 @@ $access = TikiLib::lib('access');
 $access->check_feature('vimeo_upload');
 
 $videoId = $_REQUEST['videoId'] ?? null;
-$isEdit = !empty($videoId);
+$isEdit = ! empty($videoId);
 
 if ($isEdit) {
     $access->check_permission('tiki_p_edit_videos');
@@ -49,14 +49,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
         $errors[] = tra('Description must be at least 3 characters, or leave it empty.');
     }
 
-    if (!$errors) {
+    if (! $errors) {
         $metadata = ['name' => $name];
 
         if ($desc !== '') {
             $metadata['description'] = $desc;
         }
 
-        if (!empty($_POST['privacy'])) {
+        if (! empty($_POST['privacy'])) {
             $metadata['privacy'] = $_POST['privacy'];
         }
 
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
                 $vimeolib->updateVideo($videoId, $metadata);
 
                 // Replace video if new file provided
-                if (!empty($_FILES['video']['size']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
+                if (! empty($_FILES['video']['size']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
                     if ($_FILES['video']['size'] > $max_upload_size) {
                         throw new Exception(tra('File exceeds maximum size of ') . $max_upload_size_comment);
                     }
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
                 }
 
                 // Upload thumbnail if provided
-                if (!empty($_FILES['thumbnail']['size']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
+                if (! empty($_FILES['thumbnail']['size']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
                     $thumb = ['thumbfile' => $_FILES['thumbnail']['tmp_name']];
                     $vimeolib->uploadThumbnail($videoId, $thumb);
                 }
@@ -83,25 +83,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
                 try {
                     $statusVideo = $vimeolib->getVideo($videoId);
                     $status = is_object($statusVideo) ? ($statusVideo->status ?? 'unknown') : ($statusVideo['status'] ?? 'unknown');
-                } catch (Exception $e) { $status = 'unknown'; }
+                } catch (Exception $e) {
+                    $status = 'unknown';
+                }
                 Feedback::success(tra('Video updated successfully! It may take a bit of time to be processed by Vimeo for streaming. Please refresh the page later to view it. (Status: ') . $status . ')');
                 header('Location: tiki-vimeo_video.php?videoId=' . urlencode($videoInfo->shortUUID));
                 exit;
-
             } else {
                 // New video upload
-                if (!empty($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
+                if (! empty($_FILES['video']) && $_FILES['video']['error'] === UPLOAD_ERR_OK) {
                     if ($_FILES['video']['size'] > $max_upload_size) {
                         throw new Exception(tra('File exceeds maximum size of ') . $max_upload_size_comment);
                     }
                     $file = ['videofile' => $_FILES['video']['tmp_name']];
                     $result = $vimeolib->uploadVideo($file, $metadata);
 
-                    if (!empty($result['video']['uuid'])) {
+                    if (! empty($result['video']['uuid'])) {
                         $newVideoId = $result['video']['shortUUID'];
 
                         // Upload thumbnail if provided
-                        if (!empty($_FILES['thumbnail']['size']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
+                        if (! empty($_FILES['thumbnail']['size']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
                             $thumb = ['thumbfile' => $_FILES['thumbnail']['tmp_name']];
                             $vimeolib->uploadThumbnail($newVideoId, $thumb);
                         }
@@ -109,7 +110,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
                         try {
                             $statusVideo = $vimeolib->getVideo($newVideoId);
                             $status = is_object($statusVideo) ? ($statusVideo->status ?? 'unknown') : ($statusVideo['status'] ?? 'unknown');
-                        } catch (Exception $e) { $status = 'unknown'; }
+                        } catch (Exception $e) {
+                            $status = 'unknown';
+                        }
                         Feedback::success(tra('Video uploaded successfully! It may take a bit of time to be processed by Vimeo for streaming. Please refresh the page later to view it. (Status: ') . $status . ')');
                         header('Location: tiki-vimeo_video.php?videoId=' . urlencode($newVideoId));
                         exit;

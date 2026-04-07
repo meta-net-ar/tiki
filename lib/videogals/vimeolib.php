@@ -136,8 +136,8 @@ class VimeoLib
         }
 
         // Often Vimeo returns the picture URI array. If the upload doesn't throw, it likely succeeded.
-        // Let's check if the response has uri 
-        if (is_array($response) && !empty($response['uri'])) {
+        // Let's check if the response has uri
+        if (is_array($response) && ! empty($response['uri'])) {
             return true;
         }
 
@@ -189,7 +189,7 @@ class VimeoLib
                     'publishedAt' => $vid['created_time'],
                     'views'       => $vid['stats']['plays'] ?? 0,
                     'privacy'     => ['label' => $vid['privacy']['view']],
-                    'privacyLabel'=> $vid['privacy']['view'],
+                    'privacyLabel' => $vid['privacy']['view'],
                     'duration'    => $vid['duration'],
                     'thumbUrl'    => $thumbUrl,
                 ];
@@ -237,7 +237,7 @@ class VimeoLib
                 'publishedAt' => $vid['created_time'],
                 'views'       => $vid['stats']['plays'] ?? 0,
                 'privacy'     => ['label' => $vid['privacy']['view']],
-                'privacyLabel'=> $vid['privacy']['view'],
+                'privacyLabel' => $vid['privacy']['view'],
                 'duration'    => $vid['duration'],
                 'tags'        => array_column($vid['tags'], 'name'),
                 'status'      => $vid['status'],

@@ -127,16 +127,16 @@ function wikiplugin_vimeo_info()
 
 function vimeo_iframe($data, $params)
 {
-    $hasCustomDimensions = !empty($params['width']) || !empty($params['height']);
+    $hasCustomDimensions = ! empty($params['width']) || ! empty($params['height']);
     $height = $params['height'] ?? '';
     $width = $params['width'] ?? '';
 
     $url = $params['vimeo'];
-    
+
     // Extract video ID, and optionally the unlisted hash.
     $parsed = parse_url($url);
     $path = trim($parsed['path'] ?? '', '/');
-    
+
     if (preg_match('/^(\d+)(?:\/([a-zA-Z0-9]+))?/', $path, $matches)) {
         $vimeoId = $matches[1];
         $hash = $matches[2] ?? null;
@@ -147,29 +147,29 @@ function vimeo_iframe($data, $params)
         $vimeoId = $url;
         $hash = null;
     }
-    
+
     if (empty($vimeoId)) {
         return '';
     }
 
     $embedUrl = "https://player.vimeo.com/video/" . $vimeoId;
     $args = [];
-    if (!empty($hash)) {
+    if (! empty($hash)) {
         $args['h'] = $hash;
     }
-    if (!empty($params['showTitle']) && $params['showTitle'] === 'false') {
+    if (! empty($params['showTitle']) && $params['showTitle'] === 'false') {
         $args['title'] = 0;
     }
-    if (!empty($params['showByline']) && $params['showByline'] === 'false') {
+    if (! empty($params['showByline']) && $params['showByline'] === 'false') {
         $args['byline'] = 0;
     }
-    if (!empty($params['showPortrait']) && $params['showPortrait'] === 'false') {
+    if (! empty($params['showPortrait']) && $params['showPortrait'] === 'false') {
         $args['portrait'] = 0;
     }
-    if (!empty($args)) {
+    if (! empty($args)) {
         $embedUrl .= '?' . http_build_query($args);
     }
-    if (!empty($params['start'])) {
+    if (! empty($params['start'])) {
         $embedUrl .= '#t=' . (int)$params['start'] . 's';
     }
 
@@ -177,20 +177,20 @@ function vimeo_iframe($data, $params)
         'src' => $embedUrl,
         'frameborder' => '0',
     ];
-    
+
     if ($hasCustomDimensions) {
         $iframeAttrs['width'] = $width ?: 560;
         $iframeAttrs['height'] = $height ?: 315;
     }
-    
+
     // Default to true if not explicitly "n"
-    if (!isset($params['allowFullScreen']) || $params['allowFullScreen'] !== 'n') {
+    if (! isset($params['allowFullScreen']) || $params['allowFullScreen'] !== 'n') {
         $iframeAttrs['allow'] = 'autoplay; fullscreen; picture-in-picture; clipboard-write';
         $iframeAttrs['allowfullscreen'] = true;
         $iframeAttrs['webkitallowfullscreen'] = true;
         $iframeAttrs['mozallowfullscreen'] = true;
     }
-    
+
     $htmlAttrs = '';
     foreach ($iframeAttrs as $k => $v) {
         if ($v === true) {
@@ -199,38 +199,38 @@ function vimeo_iframe($data, $params)
             $htmlAttrs .= " $k=\"" . htmlspecialchars((string)$v) . "\"";
         }
     }
-    
+
     $inlineStyles = [];
-    if (!$hasCustomDimensions) {
+    if (! $hasCustomDimensions) {
         $inlineStyles[] = 'aspect-ratio: 16/9';
         $inlineStyles[] = 'width: 100%';
         $inlineStyles[] = 'max-width: 100%';
     }
-    if (!empty($params['borderRadius']) && $params['borderRadius'] === 'y') {
+    if (! empty($params['borderRadius']) && $params['borderRadius'] === 'y') {
         $inlineStyles[] = 'border-radius: 8px';
     }
-    
+
     $iframeStyleAttr = '';
-    if (!empty($inlineStyles)) {
+    if (! empty($inlineStyles)) {
         $iframeStyleAttr = ' style="' . implode('; ', $inlineStyles) . ';"';
     }
 
-    $output = "<iframe data-fileid=\"" . (!empty($params['vimeo_fileId']) ? htmlspecialchars($params['vimeo_fileId']) : '0') . "\" id=\"" . (!empty($params['player_id']) ? htmlspecialchars($params['player_id']) : '') . "\" $htmlAttrs$iframeStyleAttr></iframe>";
+    $output = "<iframe data-fileid=\"" . (! empty($params['vimeo_fileId']) ? htmlspecialchars($params['vimeo_fileId']) : '0') . "\" id=\"" . (! empty($params['player_id']) ? htmlspecialchars($params['player_id']) : '') . "\" $htmlAttrs$iframeStyleAttr></iframe>";
 
     // Apply container background/border styles
     $containerStyle = [];
-    if (!empty($params['bg'])) {
+    if (! empty($params['bg'])) {
         $containerStyle[] = 'background-color:' . htmlspecialchars($params['bg']);
     }
-    if (!empty($params['border'])) {
+    if (! empty($params['border'])) {
         $containerStyle[] = 'border: 1px solid ' . htmlspecialchars($params['border']);
     }
-    if (!empty($params['borderRadius']) && $params['borderRadius'] === 'y') {
+    if (! empty($params['borderRadius']) && $params['borderRadius'] === 'y') {
         $containerStyle[] = 'border-radius: 8px; overflow: hidden;';
     }
 
-    if (!empty($containerStyle)) {
-        $output = '<div style="' . implode(' ', $containerStyle) . '; display:inline-block; max-width: 100%;' . (!$hasCustomDimensions ? ' width: 100%;' : '') . '">' . $output . '</div>';
+    if (! empty($containerStyle)) {
+        $output = '<div style="' . implode(' ', $containerStyle) . '; display:inline-block; max-width: 100%;' . (! $hasCustomDimensions ? ' width: 100%;' : '') . '">' . $output . '</div>';
     }
 
     return $output;
@@ -260,7 +260,7 @@ function wikiplugin_vimeo($data, $params)
             if (! empty($attributes['tiki.content.url'])) {
                 $videoParams = $params;
                 $videoParams['url'] = $attributes['tiki.content.url'];
-                
+
                 $videoParams['vimeo'] = $videoParams['url'];
                 $videoParams['player_id'] = "pid_" . uniqid();
                 $videoParams['vimeo_fileId'] = $fileId;
