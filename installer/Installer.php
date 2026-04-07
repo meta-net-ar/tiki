@@ -217,6 +217,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
                 throw new Exception('No such patch', 1);
             }
         } elseif (! $status) {
+            Patch::$list[$patch]->setStatus(Patch::FAILED);
             throw new Exception('Patch application failed', 2);
         } else {
             Patch::$list[$patch]->record();
@@ -319,9 +320,10 @@ class Installer extends TikiDb_Bridge implements SplSubject
                 if ($throwOnError) {
                     throw new Exception("Failed running query $statement from file $file");
                 }
+            } else {
+                $this->queries['executed'] += 1;
             }
 
-            $this->queries['executed'] += 1;
             $this->queries['currentStmt'] = $statement;
             $this->notify();
         }
