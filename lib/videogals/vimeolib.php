@@ -145,6 +145,7 @@ class VimeoLib
                     'publishedAt' => $vid['created_time'],
                     'views'       => $vid['stats']['plays'] ?? 0,
                     'privacy'     => ['label' => $vid['privacy']['view']],
+                    'privacyLabel'=> $vid['privacy']['view'],
                     'duration'    => $vid['duration'],
                     'thumbUrl'    => $thumbUrl,
                 ];
@@ -192,6 +193,7 @@ class VimeoLib
                 'publishedAt' => $vid['created_time'],
                 'views'       => $vid['stats']['plays'] ?? 0,
                 'privacy'     => ['label' => $vid['privacy']['view']],
+                'privacyLabel'=> $vid['privacy']['view'],
                 'duration'    => $vid['duration'],
                 'tags'        => array_column($vid['tags'], 'name'),
                 'embedPath'   => '',
