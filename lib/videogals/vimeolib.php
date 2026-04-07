@@ -100,6 +100,50 @@ class VimeoLib
         throw new \Exception(tr('Upload failed or unexpected response: %0', print_r($response, true)));
     }
 
+    public function replaceVideo($videoId, array $file)
+    {
+        if (empty($file['videofile'])) {
+            throw new \Exception(tr('No video file provided for replacement.'));
+        }
+
+        $filePath = $file['videofile'];
+        $uri = strpos($videoId, '/videos/') === 0 ? $videoId : '/videos/' . $videoId;
+
+        $response = $this->getClient()->replace($uri, $filePath);
+
+        // $response is the URI of the replaced video
+        if (is_string($response) && strpos($response, '/videos/') === 0) {
+            return true;
+        }
+
+        throw new \Exception(tr('Video replacement failed or unexpected response: %0', print_r($response, true)));
+    }
+
+    public function uploadThumbnail($videoId, array $file, $activate = true)
+    {
+        if (empty($file['thumbfile'])) {
+            throw new \Exception(tr('No thumbnail file provided.'));
+        }
+
+        $filePath = $file['thumbfile'];
+        $uri = strpos($videoId, '/videos/') === 0 ? $videoId : '/videos/' . $videoId;
+        $picturesUri = $uri . '/pictures';
+
+        $response = $this->getClient()->uploadImage($picturesUri, $filePath, $activate);
+
+        if (is_string($response) && strpos($response, $uri) === 0) {
+            return true;
+        }
+
+        // Often Vimeo returns the picture URI array. If the upload doesn't throw, it likely succeeded.
+        // Let's check if the response has uri 
+        if (is_array($response) && !empty($response['uri'])) {
+            return true;
+        }
+
+        throw new \Exception(tr('Thumbnail upload failed or unexpected response: %0', print_r($response, true)));
+    }
+
     public function listVideos($sort_mode = 'date_desc', $page = 1, $page_size = 10, $find = '')
     {
         $map = [

@@ -29,7 +29,7 @@
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="videoActionMenu">
                         <li>
-                            <a class="dropdown-item" href="tiki-vimeo_video.php?videoId={$videoInfo->uuid|escape}&action=edit">
+                            <a class="dropdown-item" href="tiki-vimeo_upload.php?videoId={$videoInfo->uuid|escape}">
                                 <i class="fas fa-cogs me-2"></i> {tr}Manage{/tr}
                             </a>
                         </li>
