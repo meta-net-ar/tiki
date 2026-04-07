@@ -79,6 +79,16 @@
             <legend>{tr}Notable Settings{/tr}</legend>
             {preference name=url_fragment_format}
         </fieldset>
+        <fieldset class="mb-3 w-100 clearfix featurelist">
+        <legend>{tr}Key Settings{/tr}</legend>
+
+        {preference name=url_fragment_format}
+        {preference name=feature_wysiwyg}
+        {preference name=feature_ajax}
+        {preference name=feature_two_factor_auth}
+        {preference name=feature_file_galleries}
+
+        </fieldset>
 
         <i>
             {tr}This release focuses on stability and long-term improvements rather than major breaking changes.{/tr}
