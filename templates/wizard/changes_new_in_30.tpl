@@ -5,19 +5,14 @@
             {icon name='magic' iclass='fa-flip-horizontal fa-stack-1x ms-4 mt-4'}
         </span>
     </div>
-
     <div class="flex-grow-1 ms-3">
-
         <h2>{tr}New in Tiki 30 (LTS){/tr}</h2>
-
         <p>
             {tr}Tiki 30 is a Long-Term Support (LTS) release, supported until 2031, focused on stability, performance and modern improvements.{/tr}
         </p>
-
         <a href="https://doc.tiki.org/Tiki30" target="tikihelp" class="tikihelp text-info">
             {icon name="help"} {tr}Read full documentation{/tr}
         </a>
-
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}Infrastructure & Core{/tr}</legend>
             <ul>
@@ -26,7 +21,6 @@
                 <li>{tr}Support for modern PHP environments (including PHP 8.4+){/tr}</li>
             </ul>
         </fieldset>
-
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}User Interface & UX{/tr}</legend>
             <ul>
@@ -37,7 +31,6 @@
                 <li>{tr}User info tooltips enabled by default{/tr}</li>
             </ul>
         </fieldset>
-
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}Editors{/tr}</legend>
             <ul>
@@ -46,7 +39,6 @@
                 <li>{tr}New ToastUI editor support{/tr}</li>
             </ul>
         </fieldset>
-
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}New External Integrations{/tr}</legend>
             <ul>
@@ -56,7 +48,6 @@
                 <li>{tr}BigBlueButton integration for online meetings{/tr}</li>
             </ul>
         </fieldset>
-
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}New Wiki Plugins{/tr}</legend>
             <ul>
@@ -69,7 +60,6 @@
                  <li>{tr}Sublist Plugin: Memory Optimization with limitfields{/tr}</li>
             </ul>
         </fieldset>
-
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}Security{/tr}</legend>
             <ul>
@@ -80,7 +70,6 @@
                 <li>{tr}Usernames cannot contain spaces{/tr}</li>
             </ul>
         </fieldset>
-
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}Developers & Technical Improvements{/tr}</legend>
             <ul>
@@ -90,10 +79,8 @@
                 <li>{tr}Git commit information available in admin panel{/tr}</li>
             </ul>
         </fieldset>
-
         <i>
             {tr}This release focuses on stability and long-term improvements rather than major breaking changes.{/tr}
         </i>
-
     </div>
 </div>
