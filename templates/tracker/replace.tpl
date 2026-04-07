@@ -696,6 +696,50 @@
                 </select>
             </div>
         {/accordion_group}
+        
+        {accordion_group title="{tr}Schema.org Data{/tr}"}
+            <div class="mb-3 mx-0">
+                <label class="mb-2" for="schemaOrgData">{tr}Item Pages will have Schema.org Data Provided from{/tr}</label>
+                <select name="schemaOrgDataConfig" id="schemaOrgData" class="form-control">
+                    <option value="static_text" {if $info.schemaOrgDataConfig eq 'static_text'}selected{/if}>{tr}Static Text{/tr}</option>
+                    <option value="tracker_field" {if $info.schemaOrgDataConfig eq 'tracker_field'}selected{/if}>
+                        {tr}Tracker field{/tr}
+                    </option>
+                </select>
+                {if $info.schemaOrgDataConfig eq 'static_text'}
+                <input type="text" name="schemaOrgDataSourceConfigHeadeline" id="schemaOrgDataSourceConfigHeadeline" value="{$info.schemaOrgDataSourceConfigHeadeline|escape}" class="form-control mt-2" placeholder="{tr}Headline field for Article type{/tr}">
+                <input type="text" name="schemaOrgDataSourceConfigDescription" id="schemaOrgDataSourceConfigDescription" value="{$info.schemaOrgDataSourceConfigDescription|escape}" class="form-control mt-2" placeholder="{tr}Description field for Article type{/tr}">
+                <input type="file" name="schemaOrgDataSourceConfigImage" id="schemaOrgDataSourceConfigImage" value="{$info.schemaOrgDataSourceConfigImage|escape}" class="form-control mt-2" placeholder="{tr}Image field for Article type{/tr}">
+                {elseif $info.schemaOrgDataConfig eq 'tracker_field'}
+                <div class="mt-2">
+                    <div>
+                        <label for="schemaOrgDataSourceConfigHeadeline">{tr}Headline field for Article type{/tr}</label>
+                        <select name="schemaOrgDataSourceConfigHeadeline" class="form-select">
+                            {foreach from=$fields item=field}
+                                <option value="{$field.fieldId}" {if $info.schemaOrgDataSourceConfigHeadeline eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                            {/foreach}
+                         </select>
+                    </div>
+                    <div>
+                        <label for="schemaOrgDataSourceConfigDescription">{tr}Description field for Article type{/tr}</label>
+                        <select name="schemaOrgDataSourceConfigDescription" class="form-select">
+                            {foreach from=$fields item=field}
+                                <option value="{$field.fieldId}" {if $info.schemaOrgDataSourceConfigDescription eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="schemaOrgDataSourceConfigImage">{tr}Image field for Article type{/tr}</label>
+                        <select name="schemaOrgDataSourceConfigImage" class="form-select">
+                            {foreach from=$fields item=field}
+                                <option value="{$field.fieldId}" {if $info.schemaOrgDataSourceConfigImage eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                {/if}
+            </div>
+        {/accordion_group}
     {/accordion}
     <div class="mb-3 mx-0 submit">
         <input type="hidden" name="confirm" value="1">

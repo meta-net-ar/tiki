@@ -7398,6 +7398,11 @@ class TrackerLib extends TikiLib
             'relationshipBehaviour' => $input->relationshipBehaviour->text(),
             'allowInlineEditing' => $input->allowInlineEditing->int() ? 'y' : 'n',
             'allowChooseFieldsToDisplay' => $input->allowChooseFieldsToDisplay->int() ? 'y' : 'n',
+            'schemaOrgDataConfig' => $input->schemaOrgDataConfig->text(),
+            'schemaOrgDataSourceConfigHeadeline' => $input->schemaOrgDataSourceConfigHeadeline->text(),
+            'schemaOrgDataSourceConfigDescription' => $input->schemaOrgDataSourceConfigDescription->text(),
+            'schemaOrgDataSourceImageField' => $input->schemaOrgDataSourceImageField->text(), // will be image path or fieldId depending on the configuration (can later be file galey id)
+            // here is wehere we define tracker options (more to be added)
         ];
     }
 }

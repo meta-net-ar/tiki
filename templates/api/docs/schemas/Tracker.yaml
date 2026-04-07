@@ -375,3 +375,15 @@ properties:
       By default, last import time gets reset every time an import happens. Check this option if you want the last import time to be static and kept what is entered above. Possible values:
       - `y`: skips resetting the last import time
       - `n`: doesn't skip
+  schemaOrgDataConfig:
+    type: string
+    description: The configuration for source of data for schema.org data
+  schemaOrgDataSourceConfigHeadeline:
+    type: string
+    description: The field to use as headline for schema.org data
+  schemaOrgDataSourceConfigDescription:
+    type: string
+    description: The field to use as description for schema.org data
+  schemaOrgDataSourceImageField:
+    type: string
+    description: The field to use as image for schema.org data. Depending on the configuration, this can be either the image path or the field ID (which can later be a file gallery ID).
