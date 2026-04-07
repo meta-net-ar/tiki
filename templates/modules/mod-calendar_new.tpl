@@ -16,32 +16,26 @@
                 {/if}
                 {if $viewlist neq 'list'}
                     {jq}
-                        let paramOfModuleCalendar = {{$fullCalendarParams|json_encode}};
-                        const moduleCalendarFocusDate = document.getElementById('date-module-calendar');
-                        paramOfModuleCalendar['initialDate'] = $('#date-module-calendar').val();
-                        let returnUrl = ('{{$returnURL}}');
-                        let associatedWikiPage = {{$associatedWikiPage|json_encode}} || null;
-                        returnUrl = returnUrl.toString();
-                        let dataToBuildUrl = {{$urlOfFetchingData|json_encode}} || null;
-                        let urlOfFetchingData = $.service("tracker_calendar", "list", $.extend(dataToBuildUrl, dataToBuildUrl));
+                        var printingParams = {pdf_export: '{{$pdf_export}}', pdf_warning: '{{$pdf_warning}}', pref_print_pdf_from_url: '{{$prefs.print_pdf_from_url}}'};
+                        var associatedWikiPage = {{$associatedWikiPage|json_encode}} || null;
+                        var fullCalendarParams = {{$fullCalendarParams|json_encode}};
+                        var returnUrl = ('{{$returnURL}}');
+                        var uniqueId = ({{$uniqueId|json_encode}}) || null; // In the case user want to display the same calendar with the same parameter more than one time
+                        var moduleCalendarFocusdate = '{{$moduleCalendarFocusdate}}';
 
-                        const calendarContainer = [window.moduleCalendar];
-                        $("#module-calendar").setupFullCalendar(paramOfModuleCalendar, calendarContainer, 'module-calendar',dataToBuildUrl ? urlOfFetchingData : 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}', returnUrl, associatedWikiPage);
-                        moduleCalendarFocusDate.addEventListener('change', () => {
-                            document.getElementById('module-calendar').innerHTML = "";
-                            paramOfModuleCalendar['initialDate'] = $('#date-module-calendar').val();
-                            $("#module-calendar").setupFullCalendar(paramOfModuleCalendar, calendarContainer, 'module-calendar',dataToBuildUrl ? urlOfFetchingData : 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds={{$moduleCalendarIds}}', returnUrl, associatedWikiPage);
-                        })
-                        {{if $prefs.print_pdf_from_url neq 'none'}$("#module-calendar").addFullCalendarPrint('#module-calendar-pdf-btn', calendarContainer[0]);{/if}}
+                        var dataToBuildUrl = '{{$moduleCalendarIds}}' ? null : {{$urlOfFetchingData|json_encode}};
+                        var divClassContainer = ".calendar-container";
+                        var urlOfFetchingData = $.service("tracker_calendar", "list", $.extend(dataToBuildUrl, dataToBuildUrl));
+                        var linkToFindItemsOfCalendar = dataToBuildUrl ? urlOfFetchingData : 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds=' + '{{$moduleCalendarIds}}'
+                        $('.calendar-container').defineParameterOfMultipleCalendar(fullCalendarParams, printingParams, divClassContainer, moduleCalendarFocusdate, linkToFindItemsOfCalendar, associatedWikiPage, returnUrl);
                     {/jq}
                 {/if}
                 {if $pdf_export eq 'y' and $pdf_warning eq 'n'}
-                    <a id="module-calendar-pdf-btn" href="#" class="text-end d-none" role="button">{icon name='pdf'} {tr}Export as PDF{/tr}</a>
+                    
                 {/if}
                 <div id="test"></div>
                 {include file="configlinks_calendar.tpl" filterCal="filterModuleCal"}
-                <input type="date" class="form-control" value="{$moduleCalendarFocusdate}" id="date-module-calendar">
-                <div id='module-calendar'></div>
+                <div class='calendar-container'></div>
                 {if $viewlist eq 'list'}
                     {$out}
                 {/if}
