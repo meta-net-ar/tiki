@@ -28,47 +28,63 @@ function wikiplugin_vimeo_info()
             'width' => [
                 'required' => false,
                 'name' => tra('Width'),
-                'description' => tra('Width in pixels'),
-                'since' => '6.1',
-                'filter' => 'text',
-                'default' => 425,
+                'description' => tra('Width in pixels (e.g., 560). Leave empty to use provider dimensions.'),
+                'filter' => 'digits',
+                'default' => '',
             ],
             'height' => [
                 'required' => false,
                 'name' => tra('Height'),
-                'description' => tra('Height in pixels'),
-                'since' => '6.1',
-                'filter' => 'text',
-                'default' => 350,
+                'description' => tra('Height in pixels (e.g., 315). Leave empty to use provider dimensions.'),
+                'filter' => 'digits',
+                'default' => '',
             ],
-            'quality' => [
+            'bg' => [
                 'required' => false,
-                'name' => tra('Quality'),
-                'description' => tra('Quality of the video'),
-                'since' => '6.1',
+                'name' => tra('Background'),
+                'description' => tra('Object background color. Example:') . ' <code>#ffffff</code>',
+                'filter' => 'text',
+                'default' => '',
+                'advanced' => true,
+            ],
+            'border' => [
+                'required' => false,
+                'name' => tra('Border Color'),
+                'description' => tra('Object border color. Example:') . ' <code>#ffffff</code>',
+                'filter' => 'text',
+                'default' => '',
+                'advanced' => true,
+            ],
+            'borderRadius' => [
+                'required' => false,
+                'name' => tra('Border Radius'),
+                'description' => tra('Apply rounded corners. Default: Yes'),
+                'default' => 'y',
                 'filter' => 'alpha',
                 'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('High'), 'value' => 'high'],
-                    ['text' => tra('Medium'), 'value' => 'medium'],
-                    ['text' => tra('Low'), 'value' => 'low'],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
                 ],
-                'default' => 'high',
-                'advanced' => true
+                'advanced' => true,
+            ],
+            'start' => [
+                'required' => false,
+                'name' => tra('Start Time'),
+                'description' => tra('Start time offset in seconds'),
+                'filter' => 'digits',
+                'default' => 0,
             ],
             'allowFullScreen' => [
                 'required' => false,
-                'name' => tra('Full screen'),
-                'description' => tra('Expand to full screen'),
-                'since' => '6.1',
+                'name' => tra('Allow Full-Screen'),
+                'description' => tra('Enlarge video to full screen size'),
+                'default' => 'y',
                 'filter' => 'alpha',
                 'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Yes'), 'value' => 'true'],
-                    ['text' => tra('No'), 'value' => 'false'],
+                    ['text' => tra('Yes'), 'value' => 'y'],
+                    ['text' => tra('No'), 'value' => 'n'],
                 ],
-                'default' => '',
-                'advanced' => true
+                'advanced' => true,
             ],
             'fileId' => [
                 'required' => false,
@@ -105,83 +121,118 @@ function wikiplugin_vimeo_info()
                 'filter' => 'int',
                 'advanced' => true
             ],
-            'showTitle' => [
-                'required' => false,
-                'name' => tra('Show Title'),
-                'description' => tra('Show the Video Title') . ' ' . tra('(default is to show)'),
-                'since' => '15.0',
-                'filter' => 'alpha',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Yes'), 'value' => 'true'],
-                    ['text' => tra('No'), 'value' => 'false'],
-                ],
-                'default' => '',
-                'advanced' => true,
-            ],
-            'showByline' => [
-                'required' => false,
-                'name' => tra('Show Byline') . ' ' . tra('(default is to show)'),
-                'description' => tra("Show the creator's byline"),
-                'since' => '15.0',
-                'filter' => 'alpha',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Yes'), 'value' => 'true'],
-                    ['text' => tra('No'), 'value' => 'false'],
-                ],
-                'default' => '',
-                'advanced' => true,
-            ],
-            'showPortrait' => [
-                'required' => false,
-                'name' => tra('Show Portrait') . ' ' . tra('(default is to show)'),
-                'description' => tra("Show the creator's profile picture"),
-                'since' => '15.0',
-                'filter' => 'alpha',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Yes'), 'value' => 'true'],
-                    ['text' => tra('No'), 'value' => 'false'],
-                ],
-                'default' => '',
-                'advanced' => true,
-            ],
         ],
     ];
 }
 
 function vimeo_iframe($data, $params)
 {
-    $height = $params['height'];
-    $width = $params['width'];
+    $hasCustomDimensions = !empty($params['width']) || !empty($params['height']);
+    $height = $params['height'] ?? '';
+    $width = $params['width'] ?? '';
 
-    $urlparts = explode('/', $params['vimeo']);
-    foreach ($urlparts as $urlpart) {
-        if (ctype_digit($urlpart)) {
-            $vimeoId = $urlpart;
-        }
+    $url = $params['vimeo'];
+    
+    // Extract video ID, and optionally the unlisted hash.
+    $parsed = parse_url($url);
+    $path = trim($parsed['path'] ?? '', '/');
+    
+    if (preg_match('/^(\d+)(?:\/([a-zA-Z0-9]+))?/', $path, $matches)) {
+        $vimeoId = $matches[1];
+        $hash = $matches[2] ?? null;
+    } elseif (preg_match('/video\/(\d+)(?:\/([a-zA-Z0-9]+))?/', $path, $matches)) {
+        $vimeoId = $matches[1];
+        $hash = $matches[2] ?? null;
+    } elseif (ctype_digit($url)) {
+        $vimeoId = $url;
+        $hash = null;
     }
-    if (! isset($vimeoId)) {
+    
+    if (empty($vimeoId)) {
         return '';
     }
-    $url = '//player.vimeo.com/video/' . $vimeoId;
 
+    $embedUrl = "https://player.vimeo.com/video/" . $vimeoId;
     $args = [];
-    if (! empty($params['showTitle']) && $params['showTitle'] === 'false') {
+    if (!empty($hash)) {
+        $args['h'] = $hash;
+    }
+    if (!empty($params['showTitle']) && $params['showTitle'] === 'false') {
         $args['title'] = 0;
     }
-    if (! empty($params['showByline']) && $params['showByline'] === 'false') {
+    if (!empty($params['showByline']) && $params['showByline'] === 'false') {
         $args['byline'] = 0;
     }
-    if (! empty($params['showPortrait']) && $params['showPortrait'] === 'false') {
+    if (!empty($params['showPortrait']) && $params['showPortrait'] === 'false') {
         $args['portrait'] = 0;
     }
-    if ($args) {
-        $url .= '?' . http_build_query($args);
+    if (!empty($args)) {
+        $embedUrl .= '?' . http_build_query($args);
+    }
+    if (!empty($params['start'])) {
+        $embedUrl .= '#t=' . (int)$params['start'] . 's';
     }
 
-    $output = '<iframe data-fileid="' . $params['vimeo_fileId'] . '" id="' . $params['player_id'] . '" src="' . $url . '" width="' . $width . '" height="' . $height . '" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>';
+    $iframeAttrs = [
+        'src' => $embedUrl,
+        'frameborder' => '0',
+    ];
+    
+    if ($hasCustomDimensions) {
+        $iframeAttrs['width'] = $width ?: 560;
+        $iframeAttrs['height'] = $height ?: 315;
+    }
+    
+    // Default to true if not explicitly "n"
+    if (!isset($params['allowFullScreen']) || $params['allowFullScreen'] !== 'n') {
+        $iframeAttrs['allow'] = 'autoplay; fullscreen; picture-in-picture; clipboard-write';
+        $iframeAttrs['allowfullscreen'] = true;
+        $iframeAttrs['webkitallowfullscreen'] = true;
+        $iframeAttrs['mozallowfullscreen'] = true;
+    }
+    
+    $htmlAttrs = '';
+    foreach ($iframeAttrs as $k => $v) {
+        if ($v === true) {
+            $htmlAttrs .= " $k";
+        } else {
+            $htmlAttrs .= " $k=\"" . htmlspecialchars((string)$v) . "\"";
+        }
+    }
+    
+    $inlineStyles = [];
+    if (!$hasCustomDimensions) {
+        $inlineStyles[] = 'aspect-ratio: 16/9';
+        $inlineStyles[] = 'width: 100%';
+        $inlineStyles[] = 'max-width: 100%';
+    }
+    if (!empty($params['borderRadius']) && $params['borderRadius'] === 'y') {
+        $inlineStyles[] = 'border-radius: 8px';
+    }
+    
+    $iframeStyleAttr = '';
+    if (!empty($inlineStyles)) {
+        $iframeStyleAttr = ' style="' . implode('; ', $inlineStyles) . ';"';
+    }
+
+    $output = "<iframe data-fileid=\"" . (!empty($params['vimeo_fileId']) ? htmlspecialchars($params['vimeo_fileId']) : '0') . "\" id=\"" . (!empty($params['player_id']) ? htmlspecialchars($params['player_id']) : '') . "\" $htmlAttrs$iframeStyleAttr></iframe>";
+
+    // Apply container background/border styles
+    $containerStyle = [];
+    if (!empty($params['bg'])) {
+        $containerStyle[] = 'background-color:' . htmlspecialchars($params['bg']);
+    }
+    if (!empty($params['border'])) {
+        $containerStyle[] = 'border: 1px solid ' . htmlspecialchars($params['border']);
+    }
+    if (!empty($params['borderRadius']) && $params['borderRadius'] === 'y') {
+        $containerStyle[] = 'border-radius: 8px; overflow: hidden;';
+    }
+
+    if (!empty($containerStyle)) {
+        $output = '<div style="' . implode(' ', $containerStyle) . '; display:inline-block; max-width: 100%;' . (!$hasCustomDimensions ? ' width: 100%;' : '') . '">' . $output . '</div>';
+    }
+
     return $output;
 }
 
@@ -191,14 +242,14 @@ function wikiplugin_vimeo($data, $params)
     static $instance = 0;
     $instance++;
 
-    if (! is_null($params['url'])) {
+    if (! is_null($params['url']) && ! empty($params['url'])) {
         $params['vimeo'] = $params['url'];
         $params['player_id'] = "pid_" . uniqid();
         $params['vimeo_fileId'] = 0;
         unset($params['url']);
 
         return vimeo_iframe($data, $params);
-    } elseif (! is_null($params['fileId'])) {
+    } elseif (! is_null($params['fileId']) && ! empty($params['fileId'])) {
         $fileIds = preg_split('/\D+/', $params['fileId'], -1, PREG_SPLIT_NO_EMPTY);
         unset($params['fileId']);
 
@@ -207,10 +258,15 @@ function wikiplugin_vimeo($data, $params)
             $attributelib = TikiLib::lib('attribute');
             $attributes = $attributelib->get_attributes('file', $fileId);
             if (! empty($attributes['tiki.content.url'])) {
-                $params['vimeo'] = $attributes['tiki.content.url'];
-                $params['player_id'] = "pid_" . uniqid();
-                $params['vimeo_fileId'] = $fileId;
-                $out .= vimeo_iframe($data, $params);
+                $videoParams = $params;
+                $videoParams['url'] = $attributes['tiki.content.url'];
+                
+                $videoParams['vimeo'] = $videoParams['url'];
+                $videoParams['player_id'] = "pid_" . uniqid();
+                $videoParams['vimeo_fileId'] = $fileId;
+                unset($videoParams['url']);
+
+                $out .= vimeo_iframe($data, $videoParams);
             } else {
                 Feedback::error(tr('Vimeo video not found for file #%0', $fileId));
             }
