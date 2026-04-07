@@ -8,7 +8,7 @@ function wikiplugin_exercise_info()
 {
     return [
         'name' => tra('Exercise'),
-        'documentation' => tra('PluginExercise'),
+        'documentation' => 'PluginExercise',
         'description' => tra('Create an exercise/test with questions and grade'),
         'prefs' => ['wikiplugin_exercise'],
         'filter' => 'text',
