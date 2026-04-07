@@ -80,7 +80,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
                     $vimeolib->uploadThumbnail($videoId, $thumb);
                 }
 
-                Feedback::success(tra('Video updated successfully!'));
+                try {
+                    $statusVideo = $vimeolib->getVideo($videoId);
+                    $status = is_object($statusVideo) ? ($statusVideo->status ?? 'unknown') : ($statusVideo['status'] ?? 'unknown');
+                } catch (Exception $e) { $status = 'unknown'; }
+                Feedback::success(tra('Video updated successfully! It may take a bit of time to be processed by Vimeo for streaming. Please refresh the page later to view it. (Status: ') . $status . ')');
                 header('Location: tiki-vimeo_video.php?videoId=' . urlencode($videoInfo->shortUUID));
                 exit;
 
@@ -102,7 +106,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($errors)) {
                             $vimeolib->uploadThumbnail($newVideoId, $thumb);
                         }
 
-                        Feedback::success(tra('Video uploaded successfully!'));
+                        try {
+                            $statusVideo = $vimeolib->getVideo($newVideoId);
+                            $status = is_object($statusVideo) ? ($statusVideo->status ?? 'unknown') : ($statusVideo['status'] ?? 'unknown');
+                        } catch (Exception $e) { $status = 'unknown'; }
+                        Feedback::success(tra('Video uploaded successfully! It may take a bit of time to be processed by Vimeo for streaming. Please refresh the page later to view it. (Status: ') . $status . ')');
                         header('Location: tiki-vimeo_video.php?videoId=' . urlencode($newVideoId));
                         exit;
                     } else {

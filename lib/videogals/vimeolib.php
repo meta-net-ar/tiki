@@ -240,6 +240,7 @@ class VimeoLib
                 'privacyLabel'=> $vid['privacy']['view'],
                 'duration'    => $vid['duration'],
                 'tags'        => array_column($vid['tags'], 'name'),
+                'status'      => $vid['status'],
                 'embedPath'   => '',
                 'link'        => $vid['link'],
                 'thumbUrl'    => $thumbUrl,
