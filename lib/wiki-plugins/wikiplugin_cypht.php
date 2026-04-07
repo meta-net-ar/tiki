@@ -423,8 +423,7 @@ function wikiplugin_cypht($data, $params)
     $dispatcher = $config->triggerInit();
 
     if ($dispatcher->request->format == 'Hm_Format_JSON') {
-        echo $dispatcher->output;
-        trigger_error("JSON response: " . $dispatcher->output, E_USER_NOTICE);
+        echo $dispatcher->session->dedup_page_links($dispatcher->output);
         exit;
     }
 
