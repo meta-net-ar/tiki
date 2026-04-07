@@ -130,6 +130,13 @@ class VimeoLib
             foreach ($response['body']['data'] as $vid) {
                 // Parse UUID
                 $uuid = str_replace('/videos/', '', $vid['uri']);
+                // Grab the best available thumbnail, typically size index 2 is approx 295x166
+                $thumbUrl = null;
+                if (! empty($vid['pictures']['sizes']) && is_array($vid['pictures']['sizes'])) {
+                    $sizes = $vid['pictures']['sizes'];
+                    $thumbUrl = $sizes[min(2, count($sizes) - 1)]['link'] ?? $sizes[0]['link'] ?? null;
+                }
+
                 $videos[] = (object)[
                     'id'          => $uuid,
                     'uuid'        => $uuid,
@@ -139,6 +146,7 @@ class VimeoLib
                     'views'       => $vid['stats']['plays'] ?? 0,
                     'privacy'     => ['label' => $vid['privacy']['view']],
                     'duration'    => $vid['duration'],
+                    'thumbUrl'    => $thumbUrl,
                 ];
             }
             return (object)[
@@ -167,6 +175,13 @@ class VimeoLib
 
             $uuid = str_replace('/videos/', '', $vid['uri']);
 
+            // Grab the best available thumbnail
+            $thumbUrl = null;
+            if (! empty($vid['pictures']['sizes']) && is_array($vid['pictures']['sizes'])) {
+                $sizes = $vid['pictures']['sizes'];
+                $thumbUrl = $sizes[min(2, count($sizes) - 1)]['link'] ?? $sizes[0]['link'] ?? null;
+            }
+
             // Transform object to resemble peertube data structure
             return [
                 'id'          => $uuid,
@@ -181,6 +196,7 @@ class VimeoLib
                 'tags'        => array_column($vid['tags'], 'name'),
                 'embedPath'   => '',
                 'link'        => $vid['link'],
+                'thumbUrl'    => $thumbUrl,
             ];
         }
 
