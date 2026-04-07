@@ -1,6 +1,10 @@
 -- Activate the preference as disabled by default (but preserve if already set)
 INSERT IGNORE INTO `tiki_preferences` (`name`, `value`) VALUES ('vimeo_upload', 'n');
 
+-- Permissions
+INSERT IGNORE INTO `users_permissions` (`permName`, `level`) VALUES
+('tiki_p_admin_vimeo', 'admin');
+
 -- Menu entries
 INSERT IGNORE INTO `tiki_menu_options`
 (`menuId`,`type`,`name`,`url`,`position`,`section`,`perm`,`groupname`,`userlevel`) VALUES
