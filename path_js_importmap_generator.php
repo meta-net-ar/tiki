@@ -184,7 +184,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-widgets/el-select" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/select.js",
                 "@vue-widgets/el-slider" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/slider.js",
                 "@vue-widgets/el-transfer" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/transfer.js",
-                "@vue-widgets/el-backtop" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/backTop.js",
+                "@vue-widgets/el-backtop" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/backtop.js",
 
                 /* src/js/wysiwyg */
                 "@wysiwyg/summernote" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg/summernote.js",
