@@ -785,7 +785,6 @@ class HeaderLib
             // this called only in header.tpl
             $back .= $this->head->autoGenerate() . "\n";
         } else {
-            $this->head->meta('generator', 'Tiki Wiki CMS Groupware - https://tiki.org');
             $back .= (string) $this->head . "\n";
         }
 

@@ -35,8 +35,6 @@ class HtmlHead extends MetaTags
     public ?string $modifiedDate = null;
     public ?string $pageType = null;
     public ?string $breadcrumbTitle = null;
-
-    // Template identifier (set externally)
     public ?string $middleSectionTemplate;
 
     /**
@@ -150,7 +148,7 @@ class HtmlHead extends MetaTags
                 break;
         }
 
-        $this->setCanonicalUrl();
+        $this->fallbacks();
     }
 
     /**
@@ -170,18 +168,18 @@ class HtmlHead extends MetaTags
 
         if ($isPost) {
             if (! empty($post_info['parsed_excerpt'])) {
-                $this->description = $this->truncate(strip_tags($post_info['parsed_excerpt']));
+                $this->description = $this->cleanText($post_info['parsed_excerpt']);
             } elseif (! empty($post_info['parsed_data'])) {
-                $this->description = $this->truncate(strip_tags($post_info['parsed_data']));
+                $this->description = $this->cleanText($post_info['parsed_data']);
             } elseif (! empty($parsed_data)) {
-                $this->description = $this->truncate(strip_tags($parsed_data));
+                $this->description = $this->cleanText($parsed_data);
             } else {
                 $postTitle = $post_info['title'] ?? '';
                 $blogTitle = $blog_data['title'] ?? '';
                 $this->description = $postTitle . ($postTitle && $blogTitle ? ' - ' : '') . $blogTitle;
             }
         } elseif (! empty($blog_data['description'])) {
-            $this->description = $this->truncate(strip_tags($blog_data['description']));
+            $this->description = $this->cleanText($blog_data['description']);
         }
 
         if ($isPost && ! empty($post_info['author'])) {
@@ -217,13 +215,13 @@ class HtmlHead extends MetaTags
         }
 
         if (! empty($parsed_heading)) {
-            $this->description = $this->truncate(strip_tags($parsed_heading));
+            $this->description = $this->cleanText($parsed_heading);
         } elseif (! empty($parsed_body)) {
-            $this->description = $this->truncate(strip_tags($parsed_body));
+            $this->description = $this->cleanText($parsed_body);
         } elseif (! empty($article_data['heading'])) {
-            $this->description = $this->truncate(strip_tags($article_data['heading']));
+            $this->description = $this->cleanText($article_data['heading']);
         } elseif (! empty($article_data['body'])) {
-            $this->description = $this->truncate(strip_tags($article_data['body']));
+            $this->description = $this->cleanText($article_data['body']);
         }
 
         if (! empty($article_data['authorName'])) {
@@ -244,8 +242,8 @@ class HtmlHead extends MetaTags
         }
 
         $articleId = $_REQUEST['articleId'] ?? null;
-        $topicId = $_REQUEST['topicId'] ?? ($article_data['topicId'] ?? null);
-        $hasImage = ! empty($article_data['image_data']) && strlen($article_data['image_data']) > 0;
+        $topicId   = $_REQUEST['topicId'] ?? ($article_data['topicId'] ?? null);
+        $hasImage  = ! empty($article_data['image_data']) && strlen($article_data['image_data']) > 0;
 
         if ($hasImage && ! empty($articleId)) {
             $this->images[] = $base_url_canonical . 'article_image.php?image_type=article&id=' . $articleId;
@@ -270,7 +268,7 @@ class HtmlHead extends MetaTags
         }
 
         if (! empty($gal_info['description'])) {
-            $this->description = $this->truncate(strip_tags($gal_info['description']));
+            $this->description = $this->cleanText($gal_info['description']);
         }
 
         if (isset($_REQUEST['galleryId'])) {
@@ -304,7 +302,7 @@ class HtmlHead extends MetaTags
         }
 
         if (! empty($prefs['metatag_pagedesc']) && $prefs['metatag_pagedesc'] === 'y' && ! empty($description)) {
-            $this->description = $this->truncate(strip_tags($description));
+            $this->description = $this->cleanText($description);
         }
 
         if (! empty($page)) {
@@ -366,7 +364,7 @@ class HtmlHead extends MetaTags
             $this->description = $tracker_info['name'];
         }
 
-        if ($isItem && ! empty($_REQUEST['itemId'])) {
+        if ($isItem) {
             $this->canonicalPath = \filter_out_sefurl($_REQUEST['itemId'], 'trackeritem', null, null, 'n');
         }
     }
@@ -504,12 +502,20 @@ class HtmlHead extends MetaTags
      */
     protected function initMyTiki(): void
     {
-        global $user, $userinfo;
+        global $user, $userinfo, $title, $description, $page, $headtitle;
 
-        if (! empty($userinfo['login'])) {
+        if (! empty($title) && ! is_array($title)) {
+            $this->title = $title;
+        } elseif (! empty($description)) {
+            $this->title = $description;
+        } elseif (! empty($page)) {
+            $this->title = $page;
+        } elseif (! empty($userinfo['login'])) {
             $this->title = $userinfo['login'];
         } elseif (! empty($user)) {
             $this->title = $user;
+        } elseif (! empty($headtitle)) {
+            $this->title = str_replace('&nbsp;', ' ', $headtitle);
         }
     }
 
@@ -530,13 +536,6 @@ class HtmlHead extends MetaTags
      */
     protected function initSearch(): void
     {
-        global $query;
-
-        if (! empty($query) && is_string($query)) {
-            $this->title = tra('Search results for') . ': ' . $query;
-            return;
-        }
-
         $this->title = tra('Search');
     }
 
@@ -575,8 +574,6 @@ class HtmlHead extends MetaTags
 
         if (! empty($title) && ! is_array($title)) {
             $this->title = $title;
-        } elseif (! empty($description)) {
-            $this->title = $description;
         } elseif (! empty($page)) {
             $this->title = $page;
         } elseif (! empty($userinfo['login'])) {
@@ -649,36 +646,36 @@ class HtmlHead extends MetaTags
     }
 
     /**
-     * Set canonical URL
+     * fallback metatags
      */
-    protected function setCanonicalUrl(): void
+    protected function fallbacks(): void
     {
-        global $base_url_canonical;
+        global $base_url_canonical, $prefs, $header_featured_images, $section;
 
         if (! empty($this->canonicalPath)) {
             $this->canonicalUrl = $base_url_canonical . $this->canonicalPath;
-        } else {
-            $this->canonicalUrl = $base_url_canonical;
-        }
-    }
-
-    /**
-     * Set fallback images
-     */
-    protected function fallbackImages(): void
-    {
-        global $header_featured_images, $prefs;
-
-        if (! empty($header_featured_images) && is_array($header_featured_images)) {
-            $this->images = $header_featured_images;
-            return;
         }
 
-        if (! empty($prefs['socialnetworks_facebook_site_image'])) {
-            $this->og('image', $prefs['socialnetworks_facebook_site_image']);
+        if (! $this->description && !empty($prefs['metatag_description'])) {
+            $this->description = $prefs['metatag_description'];
         }
-        if (! empty($prefs['socialnetworks_twitter_site_image'])) {
-            $this->twitter('image', $prefs['socialnetworks_twitter_site_image']);
+
+        if (empty($this->title) && ! empty($section)) {
+            $this->title = ucfirst($section);
+        }
+
+        if (empty($this->images)) {
+            if (! empty($header_featured_images) && is_array($header_featured_images)) {
+                $this->images = $header_featured_images;
+                return;
+            }
+
+            if (! empty($prefs['socialnetworks_facebook_site_image'])) {
+                $this->og('image', $prefs['socialnetworks_facebook_site_image']);
+            }
+            if (! empty($prefs['socialnetworks_twitter_site_image'])) {
+                $this->twitter('image', $prefs['socialnetworks_twitter_site_image']);
+            }
         }
     }
 
@@ -718,12 +715,13 @@ class HtmlHead extends MetaTags
     }
 
     /**
-     * Truncate text to 150 characters (header.tpl truncate:150)
+     * Truncate and clean text to maxLen characters
      */
-    protected function truncate(string $text): string
+    protected function cleanText(string $text, int $maxLen = 150): string
     {
-        if (strlen($text) > 150) {
-            return substr($text, 0, 147) . '...';
+        $text = strip_tags($text);
+        if (strlen($text) > $maxLen) {
+            $text = substr($text, 0, $maxLen - 3) . '...';
         }
         return $text;
     }
@@ -746,7 +744,7 @@ class HtmlHead extends MetaTags
     }
 
     /**
-     * Get breadcrumbs title (header.tpl lines 130-134)
+     * Get breadcrumbs title
      */
     public function getBreadcrumbsTitle(): ?string
     {
@@ -784,9 +782,9 @@ class HtmlHead extends MetaTags
     }
 
     /**
-     * Build the final title
+     * Get the final title
      */
-    public function buildTitle(): string
+    public function getTitle(): string
     {
         global $sswindowtitle, $prefs;
 
@@ -795,7 +793,7 @@ class HtmlHead extends MetaTags
         }
 
         $browserTitle = $this->getBrowserTitle();
-        $middleTitle = $this->title ?? '';
+        $middleTitle  = $this->title ?? '';
 
         $breadcrumbsTitle = $this->getBreadcrumbsTitle();
         if (! empty($breadcrumbsTitle)) {
@@ -824,7 +822,7 @@ class HtmlHead extends MetaTags
     {
         global $prefs, $base_url_canonical;
 
-        $title = $this->buildTitle();
+        $title = $this->getTitle();
 
         $this->title($title)
             ->description($this->description ?? $title)
@@ -858,7 +856,6 @@ class HtmlHead extends MetaTags
                 $this->image($img, 'summary');
             }
         } else {
-            $this->fallbackImages();
             $this->twitter('card', 'summary');
         }
 
@@ -867,8 +864,8 @@ class HtmlHead extends MetaTags
             $this->robots($robots);
             $this->robots($robots, 'googlebot');
         } elseif ($this->pageType === null) { // my tiki pages.
-            $this->robots('NOINDEX, NOFOLLOW');
-            $this->robots('NOINDEX, NOFOLLOW', 'googlebot');
+            $this->robots('noindex, nofollow');
+            $this->robots('noindex, nofollow', 'googlebot');
         }
 
         // fb site name
@@ -1067,8 +1064,8 @@ class HtmlHead extends MetaTags
         // Article or BlogPosting
         if (in_array($this->pageType, ['article', 'blog_post'])) {
             $postData = [
-                'headline' => $this->buildTitle(),
-                'description' => $this->description ?? $this->buildTitle(),
+                'headline' => $this->getTitle(),
+                'description' => $this->description ?? $this->getTitle(),
                 'url' => $pageUrl,
                 'mainEntityOfPage' => ['@id' => "{$pageUrl}#webpage"],
                 'publisher' => ['@id' => "{$base_url_canonical}#organization"],
