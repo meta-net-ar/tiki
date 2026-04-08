@@ -8,6 +8,7 @@
 namespace Tiki\HtmlHead;
 
 use TikiLib;
+use Tiki\Sections;
 use Melbahja\Seo\Schema;
 use Melbahja\Seo\MetaTags;
 use Melbahja\Seo\Schema\Thing;
@@ -23,122 +24,751 @@ if (function_exists('\filter_out_sefurl') === false) {
 
 class HtmlHead extends MetaTags
 {
-    protected array $images = [];
-    protected ?string $canonicalPath = null;
-    protected ?array $breadcrumbTitle = null;
+    // Set by init() based on section
+    public ?string $title = null;
+    public ?string $description = null;
+    public ?string $author = null;
+    public ?string $canonicalPath = null;
+    public ?string $canonicalUrl = null;
+    public array $images = [];
+    public ?string $publishDate = null;
+    public ?string $modifiedDate = null;
+    public ?string $pageType = null;
+    public ?string $breadcrumbTitle = null;
+
+    // Template identifier (set externally)
     public ?string $middleSectionTemplate;
 
-
-    public function getPageType(): ?string
+    /**
+     * Initialize
+     */
+    public function init(?string $middleSectionTemplate): void
     {
-        switch ($this->middleSectionTemplate) {
-            case 'tiki-read_article.tpl':
+        global $section, $prefs;
+
+        $this->pageType              = $this->getPageTypeFromSection($section);
+        $this->middleSectionTemplate = $middleSectionTemplate;
+
+        switch ($section) {
+            case Sections::SECTION_BLOGS:
+                $this->initBlogs();
+                break;
+
+            case Sections::SECTION_CMS:
+                $this->initCms();
+                break;
+
+            case Sections::SECTION_FILE_GALLERIES:
+                $this->initFileGalleries();
+                break;
+
+            case Sections::SECTION_WIKI_PAGE:
+            case Sections::SECTION_WIKI:
+                $this->initWiki();
+                break;
+
+            case Sections::SECTION_FORUM:
+            case Sections::SECTION_FORUMS:
+                $this->initForums();
+                break;
+
+            case Sections::SECTION_TRACKERS:
+                $this->initTrackers();
+                break;
+
+            case Sections::SECTION_CATEGORIES:
+                $this->initCategories();
+                break;
+
+            case Sections::SECTION_FAQS:
+                $this->initFaqs();
+                break;
+
+            case Sections::SECTION_SURVEYS:
+                $this->initSurveys();
+                break;
+
+            case Sections::SECTION_QUIZZES:
+                $this->initQuizzes();
+                break;
+
+            case Sections::SECTION_POLL:
+                $this->initPolls();
+                break;
+
+            case Sections::SECTION_DIRECTORY:
+                $this->initDirectory();
+                break;
+
+            case Sections::SECTION_CALENDAR:
+                $this->initCalendar();
+                break;
+
+            case Sections::SECTION_NEWSLETTERS:
+                $this->initNewsletters();
+                break;
+
+            case Sections::SECTION_SHEET:
+                $this->initSheets();
+                break;
+
+            case Sections::SECTION_HTML_PAGES:
+                $this->initHtmlPages();
+                break;
+
+            case Sections::SECTION_MY_TIKI:
+                $this->initMyTiki();
+                break;
+
+            case Sections::SECTION_FREETAGS:
+                $this->initFreetags();
+                break;
+
+            case Sections::SECTION_SEARCH:
+                $this->initSearch();
+                break;
+
+            case Sections::SECTION_DOCS:
+                $this->initDocs();
+                break;
+
+            case Sections::SECTION_ADMIN:
+                $this->initAdmin();
+                break;
+
+            case Sections::SECTION_USER_MESSAGES:
+            case Sections::SECTION_WEBMAIL:
+            case Sections::SECTION_CONTACTS:
+            case Sections::SECTION_FEATURED_LINKS:
+            case Sections::SECTION_VALIDATE_EMAIL:
+            case Sections::SECTION_GLOBAL:
+            case Sections::SECTION_LIVESUPPORT:
+            case Sections::SECTION_SHARE:
+            case Sections::SECTION_CHAT:
+            default:
+                $this->initDefault();
+                break;
+        }
+
+        $this->setCanonicalUrl();
+        $this->setRobots();
+    }
+
+    /**
+     * Blogs section
+     */
+    protected function initBlogs(): void
+    {
+        global $post_info, $blog_data, $parsed_data;
+
+        $isPost = ! empty($_REQUEST['postId']);
+
+        if ($isPost && ! empty($post_info['title'])) {
+            $this->title = $post_info['title'];
+        } elseif (! empty($blog_data['title'])) {
+            $this->title = $blog_data['title'];
+        }
+
+        if ($isPost) {
+            if (! empty($post_info['parsed_excerpt'])) {
+                $this->description = $this->truncate(strip_tags($post_info['parsed_excerpt']));
+            } elseif (! empty($post_info['parsed_data'])) {
+                $this->description = $this->truncate(strip_tags($post_info['parsed_data']));
+            } elseif (! empty($parsed_data)) {
+                $this->description = $this->truncate(strip_tags($parsed_data));
+            } else {
+                $postTitle = $post_info['title'] ?? '';
+                $blogTitle = $blog_data['title'] ?? '';
+                $this->description = $postTitle . ($postTitle && $blogTitle ? ' - ' : '') . $blogTitle;
+            }
+        } elseif (! empty($blog_data['description'])) {
+            $this->description = $this->truncate(strip_tags($blog_data['description']));
+        }
+
+        if ($isPost && ! empty($post_info['author'])) {
+            $this->author = $post_info['author'];
+        }
+
+        if ($isPost) {
+            if (! empty($post_info['created'])) {
+                $this->publishDate = $this->formatDate($post_info['created']);
+            }
+            if (! empty($post_info['lastModif'])) {
+                $this->modifiedDate = $this->formatDate($post_info['lastModif']);
+            }
+        }
+
+        if ($isPost && ! empty($_REQUEST['postId'])) {
+            $this->canonicalPath = \filter_out_sefurl($_REQUEST['postId'], 'blogpost', null, null, 'n');
+        } elseif (! empty($_REQUEST['blogId'])) {
+            $this->canonicalPath = \filter_out_sefurl($_REQUEST['blogId'], 'blog', null, null, 'n');
+        }
+    }
+
+    /**
+     * CMS section
+     */
+    protected function initCms(): void
+    {
+        global $article_data, $base_url_canonical;
+        global $parsed_heading, $parsed_body;
+
+        if (! empty($article_data['title'])) {
+            $this->title = $article_data['title'];
+        }
+
+        if (! empty($parsed_heading)) {
+            $this->description = $this->truncate(strip_tags($parsed_heading));
+        } elseif (! empty($parsed_body)) {
+            $this->description = $this->truncate(strip_tags($parsed_body));
+        } elseif (! empty($article_data['heading'])) {
+            $this->description = $this->truncate(strip_tags($article_data['heading']));
+        } elseif (! empty($article_data['body'])) {
+            $this->description = $this->truncate(strip_tags($article_data['body']));
+        }
+
+        if (! empty($article_data['authorName'])) {
+            $this->author = $article_data['authorName'];
+        } elseif (! empty($article_data['author'])) {
+            $this->author = $article_data['author'];
+        }
+
+        if (! empty($article_data['publishDate'])) {
+            $this->publishDate = $this->formatDate($article_data['publishDate']);
+        }
+        if (! empty($article_data['lastModif'])) {
+            $this->modifiedDate = $this->formatDate($article_data['lastModif']);
+        }
+
+        if (! empty($_REQUEST['articleId'])) {
+            $this->canonicalPath = \filter_out_sefurl($_REQUEST['articleId'], 'article', null, null, 'n');
+        }
+
+        $articleId = $_REQUEST['articleId'] ?? null;
+        $topicId = $_REQUEST['topicId'] ?? ($article_data['topicId'] ?? null);
+        $hasImage = ! empty($article_data['image_data']) && strlen($article_data['image_data']) > 0;
+
+        if ($hasImage && ! empty($articleId)) {
+            $this->images[] = $base_url_canonical . 'article_image.php?image_type=article&id=' . $articleId;
+        } elseif (! empty($topicId)) {
+            $artlib = TikiLib::lib('art');
+            $topics = $artlib->list_topics();
+            if (! empty($topics[$article_data['topicId']]['image_name'])) {
+                $this->images[] = $base_url_canonical . 'article_image.php?image_type=topic&id=' . $topicId;
+            }
+        }
+    }
+
+    /**
+     * File Galleries
+     */
+    protected function initFileGalleries(): void
+    {
+        global $gal_info;
+
+        if (! empty($gal_info['name'])) {
+            $this->title = $gal_info['name'];
+        }
+
+        if (! empty($gal_info['description'])) {
+            $this->description = $this->truncate(strip_tags($gal_info['description']));
+        }
+
+        if (isset($_REQUEST['galleryId'])) {
+            $this->canonicalPath = 'file' . $_REQUEST['galleryId'];
+        }
+    }
+
+    /**
+     * Wiki section
+     */
+    protected function initWiki(): void
+    {
+        global $page, $description, $prefs;
+        global $structure, $structure_path, $aliasname, $tagTitle, $title;
+
+        if (! empty($tagTitle)) {
+            $this->title = $tagTitle;
+        } elseif (! empty($title) && ! is_array($title)) {
+            $this->title = $title;
+        } elseif (! empty($aliasname)) {
+            $this->title = $aliasname;
+        } elseif (! empty($structure) && $structure === 'y' && ! empty($structure_path) && is_array($structure_path)) {
+            $lastItem = end($structure_path);
+            if (! empty($lastItem['page_alias'])) {
+                $this->title = $lastItem['page_alias'];
+            } else {
+                $this->title = $page;
+            }
+        } elseif (! empty($page)) {
+            $this->title = $page;
+        }
+
+        if (! empty($prefs['metatag_pagedesc']) && $prefs['metatag_pagedesc'] === 'y' && ! empty($description)) {
+            $this->description = $this->truncate(strip_tags($description));
+        }
+
+        if (! empty($page)) {
+            global $canonical_ending;
+            $this->canonicalPath = \filter_out_sefurl($page) . (! empty($canonical_ending) ? $canonical_ending : '');
+        }
+    }
+
+    /**
+     * Forums section
+     */
+    protected function initForums(): void
+    {
+        global $forum_info, $thread_info;
+
+        $isThread = ! empty($_REQUEST['comments_parentId']);
+
+        if ($isThread && ! empty($thread_info['title'])) {
+            $this->title = $thread_info['title'];
+        } elseif (! empty($forum_info['name'])) {
+            $this->title = $forum_info['name'];
+        }
+
+        if ($isThread && ! empty($thread_info['title'])) {
+            $this->description = $thread_info['title'];
+        } elseif (! empty($forum_info['name'])) {
+            $this->description = $forum_info['name'];
+        }
+
+        if ($isThread && ! empty($_REQUEST['comments_parentId'])) {
+            $this->canonicalPath = \filter_out_sefurl($_REQUEST['comments_parentId'], 'forumthread');
+        } elseif (! empty($_REQUEST['forumId'])) {
+            $this->canonicalPath = \filter_out_sefurl($_REQUEST['forumId'], 'forum');
+        }
+    }
+
+    /**
+     * Trackers section
+     */
+    protected function initTrackers(): void
+    {
+        global $tracker_info, $tracker_item_main_value;
+
+        $isItem = ! empty($_REQUEST['itemId']);
+
+        if ($isItem && ! empty($tracker_item_main_value)) {
+            $this->title = strlen($tracker_item_main_value) > 255
+                ? substr($tracker_item_main_value, 0, 252) . '...'
+                : $tracker_item_main_value;
+        } elseif (! empty($tracker_info['pagetitle'])) {
+            $this->title = $tracker_info['pagetitle'];
+        } elseif (! empty($tracker_info['name'])) {
+            $this->title = $tracker_info['name'];
+        }
+
+        if ($isItem && ! empty($tracker_item_main_value)) {
+            $this->description = $tracker_item_main_value;
+        } elseif (! empty($tracker_info['name'])) {
+            $this->description = $tracker_info['name'];
+        }
+
+        if ($isItem && ! empty($_REQUEST['itemId'])) {
+            $this->canonicalPath = \filter_out_sefurl($_REQUEST['itemId'], 'trackeritem', null, null, 'n');
+        }
+    }
+
+    /**
+     * Categories section
+     */
+    protected function initCategories(): void
+    {
+        global $categ_info;
+
+        if (! empty($categ_info['name'])) {
+            $this->title = $categ_info['name'];
+        }
+
+        if (! empty($categ_info['name'])) {
+            $this->description = $categ_info['name'];
+        }
+
+        if (! empty($_REQUEST['parentId'])) {
+            $this->canonicalPath = \filter_out_sefurl($_REQUEST['parentId'], 'category');
+        }
+    }
+
+    /**
+     * FAQs
+     */
+    protected function initFaqs(): void
+    {
+        global $faq_info;
+
+        if (! empty($faq_info['title'])) {
+            $this->title = $faq_info['title'];
+        }
+    }
+
+    /**
+     * Surveys section
+     */
+    protected function initSurveys(): void
+    {
+        global $survey_info;
+
+        if (! empty($survey_info['name'])) {
+            $this->title = $survey_info['name'];
+        }
+    }
+
+    /**
+     * Quizzes
+     */
+    protected function initQuizzes(): void
+    {
+        global $quiz_info;
+
+        if (! empty($quiz_info['name'])) {
+            $this->title = $quiz_info['name'];
+        }
+    }
+
+    /**
+     * Polls
+     */
+    protected function initPolls(): void
+    {
+        global $poll_info;
+
+        if (! empty($poll_info['title'])) {
+            $this->title = $poll_info['title'];
+        }
+    }
+
+    /**
+     * Directory section
+     */
+    protected function initDirectory(): void
+    {
+        global $directory_info;
+
+        if (! empty($directory_info['name'])) {
+            $this->title = $directory_info['name'];
+        }
+    }
+
+    /**
+     * Calendar section
+     */
+    protected function initCalendar(): void
+    {
+        global $calendar;
+
+        if (! empty($calendar['name'])) {
+            $this->title = $calendar['name'];
+        }
+    }
+
+    /**
+     * Newsletters
+     */
+    protected function initNewsletters(): void
+    {
+        global $nl_info;
+
+        if (! empty($nl_info['name'])) {
+            $this->title = $nl_info['name'];
+        }
+    }
+
+    /**
+     * Sheets
+     */
+    protected function initSheets(): void
+    {
+        global $sheet_info;
+
+        if (! empty($sheet_info['title'])) {
+            $this->title = $sheet_info['title'];
+        }
+    }
+
+    /**
+     * HTML Pages
+     */
+    protected function initHtmlPages(): void
+    {
+        global $htmlpage;
+
+        if (! empty($htmlpage['pageName'])) {
+            $this->title = $htmlpage['pageName'];
+        }
+    }
+
+    /**
+     * My Tiki section
+     */
+    protected function initMyTiki(): void
+    {
+        global $user, $userinfo;
+
+        if (! empty($userinfo['login'])) {
+            $this->title = $userinfo['login'];
+        } elseif (! empty($user)) {
+            $this->title = $user;
+        }
+    }
+
+    /**
+     * Freetags
+     */
+    protected function initFreetags(): void
+    {
+        global $tag;
+
+        if (! empty($tag)) {
+            $this->title = $tag;
+        }
+    }
+
+    /**
+     * Search
+     */
+    protected function initSearch(): void
+    {
+        global $query;
+
+        if (! empty($query) && is_string($query)) {
+            $this->title = tra('Search results for') . ': ' . $query;
+            return;
+        }
+
+        $this->title = tra('Search');
+    }
+
+    /**
+     * Docs
+     */
+    protected function initDocs(): void
+    {
+        global $doc;
+
+        if (! empty($doc['name'])) {
+            $this->title = $doc['name'];
+        }
+    }
+
+    /**
+     * Admin section
+     */
+    protected function initAdmin(): void
+    {
+        global $admintitle;
+
+        if (! empty($admintitle)) {
+            $this->title = $admintitle;
+        } else {
+            $this->title = tra('Administration');
+        }
+    }
+
+    /**
+     * Default
+     */
+    protected function initDefault(): void
+    {
+        global $title, $description, $page, $headtitle, $userinfo, $user;
+
+        if (! empty($title) && ! is_array($title)) {
+            $this->title = $title;
+        } elseif (! empty($description)) {
+            $this->title = $description;
+        } elseif (! empty($page)) {
+            $this->title = $page;
+        } elseif (! empty($userinfo['login'])) {
+            $this->title = $userinfo['login'];
+        } elseif (! empty($user)) {
+            $this->title = $user;
+        } elseif (! empty($headtitle)) {
+            $this->title = str_replace('&nbsp;', ' ', $headtitle);
+        }
+    }
+
+    /**
+     * Get page type from section
+     */
+    protected function getPageTypeFromSection(?string $section): ?string
+    {
+        switch ($section) {
+            case Sections::SECTION_CMS:
                 return 'article';
 
-            case 'tiki-view_blog_post.tpl':
-                return 'blog_post';
+            case Sections::SECTION_BLOGS:
+                return ! empty($_REQUEST['postId']) ? 'blog_post' : 'blog';
 
-            case 'tiki-view_blog.tpl':
-                return 'blog';
-
-            case 'tiki-show_page.tpl':
-            case 'tiki-index_p.tpl':
-            case 'tiki-show_page_raw.tpl':
-            case 'tiki-all_languages.tpl':
-            case 'tiki-show_content.tpl':
-            case 'extends:layouts/internal/layout_view.tpl|tiki-show_page.tpl':
+            case Sections::SECTION_WIKI_PAGE:
+            case Sections::SECTION_WIKI:
                 return 'wiki';
 
-            case 'tiki-view_forum.tpl':
-                return 'forum';
+            case Sections::SECTION_FORUM:
+            case Sections::SECTION_FORUMS:
+                return ! empty($_REQUEST['comments_parentId']) ? 'forum_thread' : 'forum';
 
-            case 'tiki-view_forum_thread.tpl':
-            case 'tiki-print_forum_thread.tpl':
-                return 'forum_thread';
+            case Sections::SECTION_TRACKERS:
+                return ! empty($_REQUEST['itemId']) ? 'tracker_item' : 'tracker';
 
-            case 'tiki-view_tracker_item.tpl':
-                return 'tracker_item';
-
-            case 'tiki-browse_categories.tpl':
+            case Sections::SECTION_CATEGORIES:
                 return 'category';
 
-            case 'tiki-list_file_gallery.tpl':
+            case Sections::SECTION_FILE_GALLERIES:
                 return 'file_gallery';
+
+            case Sections::SECTION_FAQS:
+                return 'faq';
+
+            case Sections::SECTION_SURVEYS:
+                return 'survey';
+
+            case Sections::SECTION_QUIZZES:
+                return 'quiz';
+
+            case Sections::SECTION_POLL:
+                return 'poll';
+
+            case Sections::SECTION_DIRECTORY:
+                return 'directory';
+
+            case Sections::SECTION_CALENDAR:
+                return 'calendar';
+
+            case Sections::SECTION_NEWSLETTERS:
+                return 'newsletter';
+
+            case Sections::SECTION_SHEET:
+                return 'sheet';
+
+            case Sections::SECTION_HTML_PAGES:
+                return 'html_page';
         }
 
         return null;
     }
 
-    public function getDescription(): string
+    /**
+     * Set canonical URL
+     */
+    protected function setCanonicalUrl(): void
     {
-        global $section, $post_info, $blog_data, $parsed_heading, $parsed_body;
-        global $gal_info, $description, $title, $prefs;
+        global $base_url_canonical;
 
-        $desc = '';
-        if ($section === 'blogs') {
-            if (! empty($post_info['parsed_excerpt'])) {
-                $desc = strip_tags($post_info['parsed_excerpt']);
-            } elseif (! empty($post_info['parsed_data'])) {
-                $desc = strip_tags($post_info['parsed_data']);
-            } else {
-                $postTitle = ! empty($post_info['title']) ? $post_info['title'] : '';
-                $blogTitle = (! empty($blog_data) && ! empty($blog_data['title'])) ? $blog_data['title'] : '';
-                $desc = $postTitle . ($postTitle && $blogTitle ? ' - ' : '') . $blogTitle;
-            }
-        } elseif ($section === 'cms') {
-            if (! empty($parsed_heading)) {
-                $desc = strip_tags($parsed_heading);
-            } elseif (! empty($parsed_body)) {
-                $desc = strip_tags($parsed_body);
-            }
-        } elseif ($section === 'file_galleries') {
-            if (! empty($gal_info['description'])) {
-                $desc = strip_tags($gal_info['description']);
-            }
-        } elseif (! empty($prefs['metatag_pagedesc']) && $prefs['metatag_pagedesc'] === 'y' && ! empty($description)) {
-            $desc = strip_tags($description);
-        } elseif (! empty($prefs['metatag_description_translated'])) {
-            $desc = $prefs['metatag_description_translated'];
-        } elseif (! empty($prefs['metatag_description'])) {
-            $desc = $prefs['metatag_description'];
+        if (! empty($this->canonicalPath)) {
+            $this->canonicalUrl = $base_url_canonical . $this->canonicalPath;
+        } else {
+            $this->canonicalUrl = $base_url_canonical;
         }
-
-        if (empty($desc)) {
-            $browserTitle = $this->getBrowserTitle();
-            $sep          = ! empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
-            $pageTitle    = isset($title) ? $title : '';
-            $desc         = $browserTitle . ($browserTitle && $pageTitle ? " $sep " : '') . $pageTitle;
-        }
-
-        if (strlen($desc) > 150) {
-            $desc = substr($desc, 0, 147) . '...';
-        }
-
-        return trim($desc);
     }
 
+    /**
+     * Set fallback images
+     */
+    protected function fallbackImages(): void
+    {
+        global $header_featured_images, $prefs;
+
+        if (! empty($header_featured_images) && is_array($header_featured_images)) {
+            $this->images = $header_featured_images;
+            return;
+        }
+
+        if (! empty($prefs['socialnetworks_facebook_site_image'])) {
+            $this->og('image', $prefs['socialnetworks_facebook_site_image']);
+        }
+        if (! empty($prefs['socialnetworks_twitter_site_image'])) {
+            $this->twitter('image', $prefs['socialnetworks_twitter_site_image']);
+        }
+    }
+
+    /**
+     * Set robots
+     */
+    protected function setRobots(): void
+    {
+        global $prefs, $metatag_robotscustom, $metatag_robots;
+
+        // specific custom robots
+        if (! empty($prefs['metatag_robotscustom']) && $prefs['metatag_robotscustom'] === 'y' && ! empty($metatag_robotscustom)) {
+            $this->robots($metatag_robotscustom);
+            return;
+        }
+
+        $hasGlobal = ! empty($prefs['metatag_robots']);
+        $hasScript = ! empty($metatag_robots);
+
+        if ($hasGlobal && ! $hasScript) {
+            $this->robots($prefs['metatag_robots']);
+        } elseif (! $hasGlobal && $hasScript) {
+            $this->robots($metatag_robots);
+        } elseif ($hasGlobal && $hasScript) {
+            $scriptLower = strtolower($metatag_robots);
+            $prefsLower = strtolower($prefs['metatag_robots']);
+            $scriptRestrictive = (strpos($scriptLower, 'noindex') !== false || strpos($scriptLower, 'nofollow') !== false);
+            $prefsRestrictive = (strpos($prefsLower, 'noindex') !== false || strpos($prefsLower, 'nofollow') !== false);
+
+            if ($scriptRestrictive) {
+                $this->robots($metatag_robots);
+            } elseif ($prefsRestrictive) {
+                $this->robots($prefs['metatag_robots']);
+            } else {
+                $this->robots($prefs['metatag_robots'] . ', ' . $metatag_robots);
+            }
+        }
+    }
+
+    /**
+     * Truncate text to 150 characters (header.tpl truncate:150)
+     */
+    protected function truncate(string $text): string
+    {
+        if (strlen($text) > 150) {
+            return substr($text, 0, 147) . '...';
+        }
+        return $text;
+    }
+
+    /**
+     * Format date to ISO 8601
+     */
+    protected function formatDate($date): string
+    {
+        return date('c', is_numeric($date) ? $date : strtotime($date));
+    }
+
+    /**
+     * Get browser title from preferences
+     */
     public function getBrowserTitle(): string
     {
         global $prefs;
         return ! empty($prefs['browsertitle_translated']) ? $prefs['browsertitle_translated'] : ($prefs['browsertitle'] ?? '');
     }
 
+    /**
+     * Get breadcrumbs title (header.tpl lines 130-134)
+     */
     public function getBreadcrumbsTitle(): ?string
     {
         if ($this->breadcrumbTitle !== null) {
-            return $this->breadcrumbTitle ?? null;
+            return $this->breadcrumbTitle ?: null;
         }
 
-        global $trail, $prefs;
+        global $crumbs, $prefs;
 
         if (
-            (($prefs['feature_breadcrumbs'] === 'y') || ($prefs['site_title_breadcrumb'] === 'desc'))
-            && isset($trail)
-            && is_array($trail)
+            (($prefs['feature_breadcrumbs'] ?? '') === 'y' || ($prefs['site_title_breadcrumb'] ?? '') === 'desc')
+            && isset($crumbs)
+            && is_array($crumbs)
+            && ! empty($crumbs)
         ) {
             $crumbTitles = [];
-            foreach ($trail as $crumb) {
-                if (! empty($crumb['title'])) {
+            foreach ($crumbs as $crumb) {
+                if (is_object($crumb) && ! empty($crumb->title)) {
+                    $crumbTitles[] = $crumb->title;
+                } elseif (is_array($crumb) && ! empty($crumb['title'])) {
                     $crumbTitles[] = $crumb['title'];
                 }
             }
@@ -155,349 +785,108 @@ class HtmlHead extends MetaTags
         return $this->breadcrumbTitle;
     }
 
-    public function getTitle(): string
+    /**
+     * Build the final title
+     */
+    public function buildTitle(): string
     {
-        global $sswindowtitle, $structure, $structure_path, $aliasname;
-        global $tracker_item_main_value, $tagTitle, $title, $arttitle;
-        global $thread_info, $forum_info, $categ_info, $userinfo;
-        global $tracker_info, $page, $description, $headtitle, $prefs;
+        global $sswindowtitle, $prefs;
 
-        $pageTitle = '';
         if (! empty($sswindowtitle)) {
-            if ($sswindowtitle === 'none') {
-                $pageTitle = '&nbsp;';
-            } else {
-                $pageTitle = $sswindowtitle;
-            }
+            return $sswindowtitle === 'none' ? '&nbsp;' : $sswindowtitle;
+        }
+
+        $browserTitle = $this->getBrowserTitle();
+        $middleTitle = $this->title ?? '';
+
+        $breadcrumbsTitle = $this->getBreadcrumbsTitle();
+        if (! empty($breadcrumbsTitle)) {
+            $middleTitle = $breadcrumbsTitle;
+        }
+
+        $sep      = ! empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
+        $location = ! empty($prefs['site_title_location']) ? $prefs['site_title_location'] : '';
+
+        // assemble title
+        if ($location === 'only') {
+            return $browserTitle;
+        } elseif ($location === 'before') {
+            return $browserTitle . ($browserTitle && $middleTitle ? " $sep " : '') . $middleTitle;
+        } elseif ($location === 'after') {
+            return $middleTitle . ($middleTitle && $browserTitle ? " $sep " : '') . $browserTitle;
         } else {
-            $localAlias = $aliasname;
-            if (empty($localAlias) && isset($structure) && $structure === 'y' && ! empty($structure_path) && is_array($structure_path)) {
-                $lastItem = end($structure_path);
-                $localAlias = $lastItem['page_alias'] ?? null;
-            }
-
-            $breadcrumbsTitle = $this->getBreadcrumbsTitle();
-            if (! empty($breadcrumbsTitle)) {
-                $middleTitle = $breadcrumbsTitle;
-            } else {
-                if (! empty($tracker_item_main_value)) {
-                    $middleTitle = strlen($tracker_item_main_value) > 255
-                        ? substr($tracker_item_main_value, 0, 252) . '...'
-                        : $tracker_item_main_value;
-                } elseif (! empty($tagTitle)) {
-                    $middleTitle = $tagTitle;
-                } elseif (! empty($title) && ! is_array($title)) {
-                    $middleTitle = $title;
-                } elseif (! empty($localAlias)) {
-                    $middleTitle = $localAlias;
-                } elseif (! empty($arttitle)) {
-                    $middleTitle = $arttitle;
-                } elseif (! empty($thread_info['title'])) {
-                    $middleTitle = $thread_info['title'];
-                } elseif (! empty($forum_info['name'])) {
-                    $middleTitle = $forum_info['name'];
-                } elseif (! empty($categ_info['name'])) {
-                    $middleTitle = $categ_info['name'];
-                } elseif (! empty($userinfo['login'])) {
-                    $middleTitle = $userinfo['login'];
-                } elseif (! empty($tracker_info['pagetitle'])) {
-                    $middleTitle = $tracker_info['pagetitle'];
-                } elseif (! empty($tracker_info['name'])) {
-                    $middleTitle = $tracker_info['name'];
-                } elseif (! empty($page) && ! empty($prefs['site_title_breadcrumb']) && $prefs['site_title_breadcrumb'] === 'pagetitle') {
-                    $middleTitle = $page;
-                } elseif (! empty($description)) {
-                    $middleTitle = $description;
-                } elseif (! empty($page)) {
-                    $middleTitle = $page;
-                } elseif (! empty($headtitle)) {
-                    $middleTitle = str_replace('&nbsp;', ' ', $headtitle);
-                } else {
-                    $middleTitle = '';
-                }
-            }
-
-            $browserTitle = $this->getBrowserTitle();
-            $sep = ! empty($prefs['site_nav_seper']) ? $prefs['site_nav_seper'] : '';
-            $location = ! empty($prefs['site_title_location']) ? $prefs['site_title_location'] : '';
-
-            if ($location === 'only') {
-                $pageTitle = $browserTitle;
-            } elseif ($location === 'before') {
-                $pageTitle = $browserTitle . ($browserTitle && $middleTitle ? " $sep " : '') . $middleTitle;
-            } elseif ($location === 'after') {
-                $pageTitle = $middleTitle . ($middleTitle && $browserTitle ? " $sep " : '') . $browserTitle;
-            } else {
-                $pageTitle = $middleTitle ?: $browserTitle;
-            }
+            return $middleTitle ?: $browserTitle;
         }
-
-         return $pageTitle;
     }
 
-
-    public function getAuthor(): ?string
-    {
-        global $author, $post_info;
-
-        $pageAuthor = $author;
-        if (empty($pageAuthor) && $this->getPageType() === 'blog_post' && ! empty($post_info['author'])) {
-            $pageAuthor = $post_info['author'];
-        }
-
-        return ! empty($pageAuthor) ? $pageAuthor : null;
-    }
-
-    public function getCanonicalPath(): ?string
-    {
-        global $prefs, $page, $canonical_ending;
-
-        if ($this->canonicalPath !== null) {
-            return $this->canonicalPath;
-        }
-
-        $url = null;
-        if (($prefs['feature_canonical_url'] ?? '') === 'y' && ! empty($this->middleSectionTemplate)) {
-            switch ($this->middleSectionTemplate) {
-                case 'tiki-show_page.tpl':
-                case 'tiki-index_p.tpl':
-                case 'tiki-show_page_raw.tpl':
-                case 'tiki-all_languages.tpl':
-                case 'tiki-show_content.tpl':
-                case 'extends:layouts/internal/layout_view.tpl|tiki-show_page.tpl':
-                    if (! empty($page)) {
-                        $url = \filter_out_sefurl($page) . (! empty($canonical_ending) ? $canonical_ending : '');
-                    }
-                    break;
-
-                case 'tiki-view_tracker_item.tpl':
-                    if (! empty($_REQUEST['itemId'])) {
-                        $url = \filter_out_sefurl($_REQUEST['itemId'], 'trackeritem', null, null, 'n');
-                    }
-                    break;
-
-                case 'tiki-view_forum.tpl':
-                    if (! empty($_REQUEST['forumId'])) {
-                        $url = \filter_out_sefurl($_REQUEST['forumId'], 'forum');
-                    }
-                    break;
-
-                case 'tiki-view_forum_thread.tpl':
-                case 'tiki-print_forum_thread.tpl':
-                    if (! empty($_REQUEST['comments_parentId'])) {
-                        $url = \filter_out_sefurl($_REQUEST['comments_parentId'], 'forumthread');
-                    }
-                    break;
-
-                case 'tiki-view_blog.tpl':
-                    if (! empty($_REQUEST['blogId'])) {
-                        $url = \filter_out_sefurl($_REQUEST['blogId'], 'blog', null, null, 'n');
-                    }
-                    break;
-
-                case 'tiki-view_blog_post.tpl':
-                    if (! empty($_REQUEST['postId'])) {
-                        $url = \filter_out_sefurl($_REQUEST['postId'], 'blogpost', null, null, 'n');
-                    }
-                    break;
-
-                case 'tiki-read_article.tpl':
-                    if (! empty($_REQUEST['articleId'])) {
-                        $url = \filter_out_sefurl($_REQUEST['articleId'], 'article', null, null, 'n');
-                    }
-                    break;
-
-                case 'tiki-browse_categories.tpl':
-                    if (! empty($_REQUEST['parentId'])) {
-                        $url = \filter_out_sefurl($_REQUEST['parentId'], 'category');
-                    }
-                    break;
-
-                case 'tiki-list_file_gallery.tpl':
-                    if (isset($_REQUEST['galleryId'])) {
-                        $url = 'file' . $_REQUEST['galleryId'];
-                    }
-                    break;
-            }
-        }
-
-        $this->canonicalPath = $url;
-        return $this->canonicalPath;
-    }
-
-    public function getCanonicalUrl(): string
-    {
-        global $base_url_canonical;
-        $path = $this->getCanonicalPath();
-        return $path ? $base_url_canonical . $path : ($base_url_canonical ?? '');
-    }
-
-
-    public function getImages(): array
-    {
-        if (! empty($this->images)) {
-            return $this->images;
-        }
-
-        global $header_featured_images, $prefs, $hasImage, $topics, $base_url_canonical;
-
-        $images = [];
-        if (! empty($header_featured_images) && is_array($header_featured_images)) {
-            $images = $header_featured_images;
-        } elseif (
-            $prefs['feature_canonical_url'] === 'y'
-            && $this->middleSectionTemplate === 'tiki-read_article.tpl'
-            && ((! empty($hasImage) && $hasImage === 'y') || ! empty($topics['image_name']))
-        ) {
-            $imgUrl = '';
-            $articleId = $_REQUEST['articleId'] ?? null;
-            $topicId = $_REQUEST['topicId'] ?? null;
-
-            if (! empty($hasImage) && $hasImage === 'y' && ! empty($articleId)) {
-                $imgUrl = $base_url_canonical . 'article_image.php?image_type=article&id=' . $articleId;
-            } elseif (! empty($topics['image_name']) && ! empty($topicId)) {
-                $imgUrl = $base_url_canonical . 'article_image.php?image_type=topic&id=' . $topicId;
-            }
-
-            if (! empty($imgUrl)) {
-                $images[] = $imgUrl;
-            }
-        }
-
-        if (empty($images)) {
-            if (! empty($prefs['socialnetworks_facebook_site_image'])) {
-                $images[] = $prefs['socialnetworks_facebook_site_image'];
-            }
-            if (! empty($prefs['socialnetworks_twitter_site_image'])) {
-                $images[] = $prefs['socialnetworks_twitter_site_image'];
-            }
-        }
-
-        $this->images = $images;
-        return $this->images;
-    }
-
-
-    public function getRobots(): ?string
-    {
-        global $prefs, $metatag_robotscustom, $metatag_robots;
-
-        $content = null;
-        if (! empty($prefs['metatag_robotscustom']) && $prefs['metatag_robotscustom'] === 'y' && ! empty($metatag_robotscustom)) {
-            $content = $metatag_robotscustom;
-        } else {
-            $hasGlobal = ! empty($prefs['metatag_robots']);
-            $hasScript = ! empty($metatag_robots);
-
-            if ($hasGlobal && ! $hasScript) {
-                $content = $prefs['metatag_robots'];
-            } elseif (! $hasGlobal && $hasScript) {
-                $content = $metatag_robots;
-            } elseif ($hasGlobal && $hasScript) {
-                $scriptLower = strtolower($metatag_robots);
-                $prefsLower = strtolower($prefs['metatag_robots']);
-                $scriptRestrictive = (strpos($scriptLower, 'noindex') !== false || strpos($scriptLower, 'nofollow') !== false);
-                $prefsRestrictive = (strpos($prefsLower, 'noindex') !== false || strpos($prefsLower, 'nofollow') !== false);
-
-                if ($scriptRestrictive) {
-                    $content = $metatag_robots;
-                } elseif ($prefsRestrictive) {
-                    $content = $prefs['metatag_robots'];
-                } else {
-                    $content = $prefs['metatag_robots'] . ', ' . $metatag_robots;
-                }
-            }
-        }
-
-        return $content;
-    }
-
-    public function getPublishDate(): ?string
-    {
-        global $publishDate, $post_info;
-
-        $date = null;
-        if ($this->getPageType() === 'blog_post' && ! empty($post_info['created'])) {
-            $date = $post_info['created'];
-        } elseif (! empty($publishDate)) {
-            $date = $publishDate;
-        }
-
-        return $date ? date('c', is_numeric($date) ? $date : strtotime($date)) : null;
-    }
-
-    public function getModifiedDate(): ?string
-    {
-        global $edit_data, $post_info;
-
-        $date = null;
-        if ($this->getPageType() === 'blog_post' && ! empty($post_info['lastModif'])) {
-            $date = $post_info['lastModif'];
-        } elseif (! empty($edit_data)) {
-            $date = $edit_data;
-        }
-
-        return $date ? date('c', is_numeric($date) ? $date : strtotime($date)) : null;
-    }
-
+    /**
+     * Auto generate meta tags
+     */
     public function autoGenerate(): string
     {
         global $prefs, $base_url_canonical;
 
-        $this->title($this->getTitle())
-            ->description($this->getDescription())
+        $title = $this->buildTitle();
+
+        $this->title($title)
+            ->description($this->description ?? $title)
             ->meta('generator', 'Tiki Wiki CMS Groupware - https://tiki.org');
 
-        if (! empty($canonicalPath = $this->getCanonicalPath())) {
-            $this->canonical($base_url_canonical . $canonicalPath);
-            $this->url($base_url_canonical . $canonicalPath);
+        // canonical URL
+        if (! empty($this->canonicalUrl)) {
+            $this->canonical($this->canonicalUrl);
+            $this->url($this->canonicalUrl);
         } elseif (! empty($base_url_canonical)) {
             $this->url($base_url_canonical);
         }
 
+        // twitter domain
         if (! empty($base_url_canonical)) {
             $this->twitter('domain', $base_url_canonical);
         }
 
-        $pageType  = $this->getPageType();
-        $isArticle = in_array($pageType, ['article', 'blog_post']);
+        // open graph type
+        $isArticle = in_array($this->pageType, ['article', 'blog_post']);
         $this->og('type', $isArticle ? 'article' : 'website');
 
-        if ($isArticle && ! empty($pubDate = $this->getPublishDate())) {
-            $this->articleMeta($pubDate, $this->getModifiedDate(), $this->getAuthor());
+        // article meta
+        if ($isArticle && ! empty($this->publishDate)) {
+            $this->articleMeta($this->publishDate, $this->modifiedDate, $this->author);
         }
 
-        if (! empty($images = $this->getImages())) {
-            foreach ($images as $img) {
+        // images
+        if (! empty($this->images)) {
+            foreach ($this->images as $img) {
                 $this->image($img, 'summary');
             }
         } else {
+            $this->fallbackImages();
             $this->twitter('card', 'summary');
         }
 
+        // fb site name
         $siteName = ! empty($prefs['socialnetworks_facebook_site_name']) ? $prefs['socialnetworks_facebook_site_name'] : $this->getBrowserTitle();
         if (! empty($siteName)) {
             $this->og('site_name', $siteName);
         }
 
+        // twitter site
         $twitterSite = ! empty($prefs['socialnetworks_twitter_site']) ? $prefs['socialnetworks_twitter_site'] : $siteName;
         if (! empty($twitterSite)) {
             $this->twitter('site', $twitterSite);
         }
 
+        // fb app id
         if (! empty($prefs['socialnetworks_facebook_application_id'])) {
             $this->push('meta', ['property' => 'fb:app_id', 'content' => $prefs['socialnetworks_facebook_application_id']]);
         }
 
-        if (! empty($robots = $this->getRobots())) {
-            $this->robots($robots);
-            $this->robots($robots, 'googlebot');
-        }
-
+        // google site verification
         if (! empty($prefs['site_google_analytics_site_ownership'])) {
             $this->verification('google', $prefs['site_google_analytics_site_ownership']);
         }
 
+        // geo tags
         if (! empty($prefs['metatag_geoposition'])) {
             $this->meta('geo.position', $prefs['metatag_geoposition']);
             $this->meta('ICBM', str_replace(';', ',', $prefs['metatag_geoposition']));
@@ -511,6 +900,7 @@ class HtmlHead extends MetaTags
             $this->meta('geo.placename', $prefs['metatag_geoplacename']);
         }
 
+        // google directives
         if (($prefs['metatag_google_notranslate'] ?? 'n') === 'y') {
             $this->meta('google', 'notranslate');
         }
@@ -519,8 +909,10 @@ class HtmlHead extends MetaTags
             $this->meta('google', 'nositelinkssearchbox');
         }
 
+        // RSS feeds
         $this->generateAltLinks();
 
+        // schema.org
         if (($prefs['schema_enable'] ?? 'n') === 'y') {
             $this->generateSchema();
         }
@@ -528,7 +920,10 @@ class HtmlHead extends MetaTags
         return (string) $this;
     }
 
-    private function generateAltLinks(): void
+    /**
+     * Generate alternate links (RSS feeds, edit link)
+     */
+    protected function generateAltLinks(): void
     {
         global $prefs, $tiki_p_view, $tiki_p_read_blog, $tiki_p_read_article;
         global $tiki_p_view_file_gallery, $tiki_p_forum_read, $tiki_p_view_directory, $tiki_p_view_calendar;
@@ -560,6 +955,7 @@ class HtmlHead extends MetaTags
             }
         }
 
+        // tracker feeds
         if (
             ! empty($prefs['feature_trackers']) && $prefs['feature_trackers'] === 'y'
             && ! empty($prefs['feed_tracker']) && $prefs['feed_tracker'] === 'y'
@@ -575,6 +971,7 @@ class HtmlHead extends MetaTags
             }
         }
 
+        // edit link
         if (! empty($editable) && $editable && ! empty($page)) {
             $canEdit = (! empty($tiki_p_edit) && $tiki_p_edit === 'y') ||
                        (strtolower($page) === 'sandbox') ||
@@ -584,49 +981,65 @@ class HtmlHead extends MetaTags
                 $this->push('link', [
                     'rel' => 'alternate',
                     'type' => 'application/x-wiki',
-                    'title' => tra('Edit this page! '),
+                    'title' => tra('Edit this page!'),
                     'href' => 'tiki-editpage.php?page=' . urlencode($page)
                 ]);
             }
         }
     }
 
-
-    private function generateSchema(): void
+    /**
+     * Generate structured data
+     */
+    protected function generateSchema(): void
     {
-        global $prefs, $base_url_canonical, $trail;
+        global $prefs, $base_url_canonical, $crumbs;
 
         $entities = [];
-        $pageUrl  = $this->getCanonicalUrl();
+        $pageUrl = $this->canonicalUrl ?? $base_url_canonical;
+
         $webPageData = [
             '@id' => "{$pageUrl}#webpage",
             'url' => $pageUrl,
-            'name' => $this->getTitle(),
-            'description' => $this->getDescription()
+            'name' => $this->title,
+            'description' => $this->description ?? $this->title,
         ];
 
+        // Organization
         if (! empty($siteName = $this->getBrowserTitle())) {
             $entities[] = new Organization([
                 '@id' => "{$base_url_canonical}#organization",
                 'name' => $siteName,
                 'url' => $base_url_canonical,
-                'logo' => $prefs['sitelogo_src']
+                'logo' => $prefs['sitelogo_src'] ?? null,
             ]);
         }
 
-        if (! empty($trail) && is_array($trail) && count($trail) > 0) {
+        // Breadcrumbs
+        if (! empty($crumbs) && is_array($crumbs) && count($crumbs) > 0) {
             $listItems = [];
-            foreach ($trail as $k => $crumb) {
-                if (! empty($crumb['title'])) {
+            foreach ($crumbs as $k => $crumb) {
+                $title = null;
+                $url = null;
+
+                if (is_object($crumb)) {
+                    $title = $crumb->title ?? null;
+                    $url = $crumb->url ?? null;
+                } elseif (is_array($crumb)) {
+                    $title = $crumb['title'] ?? null;
+                    $url = $crumb['url'] ?? null;
+                }
+
+                if (! empty($title)) {
                     $position = $k + 1;
                     $item = [
                         '@type' => 'ListItem',
                         'position' => $position,
-                        'name' => $crumb['title']
+                        'name' => $title,
                     ];
 
-                    if (! empty($crumb['url']) && $position < count($trail)) {
-                        $item['item'] = (strpos($crumb['url'], 'http') === 0) ? $crumb['url'] : $base_url_canonical . $crumb['url'];
+                    if (! empty($url) && $position < count($crumbs)) {
+                        $item['item'] = (strpos($url, 'http') === 0) ? $url : $base_url_canonical . $url;
                     }
 
                     $listItems[] = $item;
@@ -636,53 +1049,49 @@ class HtmlHead extends MetaTags
             if (! empty($listItems)) {
                 $entities[] = new BreadcrumbList([
                     '@id' => "{$pageUrl}#breadcrumb",
-                    'itemListElement' => $listItems
+                    'itemListElement' => $listItems,
                 ]);
-
                 $webPageData['breadcrumb'] = ['@id' => "{$pageUrl}#breadcrumb"];
             }
         }
 
         $entities[] = new WebPage($webPageData);
 
-        $pageType  = $this->getPageType();
-        $postId    = $_REQUEST['postId'] ?? null;
-        $articleId = $_REQUEST['articleId'] ?? null;
-
-        if (($pageType === 'article' && ! empty($articleId)) || ($pageType === 'blog_post' && ! empty($postId))) {
+        // Article or BlogPosting
+        if (in_array($this->pageType, ['article', 'blog_post'])) {
             $postData = [
-                'headline' => $this->getTitle(),
-                'description' => $this->getDescription(),
+                'headline' => $this->buildTitle(),
+                'description' => $this->description ?? $this->buildTitle(),
                 'url' => $pageUrl,
                 'mainEntityOfPage' => ['@id' => "{$pageUrl}#webpage"],
-                'publisher' => ['@id' => "{$base_url_canonical}#organization"]
+                'publisher' => ['@id' => "{$base_url_canonical}#organization"],
             ];
 
-            if (! empty($images = $this->getImages())) {
-                $postData['image'] = count($images) === 1 ? $images[0] : $images;
+            if (! empty($this->images)) {
+                $postData['image'] = count($this->images) === 1 ? $this->images[0] : $this->images;
             }
 
-            if (! empty($author = $this->getAuthor())) {
+            if (! empty($this->author)) {
                 $postData['author'] = new Thing(
                     type: 'Person',
-                    props: ['name' => $author]
+                    props: ['name' => $this->author]
                 );
             }
 
-            if (! empty($pubDate = $this->getPublishDate())) {
-                $postData['datePublished'] = $pubDate;
+            if (! empty($this->publishDate)) {
+                $postData['datePublished'] = $this->publishDate;
             }
 
-            if (! empty($modDate = $this->getModifiedDate())) {
-                $postData['dateModified'] = $modDate;
+            if (! empty($this->modifiedDate)) {
+                $postData['dateModified'] = $this->modifiedDate;
             }
 
-            if ($pageType === 'article') {
+            if ($this->pageType === 'article') {
                 $entities[] = new Article($postData);
             } else {
                 $entities[] = new BlogPosting($postData);
             }
-        } // TODO: resolve/detect other types.
+        } // TODO: detect other types.
 
         if (! empty($entities)) {
             $this->schema(new Schema(...$entities));
