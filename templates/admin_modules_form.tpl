@@ -13,8 +13,8 @@
     {if isset($assign_info)}<div class="description form-text">{$assign_info.description}{if isset($assign_info.documentation)} {help url=$assign_info.documentation}{/if}</div>{/if}
 </div>
 <div id="module_params">
-{tabset name="module_params{$assign_name}" toggle="n"}
-    {if !empty($assign_name)}
+{if !empty($assign_name)}
+    {tabset name="module_params{$assign_name}" toggle="n" cookietab=1}
         {tab name="{tr}Basic{/tr}" key=basic}
             <fieldset id="param_section_basic">
                 <div class="clearfix mb-3">
@@ -154,11 +154,11 @@
                     {self_link um_edit=$assign_name cookietab="2" _anchor="editcreate"}{tr}Edit custom module{/tr} {icon name="next"}{/self_link}
                 </div>
             {/if}
-        <div class="d-flex justify-content-center submit-container">
-            <input type="submit" class="btn btn-secondary me-2" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false;">
+        <div class="d-flex justify-content-center submit-container mt-2">
+            {button edit_assign=0 cookietab=2 _type="secondary" _class="me-2" href="#assign" _auto_args="edit_assign,cookietab" _text="{tr}Preview{/tr}"}
             <input type="submit" class="btn btn-primary" name="assign" value="{tr}Assign{/tr}" onclick="needToConfirm=false;">
         </div>
-    {/if}
+    {/tabset}
+{/if}
 
-{/tabset}
 </div>
