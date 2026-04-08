@@ -170,8 +170,8 @@ class Hm_Custom_Session extends Hm_Session {
         }
         $page_param_name = $this->site_config->get('page_param_name') ?? 'page';
         $output = str_replace("?$page_param_name=", "?page=" . $this->get('page') . "&$page_param_name=", $output);
-        $output = str_replace('<input type="hidden" name="page" value=', '<input type="hidden" name="page_id" value="' . $this->get('page_id') . '"><input type="hidden" name="page" value=', $output);
-        $output = str_replace('<input type=\\"hidden\\" name=\\"page\\" value=', '<input type=\\"hidden\\" name=\\"page_id\\" value=\\"' . $this->get('page_id') . '\\"><input type=\\"hidden\\" name=\\"page\\" value=', $output);
+        $output = str_replace('<input type="hidden" name="' . $page_param_name . '"', '<input type="hidden" name="page" value="' . $this->get('page') . '"><input type="hidden" name="' . $page_param_name . '"', $output);
+        $output = str_replace('<input type=\\"hidden\\" name=\\"' . $page_param_name . '\\"', '<input type=\\"hidden\\" name=\\"page\\" value=\\"' . $this->get('page') . '\\"><input type=\\"hidden\\" name=\\"' . $page_param_name . '\\"', $output);
         return $output;
     }
 
