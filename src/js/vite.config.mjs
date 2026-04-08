@@ -154,7 +154,17 @@ export default defineConfig(({ command, mode }) => {
         resolve: {
             alias: {
                 "moment-timezone": resolve(__dirname, "../../node_modules/moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js"),
-                "html2canvas": "html2canvas-pro"
+                "html2canvas": "html2canvas-pro",
+                // ui-predicate-vue3
+                "ui-predicate-vue3/dist/ui-predicate-vue3.css": resolve(
+                    __dirname,
+                    "../../node_modules/ui-predicate-vue3/dist/ui-predicate-vue3.css"
+                ),
+                // npm "main" is Parcel IIFE assigning to undeclared parcelRequire — invalid in ESM (strict). Bundle CJS sources.
+                "ui-predicate-core": resolve(
+                    __dirname,
+                    "../../node_modules/ui-predicate-core/src/index.js"
+                ),
             },
         },
         build: {

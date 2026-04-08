@@ -966,8 +966,8 @@ class CalendarLib extends TikiLib
             }
 
             $query = 'INSERT INTO `tiki_calendar_items` (' . implode(',', $l) . ') VALUES (' . implode(',', $z) . ')';
-            $result = $this->query($query, $r);
-            $calitemId = $this->GetOne("SELECT MAX(`calitemId`) FROM `tiki_calendar_items` where `calendarId`=?", [$data["calendarId"]]);
+            $this->query($query, $r);
+            $calitemId = $this->lastInsertId();
             $this->add_change($data['calendarId'], $calitemId, 1);
         }
 

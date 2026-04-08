@@ -32,7 +32,7 @@ $auto_query_args = ['offset', 'find', 'sort_mode', 'faqId'];
 $access->check_feature('feature_faqs');
 $access->check_permission('tiki_p_view_faqs');
 //get_strings tra('Admin FAQs')
-$maxFaqTitleLength = $faqlib->getFaqTitleMaxLength();
+$maxFaqTitleLength = FaqLib::MAX_FAQ_TITLE_LENGTH;
 $smarty->assign('MAX_FAQ_TITLE_LENGTH', $maxFaqTitleLength);
 
 if (! isset($_REQUEST["faqId"])) {

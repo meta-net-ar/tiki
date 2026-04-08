@@ -120,6 +120,11 @@
     }
 }
 
+// Improve appearance when two areas with same background color meet
+.navbar-wrapper:has(.tiki-admin-aside-nav-light) {
+    box-shadow: 5px 0 10px -5px #e3e1e1;
+}
+
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
     --tiki-admin-top-nav-bg: rgba(50, 93, 136, 1);

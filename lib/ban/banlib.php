@@ -291,18 +291,26 @@ class BanLib extends TikiLib
             $query = "insert into `tiki_banning`(`mode`,`title`,`ip1`,`ip2`,`ip3`,`ip4`,`user`,`date_from`,`date_to`,`use_dates`,`message`,`attempts`,`created`) " .
                 "values(?,?,?,?,?,?,?,FROM_UNIXTIME(?),FROM_UNIXTIME(?),?,?,?,?)";
             $resultInsert = $this->query($query, [$mode, $title, $ip1, $ip2, $ip3, $ip4, $user, $date_from, $date_to, $use_dates, $message, $attempt, $this->now]);
-            $banId = $this->getOne("select max(`banId`) from `tiki_banning` where `created`=?", [$this->now]);
+            $banId = $this->lastInsertId();
         }
 
         $oldSections = TikiDb::get()->table('tiki_banning_sections')->fetchColumn('section', ['banId' => $banId]);
         $query = "delete from `tiki_banning_sections` where `banId`=?";
         $this->query($query, [$banId]);
+        if (! empty($sections)) {
+            $values = [];
+            $bindvars = [];
 
-        foreach ($sections as $section) {
-            $query = "insert into `tiki_banning_sections`(`banId`,`section`) values(?,?)";
+            foreach ($sections as $section) {
+                $values[] = "(?, ?)";
+                $bindvars[] = (int) $banId;
+                $bindvars[] = $section;
+            }
 
-            $resultSections = $this->query($query, [$banId, $section]);
+            $query = "INSERT INTO `tiki_banning_sections` (`banId`, `section`) VALUES " . implode(', ', $values);
+            $this->query($query, $bindvars);
         }
+
         $newSections = TikiDb::get()->table('tiki_banning_sections')->fetchColumn('section', ['banId' => $banId]);
 
         if (isset($resultInsert)) {

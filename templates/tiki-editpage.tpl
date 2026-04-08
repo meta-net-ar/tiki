@@ -15,6 +15,11 @@
         {title}{tr}Update '{$page}'{/tr}{/title}
     {/if}
 {/block}
+{function name="render_editor" content=""}
+    {textarea codemirror='true' aria-label="{tr}Edit page{/tr}"}{$content}{/textarea}
+{/function}
+{$loadtextarea={render_editor content=$pagedata}}
+
 {block name=content}
     {if $page|lower neq 'sandbox' and $prefs.feature_contribution eq 'y' and $prefs.feature_contribution_mandatory eq 'y'}
         {remarksbox type='tip' title="{tr}Tip{/tr}"}
@@ -285,7 +290,7 @@
                             {tr}Reproduce the changes highlighted on the left using the editor below{/tr}.
                         </div>
                     {/if}
-                    {textarea codemirror='true' aria-label="{tr}Edit page{/tr}"}{$pagedata}{/textarea}
+                    {$loadtextarea}
                         {if $prefs.wiki_freetags_edit_position eq 'edit'}
                             {if $prefs.feature_freetags eq 'y' and $tiki_p_freetags_tag eq 'y'}
                                 <fieldset>

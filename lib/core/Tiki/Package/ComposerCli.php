@@ -213,7 +213,7 @@ class ComposerCli
         $canExecute = false;
 
         if ($this->composerPharExists()) {
-            list($output) = $this->execComposer(['--no-ansi', '--version']);
+            list($output) = $this->execComposer(['--no-ansi', '--version'], 5);
             if (strncmp($output, 'Composer', 8) == 0) {
                 $canExecute = true;
             }
@@ -236,9 +236,10 @@ class ComposerCli
      * Execute Composer
      *
      * @param $args
+     * @param int|null $timeout
      * @return array
      */
-    protected function execComposer($args)
+    protected function execComposer($args, $timeout = null)
     {
         global $prefs;
 
@@ -271,7 +272,29 @@ class ComposerCli
 
             $process = new Process($args, null, $env);
             $command = $process->getCommandLine();
-            $process->setTimeout($this->timeout);
+            $timeout = $timeout ?? $this->timeout;
+
+            $maxExecutionTime = (int) ini_get('max_execution_time');
+            if ($maxExecutionTime > 0) {
+                $elapsed = 0;
+                if (isset($_SERVER['REQUEST_TIME_FLOAT'])) {
+                    $elapsed = microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'];
+                } elseif (isset($_SERVER['REQUEST_TIME'])) {
+                    $elapsed = time() - $_SERVER['REQUEST_TIME'];
+                }
+
+                $remaining = $maxExecutionTime - $elapsed;
+                $safeTimeout = $remaining - 5;
+
+                if ($safeTimeout < 1) {
+                    $safeTimeout = 1;
+                }
+                if ($timeout > $safeTimeout) {
+                    $timeout = $safeTimeout;
+                }
+            }
+
+            $process->setTimeout($timeout);
             $process->run();
 
             $code = $process->getExitCode();

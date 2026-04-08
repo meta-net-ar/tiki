@@ -720,6 +720,15 @@ When the limit is reached, no more files can be uploaded. The user will see an e
             'default' => '250',
             'units' => 'pixels'
         ],
+        'fgal_file_max_archives' => [
+            'name' => tra('Default maximum number of archives for each file'),
+            'description' => tra('The default maximum number of archives for each file'),
+            'shorthint' => tra('Use: 0=unlimited, -1=none.'),
+            'type' => 'text',
+            'filter' => 'int',
+            'size' => 4,
+            'default' => 0
+        ],
         'fgal_export_diagram_on_image_save' => [
             'name' => tra('Export diagram image on save'),
             'description' => tra('If enabled, diagrams will be cached in PNG format when saved or edited.'),

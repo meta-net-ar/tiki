@@ -758,7 +758,7 @@ class Comments extends TikiLib
         if ($threadId) {
             $timestamp = (int) $this->table('tiki_comments')->fetchOne('commentDate', ['threadId' => $threadId]);
         } else {
-            $timestamp = (int) $this->now;
+            $timestamp = $this->now;
         }
 
         $queue = $this->table('tiki_forums_queue');

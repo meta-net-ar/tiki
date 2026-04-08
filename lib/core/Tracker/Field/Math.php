@@ -64,6 +64,16 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
                             'text_sort' => tr('Text'),
                         ],
                     ],
+                    'overridable' => [
+                        'name' => tr('Overridable'),
+                        'description' => tr('Allow the value to be overridden by the user. Useful when calculated value is stored in the field to avoid recalculations but still need a way to override it.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                    ],
                 ],
             ],
         ];
@@ -86,7 +96,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
 
     public function renderInput($context = [])
     {
-        return tr('Value will be re-calculated on save. Current value: %0', $this->getValue());
+        return $this->renderTemplate('trackerinput/math.tpl', $context);
     }
 
     public function renderOutput($context = [])
@@ -190,6 +200,9 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
      */
     public function handleFinalSave(array &$data)
     {
+        if ($this->getOption('overridable') && $this->getValue()) {
+            return $this->getValue();
+        }
         try {
             $this->prepareFieldValues($data);
             $data = array_merge($data, $this->calcMetadata());

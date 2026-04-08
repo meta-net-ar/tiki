@@ -511,8 +511,7 @@ class BlogLib extends TikiDb_Bridge
 
             $result = $this->query($query, [$created, $lastModif, $title, $description, $user, $public, 0, (int) $maxPosts, 0, $heading, $use_title, $use_title_in_post, $use_description, $use_breadcrumbs, $use_author, $add_date, $use_find, $allow_comments, $allow_post_categorization, $show_avatar, $alwaysOwner, $post_heading, $show_related, $related_max, $use_excerpt]);
 
-            $query2 = "select max(`blogId`) from `tiki_blogs` where `lastModif`=?";
-            $blogId = $this->getOne($query2, [$lastModif]);
+            $blogId = $this->lastInsertId();
 
             TikiLib::events()->trigger(
                 'tiki.blog.create',
@@ -742,50 +741,45 @@ class BlogLib extends TikiDb_Bridge
      * @param string $sort_mode
      * @param string $find
      * @param string $date
+     *
      * @access public
-     * @return void
+     * @return array
      */
     public function list_all_blog_posts($offset = 0, $maxRecords = -1, $sort_mode = 'created_desc', $find = '', $date = '')
     {
 
-        if ($find) {
-            $findesc = '%' . $find . '%';
+        $bindvars = [];
+        $conditions = [];
 
-            $mid = " where (`data` like ?) ";
-            $bindvars = [$findesc];
-        } else {
-            $mid = "";
-            $bindvars = [];
+        if ($find) {
+            $conditions[] = "`p`.`data` LIKE ?";
+            $bindvars[] = '%' . $find . '%';
         }
 
         if ($date) {
+            $conditions[] = "`p`.`created` <= ?";
             $bindvars[] = $date;
-            if ($mid) {
-                $mid .= " and `created`<=? ";
-            } else {
-                $mid .= " where `created`<=? ";
-            }
         }
 
-        $query = "select * from `tiki_blog_posts` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_count = "select count(*) from `tiki_blog_posts` $mid";
-        $result = $this->fetchAll($query, $bindvars, $maxRecords, $offset);
+        $whereSql = ! empty($conditions) ? ' WHERE ' . implode(' AND ', $conditions) : '';
+
+        // Use JOIN to get the blog title in the primary query
+        $query = "SELECT p.*, b.`title` as `blogtitle` 
+              FROM `tiki_blog_posts` p
+              LEFT JOIN `tiki_blogs` b ON p.`blogId` = b.`blogId`
+              $whereSql ORDER BY " . $this->convertSortMode($sort_mode);
+
+        $query_count = "select count(*) from `tiki_blog_posts` p $whereSql";
+
         $count = $this->getOne($query_count, $bindvars);
-        $ret = [];
+        $result = $this->fetchAll($query, $bindvars, $maxRecords, $offset);
 
         $result = Perms::filter(['type' => 'blog post'], 'object', $result, ['object' => 'postId'], ['read_blog', 'blog_post_view_ref']);
 
-        foreach ($result as $res) {
-            $query2 = "select `title` from `tiki_blogs` where `blogId`=?";
-            $title = $this->getOne($query2, [$res["blogId"]]);
-            $res["blogtitle"] = $title;
-            $ret[] = $res;
-        }
-
-        $retval = [];
-        $retval["data"] = $ret;
-        $retval["count"] = $count;
-        return $retval;
+        return [
+            "data" => $result,
+            "count" => $count
+        ];
     }
 
     /**
@@ -820,11 +814,10 @@ class BlogLib extends TikiDb_Bridge
         }
 
         $query = "insert into `tiki_blog_posts`(`blogId`,`data`,`excerpt`,`created`,`user`,`title`,`priv`,`wysiwyg`) values(?,?,?,?,?,?,?,?)";
-        $result = $this->query($query, [(int) $blogId, $data, $excerpt, (int) $created, $user, $title, $priv, $wysiwyg]);
-        $query = "select max(`postId`) from `tiki_blog_posts` where `created`=? and `user`=?";
-        $id = $this->getOne($query, [(int) $created, $user]);
+        $result = $this->query($query, [$blogId, $data, $excerpt, (int) $created, $user, $title, $priv, $wysiwyg]);
+        $id = $this->lastInsertId();
         $query = "update `tiki_blogs` set `lastModif`=?,`posts`=`posts`+1 where `blogId`=?";
-        $result = $this->query($query, [(int) $created, (int) $blogId]);
+        $result = $this->query($query, [(int) $created, $blogId]);
         $this->add_blog_activity($blogId);
 
         $wikilib = TikiLib::lib('wiki');
@@ -848,7 +841,7 @@ class BlogLib extends TikiDb_Bridge
 
             if ($prefs['feature_daily_report_watches'] == 'y') {
                 $query = "select `title` from `tiki_blogs` where `blogId`=?";
-                $blogTitle = $this->getOne($query, [(int)$blogId]);
+                $blogTitle = $this->getOne($query, [$blogId]);
                 $reportsManager = Reports_Factory::build('Reports_Manager');
                 $reportsManager->addToCache($nots, ["event" => 'blog_post', "blogId" => $blogId, "blogTitle" => $blogTitle, "postId" => $id, "user" => $user]);
             }
@@ -904,31 +897,36 @@ class BlogLib extends TikiDb_Bridge
     {
         global $user;
         $tikilib = TikiLib::lib('tiki');
+        try {
+            $this->beginTransaction();
+            $query = "delete from `tiki_blogs` where `blogId`=?";
+            $this->query($query, [(int) $blogId]);
 
-        $query = "delete from `tiki_blogs` where `blogId`=?";
+            $query = "select `postId` from `tiki_blog_posts` where `blogId`=?";
+            $result = $this->query($query, [(int) $blogId]);
 
-        $result = $this->query($query, [(int) $blogId]);
+            if ($res = $result->fetchRow()) {
+                $tikilib->remove_object('post', $res['postId']);
+            }
 
-        $query = "select `postId` from `tiki_blog_posts` where `blogId`=?";
-        $result = $this->query($query, [(int) $blogId]);
-        if ($res = $result->fetchRow()) {
-            $tikilib->remove_object('post', $res['postId']);
+            $query = "delete from `tiki_blog_posts` where `blogId`=?";
+            $result = $this->query($query, [(int) $blogId]);
+            $tikilib->remove_object('blog', $blogId);
+
+            TikiLib::events()->trigger(
+                'tiki.blog.delete',
+                [
+                    'type' => 'blog',
+                    'object' => $blogId,
+                    'user' => $user,
+                ]
+            );
+            $this->commit();
+            return true;
+        } catch (\Exception) {
+            $this->rollback();
+            return false;
         }
-
-        $query = "delete from `tiki_blog_posts` where `blogId`=?";
-        $result = $this->query($query, [(int) $blogId]);
-        $tikilib->remove_object('blog', $blogId);
-
-        TikiLib::events()->trigger(
-            'tiki.blog.delete',
-            [
-                'type' => 'blog',
-                'object' => $blogId,
-                'user' => $user,
-            ]
-        );
-
-        return true;
     }
 
     /**
@@ -1011,7 +1009,7 @@ class BlogLib extends TikiDb_Bridge
      * @param mixed $postId
      * @param bool $adjacent whether to return or not adjacent posts
      * @access public
-     * @return The post
+     * @return array | bool post
      */
     public function get_post($postId, $adjacent = false)
     {
