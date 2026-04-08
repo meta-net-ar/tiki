@@ -328,7 +328,7 @@ function wikiplugin_cypht($data, $params)
         }
     }
 
-    $_SESSION[$session_prefix]['page_id'] = $tikilib->get_page_id_from_name($page);
+    $_SESSION[$session_prefix]['page'] = $page;
 
     require_once  'vendor_bundled/vendor/cypht-org/cypht/index.php';
 

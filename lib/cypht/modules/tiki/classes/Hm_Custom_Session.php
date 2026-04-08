@@ -156,9 +156,8 @@ class Hm_Custom_Session extends Hm_Session {
 
     /**
      * When Cypht runs in a wiki page as a wiki plugin and SEFURL is off
-     * replace all Cypht links to include the page_id of the wiki page
-     * so tiki-index can load the correct wiki page. Cypht reuses page param
-     * for its internal uses.
+     * ensure that the page parameter is preserved in links as links in Cypht are absolute search params,
+     * which would result in the wiki page parameter being lost during navigation.
      */
     public function dedup_page_links($output)
     {
@@ -166,10 +165,11 @@ class Hm_Custom_Session extends Hm_Session {
         if ($prefs['feature_sefurl'] === 'y') {
             return $output;
         }
-        if (! $this->get('page_id')) {
+        if (! $this->get('page')) {
             return $output;
         }
-        $output = str_replace("?page=", "?page_id=" . $this->get('page_id') . "&page=", $output);
+        $page_param_name = $this->site_config->get('page_param_name') ?? 'page';
+        $output = str_replace("?$page_param_name=", "?page=" . $this->get('page') . "&$page_param_name=", $output);
         $output = str_replace('<input type="hidden" name="page" value=', '<input type="hidden" name="page_id" value="' . $this->get('page_id') . '"><input type="hidden" name="page" value=', $output);
         $output = str_replace('<input type=\\"hidden\\" name=\\"page\\" value=', '<input type=\\"hidden\\" name=\\"page_id\\" value=\\"' . $this->get('page_id') . '\\"><input type=\\"hidden\\" name=\\"page\\" value=', $output);
         return $output;
