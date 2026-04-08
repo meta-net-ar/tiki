@@ -227,7 +227,7 @@ li.archivedate {
 .fb-image {
     margin: 0 -12px 10px -12px;
     line-height: 0;
-    
+
     img {
         width: 100%;
         height: auto;
@@ -261,7 +261,7 @@ li.archivedate {
     font-size: 14px;
     color: #050505;
     margin-bottom: 4px;
-    
+
     a {
         color: #050505;
         text-decoration: none;
@@ -304,7 +304,7 @@ li.archivedate {
     font-weight: 600;
     text-decoration: none;
     transition: background 0.2s;
-    
+
     &:hover {
         background: #166fe5;
         color: #fff;
@@ -399,6 +399,11 @@ li.login_link ul li a {
 .siteloginbar_popup img {
     border-radius: var(--bs-border-radius);
     height: 2.5rem;
+}
+
+.siteloginbar_poppedup.dropdown-menu {
+    width: 300px;
+    max-width: 90vw;
 }
 
 .navbar-form .siteloginbar_poppedup .form-control,
@@ -589,7 +594,7 @@ header.fixed-top {
     align-items: center; 
     justify-content: center;
   }
-  
+
 #toggleSwitch_modules {
     margin: 0;
 }
