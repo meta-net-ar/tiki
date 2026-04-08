@@ -164,6 +164,8 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 /* src/js/tiki-vue-sfc-loader */
                 "@tiki-vue-sfc-loader" => $tikiUrl . JS_ASSETS_PATH . "/tiki-vue-sfc-loader.js",
 
+                /* single-spa microfrontends and common files (root and styleguide) */
+                "@vue-mf/comments" => $tikiUrl . JS_ASSETS_PATH . "/comments.js",
                 /* src/js/vue-mf single-spa microfrontends and common files (root and styleguide) */
                 "@vue-mf/duration-picker" => $tikiUrl . JS_ASSETS_PATH . "/duration-picker.js",
                 "@vue-mf/emoji-picker" => $tikiUrl . JS_ASSETS_PATH . "/emoji-picker.js",

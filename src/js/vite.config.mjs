@@ -1,5 +1,6 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import vueDevTools from "vite-plugin-vue-devtools";
 import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { viteStaticCopy } from "vite-plugin-static-copy";
@@ -129,6 +130,7 @@ export default defineConfig(({ command, mode }) => {
         "element-plus-ui/select-root-css": resolve(__dirname, "vue-widgets/element-plus-ui/src/components/Select/select.scss"),
         "tiki-html5-qrcode": resolve(__dirname, "tiki-html5-qrcode/index.js"),
         kanban: resolve(__dirname, "vue-mf/kanban/src/kanban.js"),
+        comments: resolve(__dirname, "vue-mf/comments/src/comments.js"),
         "root-config": resolve(__dirname, "vue-mf/root-config/src/root-config.js"),
         "tiki-3d-model-viewer": resolve(__dirname, "tiki-model3dviewer/model3dviewer.js"),
         "tiki-glightbox": resolve(__dirname, "tiki-glightbox/glightbox-index.js"),
@@ -173,13 +175,12 @@ export default defineConfig(({ command, mode }) => {
             // Allow large tools: SVGEdit, Avatar Generator, SFC Loader, Emoji Picker, 3D Viewer.
             chunkSizeWarningLimit: 2500,
             minify: mode === "production",
-            sourcemap: mode === "production",
+            sourcemap: mode !== "production", //We want the sourcemaps in dev, for .vue, .scss, etc.
             cssCodeSplit: true,
             // emit manifest so PHP can find the hashed files
             manifest: true,
             target: "es2022", //https://caniuse.com/?search=es2022 Who cares about IE these days...
             optimizeDeps: {
-                disabled: false,
                 include: ["@event-calendar/core"],
                 //If you ever need to debug a dependency and see your changes do this (ref: https://dev.to/hontas/using-vite-with-linked-dependencies-37n7):
                 //exclude: ["svelte"],
@@ -275,6 +276,7 @@ export default defineConfig(({ command, mode }) => {
                     },
                 },
             }),
+            vueDevTools(),
 
             //These are re-bundled files that need to be read at runtime
 
