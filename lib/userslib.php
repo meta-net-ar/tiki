@@ -7240,7 +7240,7 @@ class UsersLib extends TikiLib
         list($secret, $userId) = explode('.', $cookie, 2);
         $query = 'select `userId` from `tiki_user_login_cookies` where `secret`=? and `userId`=? and `expiration` > NOW()';
 
-        if ($userId === $this->getOne($query, [$secret, $userId])) {
+        if ($userId === (string) $this->getOne($query, [$secret, $userId])) {
             return $userId;
         } else {
             TikiLib::lib('logs')->add_log('login', 'get_user_by_cookie failed', $userId);
