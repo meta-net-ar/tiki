@@ -38,6 +38,11 @@ layout_basic.fullscreen,
 }
 
 // Copied from base_files/scss/_tiki-selectors.scss (which these child themes don't import)
+
+.tiki .popover {
+    z-index: $zindex-popover; // 1070
+}
+
 .tiki .wiki.external + .icon-link-external, // wikitext
 .tiki .wiki.external .icon-link-external,
 .editable-inline .icon { // Tracker inline editing
