@@ -8,7 +8,7 @@ function wikiplugin_trackeritemcopy_info()
 {
     return [
         'name' => tra('Copy Tracker Item'),
-        'documentation' => tra('PluginTrackerItemCopy'),
+        'documentation' => 'PluginTrackerItemCopy',
         'description' => tra('Copy a tracker item'),
         'prefs' => ['wikiplugin_trackeritemcopy', 'feature_trackers'],
         'validate' => 'all',
