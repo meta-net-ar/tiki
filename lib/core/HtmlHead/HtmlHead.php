@@ -151,7 +151,6 @@ class HtmlHead extends MetaTags
         }
 
         $this->setCanonicalUrl();
-        $this->setRobots();
     }
 
     /**
@@ -683,40 +682,39 @@ class HtmlHead extends MetaTags
         }
     }
 
-    /**
-     * Set robots
-     */
-    protected function setRobots(): void
+
+    public function getRobots(): ?string
     {
         global $prefs, $metatag_robotscustom, $metatag_robots;
 
-        // specific custom robots
+        $content = null;
         if (! empty($prefs['metatag_robotscustom']) && $prefs['metatag_robotscustom'] === 'y' && ! empty($metatag_robotscustom)) {
-            $this->robots($metatag_robotscustom);
-            return;
-        }
+            $content = $metatag_robotscustom;
+        } else {
+            $hasGlobal = ! empty($prefs['metatag_robots']);
+            $hasScript = ! empty($metatag_robots);
 
-        $hasGlobal = ! empty($prefs['metatag_robots']);
-        $hasScript = ! empty($metatag_robots);
+            if ($hasGlobal && ! $hasScript) {
+                $content = $prefs['metatag_robots'];
+            } elseif (! $hasGlobal && $hasScript) {
+                $content = $metatag_robots;
+            } elseif ($hasGlobal && $hasScript) {
+                $scriptLower = strtolower($metatag_robots);
+                $prefsLower = strtolower($prefs['metatag_robots']);
+                $scriptRestrictive = (strpos($scriptLower, 'noindex') !== false || strpos($scriptLower, 'nofollow') !== false);
+                $prefsRestrictive = (strpos($prefsLower, 'noindex') !== false || strpos($prefsLower, 'nofollow') !== false);
 
-        if ($hasGlobal && ! $hasScript) {
-            $this->robots($prefs['metatag_robots']);
-        } elseif (! $hasGlobal && $hasScript) {
-            $this->robots($metatag_robots);
-        } elseif ($hasGlobal && $hasScript) {
-            $scriptLower = strtolower($metatag_robots);
-            $prefsLower = strtolower($prefs['metatag_robots']);
-            $scriptRestrictive = (strpos($scriptLower, 'noindex') !== false || strpos($scriptLower, 'nofollow') !== false);
-            $prefsRestrictive = (strpos($prefsLower, 'noindex') !== false || strpos($prefsLower, 'nofollow') !== false);
-
-            if ($scriptRestrictive) {
-                $this->robots($metatag_robots);
-            } elseif ($prefsRestrictive) {
-                $this->robots($prefs['metatag_robots']);
-            } else {
-                $this->robots($prefs['metatag_robots'] . ', ' . $metatag_robots);
+                if ($scriptRestrictive) {
+                    $content = $metatag_robots;
+                } elseif ($prefsRestrictive) {
+                    $content = $prefs['metatag_robots'];
+                } else {
+                    $content = $prefs['metatag_robots'] . ', ' . $metatag_robots;
+                }
             }
         }
+
+        return $content;
     }
 
     /**
@@ -862,6 +860,15 @@ class HtmlHead extends MetaTags
         } else {
             $this->fallbackImages();
             $this->twitter('card', 'summary');
+        }
+
+        // robots.
+        if (! empty($robots = $this->getRobots())) {
+            $this->robots($robots);
+            $this->robots($robots, 'googlebot');
+        } elseif ($this->pageType === null) { // my tiki pages.
+            $this->robots('NOINDEX, NOFOLLOW');
+            $this->robots('NOINDEX, NOFOLLOW', 'googlebot');
         }
 
         // fb site name
