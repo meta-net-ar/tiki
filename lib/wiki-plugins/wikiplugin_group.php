@@ -106,12 +106,17 @@ function wikiplugin_group($data, $params)
     if (isset($groupPluginReturnAll) && $groupPluginReturnAll == true) {
         return $data . $dataelse;
     }
+    $defaults = [];
+    $defaults = WikiPlugin_Helper::applyParamsDefaults($defaults, wikiplugin_group_info());
+    $params = array_merge($defaults, $params);
 
     $groups = $params['groups'];
     $notgroups = $params['notgroups'];
     $allowedUsers = $params['users'];
     $userPending = [];
     $userNotPending = [];
+    $notpending = [];
+    $pending = [];
     if (! is_null($params['pending']) || ! is_null($params['notpending'])) {
         $pending = $params['pending'] ?? [];
         $notpending = $params['notpending'] ?? [];
