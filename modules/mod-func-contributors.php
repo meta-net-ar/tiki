@@ -27,7 +27,6 @@ function module_contributors($mod_reference, $module_params)
     $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
-    $headerlib = TikiLib::lib('header');
     $wikilib = TikiLib::lib('wiki');
     $currentObject = current_object();
     if ($currentObject && $currentObject['type'] == 'wiki page') {
@@ -35,7 +34,6 @@ function module_contributors($mod_reference, $module_params)
         if ($objectperms->view) {
             $contributors = $wikilib->get_contributors($currentObject['object']);
             $contributors_details = [];
-            $headerlib->add_css('div.contributors div br {clear: both;}'); // Avoid avatar conflicts with lines below
             foreach ($contributors as $contributor) {
                 $details = ['login' => $contributor];
                 $details['realName'] = $userlib->get_user_preference($contributor, 'realName');
