@@ -656,7 +656,7 @@ class HtmlHead extends MetaTags
             $this->canonicalUrl = $base_url_canonical . $this->canonicalPath;
         }
 
-        if (! $this->description && !empty($prefs['metatag_description'])) {
+        if (! $this->description && ! empty($prefs['metatag_description'])) {
             $this->description = $prefs['metatag_description'];
         }
 
