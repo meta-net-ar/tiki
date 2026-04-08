@@ -750,7 +750,7 @@ class HeaderLib
         $this->outputHeadersWasStartedBy   = $this->getOutputCallerInfo();
         // Middle section template is set after headerlib instance created,
         // So in order to get the value we have to move it here.
-        $this->head->middleSectionTemplate = TikiLib::lib('smarty')->getTemplateVars('mid');
+        $this->head->init(TikiLib::lib('smarty')->getTemplateVars('mid'));
 
         ksort($this->cssfiles);
         ksort($this->css);
@@ -775,7 +775,7 @@ class HeaderLib
         if (count($this->rssfeeds)) {
             foreach ($this->rssfeeds as $x => $rssf) {
                 foreach ($rssf as $rsstitle => $rssurl) {
-                    $this->head->feed(url: $rssurl, title: $this->convert_cdn($rsstitle));
+                    $this->head->feed(url: $this->convert_cdn($rssurl), title: $rsstitle);
                 }
             }
         }
