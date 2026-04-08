@@ -402,7 +402,8 @@ li.login_link ul li a {
 }
 
 .siteloginbar_poppedup.dropdown-menu {
-    min-width: 300px;
+    width: 300px;
+    max-width: 90vw;
 }
 
 .navbar-form .siteloginbar_poppedup .form-control,
