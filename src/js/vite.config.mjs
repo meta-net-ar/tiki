@@ -629,6 +629,10 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/boomerangjs/",
                     },
                     {
+                        src: "node_modules/vue/dist/vue.esm-browser.prod.js",
+                        dest: "vendor_dist/vue/dist",
+                    },
+                    {
                         src: "node_modules/boomerangjs/plugins/rt.js",
                         dest: "vendor_dist/boomerangjs/plugins",
                     },
