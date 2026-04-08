@@ -45,19 +45,18 @@
                 <li>{tr}CryptPad integration for collaborative Office document editing{/tr}</li>
                 <li>{tr}PeerTube integration for decentralized video hosting{/tr}</li>
                 <li>{tr}Prosody and Converse.js integration with Tiki as identity provider{/tr}</li>
-                <li>{tr}BigBlueButton integration for online meetings{/tr}</li>
             </ul>
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}New Wiki Plugins{/tr}</legend>
             <ul>
-                <li>{tr}Lottie plugin for displaying animations{/tr}</li>
-                <li>{tr}Model3DViewer plugin for 3D objects{/tr}</li>
-                <li>{tr}FancyLink plugin for rich link previews{/tr}</li>
-                <li>{tr}Mermaid diagrams support for workflows and charts{/tr}</li>
-                <li>{tr}YouTube plugin with responsive video support{/tr}</li>
-                <li>{tr}PluginImg Reflection Update{/tr}</li>
-                 <li>{tr}Sublist Plugin: Memory Optimization with limitfields{/tr}</li>
+            <li>{tr}Lottie plugin for displaying animations{/tr}</li>
+            <li>{tr}Model3DViewer plugin for 3D objects{/tr}</li>
+            <li>{tr}FancyLink plugin for rich link previews{/tr}</li>
+            <li>{tr}Mermaid diagrams support for workflows and charts{/tr}</li>
+            <li>{tr}YouTube plugin with responsive video support{/tr}</li>
+            <li>{tr}PluginImg Reflection Update{/tr}</li>
+            <li>{tr}Sublist Plugin: Memory Optimization with limitfields{/tr}</li>
             </ul>
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
@@ -73,11 +72,19 @@
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}Developers & Technical Improvements{/tr}</legend>
             <ul>
-                <li>{tr}Mermaid diagrams used for transitions and visualizations{/tr}</li>
-                <li>{tr}PHPStan static analysis integrated into CI{/tr}</li>
-                <li>{tr}Node.js 24 support in build system{/tr}</li>
-                <li>{tr}Git commit information available in admin panel{/tr}</li>
+            <li>{tr}Mermaid diagrams used for transitions and visualizations{/tr}</li>
+            <li>{tr}PHPStan static analysis integrated into CI{/tr}</li>
+            <li>{tr}Node.js 24 support in build system{/tr}</li>
+            <li>{tr}Git commit information available in admin panel{/tr}</li>
             </ul>
+        </fieldset>
+        <fieldset class="mb-3 w-100 clearfix featurelist">
+            <legend>{tr}Key Settings{/tr}</legend>
+            {preference name=url_fragment_format}
+            {preference name=feature_wysiwyg}
+            {preference name=feature_ajax}
+            {preference name=feature_two_factor_auth}
+            {preference name=feature_file_galleries}
         </fieldset>
         <i>
             {tr}This release focuses on stability and long-term improvements rather than major breaking changes.{/tr}
