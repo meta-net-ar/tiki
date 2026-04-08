@@ -83,7 +83,6 @@
             {preference name=url_fragment_format}
             {preference name=feature_wysiwyg}
             {preference name=feature_ajax}
-            {preference name=feature_two_factor_auth}
             {preference name=feature_file_galleries}
         </fieldset>
         <i>
