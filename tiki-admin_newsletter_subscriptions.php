@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'            => [
@@ -334,11 +337,10 @@ if (isset($_REQUEST['export'])) {
             die;
 }
 
-if (! isset($_REQUEST["sort_mode"])) {
-            $sort_mode = 'subscribed_desc';
-} else {
-            $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'subscribed_desc',
+    ['tiki_newsletter_subscriptions']
+);
 $offset = $_REQUEST["offset"] ?? 0;
 
         $find = $_REQUEST["find"] ?? '';

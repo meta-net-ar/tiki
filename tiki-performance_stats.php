@@ -30,13 +30,45 @@ if (! empty($_REQUEST['clear']) && $access->checkCsrf()) {
 $find = $_REQUEST['find'] ?? '';
 $averageStatOffset = $_REQUEST['average_stat_offset'] ?? 0;
 $maximumStatOffset = $_REQUEST['maximum_stat_offset'] ?? 0;
-$maximumStatOrder = $_REQUEST['maximum_stat_order'] ?? 'DESC';
-$averageStatOrder = $_REQUEST['average_stat_order'] ?? 'DESC';
-$orderType = 'average_stat_order';
-if (! empty($_REQUEST['no_of_requests'])) {
-    $averageStatOrder = $_REQUEST['no_of_requests'];
-    $orderType = 'no_of_requests';
+
+/**
+ * Validates a sort direction ('ASC' or 'DESC').
+ * Falls back to a default if invalid, and provides feedback on invalid input.
+ */
+function validateDirection(?string $direction, string $default = 'DESC'): string
+{
+    $allowedDirections = ['ASC', 'DESC'];
+
+    if (! is_string($direction)) {
+        return $default;
+    }
+
+    $normalized = strtoupper($direction);
+
+    if (in_array($normalized, $allowedDirections, true)) {
+        return $normalized;
+    }
+
+    // Detect and report invalid input that is not null, not a string, or not an allowed value.
+    Feedback::warning(tra(
+        'Invalid sort direction provided. ' . $direction . ' only ASC or DESC is allowed'
+    ));
+
+    return $default;
 }
+
+// Determine the order type and the requested direction.
+if (! empty($_REQUEST['no_of_requests'])) {
+    $orderType = 'no_of_requests';
+    $requestedAverageOrder = $_REQUEST['no_of_requests'];
+} else {
+    $orderType = 'average_stat_order';
+    $requestedAverageOrder = $_REQUEST['average_stat_order'] ?? null;
+}
+
+// Validate directions
+$averageStatOrder = validateDirection($requestedAverageOrder);
+$maximumStatOrder = validateDirection($_REQUEST['maximum_stat_order'] ?? null);
 
 $smarty->assign('performance_stats_lib', $performanceLib);
 $smarty->assign('find', $find);

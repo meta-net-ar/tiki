@@ -462,6 +462,7 @@
             "Type": "../lib/core/",
             "WikiParser": "../lib/core/",
             "WikiPlugin": "../lib/core/",
+            "SortModeValidator": "../lib/core/",
             "Text": "vendor/tikiwiki/text-wiki-mediawiki/"
         },
         "psr-4": {

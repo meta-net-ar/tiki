@@ -5,6 +5,9 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
+
+use Tiki\SortModeValidator;
+
 if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
@@ -67,9 +70,11 @@ if (! empty($_REQUEST['find'])) {
 if (! empty($_REQUEST['offset'])) {
     $offset = $_REQUEST['offset'];
 }
-if (! empty($_REQUEST['sort_mode'])) {
-    $sort_mode = $_REQUEST['sort_mode'];
-}
+
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'created_desc',
+    ['tiki_tracker_item_attachments']
+);
 
 $smarty->assign_by_ref('find', $find);
 $smarty->assign_by_ref('offset', $offset);
