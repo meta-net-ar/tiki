@@ -1091,7 +1091,7 @@ if ($prefs['feature_realtime'] == 'y') {
 
 if ($prefs['feature_calendar'] === 'y') {
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/dist/index.css");
-    $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar";');
+    $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar"; window.moduleCalendar = [];');
     $headerlib->add_js_module('import "@jquery-tiki/eventcalendar_to_pdf";');
 }
 

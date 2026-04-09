@@ -151,6 +151,8 @@ $prefs = [
     'webcron_enabled' => 'n',
     //tiki-user_preferences.php
     'remember_closed_rboxes' => 'n',
+    // \Tiki\Smarty\SmartyTiki::initializePaths
+    'feature_webservices' => 'n',
 ];
 
 require_once 'lib/init/initlib.php';

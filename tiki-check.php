@@ -3487,11 +3487,22 @@ if (! $standalone) {
             'message' => tra('Composer found')
         );
     } else {
-        $composerChecks['composer'] = array(
-            'fitness' => tra('bad'),
-            'fitness_status' => FITNESS_STATUS_BAD,
-            'message' => tra('Composer not found')
-        );
+        $lastResult = $composerManager->getComposer()->getLastResult();
+        $isTimeout = $lastResult && stripos($lastResult['errors'], 'timeout') !== false;
+
+        if ($isTimeout) {
+            $composerChecks['composer'] = array(
+                'fitness' => tra('unsure'),
+                'fitness_status' => FITNESS_STATUS_UNSURE,
+                'message' => tra('Composer check timed out. This may indicate a system-level process blocking issue (e.g. antivirus scanning) or severe resource constraints.')
+            );
+        } else {
+            $composerChecks['composer'] = array(
+                'fitness' => tra('bad'),
+                'fitness_status' => FITNESS_STATUS_BAD,
+                'message' => tra('Composer not found')
+            );
+        }
     }
 
     if (extension_loaded('bz2')) {

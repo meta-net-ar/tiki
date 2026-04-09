@@ -283,7 +283,7 @@ class Services_File_FinderController
             $id = $ar[1];
             if ($isgal) {
                 $visible = $this->isVisible($id, $data, $isgal);
-            } else {
+            } else if (isset($this->parentIds['files'][$id])) {
                 $visible = $this->isVisible($this->parentIds['files'][$id], $data, $isgal);
             }
         } else {

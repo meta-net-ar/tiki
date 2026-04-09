@@ -32,6 +32,15 @@ add_handler('ajax_tiki_groupmail', 'groupmail_fetch_messages', true);
 add_handler('ajax_tiki_groupmail', 'save_imap_cache', true);
 add_output('ajax_tiki_groupmail', 'filter_groupmail_data', true);
 
+/* ajax trackers callback data */
+setup_base_ajax_page('ajax_tiki_trackers', 'core');
+add_handler('ajax_tiki_trackers', 'load_imap_servers_from_config', true, 'imap', 'load_user_data', 'after');
+add_handler('ajax_tiki_trackers', 'imap_oauth2_token_check', true, 'imap');
+add_handler('ajax_tiki_trackers', 'close_session_early', true, 'core');
+add_handler('ajax_tiki_trackers', 'trackers_fetch_messages', true);
+add_handler('ajax_tiki_trackers', 'save_imap_cache', true);
+add_output('ajax_tiki_trackers', 'filter_trackers_data', true);
+
 /* ajax take groupmail */
 setup_base_ajax_page('ajax_take_groupmail', 'core');
 add_handler('ajax_take_groupmail', 'prepare_groupmail_settings', true, 'tiki', 'load_user_data', 'after');
@@ -122,7 +131,12 @@ add_handler('settings', 'before_save_user_settings', true, 'tiki', 'save_user_se
 add_handler('settings', 'after_save_user_settings', true, 'tiki', 'save_user_settings', 'after');
 add_handler('settings', 'process_enable_oauth2_over_imap', true, 'tiki', 'save_user_settings', 'before');
 add_handler('settings', 'process_enable_gmail_contacts_module', true, 'tiki', 'save_user_settings', 'before');
+add_handler('settings', 'process_trackers_setting', true, 'core', 'date', 'after');
+
 add_output('settings', 'debug_mode_setting', true, 'tiki', 'start_unread_settings', 'before');
+add_output('settings', 'start_trackers_settings', true, 'core', 'flagged_source_max_setting', 'after');
+add_output('settings', 'trackers_since_setting', true, 'core', 'start_trackers_settings', 'after');
+add_output('settings', 'trackers_source_max_setting', true, 'core', 'trackers_since_setting', 'after');
 add_output('settings', 'start_advanced_settings', true, 'core', 'end_settings_form', 'before');
 add_output('settings', 'allow_external_images_setting', true, 'tiki', 'start_advanced_settings', 'after');
 add_output('settings', 'enable_oauth2_over_imap_setting', true, 'tiki', 'allow_external_images_setting', 'after');
@@ -132,6 +146,7 @@ add_output('settings', 'enable_gmail_contacts_module_setting', true, 'tiki', 'en
 add_handler('message', 'tracker_message_list_type', true, 'core', 'message_list_type', 'after');
 add_handler('message', 'tiki_download_message', true, 'core', 'message_list_type', 'after');
 add_handler('message_list', 'check_path_redirect', true, 'core', 'load_user_data', 'after');
+add_handler('message_list', 'load_trackers_data_sources', true, 'tiki', 'message_list_type', 'after');
 add_handler('compose', 'tiki_presave_sent', true, 'smtp', 'imap_save_sent', 'before');
 add_handler('compose', 'tiki_mark_as_answered', true, 'smtp', 'process_compose_form_submit', 'after');
 add_handler('compose', 'tiki_save_sent', true, 'smtp', 'tiki_mark_as_answered', 'after');
@@ -218,6 +233,7 @@ add_output('info', 'config_map', true, 'developer', 'server_status_end', 'after'
 
 /* folder list */
 add_output('ajax_hm_folders', 'info_page_link', true, 'developer', 'settings_menu_end', 'before');
+add_output('ajax_hm_folders', 'combined_trackers_link', true, 'tiki', 'main_menu_content', 'before');
 
 /* sieve filters */
 add_handler('sieve_filters', 'tiki_add_sieve_config_host', true, 'tiki', 'load_imap_servers_from_config', 'after');
@@ -245,6 +261,7 @@ return [
   'allowed_pages' => [
     'groupmail',
     'ajax_tiki_groupmail',
+    'ajax_tiki_trackers',
     'ajax_take_groupmail',
     'ajax_put_back_groupmail',
     'ajax_rsvp_action',
@@ -343,5 +360,7 @@ return [
     'limit' => FILTER_VALIDATE_INT,
     'in_reply_to' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
     'auto_move' => FILTER_VALIDATE_BOOLEAN,
+    'trackers_per_source' => FILTER_VALIDATE_INT,
+    'trackers_since' => FILTER_SANITIZE_FULL_SPECIAL_CHARS,
   ]
 ];

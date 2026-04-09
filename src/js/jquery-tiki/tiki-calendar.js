@@ -460,3 +460,70 @@ $(function () {
         window.location.href = url.toString();
     });
 });
+
+$.fn.defineParameterOfMultipleCalendar = function (
+    eventCalendarParams,
+    printingParams,
+    divClassContainer,
+    moduleCalendarFocusdate,
+    linkToFindItemsOfCalendar,
+    associatedWikiPage,
+    returnUrl
+) {
+    let paramOfModuleCalendar = eventCalendarParams;
+
+    /**
+     *Since window.moduleCalendar is a global variable, It’s the one we use to contain all the calendars that are currently being displayed,
+     *I first push an empty array into it as preparation
+     *for the container where the calendar will be placed. I do this initially because I also need to know
+     *the index of the calendar I will be using.
+
+     *After that, I create the node where the calendar will be displayed and set the parameters around the
+     *calendar currently being created.
+     */
+
+    window.moduleCalendar.push([]);
+    let takeLength = window.moduleCalendar.length;
+    const calendarContainer = window.moduleCalendar[takeLength - 1];
+
+    var newNode = $('<div class="calendar"></div>').attr("id", "calendar-" + takeLength);
+    const dateOfChangeCalendar = $('<input type="date" class="form-control date-calendar mt-2 mb-2 w-50" >')
+        .attr("id", "date-calendar-" + takeLength)
+        .attr("value", moduleCalendarFocusdate);
+
+    $(divClassContainer)
+        .eq(takeLength - 1)
+        .append(dateOfChangeCalendar);
+    $(divClassContainer)
+        .eq(takeLength - 1)
+        .append(newNode);
+    paramOfModuleCalendar["initialDate"] = $("#date-calendar" + takeLength).val();
+
+    displayCalendarAndPrintButton(takeLength);
+    dateOfChangeCalendar.on("change", function () {
+        paramOfModuleCalendar["initialDate"] = dateOfChangeCalendar.val();
+        let takeIndex = dateOfChangeCalendar.attr("id").split("-")[2];
+        newNode.empty();
+        displayCalendarAndPrintButton(takeIndex);
+    });
+    function displayCalendarAndPrintButton(takeIndex) {
+        const { pdf_export, pdf_warning, pref_print_pdf_from_url } = printingParams;
+        newNode.setupEventCalendar(
+            paramOfModuleCalendar,
+            calendarContainer,
+            "calendar-" + takeIndex,
+            linkToFindItemsOfCalendar,
+            returnUrl,
+            associatedWikiPage
+        );
+        if (pdf_export == "y" && pdf_warning == "n") {
+            const printButton = $('<a href="#" class="text-end d-none" role="button"> Export as PDF</a>').attr("id", "calendar-pdf-btn-" + takeIndex);
+            $(divClassContainer)
+                .eq(takeIndex - 1)
+                .append(printButton);
+        }
+        if (pref_print_pdf_from_url != "none") {
+            newNode.addEventCalendarPrint("#calendar-pdf-btn-" + takeIndex, calendarContainer);
+        }
+    }
+};

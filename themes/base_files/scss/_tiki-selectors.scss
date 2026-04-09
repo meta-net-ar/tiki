@@ -600,6 +600,10 @@ ul.all_languages > li {
     border: 1px solid $success;
 }
 
+.tiki .popover {
+    z-index: $zindex-popover;
+}
+
 // /* mouseover plugin */
 .plugin-mouseover {
     background: $popover-bg;

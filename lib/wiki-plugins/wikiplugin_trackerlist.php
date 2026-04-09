@@ -2184,10 +2184,10 @@ function wikiplugin_trackerlist($data, $params)
                     Feedback::errorAndDie(tra("This feature is disabled, Please go into the settings and enable the calendar feature"), \Laminas\Http\Response::STATUS_CODE_401);
                 }
 
-                foreach ($items['data'] as $i => $item) {
+                for ($i = 0; $i < count($items['data']); $i++) {
                     if (! empty($wiki)) {
-                        $smarty->assign('fields', $item['field_values']);
-                        $smarty->assign('item', $item);
+                        $smarty->assign('fields', $items['data'][$i]['field_values']);
+                        $smarty->assign('item', $items['data'][$i]);
                         $smarty->assign('wiki', "wiki:$wiki");
                         $smarty->assign('showpopup', 'n');
                         try {
@@ -2197,8 +2197,8 @@ function wikiplugin_trackerlist($data, $params)
                         }
                     }
                     if (! empty($tplwiki)) {
-                        $smarty->assign('fields', $item['field_values']);
-                        $smarty->assign('item', $item);
+                        $smarty->assign('fields', $items['data'][$i]['field_values']);
+                        $smarty->assign('item', $items['data'][$i]);
                         $smarty->assign('wiki', "tplwiki:$tplwiki");
                         $smarty->assign('showpopup', 'n');
                         try {
@@ -2207,7 +2207,6 @@ function wikiplugin_trackerlist($data, $params)
                             $associatedWikiPage[$items['data'][$i]['itemId']] = $se->getMessage();
                         }
                     }
-
                     if (empty($associatedWikiPage[$items['data'][$i]['itemId']])) {
                         $associatedWikiPage[$items['data'][$i]['itemId']] = $trklib->get_isMain_value($trackerId, $item['itemId']);
                     }
@@ -2223,12 +2222,13 @@ function wikiplugin_trackerlist($data, $params)
                 foreach (array_diff(array_keys($takePermNames), $calendarfielddate) as $value) {
                     $takeKeysOfTitleAndDescriptionOfEvent[] = $value;
                 }
+
                 $urlOfFetchingData = [
                     'title' => array_key_exists($takeKeysOfTitleAndDescriptionOfEvent[0], $takePermNames) ? $takePermNames[$takeKeysOfTitleAndDescriptionOfEvent[0]] : '',
                     'description' => array_key_exists($takeKeysOfTitleAndDescriptionOfEvent[1], $takePermNames) ? $takePermNames[$takeKeysOfTitleAndDescriptionOfEvent[1]] : '',
                     'trackerId' => $trackerId,
                     'beginField' => $takePermNames[$calendarfielddate[0]],
-                    'endField' => array_key_exists($calendarfielddate[1], $takePermNames) ? $takePermNames[$calendarfielddate[0]] : null,
+                    'endField' => array_key_exists($calendarfielddate[1], $takePermNames) ? $takePermNames[$calendarfielddate[1]] : null,
                     'filters' => '',
                     'maxRecords' => 200,
                 ];
@@ -2246,7 +2246,9 @@ function wikiplugin_trackerlist($data, $params)
                         'initialView'      => 'dayGridMonth',
                     ]
                 );
+                $moduleCalendarIds = '';
                 $moduleCalendarFocusdate = date("Y-m-d");
+                $smarty->assign('moduleCalendarIds', $moduleCalendarIds);
                 $smarty->assign('associatedWikiPage', $associatedWikiPage);
                 $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
                 $smarty->assign('urlOfFetchingData', $urlOfFetchingData);
@@ -2275,6 +2277,7 @@ function wikiplugin_trackerlist($data, $params)
                 $smarty->assign('showpopup', 'n');
                 $headerlib = TikiLib::lib('header');
                 $headerlib->add_cssfile('themes/base_files/feature_css/calendar.css', 20);
+                $smarty->assign('uniqueId', rand());
                 return $smarty->fetch('modules/mod-calendar_new.tpl');
             }
             if (! empty($wiki)) {

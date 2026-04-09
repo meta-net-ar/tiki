@@ -1105,40 +1105,32 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
     public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
-        if ($this->getOption('indexGeometry') && $this->getValue()) {
-            return ['geo_located', 'geo_file', 'geo_file_format', $baseKey];
-        } else {
-            $fields = [
-                $baseKey,
-                "{$baseKey}_text",
-                "{$baseKey}_names",
-                "{$baseKey}_filenames",
-                "{$baseKey}_filetypes",
-            ];
-            return $fields;
-        }
+        $fields = [
+            $baseKey,
+            "{$baseKey}_text",
+            "{$baseKey}_names",
+            "{$baseKey}_filenames",
+            "{$baseKey}_filetypes",
+            'geo_located',
+            'geo_file',
+            'geo_file_format',
+        ];
+        return $fields;
     }
 
     public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
-        if ($this->getOption('indexGeometry') && $this->getValue()) {
-            return [
-                'geo_located' => 'identifier',
-                'geo_file' => 'identifier',
-                'geo_file_format' => 'identifier',
-                $baseKey => 'identifier'
-            ];
-        } else {
-            $baseKey = $this->getBaseKey();
-            return [
-                $baseKey => 'sortable',
-                "{$baseKey}_text" => 'sortable',
-                "{$baseKey}_names" => 'multivalue',
-                "{$baseKey}_filenames" => 'multivalue',
-                "{$baseKey}_filetypes" => 'multivalue',
-            ];
-        }
+        return [
+            $baseKey => 'sortable',
+            "{$baseKey}_text" => 'sortable',
+            "{$baseKey}_names" => 'multivalue',
+            "{$baseKey}_filenames" => 'multivalue',
+            "{$baseKey}_filetypes" => 'multivalue',
+            'geo_located' => 'identifier',
+            'geo_file' => 'identifier',
+            'geo_file_format' => 'identifier',
+        ];
     }
 
     public function getGlobalFields(): array
