@@ -174,7 +174,7 @@ class PerspectiveLib
         global $prefs;
         $section = Sections::getCurrentSection();
 
-        if (! isset($section) || ! Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
+        if (! isset($section) || (! Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))) {
             if ($persp = $this->get_current_perspective($prefs)) {
                 $perspectivePreferences = $this->get_preferences($persp);
                 $prefs = $perspectivePreferences + $prefs;

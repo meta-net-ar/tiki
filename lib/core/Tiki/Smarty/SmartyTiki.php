@@ -651,7 +651,7 @@ class SmartyTiki extends Smarty
     {
         global $prefs;
 
-        if (! Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
+        if (! Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT)) {
             $selectedLayout = $prefs['site_layout'] ?? $prefs['site_layout_admin'] ?? SMARTY_DEFAULT_LAYOUT;
         } else {
             $selectedLayout = $prefs['site_layout_admin'] ?? $prefs['site_layout'] ?? SMARTY_DEFAULT_LAYOUT;

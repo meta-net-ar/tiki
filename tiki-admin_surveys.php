@@ -27,7 +27,7 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 include_once('lib/surveys/surveylib.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 $access->check_feature('feature_surveys');
 
