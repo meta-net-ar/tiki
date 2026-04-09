@@ -21,8 +21,6 @@ use Exception;
  */
 class Installer extends TikiDb_Bridge implements SplSubject
 {
-    public const WARNING_THRESHOLD_PATCH = '20260301';
-
     public static $instance = null; // Singleton instance
     private $observers;
 
@@ -365,25 +363,11 @@ class Installer extends TikiDb_Bridge implements SplSubject
 
         $isCI = ! empty($_ENV['TIKI_CATCH_UPDATE_WARNINGS']) || getenv('TIKI_CATCH_UPDATE_WARNINGS');
         $warnings = [];
-        $warnErr = '';
-        $warnResult = $this->queryError('SHOW WARNINGS', $warnErr);
+        $warnResult = self::get()->query('SHOW WARNINGS', reporterrors: \TikiDb::ERR_NONE);
 
         if ($warnResult) {
-            $isIgnorableContext = empty($this->currentPatchName) || $this->currentPatchName < self::WARNING_THRESHOLD_PATCH;
             while ($row = $warnResult->fetchRow()) {
                 if ($row['Level'] === 'Warning' || $row['Level'] === 'Error') {
-                    if ($isIgnorableContext && in_array((int)$row['Code'], [124, 1060, 1061, 1062, 1091, 1681, 1831])) {
-                        // These are common warnings from old patches that we can safely skip.
-                        // 124: InnoDB rebuilding table (happens during fulltext index creation)
-                        // 1060: Duplicate column name
-                        // 1061: Duplicate key name
-                        // 1062: Duplicate entry
-                        // 1091: Can't DROP '...'; check that column/key exists
-                        // 1681: Integer display width is deprecated (display_width is deprecated since MySQL 8.0.17)
-                        // 1831: Duplicate index
-                        // These usually happen when we re-run the same patch more than once.
-                        continue;
-                    }
                     $warnings[] = $row['Level'] . ' ' . $row['Code'] . ': ' . $row['Message'];
                 }
             }
@@ -403,17 +387,6 @@ class Installer extends TikiDb_Bridge implements SplSubject
             }
             return $result;
         } else {
-            // The query failed. Can we ignore it (for old patches)?
-            $isOldPatchContext = ! empty($this->currentPatchName) && $this->currentPatchName < self::WARNING_THRESHOLD_PATCH;
-            if ($isOldPatchContext && empty($warnings)) {
-                // All warnings/errors were filtered out (they were common/ignorable)
-                if ($countQueries) {
-                    $this->queries['successful'][] = $query;
-                }
-                return true; // Treat as success
-            }
-
-            // For NEW patches in CI, throw detailed exception even on failure
             if ($isCI && ! empty($warnings)) {
                 throw new MySQLWarningException("MySQL Error/Warning(s) caught during upgrade in query:\n$query\nDetails:\n" . implode("\n", $warnings));
             }
