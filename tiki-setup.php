@@ -265,8 +265,7 @@ if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
 }
 
-$iconset = TikiLib::lib('iconset')->getIconsetForTheme($prefs['theme'], $prefs['theme_option']);
-Tiki\Lib\Theme\ThemeLib::registerThemeAssets($iconset);
+Tiki\Lib\Theme\ThemeLib::registerThemeAssets();
 
 //6) include UAB admin CSS and layout in case we are on an admin or management page (when script file name contains the string)
 

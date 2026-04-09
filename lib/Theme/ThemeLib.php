@@ -593,18 +593,18 @@ class ThemeLib extends TikiLib
             $headerlib->add_css('@media (min-width: 1200px) { .container { max-width:' . (! empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') . '; } }');
         }
 
-        //2) Always add tiki_base.css. Add it first, so that it can be overriden in the custom themes
+        // Always add tiki_base.css. Add it first, so that it can be overriden in the custom themes
         $headerlib->add_cssfile("themes/base_files/css/tiki_base.css");
 
-        //3) Always add bundled font-awesome css for the default icon fonts
+        // Always add bundled font-awesome css for the default icon fonts
         $headerlib->add_cssfile(FONTAWESOME_CSS_PATH . '/all.css');
 
-        // 3a) Optionally add bundled Bootstrap-icons CSS for the optional Bootstrap icons
+        // Optionally add bundled Bootstrap-icons CSS for the optional Bootstrap icons
         if ($prefs['theme_iconset'] === 'bootstrap_icon_font') {
             $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
         }
 
-        //4) Add Addon custom css first, so it can be overridden by themes
+        // Add Addon custom css first, so it can be overridden by themes
         foreach (\Tiki\Package\ExtensionManager::getEnabledPackageExtensions() as $package) {
             $finder = new \Symfony\Component\Finder\Finder();
 
@@ -616,7 +616,7 @@ class ThemeLib extends TikiLib
         }
 
         self::headerSetupForThemeChange($theme_active, $theme_option_active, $headerlib, $prefs);
-        //7) include optional custom.css if there. In case of theme option, first include main theme's custom.css, than the option's custom.css
+        // include optional custom.css if there. In case of theme option, first include main theme's custom.css, than the option's custom.css
         if (! empty($theme_option_active)) {
             $main_theme_path       = $themelib->get_theme_path($theme_active);
             $main_theme_custom_css = "{$main_theme_path}/css/custom.css";
@@ -732,9 +732,9 @@ class ThemeLib extends TikiLib
      * @param object $headerlib
      * @param array $prefs
      */
-    public static function registerThemeAssets($iconset)
+    public static function registerThemeAssets()
     {
-        global $prefs, $smarty, $user;
+        global $prefs, $smarty, $user, $iconset;
 
         $headerlib = TikiLib::lib('header');
         $userlib = TikiLib::lib('user');
@@ -743,11 +743,13 @@ class ThemeLib extends TikiLib
         $theme_option_active = $prefs['theme_option'];
 
         self::headerSetupForThemeChange($theme_active, $theme_option_active, $headerlib, $prefs);
+        // produce $iconset to be used for generating icons
+        $iconset = TikiLib::lib('iconset')->getIconsetForTheme($theme_active, $theme_option_active);
         // and add js support file
         $headerlib->add_js('jqueryTiki.iconset = ' . json_encode($iconset->getJS()));
         $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 
-        //6) include UAB admin CSS and layout in case we are on an admin or management page (when script file name contains the string)
+        // include UAB admin CSS and layout in case we are on an admin or management page (when script file name contains the string)
         $groups = $userlib->get_user_groups($user);
 
         if ($prefs['theme_unified_admin_backend'] === 'y' && in_array('Admins', $groups) && (strpos($_SERVER['PHP_SELF'], 'admin') || strpos($_SERVER['PHP_SELF'], 'cache') || strpos($_SERVER['PHP_SELF'], 'import') || strpos($_SERVER['PHP_SELF'], 'manage') || strpos($_SERVER['PHP_SELF'], 'permissions') || strpos($_SERVER['PHP_SELF'], 'stats') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_banner') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_categories') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_perspective') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_quiz') || strpos($_SERVER['PHP_SELF'], 'tiki-export') || strpos($_SERVER['PHP_SELF'], 'tiki-import') || strpos($_SERVER['PHP_SELF'], 'tiki-list_banners') || strpos($_SERVER['PHP_SELF'], 'tiki-list_comments') || strpos($_SERVER['PHP_SELF'], 'tiki-list_contents') || strpos($_SERVER['PHP_SELF'], 'tiki-plugins') || strpos($_SERVER['PHP_SELF'], 'tiki-received') || strpos($_SERVER['PHP_SELF'], 'tiki-sys'))) { // TODO: refactor this check into an array of all admin and management pages we want to include and the related perms to access in UAB layout
@@ -780,7 +782,7 @@ class ThemeLib extends TikiLib
 
     private static function headerSetupForThemeChange($theme_active, $theme_option_active, $headerlib, $prefs)
     {
-         //5) Now add the theme or theme option
+         // Now add the theme or theme option
         if (! empty($prefs['header_custom_scss'])) {
             // TODO call compile_custom_scss() here
         } elseif ($theme_active == 'custom_url' && ! empty($prefs['theme_custom_url'])) {
