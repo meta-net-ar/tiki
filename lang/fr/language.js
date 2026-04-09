@@ -67,6 +67,26 @@ lang = {
     "Copied to clipboard" : "Copié dans le presse-papiers",
     "Failure to copy. Check permissions for clipboard" : "Échec de la copie. Vérifiez les permissions du presse-papiers",
     "New event" : "Nouvel événement",
-    "Edit event" : "Modifier l'événement"
+    "Edit event" : "Modifier l'événement",
+    "Delete the event" : "Supprimer l'événement",
+    "Are you sure you want to delete the event %0 ?" : "Êtes-vous sûr de vouloir supprimer l'événement %0 ?",
+    "Please add your email to list of participants." : "Veuillez ajouter votre adresse courriel à la liste des participants.",
+    "The field Start - End is mandatory" : "Le champ Début - Fin est obligatoire",
+    "Show duration" : "Afficher la durée",
+    "Show end time" : "Afficher l'heure de fin",
+    "There's no such date as" : "Cette date n'existe pas :",
+    "of" : "de",
+    "January" : "janvier",
+    "February" : "février",
+    "March" : "mars",
+    "April" : "avril",
+    "May" : "mai",
+    "June" : "juin",
+    "July" : "juillet",
+    "August" : "août",
+    "September" : "septembre",
+    "October" : "octobre",
+    "November" : "novembre",
+    "December" : "décembre"
     // remember the IE does not support ending comma on last item
 };

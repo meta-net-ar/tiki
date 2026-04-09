@@ -335,10 +335,10 @@
                             <br>
                             <div class="row">
                                 <div class="col-sm-9">
-                                    <input type="text" name="add_participant_email" id="add_participant_email" value="" placeholder="or invite by email address..." class="form-control">
+                                    <input type="text" name="add_participant_email" id="add_participant_email" value="" placeholder="{tr}or invite by email address...{/tr}" class="form-control">
                                 </div>
                                 <div class="col-sm-3">
-                                    <input type="button" class="btn btn-primary btn-sm" value="Add" id="invite_emails">
+                                    <input type="button" class="btn btn-primary btn-sm" value="{tr}Add{/tr}" id="invite_emails">
                                 </div>
                             </div>
                             <br>
@@ -378,10 +378,10 @@
                                             <td>{$ppl.username|userlink}</td>
                                             <td>
                                                 <select name="calitem[participant_partstat][{$ppl.username}]" class="form-control">
-                                                    <option value="NEEDS-ACTION">NEEDS-ACTION</option>
-                                                    <option value="ACCEPTED" {if $ppl.partstat eq 'ACCEPTED'}selected{/if}>ACCEPTED</option>
-                                                    <option value="TENTATIVE" {if $ppl.partstat eq 'TENTATIVE'}selected{/if}>TENTATIVE</option>
-                                                    <option value="DECLINED" {if $ppl.partstat eq 'DECLINED'}selected{/if}>DECLINED</option>
+                                                    <option value="NEEDS-ACTION">{tr}NEEDS-ACTION{/tr}</option>
+                                                    <option value="ACCEPTED" {if $ppl.partstat eq 'ACCEPTED'}selected{/if}>{tr}ACCEPTED{/tr}</option>
+                                                    <option value="TENTATIVE" {if $ppl.partstat eq 'TENTATIVE'}selected{/if}>{tr}TENTATIVE{/tr}</option>
+                                                    <option value="DECLINED" {if $ppl.partstat eq 'DECLINED'}selected{/if}>{tr}DECLINED{/tr}</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -405,7 +405,7 @@
                             <br/>
                             <div>
                                 <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="calitem[process_itip]" value="1" checked>
-                                Send calendar invitations and event updates via email
+                                {tr}Send calendar invitations and event updates via email{/tr}
                             </div>
                             <div>
                                 <input type="checkbox" class="form-check-input" name="calitem[hideParticipants]" aria-label="{tr}Hide participants list from others{/tr}" {if $calitem.hideParticipants}checked="checked"{/if}/>
