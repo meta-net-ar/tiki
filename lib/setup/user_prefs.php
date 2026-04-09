@@ -79,7 +79,7 @@ $smarty->assign('IP', $tikilib->get_ip_address());
 
 $tikilib->set_display_timezone($user);
 
-if (! empty($section) && Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! empty($prefs['language_admin'])) {
+if (! empty($section) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT)) && ! empty($prefs['language_admin'])) {
     $prefs['language'] = $prefs['language_admin'];
 }
 

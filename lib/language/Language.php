@@ -761,7 +761,12 @@ class Language extends TikiDb_Bridge
     {
         global $prefs;
         $section = Sections::getCurrentSection();
-        if (! empty($section) && Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! empty($prefs['language_admin']) && self::isValidLocale($prefs['language_admin'])) {
+        if (
+            ! empty($section)
+            && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))
+            && ! empty($prefs['language_admin'])
+            && self::isValidLocale($prefs['language_admin'])
+        ) {
             return $prefs['language_admin'];
         }
 

@@ -47,6 +47,9 @@ $inputConfiguration = [
 ];
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 
 if (! empty($_REQUEST['group'])) {
     if (! $userlib->group_exists($_REQUEST['group'])) {

@@ -28,7 +28,7 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 require_once('lib/integrator/integrator.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 // If Integrator is ON, check permissions...
 $access->check_feature('feature_integrator');
