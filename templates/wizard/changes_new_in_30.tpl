@@ -42,21 +42,71 @@
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}New External Integrations{/tr}</legend>
             <ul>
-                <li>{tr}CryptPad integration for collaborative Office document editing{/tr}</li>
-                <li>{tr}PeerTube integration for decentralized video hosting{/tr}</li>
-                <li>{tr}Prosody and Converse.js integration with Tiki as identity provider{/tr}</li>
+                <li>
+                    {tr}CryptPad integration for collaborative Office document editing{/tr}<br>
+                    <a href="https://doc.tiki.org/Tiki30#External_Services_Integrations" target="tikihelp">
+                        {tr}More Information{/tr}
+                    </a>
+                </li>
+                <li>
+                    {tr}PeerTube integration for decentralized video hosting{/tr}<br>
+                    <a href="https://doc.tiki.org/Tiki30#External_Services_Integrations" target="tikihelp">
+                        {tr}More Information{/tr}
+                    </a>
+                </li>
+                <li>
+                    {tr}Prosody and Converse.js integration with Tiki as identity provider{/tr}<br>
+                    <a href="https://wikisuite.org/How-to-install-Prosody-using-Tiki-for-its-userlist" target="tikihelp">
+                        {tr}More Information{/tr}
+                    </a>
+                </li>
             </ul>
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}New Wiki Plugins{/tr}</legend>
             <ul>
-            <li>{tr}Lottie plugin for displaying animations{/tr}</li>
-            <li>{tr}Model3DViewer plugin for 3D objects{/tr}</li>
-            <li>{tr}FancyLink plugin for rich link previews{/tr}</li>
-            <li>{tr}Mermaid diagrams support for workflows and charts{/tr}</li>
-            <li>{tr}YouTube plugin with responsive video support{/tr}</li>
-            <li>{tr}PluginImg Reflection Update{/tr}</li>
-            <li>{tr}Sublist Plugin: Memory Optimization with limitfields{/tr}</li>
+            <li>
+                {tr}Lottie plugin for displaying animations{/tr}<br>
+                <a href="https://doc.tiki.org/Tiki30#Plugins" target="tikihelp">
+                    {tr}More Information{/tr}
+                </a>
+            </li>
+            <li>
+                {tr}Model3DViewer plugin for 3D objects{/tr}<br>
+                <a href="https://doc.tiki.org/PluginModel3DViewer" target="tikihelp">
+                    {tr}More Information{/tr}
+                </a>
+            </li>
+            <li>
+                {tr}FancyLink plugin for rich link previews{/tr}<br>
+                <a href="https://doc.tiki.org/Pluginfancylink" target="tikihelp">
+                    {tr}More Information{/tr}
+                </a>
+            </li>
+            <li>
+                {tr}Mermaid diagrams support for workflows and charts{/tr}<br>
+                <a href="https://doc.tiki.org/PluginContributionsDashboard" target="tikihelp">
+                    {tr}More Information{/tr}
+                </a>
+            </li>
+            <li>
+                {tr}PluginList{/tr}<br>
+                <a href="https://doc.tiki.org/PluginList-with-editable-filters" target="tikihelp">
+                    {tr}More Information{/tr}
+                </a>
+            </li>
+            <li>
+                {tr}PluginImg Reflection Update{/tr}<br>
+                <a href="https://doc.tiki.org/PluginImg" target="tikihelp">
+                    {tr}More Information{/tr}
+                </a>
+            </li>
+            <li>
+                {tr}Sublist Plugin: Memory Optimization with limitfields{/tr}<br>
+                <a href="https://doc.tiki.org/Sublist" target="tikihelp">
+                    {tr}More Information{/tr}
+                </a>
+            </li>
             </ul>
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
