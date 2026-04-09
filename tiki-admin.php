@@ -14,6 +14,7 @@ use Tiki\Package\ComposerCli;
 use Tiki\Package\ExtensionManager;
 use Tiki\Suggestion\Rules;
 use Tiki\Sections;
+
 $section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 
@@ -23,7 +24,6 @@ $auto_query_args = ['page'];
 
 $access->check_permission('tiki_p_admin');
 $logslib = TikiLib::lib('logs');
-
 /**
  * Display feedback on prefs changed
  *

@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
@@ -44,7 +47,6 @@ $auto_query_args = [
     'maxRecords'
 ];
 $watches = $notificationlib->get_global_watch_types();
-
 $save = true;
 $login = '';
 if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
@@ -121,11 +123,10 @@ if (
         Feedback::error(tr('%0 of %1 selected mail notification events deleted', $i, $checkedCount));
     }
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'event_asc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'event_asc',
+    ['tiki_user_watches', 'tiki_group_watches']
+);
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 $find = $_REQUEST["find"] ?? '';

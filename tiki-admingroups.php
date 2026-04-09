@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
@@ -135,11 +138,11 @@ if (! isset($_REQUEST['maxRecords'])) {
     $numrows = $_REQUEST['maxRecords'];
 }
 $smarty->assign_by_ref('maxRecords', $numrows);
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'groupName_asc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'groupName_asc',
+    ['users_groups']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);

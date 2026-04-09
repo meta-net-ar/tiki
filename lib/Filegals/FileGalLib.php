@@ -41,6 +41,23 @@ class FileGalLib extends TikiLib
     protected static $getGalleriesParentIdsCache = null;
     protected $loadedGalleryDefinitions = [];
 
+    // These are field names that are created by the SQL query in the FileGalLib::get_files()
+    // method and DO NOT exist as physical columns in the tiki_files or tiki_file_galleries tables.
+    // This whitelist is essential for the generic validator to safely approve them.
+    public $pure_aliases = [
+        // --- Aliases from the primary UNION query in FileGalLib::get_files() ---
+        'id',           // Aliases `tf.fileId` for files and `tfg.galleryId` for galleries.
+        'isgal',        // A constant flag: `0` for files, `1` for galleries.
+        'size',         // Aliases the `tf.filesize` column for files.
+        'type',         // Unifies `tf.filetype` and `tfg.type`.
+        'creator',      // Aliases the `user` column (the item's creator) from both tables.
+        'last_user',    // Aliases the `tf.lastModifUser` column for files.
+        // --- Aliases from common conditional JOINS ---
+        'files',        // A calculated `COUNT(*)` of items within a gallery.
+        'parentName',   // The `name` from a joined parent gallery table.
+        'source',       // Aliases the `tfg.show_source` column for galleries.
+    ];
+
     public function isPodCastGallery($galleryId, $gal_info = null)
     {
         if (empty($gal_info)) {

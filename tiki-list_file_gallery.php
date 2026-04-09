@@ -9,8 +9,9 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\SortModeValidator;
 use Tiki\Package\VendorHelper;
+use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 $inputConfiguration = [
     [
@@ -1076,8 +1077,13 @@ if (empty($_REQUEST['sort_mode'])) {
         $_REQUEST['sort_mode'] = $gal_info['sort_mode'];
     }
 }
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'name_asc',
+    ['tiki_files', 'tiki_file_galleries'],
+    $filegallib->pure_aliases
+);
 
-$smarty->assign_by_ref('sort_mode', $_REQUEST['sort_mode']);
+$smarty->assign('sort_mode', $sort_mode);
 
 $find = [];
 if (! isset($_REQUEST['find_creator'])) {
@@ -1161,7 +1167,7 @@ if (isset($_GET['slideshow'])) {
     $files = $filegallib->get_files(
         0,
         -1,
-        $_REQUEST['sort_mode'],
+        $sort_mode,
         $_REQUEST['find'],
         $galleryId,
         false,
@@ -1222,7 +1228,6 @@ if (isset($_GET['slideshow'])) {
             $syntax = '';
         }
         $with_archive = ! ((isset($gal_info['archives']) && $gal_info['archives'] == '-1'));
-
         if ($view == 'page' && isset($_REQUEST['fileId'])) {
             try {
                 $file = $filegallib->get_file_additional($fileId);
@@ -1248,7 +1253,7 @@ if (isset($_GET['slideshow'])) {
             $files = $filegallib->get_files(
                 $_REQUEST['offset'],
                 $_REQUEST['maxRecords'],
-                $_REQUEST['sort_mode'],
+                $sort_mode,
                 $_REQUEST['find'],
                 $galleryId,
                 $with_archive,

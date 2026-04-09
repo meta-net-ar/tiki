@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
@@ -75,12 +78,10 @@ if (isset($_REQUEST["clean"])) {
         }
     }
 }
-
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'actionid_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'actionId_desc',
+    ['tiki_actionlog']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);

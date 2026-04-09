@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
@@ -259,12 +262,12 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
         }
     }
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'name_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
-$offset = $_REQUEST["offset"] ?? 0;
+
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'name_asc',
+    ['tiki_rss_modules']
+);
+$offset = (int)$_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 $find = $_REQUEST["find"] ?? '';
 if ($prefs['feature_multilingual'] == 'y') {
