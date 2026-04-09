@@ -170,6 +170,8 @@ const TIKI_VENDOR_NONBUNDLED_PATH = 'vendor'; //VENDOR_PATH caused a problem wit
 
 const TIKI_VENDOR_CUSTOM_PATH = 'vendor_custom';
 
+const CYPHT_PATH = 'vendor_bundled/vendor/cypht-org/cypht'; // @TODO: Change this to the appropriate package name before deploying
+
 const PRIMARY_AUTOLOAD_FILE_PATH = 'vendor_bundled/vendor/autoload.php';
 const PRIMARY_COMPOSERJSON_FILE_PATH = 'vendor_bundled/composer.json';
 const COMPOSERLOCK_FILE_PATH = 'vendor_bundled/composer.lock';

@@ -156,11 +156,20 @@ class Tiki_Hm_Functions
             // init Cypht app
             $_SESSION['cypht'] = [];
             $_SESSION['cypht']['preference_name'] = 'cypht_user_config';
-            require_once $tikipath . '/lib/cypht/integration/classes.php';
+
+            define('APP_PATH', CYPHT_PATH . '/'); // Essential for Cypht framework to bundle different of its components.
+            define('DEBUG_MODE', false);
+
+            require_once APP_PATH . 'lib/framework.php';
+            require_once APP_PATH . 'modules/tiki/lib.php';
+
             $_SESSION['cypht']['request_key'] = Hm_Crypt::unique_id();
             $_SESSION['cypht']['username'] = $user;
 
-            $config = new Tiki_Hm_Site_Config_File();
+            $environment = Hm_Environment::getInstance();
+            $environment->load();
+
+            $config = new Hm_Custom_Site_Config();
             $config->set('disable_empty_superglobals', true);
             $environment->define_default_constants($config);
             $session_config = new Hm_Session_Setup($config);
