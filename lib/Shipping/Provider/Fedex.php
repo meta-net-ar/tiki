@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Shipping\Provider;
 
-/** @phpstan-ignore class.nameCase (PHPStan 2.x stubs incorrectly define SoapClient as soapclient) */
+// @phpstan-ignore-next-line class.nameCase (PHPStan 2.x stubs incorrectly define SoapClient as soapclient)
 use SoapClient;
 use SoapFault;
 use Tiki\Lib\Shipping\Provider\ShippingProviderInterface as ShippingProvider;
