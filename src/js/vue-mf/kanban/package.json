@@ -11,14 +11,13 @@
   },
   "dependenciesComment": {
     "@casl/ability": "Changelog: https://github.com/stalniy/casl/blob/master/packages/casl-ability/CHANGELOG.md",
-    "axios": "Changelog: https://github.com/axios/axios/blob/v1.x/CHANGELOG.md",
     "vee-validate": "Changelog:https://github.com/logaretm/vee-validate/blob/main/CHANGELOG.md",
     "vue3-perfect-scrollbar": "Changelog: https://github.com/mercs600/vue3-perfect-scrollbar/releases"
   },
   "dependencies": {
     "@casl/ability": "^6.7.1",
     "autosize": "^6.0.1",
-    "axios": "^1.7.5",
+    "ky": "^1.14.3",
     "picoquery": "^2.5.0",
     "vee-validate": "^4.13.1",
     "vue-final-modal": "^4.5.4",
