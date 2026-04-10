@@ -726,6 +726,8 @@
                         </label>
                     </div>
                     <div class="form-text">{tr}Choose between static values or dynamic values from tracker fields{/tr}</div>
+                    <div class="form-text mt-2">{tr}You can leave some fields empty then they may get filled automatically{/tr}</div>
+                    <div class="form-text">{tr}Date related fields, Author field and Publisher are subject to the auto-fill behavior described above{/tr}</div>
                 </div>
 
                 {* ==================== ARTICLE FIELDS ==================== *}
@@ -1190,7 +1192,7 @@
                     </div>
                 </div>
             </div>
-            
+
             {literal}
                 <script>
                     $('#schemaOrgType').on('change', function() {
