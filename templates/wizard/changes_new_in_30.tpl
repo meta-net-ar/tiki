@@ -65,48 +65,14 @@
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}New Wiki Plugins{/tr}</legend>
             <ul>
-            <li>
-                {tr}Lottie plugin for displaying animations{/tr}<br>
-                <a href="https://doc.tiki.org/Tiki30#Plugins" target="tikihelp">
-                    {tr}More Information{/tr}
-                </a>
-            </li>
-            <li>
-                {tr}Model3DViewer plugin for 3D objects{/tr}<br>
-                <a href="https://doc.tiki.org/PluginModel3DViewer" target="tikihelp">
-                    {tr}More Information{/tr}
-                </a>
-            </li>
-            <li>
-                {tr}FancyLink plugin for rich link previews{/tr}<br>
-                <a href="https://doc.tiki.org/Pluginfancylink" target="tikihelp">
-                    {tr}More Information{/tr}
-                </a>
-            </li>
-            <li>
-                {tr}Mermaid diagrams support for workflows and charts{/tr}<br>
-                <a href="https://doc.tiki.org/PluginContributionsDashboard" target="tikihelp">
-                    {tr}More Information{/tr}
-                </a>
-            </li>
-            <li>
-                {tr}PluginList{/tr}<br>
-                <a href="https://doc.tiki.org/PluginList-with-editable-filters" target="tikihelp">
-                    {tr}More Information{/tr}
-                </a>
-            </li>
-            <li>
-                {tr}PluginImg Reflection Update{/tr}<br>
-                <a href="https://doc.tiki.org/PluginImg" target="tikihelp">
-                    {tr}More Information{/tr}
-                </a>
-            </li>
-            <li>
-                {tr}Sublist Plugin: Memory Optimization with limitfields{/tr}<br>
-                <a href="https://doc.tiki.org/Sublist" target="tikihelp">
-                    {tr}More Information{/tr}
-                </a>
-            </li>
+            <li>{preference name=wikiplugin_lottie}<br></li>
+            <li>{preference name=wikiplugin_model3dviewer}<br></li>
+            <li>{preference name=wikiplugin_fancylink}<br></li>
+            <li>{preference name=wikiplugin_contributionsdashboard}<br></li>
+            <li>{preference name=wikiplugin_list}<br></li>
+            <li>{preference name=wikiplugin_img}<br></li>
+            <li>{preference name=wikiplugin_rss}<br></li>
+            <li>{preference name=wikiplugin_rss}<br></li>
             </ul>
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
