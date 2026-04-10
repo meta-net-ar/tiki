@@ -69,8 +69,6 @@
             <li>{preference name=wikiplugin_model3dviewer}<br></li>
             <li>{preference name=wikiplugin_fancylink}<br></li>
             <li>{preference name=wikiplugin_contributionsdashboard}<br></li>
-            <li>{preference name=wikiplugin_list}<br></li>
-            <li>{preference name=wikiplugin_img}<br></li>
             </ul>
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
