@@ -992,4 +992,4 @@ class SocialNetworksLib extends LogsLib
 
 global $socialnetworkslib;
 
-$socialnetworkslib = new socialNetworksLib();
+$socialnetworkslib = new SocialNetworksLib();

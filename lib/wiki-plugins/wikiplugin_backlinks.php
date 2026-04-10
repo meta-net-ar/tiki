@@ -267,7 +267,7 @@ function wikiplugin_backlinks_info()
 
 function wikiplugin_backlinks($data, $params)
 {
-    $plugin = new wikipluginbacklinks();
+    $plugin = new WikiPluginBackLinks();
     $data = $plugin->run($data, $params);
     if (TikiLib::lib('parser')->option['is_markdown']) {
         $data = "\n" . $data;

@@ -6,6 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function smarty_function_rating($params, \Smarty\Template $template)
 {
-    $smartyFunctionRatingHandler = new \smartytiki\FunctionHandler\Rating();
+    $smartyFunctionRatingHandler = new \SmartyTiki\FunctionHandler\Rating();
     return $smartyFunctionRatingHandler->handle($params, $template);
 }

@@ -34,8 +34,6 @@ parameters:
       identifier: method.void
     -
       identifier: variable.undefined
-    -
-      identifier: class.nameCase
   # TODO: phpstan level 0 tests that represents things that Maybe that still work, but in this day and age...
     -
-      identifier: method.staticCall                                 
+      identifier: method.staticCall

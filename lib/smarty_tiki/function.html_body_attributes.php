@@ -11,6 +11,6 @@
 
 function smarty_function_html_body_attributes($params, \Smarty\Template $template)
 {
-    $smartyFunctionHmlBodyAttributesHandler = new \smartytiki\FunctionHandler\HtmlBodyAttributes();
+    $smartyFunctionHmlBodyAttributesHandler = new \SmartyTiki\FunctionHandler\HtmlBodyAttributes();
     return $smartyFunctionHmlBodyAttributesHandler->handle($params, $template);
 }
