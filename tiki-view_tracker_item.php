@@ -5,6 +5,8 @@
  */
 
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Melbahja\Seo\Schema;
+use Melbahja\Seo\Schema\Thing;
 
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
@@ -699,6 +701,212 @@ $info["lastModifByReal"] = $tikilib->get_user_preference($info["lastModifBy"], '
 if ($tracker_info_value('doNotShowEmptyField') == 'y') {
     $trackerlib = TikiLib::lib('trk');
     $fields['data'] = $trackerlib->mark_fields_as_empty($fields['data']);
+}
+
+//easy to pick data from $Info (field id is k=>v)
+/*
+$info array (10)
+itemId => integer 838
+trackerId => integer 6
+created => integer 1775220792
+createdBy => string (5) "admin"
+status => string (1) "o"
+lastModif => integer 1775220792
+lastModifBy => string (5) "admin"
+17 => string (514) "Some initial ideas for generating automated structured data from Trackers Po...
+createdByReal => string (20) "System Administrator"
+lastModifByReal => string (20) "System Administrator"
+*/
+
+$thingType = $tracker_info["schemaOrgType"]; //Artcicle, Event & Product are supported for now
+$data_source = $tracker_info["schemaOrgDataConfig"]; //either static_text or tracker_field
+
+
+//TODO : make switch to build schema based on data, check empty for date & author then fill with $info (contains createdBy, createdByReal, created, lastModif, lastModifBy, lastModifByReal and all fieldId=>value) based on config (tracker_field) or static text (static_text
+// Then repeat the same logic to wiki page now)
+
+switch ($thingType) {
+    case 'Product':
+        $product = new Thing(type: 'Product');
+        
+        if($data_source == "static_text"){
+            $name = $tracker_info["schemaOrgProductName"];
+            $description = $tracker_info["schemaOrgProductDescription"];
+            $sku = $tracker_info["schemaOrgProductSku"];
+            $price = $tracker_info["schemaOrgProductPrice"];
+            $priceCurrency = $tracker_info["schemaOrgProductPriceCurrency"];
+            $availability = $tracker_info["schemaOrgProductAvailability"];
+            $ratingValue = $tracker_info["schemaOrgProductRatingValue"];
+            $reviewCount = $tracker_info["schemaOrgProductReviewCount"];
+        }
+        
+        if($data_source == "tracker_field") {
+            $name = $tracker_info["schemaOrgProductNameField"] && isset($info[$tracker_info["schemaOrgProductNameField"]]) ? $info[$tracker_info["schemaOrgProductNameField"]] : '';
+            $description = $tracker_info["schemaOrgProductDescriptionField"] && isset($info[$tracker_info["schemaOrgProductDescriptionField"]]) ? $info[$tracker_info["schemaOrgProductDescriptionField"]] : '';
+            $sku = $tracker_info["schemaOrgProductSkuField"] && isset($info[$tracker_info["schemaOrgProductSkuField"]]) ? $info[$tracker_info["schemaOrgProductSkuField"]] : '';
+            $price = $tracker_info["schemaOrgProductPriceField"] && isset($info[$tracker_info["schemaOrgProductPriceField"]]) ? $info[$tracker_info["schemaOrgProductPriceField"]] : '';
+            $priceCurrency = $tracker_info["schemaOrgProductPriceCurrencyField"] && isset($info[$tracker_info["schemaOrgProductPriceCurrencyField"]]) ? $info[$tracker_info["schemaOrgProductPriceCurrencyField"]] : '';
+            $availability = $tracker_info["schemaOrgProductAvailabilityField"] && isset($info[$tracker_info["schemaOrgProductAvailabilityField"]]) ? $info[$tracker_info["schemaOrgProductAvailabilityField"]] : '';
+            $ratingValue = $tracker_info["schemaOrgProductRatingValueField"] && isset($info[$tracker_info["schemaOrgProductRatingValueField"]]) ? $info[$tracker_info["schemaOrgProductRatingValueField"]] : '';
+            $reviewCount = $tracker_info["schemaOrgProductReviewCountField"] && isset($info[$tracker_info["schemaOrgProductReviewCountField"]]) ? $info[$tracker_info["schemaOrgProductReviewCountField"]] : '';
+        }
+
+        $product->name = $name;
+        $product->description = $description;
+        $product->sku = $sku;
+        
+        if(!empty($price) || !empty($priceCurrency) || !empty($availability)){
+            $product->offers = new Thing(type: 'Offer', props: [
+                'price' => $price,
+                'priceCurrency' => $priceCurrency,
+                'availability' => $availability
+            ]);
+        }
+        
+        if(!empty($ratingValue) && !empty($reviewCount)){
+            $product->aggregateRating = new Thing(type: 'AggregateRating', props: [
+                'ratingValue' => $ratingValue,
+                'reviewCount' => $reviewCount
+            ]);
+        }
+        
+        $schema = new Schema($product);
+    break;
+
+    case 'Article':
+        $article = new Thing(type: 'Article');
+        
+        if($data_source == "static_text"){
+            $headline = $tracker_info["schemaOrgArticleHeadline"];
+            $description = $tracker_info["schemaOrgArticleDescription"];
+            $image = $tracker_info["schemaOrgArticleImage"];
+            $authorName = $tracker_info["schemaOrgArticleAuthor"];
+            $publisherName = $tracker_info["schemaOrgArticlePublisher"];
+            $publisherLogo = $tracker_info["schemaOrgArticlePublisherLogo"];
+            $datePublished = $tracker_info["schemaOrgArticleDatePublished"];
+            $dateModified = $tracker_info["schemaOrgArticleDateModified"];
+            $mainEntityUrl = $tracker_info["schemaOrgArticleMainEntityUrl"];
+        }
+        
+        if($data_source == "tracker_field") {
+            $headline = $tracker_info["schemaOrgArticleHeadlineField"] && isset($info[$tracker_info["schemaOrgArticleHeadlineField"]]) ? $info[$tracker_info["schemaOrgArticleHeadlineField"]] : '';
+            $description = $tracker_info["schemaOrgArticleDescriptionField"] && isset($info[$tracker_info["schemaOrgArticleDescriptionField"]]) ? $info[$tracker_info["schemaOrgArticleDescriptionField"]] : '';
+            $image = $tracker_info["schemaOrgArticleImageField"] && isset($info[$tracker_info["schemaOrgArticleImageField"]]) ? $info[$tracker_info["schemaOrgArticleImageField"]] : '';
+            $authorName = $tracker_info["schemaOrgArticleAuthorField"] && isset($info[$tracker_info["schemaOrgArticleAuthorField"]]) ? $info[$tracker_info["schemaOrgArticleAuthorField"]] : '';
+            $publisherName = $tracker_info["schemaOrgArticlePublisherField"] && isset($info[$tracker_info["schemaOrgArticlePublisherField"]]) ? $info[$tracker_info["schemaOrgArticlePublisherField"]] : '';
+            $publisherLogo = $tracker_info["schemaOrgArticlePublisherLogoField"] && isset($info[$tracker_info["schemaOrgArticlePublisherLogoField"]]) ? $info[$tracker_info["schemaOrgArticlePublisherLogoField"]] : '';
+            $datePublished = $tracker_info["schemaOrgArticleDatePublishedField"] && isset($info[$tracker_info["schemaOrgArticleDatePublishedField"]]) ? $info[$tracker_info["schemaOrgArticleDatePublishedField"]] : '';
+            $dateModified = $tracker_info["schemaOrgArticleDateModifiedField"] && isset($info[$tracker_info["schemaOrgArticleDateModifiedField"]]) ? $info[$tracker_info["schemaOrgArticleDateModifiedField"]] : '';
+            $mainEntityUrl = $tracker_info["schemaOrgArticleMainEntityUrlField"] && isset($info[$tracker_info["schemaOrgArticleMainEntityUrlField"]]) ? $info[$tracker_info["schemaOrgArticleMainEntityUrlField"]] : '';
+        }
+
+        $article->headline = $headline;
+        $article->description = $description;
+        
+        if(!empty($image)){
+            $article->image = $image;
+        }
+        
+        if(!empty($authorName)){
+            $article->author = new Thing(type: 'Person', props: [
+                'name' => $authorName
+            ]);
+        }
+        
+        if(!empty($publisherName)){
+            $publisherProps = ['name' => $publisherName];
+            if(!empty($publisherLogo)){
+                $publisherProps['logo'] = new Thing(type: 'ImageObject', props: [
+                    'url' => $publisherLogo
+                ]);
+            }
+            $article->publisher = new Thing(type: 'Organization', props: $publisherProps);
+        }
+        
+        if(!empty($datePublished)){
+            $article->datePublished = date('Y-m-d', strtotime($datePublished));
+        }
+        
+        if(!empty($dateModified)){
+            $article->dateModified = date('Y-m-d', strtotime($dateModified));
+        }
+        
+        if(!empty($mainEntityUrl)){
+            $article->mainEntityOfPage = new Thing(type: 'WebPage', props: [
+                '@id' => $mainEntityUrl
+            ]);
+        }
+        
+        $schema = new Schema($article);
+    break;
+
+    case 'Event':
+        $event = new Thing(type: 'Event');
+        
+        if($data_source == "static_text"){
+            $name = $tracker_info["schemaOrgEventName"];
+            $description = $tracker_info["schemaOrgEventDescription"];
+            $startDate = $tracker_info["schemaOrgEventStartDate"];
+            $endDate = $tracker_info["schemaOrgEventEndDate"];
+            $eventStatus = $tracker_info["schemaOrgEventStatus"];
+            $locationName = $tracker_info["schemaOrgEventLocationName"];
+            $locationAddress = $tracker_info["schemaOrgEventLocationAddress"];
+            $price = $tracker_info["schemaOrgEventPrice"];
+            $priceCurrency = $tracker_info["schemaOrgEventPriceCurrency"];
+        }
+        
+        if($data_source == "tracker_field") {
+            $name = $tracker_info["schemaOrgEventNameField"] && isset($info[$tracker_info["schemaOrgEventNameField"]]) ? $info[$tracker_info["schemaOrgEventNameField"]] : '';
+            $description = $tracker_info["schemaOrgEventDescriptionField"] && isset($info[$tracker_info["schemaOrgEventDescriptionField"]]) ? $info[$tracker_info["schemaOrgEventDescriptionField"]] : '';
+            $startDate = $tracker_info["schemaOrgEventStartDateField"] && isset($info[$tracker_info["schemaOrgEventStartDateField"]]) ? $info[$tracker_info["schemaOrgEventStartDateField"]] : '';
+            $endDate = $tracker_info["schemaOrgEventEndDateField"] && isset($info[$tracker_info["schemaOrgEventEndDateField"]]) ? $info[$tracker_info["schemaOrgEventEndDateField"]] : '';
+            $eventStatus = $tracker_info["schemaOrgEventStatusField"] && isset($info[$tracker_info["schemaOrgEventStatusField"]]) ? $info[$tracker_info["schemaOrgEventStatusField"]] : '';
+            $locationName = $tracker_info["schemaOrgEventLocationNameField"] && isset($info[$tracker_info["schemaOrgEventLocationNameField"]]) ? $info[$tracker_info["schemaOrgEventLocationNameField"]] : '';
+            $locationAddress = $tracker_info["schemaOrgEventLocationAddressField"] && isset($info[$tracker_info["schemaOrgEventLocationAddressField"]]) ? $info[$tracker_info["schemaOrgEventLocationAddressField"]] : '';
+            $price = $tracker_info["schemaOrgEventPriceField"] && isset($info[$tracker_info["schemaOrgEventPriceField"]]) ? $info[$tracker_info["schemaOrgEventPriceField"]] : '';
+            $priceCurrency = $tracker_info["schemaOrgEventPriceCurrencyField"] && isset($info[$tracker_info["schemaOrgEventPriceCurrencyField"]]) ? $info[$tracker_info["schemaOrgEventPriceCurrencyField"]] : '';
+        }
+
+        $event->name = $name;
+        $event->description = $description;
+        
+        if(!empty($startDate)){
+            $event->startDate = date(DATE_ATOM, strtotime($startDate));
+        }
+        
+        if(!empty($endDate)){
+            $event->endDate = date(DATE_ATOM, strtotime($endDate));
+        }
+        
+        if(!empty($eventStatus)){
+            $event->eventStatus = $eventStatus;
+        }
+        
+        if(!empty($locationName) || !empty($locationAddress)){
+            $event->location = new Thing(type: 'Place', props: [
+                'name' => $locationName,
+                'address' => $locationAddress
+            ]);
+        }
+        
+        if(!empty($price) || !empty($priceCurrency)){
+            $event->offers = new Thing(type: 'Offer', props: [
+                'price' => $price,
+                'priceCurrency' => $priceCurrency
+            ]);
+        }
+        
+        $schema = new Schema($event);
+    break;
+
+    default: 
+        $schema = null;
+    break;
+}
+
+if(isset($schema)){
+    $headerlib = TikiLib::lib('header');
+    $headerlib->add_rawhtml($schema ? '<script type="application/ld+json">' . json_encode($schema, JSON_PRETTY_PRINT) . '</script>' : '');
 }
 
 $smarty->assign('trackerId', $trackerId);
