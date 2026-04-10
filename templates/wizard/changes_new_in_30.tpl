@@ -83,15 +83,6 @@
                 <li>{tr}Usernames cannot contain spaces{/tr}</li>
             </ul>
         </fieldset>
-        <fieldset class="mb-3 w-100 clearfix featurelist">
-            <legend>{tr}Developers & Technical Improvements{/tr}</legend>
-            <ul>
-            <li>{tr}Mermaid diagrams used for transitions and visualizations{/tr}</li>
-            <li>{tr}PHPStan static analysis integrated into CI{/tr}</li>
-            <li>{tr}Node.js 24 support in build system{/tr}</li>
-            <li>{tr}Git commit information available in admin panel{/tr}</li>
-            </ul>
-        </fieldset>
         <i>
             {tr}This release focuses on stability and long-term improvements rather than major breaking changes.{/tr}
         </i>
