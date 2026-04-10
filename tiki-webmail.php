@@ -11,6 +11,31 @@ $access->check_feature('feature_webmail');
 $access->check_permission_either(['tiki_p_use_webmail', 'tiki_p_use_group_webmail']);
 $access->check_user($user);
 
+if (empty($_SESSION['cypht']['username']) || $_SESSION['cypht']['username'] != $user) {
+    unset($_SESSION['cypht']);
+    $headerlib = TikiLib::lib('header');
+    $headerlib->add_js('
+        document.cookie = "hm_reload_folders=1";
+        document.cookie = "hm_first_load=1";
+        for(var i =0; i < sessionStorage.length; i++){
+            var key = sessionStorage.key(i);
+            if (key.indexOf(window.location.pathname) > -1) {
+                sessionStorage.removeItem(key);
+            }
+        }
+    ');
+}
+
+if (
+    empty($_SESSION['cypht']['preference_name']) || $_SESSION['cypht']['preference_name'] != 'cypht_user_config'
+    || (! empty($_SESSION['cypht']['username']) && $_SESSION['cypht']['username'] != $user)
+    || ! empty($_REQUEST['clear_cache'])
+) {
+  // resetting the session on purpose - could be coming from PluginCypht
+    $_SESSION['cypht'] = [];
+    $_SESSION['cypht']['preference_name'] = 'cypht_user_config';
+}
+
 //handle message priting
 if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
     require_once 'lib/cypht/integration/print_pdf.php';
@@ -19,6 +44,12 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
 }
 
 require_once  'vendor_bundled/vendor/cypht-org/cypht/index.php';
+
+
+if (empty($_SESSION['cypht']['request_key'])) {
+    $_SESSION['cypht']['request_key'] = Hm_Crypt::unique_id();
+}
+$_SESSION['cypht']['username'] = $user;
 
 $config->initSession();
 
