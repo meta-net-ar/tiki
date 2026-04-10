@@ -699,46 +699,517 @@
         
         {accordion_group title="{tr}Schema.org Data{/tr}"}
             <div class="mb-3 mx-0">
-                <label class="mb-2" for="schemaOrgData">{tr}Item Pages will have Schema.org Data Provided from{/tr}</label>
-                <select name="schemaOrgDataConfig" id="schemaOrgData" class="form-control">
-                    <option value="static_text" {if $info.schemaOrgDataConfig eq 'static_text'}selected{/if}>{tr}Static Text{/tr}</option>
-                    <option value="tracker_field" {if $info.schemaOrgDataConfig eq 'tracker_field'}selected{/if}>
-                        {tr}Tracker field{/tr}
-                    </option>
-                </select>
-                {if $info.schemaOrgDataConfig eq 'static_text'}
-                <input type="text" name="schemaOrgDataSourceConfigHeadeline" id="schemaOrgDataSourceConfigHeadeline" value="{$info.schemaOrgDataSourceConfigHeadeline|escape}" class="form-control mt-2" placeholder="{tr}Headline field for Article type{/tr}">
-                <input type="text" name="schemaOrgDataSourceConfigDescription" id="schemaOrgDataSourceConfigDescription" value="{$info.schemaOrgDataSourceConfigDescription|escape}" class="form-control mt-2" placeholder="{tr}Description field for Article type{/tr}">
-                <input type="file" name="schemaOrgDataSourceConfigImage" id="schemaOrgDataSourceConfigImage" value="{$info.schemaOrgDataSourceConfigImage|escape}" class="form-control mt-2" placeholder="{tr}Image field for Article type{/tr}">
-                {elseif $info.schemaOrgDataConfig eq 'tracker_field'}
-                <div class="mt-2">
-                    <div>
-                        <label for="schemaOrgDataSourceConfigHeadeline">{tr}Headline field for Article type{/tr}</label>
-                        <select name="schemaOrgDataSourceConfigHeadeline" class="form-select">
-                            {foreach from=$fields item=field}
-                                <option value="{$field.fieldId}" {if $info.schemaOrgDataSourceConfigHeadeline eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
-                            {/foreach}
-                         </select>
+                {* Schema Type Selector *}
+                <div class="form-group mb-3">
+                    <label class="mb-2 fw-bold" for="schemaOrgType">{tr}Select Schema.org Type{/tr}</label>
+                    <select name="schemaOrgType" id="schemaOrgType" class="form-select">
+                        <option value="" {if empty($info.schemaOrgType)}selected{/if}>{tr}None - Disable Schema.org{/tr}</option>
+                        <option value="Article" {if $info.schemaOrgType eq 'Article'}selected{/if}>{tr}Article - Blog posts, news articles{/tr}</option>
+                        <option value="Product" {if $info.schemaOrgType eq 'Product'}selected{/if}>{tr}Product - Shop items, goods{/tr}</option>
+                        <option value="Event" {if $info.schemaOrgType eq 'Event'}selected{/if}>{tr}Event - Meetings, conferences{/tr}</option>
+                    </select>
+                    <div class="form-text">{tr}Configure structured data for better search engine visibility{/tr}</div>
+                </div>
+
+                {* Data Source Selector *}
+                <div class="form-group mb-4 schema-org-fields" style="{if empty($info.schemaOrgType)}display:none;{/if}">
+                    <label class="mb-2 fw-bold" for="schemaOrgDataConfig">{tr}Data Source{/tr}</label>
+                    <div class="btn-group d-block" role="group">
+                        <input type="radio" class="btn-check" name="schemaOrgDataConfig" id="schemaOrgDataConfig_static" value="static_text" {if $info.schemaOrgDataConfig neq 'tracker_field'}checked{/if}>
+                        <label class="btn btn-outline-primary" for="schemaOrgDataConfig_static">
+                            {icon name="edit"} {tr}Static Text{/tr}
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="schemaOrgDataConfig" id="schemaOrgDataConfig_field" value="tracker_field" {if $info.schemaOrgDataConfig eq 'tracker_field'}checked{/if}>
+                        <label class="btn btn-outline-primary" for="schemaOrgDataConfig_field">
+                            {icon name="list"} {tr}Tracker Fields{/tr}
+                        </label>
                     </div>
-                    <div>
-                        <label for="schemaOrgDataSourceConfigDescription">{tr}Description field for Article type{/tr}</label>
-                        <select name="schemaOrgDataSourceConfigDescription" class="form-select">
-                            {foreach from=$fields item=field}
-                                <option value="{$field.fieldId}" {if $info.schemaOrgDataSourceConfigDescription eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
-                            {/foreach}
-                        </select>
-                    </div>
-                    <div>
-                        <label for="schemaOrgDataSourceConfigImage">{tr}Image field for Article type{/tr}</label>
-                        <select name="schemaOrgDataSourceConfigImage" class="form-select">
-                            {foreach from=$fields item=field}
-                                <option value="{$field.fieldId}" {if $info.schemaOrgDataSourceConfigImage eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
-                            {/foreach}
-                        </select>
+                    <div class="form-text">{tr}Choose between static values or dynamic values from tracker fields{/tr}</div>
+                </div>
+
+                {* ==================== ARTICLE FIELDS ==================== *}
+                <div class="schema-type-fields schema-type-Article mt-3" style="{if $info.schemaOrgType neq 'Article'}display:none;{/if}">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <strong>{tr}Article Schema Fields{/tr}</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                {* Headline *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Headline{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgArticleHeadline" class="form-control form-control-sm" value="{$info.schemaOrgArticleHeadline|escape}" placeholder="{tr}Article headline{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgArticleHeadlineField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgArticleHeadlineField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Description *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Description{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgArticleDescription" class="form-control form-control-sm" value="{$info.schemaOrgArticleDescription|escape}" placeholder="{tr}Short summary{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgArticleDescriptionField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgArticleDescriptionField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Image *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Image URL{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgArticleImage" class="form-control form-control-sm" value="{$info.schemaOrgArticleImage|escape}" placeholder="{tr}https://example.com/image.jpg{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgArticleImageField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgArticleImageField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Author *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Author Name{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgArticleAuthor" class="form-control form-control-sm" value="{$info.schemaOrgArticleAuthor|escape}" placeholder="{tr}Author Name{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgArticleAuthorField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgArticleAuthorField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Publisher *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Publisher Name{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgArticlePublisher" class="form-control form-control-sm" value="{$info.schemaOrgArticlePublisher|escape}" placeholder="{tr}Website Name{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgArticlePublisherField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgArticlePublisherField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Publisher Logo *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Publisher Logo{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgArticlePublisherLogo" class="form-control form-control-sm" value="{$info.schemaOrgArticlePublisherLogo|escape}" placeholder="{tr}https://example.com/logo.png{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgArticlePublisherLogoField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgArticlePublisherLogoField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Date Published *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Date Published{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="date" name="schemaOrgArticleDatePublished" class="form-control form-control-sm" value="{$info.schemaOrgArticleDatePublished|escape}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgArticleDatePublishedField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgArticleDatePublishedField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Date Modified *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Date Modified{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="date" name="schemaOrgArticleDateModified" class="form-control form-control-sm" value="{$info.schemaOrgArticleDateModified|escape}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgArticleDateModifiedField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgArticleDateModifiedField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Main Entity URL *}
+                                <div class="col-md-12">
+                                    <label class="form-label fw-semibold">{tr}Main Entity Page URL{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgArticleMainEntityUrl" class="form-control form-control-sm" value="{$info.schemaOrgArticleMainEntityUrl|escape}" placeholder="{tr}https://example.com/article-url{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgArticleMainEntityUrlField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgArticleMainEntityUrlField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                {/if}
+
+                {* ==================== PRODUCT FIELDS ==================== *}
+                <div class="schema-type-fields schema-type-Product mt-3" style="{if $info.schemaOrgType neq 'Product'}display:none;{/if}">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <strong>{tr}Product Schema Fields{/tr}</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                {* Product Name *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Product Name{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgProductName" class="form-control form-control-sm" value="{$info.schemaOrgProductName|escape}" placeholder="{tr}Product Name{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgProductNameField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgProductNameField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Description *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Description{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgProductDescription" class="form-control form-control-sm" value="{$info.schemaOrgProductDescription|escape}" placeholder="{tr}Product description{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgProductDescriptionField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgProductDescriptionField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* SKU *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}SKU{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgProductSku" class="form-control form-control-sm" value="{$info.schemaOrgProductSku|escape}" placeholder="{tr}Product SKU{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgProductSkuField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgProductSkuField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Price *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Price{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgProductPrice" class="form-control form-control-sm" value="{$info.schemaOrgProductPrice|escape}" placeholder="{tr}99.99{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgProductPriceField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgProductPriceField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Price Currency *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Price Currency{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgProductPriceCurrency" class="form-control form-control-sm" value="{$info.schemaOrgProductPriceCurrency|escape}" placeholder="{tr}USD{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgProductPriceCurrencyField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgProductPriceCurrencyField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Availability *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Availability{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgProductAvailability" class="form-select form-select-sm">
+                                            <option value="https://schema.org/InStock" {if $info.schemaOrgProductAvailability eq 'https://schema.org/InStock'}selected{/if}>{tr}In Stock{/tr}</option>
+                                            <option value="https://schema.org/OutOfStock" {if $info.schemaOrgProductAvailability eq 'https://schema.org/OutOfStock'}selected{/if}>{tr}Out of Stock{/tr}</option>
+                                            <option value="https://schema.org/PreOrder" {if $info.schemaOrgProductAvailability eq 'https://schema.org/PreOrder'}selected{/if}>{tr}Pre-Order{/tr}</option>
+                                            <option value="https://schema.org/BackOrder" {if $info.schemaOrgProductAvailability eq 'https://schema.org/BackOrder'}selected{/if}>{tr}Back Order{/tr}</option>
+                                        </select>
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgProductAvailabilityField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgProductAvailabilityField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Rating Value *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Rating Value{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgProductRatingValue" class="form-control form-control-sm" value="{$info.schemaOrgProductRatingValue|escape}" placeholder="{tr}4.5{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgProductRatingValueField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgProductRatingValueField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Review Count *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Review Count{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgProductReviewCount" class="form-control form-control-sm" value="{$info.schemaOrgProductReviewCount|escape}" placeholder="{tr}128{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgProductReviewCountField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgProductReviewCountField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {* ==================== EVENT FIELDS ==================== *}
+                <div class="schema-type-fields schema-type-Event mt-3" style="{if $info.schemaOrgType neq 'Event'}display:none;{/if}">
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <strong>{tr}Event Schema Fields{/tr}</strong>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                {* Event Name *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Event Name{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgEventName" class="form-control form-control-sm" value="{$info.schemaOrgEventName|escape}" placeholder="{tr}Event Name{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgEventNameField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgEventNameField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Description *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Description{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgEventDescription" class="form-control form-control-sm" value="{$info.schemaOrgEventDescription|escape}" placeholder="{tr}Event description{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgEventDescriptionField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgEventDescriptionField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Start Date *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Start Date/Time{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="datetime-local" name="schemaOrgEventStartDate" class="form-control form-control-sm" value="{$info.schemaOrgEventStartDate|escape}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgEventStartDateField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgEventStartDateField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* End Date *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}End Date/Time{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="datetime-local" name="schemaOrgEventEndDate" class="form-control form-control-sm" value="{$info.schemaOrgEventEndDate|escape}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgEventEndDateField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgEventEndDateField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Event Status *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Event Status{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgEventStatus" class="form-select form-select-sm">
+                                            <option value="https://schema.org/EventScheduled" {if $info.schemaOrgEventStatus eq 'https://schema.org/EventScheduled'}selected{/if}>{tr}Scheduled{/tr}</option>
+                                            <option value="https://schema.org/EventCancelled" {if $info.schemaOrgEventStatus eq 'https://schema.org/EventCancelled'}selected{/if}>{tr}Cancelled{/tr}</option>
+                                            <option value="https://schema.org/EventPostponed" {if $info.schemaOrgEventStatus eq 'https://schema.org/EventPostponed'}selected{/if}>{tr}Postponed{/tr}</option>
+                                            <option value="https://schema.org/EventRescheduled" {if $info.schemaOrgEventStatus eq 'https://schema.org/EventRescheduled'}selected{/if}>{tr}Rescheduled{/tr}</option>
+                                        </select>
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgEventStatusField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgEventStatusField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Location Name *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Location Name{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgEventLocationName" class="form-control form-control-sm" value="{$info.schemaOrgEventLocationName|escape}" placeholder="{tr}Venue Name{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgEventLocationNameField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgEventLocationNameField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Location Address *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Location Address{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgEventLocationAddress" class="form-control form-control-sm" value="{$info.schemaOrgEventLocationAddress|escape}" placeholder="{tr}123 Main Street{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgEventLocationAddressField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgEventLocationAddressField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Price *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Ticket Price{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgEventPrice" class="form-control form-control-sm" value="{$info.schemaOrgEventPrice|escape}" placeholder="{tr}25{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgEventPriceField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgEventPriceField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {* Price Currency *}
+                                <div class="col-md-6">
+                                    <label class="form-label fw-semibold">{tr}Price Currency{/tr}</label>
+                                    <div class="schema-input-static" style="{if $info.schemaOrgDataConfig eq 'tracker_field'}display:none;{/if}">
+                                        <input type="text" name="schemaOrgEventPriceCurrency" class="form-control form-control-sm" value="{$info.schemaOrgEventPriceCurrency|escape}" placeholder="{tr}USD{/tr}">
+                                    </div>
+                                    <div class="schema-input-field" style="{if $info.schemaOrgDataConfig neq 'tracker_field'}display:none;{/if}">
+                                        <select name="schemaOrgEventPriceCurrencyField" class="form-select form-select-sm">
+                                            <option value="">{tr}-- Select Field --{/tr}</option>
+                                            {foreach from=$fields item=field}
+                                                <option value="{$field.fieldId}" {if $info.schemaOrgEventPriceCurrencyField eq $field.fieldId}selected{/if}>{$field.name|escape}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            
+            {literal}
+                <script>
+                    $('#schemaOrgType').on('change', function() {
+                        var selectedType = $(this).val();
+                        $('.schema-org-fields').toggle(selectedType !== '');
+                        $('.schema-type-fields').hide();
+                        if (selectedType) {
+                            $('.schema-type-' + selectedType).show();
+                        }
+                    });
+
+                    // Data Source toggle (radio buttons for static text vs tracker field)
+                    $('input[name="schemaOrgDataConfig"]').on('change', function() {
+                        var isTrackerField = $(this).val() === 'tracker_field';
+                        $('.schema-input-static').toggle(!isTrackerField);
+                        $('.schema-input-field').toggle(isTrackerField);
+                    });
+                </script>
+            {/literal}
         {/accordion_group}
     {/accordion}
     <div class="mb-3 mx-0 submit">
