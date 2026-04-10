@@ -7,7 +7,8 @@
 
 require_once 'lib/pdflib.php';
 
-function printPDFFromMessage() {
+function printPDFFromMessage()
+{
     $generator = new PdfGenerator(PdfGenerator::MPDF);
     if (! empty($generator->error)) {
         Feedback::error($generator->error);

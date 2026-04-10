@@ -1,8 +1,10 @@
 <?php
+
 /**
  * Custom session class. To use this, you must set the SESSION_TYPE environment variable to 'custom'.
  */
-class Hm_Custom_Session extends Hm_Session {
+class Hm_Custom_Session extends Hm_Session
+{
     /**
      * @var bool
      */

@@ -5,12 +5,13 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-require_once APP_PATH.'modules/sievefilters/hm-sieve.php';
+require_once APP_PATH . 'modules/sievefilters/hm-sieve.php';
 
 /**
  * Custom sieve client factory class. To use this, you must set the ENABLE_CUSTOM_SIEVE_FACTORY environment variable to true.
  */
-class Hm_Custom_Sieve_Client_Factory extends Hm_Sieve_Client_Factory {
+class Hm_Custom_Sieve_Client_Factory extends Hm_Sieve_Client_Factory
+{
     public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
     {
         if (($imap_account && ! empty($imap_account['sieve_config_host'])) && $imap_account['sieve_config_host'] !== 'localhost') {
