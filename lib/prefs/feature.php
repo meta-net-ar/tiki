@@ -571,7 +571,7 @@ function prefs_feature_list($partial = false)
             'description' => tra('Quickperms are an interface in addition to the normal edit-permissions page, for quick assignment of permissions for a page or other object.'),
             'help' => 'Quickperms',
             'type' => 'flag',
-            'default' => 'n',
+            'default' => 'y',
             'tags' => ['experimental'],
         ],
         'feature_user_encryption' => [
