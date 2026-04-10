@@ -17,6 +17,7 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 }
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> bf7a0bee6c ([FIX] Simplify theme asset registration by removing iconset parameter)
 
@@ -506,3 +507,5 @@ $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 >>>>>>> e64f2f0b69 ([FIX] Add documentation to theme setup function for better maintainability and clarity of responsibilities.)
 =======
 >>>>>>> bf7a0bee6c ([FIX] Simplify theme asset registration by removing iconset parameter)
+=======
+>>>>>>> 3418f0d9d1 ([FIX] Simplify theme asset registration by removing iconset parameter)
