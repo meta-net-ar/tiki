@@ -51,21 +51,14 @@ class ThemeLib extends TikiLib
     }
 
     /**
-     * Retrieve the active theme and option.
-     *
-     * This method determines the active theme based on the current context,
-     * including user preferences, group settings, and admin overrides.
-     *
-     * Usually accessed as:
-     * list($theme, $themeOption) = ThemeLib::getActiveThemeAndOption();
-     *
-     * @return array Array containing:
-     *               - [0] => active theme name
-     *               - [1] => active theme option (if any)
+     * Retrieve the active theme and option
+     * Usually accessed as list($theme, $themeOption) = ThemeLib::getActiveThemeAndOption();
+     * @return array array of two strings, first is the theme, second is the theme option if any.
      */
     public static function getActiveThemeAndOption(): array
     {
         global $prefs, $smarty;
+        $section = Sections::getCurrentSection();
         //Initialize variables for the actual theme and theme option to be displayed
         $theme_active = $prefs['theme'] ?? '';
         $theme_option_active = $prefs['theme_option'] ?? '';
@@ -94,6 +87,7 @@ class ThemeLib extends TikiLib
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty($section))) {        // use admin theme if set
 =======
         if (! empty($prefs['theme_admin']) && $section === Sections::SECTION_ADMIN) {       // use admin theme if set
@@ -107,6 +101,9 @@ class ThemeLib extends TikiLib
 =======
         if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty($section))) {      // use admin theme if set
 >>>>>>> aa4665c139 ([FIX] Simplify theme asset registration by removing iconset parameter)
+=======
+        if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty($section))) {        // use admin theme if set
+>>>>>>> 7205c40762 ([FIX] Simplify theme asset registration by removing iconset parameter)
             $theme_active = $prefs['theme_admin'];
             $theme_option_active = $prefs['theme_option_admin'] ?? '';                                // and its option
         }
@@ -371,7 +368,6 @@ class ThemeLib extends TikiLib
     {
         global $tikidomain;
         list($activeTheme, $activeThemeOption) = self::getActiveThemeAndOption();
-
         $path = null;
         $dir_base = '';
         if ($tikidomain && is_dir(BASE_THEMES_SRC_PATH . "/$tikidomain")) {

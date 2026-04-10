@@ -6,28 +6,20 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 /**
- * Tiki\Sections - Section configuration and object detection helper.
+ * Tiki\Sections - Section Configuration & Object Detection
  *
- * Defines all logical sections of the application and their associated
- * metadata (features, request keys, object types, etc.).
- *
- * Sections are used across the system for:
- * - permission checks
- * - module visibility
- * - layout and UI behaviour
- * - theme selection (e.g. admin vs site theme)
- *
- * This class also provides utilities to detect the current object being
- * accessed based on request parameters.
+ * Defines all application sections and their metadata for permissions,
+ * toolbars, and object type mapping. Provides automatic object detection
+ * from request parameters.
  *
  * USAGE:
- * - Retrieve section definitions: $sections = Sections::getSections()
- * - Detect the current object: $object = Sections::currentObject($_REQUEST)
- * - Set the current section: Sections::setCurrentSection(Sections::SECTION_WIKI)
- * - Get the current section: $section = Sections::getCurrentSection()
+ * - Access section metadata: $sections = Sections::getSections()
+ * - Detect current object: $object = Sections::currentObject($_REQUEST)
+ * - Use constants ex:
+ *   $section = Sections::SECTION_WIKI;
  *
- * Each section definition specifies the required feature, request keys,
- * and object types needed for proper permission handling and UI behavior.
+ * Each section defines required features, request parameters, and object types
+ * for proper permission checking and UI behavior.
  */
 
 namespace Tiki;
@@ -70,9 +62,13 @@ class Sections
     public const SECTION_CHAT = 'chat';
     public const SECTION_ADMIN_LAYOUT = 'admin layout';
 <<<<<<< HEAD
+<<<<<<< HEAD
     // 'admin layout' section is special as it is used for the admin/management pages that should behave as control panels in the Unified Admin Backend UI (if there is a need to exclude an admin page from that layout, do NOT assign it to this one)
 =======
 >>>>>>> aa4665c139 ([FIX] Simplify theme asset registration by removing iconset parameter)
+=======
+    // 'admin layout' section is special as it is used for the admin/management pages that should behave as control panels in the Unified Admin Backend UI (if there is a need to exclude an admin page from that layout, do NOT assign it to this one)
+>>>>>>> 7205c40762 ([FIX] Simplify theme asset registration by removing iconset parameter)
 
     private static $currentSection;
 
@@ -276,11 +272,6 @@ class Sections
         ],
     ];
 
-    /**
-     * Sets the current application section (e.g. admin, wiki, trackers).
-     * Validates the section and updates the internal state.
-     * Triggers registered callbacks so other components can react to the section change.
-    */
     public static function setCurrentSection(string $section): void
     {
         if (! in_array($section, self::getAllSections(), true)) {
