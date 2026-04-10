@@ -886,6 +886,50 @@ if ($prefs['sitemap_enable'] === 'y') {
         $smarty->assign('for_sitemap', 'y');
     }
 }
+
+$attributelib = TikiLib::lib('attribute');
+$schemaOrgAttributeMap = [
+    'schemaOrgType' => 'tiki.schema.type',
+    // Article fields (prefix: tiki.schema.art.)
+    'schemaOrgArticleHeadline' => 'tiki.schema.art.headline',
+    'schemaOrgArticleDescription' => 'tiki.schema.art.desc',
+    'schemaOrgArticleImage' => 'tiki.schema.art.image',
+    'schemaOrgArticleAuthor' => 'tiki.schema.art.author',
+    'schemaOrgArticlePublisher' => 'tiki.schema.art.publisher',
+    'schemaOrgArticlePublisherLogo' => 'tiki.schema.art.publogo',
+    'schemaOrgArticleDatePublished' => 'tiki.schema.art.datepub',
+    'schemaOrgArticleDateModified' => 'tiki.schema.art.datemod',
+    'schemaOrgArticleMainEntityUrl' => 'tiki.schema.art.mainurl',
+    // Product fields (prefix: tiki.schema.prod.)
+    'schemaOrgProductName' => 'tiki.schema.prod.name',
+    'schemaOrgProductDescription' => 'tiki.schema.prod.desc',
+    'schemaOrgProductSku' => 'tiki.schema.prod.sku',
+    'schemaOrgProductPrice' => 'tiki.schema.prod.price',
+    'schemaOrgProductPriceCurrency' => 'tiki.schema.prod.currency',
+    'schemaOrgProductAvailability' => 'tiki.schema.prod.avail',
+    'schemaOrgProductRatingValue' => 'tiki.schema.prod.rating',
+    'schemaOrgProductReviewCount' => 'tiki.schema.prod.reviews',
+    // Event fields (prefix: tiki.schema.evt.)
+    'schemaOrgEventName' => 'tiki.schema.evt.name',
+    'schemaOrgEventDescription' => 'tiki.schema.evt.desc',
+    'schemaOrgEventStartDate' => 'tiki.schema.evt.start',
+    'schemaOrgEventEndDate' => 'tiki.schema.evt.end',
+    'schemaOrgEventStatus' => 'tiki.schema.evt.status',
+    'schemaOrgEventLocationName' => 'tiki.schema.evt.locname',
+    'schemaOrgEventLocationAddress' => 'tiki.schema.evt.locaddr',
+    'schemaOrgEventPrice' => 'tiki.schema.evt.price',
+    'schemaOrgEventPriceCurrency' => 'tiki.schema.evt.currency',
+];
+
+foreach ($schemaOrgAttributeMap as $fieldName => $attrName) {
+    $attrValue = $attributelib->get_attribute('wiki page', $page, $attrName);
+    if ($attrValue !== false) {
+        $schemainfo[$fieldName] = $attrValue;
+    }
+}
+
+$smarty->assign('schemainfo', $schemainfo);
+
 $wiki_authors_style = '';
 if ($prefs['wiki_authors_style_by_page'] === 'y') {
     if (isset($_REQUEST['wiki_authors_style']) && $tiki_p_admin_wiki === 'y') {
@@ -1278,6 +1322,51 @@ if (
             if (isset($_REQUEST['for_sitemap'])) {
                 $attributelib = TikiLib::lib('attribute');
                 $attributelib->set_attribute('wiki page', $page, 'tiki.object.sitemap', $_REQUEST['for_sitemap']);
+            }
+
+            // Save Schema.org attributes
+            // Note: Attribute names must be lowercase with dots and max 25 chars per Tiki standards
+            $attributelib = TikiLib::lib('attribute');
+            $schemaOrgAttributeMap = [
+                'schemaOrgType' => 'tiki.schema.type',
+                // Article fields (prefix: tiki.schema.art.)
+                'schemaOrgArticleHeadline' => 'tiki.schema.art.headline',
+                'schemaOrgArticleDescription' => 'tiki.schema.art.desc',
+                'schemaOrgArticleImage' => 'tiki.schema.art.image',
+                'schemaOrgArticleAuthor' => 'tiki.schema.art.author',
+                'schemaOrgArticlePublisher' => 'tiki.schema.art.publisher',
+                'schemaOrgArticlePublisherLogo' => 'tiki.schema.art.publogo',
+                'schemaOrgArticleDatePublished' => 'tiki.schema.art.datepub',
+                'schemaOrgArticleDateModified' => 'tiki.schema.art.datemod',
+                'schemaOrgArticleMainEntityUrl' => 'tiki.schema.art.mainurl',
+                // Product fields (prefix: tiki.schema.prod.)
+                'schemaOrgProductName' => 'tiki.schema.prod.name',
+                'schemaOrgProductDescription' => 'tiki.schema.prod.desc',
+                'schemaOrgProductSku' => 'tiki.schema.prod.sku',
+                'schemaOrgProductPrice' => 'tiki.schema.prod.price',
+                'schemaOrgProductPriceCurrency' => 'tiki.schema.prod.currency',
+                'schemaOrgProductAvailability' => 'tiki.schema.prod.avail',
+                'schemaOrgProductRatingValue' => 'tiki.schema.prod.rating',
+                'schemaOrgProductReviewCount' => 'tiki.schema.prod.reviews',
+                // Event fields (prefix: tiki.schema.evt.)
+                'schemaOrgEventName' => 'tiki.schema.evt.name',
+                'schemaOrgEventDescription' => 'tiki.schema.evt.desc',
+                'schemaOrgEventStartDate' => 'tiki.schema.evt.start',
+                'schemaOrgEventEndDate' => 'tiki.schema.evt.end',
+                'schemaOrgEventStatus' => 'tiki.schema.evt.status',
+                'schemaOrgEventLocationName' => 'tiki.schema.evt.locname',
+                'schemaOrgEventLocationAddress' => 'tiki.schema.evt.locaddr',
+                'schemaOrgEventPrice' => 'tiki.schema.evt.price',
+                'schemaOrgEventPriceCurrency' => 'tiki.schema.evt.currency',
+            ];
+
+            foreach ($schemaOrgAttributeMap as $fieldName => $attrName) {
+                if (isset($_REQUEST[$fieldName])) {
+                    $attributelib->set_attribute('wiki page', $page, $attrName, $_REQUEST[$fieldName]);
+                } else {
+                    // Delete attribute if field is not set (user may have cleared it)
+                    $attributelib->set_attribute('wiki page', $page, $attrName, '');
+                }
             }
 
             // Handle translation bits
