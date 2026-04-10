@@ -71,7 +71,6 @@
             <li>{preference name=wikiplugin_contributionsdashboard}<br></li>
             <li>{preference name=wikiplugin_list}<br></li>
             <li>{preference name=wikiplugin_img}<br></li>
-            <li>{preference name=wikiplugin_rss}<br></li>
             </ul>
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
@@ -92,13 +91,6 @@
             <li>{tr}Node.js 24 support in build system{/tr}</li>
             <li>{tr}Git commit information available in admin panel{/tr}</li>
             </ul>
-        </fieldset>
-        <fieldset class="mb-3 w-100 clearfix featurelist">
-            <legend>{tr}Key Settings{/tr}</legend>
-            {preference name=url_fragment_format}
-            {preference name=feature_wysiwyg}
-            {preference name=feature_ajax}
-            {preference name=feature_file_galleries}
         </fieldset>
         <i>
             {tr}This release focuses on stability and long-term improvements rather than major breaking changes.{/tr}
