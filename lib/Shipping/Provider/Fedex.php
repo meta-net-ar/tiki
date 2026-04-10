@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Shipping\Provider;
 
+// @phpstan-ignore-next-line class.nameCase (PHPStan 2.x stubs incorrectly define SoapClient as soapclient)
 use SoapClient;
 use SoapFault;
 use Tiki\Lib\Shipping\Provider\ShippingProviderInterface as ShippingProvider;
@@ -36,7 +37,7 @@ class Fedex implements ShippingProvider
         $request = $this->getRequest($from, $to, $packages);
 
         try {
-            $client = new SoapClient($wsdl, $args);
+            $client = new SoapClient($wsdl, $args); // @phpstan-ignore class.nameCase
             $response = $client->getRates($request);
 
             $options = $response->RateReplyDetails;

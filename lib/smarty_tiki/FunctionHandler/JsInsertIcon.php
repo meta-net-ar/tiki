@@ -22,7 +22,7 @@ class JsInsertIcon extends Base
 {
     public function handle($params, Template $template)
     {
-        $smarty = \Tikilib::lib("smarty");
+        $smarty = \TikiLib::lib("smarty");
         if (! empty($params['type'])) {
             //set icon
             $iconmap = [
