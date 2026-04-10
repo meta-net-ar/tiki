@@ -90,6 +90,18 @@ function looksLikeDependencyMap(array $section): bool
     return true;
 }
 
+function findFirstUnordered(array $keys): ?string
+{
+    $sorted = $keys;
+    sort($sorted, SORT_STRING);
+    for ($i = 1; $i < count($sorted); $i++) {
+        if ($keys[$i] !== $sorted[$i]) {
+            return $keys[$i]; // Returns the first out-of-order item
+        }
+    }
+    return null; // All items are in order
+}
+
 /**
  * Checks if dependencies in a given section are alphabetically sorted.
  */
@@ -101,11 +113,9 @@ function checkDependenciesOrder(array $data, string $section, string $file): boo
     }
 
     $keys = array_keys($deps);
-    $sorted = $keys;
-    sort($sorted, SORT_STRING);
 
-    if ($keys !== $sorted) {
-        echo colorText("⚠️  Dependencies in '$section' of '$file' are not sorted alphabetically.\n", 'yellow');
+    if ($firstUnordered = findFirstUnordered($keys)) {
+        echo colorText("⚠️  Dependencies in '$section' of '$file' are not sorted alphabetically: $firstUnordered is out of order\n", 'yellow');
         return false;
     }
 

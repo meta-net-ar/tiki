@@ -100,6 +100,11 @@ export default defineConfig(({ command, mode }) => {
     addGlobEntries(rollupInput, [
         { prefix: "jquery-tiki/", src: "src/js/jquery-tiki" },
         { prefix: "common-reexported/", src: "src/js/common-reexported" },
+        { prefix: "@tiki/editor-toolbar/", src: "src/js/@tiki/editor-toolbar" },
+        { prefix: "@tiki/plugin-base/", src: "src/js/@tiki/plugin-base" },
+        { prefix: "@tiki/plugins/", src: "src/js/@tiki/plugins" },
+        { prefix: "@tiki/tracker-field-base/", src: "src/js/@tiki/tracker-field-base" },
+        { prefix: "@tiki/tracker-fields/", src: "src/js/@tiki/tracker-fields" },
     ]);
 
     Object.assign(rollupInput, {
@@ -140,7 +145,8 @@ export default defineConfig(({ command, mode }) => {
         "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(__dirname, "tiki-toast-ui/toast-index.js"),
         "@tiki/ui-utils": resolve(__dirname, "@tiki/ui-utils/index.js"),
-        "wysiwyg-summernote": resolve(__dirname, "wysiwyg/summernote/index.js"),
+        "wysiwyg/summernote": resolve(__dirname, "wysiwyg/summernote/index.js"),
+        "wysiwyg/plugin": resolve(__dirname, "wysiwyg/plugin.js"),
     });
     return {
         base: "/public/generated/js", //This must NOT have a trailing slash
@@ -148,6 +154,17 @@ export default defineConfig(({ command, mode }) => {
         resolve: {
             alias: {
                 "moment-timezone": resolve(__dirname, "../../node_modules/moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js"),
+                "html2canvas": "html2canvas-pro",
+                // ui-predicate-vue3
+                "ui-predicate-vue3/dist/ui-predicate-vue3.css": resolve(
+                    __dirname,
+                    "../../node_modules/ui-predicate-vue3/dist/ui-predicate-vue3.css"
+                ),
+                // npm "main" is Parcel IIFE assigning to undeclared parcelRequire — invalid in ESM (strict). Bundle CJS sources.
+                "ui-predicate-core": resolve(
+                    __dirname,
+                    "../../node_modules/ui-predicate-core/src/index.js"
+                ),
             },
         },
         build: {
@@ -170,27 +187,51 @@ export default defineConfig(({ command, mode }) => {
             rollupOptions: {
                 // NOTE: Keep the list alphabetically sorted.
                 external: [
+                    /* src/js/common-reexported section
+                    */
                     /^common-reexported\/.+/,
+
+                    /* src/js/common-externals section
+                    Loaded through path_js_importmap_generator.php or directly in inline modules
+                    As of 2026-03-11, some modules are missing from this list.  They must be found, added here, and functionality checked - benoitg
+                    */
+                    "@dicebear/collection",
+                    "@dicebear/core",
+                    /^@jquery-tiki\/.+/,
+                    "@lottiefiles/dotlottie-wc",
+                    "@popperjs/core",
                     /^@vue-mf\/.+/,
                     /^@vue-widgets\/.+/,
-                    /^@jquery-tiki\/.+/,
-                    "@popperjs/core",
                     "@wysiwyg/summernote",
+                    "@zxing/library",
                     "bootstrap",
                     "clipboard",
                     "converse.js",
                     "dompurify",
                     "driver.js",
+                    "html2canvas-pro",
                     "jquery",
                     "jquery-ui",
                     "jquery-validation",
-                    /^moment\/.+/,
+                    "mermaid",
+                    "moment",
+                    /^moment\/.+/, //Moment submodules
                     "pivottablejs",
                     "reveal.js",
                     "sortablejs",
                     "subtotal",
                     "summernote",
+                    "svgedit",
+                    "three",
+                    "underscore",
                     "vue",
+                    "vue3-sfc-loader",
+
+                    /* src/js/common-externals-legacy-cjs section
+                    Loaded manually through headerlib add_js_file()
+                    */
+                    "swiper",
+                    "tablesorter",
                 ],
                 input: rollupInput,
                 maxParallelFileOps: 100, // TRy to workaround run watch getting stalled with no error.  See https://github.com/vitejs/vite/issues/19410 and https://github.com/rollup/rollup/issues/5848
@@ -251,7 +292,9 @@ export default defineConfig(({ command, mode }) => {
                 //Interesting discussion: https://github.com/vitejs/vite/discussions/8364
 
                 targets: [
-                    /* Things to remember when adding to this list:
+                    /*
+                    Essentially, this builds a common CDN repository
+                    Things to remember when adding to this list:
                     - The reason we copy these is that tiki must run without internet access, so we can't rely on CDNs.  But do try to keep the structure these packages have on CDNs.  Typically, that means copying the dist folder under dist.  To check quickly, look up the package on https://unpkg.com/ , you can then browse what is distributed for each version.
                     - We want to save space, so if there is multiple formats distributed, only pick one (typically ESM)
                     - For many modules that just means:
@@ -262,81 +305,35 @@ export default defineConfig(({ command, mode }) => {
                     But make sure to look into the dist folder, so we don't add a bunch of useless stuff, but don't miss required support files (such as language files)
                     */
 
-                    /* jquery_tiki */
-                    {
-                        src: "node_modules/@event-calendar/core/dist/index.css",
-                        dest: "vendor_dist/@event-calendar/core/dist",
-                    },
-                    {
-                        src: "node_modules/boomerangjs/boomerang.js",
-                        dest: "vendor_dist/boomerangjs/",
-                    },
-                    {
-                        src: "node_modules/boomerangjs/plugins/rt.js",
-                        dest: "vendor_dist/boomerangjs/plugins",
-                    },
-                    {
-                        src: "node_modules/bootstrap/dist/css/bootstrap.min.*",
-                        dest: "vendor_dist/bootstrap/dist/css",
-                    },
-                    {
-                        src: "node_modules/bootstrap/dist/js/bootstrap.esm.min.js",
-                        dest: "vendor_dist/bootstrap/dist/js",
-                    },
-                    {
-                        src: "node_modules/@popperjs/core/dist/esm/*",
-                        dest: "vendor_dist/@popperjs/core/dist/esm",
-                    },
-                    {
-                        src: "node_modules/bootstrap-icons/font/*",
-                        dest: "vendor_dist/bootstrap-icons/font",
-                    },
-                    {
-                        src: ["node_modules/timeago/jquery.timeago.js", "node_modules/timeago/locales"],
-                        dest: "vendor_dist/timeago/dist",
-                    },
-                    /* module system */
+                    /* Importmap polyfills used in path_js_importmap_generator module system */
                     {
                         src: "node_modules/es-module-shims/dist/es-module-shims.js",
                         dest: "vendor_dist/es-module-shims/dist",
                     },
-                    /* tiki_themes */
+
+                    // TODO: This is an indirect runtime dependency of chart.js.  So why isn't it made a direct dependency in common-externals if we have to copy files from it?  -  benoitg - 2026-03-09
                     {
-                        src: "node_modules/@fortawesome/fontawesome-free/css/all.css",
-                        dest: "vendor_dist/@fortawesome/fontawesome-free/css",
+                        src: "node_modules/@kurkle/color/dist/color.esm.js",
+                        dest: "vendor_dist/@kurkle/color/dist",
+                    },
+
+                    /* BEGIN common_externals section
+                    These should all ALSO be in rollupOptions / external */
+                    {
+                        src: "node_modules/@dicebear/*", //Both @@dicebear/core and @dicebear/collection.  They do not have a normal dist structure
+                        dest: "vendor_dist/@dicebear",
                     },
                     {
-                        src: "node_modules/@fortawesome/fontawesome-free/webfonts/*",
-                        dest: "vendor_dist/@fortawesome/fontawesome-free/webfonts",
+                        src: "node_modules/@lottiefiles/dotlottie-wc/dist/*.js",
+                        dest: "vendor_dist/@lottiefiles/dotlottie-wc/dist",
                     },
-                    {
-                        src: "node_modules/@zxing/library/umd/index.min.js",
-                        dest: "vendor_dist/@zxing/library/umd/index.min.js",
-                    },
-                    /* vue_widgets */
-                    {
-                        src: "node_modules/element-plus/dist/locale/*.min.mjs",
-                        dest: "vendor_dist/element-plus/dist/locale",
-                    },
-                    {
-                        src: [
-                            "node_modules/element-plus/theme-chalk/base.css",
-                            "node_modules/element-plus/theme-chalk/el-message.css",
-                            "node_modules/element-plus/theme-chalk/el-message-box.css",
-                            "node_modules/element-plus/theme-chalk/el-popper.css",
-                            "node_modules/element-plus/theme-chalk/el-backtop.css",
-                        ],
-                        dest: "vendor_dist/element-plus/css",
-                    },
-                    /* common_externals */
                     {
                         src: "node_modules/@shoelace-style/shoelace/dist/themes/*.css",
                         dest: "vendor_dist/@shoelace-style/shoelace/dist/themes",
                     },
                     {
-                        // This is an indirect runtime dependency of chart.js
-                        src: "node_modules/@kurkle/color/dist/color.esm.js",
-                        dest: "vendor_dist/@kurkle/color/dist",
+                        src: "node_modules/@zxing/library/umd/index.min.js",
+                        dest: "vendor_dist/@zxing/library/umd/index.min.js",
                     },
                     {
                         src: "node_modules/animejs/lib/anime.es.js",
@@ -407,7 +404,7 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/d3-milestones/build",
                     },
                     {
-                        src: "node_modules/dompurify/dist/purify.(es|min)*",
+                        src: "node_modules/dompurify/dist/purify.(es)*",
                         dest: "vendor_dist/dompurify/dist",
                     },
                     {
@@ -443,7 +440,7 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/glightbox/dist",
                     },
                     {
-                        src: "node_modules/html2canvas-pro/dist/html2canvas-pro.min.js",
+                        src: "node_modules/html2canvas-pro/dist/html2canvas-pro.esm.js",
                         dest: "vendor_dist/html2canvas-pro/dist",
                     },
                     {
@@ -465,10 +462,6 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/jquery-zoom/(icon.png|jquery.zoom.js)",
                         dest: "vendor_dist/jquery-zoom",
-                    },
-                    {
-                        src: "node_modules/moment/min/*",
-                        dest: "vendor_dist/moment/min",
                     },
                     {
                         src: "node_modules/jquery/dist/*",
@@ -495,8 +488,20 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/jquery-validation/dist",
                     },
                     {
+                        src: "node_modules/mermaid/dist/mermaid.esm.min.mjs",
+                        dest: "vendor_dist/mermaid/dist",
+                    },
+                                        {
+                        src: "node_modules/mermaid/dist/chunks/mermaid.esm.min/*",
+                        dest: "vendor_dist/mermaid/dist/chunks/mermaid.esm.min",
+                    },
+                    {
                         src: "node_modules/moment/dist/*",
                         dest: "vendor_dist/moment/dist",
+                    },
+                    { //This is a nightmare.  It was added https://gitlab.com/tikiwiki/tiki/-/merge_requests/5950, out of alphabetical order.  But then https://gitlab.com/tikiwiki/tiki/-/merge_requests/7598 added it in setup.php on every page if fgal_use_record_rtc_screen is on!  Which would be bad enough, but it's not the same version as the rest of tiki uses above from the importmap.  benoitg - 2026-03-09
+                        src: "node_modules/moment/min/*",
+                        dest: "vendor_dist/moment/min",
                     },
                     {
                         src: "node_modules/ol/dist/ol.js",
@@ -550,6 +555,10 @@ export default defineConfig(({ command, mode }) => {
                         src: "node_modules/subtotal/dist/subtotal.min.js",
                         dest: "vendor_dist/subtotal/dist",
                     },
+                                        {
+                        src: "node_modules/svgedit/dist/editor/*",  //Could be pared down, but we do need most of the subdirectories
+                        dest: "vendor_dist/svgedit/dist/editor",
+                    },
                     {
                         src: [
                             "node_modules/swagger-ui-dist/swagger-ui-bundle.js",
@@ -560,9 +569,34 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/swagger-ui-dist",
                     },
                     {
+                        src: "node_modules/three/build/three.*.min.js",
+                        dest: "vendor_dist/three/build",
+                    },
+                    {
+                        src: "node_modules/vue/dist/vue.esm-browser.js",
+                        dest: "vendor_dist/vue/dist",
+                    },
+                    {
+                        src: "node_modules/vue3-sfc-loader/dist/vue3-sfc-loader.esm.js",
+                        dest: "vendor_dist/vue3-sfc-loader/dist",
+                    },
+                    /* END common-externals section */
+
+                    /* BEGIN src/js/common-externals-legacy-cjs section
+                    These should all ALSO be in rollupOptions / external */
+                    {
+                        src: "node_modules/swiper/*.min.js",
+                        dest: "vendor_dist/swiper",
+                    },
+                    {
+                        src: "node_modules/swiper/*.min.css",
+                        dest: "vendor_dist/swiper",
+                    },
+                    {
                         src: "node_modules/tablesorter/dist/js/jquery.tablesorter.combined.js",
                         dest: "vendor_dist/tablesorter/dist/js",
                     },
+
                     {
                         src: "node_modules/tablesorter/dist/js/parsers/parser-input-select.min.js",
                         dest: "vendor_dist/tablesorter/dist/js/parsers",
@@ -580,30 +614,47 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/tablesorter/dist/js/widgets",
                     },
                     {
-                        src: "node_modules/vue/dist/vue.esm-browser.js",
-                        dest: "vendor_dist/vue/dist",
+                        src: "node_modules/underscore/underscore-esm-min.js",
+                        dest: "vendor_dist/underscore",
+                    },
+                    /* END src/js/common-externals-legacy-cjs section */
+
+                    /* src/js/jquery_tiki - These should be in common-externals* if they are not compiled in!  - benoitg - 2026-03-11 */
+                    {
+                        src: "node_modules/@event-calendar/core/dist/index.css",
+                        dest: "vendor_dist/@event-calendar/core/dist",
                     },
                     {
-                        src: ["node_modules/summernote/dist/summernote-bs5.min.js", "node_modules/summernote/dist/summernote-bs5.min.css"],
-                        dest: "vendor_dist/summernote/dist",
+                        src: "node_modules/boomerangjs/boomerang.js",
+                        dest: "vendor_dist/boomerangjs/",
                     },
                     {
-                        src: "node_modules/summernote/dist/font/*",
-                        dest: "vendor_dist/summernote/dist/font",
+                        src: "node_modules/boomerangjs/plugins/rt.js",
+                        dest: "vendor_dist/boomerangjs/plugins",
                     },
                     {
-                        src: "node_modules/summernote/dist/lang/*.min.js",
-                        dest: "vendor_dist/summernote/dist/lang",
+                        src: "node_modules/bootstrap/dist/css/bootstrap.min.*",
+                        dest: "vendor_dist/bootstrap/dist/css",
                     },
                     {
-                        src: "node_modules/swiper/*.min.js",
-                        dest: "vendor_dist/swiper",
+                        src: "node_modules/bootstrap/dist/js/bootstrap.esm.min.js",
+                        dest: "vendor_dist/bootstrap/dist/js",
                     },
                     {
-                        src: "node_modules/swiper/*.min.css",
-                        dest: "vendor_dist/swiper",
+                        src: "node_modules/@popperjs/core/dist/esm/*",
+                        dest: "vendor_dist/@popperjs/core/dist/esm",
                     },
+                    {
+                        src: "node_modules/bootstrap-icons/font/*",
+                        dest: "vendor_dist/bootstrap-icons/font",
+                    },
+                    {
+                        src: ["node_modules/timeago/jquery.timeago.js", "node_modules/timeago/locales"],
+                        dest: "vendor_dist/timeago/dist",
+                    },
+
                     /**
+                     * src/js/tiki-toast-ui
                      * Toast UI Editor: We place the CSS file here because inserting it directly into the toast-index.js file
                      * causes part of the editor to be styled while another part remains unstyled. Therefore, we preferred to use the CSS file directly
                      */
@@ -622,6 +673,47 @@ export default defineConfig(({ command, mode }) => {
                         ],
                         dest: "vendor_dist/vis-timeline/dist",
                     },
+
+                    /* src/js/vue_widgets */
+                    {
+                        src: "node_modules/element-plus/dist/locale/*.min.mjs",
+                        dest: "vendor_dist/element-plus/dist/locale",
+                    },
+                    {
+                        src: [
+                            "node_modules/element-plus/theme-chalk/base.css",
+                            "node_modules/element-plus/theme-chalk/el-message.css",
+                            "node_modules/element-plus/theme-chalk/el-message-box.css",
+                            "node_modules/element-plus/theme-chalk/el-popper.css",
+                            "node_modules/element-plus/theme-chalk/el-backtop.css",
+                        ],
+                        dest: "vendor_dist/element-plus/css",
+                    },
+
+                    /* src/js/wysiwyg  - These should be in common-externals* if they are not compiled in!  - benoitg - 2026-03-11 */
+                    {
+                        src: ["node_modules/summernote/dist/summernote-bs5.min.js", "node_modules/summernote/dist/summernote-bs5.min.css"],
+                        dest: "vendor_dist/summernote/dist",
+                    },
+                    {
+                        src: "node_modules/summernote/dist/font/*",
+                        dest: "vendor_dist/summernote/dist/font",
+                    },
+                    {
+                        src: "node_modules/summernote/dist/lang/*.min.js",
+                        dest: "vendor_dist/summernote/dist/lang",
+                    },
+
+                    /* Assets for src/scss (theme system) */
+                    {
+                        src: "node_modules/@fortawesome/fontawesome-free/css/all.css",
+                        dest: "vendor_dist/@fortawesome/fontawesome-free/css",
+                    },
+                    {
+                        src: "node_modules/@fortawesome/fontawesome-free/webfonts/*",
+                        dest: "vendor_dist/@fortawesome/fontawesome-free/webfonts",
+                    },
+
                 ],
             }),
             AutoImport({
@@ -638,7 +730,7 @@ export default defineConfig(({ command, mode }) => {
         server: {
             watch: {
                 //This is also used by vitest to exclude files from watch
-                ignored: ["**/node_modules/**", "**/.git/**", "**/.gitlab-ci-local/**", "**/vendor_bundled/**"],
+                ignored: ["**/node_modules/**", "**/.git/**", "**/.gitlab-ci-local/**", "**/vendor_bundled/**","**/temp/**"],
             },
         },
         test: {
@@ -676,7 +768,8 @@ function addGlobEntries(rollupInput, entries) {
         Object.assign(
             rollupInput,
             Object.fromEntries(
-                globSync(`${src}/**/*.js`, {
+                //do NOT change this to /**/*.js, this is to implement an easy migration path for single file modules like the old lib/jquery-tiki
+                globSync(`${src}/*.js`, {
                     ignore: ["**/node_modules/**", "**/*.test.js"]
                 }).map(file => {
                     const relativePath = path.relative(src, file.slice(0, file.length - path.extname(file).length));

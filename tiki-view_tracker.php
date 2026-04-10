@@ -30,7 +30,6 @@ $inputConfiguration = [
             'offset'             => 'int',           //get
             'maxRecords'         => 'int',           //get
             'filterfield'        => 'word',          //get
-            'filtervalue'        => 'word',          //get
             'filtervalue_other'  => 'word',          //get
             'displayedFields'    => 'word',          //get
         ],
@@ -38,6 +37,7 @@ $inputConfiguration = [
             'action'                => 'string',    //get
             'vals'                  => 'none',      //get
             'sort_mode'             => 'string',    //get
+            'filtervalue'           => 'word',
         ],
     ],
 ];

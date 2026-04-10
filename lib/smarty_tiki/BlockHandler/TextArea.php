@@ -29,7 +29,8 @@ use Exception;
  *    _syntax: Specify syntax to be used.
  *              If blank then \WikiParser_Parsable::guess_syntax is used.
  *              Use "none" to make a plain text area
- *
+ *    codemirror: if set to 'true' and feature_syntax_highlighter is enabled,
+ *             initializes the textarea using CodeMirror instead of the default editor.
  * usage: {textarea id='my_area' name='my_area'}{tr}My Text{/tr}{/textarea}
  */
 /**
@@ -101,6 +102,9 @@ class TextArea extends Base
         if ($prefs['feature_syntax_highlighter'] === 'y') {
             $params['data-codemirror'] = $params['codemirror'] ?? '';
             $params['data-syntax'] = $params['_syntax'];
+            //add codemirror stuff
+            require_once("lib/codemirror_tiki/tiki_codemirror.php");
+            addCodemirror();
         }
         //keep params html5 friendly
         unset($params['codemirror']);
@@ -207,8 +211,11 @@ class TextArea extends Base
 
             // setup for wiki editor
 
+            if (empty($params['disabled'])) {
+                unset($params['disabled']);
+            }
+
             $params['rows'] = ! empty($params['rows']) ? $params['rows'] : 20;
-    //      $params['cols'] = !empty($params['cols']) ? $params['cols'] : 80;
 
             $textarea_attributes = '';
             foreach ($params as $k => $v) {

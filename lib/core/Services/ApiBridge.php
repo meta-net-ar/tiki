@@ -38,6 +38,21 @@ class Services_ApiBridge
                 }
             }
         }
+        // Merge JSON request body when Content-Type is application/json.
+        // PHP only populates $_POST for form-urlencoded and multipart, not for JSON bodies.
+        // This makes JSON fields available via $input in all API controllers.
+        if (
+            isset($_SERVER['CONTENT_TYPE'])
+            && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false
+        ) {
+            $rawBody = file_get_contents('php://input');
+            if (! empty($rawBody)) {
+                $jsonData = json_decode($rawBody, true);
+                if (is_array($jsonData)) {
+                    $request = array_merge($request, $jsonData);
+                }
+            }
+        }
         $this->jitRequest = new JitFilter($request);
         if ($route['_route'] == 'home') {
             $this->renderDocs();
@@ -175,6 +190,7 @@ class Services_ApiBridge
         $routes->add('wiki-unlock', (new Route('wiki/unlock', ['controller' => 'wiki', 'action' => 'unlock_pages', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('wiki-zip', (new Route('wiki/zip', ['controller' => 'wiki', 'action' => 'zip', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('wiki-versions-delete', (new Route('wiki/page/{page}/delete', ['controller' => 'wiki', 'action' => 'remove_page_versions', 'confirmForm' => 'y']))->setMethods(['POST']));
+        $routes->add('wiki-patch', (new Route('wiki/page/{page}', ['controller' => 'wiki', 'action' => 'patch_page']))->setMethods(['PATCH']));
         $routes->add('galleries', (new Route('galleries', ['controller' => 'file', 'action' => 'list_galleries', 'offset' => 0, 'maxRecords' => -1]))->setMethods(['GET']));
         $routes->add('galleries-upload', (new Route('galleries/upload', ['controller' => 'file', 'action' => 'upload', 'upload' => 1]))->setMethods(['POST']));
         $routes->add('galleries-download', (new Route('galleries/{fileId}/download', ['controller' => 'file', 'action' => 'download']))->setMethods(['GET']));

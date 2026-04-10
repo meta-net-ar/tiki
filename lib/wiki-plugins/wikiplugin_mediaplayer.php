@@ -103,36 +103,60 @@ function wikiplugin_mediaplayer($data, $params)
     } elseif (! is_null($params['src'])) {
         // This regex is used to extract the file ID from various URL formats:
         // - tiki-display.php?fileId=74
+        // - tiki-download_file.php?fileId=74
+        // - tiki-download_wiki_attachment.php?attId=81
         // - display74
         // - dl74
         //
-        // The pattern (?:dl|display|fileId=)(\d*)(?:$|&|?) ensures that:
-        // - The correct fileId is captured regardless of URL format.
+        // The pattern (?:dl|display|fileId=|attId=)(\d*)(?:$|&|?) ensures that:
+        // - The correct fileId/attId is captured regardless of URL format.
         // - It properly handles URLs with additional parameters.
         //
         // Ideally, URL parsing should be handled by the routing system (route.php) instead of using a regex in a plugin.
         // However, since the necessary abstractions are not currently available, this regex is applied here as a temporary solution.
 
         preg_match('/(?:dl|display|attId=|fileId=)(\d+)(?:$|&|\?|#)/', $params['src'], $matches);
+
+        // Detect wiki attachment URLs (tiki-download_wiki_attachment.php?attId=X)
+        // These are stored in a separate table and handled by a different library than file gallery files.
+        $isWikiAttachment = strpos($params['src'], 'tiki-download_wiki_attachment.php') !== false
+            || (! empty($matches[0]) && strpos($matches[0], 'attId=') === 0);
+
         $file = '';
-        if (! empty($matches[1])) { // fileId 0 is also invalid
-            $fileId = $matches[1];
-            $filegallib = TikiLib::lib('filegal');
+        if (! empty($matches[1])) { // fileId/attId 0 is also invalid
+            $itemId = $matches[1];
             global $base_url;
             $sourceLink = $access->absoluteUrl($params['src']);
 
             // Internal link.
             if (strrpos($sourceLink, $base_url) !== false) {
-                $file = $filegallib->get_file_info($fileId);
-                if (! empty($file['filetype']) && $file['fileId'] == $fileId) {
-                    $extension = pathinfo($file['filename'], PATHINFO_EXTENSION);
-                    $params['type'] = $file['filetype'];
-                    $sourceLink = smarty_modifier_sefurl($fileId, 'display');
-                    $fileUrl = $access->absoluteUrl($sourceLink);
-                    $params['src'] = $fileUrl;
+                if ($isWikiAttachment) {
+                    // Wiki attachment: use tikilib instead of filegallib.
+                    $tikilib = TikiLib::lib('tiki');
+                    $file = $tikilib->get_wiki_attachment($itemId);
+                    if (! empty($file['filetype']) && $file['attId'] == $itemId) {
+                        $extension = pathinfo($file['filename'], PATHINFO_EXTENSION);
+                        $params['type'] = $file['filetype'];
+                        // Keep $params['src'] pointing to the wiki attachment URL as-is.
+                    } else {
+                        Feedback::error(tr("PluginMediaPlayer: File %0 not found.", $params['src']));
+                        return '';
+                    }
                 } else {
-                    Feedback::error(tr("PluginMediaPlayer: File %0 not found.", $params['src']));
-                    return '';
+                    // File gallery file.
+                    $fileId = $itemId;
+                    $filegallib = TikiLib::lib('filegal');
+                    $file = $filegallib->get_file_info($fileId);
+                    if (! empty($file['filetype']) && $file['fileId'] == $fileId) {
+                        $extension = pathinfo($file['filename'], PATHINFO_EXTENSION);
+                        $params['type'] = $file['filetype'];
+                        $sourceLink = smarty_modifier_sefurl($fileId, 'display');
+                        $fileUrl = $access->absoluteUrl($sourceLink);
+                        $params['src'] = $fileUrl;
+                    } else {
+                        Feedback::error(tr("PluginMediaPlayer: File %0 not found.", $params['src']));
+                        return '';
+                    }
                 }
             } else {
                 // External link.
@@ -161,6 +185,19 @@ function wikiplugin_mediaplayer($data, $params)
             }
         } else {
             $extension = pathinfo($params['src'], PATHINFO_EXTENSION);
+        }
+
+        // If the extension could not be determined from the URL or remote headers,
+        // fall back to deriving it from the 'type' parameter (e.g. 'mp4' or 'video/mp4').
+        if (empty($extension) && ! empty($params['type'])) {
+            $typeHint = strtolower($params['type']);
+            // Strip MIME type prefix (e.g. 'video/mp4' → 'mp4').
+            if (strpos($typeHint, '/') !== false) {
+                $typeHint = substr($typeHint, strrpos($typeHint, '/') + 1);
+            }
+            if (in_array($typeHint, ALL_ACCEPTED_FORMATS)) {
+                $extension = $typeHint;
+            }
         }
 
         if (! in_array($extension, ALL_ACCEPTED_FORMATS)) {

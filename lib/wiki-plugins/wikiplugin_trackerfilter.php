@@ -1002,7 +1002,17 @@ function wikiplugin_trackerFilter_build_urlquery($params)
     }
     $urlquery = [];
     foreach ($params['filterfield'] as $key => $filter) {
-        $filterfield[] = $filter;
+        if (is_array($filter)) {
+            if (! empty($filter['sqlsearch']) && is_array($filter['sqlsearch'])) {
+                $filterfield[] = '(' . implode(':', $filter['sqlsearch']) . ')';
+            } elseif (! empty($filter['usersearch']) && is_array($filter['usersearch'])) {
+                $filterfield[] = '(' . implode(':', $filter['usersearch']) . ')';
+            } else {
+                continue;
+            }
+        } else {
+            $filterfield[] = $filter;
+        }
         if (! empty($params['exactvalue'][$key]) && empty($params['filtervalue'][$key])) {
             $filtervalue[] = '';
             $exactvalue[] = $params['exactvalue'][$key];

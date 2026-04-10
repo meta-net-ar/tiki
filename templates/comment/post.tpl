@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -17,7 +17,7 @@
     {else}
         <form method="post" action="{service controller=comment action=post}">
             <div class="card">
-                {include file="post_form_content.tpl"}
+                {include file="comment/post_form_content.tpl"}
                 <div class="card-footer">
                     {if $prefs.feature_antibot eq 'y'}
                         {$showmandatory='y'}

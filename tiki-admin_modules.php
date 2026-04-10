@@ -62,6 +62,8 @@ $modlib = TikiLib::lib('mod');
 $menulib = TikiLib::lib('menu');
 $tikilib = TikiLib::lib('tiki');
 
+$modlib->setModuleAssignmentMode(true);
+
 $userHasAssignedModules = $prefs['user_assigned_modules'] === 'y'
     && TikiLib::lib('usermodules')->user_has_assigned_modules($user);
 
@@ -125,6 +127,7 @@ if (! empty($_REQUEST['edit_assign'])) {
     $smarty->assign_by_ref('assign_position', $info['position']);
     $smarty->assign_by_ref('assign_cache', $info['cache_time']);
     $smarty->assign_by_ref('assign_type', $info['type']);
+    $smarty->assign_by_ref('assign_rows', $info['rows']);
     $smarty->assign_by_ref('assign_order', $cosa);
     $smarty->assign_by_ref('info', $info);
     if (! $info['name']) {
@@ -141,18 +144,18 @@ if (! empty($_REQUEST['edit_assign'])) {
     }
 
     $modinfo = $modlib->get_module_info($info['name']);
-    if ($modinfo['type'] != 'function') {
-        $smarty->assign_by_ref('assign_rows', $info['rows']);
-        $smarty->assign_by_ref('assign_params', $info['params']); // For old-style (user) modules
-    } else {
-        if (empty($info['params'])) {
-            $info['params'] = [];
-        }
-        $modlib->dispatchValues($info['params'], $modinfo['params']);
-        if (isset($modinfo['params']['rows'])) {
-            $modinfo['params']['rows']['value'] = $info['rows'];
+    $params = [];
+
+    if (! empty($info['params'])) {
+        if (is_array($info['params'])) {
+            $params = $info['params'];
+        } else {
+            parse_str($info['params'], $params);
         }
     }
+    $params['rows'] = $info['rows'];
+
+    $modlib->dispatchValues($params, $modinfo['params']);
     $smarty->assign('assign_info', $modinfo);
 }
 //post is used for preview because there is another submit item on the form requiring it
@@ -412,7 +415,6 @@ if (isset($_REQUEST['assign']) && $access->checkCsrf()) {
             $_REQUEST['assign_type']
         );
         $logslib->add_log('adminmodules', 'assigned module ' . $assign_name);
-        $modlib->reorder_modules();
         if ($result) {
             Feedback::success(tr('Module assigned'));
         } else {

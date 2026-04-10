@@ -104,16 +104,17 @@ header.navbar.fixed-top {
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
-    --tiki-admin-navbar-bg: #28AAE1FF;
+    --tiki-admin-top-nav-bg: #28AAE1FF;
     --tiki-admin-top-nav-color: var(--tiki-top-color);
     --tiki-admin-top-nav-hover-color: #{$navbar-dark-hover-color};
     --tiki-admin-top-nav-hover-bg: none ;
+    --tiki-admin-top-box-shadow: 0px 1px 10px #32373d;
     --tiki-admin-aside-nav-bg: #28AAE1FF;
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
     --tiki-admin-dropdown-bg: #{$dropdown-bg};
- //   --tiki-admin-dropdown-link-color: #{$dropdown-link-color};
-//    --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
+    --tiki-admin-dropdown-link-color: #{$dropdown-color};
+    --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
 }
 
@@ -131,10 +132,10 @@ header.navbar.fixed-top {
     --tiki-admin-aside-nav-bg: var(--tiki-admin-top-nav-bg);
     --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
     --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
-    --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color};
     --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
-//    --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
-//    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
+    --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color};
+    --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
+    --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
 //    --tiki-admin-dropdown-link-active-bg: purple;
 
     .accordion-item {

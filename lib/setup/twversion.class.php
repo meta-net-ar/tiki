@@ -46,7 +46,7 @@ class TWVersion
         $this->branch   = 'trunk';
 
         // Set everything else, including defaults.
-        $this->version  = '30.0vcs';
+        $this->version  = '31.0vcs';
         $this->star     = 'TBA';
         $this->releases = [];
 
@@ -506,6 +506,7 @@ class TWVersion
         return [
             '24' => '2027-03-31',
             '27' => '2029-02-28',
+            '30' => '2031-03-31',
         ];
     }
 

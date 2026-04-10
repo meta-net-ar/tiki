@@ -9,21 +9,14 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "svgedit": "~7.4.1"
-  },
-  "dependenciesComment": {
-    "svgedit": "version 7.4.1 fixes jspdf security vulnerabilities (GHSA-8mvj-3j78-4qmw, GHSA-f8cm-6447-x5h2)"
-  },
   "devDependenciesComment": {
-    "@svgedit/svgcanvas": "https://github.com/SVG-Edit/svgedit/blob/master/packages/svgcanvas/CHANGES.md",
+    "@event-calendar/core": "Used by tiki-calendar.js",
+    "async-es": "Used by tiki-async-loop.js",
     "svelte": "This is an indirect dependency of @event-calendar/core. It is pinned to 5.51.0 because later versions break most calendar interactions. See: https://github.com/vkurko/calendar/issues/623"
   },
   "devDependencies": {
     "@event-calendar/core": "^4.5.1",
-    "@svgedit/svgcanvas": "^7.2.1",
     "async-es": "^3.2.6",
-    "summernote": "^0.9.1",
     "svelte": "5.51.0"
   }
 }

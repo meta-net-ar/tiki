@@ -85,11 +85,11 @@ $mark-bg: #806200;
 //$table-bg-scale:              0%; // !default;
 
 // Forms
-$input-bg:                          $white; // !default;
+//$input-bg:                          $white; // !default;
 $input-disabled-color:              $gray-600; // !default;
 $input-disabled-bg:                 $gray-100; // !default;
 
-$input-color:                       $gray-900; // !default;
+$input-color:                       #aaa; // $gray-200;
 $input-border-color:                transparent; // !default;
 
 $input-placeholder-color:               $gray-500; // !default;

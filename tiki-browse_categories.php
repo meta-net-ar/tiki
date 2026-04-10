@@ -11,19 +11,19 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'parentId'                    => 'int',           //get
-            'maxRecords'                  => 'int',           //get
-            'sort_mode'                   => 'word',          //get
-            'type'                        => 'string',        //get
-            'offset'                      => 'int',           //get
-            'find'                        => 'string',        //post
-            'deep'                        => 'string',          //get
-            'watch_event'                 => 'word',          //get
-            'watch_action'                => 'word',          //get
-            'watch_object'                => 'int',           //get
-            'and'                         => 'bool',          //get
-            'plain'                       => 'striptags',     //get
-            'links'                       => 'striptags',     //get
+            'parentId'                    => 'int',           // get
+            'maxRecords'                  => 'int',           // get
+            'sort_mode'                   => 'word',           // get
+            'type'                        => 'wordspace',     // get
+            'offset'                      => 'int',           // get
+            'find'                        => 'string',     // post
+            'deep'                        => 'word',          // get & post
+            'watch_event'                 => 'word',           // get
+            'watch_action'                => 'word',           // get
+            'watch_object'                => 'int',           // get
+            'and'                         => 'bool',          // get
+            'plain'                       => 'striptags',          // get
+            'links'                       => 'striptags',          // get
         ],
     ]
 ];

@@ -1381,6 +1381,7 @@ class TrackerLib extends TikiLib
                 $fv = $filtervalue;
                 $ev = $exactvalue;
                 $ff = (int) $filterfield;
+                $ff_array = $filterfield;
                 $nb_filtered_fields = 1;
             } else {
                 $nb_filtered_fields = count($filterfield);
@@ -1394,7 +1395,21 @@ class TrackerLib extends TikiLib
                     $ev = ! empty($exactvalue[$i]) ? $exactvalue[$i] : null;
                     $fv = ! empty($filtervalue[$i]) ? $filtervalue[$i] : null;
                 }
-                $filter = $this->get_tracker_field($ff);
+                $isCompositeFilter = is_array($ff_array)
+                    && (
+                        (isset($ff_array['sqlsearch']) && is_array($ff_array['sqlsearch']))
+                        || (isset($ff_array['usersearch']) && is_array($ff_array['usersearch']))
+                    );
+                if ($isCompositeFilter) {
+                    $filter = ['type' => null];
+                } else {
+                    $field = $this->get_tracker_field($ff);
+                    if ($field) {
+                        $filter = $field;
+                    } else {
+                        $filter = ['type' => null];
+                    }
+                }
 
                 // Determine if field is an item list field and postpone filtering till later if so
                 if ($filter["type"] == 'l' && isset($filter['options_array'][2]) && isset($filter['options_array'][2]) && isset($filter['options_array'][3])) {
@@ -3922,9 +3937,12 @@ class TrackerLib extends TikiLib
     public function get_tracker_field($fieldIdOrPermName, $useCache = true)
     {
         static $cache = [];
-        if ($useCache && (is_string($fieldIdOrPermName) || is_int($fieldIdOrPermName)) && isset($cache[$fieldIdOrPermName])) {
+        $isCacheableKey = is_string($fieldIdOrPermName) || is_int($fieldIdOrPermName);
+
+        if ($useCache && $isCacheableKey && isset($cache[$fieldIdOrPermName])) {
             return $cache[$fieldIdOrPermName];
         }
+
         if ((int)$fieldIdOrPermName > 0) {
             $res = $this->fields()->fetchFullRow(['fieldId' => (int)$fieldIdOrPermName]);
         } else {
@@ -3940,7 +3958,9 @@ class TrackerLib extends TikiLib
             if (TikiLib::lib('tiki')->isMemoryLow()) {
                 $cache = [];
             }
-            $cache[$fieldIdOrPermName] = $res;
+            if ($isCacheableKey) {
+                $cache[$fieldIdOrPermName] = $res;
+            }
             return $res;
         }
     }
@@ -4175,7 +4195,11 @@ class TrackerLib extends TikiLib
             $handler = $this->get_field_handler($field, $item);
 
             if ($handler) {
-                $value = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
+                $field_ins = $handler->getFieldData();
+                $value_ins = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
+                if (is_array($value_ins)) {
+                    $value = array_merge($value_ins, $field_ins);
+                }
             }
 
             if (! empty($value)) {
@@ -5686,14 +5710,17 @@ class TrackerLib extends TikiLib
             }
             include_once('lib/webmail/tikimaillib.php');
             if ($simpleEmail == "n") {
+                $desc = "";
                 $mail_main_value_fieldId = $tracker_definition->getMainFieldId();
-                $mail_main_value_field = $tracker_definition->getFieldInfoFromFieldId($mail_main_value_fieldId);
-                if (in_array($mail_main_value_field['type'], ['r', 'q'])) {
-                    // Item Link & auto-inc are special cases as field value is not the displayed text. There might be other such field types.
-                    $handler = $this->get_field_handler($mail_main_value_field);
-                    $desc = $handler->renderOutput(['list_mode' => 'csv']);
-                } else {
-                    $desc = $this->get_item_value($trackerId, $itemId, $mail_main_value_fieldId);
+                if ($mail_main_value_fieldId) {
+                    $mail_main_value_field = $tracker_definition->getFieldInfoFromFieldId($mail_main_value_fieldId);
+                    if (in_array($mail_main_value_field['type'], ['r', 'q'])) {
+                        // Item Link & auto-inc are special cases as field value is not the displayed text. There might be other such field types.
+                        $handler = $this->get_field_handler($mail_main_value_field);
+                        $desc = $handler->renderOutput(['list_mode' => 'csv']);
+                    } else {
+                        $desc = $this->get_item_value($trackerId, $itemId, $mail_main_value_fieldId);
+                    }
                 }
                 $smarty = TikiLib::lib('smarty');
                 $desc = $this->removeInlineSyntaxTags($desc);

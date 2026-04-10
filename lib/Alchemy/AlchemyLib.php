@@ -90,6 +90,11 @@ class AlchemyLib
         }
 
         $commandOutput = shell_exec('identify -list policy');
+
+        if ($commandOutput === null) {
+            throw new \Exception(tr('Unable to execute "identify" command. Make sure ImageMagick is installed'));
+        }
+
         preg_match("/Path: .*ImageMagick.*policy.xml.*rights:(.+)pattern: PDF/s", $commandOutput, $matches);
 
         if (! isset($matches[1])) {

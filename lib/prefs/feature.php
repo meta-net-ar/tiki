@@ -2587,6 +2587,7 @@ function prefs_feature_list($partial = false)
             'help' => 'Tiki-User-Credits',
             'default' => 'n',
             'view' => 'tiki-admin_credits.php',
+            'tags' => ['experimental'],
         ],
         'feature_invite' => [
             'name' => tra('Invite users'),

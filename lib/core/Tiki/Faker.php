@@ -272,26 +272,14 @@ class Faker extends FakerProviderBase
     }
 
     /**
-     * Insert unique identifier number
+     * Insert unique identifier number - handled by the autoincrement field handler
      *
      * @param $field
-     * @return null
+     * @return string
      */
     public function tikiUniqueIdentifier($field)
     {
-        $trackerId = ! empty($field['trackerId']) ? $field['trackerId'] : 0;
-        $trackerName = ! empty($field['permName']) ? $field['permName'] : '';
-        $definition = Tracker_Definition::get($trackerId);
-        $trackerUtilities = new Services_Tracker_Utilities();
-        $trackerUtilities->insertItem(
-            $definition,
-            [
-                'status' => null,
-                'fields' => [$trackerName => ''],
-            ]
-        );
-
-        return null;
+        return '';
     }
 
     /**

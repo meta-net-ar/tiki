@@ -191,7 +191,7 @@ composer-dbdiff:
 
 
 #
-# Code quality:  linting, coding standards, etc.
+# Code quality: linting, coding standards, etc.
 #
 
 phpcs:
@@ -230,6 +230,12 @@ smarty-lint:
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - php vendor_bundled/vendor/umakantp/smartylint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
+
+smarty-syntax-check:
+  stage: code-quality
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php doc/devtools/check_smarty_syntax.php
 
 eslint:
   stage: code-quality
@@ -339,6 +345,13 @@ check-external-links:
   script:
     - php -d display_errors=On doc/devtools/check_external_links.php
 
+check-security-static:
+  stage: tiki-check
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    - php -d display_errors=On doc/devtools/securitycheck.php
+
 translation:
   stage: tiki-check
   needs:
@@ -446,6 +459,22 @@ composer-could-update-lock:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
       command: [ "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
       alias: mysql
+
+db-upgrade-30-mysql:
+  <<: *template-tiki-schema-upgrade-mysql8
+  variables:
+    DBFILE: ci_30.sql
+    DBVER: 30
+    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
+    ENGINE: InnoDB
+
+db-upgrade-29-mysql:
+  <<: *template-tiki-schema-upgrade-mysql8
+  variables:
+    DBFILE: ci_29.sql
+    DBVER: 29
+    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
+    ENGINE: InnoDB
 
 db-upgrade-28-mysql:
   <<: *template-tiki-schema-upgrade-mysql8

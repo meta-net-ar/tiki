@@ -360,11 +360,27 @@ function getTikiRequirements()
 {
     return array(
         array(
+            'name'    => 'Tiki 30.x',
+            'version' => 30,
+            'php'     => array(
+                'min' => '8.1.0', // For the latest version, this should match TIKI_MIN_PHP_VERSION, but cannot use it since tiki-check is expected to run standalone
+                'max' => '8.5.99', // For the latest version, this should match TIKI_MAX_SUPPORTED_PHP_VERSION, but cannot use it since tiki-check is expected to run standalone
+            ),
+            'mariadb' => array(
+                'min' => '10.5',
+                'max' => null
+            ),
+            'mysql'   => array(
+                'min' => '8.0',
+                'max' => null
+            ),
+        ),
+        array(
             'name'    => 'Tiki 29.x',
             'version' => 29,
             'php'     => array(
-                'min' => '8.1.0', // For the latest version, this should match TIKI_MIN_PHP_VERSION, but cannot use it since tiki-check is expected to run standalone
-                'max' => '8.4.99', // For the latest version, this should match TIKI_MAX_SUPPORTED_PHP_VERSION, but cannot use it since tiki-check is expected to run standalone
+                'min' => '8.1.0',
+                'max' => '8.4.99',
             ),
             'mariadb' => array(
                 'min' => '10.5',
@@ -3499,11 +3515,22 @@ if (! $standalone) {
             'message' => tra('Composer found')
         );
     } else {
-        $composerChecks['composer'] = array(
-            'fitness' => tra('bad'),
-            'fitness_status' => FITNESS_STATUS_BAD,
-            'message' => tra('Composer not found')
-        );
+        $lastResult = $composerManager->getComposer()->getLastResult();
+        $isTimeout = $lastResult && stripos($lastResult['errors'], 'timeout') !== false;
+
+        if ($isTimeout) {
+            $composerChecks['composer'] = array(
+                'fitness' => tra('unsure'),
+                'fitness_status' => FITNESS_STATUS_UNSURE,
+                'message' => tra('Composer check timed out. This may indicate a system-level process blocking issue (e.g. antivirus scanning) or severe resource constraints.')
+            );
+        } else {
+            $composerChecks['composer'] = array(
+                'fitness' => tra('bad'),
+                'fitness_status' => FITNESS_STATUS_BAD,
+                'message' => tra('Composer not found')
+            );
+        }
     }
 
     if (extension_loaded('bz2')) {

@@ -27,7 +27,7 @@ $(document).ready(function () {
     function show2FactorInputElement(btn, event) {
         const btnStep = parseInt(btn.attr('step')) + 1;
         btn.attr('step', btnStep);
-        $(event.currentTarget).find('fieldset').children().not('#two_factor_div').hide();
+        $(event.currentTarget).find('#two_factor_div').siblings().not('#two_factor_div').hide();
         $(event.currentTarget).find('#two_factor_div').show();
         $(event.currentTarget).find('div#webauthn_div').hide();
         $(btn).parent().show();
@@ -373,7 +373,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 <button type="button" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown">
                     {tr}Log in{/tr}
                 </button>
-                <div class="siteloginbar_poppedup dropdown-menu dropdown-menu-end float-sm-end modal-sm p-3">
+                <div class="siteloginbar_poppedup dropdown-menu dropdown-menu-end float-sm-end p-3">
                     {capture assign="close_tags"}</div></div>{$close_tags}{/capture}
         {/if}
 

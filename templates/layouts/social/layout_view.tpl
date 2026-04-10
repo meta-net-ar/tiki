@@ -32,18 +32,18 @@
         {include file='tiki-ajax_header.tpl'}
     {/if}
     <a class="btn btn-info btn-lg skipnav" href="#col1" role="button">{tr}Skip to main content{/tr}</a>
-    {block name=module_header}{/block}
     {if !isset($smarty.session.fullscreen) || isset($smarty.session.fullscreen) && $smarty.session.fullscreen ne 'y'}
         {if $prefs.theme_unified_admin_backend neq 'y' or $smarty.server.SCRIPT_NAME|strpos:'tiki-admin.php' === false}            
             <header
                 class="navbar navbar-expand-md tiki-top-nav-{$navbar_color_variant} navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-header-top fixed-top p-0">
-                <div class="container-fluid">
+                <div class="container{if $prefs.feature_fixed_width eq 'y' and $prefs.layout_fixed_width_header neq 'y'}-fluid{/if}">
                     {modulelist zone=top class="top_modules w-100 tiki-top-nav-{$navbar_color_variant} navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
                 </div>
             </header>
         {/if}
     {/if}
-    <div class="middle_outer" id="middle_outer" style="margin-top: 70px;">
+    <div class="middle_outer" id="middle_outer">
+        {block name=module_header}{/block}
         {if !isset($smarty.session.fullscreen) && $smarty.session.fullscreen ne 'y'}
             {if $prefs.theme_unified_admin_backend eq 'y' && $smarty.server.SCRIPT_NAME eq $url_path|cat:'tiki-admin.php'}
                 {modulelist zone=top class="top_modules uab top navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant} w-100 mb-sm" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
@@ -109,12 +109,10 @@
                         {/if}
                     </div>
                     <div class="col col3 col-12 col-md-6 col-lg-3 {if $prefs.feature_fixed_width neq 'y'}col-xl-2{/if}" id="col3">
-                        <div class="p-1 bg-light">
-                            {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
-                                {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='right'}
-                            {/if}
-                            {modulelist zone=right class="right-aside" heading_text='{tr}More content and functionality (right side){/tr}' role=complementary}
-                        </div>
+                        {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                            {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='right'}
+                        {/if}
+                        {modulelist zone=right class="right-aside" heading_text='{tr}More content and functionality (right side){/tr}' role=complementary}
                     </div>
                 </div>
                     {elseif zone_is_empty('right') or $prefs.feature_right_column eq 'n'}
@@ -149,12 +147,10 @@
                         {/if}
                     </div>
                     <div class="col col2 col-12 col-md-6 col-lg-3 {if $prefs.feature_fixed_width neq 'y'}col-xl-2{/if} order-sm-2 order-md-2 order-lg-1" id="col2">
-                        <div class="p-1 bg-light">
-                            {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
-                                {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='left'}
-                            {/if}
-                            {modulelist zone=left class="left-aside" heading_text='{tr}More content and functionality (left side){/tr}' role=complementary}
-                        </div>
+                        {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                            {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='left'}
+                        {/if}
+                        {modulelist zone=left class="left-aside" heading_text='{tr}More content and functionality (left side){/tr}' role=complementary}
                     </div>
                 {else}
             <div class="col col1 col-sm-12 col-lg-8 order-xs-1 order-lg-2 pb-4" id="col1">
@@ -196,20 +192,16 @@
                 {/if}
             </div>
             <div class="col col2 col-12 col-md-6 col-lg-2 order-md-2 order-lg-1" id="col2">
-                <div class="p-1 bg-light">
-                    {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
-                        {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='left'}
-                    {/if}
-                    {modulelist zone=left class="left-aside" heading_text='{tr}More content and functionality (left side){/tr}' role=complementary}
-                </div>
+                {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                    {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='left'}
+                {/if}
+                {modulelist zone=left class="left-aside" heading_text='{tr}More content and functionality (left side){/tr}' role=complementary}
             </div>
             <div class="col col3 col-12 col-md-6 col-lg-2 order-md-3" id="col3">
-                <div class="p-1 bg-light">
-                    {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
-                        {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='right'}
-                    {/if}
-                    {modulelist zone=right class="right-aside" heading_text='{tr}More content and functionality (right side){/tr}' role=complementary}
-                </div>
+                {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                    {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='right'}
+                {/if}
+                {modulelist zone=right class="right-aside" heading_text='{tr}More content and functionality (right side){/tr}' role=complementary}
             </div>
                 {/if}
             </div> {* row *}

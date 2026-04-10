@@ -73,6 +73,10 @@
  *
  */
 
+if (PHP_SAPI !== 'cli') {
+    die("This script must be run from the command line.\n");
+}
+
 $baseDir = isset($argv[1]) && $argv[1] !== '' ? $argv[1] : 'templates/'; // Folder to scan (or pass path as first arg)
 $baseDir = rtrim($baseDir, '/');
 

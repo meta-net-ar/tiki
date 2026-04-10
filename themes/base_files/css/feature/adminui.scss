@@ -35,10 +35,6 @@ body.tiki-admin {
     border: inherit;
 }
 
-.tiki-admin .container.container-std .col1 {
-    padding-left: 0;
-}
-
 .tiki-admin .top_modules .box-login_box {
     padding: 0;
 }
@@ -322,6 +318,7 @@ body.tiki-admin {
 
 @media (min-width: 992px) {
 
+    // When the sidebar is collapsed (narrow mode)
     .tiki-admin aside.admin-nav .offcanvas.narrow,
     .tiki-admin aside.admin-nav .navbar-wrapper.narrow {
         max-width: 80px !important;
@@ -330,9 +327,21 @@ body.tiki-admin {
         min-height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;
         display: flex !important;
         flex-direction: column !important;
+        overflow-x: hidden !important; // Hide any horizontal scrolling
+
+        // Ensure all items inside fit the narrow width
+        * {
+            max-width: 100% !important;
+        }
     }
 
-    // Ensure collapsed sidebar inner content expands to full height
+    // This part sits between the wrapper and offcanvas
+    .tiki-admin aside.admin-nav .navbar-wrapper.narrow>.navbar {
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    // Make sure the body takes full height
     .tiki-admin aside.admin-nav .offcanvas.narrow .offcanvas-body,
     .tiki-admin aside.admin-nav .navbar-wrapper.narrow .offcanvas-body {
         height: 100% !important;
@@ -340,6 +349,7 @@ body.tiki-admin {
         flex-direction: column !important;
     }
 
+    // Main inner container for sidebar items
     .tiki-admin aside.admin-nav .offcanvas.narrow .offcanvas-body>div,
     .tiki-admin aside.admin-nav .navbar-wrapper.narrow>div {
         height: 100% !important;
@@ -348,11 +358,20 @@ body.tiki-admin {
         flex: 1 !important;
     }
 
+    // The accordion holds the menu sections
     .tiki-admin aside.admin-nav .offcanvas.narrow .accordion,
     .tiki-admin aside.admin-nav .navbar-wrapper.narrow .accordion {
         flex: 1 !important;
         display: flex !important;
         flex-direction: column !important;
+        overflow-x: hidden !important; // Critical fix: prevents the horizontal scrollbar
+    }
+
+    // Center the search icon form
+    .tiki-admin aside.admin-nav .navbar-wrapper.narrow .search-preferences form {
+        text-align: center;
+        display: flex;
+        justify-content: center;
     }
 
     // Keep the collapse button at the bottom
@@ -432,6 +451,11 @@ body.tiki-admin {
     // Hide arrow down icons (chevrons) when sidebar is collapsed - show only icons
     .tiki-admin aside.admin-nav .offcanvas.narrow .accordion-button::after {
         display: none !important;
+    }
+
+
+    .tiki-admin aside.admin-nav .offcanvas.narrow .accordion-body {
+        padding: 0 !important;
     }
 
     .tiki-admin aside.admin-nav .offcanvas.narrow .accordion-button .icon {
@@ -655,13 +679,10 @@ body.sidebar_collapsed .admin-menu-collapser .expand-text {
     border-color: rgba(0, 0, 0, 0.1);
 }
 
-// Prevent accordion collapse when sidebar is collapsed and showing popover
+// Allow accordion buttons to be clickable in narrow mode
 .tiki-admin aside.admin-nav .offcanvas.narrow .accordion-button {
     pointer-events: auto;
-}
-
-.tiki-admin aside.admin-nav .offcanvas.narrow .accordion-button[data-bs-toggle="collapse"] {
-    pointer-events: none;
+    cursor: pointer;
 }
 
 .tiki-admin aside.admin-nav .offcanvas.narrow .admin-menu-trigger {
@@ -681,6 +702,10 @@ body.sidebar_collapsed .admin-menu-collapser .expand-text {
     display: block; // Show the container
     padding: 0.75rem 0.5rem; // Match item padding
     margin: 0;
+
+    .my-1.mx-4 {
+        margin: 0
+    }
 
     .search-prefs-container {
         justify-content: center;
@@ -730,12 +755,15 @@ body.sidebar_collapsed .admin-menu-collapser .expand-text {
     }
 }
 
-// Adjust content padding when sidebar is collapsed
-body.sidebar_collapsed.tiki-admin.uab #tikifeedback,
-body.sidebar_collapsed.tiki-admin.uab .admin-content,
-body.sidebar_collapsed.tiki-admin.uab .errors-wrapper,
-body.sidebar_collapsed.tiki-admin.uab .bottom_modules {
-    padding-left: 80px !important;
+// Adjust content padding when sidebar is collapsed (Desktop only, mobile has offcanvas)
+@media (min-width: 992px) {
+
+    body.sidebar_collapsed.tiki-admin.uab #tikifeedback,
+    body.sidebar_collapsed.tiki-admin.uab .admin-content,
+    body.sidebar_collapsed.tiki-admin.uab .errors-wrapper,
+    body.sidebar_collapsed.tiki-admin.uab .bottom_modules {
+        padding-left: 80px !important;
+    }
 }
 
 body.tiki-admin .container.container-std {

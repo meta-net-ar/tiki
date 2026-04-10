@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="navigation"}
@@ -53,7 +53,7 @@
                     </label>
                 </div>
                 <div class="comment-form d-none">
-                    {include file="comment/post_form_content.tpl" type='trackeritem' objectId=$itemId}
+                    {include file="comment/post_form_content.tpl" type='trackeritem' objectId=$itemId data='' title=$commentTitle}
                 </div>
             {/if}
             <div class="submit">

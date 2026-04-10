@@ -54,6 +54,17 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
                             1 => tr('Yes'),
                         ],
                     ],
+                    'strictValidation' => [
+                        'name' => tr('Strict validation'),
+                        'description' => tr('This field expects data that resolves to syntactically valid URLs. Setting this to No disables URL syntax validation at data entry and import.  This will allow you to use currently unsupported data in this field such as raw file paths, but doing so may trigger problems in code that uses this data if it expects valid URLs.  If you set this to No, test the interfaces that use this field in your site thoroughly.'),
+                        'filter' => 'int',
+                        'legacy_index' => 3,
+                        'default' => 1,
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -73,8 +84,10 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
     public function renderOutput($context = [])
     {
         $smarty = TikiLib::lib('smarty');
+        $rawValue = (string) $this->getConfiguration('value');
+        $parsedWikiLink = self::extractParsedWikiLinkData(trim($rawValue));
 
-        $url = self::normalizeStoredValueToUrl((string) $this->getConfiguration('value'));
+        $url = self::normalizeStoredValueToUrl($rawValue);
 
         if ($url === '' || ($context['list_mode'] ?? '') === 'csv' || $this->getOption('linkToURL') == 1) {
             return $url;
@@ -91,7 +104,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
                 [
                     'type' => 'external',
                     'id' => $url,
-                    'title' => $url,
+                    'title' => $parsedWikiLink['label'] ?? $url,
                 ],
                 $smarty->getEmptyInternalTemplate()
             );
@@ -123,6 +136,11 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
             || (str_starts_with($value, '[') && str_ends_with($value, ']'));
     }
 
+    protected function isStrictValidationEnabled(): bool
+    {
+        return (int) $this->getOption('strictValidation') === 1;
+    }
+
     public function isValid($ins_fields_data)
     {
         $fieldId = $this->getFieldId();
@@ -133,8 +151,12 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
             return true;
         }
 
+        if (! $this->isStrictValidationEnabled()) {
+            return true;
+        }
+
         if (self::isWikiSyntaxLink($trimmed)) {
-            $resolvedHref = self::extractFirstHrefFromParsedWikiLink($trimmed);
+            $resolvedHref = self::extractParsedWikiLinkData($trimmed)['href'] ?? null;
             if ($resolvedHref === null) {
                 return tr('Invalid wiki syntax. The link target could not be resolved.');
             }
@@ -159,6 +181,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
     public function renderInput($context = [])
     {
         $templateData = [
+            'strictValidationEnabled' => $this->isStrictValidationEnabled(),
             'wikiSyntaxInfo' => tr('You can also use complete wiki-link syntax: ((PageName)) or [url|text].'),
         ];
 
@@ -210,19 +233,26 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
             return $value;
         }
 
-        $resolvedHref = self::extractFirstHrefFromParsedWikiLink($trimmed);
+        $resolvedHref = self::extractParsedWikiLinkData($trimmed)['href'] ?? null;
+        // Normalization keeps only the resolved target URL.
+        // The optional wiki-link label is extracted separately for rendering.
         return $resolvedHref ?? $value;
     }
 
-    protected static function extractFirstHrefFromParsedWikiLink(string $value): ?string
+    protected static function extractParsedWikiLinkData(string $value): ?array
     {
         $parsed = TikiLib::lib('parser')->parse_data_simple($value);
 
-        if (! preg_match('/<a\b[^>]*\bhref=(["\'])(.*?)\1/i', $parsed, $matches)) {
+        if (! preg_match('/<a\b[^>]*\bhref=(["\'])(.*?)\1[^>]*>(.*?)<\/a>/is', $parsed, $matches)) {
             return null;
         }
 
-        return html_entity_decode($matches[2], ENT_QUOTES, 'UTF-8');
+        $label = trim(html_entity_decode(strip_tags($matches[3]), ENT_QUOTES, 'UTF-8'));
+
+        return [
+            'href' => html_entity_decode($matches[2], ENT_QUOTES, 'UTF-8'),
+            'label' => $label !== '' ? $label : null,
+        ];
     }
 
     protected static function isSyntacticallyValidUrl(string $url): bool
@@ -248,7 +278,7 @@ class Tracker_Field_Url extends \Tracker\Field\AbstractItemField implements \Tra
             return (bool) preg_match('/^[a-z][a-z0-9+.-]*$/i', $parsed['scheme']) && ! preg_match('/\s/', $url);
         }
 
-        return ! preg_match('/\s/', $url);
+        return false;
     }
 
     protected static function extractWikiLinkTarget(string $value): ?string

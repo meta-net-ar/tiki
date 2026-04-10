@@ -97,7 +97,7 @@
 
     <div>
         <div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#page-source"><span class="copy_code_tooltiptext copy-html" id='copy_source'>Copy to clipboard</span></div>
-        <pre class="codelisting preview-html" data-theme="default" data-wrap="1" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;" id="page-source">
+        <pre class="codelisting preview-html" data-theme="default" data-syntax="{$syntax_type}" data-wrap="1" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;" id="page-source">
             {$sourced|escape}
         </pre>
     </div>

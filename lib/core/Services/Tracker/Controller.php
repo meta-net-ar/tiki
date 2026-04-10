@@ -1028,7 +1028,7 @@ class Services_Tracker_Controller
             TikiLib::lib('header')->add_jq_onready($js);
         }
 
-        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/dirtyCheck";');
+        TikiLib::lib('header')->add_js_module('import "@tiki/tracker-field-base/dirtyCheck";');
 
         $itemId = 0;
         $util = new Services_Utilities();
@@ -1246,6 +1246,8 @@ class Services_Tracker_Controller
             throw new Services_Exception_Denied();
         }
 
+        $version = TikiLib::lib('trk')->last_log_version($itemId) + 1;
+
         $access = TikiLib::lib('access');
         if ($prefs['feature_warn_on_edit'] == 'y' && $input->conflictoverride->int() !== 1) {
             try {
@@ -1302,7 +1304,7 @@ class Services_Tracker_Controller
             TikiLib::lib('header')->add_jq_onready($js);
         }
 
-        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/dirtyCheck";');
+        TikiLib::lib('header')->add_js_module('import "@tiki/tracker-field-base/dirtyCheck";');
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $access->preventRedirect(true);
@@ -1407,19 +1409,17 @@ class Services_Tracker_Controller
 
                 if ($input->addComment->bool()) {
                     $comment = new Services_Comment_Controller();
-
-                    $version = TikiLib::lib('trk')->last_log_version($itemId);
-
                     $comment->action_post(new JitFilter([
                         'post' => 1,
                         'anonymous_name' => $input->comment_anonymous_name->text(),
                         'comment' => $input->comment->text(),
                         'objectId' => $itemId,
                         'type' => 'trackeritem',
-                        'title' => tr('Comment for edit #%0', $version),
+                        'title' => $input->title->text(),
                         'data' => $input->data->wikicontent(),
                         'return_url' => $input->redirect->none(),
                         'version' => $version,
+                        'related_files' => $input->related_files->raw(),
                     ]));
                 }
 
@@ -1530,7 +1530,9 @@ class Services_Tracker_Controller
             'save_return' => $input->save_return->alpha() ?? 'n',
             'can_remove' => $itemObject->canRemove(),
             'skipRefresh' => $input->skipRefresh->bool(),
+            'commentTitle' => tr('Comment for edit #%0', $version),
             'MAX_COMMENT_DATA_LENGTH' => TikiLib::lib('comments')::MAX_COMMENT_DATA_LENGTH,
+            'MAX_COMMENT_TITLE_LENGTH' => TikiLib::lib('comments')::MAX_COMMENT_TITLE_LENGTH,
         ];
     }
 
@@ -1591,6 +1593,9 @@ class Services_Tracker_Controller
             }
             if (isset($f['files'])) {
                 $fieldsProcessed[$permName] = ['files' => $f['files']];
+            }
+            if (isset($f['articleIds'])) {
+                $fieldsProcessed[$permName]['articleIds'] = $f['articleIds'];
             }
         }
 
@@ -1700,6 +1705,9 @@ class Services_Tracker_Controller
                 }
                 if (isset($fieldsProcessed[$permName]['files'])) {
                     $field['files'] = $fieldsProcessed[$permName]['files'];
+                }
+                if (isset($fieldsProcessed[$permName]['articleIds'])) {
+                    $field['articleIds'] = $fieldsProcessed[$permName]['articleIds'];
                 }
             }
         }

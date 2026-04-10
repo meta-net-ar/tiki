@@ -70,10 +70,10 @@ class PollLib extends PollLibShared
         if ($find) {
             $findesc = '%' . $find . '%';
             $mid = " where (`active`=? or `active`=? or `active`=?) and `publishDate`<=? and (`title` like ?)";
-            $bindvars = ['a', 'c', 'o', (int) $this->now, $findesc];
+            $bindvars = ['a', 'c', 'o', $this->now, $findesc];
         } else {
             $mid = " where (`active`=? or `active`=? or `active`=?) and `publishDate`<=? ";
-            $bindvars = ['a', 'c', 'o', (int) $this->now];
+            $bindvars = ['a', 'c', 'o', $this->now];
         }
 
         $query = "select * from `tiki_polls` $mid order by " . $this->convertSortMode($sort_mode);
@@ -105,10 +105,10 @@ class PollLib extends PollLibShared
         if ($find) {
             $findesc = '%' . $find . '%';
             $mid = " where `publishDate`<=? and (`title` like ?)";
-            $bindvars = [(int) $this->now, $findesc];
+            $bindvars = [$this->now, $findesc];
         } else {
             $mid = " where `publishDate`<=? ";
-            $bindvars = [(int) $this->now];
+            $bindvars = [$this->now];
         }
 
         $query = "select * from `tiki_polls` $mid order by " . $this->convertSortMode($sort_mode);
@@ -133,7 +133,7 @@ class PollLib extends PollLibShared
     public function set_last_poll()
     {
         $query = "select max(`publishDate`) from `tiki_polls` where `publishDate`<=?";
-        $last = $this->getOne($query, [(int) $this->now]);
+        $last = $this->getOne($query, [$this->now]);
         $query = "update `tiki_polls` set `active`=? where `publishDate`=?";
         return $this->query($query, ['c', $last]);
     }
@@ -144,7 +144,7 @@ class PollLib extends PollLibShared
     public function close_all_polls()
     {
         $query = "select max(`publishDate`) from `tiki_polls` where `publishDate`<=?";
-        $last = $this->getOne($query, [(int) $this->now]);
+        $last = $this->getOne($query, [$this->now]);
         $query = "update `tiki_polls` set `active`=? where `publishDate`<?";
         return $this->query($query, ['x', (int) $last]);
     }
@@ -155,7 +155,7 @@ class PollLib extends PollLibShared
     public function active_all_polls()
     {
         $query = "update `tiki_polls` set `active`=? where `publishDate`<=?";
-        return $this->query($query, ['a', (int) $this->now]);
+        return $this->query($query, ['a', $this->now]);
     }
 
     /**

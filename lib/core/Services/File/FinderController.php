@@ -194,7 +194,14 @@ class Services_File_FinderController
             if ($input->insertion_syntax->text()) {
                 $params['insertion_syntax'] = $input->insertion_syntax->text();
             }
-            return $this->getHashInfo($elFinder, $input->hash->word(), $params);
+            $hashes = $input->hash->asArray();
+            $fileInfos = [];
+
+            foreach ($hashes as $hash) {
+                $fileInfos[] = $this->getHashInfo($elFinder, $hash, $params);
+            }
+
+            return $fileInfos;
         } elseif ($input->cmd->text() === 'file') {
             // intercept download command and use tiki-download_file so the mime type and extension is correct
             $fileId = $elFinder->realpath($input->target->text());
@@ -276,7 +283,7 @@ class Services_File_FinderController
             $id = $ar[1];
             if ($isgal) {
                 $visible = $this->isVisible($id, $data, $isgal);
-            } else {
+            } else if (isset($this->parentIds['files'][$id])) {
                 $visible = $this->isVisible($this->parentIds['files'][$id], $data, $isgal);
             }
         } else {

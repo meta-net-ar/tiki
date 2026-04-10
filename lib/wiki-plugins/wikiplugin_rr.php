@@ -1002,12 +1002,18 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
 
                     //respect wrap setting when Codemirror is off and set to wrap when Codemirror is on to avoid broken view while
                     //javascript loads
-                    if ((isset($prefs['feature_syntax_highlighter']) && $prefs['feature_syntax_highlighter'] == 'y') || $wrap == 1) {
+                    if ($prefs['feature_syntax_highlighter'] == 'y' || $wrap == 1) {
                         $pre_style = 'white-space:pre-wrap;'
                         . ' white-space:-moz-pre-wrap !important;'
                         . ' white-space:-pre-wrap;'
                         . ' white-space:-o-pre-wrap;'
                         . ' word-wrap:break-word;';
+                    }
+
+                    if ($prefs['feature_syntax_highlighter'] == 'y') {
+                        //add codemirror stuff
+                        require_once("lib/codemirror_tiki/tiki_codemirror.php");
+                        addCodemirror();
                     }
 
                     $out = (isset($caption) ? '<div class="codecaption">' . $caption . '</div>' : "" )
@@ -1027,7 +1033,7 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
             # Check if there is anything after "-->" in $cont. Otherwise, do not show the pre tags.
             # Split the content $cont by the splitter "-->", and the 2nd element (#1 since it starts with 0) is the text output, if any
             # if no text output, don't add the pre tags since in Tiki 15+ they display a grey box by default.
-            $textoutput = preg_split("/-->/", $cont);
+            $textoutput = explode("-->", $cont);
             if (! empty($textoutput[1])) {
                 fwrite($fd, $prg . '<pre id="routput' . $r_count . '" name="routput' . $r_count . '" style="' . $pre_style . '"><!-- ' . $cont . '</pre>');
             }

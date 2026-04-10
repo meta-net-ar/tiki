@@ -109,22 +109,25 @@ class BookmarkLib extends TikiLib
 
         $query = "insert into `tiki_user_bookmarks_folders`(`folderId`, `name`,`parentId`,`user`) values(?,?,?,?)";
         $result = $this->query($query, [$maxId + 1,$name,$parentId,$user]);
+        return ($result && $result->numRows() > 0);
     }
 
     public function replace_url($urlId, $folderId, $name, $url, $user)
     {
         if ($urlId) {
             $query = "update `tiki_user_bookmarks_urls` set `user`=?,`lastUpdated`=?,`folderId`=?,`name`=?,`url`=? where `urlId`=?";
-            $bindvars = [$user,(int) $this->now,$folderId,$name,$url,$urlId];
+            $bindvars = [$user, $this->now, $folderId, $name, $url, $urlId];
+            $result = $this->query($query, $bindvars);
+            return  $urlId;
         } else {
-            $query = " insert into `tiki_user_bookmarks_urls`(`name`,`url`,`data`,`lastUpdated`,`folderId`,`user`)
-      values(?,?,?,?,?,?)";
-                  $bindvars = [$name,$url,'',(int) $this->now,$folderId,$user];
+            $query = " insert into `tiki_user_bookmarks_urls`(`name`,`url`,`data`,`lastUpdated`,`folderId`,`user`) values(?,?,?,?,?,?)";
+            $bindvars = [$name, $url, '', $this->now, $folderId, $user];
+            $result = $this->query($query, $bindvars);
+            if ($result && $result->numRows()) {
+                return $this->lastInsertId();
+            }
+            return false;
         }
-
-        $result = $this->query($query, $bindvars);
-        $id = $this->getOne("select max(`urlId`) from `tiki_user_bookmarks_urls` where `url`=? and `lastUpdated`=?", [$url,(int) $this->now]);
-        return $id;
     }
 
     public function refresh_url($urlId)
@@ -138,11 +141,11 @@ class BookmarkLib extends TikiLib
         $data = @$this->httprequest($info["url"]);
 
         if (! $data) {
-            return;
+            return false;
         }
 
         $query = "update `tiki_user_bookmarks_urls` set `lastUpdated`=?, `data`=? where `urlId`=?";
-        $result = $this->query($query, [(int) $this->now,$data,$urlId]);
+        $result = $this->query($query, [$this->now,$data,$urlId]);
         return true;
     }
 

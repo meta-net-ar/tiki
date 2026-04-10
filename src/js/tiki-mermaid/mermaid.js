@@ -1,6 +1,6 @@
 import svgPanZoom from "svg-pan-zoom";
-import mermaid from "mermaid/dist/mermaid.esm.mjs"; //from "mermaid" will resolve to mermaid-core.esm.mjs, which currently doesn't work - benoitg-2025-03-14.
-
+//import mermaid from "mermaid/dist/mermaid.esm.mjs"; //from "mermaid" will resolve to mermaid-core.esm.mjs, which currently doesn't work - benoitg-2025-03-14.
+import mermaid from "mermaid";
 export default function handleMermaid() {
     mermaid.initialize({
         startOnLoad: false,
