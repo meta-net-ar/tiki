@@ -93,6 +93,7 @@ $safePaths = [
     '\./lib/test/local.php', // contains database credentials for testing.
     '/lib/cypht/modules/tiki/modules.php', // bootstrap includes file.
     '/lib/cypht/modules/tiki/setup.php', // configuration file.
+    '/lib/cypht/modules/tiki/lib.php', // contains import statements to custom classes.
 
     /* exception files */
     '\./tiki-admin_trackers.php', // perform redirection and a target file has its own check.
