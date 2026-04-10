@@ -72,7 +72,6 @@
             <li>{preference name=wikiplugin_list}<br></li>
             <li>{preference name=wikiplugin_img}<br></li>
             <li>{preference name=wikiplugin_rss}<br></li>
-            <li>{preference name=wikiplugin_rss}<br></li>
             </ul>
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
