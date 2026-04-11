@@ -158,6 +158,7 @@ class Permissions
         $loaded = $accessor->getResolver()->dump();
 
         $results = [];
+        $permDescriptions = [];
 
         foreach ($all['data'] as $permDef) {
             foreach ($loaded['perms'] as $perm => $groups) {
@@ -165,10 +166,39 @@ class Permissions
                     continue;
                 }
                 $results[$permDef['type']][$perm] = $groups;
+                $permDescriptions[$permDef['type']][$perm] = $permDef['permDesc'];
             }
         }
 
+        // Sort permission groups by name
+        ksort($results);
+        ksort($permDescriptions);
+        // Sort permissions within each type by description
+        foreach ($results as $type => &$perms) {
+            // Create array of permission key => description for sorting
+            $permsSorted = [];
+            foreach ($perms as $perm => $groups) {
+                $description = isset($permDescriptions[$type][$perm]) ? $permDescriptions[$type][$perm] : $perm;
+                $permsSorted[$description] = ['perm' => $perm, 'groups' => $groups];
+            }
+            // Sort by description
+            ksort($permsSorted, SORT_FLAG_CASE);
+
+            // Rebuild the perms array in sorted order
+            $perms = [];
+            foreach ($permsSorted as $description => $data) {
+                $perms[$data['perm']] = $data['groups'];
+            }
+        }
+
+        // Sort permission descriptions to match the same order
+        foreach ($permDescriptions as $type => &$descs) {
+            // Sort descriptions by their values (case-insensitive)
+            asort($descs, SORT_FLAG_CASE);
+        }
+
         $loaded['perms'] = $results;
+        $loaded['permDescriptions'] = $permDescriptions;
 
         $smarty = TikiLib::lib('smarty');
         if ($loaded['from'] == 'parent object' && $parentId && $parentType) {
