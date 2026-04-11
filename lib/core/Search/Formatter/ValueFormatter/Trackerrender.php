@@ -36,6 +36,12 @@ class Search_Formatter_ValueFormatter_Trackerrender extends Search_Formatter_Val
     public function render($name, $value, array $entry)
     {
         if ($name === 'tracker_status') {
+            if (empty($entry['tracker_id'])) {
+                if (($entry['object_type'] ?? '') === 'trackeritem') {
+                    trigger_error('Trackerrender: tracker_id missing for tracker_status rendering of item ' . ($entry['object_id'] ?? 'unknown'), E_USER_WARNING);
+                }
+                return $value;
+            }
             $options  = TikiLib::lib('trk')->get_tracker_options($entry['tracker_id']);
             switch ($value) {
                 case 'o':
@@ -60,21 +66,24 @@ class Search_Formatter_ValueFormatter_Trackerrender extends Search_Formatter_Val
             return $value;
         }
 
-        $tracker = Tracker_Definition::get($entry['tracker_id']);
+        try {
+            $tracker = Tracker_Definition::get($entry['tracker_id']);
+        } catch (\Exception $e) {
+            if (($entry['object_type'] ?? '') === 'trackeritem') {
+                trigger_error('Trackerrender: ' . $e->getMessage() . ' for item ' . ($entry['object_id'] ?? 'unknown'), E_USER_WARNING);
+            }
+            return $value;
+        }
         if (! is_object($tracker)) {
             return $value;
         }
         if ($name === 'title') {
             // function getField works with either id of permName
-            $nameOrId = $tracker->getMainFieldId($entry['tracker_id']);
+            $nameOrId = $tracker->getMainFieldId();
         } else {
             $nameOrId = substr($name, 14);
         }
         $field = $tracker->getField($nameOrId);
-
-        if ($name === 'title') {
-            $name = 'tracker_field_' . $field['permName'];
-        }
 
         if (! $field) {
             if (Perms::get()->tracker_admin) {
@@ -82,6 +91,10 @@ class Search_Formatter_ValueFormatter_Trackerrender extends Search_Formatter_Val
             } else {
                 return '';
             }
+        }
+
+        if ($name === 'title') {
+            $name = 'tracker_field_' . $field['permName'];
         }
 
         // check translations of multilingual fields
