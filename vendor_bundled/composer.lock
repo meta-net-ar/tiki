@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2be799eca83ff6a694188113b7eefe19",
+    "content-hash": "bca84cc9d8ac314084016f4a6ef7adee",
     "packages": [
         {
             "name": "Sam152/Javascript-Equal-Height-Responsive-Rows",
@@ -18398,8 +18398,8 @@
     "stability-flags": {
         "candy-chat/xmpp-prebind-php": 20,
         "npm-asset/select2": 5,
-        "rubix/extras": 10,
-        "phpcompatibility/php-compatibility": 15
+        "phpcompatibility/php-compatibility": 15,
+        "rubix/extras": 10
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -18416,12 +18416,12 @@
         "ext-openssl": "*",
         "ext-zip": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.1",
         "ext-ldap": "0",
         "ext-soap": "0",
         "ext-sockets": "0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
