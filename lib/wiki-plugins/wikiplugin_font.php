@@ -28,6 +28,15 @@ function wikiplugin_font_getfontoptions()
   */
 function wikiplugin_font_info()
 {
+    // Enqueue jsfontpicker assets for the plugin parameter UI
+    $initScript = <<<'JS'
+        import initFontPicker from "@jquery-tiki/tiki-fontpicker_init";
+        initFontPicker(".tiki-fontpicker");
+JS;
+    TikiLib::lib('header')
+        ->add_cssfile('lib/jsfontpicker/fontpicker.css')
+        ->add_js_module($initScript);
+
     return [
         'searchable_by_default' => true,
         'name' => tra('Font'),
@@ -44,10 +53,10 @@ function wikiplugin_font_info()
                 'required' => false,
                 'name' => tra('Font Family'),
                 'default' => '',
-                'description' => tra('Select the font family to display the content.'),
+                'description' => tra('Select the font family to display the content. You can pick from available system or web fonts.'),
                 'since' => '8.0',
                 'filter' => 'text',
-                'options' => wikiplugin_font_getfontoptions(),
+                'class' => 'tiki-fontpicker',
             ],
             'size' => [
                 'required' => false,
@@ -80,7 +89,7 @@ function wikiplugin_font($data, $params)
         $f = strtolower($f);
     }
 
-    $family = strtolower($params['family']);
+    $family = $params['family'];
     $size = $params['size'];
 
     if ((string)(int)$size == $size and $size > 0) {
@@ -88,7 +97,11 @@ function wikiplugin_font($data, $params)
     }
 
     $style  = '';
-    $style .= ($family and in_array($family, $all_fonts)) ? "font-family: $family; " : '';
+    if (! empty($family)) {
+        // Sanitize and apply the selected font family
+        $clean_family = htmlentities($family, ENT_QUOTES, 'UTF-8');
+        $style .= "font-family: '{$clean_family}'; ";
+    }
     $style .= (($params['size']) ? "font-size: $size;" : '');
 
     if ($style) {

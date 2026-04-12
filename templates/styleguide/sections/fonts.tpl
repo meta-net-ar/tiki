@@ -27,6 +27,14 @@
         <div class="col-sm-4 col-md-3">
             <div class="input">
                 <p>
+                    <label for="tc-font-base">{tr}Base font family:{/tr}</label>
+                    <input id="tc-font-base" class="nocolor tiki-fontpicker" data-selector="body" data-element="font-family" type="text">
+                </p>
+                <p>
+                    <label for="tc-font-headings">{tr}Headings font family:{/tr}</label>
+                    <input id="tc-font-headings" class="nocolor tiki-fontpicker" data-selector="h1, h2, h3, h4, h5, h6" data-element="font-family" type="text">
+                </p>
+                <p>
                     <label for="tc-font-size">{tr}Font size:{/tr}</label>
                     <input id="tc-font-size" class="nocolor" data-selector="p" data-element="font-size" type="text">
                 </p>

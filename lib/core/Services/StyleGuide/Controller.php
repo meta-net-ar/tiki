@@ -44,8 +44,13 @@ class Services_StyleGuide_Controller
         }
 
         TikiLib::lib('header')
+            ->add_cssfile('lib/jsfontpicker/fontpicker.css')
             ->add_cssfile('themes/base_files/css/theme-customizer.css')
             ->add_jsfile('lib/jquery_tiki/theme-customizer.js')
+            ->add_js_module(<<<'JS'
+                import initFontPicker from "@jquery-tiki/tiki-fontpicker_init";
+                initFontPicker(".tiki-fontpicker", { customizer: true });
+            JS)
         ;
 
         return [
