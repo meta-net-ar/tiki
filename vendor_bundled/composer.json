@@ -530,9 +530,8 @@
             "type": "composer",
             "url": "https://packagist.org",
             "exclude": [
-                "pear/text_wiki_mediawiki",
                 "itsjavi/bootstrap-colorpicker",
-                "league/commonmark"
+                "pear/text_wiki_mediawiki"
             ]
         },
         "asset-packagist.org": {
@@ -544,16 +543,11 @@
             "url": "https://composer.tiki.org",
             "canonical": false,
             "only": [
-                "simile_timeline/simile_timeline",
-                "openannotation/annotator",
-                "jquery-plugins/reflection-jquery",
-                "jquery/jquery-sheet",
-                "umakantp/smartylint",
-                "bower-asset/wodo.texteditor",
-                "pear/text_wiki_mediawiki",
                 "avianey/jqdoublescroll",
+                "bower-asset/wodo.texteditor",
                 "codemirror/codemirror",
                 "css-tricks/anythingslider-themes",
+                "itsjavi/bootstrap-colorpicker",
                 "jquery-plugins/anythingslider",
                 "jquery-plugins/async",
                 "jquery-plugins/colorbox",
@@ -562,20 +556,24 @@
                 "jquery-plugins/infinitecarousel",
                 "jquery-plugins/jquery-json",
                 "jquery-plugins/nestedsortable",
+                "jquery-plugins/reflection-jquery",
                 "jquery-plugins/tagcanvas",
                 "jquery-plugins/treetable",
                 "jquery-plugins/zoom",
+                "jquery/jquery-sheet",
                 "jquery/jquery-timepicker-addon",
                 "jquery/minicart",
                 "jquery/photoswipe",
                 "mrrio/jspdf",
+                "openannotation/annotator",
                 "openlayers/openlayers",
+                "pear/text_wiki_mediawiki",
                 "rangy/rangy",
                 "sam152/javascript-equal-height-responsive-rows",
+                "simile_timeline/simile_timeline",
                 "svg-edit/svg-edit",
-                "walkermatt/ol-layerswitcher",
-                "itsjavi/bootstrap-colorpicker",
-                "league/commonmark"
+                "umakantp/smartylint",
+                "walkermatt/ol-layerswitcher"
             ]
         }
     }
