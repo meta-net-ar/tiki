@@ -33,7 +33,7 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 /** @var RSSLib $rsslib */
 $rsslib = TikiLib::lib('rss');

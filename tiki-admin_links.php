@@ -25,7 +25,7 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 include_once('lib/featured_links/flinkslib.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 $access->check_feature('feature_featuredLinks');
 $access->check_permission('tiki_p_admin');

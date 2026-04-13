@@ -22,7 +22,7 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 $polllib = TikiLib::lib('poll');
 $access->check_feature('feature_polls');

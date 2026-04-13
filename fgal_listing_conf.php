@@ -45,7 +45,7 @@ $fgal_listing_conf = [
 
 $section = Sections::getCurrentSection();
 
-if (isset($section) && Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
+if (isset($section) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))) {
     foreach ($fgal_listing_conf as $k => $v) {
         $fgal_listing_conf_admin[$k . '_admin'] = $v;
     }
@@ -81,7 +81,7 @@ if (isset($gal_info) && isset($gal_info['galleryId']) && isset($gal_info['lockab
 $smarty = TikiLib::lib('smarty');
 $smarty->assign_by_ref('fgal_listing_conf', $fgal_listing_conf);
 
-if (isset($section) && Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
+if (isset($section) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))) {
     foreach ($fgal_listing_conf_admin as $k => $v) {
         if (isset($prefs['fgal_list_' . $k])) {
             $fgal_listing_conf_admin[$k]['value'] = $prefs['fgal_list_' . $k];
