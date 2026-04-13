@@ -1614,6 +1614,11 @@ class ParserLib extends TikiDb_Bridge
                     $fileId = $file['fileId'];
                     $filename = $file['name'];
                     $type = $file['filetype'];
+
+                    if (str_starts_with($type, 'audio/')) {
+                        return smarty_function_inline_audio_player(['fileId' => $fileId, 'type' => $type], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                    }
+
                     $icon = smarty_function_icon(['name' => 'paperclip'], TikiLib::lib('smarty')->getEmptyInternalTemplate());
                     return "<span class='badge rounded-pill bg-secondary' role='button' data-file-ref-type='$type' data-file-ref-id='$fileId'>$icon $filename</span>";
                 }

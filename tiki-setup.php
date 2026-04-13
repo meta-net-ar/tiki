@@ -761,6 +761,8 @@ if ($prefs['feature_shadowbox'] == 'y') {
 ');
     $localPlyrCSS = NODE_PUBLIC_DIST_PATH . '/glightbox/dist/plyr.css';
     $localPlyrJS = NODE_PUBLIC_DIST_PATH . '/glightbox/dist/plyr.min.js';
+    $headerlib->add_jsfile($localPlyrJS);
+    $headerlib->add_cssfile($localPlyrCSS);
     $headerlib->add_js_module(<<<JS
     import initGlightbox from "@tiki-glightbox";
     window.applyGlightbox = initGlightbox({
