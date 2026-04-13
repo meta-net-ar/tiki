@@ -131,7 +131,7 @@ function getComposerJson($source)
  */
 function getAvailableTikiVersions()
 {
-    return ['24.x', '27.x', '28.x', 'master'];
+    return ['24.x', '27.x', '29.x', '30.x', 'master'];
 }
 
 /**
