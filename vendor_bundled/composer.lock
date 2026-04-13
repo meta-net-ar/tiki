@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0cc3923d6c0aacab0dfd5f09c7d80ce4",
+    "content-hash": "743e4f6ddb35227702a8929cc3491fda",
     "packages": [
         {
             "name": "amphp/amp",
@@ -3232,16 +3232,16 @@
         },
         {
             "name": "jason-munro/cypht",
-            "version": "dev-master",
+            "version": "v2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "37644a3652eadc30485706afbc3d9f6355dc5ef0"
+                "reference": "064c1978c51e1e355453db2c5299780340d23e14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/37644a3652eadc30485706afbc3d9f6355dc5ef0",
-                "reference": "37644a3652eadc30485706afbc3d9f6355dc5ef0",
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/064c1978c51e1e355453db2c5299780340d23e14",
+                "reference": "064c1978c51e1e355453db2c5299780340d23e14",
                 "shasum": ""
             },
             "require": {
@@ -3258,10 +3258,8 @@
                 "ezyang/htmlpurifier": "^4.17",
                 "garethp/php-ews": "dev-master",
                 "henrique-borba/php-sieve-manager": "^1.0",
-                "league/commonmark": "^2.8.1",
-                "monolog/monolog": "^3.0",
+                "league/commonmark": "^2.7",
                 "php": ">=8.1",
-                "sentry/sdk": "^4.0",
                 "symfony/dotenv": "^6.4",
                 "symfony/yaml": "~6.4.3",
                 "thomaspark/bootswatch": "^5.3",
@@ -3281,7 +3279,6 @@
                 "ext-pdo": "To use database features, this needs to be installed",
                 "ext-redis": "To use Redis for caching, this needs to be installed"
             },
-            "default-branch": true,
             "type": "project",
             "notification-url": "https://packagist.org/downloads/",
             "license": [
@@ -3319,7 +3316,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "wiki": "https://github.com/cypht-org/cypht/wiki"
             },
-            "time": "2026-04-01T10:32:40+00:00"
+            "time": "2026-02-27T12:34:19+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -11244,61 +11241,6 @@
                 "source": "https://github.com/fruux/sabre-xml"
             },
             "time": "2024-09-06T07:37:46+00:00"
-        },
-        {
-            "name": "sentry/sdk",
-            "version": "4.0.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/getsentry/sentry-php-sdk.git",
-                "reference": "fcbca864e8d1dc712f3ecfaa95ea89d024fb2e53"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/getsentry/sentry-php-sdk/zipball/fcbca864e8d1dc712f3ecfaa95ea89d024fb2e53",
-                "reference": "fcbca864e8d1dc712f3ecfaa95ea89d024fb2e53",
-                "shasum": ""
-            },
-            "require": {
-                "sentry/sentry": "^4.0"
-            },
-            "type": "metapackage",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Sentry",
-                    "email": "accounts@sentry.io"
-                }
-            ],
-            "description": "This is a meta package of sentry/sentry. We recommend using sentry/sentry directly.",
-            "homepage": "http://sentry.io",
-            "keywords": [
-                "crash-reporting",
-                "crash-reports",
-                "error-handler",
-                "error-monitoring",
-                "log",
-                "logging",
-                "sentry"
-            ],
-            "support": {
-                "issues": "https://github.com/getsentry/sentry-php-sdk/issues",
-                "source": "https://github.com/getsentry/sentry-php-sdk/tree/4.0.0"
-            },
-            "funding": [
-                {
-                    "url": "https://sentry.io/",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://sentry.io/pricing/",
-                    "type": "custom"
-                }
-            ],
-            "time": "2023-11-06T10:23:19+00:00"
         },
         {
             "name": "sentry/sentry",
@@ -19609,7 +19551,6 @@
     "stability-flags": {
         "candy-chat/xmpp-prebind-php": 20,
         "garethp/php-ews": 20,
-        "jason-munro/cypht": 20,
         "phpcompatibility/php-compatibility": 20,
         "phpcompatibility/phpcompatibility-paragonie": 20,
         "phpcompatibility/phpcompatibility-passwordcompat": 20,
@@ -19630,7 +19571,7 @@
         "ext-openssl": "*",
         "ext-zip": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.1",
         "ext-ldap": "0",
@@ -19638,5 +19579,5 @@
         "ext-sockets": "0",
         "ext-ftp": "0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
