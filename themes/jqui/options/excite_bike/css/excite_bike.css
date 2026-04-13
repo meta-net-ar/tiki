@@ -1,9 +1,9 @@
 /*! The Excite Bike theme option for the jQui theme */
-/* "-bg" in this file refers to "background color" in keeping with Bootstrap naming conventions. "-bg-path" refers to the path of the background image. */
-/* @import url("../../../../../../../../../themes/default/css/default.css"); */
+/* For Bootstrap CSS variables ("--bs-),"-bg" in this file refers to "background color" in keeping with Bootstrap naming conventions.
+ * For Tiki CSS variables ("--tiki-"), "-bg" refers to the overall CSS background property including color, background-image, etc. */
+
 @import url("../../tiki-selectors.css");
 
-/* Oct 19 */
 :root {
     --tiki-jui-border-radius: 4px;
 
@@ -29,16 +29,16 @@
 
     /* Interactive elements including buttons, etc. */
     --tiki-jui-state-default-color: #000; /* btn-primary, etc.*/
-    --tiki-jui-state-default-bg: #1484e6;
+    --tiki-jui-state-default-bg-color: #1484e6;
     --tiki-jui-state-default-bg-path: url('excite_bike/images/ui-bg_diagonals-thick_22_1484e6_40x40.png');
     --tiki-jui-state-default-bg-path-adminui: url('../images/ui-bg_diagonals-thick_22_1484e6_40x40.png');
     --tiki-jui-state-default-bg-position: 50% 50%;
     --tiki-jui-state-default-border-color: #ffffff;
 
     --tiki-jui-state-hover-color: #000;
-    --tiki-jui-state-hover-bg: #e69700;
+    --tiki-jui-state-hover-bg-color: #e69700;
     --tiki-jui-state-hover-bg-path: url('excite_bike/images/ui-bg_diagonals-thick_20_e69700_40x40.png');
-    --tiki-pagetop-jui-state-hover-bg-path: url('../../jqui/options/excite_bike/images/ui-bg_diagonals-thick_20_e69700_40x40.png');
+    --tiki-jui-state-hover-bg-path-pagetop: url('../../jqui/options/excite_bike/images/ui-bg_diagonals-thick_20_e69700_40x40.png');
     --tiki-jui-state-hover-bg-path-adminui: url('../images/ui-bg_diagonals-thick_20_e69700_40x40.png');
     --tiki-jui-state-hover-bg-position: 50% 50%;
     --tiki-jui-state-hover-border-color: #e69700;
@@ -92,7 +92,7 @@
 
 /*    --tiki-nav-tabs-link-color: #4c3000;
     --tiki-active-color: var(--bs-link-color);
-    --tiki-active-bg: var(--bs-info-bg-subtle);
+    --tiki-active-bg-color: var(--bs-info-bg-subtle);
     --tiki-active-border-color: var(--bs-border-color);
     --bs-nav-tabs-border-color: var(--bs-border-color); /* default */
  /*   --bs-nav-tabs-link-bg: #fece2f;
@@ -229,7 +229,7 @@
 }
 
 [data-bs-theme=dark] .tiki-top-nav-light {
-    --tiki-top-bg: var(--tiki-pagetop-jui-state-hover-bg-path);
+    --tiki-top-bg: var(--tiki-jui-state-hover-bg-path-pagetop);
     --tiki-top-color: #e0e0e0;
     --tiki-top-hover-color: #fff;
     --tiki-top-text-color: #fff;
@@ -281,6 +281,10 @@
     --tiki-admin-dropdown-link-hover-bg: var(--bs-tertiary-bg);
 }
 
+:root .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light {
+    background: url('../../excite_bike/images/ui-bg_diagonals-small_25_c5ddfc_40x40.png') repeat !important;
+}
+
 /* Admin section left menu accordion buttons, light and dark options */
 :root .tiki .tiki-admin-aside-nav-light button.accordion-button,
 :root .tiki .tiki-admin-aside-nav-dark button.accordion-button{
@@ -312,6 +316,15 @@
     --tiki-admin-dropdown-link-hover-bg: rgba(255, 255, 255, 0.15);
 }
 
+:root .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark {
+    background: repeating-linear-gradient(
+            135deg,
+            #032B4A,
+            #032B4A 4px,
+            #02253f 4px,
+            #02253f 8px);
+}
+
 :root .tiki .tiki-admin-aside-nav-dark .nav-link {
     color: white;
 }
@@ -337,7 +350,7 @@
 [data-bs-theme=dark] .tiki .tiki-admin-top-nav-light,
 [data-bs-theme=dark] .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light,
 [data-bs-theme=dark] .tiki .tiki-admin-aside-nav-light {
-    --tiki-admin-top-nav-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path-adminui);
+    --tiki-admin-top-nav-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path-adminui) 50% 50% repeat;
     --tiki-admin-top-nav-color: black;
     --tiki-admin-top-nav-hover-color: rgba(255, 255, 255, 0.55);
     --tiki-admin-top-nav-hover-bg: rgba(255, 255, 255, 0.75);
