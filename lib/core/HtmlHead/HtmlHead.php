@@ -618,6 +618,8 @@ class HtmlHead extends MetaTags
             // This is when headtitle is not a global var and set in templates.
             if (! empty($title = TikiLib::lib('smarty')->getTemplateVars('headtitle'))) {
                 $this->title = $title;
+            } elseif (! empty($title = TikiLib::lib('smarty')->getTemplateVars('title'))) {
+                $this->title = $title;
             } elseif (! empty($section)) {
                 $this->title = ucfirst($section);
             }
