@@ -18,8 +18,11 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> bf7a0bee6c ([FIX] Simplify theme asset registration by removing iconset parameter)
+=======
+>>>>>>> 7c6e402fd9 (Fix conflicts)
 
 $themelib = TikiLib::lib('theme');
 
@@ -139,6 +142,7 @@ if (
         $prefs['site_layout_admin'] = 'admin';
         /* Force the admin layout on setup/management pages too */
         $prefs['site_layout'] = 'admin';
+<<<<<<< HEAD
 <<<<<<< HEAD
         /* Set the section to "admin" to display only the UAB specific modules (defined in lib/modules/modlib.php) */
         Sections::setCurrentSection(Sections::SECTION_ADMIN);
@@ -371,6 +375,8 @@ if (
         $prefs['site_layout'] = 'admin';
 =======
 >>>>>>> bf7a0bee6c ([FIX] Simplify theme asset registration by removing iconset parameter)
+=======
+>>>>>>> 7c6e402fd9 (Fix conflicts)
         /* Mark these pages as admin-layout so they keep admin-like behavior without using the control-panel-only module filtering. */
         Sections::setCurrentSection(Sections::SECTION_ADMIN_LAYOUT);
 
@@ -454,8 +460,11 @@ $headerlib->add_js('jqueryTiki.iconset = ' . json_encode($iconset->getJS()));
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> bf7a0bee6c ([FIX] Simplify theme asset registration by removing iconset parameter)
+=======
+>>>>>>> 7c6e402fd9 (Fix conflicts)
 $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 
 //Note: if Theme Control is active, than tiki-tc.php can modify the active theme
@@ -469,6 +478,7 @@ if ($prefs['webmonetization_all_website'] === 'y' && ! empty($prefs['webmonetiza
 if ($prefs['theme_header_and_address_bar_color'] === 'y') {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
     if (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty(Sections::getCurrentSection())) {
 =======
     if (Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
@@ -476,6 +486,9 @@ if ($prefs['theme_header_and_address_bar_color'] === 'y') {
 =======
     if (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty(Sections::getCurrentSection())) {
 >>>>>>> bf7a0bee6c ([FIX] Simplify theme asset registration by removing iconset parameter)
+=======
+    if (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty(Sections::getCurrentSection())) {
+>>>>>>> 7c6e402fd9 (Fix conflicts)
         $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant_admin'] . "-bg";
     } else {
         $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant'] . "-bg";
@@ -495,6 +508,7 @@ if ($prefs['theme_header_and_address_bar_color'] === 'y') {
 //finish
 $smarty->initializePaths();
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 >>>>>>> e050c16f08 ([FIX] Add documentation to theme setup function for better maintainability and clarity of responsibilities.)
@@ -509,3 +523,5 @@ $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 >>>>>>> bf7a0bee6c ([FIX] Simplify theme asset registration by removing iconset parameter)
 =======
 >>>>>>> 3418f0d9d1 ([FIX] Simplify theme asset registration by removing iconset parameter)
+=======
+>>>>>>> 7c6e402fd9 (Fix conflicts)
