@@ -60,6 +60,8 @@ class Sections
     public const SECTION_SHARE = 'share';
     public const SECTION_SHEET = 'sheet';
     public const SECTION_CHAT = 'chat';
+    public const SECTION_ADMIN_LAYOUT = 'admin layout';
+    // 'admin layout' section is special as it is used for the admin/management pages that should behave as control panels in the Unified Admin Backend UI (if there is a need to exclude an admin page from that layout, do NOT assign it to this one)
 
     private static $currentSection;
 
@@ -109,6 +111,7 @@ class Sections
             self::SECTION_SHARE,
             self::SECTION_SHEET,
             self::SECTION_CHAT,
+            self::SECTION_ADMIN_LAYOUT,
         ];
     }
 

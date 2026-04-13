@@ -24,7 +24,7 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 include_once('lib/hotwords/hotwordlib.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 $access->check_feature('feature_hotwords');
 $access->check_permission('tiki_p_admin');

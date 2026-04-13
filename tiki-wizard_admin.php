@@ -37,6 +37,10 @@ $headerlib->add_css('.pref_dependency{display:none !important;}');
 $accesslib = TikiLib::lib('access');
 $accesslib->check_permission('tiki_p_admin');
 
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN;
+Sections::setCurrentSection($section);
+
 // Create the template instances
 $pages = [];
 
