@@ -26,7 +26,7 @@ $access->check_permission(['tiki_p_view_integrator']);
 $repID = (isset($_REQUEST["repID"]) && strlen($_REQUEST["repID"]) > 0) ? $_REQUEST["repID"] : 0;
 
 if (! isset($_REQUEST["repID"]) && ($repID <= 0)) {
-    Feedback::errorAndDie(tra("No repository given"), \Laminas\Http\Response::STATUS_CODE_409);
+    Feedback::errorAndDie(tra("Repository not found"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 // Create instance of integrator
 $integrator = new TikiIntegrator();
