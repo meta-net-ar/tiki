@@ -56,7 +56,7 @@
                 </li>
                 <li>
                     {tr}Prosody and Converse.js integration with Tiki as identity provider{/tr}<br>
-                    <a href="https://wikisuite.org/How-to-install-Prosody-using-Tiki-for-its-userlist" target="tikihelp">
+                    <a href="https://doc.tiki.org/Prosody" target="tikihelp">
                         {tr}More Information{/tr}
                     </a>
                 </li>
