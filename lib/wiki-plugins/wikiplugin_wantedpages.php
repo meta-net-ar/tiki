@@ -256,6 +256,15 @@ class WikiPluginWantedPages extends PluginsLib
                 continue;
             }
 
+            if (TikiLib::lib('parser')->wikiLinkStaleQualifiedDigitInSource($row['fromPageContent'] ?? '', $row['toPage'])) {
+                if ($debug == 2) {
+                    echo tr('%0 [from: %1]: qualified paren digit artifact', $row['toPage'], $row['fromPage']) . '<br />';
+                } elseif ($debug) {
+                    $tmp[] = [$row['toPage'], $row['fromPage'], tra('qualified paren digit artifact')];
+                }
+                continue;
+            }
+
             foreach ($ignorepages as $ipage) {
                 // test whether a substring ignores this page, ignore case
                 if (fnmatch(mb_strtolower($ipage), mb_strtolower($row['fromPage'])) === true) {
