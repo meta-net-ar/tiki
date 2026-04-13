@@ -6,6 +6,7 @@
         <div class="col">
             {textarea
                 _toolbars="n"
+                _wysiwyg="n"
                 name="{$p.preference|escape}"
                 id="{$p.id|escape}"
                 syntax="{$syntax|escape|default:''}"
