@@ -3987,14 +3987,32 @@ class TrackerLib extends TikiLib
         // for ItemLink, AutoIncrement, UserPref and Category fields use the proper output method
         if (in_array($main_field_type, ['r','q', 'p', 'e'])) {
             $definition = Tracker_Definition::get($trackerId);
-            $field = $definition->getField($this->get_main_field($trackerId));
-            $item = $this->get_tracker_item($itemId);
-            $handler = $this->get_field_handler($field, $item);
-            // when called from \ObjectLib::get_title Category fields need to have getFieldData run before the category name can be rendered
-            $field = array_merge($field, $handler->getFieldData());
-            $handler = $this->get_field_handler($field, $item);
 
-            $result = $handler->renderOutput(['list_mode' => 'csv']);
+            if (! $definition) {
+                trigger_error(
+                    tr('Requested main tracker item field value of item %0 but tracker %1 not found.', $itemId, $trackerId),
+                    E_USER_WARNING
+                );
+                return '';
+            }
+
+            $mainFieldId = $this->get_main_field($trackerId);
+            if ($mainFieldId) {
+                $field = $definition->getField($mainFieldId);
+                $item = $this->get_tracker_item($itemId);
+                $handler = $this->get_field_handler($field, $item);
+
+                if ($handler) {
+                    // when called from \ObjectLib::get_title Category fields need to have getFieldData run before the category name can be rendered
+                    $mergedField = array_merge($field, $handler->getFieldData());
+                    $mergedHandler = $this->get_field_handler($mergedField, $item);
+                    // Prefer the merged handler (needed for Category), but fall back to the
+                    // original handler so AutoIncrement etc. keep their formatting instead
+                    // of silently returning the raw DB value.
+                    $renderHandler = $mergedHandler ?: $handler;
+                    $result = $renderHandler->renderOutput(['list_mode' => 'csv']);
+                }
+            }
         }
 
         if (is_string($result) && strlen($result) && $result[0] === '{') {
