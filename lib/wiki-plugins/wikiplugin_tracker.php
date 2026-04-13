@@ -712,6 +712,7 @@ function wikiplugin_tracker($data, $params)
     $smarty->assign('trackerEditFormId', $iTRACKER);
     $item = [];
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_tracker_info());
     extract($params, EXTR_SKIP);
 
     $thisIsThePlugin = isset($_REQUEST['iTRACKER']) && $_REQUEST['iTRACKER'] == $iTRACKER;
