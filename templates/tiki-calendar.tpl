@@ -83,21 +83,23 @@
     <div id="test"></div>
     
     <div id='currentcalitemId' class='d-none'>{$currentcalitemId}</div>
-    <div class='border border-secondary p-2 row'>
-        <div class='col-md-3 border-end border-secondary'>
-            {include 
-                file='calendar_header.tpl' isInMainCalendar="y"
-            }
+    <div class='row'>
+        <div class='col-md-12'>
+            <div class="d-flex align-items-center justify-content-between">
+                {include file='calendar_header.tpl' isInMainCalendar="y"}
+                {if count($calendars) >= 1}
+                    <div class="d-flex align-items-center">
+                        {include file="checkboxes_calendar_form.tpl" filterCal="filterMainCal" class="me-2"}
+                        {include file="export_calendar_in_csv_or_ical.tpl" exportCal="exportMainCal"}
+                    </div>
+                {/if}
+            </div>
             {if count($calendars) >= 1}
-                {include file="checkboxes_calendar_form.tpl" filterCal="filterMainCal" class="mt-2" style="display: block;"}
-                {include file="export_calendar_in_csv_or_ical.tpl" exportCal="exportMainCal" style="display: block;"}
-                <h6 class="text-center text-secondary border-top border-bottom py-1">
-                {tr}Displayed calendar{/tr}
-                </h6>
-                {include file="configlinks_calendar.tpl" filterCal="filterMainCal" isInMainCalendar="y" style="display: block;"}
+                <h6 class="text-secondary mt-3">{tr}Displayed calendar{/tr}</h6>
+                {include file="configlinks_calendar.tpl" filterCal="filterMainCal" isInMainCalendar="y"}
             {/if}
         </div>
-        <div class='col-md-9'>
+        <div class='col-md-12'>
             {if $viewlist eq 'list'}
                 {include file='tiki-calendar_listmode.tpl'}
             {else}
