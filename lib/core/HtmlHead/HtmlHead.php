@@ -25,15 +25,15 @@ if (function_exists('\filter_out_sefurl') === false) {
 class HtmlHead extends MetaTags
 {
     // Set by init() based on section
-    public ?string $title = null;
-    public ?string $description = null;
-    public ?string $author = null;
-    public ?string $canonicalPath = null;
-    public ?string $canonicalUrl = null;
-    public array $images = [];
-    public ?string $publishDate = null;
-    public ?string $modifiedDate = null;
-    public ?string $pageType = null;
+    public ?string $title           = null;
+    public ?string $description     = null;
+    public ?string $author          = null;
+    public ?string $canonicalPath   = null;
+    public ?string $canonicalUrl    = null;
+    public array $images          = [];
+    public ?string $publishDate     = null;
+    public ?string $modifiedDate    = null;
+    public ?string $pageType        = null;
     public ?string $breadcrumbTitle = null;
     public ?string $middleSectionTemplate;
 
@@ -44,73 +44,88 @@ class HtmlHead extends MetaTags
     {
         global $section, $prefs;
 
-        $this->pageType              = $this->getPageTypeFromSection($section);
         $this->middleSectionTemplate = $middleSectionTemplate;
 
         switch ($section) {
             case Sections::SECTION_BLOGS:
+                $this->pageType = ! empty($_REQUEST['postId']) ? 'blog_post' : 'blog';
                 $this->initBlogs();
                 break;
 
             case Sections::SECTION_CMS:
+                $this->pageType = 'article';
                 $this->initCms();
                 break;
 
             case Sections::SECTION_FILE_GALLERIES:
+                $this->pageType = 'file_gallery';
                 $this->initFileGalleries();
                 break;
 
             case Sections::SECTION_WIKI_PAGE:
             case Sections::SECTION_WIKI:
+                $this->pageType = 'wiki';
                 $this->initWiki();
                 break;
 
             case Sections::SECTION_FORUM:
             case Sections::SECTION_FORUMS:
+                $this->pageType = ! empty($_REQUEST['comments_parentId']) ? 'forum_thread' : 'forum';
                 $this->initForums();
                 break;
 
             case Sections::SECTION_TRACKERS:
+                $this->pageType = ! empty($_REQUEST['itemId']) ? 'tracker_item' : 'tracker';
                 $this->initTrackers();
                 break;
 
             case Sections::SECTION_CATEGORIES:
+                $this->pageType = 'category';
                 $this->initCategories();
                 break;
 
             case Sections::SECTION_FAQS:
+                $this->pageType = 'faq';
                 $this->initFaqs();
                 break;
 
             case Sections::SECTION_SURVEYS:
+                $this->pageType = 'survey';
                 $this->initSurveys();
                 break;
 
             case Sections::SECTION_QUIZZES:
+                $this->pageType = 'quiz';
                 $this->initQuizzes();
                 break;
 
             case Sections::SECTION_POLL:
+                $this->pageType = 'poll';
                 $this->initPolls();
                 break;
 
             case Sections::SECTION_DIRECTORY:
+                $this->pageType = 'directory';
                 $this->initDirectory();
                 break;
 
             case Sections::SECTION_CALENDAR:
+                $this->pageType = 'calendar';
                 $this->initCalendar();
                 break;
 
             case Sections::SECTION_NEWSLETTERS:
+                $this->pageType = 'newsletter';
                 $this->initNewsletters();
                 break;
 
             case Sections::SECTION_SHEET:
+                $this->pageType = 'sheet';
                 $this->initSheets();
                 break;
 
             case Sections::SECTION_HTML_PAGES:
+                $this->pageType = 'html_page';
                 $this->initHtmlPages();
                 break;
 
@@ -143,13 +158,14 @@ class HtmlHead extends MetaTags
             case Sections::SECTION_LIVESUPPORT:
             case Sections::SECTION_SHARE:
             case Sections::SECTION_CHAT:
-            default:
+                $this->pageType = null;
                 $this->initDefault();
                 break;
         }
 
         $this->fallbacks();
     }
+
 
     /**
      * Blogs section
@@ -349,9 +365,7 @@ class HtmlHead extends MetaTags
         $isItem = ! empty($_REQUEST['itemId']);
 
         if ($isItem && ! empty($tracker_item_main_value)) {
-            $this->title = strlen($tracker_item_main_value) > 255
-                ? substr($tracker_item_main_value, 0, 252) . '...'
-                : $tracker_item_main_value;
+            $this->title = $this->cleanText($tracker_item_main_value, 255);
         } elseif (! empty($tracker_info['pagetitle'])) {
             $this->title = $tracker_info['pagetitle'];
         } elseif (! empty($tracker_info['name'])) {
@@ -586,66 +600,6 @@ class HtmlHead extends MetaTags
     }
 
     /**
-     * Get page type from section
-     */
-    protected function getPageTypeFromSection(?string $section): ?string
-    {
-        switch ($section) {
-            case Sections::SECTION_CMS:
-                return 'article';
-
-            case Sections::SECTION_BLOGS:
-                return ! empty($_REQUEST['postId']) ? 'blog_post' : 'blog';
-
-            case Sections::SECTION_WIKI_PAGE:
-            case Sections::SECTION_WIKI:
-                return 'wiki';
-
-            case Sections::SECTION_FORUM:
-            case Sections::SECTION_FORUMS:
-                return ! empty($_REQUEST['comments_parentId']) ? 'forum_thread' : 'forum';
-
-            case Sections::SECTION_TRACKERS:
-                return ! empty($_REQUEST['itemId']) ? 'tracker_item' : 'tracker';
-
-            case Sections::SECTION_CATEGORIES:
-                return 'category';
-
-            case Sections::SECTION_FILE_GALLERIES:
-                return 'file_gallery';
-
-            case Sections::SECTION_FAQS:
-                return 'faq';
-
-            case Sections::SECTION_SURVEYS:
-                return 'survey';
-
-            case Sections::SECTION_QUIZZES:
-                return 'quiz';
-
-            case Sections::SECTION_POLL:
-                return 'poll';
-
-            case Sections::SECTION_DIRECTORY:
-                return 'directory';
-
-            case Sections::SECTION_CALENDAR:
-                return 'calendar';
-
-            case Sections::SECTION_NEWSLETTERS:
-                return 'newsletter';
-
-            case Sections::SECTION_SHEET:
-                return 'sheet';
-
-            case Sections::SECTION_HTML_PAGES:
-                return 'html_page';
-        }
-
-        return null;
-    }
-
-    /**
      * fallback metatags
      */
     protected function fallbacks(): void
@@ -660,8 +614,13 @@ class HtmlHead extends MetaTags
             $this->description = $prefs['metatag_description'];
         }
 
-        if (empty($this->title) && ! empty($section)) {
-            $this->title = ucfirst($section);
+        if (empty($this->title)) {
+            // This is when headtitle is not a global var and set in templates.
+            if (! empty($title = TikiLib::lib('smarty')->getTemplateVars('headtitle'))) {
+                $this->title = $title;
+            } elseif (! empty($section)) {
+                $this->title = ucfirst($section);
+            }
         }
 
         if (empty($this->images)) {
@@ -711,6 +670,11 @@ class HtmlHead extends MetaTags
             }
         }
 
+        // Workaround for $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
+        if (empty($content)) {
+            $content = TikiLib::lib('smarty')->getTemplateVars('metatag_robots');
+        }
+
         return $content;
     }
 
@@ -720,8 +684,8 @@ class HtmlHead extends MetaTags
     protected function cleanText(string $text, int $maxLen = 150): string
     {
         $text = strip_tags($text);
-        if (strlen($text) > $maxLen) {
-            $text = substr($text, 0, $maxLen - 3) . '...';
+        if (mb_strlen($text) > $maxLen) {
+            $text = mb_substr($text, 0, $maxLen - 3) . '...';
         }
         return $text;
     }
@@ -861,11 +825,9 @@ class HtmlHead extends MetaTags
 
         // robots.
         if (! empty($robots = $this->getRobots())) {
+            $robots = strtolower($robots);
             $this->robots($robots);
             $this->robots($robots, 'googlebot');
-        } elseif ($this->pageType === null) { // my tiki pages.
-            $this->robots('noindex, nofollow');
-            $this->robots('noindex, nofollow', 'googlebot');
         }
 
         // fb site name
