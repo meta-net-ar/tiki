@@ -149,13 +149,17 @@
         </a>
 
         {if $gal_info.archives gt -1}
-            {if isset($file.nbArchives) and $file.nbArchives gt 0}
-                {$nb_archives=$file.nbArchives}
+            {$has_archives = isset($file.nbArchives) and $file.nbArchives gt 0}
+            {if $has_archives}
                 <a href="tiki-file_archives.php?fileId={$file.fileId}{if !empty($filegals_manager)}&amp;filegals_manager={$filegals_manager|escape}{/if}">
-                    {icon _menu_text=$menu_text _menu_icon=$menu_icon name='file-archive' alt="{tr}Archives{/tr} ($nb_archives)"}
+            {else}
+                <span class="text-muted" title="{tr}There are no archives yet.{/tr}">
+            {/if}
+                {icon _menu_text=$menu_text _menu_icon=$menu_icon name='file-archive' alt="{tr}Archives{/tr}{if $has_archives} ({$file.nbArchives}){/if}"}
+            {if $has_archives}
                 </a>
             {else}
-                {icon _menu_text=$menu_text _menu_icon=$menu_icon name='file-archive' alt="{tr}Archives{/tr}"}
+                </span>
             {/if}
             {$replace_action_title="{tr}Upload new version{/tr}"}
         {else}
