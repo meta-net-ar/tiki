@@ -112,6 +112,8 @@ function wikiplugin_group($data, $params)
     $allowedUsers = $params['users'];
     $userPending = [];
     $userNotPending = [];
+    $pending = [];
+    $notpending = [];
     if (! is_null($params['pending']) || ! is_null($params['notpending'])) {
         $pending = $params['pending'] ?? [];
         $notpending = $params['notpending'] ?? [];
