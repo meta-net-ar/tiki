@@ -11,6 +11,7 @@
 
 use Tiki\Lib\Theme\ThemeLib;
 use Tiki\Sections;
+<<<<<<< HEAD
 
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
@@ -544,3 +545,5 @@ $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 >>>>>>> 0aeb9bdcd0 (Fix conflicts)
 =======
 >>>>>>> bdbcd50d63 (Fix conflicts)
+=======
+>>>>>>> 6d71abb62a ([FIX] Update section detection for admin theme layout)
