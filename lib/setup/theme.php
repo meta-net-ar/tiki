@@ -1,10 +1,14 @@
 <?php
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 <<<<<<< HEAD
 =======
 >>>>>>> e64f2f0b69 ([FIX] Add documentation to theme setup function for better maintainability and clarity of responsibilities.)
+=======
+
+>>>>>>> 71a1c30fe1 ([FIX] Update section detection for admin theme layout)
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -12,6 +16,7 @@
 
 use Tiki\Lib\Theme\ThemeLib;
 use Tiki\Sections;
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
@@ -550,3 +555,9 @@ $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 >>>>>>> 6d71abb62a ([FIX] Update section detection for admin theme layout)
 =======
 >>>>>>> db0f66c2ff ([FIX] Update section detection for admin theme layout)
+=======
+
+if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
+    die('This script may only be included.');
+}
+>>>>>>> 71a1c30fe1 ([FIX] Update section detection for admin theme layout)
