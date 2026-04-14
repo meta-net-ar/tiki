@@ -82,6 +82,9 @@ class ConfigureCommand extends Command
 // \$system_configuration_file = '/etc/tiki.ini';
 // \$system_configuration_identifier = 'example.com';
 
+// Multiple configuration files (files listed later override earlier ones):
+// \$system_configuration_files = ['/etc/tiki/ansible_local.ini', '/etc/tiki/dev_local.ini'];
+
 LOCALPHP;
         $local_php = \Tiki\TikiInit::getCredentialsFile();
         $result = file_put_contents($local_php, $out);

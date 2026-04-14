@@ -578,19 +578,29 @@ class AdminLib extends TikiLib
      */
     public function checkSystemConfigurationFile()
     {
-        global $system_configuration_file;
+        global $system_configuration_file, $system_configuration_files;
         $show_warning = false;
 
         if (file_exists(TIKI_CONFIG_FILE_PATH)) {
             include(TIKI_CONFIG_FILE_PATH);
 
-            if (isset($system_configuration_file) && file_exists($system_configuration_file)) {
-                $tikiPath = realpath(TIKI_PATH);
-                $configPath = realpath($system_configuration_file);
-                if (strncmp($tikiPath, $configPath, strlen($tikiPath)) == 0) {
-                    $file_extension = pathinfo($system_configuration_file, PATHINFO_EXTENSION);
-                    if ($file_extension == 'ini') {
-                        $show_warning = true;
+            // Normalize to array for multi-file support
+            if (! isset($system_configuration_files) || ! is_array($system_configuration_files)) {
+                $filesToCheck = ! empty($system_configuration_file) ? [$system_configuration_file] : [];
+            } else {
+                $filesToCheck = $system_configuration_files;
+            }
+
+            foreach ($filesToCheck as $configFile) {
+                if (isset($configFile) && file_exists($configFile)) {
+                    $tikiPath = realpath(TIKI_PATH);
+                    $configPath = realpath($configFile);
+                    if (strncmp($tikiPath, $configPath, strlen($tikiPath)) == 0) {
+                        $file_extension = pathinfo($configFile, PATHINFO_EXTENSION);
+                        if ($file_extension == 'ini') {
+                            $show_warning = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -661,33 +671,50 @@ class AdminLib extends TikiLib
      */
     public function retrieveConfigFileData($retrieve_all_data = false)
     {
-        global $system_configuration_identifier, $system_configuration_file;
+        global $system_configuration_identifier, $system_configuration_file, $system_configuration_files;
 
-        if (! is_readable($system_configuration_file)) {
-            throw new Exception(tr('%0 configuration file could not be read', $system_configuration_file));
-        }
-        $configData = [];
-        if ($retrieve_all_data || ! isset($system_configuration_identifier)) {
-            $system_configuration_identifier = null;
-        }
-        $configReader = new Ini();
-        $configReader->setFilterSection($system_configuration_identifier);
-
-        if (preg_match('/\.ini.php$/', $system_configuration_file)) {
-            $retrieveIniContent = function ($system_configuration_file) {
-                ob_start();
-                include($system_configuration_file);
-                $system_configuration_file_content = ob_get_contents();
-                ob_end_clean();
-
-                return $system_configuration_file_content;
-            };
-
-            $system_configuration_content = $retrieveIniContent($system_configuration_file);
-            $configData = $configReader->fromString($system_configuration_content);
+        // Normalize to array for multi-file support
+        if (! isset($system_configuration_files) || ! is_array($system_configuration_files)) {
+            $filesToLoad = ! empty($system_configuration_file) ? [$system_configuration_file] : [];
         } else {
-            $configData = $configReader->fromFile($system_configuration_file);
+            $filesToLoad = $system_configuration_files;
         }
-        return $configData;
+
+        $mergedConfigData = [];
+
+        foreach ($filesToLoad as $configFilePath) {
+            if (! is_readable($configFilePath)) {
+                throw new Exception(tr('%0 configuration file could not be read', $configFilePath));
+            }
+
+            $configData = [];
+            $identifier = ($retrieve_all_data || ! isset($system_configuration_identifier))
+                ? null
+                : $system_configuration_identifier;
+
+            $configReader = new Ini();
+            $configReader->setFilterSection($identifier);
+
+            if (preg_match('/\.ini.php$/', $configFilePath)) {
+                $retrieveIniContent = function ($file) {
+                    ob_start();
+                    include($file);
+                    $content = ob_get_contents();
+                    ob_end_clean();
+
+                    return $content;
+                };
+
+                $iniContent = $retrieveIniContent($configFilePath);
+                $configData = $configReader->fromString($iniContent);
+            } else {
+                $configData = $configReader->fromFile($configFilePath);
+            }
+
+            // Merge: later files override earlier files (array_replace_recursive)
+            $mergedConfigData = array_replace_recursive($mergedConfigData, $configData);
+        }
+
+        return $mergedConfigData;
     }
 }
