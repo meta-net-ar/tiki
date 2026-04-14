@@ -752,7 +752,27 @@ class ThemeLib extends TikiLib
         // include UAB admin CSS and layout in case we are on an admin or management page (when script file name contains the string)
         $groups = $userlib->get_user_groups($user);
 
-        if ($prefs['theme_unified_admin_backend'] === 'y' && in_array('Admins', $groups) && (strpos($_SERVER['PHP_SELF'], 'admin') || strpos($_SERVER['PHP_SELF'], 'cache') || strpos($_SERVER['PHP_SELF'], 'import') || strpos($_SERVER['PHP_SELF'], 'manage') || strpos($_SERVER['PHP_SELF'], 'permissions') || strpos($_SERVER['PHP_SELF'], 'stats') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_banner') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_categories') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_perspective') || strpos($_SERVER['PHP_SELF'], 'tiki-edit_quiz') || strpos($_SERVER['PHP_SELF'], 'tiki-export') || strpos($_SERVER['PHP_SELF'], 'tiki-import') || strpos($_SERVER['PHP_SELF'], 'tiki-list_banners') || strpos($_SERVER['PHP_SELF'], 'tiki-list_comments') || strpos($_SERVER['PHP_SELF'], 'tiki-list_contents') || strpos($_SERVER['PHP_SELF'], 'tiki-plugins') || strpos($_SERVER['PHP_SELF'], 'tiki-received') || strpos($_SERVER['PHP_SELF'], 'tiki-sys'))) { // TODO: refactor this check into an array of all admin and management pages we want to include and the related perms to access in UAB layout
+        if (
+            $prefs['theme_unified_admin_backend'] === 'y' && in_array('Admins', $groups)
+            && (strpos($_SERVER['PHP_SELF'], 'admin')
+            || strpos($_SERVER['PHP_SELF'], 'cache')
+            || strpos($_SERVER['PHP_SELF'], 'import')
+            || strpos($_SERVER['PHP_SELF'], 'manage')
+            || strpos($_SERVER['PHP_SELF'], 'permissions')
+            || strpos($_SERVER['PHP_SELF'], 'stats')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_banner')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_categories')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_perspective')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_quiz')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-export')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-import')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-list_banners')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-list_comments')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-list_contents')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-plugins')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-received')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-sys'))
+        ) { // TODO: refactor this check into an array of all admin and management pages we want to include and the related perms to access in UAB layout
             $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
 
             if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin.php') && ! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') && strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false) { // Exclude tiki-admin.php, tiki-admin_tracker_fields.php, and the modules admin here
