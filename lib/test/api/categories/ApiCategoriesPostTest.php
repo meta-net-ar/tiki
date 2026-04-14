@@ -368,8 +368,8 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         $this->assertArrayHasKey('categId', $body, 'Response should contain objects key');
         $this->assertArrayHasKey('objects', $body, 'Response should contain objects key');
         $this->assertEquals($categId, $body['categId'], 'Objects should contain the original invalid string');
-        $this->assertEquals(['invalidformat'], $body['objects'], 'Objects should contain the original invalid string');
-        $this->assertCount(1, $body['objects'], 'Should have exactly 1 object returned');
+        $this->assertEmpty($body['objects'], 'No objects should be processed for invalid format');
+        $this->assertEquals("unchanged", $body['count'], 'Count should be "unchanged" for invalid object format');
     }
 
     public function testApiUncategorizeWikiPage()

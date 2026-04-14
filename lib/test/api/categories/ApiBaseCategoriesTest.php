@@ -212,16 +212,13 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
             $this->assertMatchesSchema($body, $this->getCategorizeResponseSchema());
         } elseif($body['count'] === 'unchanged') {
             $this->assertArrayHasKey('categId', $body, 'Response should have categId');
-            // FIXME: in uncategorize with unchanged, categId is string
-            // $this->assertIsInt($body['categId'], 'categId should be integer');
+            $this->assertIsInt($body['categId'], 'categId should be integer');
             $this->assertArrayHasKey('objects', $body, 'Response should have objects');
             $this->assertIsArray($body['objects'], 'Objects should be an array');
 
             foreach ($body['objects'] as $object) {
-                $this->assertIsString($object, 'Each object should be a string when count is "unchanged"');
-                $this->assertStringContainsString(':', $object, 'Object string should be in "type:id" format');
-
-                list($type, $id) = array_map('trim', explode(':', $object, 2)); // Split into type and id
+                $type = $object['type'] ?? '';
+                $id = $object['id'] ?? '';
                 $this->assertNotEmpty($type, 'Object type should not be empty');
                 $this->assertNotEmpty($id, 'Object id should not be empty');
             }
