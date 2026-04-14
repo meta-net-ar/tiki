@@ -1,6 +1,7 @@
 <?php
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -9,6 +10,9 @@
 =======
 
 >>>>>>> 71a1c30fe1 ([FIX] Update section detection for admin theme layout)
+=======
+
+>>>>>>> bc9fff562c (Fix conflicts)
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -16,6 +20,7 @@
 
 use Tiki\Lib\Theme\ThemeLib;
 use Tiki\Sections;
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 
@@ -564,3 +569,5 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 >>>>>>> 71a1c30fe1 ([FIX] Update section detection for admin theme layout)
 =======
 >>>>>>> 558d638418 ([FIX] Update section detection for admin theme layout)
+=======
+>>>>>>> bc9fff562c (Fix conflicts)
