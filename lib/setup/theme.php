@@ -1,4 +1,5 @@
 <?php
+<<<<<<< HEAD
 
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -547,3 +548,5 @@ $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 >>>>>>> bdbcd50d63 (Fix conflicts)
 =======
 >>>>>>> 6d71abb62a ([FIX] Update section detection for admin theme layout)
+=======
+>>>>>>> db0f66c2ff ([FIX] Update section detection for admin theme layout)
