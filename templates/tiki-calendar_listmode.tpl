@@ -36,7 +36,7 @@
                     <a href="{bootstrap_modal controller='calendar' action='view_item' size='modal-lg' calitemId=$event.calitemId}" title="{tr}View{/tr}">
                     {if isset($infocals.$calendarId.customfgcolor) && $infocals.$calendarId.customfgcolor ne ''}<span style="color:#{$infocals.$calendarId.customfgcolor};">{/if}
                     <span class="summary">{$event.name|escape}</span></a><br>
-                    <span class="description" style="font-style:italic">{$event.parsed}</span>
+                    <span class="description font-italic">{$event.parsed}</span>
                     {if !empty($event.web)}
                         <br><a href="{$event.web}" target="_other" class="calweb" title="{$event.web}">{icon name='link-external'}</a>
                         {if isset($infocals.$calendarId.customfgcolor) && $infocals.$calendarId.customfgcolor ne ''}</span>{/if}

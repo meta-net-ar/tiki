@@ -541,7 +541,6 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
 
         if (! $input->modal->int()) {
             TikiLib::lib('header')
-                ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
                 ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
         }
 
