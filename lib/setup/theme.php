@@ -28,6 +28,7 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> bf7a0bee6c ([FIX] Simplify theme asset registration by removing iconset parameter)
 =======
@@ -561,3 +562,5 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
 >>>>>>> 71a1c30fe1 ([FIX] Update section detection for admin theme layout)
+=======
+>>>>>>> 558d638418 ([FIX] Update section detection for admin theme layout)
