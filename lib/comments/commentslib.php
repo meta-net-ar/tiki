@@ -2650,6 +2650,9 @@ class Comments extends TikiLib
                     }
                     $maxRecords = $maxRecords - $ret[$key]['replies_info']['totalReplies'];
                 }
+            } else {
+                // maxRecords exhausted, replies not loaded but replies_info must be a valid array
+                $ret[$key]['replies_info'] = ['replies' => [], 'numReplies' => 0, 'totalReplies' => 0];
             }
 
             if (empty($res["data"])) {

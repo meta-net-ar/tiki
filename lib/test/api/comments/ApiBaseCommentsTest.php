@@ -287,11 +287,10 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         );
 
         // Create an item
-        $itemId = $trklib->replace_item(
-            $trackerId,
-            0,
-            ['data' => [$fieldId => ['value' => $name]]]
-        );
+        $definition = \Tracker_Definition::get($trackerId);
+        $fields = $definition->getFields();
+        $fields[0]['value'] = $name;
+        $itemId = $trklib->replace_item($trackerId, 0, ['data' => $fields]);
         if ($itemId) {
             static::$testObjects['tracker_items'][] = $itemId;
         }
@@ -539,7 +538,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
             [
                 'grandFather' => 'int|null',
                 'can_edit' => 'bool',
-                'replies_info' => [ // FIXME: replies_info sometimes contains null value instead of array
+                'replies_info' => [
                     'replies' => [[ /* same as getCommentResponseSchema() */]],
                     'numReplies' => 'int',
                     'totalReplies' => 'int',
