@@ -61,14 +61,7 @@ class Sections
     public const SECTION_SHEET = 'sheet';
     public const SECTION_CHAT = 'chat';
     public const SECTION_ADMIN_LAYOUT = 'admin layout';
-<<<<<<< HEAD
-<<<<<<< HEAD
     // 'admin layout' section is special as it is used for the admin/management pages that should behave as control panels in the Unified Admin Backend UI (if there is a need to exclude an admin page from that layout, do NOT assign it to this one)
-=======
->>>>>>> aa4665c139 ([FIX] Simplify theme asset registration by removing iconset parameter)
-=======
-    // 'admin layout' section is special as it is used for the admin/management pages that should behave as control panels in the Unified Admin Backend UI (if there is a need to exclude an admin page from that layout, do NOT assign it to this one)
->>>>>>> 7205c40762 ([FIX] Simplify theme asset registration by removing iconset parameter)
 
     private static $currentSection;
 
