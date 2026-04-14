@@ -38,6 +38,7 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 use Tiki\Sections;
+use Tiki\SortModeValidator;
 $section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 $access->check_feature('feature_newsletters');
@@ -199,11 +200,10 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     $smarty->assign('info', $info);
     $cookietab = 1;
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'created_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'created_desc',
+    ['tiki_newsletters','tiki_sent_newsletters']
+);
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 $find = $_REQUEST["find"] ?? '';

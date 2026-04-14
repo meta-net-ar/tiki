@@ -20,6 +20,7 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 use Tiki\Sections;
+use Tiki\SortModeValidator;
 $section = Sections::SECTION_BLOGS;
 Sections::setCurrentSection($section);
 $bloglib = TikiLib::lib('blog');
@@ -43,11 +44,10 @@ if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
 // for the information as the number of
 // days to get in the log 1,3,4,etc
 // it will default to 1 recovering information for today
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = $prefs['blog_list_order'];
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? $prefs['blog_list_order'],
+    ['tiki_blogs', 'tiki_blog_posts']
+) ?: 'created_desc';
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
