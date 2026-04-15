@@ -1623,6 +1623,61 @@ class ParserLib extends TikiDb_Bridge
         return $data;
     }
 
+    /**
+     * Reltype plus numeric page tokens usually come from SQL or code snippets.
+     * Treat them as non wiki targets.
+     */
+    private function isQualifiedParenDigitFalsePositive($qualifier, $pageName)
+    {
+        return ($qualifier ?? '') !== '' && preg_match('/^\d+$/', trim((string) $pageName));
+    }
+
+    /** Keep get_pages link extraction aligned with parse_data_wikilinks. */
+    private function stripQualifiedParenDigitWikiMatches(array $m)
+    {
+        if (empty($m[2])) {
+            return $m;
+        }
+        $groupKeys = [];
+        foreach ($m as $k => $v) {
+            if (is_int($k) && is_array($v)) {
+                $groupKeys[] = $k;
+            }
+        }
+        sort($groupKeys);
+        $out = [];
+        foreach ($groupKeys as $g) {
+            $out[$g] = [];
+        }
+        $n = count($m[2]);
+        for ($i = 0; $i < $n; $i++) {
+            if ($this->isQualifiedParenDigitFalsePositive($m[1][$i] ?? '', $m[2][$i] ?? '')) {
+                continue;
+            }
+            foreach ($groupKeys as $g) {
+                $out[$g][] = $m[$g][$i];
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * Detect stale tiki_links rows for numeric targets coming from qualified paren syntax in source.
+     */
+    public function wikiLinkStaleQualifiedDigitInSource($content, $toPage)
+    {
+        if ($content === '' || ! preg_match('/^\d+$/', (string) $toPage)) {
+            return false;
+        }
+        $q = preg_quote($toPage, '/');
+        if (preg_match('/\(\(\s*' . $q . '(?:\s*[\|#]|\s*\)\))/', $content)) {
+            return false;
+        }
+
+        return preg_match('/\([a-z0-9-]+\(\s*' . $q . '\s*\)\)/', $content) === 1;
+    }
+
     //*
     protected function parse_data_wikilinks($data, $simple_wiki, $html_editor = false) //TODO: need a wikilink handler
     {
@@ -1654,7 +1709,13 @@ class ParserLib extends TikiDb_Bridge
         for ($i = 0; $i < $temp_max; $i++) {
             $exactMatch = $pages[0][$i];
             $description = $pages[6][$i];
+            $page_parse = trim($pages[2][$i]);
+            $qualifier = $pages[1][$i] ?? '';
             $anchor = null;
+
+            if ($this->isQualifiedParenDigitFalsePositive($qualifier, $page_parse)) {
+                continue;
+            }
 
             if ($description && $description[0] == '#') {
                 $temp = $description;
@@ -1662,7 +1723,7 @@ class ParserLib extends TikiDb_Bridge
                 $description = strtok('|');
             }
 
-            $replacement = $this->get_wiki_link_replacement($pages[2][$i], ['description' => $description,'reltype' => $pages[1][$i],'anchor' => $anchor], $html_editor);
+            $replacement = $this->get_wiki_link_replacement($page_parse, ['description' => $description,'reltype' => $qualifier,'anchor' => $anchor], $html_editor);
 
             $data = str_replace($exactMatch, $replacement, $data);
         }
@@ -1672,7 +1733,14 @@ class ParserLib extends TikiDb_Bridge
 
         foreach ($pages[2] as $idx => $page_parse) {
             $exactMatch = $pages[0][$idx];
-            $replacement = $this->get_wiki_link_replacement($page_parse, [ 'reltype' => $pages[1][$idx] ], $html_editor);
+            $page_parse = trim($page_parse);
+            $qualifier = $pages[1][$idx] ?? '';
+
+            if ($this->isQualifiedParenDigitFalsePositive($qualifier, $page_parse)) {
+                continue;
+            }
+
+            $replacement = $this->get_wiki_link_replacement($page_parse, [ 'reltype' => $qualifier ], $html_editor);
 
             $data = str_replace($exactMatch, $replacement, $data);
         }
@@ -3481,6 +3549,8 @@ class ParserLib extends TikiDb_Bridge
         $htmlLinksSefurl = ["0" => "dummy"];
         preg_match_all("/\(([a-z0-9-]+)?\( *($page_regex) *\)\)/", $data, $normal);
         preg_match_all("/\(([a-z0-9-]+)?\( *($page_regex) *\|(.+?)\)\)/", $data, $withDesc);
+        $normal = $this->stripQualifiedParenDigitWikiMatches($normal);
+        $withDesc = $this->stripQualifiedParenDigitWikiMatches($withDesc);
         preg_match_all("/(?<=\]\()($page_regex)(?=\))/", $data, $markdown);
         preg_match_all('/<a class="wiki[^\"]*" href="tiki-index\.php\?page=([^\?&"]+)[^"]*"/', $data, $htmlLinks1);
         preg_match_all('/<a href="tiki-index\.php\?page=([^\?&"]+)[^"]*"/', $data, $htmlLinks2);
