@@ -310,7 +310,7 @@ class Cypht
             'email_body' => $content_placeholder,
             'email_plaintext' => $content_placeholder,
             'email_html' => $content_placeholder,
-            'url' => 'tiki-webmail.php?page=message&uid=' . $msg['uid'] . '&list_path=' . sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']) . '&list_parent=' . $parent_path,
+            'url' => 'tiki-webmail.php?cypht_page=message&uid=' . $msg['uid'] . '&list_path=' . sprintf('imap_%s_%s', $msg['server_id'], $msg['folder']) . '&list_parent=' . $parent_path,
         ];
     }
 }
