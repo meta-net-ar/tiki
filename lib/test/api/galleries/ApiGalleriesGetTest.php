@@ -251,52 +251,30 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
 
     public function testApiGetGalleryFilesWithSorting()
     {
-        $galleryId = static::$defaultGalleries['default']['galleryId'];
+        $galleryId = static::createGallery('API_Test_Gallery_Sorting', 'Gallery for sorting test');
+        $this->assertNotEmpty($galleryId, 'Sorting test gallery should be created');
 
-        // create more files with varying names to test sorting
-        static::createFile(
-            $galleryId,
-            "cherry.txt",
-            "Cherry File",
-            "This is a cherry file for sorting test",
-            'text/plain',
-            "Cherry content"
-        );
-        static::createFile(
-            $galleryId,
-            "apple.txt",
-            "Apple File",
-            "This is an apple file for sorting test",
-            'text/plain',
-            "Apple content"
-        );
-        static::createFile(
-            $galleryId,
-            "banana.txt",
-            "Banana File",
-            "This is a banana file for sorting test",
-            'text/plain',
-            "Banana content"
-        );
+        static::createFile($galleryId, 'cherry.txt', 'Cherry File', 'Cherry file for sorting test', 'text/plain', 'Cherry content');
+        static::createFile($galleryId, 'apple.txt',  'Apple File',  'Apple file for sorting test',  'text/plain', 'Apple content');
+        static::createFile($galleryId, 'banana.txt', 'Banana File', 'Banana file for sorting test', 'text/plain', 'Banana content');
 
-        $data = ['sort_mode' => 'filename_asc'];
         $response = $this->makeApiRequest(
             'GET',
             "/galleries/{$galleryId}/list_files",
             'Admins',
-            $data
+            ['sort_mode' => 'filename_asc']
         );
 
         $this->assertResponseStatus(200, $response);
-
         $body = $this->getResponseBody($response);
         $this->assertValidFileListResponse($body);
 
-        // verify files are sorted by filename (if we have multiple)
-        $filenames = array_column($body['result'], 'name');
-        $sortedFilenames = $filenames;
-        sort($sortedFilenames, SORT_NATURAL | SORT_FLAG_CASE);
-        $this->assertEquals($sortedFilenames, $filenames, 'Files should be sorted by name ascending');
+        $filenames = array_column($body['result'], 'filename');
+        $this->assertEquals(
+            ['apple.txt', 'banana.txt', 'cherry.txt'],
+            $filenames,
+            'Files should be sorted by filename ascending'
+        );
     }
 
     public function testApiGetGalleryFilesWithSearch()

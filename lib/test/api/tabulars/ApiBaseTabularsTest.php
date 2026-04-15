@@ -240,14 +240,17 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
         foreach (static::$testTrackerItems as $itemId) {
             $trklib->remove_tracker_item($itemId);
         }
+        static::$testTrackerItems = [];
 
         foreach (static::$testTabulars as $tabularId) {
             $tabularlib->remove($tabularId);
         }
+        static::$testTabulars = [];
 
         foreach (static::$testTrackers as $trackerId) {
             $trklib->remove_tracker($trackerId);
         }
+        static::$testTrackers = [];
 
         foreach (self::$preferences as $pref => $value) {
             $tikilib->delete_preference($pref);
