@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_file_galleries` MODIFY `name` TEXT NOT NULL;
