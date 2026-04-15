@@ -12,6 +12,8 @@
  */
 class Tracker_Field_TextArea extends Tracker_Field_Text
 {
+    private bool $historyMode = false;
+
     public static function getManagedTypesInfo(): array
     {
         return [
@@ -140,6 +142,7 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
 
     public function getFieldData(array $requestData = []): array
     {
+        $this->historyMode = ! empty($requestData['_context_history']);
         $ins_id = $this->getInsertId();
         $data = $this->processMultilingual($requestData, $ins_id);
 
@@ -430,14 +433,19 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
         $parseOptions = [
             'objectType' => 'trackeritem',
             'objectId' => json_encode([$this->getItemId(), $this->getFieldId()]),
-            'fieldName' => 'value'
+            'fieldName' => 'value',
+            // In history mode, wiki plugins must not be executed.
+            // History display only needs the formatted text, not parsed plugin output.
+            'noparseplugins' => $this->historyMode,
         ];
         if ($this->getOption('wysiwyg') === 'y') {
             $parseOptions['is_html'] = ($prefs['wysiwyg_htmltowiki'] !== 'y');
         } else {
             $parseOptions['is_html'] = false;
         }
-        return TikiLib::lib('parser')->parse_data($text, $parseOptions);
+        $result = TikiLib::lib('parser')->parse_data($text, $parseOptions);
+        $this->historyMode = false;
+        return $result;
     }
 
     protected function getIndexableType()

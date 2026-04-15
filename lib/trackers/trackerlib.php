@@ -6520,6 +6520,11 @@ class TrackerLib extends TikiLib
                 } else {
                     $requestData = $field;
                 }
+                // Pass the history context flag to field handlers so they can opt out of
+                // operations that are unnecessary or unsafe in a read-only history display
+                if (! empty($params['history'])) {
+                    $requestData['_context_history'] = $params['history'];
+                }
                 $linkedField = $handler->getFieldData($requestData);
                 $field = array_merge($field, $linkedField);
                 $field['ins_id'] = 'ins_' . $field['fieldId'];
