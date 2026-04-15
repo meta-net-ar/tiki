@@ -141,7 +141,7 @@ class Services_File_Controller
         }
         if (isset($_FILES['data'])) {
             // used by $this->action_upload_multiple and file gallery Files fields (possibly others)
-            if (is_uploaded_file($_FILES['data']['tmp_name'])) {
+            if (is_uploaded_file($_FILES['data']['tmp_name']) || is_file($_FILES['data']['tmp_name'])) {
                 $_SESSION['lastUploadGalleryId'] = $gal_info["galleryId"];
                 $file = new JitFilter($_FILES['data']);
                 $name = $file->name->text();
@@ -584,7 +584,7 @@ class Services_File_Controller
     {
         $id = $input->id->int();
         $galleryId = $input->galleryId->int() ?: 0;
-        $recurse = $input->recurse ?: true;
+        $recurse = isset($input['recurse']) ? (bool) $input->recurse->int() : true;
 
         $perms = Perms::get('file gallery', $galleryId);
 

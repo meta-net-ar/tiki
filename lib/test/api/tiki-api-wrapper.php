@@ -11,13 +11,20 @@
 // Only errors and above will be reported
 error_reporting(E_ERROR | E_PARSE);
 
+// Install a base error handler so SmartyTikiErrorHandler::activate() can chain to it.
+// SmartyTikiErrorHandler throws if set_error_handler() returns null.
+// Returning false here defers to PHP's built-in error handling (respecting error_reporting above).
+set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+    return false;
+});
+
 // Parse QUERY_STRING into $_GET if set
 if (! empty($_SERVER['QUERY_STRING'])) {
     parse_str($_SERVER['QUERY_STRING'], $_GET);
 }
 
-// Parse POST data from stdin for POST/PUT/PATCH requests
-if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'PATCH'])) {
+// Parse POST data from stdin for POST/PUT/PATCH/DELETE requests
+if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'PATCH', 'DELETE'])) {
     $input = file_get_contents('php://stdin');
     if (! empty($input)) {
         $contentType = $_SERVER['CONTENT_TYPE'] ?? 'application/json';
@@ -53,7 +60,7 @@ if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'PATCH'])) {
                             file_put_contents($tmpFile, substr($value, 0, -2));
                             $_FILES[$name] = [
                                 'name'     => $filename,
-                                'type'     => 'application/octet-stream',
+                                'type'     => mime_content_type($tmpFile) ?: 'application/octet-stream',
                                 'tmp_name' => $tmpFile,
                                 'error'    => UPLOAD_ERR_OK,
                                 'size'     => filesize($tmpFile),

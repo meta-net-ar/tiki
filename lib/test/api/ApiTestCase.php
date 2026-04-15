@@ -109,8 +109,8 @@ abstract class ApiTestCase extends TikiTestCase
         $env['QUERY_STRING'] = $queryString;
         $env['REQUEST_URI'] .= '?' . $queryString;
 
-        // Handle request data based on method and content type for POST/PUT/PATCH
-        if (in_array($method, ['POST', 'PUT', 'PATCH']) && ! empty($data)) {
+        // Handle request data based on method and content type for POST/PUT/PATCH/DELETE
+        if (in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE']) && ! empty($data)) {
             if ($contentType === 'application/json') {
                 $env['CONTENT_DATA'] = json_encode($data);
                 $env['CONTENT_LENGTH'] = strlen($env['CONTENT_DATA']);
@@ -126,11 +126,11 @@ abstract class ApiTestCase extends TikiTestCase
 
                 foreach ($data as $key => $value) {
                     $multipart .= "--$boundary\r\n";
-                    if (file_exists($value)) {
-                        $filename = basename($value);
+                    if (is_string($value) && file_exists($value)) {
                         $fileContent = file_get_contents($value);
-                        $multipart .= "Content-Disposition: form-data; name=\"$key\"; filename=\"$filename\"\r\n";
-                        $multipart .= "Content-Type: application/octet-stream\r\n\r\n";
+                        $filename = basename($value);
+                        // Send with filename so the wrapper populates $_FILES.
+                        $multipart .= "Content-Disposition: form-data; name=\"$key\"; filename=\"$filename\"\r\n\r\n";
                         $multipart .= $fileContent . "\r\n";
                     } else {
                         $multipart .= "Content-Disposition: form-data; name=\"$key\"\r\n\r\n";
