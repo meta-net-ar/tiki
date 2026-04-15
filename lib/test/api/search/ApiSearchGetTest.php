@@ -114,9 +114,9 @@ class ApiSearchGetTest extends ApiBaseSearchTest
             'filter' => ['title' => 'NonExistentPageThatDoesNotExist12345']
         ];
         $response = $this->makeApiRequest('GET', '/search/lookup', 'Admins', $data);
-        
+
         $this->assertResponseStatus(200, $response, 'GET /search/lookup with no results should return 200');
-        
+
         $body = $this->getResponseBody($response);
         $this->assertValidSearchResponse($body);
 

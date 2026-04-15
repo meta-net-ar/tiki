@@ -31,7 +31,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
     {
         $queryParams = ['type' => 'all'];
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
-        
+
         $this->assertResponseStatus(200, $response);
         $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
@@ -94,14 +94,14 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
     public function testApiListCategoriesByNonExistentParentId()
     {
         $nonExistentParentId = 999999999;
-        
+
         $queryParams = ['parentId' => $nonExistentParentId, 'type' => 'children'];
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
 
         $this->assertResponseStatus(200, $response);
         $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
-        
+
         $this->assertIsArray($body, 'Should return array even for non-existent parent');
         $this->assertEmpty($body, 'Should return empty array for non-existent parent');
     }
@@ -110,7 +110,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
     {
         $queryParams = ['type' => 'children']; // Missing parentId
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
-        
+
         $this->assertResponseStatus(409, $response);
         $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
@@ -122,11 +122,11 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
     {
         $queryParams = ['parentId' => 'not_a_number', 'type' => 'children'];
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
-        
+
         $this->assertResponseStatus(409, $response);
         $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
-        
+
         $this->assertValidErrorResponse($body, 409, '<!--field[parentId]-->Field Required');
     }
 
@@ -135,7 +135,7 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $tikilib = TikiLib::lib('tiki');
         $originalValue = $tikilib->get_preference('feature_categories');
         $tikilib->set_preference('feature_categories', 'n');
-        
+
         try {
             $response = $this->makeApiRequest('GET', '/categories', 'Admins');
 

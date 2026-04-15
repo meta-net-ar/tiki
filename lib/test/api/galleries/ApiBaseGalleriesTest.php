@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Galleries;
 
-use ApiTestCase;
+use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 use Exception;
 
@@ -153,7 +153,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
     protected static function createGallery($name, $description = '', $type = 'default', $parentId = null)
     {
         $filegallib = TikiLib::lib('filegal');
-        
+
         if ($parentId === null) {
             $parentId = static::$rootGalleryId;
         }
@@ -519,7 +519,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
     {
         $this->assertMatchesSchema($response, $this->getFileUploadResponseSchema());
     }
-    
+
     protected function assertValidFileListResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getFilesListResponseSchema());

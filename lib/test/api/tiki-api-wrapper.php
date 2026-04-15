@@ -49,7 +49,7 @@ if (in_array($_SERVER['REQUEST_METHOD'] ?? '', ['POST', 'PUT', 'PATCH', 'DELETE'
                     if (preg_match('/Content-Disposition:.*?name=\"([^\"]+)\"(?:; filename=\"([^\"]+)\")?/', $part, $dispMatch)) {
                         $name = $dispMatch[1];
                         $filename = $dispMatch[2] ?? null;
-                        
+
                         // Split on \r\n\r\n to separate headers from content
                         $partPieces = preg_split('/\r\n\r\n/', $part, 2);
                         $value = $partPieces[1] ?? '';
