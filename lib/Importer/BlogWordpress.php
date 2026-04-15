@@ -621,7 +621,9 @@ class BlogWordpress extends Blog
                             $editlib = new EditLib();
                             $content = $data['content'];
                             $content = $this->replaceParagraphWithLineBreak($content);
-                            $content = $this->parseYoutubeEmbedded($content);
+                            if (str_contains($content, 'youtube.com/embed')) {
+                                $content = $this->parseYoutubeEmbedded($content);
+                            }
                             $data['content'] = $editlib->parse_html($content);
                         }
                         break;
