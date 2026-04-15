@@ -6,14 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Categories;
 
-use ApiTestCase;
+use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 use Exception;
 
 /**
  * Base class for Categories API integration tests
  * Provides shared functionality for category CRUD operations testing
- * 
+ *
  * @group api-integration-test
  */
 abstract class ApiBaseCategoriesTest extends ApiTestCase
@@ -210,7 +210,7 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
 
         if (is_int($body['count'])) {
             $this->assertMatchesSchema($body, $this->getCategorizeResponseSchema());
-        } elseif($body['count'] === 'unchanged') {
+        } elseif ($body['count'] === 'unchanged') {
             $this->assertArrayHasKey('categId', $body, 'Response should have categId');
             $this->assertIsInt($body['categId'], 'categId should be integer');
             $this->assertArrayHasKey('objects', $body, 'Response should have objects');

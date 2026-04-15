@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Search;
 
-use ApiTestCase;
+use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 use Exception;
 use Tiki\Search\SearchIndexRebuilder;

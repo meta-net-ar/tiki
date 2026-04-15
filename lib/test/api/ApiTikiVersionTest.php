@@ -2,12 +2,14 @@
 
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
-// All Rights Reserved. See copyright.txt for details and a complete list of authors.  
+// All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+namespace Tiki\Lib\Test\Api;
 
 /**
  * Integration tests for /version endpoint
- * 
+ *
  * @group api-integration-test
  */
 class ApiTikiVersionTest extends ApiTestCase
@@ -17,7 +19,7 @@ class ApiTikiVersionTest extends ApiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->lib = TikiLib::lib('version');
+        $this->lib = \TikiLib::lib('version');
     }
 
     public function testApiGetTikiVersion()

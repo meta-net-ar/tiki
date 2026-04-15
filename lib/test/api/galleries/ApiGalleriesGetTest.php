@@ -255,7 +255,7 @@ class ApiGalleriesGetTest extends ApiBaseGalleriesTest
         $this->assertNotEmpty($galleryId, 'Sorting test gallery should be created');
 
         static::createFile($galleryId, 'cherry.txt', 'Cherry File', 'Cherry file for sorting test', 'text/plain', 'Cherry content');
-        static::createFile($galleryId, 'apple.txt',  'Apple File',  'Apple file for sorting test',  'text/plain', 'Apple content');
+        static::createFile($galleryId, 'apple.txt', 'Apple File', 'Apple file for sorting test', 'text/plain', 'Apple content');
         static::createFile($galleryId, 'banana.txt', 'Banana File', 'Banana file for sorting test', 'text/plain', 'Banana content');
 
         $response = $this->makeApiRequest(

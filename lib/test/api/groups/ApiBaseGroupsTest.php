@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Groups;
 
-use ApiTestCase;
+use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 use Exception;
 

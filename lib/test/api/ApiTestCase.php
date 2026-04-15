@@ -5,7 +5,9 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-abstract class ApiTestCase extends TikiTestCase
+namespace Tiki\Lib\Test\Api;
+
+abstract class ApiTestCase extends \TikiTestCase
 {
     /**
      * @var \TikiDb The database connection used for API tests
@@ -41,7 +43,7 @@ abstract class ApiTestCase extends TikiTestCase
     {
         parent::setUp();
         $this->tikiapiPath = dirname(__FILE__) . '/tiki-api-wrapper.php';
-        $this->db = TikiDb::get();
+        $this->db = \TikiDb::get();
     }
 
     /**
@@ -206,7 +208,7 @@ abstract class ApiTestCase extends TikiTestCase
 
     /**
      * Parse the raw response from the subprocess
-     * 
+     *
      * Simplified parsing based on JSON response patterns:
      * - Scenario 1: Valid JSON without code/message/errortitle = 200 OK
      * - Scenario 2: Valid JSON with code/message/errortitle = Error response
@@ -278,7 +280,7 @@ abstract class ApiTestCase extends TikiTestCase
     }
 
     /**
-     * Handle invalid JSON response (Scenario 3) 
+     * Handle invalid JSON response (Scenario 3)
      */
     private function handleInvalidJsonResponse($body)
     {
@@ -366,7 +368,7 @@ abstract class ApiTestCase extends TikiTestCase
 
     /**
      * Get authentication token for API requests
-     * 
+     *
      * @param string $permission Permission level
      * @return string Authentication token
      */
@@ -430,7 +432,7 @@ abstract class ApiTestCase extends TikiTestCase
     protected function assertResponseHasHeader($headerName, $response, $expectedValue = null, $message = '')
     {
         $this->assertArrayHasKey($headerName, $response['headers'], $message ?: "Response missing header: $headerName");
-        
+
         if ($expectedValue !== null) {
             $this->assertEquals($expectedValue, $response['headers'][$headerName], $message ?: "Header $headerName has unexpected value");
         }

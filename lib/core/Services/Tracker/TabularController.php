@@ -558,11 +558,7 @@ class Services_Tracker_TabularController
         $separator = $input->separator->text();
         $fileIsTsv = ! ($separator == "," || $separator == ';');
 
-        if (empty($info['format_descriptor']) && 
-            empty($info['filter_descriptor']) && 
-            empty($info['config']) && 
-            empty($info['odbc_config']) && 
-            empty($info['api_config'])) {
+        if (empty($info['format_descriptor']) && empty($info['filter_descriptor']) && empty($info['config']) && empty($info['odbc_config']) && empty($info['api_config'])) {
             throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
         }
 

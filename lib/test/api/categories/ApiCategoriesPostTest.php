@@ -34,7 +34,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
 
         $this->assertResponseStatus(200, $response);
         $this->assertResponseIsJson($response);
-        
+
         $body = $this->getResponseBody($response);
 
         // Track categId for cleanup
@@ -249,7 +249,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         }
 
         // Categorize all pages using "Type:ID" format
-        $objectStrings = array_map(function($page) {
+        $objectStrings = array_map(function ($page) {
             return "wiki page:$page"; // Format: "Type:ID"
         }, $pages);
 
@@ -428,7 +428,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         }
 
         // Build object strings using "Type:ID" format
-        $objectStrings = array_map(function($page) {
+        $objectStrings = array_map(function ($page) {
             return "wiki page:$page"; // Format: "Type:ID"
         }, $pages);
 
@@ -493,7 +493,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        
+
         $body = $this->getResponseBody($response);
         $this->assertValidCategorizeResponse($body);
         $this->assertEquals('unchanged', $body['count'], 'Count should be "unchanged" for non-categorized object');

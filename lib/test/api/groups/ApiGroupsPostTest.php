@@ -26,7 +26,7 @@ class ApiGroupsPostTest extends ApiBaseGroupsTest
         $response = $this->makeApiRequest(
             'POST',
             '/groups',
-            null, // Anonymous user 
+            null, // Anonymous user
             $data,
             'application/x-www-form-urlencoded'
         );
@@ -142,7 +142,7 @@ class ApiGroupsPostTest extends ApiBaseGroupsTest
         $response = $this->makeApiRequest(
             'POST',
             "/groups/{$oldName}",
-            'Admins', 
+            'Admins',
             $data,
             'application/x-www-form-urlencoded'
         );
@@ -174,7 +174,7 @@ class ApiGroupsPostTest extends ApiBaseGroupsTest
         $response = $this->makeApiRequest(
             'POST',
             "/groups/{$groupName}",
-            'Admins', 
+            'Admins',
             ['desc' => 'Updated description without name'],
             'application/x-www-form-urlencoded'
         );

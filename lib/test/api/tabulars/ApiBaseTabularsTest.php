@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Tabulars;
 
-use ApiTestCase;
+use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 
 /**
@@ -117,7 +117,7 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
                 static::$testTrackerFields[$trackerId][] = $field1;
             }
 
-            $field2 = static::addTrackerField($trackerId, 't', 'Description', "{$trackerName}_desc_field");    
+            $field2 = static::addTrackerField($trackerId, 't', 'Description', "{$trackerName}_desc_field");
             if ($field2) {
                 static::$testTrackerFields[$trackerId][] = $field2;
             }
@@ -156,7 +156,7 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
                     "isUniqueKey" => false
                 ],
             ];
-            $tabularId = static::createTabular("{$trackerName}_Format", $trackerId, $format);            
+            $tabularId = static::createTabular("{$trackerName}_Format", $trackerId, $format);
         }
 
         return $tabularId;

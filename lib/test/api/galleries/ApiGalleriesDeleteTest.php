@@ -7,6 +7,7 @@
 namespace Tiki\Lib\Test\Api\Galleries;
 
 use TikiLib;
+
 /**
  * Tests for File Galleries API DELETE endpoints
  *
