@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_blogs` MODIFY `activity` DECIMAL(5,2) DEFAULT NULL;
