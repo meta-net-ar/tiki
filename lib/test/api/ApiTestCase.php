@@ -306,46 +306,55 @@ abstract class ApiTestCase extends \TikiTestCase
     protected function assertMatchesSchema(array $data, array $schema, string $context = ''): void
     {
         foreach ($schema as $key => $typeOrNested) {
+            // Wildcard '*': validate every entry in $data against the sub-schema.
+            // Usage:  ['*' => ['field' => 'string']]  or  ['*' => 'int']
+            if ($key === '*') {
+                foreach ($data as $dataKey => $dataValue) {
+                    $msg = $context ? "$context - $dataKey" : (string) $dataKey;
+                    $this->assertSchemaValue($dataValue, $typeOrNested, $msg);
+                }
+                continue;
+            }
+
             $msg = $context ? "$context - $key" : $key;
 
             $this->assertArrayHasKey($key, $data, "$msg is missing");
 
-            $value = $data[$key];
-
-            if (is_array($typeOrNested)) {
-                $this->assertIsArray($value, "$msg should be an array");
-
-                // Handle schemas defined as [0 => [...]] (array of objects)
-                if (isset($typeOrNested[0]) && is_array($typeOrNested[0])) {
-                    foreach ($value as $i => $item) {
-                        $this->assertMatchesSchema($item, $typeOrNested[0], "$msg");
-                    }
-                } else { // Handle associative nested schemas
-                    $this->assertMatchesSchema($value, $typeOrNested, $msg);
-                }
-
-                continue;
-            }
-
-            $valid = false;
-            foreach (explode('|', $typeOrNested) as $type) {
-                $type = trim($type);
-                if ($this->valueMatchesType($value, $type)) {
-                    $valid = true;
-                    break;
-                }
-            }
-
-            $this->assertTrue($valid, "$msg should be of type $typeOrNested, got " . gettype($value));
+            $this->assertSchemaValue($data[$key], $typeOrNested, $msg);
         }
     }
 
     /**
-     * Check if array is a sequential list (non-associative with integer keys starting from 0)
+     * Validate a single value against a schema entry (type string or nested schema array).
+     * Extracted so both the normal key path and the wildcard path share the same logic.
      */
-    private function isSequentialArray(array $array): bool
+    private function assertSchemaValue(mixed $value, mixed $typeOrNested, string $msg): void
     {
-        return array_values($array) === $array;
+        if (is_array($typeOrNested)) {
+            $this->assertIsArray($value, "$msg should be an array");
+
+            // [0 => [...]] — array of objects, each validated against the inner schema
+            if (isset($typeOrNested[0]) && is_array($typeOrNested[0])) {
+                foreach ($value as $item) {
+                    $this->assertMatchesSchema($item, $typeOrNested[0], $msg);
+                }
+            } else {
+                // Associative nested schema
+                $this->assertMatchesSchema($value, $typeOrNested, $msg);
+            }
+
+            return;
+        }
+
+        $valid = false;
+        foreach (explode('|', $typeOrNested) as $type) {
+            if ($this->valueMatchesType($value, trim($type))) {
+                $valid = true;
+                break;
+            }
+        }
+
+        $this->assertTrue($valid, "$msg should be of type $typeOrNested, got " . gettype($value));
     }
 
     /**
