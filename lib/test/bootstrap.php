@@ -16,6 +16,13 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 const TIKI_IN_TEST = 1;
 
 define('TIKI_PATH', dirname(dirname(__DIR__)) . '/');
+
+// TIKI_API is normally defined in tiki-api.php (true) or tiki-setup.php (false).
+// Neither is loaded by the test bootstrap, so define it here to avoid fatal errors
+// in PHP 8+ when Service controllers reference it (e.g. Services/Comment/Controller.php).
+if (! defined('TIKI_API')) {
+    define('TIKI_API', false);
+}
 chdir(TIKI_PATH);
 
 ini_set('display_errors', 'on');
