@@ -31,6 +31,9 @@ abstract class ApiTestCase extends \TikiTestCase
     {
         parent::setUpBeforeClass();
 
+        // Ensure the API token service is enabled in the DB so subprocesses see it
+        \TikiLib::lib('tiki')->set_preference('auth_api_tokens', 'y');
+
         $tokenlib = \TikiLib::lib('api_token');
         $token = $tokenlib->createToken([
             'type' => 'manual',
