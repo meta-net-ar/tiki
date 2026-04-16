@@ -597,6 +597,7 @@ class TikiLib extends TikiDb_Bridge
         try {
             $client = $this->get_http_client($url, useRssProxy: $useRssProxy);
             $client->setHeaders($headers);
+
             $response = $this->http_perform_request($client);
 
             if (! $response->isSuccess()) {
@@ -604,7 +605,7 @@ class TikiLib extends TikiDb_Bridge
             }
 
             foreach ($headers_out as $header) {
-                $headers_out[$header] = $response->getHeaders()->get($header);
+                $headers_out[$header] = $response->getHeaders()->get($header)->getFieldValue();
             }
 
             return ['headers' => $headers_out, 'body' => $response->getBody()];

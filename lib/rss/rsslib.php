@@ -526,11 +526,11 @@ class RSSLib extends TikiDb_Bridge
             $conditions['date'] = $this->modules->expr('`lastUpdated` < ? - `refresh`', [$tikilib->now]);
         }
 
-        $result = $this->modules->fetchAll(['rssId', 'url', 'actions'], $conditions);
+        $result = $this->modules->fetchAll(['rssId', 'url', 'actions', 'lastModifiedSince_raw'], $conditions);
         $feedResult['feeds'] = count($result);
         $entryReturn = ['feed' => 0, 'articles' => 0, 'feedData' => []];
         foreach ($result as $row) {
-            $entryResult = $this->update_feed($row['url'], $row['rssId'], $row['actions']);
+            $entryResult = $this->update_feed($row['url'], $row['rssId'], $row['actions'], $row['lastModifiedSince_raw']);
             if (! empty($entryResult['feed'])) {
                 $entryReturn['feed'] += $entryResult['feed'];
             }
@@ -556,7 +556,7 @@ class RSSLib extends TikiDb_Bridge
     private function update_feed($url, $rssId = null, $actions = null, $requestLastModifiedHeader = null): array
     {
         global $tikilib;
-        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => [], 'ttl' => self::DEFAULT_FEED_TTL, 'lastUpdated' => $tikilib->now];
+        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => [], 'ttl' => self::DEFAULT_FEED_TTL, 'lastUpdated' => $tikilib->now, 'lastModifiedSince' => null];
         $filter = $this->createFilter();
         $feedResponse = $this->fetchFeed($url, $requestLastModifiedHeader);
         if (! $feedResponse) {
@@ -576,7 +576,7 @@ class RSSLib extends TikiDb_Bridge
         $feed = $feedResponse['content'];
 
         if (isset($feedResponse['headers']['Last-Modified'])) {
-            $success['lastModified'] = $feedResponse['headers']['Last-Modified'];
+            $success['lastModifiedSince'] = $feedResponse['headers']['Last-Modified'];
         }
 
         $siteTitle = TikiFilter::get('striptags')->filter($feed->getTitle());
@@ -592,6 +592,7 @@ class RSSLib extends TikiDb_Bridge
                     'lastUpdated' => $tikilib->now,
                     'sitetitle'   => $siteTitle,
                     'siteurl'     => $siteUrl,
+                    'lastModifiedSince_raw' => $success['lastModifiedSince'],
                 ],
                 ['rssId' => $rssId,]
             );
@@ -1062,14 +1063,13 @@ class RSSLib extends TikiDb_Bridge
         return  $data;
     }
 
-    private function fetchFeed(string $url, $lastModified = null)
+    private function fetchFeed(string $url, $lastModifiedSince = null)
     {
         global $tikilib, $prefs;
         try {
-
             $headers = [];
-            if ($lastModified) {
-                $headers['If-Modified-Since'] = $lastModified;
+            if ($lastModifiedSince) {
+                $headers['If-Modified-Since'] = $lastModifiedSince;
             }
 
             $useProxy = $prefs['use_rss_proxy'] == 'y';
@@ -1151,7 +1151,10 @@ class RSSLib extends TikiDb_Bridge
         $cache_feed_result = self::$cachelib->getSerialized($cache_feed_key);
 
         $result = null;
+        $lastModifiedSince = null;
         if ($cache_feed_result) {
+            $lastModifiedSince = $cache_feed_result['lastModifiedSince'];
+            
             $refresh_time = max($this->cacheLifetime((int)($cache_feed_result['ttl'] ?? self::DEFAULT_FEED_TTL), TimeUnit::MINUTES), $this->cacheLifetime((int)($params['refresh'] ?? 0), TimeUnit::MINUTES));
             $cache_time = $cache_feed_result['lastUpdated'];
             $maxTime = $cache_time + $refresh_time;
@@ -1191,7 +1194,11 @@ class RSSLib extends TikiDb_Bridge
                 'min_interval' => $min_interval,
             ]));
 
-            $result = $this->update_feed($url);
+            $result = $this->update_feed($url, requestLastModifiedHeader: $lastModifiedSince);
+            if (empty($result['feedData']) && $cache_feed_result) {
+                // Fallback to the cached version when the remote responds with a 304 status
+                $result = $cache_feed_result;
+            }
             self::$cachelib->cacheItem($cache_feed_key, serialize($result));
 
             $observed_interval = max($this->cacheLifetime((int)($result['ttl'] ?? self::DEFAULT_FEED_TTL), TimeUnit::MINUTES), $refresh_seconds);

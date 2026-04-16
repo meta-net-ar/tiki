@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_rss_modules` ADD `lastModifiedSince_raw` VARCHAR(255) DEFAULT NULL AFTER `actions`;

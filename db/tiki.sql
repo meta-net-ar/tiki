@@ -2201,6 +2201,7 @@ CREATE TABLE `tiki_rss_modules` (
   `sitetitle` VARCHAR(255),
   `siteurl` VARCHAR(255),
   `actions` TEXT,
+  'lastModifiedSince_raw' VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY (`rssId`),
   KEY `name` (name)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
