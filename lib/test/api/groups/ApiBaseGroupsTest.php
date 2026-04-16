@@ -52,9 +52,8 @@ abstract class ApiBaseGroupsTest extends ApiTestCase
         parent::setUpBeforeClass();
 
         // Enable required features if needed
-        $tikilib = TikiLib::lib('tiki');
         foreach (self::$preferences as $pref => $value) {
-            $tikilib->set_preference($pref, $value);
+            static::setTestPreference($pref, $value);
         }
 
         // Create default test groups

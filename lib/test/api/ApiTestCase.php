@@ -32,13 +32,7 @@ abstract class ApiTestCase extends \TikiTestCase
         parent::setUpBeforeClass();
 
         // Ensure the API token service is enabled in the DB so subprocesses see it.
-        // Write directly to tiki_preferences to avoid set_preference()'s side-effects
-        // (cache invalidation, menu rebuilds) which trigger PHPUnit events outside a
-        // live test context and throw NoTestCaseObjectOnCallStackException in PHPUnit 10+.
-        \TikiDb::get()->query(
-            'INSERT INTO `tiki_preferences` (`name`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?',
-            ['auth_api_tokens', 'y', 'y']
-        );
+        static::setTestPreference('auth_api_tokens', 'y');
 
         $tokenlib = \TikiLib::lib('api_token');
         $token = $tokenlib->createToken([
@@ -46,6 +40,26 @@ abstract class ApiTestCase extends \TikiTestCase
             'user' => 'admin'
         ]);
         self::$adminApiToken = $token['token'];
+    }
+
+    /**
+     * Write a preference directly to the database, bypassing set_preference().
+     *
+     * set_preference() has side-effects (cache invalidation, menu rebuilds) that
+     * dispatch PHPUnit events. PHPUnit 10+ throws NoTestCaseObjectOnCallStackException
+     * when those events fire from a static setUpBeforeClass() with no TestCase on the
+     * call stack. All API base classes must use this method instead of set_preference()
+     * when setting preferences inside setUpBeforeClass().
+     *
+     * @param string $name  Preference name
+     * @param mixed  $value Preference value
+     */
+    protected static function setTestPreference(string $name, $value): void
+    {
+        \TikiDb::get()->query(
+            'INSERT INTO `tiki_preferences` (`name`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?',
+            [$name, $value, $value]
+        );
     }
 
     protected function setUp(): void

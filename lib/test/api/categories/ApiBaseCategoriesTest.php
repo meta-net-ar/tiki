@@ -31,8 +31,7 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
         static::cleanupTestCategories();
 
         // Enable categories feature
-        $tikilib = TikiLib::lib('tiki');
-        $tikilib->set_preference('feature_categories', 'y');
+        static::setTestPreference('feature_categories', 'y');
 
         static::createDefaultCategories();
     }
