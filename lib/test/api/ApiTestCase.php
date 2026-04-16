@@ -31,8 +31,14 @@ abstract class ApiTestCase extends \TikiTestCase
     {
         parent::setUpBeforeClass();
 
-        // Ensure the API token service is enabled in the DB so subprocesses see it
-        \TikiLib::lib('tiki')->set_preference('auth_api_tokens', 'y');
+        // Ensure the API token service is enabled in the DB so subprocesses see it.
+        // Write directly to tiki_preferences to avoid set_preference()'s side-effects
+        // (cache invalidation, menu rebuilds) which trigger PHPUnit events outside a
+        // live test context and throw NoTestCaseObjectOnCallStackException in PHPUnit 10+.
+        \TikiDb::get()->query(
+            'INSERT INTO `tiki_preferences` (`name`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?',
+            ['auth_api_tokens', 'y', 'y']
+        );
 
         $tokenlib = \TikiLib::lib('api_token');
         $token = $tokenlib->createToken([
