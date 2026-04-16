@@ -47,9 +47,8 @@ abstract class ApiBaseSearchTest extends ApiTestCase
     {
         parent::setUpBeforeClass();
 
-        $tikilib = TikiLib::lib('tiki');
         foreach (self::$preferences as $pref => $value) {
-            $tikilib->set_preference($pref, $value);
+            static::setTestPreference($pref, $value);
         }
 
         static::createDefaultTestContent();

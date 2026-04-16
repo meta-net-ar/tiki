@@ -68,9 +68,8 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         parent::setUpBeforeClass();
 
         // Enable required features
-        $tikilib = TikiLib::lib('tiki');
         foreach (self::$preferences as $pref => $value) {
-            $tikilib->set_preference($pref, $value);
+            static::setTestPreference($pref, $value);
         }
 
         global $prefs;
