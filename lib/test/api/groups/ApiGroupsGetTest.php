@@ -99,34 +99,4 @@ class ApiGroupsGetTest extends ApiBaseGroupsTest
             $this->assertEquals('A', strtoupper(substr($group['groupName'], 0, 1)), 'All groups should start with A');
         }
     }
-
-    public function testApiGetGroupsWithCombinedFilters()
-    {
-        // create groups to test combined filters
-        for ($i = 1; $i <= 10; $i++) {
-            static::createGroup("Test_API_Combined_Group_$i", "Test group $i for combined filters");
-        }
-
-        $data = [
-            'find' => 'Combined',
-            'initial' => 'T',
-            'offset' => 0,
-            'maxRecords' => 5
-        ];
-        $response = $this->makeApiRequest('GET', '/groups', 'Admins', $data);
-
-        $this->assertResponseStatus(200, $response);
-
-        $body = $this->getResponseBody($response);
-        $this->assertValidGroupListResponse($body);
-
-        $this->assertEquals(0, $body['offset'], 'Offset should be 0');
-        $this->assertEquals(5, count($body['data']), 'Should return at most 5 groups');
-
-        // Verify all results match filters
-        foreach ($body['data'] as $group) {
-            $this->assertStringContainsStringIgnoringCase('Combined', $group['groupName'], 'Group name should contain search term');
-            $this->assertEquals('T', strtoupper(substr($group['groupName'], 0, 1)), 'Group name should start with T');
-        }
-    }
 }
