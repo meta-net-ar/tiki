@@ -592,7 +592,7 @@ class TikiLib extends TikiDb_Bridge
      * @param bool $useRssProxy Whether to use the RSS proxy settings for this request
      * @return bool|array
      */
-    public function advanced_httprequest($url, $headers = [], $headers_out = [], $useRssProxy = false)
+    public function advancedHttprequest($url, $headers = [], $headers_out = [], $useRssProxy = false)
     {
         try {
             $client = $this->get_http_client($url, useRssProxy: $useRssProxy);

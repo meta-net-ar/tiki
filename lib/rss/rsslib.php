@@ -1073,7 +1073,7 @@ class RSSLib extends TikiDb_Bridge
             }
 
             $useProxy = $prefs['use_rss_proxy'] == 'y';
-            $res = $tikilib->advanced_httprequest($url, $headers, ['Last-Modified'], $useProxy);
+            $res = $tikilib->advancedHttprequest($url, $headers, ['Last-Modified'], $useProxy);
 
             if ($res) {
                 return ['headers' => $res['headers'], 'content' => Laminas\Feed\Reader\Reader::importString($res['body'])];
