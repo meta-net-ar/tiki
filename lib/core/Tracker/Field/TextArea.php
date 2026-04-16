@@ -427,6 +427,11 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
     {
         global $prefs;
 
+        // pvalue is not used in list templates; skip the expensive parse when no item is set.
+        if (! $this->getItemId()) {
+            return $text;
+        }
+
         $parseOptions = [
             'objectType' => 'trackeritem',
             'objectId' => json_encode([$this->getItemId(), $this->getFieldId()]),

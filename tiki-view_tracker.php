@@ -505,6 +505,7 @@ if (isset($_REQUEST["save"])) {
 }
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
+$maxRecords = $prefs['maxRecords'] ?? 25;
 if (! empty($_REQUEST["maxRecords"])) {
     $maxRecords = $_REQUEST['maxRecords'];
 }

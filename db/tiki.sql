@@ -2581,7 +2581,9 @@ CREATE TABLE `tiki_tracker_items` (
   PRIMARY KEY (`itemId`),
   INDEX `trackerId` (`trackerId`),
   INDEX `idx_lastModif` (`lastModif`),
-  INDEX `idx_slvn_created` (`created`)
+  INDEX `idx_slvn_created` (`created`),
+  INDEX `idx_tracker_lastModif` (`trackerId`, `lastModif`),
+  INDEX `idx_tracker_created` (`trackerId`, `created`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `tiki_tracker_options`;

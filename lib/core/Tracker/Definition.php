@@ -319,7 +319,9 @@ class Tracker_Definition
     public function getField($id): array|null
     {
         if (is_numeric($id)) {
-            return $this->getFieldInfoFromFieldId((int) $id);
+            $intId = (int) $id;
+            // Return null for deleted fields still referenced in stored item content.
+            return $this->hasFieldId($intId) ? $this->getFieldInfoFromFieldId($intId) : null;
         } else {
             return $this->getFieldFromPermName($id);
         }
