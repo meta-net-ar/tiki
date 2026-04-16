@@ -24782,7 +24782,6 @@ $lang_current = array(
 // "Database password" => "Database password",
 // "As a security precaution, the Tiki Installer has been disabled. To re-enable the installer" => "As a security precaution, the Tiki Installer has been disabled. To re-enable the installer",
 // "Validate and Continue " => "Validate and Continue ",
-"No repository given" => "Ei säilytyspaikkaa annettu",
 // "Repository not found" => "Repository not found",
 // "Some CSV lines were ignored because they are not in the expected format (lastname, firstname, email)" => "Some CSV lines were ignored because they are not in the expected format (lastname, firstname, email)",
 // "The email content must include the {link} placeholder for the invitation link" => "The email content must include the {link} placeholder for the invitation link",
