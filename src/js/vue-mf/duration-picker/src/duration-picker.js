@@ -1,40 +1,36 @@
-import singleSpaVue from "single-spa-vue";
-import singleSpaCss from "single-spa-css";
-import { createApp, h } from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 
 import "../custom.scss";
 
-const vueLifecycles = singleSpaVue({
-    createApp,
-    appOptions: {
-        render() {
-            return h(App, {
-                // single-spa props are available on the "this" object. Forward them to your component as needed.
-                // https://single-spa.js.org/docs/building-applications#lifecyle-props
-                // name: this.name,
-                // mountParcel: this.mountParcel,
-                // singleSpa: this.singleSpa,
-                durationData: this.durationData,
-            });
-        },
-    },
-    handleInstance: (app) => {
-        if (import.meta.env.MODE === "development") {
-            console.log(import.meta.env);
-        }
-    },
-});
+const mountedApps = new Map();
 
-const cssLifecycle = singleSpaCss({
-    cssUrls: [
-        {
-            href: "public/generated/js/duration-picker.css",
-        },
-    ],
-});
+function createVueApp(props = {}) {
+    const app = createApp(App, props);
 
-export const bootstrap = [cssLifecycle.bootstrap, vueLifecycles.bootstrap];
-export const mount = [cssLifecycle.mount, vueLifecycles.mount];
-export const unmount = [cssLifecycle.unmount, vueLifecycles.unmount];
+    if (import.meta.env.MODE === "development") {
+        console.log(import.meta.env);
+    }
+
+    return app;
+}
+
+function mount(container, props = {}) {
+    const app = createVueApp(props);
+    app.mount(container);
+    mountedApps.set(container, app);
+    return app;
+}
+
+function unmount(container) {
+    if (container && mountedApps.has(container)) {
+        const app = mountedApps.get(container);
+        app.unmount();
+        mountedApps.delete(container);
+    }
+}
+
+export const bootstrap = () => Promise.resolve();
+export const mountApp = mount;
+export const unmountApp = unmount;
 export const DurationPicker = App;
