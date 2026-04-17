@@ -158,9 +158,6 @@ class UserRegistration extends Base
                     $user = $_REQUEST['name'];  // so that one can set user preferences at registration time
                     $_REQUEST['iTRACKER'] = 1;  // only one tracker plugin on registration
                 }
-                if (! is_array($re['registrationUsersFieldIds'])) {
-                    $re['registrationUsersFieldIds'] = explode(':', $re['registrationUsersFieldIds']);
-                }
                 if ($registrationlib->merged_prefs["user_register_prettytracker"] == 'y' && ! empty($registrationlib->merged_prefs["user_register_prettytracker_tpl"])) {
                     if (str_ends_with($registrationlib->merged_prefs["user_register_prettytracker_tpl"], ".tpl")) {
                         $userTrackerData = TikiLib::lib('parser')->invokePlugin(
