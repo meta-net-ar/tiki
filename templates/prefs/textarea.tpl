@@ -5,6 +5,7 @@
         </label>
         <div class="col">
             {textarea
+                _simple="y"
                 _toolbars="n"
                 _wysiwyg="n"
                 name="{$p.preference|escape}"
