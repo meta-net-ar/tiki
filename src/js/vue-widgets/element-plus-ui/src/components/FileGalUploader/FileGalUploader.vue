@@ -15,6 +15,9 @@ const maxFiles = JSON.parse(props.maxFiles);
 const uploadRef = ref(null);
 const insertIntoEditor = ref(false);
 const uploadedFiles = ref([]);
+const totalFilesToUpload = ref(0);
+const completedUploads = ref(0);
+const submitCalled = ref(false);
 
 onMounted(() => {
     const searcParams = new URLSearchParams(location.search);
@@ -24,6 +27,14 @@ onMounted(() => {
 })
 
 const submitUpload = () => {
+    submitCalled.value = true;
+    if (uploadRef.value && uploadRef.value.uploadFiles) {
+        totalFilesToUpload.value = uploadRef.value.uploadFiles.length;
+        completedUploads.value = 0;
+    } else if (uploadRef.value) {
+        totalFilesToUpload.value = 0;
+        completedUploads.value = 0;
+    }
     uploadRef.value.submit();
 }
 
@@ -35,25 +46,60 @@ const beforeUpload = (rawFile) => {
     }
 }
 
+/**
+ * When opened as a file gallery manager (filegals_manager=…), inserts use
+ * window.opener.insertAt; closing the popup is handled by the shared jQuery
+ * helper on window (reads #keepOpenCbx — see tiki-jquery.js).
+ */
+const closeGalleryManagerAfterInsert = () => {
+    window.tikiCloseFileGalleryManagerWindow?.();
+};
+
+const checkAllUploadsComplete = () => {
+    if (totalFilesToUpload.value > 0) {
+        if (completedUploads.value >= totalFilesToUpload.value) {
+            if (insertIntoEditor.value) {
+                closeGalleryManagerAfterInsert();
+            }
+        }
+    }
+}
+
 const handleUploadError = (error) => {
     ElMessage.error(error.message)
+    completedUploads.value++;
+    checkAllUploadsComplete();
 }
 
 const handleUploadSuccess = (response, file) => {
     ElMessage.success(`${file.name} uploaded successfully`)
 
+    const syntax = response.syntax || `{img fileId="${response.fileId}" thumb="box"}`;
+
     // Store uploaded file info
     uploadedFiles.value.push({
         name: file.name,
         fileId: response.fileId,
-        syntax: `{img fileId="${response.fileId}" thumb="box"}`
+        syntax: syntax
     });
 
     const searcParams = new URLSearchParams(location.search);
     if (insertIntoEditor.value) {
-        window.opener.insertAt(searcParams.get('filegals_manager'), response.syntax, false, false, true);
-        checkClose();
+        window.opener.insertAt(searcParams.get('filegals_manager'), syntax, false, false, true);
     }
+
+    if (totalFilesToUpload.value === 0) {
+        if (uploadRef.value && uploadRef.value.uploadFiles && uploadRef.value.uploadFiles.length > 0) {
+            totalFilesToUpload.value = uploadRef.value.uploadFiles.length;
+        } else if (!submitCalled.value) {
+            totalFilesToUpload.value = 1;
+        }
+    }
+
+    completedUploads.value++;
+
+    checkAllUploadsComplete();
+    
     if (props.vimeoUrl) {
         completeVimeoUpload(file.name);
     }
