@@ -125,11 +125,6 @@ $(document).ready(function () {
 
     $("#loginbox-{{$module_logo_instance}}").on("submit", async function (event) {
         event.preventDefault();
-        var isWebAuthnIsChoosen = $("#webauthn_checkbox_login").is(':checked') && isWebauthnEnabled === 'y';
-        var isWebauthnPassed = $("#webauthn_checkbox_login").attr('is_passed');
-        if (isWebAuthnIsChoosen && isWebauthnPassed === 'n') {
-            await $.fn.loginWebAuth.loginStart(event, moduleLogoInstance, 'login');
-        }
 
         var isLoginScreen = parseInt($(event.currentTarget).parent('#login_form_div').length);
         var isNormalLogin = $(this).data('normalLogin');
@@ -170,7 +165,7 @@ $(document).ready(function () {
                 return false;
             }
 
-            if ((username && password) || isWebauthnPassed === 'y' || isWebAuthnIsChoosen) {
+            if ((username && password)) {
                 if (is2FAEnabled === 'y') {
                     const twoFASecret = await getTwoFactorSecretGoogle2FA(username);
 
@@ -438,9 +433,30 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             </div>
         </div>
         {if $prefs.auth_webauthn_enabled eq 'y'}
-            <div id="webauthn_div" class="my-2 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} none; {else} block; {/if}">
-                {include file='webauthn.tpl' form='login'}
-            </div>
+            {jq}
+            $("#passkeyLoginBtn").on("click", async function () {
+                var btn = $(this);
+                var originalHtml = btn.html();
+                var spinnerHtml = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>';
+                btn.html(spinnerHtml + tr("Verifying\u2026")).prop("disabled", true);
+                $("#login_feeback").html(
+                    '<div class="alert alert-info">' + tr("Follow your device\u2019s prompt to sign in with your passkey\u2026") + '</div>'
+                );
+                try {
+                    var fakeEvent = { preventDefault: function () {} };
+                    await $.fn.loginWebAuth.loginStart(fakeEvent, "{{$module_logo_instance}}", 'login');
+                    $("#login_feeback").html('');
+                    $("#loginbox-{{$module_logo_instance}}").off("submit").submit();
+                } catch (err) {
+                    var msg = (err && err.toString) ? err.toString() : tr("Passkey sign-in failed. Please try again.");
+                    $("#login_feeback").html(
+                        '<div class="alert alert-danger alert-dismissible">' + msg +
+                        '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
+                    );
+                    btn.html(originalHtml).prop("disabled", false);
+                }
+            });
+            {/jq}
         {/if}
         <input type="hidden" name="login_mode" value="{$mode}" />
         {if $prefs.twoFactorAuth eq 'y' and ((isset($module_params.show_two_factor_auth) and $module_params.show_two_factor_auth eq 'y') or ! empty($error_login))}
@@ -497,6 +513,16 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         <div class="my-2 {if $mode eq 'header'}mx-2{/if} text-center" {if $mode eq 'header'}style="margin-top: 2.4rem !important;"{/if}>
             <button class="btn btn-primary button submit" type="submit" id="loginSubmit" name="login" step="1">{tr}Log in{/tr} {* <i class="fa fa-arrow-circle-right"></i> *}</button>
         </div>
+        {if $prefs.auth_webauthn_enabled eq 'y' and $create2FaCodeNormalLogin neq 'y'}
+            <div class="my-2 {if $mode eq 'header'}mx-2{/if} text-center">
+                <div class="d-flex align-items-center text-muted my-2">
+                    <hr class="flex-grow-1"><span class="mx-2 small">{tr}or{/tr}</span><hr class="flex-grow-1">
+                </div>
+                <button type="button" class="btn btn-outline-secondary w-100" id="passkeyLoginBtn">
+                    {icon name='key' iclass='me-2'}{tr}Login in with Passkey{/tr}
+                </button>
+            </div>
+        {/if}
         {if $module_params.show_register eq 'y' or $prefs.twoFactorAuth eq 'y'}
             <div {if $mode eq 'header'}class="text-end" style="display:inline;"{/if}>
                 {strip}
