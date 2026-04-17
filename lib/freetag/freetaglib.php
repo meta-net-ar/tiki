@@ -473,6 +473,29 @@ class FreetagLib extends ObjectLib
     }
 
     /**
+     * Assign tags for the current object to Smarty as $tags.
+     *
+     * @throws UnexpectedValueException If the current section is not set yet.
+     */
+    public function assignCurrentObjectTagsToSmarty(): void
+    {
+        $section = \Tiki\Sections::getCurrentSection();
+        if (empty($section)) {
+            throw new \UnexpectedValueException('Current section is not set.');
+        }
+
+        $object = \Tiki\Sections::currentObject();
+        if (! $object) {
+            return;
+        }
+
+        $objectTags = $this->get_tags_on_object($object['object'], $object['type']);
+        $tags = $objectTags ? $objectTags['data'] : [];
+
+        TikiLib::lib('smarty')->assign('tags', $tags);
+    }
+
+    /**
      *
      */
     /**

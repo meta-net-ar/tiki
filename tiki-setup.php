@@ -218,6 +218,14 @@ Sections::onSectionChange(function ($section) {
     Language::setSectionLanguage();
 });
 
+Sections::onSectionChange(function ($section) use ($prefs) {
+    if (($prefs['feature_freetags'] ?? 'n') !== 'y') {
+        return;
+    }
+
+    TikiLib::lib('freetag')->assignCurrentObjectTagsToSmarty();
+});
+
 require_once('lib/setup/wiki.php');
 
 $user_groups = $userlib->get_user_groups($user);
