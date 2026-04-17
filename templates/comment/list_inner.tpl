@@ -65,25 +65,26 @@
                         {/if}
                         {if $comment.userName ne $user and $comment.approved eq 'y' and $allow_vote}
                             <div class="commentRating d-inline-block ms-3">
-                            <form class="commentRatingForm" method="post">
-                                <fieldset>
-                                    <legend class="fs-6">{tr}Rate this comment:{/tr}</legend>
-                                    {rating type="comment" id=$comment.threadId}
-                                    <input type="hidden" name="id" value="{$comment.threadId}" />
-                                    <input type="hidden" name="type" value="comment" />
-                                </fieldset>
-                            </form>
-                            {jq}
-                                var crf = $('form.commentRatingForm').on("submit", function() {
-                                    var vals = $(this).serialize();
-                                    $.tikiModal(tr('Loading...'));
-                                    $.post($.service('rating', 'vote'), vals, function() {
-                                        $.tikiModal();
-                                        showMessage(tr('Thanks for rating!'), "success");
+                                <form class="commentRatingForm" method="post">
+                                    <fieldset>
+                                        <legend class="fs-6">{tr}Rate this comment:{/tr}</legend>
+                                        {rating type="comment" id=$comment.threadId}
+                                        <input type="hidden" name="id" value="{$comment.threadId}" />
+                                        <input type="hidden" name="type" value="comment" />
+                                    </fieldset>
+                                </form>
+                                {jq}
+                                    var crf = $('form.commentRatingForm').on("submit", function() {
+                                        var vals = $(this).serialize();
+                                        $.tikiModal(tr('Loading...'));
+                                        $.post($.service('rating', 'vote'), vals, function() {
+                                            $.tikiModal();
+                                            showMessage(tr('Thanks for rating!'), "success");
+                                        });
+                                        return false;
                                     });
-                                    return false;
-                                });
-                            {/jq}
+                                {/jq}
+                            </div>
                         {/if}
                         {if $prefs.wiki_comments_simple_ratings eq 'y' && ($tiki_p_ratings_view_results eq 'y' or $tiki_p_admin eq 'y')}
                             {rating_result type="comment" id=$comment.threadId}
@@ -106,7 +107,6 @@
                                 </div>
                             </div>
                         {/if}
-                            </div>
                     </div>{* End of comment-footer *}
                 </div>{* End of comment-item *}
                 {if ! $level || $prefs.comments_threshold_indent eq '0' || $level lt $prefs.comments_threshold_indent}
