@@ -58,6 +58,8 @@ $inputConfiguration = [
             'ei_tpl'           => 'text',          //get
             'maxRecords'       => 'int',           //get
             'initial'          => 'text',          //get
+            'lock'             => 'bool',          //get
+            'unlock'           => 'bool',          //get
         ]
     ],
 ];
@@ -284,6 +286,24 @@ if (! $definition) {
 
 $fieldDefinitions = $definition->getFields();
 $smarty->assign('tracker_is_multilingual', $prefs['feature_multilingual'] == 'y' && $definition->getLanguageField());
+
+$itemObject = Tracker_Item::fromId($itemId);
+$isLocked = $itemObject->isLocked();
+
+$perms = Perms::get('tracker', $trackerId);
+if ($perms->unlock_tracker_item && isset($_REQUEST['unlock']) && $access->checkCsrf()) {
+    if ($isLocked) {
+        $itemObject->unlock();
+        Feedback::success(tr('Item unlocked successfully'));
+    } else {
+        Feedback::error(tr('Item is not locked'));
+    }
+    header("Location: tiki-view_tracker_item.php?trackerId=$trackerId&itemId=$itemId");
+    exit;
+}
+
+$smarty->assign('item_is_locked', $isLocked);
+$smarty->assign('show_lock_controls', $perms->unlock_tracker_item);
 
 if ($prefs['feature_groupalert'] == 'y') {
     $groupforalert = $groupalertlib->GetGroup('tracker', $trackerId);

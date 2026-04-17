@@ -2020,9 +2020,9 @@ class TrackerLib extends TikiLib
         $_GET = $get;
     }
 
-    public function replace_item($trackerId, $itemId, $ins_fields, $status = '', $ins_categs = 0, $bulk_import = false, $skip_sync = false, $deleted_files = [], $notify_watchers = true)
+    public function replace_item($trackerId, $itemId, $ins_fields, $status = '', $ins_categs = 0, $bulk_import = false, $skip_sync = false, $deleted_files = [])
     {
-        global $user, $prefs, $tiki_p_admin_users;
+        global $user, $prefs, $tiki_p_admin_trackers, $tiki_p_admin_users;
         $final_event = 'tiki.trackeritem.update';
 
         if (! $bulk_import) {
@@ -2077,6 +2077,12 @@ class TrackerLib extends TikiLib
             }
 
             $version = $this->last_log_version($itemId) + 1;
+            if ($status == 'c' && $tracker_definition->isLockOnCloseEnabled()) {
+                $itemObject = Tracker_Item::fromId($itemId);
+                if ($itemObject && ! $itemObject->isLocked()) {
+                    $itemObject->lock();
+                }
+            }
         } else {
             if (empty($status) && isset($tracker_info['newItemStatus'])) {
                 // set status based on tracker setting of status not explicitly requested
@@ -2104,6 +2110,12 @@ class TrackerLib extends TikiLib
             $version = 0;
 
             $final_event = 'tiki.trackeritem.create';
+            if ($status == 'c' && $tracker_definition->isLockOnCloseEnabled()) {
+                $itemObject = Tracker_Item::fromId($new_itemId);
+                if ($itemObject && ! $itemObject->isLocked()) {
+                    $itemObject->lock();
+                }
+            }
         }
 
         $currentItemId = $itemId ? $itemId : $new_itemId;
@@ -3440,11 +3452,13 @@ class TrackerLib extends TikiLib
             $description = "{syntax type={$prefs['markdown_default']}}\r\n$description";
         }
 
+        $lock_on_close = ! empty($options['lock_on_close']) ? 1 : 0;
         $data = [
             'name' => $name,
             'description' => $description,
             'descriptionIsParsed' => $descriptionIsParsed,
             'lastModif' => $this->now,
+            'lock_on_close' => $lock_on_close,
         ];
 
         $logOption = 'Updated';
@@ -7299,6 +7313,7 @@ class TrackerLib extends TikiLib
             'relationshipBehaviour' => $input->relationshipBehaviour->text(),
             'allowInlineEditing' => $input->allowInlineEditing->int() ? 'y' : 'n',
             'allowChooseFieldsToDisplay' => $input->allowChooseFieldsToDisplay->int() ? 'y' : 'n',
+            'lock_on_close' => $input->lock_on_close->int() ? 1 : 0,
         ];
     }
 }

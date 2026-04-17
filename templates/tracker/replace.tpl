@@ -383,6 +383,14 @@
                     {/foreach}
 
             </div>
+            <div class="mb-3 mx-0">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="lock_on_close" id="lock_on_close" value="1"{if $info.lock_on_close eq 1} checked="checked"{/if}>
+                    <label class="form-check-label" for="lock_on_close">
+                        {tr}Lock items when status is Closed{/tr}
+                    </label>
+                </div>
+            </div>
         {/accordion_group}
         {accordion_group title="{tr}Notifications{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">

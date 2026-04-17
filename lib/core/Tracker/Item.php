@@ -116,8 +116,13 @@ class Tracker_Item
         return $this->perms->$permName;
     }
 
+    /**
+     * Check if the user can modify the tracker item
+     * @return bool True if the item can be modified, false otherwise
+     */
     public function canModify()
     {
+
         if ($this->isNew()) {
             return $this->perms->create_tracker_items;
         }
@@ -129,7 +134,7 @@ class Tracker_Item
         $status = $this->info['status'] ?? '';
 
         if ($status == 'c') {
-            return $this->perms->modify_tracker_items_closed;
+            return ! $this->isLocked() && $this->perms->modify_tracker_items_closed;
         } elseif ($status == 'p') {
             return $this->perms->modify_tracker_items_pending;
         } else {
@@ -631,6 +636,75 @@ class Tracker_Item
     }
 
     /**
+     * Check if the tracker item is locked
+     * @return bool True if the item is locked, false otherwise
+     */
+    public function isLocked()
+    {
+        $item = $this->getData();
+        if (! $item) {
+            return false;
+        }
+
+        $definition = Tracker_Definition::get($this->info['trackerId']);
+        // If lock on close is not enabled, we don't check for lock
+        if (! $definition->isLockOnCloseEnabled()) {
+            return false;
+        }
+
+        return ! empty($item['is_locked']) && $item['is_locked'] == 1;
+    }
+
+    /**
+     * Lock the tracker item
+     * @param int|null $userId ID of the user locking the item
+     * @return bool True if the lock succeeds, false otherwise
+     */
+    public function lock($userId = null)
+    {
+        $definition = Tracker_Definition::get($this->info['trackerId']);
+        if (! $definition->isLockOnCloseEnabled()) {
+            return false;
+        }
+
+        $query = "UPDATE tiki_tracker_items SET is_locked = 1 WHERE itemId = ?";
+        $result = TikiLib::lib('tiki')->query($query, [$this->getId()]);
+
+        if ($result) {
+            TikiLib::lib('logs')->add_action('Locked', $this->getId(), 'trackeritem', "Locked by userId: $userId");
+            $this->info['is_locked'] = 1;
+        }
+        return $result;
+    }
+
+    /**
+     * Unlock the tracker item
+     * @param int|null $userId ID of the user unlocking the item
+     * @return bool True if the unlock succeeds, false otherwise
+     */
+    public function unlock($userId = null)
+    {
+        global $user;
+
+        if (! $userId) {
+            $userId = TikiLib::lib('tiki')->get_user_id($user);
+            if (! $userId) {
+                Feedback::error(tr('You must be logged in to unlock an item.'));
+                return false;
+            }
+        }
+
+        $query = "UPDATE tiki_tracker_items SET is_locked = 0 WHERE itemId = ?";
+        $result = TikiLib::lib('tiki')->query($query, [$this->getId()]);
+
+        if ($result) {
+            TikiLib::lib('logs')->add_action('Unlocked', $this->getId(), 'trackeritem', "Unlocked by userId: $userId");
+            $this->info['is_locked'] = 0;
+        }
+        return $result;
+    }
+
+    /**
      * Gets a tracker item's data
      *
      * @param JitFilter|null $input optional input object
@@ -670,11 +744,14 @@ class Tracker_Item
             $newStatus = $this->definition->getConfiguration('newItemStatus', 'o');
         }
 
+        $isLocked = isset($this->info['is_locked']) ? (int)$this->info['is_locked'] : 0;
+
         return [
             'itemId' => $this->isNew() ? null : $this->info['itemId'],
             'status' => $this->isNew() ? $newStatus : $this->info['status'],
             'creation_date' => $this->info['created'],
             'trackerId' => $this->isNew() ? null : $this->info['trackerId'],
+            'is_locked' => $isLocked,
             'fields' => $out,
         ];
     }

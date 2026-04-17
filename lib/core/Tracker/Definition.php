@@ -698,4 +698,13 @@ class Tracker_Definition
         }
         return $tabulars;
     }
+
+    /**
+     * Check if the tracker locks items when status is set to Closed
+     * @return bool True if locking is enabled for Closed items
+     */
+    public function isLockOnCloseEnabled()
+    {
+        return isset($this->trackerInfo['lock_on_close']) && $this->trackerInfo['lock_on_close'] == 1;
+    }
 }

@@ -1232,7 +1232,7 @@ function wikiplugin_tracker($data, $params)
                         Feedback::error($captchalib->getErrors());
                         $field_errors['err_antibot'] = 'y';
                     }
-                } elseif (! is_null($transactionName)) {
+                } elseif (isset($transactionName) && ! empty($transactionName)) {
                     // if transaction, set antibot session var to avoid revalidation
                     $_SESSION[$transactionName]['captchaValidated'] = true;
                 }

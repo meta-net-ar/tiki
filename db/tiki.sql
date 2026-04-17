@@ -2578,6 +2578,7 @@ CREATE TABLE `tiki_tracker_items` (
   `status` char(1) default NULL,
   `lastModif` int(14) default NULL,
   `lastModifBy` varchar(200) default NULL,
+  `is_locked` tinyint(1) default 0,
   PRIMARY KEY (`itemId`),
   INDEX `trackerId` (`trackerId`),
   INDEX `idx_lastModif` (`lastModif`),
@@ -2601,6 +2602,7 @@ CREATE TABLE `tiki_trackers` (
   `created` int(14) default NULL,
   `lastModif` int(14) default NULL,
   `items` int(10) default NULL,
+  `lock_on_close` tinyint(1) default 0,
   PRIMARY KEY (`trackerId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 

@@ -10,6 +10,15 @@
 
         {* --------- navigation ------ *}
         <div class="t_navbar mb-4">
+            {if $item_is_locked && !$canModify}
+                <div class="tracker-lock-status mb-2">
+                    <small class="text-muted">
+                        <i class="fas fa-lock me-1"></i>
+                        {tr}This item is locked (Status: Closed){/tr}
+                    </small>
+                </div>
+            {/if}
+
             <div class="float-sm-end btn-group">
                 {if ! $js}<ul><li>{/if}
                 <a class="btn btn-link" data-bs-toggle="dropdown" href="#" role="button">
@@ -107,6 +116,14 @@
                     {if $prefs.user_favorites eq 'y' and isset($itemId)}
                         <li class="dropdown-item">
                             {favorite button_classes="favorite-icon" label="{tr}Favorite{/tr}"  type="trackeritem" object=$itemId }
+                        </li>
+                    {/if}
+                    {if $show_lock_controls && $item_is_locked && !$canModify}
+                        <li class="dropdown-item">
+                            <a data-bs-toggle="modal" data-bs-target="#bootstrap-modal"
+                            href="{service controller=tracker action=unlockModal trackerId=$trackerId itemId=$itemId modal=1}">
+                                {icon name="unlock"} {tr}Unlock{/tr}
+                            </a>
                         </li>
                     {/if}
                 </ul>

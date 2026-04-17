@@ -5690,6 +5690,15 @@ class UsersLib extends TikiLib
                 'scope' => 'global',
             ],
             [
+                'name' => 'tiki_p_unlock_tracker_item',
+                'description' => tra('Can unlock locked tracker items'),
+                'level' => 'admin',
+                'type' => 'trackers',
+                'admin' => false,
+                'prefs' => ['feature_trackers'],
+                'scope' => 'object',
+            ],
+            [
                 'name' => 'tiki_p_tabular_admin',
                 'description' => tr('Manage tracker views'),
                 'level' => 'admin',
