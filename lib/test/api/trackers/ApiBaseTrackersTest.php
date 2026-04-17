@@ -737,5 +737,12 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
     protected function assertValidDeleteTrackerItemResponse($body)
     {
         $this->assertMatchesSchema($body, $this->getDeleteTrackerItemResponseSchema());
+        $this->assertEquals('Remove', $body['title'], 'Response title should be "remove" after deleting tracker item');
+    }
+
+    protected function assertValidDeleteTrackerFieldResponse($body)
+    {
+        $this->assertMatchesSchema($body, $this->getDeleteTrackerFieldResponseSchema());
+        $this->assertEquals('DONE', $body['status'], 'Status should be DONE after deleting tracker field');
     }
 }
