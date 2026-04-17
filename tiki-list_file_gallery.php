@@ -1277,7 +1277,11 @@ if (isset($_GET['slideshow'])) {
             }
         }
         if ($view == 'page') {
-            $smarty->assign('maxWidth', $_REQUEST['maxWidth'] ?? '300px');
+            $maxWidth = (int)($_REQUEST['maxWidth'] ?? 300);
+            if ($maxWidth <= 0) {
+                $maxWidth = 300;
+            }
+            $smarty->assign('maxWidth', $maxWidth);
             $smarty->assign('maxRecords', 1);
             $smarty->assign(
                 'metarray',
