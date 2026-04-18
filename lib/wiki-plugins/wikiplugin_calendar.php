@@ -85,6 +85,8 @@ function wikiplugin_calendar($data, $params)
     $tikilib = TikiLib::lib('tiki');
     $calendarlib = TikiLib::lib('calendar');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_calendar_info());
+
     if (is_null($params['calIds'])) {
         $params['calIds'] = [1];
     }

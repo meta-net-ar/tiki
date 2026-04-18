@@ -128,6 +128,7 @@ function wikiplugin_trackerstat($data, $params)
     $trklib = TikiLib::lib('trk');
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_trackerstat_info());
     extract($params, EXTR_SKIP);
 
     if ($prefs['feature_trackers'] != 'y' || empty($trackerId) || ! ($tracker_info = $trklib->get_tracker($trackerId))) {

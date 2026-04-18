@@ -31,6 +31,8 @@ function wikiplugin_usercount_info()
 
 function wikiplugin_usercount($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_usercount_info());
+
     $userlib = TikiLib::lib('user');
 
     if (! is_null($params['groups'])) {

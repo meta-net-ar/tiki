@@ -167,6 +167,8 @@ function wikiplugin_map_info()
 
 function wikiplugin_map($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_map_info());
+
     $width = '100%';
     if (! is_null($params['width'])) {
         $width = (int)$params['width'] . 'px';
@@ -177,9 +179,6 @@ function wikiplugin_map($data, $params)
         $height = (int)$params['height'] . 'px';
     }
 
-    if (! is_array($params['controls'])) {
-        $params['controls'] = explode(',', $params['controls']);
-    }
 
     $popupStyle = smarty_modifier_escape($params['popupstyle']);
 

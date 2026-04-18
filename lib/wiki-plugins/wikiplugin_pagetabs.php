@@ -41,6 +41,7 @@ function wikiplugin_pagetabs($data, $params)
 
     static $pagetabsindex = 0;
     ++$pagetabsindex;
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_pagetabs_info());
     extract($params, EXTR_SKIP);
 
     $smarty->assign('id', $pagetabsindex);
