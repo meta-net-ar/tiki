@@ -59,6 +59,12 @@
     <meta property="og:description" content="{if not empty($prefs.browsertitle_translated)}{$prefs.browsertitle_translated|tr_if|escape}{else}{$prefs.browsertitle|tr_if|escape}{/if}{if isset($title)} {$prefs.site_nav_seper} {$title}{/if}">
     <meta name="twitter:description" content="{if not empty($prefs.browsertitle_translated)}{$prefs.browsertitle_translated|tr_if|escape}{else}{$prefs.browsertitle|tr_if|escape}{/if}{if isset($title)} {$prefs.site_nav_seper} {$title}{/if}">
 {/if}
+{* --- Meta keywords: forum, per-page keywords, and/or tags (when "Include tags" is on) --- *}
+{if !empty($forum_info.name) and $prefs.metatag_threadtitle eq 'y'}
+    <meta name="keywords" content="{tr}Forum{/tr} {$forum_info.name|escape} {if !empty($thread_info.title)}{$thread_info.title|escape}{/if} {if $prefs.metatag_freetags eq 'y' and isset($tags) and !empty($tags)}{foreach from=$tags item=taginfo}{$taginfo.tag|escape} {/foreach}{/if}">
+{elseif !empty($metatag_local_keywords) or ($prefs.metatag_freetags eq 'y' and isset($tags) and !empty($tags))}
+    <meta name="keywords" content="{if $prefs.metatag_freetags eq 'y' and isset($tags) and !empty($tags)}{foreach from=$tags item="taginfo"}{$taginfo.tag|escape}, {/foreach}{/if}{if !empty($metatag_local_keywords)}{$metatag_local_keywords|escape}{/if}">
+{/if}
 {if $prefs.site_google_analytics_site_ownership neq ''}
     <meta name="google-site-verification" content="{$prefs.site_google_analytics_site_ownership|escape}">
 {/if}
