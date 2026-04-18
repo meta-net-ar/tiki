@@ -1,4 +1,4 @@
-<div class="card shadow-sm mt-4" id="passkey-prompt-card" style="max-width:520px; margin:0 auto;">
+<div class="card shadow-sm mt-4" id="passkey-prompt-card" data-redirect="tiki-login_scr.php?clearmenucache=y" style="max-width:520px; margin:0 auto;">
     <div class="card-body text-center py-5 px-4">
         <div class="mb-3 fs-3">
             {icon name='key' iclass='text-primary fa-2x'}
