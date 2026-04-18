@@ -434,6 +434,196 @@
                     </div>
                 </div>
             {/if}
+            {if $prefs.feature_file_galleries eq 'y'}
+                <div class="mb-3 row" id="calattach">
+                    <label class="col-form-label col-sm-3">{tr}Attachments{/tr}</label>
+                    <div class="col-sm-9">
+                        <div class="files-field calendar-attachments-field uninitialized" data-galleryid="{$attachmentsGalleryId|escape}">
+                            <input type="hidden" name="calitem[attachments]" class="input" value="{if !empty($calitem.attachments)}{foreach $calitem.attachments as $file}{$file.fileId}{if !$file@last},{/if}{/foreach}{/if}">
+                            <ol class="current-list list-unstyled mb-3">
+                                {if !empty($calitem.attachments)}
+                                    {foreach $calitem.attachments as $file}
+                                        <li data-file-id="{$file.fileId}" class="m-1">
+                                            {$file.fileId|sefurl:'file'|iconify:$file.filetype:$file.fileId:1}
+                                            <a href="{$file.fileId|sefurl:'file'}" data-box="box">{$file.filename|escape}</a>
+                                            <span class="text-muted small ms-1">({$file.filesize|kbsize})</span>
+                                            <a href="#" class="file-delete-icon text-danger ms-2" title="{tr}Remove attachment{/tr}">
+                                                {icon name='delete'}
+                                            </a>
+                                        </li>
+                                    {/foreach}
+                                {/if}
+                            </ol>
+                            {if $canUploadAttachments}
+                                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$attachmentsGalleryId limit=100}" 
+                                   class="btn btn-primary upload-files me-2" role="button">
+                                    {icon name='upload'} {tr}Upload Files{/tr}
+                                </a>
+                            {/if}
+
+                            {if $prefs.fgal_tracker_existing_search eq 'y'}
+                                {if $prefs.fgal_elfinder_feature eq 'y'}
+                                    <a href="tiki-list_file_gallery.php" 
+                                       class="btn btn-secondary browse-files-elfinder" 
+                                       role="button"
+                                       data-gallery-id="{$attachmentsGalleryId|escape}"
+                                       data-ticket="{ticket mode=get}">
+                                        {icon name='folder-open'} {tr}Browse Files{/tr}
+                                    </a>
+                                {else}
+                                    <a href="{service controller=file action=browse galleryId=$attachmentsGalleryId limit=100}" 
+                                       class="btn btn-secondary browse-files" role="button">
+                                        {icon name='folder-open'} {tr}Browse Files{/tr}
+                                    </a>
+                                {/if}
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+                {jq}
+
+                $('.files-field.calendar-attachments-field.uninitialized').removeClass('uninitialized').each(function () {
+                    var $self = $(this);
+                    var $files = $('.current-list', this);
+                    var $field = $('.input', this);
+                    var galleryId = $self.data('galleryid');
+
+                    function addFile(fileId, type, name, size) {
+                        fileId = String(fileId);
+                        // Check if already exists
+                        if ($files.find('[data-file-id="' + fileId + '"]').length) {
+                            return;
+                        }
+
+                        var li = $('<li class="m-1">').appendTo($files);
+                        li.attr('data-file-id', fileId);
+                        li.append($.fileTypeIcon(fileId, { type: type, name: name }));
+                        li.append($('<a href="tiki-download_file.php?fileId=' + fileId + '" data-box="box">').text(name));
+                        // Show file size if available, otherwise show nothing
+                        if (size) {
+                            li.append($('<span class="text-muted small ms-1">').text('(' + formatFileSize(size) + ')'));
+                        }
+                        li.append($('<a href="#" class="file-delete-icon text-danger ms-2" title="' + tr('Remove attachment') + '">').html('{{icon name="delete"}}'));
+
+                        $field.input_csv('add', ',', fileId);
+                        $field.trigger("change");
+                    }
+
+                    // Helper function to format file size
+                    function formatFileSize(bytes) {
+                        if (bytes === 0) return '0 B';
+                        var k = 1024;
+                        var sizes = ['B', 'KB', 'MB', 'GB'];
+                        var i = Math.floor(Math.log(bytes) / Math.log(k));
+                        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+                    }
+
+                    // Store addFile function globally for elFinder callback
+                    window.calendarAttachmentsAddFile = addFile;
+
+                    // Handle upload modal
+                    $self.find('.btn.upload-files').clickModal({
+                        success: function (data) {
+                            $.each(data.files, function (k, file) {
+                                addFile(file.fileId, file.type, file.label || file.name, file.size);
+                            });
+                            $.closeModal();
+                        }
+                    });
+
+                    // Handle browse files modal (non-elFinder)
+                    $self.find('.btn.browse-files').on('click', function () {
+                        if (! $(this).data('initial-href')) {
+                            $(this).data('initial-href', $(this).attr('href'));
+                        }
+                        // Before the dialog handler triggers, replace the href with one including current files
+                        $(this).attr('href', $(this).data('initial-href') + '&file=' + $field.val());
+                    });
+                    $self.find('.btn.browse-files').clickModal({
+                        size: 'modal-lg',
+                        success: function (data) {
+                            $.each(data.files, function (k, file) {
+                                addFile(file.fileId, file.type, file.name, file.size);
+                            });
+                            $.closeModal();
+                        }
+                    });
+
+                    // Delete file handler
+                    $files.parent().on('click', '.file-delete-icon', function (e) {
+                        e.preventDefault();
+                        var fileId = $(e.target).closest('li').data('file-id');
+                        if (fileId) {
+                            $field.input_csv('delete', ',', fileId);
+                            $(e.target).closest('li').remove();
+                            $field.trigger("change");
+                        }
+                        return false;
+                    });
+
+                    // Handle elFinder browse button
+                    $self.find('.browse-files-elfinder').on('click', function(e) {
+                        e.preventDefault();
+                        var browseGalleryId = $(this).data('gallery-id') || galleryId;
+                        var ticket = $(this).data('ticket');
+
+                        return openElFinderDialog(this, {
+                            defaultGalleryId: browseGalleryId,
+                            deepGallerySearch: 1,
+                            defaultVolumeId: browseGalleryId,
+                            ticket: ticket,
+                            getFileCallback: function(file, elfinder) {
+                                window.handleCalendarFinderFile(file, elfinder);
+                            },
+                            eventOrigin: this
+                        });
+                    });
+                });
+
+                // Handler for elFinder file selection
+                window.handleCalendarFinderFile = function(value, elfinder) {
+                    var hashes = [];
+                    if (Array.isArray(value)) {
+                        for (var i = 0; i < value.length; i++) {
+                            var file = value[i];
+                            if (typeof file === "string") {
+                                var m = file.match(/target=([^&]*)/);
+                                if (m && m.length >= 2) {
+                                    hashes.push(m[1]);
+                                }
+                            } else if (file.hash) {
+                                hashes.push(file.hash);
+                            }
+                        }
+                    } else if (value && value.hash) {
+                        hashes.push(value.hash);
+                    }
+
+                    if (hashes.length === 0) return;
+
+                    $.ajax({
+                        type: 'GET',
+                        url: $.service('file_finder', 'finder'),
+                        dataType: 'json',
+                        data: {
+                            cmd: "tikiFileFromHash",
+                            hash: hashes
+                        },
+                        success: function (data) {
+                            for (var i = 0; i < data.length; i++) {
+                                if (window.calendarAttachmentsAddFile) {
+                                    window.calendarAttachmentsAddFile(data[i].fileId, data[i].filetype, data[i].name, data[i].filesize);
+                                }
+                            }
+                        },
+                        complete: function () {
+                            $.closeModal();
+                            $(window).data("elFinderDialog", null);
+                        }
+                    });
+                };
+                {/jq}
+            {/if}
             {if !$user and $prefs.feature_antibot eq 'y'}
                 {include file='antibot.tpl'}
             {/if}
