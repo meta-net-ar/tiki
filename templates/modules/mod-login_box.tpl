@@ -444,7 +444,9 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 );
                 try {
                     var fakeEvent = { preventDefault: function () {} };
-                    await $.fn.loginWebAuth.loginStart(fakeEvent, "{{$module_logo_instance}}", 'login');
+                    var loginFn = (window.tikiWebAuthn || $.fn.loginWebAuth);
+                    if (!loginFn) { throw new Error(tr("WebAuthn module not loaded.")); }
+                    await loginFn.loginStart(fakeEvent, "{{$module_logo_instance}}", 'login');
                     $("#login_feeback").html('');
                     $("#loginbox-{{$module_logo_instance}}").off("submit").submit();
                 } catch (err) {
