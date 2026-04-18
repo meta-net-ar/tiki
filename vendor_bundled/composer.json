@@ -417,6 +417,9 @@
             "php-http/discovery": true
         },
         "audit": {
+            "ignore": {
+                "PKSA-5jz8-6tcw-pbk4": "phpunit dev-only dependency, no fix available in PHP 8.1-compatible 10.x line. Fix exists in phpunit 12.5.22+ which requires PHP >= 8.3."
+            },
             "ignore-abandoned": {
                 "candy-chat/xmpp-prebind-php": "Work scheduled for removal next month.",
                 "laminas/laminas-loader": "Required transitively by laminas/laminas-http but will be solved in 3.0 https://github.com/laminas/laminas-http/pull/110",
