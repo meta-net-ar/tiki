@@ -32,6 +32,10 @@
     </div>
 </div>
 
+<div id="passkey-success" hidden>
+    {include file='mail/user_welcome_msg.tpl'}
+</div>
+
 {jq}
     $.fn.passkeyPrompt.init("{{$username|escape:'javascript'}}");
 {/jq}
