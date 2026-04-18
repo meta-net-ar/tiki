@@ -434,8 +434,13 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         </div>
         {if $prefs.auth_webauthn_enabled eq 'y'}
             {jq}
-            $("#passkeyLoginBtn").on("click", async function () {
+            $("#passkeyLoginBtn").on("click", async function (e) {
+                e.stopPropagation();
                 var btn = $(this);
+                var dropdown = btn.closest('.dropdown');
+                // Keep the dropdown open for the entire passkey flow
+                dropdown.on('hide.bs.dropdown.passkey', function (ev) { ev.preventDefault(); });
+
                 var originalHtml = btn.html();
                 var spinnerHtml = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>';
                 btn.html(spinnerHtml + tr("Verifying\u2026")).prop("disabled", true);
@@ -447,9 +452,11 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                     var loginFn = (window.tikiWebAuthn || $.fn.loginWebAuth);
                     if (!loginFn) { throw new Error(tr("WebAuthn module not loaded.")); }
                     await loginFn.loginStart(fakeEvent, "{{$module_logo_instance}}", 'login');
+                    dropdown.off('hide.bs.dropdown.passkey');
                     $("#login_feeback").html('');
                     $("#loginbox-{{$module_logo_instance}}").off("submit").submit();
                 } catch (err) {
+                    dropdown.off('hide.bs.dropdown.passkey');
                     var msg = (err && err.toString) ? err.toString() : tr("Passkey sign-in failed. Please try again.");
                     $("#login_feeback").html(
                         '<div class="alert alert-danger alert-dismissible">' + msg +
