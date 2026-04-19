@@ -43,8 +43,7 @@
                 $("#" + $("select[name='destination']").val() + "row").show();
                 $("input[name='" + $("select[name='destination']").val() + "']").trigger("focus");
                 $("input[name='" + $("select[name='destination']").val() + "']").removeAttr("disabled");
-            }
-            );
+            });
             {/jq}
         </div>
     </div>
@@ -57,7 +56,12 @@
             {autocomplete element='#flogin' type='username'}
         </div>
         <div class="col-sm-3">
-            <a href="#" onclick="document.getElementById('flogin').value='{$user}'; return false;" class="btn btn-link" role="button">{tr}Myself{/tr}</a>
+            <a href="#"
+                onclick="var inp = document.getElementById('flogin'); inp.value='{$user|escape:javascript}'; inp.dispatchEvent(new Event('change')); return false;"
+                class="btn btn-link"
+                role="button">
+                {tr}Myself{/tr}
+            </a>
         </div>
     </div>
     <div class="mb-3 row" id="emailrow" style="display:none">

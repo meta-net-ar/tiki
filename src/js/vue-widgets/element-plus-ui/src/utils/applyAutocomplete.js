@@ -72,6 +72,18 @@ export default function applyAutocomplete(element, remoteSourceUrl = null, sourc
     element.setAttribute("element-plus-ref", elementUniqueId);
     element.style.display = "none";
     element.parentNode.insertBefore(elementPlusUi, element.nextSibling);
+    const syncUiValue = () => {
+        const newValue = element.value;
+        elementPlusUi.setAttribute("value", newValue);
+
+        if (typeof elementPlusUi.setValue === "function") {
+            elementPlusUi.setValue(newValue);
+        } else {
+            elementPlusUi.value = newValue;
+        }
+    };
+
+    element.addEventListener("change", syncUiValue);
 
     return elementPlusUi;
 }
