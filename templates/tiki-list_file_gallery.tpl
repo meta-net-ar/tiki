@@ -296,7 +296,7 @@
                 <div class="row col-sm-3">
                     <label for="maxWidth" class="col-form-label">{tr}Maximum width{/tr}</label>
                     <div class="input-group col-sm-2">
-                        <input id="maxWidth" class="form-control" type="number" name="maxWidth" value="{$maxWidth|substr:0:-2}">
+                        <input id="maxWidth" class="form-control" type="number" name="maxWidth" value="{$maxWidth}">
                         <span class="input-group-text">{tr}pixels{/tr}</span>
                     </div>
                 </div>

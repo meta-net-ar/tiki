@@ -373,4 +373,32 @@
             </table>
         </div>
     </div>
+
+    {* File Attachments Section *}
+    {if $prefs.feature_file_galleries eq 'y' && !empty($calitem.attachments)}
+        <div class="card mt-3 mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{icon name='paperclip'} {tr}Attachments{/tr}</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {foreach from=$calitem.attachments item=file}
+                        <li class="mb-2 d-flex align-items-center">
+                            {$file.fileId|sefurl:'file'|iconify:$file.filetype:$file.fileId:1}
+                            <a href="{$file.fileId|sefurl:'file'}" class="ms-2" data-box="box">{$file.filename|escape}</a>
+                            <span class="text-muted small ms-2">({$file.filesize|kbsize})</span>
+                        </li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    {/if}
+
+    {if not $preview}
+        {permission name='change_events' type='calendaritem' object=$calitem.calitemId}
+            <a href="{service controller='calendar' action='edit_item' calitemId=$calitem.calitemId|escape}" class="btn btn-primary edit-calendar-item-btn mt-1">
+                {tr}Edit{/tr}
+            </a>
+        {/permission}
+    {/if}
 {/block}

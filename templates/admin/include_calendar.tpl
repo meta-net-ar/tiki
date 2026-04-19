@@ -47,6 +47,7 @@
         {preference name=calendar_view_days}
         {preference name=calendar_description_is_html}
         {preference name=calendar_watch_editor}
+        {preference name=calendar_attachments_galleryId}
         {preference name=calendar_holidays}
     </fieldset>
     </div>

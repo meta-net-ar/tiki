@@ -50,6 +50,15 @@ if (isValidMonitor('SearchIndexRebuildLast')) {
     $result['SearchIndexRebuildLast'] = $tikilib->get_preference('unified_last_rebuild_' . $prefs['unified_engine']);
 }
 
+if (isValidMonitor('SchedulerLastRun')) {
+    $result['SchedulerLastRun'] = (int) $tikilib->get_preference('scheduler_last_run_timestamp', 0);
+}
+
+if (isValidMonitor('SchedulerHealthy')) {
+    $schedulerUtils = new Scheduler_Utils();
+    $result['SchedulerHealthy'] = $schedulerUtils->isSchedulerRunConfigured() ? 1 : 0;
+}
+
 // Get probes result
 $probes = getProbes($result);
 
