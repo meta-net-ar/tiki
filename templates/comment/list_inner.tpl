@@ -59,7 +59,7 @@
                             {if $allow_resolve && $is_top_level}
                                 {if isset($comment.is_resolved) && $comment.is_resolved eq 'y'}
                                     <button type="button" class="btn btn-outline-success btn-sm resolve-direct" data-url="{service controller=comment action=resolve do=unresolve threadId=$comment.threadId}" title="{tr}Mark as unresolved{/tr}">{icon name="undo"} {tr}Unresolve{/tr}</button>
-                                {else}
+                                {elseif $comment.replies_info.numReplies gt 0}
                                     <button type="button" class="btn btn-success btn-sm resolve-direct" data-url="{service controller=comment action=resolve do=resolve threadId=$comment.threadId}" title="{tr}Mark as resolved{/tr}">{icon name="check"} {tr}Resolve{/tr}</button>
                                 {/if}
                             {/if}
