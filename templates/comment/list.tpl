@@ -185,6 +185,18 @@
     
     {if $prefs.comments_resolved_threads eq 'y'}
     <style>
+        {* Hide modal chrome when loaded inside the comment container *}
+        #comments .modal-header, 
+        #comments .modal-footer, 
+        #comments .btn-close, 
+        #comments .modal-content > .btn.btn-link,
+        .comment-container .modal-header,
+        .comment-container .modal-footer,
+        .comment-container .btn-close,
+        .comment-container .modal-content > .btn.btn-link {
+            display: none !important;
+        }
+        
         .comment-resolved-header {
             cursor: pointer;
             transition: all 0.2s ease-in-out;

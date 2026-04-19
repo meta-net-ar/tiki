@@ -640,9 +640,9 @@ class Services_Comment_Controller
         $commentslib = TikiLib::lib('comments');
 
         if ($do == 'resolve') {
-            $commentslib->resolve_thread($threadId);
+            $commentslib->resolveThread($threadId);
         } else {
-            $commentslib->unresolve_thread($threadId);
+            $commentslib->unresolveThread($threadId);
         }
 
         return [
