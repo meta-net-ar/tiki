@@ -191,7 +191,7 @@ class TreeTable extends Base
                     'id' => $id . '_filter',
                     'selectors' => "#$id tbody tr",
                     'parentSelector' => "#$id .collapsed:not(\".leaf\"), #$id .expanded:not(\".leaf\")",
-                    'exclude' => ""
+                    'exclude' => "#$id .subHeader"
                 ],
                 $template
             );
