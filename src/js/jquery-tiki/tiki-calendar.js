@@ -72,7 +72,14 @@ $.fn.setupEventCalendar = function (
                     remote: $.service("calendar", "edit_item", params),
                     open: function () {
                         $(calendarEl).tikiModal();
-                        $("form:not(.no-ajax)", this).addClass("no-ajax");
+                        $("form:not(.no-ajax)", this)
+                            .addClass("no-ajax") // Remove default ajax handling, we replace it
+                            .on(
+                                "submit",
+                                ajaxSubmitEventHandler(function (data) {
+                                    calendarEditSubmit(data, this);
+                                })
+                            );
                         isOpeningModal = false;
                     },
                     error: function () {
