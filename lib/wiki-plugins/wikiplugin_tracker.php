@@ -2328,13 +2328,10 @@ FILL;
         }
 
         if (! empty($params['_ajax_form_ins_id'])) {    // save new js in a function for the form init fn
-            // Only add JS if not an AJAX request
-            $isAjax = isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
-            if (! $isAjax) {
-                $headerlib->add_js(' var ajaxTrackerFormInit_' . $params['_ajax_form_ins_id'] . ' = function() {' . $headerlib->outputInlineJS(false) . '}', 10);
-            }
+            $headerlib->add_js(' var ajaxTrackerFormInit_' . $params['_ajax_form_ins_id'] . ' = function() {' . $headerlib->outputInlineJS(false) . '}', 10);
 
             // put back the pre-existing js
+            $headerlib->clear_js();
             $headerlib->js = array_merge($headerlib->js, $old_js['js']);
             $headerlib->jq_onready = array_merge($headerlib->jq_onready, $old_js['jq_onready']);
         }
