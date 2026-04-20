@@ -339,7 +339,7 @@ class Icon extends \Smarty\FunctionHandler\Base
             }
         }
 
-        $cachelib->cacheItem($cache_key, $html);
+        // $cachelib->cacheItem($cache_key, $html);
         return $html;
     }
 }

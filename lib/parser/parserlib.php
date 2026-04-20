@@ -1737,12 +1737,17 @@ class ParserLib extends TikiDb_Bridge
             $ext_icon = '';
             $rel = '';
             $title = '';
+            $label = $link;
 
             if ($prefs['popupLinks'] == 'y') {
                 $target = 'target="_blank"';
             }
             if (! str_contains($link, '://')) {
                 $target = '';
+                $objectLabel = $this->getInternalLinkLabel($link);
+                if ($objectLabel) {
+                    $label = $objectLabel;
+                }
             } else {
                 $class = 'class="wiki external"';
                 if ($prefs['feature_wiki_ext_icon'] == 'y' && ! ($this->option['suppress_icons'] || $suppress_icons)) {
@@ -1800,7 +1805,7 @@ class ParserLib extends TikiDb_Bridge
                 $pattern = "/(?<!\[)\[$link2\|([^\]\|]+)([^\]])*\]/";
                 $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$rel\">$1</a>$ext_icon", $data);
                 $pattern = "/(?<!\[)\[$link2\|?\]/";
-                $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$rel\">$link</a>$ext_icon", $data);
+                $data = preg_replace($pattern, "<a $class $target $title href=\"$link\" rel=\"$rel\">$label</a>$ext_icon", $data);
             }
         }
 
@@ -1811,6 +1816,40 @@ class ParserLib extends TikiDb_Bridge
         }
 
         return $data;
+    }
+
+    protected function getInternalLinkLabel($link)
+    {
+        $matches = [];
+        if (! preg_match("/\.php\?([^=]+)=([^&]+)/", $link, $matches)) { // non-sefurl
+            if (! preg_match("/([a-z]+)([0-9]+)/", $link, $matches)) { // sefurl with type and id
+                if (! preg_match("/(\b)([a-z0-9]+)/i", $link, $matches)) { // sefurl for wiki pages
+                    return null;
+                }
+            }
+        }
+
+        $type = preg_replace("/id$/i", "", $matches[1]) ?: "page";
+        $objectType = TikiLib::lib('object')->getSelectorType($type);
+        $objectId = $matches[2];
+
+        if (! $objectType || ! $objectId) {
+            return null;
+        }
+
+        $objectlib = TikiLib::lib('object');
+
+        if (! $objectlib->isValidObject($objectType, $objectId)) {
+            return null;
+        }
+
+        $title = $objectlib->get_title($objectType, $objectId, '<span class="text-body-tertiary fw-bold">{parent_object_title}:</span> {title}');
+
+        $iconName = $objectlib->getObjectIconName($objectType);
+
+        $icon = smarty_function_icon(['name' => $iconName, 'iclass' => 'text-body-tertiary me-1'], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+
+        return $icon . $title;
     }
 
     //*

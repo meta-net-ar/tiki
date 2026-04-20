@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Cache\NoCache;
+
 /**
  * @group integration
  *
@@ -11,6 +14,37 @@
 
 class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
 {
+    private $originalCacheImpl;
+    private $originalIconset;
+
+    protected function setUp(): void
+    {
+        global $iconset;
+
+        $this->originalIconset = $iconset;
+
+        // Mock iconset
+        $iconset = new class {
+            public function getHtml($name, $params = [])
+            {
+                return "$name-icon-mock ";
+            }
+        };
+
+        $cachelib = TikiLib::lib('cache');
+        // Prevent caching of icons during tests to avoid stale values from previous tests interfering with assertions
+        $this->originalCacheImpl = $cachelib->replaceImplementation(new NoCache());
+    }
+
+    protected function tearDown(): void
+    {
+        global $iconset;
+
+        $iconset = $this->originalIconset;
+
+        TikiLib::lib('cache')->replaceImplementation($this->originalCacheImpl);
+    }
+
     /**
      * @covers       ParserLib::parse_data
      * @dataProvider provider
@@ -79,7 +113,7 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
             ['--foo--', "<strike>foo</strike><br />"],  // strike out
             ['-- foo --', "-- foo --<br />"],   // not parsed
 
-            ['[foo]', '<a class="wiki"   href="foo" rel="">foo</a><br />'], // link
+            ['[foo]', '<a class="wiki"   href="foo" rel="">wiki-icon-mock foo</a><br />'], // link
             ['[foo|bar]', '<a class="wiki"   href="foo" rel="">bar</a><br />'], // link
 
             ['[[foo', '[foo<br />'], // Square brackets

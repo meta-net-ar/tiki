@@ -274,13 +274,47 @@ class ObjectLib extends TikiLib
             'sheet' => 'sheet',
             'wiki_page' => 'wiki page',
             'wiki page' => 'wiki page',
+            'page' => 'wiki page',
             'template' => 'template',
+            'item' => 'trackeritem',
+            'tracker_item' => 'trackeritem',
         ];
 
         if (isset($supported[$type])) {
             return $supported[$type];
         } else {
             return false;
+        }
+    }
+
+    public function getObjectIconName($type)
+    {
+        $icons = [
+            'article' => 'articles',
+            'blog' => 'blog',
+            'calendar' => 'calendar',
+            'directory' => 'directory',
+            'faq' => 'faq',
+            'file' => 'file',
+            'file gallery' => 'file-gallery',
+            'forum' => 'forum',
+            'perspective' => 'perspective',
+            'poll' => 'poll',
+            'quiz' => 'quiz',
+            'structure' => 'structure',
+            'tracker' => 'admin_trackers',
+            'survey' => 'survey',
+            'trackeritem' => 'admin_trackers',
+            'sheet' => 'sheet',
+            'user' => 'user',
+            'wiki page' => 'wiki',
+            'template' => 'template'
+        ];
+
+        if (isset($icons[$type])) {
+            return $icons[$type];
+        } else {
+            return null;
         }
     }
 
@@ -637,6 +671,11 @@ class ObjectLib extends TikiLib
             if ($info) {
                 return true;
             }
+        } elseif ($type === 'tracker') {
+            $tracker = TikiLib::lib('trk')->get_tracker($objectId);
+            if ($tracker) {
+                return true;
+            }
         }
         return false;
     }
@@ -929,6 +968,8 @@ class ObjectLib extends TikiLib
         $info = $this->get_info($type, $id);
 
         if (isset($info['title'])) {
+            // trigger_error('Getting title for ' . $type . ':' . $id . ' with format ' . $format, E_USER_WARNING);
+            // trigger_error("Info for $type:$id: " . print_r($info, true), E_USER_WARNING);
             return $info['title'];
         }
 
