@@ -440,18 +440,6 @@
                 </div>
             </fieldset>
 
-            <fieldset>
-                <legend class="h3">{tr}Vimeo{/tr}</legend>
-                {preference name=vimeo_upload}
-                {preference name=vimeo_delete}
-                <div class="adminoptionboxchild" id="vimeo_upload_childcontainer">
-                    {preference name=vimeo_default_gallery}
-                    {preference name=vimeo_consumer_key}
-                    {preference name=vimeo_consumer_secret}
-                    {preference name=vimeo_access_token}
-                    {preference name=vimeo_access_token_secret}
-                </div>
-            </fieldset>
         {/tab}
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}

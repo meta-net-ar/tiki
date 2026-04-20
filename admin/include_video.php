@@ -63,6 +63,25 @@ if ($prefs['feature_peertube'] === 'y') {
     $peertubeText = "<div class='adminoptionbox error'>" . tr("PeerTube feature disabled") . "</div>";
 }
 
+$vimeoText = "";
+if ($prefs['vimeo_upload'] === 'y') {
+    $vimeolib = TikiLib::lib('vimeo');
+
+    $result = $vimeolib->testConnection();
+
+    if ($result === true) {
+        $vimeoText = "<div class='adminoptionbox'>" . tr(
+            "Vimeo instance is reachable with correct API credentials. Visit <a href='%0'>the video list</a>.",
+            'tiki-list_vimeo_entries.php'
+        ) . "</div>";
+    } else {
+        $vimeoText = "<div class='adminoptionbox error'>" . $result . "</div>";
+    }
+} else {
+    $vimeoText = "<div class='adminoptionbox error'>" . tr("Vimeo feature disabled") . "</div>";
+}
+
 $smarty->assign('kcwText', $kcwText);
 $smarty->assign('kplayerlist', $kplayerlist);
 $smarty->assign('peertubeText', $peertubeText);
+$smarty->assign('vimeoText', $vimeoText);

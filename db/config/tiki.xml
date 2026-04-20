@@ -341,8 +341,8 @@
         <service id="tiki.lib.vuejs" class="VueJsLib">
             <file>%kernel.root_dir%/lib/vue/vuejslib.php</file>
         </service>
-        <service id="tiki.lib.vimeo" class="Tiki\Lib\Filegals\VimeoLib">
-            <argument type="service" id="tiki.lib.oauth"/>
+        <service id="tiki.lib.vimeo" class="Tiki\Videogals\VimeoLib">
+            <file>%kernel.root_dir%/lib/videogals/vimeolib.php</file>
         </service>
         <service id="tiki.lib.xmpp" class="XMPPLib">
             <file>%kernel.root_dir%/lib/xmpp/xmpplib.php</file>

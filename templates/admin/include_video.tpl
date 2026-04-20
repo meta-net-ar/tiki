@@ -108,6 +108,33 @@
                 {tr}No Client ID or Client Secret is required in this interface.{/tr}
             {/remarksbox}
         {/tab}
+        {tab name="{tr}Vimeo{/tr}"}
+            <br> 
+            {if $vimeoText}
+                {remarksbox type="info" title="{tr}Vimeo Configuration Status{/tr}"}
+                    <div class="mb-3">{$vimeoText}</div>
+                {/remarksbox}
+            {/if}
+
+            {button _text="{tr}List Videos{/tr}" href="tiki-list_vimeo_entries.php"}
+
+            <div class="row">
+                <div class="mb-3 col-lg-12 clearfix">
+                    {include file='admin/include_apply_top.tpl'}
+                </div>
+            </div>
+            <fieldset>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
+                {preference name=vimeo_upload visible="always"}
+            </fieldset>
+            <br>
+            <fieldset>
+                <legend class="h3">{tr}Vimeo settings{/tr}</legend>
+                {preference name=vimeo_consumer_key}
+                {preference name=vimeo_consumer_secret}
+                {preference name=vimeo_access_token}
+            </fieldset>
+        {/tab}
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}
 </form>

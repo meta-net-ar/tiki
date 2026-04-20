@@ -134,7 +134,7 @@ namespace PHPSTORM_META {
             'userprefs'                  => \UserPrefsLib::class,
             'validators'                 => \Validators::class,
             'vuejs'                      => \VueJsLib::class,
-            'vimeo'                      => \Tiki\Lib\Filegals\VimeoLib::class,
+            'vimeo'                      => \Tiki\Videogals\VimeoLib::class,
             'xmpp'                       => \XMPPLib::class,
             'wiki'                       => \WikiLib::class,
             'wizard'                     => \WizardLib::class,

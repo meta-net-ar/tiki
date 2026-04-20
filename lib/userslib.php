@@ -5029,7 +5029,7 @@ class UsersLib extends TikiLib
                 'level' => 'registered',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura', 'feature_peertube'],
+                'prefs' => ['feature_kaltura', 'feature_peertube', 'vimeo_upload'],
                 'scope' => 'global',
             ],
             [
@@ -5038,7 +5038,7 @@ class UsersLib extends TikiLib
                 'level' => 'editors',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura', 'feature_peertube'],
+                'prefs' => ['feature_kaltura', 'feature_peertube', 'vimeo_upload'],
                 'scope' => 'global',
             ],
             [
@@ -5047,7 +5047,7 @@ class UsersLib extends TikiLib
                 'level' => 'editors',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura', 'feature_peertube'],
+                'prefs' => ['feature_kaltura', 'feature_peertube', 'vimeo_upload'],
                 'scope' => 'global',
             ],
             [
@@ -5056,7 +5056,7 @@ class UsersLib extends TikiLib
                 'level' => 'basic',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura', 'feature_peertube'],
+                'prefs' => ['feature_kaltura', 'feature_peertube', 'vimeo_upload'],
                 'scope' => 'global',
             ],
             [
@@ -5065,7 +5065,7 @@ class UsersLib extends TikiLib
                 'level' => 'basic',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura', 'feature_peertube'],
+                'prefs' => ['feature_kaltura', 'feature_peertube', 'vimeo_upload'],
                 'scope' => 'global',
             ],
             [
@@ -5074,7 +5074,7 @@ class UsersLib extends TikiLib
                 'level' => 'basic',
                 'type' => 'media',
                 'admin' => false,
-                'prefs' => ['feature_kaltura', 'feature_peertube'],
+                'prefs' => ['feature_kaltura', 'feature_peertube', 'vimeo_upload'],
                 'scope' => 'global',
             ],
             [
