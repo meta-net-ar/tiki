@@ -25,6 +25,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
             // NOTE: Keep the list alphabetically sorted.
             //IMPORTANT:  All these have to be ESM modules, TEST them, don't assume that they are.
             "imports" => [
+                "@tiki/editor-toolbar/fileRecording" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/editor-toolbar/fileRecording.js",
                 "@tiki/plugin-base/buttonParamHandler" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugin-base/buttonParamHandler.js",
                 "@tiki/plugin-base/registerFieldDependency" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugin-base/registerFieldDependency.js",
                 "@tiki/plugins/bigbluebutton" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/bigbluebutton.js",
@@ -183,7 +184,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-widgets/el-select" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/select.js",
                 "@vue-widgets/el-slider" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/slider.js",
                 "@vue-widgets/el-transfer" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/transfer.js",
-                "@vue-widgets/el-backtop" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/backTop.js",
+                "@vue-widgets/el-backtop" => $tikiUrl . JS_ASSETS_PATH . "/element-plus-ui/backtop.js",
 
                 /* src/js/wysiwyg */
                 "@wysiwyg/summernote" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg/summernote.js",

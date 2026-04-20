@@ -131,8 +131,7 @@ class UserMenuLib extends TikiLib
             $query = 'insert into `tiki_user_menus`(`user`,`name`,`url`,`position`,`mode`) values(?,?,?,?,?)';
 
             $this->query($query, [$user, $name, $url, $position, $mode]);
-            $Id = $this->getOne('select max(`menuId`) from `tiki_user_menus` where `user`=? and `url`=? and `name`=?', [$user, $url, $name]);
-            return $Id;
+            return $this->lastInsertId();
         }
     }
 

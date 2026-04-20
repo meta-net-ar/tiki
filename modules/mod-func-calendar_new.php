@@ -235,7 +235,7 @@ function module_calendar_new($mod_reference, $module_params)
         $smarty->assign('returnURL', $current_url);
         $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
         $smarty->assign('defaultCalendarId', $defaultCalendarId);
-
+        $smarty->assign('uniqueId', rand());
         $smarty->assign('show_calendar_module', 'y');
         if (isset($save_todate)) {
             $_REQUEST['todate'] = $save_todate;

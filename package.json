@@ -57,11 +57,13 @@
     },
     "dependencies" : {
         "single-spa-css" : "^4.0.1",
-        "single-spa-vue" : "^3.0.1"
+        "single-spa-vue" : "^3.0.1",
+        "ui-predicate-vue3" : "1.1.0"
     },
     "depencenciesComment" : {
         "single-spa-css" : "https://github.com/single-spa/single-spa-css/releases",
-        "single-spa-vue" : "https://github.com/single-spa/single-spa-vue/releases"
+        "single-spa-vue" : "https://github.com/single-spa/single-spa-vue/releases",
+        "ui-predicate-vue3" : "https://www.npmjs.com/package/ui-predicate-vue3 — Vue 3 adapter for ui-predicate (replaces vendored lib in vue-mf/tracker-rules)"
     },
     "devDependencies" : {
         "@commitlint/cli" : "^20.2.0",

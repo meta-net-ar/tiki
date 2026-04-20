@@ -758,7 +758,7 @@ class Comments extends TikiLib
         if ($threadId) {
             $timestamp = (int) $this->table('tiki_comments')->fetchOne('commentDate', ['threadId' => $threadId]);
         } else {
-            $timestamp = (int) $this->now;
+            $timestamp = $this->now;
         }
 
         $queue = $this->table('tiki_forums_queue');
@@ -3575,6 +3575,8 @@ class Comments extends TikiLib
         }
         global $prefs;
 
+        // Remove file recordings of this comment
+        TikiLib::lib('filegal')->deleteObjectFiles('comment', $threadId, 'tiki.comment.recording');
         $this->delete_forum_deliberations($threadId);
 
         $comments = $this->table('tiki_comments');

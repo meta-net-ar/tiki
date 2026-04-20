@@ -534,6 +534,10 @@ class ModLib extends TikiLib
         $section = Sections::getCurrentSection();
         $tikilib = TikiLib::lib('tiki');
 
+        if (! isset($prefs['module_' . $module["name"]])) {
+            return false;
+        }
+
         if ($prefs['module_' . $module["name"]] != 'y') {
             return false;
         }
@@ -546,7 +550,7 @@ class ModLib extends TikiLib
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
-        $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN);
+        $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT);
 
         if (
             $prefs['theme_unified_admin_backend'] === 'y'
@@ -678,7 +682,7 @@ class ModLib extends TikiLib
 
         if ($prefs['cookie_consent_feature'] == 'y' && $prefs['cookie_consent_disable'] !== 'y') {      // check if consent required to show
             if (! empty($params['cookie_consent']) && $params['cookie_consent'] === 'y') {
-                if (! CookieConsentLib::checkAllowedCookieCategory(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
+                if (! CookieConsentLib::isCategoryAllowed(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
                     return false;
                 }
             }

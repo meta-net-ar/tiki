@@ -63,7 +63,7 @@ class Tiki_Profile_Writer_SearchFieldHelper
             $trklib = TikiLib::lib('trk');
             $field = $trklib->get_field_by_perm_name($args['field']);
             if ($field && isset($field['type']) && $field['type'] == 'e') { // category field
-                $args['value'] = Tiki_profile_Writer_Helper::uniform_string('category', $writer, $args['value']);
+                $args['value'] = Tiki_Profile_Writer_Helper::uniform_string('category', $writer, $args['value']);
             }
         }
 

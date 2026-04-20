@@ -257,6 +257,9 @@ const handleReset = () => {
     conditionsOutput.value = "";
     actionOutput.value = "";
     elseOutput.value = "";
+    conditionsData.value = "";
+    actionsData.value = "";
+    elseData.value = "";
 
     // $(trackerPredicateRef.value).find(".card-body:not(.tips)").empty();
 }

@@ -11,20 +11,20 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'parent'                      => 'int',               //post
-            'categId'                     => 'int',               //get
-            'remove'                      => 'int',               //post
-            'save'                        => 'bool',              //post
-            'allowSites'                  => 'bool',              //post
-            'showCount'                   => 'bool',              //post
-            'name'                        => 'string',            //post
-            'description'                 => 'xss',               //post
-            'childrenType'                => 'string',            //post
-            'viewableChildren'            => 'string',            //post
-            'editorGroup'                 => 'string',            //post
-            'offset'                      => 'int',               //get
-            'find'                        => 'string',            //post
-            'sort_mode'                   => 'string',            //get
+            'parent'                      => 'int',       // post
+            'categId'                     => 'int',       // get
+            'remove'                      => 'int',       // post
+            'save'                        => 'bool',      // post
+            'allowSites'                  => 'word',      // post
+            'showCount'                   => 'word',      // post
+            'name'                        => 'striptags', // post
+            'description'                 => 'striptags', // post
+            'childrenType'                => 'string',     // post
+            'viewableChildren'            => 'digits',    // post
+            'editorGroup'                 => 'groupname', // post
+            'offset'                      => 'int',       // get
+            'find'                        => 'striptags', // post
+            'sort_mode'                   => 'word',       // get
         ],
     ],
 ];

@@ -174,10 +174,10 @@ function get_default_prefs()
                 style, fontname, fontsize, outdent, indent /
             ',
             'toolbar_global_comments' => '
-                bold, italic, underline, strike , - , link, smiley | help
+                bold, italic, underline, strike , - , link, smiley, filerecording | help
             ',
             'toolbar_trackers_comments' => '
-                bold, italic, underline, strike , - , link, smiley, linkfile | help
+                bold, italic, underline, strike , - , link, smiley, linkfile, filerecording | help
             ',
             'toolbar_sheet' => 'addrow, addrowbefore, addrowmulti, deleterow,-, addcolumn, addcolumnbefore, addcolumnmulti, deletecolumn,-,
                                 sheetgetrange, sheetrefresh, -, sheetfind | sheetclose, sheetsave, help/
@@ -200,6 +200,7 @@ function get_default_prefs()
             'shoutbox_autolink' => 'n',
             'show_comzone' => 'n',
             'use_proxy' => 'n',
+            'use_rss_proxy' => 'n',
             'webserverauth' => 'n',
 
             'feature_intertiki_imported_groups' => '',

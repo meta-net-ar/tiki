@@ -183,5 +183,17 @@ function prefs_calendar_list()
             'default' => '',
             'profile_reference' => 'calendar',
         ],
+        'calendar_attachments_galleryId' => [
+            'name' => tra('Attachments File Gallery'),
+            'description' => tra('File gallery to store calendar event attachments. Leave empty to use the root file gallery.'),
+            'type' => 'text',
+            'filter' => 'int',
+            'size' => 5,
+            'default' => '',
+            'profile_reference' => 'file_gallery',
+            'dependencies' => [
+                'feature_file_galleries',
+            ],
+        ],
     ];
 }

@@ -3,7 +3,7 @@
            name="{$field.ins_id}" id="{$field.ins_id}" value="{$field.value|escape}" size="60"
            {if $data.strictValidationEnabled}data-url-wiki-wrapper-validation-input=""
            data-url-wiki-wrapper-feedback-id="{$field.ins_id}_wikiSyntaxLive"{/if}
-           {if !empty($field.options_map.labelasplaceholder)}placeholder="{$field.name}"{/if}
+           {if !empty($field.options_map.labelasplaceholder)}placeholder="{tr}{$field.name}{/tr}"{/if}
     >
     {if $field.options_map.labelasplaceholder and $field.isMandatory eq 'y'}
         <span class="input-group-text">

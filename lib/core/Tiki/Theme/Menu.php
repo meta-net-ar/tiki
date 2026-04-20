@@ -71,10 +71,7 @@ class Menu
         if ($searchMenu['count'] == 1) {
             $menuId = $searchMenu['data'][0]['menuId'];
         }
-        $menuLib->replace_menu($menuId, $data['name'], $data['description'], $type, $data['icon'], $data['use_items_icons'], $data['parse']);
-        $result = $tikiLib->query("SELECT MAX(`menuId`) FROM `tiki_menus`");
-        $resultRow = $result->fetchRow();
-        $menuId = reset($resultRow);
+        $menuId = $menuLib->replace_menu($menuId, $data['name'], $data['description'], $type, $data['icon'], $data['use_items_icons'], $data['parse']);
 
         if (empty($menuId)) {
             return false;

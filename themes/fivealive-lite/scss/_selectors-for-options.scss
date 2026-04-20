@@ -6,6 +6,11 @@ $imagePath: "../images/";
 //    background-image: url('#{$imagePath}bg.jpg');
 
 // Copied from base_files/scss/_tiki-selectors.scss (which these child themes don't import)
+
+.tiki .popover {
+    z-index: $zindex-popover; // 1070
+}
+
 .tiki .wiki.external + .icon-link-external, // wikitext
 .tiki .wiki.external .icon-link-external,
 .editable-inline .icon { // Tracker inline editing
@@ -153,4 +158,10 @@ a.flipmoduletitle,
     .card { color: #dee2e6; background: #262626; }
     a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link { color: $tiki-dark-footer-link-color; }
     a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover { color: $tiki-dark-footer-link-hover-color; }
+}
+
+
+// Navbar border seems to cause permanent scrollbar on side menu
+.tiki-admin .navbar-wrapper.fixed-top > .navbar-expand-lg {
+    height: calc(100vh - var(--tiki-admin-top-modules-height) - 4px)
 }

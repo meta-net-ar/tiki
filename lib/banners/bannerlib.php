@@ -18,7 +18,7 @@ class BannerLib extends TikiLib
         $cookieName = "banner_$zone";
         $mid = '';
         $views = [];
-        $bindvars = ['y', $hour, $hour, 'y', (int) $this->now, (int) $this->now, 'n', -1, -1, $zone];
+        $bindvars = ['y', $hour, $hour, 'y', $this->now, $this->now, 'n', -1, -1, $zone];
 
         if (isset($_COOKIE[$cookieName])) {
             $views = json_decode($_COOKIE[$cookieName]);
@@ -213,155 +213,61 @@ class BannerLib extends TikiLib
         return $res;
     }
 
-    public function replace_banner(
-        $bannerId,
-        $client,
-        $url,
-        $title,
-        $alt,
-        $use,
-        $imageData,
-        $imageType,
-        $imageName,
-        $HTMLData,
-        $fixedURLData,
-        $textData,
-        $fromDate,
-        $toDate,
-        $useDates,
-        $mon,
-        $tue,
-        $wed,
-        $thu,
-        $fri,
-        $sat,
-        $sun,
-        $hourFrom,
-        $hourTo,
-        $maxImpressions,
-        $maxClicks,
-        $zone,
-        $maxUserImpressions = -1,
-        $onlyInURIs = null,
-        $exceptInURIs = null
-    ) {
+    public function replace_banner($bannerId, array $data)
+    {
 
-        $imageData = urldecode($imageData);
-        //$imageData = '';
+        if (isset($data['imageData'])) {
+            $data['imageData'] = urldecode($data['imageData']);
+        }
+        $data['created'] = $this->now;
+
+        $allowedColumns = [
+            'client', 'url', 'title', 'alt', 'which',
+            'imageData', 'imageType', 'imageName',
+            'HTMLData', 'fixedURLData', 'textData',
+            'fromDate', 'toDate', 'useDates',
+            'mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun',
+            'hourFrom', 'hourTo',
+            'maxImpressions', 'maxClicks',
+            'zone', 'maxUserImpressions',
+            'onlyInURIs', 'exceptInURIs',
+            'created'
+        ];
 
         if ($bannerId) {
-            $query = "update `tiki_banners` set
-                `client` = ?,
-                `url` = ?,
-                `title` = ?,
-                `alt` = ?,
-                `which` = ?,
-                `imageData` = ?,
-                `imageType` = ?,
-                `imageName` = ?,
-                `HTMLData` = ?,
-                `fixedURLData` = ?,
-                `textData` = ?,
-                `fromDate` = ?,
-                `toDate` = ?,
-                `useDates` = ?,
-                `created` = ?,
-                `zone` = ?,
-                `hourFrom` = ?,
-                `hourTo` = ?,
-                `mon` = ? ,`tue` = ?, `wed` = ?, `thu` = ?, `fri` = ?, `sat` = ?, `sun` = ?,
-                `maxImpressions` = ?, `maxUserImpressions`=?, `maxClicks` = ?, `onlyInURIs`=?, `exceptInURIs`=? where `bannerId`=?";
+            $setParts = [];
+            $bindvars = [];
 
-            $bindvars = [
-                                $client,
-                                $url,
-                                $title,
-                                $alt,
-                                $use,
-                                $imageData,
-                                $imageType,
-                                $imageName,
-                                $HTMLData,
-                                $fixedURLData,
-                                $textData,
-                                $fromDate,
-                                $toDate,
-                                $useDates,
-                                $this->now,
-                                $zone,
-                                $hourFrom,
-                                $hourTo,
-                                $mon,
-                                $tue,
-                                $wed,
-                                $thu,
-                                $fri,
-                                $sat,
-                                $sun,
-                                $maxImpressions,
-                                $maxUserImpressions,
-                                $maxClicks,
-                                $onlyInURIs,
-                                $exceptInURIs,
-                                $bannerId
-            ];
+            foreach ($data as $column => $value) {
+                if (! in_array($column, $allowedColumns, true)) {
+                    continue;
+                }
+                $setParts[] = "`$column` = ?";
+                $bindvars[] = $value;
+            }
 
-            $result = $this->query($query, $bindvars);
+            $bindvars[] = (int) $bannerId;
+            $query = "UPDATE `tiki_banners` SET " . implode(', ', $setParts) . " WHERE `bannerId` = ?";
+
+            $this->query($query, $bindvars);
 
             /* invalid cache */
-            global $tikilib, $tikidomain, $prefs;
-            $bannercachefile = $prefs['tmpDir'];
-            if ($tikidomain) {
-                $bannercachefile .= "/$tikidomain";
+            global $tikidomain, $prefs;
+            $cacheFile = $prefs['tmpDir'] . ($tikidomain ? "/$tikidomain" : "") . "/banner." . (int)$bannerId;
+
+            if (file_exists($cacheFile)) {
+                unlink($cacheFile);
             }
-            $bannercachefile .= "/banner." . (int)$bannerId;
-            unlink($bannercachefile);
         } else {
-            $query = "insert into `tiki_banners`(`client`, `url`, `title`, `alt`, `which`, `imageData`, `imageType`, `HTMLData`," .
-                            " `fixedURLData`, `textData`, `fromDate`, `toDate`, `useDates`, `mon`, `tue`, `wed`, `thu`, `fri`, `sat`, `sun`," .
-                            " `hourFrom`, `hourTo`, `maxImpressions`,`maxUserImpressions`,`maxClicks`,`created`,`zone`,`imageName`," .
-                            " `impressions`,`clicks`, `onlyInURIs`, `exceptInURIs`)" .
-                            " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            $data['impressions'] = 0;
+            $data['clicks'] = 0;
+            $columns = "`" . implode("`, `", array_keys($data)) . "`";
+            $placeholders = implode(", ", array_fill(0, count($data), "?"));
+            $bindvars = array_values($data);
+            $query = "INSERT INTO `tiki_banners` ($columns) VALUES ($placeholders)";
 
-            $bindvars = [
-                                    $client,
-                                    $url,
-                                    $title,
-                                    $alt,
-                                    $use,
-                                    $imageData,
-                                    $imageType,
-                                    $HTMLData,
-                                    $fixedURLData,
-                                    $textData,
-                                    $fromDate,
-                                    $toDate,
-                                    $useDates,
-                                    $mon,
-                                    $tue,
-                                    $wed,
-                                    $thu,
-                                    $fri,
-                                    $sat,
-                                    $sun,
-                                    $hourFrom,
-                                    $hourTo,
-                                    $maxImpressions,
-                                    $maxUserImpressions,
-                                    $maxClicks,
-                                    $this->now,
-                                    $zone,
-                                    $imageName,
-                                    0,
-                                    0,
-                                    $onlyInURIs,
-                                    $exceptInURIs
-            ];
-
-
-            $result = $this->query($query, $bindvars);
-            $query = "select max(`bannerId`) from `tiki_banners` where `created`=?";
-            $bannerId = $this->getOne($query, [(int)$this->now]);
+            $this->query($query, $bindvars);
+            $bannerId = $this->lastInsertId();
         }
 
         return $bannerId;
@@ -369,10 +275,8 @@ class BannerLib extends TikiLib
 
     public function banner_add_zone($zone)
     {
-        $query = "delete from `tiki_zones` where `zone`=?";
-        $this->query($query, [$zone], -1, -1, false);
-        $query = "insert into `tiki_zones`(`zone`) values(?)";
-        $result = $this->query($query, [$zone]);
+        $query = "INSERT IGNORE INTO `tiki_zones` (`zone`) VALUES (?)";
+        $this->query($query, [$zone]);
         return true;
     }
 
@@ -380,14 +284,7 @@ class BannerLib extends TikiLib
     {
         $query = "select * from `tiki_zones`";
 
-        $result = $this->query($query, []);
-        $ret = [];
-
-        while ($res = $result->fetchRow()) {
-            $ret[] = $res;
-        }
-
-        return $ret;
+        return $this->fetchAll($query);
     }
 
     public function banner_remove_zone($zone)
@@ -396,6 +293,6 @@ class BannerLib extends TikiLib
 
         $result = $this->query($query, [$zone]);
 
-        return true;
+        return ($result && $result->numRows());
     }
 }

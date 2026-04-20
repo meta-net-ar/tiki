@@ -63,6 +63,16 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
                             1 => tr('Yes'),
                         ],
                     ],
+                    'overridable' => [
+                        'name' => tr('Overridable'),
+                        'description' => tr('Allow the value to be overridden by the user. Use with caution.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                    ],
                 ],
             ],
         ];
@@ -116,7 +126,7 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
         $value = false;
         if ($this->getOption('itemId') == 'itemId') {
             $value = $this->getItemId();
-        } elseif (is_null($oldValue)) {
+        } elseif (is_null($oldValue) || ($this->getOption('overridable') && ! $value)) {
             $value = $this->syncFromSource();
             if ($value === false) {
                 $value = TikiLib::lib('trk')->get_maximum_value($this->getConfiguration('fieldId'));

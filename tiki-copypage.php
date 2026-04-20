@@ -12,14 +12,14 @@ $section_class = "tiki_wiki_page manage";   // This will be body class instead o
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'page'                         => 'pagename',          //get
-            'version'                      => 'string',            //get
-            'copy'                         => 'bool',              //post
-            'confirm'                      => 'bool',              //post
-            'badname'                      => 'pagename',          //post
-            'newpage'                      => 'pagename',          //post
-            'dupCateg'                     => 'bool',              //post
-            'dupTags'                      => 'bool',              //post
+            'page'                         => 'pagename',          // get
+            'version'                      => 'word',               // get
+            'copy'                         => 'bool',              // post
+            'confirm'                      => 'bool',              // post
+            'badname'                      => 'pagename',          // post
+            'newpage'                      => 'pagename',          // post
+            'dupCateg'                     => 'word',              // post
+            'dupTags'                      => 'word',              // post
         ],
     ],
 ];
@@ -73,8 +73,9 @@ if (isset($_REQUEST["copy"]) || isset($_REQUEST["confirm"])) {
     if (stristr($newName, $prefs['feature_wiki_userpage_prefix']) == $newName) {
         Feedback::errorAndDie(tra("Cannot rename page because the new name begins with reserved prefix") . ' (' . $prefs['feature_wiki_userpage_prefix'] . ').', \Laminas\Http\Response::STATUS_CODE_409);
     }
-    $dupCateg = isset($_REQUEST['dupCateg']) && $_REQUEST['dupCateg'] === 'y';
-    $dupTags = isset($_REQUEST['dupTags']) && $_REQUEST['dupTags'] === 'y';
+
+    $dupCateg = ! empty($_REQUEST['dupCateg']);
+    $dupTags = ! empty($_REQUEST['dupTags']);
 
     $smarty->assign('newname', $newName);
     $result = false;

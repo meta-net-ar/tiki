@@ -65,7 +65,7 @@ class PhpCAS
         $nyholm = new Psr17Factory();
         $psr17  = new Psr17($nyholm, $nyholm, $nyholm, $nyholm, $nyholm, $nyholm);
 
-        $laminasClient = \Tikilib::lib('tiki')->get_http_client();
+        $laminasClient = \TikiLib::lib('tiki')->get_http_client();
         if ($serverValidation === false && method_exists($laminasClient, 'setOptions')) {
             $laminasClient->setOptions([
                 'sslverifypeer' => false,
@@ -232,7 +232,7 @@ class PhpCAS
             $qs  = http_build_query(['format' => 'JSON', 'service' => $service, 'ticket' => $ticket], '', '&', PHP_QUERY_RFC3986);
             $url = rtrim($baseUrl, '/') . '/p3/serviceValidate?' . $qs;
 
-            $laminas = \Tikilib::lib('tiki')->get_http_client();
+            $laminas = \TikiLib::lib('tiki')->get_http_client();
             if (method_exists($laminas, 'setOptions')) {
                 $laminas->setOptions(['maxredirects' => 0, 'timeout' => 30]);
             }

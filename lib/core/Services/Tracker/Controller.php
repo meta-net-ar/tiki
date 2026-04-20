@@ -1419,6 +1419,7 @@ class Services_Tracker_Controller
                         'data' => $input->data->wikicontent(),
                         'return_url' => $input->redirect->none(),
                         'version' => $version,
+                        'related_files' => $input->related_files->raw(),
                     ]));
                 }
 
@@ -1593,6 +1594,9 @@ class Services_Tracker_Controller
             if (isset($f['files'])) {
                 $fieldsProcessed[$permName] = ['files' => $f['files']];
             }
+            if (isset($f['articleIds'])) {
+                $fieldsProcessed[$permName]['articleIds'] = $f['articleIds'];
+            }
         }
 
         $fieldDefinitions = $definition->getFields();
@@ -1701,6 +1705,9 @@ class Services_Tracker_Controller
                 }
                 if (isset($fieldsProcessed[$permName]['files'])) {
                     $field['files'] = $fieldsProcessed[$permName]['files'];
+                }
+                if (isset($fieldsProcessed[$permName]['articleIds'])) {
+                    $field['articleIds'] = $fieldsProcessed[$permName]['articleIds'];
                 }
             }
         }

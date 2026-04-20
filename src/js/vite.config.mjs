@@ -100,7 +100,7 @@ export default defineConfig(({ command, mode }) => {
     addGlobEntries(rollupInput, [
         { prefix: "jquery-tiki/", src: "src/js/jquery-tiki" },
         { prefix: "common-reexported/", src: "src/js/common-reexported" },
-        { prefix: "MOVE_THIS_CONTENT_ELSEWHERE/", src: "src/js/MOVE_THIS_CONTENT_ELSEWHERE" },
+        { prefix: "@tiki/editor-toolbar/", src: "src/js/@tiki/editor-toolbar" },
         { prefix: "@tiki/plugin-base/", src: "src/js/@tiki/plugin-base" },
         { prefix: "@tiki/plugins/", src: "src/js/@tiki/plugins" },
         { prefix: "@tiki/tracker-field-base/", src: "src/js/@tiki/tracker-field-base" },
@@ -154,7 +154,17 @@ export default defineConfig(({ command, mode }) => {
         resolve: {
             alias: {
                 "moment-timezone": resolve(__dirname, "../../node_modules/moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js"),
-                "html2canvas": "html2canvas-pro"
+                "html2canvas": "html2canvas-pro",
+                // ui-predicate-vue3
+                "ui-predicate-vue3/dist/ui-predicate-vue3.css": resolve(
+                    __dirname,
+                    "../../node_modules/ui-predicate-vue3/dist/ui-predicate-vue3.css"
+                ),
+                // npm "main" is Parcel IIFE assigning to undeclared parcelRequire — invalid in ESM (strict). Bundle CJS sources.
+                "ui-predicate-core": resolve(
+                    __dirname,
+                    "../../node_modules/ui-predicate-core/src/index.js"
+                ),
             },
         },
         build: {

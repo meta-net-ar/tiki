@@ -54,7 +54,7 @@
         {/if}
         <h2>{tr}Assigned Modules{/tr}</h2>
         <div class="mb-4">
-            {button edit_assign=0 cookietab=1 href="#assign" _auto_args="edit_assign,cookietab" _text="{tr}Assign new module{/tr}"}
+            {button edit_assign=0 cookietab=2 href="#assign" _auto_args="edit_assign,cookietab" _text="{tr}Assign new module{/tr}"}
         </div>
 
         <div id="assigned_modules">

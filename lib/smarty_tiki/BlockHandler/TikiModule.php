@@ -58,9 +58,8 @@ class TikiModule extends Base
         }
         if (! isset($name)) {
             $name  = $title;
-        } else {
-            $name  = $name;
         }
+
         $name = urlencode($name);
         if (! isset($flip) || ($flip != 'y' && $flip != 'yc')) {
             $flip = 'n';

@@ -8,7 +8,7 @@ function wikiplugin_transclude_info()
 {
     return [
         'name' => tra('Transclude'),
-        'documentation' => tra('PluginTransclude'),
+        'documentation' => 'PluginTransclude',
         'description' => tra('Include the content of another page with certain changes'),
         'prefs' => ['wikiplugin_transclude', 'feature_wiki'],
         'extraparams' => true,

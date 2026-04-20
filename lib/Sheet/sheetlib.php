@@ -367,7 +367,7 @@ class SheetLib extends TikiLib
                     Feedback::error(tra('A sheet with the same title and description already exists.'));
                 } else {
                     $this->query("INSERT INTO `tiki_sheets` ( `title`, `description`, `author` ) VALUES( ?, ?, ? )", [$title, $description, $author]);
-                    $sheetId = $this->getOne("SELECT MAX(`sheetId`) FROM `tiki_sheets` WHERE `author` = ?", [$author]);
+                    $sheetId = $this->lastInsertId();
                     if ($prefs['feature_actionlog'] == 'y') {
                         $logslib = TikiLib::lib('logs');
                         $query = 'select `sheetId` from `tiki_sheets` where `title`=? and `description`= ? and `author`=?';
@@ -524,7 +524,7 @@ class SheetLib extends TikiLib
             WHERE `sheetid` = ?
         ", [$user, $parentSheetId, $sheetId]);
 
-        $newSheetId = $this->getOne("SELECT MAX(`sheetId`) FROM `tiki_sheets` WHERE `author` = ?", [$user]);
+        $newSheetId = $this->lastInsertId();
         //clone the sheet layout
         $this->query("
             INSERT INTO `tiki_sheet_layout` (`sheetId`, `begin`, `end`, `headerRow`, `footerRow`, `className`, `parseValues`, `clonedSheetId`)

@@ -281,12 +281,14 @@ class Utilities
                 $lastOccurence = 0;
             }
         }
-
+        // Calculate the duration of the event
+        $duration = $lastOccurence - $firstOccurence;
         $result = [
             'start'          => $firstOccurence,
             'end'            => $lastOccurence,
             'rec'            => $rec,
             'uid'            => strval($component->UID),
+            'duration'       => $duration,
         ];
 
         $convertToString = function ($component_prop) {

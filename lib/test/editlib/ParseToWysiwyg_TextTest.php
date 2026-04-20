@@ -185,6 +185,7 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
      */
     public function testNumberedHeadings(): void
     {
+        // Legacy expectations to keep backward compatibility intact.
         $inData = '!#Heading Level 1';
         $ex = '<h1 class="showhide_heading d-flex justify-content-start" id="Heading_Level_1">1. Heading Level&nbsp;1</h1>';
         $out = trim($this->el->parseToWysiwyg($inData));
@@ -222,6 +223,92 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         $inData .= '!!!!!!#Heading Level 6';
         $ex .= "\n";
         $ex .= '<h6 class="showhide_heading d-flex justify-content-start" id="Heading_Level_6">1.1.1.1.1.1. Heading Level&nbsp;6</h6>';
+        $out = trim($this->el->parseToWysiwyg($inData));
+        $this->assertEquals($ex, $out);
+
+        // Additional coverage validating extended numbering behavior.
+        $inData = <<<TEST
+!# title 1
+!!# title 1.1
+!!!# title 1.2
+!!!!# title 1.3
+!!!!!# title 1.4
+!!!!!!# title 1.4
+!# title 2
+!!# title 2.1
+TEST;
+        $ex = <<<EX
+<h1 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1</h1>
+<h2 class="showhide_heading d-flex justify-content-start" id="title_1.1">1.1. title&nbsp;1.1</h2>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_1.2">1.1.1. title&nbsp;1.2</h3>
+<h4 class="showhide_heading d-flex justify-content-start" id="title_1.3">1.1.1.1. title&nbsp;1.3</h4>
+<h5 class="showhide_heading d-flex justify-content-start" id="title_1.4">1.1.1.1.1. title&nbsp;1.4</h5>
+<h6 class="showhide_heading d-flex justify-content-start" id="title_1.4_2">1.1.1.1.1.1. title&nbsp;1.4</h6>
+<h1 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2</h1>
+<h2 class="showhide_heading d-flex justify-content-start" id="title_2.1">2.1. title&nbsp;2.1</h2>
+EX;
+        $out = trim($this->el->parseToWysiwyg($inData));
+        $this->assertEquals($ex, $out);
+
+        // Any highest level heading should have a number 1
+        $inData = <<<TEST
+!!!# title 1
+!!!!# title 1.1
+!!!!# title 1.2
+!!!# title 2
+!!!# title 2.1
+TEST;
+        $ex = <<<EX
+<h3 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1</h3>
+<h4 class="showhide_heading d-flex justify-content-start" id="title_1.1">1.1. title&nbsp;1.1</h4>
+<h4 class="showhide_heading d-flex justify-content-start" id="title_1.2">1.2. title&nbsp;1.2</h4>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2</h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_2.1">3. title&nbsp;2.1</h3>
+EX;
+        $out = trim($this->el->parseToWysiwyg($inData));
+        $this->assertEquals($ex, $out);
+
+        // Heading reset so it starts from 1
+        $inData = <<<TEST
+!!!# title 1
+!!!# title 2
+!!!#) title 1
+!!!# title 2
+TEST;
+        $ex = <<<EX
+<h3 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1</h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2</h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_1_2">1. title&nbsp;1</h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_2_2">2. title&nbsp;2</h3>
+EX;
+        $out = trim($this->el->parseToWysiwyg($inData));
+        $this->assertEquals($ex, $out);
+
+        // More complex example combining numbered and unnumbered headings
+        $inData = <<<TEST
+! Unnumbered Heading
+!!# title 1
+!!!# title 1.1
+!!!!# title 1.2
+!!# title 2
+!!!# title 2
+
+!!!#) Title 1
+!!!# Title 2
+!!!!!# Title 1.2.1.1.
+TEST;
+        $ex = <<<EX
+<h1 class="showhide_heading d-flex justify-content-start" id="Unnumbered_Heading"> Unnumbered Heading</h1>
+<h2 class="showhide_heading d-flex justify-content-start" id="title_1">1. title&nbsp;1</h2>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_1.1">1.1. title&nbsp;1.1</h3>
+<h4 class="showhide_heading d-flex justify-content-start" id="title_1.2">1.1.1. title&nbsp;1.2</h4>
+<h2 class="showhide_heading d-flex justify-content-start" id="title_2">2. title&nbsp;2</h2>
+<h3 class="showhide_heading d-flex justify-content-start" id="title_2_2">2.1. title&nbsp;2</h3>
+<br />
+<h3 class="showhide_heading d-flex justify-content-start" id="Title_1">1.1. Title&nbsp;1</h3>
+<h3 class="showhide_heading d-flex justify-content-start" id="Title_2">1.2. Title&nbsp;2</h3>
+<h5 class="showhide_heading d-flex justify-content-start" id="Title_1.2.1.1.">1.2.1.1. Title&nbsp;1.2.1.1.</h5>
+EX;
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
     }

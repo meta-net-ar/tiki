@@ -284,7 +284,7 @@ class Hm_Output_allow_external_images_setting extends Hm_Output_Module
         if (array_key_exists('allow_external_images', $settings)) {
             $allow_external_images = $settings['allow_external_images'];
         }
-        return '<tr class="general_setting"><td><label class="form-check-label">' . tr('Allow remote image sources') . '</label></td><td><input type="checkbox" class="form-check-input" name="allow_external_images" value="1" ' . ($allow_external_images ? 'checked >' . $reset : '>') . '</td></tr>';
+        return '<tr class="advanced_setting"><td><label class="form-check-label">' . tr('Allow remote image sources') . '</label></td><td><input type="checkbox" class="form-check-input" name="allow_external_images" value="1" ' . ($allow_external_images ? 'checked >' . $reset : '>') . '</td></tr>';
     }
 }
 
@@ -374,20 +374,20 @@ class Hm_Output_enable_oauth2_over_imap_setting extends Hm_Output_Module
         }
 
         return '
-        <tr class="general_setting"><td><label class="form-check-label">' . tr('Enable Oauth2 over IMAP') . '</label></td><td><input type="checkbox" name="tiki_enable_oauth2_over_imap" value="1" class="tiki_enable_oauth2_over_imap form-check-input" ' . ($enable_oauth2_over_imap ? 'checked >' . $reset : '>') . '</td></tr>
-        <tr class="oauth reveal-if-unchecked"><td>' . tr('Gmail Client ID') . '</td><td><textarea class="form-control" name="gmail_client_id">' . $gmail_client_id . '</textarea></td></tr>
-        <tr class="oauth reveal-if-unchecked"><td>' . tr('Gmail Client secret') . '</td><td><textarea class="form-control" name="gmail_client_secret">' . $gmail_client_secret . '</textarea></td></tr>
-        <tr class="oauth reveal-if-unchecked"><td>' . tr('Gmail Client Uri') . '</td><td><textarea class="form-control" name="gmail_client_uri">' . $gmail_client_uri . '</textarea></td></tr>
-        <tr class="reveal-if-unchecked"><td>' . tr('Gmail Auth Uri') . '</td><td><textarea class="form-control" name="gmail_auth_uri">' . $gmail_auth_uri . '</textarea></td></tr>
-        <tr class="reveal-if-unchecked"><td>' . tr('Gmail Token Uri') . '</td><td><textarea class="form-control" name="gmail_token_uri">' . $gmail_token_uri . '</textarea></td></tr>
-        <tr class="reveal-if-unchecked"><td>' . tr('Gmail Refresh Uri') . '</td><td><textarea class="form-control" name="gmail_refresh_uri">' . $gmail_refresh_uri . '</textarea></td></tr>
-        <tr class="oauth reveal-if-unchecked"></tr>
-        <tr class="oauth reveal-if-unchecked"><td>' . tr('Outlook Client ID') . '</td><td><textarea class="form-control" name="outlook_client_id">' . $outlook_client_id . '</textarea></td></tr>
-        <tr class="oauth reveal-if-unchecked"><td>' . tr('Outlook Client secret') . '</td><td><textarea class="form-control" name="outlook_client_secret">' . $outlook_client_secret . '</textarea></td></tr>
-        <tr class="oauth reveal-if-unchecked"><td>' . tr('Outlook Client Uri') . '</td><td><textarea class="form-control" name="outlook_client_uri">' . $outlook_client_uri . '</textarea></td></tr>
-        <tr class="reveal-if-unchecked"><td>' . tr('Outlook Auth Uri') . '</td><td><textarea class="form-control" name="outlook_auth_uri">' . $outlook_auth_uri . '</textarea></td></tr>
-        <tr class="reveal-if-unchecked"><td>' . tr('Outlook Token Uri') . '</td><td><textarea class="form-control" name="outlook_token_uri">' . $outlook_token_uri . '</textarea></td></tr>
-        <tr class="reveal-if-unchecked"><td>' . tr('Outlook Refresh Uri') . '</td><td><textarea class="form-control" name="outlook_refresh_uri">' . $outlook_refresh_uri . '</textarea></td></tr>
+        <tr class="advanced_setting"><td><label class="form-check-label">' . tr('Enable Oauth2 over IMAP') . '</label></td><td><input type="checkbox" name="tiki_enable_oauth2_over_imap" value="1" class="tiki_enable_oauth2_over_imap form-check-input" ' . ($enable_oauth2_over_imap ? 'checked >' . $reset : '>') . '</td></tr>
+        <tr class="oauth reveal-if-unchecked advanced_setting"><td>' . tr('Gmail Client ID') . '</td><td><textarea class="form-control" name="gmail_client_id">' . $gmail_client_id . '</textarea></td></tr>
+        <tr class="oauth reveal-if-unchecked advanced_setting"><td>' . tr('Gmail Client secret') . '</td><td><textarea class="form-control" name="gmail_client_secret">' . $gmail_client_secret . '</textarea></td></tr>
+        <tr class="oauth reveal-if-unchecked advanced_setting"><td>' . tr('Gmail Client Uri') . '</td><td><textarea class="form-control" name="gmail_client_uri">' . $gmail_client_uri . '</textarea></td></tr>
+        <tr class="reveal-if-unchecked advanced_setting"><td>' . tr('Gmail Auth Uri') . '</td><td><textarea class="form-control" name="gmail_auth_uri">' . $gmail_auth_uri . '</textarea></td></tr>
+        <tr class="reveal-if-unchecked advanced_setting"><td>' . tr('Gmail Token Uri') . '</td><td><textarea class="form-control" name="gmail_token_uri">' . $gmail_token_uri . '</textarea></td></tr>
+        <tr class="reveal-if-unchecked advanced_setting"><td>' . tr('Gmail Refresh Uri') . '</td><td><textarea class="form-control" name="gmail_refresh_uri">' . $gmail_refresh_uri . '</textarea></td></tr>
+        <tr class="oauth reveal-if-unchecked advanced_setting"></tr>
+        <tr class="oauth reveal-if-unchecked advanced_setting"><td>' . tr('Outlook Client ID') . '</td><td><textarea class="form-control" name="outlook_client_id">' . $outlook_client_id . '</textarea></td></tr>
+        <tr class="oauth reveal-if-unchecked advanced_setting"><td>' . tr('Outlook Client secret') . '</td><td><textarea class="form-control" name="outlook_client_secret">' . $outlook_client_secret . '</textarea></td></tr>
+        <tr class="oauth reveal-if-unchecked advanced_setting"><td>' . tr('Outlook Client Uri') . '</td><td><textarea class="form-control" name="outlook_client_uri">' . $outlook_client_uri . '</textarea></td></tr>
+        <tr class="reveal-if-unchecked advanced_setting"><td>' . tr('Outlook Auth Uri') . '</td><td><textarea class="form-control" name="outlook_auth_uri">' . $outlook_auth_uri . '</textarea></td></tr>
+        <tr class="reveal-if-unchecked advanced_setting"><td>' . tr('Outlook Token Uri') . '</td><td><textarea class="form-control" name="outlook_token_uri">' . $outlook_token_uri . '</textarea></td></tr>
+        <tr class="reveal-if-unchecked advanced_setting"><td>' . tr('Outlook Refresh Uri') . '</td><td><textarea class="form-control" name="outlook_refresh_uri">' . $outlook_refresh_uri . '</textarea></td></tr>
         ';
     }
 }

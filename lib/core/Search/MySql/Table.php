@@ -64,12 +64,12 @@ class Search_MySql_Table extends TikiDb_Table
     {
         $stopwordTableName = $this->tableName . '_stopwords';
         $escapedStopwordTable = $this->escapeIdentifier($stopwordTableName);
-        $this->db->query("DROP TABLE IF EXISTS $escapedStopwordTable", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
+        $this->db->query("DROP TABLE IF EXISTS $escapedStopwordTable", options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
 
         $tables = $this->indexTables();
         foreach ($tables as $table) {
             $table = $this->escapeIdentifier($table);
-            $this->db->query("DROP TABLE IF EXISTS $table", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
+            $this->db->query("DROP TABLE IF EXISTS $table", options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
         }
 
         $this->definition = false;
@@ -215,7 +215,7 @@ class Search_MySql_Table extends TikiDb_Table
     {
         $tables = $this->indexTables();
         $join = $this->getIndexTablesSqlJoins();
-        if ($result = $this->fetchAll([$this->count()], $conditions, 1, 0, null, $join, options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP])) {
+        if ($result = $this->fetchAll([$this->count()], $conditions, 1, 0, null, $join, options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP])) {
             $result = reset($result);
             if ($result) {
                 return reset($result);
@@ -249,7 +249,7 @@ class Search_MySql_Table extends TikiDb_Table
     {
         $available_fields = TikiLib::lib('unifiedsearch')->getAvailableFields();
         $join = $this->getIndexTablesSqlJoins();
-        $resultset = $this->query($selectFields, $conditions, $numrows, $offset, $orderClause, $join, options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
+        $resultset = $this->query($selectFields, $conditions, $numrows, $offset, $orderClause, $join, options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
         $hasCustomSelect = ! (isset($selectFields[0]) && ($selectFields[0] instanceof TikiDb_Expr) && $selectFields[0]->getQueryPart(null) === '*');
         $result = [];
         while ($row = $resultset->fetchRow()) {
@@ -281,14 +281,14 @@ class Search_MySql_Table extends TikiDb_Table
     public function deleteMultipleIndex(array $conditions)
     {
         $tables = $this->indexTables();
-        $matches = $this->fetchAll(['id'], $conditions, options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
+        $matches = $this->fetchAll(['id'], $conditions, options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
         foreach ($matches as $row) {
             $conditions = ['id' => $row['id']];
             foreach ($tables as $table) {
                 $bindvars = [];
                 $query = "DELETE FROM {$this->escapeIdentifier($table)}";
                 $query .= $this->buildConditions($conditions, $bindvars);
-                $this->db->queryException($query, $bindvars, options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
+                $this->db->queryException($query, $bindvars, options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
             }
         }
     }
@@ -302,7 +302,7 @@ class Search_MySql_Table extends TikiDb_Table
                 $tableName = $this->tableName;
             }
             $tables = [$tableName];
-            $result = $this->db->fetchAll("SHOW TABLES LIKE '" . $tableName . "_%'", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
+            $result = $this->db->fetchAll("SHOW TABLES LIKE '" . $tableName . "_%'", options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
 
             $partitions = array_filter(
                 array_map(fn($row) => array_shift($row), $result),
@@ -331,7 +331,7 @@ class Search_MySql_Table extends TikiDb_Table
 
         $tables = $this->indexTables();
         foreach ($tables as $table) {
-            $result = $this->db->fetchAll("DESC {$this->escapeIdentifier($table)}", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
+            $result = $this->db->fetchAll("DESC {$this->escapeIdentifier($table)}", options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
             foreach ($result as $row) {
                 $this->definition[$this->tfTranslator->normalize($row['Field'])] = [
                     'table' => $table,
@@ -340,7 +340,7 @@ class Search_MySql_Table extends TikiDb_Table
                 $this->tableFields[$table][] = $this->tfTranslator->normalize($row['Field']);
             }
 
-            $result = $this->db->fetchAll("SHOW INDEXES FROM {$this->escapeIdentifier($table)}", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
+            $result = $this->db->fetchAll("SHOW INDEXES FROM {$this->escapeIdentifier($table)}", options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
             foreach ($result as $row) {
                 $this->indexes[$this->tfTranslator->normalize($row['Key_name'])] = [
                     'table' => $table,
@@ -360,7 +360,7 @@ class Search_MySql_Table extends TikiDb_Table
                 PRIMARY KEY(`id`),
                 INDEX (`object_type`, `object_id`(160))
             ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC",
-            options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]
+            options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]
         );
         $this->exists = true;
 
@@ -376,7 +376,7 @@ class Search_MySql_Table extends TikiDb_Table
                 `id` INT NOT NULL AUTO_INCREMENT,
                 PRIMARY KEY(`id`)
             ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC",
-            options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]
+            options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]
         );
     }
 

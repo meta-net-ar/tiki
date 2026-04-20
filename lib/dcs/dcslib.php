@@ -283,19 +283,15 @@ class DCSLib extends TikiLib
         if (! $pId) {
             // was replace into ...
             $query = "insert into `tiki_programmed_content`(`contentId`,`publishDate`,`data`,`content_type`) values(?,?,?,?)";
-
-            $result = $this->query($query, [$contentId, $publishDate, $data, $content_type]);
-            $query = "select max(`pId`) from `tiki_programmed_content` where `publishDate`=? and `data`=?";
-            $id = $this->getOne($query, [$publishDate, $data]);
+            $res = $this->query($query, [$contentId, $publishDate, $data, $content_type]);
+            return $this->lastInsertId();
         } else {
             $query
                 = "update `tiki_programmed_content` set `contentId`=?, `publishDate`=?, `data`=?, `content_type`=? where `pId`=?";
 
-            $result = $this->query($query, [$contentId, $publishDate, $data, $content_type, $pId]);
-            $id = $pId;
+            $this->query($query, [$contentId, $publishDate, $data, $content_type, $pId]);
+            return $pId;
         }
-
-        return $id;
     }
 
     /**
@@ -360,7 +356,7 @@ class DCSLib extends TikiLib
                 . ' where `contentId`=?';
 
             $bindvars[] = $contentId;
-            $result = $this->query($query, $bindvars);
+            $this->query($query, $bindvars);
         } else {
             $query = 'insert into `tiki_content` (`description`'
                 . ( $label === null ? '' : ',`contentLabel`')
@@ -368,11 +364,8 @@ class DCSLib extends TikiLib
                 . ( $label === null ? '' : ',?')
                 . ')';
 
-            $result = $this->query($query, $bindvars);
-            $contentId = $this->getOne(
-                'select max(`contentId`) from `tiki_content` where `description` = ? and `contentLabel` = ?',
-                $bindvars
-            );
+            $this->query($query, $bindvars);
+            $contentId = $this->lastInsertId();
         }
 
         return $contentId;
