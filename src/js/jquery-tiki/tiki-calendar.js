@@ -234,7 +234,14 @@ $.fn.setupFullCalendar = function (
                             remote: $.service("calendar", "edit_item", { todate: info.date.toUnix(), modal: 1, return_url: returnUrl }),
                             open: function () {
                                 $this.tikiModal();
-                                $("form:not(.no-ajax)", this).addClass("no-ajax"); // Remove default ajax handling, we replace it
+                                $("form:not(.no-ajax)", this)
+                                    .addClass("no-ajax") // Remove default ajax handling, we replace it
+                                    .on(
+                                        "submit",
+                                        ajaxSubmitEventHandler(function (data) {
+                                            calendarEditSubmit(data, this);
+                                        })
+                                    );
                             },
                         });
                     } else {
