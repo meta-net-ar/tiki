@@ -457,9 +457,21 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                     $("#loginbox-{{$module_logo_instance}}").off("submit").submit();
                 } catch (err) {
                     dropdown.off('hide.bs.dropdown.passkey');
-                    var msg = (err && err.toString) ? err.toString() : tr("Passkey sign-in failed. Please try again.");
+                    var errCode = (err && err.code) ? err.code : '';
+                    var errMsg  = (err && err.message) ? err.message : (err && err.toString ? err.toString() : tr("Passkey sign-in failed. Please try again."));
+                    var alertClass = 'alert-danger';
+                    var extraHtml  = '';
+
+                    if (errCode === 'USER_CANCELLED') {
+                        // Soft cancellation — use a warning tone, not danger.
+                        alertClass = 'alert-warning';
+                    } else if (errCode === 'NO_PASSKEYS') {
+                        // Guide the user toward registering a passkey.
+                        extraHtml = ' <a href="tiki-webauthn.php" class="alert-link">' + tr("Manage your passkeys") + '</a>';
+                    }
+
                     $("#login_feeback").html(
-                        '<div class="alert alert-danger alert-dismissible">' + msg +
+                        '<div class="alert ' + alertClass + ' alert-dismissible">' + errMsg + extraHtml +
                         '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
                     );
                     btn.html(originalHtml).prop("disabled", false);

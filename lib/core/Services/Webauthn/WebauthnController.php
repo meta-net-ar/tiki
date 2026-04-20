@@ -233,6 +233,14 @@ class WebauthnController
 
         $userData = $this->webAuthnTable->fetchAll(['credential_id'], ['user' => $userName]);
 
+        if (empty($userData)) {
+            return [
+                'status' => 'error',
+                'code'    => 'NO_PASSKEYS',
+                'message' => tr('No passkeys found for this account. Please sign in with your password and register a passkey first.'),
+            ];
+        }
+
         $credentialDescriptors = array_map(function ($credential) {
             return new PublicKeyCredentialDescriptor(
                 PublicKeyCredentialDescriptor::CREDENTIAL_TYPE_PUBLIC_KEY,

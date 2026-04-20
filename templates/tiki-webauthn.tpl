@@ -51,9 +51,6 @@
             if (!window.PublicKeyCredential) {
                 throw new Error(tr("Your browser does not support password less login feature."));
             }
-            if (!window.isSecureContext) {
-                throw new Error(tr("Passkey feature requires a secure (HTTPS) connection. Please ensure you are using a secure website."));
-            }
             const result = await $.fn.registerWebAuth.createCredentials(event, registeredUser);
             if (result) {
                 const feedbackClass = result.status === "success" ? "alert-success" : "alert-danger";
@@ -69,9 +66,10 @@
                 }
             }
         } catch (error) {
+            var errMsg = (error && error.message) ? error.message : String(error);
             $("#tikifeedback").html(
                 `<div class="alert alert-danger alert-dismissible">
-                    ${error}
+                    ${errMsg}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>`
             );
