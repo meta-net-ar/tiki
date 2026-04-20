@@ -3,14 +3,14 @@
         <div class="mb-3 fs-3">
             {icon name='key' iclass='text-primary fa-2x'}
         </div>
-        <h4 class="card-title mb-2">{tr}Secure your account with a Passkey{/tr}</h4>
+        <h4 class="card-title mb-2">{tr}Secure your account with a passkey{/tr}</h4>
         <p class="text-muted mb-4">
             {tr}A passkey lets you sign in using your device's biometrics or security key — no password needed. It's faster and phishing-resistant.{/tr}
         </p>
 
         <div id="passkey-actions">
             <button class="btn btn-primary btn-lg me-2" id="addPasskeyBtn">
-                {tr}Create Passkey{/tr}
+                {tr}Create passkey{/tr}
             </button>
             <button class="btn btn-outline-secondary btn-lg" id="skipPasskeyBtn">
                 {tr}Skip for now{/tr}

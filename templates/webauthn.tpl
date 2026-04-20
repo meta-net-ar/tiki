@@ -2,7 +2,7 @@
     <div>
         <input type="checkbox" class="form-check-input" id="webauthn_checkbox_{$form}" is_passed="n">
         <label for="webauthn_checkbox_{$form}">
-            {tr}Use Passkey to login{/tr}
+            {tr}Use passkey to login{/tr}
         </label>
     </div>
 {/if}

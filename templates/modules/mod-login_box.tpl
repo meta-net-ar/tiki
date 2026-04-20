@@ -76,7 +76,7 @@ $(document).ready(function () {
 
     function displayFeedback(type, message) {
         const feedbackClass = type === "success" ? "alert-success" : "alert-danger";
-        $("#login_feeback").html(
+        $("#login_feeback_{{$module_logo_instance}}").html(
             `<div class="alert ${feedbackClass} alert-dismissible">
                 ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -393,7 +393,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 {else}{$error_login|escape}{/if}
             {/remarksbox}
         {/if}
-        <div id="login_feeback"></div>
+        <div id="login_feeback_{$module_logo_instance}"></div>
         {if !empty($prefs.login_text_explanation) && !($mode eq "popup")}
         <div class="login-description my-2 {if $mode eq 'header'}mx-2{/if}">
             <label> {wiki} {$login_text_explanation} {/wiki}</label>
@@ -434,7 +434,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         </div>
         {if $prefs.auth_webauthn_enabled eq 'y'}
             {jq}
-            $("#passkeyLoginBtn").on("click", async function (e) {
+            $("#passkeyLoginBtn_{{$module_logo_instance}}").on("click", async function (e) {
                 e.stopPropagation();
                 var btn = $(this);
                 var dropdown = btn.closest('.dropdown');
@@ -444,7 +444,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 var originalHtml = btn.html();
                 var spinnerHtml = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>';
                 btn.html(spinnerHtml + tr("Verifying\u2026")).prop("disabled", true);
-                $("#login_feeback").html(
+                $("#login_feeback_{{$module_logo_instance}}").html(
                     '<div class="alert alert-info">' + tr("Follow your device\u2019s prompt to sign in with your passkey\u2026") + '</div>'
                 );
                 try {
@@ -453,15 +453,15 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                     if (!loginFn) { throw new Error(tr("WebAuthn module not loaded.")); }
                     await loginFn.loginStart(fakeEvent, "{{$module_logo_instance}}", 'login');
                     dropdown.off('hide.bs.dropdown.passkey');
-                    $("#login_feeback").html('');
-                    $("#loginbox-{{$module_logo_instance}}").off("submit").submit();
+                    $("#login_feeback_{{$module_logo_instance}}").html('');
+                    $("#loginbox-{{$module_logo_instance}}")[0].submit();
                 } catch (err) {
                     dropdown.off('hide.bs.dropdown.passkey');
                     var errCode = (err && err.code) ? err.code : '';
                     var errMsg  = (err && err.message) ? err.message : (err && err.toString ? err.toString() : tr("Passkey sign-in failed. Please try again."));
                     var alertClass = errCode === 'USER_CANCELLED' ? 'alert-warning' : 'alert-danger';
 
-                    $("#login_feeback").html(
+                    $("#login_feeback_{{$module_logo_instance}}").html(
                         '<div class="alert ' + alertClass + ' alert-dismissible">' + errMsg +
                         '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>'
                     );
@@ -530,8 +530,8 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 <div class="d-flex align-items-center text-muted my-2">
                     <hr class="flex-grow-1"><span class="mx-2 small">{tr}or{/tr}</span><hr class="flex-grow-1">
                 </div>
-                <button type="button" class="btn btn-outline-secondary w-100" id="passkeyLoginBtn">
-                    {icon name='key' iclass='me-2'}{tr}Login in with Passkey{/tr}
+                <button type="button" class="btn btn-outline-secondary w-100" id="passkeyLoginBtn_{{$module_logo_instance}}">
+                    {icon name='key' iclass='me-2'}{tr}Log in with passkey{/tr}
                 </button>
             </div>
         {/if}

@@ -315,7 +315,6 @@ class WebauthnController
                     'last_signin' => date('Y-m-d H:i:s')
                 ], [
                     'credential_id' => $credential_id,
-                    'user' => $userName
                 ]);
                 return ['status' => 'success', 'message' => tr('Signature verification successful')];
             }
