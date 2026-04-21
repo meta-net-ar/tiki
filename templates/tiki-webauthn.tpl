@@ -1,8 +1,8 @@
-{title help="Webauthn" url="tiki-webauthn.php"}{tr}Registered Authenticators{/tr}{/title}
+{title help="Passkey" url="tiki-webauthn.php"}{tr}Registered Passkeys{/tr}{/title}
 {if $prefs.auth_webauthn_enabled eq 'y'}
     <div class="row">
         <div class="col-md-4 mb-3">
-            <button class="btn btn-primary" id="registerWebAuthDevice" type="button">{tr}Register Device{/tr}</button>
+            <button class="btn btn-primary" id="registerWebAuthDevice" type="button">{tr}Add Passkey{/tr}</button>
         </div>
     </div>
 {/if}

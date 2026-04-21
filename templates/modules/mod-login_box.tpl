@@ -443,9 +443,9 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
 
                 var originalHtml = btn.html();
                 var spinnerHtml = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>';
-                btn.html(spinnerHtml + tr("Verifying\u2026")).prop("disabled", true);
+                btn.html(spinnerHtml + tr("Verifying…")).prop("disabled", true);
                 $("#login_feeback_{{$module_logo_instance}}").html(
-                    '<div class="alert alert-info">' + tr("Follow your device\u2019s prompt to sign in with your passkey\u2026") + '</div>'
+                    '<div class="alert alert-info">' + tr("Follow your device\'s prompt to sign in with your passkey…") + '</div>'
                 );
                 try {
                     var fakeEvent = { preventDefault: function () {} };
