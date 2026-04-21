@@ -11,7 +11,6 @@
     <div class="table-responsive webauthn">
         <table id="webauthn_table" class="table normal table-striped table-hover" data-count="{$devices|count}">
             <thead>
-                <th>{tr}User{/tr}</th>
                 <th>{tr}Authenticator{/tr}</th>
                 <th>{tr}Device{/tr}</th>
                 <th>{tr}Sign Count{/tr}</th>
@@ -22,7 +21,6 @@
             <tbody>
                 {section name=device loop=$devices}
                     <tr>
-                        <td> {$devices[device].user} </td>
                         <td> {$devices[device].authenticator_name} </td>
                         <td> {$devices[device].device_name} </td>
                         <td> {$devices[device].sign_count} </td>
