@@ -140,9 +140,7 @@
                                     {permission_link mode=text type=calendar id=$id title=$cal.name}
                                 </action>
                                 <action>
-                                    <a href="tiki-admin_calendars.php?offset={$offset}&amp;sort_mode={$sort_mode}&amp;drop={$id}&amp;calendarId={$id}"
-                                        onclick="confirmPopup('{tr}Delete calendar?{/tr}', '{ticket mode=get}')"
-                                    >
+                                    <a href="{bootstrap_modal controller='calendar' action='remove_calendar' calendarId=$id}">
                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
                                     </a>
                                 </action>

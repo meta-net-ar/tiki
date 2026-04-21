@@ -147,49 +147,8 @@ if (! $skip) {
     if (! is_array($info)) {
         $access->display_error(null, tra('File has been deleted'), 404);
     }
-    if ($prefs['auth_token_access'] != 'y' || ! $is_token_access) {
-        // Check permissions except if the user comes with a valid Token
-
-        if ($tiki_p_admin_file_galleries != 'y' && $info['backlinkPerms'] == 'y' && $filegallib->hasOnlyPrivateBacklinks($info['fileId'])) {
-            if (! $user && $prefs['permission_denied_login_box'] === 'y' && empty($_SESSION['loginfrom'])) {
-                $_SESSION['loginfrom'] = $_SERVER['HTTP_REFERER'];
-            }
-            $access->display_error('', tra('Permission denied'), 401);
-        }
-
-        $attachment_perms = false;
-        if ($prefs['feature_use_fgal_for_wiki_attachments'] === 'y' && $tiki_p_admin_file_galleries !== 'y') {
-            $gal_info = $filegallib->get_file_gallery_info($info['galleryId']);
-            if ($gal_info['type'] == 'attachments') {
-                $perms = Perms::get(['object' => $gal_info['name'], 'type' => 'wiki page']);
-                if (($perms->view && $perms->wiki_view_attachments) || $perms->wiki_admin_attachments) {
-                    $attachment_perms = true;
-                }
-            }
-        }
-
-        if (! $zip && ! $attachment_perms && $tiki_p_admin_file_galleries != 'y' && ! $userlib->user_has_perm_on_object($user, $info['fileId'], 'file', 'tiki_p_download_files') && ! $filegallib->isBacklinkedFromAViewableTrackerItem($info['fileId'])) {
-            if (! $user && $prefs['permission_denied_login_box'] === 'y' && empty($_SESSION['loginfrom'])) {
-                $_SESSION['loginfrom'] = $_SERVER['HTTP_REFERER'];
-            }
-            $access->display_error('', tra('Permission denied'), 401);
-        }
-        if (isset($_GET['thumbnail']) && is_numeric($_GET['thumbnail'])) { //check also perms on thumb
-            $info_thumb = $filegallib->get_file($_GET['thumbnail']);
-            if (! $zip && ! $attachment_perms && $tiki_p_admin_file_galleries != 'y' && ! $userlib->user_has_perm_on_object($user, $info_thumb['fileId'], 'file', 'tiki_p_download_files')) {
-                if (! $user && $prefs['permission_denied_login_box'] === 'y' && empty($_SESSION['loginfrom'])) {
-                    $_SESSION['loginfrom'] = $_SERVER['HTTP_REFERER'];
-                }
-                $access->display_error('', tra('Permission denied'), 401);
-            }
-        }
-        if ($prefs['feature_use_fgal_for_user_files'] === 'y' && $tiki_p_admin_file_galleries !== 'y' && $prefs['userfiles_private'] === 'y') {
-            $gal_info = $filegallib->get_file_gallery_info($info['galleryId']);
-            if ($gal_info['type'] === 'user' && $gal_info['visible'] !== 'y' && $gal_info['user'] !== $user) {
-                $access->display_error('', tra('Permission denied'), 401);
-            }
-        }
-    }
+    $utilities = new Services_File_Utilities();
+    $utilities->enforceFileDownloadPermissions($info, $zip);
 }
 
 //if the file is remote, display, and don't cache
@@ -445,9 +404,7 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
                     } elseif (isset($_GET['thumbnail'])) {
                     // We resize to a thumbnail size if needed
                         if (is_numeric($_GET['thumbnail'])) {
-                            if (empty($info_thumb)) {
-                                $info_thumb = $filegallib->get_file($_GET['thumbnail']);
-                            }
+                            $info_thumb = $filegallib->get_file($_GET['thumbnail']);
                             $file_thumb = new Tiki\FileGallery\File($info_thumb);
                             $image = Image::create($file_thumb->getContents());
                             $content = null; // Explicitely free memory before getting cache
