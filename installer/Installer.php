@@ -368,6 +368,14 @@ class Installer extends TikiDb_Bridge implements SplSubject
         if ($warnResult) {
             while ($row = $warnResult->fetchRow()) {
                 if ($row['Level'] === 'Warning' || $row['Level'] === 'Error') {
+                    $code = (int) $row['Code'];
+                    // Historical patches are before 2026-04-17. Base schema (empty name) is also historical.
+                    $isHistorical = empty($this->currentPatchName) || substr($this->currentPatchName, 0, 8) < '20260417';
+
+                    if ($code === 1681 && $isHistorical) {
+                        continue;
+                    }
+
                     $warnings[] = $row['Level'] . ' ' . $row['Code'] . ': ' . $row['Message'];
                 }
             }
