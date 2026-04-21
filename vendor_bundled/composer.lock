@@ -449,24 +449,27 @@
         },
         {
             "name": "amphp/serialization",
-            "version": "v1.0.0",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/amphp/serialization.git",
-                "reference": "693e77b2fb0b266c3c7d622317f881de44ae94a1"
+                "reference": "fdf2834d78cebb0205fb2672676c1b1eb84371f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/amphp/serialization/zipball/693e77b2fb0b266c3c7d622317f881de44ae94a1",
-                "reference": "693e77b2fb0b266c3c7d622317f881de44ae94a1",
+                "url": "https://api.github.com/repos/amphp/serialization/zipball/fdf2834d78cebb0205fb2672676c1b1eb84371f0",
+                "reference": "fdf2834d78cebb0205fb2672676c1b1eb84371f0",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.1"
+                "php": ">=7.4"
             },
             "require-dev": {
-                "amphp/php-cs-fixer-config": "dev-master",
-                "phpunit/phpunit": "^9 || ^8 || ^7"
+                "amphp/php-cs-fixer-config": "^2",
+                "ext-json": "*",
+                "ext-zlib": "*",
+                "phpunit/phpunit": "^9",
+                "psalm/phar": "6.16.1"
             },
             "type": "library",
             "autoload": {
@@ -501,9 +504,15 @@
             ],
             "support": {
                 "issues": "https://github.com/amphp/serialization/issues",
-                "source": "https://github.com/amphp/serialization/tree/master"
+                "source": "https://github.com/amphp/serialization/tree/v1.1.0"
             },
-            "time": "2020-03-25T21:39:07+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/amphp",
+                    "type": "github"
+                }
+            ],
+            "time": "2026-04-05T15:59:53+00:00"
         },
         {
             "name": "amphp/sync",
@@ -8842,16 +8851,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "3.0.50",
+            "version": "3.0.51",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "aa6ad8321ed103dc3624fb600a25b66ebf78ec7b"
+                "reference": "d59c94077f9c9915abb51ddb52ce85188ece1748"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/aa6ad8321ed103dc3624fb600a25b66ebf78ec7b",
-                "reference": "aa6ad8321ed103dc3624fb600a25b66ebf78ec7b",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/d59c94077f9c9915abb51ddb52ce85188ece1748",
+                "reference": "d59c94077f9c9915abb51ddb52ce85188ece1748",
                 "shasum": ""
             },
             "require": {
@@ -8932,7 +8941,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.50"
+                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.51"
             },
             "funding": [
                 {
@@ -8948,7 +8957,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-19T02:57:58+00:00"
+            "time": "2026-04-10T01:33:53+00:00"
         },
         {
             "name": "phpxmlrpc/phpxmlrpc",
@@ -11511,16 +11520,16 @@
         },
         {
             "name": "studio-42/elfinder",
-            "version": "2.1.66",
+            "version": "2.1.67",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Studio-42/elFinder.git",
-                "reference": "78488951e44d69e8b9e4e849f8268df408632a6c"
+                "reference": "5e463d1384972dffcb736ad3c94f35af10656ca2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Studio-42/elFinder/zipball/78488951e44d69e8b9e4e849f8268df408632a6c",
-                "reference": "78488951e44d69e8b9e4e849f8268df408632a6c",
+                "url": "https://api.github.com/repos/Studio-42/elFinder/zipball/5e463d1384972dffcb736ad3c94f35af10656ca2",
+                "reference": "5e463d1384972dffcb736ad3c94f35af10656ca2",
                 "shasum": ""
             },
             "require": {
@@ -11567,7 +11576,7 @@
             "homepage": "http://elfinder.org",
             "support": {
                 "issues": "https://github.com/Studio-42/elFinder/issues",
-                "source": "https://github.com/Studio-42/elFinder/tree/2.1.66"
+                "source": "https://github.com/Studio-42/elFinder/tree/2.1.67"
             },
             "funding": [
                 {
@@ -11575,7 +11584,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-08-28T11:51:22+00:00"
+            "time": "2026-04-17T03:02:32+00:00"
         },
         {
             "name": "svg-edit/svg-edit",
@@ -12674,16 +12683,16 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.33.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
-                "reference": "a3cc8b044a6ea513310cbd48ef7333b384945638"
+                "reference": "141046a8f9477948ff284fa65be2095baafb94f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/a3cc8b044a6ea513310cbd48ef7333b384945638",
-                "reference": "a3cc8b044a6ea513310cbd48ef7333b384945638",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/141046a8f9477948ff284fa65be2095baafb94f2",
+                "reference": "141046a8f9477948ff284fa65be2095baafb94f2",
                 "shasum": ""
             },
             "require": {
@@ -12733,7 +12742,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -12753,20 +12762,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-09T11:45:10+00:00"
+            "time": "2026-04-10T16:19:22+00:00"
         },
         {
             "name": "symfony/polyfill-iconv",
-            "version": "v1.33.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-iconv.git",
-                "reference": "5f3b930437ae03ae5dff61269024d8ea1b3774aa"
+                "reference": "2c5729fd241b4b22f6e4b436bc3354a4f262df57"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-iconv/zipball/5f3b930437ae03ae5dff61269024d8ea1b3774aa",
-                "reference": "5f3b930437ae03ae5dff61269024d8ea1b3774aa",
+                "url": "https://api.github.com/repos/symfony/polyfill-iconv/zipball/2c5729fd241b4b22f6e4b436bc3354a4f262df57",
+                "reference": "2c5729fd241b4b22f6e4b436bc3354a4f262df57",
                 "shasum": ""
             },
             "require": {
@@ -12817,7 +12826,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-iconv/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-iconv/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -12837,20 +12846,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-17T14:58:18+00:00"
+            "time": "2026-04-10T16:19:22+00:00"
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
-            "version": "v1.33.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-grapheme.git",
-                "reference": "380872130d3a5dd3ace2f4010d95125fde5d5c70"
+                "reference": "ad1b7b9092976d6c948b8a187cec9faaea9ec1df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/380872130d3a5dd3ace2f4010d95125fde5d5c70",
-                "reference": "380872130d3a5dd3ace2f4010d95125fde5d5c70",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/ad1b7b9092976d6c948b8a187cec9faaea9ec1df",
+                "reference": "ad1b7b9092976d6c948b8a187cec9faaea9ec1df",
                 "shasum": ""
             },
             "require": {
@@ -12899,7 +12908,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -12919,20 +12928,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-06-27T09:58:17+00:00"
+            "time": "2026-04-10T16:19:22+00:00"
         },
         {
             "name": "symfony/polyfill-intl-icu",
-            "version": "v1.33.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-icu.git",
-                "reference": "bfc8fa13dbaf21d69114b0efcd72ab700fb04d0c"
+                "reference": "3510b63d07376b04e57e27e82607d468bb134f78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-icu/zipball/bfc8fa13dbaf21d69114b0efcd72ab700fb04d0c",
-                "reference": "bfc8fa13dbaf21d69114b0efcd72ab700fb04d0c",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-icu/zipball/3510b63d07376b04e57e27e82607d468bb134f78",
+                "reference": "3510b63d07376b04e57e27e82607d468bb134f78",
                 "shasum": ""
             },
             "require": {
@@ -12987,7 +12996,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-icu/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-intl-icu/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -13007,11 +13016,11 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-06-20T22:24:30+00:00"
+            "time": "2026-04-10T16:50:15+00:00"
         },
         {
             "name": "symfony/polyfill-intl-idn",
-            "version": "v1.33.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-idn.git",
@@ -13074,7 +13083,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -13098,7 +13107,7 @@
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
-            "version": "v1.33.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-normalizer.git",
@@ -13159,7 +13168,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -13183,16 +13192,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.33.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "6d857f4d76bd4b343eac26d6b539585d2bc56493"
+                "reference": "6a21eb99c6973357967f6ce3708cd55a6bec6315"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/6d857f4d76bd4b343eac26d6b539585d2bc56493",
-                "reference": "6d857f4d76bd4b343eac26d6b539585d2bc56493",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/6a21eb99c6973357967f6ce3708cd55a6bec6315",
+                "reference": "6a21eb99c6973357967f6ce3708cd55a6bec6315",
                 "shasum": ""
             },
             "require": {
@@ -13244,7 +13253,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -13264,20 +13273,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-12-23T08:48:59+00:00"
+            "time": "2026-04-10T17:25:58+00:00"
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "v1.33.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
-                "reference": "0cc9dd0f17f61d8131e7df6b84bd344899fe2608"
+                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/0cc9dd0f17f61d8131e7df6b84bd344899fe2608",
-                "reference": "0cc9dd0f17f61d8131e7df6b84bd344899fe2608",
+                "url": "https://api.github.com/repos/symfony/polyfill-php80/zipball/dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
+                "reference": "dfb55726c3a76ea3b6459fcfda1ec2d80a682411",
                 "shasum": ""
             },
             "require": {
@@ -13328,7 +13337,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -13348,20 +13357,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-01-02T08:10:11+00:00"
+            "time": "2026-04-10T16:19:22+00:00"
         },
         {
             "name": "symfony/polyfill-php82",
-            "version": "v1.33.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php82.git",
-                "reference": "5d2ed36f7734637dacc025f179698031951b1692"
+                "reference": "34808efe3e68f69685796f7c253a2f1d8ea9df59"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php82/zipball/5d2ed36f7734637dacc025f179698031951b1692",
-                "reference": "5d2ed36f7734637dacc025f179698031951b1692",
+                "url": "https://api.github.com/repos/symfony/polyfill-php82/zipball/34808efe3e68f69685796f7c253a2f1d8ea9df59",
+                "reference": "34808efe3e68f69685796f7c253a2f1d8ea9df59",
                 "shasum": ""
             },
             "require": {
@@ -13408,7 +13417,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php82/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-php82/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -13428,20 +13437,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-09T11:45:10+00:00"
+            "time": "2026-04-10T16:19:22+00:00"
         },
         {
             "name": "symfony/polyfill-php83",
-            "version": "v1.33.0",
+            "version": "v1.36.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php83.git",
-                "reference": "17f6f9a6b1735c0f163024d959f700cfbc5155e5"
+                "reference": "3600c2cb22399e25bb226e4a135ce91eeb2a6149"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-php83/zipball/17f6f9a6b1735c0f163024d959f700cfbc5155e5",
-                "reference": "17f6f9a6b1735c0f163024d959f700cfbc5155e5",
+                "url": "https://api.github.com/repos/symfony/polyfill-php83/zipball/3600c2cb22399e25bb226e4a135ce91eeb2a6149",
+                "reference": "3600c2cb22399e25bb226e4a135ce91eeb2a6149",
                 "shasum": ""
             },
             "require": {
@@ -13488,7 +13497,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php83/tree/v1.33.0"
+                "source": "https://github.com/symfony/polyfill-php83/tree/v1.36.0"
             },
             "funding": [
                 {
@@ -13508,7 +13517,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2025-07-08T02:45:35+00:00"
+            "time": "2026-04-10T17:25:58+00:00"
         },
         {
             "name": "symfony/process",
@@ -14839,20 +14848,20 @@
         },
         {
             "name": "zf1s/zend-exception",
-            "version": "1.15.6",
+            "version": "1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zf1s/zend-exception.git",
-                "reference": "2b0ab0dd6f615207f28c927123c9b8d9562a577a"
+                "reference": "02594537cf13b5d2ba5502bae3f51d1ae41e16dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zf1s/zend-exception/zipball/2b0ab0dd6f615207f28c927123c9b8d9562a577a",
-                "reference": "2b0ab0dd6f615207f28c927123c9b8d9562a577a",
+                "url": "https://api.github.com/repos/zf1s/zend-exception/zipball/02594537cf13b5d2ba5502bae3f51d1ae41e16dd",
+                "reference": "02594537cf13b5d2ba5502bae3f51d1ae41e16dd",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=7.1"
             },
             "replace": {
                 "zf1/zend-exception": "^1.12"
@@ -14881,30 +14890,30 @@
                 "zend"
             ],
             "support": {
-                "source": "https://github.com/zf1s/zend-exception/tree/1.15.6"
+                "source": "https://github.com/zf1s/zend-exception/tree/1.16.0"
             },
-            "time": "2024-01-04T13:33:07+00:00"
+            "time": "2026-04-13T21:11:39+00:00"
         },
         {
             "name": "zf1s/zend-http",
-            "version": "1.15.6",
+            "version": "1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zf1s/zend-http.git",
-                "reference": "992a5e8b4e4597f786e1947f93469392aa3cad35"
+                "reference": "fa808063b6ae44ad10b45741820aa927f04a0afb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zf1s/zend-http/zipball/992a5e8b4e4597f786e1947f93469392aa3cad35",
-                "reference": "992a5e8b4e4597f786e1947f93469392aa3cad35",
+                "url": "https://api.github.com/repos/zf1s/zend-http/zipball/fa808063b6ae44ad10b45741820aa927f04a0afb",
+                "reference": "fa808063b6ae44ad10b45741820aa927f04a0afb",
                 "shasum": ""
             },
             "require": {
                 "ext-ctype": "*",
-                "php": ">=5.3.3",
-                "zf1s/zend-exception": "^1.15.6",
-                "zf1s/zend-loader": "^1.15.6",
-                "zf1s/zend-uri": "^1.15.6"
+                "php": ">=7.1",
+                "zf1s/zend-exception": "^1.16.0",
+                "zf1s/zend-loader": "^1.16.0",
+                "zf1s/zend-uri": "^1.16.0"
             },
             "replace": {
                 "zf1/zend-http": "^1.12"
@@ -14937,27 +14946,27 @@
                 "zend"
             ],
             "support": {
-                "source": "https://github.com/zf1s/zend-http/tree/1.15.6"
+                "source": "https://github.com/zf1s/zend-http/tree/1.16.0"
             },
-            "time": "2026-04-02T15:49:24+00:00"
+            "time": "2026-04-13T21:11:39+00:00"
         },
         {
             "name": "zf1s/zend-loader",
-            "version": "1.15.6",
+            "version": "1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zf1s/zend-loader.git",
-                "reference": "18da6a9e653703337297f6081b4e8fb250917d14"
+                "reference": "b0523659278d20e57552c86b5941a6f4f4f6d04a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zf1s/zend-loader/zipball/18da6a9e653703337297f6081b4e8fb250917d14",
-                "reference": "18da6a9e653703337297f6081b4e8fb250917d14",
+                "url": "https://api.github.com/repos/zf1s/zend-loader/zipball/b0523659278d20e57552c86b5941a6f4f4f6d04a",
+                "reference": "b0523659278d20e57552c86b5941a6f4f4f6d04a",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3",
-                "zf1s/zend-exception": "^1.15.6"
+                "php": ">=7.1",
+                "zf1s/zend-exception": "^1.16.0"
             },
             "replace": {
                 "zf1/zend-loader": "^1.12"
@@ -14986,27 +14995,27 @@
                 "zend"
             ],
             "support": {
-                "source": "https://github.com/zf1s/zend-loader/tree/1.15.6"
+                "source": "https://github.com/zf1s/zend-loader/tree/1.16.0"
             },
-            "time": "2026-04-02T15:49:24+00:00"
+            "time": "2026-04-13T21:11:39+00:00"
         },
         {
             "name": "zf1s/zend-registry",
-            "version": "1.15.6",
+            "version": "1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zf1s/zend-registry.git",
-                "reference": "ef19838e21ba9513ba20a187c5b7d881e4b4b796"
+                "reference": "f0094193b20e202fb2558587a1b11d75bac17911"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zf1s/zend-registry/zipball/ef19838e21ba9513ba20a187c5b7d881e4b4b796",
-                "reference": "ef19838e21ba9513ba20a187c5b7d881e4b4b796",
+                "url": "https://api.github.com/repos/zf1s/zend-registry/zipball/f0094193b20e202fb2558587a1b11d75bac17911",
+                "reference": "f0094193b20e202fb2558587a1b11d75bac17911",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3",
-                "zf1s/zend-exception": "^1.15.6"
+                "php": ">=7.1",
+                "zf1s/zend-exception": "^1.16.0"
             },
             "replace": {
                 "zf1/zend-registry": "^1.12"
@@ -15038,30 +15047,30 @@
                 "zend"
             ],
             "support": {
-                "source": "https://github.com/zf1s/zend-registry/tree/1.15.6"
+                "source": "https://github.com/zf1s/zend-registry/tree/1.16.0"
             },
-            "time": "2026-04-02T15:49:24+00:00"
+            "time": "2026-04-13T21:11:39+00:00"
         },
         {
             "name": "zf1s/zend-service-akismet",
-            "version": "1.15.6",
+            "version": "1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zf1s/zend-service-akismet.git",
-                "reference": "201bc56802ff96a54e83cd1c27719d48197c1e76"
+                "reference": "1154ffebce259974cf2bcba338b23b57c8502cf0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zf1s/zend-service-akismet/zipball/201bc56802ff96a54e83cd1c27719d48197c1e76",
-                "reference": "201bc56802ff96a54e83cd1c27719d48197c1e76",
+                "url": "https://api.github.com/repos/zf1s/zend-service-akismet/zipball/1154ffebce259974cf2bcba338b23b57c8502cf0",
+                "reference": "1154ffebce259974cf2bcba338b23b57c8502cf0",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3",
-                "zf1s/zend-exception": "^1.15.6",
-                "zf1s/zend-http": "^1.15.6",
-                "zf1s/zend-uri": "^1.15.6",
-                "zf1s/zend-version": "^1.15.6"
+                "php": ">=7.1",
+                "zf1s/zend-exception": "^1.16.0",
+                "zf1s/zend-http": "^1.16.0",
+                "zf1s/zend-uri": "^1.16.0",
+                "zf1s/zend-version": "^1.16.0"
             },
             "replace": {
                 "zf1/zend-service-akismet": "^1.12"
@@ -15091,30 +15100,30 @@
                 "zend"
             ],
             "support": {
-                "source": "https://github.com/zf1s/zend-service-akismet/tree/1.15.6"
+                "source": "https://github.com/zf1s/zend-service-akismet/tree/1.16.0"
             },
-            "time": "2026-04-02T15:49:24+00:00"
+            "time": "2026-04-13T21:11:39+00:00"
         },
         {
             "name": "zf1s/zend-uri",
-            "version": "1.15.6",
+            "version": "1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zf1s/zend-uri.git",
-                "reference": "11c7165ac83ed7d7c9753039635188f51488e56b"
+                "reference": "0ee217178f897c238782770d615ce14119720fd7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zf1s/zend-uri/zipball/11c7165ac83ed7d7c9753039635188f51488e56b",
-                "reference": "11c7165ac83ed7d7c9753039635188f51488e56b",
+                "url": "https://api.github.com/repos/zf1s/zend-uri/zipball/0ee217178f897c238782770d615ce14119720fd7",
+                "reference": "0ee217178f897c238782770d615ce14119720fd7",
                 "shasum": ""
             },
             "require": {
                 "ext-ctype": "*",
-                "php": ">=5.3.3",
-                "zf1s/zend-exception": "^1.15.6",
-                "zf1s/zend-loader": "^1.15.6",
-                "zf1s/zend-validate": "^1.15.6"
+                "php": ">=7.1",
+                "zf1s/zend-exception": "^1.16.0",
+                "zf1s/zend-loader": "^1.16.0",
+                "zf1s/zend-validate": "^1.16.0"
             },
             "replace": {
                 "zf1/zend-uri": "^1.12"
@@ -15147,30 +15156,30 @@
                 "zend"
             ],
             "support": {
-                "source": "https://github.com/zf1s/zend-uri/tree/1.15.6"
+                "source": "https://github.com/zf1s/zend-uri/tree/1.16.0"
             },
-            "time": "2026-04-02T15:49:24+00:00"
+            "time": "2026-04-13T21:11:39+00:00"
         },
         {
             "name": "zf1s/zend-validate",
-            "version": "1.15.6",
+            "version": "1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zf1s/zend-validate.git",
-                "reference": "e8cdc014b9c07347e2af390435dc2bcc60343397"
+                "reference": "76c35c27eaa49614e18a02da0d473d116af43b62"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zf1s/zend-validate/zipball/e8cdc014b9c07347e2af390435dc2bcc60343397",
-                "reference": "e8cdc014b9c07347e2af390435dc2bcc60343397",
+                "url": "https://api.github.com/repos/zf1s/zend-validate/zipball/76c35c27eaa49614e18a02da0d473d116af43b62",
+                "reference": "76c35c27eaa49614e18a02da0d473d116af43b62",
                 "shasum": ""
             },
             "require": {
                 "ext-ctype": "*",
                 "ext-reflection": "*",
-                "php": ">=5.3.3",
-                "zf1s/zend-exception": "^1.15.6",
-                "zf1s/zend-registry": "^1.15.6"
+                "php": ">=7.1",
+                "zf1s/zend-exception": "^1.16.0",
+                "zf1s/zend-registry": "^1.16.0"
             },
             "replace": {
                 "zf1/zend-validate": "^1.12"
@@ -15212,26 +15221,26 @@
             ],
             "support": {
                 "issues": "https://github.com/zf1s/zend-validate/issues",
-                "source": "https://github.com/zf1s/zend-validate/tree/1.15.6"
+                "source": "https://github.com/zf1s/zend-validate/tree/1.16.0"
             },
-            "time": "2026-04-02T15:49:24+00:00"
+            "time": "2026-04-13T21:11:39+00:00"
         },
         {
             "name": "zf1s/zend-version",
-            "version": "1.15.6",
+            "version": "1.16.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zf1s/zend-version.git",
-                "reference": "ccb2aba00702fbaa45c90fc4c7d56d49e65c5853"
+                "reference": "46605f44a944b4c58c68ccb3c7d17d6a1724af9c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zf1s/zend-version/zipball/ccb2aba00702fbaa45c90fc4c7d56d49e65c5853",
-                "reference": "ccb2aba00702fbaa45c90fc4c7d56d49e65c5853",
+                "url": "https://api.github.com/repos/zf1s/zend-version/zipball/46605f44a944b4c58c68ccb3c7d17d6a1724af9c",
+                "reference": "46605f44a944b4c58c68ccb3c7d17d6a1724af9c",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=7.1"
             },
             "replace": {
                 "zf1/zend-version": "^1.12"
@@ -15260,9 +15269,9 @@
                 "zend"
             ],
             "support": {
-                "source": "https://github.com/zf1s/zend-version/tree/1.15.6"
+                "source": "https://github.com/zf1s/zend-version/tree/1.16.0"
             },
-            "time": "2024-01-04T13:33:07+00:00"
+            "time": "2026-04-13T21:11:39+00:00"
         }
     ],
     "packages-dev": [
@@ -18398,8 +18407,8 @@
     "stability-flags": {
         "candy-chat/xmpp-prebind-php": 20,
         "npm-asset/select2": 5,
-        "phpcompatibility/php-compatibility": 15,
-        "rubix/extras": 10
+        "rubix/extras": 10,
+        "phpcompatibility/php-compatibility": 15
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -18416,12 +18425,12 @@
         "ext-openssl": "*",
         "ext-zip": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "php": "8.1",
         "ext-ldap": "0",
         "ext-soap": "0",
         "ext-sockets": "0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
