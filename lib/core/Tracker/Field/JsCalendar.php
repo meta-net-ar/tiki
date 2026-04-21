@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
 {
     /**
@@ -105,9 +108,12 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
                 // prevent corrupted date values getting saved (e.g. from inline edit sometimes)
                 $this->validateTimestamp($value);
 
-                if ($this->getOption('datetime') === 'd' && is_numeric($value)) {
-                    $timezone = $requestData[$ins_id . '_timezone'] ?? null;
-                    $value = $this->normalizeDateOnlyTimestamp((int) $value, $timezone);
+                // Guard skips values already at UTC midnight
+                if ($this->getOption('datetime') === 'd' && is_numeric($value) && (int) $value % 86400 !== 0) {
+                    // Normalize to midnight UTC, mirroring DateTime handler (see DateTime::getFieldData).
+                    $timezone = $requestData[$ins_id . '_timezone'] ?? TikiLib::lib('tiki')->get_display_timezone();
+                    $server_offset = TikiDate::tzServerOffset($timezone, (int) $value);
+                    $value = (int) $value + $server_offset;
                 }
             } catch (Services_Exception $e) {
                 $value = '';
@@ -118,19 +124,6 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
         return [
             'value' => $value,
         ];
-    }
-
-    private function normalizeDateOnlyTimestamp(int $timestamp, ?string $timezone = null): int
-    {
-        if ($timestamp % 86400 === 0) {
-            return $timestamp;
-        }
-
-        $timezone = $timezone ?: TikiLib::lib('tiki')->get_display_timezone();
-
-        $dateInTimezone = TikiLib::date_format('Y-m-d', $timestamp, false, 5, false, $timezone);
-
-        return (int) strtotime($dateInTimezone . ' UTC');
     }
 
     public function renderInput($context = [])

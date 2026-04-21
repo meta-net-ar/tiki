@@ -442,34 +442,8 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
         }
     }
 
-    /**
-     * Determine if a calendar value should be treated as date-only (all-day).
-     *
-     * @param mixed $value Optional value to check. If not provided, the field's current value will be used.
-     * @return bool True if the value should be treated as date-only, false otherwise.
-     */
-    public function isDateOnlyCalendarValue($value = null): bool
+    public function isDateOnlyCalendarValue(): bool
     {
-        if ($value === null) {
-            $value = $this->getValue();
-        }
-
-        if ($this->getOption('datetime') === 'd') {
-            return true;
-        }
-
-        if (is_numeric($value)) {
-            return ((int) $value % 86400) === 0;
-        }
-
-        if (is_string($value) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
-            return true;
-        }
-
-        if (is_string($value) && preg_match('/^\d{14}$/', $value)) {
-            return substr($value, 8, 6) === '000000';
-        }
-
-        return false;
+        return $this->getOption('datetime') === 'd';
     }
 }

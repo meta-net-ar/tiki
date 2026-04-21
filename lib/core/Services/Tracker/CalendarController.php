@@ -188,9 +188,9 @@ class Services_Tracker_CalendarController
             }
 
             $beginIsDateOnly = $beginDateFieldHandler instanceof Tracker_Field_DateTime
-                && $beginDateFieldHandler->isDateOnlyCalendarValue($startValue);
+                && $beginDateFieldHandler->isDateOnlyCalendarValue();
             $endIsDateOnly = $endDateFieldHandler instanceof Tracker_Field_DateTime
-                && $endDateFieldHandler->isDateOnlyCalendarValue($endValue);
+                && $endDateFieldHandler->isDateOnlyCalendarValue();
 
             // Determine if event is date-only
             // If only one field is specified, check that field; if both are specified, both must be date-only
