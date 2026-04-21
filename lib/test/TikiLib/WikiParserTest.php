@@ -16,6 +16,7 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
 {
     private $originalCacheImpl;
     private $originalIconset;
+    private TestHelpers $testhelpers;
 
     protected function setUp(): void
     {
@@ -26,7 +27,7 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         // Mock iconset
         $iconset = new class {
             public function getHtml($name, $params = [])
-            {
+            {   
                 return "$name-icon-mock ";
             }
         };
@@ -34,6 +35,11 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         $cachelib = TikiLib::lib('cache');
         // Prevent caching of icons during tests to avoid stale values from previous tests interfering with assertions
         $this->originalCacheImpl = $cachelib->replaceImplementation(new NoCache());
+
+        $this->testhelpers = new TestHelpers();
+        $this->testhelpers->simulateTikiScriptContext();
+
+        $this->testhelpers->createPage('foo', 0, ''); // Create 'foo' page to be used in link tests
     }
 
     protected function tearDown(): void
@@ -43,6 +49,9 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         $iconset = $this->originalIconset;
 
         TikiLib::lib('cache')->replaceImplementation($this->originalCacheImpl);
+
+        $this->testhelpers->removeAllVersions('foo');
+        $this->testhelpers->stopSimulatingTikiScriptContext();
     }
 
     /**
