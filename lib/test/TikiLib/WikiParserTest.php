@@ -27,7 +27,7 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         // Mock iconset
         $iconset = new class {
             public function getHtml($name, $params = [])
-            {   
+            {
                 return "$name-icon-mock ";
             }
         };
