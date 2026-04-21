@@ -134,25 +134,39 @@ if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["c
 
         $vcalendar = new Sabre\VObject\Component\VCalendar();
 
+        // RFC 5545 §3.8.7.2/§3.8.7.3 require DTSTAMP and LAST-MODIFIED to be UTC.
+        // DTSTART/DTEND are emitted in the calendar owner's display timezone to
+        // stay consistent with the CalDAV export (see Tiki\SabreDav\Utilities::
+        // constructCalendarData). No VTIMEZONE component is emitted - clients are
+        // expected to resolve the TZID name, same as the CalDAV path.
+        $utc = new DateTimeZone('UTC');
+        $tikilib = TikiLib::lib('tiki');
+        $calendar_timezones = [];
+
         foreach ($events as $event) {
+            $calendarId = $event['calendarId'];
+            if (! isset($calendar_timezones[$calendarId])) {
+                $calendarOwner = $calendars['data'][$calendarId]['user'] ?? $user;
+                $calendar_timezones[$calendarId] = new DateTimeZone(
+                    $tikilib->get_display_timezone($calendarOwner)
+                );
+            }
+            $eventTz = $calendar_timezones[$calendarId];
+
             $vevent = [];
             $vevent['SUMMARY'] = $event['name'];
-            $vevent['DTSTART'] = (new DateTime())->setTimestamp($event['start']);
-            $vevent['DTEND'] = (new DateTime())->setTimestamp($event['end']);
+            $vevent['DTSTART'] = (new DateTime('@' . $event['start']))->setTimezone($eventTz);
+            $vevent['DTEND'] = (new DateTime('@' . $event['end']))->setTimezone($eventTz);
 
-            $vevent['DESCRIPTION'] = preg_replace(
-                '/\n/',
-                "\\n",
-                strip_tags(
-                    TikiLib::lib('parser')->parse_data(
-                        $event['description'],
-                        ['is_html' => $prefs['calendar_description_is_html'] === 'y']
-                    )
+            $vevent['DESCRIPTION'] = strip_tags(
+                TikiLib::lib('parser')->parse_data(
+                    $event['description'],
+                    ['is_html' => $prefs['calendar_description_is_html'] === 'y']
                 )
             );
 
-            $vevent['DTSTAMP'] = (new DateTime())->setTimestamp($event['created']);
-            $vevent['LAST-MODIFIED'] = (new DateTime())->setTimestamp($event['lastModif']);
+            $vevent['DTSTAMP'] = (new DateTime('@' . $event['created']))->setTimezone($utc);
+            $vevent['LAST-MODIFIED'] = (new DateTime('@' . $event['lastModif']))->setTimezone($utc);
 
             $vevent['CONTACT'] = $event['user']; // Name
 
@@ -193,16 +207,9 @@ if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["c
         // These two lines fix pb with IE and HTTPS
         header("Cache-Control: private");
         header("Pragma: dummy=bogus");
-        // Outlook needs iso8859 encoding
-        header("Content-Type:text/calendar; method=REQUEST; charset=iso-8859-15");
+        header('Content-Type: text/calendar; charset=utf-8');
         header('Content-Disposition: inline; filename=tiki-calendar.ics');
-        header("Content-Transfer-Encoding:quoted-printable");
-        $re_encode = stripos($_SERVER['HTTP_USER_AGENT'], 'windows');   // only re-encode to ISO-8859-15 if client on Windows
-        if (function_exists('iconv') && $re_encode !== false) {
-            print(iconv("UTF-8", "ISO-8859-15", $calendar_str));
-        } else {
-            print($calendar_str);   // UTF-8 is good for other platforms
-        }
+        print($calendar_str);
     }
     die;
 }
