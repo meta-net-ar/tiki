@@ -31,6 +31,19 @@
     right: 10px; */
 }
 
+// Arrows point right for flyout menus on desktop
+.tiki .navbar-nav.sm-vertical:not(.sm-collapsible) .sm-sub-toggler > small *,
+.tiki .sm-sub .sm-sub-toggler > small *,
+.tiki .sm-vertical .sm-sub-toggler > small * {
+    display: inline-block;
+    transform: rotate(-90deg) !important;
+}
+
+// Reset arrows to point down for normal horizontal menus
+.tiki .navbar-nav:not(.sm-vertical) > .nav-item:not(.sm-vertical) > .sm-sub-toggler > small * {
+    transform: none !important;
+}
+
 // Stacking Layer Isolation:
 // Ensures dropdowns (9999) appear over fixed headers while keeping 
 // the navbar container at its natural stacking level to respect sidebars.
@@ -42,14 +55,18 @@
     }
 }
 
-// Dropdown Vertical Reachability:
-// Implements a viewport-relative max-height to ensure long menus remain 
-// scrollable and accessible, especially in fixed-header layouts.
+// Help long menus stay inside the screen height
 $sm-sub-top-offset: 70px; // Estimated header height
 $sm-sub-bottom-buffer: 50px; // Safety margin for viewport edges
 $sm-sub-max-height: calc(100vh - ($sm-sub-top-offset + $sm-sub-bottom-buffer));
 
-.tiki .sm-navbar .sm-sub {
+// Stop menus with submenus from clipping their children
+.tiki .sm-navbar:not(.sm-collapsible) .sm-sub:has(.sm-sub) {
+    max-height: none !important;
+    overflow-y: visible !important;
+}
+
+.tiki .sm-navbar:not(.sm-collapsible) .sm-sub:not(:has(.sm-sub)) {
     max-height: $sm-sub-max-height;
     overflow-y: auto;
 }

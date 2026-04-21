@@ -76,4 +76,42 @@ $(function () {
     });
 })(jQuery);
 
+/* Fix mobile touch for menu parents that have links so they open instead of navigating */
+$(document).on("touchend click", ".sm-navbar .sm-sub-toggler", function (e) {
+    var $toggler = $(this);
+    var $navbar = $toggler.closest(".sm-navbar");
+
+    // Only run on mobile
+    if (!$navbar.hasClass("sm-collapsible") && window.innerWidth >= 768) {
+        return;
+    }
+
+    // Stop the link from opening and avoid double clicks
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    var $panel = $toggler.siblings(".sm-sub").first();
+    if (!$panel.length || !window.bootstrap || !window.bootstrap.Collapse) return;
+
+    // Open or close the menu using Bootstrap
+    var bsCollapse = window.bootstrap.Collapse.getOrCreateInstance($panel[0], { toggle: false });
+    var isShown = $panel.hasClass("show");
+
+    bsCollapse.toggle();
+    $toggler.attr("aria-expanded", isShown ? "false" : "true");
+
+    // Close other open menus at the same level
+    if (!isShown) {
+        $toggler
+            .closest("li")
+            .siblings("li")
+            .find("> .sm-sub.show")
+            .each(function () {
+                var peer = window.bootstrap.Collapse.getInstance(this);
+                if (peer) peer.hide();
+                $(this).siblings(".sm-sub-toggler").attr("aria-expanded", "false");
+            });
+    }
+});
+
 // end of src/js/tiki-menu.js
