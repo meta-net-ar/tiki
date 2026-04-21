@@ -263,7 +263,7 @@ class WebauthnController
         );
 
         if (empty($userData)) {
-            return ['status' => 'error', 'message' => tr('Passkey not recognised. Please sign in with your password.')];
+            return ['status' => 'error', 'message' => tr('Passkey not recognized. Please sign in with your password.')];
         }
 
         $userName = $userData['user'];
