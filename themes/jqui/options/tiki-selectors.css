@@ -4,9 +4,9 @@
 :root {
     --tiki-jui-bg-repeat: repeat-x;
 
-    --tiki-jui-bg-default: var(--tiki-jui-state-default-bg) var(--tiki-jui-state-default-bg-path) var(--tiki-jui-state-default-bg-position) var(--tiki-jui-bg-repeat);
-    --tiki-jui-bg-hover: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path) var(--tiki-jui-state-hover-bg-position) var(--tiki-jui-bg-repeat);
-    --tiki-jui-bg-active: var(--tiki-jui-state-active-bg) var(--tiki-jui-state-active-bg-path) var(--tiki-jui-state-active-bg-position) var(--tiki-jui-bg-repeat);
+    --tiki-jui-state-default-bg: var(--tiki-jui-state-default-bg-color) var(--tiki-jui-state-default-bg-path) var(--tiki-jui-state-default-bg-position) var(--tiki-jui-bg-repeat);
+    --tiki-jui-state-hover-bg: var(--tiki-jui-state-hover-bg-color) var(--tiki-jui-state-hover-bg-path) var(--tiki-jui-state-hover-bg-position) var(--tiki-jui-bg-repeat);
+    --tiki-jui-state-active-bg: var(--tiki-jui-state-active-bg-color) var(--tiki-jui-state-active-bg-path) var(--tiki-jui-state-active-bg-position) var(--tiki-jui-bg-repeat);
 
     --tiki-jui-widget-header-bg: var(--tiki-jui-widget-header-bg-color) var(--tiki-jui-widget-header-bg-path) var(--tiki-jui-widget-header-bg-position) var(--tiki-jui-bg-repeat);
     --tiki-jui-widget-content-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path) var(--tiki-jui-widget-content-bg-position) var(--tiki-jui-bg-repeat);
@@ -25,20 +25,26 @@
 .accordion-button.collapsed,
 .accordion-toggle.collapsed{
     color: var(--tiki-jui-state-default-color);
-    background: var(--tiki-jui-bg-default);
+    background: var(--tiki-jui-state-default-bg);
     border-color: var(--tiki-jui-state-default-border-color);
     font-weight: var(--tiki-jui-widget-font-weight);
 }
 
 .btn:not(.btn-link) {
     color: var(--tiki-jui-state-default-color);
-    background: var(--tiki-jui-bg-default);
+    background: var(--tiki-jui-state-default-bg);
     font-weight: var(--tiki-jui-widget-font-weight);
 }
 
 .btn:not(.btn-link):hover {
     color: var(--tiki-jui-state-hover-color);
-    background: var(--tiki-jui-bg-hover);
+    background: var(--tiki-jui-state-hover-bg);
+}
+
+.btn:not(.btn-link).active {
+    color: var(--tiki-jui-state-active-color);
+    background: var(--tiki-jui-state-active-bg-color) var(--tiki-jui-state-active-bg-path) var(--tiki-jui-state-active-bg-position) repeat-x;
+    border-color: var(--tiki-jui-state-active-border-color);
 }
 
 .btn.btn-outline-primary {
@@ -48,7 +54,7 @@
 .ui-state-hover,
 .btn-primary:hover, .btn-info:hover {
     color: var(--tiki-jui-state-hover-color);
-    background: var(--tiki-jui-bg-hover);
+    background: var(--tiki-jui-state-hover-bg);
     border-color: var(--tiki-jui-state-hover-border-color);
 }
 
@@ -58,7 +64,7 @@
 .accordion-button:not(.collapsed),
 .accordion-toggle:not(.collapsed) {
     color: var(--tiki-jui-state-active-color);
-    background: var(--tiki-jui-bg-active);
+    background: var(--tiki-jui-state-active-bg);
     border-color: var(--tiki-jui-state-active-border-color);
     font-weight: var(--tiki-jui-widget-font-weight);
 }
@@ -90,7 +96,7 @@
 .btn-info:hover,
 .btn-info.active {
     color: var(--tiki-jui-state-hover-color);
-    background: var(--tiki-jui-bg-hover);
+    background: var(--tiki-jui-state-hover-bg);
     border-color: var(--tiki-jui-state-hover-border-color);
 }
 
@@ -205,7 +211,7 @@ a, .btn-link {
 
 .nav-tabs .nav-link {
     border: 1px solid var(--tiki-jui-state-default-border-color);
-    background: var(--tiki-jui-bg-default);
+    background: var(--tiki-jui-state-default-bg);
     font-weight: var(--tiki-jui-widget-font-weight);
     color: var(--tiki-jui-state-default-color);
     --bs-nav-tabs-link-active-color: var(--tiki-jui-state-default-color);
@@ -214,13 +220,13 @@ a, .btn-link {
 
 .nav-tabs .nav-link:hover {
     border: 1px solid var(--tiki-jui-state-default-border-color);
-    background: var(--tiki-jui-bg-hover);
+    background: var(--tiki-jui-state-hover-bg);
     color: var(--tiki-jui-state-hover-color);
 }
 
 .nav-tabs .nav-link.active {
     border: 1px solid var(--tiki-jui-state-active-border-color);
-    background: var(--tiki-jui-bg-active);
+    background: var(--tiki-jui-state-active-bg);
     color: var(--tiki-jui-state-active-color);
 }
 
@@ -270,17 +276,17 @@ a, .btn-link {
 /* Active state */
 .nav-pills {
     --bs-nav-pills-link-active-color: var(--tiki-active-color);
-    --bs-nav-pills-link-active-bg: var(--tiki-active-bg);
+    --bs-nav-pills-link-active-bg: var(--tiki-jui-state-active-bg);
 }
 
 .accordion-button {
     --bs-accordion-active-color: var(--tiki-jui-state-default-color);
-    --bs-accordion-active-bg: var(--tiki-jui-state-default-color);
+    --bs-accordion-active-bg: var(--tiki-jui-state-default-bg);
 }
 
 .pagination {
     --bs-pagination-active-color: var(--tiki-active-color);
-    --bs-pagination-active-bg: var(--tiki-active-bg);
+    --bs-pagination-active-bg: var(--tiki-jui-state-active-bg);
     --bs-pagination-active-border-color: var(--tiki-active-border-color);
     --bs-pagination-disabled-color: var(--bs-secondary-color);
     --bs-pagination-disabled-bg: var(--bs-secondary-bg);
@@ -295,7 +301,7 @@ a, .btn-link {
 
 .list-group {
     --bs-list-group-action-active-color: var(--bs-body-color);
-    --bs-list-group-action-active-bg: var(--tiki-active-bg);;
+    --bs-list-group-action-active-bg: var(--tiki-jui-state-active-bg);;
     --bs-list-group-disabled-color: var(--bs-secondary-color);
     --bs-list-group-disabled-bg: var(--bs-body-bg);
     --bs-list-group-active-color: #fff;
@@ -305,13 +311,13 @@ a, .btn-link {
 
 .list-group-item.active {
     color: var(--bs-list-group-active-color);
-    background-color: var(--tiki-active-bg);
+    background-color: var(--tiki-active-bg-color);
     border-color: var(--bs-list-group-active-border-color);
 }
 
 .list-group-item-action:not(.active):active {
     color: var(--bs-list-group-action-active-color);
-    background-color: var(--tiki-active-bg);
+    background-color: var(--tiki-active-bg-color);
 }
 /* End active states */
 
@@ -342,16 +348,16 @@ code, pre.codelisting, .CodeMirror.codelisting {
 
 .dropdown-item:hover {
     --bs-dropdown-link-active-color: var(--tiki-jui-state-hover-color);
-    --bs-dropdown-link-active-bg: var(--tiki-jui-bg-hover);
-    background:  var(--tiki-jui-bg-hover);
+    --bs-dropdown-link-active-bg: var(--tiki-jui-state-hover-bg);
+    background:  var(--tiki-jui-state-hover-bg);
     color: var(--tiki-jui-state-hover-color);
     border-color: var(--tiki-jui-state-hover-border-color);
 }
 
 .dropdown-item.active, .dropdown-item:active {
     --bs-dropdown-link-active-color: var(--tiki-jui-state-active-color);
-    --bs-dropdown-link-active-bg: var(--tiki-jui-bg-active);
-    background:  var(--tiki-jui-bg-active);
+    --bs-dropdown-link-active-bg: var(--tiki-jui-state-active-bg);
+    background:  var(--tiki-jui-state-active-bg);
     color: var(--tiki-jui-state-active-color);
     border-color: var(--tiki-jui-state-active-border-color);
 }
@@ -400,12 +406,12 @@ h4.mt-0 {
 .tiki .ui-widget button {
     color: var(--tiki-jui-state-default-color);
     border: 1px solid var(--tiki-jui-state-default-border-color);
-    background: var(--tiki-jui-bg-default);
+    background: var(--tiki-jui-state-default-bg);
     border-radius: var(--tiki-jui-border-radius);
 }
 
 .tiki .ui-dialog-buttonset button:hover {
-    background: var(--tiki-jui-bg-active);
+    background: var(--tiki-jui-state-active-bg);
     color: var(--tiki-jui-state-hover-color);
 }
 .tiki .ui-dialog .ui-dialog-titlebar-close {

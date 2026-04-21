@@ -402,6 +402,7 @@ CREATE TABLE `tiki_calendar_recurrence` (
   `calendarId` int(14) NOT NULL default '0',
   `start` int(4) NOT NULL default '0',
   `end` int(4) NOT NULL default '2359',
+  `duration` int(14) default NULL,
   `allday` tinyint(1) NOT NULL default '0',
   `locationId` int(14) default NULL,
   `categoryId` int(14) default NULL,

@@ -748,6 +748,8 @@ class CalendarLib extends TikiLib
                 ]
             );
             $res['parsedName'] = $parserlib->parse_data($res['name']);
+
+            $res['attachments'] = $this->getEventAttachments((int) $res['calitemId']);
         }
         return $res;
     }
@@ -1006,6 +1008,13 @@ class CalendarLib extends TikiLib
             $this->watch($calitemId, $data);
         }
 
+        if (isset($data['attachments']) && $calitemId) {
+            $fileIds = is_array($data['attachments'])
+                ? $data['attachments']
+                : array_filter(explode(',', (string) $data['attachments']));
+            $this->setEventAttachments((int) $calitemId, $fileIds);
+        }
+
         TikiLib::events()->trigger($finalEvent, [
             'type' => 'calendaritem',
             'object' => $calitemId,
@@ -1098,6 +1107,13 @@ class CalendarLib extends TikiLib
             $this->query($query, [$calitemId]);
             $query = "delete from `tiki_calendar_roles` where `calitemId`=?";
             $this->query($query, [$calitemId]);
+
+            $relationlib = TikiLib::lib('relation');
+            $relations = $relationlib->get_relations_from('calendaritem', $calitemId, 'tiki.file.attach');
+            foreach ($relations as $relation) {
+                $relationlib->remove_relation($relation['relationId']);
+            }
+
             $this->remove_object('calendar event', $calitemId);
             TikiLib::lib('calendar')->add_change($item['calendarId'], $calitemId, 3);
 
@@ -2440,5 +2456,90 @@ class CalendarLib extends TikiLib
             }
         }
         return $item;
+    }
+
+    /**
+     * Get files attached to a calendar event.
+     *
+     * @param int $calitemId The calendar item ID
+     * @return array Array of file info arrays (fileId, name, filename, filetype, etc.)
+     */
+    public function getEventAttachments(int $calitemId): array
+    {
+        $relationlib = TikiLib::lib('relation');
+        $filegallib = TikiLib::lib('filegal');
+
+        $relations = $relationlib->get_relations_from('calendaritem', $calitemId, 'tiki.file.attach');
+        $fileIds = [];
+        foreach ($relations as $relation) {
+            if ($relation['type'] === 'file') {
+                $fileIds[] = (int) $relation['itemId'];
+            }
+        }
+
+        if (empty($fileIds)) {
+            return [];
+        }
+
+        $files = $filegallib->get_files_info(null, $fileIds);
+        return $files ?: [];
+    }
+
+    /**
+     * Set files attached to a calendar event.
+     * This will add new relations and remove ones no longer in the list.
+     *
+     * @param int $calitemId The calendar item ID
+     * @param array $fileIds Array of file IDs to attach
+     * @return void
+     */
+    public function setEventAttachments(int $calitemId, array $fileIds): void
+    {
+        $relationlib = TikiLib::lib('relation');
+
+        // Normalize and removeduplicate file IDs
+        $fileIds = array_unique(array_filter(array_map('intval', $fileIds)));
+
+        // Get current attachments
+        $relations = $relationlib->get_relations_from('calendaritem', $calitemId, 'tiki.file.attach');
+        $currentFileIds = [];
+        $relationMap = []; // fileId => relationId
+
+        foreach ($relations as $relation) {
+            if ($relation['type'] === 'file') {
+                $fid = (int) $relation['itemId'];
+                $currentFileIds[] = $fid;
+                $relationMap[$fid] = $relation['relationId'];
+            }
+        }
+
+        // Determine which to add and which to remove
+        $toAdd = array_diff($fileIds, $currentFileIds);
+        $toRemove = array_diff($currentFileIds, $fileIds);
+
+        // Remove old relations
+        foreach ($toRemove as $fileId) {
+            if (isset($relationMap[$fileId])) {
+                $relationlib->remove_relation($relationMap[$fileId]);
+            }
+        }
+
+        // Add new relations
+        foreach ($toAdd as $fileId) {
+            $relationlib->add_relation('tiki.file.attach', 'calendaritem', $calitemId, 'file', $fileId);
+        }
+    }
+
+    /**
+     * Get the file gallery ID to use for calendar event attachments.
+     * Falls back to global preference or root gallery.
+     *
+     * @return int The gallery ID
+     */
+    public function getAttachmentsGalleryId(): int
+    {
+        global $prefs;
+
+        return (int) ($prefs['calendar_attachments_galleryId'] ?? $prefs['fgal_root_id'] ?? 1);
     }
 }

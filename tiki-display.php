@@ -8,7 +8,6 @@ use Tiki\File\FileHelper;
 
 require_once('tiki-setup.php');
 
-global $user;
 $accesslib = TikiLib::lib('access');
 $accesslib->check_feature('feature_file_galleries');
 
@@ -25,9 +24,8 @@ if (is_null($file)) {
     $accesslib->display_error('tiki-display.php', tr(sprintf('File ID %s not found.', $fileId)));
 }
 
-if (! $tikilib->user_has_perm_on_object($user, $fileId, 'file', 'tiki_p_download_files')) {
-    $accesslib->display_error('tiki-display.php', tr('You do not have permission to view this file'), 403);
-}
+$utilities = new Services_File_Utilities();
+$utilities->enforceFileDownloadPermissions($file);
 
 $data = $file['data'];
 $templatePath = FileHelper::getDisplayTemplate($file, $data, true);

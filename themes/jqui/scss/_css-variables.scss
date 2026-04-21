@@ -25,7 +25,7 @@
     /* Component container headers, including card-header, etc. */
     --tiki-jui-widget-header-color: #222222;
     --tiki-jui-widget-header-bg-color: #cccccc;
-    --tiki-jui-widget-header-bg-path: url('..//images/ui-bg_highlight-soft_75_cccccc_1x100.png');
+    --tiki-jui-widget-header-bg-path: url('../images/ui-bg_highlight-soft_75_cccccc_1x100.png');
     --tiki-jui-widget-header-bg-position: 50% 50%;
     --tiki-jui-widget-header-border-color: #aaaaaa;
     --tiki-jui-widget-header-link-color: #222222;
@@ -40,22 +40,22 @@
     --tiki-jui-widget-content-link-hover-color: #222222;
 
     /* Interactive elements including buttons, etc. */
-    --tiki-jui-state-default-color: #555555; /* btn-primary, etc.*/
-    --tiki-jui-state-default-bg: #e6e6e6;
+    --tiki-jui-state-default-color: #666666; /* btn-primary, etc.*/
+    --tiki-jui-state-default-bg-color: #e6e6e6;
     --tiki-jui-state-default-bg-path: url('../images/ui-bg_glass_75_e6e6e6_1x400.png');
     --tiki-jui-state-default-bg-path-adminui: url('../images/ui-bg_glass_75_e6e6e6_1x400.png');
     --tiki-jui-state-default-bg-position: 50% 50%;
     --tiki-jui-state-default-border-color: #d3d3d3;
 
     --tiki-jui-state-hover-color: #212121;
-    --tiki-jui-state-hover-bg: #dadada;
+    --tiki-jui-state-hover-bg-color: #dadada;
     --tiki-jui-state-hover-bg-path: url('../images/ui-bg_glass_75_dadada_1x400.png');
     --tiki-jui-state-hover-bg-path-adminui: url('../images/ui-bg_glass_75_dadada_1x400.png');
     --tiki-jui-state-hover-bg-position: 50% 50%;
     --tiki-jui-state-hover-border-color: #d3d3d3;
 
     --tiki-jui-state-active-color: #212121;
-    --tiki-jui-state-active-bg: #ffffff;
+    --tiki-jui-state-active-bg-color: #ffffff;
     --tiki-jui-state-active-bg-path: url('../images/ui-bg_glass_65_ffffff_1x400.png');
     --tiki-jui-state-active-bg-path-adminui: url('../images/ui-bg_glass_65_ffffff_1x400.png');
     --tiki-jui-state-active-bg-position: 50% 50%;
@@ -87,7 +87,7 @@
     --tiki-jui-widget-content-bg-path: ;
     --tiki-jui-widget-content-link-color: var(--bs-link-color);
     --tiki-jui-widget-content-link-hover-color: var(--bs-link-hover-color);
-    --tiki-jui-widget-header-color:  var(--bs-body-color);
+    /*--tiki-jui-widget-header-color:  var(--bs-body-color);*/
 }
 
 // Used for L&F nav color choice and color mode override
@@ -112,16 +112,17 @@
 }
 
 @mixin top-nav-light {
-    --tiki-top-bg: var(--tiki-jui-state-default-bg) var(--tiki-jui-state-default-bg-path) var(--tiki-jui-state-default-bg-position) repeat-x;
+    --tiki-top-bg: var(--tiki-jui-state-default-bg-color) var(--tiki-jui-state-default-bg-path) var(--tiki-jui-state-default-bg-position) repeat-x;
     --tiki-top-color: #{$navbar-light-color};
     --tiki-top-hover-color: #{$navbar-light-hover-color};
     --tiki-top-text-color: #{$navbar-light-hover-color};
     --bs-navbar-brand-color: #{$navbar-light-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
+    --tiki-top-box-shadow: 0px 1px 10px #cac8c8;
 }
 
 @mixin topbar-nav-light {
-    --tiki-topbar-bg: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path) var(--tiki-jui-state-hover-bg-position) repeat-x;
+    --tiki-topbar-bg: var(--tiki-jui-state-hover-bg-color) var(--tiki-jui-state-hover-bg-path) var(--tiki-jui-state-hover-bg-position) repeat-x;
     --tiki-topbar-color: #{$navbar-light-color};
     --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
     --tiki-topbar-text-color: #{$navbar-dark-hover-color};
@@ -144,14 +145,14 @@
 }
 
 // Color mode preference trumps L&F admin light navbar option
-[data-bs-theme=dark] {                              // dark color mode
-    .tiki-top-nav-light {                           // light top selector
-        @include top-nav-dark;                      // dark values
-    }
-    .tiki-topbar-nav-light {
-        @include topbar-nav-dark;
-    }
-}
+//[data-bs-theme=dark] {                              // dark color mode
+//    .tiki-top-nav-light {                           // light top selector
+//        @include top-nav-dark;                      // dark values
+//    }
+//    .tiki-topbar-nav-light {
+//        @include topbar-nav-dark;
+//    }
+//}
 
 // Color mode preference trumps L&F admin dark navbar option
 
@@ -159,10 +160,11 @@
 
 // Light navbar minus top nav
 @mixin admin-nav-light {
-    --tiki-admin-top-nav-bg: var(--tiki-jui-state-default-bg) url('../images/ui-bg_glass_75_e6e6e6_1x400.png') var(--tiki-jui-state-default-bg-position) repeat-x;
+    --tiki-admin-top-nav-bg: var(--tiki-jui-state-default-bg-color) url('../images/ui-bg_glass_75_e6e6e6_1x400.png') var(--tiki-jui-state-default-bg-position) repeat-x;
     --tiki-admin-top-nav-color:  #{$navbar-light-color};
     --tiki-admin-top-nav-hover-color: #{$navbar-dark-hover-color};
     --tiki-admin-top-nav-hover-bg: none ;
+    --tiki-admin-top-box-shadow: 0px 1px 10px #cac8c8;
     --tiki-admin-aside-nav-bg: linear-gradient(to bottom, #e3e3e3 0%, #cccccc 100%);
     --tiki-admin-aside-nav-color: #{$navbar-light-color};
     --tiki-admin-aside-nav-hover-color: #{$navbar-dark-hover-color};
@@ -170,19 +172,25 @@
     --tiki-admin-dropdown-link-color: #{$dropdown-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
+}
+
+:root .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light {
+    background: url('../images/ui-bg_glass_75_e6e6e6_1x400.png') repeat-x 50% 50% !important;
+}
+
     button.accordion-button:not(.collapsed) {
         color: var(--tiki-admin-aside-nav-color);
         background: var(--tiki-jui-state-active-bg) var(--tiki-jui-state-active-bg-path-adminui) 50% 50% repeat-x;
     }
     button.accordion-button.collapsed {
-        color: var(--tiki-admin-aside-nav-color);
-        background: var(--tiki-jui-state-default-bg) var(--tiki-jui-state-default-bg-path-adminui) 50% 50% repeat-x;
+        color: #{$navbar-light-color};
+        background: var(--tiki-jui-state-default-bg-color) var(--tiki-jui-state-default-bg-path-adminui) 50% 50% repeat-x;
     }
     button.accordion-button:hover {
         color: var(--tiki-admin-aside-nav-color);
-        background: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path-adminui) 50% 50% repeat-x;
+        background: var(--tiki-jui-state-hover-bg-color) var(--tiki-jui-state-hover-bg-path-adminui) 50% 50% repeat-x;
     }
-}
+
 
 // Improve appearance when two areas with same background color meet
 .navbar-wrapper:has(.tiki-admin-aside-nav-light) {
@@ -208,6 +216,10 @@
         color: var(--tiki-admin-aside-nav-color);
         background: #696868 linear-gradient(180deg,rgba(105, 104, 104, 1) 0%, rgba(99, 98, 98, 1) 30%, rgba(82, 81, 81, 1) 50%, rgba(89, 88, 88, 1) 70%, rgba(82, 82, 82, 1) 100%);
     }
+    button.accordion-button:not(.collapsed) {
+        color: #636262;
+    }
+
     .tiki-admin-aside-nav-dark .dropdown-item.active, .dropdown-item:active {
           --bs-dropdown-link-active-color: #fff;
     }
@@ -260,5 +272,23 @@
         .nav-link {
             color: $link-color-dark;
         }
+    }
+    button.accordion-button:not(.collapsed) {
+        background: #696868 linear-gradient(180deg,rgba(105, 104, 104, 1) 0%, rgba(99, 98, 98, 1) 30%, rgba(82, 81, 81, 1) 50%, rgba(89, 88, 88, 1) 70%, rgba(82, 82, 82, 1) 100%);
+        color: #e0e0e0;
+        &:hover {
+            color: black;
+        }
+    }
+    button.accordion-button.collapsed {
+        color: #{$navbar-light-color};
+        background: #696868 linear-gradient(180deg,rgba(105, 104, 104, 1) 0%, rgba(82, 81, 81, 1) 30%, rgba(89, 88, 88, 1) 50%, rgba(82, 82, 82, 1) 70%, rgba(99, 98, 98, 1)  100%);
+        &:hover {
+            color: black;
+        }
+    }
+    button.accordion-button:hover {
+        color: var(--tiki-admin-aside-nav-color);
+        background: var(--tiki-jui-state-hover-bg-color) var(--tiki-jui-state-hover-bg-path-adminui) 50% 50% repeat-x;
     }
 }

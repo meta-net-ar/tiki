@@ -71,16 +71,6 @@
         "    We use version ~8.0 instead of ~9.0 because new version of this uses ",
         "    \"lcobucci/jwt\": >= 5.4 which requires php > 8.2.0 our php version is 8.1 .",
         "",
-        "  paragonie/sodium_compat: ",
-        "    This is https://github.com/paragonie/sodium_compat",
-        "    A pure php polyfill for ",
-        "    https://www.php.net/manual/en/sodium.installation.php",
-        "    Sodium is a core extension since php 7.2",
-        "    + we seem to actually check for it in tiki-check.php",
-        "    + we have alternate code paths in lib/crypt/cryptlib.php",
-        "    Security critical, aparently uninitialised code",
-        "    Should probably be removed. benoitg 2023-05-05",
-        "",
         "  pear/xml_parser:",
         "    This package is abandoned and no longer maintained. No replacement package was suggested. ",
         "    We use this in lib/wiki/PageParser.php",
@@ -190,7 +180,6 @@
         "ext-gd": "*",
         "ext-iconv": "*",
         "ext-intl": "*",
-        "ext-json": "*",
         "ext-libxml": "*",
         "ext-openssl": "*",
         "ext-zip": "*",
@@ -242,7 +231,6 @@
         "nyholm/psr7-server": "~1.1",
         "onelogin/php-saml": "~4.3",
         "openannotation/annotator": ">=1.2.10",
-        "paragonie/sodium_compat": "~2.4",
         "pclzip/pclzip": "~2.8",
         "pear/net_socket": "~1.2",
         "pear/pear": "~1.10",
@@ -428,6 +416,9 @@
             "php-http/discovery": true
         },
         "audit": {
+            "ignore": {
+                "PKSA-5jz8-6tcw-pbk4": "phpunit dev-only dependency, no fix available in PHP 8.1-compatible 10.x line. Fix exists in phpunit 12.5.22+ which requires PHP >= 8.3."
+            },
             "ignore-abandoned": {
                 "candy-chat/xmpp-prebind-php": "Work scheduled for removal next month.",
                 "laminas/laminas-loader": "Required transitively by laminas/laminas-http but will be solved in 3.0 https://github.com/laminas/laminas-http/pull/110",

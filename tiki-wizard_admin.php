@@ -107,6 +107,9 @@ if ($useDefaultPrefs) {
     // Store the use Changes Wizard selection in the wizard bar
     $smarty->assign('useChangesWizard', $useChangesWizard);
 
+    require_once('lib/wizard/pages/changes_new_in_30.php');
+    $pages[] = new Tiki\Lib\Wizard\Pages\ChangesWizardNewIn30();
+
     require_once('lib/wizard/pages/changes_new_in_26.php');
     $pages[] = new ChangesWizardNewIn26();
 

@@ -118,4 +118,44 @@ class WikiPlugin_Helper
 
         return $missing;
     }
+
+    /**
+     * Apply separator processing to plugin parameters
+     *
+     * Converts string parameters with defined separators into arrays. (eg. "1:2:3" converts to [1, 2, 3])
+     *
+     * @param array $params Plugin parameters
+     * @param array $info Plugin info array (must contain 'params')
+     * @return array Updated parameters with separators applied
+     */
+    public static function applySeparators($params, $info)
+    {
+        $tikilib = TikiLib::lib('tiki');
+
+        if (! isset($info['params'])) {
+            return $params;
+        }
+
+        foreach ($info['params'] as $key => $paramInfo) {
+            if (! isset($paramInfo['separator'])) {
+                continue;
+            }
+
+            // Skip if parameter not provided or is null
+            if (! isset($params[$key]) || $params[$key] === null) {
+                continue;
+            }
+
+            // If already an array, skip processing
+            if (is_array($params[$key])) {
+                continue;
+            }
+
+            // Split the string value using the separator
+            $params[$key] = $tikilib->multi_explode($paramInfo['separator'], $params[$key]);
+            $params[$key] = array_values(array_filter($params[$key]));
+        }
+
+        return $params;
+    }
 }

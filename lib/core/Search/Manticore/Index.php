@@ -400,12 +400,12 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
 
     public function optimize()
     {
+        $this->pdo_client->flush();
         $this->pdo_client->optimize($this->index);
     }
 
     public function endUpdate()
     {
-        $this->pdo_client->flush();
         $this->optimize();
     }
 

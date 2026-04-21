@@ -582,6 +582,16 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             );
         }
 
+        $attachmentsGalleryId = $this->calendarLib->getAttachmentsGalleryId();
+
+        $canUploadAttachments = Perms::get(['type' => 'file gallery', 'object' => $attachmentsGalleryId])->upload_files;
+
+        // Load elFinder JS/CSS if enabled for file browsing
+        if ($prefs['fgal_elfinder_feature'] == 'y' && $prefs['fgal_tracker_existing_search'] == 'y') {
+            include_once 'lib/jquery_tiki/elfinder/tikiElFinder.php';
+            \tikiElFinder::loadJSCSS();
+        }
+
         return [
             // collections
             'daynames'                   => $this->daynames,
@@ -621,6 +631,9 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'hideCalendarSelector'       => $input->prefill_start->text() !== '' && $input->target_user->text() !== '',
             // related tracker items
             'trackerItems'              => ! empty($trackerItems) ? $trackerItems : [],
+            // file attachments
+            'attachmentsGalleryId'       => $attachmentsGalleryId,
+            'canUploadAttachments'       => $canUploadAttachments,
         ];
     }
 
@@ -765,6 +778,60 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         return [];
     }
 
+    public function action_remove_calendar(JitFilter $input): array
+    {
+        $calendarId = $input->calendarId->int();
+        if (! $calendarId) {
+            throw new Services_Exception_NotFound(tr('Calendar not found'));
+        }
+
+        $calendar = $this->calendarLib->get_calendar($calendarId);
+        if (empty($calendar)) {
+            throw new Services_Exception_NotFound(tr('Calendar not found'));
+        }
+
+        if (! $this->calendarLib->canAdminCalendar($calendar)) {
+            throw new Services_Exception_Denied(tr('Permission denied'));
+        }
+
+        $util = new Services_Utilities();
+        if ($util->notConfirmPost()) {
+            $util->setVars($input, ['calendarId' => 'int']);
+
+            $calendarDisplayName = ! empty($calendar['name']) ? $calendar['name'] : tr('Id #%0', $calendarId);
+
+            $eventCount = (int) $this->calendarLib->getOne(
+                "SELECT COUNT(*) FROM `tiki_calendar_items` WHERE `calendarId` = ?",
+                [$calendarId]
+            );
+
+            $extras = [];
+            if ($eventCount === 1) {
+                $extras['warning'] = tr(
+                    'This calendar has 1 event. Deleting this calendar will permanently delete all events and cannot be undone.'
+                );
+            } elseif ($eventCount > 1) {
+                $extras['warning'] = tr(
+                    'This calendar has %0 events. Deleting this calendar will permanently delete all events and cannot be undone.',
+                    $eventCount
+                );
+            }
+
+            return $util->confirm(tr('Delete calendar "%0"?', $calendarDisplayName), tra('Delete'), $extras);
+        } elseif ($util->checkCsrf()) {
+            $result = $this->calendarLib->drop_calendar($calendarId);
+            if ($result->numRows()) {
+                Feedback::success(tr('Calendar %0 deleted', $calendarId));
+            } else {
+                Feedback::error(tr('Calendar %0 not deleted', $calendarId));
+            }
+
+            return Services_Utilities::refresh();
+        }
+
+        return [];
+    }
+
     public function action_delete_recurrent_items(JitFilter $input): array
     {
         $calitemId = $this->getItemId($input); // also checks edit perms
@@ -840,6 +907,14 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                     $calitemId = $this->calendarLib->getMaxItemId();
                 }
 
+                // Handle file attachments
+                if ($calitemId && isset($calitem['attachments'])) {
+                    $fileIds = is_array($calitem['attachments'])
+                        ? $calitem['attachments']
+                        : array_filter(explode(',', (string) $calitem['attachments']));
+                    $this->calendarLib->setEventAttachments((int) $calitemId, $fileIds);
+                }
+
                 // Save the ip at the log for the addition of new calendar items
                 if ($this->logsLib) {
                     $this->logsLib->add_action(
@@ -912,8 +987,10 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $tikidateStart->setDate($calitem['start']);
         $tikidateEnd = new TikiDate();
         $tikidateEnd->setDate($calitem['end']);
+        $duration = ($calitem['end'] - $calitem['start']);
         $recurrence->setStart($tikidateStart->format("%H%M", true));
         $recurrence->setEnd($tikidateEnd->format("%H%M", true));
+        $recurrence->setDuration($duration);
         date_default_timezone_set($tz);
         $recurrence->setAllday($calitem['allday']);
         $recurrence->setLocationId($calitem['locationId']);

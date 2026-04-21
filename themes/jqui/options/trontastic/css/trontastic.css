@@ -1,7 +1,8 @@
- /*! The Trontastic theme option for the jQqui theme */
-/* "-bg" in this file refers to "background color" in keeping with Bootstrap naming conventions. "-bg-path" refers to the path of the background image. */
-/* @import url("../../../../../../../../../themes/default/css/default.css"); */
-@import url("../../tiki-selectors.css");
+ /*! The Trontastic theme option for the jQui theme */
+ /* For Bootstrap CSS variables ("--bs-),"-bg" in this file refers to "background color" in keeping with Bootstrap naming conventions.
+  * For Tiki CSS variables ("--tiki-"), "-bg" refers to the overall CSS background property including color, background-image, etc. */
+
+ @import url("../../tiki-selectors.css");
 
 :root {
     --tiki-jui-border-radius: 8px;
@@ -31,14 +32,14 @@
     /* Interactive elements including buttons, etc. */
     --tiki-jui-state-default-color: #c7f391; /* btn-primary, etc.*/
     --tiki-jui-state-default-color-rgba-25: rgba(184, 236, 121, 0.25);
-    --tiki-jui-state-default-bg: #0a0a0a;
+    --tiki-jui-state-default-bg-color: #0a0a0a;
     --tiki-jui-state-default-bg-path: url("trontastic/images/ui-bg_glass_40_0a0a0a_1x400.png");
     --tiki-jui-state-default-bg-path-adminui: url("../images/ui-bg_glass_40_0a0a0a_1x400.png");
     --tiki-jui-state-default-bg-position: 50% 50%;
     --tiki-jui-state-default-border-color: #c7f391a1;
 
     --tiki-jui-state-hover-color: #96f226;
-    --tiki-jui-state-hover-bg: #000;
+    --tiki-jui-state-hover-bg-color: #000;
     --tiki-jui-state-hover-bg-path: url("trontastic/images/ui-bg_glass_60_000000_1x400.png");
     --tiki-jui-state-hover-bg-path-adminui: url("../images/ui-bg_glass_60_000000_1x400.png");
     --tiki-jui-state-hover-bg-position: 50% 50%;
@@ -56,7 +57,7 @@
     --tiki-jui-highlight-bg-path: url("trontastic/images/ui-bg_glass_55_f1fbe5_1x400.png");
     --tiki-jui-highlight-bg-position: 50% 50%;
     --tiki-jui-highlight-bg-repeat: repeat-x;
-    --tiki-jui-highlight-border-color:#8cce3b ;
+    --tiki-jui-highlight-border-color: fffffffff#8cce3b ;
 
     --tiki-jui-error-color: #74736d;
     --tiki-jui-error-link-color: #74736d;
@@ -136,7 +137,7 @@
 
     --tiki-nav-tabs-link-color: #b8ec79;
     --tiki-active-color: var(--bs-link-color);
-    --tiki-active-bg: var(--bs-info-bg-subtle);
+    --tiki-active-bg-color: var(--bs-info-bg-subtle);
     --tiki-active-border-color: var(--bs-border-color);
     --tiki-jui-bg-light: gray !important;
 }
@@ -152,7 +153,7 @@
 }
 
 .tiki-topbar-nav-light {
-    --tiki-topbar-bg: var(--tiki-jui-bg-widget-content);
+    --tiki-topbar-bg: var(--tiki-jui-widget-content-bg-color); var(--tiki-jui-widget-content-bg-path-pagetop) 50% repeat-x;
     --tiki-topbar-color: var(--tiki-jui-widget-content-color);
     --tiki-topbar-hover-color: rgba(0, 0, 0, 0.7);
     --tiki-topbar-text-color: rgba(0, 0, 0, 0.7);
@@ -180,7 +181,7 @@
 }
 
 [data-bs-theme=dark] .tiki-top-nav-light {
-    --tiki-top-bg: var(--tiki-jui-bg-widget-content); /*#212529;*/
+    --tiki-top-bg: var(--tiki-jui-widget-content-bg-color); var(--tiki-jui-widget-content-bg-path-pagetop) 50% repeat-x; /*#212529;*/
     --tiki-top-color: #fff;
     --tiki-top-hover-color: #fff;
     --tiki-top-text-color: #fff;
@@ -213,6 +214,11 @@
     --tiki-admin-dropdown-link-hover-bg: var(--tiki-jui-widget-header-bg-color);
 }
 
+ :root .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light {
+     background: url("../../trontastic/images/ui-bg_gloss-wave_85_9fda58_500x100.png") repeat-x 50% 50% !important;
+ }
+
+
 :root .tiki .tiki-admin-aside-nav-light,
 :root .tiki .tiki-admin-aside-nav-dark {
     background-repeat: no-repeat !important;
@@ -232,7 +238,7 @@
 /*:root .tiki .tiki-admin-top-nav-dark,*/
 :root .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark,
 :root .tiki .tiki-admin-aside-nav-dark {
-    --tiki-admin-top-nav-bg: var(--tiki-jui-widget-content-bg-path-adminui) 50% repeat-x;
+    /*--tiki-admin-top-nav-bg: var(--tiki-jui-widget-content-bg-color) var(--tiki-jui-widget-content-bg-path-adminui) 50% repeat-x !important;*/
     --tiki-admin-top-nav-color: var(--tiki-jui-state-default-color);
     --tiki-admin-top-nav-hover-color: #fff;
     --tiki-admin-top-nav-hover-bg: #fff;
@@ -244,6 +250,10 @@
     --tiki-admin-dropdown-link-hover-color: var(--bs-body-color);
     --tiki-admin-dropdown-link-hover-bg: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path-adminui) var(--tiki-jui-state-hover-bg-position) var(--tiki-jui-bg-repeat);
 }
+
+ :root .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark {
+     background: url('../../trontastic/images/ui-bg_gloss-wave_55_000000_500x100.png') repeat-x 50% 50% !important;
+ }
 
 :root .tiki .tiki-admin-aside-nav-dark button.accordion-button {
     color: var(--tiki-admin-aside-nav-color) !important;

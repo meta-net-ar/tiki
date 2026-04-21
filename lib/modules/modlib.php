@@ -534,6 +534,10 @@ class ModLib extends TikiLib
         $section = Sections::getCurrentSection();
         $tikilib = TikiLib::lib('tiki');
 
+        if (! isset($prefs['module_' . $module["name"]])) {
+            return false;
+        }
+
         if ($prefs['module_' . $module["name"]] != 'y') {
             return false;
         }

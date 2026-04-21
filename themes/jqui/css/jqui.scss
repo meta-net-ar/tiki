@@ -4,6 +4,7 @@
  * Copyright 2002-2025 The Tiki Community as described in copyright.txt
  * Licensed under MIT
  * The jQui theme and its child themes use some design elements from https://jqueryui.com/themeroller/, copyright OpenJS Foundation and other contributors, https://openjsf.org/,  in accordance with the terms of use.
+ * The jQui child themes are an experiment in creating no-compile child themes (CSS only, no SCSS files) making extensive use of CSS variables.
  */
 
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
