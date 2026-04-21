@@ -21,7 +21,7 @@
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">{tr}Loading...{/tr}</span>
             </div>
-            <p class="text-muted mt-2">{tr}Follow your device's prompt to create a passkey…{/tr}</p>
+            <p class="text-muted mt-2">{tr}Follow your device's prompt to create a passkey...{/tr}</p>
         </div>
 
         <div id="passkey-error" class="mt-4" style="display:none;">
