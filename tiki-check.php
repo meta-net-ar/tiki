@@ -5735,7 +5735,7 @@ function get_tiki_check_db_connection()
     // Fallback to standalone logic or if TikiDb is not available/not mysqli
     global $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki;
 
-    if (!isset($host_tiki) || !isset($user_tiki)) {
+    if (! isset($host_tiki) || ! isset($user_tiki)) {
         if (file_exists('db/local.php')) {
             include 'db/local.php';
         }
