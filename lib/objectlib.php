@@ -968,8 +968,6 @@ class ObjectLib extends TikiLib
         $info = $this->get_info($type, $id);
 
         if (isset($info['title'])) {
-            // trigger_error('Getting title for ' . $type . ':' . $id . ' with format ' . $format, E_USER_WARNING);
-            // trigger_error("Info for $type:$id: " . print_r($info, true), E_USER_WARNING);
             return $info['title'];
         }
 
