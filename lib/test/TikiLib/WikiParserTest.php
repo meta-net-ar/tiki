@@ -69,6 +69,7 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         $prefs['feature_wiki_paragraph_formatting'] = 'n';
         $prefs['pass_chr_special'] = 'n';
         $prefs['wiki_heading_links'] = 'n';
+        $prefs['feature_wiki_show_link_title'] = 'y';
         $this->assertEquals($output, TikiLib::lib('parser')->parse_data($input, $options));
     }
 
@@ -122,8 +123,8 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
             ['--foo--', "<strike>foo</strike><br />"],  // strike out
             ['-- foo --', "-- foo --<br />"],   // not parsed
 
-            ['[foo]', '<a class="wiki"   href="foo" rel="">wiki-icon-mock foo</a><br />'], // link
-            ['[foo|bar]', '<a class="wiki"   href="foo" rel="">bar</a><br />'], // link
+            ['[foo]', '<a class="wiki tips"  data-bs-content="foo" data-bs-toggle="tooltip" href="foo" rel="">foo</a><br />'], // link
+            ['[foo|bar]', '<a class="wiki tips"  data-bs-content="foo" data-bs-toggle="tooltip" href="foo" rel="">bar</a><br />'], // link
 
             ['[[foo', '[foo<br />'], // Square brackets
             ['[[foo]]', '[[foo]]<br />'], // Square brackets

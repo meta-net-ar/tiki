@@ -287,37 +287,6 @@ class ObjectLib extends TikiLib
         }
     }
 
-    public function getObjectIconName($type)
-    {
-        $icons = [
-            'article' => 'articles',
-            'blog' => 'blog',
-            'calendar' => 'calendar',
-            'directory' => 'directory',
-            'faq' => 'faq',
-            'file' => 'file',
-            'file gallery' => 'file-gallery',
-            'forum' => 'forum',
-            'perspective' => 'perspective',
-            'poll' => 'poll',
-            'quiz' => 'quiz',
-            'structure' => 'structure',
-            'tracker' => 'admin_trackers',
-            'survey' => 'survey',
-            'trackeritem' => 'admin_trackers',
-            'sheet' => 'sheet',
-            'user' => 'user',
-            'wiki page' => 'wiki',
-            'template' => 'template'
-        ];
-
-        if (isset($icons[$type])) {
-            return $icons[$type];
-        } else {
-            return null;
-        }
-    }
-
     public function insert_object($type, $itemId, $description = '', $name = '', $href = '')
     {
         if (! $itemId) {
