@@ -1,8 +1,9 @@
 {if $facets|@count}
-    <div class="facets" style="width: 25%; float: right;">
+<div class="search-with-facets">
+    <aside class="facets search-facets-sidebar" aria-label="{tr}Search filters{/tr}">
         {foreach from=$facets item=facet}
-            <div class="mb-3 row facet-hide-group">
-                <label for="{$facet.name|escape}">{$facet.label|escape}</label>
+            <div class="mb-3 facet-hide-group">
+                <label class="form-label" for="{$facet.name|escape}">{$facet.label|escape}</label>
                 <select id="{$facet.name|escape}" class="form-select" multiple data-for="#search-form input[name$='filter~{$facet.name|escape}']" data-join="{$facet.operator|escape}">
                     {foreach from=$facet.options key=value item=label}
                         <option value="{$value|escape}">{$label|escape}</option>
@@ -10,17 +11,16 @@
                 </select>
             </div>
         {/foreach}
-        <div class="mb-3 row">
-            <button class="btn btn-primary">{tr}Filter{/tr}</button>
+        <div class="search-facets-actions">
+            <button type="button" class="btn btn-primary">{tr}Filter{/tr}</button>
         </div>
-    </div>
+    </aside>
     {jq}
         $('.facets select').registerFacet();
         $('.facets button').on("click", function () {
             $('#search-form').trigger("submit");
         });
 
-        // remove empty inputs to keep the url clean
         $('#search-form').on("submit", function () {
             $(this)
                 .find('input[name]')
@@ -30,8 +30,10 @@
                 .prop('name', '');
         });
     {/jq}
-{/if}
+    <div class="search-results-main">
+{else}
 <div>
+{/if}
 <ul class="searchresults">
     {if $results->didYouMean}
         <i>{tr}Found results for:{/tr} <b>{$results->didYouMean}</b></i>
@@ -78,3 +80,6 @@
 </ul>
 {pagination_links resultset=$results}{/pagination_links}
 </div>
+{if $facets|@count}
+</div>
+{/if}
