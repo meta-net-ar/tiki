@@ -14,7 +14,6 @@
                         {include file="register-form.tpl"}
                         {if $merged_prefs.feature_antibot eq 'y'}{include file='antibot.tpl' form='register'}{/if}
                         <div class="row mb-4">
-                            {if $prefs.auth_webauthn_enabled eq 'y'}{include file='webauthn.tpl' form='register'}{/if}
                             <div class="col-sm-8 offset-sm-4">
                               <input type="hidden" name="register" value="1">
                               <button class="btn btn-primary registerSubmit submit" id="registerSubmit" name="register" type="submit">{tr}Register{/tr} {*<i class="fa fa-check"></i>*}</button>
@@ -64,42 +63,7 @@
 
                 setSubmitting(true);
 
-                var isWebauthnEnabled = "{{$prefs.auth_webauthn_enabled}}";
-                var isWebAuthnIsChoosen = $("#webauthn_checkbox_register").is(':checked') && isWebauthnEnabled === 'y';
-                var regUser = $(this).find('#name').val();
-                if (isWebAuthnIsChoosen) {
-                    try {
-                        if (!window.PublicKeyCredential) {
-                            throw new Error(tr("Your browser does not support password less login feature."));
-                        }
-                        if (!window.isSecureContext) {
-                            throw new Error(tr("Passkey feature requires a secure (HTTPS) connection. Please ensure you are using a secure website."));
-                        }
-                        const result = await $.fn.registerWebAuth.createCredentials(event, regUser);
-                        if (result && result.code === 'AUTHENTICATOR_EXIST') {
-                            $("#tikifeedback").html(
-                                `<div class="alert alert-danger alert-dismissible">
-                                    ${result.message}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>`
-                            );
-                            setSubmitting(false);
-                            return;
-                        }
-                        this.submit();
-                    } catch (error) {
-                        $("#tikifeedback").html(
-                            `<div class="alert alert-danger alert-dismissible">
-                                ${error}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>`
-                        );
-                        setSubmitting(false);
-                        return;
-                    }
-                } else {
-                    this.submit();
-                }
+                this.submit();
             });
         {/jq}
     {/if}

@@ -429,7 +429,12 @@ class RegistrationLib extends TikiLib
             if (! $pending) {
                 $smarty->assign('username', $registration['name']);
                 $logslib->add_log('register', 'created account ' . $registration['name']);
-                $result = $smarty->fetch('mail/user_welcome_msg.tpl');
+                if ($prefs['auth_webauthn_enabled'] === 'y') {
+                    TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-webauthn.js');
+                    $result = $smarty->fetch('mail/user_add_passkey_prompt.tpl');
+                } else {
+                    $result = $smarty->fetch('mail/user_welcome_msg.tpl');
+                }
             }
         }
 
