@@ -93,24 +93,40 @@ $(document).on("touchend click", ".sm-navbar .sm-sub-toggler", function (e) {
     var $panel = $toggler.siblings(".sm-sub").first();
     if (!$panel.length || !window.bootstrap || !window.bootstrap.Collapse) return;
 
-    // Open or close the menu using Bootstrap
     var bsCollapse = window.bootstrap.Collapse.getOrCreateInstance($panel[0], { toggle: false });
     var isShown = $panel.hasClass("show");
 
-    bsCollapse.toggle();
-    $toggler.attr("aria-expanded", isShown ? "false" : "true");
-
-    // Close other open menus at the same level
+    // Close other open menus in the same navbar before opening this one,
+    // but spare the parent chain (ancestors) of the clicked toggler.
     if (!isShown) {
-        $toggler
-            .closest("li")
-            .siblings("li")
-            .find("> .sm-sub.show")
-            .each(function () {
+        $navbar.find(".sm-sub.show").each(function () {
+            // Skip the panel we are about to open and any ancestor panels
+            if (this !== $panel[0] && !$.contains(this, $toggler[0])) {
                 var peer = window.bootstrap.Collapse.getInstance(this);
                 if (peer) peer.hide();
                 $(this).siblings(".sm-sub-toggler").attr("aria-expanded", "false");
-            });
+            }
+        });
+    }
+
+    // Open or close the menu using Bootstrap
+    bsCollapse.toggle();
+    $toggler.attr("aria-expanded", isShown ? "false" : "true");
+});
+
+/* Click outside to close open mobile menu dropdowns */
+$(document).on("touchend click", function (e) {
+    var $target = $(e.target);
+
+    // If the click is outside all navbars, close any open dropdowns
+    if (!$target.closest(".sm-navbar").length) {
+        $(".sm-navbar .sm-sub.show").each(function () {
+            var peer = window.bootstrap.Collapse.getInstance(this);
+            if (peer) {
+                peer.hide();
+                $(this).siblings(".sm-sub-toggler").attr("aria-expanded", "false");
+            }
+        });
     }
 });
 
