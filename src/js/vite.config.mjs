@@ -105,10 +105,13 @@ export default defineConfig(({ command, mode }) => {
         { prefix: "@tiki/plugins/", src: "src/js/@tiki/plugins" },
         { prefix: "@tiki/tracker-field-base/", src: "src/js/@tiki/tracker-field-base" },
         { prefix: "@tiki/tracker-fields/", src: "src/js/@tiki/tracker-fields" },
-        { prefix: "themes/", src: "themes", pattern: "themes/*/js/custom.module.js" },
-        { prefix: "themes/", src: "themes", pattern: "themes/*/options/*/js/custom.module.js" },
-        { prefix: "_custom/", src: "_custom", pattern: "_custom/shared/js/custom.module.js" },
-        { prefix: "_custom/", src: "_custom", pattern: "_custom/sites/*/js/custom.module.js" },
+    ]);
+
+    addThemeAndCustomEntries(rollupInput, [
+        "themes/*/js/custom.module.js",
+        "themes/*/options/*/js/custom.module.js",
+        "_custom/shared/js/custom.module.js",
+        "_custom/sites/*/js/custom.module.js",
     ]);
 
     Object.assign(rollupInput, {
@@ -769,20 +772,49 @@ export default defineConfig(({ command, mode }) => {
  * @param {Array} entries - An array of objects with the following properties:
  *   - prefix: prefix used for the key names (e.g., "jquery-tiki/")
  *   - src: path to the source folder to scan (e.g., "src/js/jquery-tiki")
- *   - pattern: optional glob pattern override (defaults to `${src}/*.js`)
  */
 function addGlobEntries(rollupInput, entries) {
-    entries.forEach(({ prefix, src, pattern }) => {
+    entries.forEach(({ prefix, src }) => {
         Object.assign(
             rollupInput,
             Object.fromEntries(
-                //do NOT change the default to /**/*.js, this is to implement an easy migration path for single file modules like the old lib/jquery-tiki
-                globSync(pattern || `${src}/*.js`, {
+                //do NOT change this to /**/*.js, this is to implement an easy migration path for single file modules like the old lib/jquery-tiki
+                globSync(`${src}/*.js`, {
                     ignore: ["**/node_modules/**", "**/*.test.js"]
                 }).map(file => {
                     const relativePath = path.relative(src, file.slice(0, file.length - path.extname(file).length));
                     const fullPath = resolve(__dirname, path.relative(__dirname, file));
                     return [`${prefix}${relativePath}`, fullPath];
+                })
+            )
+        );
+    });
+}
+
+/**
+ * Adds theme and _custom `custom.module.js` entrypoints to rollupInput.
+ *
+ * These are per-site / per-theme customization modules that live OUTSIDE of `src/js/`.
+ * Basic processing for these involve:
+ *   - output filenames are hashed (`[name]-[hash].js`) so PHP can cache-bust via the Vite manifest (see lib/core/Tiki/Build/ViteManifest.php).
+ *   - rollup input keys preserve the full source path (e.g. `themes/xyz/js/custom.module`) so the Vite manifest lookup from PHP
+ *     works with the original on-disk path. See path_js_importmap_generator.php for how they are injected into the runtime importmap.
+ *
+ * @param {object} rollupInput - The rollupInput object to update.
+ * @param {Array<string>} entries
+ */
+function addThemeAndCustomEntries(rollupInput, entries) {
+    entries.forEach((pattern) => {
+        Object.assign(
+            rollupInput,
+            Object.fromEntries(
+                globSync(pattern, {
+                    ignore: ["**/node_modules/**", "**/*.test.js"]
+                }).map(file => {
+                    // Use the full source-relative path as the rollup key so it matches what ends up in the Vite manifest
+                    const key = file.slice(0, file.length - path.extname(file).length);
+                    const fullPath = resolve(__dirname, path.relative(__dirname, file));
+                    return [key, fullPath];
                 })
             )
         );
