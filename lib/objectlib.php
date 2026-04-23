@@ -278,6 +278,9 @@ class ObjectLib extends TikiLib
             'template' => 'template',
             'item' => 'trackeritem',
             'tracker_item' => 'trackeritem',
+            'calitem' => 'calendaritem',
+            'event' => 'calendaritem',
+            'calevent' => 'calendaritem',
         ];
 
         if (isset($supported[$type])) {
@@ -643,6 +646,12 @@ class ObjectLib extends TikiLib
         } elseif ($type === 'tracker') {
             $tracker = TikiLib::lib('trk')->get_tracker($objectId);
             if ($tracker) {
+                return true;
+            }
+        } elseif ($type === 'calendaritem') {
+            $calendarlib = TikiLib::lib('calendar');
+            $info = $calendarlib->get_item($objectId);
+            if ($info) {
                 return true;
             }
         }

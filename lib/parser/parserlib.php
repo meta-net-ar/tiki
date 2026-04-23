@@ -1824,9 +1824,22 @@ class ParserLib extends TikiDb_Bridge
     {
         $matches = [];
         if (! preg_match("/\.php\?([^=]+)=([^&]+)/", $link, $matches)) { // non-sefurl
-            if (! preg_match("/(item|art|article|blog|tracker)([0-9]+)/", $link, $matches)) { // sefurl with type and id @TODO: add more object types
+            if (! preg_match("/(item|art|article|blog|tracker|event|calevent)([0-9]+)/", $link, $matches)) { // sefurl with type and id @TODO: add more object types
                 if (! preg_match("/(\b)([a-z0-9]+)/i", $link, $matches)) { // sefurl for wiki pages
                     return null;
+                }
+            }
+        } else {
+            // Not relying on the regex to extract type and id, as there can be many parameters in the query string and the order is not guaranteed. Instead, parse the query string properly.
+            $urlQuery = parse_url(html_entity_decode($link), PHP_URL_QUERY);
+            parse_str($urlQuery, $queryParams);
+
+            $possibleTypes = ['itemid', 'artid', 'articleid', 'blogid', 'trackerid', 'calitemid', 'page'];
+            foreach ($queryParams as $param => $value) {
+                if (in_array(strtolower($param), $possibleTypes)) {
+                    $matches[1] = $param;
+                    $matches[2] = $value;
+                    break;
                 }
             }
         }
