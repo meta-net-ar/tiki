@@ -105,7 +105,7 @@
                         {if !empty($comment.diffInfo)}
                             <div class="{*well*}">
                                 <h4 class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target=".version{$comment.diffInfo[0].version}" aria-expanded="false" aria-controls="collapseExample">
-                                    Version {$comment.diffInfo[0].version}
+                                    {tr}Version{/tr} {$comment.diffInfo[0].version}
                                     {icon name='history'}
                                 </h4>
                                 <div class="collapse table-responsive version{$comment.diffInfo[0].version}">
