@@ -284,3 +284,8 @@ div.mb-3 label.error {
         width: auto;
     }
 }
+
+:root {
+    --plyr-audio-controls-background: var(--bs-secondary-bg-subtle);
+    --plyr-color-main: var(--bs-primary);
+}

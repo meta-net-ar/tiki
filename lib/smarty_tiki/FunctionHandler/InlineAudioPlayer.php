@@ -13,28 +13,22 @@ class InlineAudioPlayer extends \Smarty\FunctionHandler\Base
 {
     public function handle($params, \Smarty\Template $template)
     {
-        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tiki-inline_audio_player";');
-        $icon = smarty_function_icon(['name' => 'play'], $template);
-        $pauseIcon = smarty_function_icon(['name' => 'pause', 'size' => 1], $template);
-        $stopIcon = smarty_function_icon(['name' => 'xmark', 'size' => 1], $template);
-        $src = 'tiki-download_file.php?fileId=' . $params['fileId'];
+        $fileId = $params['fileId'];
+        $type = $params['type'];
+
+        $uniqueId = uniqid('audio-player-');
+
+        $headerlib = TikiLib::lib('header');
+        $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/glightbox/dist/plyr.min.js');
+        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/glightbox/dist/plyr.css');
+        $headerlib->add_js(<<<JS
+            new Plyr('#$uniqueId', {
+                controls: ['play', 'progress', 'current-time', 'duration', 'settings']
+            });
+        JS);
 
         return <<<HTML
-        <button class="play-audio btn btn-sm btn-link bg-secondary-subtle rounded-circle" data-src="{$src}">
-            {$icon}
-        </button>
-        <button class="pause-audio btn btn-sm btn-link bg-secondary-subtle rounded-circle d-none">
-            {$pauseIcon}
-        </button>
-        <div class="audio-timer">
-            <div class="end-line rounded-pill bg-secondary-subtle">
-                <div class="progress-bar rounded-pill bg-secondary"></div>
-            </div>
-            <div class="time d-none fw-lighter"></div>
-        </div>
-        <button class="stop-audio btn btn-sm btn-link rounded-circle d-none">
-            {$stopIcon}
-        </button>
-        HTML;
+                <audio playsinline id="$uniqueId" data-file-ref-id="$fileId"><source src="tiki-download_file.php?fileId=$fileId&display" type="$type"></audio>
+            HTML;
     }
 }

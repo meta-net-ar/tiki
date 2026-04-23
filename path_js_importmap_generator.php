@@ -122,7 +122,6 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@jquery-tiki/tiki-admin_menu_options" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-admin_menu_options.js",
                 "@jquery-tiki/tiki-admin_2fa" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-admin_2fa.js",
                 "@jquery-tiki/tiki-edit_structure" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-edit_structure.js",
-                "@jquery-tiki/tiki-inline_audio_player" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-inline_audio_player.js",
                 "@jquery-tiki/wikiplugin-mouseover" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/wikiplugin-mouseover.js",
                 "@jquery-tiki/wikiplugin-trackercalendar" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/wikiplugin-trackercalendar.js",
                 "@jquery-tiki/eventcalendar_to_pdf" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/eventcalendar_to_pdf.js",
