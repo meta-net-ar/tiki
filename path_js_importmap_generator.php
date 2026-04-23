@@ -21,11 +21,12 @@ use Tiki\Paths\Customization;
  * If the file hasn't been built by Vite we fall back to importing the raw source path with a
  * `?v=<mtime>` query string
  *
- * @param string $tikiUrl Absolute or root-relative URL prefix to prepend.
+ * @param string|null $tikiUrl Absolute or root-relative URL prefix to prepend.
  * @return array<string,string>
  */
-function getCustomModuleImportmapEntries(string $tikiUrl): array
+function getCustomModuleImportmapEntries(?string $tikiUrl): array
 {
+    $tikiUrl = $tikiUrl ?? '';
     $sources = [
         '@tiki-custom/theme' => ThemeLib::getThemePath(null, '', 'js/custom.module.js'),
         '@tiki-custom/theme-option' => ThemeLib::getThemePath(null, null, 'js/custom.module.js'),
