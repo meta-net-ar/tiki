@@ -21,7 +21,6 @@ add_output('groupmail', 'groupmail_end', true, 'tiki', 'groupmail_start', 'after
 /* folder list update ajax request */
 add_handler('ajax_hm_folders', 'check_groupmail_setting', true, 'tiki', 'load_user_data', 'after');
 add_output('ajax_hm_folders', 'groupmail_page_link', true, 'tiki', 'logout_menu_item', 'before');
-add_output('ajax_hm_folders', 'clear_cache_link', true, 'tiki', 'folder_list_content_end', 'before');
 
 /* ajax groupmail callback data */
 setup_base_ajax_page('ajax_tiki_groupmail', 'core');
