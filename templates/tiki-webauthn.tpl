@@ -1,8 +1,8 @@
-{title help="Webauthn" url="tiki-webauthn.php"}{tr}Registered Authenticators{/tr}{/title}
+{title help="Passkey" url="tiki-webauthn.php"}{tr}Registered Passkeys{/tr}{/title}
 {if $prefs.auth_webauthn_enabled eq 'y'}
     <div class="row">
         <div class="col-md-4 mb-3">
-            <button class="btn btn-primary" id="registerWebAuthDevice" type="button">{tr}Register Device{/tr}</button>
+            <button class="btn btn-primary" id="registerWebAuthDevice" type="button">{tr}Add Passkey{/tr}</button>
         </div>
     </div>
 {/if}
@@ -11,7 +11,6 @@
     <div class="table-responsive webauthn">
         <table id="webauthn_table" class="table normal table-striped table-hover" data-count="{$devices|count}">
             <thead>
-                <th>{tr}User{/tr}</th>
                 <th>{tr}Authenticator{/tr}</th>
                 <th>{tr}Device{/tr}</th>
                 <th>{tr}Sign Count{/tr}</th>
@@ -22,7 +21,6 @@
             <tbody>
                 {section name=device loop=$devices}
                     <tr>
-                        <td> {$devices[device].user} </td>
                         <td> {$devices[device].authenticator_name} </td>
                         <td> {$devices[device].device_name} </td>
                         <td> {$devices[device].sign_count} </td>
@@ -31,7 +29,7 @@
                         <td class="action">
                             {actions}
                                 <action>
-                                    <a href="tiki-webauthn.php?authenticator_id={$devices[device].id}&amp;action=remove" onclick="confirmPopup('{tr}Delete authenticator?{/tr}', '{ticket mode=get}')">
+                                    <a href="tiki-webauthn.php?authenticator_id={$devices[device].id}&amp;action=remove" onclick="confirmPopup('{tr}Delete this passkey from this site? Note: the copy saved on your device will NOT be removed automatically. You must delete it from your device\'s passkey/password manager separately.{/tr}', '{ticket mode=get}')">
                                         {icon name='delete' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                     </a>
                                 </action>
@@ -51,9 +49,6 @@
             if (!window.PublicKeyCredential) {
                 throw new Error(tr("Your browser does not support password less login feature."));
             }
-            if (!window.isSecureContext) {
-                throw new Error(tr("Passkey feature requires a secure (HTTPS) connection. Please ensure you are using a secure website."));
-            }
             const result = await $.fn.registerWebAuth.createCredentials(event, registeredUser);
             if (result) {
                 const feedbackClass = result.status === "success" ? "alert-success" : "alert-danger";
@@ -69,9 +64,10 @@
                 }
             }
         } catch (error) {
+            var errMsg = (error && error.message) ? error.message : String(error);
             $("#tikifeedback").html(
                 `<div class="alert alert-danger alert-dismissible">
-                    ${error}
+                    ${errMsg}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>`
             );

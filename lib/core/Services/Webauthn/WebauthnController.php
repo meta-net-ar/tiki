@@ -110,7 +110,9 @@ class WebauthnController
                 }, $publicKeyCredentialCreationOptions->pubKeyCredParams),
                 'timeout' => $publicKeyCredentialCreationOptions->timeout,
                 'authenticatorSelection' => [
-                    'userVerification' => $publicKeyCredentialCreationOptions->authenticatorSelection->userVerification
+                    'residentKey'        => 'required',
+                    'requireResidentKey' => true,
+                    'userVerification'   => 'required',
                 ],
                 'attestation' => $publicKeyCredentialCreationOptions->attestation
             ];
@@ -223,29 +225,14 @@ class WebauthnController
     {
         global $url_host;
 
-        $userName = $input->username->text();
-        if (empty($userName)) {
-            return [
-                'status' => 'error',
-                'message' => tr('Username is required')
-            ];
-        }
-
-        $userData = $this->webAuthnTable->fetchAll(['credential_id'], ['user' => $userName]);
-
-        $credentialDescriptors = array_map(function ($credential) {
-            return new PublicKeyCredentialDescriptor(
-                PublicKeyCredentialDescriptor::CREDENTIAL_TYPE_PUBLIC_KEY,
-                base64_decode($credential['credential_id'])
-            );
-        }, $userData);
-
         $challenge = random_bytes(32);
 
+        // Empty allowCredentials = usernameless / discoverable-credential flow.
+        // The browser presents all passkeys saved for this site; no username needed.
         $options = PublicKeyCredentialRequestOptions::create(
             $challenge,
             $url_host,
-            $credentialDescriptors,
+            [],
             PublicKeyCredentialRequestOptions::USER_VERIFICATION_REQUIREMENT_REQUIRED
         );
 
@@ -254,7 +241,6 @@ class WebauthnController
 
     public function actionLoginFinish($input)
     {
-        $userName = $input->username->text();
         $credential_id = $input->rawId->text();
         $clientDataJSON = $input->clientDataJSON->text();
         $authenticatorData = $input->authenticatorData->text();
@@ -270,14 +256,17 @@ class WebauthnController
             return ['status' => 'error', 'message' => tr('Invalid authenticator data received')];
         }
 
+        // Usernameless flow: identify the user from the stored credential, not from client input.
         $userData = $this->webAuthnTable->fetchRow(
-            ['user_handle', 'public_key', 'sign_count'],
-            ['credential_id' => $credential_id, 'user' => $userName]
+            ['user', 'user_handle', 'public_key', 'sign_count'],
+            ['credential_id' => $credential_id]
         );
 
         if (empty($userData)) {
-            return ['status' => 'error', 'message' => tr('User credential not registered')];
+            return ['status' => 'error', 'message' => tr('Passkey not recognized. Please sign in with your password.')];
         }
+
+        $userName = $userData['user'];
 
         try {
             $collectedClientData = new CollectedClientData(
@@ -326,7 +315,6 @@ class WebauthnController
                     'last_signin' => date('Y-m-d H:i:s')
                 ], [
                     'credential_id' => $credential_id,
-                    'user' => $userName
                 ]);
                 return ['status' => 'success', 'message' => tr('Signature verification successful')];
             }
