@@ -1743,7 +1743,7 @@ class ParserLib extends TikiDb_Bridge
             }
             if (! str_contains($link, '://')) {
                 $target = '';
-                if ($prefs['feature_wiki_show_link_title'] == 'y') {
+                if ($prefs['feature_wiki_show_int_link_title'] == 'y') {
                     $objectLabel = $this->getInternalLinkLabel($link);
                     if ($objectLabel) {
                         $title = $objectLabel ? 'data-bs-content="' . $objectLabel . '" data-bs-toggle="tooltip"' : '';

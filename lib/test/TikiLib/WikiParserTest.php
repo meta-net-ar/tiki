@@ -69,7 +69,7 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         $prefs['feature_wiki_paragraph_formatting'] = 'n';
         $prefs['pass_chr_special'] = 'n';
         $prefs['wiki_heading_links'] = 'n';
-        $prefs['feature_wiki_show_link_title'] = 'y';
+        $prefs['feature_wiki_show_int_link_title'] = 'y';
         $this->assertEquals($output, TikiLib::lib('parser')->parse_data($input, $options));
     }
 
