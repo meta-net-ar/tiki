@@ -891,6 +891,7 @@ $("#top").on("annotationCreated", function (e, annotation) {
 }
 
 $headerlib->add_jsfile('lib/jquery_tiki/pluginedit.js');
+$headerlib->add_js_module('import "@jquery-tiki/constants";');
 
 if ($prefs['feature_machine_learning'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-machine_learning.js');
