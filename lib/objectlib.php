@@ -264,6 +264,8 @@ class ObjectLib extends TikiLib
             'filedetails' => 'file',
             'file_gallery' => 'file gallery',
             'forum' => 'forum',
+            'forum post' => 'forum post',
+            'forumthread' => 'forum post',
             'group' => 'group',
             'poll' => 'poll',
             'structure' => 'structure',
@@ -631,6 +633,11 @@ class ObjectLib extends TikiLib
         } elseif ($type === 'forum') {
             $forum_info = TikiLib::lib('comments')->get_forum($objectId);
             if ($forum_info != false) {
+                return true;
+            }
+        } elseif ($type === 'forum post') {
+            $post_info = TikiLib::lib('comments')->getCommentLight($objectId);
+            if ($post_info != false) {
                 return true;
             }
         } elseif ($type === 'activity') {

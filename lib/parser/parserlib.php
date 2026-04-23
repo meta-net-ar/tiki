@@ -1824,9 +1824,9 @@ class ParserLib extends TikiDb_Bridge
     {
         $matches = [];
         if (! preg_match("/\.php\?([^=]+)=([^&]+)/", $link, $matches)) { // non-sefurl
-            if (! preg_match("/(item|art|article|blog|tracker|event|calevent)([0-9]+)/", $link, $matches)) { // sefurl with type and id @TODO: add more object types
-            if (! preg_match("/(filedetails)\d+-(\d+)/", $link, $matches)) { // sefurl for file details
-                if (! preg_match("/(\b)([a-z0-9]+)/i", $link, $matches)) { // sefurl for wiki pages
+            if (! preg_match("/(item|art|article|blog|tracker|event|calevent|forum|forumthread)([0-9]+)/", $link, $matches)) { // sefurl with type and id
+                if (! preg_match("/(filedetails)\d+-(\d+)/", $link, $matches)) { // sefurl for file details
+                    if (! preg_match("/(\b)([a-z0-9]+)/i", $link, $matches)) { // sefurl for wiki pages
                         return null;
                     }
                 }
@@ -1837,9 +1837,11 @@ class ParserLib extends TikiDb_Bridge
             parse_str($urlQuery, $queryParams);
 
             $possibleTypes = ['itemid', 'artid', 'articleid', 'blogid', 'trackerid', 'calitemid', 'page'];
+            $mappedTypes = ['comments_parentid' => 'forum post'];
             foreach ($queryParams as $param => $value) {
-                if (in_array(strtolower($param), $possibleTypes)) {
-                    $matches[1] = $param;
+                $normalizedParam = strtolower($param);
+                if (isset($mappedTypes[$normalizedParam]) || in_array($normalizedParam, $possibleTypes)) {
+                    $matches[1] = $mappedTypes[$normalizedParam] ?? $param;
                     $matches[2] = $value;
                     break;
                 }
