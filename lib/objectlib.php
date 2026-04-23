@@ -261,6 +261,7 @@ class ObjectLib extends TikiLib
             'calendar' => 'calendar',
             'category' => 'category',
             'file' => 'file',
+            'filedetails' => 'file',
             'file_gallery' => 'file gallery',
             'forum' => 'forum',
             'group' => 'group',

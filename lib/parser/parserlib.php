@@ -1825,8 +1825,10 @@ class ParserLib extends TikiDb_Bridge
         $matches = [];
         if (! preg_match("/\.php\?([^=]+)=([^&]+)/", $link, $matches)) { // non-sefurl
             if (! preg_match("/(item|art|article|blog|tracker|event|calevent)([0-9]+)/", $link, $matches)) { // sefurl with type and id @TODO: add more object types
+            if (! preg_match("/(filedetails)\d+-(\d+)/", $link, $matches)) { // sefurl for file details
                 if (! preg_match("/(\b)([a-z0-9]+)/i", $link, $matches)) { // sefurl for wiki pages
-                    return null;
+                        return null;
+                    }
                 }
             }
         } else {
