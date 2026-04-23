@@ -22,21 +22,30 @@
 
 .navbar-nav.sm-vertical:not(.sm-collapsible) a:not(.dropdown-item) .sub-arrow {
     transform: rotate(-90deg);
-    /* position: absolute;
-    top: 55%;
-    margin-top: -5px;
-    bottom: auto;
-    left: auto;
-    margin-left: 0;
-    right: 10px; */
 }
 
-// Arrows point right for flyout menus on desktop
-.tiki .navbar-nav.sm-vertical:not(.sm-collapsible) .sm-sub-toggler > small *,
-.tiki .sm-sub .sm-sub-toggler > small *,
-.tiki .sm-vertical .sm-sub-toggler > small * {
-    display: inline-block;
-    transform: rotate(-90deg) !important;
+// Vertical menu arrow reactivity (rotate right when open)
+.tiki .sm-navbar--vertical {
+  .nav-item, .sm-sub-item {
+    > .sm-sub-toggler {
+      -webkit-touch-callout: none; // Disable iOS long-press menu
+
+      > small > span.icon-caret-down {
+        display: inline-block !important;
+        transition: transform 0.2s ease-in-out !important;
+        transform: none !important;
+      }
+
+      &[aria-expanded="true"] > small > span.icon-caret-down,
+      &.highlighted > small > span.icon-caret-down {
+        transform: rotate(-90deg) !important;
+      }
+    }
+
+    &:hover > .sm-sub-toggler > small > span.icon-caret-down {
+      transform: rotate(-90deg) !important;
+    }
+  }
 }
 
 // Reset arrows to point down for normal horizontal menus
@@ -201,6 +210,19 @@ $sm-sub-max-height: calc(100vh - ($sm-sub-top-offset + $sm-sub-bottom-buffer));
     bottom: 100% !important;
     margin-bottom: .5rem;
     margin-top: 0 !important;
+}
+
+// Support for dropup menus (sm-navbar--drop-reverse-y)
+.tiki .sm-navbar--drop-reverse-y {
+    .sm-sub {
+        top: auto !important;
+        bottom: 100% !important;
+        margin-bottom: 2px !important;
+    }
+}
+.tiki .sm-navbar:has(.sm-navbar--drop-reverse-y),
+.tiki .sm-navbar:has(.sm-navbar--drop-reverse-y) .sm-collapse {
+    overflow: visible !important;
 }
 
 .dropdown-menu-top-t,

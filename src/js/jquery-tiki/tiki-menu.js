@@ -76,19 +76,17 @@ $(function () {
     });
 })(jQuery);
 
-/* Fix mobile touch for menu parents that have links so they open instead of navigating */
-$(document).on("touchend click", ".sm-navbar .sm-sub-toggler", function (e) {
+/* Prevent mobile touch race condition on parent links (iOS Safari) */
+$(document).on("click touchend", ".sm-navbar .sm-sub-toggler", function (e) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
     var $toggler = $(this);
     var $navbar = $toggler.closest(".sm-navbar");
 
-    // Only run on mobile
     if (!$navbar.hasClass("sm-collapsible") && window.innerWidth >= 768) {
         return;
     }
-
-    // Stop the link from opening and avoid double clicks
-    e.preventDefault();
-    e.stopImmediatePropagation();
 
     var $panel = $toggler.siblings(".sm-sub").first();
     if (!$panel.length || !window.bootstrap || !window.bootstrap.Collapse) return;
@@ -96,11 +94,9 @@ $(document).on("touchend click", ".sm-navbar .sm-sub-toggler", function (e) {
     var bsCollapse = window.bootstrap.Collapse.getOrCreateInstance($panel[0], { toggle: false });
     var isShown = $panel.hasClass("show");
 
-    // Close other open menus in the same navbar before opening this one,
-    // but spare the parent chain (ancestors) of the clicked toggler.
+    // Close peers but spare ancestors (Accordion behavior)
     if (!isShown) {
         $navbar.find(".sm-sub.show").each(function () {
-            // Skip the panel we are about to open and any ancestor panels
             if (this !== $panel[0] && !$.contains(this, $toggler[0])) {
                 var peer = window.bootstrap.Collapse.getInstance(this);
                 if (peer) peer.hide();
@@ -109,9 +105,10 @@ $(document).on("touchend click", ".sm-navbar .sm-sub-toggler", function (e) {
         });
     }
 
-    // Open or close the menu using Bootstrap
     bsCollapse.toggle();
     $toggler.attr("aria-expanded", isShown ? "false" : "true");
+
+    return false;
 });
 
 /* Click outside to close open mobile menu dropdowns */
