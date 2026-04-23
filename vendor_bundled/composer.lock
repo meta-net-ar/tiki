@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d950c9488c3c091ce0f50af86d7e6798",
+    "content-hash": "3d7f684407a25e94c9a7225031582d64",
     "packages": [
         {
             "name": "Sam152/Javascript-Equal-Height-Responsive-Rows",
@@ -2691,16 +2691,16 @@
         },
         {
             "name": "jason-munro/cypht",
-            "version": "v2.6.0",
+            "version": "v2.7.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "085cbea53488d98ee9f3a7eb25c52244b6ced0ef"
+                "reference": "064c1978c51e1e355453db2c5299780340d23e14"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/085cbea53488d98ee9f3a7eb25c52244b6ced0ef",
-                "reference": "085cbea53488d98ee9f3a7eb25c52244b6ced0ef",
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/064c1978c51e1e355453db2c5299780340d23e14",
+                "reference": "064c1978c51e1e355453db2c5299780340d23e14",
                 "shasum": ""
             },
             "require": {
@@ -2728,7 +2728,7 @@
                 "zbateson/mail-mime-parser": "^3.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^10.5"
+                "phpunit/phpunit": "^10.5.62"
             },
             "suggest": {
                 "ext-gd": "To use 2fa, this needs to be installed for the QR code display",
@@ -2775,7 +2775,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "wiki": "https://github.com/cypht-org/cypht/wiki"
             },
-            "time": "2026-01-17T06:04:26+00:00"
+            "time": "2026-02-27T12:34:19+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
