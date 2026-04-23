@@ -787,12 +787,39 @@ class HtmlHead extends MetaTags
     public function autoGenerate(): string
     {
         global $prefs, $base_url_canonical;
+        global $forum_info, $thread_info;
 
         $title = $this->getTitle();
 
         $this->title($title)
             ->description($this->description ?? $title)
             ->meta('generator', 'Tiki Wiki CMS Groupware - https://tiki.org');
+
+        // keywords from MR 9727
+        $keywords = [];
+        $forumMode = ($prefs['metatag_threadtitle'] ?? 'n') === 'y' && ! empty($forum_info['name']);
+
+        if ($forumMode) {
+            $keywords[] = tra('Forum') . ' ' . $forum_info['name'];
+            $keywords[] = $thread_info['title'] ?? '';
+        }
+
+        if (($prefs['metatag_freetags'] ?? 'n') === 'y') {
+            $object = Sections::currentObject();
+            if ($object) {
+                $objectTags = TikiLib::lib('freetag')->get_tags_on_object($object['object'], $object['type']);
+                $tags = $objectTags ? ($objectTags['data'] ?? []) : [];
+                foreach ($tags as $taginfo) {
+                    $keywords[] = $taginfo['tag'] ?? '';
+                }
+            }
+        }
+
+        $keywords[] = TikiLib::lib('smarty')->getTemplateVars('metatag_local_keywords');
+        if ($keywords = implode(', ', array_filter($keywords))) {
+            $this->meta('keywords', $keywords);
+        }
+
 
         // canonical URL
         if (! empty($this->canonicalUrl)) {
