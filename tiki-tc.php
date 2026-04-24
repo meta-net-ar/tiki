@@ -11,6 +11,9 @@
 if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
+
+use Tiki\Lib\Theme\IconsetLib;
+
 require_once('tiki-setup.php');
 if ($prefs['feature_theme_control'] == 'y' && empty($_SESSION['try_theme'])) {
     //we arrive here after lib/setup/theme.php has finished, so $prefs['theme'] and $prefs['theme_active_option'] are already set. Here we want to overwrite them according to the theme control setting
@@ -75,7 +78,7 @@ if ($prefs['feature_theme_control'] == 'y' && empty($_SESSION['try_theme'])) {
         $theme_path = $tc_theme_path;
 
         //RESET $iconset according to the new theme
-        $iconset = TikiLib::lib('iconset')->getIconsetForTheme($tc_theme, $tc_theme_option);
+        $iconset = IconsetLib::getIconsetForTheme($tc_theme, $tc_theme_option);
 
         //RESET theme prefs
         $prefs['theme'] = $tc_theme;
