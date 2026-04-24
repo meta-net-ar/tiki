@@ -579,6 +579,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
             $itemId = $row['itemId'];
             $pageData = [];
             $finalValue = '';
+            $oldValue = (string)($row['value'] ?? '');
 
             $pageName = trim($row['value']);
 
@@ -597,7 +598,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                 $pageData = $pageTable->fetchColumn('data', [
                     'pageName' => $pageName,
                 ]);
-                if (empty(array_filter($pageData))) {
+                if (count($pageData) !== 1) {
                     // try again with the cleaned version of the page
                     $originalPageName = $pageName;
                     $pageName = $this->cleanPageName($pageName);
@@ -607,7 +608,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                     ]);
 
                     if (
-                        empty(array_filter($pageData)) &&
+                        count($pageData) !== 1 &&
                         (! $pageNamePrefix || strpos($pageName, $pageNamePrefix) !== 0)
                     ) {
                         // try again with the prefix as old bugs created bad data
@@ -620,20 +621,63 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                 }
             }
 
-            if (empty(array_filter($pageData))) {
+            if (count($pageData) !== 1) {
                 // page might have been renamed? Check if there's a relation to an existing page
                 $related = $relationlib->get_relations_to('trackeritem', $itemId, 'tiki.wiki.linkeditem');
+                $legacyCandidateCount = 0;
+                $legacyCandidatePageName = '';
+                $legacyCandidatePageData = [];
                 foreach ($related as $rel) {
-                    $pageName = $rel['itemId'];
-                    if (strlen($pageName) > 160) {
-                        $pageName = substr($pageName, 0, 160);
+                    $candidatePageName = (string)($rel['itemId'] ?? '');
+                    if (! $candidatePageName) {
+                        continue;
                     }
-                    $pageData = $pageTable->fetchColumn('data', [
-                        'pageName' => $pageName,
+                    if (strlen($candidatePageName) > 160) {
+                        $candidatePageName = substr($candidatePageName, 0, 160);
+                    }
+
+                    $relatedFields = $relationlib->get_relations_from('wiki page', $candidatePageName, 'tiki.wiki.linkedfield');
+                    $linkedFieldIds = [];
+                    foreach ($relatedFields as $relation) {
+                        $linkedFieldId = (int)($relation['itemId'] ?? 0);
+                        if ($linkedFieldId > 0) {
+                            $linkedFieldIds[] = $linkedFieldId;
+                        }
+                    }
+                    $linkedFieldIds = array_values(array_unique($linkedFieldIds));
+                    if (in_array($fieldId, $linkedFieldIds, true)) {
+                        $candidatePageData = $pageTable->fetchColumn('data', [
+                            'pageName' => $candidatePageName,
+                        ]);
+                        if (count($candidatePageData) === 1) {
+                            $pageName = $candidatePageName;
+                            $pageData = $candidatePageData;
+                            break;
+                        }
+                        continue;
+                    }
+
+                    // Don't consume pages that are explicitly linked to a different Wiki field.
+                    if (! empty($linkedFieldIds)) {
+                        continue;
+                    }
+
+                    // Legacy data may have linkeditem relation without linkedfield relation.
+                    $candidatePageData = $pageTable->fetchColumn('data', [
+                        'pageName' => $candidatePageName,
                     ]);
-                    if (count($pageData) === 1) {
-                        break;
+                    if (count($candidatePageData) === 1) {
+                        $legacyCandidateCount++;
+                        if ($legacyCandidateCount === 1) {
+                            $legacyCandidatePageName = $candidatePageName;
+                            $legacyCandidatePageData = $candidatePageData;
+                        }
                     }
+                }
+
+                if (count($pageData) !== 1 && $legacyCandidateCount === 1) {
+                    $pageName = $legacyCandidatePageName;
+                    $pageData = $legacyCandidatePageData;
                 }
             }
 
@@ -687,10 +731,14 @@ Page too big, so included below:
                     )
                 );
             }
-            // record the change
-            $version = $trklib->last_log_version($itemId) + 1;
-            $logslib->add_action('Updated', $itemId, 'trackeritem', $version);
-            $trklib->log($version, $itemId, $fieldId, $finalValue);
+            if ($oldValue !== $finalValue) {
+                // record the previous value so conversion appears correctly in field history
+                $version = $trklib->last_log_version($itemId) + 1;
+                if (($logslib->add_action('Updated', $itemId, 'trackeritem', $version)) == 0) {
+                    $version = 0;
+                }
+                $trklib->log($version, $itemId, $fieldId, $oldValue);
+            }
 
             // don't mark item as needing reindexing - a full index rebuild will usually be quicker
             //$unifiedsearchlib->invalidateObject('trackeritem', $itemId);
