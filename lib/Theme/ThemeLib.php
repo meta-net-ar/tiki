@@ -95,6 +95,20 @@ class ThemeLib extends TikiLib
         }
         return [$theme_active, $theme_option_active];
     }
+
+    /**
+     * Return the current Iconset (according to the currently active theme and options)
+     *
+     * TODO:  Cache this result so we can eliminate the @iconset global variable - benoitg - 2026-04-24
+     *
+     * @return Iconset
+     */
+    public static function getCurrentIconset(): Iconset
+    {
+        list($theme, $theme_option) = ThemeLib::getActiveThemeAndOption();
+        return IconsetLib::getIconsetForTheme($theme, $theme_option);
+    }
+
     /**
      * A utility method for \Tiki\Smarty\SmartyTiki to convert paths like
      * public/generated/_custom/sites/default_site/themes/customizationstest/ back into
@@ -122,13 +136,13 @@ class ThemeLib extends TikiLib
         $paths = [];
         $path = Customization::getCurrentSitePublicPath(THEMES_PATH_FRAGMENT);
         if ($path) {
-                $paths[] = $path;
+            $paths[] = $path;
         }
         if ($tikidomain) {
             //Legacy tikidomain themes
             $tikidomainThemePath = BASE_THEMES_SRC_PATH . "/$tikidomain";
             if (is_dir($tikidomainThemePath)) {
-                 $paths[] = $tikidomainThemePath;
+                $paths[] = $tikidomainThemePath;
             }
         }
 
@@ -152,8 +166,8 @@ class ThemeLib extends TikiLib
         //set special array values and get themes from the main themes directory
         //this way default and custom remains on the top of the array and default keeps its description
         $themes = [
-        'default' => tr('Default Bootstrap'),
-        'custom_url' => tr('Custom theme by specifying URL'),
+            'default' => tr('Default Bootstrap'),
+            'custom_url' => tr('Custom theme by specifying URL'),
         ];
 
         foreach (self::getThemeLookupPaths() as $lookupPath) {
@@ -163,14 +177,14 @@ class ThemeLib extends TikiLib
         return $themes;
     }
 
-/**
- * Lists the layouts available for the specified theme and theme option.
- * Includes the layouts distributed with tiki, and the parent theme's layouts.
- *
- * @param string|null $theme
- * @param string|null $theme_option
- * @return array
- */
+    /**
+     * Lists the layouts available for the specified theme and theme option.
+     * Includes the layouts distributed with tiki, and the parent theme's layouts.
+     *
+     * @param string|null $theme
+     * @param string|null $theme_option
+     * @return array
+     */
     private static function listLayouts(?string $theme = null, ?string $theme_option = null): array
     {
         $available_layouts = [];
@@ -185,7 +199,7 @@ class ThemeLib extends TikiLib
             if (file_exists($path . '/templates/layouts/')) {
                 foreach (scandir($path . '/templates/layouts/') as $layoutName) {
                     if ($layoutName[0] != '.' && $layoutName != 'index.php') {
-                         $available_layouts[$layoutName] = ucfirst($layoutName);
+                        $available_layouts[$layoutName] = ucfirst($layoutName);
                     }
                 }
             }
@@ -378,7 +392,7 @@ class ThemeLib extends TikiLib
             $realLookupPath = $returnPrivatePath ? self::convertPublicToPrivatePath($lookupPath) : $lookupPath;
             if ($option) {
                 $path = $realLookupPath .
-                $themePathFragment . $themeOptionPathFragment . $suffixFragment;
+                    $themePathFragment . $themeOptionPathFragment . $suffixFragment;
                 if (file_exists($path)) {
                     break;
                 }
@@ -442,7 +456,7 @@ class ThemeLib extends TikiLib
         if ($filename) {
             $pathFragment .= ($subdir ? '/' . $filename : $filename);
         }
-            $path = self::getThemePath($theme, $option, $pathFragment);
+        $path = self::getThemePath($theme, $option, $pathFragment);
         if (is_null($path)) {
             $path = '';
         }
@@ -465,12 +479,11 @@ class ThemeLib extends TikiLib
     public function list_base_iconsets()
     {
         $base_iconsets = [];
-        $iconsetlib = TikiLib::lib('iconset');
 
         if (is_dir(BASE_THEMES_SRC_PATH . '/base_files/iconsets')) {
             foreach (scandir(BASE_THEMES_SRC_PATH . '/base_files/iconsets') as $iconset_file) {
                 if ($iconset_file[0] != '.' && $iconset_file != 'index.php') {
-                    $data = $iconsetlib->loadFile(BASE_THEMES_SRC_PATH . '/base_files/iconsets/' . $iconset_file);
+                    $data = IconsetLib::loadFile(BASE_THEMES_SRC_PATH . '/base_files/iconsets/' . $iconset_file);
                     $base_iconsets[substr($iconset_file, 0, -4)] = $data['name'];
                 }
             }
@@ -534,18 +547,16 @@ class ThemeLib extends TikiLib
     }
 
     /**
-     * Setup theme assets (CSS, JS, favicon, meta).
-     * Keeps compatibility with Tiki bootstrap lifecycle.
+     * Add theme dependent assets (CSS, JS, favicon, meta) to headerlib.
+     * Needs to be called as late as possible.
      */
-    public static function setupThemeHeaders(): void
+    public static function addHeaderlibThemeDependentAssets(): void
     {
         global $prefs;
-
-        // Get themelib instance for theme path operations
-        $themelib = new self();
         $headerlib = TikiLib::lib('header');
 
         list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
+
         //START loading theme related items
         //This bundle Loads bootstrap JS and popper JS
 
@@ -573,7 +584,7 @@ class ThemeLib extends TikiLib
             $headerlib->add_css('@media (min-width: 1200px) { .container { max-width:' . (! empty($prefs['layout_fixed_width']) ? $prefs['layout_fixed_width'] : '1170px') . '; } }');
         }
 
-        // Always add tiki_base.css. Add it first, so that it can be overriden in the custom themes
+        // Always add tiki_base.css. Add it first, so that it can be overridden in the custom themes
         $headerlib->add_cssfile("themes/base_files/css/tiki_base.css");
 
         // Always add bundled font-awesome css for the default icon fonts
@@ -595,38 +606,126 @@ class ThemeLib extends TikiLib
             }
         }
 
-        self::headerSetupForThemeChange($theme_active, $theme_option_active, $headerlib, $prefs);
-        // include optional custom.css if there. In case of theme option, first include main theme's custom.css, than the option's custom.css
-        if (! empty($theme_option_active)) {
-            $main_theme_path       = $themelib->get_theme_path($theme_active);
-            $main_theme_custom_css = "{$main_theme_path}/css/custom.css";
+        self::headerSetupForThemeChange($theme_active, $theme_option_active);
 
-            if (is_readable($main_theme_custom_css)) {
-                $headerlib->add_cssfile($main_theme_custom_css, 53);
+
+
+
+        // Web Monetization
+        if ($prefs['webmonetization_all_website'] === 'y' && ! empty($prefs['webmonetization_default_payment_pointer'])) {
+            $headerlib->add_meta(
+                'monetization',
+                $prefs['webmonetization_default_payment_pointer']
+            );
+        }
+
+        // set the color of header bar and address bar
+        if ($prefs['theme_header_and_address_bar_color'] === 'y') {
+            if (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty(Sections::getCurrentSection())) {
+                $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant_admin'] . "-bg";
+            } else {
+                $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant'] . "-bg";
+            }
+
+            // construct jq to get the value of the $css_color_variable
+            $jq  = "var color = window.getComputedStyle(document.documentElement).getPropertyValue('{$css_color_variable}');";
+            $jq .= "$('meta[name=\"theme-color\"]').attr('content', color);";
+
+            // add meta tag
+            $headerlib->add_meta("theme-color", "");
+            // iOS Safari
+            $headerlib->add_meta("apple-mobile-web-app-capable", "yes");
+            $headerlib->add_meta("apple-mobi// TODOle-web-app-status-bar-style", "black-translucent");
+            // add jq to set content of theme-color Meta Tag to the current theme navbar color
+            $headerlib->add_jq_onready($jq, 5);
+        }
+    }
+
+    /**
+     * Register base theme CSS and icon assets.
+     *
+     * @param object $headerlib
+     * @param array $prefs
+     */
+    public static function registerThemeAssets()
+    {
+        global $prefs, $smarty, $user;
+
+        //Write back global variable and prefs so that they can be accessed elsewhere
+        //This is not a great pattern, but it was like that and I didn't have time to refactor further.  At least now it's right after it's computed - benoitg - 2024-04-08
+        list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
+
+        $prefs['theme'] = $theme_active;
+        $prefs['theme_option'] = $theme_option_active;
+        $smarty->initializePaths();
+    }
+
+    /** Handles everything that is directly dependent on the currently active theme and theme option */
+    private static function headerSetupForThemeChange($theme_active, $theme_option_active)
+    {
+        $headerlib = TikiLib::lib('header');
+        global $prefs;
+        global $iconset; //This really shouldn't be a global - benoitg - 2026-04-24
+        // Now add the theme or theme option
+        if (! empty($prefs['header_custom_scss'])) {
+            // TODO call compile_custom_scss() here
+        } elseif ($theme_active == 'custom_url' && ! empty($prefs['theme_custom_url'])) {
+            $custom_theme = $prefs['theme_custom_url'];
+
+            if (preg_match('/^(http(s)?:)?\/\//', $custom_theme)) {
+                $headerlib->add_cssfile($custom_theme, 'external');
+            } else {
+                $headerlib->add_cssfile($custom_theme);
+            }
+        } else {
+            $theme_css = self::getThemeCssFilePath($theme_active, '');
+
+            if ($theme_css) {
+                if ($prefs['theme_option_includes_main'] != 'y' || empty($theme_option_active)) {
+                    $headerlib->add_cssfile($theme_css);
+                }
+                if (! empty($theme_option_active)) {
+                    $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
+                    $headerlib->add_cssfile($option_css);
+                }
+            } else {
+                trigger_error("The requested theme's CSS file could not be read. Falling back to default theme.", E_USER_WARNING);
+                $theme_active = 'default';
+                $theme_option_active = '';
+                $theme_css = self::getThemeCssFilePath($theme_active, null);
+                $headerlib->add_cssfile($theme_css);
             }
         }
 
-        $custom_css = $themelib->get_theme_path(
-            $theme_active,
-            $theme_option_active,
-            'custom.css'
-        );
+        //Include optional custom.css files if there.
 
-        if (empty($custom_css)) {
-            $custom_css = $themelib->get_theme_path('', '', 'custom.css');
+        //In case of theme option, first include main theme's custom.css
+        $main_theme_path       = self::getThemePath($theme_active, '');
+        $main_theme_custom_css = "{$main_theme_path}/css/custom.css";
+
+        if (is_readable($main_theme_custom_css)) {
+            $headerlib->add_cssfile($main_theme_custom_css, 53);
         }
 
-        if (is_readable($custom_css)) {
-            $headerlib->add_cssfile($custom_css, 53);
+        //Then the option's custom.css
+        if (! empty($theme_option_active)) {
+            $custom_css = self::getThemePath(
+                $theme_active,
+                $theme_option_active,
+                'custom.css'
+            );
+
+            if (is_readable($custom_css)) {
+                $headerlib->add_cssfile($custom_css, 53);
+            }
         }
 
         // FAVICONS
         if (! isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 'y') { // if favicons are disabled in preferences, skip the lot of it.
-            $favicon_path = $themelib->get_theme_path(
-                $prefs['theme'],
-                $prefs['theme_option'],
-                'favicon-16x16.png',
-                'favicons'
+            $favicon_path = self::getThemePath(
+                $theme_active,
+                $theme_option_active,
+                'favicons/favicon-16x16.png'
             );
 
             if ($favicon_path) { // if there is a 16x16 png favicon in the theme folder, then find and display others if they exist
@@ -676,141 +775,11 @@ class ThemeLib extends TikiLib
             unset($favicon_path); // no longer needed, so bye bye
         }
 
-        // Web Monetization
-        if ($prefs['webmonetization_all_website'] === 'y' && ! empty($prefs['webmonetization_default_payment_pointer'])) {
-            $headerlib->add_meta(
-                'monetization',
-                $prefs['webmonetization_default_payment_pointer']
-            );
-        }
-
-        // set the color of header bar and address bar
-        if ($prefs['theme_header_and_address_bar_color'] === 'y') {
-            if (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty(Sections::getCurrentSection())) {
-                $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant_admin'] . "-bg";
-            } else {
-                $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant'] . "-bg";
-            }
-
-            // construct jq to get the value of the $css_color_variable
-            $jq  = "var color = window.getComputedStyle(document.documentElement).getPropertyValue('{$css_color_variable}');";
-            $jq .= "$('meta[name=\"theme-color\"]').attr('content', color);";
-
-            // add meta tag
-            $headerlib->add_meta("theme-color", "");
-            // iOS Safari
-            $headerlib->add_meta("apple-mobile-web-app-capable", "yes");
-            $headerlib->add_meta("apple-mobi// TODOle-web-app-status-bar-style", "black-translucent");
-            // add jq to set content of theme-color Meta Tag to the current theme navbar color
-            $headerlib->add_jq_onready($jq, 5);
-        }
-    }
-
-    /**
-     * Register base theme CSS and icon assets.
-     *
-     * @param object $headerlib
-     * @param array $prefs
-     */
-    public static function registerThemeAssets()
-    {
-        global $prefs, $smarty, $user, $iconset;
-
-        $headerlib = TikiLib::lib('header');
-        $userlib = TikiLib::lib('user');
-
-        $theme_active = $prefs['theme'];
-        $theme_option_active = $prefs['theme_option'];
-
-        self::headerSetupForThemeChange($theme_active, $theme_option_active, $headerlib, $prefs);
         // produce $iconset to be used for generating icons
-        $iconset = TikiLib::lib('iconset')->getIconsetForTheme($theme_active, $theme_option_active);
+        $iconset = self::getCurrentIconset();
+
         // and add js support file
         $headerlib->add_js('jqueryTiki.iconset = ' . json_encode($iconset->getJS()));
         $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
-
-        // include UAB admin CSS and layout in case we are on an admin or management page (when script file name contains the string)
-        $groups = $userlib->get_user_groups($user);
-
-        if (
-            $prefs['theme_unified_admin_backend'] === 'y' && in_array('Admins', $groups)
-            && (strpos($_SERVER['PHP_SELF'], 'admin')
-            || strpos($_SERVER['PHP_SELF'], 'cache')
-            || strpos($_SERVER['PHP_SELF'], 'import')
-            || strpos($_SERVER['PHP_SELF'], 'manage')
-            || strpos($_SERVER['PHP_SELF'], 'permissions')
-            || strpos($_SERVER['PHP_SELF'], 'stats')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_banner')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_categories')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_perspective')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_quiz')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-export')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-import')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-list_banners')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-list_comments')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-list_contents')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-plugins')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-received')
-            || strpos($_SERVER['PHP_SELF'], 'tiki-sys'))
-        ) { // TODO: refactor this check into an array of all admin and management pages we want to include and the related perms to access in UAB layout
-            $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
-
-            if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin.php') && ! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php') && strpos($_SERVER['PHP_SELF'], 'tiki-admin_tracker_fields.php') === false) { // Exclude tiki-admin.php, tiki-admin_tracker_fields.php, and the modules admin here
-                /* Force the admin layout on admin pages */
-                $prefs['site_layout_admin'] = 'admin';
-                /* Force the admin layout on setup/management pages too */
-                $prefs['site_layout'] = 'admin';
-                /* Set the section to "admin" to display only the UAB specific modules (defined in lib/modules/modlib.php) */
-                Sections::setCurrentSection(Sections::SECTION_ADMIN_LAYOUT);
-                include_once 'admin/define_admin_icons.php';
-
-                foreach ($admin_icons as &$admin_icon) {
-                    foreach ($admin_icon['children'] as &$child) {
-                        $child = array_merge(['disabled' => false, 'description' => ''], $child);
-                    }
-                }
-                $smarty->assign('admin_icons', $admin_icons);
-            }
-            if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) { // Exclude the modules admin here
-                $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
-            }
-        } else {
-            $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant']);
-        }
-        $smarty->initializePaths();
-    }
-
-    private static function headerSetupForThemeChange($theme_active, $theme_option_active, $headerlib, $prefs)
-    {
-         // Now add the theme or theme option
-        if (! empty($prefs['header_custom_scss'])) {
-            // TODO call compile_custom_scss() here
-        } elseif ($theme_active == 'custom_url' && ! empty($prefs['theme_custom_url'])) {
-            $custom_theme = $prefs['theme_custom_url'];
-
-            if (preg_match('/^(http(s)?:)?\/\//', $custom_theme)) {
-                $headerlib->add_cssfile($custom_theme, 'external');
-            } else {
-                $headerlib->add_cssfile($custom_theme);
-            }
-        } else {
-            $theme_css = self::getThemeCssFilePath($theme_active, '');
-
-            if ($theme_css) {
-                if ($prefs['theme_option_includes_main'] != 'y' || empty($theme_option_active)) {
-                    $headerlib->add_cssfile($theme_css);
-                }
-                if (! empty($theme_option_active)) {
-                    $option_css = self::getThemeCssFilePath($theme_active, $theme_option_active);
-                    $headerlib->add_cssfile($option_css);
-                }
-            } else {
-                trigger_error("The requested theme's CSS file could not be read. Falling back to default theme.", E_USER_WARNING);
-                $theme_active = 'default';
-                $theme_option_active = '';
-                $theme_css = self::getThemeCssFilePath($theme_active, null);
-                $headerlib->add_cssfile($theme_css);
-            }
-        }
     }
 }
