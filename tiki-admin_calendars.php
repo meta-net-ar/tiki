@@ -15,7 +15,6 @@ $inputConfiguration = [
             'offset'                      => 'digits',            //get
             'sort_mode'                   => 'alnumdash',         //get
             'description'                 => 'xss',               //post
-            'drop'                        => 'int',               //get
             'remove_subscription'         => 'int',               //get
             'save'                        => 'alpha',             //post
             'customlanguages'             => 'alpha',             //post
@@ -106,15 +105,6 @@ if (! empty($_REQUEST['subscriptionId'])) {
     $smarty->assign('subscription', $subscription);
 }
 
-if (isset($_REQUEST["drop"]) && $access->checkCsrf(true)) {
-    $result = $calendarlib->drop_calendar($_REQUEST['calendarId']);
-    if ($result->numRows()) {
-        Feedback::success(tr('Calendar %0 deleted', (int) $_REQUEST['calendarId']));
-    } else {
-        Feedback::error(tr('Calendar %0 not deleted', (int) $_REQUEST['calendarId']));
-    }
-    $_REQUEST["calendarId"] = 0;
-}
 if (isset($_REQUEST["remove_subscription"]) && $access->checkCsrf(true)) {
     $subscription = $calendarlib->get_subscription($_REQUEST['remove_subscription']);
     if ($subscription['user'] == $user) {
