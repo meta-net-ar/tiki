@@ -59,7 +59,7 @@ class Services_Wiki_Controller
             false,
             true,
             $input->onlyOrphans->text() == 'y',
-            $input->filter->asArray(),
+            $input->asArray(),
             $input->onlyCount->text() == 'y'
         );
     }
@@ -536,7 +536,7 @@ class Services_Wiki_Controller
             //return to page
             if (
                 count($util->items) === 1 && ($all || $util->extra['one'])
-                && strpos($_SERVER['HTTP_REFERER'], $allinfo['pageName']) !== false
+                && strpos($_SERVER['HTTP_REFERER'] ?? '', $allinfo['pageName']) !== false
             ) {
                 //go to tiki index if the page the user was on has been deleted - avoids no page found error.
                 global $prefs, $base_url;

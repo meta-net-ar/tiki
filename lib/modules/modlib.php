@@ -1060,7 +1060,7 @@ class ModLib extends TikiLib
             ]
         );
 
-        if ($prefs['cookie_consent_feature'] === 'y' && $prefs['cookie_consent_disable'] !== 'y') {
+        if (($prefs['cookie_consent_feature'] ?? null) === 'y' && $prefs['cookie_consent_disable'] !== 'y') {
             $info['params']['cookie_consent'] = [
                 'name' => tra('Cookie Consent'),
                 'description' => 'n|y ' . tra('Show only if consent to accept cookies has been granted.'),
