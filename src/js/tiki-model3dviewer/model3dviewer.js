@@ -57,6 +57,7 @@ export function initViewer(containerId, options) {
     const aspect = width / height;
 
     const clock = new Clock();
+    const ext = getExtensionFromUrl(modelUrl);
 
     // === Set up scene ===
     const scene = new Scene();
@@ -172,9 +173,6 @@ export function initViewer(containerId, options) {
             controlsAPI = createControlsAPI(camera, controls, uid, mixer, initialState, autoplay);
         }
     };
-
-    // === Determine loader by file extension ===
-    const ext = getExtensionFromUrl(modelUrl);
 
     switch (ext) {
         case "glb":
