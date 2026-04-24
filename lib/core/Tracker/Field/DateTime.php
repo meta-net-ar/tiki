@@ -441,4 +441,9 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
             throw new Services_Exception(tr('Invalid UNIX timestamp "%0"', $value), 400);
         }
     }
+
+    public function isDateOnlyCalendarValue(): bool
+    {
+        return $this->getOption('datetime') === 'd';
+    }
 }
