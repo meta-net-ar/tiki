@@ -218,7 +218,7 @@ class Services_Comment_Controller
                     $version
                 );
                 if ($threadId) {
-                    $related_files = $input->related_files->raw();
+                    $related_files = $input->related_files->raw() ?? [];
                     foreach ($related_files as $fileId) {
                         TikiLib::lib('relation')->add_relation('tiki.comment.recording', 'comment', $threadId, 'file', $fileId, false);
                     }
