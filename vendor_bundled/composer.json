@@ -299,10 +299,10 @@
         "rector/rector": "~2.0",
         "sebastian/diff": "~5.1",
         "squizlabs/php_codesniffer": "~4.0",
+        "smarty/smarty-lint" : "~0.3",
         "stevegrunwell/phpunit-markup-assertions": "~2.0",
         "symfony/browser-kit": "~6.4",
-        "symfony/http-client": "~6.4",
-        "umakantp/smartylint": "0.1.4-p1"
+        "symfony/http-client": "~6.4"
     },
     "extra": {
         "composer-patches": {
@@ -539,7 +539,6 @@
             "only": [
                 "openannotation/annotator",
                 "jquery/jquery-sheet",
-                "umakantp/smartylint",
                 "bower-asset/wodo.texteditor"
             ]
         }
