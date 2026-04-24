@@ -18,6 +18,8 @@ $trackerUtilities = new Services_Tracker_Utilities();
 $field_types = $trackerUtilities->getFieldTypes();
 
 use Tiki\Lib\iot\DrawflowEditor;
+use Tiki\Lib\Theme\IconsetLib;
+
 $iot_apps = [];
 
 global $jitRequest;
@@ -110,7 +112,7 @@ if ($mode == "view" && ! empty($app_id)) {
         $edit_iot_app_forms[$iot_app['app_uuid']] = $smarty->fetch("iot/edit_iot_app_form.tpl", ['trackerIdsList' => $trackerIdsList['data'], 'app_data' => $iot_app]);
         unset($iot_apps[$key]['app_raw_info']['scenario_config']);
         $onReadyScripts[] = $editor->getEditorScript($iot_app['scenario_config']);
-        $smarty->assign("iconset", TikiLib::lib('iconset')->getIconsetForTheme($prefs['theme_iconset'], "")->icons());
+        $smarty->assign("iconset", IconsetLib::getIconsetForTheme($prefs['theme_iconset'], "")->icons());
     }
     $create_iot_app_form = $smarty->fetch("iot/create_iot_app_form.tpl", ['trackerIdsList' => $trackerIdsList['data']]);
     $sensor_input_widget = $smarty->fetch("iot/dashboard_widgets/sensor-input.tpl");

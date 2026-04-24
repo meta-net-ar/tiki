@@ -7,6 +7,7 @@
 
 use SteveGrunwell\PHPUnit_Markup_Assertions\MarkupAssertionsTrait;
 use Tiki\Smarty\SmartyTiki;
+use Tiki\Lib\Theme\IconsetLib;
 
 require_once(__DIR__ . '/../../smarty_tiki/function.toolbars.php');
 
@@ -31,7 +32,7 @@ class FunctionToolbarsTest extends TikiTestCase
         unset($_SESSION['tiki_cookie_jar']);
         include_once 'lib/setup/cookies.php';
 
-        $iconset = TikiLib::lib('iconset')->getIconsetForTheme('default', '');
+        $iconset = IconsetLib::getIconsetForTheme('default', '');
         $toolbarDialogIndex = 0;
 
         $this->smarty = TikiLib::lib('smarty');
