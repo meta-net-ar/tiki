@@ -59,7 +59,7 @@ class Services_Wiki_Controller
             false,
             true,
             $input->onlyOrphans->text() == 'y',
-            $input->filter->asArray(),
+            $input->asArray(),
             $input->onlyCount->text() == 'y'
         );
     }
