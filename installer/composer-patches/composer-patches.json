@@ -8,10 +8,6 @@
     },
     "nicolaskruchten/pivottable": {
       "Sort rows and columns by key_z_to_a and Drag and drop via touch": "../installer/composer-patches/nicolaskruchten_pivottable__sort_by_key_z_to_a_and_drag_and_drop_via_touch.patch"
-    },
-    "umakantp/smartylint": {
-      "Fix smartylint syntax with curly braces": "../installer/composer-patches/smartylint-warning-curly-bracket.patch",
-      "Fix smartylint PHP 8.1 support and other fixes": "../installer/composer-patches/smartylint-php8.1-and-other-fixes.patch"
     }
   }
 }
