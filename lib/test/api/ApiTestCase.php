@@ -120,6 +120,7 @@ abstract class ApiTestCase extends \TikiTestCase
             'REQUEST_SCHEME' => 'http',
             'REMOTE_ADDR' => '127.0.0.1',
             'REMOTE_HOST' => 'localhost',
+            'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
         ];
 
         // Add authentication header if permission is provided
@@ -358,8 +359,11 @@ abstract class ApiTestCase extends \TikiTestCase
 
             // [0 => [...]] — array of objects, each validated against the inner schema
             if (isset($typeOrNested[0]) && is_array($typeOrNested[0])) {
-                foreach ($value as $item) {
-                    $this->assertMatchesSchema($item, $typeOrNested[0], $msg);
+                $innerSchema = $typeOrNested[0];
+                foreach ($value as $idx => $item) {
+                    $itemMsg = "{$msg}[{$idx}]";
+                    $this->assertIsArray($item, "$itemMsg should be an array");
+                    $this->assertMatchesSchema($item, $innerSchema, $itemMsg);
                 }
             } else {
                 // Associative nested schema

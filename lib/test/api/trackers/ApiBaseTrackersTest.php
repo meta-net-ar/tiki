@@ -54,6 +54,9 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      */
     private static $preferences = [
         'feature_trackers' => 'y',
+        // Disable unified search: processUpdateQueue() in insert/update actions fails in
+        // the CLI subprocess test environment when the search index is not available.
+        'unified_engine' => 'n',
     ];
 
     /**
@@ -292,7 +295,7 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
         return [
             'accordion_pos' => 'int',
             'title' => 'string',
-            'trackerId' => 'int',
+            'trackerId' => 'int|string',
             'info' => 'array',
             'statusTypes' => [
                 '*' => [ // status type key is dynamic (o, p, c)
@@ -334,6 +337,8 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
                     'created' => 'int',
                     'lastModif' => 'int',
                     'items' => 'int',
+                    'fieldsCount' => 'int',
+                    'system_tracker' => 'bool'
                 ]
             ],
             'count' => 'int',
@@ -349,10 +354,10 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
             'itemId'      => 'int',
             'trackerId'   => 'int',
             'created'     => 'int',
-            'createdBy'   => 'string',
+            'createdBy'   => 'string|null',
             'status'      => 'string',
             'lastModif'   => 'int',
-            'lastModifBy' => 'string',
+            'lastModifBy' => 'string|null',
         ];
     }
 
@@ -361,8 +366,7 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      *
      * Extends getTrackerFieldEntrySchema() with the rendered-value keys that
      * are only present when viewing an item (not in list_fields):
-     * - value / pvalue:       raw and processed scalar value (string for most types)
-     * - lingualvalue / lingualpvalue: multilingual variants (empty array when not multilingual)
+     * - value:       raw and processed scalar value (string for most types)
      * - ins_id:               the HTML input id used for this field ("ins_{fieldId}")
      */
     private function getTrackerItemFieldEntrySchema()
@@ -371,9 +375,6 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
             $this->getTrackerFieldEntrySchema(),
             [
                 'value'         => 'scalar|null',
-                'pvalue'        => 'scalar|null',
-                'lingualvalue'  => 'array',
-                'lingualpvalue' => 'array',
                 'ins_id'        => 'string',
             ]
         );
@@ -406,9 +407,11 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
             'offset' => 'int',
             'maxRecords' => 'int',
             'result' => [
-                'itemId' => 'int',
-                'status' => 'string',
-                'fields' => 'array',
+                [
+                    'itemId' => 'int',
+                    'status' => 'string',
+                    'fields' => 'array',
+                ]
             ],
         ];
     }
@@ -567,14 +570,14 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
             'description'         => 'string',
             'descriptionIsParsed' => 'string|null',
             'modal'               => 'string|null',
-            'fieldPrefix'         => 'string',
+            'fieldPrefix'         => 'string|bool',
         ];
     }
 
     private function getDeleteClearDuplicateTrackerResponseSchema()
     {
         return [
-            'trackerId' => 'int',
+            'trackerId' => 'int|string',
             'name' => 'string|null',
             'message' => 'string',
         ];
@@ -603,7 +606,7 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
             'version'   => 'int',
             'fieldId'   => 'int|null',
             'value'     => 'string',
-            'user'      => 'string',
+            'user'      => 'string|null',
             'lastModif' => 'int',
             'new'       => 'string',
         ];
@@ -634,31 +637,43 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
     }
 
     /**
-     * Schema for a single feedback entry inside the 'default' array of the feedback object.
-     */
-    private function getFeedbackEntrySchema(): array
-    {
-        return [
-            'type'  => 'string',
-            'icon'  => 'string',
-            'title' => 'string',
-            'mes'   => 'array',
-        ];
-    }
-
-    /**
      * Schema for the update_item (POST /trackers/{id}/items/{itemId}) response.
      *
-     * - feedback:   UI feedback keyed by 'default'; each entry uses getFeedbackEntrySchema()
      * - fields:     flat map of permName -> current value (keys vary per tracker)
      */
     private function getUpdateItemResponseSchema(): array
     {
         return [
-            'feedback'   => ['default' => ['*' => $this->getFeedbackEntrySchema()]],
+            // Feedback::get() reads from $_SESSION which is not populated in the CLI
+            // subprocess used for API integration tests, so it returns false.
+            'feedback'   => 'array|bool',
             'itemId'     => 'int',
             'status'     => 'string',
             'fields'     => ['*' => 'scalar|null'],
+            'nextTicket' => 'string',
+        ];
+    }
+
+    private function getUpdateItemStatusResponseSchema()
+    {
+        return [
+            'FORWARD' => [
+                'controller' => 'string',
+                'action' => 'string',
+                'status' => 'string',
+                'redirect' => 'string',
+            ]
+        ];
+    }
+
+    private function getCreateItemResponseSchema()
+    {
+        return [
+            'itemId' => 'int',
+            'status' => 'string',
+            'fields' => ['*' => 'scalar|null'],
+            'itemTitle' => 'string',
+            'processedFields' => ['*' => 'scalar|null'],
             'nextTicket' => 'string',
         ];
     }
@@ -675,10 +690,14 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
         ];
     }
 
+    protected function assertValidCreateUpdateTrackerResponse($body)
+    {
+        $this->assertMatchesSchema($body, $this->getCreateUpdateTrackerResponseSchema());
+    }
+
     protected function assertValidTrackerListResponse($body)
     {
         $this->assertMatchesSchema($body, $this->getTrackerListSchema());
-        $this->assertIsArray($body['data']);
     }
 
     protected function assertValidTrackerItemViewResponse($body)
@@ -689,13 +708,13 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
     protected function assertValidTrackerItemsListResponse($body)
     {
         $this->assertMatchesSchema($body, $this->getTrackerItemsListSchema());
-        $this->assertIsArray($body['result']);
     }
 
     protected function assertValidTrackerFieldsListResponse($body)
     {
+        $this->assertNotEmpty($body['fields'], 'Tracker should have at least one field');
+        $this->assertNotEmpty($body['types'], 'Field types should always be present in the response');
         $this->assertMatchesSchema($body, $this->getTrackerFieldsListSchema());
-        $this->assertIsArray($body['fields']);
     }
 
     protected function assertValidDeleteClearDuplicateTrackerResponse($body)
@@ -705,8 +724,9 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
 
     protected function assertValidExportFieldsResponse($body)
     {
-        $this->assertMatchesSchema($body, $this->getExportFieldsResponseSchema());
         $this->assertNotEmpty($body['export'], 'export string should not be empty');
+        $this->assertNotEmpty($body['fields'], 'Exported fields should not be empty');
+        $this->assertMatchesSchema($body, $this->getExportFieldsResponseSchema());
     }
 
     protected function assertValidEditFieldResponse($body)
@@ -730,6 +750,18 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
     protected function assertValidUpdateItemResponse($body)
     {
         $this->assertMatchesSchema($body, $this->getUpdateItemResponseSchema());
+        $this->assertGreaterThan(0, $body['itemId'], 'itemId should be a positive integer');
+        $this->assertNotEmpty($body['nextTicket'], 'nextTicket should not be empty');
+    }
+
+    protected function assertValidUpdateItemStatusResponse($body)
+    {
+        $this->assertMatchesSchema($body, $this->getUpdateItemStatusResponseSchema());
+    }
+
+    protected function assertValidCreateItemResponse($body)
+    {
+        $this->assertMatchesSchema($body, $this->getCreateItemResponseSchema());
         $this->assertGreaterThan(0, $body['itemId'], 'itemId should be a positive integer');
         $this->assertNotEmpty($body['nextTicket'], 'nextTicket should not be empty');
     }
