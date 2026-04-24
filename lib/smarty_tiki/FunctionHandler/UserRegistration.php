@@ -23,7 +23,10 @@ class UserRegistration extends Base
         $captchalib = TikiLib::lib('captcha');
         $access = TikiLib::lib('access');
 
-        $captchalib->generate();
+        // Only generate captcha if this is not a form submission
+        if (! isset($_REQUEST['register'])) {
+            $captchalib->generate();
+        }
 
         if ($prefs['allowRegister'] != 'y') {
             return;
