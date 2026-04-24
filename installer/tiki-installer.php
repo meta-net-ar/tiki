@@ -10,6 +10,7 @@
 use Tiki\Installer\Installer;
 use Tiki\Installer\Patch;
 use Tiki\Installer\ProgressBar;
+use Tiki\Lib\Theme\IconsetLib;
 
 //this script may only be included - so its better to die if called directly.
 if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
@@ -821,9 +822,9 @@ jqueryTiki.effect_tabs = "";
 jqueryTiki.effect_tabs_direction = "";
 jqueryTiki.effect_tabs_speed = 400;
 ';
-$headerlib->add_js($js, 100);
+$headerlib->add_js($js);
 
-$iconset = TikiLib::lib('iconset')->getIconsetForTheme('default', '');
+$iconset = IconsetLib::getIconsetForTheme('default', '');
 
 $smarty->assign_by_ref('headerlib', $headerlib);
 

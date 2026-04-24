@@ -19,6 +19,7 @@ use Smarty\Variable;
 use Smarty_Resource_Tplwiki;
 use Smarty_Resource_Wiki;
 use SmartyTiki\Extension\SmartyTikiExtension;
+use Tiki\Lib\Theme\ThemeLib;
 use Tiki\Sections;
 use TikiLib;
 
@@ -699,13 +700,12 @@ class SmartyTiki extends Smarty
         // when called from release.php TikiLib isn't initialised so we can ignore the themes and addons
         if (class_exists('TikiLib')) {
             // Theme templates
-            $themelib = TikiLib::lib('theme');
             $theme = $prefs['theme'] ?? null;
             $themeOption = $prefs['theme_option'] ?? null;
             if (! in_array($theme, ['custom_url'])) {
                 //Templates from theme_options of currently active theme
                 if ($themeOption) {
-                    $currentThemeOptionTemplatesPath = $themelib->getThemePath($theme, $themeOption, SMARTY_TEMPLATES_PATH_FRAGMENT, true); // path to the theme options
+                    $currentThemeOptionTemplatesPath = ThemeLib::getThemePath($theme, $themeOption, SMARTY_TEMPLATES_PATH_FRAGMENT, true); // path to the theme options
                     if ($currentThemeOptionTemplatesPath) {
                         $this->addTemplateDir(TIKI_PATH . "/$currentThemeOptionTemplatesPath/");
                         $this->addLayoutTemplatesFromTemplatePath($currentThemeOptionTemplatesPath);
@@ -714,7 +714,7 @@ class SmartyTiki extends Smarty
 
                 //Templates from currently active theme
                 //This will fallback to 'default' theme if $theme is empty
-                $currentThemeTemplatesPath = $themelib->getThemePath($theme, '', SMARTY_TEMPLATES_PATH_FRAGMENT, true); // path to the currently active main theme templates
+                $currentThemeTemplatesPath = ThemeLib::getThemePath($theme, '', SMARTY_TEMPLATES_PATH_FRAGMENT, true); // path to the currently active main theme templates
                 if ($currentThemeTemplatesPath) {
                     $this->addTemplateDir(TIKI_PATH . "/$currentThemeTemplatesPath/");
                     $this->addLayoutTemplatesFromTemplatePath($currentThemeTemplatesPath);

@@ -4,6 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 /**
  * @group integration
  *
@@ -30,8 +31,8 @@ class TikiLib_MarkdownParserTest extends TikiTestCase
 
 
     /**
-    * remove the external Wikis defined in the tests
-    */
+     * remove the external Wikis defined in the tests
+     */
     protected function tearDown(): void
     {
         global $prefs, $user;
@@ -190,10 +191,12 @@ Duplicated footnote reference[^second].
     protected function html($with_heading_links = false): string
     {
         if ($with_heading_links) {
+            //Note, this fixture is extremely brittle, because it depends on the exact iconset active at the time of generation, which isn't at all what is being tested here.
+            //Updated for recent iconset initialization changes, but it should be refactored to check that a link with the proper href is generated, and nothing else - benoitg - 2026-04-24
             $res = '<hr />
-<h2 class="showhide_heading" id="User:_admin">User: admin<a href="#User:_admin" class="heading-link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h2>
-<h2 class="showhide_heading" id="Plugin_test:_12">Plugin test: <sup><strong>12</strong></sup><a href="#Plugin_test:_12" class="heading-link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h2>
-<h1 class="showhide_heading" id="h1_Heading_8-_">h1 Heading 😎<a href="#h1_Heading_8-_" class="heading-link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h1>';
+<h2 class="showhide_heading" id="User:_admin">User: admin<a href="#User:_admin" class="heading-link"><span class="icon icon-link fas fa-link "   ></span></a></h2>
+<h2 class="showhide_heading" id="Plugin_test:_12">Plugin test: <sup><strong>12</strong></sup><a href="#Plugin_test:_12" class="heading-link"><span class="icon icon-link fas fa-link "   ></span></a></h2>
+<h1 class="showhide_heading" id="h1_Heading_8-_">h1 Heading 😎<a href="#h1_Heading_8-_" class="heading-link"><span class="icon icon-link fas fa-link "   ></span></a></h1>';
         } else {
             $res = '<hr />
 <h2>User: admin</h2>
@@ -312,12 +315,12 @@ line 3 of code
 <li class="footnote" id="fn:second" role="doc-endnote"><p>Footnote text.&nbsp;<a class="footnote-backref" rev="footnote" href="#fnref:second" role="doc-backlink">↩</a>&nbsp;<a class="footnote-backref" rev="footnote" href="#fnref:second__2" role="doc-backlink">↩</a></p></li>
 <li class="footnote" id="fn:text-of-inline-footn" role="doc-endnote"><p>Text of inline footnote&nbsp;<a class="footnote-backref" rev="footnote" href="#fnref:text-of-inline-footn" role="doc-backlink">↩</a></p></li></ol></div>
 ';
-    /**
-     * Different operating systems use different line-ending characters.
-     * By converting \r\n to \n, this code ensures that the string $res
-     * has consistent line endings regardless of the platform it was created on.
-     * Consistent line endings can simplify the parsing of text and reduce the likelihood of bugs in text-handling functions.
-     */
+        /**
+         * Different operating systems use different line-ending characters.
+         * By converting \r\n to \n, this code ensures that the string $res
+         * has consistent line endings regardless of the platform it was created on.
+         * Consistent line endings can simplify the parsing of text and reduce the likelihood of bugs in text-handling functions.
+         */
         return str_replace("\r\n", "\n", $res);
     }
 }
