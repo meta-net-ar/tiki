@@ -144,6 +144,7 @@ export default defineConfig(({ command, mode }) => {
         "tiki-lottie": resolve(__dirname, "tiki-lottie/lottie.js"),
         "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
         "tiki-toast-ui": resolve(__dirname, "tiki-toast-ui/toast-index.js"),
+        "tiki-schema-builder": resolve(__dirname, "vue-mf/schema-builder/src/schema-builder.js"),
         "@tiki/ui-utils": resolve(__dirname, "@tiki/ui-utils/index.js"),
         "wysiwyg/summernote": resolve(__dirname, "wysiwyg/summernote/index.js"),
         "wysiwyg/plugin": resolve(__dirname, "wysiwyg/plugin.js"),
