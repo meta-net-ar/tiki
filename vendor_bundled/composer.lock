@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "27fec80f8035cd7aee966c9542985a37",
+    "content-hash": "2b84c0cb5ae22c4cca8e49ba4c6148dd",
     "packages": [
         {
             "name": "amphp/amp",
@@ -8281,64 +8281,6 @@
                 "source": "https://github.com/pear/Console_Getopt"
             },
             "time": "2019-11-20T18:27:48+00:00"
-        },
-        {
-            "name": "pear/net_socket",
-            "version": "v1.2.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/pear/Net_Socket.git",
-                "reference": "bbe6a12bb4f7059dba161f6ddd43f369c0ec8d09"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/pear/Net_Socket/zipball/bbe6a12bb4f7059dba161f6ddd43f369c0ec8d09",
-                "reference": "bbe6a12bb4f7059dba161f6ddd43f369c0ec8d09",
-                "shasum": ""
-            },
-            "require": {
-                "pear/pear_exception": "*"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Net": "./"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "include-path": [
-                "./"
-            ],
-            "license": [
-                "PHP License"
-            ],
-            "authors": [
-                {
-                    "name": "Chuck Hagenbuch",
-                    "email": "chuck@horde.org",
-                    "role": "Lead"
-                },
-                {
-                    "name": "Aleksander Machniak",
-                    "email": "alec@php.net",
-                    "role": "Lead"
-                },
-                {
-                    "name": "Stig Bakken",
-                    "email": "stig@php.net",
-                    "role": "Lead"
-                }
-            ],
-            "description": "More info available on: http://pear.php.net/package/Net_Socket",
-            "support": {
-                "issues": "http://pear.php.net/bugs/search.php?cmd=display&package_name[]=Net_Socket",
-                "source": "https://github.com/pear/Net_Socket"
-            },
-            "abandoned": true,
-            "time": "2015-03-22T15:48:19+00:00"
         },
         {
             "name": "pear/pear",
@@ -20124,5 +20066,5 @@
         "ext-sockets": "0",
         "ext-ftp": "0"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
