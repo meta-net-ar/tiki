@@ -10,6 +10,7 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     exit;
 }
 
+use Tiki\Lib\Language\LangStringEscaper;
 use Tiki\Sections;
 
 /**
@@ -70,20 +71,12 @@ class Language extends TikiDb_Bridge
      * since they should not apper in english strings.
      *
      * @param string $string
+     *
      * @return string modified string;
      */
-    public static function addPhpSlashes($string)
+    public static function addPhpSlashes(string $string): string
     {
-        $addPHPslashes = [
-            "\n" => '\n',
-            "\r" => '\r',
-            "\t" => '\t',
-            '\\' => '\\\\',
-            '$'  => '\$',
-            '"'  => '\"'
-        ];
-
-        return strtr($string, $addPHPslashes);
+        return LangStringEscaper::addPhpSlashes($string);
     }
 
     /**

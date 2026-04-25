@@ -12,6 +12,7 @@
 // Also see: doc/devtools/mass_wording_corrections.pl
 //
 
+use Tiki\Lib\Language\LangStringEscaper;
 
 if ($argc < 3) {
     die("\nUsage: php doc/devtools/update_english_strings.php \"oldString\" \"newString\"\n\n");
@@ -19,30 +20,42 @@ if ($argc < 3) {
 
 set_include_path(get_include_path() . PATH_SEPARATOR . '../../');
 
-require_once('lib/language/Language.php');
+require_once('lib/language/LangStringEscaper.php');
 
-$oldString = Language::addPhpSlashes($argv[1]);
-$newString = Language::addPhpSlashes($argv[2]);
+$oldString = LangStringEscaper::addPhpSlashes($argv[1]);
+$newString = LangStringEscaper::addPhpSlashes($argv[2]);
 
-$dirHandle = opendir('lang/');
+$totalFiles = 0;
+$updatedFiles = 0;
 
-while (($dir = readdir($dirHandle)) !== false) {
-    if ($dir == '.' || $dir == '..') {
+$iterator = new FilesystemIterator('lang/', FilesystemIterator::SKIP_DOTS);
+
+echo "Processing languages: ";
+
+foreach ($iterator as $dirInfo) {
+    if (! $dirInfo->isDir()) {
         continue;
     }
 
-    $dir = 'lang/' . $dir;
-    if (is_dir($dir)) {
-        $filePath = $dir . '/language.php';
+    $filePath = $dirInfo->getPathname() . '/language.php';
 
-        if (! file_exists($filePath)) {
-            continue;
-        }
-
-        $langFile = file_get_contents($filePath);
-        $fileHandle = fopen($filePath, 'w');
-        $langFile = str_replace("\"$oldString\" => ", "\n\"$newString\" => ", $langFile);
-        fwrite($fileHandle, $langFile);
-        fclose($fileHandle);
+    if (! file_exists($filePath)) {
+        continue;
     }
+
+    $totalFiles++;
+
+    $content = file_get_contents($filePath);
+
+    $pattern = '~^([ \t]*(?://[ \t]*)?)"' . preg_quote($oldString, '~') . '"([ \t]*=>[ \t]*)~m';
+    $replacement = '$1"' . $newString . '"$2';
+
+    $updatedContent = preg_replace($pattern, $replacement, $content, -1, $replacements);
+    file_put_contents($filePath, $updatedContent);
+    $updatedFiles++;
+    echo ".";
 }
+
+echo "\n\nSummary\n";
+printf("  Files checked:     %d\n", $totalFiles);
+printf("  Files updated:     %d\n", $updatedFiles);
