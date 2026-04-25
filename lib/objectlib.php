@@ -1136,8 +1136,15 @@ class ObjectLib extends TikiLib
 
                 return str_replace($empty_marker, '', $replaced);
             });
+
             $titles = $result->getArrayCopy();
-            $title = array_shift($titles);
+
+            if (empty($titles)) {
+                $title = $defaultTitle;
+            } else {
+                $title = array_shift($titles);
+            }
+
             ObjectLib::$titleCache[$cacheKey] = $title;
         } else {
             $title = $defaultTitle;
