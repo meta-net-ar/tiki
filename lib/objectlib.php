@@ -1105,23 +1105,36 @@ class ObjectLib extends TikiLib
             $query->addObject($type, $id);
 
             $format_pattern = '/\{([\w\.]+)\}/';
+            $sep_pattern = '/\[\|([^|]*)\|\]/';
+            $empty_marker = "\x01";
+
             if (preg_match_all($format_pattern, $format, $m)) {
                 $query->setSelectionFields($m[1]);
             }
+
             $result = $query->search($lib->getIndex());
-            $result->applyTransform(function ($item) use ($format, $format_pattern, $metadata) {
-                return preg_replace_callback($format_pattern, function ($matches) use ($item, $format, $metadata) {
+            $result->applyTransform(function ($item) use ($format, $format_pattern, $sep_pattern, $empty_marker, $metadata) {
+                $replaced = preg_replace_callback($format_pattern, function ($matches) use ($item, $format, $metadata, $empty_marker) {
                     $key = $matches[1];
-                    if (isset($item[$key])) {
+                    if (isset($item[$key]) && $item[$key] !== '') {
                         return $item[$key];
                     } elseif (str_starts_with($key, 'meta.')) {
-                        return $metadata[substr($key, 5)] ?? '';
+                        $val = $metadata[substr($key, 5)] ?? '';
+                        return $val !== '' ? $val : $empty_marker;
                     } elseif (! $format || $format == '{title}') {
                         return tr('empty');
                     } else {
-                        return '';
+                        return $empty_marker;
                     }
                 }, $format);
+
+                // Remove conditional separators [| text |] when either adjacent field was empty
+                $replaced = preg_replace('/\x01\[\|[^|]*\|\]|\[\|[^|]*\|\]\x01/', '', $replaced);
+
+                // Render remaining conditional separators (both sides had values)
+                $replaced = preg_replace($sep_pattern, '$1', $replaced);
+
+                return str_replace($empty_marker, '', $replaced);
             });
             $titles = $result->getArrayCopy();
             $title = array_shift($titles);
