@@ -3799,7 +3799,7 @@ CREATE TABLE `tiki_object_attributes` (
     `type` varchar(50) NOT NULL,
     `itemId` varchar(160) NOT NULL,
     `attribute` varchar(70) NOT NULL,
-    `value` varchar(255),
+    `value` LONGTEXT NOT NULL,
     `fieldId` INT DEFAULT NULL,
     `comment` varchar(255),
     UNIQUE `item_attribute_uq` ( `type`, `itemId`(91), `attribute`(50) ),
