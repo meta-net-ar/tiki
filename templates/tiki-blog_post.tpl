@@ -142,7 +142,20 @@
         {if isset($blog_data) and $blog_data.allow_post_categorization === 'y'}
             {include file='categorize.tpl'}
         {/if}
+        <div class="mb-3 row">
+            <label class="col-md-4 col-form-label" for="schemaOrgMarkup">{tr}Schema.org JSON-LD Markup{/tr}</label>
+            <div class="col-md-8">
+                <input type="hidden" name="schemaOrgMarkup" id="schemaOrgMarkup" value="{$schemainfo.schemaOrgMarkup|escape}">
+                <div id="single-spa-application:@vue-mf/schema-markup-builder" class="schema-builder"></div>
+            </div>
+            {jq}
+                document.addEventListener('schema-builder:update', function(e){
+                    $('#schemaOrgMarkup').val(JSON.stringify(e.detail));
+                });
+            {/jq}
+        </div>
     </fieldset>
+
     <div class="text-center">
         <input type="submit" class="wikiaction btn btn-secondary" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false;">
         <input type="submit" class="wikiaction btn btn-primary" name="save" value="{tr}Save{/tr}" onclick="needToConfirm=false;">

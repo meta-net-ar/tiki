@@ -214,6 +214,14 @@ if ($user && $prefs['feature_notepad'] == 'y' && $tiki_p_notepad == 'y' && isset
     $tikilib->replace_note($user, 0, $post_info['title'] ? $post_info['title'] : $tikilib->date_format("%d/%m/%Y [%H:%M]", $post_info['created']), $post_info['data']);
 }
 
+$headerlib = TikiLib::lib('header');
+$attributelib = TikiLib::lib('attribute');
+$schema = $attributelib->get_attribute('blog post', $postId, "tiki.schema.markup");
+if ($schema) {
+    $schema = json_decode($schema)->schema ?? null;
+    $headerlib->add_rawhtml($schema ? '<script type="application/ld+json">' . json_encode($schema, JSON_PRETTY_PRINT) . '</script>' : '');
+}
+
 // Display the template
 $smarty->assign('mid', 'tiki-view_blog_post.tpl');
 $smarty->display("tiki.tpl");
