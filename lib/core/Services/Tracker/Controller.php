@@ -2287,6 +2287,9 @@ class Services_Tracker_Controller
             'relationshipBehaviourList' => array_keys(Tiki\Relation\Semantics::BEHAVIOUR_LIST),
             'displayTimezone' => TikiLib::lib('tiki')->get_display_timezone(),
             'fields' => $trackerId ? $definition->getFields() : [],
+            'schema_json_generator_app_id' =>  "vue-mf-schema-markup-builder-".$trackerId."-".time(),
+            //'trkfields' => $trackerlib->list_tracker_fields($trackerId),
+            // here nous pouvons passer des donnees a replace.tpl
         ];
     }
 

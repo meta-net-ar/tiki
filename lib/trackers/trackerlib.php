@@ -7400,71 +7400,7 @@ class TrackerLib extends TikiLib
             'allowChooseFieldsToDisplay' => $input->allowChooseFieldsToDisplay->int() ? 'y' : 'n',
             
             // Schema.org Data Configuration
-            'schemaOrgType' => $input->schemaOrgType->text(), // Article, Product, Event, or empty
-            'schemaOrgDataConfig' => $input->schemaOrgDataConfig->text(), // static_text or tracker_field
-            
-            // Article Schema Fields (static values)
-            'schemaOrgArticleHeadline' => $input->schemaOrgArticleHeadline->text(),
-            'schemaOrgArticleDescription' => $input->schemaOrgArticleDescription->text(),
-            'schemaOrgArticleImage' => $input->schemaOrgArticleImage->text(),
-            'schemaOrgArticleAuthor' => $input->schemaOrgArticleAuthor->text(),
-            'schemaOrgArticlePublisher' => $input->schemaOrgArticlePublisher->text(),
-            'schemaOrgArticlePublisherLogo' => $input->schemaOrgArticlePublisherLogo->text(),
-            'schemaOrgArticleDatePublished' => $input->schemaOrgArticleDatePublished->text(),
-            'schemaOrgArticleDateModified' => $input->schemaOrgArticleDateModified->text(),
-            'schemaOrgArticleMainEntityUrl' => $input->schemaOrgArticleMainEntityUrl->text(),
-            // Article Schema Fields (tracker field IDs)
-            'schemaOrgArticleHeadlineField' => $input->schemaOrgArticleHeadlineField->int(),
-            'schemaOrgArticleDescriptionField' => $input->schemaOrgArticleDescriptionField->int(),
-            'schemaOrgArticleImageField' => $input->schemaOrgArticleImageField->int(),
-            'schemaOrgArticleAuthorField' => $input->schemaOrgArticleAuthorField->int(),
-            'schemaOrgArticlePublisherField' => $input->schemaOrgArticlePublisherField->int(),
-            'schemaOrgArticlePublisherLogoField' => $input->schemaOrgArticlePublisherLogoField->int(),
-            'schemaOrgArticleDatePublishedField' => $input->schemaOrgArticleDatePublishedField->int(),
-            'schemaOrgArticleDateModifiedField' => $input->schemaOrgArticleDateModifiedField->int(),
-            'schemaOrgArticleMainEntityUrlField' => $input->schemaOrgArticleMainEntityUrlField->int(),
-            
-            // Product Schema Fields (static values)
-            'schemaOrgProductName' => $input->schemaOrgProductName->text(),
-            'schemaOrgProductDescription' => $input->schemaOrgProductDescription->text(),
-            'schemaOrgProductSku' => $input->schemaOrgProductSku->text(),
-            'schemaOrgProductPrice' => $input->schemaOrgProductPrice->text(),
-            'schemaOrgProductPriceCurrency' => $input->schemaOrgProductPriceCurrency->text(),
-            'schemaOrgProductAvailability' => $input->schemaOrgProductAvailability->text(),
-            'schemaOrgProductRatingValue' => $input->schemaOrgProductRatingValue->text(),
-            'schemaOrgProductReviewCount' => $input->schemaOrgProductReviewCount->text(),
-            // Product Schema Fields (tracker field IDs)
-            'schemaOrgProductNameField' => $input->schemaOrgProductNameField->int(),
-            'schemaOrgProductDescriptionField' => $input->schemaOrgProductDescriptionField->int(),
-            'schemaOrgProductSkuField' => $input->schemaOrgProductSkuField->int(),
-            'schemaOrgProductPriceField' => $input->schemaOrgProductPriceField->int(),
-            'schemaOrgProductPriceCurrencyField' => $input->schemaOrgProductPriceCurrencyField->int(),
-            'schemaOrgProductAvailabilityField' => $input->schemaOrgProductAvailabilityField->int(),
-            'schemaOrgProductRatingValueField' => $input->schemaOrgProductRatingValueField->int(),
-            'schemaOrgProductReviewCountField' => $input->schemaOrgProductReviewCountField->int(),
-            
-            // Event Schema Fields (static values)
-            'schemaOrgEventName' => $input->schemaOrgEventName->text(),
-            'schemaOrgEventDescription' => $input->schemaOrgEventDescription->text(),
-            'schemaOrgEventStartDate' => $input->schemaOrgEventStartDate->text(),
-            'schemaOrgEventEndDate' => $input->schemaOrgEventEndDate->text(),
-            'schemaOrgEventStatus' => $input->schemaOrgEventStatus->text(),
-            'schemaOrgEventLocationName' => $input->schemaOrgEventLocationName->text(),
-            'schemaOrgEventLocationAddress' => $input->schemaOrgEventLocationAddress->text(),
-            'schemaOrgEventPrice' => $input->schemaOrgEventPrice->text(),
-            'schemaOrgEventPriceCurrency' => $input->schemaOrgEventPriceCurrency->text(),
-            // Event Schema Fields (tracker field IDs)
-            'schemaOrgEventNameField' => $input->schemaOrgEventNameField->int(),
-            'schemaOrgEventDescriptionField' => $input->schemaOrgEventDescriptionField->int(),
-            'schemaOrgEventStartDateField' => $input->schemaOrgEventStartDateField->int(),
-            'schemaOrgEventEndDateField' => $input->schemaOrgEventEndDateField->int(),
-            'schemaOrgEventStatusField' => $input->schemaOrgEventStatusField->int(),
-            'schemaOrgEventLocationNameField' => $input->schemaOrgEventLocationNameField->int(),
-            'schemaOrgEventLocationAddressField' => $input->schemaOrgEventLocationAddressField->int(),
-            'schemaOrgEventPriceField' => $input->schemaOrgEventPriceField->int(),
-            'schemaOrgEventPriceCurrencyField' => $input->schemaOrgEventPriceCurrencyField->int(),
-            
-            // here is where we define tracker options (more to be added)
+            'schemaOrgMarkup' => $input->schemaOrgMarkup->text(),
         ];
     }
 }
