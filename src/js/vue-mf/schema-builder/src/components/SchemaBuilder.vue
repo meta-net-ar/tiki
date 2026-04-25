@@ -912,6 +912,136 @@ watch(schemaJson, (newVal) => {
 
 // ─── Hydrate from schemajson prop ────────────────────────────────────────────
 
+const schemaHydrators = {
+    Article:     hydrateArticle,
+    NewsArticle: hydrateArticle,
+    BlogPosting: hydrateArticle,
+
+    BreadcrumbList(jsonld, form) {
+        form.items = (jsonld.itemListElement || []).map((item) => ({ name: item.name || '', url: item.item || '' }));
+    },
+
+    Event(jsonld, form) {
+        copyDirect(jsonld, form, ['name', 'description', 'image', 'startDate', 'endDate', 'eventStatus', 'eventAttendanceMode']);
+        form.locationName    = jsonld.location?.name || '';
+        form.locationAddress = jsonld.location?.address || '';
+        form.organizerName   = jsonld.organizer?.name || '';
+        form.organizerUrl    = jsonld.organizer?.url || '';
+        form.price           = jsonld.offers?.price || '';
+        form.priceCurrency   = jsonld.offers?.priceCurrency || '';
+        form.ticketUrl       = jsonld.offers?.url || '';
+    },
+
+    FAQPage(jsonld, form) {
+        form.questions = (jsonld.mainEntity || []).map((question) => ({
+            question: question.name || '',
+            answer:   question.acceptedAnswer?.text || '',
+        }));
+    },
+
+    HowTo(jsonld, form) {
+        copyDirect(jsonld, form, ['name', 'description', 'image', 'totalTime']);
+        form.estimatedCost         = jsonld.estimatedCost?.value || '';
+        form.estimatedCostCurrency = jsonld.estimatedCost?.currency || '';
+        form.supply = (jsonld.supply || []).map((item) => item.name).join(', ');
+        form.tool   = (jsonld.tool   || []).map((item) => item.name).join(', ');
+        form.steps  = (jsonld.step   || []).map((step) => ({ name: step.name || '', text: step.text || '', image: step.image || '', url: step.url || '' }));
+    },
+
+    JobPosting(jsonld, form) {
+        copyDirect(jsonld, form, ['title', 'description', 'datePosted', 'validThrough', 'employmentType']);
+        form.hiringOrgName     = jsonld.hiringOrganization?.name  || '';
+        form.hiringOrgUrl      = jsonld.hiringOrganization?.sameAs || '';
+        form.hiringOrgLogo     = jsonld.hiringOrganization?.logo   || '';
+        form.jobLocationAddress = jsonld.jobLocation?.address || '';
+        form.remote            = jsonld.jobLocationType || '';
+        form.salaryValue       = jsonld.baseSalary?.value?.value    || '';
+        form.salaryCurrency    = jsonld.baseSalary?.currency        || '';
+        form.salaryUnit        = jsonld.baseSalary?.value?.unitText || '';
+    },
+
+    LocalBusiness(jsonld, form) {
+        copyDirect(jsonld, form, ['name', 'description', 'image', 'url', 'telephone', 'email', 'priceRange']);
+        form.streetAddress   = jsonld.address?.streetAddress   || '';
+        form.addressLocality = jsonld.address?.addressLocality || '';
+        form.addressRegion   = jsonld.address?.addressRegion   || '';
+        form.postalCode      = jsonld.address?.postalCode      || '';
+        form.addressCountry  = jsonld.address?.addressCountry  || '';
+        form.latitude        = jsonld.geo?.latitude  || '';
+        form.longitude       = jsonld.geo?.longitude || '';
+        form.openingHours    = Array.isArray(jsonld.openingHours) ? jsonld.openingHours.join(', ') : (jsonld.openingHours || '');
+    },
+
+    Organization(jsonld, form) {
+        copyDirect(jsonld, form, ['name', 'url', 'logo', 'description', 'foundingDate']);
+        form.email       = jsonld.contactPoint?.email       || '';
+        form.telephone   = jsonld.contactPoint?.telephone   || '';
+        form.contactType = jsonld.contactPoint?.contactType || '';
+        form.sameAs      = Array.isArray(jsonld.sameAs) ? jsonld.sameAs.join(', ') : (jsonld.sameAs || '');
+    },
+
+    Person(jsonld, form) {
+        copyDirect(jsonld, form, ['name', 'url', 'image', 'jobTitle', 'email', 'telephone', 'description']);
+        form.worksForName = jsonld.worksFor?.name || '';
+        form.sameAs       = Array.isArray(jsonld.sameAs) ? jsonld.sameAs.join(', ') : (jsonld.sameAs || '');
+    },
+
+    Product(jsonld, form) {
+        copyDirect(jsonld, form, ['name', 'description', 'image', 'sku', 'gtin']);
+        form.brand           = jsonld.brand?.name || '';
+        form.offerUrl        = jsonld.offers?.url            || '';
+        form.price           = jsonld.offers?.price          || '';
+        form.priceCurrency   = jsonld.offers?.priceCurrency  || '';
+        form.priceValidUntil = jsonld.offers?.priceValidUntil || '';
+        form.availability    = jsonld.offers?.availability   || '';
+        form.itemCondition   = jsonld.offers?.itemCondition  || '';
+        form.ratingValue     = jsonld.aggregateRating?.ratingValue  || '';
+        form.ratingCount     = jsonld.aggregateRating?.ratingCount  || '';
+        form.reviewCount     = jsonld.aggregateRating?.reviewCount  || '';
+        form.reviews = (jsonld.review || []).map((review) => ({
+            reviewBody:    review.reviewBody || '',
+            ratingValue:   review.reviewRating?.ratingValue || '',
+            authorName:    review.author?.name || '',
+            datePublished: review.datePublished || '',
+        }));
+    },
+
+    Recipe(jsonld, form) {
+        copyDirect(jsonld, form, ['name', 'description', 'image', 'datePublished', 'prepTime', 'cookTime', 'totalTime',
+                                  'recipeYield', 'recipeCategory', 'recipeCuisine', 'keywords']);
+        form.authorName        = jsonld.author?.name || '';
+        form.calories          = jsonld.nutrition?.calories || '';
+        form.recipeIngredient  = Array.isArray(jsonld.recipeIngredient) ? jsonld.recipeIngredient.join('\n') : (jsonld.recipeIngredient || '');
+        form.recipeInstructions = (jsonld.recipeInstructions || []).map((step) => ({
+            name: step.name || '', text: step.text || '', image: step.image || '',
+        }));
+    },
+
+    VideoObject(jsonld, form) {
+        copyDirect(jsonld, form, ['name', 'description', 'thumbnailUrl', 'uploadDate', 'duration', 'contentUrl', 'embedUrl']);
+        form.publisher        = jsonld.publisher?.name || '';
+        form.interactionCount = jsonld.interactionStatistic?.userInteractionCount || '';
+    },
+
+    WebSite(jsonld, form) {
+        copyDirect(jsonld, form, ['name', 'url', 'description', 'alternateName']);
+        form.searchUrlTemplate = jsonld.potentialAction?.target?.urlTemplate || jsonld.potentialAction?.target || '';
+    },
+};
+
+function copyDirect(jsonld, form, keys) {
+    keys.forEach((key) => { if (jsonld[key] !== undefined) form[key] = jsonld[key]; });
+}
+
+function hydrateArticle(jsonld, form) {
+    copyDirect(jsonld, form, ['headline', 'description', 'image', 'datePublished', 'dateModified']);
+    form.authorName    = jsonld.author?.name    || '';
+    form.authorUrl     = jsonld.author?.url     || '';
+    form.publisherName = jsonld.publisher?.name || '';
+    form.publisherLogo = jsonld.publisher?.logo?.url || (typeof jsonld.publisher?.logo === 'string' ? jsonld.publisher.logo : '');
+    form.mainEntityUrl = jsonld.mainEntityOfPage?.['@id'] || '';
+}
+
 onMounted(() => {
     if (props.schemajson) {
         try {
@@ -920,10 +1050,7 @@ onMounted(() => {
             if (type && schemaDefinitions[type]) {
                 schemaType.value = type;
                 resetForm();
-                // Best-effort: copy top-level string values into formData
-                Object.keys(formData).forEach((key) => {
-                    if (typeof parsed[key] === 'string') formData[key] = parsed[key];
-                });
+                schemaHydrators[type]?.(parsed, formData);
             }
         } catch {
             // Invalid JSON prop — ignore
