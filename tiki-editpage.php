@@ -888,47 +888,31 @@ if ($prefs['sitemap_enable'] === 'y') {
 }
 
 $attributelib = TikiLib::lib('attribute');
-$schemaOrgAttributeMap = [
-    'schemaOrgType' => 'tiki.schema.type',
-    // Article fields (prefix: tiki.schema.art.)
-    'schemaOrgArticleHeadline' => 'tiki.schema.art.headline',
-    'schemaOrgArticleDescription' => 'tiki.schema.art.desc',
-    'schemaOrgArticleImage' => 'tiki.schema.art.image',
-    'schemaOrgArticleAuthor' => 'tiki.schema.art.author',
-    'schemaOrgArticlePublisher' => 'tiki.schema.art.publisher',
-    'schemaOrgArticlePublisherLogo' => 'tiki.schema.art.publogo',
-    'schemaOrgArticleDatePublished' => 'tiki.schema.art.datepub',
-    'schemaOrgArticleDateModified' => 'tiki.schema.art.datemod',
-    'schemaOrgArticleMainEntityUrl' => 'tiki.schema.art.mainurl',
-    // Product fields (prefix: tiki.schema.prod.)
-    'schemaOrgProductName' => 'tiki.schema.prod.name',
-    'schemaOrgProductDescription' => 'tiki.schema.prod.desc',
-    'schemaOrgProductSku' => 'tiki.schema.prod.sku',
-    'schemaOrgProductPrice' => 'tiki.schema.prod.price',
-    'schemaOrgProductPriceCurrency' => 'tiki.schema.prod.currency',
-    'schemaOrgProductAvailability' => 'tiki.schema.prod.avail',
-    'schemaOrgProductRatingValue' => 'tiki.schema.prod.rating',
-    'schemaOrgProductReviewCount' => 'tiki.schema.prod.reviews',
-    // Event fields (prefix: tiki.schema.evt.)
-    'schemaOrgEventName' => 'tiki.schema.evt.name',
-    'schemaOrgEventDescription' => 'tiki.schema.evt.desc',
-    'schemaOrgEventStartDate' => 'tiki.schema.evt.start',
-    'schemaOrgEventEndDate' => 'tiki.schema.evt.end',
-    'schemaOrgEventStatus' => 'tiki.schema.evt.status',
-    'schemaOrgEventLocationName' => 'tiki.schema.evt.locname',
-    'schemaOrgEventLocationAddress' => 'tiki.schema.evt.locaddr',
-    'schemaOrgEventPrice' => 'tiki.schema.evt.price',
-    'schemaOrgEventPriceCurrency' => 'tiki.schema.evt.currency',
-];
+$schemainfo['schemaOrgMarkup'] = $attributelib->get_attribute('wiki page', $page, "tiki.schema.markup") ?: '';
 
-foreach ($schemaOrgAttributeMap as $fieldName => $attrName) {
-    $attrValue = $attributelib->get_attribute('wiki page', $page, $attrName);
-    if ($attrValue !== false) {
-        $schemainfo[$fieldName] = $attrValue;
-    }
-}
+TikiLib::lib('header')->add_js_module('
+import "@vue-mf/root-config"; 
+import \'@vue-mf/schema-markup-builder\'');
 
-$smarty->assign('schemainfo', $schemainfo);
+TikiLib::lib('header')->add_jq_onready('
+window.registerApplication({
+    name: "@vue-mf/schema-markup-builder",
+    app: () => importShim("@vue-mf/schema-markup-builder"),
+    activeWhen: (location) => {
+        let condition = true;
+        return condition;
+    },
+    customProps: {
+        //trackerfieldMap : "' . json_encode($schemaOrgAttributeMap) . '",
+        schemajson: \'' . json_encode(json_decode($schemainfo['schemaOrgMarkup'])->schema) . '\',
+    },
+})
+
+onDOMElementRemoved("single-spa-application:@vue-mf/schema-markup-builder", function () {
+    window.unregisterApplication("@vue-mf/schema-markup-builder");
+});');
+
+$smarty->assign('schemainfo', $schemainfo); //TODO : schema info will now come from properties as plain json, now built in frontend not backend, so we can add more fields without changing backend code
 
 $wiki_authors_style = '';
 if ($prefs['wiki_authors_style_by_page'] === 'y') {
@@ -1327,46 +1311,11 @@ if (
             // Save Schema.org attributes
             // Note: Attribute names must be lowercase with dots and max 25 chars per Tiki standards
             $attributelib = TikiLib::lib('attribute');
-            $schemaOrgAttributeMap = [
-                'schemaOrgType' => 'tiki.schema.type',
-                // Article fields (prefix: tiki.schema.art.)
-                'schemaOrgArticleHeadline' => 'tiki.schema.art.headline',
-                'schemaOrgArticleDescription' => 'tiki.schema.art.desc',
-                'schemaOrgArticleImage' => 'tiki.schema.art.image',
-                'schemaOrgArticleAuthor' => 'tiki.schema.art.author',
-                'schemaOrgArticlePublisher' => 'tiki.schema.art.publisher',
-                'schemaOrgArticlePublisherLogo' => 'tiki.schema.art.publogo',
-                'schemaOrgArticleDatePublished' => 'tiki.schema.art.datepub',
-                'schemaOrgArticleDateModified' => 'tiki.schema.art.datemod',
-                'schemaOrgArticleMainEntityUrl' => 'tiki.schema.art.mainurl',
-                // Product fields (prefix: tiki.schema.prod.)
-                'schemaOrgProductName' => 'tiki.schema.prod.name',
-                'schemaOrgProductDescription' => 'tiki.schema.prod.desc',
-                'schemaOrgProductSku' => 'tiki.schema.prod.sku',
-                'schemaOrgProductPrice' => 'tiki.schema.prod.price',
-                'schemaOrgProductPriceCurrency' => 'tiki.schema.prod.currency',
-                'schemaOrgProductAvailability' => 'tiki.schema.prod.avail',
-                'schemaOrgProductRatingValue' => 'tiki.schema.prod.rating',
-                'schemaOrgProductReviewCount' => 'tiki.schema.prod.reviews',
-                // Event fields (prefix: tiki.schema.evt.)
-                'schemaOrgEventName' => 'tiki.schema.evt.name',
-                'schemaOrgEventDescription' => 'tiki.schema.evt.desc',
-                'schemaOrgEventStartDate' => 'tiki.schema.evt.start',
-                'schemaOrgEventEndDate' => 'tiki.schema.evt.end',
-                'schemaOrgEventStatus' => 'tiki.schema.evt.status',
-                'schemaOrgEventLocationName' => 'tiki.schema.evt.locname',
-                'schemaOrgEventLocationAddress' => 'tiki.schema.evt.locaddr',
-                'schemaOrgEventPrice' => 'tiki.schema.evt.price',
-                'schemaOrgEventPriceCurrency' => 'tiki.schema.evt.currency',
-            ];
-
-            foreach ($schemaOrgAttributeMap as $fieldName => $attrName) {
-                if (isset($_REQUEST[$fieldName])) {
-                    $attributelib->set_attribute('wiki page', $page, $attrName, $_REQUEST[$fieldName]);
-                } else {
-                    // Delete attribute if field is not set (user may have cleared it)
-                    $attributelib->set_attribute('wiki page', $page, $attrName, '');
-                }
+            if(isset($_REQUEST['schemaOrgMarkup'])) {
+                $attributelib->set_attribute('wiki page', $page, 'tiki.schema.markup', $_REQUEST['schemaOrgMarkup']);
+            } else {
+                // Delete attribute if field is not set (user may have cleared it)
+                $attributelib->set_attribute('wiki page', $page, 'tiki.schema.markup', '');
             }
 
             // Handle translation bits
