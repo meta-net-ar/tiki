@@ -14,7 +14,7 @@ $inputConfiguration = [
         'blogId'                   => 'digits',            //post
         'postId'                   => 'digits',            //post
         'remove_image'             => 'int',               //get
-        'wysiwyg'                  => 'string',            //post
+        'wysiwyg'                  => 'bool',              //post
         'publish_Meridian'         => 'text',              //post
         'publish_Hour'             => 'digits',            //post
         'publish_Minute'           => 'digits',            //post
@@ -87,7 +87,6 @@ if ($postId > 0) {
     }
     if (isset($data['wysiwyg']) && ! isset($_POST['wysiwyg'])) {
         $_POST['wysiwyg'] = $data['wysiwyg'];
-        $_REQUEST['wysiwyg'] = $data['wysiwyg'];
     }
 }
 
