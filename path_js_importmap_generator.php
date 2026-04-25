@@ -108,6 +108,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "vue3-sfc-loader" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/vue3-sfc-loader/dist/vue3-sfc-loader.esm.js",
 
                 /* src/js/common_reexported */
+                "@altcha" => $tikiUrl . JS_ASSETS_PATH . "/common-reexported/altcha.js",
                 "common-reexported/jspdf" => $tikiUrl . JS_ASSETS_PATH . "/common-reexported/jspdf.js",
 
                 /* src/js/jquery_tiki */
@@ -134,9 +135,6 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
 
                 /* src/js/tiki-3d-model-viewer */
                 "@tiki-3d-model-viewer/model3dviewer" => $tikiUrl . JS_ASSETS_PATH . "/tiki-3d-model-viewer.js",
-
-                /* src/js/tiki-altcha */
-                "@altcha" => $tikiUrl . JS_ASSETS_PATH . "/tiki-altcha.js",
 
                 /* src/js/tiki-figlet */
                 "@tiki-figlet" => $tikiUrl . JS_ASSETS_PATH . "/tiki-figlet.js",
