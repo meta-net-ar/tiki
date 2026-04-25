@@ -937,6 +937,9 @@ class ObjectLib extends TikiLib
                 $structlib = TikiLib::lib('struct');
                 $info = $structlib->s_get_page_info($id);
                 return ! empty($info['page_alias']) ? $info['page_alias'] : $info['pageName'];
+            case 'wiki page':
+                $info = TikiLib::lib('tiki')->get_page_info($id);
+                return $this->getFormattedTitle($type, $id, $info['pageName'], $format);
         }
 
         $title = $this->table('tiki_objects')->fetchOne(
@@ -1097,10 +1100,10 @@ class ObjectLib extends TikiLib
             } else {
                 $metadata = null;
             }
-            $query = $lib->buildQuery([
-                'object_type' => $type,
-                'object_id'   => $id
-            ]);
+
+            $query = $lib->buildQuery([]);
+            $query->addObject($type, $id);
+
             $format_pattern = '/\{([\w\.]+)\}/';
             if (preg_match_all($format_pattern, $format, $m)) {
                 $query->setSelectionFields($m[1]);
