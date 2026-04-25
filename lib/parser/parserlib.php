@@ -1862,7 +1862,18 @@ class ParserLib extends TikiDb_Bridge
             return null;
         }
 
-        return $objectlib->get_title($objectType, $objectId, '__{parent_object_title}__: {title}');
+        switch ($objectType) {
+            case 'wiki page':
+                $format = '__{title}__[| : |]{description}';
+                break;
+            case 'forum post':
+                $format = '__{forum_title}__[| : |]{title}';
+                break;
+            default:
+                $format = '__{parent_object_title}__[| : |]{title}';
+        }
+
+        return $objectlib->get_title($objectType, $objectId, $format);
     }
 
     //*

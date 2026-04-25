@@ -93,7 +93,6 @@ class Search_ContentSource_ForumPostSource implements Search_ContentSource_Inter
 
             'parent_object_type' => $typeFactory->identifier($comment['objectType']),
             'parent_object_id' => $typeFactory->identifier($comment['object']),
-            'parent_object_title' => $typeFactory->sortable($forum_info['name']),
             'view_permission' => $typeFactory->identifier('tiki_p_forum_read'),
             '_permission_accessor' => Perms::get('thread', $objectId, $comment['object']),
             'parent_contributors' => $typeFactory->multivalue(array_unique($root_author)),
