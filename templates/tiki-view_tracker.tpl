@@ -286,8 +286,8 @@
                                         link="{tr}List Attachments{/tr}">{icon name="attach"}</a> {$items[user].attachments}</td>
                                         {if $tiki_p_admin_trackers eq 'y'}<td style="text-align:center;">{$items[user].hits}</td>{/if}
                                     {/if}
-                                    {if $tiki_p_admin_trackers eq 'y' or ($tiki_p_remove_tracker_items eq 'y' and $items[user].status ne 'p' and $items[user].status ne 'c') or ($tiki_p_remove_tracker_items_pending eq 'y' and $items[user].status eq 'p') or ($tiki_p_remove_tracker_items_closed eq 'y' and $items[user].status eq 'c')}
-                                        <td class="action">
+                                    <td class="action">
+                                        {if $tiki_p_admin_trackers eq 'y' or ($tiki_p_remove_tracker_items eq 'y' and $items[user].status ne 'p' and $items[user].status ne 'c') or ($tiki_p_remove_tracker_items_pending eq 'y' and $items[user].status eq 'p') or ($tiki_p_remove_tracker_items_closed eq 'y' and $items[user].status eq 'c')}
                                             {actions}
                                                 {strip}
                                                     {if $prefs.tracker_legacy_insert neq 'y'}
@@ -337,8 +337,8 @@
                                                     {/if}
                                                 {/strip}
                                             {/actions}
-                                        </td>
-                                    {/if}
+                                        {/if}
+                                    </td>
                                 </tr>
                                 {$itemoff=$itemoff+1}
                             {/section}
