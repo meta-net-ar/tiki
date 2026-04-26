@@ -183,7 +183,7 @@ if ($prefs['feature_theme_control'] == 'y') {
 
 $smarty->assign(
     'parsed_body',
-    $parserlib->parse_data(
+    $parsedBody = $parserlib->parse_data(
         $body,
         [
             'is_html' => $artlib->is_html($article_data),
@@ -195,7 +195,7 @@ $smarty->assign(
 );
 $smarty->assign(
     'parsed_heading',
-    $parserlib->parse_data(
+    $parsedHeading = $parserlib->parse_data(
         $heading,
         [
             'min_one_paragraph' => true,
@@ -206,6 +206,16 @@ $smarty->assign(
         ]
     )
 );
+if (empty($article_data['metatag_description_source'])) {
+    $metatagDescriptionSource = ! empty($parsedHeading) ? $parsedHeading : $parsedBody;
+    $metatagDescription = trim(preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags($metatagDescriptionSource), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    if ($metatagDescription !== '') {
+        if (mb_strlen($metatagDescription) > 160) {
+            $metatagDescription = rtrim(mb_substr($metatagDescription, 0, 157)) . '...';
+        }
+        $smarty->assign('metatag_description', $metatagDescription);
+    }
+}
 if ($prefs['article_related_articles'] == 'y') {
     $article_data['related_articles'] = $artlib->get_related_articles($article_data['articleId']);
     if (isset($article_data['related_articles']) && ! empty($article_data['related_articles'])) {
@@ -218,6 +228,23 @@ if (isset($topics[$article_data['topicId']])) {
     $smarty->assign('topicName', $topics[$article_data['topicId']]['name']);
 }
 $smarty->assign_by_ref('topics', $topics);
+
+if (
+    $smarty->getTemplateVars('hasImage') === 'y'
+    || ! empty($topics[$article_data['topicId']]['image_name'])
+) {
+    $smarty->assign('twitter_card', 'summary_large_image');
+}
+
+$articleIsPublic = $article_data['ispublished'] === 'y'
+    && ($article_data['publishDate'] <= $tikilib->now || $article_data['show_pre_publ'] === 'y');
+if ($articleIsPublic) {
+    $smarty->assign('metatag_robots_override', 'index, follow');
+    if (function_exists('header_remove')) {
+        header_remove('X-Robots-Tag');
+    }
+    $headerlib->setXRobotsTag('index, follow');
+}
 
 $objId = $_REQUEST['articleId'];
 if ($prefs['feature_categories'] == 'y') {

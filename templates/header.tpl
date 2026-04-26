@@ -11,44 +11,46 @@
 {* --- Canonical URL --- *}
 {include file="canonical.tpl"}
 
-{* --- Blog description --- *}
-{if isset($section) and $section eq "blogs"}
-    {if not empty($post_info) and not empty($post_info.parsed_excerpt)}
-        {$metatag_description = $post_info.parsed_excerpt|strip_tags:false|truncate:150|escape}
-    {elseif not empty($post_info) and not empty($post_info.parsed_data|strip_tags)}
-        {$metatag_description = $post_info.parsed_data|strip_tags:false|truncate:150|escape}
-    {else}
-        {if not empty($post_info) and not empty($post_info.title)}
-            {$tmp_post_info_title=$post_info.title}
+{if empty($metatag_description)}
+    {* --- Blog description --- *}
+    {if isset($section) and $section eq "blogs"}
+        {if not empty($post_info) and not empty($post_info.parsed_excerpt)}
+            {$metatag_description = $post_info.parsed_excerpt|strip_tags:false|truncate:150|escape}
+        {elseif not empty($post_info) and not empty($post_info.parsed_data|strip_tags)}
+            {$metatag_description = $post_info.parsed_data|strip_tags:false|truncate:150|escape}
         {else}
-            {$tmp_post_info_title=''}
+            {if not empty($post_info) and not empty($post_info.title)}
+                {$tmp_post_info_title=$post_info.title}
+            {else}
+                {$tmp_post_info_title=''}
+            {/if}
+            {if not empty($blog_data) and not empty($blog_data.title)}
+                {$tmp_blog_data_title=$blog_data.title}
+            {else}
+                {$tmp_blog_data_title=''}
+            {/if}
+            {$metatag_description = $tmp_post_info_title|cat:' - '|cat:$tmp_blog_data_title|escape}
         {/if}
-        {if not empty($blog_data) and not empty($blog_data.title)}
-            {$tmp_blog_data_title=$blog_data.title}
-        {else}
-            {$tmp_blog_data_title=''}
+    {* --- Article description --- *}
+    {elseif isset($section) and $section eq "cms"}
+        {if not empty($heading)}
+            {$metatag_description = $parsed_heading|strip_tags:false|truncate:150|escape}
+        {elseif not empty ($body)}
+            {$metatag_description = $parsed_body|strip_tags:false|truncate:150|escape}
         {/if}
-        {$metatag_description = $tmp_post_info_title|cat:' - '|cat:$tmp_blog_data_title|escape}
+    {* --- File Gallery description --- *}
+    {elseif isset($section) and $section eq "file_galleries"}
+        {if not empty($gal_info.description)}
+            {$metatag_description = $gal_info.description|strip_tags:false|truncate:150|escape}
+        {/if}
+    {* --- Page description --- *}
+    {elseif $prefs.metatag_pagedesc eq 'y' and not empty($description)}
+        {$metatag_description = $description|escape}
+    {elseif not empty($prefs.metatag_description_translated)}
+        {$metatag_description = $prefs.metatag_description_translated|escape}
+    {elseif not empty($prefs.metatag_description)}
+        {$metatag_description = $prefs.metatag_description|escape}
     {/if}
-{* --- Article description --- *}
-{elseif isset($section) and $section eq "cms"}
-    {if not empty($heading)}
-        {$metatag_description = $parsed_heading|strip_tags:false|truncate:150|escape}
-    {elseif not empty ($body)}
-        {$metatag_description = $parsed_body|strip_tags:false|truncate:150|escape}
-    {/if}
-{* --- File Gallery description --- *}
-{elseif isset($section) and $section eq "file_galleries"}
-    {if not empty($gal_info.description)}
-        {$metatag_description = $gal_info.description|strip_tags:false|truncate:150|escape}
-    {/if}
-{* --- Page description --- *}
-{elseif $prefs.metatag_pagedesc eq 'y' and not empty($description)}
-    {$metatag_description = $description|escape}
-{elseif not empty($prefs.metatag_description_translated)}
-    {$metatag_description = $prefs.metatag_description_translated|escape}
-{elseif not empty($prefs.metatag_description)}
-    {$metatag_description = $prefs.metatag_description|escape}
 {/if}
 {if not empty($metatag_description) and not empty($metatag_description|trim)}
     <meta name="description" content="{$metatag_description}">
@@ -81,7 +83,10 @@
 {if $prefs.metatag_geoplacename neq ''}
     <meta name="geo.placename" content="{$prefs.metatag_geoplacename|escape}">
 {/if}
-{if ($prefs.metatag_robotscustom == 'y' and not empty($metatag_robotscustom))}
+{if not empty($metatag_robots_override)}
+    <meta name="robots" content="{$metatag_robots_override|escape}">
+    <meta name="googlebot" content="{$metatag_robots_override|escape}">
+{elseif ($prefs.metatag_robotscustom == 'y' and not empty($metatag_robotscustom))}
     {* PRIORITY 1: Page-specific custom robots (highest priority, complete override) *}
     <meta name="robots" content="{$metatag_robotscustom|escape}">
     <meta name="googlebot" content="{$metatag_robotscustom|escape}">
@@ -203,7 +208,11 @@
 {/if}
 {* To be added someday when using cart feature: product, product.group, product.item *}
 {* May be usefull too : profile *}
-<meta name="twitter:card" content="summary">
+{if !empty($twitter_card)}
+    <meta name="twitter:card" content="{$twitter_card|escape}">
+{else}
+    <meta name="twitter:card" content="summary">
+{/if}
 {* --- SocialNetwork:image --- *}
 {* first we check if there is a featured image to use it *}
 {if not empty($header_featured_images)}
@@ -216,7 +225,7 @@
     {elseif $mid eq 'tiki-view_blog_post.tpl'}
     {* --- Article --- *}
     {* If there is no featured image we check if an article image or a topic image exist to use it *}
-    {elseif ($mid eq 'tiki-read_article.tpl') and ($hasImage eq 'y') or (not empty ($topics.image_name))}
+    {elseif $mid eq 'tiki-read_article.tpl' and (($hasImage eq 'y') or (not empty($topics.image_name)))}
         <meta property="og:image" content="{$base_url_canonical}{if $hasImage eq 'y'}article_image.php?image_type=article&id={$articleId}{elseif not empty ($topics.image_name)}article_image.php?image_type=topic&id={$topicId}{/if}">
         <meta name="twitter:image" content="{$base_url_canonical}{if $hasImage eq 'y'}article_image.php?image_type=article&id={$articleId}{elseif not empty ($topics.image_name)}article_image.php?image_type=topic&id={$topicId}{/if}">
     {* We use the social network image as failsafe - control panel social network *}

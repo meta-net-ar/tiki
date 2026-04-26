@@ -24,8 +24,8 @@
         <link rel="canonical" href="{$base_url_canonical}{$postId|sefurl:blogpost:null:null:'n'}">
         <meta content="{$base_url_canonical}{$postId|sefurl:blogpost:null:null:'n'}" property="og:url">
     {elseif $mid eq 'tiki-read_article.tpl'}
-        <link rel="canonical" href="{$base_url_canonical}{$articleId|sefurl:article:null:null:'n'}">
-        <meta content="{$base_url_canonical}{$articleId|sefurl:article:null:null:'n'}" property="og:url">
+        <link rel="canonical" href="{$base_url_canonical}{$articleId|sefurl:article:null:null:'y':$arttitle}">
+        <meta content="{$base_url_canonical}{$articleId|sefurl:article:null:null:'y':$arttitle}" property="og:url">
     {elseif $mid eq 'tiki-browse_categories.tpl'}
         <link rel="canonical" href="{$base_url_canonical}{$parentId|sefurl:category}">
         <meta content="{$base_url_canonical}{$parentId|sefurl:category}" property="og:url">

@@ -32,8 +32,14 @@ class Articles extends AbstractType
 
         $ranges = $this->getTypeDateRanges('Articles', $prefs['sitemap_split']);
         foreach ($ranges as $range) {
-            // on auto mode only gen what requested for
-            if ($auto && intval($context['year'] ?? 0) !== intval($range['year'] ?? 0)) {
+            // On automatic mode skip non requested ranges.
+            if (
+                $auto
+                && (
+                    intval($context['year'] ?? 0) !== intval($range['year'] ?? 0)
+                    || intval($context['month'] ?? 0) !== intval($range['month'] ?? 0)
+                )
+            ) {
                 continue;
             }
 
@@ -66,10 +72,19 @@ class Articles extends AbstractType
 
             // In case of multilingual websites.
             if ($isMultilingual) {
+                // Keep only one article per translation set, preferring the site language,
+                // while still preserving monolingual/orphaned articles in the sitemap.
+                $listPages['data'] = $multilinguallib->selectLangList('article', $listPages['data'], $prefs['site_language']);
+
                 // Attach translations to each article
                 foreach ($listPages['data'] as &$article) {
                     try {
-                        $translations = $multilinguallib->getTranslations('article', $article['articleId']);
+                        $translations = $multilinguallib->getTranslations(
+                            'article',
+                            $article['articleId'],
+                            $article['title'] ?? '',
+                            $article['lang'] ?? ''
+                        );
 
                         // exclude primary from translations list (it's index 0)
                         $article['translations'] = array_slice($translations, 1);
