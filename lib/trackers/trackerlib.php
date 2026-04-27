@@ -3123,6 +3123,8 @@ class TrackerLib extends TikiLib
                         }
                     }
 
+                    // Only gate non-empty values: empty values fall through to the mandatory-field
+                    // check above; optional encrypted fields legitimately submit empty.
                     if (! empty($f['encryptionKeyId']) && ! empty(trim((string)($f['value'] ?? '')))) {
                         try {
                             $key = new Tiki\Encryption\Key($f['encryptionKeyId']);

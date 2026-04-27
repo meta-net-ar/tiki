@@ -83,8 +83,8 @@
             el.removeAttribute("disabled");
         });
 
+        var fd = new FormData();
         if (itemId > 0) {
-            var fd = new FormData();
             fd.append("keyId", keyId);
             fd.append("fieldId", wrap.dataset.fieldId || "");
             fd.append("itemId", itemId);
@@ -108,16 +108,15 @@
                     }
                 })
                 .catch(function () {
-                    reDisable(wrap, info, "An error occurred. Please try entering the key again.");
+                    reDisable(wrap, info, wrap.dataset.networkError);
                 });
         } else {
             // New item: no ciphertext exists yet — verify the session key using
             // the verificationCanary stored on the key record.
-            var fd2 = new FormData();
-            fd2.append("keyId", keyId);
+            fd.append("keyId", keyId);
             fetch("tiki-ajax_services.php?controller=encryption&action=verify_key", {
                 method: "POST",
-                body: fd2,
+                body: fd,
             })
                 .then(function (r) {
                     return r.json();
@@ -130,7 +129,7 @@
                     if (info) info.remove();
                 })
                 .catch(function () {
-                    reDisable(wrap, info, "An error occurred. Please try entering the key again.");
+                    reDisable(wrap, info, wrap.dataset.networkError);
                 });
         }
     });

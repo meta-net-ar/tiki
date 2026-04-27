@@ -282,6 +282,11 @@ class Services_Encryption_Controller
      */
     public function action_verify_key($input)
     {
+        global $user;
+        if (empty($user)) {
+            throw new Services_Exception_Denied(tr('Permission denied'));
+        }
+
         $keyId = $input->keyId->int();
         $encryption_key = $this->encryptionlib->get_key($keyId);
 
@@ -307,6 +312,46 @@ class Services_Encryption_Controller
         }
 
         return ['verified' => true];
+    }
+
+    /**
+     * Generates a verification canary for a given key.
+     *
+     * @param string $key The key to generate a canary for.
+     * @return string The encrypted verification canary.
+     */
+    private function generateVerificationCanary(string $key): string
+    {
+        $crypt = TikiLib::lib('crypt');
+        $crypt->initSeed($key);
+        return $crypt->encryptData('tiki-key-verify-v1');
+    }
+
+    /**
+     * Opportunistically stores a verificationCanary on a legacy key the first time a user with a stored account share enters it. Non-critical: any failure is silently swallowed so it never blocks key entry.
+     *
+     * @param array $encryptionKey The encryption key to backfill the verification canary for.
+     */
+    private function backfillVerificationCanary(array $encryptionKey): void
+    {
+        if (! empty($encryptionKey['verificationCanary'])) {
+            return;
+        }
+        try {
+            $userShare = $this->action_get_share_for_key(new JitFilter(['keyId' => $encryptionKey['keyId']]));
+            if (! empty($userShare)) {
+                $correctKey = $this->action_decrypt_key(new JitFilter([
+                    'keyId'    => $encryptionKey['keyId'],
+                    'existing' => $userShare,
+                ]));
+                $this->encryptionlib->set_key(
+                    $encryptionKey['keyId'],
+                    ['verificationCanary' => $this->generateVerificationCanary($correctKey)]
+                );
+            }
+        } catch (\Throwable $e) {
+            // Non-critical: canary generation failure does not block key entry
+        }
     }
 
     private function share($key, &$data)

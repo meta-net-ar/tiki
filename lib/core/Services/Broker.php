@@ -20,6 +20,8 @@ class Services_Broker
     public function process($controller, $action, JitFilter $request)
     {
         $access = TikiLib::lib('access');
+        $isNoTemplateXhr = $access->is_xml_http_request()
+            && str_contains($_SERVER['QUERY_STRING'] ?? '', '&noTemplate');
 
         try {
             $this->preExecute();
@@ -50,8 +52,6 @@ class Services_Broker
                 echo $this->render($controller, $action, $output, $request);
             }
         } catch (Services_Exception_FieldError $e) {
-            $isNoTemplateXhr = $access->is_xml_http_request()
-                && str_contains($_SERVER['QUERY_STRING'] ?? '', '&noTemplate');
             if ($isNoTemplateXhr) {
                 // noTemplate XHR callers (e.g. forms inside modals) expect JSON on both
                 // success and error paths. Return a structured JSON error so that
@@ -76,8 +76,6 @@ class Services_Broker
                 $access->display_error(null, $e->getMessage(), $e->getCode());
             }
         } catch (Exception $e) {
-            $isNoTemplateXhr = $access->is_xml_http_request()
-                && str_contains($_SERVER['QUERY_STRING'] ?? '', '&noTemplate');
             if ($isNoTemplateXhr) {
                 http_response_code($e->getCode() ?: 500);
                 header('Content-Type: application/json');

@@ -117,7 +117,8 @@ class TrackerInput extends Base
                 return '<div class="encrypted-field-wrapper"'
                     . ' data-encryption-key-id="' . $encryptionKeyId . '"'
                     . ' data-field-id="' . (int)$field['fieldId'] . '"'
-                    . ' data-item-id="' . $itemId . '">'
+                    . ' data-item-id="' . $itemId . '"'
+                    . ' data-network-error="' . htmlspecialchars(tr('A network error occurred. Please try entering the key again.'), ENT_QUOTES) . '">'
                     . $fieldHtml . $info
                     . '</div>' . $desc;
             }
