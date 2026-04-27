@@ -63,8 +63,6 @@ class Key
                 throw new Services_Exception_Denied(tr('Could not decrypt key.'));
             }
             return $key;
-        } catch (Services_Exception_Denied $e) {
-            throw new KeyException($e->getMessage());
         } catch (\Throwable $e) {
             throw new KeyException($e->getMessage());
         }

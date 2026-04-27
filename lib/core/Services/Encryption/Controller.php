@@ -322,7 +322,7 @@ class Services_Encryption_Controller
      */
     private function generateVerificationCanary(string $key): string
     {
-        $crypt = TikiLib::lib('crypt');
+        $crypt = new \CryptLib();
         $crypt->initSeed($key);
         return $crypt->encryptData('tiki-key-verify-v1');
     }
