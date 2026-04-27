@@ -8,6 +8,50 @@
     margin: 10px 0 0;
 }
 
+.search-with-facets {
+    &::after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+}
+
+.search-with-facets .search-facets-sidebar {
+    width: 25%;
+    float: right;
+    margin-left: 1rem;
+    margin-bottom: 1.25rem;
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+.search-with-facets .search-facets-sidebar .form-select[multiple] {
+    max-width: 100%;
+}
+
+.search-with-facets .search-facets-sidebar .search-facets-actions {
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+}
+
+.search-with-facets .search-results-main {
+    overflow: hidden;
+}
+
+@media (max-width: breakpoint-max(md)) {
+    .search-with-facets .search-facets-sidebar {
+        float: none;
+        width: 100%;
+        margin-left: 0;
+        margin-bottom: 1.25rem;
+    }
+
+    .search-with-facets .search-results-main {
+        overflow: visible;
+        clear: both;
+    }
+}
+
 @media (max-width: breakpoint-max(sm)) {
     .searchresults li {
         margin: 25px 0;

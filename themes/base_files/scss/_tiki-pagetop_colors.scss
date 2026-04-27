@@ -95,3 +95,20 @@ body:not(.tiki-admin) .tiki-top-nav-dark
         border: none;
     }
 }
+
+/* Fix responsive spacing for top modules and page content when using fixed navbar */
+.top_modules {
+    margin-top: var(--top-modules-offset);
+}
+
+@media (max-width: 991px) {
+    :root {
+        --top-modules-offset: 60px;
+    }
+}
+
+@media (max-width: 767px) {
+    :root {
+        --top-modules-offset: 80px;
+    }
+}

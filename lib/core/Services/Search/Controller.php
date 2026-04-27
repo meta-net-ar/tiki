@@ -45,7 +45,7 @@ class Services_Search_Controller
             $stat = $prefs['unified_last_rebuild_stats_' . $prefs['unified_engine']];
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $searchIndexRebuilder = new SearchIndexRebuilder();
-            $stat = $searchIndexRebuilder->executeOrQueueIndexRebuild($input->loggit->int());
+            $stat = $searchIndexRebuilder->executeOrQueueIndexRebuild($input->loggit->int() ?? 0);
 
             // If it was queued, return early
             if ($stat === null) {

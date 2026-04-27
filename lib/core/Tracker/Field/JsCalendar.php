@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
 {
     /**
@@ -96,7 +99,8 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
             $requestData[$ins_id] = $requestData[$ins_id]['date'];
         }
 
-        $value = (isset($requestData[$ins_id]))
+        $valueFromRequest = isset($requestData[$ins_id]);
+        $value = $valueFromRequest
             ? $requestData[$ins_id]
             : $this->getValue();
 
@@ -104,6 +108,14 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
             try {
                 // prevent corrupted date values getting saved (e.g. from inline edit sometimes)
                 $this->validateTimestamp($value);
+
+                // Guard skips values already at UTC midnight. Only normalize when the value comes from a form submission, never from stored data.
+                if ($valueFromRequest && $this->getOption('datetime') === 'd' && is_numeric($value) && (int) $value % 86400 !== 0) {
+                    // Normalize to midnight UTC, mirroring DateTime handler (see DateTime::getFieldData).
+                    $timezone = $requestData[$ins_id . '_timezone'] ?? TikiLib::lib('tiki')->get_display_timezone();
+                    $server_offset = TikiDate::tzServerOffset($timezone, (int) $value);
+                    $value = (int) $value + $server_offset;
+                }
             } catch (Services_Exception $e) {
                 $value = '';
                 Feedback::error(tr('Date Picker Field: %0', $e->getMessage()));
