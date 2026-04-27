@@ -68,7 +68,12 @@ include_once('lib/setup/twversion.class.php');
 $TWV = new TWVersion();
 
 if ($options['only-secdb']) {
-    passthru("$phpCommand doc/devtools/generate_secdb.php", $exitCode);
+    // SecDB generation is temporarily disabled.
+    // Reason: per team discussion, SecDB is unstable and has been removed
+    // from CI and release scripts for now.
+//    passthru("$phpCommand doc/devtools/generate_secdb.php", $exitCode);
+    info(">> SecDB generation is temporarily disabled.");
+    exit(0);
 }
 
 $script = $_SERVER['argv'][0];
@@ -158,13 +163,13 @@ if (! $options['no-copyright-update'] && important_step("Update '" . COPYRIGHTS_
     }
 }
 
-if (! $options['no-secdb'] && important_step("Update SecDB file(s) 'db/tiki-secdb_{$version}_mysql.sql'")) {
-    passthru("$phpCommand doc/devtools/generate_secdb.php", $exitCode);
-    if ($exitCode === 0) {
-        print "SecDB file has been successfully created\n";
-    } else {
-        error('SecDB file update failed.');
-    }
+if (! $options['no-secdb']) {
+    // SecDB generation is temporarily disabled.
+    // Reason: per team discussion, SecDB is unstable and has been removed
+    // from CI and release scripts for now.
+    //    passthru("$phpCommand doc/devtools/generate_secdb.php", $exitCode);
+    info(">> SecDB generation is temporarily disabled.");
+    exit(0);
 }
 
 if ($isPre) {
@@ -575,7 +580,7 @@ function get_options()
         'no-lang-update' => false,
         'no-changelog-update' => false,
         'no-copyright-update' => false,
-        'no-secdb' => false,
+        'no-secdb' => true,
         'no-packaging' => false,
         'no-tagging' => false,
         'force-yes' => false,
