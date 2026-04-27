@@ -129,8 +129,15 @@ $.fn.setupEventCalendar = function (
             view: eventCalendarParams.initialView,
             date: eventCalendarParams.initialDate,
             viewDidMount: function (data) {
+                // Preserve selected view across date-picker re-renders (callback can expose `data.type` or `data.view.type`).
+                const mountedViewType = data?.type ?? data?.view?.type;
+                // Use `data.type` for existing toolbar condition checks
+                const legacyToolbarViewType = data?.type;
+                if (mountedViewType) {
+                    eventCalendarParams.initialView = mountedViewType;
+                }
                 $(calendarEl).tikiModal();
-                if (data.type == "dayGridMonth" || data.type == "listMonth") {
+                if (legacyToolbarViewType == "dayGridMonth" || legacyToolbarViewType == "listMonth") {
                     calendarContainer[0].setOption("duration", { months: 1 });
                     if (!document.getElementById("quarter")) {
                         const ecStart = document.querySelector(".ec-start");
@@ -188,20 +195,20 @@ $.fn.setupEventCalendar = function (
                         document.getElementById("quarter").remove();
                         document.getElementById("semester").remove();
                     }
-                    if (data.type == "timeGridWeek" || data.type == "listWeek") {
+                    if (legacyToolbarViewType == "timeGridWeek" || legacyToolbarViewType == "listWeek") {
                         calendarContainer[0].setOption("duration", { days: 7 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     }
-                    if (data.type == "timeGridDay" || data.type == "listDay") {
+                    if (legacyToolbarViewType == "timeGridDay" || legacyToolbarViewType == "listDay") {
                         calendarContainer[0].setOption("duration", { days: 1 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     }
 
-                    if (data.type == "listYear") {
+                    if (legacyToolbarViewType == "listYear") {
                         calendarContainer[0].setOption("duration", { months: 12 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
@@ -504,10 +511,14 @@ $.fn.defineParameterOfMultipleCalendar = function (
     $(divClassContainer)
         .eq(takeLength - 1)
         .append(newNode);
-    paramOfModuleCalendar["initialDate"] = $("#date-calendar" + takeLength).val();
+    paramOfModuleCalendar["initialDate"] = dateOfChangeCalendar.val();
 
     displayCalendarAndPrintButton(takeLength);
     dateOfChangeCalendar.on("change", function () {
+        const currentView = calendarContainer[0]?.getView?.();
+        if (currentView?.type) {
+            paramOfModuleCalendar["initialView"] = currentView.type;
+        }
         paramOfModuleCalendar["initialDate"] = dateOfChangeCalendar.val();
         let takeIndex = dateOfChangeCalendar.attr("id").split("-")[2];
         newNode.empty();
