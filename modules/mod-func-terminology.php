@@ -21,7 +21,8 @@ function module_terminology_info()
                                                 . tra('Defaults to \'Term\''),
                 'profile_reference' => 'category',
             ],
-        ]
+        ],
+        'pref_enabled_by_default' => false,
     ];
 }
 

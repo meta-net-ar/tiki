@@ -23,7 +23,7 @@
         <div class="mb-3 row">
             <label class="col-form-label col-sm-3" for="trackerId">{tr}Tracker{/tr} <span class="text-danger"> *</span></label>
             <div class="col-sm-9">
-                {object_selector _class="form-control" type="tracker" _simplename="trackerId" _simpleid="trackerId"}
+                {object_selector _class="form-control" type="tracker" _simplename="trackerId" _simpleid="trackerId" _simplevalue=$format.trackerId}
             </div>
         </div>
         <div class="row mb-4">
