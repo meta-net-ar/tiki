@@ -24,28 +24,23 @@
     transform: rotate(-90deg);
 }
 
-// Vertical menu arrow reactivity (rotate right when open)
-.tiki .sm-navbar--vertical {
-  .nav-item, .sm-sub-item {
-    > .sm-sub-toggler {
-      -webkit-touch-callout: none; // Disable iOS long-press menu
+// Vertical menu arrows point right by default
+// 7-class specificity to overpower the accidental horizontal reset rule at line 44
+.tiki .sm-navbar.sm-navbar--vertical .navbar-collapse .navbar-nav > .nav-item > .sm-sub-toggler > small * {
+    display: inline-block !important;
+    transition: transform 0.2s ease-in-out !important;
+    transform: rotate(-90deg) !important; // Point RIGHT by default
+}
 
-      > small > span.icon-caret-down {
-        display: inline-block !important;
-        transition: transform 0.2s ease-in-out !important;
-        transform: none !important;
-      }
+// All nested sub-menu arrows fly out to the side, so they must point right globally
+.tiki .sm-sub-item > .sm-sub-toggler > small * {
+    display: inline-block !important;
+    transition: transform 0.2s ease-in-out !important;
+    transform: rotate(-90deg) !important; 
+}
 
-      &[aria-expanded="true"] > small > span.icon-caret-down,
-      &.highlighted > small > span.icon-caret-down {
-        transform: rotate(-90deg) !important;
-      }
-    }
-
-    &:hover > .sm-sub-toggler > small > span.icon-caret-down {
-      transform: rotate(-90deg) !important;
-    }
-  }
+.tiki .sm-navbar--vertical .sm-sub-toggler {
+    -webkit-touch-callout: none; // Disable iOS long-press menu
 }
 
 // Reset arrows to point down for normal horizontal menus
@@ -205,35 +200,50 @@ $sm-sub-max-height: calc(100vh - ($sm-sub-top-offset + $sm-sub-bottom-buffer));
 }
 
 /* --- Force all dropdowns to open upwards ---*/
-.dropdown-menu-bottom {
+/* Note: :not(.sm-sub) prevents breaking SmartMenus v2 native collision detection */
+.dropdown-menu-bottom:not(.sm-sub) {
     top: auto !important;
     bottom: 100% !important;
     margin-bottom: .5rem;
     margin-top: 0 !important;
 }
 
-// Support for dropup menus (sm-navbar--drop-reverse-y)
-.tiki .sm-navbar--drop-reverse-y {
-    .sm-sub {
+// Support for dropup menus (.sm-navbar--drop-reverse-y or inside bottom modules)
+.tiki .sm-navbar--drop-reverse-y,
+.tiki [id^="mod-menubottom"] .sm-navbar {
+    
+    // 1. ONLY first-level dropdowns open UPWARDS
+    .navbar-nav > .nav-item > .sm-sub {
         top: auto !important;
         bottom: 100% !important;
         margin-bottom: 2px !important;
     }
+
+    // 2. Nested flyouts open to the SIDE, aligning their bottoms with the parent item
+    .sm-sub .sm-sub {
+        top: auto !important;
+        bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
 }
+
+// Prevent clipping for dropups
 .tiki .sm-navbar:has(.sm-navbar--drop-reverse-y),
-.tiki .sm-navbar:has(.sm-navbar--drop-reverse-y) .sm-collapse {
+.tiki .sm-navbar:has(.sm-navbar--drop-reverse-y) .sm-collapse,
+.tiki [id^="mod-menubottom"] .sm-navbar,
+.tiki [id^="mod-menubottom"] .sm-navbar .sm-collapse {
     overflow: visible !important;
 }
 
-.dropdown-menu-top-t,
-.dropdown-menu-end-l,
-.dropdown-menu-start-r {
+.dropdown-menu-top-t:not(.sm-sub),
+.dropdown-menu-end-l:not(.sm-sub),
+.dropdown-menu-start-r:not(.sm-sub) {
     top: 100%;
     bottom: auto;
     z-index: 2000;
 }
 
-.dropdown-menu-bottom-b {
+.dropdown-menu-bottom-b:not(.sm-sub) {
     max-height: 90vh;
     z-index: 3000;
 }
