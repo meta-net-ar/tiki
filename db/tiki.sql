@@ -857,6 +857,7 @@ CREATE TABLE `tiki_encryption_keys` (
   `shares` int(11) NOT NULL,
   `users` text NULL,
   `secret` varchar(191) NOT NULL,
+  `verificationCanary` text NULL,
   PRIMARY KEY  (`keyId`)
 ) ENGINE=MyISAM;
 

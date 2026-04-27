@@ -50,7 +50,17 @@ class Services_Broker
                 echo $this->render($controller, $action, $output, $request);
             }
         } catch (Services_Exception_FieldError $e) {
-            if ($request->modal->int() && $access->is_xml_http_request()) {
+            $isNoTemplateXhr = $access->is_xml_http_request()
+                && str_contains($_SERVER['QUERY_STRING'] ?? '', '&noTemplate');
+            if ($isNoTemplateXhr) {
+                // noTemplate XHR callers (e.g. forms inside modals) expect JSON on both
+                // success and error paths. Return a structured JSON error so that
+                // tiki-jquery.js showError() can display a clean message instead of
+                // injecting the full HTML error page as text.
+                http_response_code($e->getCode() ?: 409);
+                header('Content-Type: application/json');
+                echo json_encode(['message' => $e->getMessage()]);
+            } elseif ($request->modal->int() && $access->is_xml_http_request()) {
                 // Special handling for modal dialog requests
                 // Do not send an error code as bootstrap will just blank out
                 // Render the error as a modal
@@ -66,7 +76,13 @@ class Services_Broker
                 $access->display_error(null, $e->getMessage(), $e->getCode());
             }
         } catch (Exception $e) {
-            if ($request->modal->int() && $access->is_xml_http_request()) {
+            $isNoTemplateXhr = $access->is_xml_http_request()
+                && str_contains($_SERVER['QUERY_STRING'] ?? '', '&noTemplate');
+            if ($isNoTemplateXhr) {
+                http_response_code($e->getCode() ?: 500);
+                header('Content-Type: application/json');
+                echo json_encode(['message' => $e->getMessage()]);
+            } elseif ($request->modal->int() && $access->is_xml_http_request()) {
                 // Special handling for modal dialog requests
                 // Do not send an error code as bootstrap will just blank out
                 // Render the error as a modal
