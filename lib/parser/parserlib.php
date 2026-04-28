@@ -1743,6 +1743,13 @@ class ParserLib extends TikiDb_Bridge
             }
             if (! str_contains($link, '://')) {
                 $target = '';
+                if ($prefs['feature_wiki_show_int_link_title'] == 'y') {
+                    $objectLabel = $this->getInternalLinkLabel($link);
+                    if ($objectLabel) {
+                        $title = $objectLabel ? 'data-bs-content="' . $objectLabel . '" data-bs-toggle="tooltip"' : '';
+                        $class = 'class="wiki tips"';
+                    }
+                }
             } else {
                 $class = 'class="wiki external"';
                 if ($prefs['feature_wiki_ext_icon'] == 'y' && ! ($this->option['suppress_icons'] || $suppress_icons)) {
@@ -1811,6 +1818,62 @@ class ParserLib extends TikiDb_Bridge
         }
 
         return $data;
+    }
+
+    protected function getInternalLinkLabel($link)
+    {
+        $matches = [];
+        if (! preg_match("/\.php\?([^=]+)=([^&]+)/", $link, $matches)) { // non-sefurl
+            if (! preg_match("/(item|art|article|blog|tracker|event|calevent|forum|forumthread)([0-9]+)/", $link, $matches)) { // sefurl with type and id
+                if (! preg_match("/(filedetails)\d+-(\d+)/", $link, $matches)) { // sefurl for file details
+                    if (! preg_match("/(\b)([a-z0-9]+)/i", $link, $matches)) { // sefurl for wiki pages
+                        return null;
+                    }
+                }
+            }
+        } else {
+            // Not relying on the regex to extract type and id, as there can be many parameters in the query string and the order is not guaranteed. Instead, parse the query string properly.
+            $urlQuery = parse_url(html_entity_decode($link), PHP_URL_QUERY);
+            parse_str($urlQuery, $queryParams);
+
+            $possibleTypes = ['itemid', 'artid', 'articleid', 'blogid', 'trackerid', 'calitemid', 'page'];
+            $mappedTypes = ['comments_parentid' => 'forum post'];
+            foreach ($queryParams as $param => $value) {
+                $normalizedParam = strtolower($param);
+                if (isset($mappedTypes[$normalizedParam]) || in_array($normalizedParam, $possibleTypes)) {
+                    $matches[1] = $mappedTypes[$normalizedParam] ?? $param;
+                    $matches[2] = $value;
+                    break;
+                }
+            }
+        }
+
+        $type = preg_replace("/id$/i", "", $matches[1]) ?: "page";
+        $objectType = TikiLib::lib('object')->getSelectorType($type);
+        $objectId = $matches[2];
+
+        if (! $objectType || ! $objectId) {
+            return null;
+        }
+
+        $objectlib = TikiLib::lib('object');
+
+        if (! $objectlib->isValidObject($objectType, $objectId)) {
+            return null;
+        }
+
+        switch ($objectType) {
+            case 'wiki page':
+                $format = '__{title}__[| : |]{description}';
+                break;
+            case 'forum post':
+                $format = '__{forum_title}__[| : |]{title}';
+                break;
+            default:
+                $format = '__{parent_object_title}__[| : |]{title}';
+        }
+
+        return $objectlib->get_title($objectType, $objectId, $format);
     }
 
     //*
