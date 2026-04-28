@@ -67,12 +67,11 @@ function parse_args(): array
 {
     global $valid_tags, $low_priority_tags, $high_priority_tags;
 
-    $args = getopt('', ['expand::', 'only::', 'help']);
+    $args = getopt('', ['expand::', 'only::', 'range::', 'help']);
 
     if (isset($args['help'])) {
         echo "Usage:\n";
-        echo "  php generate_changelog.php [--expand=TAG1,TAG2] [--only=TAG1,TAG2]\n\n";
-
+        echo "  php generate_changelog.php [--expand=TAG1,TAG2] [--only=TAG1,TAG2] [--range=FROM..TO]\n\n";
         echo "Description:\n";
         echo "  Generates a changelog from Git history grouped by commit tags.\n\n";
 
@@ -84,7 +83,8 @@ function parse_args(): array
         echo "Options:\n";
         echo "  --expand=TAG1,TAG2\n";
         echo "      Force full display of selected tags, even if they exceed the collapse threshold.\n\n";
-
+        echo "  --range=FROM..TO\n";
+        echo "      Use a custom Git range instead of the automatically detected release range.\n\n";
         echo "  --only=TAG1,TAG2\n";
         echo "      Show only the specified tags and hide all others.\n\n";
 
@@ -118,6 +118,7 @@ function parse_args(): array
     return [
         'expand' => $expand,
         'only'   => $only,
+        'range'  => $args['range'] ?? null,
     ];
 }
 
@@ -175,13 +176,18 @@ function get_first_commit_after_branch_point(string $branch, string $parent = 'm
     return $commits[0] ?? $base;
 }
 
-function commits_for_release(): array
+function commits_for_release(?string $range = null): array
 {
-    $release = detect_release_range();
-    $cmd = "git log {$release['range']} --pretty=format:'%H|%s|%b%x00'";
+    if ($range === null) {
+        $release = detect_release_range();
+        $range = $release['range'];
+    }
+
+    echo "Using changelog range: $range" . PHP_EOL;
+
+    $cmd = "git log $range --pretty=format:'%H|%s|%b%x00'";
     return explode("\0", run($cmd));
 }
-
 function extract_tags($msg): array
 {
     if (preg_match('/^\[([A-Z]+)]/', $msg, $m)) {
@@ -208,9 +214,6 @@ function extract_mr($body): ?string
         }
         break;
     }
-
-    echo $body . "\n\n";
-
     return null;
 }
 
@@ -330,7 +333,7 @@ function render_summary(array $groups, array $options): string
 $options = parse_args();
 
 $version = tiki_version();
-$commits = commits_for_release();
+$commits = commits_for_release($options['range']);
 
 $groups = build_groups($commits);
 $groups = filter_groups_by_tags($groups, $options['only']);
