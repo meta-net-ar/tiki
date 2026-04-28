@@ -341,4 +341,9 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
                 })
         ];
     }
+
+    public function isDateOnlyCalendarValue(): bool
+    {
+        return $this->getOption('datetime') === 'd';
+    }
 }
