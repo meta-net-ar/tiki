@@ -1,5 +1,8 @@
-{extends $global_extend_layout|default:'layout_view.tpl'}
-{block name="navigation"}
+{extends $global_extend_layout|default:'layouts/admin/layout_view.tpl'}
+{block name="navigation"}{/block}
+{block name="title"}{/block}
+{block name="content"}
+    {title help="ActivityRules"}{tr}Activity Rules{/tr}{/title}
     {if $tiki_p_admin eq 'y'}
         <div class="t_navbar mb-4">
             <div class="btn-group">
@@ -22,10 +25,10 @@
                 </div>
             </div>
             {button href="tiki-admin.php?page=community" _icon_name="settings" _text="{tr}Community{/tr}" _class="tips" _title=":{tr}Community Control Panel{/tr}"}
-            
+
             {$headerlib->add_js_module("import handleMermaid from '@mermaidPack'; handleMermaid();")}
             <button class="btn btn-primary" data-bs-toggle="offcanvas" data-bs-target="#mermaidOffcanvas" aria-controls="mermaidOffcanvas">{icon name="diagram"} {tr}Event Chain Diagram{/tr}</button>
-            
+
             <div class="offcanvas offcanvas-start" style="width: 100vw !important;" tabindex="-1" id="mermaidOffcanvas" aria-labelledby="mermaidOffcanvasLabel">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title" id="mermaidOffcanvasLabel">{tr}Event Chain Diagram{/tr}</h5>
@@ -40,11 +43,11 @@
             </div>
         </div>
     {/if}
-{/block}
-{block name="title"}
-    {title}{tr}Activity Rules{/tr}{/title}
-{/block}
-{block name="content"}
+    {remarksbox type="info" title="{tr}About Activity Rules{/tr}"}
+        {tr}Activity Rules allow you to configure how events in Tiki are processed and recorded in the Activity Stream. You can create rules to record events, trigger notifications, or perform custom actions based on specific events.{/tr}
+        <br><br>
+        {tr _0='<a class="alert-link" href="https://doc.tiki.org/PluginActivityStream" target="_blank" title="Activity Stream Documentation"><strong>' _1='</strong></a>'}For detailed information about Activity Stream and how to configure Activity Rules, please see %0Activity Stream Documentation%1 on Tiki's documentation site.{/tr}
+    {/remarksbox}
     <div class="styling-element">
     <div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
         <table class="table table-hover">
