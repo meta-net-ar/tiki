@@ -772,15 +772,36 @@ HTML;
                         $debugOutput .= $htmlChunk;
                     }
                     $mpdf->WriteHTML($htmlChunk);
-                    $pagesTotal += floor(strlen($pdfPage['pageContent']) / 3000);
+
                     //checking if page content is less than mPDF character limit, otherwise split it and loop to writeHTML
-                    for ($charLimit = 0; $charLimit <= strlen($pdfPage['pageContent']); $charLimit += $pcreBacktrackLimit) {
-                        $content_slice = substr($pdfPage['pageContent'], $charLimit, $pcreBacktrackLimit);
+                    $pageContentLength = strlen($pdfPage['pageContent']);
+                    $chunkStartPos = 0;
+                    while ($chunkStartPos <= $pageContentLength) {
+                        $content_slice = substr($pdfPage['pageContent'], $chunkStartPos, $pcreBacktrackLimit);
+                        if ($pageContentLength - $chunkStartPos > $pcreBacktrackLimit) {
+                            // more to come?
+                            $lastTagStart = strrpos($content_slice, '<');
+                            $lastTagEnd = strrpos($content_slice, '>');
+                            if ($lastTagStart > $lastTagEnd) {
+                                // truncate before the last unclosed tag, often a base64 data src image
+                                $newChunkStartPos = $chunkStartPos + $lastTagStart;
+                                $content_slice = substr($pdfPage['pageContent'], $chunkStartPos, $newChunkStartPos - $chunkStartPos);
+                                $chunkStartPos = $newChunkStartPos;
+                            } else {
+                                $chunkStartPos += $pcreBacktrackLimit;
+                            }
+                        } else {
+                            $chunkStartPos += $pcreBacktrackLimit;
+                        }
                         if ($content_slice) {
                             if ($prefs['print_pdf_mpdf_debug'] === 'y') {
                                 $debugOutput .= $content_slice;
                             }
-                            $mpdf->WriteHTML($content_slice);
+                            try {
+                                $mpdf->WriteHTML($content_slice);
+                            } catch (\Mpdf\MpdfException $e) {
+                                \Feedback::error($e->getMessage());
+                            }
                         }
                     }
                     $htmlChunk = '</body></html>';
