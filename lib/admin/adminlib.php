@@ -578,20 +578,13 @@ class AdminLib extends TikiLib
      */
     public function checkSystemConfigurationFile()
     {
-        global $system_configuration_file, $system_configuration_files;
+        global $system_configuration_files;
         $show_warning = false;
 
         if (file_exists(TIKI_CONFIG_FILE_PATH)) {
             include(TIKI_CONFIG_FILE_PATH);
 
-            // Normalize to array for multi-file support
-            if (! isset($system_configuration_files) || ! is_array($system_configuration_files)) {
-                $filesToCheck = ! empty($system_configuration_file) ? [$system_configuration_file] : [];
-            } else {
-                $filesToCheck = $system_configuration_files;
-            }
-
-            foreach ($filesToCheck as $configFile) {
+            foreach ($system_configuration_files as $configFile) {
                 if (isset($configFile) && file_exists($configFile)) {
                     $tikiPath = realpath(TIKI_PATH);
                     $configPath = realpath($configFile);
@@ -671,18 +664,11 @@ class AdminLib extends TikiLib
      */
     public function retrieveConfigFileData($retrieve_all_data = false)
     {
-        global $system_configuration_identifier, $system_configuration_file, $system_configuration_files;
-
-        // Normalize to array for multi-file support
-        if (! isset($system_configuration_files) || ! is_array($system_configuration_files)) {
-            $filesToLoad = ! empty($system_configuration_file) ? [$system_configuration_file] : [];
-        } else {
-            $filesToLoad = $system_configuration_files;
-        }
+        global $system_configuration_identifier, $system_configuration_files;
 
         $mergedConfigData = [];
 
-        foreach ($filesToLoad as $configFilePath) {
+        foreach ($system_configuration_files as $configFilePath) {
             if (! is_readable($configFilePath)) {
                 throw new Exception(tr('%0 configuration file could not be read', $configFilePath));
             }

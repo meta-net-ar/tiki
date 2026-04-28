@@ -36,7 +36,7 @@ class PreferencesSetCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        global $system_configuration_file, $system_configuration_files;
+        global $system_configuration_files;
 
         $logslib = TikiLib::lib('logs');
         $preference = $input->getArgument('name');
@@ -80,10 +80,10 @@ class PreferencesSetCommand extends Command
                 $output->writeln(sprintf('Preference %s was successfully set to %s in the database.', $preference, $userValue));
                 if ($result['forced_by_config']) {
                     $configValue = $result['config_value'];
-                    if (isset($system_configuration_files) && is_array($system_configuration_files)) {
+                    if (! empty($system_configuration_files)) {
                         $configFile = implode(', ', $system_configuration_files);
                     } else {
-                        $configFile = $system_configuration_file ?? 'unknown configuration file';
+                        $configFile = 'unknown configuration file';
                     }
                     if ($userValue === $configValue) {
                         $output->writeln(sprintf(

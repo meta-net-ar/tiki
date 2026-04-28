@@ -63,7 +63,6 @@ function write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_
         $filetowrite .= "// See http://tiki.org/ReleaseNotes5.0#Known_Issues and http://doc.tiki.org/Understanding+Encoding for more info\n\n";
         $filetowrite .= "// If your php installation does not not have pdo extension\n";
         $filetowrite .= "// Want configurations managed at the system level or restrict some preferences? http://doc.tiki.org/System+Configuration\n";
-        $filetowrite .= "// \$system_configuration_file = '/etc/tiki.ini.php';\n";
         $filetowrite .= "// If \$system_configuration_identifier is present, it MUST match one of the top sections in your ini file.  That section will be the active configuration.\n";
         $filetowrite .= "// \$system_configuration_identifier = 'example.com';\n\n";
         $filetowrite .= "// Multiple configuration files (files listed later override earlier ones):\n";
