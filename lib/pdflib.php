@@ -723,16 +723,17 @@ HTML;
                     }
                     $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), "O");
                     $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), "E");
-                    $mpdf->AddPageByArray([
-                            'orientation' => $pdfPage['orientation'],
-                            'resetpagenum' => $resetPage,
-                            'margin-left' => $pdfPage['margin_left'],
-                            'margin-right' => $pdfPage['margin_right'],
-                            'margin-top' => $pdfPage['margin_top'],
+                    $mpdf->AddPageByArray(
+                        [
+                            'orientation'   => $pdfPage['orientation'],
+                            'resetpagenum'  => $resetPage,
+                            'margin-left'   => $pdfPage['margin_left'],
+                            'margin-right'  => $pdfPage['margin_right'],
+                            'margin-top'    => $pdfPage['margin_top'],
                             'margin-bottom' => $pdfPage['margin_bottom'],
                             //$pdfPage['margin_header'],
                             //$pdfPage['margin_footer'],
-                            'sheet-size' => $pdfPage['pagesize'],
+                            'sheet-size'    => $pdfPage['pagesize'],
                         ]
                     );
                     $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? '')); //Add the header to other pages
