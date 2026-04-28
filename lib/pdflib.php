@@ -5,6 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Mpdf\Mpdf;
+use Mpdf\MpdfException;
 use Tiki\Lib\Auth\Tokens;
 use Tiki\Lib\Theme\ThemeLib;
 
@@ -333,7 +335,7 @@ HTML;
             mkdir($mpdfConfig['tempDir'], 0770, true);
         }
 
-        $mpdf = new \Mpdf\Mpdf($mpdfConfig); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
+        $mpdf = new Mpdf($mpdfConfig); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
         $mpdf->curlAllowUnsafeSslRequests = ($prefs['print_pdf_mpdf_allow_unsafe_ssl_requests'] ?? 'y') === 'y';
 
         $basePath = $params['base_path'] ?? TIKI_PATH ;
@@ -487,7 +489,7 @@ HTML;
 
                 $coverHtml = '<div style="' . $coverStyle . '">' . $coverHtml . '</div>';
 
-                $coverMpdf = new \Mpdf\Mpdf($mpdfConfig); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
+                $coverMpdf = new Mpdf($mpdfConfig); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
                 $coverMpdf->SetHTMLHeader();
                 $coverMpdf->SetHTMLFooter();
                 $coverMpdf->AddPage(
@@ -799,7 +801,7 @@ HTML;
                             }
                             try {
                                 $mpdf->WriteHTML($content_slice);
-                            } catch (Mpdf\MpdfException $e) {
+                            } catch (MpdfException $e) {
                                 \Feedback::error($e->getMessage());
                             }
                         }
