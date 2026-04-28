@@ -33,7 +33,6 @@ class MLModelTest extends TikiTestCase
         parent::setUpBeforeClass();
         self::$trklib = TikiLib::lib('trk');
         self::$mllib = TikiLib::lib('ml');
-        unset($prefs['unified_engine']);
         // create a tracker and a field
         self::$trackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
         self::assertNotEmpty(self::$trackerId, "Check the tracker was created properly");
@@ -98,7 +97,6 @@ class MLModelTest extends TikiTestCase
 
         $builder = new Perms_Builder();
         Perms::set($builder->build());
-        $prefs['unified_engine'] = self::$old_prefs['unified_engine'];
     }
 
     public function testTrain(): void

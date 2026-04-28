@@ -32,7 +32,6 @@ class TrackerFieldMathTest extends TikiTestCase
         $prefs['feature_trackers'] = 'y';
         $prefs['short_date_format'] = '%Y-%m-%d';
         $prefs['short_time_format'] = '%H:%M';
-        unset($prefs['unified_engine']);
         parent::setUpBeforeClass();
         self::$trklib = TikiLib::lib('trk');
         self::$objectlib = TikiLib::lib('object');

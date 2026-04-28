@@ -30,7 +30,6 @@ class TrackerItemLinkTest extends TikiTestCase
         global $prefs;
         self::$old_prefs = $prefs;
         $prefs['feature_trackers'] = 'y';
-        unset($prefs['unified_engine']);
         parent::setUpBeforeClass();
         self::$trklib = TikiLib::lib('trk');
         self::$objectlib = TikiLib::lib('object');
@@ -131,7 +130,6 @@ class TrackerItemLinkTest extends TikiTestCase
         parent::tearDownAfterClass();
         self::$trklib->remove_tracker(self::$trackerId);
         self::$trklib->remove_tracker(self::$linkedTrackerId);
-        $prefs['unified_engine'] = self::$old_prefs['unified_engine'];
     }
 
     public function testBasicFunctionnality(): void

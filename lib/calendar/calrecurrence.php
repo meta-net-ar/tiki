@@ -998,14 +998,17 @@ class CalRecurrence extends TikiLib
             $data['DESCRIPTION'] = $this->getDescription();
         }
         $locations = TikiLib::lib('calendar')->list_locations($this->getCalendarId());
-        if (! empty($locations[$this->getLocationId()])) {
-            $data['LOCATION'] = $locations[$this->getLocationId()];
+        $locationId = $this->getLocationId();
+
+        if ($locationId !== null && ! empty($locations[$locationId])) {
+            $data['LOCATION'] = $locations[$locationId];
         }
         if (! empty($this->getLocationId())) {
             $data['X-Tiki-LocationId'] = $this->getLocationId();
         }
         $categories = TikiLib::lib('calendar')->list_categories($this->getCategoryId());
-        if (! empty($categories[$this->getCategoryId()])) {
+        $categoryId = $this->getCategoryId();
+        if ($categoryId !== null && ! empty($categories[$categoryId])) {
             $data['CATEGORIES'] = $categories[$this->getCategoryId()];
         }
         if (! empty($this->getCategoryId())) {

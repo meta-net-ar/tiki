@@ -70,8 +70,6 @@ class RelationTest extends TikiTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $mock = $this->createMock(get_class(TikiLib::lib('unifiedsearch')));
-        $mock->method('processUpdateQueue')->willReturn(null);
         TikiDb::get()->query('DELETE FROM `tiki_object_relations` WHERE `relation` LIKE ?', ['tiki.test%']);
     }
 

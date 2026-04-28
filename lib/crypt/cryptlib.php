@@ -417,7 +417,7 @@ class CryptLib extends TikiLib
 
         // Due to appending spaces to short input data, short cleartext data cannot end with space
         $pwdLen = mb_strlen($cleartextData);
-        if ($pwdLen < 20 && $cleartextData[$pwdLen] == ' ') {
+        if ($pwdLen < 20 && str_ends_with($cleartextData, ' ')) {
             throw new Exception('Data to encrypt cannot end with a space');
         }
         // Make sure the data is at least 20 characters long

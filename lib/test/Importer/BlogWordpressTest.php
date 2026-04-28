@@ -27,8 +27,6 @@ class BlogWordpressTest extends AbstractImporterTestCase
         date_default_timezone_set('UTC');
         $this->obj = new BlogWordpress();
         $this->ensureDefaultGalleryExists();
-        $mock = $this->createMock(get_class(TikiLib::lib('unifiedsearch')));
-        $mock->method('processUpdateQueue')->willReturn(null);
     }
 
     protected function tearDown(): void
