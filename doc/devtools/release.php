@@ -20,8 +20,7 @@ define('TOOLS', __DIR__);
 define('ROOT', realpath(TOOLS . '/../..'));
 define('TEMP_DIR', 'temp');
 
-define('CHANGELOG_FILENAME', 'changelog.txt');
-define('CHANGELOG', ROOT . '/' . CHANGELOG_FILENAME);
+define('CHANGELOG_FILENAME', 'changelog.md'); //
 define('COPYRIGHTS_FILENAME', 'copyright.txt');
 define('COPYRIGHTS', ROOT . '/' . COPYRIGHTS_FILENAME);
 define('LICENSE_FILENAME', 'license.txt');
@@ -145,20 +144,15 @@ if (! $options['no-lang-update'] && important_step("Update language files")) {
 }
 
 if (! $options['no-changelog-update'] && important_step("Update '" . CHANGELOG_FILENAME . "' file (using final version number '$version')")) {
-    if ($ucf = update_changelog_file($version)) {
-        if ($ucf['nbCommits'] == 0) {
-            info('>> Changelog updated (last commits were already inside)');
-        } else {
-            if ($ucf['sameFinalVersion']) {
-                info(">> There were already some commits for the same final version number in the changelog. Merging them with the new ones.");
-            }
-            info(">> Changelog updated with {$ucf['nbCommits']} new commits (revision {$ucf['firstRevision']} to {$ucf['lastRevision']}), excluding duplicates, merges and release-related commits.");
-        }
+    $output = [];
+    $returnVar = 0;
+    exec("php doc/devtools/generate_changelog.php", $output, $returnVar);
+    if ($returnVar === 0) {
+        info(">> Changelog updated successfully using doc/devtools/generate_changelog.php script.");
         important_step("Commit new " . CHANGELOG_FILENAME, true, "[REL] Update " . CHANGELOG_FILENAME . " for $secdbVersion");
     } else {
-        error('Changelog update failed.');
+        error("Changelog update failed. generate_changelog.php exited with code $returnVar.\nOutput:\n" . implode("\n", $output));
     }
-    unset($ucf);
 }
 
 $nbCommiters = 0;
@@ -825,132 +819,6 @@ function important_step($msg, $increment_step = true, $commit_msg = false)
  * @param $newVersion
  * @return array|bool
  */
-function update_changelog_file($newVersion)
-{
-    $handle = false;
-    if (! is_readable(CHANGELOG) || ! is_writable(CHANGELOG) || ! ($handle = @fopen(CHANGELOG, "r"))) {
-        error('The changelog file "' . CHANGELOG . '" is not readable or writable.');
-    }
-
-    $majorVersion = substr($newVersion, 0, strpos($newVersion, '.'));
-    $parseLogs = $sameFinalVersion = $skipBuffer = false;
-    $lastReleaseMajorNumber = -1;
-    $lastReleaseNumber = '';
-    $minRevision = $currentParsedRevision = 0;
-    $lastReleaseLogs = [];
-    $versionMatches = [];
-    $newChangelog = '';
-    $newChangelogEnd = '';
-
-    if ($handle) {
-        while (! feof($handle)) {
-            $buffer = fgets($handle);
-            if (empty($buffer)) {
-                continue;
-            }
-
-            if (preg_match('/^Version (\d+)\.(\d+)/', $buffer, $versionMatches)) {
-                $versionString = $versionMatches[1] . '.' . $versionMatches[2];
-                if ((float)$lastReleaseNumber < (float)$versionString) {
-                    $lastReleaseNumber = $versionString;
-                    if ($lastReleaseNumber === $newVersion) {
-                        // The changelog file already contains log for the same final version
-                        $sameFinalVersion = true;
-                        $skipBuffer = true;
-                    }
-                    $parseLogs = true;
-                    $lastReleaseMajorNumber = $versionMatches[1];
-                }
-            }
-            if ($parseLogs) {
-                $matches = [];
-                if (preg_match('/^(\d+ | ) \|/', $buffer, $matches)) {
-                    $skipBuffer = false;
-                    if ($minRevision == 0) {
-                        $minRevision = (int)$matches[1];
-                    }
-                    $currentParsedRevision = (int)$matches[1];
-                } elseif (! $skipBuffer && $currentParsedRevision > 0 && $buffer[0] != '-') {
-                    if (isset($lastReleaseLogs[$currentParsedRevision])) {
-                        $lastReleaseLogs[$currentParsedRevision] .= $buffer;
-                    } else {
-                        $lastReleaseLogs[$currentParsedRevision] = $buffer;
-                    }
-                }
-            }
-            if ($lastReleaseMajorNumber != -1 && $lastReleaseMajorNumber < $majorVersion) {
-                $newChangelogEnd .= generate_changelog_version_header($lastReleaseNumber);
-                $newChangelogEnd .= "Changelog for Tiki version " . $lastReleaseNumber . ", or older, available at:\n";
-                $newChangelogEnd .= "https://sourceforge.net/p/tikiwiki/code/HEAD/tree/tags/" . $lastReleaseNumber . "/changelog.txt\n\n";
-                break; // truncate the rest of the file
-            }
-            if (! $skipBuffer) {
-                if ($lastReleaseMajorNumber == -1) {
-                    $newChangelog .= $buffer;
-                } else {
-                    $newChangelogEnd .= $buffer;
-                }
-            }
-        }
-        fclose($handle);
-    }
-
-    $newChangelog .= generate_changelog_version_header($newVersion);
-
-    $return = ['nbCommits' => 0, 'sameFinalVersion' => $sameFinalVersion];
-    $matches = [];
-
-    if ($minRevision === 0) { // failed to get the last rev from the old file contents
-        $minRevision = get_tag_revision($lastReleaseNumber);
-    }
-    if ($minRevision != 0) {
-        if (preg_match_all('/^([A-Za-z0-9]+).\|.*\n\n(.*)\-{46}/Ums', get_logs('.', $minRevision), $matches, PREG_SET_ORDER)) {
-            foreach ($matches as $logEntry) {
-                // Do not keep merges and release-related logs
-                $commitFlag = substr(trim($logEntry[2]), 0, 5);
-                if ($commitFlag == '[MRG]' || $commitFlag == '[REL]') {
-                    continue;
-                }
-
-                // Add log entries only if they were not already listed (same revision number or same log message) in the previous version
-                if (! isset($lastReleaseLogs[$logEntry[1]]) && ! in_array("\n" . $logEntry[2], $lastReleaseLogs)) {
-                    $newChangelog .= str_replace("\n\n", "\n", $logEntry[0]) . "\n";
-
-                    $lastReleaseLogs[] = "\n" . $logEntry[2];
-                    if ($return['nbCommits'] == 0) {
-                        $return['firstRevision'] = $logEntry[1];
-                    }
-                    $return['lastRevision'] = $logEntry[1];
-                    $return['nbCommits']++;
-                }
-            }
-        }
-    }
-
-    return file_put_contents(CHANGELOG, $newChangelog . $newChangelogEnd) ? $return : false;
-}
-
-/**
- * Generate the header for a given version, used in the changelog
- * @param string $version
- * @return string
- */
-function generate_changelog_version_header($version)
-{
-    $majorVersion = substr($version, 0, strpos($version, '.'));
-    $releaseNotesURL = '<http://doc.tiki.org/Tiki' . $majorVersion . '>';
-
-    $versionHeader = <<<EOS
-Version $version
-$releaseNotesURL
-------------------
-
-----------------------------------------------
-
-EOS;
-    return $versionHeader;
-}
-
 function update_copyright_file($newVersion)
 {
     if (! is_readable(COPYRIGHTS) || ! is_writable(COPYRIGHTS)) {

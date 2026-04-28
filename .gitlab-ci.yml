@@ -641,6 +641,8 @@ unit-tests-icon-generator:
 
 tiki-package:
   stage: package-tiki
+  variables:
+    GIT_DEPTH: "1000"
   needs:
     - composer
     - node_build
@@ -665,10 +667,15 @@ tiki-package:
     - echo "=> Optimize language files ..."
     - find lang/ -name language.php -exec php doc/devtools/stripcomments.php {} \;
     # set Permissions
-    - echo "=> Fix permissions ..."
-    - find . -type f -exec chmod 0664 {} \;
-    - chown 0775 setup.sh
-    - find . -type d -exec chmod 0755 {} \;
+    - echo "=> Generate changelog ..."
+    - 'TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"'
+    - git fetch origin "$TARGET_BRANCH" --tags --depth=1000
+    - 'LAST_TAG=$(git tag --sort=-v:refname | head -n 1)'
+    - 'echo "Latest tag: $LAST_TAG"'
+    - 'echo "Target branch: $TARGET_BRANCH"'
+    - git merge-base --is-ancestor "$LAST_TAG" "origin/$TARGET_BRANCH" || git fetch --unshallow
+    - php doc/devtools/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
+    - mv generated_changelog.md CHANGELOG.generated.md
     # pack
     - echo "=> Pack tiki ..."
     - tar --exclude *.DS_Store --exclude tests --exclude doc/devtools --exclude .git --exclude .gitignore --exclude .composercache -pczf tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz *
@@ -676,6 +683,7 @@ tiki-package:
   artifacts:
     paths:
       - tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz
+      - CHANGELOG.generated.md
     expire_in: 2 days
   allow_failure: true
 
