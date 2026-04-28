@@ -1411,6 +1411,12 @@ if ($php_properties['session.save_handler']['setting'] == 'files') {
     $currentSession = session_id();
     session_write_close();
 
+    // Strict mode rejects session IDs from session_create_id() that are not
+    // yet stored, so session_start() would allocate a fresh ID and break the
+    // write/read probe. Disable it for the duration of the check.
+    $strictMode = ini_get('session.use_strict_mode');
+    ini_set('session.use_strict_mode', '0');
+
     $newSession = session_create_id('tikicheck');
     session_id($newSession);
     session_start();
@@ -1421,6 +1427,8 @@ if ($php_properties['session.save_handler']['setting'] == 'files') {
     session_start();
     $writableSessionPath = isset($_SESSION['tikisession']) && count($_SESSION) === 1 && $_SESSION['tikisession'] === 'tikisession';
     session_write_close();
+
+    ini_set('session.use_strict_mode', $strictMode);
 
     session_id($currentSession);
     session_start();
