@@ -638,7 +638,14 @@ if ($prefs['feature_jquery_zoom'] === 'y') {
 }
 ');
 }
-
+// Load CodeMirror CSS early.
+// Adding it from Smarty/Ajax is too late and breaks the editor.
+// Therefore, we load these CSS files during setup (tiki-setup.php / early stage)
+// to ensure they are present in the <head> before any rendering occurs.
+if ($prefs['feature_syntax_highlighter'] == 'y') {
+    $headerlib->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
+        ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css');
+}
 if ($prefs['feature_ajax'] === 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-confirm.js');
     $headerlib->add_jsfile('lib/ajax/autosave.js'); // Note that this file is needed even if ajax_autosave is off otherwise wysiwyg won't load.
