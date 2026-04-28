@@ -21,6 +21,30 @@ class Services_ActivityStream_ManageController
         }
 
         $this->lib = TikiLib::lib('activity');
+
+        global $prefs, $smarty, $headerlib;
+        // This controller is served via tiki-ajax_services.php, so it is not detected by
+        // the usual UAB trigger conditions based on PHP_SELF (lib/setup/theme.php).
+        // Activity Rules is admin-only, so we explicitly force admin section/layout here
+        // to render it consistently with other admin management pages.
+        \Tiki\Sections::setCurrentSection(\Tiki\Sections::SECTION_ADMIN_LAYOUT);
+        $prefs['site_layout_admin'] = 'admin';
+        $prefs['site_layout'] = 'admin';
+
+        // Load admin UI CSS and navigation icons
+        $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
+        $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin'] ?? $prefs['theme_navbar_color_variant']);
+
+        include_once 'admin/define_admin_icons.php';
+        global $admin_icons;
+        if (isset($admin_icons)) {
+            foreach ($admin_icons as & $admin_icon) {
+                foreach ($admin_icon['children'] as & $child) {
+                    $child = array_merge(['disabled' => false, 'description' => ''], $child);
+                }
+            }
+            $smarty->assign('admin_icons', $admin_icons);
+        }
     }
 
     /**
