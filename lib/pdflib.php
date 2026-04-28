@@ -801,7 +801,7 @@ HTML;
                             }
                             try {
                                 $mpdf->WriteHTML($content_slice);
-                            } catch (MpdfException $e) {
+                            } catch (ErrorException $e) {
                                 \Feedback::error($e->getMessage());
                             }
                         }
