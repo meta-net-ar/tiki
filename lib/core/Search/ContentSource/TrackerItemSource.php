@@ -108,6 +108,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
                 'view_permission' => $typeFactory->identifier($permNeeded),
                 'parent_object_id' => $typeFactory->identifier($item['trackerId']),
                 'parent_object_type' => $typeFactory->identifier('tracker'),
+                'parent_object_title' => $typeFactory->sortable($definition->getName()),
 
                 'field_permissions' => $typeFactory->plaintext(json_encode($fieldPermissions)),
 
@@ -152,6 +153,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             'view_permission',
             'parent_object_id',
             'parent_object_type',
+            'parent_object_title',
         ];
 
         foreach (self::getAllIndexableHandlers() as $handler) {

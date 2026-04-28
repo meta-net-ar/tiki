@@ -1211,6 +1211,13 @@ function prefs_feature_list($partial = false)
             'default' => 'n',
             'tags' => ['basic'],
         ],
+        'feature_wiki_show_int_link_title' => [
+            'name' => tra('Show internal link titles'),
+            'description' => tra('Show descriptive titles for internal links when hovering over them.'),
+            'type' => 'flag',
+            'default' => 'y',
+            'tags' => ['basic'],
+        ],
         'feature_semantic' => [
             'name' => tra('Semantic links'),
             'description' => tra('Going beyond Backlinks functionality, this allows some semantic relationships to be defined between wiki pages.'),

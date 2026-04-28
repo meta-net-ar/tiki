@@ -73,6 +73,8 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
         }
         $alertEmails = array_unique(array_filter($alertEmails));
 
+        $calendarInfo = $lib->get_calendar($item['calendarId']);
+
         $data = [
             'title' => $typeFactory->sortable($item['name']),
             'language' => $typeFactory->identifier(empty($item['lang']) ? 'unknown' : $item['lang']),
@@ -100,6 +102,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             'view_permission' => $typeFactory->identifier('tiki_p_view_events'),
             'parent_object_type' => $typeFactory->identifier('calendar'),
             'parent_object_id' => $typeFactory->identifier($item['calendarId']),
+            'parent_object_title' => $typeFactory->sortable($calendarInfo['name']),
 
             'trackeritems' => $typeFactory->multivalue($trackerItems),
 
