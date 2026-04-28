@@ -43,7 +43,7 @@ class Iconset
         $this->defaults = $data['defaults'] ?? [];
 
         if (! empty($data['source'])) {
-            $source = new Iconset(IconsetLib::loadFile($data['source']));
+            $source = new Iconset(TikiLib::lib('iconset')->loadFile($data['source']));
             $this->merge($source, false);
         }
     }

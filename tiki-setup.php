@@ -226,12 +226,6 @@ Sections::onSectionChange(function ($section) use ($prefs) {
     TikiLib::lib('freetag')->assignCurrentObjectTagsToSmarty();
 });
 
-// The theme can override smarty templates (in SmartyTiki::initializePaths) so must be setup before template rendering starts.
-// Since the theme may be overridden by the section, this is as early as we can set it up.
-Sections::onSectionChange(function ($section) {
-    Tiki\Lib\Theme\ThemeLib::registerThemeAssets();
-});
-
 require_once('lib/setup/wiki.php');
 
 $user_groups = $userlib->get_user_groups($user);
@@ -270,6 +264,8 @@ if ($color_mode_table_exists) {
 if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
 }
+
+require_once('lib/setup/theme.php');
 
 /* Cookie consent setup, has to be after the JS decision and wiki setup */
 if (! TIKI_API) {
