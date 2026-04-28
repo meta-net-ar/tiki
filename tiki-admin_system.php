@@ -60,7 +60,7 @@ if (isset($_GET['do'])) {
         include_once('lib/setup/prefs.php');
         initialize_prefs();
         include('lib/setup/javascript.php');
-        Tiki\Lib\Theme\ThemeLib::registerThemeAssets();
+        include('lib/setup/theme.php');
     }
     // codemirror modes are created in /temp/public -- need to restore them
     if ($_GET['do'] === 'temp_public') {

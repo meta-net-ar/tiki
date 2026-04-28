@@ -531,7 +531,6 @@ class HeaderLib
     public function output_headers(): string
     {
         $this->throwIfHeadersAlreadyOutput();
-        Tiki\Lib\Theme\ThemeLib::addHeaderlibThemeDependentAssets();
         $this->outputHeadersWasStartedBy = $this->getOutputCallerInfo();
 
         ksort($this->cssfiles);
