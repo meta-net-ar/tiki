@@ -405,10 +405,22 @@ class Language_GetStrings
 
     public function writeToFiles($strings)
     {
+        $isCustomDir = Language_WriteFile::isCustomDir($this->baseDir);
+
+        // Segregate strings by source: custom output files only receive strings from _custom/ files and the database;
+        // standard output files only receive strings from core Tiki files.
+        $filteredStrings = array_filter($strings, function ($s) use ($isCustomDir) {
+            $sources = $s['source'] ?? [];
+            if ($isCustomDir) {
+                return in_array('custom', $sources, true) || in_array('database', $sources, true);
+            }
+            return in_array('standard', $sources, true);
+        });
+
         foreach ($this->languages as $lang) {
             $filePath = $this->baseDir . '/lang/' . $lang . '/' . $this->fileName;
             $writeFile = $this->writeFileFactory->factory($filePath);
-            $writeFile->writeStringsToFile($strings, $this->outputFiles, $lang, $this->baseDir, $this->skipRemove);
+            $writeFile->writeStringsToFile($filteredStrings, $this->outputFiles, $lang, $this->baseDir, $this->skipRemove);
         }
     }
 

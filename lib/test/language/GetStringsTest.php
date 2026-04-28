@@ -282,7 +282,12 @@ class Language_GetStringsTest extends TikiTestCase
      */
     public function testWriteToFilesShouldCallWriteStringsThreeTimes(): void
     {
-        $strings = ['string1', 'string2', 'string3', 'string4'];
+        $strings = [
+            'string1' => ['name' => 'string1', 'source' => ['standard']],
+            'string2' => ['name' => 'string2', 'source' => ['standard']],
+            'string3' => ['name' => 'string3', 'source' => ['standard']],
+            'string4' => ['name' => 'string4', 'source' => ['standard']],
+        ];
 
         $this->writeFile->expects($this->exactly(3))->method('writeStringsToFile')->with($strings, false);
         $this->obj->setLanguages(['en', 'es', 'pt-br']);
@@ -309,7 +314,12 @@ class Language_GetStringsTest extends TikiTestCase
      */
     public function testWriteToFilesShouldCallWriteStringsWithOutputFileParam(): void
     {
-        $strings = ['string1', 'string2', 'string3', 'string4'];
+        $strings = [
+            'string1' => ['name' => 'string1', 'source' => ['standard']],
+            'string2' => ['name' => 'string2', 'source' => ['standard']],
+            'string3' => ['name' => 'string3', 'source' => ['standard']],
+            'string4' => ['name' => 'string4', 'source' => ['standard']],
+        ];
 
         $this->writeFile->expects($this->atLeastOnce())->method('writeStringsToFile')->with($strings, true);
         $this->writeFileFactory->expects($this->atLeastOnce())->method('factory')->willReturn($this->writeFile);
@@ -324,7 +334,12 @@ class Language_GetStringsTest extends TikiTestCase
      */
     public function testWriteToFilesShouldUseCustomFileName(): void
     {
-        $strings = ['string1', 'string2', 'string3', 'string4'];
+        $strings = [
+            'string1' => ['name' => 'string1', 'source' => ['standard']],
+            'string2' => ['name' => 'string2', 'source' => ['standard']],
+            'string3' => ['name' => 'string3', 'source' => ['standard']],
+            'string4' => ['name' => 'string4', 'source' => ['standard']],
+        ];
 
         $this->writeFile->expects($this->once())->method('writeStringsToFile')->with($strings, false);
         $this->writeFileFactory->expects($this->once())->method('factory')->with($this->stringContains('language_r.php'))->willReturn($this->writeFile);
