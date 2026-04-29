@@ -217,6 +217,22 @@ abstract class SearchIndexBase extends TikiTestCase
         $this->assertResultCount(1, 'filterRelation', "$invert_product and $invert_user", ['tiki.content.link', 'tiki.user.favorite']);
     }
 
+    public function testOrModeSubQuery()
+    {
+        $andQuery = new Search_Query();
+        $andQuery->filterContent('world', 'contents');
+        $andQuery->filterContent('foobar', 'title');
+        $this->assertCount(0, $andQuery->search($this->index));
+
+        $orSubQuery = new Search_Query(null, 'or');
+        $orSubQuery->filterContent('world', 'contents');
+        $orSubQuery->filterContent('foobar', 'title');
+
+        $orQuery = new Search_Query();
+        $orQuery->getExpr()->addPart($orSubQuery->getExpr());
+        $this->assertGreaterThan(0, count($orQuery->search($this->index)));
+    }
+
     protected function assertResultCount($count, $filterMethod, $argument)
     {
         $arguments = func_get_args();
