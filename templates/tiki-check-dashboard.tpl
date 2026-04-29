@@ -99,7 +99,7 @@
                 <li>
                     <strong>{$issue.title}</strong>: {$issue.message}
                     {if $issue.section}
-                    <a href="#{$issue.row_id|default:$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}" class="btn btn-sm btn-outline-danger ml-2">{tr}View Details{/tr}</a>
+                    <a href="#{if !empty($issue.row_id)}{$issue.row_id}{else}{$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}{/if}" class="btn btn-sm btn-outline-danger ml-2">{tr}View Details{/tr}</a>
                     {/if}
                 </li>
                 {/foreach}
@@ -118,7 +118,7 @@
                 <li>
                     <strong>{$issue.title}</strong>: {$issue.message}
                     {if $issue.section}
-                    <a href="#{$issue.row_id|default:$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}" class="btn btn-sm btn-outline-warning ml-2">{tr}View Details{/tr}</a>
+                    <a href="#{if !empty($issue.row_id)}{$issue.row_id}{else}{$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}{/if}" class="btn btn-sm btn-outline-warning ml-2">{tr}View Details{/tr}</a>
                     {/if}
                 </li>
                 {/foreach}
@@ -137,7 +137,7 @@
                 <li>
                     <strong>{$issue.title}</strong>: {$issue.message}
                     {if $issue.section}
-                    <a href="#{$issue.row_id|default:$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}" class="btn btn-sm btn-outline-info ml-2">{tr}View Details{/tr}</a>
+                    <a href="#{if !empty($issue.row_id)}{$issue.row_id}{else}{$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}{/if}" class="btn btn-sm btn-outline-info ml-2">{tr}View Details{/tr}</a>
                     {/if}
                 </li>
                 {/foreach}

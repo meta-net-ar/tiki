@@ -1064,7 +1064,7 @@ setInterval(function() {
         </tr>
 </thead><tbody>
         {foreach from=$ocr key=key item=item}
-            <tr>
+            <tr id="OCR_Status_{$item.name|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text">{tr}Requirement:{/tr} {$item.name}</th>
                 <td data-th="{tr}Version:{/tr}" class="text">&nbsp;{$item.version}</td>
                 <td data-th="{tr}Status:{/tr} " data-th="{tr}Version : {/tr}" class="text">

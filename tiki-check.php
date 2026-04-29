@@ -6140,6 +6140,9 @@ function collect_prefixed_issue_groups(
     $server_critical_issues = array();
     $security_warning_issues = array();
     $optional_recommendations = array();
+    $sanitize_row_fragment = static function ($value) {
+        return preg_replace('/[^a-zA-Z0-9]/', '_', (string) $value);
+    };
 
     foreach ($all_properties as $key => $item) {
         if (! isset($item['message']) || ! isset($item['fitness_status'])) {
@@ -6158,13 +6161,18 @@ function collect_prefixed_issue_groups(
             $tiki_properties,
             $database_properties
         );
+        $row_id = $section . '_' . $sanitize_row_fragment($key);
+        // Template has no per-row ids for available_tiki_properties; scroll to section heading.
+        if ($section === 'Tiki_Properties') {
+            $row_id = 'Server_Compatibility';
+        }
 
         if (strpos($msg, '[Critical') === 0) {
-            $server_critical_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+            $server_critical_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section, 'row_id' => $row_id);
         } elseif (strpos($msg, '[Warning') === 0) {
-            $security_warning_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+            $security_warning_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section, 'row_id' => $row_id);
         } elseif (strpos($msg, '[Optional') === 0) {
-            $optional_recommendations[] = array('title' => $key, 'message' => $msg, 'section' => $section);
+            $optional_recommendations[] = array('title' => $key, 'message' => $msg, 'section' => $section, 'row_id' => $row_id);
         }
     }
 
@@ -6174,12 +6182,13 @@ function collect_prefixed_issue_groups(
                 continue;
             }
             $msg = (string) $ocr['message'];
+            $ocr_row_id = 'OCR_Status_' . $sanitize_row_fragment($ocr['name']);
             if (strpos($msg, '[Critical') === 0) {
-                $server_critical_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+                $server_critical_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status', 'row_id' => $ocr_row_id);
             } elseif (strpos($msg, '[Warning') === 0) {
-                $security_warning_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+                $security_warning_issues[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status', 'row_id' => $ocr_row_id);
             } elseif (strpos($msg, '[Optional') === 0) {
-                $optional_recommendations[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status');
+                $optional_recommendations[] = array('title' => $ocr['name'], 'message' => $msg, 'section' => 'OCR_Status', 'row_id' => $ocr_row_id);
             }
         }
     }
