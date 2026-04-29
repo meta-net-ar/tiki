@@ -33,45 +33,6 @@
                 {tr _0="$sender_email"}If you use an email filter, be sure to add %0 to your accepted list{/tr}
             {/remarksbox}
         </div>
-        {jq}
-            $('form[name="RegForm"]').on("submit", async function (event) {
-                event.preventDefault();
-                var isWebauthnEnabled = "{{$prefs.auth_webauthn_enabled}}";
-                var isWebAuthnIsChoosen = $("#webauthn_checkbox_register").is(':checked') && isWebauthnEnabled === 'y';
-                var regUser = $(this).find('#name').val();
-                if (isWebAuthnIsChoosen) {
-                    try {
-                        if (!window.PublicKeyCredential) {
-                            throw new Error(tr("Your browser does not support password less login feature."));
-                        }
-                        if (!window.isSecureContext) {
-                            throw new Error(tr("Passkey feature requires a secure (HTTPS) connection. Please ensure you are using a secure website."));
-                        }
-                        const result = await $.fn.registerWebAuth.createCredentials(event, regUser);
-                        if (result && result.code === 'AUTHENTICATOR_EXIST') {
-                            $("#tikifeedback").html(
-                                `<div class="alert alert-danger alert-dismissible">
-                                    ${result.message}
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>`
-                            );
-                            return;
-                        }
-                        this.submit();
-                    } catch (error) {
-                        $("#tikifeedback").html(
-                            `<div class="alert alert-danger alert-dismissible">
-                                ${error}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>`
-                        );
-                        return;
-                    }
-                } else {
-                    this.submit();
-                }
-            });
-        {/jq}
     {/if}
 {else}
     {include file='modules/mod-login_box.tpl' nobox='y'}
