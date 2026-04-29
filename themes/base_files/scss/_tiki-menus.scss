@@ -24,28 +24,29 @@
     transform: rotate(-90deg);
 }
 
-// Vertical menu arrows point right by default
-// 7-class specificity to overpower the accidental horizontal reset rule at line 44
-.tiki .sm-navbar.sm-navbar--vertical .navbar-collapse .navbar-nav > .nav-item > .sm-sub-toggler > small * {
-    display: inline-block !important;
-    transition: transform 0.2s ease-in-out !important;
-    transform: rotate(-90deg) !important; // Point RIGHT by default
+// Submenu Arrow Directions
+:root {
+    --tiki-menu-arrow-rotate: -90deg;
+}
+html[dir="rtl"] {
+    --tiki-menu-arrow-rotate: 90deg;
 }
 
-// All nested sub-menu arrows fly out to the side, so they must point right globally
+// Direction-neutral rule for vertical and nested flyout arrows
+.tiki .sm-navbar.sm-navbar--vertical .navbar-collapse .navbar-nav > .nav-item > .sm-sub-toggler > small *,
 .tiki .sm-sub-item > .sm-sub-toggler > small * {
     display: inline-block !important;
-    transition: transform 0.2s ease-in-out !important;
-    transform: rotate(-90deg) !important; 
+    transform: rotate(var(--tiki-menu-arrow-rotate)) !important;
 }
 
-.tiki .sm-navbar--vertical .sm-sub-toggler {
-    -webkit-touch-callout: none; // Disable iOS long-press menu
-}
-
-// Reset arrows to point down for normal horizontal menus
-.tiki .navbar-nav:not(.sm-vertical) > .nav-item:not(.sm-vertical) > .sm-sub-toggler > small * {
+// Reset horizontal top-level arrows to DOWN
+.tiki .sm-navbar:not(.sm-navbar--vertical) .navbar-nav > .nav-item > .sm-sub-toggler > small * {
     transform: none !important;
+}
+
+// Prevent iOS native long-press menu on togglers
+.tiki .sm-navbar--vertical .sm-sub-toggler {
+    -webkit-touch-callout: none;
 }
 
 // Stacking Layer Isolation:
