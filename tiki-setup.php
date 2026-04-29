@@ -226,12 +226,6 @@ Sections::onSectionChange(function ($section) use ($prefs) {
     TikiLib::lib('freetag')->assignCurrentObjectTagsToSmarty();
 });
 
-// The theme can override smarty templates (in SmartyTiki::initializePaths) so must be setup before template rendering starts.
-// Since the theme may be overridden by the section, this is as early as we can set it up.
-Sections::onSectionChange(function ($section) {
-    Tiki\Lib\Theme\ThemeLib::registerThemeAssets();
-});
-
 require_once('lib/setup/wiki.php');
 
 $user_groups = $userlib->get_user_groups($user);
@@ -270,6 +264,8 @@ if ($color_mode_table_exists) {
 if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
 }
+
+require_once('lib/setup/theme.php');
 
 /* Cookie consent setup, has to be after the JS decision and wiki setup */
 if (! TIKI_API) {
@@ -642,7 +638,14 @@ if ($prefs['feature_jquery_zoom'] === 'y') {
 }
 ');
 }
-
+// Load CodeMirror CSS early.
+// Adding it from Smarty/Ajax is too late and breaks the editor.
+// Therefore, we load these CSS files during setup (tiki-setup.php / early stage)
+// to ensure they are present in the <head> before any rendering occurs.
+if ($prefs['feature_syntax_highlighter'] == 'y') {
+    $headerlib->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
+        ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css');
+}
 if ($prefs['feature_ajax'] === 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-confirm.js');
     $headerlib->add_jsfile('lib/ajax/autosave.js'); // Note that this file is needed even if ajax_autosave is off otherwise wysiwyg won't load.

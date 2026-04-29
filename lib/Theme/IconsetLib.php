@@ -16,29 +16,29 @@ class IconsetLib
      * @return Iconset
      * @throws Exception
      */
-    public static function getIconsetForTheme($theme, $theme_option): Iconset
+    public function getIconsetForTheme($theme, $theme_option): Iconset
     {
         global $prefs;
         $themelib = TikiLib::lib('theme');
 
         // start with the default base and merge in others which will generally be less complete
-        $iconset = new Iconset(self::loadFile('themes/base_files/iconsets/default.php'));
+        $iconset = new Iconset($this->loadFile('themes/base_files/iconsets/default.php'));
 
         //override the default icons with theme specific icons or with site icon set setting
         if (isset($prefs['theme_iconset']) && $prefs['theme_iconset'] === 'theme_specific_iconset') {
             $filename = $themelib->get_theme_path($theme, '', str_replace('-', '_', $theme) . '.php');
             if ($filename) {
-                $iconset1 = new Iconset(self::loadFile($filename));
+                $iconset1 = new Iconset($this->loadFile($filename));
                 $iconset->merge($iconset1);
             }
             $filename = $themelib->get_theme_path($theme, $theme_option, str_replace('-', '_', $theme_option) . '.php');
             if ($filename) {
-                $iconset1 = new Iconset(self::loadFile($filename));
+                $iconset1 = new Iconset($this->loadFile($filename));
                 $iconset->merge($iconset1);
             }
         } elseif (isset($prefs['theme_iconset']) && $prefs['theme_iconset'] !== 'default') {
             $filename = "themes/base_files/iconsets/{$prefs['theme_iconset']}.php";
-            $iconset1 = new Iconset(self::loadFile($filename));
+            $iconset1 = new Iconset($this->loadFile($filename));
             $iconset->merge($iconset1);
         }
 
@@ -46,7 +46,7 @@ class IconsetLib
         if (! empty($theme_option)) {
             $filename = $themelib->get_theme_path($theme, '', str_replace('-', '_', $theme) . '_custom.php', 'icons/');
             if ($filename) {
-                $iconset1 = new Iconset(self::loadFile($filename));
+                $iconset1 = new Iconset($this->loadFile($filename));
                 $iconset->merge($iconset1);
             }
         }
@@ -54,7 +54,7 @@ class IconsetLib
         //finally override with custom icons of the displayed theme
         $filename = $themelib->get_theme_path($theme, $theme_option, str_replace('-', '_', $theme_option) . '_custom.php', 'icons/');
         if ($filename) {
-            $iconset1 = new Iconset(self::loadFile($filename));
+            $iconset1 = new Iconset($this->loadFile($filename));
             $iconset->merge($iconset1);
         }
 
@@ -65,7 +65,7 @@ class IconsetLib
      * @param $filename
      * @return array
      */
-    public static function loadFile($filename)
+    public function loadFile($filename)
     {
         $data = [];
         if (is_readable($filename)) {

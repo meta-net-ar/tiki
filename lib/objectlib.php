@@ -261,8 +261,11 @@ class ObjectLib extends TikiLib
             'calendar' => 'calendar',
             'category' => 'category',
             'file' => 'file',
+            'filedetails' => 'file',
             'file_gallery' => 'file gallery',
             'forum' => 'forum',
+            'forum post' => 'forum post',
+            'forumthread' => 'forum post',
             'group' => 'group',
             'poll' => 'poll',
             'structure' => 'structure',
@@ -274,7 +277,13 @@ class ObjectLib extends TikiLib
             'sheet' => 'sheet',
             'wiki_page' => 'wiki page',
             'wiki page' => 'wiki page',
+            'page' => 'wiki page',
             'template' => 'template',
+            'item' => 'trackeritem',
+            'tracker_item' => 'trackeritem',
+            'calitem' => 'calendaritem',
+            'event' => 'calendaritem',
+            'calevent' => 'calendaritem',
         ];
 
         if (isset($supported[$type])) {
@@ -626,6 +635,11 @@ class ObjectLib extends TikiLib
             if ($forum_info != false) {
                 return true;
             }
+        } elseif ($type === 'forum post') {
+            $post_info = TikiLib::lib('comments')->getCommentLight($objectId);
+            if ($post_info != false) {
+                return true;
+            }
         } elseif ($type === 'activity') {
             $activity = TikiLib::lib('activity')->getActivity($objectId);
             if ($activity != null) {
@@ -634,6 +648,17 @@ class ObjectLib extends TikiLib
         } elseif ($type === 'structure') {
             $structlib = TikiLib::lib('struct');
             $info = $structlib->s_get_page_info($objectId);
+            if ($info) {
+                return true;
+            }
+        } elseif ($type === 'tracker') {
+            $tracker = TikiLib::lib('trk')->get_tracker($objectId);
+            if ($tracker) {
+                return true;
+            }
+        } elseif ($type === 'calendaritem') {
+            $calendarlib = TikiLib::lib('calendar');
+            $info = $calendarlib->get_item($objectId);
             if ($info) {
                 return true;
             }
@@ -912,6 +937,9 @@ class ObjectLib extends TikiLib
                 $structlib = TikiLib::lib('struct');
                 $info = $structlib->s_get_page_info($id);
                 return ! empty($info['page_alias']) ? $info['page_alias'] : $info['pageName'];
+            case 'wiki page':
+                $info = TikiLib::lib('tiki')->get_page_info($id);
+                return $this->getFormattedTitle($type, $id, $info['pageName'], $format);
         }
 
         $title = $this->table('tiki_objects')->fetchOne(
@@ -1072,31 +1100,51 @@ class ObjectLib extends TikiLib
             } else {
                 $metadata = null;
             }
-            $query = $lib->buildQuery([
-                'object_type' => $type,
-                'object_id'   => $id
-            ]);
+
+            $query = $lib->buildQuery([]);
+            $query->addObject($type, $id);
+
             $format_pattern = '/\{([\w\.]+)\}/';
+            $sep_pattern = '/\[\|([^|]*)\|\]/';
+            $empty_marker = "\x01";
+
             if (preg_match_all($format_pattern, $format, $m)) {
                 $query->setSelectionFields($m[1]);
             }
+
             $result = $query->search($lib->getIndex());
-            $result->applyTransform(function ($item) use ($format, $format_pattern, $metadata) {
-                return preg_replace_callback($format_pattern, function ($matches) use ($item, $format, $metadata) {
+            $result->applyTransform(function ($item) use ($format, $format_pattern, $sep_pattern, $empty_marker, $metadata) {
+                $replaced = preg_replace_callback($format_pattern, function ($matches) use ($item, $format, $metadata, $empty_marker) {
                     $key = $matches[1];
-                    if (isset($item[$key])) {
+                    if (isset($item[$key]) && $item[$key] !== '') {
                         return $item[$key];
                     } elseif (str_starts_with($key, 'meta.')) {
-                        return $metadata[substr($key, 5)] ?? '';
+                        $val = $metadata[substr($key, 5)] ?? '';
+                        return $val !== '' ? $val : $empty_marker;
                     } elseif (! $format || $format == '{title}') {
                         return tr('empty');
                     } else {
-                        return '';
+                        return $empty_marker;
                     }
                 }, $format);
+
+                // Remove conditional separators [| text |] when either adjacent field was empty
+                $replaced = preg_replace('/\x01\[\|[^|]*\|\]|\[\|[^|]*\|\]\x01/', '', $replaced);
+
+                // Render remaining conditional separators (both sides had values)
+                $replaced = preg_replace($sep_pattern, '$1', $replaced);
+
+                return str_replace($empty_marker, '', $replaced);
             });
+
             $titles = $result->getArrayCopy();
-            $title = array_shift($titles);
+
+            if (empty($titles)) {
+                $title = $defaultTitle;
+            } else {
+                $title = array_shift($titles);
+            }
+
             ObjectLib::$titleCache[$cacheKey] = $title;
         } else {
             $title = $defaultTitle;

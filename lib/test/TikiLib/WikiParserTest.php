@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Cache\NoCache;
+
 /**
  * @group integration
  *
@@ -11,6 +14,46 @@
 
 class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
 {
+    private $originalCacheImpl;
+    private $originalIconset;
+    private TestHelpers $testhelpers;
+
+    protected function setUp(): void
+    {
+        global $iconset;
+
+        $this->originalIconset = $iconset;
+
+        // Mock iconset
+        $iconset = new class {
+            public function getHtml($name, $params = [])
+            {
+                return "$name-icon-mock ";
+            }
+        };
+
+        $cachelib = TikiLib::lib('cache');
+        // Prevent caching of icons during tests to avoid stale values from previous tests interfering with assertions
+        $this->originalCacheImpl = $cachelib->replaceImplementation(new NoCache());
+
+        $this->testhelpers = new TestHelpers();
+        $this->testhelpers->simulateTikiScriptContext();
+
+        $this->testhelpers->createPage('foo', 0, ''); // Create 'foo' page to be used in link tests
+    }
+
+    protected function tearDown(): void
+    {
+        global $iconset;
+
+        $iconset = $this->originalIconset;
+
+        TikiLib::lib('cache')->replaceImplementation($this->originalCacheImpl);
+
+        $this->testhelpers->removeAllVersions('foo');
+        $this->testhelpers->stopSimulatingTikiScriptContext();
+    }
+
     /**
      * @covers       ParserLib::parse_data
      * @dataProvider provider
@@ -26,6 +69,7 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         $prefs['feature_wiki_paragraph_formatting'] = 'n';
         $prefs['pass_chr_special'] = 'n';
         $prefs['wiki_heading_links'] = 'n';
+        $prefs['feature_wiki_show_int_link_title'] = 'y';
         $this->assertEquals($output, TikiLib::lib('parser')->parse_data($input, $options));
     }
 
@@ -79,8 +123,8 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
             ['--foo--', "<strike>foo</strike><br />"],  // strike out
             ['-- foo --', "-- foo --<br />"],   // not parsed
 
-            ['[foo]', '<a class="wiki"   href="foo" rel="">foo</a><br />'], // link
-            ['[foo|bar]', '<a class="wiki"   href="foo" rel="">bar</a><br />'], // link
+            ['[foo]', '<a class="wiki tips"  data-bs-content="foo" data-bs-toggle="tooltip" href="foo" rel="">foo</a><br />'], // link
+            ['[foo|bar]', '<a class="wiki tips"  data-bs-content="foo" data-bs-toggle="tooltip" href="foo" rel="">bar</a><br />'], // link
 
             ['[[foo', '[foo<br />'], // Square brackets
             ['[[foo]]', '[[foo]]<br />'], // Square brackets
