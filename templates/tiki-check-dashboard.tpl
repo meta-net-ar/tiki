@@ -91,7 +91,7 @@
     
     {* Critical Issues Summary *}
     {if $server_critical_issues && count($server_critical_issues) > 0}
-    <div class="critical-issues-summary mt-3">
+    <div class="critical-issues-summary critical-issues-summary--critical mt-3">
         <div class="alert alert-danger">
             <h5><i class="fas fa-exclamation-triangle"></i> {tr}Critical Issues (Server Configuration - Must Fix){/tr}</h5>
             <ul class="mb-0">
@@ -110,13 +110,13 @@
 
     {* Security Warnings *}
     {if $security_warning_issues && count($security_warning_issues) > 0}
-    <div class="critical-issues-summary mt-3">
+    <div class="critical-issues-summary critical-issues-summary--security-warning mt-3">
         <div class="alert alert-warning">
             <h5><i class="fas fa-exclamation-circle"></i> {tr}Security Warnings (Verify and Harden){/tr}</h5>
             <ul class="mb-0">
                 {foreach from=$security_warning_issues item=issue}
                 <li>
-                    <strong>{$issue.title}</strong>: {$issue.message}
+                    <i class="fas fa-exclamation-circle text-warning list-item-section-icon" aria-hidden="true"></i><strong>{$issue.title}</strong>: {$issue.message}
                     {if $issue.section}
                     <a href="#{if !empty($issue.row_id)}{$issue.row_id}{else}{$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}{/if}" class="btn btn-sm btn-outline-warning ml-2">{tr}View Details{/tr}</a>
                     {/if}
@@ -129,13 +129,13 @@
 
     {* Optional Features / Recommendations *}
     {if $optional_recommendations && count($optional_recommendations) > 0}
-    <div class="critical-issues-summary mt-3">
+    <div class="critical-issues-summary critical-issues-summary--optional mt-3">
         <div class="alert alert-info">
             <h5><i class="fas fa-info-circle"></i> {tr}Optional Features / Recommendations{/tr}</h5>
             <ul class="mb-0">
                 {foreach from=$optional_recommendations item=issue}
                 <li>
-                    <strong>{$issue.title}</strong>: {$issue.message}
+                    <i class="fas fa-info-circle text-info list-item-section-icon" aria-hidden="true"></i><strong>{$issue.title}</strong>: {$issue.message}
                     {if $issue.section}
                     <a href="#{if !empty($issue.row_id)}{$issue.row_id}{else}{$issue.section|cat:'_'|cat:$issue.title|regex_replace:'/[^a-zA-Z0-9]/':'_'}{/if}" class="btn btn-sm btn-outline-info ml-2">{tr}View Details{/tr}</a>
                     {/if}

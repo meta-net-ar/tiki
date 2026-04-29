@@ -253,17 +253,34 @@
 
 .critical-issues-summary li {
     margin-bottom: 0.75rem;
-    color: #721c24;
     font-weight: 500;
     position: relative;
     padding-left: 1rem;
 }
 
-.critical-issues-summary li::before {
+.critical-issues-summary .alert-danger li {
+    color: #721c24;
+}
+
+.critical-issues-summary .alert-danger li::before {
     content: '⚠️';
     position: absolute;
     left: -1.5rem;
     top: 0;
+    font-size: 1.1rem;
+}
+
+.critical-issues-summary .alert-warning li::before,
+.critical-issues-summary .alert-info li::before {
+    content: none;
+}
+
+/* Section icon in list replaces the danger-only ::above slot */
+.critical-issues-summary .alert-warning li > .list-item-section-icon,
+.critical-issues-summary .alert-info li > .list-item-section-icon {
+    position: absolute;
+    left: -1.5rem;
+    top: 0.1rem;
     font-size: 1.1rem;
 }
 
