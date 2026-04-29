@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Mpdf\Mpdf;
-use Mpdf\MpdfException;
 use Tiki\Lib\Auth\Tokens;
 use Tiki\Lib\Theme\ThemeLib;
 
@@ -803,6 +802,7 @@ HTML;
                                 $mpdf->WriteHTML($content_slice);
                             } catch (ErrorException $e) {
                                 \Feedback::error($e->getMessage());
+                                die($e->getMessage());
                             }
                         }
                     }
