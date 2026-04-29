@@ -1,16 +1,24 @@
 import { attachChangeEventHandler, observeSelectElementMutations, syncSelectOptions } from "../helpers/select/applySelect";
 
+const OPT_IN_SELECTOR = "select.tiki-elementplus-select:not([element-plus-ref]), select[data-elementplus-select='true']:not([element-plus-ref])";
+
 export default function applySelect() {
     transformContainerSelects(document.body);
     new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-            transformContainerSelects(mutation.target);
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    transformContainerSelects(node);
+                }
+            });
         });
     }).observe(document.body, { childList: true, subtree: true });
 }
 
-function transformContainerSelects(containerElement) {
-    const selects = $(containerElement).find("select:not([element-plus-ref])");
+export function transformContainerSelects(containerElement) {
+    const container = $(containerElement);
+    const selects = container.find(OPT_IN_SELECTOR).add(container.filter(OPT_IN_SELECTOR));
+
     if (selects.length) {
         selects.each(function () {
             const elementUniqueId = "el-" + Math.random().toString(36).substring(7);
