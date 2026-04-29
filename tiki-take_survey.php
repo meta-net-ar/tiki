@@ -135,7 +135,16 @@ if (isset($_REQUEST["ans"])) {
         if (! empty($_REQUEST["vote"])) {
             $srvlib->add_survey_hit($_REQUEST["surveyId"]);
         }
-        header('Location: tiki-list_surveys.php');
+        if (! empty($survey_info['redirect_after'])) {
+            $redirect_url = $survey_info['redirect_after'];
+            // If it looks like a wiki page name (no protocol, no slash), build the wiki URL
+            if (! preg_match('#^https?://#', $redirect_url) && strpos($redirect_url, '/') === false) {
+                $redirect_url = 'tiki-index.php?page=' . urlencode($redirect_url);
+            }
+            header('Location: ' . $redirect_url);
+        } else {
+            header('Location: tiki-list_surveys.php');
+        }
         die;
     }
 }
