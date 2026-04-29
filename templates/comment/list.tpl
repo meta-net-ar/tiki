@@ -41,8 +41,9 @@
                             var $collapse = $wrapper.find('.collapse').first();
                             if ($collapse.length) {
                                 var shouldExpand = false;
-                                if (hash && hash.match(/^#threadId\d+/)) {
-                                    if ($wrapper.find(hash).length > 0) {
+                                if (hash && hash.match(/^#threadId=?\d+/)) {
+                                    var targetSelector = hash.replace('=', '');
+                                    if ($wrapper.is(targetSelector) || $wrapper.find(targetSelector).length > 0) {
                                         shouldExpand = true;
                                     }
                                 }
@@ -53,13 +54,16 @@
                                         $wrapper.find('.comment-resolved-header').attr('aria-expanded', 'true');
                                         $wrapper.find('.comment-collapse-icon').addClass('comment-collapse-icon-open');
                                         setTimeout(function() {
-                                            var $target = $(hash);
+                                            var targetId = hash.replace('=', '');
+                                            var $target = $(targetId);
                                             if ($target.length) {
-                                                $target[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                                $('html, body').stop().animate({
+                                                    scrollTop: $target.offset().top - 150
+                                                }, 800);
                                                 $target.addClass('comment-highlight');
                                                 setTimeout(function() { $target.removeClass('comment-highlight'); }, 3000);
                                             }
-                                        }, 500);
+                                        }, 700);
                                     } else {
                                         $collapse.removeClass('show');
                                         $wrapper.find('.comment-resolved-header').attr('aria-expanded', 'false');
@@ -72,6 +76,9 @@
                         });
                     }
                     initResolvedThreads();
+                    $(window).on('hashchange', function() {
+                        initResolvedThreads();
+                    });
                     $(document).off('click.resolved').on('click.resolved', '.comment-resolved-header', function() {
                         // Toggle handled by Bootstrap collapse
                     });

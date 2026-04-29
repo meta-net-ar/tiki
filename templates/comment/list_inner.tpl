@@ -53,7 +53,7 @@
                                     <span class="label label-primary">{tr}Archived{/tr}</span>
                                     <a class="btn btn-info btn-sm" href="{service controller=comment action=archive do=unarchive threadId=$comment.threadId}">{tr}Unarchive{/tr}</a>
                                 {else}
-                                    <a class="btn btn-success btn-sm" href="{service controller=comment action=archive do=archive threadId=$comment.threadId}">{tr}Archive{/tr}</a>
+                                    <a class="btn btn-warning btn-sm" href="{service controller=comment action=archive do=archive threadId=$comment.threadId}">{tr}Archive{/tr}</a>
                                 {/if}
                             {/if}
                             {if $allow_resolve && $is_top_level}
