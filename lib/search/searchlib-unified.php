@@ -1352,9 +1352,11 @@ class UnifiedSearchLib
 
     /**
      * @param array $filter
+     * @param Search_Query|null $query
+     * @param bool $orMode
      * @return Search_Query
      */
-    public function buildQuery(array $filter, $query = null)
+    public function buildQuery(array $filter, $query = null, bool $orMode = false)
     {
         if (! $query) {
             $query = new Search_Query();
@@ -1487,8 +1489,15 @@ class UnifiedSearchLib
         unset($filter['groups']);
 
 
-        foreach ($filter as $key => $value) {
-            if ($value) {
+        $remaining = array_filter($filter);
+        if ($orMode && count($remaining) > 1) {
+            $orSubQuery = new Search_Query(null, 'or');
+            foreach ($remaining as $key => $value) {
+                $orSubQuery->filterContent($value, $key);
+            }
+            $query->getExpr()->addPart($orSubQuery->getExpr());
+        } else {
+            foreach ($remaining as $key => $value) {
                 $query->filterContent($value, $key);
             }
         }
