@@ -38,6 +38,12 @@ function prefs_comments_list()
             'type' => 'flag',
             'default' => 'n',
         ],
+        'comments_resolved_threads' => [
+            'name' => tra('Resolvable comment threads'),
+            'description' => tra('Allow marking top-level comment threads as resolved. Resolved threads are collapsed by default.'),
+            'type' => 'flag',
+            'default' => 'n',
+        ],
         'comments_allow_correction' => [
             'name' => tr('Allow comments to be edited by their author'),
             'description' => tr('Allow a comment to be modified by its author after posting it, for clarifications, correction of errors, etc.'),

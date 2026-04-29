@@ -69,6 +69,7 @@ class Services_Comment_Controller
             'allow_lock'        => $this->canLock($type, $objectId),
             'allow_unlock'      => $this->canUnlock($type, $objectId),
             'allow_archive'     => $this->canArchive($type, $objectId),
+            'allow_resolve'     => $this->canResolve($type, $objectId),
             'allow_moderate'    => $this->canModerate($type, $objectId),
             'allow_vote'        => $this->canVote($type, $objectId),
         ];
@@ -620,6 +621,39 @@ class Services_Comment_Controller
         ];
     }
 
+    public function action_resolve($input)
+    {
+        $threadId = $input->threadId->int();
+        $do = $input->do->alpha();
+        if (! $comment = $this->getCommentInfo($threadId)) {
+            throw new Services_Exception(tr('Comment not found.'), 404);
+        }
+
+        $type = $comment['objectType'];
+        $object = $comment['object'];
+
+        if (! $this->canResolve($type, $object)) {
+            throw new Services_Exception(tr('Permission denied.'), 403);
+        }
+
+        $status = 'DONE';
+        $commentslib = TikiLib::lib('comments');
+
+        if ($do == 'resolve') {
+            $commentslib->resolveThread($threadId);
+        } else {
+            $commentslib->unresolveThread($threadId);
+        }
+
+        return [
+            'threadId' => $threadId,
+            'type' => $type,
+            'objectId' => $object,
+            'status' => $status,
+            'do' => $do,
+        ];
+    }
+
     public function action_deliberation_item($input)
     {
         return [];
@@ -801,6 +835,19 @@ class Services_Comment_Controller
         global $prefs;
 
         if ($prefs['comments_archive'] != 'y') {
+            return false;
+        }
+
+        $perms = $this->getApplicablePermissions($type, $objectId);
+
+        return $perms->admin_comments;
+    }
+
+    private function canResolve($type, $objectId)
+    {
+        global $prefs;
+
+        if ($prefs['comments_resolved_threads'] != 'y') {
             return false;
         }
 
