@@ -17,6 +17,7 @@
             {preference name=feature_comments_post_as_anonymous}
             {preference name=comments_vote}
             {preference name=comments_archive}
+            {preference name=comments_resolved_threads}
             {preference name=comments_allow_correction}
             <div class="adminoptionboxchild" id="comments_allow_correction_childcontainer">
                 {preference name=comments_correction_timeout}
