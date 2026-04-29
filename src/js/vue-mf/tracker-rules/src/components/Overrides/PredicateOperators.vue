@@ -3,7 +3,8 @@
         v-if="isElementPlusActive"
         v-model="modelValue"
         placeholder="Select"
-        @change="() => emit('change', modelValue)"
+        :teleported="false"
+        @change="handleElementPlusChange"
     >
         <el-option v-for="operator in predicate.target.$type.$operators" :key="operator.label" :label="operator.label" :value="operator.operator_id" />
     </el-select>
@@ -34,6 +35,10 @@ const modelValue = ref(props.predicate.operator.operator_id);
 const isElementPlusActive = ref(!!window.elementPlus);
 
 const emit = defineEmits(["change"]);
+
+const handleElementPlusChange = (value) => {
+    emit("change", value);
+};
 
 const handleChange = (event) => {
     emit("change", event.target.value);
