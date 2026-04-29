@@ -62,12 +62,11 @@ test = { mode: function () {}, indentation: function() {} }
     }
 
     //add codemirror stuff
-    TikiLib::lib("header")->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
+    TikiLib::lib("header")
         ->add_jsfile_dependency(CODEMIRROR_DIST_PATH . '/lib/codemirror.js')
         ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/search/searchcursor.js')
         ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/mode/overlay.js')
         //add tiki stuff
-        ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css')
         ->add_jsfile('lib/codemirror_tiki/codemirror_tiki.js')
         //add interactjs
         ->add_jsfile(NODE_PUBLIC_DIST_PATH . '/interactjs/dist/interact.min.js')

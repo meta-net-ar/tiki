@@ -35,23 +35,6 @@ __Fix visibility issues.__
 
 We will get rid of this patch soon, after the replacement of jQuery.sheet (aka WickedGrid) with a more modern solution.
 
-### [smartylint-php8.1-and-other-fixes.patch](./smartylint-php8.1-and-other-fixes.patch)
-__Fix smartylint PHP 8.1 support and other fixes.__
-
-SmartyLint seems to be very old not getting any updates since a period over 9 years, so, this patch is valuable. It fixes the following points:
-* Ensure that the `auto_detect_line_endings` INI directive isn't set for PHP version 8.1 and greater.
-* Fixes the iterator wrongly incremented in the lib.
-* Fix the issue: assignement to undefined variable $iPointer.
-
-Related: 
-* https://github.com/smarty-php/smarty/discussions/951
-* https://github.com/umakantp/SmartyLint/issues/3
-
-### [smartylint-warning-curly-bracket.patch](./smartylint-warning-curly-bracket.patch)
-__Fix smartylint syntax with curly braces.__
-
-Related to the previous one, this patch replaces the usage of curly-braces syntax to access element or character at a specific index in an array or a string with the square bracket syntax.
-
 ### [xmpp-prebind-php__php8fixes.patch](./xmpp-prebind-php__php8fixes.patch)
 __Removed string access with curly braces syntax in PHP8.__
 

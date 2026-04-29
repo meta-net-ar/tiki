@@ -114,17 +114,24 @@
         "vitest" : "https://github.com/vitest-dev/vitest/releases"
     },
     "overrides" : {
-        "dompurify" : "3.3.1"
+        "dompurify" : "3.3.3",
+        "jspdf" : "4.2.1",
+        "svgedit" : {
+            "jspdf" : "4.2.1"
+        }
     },
     "overridesComment" : {
+        "jspdf": [
+            "npm audit flagged jspdf <= 4.2.0 (critical). Pin 4.2.1 so the root install and svgedit (nested 4.0.0) resolve to a patched release."
+        ],
         "dompurify": [
-            "This override forces all packages to use DOMPurify v3.3.1 to fix a security vulnerability present in DOMPurify v2.x.",
+            "This override forces all packages to use DOMPurify v3.3.3 to fix security issues present in DOMPurify v2.x and patched releases in the v3 line.",
             "Upgrading from v2 to v3 is safe for our project because we do not support Internet Explorer (IE).",
             "As noted by Victor Buzinaro in https://github.com/cure53/DOMPurify/issues/785, the only breaking change introduced in v3 is the removal of IE-specific support.",
             "After reviewing the changes between versions 2.5.8 and 3.3.0 (https://github.com/cure53/DOMPurify/compare/2.5.8...3.3.0), we confirmed there are no functional breaking changes that affect our usage.",
             "Toast UI Editor currently depends on DOMPurify v2.x, but its DOMPurify integration",
             "(introduced in https://github.com/nhn/tui.editor/commit/6e5730914902071b54c529673e964a24b58e3eec#diff-e70b3ac7e7e963527907ae78c682a077c1b87015783bdcb150084e023ce17528) is compatible with v3.",
-            "For this reason, enforcing DOMPurify v3.2.7 is safe for us. We should remove this override once @toast-ui/editor officially updates to DOMPurify v3 or when we replace/fork it with a maintained version compatible with v3."
+            "For this reason, enforcing DOMPurify v3.3.x is safe for us. Remove this override when upstream packages pin a secure DOMPurify without conflicts."
         ]
     },
     "workspaces": [

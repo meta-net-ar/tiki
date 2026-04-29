@@ -5512,7 +5512,7 @@ class UsersLib extends TikiLib
             [
                 'name' => 'tiki_p_comment_tracker_items',
                 'description' => tra('Can post tracker item comments'),
-                'level' => 'basic',
+                'level' => 'registered',
                 'type' => 'trackers',
                 'admin' => false,
                 'prefs' => ['feature_trackers'],
@@ -5521,7 +5521,7 @@ class UsersLib extends TikiLib
             [
                 'name' => 'tiki_p_tracker_view_comments',
                 'description' => tra('Can view tracker item comments'),
-                'level' => 'basic',
+                'level' => 'registered',
                 'type' => 'trackers',
                 'admin' => false,
                 'prefs' => ['feature_trackers'],
@@ -5539,7 +5539,7 @@ class UsersLib extends TikiLib
             [
                 'name' => 'tiki_p_list_trackers',
                 'description' => tra('Can list trackers'),
-                'level' => 'basic',
+                'level' => 'registered',
                 'type' => 'trackers',
                 'admin' => false,
                 'prefs' => ['feature_trackers'],
@@ -5602,7 +5602,7 @@ class UsersLib extends TikiLib
             [
                 'name' => 'tiki_p_tracker_view_ratings',
                 'description' => tra('Can view rating result for tracker items'),
-                'level' => 'basic',
+                'level' => 'registered',
                 'type' => 'trackers',
                 'admin' => false,
                 'prefs' => ['feature_trackers'],
@@ -5638,7 +5638,7 @@ class UsersLib extends TikiLib
             [
                 'name' => 'tiki_p_view_trackers',
                 'description' => tra('Can view trackers'),
-                'level' => 'basic',
+                'level' => 'registered',
                 'type' => 'trackers',
                 'admin' => false,
                 'prefs' => ['feature_trackers'],

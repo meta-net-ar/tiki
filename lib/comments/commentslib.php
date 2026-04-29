@@ -2552,7 +2552,7 @@ class Comments extends TikiLib
             if ($tiki_p_admin_comments == 'y') {
                 $adminFields = ', tc1.`user_ip`';
             }
-            $query = "select tc1.`threadId`, tc1.`object`, tc1.`objectType`, tc1.`parentId`, tc1.`userName`, tc1.`commentDate`, tc1.`hits`, tc1.`type`, tc1.`points`, tc1.`votes`, tc1.`average`, tc1.`title`, tc1.`data`, tc1.`summary`, tc1.`smiley`, tc1.`message_id`, tc1.`in_reply_to`, tc1.`comment_rating`, tc1.`approved`, tc1.`locked`$adminFields  from `tiki_comments` as tc1
+            $query = "select tc1.`threadId`, tc1.`object`, tc1.`objectType`, tc1.`parentId`, tc1.`userName`, tc1.`commentDate`, tc1.`hits`, tc1.`type`, tc1.`points`, tc1.`votes`, tc1.`average`, tc1.`title`, tc1.`data`, tc1.`summary`, tc1.`smiley`, tc1.`message_id`, tc1.`in_reply_to`, tc1.`comment_rating`, tc1.`approved`, tc1.`locked`, tc1.`is_resolved`$adminFields  from `tiki_comments` as tc1
                 left outer join `tiki_comments` as tc2 on tc1.`in_reply_to` = tc2.`message_id`
                 and tc1.`parentId` = ?
                 and tc2.`parentId` = ?
@@ -3852,6 +3852,41 @@ class Comments extends TikiLib
             return $this->table('tiki_comments')->update(
                 ['archived' => 'n'],
                 ['threadId' => (int) $threadId, 'parentId' => (int) $parentId]
+            );
+        }
+        return false;
+    }
+
+    /**
+     * Mark a top-level comment thread as resolved.
+     * Resolved threads are collapsed by default in the UI.
+     *
+     * @param int $threadId the comment/thread id
+     * @return bool|TikiDb_Pdo_Result
+     */
+    public function resolveThread($threadId)
+    {
+        if ($threadId > 0) {
+            return $this->table('tiki_comments')->update(
+                ['is_resolved' => 'y'],
+                ['threadId' => (int) $threadId]
+            );
+        }
+        return false;
+    }
+
+    /**
+     * Unresolve a previously resolved comment thread.
+     *
+     * @param int $threadId the comment/thread id
+     * @return bool|TikiDb_Pdo_Result
+     */
+    public function unresolveThread($threadId)
+    {
+        if ($threadId > 0) {
+            return $this->table('tiki_comments')->update(
+                ['is_resolved' => 'n'],
+                ['threadId' => (int) $threadId]
             );
         }
         return false;

@@ -108,7 +108,7 @@ function prefs_module_list()
             'name' => $modinfo['name'],
             'type' => 'flag',
             'description' => $modinfo['description'],
-            'default' => 'y',
+            'default' => ($modinfo['pref_enabled_by_default'] ?? 'y') === 'y' ? 'y' : 'n',
         ];
     }
     return $pref_modules;

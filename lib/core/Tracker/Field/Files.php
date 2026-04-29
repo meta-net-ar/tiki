@@ -597,15 +597,19 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
 
                 foreach ($this->getConfiguration('files') as $fileId => $file) {
                     $ret .= '<li>';
+                    $skipName = false;
                     if ($prefs['vimeo_upload'] == 'y' && $this->getOption('displayMode') == 'vimeo') {
                         $ret .= smarty_function_icon(['name' => 'vimeo'], $smarty->getEmptyInternalTemplate());
                     } elseif (str_starts_with($file['filetype'], 'audio/')) {
-                        $ret .= smarty_function_inline_audio_player(['fileId' => $fileId], $smarty->getEmptyInternalTemplate());
+                        $ret .= smarty_function_inline_audio_player(['fileId' => $fileId, 'type' => $file['filetype']], $smarty->getEmptyInternalTemplate());
+                        $skipName = true;
                     } else {
                         $ret .= smarty_modifier_iconify('tiki-download_file.php?fileId=' . $fileId, $file['filetype'], $fileId, 2);
                     }
 
-                    $ret .= smarty_function_object_link(['type' => 'file', 'id' => $fileId, 'title' => $file['name'], 'class' => 'label'], $smarty->getEmptyInternalTemplate());
+                    if (! $skipName) {
+                        $ret .= smarty_function_object_link(['type' => 'file', 'id' => $fileId, 'title' => $file['name'], 'class' => 'label'], $smarty->getEmptyInternalTemplate());
+                    }
 
                     $globalperms = Perms::get([ 'type' => 'file gallery', 'object' => $galleryId ]);
 

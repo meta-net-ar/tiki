@@ -65,6 +65,10 @@ class ToolbarFileRecording extends ToolbarUtilityItem
                 <label class="form-check-label" for="recordCamera">Camera</label>
             </div>
         </div>
+        <span class="recording-timer" id="recording-timer-$this->domElementId">00:00</span>
+        <div id="waveform-canvas-$this->domElementId" class="waveform-container">
+            <canvas id="wave-canvas-$this->domElementId" class="w-100 h-100"></canvas>
+        </div>
         HTML;
     }
 

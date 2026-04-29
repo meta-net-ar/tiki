@@ -51,6 +51,12 @@ $userlib->refresh_locked_users_list();
 $login_url_params = '';
 $isOpenIdValid = false;
 
+// Usernameless passkey login submits the form without a 'user' field.
+// Inject from session early so the redirect-to-login-screen guard below does not fire.
+if ($prefs['auth_webauthn_enabled'] === 'y' && ! empty($_SESSION['webauthn_user'])) {
+    $_REQUEST['user'] = $_SESSION['webauthn_user'];
+}
+
 if (! empty($_REQUEST['code']) && $prefs['auth_method'] == 'openid_connect' && TikiLib::lib('openidconnect')->isAvailable()) {
     $_REQUEST['user'] = '';
 } elseif (isset($_REQUEST['cas']) && $_REQUEST['cas'] == 'y' && $prefs['auth_method'] == 'cas') {
