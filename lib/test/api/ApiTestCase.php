@@ -357,9 +357,11 @@ abstract class ApiTestCase extends \TikiTestCase
         if (is_array($typeOrNested)) {
             $this->assertIsArray($value, "$msg should be an array");
 
-            // [0 => [...]] — array of objects, each validated against the inner schema
+            // [0 => [...]] — array of objects, each validated against the inner schema.
+            // The array must be non-empty: an empty array skips all per-element assertions
             if (isset($typeOrNested[0]) && is_array($typeOrNested[0])) {
                 $innerSchema = $typeOrNested[0];
+                $this->assertNotEmpty($value, "$msg should be a non-empty array of objects");
                 foreach ($value as $idx => $item) {
                     $itemMsg = "{$msg}[{$idx}]";
                     $this->assertIsArray($item, "$itemMsg should be an array");
