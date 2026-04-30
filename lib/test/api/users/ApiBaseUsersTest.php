@@ -241,6 +241,18 @@ abstract class ApiBaseUsersTest extends ApiTestCase
         ];
     }
 
+    private function getRegisterUserErrorSchema(): array
+    {
+        return [
+            'result' => [
+                [
+                    'field' => 'string',
+                    'msg'  => 'string',
+                ]
+            ],
+        ];
+    }
+
     private function getDeleteUserFeedbackSchema(): array
     {
         return [
@@ -288,6 +300,27 @@ abstract class ApiBaseUsersTest extends ApiTestCase
     protected function assertValidRegisterUserResponse(array $body): void
     {
         $this->assertMatchesSchema($body, $this->getRegisterUserSchema());
+    }
+
+    protected function assertValidRegisterUserDuplicateResponse(array $body): void
+    {
+        $this->assertMatchesSchema($body, $this->getRegisterUserErrorSchema());
+        $this->assertEquals('name', $body['result'][0]['field'], 'Duplicate registration error should indicate the field causing the conflict');
+        $this->assertEquals('User already exists', $body['result'][0]['msg'], 'Duplicate registration error message should indicate the user already exists');
+    }
+
+    protected function assertValidRegisterUserMissingCredentialsResponse(array $body): void
+    {
+        $this->assertMatchesSchema($body, $this->getRegisterUserErrorSchema());
+        $fields = array_column($body['result'], 'field');
+        $messages = array_column($body['result'], 'msg');
+
+        $this->assertContains('name', $fields, 'Error response should include a field error for name');
+        $this->assertContains('pass', $fields, 'Error response should include a field error for pass');
+        $this->assertContains('Username is required', $messages, 'Error message should indicate username is required');
+        $this->assertContains('Password is required', $messages, 'Error message should indicate password is required');
+        $this->assertContains('Username must be at least 1 characters long', $messages, 'Error message should indicate username length requirement');
+        $this->assertContains('Password should be at least 5 characters long.', $messages, 'Error message should indicate password length requirement');
     }
 
     protected function assertValidDeleteUserResponse(array $body): void
