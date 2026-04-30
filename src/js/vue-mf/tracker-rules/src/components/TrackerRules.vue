@@ -275,30 +275,23 @@ const handleInvertActions = () => {
         return ; // no valid actions
     }
 
-    // Shallow clone the actions and set them to the opposites
-    const oppositeActions = { ...actions };
+    const invertedOperators = {
+        Show: "Hide",
+        Hide: "Show",
+        Editable: "NotEditable",
+        NotEditable: "Editable",
+        Required: "NotRequired",
+        NotRequired: "Required",
+    };
+
+    // Clone deeply so inverting Else never mutates Actions source data.
+    // Some runtimes do not expose structuredClone yet.
+    const oppositeActions = JSON.parse(JSON.stringify(actions));
 
     // Invert operator IDs
     oppositeActions.predicates.forEach((pred) => {
-        switch (pred.operator_id) {
-            case "Show":
-                pred.operator_id = "Hide";
-                break;
-            case "Hide":
-                pred.operator_id = "Show";
-                break;
-            case "Editable":
-                pred.operator_id = "NotEditable";
-                break;
-            case "NotEditable":
-                pred.operator_id = "Editable";
-                break;
-            case "Required":
-                pred.operator_id = "NotRequired";
-                break;
-            case "NotRequired":
-                pred.operator_id = "Required";
-                break;
+        if (invertedOperators[pred.operator_id]) {
+            pred.operator_id = invertedOperators[pred.operator_id];
         }
     });
 
