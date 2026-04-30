@@ -176,6 +176,7 @@ class Services_Search_Controller
         try {
             $filterData = $input->filter->none();
             $filter = (! empty($filterData) && is_array($filterData)) ? $filterData : [];
+            $useOr = (bool) $input->filter_or->int();
             $format = $input->format->text() ?: '{title}';
             $use_permname = $input->use_permname->text();
             $titleFilter = null;
@@ -184,7 +185,32 @@ class Services_Search_Controller
             /** @var UnifiedSearchLib $lib */
             $lib = TikiLib::lib('unifiedsearch');
 
-            if (! empty($filter['title']) && preg_match_all('/\{(\w+)\}/', $format, $matches)) {
+            if ($useOr && preg_match_all('/\{(\w+)\}/', $format, $matches)) {
+                $formatFields = $matches[1];
+                $baseFilter = [];
+                $orFilter   = [];
+                foreach (array_filter($filter) as $key => $value) {
+                    $matched = false;
+                    foreach ($formatFields as $field) {
+                        if (stripos($field, $key) !== false) {
+                            $orFilter[$field] = $value;
+                            if (stripos($field, 'name') !== false || stripos($field, 'title') !== false) {
+                                $titleFilter     = $value;
+                                $highlightHelper = new Search_MySql_HighlightHelper(explode(' ', $value));
+                            }
+                            $matched = true;
+                            break;
+                        }
+                    }
+                    if (! $matched) {
+                        $baseFilter[$key] = $value;
+                    }
+                }
+                $query = $lib->buildQuery($baseFilter);
+                if ($orFilter) {
+                    $lib->buildQuery($orFilter, $query, true);
+                }
+            } elseif (! empty($filter['title']) && preg_match_all('/\{(\w+)\}/', $format, $matches)) {
                 // formatted object_selector search results should also search in formatted fields besides the title
                 $titleFilter = $filter['title'];
                 unset($filter['title']);

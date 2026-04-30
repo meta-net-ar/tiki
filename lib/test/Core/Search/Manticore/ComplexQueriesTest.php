@@ -246,4 +246,17 @@ class ComplexQueriesTest extends \PHPUnit\Framework\TestCase
         $query->filterContent('sentence', 'tracker_field_text');
         $this->assertCount(1, $query->search($this->index));
     }
+
+    public function testBuildQueryOrMode()
+    {
+        $lib = \TikiLib::lib('unifiedsearch');
+
+        $query = $lib->buildQuery(['type' => 'wiki page']);
+        $lib->buildQuery(['title' => 'Unified', 'contents' => 'nonexistent'], $query, false);
+        $this->assertCount(0, $query->search($this->index));
+
+        $query = $lib->buildQuery(['type' => 'wiki page']);
+        $lib->buildQuery(['title' => 'Unified', 'contents' => 'nonexistent'], $query, true);
+        $this->assertCount(1, $query->search($this->index));
+    }
 }
