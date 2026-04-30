@@ -2522,6 +2522,7 @@ CREATE TABLE `tiki_tracker_fields` (
   `rules` TEXT,
   `encryptionKeyId` int(11) NULL,
   `excludeFromNotification` char(1) default 'n',
+  `excludeFromTrackerItemLastModificationDate` char(1) NOT NULL default 'n',
   `visibleInViewMode` char(1) NOT NULL default 'y',
   `visibleInEditMode` char(1) NOT NULL default 'y',
   `visibleInHistoryMode` char(1) NOT NULL default 'y',

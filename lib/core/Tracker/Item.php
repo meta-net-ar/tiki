@@ -9,6 +9,8 @@ use Tracker\Field\AbstractItemField;
 
 class Tracker_Item
 {
+    public const LAST_MODIF = 'lastModif';
+    public const LAST_MODIF_BY = 'lastModifBy';
     public const PERM_NAME_MAX_ALLOWED_SIZE = 50;
 
     /**
