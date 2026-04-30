@@ -90,7 +90,11 @@ if (! empty($_SERVER['TIKI_INI_FILE']) && is_readable($_SERVER['TIKI_INI_FILE'])
 // Normalize to array: support both legacy $system_configuration_file (string)
 // and the newer $system_configuration_files (array of file paths).
 // When using the array form, files listed later override keys from earlier files.
-if (! isset($system_configuration_files) || ! is_array($system_configuration_files)) {
+if (isset($system_configuration_files)) {
+    if (! is_array($system_configuration_files)) {
+        $fail('$system_configuration_files must be an array.');
+    }
+} else {
     $system_configuration_files = ! empty($system_configuration_file) ? [$system_configuration_file] : [];
 }
 

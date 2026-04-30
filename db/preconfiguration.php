@@ -10,4 +10,4 @@
 
 // Want configurations managed at the system level or restrict some preferences? http://doc.tiki.org/System+Configuration
 // Multiple configuration files (files listed later override earlier ones):
-// $system_configuration_files = ['db/ansible_local.ini', 'db/dev_local.ini'];
+// $system_configuration_files = ['db/local.ini', 'db/system_local.ini'];
