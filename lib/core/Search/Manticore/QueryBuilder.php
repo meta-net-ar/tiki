@@ -226,7 +226,7 @@ class QueryBuilder
         } elseif ($node instanceof Initial) {
             $field = $this->getField($node);
             Index::addSearchedField($node->getField(), 'others');
-            $value = $this->getQuoted($node, '(?i)^');
+            $value = $this->quoteRegex($node, '(?i)^');
             $key = 'tf_' . uniqid();
             $this->select[$key] = "REGEX(TO_STRING({$field}), $value)";
             return "$key = 1";
@@ -295,7 +295,7 @@ class QueryBuilder
                 $this->select[$key] = "TO_STRING({$field}) = $value";
                 return "$key = 1";
             } else {
-                $value = $this->getQuoted($node, '(?i)');
+                $value = $this->quoteRegex($node, '(?i)');
                 $key = 'tf_' . uniqid();
                 $this->select[$key] = "REGEX(TO_STRING({$field}), $value)";
                 return "$key = 1";
@@ -310,17 +310,18 @@ class QueryBuilder
             $value = $this->getQuoted($node);
             return "{$field} = $value";
         } else {
-            $value = $this->getQuoted($node, '(?i)');
-            if (is_array($value)) {
+            $rawValue = $this->getRaw($node);
+            if (is_array($rawValue)) {
                 return '(' . implode(' OR ', array_filter(array_map(function ($v) use ($field) {
                     if (is_scalar($v)) {
-                        $v = $this->pdo_client->quote('(?i)' . strval($v));
+                        $v = $this->pdo_client->quote('(?i)' . $this->wildcardToRe2(strval($v)));
                     } else {
                         return null;
                     }
                     return "REGEX({$field}, $v)";
-                }, $value))) . ')';
+                }, $rawValue))) . ')';
             } else {
+                $value = $this->quoteRegex($node, '(?i)');
                 return "REGEX({$field}, $value)";
             }
         }
@@ -391,6 +392,20 @@ class QueryBuilder
         } else {
             return $raw;
         }
+    }
+
+    private function quoteRegex($node, $prefix)
+    {
+        return $this->pdo_client->quote($prefix . $this->wildcardToRe2(strval($this->getRaw($node))));
+    }
+
+    private function wildcardToRe2($value)
+    {
+        if ($value === '') {
+            return $value;
+        }
+        $escaped = preg_quote($value, '/');
+        return str_replace('\\*', '.*', $escaped);
     }
 
     private function getRaw($node, $forceType = null)
