@@ -41,6 +41,7 @@ use Composer\Semver\VersionParser;
 use Composer\Semver\Comparator;
 
 static $versionParser = null;
+$isCiMode = false;
 
 function getVersionParser()
 {
@@ -132,10 +133,10 @@ function getComposerJson($source)
         }
         $json = json_decode($content, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            // Provide more specific error information
+            $errorCode = json_last_error();
             $errorMsg = "Invalid JSON in composer.json: " . json_last_error_msg();
             $errorMsg .= "\nFile: {$source['path']}";
-            $errorMsg .= "\nLine: " . (json_last_error() === JSON_ERROR_SYNTAX ? "Syntax error" : "Unknown error");
+            $errorMsg .= "\nError code: {$errorCode}";
             return logError($errorMsg);
         }
         return $json;
@@ -153,7 +154,12 @@ function getComposerJson($source)
         }
         $json = json_decode($content, true);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            return logError("Invalid JSON in remote composer.json: " . json_last_error_msg());
+            $errorCode = json_last_error();
+            return logError(
+                "Invalid JSON in remote composer.json: " . json_last_error_msg() .
+                "\nURL: {$source['url']}" .
+                "\nError code: {$errorCode}"
+            );
         }
         return $json;
     }
@@ -1297,6 +1303,217 @@ function generateIssuesSummary($issuesByPackage, $stableRegressions)
 }
 
 /**
+ * Split existing baseline issues into stability issues and version downgrades.
+ */
+function splitExistingIssuesByType($existingIssues)
+{
+    $stabilityIssues = [];
+    $versionDowngrades = [];
+
+    foreach ($existingIssues as $issue) {
+        if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
+            $versionDowngrades[] = $issue;
+        }
+
+        if (
+            (isset($issue['has_unstable']) && $issue['has_unstable']) ||
+            (isset($issue['has_regression']) && $issue['has_regression'])
+        ) {
+            $stabilityIssues[] = $issue;
+        }
+    }
+
+    return [$stabilityIssues, $versionDowngrades];
+}
+
+/**
+ * Summary
+ */
+function renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory, $ignoreMap)
+{
+    if ($baselineAnalysis['shouldFail']) {
+        echo "\n## 🚨 Current Branch Introduces New Stability Issues\n\n";
+
+        if (! empty($baselineAnalysis['newIssues'])) {
+            echo "### Issues Introduced by Current Branch:\n";
+            foreach ($baselineAnalysis['newIssues'] as $issue) {
+                switch ($issue['type']) {
+                    case 'new_issue':
+                        $stability = $issue['stability'] ?? 'unknown';
+                        $version = $issue['version'] ?? 'unknown';
+                        $reason = isset($issue['reason']) ? " - {$issue['reason']}" : "";
+                        echo "- **{$issue['package']}**: Introduced unstable version `{$version}` ({$stability}){$reason}\n";
+                        break;
+                    case 'worsened_existing':
+                        $baselineStability = $issue['baseline_stability'] ?? 'unknown';
+                        $baselineVersion = $issue['baseline_version'] ?? 'unknown';
+                        $currentStability = $issue['current_stability'] ?? 'unknown';
+                        $currentVersion = $issue['current_version'] ?? 'unknown';
+                        echo "- **{$issue['package']}**: Made existing issue worse: from `{$baselineVersion}` ({$baselineStability}) to `{$currentVersion}` ({$currentStability})\n";
+                        break;
+                    case 'new_version_downgrade':
+                        $fromVersion = $issue['from_version'] ?? 'unknown';
+                        $toVersion = $issue['to_version'] ?? 'unknown';
+                        echo "- **{$issue['package']}**: Introduced version downgrade from `{$fromVersion}` to `{$toVersion}`\n";
+                        break;
+                    case 'version_downgrade':
+                        $fromVersion = $issue['from_version'] ?? 'unknown';
+                        $toVersion = $issue['to_version'] ?? 'unknown';
+                        echo "- **{$issue['package']}**: Existing version downgrade from `{$fromVersion}` to `{$toVersion}`\n";
+                        break;
+                    default:
+                        echo "- **{$issue['package']}**: Unknown issue type: {$issue['type']}\n";
+                        break;
+                }
+            }
+        }
+
+        echo "\n**Pipeline Failed**: Current branch introduces stability issues that must be fixed.\n";
+        return;
+    }
+
+    if (! empty($baselineAnalysis['existingIssues'])) {
+        if ($hasWarnings) {
+            echo "\n## ⚠️ Stability Issues Detected in Baseline\n\n";
+            echo "**Reason**: Baseline contains packages with [WARNING] tags (not mitigated).\n\n";
+        } else {
+            echo "\n## ⚠️ Stability Issues Detected (All Mitigated)\n\n";
+            echo "**Status**: All baseline issues are documented and mitigated.\n\n";
+        }
+
+        [$stabilityIssues, $versionDowngrades] = splitExistingIssuesByType($baselineAnalysis['existingIssues']);
+
+        if (! empty($stabilityIssues)) {
+            echo "### Stability Issues (Existing):\n";
+            foreach ($stabilityIssues as $issue) {
+                echo "- **{$issue['package']}**: ";
+                $issueTypes = [];
+
+                if ($issue['has_regression']) {
+                    $issueTypes[] = "Stability regression detected";
+                }
+                if ($issue['has_unstable']) {
+                    $issueTypes[] = "Unstable versions used";
+                }
+
+                echo implode(" & ", $issueTypes);
+
+                $package = $issue['package'];
+                $history = $packageHistory[$package];
+                $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
+                $hasWarningsForPackage = $packageStatus['hasWarnings'];
+                $allVersionsMitigated = $packageStatus['allVersionsMitigated'];
+
+                if ($hasWarningsForPackage) {
+                    echo " [WARNING]";
+                } elseif ($allVersionsMitigated) {
+                    echo " [MITIGATED]";
+                }
+
+                echo "\n";
+            }
+        }
+
+        if (! empty($versionDowngrades)) {
+            echo "\n### Version Downgrades (Existing):\n";
+            foreach ($versionDowngrades as $issue) {
+                echo "- **{$issue['package']}**: Version downgrade detected";
+
+                $package = $issue['package'];
+                $hasWarningsForPackage = false;
+                $hasUnmitigatedDowngrade = false;
+
+                if (isset($issue['from_tiki']) && isset($issue['to_tiki'])) {
+                    $fromVersion = $issue['from_tiki'];
+                    $toVersion = $issue['to_tiki'];
+
+                    $hasUnmitigatedDowngrade = ! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap);
+                }
+
+                if ($hasWarningsForPackage || $hasUnmitigatedDowngrade) {
+                    echo " [WARNING]";
+                } elseif (isset($issue['is_ignored']) && $issue['is_ignored']) {
+                    echo " [MITIGATED]";
+                }
+
+                echo "\n";
+            }
+        }
+
+        if ($hasWarnings) {
+            echo "\n**Pipeline Passes**: Current branch did not introduce/worsen issues on touched packages.\n";
+            echo "**Action Suggested**:\n";
+            echo "1. Fix unstable package versions in baseline where possible, OR\n";
+            echo "2. Add them to the `stability-ignore` list in `vendor_bundled/composer.json` with:\n";
+            echo "   - `reason`: Why this unstable version is acceptable\n";
+            echo "   - `mitigation`: How you're handling the risk\n";
+            echo "   - `reviewed`: Date of review\n";
+        } else {
+            echo "\n**Pipeline Warning**: All baseline issues are properly mitigated.\n";
+            echo "**Note**: These mitigated issues are documented and tracked for future cleanup.\n";
+        }
+
+        return;
+    }
+
+    echo "\n## ✅ No Composer stability issues detected\n";
+}
+
+/**
+ * Render detailed package-level report.
+ */
+function renderDetailedReport($packageHistory, $versionsToCheck, $ignoreMap = [], $showTitle = true)
+{
+    $reportData = processPackageData($packageHistory, $versionsToCheck);
+    $hasIssues = $reportData['hasIssues'];
+    $issuesByPackage = $reportData['issuesByPackage'];
+    $stableRegressions = $reportData['stableRegressions'];
+
+    if ($showTitle) {
+        echo "\nPackage Stability Analysis:\n==================\n";
+    }
+
+    if (! $hasIssues && empty($stableRegressions)) {
+        echo "\n✅ No stability issues detected across all versions!\n";
+    } else {
+        generateStabilityIssuesReport($issuesByPackage, $versionsToCheck, $ignoreMap);
+        generateStableRegressionsReport($stableRegressions, $versionsToCheck, $ignoreMap);
+        generateIssuesSummary($issuesByPackage, $stableRegressions);
+    }
+
+    global $globalIssuesByPackage, $globalStableRegressions;
+    $globalIssuesByPackage = $issuesByPackage;
+    $globalStableRegressions = $stableRegressions;
+}
+
+/**
+ * Render non-CI executive summary.
+ */
+function renderNonCiExecutiveSummary($packageHistory, $versionsToCheck)
+{
+    $reportData = processPackageData($packageHistory, $versionsToCheck);
+    $issuesByPackage = $reportData['issuesByPackage'];
+    $stableRegressions = $reportData['stableRegressions'];
+
+    $unstableCount = count(array_filter($issuesByPackage, fn($p) => $p['metadata']['has_unstable']));
+    $regressionCount = count(array_filter($issuesByPackage, fn($p) => $p['metadata']['has_regressions']));
+    $downgradeCount = count($stableRegressions);
+    $totalIssuePackages = count(array_unique(array_merge(array_keys($issuesByPackage), array_keys($stableRegressions))));
+
+    echo "\n## Report Summary\n\n";
+
+    if ($totalIssuePackages === 0) {
+        echo "- No stability issues detected across checked versions.\n";
+        return;
+    }
+
+    echo "- Packages with issues: {$totalIssuePackages}\n";
+    echo "- Unstable versions: {$unstableCount}\n";
+    echo "- Stability regressions: {$regressionCount}\n";
+    echo "- Stable version downgrades: {$downgradeCount}\n";
+}
+
+/**
  * Analyze current branch against baseline to determine if it introduces new issues
  * This helps CI pipelines fail only when the current branch is responsible
  */
@@ -1768,145 +1985,9 @@ if ($isCiMode) {
         $hasWarnings = hasUnmitigatedWarnings($baselineAnalysis['existingIssues'], $packageHistory, $ignoreMap);
     }
 
-    if ($baselineAnalysis['shouldFail']) {
-        echo "\n## 🚨 Current Branch Introduces New Stability Issues\n\n";
-
-        if (! empty($baselineAnalysis['newIssues'])) {
-            echo "### Issues Introduced by Current Branch:\n";
-            foreach ($baselineAnalysis['newIssues'] as $issue) {
-                switch ($issue['type']) {
-                    case 'new_issue':
-                        $stability = $issue['stability'] ?? 'unknown';
-                        $version = $issue['version'] ?? 'unknown';
-                        $reason = isset($issue['reason']) ? " - {$issue['reason']}" : "";
-                        echo "- **{$issue['package']}**: Introduced unstable version `{$version}` ({$stability}){$reason}\n";
-                        break;
-                    case 'worsened_existing':
-                        $baselineStability = $issue['baseline_stability'] ?? 'unknown';
-                        $baselineVersion = $issue['baseline_version'] ?? 'unknown';
-                        $currentStability = $issue['current_stability'] ?? 'unknown';
-                        $currentVersion = $issue['current_version'] ?? 'unknown';
-                        echo "- **{$issue['package']}**: Made existing issue worse: from `{$baselineVersion}` ({$baselineStability}) to `{$currentVersion}` ({$currentStability})\n";
-                        break;
-                    case 'new_version_downgrade':
-                        $fromVersion = $issue['from_version'] ?? 'unknown';
-                        $toVersion = $issue['to_version'] ?? 'unknown';
-                        echo "- **{$issue['package']}**: Introduced version downgrade from `{$fromVersion}` to `{$toVersion}`\n";
-                        break;
-                    case 'version_downgrade':
-                        $fromVersion = $issue['from_version'] ?? 'unknown';
-                        $toVersion = $issue['to_version'] ?? 'unknown';
-                        echo "- **{$issue['package']}**: Existing version downgrade from `{$fromVersion}` to `{$toVersion}`\n";
-                        break;
-                    default:
-                        echo "- **{$issue['package']}**: Unknown issue type: {$issue['type']}\n";
-                        break;
-                }
-            }
-        }
-
-        echo "\n**Pipeline Failed**: Current branch introduces stability issues that must be fixed.\n";
-        echo "**Tip**: To see detailed issue information, run `php doc/devtools/check_composer_stability.php` (without --ci) from your project root.\n";
-    } elseif (! empty($baselineAnalysis['existingIssues'])) {
-        if ($hasWarnings) {
-            echo "\n## ⚠️ Stability Issues Detected in Baseline\n\n";
-            echo "**Reason**: Baseline contains packages with [WARNING] tags (not mitigated).\n\n";
-        } else {
-            echo "\n## ⚠️ Stability Issues Detected (All Mitigated)\n\n";
-            echo "**Status**: All baseline issues are documented and mitigated.\n\n";
-        }
-
-        $stabilityIssues = [];
-        $versionDowngrades = [];
-
-        foreach ($baselineAnalysis['existingIssues'] as $issue) {
-            if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
-                $versionDowngrades[] = $issue;
-            }
-
-            if (
-                (isset($issue['has_unstable']) && $issue['has_unstable']) ||
-                (isset($issue['has_regression']) && $issue['has_regression'])
-            ) {
-                $stabilityIssues[] = $issue;
-            }
-        }
-
-        if (! empty($stabilityIssues)) {
-            echo "### Stability Issues (Existing):\n";
-            foreach ($stabilityIssues as $issue) {
-                echo "- **{$issue['package']}**: ";
-                $issueTypes = [];
-
-                if ($issue['has_regression']) {
-                    $issueTypes[] = "Stability regression detected";
-                }
-                if ($issue['has_unstable']) {
-                    $issueTypes[] = "Unstable versions used";
-                }
-
-                echo implode(" & ", $issueTypes);
-
-                $package = $issue['package'];
-                $history = $packageHistory[$package];
-                $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
-                $hasWarningsForPackage = $packageStatus['hasWarnings'];
-                $allVersionsMitigated = $packageStatus['allVersionsMitigated'];
-
-                if ($hasWarningsForPackage) {
-                    echo " [WARNING]";
-                } elseif ($allVersionsMitigated) {
-                    echo " [MITIGATED]";
-                }
-
-                echo "\n";
-            }
-        }
-
-        if (! empty($versionDowngrades)) {
-            echo "\n### Version Downgrades (Existing):\n";
-            foreach ($versionDowngrades as $issue) {
-                echo "- **{$issue['package']}**: Version downgrade detected";
-
-                $package = $issue['package'];
-                $hasWarningsForPackage = false;
-                $hasUnmitigatedDowngrade = false;
-
-                if (isset($issue['from_tiki']) && isset($issue['to_tiki'])) {
-                    $fromVersion = $issue['from_tiki'];
-                    $toVersion = $issue['to_tiki'];
-
-                    $hasUnmitigatedDowngrade = ! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap);
-                }
-
-                if ($hasWarningsForPackage || $hasUnmitigatedDowngrade) {
-                    echo " [WARNING]";
-                } elseif (isset($issue['is_ignored']) && $issue['is_ignored']) {
-                    echo " [MITIGATED]";
-                }
-
-                echo "\n";
-            }
-        }
-
-        if ($hasWarnings) {
-            echo "\n**Pipeline Passes**: Current branch did not introduce/worsen issues on touched packages.\n";
-            echo "**Action Suggested**:\n";
-            echo "1. Fix unstable package versions in baseline where possible, OR\n";
-            echo "2. Add them to the `stability-ignore` list in `vendor_bundled/composer.json` with:\n";
-            echo "   - `reason`: Why this unstable version is acceptable\n";
-            echo "   - `mitigation`: How you're handling the risk\n";
-            echo "   - `reviewed`: Date of review\n\n";
-            echo "**Tip**: Run `php doc/devtools/check_composer_stability.php` (without --ci) for detailed information.\n";
-        } else {
-            echo "\n**Pipeline Warning**: All baseline issues are properly mitigated.\n";
-            echo "**Note**: These mitigated issues are documented and tracked for future cleanup.\n";
-            echo "**Tip**: Run `php doc/devtools/check_composer_stability.php` (without --ci) for detailed information.\n";
-        }
-    } else {
-            echo "\n## ✅ No Composer stability issues detected\n";
-            echo "**Tip**: To see detailed issue information, run `php doc/devtools/check_composer_stability.php` (without --ci) from your project root.\n";
-    }
+    renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory, $ignoreMap);
+    echo "\n\n## Detailed Package Report\n";
+    renderDetailedReport($packageHistory, $versionsToCheck, $ignoreMap, true);
 
     $junitIssues = buildJUnitReportData($baselineAnalysis['existingIssues']);
     $junitReport = generateJUnitReport($junitIssues, []);
@@ -1921,6 +2002,8 @@ if ($isCiMode) {
 
     exit($exitCode);
 } else {
-    generateReport($packageHistory, $versionsToCheck, $ignoreMap);
+    renderNonCiExecutiveSummary($packageHistory, $versionsToCheck);
+    echo "\n## Detailed Package Report\n";
+    renderDetailedReport($packageHistory, $versionsToCheck, $ignoreMap, true);
     exit(empty($globalIssuesByPackage) && empty($globalStableRegressions) ? 0 : 1);
 }
