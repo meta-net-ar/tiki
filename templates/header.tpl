@@ -275,6 +275,17 @@
 {/if}
 
 {if $headerlib} 
+    {* This is wrong (and always has been).
+    For one thing, why would headerlib be or not be there.
+    Second, and more importantly it prevents wikiplugins, block handlers, etc. from adding CSS, requiring workarounds like
+    https://gitlab.com/tikiwiki/tiki/-/merge_requests/10093
+    
+    While this pattern may practically work (if not cleanly) in the footer because smarty processing is done by then, it will never work generally here, we cannot time-travel.
+
+    A different solution needs to be implemented if we want both wikiplugins and block handlers to "just work", and headerlib add_css to "just work".
+
+    The simplest solution is probably to add this in SmartyTiki AFTER processing, using DOMDocument. - benoitg - 2026-04-30
+    *}
     {$headerlib->output_headers()}
 {/if}
 
