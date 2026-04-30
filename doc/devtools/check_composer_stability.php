@@ -7,7 +7,7 @@
 /**
  * Package Stability Checker for Tiki
  *
- * This script analyzes composer.json files across different Tiki versions to detect:
+ * This script analyzes composer.json files across different Tiki branches to detect:
  * 1. Packages with unstable versions (dev, alpha, beta, RC)
  * 2. Actual version downgrades (e.g., from ^1.27 to ~1.8)
  * 3. Stability regressions (e.g., from stable to beta)
@@ -16,9 +16,9 @@
  *   php check_composer_stability.php [tiki-version1] [tiki-version2] ...
  *
  * Examples:
- *   php check_composer_stability.php              # Compare all available versions
+ *   php check_composer_stability.php              # Compare all available branches
  *   php check_composer_stability.php 24.x 27.x    # Compare only 24.x and 27.x
- *   php check_composer_stability.php 24.x 26.x master  # Compare specific versions
+ *   php check_composer_stability.php 24.x 26.x master  # Compare specific branches
  *   php check_composer_stability.php 28.x current # Compare 28.x with current branch
  *   php check_composer_stability.php current 29.x master # Compare current branch with 29.x and master
  *
@@ -272,12 +272,12 @@ function getVersionsToCheck()
         } elseif (in_array($arg, $availableVersions)) {
                 $versionsToCheck[] = $arg;
         } else {
-                logWarning("Ignoring invalid version '$arg'. Available versions are: " . implode(', ', $availableVersions) . " or 'current'");
+                logWarning("Ignoring invalid branch '$arg'. Available branches are: " . implode(', ', $availableVersions) . " or 'current'");
         }
     }
 
     if (empty($versionsToCheck)) {
-        logError("No valid versions specified. Using smart version ordering.");
+        logError("No valid branches specified. Using smart branch ordering.");
         return getSmartVersionOrder();
     }
 
@@ -920,7 +920,7 @@ function printPackageHistory(string $package, array $history, string $icon = '�
         echo " [MITIGATED]";
     }
     echo "\n";
-    echo "   Versions:\n";
+    echo "   Branches:\n";
 
     foreach ($history as $tikiVersion => $constraint) {
         if ($tikiVersion === '_metadata') {
@@ -1043,7 +1043,7 @@ function generateReport($packageHistory, $versionsToCheck, $ignoreMap = [])
 
     if (! $isCiMode) {
         if (! $hasIssues && empty($stableRegressions)) {
-            echo "\n✅ No stability issues detected across all versions!\n";
+            echo "\n✅ No stability issues detected across all checked branches!\n";
             return;
         }
 
@@ -1235,7 +1235,7 @@ function generateStableRegressionsReport($stableRegressions, $versionsToCheck, $
         }
 
         echo "\n{$icon} Package: {$package}{$status}\n";
-        echo "   Versions:\n";
+        echo "   Branches:\n";
 
         // Print individual version details
         printStableRegressionVersions($data, $package, $hasUnmitigatedDowngrade, $ignoreMap);
@@ -1441,7 +1441,7 @@ function renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory
         }
 
         if ($hasWarnings) {
-            echo "\n**Pipeline Passes**: Current branch did not introduce/worsen issues on touched packages.\n";
+            echo "\n**Pipeline Failed**: Baseline contains unmitigated stability warnings.\n";
             echo "**Action Suggested**:\n";
             echo "1. Fix unstable package versions in baseline where possible, OR\n";
             echo "2. Add them to the `stability-ignore` list in `vendor_bundled/composer.json` with:\n";
@@ -1474,7 +1474,7 @@ function renderDetailedReport($packageHistory, $versionsToCheck, $ignoreMap = []
     }
 
     if (! $hasIssues && empty($stableRegressions)) {
-        echo "\n✅ No stability issues detected across all versions!\n";
+        echo "\n✅ No stability issues detected across all checked branches!\n";
     } else {
         generateStabilityIssuesReport($issuesByPackage, $versionsToCheck, $ignoreMap);
         generateStableRegressionsReport($stableRegressions, $versionsToCheck, $ignoreMap);
@@ -1966,12 +1966,12 @@ $versionsToCheck = getVersionsToCheck();
 $currentBranch = getCurrentBranch();
 $targetBranch = getTargetBranch();
 
-echo "Current Tiki Version: {$currentVersion}\n";
+echo "Current Tiki Branch: {$currentVersion}\n";
 if ($currentBranch && $currentBranch !== $targetBranch) {
     echo "Current Branch: {$currentBranch}\n";
     echo "Target Branch: {$targetBranch}\n";
 }
-echo "Comparing Tiki versions: " . implode(', ', $versionsToCheck) . "\n";
+echo "Comparing Tiki branches: " . implode(', ', $versionsToCheck) . "\n";
 
 $packageHistory = buildPackageHistory($versionsToCheck);
 
@@ -1993,12 +1993,7 @@ if ($isCiMode) {
     $junitReport = generateJUnitReport($junitIssues, []);
     file_put_contents('composer-stability-report.xml', $junitReport);
 
-    $exitCode = 0;
-    if ($baselineAnalysis['shouldFail']) {
-        $exitCode = 1;
-    } else {
-        $exitCode = 0;
-    }
+    $exitCode = ($baselineAnalysis['shouldFail'] || $hasWarnings) ? 1 : 0;
 
     exit($exitCode);
 } else {
