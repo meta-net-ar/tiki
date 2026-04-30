@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7179dd0043c9a5e5d0255ebb742bac3f",
+    "content-hash": "91cd45ba6e24f925047ee76e59249c5a",
     "packages": [
         {
             "name": "Sam152/Javascript-Equal-Height-Responsive-Rows",
@@ -2730,16 +2730,16 @@
         },
         {
             "name": "jasig/phpcas",
-            "version": "1.6.1",
+            "version": "1.6.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/apereo/phpCAS.git",
-                "reference": "c129708154852656aabb13d8606cd5b12dbbabac"
+                "reference": "b413d2981947fd4f97079f715e0571d0c8f2a2c5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/apereo/phpCAS/zipball/c129708154852656aabb13d8606cd5b12dbbabac",
-                "reference": "c129708154852656aabb13d8606cd5b12dbbabac",
+                "url": "https://api.github.com/repos/apereo/phpCAS/zipball/b413d2981947fd4f97079f715e0571d0c8f2a2c5",
+                "reference": "b413d2981947fd4f97079f715e0571d0c8f2a2c5",
                 "shasum": ""
             },
             "require": {
@@ -2795,10 +2795,10 @@
             ],
             "support": {
                 "issues": "https://github.com/apereo/phpCAS/issues",
-                "source": "https://github.com/apereo/phpCAS/tree/1.6.1"
+                "source": "https://github.com/apereo/phpCAS/tree/1.6.2"
             },
             "abandoned": "apereo/phpcas",
-            "time": "2023-02-19T19:52:35+00:00"
+            "time": "2026-04-22T09:20:37+00:00"
         },
         {
             "name": "jason-munro/cypht",
@@ -6419,19 +6419,65 @@
             "time": "2019-10-16T11:51:47+00:00"
         },
         {
-            "name": "npm-asset/babel--parser",
-            "version": "v7.29.1",
+            "name": "npm-asset/babel--helper-string-parser",
+            "version": "v7.28.6",
             "source": {
                 "type": "git",
                 "url": "git@github.com:babel/babel.git",
-                "reference": "713d478674cd9f29ff84568f50df43393d6e3068"
+                "reference": "d7f400889567ae18ef9ac41b024b5120f6060e17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/babel/babel/zipball/713d478674cd9f29ff84568f50df43393d6e3068",
-                "reference": "713d478674cd9f29ff84568f50df43393d6e3068"
+                "url": "https://api.github.com/repos/babel/babel/zipball/d7f400889567ae18ef9ac41b024b5120f6060e17",
+                "reference": "d7f400889567ae18ef9ac41b024b5120f6060e17"
             },
             "type": "npm-asset"
+        },
+        {
+            "name": "npm-asset/babel--helper-validator-identifier",
+            "version": "v7.28.6",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:babel/babel.git",
+                "reference": "d7f400889567ae18ef9ac41b024b5120f6060e17"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/babel/babel/zipball/d7f400889567ae18ef9ac41b024b5120f6060e17",
+                "reference": "d7f400889567ae18ef9ac41b024b5120f6060e17"
+            },
+            "type": "npm-asset"
+        },
+        {
+            "name": "npm-asset/babel--parser",
+            "version": "7.28.5",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/@babel/parser/-/parser-7.28.5.tgz"
+            },
+            "require": {
+                "npm-asset/babel--types": ">=7.28.5,<8.0.0"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/babel--types",
+            "version": "7.28.5",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/@babel/types/-/types-7.28.5.tgz"
+            },
+            "require": {
+                "npm-asset/babel--helper-string-parser": ">=7.27.1,<8.0.0",
+                "npm-asset/babel--helper-validator-identifier": ">=7.28.5,<8.0.0"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
         },
         {
             "name": "npm-asset/base64-arraybuffer",
@@ -6655,10 +6701,10 @@
         },
         {
             "name": "npm-asset/dompurify",
-            "version": "2.5.9",
+            "version": "2.5.8",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/dompurify/-/dompurify-2.5.9.tgz"
+                "url": "https://registry.npmjs.org/dompurify/-/dompurify-2.5.8.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -6845,15 +6891,18 @@
         },
         {
             "name": "npm-asset/prefixfree",
-            "version": "1.0.0",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/prefixfree/-/prefixfree-1.0.0.tgz"
+            "version": "v1.0.10",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:LeaVerou/prefixfree.git",
+                "reference": "846904c874a2bf436ff8a9623585f935d7ef4009"
             },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LeaVerou/prefixfree/zipball/846904c874a2bf436ff8a9623585f935d7ef4009",
+                "reference": "846904c874a2bf436ff8a9623585f935d7ef4009"
+            },
+            "type": "npm-asset"
         },
         {
             "name": "npm-asset/prettier",
@@ -7016,10 +7065,10 @@
         },
         {
             "name": "npm-asset/sortablejs",
-            "version": "1.15.7",
+            "version": "1.15.6",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/sortablejs/-/sortablejs-1.15.7.tgz"
+                "url": "https://registry.npmjs.org/sortablejs/-/sortablejs-1.15.6.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -8481,16 +8530,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.53",
+            "version": "2.0.54",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "2d1a664b940b9b8f367185307dc010d11a2790f3"
+                "reference": "a96a835067c39ee7a709329fe70869817da18081"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/2d1a664b940b9b8f367185307dc010d11a2790f3",
-                "reference": "2d1a664b940b9b8f367185307dc010d11a2790f3",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/a96a835067c39ee7a709329fe70869817da18081",
+                "reference": "a96a835067c39ee7a709329fe70869817da18081",
                 "shasum": ""
             },
             "require": {
@@ -8571,7 +8620,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.53"
+                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.54"
             },
             "funding": [
                 {
@@ -8587,7 +8636,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-10T01:30:02+00:00"
+            "time": "2026-04-27T06:59:24+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -9652,23 +9701,23 @@
         },
         {
             "name": "sabre/event",
-            "version": "5.1.7",
+            "version": "5.1.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabre-io/event.git",
-                "reference": "86d57e305c272898ba3c28e9bd3d65d5464587c2"
+                "reference": "1dd5f55421b0092006510264131a4d632d02d2c1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabre-io/event/zipball/86d57e305c272898ba3c28e9bd3d65d5464587c2",
-                "reference": "86d57e305c272898ba3c28e9bd3d65d5464587c2",
+                "url": "https://api.github.com/repos/sabre-io/event/zipball/1dd5f55421b0092006510264131a4d632d02d2c1",
+                "reference": "1dd5f55421b0092006510264131a4d632d02d2c1",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.1 || ^8.0"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "~2.17.1||^3.63",
+                "friendsofphp/php-cs-fixer": "~2.17.1||^3.95",
                 "phpstan/phpstan": "^0.12",
                 "phpunit/phpunit": "^7.5 || ^8.5 || ^9.6"
             },
@@ -9714,7 +9763,7 @@
                 "issues": "https://github.com/sabre-io/event/issues",
                 "source": "https://github.com/fruux/sabre-event"
             },
-            "time": "2024-08-27T11:23:05+00:00"
+            "time": "2026-04-27T04:19:36+00:00"
         },
         {
             "name": "sabre/http",
@@ -11582,7 +11631,7 @@
         },
         {
             "name": "symfony/polyfill-ctype",
-            "version": "v1.36.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-ctype.git",
@@ -11641,7 +11690,7 @@
                 "portable"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.36.0"
+                "source": "https://github.com/symfony/polyfill-ctype/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -11665,7 +11714,7 @@
         },
         {
             "name": "symfony/polyfill-iconv",
-            "version": "v1.36.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-iconv.git",
@@ -11725,7 +11774,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-iconv/tree/v1.36.0"
+                "source": "https://github.com/symfony/polyfill-iconv/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -11749,16 +11798,16 @@
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
-            "version": "v1.36.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-grapheme.git",
-                "reference": "ad1b7b9092976d6c948b8a187cec9faaea9ec1df"
+                "reference": "4864388bfbd3001ce88e234fab652acd91fdc57e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/ad1b7b9092976d6c948b8a187cec9faaea9ec1df",
-                "reference": "ad1b7b9092976d6c948b8a187cec9faaea9ec1df",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/4864388bfbd3001ce88e234fab652acd91fdc57e",
+                "reference": "4864388bfbd3001ce88e234fab652acd91fdc57e",
                 "shasum": ""
             },
             "require": {
@@ -11807,7 +11856,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.36.0"
+                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -11827,11 +11876,11 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-10T16:19:22+00:00"
+            "time": "2026-04-26T13:13:48+00:00"
         },
         {
             "name": "symfony/polyfill-intl-icu",
-            "version": "v1.36.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-icu.git",
@@ -11895,7 +11944,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-icu/tree/v1.36.0"
+                "source": "https://github.com/symfony/polyfill-intl-icu/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -11919,7 +11968,7 @@
         },
         {
             "name": "symfony/polyfill-intl-idn",
-            "version": "v1.36.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-idn.git",
@@ -11982,7 +12031,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.36.0"
+                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -12006,7 +12055,7 @@
         },
         {
             "name": "symfony/polyfill-intl-normalizer",
-            "version": "v1.36.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-normalizer.git",
@@ -12067,7 +12116,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.36.0"
+                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -12091,7 +12140,7 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.36.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
@@ -12152,7 +12201,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.36.0"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -12309,7 +12358,7 @@
         },
         {
             "name": "symfony/polyfill-php73",
-            "version": "v1.36.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php73.git",
@@ -12365,7 +12414,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php73/tree/v1.36.0"
+                "source": "https://github.com/symfony/polyfill-php73/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -12389,7 +12438,7 @@
         },
         {
             "name": "symfony/polyfill-php80",
-            "version": "v1.36.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php80.git",
@@ -12449,7 +12498,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php80/tree/v1.36.0"
+                "source": "https://github.com/symfony/polyfill-php80/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -12473,7 +12522,7 @@
         },
         {
             "name": "symfony/polyfill-php81",
-            "version": "v1.36.0",
+            "version": "v1.37.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-php81.git",
@@ -12529,7 +12578,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-php81/tree/v1.36.0"
+                "source": "https://github.com/symfony/polyfill-php81/tree/v1.37.0"
             },
             "funding": [
                 {
@@ -16109,7 +16158,7 @@
         "ext-iconv": "*",
         "ext-zip": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "ext-ldap": "0",
         "ext-soap": "0",
