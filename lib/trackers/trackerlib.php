@@ -2062,18 +2062,10 @@ class TrackerLib extends TikiLib
             $status = $status ? $status : $oldStatus;
             $fil['status'] = $status;
             $old_values['status'] = $oldStatus;
+            $fieldsModified = [];
 
             if ($status != $oldStatus) {
                 $this->change_status([$itemId], $status);
-            } else {
-                $this->update_items(
-                    [$itemId],
-                    [
-                        'lastModif' => $tikilib->now,
-                        'lastModifBy' => $user,
-                    ],
-                    false
-                );
             }
 
             $version = $this->last_log_version($itemId) + 1;
@@ -2180,6 +2172,7 @@ class TrackerLib extends TikiLib
                     if ($old_value != $value) {
                         // Save old value
                         $this->log($version, $currentItemId, $array['fieldId'], $old_value);
+                        $fieldsModified[$array['fieldId']] = $array;
                     }
                     $fil[$fieldId] = $value;
                 }
@@ -2196,6 +2189,7 @@ class TrackerLib extends TikiLib
                     if ($old_value != $value) {
                         // Save old value
                         $this->log($version, $currentItemId, $array['fieldId'], $old_value);
+                        $fieldsModified[$array['fieldId']] = $array;
                     }
                     $fil[$fieldId] = $value;
                 }
@@ -2389,6 +2383,23 @@ class TrackerLib extends TikiLib
             'aggregate' => sha1("trackeritem/$currentItemId"),
             'notify_watchers' => $notify_watchers,
         ];
+
+        if (! empty($itemId) && ! empty($fieldsModified)) {
+            $rowUpdatedColumns = [];
+            $definition = \Tracker_Definition::get($trackerId);
+            foreach ($fieldsModified as $fieldId => $array) {
+                $trackerField = $definition->getFieldInstance($fieldId);
+                if ($trackerField) {
+                    $updatedColumns = $trackerField->handleTrackerItemSave($item_info);
+                    $item_info = array_merge($item_info, $updatedColumns);
+                    $rowUpdatedColumns = array_merge($rowUpdatedColumns, $updatedColumns);
+                }
+            }
+
+            if (! empty($rowUpdatedColumns)) {
+                $this->update_items([$itemId], $rowUpdatedColumns, false);
+            }
+        }
 
         // this needs to trigger no matter of the size as trackeritem categorization depends on this and other event types as well
         TikiLib::events()->trigger(
@@ -3543,7 +3554,7 @@ class TrackerLib extends TikiLib
      * @param int $fieldId  0 has special meaning:  insert a new field
      * @return int the field id inserted or operated on.
      */
-    public function replace_tracker_field($trackerId, int $fieldId, $name, $type, $isMain, $isSearchable, $isTblVisible, $isPublic, $isHidden, $isMandatory, $position, $options, $description = '', $isMultilingual = '', $itemChoices = null, $errorMsg = '', $visibleBy = null, $editableBy = null, $descriptionIsParsed = 'n', $validation = '', $validationParam = '', $validationMessage = '', $permName = null, $rules = null, $encryptionKeyId = null, $excludeFromNotification = false, $visibleInViewMode = 'y', $visibleInEditMode = 'y', $visibleInHistoryMode = 'y'): int
+    public function replace_tracker_field($trackerId, int $fieldId, $name, $type, $isMain, $isSearchable, $isTblVisible, $isPublic, $isHidden, $isMandatory, $position, $options, $description = '', $isMultilingual = '', $itemChoices = null, $errorMsg = '', $visibleBy = null, $editableBy = null, $descriptionIsParsed = 'n', $validation = '', $validationParam = '', $validationMessage = '', $permName = null, $rules = null, $encryptionKeyId = null, $excludeFromNotification = false, $visibleInViewMode = 'y', $visibleInEditMode = 'y', $visibleInHistoryMode = 'y', $excludeFromTrackerItemLastModificationDate = 'n'): int
     {
         global $prefs;
         $fieldId = (int) $fieldId;
@@ -3607,6 +3618,7 @@ class TrackerLib extends TikiLib
             'rules' => $rules,
             'encryptionKeyId' => $encryptionKeyId,
             'excludeFromNotification' => $excludeFromNotification,
+            'excludeFromTrackerItemLastModificationDate' => $excludeFromTrackerItemLastModificationDate,
             'visibleInViewMode' => $visibleInViewMode ?? 'y',
             'visibleInEditMode' => $visibleInEditMode ?? 'y',
             'visibleInHistoryMode' => $visibleInHistoryMode ?? 'y'
@@ -4531,7 +4543,8 @@ class TrackerLib extends TikiLib
                 $field['excludeFromNotification'],
                 $field['visibleInViewMode'],
                 $field['visibleInEditMode'],
-                $field['visibleInHistoryMode']
+                $field['visibleInHistoryMode'],
+                $field['excludeFromTrackerItemLastModificationDate']
             );
             if ($options['defaultOrderKey'] == $field['fieldId']) {
                 $options['defaultOrderKey'] = $newFieldId;
