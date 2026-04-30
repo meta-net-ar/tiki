@@ -241,7 +241,7 @@
         "nyholm/psr7-server": "~1.1",
         "onelogin/php-saml": "~4.3",
         "openannotation/annotator": ">=1.2.10",
-        "paragonie/sodium_compat": "~2.4",
+        "paragonie/sodium_compat": "~2.5",
         "pclzip/pclzip": "~2.8",
         "pear/net_socket": "~1.2",
         "pear/pear": "~1.10",
