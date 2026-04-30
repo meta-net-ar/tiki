@@ -27,6 +27,8 @@ $inputConfiguration = [[
         'watch' => 'alpha',         //post  templates/comment/post.tpl:58
         'confirmForm' => 'alpha',   // \Services_Utilities::isConfirmPost
         'itemId' => 'int',          // often used in \ParserLib::parse_wiki_argvariable
+        'data' => 'none',           // post JSON payloads (structure save, menu save, etc.)
+        'params' => 'none',         // post JSON payloads (structure save, etc.)
     ],
 ]];
 

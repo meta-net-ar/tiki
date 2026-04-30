@@ -536,6 +536,31 @@ if (! $pageRenderer->canView) {
     $access->display_error($page, tra('You do not have permission to view this page.'), '401');
 }
 
+$smarty->assign('structuresToAdd', []);
+$smarty->assign('showAddToStructureBar', false);
+if (
+    $prefs['feature_wiki_structure'] === 'y'
+    && empty($page_ref_id)
+    && strtolower($page) !== 'sandbox'
+    && $tikilib->page_exists($page)
+    && $tiki_p_edit_structures === 'y'
+) {
+    $pageStructureNames = array_fill_keys(array_column($structs_with_perm, 'pageName'), true);
+    $structuresToAdd = [];
+    $structuresList = $structlib->list_structures(0, -1, 'pageName_asc');
+    foreach ($structuresList['data'] ?? [] as $struct) {
+        if (($struct['edit_structure'] ?? 'n') !== 'y') {
+            continue;
+        }
+        if (isset($pageStructureNames[$struct['pageName']])) {
+            continue;
+        }
+        $structuresToAdd[] = $struct;
+    }
+    $smarty->assign('structuresToAdd', $structuresToAdd);
+    $smarty->assign('showAddToStructureBar', count($structuresToAdd) > 0);
+}
+
 // Convert page to structure
 if (isset($_REQUEST['convertstructure']) && isset($structs) && count($structs) == 0) {
     $page_ref_id = $structlib->s_create_page(0, null, $page);

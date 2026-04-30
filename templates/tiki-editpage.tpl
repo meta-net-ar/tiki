@@ -334,6 +334,61 @@
                         {/if}
                     {/tab}
                 {/if}
+                {if $prefs.feature_wiki_structure eq 'y' and !empty($showStructuresTab)}
+                    {tab name="{tr}Structures{/tr}" key="structures"}
+                        {if $pageIsNew and $creationStructureInfo}
+                            {remarksbox type="note" title="{tr}Note{/tr}"}
+                                {tr _0=$creationStructureInfo.pageName}This page will be added to structure %0 when you save.{/tr}
+                            {/remarksbox}
+                        {elseif $pageIsNew}
+                            {remarksbox type="note" title="{tr}Note{/tr}"}
+                                {tr}Save this page first, then use the links below to add it to a structure.{/tr}
+                            {/remarksbox}
+                        {/if}
+                        {if $showstructs|@count gt 0}
+                            <h4>{tr}Member of{/tr}</h4>
+                            <ul class="list-unstyled">
+                                {foreach from=$showstructs item=struct_info}
+                                    <li class="mb-2">
+                                        {icon name="structure"}
+                                        {if !empty($struct_info.page_alias)}{$struct_info.page_alias|escape}{else}{$struct_info.pageName|pagename}{/if}
+                                        <span class="ms-2">
+                                            {self_link _script="tiki-edit_structure.php" page_ref_id=$struct_info.page_ref_id _class="btn btn-link btn-sm p-0" _title="{tr}Manage structure{/tr}"}
+                                                {icon name="edit"} {tr}Manage{/tr}
+                                            {/self_link}
+                                            {self_link page=$page structure=$struct_info.pageName page_ref_id=$struct_info.req_page_ref_id _class="btn btn-link btn-sm p-0" _title="{tr}View in structure{/tr}"}
+                                                {icon name="view"} {tr}View{/tr}
+                                            {/self_link}
+                                        </span>
+                                    </li>
+                                {/foreach}
+                            </ul>
+                        {/if}
+                        {if $tiki_p_edit_structures eq 'y' and $structuresToAdd|@count gt 0}
+                            {if $showstructs|@count gt 0}<hr>{/if}
+                            <h4>{tr}Add to a structure{/tr}</h4>
+                            {remarksbox type="tip" title="{tr}Quick help{/tr}"}
+                                {tr}Open a structure below to drag this page into the tree, or use "Add Page" on any structure page.{/tr}
+                            {/remarksbox}
+                            <ul class="list-unstyled">
+                                {foreach from=$structuresToAdd item=struct_info}
+                                    <li class="mb-2">
+                                        {icon name="structure"}
+                                        {if !empty($struct_info.page_alias)}{$struct_info.page_alias|escape}{else}{$struct_info.pageName|pagename}{/if}
+                                        {self_link _script="tiki-edit_structure.php" page_ref_id=$struct_info.page_ref_id find_objects=$page search_objects=Filter _class="btn btn-primary btn-sm ms-2" _title="{tr}Add this page to the structure{/tr}" _ajax="n"}
+                                            {icon name="add"} {tr}Add to structure{/tr}
+                                        {/self_link}
+                                    </li>
+                                {/foreach}
+                            </ul>
+                        {elseif $tiki_p_edit_structures eq 'y' and $showstructs|@count eq 0}
+                            {remarksbox type="note" title="{tr}Note{/tr}"}
+                                {tr}You do not have permission to edit any structure, or no structures exist yet.{/tr}
+                                <a href="tiki-admin_structures.php" class="alert-link">{tr}Manage structures{/tr}</a>
+                            {/remarksbox}
+                        {/if}
+                    {/tab}
+                {/if}
                 {if $prefs.wiki_freetags_edit_position eq 'freetagstab'}
                     {if $prefs.feature_freetags eq 'y' and $tiki_p_freetags_tag eq 'y'}
                         {tab name="{tr}Tags{/tr}"}
@@ -357,7 +412,11 @@
                                     {icon name="content-template"} {tr}Content Templates{/tr}
                                 </a>
                             {/if}
-                            {if isset($tiki_p_edit_structures) and $tiki_p_edit_structures eq 'y'}
+                            {if $prefs.feature_wiki_structure eq 'y' and !empty($showStructuresTab)}
+                                <a href="#contenttabs_editpage-structures" class="btn btn-link" data-bs-toggle="tab" role="tab" title="{tr}Open the Structures tab for this page{/tr}">
+                                    {icon name="structure"} {tr}Structures{/tr}
+                                </a>
+                            {elseif isset($tiki_p_edit_structures) and $tiki_p_edit_structures eq 'y'}
                                 <a href="tiki-admin_structures.php" class="btn btn-link" title="{tr}Leave page and go to....{/tr}">
                                     {icon name="structure"} {tr}Structures{/tr}
                                 </a>
@@ -376,9 +435,8 @@
                         {assign var="copyright" value=$page|lower neq 'sandbox' && $prefs.feature_copyright eq 'y' && $prefs.wiki_feature_copyrights eq 'y'}{* for Copyright *}
                         {assign var="geolocation" value=$prefs.geo_locate_wiki eq 'y'}{* for Geolocation *}
                         {assign var="myfootnotes" value=$prefs.feature_wiki_footnotes eq 'y' && $user}{* for My Footnotes *}
-                        {assign var="structures" value=$page|lower neq 'sandbox' && $prefs.feature_wiki_structure eq 'y' && $showstructs|@count gt 0}{* for Structures *}
 
-                        {if  $attachments || $authors || $biblioSection || $copyright || $geolocation || $myfootnotes || $structures}
+                        {if  $attachments || $authors || $biblioSection || $copyright || $geolocation || $myfootnotes}
                             <h3>{tr}Editing : {/tr}</h3>
                             {if $attachments}
                                 <input type="hidden" name="MAX_FILE_SIZE" value="1000000000">
@@ -474,18 +532,6 @@
                                         </div>
                                     </div>
                                 {/if}
-                            {/if}
-                            {if $structures}
-                                <div class="mb-3 row">
-                                    <label class="col-md-4 col-form-label">{tr}Structures{/tr}</label>
-                                    <div class="col-md-8" id="showstructs">
-                                        <ul>
-                                            {foreach from=$showstructs item=page_info}
-                                                <li>{$page_info.pageName}{if !empty(${$page_info.outputType}.page_alias)}({$page_info.page_alias}){/if}</li>
-                                            {/foreach}
-                                        </ul>
-                                    </div>
-                                </div>
                             {/if}
                             <hr>
                         {/if}
