@@ -26,7 +26,7 @@ include_once("tiki-setup.php");
 
 
 //Enable Two-Factor Auth Input
-$twoFactorForm = 'n';
+$twoFactorForm = $prefs['twoFactorAuth'];
 if (isset($_REQUEST["twoFactorForm"])) {
     $twoFactorForm = 'y';
 }

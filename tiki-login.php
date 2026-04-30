@@ -55,7 +55,7 @@ if (! empty($_REQUEST['code']) && $prefs['auth_method'] == 'openid_connect' && T
 } elseif (isset($_REQUEST['cas']) && $_REQUEST['cas'] == 'y' && $prefs['auth_method'] == 'cas') {
     $login_url_params = '?cas=y';
     $_REQUEST['user'] = '';
-} elseif ($prefs['twoFactorAuth'] === 'n' && (! isset($_REQUEST['user']) or isset($_REQUEST['username'])) && empty($_REQUEST['su'])) {
+} elseif ((! isset($_REQUEST['user']) or isset($_REQUEST['username'])) && empty($_REQUEST['su']) && empty($_SESSION['tiki_creds_username'])) {
     if (! $https_mode && $prefs['https_login'] == 'required') {
         header('Location: ' . $base_url_https . 'tiki-login_scr.php');
     } else {
@@ -155,8 +155,8 @@ if ($prefs['feature_intertiki'] == 'y' && $prefs['feature_intertiki_server'] != 
 }
 
 //Enable Two-Factor Auth Input
-$twoFactorForm = 'n';
-if (isset($_REQUEST["$twoFactorForm"])) {
+$twoFactorForm = $prefs['twoFactorAuth'];
+if (isset($_REQUEST["twoFactorForm"])) {
     $twoFactorForm = 'y';
 }
 $smarty->assign('twoFactorForm', $twoFactorForm);
@@ -371,7 +371,10 @@ if (
                 $user = $requestedUser;
             }
         } catch (TwoFactorAuthException $e) {
-            Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_409);
+            Feedback::error($e->getMessage());
+            unset($_SESSION['tiki_creds_username'], $_SESSION['tiki_creds_password']);
+            header('Location: ' . $base_url . 'tiki-login_scr.php');
+            exit;
         }
     }
 }
