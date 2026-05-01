@@ -206,7 +206,7 @@ abstract class ApiBaseWikiTest extends ApiTestCase
     private function getCreateUpdatePageSchema(): array
     {
         return [
-            'info' => 'array',
+            'info' => $this->getPageInfoSchema(),
         ];
     }
 
@@ -220,7 +220,10 @@ abstract class ApiBaseWikiTest extends ApiTestCase
                 'action' => [
                     [
                         'type' => 'string',
-                        'mes'  => 'string',
+                        'icon' => 'string',
+                        'title' => 'string',
+                        'mes'  => 'array',
+                        'items' => 'array',
                     ]
                 ]
             ]
