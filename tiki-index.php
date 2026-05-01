@@ -795,7 +795,7 @@ if (! empty($prefs['wiki_page_actions_groups'])) {
 $attributelib = TikiLib::lib('attribute');
 $schema = $attributelib->get_attribute('wiki page', $page, "tiki.schema.markup");
 
-if(isset($schema)){
+if (isset($schema)) {
     $schema = json_decode($schema)->schema ?? null;
     $headerlib = TikiLib::lib('header');
     $headerlib->add_rawhtml($schema ? '<script type="application/ld+json">' . json_encode($schema, JSON_PRETTY_PRINT) . '</script>' : '');

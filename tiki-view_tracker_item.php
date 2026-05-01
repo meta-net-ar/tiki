@@ -725,7 +725,7 @@ $schema = $tracker_info["schemaOrgMarkup"]; //the json data
 // TODO : make switch to build schema based on data, check empty for date & author then fill with $info (contains createdBy, createdByReal, created, lastModif, lastModifBy, lastModifByReal and all fieldId=>value) based on config (tracker_field) or static text (static_text
 // Then repeat the same logic to wiki page now)
 
-if(isset($schema)){
+if (isset($schema)) {
     foreach ($fieldDefinitions as $fieldDefinition) {
         $fid = $fieldDefinition["fieldId"];
         $permName = $fieldDefinition["permName"]; //used as id in the placeholder of the json data, ex: {{trackerfieldPermName}}

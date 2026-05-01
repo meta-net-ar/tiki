@@ -1311,7 +1311,7 @@ if (
             // Save Schema.org attributes
             // Note: Attribute names must be lowercase with dots and max 25 chars per Tiki standards
             $attributelib = TikiLib::lib('attribute');
-            if(isset($_REQUEST['schemaOrgMarkup'])) {
+            if (isset($_REQUEST['schemaOrgMarkup'])) {
                 $attributelib->set_attribute('wiki page', $page, 'tiki.schema.markup', $_REQUEST['schemaOrgMarkup']);
             } else {
                 // Delete attribute if field is not set (user may have cleared it)
