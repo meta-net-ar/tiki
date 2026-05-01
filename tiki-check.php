@@ -5099,6 +5099,7 @@ if ($standalone && ! $nagios) {
     $smarty->assign('dashboard_debug_enabled', $dashboard_debug_enabled);
     $smarty->assign('dashboard_debug_sources', $dashboard_metrics['debug_sources']);
     $smarty->assign('dashboard_debug_ignored', $dashboard_metrics['ignored']);
+    $smarty->assign('tooltip_html', build_dashboard_tooltip_html($dashboard_metrics['debug_sources']));
 
     $source_breakdown = $dashboard_metrics['source_breakdown'];
 
@@ -6034,6 +6035,64 @@ function compute_dashboard_metrics($sources)
 }
 
 /**
+ * Human-readable source labels for dashboard tooltip.
+ */
+function get_dashboard_source_label($source)
+{
+    $labels = array(
+        'core' => tra('Core checks'),
+        'server_requirements' => tra('Server compatibility'),
+        'available_tiki_versions' => tra('Supported Tiki versions'),
+        'composer_requirements' => tra('Composer requirements'),
+        'realtime' => tra('Realtime (static checks)'),
+        'file_gallery_indexing' => tra('File Gallery Search Indexing'),
+        'trim_server_instance' => tra('Server instance'),
+        'trim_client_instance' => tra('Client instance'),
+        'packages' => tra('Packages'),
+        'ocr' => tra('OCR'),
+    );
+
+    return $labels[$source] ?? $source;
+}
+
+/**
+ * Build per-status tooltip HTML by source contributions.
+ */
+function build_dashboard_tooltip_html($debug_sources)
+{
+    $status_map = array(
+        'critical' => array('label' => tra('Critical Breakdown by Source'), 'key' => 'critical'),
+        'warning' => array('label' => tra('Warning Breakdown by Source'), 'key' => 'warning'),
+        'info' => array('label' => tra('Information Breakdown by Source'), 'key' => 'info'),
+        'good' => array('label' => tra('Good Breakdown by Source'), 'key' => 'good'),
+    );
+
+    $tooltips = array();
+    foreach ($status_map as $status => $meta) {
+        $lines = array();
+        $total = 0;
+
+        foreach ($debug_sources as $source => $counts) {
+            $count = isset($counts[$meta['key']]) ? (int) $counts[$meta['key']] : 0;
+            if ($count <= 0) {
+                continue;
+            }
+            $total += $count;
+            $lines[] = '&bull; ' . get_dashboard_source_label($source) . ': ' . $count;
+        }
+
+        if (empty($lines)) {
+            $lines[] = '&bull; ' . tra('No counted items');
+        }
+        $lines[] = '&bull; ' . tra('Total') . ': ' . $total;
+
+        $tooltips[$status] = '<strong>' . $meta['label'] . '</strong><br>' . implode('<br>', $lines);
+    }
+
+    return $tooltips;
+}
+
+/**
  * Resolve which dashboard section an item belongs to.
  */
 function resolve_dashboard_section(
@@ -6336,25 +6395,5 @@ $source_breakdown = $dashboard_metrics['source_breakdown'];
 
 $smarty->assign('fitness_counts', $fitness_counts);
 
-function formatTooltipHtml($type, $breakdown)
-{
-    $title = ucfirst($type) . ' Breakdown:';
-    $main = $breakdown['main'] ?? 0;
-    $packages = $breakdown['packages'] ?? 0;
-    $ocr = $breakdown['ocr'] ?? 0;
-
-    return "<strong>{$title}</strong><br>" .
-           "• Main Checks: {$main}<br>" .
-           "• Packages: {$packages}<br>" .
-           "• OCR: {$ocr}";
-}
-
-$tooltip_html = array(
-    'critical' => formatTooltipHtml('critical', $source_breakdown['critical']),
-    'warning' => formatTooltipHtml('warning', $source_breakdown['warning']),
-    'info' => formatTooltipHtml('info', $source_breakdown['info']),
-    'good' => formatTooltipHtml('good', $source_breakdown['good'])
-);
-
 $smarty->assign('source_breakdown', $source_breakdown);
-$smarty->assign('tooltip_html', $tooltip_html);
+$smarty->assign('tooltip_html', build_dashboard_tooltip_html($dashboard_metrics['debug_sources']));
