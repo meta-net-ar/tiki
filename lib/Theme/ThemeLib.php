@@ -83,7 +83,7 @@ class ThemeLib extends TikiLib
         }
 
         //consider Admin Theme
-        if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty($section))) {        // use admin theme if set
+        if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))) {        // use admin theme if set
             $theme_active = $prefs['theme_admin'];
             $theme_option_active = $prefs['theme_option_admin'] ?? '';                                // and its option
         }
@@ -94,6 +94,18 @@ class ThemeLib extends TikiLib
             list($theme_active, $theme_option_active) = self::extractThemeAndOptionFromString($_SESSION['try_theme']);
         }
         return [$theme_active, $theme_option_active];
+    }
+
+    /**
+     * Update Smarty template variables with the currently active theme
+     * Called when section changes to ensure theme is correctly applied
+     */
+    public static function applyCurrentTheme(): void
+    {
+        list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
+        $smarty = TikiLib::lib('smarty');
+        $smarty->assign('theme', $theme_active);
+        $smarty->assign('theme_option', $theme_option_active);
     }
     /**
      * A utility method for \Tiki\Smarty\SmartyTiki to convert paths like

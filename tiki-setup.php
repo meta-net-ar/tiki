@@ -214,9 +214,10 @@ Language::setSectionLanguage();
 
 // Register callback to update language when section changes
 // This ensures that when admin files call Sections::setCurrentSection(),
-// the language is automatically updated (e.g., admin section gets admin language)
+// the language and the theme are automatically updated (e.g., admin section gets admin language)
 Sections::onSectionChange(function ($section) {
     Language::setSectionLanguage();
+    TikiLib::lib('theme')->applyCurrentTheme();
 });
 
 Sections::onSectionChange(function ($section) use ($prefs) {
