@@ -103,7 +103,7 @@ function filter_out_sefurl($tpl_output, $type = null, $title = '', $with_next = 
         }
     }
     if ($type == 'tracker item' || $type == 'trackeritem') {
-        if (preg_match('/itemId=([0-9]+)/', $tpl_output, $matches)) {
+        if (preg_match('/item(?:Id=)?([0-9]+)/', $tpl_output, $matches)) {
             $trklib = TikiLib::lib('trk');
 
             if ($prefs['feature_sefurl_title_trackeritem'] == 'y') {
