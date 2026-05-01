@@ -1008,6 +1008,7 @@ CREATE TABLE `tiki_files` (
   `comment` varchar(200) default NULL,
   `archiveId` int(14) default 0,
   `deleteAfter` int(14) default NULL,
+  `deleteAfterDuration` int(14) default NULL,
   `ocr_state` TINYINT(1) default NULL,
   `ocr_lang` VARCHAR(255) default NULL,
   `ocr_data` MEDIUMTEXT default NULL,

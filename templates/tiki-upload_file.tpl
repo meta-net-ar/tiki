@@ -223,7 +223,13 @@
                     </label>
                 </div>
             </div>
-
+            <div class="col-sm-12">
+                <div class="form-check">
+                    <label for="deletionday" class="form-check-label">
+                        <input class="form-check-input" type="checkbox" id="deletionday" />{tr}Set deletion time (in days){/tr}
+                    </label>
+                </div>
+            </div>
             <div id="customsize" style="display:none">
                 <div class="mb-3 row">
                     <label for="image_max_size_x" class="col-sm-4 text-end">{tr}Maximum width of images{/tr}</label>
@@ -417,6 +423,7 @@
                 {/if}
                 <input type="hidden" name="galleryId[]" value="{$galleryId}">
             {/if}
+            <div id="contain-the-day-until-deletion"></div>
             {if $prefs.elementplus_upload eq 'y'}
                 <div class="mb-3 row">
                     <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{if isset($gal_info.image_max_size_x)}{$gal_info.image_max_size_x}{/if}" max-height="{if isset($gal_info.image_max_size_y)}{$gal_info.image_max_size_y}{/if}" />
@@ -671,4 +678,35 @@ $("#galleryId").on("change", function(){
         }
     });
 });
+
+    inputDaysUntilDeletion = $('<input>')
+            .addClass('day form-control')
+            .attr('type', 'number')
+            .attr('step', '0.0001')
+            .attr('name', 'daysuntildeletion')
+            .attr('placeholder', tr('Set deletion time (in days)'))
+            .hide()
+            .on('input', function() {
+                // Get the current value of the input
+                var value = $(this).val();
+
+                // Allow only valid float numbers
+                if (!/^[-+]?[0-9]*\.?[0-9]*$/.test(value)) {
+                    // If the value is not a valid float, make the border be red
+                    $(this).addClass('text-danger');
+                } else {
+                    $(this).removeClass('text-danger');
+                }
+            });
+
+
+    $('#deletionday').on('change', function() {
+        if ($(this).is(':checked')) {
+            $("input.day").show();
+        } else {
+            $("input.day").hide();
+        }
+    });
+
+    $('#contain-the-day-until-deletion').append(inputDaysUntilDeletion.clone(true));
 {/jq}

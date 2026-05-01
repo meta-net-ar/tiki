@@ -226,7 +226,8 @@ if ($isUpload) {
             'image_max_size_x',
             'image_max_size_y',
             'ocr_state',
-            'ocr_lang'
+            'ocr_lang',
+            'daysuntildeletion'
         ];
 
         $uploadParams = [

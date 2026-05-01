@@ -4,6 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 class Services_File_Controller
 {
     private $defaultGalleryId = 1;
@@ -114,6 +115,7 @@ class Services_File_Controller
         }
         $title = $input->title->text();
         $description = $input->description->text() ?: '';
+        $deleteAfterDuration = $input->daysuntildeletion->text();
         $directoryPattern = $input->directoryPattern->text();
         $categlib = TikiLib::lib('categ');
         $categories = $fileId ? $categlib->get_object_categories('file', $fileId) : [];
@@ -125,6 +127,13 @@ class Services_File_Controller
         $perms = Perms::get('file gallery', $gal_info['galleryId']);
         if (! $perms->upload_files) {
             throw new Services_Exception_Denied();
+        }
+
+        if (! empty((float) $deleteAfterDuration)) {
+            $deleteAfterDuration = $deleteAfterDuration * 3600 * 24;
+            $this->eventOfAutomaticDeletion();
+        } else {
+            $deleteAfterDuration = null;
         }
 
         $fileInfo = ($fileId) ? TikiLib::lib('filegal')->get_file_info($fileId) : false;
@@ -147,7 +156,6 @@ class Services_File_Controller
                 $name = $file->name->text();
                 $size = $file->size->int();
                 $type = $file->type->text();
-
                 $data = file_get_contents($_FILES['data']['tmp_name']);
             } else {
                 $message = $this->getFileUploadErrorMessage($_FILES['data']['error']);
@@ -196,7 +204,7 @@ class Services_File_Controller
                 $title = $title ?: $fileInfo['name'];
                 $this->utilities->updateFile($gal_info, $name, $size, $type, $data, $fileId, $asuser, $title, $description);
             } else {
-                $fileId = $this->utilities->uploadFile($gal_info, $name, $size, $type, $data, $asuser, $image_x, $image_y, $description, '', $title, $directoryPattern);
+                $fileId = $this->utilities->uploadFile($gal_info, $name, $size, $type, $data, $asuser, $image_x, $image_y, $description, '', $title, $directoryPattern, $deleteAfterDuration);
             }
         } else {
             $fileId = false;
@@ -1019,5 +1027,43 @@ class Services_File_Controller
         }
 
         return $message;
+    }
+
+    private function eventOfAutomaticDeletion()
+    {
+        global $tikilib;
+        // Check if the event exists
+        $checkEventSql = "
+        SELECT COUNT(*) 
+        FROM INFORMATION_SCHEMA.EVENTS 
+        WHERE EVENT_SCHEMA = DATABASE() 
+        AND EVENT_NAME = 'my_daily_event'
+        ";
+        $result = \TikiDb::get()->query($checkEventSql);
+        if ($result) {
+            $row = $result->fetchRow();
+            $eventExists = $row[0];
+            if ($eventExists) {
+                // "Event 'my_daily_event' already exists";
+            } else {
+                // Set the event scheduler
+                $sql1 = "SET GLOBAL event_scheduler = ON";
+                \TikiDb::get()->query($sql1);
+                // Create the event
+                $sql2 = "
+                    CREATE EVENT IF NOT EXISTS my_daily_event
+                    ON SCHEDULE EVERY 1 DAY
+                    STARTS '2023-01-01 00:00:00'
+                    DO
+                    BEGIN
+                        DELETE FROM tiki_files 
+                        WHERE deleteAfterDuration IS NOT NULL 
+                        AND UNIX_TIMESTAMP(NOW()) > (deleteAfterDuration + created);
+                    END;
+                ";
+
+                \TikiDb::get()->query($sql2);
+            }
+        }
     }
 }
