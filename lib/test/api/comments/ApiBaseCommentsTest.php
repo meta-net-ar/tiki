@@ -92,62 +92,76 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         // Wiki page
         $wikiPage = 'API_Test_WikiPage_Comments';
         static::createWikiPage($wikiPage);
+        $wikiPageThreadId = static::createComment('wiki page', $wikiPage, 'Default wiki comment', 'Test comment on wiki page');
+        static::createComment('wiki page', $wikiPage, 'Reply to default comment', 'This is a reply', $wikiPageThreadId); // add reply to the default comment to test threading in the response
         static::$defaultComments['wiki page'] = [
             'objectId' => $wikiPage,
-            'threadId' => static::createComment('wiki page', $wikiPage, 'Default wiki comment', 'Test comment on wiki page')
+            'threadId' => $wikiPageThreadId
         ];
 
         // File gallery
         $galleryId = static::createFileGallery('API_Test_Gallery_Comments');
         if ($galleryId) {
+            $galleryThreadId = static::createComment('file gallery', $galleryId, 'Default gallery comment', 'Test comment on file gallery');
+            static::createComment('file gallery', $galleryId, 'Reply to default gallery comment', 'This is a reply', $galleryThreadId); // add reply to the default comment to test threading in the response
             static::$defaultComments['file gallery'] = [
                 'objectId' => $galleryId,
-                'threadId' => static::createComment('file gallery', $galleryId, 'Default gallery comment', 'Test comment on file gallery')
+                'threadId' => $galleryThreadId
             ];
         }
 
         // Poll
         $pollId = static::createPoll('API_Test_Poll_Comments');
         if ($pollId) {
+            $pollThreadId = static::createComment('poll', $pollId, 'Default poll comment', 'Test comment on poll');
+            static::createComment('poll', $pollId, 'Reply to default poll comment', 'This is a reply', $pollThreadId); // add reply to the default comment to test threading in the response
             static::$defaultComments['poll'] = [
                 'objectId' => $pollId,
-                'threadId' => static::createComment('poll', $pollId, 'Default poll comment', 'Test comment on poll')
+                'threadId' => $pollThreadId
             ];
         }
 
         // FAQ
         $faqId = static::createFaq('API_Test_FAQ_Comments');
         if ($faqId) {
+            $faqThreadId = static::createComment('faq', $faqId, 'Default FAQ comment', 'Test comment on FAQ');
+            static::createComment('faq', $faqId, 'Reply to default FAQ comment', 'This is a reply', $faqThreadId); // add reply to the default comment to test threading in the response
             static::$defaultComments['faq'] = [
                 'objectId' => $faqId,
-                'threadId' => static::createComment('faq', $faqId, 'Default FAQ comment', 'Test comment on FAQ')
+                'threadId' => $faqThreadId
             ];
         }
 
         // Blog post
         $blogPostId = static::createBlogPost('API_Test_BlogPost_Comments');
         if ($blogPostId) {
+            $blogPostThreadId = static::createComment('blog post', $blogPostId, 'Default blog comment', 'Test comment on blog post');
+            static::createComment('blog post', $blogPostId, 'Reply to default blog comment', 'This is a reply', $blogPostThreadId); // add reply to the default comment to test threading in the response
             static::$defaultComments['blog post'] = [
                 'objectId' => $blogPostId,
-                'threadId' => static::createComment('blog post', $blogPostId, 'Default blog comment', 'Test comment on blog post')
+                'threadId' => $blogPostThreadId
             ];
         }
 
         // Tracker item
         $trackerItemId = static::createTrackerItem('API_Test_TrackerItem_Comments');
         if ($trackerItemId) {
+            $trackerItemThreadId = static::createComment('trackeritem', $trackerItemId, 'Default tracker comment', 'Test comment on tracker item');
+            static::createComment('trackeritem', $trackerItemId, 'Reply to default tracker comment', 'This is a reply', $trackerItemThreadId); // add reply to the default comment to test threading in the response
             static::$defaultComments['trackeritem'] = [
                 'objectId' => $trackerItemId,
-                'threadId' => static::createComment('trackeritem', $trackerItemId, 'Default tracker comment', 'Test comment on tracker item')
+                'threadId' => $trackerItemThreadId
             ];
         }
 
         // Article
         $articleId = static::createArticle('API_Test_Article_Comments');
         if ($articleId) {
+            $articleThreadId = static::createComment('article', $articleId, 'Default article comment', 'Test comment on article');
+            static::createComment('article', $articleId, 'Reply to default article comment', 'This is a reply', $articleThreadId); // add reply to the default comment to test threading in the response
             static::$defaultComments['article'] = [
                 'objectId' => $articleId,
-                'threadId' => static::createComment('article', $articleId, 'Default article comment', 'Test comment on article')
+                'threadId' => $articleThreadId
             ];
         }
     }
@@ -538,11 +552,11 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
                 'grandFather' => 'int|null',
                 'can_edit' => 'bool',
                 'replies_info' => [
-                    'replies' => [[ /* same as getCommentResponseSchema() */]],
+                    'replies' => [$this->getCommentResponseSchema()],
                     'numReplies' => 'int',
                     'totalReplies' => 'int',
                 ],
-                'replies_flat' => [[ /* same as getCommentResponseSchema() */]]
+                'replies_flat' => [$this->getCommentResponseSchema()]
             ]
         );
 
