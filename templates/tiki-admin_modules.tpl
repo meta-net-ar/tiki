@@ -80,7 +80,7 @@
                                     </tr>
                                     {if isset($assigned_modules[$zone_initial])}
                                     {foreach $assigned_modules[$zone_initial] as $module}
-                                        {assign var="pref_module_name" value="module_"|cat:($module.name|lower|regex_replace-z0-9]/":"_")}
+                                        {assign var="pref_module_name" value="module_"|cat:($module.name|regex_replace:"/[^a-z0-9]/":"_")}
                                         {if isset($prefs[$pref_module_name]) && $prefs[$pref_module_name] eq 'y'}
                                             <tr>
                                                 <td>{$module.name|escape}</td>
