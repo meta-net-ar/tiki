@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_object_attributes` CHANGE `value` `value` longtext COLLATE utf8mb4_unicode_ci NOT NULL;
+ALTER TABLE `tiki_object_attributes` CHANGE `value` `value` longtext NOT NULL;
