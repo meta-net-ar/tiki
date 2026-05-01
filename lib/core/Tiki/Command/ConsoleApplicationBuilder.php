@@ -44,6 +44,7 @@ class ConsoleApplicationBuilder
     protected const ACTION_NOT_CALLABLE = 4;
 
     private static $lastInstance;
+    private static bool $lastInstanceComplete = false;
 
     /**
      * List of commands registered on the console
@@ -532,33 +533,55 @@ class ConsoleApplicationBuilder
      * Iterates over all commands in the list, and registers / doesn't register the commands in accordance with the result
      * of the check function and the action configured for the command group
      *
-     * @param boolean $returnLastInstance
+     * @param int|bool $statusCode
+     * @param string|null $commandCalled
      * @return Application
      */
-    public function create($statusCode = 1100): Application
+    public function create($statusCode = 1100, ?string $commandCalled = null): Application
     {
         global $tikipath;
 
-        if (self::$lastInstance) {
+        if (is_bool($statusCode)) {
+            $statusCode = 1100;
+        }
+
+        $commandCalled ??= $_SERVER['argv'][1] ?? false;
+
+        if (
+            self::$lastInstance && (
+                (! $commandCalled && self::$lastInstanceComplete)
+                || ($commandCalled && self::$lastInstance->has($commandCalled))
+            )
+        ) {
             return self::$lastInstance;
         }
 
         /**
          * Define our constants, based on what error (if any) was thrown
          * @see $statusCode For explanations on what these constants these do.
+         * create() may be called more than once in the same PHP process when rebuilding
+         * the console for a requested command that was not present in the cached instance.
+         * Constants are process-global, so the check is to ensure we only define them once.
          */
-        define('DB_RUNNING', $statusCode > 1001);
-        define('DB_STATUS', $statusCode > 1002);
-        define('DB_TIKI_SETUP', $statusCode > 1003);
-        define('DB_SYNCHRONAL', $statusCode > 1004);
+        if (! defined('DB_RUNNING')) {
+            define('DB_RUNNING', $statusCode > 1001);
+        }
+        if (! defined('DB_STATUS')) {
+            define('DB_STATUS', $statusCode > 1002);
+        }
+        if (! defined('DB_TIKI_SETUP')) {
+            define('DB_TIKI_SETUP', $statusCode > 1003);
+        }
+        if (! defined('DB_SYNCHRONAL')) {
+            define('DB_SYNCHRONAL', $statusCode > 1004);
+        }
 
         /** @var Application Console application that commands are added to, and finally returned. */
         $console = new Application();
         $console->setAutoExit(false);
         $console->setName(tra('Tiki Console Tool'));
         $console->setCatchExceptions(false);
-
-        $commandCalled = $_SERVER['argv'][1] ?? false;
+        $registeredAllCommands = true;
 
         /**
          * @var  $condition string  The name of the check method to be executed
@@ -623,6 +646,7 @@ class ConsoleApplicationBuilder
                 $console->add($command);
                 // If the command exactly matches one that was requested, stop processing further commands as they will not be used anyhow.
                 if ($commandCalled === $command->getName()) {
+                    $registeredAllCommands = false;
                     break 2;
                 }
             }
@@ -659,6 +683,7 @@ class ConsoleApplicationBuilder
         \TikiLib::events()->trigger('tiki.commands.register', ['console' => $console]);
 
         self::$lastInstance = $console;
+        self::$lastInstanceComplete = $registeredAllCommands;
 
         return $console;
     }

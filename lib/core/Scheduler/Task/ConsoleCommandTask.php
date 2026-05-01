@@ -24,7 +24,7 @@ class Scheduler_Task_ConsoleCommandTask extends Scheduler_Task_CommandTask
 
         try {
             $consoleBuilder = new Tiki\Command\ConsoleApplicationBuilder();
-            $console = $consoleBuilder->create();
+            $console = $consoleBuilder->create(1100, $commandName);
 
             $command = $console->find($commandName);
 
