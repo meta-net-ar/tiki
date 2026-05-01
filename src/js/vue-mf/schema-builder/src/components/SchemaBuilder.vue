@@ -33,7 +33,7 @@
         <div class="mb-4">
             <label class="form-label fw-semibold">Schema Type</label>
             <select v-model="schemaType" class="form-select" @change="resetForm">
-                <option value="" disabled>Select a schema type...</option>
+                <option value="">— None (disabled) —</option>
                 <optgroup v-for="group in schemaTypeGroups" :key="group.label" :label="group.label">
                     <option v-for="type in group.types" :key="type.value" :value="type.value">
                         {{ type.label }}
@@ -952,14 +952,16 @@ function copyToClipboard() {
 // ─── Emit custom JS event to document on schema change ───────────────────────
 
 watch(schemaJson, (newVal) => {
-    if (newVal) {
-        document.dispatchEvent(
-            new CustomEvent('schema-builder:update', {
-                detail: { schema: newVal, schemaType: schemaType.value, schemaJson: JSON.stringify(newVal) },
-                bubbles: true,
-            })
-        );
-    }
+    document.dispatchEvent(
+        new CustomEvent('schema-builder:update', {
+            detail: {
+                schema: newVal ?? null,
+                schemaType: schemaType.value,
+                schemaJson: newVal ? JSON.stringify(newVal) : '',
+            },
+            bubbles: true,
+        })
+    );
 }, { deep: true });
 
 // ─── Hydrate from schemajson prop ────────────────────────────────────────────
