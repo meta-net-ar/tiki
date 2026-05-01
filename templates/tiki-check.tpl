@@ -120,23 +120,6 @@ window.showCriticalIssues = function() {
     }
 };
 
-// Auto-refresh dashboard every 5 minutes
-setInterval(function() {
-    // Only refresh if user is on the page
-    if (!document.hidden) {
-        $.get('tiki-check.php?ajax=dashboard', function(data) {
-            $('.dashboard-summary').html(data);
-            // Reinitialize tooltips after AJAX update
-            if (typeof $ !== 'undefined' && typeof $.fn.tooltip !== 'undefined') {
-                $('[data-toggle="tooltip"]').tooltip({
-                    html: true,
-                    placement: 'top',
-                    trigger: 'hover'
-                });
-            }
-        });
-    }
-}, 300000); // 5 minutes
 </script>
 
 <h2  class="showhide_heading" id="Server_Compatibility">{tr}Server compatibility{/tr} <a href="#Server_compatibility" class="heading-link" aria-label="{tr}Server compatibility{/tr}><span class="icon icon-link fas fa-link "></span></a></h2>
