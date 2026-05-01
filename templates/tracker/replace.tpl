@@ -716,7 +716,7 @@
                         return condition;
                     },
                     customProps: {
-                        //trackerfieldMap : "' . json_encode($schemaOrgAttributeMap) . '",
+                        trackerfieldMap : {json_encode($fieldMap)},
                         schemajson: `{json_encode(json_decode($info.schemaOrgMarkup)->schema)}`,
                     },
                 });

@@ -726,6 +726,11 @@ $schema = $tracker_info["schemaOrgMarkup"]; //the json data
 // Then repeat the same logic to wiki page now)
 
 if(isset($schema)){
+    foreach ($fieldDefinitions as $fieldDefinition) {
+        $fid = $fieldDefinition["fieldId"];
+        $permName = $fieldDefinition["permName"]; //used as id in the placeholder of the json data, ex: {{trackerfieldPermName}}
+        $schema = str_replace('{{' . $permName . '}}', $info[$fid] ?? '', $schema);
+    }
     $schema = json_decode($schema)->schema;
     $headerlib = TikiLib::lib('header');
     $headerlib->add_rawhtml($schema ? '<script type="application/ld+json">' . json_encode($schema, JSON_PRETTY_PRINT) . '</script>' : '');

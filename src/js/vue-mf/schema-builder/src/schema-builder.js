@@ -4,7 +4,7 @@ import { createApp, h } from "vue";
 import App from "./App.vue";
 import "../style.scss";
 
-//createApp(App).mount("#app");
+// createApp(App).mount("#app");
 
 const vueLifecycles = singleSpaVue({
     createApp,

@@ -1,5 +1,5 @@
 <template>
-    <div class="schema-builder">
+    <div class="schema-builder" @focusin="handleFocusIn">
         <!-- Header -->
         <div class="d-flex align-items-center justify-content-between mb-3">
             <div>
@@ -7,6 +7,26 @@
                 <p class="text-muted small mb-0">Build structured data markup for search engines</p>
             </div>
             <span v-if="schemaType" class="badge bg-primary fs-6">{{ schemaType }}</span>
+        </div>
+        <!-- Dynamic value from fieldMap -->
+        <div v-if="trackerfieldMap && trackerfieldMap.length" class="tracker-field-insert border rounded p-2 bg-light mb-4">
+            <p class="text-muted small mb-1 fw-semibold">
+                <i class="bi bi-cursor-text me-1"></i>
+                Click a field to insert it at the cursor position in any input below:
+            </p>
+            <div class="d-flex flex-wrap gap-1">
+                <button
+                    v-for="field in trackerfieldMap"
+                    :key="field.id"
+                    @mousedown.prevent
+                    @click="insertAtCursor(field.id)"
+                    type="button"
+                    class="btn btn-sm btn-outline-secondary"
+                    :title="`Insert {{${field.id}}}`"
+                >
+                    <span class="font-monospace small">{{ field.name }}</span>
+                </button>
+            </div>
         </div>
 
         <!-- Schema Type Selector -->
@@ -888,6 +908,38 @@ function addRepeatableItem(key, fields) {
 
 function removeRepeatableItem(key, index) {
     formData[key].splice(index, 1);
+}
+
+// ─── Tracker field insertion ─────────────────────────────────────────────────
+
+const lastFocusedEl = ref(null);
+
+function handleFocusIn(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        lastFocusedEl.value = e.target;
+    }
+}
+
+function insertAtCursor(fieldId) {
+    const el = lastFocusedEl.value;
+    const token = `{{${fieldId}}}`;
+
+    if (!el) return;
+
+    const start = el.selectionStart ?? el.value.length;
+    const end   = el.selectionEnd   ?? el.value.length;
+    const newValue = el.value.slice(0, start) + token + el.value.slice(end);
+
+    // Update DOM value
+    el.value = newValue;
+
+    // Trigger Vue v-model sync
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // Restore cursor after inserted token
+    const cursor = start + token.length;
+    el.setSelectionRange(cursor, cursor);
+    el.focus();
 }
 
 function copyToClipboard() {
