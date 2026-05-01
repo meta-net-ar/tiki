@@ -44,7 +44,7 @@ export const bootstrap = [
     },
 ];
 export const mount = [
-    cssLifecycle.mount, 
+    cssLifecycle.mount,
     vueLifecycles.mount,
     async function () {
         console.log("Mount complete for schema builder");
