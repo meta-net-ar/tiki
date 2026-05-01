@@ -7,53 +7,53 @@
     <div class="row">
         <div class="col-md-3 mb-3">
             <div class="status-card critical" data-toggle="tooltip" data-html="true" 
-                 title="Critical Breakdown: Main Checks: {$source_breakdown.critical.main|default:0}, Packages: {$source_breakdown.critical.packages|default:0}, OCR: {$source_breakdown.critical.ocr|default:0}">
+                 title="Critical Breakdown (All Checks): Main Checks: {$source_breakdown.critical.main|default:0}, Packages: {$source_breakdown.critical.packages|default:0}, OCR: {$source_breakdown.critical.ocr|default:0}">
                 <div class="card-header">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <h4>{tr}Critical Issues{/tr}</h4>
+                    <h4>{tr}Critical Findings{/tr}</h4>
                 </div>
                 <div class="card-body">
                     <span class="count">{$critical_count|default:0}</span>
-                    <p class="description">{tr}Requires immediate attention{/tr}</p>
+                    <p class="description">{tr}Sum of checks with BAD, UNSAFE, or RISKY status{/tr}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="status-card warning" data-toggle="tooltip" data-html="true"
-                 title="Warning Breakdown: Main Checks: {$source_breakdown.warning.main|default:0}, Packages: {$source_breakdown.warning.packages|default:0}, OCR: {$source_breakdown.warning.ocr|default:0}">
+                 title="Warning Breakdown (All Checks): Main Checks: {$source_breakdown.warning.main|default:0}, Packages: {$source_breakdown.warning.packages|default:0}, OCR: {$source_breakdown.warning.ocr|default:0}">
                 <div class="card-header">
                     <i class="fas fa-exclamation-circle"></i>
-                    <h4>{tr}Warnings{/tr}</h4>
+                    <h4>{tr}Checks Requiring Attention{/tr}</h4>
                 </div>
                 <div class="card-body">
                     <span class="count">{$warning_count|default:0}</span>
-                    <p class="description">{tr}Should be addressed soon{/tr}</p>
+                    <p class="description">{tr}Sum of checks with UNSURE status{/tr}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="status-card info" data-toggle="tooltip" data-html="true"
-                 title="Information Breakdown: Main Checks: {$source_breakdown.info.main|default:0}, Packages: {$source_breakdown.info.packages|default:0}, OCR: {$source_breakdown.info.ocr|default:0}">
+                 title="Information Breakdown (All Checks): Main Checks: {$source_breakdown.info.main|default:0}, Packages: {$source_breakdown.info.packages|default:0}, OCR: {$source_breakdown.info.ocr|default:0}">
                 <div class="card-header">
                     <i class="fas fa-info-circle"></i>
-                    <h4>{tr}Information{/tr}</h4>
+                    <h4>{tr}Informational Findings{/tr}</h4>
                 </div>
                 <div class="card-body">
                     <span class="count">{$info_count|default:0}</span>
-                    <p class="description">{tr}For your reference{/tr}</p>
+                    <p class="description">{tr}Sum of checks with INFO status{/tr}</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3 mb-3">
             <div class="status-card success" data-toggle="tooltip" data-html="true"
-                 title="Good Breakdown: Main Checks: {$source_breakdown.good.main|default:0}, Packages: {$source_breakdown.good.packages|default:0}, OCR: {$source_breakdown.good.ocr|default:0}">
+                 title="Good Breakdown (All Checks): Main Checks: {$source_breakdown.good.main|default:0}, Packages: {$source_breakdown.good.packages|default:0}, OCR: {$source_breakdown.good.ocr|default:0}">
                 <div class="card-header">
                     <i class="fas fa-check-circle"></i>
-                    <h4>{tr}Good{/tr}</h4>
+                    <h4>{tr}Passed Checks{/tr}</h4>
                 </div>
                 <div class="card-body">
                     <span class="count">{$good_count|default:0}</span>
-                    <p class="description">{tr}Working correctly{/tr}</p>
+                    <p class="description">{tr}Sum of checks with GOOD or SAFE status{/tr}</p>
                 </div>
             </div>
         </div>
@@ -74,6 +74,7 @@
                          title="Health Score Calculation: Good items: {$good_count|default:0} (count 100%), Info items: {$info_count|default:0} (count 50%), Warning items: {$warning_count|default:0} (count 0%), Critical items: {$critical_count|default:0} (count 0%). Formula: ({$good_count|default:0} + {$info_count|default:0} × 0.5) ÷ {$total_checks|default:0} × 100 = {$health_score|default:100}%">
                         {$health_score|default:100}/100
                     </div>
+                    <p class="description mb-0 mt-2">{tr}Overview of all executed checks and their resulting statuses{/tr}</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -89,11 +90,13 @@
         </div>
     </div>
     
+    <p class="description mt-3 mb-2">{tr}Curated actionable items extracted from tagged diagnostic messages{/tr}</p>
+
     {* Critical Issues Summary *}
     {if $server_critical_issues && count($server_critical_issues) > 0}
     <div class="critical-issues-summary critical-issues-summary--critical mt-3">
         <div class="alert alert-danger">
-            <h5><i class="fas fa-exclamation-triangle"></i> {tr}Critical Issues (Server Configuration - Must Fix){/tr}</h5>
+            <h5><i class="fas fa-exclamation-triangle"></i> {tr}Immediate Actions Required{/tr}</h5>
             <ul class="mb-0">
                 {foreach from=$server_critical_issues item=issue}
                 <li>
@@ -112,7 +115,7 @@
     {if $security_warning_issues && count($security_warning_issues) > 0}
     <div class="critical-issues-summary critical-issues-summary--security-warning mt-3">
         <div class="alert alert-warning">
-            <h5><i class="fas fa-exclamation-circle"></i> {tr}Security Warnings (Verify and Harden){/tr}</h5>
+            <h5><i class="fas fa-exclamation-circle"></i> {tr}Recommended Security Reviews{/tr}</h5>
             <ul class="mb-0">
                 {foreach from=$security_warning_issues item=issue}
                 <li>
@@ -131,7 +134,7 @@
     {if $optional_recommendations && count($optional_recommendations) > 0}
     <div class="critical-issues-summary critical-issues-summary--optional mt-3">
         <div class="alert alert-info">
-            <h5><i class="fas fa-info-circle"></i> {tr}Optional Features / Recommendations{/tr}</h5>
+            <h5><i class="fas fa-info-circle"></i> {tr}Optional Improvements & Recommendations{/tr}</h5>
             <ul class="mb-0">
                 {foreach from=$optional_recommendations item=issue}
                 <li>
