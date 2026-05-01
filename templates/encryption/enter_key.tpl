@@ -20,48 +20,32 @@
         </div>
     </form>
     <script>
-    (function () {
-        var form = document.getElementById('enter-key-form');
-        if (!form) return;
-        form.addEventListener('submit', function (e) {
+    $(function () {
+        var $form = $('#enter-key-form');
+        if (!$form.length) return;
+        $form.on('submit', function (e) {
             e.preventDefault();
-            var body = new URLSearchParams(new FormData(form));
-            fetch(form.action, {
-                method: 'POST',
-                body: body,
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            var $modal = $form.closest('.modal-dialog');
+            $modal.tikiModal(tr('Loading...'));
+            $.ajax({
+                type: 'POST',
+                url: $form.attr('action'),
+                data: $form.serialize(),
+                dataType: 'json',
             })
-            .then(function (r) {
-                return r.json().then(function (data) {
-                    return { ok: r.ok, data: data };
+                .done(function (data) {
+                    if (data && data.extra === 'close') {
+                        $.closeModal();
+                    }
+                })
+                .fail(function (jqxhr) {
+                    $form.showError(jqxhr);
+                    $form.find('#shared_key').val('').trigger('focus');
+                })
+                .always(function () {
+                    $modal.tikiModal();
                 });
-            })
-            .then(function (res) {
-                if (res.ok && res.data && res.data.extra === 'close') {
-                    $.closeModal();
-                    return;
-                }
-                var msg = (res.data && res.data.message) || '{tr}An error occurred.{/tr}';
-                var old = form.querySelector('.ajax-errors');
-                if (old) old.remove();
-                var alert = document.createElement('div');
-                alert.className = 'ajax-errors alert alert-danger alert-dismissible';
-                var closeBtn = document.createElement('button');
-                closeBtn.type = 'button';
-                closeBtn.className = 'btn-close';
-                closeBtn.dataset.bsDismiss = 'alert';
-                alert.appendChild(closeBtn);
-                var ul = document.createElement('ul');
-                var li = document.createElement('li');
-                li.textContent = msg;
-                ul.appendChild(li);
-                alert.appendChild(ul);
-                form.prepend(alert);
-                var input = form.querySelector('#shared_key');
-                if (input) { input.value = ''; input.focus(); }
-            })
-            .catch(function () {});
         });
-    })();
+    });
     </script>
 {/block}
