@@ -139,28 +139,30 @@ function wikiplugin_youtube_info()
 
 function wikiplugin_youtube($data, $params)
 {
+    // Centralize all default values for plugin parameters
+    $params = array_merge([
+        'borderRadius' => 'y',
+        'allowFullScreen' => 'y',
+        'related' => 'y',
+        'privacyEnhanced' => '',
+        'quality' => 'high',
+    ], $params);
+
     global $tikilib;
 
-    $isShorts = ! empty($params['movie']) && str_contains($params['movie'], '/shorts/');
-
-    if (empty($params['movie'])) {
-        Feedback::error(tra('Plugin YouTube error: the movie parameter is empty.'));
-
+    // Extract YouTube ID and type (e.g., shorts, live, etc.)
+    $youtubeInfo = getYoutubeId($params['movie']);
+    if (! $youtubeInfo || empty($youtubeInfo['id'])) {
+        Feedback::error(tra('Plugin YouTube error: Invalid YouTube URL provided: ') . $params['movie']);
         return '<div class="alert alert-warning">'
-            . tra('Plugin YouTube error: the movie parameter is empty.')
-            . '</div>';
+            . tra('Plugin YouTube error: Invalid YouTube URL provided: ') . htmlspecialchars($params['movie']) .
+            '</div>';
     }
+    $sYoutubeId = $youtubeInfo['id'];
+    $isShorts = ($youtubeInfo['type'] ?? '') === 'shorts';
+
 
     $scheme = $tikilib->httpScheme();
-
-    $sYoutubeId  = getYoutubeId($params['movie']);
-    if (empty($sYoutubeId)) {
-        Feedback::error(tra('Invalid YouTube URL provided'));
-
-        return '<div class="alert alert-warning">'
-            . tra('Plugin YouTube error: Invalid YouTube URL provided.')
-            . '</div>';
-    }
 
     $oEmbedData = getYoutubeOEmbedData('https://www.youtube.com/watch?v=' . $sYoutubeId);
     if ($oEmbedData === false) {
@@ -171,8 +173,8 @@ function wikiplugin_youtube($data, $params)
         $oEmbedData['height'] = 16;
     }
 
-    $privacyEnhanced = $params['privacyEnhanced'] ?? '';
-    $related = $params['related'] ?? 'y';
+    $privacyEnhanced = $params['privacyEnhanced'];
+    $related = $params['related'];
 
     $fqdn = $privacyEnhanced === 'y' ? 'www.youtube-nocookie.com' : 'www.youtube.com';
     $src = $scheme . '://' . $fqdn . '/embed/' . $sYoutubeId;
@@ -196,31 +198,49 @@ function getYoutubeId($sYoutubeUrl)
 {
     $aParsedUrl = parse_url($sYoutubeUrl);
     if ($aParsedUrl !== false && ! empty($aParsedUrl['host'])) {
-        if (
-            $aParsedUrl['host'] !== 'youtube.com'
-            && $aParsedUrl['host'] !== 'www.youtube.com'
-            && $aParsedUrl['host'] !== 'youtu.be'
-            && $aParsedUrl['host'] !== 'www.youtu.be'
-        ) {
+        $host = strtolower($aParsedUrl['host']);
+        // Support all known hosts
+        $validHosts = [
+            'youtube.com', 'www.youtube.com',
+            'youtu.be', 'www.youtu.be',
+            'youtube-nocookie.com', 'www.youtube-nocookie.com',
+        ];
+        if (! in_array($host, $validHosts, true)) {
             return false;
         }
-        if ($aParsedUrl['host'] === 'youtu.be') {
-            $sYoutubeId = str_replace('/', '', $aParsedUrl['path']);
-            return $sYoutubeId;
-        }
-        if ($aParsedUrl['host'] === 'youtube.com' || $aParsedUrl['host'] === 'www.youtube.com') {
-            if (! empty($aParsedUrl['path']) && preg_match('#^/shorts/([\w\-_]+)#', $aParsedUrl['path'], $matches)) {
-                return $matches[1];
+        // Direct youtu.be links
+        if ($host === 'youtu.be' || $host === 'www.youtu.be') {
+            // Only keep the first path segment (the ID)
+            $id = preg_replace('#/.*$#', '', ltrim($aParsedUrl['path'], '/'));
+            if (empty($id)) {
+                return false;
             }
-            parse_str(parse_url($sYoutubeUrl, PHP_URL_QUERY), $aQueryString);
-            return $aQueryString['v'] ?? false;
+            return ['id' => $id, 'type' => 'video'];
+        }
+        // youtube.com, youtube-nocookie.com, etc.
+        if (isset($aParsedUrl['path'])) {
+            // /watch?v=ID (strict match)
+            if ($aParsedUrl['path'] === '/watch') {
+                parse_str($aParsedUrl['query'] ?? '', $aQueryString);
+                if (empty($aQueryString['v'])) {
+                    return false;
+                }
+                return ['id' => $aQueryString['v'], 'type' => 'video'];
+            }
+            // /v/ID, /e/ID, /embed/ID, /shorts/ID, /live/ID
+            if (preg_match('#^/(v|e|embed|shorts|live)/([\w\-_]+)#', $aParsedUrl['path'], $matches)) {
+                $type = $matches[1];
+                $id = $matches[2];
+                return ['id' => $id, 'type' => $type];
+            }
         }
     } elseif (preg_match('/^([\w\-_]+)$/', $sYoutubeUrl, $matches)) {
-        $sYoutubeId = $sYoutubeUrl;
+        // Raw ID
+        return ['id' => $matches[1], 'type' => 'video'];
     } else {
         return false;
     }
-    return $sYoutubeId;
+    return false;
 }
 
 function getYoutubeOEmbedData($youtubeUrl)
