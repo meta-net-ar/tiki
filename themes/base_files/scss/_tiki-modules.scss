@@ -626,3 +626,13 @@ header.fixed-top {
         padding: 0;
     }
 }
+
+// Remove unnecessary card-body horizontal padding in menu module in fixed-width layout side columns to reduce text wrapping and overflow
+.fixed_width {
+    .col1,
+    .col2 {
+        .box-menu .card-body {
+            --bs-card-spacer-x: 0rem;
+        }
+    }
+}
