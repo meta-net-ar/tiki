@@ -5042,105 +5042,28 @@ if ($standalone && ! $nagios) {
         isset($iis_properties) ? $iis_properties : array()
     );
 
-    foreach ($all_properties as $key => $item) {
-        switch ($item['fitness_status']) {
-            case FITNESS_STATUS_BAD:
-            case FITNESS_STATUS_UNSAFE:
-            case FITNESS_STATUS_RISKY:
-                $critical_count++;
+    $dashboard_metrics = compute_dashboard_metrics(array(
+        'core' => $all_properties,
+        'server_requirements' => isset($serverRequirements) ? $serverRequirements : array(),
+        'available_tiki_versions' => isset($available_tiki_properties) ? $available_tiki_properties : array(),
+        'composer_requirements' => isset($composerChecks) ? $composerChecks : array(),
+        'realtime' => isset($realtime) ? $realtime : array(),
+        'file_gallery_indexing' => isset($file_handlers) ? $file_handlers : array(),
+        'trim_server_instance' => isset($trimServerRequirements) ? $trimServerRequirements : array(),
+        'trim_client_instance' => isset($trimClientRequirements) ? $trimClientRequirements : array(),
+        'packages' => isset($packagesToDisplay) ? $packagesToDisplay : array(),
+        'ocr' => isset($ocrToDisplay) ? $ocrToDisplay : array(),
+    ));
 
-                $section = resolve_dashboard_section(
-                    $key,
-                    $server_properties,
-                    $mysql_properties,
-                    $php_properties,
-                    $security,
-                    $tiki_security,
-                    isset($apache_properties) ? $apache_properties : array(),
-                    isset($iis_properties) ? $iis_properties : array()
-                );
-
-                $critical_issues[] = array(
-                    'title' => $key,
-                    'message' => $item['message'],
-                    'section' => $section
-                );
-                break;
-            case FITNESS_STATUS_UNSURE:
-                $warning_count++;
-                break;
-            case FITNESS_STATUS_INFO:
-                $info_count++;
-                break;
-            case FITNESS_STATUS_GOOD:
-            case FITNESS_STATUS_SAFE:
-                $good_count++;
-                break;
-        }
-    }
-
-    // Count from packages
-    if (isset($packagesToDisplay)) {
-        foreach ($packagesToDisplay as $package) {
-            switch ($package['fitness_status']) {
-                case FITNESS_STATUS_BAD:
-                case FITNESS_STATUS_UNSAFE:
-                case FITNESS_STATUS_RISKY:
-                    $critical_count++;
-                    $critical_issues[] = array(
-                        'title' => $package['name'],
-                        'message' => implode(', ', $package['message']),
-                        'section' => 'Tiki_Packages'
-                    );
-                    break;
-                case FITNESS_STATUS_UNSURE:
-                    $warning_count++;
-                    break;
-                case FITNESS_STATUS_INFO:
-                    $info_count++;
-                    break;
-                case FITNESS_STATUS_GOOD:
-                case FITNESS_STATUS_SAFE:
-                    $good_count++;
-                    break;
-            }
-        }
-    }
-
-    // Count from OCR
-    if (isset($ocrToDisplay)) {
-        foreach ($ocrToDisplay as $ocr) {
-            switch ($ocr['fitness_status']) {
-                case FITNESS_STATUS_BAD:
-                case FITNESS_STATUS_UNSAFE:
-                case FITNESS_STATUS_RISKY:
-                    $critical_count++;
-                    $critical_issues[] = array(
-                        'title' => $ocr['name'],
-                        'message' => $ocr['message'],
-                        'section' => 'OCR_Status'
-                    );
-                    break;
-                case FITNESS_STATUS_UNSURE:
-                    $warning_count++;
-                    break;
-                case FITNESS_STATUS_INFO:
-                    $info_count++;
-                    break;
-                case FITNESS_STATUS_GOOD:
-                case FITNESS_STATUS_SAFE:
-                    $good_count++;
-                    break;
-            }
-        }
-    }
-
-    $total_checks = $critical_count + $warning_count + $info_count + $good_count;
-    $health_score = $total_checks > 0 ? round((($good_count + $info_count * 0.5) / $total_checks) * 100) : 100;
-
-    $critical_percentage = $total_checks > 0 ? round(($critical_count / $total_checks) * 100) : 0;
-    $warning_percentage = $total_checks > 0 ? round(($warning_count / $total_checks) * 100) : 0;
-    $health_percentage = $total_checks > 0 ? round((($good_count + $info_count) / $total_checks) * 100) : 100;
+    $critical_count = $dashboard_metrics['critical_count'];
+    $warning_count = $dashboard_metrics['warning_count'];
+    $info_count = $dashboard_metrics['info_count'];
+    $good_count = $dashboard_metrics['good_count'];
+    $total_checks = $dashboard_metrics['total_checks'];
+    $health_score = $dashboard_metrics['health_score'];
+    $critical_percentage = $dashboard_metrics['critical_percentage'];
+    $warning_percentage = $dashboard_metrics['warning_percentage'];
+    $health_percentage = $dashboard_metrics['health_percentage'];
 
     $smarty->assign('critical_count', $critical_count);
     $smarty->assign('warning_count', $warning_count);
@@ -5172,106 +5095,12 @@ if ($standalone && ! $nagios) {
     $smarty->assign('critical_percentage', $critical_percentage);
     $smarty->assign('warning_percentage', $warning_percentage);
     $smarty->assign('total_checks', $total_checks);
+    $dashboard_debug_enabled = isset($_REQUEST['debug_dashboard_counts']) && in_array((string) $_REQUEST['debug_dashboard_counts'], array('1', 'y', 'yes', 'true'), true);
+    $smarty->assign('dashboard_debug_enabled', $dashboard_debug_enabled);
+    $smarty->assign('dashboard_debug_sources', $dashboard_metrics['debug_sources']);
+    $smarty->assign('dashboard_debug_ignored', $dashboard_metrics['ignored']);
 
-    $main_critical = 0;
-    $main_warning = 0;
-    $main_info = 0;
-    $main_good = 0;
-    $packages_critical = 0;
-    $packages_warning = 0;
-    $packages_info = 0;
-    $packages_good = 0;
-    $ocr_critical = 0;
-    $ocr_warning = 0;
-    $ocr_info = 0;
-    $ocr_good = 0;
-
-    foreach ($all_properties as $key => $item) {
-        switch ($item['fitness_status']) {
-            case FITNESS_STATUS_BAD:
-            case FITNESS_STATUS_UNSAFE:
-            case FITNESS_STATUS_RISKY:
-                $main_critical++;
-                break;
-            case FITNESS_STATUS_UNSURE:
-                $main_warning++;
-                break;
-            case FITNESS_STATUS_INFO:
-                $main_info++;
-                break;
-            case FITNESS_STATUS_GOOD:
-            case FITNESS_STATUS_SAFE:
-                $main_good++;
-                break;
-        }
-    }
-
-    if (isset($packagesToDisplay)) {
-        foreach ($packagesToDisplay as $package) {
-            switch ($package['fitness_status']) {
-                case FITNESS_STATUS_BAD:
-                case FITNESS_STATUS_UNSAFE:
-                case FITNESS_STATUS_RISKY:
-                    $packages_critical++;
-                    break;
-                case FITNESS_STATUS_UNSURE:
-                    $packages_warning++;
-                    break;
-                case FITNESS_STATUS_INFO:
-                    $packages_info++;
-                    break;
-                case FITNESS_STATUS_GOOD:
-                case FITNESS_STATUS_SAFE:
-                    $packages_good++;
-                    break;
-            }
-        }
-    }
-
-    if (isset($ocrToDisplay)) {
-        foreach ($ocrToDisplay as $ocr) {
-            switch ($ocr['fitness_status']) {
-                case FITNESS_STATUS_BAD:
-                case FITNESS_STATUS_UNSAFE:
-                case FITNESS_STATUS_RISKY:
-                    $ocr_critical++;
-                    break;
-                case FITNESS_STATUS_UNSURE:
-                    $ocr_warning++;
-                    break;
-                case FITNESS_STATUS_INFO:
-                    $ocr_info++;
-                    break;
-                case FITNESS_STATUS_GOOD:
-                case FITNESS_STATUS_SAFE:
-                    $ocr_good++;
-                    break;
-            }
-        }
-    }
-
-    $source_breakdown = array(
-        'critical' => array(
-            'main' => $main_critical,
-            'packages' => $packages_critical,
-            'ocr' => $ocr_critical
-        ),
-        'warning' => array(
-            'main' => $main_warning,
-            'packages' => $packages_warning,
-            'ocr' => $ocr_warning
-        ),
-        'info' => array(
-            'main' => $main_info,
-            'packages' => $packages_info,
-            'ocr' => $ocr_info
-        ),
-        'good' => array(
-            'main' => $main_good,
-            'packages' => $packages_good,
-            'ocr' => $ocr_good
-        )
-    );
+    $source_breakdown = $dashboard_metrics['source_breakdown'];
 
     $smarty->assign('source_breakdown', $source_breakdown);
 
@@ -6076,6 +5905,135 @@ function build_dashboard_all_properties(
 }
 
 /**
+ * Normalize various item shapes to a dashboard fitness status.
+ */
+function normalize_dashboard_fitness_status($item)
+{
+    if (! is_array($item)) {
+        return null;
+    }
+
+    if (! empty($item['fitness_status'])) {
+        return $item['fitness_status'];
+    }
+
+    if (empty($item['status']) || ! is_string($item['status'])) {
+        return null;
+    }
+
+    $status = strtolower(trim($item['status']));
+    if ($status === 'js') {
+        return null;
+    }
+
+    $map = array(
+        'bad' => FITNESS_STATUS_BAD,
+        'unsafe' => FITNESS_STATUS_UNSAFE,
+        'risky' => FITNESS_STATUS_RISKY,
+        'unsure' => FITNESS_STATUS_UNSURE,
+        'info' => FITNESS_STATUS_INFO,
+        'informational' => FITNESS_STATUS_INFO,
+        'good' => FITNESS_STATUS_GOOD,
+        'safe' => FITNESS_STATUS_SAFE,
+    );
+
+    return $map[$status] ?? null;
+}
+
+/**
+ * Compute dashboard counters and percentages from multiple data sources.
+ */
+function compute_dashboard_metrics($sources)
+{
+    $counts = array(
+        'critical' => 0,
+        'warning' => 0,
+        'info' => 0,
+        'good' => 0,
+    );
+
+    $source_breakdown = array(
+        'critical' => array('main' => 0, 'packages' => 0, 'ocr' => 0),
+        'warning' => array('main' => 0, 'packages' => 0, 'ocr' => 0),
+        'info' => array('main' => 0, 'packages' => 0, 'ocr' => 0),
+        'good' => array('main' => 0, 'packages' => 0, 'ocr' => 0),
+    );
+    $debug_sources = array();
+    $ignored = array(
+        'non_array_item' => 0,
+        'unknown_or_unmapped_status' => 0,
+    );
+
+    foreach ($sources as $source_name => $dataset) {
+        if (! is_array($dataset)) {
+            continue;
+        }
+
+        $bucket = in_array($source_name, array('packages', 'ocr'), true) ? $source_name : 'main';
+        $debug_sources[$source_name] = array(
+            'critical' => 0,
+            'warning' => 0,
+            'info' => 0,
+            'good' => 0,
+            'total_counted' => 0,
+            'total_items' => count($dataset),
+            'ignored_items' => 0,
+        );
+        foreach ($dataset as $item) {
+            if (! is_array($item)) {
+                $ignored['non_array_item']++;
+                $debug_sources[$source_name]['ignored_items']++;
+                continue;
+            }
+            $status = normalize_dashboard_fitness_status($item);
+            if ($status === null) {
+                $ignored['unknown_or_unmapped_status']++;
+                $debug_sources[$source_name]['ignored_items']++;
+                continue;
+            }
+
+            if (in_array($status, array(FITNESS_STATUS_BAD, FITNESS_STATUS_UNSAFE, FITNESS_STATUS_RISKY), true)) {
+                $counts['critical']++;
+                $source_breakdown['critical'][$bucket]++;
+                $debug_sources[$source_name]['critical']++;
+            } elseif ($status === FITNESS_STATUS_UNSURE) {
+                $counts['warning']++;
+                $source_breakdown['warning'][$bucket]++;
+                $debug_sources[$source_name]['warning']++;
+            } elseif ($status === FITNESS_STATUS_INFO) {
+                $counts['info']++;
+                $source_breakdown['info'][$bucket]++;
+                $debug_sources[$source_name]['info']++;
+            } elseif (in_array($status, array(FITNESS_STATUS_GOOD, FITNESS_STATUS_SAFE), true)) {
+                $counts['good']++;
+                $source_breakdown['good'][$bucket]++;
+                $debug_sources[$source_name]['good']++;
+            }
+
+            $debug_sources[$source_name]['total_counted']++;
+        }
+    }
+
+    $total = $counts['critical'] + $counts['warning'] + $counts['info'] + $counts['good'];
+    $health_score = $total > 0 ? round((($counts['good'] + $counts['info'] * 0.5) / $total) * 100) : 100;
+
+    return array(
+        'critical_count' => $counts['critical'],
+        'warning_count' => $counts['warning'],
+        'info_count' => $counts['info'],
+        'good_count' => $counts['good'],
+        'total_checks' => $total,
+        'health_score' => $health_score,
+        'critical_percentage' => $total > 0 ? round(($counts['critical'] / $total) * 100) : 0,
+        'warning_percentage' => $total > 0 ? round(($counts['warning'] / $total) * 100) : 0,
+        'health_percentage' => $total > 0 ? round((($counts['good'] + $counts['info']) / $total) * 100) : 100,
+        'source_breakdown' => $source_breakdown,
+        'debug_sources' => $debug_sources,
+        'ignored' => $ignored,
+    );
+}
+
+/**
  * Resolve which dashboard section an item belongs to.
  */
 function resolve_dashboard_section(
@@ -6297,10 +6255,6 @@ $all_arrays = array(
 
 $fitness_counts = countFitnessStatuses($all_arrays);
 
-$main_critical = 0;
-$main_warning = 0;
-$main_info = 0;
-$main_good = 0;
 $critical_count = 0;
 $warning_count = 0;
 $info_count = 0;
@@ -6320,128 +6274,28 @@ $all_properties = build_dashboard_all_properties(
     isset($database_properties) ? $database_properties : array()
 );
 
-foreach ($all_properties as $key => $item) {
-    switch ($item['fitness_status']) {
-        case FITNESS_STATUS_BAD:
-        case FITNESS_STATUS_UNSAFE:
-        case FITNESS_STATUS_RISKY:
-            $main_critical++;
-            $critical_count++;
+$dashboard_metrics = compute_dashboard_metrics(array(
+    'core' => $all_properties,
+    'server_requirements' => isset($serverRequirements) ? $serverRequirements : array(),
+    'available_tiki_versions' => isset($available_tiki_properties) ? $available_tiki_properties : array(),
+    'composer_requirements' => isset($composerChecks) ? $composerChecks : array(),
+    'realtime' => isset($realtime) ? $realtime : array(),
+    'file_gallery_indexing' => isset($file_handlers) ? $file_handlers : array(),
+    'trim_server_instance' => isset($trimServerRequirements) ? $trimServerRequirements : array(),
+    'trim_client_instance' => isset($trimClientRequirements) ? $trimClientRequirements : array(),
+    'packages' => isset($packagesToDisplay) ? $packagesToDisplay : array(),
+    'ocr' => isset($ocrToDisplay) ? $ocrToDisplay : array(),
+));
 
-            $section = resolve_dashboard_section(
-                $key,
-                $server_properties,
-                $mysql_properties,
-                $php_properties,
-                $security,
-                $tiki_security,
-                isset($apache_properties) ? $apache_properties : array(),
-                isset($iis_properties) ? $iis_properties : array(),
-                isset($tiki_properties) ? $tiki_properties : array(),
-                isset($database_properties) ? $database_properties : array()
-            );
-
-            $critical_issues[] = array(
-                'title' => $key,
-                'message' => $item['message'],
-                'section' => $section
-            );
-            break;
-        case FITNESS_STATUS_UNSURE:
-            $main_warning++;
-            $warning_count++;
-            break;
-        case FITNESS_STATUS_INFO:
-            $main_info++;
-            $info_count++;
-            break;
-        case FITNESS_STATUS_GOOD:
-        case FITNESS_STATUS_SAFE:
-            $main_good++;
-            $good_count++;
-            break;
-    }
-}
-
-$packages_critical = 0;
-$packages_warning = 0;
-$packages_info = 0;
-$packages_good = 0;
-
-if (isset($packagesToDisplay)) {
-    foreach ($packagesToDisplay as $package) {
-        switch ($package['fitness_status']) {
-            case FITNESS_STATUS_BAD:
-            case FITNESS_STATUS_UNSAFE:
-            case FITNESS_STATUS_RISKY:
-                $critical_count++;
-                $packages_critical++;
-                $critical_issues[] = array(
-                    'title' => $package['name'],
-                    'message' => implode(', ', $package['message']),
-                    'section' => 'Tiki_Packages'
-                );
-                break;
-            case FITNESS_STATUS_UNSURE:
-                $warning_count++;
-                $packages_warning++;
-                break;
-            case FITNESS_STATUS_INFO:
-                $info_count++;
-                $packages_info++;
-                break;
-            case FITNESS_STATUS_GOOD:
-            case FITNESS_STATUS_SAFE:
-                $good_count++;
-                $packages_good++;
-                break;
-        }
-    }
-}
-
-$ocr_critical = 0;
-$ocr_warning = 0;
-$ocr_info = 0;
-$ocr_good = 0;
-
-if (isset($ocrToDisplay)) {
-    foreach ($ocrToDisplay as $ocr) {
-        switch ($ocr['fitness_status']) {
-            case FITNESS_STATUS_BAD:
-            case FITNESS_STATUS_UNSAFE:
-            case FITNESS_STATUS_RISKY:
-                $critical_count++;
-                $ocr_critical++;
-                $critical_issues[] = array(
-                    'title' => $ocr['name'],
-                    'message' => $ocr['message'],
-                    'section' => 'OCR_Status'
-                );
-                break;
-            case FITNESS_STATUS_UNSURE:
-                $warning_count++;
-                $ocr_warning++;
-                break;
-            case FITNESS_STATUS_INFO:
-                $info_count++;
-                $ocr_info++;
-                break;
-            case FITNESS_STATUS_GOOD:
-            case FITNESS_STATUS_SAFE:
-                $good_count++;
-                $ocr_good++;
-                break;
-        }
-    }
-}
-
-$total_checks = $critical_count + $warning_count + $info_count + $good_count;
-$health_score = $total_checks > 0 ? round((($good_count + $info_count * 0.5) / $total_checks) * 100) : 100;
-
-// Calculate percentages for progress bar
-$critical_percentage = $total_checks > 0 ? round(($critical_count / $total_checks) * 100) : 0;
-$warning_percentage = $total_checks > 0 ? round(($warning_count / $total_checks) * 100) : 0;
-$health_percentage = $total_checks > 0 ? round((($good_count + $info_count) / $total_checks) * 100) : 100;
+$critical_count = $dashboard_metrics['critical_count'];
+$warning_count = $dashboard_metrics['warning_count'];
+$info_count = $dashboard_metrics['info_count'];
+$good_count = $dashboard_metrics['good_count'];
+$total_checks = $dashboard_metrics['total_checks'];
+$health_score = $dashboard_metrics['health_score'];
+$critical_percentage = $dashboard_metrics['critical_percentage'];
+$warning_percentage = $dashboard_metrics['warning_percentage'];
+$health_percentage = $dashboard_metrics['health_percentage'];
 
 $smarty->assign('critical_count', $critical_count);
 $smarty->assign('warning_count', $warning_count);
@@ -6473,29 +6327,12 @@ $smarty->assign('health_score', $health_score);
 $smarty->assign('health_percentage', $health_percentage);
 $smarty->assign('critical_percentage', $critical_percentage);
 $smarty->assign('warning_percentage', $warning_percentage);
+$dashboard_debug_enabled = isset($_REQUEST['debug_dashboard_counts']) && in_array((string) $_REQUEST['debug_dashboard_counts'], array('1', 'y', 'yes', 'true'), true);
+$smarty->assign('dashboard_debug_enabled', $dashboard_debug_enabled);
+$smarty->assign('dashboard_debug_sources', $dashboard_metrics['debug_sources']);
+$smarty->assign('dashboard_debug_ignored', $dashboard_metrics['ignored']);
 
-$source_breakdown = array(
-    'critical' => array(
-        'main' => $main_critical,
-        'packages' => $packages_critical,
-        'ocr' => $ocr_critical
-    ),
-    'warning' => array(
-        'main' => $main_warning,
-        'packages' => $packages_warning,
-        'ocr' => $ocr_warning
-    ),
-    'info' => array(
-        'main' => $main_info,
-        'packages' => $packages_info,
-        'ocr' => $ocr_info
-    ),
-    'good' => array(
-        'main' => $main_good,
-        'packages' => $packages_good,
-        'ocr' => $ocr_good
-    )
-);
+$source_breakdown = $dashboard_metrics['source_breakdown'];
 
 $smarty->assign('fitness_counts', $fitness_counts);
 

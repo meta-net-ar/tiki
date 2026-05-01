@@ -89,6 +89,50 @@
             </div>
         </div>
     </div>
+
+    {if $dashboard_debug_enabled}
+    <div class="alert alert-secondary mt-3">
+        <h5>{tr}Dashboard Count Debug{/tr}</h5>
+        <p class="mb-2">{tr}Use this table to reconcile summary cards with per-source contributions{/tr}</p>
+        <div class="table-responsive">
+            <table class="table table-sm table-striped mb-2">
+                <thead>
+                    <tr>
+                        <th>{tr}Source{/tr}</th>
+                        <th>{tr}Critical{/tr}</th>
+                        <th>{tr}Warning{/tr}</th>
+                        <th>{tr}Info{/tr}</th>
+                        <th>{tr}Good{/tr}</th>
+                        <th>{tr}Counted{/tr}</th>
+                        <th>{tr}Ignored{/tr}</th>
+                        <th>{tr}Total Items{/tr}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach from=$dashboard_debug_sources key=source item=counts}
+                    <tr>
+                        <td>{$source|escape}</td>
+                        <td>{$counts.critical|default:0}</td>
+                        <td>{$counts.warning|default:0}</td>
+                        <td>{$counts.info|default:0}</td>
+                        <td>{$counts.good|default:0}</td>
+                        <td>{$counts.total_counted|default:0}</td>
+                        <td>{$counts.ignored_items|default:0}</td>
+                        <td>{$counts.total_items|default:0}</td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+        <p class="mb-0">
+            {tr}Global ignored items{/tr}:
+            {$dashboard_debug_ignored.non_array_item|default:0}
+            ({tr}non-array{/tr}),
+            {$dashboard_debug_ignored.unknown_or_unmapped_status|default:0}
+            ({tr}unknown or unmapped status{/tr})
+        </p>
+    </div>
+    {/if}
     
     <p class="description mt-3 mb-2">{tr}Curated actionable items extracted from tagged diagnostic messages{/tr}</p>
 
