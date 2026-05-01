@@ -70,7 +70,9 @@ class ApiCommentsGetTest extends ApiBaseCommentsTest
 
         // Create 5 comments
         for ($i = 1; $i <= 5; $i++) {
-            static::createComment('wiki page', $pageName, "Test Comment $i", "Comment content $i");
+            $threadId = static::createComment('wiki page', $pageName, "Test Comment $i", "Comment content $i");
+            // add reply to each comment to test threading in the response
+            static::createComment('wiki page', $pageName, "Reply to Comment $i", "Reply content $i", $threadId);
         }
 
         $data1 = [

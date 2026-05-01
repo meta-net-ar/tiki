@@ -324,6 +324,15 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
         ];
     }
 
+    private function getEmptyTrackerListSchema()
+    {
+        return [
+            'list' => 'array',
+            'data' => 'array',
+            'count' => 'int',
+        ];
+    }
+
     private function getTrackerListSchema()
     {
         return [
@@ -776,5 +785,13 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
     {
         $this->assertMatchesSchema($body, $this->getDeleteTrackerFieldResponseSchema());
         $this->assertEquals('DONE', $body['status'], 'Status should be DONE after deleting tracker field');
+    }
+
+    protected function assertValidEmptyTrackerListResponse($body)
+    {
+        $this->assertMatchesSchema($body, $this->getEmptyTrackerListSchema());
+        $this->assertEmpty($body['list'], 'Tracker list should be empty');
+        $this->assertEmpty($body['data'], 'Tracker data should be empty');
+        $this->assertGreaterThanOrEqual(0, $body['count'], 'Tracker count should be a non-negative integer');
     }
 }

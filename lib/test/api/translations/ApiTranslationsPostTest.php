@@ -122,7 +122,7 @@ class ApiTranslationsPostTest extends ApiBaseTranslationsTest
             ]);
 
             $body = $this->getResponseBody($response);
-            $this->assertValidErrorResponse($body, 400, 'The object has no language indicated and cannot be translated');
+            $this->assertValidErrorResponse($body, 403, 'Feature Disabled');
         } finally {
             static::setTestPreference('feature_multilingual', 'y');
         }

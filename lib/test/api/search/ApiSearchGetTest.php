@@ -118,7 +118,7 @@ class ApiSearchGetTest extends ApiBaseSearchTest
         $this->assertResponseStatus(200, $response, 'GET /search/lookup with no results should return 200');
 
         $body = $this->getResponseBody($response);
-        $this->assertValidSearchResponse($body);
+        $this->assertValidSearchNoResultsResponse($body);
 
         $this->assertEquals(0, $body['resultset']['count'], 'Should find 0 matching records');
         $this->assertEmpty($body['resultset']['result'], 'Result set should be empty');

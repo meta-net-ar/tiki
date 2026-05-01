@@ -30,7 +30,7 @@ class ApiTrackersGetTest extends ApiBaseTrackersTest
 
         $this->assertResponseStatus(200, $response);
         $body = $this->getResponseBody($response);
-        $this->assertValidTrackerListResponse($body);
+        $this->assertValidEmptyTrackerListResponse($body);
     }
 
     public function testApiListTrackersContainsDefaultTracker()

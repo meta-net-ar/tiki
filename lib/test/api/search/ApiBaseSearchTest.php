@@ -175,7 +175,7 @@ abstract class ApiBaseSearchTest extends ApiTestCase
         ];
     }
 
-    private function getSearchLookupResponseSchema()
+    private function getSearchLookupNoResultsResponseSchema()
     {
         return [
             'title' => 'string',
@@ -183,16 +183,23 @@ abstract class ApiBaseSearchTest extends ApiTestCase
                 'count' => 'int',
                 'offset' => 'int',
                 'maxRecords' => 'int',
-                'result' => [
-                    [
-                        'object_type' => 'string',
-                        'object_id' => 'string|int',
-                        'parent_id' => 'int|string|null',
-                        'title' => 'string',
-                    ]
-                ],
+                'result' => 'array',
             ],
         ];
+    }
+
+    private function getSearchLookupResponseSchema()
+    {
+        $baseSchema = $this->getSearchLookupNoResultsResponseSchema();
+        $baseSchema['resultset']['result'] = [
+            [
+                'object_type' => 'string',
+                'object_id' => 'string|int',
+                'parent_id' => 'int|string|null',
+                'title' => 'string',
+            ]
+        ];
+        return $baseSchema;
     }
 
     protected function assertValidRebuildResponse($response)
@@ -208,5 +215,10 @@ abstract class ApiBaseSearchTest extends ApiTestCase
     protected function assertValidSearchResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getSearchLookupResponseSchema());
+    }
+
+    protected function assertValidSearchNoResultsResponse($response)
+    {
+        $this->assertMatchesSchema($response, $this->getSearchLookupNoResultsResponseSchema());
     }
 }
