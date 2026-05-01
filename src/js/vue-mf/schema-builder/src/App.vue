@@ -15,13 +15,10 @@ const props = defineProps({
         required: false
     }
 })
-console.log('Schema JSON:', props.schemajson);
-console.log('Tracker Field Map:', props.trackerfieldMap);
 </script>
 
 <template>
     <div>
-        <h1>Schema Builder</h1>
         <SchemaBuilder :schemajson="schemajson" :trackerfieldMap="trackerfieldMap" />
     </div>
 </template>
