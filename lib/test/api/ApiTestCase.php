@@ -60,6 +60,12 @@ abstract class ApiTestCase extends \TikiTestCase
             'INSERT INTO `tiki_preferences` (`name`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?',
             [$name, $value, $value]
         );
+
+        // Clear the preference cache so the updated preference value is read from the database
+        // in subsequent API subprocess calls
+        $cachelib = \TikiLib::lib('cache');
+        $cachelib->invalidate('global_preferences');
+        $cachelib->invalidate('tiki_default_preferences_cache');
     }
 
     protected function setUp(): void
