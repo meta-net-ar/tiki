@@ -53,8 +53,8 @@
             </div>
             {if empty($pollId) or $poll_info.voteConsiderationSpan > 0}
                 <div class="form-check">
-                    <input type="radio" class="form-check-input" name="which_date" id="which_date_all" value="all"{if $which_date eq 'all'} checked="checked"{/if}>
-                    <label class="form-check-label" for="which_date_all">{tr}All votes with no time span consideration{/tr}</label>
+                    <input type="radio" class="form-check-input" name="which_date" id="which_date_all_no_span" value="all"{if $which_date eq 'all'} checked="checked"{/if}>
+                    <label class="form-check-label" for="which_date_all_no_span">{tr}All votes with no time span consideration{/tr}</label>
                 </div>
                 <div class="form-check">
                     <input type="radio" class="form-check-input" name="which_date" id="which_date_consideration" value="consideration"{if $which_date eq 'consideration' or $which_date eq ''} checked="checked"{/if}>
@@ -62,8 +62,8 @@
                 </div>
             {else}
                 <div class="form-check">
-                    <input type="radio" name="which_date" id="which_date_all" value="all"{if $which_date eq 'all' or $which_date eq ''} checked="checked"{/if} class="form-check-input">
-                    <label class="form-check-label" for="which_date_all">{tr}All votes{/tr}</label>
+                    <input type="radio" name="which_date" id="which_date_all_simple" value="all"{if $which_date eq 'all' or $which_date eq ''} checked="checked"{/if} class="form-check-input">
+                    <label class="form-check-label" for="which_date_all_simple">{tr}All votes{/tr}</label>
                 </div>
             {/if}
             <input type="submit" class="btn btn-primary btn-sm" name="search" value="{tr}Find{/tr}">
