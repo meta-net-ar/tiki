@@ -4860,6 +4860,7 @@ if (isStandaloneMode() && ! $nagios) {
     update_overall_status($tiki_security, "Tiki Security");
     $return = json_encode($monitoring_info);
     echo $return;
+    return;
 } else {    // not stand-alone
     if (isset($_REQUEST['acknowledge']) || empty($last_state)) {
         $tiki_check_status = array();
@@ -5069,91 +5070,19 @@ if (isStandaloneMode() && ! $nagios) {
 
     $smarty->assign('locales', $locales);
 
-    // Calculate dashboard statistics
-    $critical_count = 0;
-    $warning_count = 0;
-    $info_count = 0;
-    $good_count = 0;
-    $critical_issues = array();
-
-    // Count issues from different sections
-    $all_properties = build_dashboard_all_properties(
-        $server_properties,
-        $mysql_properties,
-        $php_properties,
-        $security,
-        $tiki_security,
-        isset($apache_properties) ? $apache_properties : array(),
-        isset($iis_properties) ? $iis_properties : array()
-    );
-
-    $dashboard_metrics = compute_dashboard_metrics(array(
-        'core' => $all_properties,
-        'server_requirements' => isset($serverRequirements) ? $serverRequirements : array(),
-        'available_tiki_versions' => isset($available_tiki_properties) ? $available_tiki_properties : array(),
-        'composer_requirements' => isset($composerChecks) ? $composerChecks : array(),
-        'realtime' => isset($realtime) ? $realtime : array(),
-        'file_gallery_indexing' => isset($file_handlers) ? $file_handlers : array(),
-        'trim_server_instance' => isset($trimServerRequirements) ? $trimServerRequirements : array(),
-        'trim_client_instance' => isset($trimClientRequirements) ? $trimClientRequirements : array(),
-        'packages' => isset($packagesToDisplay) ? $packagesToDisplay : array(),
-        'ocr' => isset($ocrToDisplay) ? $ocrToDisplay : array(),
-    ));
-
-    $critical_count = $dashboard_metrics['critical_count'];
-    $warning_count = $dashboard_metrics['warning_count'];
-    $info_count = $dashboard_metrics['info_count'];
-    $good_count = $dashboard_metrics['good_count'];
-    $total_checks = $dashboard_metrics['total_checks'];
-    $health_score = $dashboard_metrics['health_score'];
-    $critical_percentage = $dashboard_metrics['critical_percentage'];
-    $warning_percentage = $dashboard_metrics['warning_percentage'];
-    $health_percentage = $dashboard_metrics['health_percentage'];
-
-    $smarty->assign('critical_count', $critical_count);
-    $smarty->assign('warning_count', $warning_count);
-    $smarty->assign('info_count', $info_count);
-    $smarty->assign('good_count', $good_count);
-    $smarty->assign('critical_issues', $critical_issues);
-    $issue_groups = collect_prefixed_issue_groups(
-        $all_properties,
-        $server_properties,
-        $mysql_properties,
-        $php_properties,
-        $security,
-        $tiki_security,
-        isset($apache_properties) ? $apache_properties : array(),
-        isset($iis_properties) ? $iis_properties : array(),
-        array(),
-        array(),
-        isset($ocrToDisplay) ? $ocrToDisplay : array()
-    );
-    $server_critical_issues = $issue_groups['server_critical_issues'];
-    $security_warning_issues = $issue_groups['security_warning_issues'];
-    $optional_recommendations = $issue_groups['optional_recommendations'];
-
-    $smarty->assign('server_critical_issues', $server_critical_issues);
-    $smarty->assign('security_warning_issues', $security_warning_issues);
-    $smarty->assign('optional_recommendations', $optional_recommendations);
-    $smarty->assign('health_score', $health_score);
-    $smarty->assign('health_percentage', $health_percentage);
-    $smarty->assign('critical_percentage', $critical_percentage);
-    $smarty->assign('warning_percentage', $warning_percentage);
-    $smarty->assign('total_checks', $total_checks);
-    $dashboard_debug_enabled = isset($_REQUEST['debug_dashboard_counts']) && in_array((string) $_REQUEST['debug_dashboard_counts'], array('1', 'y', 'yes', 'true'), true);
-    $smarty->assign('dashboard_debug_enabled', $dashboard_debug_enabled);
-    $smarty->assign('dashboard_debug_sources', $dashboard_metrics['debug_sources']);
-    $smarty->assign('dashboard_debug_ignored', $dashboard_metrics['ignored']);
-    $smarty->assign('tooltip_html', build_dashboard_tooltip_html($dashboard_metrics['debug_sources']));
-
-    $source_breakdown = $dashboard_metrics['source_breakdown'];
-
-    $smarty->assign('source_breakdown', $source_breakdown);
+    assign_tiki_check_dashboard_to_smarty($smarty);
 
     $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
     $smarty->assign('mid', 'tiki-check.tpl');
     $smarty->display('tiki.tpl');
+    return;
 }
+
+/*
+ * Control-flow: the main if/elseif/else ends above with return (embedded) or die (standalone createPage).
+ * Nagios JSON branch uses return immediately after echo so this file does not fall through into
+ * function declarations with no further work.
+ */
 
 /**
  * Check package warnings based on specific nuances of each package
@@ -6291,152 +6220,180 @@ function countFitnessStatuses($arrays)
     return $counts;
 }
 
-// Initialize undefined arrays to prevent warnings
-if (! isset($tiki_performance)) {
-    $tiki_performance = array();
-}
-if (! isset($tiki_requirements)) {
-    $tiki_requirements = array();
-}
-if (! isset($tiki_available)) {
-    $tiki_available = array();
-}
-if (! isset($tiki_installed)) {
-    $tiki_installed = array();
-}
-if (! isset($tiki_configured)) {
-    $tiki_configured = array();
-}
-if (! isset($tiki_working)) {
-    $tiki_working = array();
-}
-if (! isset($tiki_health)) {
-    $tiki_health = array();
-}
-if (! isset($tiki_issues)) {
-    $tiki_issues = array();
-}
-if (! isset($tiki_warnings)) {
-    $tiki_warnings = array();
-}
-if (! isset($tiki_info)) {
-    $tiki_info = array();
-}
-if (! isset($tiki_good)) {
-    $tiki_good = array();
-}
-if (! isset($tiki_permissions)) {
-    $tiki_permissions = array();
-}
-if (! isset($tiki_properties)) {
-    $tiki_properties = array();
-}
-if (! isset($database_properties)) {
-    $database_properties = array();
-}
+/**
+ * Compute Server Check dashboard metrics and assign related Smarty variables (embedded admin UI only).
+ *
+ * @param Smarty\Smarty $smarty
+ */
+function assign_tiki_check_dashboard_to_smarty($smarty)
+{
+    global $server_properties;
+    global $mysql_properties;
+    global $php_properties;
+    global $security;
+    global $tiki_security;
+    global $apache_properties;
+    global $iis_properties;
+    global $tiki_properties;
+    global $database_properties;
+    global $tiki_performance;
+    global $tiki_requirements;
+    global $tiki_available;
+    global $tiki_installed;
+    global $tiki_configured;
+    global $tiki_working;
+    global $tiki_health;
+    global $tiki_issues;
+    global $tiki_warnings;
+    global $tiki_info;
+    global $tiki_good;
+    global $tiki_permissions;
+    global $serverRequirements;
+    global $available_tiki_properties;
+    global $composerChecks;
+    global $realtime;
+    global $file_handlers;
+    global $trimServerRequirements;
+    global $trimClientRequirements;
+    global $packagesToDisplay;
+    global $ocrToDisplay;
 
-$all_arrays = array(
-    'php_properties' => $php_properties,
-    'server_properties' => $server_properties,
-    'database_properties' => $database_properties,
-    'tiki_properties' => $tiki_properties,
-    'tiki_security' => $tiki_security,
-    'tiki_permissions' => $tiki_permissions,
-    'tiki_performance' => $tiki_performance,
-    'tiki_requirements' => $tiki_requirements,
-    'tiki_available' => $tiki_available,
-    'tiki_installed' => $tiki_installed,
-    'tiki_configured' => $tiki_configured,
-    'tiki_working' => $tiki_working,
-    'tiki_health' => $tiki_health,
-    'tiki_issues' => $tiki_issues,
-    'tiki_warnings' => $tiki_warnings,
-    'tiki_info' => $tiki_info,
-    'tiki_good' => $tiki_good
-);
+    if (! isset($tiki_performance)) {
+        $tiki_performance = array();
+    }
+    if (! isset($tiki_requirements)) {
+        $tiki_requirements = array();
+    }
+    if (! isset($tiki_available)) {
+        $tiki_available = array();
+    }
+    if (! isset($tiki_installed)) {
+        $tiki_installed = array();
+    }
+    if (! isset($tiki_configured)) {
+        $tiki_configured = array();
+    }
+    if (! isset($tiki_working)) {
+        $tiki_working = array();
+    }
+    if (! isset($tiki_health)) {
+        $tiki_health = array();
+    }
+    if (! isset($tiki_issues)) {
+        $tiki_issues = array();
+    }
+    if (! isset($tiki_warnings)) {
+        $tiki_warnings = array();
+    }
+    if (! isset($tiki_info)) {
+        $tiki_info = array();
+    }
+    if (! isset($tiki_good)) {
+        $tiki_good = array();
+    }
+    if (! isset($tiki_permissions)) {
+        $tiki_permissions = array();
+    }
+    if (! isset($tiki_properties)) {
+        $tiki_properties = array();
+    }
+    if (! isset($database_properties)) {
+        $database_properties = array();
+    }
 
-$fitness_counts = countFitnessStatuses($all_arrays);
+    $all_arrays = array(
+        'php_properties' => $php_properties,
+        'server_properties' => $server_properties,
+        'database_properties' => $database_properties,
+        'tiki_properties' => $tiki_properties,
+        'tiki_security' => $tiki_security,
+        'tiki_permissions' => $tiki_permissions,
+        'tiki_performance' => $tiki_performance,
+        'tiki_requirements' => $tiki_requirements,
+        'tiki_available' => $tiki_available,
+        'tiki_installed' => $tiki_installed,
+        'tiki_configured' => $tiki_configured,
+        'tiki_working' => $tiki_working,
+        'tiki_health' => $tiki_health,
+        'tiki_issues' => $tiki_issues,
+        'tiki_warnings' => $tiki_warnings,
+        'tiki_info' => $tiki_info,
+        'tiki_good' => $tiki_good,
+    );
 
-$critical_count = 0;
-$warning_count = 0;
-$info_count = 0;
-$good_count = 0;
-$critical_issues = array();
+    $fitness_counts = countFitnessStatuses($all_arrays);
 
-// Count issues from different sections (same logic as AJAX section)
-$all_properties = build_dashboard_all_properties(
-    $server_properties,
-    $mysql_properties,
-    $php_properties,
-    $security,
-    $tiki_security,
-    isset($apache_properties) ? $apache_properties : array(),
-    isset($iis_properties) ? $iis_properties : array(),
-    isset($tiki_properties) ? $tiki_properties : array(),
-    isset($database_properties) ? $database_properties : array()
-);
+    $critical_issues = array();
 
-$dashboard_metrics = compute_dashboard_metrics(array(
-    'core' => $all_properties,
-    'server_requirements' => isset($serverRequirements) ? $serverRequirements : array(),
-    'available_tiki_versions' => isset($available_tiki_properties) ? $available_tiki_properties : array(),
-    'composer_requirements' => isset($composerChecks) ? $composerChecks : array(),
-    'realtime' => isset($realtime) ? $realtime : array(),
-    'file_gallery_indexing' => isset($file_handlers) ? $file_handlers : array(),
-    'trim_server_instance' => isset($trimServerRequirements) ? $trimServerRequirements : array(),
-    'trim_client_instance' => isset($trimClientRequirements) ? $trimClientRequirements : array(),
-    'packages' => isset($packagesToDisplay) ? $packagesToDisplay : array(),
-    'ocr' => isset($ocrToDisplay) ? $ocrToDisplay : array(),
-));
+    $all_properties = build_dashboard_all_properties(
+        $server_properties,
+        $mysql_properties,
+        $php_properties,
+        $security,
+        $tiki_security,
+        isset($apache_properties) ? $apache_properties : array(),
+        isset($iis_properties) ? $iis_properties : array(),
+        isset($tiki_properties) ? $tiki_properties : array(),
+        isset($database_properties) ? $database_properties : array()
+    );
 
-$critical_count = $dashboard_metrics['critical_count'];
-$warning_count = $dashboard_metrics['warning_count'];
-$info_count = $dashboard_metrics['info_count'];
-$good_count = $dashboard_metrics['good_count'];
-$total_checks = $dashboard_metrics['total_checks'];
-$health_score = $dashboard_metrics['health_score'];
-$critical_percentage = $dashboard_metrics['critical_percentage'];
-$warning_percentage = $dashboard_metrics['warning_percentage'];
-$health_percentage = $dashboard_metrics['health_percentage'];
+    $dashboard_metrics = compute_dashboard_metrics(array(
+        'core' => $all_properties,
+        'server_requirements' => isset($serverRequirements) ? $serverRequirements : array(),
+        'available_tiki_versions' => isset($available_tiki_properties) ? $available_tiki_properties : array(),
+        'composer_requirements' => isset($composerChecks) ? $composerChecks : array(),
+        'realtime' => isset($realtime) ? $realtime : array(),
+        'file_gallery_indexing' => isset($file_handlers) ? $file_handlers : array(),
+        'trim_server_instance' => isset($trimServerRequirements) ? $trimServerRequirements : array(),
+        'trim_client_instance' => isset($trimClientRequirements) ? $trimClientRequirements : array(),
+        'packages' => isset($packagesToDisplay) ? $packagesToDisplay : array(),
+        'ocr' => isset($ocrToDisplay) ? $ocrToDisplay : array(),
+    ));
 
-$smarty->assign('critical_count', $critical_count);
-$smarty->assign('warning_count', $warning_count);
-$smarty->assign('info_count', $info_count);
-$smarty->assign('good_count', $good_count);
-$smarty->assign('critical_issues', $critical_issues);
+    $critical_count = $dashboard_metrics['critical_count'];
+    $warning_count = $dashboard_metrics['warning_count'];
+    $info_count = $dashboard_metrics['info_count'];
+    $good_count = $dashboard_metrics['good_count'];
+    $total_checks = $dashboard_metrics['total_checks'];
+    $health_score = $dashboard_metrics['health_score'];
+    $critical_percentage = $dashboard_metrics['critical_percentage'];
+    $warning_percentage = $dashboard_metrics['warning_percentage'];
+    $health_percentage = $dashboard_metrics['health_percentage'];
 
-$issue_groups = collect_prefixed_issue_groups(
-    $all_properties,
-    $server_properties,
-    $mysql_properties,
-    $php_properties,
-    $security,
-    $tiki_security,
-    isset($apache_properties) ? $apache_properties : array(),
-    isset($iis_properties) ? $iis_properties : array(),
-    isset($tiki_properties) ? $tiki_properties : array(),
-    isset($database_properties) ? $database_properties : array(),
-    isset($ocrToDisplay) ? $ocrToDisplay : array()
-);
-$server_critical_issues = $issue_groups['server_critical_issues'];
-$security_warning_issues = $issue_groups['security_warning_issues'];
-$optional_recommendations = $issue_groups['optional_recommendations'];
+    $smarty->assign('critical_count', $critical_count);
+    $smarty->assign('warning_count', $warning_count);
+    $smarty->assign('info_count', $info_count);
+    $smarty->assign('good_count', $good_count);
+    $smarty->assign('critical_issues', $critical_issues);
 
-$smarty->assign('server_critical_issues', $server_critical_issues);
-$smarty->assign('security_warning_issues', $security_warning_issues);
-$smarty->assign('optional_recommendations', $optional_recommendations);
-$smarty->assign('health_score', $health_score);
-$smarty->assign('health_percentage', $health_percentage);
-$smarty->assign('critical_percentage', $critical_percentage);
-$smarty->assign('warning_percentage', $warning_percentage);
-$dashboard_debug_enabled = isset($_REQUEST['debug_dashboard_counts']) && in_array((string) $_REQUEST['debug_dashboard_counts'], array('1', 'y', 'yes', 'true'), true);
-$smarty->assign('dashboard_debug_enabled', $dashboard_debug_enabled);
-$smarty->assign('dashboard_debug_sources', $dashboard_metrics['debug_sources']);
-$smarty->assign('dashboard_debug_ignored', $dashboard_metrics['ignored']);
+    $issue_groups = collect_prefixed_issue_groups(
+        $all_properties,
+        $server_properties,
+        $mysql_properties,
+        $php_properties,
+        $security,
+        $tiki_security,
+        isset($apache_properties) ? $apache_properties : array(),
+        isset($iis_properties) ? $iis_properties : array(),
+        isset($tiki_properties) ? $tiki_properties : array(),
+        isset($database_properties) ? $database_properties : array(),
+        isset($ocrToDisplay) ? $ocrToDisplay : array()
+    );
 
-$source_breakdown = $dashboard_metrics['source_breakdown'];
+    $smarty->assign('server_critical_issues', $issue_groups['server_critical_issues']);
+    $smarty->assign('security_warning_issues', $issue_groups['security_warning_issues']);
+    $smarty->assign('optional_recommendations', $issue_groups['optional_recommendations']);
+    $smarty->assign('health_score', $health_score);
+    $smarty->assign('health_percentage', $health_percentage);
+    $smarty->assign('critical_percentage', $critical_percentage);
+    $smarty->assign('warning_percentage', $warning_percentage);
+    $smarty->assign('total_checks', $total_checks);
 
-$smarty->assign('fitness_counts', $fitness_counts);
-
-$smarty->assign('source_breakdown', $source_breakdown);
-$smarty->assign('tooltip_html', build_dashboard_tooltip_html($dashboard_metrics['debug_sources']));
+    $dashboard_debug_enabled = isset($_REQUEST['debug_dashboard_counts']) && in_array((string) $_REQUEST['debug_dashboard_counts'], array('1', 'y', 'yes', 'true'), true);
+    $smarty->assign('dashboard_debug_enabled', $dashboard_debug_enabled);
+    $smarty->assign('dashboard_debug_sources', $dashboard_metrics['debug_sources']);
+    $smarty->assign('dashboard_debug_ignored', $dashboard_metrics['ignored']);
+    $smarty->assign('tooltip_html', build_dashboard_tooltip_html($dashboard_metrics['debug_sources']));
+    $smarty->assign('source_breakdown', $dashboard_metrics['source_breakdown']);
+    $smarty->assign('fitness_counts', $fitness_counts);
+}
