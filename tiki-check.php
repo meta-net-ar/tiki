@@ -6111,7 +6111,12 @@ function resolve_dashboard_section(
 }
 
 /**
- * Build grouped issue lists based on message prefixes.
+ * Build grouped issue lists for the Server Check actionable sections.
+ *
+ * Grouping is driven by the start of each item's `message` string: messages must begin with
+ * "[Critical", "[Warning", or "[Optional" (prefix match) to appear in the curated lists.
+ * OCR rows use the same rule on `$ocr['message']`. Rows without these prefixes are omitted here
+ * (they may still affect dashboard counts via fitness_status elsewhere).
  */
 function collect_prefixed_issue_groups(
     $all_properties,
@@ -6189,37 +6194,6 @@ function collect_prefixed_issue_groups(
     );
 }
 
-// Debug: Count FITNESS_STATUS constants
-function countFitnessStatuses($arrays)
-{
-    $counts = array(
-        'good' => 0,
-        'bad' => 0,
-        'unsure' => 0,
-        'info' => 0,
-        'N/A' => 0,
-        'safe' => 0,
-        'unsafe' => 0,
-        'unknown' => 0,
-        'risky' => 0
-    );
-
-    foreach ($arrays as $array_name => $array_data) {
-        if (is_array($array_data)) {
-            foreach ($array_data as $key => $item) {
-                if (is_array($item) && isset($item['fitness'])) {
-                    $status = $item['fitness'];
-                    if (isset($counts[$status])) {
-                        $counts[$status]++;
-                    }
-                }
-            }
-        }
-    }
-
-    return $counts;
-}
-
 /**
  * Compute Server Check dashboard metrics and assign related Smarty variables (embedded admin UI only).
  *
@@ -6236,18 +6210,6 @@ function assign_tiki_check_dashboard_to_smarty($smarty)
     global $iis_properties;
     global $tiki_properties;
     global $database_properties;
-    global $tiki_performance;
-    global $tiki_requirements;
-    global $tiki_available;
-    global $tiki_installed;
-    global $tiki_configured;
-    global $tiki_working;
-    global $tiki_health;
-    global $tiki_issues;
-    global $tiki_warnings;
-    global $tiki_info;
-    global $tiki_good;
-    global $tiki_permissions;
     global $serverRequirements;
     global $available_tiki_properties;
     global $composerChecks;
@@ -6258,70 +6220,12 @@ function assign_tiki_check_dashboard_to_smarty($smarty)
     global $packagesToDisplay;
     global $ocrToDisplay;
 
-    if (! isset($tiki_performance)) {
-        $tiki_performance = array();
-    }
-    if (! isset($tiki_requirements)) {
-        $tiki_requirements = array();
-    }
-    if (! isset($tiki_available)) {
-        $tiki_available = array();
-    }
-    if (! isset($tiki_installed)) {
-        $tiki_installed = array();
-    }
-    if (! isset($tiki_configured)) {
-        $tiki_configured = array();
-    }
-    if (! isset($tiki_working)) {
-        $tiki_working = array();
-    }
-    if (! isset($tiki_health)) {
-        $tiki_health = array();
-    }
-    if (! isset($tiki_issues)) {
-        $tiki_issues = array();
-    }
-    if (! isset($tiki_warnings)) {
-        $tiki_warnings = array();
-    }
-    if (! isset($tiki_info)) {
-        $tiki_info = array();
-    }
-    if (! isset($tiki_good)) {
-        $tiki_good = array();
-    }
-    if (! isset($tiki_permissions)) {
-        $tiki_permissions = array();
-    }
     if (! isset($tiki_properties)) {
         $tiki_properties = array();
     }
     if (! isset($database_properties)) {
         $database_properties = array();
     }
-
-    $all_arrays = array(
-        'php_properties' => $php_properties,
-        'server_properties' => $server_properties,
-        'database_properties' => $database_properties,
-        'tiki_properties' => $tiki_properties,
-        'tiki_security' => $tiki_security,
-        'tiki_permissions' => $tiki_permissions,
-        'tiki_performance' => $tiki_performance,
-        'tiki_requirements' => $tiki_requirements,
-        'tiki_available' => $tiki_available,
-        'tiki_installed' => $tiki_installed,
-        'tiki_configured' => $tiki_configured,
-        'tiki_working' => $tiki_working,
-        'tiki_health' => $tiki_health,
-        'tiki_issues' => $tiki_issues,
-        'tiki_warnings' => $tiki_warnings,
-        'tiki_info' => $tiki_info,
-        'tiki_good' => $tiki_good,
-    );
-
-    $fitness_counts = countFitnessStatuses($all_arrays);
 
     $critical_issues = array();
 
@@ -6394,6 +6298,4 @@ function assign_tiki_check_dashboard_to_smarty($smarty)
     $smarty->assign('dashboard_debug_sources', $dashboard_metrics['debug_sources']);
     $smarty->assign('dashboard_debug_ignored', $dashboard_metrics['ignored']);
     $smarty->assign('tooltip_html', build_dashboard_tooltip_html($dashboard_metrics['debug_sources']));
-    $smarty->assign('source_breakdown', $dashboard_metrics['source_breakdown']);
-    $smarty->assign('fitness_counts', $fitness_counts);
 }
