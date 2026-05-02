@@ -58,7 +58,17 @@ class ThemeLib extends TikiLib
     public static function getActiveThemeAndOption(): array
     {
         global $prefs, $smarty;
-        $section = Sections::getCurrentSection();
+
+        // Detect and set admin section BEFORE determining theme so that section checks work correctly
+        // Only do this once per request to avoid recursion
+        static $adminSectionDetected = false;
+        if (!$adminSectionDetected && self::isAdminPageRequest()) {
+            Sections::setCurrentSection(Sections::SECTION_ADMIN_LAYOUT);
+            $prefs['site_layout_admin'] = 'admin';
+            $prefs['site_layout'] = 'admin';
+            $adminSectionDetected = true;
+        }
+
         //Initialize variables for the actual theme and theme option to be displayed
         $theme_active = $prefs['theme'] ?? '';
         $theme_option_active = $prefs['theme_option'] ?? '';
@@ -87,7 +97,6 @@ class ThemeLib extends TikiLib
             $theme_active = $prefs['theme_admin'];
             $theme_option_active = $prefs['theme_option_admin'] ?? '';                                // and its option
         }
-
 
         //consider CSS Editor (tiki-edit_css.php)
         if (! empty($_SESSION['try_theme'])) {
