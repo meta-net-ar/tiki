@@ -6160,6 +6160,10 @@ function collect_prefixed_issue_groups(
         if ($section === 'Tiki_Properties') {
             $row_id = 'Server_Compatibility';
         }
+        // No Database_Properties table in tiki-check.tpl; land on MySQL / MariaDB section.
+        if ($section === 'Database_Properties') {
+            $row_id = 'MySQL_or_MariaDB_Database_Properties';
+        }
 
         if (strpos($msg, '[Critical') === 0) {
             $server_critical_issues[] = array('title' => $key, 'message' => $msg, 'section' => $section, 'row_id' => $row_id);
@@ -6298,4 +6302,7 @@ function assign_tiki_check_dashboard_to_smarty($smarty)
     $smarty->assign('dashboard_debug_sources', $dashboard_metrics['debug_sources']);
     $smarty->assign('dashboard_debug_ignored', $dashboard_metrics['ignored']);
     $smarty->assign('tooltip_html', build_dashboard_tooltip_html($dashboard_metrics['debug_sources']));
+    if ($dashboard_debug_enabled) {
+        $smarty->assign('source_breakdown', $dashboard_metrics['source_breakdown']);
+    }
 }

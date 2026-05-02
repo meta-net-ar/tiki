@@ -1,6 +1,7 @@
 <div class="panel panel-default">
     <div class="panel-heading">
         <strong>{tr}Server Check Summary{/tr}</strong>
+        <p class="small text-muted mb-0 mt-2">{tr}These totals are computed from the automated checks below and may differ from what you see in practice. In particular, parts of Realtime Tiki (such as live WebSocket connectivity and message exchange, which are evaluated in the browser), so the summary does not fully reflect realtime behavior.{/tr}</p>
     </div>
     <div class="panel-body">
         <div class="dashboard-summary">
@@ -103,12 +104,38 @@
             </table>
         </div>
         <p class="mb-0">
-            {tr}Global ignored items{/tr}:
+            {tr}Global ignored items:{/tr}
             {$dashboard_debug_ignored.non_array_item|default:0}
             ({tr}non-array{/tr}),
             {$dashboard_debug_ignored.unknown_or_unmapped_status|default:0}
             ({tr}unknown or unmapped status{/tr})
         </p>
+        {if isset($source_breakdown)}
+        <h6 class="mt-3 mb-2">{tr}Summary card buckets (main vs packages vs OCR){/tr}</h6>
+        <p class="small text-muted mb-2">{tr}Per-status counts attributed to merged core checks (main), optional packages, and OCR rows.{/tr}</p>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered mb-0">
+                <thead>
+                    <tr>
+                        <th>{tr}Status bucket{/tr}</th>
+                        <th>{tr}Main{/tr}</th>
+                        <th>{tr}Packages{/tr}</th>
+                        <th>{tr}OCR{/tr}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach from=$source_breakdown key=st item=buckets}
+                    <tr>
+                        <td>{$st|escape}</td>
+                        <td>{$buckets.main|default:0}</td>
+                        <td>{$buckets.packages|default:0}</td>
+                        <td>{$buckets.ocr|default:0}</td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+        {/if}
     </div>
     {/if}
     

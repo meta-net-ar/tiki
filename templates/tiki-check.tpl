@@ -122,7 +122,7 @@ window.showCriticalIssues = function() {
 
 </script>
 
-<h2  class="showhide_heading" id="Server_Compatibility">{tr}Server compatibility{/tr} <a href="#Server_compatibility" class="heading-link" aria-label="{tr}Server compatibility{/tr}><span class="icon icon-link fas fa-link "></span></a></h2>
+<h2  class="showhide_heading" id="Server_Compatibility">{tr}Server compatibility{/tr} <a href="#Server_Compatibility" class="heading-link" aria-label="{tr}Server compatibility{/tr}><span class="icon icon-link fas fa-link "></span></a></h2>
 
 {if ! $is_compatible}
     {remarksbox type='error' title="{tr}Server Compatibility Issue{/tr}" close='n'}
@@ -182,7 +182,7 @@ window.showCriticalIssues = function() {
         </thead>
         <tbody>
         {foreach from=$available_tiki_properties key=key item=item}
-            <tr>
+            <tr id="Server_Compatibility_Available_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text">{$item.name}</th>
                 <td class="text">
                     {$item.php.min}{if $item.php.max && $item.php.max != $item.php.min} - {$item.php.max}{elseif !$item.php.max}+{/if}
@@ -272,7 +272,7 @@ window.showCriticalIssues = function() {
 </div>
 
 <a name="dbmismatches"></a>
-<h2 class="showhide_heading" id="Database_mismatches">{tr}Database mismatches{/tr}<a href="#Database mismatches" class="heading-link" aria-label="{tr}Database mismatches{/tr}"><span class="icon icon-link fas fa-link "></span></a></h2>
+<h2 class="showhide_heading" id="Database_mismatches">{tr}Database mismatches{/tr}<a href="#Database_mismatches" class="heading-link" aria-label="{tr}Database mismatches{/tr}"><span class="icon icon-link fas fa-link "></span></a></h2>
 {tr}Check for database tables and columns that are not synced with db/tiki.sql{/tr}.<br>
 <a href="tiki-check.php?dbmismatches=run&ts={$smarty.now}#dbmismatches" class="btn btn-primary btn-sm" style="margin-bottom: 10px;">{tr}Check{/tr}</a>
 {if !empty($diffDatabase)}
@@ -559,7 +559,7 @@ window.showCriticalIssues = function() {
         <tbody>
             {foreach from=$dirs item=d key=k}
                 {if $useDatabase[$k] !== 'y'}
-                    <tr>
+                    <tr id="Special_directories_{$d|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                         <th class="text">Directory: {$d|escape}</th>
                         <td data-th="{tr}Fitness:{/tr}" class="text">&nbsp;
                             {if $dirsWritable[$k]}
@@ -987,7 +987,7 @@ window.showCriticalIssues = function() {
             <th>{tr}Message{/tr}</th>
         </tr></thead><tbody>
         {foreach from=$composer_checks key=key item=item}
-                <tr>
+                <tr id="Tiki_Packages_Composer_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                     <th class="text">{tr}Requirement:{/tr} {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
                     <span class="text-{$fmap[$item.fitness_status]['class']}">
@@ -1015,7 +1015,7 @@ window.showCriticalIssues = function() {
         </tr>
 </thead><tbody>
         {foreach from=$packages key=key item=item}
-            <tr>
+            <tr id="Tiki_Packages_Package_{$item.name|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text">{tr}Package name:{/tr} {$item.name}</th>
                 <td data-th="{tr}Version:{/tr}" class="text">&nbsp;{$item.version}</td>
                 <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
