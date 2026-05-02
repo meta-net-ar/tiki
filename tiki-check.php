@@ -787,6 +787,39 @@ if (! $standalone) {
     $render = "";
 
     /**
+     * Standalone translation fallback with %0, %1... replacements.
+     *
+     * @param string $string
+     * @param mixed ...$args
+     * @return string
+     */
+    function tra($string, ...$args)
+    {
+        $text = (string) $string;
+        if (! empty($args)) {
+            $replacements = array();
+            foreach ($args as $idx => $value) {
+                $replacements['%' . $idx] = (string) $value;
+            }
+            $text = strtr($text, $replacements);
+        }
+
+        return $text;
+    }
+
+    /**
+     * Alias to tra() for standalone fallback compatibility.
+     *
+     * @param string $string
+     * @param mixed ...$args
+     * @return string
+     */
+    function tr($string, ...$args)
+    {
+        return tra($string, ...$args);
+    }
+
+    /**
       * @param $var
       * @param $style
       */
@@ -877,13 +910,25 @@ if (! $standalone) {
     }
 }
 
+/**
+ * Whether tiki-check is running in standalone mode (HTML output without full Tiki).
+ *
+ * Uses $GLOBALS so helper calls stay correct inside nested functions that shadow $standalone.
+ *
+ * @return bool
+ */
+function isStandaloneMode()
+{
+    return array_key_exists('standalone', $GLOBALS) ? (bool) $GLOBALS['standalone'] : false;
+}
+
 // Get PHP properties and check them
 $php_properties = array();
 
 if (! file_exists('db/local.php')) {
     $errorMessage = tra('Mysql benchmark was skipped because no DB configuration was found.');
 
-    if ($standalone) {
+    if (isStandaloneMode()) {
         $errorMessage = tra('Mysql benchmark was skipped because it was running as standalone and no DB configuration was found.');
     }
 
@@ -1026,7 +1071,7 @@ if ($s) {
 
 // Now connect to the DB and make all our connectivity methods work the same
 $connection = false;
-if ($standalone && ! $locked) {
+if (isStandaloneMode() && ! $locked) {
     if (empty($_POST['dbhost']) && ! ($php_properties['DB Driver']['setting'] == 'Not available')) {
             $render .= <<<DBC
 <h2>Database credentials</h2>
@@ -1189,7 +1234,7 @@ if (function_exists('disk_free_space')) {
         );
 }
 
-if (! $standalone) {
+if (! isStandaloneMode()) {
     $tikiWikiVersion = new TWVersion();
     $tikiBaseVersion = $tikiWikiVersion->getBaseVersion();
 }
@@ -2160,7 +2205,7 @@ if ($s) {
 }
 
 $s = extension_loaded('openssl');
-if (! $standalone) {
+if (! isStandaloneMode()) {
     $msg = tr('Enable safe, encrypted storage of data such as passwords. Tiki 21 and earlier versions, require OpenSSL for the User Encryption feature and improves encryption in other features, when available. Tiki still uses OpenSSL to decrypt user data encrypted with OpenSSL, when converting that data to Sodium (PHP 7.2+). Please check the \'User Data Encryption\' section to see if there is user data encrypted with OpenSSL.');
 } else {
     $msg = tr('Enable safe, encrypted storage of data such as passwords. Tiki 21 and earlier versions, require OpenSSL for the User Encryption feature and improves encryption in other features, when available.');
@@ -2183,7 +2228,7 @@ if ($s) {
 
 
 $s = extension_loaded('mcrypt');
-if (! $standalone) {
+if (! isStandaloneMode()) {
     $msg = tr('MCrypt is abandonware and is being phased out. Starting in version 18 up to 21, Tiki uses OpenSSL where it previously used MCrypt, except perhaps via third-party libraries. Tiki still uses MCrypt to decrypt user data encrypted with MCrypt, when converting that data to OpenSSL. Please check the \'User Data Encryption\' section to see if there is user data encrypted with MCrypt.');
 } else {
     $msg = tr('MCrypt is abandonware and is being phased out. Starting in version 18 up to 21, Tiki uses OpenSSL where it previously used MCrypt, except perhaps via third-party libraries.');
@@ -2205,7 +2250,7 @@ if ($s) {
 }
 
 
-if (! $standalone) {
+if (! isStandaloneMode()) {
     // check Zend captcha will work which depends on \Laminas\Math\Rand
     $captcha = new Laminas\Captcha\Dumb();
     $math_random = array(
@@ -2320,7 +2365,7 @@ if ($has_xdebug) {
 // Get MySQL properties and check them
 $mysql_properties = array();
 $mysql_variables = array();
-if ($connection || ! $standalone) {
+if ($connection || ! isStandaloneMode()) {
     // MySQL version
     $query = 'SELECT VERSION();';
     $result = query($query, $connection) ?? array();
@@ -2546,7 +2591,7 @@ if ($connection || ! $standalone) {
         $mysql_variables[$value['Variable_name']] = array('value' => $value['Value']);
     }
 
-    if (! $standalone) {
+    if (! isStandaloneMode()) {
         $mysql_crashed_tables = array();
         // This should give all crashed tables (MyISAM at least) - does need testing though !!
         $query = 'SHOW TABLE STATUS WHERE engine IS NULL AND comment <> "VIEW";';
@@ -2584,7 +2629,7 @@ if (function_exists('apache_get_version')) {
         );
     }
 
-    if (! $standalone) {
+    if (! isStandaloneMode()) {
         // work out if RewriteBase is set up properly
         global $url_path;
         $enabledFileName = '.htaccess';
@@ -2630,7 +2675,7 @@ if (function_exists('apache_get_version')) {
         $sef_test_url = $sef_test_base_url . 'tiki-check?tiki-check-ping=' . $sef_test_ping_value;
         $sef_test_folder_created = false;
         $sef_test_folder_writable = true;
-        if ($standalone) {
+        if (isStandaloneMode()) {
             $sef_test_path_current = __DIR__;
             $sef_test_dir_name = 'tiki-check-' . $sef_test_ping_value;
             $sef_test_folder = $sef_test_path_current . DIRECTORY_SEPARATOR . $sef_test_dir_name;
@@ -2788,7 +2833,7 @@ if (check_isIIS()) {
 }
 
 // Check Tiki Packages
-if (! $standalone) {
+if (! isStandaloneMode()) {
     global $tikipath, $base_host;
 
     $composerManager = new ComposerManager($tikipath);
@@ -3392,7 +3437,7 @@ if ($s == 1) {
     );
 }
 
-if ($standalone || (! empty($prefs) && $prefs['fgal_enable_auto_indexing'] === 'y')) {
+if (isStandaloneMode() || (! empty($prefs) && $prefs['fgal_enable_auto_indexing'] === 'y')) {
     // adapted from \Tiki\Lib\Filegals\FileGalLib::get_file_handlers
     $fh_possibilities = array(
         'application/ms-excel' => array('xls2csv %1'),
@@ -3436,14 +3481,14 @@ if ($standalone || (! empty($prefs) && $prefs['fgal_enable_auto_indexing'] === '
             'message' => '',
         );
 
-        if (! $standalone && array_key_exists($type, $fh_native)) {
+        if (! isStandaloneMode() && array_key_exists($type, $fh_native)) {
             if ($tikiWikiVersion->getBaseVersion() >= $fh_native["$type"]) {
                 $file_handler['fitness'] = tra('good');
                 $file_handler['fitness_status'] = FITNESS_STATUS_GOOD;
                 $file_handler['message'] = tra("will be handled natively");
             }
         }
-        if ($standalone && array_key_exists($type, $fh_native)) {
+        if (isStandaloneMode() && array_key_exists($type, $fh_native)) {
             $file_handler['fitness'] = tra('info');
             $file_handler['fitness_status'] = FITNESS_STATUS_INFO;
             $file_handler['message'] = tr("will be handled natively by Tiki &gt;= %0", $fh_native["$type"]);
@@ -3488,7 +3533,7 @@ if ($standalone || (! empty($prefs) && $prefs['fgal_enable_auto_indexing'] === '
 }
 
 
-if (! $standalone) {
+if (! isStandaloneMode()) {
     // The following is borrowed from tiki-admin_system.php
     $useDatabase = array();
     if ($prefs['feature_forums'] == 'y') {
@@ -3830,7 +3875,7 @@ $diffIndexDefis = array();
 $alterTableFile = array();
 
 // Get Security token, neccessary for mismatch tables deletion
-if (! $standalone) {
+if (! isStandaloneMode()) {
     $ticket = smarty_function_ticket(array('mode' => 'get'), $smarty->getEmptyInternalTemplate());
     $smarty->assign('ticket', $ticket);
 }
@@ -4202,7 +4247,7 @@ function compareKeyDefinitions($fileIndexes, $dbIndexes, &$diffIndexDefis, $tabl
     $diffIndexDefis[$tableName]['db'] = array_values($dbIndexes);
 }
 
-if (isset($_REQUEST['dbmismatches']) && ! $standalone && file_exists('db/tiki.sql')) {
+if (isset($_REQUEST['dbmismatches']) && ! isStandaloneMode() && file_exists('db/tiki.sql')) {
     $diffDatabase = true;
     // Get the db_mismatches check result
     $checkResult = check_db_mismatches();
@@ -4343,7 +4388,7 @@ if ($trimCapable) {
 }
 
 $dbEngine = $dbVersion = null;
-if ($connection || ! $standalone) {
+if ($connection || ! isStandaloneMode()) {
     $dbEngine = $isMariaDB ? 'mariadb' : 'mysql';
     $dbVersion = ! empty($mysql_properties['Version']['setting']) ? $mysql_properties['Version']['setting'] : null;
 } elseif (isset($_POST['db-engine'], $_POST['db-version'])) {
@@ -4354,7 +4399,7 @@ if ($connection || ! $standalone) {
 $serverRequirements = checkServerRequirements(PHP_VERSION, $dbEngine, $dbVersion);
 $available_tiki_properties = getCompatibleVersions($dbEngine, $dbVersion);
 
-if (! $standalone) {
+if (! isStandaloneMode()) {
     $serverRequirements['Tiki Version'] = array(
         'value' => $tikiBaseVersion,
         'fitness' => tra('info'),
@@ -4383,7 +4428,7 @@ if (! $standalone) {
     }
 }
 
-if ($standalone) {
+if (isStandaloneMode()) {
     function createPage($title, $content)
     {
         echo <<<END
@@ -4592,7 +4637,7 @@ END;
     }
 }
 
-if ($standalone && ! $nagios) {
+if (isStandaloneMode() && ! $nagios) {
     $render .= '<style type="text/css">td, th { border: 1px solid #000000; vertical-align: baseline; padding: .5em; }</style>';
     $render .= '<h2>Server compatibility</h2>';
 
@@ -5639,9 +5684,7 @@ function get_tiki_check_db_connection()
         return $connection;
     }
 
-    global $standalone;
-
-    if ($standalone === false && class_exists('\TikiDb')) {
+    if (! isStandaloneMode() && class_exists('\TikiDb')) {
         $tikiDb = \TikiDb::get();
         if ($tikiDb && isset($tikiDb->db) && $tikiDb->db instanceof \mysqli) {
             $connection = $tikiDb->db;
