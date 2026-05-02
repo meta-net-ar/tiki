@@ -107,6 +107,47 @@ class ThemeLib extends TikiLib
         $smarty->assign('theme', $theme_active);
         $smarty->assign('theme_option', $theme_option_active);
     }
+
+    /**
+     * Check if the current request is for an admin page that should use the admin theme
+     * Encapsulates the complex condition check to avoid code duplication
+     * @return bool True if this is an admin page request
+     */
+    public static function isAdminPageRequest(): bool
+    {
+        global $prefs, $user;
+
+        if ($prefs['theme_unified_admin_backend'] !== 'y') {
+            return false;
+        }
+
+        $userlib = TikiLib::lib('user');
+        $groups = $userlib->get_user_groups($user);
+
+        if (! in_array('Admins', $groups)) {
+            return false;
+        }
+
+        return (strpos($_SERVER['PHP_SELF'], 'admin')
+            || strpos($_SERVER['PHP_SELF'], 'cache')
+            || strpos($_SERVER['PHP_SELF'], 'import')
+            || strpos($_SERVER['PHP_SELF'], 'manage')
+            || strpos($_SERVER['PHP_SELF'], 'permissions')
+            || strpos($_SERVER['PHP_SELF'], 'stats')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_banner')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_categories')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_perspective')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-edit_quiz')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-export')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-import')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-list_banners')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-list_comments')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-list_contents')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-plugins')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-received')
+            || strpos($_SERVER['PHP_SELF'], 'tiki-sys'));
+    }
+
     /**
      * A utility method for \Tiki\Smarty\SmartyTiki to convert paths like
      * public/generated/_custom/sites/default_site/themes/customizationstest/ back into
