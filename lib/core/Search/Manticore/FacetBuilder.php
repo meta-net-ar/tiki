@@ -24,6 +24,9 @@ class FacetBuilder
         $this->possibleFields = $fields;
     }
 
+    /**
+     * @param \Search_Query_Facet_Interface[] $facets
+     */
     public function build(array $facets)
     {
         if (empty($facets)) {
@@ -32,6 +35,9 @@ class FacetBuilder
 
         $out = [];
         foreach ($facets as $facet) {
+            if (! $facet->isBuiltFromIndex()) {
+                continue;
+            }
             $out[] = $this->buildFacet($facet);
         }
         return implode(' ', $out);

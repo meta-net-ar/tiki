@@ -1383,6 +1383,14 @@ class UnifiedSearchLib
             $query->filterTags($filter['tags']);
         }
 
+        if (isset($filter['fields']) && isset($filter['content'])) {
+            $fields = array_map('trim', explode(Search_Query_Facet_FieldAggregator::OPERATOR, $filter['fields']));
+            $query->filterContent($filter['content'], $fields);
+
+            unset($filter['fields']);
+            unset($filter['content']);
+        }
+
         if (isset($filter['content']) && $filter['content']) {
             $query->filterContent($filter['content'], $this->getFilterContentFields());
         }
@@ -1511,10 +1519,16 @@ class UnifiedSearchLib
         global $prefs;
         $types = $this->getSupportedTypes();
 
+        $fields = $this->getAvailableFields()['object_types'];
+
         $facets = [
             Search_Query_Facet_Term::fromField('object_type')
                 ->setLabel(tr('Object Type'))
                 ->setRenderMap($types),
+            Search_Query_Facet_FieldAggregator::fromName('fields')
+                ->setLabel(tr('Fields'))
+                ->setData($fields)
+                ->addDependencyName('object_type'),
         ];
 
         if ($prefs['feature_multilingual'] == 'y') {

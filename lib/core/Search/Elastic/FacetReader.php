@@ -15,6 +15,16 @@ class Search_Elastic_FacetReader
 
     public function getFacetFilter(Search_Query_Facet_Interface $facet)
     {
+        foreach ($facet->getDependencyNames() as $dependency) {
+            if (empty($this->data->facets->$dependency->total) && empty($this->data->aggregations->$dependency->buckets)) {
+                return null;
+            }
+        }
+
+        if (! $facet->isBuiltFromIndex()) {
+            return new Search_ResultSet_FacetFilter($facet, $facet->getData());
+        }
+
         $facetName = $facet->getName();
         $entry = null;
 
