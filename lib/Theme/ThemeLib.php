@@ -62,7 +62,7 @@ class ThemeLib extends TikiLib
         // Detect and set admin section BEFORE determining theme so that section checks work correctly
         // Only do this once per request to avoid recursion
         static $adminSectionDetected = false;
-        if (!$adminSectionDetected && self::isAdminPageRequest()) {
+        if (! $adminSectionDetected && self::isAdminPageRequest()) {
             Sections::setCurrentSection(Sections::SECTION_ADMIN_LAYOUT);
             $prefs['site_layout_admin'] = 'admin';
             $prefs['site_layout'] = 'admin';
