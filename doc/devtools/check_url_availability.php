@@ -42,6 +42,9 @@ class UrlAvailabilityChecker
     /** @var int URLs to check concurrently (too high may trigger rate limiting) */
     private $batchSize = 50;
 
+    /** @var int Max retries for transient failures (timeouts, 429, 5xx) */
+    private $maxRetries = 2;
+
     /** @var string Browser-like User-Agent to reduce bot detection false positives */
     private $userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
@@ -63,19 +66,32 @@ class UrlAvailabilityChecker
         $totalUrls = count($urlData);
         $processed = 0;
 
-        $batches = array_chunk($urlData, $this->batchSize);
+        foreach ($urlData as &$data) {
+            $data['attempts'] = 0;
+        }
+        unset($data);
 
-        foreach ($batches as $batch) {
-            $this->processBatch($batch);
-            $processed += count($batch);
+        $queue = $urlData;
+
+        while (! empty($queue)) {
+            $batchSize = min(count($queue), $this->batchSize);
+            $batch = array_splice($queue, 0, $batchSize);
+
+            $retries = $this->processBatch($batch);
+
+            if (! empty($retries)) {
+                $queue = array_merge($queue, $retries);
+            }
+
+            $processed += (count($batch) - count($retries));
             echo "\rChecking URL availability... " . $processed . "/" . $totalUrls . " URLs checked";
         }
 
         echo "\r" . str_repeat(' ', 60) . "\r";
 
         return [
-            'broken' => $this->brokenUrls,
-            'active' => $this->activeUrls,
+            'broken'    => $this->brokenUrls,
+            'active'    => $this->activeUrls,
             'uncertain' => $this->uncertainUrls,
         ];
     }
@@ -84,6 +100,7 @@ class UrlAvailabilityChecker
     {
         $multiHandle = curl_multi_init();
         $handles = [];
+        $retries = [];
 
         foreach ($batch as $index => $data) {
             // Clean URL: remove trailing punctuation and Tiki wiki syntax (|text)
@@ -95,17 +112,17 @@ class UrlAvailabilityChecker
 
             $ch = curl_init();
             curl_setopt_array($ch, [
-                CURLOPT_URL => $cleanUrl,
+                CURLOPT_URL            => $cleanUrl,
                 CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => $this->timeout,
+                CURLOPT_TIMEOUT        => $this->timeout,
                 CURLOPT_CONNECTTIMEOUT => $this->connectTimeout,
                 CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_MAXREDIRS => 5,
-                CURLOPT_NOBODY => true,
-                CURLOPT_USERAGENT => $this->userAgent,
+                CURLOPT_MAXREDIRS      => 5,
+                CURLOPT_NOBODY         => true,
+                CURLOPT_USERAGENT      => $this->userAgent,
                 CURLOPT_SSL_VERIFYPEER => true,
                 CURLOPT_SSL_VERIFYHOST => 2,
-                CURLOPT_HTTPHEADER => [
+                CURLOPT_HTTPHEADER     => [
                     'Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
                     'Accept-Language: en-US,en;q=0.5',
                 ],
@@ -129,36 +146,52 @@ class UrlAvailabilityChecker
 
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $error = curl_error($ch);
+            $errno = curl_errno($ch);
 
-            // Some sites don't support HEAD requests properly and return 404 or 405
-            // Retry with GET to confirm if the resource actually exists
-            if ($httpCode === 404 || $httpCode === 405) {
+            // Retry with GET if HEAD fails with 403/404/405 (common with bot protection)
+            if ($httpCode === 403 || $httpCode === 404 || $httpCode === 405) {
                 curl_multi_remove_handle($multiHandle, $ch);
                 curl_setopt($ch, CURLOPT_NOBODY, false);
                 curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
                 curl_exec($ch);
                 $newHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 $error = curl_error($ch);
+                $errno = curl_errno($ch);
                 if ($newHttpCode >= 200 && $newHttpCode < 400) {
                     $httpCode = $newHttpCode;
                 }
-                curl_multi_add_handle($multiHandle, $ch);
             }
 
-            if ($httpCode >= 200 && $httpCode < 400) {
-                $this->activeUrls[] = $data;
-            } elseif (in_array($httpCode, [103, 400, 401, 403, 405, 429])) {
-                // Uncertain: bot protection, auth required, method not allowed, rate limited
+            // Transient issues (Timeout, 429, 5xx)
+            $isTransient = $errno === CURLE_OPERATION_TIMEDOUT
+                || $httpCode === 429
+                || ($httpCode >= 500 && $httpCode < 600);
+
+            $resultData = $data;
+            unset($resultData['attempts']);
+
+            if ($isTransient && $data['attempts'] < $this->maxRetries) {
+                $data['attempts']++;
+                $retries[] = $data;
+            } elseif ($httpCode >= 200 && $httpCode < 400) {
+                $this->activeUrls[] = $resultData;
+            } elseif ($isTransient) {
+                // Exhausted retries -> Uncertain
+                $reason = $errno === CURLE_OPERATION_TIMEDOUT
+                    ? 'Timeout (after ' . $this->maxRetries . ' retries)'
+                    : "HTTP $httpCode (after " . $this->maxRetries . ' retries)';
+                $this->uncertainUrls[] = array_merge($resultData, ['reason' => $reason, 'http_code' => $httpCode]);
+            } elseif (in_array($httpCode, [103, 400, 401, 403, 405])) {
+                // Uncertain: bot protection, auth required, method not allowed
                 $reasons = [
                     103 => 'HTTP 103 (Early Hints - provisional)',
                     400 => 'HTTP 400 (Possible bot protection)',
                     401 => 'HTTP 401 (Requires authentication)',
                     403 => 'HTTP 403 (Possible bot protection)',
                     405 => 'HTTP 405 (Method not allowed)',
-                    429 => 'HTTP 429 (Rate limited)',
                 ];
                 $reason = $reasons[$httpCode] ?? "HTTP $httpCode";
-                $this->uncertainUrls[] = array_merge($data, ['reason' => $reason, 'http_code' => $httpCode]);
+                $this->uncertainUrls[] = array_merge($resultData, ['reason' => $reason, 'http_code' => $httpCode]);
             } else {
                 $reason = $error ?: "HTTP $httpCode";
                 if ($httpCode === 0) {
@@ -168,13 +201,16 @@ class UrlAvailabilityChecker
                 } elseif ($httpCode >= 500) {
                     $reason = "HTTP $httpCode (Server Error)";
                 }
-                $this->brokenUrls[] = array_merge($data, ['reason' => $reason, 'http_code' => $httpCode]);
+                $this->brokenUrls[] = array_merge($resultData, ['reason' => $reason, 'http_code' => $httpCode]);
             }
 
             curl_multi_remove_handle($multiHandle, $ch);
+            curl_close($ch);
         }
 
         curl_multi_close($multiHandle);
+
+        return $retries;
     }
 }
 
