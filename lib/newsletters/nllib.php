@@ -89,7 +89,7 @@ class NlLib extends TikiLib
         string $articleClipTypes,
         string $emptyClipBlocksSend
     ): int|false {
-        $query = 'update `' . self::TABLE_NEWSLETTERS . '` set  
+        $query = 'update `' . self::TABLE_NEWSLETTERS . '` set
                 `name`=?,
                 `description`=?,
                 `allowUserSub`=?,
@@ -102,7 +102,7 @@ class NlLib extends TikiLib
                 `autoArticleClip`=?,
                 `articleClipRange`=?,
                 `articleClipTypes`=?,
-                `emptyClipBlocksSend`=? 
+                `emptyClipBlocksSend`=?
                 where `nlId`=?';
         $result = $this->query($query, [
             $name,
@@ -614,6 +614,62 @@ class NlLib extends TikiLib
         }
     }
 
+    private function validateEmailWithDetails($email)
+    {
+        global $prefs;
+
+        if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return [
+                'valid' => false,
+                'error' => tr('Invalid email format: %0', $email)
+            ];
+        }
+
+        $parts = explode('@', $email, 2);
+        $domain = $parts[1] ?? '';
+
+        if (($prefs['newsletter_validate_email_dns'] ?? 'n') !== 'y') {
+            return ['valid' => true, 'error' => null];
+        }
+
+        $mxHosts = [];
+        $hasMx = @getmxrr($domain, $mxHosts);
+
+        if (! $hasMx) {
+            $hasMx = @checkdnsrr($domain, 'MX');
+        }
+
+        if (! $hasMx) {
+            return [
+                'valid' => false,
+                'error' => tr('No mail server found for domain: %0 (the domain %1 has no MX record configured for email delivery)', $email, $domain)
+            ];
+        }
+
+        $hasValidMx = false;
+        if (! empty($mxHosts)) {
+            foreach ($mxHosts as $mxHost) {
+                $mxHost = trim($mxHost);
+                if (! empty($mxHost) && $mxHost !== '.') {
+                    $hasValidMx = true;
+                    break;
+                }
+            }
+        } else {
+            // Resolver found MX but did not return hosts; keep this as valid.
+            $hasValidMx = true;
+        }
+
+        if (! $hasValidMx) {
+            return [
+                'valid' => false,
+                'error' => tr('No mail server found for domain: %0 (the domain %1 exists but has no valid MX record configured for email delivery)', $email, $domain)
+            ];
+        }
+
+        return ['valid' => true, 'error' => null];
+    }
+
     private function logEmailStatus(Email $mail, $error, $subject, $slug)
     {
         global $prefs;
@@ -926,8 +982,8 @@ class NlLib extends TikiLib
         }
 
         $query = "select tn.nlId, tn.`name`, tn.`description`, tn.`users`, tn.`editions`, tn.`author`, max(tsn.`sent`) as lastSent, tn.`allowTxt`, tn.`allowArticleClip`
-        from `tiki_newsletters` tn 
-        left join `tiki_sent_newsletters` tsn on (tn.`nlId` = tsn.`nlId`) $mid 
+        from `tiki_newsletters` tn
+        left join `tiki_sent_newsletters` tsn on (tn.`nlId` = tsn.`nlId`) $mid
         group by tn.`nlId`, tn.`name`, tn.`description`, tn.`users`, tn.`editions`, tn.`author`
         order by " . $this->convertSortmode("$sort_mode");
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
@@ -1639,7 +1695,9 @@ class NlLib extends TikiLib
                 $prefs['site_language']
             );
 
-            if (preg_match('/([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+/', $email)) {
+            // Use detailed email validation instead of simple regex
+            $validation = $this->validateEmailWithDetails($email);
+            if ($validation['valid']) {
                 if (in_array($email, $remaining)) {
                     $uInfo['user'] = $userEmail;
                     $uInfo['email'] = $email;
@@ -1662,7 +1720,7 @@ class NlLib extends TikiLib
                     }
                 }
             } else {
-                $errors[] = ["user" => $userEmail, "email" => $email, "msg" => tr("invalid email")];
+                $errors[] = ["user" => $userEmail, "email" => $email, "msg" => $validation['error']];
             }
         }
 
@@ -1698,7 +1756,25 @@ class NlLib extends TikiLib
 
             if ($csrfCheck) {
                 $zmail = null;
+                $errorMsg = null; // Initialize error message variable
                 try {
+                    $validation = $this->validateEmailWithDetails($email);
+                    if (! $validation['valid']) {
+                        $errorMsg = $validation['error'];
+                        if ($browser) {
+                            print '<div class="confirmation">' . ' Total emails sent: ' . count($sent)
+                                . tr(' after error validating') . ' <b>' . $email . '</b>: <span class="text-danger">'
+                                . tr('Error') . ' - ' . $errorMsg . '</span></div>' . "\n";
+                        }
+                        $errors[] = ["user" => $us['user'], "email" => $email, "msg" => $errorMsg];
+                        $this->mark_edition_subscriber($info['editionId'], $us);
+                        $logStatus = 'Error';
+                        if ($logFileHandle) {
+                            @fwrite($logFileHandle, "$email : $logStatus - $errorMsg\n");
+                        }
+                        continue;
+                    }
+
                     $zmail = $this->get_edition_mail(
                         $info['editionId'],
                         $us,
@@ -1727,18 +1803,67 @@ class NlLib extends TikiLib
                     $logStatus = 'OK';
                     $this->logEmailStatus($zmail, '', trim($zmail->getSubject()), 'From Send Method nllib');
                 } catch (TransportExceptionInterface | \Throwable $e) {
+                    $errorMsg = $e->getMessage();
+
+                    if (str_contains($errorMsg, 'Connection timed out') || str_contains($errorMsg, 'timeout')) {
+                        $errorMsg = tr('Connection timeout: Unable to connect to mail server');
+                    } elseif (str_contains($errorMsg, 'Connection refused') || str_contains($errorMsg, 'refused')) {
+                        $errorMsg = tr('Connection refused: Mail server refused the connection');
+                    } elseif (str_contains($errorMsg, 'Host not found') || str_contains($errorMsg, 'Name or service not known')) {
+                        $errorMsg = tr('Host not found: Mail server hostname cannot be resolved');
+                    } elseif (str_contains($errorMsg, 'Authentication failed') || str_contains($errorMsg, 'authentication')) {
+                        $errorMsg = tr('Authentication failed: Invalid mail server credentials');
+                    } elseif (
+                        preg_match('/\b550\b/', $errorMsg) || preg_match('/\b5\.1\.1\b/', $errorMsg) ||
+                        str_contains($errorMsg, 'User unknown') || str_contains($errorMsg, 'User not found') ||
+                        str_contains($errorMsg, 'mailbox unavailable') || str_contains($errorMsg, 'recipient rejected')
+                    ) {
+                        $errorMsg = tr('Recipient not found: Email address does not exist on the mail server (SMTP 550/5.1.1)');
+                    } elseif (
+                        preg_match('/\b551\b/', $errorMsg) || preg_match('/\b5\.1\.0\b/', $errorMsg) ||
+                        str_contains($errorMsg, 'User not local')
+                    ) {
+                        $errorMsg = tr('Recipient not local: Email address is not local to this mail server (SMTP 551/5.1.0)');
+                    } elseif (
+                        preg_match('/\b552\b/', $errorMsg) || preg_match('/\b5\.2\.2\b/', $errorMsg) ||
+                        str_contains($errorMsg, 'mailbox full') || str_contains($errorMsg, 'quota exceeded')
+                    ) {
+                        $errorMsg = tr('Mailbox full: Recipient mailbox is full and cannot accept messages (SMTP 552/5.2.2)');
+                    } elseif (
+                        preg_match('/\b553\b/', $errorMsg) || preg_match('/\b5\.1\.8\b/', $errorMsg) ||
+                        str_contains($errorMsg, 'sender rejected') || str_contains($errorMsg, 'relay denied')
+                    ) {
+                        $errorMsg = tr('Invalid sender: Sender email address is not allowed or relay denied (SMTP 553/5.1.8)');
+                    } elseif (
+                        preg_match('/\b554\b/', $errorMsg) || str_contains($errorMsg, 'transaction failed') ||
+                        str_contains($errorMsg, 'message rejected')
+                    ) {
+                        $errorMsg = tr('Message rejected: Mail server rejected the message (SMTP 554)');
+                    } elseif (
+                        preg_match('/\b451\b/', $errorMsg) || preg_match('/\b4\.\d\.\d\b/', $errorMsg) ||
+                        str_contains($errorMsg, 'temporary failure') || str_contains($errorMsg, 'try again')
+                    ) {
+                        $errorMsg = tr('Temporary failure: Mail server temporarily unavailable, message may be retried later (SMTP 451)');
+                    } elseif (preg_match('/\b452\b/', $errorMsg) || str_contains($errorMsg, 'insufficient system storage')) {
+                        $errorMsg = tr('Insufficient storage: Mail server storage full, message may be retried later (SMTP 452)');
+                    } elseif (preg_match('/\b5\.\d\.\d\b/', $errorMsg)) {
+                        $errorMsg = tr('Permanent delivery failure: Mail server permanently rejected the message (SMTP 5xx)');
+                    } elseif (preg_match('/\b4\.\d\.\d\b/', $errorMsg)) {
+                        $errorMsg = tr('Temporary delivery failure: Mail server temporarily rejected the message, may be retried (SMTP 4xx)');
+                    }
+
                     if ($browser) {
                         print '<div class="confirmation">' . ' Total emails sent: ' . count($sent)
                             . tr(' after error in sending to') . ' <b>' . $email . '</b>: <span class="text-danger">'
-                            . tr('Error') . ' - ' . $e->getMessage();
-                        print "'red'>" . tr('Error') . " - {$e->getMessage()}" . '</font></div>' . "\n";
+                            . tr('Error') . ' - ' . htmlspecialchars($errorMsg) . '</span></div>' . "\n";
                     }
-                    $errors[] = ["user" => $us['user'], "email" => $email, "msg" => $e->getMessage()];
+                    $errors[] = ["user" => $us['user'], "email" => $email, "msg" => $errorMsg];
                     $this->mark_edition_subscriber($info['editionId'], $us);
                     $logStatus = 'Error';
-                    $this->logEmailStatus($zmail, $e->getMessage(), trim($zmail->getSubject()), 'From Send Method nllib');
+                    $this->logEmailStatus($zmail ?: tiki_get_basic_mail(), $errorMsg, $zmail ? trim($zmail->getSubject()) : '', 'From Send Method nllib');
                 }
             } else {
+                $errorMsg = tr('Potential cross site forgery request detected');
                 if ($browser) {
                     print '<div class="confirmation">' . ' Total emails sent: ' . count($sent)
                         . tr(' after failure to send to') . ' <b>' . $email . '</b>: <span class="text-danger">'
@@ -1747,14 +1872,18 @@ class NlLib extends TikiLib
                 $errors[] = [
                     "user" => $us['user'],
                     "email" => $email,
-                    "msg" => tr('Potential cross site forgery request detected'),
+                    "msg" => $errorMsg,
                 ];
                 $this->mark_edition_subscriber($info['editionId'], $us);
                 $logStatus = 'Error';
             }
 
             if ($logFileHandle) {
-                @fwrite($logFileHandle, "$email : $logStatus\n");
+                $logMsg = "$email : $logStatus";
+                if ($logStatus === 'Error' && isset($errorMsg)) {
+                    $logMsg .= " - $errorMsg";
+                }
+                @fwrite($logFileHandle, "$logMsg\n");
             }
 
             if ($browser) {
@@ -1830,7 +1959,16 @@ class NlLib extends TikiLib
         $msg = '<h4>' . sprintf(tra('Newsletter successfully sent to %s users.'), $nb_sent) . '</h4>';
         if ($nb_errors > 0) {
             $msg .= "\n" . '<span class="text-danger">' . '(' . sprintf(tra('Number of errors: %s'), $nb_errors) . ')'
-                . '</span><br />';
+                . '</span><br /><br />';
+
+            // Display detailed list of errors
+            $msg .= '<div class="alert alert-danger"><strong>' . tra('Errors details:') . '</strong><ul style="margin-top: 10px; margin-bottom: 0;">';
+            foreach ($errors as $error) {
+                $email_display = htmlspecialchars($error['email'] ?? '');
+                $error_msg = htmlspecialchars($error['msg'] ?? tra('Unknown error'));
+                $msg .= '<li><strong>' . $email_display . ':</strong> ' . $error_msg . '</li>';
+            }
+            $msg .= '</ul></div>';
         }
 
         // If logfile exists and if it is reachable from the web browser, add a download link
