@@ -32,7 +32,7 @@ abstract class ApiTestCase extends \TikiTestCase
         parent::setUpBeforeClass();
 
         // Ensure the API token service is enabled in the DB so subprocesses see it.
-        static::setTestPreference('auth_api_tokens', 'y');
+        static::setTestPreferences('auth_api_tokens', 'y');
 
         $tokenlib = \TikiLib::lib('api_token');
         $token = $tokenlib->createToken([
@@ -43,19 +43,27 @@ abstract class ApiTestCase extends \TikiTestCase
     }
 
     /**
-     * Write a preference directly to the database, bypassing set_preference().
+     * Write a preference or multiple preferences directly to the database, bypassing set_preference().
+     * set_preference() has side-effects (cache invalidation, menu rebuilds) that dispatch PHPUnit events.
      *
-     * set_preference() has side-effects (cache invalidation, menu rebuilds) that
-     * dispatch PHPUnit events. PHPUnit 10+ throws NoTestCaseObjectOnCallStackException
-     * when those events fire from a static setUpBeforeClass() with no TestCase on the
-     * call stack. All API base classes must use this method instead of set_preference()
-     * when setting preferences inside setUpBeforeClass().
+     * Can be called in two ways:
+     * - Single preference: setTestPreferences('name', $value)
+     * - Multiple preferences: setTestPreferences(['name1' => $value1, 'name2' => $value2])
      *
-     * @param string $name  Preference name
-     * @param mixed  $value Preference value
+     * @param string|array $name  Preference name or associative array of preferences
+     * @param mixed  $value Preference value (ignored when $name is an array)
      */
-    protected static function setTestPreference(string $name, $value): void
+    protected static function setTestPreferences($name, $value = null): void
     {
+        // Handle array of preferences
+        if (is_array($name)) {
+            foreach ($name as $prefName => $prefValue) {
+                static::setTestPreferences($prefName, $prefValue);
+            }
+            return;
+        }
+
+        // Handle single preference
         \TikiDb::get()->query(
             'INSERT INTO `tiki_preferences` (`name`, `value`) VALUES (?, ?) ON DUPLICATE KEY UPDATE `value` = ?',
             [$name, $value, $value]
@@ -66,6 +74,82 @@ abstract class ApiTestCase extends \TikiTestCase
         $cachelib = \TikiLib::lib('cache');
         $cachelib->invalidate('global_preferences');
         $cachelib->invalidate('tiki_default_preferences_cache');
+    }
+
+    /**
+     * Delete a set of test preferences directly via SQL.
+     * Avoids TikiLib::delete_preference(), which loads preference definition files (including
+     * fgal.php) that execute Table ORM queries and dispatch PHPUnit events — causing
+     * NoTestCaseObjectOnCallStackException in PHPUnit 10+ static teardown context.
+     */
+    protected static function deleteTestPreferences(array $prefs): void
+    {
+        foreach (array_keys($prefs) as $name) {
+            \TikiDb::get()->query('DELETE FROM `tiki_preferences` WHERE `name` = ?', [$name]);
+        }
+        $cachelib = \TikiLib::lib('cache');
+        $cachelib->invalidate('global_preferences');
+        $cachelib->invalidate('tiki_default_preferences_cache');
+    }
+
+    /**
+     * Core user-creation logic shared by domain base classes.
+     * Returns true when the user was created or already existed.
+     */
+    protected static function createTestUser(string $username, string $password = 'TestPass123!', string $email = ''): bool
+    {
+        $userlib = \TikiLib::lib('user');
+        if ($userlib->user_exists($username)) {
+            return true;
+        }
+        $email = $email ?: $username . '@api-test.tiki.org';
+        return (bool) $userlib->add_user($username, $password, $email, '', false);
+    }
+
+    /**
+     * Core group-creation logic shared by domain base classes.
+     * For groups with extended parameters (isRole, isTplGroup, etc.) use ApiBaseGroupsTest::createGroup().
+     */
+    protected static function createTestGroup(string $name, string $desc = ''): bool
+    {
+        $userlib = \TikiLib::lib('user');
+        if ($userlib->group_exists($name)) {
+            return true;
+        }
+        return (bool) $userlib->add_group($name, $desc ?: "API integration test group: $name");
+    }
+
+    /**
+     * Core wiki-page creation logic shared by domain base classes.
+     * Returns true when the page was created or already existed.
+     */
+    protected static function createTestWikiPage(string $pageName, string $content = 'API test content', string $lang = ''): bool
+    {
+        $tikilib = \TikiLib::lib('tiki');
+        if ($tikilib->page_exists($pageName)) {
+            return true;
+        }
+        try {
+            $result = $tikilib->create_page($pageName, 0, $content, $tikilib->now, '', 'admin', '127.0.0.1', '', $lang);
+            return $result !== false;
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Remove a wiki page (all versions). Safe to call when the page does not exist.
+     */
+    protected static function removeTestWikiPage(string $pageName): void
+    {
+        try {
+            $tikilib = \TikiLib::lib('tiki');
+            if ($tikilib->page_exists($pageName)) {
+                $tikilib->remove_all_versions($pageName);
+            }
+        } catch (\Exception) {
+            // ignore cleanup errors
+        }
     }
 
     protected function setUp(): void
@@ -430,19 +514,6 @@ abstract class ApiTestCase extends \TikiTestCase
     }
 
     /**
-     * Cleans the specified database tables by truncating them.
-     *
-     * @param array $tables An array of table names to be cleaned.
-     * @return void
-     */
-    protected function cleanDatabaseTables(array $tables): void
-    {
-        foreach ($tables as $table) {
-            $this->db->query("TRUNCATE TABLE $table");
-        }
-    }
-
-    /**
      * Assert that the response has the expected status code
      *
      * @param int $expectedCode Expected status code
@@ -455,34 +526,6 @@ abstract class ApiTestCase extends \TikiTestCase
     }
 
     /**
-     * Assert that the response body is valid JSON
-     *
-     * @param array $response Response array
-     * @param string $message Optional assertion message
-     */
-    protected function assertResponseIsJson($response, $message = '')
-    {
-        $this->assertIsArray($response['parsed_body'], $message ?: 'Response body is not valid JSON');
-    }
-
-    /**
-     * Assert that the response has a specific header
-     *
-     * @param string $headerName Header name
-     * @param array $response Response array
-     * @param string $expectedValue Optional expected header value
-     * @param string $message Optional assertion message
-     */
-    protected function assertResponseHasHeader($headerName, $response, $expectedValue = null, $message = '')
-    {
-        $this->assertArrayHasKey($headerName, $response['headers'], $message ?: "Response missing header: $headerName");
-
-        if ($expectedValue !== null) {
-            $this->assertEquals($expectedValue, $response['headers'][$headerName], $message ?: "Header $headerName has unexpected value");
-        }
-    }
-
-    /**
      * Get the parsed response body (as array if JSON)
      *
      * @param array $response Response array
@@ -491,17 +534,6 @@ abstract class ApiTestCase extends \TikiTestCase
     protected function getResponseBody($response)
     {
         return $response['parsed_body'];
-    }
-
-    /**
-     * Get the raw response body
-     *
-     * @param array $response Response array
-     * @return string Raw response body
-     */
-    protected function getRawResponseBody($response)
-    {
-        return $response['body'];
     }
 
     /**

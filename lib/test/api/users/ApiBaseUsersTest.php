@@ -54,9 +54,7 @@ abstract class ApiBaseUsersTest extends ApiTestCase
     {
         parent::setUpBeforeClass();
 
-        foreach (self::$preferences as $pref => $value) {
-            static::setTestPreference($pref, $value);
-        }
+        static::setTestPreferences(self::$preferences);
 
         static::createDefaultTestData();
     }
@@ -85,51 +83,33 @@ abstract class ApiBaseUsersTest extends ApiTestCase
 
     /**
      * Create a user and register it for cleanup.
+     * Delegates DB logic to ApiTestCase::createTestUser().
      */
     protected static function createUser(string $username, string $password = 'TestPass123!', string $email = ''): bool
     {
-        $userlib = TikiLib::lib('user');
-
-        if ($userlib->user_exists($username)) {
-            static::$testUsers[] = $username;
-            return true;
-        }
-
-        $email  = $email ?: $username . '@api-test.tiki.org';
-        $result = $userlib->add_user($username, $password, $email, '', false);
-
+        $result = static::createTestUser($username, $password, $email);
         if ($result) {
             static::$testUsers[] = $username;
-            return true;
         }
-        return false;
+        return $result;
     }
 
     /**
      * Create a group and register it for cleanup.
+     * Delegates DB logic to ApiTestCase::createTestGroup().
      */
     protected static function createGroup(string $groupName, string $desc = ''): bool
     {
-        $userlib = TikiLib::lib('user');
-
-        if ($userlib->group_exists($groupName)) {
+        $result = static::createTestGroup($groupName, $desc);
+        if ($result) {
             static::$testGroups[] = $groupName;
-            return true;
         }
-
-        $groupId = $userlib->add_group($groupName, $desc ?: "API integration test group: $groupName");
-
-        if ($groupId) {
-            static::$testGroups[] = $groupName;
-            return true;
-        }
-        return false;
+        return $result;
     }
 
     protected static function cleanupTestData(): void
     {
         $userlib = TikiLib::lib('user');
-        $tikilib = TikiLib::lib('tiki');
 
         foreach (static::$testUsers as $username) {
             try {
@@ -156,15 +136,13 @@ abstract class ApiBaseUsersTest extends ApiTestCase
         static::$defaultTestUser  = null;
         static::$defaultTestGroup = null;
 
-        foreach (array_keys(self::$preferences) as $pref) {
-            $tikilib->delete_preference($pref);
-        }
+        static::deleteTestPreferences(self::$preferences);
     }
 
     /**
      * Schema for a single user entry in the GET /users result array.
      */
-    private function getUserListEntrySchema(): array
+    protected function getUserListEntrySchema(): array
     {
         return [
             'userId'           => 'int|string',
@@ -191,7 +169,7 @@ abstract class ApiBaseUsersTest extends ApiTestCase
     /**
      * Top-level schema for GET /users (action_list_users).
      */
-    private function getUserListSchema(): array
+    protected function getUserListSchema(): array
     {
         return [
             'result' => [$this->getUserListEntrySchema()],
@@ -202,7 +180,7 @@ abstract class ApiBaseUsersTest extends ApiTestCase
     /**
      * Schema for GET /users/{username} (action_info).
      */
-    private function getUserInfoSchema(): array
+    protected function getUserInfoSchema(): array
     {
         return [
             'fullname'      => 'string',
@@ -224,7 +202,7 @@ abstract class ApiBaseUsersTest extends ApiTestCase
     /**
      * Schema for GET /message-count (action_get_message_count).
      */
-    private function getMessageCountSchema(): array
+    protected function getMessageCountSchema(): array
     {
         return [
             'count' => 'int',
@@ -234,14 +212,14 @@ abstract class ApiBaseUsersTest extends ApiTestCase
     /**
      * Schema for POST /users (action_register) success response.
      */
-    private function getRegisterUserSchema(): array
+    protected function getRegisterUserSchema(): array
     {
         return [
             'result' => 'string|array',
         ];
     }
 
-    private function getRegisterUserErrorSchema(): array
+    protected function getRegisterUserErrorSchema(): array
     {
         return [
             'result' => [
@@ -253,7 +231,7 @@ abstract class ApiBaseUsersTest extends ApiTestCase
         ];
     }
 
-    private function getDeleteUserFeedbackSchema(): array
+    protected function getDeleteUserFeedbackSchema(): array
     {
         return [
             'feedback' => [
@@ -264,7 +242,7 @@ abstract class ApiBaseUsersTest extends ApiTestCase
         ];
     }
 
-    private function getManageGroupsFeedbackSchema(): array
+    protected function getManageGroupsFeedbackSchema(): array
     {
         return [
             'feedback' => [

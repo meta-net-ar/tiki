@@ -29,8 +29,8 @@ class ApiUsersPostTest extends ApiBaseUsersTest
         $email    = $username . '@api-test.tiki.org';
 
         // disable registration preferences that would interfere with testing
-        static::setTestPreference('useRegisterPasscode', 'n');
-        static::setTestPreference('validateRegistration', 'n');
+        static::setTestPreferences('useRegisterPasscode', 'n');
+        static::setTestPreferences('validateRegistration', 'n');
 
         // Register the user so it gets cleaned up
         static::$testUsers[] = $username;

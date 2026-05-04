@@ -91,9 +91,11 @@ class ApiWikiPostTest extends ApiBaseWikiTest
         $this->assertValidCreateUpdatePageResponse($body);
         $this->assertEquals($pageName, $body['info']['pageName'], 'Updated page name should match');
 
-        // Verify the content was actually updated in the database
+        // Verify the content was actually updated in the database.
+        // Pass skipCache=true: create_page() populates the in-process cache during setUpBeforeClass,
+        // and without bypassing it get_page_info() would return the stale original content.
         $tikilib = TikiLib::lib('tiki');
-        $info = $tikilib->get_page_info($pageName);
+        $info = $tikilib->get_page_info($pageName, true, true);
         $this->assertEquals($updatedContent, $info['data'], 'Page content should reflect the API update');
     }
 
@@ -145,8 +147,10 @@ class ApiWikiPostTest extends ApiBaseWikiTest
         $feedbackTitle = $body['feedback']['action'][0]['title'] ?? '';
         $this->assertStringContainsString('Success', $feedbackTitle, 'Feedback title should indicate success');
 
-        // Verify the page was actually deleted from the database
+        // Verify the page was actually deleted from the database.
+        // Clear the in-process page cache first so page_exists() reads fresh from DB.
         $tikilib = TikiLib::lib('tiki');
+        $tikilib->cache_page_info = [];
         $this->assertFalse((bool) $tikilib->page_exists($pageName), 'Page should no longer exist after deletion');
     }
 
@@ -177,6 +181,7 @@ class ApiWikiPostTest extends ApiBaseWikiTest
         $this->assertStringContainsString('Success', $feedbackTitle, 'Feedback title should indicate success');
 
         $tikilib = TikiLib::lib('tiki');
+        $tikilib->cache_page_info = [];
         $this->assertFalse((bool) $tikilib->page_exists($page1), 'First page should be deleted');
         $this->assertFalse((bool) $tikilib->page_exists($page2), 'Second page should be deleted');
     }
@@ -244,7 +249,7 @@ class ApiWikiPostTest extends ApiBaseWikiTest
     public function testApiLockPageWithFeatureDisabled()
     {
         // Temporarily disable feature_wiki_usrlock
-        static::setTestPreference('feature_wiki_usrlock', 'n');
+        static::setTestPreferences('feature_wiki_usrlock', 'n');
 
         try {
             $pageName = static::$defaultTestPage;
@@ -258,7 +263,7 @@ class ApiWikiPostTest extends ApiBaseWikiTest
             $this->assertValidErrorResponse($body, 403, 'Feature disabled: feature_wiki_usrlock');
         } finally {
             // Re-enable for subsequent tests
-            static::setTestPreference('feature_wiki_usrlock', 'y');
+            static::setTestPreferences('feature_wiki_usrlock', 'y');
         }
     }
 

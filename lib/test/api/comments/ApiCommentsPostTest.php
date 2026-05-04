@@ -343,30 +343,22 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
 
     public function testApiLockAlreadyLockedComment()
     {
-        // createComment
         $threadId = static::createComment(
             'wiki page',
             static::$defaultComments['wiki page']['objectId'],
             'Lock Test Comment 2',
             'This comment will be locked twice.'
         );
-        // First lock the comment
-        $commentslib = TikiLib::lib('comments');
-        $commentslib->lock_comment($threadId);
-
-        // Try to lock already locked comment
         $data = [
             'type' => 'wiki page',
             'objectId' => static::$defaultComments['wiki page']['objectId'],
         ];
-        $response = $this->makeApiRequest(
-            'POST',
-            '/comments/' . $threadId . '/lock',
-            'Admins',
-            $data,
-            'application/x-www-form-urlencoded'
-        );
 
+        // Lock the comment via the API so the subprocess (which reads fresh DB prefs) sets the state.
+        $this->makeApiRequest('POST', '/comments/' . $threadId . '/lock', 'Admins', $data, 'application/x-www-form-urlencoded');
+
+        // Locking an already-locked comment should be rejected
+        $response = $this->makeApiRequest('POST', '/comments/' . $threadId . '/lock', 'Admins', $data, 'application/x-www-form-urlencoded');
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 403, 'Comments already locked.');
     }
@@ -410,29 +402,26 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
 
     public function testApiUnlockComment()
     {
-        // createComment
+        $pageName = 'POST_UnlockTestPage_' . uniqid();
+        static::createWikiPage($pageName);
+
         $threadId = static::createComment(
             'wiki page',
-            static::$defaultComments['wiki page']['objectId'],
+            $pageName,
             'Unlock Test Comment',
             'This comment will be locked and then unlocked.'
         );
-        // First lock the comment
-        $commentslib = TikiLib::lib('comments');
-        $commentslib->lock_comment($threadId);
-
-        // Then unlock
         $data = [
             'type' => 'wiki page',
-            'objectId' => static::$defaultComments['wiki page']['objectId'],
+            'objectId' => $pageName,
         ];
-        $response = $this->makeApiRequest(
-            'POST',
-            '/comments/' . $threadId . '/unlock',
-            'Admins',
-            $data,
-            'application/x-www-form-urlencoded'
-        );
+
+        // Lock via the API so the subprocess sets the locked state using fresh DB prefs.
+        $lockResponse = $this->makeApiRequest('POST', '/comments/' . $threadId . '/lock', 'Admins', $data, 'application/x-www-form-urlencoded');
+        $this->assertResponseStatus(200, $lockResponse, 'Setup lock step should succeed before testing unlock');
+
+        // Unlock the comment
+        $response = $this->makeApiRequest('POST', '/comments/' . $threadId . '/unlock', 'Admins', $data, 'application/x-www-form-urlencoded');
         $this->assertResponseStatus(200, $response);
         $body = $this->getResponseBody($response);
         $this->assertValidLockCommentResponse($body);
@@ -442,25 +431,17 @@ class ApiCommentsPostTest extends ApiBaseCommentsTest
 
     public function testApiUnlockAlreadyUnlockedComment()
     {
-        // createComment
-        $threadId = static::createComment(
-            'wiki page',
-            static::$defaultComments['wiki page']['objectId'],
-            'Unlock Test Comment 2',
-            'This comment will be unlocked twice.'
-        );
+        $pageName = 'POST_UnlockAlreadyUnlocked_' . uniqid();
+        static::createWikiPage($pageName);
+
+        $threadId = static::createComment('wiki page', $pageName, 'Unlock Test Comment 2', 'This comment will be unlocked twice.');
         $data = [
             'type' => 'wiki page',
-            'objectId' => static::$defaultComments['wiki page']['objectId'],
+            'objectId' => $pageName,
         ];
-        // First unlock attempt
-        $response = $this->makeApiRequest(
-            'POST',
-            '/comments/' . $threadId . '/unlock',
-            'Admins',
-            $data,
-            'application/x-www-form-urlencoded'
-        );
+
+        // A fresh page's object thread is unlocked — trying to unlock should be rejected
+        $response = $this->makeApiRequest('POST', '/comments/' . $threadId . '/unlock', 'Admins', $data, 'application/x-www-form-urlencoded');
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 403, 'Comments already unlocked.');
     }

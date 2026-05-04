@@ -37,6 +37,11 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     protected static $defaultComments = [];
 
     /**
+     * Guard for lazy one-time test-data creation.
+     */
+    private static bool $testDataCreated = false;
+
+    /**
      * Preferences to enable required features
      * @var array
      */
@@ -59,20 +64,20 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         'comments_archive' => 'y',
     ];
 
-    /**
-     * Setup before class - enable features and create default test objects
-     */
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
+        static::setTestPreferences(self::$preferences);
+        static::$testDataCreated = false;
+    }
 
-        // Enable required features
-        foreach (self::$preferences as $pref => $value) {
-            static::setTestPreference($pref, $value);
+    protected function setUp(): void
+    {
+        parent::setUp();
+        if (! static::$testDataCreated) {
+            static::createDefaultTestObjects();
+            static::$testDataCreated = true;
         }
-
-        // Create default test objects with comments
-        static::createDefaultTestObjects();
     }
 
     /**
@@ -488,16 +493,13 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
             }
         }
 
-        // disable preferences set for tests
-        foreach (self::$preferences as $pref => $value) {
-            $tikilib->delete_preference($pref);
-        }
+        static::deleteTestPreferences(self::$preferences);
     }
 
-    private function getSimpleCommentResponseSchema()
+    protected function getSimpleCommentResponseSchema()
     {
         return [
-            'threadId' => 'string|int|null', // FIXME: cthreadId is returned as string in some cases. eg. "123"
+            'threadId' => 'string|int|null', // FIXME: threadId is returned as string in some cases. eg. "123"
             'parentId' => 'int|null',
             'type' => 'string',
             'objectId' => 'string|int',
@@ -505,7 +507,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         ];
     }
 
-    private function getCommentResponseSchema()
+    protected function getCommentResponseSchema()
     {
         $commentSchema = [
             'threadId' => 'string|int|null',
@@ -544,7 +546,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         return $commentSchema;
     }
 
-    private function getCommentListResponseSchema()
+    protected function getCommentListResponseSchema()
     {
         $commentExtraKeys = array_merge(
             $this->getCommentResponseSchema(),
@@ -580,7 +582,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         ];
     }
 
-    private function getUpdateCommentResponseSchema()
+    protected function getUpdateCommentResponseSchema()
     {
         return [
             'threadId' => 'string|int|null',
@@ -588,7 +590,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         ];
     }
 
-    private function getDeleteCommentResponseSchema()
+    protected function getDeleteCommentResponseSchema()
     {
         return [
             'threadId' => 'int',
@@ -599,7 +601,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         ];
     }
 
-    private function getLockCommentResponseSchema()
+    protected function getLockCommentResponseSchema()
     {
         return [
             'title' => 'string',
@@ -610,7 +612,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
     }
 
     // schema for approve, reject, archive, unarchive
-    private function getModerateCommentResponseSchema()
+    protected function getModerateCommentResponseSchema()
     {
         return [
             'threadId' => 'int',
@@ -621,10 +623,6 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         ];
     }
 
-    /**
-     * Assert that a comment response has valid structure
-     * @param array $comment
-     */
     protected function assertValidCommentResponse($comment)
     {
         $this->assertMatchesSchema($comment, $this->getSimpleCommentResponseSchema());
@@ -635,11 +633,6 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         $this->assertMatchesSchema($response, $this->getUpdateCommentResponseSchema());
     }
 
-    /**
-     * Assert that a comment list response has valid structure
-     * @param array $response
-     * @param string $message
-     */
     protected function assertValidCommentListResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getCommentListResponseSchema());

@@ -49,6 +49,11 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
     protected static $defaultItemIds = [];
 
     /**
+     * Guard for lazy one-time test-data creation.
+     */
+    private static bool $testDataCreated = false;
+
+    /**
      * Preferences to enable for testing
      * @var array
      */
@@ -60,18 +65,24 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
     ];
 
     /**
-     * Set up features and default test data before any test in the class
+     * Defers createDefaultTestData() to setUp() because trackerlib uses TikiDb Table,
+     * which dispatches PHPUnit events that throw NoTestCaseObjectOnCallStackException
+     * when called from a static setUpBeforeClass context (PHPUnit 10+).
      */
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
+        static::setTestPreferences(self::$preferences);
+        static::$testDataCreated = false;
+    }
 
-        $tikilib = TikiLib::lib('tiki');
-        foreach (self::$preferences as $pref => $value) {
-            $tikilib->set_preference($pref, $value);
+    protected function setUp(): void
+    {
+        parent::setUp();
+        if (! static::$testDataCreated) {
+            static::createDefaultTestData();
+            static::$testDataCreated = true;
         }
-
-        static::createDefaultTestData();
     }
 
     /**
@@ -226,8 +237,7 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      */
     protected static function cleanupTestData(): void
     {
-        $trklib  = TikiLib::lib('trk');
-        $tikilib = TikiLib::lib('tiki');
+        $trklib = TikiLib::lib('trk');
 
         foreach (static::$testTrackerItems as $itemId) {
             try {
@@ -251,9 +261,7 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
         static::$defaultTrackerFields = [];
         static::$defaultItemIds = [];
 
-        foreach (array_keys(self::$preferences) as $pref) {
-            $tikilib->delete_preference($pref);
-        }
+        static::deleteTestPreferences(self::$preferences);
     }
 
     /**

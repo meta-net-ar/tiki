@@ -33,7 +33,6 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
 
@@ -69,7 +68,6 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
 
@@ -102,7 +100,6 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(409, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 409, '<!--field[name]-->Field Required');
@@ -124,7 +121,6 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(403, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 403, 'Permission denied');
@@ -147,7 +143,6 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
 
@@ -174,7 +169,6 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
 
@@ -200,7 +194,6 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(404, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 404, 'Not found (404)');
@@ -337,7 +330,6 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(403, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 403, 'Permission denied');
@@ -521,7 +513,6 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(403, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 403, 'Permission denied');

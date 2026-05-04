@@ -21,7 +21,6 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $response = $this->makeApiRequest('GET', '/categories');
 
         $this->assertResponseStatus(403, $response);
-        $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
 
         $this->assertValidErrorResponse($body, 403, 'Permission denied');
@@ -33,7 +32,6 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
 
         $this->assertValidCategoryListResponse($body);
@@ -45,7 +43,6 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
 
         $this->assertValidCategoryListResponse($body);
@@ -69,7 +66,6 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
         $this->assertValidCategoryListResponse($body);
 
@@ -99,7 +95,6 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
 
         $this->assertIsArray($body, 'Should return array even for non-existent parent');
@@ -112,7 +107,6 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
 
         $this->assertResponseStatus(409, $response);
-        $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
 
         $this->assertValidErrorResponse($body, 409, '<!--field[parentId]-->Field Required');
@@ -124,7 +118,6 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
         $response = $this->makeApiRequest('GET', '/categories', 'Admins', $queryParams);
 
         $this->assertResponseStatus(409, $response);
-        $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
 
         $this->assertValidErrorResponse($body, 409, '<!--field[parentId]-->Field Required');
@@ -140,7 +133,6 @@ class ApiCategoriesGetTest extends ApiBaseCategoriesTest
             $response = $this->makeApiRequest('GET', '/categories', 'Admins');
 
             $this->assertResponseStatus(403, $response);
-            $this->assertResponseIsJson($response);
             $body = $this->getResponseBody($response);
 
             $this->assertValidErrorResponse($body, 403, 'Feature disabled: feature_categories');

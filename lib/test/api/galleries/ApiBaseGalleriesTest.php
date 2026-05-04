@@ -67,10 +67,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
     {
         parent::setUpBeforeClass();
 
-        // Enable required features
-        foreach (self::$preferences as $pref => $value) {
-            static::setTestPreference($pref, $value);
-        }
+        static::setTestPreferences(self::$preferences);
 
         global $prefs;
         // Get root gallery ID
@@ -221,7 +218,6 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
     protected static function cleanupTestData()
     {
         $filegallib = TikiLib::lib('filegal');
-        $tikilib = TikiLib::lib('tiki');
 
         // Remove all test files
         foreach (static::$testFiles as $fileId) {
@@ -245,13 +241,10 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
             }
         }
 
-        // disable preferences set for tests
-        foreach (self::$preferences as $pref => $value) {
-            $tikilib->delete_preference($pref);
-        }
+        static::deleteTestPreferences(self::$preferences);
     }
 
-    private function getGalleriesListResultSchema()
+    protected function getGalleriesListResultSchema()
     {
         return [
             'isgal' => 'int',
@@ -297,7 +290,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    private function getGalleriesListResponseSchema()
+    protected function getGalleriesListResponseSchema()
     {
         $result = array_merge(
             $this->getGalleriesListResultSchema(),
@@ -317,7 +310,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    private function getFilesListResponseSchema()
+    protected function getFilesListResponseSchema()
     {
         return [
             'title' => 'string',
@@ -331,7 +324,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    private function getFileResponseSchema()
+    protected function getFileResponseSchema()
     {
         return [
             'title' => 'string',
@@ -363,7 +356,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    private function getGalleryResponseSchema()
+    protected function getGalleryResponseSchema()
     {
         return [
             'galleryId' => 'int',
@@ -424,14 +417,14 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    private function getInfoGalleriesResponseSchema()
+    protected function getInfoGalleriesResponseSchema()
     {
         return [
             'info' => $this->getGalleryResponseSchema()
         ];
     }
 
-    private function getFileUploadResponseSchema()
+    protected function getFileUploadResponseSchema()
     {
         $info = array_merge(
             $this->getFileResponseSchema()['info'],
@@ -463,7 +456,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    private function getLockFileResponseSchema()
+    protected function getLockFileResponseSchema()
     {
         return [
             'title' => 'string',
@@ -472,7 +465,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    private function getUnlockFileResponseSchema()
+    protected function getUnlockFileResponseSchema()
     {
         return [
             'title' => 'string',
@@ -481,7 +474,7 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    private function getDeleteFileGalleryResponseSchema()
+    protected function getDeleteFileGalleryResponseSchema()
     {
         return [
             'title' => 'string',
@@ -489,21 +482,11 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    /**
-     * Assert that a gallery response has valid structure
-     * @param array $response
-     * @param string $message
-     */
     protected function assertValidGalleryResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getGalleryResponseSchema());
     }
 
-    /**
-     * Assert that a gallery list response has valid structure
-     * @param array $response
-     * @param string $message
-     */
     protected function assertValidGalleryListResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getGalleriesListResponseSchema());
@@ -524,11 +507,6 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         $this->assertMatchesSchema($response, $this->getFilesListResponseSchema());
     }
 
-    /**
-     * Assert that a file response has valid structure
-     * @param array $file
-     * @param string $message
-     */
     protected function assertValidFileResponse($response)
     {
         $this->assertMatchesSchema($response, $this->getFileResponseSchema());

@@ -21,6 +21,8 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
     protected static $testCategories = [];
     protected static $defaultCategories = [];
 
+    private static array $preferences = ['feature_categories' => 'y'];
+
     /**
      * Set up categories feature and default test data
      */
@@ -29,10 +31,7 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
         parent::setUpBeforeClass();
 
         static::cleanupTestCategories();
-
-        // Enable categories feature
-        static::setTestPreference('feature_categories', 'y');
-
+        static::setTestPreferences(self::$preferences);
         static::createDefaultCategories();
     }
 
@@ -67,7 +66,7 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
             $anotherRootCategId = $categlib->add_category(0, 'Another Test Root', 'Another root category for testing');
             static::$defaultCategories['another_root'] = $anotherRootCategId;
             static::$testCategories[] = $anotherRootCategId;
-        } catch (Exception $e) {
+        } catch (Exception) {
             // If we can't create default categories, tests may be skipped
         }
     }
@@ -80,15 +79,17 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
         $categlib = TikiLib::lib('categ');
         foreach (static::$testCategories as $categId) {
             try {
-                if ($category = $categlib->get_category($categId)) {
+                if ($categlib->get_category($categId)) {
                     $categlib->remove_category($categId);
                 }
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // Ignore cleanup errors
             }
         }
         static::$testCategories = [];
         static::$defaultCategories = [];
+
+        static::deleteTestPreferences(self::$preferences);
     }
 
     /**
@@ -99,10 +100,10 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
         $categlib = TikiLib::lib('categ');
         foreach ($categIds as $categId) {
             try {
-                if ($category = $categlib->get_category($categId)) {
+                if ($categlib->get_category($categId)) {
                     $categlib->remove_category($categId);
                 }
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // Ignore cleanup errors
             }
             // Also remove from tracked test categories
@@ -142,7 +143,7 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
         return static::$defaultCategories[$key];
     }
 
-    private function getCategoryResponseSchema()
+    protected function getCategoryResponseSchema()
     {
         return [
             'categId' => 'int',
@@ -163,7 +164,7 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
         ];
     }
 
-    private function getCategorizeResponseSchema()
+    protected function getCategorizeResponseSchema()
     {
         return [
             'categId' => 'int|string', // for uncategorize action, the categId is returned as string. eg. "180"
@@ -178,17 +179,11 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
         ];
     }
 
-    /**
-     * Assert that response contains a valid category structure
-     */
     protected function assertValidCategoryResponse($category)
     {
         $this->assertMatchesSchema($category, $this->getCategoryResponseSchema());
     }
 
-    /**
-     * Assert that response contains a valid category list
-     */
     protected function assertValidCategoryListResponse($body)
     {
         foreach ($body as $category) {
@@ -196,9 +191,6 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
         }
     }
 
-    /**
-     * Assert that response contains valid categorize/uncategorize response
-     */
     protected function assertValidCategorizeResponse($body)
     {
         // Count can be integer (number of objects) or string 'unchanged'
