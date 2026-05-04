@@ -80,7 +80,8 @@
                                     </tr>
                                     {if isset($assigned_modules[$zone_initial])}
                                     {foreach $assigned_modules[$zone_initial] as $module}
-                                        {if isset($prefs['module_'|cat:$module.name]) && $prefs['module_'|cat:$module.name] eq 'y'}
+                                        {assign var="pref_module_name" value="module_"|cat:($module.name|regex_replace:"/[^a-z0-9]/":"_")}
+                                        {if isset($prefs[$pref_module_name]) && $prefs[$pref_module_name] eq 'y'}
                                             <tr>
                                                 <td>{$module.name|escape}</td>
                                                 <td>{$module.ord}</td>
@@ -393,6 +394,7 @@
                 </div>
                 <ul id="module_list" class="p-0">
                     {foreach key=name item=info from=$all_modules_info}
+                        {assign var="pref_module_name" value="module_"|cat:($module.name|regex_replace:"/[^a-z0-9]/":"_")}
                         {if isset($prefs['module_'|cat:$name]) && $prefs['module_'|cat:$name] eq 'y'}
                             <li class="{if !empty($info.enabled)}enabled{else}disabled{/if} clearfix">
                                 <input type="hidden" value="{$name}">
