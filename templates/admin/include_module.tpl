@@ -46,7 +46,7 @@
             <fieldset>
                 <legend class="h3">{tr}Enable/Disable Modules{/tr}</legend>
                 {foreach from=$all_modules item=name}
-                    {preference name="module_{$name}"}
+                    {preference name="module_{$name|regex_replace:'/[^a-zA-Z0-9]/':'_'}"}
                 {/foreach}
             </fieldset>
         </div>
