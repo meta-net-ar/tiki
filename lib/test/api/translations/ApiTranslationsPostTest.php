@@ -109,7 +109,7 @@ class ApiTranslationsPostTest extends ApiBaseTranslationsTest
 
     public function testApiAttachTranslationsWithFeatureDisabled()
     {
-        static::setTestPreference('feature_multilingual', 'n');
+        static::setTestPreferences('feature_multilingual', 'n');
 
         try {
             $uid        = uniqid();
@@ -124,7 +124,7 @@ class ApiTranslationsPostTest extends ApiBaseTranslationsTest
             $body = $this->getResponseBody($response);
             $this->assertValidErrorResponse($body, 403, 'Feature Disabled');
         } finally {
-            static::setTestPreference('feature_multilingual', 'y');
+            static::setTestPreferences('feature_multilingual', 'y');
         }
     }
 

@@ -54,6 +54,11 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
     protected static $defaultTabularId = null;
 
     /**
+     * Guard for lazy one-time test-data creation.
+     */
+    private static bool $testDataCreated = false;
+
+    /**
      * Preferences to enable required features
      * @var array
      */
@@ -62,18 +67,20 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
         'tracker_tabular_enabled' => 'y',
     ];
 
-    /**
-     * Setup before class - enable features and create default test content
-     */
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
+        static::setTestPreferences(self::$preferences);
+        static::$testDataCreated = false;
+    }
 
-        foreach (self::$preferences as $pref => $value) {
-            static::setTestPreference($pref, $value);
+    protected function setUp(): void
+    {
+        parent::setUp();
+        if (! static::$testDataCreated) {
+            static::createDefaultTestData();
+            static::$testDataCreated = true;
         }
-
-        static::createDefaultTestData();
     }
 
     /**
@@ -234,7 +241,6 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
     {
         $trklib = TikiLib::lib('trk');
         $tabularlib = TikiLib::lib('tabular');
-        $tikilib = TikiLib::lib('tiki');
 
         foreach (static::$testTrackerItems as $itemId) {
             $trklib->remove_tracker_item($itemId);
@@ -251,9 +257,7 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
         }
         static::$testTrackers = [];
 
-        foreach (self::$preferences as $pref => $value) {
-            $tikilib->delete_preference($pref);
-        }
+        static::deleteTestPreferences(self::$preferences);
     }
 
     /**

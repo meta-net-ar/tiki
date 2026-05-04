@@ -7,8 +7,6 @@
 namespace Tiki\Lib\Test\Api\Search;
 
 use Tiki\Lib\Test\Api\ApiTestCase;
-use TikiLib;
-use Exception;
 use Tiki\Search\SearchIndexRebuilder;
 
 /**
@@ -32,6 +30,11 @@ abstract class ApiBaseSearchTest extends ApiTestCase
     protected static $defaultContent = [];
 
     /**
+     * Guard for lazy one-time test-data creation.
+     */
+    private static bool $testDataCreated = false;
+
+    /**
      * Preferences to enable required features
      * @var array
      */
@@ -41,18 +44,25 @@ abstract class ApiBaseSearchTest extends ApiTestCase
     ];
 
     /**
-     * Setup before class - enable features and create default test content
+     * Defers createDefaultTestContent() and rebuildSearchIndex() to setUp() because
+     * SearchIndexRebuilder calls set_preference(), which loads fgal.php and executes
+     * Table ORM queries that throw NoTestCaseObjectOnCallStackException in PHPUnit 10+.
      */
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
+        static::setTestPreferences(self::$preferences);
+        static::$testDataCreated = false;
+    }
 
-        foreach (self::$preferences as $pref => $value) {
-            static::setTestPreference($pref, $value);
+    protected function setUp(): void
+    {
+        parent::setUp();
+        if (! static::$testDataCreated) {
+            static::createDefaultTestContent();
+            static::rebuildSearchIndex();
+            static::$testDataCreated = true;
         }
-
-        static::createDefaultTestContent();
-        static::rebuildSearchIndex();
     }
 
     /**
@@ -86,26 +96,17 @@ abstract class ApiBaseSearchTest extends ApiTestCase
     }
 
     /**
-     * Create a wiki page for testing
-     * @param string $pageName Page name
-     * @param string $content Page content
-     * @return string|null The page name or null on failure
+     * Create a wiki page for testing and register it for cleanup.
+     * Returns the page name on success, null on failure.
      */
-    protected static function createWikiPage($pageName, $content)
+    protected static function createWikiPage(string $pageName, string $content = 'API test content'): ?string
     {
-        $tikilib = TikiLib::lib('tiki');
-
-        // Check if page already exists
-        if ($tikilib->page_exists($pageName)) {
+        $result = static::createTestWikiPage($pageName, $content);
+        if ($result) {
             static::$testPages[] = $pageName;
             return $pageName;
         }
-
-        // Create page
-        $tikilib->create_page($pageName, 0, $content, time(), 'Created by API test', 'admin');
-
-        static::$testPages[] = $pageName;
-        return $pageName;
+        return null;
     }
 
     /**
@@ -122,26 +123,15 @@ abstract class ApiBaseSearchTest extends ApiTestCase
      */
     protected static function cleanupTestData()
     {
-        $tikilib = TikiLib::lib('tiki');
-
-        // Remove wiki pages
         foreach (static::$testPages as $pageName) {
-            try {
-                if ($tikilib->page_exists($pageName)) {
-                    $tikilib->remove_all_versions($pageName);
-                }
-            } catch (Exception $e) {
-                // Ignore errors during cleanup
-            }
+            static::removeTestWikiPage($pageName);
         }
+        static::$testPages = [];
 
-        // Disable preferences set for tests
-        foreach (self::$preferences as $pref => $value) {
-            $tikilib->delete_preference($pref);
-        }
+        static::deleteTestPreferences(self::$preferences);
     }
 
-    private function getSearchRebuildResponseSchema()
+    protected function getSearchRebuildResponseSchema()
     {
         return [
             'title' => 'string',
@@ -165,7 +155,7 @@ abstract class ApiBaseSearchTest extends ApiTestCase
         ];
     }
 
-    private function getSearchProcessQueueResponseSchema()
+    protected function getSearchProcessQueueResponseSchema()
     {
         return [
             'title' => 'string',
@@ -175,7 +165,7 @@ abstract class ApiBaseSearchTest extends ApiTestCase
         ];
     }
 
-    private function getSearchLookupNoResultsResponseSchema()
+    protected function getSearchLookupNoResultsResponseSchema()
     {
         return [
             'title' => 'string',
@@ -188,7 +178,7 @@ abstract class ApiBaseSearchTest extends ApiTestCase
         ];
     }
 
-    private function getSearchLookupResponseSchema()
+    protected function getSearchLookupResponseSchema()
     {
         $baseSchema = $this->getSearchLookupNoResultsResponseSchema();
         $baseSchema['resultset']['result'] = [

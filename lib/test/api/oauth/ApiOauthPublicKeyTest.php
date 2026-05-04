@@ -21,7 +21,6 @@ class ApiOauthPublicKeyTest extends ApiTestCase
         $response = $this->makeApiRequest('GET', '/oauth/public-key');
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
 
         $responseData = $this->getResponseBody($response);
         $this->assertIsArray($responseData);

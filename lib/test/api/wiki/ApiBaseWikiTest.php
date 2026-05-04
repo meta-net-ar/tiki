@@ -7,7 +7,6 @@
 namespace Tiki\Lib\Test\Api\Wiki;
 
 use Tiki\Lib\Test\Api\ApiTestCase;
-use TikiLib;
 
 /**
  * Base class for Wiki API integration tests
@@ -44,9 +43,7 @@ abstract class ApiBaseWikiTest extends ApiTestCase
     {
         parent::setUpBeforeClass();
 
-        foreach (self::$preferences as $pref => $value) {
-            static::setTestPreference($pref, $value);
-        }
+        static::setTestPreferences(self::$preferences);
 
         static::createDefaultTestData();
     }
@@ -69,38 +66,15 @@ abstract class ApiBaseWikiTest extends ApiTestCase
 
     /**
      * Create a wiki page and register it for cleanup.
+     * Delegates page-creation I/O to ApiTestCase::createTestWikiPage().
      */
     protected static function createWikiPage(string $name, string $data = 'API test content', string $lang = ''): bool
     {
-        $tikilib = TikiLib::lib('tiki');
-
-        if ($tikilib->page_exists($name)) {
+        $result = static::createTestWikiPage($name, $data, $lang);
+        if ($result) {
             static::$testPages[] = $name;
-            return true;
         }
-
-        try {
-            $result = $tikilib->create_page(
-                $name,
-                0,
-                $data,
-                $tikilib->now,
-                '',
-                'admin',
-                '127.0.0.1',
-                '',
-                $lang
-            );
-
-            if ($result) {
-                static::$testPages[] = $name;
-                return true;
-            }
-        } catch (\Exception) {
-            // Ignore creation errors — test will be skipped or fail gracefully
-        }
-
-        return false;
+        return $result;
     }
 
     /**
@@ -108,14 +82,7 @@ abstract class ApiBaseWikiTest extends ApiTestCase
      */
     protected static function removeWikiPage(string $name): void
     {
-        try {
-            $tikilib = TikiLib::lib('tiki');
-            if ($tikilib->page_exists($name)) {
-                $tikilib->remove_all_versions($name);
-            }
-        } catch (\Exception) {
-            // Ignore cleanup errors
-        }
+        static::removeTestWikiPage($name);
     }
 
     protected static function cleanupTestData(): void
@@ -126,10 +93,7 @@ abstract class ApiBaseWikiTest extends ApiTestCase
         static::$testPages = [];
         static::$defaultTestPage = null;
 
-        $tikilib = TikiLib::lib('tiki');
-        foreach (array_keys(self::$preferences) as $pref) {
-            $tikilib->delete_preference($pref);
-        }
+        static::deleteTestPreferences(self::$preferences);
     }
 
     protected function getPageResponseSchema(): array
@@ -169,7 +133,7 @@ abstract class ApiBaseWikiTest extends ApiTestCase
     /**
      * Top-level schema for GET /wiki (action_pages).
      */
-    private function getPageListSchema(): array
+    protected function getPageListSchema(): array
     {
         $extraListFields = [
             'perms' => 'array',
@@ -187,7 +151,7 @@ abstract class ApiBaseWikiTest extends ApiTestCase
     /**
      * Schema for GET /wiki/page/{page} (action_get_page).
      */
-    private function getPageInfoSchema(): array
+    protected function getPageInfoSchema(): array
     {
         $extraFields = [
             'baseName' => 'string',
@@ -203,7 +167,7 @@ abstract class ApiBaseWikiTest extends ApiTestCase
     /**
      * Schema for POST /wiki and POST /wiki/page/{page} (action_create_update_page).
      */
-    private function getCreateUpdatePageSchema(): array
+    protected function getCreateUpdatePageSchema(): array
     {
         return [
             'info' => $this->getPageInfoSchema(),
@@ -213,7 +177,7 @@ abstract class ApiBaseWikiTest extends ApiTestCase
     /**
      * Schema for endpoints that return Services_Utilities::refresh() in TIKI_API context.
      */
-    private function getRefreshFeedbackSchema(): array
+    protected function getRefreshFeedbackSchema(): array
     {
         return [
             'feedback' => [
@@ -233,7 +197,7 @@ abstract class ApiBaseWikiTest extends ApiTestCase
     /**
      * Schema for PATCH /wiki/page/{page} (action_patch_page).
      */
-    private function getPatchPageSchema(): array
+    protected function getPatchPageSchema(): array
     {
         return [
             'status'         => 'string',

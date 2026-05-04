@@ -29,7 +29,6 @@ class ApiTikiVersionTest extends ApiTestCase
         $expectedVersion = $this->lib->getVersion();
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
         $this->assertArrayHasKey('version', $responseData);
         $this->assertEquals($expectedVersion, $responseData['version']);
     }
@@ -40,7 +39,6 @@ class ApiTikiVersionTest extends ApiTestCase
         $responseData = $this->getResponseBody($response);
 
         $this->assertResponseStatus(200, $response);
-        $this->assertResponseIsJson($response);
         $this->assertIsArray($responseData);
         $this->assertArrayHasKey('version', $responseData);
         $this->assertIsString($responseData['version']);

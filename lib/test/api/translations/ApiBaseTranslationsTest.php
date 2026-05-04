@@ -35,10 +35,12 @@ abstract class ApiBaseTranslationsTest extends ApiTestCase
      */
     protected static $noLangPage = null;
 
+    private static array $preferences = ['feature_multilingual' => 'y'];
+
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
-        static::setTestPreference('feature_multilingual', 'y');
+        static::setTestPreferences(self::$preferences);
         static::createDefaultTestData();
     }
 
@@ -63,34 +65,18 @@ abstract class ApiBaseTranslationsTest extends ApiTestCase
 
     /**
      * Create a wiki page with the given language and register it for cleanup.
-     * Returns true on success.
+     * Delegates page-creation I/O to ApiTestCase::createTestWikiPage().
      */
     protected static function createWikiPage(string $name, string $lang): bool
     {
-        try {
-            $tikilib = TikiLib::lib('tiki');
-            if ($tikilib->page_exists($name)) {
-                $tikilib->remove_all_versions($name);
-            }
-            $result = $tikilib->create_page(
-                $name,
-                0,
-                'Integration test page for Translations API tests.',
-                time(),
-                '',
-                'admin',
-                '127.0.0.1',
-                '',
-                $lang
-            );
-            if ($result !== false) {
-                static::$testPages[] = $name;
-                return true;
-            }
-        } catch (\Exception $e) {
-            // Ignore — callers should handle missing pages
+        // Remove any pre-existing page with this name so the language is set correctly.
+        static::removeTestWikiPage($name);
+
+        $result = static::createTestWikiPage($name, 'Integration test page for Translations API tests.', $lang);
+        if ($result) {
+            static::$testPages[] = $name;
         }
-        return false;
+        return $result;
     }
 
     /**
@@ -98,11 +84,7 @@ abstract class ApiBaseTranslationsTest extends ApiTestCase
      */
     protected static function removeWikiPage(string $name): void
     {
-        try {
-            TikiLib::lib('tiki')->remove_all_versions($name);
-        } catch (\Exception $e) {
-            // Ignore cleanup errors
-        }
+        static::removeTestWikiPage($name);
     }
 
     /**
@@ -133,10 +115,7 @@ abstract class ApiBaseTranslationsTest extends ApiTestCase
         static::$defaultSourcePage = null;
         static::$noLangPage        = null;
 
-        \TikiDb::get()->query(
-            'DELETE FROM `tiki_preferences` WHERE `name` = ?',
-            ['feature_multilingual']
-        );
+        static::deleteTestPreferences(self::$preferences);
     }
 
     /**
@@ -146,7 +125,7 @@ abstract class ApiBaseTranslationsTest extends ApiTestCase
      *   when no other language is available.
      * - translations is an array of translation objects (empty when no links exist).
      */
-    private function getManageTranslationsSchema(): array
+    protected function getManageTranslationsSchema(): array
     {
         return [
             'title'        => 'string',
@@ -162,7 +141,7 @@ abstract class ApiBaseTranslationsTest extends ApiTestCase
         ];
     }
 
-    private function getManageTranslationsWithAttachedTranslationSchema(): array
+    protected function getManageTranslationsWithAttachedTranslationSchema(): array
     {
         $schema = $this->getManageTranslationsSchema();
         $schema['translations'] = [
@@ -176,7 +155,7 @@ abstract class ApiBaseTranslationsTest extends ApiTestCase
         return $schema;
     }
 
-    private function getForwardTranslationSchema(): array
+    protected function getForwardTranslationSchema(): array
     {
         return [
             'FORWARD' => [

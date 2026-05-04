@@ -51,10 +51,7 @@ abstract class ApiBaseGroupsTest extends ApiTestCase
     {
         parent::setUpBeforeClass();
 
-        // Enable required features if needed
-        foreach (self::$preferences as $pref => $value) {
-            static::setTestPreference($pref, $value);
-        }
+        static::setTestPreferences(self::$preferences);
 
         // Create default test groups
         static::createDefaultTestGroups();
@@ -182,24 +179,12 @@ abstract class ApiBaseGroupsTest extends ApiTestCase
      */
     protected static function createUser($username, $email = null, $password = 'testpass123')
     {
-        $userlib = TikiLib::lib('user');
-
-        // Check if user already exists
-        if ($userlib->user_exists($username)) {
-            static::$testUsers[] = $username;
-            return true;
-        }
-
-        $email = $email ?? $username . '@test.tiki.org';
-
-        // Create user
-        $result = $userlib->add_user($username, $password, $email, '', false);
-
+        $email  = $email ?? $username . '@test.tiki.org';
+        $result = static::createTestUser($username, $password, $email);
         if ($result) {
             static::$testUsers[] = $username;
         }
-
-        return $result !== false;
+        return $result;
     }
 
     /**
@@ -220,14 +205,13 @@ abstract class ApiBaseGroupsTest extends ApiTestCase
     protected static function cleanupTestData()
     {
         $userlib = TikiLib::lib('user');
-        $tikilib = TikiLib::lib('tiki');
 
         // Remove users from all test groups first
         foreach (static::$testUsers as $username) {
             foreach (static::$testGroups as $groupName) {
                 try {
                     $userlib->remove_user_from_group($username, $groupName);
-                } catch (Exception $e) {
+                } catch (Exception) {
                     // Ignore errors during cleanup
                 }
             }
@@ -239,30 +223,26 @@ abstract class ApiBaseGroupsTest extends ApiTestCase
                 if ($userlib->user_exists($username)) {
                     $userlib->remove_user($username);
                 }
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // Ignore errors during cleanup
             }
         }
 
         // Remove all test groups (in reverse order)
-        $groups = array_reverse(static::$testGroups);
-        foreach ($groups as $groupName) {
+        foreach (array_reverse(static::$testGroups) as $groupName) {
             try {
                 if ($userlib->group_exists($groupName)) {
                     $userlib->remove_group($groupName);
                 }
-            } catch (Exception $e) {
+            } catch (Exception) {
                 // Ignore errors during cleanup
             }
         }
 
-        // Disable preferences set for tests
-        foreach (self::$preferences as $pref => $value) {
-            $tikilib->delete_preference($pref);
-        }
+        static::deleteTestPreferences(self::$preferences);
     }
 
-    private function getGroupListResponseSchema()
+    protected function getGroupListResponseSchema()
     {
         return [
             'data' => [
@@ -298,7 +278,7 @@ abstract class ApiBaseGroupsTest extends ApiTestCase
         ];
     }
 
-    private function getGroupActionResponseSchema()
+    protected function getGroupActionResponseSchema()
     {
         return [
             'type' => 'string',
@@ -308,7 +288,7 @@ abstract class ApiBaseGroupsTest extends ApiTestCase
         ];
     }
 
-    private function getGroupCreateUpdateResponseSchema()
+    protected function getGroupCreateUpdateResponseSchema()
     {
         return [
             'feedback' => [
@@ -319,7 +299,7 @@ abstract class ApiBaseGroupsTest extends ApiTestCase
         ];
     }
 
-    private function getGroupAddBanDelUsersResponseSchema()
+    protected function getGroupAddBanDelUsersResponseSchema()
     {
         $extraparams = array_merge(
             $this->getGroupActionResponseSchema(),

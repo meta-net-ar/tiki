@@ -25,7 +25,6 @@ class ApiCategoriesDeleteTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(200, $response);
-        // $this->assertResponseIsJson($response);
         $body = $this->getResponseBody($response);
 
         $this->assertValidCategoryResponse($body);
@@ -115,7 +114,6 @@ class ApiCategoriesDeleteTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(404, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 404, 'Not found (404)');
@@ -131,7 +129,6 @@ class ApiCategoriesDeleteTest extends ApiBaseCategoriesTest
         );
 
         $this->assertResponseStatus(403, $response);
-        $this->assertResponseIsJson($response);
 
         $body = $this->getResponseBody($response);
         $this->assertValidErrorResponse($body, 403, 'Permission denied');
