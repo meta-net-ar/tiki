@@ -18,8 +18,6 @@ use League\CommonMark\MarkdownConverter;
 use League\CommonMark\Node\Node;
 use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
-use League\CommonMark\Extension\CommonMark\Node\Block\FencedCode;
-use League\CommonMark\Extension\CommonMark\Renderer\Block\FencedCodeRenderer;
 use Tiki\WikiParser\Markdown\Extension as TikiExtension;
 
 class WikiParser_ParsableMarkdown extends ParserLib
@@ -59,21 +57,6 @@ class WikiParser_ParsableMarkdown extends ParserLib
         if ($prefs['markdown_gfm'] === 'y') {
             $environment->addExtension(new GithubFlavoredMarkdownExtension());
         }
-
-        // add default class to code blocks -> <pre class="codelisting">
-        $environment->addRenderer(
-            FencedCode::class,
-            new class implements NodeRendererInterface {
-                public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-                {
-                    $htmlEl = (new FencedCodeRenderer())->render($node, $childRenderer);
-                    $class = $htmlEl->getAttribute('class') ?: 'codelisting';
-                    $htmlEl->setAttribute('class', $class);
-                    return $htmlEl;
-                }
-            },
-            10
-        );
 
         // add default class to table -> <table class="wikitable table table-striped table-hover">
         $environment->addRenderer(
