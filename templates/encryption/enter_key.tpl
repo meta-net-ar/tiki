@@ -32,6 +32,7 @@
                 url: $form.attr('action'),
                 data: $form.serialize(),
                 dataType: 'json',
+                preventGlobalErrorHandle: true,
             })
                 .done(function (data) {
                     if (data && data.extra === 'close') {
