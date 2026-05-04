@@ -859,8 +859,22 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
         }
         $this->out('show_archive', $email['show_archive']);
 
-        if (preg_match("/tracker_folder_(\d+)_(\d+)/", $this->request->post['list_path'], $m) && $email['is_tiki_tracker_trash_folder']) {
-            $this->out('show_restore', true);
+        if (preg_match("/tracker_folder_(\d+)_(\d+)/", $this->request->post['list_path'], $m)) {
+            $trklib = TikiLib::lib('trk');
+            $uid = $this->request->get['uid'];
+            $value = $trklib->get_item_value(null, $m[1], $m[2]);
+            $value = json_decode($value, true);
+
+            foreach ($value as $folder => $emailIds) {
+                if (in_array($uid, $emailIds)) {
+                    $this->out('msg_current_folder', $folder);
+                    break;
+                }
+            }
+
+            if ($email['is_tiki_tracker_trash_folder']) {
+                $this->out('show_restore', true);
+            }
         }
 
         clear_existing_reply_details($this->session);
