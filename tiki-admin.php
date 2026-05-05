@@ -9,6 +9,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
+
 use Tiki\Installer\Installer;
 use Tiki\Package\ComposerCli;
 use Tiki\Package\ExtensionManager;
@@ -38,11 +39,13 @@ function add_feedback($name, $message, $st, $num = null)
 {
     TikiLib::lib('prefs')->addRecent($name);
 
-    Feedback::add(['num' => $num,
+    Feedback::add([
+        'num' => $num,
         'mes' => $message,
         'st' => $st,
         'name' => $name,
-        'tpl' => 'pref',]);
+        'tpl' => 'pref',
+    ]);
 }
 
 /**
@@ -276,8 +279,8 @@ if (isset($_REQUEST['page'])) {
     $url = 'tiki-admin.php' . '?page=' . $adminPage;
 
     if ($prefs['theme_unified_admin_backend'] === 'y') {
-        foreach ($admin_icons as & $admin_icon) {
-            foreach ($admin_icon['children'] as & $child) {
+        foreach ($admin_icons as &$admin_icon) {
+            foreach ($admin_icon['children'] as &$child) {
                 $child = array_merge(['disabled' => false, 'description' => ''], $child);
             }
 
@@ -291,7 +294,7 @@ if (isset($_REQUEST['page'])) {
         }
     } else {
         foreach ($admin_icons as &$admin_icon) {
-            $admin_icon = array_merge([ 'disabled' => false, 'description' => ''], $admin_icon);
+            $admin_icon = array_merge(['disabled' => false, 'description' => ''], $admin_icon);
         }
         if (isset($admin_icons[$adminPage])) {
             $current_admin_icon = $admin_icons[$adminPage];
@@ -477,6 +480,14 @@ if (empty($_GET)) {
         if ($maxRetries) {
             $smarty->assign('mailer_queue_requires_update', $maxRetries);
         }
+    }
+
+    $unsupportedMailQueueEntries = \TikiDb::get()->getOne(
+        'SELECT COUNT(*) FROM tiki_mail_queue WHERE message LIKE ? OR message LIKE ? OR message LIKE ? OR message LIKE ?',
+        ['%Laminas\\Mail\\Message%', '%Zend\\Mail\\Message%', '%LaminasMailMessage%', '%ZendMailMessage%']
+    );
+    if ($unsupportedMailQueueEntries) {
+        $smarty->assign('unsupported_mail_queue_entries', $unsupportedMailQueueEntries);
     }
 }
 
