@@ -52,6 +52,13 @@ abstract class ApiBaseSearchTest extends ApiTestCase
     {
         parent::setUpBeforeClass();
         static::setTestPreferences(self::$preferences);
+
+        // Sync to the in-process $prefs global so ORM calls in lazy setUp() do not
+        // attempt to reach search services that are absent in the CI environment.
+        global $prefs;
+        foreach (self::$preferences as $name => $value) {
+            $prefs[$name] = $value;
+        }
         static::$testDataCreated = false;
     }
 

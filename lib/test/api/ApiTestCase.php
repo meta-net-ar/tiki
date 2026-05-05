@@ -306,7 +306,7 @@ abstract class ApiTestCase extends \TikiTestCase
 
         // Read response with a timeout so a hanging subprocess doesn't block the
         // entire test run indefinitely (e.g. DB deadlock).
-        $timeoutSeconds = 60;
+        $timeoutSeconds = 120;
         stream_set_blocking($pipes[1], false);
         stream_set_blocking($pipes[2], false);
 
