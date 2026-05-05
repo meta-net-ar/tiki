@@ -304,13 +304,47 @@ abstract class ApiTestCase extends \TikiTestCase
         }
         fclose($pipes[0]);
 
-        // Read response
-        $output = stream_get_contents($pipes[1]);
-        $errors = stream_get_contents($pipes[2]);
+        // Read response with a timeout so a hanging subprocess doesn't block the
+        // entire test run indefinitely (e.g. DB deadlock).
+        $timeoutSeconds = 60;
+        stream_set_blocking($pipes[1], false);
+        stream_set_blocking($pipes[2], false);
+
+        $output   = '';
+        $errors   = '';
+        $deadline = microtime(true) + $timeoutSeconds;
+
+        do {
+            $output .= (string) stream_get_contents($pipes[1]);
+            $errors .= (string) stream_get_contents($pipes[2]);
+            $status  = proc_get_status($process);
+            if ($status['running'] && microtime(true) < $deadline) {
+                usleep(50_000); // 50 ms polling interval
+            }
+        } while ($status['running'] && microtime(true) < $deadline);
+
+        // Capture the exit code NOW from $status, before any further proc_get_status or proc_close calls.
+        $timedOut = $status['running'];
+        $exitCode = $timedOut ? 1 : (int) $status['exitcode'];
+
+        if ($timedOut) {
+            proc_terminate($process, 9);
+        }
+
+        // Final flush: switch back to blocking so stream_get_contents drains any
+        // bytes written to the pipe buffer after the last non-blocking read in the loop.
+        stream_set_blocking($pipes[1], true);
+        stream_set_blocking($pipes[2], true);
+        $output .= (string) stream_get_contents($pipes[1]);
+        $errors .= (string) stream_get_contents($pipes[2]);
+
+        if ($timedOut) {
+            $errors .= "\n[TIMEOUT: API subprocess exceeded {$timeoutSeconds}s]";
+        }
+
         fclose($pipes[1]);
         fclose($pipes[2]);
-
-        $exitCode = proc_close($process);
+        proc_close($process);
 
         if ($exitCode !== 0) {
             $debugInfo = "\nCommand: $fullCommand\nExit code: $exitCode\nStderr: $errors\nStdout: " . substr($output, 0, 500);
