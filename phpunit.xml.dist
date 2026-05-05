@@ -32,6 +32,20 @@
       <!-- Exclude files where all tests are marked as skipped -->
       <exclude>./lib/test/AcceptanceTests/</exclude>
       <exclude>./lib/test/Core/Reports/ReportsEndToEndTest.php</exclude>
+      <!-- Abstract API base classes: exclude so PHPUnit does not try to instantiate
+           them as runnable test cases and emit test-runner warnings that would trigger
+           failOnPhpunitWarning and fail the unit-tests-api CI jobs. -->
+      <exclude>./lib/test/api/ApiTestCase.php</exclude>
+      <exclude>./lib/test/api/categories/ApiBaseCategoriesTest.php</exclude>
+      <exclude>./lib/test/api/comments/ApiBaseCommentsTest.php</exclude>
+      <exclude>./lib/test/api/galleries/ApiBaseGalleriesTest.php</exclude>
+      <exclude>./lib/test/api/groups/ApiBaseGroupsTest.php</exclude>
+      <exclude>./lib/test/api/search/ApiBaseSearchTest.php</exclude>
+      <exclude>./lib/test/api/tabulars/ApiBaseTabularsTest.php</exclude>
+      <exclude>./lib/test/api/trackers/ApiBaseTrackersTest.php</exclude>
+      <exclude>./lib/test/api/translations/ApiBaseTranslationsTest.php</exclude>
+      <exclude>./lib/test/api/users/ApiBaseUsersTest.php</exclude>
+      <exclude>./lib/test/api/wiki/ApiBaseWikiTest.php</exclude>
     </testsuite>
   </testsuites>
   <groups>

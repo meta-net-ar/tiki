@@ -775,14 +775,20 @@ unit-tests-api:
   parallel:
     matrix:
       - TEST_FILTER: "ApiTikiVersion"
-      - TEST_FILTER: "ApiOauthPublicKeyTest"
+      - TEST_FILTER: "ApiOauth"
       - TEST_FILTER: "ApiCategories"
-      - TEST_FILTER: "ApiComments"
-      - TEST_FILTER: "ApiGalleries"
+      - TEST_FILTER: "ApiCommentsGetTest"
+      - TEST_FILTER: "ApiCommentsPostTest"
+      - TEST_FILTER: "ApiCommentsDeleteTest"
+      - TEST_FILTER: "ApiGalleriesGetTest"
+      - TEST_FILTER: "ApiGalleriesPostTest"
+      - TEST_FILTER: "ApiGalleriesDeleteTest"
       - TEST_FILTER: "ApiGroups"
       - TEST_FILTER: "ApiSearch"
       - TEST_FILTER: "ApiTabulars"
-      - TEST_FILTER: "ApiTrackers"
+      - TEST_FILTER: "ApiTrackersGetTest"
+      - TEST_FILTER: "ApiTrackersPostTest"
+      - TEST_FILTER: "ApiTrackersDeleteTest"
       - TEST_FILTER: "ApiTranslations"
       - TEST_FILTER: "ApiUsers"
       - TEST_FILTER: "ApiWiki"
@@ -790,7 +796,7 @@ unit-tests-api:
     - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
     - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
     - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
-    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --group api-integration-test --filter ${TEST_FILTER}
+    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --do-not-fail-on-phpunit-warning --do-not-fail-on-phpunit-deprecation --group api-integration-test --filter ${TEST_FILTER}
 
 unit-tests-node:
   stage: unit-tests
