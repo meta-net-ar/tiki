@@ -90,8 +90,8 @@
                             </td>
                             {if empty($diff_style)}
                                 {if !empty($field_value.fieldId) && $field_value.fieldId > 0}
-                                    <td class="text">{$field_value.value=$hist.value}{trackeroutput field=$field_value list_mode=csv item=$item_info history=y process=y}</td>
-                                    <td class="text">{$field_value.value=$hist.new}{trackeroutput field=$field_value list_mode=csv item=$item_info history=y process=y}</td>
+                                    <td class="text">{$hist.rendered_value}</td>
+                                    <td class="text">{$hist.rendered_new}</td>
                                 {else}
                                     <td class="text">{$hist.value|escape}</td>
                                     <td class="text">{$hist.new|escape}</td>
@@ -99,8 +99,7 @@
                             {else}
                                 <td colspan="2" class="tracker-diff {$diff_style}">
                                     {if !empty($field_value.fieldId) && $field_value.fieldId > 0}
-                                        {$field_value.value=$hist.new}
-                                        {trackeroutput field=$field_value list_mode='y' history=y item=$item_info process=y oldValue=$hist.value diff_style=$diff_style}
+                                        {$hist.rendered_diff}
                                     {else}
                                         {wikidiff object_type=direct oldver=$hist.value newver=$hist.new diff_style=$diff_style}
                                     {/if}
