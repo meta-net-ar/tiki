@@ -825,7 +825,7 @@ $headerlib->add_jsfile('lib/jquery_tiki/tiki-vue.js');
 if (empty($user) && $prefs['feature_antibot'] == 'y') {
     $headerlib->add_jsfile_late('lib/captcha/captchalib.js');
     if (CaptchaTypeResolver::getConfiguredType($prefs) === 'altcha') {
-        $headerlib->add_js_module('import altcha from "@altcha";');
+        $headerlib->add_js_module('import {Altcha} from "altcha";');
     }
 }
 

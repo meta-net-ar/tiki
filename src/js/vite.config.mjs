@@ -138,7 +138,6 @@ export default defineConfig(({ command, mode }) => {
         "tiki-offline": resolve(__dirname, "vue-mf/tiki-offline/src/tiki-offline.js"),
         "toolbar-dialogs": resolve(__dirname, "vue-mf/toolbar-dialogs/src/toolbar-dialogs.js"),
         "tracker-rules": resolve(__dirname, "vue-mf/tracker-rules/src/tracker-rules.js"),
-        // "tiki-altcha    ": resolve(__dirname, "common-reexported/altcha.js"),
         "tiki-iot-dashboard": resolve(__dirname, "tiki-iot/dashboard.js"),
         "tiki-iot-dashboard-all": resolve(__dirname, "tiki-iot/dashboard-all.js"),
         "tiki-mermaid": resolve(__dirname, "tiki-mermaid/mermaid.js"),
@@ -205,6 +204,7 @@ export default defineConfig(({ command, mode }) => {
                     /^@vue-widgets\/.+/,
                     "@wysiwyg/summernote",
                     "@zxing/library",
+                    "altcha",
                     "bootstrap",
                     "clipboard",
                     "converse.js",
@@ -335,6 +335,10 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/@zxing/library/umd/index.min.js",
                         dest: "vendor_dist/@zxing/library/umd/index.min.js",
+                    },
+                    {
+                        src: "node_modules/altcha/dist/*.js",
+                        dest: "vendor_dist/altcha/dist",
                     },
                     {
                         src: "node_modules/animejs/lib/anime.es.js",
