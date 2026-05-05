@@ -60,7 +60,7 @@ class Search_Action_TrackerItemModify implements Search_Action_Action
             }
         }
 
-        if (empty($value) && empty($calc) && empty($add) && empty($remove) && empty($method)) {
+        if (! isset($value) && empty($calc) && empty($add) && empty($remove) && empty($method)) {
             throw new Search_Action_Exception(tr('tracker_item_modify action missing value, calc, add or remove parameter.'));
         }
 
