@@ -241,13 +241,21 @@
                 "alternatives": "Migrate to alternative to modern approach using css media queries.",
                 "impact": "As new devices emerge continued use may pose long-term maintenance risks due to abandonment, but immediate functionality is unaffected."
             },
-            "bootstrap-v4-rtl/bootstrap-rtl": {
+            "hesammousavi/bootstrap-v4-rtl": {
                 "reason": "Required to provide proper right-to-left (RTL) layout support for Bootstrap 4 in Tiki24. The project does not publish tagged releases or semantic versions; only the master branch is available.",
                 "mitigation": "The CSS file is bundled and loaded explicitly with a high priority to ensure it overrides standard Bootstrap styles. Usage is limited to RTL contexts and is well-isolated.",
                 "reviewed": "2026-02-10",
                 "reviewer": "Ushindi",
                 "alternatives": "Migrate to alternative library MahdiMajidzadeh/bootstrap-v4-rtl. Switching can require refactoring the code",
                 "impact": "Continued use may pose long-term maintenance risks due to abandonment, but immediate functionality is unaffected"
+            },
+            "rubix/extras": {
+                "reason": "Machine learning extras package providing additional algorithms and transformers required by Tiki ML features. Version constraint is pinned to 0.4.0-beta to match Rubix ML compatibility in this branch.",
+                "mitigation": "Package is abandoned but remains functional for current feature set. Usage is limited to existing ML workflows already integrated in MachineLearningLib; behavior is known and tested in current stack.",
+                "reviewed": "2026-04-30",
+                "reviewer": "Joseph Kausi",
+                "alternatives": "No direct drop-in replacement was suggested. Alternatives are migrating to another ML ecosystem or maintaining a fork.",
+                "impact": "Machine learning features become non-functional, including model training/prediction and ML-based data analysis capabilities."
             }
         }
     },
