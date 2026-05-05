@@ -40,7 +40,7 @@ class DefaultSchedulers
                 'name' => tr('Generate sitemap daily'),
                 'description' => tr('Generate the sitemap daily at 02:00.'),
                 'task' => 'ConsoleCommandTask',
-                'params' => json_encode(['console_command' => 'sitemap:generate']),
+                'params' => json_encode(['console_command' => 'sitemap:generate ' . TikiLib::tikiUrl()]),
                 'run_time' => '0 2 * * *'
             ],[
                 'name' => tr('Rebuild preferences index every Sunday'),

@@ -57,7 +57,7 @@ class Pages extends AbstractType
 
         $attributes = TikiLib::lib('attribute')->getAllAttributes("tiki.object.sitemap");
         $listPages['data'] = array_filter($listPages['data'], function ($page) use ($attributes) {
-            if ($attributes[$page['pageName']] !== 'n') {
+            if (isset($attributes[$page['pageName']]) && $attributes[$page['pageName']] !== 'n') {
                 return ($page);
             }
         });
