@@ -8,7 +8,6 @@ namespace Tiki\Lib\Test\Api\Trackers;
 
 use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
-use Tracker_Definition;
 
 /**
  * Base class for Trackers API integration tests
@@ -80,15 +79,15 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
         foreach (self::$preferences as $name => $value) {
             $prefs[$name] = $value;
         }
-        static::$testDataCreated = false;
+        self::$testDataCreated = false;
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-        if (! static::$testDataCreated) {
+        if (! self::$testDataCreated) {
             static::createDefaultTestData();
-            static::$testDataCreated = true;
+            self::$testDataCreated = true;
         }
     }
 
@@ -207,7 +206,7 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
     }
 
     /**
-     * Create a tracker item with specified field values
+     * Create a tracker item via direct SQL to avoid event system overhead.
      *
      * Field values are keyed by permName.
      *
@@ -217,26 +216,30 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      */
     protected static function createTrackerItem($trackerId, $fieldValues = [])
     {
-        $trklib = TikiLib::lib('trk');
-        $definition = Tracker_Definition::get($trackerId);
-        if (! $definition) {
+        $now = time();
+        $db  = \TikiDb::get();
+
+        $db->query(
+            'INSERT INTO `tiki_tracker_items` (`trackerId`, `status`, `created`, `createdBy`, `lastModif`, `lastModifBy`) VALUES (?, ?, ?, ?, ?, ?)',
+            [$trackerId, 'o', $now, 'admin', $now, 'admin']
+        );
+        $itemId = (int) $db->lastInsertId();
+
+        if (! $itemId) {
             return null;
         }
 
-        $data = [];
-        foreach ($definition->getFields() as $field) {
-            $value = $fieldValues[$field['permName']] ?? '';
-
-            $data[] = array_merge($field, ['value' => $value]);
+        // Insert field values keyed by permName -> fieldId lookup from our known fields.
+        foreach (static::$defaultTrackerFields as $key => $fieldInfo) {
+            $value = $fieldValues[$key] ?? '';
+            $db->query(
+                'INSERT INTO `tiki_tracker_item_fields` (`itemId`, `fieldId`, `value`) VALUES (?, ?, ?)',
+                [$itemId, $fieldInfo['fieldId'], (string) $value]
+            );
         }
 
-        $itemId = $trklib->replace_item($trackerId, 0, ['data' => $data], 'o');
-
-        if ($itemId && $itemId > 0) {
-            static::$testTrackerItems[] = $itemId;
-        }
-
-        return ($itemId && $itemId > 0) ? $itemId : null;
+        static::$testTrackerItems[] = $itemId;
+        return $itemId;
     }
 
     /**

@@ -75,15 +75,15 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         foreach (self::$preferences as $name => $value) {
             $prefs[$name] = $value;
         }
-        static::$testDataCreated = false;
+        self::$testDataCreated = false;
     }
 
     protected function setUp(): void
     {
         parent::setUp();
-        if (! static::$testDataCreated) {
+        if (! self::$testDataCreated) {
             static::createDefaultTestObjects();
-            static::$testDataCreated = true;
+            self::$testDataCreated = true;
         }
     }
 
