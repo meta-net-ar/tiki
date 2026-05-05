@@ -13,6 +13,7 @@ use Tiki\Lib\Test\Api\ApiTestCase;
  * Integration tests for OAuth /oauth/public-key endpoint
  *
  * @group api-integration-test
+ * @group api-oauth
  */
 class ApiOauthPublicKeyTest extends ApiTestCase
 {

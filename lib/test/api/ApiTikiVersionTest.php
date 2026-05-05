@@ -11,6 +11,7 @@ namespace Tiki\Lib\Test\Api;
  * Integration tests for /version endpoint
  *
  * @group api-integration-test
+ * @group api-version
  */
 class ApiTikiVersionTest extends ApiTestCase
 {
