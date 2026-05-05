@@ -59,7 +59,7 @@
 
     {if $request_detail_summary}
         <p>
-            <strong>{tr}URL{/tr}:</strong>
+            <strong>{tr}URL:{/tr}</strong>
             <a href="{$details_url}">{$performance_stats_lib->simplifyURL($details_url)}</a>
         </p>
 

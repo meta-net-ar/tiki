@@ -25,19 +25,12 @@ class PerformanceStatsLib extends TikiLib
      */
     public function addRecord(string $url, int $time_taken, ?int $backend_time = null, ?int $frontend_time = null)
     {
-        try {
-            return $this->table('tiki_performance')->insert([
-                'url' => $url,
-                'time_taken' => $time_taken,
-                'backend_time' => $backend_time,
-                'frontend_time' => $frontend_time,
-            ]);
-        } catch (Exception $e) {
-            return $this->table('tiki_performance')->insert([
-                'url' => $url,
-                'time_taken' => $time_taken,
-            ]);
-        }
+        return $this->table('tiki_performance')->insert([
+            'url' => $url,
+            'time_taken' => $time_taken,
+            'backend_time' => $backend_time,
+            'frontend_time' => $frontend_time,
+        ]);
     }
 
     /**
@@ -100,7 +93,7 @@ class PerformanceStatsLib extends TikiLib
      * @param string $url
      * @return array|false
      */
-    public function getRequestDetailsByUrl(string $url)
+    public function getRequestDetailsByUrl(string $url): array|false
     {
         $result = $this->query(
             "SELECT
@@ -126,17 +119,17 @@ class PerformanceStatsLib extends TikiLib
      *
      * @param string $url
      * @param int $amount
-     * @return Tiki\TikiDb\PdoResult
+     * @return array
      */
-    public function getSlowestSamplesByUrl(string $url, int $amount = 25)
+    public function getSlowestSamplesByUrl(string $url, int $amount = 25): array
     {
-        return $this->query(
+        return $this->fetchAll(
             "SELECT id, time_taken, backend_time, frontend_time
             FROM tiki_performance
             WHERE url = ?
-            ORDER BY time_taken DESC
-            LIMIT $amount",
-            [$url]
+            ORDER BY time_taken DESC",
+            [$url],
+            $amount
         );
     }
 

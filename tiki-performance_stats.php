@@ -83,6 +83,6 @@ $smarty->assign_by_ref('average_load_time_stats', $performanceLib->getRequestsBa
 $smarty->assign_by_ref('maximum_load_time_stats', $performanceLib->getRequestsBasedOnMaximumProcessingTime(25, $maximumStatOffset, $find, $maximumStatOrder)->result);
 $smarty->assign('details_url', $detailsUrl);
 $smarty->assign('request_detail_summary', $detailsUrl ? $performanceLib->getRequestDetailsByUrl($detailsUrl) : false);
-$smarty->assign('request_detail_samples', $detailsUrl ? $performanceLib->getSlowestSamplesByUrl($detailsUrl, 25)->result : []);
+$smarty->assign('request_detail_samples', $detailsUrl ? $performanceLib->getSlowestSamplesByUrl($detailsUrl, 25) : []);
 $smarty->assign('mid', 'tiki-performance_stats.tpl');
 $smarty->display("tiki.tpl");

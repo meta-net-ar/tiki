@@ -4182,6 +4182,8 @@ CREATE TABLE `tiki_performance` (
     `id` int(12) NOT NULL AUTO_INCREMENT,
     `url` TEXT NOT NULL,
     `time_taken` int(12) NOT NULL,
+    `backend_time` int DEFAULT NULL,
+    `frontend_time` int DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
 

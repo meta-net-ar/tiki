@@ -4,155 +4,71 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+namespace Tiki\Test\Performance;
+
+require_once 'lib/test/TikiTestCase.php';
 require_once 'lib/performance/performancestatslib.php';
 
-class PerformanceStatsLibTest extends PHPUnit\Framework\TestCase
+class PerformanceStatsLibTest extends \TikiTestCase
 {
-    public function testAddRecordStoresBackendAndFrontendTimesWhenSchemaSupportsIt(): void
+    private $lib;
+
+    protected function setUp(): void
     {
-        $table = $this->getMockBuilder(stdClass::class)
-            ->addMethods(['insert'])
-            ->getMock();
+        parent::setUp();
+        $this->lib = new \PerformanceStatsLib();
+        $db = \TikiDb::get();
 
-        $table->expects($this->once())
-            ->method('insert')
-            ->with([
-                'url' => 'https://example.org/wiki/HomePage',
-                'time_taken' => 1200,
-                'backend_time' => 450,
-                'frontend_time' => 750,
-            ])
-            ->willReturn(true);
-
-        $lib = $this->getMockBuilder('PerformanceStatsLib')
-            ->disableOriginalConstructor()
-            ->onlyMethods(['table'])
-            ->getMock();
-
-        $lib->expects($this->once())
-            ->method('table')
-            ->with('tiki_performance')
-            ->willReturn($table);
-
-        $this->assertTrue(
-            $lib->addRecord('https://example.org/wiki/HomePage', 1200, 450, 750)
+        $db->query('DELETE FROM tiki_performance');
+        $db->query(
+            'INSERT INTO tiki_performance (id, url, time_taken, backend_time, frontend_time) VALUES
+            (1, ?, 1200, 500, 700),
+            (2, ?, 800, 400, 400),
+            (3, ?, 600, NULL, NULL)',
+            [
+                'https://example.org/wiki/HomePage',
+                'https://example.org/wiki/HomePage',
+                'https://example.org/wiki/AnotherPage',
+            ]
         );
     }
 
-    public function testAddRecordFallsBackToLegacyInsertIfExtraColumnsAreUnavailable(): void
+    public function testAddRecordStoresBackendAndFrontendTimes(): void
     {
-        $modernTable = $this->getMockBuilder(stdClass::class)
-            ->addMethods(['insert'])
-            ->getMock();
+        $this->lib->addRecord('https://example.org/wiki/NewPage', 1500, 600, 900);
 
-        $modernTable->expects($this->once())
-            ->method('insert')
-            ->with([
-                'url' => 'https://example.org/wiki/HomePage',
-                'time_taken' => 1200,
-                'backend_time' => 450,
-                'frontend_time' => 750,
-            ])
-            ->willThrowException(new Exception('Unknown column backend_time'));
-
-        $legacyTable = $this->getMockBuilder(stdClass::class)
-            ->addMethods(['insert'])
-            ->getMock();
-
-        $legacyTable->expects($this->once())
-            ->method('insert')
-            ->with([
-                'url' => 'https://example.org/wiki/HomePage',
-                'time_taken' => 1200,
-            ])
-            ->willReturn(true);
-
-        $lib = $this->getMockBuilder('PerformanceStatsLib')
-            ->disableOriginalConstructor()
-            ->onlyMethods(['table'])
-            ->getMock();
-
-        $lib->expects($this->exactly(2))
-            ->method('table')
-            ->with('tiki_performance')
-            ->willReturnOnConsecutiveCalls($modernTable, $legacyTable);
-
-        $this->assertTrue(
-            $lib->addRecord('https://example.org/wiki/HomePage', 1200, 450, 750)
+        $row = \TikiDb::get()->table('tiki_performance')->fetchRow(
+            ['url', 'time_taken', 'backend_time', 'frontend_time'],
+            ['url' => 'https://example.org/wiki/NewPage']
         );
+
+        $this->assertSame('https://example.org/wiki/NewPage', $row['url']);
+        $this->assertSame(1500, (int) $row['time_taken']);
+        $this->assertSame(600, (int) $row['backend_time']);
+        $this->assertSame(900, (int) $row['frontend_time']);
     }
 
-    public function testGetRequestDetailsByUrlReturnsFetchedAggregateRow(): void
+    public function testGetRequestDetailsByUrlReturnsAggregateValues(): void
     {
-        $result = $this->getMockBuilder(stdClass::class)
-            ->addMethods(['fetchRow'])
-            ->getMock();
+        $stats = $this->lib->getRequestDetailsByUrl('https://example.org/wiki/HomePage');
 
-        $expected = [
-            'url' => 'https://example.org/wiki/HomePage',
-            'number_of_requests' => 3,
-            'average_time_taken' => 900,
-            'minimum_time_taken' => 700,
-            'maximum_time_taken' => 1200,
-            'average_backend_time' => 400,
-            'average_frontend_time' => 500,
-            'breakdown_samples' => 2,
-        ];
-
-        $result->expects($this->once())
-            ->method('fetchRow')
-            ->willReturn($expected);
-
-        $lib = $this->getMockBuilder('PerformanceStatsLib')
-            ->disableOriginalConstructor()
-            ->onlyMethods(['query'])
-            ->getMock();
-
-        $lib->expects($this->once())
-            ->method('query')
-            ->with(
-                $this->stringContains('SELECT'),
-                ['https://example.org/wiki/HomePage']
-            )
-            ->willReturn($result);
-
-        $this->assertSame($expected, $lib->getRequestDetailsByUrl('https://example.org/wiki/HomePage'));
+        $this->assertSame('https://example.org/wiki/HomePage', $stats['url']);
+        $this->assertSame(2, (int) $stats['number_of_requests']);
+        $this->assertSame(1000, (int) $stats['average_time_taken']);
+        $this->assertSame(800, (int) $stats['minimum_time_taken']);
+        $this->assertSame(1200, (int) $stats['maximum_time_taken']);
+        $this->assertSame(450, (int) $stats['average_backend_time']);
+        $this->assertSame(550, (int) $stats['average_frontend_time']);
+        $this->assertSame(2, (int) $stats['breakdown_samples']);
     }
 
-    public function testGetRequestDetailsByUrlReturnsFalseWhenQueryFails(): void
+    public function testGetSlowestSamplesByUrlReturnsRowsSortedByTimeTakenDesc(): void
     {
-        $lib = $this->getMockBuilder('PerformanceStatsLib')
-            ->disableOriginalConstructor()
-            ->onlyMethods(['query'])
-            ->getMock();
+        $rows = $this->lib->getSlowestSamplesByUrl('https://example.org/wiki/HomePage', 2);
 
-        $lib->expects($this->once())
-            ->method('query')
-            ->willReturn(false);
-
-        $this->assertFalse($lib->getRequestDetailsByUrl('https://example.org/wiki/HomePage'));
-    }
-
-    public function testGetSlowestSamplesByUrlPassesUrlAndLimitToQuery(): void
-    {
-        $pdoResult = new stdClass();
-
-        $lib = $this->getMockBuilder('PerformanceStatsLib')
-            ->disableOriginalConstructor()
-            ->onlyMethods(['query'])
-            ->getMock();
-
-        $lib->expects($this->once())
-            ->method('query')
-            ->with(
-                $this->stringContains('LIMIT 10'),
-                ['https://example.org/wiki/HomePage']
-            )
-            ->willReturn($pdoResult);
-
-        $this->assertSame(
-            $pdoResult,
-            $lib->getSlowestSamplesByUrl('https://example.org/wiki/HomePage', 10)
-        );
+        $this->assertCount(2, $rows);
+        $this->assertSame(1200, (int) $rows[0]['time_taken']);
+        $this->assertSame(800, (int) $rows[1]['time_taken']);
     }
 }
