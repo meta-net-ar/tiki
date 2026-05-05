@@ -147,7 +147,7 @@ class TikiMail
                 $headers->addIdHeader('References', $value);
                 break;
             default:
-                $headers->addTextHeader($name, $value);
+                $headers->addTextHeader($name, implode(',', $value));
                 break;
         }
     }
