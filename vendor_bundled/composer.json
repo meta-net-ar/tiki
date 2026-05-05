@@ -230,7 +230,7 @@
         "manticoresoftware/manticoresearch-php": "^3.0",
         "matthiasmullie/minify": "^1.3.58",
         "mautic/api-library": "~3.0.0",
-        "melbahja/seo": "^2.0",
+        "melbahja/seo": "~3.0",
         "michelf/php-smartypants": "^1.8.1",
         "montefuscolo/xmpp": "~0.8",
         "mottie/tablesorter": "^2.32",
