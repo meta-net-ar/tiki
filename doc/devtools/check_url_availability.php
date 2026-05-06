@@ -66,12 +66,10 @@ class UrlAvailabilityChecker
         $totalUrls = count($urlData);
         $processed = 0;
 
-        foreach ($urlData as &$data) {
+        $queue = array_map(function ($data) {
             $data['attempts'] = 0;
-        }
-        unset($data);
-
-        $queue = $urlData;
+            return $data;
+        }, $urlData);
 
         while (! empty($queue)) {
             $batchSize = min(count($queue), $this->batchSize);
@@ -132,13 +130,26 @@ class UrlAvailabilityChecker
             $handles[$index] = ['handle' => $ch, 'data' => $data];
         }
 
-        $running = null;
-        do {
-            curl_multi_exec($multiHandle, $running);
-            if ($running) {
-                curl_multi_select($multiHandle);
+        $this->runMulti($multiHandle);
+
+        $fallbackActive = false;
+        foreach ($handles as $index => $item) {
+            $ch = $item['handle'];
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            // Retry with GET in parallel if HEAD fails with 403/404/405 (common with bot protection)
+            if ($httpCode === 403 || $httpCode === 404 || $httpCode === 405) {
+                curl_multi_remove_handle($multiHandle, $ch);
+                curl_setopt($ch, CURLOPT_NOBODY, false);
+                curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
+                curl_multi_add_handle($multiHandle, $ch);
+                $fallbackActive = true;
             }
-        } while ($running > 0);
+        }
+
+        if ($fallbackActive) {
+            $this->runMulti($multiHandle);
+        }
 
         foreach ($handles as $index => $item) {
             $ch = $item['handle'];
@@ -147,20 +158,6 @@ class UrlAvailabilityChecker
             $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $error = curl_error($ch);
             $errno = curl_errno($ch);
-
-            // Retry with GET if HEAD fails with 403/404/405 (common with bot protection)
-            if ($httpCode === 403 || $httpCode === 404 || $httpCode === 405) {
-                curl_multi_remove_handle($multiHandle, $ch);
-                curl_setopt($ch, CURLOPT_NOBODY, false);
-                curl_setopt($ch, CURLOPT_TIMEOUT, $this->timeout);
-                curl_exec($ch);
-                $newHttpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                $error = curl_error($ch);
-                $errno = curl_errno($ch);
-                if ($newHttpCode >= 200 && $newHttpCode < 400) {
-                    $httpCode = $newHttpCode;
-                }
-            }
 
             // Transient issues (Timeout, 429, 5xx)
             $isTransient = $errno === CURLE_OPERATION_TIMEDOUT
@@ -211,6 +208,20 @@ class UrlAvailabilityChecker
         curl_multi_close($multiHandle);
 
         return $retries;
+    }
+
+    /**
+     * Execute multi-handle requests and wait for completion
+     */
+    private function runMulti($multiHandle)
+    {
+        $running = null;
+        do {
+            curl_multi_exec($multiHandle, $running);
+            if ($running) {
+                curl_multi_select($multiHandle);
+            }
+        } while ($running > 0);
     }
 }
 
