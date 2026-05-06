@@ -87,16 +87,29 @@ if (! empty($_SERVER['TIKI_INI_FILE']) && is_readable($_SERVER['TIKI_INI_FILE'])
     $fail($_SERVER['TIKI_INI_FILE'] . ' could not be read');
 }
 
-if (! empty($system_configuration_file)) {
-    try {
-        $ini = new Ini();
-        $baseData = $ini->fromFile($system_configuration_file, $system_configuration_identifier ?? null);
-        $systemConfiguration->merge($baseData);
-    } catch (\Throwable $e) {
-        $fail('Failed to load ' . $system_configuration_file . ': ' . $e->getMessage());
+// Normalize to array: support both legacy $system_configuration_file (string)
+// and the newer $system_configuration_files (array of file paths).
+// When using the array form, files listed later override keys from earlier files.
+if (isset($system_configuration_files)) {
+    if (! is_array($system_configuration_files)) {
+        $fail('$system_configuration_files must be an array.');
     }
-} elseif (! empty($system_configuration_file) && ! is_readable($system_configuration_file)) {
-    $fail($system_configuration_file . ' could not be read');
+} else {
+    $system_configuration_files = ! empty($system_configuration_file) ? [$system_configuration_file] : [];
+}
+
+foreach ($system_configuration_files as $configFile) {
+    if (! empty($configFile) && is_readable($configFile)) {
+        try {
+            $ini = new Ini();
+            $baseData = $ini->fromFile($configFile, $system_configuration_identifier ?? null);
+            $systemConfiguration->merge($baseData);
+        } catch (\Throwable $e) {
+            $fail('Failed to load ' . $configFile . ': ' . $e->getMessage());
+        }
+    } elseif (! empty($configFile) && ! is_readable($configFile)) {
+        $fail($configFile . ' could not be read');
+    }
 }
 
 if ($re === false) {
