@@ -92,7 +92,7 @@ class EnglishUpdateCommand extends Command
             $rev = implode(' ', $revisions);
         }
 
-        $raw = shell_exec("git diff $rev 2>&1");
+        $raw = shell_exec("git diff $rev 2>&1") ?? '';
 
 
         // strip any empty translation strings now to avoid complexities later
