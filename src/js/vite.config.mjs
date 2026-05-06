@@ -205,6 +205,7 @@ export default defineConfig(({ command, mode }) => {
                     /^@vue-widgets\/.+/,
                     "@wysiwyg/summernote",
                     "@zxing/library",
+                    "altcha",
                     "bootstrap",
                     "clipboard",
                     "converse.js",
@@ -335,6 +336,10 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/@zxing/library/umd/index.min.js",
                         dest: "vendor_dist/@zxing/library/umd/index.min.js",
+                    },
+                    {
+                        src: "node_modules/altcha/dist/*.js",
+                        dest: "vendor_dist/altcha/dist",
                     },
                     {
                         src: "node_modules/animejs/lib/anime.es.js",

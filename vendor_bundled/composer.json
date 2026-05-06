@@ -52,6 +52,14 @@
         "    Currently no actively maintained PHP alternative.",
         "    Replacing it would require a custom solution or migration to token-based auth",
         "",
+        "  altcha-org/altcha:",
+        "    Upstream v1.2+ declares php >= 8.2, but Tiki still supports PHP 8.1.",
+        "    We keep the ~1.1 constraint and override Composer metadata via a custom repository entry",
+        "    because Tiki's integration has been adapted to run on PHP 8.1.",
+        "    Audit tag: PKSA-5rb8-j658-qvzz is ignored to suppress the related advisory while PHP 8.1",
+        "    remains supported; this only affects composer audit output and not dependency resolution.",
+        "    Remove the override after Tiki drops PHP 8.1 support.",
+        "",
         "  garethp/php-ews: ",
         "    Overrides minimum-stability for this Cypht dependency until it releases a stable version.",
         "",
@@ -161,6 +169,7 @@
         ""
     ],
     "require": {
+        "altcha-org/altcha": "1.3.2",
         "bacon/bacon-qr-code": "~3.0",
         "bertoost/elasticemail-mailer": "~1.1",
         "bigbluebutton/bigbluebutton-api-php": "~2.3",
@@ -414,6 +423,7 @@
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "php-http/discovery": true
         },
+        "auditComment": "PKSA-5rb8-j658-qvzz: Ignore this audit advisory while Tiki supports PHP 8.1. The audit ignore only suppresses composer audit output; installation compatibility is handled separately by the altcha repository override.",
         "audit": {
             "ignore": {
                 "PKSA-5jz8-6tcw-pbk4": "phpunit dev-only dependency, no fix available in PHP 8.1-compatible 10.x line. Fix exists in phpunit 12.5.22+ which requires PHP >= 8.3."
@@ -425,7 +435,8 @@
                 "pear/structures_graph": " Reported as an abandoned package, but it is still required indirectly by pear/pear",
                 "pear/xml_parser": "This package is abandoned and no longer maintained. No replacement package was suggested.",
                 "pear/xml_util": " Reported as an abandoned package, but it is still required indirectly by pear/pear"
-            }
+            },
+            "ignore": ["PKSA-5rb8-j658-qvzz"]
         }
     },
     "autoload": {
@@ -527,6 +538,34 @@
         "test": "php ../lib/test/phpunit.php -c phpunit.xml.dist --colors=always"
     },
     "repositories": {
+        "altcha-org/altcha": {
+            "type": "package",
+            "package": {
+                "name": "altcha-org/altcha",
+                "version": "1.3.2",
+                "type": "library",
+                "license": "MIT",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/altcha-org/altcha-lib-php.git",
+                    "reference": "1c4588d9aa67d4e22302da2688f079d3b7500d15"
+                },
+                "dist": {
+                    "type": "zip",
+                    "url": "https://api.github.com/repos/altcha-org/altcha-lib-php/zipball/1c4588d9aa67d4e22302da2688f079d3b7500d15",
+                    "reference": "1c4588d9aa67d4e22302da2688f079d3b7500d15"
+                },
+                "require": {
+                    "php": ">=8.1",
+                    "ext-json": "*"
+                },
+                "autoload": {
+                    "psr-4": {
+                        "AltchaOrg\\Altcha\\": "src/"
+                    }
+                }
+            }
+        },
         "asset-packagist.org": {
             "type": "composer",
             "url": "https://asset-packagist.org"

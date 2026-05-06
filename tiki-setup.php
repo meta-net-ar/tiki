@@ -15,6 +15,7 @@
 use Tiki\Maintenance\Maintenance;
 use Tiki\Package\VendorHelper;
 use Tiki\Profiling\Timer;
+use Tiki\Captcha\CaptchaTypeResolver;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 //Be careful, composer autoloading isn't available until tiki-setup_base.php is required further down
@@ -466,8 +467,9 @@ if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
 }
 
 if ($prefs['feature_antibot'] == 'y' && empty($user)) {
-    if ($prefs['recaptcha_enabled'] === 'y') {
-        if ($prefs['recaptcha_version'] == '2') {
+    $captchaType = CaptchaTypeResolver::getConfiguredType($prefs);
+    if (in_array($captchaType, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
+        if ($captchaType == 'recaptcha20') {
             if (! empty($prefs['language'])) {
                 $headerlib->add_jsfile_cdn("$url_scheme://www.google.com/recaptcha/api.js?hl=" . $prefs['language']);
             } else {
@@ -822,6 +824,9 @@ $headerlib->add_jsfile('lib/jquery_tiki/tiki-vue.js');
 
 if (empty($user) && $prefs['feature_antibot'] == 'y') {
     $headerlib->add_jsfile_late('lib/captcha/captchalib.js');
+    if (CaptchaTypeResolver::getConfiguredType($prefs) === 'altcha') {
+        $headerlib->add_js_module('import {Altcha} from "altcha";');
+    }
 }
 
 if (! empty($prefs['header_custom_css'])) {

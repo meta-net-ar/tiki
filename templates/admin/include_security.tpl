@@ -197,22 +197,35 @@
                 {tr _0='<a href="http://doc.tiki.org/Forum+Admin#Forum_moderation" target="_blank" class="alert-link">' _1="</a>" _2="<strong>" _3="</strong>" _4='<a href="tiki-admin_actionlog.php" target="_blank" class="alert-link">' _5="</a>" _6='<a href="tiki-adminusers.php" target="_blank" class="alert-link">' _7="</a>" _8='<a href="tiki-list_comments.php" target="_blank" class="alert-link">' _9="</a>"}You can additionally protect from spam enabling the '%0moderation queue on forums%1', or through %2banning%3 multiple ip's from the '%4Action log%5', from '%6Users registration%7', or from the '%8Comments moderation queue%9' itself{/tr}.
             {/remarksbox}
             <fieldset>
-                <legend class="h3">{tr}CAPTCHA{/tr}</legend>
+                <legend class="h3">{tr}CAPTCHA Options{/tr}</legend>
                 {preference name=feature_antibot}
                 <div class="adminoptionboxchild" id="feature_antibot_childcontainer">
-                    {preference name=captcha_wordLen}
-                    {preference name=captcha_width}
-                    {preference name=captcha_noise}
-                    {preference name=recaptcha_enabled}
-                    <div class="adminoptionboxchild" id="recaptcha_enabled_childcontainer">
-                        {preference name=recaptcha_pubkey}
-                        {preference name=recaptcha_privkey}
-                        {preference name=recaptcha_theme}
-                        {preference name=recaptcha_version}
-                    </div>
-                    {preference name=captcha_questions_active}
-                    <div class="adminoptionboxchild" id="captcha_questions_active_childcontainer">
-                        {preference name=captcha_questions}
+                    {preference name=captcha_type}
+                    {remarksbox type="tip" title="{tr}Tip{/tr}" close="n"}
+                        {tr}Use the selector above to choose the active CAPTCHA implementation. The selected CAPTCHA must also be configured in its section below before it can be used. Other CAPTCHA settings remain available but inactive until selected.{/tr}
+                    {/remarksbox}
+                    <div class="adminoptionboxchild">
+                        <h5 class="mt-3">{tr}Classic CAPTCHA{/tr}</h5>
+                        <div class="adminoptionboxchild" id="captcha_wordLen_childcontainer">
+                            {preference name=captcha_wordLen}
+                            {preference name=captcha_width}
+                            {preference name=captcha_noise}
+                        </div>
+                        <h5 class="mt-4">{tr}Custom Questions CAPTCHA{/tr}</h5>
+                        <div class="adminoptionboxchild" id="captcha_questions_childcontainer">
+                            {preference name=captcha_questions}
+                        </div>
+                        <h5 class="mt-4">{tr}Google reCAPTCHA{/tr}</h5>
+                        <div class="adminoptionboxchild">
+                            {preference name=recaptcha_pubkey}
+                            {preference name=recaptcha_privkey}
+                            {preference name=recaptcha_theme}
+                            {preference name=recaptcha_version}
+                        </div>
+                        <h5 class="mt-4">{tr}Altcha CAPTCHA{/tr}</h5>
+                        <div class="adminoptionboxchild">
+                            {preference name=altcha_hmac_key}
+                        </div>
                     </div>
                 </div>
             </fieldset>

@@ -5,13 +5,18 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
+
+use AltchaOrg\Altcha\V1\ChallengeOptions;
+use AltchaOrg\Altcha\V1\Altcha as AltchaLib;
+use Tiki\Captcha\CaptchaTypeResolver;
+
 if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
 
 /**
- * A simple class to switch between Laminas\Captcha\Image and
+ * A simple class to switch between Laminas\Captcha\Image, AltchaOrg\Altcha\V1\Altcha and
  * Laminas\Captcha\ReCaptcha based on admin preference
  */
 class Captcha
@@ -25,7 +30,7 @@ class Captcha
     public $type = '';
 
     /**
-     * An instance of Laminas\Captcha\Image or Laminas\Captcha\ReCaptcha
+     * An instance of Laminas\Captcha\Image or Laminas\Captcha\ReCaptcha or AltchaOrg\Altcha\V1\Altcha
      * depending on the value of $this->type
      *
      * @var object
@@ -33,8 +38,15 @@ class Captcha
     public $captcha = '';
 
     /**
+     * Fallback error messages for captcha implementations without Laminas-style message APIs.
+     *
+     * @var array<string, string>
+     */
+    private $errorMessages = [];
+
+    /**
      * Class constructor: decides whether to create an instance of
-     * Laminas\Captcha\Image or Laminas\Captcha\ReCaptcha or Captcha_Question
+     * Laminas\Captcha\Image or Laminas\Captcha\ReCaptcha or Captcha_Question or AltchaOrg\Altcha\V1\Altcha
      *
      * @param string $type recaptcha|questions|default|dumb
      */
@@ -43,21 +55,7 @@ class Captcha
         global $prefs;
 
         if (empty($type)) {
-            if ($prefs['recaptcha_enabled'] == 'y' && ! empty($prefs['recaptcha_privkey']) && ! empty($prefs['recaptcha_pubkey'])) {
-                if ($prefs['recaptcha_version'] == '2') {
-                    $type = 'recaptcha20';
-                } elseif ($prefs['recaptcha_version'] == '3') {
-                    $type = 'recaptcha30';
-                } else {
-                    $type = 'recaptcha';
-                }
-            } elseif ($prefs['captcha_questions_active'] == 'y' && ! empty($prefs['captcha_questions'])) {
-                $type = 'questions';
-            } elseif (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox')) {
-                $type = 'default';
-            } else {
-                $type = 'dumb';
-            }
+            $type = CaptchaTypeResolver::getConfiguredType($prefs);
         }
 
         if ($type === 'recaptcha') {
@@ -128,6 +126,10 @@ class Captcha
 
             include_once('lib/captcha/Captcha_Questions.php');
             $this->captcha = new Captcha_Questions($questions);
+        } elseif ($type === 'altcha') {
+            $hmacKey = $prefs['altcha_hmac_key'];
+            $this->captcha = new AltchaLib($hmacKey);
+            $this->type = $type;
         } else {        // implied $type==='dumb'
             $this->captcha = new Laminas\Captcha\Dumb();
             $this->captcha->setWordlen($prefs['captcha_wordLen']);
@@ -152,27 +154,48 @@ class Captcha
         }
 
         try {
-            $key = $this->captcha->generate();
-            if ($this->type == 'default' || $this->type == 'questions') {
-                // the following needed to keep session active for ajax checking
-                $session = $this->captcha->getSession();
-                $session->setExpirationHops(2, null, true);
-                $this->captcha->setSession($session);
-                $this->captcha->setKeepSession(false);
+            if ($this->type === 'altcha') {
+                $options = new ChallengeOptions(
+                    maxNumber: 50000,
+                    expires: (new \DateTimeImmutable())->add(new \DateInterval('PT10S'))
+                );
+                $key = $this->captcha->createChallenge($options);
+                $_SESSION['altcha_challenge'] = $key;
+                return $key;
+            } else {
+                $key = $this->captcha->generate();
+                if ($this->type == 'default' || $this->type == 'questions') {
+                    $session = $this->captcha->getSession();
+                    $session->setExpirationHops(2, null, true);
+                    $this->captcha->setSession($session);
+                    $this->captcha->setKeepSession(false);
+                }
+                return $key;
             }
         } catch (Exception $e) {
             Feedback::error($e->getMessage());
         }
-        return $key;
     }
 
-    /** Return captcha ID
+    /**
+     * Return CAPTCHA ID
      *
-     * @return string captcha ID
+     * The ID is used by the classic CAPTCHA flow to identify the generated challenge,
+     * post it back as captcha[id], and store successful validation in session.
+     *
+     * Not all CAPTCHA implementations expose such an ID. For providers without one
+     * (for example Altcha), this returns an empty string. That is acceptable for
+     * those providers because they use their own challenge/payload validation flow
+     * instead of the legacy captcha[id] mechanism.
+     *
+     * @return string captcha ID or empty string if not available
      */
     public function getId()
     {
-        return $this->captcha->getId();
+        if (method_exists($this->captcha, 'getId')) {
+            return $this->captcha->getId();
+        }
+        return '';
     }
 
     /**
@@ -190,13 +213,20 @@ class Captcha
                 $params = json_encode($this->captcha->getService()->getOptions());
                 $id = 1;
                 TikiLib::lib('header')->add_js('
-Recaptcha.create("' . $this->captcha->getSiteKey() . '",
-    "captcha' . $id . '",' . $params . '
-  );
-', 100);
+                    Recaptcha.create("' . $this->captcha->getSiteKey() . '",
+                    "captcha' . $id . '",' . $params . '
+                    );
+                ', 100);
                 return '<div id="captcha' . $id . '"></div>';
             } else {
                 return $this->captcha->render();
+            }
+        } elseif ($this->type === 'altcha') {
+            $challenge = $_SESSION['altcha_challenge'] ?? null;
+            if ($challenge) {
+                return '<altcha-widget challengeurl="antibot.php"></altcha-widget>';
+            } else {
+                return '<div>' . tra('Altcha challenge unavailable') . '</div>';
             }
         } else {
             if (in_array($this->type, ['recaptcha20', 'recaptcha30'])) {
@@ -245,6 +275,12 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
             ini_set('arg_separator.output', '&');
             $result = $this->captcha->isValid($input);
             ini_set('arg_separator.output', $oldVal);
+        } elseif ($this->type === 'altcha') {
+            $payload = $input['altcha'] ?? null;
+            if (! $payload) {
+                return false;
+            }
+            $result = $this->captcha->verifySolution($payload, true);
         } else {
             if (isset($input['captcha'])) {
                 $captchaInput = $input['captcha'];
@@ -271,7 +307,9 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
     public function getPath()
     {
         try {
-            return $this->captcha->getImgDir() . $this->captcha->getId() . $this->captcha->getSuffix();
+            if (method_exists($this->captcha, 'getImgDir')) {
+                return $this->captcha->getImgDir() . $this->captcha->getId() . $this->captcha->getSuffix();
+            }
         } catch (Exception $e) {
             Feedback::error($e->getMessage());
         }
@@ -289,14 +327,18 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
             'missingValue' => tra('Empty CAPTCHA value'),
             'badCaptcha' => tra('You have mistyped the anti-bot verification code. Please try again.')
         ];
-
-        if (in_array($this->type, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
+        if ($this->type === 'altcha') {
+            $errors['errCaptcha'] = tra('Failed to validate CAPTCHA');
+        } elseif (in_array($this->type, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
             $errors['errCaptcha'] = tra('Failed to validate CAPTCHA');
         } else {
             $errors['missingID'] = tra('CAPTCHA ID field is missing');
         }
+        $this->errorMessages = $errors;
 
-        $this->captcha->setMessages($errors);
+        if (method_exists($this->captcha, 'setMessages')) {
+            $this->captcha->setMessages($errors);
+        }
     }
 
     /**
@@ -306,7 +348,15 @@ Recaptcha.create("' . $this->captcha->getSiteKey() . '",
      */
     public function getErrors()
     {
-        return implode('<br />', $this->captcha->getMessages());
+        if ($this->type === 'altcha') {
+            return '<br />' . ($this->errorMessages['errCaptcha'] ?? tra('Invalid Captcha.'));
+        }
+
+        if (method_exists($this->captcha, 'getMessages')) {
+            return implode('<br />', $this->captcha->getMessages());
+        }
+
+        return implode('<br />', $this->errorMessages);
     }
 
     /**

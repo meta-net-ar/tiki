@@ -144,8 +144,8 @@
                 </div>
                 {preference name=jquery_timeago}
                 {preference name=user_unique_email}
-                {preference name=recaptcha_enabled}
-                <div class="adminoptionboxchild" id="recaptcha_enabled_childcontainer">
+                {preference name=captcha_type}
+                <div class="adminoptionboxchild" id="captcha_type_childcontainer">
                     {preference name=recaptcha_pubkey}
                     {preference name=recaptcha_privkey}
                     {preference name=recaptcha_theme}

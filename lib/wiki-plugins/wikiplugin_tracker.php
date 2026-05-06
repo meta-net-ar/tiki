@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Tiki\Captcha\CaptchaTypeResolver;
 use Tiki\Lib\Registration\Error as RegistrationError;
 use Tiki\Lib\core\WikiPlugin\Options\TrackerStatuses;
 use Tiki\Lib\core\WikiPlugin\Options\BooleanEnglishLetter;
@@ -1863,7 +1864,7 @@ function wikiplugin_tracker($data, $params)
                 $customvalidation .= '} } } ';
                 $customvalidation .= '}, ';
                 $customvalidation_m .= 'name: { required: "' . tra("This field is required") . '"}, ';
-                if (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox') && $prefs['feature_antibot'] == 'y' && empty($user) && $prefs['recaptcha_enabled'] != 'y') {
+                if (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox') && $prefs['feature_antibot'] == 'y' && empty($user) && CaptchaTypeResolver::requiresManualInput($prefs)) {
                     // antibot validation
                     $customvalidation .= '"captcha[input]": { ';
                     $customvalidation .= 'required: true, ';

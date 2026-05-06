@@ -15,6 +15,7 @@
     "@lottiefiles/dotlottie-wc": "^0.8.0",
     "@shoelace-style/shoelace": "^2.15.1",
     "@zxing/library": "^0.21.2",
+    "altcha": "^2.1.0",
     "animejs": "~3.2.2",
     "boomerangjs": "^1.815.1",
     "bootstrap": "^5.3.8",

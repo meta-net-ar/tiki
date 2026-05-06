@@ -10,6 +10,8 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     exit;
 }
 
+use Tiki\Captcha\CaptchaTypeResolver;
+
 if (empty($_REQUEST['registration_choices'])) {
     $_REQUEST['registration_choices'] = [];
 }
@@ -67,8 +69,7 @@ if (! empty($_REQUEST['resync_tracker']) && $access->checkCsrf(true)) {
 
 $smarty->assign('gd_lib_found', function_exists('gd_info') ? 'y' : 'n');
 
-
-if ($prefs['feature_antibot'] === 'y' && $prefs['captcha_questions_active'] !== 'y' && $prefs['recaptcha_enabled'] !== 'y') {
+if ($prefs['feature_antibot'] === 'y' && in_array(CaptchaTypeResolver::getConfiguredType($prefs), ['default', 'dumb'])) {
     // check Zend captcha will work
     $captcha = new Laminas\Captcha\Dumb();
 
