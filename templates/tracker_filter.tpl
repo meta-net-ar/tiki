@@ -57,8 +57,8 @@
                     {if $field.type eq 'c'}
                         <div style="display:{if $filterfield eq $fid}block{else}none{/if};" id="fid{$fid}">
                             <select name="filtervalue[{$fid}]" class="form-select">
-                                <option value="y" {if $filtervalue eq 'y'} selected="selected" {/if}>{tr}Yes{/tr}</option>
-                                <option value="n" {if $filtervalue eq 'n'} selected="selected" {/if}>{tr}No{/tr}</option>
+                                <option value="y"{if $filtervalue eq 'y'} selected="selected"{/if}>{tr}Yes{/tr}</option>
+                                <option value="n"{if $filtervalue eq 'n'} selected="selected"{/if}>{tr}No{/tr}</option>
                             </select>
                         </div>
                     {elseif $field.type eq 'd' or $field.type eq 'D'}
