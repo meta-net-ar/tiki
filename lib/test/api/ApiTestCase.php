@@ -78,9 +78,8 @@ abstract class ApiTestCase extends \TikiTestCase
 
     /**
      * Delete a set of test preferences directly via SQL.
-     * Avoids TikiLib::delete_preference(), which loads preference definition files (including
-     * fgal.php) that execute Table ORM queries and dispatch PHPUnit events — causing
-     * NoTestCaseObjectOnCallStackException in PHPUnit 10+ static teardown context.
+     * Avoids TikiLib::delete_preference(), which loads preference definition files
+     * and may dispatch PHPUnit events in static teardown context.
      */
     protected static function deleteTestPreferences(array $prefs): void
     {
