@@ -135,7 +135,11 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
             }
         }
         $value = parent::renderInnerOutput($context);
-        if ($this->getConfiguration('type') === 't' && $context['list_mode'] !== 'csv') {   // not TextAreas or csv output
+        if (
+            $this->getConfiguration('type') === 't'
+            && $context['list_mode'] !== 'csv'
+            && empty($context['isMain_context'])
+        ) {
             $value = smarty_modifier_escape($value);
         }
         if (
