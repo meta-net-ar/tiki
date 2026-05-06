@@ -1,27 +1,31 @@
-<form action="#" method="get">
+<form action="" method="get">
     <input type="hidden" name="trackerId" value="{$trackerId|escape}">
     {if $status}<input type="hidden" name="status" value="{$status}">{/if}
     {if $sort_mode}<input type="hidden" name="sort_mode" value="{$sort_mode}">{/if}
     {if $offset}<input type="hidden" name="offset" value="{$offset}">{/if}
     <div class="search_container mb-3 d-flex flex-row flex-wrap align-items-center gap-2">
         {if ($tracker_info.showStatus|default:null eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')) and $showstatus|default:null ne 'n'}
-            <div class="btn-group" role="group" aria-label="{tr}Filter by status{/tr}">
-                {* "Reset" button: Restores the default status filter (clears manual selections) *}
-                <button id="js-status-all" type="button" class="btn btn-outline-secondary d-flex align-items-center gap-1"
-                    title="{tr}Reset to default status filter{/tr}">
-                    {icon name="undo"} <span>{tr}Reset{/tr}</span>
-                </button>
+            <div class="d-flex align-items-center gap-2">
+                <span class="text-muted">{tr}Filter by:{/tr}</span>
+                <div class="btn-group" role="group" aria-label="{tr}Filter by status{/tr}">
+                    {* Status Toggles: Bootstrap semantic checkboxes *}
+                    {foreach key=st item=stdata from=$status_types}
+                        <input type="checkbox" class="btn-check js-status-checkbox" id="status-btn-{$stdata.statuslink}"
+                            value="{$st}" {if $stdata.class eq 'statuson'}checked{/if}>
+                        <label class="btn btn-outline-primary d-flex align-items-center gap-1" for="status-btn-{$stdata.statuslink}">
+                            {icon name="{$stdata.iconname}"}
+                            <span>{$stdata.label}</span>
+                        </label>
+                    {/foreach}
 
-                {* Status Toggles: Bootstrap semantic checkboxes *}
-                {foreach key=st item=stdata from=$status_types}
-                    <input type="checkbox" class="btn-check js-status-checkbox" id="status-btn-{$stdata.statuslink}"
-                        value="{$st}" {if $stdata.class eq 'statuson'}checked{/if}>
-                    <label class="btn btn-outline-primary d-flex align-items-center gap-1" for="status-btn-{$stdata.statuslink}"
-                        title="{$stdata.label}">
-                        {icon name="{$stdata.iconname}"}
-                        <span>{$stdata.label}</span>
-                    </label>
-                {/foreach}
+                    {if $status}
+                        {* "Reset" button: Restores the default status filter (clears manual selections) *}
+                        <button id="js-status-all" type="button" class="btn btn-outline-secondary d-flex align-items-center gap-1"
+                            title="{tr}Reset to default status filter{/tr}">
+                            {icon name="undo"} <span>{tr}Reset{/tr}</span>
+                        </button>
+                    {/if}
+                </div>
             </div>
         {/if}
 
