@@ -2,26 +2,6 @@
 <html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if Language::isRTL()} dir="rtl"{/if}{if !empty($page_id)} id="page_{$page_id}"{/if}>
 <head>
     {include file='header.tpl'}
-    {* The following style block makes sense to be used only with this fixed top bar layout so lets put it here only *}
-    {if $prefs.theme_navbar_fixed_topbar_offset ne ''}<style>
-    {literal}
-    /* Prevent target anchors from being covered by fixed top navbar */
-    h1:target:before,
-    h2:target:before,
-    h3:target:before,
-    h4:target:before,
-    h5:target:before,
-    h6:target:before {
-        content: "";
-        display: block;
-        height: {/literal}{$prefs.theme_navbar_fixed_topbar_offset}{literal}px; /* fixed header height*/
-        margin: -{/literal}{$prefs.theme_navbar_fixed_topbar_offset}{literal}px 0 0; /* negative fixed header height */
-    }
-    #middle_outer {
-        margin-top: {/literal}{$prefs.theme_navbar_fixed_topbar_offset}{literal}px;
-    }
-    {/literal}
-    </style>{/if}
 </head>
 <body{html_body_attributes class="navbar-padding"}>
     {$cookie_consent_html}
@@ -33,12 +13,18 @@
     {/if}
     <a class="btn btn-info btn-lg skipnav" href="#col1" role="button">{tr}Skip to main content{/tr}</a>
     {if !isset($smarty.session.fullscreen) || isset($smarty.session.fullscreen) && $smarty.session.fullscreen ne 'y'}
-        {if $prefs.theme_unified_admin_backend neq 'y' or $smarty.server.SCRIPT_NAME|strpos:'tiki-admin.php' === false}            
-            <header
-                class="navbar navbar-expand-md tiki-top-nav-{$navbar_color_variant} navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-header-top fixed-top p-0">
-                <div class="container{if $prefs.feature_fixed_width eq 'y' and $prefs.layout_fixed_width_header neq 'y'}-fluid{/if}">
-                    {modulelist zone=top class="top_modules w-100 tiki-top-nav-{$navbar_color_variant} navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
-                </div>
+        {if $prefs.theme_unified_admin_backend neq 'y' or $smarty.server.SCRIPT_NAME|strpos:'tiki-admin.php' === false}
+             <header class="page-header w-100 sticky-top my-0" id="page-header" role=banner>
+                {* Main navigation - uses block for theme customization *}
+                <nav class="{block name=navClasses}navbar navbar-expand-md navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar{/block}"
+                     id="main-navbar"
+                     role="navigation"
+                     aria-label="{tr}Main navigation{/tr}">
+
+                    <div class="container{if $prefs.feature_fixed_width eq 'y' and $prefs.layout_fixed_width_header neq 'y'}-fluid{/if}">
+                        {modulelist zone=top class="top_modules w-100 tiki-top-nav-{$navbar_color_variant} bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
+                    </div>
+                </nav>
             </header>
         {/if}
     {/if}
@@ -217,32 +203,6 @@
             </div>
         </footer>
     {/if}
-
-    {* Manage top margin of middle_outer dynamically in case header height changes due to content changes (ex. Module added on Top position) or responsive design *}
-    {jq}
-        (function ($) {
-            var $header = $('header.tiki-header-top');
-            var $middle = $('#middle_outer');
-
-            function adjustMargin() {
-                if ($header.length && $middle.length) {
-                    $middle.css('margin-top', $header.outerHeight() + 'px');
-                }
-            }
-
-            // Initial adjust
-            adjustMargin();
-
-            // Update on window resize
-            $(window).on('resize', adjustMargin);
-
-            // Update if header size changes
-            if (typeof ResizeObserver !== 'undefined') {
-                var ro = new ResizeObserver(adjustMargin);
-                $header.each(function () { ro.observe(this); });
-            }
-        })(jQuery);
-    {/jq}
 
     {include file='footer.tpl'}
 </body>
