@@ -1056,13 +1056,14 @@ class ParserLib extends TikiDb_Bridge
         } else {
             $html_editor_plugin .= '}';
         }
-        // work out if I'm a nested plugin and return empty if so
+        // Nested plugins are normally suppressed in the HTML editor. Callers may allow specific plugins.
         $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $plugin_nest_level = 0;
         foreach ($stack as $st) {
             if ($st['function'] === 'parse_first') {
                 $plugin_nest_level++;
-                if ($plugin_nest_level > 1) {
+                $allowedNestedPlugins = $this->option['allow_nested_html_editor_plugins'] ?? [];
+                if ($plugin_nest_level > 1 && ! in_array($name, $allowedNestedPlugins, true)) {
                     return '';
                 }
             }
@@ -1072,7 +1073,7 @@ class ParserLib extends TikiDb_Bridge
 
         // some plugins are just too fragile to do wysiwyg, so show the "source" for them ;(
         $excluded = ['tracker', 'trackerlist', 'trackerfilter', 'kaltura', 'toc', 'freetagged', 'draw', 'googlemap',
-            'include', 'module', 'list', 'custom_search', 'iframe', 'map', 'calendar', 'file', 'files', 'mouseover', 'sort',
+            'include', 'module', 'list', 'custom_search', 'iframe', 'map', 'calendar', 'file', 'files', 'sort',
             'slideshow', 'convene', 'redirect', 'sign'];
 
         $ignore = null;
