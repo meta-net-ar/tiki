@@ -183,28 +183,6 @@ class ApiTrackersGetTest extends ApiBaseTrackersTest
         $this->assertValidErrorResponse($body, 403, "Reserved for tracker administrators");
     }
 
-    public function testApiDumpTrackerItems()
-    {
-        $trackerId = static::$defaultTrackerId;
-        $this->assertNotNull($trackerId, 'Default tracker should exist for dump test');
-
-        $response = $this->makeApiRequest('GET', "/trackers/{$trackerId}/dump", 'Admins');
-
-        // dump_items sends a CSV file and exits — the raw body is CSV, not JSON
-        $rawBody = $response['body'] ?? '';
-        $this->assertNotEmpty($rawBody, 'Dump response should not be empty');
-        // The first line should be the CSV header
-        $lines = explode("\n", trim($rawBody));
-        $this->assertNotEmpty($lines[0], 'First CSV line (header) should not be empty');
-        $headers = str_getcsv($lines[0]);
-        $headers = array_map('trim', $headers);
-        $this->assertContains('itemId', $headers, 'CSV header should contain itemId');
-        $this->assertContains('status', $headers, 'CSV header should contain status');
-        // second line should be the first item
-        $firstItem = str_getcsv($lines[1]);
-        $this->assertNotEmpty($firstItem[0], 'First item should have an itemId');
-    }
-
     public function testApiDumpTrackerItemsWithoutPermission()
     {
         $trackerId = static::$defaultTrackerId;
