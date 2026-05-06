@@ -78,8 +78,8 @@ class ConfigureCommand extends Command
 // php installation should have pdo extension (adodb is deprecated in Tiki)
 
 // Want configurations managed at the system level or restrict some preferences? http://doc.tiki.org/System+Configuration
-// \$system_configuration_file = 'db/tiki.ini.php';
-// \$system_configuration_file = '/etc/tiki.ini';
+// Multiple configuration files (files listed later override earlier ones):
+// \$system_configuration_files = ['/etc/tiki/ansible_local.ini', '/etc/tiki/dev_local.ini'];
 // \$system_configuration_identifier = 'example.com';
 
 LOCALPHP;
