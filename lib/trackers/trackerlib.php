@@ -3150,6 +3150,9 @@ class TrackerLib extends TikiLib
     {
         global $user;
         $res = $this->items()->fetchFullRow(['itemId' => (int) $itemId]);
+        if (! $res) {
+            return false;
+        }
         $trackerId = $res['trackerId'];
         $status = $res['status'];
 
