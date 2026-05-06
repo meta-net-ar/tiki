@@ -16,19 +16,26 @@
 <div id="main-shadow">{eval var=$prefs.main_shadow_start}{/if}
 
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
-    {if $prefs.feature_layoutshadows eq 'y'}
-    <div id="header-shadow">{eval var=$prefs.header_shadow_start}{/if}
-        <div class="header_outer bg-{$navbar_color_variant}-parent navbar-{$navbar_color_variant} tiki-top-nav-{$navbar_color_variant}" id="header_outer">
-            <div class="header_container">
-                <div class="container{* {if $smarty.session.fullscreen eq 'y'}*}-fluid{*{/if}*} container-std">
-                    <header class="header page-header row" id="page-header" role="banner">
-                        {modulelist zone=top class="top_modules w-100 navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}'}
-                    </header>
+        {if $prefs.feature_layoutshadows eq 'y'}
+            <div id="header-shadow">{eval var=$prefs.header_shadow_start}
+        {/if}
+        {******************************************************************* SITE HEADER STRUCTURE Same pattern as social layout for consistency ******************************************************************}
+        <header class="site-header" id="site-header" role="banner">
+
+            <nav class="{block name=navClasses}navbar navbar-expand-md navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar{/block}"
+                 id="main-navbar"
+                 role="navigation"
+                 aria-label="{tr}Main navigation{/tr}">
+
+                <div class="container-fluid container-std">
+                    {modulelist zone=top class="top_modules w-100 bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant} container-fluid" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
                 </div>
-            </div>
-        </div>
+
+            </nav>
+
+        </header>
         {if $prefs.feature_layoutshadows eq 'y'}{eval var=$prefs.header_shadow_end}</div>{/if}
-{/if}
+    {/if}
 
     <div class="middle_outer" id="middle_outer" >
         {block name=module_header}{/block}

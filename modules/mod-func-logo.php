@@ -54,6 +54,13 @@ function module_logo_info()
                 'description' => tra('CSS class for the title text container div. Defaults to sitetitles.'),
                 'filter' => 'text',
             ],
+            'max_height' => [
+                'name' => tra('Logo maximum height'),
+                'description' => tra('Maximum height in pixels for the logo image. Leave empty for automatic sizing based on navbar content.'),
+                'filter' => 'digits',
+                'default' => '',
+                'units' => 'px',
+            ],
         ],
     ];
 }
@@ -76,6 +83,7 @@ function module_logo($mod_reference, &$module_params)
             'sitesubtitle' => $prefs['sitesubtitle'],
             'class_image'  => 'sitelogo',
             'class_titles' => 'sitetitles',
+            'max_height'   => '',
         ],
         $module_params
     );
