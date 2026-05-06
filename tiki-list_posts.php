@@ -24,6 +24,7 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\SortModeValidator;
 $bloglib = TikiLib::lib('blog');
 $access->check_feature('feature_blogs');
 $access->check_permission('tiki_p_blog_admin');
@@ -41,11 +42,10 @@ if (isset($_REQUEST['checked']) && $access->checkCsrf()) {
     }
 }
 
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'created_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'created_desc',
+    ['tiki_blog_posts']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 
 $offset = $_REQUEST["offset"] ?? 0;

@@ -11,14 +11,14 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'import'                         => 'word',      //post
-            'calendarId'                      => 'int',      //post
+            'import'                      => 'word',      // post
+            'calendarId'                  => 'int',       // post
         ],
     ],
 ];
 require_once('tiki-setup.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 $calendarlib = TikiLib::lib('calendar');
 

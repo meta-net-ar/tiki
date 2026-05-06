@@ -91,7 +91,7 @@ class ObjectSelector extends Base
             $arguments['simpleid'] = 'object_selector_' . ++$uniqid;
         }
 
-        $arguments['filter'] = array_merge($arguments['filter'], $filters);
+        $arguments['filter'] = array_merge((array)$arguments['filter'], $filters);
 
         if ($arguments['simplevalue'] && ! $arguments['value'] && isset($arguments['filter']['type'])) {
             $arguments['value'] = "{$arguments['filter']['type']}:{$arguments['simplevalue']}";

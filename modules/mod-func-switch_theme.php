@@ -51,7 +51,7 @@ function module_switch_theme($mod_reference, &$module_params)
     if (
         ! empty($tc_theme) ||
         ! empty($group_theme) ||
-        (Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! empty($prefs['theme_admin'])) ||
+        ((Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT)) && ! empty($prefs['theme_admin'])) ||
         ! empty($css_theme)
     ) {
         $info_title = tra('Not allowed here') . ':' .
@@ -61,7 +61,7 @@ function module_switch_theme($mod_reference, &$module_params)
             $info_title .= ' (' . tra('Edit CSS') . ')';
         } elseif (! empty($tc_theme)) {
             $info_title .= ' (' . tra('Theme Control') . ')';
-        } elseif (Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! empty($prefs['theme_admin'])) {
+        } elseif ((Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT)) && ! empty($prefs['theme_admin'])) {
             $info_title .= ' (' . tra('Admin Theme') . ')';
         } elseif ($group_theme) {
             $info_title .= ' (' . tra('Group theme') . ')';

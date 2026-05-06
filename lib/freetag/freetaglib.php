@@ -473,6 +473,29 @@ class FreetagLib extends ObjectLib
     }
 
     /**
+     * Assign tags for the current object to Smarty as $tags.
+     *
+     * @throws UnexpectedValueException If the current section is not set yet.
+     */
+    public function assignCurrentObjectTagsToSmarty(): void
+    {
+        $section = \Tiki\Sections::getCurrentSection();
+        if (empty($section)) {
+            throw new \UnexpectedValueException('Current section is not set.');
+        }
+
+        $object = \Tiki\Sections::currentObject();
+        if (! $object) {
+            return;
+        }
+
+        $objectTags = $this->get_tags_on_object($object['object'], $object['type']);
+        $tags = $objectTags ? $objectTags['data'] : [];
+
+        TikiLib::lib('smarty')->assign('tags', $tags);
+    }
+
+    /**
      *
      */
     /**
@@ -577,9 +600,7 @@ class FreetagLib extends ObjectLib
                 $bindvals = [$normalized_tag, $tag];
                 $this->query($query, $bindvals);
             }
-
-            $query = 'SELECT MAX(`tagId`) FROM `tiki_freetags` WHERE `tag`=? AND `raw_tag`=?';
-            $tagId = $this->getOne($query, array_slice($bindvals, 0, 2));
+            $tagId = $this->lastInsertId();
         }
 
         if (! ($tagId > 0)) {
@@ -609,8 +630,7 @@ class FreetagLib extends ObjectLib
     public function safe_tag($user, $itemId, $type, $tag, $lang = null)
     {
         if (
-            ! isset($itemId) || ! isset($type) || ! isset($tag) ||
-                empty($itemId) || empty($type) || empty($tag)
+            empty($itemId) || empty($type) || empty($tag)
         ) {
             throw new Exception('Missing safe_tag argument.');
         }

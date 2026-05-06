@@ -1749,4 +1749,9 @@ AND (`major_version` > ? OR (`major_version` = ? AND `minor_version` > ?)) LIMIT
     {
         // TODO: Implement setContentHubMetadataChecked() method.
     }
+
+    public function resetHubOrganizationData()
+    {
+        // TODO: implement if/when Tiki uses H5P Hub org data
+    }
 }

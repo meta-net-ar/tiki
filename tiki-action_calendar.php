@@ -29,7 +29,7 @@ $inputConfiguration = [
 include 'tiki-setup.php';
 
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 
 $tikicalendarlib = TikiLib::lib('tikicalendar');

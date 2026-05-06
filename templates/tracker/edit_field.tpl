@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -293,6 +293,16 @@
                 </select>
                 <div class="form-text">
                     {tr}Data and changes to this field are not included in email notifications.{/tr}
+                </div>
+            </div>
+            <div class="mb-3 mx-0">
+                <label for="type" class="col-form-label">{tr}Exclude from tracker item last modification date{/tr}</label>
+                <select name="exclude_from_lastmodif" class="form-select"  data-original="{$field.excludeFromTrackerItemLastModificationDate}">
+                    <option value="0" {if $field.excludeFromTrackerItemLastModificationDate eq 'n'}selected="selected"{/if}>{tr}No{/tr}</option>
+                    <option value="1" {if $field.excludeFromTrackerItemLastModificationDate eq 'y'}selected="selected"{/if}>{tr}Yes{/tr}</option>
+                </select>
+                <div class="form-text">
+                    {tr}When this field is modified, if set to "Yes", it will NOT update the item's last modification date and user.{/tr}
                 </div>
             </div>
             <div class="mb-3 mx-0">

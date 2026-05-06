@@ -59,5 +59,5 @@
         setTimeout(() => {
             $(this).removeClass('btn-danger').html(defaultText);
         }, 1000);
-    })
+    });
 {/jq}

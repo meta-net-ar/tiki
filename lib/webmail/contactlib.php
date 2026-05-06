@@ -177,14 +177,14 @@ class ContactLib extends TikiLib
             if ($this->is_a_user_contact($contactId, $user, true)) {
                 $query = "update `tiki_webmail_contacts` set `firstName`=?, `lastName`=?, `email`=?, `nickname`=? where `contactId`=?";
                 $bindvars = [$firstName, $lastName, $email, $nickname, (int)$contactId];
-                $result = $this->query($query, $bindvars);
+                $this->query($query, $bindvars);
             } else {
                 return false;
             }
         } else {
-            $contactId = $this->getOne('select max(`contactId`) from `tiki_webmail_contacts`') + 1;
-            $query = "insert into `tiki_webmail_contacts`(`contactId`,`firstName`,`lastName`,`email`,`nickname`,`user`) values(?,?,?,?,?,?)";
-            $result = $this->query($query, [(int)$contactId, $firstName, $lastName, $email, $nickname, $user]);
+            $query = "insert into `tiki_webmail_contacts` (`firstName`,`lastName`,`email`,`nickname`,`user`) values(?,?,?,?,?)";
+            $result = $this->query($query, [$firstName, $lastName, $email, $nickname, $user]);
+            $contactId = $this->lastInsertId();
         }
         if (is_array($groups)) {
             $this->query('delete from `tiki_webmail_contacts_groups` where `contactId`=?', [(int)$contactId]);

@@ -712,6 +712,7 @@ function wikiplugin_tracker($data, $params)
     $smarty->assign('trackerEditFormId', $iTRACKER);
     $item = [];
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_tracker_info());
     extract($params, EXTR_SKIP);
 
     $thisIsThePlugin = isset($_REQUEST['iTRACKER']) && $_REQUEST['iTRACKER'] == $iTRACKER;
@@ -2253,7 +2254,7 @@ function wikiplugin_tracker($data, $params)
     <input type="hidden" value="" name="mode_wysiwyg"/>
     <input type="hidden" value="" name="mode_normal"/>
     <div class="edit-zone">
-        <textarea id="ins_fill" name="ins_fill" class="wikiedit form-control" data-syntax="" data-codemirror="" onkeyup="" rows="15" ></textarea>
+        <textarea id="ins_fill" name="ins_fill" class="wikiedit form-control" onkeyup="" rows="15" ></textarea>
     </div>
     <input type="hidden" value="n" name="wysiwyg"/>
     <div name="ins_fill_desc" class="trackerplugindesc" >

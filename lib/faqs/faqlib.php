@@ -13,33 +13,10 @@
 class FaqLib extends TikiLib
 {
     /**
-     * Fallback limit of the title field of the tiki_faqs table.
+     * Maximum length of the title field of the tiki_faqs table.
+     * Should match the varchar length defined in the DB schema.
      */
     public const MAX_FAQ_TITLE_LENGTH = 200;
-
-    /**
-     * Reads the FAQ title length directly from DB schema to avoid hardcoded usage.
-     * Falls back to MAX_FAQ_TITLE_LENGTH if schema lookup fails.
-     */
-    public function getFaqTitleMaxLength(): int
-    {
-        static $cachedLength = null;
-
-        if ($cachedLength !== null) {
-            return $cachedLength;
-        }
-
-        $column = $this->fetchAll("SHOW COLUMNS FROM `tiki_faqs` LIKE 'title'");
-        $type = is_array($column) ? ($column[0]['Type'] ?? '') : '';
-
-        if (preg_match('/^varchar\((\d+)\)/i', $type, $matches)) {
-            $cachedLength = (int) $matches[1];
-            return $cachedLength;
-        }
-
-        $cachedLength = self::MAX_FAQ_TITLE_LENGTH;
-        return $cachedLength;
-    }
 
     /**
      * @param $offset
@@ -277,11 +254,9 @@ class FaqLib extends TikiLib
             $bindvars = [$question, $answer, (int) $questionId];
             $result = $this->query($query, $bindvars);
         } else {
-            $query = 'delete from `tiki_faq_questions` where `faqId`=? and question=?';
-            $result = $this->query($query, [(int) $faqId, $question], -1, -1, false);
-            $query = 'insert into `tiki_faq_questions`(`faqId`,`question`,`answer`, `created`) values(?,?,?,?)';
+            $query = "INSERT INTO `tiki_faq_questions` (`faqId`, `question`, `answer`, `created`) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE `faqId` = LAST_INSERT_ID(`faqId`), `answer` = VALUES(`answer`), `created` = VALUES(`created`)";
             $result = $this->query($query, [(int) $faqId, $question, $answer, $this->now]);
-            $questionId = $this->getOne('select max(questionId) from `tiki_faq_questions` where `faqId`=?', $faqId);
+            $questionId = $this->lastInsertId();
         }
 
         require_once('lib/search/refresh-functions.php');
@@ -304,11 +279,9 @@ class FaqLib extends TikiLib
             $query = 'update `tiki_faqs` set `title`=?,`description`=? ,`canSuggest`=? where `faqId`=?';
             $result = $this->query($query, [$title, $description, $canSuggest, (int) $faqId]);
         } else {
-            $query = 'delete from `tiki_faqs` where `title`=?';
-            $result = $this->query($query, [$title], -1, -1, false);
-            $query = 'insert into `tiki_faqs`(`title`,`description`,`created`,`hits`,`canSuggest`) values(?,?,?,?,?)';
-            $result = $this->query($query, [$title, $description, (int) $this->now, 0, $canSuggest]);
-            $faqId = $this->getOne('select max(`faqId`) from `tiki_faqs` where `title`=? and `created`=?', [$title, (int) $this->now]);
+            $query = 'replace into `tiki_faqs`(`title`,`description`,`created`,`hits`,`canSuggest`) values(?,?,?,?,?)';
+            $result = $this->query($query, [$title, $description, $this->now, 0, $canSuggest]);
+            $faqId = $this->lastInsertId();
         }
 
         require_once('lib/search/refresh-functions.php');

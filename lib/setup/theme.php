@@ -130,8 +130,8 @@ if (
         $prefs['site_layout_admin'] = 'admin';
         /* Force the admin layout on setup/management pages too */
         $prefs['site_layout'] = 'admin';
-        /* Set the section to "admin" to display only the UAB specific modules (defined in lib/modules/modlib.php) */
-        Sections::setCurrentSection(Sections::SECTION_ADMIN);
+        /* Mark these pages as admin-layout so they keep admin-like behavior without using the control-panel-only module filtering. */
+        Sections::setCurrentSection(Sections::SECTION_ADMIN_LAYOUT);
 
         include_once 'admin/define_admin_icons.php';
         foreach ($admin_icons as & $admin_icon) {
@@ -221,7 +221,7 @@ if ($prefs['webmonetization_all_website'] === 'y' && ! empty($prefs['webmonetiza
 
 // set the color of header bar and address bar
 if ($prefs['theme_header_and_address_bar_color'] === 'y') {
-    if (Sections::isCurrentSection(Sections::SECTION_ADMIN) || empty(Sections::getCurrentSection())) {
+    if (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty(Sections::getCurrentSection())) {
         $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant_admin'] . "-bg";
     } else {
         $css_color_variable = "--tiki-top-" . $prefs['theme_navbar_color_variant'] . "-bg";

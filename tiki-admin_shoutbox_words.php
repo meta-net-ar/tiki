@@ -11,6 +11,9 @@
 // Admin to the filtering of bad shoutbox words
 // First commit on cvs by damosoft aka damian
 // Initialization
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
@@ -25,7 +28,7 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 include_once('lib/shoutbox/shoutboxlib.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 $access->check_feature('feature_shoutbox');
 $access->check_permission('tiki_p_admin_shoutbox');
@@ -42,11 +45,10 @@ if (isset($_REQUEST["add"])) {
 if (! empty($_REQUEST["remove"]) && $access->checkCsrf()) {
     $shoutboxlib->remove_bad_word($_REQUEST["remove"]);
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'word_asc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'word_asc',
+    ['tiki_shoutbox_words']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit

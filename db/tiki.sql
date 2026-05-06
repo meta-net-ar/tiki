@@ -402,6 +402,7 @@ CREATE TABLE `tiki_calendar_recurrence` (
   `calendarId` int(14) NOT NULL default '0',
   `start` int(4) NOT NULL default '0',
   `end` int(4) NOT NULL default '2359',
+  `duration` int(14) default NULL,
   `allday` tinyint(1) NOT NULL default '0',
   `locationId` int(14) default NULL,
   `categoryId` int(14) default NULL,
@@ -723,6 +724,7 @@ CREATE TABLE `tiki_comments` (
   `archived` char(1) default NULL,
   `approved` char(1) NOT NULL default 'y',
   `locked` char(1) NOT NULL default 'n',
+  `is_resolved` char(1) NOT NULL default 'n',
   PRIMARY KEY (`threadId`),
   KEY `title` (`title`(191)),
   KEY `data` (`data`(191)),
@@ -2436,6 +2438,7 @@ CREATE TABLE `tiki_surveys` (
   `lastTaken` int(14) default NULL,
   `created` int(14) default NULL,
   `status` char(1) default NULL,
+  `redirect_after` varchar(255) default NULL,
   PRIMARY KEY (`surveyId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
@@ -2519,6 +2522,7 @@ CREATE TABLE `tiki_tracker_fields` (
   `rules` TEXT,
   `encryptionKeyId` int(11) NULL,
   `excludeFromNotification` char(1) default 'n',
+  `excludeFromTrackerItemLastModificationDate` char(1) NOT NULL default 'n',
   `visibleInViewMode` char(1) NOT NULL default 'y',
   `visibleInEditMode` char(1) NOT NULL default 'y',
   `visibleInHistoryMode` char(1) NOT NULL default 'y',
@@ -3454,7 +3458,7 @@ INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES(
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-view_blog_post.php\\?postId=(\\d+)', 'blogpost$1', 'blogpost', 'feature_blogs');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-directory_browse.php\\?parent=(\\d+)', 'directory$1', 'directory', 'feature_directory');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-view_faq.php\\?faqId=(\\d+)', 'faq$1', 'faq', 'feature_faqs');
-INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`) VALUES('tiki-download_file.php\\?fileId=(\\d+)', 'display$1', 'file', 'feature_file_galleries', 10);
+INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`) VALUES('tiki-download_file.php\\?fileId=(\\d+)', 'dl$1', 'file', 'feature_file_galleries', 10);
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)thumbnail(?:=[^&]*)?(?=(?:&amp;|&|$))', 'thumbnail$1', 'thumbnail', 'feature_file_galleries');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)display(?:=[^&]*)?(?=(?:&amp;|&|$))', 'display$1', 'display', 'feature_file_galleries');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)preview(?:=[^&]*)?(?=(?:&amp;|&|$))', 'preview$1', 'preview', 'feature_file_galleries');

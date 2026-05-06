@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -235,16 +238,10 @@ if (isset($_REQUEST['checked'])) {
     Feedback::error(tra('Action not performed since no comments were selected'));
 }
 
-if (isset($_REQUEST["sort_mode"])) {
-    $sort_mode = $_REQUEST["sort_mode"];
-    $column_validity = TikiDb::get()->validateSortColumn('tiki_comments', $sort_mode);
-    if (! $column_validity) {
-        $sort_mode = 'commentDate_desc';
-        Feedback::error(tr('Invalid sort mode'));
-    }
-} else {
-    $sort_mode = 'commentDate_desc';
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'commentDate_desc',
+    ['tiki_comments']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);

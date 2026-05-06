@@ -1614,6 +1614,11 @@ class ParserLib extends TikiDb_Bridge
                     $fileId = $file['fileId'];
                     $filename = $file['name'];
                     $type = $file['filetype'];
+
+                    if (str_starts_with($type, 'audio/')) {
+                        return smarty_function_inline_audio_player(['fileId' => $fileId, 'type' => $type], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                    }
+
                     $icon = smarty_function_icon(['name' => 'paperclip'], TikiLib::lib('smarty')->getEmptyInternalTemplate());
                     return "<span class='badge rounded-pill bg-secondary' role='button' data-file-ref-type='$type' data-file-ref-id='$fileId'>$icon $filename</span>";
                 }
@@ -1738,6 +1743,13 @@ class ParserLib extends TikiDb_Bridge
             }
             if (! str_contains($link, '://')) {
                 $target = '';
+                if ($prefs['feature_wiki_show_int_link_title'] == 'y') {
+                    $objectLabel = $this->getInternalLinkLabel($link);
+                    if ($objectLabel) {
+                        $title = $objectLabel ? 'data-bs-content="' . $objectLabel . '" data-bs-toggle="tooltip"' : '';
+                        $class = 'class="wiki tips"';
+                    }
+                }
             } else {
                 $class = 'class="wiki external"';
                 if ($prefs['feature_wiki_ext_icon'] == 'y' && ! ($this->option['suppress_icons'] || $suppress_icons)) {
@@ -1806,6 +1818,62 @@ class ParserLib extends TikiDb_Bridge
         }
 
         return $data;
+    }
+
+    protected function getInternalLinkLabel($link)
+    {
+        $matches = [];
+        if (! preg_match("/\.php\?([^=]+)=([^&]+)/", $link, $matches)) { // non-sefurl
+            if (! preg_match("/(item|art|article|blog|tracker|event|calevent|forum|forumthread)([0-9]+)/", $link, $matches)) { // sefurl with type and id
+                if (! preg_match("/(filedetails)\d+-(\d+)/", $link, $matches)) { // sefurl for file details
+                    if (! preg_match("/(\b)([a-z0-9]+)/i", $link, $matches)) { // sefurl for wiki pages
+                        return null;
+                    }
+                }
+            }
+        } else {
+            // Not relying on the regex to extract type and id, as there can be many parameters in the query string and the order is not guaranteed. Instead, parse the query string properly.
+            $urlQuery = parse_url(html_entity_decode($link), PHP_URL_QUERY);
+            parse_str($urlQuery, $queryParams);
+
+            $possibleTypes = ['itemid', 'artid', 'articleid', 'blogid', 'trackerid', 'calitemid', 'page'];
+            $mappedTypes = ['comments_parentid' => 'forum post'];
+            foreach ($queryParams as $param => $value) {
+                $normalizedParam = strtolower($param);
+                if (isset($mappedTypes[$normalizedParam]) || in_array($normalizedParam, $possibleTypes)) {
+                    $matches[1] = $mappedTypes[$normalizedParam] ?? $param;
+                    $matches[2] = $value;
+                    break;
+                }
+            }
+        }
+
+        $type = preg_replace("/id$/i", "", $matches[1]) ?: "page";
+        $objectType = TikiLib::lib('object')->getSelectorType($type);
+        $objectId = $matches[2];
+
+        if (! $objectType || ! $objectId) {
+            return null;
+        }
+
+        $objectlib = TikiLib::lib('object');
+
+        if (! $objectlib->isValidObject($objectType, $objectId)) {
+            return null;
+        }
+
+        switch ($objectType) {
+            case 'wiki page':
+                $format = '__{title}__[| : |]{description}';
+                break;
+            case 'forum post':
+                $format = '__{forum_title}__[| : |]{title}';
+                break;
+            default:
+                $format = '__{parent_object_title}__[| : |]{title}';
+        }
+
+        return $objectlib->get_title($objectType, $objectId, $format);
     }
 
     //*
@@ -2530,11 +2598,9 @@ class ParserLib extends TikiDb_Bridge
         $data = '';
         $listbeg = [];
         $divdepth = [];
-        $hdr_structure = [];
-        $show_title_level = [];
-        $last_hdr = [];
+        $numbering = [];
+        $counters = [];
         $all_anchors = [];
-        $nb_last_hdr = 0;
         $nb_hdrs = 0;
         $nb_lists = 0;
         $inTable = 0;
@@ -2547,6 +2613,16 @@ class ParserLib extends TikiDb_Bridge
         // loop: process all lines
         $in_paragraph = 0;
         $in_empty_paragraph = 0;
+
+        $min_level = null;
+        foreach ($lines as $line) {
+            if (preg_match('/^(!+)[\+\-]?#/', $line, $m)) {
+                $level = strlen($m[1]);
+                if ($min_level === null || $level < $min_level) {
+                    $min_level = $level;
+                }
+            }
+        }
 
         foreach ($lines as $line) {
             // Add newlines between lines
@@ -2755,75 +2831,55 @@ class ParserLib extends TikiDb_Bridge
                     $hdrlevel = $tikilib->how_many_at_start($line, '!');
 
                     if ($litype == '!' && $hdrlevel > 0 && $hdrlevel <= 6 /* HTML has h1 to h6, but no h7 or above */) { // If the line starts with 1 to 6 exclamation marks ("!")
+                        ++$nb_hdrs;
+                        if (preg_match('/^!+[\+\-]?#\)/', $line)) {
+                            $counters = [];
+                            $line = preg_replace('/(^!+[\+\-]?)(#)\)/', '$1$2', $line);
+                        }
+
+                        $level = $hdrlevel;
+                        $current_title_real_num = '';
+                        $current_title_num = '';
+
                         /*
                          * Handle headings autonumbering syntax (i.e. !#Text, !!#Text, ...)
-                         * Note :
-                         *    this needs to be done even if the current header has no '#'
-                         *    in order to generate the right numbers when they are not specified for every headers.
-                         *    This is the case, for example, when you want to add numbers to headers of level 2 but not to level 1
+                         * Note:
+                         *     this needs to be done even if the current header has no '#'
+                         *     in order to generate the right numbers when they are not specified for every headers.
+                         *     This is the case, for example, when you want to add numbers to headers of level 2 but not to level 1.
                          */
+                        $support_numbering = preg_match('/^!+[\+\-]?#/', $line);
+                        if ($support_numbering) {
+                            // Normalize level (so the lowest becomes level 1)
+                            $relative_level = $level - $min_level + 1;
 
-                        $line_lenght = strlen($line);
-
-                        // Generate an array containing the squeleton of maketoc (based on headers levels)
-                        //   i.e. hdr_structure will contain something lile this :
-                        //     array( 1, 2, 2.1, 2.1.1, 2.1.2, 2.2, ... , X.Y.Z... )
-                        //
-
-                        $hdr_structure[$nb_hdrs] = [];
-
-                        // Generate the number (e.g. 1.2.1.1) of the current title, based on the previous title number :
-                        //   - if the current title deepest level is lesser than (or equal to)
-                        //     the deepest level of the previous title : then we increment the last level number,
-                        //   - else : we simply add new levels with value '1' (only if the previous level number was shown),
-                        //
-                        if ($nb_last_hdr > 0 && $hdrlevel <= $nb_last_hdr) {
-                            $hdr_structure[$nb_hdrs] = array_slice($last_hdr, 0, $hdrlevel);
-                            if (! empty($show_title_level[$hdrlevel]) || ! $need_autonumbering) {
-                                //
-                                // Increment the level number only if :
-                                //     - the last title of the same level number has a displayed number
-                                //  or - no title has a displayed number (no autonumbering)
-                                //
-                                $hdr_structure[$nb_hdrs][$hdrlevel - 1]++;
+                            // Reset deeper levels
+                            for ($i = $relative_level + 1; $i <= 10; $i++) {
+                                unset($counters[$i]);
                             }
-                        } else {
-                            if ($nb_last_hdr > 0) {
-                                $hdr_structure[$nb_hdrs] = $last_hdr;
+
+                            // Increment this level
+                            if (! isset($counters[$relative_level])) {
+                                $counters[$relative_level] = 1;
+                            } else {
+                                $counters[$relative_level]++;
                             }
-                            for ($h = 0; $h < $hdrlevel - $nb_last_hdr; $h++) {
-                                $hdr_structure[$nb_hdrs][$h + $nb_last_hdr] = '1';
+
+                            // Ensure parent levels exist (initialize with 1 if missing)
+                            for ($i = 1; $i < $relative_level; $i++) {
+                                if (! isset($counters[$i])) {
+                                    $counters[$i] = 1;
+                                }
                             }
-                        }
-                        $show_title_level[$hdrlevel] = preg_match('/^!+[\+\-]?#/', $line);
 
-                        // Update last_hdr info for the next header
-                        $last_hdr = $hdr_structure[$nb_hdrs];
-                        $nb_last_hdr = count($last_hdr);
-
-                        if (is_array($last_hdr)) {
-                            $current_title_real_num = implode('.', $last_hdr) . '. ';
-                        } else {
-                            $current_title_real_num = $last_hdr . '. ';
-                        }
-
-                        // Update the current title number to hide all parents levels numbers if the parent has no autonumbering
-                        $hideall = false;
-                        for ($j = $hdrlevel; $j > 0; $j--) {
-                            if ($hideall || empty($show_title_level[$j])) {
-                                unset($hdr_structure[$j - 1]);
-                                $hideall = true;
+                            $numbering = [];
+                            for ($i = 1; $i <= $relative_level; $i++) {
+                                $numbering[] = $counters[$i];
                             }
+
+                            $current_title_num = implode('.', $numbering) . ".";
+                            $current_title_real_num = $current_title_num . ' ';
                         }
-
-                        // Store the title number to use only if it has to be shown (if the '#' char is used)
-                        $current_title_num = '';
-                        if (isset($show_title_level[$hdrlevel]) && isset($hdr_structure[$nb_hdrs])) {
-                            $current_title_num = $show_title_level[$hdrlevel] ? implode('.', $hdr_structure[$nb_hdrs]) . '. ' : '';
-                        }
-
-                        $nb_hdrs++;
-
 
                         // Close open paragraph (lists already closed above)
                         $this->close_blocks($data, $in_paragraph, $listbeg, $divdepth, 1, 0, 0);
@@ -2842,7 +2898,10 @@ class ParserLib extends TikiDb_Bridge
                         $anchor = '';
                         $aclose = '';
                         $aclose2 = '';
-                        $addremove = $show_title_level[$hdrlevel] ? 1 : 0; // If needed, also remove '#' sign from title beginning
+                        $addremove = 0;
+                        if ($support_numbering) {
+                            $addremove = 1; // If needed, also remove '#' sign from title beginning
+                        }
 
                         // May be special signs present after '!'s?
                         $divstate = substr($line, $hdrlevel, 1);
@@ -2865,14 +2924,16 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         // Generate the final title text
-                        $title_text_base = substr($line, $hdrlevel + $addremove);
-                        $title_text = $current_title_num . $title_text_base;
+                        $title_text_base_raw = substr($line, $hdrlevel + $addremove);
+                        $title_text_base = $support_numbering ? ltrim($title_text_base_raw) : $title_text_base_raw;
+                        $title_text = $current_title_real_num . $title_text_base;
 
                         // Remove HTML tags from Tiki syntax
                         $title = preg_replace('#\<(.*?)\>#', '', $title_text);
                         $thisid = $this->getCleanAnchor($title, $all_anchors);
 
-                        // Collect TOC entry if any {maketoc} is present on the page
+                        // Collect TOC entry if any {maketoc} is present on the page.
+                        // Generates the skeleton of the TOC (e.g. 1, 2, 2.1, 2.1.1, ...).
                         //if ( $need_maketoc !== false ) {
                         $anch[] = [
                                         'id' => $thisid,

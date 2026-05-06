@@ -137,21 +137,41 @@
                 </div>
             </form>
             {jq}
+                var initObjectSelectors = function($container) {
+                    $container.find('.object-selector input[data-threshold]').each(function() {
+                        var $input = $(this);
+                        // Needed when items are dragged from resultzone (already initialized) to preferences
+                        if (!$input.hasClass('primary')) {
+                            $input.object_selector();
+                        }
+                    });
+                };
+
+                // Case 1: Initialize for existing preferences on page load
+                initObjectSelectors($('#preferences'));
+
                 Sortable.create($('#preferences .card-body')[0], {
                     group: 'preferences',
                     animation: 150,
-                    sort: false
+                    sort: false,
+                    onAdd: function(evt) {
+                        // Case 2: Initialize for items added via drag-and-drop
+                        initObjectSelectors($(evt.item));
+                    }
                 });
                 $('#searchform').on("submit", function(e) {
                     e.preventDefault();
                     if (typeof ajaxLoadingShow == 'function') { ajaxLoadingShow('resultzone'); }
+                    var $form = $(this);
                     $('#resultzone').load( this.action, $(this).serialize(), function() {
                          Sortable.create($('#resultzone')[0], {
                             group: 'preferences',
                             animation: 150,
                             sort: false
                          });
-                        $(this).tiki_popover();
+                        $form.tiki_popover();
+                        // Case 3: Initialize for search results loaded via AJAX (load callback fires after DOM insertion)
+                        initObjectSelectors($('#resultzone'));
                         if (typeof ajaxLoadingHide == 'function') { ajaxLoadingHide(); }
                     } );
                 } );

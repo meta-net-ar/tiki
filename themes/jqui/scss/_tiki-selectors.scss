@@ -21,6 +21,13 @@
 @use "sass:color";
 
 // Color system
+[data-bs-theme=dark] {
+    .bg-dark {
+        --bs-bg-opacity: 1;
+        background-color: rgb(18 20 22);
+    }
+}
+
 // Body (large elements)
 // Links
 // Components
@@ -30,16 +37,16 @@
     // Declaring styles to override Bootstrap defaults
 .btn:not(.btn-link) {
     color: var(--tiki-jui-state-default-color);
-    background: var(--tiki-jui-state-default-bg) var(--tiki-jui-state-default-bg-path) var(--tiki-jui-state-default-bg-position) repeat-x;
+    background: var(--tiki-jui-state-default-bg-color) var(--tiki-jui-state-default-bg-path) var(--tiki-jui-state-default-bg-position) repeat-x;
     // border-color: var(--tiki-jui-state-default-border-color); Retain default Bootstrap theme color for border
     &:hover {
         color: var(--tiki-jui-state-hover-color);
-        background: var(--tiki-jui-state-hover-bg) var(--tiki-jui-state-hover-bg-path) var(--tiki-jui-state-hover-bg-position) repeat-x;
+        background: var(--tiki-jui-state-hover-bg-color) var(--tiki-jui-state-hover-bg-path) var(--tiki-jui-state-hover-bg-position) repeat-x;
         border-color: var(--tiki-jui-state-hover-border-color);
     }
     &.active {
         color: var(--tiki-jui-state-actuve-color);
-        background: var(--tiki-jui-state-active-bg) var(--tiki-jui-state-active-bg-path) var(--tiki-jui-state-active-bg-position) repeat-x;
+        background: var(--tiki-jui-state-active-bg-color) var(--tiki-jui-state-active-bg-path) var(--tiki-jui-state-active-bg-position) repeat-x;
         border-color: var(--tiki-jui-state-active-border-color);
     }
 }

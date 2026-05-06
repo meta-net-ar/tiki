@@ -209,9 +209,9 @@ $tiki-dark-footer-link-hover-color: #8BB9FE;
     --tiki-topbar-text-color: #{$navbar-dark-hover-color};
 }
 
-.tiki-top-nav-light, .tiki-top-nav-dark {
-    --tiki-top-border-width: 0 0 5px 0;
-}
+//.tiki-top-nav-light, .tiki-top-nav-dark {
+//    --tiki-top-border-width: 0 0 5px 0;
+//}
 
 .tiki-top-nav-light {
     @include top-nav-light;

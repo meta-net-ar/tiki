@@ -226,7 +226,7 @@ function wikiplugin_model3dviewer($data, $params)
     $headerlib = TikiLib::lib('header');
     $filegallib = TikiLib::lib('filegal');
 
-    $params['uniqueId'] = 'viewer_' . $params['fileId'] . uniqid();
+    $params['uniqueId'] = 'viewer_' . ($params['fileId'] ?? '') . uniqid();
     $params['height'] = $params['height'] ?? '400px';
     $params['width'] = $params['width'] ?? '100%';
     $params['model3dviewer_mimetypes'] = '.gltf,.glb,.stl,.fbx,.obj,.dae,.ply,.3ds,.vrml,.x3d';
@@ -236,7 +236,7 @@ function wikiplugin_model3dviewer($data, $params)
 
     $fileInfo = [];
 
-    if ($params['fileId']) {
+    if (! empty($params['fileId'])) {
         $fileData = $filegallib->get_file($params['fileId']);
         $fileInfo = [
             'fileId' => $fileData['fileId'],
@@ -272,7 +272,7 @@ function wikiplugin_model3dviewer($data, $params)
         $absolute_links = true;
     }
 
-    $params['model3dviewer_src'] = resolve_model3dviewer_src($params, $absolute_links, $fileInfo['basename']);
+    $params['model3dviewer_src'] = resolve_model3dviewer_src($params, $absolute_links, $fileInfo['basename'] ?? 'model.stl');
 
     if (empty($params['model3dviewer_src'])) {
         return WikiParser_PluginOutput::error(tr('Plugin Model3DViewer'), tr('Missing or invalid source.'));
@@ -286,7 +286,7 @@ function wikiplugin_model3dviewer($data, $params)
                     modelUrl: \"" . addslashes($params['model3dviewer_src']) . "\",
                     controls: " . ($params['controls'] === 'y' ? 'true' : 'false') . ",
                     backgroundColor: \"" . $bgColor . "\",
-                    autoRotate: " . ($params['autoRotate'] === 'y' ? 'true' : 'false') . ",
+                    autoRotate: " . (($params['autorotate'] ?? 'n') === 'y' ? 'true' : 'false') . ",
                     camera: \"" . addslashes($params['camera_position']) . "\",
                     cameraType: \"" . addslashes($params['camera_type']) . "\",
                     shadow: " . ($params['shadow'] === 'y' ? 'true' : 'false') . ",
@@ -313,7 +313,8 @@ function resolve_model3dviewer_src($params, $absolute_links = false, $filename =
     if (! empty($params['fileId'])) {
         $src = smarty_modifier_sefurl($params['fileId'], 'file');
         $src = TikiLib::tikiUrl($src);
-        $src = $src . '&display&filename=' . $filename;
+        $separator = str_contains($src, '?') ? '&' : '?';
+        $src .= $separator . 'filename=' . rawurlencode($filename);
     } elseif (! empty($params['src'])) {
         $src = trim($params['src']);
         $src = str_replace(' ', '', $src);

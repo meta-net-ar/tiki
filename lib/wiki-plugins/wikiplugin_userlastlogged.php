@@ -8,7 +8,7 @@ function wikiplugin_userlastlogged_info()
 {
     return [
         'name'          => tra('Last Login information'),
-        'documentation' => tra('PluginUserLastLogged'),
+        'documentation' => 'PluginUserLastLogged',
         'description'   => tra('Show the last login information for a given or current user'),
         'iconname'      => 'user',
         'introduced'    => 13,

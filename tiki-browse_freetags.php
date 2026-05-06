@@ -11,19 +11,20 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'del'                         => 'int',      //get
-            'itemit'                      => 'int',      //post
-            'typeit'                      => 'word',     //post
-            'tag'                         => 'word',     //post
-            'sort_mode'                   => 'int',      //post
-            'find'                        => 'string',   //post
-            'type'                        => 'word',     //post
-            'old_type'                    => 'word',     //post
-            'user_only'                   => 'bool',     //post
-            'broaden'                     => 'bool',     //post
-            'maxPopular'                  => 'int',      //get
-            'tsort_mode'                  => 'word',     //get
-            'objectId'                    => 'int',      //get
+            'del'                         => 'int',           //get
+            'itemit'                      => 'int',           //post
+            'typeit'                      => 'wordspace',     //post
+            'tag'                         => 'string',        //post
+            'sort_mode'                   => 'word',          //post
+            'find'                        => 'string',        //post
+            'type'                        => 'wordspace',     //post
+            'old_type'                    => 'wordspace',     //post
+            'user_only'                   => 'word',          //post
+            'broaden'                     => 'bool',          //post
+            'maxPopular'                  => 'int',           //get
+            'tsort_mode'                  => 'word',          //get
+            'objectId'                    => 'int',           //get
+            'offset'                      => 'int',           //get
         ],
     ],
 ];

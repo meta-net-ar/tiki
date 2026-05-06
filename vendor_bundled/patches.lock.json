@@ -1,5 +1,5 @@
 {
-    "_hash": "6112759526c6c00b6c90c3c8f873596a81a3dd7c24c4d8617dffe8c560a27a65",
+    "_hash": "647a76690f5116d60935257f728859cc50963adf4d5c073bafb8b28fcc58b2f8",
     "patches": {
         "candy-chat/xmpp-prebind-php": [
             {
@@ -31,28 +31,6 @@
                 "description": "Sort rows and columns by key_z_to_a and Drag and drop via touch",
                 "url": "../installer/composer-patches/nicolaskruchten_pivottable__sort_by_key_z_to_a_and_drag_and_drop_via_touch.patch",
                 "sha256": "e3b31a4b1b6efa7412991977286873de4eaf5349d7340e44088db7503442104c",
-                "depth": 1,
-                "extra": {
-                    "provenance": "patches-file:../installer/composer-patches/composer-patches.json"
-                }
-            }
-        ],
-        "umakantp/smartylint": [
-            {
-                "package": "umakantp/smartylint",
-                "description": "Fix smartylint syntax with curly braces",
-                "url": "../installer/composer-patches/smartylint-warning-curly-bracket.patch",
-                "sha256": "50b5f06e2677a89c8911957e6173ff86bd490e9f7b2a732123a077aa80a2e110",
-                "depth": 1,
-                "extra": {
-                    "provenance": "patches-file:../installer/composer-patches/composer-patches.json"
-                }
-            },
-            {
-                "package": "umakantp/smartylint",
-                "description": "Fix smartylint PHP 8.1 support and other fixes",
-                "url": "../installer/composer-patches/smartylint-php8.1-and-other-fixes.patch",
-                "sha256": "4d6756c3c950e3bfc2e7009be37837c52bb70a2823240a45a0e7eec468745dec",
                 "depth": 1,
                 "extra": {
                     "provenance": "patches-file:../installer/composer-patches/composer-patches.json"

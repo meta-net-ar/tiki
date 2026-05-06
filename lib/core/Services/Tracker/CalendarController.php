@@ -24,17 +24,29 @@ class Services_Tracker_CalendarController
         $unifiedsearchlib = TikiLib::lib('unifiedsearch');
         $index = $unifiedsearchlib->getIndex();
 
-        $start = 'tracker_field_' . $input->beginField->word();
-        $end = 'tracker_field_' . $input->endField->word();
-        $title = 'tracker_field_' . $input->title->word();
-        $description = 'tracker_field_' . $input->description->word();
+        $beginFieldName = $input->beginField->word();
+        $endFieldName = $input->endField->word();
+        $start = 'tracker_field_' . $beginFieldName;
+        $end = 'tracker_field_' . $endFieldName;
+        $hasStartField = ! empty($beginFieldName) && $beginFieldName !== 'null';
+        $hasEndField = ! empty($endFieldName) && $endFieldName !== 'null';
+        $titleFieldName = $input->title->word();
+        $title = ($titleFieldName && $titleFieldName !== 'null') ? 'tracker_field_' . $titleFieldName : null;
+        $descriptionFieldName = $input->description->word();
+        $description = ($descriptionFieldName && $descriptionFieldName !== 'null') ? 'tracker_field_' . $descriptionFieldName : null;
 
-        if ($resource = $input->resourceField->word()) {
-            $resource = 'tracker_field_' . $resource;
+        $resource = null;
+        if ($resourceFieldName = $input->resourceField->word()) {
+            if ($resourceFieldName !== 'null') {
+                $resource = 'tracker_field_' . $resourceFieldName;
+            }
         }
 
-        if ($coloring = $input->coloringField->word()) {
-            $coloring = 'tracker_field_' . $coloring;
+        $coloring = null;
+        if ($coloringFieldName = $input->coloringField->word()) {
+            if ($coloringFieldName !== 'null') {
+                $coloring = 'tracker_field_' . $coloringFieldName;
+            }
         }
 
         $query = $unifiedsearchlib->buildQuery([]);
@@ -57,8 +69,12 @@ class Services_Tracker_CalendarController
             }
         }
 
-        $query->filterRange(0, $to, $start);
-        $query->filterRange($from, $to + 1000 * 365 * 86400, $end);
+        if ($hasStartField) {
+            $query->filterRange(0, $to, $start);
+        }
+        if ($hasEndField) {
+            $query->filterRange($from, $to + 1000 * 365 * 86400, $end);
+        }
         $maxRecords = $input->maxRecords->int() ?: null;
         $query->setRange(0, $maxRecords);
 
@@ -74,7 +90,25 @@ class Services_Tracker_CalendarController
         $response = [];
 
         $fields = [];
+        $beginDateFieldHandler = null;
+        $endDateFieldHandler = null;
         if ($definition = Tracker_Definition::get($input->trackerId->int())) {
+            $factory = $definition->getFieldFactory();
+
+            if ($hasStartField) {
+                $beginFieldInfo = $definition->getField($beginFieldName);
+                if ($beginFieldInfo) {
+                    $beginDateFieldHandler = $factory->getHandler($beginFieldInfo);
+                }
+            }
+
+            if ($hasEndField) {
+                $endFieldInfo = $definition->getField($endFieldName);
+                if ($endFieldInfo) {
+                    $endDateFieldHandler = $factory->getHandler($endFieldInfo);
+                }
+            }
+
             foreach ($definition->getPopupFields() as $fieldId) {
                 if ($field = $definition->getField($fieldId)) {
                     $fields[] = $field;
@@ -137,22 +171,53 @@ class Services_Tracker_CalendarController
 
             $colormap = base64_decode($input->colormap->word());
 
-            $dtStart = $this->getTimestamp($row[$start]);
-            $dtEnd = $this->getTimestamp($row[$end]);
+            $startValue = ($hasStartField && isset($row[$start])) ? $row[$start] : null;
+            $endValue = ($hasEndField && isset($row[$end])) ? $row[$end] : null;
+
+            if ($startValue === null && $endValue === null) {
+                continue;
+            }
+
+            // If only one of start or end is provided, use that value for both to ensure the event appears on the calendar,
+            $dtStart = $this->getTimestamp($startValue ?? $endValue);
+            $dtEnd = $this->getTimestamp($endValue ?? $startValue);
+
+            // If end is before start, treat as a single instant event by using the start value for both
+            if ($dtEnd < $dtStart) {
+                $dtEnd = $dtStart;
+            }
+
+            $beginIsDateOnly = $beginDateFieldHandler instanceof Tracker_Field_DateTime
+                && $beginDateFieldHandler->isDateOnlyCalendarValue();
+            $endIsDateOnly = $endDateFieldHandler instanceof Tracker_Field_DateTime
+                && $endDateFieldHandler->isDateOnlyCalendarValue();
+
+            // Determine if event is date-only
+            // If only one field is specified, check that field; if both are specified, both must be date-only
+            if ($beginDateFieldHandler !== null && $endDateFieldHandler !== null) {
+                $isDateOnlyEvent = $beginIsDateOnly && $endIsDateOnly;
+            } elseif ($beginDateFieldHandler !== null) {
+                $isDateOnlyEvent = $beginIsDateOnly;
+            } elseif ($endDateFieldHandler !== null) {
+                $isDateOnlyEvent = $endIsDateOnly;
+            } else {
+                $isDateOnlyEvent = false;
+            }
 
             $response[] = [
                 'id'               => $row['object_id'],
                 'trackerId'        => $row['tracker_id'] ?? null,
-                'title'            => $row[$title] ?: $row['title'],
-                'extendedProps'      => ['description' => $row[$description] ?: $row['description']],
+                'title'            => ($title && isset($row[$title])) ? $row[$title] : ($row['title'] ?? ''),
+                'extendedProps'      => ['description' => ($description && isset($row[$description])) ? $row[$description] : ($row['description'] ?? '')],
                 'url'              => smarty_modifier_sefurl($row['object_id'], $row['object_type']),
-                'allDay'           => false,
-                'start'            => $useTimestamp ? $dtStart : TikiLib::date_format("c", $dtStart, $user, 5, false),
-                'end'              => $useTimestamp ? $dtEnd : TikiLib::date_format("c", $dtEnd, $user, 5, false),
+                // For all-day events, return date-only strings so FullCalendar does not apply timezone conversions that can shift the visible day.
+                'allDay'           => $isDateOnlyEvent,
+                'start'            => $isDateOnlyEvent ? gmdate('Y-m-d', $dtStart) : ($useTimestamp ? $dtStart : TikiLib::date_format("c", $dtStart, $user, 5, false)),
+                'end'              => $isDateOnlyEvent ? gmdate('Y-m-d', $dtEnd) : ($useTimestamp ? $dtEnd : TikiLib::date_format("c", $dtEnd, $user, 5, false)),
                 'editable'         => $item->canModify(),
-                'color'            => $row[$coloring] ? ($row[$coloring] ?: $row['coloring']) : ($this->getColor($row[$coloring] ?? '', $colormap)),
+                'color'            => ($coloring && isset($row[$coloring])) ? ($row[$coloring] ?: $row['coloring'] ?? '') : ($this->getColor($row[$coloring] ?? '', $colormap)),
                 'textColor'        => '#000',
-                'resourceId'       => strtolower($row[$resource] ?? ''),
+                'resourceId'       => $resource && isset($row[$resource]) ? strtolower($row[$resource]) : '',
                 'resourceEditable' => true,
             ];
         }

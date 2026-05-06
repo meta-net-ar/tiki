@@ -65,7 +65,7 @@ class LanguageTranslations extends TikiDb_Bridge
 
         $this->filePath = "lang/{$this->lang}/language.php";
         $this->customFilePath = "lang/{$this->lang}/" . LANG_CUSTOM_PHP_BASENAME;
-        $this->translator = \I18N\LanguageTranslator::getInstance($this->lang);
+        $this->translator = \I18n\LanguageTranslator::getInstance($this->lang);
     }
 
     /**
@@ -115,7 +115,7 @@ class LanguageTranslations extends TikiDb_Bridge
         }
 
         // If the translation is not in the database and the new translation is the same as the translation defined by the filesystem, ignore it (do not insert in the database)
-        $noDbTranslator = \I18N\LanguageTranslator::getInstance($this->lang, ['skipDb' => true]);
+        $noDbTranslator = \I18n\LanguageTranslator::getInstance($this->lang, ['skipDb' => true]);
         if ($noDbTranslator->translate($originalStr) == $translatedStr) {
             static $initialDatabaseTranslations = [];
 

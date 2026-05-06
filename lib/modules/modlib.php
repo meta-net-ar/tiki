@@ -533,8 +533,13 @@ class ModLib extends TikiLib
         global $page, $prefs, $user;
         $section = Sections::getCurrentSection();
         $tikilib = TikiLib::lib('tiki');
+        $pref_module_name = 'module_' . preg_replace('/[^a-zA-Z0-9]/', '_', $module["name"]);
 
-        if ($prefs['module_' . $module["name"]] != 'y') {
+        if (! isset($prefs[$pref_module_name])) {
+            return false;
+        }
+
+        if ($prefs[$pref_module_name] != 'y') {
             return false;
         }
         if (TikiLib::lib('login')->isSwitched() && isset($_SESSION["keep_login_box_visible"]) && $_SESSION["keep_login_box_visible"] == 'y') {
@@ -546,7 +551,7 @@ class ModLib extends TikiLib
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
-        $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN);
+        $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT);
 
         if (
             $prefs['theme_unified_admin_backend'] === 'y'
@@ -678,7 +683,7 @@ class ModLib extends TikiLib
 
         if ($prefs['cookie_consent_feature'] == 'y' && $prefs['cookie_consent_disable'] !== 'y') {      // check if consent required to show
             if (! empty($params['cookie_consent']) && $params['cookie_consent'] === 'y') {
-                if (! CookieConsentLib::checkAllowedCookieCategory(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
+                if (! CookieConsentLib::isCategoryAllowed(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
                     return false;
                 }
             }
@@ -1056,7 +1061,7 @@ class ModLib extends TikiLib
             ]
         );
 
-        if ($prefs['cookie_consent_feature'] === 'y' && $prefs['cookie_consent_disable'] !== 'y') {
+        if (($prefs['cookie_consent_feature'] ?? null) === 'y' && $prefs['cookie_consent_disable'] !== 'y') {
             $info['params']['cookie_consent'] = [
                 'name' => tra('Cookie Consent'),
                 'description' => 'n|y ' . tra('Show only if consent to accept cookies has been granted.'),

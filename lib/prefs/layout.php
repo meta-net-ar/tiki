@@ -25,7 +25,6 @@ function prefs_layout_list()
             'hint' => tra('The default is to use a full width header.'),
             'dependencies' => [
                 'feature_fixed_width',
-                'layout_fixed_width',
             ],
             'tags' => ['basic'],
             'default' => 'n',

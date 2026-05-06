@@ -10,22 +10,23 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 $inputConfiguration = [
     [
-        'staticKeyFilters'                => [
-            'contactId'                   => 'int',          //post
-            'remove'                      => 'int',          //post
-            'save'                        => 'bool',         //post
-            'ext_' . $ext['fieldId']      => 'string',       //post
-            'firstName'                   => 'string',       //post
-            'lastName'                    => 'string',       //post
-            'email'                       => 'email',        //post
-            'nickname'                    => 'email',        //post
-            'groups'                      => 'groupname',    //post
-            'sort_mode'                   => 'word',         //get
-            'offset'                      => 'int',          //get
-            'find'                        => 'string',       //post
-            'maxRecords'                  => 'int',          //get
-            'initial'                     => 'string',       //get
-            'view'                        => 'string',       //get
+        'staticKeyFilters'            => [
+            'contactId'               => 'int',           // post
+            'remove'                  => 'int',           // post
+            'save'                    => 'bool',          // post
+            'firstName'               => 'striptags',     // post
+            'lastName'                => 'striptags',     // post
+            'email'                   => 'email',         // post
+            'nickname'                => 'striptags',     // post
+            'sort_mode'               => 'word',           // get
+            'offset'                  => 'int',           // get
+            'find'                    => 'string',     // post
+            'maxRecords'              => 'int',           // get
+            'initial'                 => 'string',         // get
+            'view'                    => 'striptags',           // get
+        ],
+        'staticKeyFiltersForArrays'   => [
+            'groups'                  => 'groupname',     // post
         ],
     ],
 ];
@@ -118,7 +119,6 @@ if (isset($_REQUEST["save"])) {
         $smarty->assign('contactId', 0);
     }
 }
-
 $sort_mode = $_REQUEST["sort_mode"] ?? 'email_asc';
 $offset = $_REQUEST["offset"] ?? 0;
 $find = $_REQUEST["find"] ?? '';

@@ -199,13 +199,15 @@ class SurveyLib extends TikiLib
     }
 
     /**
-     * @param $surveyId
-     * @param $name
-     * @param $description
-     * @param $status
+     * @param int    $surveyId
+     * @param string $name
+     * @param string $description
+     * @param string $restriction
+     * @param string $status
+     * @param string $redirect_after URL or wiki page name to redirect to after survey completion
      * @return mixed
      */
-    public function replace_survey($surveyId, $name, $description, $restriction, $status)
+    public function replace_survey($surveyId, $name, $description, $restriction, $status, $redirect_after = '')
     {
         $newId = $this->surveysTable->insertOrUpdate(
             [
@@ -213,6 +215,7 @@ class SurveyLib extends TikiLib
                 'description' => $description,
                 'restriction' => $restriction,
                 'status' => $status,
+                'redirect_after' => $redirect_after,
             ],
             ['surveyId' => empty($surveyId) ? 0 : $surveyId]
         );

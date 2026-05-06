@@ -31,7 +31,8 @@ if (! empty($_REQUEST['authenticator_id']) && $_REQUEST['action'] === 'remove' &
     if ($isDeleted) {
         $logslib = TikiLib::lib('logs');
         $logslib->add_action('Removed', $_REQUEST['authenticator_id'], 'webauthn_authenticator');
-        Feedback::success(tr('Authenticator deleted.'));
+        Feedback::success(tr('Authenticator deleted from this site.'));
+        Feedback::warning(tr('The passkey copy stored on your device was not removed automatically. Servers cannot delete device-side credentials. You may want to remove it from your device or browser passkey settings. <a href="https://doc.tiki.org/Passkeys#Removing-a-passkey-from-your-device" target="_blank" rel="noopener">Learn how to remove it on your device</a>.'));
     }
 }
 

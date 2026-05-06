@@ -16,6 +16,7 @@ class CalRecurrence extends TikiLib
     private $calendarId;
     private $start;
     private $end;
+    private $duration;
     private $allday;
     private $locationId;
     private $categoryId;
@@ -76,7 +77,7 @@ class CalRecurrence extends TikiLib
     {
         $dataExists = false;
         if ($this->getId() > 0) {
-            $query = "SELECT calendarId, start, end, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, daily, days,"
+            $query = "SELECT calendarId, start, end, duration, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, daily, days,"
                      . "weekly, weeks, weekdays, monthly, months, dayOfMonth, monthlyType, monthlyWeekdayValue, monthlyFirstlastWeekdayValue, yearly, years, yearlyType, dateOfYear,"
                      . "yearlyWeekdayValue, yearlyFirstlastWeekdayValue, yearlyWeekMonth, nbRecurrences, startPeriod, endPeriod, user, created, lastModif, uri, uid, recurrenceDstTimezone "
                      . "FROM tiki_calendar_recurrence WHERE recurrenceId = ?";
@@ -86,6 +87,7 @@ class CalRecurrence extends TikiLib
                 $this->setCalendarId($row['calendarId']);
                 $this->setStart($row['start']);
                 $this->setEnd($row['end']);
+                $this->setDuration(is_null($row['duration']) ? 0 : $row['duration']);
                 $this->setAllday($row['allday']);
                 $this->setLocationId($row['locationId']);
                 $this->setCategoryId($row['categoryId']);
@@ -129,6 +131,7 @@ class CalRecurrence extends TikiLib
             $this->setCalendarId(0);
             $this->setStart(0);
             $this->setEnd(0);
+            $this->setDuration(0);
             $this->setAllday(0);
             $this->setLocationId(0);
             $this->setCategoryId(0);
@@ -174,6 +177,9 @@ class CalRecurrence extends TikiLib
         $this->setCalendarId($data['calendarId']);
         $this->setStart(\DateTime::createFromFormat('U', $data['start'])->setTimezone(new \DateTimeZone('UTC'))->format('Hi'));
         $this->setEnd(\DateTime::createFromFormat('U', $data['end'])->setTimezone(new \DateTimeZone('UTC'))->format('Hi'));
+        if (isset($data['duration'])) {
+            $this->setDuration($data['duration']);
+        }
         if (isset($data['newloc'])) {
             $this->setLocationId($data['newloc']);
         }
@@ -369,15 +375,16 @@ class CalRecurrence extends TikiLib
      */
     private function create()
     {
-        $query = "INSERT INTO tiki_calendar_recurrence (calendarId, start, end, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, "
+        $query = "INSERT INTO tiki_calendar_recurrence (calendarId, start, end, duration, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, "
                  . "daily, days, weekly, weeks, weekdays, monthly, months, dayOfMonth, monthlyType, monthlyWeekdayValue, monthlyFirstlastWeekdayValue, yearly, years, yearlyType, dateOfYear, "
                  . "yearlyWeekdayValue, yearlyFirstlastWeekdayValue, yearlyWeekMonth, nbRecurrences, startPeriod, endPeriod, user, created, lastModif, uri, uid, recurrenceDstTimezone) "
-                 . "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                 . "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         $now = $this->now;
         $bindvars = [
                         $this->getCalendarId(),
                         $this->getStart(),
                         $this->getEnd(),
+                        $this->getDuration(),
                         $this->isAllday() ? 1 : 0,
                         $this->getLocationId() ?: 0,
                         $this->getCategoryId() ?: null,
@@ -434,7 +441,7 @@ class CalRecurrence extends TikiLib
      */
     private function update($updateManuallyChangedEvents = false)
     {
-        $query = "UPDATE tiki_calendar_recurrence SET calendarId = ?, start = ?, end = ?, allday = ?, locationId = ?, categoryId = ?, nlId = ?, priority = ?, status = ?, "
+        $query = "UPDATE tiki_calendar_recurrence SET calendarId = ?, start = ?, end = ?, duration = ?, allday = ?, locationId = ?, categoryId = ?, nlId = ?, priority = ?, status = ?, "
                  . "url = ?, lang = ?, name = ?, description = ?, daily = ?, days = ?, weekly = ?, weeks = ?, weekdays = ?, monthly = ?, months = ?, dayOfMonth = ?, monthlyType = ?, monthlyWeekdayValue = ?, monthlyFirstlastWeekdayValue = ?, yearly = ?, years = ?, yearlyType = ?, dateOfYear = ?, yearlyWeekdayValue = ?, yearlyFirstlastWeekdayValue = ?, yearlyWeekMonth = ?, nbRecurrences = ?, "
                  . "startPeriod = ?, endPeriod = ?, user = ?, lastModif = ?, uri = ?, uid = ?, recurrenceDstTimezone = ? WHERE recurrenceId = ?";
         $now = time();
@@ -442,6 +449,7 @@ class CalRecurrence extends TikiLib
                         $this->getCalendarId(),
                         $this->getStart(),
                         $this->getEnd(),
+                        $this->getDuration(),
                         $this->isAllday() ? 1 : 0,
                         $this->getLocationId(),
                         $this->getCategoryId(),
@@ -816,10 +824,6 @@ class CalRecurrence extends TikiLib
         if (TikiLib::date_format2('Hi', $evt['start']) != $oldRec->getStart()) {
             $result[] = "start";
         }
-        // checking the end is double check : is it the right hour ? is it the same day ?
-        if ((TikiLib::date_format2('Hi', $evt['end']) != $oldRec->getEnd()) || (TikiLib::date_format2('Ymd', $evt['start']) != TikiLib::date_format2('Ymd', $evt['end']))) {
-            $result[] = "end";
-        }
         if ($evt['allday'] != $oldRec->isAllday()) {
             $result[] = "allday";
         }
@@ -852,9 +856,6 @@ class CalRecurrence extends TikiLib
         }
         if (TikiLib::date_format2('Hi', $evt['start']) != str_pad($oldRec->getStart(), 4, "0", STR_PAD_LEFT)) {
             $result[] = "_start";
-        }
-        if (TikiLib::date_format2('Hi', $evt['end']) != str_pad($oldRec->getEnd(), 4, "0", STR_PAD_LEFT)) {
-            $result[] = "_end";
         }
         if ($oldRec->isWeekly()) {
             $weekdays = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
@@ -944,23 +945,36 @@ class CalRecurrence extends TikiLib
                 $calendar_timezones[$this->getCalendarId()] = $timezone;
             }
         }
+        // Calculate the offset of the event start in seconds
         if ($this->isAllday()) {
             $startOffset = 0;
-            $endOffset = 86399;
         } else {
             $startOffset = str_pad($this->getStart(), 4, '0', STR_PAD_LEFT);
             $startOffset = substr($startOffset, 0, 2) * 60 * 60 + substr($startOffset, -2) * 60;
-            $endOffset = str_pad($this->getEnd(), 4, '0', STR_PAD_LEFT);
-            $endOffset = substr($endOffset, 0, 2) * 60 * 60 + substr($endOffset, -2) * 60;
         }
-        // start/end period and start/end offsets are in UTC hours
+
         $dtzone = new DateTimeZone($timezone);
         $dtstart = DateTime::createFromFormat('U', TikiDate::getStartDay($this->getStartPeriod(), 'UTC') + $startOffset);
         $dtstart->setTimezone($dtzone);
-        $dtstart->setTimestamp($dtstart->getTimestamp());
-        $dtend = DateTime::createFromFormat('U', TikiDate::getStartDay($this->getStartPeriod(), 'UTC') + $endOffset);
-        $dtend->setTimezone($dtzone);
-        $dtend->setTimestamp($dtend->getTimestamp());
+
+        $duration = $this->getDuration(); // Get the event duration
+        // If event covers a single day
+        if (! $duration) {
+            // Event must finish the same day
+            if ($this->isAllday() && $dtstart->format('H:i:s') === '00:00:00') {
+                $duration = 86399;
+            } else {
+                $endOffset = str_pad($this->getEnd(), 4, '0', STR_PAD_LEFT);
+                $endOffset = substr($endOffset, 0, 2) * 60 * 60 + substr($endOffset, -2) * 60;
+                $duration = $endOffset - $startOffset;
+                if ($duration <= 0) {
+                    $duration += 86399;
+                }
+            }
+        }
+        $dtend = clone $dtstart;
+        // Add the event duration to the event start date for multi-day event
+        $dtend->modify("+{$duration} seconds");
 
         $data = [
             'CREATED' => DateTime::createFromFormat('U', $this->getCreated() ?? 0)->format('Ymd\THis\Z'),
@@ -1187,6 +1201,19 @@ class CalRecurrence extends TikiLib
     public function setEnd($value)
     {
         $this->end = $value;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setDuration($value)
+    {
+        $this->duration = $value;
+    }
+
+    public function getDuration()
+    {
+        return $this->duration;
     }
 
     public function isAllday()

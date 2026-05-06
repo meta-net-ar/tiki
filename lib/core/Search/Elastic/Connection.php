@@ -580,6 +580,8 @@ class Search_Elastic_Connection
                 $message = $message->reason;
             } elseif (is_object($message) && ! empty($message->root_cause) && ! empty($message->root_cause[0]->reason)) {
                 $message = $message->root_cause[0]->reason;
+            } elseif (is_object($message) && ! empty($message->caused_by) && ! empty($message->caused_by->reason)) {
+                $message = $message->caused_by->reason;
             } elseif (is_object($message) && ! empty($message->failed_shards) && ! empty($message->failed_shards[0]->reason)) {
                 if (is_object($message->failed_shards[0]->reason)) {
                     $message = $message->failed_shards[0]->reason->reason;
