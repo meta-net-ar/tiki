@@ -2204,16 +2204,6 @@ CREATE TABLE `tiki_search_stats` (
   PRIMARY KEY (`term`)
 ) ENGINE=MyISAM;
 
-DROP TABLE IF EXISTS `tiki_secdb`;
-CREATE TABLE tiki_secdb(
-  `md5_value` varchar(32) NOT NULL,
-  `filename` varchar(250) NOT NULL,
-  `tiki_version` varchar(60) NOT NULL,
-  `severity` int(4) NOT NULL default '0',
-  PRIMARY KEY (`filename`(171),`tiki_version`(20)),
-  KEY `sdb_fn` (filename(191))
-) ENGINE=MyISAM;
-
 DROP TABLE IF EXISTS `tiki_semaphores`;
 CREATE TABLE `tiki_semaphores` (
   `semName` varchar(250) NOT NULL default '',
