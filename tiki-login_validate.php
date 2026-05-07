@@ -8,6 +8,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\BruteForce\BruteForce;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
@@ -19,6 +21,18 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 $access->check_feature(['validateUsers','validateRegistration'], '', 'login', true);
 $isvalid = false;
+$bruteForce = new BruteForce();
+$bruteForceProperties = function ($requestedUser = null) use ($tikilib) {
+    return ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()];
+};
+$accountValidationWaitMessage = function (array $properties) use ($bruteForce) {
+    $waitTime = $bruteForce->getWaitTime('account_validation', $properties);
+    if ($waitTime > 60) {
+        return sprintf(tra('Too many account validation attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+    }
+    return sprintf(tra('Too many account validation attempts. Please try again in %d seconds.'), $waitTime);
+};
+
 if (isset($_REQUEST["user"]) && getenv('REQUEST_METHOD') != 'HEAD') {   // It seems outlook sends a HEAD request before the GET request. This getenv test ensures people are not told incorrectly the account has been already activated
     if (isset($_REQUEST["pass"])) {
         if (! empty($user) && $tiki_p_admin_users != 'y') {
@@ -31,7 +45,17 @@ if (isset($_REQUEST["user"]) && getenv('REQUEST_METHOD') != 'HEAD') {   // It se
                 $smarty->assign('mid', 'tiki-information.tpl');
                 $smarty->display("tiki.tpl");
                 die;
-            } elseif (! empty($_SESSION['last_validation'])) {
+            }
+
+            $accountValidationProperties = $bruteForceProperties($_REQUEST["user"]);
+            if (
+                ($prefs['bruteforce_protection'] ?? 'n') === 'y'
+                && ! $bruteForce->isOperationAllowed('account_validation', $accountValidationProperties, false)
+            ) {
+                Feedback::errorAndDie($accountValidationWaitMessage($accountValidationProperties), 429);
+            }
+
+            if (! empty($_SESSION['last_validation'])) {
                 if ($_SESSION['last_validation']['actpass'] == $_REQUEST["pass"] && $_SESSION['last_validation']['user'] == $_REQUEST["user"]) {
                     list($isvalid, $_REQUEST["user"], $error) = $userlib->validate_user($_REQUEST["user"], $_SESSION['last_validation']['actpass'], true);
                 } else {
@@ -54,6 +78,9 @@ if (isset($_REQUEST["user"]) && getenv('REQUEST_METHOD') != 'HEAD') {   // It se
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 $userAutoLoggedIn = false;
 if ($isvalid) {
+    if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+        $bruteForce->success('account_validation', $bruteForceProperties($_REQUEST['user']));
+    }
     $wasAdminValidation = false;
     $info = $userlib->get_user_info($_REQUEST['user']);
     if ($info['waiting'] == 'a' && $prefs['validateUsers'] == 'y') { // admin validating -> need user email validation now
@@ -117,6 +144,9 @@ if ($isvalid) {
         die;
     }
 } else {
+    if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+        $bruteForce->attempt('account_validation', $bruteForceProperties($_REQUEST['user'] ?? null));
+    }
     if ($error == PASSWORD_INCORRECT) {
         $error = tra("Invalid username or password");
     } elseif ($error == USER_NOT_FOUND) {
