@@ -62,6 +62,38 @@
 
         {/tab}
 
+        {tab name="{tr}LLMS.txt{/tr}"}
+
+            {title help="LLMS.txt" admpage="general&cookietab=3&highlight=llms_txt_enable"}{tr}LLMS.txt{/tr}{/title}
+
+            {remarksbox type="info" title="{tr}About LLMS.txt{/tr}" close="n"}
+                {tr}The <a href="https://llmstxt.org" target="_blank" class="alert-link">llms.txt</a> provides a plain text index map of your content for Large Language Models (LLMs).{/tr}
+            {/remarksbox}
+
+            <form action="tiki-admin.php?page=seoprefs" method="post" class="admin">
+                {ticket}
+
+                <fieldset class="mb-3 w-100">
+                    <legend class="h4 pt-4">{tr}General Settings{/tr}</legend>
+                    {preference name=llms_txt_enable}
+                    {preference name=llms_md_enable}
+                </fieldset>
+
+                {include file='admin/include_apply_bottom.tpl'}
+            </form>
+
+            {if $prefs.llms_txt_enable eq 'y'}
+                <div class="my-3">
+                    <p>{tr}Your LLMS.txt index is available at:{/tr}</p>
+                    <ul>
+                        <li>
+                            <a href="{$base_url}llms.txt" target="_blank"><code>{$base_url}llms.txt</code></a>
+                        </li>
+                    </ul>
+                </div>
+            {/if}
+        {/tab}
+
         {tab name="{tr}Tag title{/tr}"}
             {remarksbox type="info" title="{tr}Tag Title{/tr}" close="n"}
                 <p>{tr}Another practical method to dynamically generate the content of the title tag is here <a href="https://doc.tiki.org/PluginList---Hacks-and-Fun#Set_the_Browser_Page_Title" class="alert-link"> here</a>{/tr}</p>

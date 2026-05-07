@@ -60,11 +60,20 @@ function tiki_route($path)
         'users' => 'tiki-list_users.php',
         'tiki-check' => 'tiki-check.php',
         'robots.txt' => 'tiki-robots.php',
+        'llms.txt' => 'tiki-llms.php',
     ];
 
     foreach ($simple as $key => $file) {
         tiki_route_attempt("|^$key$|", $file);
     }
+
+    // llms md content routes.
+    tiki_route_attempt('/^page\-(.+)\.md$/', 'tiki-llms.php', function ($parts) {
+        return ['type' => 'content', 'content_type' => 'wiki', 'page' => $parts[1]];
+    });
+    tiki_route_attempt('/^article\-(\d+)\.md$/', 'tiki-llms.php', function ($parts) {
+        return ['type' => 'content', 'content_type' => 'article', 'articleId' => $parts[1]];
+    });
 
     /*
         Valid:
@@ -225,6 +234,7 @@ function tiki_route($path)
             ];
         }
     );
+
 
     if (false !== $dot = strrpos($path, '.')) {
         // Prevent things that look like filenames from being considered for wiki page names
@@ -399,7 +409,7 @@ if ($inclusion) {
     $_SERVER['SCRIPT_NAME'] = $base . basename($inclusion);
     include __DIR__ . '/' . $inclusion;
 } else {
-    error_log("No route found - full:$full query:{$_SERVER['QUERY_STRING']}");
+    error_log("No route found - full:$full query:" . ($_SERVER['QUERY_STRING'] ?? ''));
 
     // Route to the "no-route" URL, if found
     require_once('lib/init/initlib.php');

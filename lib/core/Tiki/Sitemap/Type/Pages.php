@@ -68,4 +68,44 @@ class Pages extends AbstractType
         $priority[$prefs['wikiHomePage']] = '1.0';
         $this->addEntriesToSitemap($listPages, '/tiki-index.php?page=%s', 'pageSlug', null, 'pages.xml', '', 'lastModif', $priority);
     }
+
+    /**
+     * Generate llms txt map.
+     */
+    public function getLlmsTxtEntries(bool $useMdLinks = false): array
+    {
+        global $prefs, $tikilib, $base_url;
+
+        if (! $this->checkFeatureAndPermissions('feature_wiki')) {
+            return [];
+        }
+
+        $listPages  = $tikilib->list_pages(filter: ['lang' => $prefs['site_language']]);
+        $attributes = TikiLib::lib('attribute')->getAllAttributes('tiki.object.sitemap');
+        $listPages['data'] = array_filter($listPages['data'], function ($page) use ($attributes) {
+            return ($attributes[$page['pageName']] ?? '') !== 'n';
+        });
+
+        $entries     = [];
+        $friendlyUrl = ($prefs['feature_sefurl'] ?? 'n') === 'y';
+
+        foreach ($listPages['data'] as $page) {
+            if ($useMdLinks) {
+                if ($friendlyUrl) {
+                    $url = rtrim($base_url, '/') . '/page-' . urlencode($page['pageSlug'] ?: $page['pageName']) . '.md';
+                } else {
+                    $url = rtrim($base_url, '/') . '/tiki-llms.php?type=content&content_type=wiki&page=' . urlencode($page['pageName']);
+                }
+            } else {
+                $url = $this->getEntryUrl('/tiki-index.php?page=%s', $page['pageSlug'] ?: $page['pageName'], null);
+            }
+
+            $entries[] = [
+                'url' => $url,
+                'title' => $page['pageName'],
+            ];
+        }
+
+        return $entries;
+    }
 }
