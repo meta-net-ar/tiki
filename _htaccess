@@ -198,6 +198,9 @@ FileETag MTime Size
     # -- Disallow access to hidden files (apart from well-known ones) -- #
     RewriteRule "(^|/)\.(?!well-known/)" - [F,L]
 
+    # Rewrite example.com/indexnow-{hash}.txt to tiki-indexnow.php?key=
+    RewriteRule ^(indexnow-[a-f0-9]+\.txt)$ tiki-indexnow.php?key=$1 [L]
+
     # Redirect robots.txt to dynamic tiki-robots.php file.
     RewriteRule ^robots\.txt$ route.php [L]
 
