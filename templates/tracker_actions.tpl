@@ -11,7 +11,7 @@
     <a class="btn btn-info tracker-properties tips" title=":{tr _0="{$tracker_info.name|escape}"}Edit the configuration properties of tracker “%0”{/tr}" href="{bootstrap_modal controller=tracker action=replace trackerId=$trackerId}">
         {icon name="settings"} {tr}Properties{/tr}
     </a>
-    <a class="btn btn-info tips{if $showfields === 'n'} disabled{/if}" title=":{tr _0="{$tracker_info.name|escape}"}Configure the data fields for tracker “%0”{/tr}" href="{$trackerId|sefurl:'trackerfields'}">
+    <a class="btn btn-info tips{if $smarty.server.SCRIPT_NAME|strpos:'tiki-admin_tracker_fields.php' !== false} active{/if}" title=":{tr _0="{$tracker_info.name|escape}"}Configure the data fields for tracker “%0”{/tr}" href="{$trackerId|sefurl:'trackerfields'}">
         {icon name="th-list"} {tr}Fields{/tr}
     </a>
 {/if}

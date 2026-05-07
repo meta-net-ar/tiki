@@ -11,7 +11,7 @@
             <a href="{service controller=tracker action=add_field trackerId=$trackerId}" class="btn btn-primary add-field">{icon name="create"} {tr}Add Field{/tr}</a>
             <a href="{bootstrap_modal controller=tracker action=import_fields trackerId=$trackerId}" class="btn btn-primary">{icon name="import"} {tr}Import Fields{/tr}</a>
         </div>
-        {include file="tracker_actions.tpl" showfields="n"}
+        {include file="tracker_actions.tpl"}
     </div>
 {/block}
 
