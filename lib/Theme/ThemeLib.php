@@ -157,7 +157,7 @@ class ThemeLib extends TikiLib
             );
         }
 
-        // NOW apply the 8 steps from setup/theme.php
+        // NOW apply all 8 theme setup steps
 
         //2) Always add tiki_base.css. Add it first, so that it can be overriden in the custom themes
         $headerlib->add_cssfile("themes/base_files/css/tiki_base.css");

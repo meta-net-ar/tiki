@@ -91,7 +91,7 @@ class Icon extends \Smarty\FunctionHandler\Base
                 $default_width = $default_height = ( strpos($params['_id'], '48x48') !== false ) ? 48 : 32;
             }
         }
-        // ICONSET START, work-in-progress, more information: dev.tiki.org/icons. $iconset array is prepared by lib/setup/theme.php
+        // ICONSET START, work-in-progress, more information: dev.tiki.org/icons. $iconset array is prepared by applyCurrentTheme()
         // N.B. In some contexts such as the console $iconset may not be set up
         if (! empty($params['name']) && empty($params['_tag']) && ! empty($iconset)) {
             $name = $params['name'];

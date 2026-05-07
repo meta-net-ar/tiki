@@ -94,7 +94,7 @@
         "    Used by lib/OpenIdConnectLib.php",
         "  symfony/finder: ",
         "    provides Symfony\\Component\\Finder",
-        "    Used by phpunit, but also lib/core/Tiki/Package and lib/setup/theme.php",
+        "    Used by phpunit and lib/core/Tiki/Package",
         "  symfony/process: ",
         "    provides Symfony\\Component\\Process",
         "    Used by Tiki\\Process, phpunit",
