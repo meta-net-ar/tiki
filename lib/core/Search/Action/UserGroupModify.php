@@ -71,36 +71,51 @@ class Search_Action_UserGroupModify implements Search_Action_Action
     public function execute(JitFilter $data)
     {
         $lib = TikiLib::lib('user');
-        $user = $data->user->text();
+        $targetUsers = $data->user->text();
         $add = $data->add->text();
         $remove = $data->remove->text();
         $operation = $data->operation->word();
         $value = $data->value->text();
 
+        // Determine operation type
+        $isAddOperation = (! empty($add) || $operation === 'add');
+        $permName = $isAddOperation ? 'group_add_member' : 'group_remove_member';
+
+        if (! is_array($targetUsers)) {
+            $targetUsers = [$targetUsers];
+        }
+
+        // Resolve target group from add/remove/operation inputs
         if ($add) {
-            $permName = 'group_add_member';
             $group = $add;
         } elseif ($remove) {
-            $permName = 'group_remove_member';
             $group = $remove;
-        } elseif ($operation == 'add') {
-            $permName = 'group_add_member';
-            $group = $value;
-        } elseif ($operation == 'remove') {
-            $permName = 'group_remove_member';
+        } elseif (! empty($value)) {
             $group = $value;
         } else {
-            throw new Search_Action_Exception(tr('Failed exeucting user_group_modify: nothing to add or remove.'));
+            throw new Search_Action_Exception(tr('Failed executing user_group_modify: nothing to add or remove.'));
         }
 
-        if (! is_array($user)) {
-            $user = [$user];
-        }
+        $groupInfo = $lib->get_group_info($group);
+        $perms = Perms::get();
 
-        foreach ($user as $u) {
+        global $user;
+        $currentUser = $user ?? null;
+
+        foreach ($targetUsers as $u) {
             $userGroups = $lib->get_user_groups_inclusion($u);
-            if (Perms::get()->$permName || (array_key_exists($group, $userGroups) && Perms::get()->group_join)) {
-                if ($add || $operation == 'add') {
+
+            $canSelfJoin = $u === $currentUser
+                && $isAddOperation
+                && ($groupInfo['userChoice'] ?? null) === 'y';
+
+            $hasPermission =
+                $perms->$permName
+                || (! empty($userGroups[$group]) && $perms->group_join)
+                || $canSelfJoin;
+
+            if ($hasPermission) {
+                if ($isAddOperation) {
                     $lib->assign_user_to_group($u, $group);
                 } else {
                     $lib->remove_user_from_group($u, $group);
