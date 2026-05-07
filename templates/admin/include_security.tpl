@@ -466,7 +466,7 @@
                                 {tr}Old shared key{/tr}
                             </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" name="old_share" value="">
+                                <input type="password" class="form-control" name="old_share" value="">
                                 <a class="tikihelp text-info" title="{tr}Old shared key:{/tr} {tr}You need to input one of the existing shared keys in order to regenerate the secret shares.{/tr}">
                                     {icon name=information}
                                 </a>
@@ -484,7 +484,7 @@
                             </label>
                             <div class="col-sm-8">
                                 {if $prefs.feature_user_encryption eq 'y'}
-                                    {user_selector multiple='true' name='users' class='form-control' user=$encryption_key.users select=$encryption_key.users_array editable=y}
+                                    {user_selector multiple='true' name='users[]' class='form-control' user=$encryption_key.users select=$encryption_key.users_array editable=y}
                                 {else}
                                     {tr}Depends on "User encryption".{/tr}
                                 {/if}

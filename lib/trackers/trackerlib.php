@@ -2423,8 +2423,10 @@ class TrackerLib extends TikiLib
                 $value = $key->encryptData($value);
             } catch (Tiki\Encryption\NotFoundException) {
                 Feedback::error(tr('Field "%0" is encrypted with a key that no longer exists!', $field['name']));
+                return;
             } catch (Tiki\Encryption\Exception $e) {
-                Feedback::error(tr('Field "%0" is encrypted using key "%1" but where was an error enrypting the data: %2', $field['name'], $key->get('name'), $e->getMessage()));
+                Feedback::error(tr('Field "%0" is encrypted using key "%1" but there was an error encrypting the data: %2', $field['name'], $key->get('name'), $e->getMessage()));
+                return;
             }
         }
 
@@ -3117,6 +3119,21 @@ class TrackerLib extends TikiLib
                             } else {
                                 $f['errorMsg'] = tr('Unknown error');
                             }
+                            $erroneous_values[] = $f;
+                        }
+                    }
+
+                    // Only gate non-empty values: empty values fall through to the mandatory-field
+                    // check above; optional encrypted fields legitimately submit empty.
+                    if (! empty($f['encryptionKeyId']) && ! empty(trim((string)($f['value'] ?? '')))) {
+                        try {
+                            $key = new Tiki\Encryption\Key($f['encryptionKeyId']);
+                            if (! $key->isKeyAccessible()) {
+                                $f['errorMsg'] = tr('Enter the encryption key for field "%0" before saving.', $f['name']);
+                                $erroneous_values[] = $f;
+                            }
+                        } catch (Tiki\Encryption\NotFoundException $e) {
+                            $f['errorMsg'] = tr('Field "%0" uses an encryption key that no longer exists.', $f['name']);
                             $erroneous_values[] = $f;
                         }
                     }
@@ -6514,8 +6531,9 @@ class TrackerLib extends TikiLib
                     $r = tr('Field is encrypted with a key that no longer exists!');
                 } catch (Tiki\Encryption\Exception $e) {
                     $field['value'] = $item[$field['fieldId']] = '';
-                    $r = tr('Field data is encrypted using key "%0" but where was an error decrypting the data: %1', $key->get('name'), $e->getMessage());
+                    $r = tr('Field data is encrypted using key "%0" but there was an error decrypting the data: %1', $key->get('name'), $e->getMessage());
                     $r .= ' ' . $key->manualEntry();
+                    \TikiLib::lib('header')->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tracker-field-view-reload.js');
                 }
                 $handler = $this->get_field_handler($field, $item);
                 $field = array_merge($field, $handler->getFieldData());
