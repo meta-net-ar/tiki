@@ -54,7 +54,7 @@ function get_url($url, $use_tidy = true)
 
     $result['data'] = $data;
     $htmlTidyLib = TikiLib::lib('htmltidy');
-    
+
     if ($htmlTidyLib->isTidyLoaded()) {
         $data = tidy_parse_string($data, [], 'utf8');
         tidy_diagnose($data);

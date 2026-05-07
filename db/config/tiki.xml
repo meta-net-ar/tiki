@@ -400,7 +400,7 @@
             <file>%kernel.root_dir%/lib/setup/error_tracking.php</file>
         </service>
 
-        <service id="tiki.lib.htmltidy" class="HtmlTidyLib">
+        <service id="tiki.lib.htmltidy" class="Tiki\Lib\HtmlTidy\HtmlTidyLib">
             <file>%kernel.root_dir%/lib/htmltidy/htmltidylib.php</file>
         </service>
 

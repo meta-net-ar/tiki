@@ -1020,6 +1020,7 @@ if (isset($token_error)) {
 }
 
 require_once('lib/setup/plugins_actions.php');
+require_once('lib/setup/tidy_reporting.php');
 
 if ($tiki_p_admin == 'y') {
     $headerlib->add_jsfile_late('lib/jquery_tiki/tiki-admin.js');

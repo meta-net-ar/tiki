@@ -561,23 +561,30 @@ if ( \$('#$id') ) {
             $killtoc = false;
 
             $plugin_result = $this->convert_plugin_output($output, $pluginFormat, $outputFormat);
-            
-            // Validate plugin HTML output and report errors if Tidy is enabled
+
             if (! empty($plugin_result) && is_string($plugin_result)) {
-                $htmlTidyLib = TikiLib::lib('htmltidy');
-                if ($htmlTidyLib && $htmlTidyLib->isTidyReportingEnabled()) {
-                    $context = [
-                        'source' => "Plugin: $name",
-                        'page' => $this->option['page'] ?? null,
-                        'format' => $pluginFormat,
-                        'output_format' => $outputFormat
-                    ];
-                    // Validate without modifying the output (just report errors)
-                    file_put_contents('output.txt', $plugin_result, FILE_APPEND);
-                    $htmlTidyLib->validateHtmlMarkup($plugin_result, [], 'UTF8', $context);
+                $htmlTidy = TikiLib::lib('htmltidy');
+                if ($htmlTidy->isTidyLoaded()) {
+                    $tidyErrors = $htmlTidy->reportErrors($plugin_result, [
+                        'source'        => "Plugin: $name",
+                        'page'          => $this->option['page'] ?? null,
+                        'format'        => $pluginFormat,
+                        'output_format' => $outputFormat,
+                    ]);
+                    if (! empty($tidyErrors) && ! empty($this->option['preview_mode'])) {
+                        foreach ($tidyErrors as $tidyError) {
+                            Feedback::error(tr(
+                                'HTML markup error in plugin %0: %1 (line %2, col %3)',
+                                $name,
+                                $tidyError['message'],
+                                $tidyError['line'],
+                                $tidyError['column']
+                            ));
+                        }
+                    }
                 }
             }
-            
+
             if (($this->option['html_editor'] ?? false)) {
                 return $this->convert_plugin_for_html_editor($name, $args, $plugin_result, $data, $info);
             } else {

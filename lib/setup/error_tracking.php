@@ -27,6 +27,7 @@ class ErrorTracking
 
     protected bool $phpEnabled;
     protected bool $jsEnabled;
+    protected bool $tidyEnabled;
     protected bool $tracingEnabledPhp;
     protected bool $tracingEnabledJs;
 
@@ -49,6 +50,32 @@ class ErrorTracking
     public function isJSEnabled(): bool
     {
         return isset($this->dsn) && $this->jsEnabled;
+    }
+
+    /**
+     * Check if HTML Tidy error reporting is enabled.
+     * Requires: global preference on, PHP Tidy extension loaded, session not disabled.
+     *
+     * @return bool
+     */
+    public function isTidyEnabled(): bool
+    {
+        return isset($this->dsn)
+            && $this->tidyEnabled
+            && extension_loaded('tidy')
+            && ($_SESSION['tidy_html_reporting'] ?? 'y') !== 'n';
+    }
+
+    /**
+     * Enable or disable Tidy error reporting for the current session.
+     * Lets admins suppress reporting while editing pages they cannot immediately fix,
+     * without touching the global preference.
+     *
+     * @param bool $enabled
+     */
+    public function setTidySessionReporting(bool $enabled): void
+    {
+        $_SESSION['tidy_html_reporting'] = $enabled ? 'y' : 'n';
     }
 
     /**
@@ -250,6 +277,7 @@ class ErrorTracking
         global $prefs;
         $this->phpEnabled = ($prefs['error_tracking_enabled_php'] ?? 'n') === 'y';
         $this->jsEnabled = ($prefs['error_tracking_enabled_js'] ?? 'n') === 'y';
+        $this->tidyEnabled = ($prefs['error_tracking_enabled_tidy'] ?? 'n') === 'y';
         $this->tracingEnabledPhp = ($prefs['error_tracking_tracing_enabled_php'] ?? 'n') === 'y';
         $this->tracingEnabledJs = ($prefs['error_tracking_tracing_enabled_js'] ?? 'n') === 'y';
 
