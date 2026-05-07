@@ -69,7 +69,6 @@ class ThemeLib extends TikiLib
             $prefs['site_layout'] = 'admin';
             $adminSectionDetected = true;
         }
-
         //Initialize variables for the actual theme and theme option to be displayed
         $theme_active = $prefs['theme'] ?? '';
         $theme_option_active = $prefs['theme_option'] ?? '';
@@ -94,7 +93,7 @@ class ThemeLib extends TikiLib
         }
 
         //consider Admin Theme
-        if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || !empty($section))) {        // use admin theme if set
+        if (! empty($prefs['theme_admin']) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty($section))) {        // use admin theme if set
             $theme_active = $prefs['theme_admin'];
             $theme_option_active = $prefs['theme_option_admin'] ?? '';                                // and its option
         }
@@ -114,7 +113,6 @@ class ThemeLib extends TikiLib
     {
         global $prefs, $smarty, $headerlib, $iconset;
 
-        // Get the DECISION before calling getActiveThemeAndOption
         $site_theme_before = $prefs['theme'] ?? 'not set';
         $admin_theme_before = $prefs['theme_admin'] ?? 'not set';
         $group_theme_before = 'not active';
@@ -128,7 +126,7 @@ class ThemeLib extends TikiLib
         $themeChangeModuleCurrent = $_SESSION['try_theme'] ?? 'not active';
 
         list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
-        
+
         //Write back global variables and prefs so that they can be accessed elsewhere
         $prefs['theme'] = $theme_active;
         $prefs['theme_option'] = $theme_option_active;
@@ -137,20 +135,22 @@ class ThemeLib extends TikiLib
 
         // Debug logging
         $currentSection = Sections::getCurrentSection();
-        $headerlib->add_js(
-            'console.log("=== THEME DEBUG ===", {
-                section: "' . addslashes($currentSection) . '",
-                site_theme: "' . addslashes($site_theme_before) . '",
-                group_theme: "' . addslashes($group_theme_before) . '",
-                admin_theme: "' . addslashes($admin_theme_before) . '",
-                theme_change_module: "' . addslashes($themeChangeModuleCurrent) . '",
-                final_output_theme: "' . addslashes($theme_active) . '",
-                final_theme_option: "' . addslashes($theme_option_active) . '"
-            });'
-        );
+        // Load Bootstrap as ESM module - needed for dropdowns, modals, etc.
+        $headerlib->add_js_module('
+            import * as bootstrap from "bootstrap";
+            window.bootstrap = bootstrap;
+        ');
+        $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/clipboard/dist/clipboard.min.js');
+
+        // Apply fixed width if configured
+        if ($prefs['feature_fixed_width'] === 'y' && ! empty($prefs['layout_fixed_width'])) {
+            $headerlib->add_css(
+                "@media (min-width: 1200px) { .container { max-width:{$prefs['layout_fixed_width']}; } }"
+            );
+        }
 
         // NOW apply the 8 steps from setup/theme.php
-        
+
         //2) Always add tiki_base.css. Add it first, so that it can be overriden in the custom themes
         $headerlib->add_cssfile("themes/base_files/css/tiki_base.css");
 
@@ -283,6 +283,11 @@ class ThemeLib extends TikiLib
         $headerlib->add_js('jqueryTiki.iconset = ' . json_encode($iconset->getJS()));
         $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 
+        // Web Monetization
+        if ($prefs['webmonetization_all_website'] === 'y' && ! empty($prefs['webmonetization_default_payment_pointer'])) {
+            $headerlib->add_meta('monetization', $prefs['webmonetization_default_payment_pointer']);
+        }
+
         // set the color of header bar and address bar
         if ($prefs['theme_header_and_address_bar_color'] === 'y') {
             if (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT) || empty(Sections::getCurrentSection())) {
@@ -297,6 +302,8 @@ class ThemeLib extends TikiLib
             $headerlib->add_meta("apple-mobile-web-app-status-bar-style", "black-translucent");
             $headerlib->add_jq_onready($jq, 5);
         }
+
+        $smarty->initializePaths();
     }
 
     /**

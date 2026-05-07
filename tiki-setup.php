@@ -267,8 +267,6 @@ if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
 }
 
-require_once('lib/setup/theme.php');
-
 /* Cookie consent setup, has to be after the JS decision and wiki setup */
 if (! TIKI_API) {
     $cookie_consent_html = '';
