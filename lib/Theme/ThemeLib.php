@@ -108,8 +108,9 @@ class ThemeLib extends TikiLib
     /**
      * Update Smarty template variables with the currently active theme
      * Called when section changes to ensure theme is correctly applied
+     * @param bool $redetectTheme If true, re-detect theme based on current section (for callbacks). If false, use theme already in $prefs (for initial load).
      */
-    public static function applyCurrentTheme(): void
+    public static function applyCurrentTheme(bool $redetectTheme = false): void
     {
         global $prefs, $smarty, $headerlib, $iconset;
 
@@ -125,7 +126,14 @@ class ThemeLib extends TikiLib
         }
         $themeChangeModuleCurrent = $_SESSION['try_theme'] ?? 'not active';
 
-        list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
+        // Only re-detect if requested (e.g., when section changes mid-request)
+        if ($redetectTheme) {
+            list($theme_active, $theme_option_active) = self::getActiveThemeAndOption();
+        } else {
+            // Use theme already set in $prefs (detected earlier during setup)
+            $theme_active = $prefs['theme'] ?? '';
+            $theme_option_active = $prefs['theme_option'] ?? '';
+        }
 
         //Write back global variables and prefs so that they can be accessed elsewhere
         $prefs['theme'] = $theme_active;
@@ -279,8 +287,8 @@ class ThemeLib extends TikiLib
 
         //8) produce $iconset to be used for generating icons
         $iconset = TikiLib::lib('iconset')->getIconsetForTheme($theme_active, $theme_option_active);
-        // and add js support file
-        $headerlib->add_js('jqueryTiki.iconset = ' . json_encode($iconset->getJS()));
+        // and add js support file - wrap in onready to ensure jQuery is loaded
+        $headerlib->add_jq_onready('jqueryTiki.iconset = ' . json_encode($iconset->getJS()) . ';');
         $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
 
         // Web Monetization

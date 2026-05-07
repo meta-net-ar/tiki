@@ -217,7 +217,7 @@ Language::setSectionLanguage();
 // the language and the theme are automatically updated (e.g., admin section gets admin language)
 Sections::onSectionChange(function ($section) {
     Language::setSectionLanguage();
-    TikiLib::lib('theme')->applyCurrentTheme();
+    TikiLib::lib('theme')->applyCurrentTheme(true);  // true = re-detect theme for new section
 });
 
 Sections::onSectionChange(function ($section) use ($prefs) {
@@ -266,6 +266,10 @@ if ($color_mode_table_exists) {
 if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
 }
+
+// Apply theme for initial page load (callback above handles mid-request section changes)
+// false = just use theme already in $prefs for initial load.
+TikiLib::lib('theme')->applyCurrentTheme(false);
 
 /* Cookie consent setup, has to be after the JS decision and wiki setup */
 if (! TIKI_API) {
