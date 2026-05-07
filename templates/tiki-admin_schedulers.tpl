@@ -381,7 +381,7 @@
 {if isset($schedulerinfo.id) && $schedulerinfo.id}
     {tab name="{tr}Scheduler logs{/tr}"}
         <h2>{tr}Scheduler{/tr} {$schedulerinfo.name|escape} Logs</h2>
-        <h3>{tr}Last {$numOfLogs} Logs{/tr}</h3>
+        <h3>{tr _0=$numOfLogs}Last %0 Logs{/tr}</h3>
         <div class="table-responsive">
             <table class="table normal table-striped table-hover">
                 <thead>
@@ -594,7 +594,7 @@
 {if !isset($schedulerinfo.id)}
 {tab name="{tr}Logs{/tr}"}
     <h2>{tr}Scheduler Run Logs{/tr}</h2>
-    <h3>{tr}Last {$numOfLogs} Logs{/tr}</h3>
+    <h3>{tr _0=$numOfLogs}Last %0 Logs{/tr}</h3>
     <div id="admin_schedulers_logs-div">
         <div class="{if $js}table-responsive {/if}ts-wrapperdiv">
             <table class="table normal table-striped table-hover">

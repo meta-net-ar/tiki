@@ -364,7 +364,7 @@
                                         {if !$ocrStalled}disabled{/if}
                                         class="btn btn-primary btn-sm"
                                         name="ocrstalledreset"
-                                        value="{tr}Reset {if $ocrStalled}{$ocrStalled} {/if}OCR 'stalled' files{/tr}"
+                                        value="{if $ocrStalled}{tr _0=$ocrStalled}Reset %0 OCR 'stalled' files{/tr}{else}{tr}Reset OCR 'stalled' files{/tr}{/if}"
                                 >
                             {/if}
                         </div>

@@ -17,7 +17,7 @@
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" name="calendarIds[]" value="{$calendarId|escape}" id="groupexcal_{$calendarId}"
                                 {if in_array($calendarId, $displayedcals)}checked="checked"{/if}>
-                            <label class="form-check-label calId{$calendarId}" for="groupexcal_{$calendarId}">{$calendar.name|escape} ({tr}Id #{$calendarId}{/tr})</label>
+                            <label class="form-check-label calId{$calendarId}" for="groupexcal_{$calendarId}">{$calendar.name|escape} ({tr _0=$calendarId}Id #%0{/tr})</label>
                         </div>
                     </div>
                 {/foreach}

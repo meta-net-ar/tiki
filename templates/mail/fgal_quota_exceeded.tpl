@@ -1,4 +1,4 @@
-{tr}{$prefs.mail_template_custom_text}File Gallery quota exceeded{/tr}
+{tr _0=$prefs.mail_template_custom_text}%0File Gallery quota exceeded{/tr}
 {if !empty($mail_fgal)}{tr}File gallery:{/tr} <a href="{mailurl}{$mail_fgal.galleryId|sefurl:'file gallery'}{/mailurl}">{$mail_fgal.name|escape}</a>
 {tr}Quota:{/tr} {$mail_fgal.quota} {tr}Mb{/tr}
 {/if}

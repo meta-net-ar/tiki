@@ -9,5 +9,5 @@
 
 {tr}Important: The old password remains active if you don't click the link above.{/tr}
 
-{tr}This reset link will expire in {$mail_expiry_time_formatted}.{/tr}
+{tr _0=$mail_expiry_time_formatted}This reset link will expire in %0.{/tr}
 

@@ -1,4 +1,4 @@
-{if $mail_action eq 'New'}{tr}New {$prefs.mail_template_custom_text}article post:{/tr}{/if}{if $mail_action eq 'Edit'}{tr}Edit {$prefs.mail_template_custom_text}article post:{/tr}{/if}{if $mail_action eq 'Delete'}{tr}Delete {$prefs.mail_template_custom_text}article post:{/tr}{/if} {tr}{$mail_title} by {$mail_user|username} at{/tr} {$mail_date|tiki_short_datetime:"":"n"}
+{if $mail_action eq 'New'}{tr _0=$prefs.mail_template_custom_text}New %0article post:{/tr}{/if}{if $mail_action eq 'Edit'}{tr _0=$prefs.mail_template_custom_text}Edit %0article post:{/tr}{/if}{if $mail_action eq 'Delete'}{tr _0=$prefs.mail_template_custom_text}Delete %0article post:{/tr}{/if} {tr _0=$mail_title _1=$mail_user|username}%0 by %1 at{/tr} {$mail_date|tiki_short_datetime:"":"n"}
 
 {if $mail_action neq 'Delete'}{tr}View the article at:{/tr} {mailurl}{$mail_postid|sefurl:article}{/mailurl}{/if}
 

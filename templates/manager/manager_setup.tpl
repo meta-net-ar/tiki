@@ -15,7 +15,7 @@
         <form method="post" action="{service controller=manager action=$inputValues['action']}" id="tiki-manager-{$inputValues['event']}">
             <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">
-                    {tr}Time for {$inputValues['event']}{/tr}
+                    {tr _0=$inputValues['event']}Time for %0{/tr}
                     <a class="tikihelp text-info" title="{tr}Description:{/tr} {tr}{$help.time}{/tr}">
                         {icon name=information}
                     </a>
