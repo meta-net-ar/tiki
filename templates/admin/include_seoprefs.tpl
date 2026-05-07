@@ -98,4 +98,54 @@
                 </fieldset>
             </div>
         {/tab}
+
+        {tab name="{tr}IndexNow{/tr}"}
+
+            {title help="IndexNow" admpage="general&cookietab=3&highlight=indexnow_enable"}{tr}IndexNow{/tr}{/title}
+
+            {remarksbox type="info" title="{tr}About IndexNow{/tr}" close="n"}
+                {tr}IndexNow allows you to instantly notify search engines about your latest content changes.{/tr}
+                {tr}Learn more at <a href="https://www.indexnow.org" target="_blank" class="alert-link">IndexNow.org</a>.{/tr}
+            {/remarksbox}
+
+            <form action="tiki-admin.php?page=seoprefs" method="post" class="admin">
+                {ticket}
+
+                <fieldset class="mb-3 w-100">
+                    <legend class="h4 pt-4">{tr}General Settings{/tr}</legend>
+                    {preference name=indexnow_enable}
+                </fieldset>
+
+                {if $prefs.indexnow_enable eq 'y'}
+                    <fieldset class="mb-3 w-100">
+                        <legend class="h4 pt-4">{tr}API Key{/tr}</legend>
+
+                        {if $prefs.indexnow_key}
+                            <div class="adminoptionbox clearfix mb-3">
+                                <div class="adminoptionlabel">{tr}Key Verification URL{/tr}</div>
+                                <div class="adminoptioncontent">
+                                    <a href="{$base_url}{$prefs.indexnow_key}.txt" target="_blank"><code>{$prefs.indexnow_key}.txt</code></a>
+                                    <div class="form-text">{tr}Search engines will verify your key at this URL.{/tr}</div>
+                                </div>
+                            </div>
+                        {/if}
+
+                        <div class="adminoptionbox clearfix mb-3">
+                            <div class="adminoptionlabel">&nbsp;</div>
+                            <div class="adminoptioncontent">
+                                {if $prefs.indexnow_key}
+                                    {button href="tiki-admin.php?page=seoprefs&indexnow_regenerate_key=1" _icon_name="refresh" class="btn btn-warning" _text="{tr}Regenerate Key{/tr}"}
+                                {else}
+                                    {button href="tiki-admin.php?page=seoprefs&indexnow_generate_key=1" _icon_name="key" class="btn btn-primary" _text="{tr}Generate Key{/tr}"}
+                                {/if}
+                            </div>
+                        </div>
+                    </fieldset>
+
+                {/if}
+
+                {include file='admin/include_apply_bottom.tpl'}
+            </form>
+        {/tab}
+
     {/tabset}

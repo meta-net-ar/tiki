@@ -40,6 +40,17 @@ if (isset($_REQUEST['rebuild'])) {
     $access->redirect('tiki-admin.php?page=seoprefs');
 }
 
+
+if (isset($_REQUEST['indexnow_generate_key']) || isset($_REQUEST['indexnow_regenerate_key'])) {
+    TikiLib::lib('tiki')->set_preference('indexnow_key', 'indexnow-' . bin2hex(random_bytes(16)));
+    if (isset($_REQUEST['indexnow_regenerate_key'])) {
+        Feedback::success(tra('IndexNow API key regenerated successfully!'));
+    } else {
+        Feedback::success(tra('IndexNow API key generated successfully!'));
+    }
+    $access->redirect('tiki-admin.php?page=seoprefs#content_seoprefs-3');
+}
+
 $smarty->assign('title', tra('Sitemap'));
 $smarty->assign('listPages', $listPages['data']);
 $smarty->assign('Url', $base_url . 'tiki-sitemap.php?file=' . $sitemap->getSitemapFilename());
