@@ -5,9 +5,9 @@
     {if $offset}<input type="hidden" name="offset" value="{$offset}">{/if}
     <div class="search_container mb-3 d-flex flex-row flex-wrap align-items-center gap-2">
         {if ($tracker_info.showStatus|default:null eq 'y' or ($tracker_info.showStatusAdminOnly eq 'y' and $tiki_p_admin_trackers eq 'y')) and $showstatus|default:null ne 'n'}
-            <div class="d-flex align-items-center gap-2">
-                <span class="text-muted">{tr}Filter by:{/tr}</span>
-                <div class="btn-group" role="group" aria-label="{tr}Filter by status{/tr}">
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <span class="text-muted text-nowrap">{tr}Filter by:{/tr}</span>
+                <div class="btn-group flex-wrap" role="group" aria-label="{tr}Filter by status{/tr}">
                     {* Status Toggles: Bootstrap semantic checkboxes *}
                     {foreach key=st item=stdata from=$status_types}
                         <input type="checkbox" class="btn-check js-status-checkbox" id="status-btn-{$stdata.statuslink}"
@@ -18,10 +18,10 @@
                         </label>
                     {/foreach}
 
-                    {if $status}
+                    {if isset($smarty.get.status) and $smarty.get.status neq ''}
                         {* "Reset" button: Restores the default status filter (clears manual selections) *}
-                        <button id="js-status-all" type="button" class="btn btn-outline-secondary d-flex align-items-center gap-1"
-                            title="{tr}Reset to default status filter{/tr}">
+                        <button id="js-status-all" type="button" class="btn btn-outline-secondary d-flex align-items-center gap-1 tips"
+                            title=":{tr}Reset to default status filter{/tr}">
                             {icon name="undo"} <span>{tr}Reset{/tr}</span>
                         </button>
                     {/if}
@@ -181,43 +181,43 @@
         {jq}
         // "Reset" button: clears manual status filter, lets backend use defaultStatus
         $(document).on('click', '#js-status-all', function() {
-        var $form = $(this).closest('form');
-        // Remove any explicit status parameter so backend defaults apply
-        $form.find('input[name="status"]').remove();
-        $form.submit();
+            let $form = $(this).closest('form');
+            // Remove any explicit status parameter so backend defaults apply
+            $form.find('input[name="status"]').remove();
+            $form.submit();
         });
 
         // Handle individual status checkbox changes
         $(document).on('change', '.js-status-checkbox', function() {
-        var form = this.form;
-        var $form = $(form);
-        var allCheckboxes = $form.find('.js-status-checkbox');
-        var checkboxes = allCheckboxes.filter(':checked');
+            let form = this.form;
+            let $form = $(form);
+            let allCheckboxes = $form.find('.js-status-checkbox');
+            let checkboxes = allCheckboxes.filter(':checked');
 
-        // Mandatory Rule: if user unchecks the last checkbox, reset to default filter
-        if (checkboxes.length === 0) {
-        // Reset to default: remove explicit status, let backend decide
-        $form.find('input[name="status"]').remove();
-        $form.submit();
-        return;
-        }
+            // Mandatory Rule: if user unchecks the last checkbox, reset to default filter
+            if (checkboxes.length === 0) {
+                // Reset to default: remove explicit status, let backend decide
+                $form.find('input[name="status"]').remove();
+                $form.submit();
+                return;
+            }
 
-        var values = [];
-        checkboxes.each(function() {
-        values.push(this.value);
-        });
+            let values = [];
+            checkboxes.each(function() {
+                values.push(this.value);
+            });
 
-        var outputVal = values.join('');
+            let outputVal = values.join('');
 
-        // Synchronize status hidden input
-        $form.find('input[name="status"]').remove();
-        $('<input>').attr({
-        type: 'hidden',
-        name: 'status',
-        value: outputVal
-        }).appendTo($form);
+            // Synchronize status hidden input
+            $form.find('input[name="status"]').remove();
+            $('<input>').attr({
+                type: 'hidden',
+                name: 'status',
+                value: outputVal
+            }).appendTo($form);
 
-        $form.submit();
+            $form.submit();
         });
         {/jq}
     </form>
