@@ -31,7 +31,7 @@
  *
  * Exit codes (CI mode with --ci flag):
  *   0 - No stability issues detected OR all existing issues are [MITIGATED]
- *   1 - Current branch introduces new issues OR baseline has unmitigated issues [WARNING] (fail)
+ *   1 - Current branch introduces new issues OR accepted state has unmitigated issues [WARNING] (fail)
  */
 
 require_once __DIR__ . '/../../path_constants.php';
@@ -212,14 +212,48 @@ function getIgnoreReason($package, $version, $ignoreMap)
     }
 
     $ignoreData = $ignoreMap[$version][$package];
-    $reason = isset($ignoreData['reason']) ? $ignoreData['reason'] : 'No reason provided';
-    $mitigation = isset($ignoreData['mitigation']) ? $ignoreData['mitigation'] : 'No mitigation details';
+    $reason = $ignoreData['reason'] ?? null;
+    $mitigation = $ignoreData['mitigation'] ?? null;
+    $alternative = $ignoreData['alternative'] ?? ($ignoreData['alternatives'] ?? null);
+    $reviewed = $ignoreData['reviewed'] ?? null;
 
     return [
         'reason' => $reason,
         'mitigation' => $mitigation,
-        'reviewed' => isset($ignoreData['reviewed']) ? $ignoreData['reviewed'] : 'Unknown'
+        'alternative' => $alternative,
+        'reviewed' => $reviewed
     ];
+}
+
+/**
+ * Format mitigation metadata lines for a mitigated package on a specific branch.
+ */
+function formatMitigationDetails($package, $tikiVersion, $ignoreMap)
+{
+    if (! isPackageIgnored($package, $tikiVersion, $ignoreMap)) {
+        return [];
+    }
+
+    $ignoreInfo = getIgnoreReason($package, $tikiVersion, $ignoreMap);
+    if (! $ignoreInfo) {
+        return [];
+    }
+
+    $details = [];
+    $fields = [
+        'reason' => 'reason',
+        'mitigation' => 'mitigation',
+        'alternative' => 'alternative',
+        'reviewed' => 'reviewed'
+    ];
+
+    foreach ($fields as $key => $label) {
+        if (! empty($ignoreInfo[$key])) {
+            $details[] = "     ↳ {$label}: {$ignoreInfo[$key]}";
+        }
+    }
+
+    return $details;
 }
 
 /**
@@ -940,7 +974,7 @@ function printPackageHistory(string $package, array $history, string $icon = '�
             $versionMitigated = true;
         }
 
-        echo "   - Tiki {$tikiVersion}: {$constraint} ({$stabilityText})";
+        echo "   🟥 Tiki {$tikiVersion}: {$constraint} ({$stabilityText})";
 
         if ($versionMitigated) {
             echo " [MITIGATED]";
@@ -949,6 +983,12 @@ function printPackageHistory(string $package, array $history, string $icon = '�
         }
 
         echo "\n";
+
+        if ($versionMitigated) {
+            foreach (formatMitigationDetails($package, $tikiVersion, $ignoreMap) as $detailLine) {
+                echo "{$detailLine}\n";
+            }
+        }
     }
 }
 
@@ -1275,7 +1315,7 @@ function printStableRegressionVersions($data, $package, $hasUnmitigatedDowngrade
             }
         }
 
-        echo "   - Tiki {$tikiVersion}: {$constraint} ({$stabilityText})";
+        echo "   🟥 Tiki {$tikiVersion}: {$constraint} ({$stabilityText})";
 
         if ($versionMitigated) {
             echo " [MITIGATED]";
@@ -1284,6 +1324,12 @@ function printStableRegressionVersions($data, $package, $hasUnmitigatedDowngrade
         }
 
         echo "\n";
+
+        if ($versionMitigated) {
+            foreach (formatMitigationDetails($package, $tikiVersion, $ignoreMap) as $detailLine) {
+                echo "{$detailLine}\n";
+            }
+        }
     }
 }
 
@@ -1374,17 +1420,17 @@ function renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory
 
     if (! empty($baselineAnalysis['existingIssues'])) {
         if ($hasWarnings) {
-            echo "\n## ⚠️ Stability Issues Detected in Baseline\n\n";
-            echo "**Reason**: Baseline contains packages with [WARNING] tags (not mitigated).\n\n";
+            echo "\n## ⚠️ Stability Issues Detected in Accepted State\n\n";
+            echo "**Reason**: Accepted state contains packages with [WARNING] tags (not mitigated).\n\n";
         } else {
             echo "\n## ⚠️ Stability Issues Detected (All Mitigated)\n\n";
-            echo "**Status**: All baseline issues are documented and mitigated.\n\n";
+            echo "**Status**: All accepted existing issues are documented and mitigated.\n\n";
         }
 
         [$stabilityIssues, $versionDowngrades] = splitExistingIssuesByType($baselineAnalysis['existingIssues']);
 
         if (! empty($stabilityIssues)) {
-            echo "### Stability Issues (Existing):\n";
+            echo "### Accepted Existing Stability Issues:\n";
             foreach ($stabilityIssues as $issue) {
                 echo "- **{$issue['package']}**: ";
                 $issueTypes = [];
@@ -1415,9 +1461,17 @@ function renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory
         }
 
         if (! empty($versionDowngrades)) {
-            echo "\n### Version Downgrades (Existing):\n";
+            echo "\n";
+            echo "\n### ❌ New Regressions Against Accepted State:\n";
             foreach ($versionDowngrades as $issue) {
                 echo "- **{$issue['package']}**: Version downgrade detected";
+
+                if (
+                    isset($issue['from_tiki'], $issue['to_tiki'], $issue['from_version'], $issue['to_version'])
+                ) {
+                    echo " in `{$issue['to_tiki']}` ";
+                    echo "(from `{$issue['from_version']}` in `{$issue['from_tiki']}` to `{$issue['to_version']}` in `{$issue['to_tiki']}`)";
+                }
 
                 $package = $issue['package'];
                 $hasWarningsForPackage = false;
@@ -1441,15 +1495,15 @@ function renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory
         }
 
         if ($hasWarnings) {
-            echo "\n**Pipeline Failed**: Baseline contains unmitigated stability warnings.\n";
+            echo "\n**Pipeline Failed**: Accepted state contains unmitigated stability warnings.\n";
             echo "**Action Suggested**:\n";
-            echo "1. Fix unstable package versions in baseline where possible, OR\n";
+            echo "1. Fix unstable package versions in accepted state where possible, OR\n";
             echo "2. Add them to the `stability-ignore` list in `vendor_bundled/composer.json` with:\n";
             echo "   - `reason`: Why this unstable version is acceptable\n";
             echo "   - `mitigation`: How you're handling the risk\n";
             echo "   - `reviewed`: Date of review\n";
         } else {
-            echo "\n**Pipeline Warning**: All baseline issues are properly mitigated.\n";
+            echo "\n**Pipeline Warning**: All accepted existing issues are properly mitigated.\n";
             echo "**Note**: These mitigated issues are documented and tracked for future cleanup.\n";
         }
 
@@ -1574,7 +1628,7 @@ function analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck, 
         echo "Issues Introduced by Current Branch: " . count($currentBranchIssues) . "\n";
         echo "Touched packages: " . count($touchedPackages) . "\n";
         echo "Issues on touched packages: " . count($filteredIssues) . "\n";
-        echo "Existing Issues in Baseline: " . count($existingIssues) . "\n";
+        echo "Accepted Existing Issues: " . count($existingIssues) . "\n";
     }
 
     return [
