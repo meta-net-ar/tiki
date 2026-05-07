@@ -383,7 +383,7 @@ if ($tiki_p_admin_forum == 'y') {
 if ($prefs['feature_freetags'] == 'y') {
     $cat_type = 'forum post';
     $cat_objid = $comments_parentId;
-    $objectTags = $freetaglib->get_tags_on_object($cat_objid, $cat_type);
+    $objectTags = TikiLib::lib('freetag')->get_tags_on_object($cat_objid, $cat_type);
     $tags = [];
     if ($objectTags) {
         $tags = $objectTags['data'];
