@@ -38,6 +38,7 @@
 
         {/if}
 
+        {preference name=geo_azuremaps_key visible="always"}
         {preference name=gdaltindex}
         {preference name=ogr2ogr}
 

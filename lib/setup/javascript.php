@@ -235,6 +235,7 @@ if (! timezone) {
     $jqueryTiki['autoToc_offset'] = $prefs['wiki_toc_offset'];
     $jqueryTiki['autoToc_tabs'] = $prefs['wiki_toc_tabs'];
     $jqueryTiki['bingMapsAPIKey'] = $prefs['geo_bingmaps_key'];
+    $jqueryTiki['azureMapsAPIKey'] = $prefs['geo_azuremaps_key'] ?? '';
     $jqueryTiki['nextzenAPIKey'] = $prefs['geo_nextzen_key'];
     $jqueryTiki['numericFieldScroll'] = $prefs['unified_numeric_field_scroll'];
     $jqueryTiki['themeIconset'] = $prefs['theme_iconset'];

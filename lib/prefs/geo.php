@@ -42,7 +42,7 @@ function prefs_geo_list()
         ],
         'geo_tilesets' => [
             'name' => tra('Available tile layers on maps'),
-            'description' => tra('Enables replacement of the default OpenStreetMap tiles with tiles from other mapping services, such as Google or Bing.'),
+            'description' => tra('Enables replacement of the default OpenStreetMap tiles with tiles from other mapping services. Bing Maps layers require a Bing Maps API key with access to the Bing Maps REST Imagery Metadata service.'),
             'dependencies' => ['geo_enabled'],
             'hint' => tr(
                 'Valid options for OpenLayers 2 are: %0 and for OpenLayers 3+ are: %1',
@@ -64,11 +64,14 @@ function prefs_geo_list()
                     ', ',
                     [
                         'openstreetmap',
+                        'azure_road',
+                        'azure_dark',
+                        'azure_aerial',
+                        'azure_hybrid',
                         'bing_road',
                         'bing_road_on_demand',
                         'bing_aerial',
                         'bing_aerial_with_labels',
-                        'bing_collins_bart',
                         'bing_ordnance_survey',
                     ]
                 )
@@ -117,9 +120,17 @@ function prefs_geo_list()
         ],
         'geo_bingmaps_key' => [
             'name' => tra('Bing Maps API Key'),
-            'description' => tra('Needed for Bing Map Layers'),
+            'description' => tra('Needed for Bing Maps layers. Microsoft has retired free Basic keys; use an enterprise key with access to the Bing Maps REST Imagery Metadata service, or use OpenStreetMap.'),
             'type' => 'text',
             'help' => 'https://www.bingmapsportal.com/',
+            'filter' => 'striptags',
+            'default' => '',
+        ],
+        'geo_azuremaps_key' => [
+            'name' => tra('Azure Maps API Key'),
+            'description' => tra('Needed for Azure Maps layers. Azure Maps is the Microsoft replacement path for Bing Maps and requires an Azure Maps account key.'),
+            'type' => 'text',
+            'help' => 'https://learn.microsoft.com/azure/azure-maps/quick-demo-map-app',
             'filter' => 'striptags',
             'default' => '',
         ],
