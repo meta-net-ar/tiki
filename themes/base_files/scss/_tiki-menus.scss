@@ -15,25 +15,65 @@
 }
 
 // Align the various width icons and the menu option text labels nicely
-.navbar-nav .nav-item > .nav-link .icon {
+.navbar-nav .nav-item>.nav-link .icon {
     min-width: var(--bs-gutter-x);
     text-align: center;
 }
 
 .navbar-nav.sm-vertical:not(.sm-collapsible) a:not(.dropdown-item) .sub-arrow {
     transform: rotate(-90deg);
-    /* position: absolute;
-    top: 55%;
-    margin-top: -5px;
-    bottom: auto;
-    left: auto;
-    margin-left: 0;
-    right: 10px; */
 }
 
-// Make Smartmenus dropdowns open on top of, not under, other navbars
+// Submenu Arrow Directions
+:root {
+    --tiki-menu-arrow-rotate: -90deg;
+}
+html[dir="rtl"] {
+    --tiki-menu-arrow-rotate: 90deg;
+}
+
+// Direction-neutral rule for vertical and nested flyout arrows
+.tiki .sm-navbar.sm-navbar--vertical .navbar-collapse .navbar-nav > .nav-item > .sm-sub-toggler > small *,
+.tiki .sm-sub-item > .sm-sub-toggler > small * {
+    display: inline-block !important;
+    transform: rotate(var(--tiki-menu-arrow-rotate)) !important;
+}
+
+// Reset horizontal top-level arrows to DOWN
+.tiki .sm-navbar:not(.sm-navbar--vertical) .navbar-nav > .nav-item > .sm-sub-toggler > small * {
+    transform: none !important;
+}
+
+// Prevent iOS native long-press menu on togglers
+.tiki .sm-navbar--vertical .sm-sub-toggler {
+    -webkit-touch-callout: none;
+}
+
+// Stacking Layer Isolation:
+// Ensures dropdowns (9999) appear over fixed headers while keeping 
+// the navbar container at its natural stacking level to respect sidebars.
 .tiki .sm-navbar {
     --sm-navbar-z-index: inherit !important;
+
+    .sm-sub {
+        z-index: 9999;
+    }
+}
+
+// Help long menus stay inside the screen height
+$sm-sub-top-offset: 70px; // Estimated header height
+$sm-sub-bottom-buffer: 50px; // Safety margin for viewport edges
+$sm-sub-max-height: calc(100vh - ($sm-sub-top-offset + $sm-sub-bottom-buffer));
+
+// Stop menus with submenus from clipping their children
+.tiki .sm-navbar:not(.sm-collapsible) .sm-sub:has(.sm-sub) {
+    max-height: none !important;
+    overflow-y: visible !important;
+}
+
+.tiki .sm-navbar:not(.sm-collapsible) .sm-sub:not(:has(.sm-sub)) {
+    max-height: $sm-sub-max-height;
+    overflow-y: auto;
 }
 
 /* Smartmenus navbars (Megamenu static) */
@@ -161,27 +201,50 @@
 }
 
 /* --- Force all dropdowns to open upwards ---*/
-.dropdown-menu-bottom {
+/* Note: :not(.sm-sub) prevents breaking SmartMenus v2 native collision detection */
+.dropdown-menu-bottom:not(.sm-sub) {
     top: auto !important;
     bottom: 100% !important;
     margin-bottom: .5rem;
     margin-top: 0 !important;
-    overflow-y: auto;
-    overflow-x: hidden;
 }
 
-.dropdown-menu-top-t,
-.dropdown-menu-end-l,
-.dropdown-menu-start-r {
+// Support for dropup menus (.sm-navbar--drop-reverse-y or inside bottom modules)
+.tiki .sm-navbar--drop-reverse-y,
+.tiki [id^="mod-menubottom"] .sm-navbar {
+    
+    // 1. ONLY first-level dropdowns open UPWARDS
+    .navbar-nav > .nav-item > .sm-sub {
+        top: auto !important;
+        bottom: 100% !important;
+        margin-bottom: 2px !important;
+    }
+
+    // 2. Nested flyouts open to the SIDE, aligning their bottoms with the parent item
+    .sm-sub .sm-sub {
+        top: auto !important;
+        bottom: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+// Prevent clipping for dropups
+.tiki .sm-navbar:has(.sm-navbar--drop-reverse-y),
+.tiki .sm-navbar:has(.sm-navbar--drop-reverse-y) .sm-collapse,
+.tiki [id^="mod-menubottom"] .sm-navbar,
+.tiki [id^="mod-menubottom"] .sm-navbar .sm-collapse {
+    overflow: visible !important;
+}
+
+.dropdown-menu-top-t:not(.sm-sub),
+.dropdown-menu-end-l:not(.sm-sub),
+.dropdown-menu-start-r:not(.sm-sub) {
     top: 100%;
     bottom: auto;
-    max-height: 90vh;
-    overflow-y: auto;
-    overflow-x: hidden;
-    z-index: 2000 !important;
+    z-index: 2000;
 }
 
-.dropdown-menu-bottom-b {
+.dropdown-menu-bottom-b:not(.sm-sub) {
     max-height: 90vh;
     z-index: 3000;
 }
