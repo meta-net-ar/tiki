@@ -2276,7 +2276,6 @@ function wikiplugin_trackerlist($data, $params)
                 $smarty->assign('calendar_popup', $calendarpopup);
                 $smarty->assign('showpopup', 'n');
                 $headerlib = TikiLib::lib('header');
-                $headerlib->add_cssfile('themes/base_files/feature_css/calendar.css', 20);
                 $smarty->assign('uniqueId', rand());
                 return $smarty->fetch('modules/mod-calendar_new.tpl');
             }

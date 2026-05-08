@@ -162,7 +162,6 @@ function wikiplugin_calendar($data, $params)
     $smarty->assign('uniqueId', rand());
     if ($calendarInitialParams['canEditAnything']) {
         TikiLib::lib('header')
-            ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
             ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
     }
 

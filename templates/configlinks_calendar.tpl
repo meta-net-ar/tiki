@@ -1,4 +1,4 @@
-<div id="configlinks" class="mb-3 text-end">
+<div class="mb-3 d-flex flex-wrap">
     {if count($checkedCalIds)}
         {$maxCalsForButton = 20}
         {if count($checkedCalIds) > $maxCalsForButton}<select size="5">{/if}
