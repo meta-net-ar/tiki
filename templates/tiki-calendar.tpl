@@ -91,9 +91,9 @@
             {if count($calendars) >= 1}
                 {include file="checkboxes_calendar_form.tpl" filterCal="filterMainCal" class="mt-2" style="display: block;"}
                 {include file="export_calendar_in_csv_or_ical.tpl" exportCal="exportMainCal" style="display: block;"}
-                <h5 class="text-center text-secondary border-top border-bottom">
+                <h6 class="text-center text-secondary border-top border-bottom py-1">
                 {tr}Displayed calendar{/tr}
-                </h5>
+                </h6>
                 {include file="configlinks_calendar.tpl" filterCal="filterMainCal" isInMainCalendar="y" style="display: block;"}
             {/if}
         </div>
