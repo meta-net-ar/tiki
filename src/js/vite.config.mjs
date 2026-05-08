@@ -107,6 +107,13 @@ export default defineConfig(({ command, mode }) => {
         { prefix: "@tiki/tracker-fields/", src: "src/js/@tiki/tracker-fields" },
     ]);
 
+    addThemeAndCustomEntries(rollupInput, [
+        "themes/*/js/custom.module.js",
+        "themes/*/options/*/js/custom.module.js",
+        "_custom/shared/js/custom.module.js",
+        "_custom/sites/*/js/custom.module.js",
+    ]);
+
     Object.assign(rollupInput, {
         //Watch out, __dirname is the path of the config file, no matter how vite is called...
         "avatar-generator": resolve(__dirname, "avatar-generator/index.js"),
@@ -257,6 +264,9 @@ export default defineConfig(({ command, mode }) => {
                         // Check if the chunk is from the tiki-iot workspace
                         if (chunkInfo.name.startsWith("tiki-iot")) {
                             return "tiki-iot/[name].js";
+                        }
+                        if (chunkInfo.name.startsWith("themes/") || chunkInfo.name.startsWith("_custom/")) {
+                            return "[name]-[hash].js";
                         }
                         return "[name].js";
                     },
@@ -777,6 +787,36 @@ function addGlobEntries(rollupInput, entries) {
                     const relativePath = path.relative(src, file.slice(0, file.length - path.extname(file).length));
                     const fullPath = resolve(__dirname, path.relative(__dirname, file));
                     return [`${prefix}${relativePath}`, fullPath];
+                })
+            )
+        );
+    });
+}
+
+/**
+ * Adds theme and _custom `custom.module.js` entrypoints to rollupInput.
+ *
+ * These are per-site / per-theme customization modules that live OUTSIDE of `src/js/`.
+ * Basic processing for these involve:
+ *   - output filenames are hashed (`[name]-[hash].js`) so PHP can cache-bust via the Vite manifest (see lib/core/Tiki/Build/ViteManifest.php).
+ *   - rollup input keys preserve the full source path (e.g. `themes/xyz/js/custom.module`) so the Vite manifest lookup from PHP
+ *     works with the original on-disk path. See path_js_importmap_generator.php for how they are injected into the runtime importmap.
+ *
+ * @param {object} rollupInput - The rollupInput object to update.
+ * @param {Array<string>} entries
+ */
+function addThemeAndCustomEntries(rollupInput, entries) {
+    entries.forEach((pattern) => {
+        Object.assign(
+            rollupInput,
+            Object.fromEntries(
+                globSync(pattern, {
+                    ignore: ["**/node_modules/**", "**/*.test.js"]
+                }).map(file => {
+                    // Use the full source-relative path as the rollup key so it matches what ends up in the Vite manifest
+                    const key = file.slice(0, file.length - path.extname(file).length);
+                    const fullPath = resolve(__dirname, path.relative(__dirname, file));
+                    return [key, fullPath];
                 })
             )
         );

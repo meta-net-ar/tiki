@@ -73,15 +73,12 @@ if ($custom_js) {
 // Before Tiki 27, we used to also look in /themes/js for a custom.js file
 
 $custom_js_files = [];
-$custom_js_modules = [];
 
 // Is there a js/custom.js in the current base theme (no options)?
 $custom_js_files[] = ThemeLib::getThemePath(null, '', 'js/custom.js');
-$custom_js_modules[] = ThemeLib::getThemePath(null, '', 'js/custom.module.js');
 
 // Is there a js/custom.js in the current theme options?
 $custom_js_files[] = ThemeLib::getThemePath(null, null, 'js/custom.js');
-$custom_js_modules[] = ThemeLib::getThemePath(null, null, 'js/custom.module.js');
 
 //Is there a _custom/shared/js/custom.js
 $custom_js_files[] = \Tiki\Paths\Customization::getSharedPublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_PATH_FRAGMENT);
@@ -91,17 +88,7 @@ $custom_js_files[] = \Tiki\Paths\Customization::getCurrentSitePublicPath(TIKI_CU
 
 foreach ($custom_js_files as $custom_js_file) {
     if (! empty($custom_js_file)) {
-        $headerlib->add_jsfile($custom_js_file);
-    }
-}
-
-foreach ($custom_js_modules as $custom_js_module) {
-    if (! empty($custom_js_module)) {
-        $headerlib->add_js_module(
-            "
-import \"./$custom_js_module\";
-"
-        );
+        $headerlib->add_jsfile($custom_js_file . '?v=' . filemtime($custom_js_file));
     }
 }
 
@@ -367,7 +354,7 @@ $(document).on("tiki.modal.redraw", function(event) {
     if (!$modalContent.is(".modal-content")) {
         $modalContent = $modalContent.find(".modal-content")
     }
-    
+
     // Guard: Prevent duplicate listeners on the same modal
     const el = $modalContent[0];
     if (el.dataset.resizeInit === '1') return;

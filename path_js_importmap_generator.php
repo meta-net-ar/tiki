@@ -9,6 +9,47 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Build\ViteManifest;
+use Tiki\Lib\Theme\ThemeLib;
+use Tiki\Paths\Customization;
+
+/**
+ * Discover per-theme / per-site `custom.module.js` entrypoints and turn them into importmap entries.
+ *
+ * For every discovered source file we try to resolve it through the Vite manifest first
+ * (which gives us the hashed/cache-busted build output written by vite.config.mjs').
+ * If the file hasn't been built by Vite we fall back to importing the raw source path with a
+ * `?v=<mtime>` query string
+ *
+ * @param string|null $tikiUrl Absolute or root-relative URL prefix to prepend.
+ * @return array<string,string>
+ */
+function getCustomModuleImportmapEntries(?string $tikiUrl): array
+{
+    $tikiUrl = $tikiUrl ?? '';
+    $sources = [
+        '@tiki-custom/theme' => ThemeLib::getThemePath(null, '', 'js/custom.module.js'),
+        '@tiki-custom/theme-option' => ThemeLib::getThemePath(null, null, 'js/custom.module.js'),
+        '@tiki-custom/shared' => Customization::getSharedPublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_MODULE_PATH_FRAGMENT),
+        '@tiki-custom/site' => Customization::getCurrentSitePublicPath(TIKI_CUSTOMIZATIONS_JAVASCRIPT_MODULE_PATH_FRAGMENT),
+    ];
+
+    $imports = [];
+    foreach ($sources as $key => $path) {
+        if (empty($path)) {
+            continue;
+        }
+        $versioned = ViteManifest::resolve($path);
+        if ($versioned) {
+            $imports[$key] = $tikiUrl . $versioned;
+        } else {
+            $imports[$key] = $tikiUrl . $path . '?v=' . filemtime($path);
+        }
+    }
+
+    return $imports;
+}
+
 /**
  * @param bool $useBaseUrl by default (false) the urls generated only have the URI part, when using baseUrl will also include proto and host (full URL)
  *
@@ -191,15 +232,25 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@wysiwyg/plugin" => $tikiUrl . JS_ASSETS_PATH . "/wysiwyg/plugin.js",
             ]
         ];
+
+    $bootstrapImports = "import \"@vue-mf/root-config\";";
+
+    $customModules = getCustomModuleImportmapEntries($tikiUrl);
+    foreach ($customModules as $key => $url) {
+        $importmap->imports[$key] = $url;
+        $bootstrapImports .= "\nimport " . json_encode($key, JSON_UNESCAPED_SLASHES) . ";";
+    }
+
     $importmapJson = json_encode($importmap, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
     $esModuleShimsSrc = $tikiUrl . NODE_PUBLIC_DIST_PATH . "/es-module-shims/dist/es-module-shims.js";
+
     $html = <<<HTML
     <script async src="$esModuleShimsSrc"></script>
     <script type="importmap">
         $importmapJson
     </script>
     <script type="module">
-        import "@vue-mf/root-config";
+        $bootstrapImports
     </script>
     HTML;
     return $html;
