@@ -1,7 +1,5 @@
 <?php
 
-use SebastianBergmann\CodeCoverage\Report\PHP;
-
 header('content-type: text/plain');
 
 require_once 'tiki-setup.php';
