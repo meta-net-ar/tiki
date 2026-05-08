@@ -957,25 +957,56 @@ if (str_contains($temp, 'vi_tpl=') || str_contains($temp, 'ei_tpl=')) {
 unset($temp);
 $smarty->assign('referer', $referer);
 
-// Display the template
-$smarty->assign('mid', 'tiki-view_tracker_item.tpl');
+$isPrintLikeRequest = isset($_REQUEST['print']) || isset($_REQUEST['pdf']);
+
+if ($isPrintLikeRequest) {
+    $smarty->assign('print_comments_html', '');
+
+    if (($tracker_info['useComments'] ?? 'n') === 'y'
+        && ($tiki_p_tracker_view_comments != 'n' || $tiki_p_comment_tracker_items != 'n' || $itemObject->canViewComments())) {
+        $broker = TikiLib::lib('service')->getBroker();
+        try {
+            $smarty->assign(
+                'print_comments_html',
+                $broker->internalRender(
+                    'comment',
+                    'list',
+                    new JitFilter([
+                        'controller' => 'comment',
+                        'action' => 'list',
+                        'type' => 'trackeritem',
+                        'objectId' => $itemId,
+                        'hidepost' => 1,
+                        'maxRecords' => 9999,
+                    ])
+                )
+            );
+        } catch (Services_Exception $e) {
+            trigger_error(
+                sprintf(
+                    'Tracker print comments render failed for itemId=%d trackerId=%d: %s',
+                    (int) $itemId,
+                    (int) $trackerId,
+                    $e->getMessage()
+                ),
+                E_USER_WARNING
+            );
+        }
+    }
+
+    // Pre-render a static tracker-item body for print/PDF instead of relying on the interactive page layout.
+    $smarty->assign('mid_data', $smarty->fetch('tracker/print_item.tpl'));
+} else {
+    $smarty->assign('mid', 'tiki-view_tracker_item.tpl');
+}
 
 try {
     if (isset($_REQUEST['print'])) {
         $smarty->assign('print_page', 'y');
-        $smarty->display('tiki-print.tpl');
+        $smarty->display('tiki-print_tracker_item.tpl');
     } elseif (isset($_REQUEST['pdf'])) {
         $smarty->assign('print_page', 'y');
-        //skip_footer controls the inclusion of the footer in templates\tiki-print.tpl, so that it is not included more than once when an item is converted to PDF.
-        $smarty->assign('skip_footer', 'y');
-        $trackerData = $smarty->fetch('tiki-print.tpl');
-        //getting comments associated with tracker item
-        $broker = TikiLib::lib('service')->getBroker();
-        try {
-            $comments = $broker->internalRender("comment", "list", $jitRequest = new JitFilter(["controller" => "comment","action" => "list","type" => "trackeritem","objectId" => $itemId]));
-        } catch (Services_Exception $e) {
-            $comments = $e->getMessage();
-        }
+        $trackerData = $smarty->fetch('tiki-print_tracker_item.tpl');
 
         require_once 'lib/pdflib.php';
         $generator = new PdfGenerator();
@@ -983,12 +1014,17 @@ try {
             Feedback::error($generator->error);
             $access->redirect($page);
         } else {
-            if ($comments) {
-                $data = str_ireplace("</dl>", "</dl><h3>Comments</h3>" . $comments . "<br />", $trackerData);
-            } else {
-                $data = $trackerData;
-            }
-            $pdf = $generator->getPdf('tiki-print.php', ['page' => $tracker_info['name']], $data);
+            // Point PDF generation to the tracker item print route instead of the wiki print endpoint.
+            $pdf = $generator->getPdf(
+                'tiki-view_tracker_item.php',
+                [
+                    'itemId' => $itemId,
+                    'trackerId' => $trackerId,
+                    'print' => 'y',
+                    'page' => $tracker_info['name'],
+                ],
+                $trackerData
+            );
             $length = strlen($pdf);
             header('Cache-Control: private, must-revalidate');
             header('Pragma: private');
