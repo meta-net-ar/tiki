@@ -111,8 +111,6 @@ class WildcardTest extends \PHPUnit\Framework\TestCase
     public function testWildcardToRe2EscapesMetacharacters()
     {
         $convert = new ReflectionMethod(QueryBuilder::class, 'wildcardToRe2');
-        $convert->setAccessible(true);
-
         $builder = new QueryBuilder($this->index);
 
         $cases = [
@@ -139,7 +137,6 @@ class WildcardTest extends \PHPUnit\Framework\TestCase
     public function testQuoteRegexBuildsExpectedPattern()
     {
         $quote = new ReflectionMethod(QueryBuilder::class, 'quoteRegex');
-        $quote->setAccessible(true);
 
         $builder = new QueryBuilder($this->index);
 

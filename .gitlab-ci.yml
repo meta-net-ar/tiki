@@ -667,6 +667,10 @@ tiki-package:
     - echo "=> Optimize language files ..."
     - find lang/ -name language.php -exec php doc/devtools/stripcomments.php {} \;
     # set Permissions
+    - echo "=> Fix permissions ..."
+    - find . -type f -exec chmod 0664 {} \;
+    - chmod 0775 setup.sh
+    - find . -type d -exec chmod 0755 {} \;
     - echo "=> Generate changelog ..."
     - 'TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"'
     - git fetch origin "$TARGET_BRANCH" --tags --depth=1000

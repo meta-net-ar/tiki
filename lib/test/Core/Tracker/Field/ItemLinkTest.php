@@ -7,6 +7,7 @@
 
 namespace TikiTests;
 
+use TikiTestCase;
 use Tracker_Definition,
 
 TikiLib, Tracker_Item;
@@ -14,22 +15,21 @@ TikiLib, Tracker_Item;
 /**
  * This is a smoke test for the ItemLink fields.  At least it shows how badly we need a better internal API... - benoitg - 2024-07-04
  */
-class TrackerItemLinkTest extends \PHPUnit\Framework\TestCase
+class TrackerItemLinkTest extends TikiTestCase
 {
     protected static $trklib;
     protected static $objectlib;
     protected static $unifiedlib;
     protected static $trackerId;
     protected static $linkedTrackerId;
-    protected static $old_pref;
+    protected static $old_prefs;
     protected static $old_user;
 
     public static function setUpBeforeClass(): void
     {
         global $prefs;
-        self::$old_pref = $prefs['feature_trackers'];
+        self::$old_prefs = $prefs;
         $prefs['feature_trackers'] = 'y';
-
         parent::setUpBeforeClass();
         self::$trklib = TikiLib::lib('trk');
         self::$objectlib = TikiLib::lib('object');
@@ -125,7 +125,7 @@ class TrackerItemLinkTest extends \PHPUnit\Framework\TestCase
     public static function tearDownAfterClass(): void
     {
         global $prefs, $tikilib;
-        $prefs['feature_trackers'] = self::$old_pref;
+        $prefs['feature_trackers'] = self::$old_prefs['feature_trackers'];
 
         parent::tearDownAfterClass();
         self::$trklib->remove_tracker(self::$trackerId);
@@ -176,12 +176,16 @@ class TrackerItemLinkTest extends \PHPUnit\Framework\TestCase
         $fields = $definition->getFields();
         $fields[0]['value'] = 'Test item';
         $fields[1]['value'] = 'nonexistent_id';
-
-        $itemId = self::$trklib->replace_item(self::$trackerId, 0, ['data' => $fields], 'o');
-        $item = Tracker_Item::fromId($itemId);
-        $itemLinkField = $item->getFieldFromPermName('test_link');
-        //We know there is a error raised, we supress it
-        $output = @$itemLinkField->renderOutput();
-        $this->assertStringContainsString('nonexistent_id', $output, "Error message must display the invalid or deleted id");
+        $this->assertTriggeredError(
+            "Data integrity error:",
+            function () use ($fields) {
+                $itemId = self::$trklib->replace_item(self::$trackerId, 0, ['data' => $fields], 'o');
+                $item = Tracker_Item::fromId($itemId);
+                $itemLinkField = $item->getFieldFromPermName('test_link');
+                //We know there is a error raised, we suppress it
+                $output = @$itemLinkField->renderOutput();
+                $this->assertStringContainsString('nonexistent_id', $output, "Error message must display the invalid or deleted id");
+            }
+        );
     }
 }
