@@ -12,7 +12,7 @@
 # Option 4: Add the content of this file to your httpd.conf.
 # The last two options should be repeated when the reference _htaccess file changes (when upgrading Tiki).
 #
-# DEVELOPERS: 
+# DEVELOPERS:
 # This is the sample configuration file for Apache. Must be linked to .htaccess to be active.
 # This configuration must be kept synchronized with the configuration for other Web servers .
 # If you change any rule in this file, also review and update ./web_config for IIS (Windows server).
@@ -71,9 +71,8 @@ RedirectMatch 403 /(?:\.git|node_modules)/.*$
 #</IfModule>
 
 # -- Client Cache Method -- #
-# Google wants either Last-Modified or ETag. Using ETags will improve the YSlow scores.
-# Option 1: recommended
-FileETag none
+# ETag based on modification time and size
+FileETag MTime Size
 
 <IfModule mod_headers.c>
     # -- httpoxy mitigation -- #
@@ -96,17 +95,6 @@ FileETag none
     # Header always setifempty Content-Security-Policy "default-src 'self'; ..."
     # Uncomment only on full HTTPS; add includeSubDomains/preload only after subdomain audit:
     # Header always setifempty Strict-Transport-Security "max-age=63072000"
-
-    # Option 2:
-    #Header unset ETag
-
-    # -- Client Cache Expiration -- #
-    # Google suggests to use Expires in favour of Cache-Control.
-    # Option 1: (recommended)
-    Header unset Cache-Control
-
-    #Option 2:
-    #Header unset Expires
 
     # -- Persistent Connections -- #
     # Allow multiple requests to be sent over the same TCP connection. Enable if you serve a lot of static content
@@ -138,22 +126,18 @@ FileETag none
     # -- Enable video/audio seek -- #
     Header set Accept-Ranges bytes
 
-</IfModule>
-
-# -- Expires Headers -- #
-# If the site is in active development, you may want to comment out this section.
-<IfModule mod_expires.c>
-    <FilesMatch "(?i)\.(gif|png|jpe?g|svgz?|ico)$">
-        ExpiresActive on
-        ExpiresDefault "access plus 1 month"
-    </FilesMatch>
-    <FilesMatch "(?i)\.(js|css)$">
-        ExpiresActive on
-        ExpiresDefault "access plus 1 month"
-    </FilesMatch>
-    <FilesMatch "(?i)\.(woff|woff2)$">
-        ExpiresActive on
-        ExpiresDefault "access plus 1 month"
+    # -- Cache-Control Headers -- #
+    # Vite-built assets — cache 30 days
+    <If "%{REQUEST_URI} =~ m#/public/generated/#">
+        Header set Cache-Control "public, max-age=2592000, must-revalidate"
+    </If>
+    # Theme and customization JS/CSS — short cache, always revalidate
+    <If "%{REQUEST_URI} =~ m#/(themes|_custom/shared)/.*\.(js|mjs|css)$#i">
+        Header set Cache-Control "public, max-age=3600, must-revalidate"
+    </If>
+    # Images and fonts — moderate cache
+    <FilesMatch "(?i)\.(gif|png|jpe?g|svgz?|ico|woff2?|ttf|eot|otf)$">
+        Header set Cache-Control "public, max-age=86400, must-revalidate"
     </FilesMatch>
 </IfModule>
 
