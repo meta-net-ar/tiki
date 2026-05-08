@@ -12,31 +12,30 @@
 use Tiki\Lib\GraphEngine\GDGRenderer;
 use Tiki\Lib\GraphEngine\MultilineGraphic;
 use Tiki\Lib\GraphEngine\PDFLibGRenderer;
+use Tiki\Math\Formula\GraphFormulaException;
+use Tiki\Math\Formula\GraphFormulaHelper;
 
+$inputConfiguration = [
+    [
+        'staticKeyFilters' => [
+            'w'     => 'int',
+            'h'     => 'int',
+            's'     => 'int',
+            'min'   => 'float',
+            'max'   => 'float',
+            't'     => 'word',
+            'title' => 'text',
+            'p'     => 'word',
+            'o'     => 'word',
+        ],
+        'staticKeyFiltersForArrays' => [
+            'f' => 'text',
+        ],
+    ],
+];
 require_once('tiki-setup.php');
 
-/**
- * @param string $formula
- * @return callable
- */
-function convert_formula($formula)
-{
-    $parser = new Math_Formula_Parser();
-    try {
-        $element = $parser->parse(trim($formula));
-    } catch (Math_Formula_Parser_Exception $e) {
-        die('Invalid formula: ' . htmlspecialchars($e->getMessage()));
-    }
-
-    $runner = new Math_Formula_Runner(['Math_Formula_Function_' => null]);
-    $runner->setFormula($element);
-
-    return function ($x) use ($runner) {
-        $runner->setVariables(['x' => $x]);
-        return $runner->evaluate();
-    };
-}
-
+$access->check_feature('feature_sheet');
 $access->check_permission('feature_sheet');
 
 if (
@@ -51,7 +50,7 @@ if (
     && $_GET['w'] >= 100
     && $_GET['h'] >= 100 )
 ) {
-    die;
+    Feedback::errorAndDie(tra('Invalid graph parameters.'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 switch ($_GET['t']) {
@@ -62,24 +61,32 @@ switch ($_GET['t']) {
         $renderer = new PDFLibGRenderer($_GET['p'], $_GET['o']);
         break;
     default:
-        die;
+        Feedback::errorAndDie(tra('Invalid graph output type.'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
 $graph = new MultilineGraphic();
-$graph->setTitle($_GET['title']);
+$graph->setTitle($_GET['title'] ?? '');
 
 $size = ($_GET['max'] - $_GET['min']) / $_GET['s'];
 
 $data = [];
 foreach (array_values($_GET['f']) as $key => $formula) {
-    $formula = convert_formula($formula);
+    try {
+        $evaluator = GraphFormulaHelper::compile($formula);
+    } catch (GraphFormulaException $e) {
+        Feedback::errorAndDie($e->getUserMessage(), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 
     $data['x'] = [];
     $data['y' . $key] = [];
 
     for ($x = $_GET['min']; $_GET['max'] > $x; $x += $size) {
         $data['x'][] = $x;
-        $data['y' . $key][] = $formula($x);
+        try {
+            $data['y' . $key][] = $evaluator($x);
+        } catch (GraphFormulaException $e) {
+            Feedback::errorAndDie($e->getUserMessage(), \Laminas\Http\Response::STATUS_CODE_400);
+        }
     }
 }
 
