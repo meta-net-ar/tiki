@@ -10,8 +10,6 @@ abstract class Search_Query_Facet_Abstract implements Search_Query_Facet_Interfa
     protected $field;
     protected $renderCallback;
     protected $label;
-    protected $dependencies = [];
-    protected $dependencisNames = [];
 
     public function __construct($field)
     {
@@ -60,47 +58,6 @@ abstract class Search_Query_Facet_Abstract implements Search_Query_Facet_Interfa
         }
 
         return $value;
-    }
-
-    public function getData()
-    {
-        return null;
-    }
-
-    public function isBuiltFromIndex(): bool
-    {
-        return true;
-    }
-
-    public function getOperator()
-    {
-        return null;
-    }
-
-    /**
-     * @return Search_Query_Facet_Interface[]
-     */
-    public function getDependencies(): array
-    {
-        return $this->dependencies;
-    }
-
-    public function addDependencyName(string $facetName)
-    {
-        $this->dependencisNames[] = $facetName;
-        return $this;
-    }
-
-    public function addDependency(Search_Query_Facet_Interface $facet)
-    {
-        $this->dependencies[] = $facet;
-        return $this;
-    }
-
-
-    public function getDependencyNames(): array
-    {
-        return $this->dependencisNames;
     }
 
     abstract public function getType();

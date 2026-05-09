@@ -17,23 +17,17 @@ class FacetReader
 
     public function getFacetFilter(\Search_Query_Facet_Interface $facet)
     {
+        $entry = [];
 
-        foreach ($facet->getDependencies() as $dependency) {
-            $entry = $this->getFacetEntry($dependency->getName());
-            if (empty($entry)) {
-                return null;
+        foreach ($this->results as $result) {
+            if (empty($result)) {
+                continue;
             }
-            $entries = $this->getFromBucket($entry, $dependency);
-            if (empty($entries)) {
-                return null;
+            if (strtolower(array_key_first($result[0])) == strtolower($facet->getName())) {
+                $entry = $result;
+                break;
             }
         }
-
-        if (! $facet->isBuiltFromIndex()) {
-            return new \Search_ResultSet_FacetFilter($facet, $facet->getData());
-        }
-
-        $entry = $this->getFacetEntry($facet->getName());
 
         $entries = $this->getFromBucket($entry, $facet);
         if ($entries) {
@@ -41,20 +35,6 @@ class FacetReader
         } else {
             return null;
         }
-    }
-
-    private function getFacetEntry($name)
-    {
-        foreach ($this->results as $result) {
-            if (empty($result)) {
-                continue;
-            }
-
-            if (strtolower(array_key_first($result[0])) == strtolower($name)) {
-                return $result;
-            }
-        }
-        return [];
     }
 
     private function getFromBucket($entry, $facet)

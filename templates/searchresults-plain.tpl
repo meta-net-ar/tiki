@@ -6,15 +6,7 @@
                 <label class="form-label" for="{$facet.name|escape}">{$facet.label|escape}</label>
                 <select id="{$facet.name|escape}" class="form-select" multiple data-for="#search-form input[name$='filter~{$facet.name|escape}']" data-join="{$facet.operator|escape}">
                     {foreach from=$facet.options key=value item=label}
-                        {if is_array($label)}
-                            <optgroup label="{$value|escape}">
-                                {foreach from=$label item=subItem}
-                                    <option value="{$subItem|escape}">{$subItem|escape}</option>
-                                {/foreach}
-                            </optgroup>
-                        {else}
-                            <option value="{$value|escape}">{$label|escape}</option>
-                        {/if}
+                        <option value="{$value|escape}">{$label|escape}</option>
                     {/foreach}
                 </select>
             </div>

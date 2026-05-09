@@ -1848,9 +1848,6 @@
         "lib/core/Search/Query/Facet/DateRange.php": {
             "class:Search_Query_Facet_DateRange": true
         },
-        "lib/core/Search/Query/Facet/FieldAggregator.php": {
-            "class:Search_Query_Facet_FieldAggregator": true
-        },
         "lib/core/Search/Query/Facet/Interface.php": {
             "interface:Search_Query_Facet_Interface": true
         },
@@ -8294,9 +8291,6 @@
         },
         "lib/core/Search/Query/Facet/DateRange.php": {
             "Search_Query_Facet_DateRange": true
-        },
-        "lib/core/Search/Query/Facet/FieldAggregator.php": {
-            "Search_Query_Facet_FieldAggregator": true
         },
         "lib/core/Search/Query/Facet/Interface.php": {
             "Search_Query_Facet_Interface": true

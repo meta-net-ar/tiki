@@ -19,9 +19,6 @@ class Search_Elastic_FacetBuilder
         $this->index = $index;
     }
 
-    /**
-     * @param Search_Query_Facet_Interface[] $facets
-     */
     public function build(array $facets)
     {
         if (empty($facets)) {
@@ -30,9 +27,6 @@ class Search_Elastic_FacetBuilder
 
         $out = [];
         foreach ($facets as $facet) {
-            if (! $facet->isBuiltFromIndex()) {
-                continue;
-            }
             $out[$facet->getName()] = $this->buildFacet($facet);
         }
 

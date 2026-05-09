@@ -14,12 +14,4 @@ interface Search_Query_Facet_Interface
     public function setRenderCallback($callback);
     public function render($value);
     public function getType();
-    public function getData();
-    public function isBuiltFromIndex(): bool;
-    public function getOperator();
-    public function addDependency(Search_Query_Facet_Interface $facet);
-    /**  @return Search_Query_Facet_Interface[] */
-    public function getDependencies(): array;
-    public function getDependencyNames(): array;
-    public function addDependencyName(string $name);
 }

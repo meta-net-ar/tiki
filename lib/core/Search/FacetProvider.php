@@ -39,19 +39,7 @@ class Search_FacetProvider implements Search_FacetProvider_Interface
      */
     public function getFacets()
     {
-        $this->computeDependencies();
         return $this->facets;
-    }
-
-    private function computeDependencies()
-    {
-        foreach ($this->facets as $facet) {
-            foreach ($facet->getDependencyNames() as $dependency) {
-                if (isset($this->facets[$dependency])) {
-                    $facet->addDependency($this->facets[$dependency]);
-                }
-            }
-        }
     }
 
     /**

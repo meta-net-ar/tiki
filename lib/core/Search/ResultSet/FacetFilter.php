@@ -32,25 +32,23 @@ class Search_ResultSet_FacetFilter
 
     public function getOperator()
     {
-        return $this->facet->getOperator();
+        if (is_a($this->facet, 'Search_Query_Facet_Term')) {
+            return $this->facet->getOperator();
+        } else {
+            return null;
+        }
     }
 
     public function getOptions()
     {
         $out = [];
 
-        foreach ($this->data as $key => $entry) {
-            if (! $this->facet->isBuiltFromIndex()) {
-                $out[$key] = $this->facet->render($entry);
-                continue;
-            }
-
+        foreach ($this->data as $entry) {
             if (method_exists($this->facet, 'getValue')) {
                 $value = $this->facet->getValue($entry['value']);
             } else {
                 $value = $entry['value'];
             }
-
             $out[$value] = tr('%0 (%1)', tra($this->facet->render($value)), $entry['count']);
         }
 
