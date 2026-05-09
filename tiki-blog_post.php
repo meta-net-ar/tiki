@@ -328,7 +328,7 @@ window.registerApplication({
     },
     customProps: {
         //trackerfieldMap : "' . json_encode($schemaOrgAttributeMap) . '",
-        schemajson: \'' . json_encode(json_decode($schemainfo['schemaOrgMarkup'])->schema) . '\',
+        schemajson: \'' . ($schemainfo['schemaOrgMarkup'] ? json_encode(json_decode($schemainfo['schemaOrgMarkup'])->schema) : '') . '\',
     },
 })
 

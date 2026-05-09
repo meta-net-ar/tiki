@@ -270,6 +270,26 @@ if ($prefs['print_pdf_from_url'] == "mpdf") {
     }
 }
 
+$headerlib = TikiLib::lib('header');
+$attributelib = TikiLib::lib('attribute');
+$schema = $attributelib->get_attribute('article', $_REQUEST['articleId'], "tiki.schema.markup");
+$ogTitle = $attributelib->get_attribute('article', $_REQUEST['articleId'], "tiki.seo.title");
+$metaDescription = $attributelib->get_attribute('article', $_REQUEST['articleId'], "tiki.seo.description");
+
+$headerlib->add_meta('og:type', 'article');
+if($ogTitle) {
+    $headerlib->add_meta('og:title', $ogTitle);
+} 
+
+if ($metaDescription) {
+    $headerlib->add_meta('og:description', $metaDescription);
+}
+
+if ($schema) {
+    $schema = json_decode($schema)->schema ?? null;
+    $headerlib->add_rawhtml('<script type="application/ld+json">' . json_encode($schema, JSON_PRETTY_PRINT) . '</script>');
+}
+
 // Display the Index Template
 $smarty->assign('mid', 'tiki-read_article.tpl');
 $smarty->display("tiki.tpl");
