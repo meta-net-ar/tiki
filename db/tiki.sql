@@ -732,8 +732,7 @@ CREATE TABLE `tiki_comments` (
   KEY `tc_pi` (`parentId`),
   KEY `objectType` (object(160), `objectType`),
   KEY `commentDate` (`commentDate`),
-  KEY `threaded` (message_id(40), in_reply_to(40), `parentId`),
-  KEY `idx_slvn_commentDate` (`commentDate`)
+  KEY `threaded` (message_id(40), in_reply_to(40), `parentId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `tiki_content`;
@@ -1406,7 +1405,6 @@ CREATE TABLE `tiki_link_cache` (
   PRIMARY KEY (`cacheId`),
   KEY `url` (url(191))
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
-CREATE INDEX urlindex ON tiki_link_cache (url(191));
 
 DROP TABLE IF EXISTS `tiki_links`;
 CREATE TABLE `tiki_links` (
