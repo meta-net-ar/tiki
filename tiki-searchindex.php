@@ -170,6 +170,9 @@ if (count($filter) || count($postfilter)) {
 $smarty->assign('filter', $filter);
 $smarty->assign('postfilter', $postfilter);
 $smarty->assign('facets', $facets);
+$fields = TikiLib::lib('unifiedsearch')->getAvailableFields();
+$fields = array_unique(array_merge(array_values($fields['global']), ...array_values($fields['object_types'])));
+$smarty->assign('filter_fields', $fields);
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
