@@ -17,15 +17,15 @@
                             <span>{$stdata.label}</span>
                         </label>
                     {/foreach}
-
-                    {if isset($smarty.get.status) and $smarty.get.status neq ''}
-                        {* "Reset" button: Restores the default status filter (clears manual selections) *}
-                        <button id="js-status-all" type="button" class="btn btn-outline-secondary d-flex align-items-center gap-1 tips"
-                            title=":{tr}Reset to default status filter{/tr}">
-                            {icon name="undo"} <span>{tr}Reset{/tr}</span>
-                        </button>
-                    {/if}
                 </div>
+
+                {if isset($smarty.get.status) and $smarty.get.status neq ''}
+                    {* "Reset" button: Restores the default status filter (clears manual selections) *}
+                    <button id="js-status-all" type="button" class="btn btn-link d-flex align-items-center gap-1 tips text-decoration-none"
+                        title=":{tr}Reset to default status filter{/tr}">
+                        {icon name="undo"} <span>{tr}Reset{/tr}</span>
+                    </button>
+                {/if}
             </div>
         {/if}
 
