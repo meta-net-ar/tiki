@@ -54,7 +54,7 @@ class ErrorTracking
 
     /**
      * Check if HTML Tidy error reporting is enabled.
-     * Requires: global preference on, PHP Tidy extension loaded, session not disabled.
+     * Requires: DSN configured, global preference on, PHP Tidy extension loaded, session not disabled.
      *
      * @return bool
      */
@@ -302,7 +302,7 @@ class ErrorTracking
         if ($this->isInitialised) {
             throw new Error('Error tracking can only be initialised once, so we can control where that happens');
         }
-        if (! self::LOCAL_DEBUG_MODE && (! isset($this->dsn) || ! $this->phpEnabled || $this->state !== self::STATE_DISABLED)) {
+        if (! self::LOCAL_DEBUG_MODE && (! isset($this->dsn) || (! $this->phpEnabled && ! $this->tidyEnabled) || $this->state !== self::STATE_DISABLED)) {
             return;
         }
         try {

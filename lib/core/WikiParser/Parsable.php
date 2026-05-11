@@ -564,7 +564,7 @@ if ( \$('#$id') ) {
 
             if (! empty($plugin_result) && is_string($plugin_result)) {
                 $htmlTidy = TikiLib::lib('htmltidy');
-                if ($htmlTidy->isTidyLoaded()) {
+                if ($htmlTidy->isTidyReportingEnabled()) {
                     $tidyErrors = $htmlTidy->reportErrors($plugin_result, [
                         'source'        => "Plugin: $name",
                         'page'          => $this->option['page'] ?? null,
@@ -572,15 +572,20 @@ if ( \$('#$id') ) {
                         'output_format' => $outputFormat,
                     ]);
                     if (! empty($tidyErrors) && ! empty($this->option['preview_mode'])) {
-                        foreach ($tidyErrors as $tidyError) {
-                            Feedback::error(tr(
-                                'HTML markup error in plugin %0: %1 (line %2, col %3)',
-                                $name,
-                                $tidyError['message'],
-                                $tidyError['line'],
-                                $tidyError['column']
-                            ));
-                        }
+                        $smarty  = TikiLib::lib('smarty');
+                        $repeat  = false;
+                        $items   = implode('', array_map(
+                            fn($e) => '<li>' . htmlspecialchars($e['message'])
+                                . ' <small>(line ' . (int) $e['line'] . ', col ' . (int) $e['column'] . ')</small></li>',
+                            $tidyErrors
+                        ));
+                        $box = smarty_block_remarksbox(
+                            ['type' => 'warning', 'title' => tr('HTML markup errors in plugin: %0', $name)],
+                            '<ul>' . $items . '</ul>',
+                            $smarty->getEmptyInternalTemplate(),
+                            $repeat
+                        );
+                        $plugin_result = $box . $plugin_result;
                     }
                 }
             }

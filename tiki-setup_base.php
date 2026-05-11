@@ -80,6 +80,7 @@ $needed_prefs = [
     'error_tracking_dsn' => '',
     'error_tracking_enabled_php' => 'n',
     'error_tracking_enabled_js' => 'n',
+    'error_tracking_enabled_tidy' => 'n',
     'error_tracking_sample_rate' => '1',
     'memcache_enabled' => 'n',
     'memcache_expiration' => 3600,
