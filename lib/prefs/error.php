@@ -54,11 +54,9 @@ function prefs_error_list()
             'help' => $generalPreferencesHelp,
         ],
         'error_tracking_enabled_tidy' => [
-            'name'        => tra('Track HTML markup errors'),
-            'description' => tra('Enable integration with error tracking service(ex: Sentry, GlitchTip) for HTML markup errors.'),
-            'warning'     => tra('When Tidy extension is available and this is enabled, errors are reported to error tracking system.') . '<br>'
-                        . '<strong>' . tra('PHP Tidy status: ') . '</strong>'
-                        . (extension_loaded('tidy') ? tra('Loaded') : tra('Not loaded')),
+            'name'        => tra('Track HTML markup errors (Tidy)'),
+            'description' => tra('Report HTML markup errors to the configured error tracking service (Sentry/GlitchTip). Errors are also shown inline during wiki page preview.'),
+            'warning'     => tra('PHP Tidy extension: ') . '<strong>' . (extension_loaded('tidy') ? tra('Loaded') : tra('Not loaded')) . '</strong>',
             'type'        => 'flag',
             'default'     => 'n',
             'dependencies' => [
