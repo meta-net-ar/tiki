@@ -13,6 +13,7 @@ function module_groups_emulation_info()
         'name' => tra('Groups Emulation'),
         'description' => tra('Enables temporarily changing one\'s group memberships to see how users in fewer groups experience the site.'),
         'prefs' => [],
+        'cache' => 'n',
         'params' => [
             'showallgroups' => [
                 'name' => tra('Show All Groups'),
@@ -49,6 +50,7 @@ function module_groups_emulation_info()
 function module_groups_emulation($mod_reference, $module_params)
 {
     global $user, $tiki_p_admin;
+
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
 
@@ -56,9 +58,19 @@ function module_groups_emulation($mod_reference, $module_params)
     $showyourgroups = $module_params['showyourgroups'] ?? 'y';
 
     $groups_are_emulated = $_SESSION['groups_are_emulated'] ?? 'n';
+    
+    // Hide module for anonymous users if not emulating
+    if (empty($user) && $groups_are_emulated !== 'y') {
+        $smarty->assign('hide_module', 'y');
+        return;
+    }
+
     $smarty->assign('groups_are_emulated', $groups_are_emulated);
     if (isset($_SESSION['groups_emulated'])) {
         $smarty->assign('groups_emulated', unserialize($_SESSION['groups_emulated']));
+    }
+    if (isset($_SESSION['groups_emulated_requested'])) {
+        $smarty->assign('groups_emulated_requested', unserialize($_SESSION['groups_emulated_requested']));
     }
 
     // Admins can see all existing groups
@@ -90,6 +102,7 @@ function module_groups_emulation($mod_reference, $module_params)
             $("#module_' . $moduleId . ' #mge-all").hide();
             $("#module_' . $moduleId . ' #mge-all-legend").on("click", function(){
                 $("#module_' . $moduleId . ' #mge-all").fadeToggle();
+                $(this).find(".mge-icon").toggleClass("fa-rotate-90");
             });
         });');
     }
@@ -98,6 +111,7 @@ function module_groups_emulation($mod_reference, $module_params)
             $("#module_' . $moduleId . ' #mge-mine").hide();
             $("#module_' . $moduleId . ' #mge-mine-legend").on("click", function(){
                 $("#module_' . $moduleId . ' #mge-mine").fadeToggle();
+                $(this).find(".mge-icon").toggleClass("fa-rotate-90");
             });
         });');
     }
@@ -106,9 +120,26 @@ function module_groups_emulation($mod_reference, $module_params)
             $("#module_' . $moduleId . ' #mge-emulated").hide();
             $("#module_' . $moduleId . ' #mge-emulated-legend").on("click", function(){
                 $("#module_' . $moduleId . ' #mge-emulated").fadeToggle();
+                $(this).find(".mge-icon").toggleClass("fa-rotate-90");
             });
         });');
     }
+
+    $headerlib->add_js('$(function() {
+        var $select = $("#mge-select-groups");
+        var $btn = $("#mge-simulate-btn");
+
+        var updateBtnState = function() {
+            if ($select.val() && $select.val().length > 0) {
+                $btn.prop("disabled", false);
+            } else {
+                $btn.prop("disabled", true);
+            }
+        };
+
+        $select.on("change", updateBtnState);
+        updateBtnState(); // Run once on load
+    });');
 
     $smarty->assign_by_ref('userGroups', $userGroups);
     $smarty->assign_by_ref('chooseGroups', $chooseGroups);
