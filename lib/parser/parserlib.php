@@ -1153,8 +1153,6 @@ class ParserLib extends TikiDb_Bridge
     //*
     protected function plugin_apply_filters($name, &$data, &$args)
     {
-        $tikilib = TikiLib::lib('tiki');
-
         $info = $this->plugin_info($name, $args);
 
         $default = TikiFilter::get($info['defaultfilter'] ?? 'xss');
@@ -1205,17 +1203,8 @@ class ParserLib extends TikiDb_Bridge
                     $argValue = TikiLib::htmldecode($argValue);
                 }
 
-                if (isset($paramInfo['separator'])) {
-                    if ($argValue !== null) {
-                        $vals = [];
-                        $vals = $tikilib->array_apply_filter($tikilib->multi_explode($paramInfo['separator'], $argValue), $filter);
-                        $argValue = array_values($vals);
-                    }
-                    // If $argValue is null, leave it as null (don't process separator)
-                } else {
-                    if ($argValue !== null) {
-                        $argValue = $filter->filter($argValue);
-                    }
+                if ($argValue !== null && ! isset($paramInfo['separator'])) {
+                    $argValue = $filter->filter($argValue);
                 }
             }
         }

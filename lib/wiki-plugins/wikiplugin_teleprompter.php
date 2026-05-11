@@ -182,6 +182,8 @@ function wikiplugin_teleprompter_info()
 
 function wikiplugin_teleprompter($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_teleprompter_info());
+
     if (empty($params['fileIds']) && empty($params['fgalId']) && empty($data)) {
         Feedback::error(tr('Parameters missing: Please either select file gallery, give file ids or custom block code in body.'));
         return;

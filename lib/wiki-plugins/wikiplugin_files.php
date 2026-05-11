@@ -500,6 +500,7 @@ function wikiplugin_files($data, $params)
     $smarty = TikiLib::lib('smarty');
 
     $filter = '';
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_files_info());
     extract($params, EXTR_SKIP);
 
     if ($prefs['feature_categories'] != 'y') {

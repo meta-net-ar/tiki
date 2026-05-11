@@ -174,6 +174,8 @@ function wikiplugin_rss_info()
 
 function wikiplugin_rss($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_rss_info());
+
     $rsslib = TikiLib::lib('rss');
     $params = array_merge(
         [

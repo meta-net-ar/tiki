@@ -1039,6 +1039,8 @@ function wikiplugin_trackerlist($data, $params)
         'editableall' => 'n',
     ];
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_trackerlist_info());
+
     $filterfield = $params['filterfield'] ?? [];
     $filtervalue = $params['filtervalue'] ?? [];
     $exactvalue = $params['exactvalue'] ?? [];

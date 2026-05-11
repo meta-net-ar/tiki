@@ -66,6 +66,8 @@ function wikiplugin_groupstat_info()
 
 function wikiplugin_groupstat($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_groupstat_info());
+
     $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');

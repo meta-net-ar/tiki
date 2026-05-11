@@ -296,6 +296,8 @@ function wikiplugin_layout_info()
 
 function wikiplugin_layout($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_layout_info());
+
     $headerlib = TikiLib::lib('header');
     $headerlib->add_css("#row-middle{display:none} #show-errors-button{display:none}");
     $headerlib->add_js('$( document ).ready(function() {$(\'#row-middle\').attr("style","display:flex").fadeIn(1000); });');

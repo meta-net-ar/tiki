@@ -66,6 +66,8 @@ function wikiplugin_titlesearch_info()
 
 function wikiplugin_titlesearch($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_titlesearch_info());
+
     include_once('lib/wiki-plugins/wikiplugin_listpages.php');
 
     // Default parameters required by wikiplugin_listpages

@@ -162,6 +162,8 @@ function wikiplugin_memberlist($data, $params)
     static $execution = 0;
     $exec_key = 'memberlist-execution-' . ++$execution;
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_memberlist_info());
+
     $groups = (array)$params['groups'];
 
     if ($prefs['feature_user_watches'] == 'y') {
