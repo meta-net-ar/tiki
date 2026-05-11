@@ -1153,17 +1153,11 @@ class TikiAccessLib extends TikiLib
             }
         }
 
-        if (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
-            $url = 'https://' . $url;
-            // Remove default port 443 and incorrect port 80 from TLS offload
-            if ($port == ':443' || $port == ':80') {
-                $port = '';
-            }
-        } else {
-            $url = 'http://' . $url;
-            if ($port == ':80' || $port == ':443') {
-                $port = '';
-            }
+        $scheme = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://';
+        $url = $scheme . $url;
+
+        if ($port == ':80' || $port == ':443') {
+            $port = '';
         }
 
         $url .= $port;

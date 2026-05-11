@@ -111,10 +111,9 @@ if ($prefs['http_port'] == 80) {
 
 // Detect misconfigured HTTPS port (e.g., behind reverse proxy with TLS offload)
 if ($prefs['https_port'] == 80) {
-    error_log(
-        '[Tiki Warning] HTTPS port configured as 80. This typically indicates a reverse proxy ' .
-        'or TLS offload configuration issue. Please verify your reverse proxy X-Forwarded-Proto headers ' .
-        'and feature_port_rewriting setting.'
+    trigger_error(
+        tr('HTTPS port configured as 80. This typically indicates a reverse proxy or TLS offload configuration issue. Please verify your reverse proxy X-Forwarded-Proto headers and feature_port_rewriting setting.'),
+        E_USER_WARNING
     );
 }
 
