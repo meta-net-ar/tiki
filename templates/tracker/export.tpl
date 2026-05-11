@@ -6,7 +6,7 @@
 
 {block name="content"}
     {remarksbox type="warning" title="{tr}Deprecated{/tr}"}
-        {tr}To export tracker or tracker items please{/tr} <a href="tiki-admin.php?page=trackers&highlight=tracker_tabular_enabled" class="alert-link" target="_blank" title="{tr}enable{/tr}">{tr}enable{/tr}</a> {tr}and use{/tr} <a href="tiki-tabular-manage" class="alert-link" target="_blank" title="{tr}Tracker Import-Export{/tr}">{tr}Tracker Import-Export{/tr}</a>. {tr}It is easy to use, optimised and far more powerful.{/tr}
+        {tr}To export tracker or tracker items please{/tr} <a href="tiki-admin.php?page=trackers&highlight=tracker_tabular_enabled" class="alert-link" target="_blank" title="{tr}enable{/tr}">{tr}enable{/tr}</a> {tr}and use{/tr} <a href="{service controller=tabular action=manage}" class="alert-link" target="_blank" title="{tr}Tracker Import-Export{/tr}">{tr}Tracker Import-Export{/tr}</a>. {tr}It is easy to use, optimised and far more powerful.{/tr}
         {tr}For complete documentation, please visit{/tr} <a href="https://doc.tiki.org/Tracker-Tabular" class="alert-link" target="_blank" title="{tr}Tracker Import-Export{/tr}"> {tr}Tracker Import-Export{/tr} {icon name="documentation"}</a>
     {/remarksbox}
 {accordion}
