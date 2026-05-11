@@ -79,7 +79,7 @@ class ConfigureCommand extends Command
 
 // Want configurations managed at the system level or restrict some preferences? http://doc.tiki.org/System+Configuration
 // Multiple configuration files (files listed later override earlier ones):
-// \$system_configuration_files = ['/etc/tiki/ansible_local.ini', '/etc/tiki/dev_local.ini'];
+// \$system_configuration_files = ['db/local.ini', 'db/system_local.ini'];
 // \$system_configuration_identifier = 'example.com';
 
 LOCALPHP;
