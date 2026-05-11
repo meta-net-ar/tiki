@@ -1,5 +1,4 @@
 {strip}
-{if $hide_module ne 'y'}
 {tikimodule error=$module_params.error title=$tpl_module_title name="groups_emulation" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
 
     {if isset($allGroups) && $showallgroups eq 'y'}
@@ -70,5 +69,4 @@
     </form>
 
 {/tikimodule}
-{/if}
 {/strip}

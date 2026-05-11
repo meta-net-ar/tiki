@@ -13,7 +13,6 @@ function module_groups_emulation_info()
         'name' => tra('Groups Emulation'),
         'description' => tra('Enables temporarily changing one\'s group memberships to see how users in fewer groups experience the site.'),
         'prefs' => [],
-        'cache' => 'n',
         'params' => [
             'showallgroups' => [
                 'name' => tra('Show All Groups'),
@@ -58,13 +57,6 @@ function module_groups_emulation($mod_reference, $module_params)
     $showyourgroups = $module_params['showyourgroups'] ?? 'y';
 
     $groups_are_emulated = $_SESSION['groups_are_emulated'] ?? 'n';
-    
-    // Hide module for anonymous users if not emulating
-    if (empty($user) && $groups_are_emulated !== 'y') {
-        $smarty->assign('hide_module', 'y');
-        return;
-    }
-
     $smarty->assign('groups_are_emulated', $groups_are_emulated);
     if (isset($_SESSION['groups_emulated'])) {
         $smarty->assign('groups_emulated', unserialize($_SESSION['groups_emulated']));
