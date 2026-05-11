@@ -13,6 +13,7 @@ function capLock(e, el){
 }
 {/jq}
 {jq}
+var currentLoggedInUser = "{{$user|escape:'javascript'}}";
 $(document).ready(function () {
     var twoFAType = "{{$prefs.twoFactorAuthType}}";
     var is2FAEnabled = "{{$prefs.twoFactorAuth}}";
@@ -72,16 +73,6 @@ $(document).ready(function () {
                 displayFeedback("error", error);
             }
         });
-    }
-
-    function displayFeedback(type, message) {
-        const feedbackClass = type === "success" ? "alert-success" : "alert-danger";
-        $("#login_feeback_{{$module_logo_instance}}").html(
-            `<div class="alert ${feedbackClass} alert-dismissible">
-                ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>`
-        );
     }
 
     function getTwoFactorSecretGoogle2FA(username) {
@@ -204,14 +195,66 @@ $(document).ready(function () {
         }
     });
 });
-$("#switchbox-{{$module_logo_instance}} .submit").on("click", function () {
-    if ($("#login-switchuser_{{$module_logo_instance}}").val()) {
-        confirmPopup('{tr}Switch user?{/tr}')
-        return true;
-    } else {
-        $("#login-switchuser_{{$module_logo_instance}}").trigger("focus");
+function displayFeedback(type, message) {
+    const feedbackClass = type === "success" ? "alert-success" : "alert-danger";
+    $("#login_feeback_{{$module_logo_instance}}").html(
+        `<div class="alert ${feedbackClass} alert-dismissible">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>`
+    );
+}
+var switchUserSelector_{{$module_logo_instance}} = $("#login-switchuser_{{$module_logo_instance}}");
+
+function showSwitchConfirm_{{$module_logo_instance}}(message, $form) {
+    var $modal = $(".footer-modal:not(.show)").first();
+    if (! $modal.length) {
+        if (window.confirm(message)) {
+            $form.append('<input type="hidden" name="confirmForm" value="y">');
+            $form[0].submit();
+        }
+        return;
+    }
+    $modal.find(".modal-content").html(
+        '<div class="modal-header">' +
+        '<h5 class="modal-title">' + message + '</h5>' +
+        '<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="' + tr("Close") + '"></button>' +
+        '</div>' +
+        '<div class="modal-footer">' +
+        '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">' + tr("Cancel") + '</button>' +
+        '<button type="button" class="btn btn-primary lbox-confirm-ok">' + tr("OK") + '</button>' +
+        '</div>'
+    );
+    var bsModal = bootstrap.Modal.getOrCreateInstance($modal[0]);
+    $modal.find(".lbox-confirm-ok").one("click", function () {
+        bsModal.hide();
+        $form.append('<input type="hidden" name="confirmForm" value="y">');
+        $form[0].submit();
+    });
+    bsModal.show();
+}
+
+$("#switchbox-{{$module_logo_instance}} .submit").on("click", function (event) {
+    event.preventDefault();
+    var selectedUser = (switchUserSelector_{{$module_logo_instance}}.val() || '').trim();
+
+    if (! selectedUser) {
+        displayFeedback("error", tr("Please select a user to switch to."));
+        switchUserSelector_{{$module_logo_instance}}.trigger("focus");
         return false;
     }
+
+    var msg = tr("Switch user from \"%0\" to \"%1\"?")
+        .replace("%0", currentLoggedInUser)
+        .replace("%1", selectedUser);
+    showSwitchConfirm_{{$module_logo_instance}}(msg, $(this).closest("form"));
+    return false;
+});
+
+$("#revertbox-{{$module_logo_instance}} button[type=submit]").on("click", function (event) {
+    event.preventDefault();
+    showSwitchConfirm_{{$module_logo_instance}}(tr("Return to main user?"), $(this).closest("form"));
+    return false;
 });
 $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', function(event) {
     event.stopPropagation();
@@ -232,7 +275,7 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                 {button href="tiki-logout.php" _text="{tr}Log out{/tr}"}
             </div>
             {if !empty($login_module.can_revert)}
-                <form action="{$login_module.login_url|escape}" method="post">
+                <form action="{$login_module.login_url|escape}" method="post" id="revertbox-{$module_logo_instance}">
                     {ticket}
                     <fieldset>
                         <legend class="fs-5">{tr}Return to Main User{/tr}</legend>
@@ -243,7 +286,6 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                                 type="submit"
                                 class="btn btn-primary"
                                 name="actsu"
-                                onclick="confirmPopup('{tr}Return to main user?{/tr}')"
                             >
                                 {tr}Switch{/tr}
                             </button>
@@ -288,7 +330,18 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                             {if $prefs.feature_help eq 'y'}
                                 {help url="Switch+User" desc="{tr}Help{/tr}" desc="{tr}Switch User:{/tr}{tr}Select a username and click 'Switch'.<br>Useful for testing permissions.{/tr}"}
                             {/if}
-                            {user_selector groupIds=$module_params.groups id="login-switchuser_"|cat:$module_logo_instance name='username' user='' editable=$login_module.can_switch_user class='form-control' allowNone=$module_params.allowNone}
+                            {user_selector
+                                groupIds=$module_params.groups
+                                id="login-switchuser_"|cat:$module_logo_instance
+                                name='username'
+                                user=''
+                                editable=$login_module.can_switch_user
+                                class='form-control'
+                                allowNone=$module_params.allowNone|default:'y'
+                                noneSelectable='n'
+                                noneLabel='Select user to switch to'
+                                exclude=$user
+                            }
                         </div>
                         <div class="text-center">
                             <button
