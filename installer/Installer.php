@@ -372,7 +372,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
                     // Historical patches are before 2026-04-17. Base schema (empty name) is also historical.
                     $isHistorical = empty($this->currentPatchName) || substr($this->currentPatchName, 0, 8) < '20260417';
 
-                    if (($code === 1681 || $code === 124 || ($code === 1831 && (strpos($row['Message'], 'idx_slvn_commentDate') !== false || strpos($row['Message'], 'urlindex') !== false))) && $isHistorical) {
+                    if (($code === 1681 || $code === 124) && $isHistorical) {
                         continue;
                     }
 
