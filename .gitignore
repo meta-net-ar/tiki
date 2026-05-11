@@ -129,6 +129,8 @@ templates/.htaccess
 
 themes/css/custom.css
 themes/js/custom.js
+public/storage/custom_css/
+public/storage/custom_js/
 #These cannot go in public/generated as it would break the current theme system.
 themes/**/*.css
 themes/**/*.css.map

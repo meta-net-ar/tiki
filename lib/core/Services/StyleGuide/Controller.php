@@ -65,10 +65,15 @@ class Services_StyleGuide_Controller
         Services_Exception_Denied::checkGlobal('admin');
         $customCss = $input->generated_css->text();
 
+        $dir = dirname(THEME_CUSTOMIZER_GENERATED_CSS_PATH);
+        if (! is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
         if (file_put_contents(THEME_CUSTOMIZER_GENERATED_CSS_PATH, $customCss) !== false) {
             Feedback::success(tr('The custom generated CSS has been saved'));
         } else {
-            Feedback::error(tr("Couldn't save the custom generated CSS file. Check that themes/css/ is writable."));
+            Feedback::error(tr("Couldn't save the custom generated CSS file. Check that public/storage/custom_css/ is writable."));
         }
         return true;
     }
@@ -85,7 +90,7 @@ class Services_StyleGuide_Controller
         if (file_put_contents(THEME_CUSTOMIZER_GENERATED_CSS_PATH, '') !== false) {
             Feedback::success(tr('The custom generated CSS has been reset'));
         } else {
-            Feedback::error(tr("Couldn't reset the custom generated CSS file. Check that themes/css/ is writable."));
+            Feedback::error(tr("Couldn't reset the custom generated CSS file. Check that public/storage/custom_css/ is writable."));
         }
         return true;
     }
