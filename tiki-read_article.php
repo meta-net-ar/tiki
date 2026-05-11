@@ -277,9 +277,9 @@ $ogTitle = $attributelib->get_attribute('article', $_REQUEST['articleId'], "tiki
 $metaDescription = $attributelib->get_attribute('article', $_REQUEST['articleId'], "tiki.seo.description");
 
 $headerlib->add_meta('og:type', 'article');
-if($ogTitle) {
+if ($ogTitle) {
     $headerlib->add_meta('og:title', $ogTitle);
-} 
+}
 
 if ($metaDescription) {
     $headerlib->add_meta('og:description', $metaDescription);
