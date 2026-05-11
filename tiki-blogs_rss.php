@@ -34,7 +34,7 @@ if ($res) {
 }
 $feed = "blogs";
 $uniqueid = $feed;
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 if ($output["data"] == "EMPTY") {
     $title = $prefs['feed_blogs_title'];
     $desc = $prefs['feed_blogs_desc'];

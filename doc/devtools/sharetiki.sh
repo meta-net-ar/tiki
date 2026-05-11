@@ -57,7 +57,6 @@ mysqldump -e -f --add-drop-table -h"$RDBHOST" -u"$RDBUSER" -p"$RDBPASS" "$RDBNAM
     tiki_pages  \
     tiki_quicktags  \
     tiki_related_categories  \
-    tiki_rss_feeds  \
     tiki_rss_modules  \
     tiki_structures  \
     tiki_topics  \

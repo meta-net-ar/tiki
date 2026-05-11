@@ -164,7 +164,6 @@ ALTER TABLE `tiki_received_pages` ENGINE=InnoDB;
 ALTER TABLE `tiki_referer_stats` ENGINE=InnoDB;
 ALTER TABLE `tiki_registration_fields` ENGINE=InnoDB;
 ALTER TABLE `tiki_related_categories` ENGINE=InnoDB;
-ALTER TABLE `tiki_rss_feeds` ENGINE=InnoDB;
 ALTER TABLE `tiki_rss_items` ENGINE=InnoDB;
 ALTER TABLE `tiki_rss_modules` ENGINE=InnoDB;
 ALTER TABLE `tiki_schema` ENGINE=InnoDB;

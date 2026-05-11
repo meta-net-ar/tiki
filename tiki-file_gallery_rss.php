@@ -43,7 +43,7 @@ if (empty($galleryIds)) {
 
 $feed = 'filegal';
 $uniqueid = "$feed.id=" . md5(implode('_', $galleryIds));
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output["data"] == "EMPTY") {
     $filegallib = TikiLib::lib('filegal');

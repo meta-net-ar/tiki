@@ -2200,16 +2200,6 @@ CREATE TABLE `tiki_rss_modules` (
   KEY `name` (name)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
-DROP TABLE IF EXISTS `tiki_rss_feeds`;
-CREATE TABLE `tiki_rss_feeds` (
-  `name` varchar(60) NOT NULL default '',
-  `rssVer` char(1) NOT NULL default '1',
-  `refresh` int(8) default '300',
-  `lastUpdated` int(14) default NULL,
-  `cache` longblob,
-  PRIMARY KEY (`name`,`rssVer`)
-) ENGINE=MyISAM;
-
 DROP TABLE IF EXISTS `tiki_search_stats`;
 CREATE TABLE `tiki_search_stats` (
   `term` varchar(50) NOT NULL default '',
