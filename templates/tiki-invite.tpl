@@ -85,7 +85,7 @@
         <div class="mb-3 row">
             <label class="col-form-label col-sm-5" for="emailcontent">{tr}Type here the email content you'll want to be sent to them (and let the {literal}{link}{/literal} word, it will be replaced with the good link for registering){/tr}</label>
             <div class="col-sm-7">
-                <textarea name='emailcontent' class="form-control" style='width: 100%; height: 150px;'>{tr}{if isset($smarty.request.emailcontent)}{$smarty.request.emailcontent|escape}{else}Hi {literal}{firstname} {lastname}{/literal},
+                <textarea name='emailcontent' class="form-control" style='width: 100%; height: 150px;'>{if isset($smarty.request.emailcontent)}{$smarty.request.emailcontent|escape}{else}{tr _0="{ldelim}firstname{rdelim} {ldelim}lastname{rdelim}"}Hi %0,
 
 We would like to invite you to register on our web site
 To register, just follow this link:
@@ -93,18 +93,18 @@ To register, just follow this link:
 {literal}{link}{/literal}
 
 Kind regards
-{/if}{/tr}</textarea>
+{/tr}{/if}</textarea>
             </div>
         </div>
 
         <div class="mb-3 row">
             <label class="col-form-label col-sm-5" for="wikicontent">{tr}Type here the content that the user will see when he'll click on the link from the mail{/tr}</label>
             <div class="col-sm-7">
-                <textarea name='wikicontent' class="form-control" style='width: 100%; height: 150px;'>{tr}{if isset($smarty.request.emailcontent)}{$smarty.request.wikicontent|escape}{else}Hi {literal}{firstname} {lastname}{/literal},
+                <textarea name='wikicontent' class="form-control" style='width: 100%; height: 150px;'>{if isset($smarty.request.emailcontent)}{$smarty.request.wikicontent|escape}{else}{tr _0="{ldelim}firstname{rdelim} {ldelim}lastname{rdelim}"}Hi %0,
 
 You are here because you have just clicked on the link from my invitation email.
 
-{/if}{/tr}</textarea>
+{/tr}{/if}</textarea>
             </div>
         </div>
         {if count($invitegroups) > 0 && count($usergroups) > 0}

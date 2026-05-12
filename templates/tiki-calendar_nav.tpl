@@ -9,7 +9,7 @@
                     {strip}
                         {*previous*}
                         <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='prev' todate=$focus_prev}"
-                           title=":{tr _0="{$viewmode|escape}"}Previous %0 {/tr}">
+                           title=":{tr _0=$viewmode|escape}Previous %0 {/tr}">
                             {icon name="previous"}
                         </a>
                         {*viewmodes*}
@@ -31,7 +31,7 @@
 
                         {*next*}
                         <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='next' todate=$focus_next}"
-                           title=":{tr _0="{$viewmode|escape}"}Next %0{/tr}">
+                           title=":{tr _0=$viewmode|escape}Next %0{/tr}">
                             {icon name="next"}
                         </a>
                     {/strip}
@@ -44,7 +44,7 @@
         <div class="text-center my-3">
             {*previous*}
             {if !empty($module_params.viewnavbar) && $module_params.viewnavbar eq 'partial'}
-                {self_link _ajax=$ajax _class="prev tips text-info" todate=$focus_prev _title=":{tr}Previous {$viewmode|escape}{/tr}" _icon_name="previous"}{/self_link}
+                {self_link _ajax=$ajax _class="prev tips text-info" todate=$focus_prev _title=":{tr _0=$viewmode|escape}Previous %0{/tr}" _icon_name="previous"}{/self_link}
             {/if}
 
             {if $viewlist ne 'list' or $prefs.calendar_list_begins_focus ne 'y'}
@@ -66,7 +66,7 @@
 
             {*next*}
             {if !empty($module_params.viewnavbar) && $module_params.viewnavbar eq 'partial'}
-                {self_link _ajax=$ajax _class="next tips text-info" todate=$focus_next _title=":{tr}Next {$viewmode|escape}{/tr}" _icon_name="next"}{/self_link}
+                {self_link _ajax=$ajax _class="next tips text-info" todate=$focus_next _title=":{tr _0=$viewmode|escape}Next %0{/tr}" _icon_name="next"}{/self_link}
             {/if}
         </div>
     {/if}

@@ -12,7 +12,7 @@
             {/if}
         </h1>
     {else}
-        {title}{tr}Update '{$page}'{/tr}{/title}
+        {title}{tr _0=$page}Update '%0'{/tr}{/title}
     {/if}
 {/block}
 {function name="render_editor" content=""}

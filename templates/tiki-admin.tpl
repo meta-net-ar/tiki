@@ -102,7 +102,7 @@
                 {remarksbox type="error" title="{tr}Scheduler tasks failure logs{/tr}"}
                     <p>
                     {if ! empty($prefs.scheduledTasksReport) && $prefs.scheduledTasksReport === 'last_number_of_hours'}
-                        {tr}Nº of tasks failure in last {$prefs.scheduledTasksReportHours} hours:{/tr}
+                        {tr _0=$prefs.scheduledTasksReportHours}Nº of tasks failure in last %0 hours:{/tr}
                         {if ! empty($scheduler_total_count)}
                             <strong>{$scheduler_failure_count} / {$scheduler_total_count}</strong> ({tr}failures / total executions{/tr})
                         {else}

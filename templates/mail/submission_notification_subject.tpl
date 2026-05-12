@@ -1,1 +1,1 @@
-{tr}New {$prefs.mail_template_custom_text}article submitted at %s{/tr}
+{tr _0=$prefs.mail_template_custom_text}New %0article submitted at %s{/tr}

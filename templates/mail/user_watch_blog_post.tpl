@@ -1,4 +1,4 @@
-{tr}New {$prefs.mail_template_custom_text}blog post: {$mail_title}, "{$mail_post_title}", by {$mail_user|username} at {$mail_date|tiki_short_datetime:"":"n"}{/tr}
+{tr _0=$prefs.mail_template_custom_text _1=$mail_title _2=$mail_post_title _3=$mail_user|username _4=$mail_date|tiki_short_datetime:"":"n"}New %0blog post: %1, "%2", by %3 at %4{/tr}
 {if $mail_contributions}
 
 {tr}Contribution:{/tr} {$mail_contributions}{/if}

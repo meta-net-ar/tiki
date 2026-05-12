@@ -112,7 +112,7 @@
                             {/if}
 
                         {elseif $def.separator}
-                            <div class="form-text">{tr}Separate multiple with &quot;{$def.separator}&quot;{/tr}</div>
+                            <div class="form-text">{tr _0=$def.separator}Separate multiple with &quot;%0&quot;{/tr}</div>
                         {/if}
                     {/if}
                     {if !empty($def.depends.field)}

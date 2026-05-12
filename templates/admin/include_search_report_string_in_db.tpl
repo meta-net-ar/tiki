@@ -60,7 +60,11 @@
     <span id="error">{$errorMsg}</span>
 {else}
     {if isset($searchString)}
-        {remarksbox}{tr}Results for {/tr}<b>{$searchString|escape}</b> {tr}in {if isset($tableFilter)}table <b>{$tableFilter|escape}</b>{else}all tables{/if}:{/tr}{/remarksbox}
+        {if isset($tableFilter)}
+            {remarksbox}{tr _0="<b>{$searchString|escape}</b>" _1="<b>{$tableFilter|escape}</b>"}Results for %0 in table %1:{/tr}{/remarksbox}
+        {else}
+            {remarksbox}{tr _0="<b>{$searchString|escape}</b>"}Results for %0 in all tables:{/tr}{/remarksbox}
+        {/if}
         <p>
 
         <input type="hidden" name="query" value="{$searchString|escape}">

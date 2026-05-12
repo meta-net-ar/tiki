@@ -1,4 +1,4 @@
-{tr}Remove {$prefs.mail_template_custom_text}file{/tr}
+{tr _0=$prefs.mail_template_custom_text}Remove %0file{/tr}
 ---
 {tr}Gallery:{/tr} {$galInfo.name}
 {tr}GalleryId:{/tr} {$galInfo.galleryId}

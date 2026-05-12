@@ -1,4 +1,4 @@
-{tr}A {$prefs.mail_template_custom_text}category was updated:{/tr}
+{tr _0=$prefs.mail_template_custom_text}A %0category was updated:{/tr}
 
 {tr}Updated by:{/tr} {$author|username}
 {tr}Date:{/tr} {$mail_date|tiki_short_datetime:"":"n"}

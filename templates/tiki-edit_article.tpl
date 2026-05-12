@@ -185,7 +185,7 @@
                 <label for="userfile1" class="col-form-label col-md-4">{tr}Own Image{/tr}</label>
                 <div class="col-md-8">
                     <input class="form-control" name="userfile1" id="userfile1" type="file" onchange="document.getElementById('useImage').checked = true;">
-                    <span class="form-text">{tr}If not the topic image{/tr} - {tr}Max file size : {$prefs.article_image_file_size_max/1000} KB{/tr}</span>
+                    <span class="form-text">{tr}If not the topic image{/tr} - {tr _0=$prefs.article_image_file_size_max/1000}Max file size : %0 KB{/tr}</span>
                 </div>
             </div>
             {if $hasImage eq 'y'}

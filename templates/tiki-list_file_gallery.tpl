@@ -237,7 +237,7 @@
 {if !empty($fgal_diff)}
     {remarksbox type="note" title="{tr}Modifications{/tr}"}
         {foreach from=$fgal_diff item=fgp_prop key=fgp_name name=change}
-            {tr}Property <b>{$fgp_name}</b> Changed{/tr}
+            {tr _0="<b>{$fgp_name|escape}</b>"}Property %0 Changed{/tr}
         {/foreach}
     {/remarksbox}
 {/if}

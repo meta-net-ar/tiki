@@ -10,7 +10,7 @@
             {tr}Click at the "Start" button above to begin the wizard{/tr}
         </p>
         <p>
-            <b>Tiki version {$tiki_version}</b>. {tr}To learn more about this Tiki release, go to <a href="https://doc.tiki.org/Tiki{$tikiMajorVersion}">Tiki {$tikiMajorVersion}</a>{/tr}.<br/><br/>
+            <b>Tiki version {$tiki_version}</b>. {tr _0="<a href='https://doc.tiki.org/Tiki{$tikiMajorVersion|escape}'>Tiki {$tikiMajorVersion|escape}</a>"}To learn more about this Tiki release, go to %0{/tr}.<br/><br/>
         </p>
     </fieldset>
 </div>
