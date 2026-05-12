@@ -12,7 +12,7 @@ CREATE TABLE `tiki_markdown_imports` (
   `error_note` TEXT NULL,
   `is_journal` TINYINT(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_source_relpath` (`source_key`, `relpath`(190)),
+  UNIQUE KEY `uq_source_relpath` (`source_key`(120), `relpath`(120)),
   KEY `idx_page` (`page_name`(190)),
   KEY `idx_status` (`last_status`),
   KEY `idx_orphaned` (`orphaned_at`)

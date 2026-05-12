@@ -514,7 +514,7 @@ $gcOpts = array_values(array_filter($gcOpts));
 //Build commands
 $base = 'markdown:importer';
 $cmdPreview = trim($base . ' --mode=preview ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' ' . implode(' ', $gcOpts) . ' --json');
-$cmdImport  = trim($base . ' --mode=import  ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' ' . implode(' ', $gcOpts) . ' --json');
+$cmdImport  = trim($base . ' --mode=import ' . implode(' ', $srcOpts) . ' ' . implode(' ', $common) . ' ' . implode(' ', $gcOpts) . ' --json');
 
 $smarty->assign('md_cli_preview', $cmdPreview);
 $smarty->assign('md_cli_import', $cmdImport);
