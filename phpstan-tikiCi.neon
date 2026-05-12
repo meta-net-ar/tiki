@@ -5,6 +5,7 @@
 
 includes:
   - phpstan-tikiPaths.neon
+  - vendor/spaze/phpstan-disallowed-calls/extension.neon
 
 parameters:
   #customRulesetUsed: true

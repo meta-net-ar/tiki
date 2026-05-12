@@ -95,7 +95,7 @@ $smarty->assign_by_ref('maxRecords', $maxRecords);
 $list = $logslib->list_logs('', '', $offset, $maxRecords, $sort_mode, $find);
 foreach ($list['data'] as &$row) {
     if (! empty($row['log'])) {
-        $row['log_pretty'] = print_r(unserialize($row['log']), true);
+        $row['log_pretty'] = print_r(unserialize($row['log']), true); // @phpstan-ignore disallowedFunctions.printR (returns unserialized log entry as string for syslog display, never prints)
     }
 }
 $smarty->assign_by_ref('count', $list['count']);

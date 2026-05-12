@@ -514,16 +514,12 @@ class BilingualAlignerTest extends TikiTestCase
     private function assertCostMatrixEquals($exp_cost_matrix, $got_cost_matrix, $message)
     {
 
-        //     print "-- assertCostMatrixEquals: \$exp_cost_matrix=\n";var_dump($exp_cost_matrix);print"\n";
-        //     print "-- assertCostMatrixEquals: \$got_cost_matrix=\n";var_dump($got_cost_matrix);print"\n";
 
         $exp_origins = array_keys($exp_cost_matrix);
         sort($exp_origins);
         $got_origins = array_keys($got_cost_matrix);
         sort($got_origins);
 
-        //      print "-- assertCostMatrixEquals: \$exp_origins=\n";var_dump($exp_origins);print"\n";
-        //      print "-- assertCostMatrixEquals: \$got_origins=\n";var_dump($got_origins);print"\n";
 
         $this->assertEquals(
             $exp_origins,
@@ -532,8 +528,6 @@ class BilingualAlignerTest extends TikiTestCase
         );
 
         foreach (array_keys($exp_cost_matrix) as $origin) {
-            //         print "-- assertCostMatrixEquals: \$exp_cost_matrix[$origin]=";var_dump($exp_cost_matrix[$origin]);print"\n";
-            //         print "-- assertCostMatrixEquals: \$got_cost_matrix[$origin]=";var_dump($got_cost_matrix[$origin]);print"\n";
             $this->assertEquals(
                 $exp_cost_matrix[$origin],
                 $got_cost_matrix[$origin],

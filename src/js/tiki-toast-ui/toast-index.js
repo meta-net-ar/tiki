@@ -157,7 +157,6 @@ function tikiPlugin(eventEmitter) {
                         for (let i = 1; i <= level; i++) {
                             numberingText += (numberingText ? "." : "") + numbering[i];
                         }
-                        console.log(numberingText);
                         numberingText += " ";
                     }
                 }
@@ -234,7 +233,7 @@ function tikiPlugin(eventEmitter) {
 
 export default function tikiToastEditor(options) {
     if (!options.domId) {
-        console.error("No element id 'domId' option provided to tikiToast init");
+        console.error("No element id 'domId' option provided to tikiToast init"); // eslint-disable-line no-console
         return;
     }
 

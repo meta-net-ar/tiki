@@ -240,7 +240,6 @@ class TikiHybrid extends LogsLib
 
         if (! $user) {
             $err_msg = tr('TikiHybrid unable to create a new user:' . $user . ' with your ' . $this->providerName . ' account. You might already have an account and need to link. But it is not implemented yet.');
-            //error_log($err_msg);
             Feedback::error($err_msg);
         } else {
             Feedback::note('TikiHybrid from ' . $this->providerName . ' has created a new user: ' . $user);

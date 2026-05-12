@@ -27,6 +27,7 @@ const vueLifecycles = singleSpaVue({
         app.config.idPrefix = "tracker-rules";
         app.use(UIPredicate);
         if (import.meta.env.MODE === "development") {
+            // eslint-disable-next-line no-console
             console.log(import.meta.env);
         }
     },
