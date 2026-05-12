@@ -945,6 +945,7 @@ class HeaderLib
 
     public function clear_js($clear_js_files = false)
     {
+        $this->outputStaticJSFooterWasStartedBy = null;
         $this->js = [];
         $this->jq_onready = [];
         $this->js_modules = [];
