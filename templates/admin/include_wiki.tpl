@@ -437,6 +437,15 @@
                     </div>
                 </fieldset>
             </div>
+            <div class="adminoptionbox clearfix">
+                <fieldset class="mb-3 w-100">
+                    <legend class="h3">{tr}Wiki page importers{/tr}</legend>
+                    <div class="adminoptionbox clearfix">
+                        {button href="tiki-markdown_import.php" _text="{tr}Import markdown files and convert to wiki pages{/tr}" _icon_name="file-import" _type="secondary"} <br /><br />
+                        {button href="tiki-import_xml_zip.php" _text="{tr}Import wiki pages in an XML Zip file from another Tiki{/tr}" _icon_name="file-import" _type="secondary"}
+                    </div>
+                </fieldset>
+            </div>
         {/tab}
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}
