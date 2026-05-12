@@ -25,10 +25,16 @@ class SourceManager
 
     private string $error = '';
     private ?string $sourceId = null;
+    private array $lastFetchMeta = [];
 
     public function getError(): string
     {
         return $this->error;
+    }
+
+    public function getLastFetchMeta(): array
+    {
+        return $this->lastFetchMeta;
     }
 
     /**
@@ -123,10 +129,18 @@ class SourceManager
     public function fetchWithProvider(SourceProviderInterface $provider): ?string
     {
         $this->error = '';
+        $this->lastFetchMeta = [];
         try {
-            return $provider->fetchToTempDir();
+            $path = $provider->fetchToTempDir();
+            if (method_exists($provider, 'getFetchMeta')) {
+                $this->lastFetchMeta = (array) $provider->getFetchMeta();
+            }
+            return $path;
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
+            if (method_exists($provider, 'getFetchMeta')) {
+                $this->lastFetchMeta = (array) $provider->getFetchMeta();
+            }
             return null;
         }
     }

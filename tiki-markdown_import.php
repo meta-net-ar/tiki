@@ -181,15 +181,9 @@ if ($action === ACTION_SAVE && $access->checkCsrf()) {
 
 // Dry-run (preview) — placeholder
 if ($action === ACTION_DRY_RUN && $access->checkCsrf()) {
-    $sourceCfg = $_SESSION[SESS_MD_IMPORT][SESS_SOURCE] ?? [];
-    $wikiOpts = $_SESSION[SESS_MD_IMPORT][SESS_WIKI] ?? [];
-
-    // Markdown flavor selection comes from UI (or default)
-    if (! empty($_POST['markdown_source'])) {
-        $wikiOpts[WIKI_MARKDOWN_SOURCE] = $_POST['markdown_source'];
-    } elseif (empty($wikiOpts[WIKI_MARKDOWN_SOURCE])) {
-        $wikiOpts[WIKI_MARKDOWN_SOURCE] = 'commonmark';
-    }
+    $runtimeCfg = mdimp_build_runtime_cfg($_SESSION[SESS_MD_IMPORT] ?? []);
+    $sourceCfg = $runtimeCfg[SESS_SOURCE] ?? [];
+    $wikiOpts = $runtimeCfg[SESS_WIKI] ?? [];
 
     // Upload local ad hoc ?
     $uploadTmp  = null;
@@ -217,8 +211,9 @@ if ($action === ACTION_DRY_RUN && $access->checkCsrf()) {
 
 // Import now
 if ($action === ACTION_IMPORT && $access->checkCsrf()) {
-    $sourceCfg = $_SESSION[SESS_MD_IMPORT][SESS_SOURCE] ?? [];
-    $wikiOpts = $_SESSION[SESS_MD_IMPORT][SESS_WIKI] ?? [];
+    $runtimeCfg = mdimp_build_runtime_cfg($_SESSION[SESS_MD_IMPORT] ?? []);
+    $sourceCfg = $runtimeCfg[SESS_SOURCE] ?? [];
+    $wikiOpts = $runtimeCfg[SESS_WIKI] ?? [];
 
     // upload overrides “local” source if provided
     $uploadTmp  = null;
@@ -251,7 +246,7 @@ if ($action === ACTION_IMPORT && $access->checkCsrf()) {
 
     // Markdown flavor selection comes from UI (or default)
     $flavor = $_POST['markdown_source'] ?? ($wikiOpts[WIKI_MARKDOWN_SOURCE] ?? 'commonmark');
-    $gc = $_SESSION[SESS_MD_IMPORT][SESS_GC] ?? [];
+    $gc = $runtimeCfg[SESS_GC] ?? [];
 
     $pipelineCfg = [
         'flavor'              => $flavor,
@@ -311,6 +306,102 @@ function mdimp_val_plain($v): ?string
     // escape spaces to avoid quoting
     $s = preg_replace('/\s+/u', ' ', $s);
     return str_replace(' ', '\ ', $s);
+}
+
+function mdimp_build_runtime_cfg(array $sessionCfg): array
+{
+    $source = $sessionCfg[SESS_SOURCE] ?? [];
+    $wiki = $sessionCfg[SESS_WIKI] ?? [];
+    $gc = $sessionCfg[SESS_GC] ?? [];
+
+    if (! empty($_POST['source_type'])) {
+        $type = $_POST['source_type'];
+        if (in_array($type, [SRC_TYPE_LOCAL, SRC_TYPE_GIT], true)) {
+            $source[CFG_TYPE] = $type;
+        }
+    }
+
+    if (array_key_exists('source_id', $_POST)) {
+        $source[CFG_SOURCE_ID] = trim((string)$_POST['source_id']);
+    }
+
+    if (array_key_exists('repo_url', $_POST)) {
+        $source[CFG_REPO_URL] = trim((string)$_POST['repo_url']);
+    }
+    if (array_key_exists('repo_branch', $_POST)) {
+        $source[CFG_REPO_BRANCH] = trim((string)$_POST['repo_branch']);
+    }
+    if (array_key_exists('git_pull', $_POST)) {
+        $source[CFG_GIT_PULL] = true;
+    } elseif (($source[CFG_TYPE] ?? '') === SRC_TYPE_GIT) {
+        $source[CFG_GIT_PULL] = false;
+    }
+    if (array_key_exists('repo_token', $_POST)) {
+        $source[CFG_REPO_TOKEN] = trim((string)$_POST['repo_token']);
+    }
+    if (array_key_exists('git_timeout', $_POST)) {
+        $source[CFG_GIT_TIMEOUT] = max(5, (int)$_POST['git_timeout']);
+    }
+
+    if (array_key_exists('markdown_source', $_POST) && $_POST['markdown_source'] !== '') {
+        $wiki[WIKI_MARKDOWN_SOURCE] = $_POST['markdown_source'];
+    } elseif (empty($wiki[WIKI_MARKDOWN_SOURCE])) {
+        $wiki[WIKI_MARKDOWN_SOURCE] = 'commonmark';
+    }
+
+    if (array_key_exists('roots', $_POST)) {
+        $wiki[WIKI_ROOTS] = trim((string)$_POST['roots']);
+    }
+    if (array_key_exists('recursive', $_POST)) {
+        $wiki[WIKI_RECURSIVE] = true;
+    } elseif (array_key_exists('action', $_POST)) {
+        $wiki[WIKI_RECURSIVE] = false;
+    }
+    if (array_key_exists('max_depth', $_POST)) {
+        $wiki[WIKI_MAX_DEPTH] = max(0, (int)$_POST['max_depth']);
+    }
+    if (array_key_exists('exclude_globs', $_POST)) {
+        $wiki[WIKI_EXCLUDE_GLOBS] = trim((string)$_POST['exclude_globs']);
+    }
+    if (array_key_exists('title_strategy', $_POST)) {
+        $wiki[WIKI_TITLE_STRATEGY] = (string)$_POST['title_strategy'];
+    }
+    if (array_key_exists('naming_mode', $_POST)) {
+        $wiki[WIKI_NAMING_MODE] = (string)$_POST['naming_mode'];
+    }
+    if (array_key_exists('dir_levels', $_POST)) {
+        $wiki[WIKI_DIR_LEVELS] = max(0, (int)$_POST['dir_levels']);
+    }
+    if (array_key_exists('separator', $_POST)) {
+        $wiki[WIKI_SEPARATOR] = (string)$_POST['separator'];
+    }
+    if (array_key_exists('namespace', $_POST)) {
+        $wiki[WIKI_NAMESPACE] = trim((string)$_POST['namespace']);
+    }
+    if (array_key_exists('detect_journal', $_POST)) {
+        $wiki[WIKI_DETECT_JOURNAL] = true;
+    } elseif (array_key_exists('action', $_POST)) {
+        $wiki[WIKI_DETECT_JOURNAL] = false;
+    }
+    if (array_key_exists('journal_lang', $_POST)) {
+        $wiki[WIKI_JOURNAL_LANG] = in_array($_POST['journal_lang'], ['en', 'fr'], true) ? $_POST['journal_lang'] : 'en';
+    }
+    if (array_key_exists('journal_ns', $_POST)) {
+        $wiki[WIKI_JOURNAL_NS] = trim((string)$_POST['journal_ns']);
+    }
+
+    if (array_key_exists('gc_mode', $_POST)) {
+        $gc[GC_MODE] = in_array($_POST['gc_mode'], ['off', 'mark', 'delete'], true) ? $_POST['gc_mode'] : 'off';
+    }
+    if (array_key_exists('gc_safe_namespace', $_POST)) {
+        $gc[GC_SAFE_NAMESPACE] = trim((string)$_POST['gc_safe_namespace']);
+    }
+
+    return [
+        SESS_SOURCE => $source,
+        SESS_WIKI => $wiki,
+        SESS_GC => $gc,
+    ];
 }
 
 function mdimp_same($v, $def): bool
@@ -390,7 +481,6 @@ if ($srcType === SRC_TYPE_LOCAL) {
     $srcOpts[] = mdimp_opt_if_changed('repo-url', $source[CFG_REPO_URL] ?? null, $cliDefaults['repo-url']);
     $srcOpts[] = mdimp_opt_if_changed('repo-branch', $source[CFG_REPO_BRANCH] ?? null, $cliDefaults['repo-branch']);
     $srcOpts[] = mdimp_opt_if_changed('git-pull', $source[CFG_GIT_PULL] ?? null, $cliDefaults['git-pull']);
-    $srcOpts[] = mdimp_opt_if_changed('repo-token', $source[CFG_REPO_TOKEN] ?? null, $cliDefaults['repo-token']);
     $srcOpts[] = mdimp_opt_if_changed('git-timeout', $source[CFG_GIT_TIMEOUT] ?? null, $cliDefaults['git-timeout']);
 }
 

@@ -285,6 +285,17 @@ class MarkdownImporterCommand extends Command
         $written = (int)($result['written'] ?? 0);
         $io->success(sprintf('%d page(s) imported or updated.', $written));
 
+        if (! empty($result['source_meta']) && is_array($result['source_meta'])) {
+            $meta = $result['source_meta'];
+            $io->writeln(sprintf(
+                'Git sync: mode=%s branch=%s head=%s remote=%s',
+                (string)($meta['sync_mode'] ?? 'n/a'),
+                (string)($meta['checked_out_branch'] ?? ($meta['requested_branch'] ?? 'n/a')),
+                (string)($meta['head'] ?? 'n/a'),
+                (string)($meta['remote_head'] ?? 'n/a')
+            ));
+        }
+
         if (! empty($result['errors'])) {
             $io->warning('Errors:');
             foreach ($result['errors'] as $e) {

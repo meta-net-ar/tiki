@@ -33,6 +33,7 @@ class TikiMarkdownImporter
     private const RES_NOTES = 'notes';
     private const RES_GC_REPORT = 'gc_report';
     private const RES_ORPHANED = 'orphaned';
+    private const RES_SOURCE_META = 'source_meta';
 
     private const CNT_TOTAL = 'total';
     private const CNT_GC_ORPHANS = 'gc_orphans';
@@ -124,12 +125,13 @@ class TikiMarkdownImporter
     ): array {
         $mgr = new SourceManager();
         $dirPath = $mgr->fetchToTempDir($sourceCfg, $uploadTmp, $uploadName);
+        $sourceMeta = $mgr->getLastFetchMeta();
         $seenRelpaths = [];
         $isUploadedTemp = false;
 
         if (! $dirPath) {
             $this->errors[] = $mgr->getError();
-            return [self::RES_WRITTEN => 0, self::RES_SKIPPED => 0, self::RES_COUNTS => [self::CNT_TOTAL => 0], self::RES_ERRORS => $this->errors, self::RES_NOTES => []];
+            return [self::RES_WRITTEN => 0, self::RES_SKIPPED => 0, self::RES_COUNTS => [self::CNT_TOTAL => 0], self::RES_ERRORS => $this->errors, self::RES_NOTES => [], self::RES_SOURCE_META => $sourceMeta];
         }
 
         // Detect if temp directory should be cleaned up
@@ -266,6 +268,7 @@ class TikiMarkdownImporter
             self::RES_NOTES => $this->notesByPage,
             self::RES_GC_REPORT => $gcReport,
             self::RES_ORPHANED => $orphanedEntries,
+            self::RES_SOURCE_META => $sourceMeta,
         ];
     }
 
@@ -281,9 +284,10 @@ class TikiMarkdownImporter
     ): array {
         $mgr = new SourceManager();
         $dirPath = $mgr->fetchToTempDir($sourceCfg, $uploadTmp, $uploadName);
+        $sourceMeta = $mgr->getLastFetchMeta();
         if (! $dirPath) {
             $this->lastError = $mgr->getError() ?: tra('Unknown error fetching source.');
-            return ['ok' => false, 'error' => $this->lastError];
+            return ['ok' => false, 'error' => $this->lastError, self::RES_SOURCE_META => $sourceMeta];
         }
 
         $isUploadedTemp = false;
@@ -322,6 +326,7 @@ class TikiMarkdownImporter
                 'counts'  => $scan[self::SCAN_COUNTS] ?? ['pages' => 0, 'journals' => 0, 'total' => 0],
                 'dialect' => $wikiOpts[self::WIKI_OPT_MARKDOWN_SOURCE] ?? 'commonmark',
                 'items'   => [],
+                self::RES_SOURCE_META => $sourceMeta,
             ];
         }
 
@@ -365,6 +370,7 @@ class TikiMarkdownImporter
             'counts'  => $scan[self::SCAN_COUNTS] ?? [],
             'dialect' => $dialect,
             'items'   => $items,
+            self::RES_SOURCE_META => $sourceMeta,
         ];
     }
 

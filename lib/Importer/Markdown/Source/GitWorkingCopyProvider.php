@@ -18,6 +18,8 @@ class GitWorkingCopyProvider implements SourceProviderInterface
     private const DEF_BRANCH = 'main';
     private const DEF_TIMEOUT = 45;
 
+    private array $fetchMeta = [];
+
     public function __construct(
         private array $cfg,   // ['repo_url'=>..., 'repo_branch'=>'main', 'repo_token'=>'', 'git_pull'=>true]
         private array $ctx = [] // ex: ['timeout'=>45]
@@ -45,12 +47,30 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         $wcPath = $this->computeRepoPath($repoRoot, $repoUrl);
         $this->ensureDir(\dirname($wcPath));
 
+        $this->fetchMeta = [
+            'type' => 'git',
+            'repo_url' => $repoUrl,
+            'repo_path' => $wcPath,
+            'requested_branch' => $branch,
+            'git_pull' => $gitPull,
+            'sync_mode' => 'unknown',
+            'repo_reset' => false,
+        ];
+
+        // The working copy is transient by design: always start from a fresh clone.
+        if (is_dir($wcPath)) {
+            $this->rrmdir($wcPath);
+            $this->fetchMeta['repo_reset'] = true;
+            $this->fetchMeta['sync_mode'] = 'fresh_clone';
+        }
+
         // Clone initial (with retry) or pull
         if (! is_dir($wcPath . '/.git')) {
             try {
                 $this->gitClone($git, $repoUrl, $branch, $wcPath, $token, $timeout);
                 $this->waitForCloneReady($wcPath);
                 $this->markRepoSafe($git, $wcPath, $token);
+                $this->fetchMeta['sync_mode'] = 'fresh_clone';
             } catch (\Throwable $e) {
                 if (is_dir($wcPath . '/.git')) {
                     $this->markRepoSafe($git, $wcPath, $token);
@@ -60,14 +80,25 @@ class GitWorkingCopyProvider implements SourceProviderInterface
                     $this->gitClone($git, $repoUrl, $branch, $wcPath, $token, $timeout);
                     $this->waitForCloneReady($wcPath);
                     $this->markRepoSafe($git, $wcPath, $token);
+                    $this->fetchMeta['sync_mode'] = 'fresh_clone';
                 }
             }
         } elseif ($gitPull) {
             $this->gitPull($git, $wcPath, $token, $timeout);
+            $this->fetchMeta['sync_mode'] = 'pull';
+        } else {
+            $this->fetchMeta['sync_mode'] = 'reuse_no_pull';
         }
+
+        $this->fetchMeta = array_merge($this->fetchMeta, $this->collectRepoState($git, $wcPath, $token, $repoUrl, $branch, $timeout));
 
         // Return working copy directory directly
         return $wcPath;
+    }
+
+    public function getFetchMeta(): array
+    {
+        return $this->fetchMeta;
     }
 
     /* ---------- Git helpers ---------- */
@@ -171,6 +202,9 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             $out .= (string)stream_get_contents($pipes[2]);
             usleep(100_000);
         }
+        // Drain any remaining buffered output after process exit.
+        $out .= (string)stream_get_contents($pipes[1]);
+        $out .= (string)stream_get_contents($pipes[2]);
         if (is_resource($pipes[1])) {
             fclose($pipes[1]);
         }
@@ -184,6 +218,50 @@ class GitWorkingCopyProvider implements SourceProviderInterface
             $outSafe = $this->maskSecrets($out);
             throw new \RuntimeException($errLabel . ":\n$cmd\n-- output --\n" . trim($outSafe));
         }
+    }
+
+    private function runGitCapture(string $git, string $args, int $timeout, array $env, ?string $cwd): array
+    {
+        $cmd = escapeshellarg($git) . ' ' . $args . ' 2>&1';
+        $desc = [['pipe', 'r'], ['pipe', 'w'], ['pipe', 'w']];
+        $proc = proc_open($cmd, $desc, $pipes, $cwd, $env);
+        if (! \is_resource($proc)) {
+            return ['code' => 1, 'output' => ''];
+        }
+
+        fclose($pipes[0]);
+        stream_set_blocking($pipes[1], false);
+        stream_set_blocking($pipes[2], false);
+
+        $start = time();
+        $out = '';
+        while (true) {
+            $status = proc_get_status($proc);
+            if (! $status['running']) {
+                break;
+            }
+            if (time() - $start > $timeout) {
+                proc_terminate($proc);
+                $out .= "\n[timeout]";
+                break;
+            }
+            $out .= (string)stream_get_contents($pipes[1]);
+            $out .= (string)stream_get_contents($pipes[2]);
+            usleep(100_000);
+        }
+
+        // Drain any remaining buffered output after process exit.
+        $out .= (string)stream_get_contents($pipes[1]);
+        $out .= (string)stream_get_contents($pipes[2]);
+
+        if (is_resource($pipes[1])) {
+            fclose($pipes[1]);
+        }
+        if (is_resource($pipes[2])) {
+            fclose($pipes[2]);
+        }
+
+        return ['code' => proc_close($proc), 'output' => trim($this->maskSecrets($out))];
     }
 
     private function gitClone(string $git, string $url, string $branch, string $dst, string $token, int $timeout): void
@@ -210,7 +288,30 @@ class GitWorkingCopyProvider implements SourceProviderInterface
         }
 
         $env = $this->gitEnv($token, $origin);
-        $this->runGit($git, '-C ' . escapeshellarg($path) . ' pull --ff-only', $timeout, $env, null, 'Git pull failed', false);
+        $this->runGit($git, '-C ' . escapeshellarg($path) . ' pull --ff-only', $timeout, $env, null, 'Git pull failed', true);
+    }
+
+    private function collectRepoState(string $git, string $wcPath, string $token, string $repoUrl, string $branch, int $timeout): array
+    {
+        $localEnv = $this->gitEnv($token, null);
+        $remoteEnv = $this->gitEnv($token, $repoUrl);
+
+        $head = $this->runGitCapture($git, '-C ' . escapeshellarg($wcPath) . ' rev-parse --short HEAD', $timeout, $localEnv, null);
+        $headBranch = $this->runGitCapture($git, '-C ' . escapeshellarg($wcPath) . ' rev-parse --abbrev-ref HEAD', $timeout, $localEnv, null);
+        $remote = $this->runGitCapture($git, 'ls-remote --heads ' . escapeshellarg($repoUrl) . ' ' . escapeshellarg($branch), $timeout, $remoteEnv, null);
+
+        $remoteHead = '';
+        if ($remote['code'] === 0 && $remote['output'] !== '') {
+            $parts = preg_split('/\s+/', $remote['output']);
+            $remoteHead = $parts[0] ?? '';
+        }
+
+        return [
+            'head' => $head['code'] === 0 ? trim($head['output']) : null,
+            'checked_out_branch' => $headBranch['code'] === 0 ? trim($headBranch['output']) : null,
+            'remote_head' => $remoteHead !== '' ? substr($remoteHead, 0, 12) : null,
+            'is_up_to_date' => ($remoteHead !== '' && $head['code'] === 0) ? str_starts_with($remoteHead, trim($head['output'])) : null,
+        ];
     }
 
     /* ---------- Files helpers ---------- */

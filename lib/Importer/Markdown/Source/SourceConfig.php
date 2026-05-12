@@ -25,7 +25,7 @@ class SourceConfig
 
     private const DEF_TYPE = 'local';
     private const DEF_BRANCH = 'main';
-    private const DEF_TIMEOUT = 45;
+    private const DEF_TIMEOUT = 30;
 
     private array $values;
 

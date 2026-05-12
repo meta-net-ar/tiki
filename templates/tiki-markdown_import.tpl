@@ -45,7 +45,7 @@
                 <div class="row mb-2">
                     <label class="col-sm-3 col-form-label">{tr}Access Token (HTTPS) (Required for private repos){/tr}</label>
                     <div class="col-sm-9">
-                        <input class="form-control" type="password" name="repo_token" value="{$md_source.repo_token|escape}">
+                        <input class="form-control" type="password" name="repo_token" value="" autocomplete="new-password">
                         <div class="form-text">{tr}GitHub: Fine-grained token with “Contents: Read-only” on this repo. GitLab: Access Token with read_repository.{/tr}</div>
                     </div>
                 </div>
