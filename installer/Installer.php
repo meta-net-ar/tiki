@@ -27,6 +27,8 @@ class Installer extends TikiDb_Bridge implements SplSubject
     public $scripts = [];
     public $executed = [];
 
+    private string $currentPatchName = '';
+
     public $queries = [
         'currentStmt' => '',
         'currentFile' => '',
@@ -34,7 +36,8 @@ class Installer extends TikiDb_Bridge implements SplSubject
         'total' => 0,
         'files' => [], //path of the files executed
         'successful' => [],
-        'failed' => []
+        'failed' => [],
+        'warnings' => []
     ];
 
     public $useInnoDB = true;
@@ -140,6 +143,8 @@ class Installer extends TikiDb_Bridge implements SplSubject
         foreach (Patch::getPatches([Patch::NOT_APPLIED]) as $patchName => $patch) {
             try {
                 $this->installPatch($patchName);
+            } catch (MySQLWarningException $e) {
+                throw $e;
             } catch (Exception $e) {
                 if ($e->getCode() != 2) {
                     throw $e;
@@ -163,6 +168,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
      */
     public function installPatch($patch, $force = false)
     {
+        $this->currentPatchName = (string) $patch;
         if (! $force && isset(Patch::$list[$patch]) && Patch::$list[$patch]->isApplied()) {
             throw new Exception('Patch already applied', 3);
         }
@@ -202,7 +208,8 @@ class Installer extends TikiDb_Bridge implements SplSubject
             } else {
                 try {
                     $status = $this->runFile($schema);
-                } catch (Exception $e) {
+                } catch (MySQLWarningException $e) {
+                    throw $e;
                 }
             }
 
@@ -222,6 +229,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
         } else {
             Patch::$list[$patch]->record();
         }
+        $this->currentPatchName = '';
     }
 
     /**
@@ -349,12 +357,48 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $error = '';
         $result = $this->queryError($query, $error, $values);
 
+        if (stripos(trim($query), 'SHOW WARNINGS') === 0) {
+            return $result;
+        }
+
+        $isCI = ! empty($_ENV['TIKI_CATCH_UPDATE_WARNINGS']) || getenv('TIKI_CATCH_UPDATE_WARNINGS');
+        $warnings = [];
+        $warnResult = self::get()->query('SHOW WARNINGS', reporterrors: \TikiDb::ERR_NONE);
+
+        if ($warnResult) {
+            while ($row = $warnResult->fetchRow()) {
+                if ($row['Level'] === 'Warning' || $row['Level'] === 'Error') {
+                    $code = (int) $row['Code'];
+                    // Historical patches are before 2026-04-17. Base schema (empty name) is also historical.
+                    $isHistorical = empty($this->currentPatchName) || substr($this->currentPatchName, 0, 8) < '20260417';
+
+                    if (($code === 1681 || $code === 124) && $isHistorical) {
+                        continue;
+                    }
+
+                    $warnings[] = $row['Level'] . ' ' . $row['Code'] . ': ' . $row['Message'];
+                }
+            }
+        }
+
         if ($result && empty($error)) {
+            if ($isCI && ! empty($warnings)) {
+                throw new MySQLWarningException("MySQL Warning(s) caught during upgrade in query:\n$query\nWarnings:\n" . implode("\n", $warnings));
+            }
+
+            if (! empty($warnings)) {
+                $this->queries['warnings'][] = ['query' => $query, 'warnings' => $warnings];
+            }
+
             if ($countQueries) {
                 $this->queries['successful'][] = $query;
             }
             return $result;
         } else {
+            if ($isCI && ! empty($warnings)) {
+                throw new MySQLWarningException("MySQL Error/Warning(s) caught during upgrade in query:\n$query\nDetails:\n" . implode("\n", $warnings));
+            }
+
             if ($countQueries) {
                 $this->queries['failed'][] = [$query, $error, substr(basename($patch), 0, -4)];
             }
