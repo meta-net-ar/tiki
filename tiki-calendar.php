@@ -40,8 +40,6 @@ Sections::setCurrentSection($section);
 $calendarlib = TikiLib::lib('calendar');
 $categlib = TikiLib::lib('categ');
 include_once('lib/newsletters/nllib.php');
-
-$headerlib->add_cssfile('themes/base_files/feature_css/calendar.css', 20);
 # perms are
 #   $tiki_p_view_calendar
 #   $tiki_p_admin_calendar
@@ -368,7 +366,6 @@ if ($canEditAnything) {
     $smarty->assign('maxHourOfDay', $maxHourOfDay . ':00:00');
 
     TikiLib::lib('header')
-        ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
         ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
 }
 
