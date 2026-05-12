@@ -992,8 +992,9 @@ class Tracker_Query
 
         if ($this->debug == true) {
             $result = [$query, $params];
+            // @phpstan-ignore disallowedFunctions.printR (intentional debug output gated by $this->debug)
             print_r($result);
-            print_r($tikilib->fetchAll($query, $params));
+            print_r($tikilib->fetchAll($query, $params)); // @phpstan-ignore disallowedFunctions.printR (intentional debug output gated by $this->debug)
             die;
         } else {
             $result = $tikilib->fetchAll($query, $params);

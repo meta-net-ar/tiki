@@ -148,7 +148,6 @@ function _map_field($fieldHandler, string $fieldValuesParamName, $fieldValuesPar
         $fieldParamsArray = explode(',', $fieldValuesParam[0]);
         $fieldValue = trim($fieldParamsArray[0]);
         if ($fieldValue === '') {
-            //print_r("We have a single field in the configuration, and it's the empty value");
             $appendAllPossibleFieldValues = true;
         }
     }
@@ -410,8 +409,6 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         }
     }
     foreach ($entries as $row) {
-        //echo '<pre>ROW:';print_r($row);echo '</pre>';
-
         //$trackerItem = Tracker_Item::fromInfo($row);
         //The following will cause SQL query inside a loop, but the above just doesn't work right.   We really need a proper query engine...
         $trackerItem = Tracker_Item::fromId($row['object_id']);
@@ -425,7 +422,6 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         }
         $trackerItemData = $trackerItem->getData();
 
-        //echo '<pre>trackerItemData:';print_r($trackerItemData);echo '</pre>';
 
         //We don't use $row[$swimlaneFieldPermName], because it's the title, not the value
         $swimlaneValue = $trackerItemData['fields'][$swimlaneFieldPermName];
@@ -439,17 +435,11 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
         //Filter the cards ,AGAIN!
         if ($jit->columnValues->text()) {
             if (! in_array($columnValue, array_keys($columnsInfo))) {
-                /*print_r("SKIP card missing value in column map");
-                print_r(array_keys($columnsInfo));*/
                 continue;  //Skip tracker items that have fields with values not in the mapped enumerable fields
             }
         }
         if ($jit->swimlaneValues->text()) {
             if (! in_array($swimlaneValue, array_keys($swimlanesInfo))) {
-                /*print_r("<pre>SKIP card missing value in swimlane map");
-                print_r($swimlaneValue);
-                print_r($swimlanesInfo);
-                print_r("</pre>");*/
                 continue;  //Skip tracker items that have fields with values not in the mapped enumerable fields
             }
         }
@@ -528,9 +518,6 @@ function wikiplugin_kanban(string $data, array $params): WikiParser_PluginOutput
 function wikiplugin_kanban_format_list($handler)
 {
     $fieldData = $handler->getFieldData();
-    echo '<pre>';
-    print_r($fieldData);
-    echo '</pre>';
     $list = $formatted = [];
     if ($handler->getConfiguration('type') === 'd') {
         $list = $fieldData['possibilities'];

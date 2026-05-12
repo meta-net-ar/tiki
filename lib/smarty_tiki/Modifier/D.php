@@ -53,6 +53,7 @@ class D
                     echo str_replace(['~np~', '~/np~'], '', $return);
             }
         } else {
+            // @phpstan-ignore disallowedFunctions.varDump (fallback debug output when Kint is not installed)
             var_dump($var);
         }
     }

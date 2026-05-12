@@ -265,11 +265,6 @@ class UpdatePagesTest extends TikiTestCase
     ) {
 
 
-        //      echo "<pre>-- UpdatePagesTest.do_test_basic_updating: \$orig_source_array="; var_dump($orig_source_array); echo "</pre>\n";
-        //      echo "<pre>-- UpdatePagesTest.do_test_basic_updating: \$modified_source_array="; var_dump($modified_source_array); echo "</pre>\n";
-        //      echo "<pre>-- UpdatePagesTest.do_test_basic_updating: \$orig_target_array="; var_dump($orig_target_array); echo "</pre>\n";
-        //      echo "<pre>-- UpdatePagesTest.do_test_basic_updating: \$modified_target_array="; var_dump($modified_target_array); echo "</pre>\n";
-        //      echo "<pre>-- UpdatePagesTest.do_test_basic_updating: \$expected_updated_target_array="; var_dump($expected_updated_target_array); echo "</pre>\n";
 
         $orig_source = implode(' ', $orig_source_array);
         $modified_source = implode(' ', $modified_source_array);
@@ -287,7 +282,6 @@ class UpdatePagesTest extends TikiTestCase
             $target_lng
         );
 
-        //      echo "<pre>-- UpdatePagesTest.do_test_basic_updating: \$final="; var_dump($final); echo "</pre>\n";
 
 
         $this->assertEquals($expected_updated_target_array, $final, $message);

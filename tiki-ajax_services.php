@@ -202,7 +202,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
             $access->output_serialized(['type' => 'success', 'results' => $references]);
         }
     } catch (Exception $e) {
-        error_log("Zotero error: " . $e->getMessage());
+        error_log("Zotero error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (Zotero exception reporting)
         $access->output_serialized(['type' => 'error', 'message' => $e->getMessage(), 'results' => []]);
     }
 } elseif (isset($_REQUEST['geocode']) && $access->is_serializable_request()) {

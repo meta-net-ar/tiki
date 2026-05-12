@@ -17,12 +17,12 @@ export const TEXT = {
  */
 export default function applyAutocomplete(element, remoteSourceUrl = null, sourceList = [], valueKey = null, selectCb = null) {
     if (!element) {
-        console.error(TEXT.ERROR_NO_ELEMENT);
+        console.error(TEXT.ERROR_NO_ELEMENT); // eslint-disable-line no-console
         return;
     }
 
     if (!remoteSourceUrl && !sourceList.length) {
-        console.error(TEXT.ERROR_NO_SOURCE);
+        console.error(TEXT.ERROR_NO_SOURCE); // eslint-disable-line no-console
         return;
     }
 

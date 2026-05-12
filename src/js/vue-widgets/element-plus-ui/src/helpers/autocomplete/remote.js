@@ -12,7 +12,7 @@ export function fetchSuggestions(query, callback, sourceRemoteUrl = null, source
     }
 
     if (!sourceRemoteUrl) {
-        console.error("Either sourceRemoteUrl or sourceList must be provided to fetch suggestions");
+        console.error("Either sourceRemoteUrl or sourceList must be provided to fetch suggestions"); // eslint-disable-line no-console
         return;
     }
 

@@ -883,7 +883,7 @@ class TikiAccessLib extends TikiLib
     private function csrfPhpErrorLog($msg)
     {
         global $prefs;
-        error_log(PHP_EOL
+        error_log(PHP_EOL // @phpstan-ignore disallowedFunctions.errorLog (access violation reporting)
             . '**** ' . tr('Start CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****' . PHP_EOL
             . '  ' . $msg . PHP_EOL
             . '  site_security_timeout' . tr('preference:') . $prefs['site_security_timeout']
@@ -895,7 +895,7 @@ class TikiAccessLib extends TikiLib
             . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] : '') . PHP_EOL);
         $get = count($_GET) ? json_encode($_GET, JSON_PRETTY_PRINT) : tr('empty');
         $post = count($_POST) ? json_encode($_POST, JSON_PRETTY_PRINT) : tr('empty');
-        error_log(
+        error_log( // @phpstan-ignore disallowedFunctions.errorLog (access violation reporting)
             PHP_EOL
             . '  $_GET: ' . $get . PHP_EOL
             . '  $_POST: ' . $post . PHP_EOL

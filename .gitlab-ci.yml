@@ -564,16 +564,6 @@ console-php-works:
   script:
     - php console.php
 
-check-leftover-debug-code:
-  stage: tiki-check
-  needs: []
-  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  script:
-    - php doc/devtools/CheckLeftoverDebugCode.php
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-
 #
 # Unit Tests
 #

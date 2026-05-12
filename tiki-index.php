@@ -296,7 +296,7 @@ if (empty($info)) {
                 $access->redirect($infoForSlug['pageSlug'], '', 301);
                 exit;
             } else {
-                error_log("Avoiding redirect loop: " . $infoForSlug['pageSlug']);
+                error_log("Avoiding redirect loop: " . $infoForSlug['pageSlug']); // @phpstan-ignore disallowedFunctions.errorLog (redirect loop detection warning)
             }
         }
     }

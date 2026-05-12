@@ -303,6 +303,7 @@
         "phpcsstandards/phpcsutils": "~1.0",
         "phpstan/phpstan": "~2.1",
         "phpstan/phpstan-deprecation-rules": "~2.0",
+        "spaze/phpstan-disallowed-calls": "~4.12",
         "phpunit/phpunit": "~10.5",
         "rector/rector": "~2.0",
         "sebastian/diff": "~5.1",
