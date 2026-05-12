@@ -377,7 +377,7 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
         $trk = TikiLib::lib('trk');
         $fields = $trk->get_fields_by_type('EF');
         if (! $fields) {
-            return;
+            return '';
         }
         $field_list = [];
         foreach ($fields as $field) {
