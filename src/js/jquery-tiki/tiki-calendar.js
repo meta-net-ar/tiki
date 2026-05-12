@@ -85,6 +85,7 @@ $.fn.setupFullCalendar = function (
                 },
                 year: {
                     type: "dayGrid",
+                    duration: { months: 12 },
                     buttonText: tr("year"),
                     dayCellContent: function ($x) {
                         return moment($x.date).format("M/D");
