@@ -43,6 +43,7 @@ function prefs_url_list()
                 'complete' => tra('Complete'),
             ],
             'default' => 'strict',
+            // 'help' => 'Apache-Clean-URLs',
         ],
         'url_fragment_guesser' => [
             'name' => tra('URL Fragment Guesser'),

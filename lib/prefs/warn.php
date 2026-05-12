@@ -23,5 +23,6 @@ function prefs_warn_list()
             'default' => 2,
             'help' => 'Wiki-Config',
         ],
+        'help' => 'Wiki-Config',
     ];
 }
