@@ -196,6 +196,17 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         return $item;
     }
 
+    protected function recurrenceBelongsToCalendar($recurrenceId, $calendarId)
+    {
+        $rec = new \CalRecurrence($recurrenceId);
+        if ((int)$rec->getCalendarId() !== (int)$calendarId || ! $rec->getFirstItemId()) {
+            return false;
+        }
+
+        $firstItem = TikiLib::lib('calendar')->get_item($rec->getFirstItemId());
+        return is_array($firstItem) && (int)$firstItem['calendarId'] === (int)$calendarId;
+    }
+
     protected function getCalendarUri($calendarId)
     {
         return Utilities::getCalendarUri($calendarId);
@@ -430,14 +441,19 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         $result = [];
         $recurrences = [];
         foreach ($objects as $row) {
-            if ($row['recurrenceId']) {
+            $rowForExport = $row;
+            if ($row['recurrenceId'] && $this->recurrenceBelongsToCalendar($row['recurrenceId'], $calendarId)) {
                 $recurrences[] = $row['recurrenceId'];
                 continue;
+            } elseif ($row['recurrenceId']) {
+                // Stale cross-calendar links should be exported as standalone events.
+                $rowForExport['recurrenceId'] = null;
+                $rowForExport['recurrenceStart'] = null;
             }
-            $calendardata = $this->constructCalendarData($row);
+            $calendardata = $this->constructCalendarData($rowForExport);
             $result[] = [
                 'id'           => $row['calitemId'],
-                'uri'          => $this->getCalendarObjectUri($row),
+                'uri'          => $this->getCalendarObjectUri($rowForExport),
                 'lastmodified' => (int)$row['lastModif'],
                 'etag'         => '"' . md5($calendardata) . '"',
                 'size'         => strlen($calendardata),  // TODO: add to Tiki: calendardata
