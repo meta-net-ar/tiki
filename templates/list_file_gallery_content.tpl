@@ -396,9 +396,9 @@
                             {if $propname eq 'name' and $propval eq '' and $gal_info.show_name eq 'n'}
                                 {* show the filename if only name should be displayed but is empty *}
                                 {$propval=$files[changes].filename}
-                                {$propval="<a class='fgalname namealias' $link>$propval</a>"}
+                                {$propval="<a class='fgalname namealias text-break' $link>$propval</a>"}
                             {else}
-                                {$propval="<a class='fgalname' $link>$propval</a>"}
+                                {$propval="<a class='fgalname text-break' $link>$propval</a>"}
                             {/if}
                             {if $propname eq 'name' and $gal_info.show_name eq 'n' and $gal_info.show_description eq 'o'}
                                 {if $gal_info.max_desc gt 0}
