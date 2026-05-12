@@ -47,6 +47,89 @@ header.container,
 //}
 
 //***** Site Header & Identity *****/
+
+//==================================================
+// NAVBAR - SEMANTIC STRUCTURE
+// Clean navbar using Bootstrap 5 utilities
+// No JavaScript needed!
+//==================================================
+
+// Main navbar
+#main-navbar {
+    padding-top: 0;
+    padding-bottom: 0;
+
+    // Logo sizing
+    .sitelogo-img {
+        max-height: 65px; // Default fallback if not set in module
+        width: auto;
+        height: auto;
+        object-fit: contain;
+
+        // Responsive: smaller on mobile
+        @media (max-width: 767px) {
+            max-height: 45px;
+        }
+    }
+
+    // Navbar brand (logo + title container)
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.5rem 0;
+
+        .sitetitle {
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .sitesubtitle {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+    }
+}
+
+// Sticky navbar specific styles
+.navbar.sticky-top {
+    top: 0;
+    z-index: 1020; // Bootstrap default
+
+    // Optional: Shadow when stuck
+    &.is-stuck {
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+}
+
+// Fixed navbar anchor offset
+// Prevent target anchors from being covered by fixed/sticky navbar
+.navbar.fixed-top,
+.navbar.sticky-top {
+    ~ * {
+        h1:target:before,
+        h2:target:before,
+        h3:target:before,
+        h4:target:before,
+        h5:target:before,
+        h6:target:before {
+            content: "";
+            display: block;
+            /**
+            @luciash Rightly pointed out on matrix that we shouldn't rely on such a magic string.
+            This is however well documented and proves that @sandy-12 thought about corner cases (in this case incoming links with an # anchor in the url).
+            I initially thought he didn't know about:
+            https://css-tricks.com/almanac/properties/s/scroll-margin/
+            But I think he actually wanted to avoid triggering scroll anchoring supression triggers since scroll anchoring is such a useful feature.
+            Since our header isn't fixed size (different modules can be added to it), probably the best solution is to target a height of half the viewport (ex:  height: 50vh;).  If the headers cover more than half the viewport, we have other problems to deal with.
+            benoitg - 2026-05-06
+            */
+            height: 80px; // Approximate navbar height
+            margin: -80px 0 0;
+        }
+    }
+}
+
 .box-quickadmin li {
     font-size: 0.9em;
 }
