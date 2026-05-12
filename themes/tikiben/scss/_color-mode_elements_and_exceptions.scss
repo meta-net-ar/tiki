@@ -98,7 +98,7 @@ $imagePath: "../images/";
         }
     }
 
-    .top_modules > .module {
+    .top_modules > .module:not(.box-logo) {
         & a:not(.btn), // Too general?
         & h2,
         & .siteloginbar_popup > button {
