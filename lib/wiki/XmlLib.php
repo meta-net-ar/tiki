@@ -77,12 +77,27 @@ class XmlLib extends TikiLib
             return false;
         }
 
-        $this->zip = new ZipArchive();
-        if (! file_exists($zipFile)) {
-            mkdir(EXPORT_DUMP_PATH, 0777, true);
+        $zipDir = dirname($zipFile);
+
+        if ($zipDir !== '.' && ! is_dir($zipDir)) {
+            if (! mkdir($zipDir, 0777, true) && ! is_dir($zipDir)) {
+                $this->errors[] = 'Cannot create export directory';
+                $this->errorsArgs[] = $zipDir;
+                return false;
+            }
         }
 
-        if (! $this->zip->open($zipFile, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE)) {
+        if ($zipDir !== '.' && ! is_writable($zipDir)) {
+            $this->errors[] = 'Export directory is not writable';
+            $this->errorsArgs[] = $zipDir;
+            return false;
+        }
+
+        $this->zip = new ZipArchive();
+
+        $res = $this->zip->open($zipFile, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+        if ($res !== true) {
             $this->errors[] = 'The file cannot be opened';
             $this->errorsArgs[] = $zipFile;
             return false;
