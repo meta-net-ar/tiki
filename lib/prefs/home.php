@@ -10,15 +10,19 @@ function prefs_home_list($partial = false)
     return [
         'home_blog' => [
             'name' => tra('Home blog (main blog)'),
+            'description' => tra('Select the main blog used as a homepage option and for default blog links.'),
             'type' => 'list',
             'options' => $partial ? [] : listblog_pref(),
             'default' => 0,
+            'help' => 'Blog-Config#Home_Blog_main_blog_',
             'profile_reference' => 'blog',
         ],
         'home_forum' => [
             'name' => tra('Home forum (main forum)'),
+            'description' => tra('Select the main forum used as a homepage option and for default forum links.'),
             'type' => 'text',
             'default' => 0,
+            'help' => 'Forum-Settings',
             'profile_reference' => 'forum',
         ],
         'home_file_gallery' => [
@@ -27,6 +31,7 @@ function prefs_home_list($partial = false)
             'type' => 'list',
             'options' => $partial ? [] : TikiLib::lib('filegal')->getFileGalleryList(),
             'default' => 1,
+            'help' => 'File-Gallery-General-Settings',
             'profile_reference' => 'file_gallery',
         ],
     ];

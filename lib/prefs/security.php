@@ -13,6 +13,7 @@ function prefs_security_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['advanced', 'htaccess', 'security'],
+            'help' => 'General-Security',
         ],
     ];
 }

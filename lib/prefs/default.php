@@ -15,6 +15,7 @@ function prefs_default_list()
         $cals = [];
     }
 
+    $forumAdminHelp = 'Forum-Admin';
 
     return [
         'default_mail_charset' => [
@@ -81,7 +82,7 @@ function prefs_default_list()
             'name' => tra('Forum'),
             'description' => tra('Size (height) of the forum text area.'),
             'type' => 'text',
-            'help' => 'Forum-Admin',
+            'help' => $forumAdminHelp,
             'size' => '3',
             'units' => tra('rows'),
             'filter' => 'digits',
@@ -91,7 +92,7 @@ function prefs_default_list()
             'name' => tra('Forum reply'),
             'type' => 'text',
             'description' => tra('Size (height) of the forum reply text area.'),
-            'help' => 'Forum-Admin',
+            'help' => $forumAdminHelp,
             'size' => '3',
             'units' => tra('rows'),
             'filter' => 'digits',

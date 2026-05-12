@@ -6,12 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_center_list()
 {
+    $shadowLayersHelp = 'Shadow-Layers';
+
     return [
         'center_shadow_start' => [
             'name' => tra('Center shadow start'),
             'description' => tra('Content added before the main column (Shadow layer). Use with Center shadow end.'),
             'type' => 'textarea',
-            'help' => 'Shadow-Layers',
+            'help' => $shadowLayersHelp,
             'size' => '2',
             'default' => '',
         ],
@@ -19,7 +21,7 @@ function prefs_center_list()
             'name' => tra('Center shadow end'),
             'description' => tra('Content added after the main column (Shadow layer). Use with Center shadow start.'),
             'type' => 'textarea',
-            'help' => 'Shadow-Layers',
+            'help' => $shadowLayersHelp,
             'size' => '2',
             'default' => '',
         ],

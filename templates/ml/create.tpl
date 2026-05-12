@@ -33,7 +33,7 @@
         <div class="mb-3 row">
             <label class="col-form-label col-sm-3">
                 {tr}Model template{/tr}
-                {help url="Machine Learning Models" desc="Choose a predefined ML model designed to solve a common problem or start with a blank model."}
+                {help url="Machine-Learning-Models" desc="Choose a predefined ML model designed to solve a common problem or start with a blank model."}
             </label>
             <div class="col-sm-9">
                 <select class="form-select" name="template">

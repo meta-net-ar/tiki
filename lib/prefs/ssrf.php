@@ -15,6 +15,6 @@ function prefs_ssrf_list()
             'filter' => 'text',
             'default' => '',
             'tags' => ['advanced', 'security'],
-        ],
+        ], // TODO: Add help for this preference
     ];
 }

@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_goal_list($partial = false)
 {
+    $goalsHelp = 'Goals';
+
     return [
         'goal_enabled' => [
             'name' => tr('Goal, recognition and rewards'),
@@ -13,7 +15,7 @@ function prefs_goal_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
             'admin' => $partial ?: TikiLib::lib('service')->getUrl(['controller' => 'goal', 'action' => 'admin']),
-            'help' => 'Goals',
+            'help' => $goalsHelp,
         ],
         'goal_badge_tracker' => [
             'name' => tr('Reward badge tracker'),
@@ -21,6 +23,7 @@ function prefs_goal_list($partial = false)
             'type' => 'text',
             'filter' => 'int',
             'default' => 0,
+            'help' => $goalsHelp,
             'hint' => tr('0 to disable'),
             'profile_reference' => 'tracker',
             'dependencies' => ['feature_trackers'],
@@ -29,6 +32,7 @@ function prefs_goal_list($partial = false)
             'name' => tr('Groups not eligible for goals'),
             'description' => tr('Groups that will not be on the eligible group list.'),
             'type' => 'text',
+            'help' => $goalsHelp,
             'separator' => ';',
             'filter' => 'groupname',
             'profile_reference' => 'group',

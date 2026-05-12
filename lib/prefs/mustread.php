@@ -22,6 +22,7 @@ function prefs_mustread_list()
             'type' => 'text',
             'filter' => 'int',
             'size' => 6,
+            'help' => 'Must-Reads',
             'profile_reference' => 'tracker',
             'default' => '',
         ],

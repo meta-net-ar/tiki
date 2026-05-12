@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_sefurl_list()
 {
+    $apacheCleanUrlsHelp = 'Apache-Clean-URLs';
+
     return [
 
         'sefurl_short_url' => [
@@ -17,6 +19,7 @@ function prefs_sefurl_list()
             'dependencies' => [
                 'feature_sefurl_routes',
             ],
+            'help' => $apacheCleanUrlsHelp,
         ],
         'sefurl_short_url_base_url' => [
             'name' => tr('Short URL base URL'),
@@ -28,6 +31,7 @@ function prefs_sefurl_list()
             'dependencies' => [
                 'sefurl_short_url',
             ],
+            'help' => $apacheCleanUrlsHelp,
         ],
     ];
 }

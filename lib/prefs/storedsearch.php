@@ -12,6 +12,7 @@ function prefs_storedsearch_list()
             'description' => tr('Allow users to store search queries.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Stored-Search',
         ],
     ];
 }

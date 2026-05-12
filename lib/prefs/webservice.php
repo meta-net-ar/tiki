@@ -15,6 +15,7 @@ function prefs_webservice_list()
             'filter' => 'digits',
             'units' => tra('seconds'),
             'default' => 300,       // 5 min
+            'help' => 'Webservice-Registration',
         ],
     ];
 }

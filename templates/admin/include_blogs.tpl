@@ -20,7 +20,7 @@
             {preference name=home_blog}
             <fieldset>
                 <legend class="h3">
-                    {tr}Features{/tr}{help url="Blog+Config"}
+                    {tr}Features{/tr}{help url="Blog-Config"}
                 </legend>
                 {preference name=feature_blog_rankings}
                 {preference name=feature_blog_heading}
@@ -40,7 +40,7 @@
             </fieldset>
             <fieldset>
                 <legend class="h3">
-                    {tr}Sharing on social networks{/tr}{help url="Social+Networks#Using+ShareThis"}
+                    {tr}Sharing on social networks{/tr}{help url="Social-Networks#Using-ShareThis"}
                 </legend>
                 {preference name=feature_blog_sharethis}
                 <div class="adminoptionboxchild" id="feature_blog_sharethis_childcontainer">

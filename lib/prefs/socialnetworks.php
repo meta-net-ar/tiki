@@ -6,6 +6,11 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_socialnetworks_list()
 {
+    $moduleTwitterHelp = 'Module-twitter';
+    $moduleFacebookHelp = 'Module-facebook';
+    $bitLyTabHelp = 'bit.ly-Tab';
+    $linkedInTabHelp = 'LinkedIn-Tab';
+
     return [
         'socialnetworks_twitter_client_id' => [
             'name' => tra('Twitter API Key (Client ID)'),
@@ -14,6 +19,7 @@ function prefs_socialnetworks_list()
             'keywords' => 'social networks',
             'size' => 40,
             'default' => '',
+            'help' => $moduleTwitterHelp,
         ],
         'socialnetworks_twitter_client_secret' => [
             'name' => tra('Twitter API Secret (Client Secret)'),
@@ -22,6 +28,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $moduleTwitterHelp,
         ],
         'socialnetworks_twitter_site_name' => [
             'name' => tra('Twitter site name'),
@@ -30,6 +37,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $moduleTwitterHelp,
         ],
         'socialnetworks_twitter_site_image' => [
             'name' => tra('Twitter site image'),
@@ -38,6 +46,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $moduleTwitterHelp,
         ],
         'socialnetworks_facebook_application_secr' => [
             'name' => tra('Application secret'),
@@ -46,6 +55,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_application_id' => [
             'name' => tra('Application ID'),
@@ -54,6 +64,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_site_name' => [
             'name' => tra('Facebook site name'),
@@ -62,6 +73,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_site_image' => [
             'name' => tra('Facebook site image'),
@@ -70,6 +82,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_login' => [
             'name' => tra('Login using Facebook'),
@@ -77,6 +90,7 @@ function prefs_socialnetworks_list()
             'keywords' => 'social networks',
             'type' => 'flag',
             'default' => 'n',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_autocreateuser' => [
             'name' => tra('Auto-create Tiki user'),
@@ -87,6 +101,7 @@ function prefs_socialnetworks_list()
                 'socialnetworks_facebook_login',
             ],
             'default' => 'n',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_firstloginpopup' => [
             'name' => tra('Require Facebook users to enter local account info on creation'),
@@ -98,6 +113,7 @@ function prefs_socialnetworks_list()
                 'socialnetworks_facebook_autocreateuser',
             ],
             'default' => 'n',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_publish_stream' => [
             'name' => tra('Tiki can post to the Facebook wall'),
@@ -105,6 +121,7 @@ function prefs_socialnetworks_list()
             'keywords' => 'social networks',
             'type' => 'flag',
             'default' => 'n',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_manage_events' => [
             'name' => tra('Tiki can manage events'),
@@ -112,6 +129,7 @@ function prefs_socialnetworks_list()
             'keywords' => 'social networks',
             'type' => 'flag',
             'default' => 'n',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_manage_pages' => [
             'name' => tra('Tiki can manage pages'),
@@ -119,6 +137,7 @@ function prefs_socialnetworks_list()
             'keywords' => 'social networks',
             'type' => 'flag',
             'default' => 'n',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_sms' => [
             'name' => tra('Tiki can SMS'),
@@ -126,6 +145,7 @@ function prefs_socialnetworks_list()
             'keywords' => 'social networks',
             'type' => 'flag',
             'default' => 'n',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_email' => [
             'name' => tra('Set user email from Facebook on creation.'),
@@ -136,6 +156,7 @@ function prefs_socialnetworks_list()
             ],
             'type' => 'flag',
             'default' => 'n',
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_create_user_trackeritem' => [
             'name' => tra('Create a user tracker item on registration'),
@@ -147,6 +168,7 @@ function prefs_socialnetworks_list()
                 'userTracker',
                 'socialnetworks_facebook_autocreateuser',
             ],
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_facebook_names' => [
             'name' => tra('First and last name tracker field IDs to set on creation'),
@@ -158,6 +180,7 @@ function prefs_socialnetworks_list()
                 'userTracker',
                 'socialnetworks_facebook_create_user_trackeritem',
             ],
+            'help' => $moduleFacebookHelp,
         ],
         'socialnetworks_bitly_login' => [
             'name' => tra('bit.ly login'),
@@ -166,6 +189,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $bitLyTabHelp,
         ],
         'socialnetworks_bitly_key' => [
             'name' => tra('bit.ly key'),
@@ -174,6 +198,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $bitLyTabHelp,
         ],
         'socialnetworks_bitly_sitewide' => [
             'name' => tra('Use site-wide account'),
@@ -181,6 +206,7 @@ function prefs_socialnetworks_list()
             'keywords' => 'social networks',
             'type' => 'flag',
             'default' => 'n',
+            'help' => $bitLyTabHelp,
         ],
         'socialnetworks_linkedin_client_id' => [
             'name' => tra('Client ID'),
@@ -189,6 +215,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $linkedInTabHelp,
         ],
         'socialnetworks_linkedin_client_secr' => [
             'name' => tra('Client secret'),
@@ -197,6 +224,7 @@ function prefs_socialnetworks_list()
             'type' => 'text',
             'size' => 60,
             'default' => '',
+            'help' => $linkedInTabHelp,
         ],
         'socialnetworks_linkedin_login' => [
             'name' => tra('Log in using LinkedIn'),
@@ -204,6 +232,7 @@ function prefs_socialnetworks_list()
             'keywords' => 'social networks',
             'type' => 'flag',
             'default' => 'n',
+            'help' => $linkedInTabHelp,
         ],
         'socialnetworks_linkedin_autocreateuser' => [
             'name' => tra('Auto-create Tiki user from LinkedIn'),
@@ -214,6 +243,7 @@ function prefs_socialnetworks_list()
                 'socialnetworks_linkedin_login',
             ],
             'default' => 'n',
+            'help' => $linkedInTabHelp,
         ],
         'socialnetworks_linkedin_email' => [
             'name' => tra('Set user email from LinkedIn on creation.'),
@@ -224,6 +254,7 @@ function prefs_socialnetworks_list()
                 'socialnetworks_linkedin_autocreateuser',
             ],
             'default' => 'n',
+            'help' => $linkedInTabHelp,
         ],
         'socialnetworks_linkedin_create_user_trackeritem' => [
             'name' => tra('Create a user tracker item on registration'),
@@ -235,6 +266,7 @@ function prefs_socialnetworks_list()
                 'userTracker',
                 'socialnetworks_linkedin_autocreateuser',
             ],
+            'help' => $linkedInTabHelp,
         ],
         'socialnetworks_linkedin_names' => [
             'name' => tra('First and last name tracker field IDs to set on creation'),
@@ -246,6 +278,7 @@ function prefs_socialnetworks_list()
                 'userTracker',
                 'socialnetworks_linkedin_create_user_trackeritem',
             ],
+            'help' => $linkedInTabHelp,
         ],
     ];
 }

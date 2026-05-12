@@ -6,13 +6,15 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_federated_list()
 {
+    $federatedSearchHelp = 'Federated-Search';
+
     return [
         'federated_enabled' => [
             'name' => tr('Federated search'),
             'description' => tr('Search through alternate site indices.'),
             'type' => 'flag',
             'default' => 'n',
-            'help' => 'Federated-Search',
+            'help' => $federatedSearchHelp,
             'hint' => tr('Elasticsearch or Manticore Search is required'),
             'dependencies' => ['feature_search'],
         ],
@@ -20,7 +22,7 @@ function prefs_federated_list()
             'name' => tra('Elasticsearch tribe node URL'),
             'description' => tra('URL of the tribe client node accessing multiple clusters.'),
             'type' => 'text',
-            'help' => 'Federated-Search',
+            'help' => $federatedSearchHelp,
             'filter' => 'url',
             'default' => '',
             'size' => 40,
@@ -29,7 +31,7 @@ function prefs_federated_list()
             'name' => tra('Manticore distributed index prefix'),
             'description' => tra('The prefix used when creating distributed index in Manticore. This needs to be the same for all sites participating in the federation.'),
             'type' => 'text',
-            'help' => 'Federated-Search',
+            'help' => $federatedSearchHelp,
             'default' => 'tiki_',
             'size' => 40,
         ],

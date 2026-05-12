@@ -35,5 +35,5 @@ function prefs_bruteforce_list()
             'default' => 60,
             'tags' => ['experimental'],
         ],
-    ];
+    ]; // TODO: Create help page for this
 }

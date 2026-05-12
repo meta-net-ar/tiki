@@ -18,6 +18,7 @@ function prefs_hybridauth_list()
             'dependencies' => [
                 'feature_socialnetworks',
             ],
+            'help' => 'Hybridauth-social-login',
         ],
     ];
 }

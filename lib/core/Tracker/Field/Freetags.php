@@ -18,6 +18,7 @@ class Tracker_Field_Freetags extends \Tracker\Field\AbstractItemField implements
             'F' => [
                 'name' => tr('Tags'),
                 'description' => tr('Allow tags to be shown or added for tracker items.'),
+                'help' => 'Tags',
                 'prefs' => ['trackerfield_freetags', 'feature_freetags'],
                 'tags' => ['advanced'],
                 'default' => 'y',

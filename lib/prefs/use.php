@@ -6,6 +6,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_use_list()
 {
+    $generalSettingsHelp = 'General-Settings';
+    $miscellaneousHelp = 'Miscellaneous';
+
     return  [
         'use_load_threshold' => [
             'name' => tra('Close site when server load is above the threshold'),
@@ -21,6 +24,7 @@ function prefs_use_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => 'n',
+            'help' => $generalSettingsHelp,
         ],
         'use_rss_proxy' => [
             'name' => tra('Use RSS proxy'),
@@ -28,20 +32,25 @@ function prefs_use_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => 'n',
+            'help' => $generalSettingsHelp,
         ],
 
         // FIXME: These 2 have misleading names. Actions will use context menus even if (only) one is disabled. Do we really need to have 2 preferences for this? Surely if we have context menus they should have both icons and text. Chealer 2017-07-03
         'use_context_menu_icon' => [
             'name' => tra('Use context menus for actions (icons)'),
+            'description' => tra('Show action icons in file gallery context menus.'),
             'type' => 'flag',
             'hint' => tr('Currently used in File Galleries only.'),
             'default' => 'y',
+            'help' => $miscellaneousHelp,
         ],
         'use_context_menu_text' => [
             'name' => tra('Use context menus for actions (text)'),
+            'description' => tra('Show action text labels in file gallery context menus.'),
             'type' => 'flag',
             'hint' => tr('Currently used in File Galleries only.'),
             'default' => 'y',
+            'help' => $miscellaneousHelp,
         ],
     ];
 }

@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_session_list()
 {
+    $generalSettingsHelp = 'General-Settings';
+
     return  [
         'session_storage' => [
             'name' => tra('Session storage location'),
@@ -25,6 +27,7 @@ function prefs_session_list()
                     'message' => tra('It is recommended not to set the session storage to database if you use the webmail feature. <a href="https://dev.tiki.org/item8365-Race-condition-Sessions-stored-in-the-database-and-Cypht" class="alert-link">See more details.</a>')
                 ]
             ],
+            'help' => $generalSettingsHelp,
         ],
         'session_lifetime' => [
             'name' => tra('Session lifetime'),
@@ -36,6 +39,7 @@ function prefs_session_list()
             'perspective' => false,
             'size' => '4',
             'default' => 10080,
+            'help' => $generalSettingsHelp,
         ],
         'session_silent' => [
             'name' => tra('Silent session'),
@@ -45,6 +49,7 @@ function prefs_session_list()
             'perspective' => false,
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Performance-Sessions',
 
             /* Tag experimental due to issues such as those documented above, and because PHP's session handling just doesn't allow reasonably supporting no sessions
             (writes to $_SESSION when no session is started don't even trigger a notice as of 5.6). The instance for which this preference was created no longer runs with session_silent.
@@ -59,6 +64,7 @@ function prefs_session_list()
             'perspective' => false,
             'size' => 10,
             'default' => session_name(),
+            'help' => $generalSettingsHelp,
         ],
         'session_protected' => [
             'name' => tra('Protect all sessions with HTTPS'),
@@ -68,6 +74,7 @@ function prefs_session_list()
             'default' => 'n',
             'warning' => tra('Warning: activate only if SSL is already configured; otherwise, all users including admin will be locked out of the site'),
             'tags' => ['advanced'],
+            'help' => 'General-Security',
         ],
     ];
 }

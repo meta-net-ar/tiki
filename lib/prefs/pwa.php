@@ -8,11 +8,13 @@ use Tiki\Package\VendorHelper;
 
 function prefs_pwa_list()
 {
+    $progressiveWebAppHelp = 'Progressive-Web-App';
+
     return [
         'pwa_feature' => [
             'name' => tra('Progressive Web Application Mode'),
             'description' => tra('Allow Tiki to be used offline and be installed in a mobile device.'),
-            'help' => 'Enable-Progressive-Web-Application-Mode',
+            'help' => $progressiveWebAppHelp,
             'warning' => tra('Experimental feature.<br>Only Wiki pages and Trackers are available offline for now.'),
             'type' => 'flag',
             'tags' => ['experimental'],
@@ -23,7 +25,7 @@ function prefs_pwa_list()
         'pwa_cache_links' => [
             'name' => tra('Links to cache in PWA Mode'),
             'description' => tra('List of links to be cached when PWA is enabled'),
-            'help' => 'Example: tiki-index.php?page=HomePage',
+            'help' => $progressiveWebAppHelp,
             'warning' => tra('Experimental feature.'),
             'type' => 'textarea',
             'dependencies' => ['pwa_feature'],

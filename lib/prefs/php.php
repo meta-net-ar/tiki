@@ -17,6 +17,7 @@ function prefs_php_list()
             'keywords' => 'command line php path',
             'type' => 'text',
             'default' => '',
+            'help' => 'General-Settings',
         ],
     ];
 }

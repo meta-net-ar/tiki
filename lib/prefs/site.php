@@ -17,6 +17,16 @@ function prefs_site_list()
     }
     unset($groups['Anonymous']);
 
+    $siteAccessHelp = 'Site-Access';
+    $miscellaneousHelp = 'Miscellaneous';
+    $generalPreferencesHelp = 'General-Preferences';
+    $generalSettingsHelp = 'General-Settings';
+    $googleAnalyticsHelp = 'Google-Analytics';
+    $mauticHelp = 'Mautic';
+    $siteLayoutHelp = 'Site-Layout';
+    $matomoHelp = 'Matomo';
+    $generalSecurityHelp = 'General-Security';
+
     $preferences = [
         'site_closed' => [
             'name' => tra('Close site'),
@@ -29,8 +39,10 @@ function prefs_site_list()
         ],
         'site_closed_title' => [
             'name' => tra('Title'),
+            'description' => tra('Heading shown to visitors when the site is closed.'),
             'type' => 'text',
             'perspective' => false,
+            'help' => $siteAccessHelp,
             'dependencies' => [
                 'site_closed',
             ],
@@ -39,8 +51,10 @@ function prefs_site_list()
         ],
         'site_closed_msg' => [
             'name' => tra('Message'),
+            'description' => tra('Message shown to visitors when the site is closed.'),
             'type' => 'text',
             'perspective' => false,
+            'help' => $siteAccessHelp,
             'dependencies' => [
                 'site_closed',
             ],
@@ -49,8 +63,10 @@ function prefs_site_list()
         ],
         'site_busy_title' => [
             'name' => tra('Site Busy Title'),
+            'description' => tra('Heading shown when the site is closed because server load exceeds the threshold.'),
             'type' => 'text',
             'perspective' => false,
+            'help' => $siteAccessHelp,
             'dependencies' => [
                 'use_load_threshold',
             ],
@@ -58,8 +74,10 @@ function prefs_site_list()
         ],
         'site_busy_msg' => [
             'name' => tra('Site Busy Message'),
+            'description' => tra('Message shown when the site is closed because server load exceeds the threshold.'),
             'type' => 'text',
             'perspective' => false,
+            'help' => $siteAccessHelp,
             'dependencies' => [
                 'use_load_threshold',
             ],
@@ -67,17 +85,21 @@ function prefs_site_list()
         ],
         'site_crumb_seper' => [
             'name' => tra('Locations (breadcrumbs)'),
+            'description' => tra('Separator displayed between items in breadcrumb navigation paths.'),
             'type' => 'text',
             'hint' => tr('Examples:  » / >  : -> →'),
             'size' => '5',
             'default' => '»',
+            'help' => $miscellaneousHelp,
         ],
         'site_nav_seper' => [
             'name' => tra('Choices'),
+            'description' => tra('Separator between the site browser title and the current page title in the window title and meta tags.'),
             'type' => 'text',
             'hint' => tr('Examples: | / ¦  :'),
             'size' => '5',
             'default' => '|',
+            'help' => $miscellaneousHelp,
         ],
         'site_title_location' => [
             'name' => tra('Browser title position'),
@@ -91,6 +113,7 @@ function prefs_site_list()
             ],
             'tags' => ['basic'],
             'default' => 'after',
+            'help' => $generalPreferencesHelp,
         ],
         'site_title_breadcrumb' => [
             'name' => tra('Browser title display mode'),
@@ -104,6 +127,7 @@ function prefs_site_list()
             ],
             'tags' => ['advanced'],
             'default' => 'invertfull',
+            'help' => $generalPreferencesHelp,
         ],
         'site_favicon_enable' => [
             'name' => tr('Favicons'),
@@ -120,6 +144,7 @@ function prefs_site_list()
                 'feature_perspective',
             ],
             'default' => 'n',
+            'help' => $generalSettingsHelp,
         ],
         'site_terminal_config' => [
             'name' => tra('Site terminal configuration'),
@@ -129,6 +154,7 @@ function prefs_site_list()
             'size' => 10,
             'hint' => tra('One per line. Network prefix in CIDR notation (address/mask size), separated by comma with the perspective ID.') . ' ' . tra('Example:') . ' 192.168.12.0/24,12',
             'default' => '',
+            'help' => $generalSettingsHelp,
         ],
         'site_google_analytics_account' => [
             'name' => tr('Google Analytics account number'),
@@ -140,12 +166,14 @@ function prefs_site_list()
             'dependencies' => [
                 'wikiplugin_googleanalytics',
             ],
+            'help' => $generalSettingsHelp,
         ],
         'site_google_analytics_group_option' => [
             'name' => tr('Google Analytics Groups Option'),
             'description' => tr('Define option for Google Analytics groups'),
             'type' => 'list',
             'tags' => ['advanced'],
+            'help' => $googleAnalyticsHelp,
             'options' => [
                 '' => tr('None'),
                 'included' => tr('Included'),
@@ -162,6 +190,7 @@ function prefs_site_list()
             'type' => 'multilist',
             'tags' => ['advanced'],
             'options' => $groups,
+            'help' => $googleAnalyticsHelp,
             'default' => [''],
             'dependencies' => [
                 'site_google_analytics_group_option',
@@ -173,6 +202,7 @@ function prefs_site_list()
             'description' => tra('Verification process of proving that you own the site or app that you claim to own'),
             'type' => 'text',
             'default' => '',
+            'help' => $googleAnalyticsHelp,
         ],
         'site_google_analytics_gtag' => [
             'name' => tr('Google Global Site Tag Mode'),
@@ -182,6 +212,7 @@ function prefs_site_list()
             'dependencies' => [
                 'site_google_analytics_account',
             ],
+            'help' => $googleAnalyticsHelp,
         ],
         'site_google_credentials' => [
             'name' => tra('Google authentication credentials file'),
@@ -190,57 +221,64 @@ function prefs_site_list()
             'size' => 30,
             'default' => '',
             'warning' => 'Must be kept private and not accessible on the internet directly',
-        ],
+            'help' => $googleAnalyticsHelp,
+        ], // TODO: update the google analytics documentation
         'site_mautic_enable' => [
             'name' => tra('Mautic Integration'),
             'description' => tra('Enable the feature here but configure it elsewhere'),
-            'help' => 'Mautic',
             'type' => 'flag',
             'keywords' => 'mautic integration analytics',
             'default' => 'n',
             'admin' => 'mautic',
+            'help' => $mauticHelp,
         ],
         'site_mautic_url' => [
             'name' => tra('Mautic URL'),
+            'description' => tra('Base URL of your Mautic instance, used for tracking scripts, embedded forms, and API calls.'),
             'type' => 'text',
             'filter' => 'text',
             'dependencies' => 'site_mautic_enable',
             'default' => '',
             'tags' => ['basic'],
-            'description' => tra('Put here the Mautic URL.'),
+            'help' => $mauticHelp,
         ],
         'site_mautic_tracking_script_location' => [
             'name' => tra('Tracking Script Location'),
+            'description' => tra('Where to inject the site-wide Mautic pageview tracking script: in the page head, in the footer before </body>, or not at all (tracking only where the Mautic plugin is used).'),
             'type' => 'radio',
             'options' => [
                 'head' => tra('Added in the <head> section of tiki pages.'),
                 'embed' => tra('Embed it within the footer are before </body> tag.'),
                 'visitor' => tra('Visitor will not be tracked when rendering the page.'),
             ],
-            'help' => 'Mautic',
-            'description' => tra('Tracking Script Location.'),
+            'help' => $mauticHelp,
             'default' => 'embed',
         ],
         'site_mautic_username' => [
             'name' => tra('Mautic Username'),
+            'description' => tra('Mautic API username for Basic authentication when loading contacts through the Mautic plugin.'),
             'type' => 'text',
             'dependencies' => ['site_mautic_enable'],
             'perspective' => false,
             'default' => '',
+            'help' => $mauticHelp,
         ],
         'site_mautic_password' => [
             'name' => tra('Mautic Password'),
+            'description' => tra('Mautic API password for Basic authentication when loading contacts through the Mautic plugin.'),
             'type' => 'password',
             'dependencies' => ['site_mautic_enable'],
             'perspective' => false,
             'default' => '',
+            'help' => $mauticHelp,
         ],
         'site_layout' => [
             'name' => tr('Site layout'),
             'description' => tr('Changes the template for the overall site layout'),
             'type' => 'list',
             'default' => SMARTY_DEFAULT_LAYOUT,
-            'help' => 'Site-Layout',
+            'help' => $siteLayoutHelp,
+            'hint' => tra('Important: when using the Classic Bootstrap (fixed top navbar) layout, be sure to set the fixed-top navbar height, below, to prevent content overlap.'),
             'tags' => ['advanced'],
             'options' => $available_layouts,
         ],
@@ -250,6 +288,7 @@ function prefs_site_list()
             'tags' => ['experimental'],
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'General-Layout-Options',
         ],
         'site_matomo_analytics_server_url' => [
             'name' => tr('Matomo server URL'),
@@ -260,6 +299,7 @@ function prefs_site_list()
             'size' => 30,
             'default' => '',
             'hint' => 'http(s)://yourMatomo.tld/index.php(?token_auth=yourtokencode)',
+            'help' => $matomoHelp,
         ],
         'site_matomo_site_id' => [
             'name' => tra('Site Id'),
@@ -270,6 +310,7 @@ function prefs_site_list()
             'dependencies' => [
                 'site_matomo_analytics_server_url',
             ],
+            'help' => $matomoHelp,
         ],
         'site_matomo_code' => [
             'name' => tra('Matomo JavaScript tracking code'),
@@ -282,6 +323,7 @@ function prefs_site_list()
                 'site_matomo_analytics_server_url',
                 'wikiplugin_matomo',
             ],
+            'help' => $matomoHelp,
         ],
         'site_matomo_group_option' => [
             'name' => tr('Matomo Groups Option'),
@@ -298,6 +340,7 @@ function prefs_site_list()
                 'site_matomo_code',
                 'wikiplugin_matomo',
             ],
+            'help' => $matomoHelp,
         ],
         'site_matomo_groups' => [
             'name' => tr('Matomo Available Groups'),
@@ -310,6 +353,7 @@ function prefs_site_list()
                 'site_matomo_group_option',
                 'wikiplugin_matomo',
             ],
+            'help' => $matomoHelp,
         ],
         'site_short_lived_csrf_tokens' => [
             'name' => tra('Use short lived CSRF tokens'),
@@ -318,6 +362,7 @@ function prefs_site_list()
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced'],
+            'help' => $generalSecurityHelp,
         ],
         'site_security_timeout' => [
             'name' => tra('Security timeout'),
@@ -336,6 +381,7 @@ function prefs_site_list()
             'dependencies' => [
                 'site_short_lived_csrf_tokens',
             ],
+            'help' => $generalSecurityHelp,
         ],
     ];
 
@@ -346,7 +392,7 @@ function prefs_site_list()
             'description' => tr('Specify which layout template to use for admin pages.'),
             'type' => 'list',
             'default' => SMARTY_DEFAULT_LAYOUT,
-            'help' => 'Site-Layout',
+            'help' => $siteLayoutHelp,
             'hint' => tra('Note: this does not affect the Unified Admin Backend. Only the legacy admin pages when UAB is disabled. An admin theme must be selected first.'),
             'tags' => ['advanced'],
             'options' => $available_admin_layouts,

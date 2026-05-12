@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_messu_list()
 {
+    $interUserMessagesHelp = 'Inter-user-Messages';
+
     return [
         'messu_mailbox_size' => [
             'name' => tra('Maximum mailbox size'),
@@ -15,6 +17,7 @@ function prefs_messu_list()
             'hint' => tr('0 for unlimited'),
             'filter' => 'digits',
             'units' => tra('messages'),
+            'help' => 'Inter-user-Messages#Mailbox',
             'dependencies' => [
                 'feature_messages',
             ],
@@ -28,6 +31,7 @@ function prefs_messu_list()
             'hint' => tr('0 for unlimited'),
             'filter' => 'digits',
             'units' => tra('messages'),
+            'help' => $interUserMessagesHelp,
             'dependencies' => [
                 'feature_messages',
             ],
@@ -41,6 +45,7 @@ function prefs_messu_list()
             'hint' => tr('0 for unlimited'),
             'filter' => 'digits',
             'units' => tra('messages'),
+            'help' => $interUserMessagesHelp,
             'dependencies' => [
                 'feature_messages',
             ],
@@ -53,6 +58,7 @@ function prefs_messu_list()
             'size' => '10',
             'filter' => 'digits',
             'units' => tra('characters'),
+            'help' => $interUserMessagesHelp,
             'dependencies' => [
                 'feature_messages',
             ],

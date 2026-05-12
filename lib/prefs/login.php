@@ -9,18 +9,23 @@
  */
 function prefs_login_list()
 {
+    $loginGeneralPreferencesHelp = 'Login-General-Preferences';
+    $remoteTikiAutologinHelp = 'Remote-Tiki-Autologin';
+
     return [
         'login_is_email' => [
             'name' => tra('Use email as username'),
             'description' => tra('Instead of creating new usernames, use the user\'s email address for authentication. On the registration form, there will be no Username field.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'login_is_email_obscure' => [
             'name' => tra('Obscure email when using email as username'),
             'description' => tra('This will attempt as much as possible to hide the email address, showing the real name or the truncated email address instead.'),
             'warning' => tra('Coverage will not be complete'),
             'type' => 'flag',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'login_is_email',
             ],
@@ -30,6 +35,7 @@ function prefs_login_list()
             'name' => tra('User can login via username or email.'),
             'description' => tra('This will allow users to login using their email (as well as their username).'),
             'type' => 'flag',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'user_unique_email',
             ],
@@ -44,6 +50,7 @@ function prefs_login_list()
                 'login_allow_email',
             ],
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'login_http_basic' => [
             'name' => tr('HTTP Basic Authentication'),
@@ -51,6 +58,7 @@ function prefs_login_list()
             'type' => 'list',
             'filter' => 'alpha',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
             'options' => [
                 'n' => tr('Disable'),
                 'ssl' => tr('SSL Only (Recommended)'),
@@ -63,12 +71,14 @@ function prefs_login_list()
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced'],
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'login_grab_session' => [
             'name' => tr('Grab session if already logged in'),
             'description' => tr('If users are blocked from logging in simultaneously, grab the session. Will force existing user to be logged out'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
             'dependencies' => [
                 'login_multiple_forbidden',
             ],
@@ -79,7 +89,7 @@ function prefs_login_list()
             'description' => tr('Used with autologin_remotetiki in the redirect plugin'),
             'type' => 'flag',
             'default' => 'n',
-            'help' => 'Remote-Tiki-Autologin',
+            'help' => $remoteTikiAutologinHelp,
             'tags' => ['advanced'],
             'dependencies' => [
                 'login_autologin_user',
@@ -92,6 +102,7 @@ function prefs_login_list()
             'description' => tr('Specified user must exist and be configured in Settings...Tools...DSN/Content Authentication on remote Tiki. Used with autologin_remotetiki in the redirect plugin.'),
             'type' => 'text',
             'default' => '',
+            'help' => $remoteTikiAutologinHelp,
             'tags' => ['advanced'],
         ],
         'login_autologin_group' => [
@@ -99,13 +110,15 @@ function prefs_login_list()
             'description' => tr('For security, please create a group that has no users and no permissions and specify its name here.'),
             'type' => 'text',
             'default' => '',
+            'help' => $remoteTikiAutologinHelp,
             'tags' => ['advanced'],
         ],
         'login_autologin_createnew' => [
+            'name' => tr('Create user if not registered in Tiki'),
             'description' => tr('Create a new user account if the user that is trying to autologin does not exist on this Tiki.'),
             'type' => 'flag',
             'default' => 'y',
-            'name' => tr('Create user if not registered in Tiki'),
+            'help' => $remoteTikiAutologinHelp,
             'tags' => ['advanced'],
         ],
         'login_autologin_allowedgroups' => [
@@ -113,6 +126,7 @@ function prefs_login_list()
             'description' => tr('Comma-separated list of groups to allow autologin from remote Tiki. If empty, will allow everyone.'),
             'type' => 'text',
             'default' => '',
+            'help' => $remoteTikiAutologinHelp,
             'tags' => ['advanced'],
         ],
         'login_autologin_syncgroups' => [
@@ -120,6 +134,7 @@ function prefs_login_list()
             'description' => tr('Comma-separated list of groups to sync from remote Tiki on autologin. Group membership will be added or removed accordingly.'),
             'type' => 'text',
             'default' => '',
+            'help' => $remoteTikiAutologinHelp,
             'tags' => ['advanced'],
         ],
         'login_autologin_logoutremote' => [
@@ -127,6 +142,7 @@ function prefs_login_list()
             'description' => tr('When the user logs out of this Tiki, redirect the user to logout of the other Tiki as well.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $remoteTikiAutologinHelp,
             'tags' => ['advanced'],
         ],
         'login_autologin_redirectlogin' => [
@@ -134,6 +150,7 @@ function prefs_login_list()
             'description' => tr('Redirect direct logins to this site to remote Tiki'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $remoteTikiAutologinHelp,
             'dependencies' => [
                 'login_autologin_redirectlogin_url',
                 'permission_denied_login_box',
@@ -146,15 +163,16 @@ function prefs_login_list()
             'type' => 'text',
             'default' => '',
             'tags' => ['advanced'],
+            'help' => $remoteTikiAutologinHelp,
         ],
         'login_text_explanation' => [
             'name' => tra('Descriptive sentence to ask a user to log in'),
-            'description' => tra('If the login module is called on the page and shown to users who are not logged in, this sentence may ask them to enter their credentials (supports wiki syntax)
-'),
+            'description' => tra('If the login module is called on the page and shown to users who are not logged in, this sentence may ask them to enter their credentials (supports wiki syntax)'),
             'type' => 'text',
             'size' => 100,
             'perspective' => false,
             'default' => '',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'login_cookies_auto_clean' => [
             'name' => tr('Clean expired cookies'),
@@ -162,12 +180,14 @@ function prefs_login_list()
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['advanced'],
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'login_placeholders_enable' => [
             'name' => tra('Enable placeholders feature for username and password fields'),
             'description' => tra('Show placeholder text from username and password fields in the login form. Enable this if you want to show the placeholder text.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
     ];
 }

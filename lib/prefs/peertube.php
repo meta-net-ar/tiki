@@ -6,12 +6,15 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_peertube_list()
 {
+    $peertubeHelp = 'PeerTube';
+
     return [
         'peertube_service_url' => [
             'name' => tra('PeerTube service URL'),
             'description' => tra('Your PeerTube instance URL. More information: https://joinpeertube.org/'),
             'type' => 'text',
             'size' => 40,
+            'help' => $peertubeHelp,
             'default' => '',
             'tags' => ['basic'],
         ],
@@ -20,6 +23,7 @@ function prefs_peertube_list()
             'description' => tra('PeerTube username for video uploads'),
             'type' => 'text',
             'size' => 45,
+            'help' => $peertubeHelp,
             'default' => '',
             'tags' => ['basic'],
         ],
@@ -28,6 +32,7 @@ function prefs_peertube_list()
             'description' => tra('PeerTube password for video uploads'),
             'type' => 'password',
             'size' => 45,
+            'help' => $peertubeHelp,
             'default' => '',
             'tags' => ['basic'],
         ],
@@ -37,6 +42,7 @@ function prefs_peertube_list()
             'type' => 'text',
             'size' => 20,
             'default' => '',
+            'help' => $peertubeHelp,
             'tags' => ['basic'],
         ],
     ];

@@ -15,11 +15,11 @@
                     <div class="d-flex flex-row justify-content-between was-toggle-unified-admin-panel">
                         <div class="pe-4">
                             {if $prefs.theme_unified_admin_backend eq 'y'}
-                                {tr}You are currently using the <strong>Unified Admin Backend</strong>.{/tr} <a class="alert-link" target="_blank" href="https://doc.tiki.org/VideoTutorial-2750-%20%20New%20Unified%20Admin%20Backend%20in%20Tiki">{tr}Learn more.{/tr}</a><br/>
+                                {tr}You are currently using the <strong>Unified Admin Backend</strong>.{/tr} <a class="alert-link" target="_blank" href="https://doc.tiki.org/Look-and-Feel-Theme">{tr}Learn more.{/tr}</a><br/>
                                 <span class="d-none d-sm-block">{tr}Toggle the switch to change the administration interface to the legacy control panels.{/tr}</span>
                             {else}
                                 <span>{tr}A new modern layout for admin UI is available.{/tr}</span>
-                                <a target="_blank" href="https://doc.tiki.org/VideoTutorial-2750-%20%20New%20Unified%20Admin%20Backend%20in%20Tiki">{tr}Learn more.{/tr}</a><br/>
+                                <a target="_blank" href="https://doc.tiki.org/Look-and-Feel-Theme">{tr}Learn more.{/tr}</a><br/>
                                 <span class="d-none d-sm-block">{tr}Toggle the switch to change the administration interface to the Unified Admin Backend.{/tr}</span>
                             {/if}
                         </div>

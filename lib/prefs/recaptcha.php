@@ -6,25 +6,30 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_recaptcha_list()
 {
+    $spamProtectionHelp = 'Spam-protection';
+
     return  [
         'recaptcha_pubkey' => [
             'name' => tra('Site key'),
-            'type' => 'text',
             'description' => tra('reCAPTCHA public key obtained after registering.'),
+            'type' => 'text',
+            'help' => $spamProtectionHelp,
             'size' => 60,
             'default' => '',
         ],
         'recaptcha_privkey' => [
             'name' => tra('Secret key'),
-            'type' => 'text',
             'description' => tra('reCAPTCHA private key obtained after registering.'),
+            'type' => 'text',
+            'help' => $spamProtectionHelp,
             'size' => 60,
             'default' => '',
         ],
         'recaptcha_theme' => [
             'name' => tra('reCAPTCHA theme'),
-            'type' => 'list',
             'description' => tra('Choose a theme for the reCAPTCHA widget.'),
+            'type' => 'list',
+            'help' => $spamProtectionHelp,
             'options' => [
                 'clean' => tra('Clean'),
                 'blackglass' => tra('Black Glass'),
@@ -35,8 +40,9 @@ function prefs_recaptcha_list()
         ],
         'recaptcha_version' => [
             'name' => tra('Version'),
-            'type' => 'list',
             'description' => tra('reCAPTCHA version.'),
+            'help' => $spamProtectionHelp,
+            'type' => 'list',
             'options' => [
                 '1' => tra('1.0'),
                 '2' => tra('2.0'),

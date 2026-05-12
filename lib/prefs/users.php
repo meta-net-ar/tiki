@@ -6,6 +6,12 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_users_list()
 {
+    $userPreferencesHelp = 'User-Preferences';
+    $dateAndTimeHelp = 'Date-and-Time';
+    $performanceHelp = 'Performance-Performance';
+    $userSettingsTabHelp = 'User-Settings-tab';
+    $prefsTextEditingToUsersHelp = 'Preferences---Text-editing-to-Users';
+
     return [
         'users_serve_avatar_static' => [
             'name' => tra('Serve profile pictures statically'),
@@ -13,6 +19,7 @@ function prefs_users_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => 'y',
+            'help' => $performanceHelp,
         ],
         'users_prefs_display_timezone' => [
             'name' => tra('Displayed time zone'),
@@ -24,9 +31,11 @@ function prefs_users_list()
             ],
             'default' => 'Local',
             'tags' => ['basic'],
+            'help' => $dateAndTimeHelp,
         ],
         'users_prefs_userbreadCrumb' => [
             'name' => tra('Number of visited pages to remember'),
+            'description' => tra('Length of the breadcrumb navigation trail showing recently visited pages.'),
             'type' => 'list',
             'units' => tra('visited pages'),
             'options' => [
@@ -38,6 +47,7 @@ function prefs_users_list()
                 '10' => '10',
             ],
             'default' => '4',
+            'help' => $userPreferencesHelp,
         ],
         'users_prefs_user_information' => [
             'name' => tra('User information'),
@@ -49,6 +59,7 @@ function prefs_users_list()
             ],
             'default' => 'private',
             'tags' => ['basic'],
+            'help' => $userPreferencesHelp,
         ],
         'users_prefs_display_12hr_clock' => [
             'name' => tra('Use 12-hour clock for time selectors'),
@@ -56,14 +67,17 @@ function prefs_users_list()
             'description' => tra('Use the 12-hour clock (with AM and PM) in some edit screens to set the time for publishing new or edited blog posts, articles, etc.'),
             'default' => 'n',
             'tags' => ['basic'],
+            'help' => $dateAndTimeHelp,
         ],
         'users_prefs_diff_versions' => [
             'name' => tra('Use interface that shows differences in any versions'),
+            'description' => tra('When comparing wiki page versions, show a visual diff interface highlighting changes between versions.'),
             'type' => 'flag',
             'dependencies' => [
                 'feature_wiki',
             ],
             'default' => 'n',
+            'help' => $userSettingsTabHelp,
         ],
         'users_prefs_tasks_maxRecords' => [
             'name' => tra('Tasks per page'),
@@ -86,6 +100,7 @@ function prefs_users_list()
         ],
         'users_prefs_mess_maxRecords' => [
             'name' => tra('Messages per page'),
+            'description' => tra('Maximum number of messages to display per page in the user mailbox.'),
             'type' => 'list',
             'units' => tra('messages'),
             'dependencies' => [
@@ -101,25 +116,31 @@ function prefs_users_list()
                 '50' => '50',
             ],
             'default' => '10',
+            'help' => $userPreferencesHelp,
         ],
         'users_prefs_allowMsgs' => [
             'name' => tra('Allow messages from other users'),
+            'description' => tra('Allow other users on the site to send internal messages to this user.'),
             'type' => 'flag',
             'dependencies' => [
                 'feature_messages',
             ],
             'default' => 'y',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_mess_sendReadStatus' => [
             'name' => tra('Notify sender when reading mail'),
+            'description' => tra('When reading a message, notify the sender by marking it as read in their sent mailbox.'),
             'type' => 'flag',
             'dependencies' => [
                 'feature_messages',
             ],
             'default' => 'n',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_minPrio' => [
             'name' => tra('Send me an email for messages with priority equal to or greater than'),
+            'description' => tra('Minimum message priority that triggers an email notification when a new message is received.'),
             'type' => 'list',
             'units' => tra('priority'),
             'dependencies' => [
@@ -134,6 +155,7 @@ function prefs_users_list()
                 '6' => tra('None'),
             ],
             'default' => '3',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_mess_archiveAfter' => [
             'name' => tra('Auto-archive read messages after'),
@@ -142,6 +164,7 @@ function prefs_users_list()
             'dependencies' => [
                 'feature_messages',
             ],
+            'help' => $prefsTextEditingToUsersHelp,
             'options' => [
                 '0' => tra('Never'),
                 '1' => '1',
@@ -166,6 +189,7 @@ function prefs_users_list()
             ],
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_mytiki_blogs' => [
             'name' => tra('My blogs'),
@@ -176,6 +200,7 @@ function prefs_users_list()
             ],
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_mytiki_msgs' => [
             'name' => tra('My messages'),
@@ -186,6 +211,7 @@ function prefs_users_list()
             ],
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_mytiki_tasks' => [
             'name' => tra('My tasks'),
@@ -196,6 +222,7 @@ function prefs_users_list()
             ],
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_mytiki_forum_topics' => [
             'name' => tra('My forum topics'),
@@ -206,6 +233,7 @@ function prefs_users_list()
             ],
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_mytiki_forum_replies' => [
             'name' => tra('My forum replies'),
@@ -216,6 +244,7 @@ function prefs_users_list()
             ],
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_mytiki_items' => [
             'name' => tra('My items'),
@@ -226,9 +255,11 @@ function prefs_users_list()
             ],
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_mailCharset' => [
             'name' => tra('Character set for mail'),
+            'description' => tra('Character encoding used for email messages sent to and from the user.'),
             'type' => 'list',
             'options' => [
                 '' => 'default',
@@ -236,24 +267,28 @@ function prefs_users_list()
                 'iso-8859-1' => 'iso-8859-1',
             ],
             'default' => 'utf-8',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_remember_closed_rboxes' => [
             'name' => tra('Keep closed remarksbox hidden'),
             'description' => tra("Remember the alert boxes that users have closed and don't display them again."),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_notify_oneself' => [
             'name' => tra('Notify oneself'),
             'description' => tra('Send a notification to oneself when editing a page.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_switch_user_notification' => [
             'name' => tra('Notify user when switched to their account'),
             'description' => tra('Send a notification to the user when an admin switches to their account.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_xmpp_jid' => [
             'name' => tra('XMPP account JID or username'),
@@ -261,6 +296,7 @@ function prefs_users_list()
             'keywords' => 'xmpp converse conversejs chat',
             'type' => 'text',
             'default' => '',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_xmpp_password' => [
             'name' => tra('XMPP account password'),
@@ -268,6 +304,7 @@ function prefs_users_list()
             'keywords' => 'xmpp converse conversejs chat',
             'type' => 'text',
             'default' => '',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_prefs_xmpp_custom_server_http_bind' => [
             'name' => tra('XMPP http-bind URL'),
@@ -279,6 +316,7 @@ function prefs_users_list()
             'hint' => tra('https://xmpp.example.org/http-bind/'),
             'tags' => ['basic'],
             'default' => '',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_admin_actions_require_validation' => [
             'name' => tr('Require admin users to enter their password for some critical actions'),
@@ -286,6 +324,7 @@ function prefs_users_list()
             tr('User password will be required for critical operations that can compromise the system security or stability, like adding users to the admin group'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_admin_auto_lock_user' => [
             'name' => tr('Lock user account after a period of inactivity'),
@@ -294,6 +333,7 @@ function prefs_users_list()
             'type' => 'flag',
             'tags' => ['advanced'],
             'default' => 'n',
+            'help' => $prefsTextEditingToUsersHelp,
         ],
         'users_admin_auto_lock_user_days_before_lock' => [
             'name' => tr('Period of inactivity before account get locked'),
@@ -303,6 +343,7 @@ function prefs_users_list()
             'size' => '40',
             'tags' => ['advanced'],
             'default' => 30,
+            'help' => $prefsTextEditingToUsersHelp,
         ]
     ];
 }

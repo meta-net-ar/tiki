@@ -17,6 +17,8 @@ function prefs_kaltura_list()
         }
     }
 
+    $kalturaHelp = 'Kaltura';
+
     return [
         'kaltura_partnerId' => [
             'name' => tra('Partner ID'),
@@ -24,6 +26,7 @@ function prefs_kaltura_list()
             'type' => 'text',
             'filter' => 'digits',
             'size' => 10,
+            'help' => $kalturaHelp,
             'default' => '',
             'tags' => ['basic'],
         ],
@@ -33,6 +36,7 @@ function prefs_kaltura_list()
             'type' => 'text',
             'size' => 45,
             'filter' => 'alnum',
+            'help' => $kalturaHelp,
             'default' => '',
             'tags' => ['basic'],
         ],
@@ -44,6 +48,7 @@ function prefs_kaltura_list()
             'filter' => 'alnum',
             'default' => '',
             'tags' => ['basic'],
+            'help' => $kalturaHelp,
         ],
         'kaltura_kdpUIConf' => [
             'name' => tra('Kaltura video player ID'),
@@ -52,6 +57,7 @@ function prefs_kaltura_list()
             'options' => $players,
             'size' => 20,
             'default' => '',
+            'help' => $kalturaHelp,
             'tags' => ['basic'],
         ],
         'kaltura_kdpEditUIConf' => [
@@ -61,6 +67,7 @@ function prefs_kaltura_list()
             'options' => $players,
             'size' => 20,
             'default' => '',
+            'help' => $kalturaHelp,
             'tags' => ['basic'],
         ],
         'kaltura_kServiceUrl' => [
@@ -70,12 +77,14 @@ function prefs_kaltura_list()
             'size' => 40,
             'default' => 'https://www.kaltura.com/',
             'tags' => ['basic'],
+            'help' => $kalturaHelp,
         ],
         'kaltura_legacyremix' => [
             'name' => tra('Show remixes from old versions of Kaltura'),
             'description' => tra('Show remixes from old versions of Kaltura (remixing is no longer supported)'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $kalturaHelp,
             'view' => 'tiki-list_kaltura_entries.php?list=mix',
         ],
     ];

@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_log_list()
 {
+    $generalPreferencesHelp = 'General-Preferences';
+
     return [
         'log_mail' => [
             'name' => tra('Log mail in Tiki logs'),
@@ -23,6 +25,7 @@ function prefs_log_list()
             'type' => 'flag',
             'warning' => tra('May impact performance'),
             'default' => 'n',
+            'help' => 'Miscellaneous',
         ],
         'log_sql' => [
             'name' => tra('Log SQL'),
@@ -30,12 +33,14 @@ function prefs_log_list()
             'warning' => tra('Do not enable this feature all the time. It can be very resource intensive and will impact performance.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $generalPreferencesHelp,
         ],
         'log_failed_logins' => [
             'name' => tra('Log failed logins'),
             'description' => tra('Failed logins will be logged with respective login error code.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $generalPreferencesHelp,
         ],
         'log_file_path' => [
             'name' => tra('Log file'),
@@ -43,6 +48,7 @@ function prefs_log_list()
             'warning' => tra('Make sure that the path you insert is writable and exists.'),
             'type' => 'text',
             'default' => '',
+            'help' => $generalPreferencesHelp,
         ],
         'log_sql_perf_min' => [
             'name' => tra('Log queries using more than'),
@@ -51,6 +57,7 @@ function prefs_log_list()
             'type' => 'text',
             'units' => tra('seconds'),
             'size' => 5,
+            'help' => $generalPreferencesHelp,
             'dependencies' => [
                 'log_sql',
             ],

@@ -13,6 +13,7 @@ function prefs_access_list()
             'type' => 'textarea',
             'hint' => tra('One URI per line, for example, "http://www.example.org" or "*" for any site'),
             'default' => '',
+            'help' => 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Access-Control-Allow-Origin',
         ],
     ];
 }

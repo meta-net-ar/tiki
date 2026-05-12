@@ -9,6 +9,8 @@ use Tiki\Lib\Unoconv\UnoserverStrategy;
 
 function prefs_alchemy_list()
 {
+    $mediaAlchemystHelp = 'Media-Alchemyst';
+
     $prefs = [
         'alchemy_converter_type' => [
             'name' => tra('Document Converter'),
@@ -19,6 +21,7 @@ function prefs_alchemy_list()
                 UnoserverStrategy::NAME => tra('Unoserver')
             ],
             'default' => UnoconvStrategy::NAME,
+            'help' => $mediaAlchemystHelp,
         ],
         'alchemy_ffmpeg_path' => [
             'name' => tra('ffmpeg path'),
@@ -53,6 +56,7 @@ function prefs_alchemy_list()
             'type' => 'text',
             'size' => '256',
             'default' => '/usr/bin/unoconv',
+            'help' => $mediaAlchemystHelp,
         ],
         'alchemy_gs_path' => [
             'name' => tra('ghostscript path'),
@@ -60,6 +64,7 @@ function prefs_alchemy_list()
             'type' => 'text',
             'size' => '256',
             'default' => '/usr/bin/gs',
+            'help' => $mediaAlchemystHelp,
         ],
         'alchemy_unoconv_timeout' => [
             'name' => tra('unoconv timeout'),
@@ -68,6 +73,7 @@ function prefs_alchemy_list()
             'type' => 'text',
             'default' => 60,
             'units' => tra('seconds'),
+            'help' => $mediaAlchemystHelp,
         ],
         'alchemy_unoconv_port' => [
             'name' => tra('unoconv port'),
@@ -76,6 +82,7 @@ function prefs_alchemy_list()
             'size' => '5',
             'filter' => 'digits',
             'default' => UnoconvStrategy::DEFAULT_PORT,
+            'help' => $mediaAlchemystHelp,
         ],
         'alchemy_unoserver_port' => [
             'name' => tra('unoserver port'),
@@ -84,6 +91,7 @@ function prefs_alchemy_list()
             'size' => '5',
             'filter' => 'digits',
             'default' => UnoserverStrategy::DEFAULT_PORT,
+            'help' => $mediaAlchemystHelp,
         ],
     ];
 

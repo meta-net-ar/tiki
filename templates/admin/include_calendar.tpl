@@ -19,7 +19,7 @@
         {preference name=wikiplugin_addtogooglecal}
     </fieldset>
     <fieldset>
-        <legend class="h3">{tr}General settings{/tr}{help url="Calendar+Admin"}</legend>
+        <legend class="h3">{tr}General settings{/tr}{help url="Calendar-Admin"}</legend>
         {preference name=feature_default_calendars}
         <div class="adminoptionboxchild" id="feature_default_calendars_childcontainer">
             {preference name=default_calendars}

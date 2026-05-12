@@ -7,6 +7,10 @@
 function prefs_user_list($partial = false)
 {
     $fieldFormat = '{title} ({tracker_name})';
+    $userPreferencesHelp = 'User-Preferences';
+    $loginGeneralPreferencesHelp = 'Login-General-Preferences';
+    $userTrackerHelp = 'User-Tracker';
+
     return [
         'user_must_change_password_set_default_on' => [
             'name' => tra('User must change password set default on'),
@@ -14,31 +18,35 @@ function prefs_user_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['basic'],
+            'help' => $userPreferencesHelp,
         ],
         'user_show_realnames' => [
             'name' => tra('Show user\'s real name'),
             'description' => tra('Show the user\'s real name instead of username (log-in name), when possible.'),
-            'help' => 'User-Preferences',
+            'help' => $userPreferencesHelp,
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $userPreferencesHelp,
         ],
         'user_unique_email' => [
             'name' => tra('User emails must be unique'),
-            'help' => 'User-Preferences',
+            'help' => $userPreferencesHelp,
             'description' => tra('The email address of each user must be unique.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $userPreferencesHelp,
         ],
         'user_unique_email_validation' => [
             'name' => tra('Show emails validation'),
-            'help' => 'User-Preferences',
+            'help' => $userPreferencesHelp,
             'description' => tra('Show if an email is already in use on the registration form. Will confirm an email is registered here if so without completing the form.'),
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => [
                 'user_unique_email',
             ],
+            'help' => $userPreferencesHelp,
         ],
         'user_add_tracker_item_set_default_on' => [
             'name' => tra('Add a user tracker item for new user set default on'),
@@ -48,11 +56,12 @@ function prefs_user_list($partial = false)
             'dependencies' => [
                 'userTracker',
             ],
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_tracker_infos' => [
             'name' => tra('Display user tracker information on the user information page'),
             'description' => tra('Display user tracker information on the user information page'),
-            'help' => 'User-Tracker',
+            'help' => $userTrackerHelp,
             'hint' => tra('Input the user tracker ID then field IDs to be shown, all separated by commas. Example: 1,1,2,3,4 (user tracker ID 1 followed by field IDs 1-4)'),
             'type' => 'text',
             'size' => '50',
@@ -84,7 +93,7 @@ function prefs_user_list($partial = false)
         ],
         'user_store_file_gallery_picture' => [
             'name' => tra('Store full-size copy of profile picture in file gallery'),
-            'help' => 'User-Preferences',
+            'help' => $userPreferencesHelp,
             'keywords' => 'avatar',
             'type' => 'flag',
             'default' => 'y',
@@ -92,7 +101,7 @@ function prefs_user_list($partial = false)
         ],
         'user_small_avatar_size' => [
             'name' => tra('Size of the small profile picture stored for users'),
-            'help' => 'User-Preferences',
+            'help' => $userPreferencesHelp,
             'type' => 'text',
             'units' => tra('pixels'),
             'filter' => 'digits',
@@ -100,14 +109,14 @@ function prefs_user_list($partial = false)
         ],
         'user_small_avatar_square_crop' => [
             'name' => tra('Crop the profile picture thumbnail to a square'),
-            'help' => 'User-Preferences',
+            'help' => $userPreferencesHelp,
             'type' => 'flag',
             'default' => 'n',
         ],
         'user_picture_gallery_id' => [
             'name' => tra('File gallery in which to store full-size profile picture'),
             'description' => tra('Enter the gallery ID here. Create a dedicated gallery that is admin-only for security, or make sure gallery permissions are set so that only admins can edit.'),
-            'help' => 'User-Preferences',
+            'help' => $userPreferencesHelp,
             'keywords' => 'avatar',
             'type' => 'text',
             'filter' => 'digits',
@@ -120,7 +129,7 @@ function prefs_user_list($partial = false)
             'name' => tra('File ID of default profile picture'),
             'description' => tra('File ID of image to use in file gallery as the profile picture if user has no profile picture in file galleries'),
             'keywords' => 'avatar',
-            'help' => 'User-Preferences',
+            'help' => $userPreferencesHelp,
             'type' => 'text',
             'filter' => 'digits',
             'size' => '5',
@@ -154,16 +163,18 @@ function prefs_user_list($partial = false)
                 'user_who_viewed_my_stuff',
             ],
             'default' => 'n',
-        ],
+        ], // TODO: add help for user_who_viewed_
         'user_list_order' => [
             'name' => tra('Sort order'),
+            'description' => tra('Default sort order for community user listings (by score, real name, or login). Available options depend on the name and score display settings below.'),
             'type' => 'list',
             'options' => $partial ? [] : UserListOrder(),
             'default' => 'score_desc',
+            'help' => 'Social-Interaction',
         ],
         'user_register_prettytracker' => [
             'name' => tra('Use pretty trackers for registration form'),
-            'help' => 'User-Tracker',
+            'help' => $userTrackerHelp,
             'description' => 'Allows a site manager to design forms using registration fields and have the results of each field displayed in customizable way on a Wiki page or Smarty template.',
             'type' => 'flag',
             'dependencies' => [
@@ -179,7 +190,8 @@ function prefs_user_list($partial = false)
             'dependencies' => [
                 'user_register_pretty_tracker',
             ],
-            'default' => ''
+            'default' => '',
+            'help' => $userTrackerHelp,
         ],
         'user_register_prettytracker_hide_mandatory' => [
             'name' => tra('Hide Mandatory'),
@@ -189,10 +201,11 @@ function prefs_user_list($partial = false)
             'dependencies' => [
                 'user_register_prettytracker',
             ],
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_register_prettytracker_output' => [
             'name' => tra('Output the registration results'),
-            'help' => 'User-Tracker',
+            'help' => $userTrackerHelp,
             'description' => tra('Use a wiki page as template to output the registration results to'),
             'type' => 'flag',
             'default' => 'n',
@@ -207,6 +220,7 @@ function prefs_user_list($partial = false)
             'type' => 'text',
             'size' => '20',
             'default' => '',
+            'help' => $userTrackerHelp,
             'dependencies' => [
                 'user_register_prettytracker_output',
             ],
@@ -223,6 +237,7 @@ function prefs_user_list($partial = false)
             ],
             'profile_reference' => 'tracker_field',
             'format' => $fieldFormat,
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_trackersync_trackers' => [
             'name' => tra('User tracker IDs to sync prefs from'),
@@ -235,6 +250,7 @@ function prefs_user_list($partial = false)
             'default' => '',
             'separator' => ',',
             'profile_reference' => 'tracker',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_trackersync_realname' => [
             'name' => tra('Tracker field IDs to sync the "real name" pref from'),
@@ -246,6 +262,7 @@ function prefs_user_list($partial = false)
                 'user_trackersync_trackers',
             ],
             'default' => '',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_trackersync_groups' => [
             'name' => tra('Tracker field IDs to sync user groups'),
@@ -257,6 +274,7 @@ function prefs_user_list($partial = false)
                 'user_trackersync_trackers',
             ],
             'default' => '',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_trackersync_geo' => [
             'name' => tra('Synchronize long/lat/zoom to location field'),
@@ -267,15 +285,18 @@ function prefs_user_list($partial = false)
                 'user_trackersync_trackers',
             ],
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_trackersync_lang' => [
             'name' => tra('Change user system language when changing user tracker item language'),
+            'description' => tra('When a synced user tracker item is saved, update the linked user\'s interface language from the tracker language field.'),
             'type' => 'flag',
             'dependencies' => [
                 'userTracker',
                 'user_trackersync_trackers',
             ],
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_tracker_auto_assign_item_field' => [
             'name' => tra('Assign a user tracker item when registering if email equals this field'),
@@ -287,6 +308,7 @@ function prefs_user_list($partial = false)
             'default' => '',
             'profile_reference' => 'tracker_field',
             'format' => $fieldFormat,
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_selector_threshold' => [
             'name' => tra('Maximum users in drop-down lists'),
@@ -296,6 +318,7 @@ function prefs_user_list($partial = false)
             'units' => tra('users'),
             'dependencies' => ['elementplus_autocomplete'],
             'default' => 50,
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_selector_realnames_tracker' => [
             'name' => tra('Show user\'s real name'),
@@ -304,7 +327,7 @@ function prefs_user_list($partial = false)
             'hint' => tra('This is a global switch for the parameter "Show real name if possible". Requires activation in the options of each User Selector field independently.'),
             'dependencies' => ['elementplus_autocomplete', 'user_show_realnames', 'feature_trackers'],
             'default' => 'n',
-
+            'help' => $userPreferencesHelp,
         ],
         'user_selector_realnames_messu' => [
             'name' => tra('Show user\'s real name'),
@@ -312,24 +335,28 @@ function prefs_user_list($partial = false)
             'type' => 'flag',
             'dependencies' => ['elementplus_autocomplete', 'user_show_realnames', 'feature_messages'],
             'default' => 'n',
+            'help' => $userPreferencesHelp,
         ],
         'user_favorites' => [
             'name' => tra('User favorites'),
             'description' => tra('Enable users to flag content as their favorite.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Favorites',
         ],
         'user_likes' => [
             'name' => tra('User likes'),
             'description' => tra('Enable users to "like" content.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'PluginLike',
         ],
         'user_must_choose_group' => [
             'name' => tra('Users must choose a group at registration'),
             'description' => tra('Users cannot register without choosing one of the groups indicated above.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'user_in_search_result' => [
             'name' => tr('Users available in search results'),
@@ -342,6 +369,7 @@ function prefs_user_list($partial = false)
                 'public' => tr('Public'),
             ],
             'default' => 'none',
+            'help' => 'Search-General-Settings',
         ],
         'user_use_gravatar' => [
             'name' => tr('Use Gravatar for user profile pictures'),
@@ -365,11 +393,12 @@ function prefs_user_list($partial = false)
             'tags' => ['advanced'],
             'default' => 'n',
             'dependencies' => ['feature_userPreferences'],
+            'help' => $loginGeneralPreferencesHelp
         ],
         'user_localtimezonesync' => [
             'name' => tra('Local Timezone Synchronization'),
             'description' => tr('Allow user to manage timezone incoherence.'),
-            'help' => 'User-Preferences',
+            'help' => $userPreferencesHelp,
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['basic'],

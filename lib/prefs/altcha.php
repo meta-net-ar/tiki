@@ -14,6 +14,6 @@ function prefs_altcha_list()
             'size' => 60,
             'default' => '',
             'keywords' => 'captcha altcha',
-        ]
+        ] // TODO: Update help page for this preference
     ];
 }

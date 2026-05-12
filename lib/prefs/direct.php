@@ -6,19 +6,21 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_direct_list()
 {
+    $paginationLinksHelp = 'Pagination-Links';
+
     return [
         'direct_pagination' => [
             'name' => tra('Use direct pagination links'),
             'description' => tra('Show page number links in pagination.'),
             'type' => 'flag',
-            'help' => 'Pagination-Links',
+            'help' => $paginationLinksHelp,
             'default' => 'y',
         ],
         'direct_pagination_max_middle_links' => [
             'name' => tra('Maximum number of links around the current item'),
             'description' => tra('Number of page links shown around the current page.'),
             'type' => 'text',
-            'help' => 'Pagination-Links',
+            'help' => $paginationLinksHelp,
             'units' => tra('links'),
             'size' => '4',
             'default' => 2,
@@ -27,7 +29,7 @@ function prefs_direct_list()
             'name' => tra('Maximum number of links after the first or before the last item'),
             'description' => tra('Number of page links always shown near the start and end of pagination.'),
             'type' => 'text',
-            'help' => 'Pagination-Links',
+            'help' => $paginationLinksHelp,
             'units' => tra('links'),
             'size' => '4',
             'default' => 0,

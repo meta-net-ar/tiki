@@ -15,6 +15,7 @@ function prefs_newsletter_list()
             'dependencies' => [
                 'feature_newsletters',
             ],
+            'help' => 'Newsletters',
         ],
         'newsletter_pause_length' => [
             'name' => tra('Newsletter pause length'),
@@ -24,6 +25,7 @@ function prefs_newsletter_list()
             'filter' => 'digits',
             'units' => tra('seconds'),
             'default' => 60,
+            'help' => 'Newsletters',
         ],
         'newsletter_batch_size' => [
             'name' => tra('Newsletter batch size'),
@@ -33,6 +35,7 @@ function prefs_newsletter_list()
             'filter' => 'digits',
             'units' => tra('emails'),
             'default' => 5,
+            'help' => 'Newsletters',
         ],
         'newsletter_external_client' => [
             'name' => tra('Allow sending newsletters through external clients'),
@@ -43,6 +46,7 @@ function prefs_newsletter_list()
             'dependencies' => [
                 'feature_newsletters',
             ],
+            'help' => 'Preferences---Score-to-SEFURL',
         ],
         'newsletter_validate_email_dns' => [
             'name' => tra('Validate newsletter recipient domains using DNS/MX'),
@@ -52,6 +56,6 @@ function prefs_newsletter_list()
             'dependencies' => [
                 'feature_newsletters',
             ],
-        ],
+        ], // TODO: Update help page for this preference
     ];
 }

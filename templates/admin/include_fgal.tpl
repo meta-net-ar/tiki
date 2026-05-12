@@ -52,7 +52,7 @@
             {preference name='fgal_podcast_dir'}
 
             <fieldset>
-                <legend class="h3">{tr}Features{/tr}{help url="File+Gallery+Config"}</legend>
+                <legend class="h3">{tr}Features{/tr}{help url="File-Gallery-Config"}</legend>
 
                 {preference name='feature_file_galleries_rankings'}
                 {preference name='feature_file_galleries_comments'}
@@ -111,7 +111,7 @@
             </fieldset>
 
             <fieldset>
-                <legend class="h3">{tr}Quota{/tr}{help url="File+Gallery+Config#Quota"}</legend>
+                <legend class="h3">{tr}Quota{/tr}{help url="File-Gallery-Config#Quota"}</legend>
                 {preference name='fgal_quota'}{tr}Used:{/tr} {$usedSize|kbsize}
                 <div class="adminoptionboxchild" id="fgal_quota_childcontainer">
                     {if !empty($prefs.fgal_quota)}
@@ -126,7 +126,7 @@
             </fieldset>
 
             <fieldset>
-                <legend class="h3">{tr}Upload Regex{/tr}{help url="File+Gallery+Config#Filename_must_match:"}</legend>
+                <legend class="h3">{tr}Upload Regex{/tr}{help url="File-Gallery-Config#Filename_must_not_match"}</legend>
                 {preference name='fgal_match_regex'}
                 {preference name='fgal_nmatch_regex'}
             </fieldset>

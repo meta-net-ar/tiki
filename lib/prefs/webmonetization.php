@@ -6,12 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_webmonetization_list()
 {
+    $webMonetizationHelp = 'Web-Monetization';
+
     return [
         'webmonetization_enabled' => [
             'name' => tra('Enable Web Monetization'),
             'description' => tra('Enable Web Monetization showing a message in page header.'),
             'type' => 'flag',
-            'help' => 'Web-Monetization',
+            'help' => $webMonetizationHelp,
             'tags' => ['experimental'],
             'default' => 'n',
         ],
@@ -21,6 +23,7 @@ function prefs_webmonetization_list()
             'type' => 'flag',
             'tags' => ['experimental'],
             'default' => 'n',
+            'help' => $webMonetizationHelp,
         ],
         'webmonetization_always_default' => [
             'name' => tra('Always use default site pointer'),
@@ -28,6 +31,7 @@ function prefs_webmonetization_list()
             'type' => 'flag',
             'tags' => ['experimental'],
             'default' => 'n',
+            'help' => $webMonetizationHelp,
         ],
         'webmonetization_default_payment_pointer' => [
             'name' => tra('Default payment pointer'),
@@ -35,6 +39,7 @@ function prefs_webmonetization_list()
             'type' => 'text',
             'tags' => ['experimental'],
             'default' => '',
+            'help' => $webMonetizationHelp,
         ],
         'webmonetization_default_paywall_text' => [
             'name' => tra('Default paywall text'),
@@ -42,6 +47,7 @@ function prefs_webmonetization_list()
             'type' => 'textarea',
             'tags' => ['experimental'],
             'default' => '',
+            'help' => $webMonetizationHelp,
         ],
     ];
 }

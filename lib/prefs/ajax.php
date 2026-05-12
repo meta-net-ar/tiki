@@ -19,7 +19,6 @@ function prefs_ajax_list()
             ],
             'default' => 'y',
         ],
-
         'ajax_inline_edit' => [
             'name' => tr('Inline editing'),
             'description' => tr('Enable inline editing of certain values. Currently limited to tracker item fields.'),
@@ -39,5 +38,5 @@ function prefs_ajax_list()
             'type' => 'flag',
             'default' => 'n',
         ],
-    ];
+    ]; // TODO: improve help
 }

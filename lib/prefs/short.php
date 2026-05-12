@@ -6,11 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_short_list()
 {
+    $dateAndTimeFormatsHelp = 'Date-and-Time#Date_and_Time_Formats';
+    $dayJsFormatHelp = 'https://day.js.org/docs/en/display/format#list-of-all-available-formats';
+
     return [
         'short_date_format' => [
             'name' => tra('Short date format'),
             'description' => tra('Specify how Tiki displays the date (shorter version)'),
-            'help' => 'Date-and-Time#Date_and_Time_Formats',
+            'help' => $dateAndTimeFormatsHelp,
             'type' => 'text',
             'size' => '30',
             'default' => '%Y-%m-%d',
@@ -20,7 +23,7 @@ function prefs_short_list()
         'short_time_format' => [
             'name' => tra('Short time format'),
             'description' => tra('Specify how Tiki displays the time (shorter version)'),
-            'help' => 'Date-and-Time#Date_and_Time_Formats',
+            'help' => $dateAndTimeFormatsHelp,
             'type' => 'text',
             'size' => '30',
             'default' => '%H:%M',
@@ -30,7 +33,7 @@ function prefs_short_list()
         'short_date_format_js' => [
             'name' => tra('Short JavaScript date format'),
             'description' => tra('Used in the date picker fields'),
-            'help' => 'https://day.js.org/docs/en/display/format#list-of-all-available-formats',
+            'help' => $dayJsFormatHelp,
             'type' => 'text',
             'size' => '30',
             'default' => 'YYYY-MM-DD',
@@ -38,7 +41,7 @@ function prefs_short_list()
         'short_time_format_js' => [
             'name' => tra('Short JavaScript time format'),
             'description' => tra('Used in the datetime picker fields'),
-            'help' => 'https://day.js.org/docs/en/display/format#list-of-all-available-formats',
+            'help' => $dayJsFormatHelp,
             'type' => 'text',
             'size' => '30',
             'default' => 'HH:mm',
