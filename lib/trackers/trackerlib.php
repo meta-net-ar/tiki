@@ -5599,7 +5599,6 @@ class TrackerLib extends TikiLib
                 }
             }
         }
-        //echo '<pre>'; print_r($cell); echo '</pre>';
     }
 
     public function get_tracker_by_name($name)

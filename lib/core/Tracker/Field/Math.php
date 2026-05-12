@@ -400,7 +400,6 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
         $newKey = $this->getBaseKey();
 
         if (array_search($oldKey, $array) === false) {
-            var_dump($oldKey, $array);
             throw new Error("Sanity-check:  Unable to find the expected mirrorField basekey");
         }
 

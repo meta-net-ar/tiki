@@ -14,7 +14,7 @@ class Search extends Api
             try {
                 self::$sources[] = new $source->class();
             } catch (\Exception $e) {
-                error_log($e->getMessage());
+                error_log($e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (exception logging in search extension)
             }
         }
     }

@@ -97,7 +97,7 @@ class DbgSQLQuery extends DebuggerCommand
                     $result .= '</table>';
                 } else {
                     // Let PHP to dump result :)
-                    $result = 'Query result: ' . print_r($query, true);
+                    $result = 'Query result: ' . print_r($query, true); // @phpstan-ignore disallowedFunctions.printR (intentional debug tool — formats SQL query result as string)
                 }
             } catch (Exception $e) {
                 $result = '<span class="dbgerror">' . $e->getmessage() . '</span>';
