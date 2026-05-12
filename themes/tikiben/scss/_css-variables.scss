@@ -33,7 +33,7 @@
     --tiki-top-color: #fff;
     --tiki-top-hover-color: #fff;
     //    --tiki-top-border: solid rgb(85, 85, 85);
-    --bs-navbar-brand-color: #{$navbar-dark-brand-color};
+    --bs-navbar-brand-color: var(--tiki-top-color); // #{$navbar-dark-brand-color};
     --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
 
@@ -77,15 +77,15 @@
 }
 
 // Color mode preference trumps L&F admin light navbar option - THIS ADJUSTMENT ISN'T NEEDED IN THIS THEME.
-//[data-bs-theme=dark] {                              // color mode
-//    .tiki-top-nav-light {                           // light top selector
-//        @include top-nav-dark;                      // dark values
-//    }
-//    .tiki-topbar-nav-light {
-//        @include topbar-nav-dark;
-//    }
-//}
-//
+[data-bs-theme=dark] {                              // color mode
+    .tiki-top-nav-light {                           // light top selector
+        @include top-nav-dark;                      // dark values
+    }
+    .tiki-topbar-nav-light {
+        @include topbar-nav-dark;
+    }
+}
+
 // Color mode preference trumps L&F admin dark navbar option
 //[data-bs-theme=light] {                              // color mode
 //    .tiki-top-nav-dark {                           // dark top selector
@@ -238,3 +238,11 @@
     }
     --bs-card-cap-color: #212529;;
 }
+
+.tiki .tiki-topbar-nav-light:not(:has(.module)),
+.tiki .tiki-topbar-nav-dark:not(:has(.module)) {
+    background: transparent !important;
+}
+
+
+//.admin-content .tiki-nav-light, .tiki .tiki-topbar-nav-dark
