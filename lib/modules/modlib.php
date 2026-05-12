@@ -533,10 +533,12 @@ class ModLib extends TikiLib
         global $page, $prefs, $user;
         $section = Sections::getCurrentSection();
         $tikilib = TikiLib::lib('tiki');
+        $pref_module_name = 'module_' . preg_replace('/[^a-zA-Z0-9]/', '_', $module["name"]);
 
-        if ($prefs['module_' . $module["name"]] != 'y') {
+        if (! isset($prefs[$pref_module_name]) || $prefs[$pref_module_name] != 'y') {
             return false;
         }
+
         if (TikiLib::lib('login')->isSwitched() && isset($_SESSION["keep_login_box_visible"]) && $_SESSION["keep_login_box_visible"] == 'y') {
             if ($module["name"] === "login_box" && (! isset($module["mode"]) || isset($module["mode"]) === "module")) {
                 return true;

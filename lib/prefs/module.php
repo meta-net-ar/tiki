@@ -104,7 +104,7 @@ function prefs_module_list()
     ];
     foreach ($all_modules as $name) {
         $modinfo = $modlib->get_module_info($name);
-        $pref_modules['module_' . $name] = [
+        $pref_modules['module_' . preg_replace('/[^a-zA-Z0-9]/', '_', $name)] = [
             'name' => $modinfo['name'],
             'type' => 'flag',
             'description' => $modinfo['description'],
