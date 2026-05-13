@@ -30,10 +30,9 @@ function wikiplugin_youtube_info()
                 'required' => false,
                 'name' => tra('Privacy-Enhanced'),
                 'description' => tra('Enable privacy-enhanced mode'),
-                'default' => '',
+                'default' => 'y',
                 'filter' => 'alpha',
                 'options' => [
-                    ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
                     ['text' => tra('No'), 'value' => 'n'],
                 ],
@@ -144,7 +143,7 @@ function wikiplugin_youtube($data, $params)
         'borderRadius' => 'y',
         'allowFullScreen' => 'y',
         'related' => 'y',
-        'privacyEnhanced' => '',
+        'privacyEnhanced' => 'y',
         'quality' => 'high',
     ], $params);
 
@@ -173,7 +172,7 @@ function wikiplugin_youtube($data, $params)
         $oEmbedData['height'] = 16;
     }
 
-    $privacyEnhanced = $params['privacyEnhanced'];
+    $privacyEnhanced = $params['privacyEnhanced'] ?? $params['privacyenhanced'] ?? 'y';
     $related = $params['related'];
 
     $fqdn = $privacyEnhanced === 'y' ? 'www.youtube-nocookie.com' : 'www.youtube.com';
