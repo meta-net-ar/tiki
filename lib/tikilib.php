@@ -4727,8 +4727,10 @@ class TikiLib extends TikiDb_Bridge
             }
 
             $userPreferences = $this->table('tiki_user_preferences', false);
-            $userPreferences->delete(['user' => $my_user, 'prefName' => $name]);
-            $result = $userPreferences->insert(['user' => $my_user, 'prefName' => $name,    'value' => $value]);
+            $result = $userPreferences->insertOrUpdate(
+                ['value' => $value],
+                ['user' => $my_user, 'prefName' => $name]
+            );
 
             $user_preferences[$my_user][$name] = $value;
 
