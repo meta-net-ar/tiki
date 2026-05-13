@@ -719,3 +719,8 @@ header.fixed-top {
         }
     }
 }
+
+// Remove redundant card-body vertical padding in menu module, when nobox not eq y (nav already has top and bottom margins).
+.box-menu .card-body {
+    --bs-card-spacer-y: 0rem;
+}
