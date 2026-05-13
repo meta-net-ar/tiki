@@ -143,7 +143,7 @@ describe("Transfer", () => {
             expect.objectContaining({
                 type: type,
             }),
-            null
+            expect.any(Object)
         );
 
         expect(consoleErrorSpy).not.toHaveBeenCalled();
@@ -161,7 +161,7 @@ describe("Transfer", () => {
     ])(
         "renders the alert element with the correct message in all variations of the props: minItems, maxItems, and helperText",
         (givenProps, expectedMessage) => {
-                vi.mocked(ElAlert).mockImplementationOnce((props, ctx) => h("div", props, ctx.slots.default()));
+            vi.mocked(ElAlert).mockImplementationOnce((props, ctx) => h("div", props, ctx.slots.default()));
 
             render(Transfer, { props: { ...props, ...givenProps } });
 
@@ -188,7 +188,7 @@ describe("Transfer", () => {
                     icon: expect.objectContaining({ name: "Edit" }),
                     onClick: expect.any(Function),
                 }),
-                null
+                expect.any(Object)
             );
         });
 

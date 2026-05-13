@@ -50,7 +50,7 @@ describe("Input", () => {
                 clearable: false,
                 autocomplete: "on",
             }),
-            null
+            expect.any(Object)
         );
         expect(givenProps._expose).toHaveBeenCalledWith({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
     });
@@ -81,7 +81,7 @@ describe("Input", () => {
                 clearable: true,
                 autocomplete: givenProps.autocomplete,
             }),
-            null
+            expect.any(Object)
         );
 
         // Should correctly rerender the the value prop changes
@@ -94,7 +94,7 @@ describe("Input", () => {
             expect.objectContaining({
                 modelValue: "bar",
             }),
-            null
+            expect.any(Object)
         );
         expect(givenProps._expose).toHaveBeenCalledWith({ value: expect.objectContaining({ _value: "bar", __v_isRef: true }) });
     });

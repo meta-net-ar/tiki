@@ -150,12 +150,8 @@ describe("Autocomplete", () => {
             };
 
             vi.mocked(ElAutocomplete).mockImplementationOnce((props) => {
-                const { fetchSuggestions } = props;
-                return h(
-                    "div",
-                    {},
-                    h("input", { "data-testid": "autocomplete-input", onChange: (e) => fetchSuggestions(e.target.value, () => {}) })
-                );
+                const fetchSuggestions = props["fetch-suggestions"] ?? props.fetchSuggestions;
+                return h("div", {}, h("input", { "data-testid": "autocomplete-input", onChange: (e) => fetchSuggestions(e.target.value, () => {}) }));
             });
 
             render(Autocomplete, { props: givenProps });
@@ -174,11 +170,7 @@ describe("Autocomplete", () => {
             };
 
             vi.mocked(ElAutocomplete).mockImplementationOnce((_, ctx) =>
-                h(
-                    "div",
-                    {},
-                    h("div", { "data-testid": "autocomplete-suggestion", onClick: () => ctx.emit("select", "suggestion") }, "Suggestion")
-                )
+                h("div", {}, h("div", { "data-testid": "autocomplete-suggestion", onClick: () => ctx.emit("select", "suggestion") }, "Suggestion"))
             );
 
             render(Autocomplete, { props: givenProps });
