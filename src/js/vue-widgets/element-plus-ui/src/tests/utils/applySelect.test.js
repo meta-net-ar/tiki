@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import { Window } from "happy-dom";
 import $ from "jquery";
 import applySelect from "../../utils/applySelect";
 import * as applySelectHelpers from "../../helpers/select/applySelect";
@@ -10,8 +9,7 @@ describe("applySelect", () => {
     });
 
     afterEach(() => {
-        global.window = new Window();
-        global.document = window.document;
+        document.body.innerHTML = "";
     });
 
     test("transforms select element into el-select components", async () => {
@@ -44,7 +42,7 @@ describe("applySelect", () => {
 
         document.body.append(...givenSelects);
 
-        await window.happyDOM.waitUntilComplete();
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         givenSelects.forEach((select, index) => {
             const elementPlusUi = document.querySelector(`#${select.getAttribute("element-plus-ref")}`);
@@ -75,7 +73,7 @@ describe("applySelect", () => {
         const givenSelect = document.createElement("select");
         document.body.appendChild(givenSelect);
 
-        await window.happyDOM.waitUntilComplete();
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         const elementPlusUi = document.querySelector("el-select");
         expect(elementPlusUi.getAttribute("clearable")).toBe(expectedBoolean);
@@ -96,7 +94,7 @@ describe("applySelect", () => {
         givenSelect.classList.add("form-control-sm");
         document.body.appendChild(givenSelect);
 
-        await window.happyDOM.waitUntilComplete();
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         const elementPlusUi = document.querySelector("el-select");
         expect(elementPlusUi.getAttribute("size")).toBe("small");
@@ -114,7 +112,7 @@ describe("applySelect", () => {
         givenSelect.setAttribute("data-remote-source-url", givenRemoteSourceUrl);
         document.body.appendChild(givenSelect);
 
-        await window.happyDOM.waitUntilComplete();
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         const elementPlusUi = document.querySelector("el-select");
         expect(elementPlusUi.getAttribute("remote-source-url")).toBe(givenRemoteSourceUrl);
