@@ -8,11 +8,24 @@ import * as AjaxUploadHelpers from "element-plus/es/components/upload/src/ajax.m
 import getUploadAjaxError from "../../helpers/fileGalUploader/getUploadAjaxError";
 import handleTikiFeedback from "../../helpers/fileGalUploader/handleTikiFeedback";
 
+// Defined at module scope so the mock factory's closure can access it across tests.
+let mockElUploadSubmit = vi.fn();
+
 vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
+    // Use a stateful component (has `setup`) so `ref` resolves to the exposed object
+    // rather than the root DOM element. Manually call the vi.fn() inside setup so
+    // ElUpload.mock.calls / toHaveBeenCalledWith still work for the other tests.
+    const ElUploadMock = Object.assign(vi.fn(), {
+        setup(props, { slots, expose }) {
+            ElUploadMock(props, { slots, expose });
+            expose({ submit: mockElUploadSubmit });
+            return () => h("div", props, slots.default ? slots.default() : null);
+        },
+    });
     return {
         ...actual,
-        ElUpload: vi.fn((props, { slots }) => h("div", props, slots.default ? slots.default() : null)),
+        ElUpload: ElUploadMock,
     };
 });
 
@@ -269,16 +282,6 @@ describe("FileGalUploader", () => {
         });
 
         test("clicking the submit button triggers the upload", async () => {
-            ElUpload = {
-                setup(props, { slots }) {
-                    return () => h("div", props, slots.default());
-                },
-                methods: {
-                    submit: vi.fn(),
-                },
-                exposes: ["submit"],
-            };
-
             render(FileGalUploader, {
                 props: {
                     maxSize: "100",
@@ -289,7 +292,7 @@ describe("FileGalUploader", () => {
             const submitButton = screen.getByTestId(DATA_TEST_ID.SUBMIT_BUTTON);
             await submitButton.click();
 
-            expect(ElUpload.methods.submit).toHaveBeenCalled();
+            expect(mockElUploadSubmit).toHaveBeenCalled();
         });
     });
 });

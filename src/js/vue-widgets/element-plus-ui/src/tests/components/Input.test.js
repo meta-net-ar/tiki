@@ -109,17 +109,13 @@ describe("Input", () => {
                 _emit: vi.fn(),
             };
 
-            ElInput = {
-                emits: ["input", "change"],
-                setup(_, { emit }) {
-                    return () =>
-                        h("input", {
-                            "data-testid": DATA_TEST_ID.INPUT,
-                            onInput: () => emit("input", "bar"),
-                            onChange: () => emit("change", "bar"),
-                        });
-                },
-            };
+            vi.mocked(ElInput).mockImplementationOnce((_, ctx) =>
+                h("input", {
+                    "data-testid": DATA_TEST_ID.INPUT,
+                    onInput: () => ctx.emit("input", "bar"),
+                    onChange: () => ctx.emit("change", "bar"),
+                })
+            );
 
             render(Input, { props: givenProps });
 

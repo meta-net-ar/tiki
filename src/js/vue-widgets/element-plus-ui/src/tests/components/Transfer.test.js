@@ -161,11 +161,7 @@ describe("Transfer", () => {
     ])(
         "renders the alert element with the correct message in all variations of the props: minItems, maxItems, and helperText",
         (givenProps, expectedMessage) => {
-            ElAlert = {
-                setup(props, { slots }) {
-                    return () => h("div", props, slots.default());
-                },
-            };
+                vi.mocked(ElAlert).mockImplementationOnce((props, ctx) => h("div", props, ctx.slots.default()));
 
             render(Transfer, { props: { ...props, ...givenProps } });
 
@@ -214,12 +210,9 @@ describe("Transfer", () => {
     });
 
     test("should correctly initialize SortableJS when ordering prop is true", async () => {
-        ElTransfer = {
-            setup() {
-                return () =>
-                    h("div", {}, [h("div", { class: "el-transfer-panel__list" }, "list"), h("div", { class: "el-transfer-panel__list" }, "list 2")]);
-            },
-        };
+        vi.mocked(ElTransfer).mockImplementationOnce(() =>
+            h("div", {}, [h("div", { class: "el-transfer-panel__list" }, "list"), h("div", { class: "el-transfer-panel__list" }, "list 2")])
+        );
         render(Transfer, { props: { ...props, ordering: true } });
 
         expect(Sortable).toHaveBeenCalledWith(
@@ -246,26 +239,23 @@ describe("Transfer", () => {
     });
 
     test("should correctly reorder items with SortableJS when ordering prop is true", async () => {
-        ElTransfer = {
-            setup() {
-                return () =>
-                    h("div", {}, [
-                        h("div", { class: "el-transfer-panel__list" }, "list 1"),
-                        h("div", { class: "el-transfer-panel__list" }, [
-                            h(
-                                "div",
-                                { class: "el-transfer-panel__item" },
-                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "a" }, "Item A"))
-                            ),
-                            h(
-                                "div",
-                                { class: "el-transfer-panel__item" },
-                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
-                            ),
-                        ]),
-                    ]);
-            },
-        };
+        vi.mocked(ElTransfer).mockImplementationOnce(() =>
+            h("div", {}, [
+                h("div", { class: "el-transfer-panel__list" }, "list 1"),
+                h("div", { class: "el-transfer-panel__list" }, [
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "a" }, "Item A"))
+                    ),
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
+                    ),
+                ]),
+            ])
+        );
 
         const emitValueChange = vi.fn();
         props.emitValueChange = emitValueChange;
@@ -282,26 +272,23 @@ describe("Transfer", () => {
     });
 
     test("should not reorder items with SortableJS when ordering prop is false", async () => {
-        ElTransfer = {
-            setup() {
-                return () =>
-                    h("div", {}, [
-                        h("div", { class: "el-transfer-panel__list" }, "list 1"),
-                        h("div", { class: "el-transfer-panel__list" }, [
-                            h(
-                                "div",
-                                { class: "el-transfer-panel__item" },
-                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "a" }, "Item A"))
-                            ),
-                            h(
-                                "div",
-                                { class: "el-transfer-panel__item" },
-                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
-                            ),
-                        ]),
-                    ]);
-            },
-        };
+        vi.mocked(ElTransfer).mockImplementationOnce(() =>
+            h("div", {}, [
+                h("div", { class: "el-transfer-panel__list" }, "list 1"),
+                h("div", { class: "el-transfer-panel__list" }, [
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "a" }, "Item A"))
+                    ),
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
+                    ),
+                ]),
+            ])
+        );
 
         const emitValueChange = vi.fn();
         props.emitValueChange = emitValueChange;
@@ -318,21 +305,18 @@ describe("Transfer", () => {
     });
 
     test("should correctly transfer items  via SortableJS from source to target list", async () => {
-        ElTransfer = {
-            setup() {
-                return () =>
-                    h("div", {}, [
-                        h("div", { class: "el-transfer-panel__list" }, [
-                            h(
-                                "div",
-                                { class: "el-transfer-panel__item", "data-testid": "item-c" },
-                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "c" }, "Item C"))
-                            ),
-                        ]),
-                        h("div", { class: "el-transfer-panel__list" }, "list 2"),
-                    ]);
-            },
-        };
+        vi.mocked(ElTransfer).mockImplementationOnce(() =>
+            h("div", {}, [
+                h("div", { class: "el-transfer-panel__list" }, [
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item", "data-testid": "item-c" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "c" }, "Item C"))
+                    ),
+                ]),
+                h("div", { class: "el-transfer-panel__list" }, "list 2"),
+            ])
+        );
 
         const emitValueChange = vi.fn();
         props.emitValueChange = emitValueChange;
@@ -350,21 +334,18 @@ describe("Transfer", () => {
     });
 
     test("should correctly transfer items via SortableJS from target to source list", async () => {
-        ElTransfer = {
-            setup() {
-                return () =>
-                    h("div", {}, [
-                        h("div", { class: "el-transfer-panel__list" }, "list 1"),
-                        h("div", { class: "el-transfer-panel__list" }, [
-                            h(
-                                "div",
-                                { class: "el-transfer-panel__item", "data-testid": "item-b" },
-                                h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
-                            ),
-                        ]),
-                    ]);
-            },
-        };
+        vi.mocked(ElTransfer).mockImplementationOnce(() =>
+            h("div", {}, [
+                h("div", { class: "el-transfer-panel__list" }, "list 1"),
+                h("div", { class: "el-transfer-panel__list" }, [
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item", "data-testid": "item-b" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
+                    ),
+                ]),
+            ])
+        );
 
         const emitValueChange = vi.fn();
         props.emitValueChange = emitValueChange;
@@ -383,17 +364,13 @@ describe("Transfer", () => {
 
     test("should keep hidden select in sync with el-transfer and call the given emitValueChange prop when the value changes", async () => {
         props.emitValueChange = vi.fn();
-        ElTransfer = {
-            props: ["data", "filterable", "filter-placeholder", "titles"],
-            emits: ["update:modelValue", "change"],
-            setup(props, { emit }) {
-                const handleClick = () => {
-                    emit("update:modelValue", ["c"]);
-                    emit("change", ["c"]);
-                };
-                return () => h("div", {}, h("button", { onClick: handleClick }, "Transfer Item"));
-            },
-        };
+        vi.mocked(ElTransfer).mockImplementationOnce((_, ctx) => {
+            const handleClick = () => {
+                ctx.emit("update:modelValue", ["c"]);
+                ctx.emit("change", ["c"]);
+            };
+            return h("div", {}, h("button", { onClick: handleClick }, "Transfer Item"));
+        });
 
         render(Transfer, { props });
 
