@@ -2,30 +2,32 @@ import { render, screen, waitFor, within } from "@testing-library/vue";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import FileGalUploader, { DATA_TEST_ID, DEFAULT_ACTION_URL } from "../../components/FileGalUploader/FileGalUploader.vue";
 import { h } from "vue";
-import { ElMessage, ElUpload } from "element-plus";
+import { ElMessage } from "element-plus";
 import ConfigWrapper from "../../components/ConfigWrapper.vue";
 import * as AjaxUploadHelpers from "element-plus/es/components/upload/src/ajax.mjs";
 import getUploadAjaxError from "../../helpers/fileGalUploader/getUploadAjaxError";
 import handleTikiFeedback from "../../helpers/fileGalUploader/handleTikiFeedback";
 
-// Defined at module scope so the mock factory's closure can access it across tests.
+// A plain vi.fn() spy for tracking what props FileGalUploader passes to <el-upload>.
+// Using a separate spy (instead of the component itself) because the mock must be a
+// stateful component object (not a vi.fn() function) for `ref.submit()` to work via expose().
+const elUploadSpy = vi.fn();
 let mockElUploadSubmit = vi.fn();
 
 vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
-    // Use a stateful component (has `setup`) so `ref` resolves to the exposed object
-    // rather than the root DOM element. Manually call the vi.fn() inside setup so
-    // ElUpload.mock.calls / toHaveBeenCalledWith still work for the other tests.
-    const ElUploadMock = Object.assign(vi.fn(), {
-        setup(props, { slots, expose }) {
-            ElUploadMock(props, { slots, expose });
-            expose({ submit: mockElUploadSubmit });
-            return () => h("div", props, slots.default ? slots.default() : null);
-        },
-    });
     return {
         ...actual,
-        ElUpload: ElUploadMock,
+        // Stateful component so Vue resolves the template ref to the exposed object.
+        // attrs (not props) holds all undeclared attributes passed by FileGalUploader,
+        // including data-testid, before-upload, on-error, on-success, http-request, etc.
+        ElUpload: {
+            setup(_, { attrs, slots, expose }) {
+                elUploadSpy(attrs, { slots, expose });
+                expose({ submit: mockElUploadSubmit });
+                return () => h("div", attrs, slots.default ? slots.default() : null);
+            },
+        },
     };
 });
 
@@ -73,7 +75,7 @@ describe("FileGalUploader", () => {
                 },
             });
 
-            expect(ElUpload).toHaveBeenCalledWith(
+            expect(elUploadSpy).toHaveBeenCalledWith(
                 expect.objectContaining({
                     action: DEFAULT_ACTION_URL,
                     drag: true,
@@ -117,7 +119,7 @@ describe("FileGalUploader", () => {
                 expect.any(Object)
             );
 
-            expect(ElUpload).toHaveBeenCalledWith(
+            expect(elUploadSpy).toHaveBeenCalledWith(
                 expect.objectContaining({
                     accept: givenProps.accept,
                     action: givenProps.vimeoUrl,
@@ -158,7 +160,7 @@ describe("FileGalUploader", () => {
 
             render(FileGalUploader, { props: givenProps });
 
-            const uploadValidation = ElUpload.mock.calls[0][0]["before-upload"](givenFile);
+            const uploadValidation = elUploadSpy.mock.calls[0][0]["before-upload"](givenFile);
 
             await waitFor(() => {
                 expect(elMessage).toHaveBeenCalledWith(`File size cannot exceed ${Number(givenProps.maxSize) / 1000}KB`);
@@ -177,7 +179,7 @@ describe("FileGalUploader", () => {
 
             render(FileGalUploader, { props: givenProps });
 
-            const httpRequestFunction = ElUpload.mock.calls[0][0]["http-request"];
+            const httpRequestFunction = elUploadSpy.mock.calls[0][0]["http-request"];
 
             const mockOption = {
                 action: DEFAULT_ACTION_URL,
@@ -218,7 +220,7 @@ describe("FileGalUploader", () => {
 
             render(FileGalUploader, { props: givenProps });
 
-            ElUpload.mock.calls[0][0]["on-error"]({ message: "foo" });
+            elUploadSpy.mock.calls[0][0]["on-error"]({ message: "foo" });
 
             await waitFor(() => {
                 expect(ElMessage.error).toHaveBeenCalledWith("foo");
@@ -235,7 +237,7 @@ describe("FileGalUploader", () => {
 
             render(FileGalUploader, { props: givenProps });
 
-            ElUpload.mock.calls[0][0]["on-success"]({}, { name: "foo" });
+            elUploadSpy.mock.calls[0][0]["on-success"]({}, { name: "foo" });
 
             await waitFor(() => {
                 expect(elMessage).toHaveBeenCalledWith("foo uploaded successfully");
@@ -255,7 +257,7 @@ describe("FileGalUploader", () => {
 
             render(FileGalUploader, { props: givenProps });
 
-            ElUpload.mock.calls[0][0]["on-success"]({ syntax: "syntax mock" }, { name: "foo" });
+            elUploadSpy.mock.calls[0][0]["on-success"]({ syntax: "syntax mock" }, { name: "foo" });
 
             await waitFor(() => {
                 expect(window.opener.insertAt).toHaveBeenCalledWith("editwiki", "syntax mock", false, false, true);
@@ -274,7 +276,7 @@ describe("FileGalUploader", () => {
 
             render(FileGalUploader, { props: givenProps });
 
-            ElUpload.mock.calls[0][0]["on-success"]({}, { name: "foo" });
+            elUploadSpy.mock.calls[0][0]["on-success"]({}, { name: "foo" });
 
             await waitFor(() => {
                 expect(window.completeVimeoUpload).toHaveBeenCalledWith("foo");

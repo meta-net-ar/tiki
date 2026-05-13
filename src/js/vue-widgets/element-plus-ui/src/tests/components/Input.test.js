@@ -6,7 +6,7 @@ import { h } from "vue";
 
 vi.mock("element-plus", () => {
     return {
-        ElInput: vi.fn((props) => h("div", props)),
+        ElInput: vi.fn((props, ctx) => h("div", props)),
     };
 });
 

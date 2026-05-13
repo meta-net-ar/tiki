@@ -17,8 +17,8 @@ vi.mock("element-plus", async (importOriginal) => {
                 props.modelValue.map((key) => slots.default({ option: { key } }))
             )
         ),
-        ElAlert: vi.fn(),
-        ElButton: vi.fn((props) => h("button", props)),
+        ElAlert: vi.fn((props, ctx) => null),
+        ElButton: vi.fn((props, ctx) => h("button", props)),
     };
 });
 
