@@ -106,11 +106,10 @@ class HtmlTidyLib
     private function buildConfig($override)
     {
         $defaults = [
-            'clean'                       => true,
             'output-xhtml'                => false,
             'merge-divs'                  => false,
             'show-body-only'              => false,
-            'new-blocklevel-tags'         => 'pdfsettings pdfpage pdfinclude article aside audio bdi canvas details dialog figcaption figure footer header hgroup main menu menuitem nav section source summary template track video',
+            'new-blocklevel-tags'         => 'article aside audio bdi canvas details dialog figcaption figure footer header hgroup main menu menuitem nav section source summary template track video',
             'new-empty-tags'              => 'embed keygen source track wbr',
             'new-inline-tags'             => 'svg audio command datalist embed mark menuitem meter output progress source time video wbr',
             'repeated-attributes'         => 'keep-first',

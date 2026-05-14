@@ -1962,8 +1962,17 @@ TEXT;
  */
 function cleanHtml($html, $config = null, $encoding = 'utf8')
 {
+    // new-blocklevel-tags must include both the PDF custom tags and the standard HTML5 tags
+    // from HtmlTidyLib defaults, since the override replaces rather than extends that key.
+    $pdfConfig = [
+        'clean'              => true,
+        'new-blocklevel-tags' => 'pdfsettings pdfpage pdfinclude article aside audio bdi canvas details dialog figcaption figure footer header hgroup main menu menuitem nav section source summary template track video',
+    ];
+    if (is_array($config)) {
+        $pdfConfig = array_merge($pdfConfig, $config);
+    }
     $htmlTidyLib = TikiLib::lib('htmltidy');
-    return $htmlTidyLib->cleanHtml($html, $config, $encoding, ['source' => 'pdf_generation']);
+    return $htmlTidyLib->cleanHtml($html, $pdfConfig, $encoding, ['source' => 'pdf_generation']);
 }
 
 /**
