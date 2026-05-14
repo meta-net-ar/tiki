@@ -87,39 +87,23 @@ function module_groups_emulation($mod_reference, $module_params)
         $chooseGroups["Registered"] = "included";
     }
 
-    $headerlib = TikiLib::lib("header");
     $moduleId = $mod_reference['moduleId'];
-    if (isset($allGroups) && $showallgroups == 'y') {
-        $headerlib->add_js('$(function() {
-            $("#module_' . $moduleId . ' #mge-all").hide();
-            $("#module_' . $moduleId . ' #mge-all-legend").on("click", function(){
-                $("#module_' . $moduleId . ' #mge-all").fadeToggle();
-                $(this).find(".mge-icon").toggleClass("fa-rotate-90");
-            });
-        });');
-    }
-    if ($showyourgroups == 'y') {
-        $headerlib->add_js('$(function() {
-            $("#module_' . $moduleId . ' #mge-mine").hide();
-            $("#module_' . $moduleId . ' #mge-mine-legend").on("click", function(){
-                $("#module_' . $moduleId . ' #mge-mine").fadeToggle();
-                $(this).find(".mge-icon").toggleClass("fa-rotate-90");
-            });
-        });');
-    }
-    if ($groups_are_emulated == 'y') {
-        $headerlib->add_js('$(function() {
-            $("#module_' . $moduleId . ' #mge-emulated").hide();
-            $("#module_' . $moduleId . ' #mge-emulated-legend").on("click", function(){
-                $("#module_' . $moduleId . ' #mge-emulated").fadeToggle();
-                $(this).find(".mge-icon").toggleClass("fa-rotate-90");
-            });
-        });');
-    }
+    $smarty->assign('moduleId', $moduleId);
 
+    $headerlib = TikiLib::lib("header");
+    $headerlib->add_css('
+        .mge-collapse-icon {
+            display: inline-block;
+            transition: transform 0.35s ease;
+            transform: rotate(90deg);
+        }
+        .collapsed .mge-collapse-icon {
+            transform: rotate(0deg);
+        }
+    ');
     $headerlib->add_js('$(function() {
-        var $select = $("#mge-select-groups");
-        var $btn = $("#mge-simulate-btn");
+        var $select = $("#mge-select-groups-' . $moduleId . '");
+        var $btn = $("#mge-simulate-btn-' . $moduleId . '");
 
         var updateBtnState = function() {
             if ($select.val() && $select.val().length > 0) {
