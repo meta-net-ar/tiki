@@ -101,6 +101,7 @@ export default defineConfig(({ command, mode }) => {
         { prefix: "jquery-tiki/", src: "src/js/jquery-tiki" },
         { prefix: "common-reexported/", src: "src/js/common-reexported" },
         { prefix: "@tiki/editor-toolbar/", src: "src/js/@tiki/editor-toolbar" },
+        { prefix: "@tiki/modules/", src: "src/js/@tiki/modules" },
         { prefix: "@tiki/plugin-base/", src: "src/js/@tiki/plugin-base" },
         { prefix: "@tiki/plugins/", src: "src/js/@tiki/plugins" },
         { prefix: "@tiki/tracker-field-base/", src: "src/js/@tiki/tracker-field-base" },

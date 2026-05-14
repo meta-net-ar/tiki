@@ -26,6 +26,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
             //IMPORTANT:  All these have to be ESM modules, TEST them, don't assume that they are.
             "imports" => [
                 "@tiki/editor-toolbar/fileRecording" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/editor-toolbar/fileRecording.js",
+                "@tiki/modules/search" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/modules/search.js",
                 "@tiki/plugin-base/buttonParamHandler" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugin-base/buttonParamHandler.js",
                 "@tiki/plugin-base/registerFieldDependency" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugin-base/registerFieldDependency.js",
                 "@tiki/plugins/bigbluebutton" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/bigbluebutton.js",

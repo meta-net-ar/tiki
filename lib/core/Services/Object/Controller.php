@@ -275,4 +275,11 @@ class Services_Object_Controller
 
         return [$perm, $adminperm, $attribute, $permtype];
     }
+
+    public function actionGetSemanticParentObjects($input)
+    {
+        $objectTypes = $input->objectTypes->raw();
+
+        return TikiLib::lib('object')->getSemanticParentObjects($objectTypes);
+    }
 }

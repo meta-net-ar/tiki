@@ -237,6 +237,7 @@ class ObjectLib extends TikiLib
             'file',
             'file gallery',
             'forum',
+            'forum post',
             'perspective',
             'poll',
             'quiz',
@@ -291,6 +292,51 @@ class ObjectLib extends TikiLib
         } else {
             return false;
         }
+    }
+
+    /**
+     * Returns all possible parent objects of the given object types.
+     * @param array $objectTypes
+     * @return array
+     */
+    public function getSemanticParentObjects($objectTypes = [])
+    {
+        $mappedChildParent = [
+            'trackeritem' => 'tracker',
+            'calendaritem' => 'calendar',
+            'file' => 'file gallery',
+            'file gallery' => 'file gallery',
+            'forum post' => 'forum',
+            'forum' => 'forum',
+            'user' => 'group',
+            'trackerfield' => 'tracker',
+            'structure' => 'structure',
+            'article' => 'article_topic',
+        ];
+
+        $objectParents = array_intersect_key($mappedChildParent, array_flip($objectTypes));
+
+        if (empty($objectParents)) {
+            return [];
+        }
+
+        $result = $this->query(
+            "SELECT `objectId`, `itemId`, `type` FROM `tiki_objects` WHERE `type` IN (" . implode(',', array_fill(0, count($objectParents), '?')) . ")",
+            array_values($objectParents)
+        );
+
+        $out = [];
+
+        while ($res = $result->fetchRow()) {
+            $out[] = [
+                'objectId' => $res['objectId'],
+                'itemId' => $res['itemId'],
+                'type' => $res['type'],
+                'title' => $this->get_title($res['type'], $res['itemId']),
+            ];
+        }
+
+        return $out;
     }
 
     public function insert_object($type, $itemId, $description = '', $name = '', $href = '')
