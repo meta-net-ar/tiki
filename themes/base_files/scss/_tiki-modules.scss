@@ -11,6 +11,10 @@ header.container,
     margin-bottom: 0;
 }
 
+// Wrap the modules in sticky-top layout top modules zone to allow .w-100 class modules display in full-width (e.g., nav menus on top)
+.layout_social:not(.uab.tiki-admin) header .top_modules {
+    flex-wrap: wrap;
+}
 
 .tiki.layout_classic .header_container .container.container-std {
     max-width: 100% !important;
