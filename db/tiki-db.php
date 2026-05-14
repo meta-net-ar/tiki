@@ -10,7 +10,8 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     exit;
 }
 
-use Laminas\Config\Config;
+use Tiki\Config\Config;
+use Tiki\Config\Ini;
 use Tiki\Command\ConsoleSetupException;
 use Tiki\Installer\Installer;
 use Tiki\TikiInit;
@@ -24,6 +25,20 @@ if (! empty($_REQUEST['lang'])) {
     $language = $prefs['site_language'] = $prefs['language'] = 'en';
 }
 include_once('lib/init/tra.php');
+
+$fail = static function (string $msg, int $code = 1001): void {
+    if (defined('TIKI_CONSOLE')) {
+        throw new ConsoleSetupException($msg, $code);
+    }
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, $msg . PHP_EOL);
+        exit(1);
+    }
+    header('HTTP/1.0 503 Service Unavailable', true, 503);
+    header('Retry-After: 300');
+    echo $msg;
+    exit(1);
+};
 
 $local_php = TikiInit::getCredentialsFile();
 global $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $tikidomain, $tikidomainslash, $dbfail_url;
@@ -81,51 +96,41 @@ $systemConfiguration = new Config(
 );
 if (isset($_SERVER['TIKI_INI_FILE'])) {
     if (! is_readable($_SERVER['TIKI_INI_FILE'])) {
-        $error = $_SERVER['TIKI_INI_FILE'] . ' could not be read' . PHP_EOL ;
-        if (defined('TIKI_CONSOLE')) {
-            throw new ConsoleSetupException($error, 1001);
-        }
-        echo $error;
-        exit(1);
+        $fail($_SERVER['TIKI_INI_FILE'] . ' could not be read');
     }
 
-    $configReader = new Tiki_Config_Ini();
-    $configReader->setFilterSection(isset($_SERVER['TIKI_INI_IDENTIFIER']) ? $_SERVER['TIKI_INI_IDENTIFIER'] : null);
-    $configData = $configReader->fromFile($_SERVER['TIKI_INI_FILE']);
-    $systemConfiguration = $systemConfiguration->merge(new Laminas\Config\Config($configData));
+    try {
+        $ini = new Ini();
+        $configData = $ini->fromFile($_SERVER['TIKI_INI_FILE'], isset($_SERVER['TIKI_INI_IDENTIFIER']) ? $_SERVER['TIKI_INI_IDENTIFIER'] : null);
+        $systemConfiguration = $systemConfiguration->merge($configData);
+    } catch (\Throwable $e) {
+        $fail('Failed to load ' . $_SERVER['TIKI_INI_FILE'] . ': ' . $e->getMessage());
+    }
 }
-if (isset($system_configuration_file)) {
-    if (! is_readable($system_configuration_file)) {
-        $error = $system_configuration_file . ' could not be read' . PHP_EOL ;
-        if (defined('TIKI_CONSOLE')) {
-            throw new ConsoleSetupException($error, 1001);
+
+// Normalize to array: support both legacy $system_configuration_file (string)
+// and the newer $system_configuration_files (array of file paths).
+// When using the array form, files listed later override keys from earlier files.
+if (isset($system_configuration_files)) {
+    if (! is_array($system_configuration_files)) {
+        $fail('$system_configuration_files must be an array.');
+    }
+} else {
+    $system_configuration_files = ! empty($system_configuration_file) ? [$system_configuration_file] : [];
+}
+
+foreach ($system_configuration_files as $configFile) {
+    if (! empty($configFile) && is_readable($configFile)) {
+        try {
+            $ini = new Ini();
+            $baseData = $ini->fromFile($configFile, $system_configuration_identifier ?? null);
+            $systemConfiguration->merge($baseData);
+        } catch (\Throwable $e) {
+            $fail('Failed to load ' . $configFile . ': ' . $e->getMessage());
         }
-        echo $error;
-        exit(1);
+    } elseif (! empty($configFile) && ! is_readable($configFile)) {
+        $fail($configFile . ' could not be read');
     }
-    if (! isset($system_configuration_identifier)) {
-        $system_configuration_identifier = null;
-    }
-    $configReader = new Tiki_Config_Ini();
-    $configReader->setFilterSection($system_configuration_identifier);
-
-    if (preg_match('/\.ini.php$/', $system_configuration_file)) {
-        $retrieveIniContent = function ($system_configuration_file) {
-            ob_start();
-            include($system_configuration_file);
-            $system_configuration_file_content = ob_get_contents();
-            ob_end_clean();
-
-            return $system_configuration_file_content;
-        };
-
-        $system_configuration_content = $retrieveIniContent($system_configuration_file);
-        $configData = $configReader->fromString($system_configuration_content);
-    } else {
-        $configData = $configReader->fromFile($system_configuration_file);
-    }
-
-    $systemConfiguration = $systemConfiguration->merge(new Config($configData));
 }
 
 if ($re === false) {
