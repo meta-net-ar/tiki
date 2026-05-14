@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-sm-8 col-md-9">
             <h3>{tr}Heading font{/tr}</h3>
-            <p>{tr}Body font{/tr}: In mauris integer etiam aliquet integer duis rhoncus ultricies cras in habitasse ac sociis
+            <p>{tr}Body font:{/tr} In mauris integer etiam aliquet integer duis rhoncus ultricies cras in habitasse ac sociis
                 porttitor placerat ac porttitor, in ac. A, tristique dapibus mauris, vut et porta? Enim, porta
                 penatibus, augue egestas aliquam eu velit placerat, sociis hac et, pulvinar tincidunt amet ut turpis
                 dapibus. Dolor. Lundium rhoncus elementum vel. Tempor sit nisi aliquam ut augue tincidunt tincidunt cum
