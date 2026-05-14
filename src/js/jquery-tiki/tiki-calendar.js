@@ -15,6 +15,10 @@ $.fn.setupEventCalendar = function (
     let isOpeningModal = false;
     this.each(function () {
         const calendarEl = document.getElementById(targetId);
+        if (!calendarEl) {
+            // check if element exists because an empty array is added to window.moduleCalendar for reasons i don't understand
+            return;
+        }
         $(calendarEl).tikiModal(tr("Loading..."));
         const toTimezoneStableIso = (dateValue) => moment(dateValue).format("YYYY-MM-DD[T]HH:mm:ssZ");
         const browserTimezone = (() => {
