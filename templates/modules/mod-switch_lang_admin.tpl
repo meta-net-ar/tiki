@@ -8,7 +8,7 @@
                 {$flag=$languages[ix].flag|escape}
                 {$class=$languages[ix].class|escape}
                 {if $flag neq ''}
-                    {icon href="tiki-switch_lang.php?languageAdmin=$val" alt="$langname" title="$langname" _id="img/flags/$flag.png" height=11 class="icon $class"}
+                    <a href="tiki-switch_lang.php?languageAdmin={$val}" title="{$langname}" class="icon {$class}">{$languages[ix].flag|countryflagname}</a>
                 {else}
                     {button _text="$langname" href="tiki-switch_lang.php?languageAdmin=$val" _title="$langname" _class="$class"}
                 {/if}

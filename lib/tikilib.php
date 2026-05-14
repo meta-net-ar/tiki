@@ -6518,13 +6518,7 @@ class TikiLib extends TikiDb_Bridge
             return $data;
         }
 
-        $flags = [];
-        $iterator = new FilesystemIterator("img/flags/", FilesystemIterator::SKIP_DOTS);
-        foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isFile() && str_ends_with($fileInfo->getFilename(), '.png')) {
-                $flags[] = $fileInfo->getBasename('.png');
-            }
-        }
+        $flags = \Tiki\CountryFlagHelper::getCountries();
         if ($langsort) {
             foreach ($flags as $flagname => $flagtra) {
                 unset($flags[$flagname]);

@@ -77,6 +77,10 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\CompactIsoDate(), 'handle'];
             case 'countryflag':
                 return [new \SmartyTiki\Modifier\CountryFlag(), 'handle'];
+            case 'countryflagname':
+                return [new \SmartyTiki\Modifier\CountryFlagName(), 'handle'];
+            case 'countryflagemoji':
+                return [new \SmartyTiki\Modifier\CountryFlagEmoji(), 'handle'];
             case 'count':
                 return [$this, 'smartyModifierCount'];
             case 'd':
