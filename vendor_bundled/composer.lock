@@ -6419,65 +6419,19 @@
             "time": "2019-10-16T11:51:47+00:00"
         },
         {
-            "name": "npm-asset/babel--helper-string-parser",
-            "version": "v7.28.6",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:babel/babel.git",
-                "reference": "d7f400889567ae18ef9ac41b024b5120f6060e17"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/babel/babel/zipball/d7f400889567ae18ef9ac41b024b5120f6060e17",
-                "reference": "d7f400889567ae18ef9ac41b024b5120f6060e17"
-            },
-            "type": "npm-asset"
-        },
-        {
-            "name": "npm-asset/babel--helper-validator-identifier",
-            "version": "v7.28.6",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:babel/babel.git",
-                "reference": "d7f400889567ae18ef9ac41b024b5120f6060e17"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/babel/babel/zipball/d7f400889567ae18ef9ac41b024b5120f6060e17",
-                "reference": "d7f400889567ae18ef9ac41b024b5120f6060e17"
-            },
-            "type": "npm-asset"
-        },
-        {
             "name": "npm-asset/babel--parser",
-            "version": "7.28.5",
+            "version": "v7.29.1",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:babel/babel.git",
+                "reference": "713d478674cd9f29ff84568f50df43393d6e3068"
+            },
             "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/@babel/parser/-/parser-7.28.5.tgz"
+                "type": "zip",
+                "url": "https://api.github.com/repos/babel/babel/zipball/713d478674cd9f29ff84568f50df43393d6e3068",
+                "reference": "713d478674cd9f29ff84568f50df43393d6e3068"
             },
-            "require": {
-                "npm-asset/babel--types": ">=7.28.5,<8.0.0"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
-        },
-        {
-            "name": "npm-asset/babel--types",
-            "version": "7.28.5",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/@babel/types/-/types-7.28.5.tgz"
-            },
-            "require": {
-                "npm-asset/babel--helper-string-parser": ">=7.27.1,<8.0.0",
-                "npm-asset/babel--helper-validator-identifier": ">=7.28.5,<8.0.0"
-            },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
+            "type": "npm-asset"
         },
         {
             "name": "npm-asset/base64-arraybuffer",
@@ -6701,10 +6655,10 @@
         },
         {
             "name": "npm-asset/dompurify",
-            "version": "2.5.8",
+            "version": "2.5.9",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/dompurify/-/dompurify-2.5.8.tgz"
+                "url": "https://registry.npmjs.org/dompurify/-/dompurify-2.5.9.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -6874,10 +6828,10 @@
         },
         {
             "name": "npm-asset/postcss",
-            "version": "8.5.6",
+            "version": "8.5.14",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/postcss/-/postcss-8.5.6.tgz"
+                "url": "https://registry.npmjs.org/postcss/-/postcss-8.5.14.tgz"
             },
             "require": {
                 "npm-asset/nanoid": ">=3.3.11,<4.0.0",
@@ -6891,18 +6845,15 @@
         },
         {
             "name": "npm-asset/prefixfree",
-            "version": "v1.0.10",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:LeaVerou/prefixfree.git",
-                "reference": "846904c874a2bf436ff8a9623585f935d7ef4009"
-            },
+            "version": "1.0.0",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/LeaVerou/prefixfree/zipball/846904c874a2bf436ff8a9623585f935d7ef4009",
-                "reference": "846904c874a2bf436ff8a9623585f935d7ef4009"
+                "type": "tar",
+                "url": "https://registry.npmjs.org/prefixfree/-/prefixfree-1.0.0.tgz"
             },
-            "type": "npm-asset"
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
         },
         {
             "name": "npm-asset/prettier",
@@ -7065,10 +7016,10 @@
         },
         {
             "name": "npm-asset/sortablejs",
-            "version": "1.15.6",
+            "version": "1.15.7",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/sortablejs/-/sortablejs-1.15.6.tgz"
+                "url": "https://registry.npmjs.org/sortablejs/-/sortablejs-1.15.7.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -7222,36 +7173,36 @@
         },
         {
             "name": "npm-asset/zxing--library",
-            "version": "0.21.3",
+            "version": "0.23.0",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/@zxing/library/-/library-0.21.3.tgz"
+                "url": "https://registry.npmjs.org/@zxing/library/-/library-0.23.0.tgz"
             },
             "require": {
-                "npm-asset/ts-custom-error": ">=3.2.1,<4.0.0"
+                "npm-asset/ts-custom-error": ">=3.3.1,<4.0.0"
             },
             "type": "npm-asset",
             "license": [
-                "MIT"
+                "Apache-2.0"
             ]
         },
         {
             "name": "onelogin/php-saml",
-            "version": "4.3.1",
+            "version": "4.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/SAML-Toolkits/php-saml.git",
-                "reference": "b009f160e4ac11f49366a45e0d45706b48429353"
+                "reference": "26b3a47349415e5b7aa300ba4ab7fc316c65f19e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/SAML-Toolkits/php-saml/zipball/b009f160e4ac11f49366a45e0d45706b48429353",
-                "reference": "b009f160e4ac11f49366a45e0d45706b48429353",
+                "url": "https://api.github.com/repos/SAML-Toolkits/php-saml/zipball/26b3a47349415e5b7aa300ba4ab7fc316c65f19e",
+                "reference": "26b3a47349415e5b7aa300ba4ab7fc316c65f19e",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.3",
-                "robrichards/xmlseclibs": ">=3.1.4"
+                "robrichards/xmlseclibs": "^3.1.5"
             },
             "require-dev": {
                 "pdepend/pdepend": "^2.8.0",
@@ -7297,7 +7248,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-12-09T10:50:49+00:00"
+            "time": "2026-05-07T22:38:04+00:00"
         },
         {
             "name": "oomphinc/composer-installers-extender",
@@ -10611,16 +10562,16 @@
         },
         {
             "name": "studio-42/elfinder",
-            "version": "2.1.67",
+            "version": "2.1.69",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Studio-42/elFinder.git",
-                "reference": "5e463d1384972dffcb736ad3c94f35af10656ca2"
+                "reference": "8f2c3ffafcdd52cf4515f1eec172f4eee44552ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Studio-42/elFinder/zipball/5e463d1384972dffcb736ad3c94f35af10656ca2",
-                "reference": "5e463d1384972dffcb736ad3c94f35af10656ca2",
+                "url": "https://api.github.com/repos/Studio-42/elFinder/zipball/8f2c3ffafcdd52cf4515f1eec172f4eee44552ad",
+                "reference": "8f2c3ffafcdd52cf4515f1eec172f4eee44552ad",
                 "shasum": ""
             },
             "require": {
@@ -10667,7 +10618,7 @@
             "homepage": "http://elfinder.org",
             "support": {
                 "issues": "https://github.com/Studio-42/elFinder/issues",
-                "source": "https://github.com/Studio-42/elFinder/tree/2.1.67"
+                "source": "https://github.com/Studio-42/elFinder/tree/2.1.69"
             },
             "funding": [
                 {
@@ -10675,7 +10626,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-04-17T03:02:32+00:00"
+            "time": "2026-05-07T12:53:30+00:00"
         },
         {
             "name": "svg-edit/svg-edit",
@@ -16158,7 +16109,7 @@
         "ext-iconv": "*",
         "ext-zip": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "ext-ldap": "0",
         "ext-soap": "0",
