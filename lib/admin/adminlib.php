@@ -681,7 +681,7 @@ class AdminLib extends TikiLib
                 : $system_configuration_identifier;
 
             $configReader = new Ini();
-            $configReader->setFilterSection($identifier);
+
 
             if (preg_match('/\.ini.php$/', $configFilePath)) {
                 $retrieveIniContent = function ($file) {
@@ -694,9 +694,9 @@ class AdminLib extends TikiLib
                 };
 
                 $iniContent = $retrieveIniContent($configFilePath);
-                $configData = $configReader->fromString($iniContent);
+                $configData = $configReader->fromString($iniContent, $identifier);
             } else {
-                $configData = $configReader->fromFile($configFilePath);
+                $configData = $configReader->fromFile($configFilePath, $identifier);
             }
 
             // Merge: later files override earlier files (array_replace_recursive)

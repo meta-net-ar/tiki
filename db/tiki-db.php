@@ -92,7 +92,7 @@ $systemConfiguration = new Config(
         'preference' => [],
         'rules' => [],
     ],
-    ['readOnly' => false]
+    true
 );
 if (isset($_SERVER['TIKI_INI_FILE'])) {
     if (! is_readable($_SERVER['TIKI_INI_FILE'])) {
