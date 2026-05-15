@@ -103,8 +103,9 @@ class ApiGroupsPostTest extends ApiBaseGroupsTest
 
     public function testApiUpdateGroupWithoutPermissions()
     {
-        $oldName = 'API_Test_Group_POST_Update_NoPerms_Old';
-        $newName = 'API_Test_Group_POST_Update_NoPerms_New';
+        $uid     = uniqid();
+        $oldName = 'API_Test_Group_POST_Update_NoPerms_Old_' . $uid;
+        $newName = 'API_Test_Group_POST_Update_NoPerms_New_' . $uid;
         $this->createGroup($oldName, 'Group to update without permissions');
 
         $data = [
@@ -131,8 +132,9 @@ class ApiGroupsPostTest extends ApiBaseGroupsTest
 
     public function testApiUpdateGroupName()
     {
-        $oldName = 'API_Test_Group_POST_Update_Old';
-        $newName = 'API_Test_Group_POST_Update_New';
+        $uid     = uniqid();
+        $oldName = 'API_Test_Group_POST_Update_Old_' . $uid;
+        $newName = 'API_Test_Group_POST_Update_New_' . $uid;
         $this->createGroup($oldName, 'Group to update');
 
         $data = [

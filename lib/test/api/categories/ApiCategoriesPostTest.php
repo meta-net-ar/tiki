@@ -19,8 +19,9 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
 {
     public function testApiCreateCategoryWithoutParent()
     {
+        $uid  = uniqid();
         $data = [
-            'name' => 'POST Test Root Category',
+            'name'        => 'POST Test Root Category ' . $uid,
             'description' => 'This is a test root category',
         ];
 
@@ -42,7 +43,7 @@ class ApiCategoriesPostTest extends ApiBaseCategoriesTest
         }
 
         $this->assertValidCategoryResponse($body);
-        $this->assertEquals('POST Test Root Category', $body['name']);
+        $this->assertEquals($data['name'], $body['name']);
         $this->assertEquals('This is a test root category', $body['description']);
         $this->assertEquals(0, $body['parentId'], 'Root category should have parentId = 0');
         $this->assertEquals(0, $body['objects'], 'New category should have 0 objects');
