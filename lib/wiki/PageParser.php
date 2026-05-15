@@ -59,25 +59,27 @@ class PageParser
         xml_parser_set_option($parser, XML_OPTION_CASE_FOLDING, false);
         xml_parser_set_option($parser, XML_OPTION_SKIP_WHITE, true);
 
-        xml_set_object($parser, $this);
-        xml_set_element_handler($parser, 'startHandler', 'endHandler');
-        xml_set_character_data_handler($parser, 'cdataHandler');
+        xml_set_element_handler(
+            $parser,
+            [$this, 'startHandler'],
+            [$this, 'endHandler']
+        );
+
+        xml_set_character_data_handler(
+            $parser,
+            [$this, 'cdataHandler']
+        );
 
         $result = xml_parse($parser, $xml, true);
 
-        if (!$result) {
+        if (! $result) {
             $message = sprintf(
                 'XML error: %s at line %d',
                 xml_error_string(xml_get_error_code($parser)),
                 xml_get_current_line_number($parser)
             );
-
-            xml_parser_free($parser);
-
             throw new \RuntimeException($message);
         }
-
-        xml_parser_free($parser);
 
         return true;
     }

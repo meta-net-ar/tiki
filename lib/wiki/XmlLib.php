@@ -421,7 +421,7 @@ class XmlLib extends TikiLib
                 $info['name'],
                 $info['data'],
                 'Updated from import',
-                $this->config['fromUser']?? $info['user'],
+                $this->config['fromUser'] ?? $info['user'],
                 $this->config['fromSite'] ?? $info['ip'],
                 $info['description'],
                 0,
