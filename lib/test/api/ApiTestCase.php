@@ -271,86 +271,40 @@ abstract class ApiTestCase extends \TikiTestCase
      */
     protected function executeApiSubprocess($env)
     {
-        $command = PHP_BINARY;
-
-        // Create process descriptor
-        $descriptorspec = [
-            0 => ['pipe', 'r'],  // stdin
-            1 => ['pipe', 'w'],  // stdout
-            2 => ['pipe', 'w'],  // stderr
-        ];
-
-        // Force Tiki to use lib/test/local.php instead of db/local.php (these env vars only trigger that switch)
+        // Force Tiki to use lib/test/local.php instead of db/local.php
         $testDbEnv = [
             'TIKI_TEST_HOST'   => '127.0.0.1',
             'TIKI_TEST_HOST_A' => 'tiki_test_user',
             'TIKI_TEST_HOST_B' => 'tiki_test_db',
         ];
 
-        $processEnv = array_merge($_ENV, $env, $testDbEnv);
+        $process = new \Tiki\Process\Process(
+            [PHP_BINARY, $this->tikiapiPath],
+            null,
+            array_merge($_ENV, $env, $testDbEnv),
+            $env['CONTENT_DATA'] ?? null,
+            120 // 2-minute timeout per request
+        );
 
-        // Start the process
-        $fullCommand = $command . ' ' . escapeshellarg($this->tikiapiPath);
-        $process = proc_open($fullCommand, $descriptorspec, $pipes, null, $processEnv);
-
-        if (! is_resource($process)) {
-            throw new \RuntimeException('Failed to start API subprocess');
+        try {
+            $process->run();
+        } catch (\Symfony\Component\Process\Exception\ProcessTimedOutException $e) {
+            throw new \RuntimeException(
+                "API subprocess timed out after {$process->getTimeout()}s.\n" .
+                "Stderr: " . $process->getErrorOutput() . "\n" .
+                "Stdout: " . substr($process->getOutput(), 0, 500)
+            );
         }
 
-        // Send request data if present (for POST/PUT/PATCH requests)
-        if (isset($env['CONTENT_DATA'])) {
-            fwrite($pipes[0], $env['CONTENT_DATA']);
-        }
-        fclose($pipes[0]);
-
-        // Read response with a timeout so a hanging subprocess doesn't block the
-        // entire test run indefinitely (e.g. DB deadlock).
-        $timeoutSeconds = 120;
-        stream_set_blocking($pipes[1], false);
-        stream_set_blocking($pipes[2], false);
-
-        $output   = '';
-        $errors   = '';
-        $deadline = microtime(true) + $timeoutSeconds;
-
-        do {
-            $output .= (string) stream_get_contents($pipes[1]);
-            $errors .= (string) stream_get_contents($pipes[2]);
-            $status  = proc_get_status($process);
-            if ($status['running'] && microtime(true) < $deadline) {
-                usleep(50_000); // 50 ms polling interval
-            }
-        } while ($status['running'] && microtime(true) < $deadline);
-
-        // Capture the exit code NOW from $status, before any further proc_get_status or proc_close calls.
-        $timedOut = $status['running'];
-        $exitCode = $timedOut ? 1 : (int) $status['exitcode'];
-
-        if ($timedOut) {
-            proc_terminate($process, 9);
+        if (! $process->isSuccessful()) {
+            $debugInfo = "\nCommand: " . $process->getCommandLine() .
+                         "\nExit code: " . $process->getExitCode() .
+                         "\nStderr: " . $process->getErrorOutput() .
+                         "\nStdout: " . substr($process->getOutput(), 0, 500);
+            throw new \RuntimeException("API subprocess failed with exit code {$process->getExitCode()}. Debug info: $debugInfo");
         }
 
-        // Final flush: switch back to blocking so stream_get_contents drains any
-        // bytes written to the pipe buffer after the last non-blocking read in the loop.
-        stream_set_blocking($pipes[1], true);
-        stream_set_blocking($pipes[2], true);
-        $output .= (string) stream_get_contents($pipes[1]);
-        $errors .= (string) stream_get_contents($pipes[2]);
-
-        if ($timedOut) {
-            $errors .= "\n[TIMEOUT: API subprocess exceeded {$timeoutSeconds}s]";
-        }
-
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        proc_close($process);
-
-        if ($exitCode !== 0) {
-            $debugInfo = "\nCommand: $fullCommand\nExit code: $exitCode\nStderr: $errors\nStdout: " . substr($output, 0, 500);
-            throw new \RuntimeException("API subprocess failed with exit code $exitCode. Debug info: $debugInfo");
-        }
-
-        return $output;
+        return $process->getOutput();
     }
 
     /**

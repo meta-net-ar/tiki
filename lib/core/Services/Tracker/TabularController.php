@@ -116,7 +116,7 @@ class Services_Tracker_TabularController
         $prefill_odbc = $input->prefill_odbc->bool();
         $trackerId = $info['trackerId'];
 
-        if (! $info['tabularId']) {
+        if (empty($info['tabularId'])) {
             throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
         }
 
@@ -355,7 +355,7 @@ class Services_Tracker_TabularController
         $lib = TikiLib::lib('tabular');
         $info = $lib->getInfo($input->tabularId->int());
 
-        if (! $info['tabularId']) {
+        if (empty($info['tabularId'])) {
             throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
         }
 
@@ -558,7 +558,7 @@ class Services_Tracker_TabularController
         $separator = $input->separator->text();
         $fileIsTsv = ! ($separator == "," || $separator == ';');
 
-        if (empty($info['format_descriptor']) && empty($info['filter_descriptor']) && empty($info['config']) && empty($info['odbc_config']) && empty($info['api_config'])) {
+        if (empty($info['tabularId'])) {
             throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
         }
 
@@ -681,7 +681,7 @@ class Services_Tracker_TabularController
         $lib = TikiLib::lib('tabular');
         $info = $lib->getInfo($input->tabularId->int());
 
-        if (! $info['tabularId']) {
+        if (empty($info['tabularId'])) {
             throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
         }
 
