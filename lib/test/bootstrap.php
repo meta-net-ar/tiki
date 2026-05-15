@@ -17,12 +17,6 @@ const TIKI_IN_TEST = 1;
 
 define('TIKI_PATH', dirname(dirname(__DIR__)) . '/');
 
-// TIKI_API not loaded in test bootstrap. Define as true to restore PHP 7 behavior
-// and allow WikiToolsTest broker calls to bypass CSRF validation.
-if (! defined('TIKI_API')) {
-    define('TIKI_API', true);
-}
-
 chdir(TIKI_PATH);
 
 ini_set('display_errors', 'on');
