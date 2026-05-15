@@ -737,17 +737,17 @@ class Services_Tracker_Controller
     {
         // TODO : Eventually, this method should filter according to the actual permissions, but because
         //        it is only to be used for tracker sync at this time, admin privileges are just fine.
-
-        if (! Perms::get()->admin_trackers) {
-            throw new Services_Exception_Denied(tr('Reserved for tracker administrators'));
-        }
-
         $trackerId = $input->trackerId->int();
         $offset = $input->offset->int();
         $maxRecords = $input->maxRecords->int();
         $status = $input->status->word();
         $format = $input->format->word();
         $modifiedSince = $input->modifiedSince->int();
+
+        $perms = Perms::get('tracker', $trackerId);
+        if (! $perms->admin_trackers) {
+            throw new Services_Exception_Denied(tr('Reserved for tracker administrators'));
+        }
 
         $definition = Tracker_Definition::get($trackerId);
 
