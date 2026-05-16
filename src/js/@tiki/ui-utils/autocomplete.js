@@ -96,6 +96,12 @@ export function getAutocompleteResources(type, options = {}) {
         case "reference":
             remoteSourceUrl = "tiki-ajax_services.php?listonly=references";
             break;
+        case "search_module":
+            remoteSourceUrl = $.service("search", "lookup", {
+                "filter~type": options.types,
+                "filter~not_exact": options.excludeIdentifiers,
+            });
+            break;
         default:
             remoteSourceUrl = null;
             sourceList = options.source.map((value) => ({ value }));

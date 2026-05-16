@@ -1440,6 +1440,14 @@ class UnifiedSearchLib
             unset($filter['exact']);
         }
 
+        if (isset($filter['not_exact']) && is_array($filter['not_exact'])) {
+            foreach ($filter['not_exact'] as $field => $value) {
+                $query->filterNotIdentifier($value, $field);
+            }
+
+            unset($filter['not_exact']);
+        }
+
         if (isset($filter['multi'])) {
             if (
                 isset($filter['multi']['fields']) && is_array($filter['multi']['fields']) &&
