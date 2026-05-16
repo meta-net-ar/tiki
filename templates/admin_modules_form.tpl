@@ -132,9 +132,9 @@
                                     {elseif $param.type eq 'textarea'}
                                         <textarea type="text" id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]"{if !empty($param.filter)} class="{$param.filter} form-control"{else} class="{$param.filter} form-control"{/if}>{$param.value|escape}</textarea>
                                     {elseif $param.type eq 'select' and isset($param.options) and is_array($param.options)}
-                                        <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]" class="form-control" {if $param.multiple}multiple="multiple"{/if}>
+                                        <select id="assign_params[{$name|escape}]" name="assign_params[{$name|escape}]{if isset($param.separator)}[]{/if}" class="form-control" {if isset($param.separator)}multiple="multiple"{/if}>
                                             {foreach from=$param.options key=optionKey item=optionValue}
-                                                <option value="{$optionKey|escape}" {if (is_array($param.default) and in_array($optionKey, $param.default)) or $param.default eq $optionKey}selected="selected"{/if}>{$optionValue|escape}</option>
+                                                <option value="{$optionKey|escape}" {if (is_array($param.value) and in_array($optionKey, $param.value)) or $param.value eq $optionKey}selected="selected"{/if}>{$optionValue|escape}</option>
                                             {/foreach}
                                         </select>
                                     {else}

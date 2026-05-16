@@ -302,27 +302,32 @@ class ObjectLib extends TikiLib
     public function getSemanticParentObjects($objectTypes = [])
     {
         $mappedChildParent = [
-            'trackeritem' => 'tracker',
-            'calendaritem' => 'calendar',
-            'file' => 'file gallery',
-            'file gallery' => 'file gallery',
-            'forum post' => 'forum',
-            'forum' => 'forum',
-            'user' => 'group',
-            'trackerfield' => 'tracker',
-            'structure' => 'structure',
-            'article' => 'article_topic',
+            // object type => [parent_object_id_field => parent_object_type]
+            'trackeritem' => ['parent_object_id' => 'tracker'],
+            'calendaritem' => ['parent_object_id' => 'calendar'],
+            'file' => ['gallery_id' => 'file gallery'],
+            'file gallery' => ['gallery_id' => 'file gallery'],
+            'forum post' => ['forum_id' => 'forum'],
+            'forum' => ['forum_section' => 'forum'],
+            'user' => ['groups' => 'group'],
+            'trackerfield' => ['tracker_id' => 'tracker'],
+            'structure' => ['structure_parent_id' => 'structure'],
+            'article' => ['topic_id' => 'article_topic'],
         ];
 
-        $objectParents = array_intersect_key($mappedChildParent, array_flip($objectTypes));
+        $mappedChildParent = array_intersect_key($mappedChildParent, array_flip($objectTypes));
 
-        if (empty($objectParents)) {
+        if (empty($mappedChildParent)) {
             return [];
         }
 
+        $parentTypes = array_values(array_map(function ($item) {
+            return reset($item);
+        }, $mappedChildParent));
+
         $result = $this->query(
-            "SELECT `objectId`, `itemId`, `type` FROM `tiki_objects` WHERE `type` IN (" . implode(',', array_fill(0, count($objectParents), '?')) . ")",
-            array_values($objectParents)
+            "SELECT `objectId`, `itemId`, `type` FROM `tiki_objects` WHERE `type` IN (" . implode(',', array_fill(0, count($mappedChildParent), '?')) . ")",
+            $parentTypes
         );
 
         $out = [];
@@ -333,6 +338,7 @@ class ObjectLib extends TikiLib
                 'itemId' => $res['itemId'],
                 'type' => $res['type'],
                 'title' => $this->get_title($res['type'], $res['itemId']),
+                'parent_object_id_field' => array_search($res['type'], array_merge(...array_values($mappedChildParent))),
             ];
         }
 

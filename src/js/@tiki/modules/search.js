@@ -18,9 +18,11 @@ function updateAutocompleteExcludeParentIdsOptions() {
         method: "POST",
         data: { objectTypes: selectedObjectTypes },
         success: function (data) {
+            const values = autocompleteExcludeParentIds.val();
             autocompleteExcludeParentIds.empty();
             data.forEach(function (object) {
-                autocompleteExcludeParentIds.append(new Option(object.title, object.itemId));
+                const value = `${object.parent_object_id_field}:${object.itemId}`;
+                autocompleteExcludeParentIds.append(new Option(object.title, value, values.includes(value), values.includes(value)));
             });
         },
         error: function () {
