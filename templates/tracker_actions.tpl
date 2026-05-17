@@ -15,8 +15,8 @@
         {icon name="th-list"} {tr}Fields{/tr}
     </a>
 {/if}
-{if !empty($trackerId) and $tiki_p_view_trackers eq 'y' && (empty($showitems) || $showitems !== 'n')}
-    <a class="btn btn-info tips" title=":{tr _0="{$tracker_info.name|escape}"}Go back to the list of items for “%0”{/tr}" href="{$trackerId|sefurl:"tracker"}">
+{if !empty($trackerId) and $tiki_p_view_trackers eq 'y'}
+    <a class="btn btn-info tips{if $smarty.server.SCRIPT_NAME|strpos:'tiki-view_tracker.php' !== false} active{/if}" title=":{tr _0="{$tracker_info.name|escape}"}Go back to the list of items for “%0”{/tr}" href="{$trackerId|sefurl:"tracker"}">
         {icon name="list"} {tr}Items{/tr}
     </a>
 {/if}
