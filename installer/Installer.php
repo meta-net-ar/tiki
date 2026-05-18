@@ -38,6 +38,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
     ];
 
     public $useInnoDB = true;
+    public $autoRegister = false;
 
     private function __construct()
     {

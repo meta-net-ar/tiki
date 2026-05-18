@@ -44,11 +44,13 @@
                     <td class="actions">
                         {actions}
                             {strip}
-                                <action>
-                                    <a href="{$smarty.server.SCRIPT_NAME}?{query redeliver={$mailQueues[queue].messageId}}" onclick="confirmPopup('{tr}Redeliver mail queue?{/tr}', '{ticket mode=get}')">
-                                        {icon name='undo' _menu_text='y' _menu_icon='y' alt="{tr}Redeliver{/tr}"}
-                                    </a>
-                                </action>
+                                {if not $mailQueues[queue].unreadable}
+                                    <action>
+                                        <a href="{$smarty.server.SCRIPT_NAME}?{query redeliver={$mailQueues[queue].messageId}}" onclick="confirmPopup('{tr}Redeliver mail queue?{/tr}', '{ticket mode=get}')">
+                                            {icon name='undo' _menu_text='y' _menu_icon='y' alt="{tr}Redeliver{/tr}"}
+                                        </a>
+                                    </action>
+                                {/if}
                                 <action>
                                     <a href="{$smarty.server.SCRIPT_NAME}?{query remove={$mailQueues[queue].messageId}}" onclick="confirmPopup('{tr}Delete mail queue?{/tr}', '{ticket mode=get}')">
                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
