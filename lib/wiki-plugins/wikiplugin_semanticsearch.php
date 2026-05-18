@@ -129,7 +129,6 @@ function wikiplugin_semanticsearch($data, $params)
     if ($query) {
         $results = $index->search($query);
         foreach ($results as $result) {
-            //$html .= print_r($result, true);
             $smartyResult = [];
             //This is just so the template will parse
             $smartyResult['object_type'] = 'wiki page' ;

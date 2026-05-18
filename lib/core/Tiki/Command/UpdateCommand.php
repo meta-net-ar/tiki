@@ -71,7 +71,7 @@ class UpdateCommand extends Command
                         $isEmailSent = $mail->send([$userEmail]);
                         if (! $isEmailSent) {
                             $msg = 'Unable to send mail';
-                            $mailerrors = print_r($mail->errors, true);
+                            $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string, never prints)
                             $msg .= $mailerrors;
                             $output->writeln('<error>' . $msg . '</error>');
                         }

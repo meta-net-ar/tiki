@@ -143,7 +143,6 @@ class DatabaseQueryLog
             //This is implemented this way so we can do per level min, max, variance, etc.
             for ($level = 0; $level <= 3; $level++) {
                 self::$queryLog[$level][$hash][self::TOTAL_TIME_MS] = self::$queryLog[$level][$hash][self::TOTAL_TIME_MS] + $elapsed * 1000;
-                //var_dump(self::$queryLog[$level][$hash]);
                 $hash = self::$queryLog[$level][$hash]['parentLevelEntryHash'];
             }
             return;

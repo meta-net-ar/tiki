@@ -752,7 +752,6 @@ class SmartyTiki extends Smarty
 
         //Test templates
         $this->addTemplateDir(TIKI_PATH . '/lib/test/Core/Search/');
-        //var_dump($this->getTemplateDir());
     }
 
     /**

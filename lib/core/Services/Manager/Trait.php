@@ -261,7 +261,7 @@ trait Services_Manager_Trait
         if (! empty($response['error'])) {
             throw new Services_Exception($response['error']);
         } elseif (empty($response['output']) && empty($response['data']) && empty($response['status'])) {
-            throw new Services_Exception(tr('Unrecognized response: %0', print_r($response, 1)));
+            throw new Services_Exception(tr('Unrecognized response: %0', print_r($response, 1))); // @phpstan-ignore disallowedFunctions.printR (returns response as string for exception message, never prints)
         } else {
             return $response;
         }

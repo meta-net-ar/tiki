@@ -11,7 +11,7 @@ $.fn.addEventCalendarPrint = function (buttonId, calendar) {
     let viewContainer = $(this);
     var calendarId = "#" + $(this).attr("id");
     if (!viewContainer) {
-        console.warn(calendarId + " not found");
+        console.warn(calendarId + " not found"); // eslint-disable-line no-console
         return;
     }
     viewContainer.append($(buttonId));

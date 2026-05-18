@@ -260,7 +260,7 @@ if (! empty($_REQUEST['generate_availability'])) {
         $nlg_availability = $nlgen->generateAvailability($busy_list, $ranges, NLGen\Grammars\Availability\AvailabilityGrammar::SPECIFIC, null);
         $smarty->assign('nlg_availability', $nlg_availability);
     } catch (Exception $e) {
-        error_log("Availability generation error: " . $e->getMessage());
+        error_log("Availability generation error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (calendar exception reporting)
         Feedback::error($e->getMessage());
         $smarty->assign('nlg_availability', '');
     }

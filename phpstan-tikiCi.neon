@@ -5,6 +5,7 @@
 
 includes:
   - phpstan-tikiPaths.neon
+  - vendor_bundled/vendor/spaze/phpstan-disallowed-calls/extension.neon
 
 parameters:
   #customRulesetUsed: true
@@ -37,3 +38,17 @@ parameters:
   # TODO: phpstan level 0 tests that represents things that Maybe that still work, but in this day and age...
     -
       identifier: method.staticCall
+
+  disallowedFunctionCalls:
+    -
+      function: 'print_r()'
+      message: 'Remove debug output or capture with print_r($var, true)'
+      errorIdentifier: 'disallowedFunctions.printR'
+    -
+      function: 'var_dump()'
+      message: 'Remove debug code before committing'
+      errorIdentifier: 'disallowedFunctions.varDump'
+    -
+      function: 'error_log()'
+      message: 'Use a proper logger instead of error_log()'
+      errorIdentifier: 'disallowedFunctions.errorLog'

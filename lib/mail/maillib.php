@@ -159,7 +159,7 @@ function tiki_mail_setup()
             }
             $tiki_maillib__mailer_default_transport = new Mailer($resolvedTransport);
         } catch (\Throwable  $e) {
-            error_log("Error creating mail transport: " . $e->getMessage());
+            error_log("Error creating mail transport: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mailer exception reporting)
             // Fallback to a basic sendmail transport or null transport if configuration fails
             $tiki_maillib__mailer_default_transport = new Mailer(Transport::fromDsn('null://null'));
         }
@@ -194,7 +194,7 @@ function tiki_get_admin_mail($fromName = null)
         try {
             $mail->from(new Address($prefs['sender_email'], $fromName ?: $prefs['sender_name']));
         } catch (Throwable $e) {
-            error_log("Mailer General Error: " . $e->getMessage());
+            error_log("Mailer General Error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mailer exception reporting)
         }
     }
 
@@ -235,7 +235,7 @@ function tiki_send_email($email)
             $senderName = $prefs['sender_name'] ?? null;
             $envelope->setSender(new Address($prefs['sender_email'], $senderName));
         } catch (Throwable $e) {
-            error_log("Mailer Envelope Error: " . $e->getMessage());
+            error_log("Mailer Envelope Error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mailer exception reporting)
             $envelope = null;
         }
     }
@@ -246,12 +246,12 @@ function tiki_send_email($email)
     try {
         $tiki_maillib__mailer_default_transport->send($email, $envelope);
     } catch (TransportExceptionInterface $e) {
-        error_log("Mailer Transport Error: " . $e->getMessage());
+        error_log("Mailer Transport Error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mailer exception reporting)
     } catch (Throwable $e) {
         if (str_contains($e->getMessage(), 'An email must have a "From" or a "Sender" header')) {
             Feedback::error(tr('Unable to send email: sender email not configured.'));
         } else {
-            error_log("Mailer General Error: " . $e->getMessage());
+            error_log("Mailer General Error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mailer exception reporting)
         }
     }
 }

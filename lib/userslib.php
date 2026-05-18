@@ -1076,7 +1076,6 @@ class UsersLib extends TikiLib
             return USER_VALID;
         } else {
             // Uncomment the following to see errors on that
-            // error_log("TIKI ERROR PAM: $error User: $user Pass: $pass");
             return PASSWORD_INCORRECT;
         }
     }
@@ -1324,7 +1323,7 @@ class UsersLib extends TikiLib
             $samlSettingsInfo = $this->get_saml_settings();
             $auth = new Saml2\Auth($samlSettingsInfo);
         } catch (Exception $e) {
-            print_r("There is a problem with the SAML settings, review them: " . $e->getMessage());
+            echo "There is a problem with the SAML settings, review them: " . $e->getMessage();
             exit();
         }
 
@@ -1419,7 +1418,6 @@ class UsersLib extends TikiLib
                     'groupgroupattr' => $prefs['auth_ldap_groupgroupattr'],
                     'debug' => $prefs['auth_ldap_debug']
             ];
-            // print_r($ldap_options);
             $this->ldap = new LdapLib($ldap_options);
         }
     }
@@ -9018,7 +9016,7 @@ class UsersLib extends TikiLib
             if (! $mail->send($email)) {
                 $errormsg = tr('Unable to send mail to invite "%0"', $email);
                 if (Perms::get()->admin) {
-                    $mailerrors = print_r($mail->errors, true);
+                    $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string, never prints)
                     $errormsg .= $mailerrors;
                 }
                 Feedback::error($errormsg);
