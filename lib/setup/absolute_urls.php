@@ -158,8 +158,7 @@ if (str_contains($base_uri, $tikiroot . 'route.php') && ! empty($inclusion)) {
         if (isset($sections[$section]['objectType'])) {
             $objectType = $sections[$section]['objectType'];
         } else {
-            // Fallback: use section name as objectType if not explicitly defined
-            $objectType = $section;
+            $objectType = null;
         }
         if ($objectType === Sections::SECTION_WIKI_PAGE) {
             $objectType = Sections::SECTION_WIKI;
