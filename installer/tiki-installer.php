@@ -18,7 +18,8 @@ if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
 }
 
 $inputConfiguration = [
-    [ 'staticKeyFilters' =>
+    [
+        'staticKeyFilters' =>
         [
             'admin_account' => 'striptags',
             'admin_email' => 'striptags',
@@ -65,9 +66,10 @@ $inputConfiguration = [
             'test3' => 'int',
             'test4' => 'word',
             'update' => 'word',
+            'unsupported_mail_queue_ack' => 'digits',
             'useInnoDB' => 'digits',
             'user' => 'text',
-//          'validPatches' => '',   //paramterized in sql
+            //          'validPatches' => '',   //paramterized in sql
         ]
     ]
 ];
@@ -211,7 +213,7 @@ if (is_file('db/virtuals.inc')) {
 
 $serverFilter = new DeclFilter();
 if (
-    ( isset($prefs['tiki_allow_trust_input']) && $prefs['tiki_allow_trust_input'] ) !== 'y'
+    (isset($prefs['tiki_allow_trust_input']) && $prefs['tiki_allow_trust_input']) !== 'y'
     || $tiki_p_trust_input != 'y'
 ) {
     $serverFilter->addStaticKeyFilters(
@@ -387,7 +389,7 @@ if (
             && (
                 $admin_acc == 'n'
                 || (isset($_SESSION["install-logged-$multi"])
-                && $_SESSION["install-logged-$multi"] == 'y')
+                    && $_SESSION["install-logged-$multi"] == 'y')
             )
         )
     ) && isset($_POST['dbinfo'])
@@ -475,7 +477,20 @@ $smarty->assign('tikidb_is20', false);
 if ($dbconn) {
     $has_tiki_db = has_tiki_db();
     $smarty->assign('tikidb_created', $has_tiki_db);
+    $unsupportedMailQueueEntries = 0;
+    try {
+        $unsupportedMailQueueEntries = (int) TikiDb::get()->getOne(
+            'SELECT COUNT(*) FROM tiki_mail_queue WHERE message LIKE ? OR message LIKE ? OR message LIKE ? OR message LIKE ?',
+            ['%Laminas\\Mail\\Message%', '%Zend\\Mail\\Message%', '%LaminasMailMessage%', '%ZendMailMessage%'],
+            TikiDb::ERR_NONE
+        );
+    } catch (Throwable $e) {
+        $unsupportedMailQueueEntries = 0;
+    }
 
+    if ($unsupportedMailQueueEntries > 0) {
+        $smarty->assign('unsupported_mail_queue_entries', $unsupportedMailQueueEntries);
+    }
     if ($install_step == '6' && $has_tiki_db) {
         if (isset($_POST['install_type']) && $_POST['install_type'] === 'scratch') {
             require_once('lib/setup/prefs.php');
@@ -535,10 +550,26 @@ if (
     }
 
     if (isset($_POST['update'])) {
-        $installer->update();
-        $logslib->add_log('install', 'database "' . $dbs_tiki . '" upgraded to latest version');
-        $smarty->assign('dbdone', 'y');
-        $install_type = 'update';
+        if (! empty($unsupportedMailQueueEntries) && empty($_POST['unsupported_mail_queue_ack'])) {
+            Feedback::error(
+                tr('Please confirm that unsupported queued messages will be deleted by checking the confirmation box before upgrading.')
+            );
+        } else {
+            $hadUnsupportedMails = ! empty($unsupportedMailQueueEntries);
+            if ($hadUnsupportedMails && ! empty($_POST['unsupported_mail_queue_ack'])) {
+                $installer->autoRegister = true;
+            }
+            $installer->update();
+            $logslib->add_log('install', 'database "' . $dbs_tiki . '" upgraded to latest version');
+            $smarty->assign('dbdone', 'y');
+            if ($hadUnsupportedMails) {
+                $smarty->assign('unsupported_mail_queue_cleaned', $unsupportedMailQueueEntries);
+                Feedback::success(
+                    tr('%0 unsupported queued email entries have been successfully removed during upgrade.', $unsupportedMailQueueEntries)
+                );
+            }
+            $install_type = 'update';
+        }
     }
 
     // Try to activate Apache htaccess file by making a symlink or copying _htaccess into .htaccess
@@ -701,10 +732,10 @@ if ($install_step == '2') {
         // The 'G' modifier is available since PHP 5.1.0
         case 'g':
             $memory_limit *= 1024;
-        // The 'm' modifier
+            // The 'm' modifier
         case 'm':
             $memory_limit *= 1024;
-        // The 'k' modifier
+            // The 'k' modifier
         case 'k':
             $memory_limit *= 1024;
     }
@@ -720,9 +751,9 @@ if ($install_step == '2') {
 
         $im = @imagecreate(110, 20);
         if ($im) {
-                $smarty->assign('sample_image', 'y');
+            $smarty->assign('sample_image', 'y');
         } else {
-                $smarty->assign('sample_image', 'n');
+            $smarty->assign('sample_image', 'n');
         }
     } else {
         $gd_test = 'n';
@@ -738,18 +769,18 @@ unset($TWV);
 
 // write general settings
 if (isset($_POST['general_settings']) && $_POST['general_settings'] == 'y') {
-    $switch_ssl_mode = ( isset($_POST['feature_switch_ssl_mode']) && $_POST['feature_switch_ssl_mode'] == 'on' )
+    $switch_ssl_mode = (isset($_POST['feature_switch_ssl_mode']) && $_POST['feature_switch_ssl_mode'] == 'on')
         ? 'y' : 'n';
-    $show_stay_in_ssl_mode = ( isset($_POST['feature_show_stay_in_ssl_mode'])
-        && $_POST['feature_show_stay_in_ssl_mode'] == 'on' ) ? 'y' : 'n';
+    $show_stay_in_ssl_mode = (isset($_POST['feature_show_stay_in_ssl_mode'])
+        && $_POST['feature_show_stay_in_ssl_mode'] == 'on') ? 'y' : 'n';
 
     $installer->query(
         "DELETE FROM `tiki_preferences` WHERE `name` IN " .
-        "('browsertitle', 'server_domain', 'sender_email', 'https_login', 'https_port', " .
-        "'feature_switch_ssl_mode', 'feature_show_stay_in_ssl_mode', 'language'," .
-        "'use_proxy', 'proxy_host', 'proxy_port', 'proxy_user', 'proxy_pass'," .
-        "'error_reporting_level', 'error_reporting_adminonly', 'smarty_notice_reporting', 'log_tpl'," .
-        "'smarty_enable_string_eval')"
+            "('browsertitle', 'server_domain', 'sender_email', 'https_login', 'https_port', " .
+            "'feature_switch_ssl_mode', 'feature_show_stay_in_ssl_mode', 'language'," .
+            "'use_proxy', 'proxy_host', 'proxy_port', 'proxy_user', 'proxy_pass'," .
+            "'error_reporting_level', 'error_reporting_adminonly', 'smarty_notice_reporting', 'log_tpl'," .
+            "'smarty_enable_string_eval')"
     );
 
     $query = "INSERT INTO `tiki_preferences` (`name`, `value`) VALUES"
@@ -776,8 +807,15 @@ if (isset($_POST['general_settings']) && $_POST['general_settings'] == 'y') {
         . " ('language', ?)";
 
 
-    $installer->query($query, [$_POST['browsertitle'], $_POST['server_domain'], $_POST['sender_email'], $_POST['https_login'],
-        $_POST['https_port'], $_POST['error_reporting_level'], $language]);
+    $installer->query($query, [
+        $_POST['browsertitle'],
+        $_POST['server_domain'],
+        $_POST['sender_email'],
+        $_POST['https_login'],
+        $_POST['https_port'],
+        $_POST['error_reporting_level'],
+        $language
+    ]);
     $installer->query("UPDATE `users_users` SET `email` = ? WHERE `users_users`.`userId`=1", [$_POST['admin_email']]);
     $logslib->add_log('install', 'updated preferences for browser title, sender email, https and SSL, '
         . 'error reporting, etc.');
@@ -804,7 +842,7 @@ $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery/dist/jquery.m
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-migrate/dist/jquery-migrate.min.js", true);
 $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/jquery-ui/dist/jquery-ui.js");
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-jquery.js');
-    $js = '
+$js = '
 // JS Object to hold prefs for jq
 var jqueryTiki = new Object();
 jqueryTiki.ui = false;
@@ -870,8 +908,8 @@ if ($install_step == '4') {
 if (((isset($value) && $value == 'utf8mb4') || $install_step == '7') && ($db = TikiDb::get()) && ! empty($dbs_tiki)) {
     $result = $db->fetchAll(
         'SELECT TABLE_COLLATION FROM INFORMATION_SCHEMA.TABLES '
-        . ' WHERE TABLE_SCHEMA = ? AND TABLE_COLLATION NOT LIKE "utf8mb4%" '
-        . ' AND NOT (TABLE_NAME LIKE "index_%" OR TABLE_NAME LIKE "zzz_unused_%")', // Ignore tables that are not converted - but are generated
+            . ' WHERE TABLE_SCHEMA = ? AND TABLE_COLLATION NOT LIKE "utf8mb4%" '
+            . ' AND NOT (TABLE_NAME LIKE "index_%" OR TABLE_NAME LIKE "zzz_unused_%")', // Ignore tables that are not converted - but are generated
         [$dbs_tiki]
     );
     if (! empty($result)) {
