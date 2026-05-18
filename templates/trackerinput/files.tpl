@@ -127,10 +127,10 @@
     {else}
         {if !isset($show_modal_preview)}
             {if empty($field.canUpload)}
-                {remarksbox type="error" close="n" title="{tr}You do not have permission to upload files to this gallery.{/tr}" }
+                {remarksbox type="error" close="n" title="{tr}You do not have permission to upload files to this gallery.{/tr}"}
                 {/remarksbox}
             {else}
-                {remarksbox type="error" close="n" title="{tr}You do not have permission to create galleries in this gallery.{/tr}" }
+                {remarksbox type="error" close="n" title="{tr}You do not have permission to create galleries in this gallery.{/tr}"}
                 {/remarksbox}
             {/if}
         {/if}

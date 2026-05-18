@@ -66,7 +66,7 @@
 
         {* Use `$smarty->append('tiki_page_bar_more_items', $item);` to put your item here *}
         {if ! empty($tiki_page_bar_more_items)}
-            {foreach from=$tiki_page_bar_more_items item=item }
+            {foreach from=$tiki_page_bar_more_items item=item}
                 {$item}
             {/foreach}
         {/if}
@@ -178,7 +178,7 @@
         {/if}
     {/capture}
 
-    {if $prefs.feature_wiki_discuss eq 'y' && $show_page eq 'y' && $tiki_p_forum_post eq 'y' && $prefs.wiki_discuss_visibility eq 'above' }
+    {if $prefs.feature_wiki_discuss eq 'y' && $show_page eq 'y' && $tiki_p_forum_post eq 'y' && $prefs.wiki_discuss_visibility eq 'above'}
             {include file='discussinforum.tpl'}
     {/if}
 

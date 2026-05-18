@@ -56,7 +56,7 @@
                     {textarea rows="2" class="form-control" name="description" id="description" maxlength="{$MAX_COMMENT_DESCRIPTION_LENGTH}"}{$description|escape}{/textarea}
                 </div>
             </div>
-            {if isset($role_groups) && count($role_groups) }
+            {if isset($role_groups) && count($role_groups)}
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="description">{tr}Group Roles{/tr}</label>
                 <div class="col-sm-9">

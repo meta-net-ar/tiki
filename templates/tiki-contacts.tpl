@@ -283,7 +283,7 @@
         if (pub != 'y' || {/literal}{if $tiki_p_admin_group_webmail eq 'y'}1{else}0{/if}{literal}) {    // add button only if not public
             var inputDiv = newElement.querySelector('.col-sm-7');
             var buttonDiv = newElement.querySelector('.col-sm-1');
-            var removeButton = createElementOrFill('input', {type:'button', name:'ext_'+extid, value:'-', 'onclick':'ext_remove(\''+extid+'\');' });
+            var removeButton = createElementOrFill('input', {type:'button', name:'ext_'+extid, value:'-', 'onclick':'ext_remove(\''+extid+'\');'});
             inputDiv.classList.remove('col-sm-7');
             inputDiv.classList.add('col-sm-6');
             buttonDiv.classList.remove('d-none');
