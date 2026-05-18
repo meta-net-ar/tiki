@@ -1,6 +1,6 @@
 <a name="list_filter{$filterCounter}"></a>
 <div class="list_filter" id="list_filter{$filterCounter}">
-    <form action="{$filterUrl}" method="get" id="list_filter{$filterCounter}_form">
+    <form action="{$filterUrl}#list_filter{$filterCounter}" method="get" id="list_filter{$filterCounter}_form">
         {foreach from=$filterHiddenParams key=k item=v}
             {if is_array($v)}
                 {foreach from=$v key=vk item=vv}
