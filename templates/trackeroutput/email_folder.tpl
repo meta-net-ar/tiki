@@ -1,6 +1,7 @@
 <div id="display_f{$field.fieldId|escape}" class="email-folder-field display_f{$field.fieldId|escape}">
     {if $tiki_p_use_webmail eq 'y'}
         <a href="{$data.compose_path}" class="btn btn-secondary btn-sm rounded-pill">{tr}Compose{/tr}</a>
+        <a href="{$data.search_path}" class="btn btn-outline-secondary btn-sm rounded-pill">{tr}Search Emails{/tr}</a>
     {/if}
     {if $data.count eq 0}
         {tr}Emails can be copied or moved here via the Webmail interface.{/tr}
