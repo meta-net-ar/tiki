@@ -20,7 +20,7 @@
         {/if}
         
     {/if}
-    {include file="tracker_actions.tpl" showitems="n"}
+    {include file="tracker_actions.tpl"}
     <div class="btn-group float-sm-end">
         {if ! $js}<ul><li>{/if}
                 {if $prefs.feature_group_watches eq 'y' or $prefs.feature_user_watches eq 'y' or $prefs.feed_tracker eq 'y' or $tiki_p_admin_trackers eq 'y' or $tiki_p_export_tracker eq 'y' or $prefs.sefurl_short_url eq 'y'}
