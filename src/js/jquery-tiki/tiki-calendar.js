@@ -94,6 +94,66 @@ $.fn.setupEventCalendar = function (
                 location.href = "tiki-calendar.php";
             }
         };
+        const getMonthRangeButtons = () => {
+            const monthRangeContainer = calendarEl.querySelector("#month-range-controls");
+            if (!monthRangeContainer) {
+                return {};
+            }
+
+            return {
+                oneMonth: monthRangeContainer.querySelector("#one-month"),
+                quarter: monthRangeContainer.querySelector("#quarter"),
+                semester: monthRangeContainer.querySelector("#semester"),
+            };
+        };
+        const setMonthRangeButtonState = (activeButtonId = "one-month") => {
+            const { oneMonth, quarter, semester } = getMonthRangeButtons();
+            if (!oneMonth || !quarter || !semester) {
+                return;
+            }
+            oneMonth.classList.toggle("ec-active", activeButtonId === "one-month");
+            quarter.classList.toggle("ec-active", activeButtonId === "quarter");
+            semester.classList.toggle("ec-active", activeButtonId === "semester");
+        };
+        const normalizeMonthRangeSpan = function (monthSpan) {
+            const parsedMonthSpan = Number(monthSpan);
+            return parsedMonthSpan === 3 || parsedMonthSpan === 6 ? parsedMonthSpan : 1;
+        };
+        const getMonthRangeButtonId = function (monthSpan) {
+            const normalizedMonthSpan = normalizeMonthRangeSpan(monthSpan);
+            if (normalizedMonthSpan === 3) {
+                return "quarter";
+            }
+            if (normalizedMonthSpan === 6) {
+                return "semester";
+            }
+            return "one-month";
+        };
+        let activeMonthRangeSpan = normalizeMonthRangeSpan(eventCalendarParams.initialMonthRangeSpan);
+        const formatMonthRangeTitle = (startDate, monthSpan = 1) => {
+            const rangeStart = moment(startDate).startOf("month");
+            if (!rangeStart.isValid()) {
+                return "";
+            }
+            if (monthSpan <= 1) {
+                return rangeStart.format("MMMM YYYY");
+            }
+            const rangeEnd = rangeStart.clone().add(monthSpan - 1, "months");
+            if (rangeStart.year() === rangeEnd.year()) {
+                return rangeStart.format("MMMM") + " - " + rangeEnd.format("MMMM YYYY");
+            }
+            return rangeStart.format("MMMM YYYY") + " - " + rangeEnd.format("MMMM YYYY");
+        };
+        const applyMonthRange = (monthSpan, activeButtonId) => {
+            const normalizedMonthSpan = normalizeMonthRangeSpan(monthSpan);
+            activeMonthRangeSpan = normalizedMonthSpan;
+            eventCalendarParams.initialMonthRangeSpan = normalizedMonthSpan;
+            calendarContainer[0].setOption("duration", { months: normalizedMonthSpan });
+            calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
+                return moment(dayCell).format(normalizedMonthSpan === 1 ? "D" : "M/D");
+            });
+            setMonthRangeButtonState(activeButtonId || getMonthRangeButtonId(normalizedMonthSpan));
+        };
         calendarContainer[0] = createCalendar(document.getElementById(targetId), [DayGrid, TimeGrid, Interaction, List], {
             eventTimeFormat: {
                 hour: "numeric",
@@ -132,20 +192,26 @@ $.fn.setupEventCalendar = function (
             slotDuration: eventCalendarParams.slotDuration,
             view: eventCalendarParams.initialView,
             date: eventCalendarParams.initialDate,
+            views: {
+                dayGridMonth: {
+                    titleFormat: function (startDate) {
+                        return formatMonthRangeTitle(startDate, activeMonthRangeSpan);
+                    },
+                },
+            },
             viewDidMount: function (data) {
-                // Preserve selected view across date-picker re-renders (callback can expose `data.type` or `data.view.type`).
-                const mountedViewType = data?.type ?? data?.view?.type;
-                // Use `data.type` for existing toolbar condition checks
-                const legacyToolbarViewType = data?.type;
-                if (mountedViewType) {
-                    eventCalendarParams.initialView = mountedViewType;
+                // Normalize view type because callback payload can expose either `data.type` or `data.view.type`.
+                const currentViewType = data?.type ?? data?.view?.type;
+                if (currentViewType) {
+                    eventCalendarParams.initialView = currentViewType;
                 }
                 $(calendarEl).tikiModal();
-                if (legacyToolbarViewType == "dayGridMonth" || legacyToolbarViewType == "listMonth") {
-                    calendarContainer[0].setOption("duration", { months: 1 });
-                    if (!document.getElementById("quarter")) {
-                        const ecStart = document.querySelector(".ec-start");
+                if (currentViewType == "dayGridMonth" || currentViewType == "listMonth") {
+                    if (!calendarEl.querySelector("#quarter")) {
+                        const ecStart = calendarEl.querySelector(".ec-start");
                         const buttonMonthView = document.createElement("div");
+                        buttonMonthView.id = "month-range-controls";
+                        buttonMonthView.className = "ec-button-group";
                         const quarterText = tr("Quarter");
                         const semesterText = tr("Semester");
                         const oneMonthText = tr("One-Month");
@@ -162,57 +228,39 @@ $.fn.setupEventCalendar = function (
                         ecStart.appendChild(buttonMonthView);
                     }
 
-                    const oneMonth = document.querySelector("#one-month");
-                    const quarter = document.querySelector("#quarter");
-                    const semester = document.querySelector("#semester");
-
-                    oneMonth.addEventListener("click", () => {
-                        oneMonth.classList.add("ec-active");
-                        quarter.classList.remove("ec-active");
-                        semester.classList.remove("ec-active");
-                        calendarContainer[0].setOption("duration", { months: 1 });
-                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
-                            return moment(dayCell).format("D");
-                        });
-                    });
-                    quarter.addEventListener("click", () => {
-                        oneMonth.classList.remove("ec-active");
-                        quarter.classList.add("ec-active");
-                        semester.classList.remove("ec-active");
-                        calendarContainer[0].setOption("duration", { months: 3 });
-                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
-                            return moment(dayCell).format("M/D");
-                        });
-                    });
-                    semester.addEventListener("click", () => {
-                        oneMonth.classList.remove("ec-active");
-                        quarter.classList.remove("ec-active");
-                        semester.classList.add("ec-active");
-                        calendarContainer[0].setOption("duration", { months: 6 });
-                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
-                            return moment(dayCell).format("M/D");
-                        });
-                    });
-                } else {
-                    if (document.getElementById("quarter")) {
-                        document.getElementById("one-month").remove();
-                        document.getElementById("quarter").remove();
-                        document.getElementById("semester").remove();
+                    const { oneMonth, quarter, semester } = getMonthRangeButtons();
+                    if (oneMonth && !oneMonth.dataset.rangeHandlerBound) {
+                        oneMonth.addEventListener("click", () => applyMonthRange(1, "one-month"));
+                        oneMonth.dataset.rangeHandlerBound = "1";
                     }
-                    if (legacyToolbarViewType == "timeGridWeek" || legacyToolbarViewType == "listWeek") {
+                    if (quarter && !quarter.dataset.rangeHandlerBound) {
+                        quarter.addEventListener("click", () => applyMonthRange(3, "quarter"));
+                        quarter.dataset.rangeHandlerBound = "1";
+                    }
+                    if (semester && !semester.dataset.rangeHandlerBound) {
+                        semester.addEventListener("click", () => applyMonthRange(6, "semester"));
+                        semester.dataset.rangeHandlerBound = "1";
+                    }
+                    applyMonthRange(activeMonthRangeSpan, getMonthRangeButtonId(activeMonthRangeSpan));
+                } else {
+                    const monthRangeContainer = calendarEl.querySelector("#month-range-controls");
+                    if (monthRangeContainer) {
+                        monthRangeContainer.remove();
+                    }
+                    if (currentViewType == "timeGridWeek" || currentViewType == "listWeek") {
                         calendarContainer[0].setOption("duration", { days: 7 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     }
-                    if (legacyToolbarViewType == "timeGridDay" || legacyToolbarViewType == "listDay") {
+                    if (currentViewType == "timeGridDay" || currentViewType == "listDay") {
                         calendarContainer[0].setOption("duration", { days: 1 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     }
 
-                    if (legacyToolbarViewType == "listYear") {
+                    if (currentViewType == "listYear") {
                         calendarContainer[0].setOption("duration", { months: 12 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
