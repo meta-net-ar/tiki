@@ -265,7 +265,7 @@
                         <div class="mb-3 row">
                             <label for="deleteAfter" class="col-md-4 col-form-label">{tr}File can be deleted after{/tr}</label>
                             <div class="col-md-8">
-                                {if $editFileId}
+                                {if $editFileId or $prefs.elementplus_upload eq 'y'}
                                     {html_select_duration prefix='deleteAfter' id="deleteAfter" default_value=$fileInfo.deleteAfter}
                                 {else}
                                     {html_select_duration prefix='deleteAfter[]' id="deleteAfter" default_unit=week}

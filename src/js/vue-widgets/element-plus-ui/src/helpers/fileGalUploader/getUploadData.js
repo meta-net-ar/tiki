@@ -23,7 +23,10 @@ export default async function (file, maxWidth, maxHeight) {
 
     const form = $("form#file_0").serializeArray();
     form.forEach((item) => {
-        result[item.name] = item.value;
+        // Strip [] suffix: the form uses array notation for multi-file jQuery compatibility,
+        // but Element Plus uploads one file at a time so these fields should be scalars.
+        const key = item.name.replace(/\[\]$/, "");
+        result[key] = item.value;
     });
 
     return result;
