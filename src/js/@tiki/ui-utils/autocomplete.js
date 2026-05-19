@@ -1,8 +1,13 @@
 import { applyAutocomplete } from "@vue-widgets/el-autocomplete";
 
 export default function autocomplete(element, resourceType, options = {}) {
-    const { url, sourceList, valueKey } = getAutocompleteResources(resourceType, options);
-    const autoCompleteArgs = [element, url, sourceList, valueKey];
+    const { url, sourceList, valueKey, transformResultCb } = getAutocompleteResources(resourceType, options);
+    const autocompleteOptions = {
+        remoteSourceUrl: url,
+        sourceList,
+        valueKey,
+        transformResultCb,
+    };
 
     if (resourceType == "pagename" && ($(element).attr("name") == "highlight" || /^search_mod_input_\d|highlight$/.test($(element).attr("id")))) {
         const selectCb = (event) => {
@@ -24,12 +29,12 @@ export default function autocomplete(element, resourceType, options = {}) {
                 window.location.href = "tiki-index.php?page=" + slug;
             }
         };
-        autoCompleteArgs.push(selectCb);
+        autocompleteOptions.selectCb = selectCb;
     } else if (options.select) {
-        autoCompleteArgs.push(options.select);
+        autocompleteOptions.selectCb = options.select;
     }
 
-    const component = applyAutocomplete(...autoCompleteArgs);
+    const component = applyAutocomplete(element, autocompleteOptions);
 
     if (options.onEnter) {
         handlePressEnter(component, options.onEnter);
@@ -46,6 +51,7 @@ export function getAutocompleteResources(type, options = {}) {
     let remoteSourceUrl = "";
     let sourceList = [];
     let valueKey = null;
+    let transformResultCb = null;
 
     const urlParams = new URLSearchParams(window.location.search);
     const excludepage = urlParams.get("page");
@@ -101,6 +107,12 @@ export function getAutocompleteResources(type, options = {}) {
                 "filter~type": options.types,
                 "filter~not_exact": options.excludeIdentifiers,
             });
+            transformResultCb = (res) => {
+                return res.resultset.result.map((item) => ({
+                    value: item.title,
+                    object_id: item.title,
+                }));
+            };
             break;
         default:
             remoteSourceUrl = null;
@@ -110,5 +122,5 @@ export function getAutocompleteResources(type, options = {}) {
 
     const url = remoteSourceUrl ? window.location.origin + (window.tikiroot || "/") + remoteSourceUrl : null;
 
-    return { url, sourceList, valueKey };
+    return { url, sourceList, valueKey, transformResultCb };
 }
