@@ -44,7 +44,6 @@ class ConsoleApplicationBuilder
     protected const ACTION_NOT_CALLABLE = 4;
 
     private static $lastInstance;
-    private static bool $lastInstanceComplete = false;
 
     /**
      * List of commands registered on the console
@@ -534,7 +533,7 @@ class ConsoleApplicationBuilder
      * of the check function and the action configured for the command group
      *
      * @param int|bool $statusCode
-     * @param string|null $commandCalled
+     * @param string|null $commandCalled Kept for compatibility. The console is always fully initialized.
      * @return Application
      */
     public function create($statusCode = 1100, ?string $commandCalled = null): Application
@@ -545,22 +544,13 @@ class ConsoleApplicationBuilder
             $statusCode = 1100;
         }
 
-        $commandCalled ??= $_SERVER['argv'][1] ?? false;
-
-        if (
-            self::$lastInstance && (
-                (! $commandCalled && self::$lastInstanceComplete)
-                || ($commandCalled && self::$lastInstance->has($commandCalled))
-            )
-        ) {
+        if (self::$lastInstance) {
             return self::$lastInstance;
         }
 
         /**
          * Define our constants, based on what error (if any) was thrown
          * @see $statusCode For explanations on what these constants these do.
-         * create() may be called more than once in the same PHP process when rebuilding
-         * the console for a requested command that was not present in the cached instance.
          * Constants are process-global, so the check is to ensure we only define them once.
          */
         if (! defined('DB_RUNNING')) {
@@ -581,7 +571,6 @@ class ConsoleApplicationBuilder
         $console->setAutoExit(false);
         $console->setName(tra('Tiki Console Tool'));
         $console->setCatchExceptions(false);
-        $registeredAllCommands = true;
 
         /**
          * @var  $condition string  The name of the check method to be executed
@@ -644,11 +633,6 @@ class ConsoleApplicationBuilder
                     }
                 }
                 $console->add($command);
-                // If the command exactly matches one that was requested, stop processing further commands as they will not be used anyhow.
-                if ($commandCalled === $command->getName()) {
-                    $registeredAllCommands = false;
-                    break 2;
-                }
             }
         }
 
@@ -683,7 +667,6 @@ class ConsoleApplicationBuilder
         \TikiLib::events()->trigger('tiki.commands.register', ['console' => $console]);
 
         self::$lastInstance = $console;
-        self::$lastInstanceComplete = $registeredAllCommands;
 
         return $console;
     }
