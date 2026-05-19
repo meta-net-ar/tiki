@@ -1079,6 +1079,9 @@ class Services_Tracker_Controller
             );
 
             if ($itemId) {
+                if ($cloneFrom) {
+                    $this->utilities->cascadeChildItems($cloneFrom, $itemId);
+                }
                 TikiLib::lib('unifiedsearch')->processUpdateQueue();
                 TikiLib::events()->trigger('tiki.process.redirect'); // wait for indexing to complete before loading of next request to ensure updated info shown
 
@@ -1189,6 +1192,7 @@ class Services_Tracker_Controller
             'skipRefresh' => $input->skipRefresh->bool(),
             'refreshMeta' => $input->refreshMeta->raw(),
             'refreshObject' => $input->refreshObject->raw(),
+            'cloneFrom' => $cloneFrom,
         ];
     }
 

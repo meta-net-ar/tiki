@@ -678,7 +678,22 @@ EXPORT;
 
         $itemObject = Tracker_Item::fromId($id);
 
-        foreach (TikiLib::lib('trk')->get_child_items($itemId) as $info) {
+        if ($this->cascadeChildItems($itemId, $id, $strict, $insertIds)) {
+            foreach ($insertIds as $insertedId) {
+                $this->removeItem($insertedId);
+            }
+            $transaction->commit(); // there is no rollback
+            return false;
+        }
+
+        $transaction->commit();
+
+        return $itemObject;
+    }
+
+    public function cascadeChildItems(int $sourceItemId, int $newParentId, bool $strict = false, array &$insertIds = []): bool
+    {
+        foreach (TikiLib::lib('trk')->get_child_items($sourceItemId) as $info) {
             $field = TikiLib::lib('trk')->get_tracker_field($info['field']);
             $options = Tracker_Options::fromSerialized($field['options'], Tracker_Field_Factory::getFieldInfo($field['type']));
             if (! $options->getParam('duplicateCascade')) {
@@ -686,39 +701,30 @@ EXPORT;
             }
 
             $childItem = Tracker_Item::fromId($info['itemId']);
-
-            if ($childItem->canView()) {
-                $childItem->asNew();
-                $data = $childItem->getData();
-                $data['fields'][$info['field']] = $id;
-
-                $childDefinition = $childItem->getDefinition();
-
-                // handle specific cloning actions
-
-                foreach ($childDefinition->getFields() as $field) {
-                    $handler = $childDefinition->getFieldFactory()->getHandler($field, $data);
-                    if (method_exists($handler, 'handleClone')) {
-                        $newData = $handler->handleClone($strict);
-                        $data['fields'][$field['permName']] = $newData['value'];
-                    }
-                }
-
-                $new = $this->insertItem($childDefinition, $data);
-                if ($new === false) {
-                    foreach ($insertIds as $id) { // undo items already created
-                        $this->removeItem($id);
-                    }
-                    $transaction->commit(); // there is no rollback
-                    return false;
-                }
-                $insertIds[] = $new;
+            if (! $childItem->canView()) {
+                continue;
             }
+
+            $childItem->asNew();
+            $data = $childItem->getData();
+            $data['fields'][$info['field']] = $newParentId;
+
+            $childDefinition = $childItem->getDefinition();
+            foreach ($childDefinition->getFields() as $childField) {
+                $handler = $childDefinition->getFieldFactory()->getHandler($childField, $data);
+                if (method_exists($handler, 'handleClone')) {
+                    $newData = $handler->handleClone($strict);
+                    $data['fields'][$childField['permName']] = $newData['value'];
+                }
+            }
+
+            $new = $this->insertItem($childDefinition, $data);
+            if ($new === false) {
+                return true;
+            }
+            $insertIds[] = $new;
         }
-
-        $transaction->commit();
-
-        return $itemObject;
+        return false;
     }
 
     public static function convertToDefaultCurrency($data)

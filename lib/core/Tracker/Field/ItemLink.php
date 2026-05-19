@@ -1169,6 +1169,18 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
         return ($this->trackerField->getOption('cascade') & $flag) > 0;
     }
 
+    public static function syncDuplicateCascadeDefaultForUpgrade(array $options): array
+    {
+        if (array_key_exists('duplicateCascade', $options)) {
+            return $options;
+        }
+
+        $cascadeAll = self::CASCADE_CATEG | self::CASCADE_STATUS | self::CASCADE_DELETE;
+        $options['duplicateCascade'] = isset($options['cascade']) && (int) $options['cascade'] === $cascadeAll ? 1 : 0;
+
+        return $options;
+    }
+
     public function watchCompare($old, $new)
     {
         if ($this->canHaveMultipleValues()) {
