@@ -93,4 +93,64 @@ class Articles extends AbstractType
             $this->addEntriesToSitemap($listPages, '/tiki-read_article.php?articleId=%s', 'articleId', 'article', $fileName);
         }
     }
+
+
+    public function getLlmsTxtEntries(bool $useMdLinks = false): array
+    {
+        global $prefs, $base_url;
+
+        if (! $this->checkFeatureAndPermissions('feature_articles')) {
+            return [];
+        }
+
+        $articleLibrary = TikiLib::lib('art');
+
+        $listPages = $articleLibrary->list_articles(
+            0,
+            -1,
+            'publishDate_desc',
+            '',
+            0,
+            0,
+            false,
+            '',
+            '',
+            'y',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            false,
+            'y'
+        );
+
+        $listPages['data'] = array_filter($listPages['data'], function ($article) {
+            return ($article['disp_article'] === 'y');
+        });
+
+        $entries     = [];
+        $friendlyUrl = ($prefs['feature_sefurl'] ?? 'n') === 'y';
+
+        foreach ($listPages['data'] as $article) {
+            if ($useMdLinks) {
+                if ($friendlyUrl) {
+                    $url = rtrim($base_url, '/') . '/article-' . (int) $article['articleId'] . '.md';
+                } else {
+                    $url = rtrim($base_url, '/') . '/tiki-llms.php?type=content&content_type=article&articleId=' . (int)$article['articleId'];
+                }
+            } else {
+                $url = $this->getEntryUrl('/tiki-read_article.php?articleId=%s', $article['articleId'], 'article');
+            }
+
+            $entries[] = [
+                'url' => $url,
+                'title' => $article['title'],
+            ];
+        }
+
+        return $entries;
+    }
 }

@@ -19,15 +19,15 @@ use Melbahja\Seo\Interfaces\SitemapBuilderInterface;
 abstract class AbstractType
 {
     /**
-     * @var \Melbahja\Seo\Interfaces\SitemapBuilderInterface|\Melbahja\Seo\Sitemap
+     * @var \Melbahja\Seo\Interfaces\SitemapBuilderInterface|null
      */
     protected $sitemap;
 
     /**
      * AbstractType constructor.
-     * @param \Melbahja\Seo\Interfaces\SitemapBuilderInterface|\Melbahja\Seo\Sitemap $sitemap
+     * @param \Melbahja\Seo\Interfaces\SitemapBuilderInterface|null $sitemap
      */
-    public function __construct(SitemapBuilderInterface|Sitemap $sitemap)
+    public function __construct(?SitemapBuilderInterface $sitemap)
     {
         $this->sitemap = $sitemap;
     }
@@ -151,6 +151,17 @@ abstract class AbstractType
                 }
             }
         });
+    }
+
+    /**
+     * Get entries for llms.txt.
+     *
+     * @param bool $useMdLinks if pref llms_md_enable enabled.
+     * @return array [title, url]
+     */
+    public function getLlmsTxtEntries(bool $useMdLinks = false): array
+    {
+        return [];
     }
 
     /**

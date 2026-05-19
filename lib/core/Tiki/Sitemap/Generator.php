@@ -212,6 +212,64 @@ class Generator
     }
 
 
+    /**
+     * Generate llms.txt
+     */
+    public function generateLlmsTxt(bool $useMdLinks = false): string
+    {
+        global $prefs, $user;
+
+        // set anonymous perms
+        $perms      = \Perms::getInstance();
+        $oldGroups  = $perms->getGroups();
+        $loggedUser = $user;
+        $user       = null;
+        $perms->setGroups(['Anonymous']);
+
+        $siteTitle = $prefs['browsertitle'] ?: 'Tiki Site';
+        $siteDesc  = $prefs['site_meta_description'] ?? '';
+        $siteDesc  = ! empty($siteDesc) ? "> {$siteDesc}\n" : '';
+        $output    = "# {$siteTitle}\n{$siteDesc}\n";
+
+        try {
+            $directoryFiles = new \GlobIterator(__DIR__ . '/Type/*.php');
+            foreach (array_reverse(iterator_to_array($directoryFiles)) as $file) {
+                if ($file->getFilename() === 'index.php') {
+                    continue;
+                }
+
+                $name = $file->getBasename('.php');
+                $class = self::NAMESPACE_PREFIX . $name;
+
+                if (! class_exists($class) || $name === 'Index') {
+                    continue;
+                }
+
+                /** @var AbstractType $typeHandler */
+                $typeHandler = new $class(null);
+                if (! is_subclass_of($typeHandler, self::BASE_CLASS)) {
+                    continue;
+                }
+
+                $entries = $typeHandler->getLlmsTxtEntries($useMdLinks);
+                if (empty($entries)) {
+                    continue;
+                }
+
+                $output .= "## {$name}\n";
+                foreach ($entries as $entry) {
+                    $output .= "- [{$entry['title']}]({$entry['url']})\n";
+                }
+                $output .= "\n";
+            }
+        } finally {
+            // restore perms
+            $user = $loggedUser;
+            $perms->setGroups($oldGroups);
+        }
+
+        return $output;
+    }
 
     /**
      * Return the path to the sitemap
