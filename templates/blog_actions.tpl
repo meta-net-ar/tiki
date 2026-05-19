@@ -1,5 +1,4 @@
-<div class="blogactions float-end">
-    <div class="btn-group">
+<div class="actions blogactions float-end btn-group">
         {if ! $js}<ul><li>{/if}
         <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#"title="{tr}Blog actions{/tr}" role="button">
             {icon name="menu-extra"}
@@ -68,5 +67,4 @@
                 </div>
             {/if}
         {/if}
-    </div>
 </div>
