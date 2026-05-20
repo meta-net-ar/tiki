@@ -359,6 +359,14 @@
                 "reviewer": "Victor Emanouilov",
                 "alternatives": "No alternatives for the moment, A lot of work would be needed to migrate away from Exchange integration.",
                 "impact": "Exchange integration completely non-functional."
+            },
+            "symfony/polyfill-ctype": {
+                "reason": "Provides ctype_* functions when ext-ctype extension is not available.",
+                "mitigation": "Version ~1.8 required by Symfony 6.4 components. Provides fallback functionality.",
+                "reviewed": "2026-04-30",
+                "reviewer": "Joseph Kausi",
+                "alternatives": "No alternatives for ctype function polyfills.",
+                "impact": "Symfony components fail. System likely unusable due to cascading failures."
             }
         }
     },
