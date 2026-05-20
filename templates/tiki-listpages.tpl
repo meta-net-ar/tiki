@@ -1,5 +1,11 @@
 {title admpage="wiki" help="Using Wiki Pages#Listing_Pages"}{tr}Pages{/tr}{/title}
 
+{if $tiki_p_remove eq 'y'}
+    <div class="t_navbar mb-3">
+        {button _icon_name='recycle' _text="{tr}Recycle Bin{/tr}" _type="link" _class='btn btn-outline-secondary btn-sm' _script='tiki-wiki_recycle_bin.php' _title="{tr}View and restore deleted pages{/tr}"}
+    </div>
+{/if}
+
 {tabset name='tabs_wikipages'}
     {tab name="{tr}List Wiki Pages{/tr}"}
         <h2>{tr}List Wiki Pages{/tr}</h2>

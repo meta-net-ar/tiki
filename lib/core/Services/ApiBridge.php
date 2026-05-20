@@ -184,7 +184,8 @@ class Services_ApiBridge
         $routes->add('wiki-create', (new Route('wiki', ['controller' => 'wiki', 'action' => 'create_update_page', 'create' => 1]))->setMethods(['POST']));
         $routes->add('wiki-view', (new Route('wiki/page/{page}', ['controller' => 'wiki', 'action' => 'get_page']))->setMethods(['GET']));
         $routes->add('wiki-update', (new Route('wiki/page/{page}', ['controller' => 'wiki', 'action' => 'create_update_page', 'update' => 1]))->setMethods(['POST']));
-        $routes->add('wiki-delete', (new Route('wiki/delete', ['controller' => 'wiki', 'action' => 'remove_pages', 'confirmForm' => 'y', 'version' => 'all']))->setMethods(['POST']));
+        $routes->add('wiki-delete', (new Route('wiki/delete', ['controller' => 'wiki', 'action' => 'remove_pages', 'confirmForm' => 'y']))->setMethods(['POST']));
+        $routes->add('wiki-undelete', (new Route('wiki/undelete', ['controller' => 'wiki', 'action' => 'undelete_pages', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('wiki-title', (new Route('wiki/title', ['controller' => 'wiki', 'action' => 'title', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('wiki-lock', (new Route('wiki/lock', ['controller' => 'wiki', 'action' => 'lock_pages', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('wiki-unlock', (new Route('wiki/unlock', ['controller' => 'wiki', 'action' => 'unlock_pages', 'confirmForm' => 'y']))->setMethods(['POST']));
