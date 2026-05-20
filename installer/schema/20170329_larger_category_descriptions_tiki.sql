@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_categories` MODIFY COLUMN `description` VARCHAR(500) default NULL;
+ALTER TABLE `tiki_categories` MODIFY COLUMN `description` VARCHAR(500) DEFAULT NULL;

@@ -1,2 +1,2 @@
 #sylvieg
-alter table `tiki_banners` add column `maxUserImpressions` int(8) default -1 after `impressions`;
+ALTER TABLE `tiki_banners` ADD COLUMN `maxUserImpressions` INT(8) DEFAULT -1 AFTER `impressions`;

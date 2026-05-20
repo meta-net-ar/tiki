@@ -1,1 +1,1 @@
-ALTER TABLE tiki_forums ADD COLUMN `parentId` int(8) NOT NULL default 0 AFTER `forumId`;
+ALTER TABLE tiki_forums ADD COLUMN `parentId` INT(8) NOT NULL DEFAULT 0 AFTER `forumId`;

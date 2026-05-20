@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_surveys` ADD COLUMN `redirect_after` varchar(255) default NULL;
+ALTER TABLE `tiki_surveys` ADD COLUMN `redirect_after` VARCHAR(255) DEFAULT NULL;

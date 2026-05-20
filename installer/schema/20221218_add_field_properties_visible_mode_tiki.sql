@@ -1,3 +1,3 @@
-ALTER TABLE `tiki_tracker_fields` ADD `visibleInViewMode` char(1) default 'y';
-ALTER TABLE `tiki_tracker_fields` ADD `visibleInEditMode` char(1) default 'y';
-ALTER TABLE `tiki_tracker_fields` ADD `visibleInHistoryMode` char(1) default 'y';
+ALTER TABLE `tiki_tracker_fields` ADD `visibleInViewMode` CHAR(1) DEFAULT 'y';
+ALTER TABLE `tiki_tracker_fields` ADD `visibleInEditMode` CHAR(1) DEFAULT 'y';
+ALTER TABLE `tiki_tracker_fields` ADD `visibleInHistoryMode` CHAR(1) DEFAULT 'y';

@@ -1,2 +1,2 @@
-update tiki_modules set name='who_is_there', params='content=count' where name='logged_users';
-update tiki_modules set name='who_is_there', params='content=list' where name='online_users';
+UPDATE tiki_modules SET name='who_is_there', params='content=count' WHERE name='logged_users';
+UPDATE tiki_modules SET name='who_is_there', params='content=list' WHERE name='online_users';

@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_sheets` ADD `parentSheetId` int(8) NULL;
+ALTER TABLE `tiki_sheets` ADD `parentSheetId` INT(8) NULL;

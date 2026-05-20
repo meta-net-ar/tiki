@@ -1,1 +1,1 @@
-AlTER TABLE `tiki_files` ADD COLUMN `deleteAfter` int(14) default NULL;
+ALTER TABLE `tiki_files` ADD COLUMN `deleteAfter` INT(14) DEFAULT NULL;

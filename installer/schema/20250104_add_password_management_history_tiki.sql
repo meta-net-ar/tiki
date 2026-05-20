@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `tiki_user_passwords_history` (
-  `passId` int(8) NOT NULL auto_increment,
-  `user` varchar(200) NOT NULL default '',
-  `hash` varchar(60) default NULL,
+  `passId` INT(8) NOT NULL AUTO_INCREMENT,
+  `user` VARCHAR(200) NOT NULL DEFAULT '',
+  `hash` VARCHAR(60) DEFAULT NULL,
   `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY(`passId`)
 ) ENGINE=MyISAM;

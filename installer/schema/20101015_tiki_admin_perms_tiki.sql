@@ -1,1 +1,1 @@
-update `users_permissions` set `admin`=NULL where `permName`='tiki_p_admin_importer' or `permName`='tiki_p_admin_toolbars';
+UPDATE `users_permissions` SET `admin`=NULL WHERE `permName`='tiki_p_admin_importer' OR `permName`='tiki_p_admin_toolbars';

@@ -1,13 +1,13 @@
 #sylvieg
 CREATE TABLE IF NOT EXISTS `tiki_sefurl_regex_out` (
-  `id` int(11) NOT NULL auto_increment,
-  `left` varchar(256) NOT NULL,
-  `right` varchar(256) NULL default NULL,
-  `type` varchar(32) NULL default NULL,
-  `silent` char(1) NULL default 'n',
-  `feature` varchar(256) NULL default NULL,
-  `comment` varchar(256),
-  `order` int(11) NULL default 0,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `left` VARCHAR(256) NOT NULL,
+  `right` VARCHAR(256) NULL DEFAULT NULL,
+  `type` VARCHAR(32) NULL DEFAULT NULL,
+  `silent` CHAR(1) NULL DEFAULT 'n',
+  `feature` VARCHAR(256) NULL DEFAULT NULL,
+  `comment` VARCHAR(256),
+  `order` INT(11) NULL DEFAULT 0,
   PRIMARY KEY(`id`),
   UNIQUE KEY `left`(`left`(256)),
   INDEX `idx1` (silent, type, feature(30))

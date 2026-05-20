@@ -1,1 +1,1 @@
-update tiki_modules set name='top_images', params='content=thumbnails' where name='top_images_th';
+UPDATE tiki_modules SET name='top_images', params='content=thumbnails' WHERE name='top_images_th';

@@ -1,2 +1,2 @@
 ALTER TABLE `tiki_auth_tokens`
-ADD COLUMN `data` text default NULL;
+ADD COLUMN `data` text DEFAULT NULL;

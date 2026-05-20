@@ -1,5 +1,5 @@
-ALTER TABLE `tiki_menus` ADD COLUMN `use_items_icons` char(1) NOT NULL DEFAULT 'n';
-ALTER TABLE `tiki_menu_options` ADD COLUMN `icon` varchar(200);
+ALTER TABLE `tiki_menus` ADD COLUMN `use_items_icons` CHAR(1) NOT NULL DEFAULT 'n';
+ALTER TABLE `tiki_menu_options` ADD COLUMN `icon` VARCHAR(200);
 UPDATE tiki_menu_options SET icon = 'icon-configuration48x48' WHERE name = 'Admin';
 UPDATE tiki_menu_options SET icon = 'xfce4-appfinder48x48' WHERE name = 'Search';
 UPDATE tiki_menu_options SET icon = 'wikipages48x48' WHERE name = 'Wiki';

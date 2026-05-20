@@ -1,1 +1,1 @@
-update `tiki_objects` set `type`='trackeritem' where `type` like 'tracker %';
+UPDATE `tiki_objects` SET `type`='trackeritem' WHERE `type` LIKE 'tracker %';

@@ -1,13 +1,13 @@
 
 CREATE TABLE IF NOT EXISTS tiki_perspectives (
-    `perspectiveId` int NOT NULL AUTO_INCREMENT,
-    name varchar(100) NOT NULL,
+    `perspectiveId` INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
     PRIMARY KEY( `perspectiveId` )
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS tiki_perspective_preferences (
-    `perspectiveId` int NOT NULL,
-    pref varchar(40) NOT NULL,
+    `perspectiveId` INT NOT NULL,
+    pref VARCHAR(40) NOT NULL,
     value text,
     PRIMARY KEY( `perspectiveId`, pref )
 ) ENGINE=MyISAM;

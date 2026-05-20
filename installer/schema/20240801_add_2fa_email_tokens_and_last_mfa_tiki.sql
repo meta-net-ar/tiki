@@ -3,8 +3,8 @@ CREATE TABLE IF NOT EXISTS `tiki_2fa_email_tokens` (
   `type` VARCHAR(10) NOT NULL,
   `token` VARCHAR(60) NOT NULL,
   `attempts` INT NOT NULL DEFAULT 0,
-  `created` bigint NOT NULL,
+  `created` BIGINT NOT NULL,
   PRIMARY KEY (`userId`)
 ) ENGINE=MyISAM;
 
-ALTER TABLE `users_users` ADD COLUMN `last_mfa_date` bigint DEFAULT NULL;
+ALTER TABLE `users_users` ADD COLUMN `last_mfa_date` BIGINT DEFAULT NULL;

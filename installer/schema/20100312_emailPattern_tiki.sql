@@ -1,1 +1,1 @@
-ALTER TABLE `users_groups` ADD `emailPattern`  varchar(255) default '';
+ALTER TABLE `users_groups` ADD `emailPattern`  VARCHAR(255) DEFAULT '';

@@ -1,1 +1,1 @@
-alter table tiki_mailin_accounts add column (`categoryId` int(12));
+ALTER TABLE tiki_mailin_accounts ADD COLUMN (`categoryId` INT(12));

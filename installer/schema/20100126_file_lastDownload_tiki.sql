@@ -1,1 +1,1 @@
-alter table `tiki_files` add column `lastDownload` int(14) default NULL after `hits`;
+ALTER TABLE `tiki_files` ADD COLUMN `lastDownload` INT(14) DEFAULT NULL AFTER `hits`;

@@ -1,5 +1,5 @@
 CREATE TABLE `tiki_markdown_imports` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
   `source_key` VARCHAR(190) NOT NULL,
   `relpath` VARCHAR(500) NOT NULL,
   `page_name` VARCHAR(255) NOT NULL,

@@ -1,3 +1,3 @@
 #sylvieg
-update tiki_user_assigned_modules set name='Menuapplication' where name='application_menu';
-update tiki_modules set name='Menuapplication' where name='application_menu';
+UPDATE tiki_user_assigned_modules SET name='Menuapplication' WHERE name='application_menu';
+UPDATE tiki_modules SET name='Menuapplication' WHERE name='application_menu';

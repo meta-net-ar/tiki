@@ -1,1 +1,1 @@
-alter table `tiki_file_galleries` add column `size` int(14) default NULL;
+ALTER TABLE `tiki_file_galleries` ADD COLUMN `size` INT(14) DEFAULT NULL;

@@ -1,1 +1,1 @@
-update tiki_preferences set name='available_themes' where name='available_styles';
+UPDATE tiki_preferences SET name='available_themes' WHERE name='available_styles';

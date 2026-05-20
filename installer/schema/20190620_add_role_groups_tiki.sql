@@ -1,8 +1,8 @@
-ALTER TABLE users_groups ADD column `isRole` char(1) DEFAULT 'n';
+ALTER TABLE users_groups ADD COLUMN `isRole` CHAR(1) DEFAULT 'n';
 CREATE TABLE `tiki_categories_roles` (
-    `categId` int(12) NOT NULL,
-    `categRoleId` int(12) NOT NULL,
-    `groupRoleId` int(12) NOT NULL,
-    `groupId` int(12) NOT NULL,
+    `categId` INT(12) NOT NULL,
+    `categRoleId` INT(12) NOT NULL,
+    `groupRoleId` INT(12) NOT NULL,
+    `groupId` INT(12) NOT NULL,
     PRIMARY KEY (`categId`,`categRoleId`,`groupRoleId`)
 ) ENGINE=MyISAM;

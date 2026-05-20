@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_language` ADD COLUMN `userId` int(8) AFTER `changed`;
+ALTER TABLE `tiki_language` ADD COLUMN `userId` INT(8) AFTER `changed`;

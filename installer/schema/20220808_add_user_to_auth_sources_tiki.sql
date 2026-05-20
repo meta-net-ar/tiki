@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_source_auth` ADD user varchar(200);
+ALTER TABLE `tiki_source_auth` ADD user VARCHAR(200);

@@ -1,2 +1,2 @@
 #sylvieg
-update  tiki_menu_options set url='tiki-admin.php'  WHERE url='' and position ='1050' and name='Admin';
+UPDATE  tiki_menu_options SET url='tiki-admin.php'  WHERE url='' AND position ='1050' AND name='Admin';

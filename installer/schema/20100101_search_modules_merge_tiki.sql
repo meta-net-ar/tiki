@@ -1,1 +1,1 @@
-update tiki_modules set name='search_box', params='tiki=y' where name='search_new';
+UPDATE tiki_modules SET name='search_box', params='tiki=y' WHERE name='search_new';

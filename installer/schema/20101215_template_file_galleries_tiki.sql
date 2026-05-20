@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_file_galleries` ADD COLUMN `template` int(10) default NULL AFTER `type`;
+ALTER TABLE `tiki_file_galleries` ADD COLUMN `template` INT(10) DEFAULT NULL AFTER `type`;

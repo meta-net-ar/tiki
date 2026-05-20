@@ -1,2 +1,2 @@
-ALTER TABLE `tiki_tracker_fields` MODIFY `validationMessage` varchar(255) default '' AFTER `validationParam`;
-ALTER TABLE `tiki_blogs` MODIFY `show_related` char(1) default NULL AFTER `always_owner`;
+ALTER TABLE `tiki_tracker_fields` MODIFY `validationMessage` VARCHAR(255) DEFAULT '' AFTER `validationParam`;
+ALTER TABLE `tiki_blogs` MODIFY `show_related` CHAR(1) DEFAULT NULL AFTER `always_owner`;

@@ -1,1 +1,1 @@
-alter table `tiki_user_bookmarks_urls` modify `name` varchar(200) default NULL;
+ALTER TABLE `tiki_user_bookmarks_urls` modify `name` VARCHAR(200) DEFAULT NULL;

@@ -1,1 +1,1 @@
-ALTER TABLE `users_usergroups` ADD COLUMN `expire` int(14) default NULL;
+ALTER TABLE `users_usergroups` ADD COLUMN `expire` INT(14) DEFAULT NULL;

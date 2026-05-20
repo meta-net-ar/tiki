@@ -1,1 +1,1 @@
-update `tiki_pages` tp set tp.`creator`= (select th.`user` from `tiki_history` th where th.`pageName`=tp.`pageName` order by th.`version` asc limit 0,1) where tp.`creator` is null;
+UPDATE `tiki_pages` tp SET tp.`creator`= (SELECT th.`user` FROM `tiki_history` th WHERE th.`pageName`=tp.`pageName` ORDER BY th.`version` ASC LIMIT 0,1) WHERE tp.`creator` IS NULL;

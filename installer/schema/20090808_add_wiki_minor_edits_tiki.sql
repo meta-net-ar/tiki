@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_pages` ADD `version_minor` int(8) NOT NULL default '0' AFTER `version`;
+ALTER TABLE `tiki_pages` ADD `version_minor` INT(8) NOT NULL DEFAULT '0' AFTER `version`;

@@ -1,1 +1,1 @@
-UPDATE tiki_preferences set name = 'trackerfield_autoincrement' where name = 'trackerfield_autoincement';
+UPDATE tiki_preferences SET name = 'trackerfield_autoincrement' WHERE name = 'trackerfield_autoincement';

@@ -1,1 +1,1 @@
-update `tiki_user_watches` set `type`='wiki page' where `type`='wiki'; 
+UPDATE `tiki_user_watches` SET `type`='wiki page' WHERE `type`='wiki'; 

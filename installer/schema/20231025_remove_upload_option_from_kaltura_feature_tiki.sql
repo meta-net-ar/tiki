@@ -1,1 +1,1 @@
-DELETE FROM `tiki_menu_options` where `url` = 'tiki-kaltura_upload.php' and `section` = 'feature_kaltura';
+DELETE FROM `tiki_menu_options` WHERE `url` = 'tiki-kaltura_upload.php' AND `section` = 'feature_kaltura';
