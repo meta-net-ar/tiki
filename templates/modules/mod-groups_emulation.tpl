@@ -1,6 +1,18 @@
 {strip}
 {tikimodule error=$module_params.error title=$tpl_module_title name="groups_emulation" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
 
+    <style>
+        .mge-collapse-icon {
+            display: inline-block;
+            transition: transform 0.35s ease;
+            transform: rotate(90deg);
+        }
+
+        .collapsed .mge-collapse-icon {
+            transform: rotate(0deg);
+        }
+    </style>
+
     {if isset($allGroups) && $showallgroups eq 'y'}
         <div>
             <button class="btn btn-link px-0 py-1 text-start text-decoration-none w-100 d-flex align-items-center gap-1 collapsed"
@@ -90,6 +102,25 @@
             <div class="text-center mt-2"><button type="submit" class="btn btn-primary" name="emulategroups" value="setgroups" id="mge-simulate-btn-{$moduleId}">{tr}Simulate{/tr}</button></div>
         </fieldset>
     </form>
+
+    <script>
+        (function () {
+            var moduleId = '{$moduleId|escape:"javascript"}';
+            var select = document.getElementById('mge-select-groups-' + moduleId);
+            var button = document.getElementById('mge-simulate-btn-' + moduleId);
+
+            if (!select || !button) {
+                return;
+            }
+
+            var updateButtonState = function () {
+                button.disabled = !select.value || select.selectedOptions.length === 0;
+            };
+
+            select.addEventListener('change', updateButtonState);
+            updateButtonState();
+        }());
+    </script>
 
 {/tikimodule}
 {/strip}

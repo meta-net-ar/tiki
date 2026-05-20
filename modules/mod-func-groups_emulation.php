@@ -90,33 +90,6 @@ function module_groups_emulation($mod_reference, $module_params)
     $moduleId = $mod_reference['moduleId'];
     $smarty->assign('moduleId', $moduleId);
 
-    $headerlib = TikiLib::lib("header");
-    $headerlib->add_css('
-        .mge-collapse-icon {
-            display: inline-block;
-            transition: transform 0.35s ease;
-            transform: rotate(90deg);
-        }
-        .collapsed .mge-collapse-icon {
-            transform: rotate(0deg);
-        }
-    ');
-    $headerlib->add_js('$(function() {
-        var $select = $("#mge-select-groups-' . $moduleId . '");
-        var $btn = $("#mge-simulate-btn-' . $moduleId . '");
-
-        var updateBtnState = function() {
-            if ($select.val() && $select.val().length > 0) {
-                $btn.prop("disabled", false);
-            } else {
-                $btn.prop("disabled", true);
-            }
-        };
-
-        $select.on("change", updateBtnState);
-        updateBtnState(); // Run once on load
-    });');
-
     $smarty->assign_by_ref('userGroups', $userGroups);
     $smarty->assign_by_ref('chooseGroups', $chooseGroups);
     $smarty->assign('showallgroups', $showallgroups);
