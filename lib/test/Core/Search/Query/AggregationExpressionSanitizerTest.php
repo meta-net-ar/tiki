@@ -8,6 +8,7 @@ namespace Search\Query;
 
 use PHPUnit\Framework\TestCase;
 use Search\Query\Aggregation\ExpressionSanitizer;
+use InvalidArgumentException;
 
 class AggregationExpressionSanitizerTest extends TestCase
 {
