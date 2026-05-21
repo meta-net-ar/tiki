@@ -425,6 +425,11 @@ if (
             && $prefs['language'] != $info['lang']
 ) {
     $prefs['language'] = $info['lang'];
+    if (! empty($user)) {
+        // Keep the current request consistent for logged-in users without persisting a new preference.
+        $user_preferences[$user]['language'] = $info['lang'];
+    }
+    $smarty->refreshLanguage();
     // slight duplication from lib/setup/user_prefs.php:86 but seems safest
     $translatablePreferences = TikiLib::lib('prefs')->getTranslatablePreferences();
 

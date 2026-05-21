@@ -23,6 +23,17 @@ if (isset($_SERVER['HTTP_REFERER'])) {
     $orig_url = $prefs['tikiIndex'];
 }
 
+$referrerLanguagePrefix = null;
+if (! empty($_SERVER['HTTP_REFERER'])) {
+    $referrerPath = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH) ?: '';
+    $segments = explode('/', trim($referrerPath, '/'));
+    $firstSegment = $segments[0] ?? '';
+
+    if ($firstSegment !== '' && preg_match('/^[a-z]{2}(?:-[A-Z]{2})?$/', $firstSegment)) {
+        $referrerLanguagePrefix = $firstSegment;
+    }
+}
+
 //for lang_nonswitchingpages
 if ($prefs['feature_lang_nonswitchingpages'] == "y" && ! empty($prefs['feature_lang_nonswitchingpages_names'])) {
     $nopage1 = explode(',', $prefs['feature_lang_nonswitchingpages_names']);
@@ -41,7 +52,20 @@ $item_url = parse_url($_SERVER['HTTP_REFERER'] ?? "");
 $item_query = $item_url['query'] ?? null;
 // Also, if we are at the homepage and tikiIndex is set, the URL we need to take as reference is the tikiIndex
 $item_path = $item_url['path'];
-if ($item_path == '/') {
+if ($item_path === '/' && isset($_GET['language'])) {
+    $lang    = $_GET['language'];
+    $wikilib = TikiLib::lib('wiki');
+    $homeId  = $tikilib->get_page_info($wikilib->get_default_wiki_page())['page_id'];
+    $bestId  = TikiLib::lib('multilingual')->selectLangObj('wiki page', $homeId, $lang);
+    $page    = $bestId !== $homeId ? $tikilib->get_page_name_from_id($bestId) : $wikilib->get_default_wiki_page();
+    if (function_exists('setLanguage')) {
+        call_user_func('setLanguage', $lang); // 27.x compat: persists lang to session
+        header('location: tiki-index.php?page=' . urlencode($page));
+    } else {
+        header('location: tiki-index.php?page=' . urlencode($page) . '&switchLang=' . urlencode($lang));
+    }
+    exit;
+} elseif ($item_path === '/') {
     $orig_url = $prefs['tikiIndex'];
 }
 
@@ -115,7 +139,11 @@ if (strstr($orig_url, 'tiki-index.php') || strstr($orig_url, 'tiki-read_article.
     }
 
     if ($item_query) {
-        if ($prefs['feature_sefurl'] != 'y' && ! strstr($_SERVER['HTTP_REFERER'], 'tiki-index.php') && ! strstr($_SERVER['HTTP_REFERER'], 'tiki-read_article.php')) {
+        if (
+            $prefs['feature_sefurl'] != 'y'
+            && ! strstr($_SERVER['HTTP_REFERER'], 'tiki-index.php')
+            && ! strstr($_SERVER['HTTP_REFERER'], 'tiki-read_article.php')
+        ) {
             $orig_url = $orig_url . "&" . $item_query;
         }
     }
@@ -128,5 +156,13 @@ if (isset($_GET['language'])) {
 if (isset($_GET['languageAdmin'])) {
     setLanguage($_GET['languageAdmin'], true);
 }
+
+if ($referrerLanguagePrefix !== null) {
+    $orig_url = preg_replace('#/' . preg_quote($referrerLanguagePrefix, '#') . '(?=/|$)#', '', $orig_url, 1);
+    if ($orig_url === '') {
+        $orig_url = '/';
+    }
+}
+
 header("location: $orig_url");
 exit;
