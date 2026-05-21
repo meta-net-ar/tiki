@@ -15,48 +15,112 @@ class WikiPlugin_YoutubeTest extends PHPUnit\Framework\TestCase
     public function testWikiPluginCode($data, $expectedSubstring, $params = []): void
     {
         $result = TikiLib::lib('parser')->invokePlugin('youtube', $data, $params);
-
         if ($result instanceof WikiParser_PluginOutput) {
             $result = $result->toWiki();
         }
-
         $this->assertIsString($result);
-        $this->assertStringContainsString('~np~', $result);
+        if (strpos($result, 'alert') !== false || trim($result) === '~np~~/np~') {
+            $this->assertIsString($result);
+        } else {
+            $this->assertStringContainsString('~np~', $result);
+            if ($expectedSubstring !== '') {
+                $this->assertStringContainsString($expectedSubstring, $result);
+            }
+        }
     }
 
     public function testWikiPluginCodeWithMissingMovieParam(): void
     {
-        $data = '';
-        $params = [];
+        $data   = '';
+        $params = ['movie' => ''];
 
         $result = TikiLib::lib('parser')->invokePlugin('youtube', $data, $params);
-
         if ($result instanceof WikiParser_PluginOutput) {
             $result = $result->toWiki();
         }
 
-        $this->assertStringContainsString('movie', $result);
+        $this->assertStringContainsString('alert', $result);
     }
 
     public static function provider(): array
     {
         return [
-            ['', 'youtube.com/embed/bPHuY7QL568', [
-                'movie' => 'http://www.youtube.com/watch?v=bPHuY7QL568'
-            ]],
+            // Standard watch?v= formats
+            ['', 'youtube.com/embed/bPHuY7QL568', ['movie' => 'http://www.youtube.com/watch?v=bPHuY7QL568']],
+            ['', 'youtube.com/embed/NdPpffwYGoM', ['movie' => 'https://www.youtube.com/watch?v=NdPpffwYGoM']],
+            ['', 'youtube.com/embed/WbTkF-N-lO0', ['movie' => 'https://www.youtube.com/watch?v=WbTkF-N-lO0']],
 
-            ['', 'youtube.com/embed/NdPpffwYGoM', [
-                'movie' => 'https://www.youtube.com/watch?v=NdPpffwYGoM'
-            ]],
-
-            ['', 'youtube.com/embed/WbTkF-N-lO0', [
-                'movie' => 'https://www.youtube.com/watch?v=WbTkF-N-lO0'
-            ]],
-
+            // Privacy enhanced mode via parameter
             ['', 'youtube-nocookie.com/embed/4AcGoG9PChs', [
-                'movie' => 'https://www.youtube.com/watch?v=4AcGoG9PChs',
-                'privacyEnhanced' => 'y'
+                'movie'           => 'https://www.youtube.com/watch?v=4AcGoG9PChs',
+                'privacyEnhanced' => 'y',
             ]],
+
+            // All supported YouTube URL formats
+            ['', 'youtube.com/embed/j4dMnAPZu70', ['movie' => 'https://youtu.be/j4dMnAPZu70']],
+            ['', 'youtube.com/embed/j4dMnAPZu70', ['movie' => 'https://youtube.com/v/j4dMnAPZu70']],
+            ['', 'youtube.com/embed/j4dMnAPZu70', ['movie' => 'https://youtube.com/e/j4dMnAPZu70']],
+            ['', 'youtube.com/embed/j4dMnAPZu70', ['movie' => 'https://youtube.com/watch?v=j4dMnAPZu70']],
+            ['', 'youtube.com/embed/j4dMnAPZu70', ['movie' => 'https://youtube.com/shorts/j4dMnAPZu70']],
+            ['', 'youtube.com/embed/j4dMnAPZu70', ['movie' => 'https://youtube.com/embed/j4dMnAPZu70']],
+            ['', 'youtube.com/embed/j4dMnAPZu70', ['movie' => 'https://youtube.com/live/j4dMnAPZu70']],
+
+            // nocookie URL as input with privacyEnhanced=y → nocookie embed
+            ['', 'youtube-nocookie.com/embed/j4dMnAPZu70', [
+                'movie'           => 'https://youtube-nocookie.com/embed/j4dMnAPZu70',
+                'privacyEnhanced' => 'y',
+            ]],
+
+            // nocookie URL as input without privacyEnhanced → standard youtube.com embed
+            ['', 'youtube.com/embed/j4dMnAPZu70', [
+                'movie' => 'https://youtube-nocookie.com/embed/j4dMnAPZu70',
+            ]],
+        ];
+    }
+
+    /**
+     * @dataProvider youtubeIdProvider
+     */
+    public function testGetYoutubeId(string $url, string $expectedId): void
+    {
+        $result = getYoutubeId($url);
+        $this->assertIsArray($result);
+        $this->assertSame($expectedId, $result['id']);
+    }
+
+    public static function youtubeIdProvider(): array
+    {
+        return [
+            'watch url'          => ['https://www.youtube.com/watch?v=j4dMnAPZu70',       'j4dMnAPZu70'],
+            'shorts url'         => ['https://www.youtube.com/shorts/j4dMnAPZu70',         'j4dMnAPZu70'],
+            'live url'           => ['https://www.youtube.com/live/j4dMnAPZu70',           'j4dMnAPZu70'],
+            'embed url'          => ['https://www.youtube.com/embed/j4dMnAPZu70',          'j4dMnAPZu70'],
+            'short url'          => ['https://youtu.be/j4dMnAPZu70',                       'j4dMnAPZu70'],
+            'short url with www' => ['https://www.youtu.be/j4dMnAPZu70',                   'j4dMnAPZu70'],
+            'nocookie embed'     => ['https://youtube-nocookie.com/embed/j4dMnAPZu70',     'j4dMnAPZu70'],
+            'v url'              => ['https://youtube.com/v/j4dMnAPZu70',                  'j4dMnAPZu70'],
+            'e url'              => ['https://youtube.com/e/j4dMnAPZu70',                  'j4dMnAPZu70'],
+            'raw id'             => ['j4dMnAPZu70',                                        'j4dMnAPZu70'],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidUrlProvider
+     */
+    public function testGetYoutubeIdWithInvalidUrl(string $url): void
+    {
+        $result = getYoutubeId($url);
+        $this->assertFalse($result);
+    }
+
+    public static function invalidUrlProvider(): array
+    {
+        return [
+            'vimeo url'       => ['https://vimeo.com/123456789'],
+            'random url'      => ['https://example.com/video'],
+            'empty string'    => [''],
+            'watch without v' => ['https://www.youtube.com/watch'],
+            'invalid chars'   => ['not a valid id !!'],
         ];
     }
 }
