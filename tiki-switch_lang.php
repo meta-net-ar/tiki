@@ -23,6 +23,17 @@ if (isset($_SERVER['HTTP_REFERER'])) {
     $orig_url = $prefs['tikiIndex'];
 }
 
+$referrerLanguagePrefix = null;
+if (! empty($_SERVER['HTTP_REFERER'])) {
+    $referrerPath = parse_url($_SERVER['HTTP_REFERER'], PHP_URL_PATH) ?: '';
+    $segments = explode('/', trim($referrerPath, '/'));
+    $firstSegment = $segments[0] ?? '';
+
+    if ($firstSegment !== '' && preg_match('/^[a-z]{2}(?:-[A-Z]{2})?$/', $firstSegment)) {
+        $referrerLanguagePrefix = $firstSegment;
+    }
+}
+
 //for lang_nonswitchingpages
 if ($prefs['feature_lang_nonswitchingpages'] == "y" && ! empty($prefs['feature_lang_nonswitchingpages_names'])) {
     $nopage1 = explode(',', $prefs['feature_lang_nonswitchingpages_names']);
@@ -30,7 +41,7 @@ if ($prefs['feature_lang_nonswitchingpages'] == "y" && ! empty($prefs['feature_l
 
     foreach ($nopage1 as $valpage) {
         $valpage_dec = urldecode($valpage);
-        if (str_contains($orig_url_dec, $valpage_dec)) {
+        if (strstr($orig_url_dec, $valpage_dec)) {
             $orig_url = $prefs['tikiIndex'];
         }
     }
@@ -41,24 +52,37 @@ $item_url = parse_url($_SERVER['HTTP_REFERER'] ?? "");
 $item_query = $item_url['query'] ?? null;
 // Also, if we are at the homepage and tikiIndex is set, the URL we need to take as reference is the tikiIndex
 $item_path = $item_url['path'];
-if ($item_path == '/') {
+if ($item_path === '/' && isset($_GET['language'])) {
+    $lang    = $_GET['language'];
+    $wikilib = TikiLib::lib('wiki');
+    $homeId  = $tikilib->get_page_info($wikilib->get_default_wiki_page())['page_id'];
+    $bestId  = TikiLib::lib('multilingual')->selectLangObj('wiki page', $homeId, $lang);
+    $page    = $bestId !== $homeId ? $tikilib->get_page_name_from_id($bestId) : $wikilib->get_default_wiki_page();
+    if (function_exists('setLanguage')) {
+        call_user_func('setLanguage', $lang); // 27.x compat: persists lang to session
+        header('location: tiki-index.php?page=' . urlencode($page));
+    } else {
+        header('location: tiki-index.php?page=' . urlencode($page) . '&switchLang=' . urlencode($lang));
+    }
+    exit;
+} elseif ($item_path === '/') {
     $orig_url = $prefs['tikiIndex'];
 }
 
-if ($prefs['feature_sefurl'] == 'y' && ! str_contains($orig_url, '.php')) {
+if ($prefs['feature_sefurl'] == 'y' && ! strstr($orig_url, '.php')) {
     if (preg_match('/cat[0-9]+-?/', $orig_url)) {
         include_once('tiki-sefurl.php');
         $orig_url = filter_out_sefurl(preg_replace('#(.*)\/cat([0-9]+)(.*)#', '$1/tiki-browse_categories.php?parentId=$2$3', $orig_url), 'category');
     } elseif (preg_match('/article[0-9]+-?/', $orig_url)) {
         $orig_url = preg_replace('#\/article([0-9]+)(.*)#', '/tiki-read_article.php?articleId=$1', $orig_url);
     } else {
-        if (str_contains($orig_url, '?')) {
+        if (strpos($orig_url, '?') !== false) {
             $orig_url = preg_replace('#\/([^\/\?]+)\?(.*)?$#', '/tiki-index.php?page=$1&$2', $orig_url);
         } else {
             $orig_url = preg_replace('#\/([^\/\?]+)$#', '/tiki-index.php?page=$1', $orig_url);
         }
     }
-} elseif (! str_contains($orig_url, '.php')) {
+} elseif (! strstr($orig_url, '.php')) {
     $orig_url = preg_replace('#\/([^\/\?]+)(\?.*)?$#', '/tiki-index.php?page=$1', $orig_url);
     $params = parse_url($orig_url);
     if (empty($params['query'])) {
@@ -66,10 +90,10 @@ if ($prefs['feature_sefurl'] == 'y' && ! str_contains($orig_url, '.php')) {
     }
 }
 
-if (str_contains($orig_url, 'tiki-index.php') || str_contains($orig_url, 'tiki-read_article.php')) {
+if (strstr($orig_url, 'tiki-index.php') || strstr($orig_url, 'tiki-read_article.php')) {
     $multilinguallib = TikiLib::lib('multilingual');
     $orig_url = urldecode($orig_url);
-    if (! ($txt = strstr($orig_url, '?'))) {
+    if (($txt = strstr($orig_url, '?')) == false) {
         $txt = '';
     } else {
         $txt = substr($txt, 1);
@@ -117,11 +141,8 @@ if (str_contains($orig_url, 'tiki-index.php') || str_contains($orig_url, 'tiki-r
     if ($item_query) {
         if (
             $prefs['feature_sefurl'] != 'y'
-            && ! str_contains($_SERVER['HTTP_REFERER'], 'tiki-index.php')
-            && ! str_contains(
-                $_SERVER['HTTP_REFERER'],
-                'tiki-read_article.php'
-            )
+            && ! strstr($_SERVER['HTTP_REFERER'], 'tiki-index.php')
+            && ! strstr($_SERVER['HTTP_REFERER'], 'tiki-read_article.php')
         ) {
             $orig_url = $orig_url . "&" . $item_query;
         }
@@ -129,11 +150,19 @@ if (str_contains($orig_url, 'tiki-index.php') || str_contains($orig_url, 'tiki-r
 }
 
 if (isset($_GET['language'])) {
-    Language::setCurrentLanguage($_GET['language']);
+    setLanguage($_GET['language']);
 }
 
 if (isset($_GET['languageAdmin'])) {
-    Language::setCurrentLanguage($_GET['languageAdmin'], true);
+    setLanguage($_GET['languageAdmin'], true);
 }
+
+if ($referrerLanguagePrefix !== null) {
+    $orig_url = preg_replace('#/' . preg_quote($referrerLanguagePrefix, '#') . '(?=/|$)#', '', $orig_url, 1);
+    if ($orig_url === '') {
+        $orig_url = '/';
+    }
+}
+
 header("location: $orig_url");
 exit;
