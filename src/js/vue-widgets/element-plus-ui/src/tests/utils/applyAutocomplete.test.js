@@ -17,18 +17,20 @@ describe("applyAutocomplete", () => {
         expect(givenInput.style.display).toBe("none");
     });
 
-    test("should set the placeholder and value-key attributes on the autocomplete element when provided", () => {
+    test("should set the placeholder, value-key, and remoteQueryKey attributes on the autocomplete element when provided", () => {
         const givenInput = document.createElement("input");
         document.body.appendChild(givenInput);
         const givenRemoteSourceUrl = "https://foo.bar";
         const givenValueKey = "foo";
+        const givenRemoteQueryKey = "bar";
         givenInput.setAttribute("placeholder", "bar");
 
-        applyAutocomplete(givenInput, { remoteSourceUrl: givenRemoteSourceUrl, valueKey: givenValueKey });
+        applyAutocomplete(givenInput, { remoteSourceUrl: givenRemoteSourceUrl, valueKey: givenValueKey, remoteQueryKey: givenRemoteQueryKey });
 
         const expectedAutoCompleteElement = givenInput.nextElementSibling;
         expect(expectedAutoCompleteElement.getAttribute("placeholder")).toBe("bar");
         expect(expectedAutoCompleteElement.getAttribute("value-key")).toBe(givenValueKey);
+        expect(expectedAutoCompleteElement.getAttribute("remote-query-key")).toBe(givenRemoteQueryKey);
     });
 
     test("should set the 'transform-result-fn' attribute on the autocomplete element when a transformResultCb is provided", () => {

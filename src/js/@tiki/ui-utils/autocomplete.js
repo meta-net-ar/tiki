@@ -1,12 +1,13 @@
 import { applyAutocomplete } from "@vue-widgets/el-autocomplete";
 
 export default function autocomplete(element, resourceType, options = {}) {
-    const { url, sourceList, valueKey, transformResultCb } = getAutocompleteResources(resourceType, options);
+    const { url, sourceList, valueKey, transformResultCb, customRemoteQueryKey } = getAutocompleteResources(resourceType, options);
     const autocompleteOptions = {
         remoteSourceUrl: url,
         sourceList,
         valueKey,
         transformResultCb,
+        remoteQueryKey: customRemoteQueryKey,
     };
 
     if (resourceType == "pagename" && ($(element).attr("name") == "highlight" || /^search_mod_input_\d|highlight$/.test($(element).attr("id")))) {
@@ -52,6 +53,7 @@ export function getAutocompleteResources(type, options = {}) {
     let sourceList = [];
     let valueKey = null;
     let transformResultCb = null;
+    let customRemoteQueryKey = null;
 
     const urlParams = new URLSearchParams(window.location.search);
     const excludepage = urlParams.get("page");
@@ -113,6 +115,7 @@ export function getAutocompleteResources(type, options = {}) {
                     object_id: item.title,
                 }));
             };
+            customRemoteQueryKey = "filter~content";
             break;
         default:
             remoteSourceUrl = null;
@@ -122,5 +125,5 @@ export function getAutocompleteResources(type, options = {}) {
 
     const url = remoteSourceUrl ? window.location.origin + (window.tikiroot || "/") + remoteSourceUrl : null;
 
-    return { url, sourceList, valueKey, transformResultCb };
+    return { url, sourceList, valueKey, transformResultCb, customRemoteQueryKey };
 }

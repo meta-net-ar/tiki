@@ -164,7 +164,13 @@ describe("Autocomplete", () => {
             const input = screen.getByTestId("autocomplete-input");
             await fireEvent.change(input, { target: { value: "foo" } });
 
-            expect(fetchSuggestions).toHaveBeenCalledWith("foo", expect.any(Function), remoteSourceUrl, sourceList ? JSON.parse(sourceList) : []);
+            expect(fetchSuggestions).toHaveBeenCalledWith(
+                "foo",
+                expect.any(Function),
+                remoteSourceUrl,
+                sourceList ? JSON.parse(sourceList) : [],
+                givenProps.remoteQueryKey
+            );
             expect(givenProps._expose).toHaveBeenCalled({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
 
             const fecthSuggestionsCb = fetchSuggestions.mock.calls[0][1];

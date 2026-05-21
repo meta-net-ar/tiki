@@ -3,7 +3,18 @@ import { onMounted, ref, watch } from 'vue';
 import { fetchSuggestions } from '../../helpers/autocomplete/remote';
 import ConfigWrapper from '../ConfigWrapper.vue';
 
-const props = defineProps(['_expose', 'value', 'remoteSourceUrl', 'sourceList', 'emitCustomEvent', 'placeholder', 'valueKey', 'language', 'transformResultFn']);
+const props = defineProps([
+    '_expose',
+    'value',
+    'remoteSourceUrl',
+    'sourceList',
+    'emitCustomEvent',
+    'placeholder',
+    'valueKey',
+    'language',
+    'transformResultFn',
+    'remoteQueryKey',
+]);
 
 const valueKey = props.valueKey || 'value';
 const placeholder = props.placeholder || TEXT.INPUT_PLACEHOLDER;
@@ -37,7 +48,7 @@ const handleFetchSuggestions = (query, callback) => {
             shouldRefocusOnBlur.value = true;
         }
     };
-    fetchSuggestions(query, wrappedCallback, props.remoteSourceUrl, (props.sourceList ? JSON.parse(props.sourceList): []));
+    fetchSuggestions(query, wrappedCallback, props.remoteSourceUrl, (props.sourceList ? JSON.parse(props.sourceList): []), props.remoteQueryKey);
 }
 
 const handleBlur = () => {
