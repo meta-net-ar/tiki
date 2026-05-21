@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Search\Query\Aggregation\AggregationInterface;
+
 class Search_Query implements Search_Query_Interface
 {
     private $objectList;
@@ -15,11 +18,17 @@ class Search_Query implements Search_Query_Interface
     private $identifierFields = null;
     private $selectionFields = null;
     private $countOnly = false;
+    private bool $streamingMode = false;
+    private ?int $scrollBatchSize = null;
 
     private $postFilter;
     private $processDidYouMean = false;
     private $subQueries = [];
     private $facets = [];
+    /**
+     * @var AggregationInterface[]
+     */
+    private $aggregations = [];
     private $foreignQueries = [];
     private $transformations = [];
     private $returnOnlyResultList = [];
@@ -65,6 +74,29 @@ class Search_Query implements Search_Query_Interface
     public function getSelectionFields()
     {
         return $this->selectionFields;
+    }
+
+    public function setStreamingMode(bool $streaming): void
+    {
+        $this->streamingMode = $streaming;
+    }
+
+    public function isStreamingMode(): bool
+    {
+        return $this->streamingMode;
+    }
+
+    public function setScrollBatchSize(?int $size): void
+    {
+        if ($size !== null && $size < 1) {
+            throw new InvalidArgumentException('scroll batch size must be a positive integer');
+        }
+        $this->scrollBatchSize = $size;
+    }
+
+    public function getScrollBatchSize(): ?int
+    {
+        return $this->scrollBatchSize;
     }
 
     public function getCyphtSearch()
@@ -388,6 +420,11 @@ class Search_Query implements Search_Query_Interface
         }
     }
 
+    public function hasExplicitSortOrder(): bool
+    {
+        return $this->sortOrder !== null;
+    }
+
     /**
      * @param Search_Index_Interface $index
      * @param string $multisearchId : When provided, it means that the current query is to be added to an
@@ -474,6 +511,9 @@ class Search_Query implements Search_Query_Interface
     {
         $this->finalize();
 
+        $previousStreamingMode = $this->streamingMode;
+        $this->streamingMode = true;
+
         try {
             if ($this->cyphtSearch) {
                 $index = new \Search\Index\Cypht();
@@ -490,6 +530,8 @@ class Search_Query implements Search_Query_Interface
         } catch (Exception $e) {
             Feedback::error(tr('Malformed search query:') . ' ' . $e->getMessage());
             trigger_error($e->getMessage(), E_USER_WARNING);
+        } finally {
+            $this->streamingMode = $previousStreamingMode;
         }
     }
 
@@ -643,6 +685,34 @@ class Search_Query implements Search_Query_Interface
     public function getFacets()
     {
         return $this->facets;
+    }
+
+    /**
+     * Request a server-side aggregation (group-by / metric / nested) to be
+     * pushed down to the index backend. Backends that cannot fulfil the
+     * aggregation will silently omit it from the result set.
+     */
+    public function addAggregation(AggregationInterface $aggregation)
+    {
+        $this->aggregations[$aggregation->getName()] = $aggregation;
+    }
+
+    /**
+     * @return AggregationInterface[]
+     */
+    public function getAggregations()
+    {
+        return $this->aggregations;
+    }
+
+    public function hasAggregations()
+    {
+        return ! empty($this->aggregations);
+    }
+
+    public function clearAggregations(): void
+    {
+        $this->aggregations = [];
     }
 
     public function includeForeign($indexName, Search_Query $query)

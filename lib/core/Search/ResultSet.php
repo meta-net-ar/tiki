@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Search\ResultSet\AggregationResult;
+
 class Search_ResultSet extends ArrayObject implements JsonSerializable
 {
     private $count;
@@ -13,6 +15,10 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
 
     protected $highlightHelper;
     private $filters = [];
+    /**
+     * @var array<string, AggregationResult>
+     */
+    private $aggregations = [];
     private $id;
     private $tsOn;
     private $tsettings;
@@ -46,6 +52,7 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
         $return = new self($list, $this->count, $this->offset, $this->maxRecords);
         $return->estimate = $this->estimate;
         $return->filters = $this->filters;
+        $return->aggregations = $this->aggregations;
         $return->highlightHelper = $this->highlightHelper;
         $return->id = $this->id;
         $return->tsOn = $this->tsOn;
@@ -213,6 +220,36 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
     public function addFacetFilter(Search_ResultSet_FacetFilter $facet)
     {
         $this->filters[$facet->getName()] = $facet;
+    }
+
+    /**
+     * Attach a server-side aggregation result (typically by an index backend
+     * during find()).
+     */
+    public function setAggregationResult(AggregationResult $result): void
+    {
+        $this->aggregations[$result->getName()] = $result;
+    }
+
+    /**
+     * @return AggregationResult|null
+     */
+    public function getAggregation(string $name): ?AggregationResult
+    {
+        return $this->aggregations[$name] ?? null;
+    }
+
+    /**
+     * @return array<string, AggregationResult>
+     */
+    public function getAggregationResults(): array
+    {
+        return $this->aggregations;
+    }
+
+    public function hasAggregations(): bool
+    {
+        return ! empty($this->aggregations);
     }
 
     public function groupBy($field, array $collect = [])

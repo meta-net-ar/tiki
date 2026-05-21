@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Search\ResultSet\AggregationResult;
 use Tiki\Smarty\SmartyTiki;
 
 class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_Interface
@@ -131,6 +132,13 @@ class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_
                 $entries->getFacets()
             )
         );
+        // Server-side aggregations ({group} / {metric}) flattened to plain
+        // arrays so templates can iterate them directly.
+        $aggregations = [];
+        foreach ($entries->getAggregationResults() as $aggName => $aggResult) {
+            $aggregations[$aggName] = $this->aggregationToArray($aggResult);
+        }
+        $smarty->assign('aggregations', $aggregations);
         $smarty->assign('count', count($entries));
         $smarty->assign('offset', $entries->getOffset());
         $smarty->assign('offsetplusone', $entries->getOffset() + 1);
@@ -158,6 +166,49 @@ class Search_Formatter_Plugin_SmartyTemplate implements Search_Formatter_Plugin_
         }
 
         return $r;
+    }
+
+    /**
+     * Recursively flatten an AggregationResult tree so Smarty
+     * templates can iterate it without dealing with PHP objects.
+     */
+    private function aggregationToArray(AggregationResult $result): array
+    {
+        if (! $result->isBucket()) {
+            return [
+                'kind' => $result->getKind(),
+                'is_bucket' => false,
+                'value' => $result->getValue(),
+            ];
+        }
+        $buckets = [];
+        foreach ($result->getBuckets() as $bucket) {
+            $children = [];
+            foreach ($bucket['children'] as $childName => $childResult) {
+                $children[$childName] = $this->aggregationToArray($childResult);
+            }
+            $buckets[] = [
+                'key' => $bucket['key'],
+                'doc_count' => $bucket['doc_count'],
+                'metrics' => $bucket['metrics'],
+                'children' => $children,
+            ];
+        }
+        $out = [
+            'kind' => $result->getKind(),
+            'is_bucket' => true,
+            'buckets' => $buckets,
+            'sum_other_doc_count' => $result->getSumOtherDocCount(),
+        ];
+        $groupLabel = $result->getLabel();
+        if ($groupLabel !== null) {
+            $out['label'] = $groupLabel;
+        }
+        $metricLabels = $result->getMetricLabels();
+        if ($metricLabels !== []) {
+            $out['metric_labels'] = $metricLabels;
+        }
+        return $out;
     }
 
     private function wrapEditableByContext($content)

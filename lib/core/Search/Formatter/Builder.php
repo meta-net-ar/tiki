@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Search\Formatter\Plugin\AggregationTemplate;
 use Search\Formatter\Sublist\Parser as SublistParser;
 use Tiki\WikiParser\PluginMatcherMatch;
 
@@ -257,6 +258,12 @@ class Search_Formatter_Builder
                 $arguments['template'] = __DIR__ . '/../../../../templates/search/list/debug.tpl';
             } elseif ($arguments['template'] == 'json') {
                 $arguments['template'] = __DIR__ . '/../../../../templates/search/list/json_encode.tpl';
+            } elseif ($arguments['template'] == 'aggregate_table') {
+                $arguments['template'] = __DIR__ . '/../../../../templates/search/list/aggregate_table.tpl';
+            } elseif ($arguments['template'] == 'chartjs') {
+                $arguments['template'] = __DIR__ . '/../../../../templates/search/list/chartjs.tpl';
+            } elseif ($arguments['template'] == 'chartjs_full') {
+                $arguments['template'] = __DIR__ . '/../../../../templates/search/list/chartjs_full.tpl';
             } elseif (! file_exists($arguments['template'])) {
                 $temp = $smarty->get_filename($arguments['template']);
                 if (empty($temp)) { //if get_filename cannot find template, return error
@@ -352,6 +359,8 @@ class Search_Formatter_Builder
             }
         } elseif (isset($arguments['report'])) {
             $plugin = new Search_Formatter_Plugin_ReportTemplate($output->getBody());
+        } elseif (isset($arguments['aggregation'])) {
+            $plugin = new AggregationTemplate($output->getBody());
         } else {
             $plugin = new Search_Formatter_Plugin_WikiTemplate($output->getBody());
         }

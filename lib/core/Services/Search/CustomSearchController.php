@@ -7,6 +7,7 @@
 // Controller to process requests from the custom search plugin using the list plugin to display results
 // Refactored from customsearch_ajax.php for Tiki
 
+use Search\Query\Aggregation\QueryFacade as AggregationFacade;
 use Tiki\Lib\Wiki\PluginsLibUtil;
 
 class Services_Search_CustomSearchController
@@ -52,6 +53,8 @@ class Services_Search_CustomSearchController
         $builder = $definition['builder'];
         /** @var Search_Query_FacetWikiBuilder $facetsBuilder */
         $facetsBuilder = $definition['facets'];
+        /** @var AggregationFacade|null $aggFacade */
+        $aggFacade = $definition['aggFacade'] ?? null;
 
         $tsettings = $definition['tsettings'] ?? null;
         $tsret = $definition['tsret'];
@@ -192,7 +195,11 @@ class Services_Search_CustomSearchController
 
         $index = $unifiedsearchlib->getIndex();
         PluginsLibUtil::handleDownload($query, $index, $matches, $input->asArray());
-        $resultSet = $query->search($index);
+        if ($aggFacade !== null) {
+            $resultSet = $aggFacade->searchWithAggregations($query, $index);
+        } else {
+            $resultSet = $query->search($index);
+        }
         if (! empty($_SESSION['tikifeedback']) && $_SESSION['tikifeedback'][0]['type'] === 'error') {
             Feedback::sendHeaders();
         } else {

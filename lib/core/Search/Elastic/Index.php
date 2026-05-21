@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Search\Elastic\AggregationBuilder;
+use Search\Elastic\AggregationReader;
+
 class Search_Elastic_Index implements Search_Index_Interface, Search_Index_QueryRepository
 {
     private $connection;
@@ -401,6 +404,12 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
             $builder = new Search_Elastic_FacetBuilder($this->facetCount, $this->connection->getVersion() >= 2.0, $this->connection->getVersion() >= 8.0, $this);
             $facetPart = $builder->build($query->getFacets());
 
+            $aggregationPart = [];
+            if ($query->hasAggregations()) {
+                $aggBuilder = new AggregationBuilder($this);
+                $aggregationPart = $aggBuilder->build($query->getAggregations());
+            }
+
             if ($this->connection->getVersion() >= 6.0 && $query->getSortOrder()->hasField(Search\Query\Order::FIELD_SCORE)) {
                 $builder = new Search_Elastic_RescoreQueryBuilder();
                 $rescorePart = $builder->build($query->getExpr());
@@ -477,12 +486,13 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
                 $queryPart,
                 $orderPart,
                 $facetPart,
+                $aggregationPart,
                 $rescorePart,
                 $postFilterPart,
                 $sourcePart,
                 [
                     "from" => $resultStart,
-                    "size" => $resultCount,
+                    "size" => (int) $resultCount,
                     "highlight" => [
                         "tags_schema" => "styled",
                         "fields" => [
@@ -597,6 +607,16 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
         $resultSet = new Search_Elastic_ResultSet($entries, $hits->total, $resultStart, $resultCount);
         if (! empty($didYouMean)) {
             $resultSet->setDidYouMean(implode(' ', $correctKeywords));
+        }
+
+        if ($query->hasAggregations()) {
+            $aggReader = new AggregationReader($result);
+            foreach ($query->getAggregations() as $agg) {
+                $aggResult = $aggReader->read($agg);
+                if ($aggResult !== null) {
+                    $resultSet->setAggregationResult($aggResult);
+                }
+            }
         }
 
         $reader = new Search_Elastic_FacetReader($result);
@@ -723,44 +743,56 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
 
     public function scroll(Search_Query_Interface $query)
     {
-        $builder = new Search_Elastic_OrderBuilder($this);
-        $orderPart = $builder->build($query->getSortOrder());
-
         $builder = new Search_Elastic_QueryBuilder($this);
         $builder->setDocumentReader($this->createDocumentReader());
         $queryPart = $builder->build($query->getExpr());
 
         $indices = [$this->index];
 
+        $batchSize = method_exists($query, 'getScrollBatchSize')
+            ? ($query->getScrollBatchSize() ?? 1000)
+            : 1000;
+
+        if (method_exists($query, 'hasExplicitSortOrder') && $query->hasExplicitSortOrder()) {
+            $orderBuilder = new Search_Elastic_OrderBuilder($this);
+            $orderPart = $orderBuilder->build($query->getSortOrder());
+        } else {
+            $orderPart = ['sort' => ['_doc']];
+        }
+
         $fullQuery = array_merge(
             $queryPart,
             $orderPart,
-            [
-                "size" => 100,
-                "highlight" => [
-                    "fields" => [
-                        'contents' => [
-                            "number_of_fragments" => 5,
-                        ],
-                        'file' => [
-                            "number_of_fragments" => 5,
-                        ],
-                    ],
-                ],
-            ]
+            ['size' => $batchSize]
         );
 
+        if (method_exists($query, 'getSelectionFields') && ($selection = $query->getSelectionFields())) {
+            $fullQuery['_source'] = array_values($selection);
+        }
+
         $args = ['scroll' => '5m'];
-        $result = $this->connection->search($indices, $fullQuery, $args);
-        $scrollId = $result->_scroll_id;
 
-        do {
-            foreach ($result->hits->hits as $entry) {
-                yield (array) $entry->_source;
+        $scrollId = null;
+        try {
+            $result = $this->connection->search($indices, $fullQuery, $args);
+            $scrollId = $result->_scroll_id ?? null;
+
+            while (! empty($result->hits->hits)) {
+                foreach ($result->hits->hits as $entry) {
+                    yield (array) $entry->_source;
+                }
+
+                if (! $scrollId) {
+                    break;
+                }
+
+                $result = $this->connection->scroll($scrollId, $args);
+                // The server is allowed to issue a new cursor id between batches.
+                $scrollId = $result->_scroll_id ?? $scrollId;
             }
-
-            $result = $this->connection->scroll($scrollId, $args);
-        } while (count($result->hits->hits) > 0);
+        } finally {
+            $this->connection->clearScroll($scrollId);
+        }
     }
 
     public function getTypeFactory()

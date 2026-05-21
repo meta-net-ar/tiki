@@ -24,6 +24,16 @@ class Search_MySql_Index implements Search_Index_Interface
         $this->tfTranslator = new Search_MySql_TrackerFieldTranslator();
     }
 
+    public function getTable(): Search_MySql_Table
+    {
+        return $this->table;
+    }
+
+    public function getQueryBuilder(): Search_MySql_QueryBuilder
+    {
+        return $this->builder;
+    }
+
     public function destroy()
     {
         $this->table->drop();
@@ -164,6 +174,8 @@ class Search_MySql_Index implements Search_Index_Interface
 
     public function find(Search_Query_Interface $query, $resultStart, $resultCount)
     {
+        $streaming = method_exists($query, 'isStreamingMode') && $query->isStreamingMode();
+
         try {
             $words = $query->getWords();
             $condition = $this->builder->build($query->getExpr());
@@ -209,7 +221,7 @@ class Search_MySql_Index implements Search_Index_Interface
             }
 
             $count = $this->table->fetchCountIndex($conditions);
-            if ($query->processDidYouMean() && $count === 0) {
+            if (! $streaming && $query->processDidYouMean() && $count === 0) {
                 // Try to create levenshtein function
                 $levenshteinFunctionName = $this->createLevenshteinFunction();
                 if ($levenshteinFunctionName) {
@@ -332,7 +344,9 @@ SQL;
 
     public function scroll(Search_Query_Interface $query)
     {
-        $perPage = 100;
+        $perPage = method_exists($query, 'getScrollBatchSize')
+            ? ($query->getScrollBatchSize() ?? 1000)
+            : 1000;
         $hasMore = true;
 
         for ($from = 0; $hasMore; $from += $perPage) {
