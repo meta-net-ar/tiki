@@ -597,7 +597,7 @@ function prefs_feature_list($partial = false)
         ],
         'feature_purifier' => [
             'name' => tra('HTML purifier'),
-            'description' => tra("HTML Purifier is a standards-compliant HTML filter library written in PHP and integrated in Tiki. HTML Purifier will not only remove all malicious code (better known as XSS) with a thoroughly audited, secure yet permissive whitelist, it will also ensure that your documents are standards-compliant. Since Tiki 29, HTML5 Purifier has been added to Tiki to make it HTML5 compatible."),
+            'description' => tra("HTML Purifier is a standards-compliant HTML filter library written in PHP and integrated in Tiki. HTML Purifier will not only remove all malicious code (better known as XSS) with a thoroughly audited, secure yet permissive whitelist, it will also ensure that your documents are standards-compliant."),
             'hint' => tra('If you use HTML in your wiki page and it gets stripped out or rewritten, make sure your HTML is valid, or de-activate this feature.'),
             'help' => 'Purifier',
             'type' => 'flag',
