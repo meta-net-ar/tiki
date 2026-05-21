@@ -132,7 +132,7 @@ function wikiplugin_youtube($data, $params)
 {
     global $tikilib;
 
-     $plugininfo = wikiplugin_youtube_info();
+    $plugininfo = wikiplugin_youtube_info();
     foreach ($plugininfo['params'] as $key => $param) {
         $default["$key"] = $param['default'];
     }
@@ -144,11 +144,12 @@ function wikiplugin_youtube($data, $params)
 
     $scheme = $tikilib->httpScheme();
 
-    $sYoutubeId  = getYoutubeId($params['movie']);
-    if (empty($sYoutubeId)) {
+    $youtubeInfo = getYoutubeId($params['movie']);
+    if (! $youtubeInfo || empty($youtubeInfo['id'])) {
         Feedback::error(tra('Invalid YouTube URL provided'));
         return '';
     }
+    $sYoutubeId = $youtubeInfo['id'];
 
     if ($params['privacyEnhanced'] == 'y') {
         $fqdn = 'www.youtube-nocookie.com';
@@ -194,26 +195,44 @@ function getYoutubeId($sYoutubeUrl)
 {
     $aParsedUrl = parse_url($sYoutubeUrl);
     if ($aParsedUrl !== false && ! empty($aParsedUrl['host'])) {
-        if (
-            $aParsedUrl['host'] !== 'youtube.com'
-            && $aParsedUrl['host'] !== 'www.youtube.com'
-            && $aParsedUrl['host'] !== 'youtu.be'
-            && $aParsedUrl['host'] !== 'www.youtu.be'
-        ) {
+        $host = strtolower($aParsedUrl['host']);
+        $validHosts = [
+            'youtube.com', 'www.youtube.com',
+            'youtu.be', 'www.youtu.be',
+            'youtube-nocookie.com', 'www.youtube-nocookie.com',
+        ];
+        if (! in_array($host, $validHosts, true)) {
             return false;
         }
-        if ($aParsedUrl['host'] === 'youtu.be') {
-            $sYoutubeId = str_replace('/', '', $aParsedUrl['path']);
-            return $sYoutubeId;
+
+        if ($host === 'youtu.be' || $host === 'www.youtu.be') {
+            $id = preg_replace('#/.*$#', '', ltrim($aParsedUrl['path'], '/'));
+            if (empty($id)) {
+                return false;
+            }
+            return ['id' => $id, 'type' => 'video'];
         }
-        if ($aParsedUrl['host'] === 'youtube.com' || $aParsedUrl['host'] === 'www.youtube.com') {
-            parse_str(parse_url($sYoutubeUrl, PHP_URL_QUERY), $aQueryString);
-            return $aQueryString["v"];
+        // youtube.com, youtube-nocookie.com, etc.
+        if (isset($aParsedUrl['path'])) {
+            // /watch?v=ID (strict match)
+            if ($aParsedUrl['path'] === '/watch') {
+                parse_str($aParsedUrl['query'] ?? '', $aQueryString);
+                if (empty($aQueryString['v'])) {
+                    return false;
+                }
+                return ['id' => $aQueryString['v'], 'type' => 'video'];
+            }
+            // /v/ID, /e/ID, /embed/ID, /shorts/ID, /live/ID
+            if (preg_match('#^/(v|e|embed|shorts|live)/([\w\-_]+)#', $aParsedUrl['path'], $matches)) {
+                $type = $matches[1];
+                $id = $matches[2];
+                return ['id' => $id, 'type' => $type];
+            }
         }
     } elseif (preg_match('/^([\w\-_]+)$/', $sYoutubeUrl, $matches)) {
-        $sYoutubeId = $sYoutubeUrl;
+        return ['id' => $matches[1], 'type' => 'video'];
     } else {
         return false;
     }
-    return $sYoutubeId;
+    return false;
 }
