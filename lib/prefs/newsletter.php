@@ -44,5 +44,14 @@ function prefs_newsletter_list()
                 'feature_newsletters',
             ],
         ],
+        'newsletter_validate_email_dns' => [
+            'name' => tra('Validate newsletter recipient domains using DNS/MX'),
+            'description' => tra('Verify recipient email domains exist and have valid mail exchange (MX) records before sending newsletters.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'dependencies' => [
+                'feature_newsletters',
+            ],
+        ],
     ];
 }

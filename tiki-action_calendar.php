@@ -29,16 +29,13 @@ $inputConfiguration = [
 include 'tiki-setup.php';
 
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 
-$tikicalendarlib = TikiLib::lib('tikicalendar');
 $access->check_feature('feature_action_calendar');
 $access->check_permission('tiki_p_view_tiki_calendar');
+$tikicalendarlib = TikiLib::lib('tikicalendar');
 //get_strings tra('Tiki Calendar')
-
-$headerlib->add_cssfile('themes/base_files/feature_css/calendar.css', 20);
-
 $myurl = 'tiki-action_calendar.php';
 include_once("tiki-calendar_setup.php");
 

@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'            => [
@@ -15,7 +18,7 @@ $inputConfiguration = [
             'remove'                  => 'int',         //post
             'removeall'               => 'bool',         //post
             'cookie'                  => 'striptags',    //post
-            'sort_mode'               => 'striptags',    //post
+            'sort_mode'               => 'word',         //post
             'offset'                  => 'digits',       //post
             'find'                    => 'striptags',    //post
             'save'                    => 'bool',         //post
@@ -26,7 +29,7 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 include_once('lib/taglines/taglinelib.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 
 $access->check_permission('tiki_p_edit_cookies');
@@ -103,11 +106,10 @@ if (isset($_REQUEST["save"]) && $access->checkCsrf()) {
     $smarty->assign("cookieId", '0');
     $smarty->assign('cookie', '');
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'cookieId_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'cookieId_desc',
+    ['tiki_cookies']
+);
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 $find = $_REQUEST["find"] ?? '';

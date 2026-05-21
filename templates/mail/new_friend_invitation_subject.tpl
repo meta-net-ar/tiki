@@ -1,1 +1,1 @@
-{tr}You're invited to join my {$prefs.mail_template_custom_text}network of friends!{/tr}
+{tr _0=$prefs.mail_template_custom_text}You're invited to join my %0network of friends!{/tr}

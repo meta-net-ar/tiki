@@ -129,6 +129,15 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
                         'description' => tr('Key to filter objects by using the value from the Extra Filter Field above.'),
                         'filter' => 'text',
                     ],
+                    'linkTarget' => [
+                        'name' => tr('Link Target'),
+                        'description' => tr('Control whether relation links open in the same window or a new tab.'),
+                        'filter' => 'word',
+                        'options' => [
+                            '' => tr('Same window'),
+                            '_blank' => tr('New tab'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -146,7 +155,6 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
      */
     private function getObjectRelationInstances(): array
     {
-        $relations = [];
         $relation = $this->trackerField->getOption(TrackerFieldRelation::OPT_RELATION);
         $relations = TikiLib::lib('relation')->getObjectRelations('trackeritem', $this->getItemId(), $relation);
         if ($this->trackerField->getOption(TrackerFieldRelation::OPT_INVERT)) {
@@ -349,7 +357,8 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
                 [
                     'display' => $display,
                     'relations' => $relations,
-                    'format' => $this->trackerField->getOption('format')
+                    'format' => $this->trackerField->getOption('format'),
+                    'linkTarget' => $this->trackerField->getOption('linkTarget')
                 ]
             );
         }
@@ -471,7 +480,6 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
      */
     public function handleFieldRemove()
     {
-        $trackerId = $this->getTrackerDefinition()->getConfiguration('trackerId');
         $relationlib = TikiLib::lib('relation');
         $relationlib->remove_relation_type($this->trackerField->getOption(TrackerFieldRelation::OPT_RELATION), $this->getFieldId());
     }
@@ -725,8 +733,6 @@ class Tracker_Field_Relation extends \Tracker\Field\AbstractItemField implements
      */
     public function getItemValues()
     {
-        $lib = TikiLib::lib('unifiedsearch');
-
         $data = $this->getFieldData();
         $objects = [];
         foreach ($data['relations'] as $rel) {

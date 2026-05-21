@@ -8,7 +8,10 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "dependencies": {
+  "devDependencies": {
+    "@sentry/browser": "Cannot currently be put in common-external because the esm module isn't independently usable - benoitg - 2026-03-10"
+  },
+  "devDependencies": {
     "@sentry/browser": "^10.0.0"
   }
 }

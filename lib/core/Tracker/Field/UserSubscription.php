@@ -31,10 +31,7 @@ class Tracker_Field_UserSubscription extends \Tracker\Field\AbstractItemField
     public function getFieldData(array $requestData = []): array
     {
         global $user, $jitPost;
-        $userlib = TikiLib::lib('user');
         $smarty = TikiLib::lib('smarty');
-
-        $ins_id = $this->getInsertId();
 
         if (isset($requestData[$this->getInsertId()])) {
             $value = $requestData[$this->getInsertId()];

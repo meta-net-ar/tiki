@@ -137,6 +137,7 @@
                 {preference name=cacheimages}
                 {preference name=feature_wiki_ext_icon}
                 {preference name=feature_wiki_ext_rel_nofollow}
+                {preference name=feature_wiki_show_int_link_title}
                 {preference name=popupLinks}
                 {remarksbox type='tip' title="{tr}Tip{/tr}"}
                     {tr}External links will be identified with:{/tr} {icon name="link-external"}

@@ -258,7 +258,7 @@ $tiki-dark-footer-link-hover-color: #82a653;
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
     --tiki-admin-top-nav-bg: var(--tiki-fivealive-lite-theme-bg); // #96a032;
-    --tiki-admin-top-nav-color: #1E230B;
+    --tiki-admin-top-nav-color: #FAFAFA; // #1E230B;
     --tiki-admin-top-nav-hover-color: #f2f2f2;
 //    --tiki-admin-top-nav-link-hover-bg: #{$navbar-dark-hover-color};
     --tiki-admin-aside-nav-bg: var(--tiki-fivealive-lite-theme-bg); // #96a032;
@@ -305,7 +305,7 @@ $tiki-dark-footer-link-hover-color: #82a653;
 .accordion {
     --bs-accordion-active-bg: #{$dark};
     --bs-accordion-active-color: #fff;
-    --bs-accordion-btn-bg: #6D6609; // #{$primary}; // no $bg-light
+    --bs-accordion-btn-bg: #d4c71b; // #6D6609; // #{$primary}; // no $bg-light
 }
 
 [data-bs-theme=dark] {

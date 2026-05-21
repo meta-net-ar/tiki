@@ -52,8 +52,8 @@ $table-color:                 var(--#{$prefix}body-color); // !default;
 $table-dark-color:            var(--#{$prefix}body-bg);
 
 // Forms
-$input-color:                           #073642; // Added for Element Plus
-$input-bg:                              #a9bdbd;
+$input-color:                           #a9bdbd; // #073642; // Added for Element Plus
+//$input-bg:                              #a9bdbd;
 $input-disabled-bg:                     #657b83;
 $input-group-addon-color:               #8B9C9C;
 $form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
@@ -73,6 +73,8 @@ $dropdown-divider-bg:               var(--#{$prefix}body-bg);
 $dropdown-link-color:               var(--#{$prefix}body-color);
 $dropdown-link-hover-bg:            var(--#{$prefix}body-bg);
 $dropdown-link-active-bg:           $component-active-bg; //  !default;
+
+$dropdown-dark-bg:                  #164b58; // Lightened for better contrast vs accordion buttons in admin sidebar
 
 // Pagination
 // Cards

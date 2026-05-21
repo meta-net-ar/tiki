@@ -10,6 +10,18 @@ use Tiki\Lib\Wiki\ConvertToTiki9;
 
 class HistLib extends TikiLib
 {
+    // Whitelisted aliases for tiki_lastchanges.php
+    // These are not real SQL columns but appear in get_last_changes() result
+    public $pure_aliases = [
+        'action',     // actionlog.action — Type of action performed
+        'lastModif',  // actionlog.lastModif — Timestamp of the action
+        'user',       // actionlog.user — User who performed the action
+        'ip',         // actionlog.ip — IP address used
+        'object',     // actionlog.object — Affected page name or object
+        'comment',    // history_fields.comment — Edit summary
+        'version',    // history_fields.version — Wiki page version
+        'page_id',    // history_fields.page_id — Numeric page ID
+    ];
     /*
         *   Removes a specific version of a page
         *
@@ -27,15 +39,13 @@ class HistLib extends TikiLib
         }
         $query = "delete from `tiki_history` where `pageName`=? and `version`=?";
         $result = $this->query($query, [$page,$version]);
-        $res = $this->version_exists($page, $version);
-        if (! $res) {
+        if ($result && $result->numRows() > 0) {
             $logslib = TikiLib::lib('logs');
             $logslib->add_action("Removed version", $page, 'wiki page', "version=$version");
             //get_strings tra("Removed version $version")
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     public function use_version($page, $version, $comment = '')

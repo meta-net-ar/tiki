@@ -11,7 +11,6 @@ class Validators
 
     public function __construct()
     {
-        global $prefs;
         $this->available = $this->get_all_validators();
     }
 

@@ -64,6 +64,16 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
                             'text_sort' => tr('Text'),
                         ],
                     ],
+                    'overridable' => [
+                        'name' => tr('Overridable'),
+                        'description' => tr('Allow the value to be overridden by the user. Useful when calculated value is stored in the field to avoid recalculations but still need a way to override it.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                    ],
                 ],
             ],
         ];
@@ -86,7 +96,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
 
     public function renderInput($context = [])
     {
-        return tr('Value will be re-calculated on save. Current value: %0', $this->getValue());
+        return $this->renderTemplate('trackerinput/math.tpl', $context);
     }
 
     public function renderOutput($context = [])
@@ -190,6 +200,9 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
      */
     public function handleFinalSave(array &$data)
     {
+        if ($this->getOption('overridable') && $this->getValue()) {
+            return $this->getValue();
+        }
         try {
             $this->prepareFieldValues($data);
             $data = array_merge($data, $this->calcMetadata());
@@ -387,7 +400,6 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
         $newKey = $this->getBaseKey();
 
         if (array_search($oldKey, $array) === false) {
-            var_dump($oldKey, $array);
             throw new Error("Sanity-check:  Unable to find the expected mirrorField basekey");
         }
 
@@ -457,14 +469,14 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
         global $url_host, $base_url;
 
         return [
-        'itemId' => $this->getItemId(),
-        'trackerId' => $this->getTrackerDefinition()->getConfiguration('trackerId'),
-        'creation_date' => $this->getData('created'),
-        'created_by' => $this->getData('createdBy'),
-        'modification_date' => $this->getData('lastModif'),
-        'last_modified_by' => $this->getData('lastModifBy'),
-        'domain' => $url_host,
-        'base_url' => $base_url . (substr($base_url, -1) == '/' ? '' : '/'),
+            'itemId' => $this->getItemId(),
+            'trackerId' => $this->getTrackerDefinition()->getConfiguration('trackerId'),
+            'creation_date' => $this->getData('created'),
+            'created_by' => $this->getData('createdBy'),
+            'modification_date' => $this->getData('lastModif'),
+            'last_modified_by' => $this->getData('lastModifBy'),
+            'domain' => $url_host,
+            'base_url' => $base_url . (str_ends_with($base_url ?? '', '/') ? '' : '/'),
         ];
     }
 }

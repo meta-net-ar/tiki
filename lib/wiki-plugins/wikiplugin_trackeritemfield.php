@@ -129,6 +129,7 @@ function wikiplugin_trackeritemfield($data, $params)
     $userlib = TikiLib::lib('user');
     $trklib = TikiLib::lib('trk');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_trackeritemfield_info());
     extract($params, EXTR_SKIP);
 
     if (empty($itemId) && ! empty($_REQUEST['itemId'])) {
@@ -298,9 +299,9 @@ function wikiplugin_trackeritemfield($data, $params)
                 $handler = $trklib->get_field_handler($field, $info);
                 if (! empty($params['list_mode'])) {
                     $list_mode = $params['list_mode'];
-                    $out = $handler->renderOutput(['list_mode' => $list_mode]);
+                    $out = $handler->renderOutput(['list_mode' => $list_mode, 'showlinks' => 'n']);
                 } else {
-                    $out = $handler->renderOutput(['list_mode' => 'y']);
+                    $out = $handler->renderOutput(['list_mode' => 'y', 'showlinks' => 'n']);
                 }
                 return $out;
             }

@@ -20,6 +20,7 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 include_once('lib/surveys/surveylib.php');
 use Tiki\Sections;
+use Tiki\SortModeValidator;
 $section = Sections::SECTION_SURVEYS;
 Sections::setCurrentSection($section);
 $auto_query_args = ['sort_mode', 'offset', 'find'];
@@ -27,11 +28,10 @@ $auto_query_args = ['sort_mode', 'offset', 'find'];
 $access->check_feature('feature_surveys');
 $access->check_permission('tiki_p_view_survey_stats');
 
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'created_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'created_desc',
+    ['tiki_surveys']
+);
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 $find = $_REQUEST["find"] ?? '';

@@ -11,7 +11,6 @@ class Username
 {
     public function handle($user, $login_fallback = true, $check_user_show_realnames = true, $html_encoding = true)
     {
-        global $prefs;
         $userlib = \TikiLib::lib('user');
 
         $return = $userlib->clean_user($user, ! $check_user_show_realnames, $login_fallback);

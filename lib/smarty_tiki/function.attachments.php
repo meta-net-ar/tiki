@@ -8,6 +8,6 @@
 
 function smarty_function_attachments($params, \Smarty\Template $template)
 {
-    $smartyFunctionAttachmentsHandler = new \smartytiki\FunctionHandler\Attachments();
+    $smartyFunctionAttachmentsHandler = new \SmartyTiki\FunctionHandler\Attachments();
     return $smartyFunctionAttachmentsHandler->handle($params, $template);
 }

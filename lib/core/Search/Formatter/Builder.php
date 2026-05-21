@@ -182,6 +182,11 @@ class Search_Formatter_Builder
             $plugin->setEditable($arguments['editable'], 'format' . hash('sha256', $match->getArguments() . $match->getBody()));
         }
 
+        if (isset($arguments['wysiwyg']) && method_exists($plugin, 'setWysiwyg')) {
+            $wysiwygValue = in_array($arguments['wysiwyg'], ['y', 'yes', '1', 1, true], true);
+            $plugin->setWysiwyg($wysiwygValue);
+        }
+
         $this->subFormatters[$arguments['name']] = $plugin;
     }
 

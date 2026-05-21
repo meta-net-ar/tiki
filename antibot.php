@@ -14,8 +14,23 @@ if (! $prefs['feature_antibot'] == 'y') {
 }
 
 $captchalib = TikiLib::lib('captcha');
+$challenge = $captchalib->generate();
+$type = $captchalib->type;
 
-$captchalib->generate();
-$captcha = ['captchaId' => $captchalib->getId(), 'captchaImgPath' => $captchalib->getPath()];
+if ($type === 'altcha') {
+    header('Content-Type: application/json');
+    if (! empty($challenge)) {
+        echo json_encode($challenge);
+    } else {
+        echo json_encode(['error' => 'Altcha challenge not generated.']);
+    }
+    exit;
+} else {
+    $captcha = [
+        'captchaId' => $captchalib->getId(),
+        'captchaImgPath' => $captchalib->getPath(),
+    ];
 
-echo json_encode($captcha);
+    echo json_encode($captcha);
+    exit;
+}

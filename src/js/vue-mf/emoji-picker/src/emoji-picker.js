@@ -21,6 +21,7 @@ const vueLifecycles = singleSpaVue({
     },
     handleInstance: (app) => {
         if (import.meta.env.MODE === "development") {
+            // eslint-disable-next-line no-console
             console.log(import.meta.env);
         }
     },

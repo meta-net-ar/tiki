@@ -234,7 +234,7 @@ describe("FileGalUploader", () => {
             window.opener = {
                 insertAt: vi.fn(),
             };
-            window.checkClose = vi.fn();
+            window.tikiCloseFileGalleryManagerWindow = vi.fn();
             const givenProps = {
                 maxSize: "100",
                 maxFiles: "10",
@@ -247,7 +247,7 @@ describe("FileGalUploader", () => {
             await waitFor(() => {
                 expect(window.opener.insertAt).toHaveBeenCalledWith("editwiki", "syntax mock", false, false, true);
             });
-            expect(window.checkClose).toHaveBeenCalled();
+            expect(window.tikiCloseFileGalleryManagerWindow).toHaveBeenCalled();
         });
 
         test("calls the vimeo upload callback when the file is uploaded for vimeo uploads", async () => {

@@ -711,7 +711,7 @@ setInterval(function() {
             {tr}{$php_sapi_info.message}{/tr}
         {/if}
         {if !empty($php_sapi_info.link)}
-            {tr}<a href="{$php_sapi_info.link}" class="alert-link">{$php_sapi_info.link}</a>{/tr}
+            <a href="{$php_sapi_info.link}" class="alert-link">{$php_sapi_info.link}</a>
         {/if}
         </p>
     {/if}

@@ -472,7 +472,7 @@
     </div>
     {if !empty($fileInfo.lockedby) and $user ne $fileInfo.lockedby}
         {icon name="lock"}
-        <span class="attention">{tr}The file has been locked by {$fileInfo.lockedby}{/tr}</span>
+        <span class="attention">{tr _0=$fileInfo.lockedby}The file has been locked by %0{/tr}</span>
     {/if}
 </div>
 {if not empty($metarray) and $metarray|count gt 0}

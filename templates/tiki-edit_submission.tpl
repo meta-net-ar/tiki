@@ -18,7 +18,7 @@
 </div>
 
 {remarksbox type="tip" title="{tr}Tip{/tr}"}
-    {tr}Use {$wikiPageSeparator} to separate pages in a multi-page post{/tr}
+    {tr _0=$wikiPageSeparator}Use %0 to separate pages in a multi-page post{/tr}
 {/remarksbox}
 
 <form class="styling-element" enctype="multipart/form-data" method="post" action=" " id="editpageform" novalidate>

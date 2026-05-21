@@ -61,36 +61,36 @@ body:not(.tiki-admin) .tiki-top-nav-dark
 
 
 // Apply background: transparent to children of uppermost parent to prevent nested gradients
-.tiki.layout_basic:not(.uab.tiki_admin) {
+.tiki.layout_basic:not(.tiki-admin) {
     .page-header .top_modules,
     .page-header .top_modules .navbar,
     .topbar_modules .navbar {
-        background: transparent !important;
-        --bs-bg-opacity: 0 !important;
+        background: transparent;
+        --bs-bg-opacity: 0;
         box-shadow: none;
         border: none;
     }
 }
 
-.tiki.layout_classic:not(.uab.tiki_admin) {
+.tiki.layout_classic:not(.tiki-admin) {
     .top_modules .navbar,
     .topbar,
     .topbar_modules,
     .topbar_modules .navbar {
-        background: transparent !important;
-        --bs-bg-opacity: 0 !important;
+        background: transparent;
+        --bs-bg-opacity: 0;
         box-shadow: none;
         border: none;
     }
 }
 
-.layout_social:not(.uab.tiki_admin) {
+.layout_social:not(.tiki-admin) {
     header .top_modules,
     header .top_modules .navbar,
     .topbar,
     .topbar .navbar {
-        background: transparent !important;
-        --bs-bg-opacity: 0 !important;
+        background: transparent;
+        --bs-bg-opacity: 0;
         box-shadow: none;
         border: none;
     }

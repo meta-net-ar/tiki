@@ -8,7 +8,7 @@ function wikiplugin_shopperinfo_info()
 {
     return [
         'name' => tra('Collect Anonymous Shopper Info'),
-        'documentation' => tra('PluginShopperinfo'),
+        'documentation' => 'PluginShopperinfo',
         'description' => tra('Collect shopper information for the shopping cart'),
         'prefs' => ['wikiplugin_shopperinfo', 'payment_feature'],
         'iconname' => 'cart',
@@ -54,6 +54,9 @@ function wikiplugin_shopperinfo($data, $params)
 {
     global $user;
     $smarty = TikiLib::lib('smarty');
+
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_shopperinfo_info());
+
     if ($user && ($params['showifloggedin'] != 'y') || empty($params['values'])) {
         return '';
     }

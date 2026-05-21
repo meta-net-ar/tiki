@@ -1039,6 +1039,8 @@ function wikiplugin_trackerlist($data, $params)
         'editableall' => 'n',
     ];
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_trackerlist_info());
+
     $filterfield = $params['filterfield'] ?? [];
     $filtervalue = $params['filtervalue'] ?? [];
     $exactvalue = $params['exactvalue'] ?? [];
@@ -1086,7 +1088,19 @@ function wikiplugin_trackerlist($data, $params)
         }
 
         if (! empty($filterfield) && ! empty($limit)) {
-            $limit = array_unique(array_merge($limit, $filterfield));
+            $flattenedFilterFields = [];
+            foreach ($filterfield as $ff) {
+                if (is_array($ff)) {
+                    if (! empty($ff['sqlsearch']) && is_array($ff['sqlsearch'])) {
+                        $flattenedFilterFields = array_merge($flattenedFilterFields, $ff['sqlsearch']);
+                    } elseif (! empty($ff['usersearch']) && is_array($ff['usersearch'])) {
+                        $flattenedFilterFields = array_merge($flattenedFilterFields, $ff['usersearch']);
+                    }
+                } else {
+                    $flattenedFilterFields[] = $ff;
+                }
+            }
+            $limit = array_unique(array_merge($limit, $flattenedFilterFields));
         }
 
         // for some reason if param popup is set but empty, the array contains 2 empty elements. We filter them out.
@@ -1932,10 +1946,16 @@ function wikiplugin_trackerlist($data, $params)
             $catfilternotvalue = [];
             if (! empty($filterfield)) {
                 foreach ($filterfield as $k => $ff) {
-                    if (! empty($ff['usersearch'])) {
+                    if (is_array($ff) && (! empty($ff['usersearch']) || ! empty($ff['sqlsearch']))) {
+                        continue;
+                    }
+                    if (! is_scalar($ff)) {
                         continue;
                     }
                     $filterfieldinfo = $trklib->get_tracker_field($ff);
+                    if (! is_array($filterfieldinfo) || ! isset($filterfieldinfo['type'])) {
+                        continue;
+                    }
                     if ($filterfieldinfo['type'] == 'e') {
                         $catfilters[] = $k;
                         if (! empty($filtervalue[$k]) && empty($exactvalue[$k])) {
@@ -2166,10 +2186,10 @@ function wikiplugin_trackerlist($data, $params)
                     Feedback::errorAndDie(tra("This feature is disabled, Please go into the settings and enable the calendar feature"), \Laminas\Http\Response::STATUS_CODE_401);
                 }
 
-                foreach ($items['data'] as $i => $item) {
+                for ($i = 0; $i < count($items['data']); $i++) {
                     if (! empty($wiki)) {
-                        $smarty->assign('fields', $item['field_values']);
-                        $smarty->assign('item', $item);
+                        $smarty->assign('fields', $items['data'][$i]['field_values']);
+                        $smarty->assign('item', $items['data'][$i]);
                         $smarty->assign('wiki', "wiki:$wiki");
                         $smarty->assign('showpopup', 'n');
                         try {
@@ -2179,8 +2199,8 @@ function wikiplugin_trackerlist($data, $params)
                         }
                     }
                     if (! empty($tplwiki)) {
-                        $smarty->assign('fields', $item['field_values']);
-                        $smarty->assign('item', $item);
+                        $smarty->assign('fields', $items['data'][$i]['field_values']);
+                        $smarty->assign('item', $items['data'][$i]);
                         $smarty->assign('wiki', "tplwiki:$tplwiki");
                         $smarty->assign('showpopup', 'n');
                         try {
@@ -2189,7 +2209,6 @@ function wikiplugin_trackerlist($data, $params)
                             $associatedWikiPage[$items['data'][$i]['itemId']] = $se->getMessage();
                         }
                     }
-
                     if (empty($associatedWikiPage[$items['data'][$i]['itemId']])) {
                         $associatedWikiPage[$items['data'][$i]['itemId']] = $trklib->get_isMain_value($trackerId, $item['itemId']);
                     }
@@ -2205,12 +2224,13 @@ function wikiplugin_trackerlist($data, $params)
                 foreach (array_diff(array_keys($takePermNames), $calendarfielddate) as $value) {
                     $takeKeysOfTitleAndDescriptionOfEvent[] = $value;
                 }
+
                 $urlOfFetchingData = [
                     'title' => array_key_exists($takeKeysOfTitleAndDescriptionOfEvent[0], $takePermNames) ? $takePermNames[$takeKeysOfTitleAndDescriptionOfEvent[0]] : '',
                     'description' => array_key_exists($takeKeysOfTitleAndDescriptionOfEvent[1], $takePermNames) ? $takePermNames[$takeKeysOfTitleAndDescriptionOfEvent[1]] : '',
                     'trackerId' => $trackerId,
                     'beginField' => $takePermNames[$calendarfielddate[0]],
-                    'endField' => array_key_exists($calendarfielddate[1], $takePermNames) ? $takePermNames[$calendarfielddate[0]] : null,
+                    'endField' => array_key_exists($calendarfielddate[1], $takePermNames) ? $takePermNames[$calendarfielddate[1]] : null,
                     'filters' => '',
                     'maxRecords' => 200,
                 ];
@@ -2228,7 +2248,9 @@ function wikiplugin_trackerlist($data, $params)
                         'initialView'      => 'dayGridMonth',
                     ]
                 );
+                $moduleCalendarIds = '';
                 $moduleCalendarFocusdate = date("Y-m-d");
+                $smarty->assign('moduleCalendarIds', $moduleCalendarIds);
                 $smarty->assign('associatedWikiPage', $associatedWikiPage);
                 $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
                 $smarty->assign('urlOfFetchingData', $urlOfFetchingData);
@@ -2256,7 +2278,7 @@ function wikiplugin_trackerlist($data, $params)
                 $smarty->assign('calendar_popup', $calendarpopup);
                 $smarty->assign('showpopup', 'n');
                 $headerlib = TikiLib::lib('header');
-                $headerlib->add_cssfile('themes/base_files/feature_css/calendar.css', 20);
+                $smarty->assign('uniqueId', rand());
                 return $smarty->fetch('modules/mod-calendar_new.tpl');
             }
             if (! empty($wiki)) {

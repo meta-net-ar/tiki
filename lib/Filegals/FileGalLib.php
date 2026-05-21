@@ -41,6 +41,23 @@ class FileGalLib extends TikiLib
     protected static $getGalleriesParentIdsCache = null;
     protected $loadedGalleryDefinitions = [];
 
+    // These are field names that are created by the SQL query in the FileGalLib::get_files()
+    // method and DO NOT exist as physical columns in the tiki_files or tiki_file_galleries tables.
+    // This whitelist is essential for the generic validator to safely approve them.
+    public $pure_aliases = [
+        // --- Aliases from the primary UNION query in FileGalLib::get_files() ---
+        'id',           // Aliases `tf.fileId` for files and `tfg.galleryId` for galleries.
+        'isgal',        // A constant flag: `0` for files, `1` for galleries.
+        'size',         // Aliases the `tf.filesize` column for files.
+        'type',         // Unifies `tf.filetype` and `tfg.type`.
+        'creator',      // Aliases the `user` column (the item's creator) from both tables.
+        'last_user',    // Aliases the `tf.lastModifUser` column for files.
+        // --- Aliases from common conditional JOINS ---
+        'files',        // A calculated `COUNT(*)` of items within a gallery.
+        'parentName',   // The `name` from a joined parent gallery table.
+        'source',       // Aliases the `tfg.show_source` column for galleries.
+    ];
+
     public function isPodCastGallery($galleryId, $gal_info = null)
     {
         if (empty($gal_info)) {
@@ -604,7 +621,7 @@ class FileGalLib extends TikiLib
             'direct' => null,
             'parentId' => $prefs['fgal_root_id'],
             'lockable' => 'n',
-            'archives' => 0,
+            'archives' => $prefs['fgal_file_max_archives'],
             'quota' => $prefs['fgal_quota_default'],
             'image_max_size_x' => $prefs['fgal_image_max_size_x'],
             'image_max_size_y' => $prefs['fgal_image_max_size_y'],
@@ -1814,7 +1831,6 @@ class FileGalLib extends TikiLib
         }
         if (empty($error) && $prefs['fgal_quota_per_fgal'] == 'y') {
             $list = $this->getGalleryParentsColumns($galleryId, ['galleryId', 'quota', 'size', 'name']);
-            //echo '<pre>';print_r($list);echo '</pre>';
             foreach ($list as $fgal) {
                 if (! empty($fgal['quota']) && $fgal['size'] + $size > $fgal['quota'] * 1024 * 1024) {
                     $error = tra('The upload was not completed.') . ' ' . sprintf(tra('Reason: The quota has been reached in "%s"'), $fgal['name']);
@@ -1858,7 +1874,6 @@ class FileGalLib extends TikiLib
         if (! empty($objectId)) {
             $this->internalReplaceBacklinks($objectId, $fileIds);
         }
-        //echo 'REPLACEBACKLINK'; print_r($context);print_r($fileIds);echo '<pre>'; debug_print_backtrace(); echo '</pre>';die;
     }
     protected function internalReplaceBacklinks($objectId, $fileIds = [])
     {
@@ -2010,7 +2025,6 @@ class FileGalLib extends TikiLib
             }
         }
         $fileIds = array_unique($fileIds);
-        //if (!empty($fileIds)) {echo '<pre>'; print_r($context); print_r($fileIds); echo '</pre>';}
         $this->replaceBacklinks($context, $fileIds);
         return $fileIds;
     }
@@ -4424,6 +4438,16 @@ class FileGalLib extends TikiLib
             if ($invalid) {
                 throw new Exception(tr('Orphaned file record detected: File %0 points to non-existent gallery %1', $file['fileId'] ?? 'unknown', $file['galleryId']));
             }
+        }
+    }
+
+    public function deleteObjectFiles($objectType, $objectId, $relationType = 'tiki.file.attach')
+    {
+        $relationlib = TikiLib::lib('relation');
+        $relations = $relationlib->get_relations_from($objectType, $objectId, $relationType);
+        foreach ($relations as $relation) {
+            TikiFile::id($relation['itemId'])->delete();
+            $relationlib->remove_relation($relation['relationId']);
         }
     }
 }

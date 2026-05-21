@@ -178,38 +178,60 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard') {
     }
 
     // Check database connection if available
-    if (file_exists('./db/local.php')) {
-        require_once './db/local.php';
-        if (isset($host_tiki) && isset($user_tiki) && isset($pass_tiki) && isset($dbs_tiki)) {
-            $connection = mysqli_connect($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki);
-            if ($connection) {
-                $mysql_properties['Database Connection'] = array(
-                    'fitness' => tra('good'),
-                    'fitness_status' => FITNESS_STATUS_GOOD,
-                    'setting' => 'Connected',
-                    'message' => tra('Database connection successful.')
-                );
-                mysqli_close($connection);
-            } else {
-                $mysql_properties['Database Connection'] = array(
-                    'fitness' => tra('bad'),
-                    'fitness_status' => FITNESS_STATUS_BAD,
-                    'setting' => 'Failed',
-                    'message' => tra('Database connection failed.')
-                );
-            }
-        }
+    $connection = get_tiki_check_db_connection();
+    if ($connection) {
+        $mysql_properties['Database Connection'] = array(
+            'fitness' => tra('good'),
+            'fitness_status' => FITNESS_STATUS_GOOD,
+            'setting' => 'Connected',
+            'message' => tra('Database connection successful.')
+        );
+    } else {
+        $mysql_properties['Database Connection'] = array(
+            'fitness' => tra('bad'),
+            'fitness_status' => FITNESS_STATUS_BAD,
+            'setting' => 'Failed',
+            'message' => tra('Database connection failed.')
+        );
     }
 
     // Run enhanced security checks for AJAX
     $db_permissions = check_database_config_permissions();
+    $tracker_perms = check_tracker_anonymous_permissions();
     $phpmyadmin_check = check_phpmyadmin_installations();
     $adminer_check = check_adminer_installations();
     $backup_config_check = check_backup_configuration_files();
     $directory_listing_check = check_directory_listing_vulnerabilities();
     $ssl_check = check_ssl_configuration();
 
-    $tiki_security['Database Configuration Permissions'] = $db_permissions;
+    if (! empty($db_permissions)) {
+        $tiki_security['Database Configuration Permissions'] = array(
+            'fitness' => tra('bad'),
+            'fitness_status' => FITNESS_STATUS_BAD,
+            'message' => tr('Database configuration file has insecure permissions: %0', implode(', ', $db_permissions))
+        );
+    } else {
+        $tiki_security['Database Configuration Permissions'] = array(
+            'fitness' => tra('safe'),
+            'fitness_status' => FITNESS_STATUS_SAFE,
+            'message' => tra('Database configuration file permissions are secure')
+        );
+    }
+
+    if (! empty($tracker_perms)) {
+        $tiki_security['Anonymous Tracker Permissions'] = array(
+            'fitness' => tra('risky'),
+            'fitness_status' => FITNESS_STATUS_RISKY,
+            'message' => tr('Anonymous group has global tracker permissions or dangerous defaults: %0', implode(', ', $tracker_perms))
+        );
+    } else {
+        $tiki_security['Anonymous Tracker Permissions'] = array(
+            'fitness' => tra('safe'),
+            'fitness_status' => FITNESS_STATUS_SAFE,
+            'message' => tra('Anonymous tracker permissions are secure')
+        );
+    }
+
     $tiki_security['phpMyAdmin Security'] = $phpmyadmin_check;
     $tiki_security['Adminer Security'] = $adminer_check;
     $tiki_security['Backup Configuration Files'] = $backup_config_check;
@@ -332,11 +354,27 @@ function getTikiRequirements()
 {
     return array(
         array(
+            'name'    => 'Tiki 30.x',
+            'version' => 30,
+            'php'     => array(
+                'min' => '8.1.0', // For the latest version, this should match TIKI_MIN_PHP_VERSION, but cannot use it since tiki-check is expected to run standalone
+                'max' => '8.5.99', // For the latest version, this should match TIKI_MAX_SUPPORTED_PHP_VERSION, but cannot use it since tiki-check is expected to run standalone
+            ),
+            'mariadb' => array(
+                'min' => '10.5',
+                'max' => null
+            ),
+            'mysql'   => array(
+                'min' => '8.0',
+                'max' => null
+            ),
+        ),
+        array(
             'name'    => 'Tiki 29.x',
             'version' => 29,
             'php'     => array(
-                'min' => '8.1.0', // For the latest version, this should match TIKI_MIN_PHP_VERSION, but cannot use it since tiki-check is expected to run standalone
-                'max' => '8.4.99', // For the latest version, this should match TIKI_MAX_SUPPORTED_PHP_VERSION, but cannot use it since tiki-check is expected to run standalone
+                'min' => '8.1.0',
+                'max' => '8.4.99',
             ),
             'mariadb' => array(
                 'min' => '10.5',
@@ -1373,6 +1411,12 @@ if ($php_properties['session.save_handler']['setting'] == 'files') {
     $currentSession = session_id();
     session_write_close();
 
+    // Strict mode rejects session IDs from session_create_id() that are not
+    // yet stored, so session_start() would allocate a fresh ID and break the
+    // write/read probe. Disable it for the duration of the check.
+    $strictMode = ini_get('session.use_strict_mode');
+    ini_set('session.use_strict_mode', '0');
+
     $newSession = session_create_id('tikicheck');
     session_id($newSession);
     session_start();
@@ -1383,6 +1427,8 @@ if ($php_properties['session.save_handler']['setting'] == 'files') {
     session_start();
     $writableSessionPath = isset($_SESSION['tikisession']) && count($_SESSION) === 1 && $_SESSION['tikisession'] === 'tikisession';
     session_write_close();
+
+    ini_set('session.use_strict_mode', $strictMode);
 
     session_id($currentSession);
     session_start();
@@ -3471,11 +3517,22 @@ if (! $standalone) {
             'message' => tra('Composer found')
         );
     } else {
-        $composerChecks['composer'] = array(
-            'fitness' => tra('bad'),
-            'fitness_status' => FITNESS_STATUS_BAD,
-            'message' => tra('Composer not found')
-        );
+        $lastResult = $composerManager->getComposer()->getLastResult();
+        $isTimeout = $lastResult && stripos($lastResult['errors'], 'timeout') !== false;
+
+        if ($isTimeout) {
+            $composerChecks['composer'] = array(
+                'fitness' => tra('unsure'),
+                'fitness_status' => FITNESS_STATUS_UNSURE,
+                'message' => tra('Composer check timed out. This may indicate a system-level process blocking issue (e.g. antivirus scanning) or severe resource constraints.')
+            );
+        } else {
+            $composerChecks['composer'] = array(
+                'fitness' => tra('bad'),
+                'fitness_status' => FITNESS_STATUS_BAD,
+                'message' => tra('Composer not found')
+            );
+        }
     }
 
     if (extension_loaded('bz2')) {
@@ -3543,6 +3600,22 @@ if (! empty($db_config_issues)) {
         'fitness' => tra('safe'),
         'fitness_status' => FITNESS_STATUS_SAFE,
         'message' => tra('Database configuration file permissions are secure')
+    );
+}
+
+// Check tracker anonymous permissions
+$tracker_perms_issues = check_tracker_anonymous_permissions();
+if (! empty($tracker_perms_issues)) {
+    $tiki_security['Anonymous Tracker Permissions'] = array(
+        'fitness' => tra('risky'),
+        'fitness_status' => FITNESS_STATUS_RISKY,
+        'message' => tr('Anonymous group has global tracker permissions or dangerous defaults: %0', implode(', ', $tracker_perms_issues))
+    );
+} else {
+    $tiki_security['Anonymous Tracker Permissions'] = array(
+        'fitness' => tra('safe'),
+        'fitness_status' => FITNESS_STATUS_SAFE,
+        'message' => tra('Anonymous tracker permissions are secure')
     );
 }
 
@@ -5637,6 +5710,73 @@ function check_database_config_permissions()
             if (($perms & 0x0004) || ($perms & 0x0002)) {
                 $issues[] = $file . ' is world-readable';
             }
+        }
+    }
+
+    return $issues;
+}
+
+/**
+ * Get or establish a database connection for security checks
+ * Handles both standalone mode and integrated admin mode
+ *
+ * @return mysqli|null
+ */
+function get_tiki_check_db_connection()
+{
+    static $connection = null;
+
+    if ($connection !== null) {
+        return $connection;
+    }
+
+    global $standalone;
+
+    if ($standalone === false && class_exists('\TikiDb')) {
+        $tikiDb = \TikiDb::get();
+        if ($tikiDb && isset($tikiDb->db) && $tikiDb->db instanceof \mysqli) {
+            $connection = $tikiDb->db;
+            return $connection;
+        }
+    }
+
+    // Fallback to standalone logic or if TikiDb is not available/not mysqli
+    global $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki;
+
+    if (! isset($host_tiki) || ! isset($user_tiki)) {
+        if (file_exists('db/local.php')) {
+            include 'db/local.php';
+        }
+    }
+
+    if (isset($host_tiki) && isset($user_tiki) && isset($pass_tiki) && isset($dbs_tiki)) {
+        $connection = @mysqli_connect($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki);
+    }
+
+    return $connection;
+}
+
+/**
+ * Check for anonymous tracker permissions and dangerous defaults
+ * @return array Array of security issues found
+ */
+function check_tracker_anonymous_permissions()
+{
+    $issues = array();
+    $connection = get_tiki_check_db_connection();
+
+    if ($connection) {
+        $query = "SELECT permName FROM users_grouppermissions WHERE groupName = 'Anonymous' AND permName IN ('tiki_p_list_trackers', 'tiki_p_view_trackers')";
+        $result = mysqli_query($connection, $query);
+        $permsFound = array();
+        if ($result) {
+            while ($row = mysqli_fetch_array($result)) {
+                $permsFound[] = $row['permName'];
+            }
+        }
+
+        if (! empty($permsFound)) {
+            $issues[] = tr('Anonymous group has global tracker permissions (%0). Trackers may be publicly discoverable.', implode(', ', $permsFound));
         }
     }
 

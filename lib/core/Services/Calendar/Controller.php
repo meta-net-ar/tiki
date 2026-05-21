@@ -304,8 +304,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                                 if ($return_url && ! $access->is_xml_http_request()) {
                                     $access->redirect($return_url, tr('The event was saved successfully'));
                                 }
-                                // reload the page?
-                                return [];
+                                // Ensure AJAX modals redirects
+                                return ['url' => $return_url ?: 'tiki-calendar.php'];
                             }
                         } else {
                             Feedback::error(tr('Calendar edit error')); // TODO more
@@ -368,86 +368,122 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
 
             $trackerItems = $this->calendarLib->getAttachedTrackerItems($calitemId);
         } else {
-            // new event
-            $title = tr('Calendar event : %0', tr('New'));
+            // new event or copy action
             $calitemId = 0;
-            $calendar = $calendars[0];
-            $calendarId = $input->defaultCalendarId->int() > 0 ? $input->defaultCalendarId->int() : $calendar['calendarId'];
+            $calitem = null; // Initialize to ensure clean state
+            $trackerItems = [];
+            if ($input->copy_from->int()) {
+                $copyFromId = $input->copy_from->int();
+                $input->offsetSet('calitemId', $copyFromId);
+                $copyFromId = $this->getItemId($input, 'view_events'); // Throws exception if unauthorized
+                $input->offsetSet('calitemId', 0); // Reset back to 0 for new event creation
+                $calitem = $this->calendarLib->getCopyData($copyFromId, $user);
+                if ($calitem) {
+                    $title = tr('Calendar event : %0', $calitem['name']);
+                    $calendarId = $calitem['calendarId'];
+                    $calendar = $this->calendarLib->get_calendar($calendarId);
+                    $trackerItems = $this->calendarLib->getAttachedTrackerItems($copyFromId);
+                    // Apply timezone offset for the UI form
+                    $start = new TikiDate();
+                    $start->setDate($calitem['start']);
+                    $start->setTZbyID($displayTimezone);
+                    $end = new TikiDate();
+                    $end->setDate($calitem['end']);
+                    $end->setTZbyID($displayTimezone);
 
-            $participants = [];
-            if ($user) {
-                $participants[] = [
-                    'username' => $user,
-                    'role'     => '',
-                    'partstat' => '',
-                ];
+                    $calitem['start'] = $start->getTime();
+                    $calitem['end']   = $end->getTime();
+                    $calitem['duration'] = 0;
+                }
             }
 
-            // set up default start and end
-            $dateNow->setTZbyID($displayTimezone);
-            if ($input->prefill_start->int()) {
-                $start = $input->prefill_start->int();
-                if ($input->prefill_end->int()) {
-                    $end = $input->prefill_end->int();
-                    $duration = $end - $start;
-                } else {
-                    $duration = 60 * 60;
-                    $end = $start + $duration;
-                }
-                if ($input->target_user->text()) {
-                    if ($user) {
-                        $participants[0]['role'] = '1';
-                        $participants[0]['partstat'] = 'ACCEPTED';
-                    }
+            if (empty($calitem)) {
+                $title = tr('Calendar event : %0', tr('New'));
+                $calendar = $calendars[0];
+                $calendarId = $input->defaultCalendarId->int() > 0 ? $input->defaultCalendarId->int() : $calendar['calendarId'];
+
+                $participants = [];
+                if ($user) {
                     $participants[] = [
-                        'username' => $input->target_user->text(),
-                        'role'     => '1',
+                        'username' => $user,
+                        'role'     => '',
                         'partstat' => '',
                     ];
                 }
-            } else {
-                $hour = $dateNow->date->format('H');
-                if ($input->offsetExists('todate')) {
-                    // set the correct day clicked on
-                    $dateNow->setDate($input->todate->int());
-                    $hour = $dateNow->date->format('H');
-                }
-                $tz = date_default_timezone_get();
-                date_default_timezone_set($displayTimezone);
-                $start = mktime(
-                    $hour,
-                    $dateNow->date->format('i'),
-                    $dateNow->date->format('s'),
-                    $dateNow->date->format('m'),
-                    $dateNow->date->format('d'),
-                    $dateNow->date->format('Y')
-                );
-                date_default_timezone_set($tz);
-                $duration = 60 * 60;
-                $end = $start + $duration;
-            }
+                // set up default start and end
+                $dateNow->setTZbyID($displayTimezone);
+                if ($input->prefill_start->text()) {
+                    $prefillStart = trim($input->prefill_start->text());
+                    $prefillEnd = trim((string) $input->prefill_end->text());
+                    $prefillTimezoneRequested = trim((string) $input->prefill_tz->text());
+                    $prefillTimezone = $this->resolvePrefillTimezone($prefillTimezoneRequested, $displayTimezone);
 
-            $calitem = [
-                'calitemId'             => $calitemId,
-                'calendarId'            => $calendarId,
-                'user'                  => $user,
-                'name'                  => $input->prefill_title->text(),
-                'url'                   => '',
-                'description'           => '',
-                'status'                => $calendar['defaulteventstatus'],
-                'priority'              => 0,
-                'locationId'            => 0,
-                'categoryId'            => 0,
-                'nlId'                  => 0,
-                'start'                 => $start,
-                'end'                   => $end,
-                'duration'              => $duration,
-                'recurrenceId'          => 0,
-                'allday'                => $calendar['allday'] == 'y' ? 1 : 0,
-                'organizers'            => [$user],
-                'participants'          => $participants,
-                'returnURL'             => $return_url,
-            ];
+                    $start = $this->parsePrefillDateTime($prefillStart, $prefillTimezone);
+                    if (! is_null($start) && $prefillEnd !== '') {
+                        $end = $this->parsePrefillDateTime($prefillEnd, $prefillTimezone);
+                        if (! is_null($end)) {
+                            // convert exclusive all-day selection end to inclusive end
+                            if ($this->isPrefillStartOfDay($prefillEnd, $prefillTimezone)) {
+                                $end -= 1;
+                            }
+                            if ($end <= $start) {
+                                $duration = 60 * 60;
+                                $end = $start + $duration;
+                            } else {
+                                $duration = $end - $start;
+                            }
+                        } else {
+                            $duration = 60 * 60;
+                            $end = $start + $duration;
+                        }
+                    } elseif (! is_null($start)) {
+                        $duration = 60 * 60;
+                        $end = $start + $duration;
+                    } else {
+                        [$start, $end, $duration] = $this->getDefaultStartEndDurationFromDateNow($dateNow, $displayTimezone);
+                    }
+                    if ($input->target_user->text()) {
+                        if ($user) {
+                            $participants[0]['role'] = '1';
+                            $participants[0]['partstat'] = 'ACCEPTED';
+                        }
+                        $participants[] = [
+                            'username' => $input->target_user->text(),
+                            'role'     => '1',
+                            'partstat' => '',
+                        ];
+                    }
+                } else {
+                    if ($input->offsetExists('todate')) {
+                        // set the correct day clicked on
+                        $dateNow->setTZbyID($displayTimezone);
+                        $dateNow->setDate($input->todate->text(), $displayTimezone);
+                    }
+                    [$start, $end, $duration] = $this->getDefaultStartEndDurationFromDateNow($dateNow, $displayTimezone);
+                }
+
+                $calitem = [
+                    'calitemId'             => $calitemId,
+                    'calendarId'            => $calendarId,
+                    'user'                  => $user,
+                    'name'                  => $input->prefill_title->text(),
+                    'url'                   => '',
+                    'description'           => '',
+                    'status'                => $calendar['defaulteventstatus'],
+                    'priority'              => 0,
+                    'locationId'            => 0,
+                    'categoryId'            => 0,
+                    'nlId'                  => 0,
+                    'start'                 => $start,
+                    'end'                   => $end,
+                    'duration'              => $duration,
+                    'recurrenceId'          => 0,
+                    'allday'                => $calendar['allday'] == 'y' ? 1 : 0,
+                    'organizers'            => [$user],
+                    'participants'          => $participants,
+                    'returnURL'             => $return_url,
+                ];
+            }
         }
 
         if (isset($calitem['recurrenceId']) && $calitem['recurrenceId'] > 0) {
@@ -505,7 +541,6 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
 
         if (! $input->modal->int()) {
             TikiLib::lib('header')
-                ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
                 ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
         }
 
@@ -546,6 +581,16 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             );
         }
 
+        $attachmentsGalleryId = $this->calendarLib->getAttachmentsGalleryId();
+
+        $canUploadAttachments = Perms::get(['type' => 'file gallery', 'object' => $attachmentsGalleryId])->upload_files;
+
+        // Load elFinder JS/CSS if enabled for file browsing
+        if ($prefs['fgal_elfinder_feature'] == 'y' && $prefs['fgal_tracker_existing_search'] == 'y') {
+            include_once 'lib/jquery_tiki/elfinder/tikiElFinder.php';
+            \tikiElFinder::loadJSCSS();
+        }
+
         return [
             // collections
             'daynames'                   => $this->daynames,
@@ -580,17 +625,15 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'modal'                      => $input->modal->int(),
             'displayTimezone'            => $displayTimezone,
             'timezones'                  => $timezones,
-            'prefilled'                  => $input->prefill_start->int() ? true : false,
+            'prefilled'                  => $input->prefill_start->text() ? true : false,
+            'requireParticipant'         => $input->target_user->text() !== '',
+            'hideCalendarSelector'       => $input->prefill_start->text() !== '' && $input->target_user->text() !== '',
             // related tracker items
             'trackerItems'              => ! empty($trackerItems) ? $trackerItems : [],
+            // file attachments
+            'attachmentsGalleryId'       => $attachmentsGalleryId,
+            'canUploadAttachments'       => $canUploadAttachments,
         ];
-    }
-
-    public function action_copy_item(JitFilter $input): array
-    {
-        $input->offsetSet('calitemId', 0);
-
-        return $this->action_edit_item($input);
     }
 
     /**
@@ -734,6 +777,60 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         return [];
     }
 
+    public function action_remove_calendar(JitFilter $input): array
+    {
+        $calendarId = $input->calendarId->int();
+        if (! $calendarId) {
+            throw new Services_Exception_NotFound(tr('Calendar not found'));
+        }
+
+        $calendar = $this->calendarLib->get_calendar($calendarId);
+        if (empty($calendar)) {
+            throw new Services_Exception_NotFound(tr('Calendar not found'));
+        }
+
+        if (! $this->calendarLib->canAdminCalendar($calendar)) {
+            throw new Services_Exception_Denied(tr('Permission denied'));
+        }
+
+        $util = new Services_Utilities();
+        if ($util->notConfirmPost()) {
+            $util->setVars($input, ['calendarId' => 'int']);
+
+            $calendarDisplayName = ! empty($calendar['name']) ? $calendar['name'] : tr('Id #%0', $calendarId);
+
+            $eventCount = (int) $this->calendarLib->getOne(
+                "SELECT COUNT(*) FROM `tiki_calendar_items` WHERE `calendarId` = ?",
+                [$calendarId]
+            );
+
+            $extras = [];
+            if ($eventCount === 1) {
+                $extras['warning'] = tr(
+                    'This calendar has 1 event. Deleting this calendar will permanently delete all events and cannot be undone.'
+                );
+            } elseif ($eventCount > 1) {
+                $extras['warning'] = tr(
+                    'This calendar has %0 events. Deleting this calendar will permanently delete all events and cannot be undone.',
+                    $eventCount
+                );
+            }
+
+            return $util->confirm(tr('Delete calendar "%0"?', $calendarDisplayName), tra('Delete'), $extras);
+        } elseif ($util->checkCsrf()) {
+            $result = $this->calendarLib->drop_calendar($calendarId);
+            if ($result->numRows()) {
+                Feedback::success(tr('Calendar %0 deleted', $calendarId));
+            } else {
+                Feedback::error(tr('Calendar %0 not deleted', $calendarId));
+            }
+
+            return Services_Utilities::refresh();
+        }
+
+        return [];
+    }
+
     public function action_delete_recurrent_items(JitFilter $input): array
     {
         $calitemId = $this->getItemId($input); // also checks edit perms
@@ -809,6 +906,14 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                     $calitemId = $this->calendarLib->getMaxItemId();
                 }
 
+                // Handle file attachments
+                if ($calitemId && isset($calitem['attachments'])) {
+                    $fileIds = is_array($calitem['attachments'])
+                        ? $calitem['attachments']
+                        : array_filter(explode(',', (string) $calitem['attachments']));
+                    $this->calendarLib->setEventAttachments((int) $calitemId, $fileIds);
+                }
+
                 // Save the ip at the log for the addition of new calendar items
                 if ($this->logsLib) {
                     $this->logsLib->add_action(
@@ -881,8 +986,10 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $tikidateStart->setDate($calitem['start']);
         $tikidateEnd = new TikiDate();
         $tikidateEnd->setDate($calitem['end']);
+        $duration = ($calitem['end'] - $calitem['start']);
         $recurrence->setStart($tikidateStart->format("%H%M", true));
         $recurrence->setEnd($tikidateEnd->format("%H%M", true));
+        $recurrence->setDuration($duration);
         date_default_timezone_set($tz);
         $recurrence->setAllday($calitem['allday']);
         $recurrence->setLocationId($calitem['locationId']);
@@ -907,6 +1014,89 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             $recurrence->setHideParticipants(true);
         }
         return $recurrence;
+    }
+
+    /**
+     * Build default start/end in the display timezone from current date/time context.
+     *
+     * @return array{0:int,1:int,2:int}
+     */
+    private function getDefaultStartEndDurationFromDateNow(TikiDate $dateNow, string $displayTimezone): array
+    {
+        $hour = $dateNow->date->format('H');
+        $tz = date_default_timezone_get();
+        date_default_timezone_set($displayTimezone);
+        $start = mktime(
+            $hour,
+            $dateNow->date->format('i'),
+            $dateNow->date->format('s'),
+            $dateNow->date->format('m'),
+            $dateNow->date->format('d'),
+            $dateNow->date->format('Y')
+        );
+        date_default_timezone_set($tz);
+
+        $duration = 60 * 60;
+        $end = $start + $duration;
+
+        return [$start, $end, $duration];
+    }
+
+    /**
+     * Resolve prefill timezone from request, falling back to display timezone when missing or invalid.
+     */
+    private function resolvePrefillTimezone(string $requestedTimezone, string $displayTimezone): string
+    {
+        if ($requestedTimezone === '') {
+            return $displayTimezone;
+        }
+
+        try {
+            new DateTimeZone($requestedTimezone);
+            return $requestedTimezone;
+        } catch (\Exception $e) {
+            return $displayTimezone;
+        }
+    }
+
+    /**
+     * Parse prefilled date string from calendar click/drag.
+     * Accepts timezone-aware ISO strings and falls back to display timezone when no offset is present.
+     */
+    private function parsePrefillDateTime(string $value, string $displayTimezone): ?int
+    {
+        if ($value === '') {
+            return null;
+        }
+
+        try {
+            if (preg_match('/^-?\\d+$/', $value) === 1) {
+                return (int) $value;
+            }
+
+            $date = new DateTimeImmutable($value, new DateTimeZone($displayTimezone));
+            return $date->getTimestamp();
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Detects whether a prefill value points to local start-of-day.
+     */
+    private function isPrefillStartOfDay(string $value, string $displayTimezone): bool
+    {
+        try {
+            if (preg_match('/^-?\\d+$/', $value) === 1) {
+                $date = new DateTimeImmutable('@' . $value);
+                $date = $date->setTimezone(new DateTimeZone($displayTimezone));
+            } else {
+                $date = new DateTimeImmutable($value, new DateTimeZone($displayTimezone));
+            }
+            return $date->format('H:i:s') === '00:00:00';
+        } catch (\Exception $e) {
+            return false;
+        }
     }
 
     /**

@@ -15,7 +15,6 @@ $inputConfiguration = [
             'offset'                      => 'digits',            //get
             'sort_mode'                   => 'alnumdash',         //get
             'description'                 => 'xss',               //post
-            'drop'                        => 'int',               //get
             'remove_subscription'         => 'int',               //get
             'save'                        => 'alpha',             //post
             'customlanguages'             => 'alpha',             //post
@@ -55,7 +54,7 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 
 $categlib = TikiLib::lib('categ');
@@ -106,15 +105,6 @@ if (! empty($_REQUEST['subscriptionId'])) {
     $smarty->assign('subscription', $subscription);
 }
 
-if (isset($_REQUEST["drop"]) && $access->checkCsrf(true)) {
-    $result = $calendarlib->drop_calendar($_REQUEST['calendarId']);
-    if ($result->numRows()) {
-        Feedback::success(tr('Calendar %0 deleted', (int) $_REQUEST['calendarId']));
-    } else {
-        Feedback::error(tr('Calendar %0 not deleted', (int) $_REQUEST['calendarId']));
-    }
-    $_REQUEST["calendarId"] = 0;
-}
 if (isset($_REQUEST["remove_subscription"]) && $access->checkCsrf(true)) {
     $subscription = $calendarlib->get_subscription($_REQUEST['remove_subscription']);
     if ($subscription['user'] == $user) {
@@ -380,9 +370,7 @@ if ($prefs['feature_groupalert'] == 'y') {
 
 
 if ($userlib->user_has_permission($user, 'tiki_p_add_events')) {
-    TikiLib::lib('header')
-         ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
-         ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
+    TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
 }
 
 $smarty->assign('name', $info["name"]);

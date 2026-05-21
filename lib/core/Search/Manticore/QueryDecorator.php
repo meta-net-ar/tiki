@@ -27,8 +27,6 @@ class QueryDecorator extends Decorator
 
     public function __construct(\Manticoresearch\Search $search, Index $index)
     {
-        global $prefs;
-
         parent::__construct($search, $index);
 
         $this->factory = new TypeFactory();
@@ -81,8 +79,6 @@ class QueryDecorator extends Decorator
 
     public function __invoke($callback, $node, $childNodes)
     {
-        global $prefs;
-
         if ($node instanceof ImplicitPhrase) {
             $node = $node->getBasicOperator();
         }

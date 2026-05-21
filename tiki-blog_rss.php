@@ -34,7 +34,7 @@ if ($tiki_p_read_blog != 'y') {
 $feed = 'blog';
 $id = 'blogId';
 $uniqueid = "$feed.$id=" . $_REQUEST["$id"];
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output['data'] == 'EMPTY') {
     $tmp = $bloglib->get_blog($_REQUEST["$id"]);

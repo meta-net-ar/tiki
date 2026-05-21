@@ -651,7 +651,7 @@ class SmartyTiki extends Smarty
     {
         global $prefs;
 
-        if (! Sections::isCurrentSection(Sections::SECTION_ADMIN)) {
+        if (! Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT)) {
             $selectedLayout = $prefs['site_layout'] ?? $prefs['site_layout_admin'] ?? SMARTY_DEFAULT_LAYOUT;
         } else {
             $selectedLayout = $prefs['site_layout_admin'] ?? $prefs['site_layout'] ?? SMARTY_DEFAULT_LAYOUT;
@@ -745,9 +745,13 @@ class SmartyTiki extends Smarty
         $this->addLayoutTemplatesFromTemplatePath(SMARTY_TEMPLATES_PATH);
         $this->addTemplateDir($this->main_template_dir);
 
+        // webservices create temporary templates
+        if (($prefs['feature_webservices'] ?? 'n') === 'y') {
+            $this->addTemplateDir(realpath(TEMP_CACHE_PATH));
+        }
+
         //Test templates
         $this->addTemplateDir(TIKI_PATH . '/lib/test/Core/Search/');
-        //var_dump($this->getTemplateDir());
     }
 
     /**

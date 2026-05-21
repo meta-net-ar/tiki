@@ -134,9 +134,8 @@ if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
                 $errors += $result ? 0 : 1;
             } else {
                 $tikilib->remove_user_watch($user, 'new_in_category', '*');
-                /** @var  Tiki\TikiDb\PdoResult $result */
                 $result = $tikilib->add_user_watch($user, 'new_in_category', '*', 'category', "tiki-browse_category.php");
-                $errors += $result && $result->numRows() ? 0 : 1;
+                $errors += $result ? 0 : 1;
             }
             if ($errors) {
                 Feedback::error('Errors encountered in adding category user watches');

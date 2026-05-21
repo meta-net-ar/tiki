@@ -124,6 +124,7 @@ import { defaults as defaultControls } from "ol/control";
                                             width = 3;
                                         } else {
                                             color = "#aaa";
+                                            // eslint-disable-next-line no-console
                                             console.log("Unknown road kind: " + kind);
                                         }
                                         style = new ol.style.Style({
@@ -177,8 +178,8 @@ import { defaults as defaultControls } from "ol/control";
                         var flavor = name.substring(7);
 
                         layer = new ol.layer.Tile({
-                            source: new ol.source.Stamen({
-                                layer: flavor,
+                            source: new ol.source.StadiaMaps({
+                                layer: `stamen_${flavor.replace("-", "_")}`,
                             }),
                             title: "Stamen" + flavor,
                         });
@@ -212,6 +213,7 @@ import { defaults as defaultControls } from "ol/control";
                     layers.push(lyr);
                 } else {
                     errorLayers.push(name);
+                    // eslint-disable-next-line no-console
                     console.log(tr("Cannot create map layer: " + name));
                 }
             }
@@ -289,20 +291,25 @@ import { defaults as defaultControls } from "ol/control";
                 }
 
                 // Check for color on feature property
-                var featureColor = feature.get("color");
-                if (featureColor) {
+                const intent = feature.get("intent");
+                if (intent === "vectors") {
+                    let borderColor = feature.get("color") ?? "#999";
+                    let fillColor = feature.get("fillColor");
+
+                    if (!fillColor) {
+                        // no separate fill colour provided so make the fill 50% opacity of the border
+                        const rgba = Array.from(ol.color.asArray(borderColor));
+                        fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 2]);
+                    }
+
                     return new ol.style.Style({
-                        geometry: feature.getGeometry(),
-                        image: new ol.style.Circle({
-                            radius: 10,
-                            fill: new ol.style.Fill({ color: featureColor }),
-                            stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
-                        }),
+                        fill: new ol.style.Fill({ color: fillColor }),
+                        stroke: new ol.style.Stroke({ color: borderColor, width: 2 }),
                     });
                 }
 
                 // Check if it's a marker with icon
-                if (feature.get("intent") === "marker") {
+                if (intent === "marker") {
                     return new ol.style.Style({
                         geometry: feature.getGeometry(),
                         image: new ol.style.Icon({
@@ -1095,6 +1102,7 @@ import { defaults as defaultControls } from "ol/control";
                             }
                         };
                         $(img).on("error", function () {
+                            // eslint-disable-next-line no-console
                             console.log("Map error loading marker image " + src);
                             var index = container.markerIcons.loadingMarker.indexOf(src),
                                 action;
@@ -1579,28 +1587,25 @@ import { defaults as defaultControls } from "ol/control";
                                     } else if (i.geo_file) {
                                         // load a file containing geometry, set using tracker Files indexGeometry option
 
-                                        var format,
-                                            files = i.geo_file.split(","),
-                                            proj4326 = new ol.proj.Projection("EPSG:4326"),
-                                            proj900913 = new ol.proj.Projection("EPSG:900913");
+                                        let format;
+                                        const files = i.geo_file.split(",");
 
                                         layer = container.getLayer(layerName);
 
-                                        if (i.geo_file_format == "geojson") {
+                                        if (i.geo_file_format === "geojson") {
                                             format = new ol.format.GeoJSON();
                                         } else {
-                                            if (i.geo_file_format == "gpx") {
+                                            if (i.geo_file_format === "gpx") {
                                                 format = new ol.format.GPX();
                                             }
                                         }
-                                        for (var f = 0; f < files.length; f++) {
+                                        for (let f = 0; f < files.length; f++) {
                                             $.get(files[f], function (data) {
-                                                if (data.indexOf("&quot;") > -1) {
-                                                    // decode html entities coming from file galleries
-                                                    data = $("<div/>").html(data).text();
-                                                }
                                                 try {
-                                                    features = format.readFeatures(data);
+                                                    features = format.readFeatures(data, {
+                                                        dataProjection: "EPSG:4326",
+                                                        featureProjection: container.map.getView().getProjection(),
+                                                    });
                                                 } catch (e) {
                                                     // Corrupted feature - display plain marker
                                                     $(container).addMapMarker({
@@ -1618,6 +1623,7 @@ import { defaults as defaultControls } from "ol/control";
                                                     feature.set("itemId", i.object_id);
                                                     feature.set("content", i.title);
                                                     if (!feature.get("color")) {
+                                                        // TODO find a better default, from the searchlayer maybe?
                                                         feature.set("color", "#ffa500");
                                                     }
                                                     if (!feature.get("intent")) {
@@ -1631,12 +1637,6 @@ import { defaults as defaultControls } from "ol/control";
                                                     }
                                                     if (!feature.get("popup_tpl")) {
                                                         feature.set("popup_tpl", $(form).data("popup-tpl"));
-                                                    }
-                                                    // for some reason geometry needs to be in 900913 projection to correctly appear
-                                                    // in the "Editable" vector layer, even though layer.projection === "EPSG:4326"
-                                                    let geometry = feature.getGeometry();
-                                                    if (geometry) {
-                                                        geometry.transform(proj4326, proj900913);
                                                     }
                                                 });
                                                 layer.getSource().addFeatures(features);

@@ -98,7 +98,7 @@
             {/if}
             <button class="btn btn-secondary start-recording" data-tracker-files="true" data-type="{$liveRecord}" data-gallery-id="{$field.galleryId}" data-field-id="{$field.fieldId}">{icon name=$recordIcon} {$recordLabel}</button>
             <button class="btn btn-secondary stop-recording d-none">{icon name="stop"} {tr}Stop recording{/tr}</button>
-            <span class="recording-timer" data-field-id="{$field.fieldId}">00:00</span>
+            <span class="recording-timer" id="recording-timer-{$field.fieldId}">00:00</span>
             <div id="waveform-canvas-{$field.fieldId}" class="waveform-container">
                 <canvas id="wave-canvas-{$field.fieldId}" class="w-100 h-100"></canvas>
             </div>

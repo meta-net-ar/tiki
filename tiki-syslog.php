@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
@@ -75,12 +78,10 @@ if (isset($_REQUEST["clean"])) {
         }
     }
 }
-
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'actionid_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'actionId_desc',
+    ['tiki_actionlog']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
@@ -94,7 +95,7 @@ $smarty->assign_by_ref('maxRecords', $maxRecords);
 $list = $logslib->list_logs('', '', $offset, $maxRecords, $sort_mode, $find);
 foreach ($list['data'] as &$row) {
     if (! empty($row['log'])) {
-        $row['log_pretty'] = print_r(unserialize($row['log']), true);
+        $row['log_pretty'] = print_r(unserialize($row['log']), true); // @phpstan-ignore disallowedFunctions.printR (returns unserialized log entry as string for syslog display, never prints)
     }
 }
 $smarty->assign_by_ref('count', $list['count']);

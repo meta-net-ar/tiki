@@ -78,7 +78,7 @@ function searchAllDB($search, $searchTable = null)
         $tablesSql = "show tables";
         $tables = $tikilib->fetchAll($tablesSql);
 
-        foreach ($tables as $key => $val) {
+        foreach ($tables as $val) {
             $vals = array_values($val);
             $table = $vals[0];
             if (str_starts_with($table, 'index_') && ! str_starts_with($table, 'index_pref')) {
@@ -103,7 +103,7 @@ function searchInTable($searchTerm, $table)
 
     $sql2 = "SHOW COLUMNS FROM `$table`";
     $rs2 = $tikilib->fetchAll($sql2);
-    foreach ($rs2 as $key2 => $val2) {
+    foreach ($rs2 as $val2) {
         $toExclude = [];
         $vals2 = array_values($val2);
         $colum = $vals2[0];

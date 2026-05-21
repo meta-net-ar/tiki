@@ -49,7 +49,19 @@ class Search_Elastic_Index implements Search_Index_Interface, Search_Index_Query
      */
     public function getFieldMappings()
     {
+        if (empty($this->providedMappings)) {
+            return $this->getRawFieldMappings();
+        }
+
         return $this->providedMappings;
+    }
+
+    protected function getRawFieldMappings()
+    {
+        $index = $this->index;
+        $mappings = $this->connection->rawApi("/$index/_mapping/field/*");
+        $mappings = get_object_vars($mappings->{$index}->mappings);
+        return $mappings;
     }
 
     public function exists()

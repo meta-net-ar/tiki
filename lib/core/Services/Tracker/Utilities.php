@@ -196,6 +196,8 @@ class Services_Tracker_Utilities
             false,
             $data['visibleInViewMode'] ?? 'y',
             $data['visibleInEditMode'] ?? 'y',
+            $data['visibleInHistoryMode'] ?? 'y',
+            $data['excludeFromTrackerItemLastModificationDate'] ?? 'n',
         );
     }
 
@@ -244,7 +246,8 @@ class Services_Tracker_Utilities
             $properties['excludeFromNotification'] ?? $field['excludeFromNotification'] ?? null,
             $properties['visibleInViewMode'] ?? $field['visibleInViewMode'] ?? null,
             $properties['visibleInEditMode'] ?? $field['visibleInEditMode'] ?? null,
-            $properties['visibleInHistoryMode'] ?? ($field['visibleInHistoryMode'] ?? null)
+            $properties['visibleInHistoryMode'] ?? $field['visibleInHistoryMode'] ?? null,
+            $properties['excludeFromTrackerItemLastModificationDate'] ?? $field['excludeFromTrackerItemLastModificationDate'] ?? null
         );
     }
 
@@ -577,7 +580,7 @@ EXPORT;
     {
         $fields = [];
         foreach ($fieldIds as $fieldId) {
-            $field = $field = $definition->getField($fieldId);
+            $field = $definition->getField($fieldId);
 
             if (! $field) {
                 throw new Services_Exception(tr('Field %0 does not exist in tracker', $fieldId), 404);

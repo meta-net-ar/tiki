@@ -221,7 +221,6 @@ function wikiplugin_category_info()
                 ),
                 'since' => '8.0',
                 'filter' => 'lang',
-                'default' => '',
             ],
         ],
     ];
@@ -237,12 +236,20 @@ function wikiplugin_category($data, $params)
 
     $categlib = TikiLib::lib('categ');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_category_info());
     extract($params, EXTR_SKIP);
 
     $split = strtolower($split) == 'y';
     $sub = strtolower($sub) == 'y';
     $and = strtolower($and) == 'y';
-    $filter['language'] = $lang ?: Language::getCurrentLanguage();
+
+    if (! empty($lang)) {
+        $filter['language'] = $lang;
+    } elseif (isset($params['lang'])) {
+        $filter['language'] = Language::getCurrentLanguage();
+    } else {
+        $filter = null;
+    }
 
     if (! empty($sort)) {
         $list = explode(',', $sort);

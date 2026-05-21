@@ -14,68 +14,70 @@ use Tiki\Lib\Theme\ThemeLib;
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-        'userId'                          => 'int',          //post
-        'view_user'                       => 'int',          //post
-        'generate'                        => 'bool',         //post
-        'tfagenerate'                     => 'bool',         //post
-        'new_info'                        => 'bool',         //post
-        'realName'                        => 'striptags',    //post
-        'gender'                          => 'striptags',    //post
-        'country'                         => 'striptags',    //post
-        'location'                        => 'striptags',    //post
-        'homePage'                        => 'pagename',     //post
-        'new_prefs'                       => 'bool',         //post
-        'mytheme'                         => 'striptags',    //post
-        'userbreadCrumb'                  => 'digits',       //post
-        'language'                        => 'lang',         //post
-        'languageAdmin'                   => 'lang',         //post
-        'read_language'                   => 'lang',         //post
-        'display_timezone'                => 'striptags',    //post
-        'display_12hr_clock'              => 'bool',         //post
-        'diff_versions'                   => 'bool',         //post
-        'remember_closed_rboxes'          => 'bool',         //post
-        'email_isPublic'                  => 'bool',         //post
-        'mailCharset'                     => 'striptags',    //post
-        'prefName'                        => 'striptags',    //post
-        'mess_maxRecords'                 => 'digits',       //post
-        'mess_archiveAfter'               => 'digits',       //post
-        'mess_sendReadStatus'             => 'bool',         //post
-        'minPrio'                         => 'digits',       //post
-        'allowMsgs'                       => 'bool',         //post
-        'mytiki_pages'                    => 'bool',         //post
-        'mytiki_blogs'                    => 'bool',         //post
-        'mytiki_msgs'                     => 'bool',         //post
-        'mytiki_tasks'                    => 'bool',         //post
-        'mytiki_forum_topics'             => 'bool',         //post
-        'mytiki_forum_replies'            => 'bool',         //post
-        'mytiki_items'                    => 'bool',         //post
-        'mytiki_articles'                 => 'bool',         //post
-        'tasks_maxRecords'                => 'digits',       //post
-        'xmpp_jid'                        => 'striptags',    //post
-        'xmpp_password'                   => 'password',     //post
-        'xmpp_custom_server_http_bind'    => 'striptags',    //post
-        'perspective_preferred'           => 'digits',      //post
-        'webmonetization_payment_pointer' => 'striptags',    //post
-        'webmonetization_paywall_text'    => 'striptags',    //post
-        'notify_oneself'                  => 'bool',         //post
-        'switch_user_notification'        => 'bool',         //post
-        'cookie_consent_update'           => 'word',         //post
-        'chgadmin'                        => 'bool',         //post
-        'pass'                            => 'password',     //post
-        'email'                           => 'email',        //post
-        'pass1'                           => 'password',     //post
-        'pass2'                           => 'password',     //post
-        'twofactor'                       => 'bool',         //post
-        'tfaSecret'                       => 'striptags',    //post
-        'tfaPin'                          => 'digits',       //post
-        'removetwofactor'                 => 'bool',         //post
-        'deleteaccount'                   => 'bool',         //post
+            'userId'                          => 'int',          //post
+            'view_user'                       => 'username',     //post
+            'generate'                        => 'bool',         //post
+            'tfagenerate'                     => 'bool',         //post
+            'new_info'                        => 'bool',         //post
+            'realName'                        => 'striptags',    //post
+            'gender'                          => 'striptags',    //post
+            'country'                         => 'striptags',    //post
+            'location'                        => 'striptags',    //post
+            'homePage'                        => 'pagename',     //post
+            'new_prefs'                       => 'bool',         //post
+            'mytheme'                         => 'striptags',    //post
+            'userbreadCrumb'                  => 'digits',       //post
+            'language'                        => 'lang',         //post
+            'languageAdmin'                   => 'lang',         //post
+            'read_language'                   => 'lang',         //post
+            'display_timezone'                => 'striptags',    //post
+            'display_12hr_clock'              => 'bool',         //post
+            'diff_versions'                   => 'bool',         //post
+            'remember_closed_rboxes'          => 'bool',         //post
+            'email_isPublic'                  => 'bool',         //post
+            'mailCharset'                     => 'striptags',    //post
+            'prefName'                        => 'striptags',    //post
+            'mess_maxRecords'                 => 'digits',       //post
+            'mess_archiveAfter'               => 'digits',       //post
+            'mess_sendReadStatus'             => 'bool',         //post
+            'minPrio'                         => 'digits',       //post
+            'allowMsgs'                       => 'bool',         //post
+            'mytiki_pages'                    => 'bool',         //post
+            'mytiki_blogs'                    => 'bool',         //post
+            'mytiki_msgs'                     => 'bool',         //post
+            'mytiki_tasks'                    => 'bool',         //post
+            'mytiki_forum_topics'             => 'bool',         //post
+            'mytiki_forum_replies'            => 'bool',         //post
+            'mytiki_items'                    => 'bool',         //post
+            'mytiki_articles'                 => 'bool',         //post
+            'tasks_maxRecords'                => 'digits',       //post
+            'xmpp_jid'                        => 'striptags',    //post
+            'xmpp_password'                   => 'password',     //post
+            'xmpp_custom_server_http_bind'    => 'striptags',    //post
+            'perspective_preferred'           => 'digits',      //post
+            'webmonetization_payment_pointer' => 'striptags',    //post
+            'webmonetization_paywall_text'    => 'striptags',    //post
+            'notify_oneself'                  => 'bool',         //post
+            'switch_user_notification'        => 'bool',         //post
+            'cookie_consent_update'           => 'word',         //post
+            'chgadmin'                        => 'bool',         //post
+            'pass'                            => 'password',     //post
+            'email'                           => 'email',        //post
+            'pass1'                           => 'password',     //post
+            'pass2'                           => 'password',     //post
+            'twofactor'                       => 'bool',         //post
+            'tfaSecret'                       => 'striptags',    //post
+            'tfaPin'                          => 'digits',       //post
+            'removetwofactor'                 => 'bool',         //post
+            'deleteaccount'                   => 'bool',         //post
         ],
     ],
 ];
 
 require_once('tiki-setup.php');
+
 use Tiki\Sections;
+
 $section = Sections::SECTION_MY_TIKI;
 Sections::setCurrentSection($section);
 $modlib = TikiLib::lib('mod');
@@ -85,7 +87,7 @@ $perspectivelib = TikiLib::lib('perspective');
 // Get cookie consent user preferences
 $cookieConsentPrefs = CookieConsentLib::getConsentPreferences();
 // Get all the existing cookie categories
-$cookieCategories = CookieConsentLib::getCookieCategories();
+$cookieCategories = CookieConsentLib::getRequestedCookieCategories();
 
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use PragmaRX\Google2FA\Google2FA;
@@ -274,7 +276,13 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
     if (isset($_POST['display_timezone'])) {
         $tikilib->set_user_preference($userwatch, 'display_timezone', $_POST['display_timezone']);
     }
-
+    if (array_key_exists('user_localtimezonesync', $_POST)) {
+        $tikilib->set_user_preference(
+            $userwatch,
+            'user_localtimezonesync',
+            $_POST['user_localtimezonesync'] === 'y' ? 'y' : 'n'
+        );
+    }
     if (isset($_POST['display_12hr_clock']) && $_POST['display_12hr_clock'] == 'on') {
         $tikilib->set_user_preference($userwatch, 'display_12hr_clock', 'y');
         $smarty->assign('display_12hr_clock', 'y');
@@ -549,15 +557,51 @@ if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] =
     $smarty->assign('imageType', $imageType);
 }
 
-if (isset($_POST['deleteaccount']) && $tiki_p_delete_account == 'y' && $access->checkCsrf(true)) {
-    $userlib->remove_user($userwatch);
+if (isset($_POST['deleteaccount']) && $access->checkCsrf(true)) {
+    if (! isset($_POST['deleteaccountconfirm'])) {
+        $smarty->assign('msg', tra('Please check the confirmation box to delete the account.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Determine the target user explicitly from the POST form data to prevent
+    // mismatch with $userwatch which is derived from $_REQUEST (GET+POST merged).
+    // Never fall back to $user to avoid accidentally deleting the logged-in admin.
+    if (empty($_POST['view_user'])) {
+        $smarty->assign('msg', tra('Invalid request: no target user specified.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    $deleteUser = $_POST['view_user'];
+    if (empty($userlib->user_exists($deleteUser))) {
+        $smarty->assign('msg', tra('Unknown user'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Non-admin users can only delete their own account
+    if ($deleteUser !== $user && $tiki_p_admin_users !== 'y') {
+        $smarty->assign('msg', tra('You do not have permission to delete other accounts.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    if ($deleteUser === $user && $tiki_p_delete_account !== 'y') {
+        $smarty->assign('msg', tra('You do not have permission to delete your own account.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Prevent deletion of the built-in admin account
+    if ($deleteUser === 'admin') {
+        $smarty->assign('msg', tra('The built-in admin account cannot be deleted.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    $userlib->remove_user($deleteUser);
 
     $unifiedsearchlib = TikiLib::lib('unifiedsearch');
-    $unifiedsearchlib->invalidateObject('user', $userwatch);
+    $unifiedsearchlib->invalidateObject('user', $deleteUser);
 
-    if ($user == $userwatch) {
+    if ($user === $deleteUser) {
         header('Location: tiki-logout.php');
-    } elseif ($tiki_p_admin_users == 'y') {
+    } elseif ($tiki_p_admin_users === 'y') {
         header('Location: tiki-adminusers.php');
     } else {
         header("Location: $base_url");
@@ -686,6 +730,9 @@ if ($prefs['feature_wiki'] == 'y' and $prefs['feature_wiki_userpage'] == 'y') {
         $smarty->assign('userPageExists', 'y');
     }
 }
+
+$headerlib->add_jsfile('lib/jquery_tiki/tiki-user_preferences.js');
+
 include_once('tiki-section_options.php');
 $smarty->assign('mid', 'tiki-user_preferences.tpl');
 $smarty->display("tiki.tpl");

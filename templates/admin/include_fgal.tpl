@@ -108,6 +108,7 @@
                 {preference name='file_galleries_redirect_from_image_gallery'}
                 {preference name='fgal_convert_documents_pdf'}
                 {preference name='fgal_maximum_image_width_preview'}
+                {preference name='fgal_file_max_archives'}
             </fieldset>
 
             <fieldset>
@@ -363,7 +364,7 @@
                                         {if !$ocrStalled}disabled{/if}
                                         class="btn btn-primary btn-sm"
                                         name="ocrstalledreset"
-                                        value="{tr}Reset {if $ocrStalled}{$ocrStalled} {/if}OCR 'stalled' files{/tr}"
+                                        value="{if $ocrStalled}{tr _0=$ocrStalled}Reset %0 OCR 'stalled' files{/tr}{else}{tr}Reset OCR 'stalled' files{/tr}{/if}"
                                 >
                             {/if}
                         </div>

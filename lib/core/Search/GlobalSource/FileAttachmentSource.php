@@ -56,7 +56,7 @@ class Search_GlobalSource_FileAttachmentSource implements Search_GlobalSource_In
                         }
                     }
                 } else {
-                    error_log("File " . $rel['itemId'] . ", referenced from " . $objectType . $objectId . " no longer exists.");
+                    error_log("File " . $rel['itemId'] . ", referenced from " . $objectType . $objectId . " no longer exists."); // @phpstan-ignore disallowedFunctions.errorLog (missing file warning in search indexer)
                 }
             }
         }

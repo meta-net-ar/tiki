@@ -355,8 +355,6 @@ class Tiki_Profile
     {
         $this->pageContent = $content;
 
-        $pos = 0;
-
         $this->data = [];
 
         $matches = WikiParser_PluginMatcher::match($content);
@@ -991,7 +989,6 @@ class Tiki_Profile
     public function getPath()
     {
         $domain = $this->domain;
-        $profile = $this->profile;
         if (! str_contains($domain, '://')) {
             if (is_dir($domain)) {
                 $domain = "file://" . $domain;

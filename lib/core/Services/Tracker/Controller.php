@@ -493,6 +493,7 @@ class Services_Tracker_Controller
                 'rules' => $rules,
                 'encryptionKeyId' => $input->encryption_key_id->int(),
                 'excludeFromNotification' => $input->exclude_from_notification->int() ? 'y' : 'n',
+                'excludeFromTrackerItemLastModificationDate' => $input->exclude_from_lastmodif->int() ? 'y' : 'n',
                 'visibleInViewMode' => $input->visible_in_view_mode->int() ? 'y' : 'n',
                 'visibleInEditMode' => $input->visible_in_edit_mode->int() ? 'y' : 'n',
                 'visibleInHistoryMode' => $input->visible_in_history_mode->int() ? 'y' : 'n',
@@ -1028,7 +1029,7 @@ class Services_Tracker_Controller
             TikiLib::lib('header')->add_jq_onready($js);
         }
 
-        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/dirtyCheck";');
+        TikiLib::lib('header')->add_js_module('import "@tiki/tracker-field-base/dirtyCheck";');
 
         $itemId = 0;
         $util = new Services_Utilities();
@@ -1246,6 +1247,8 @@ class Services_Tracker_Controller
             throw new Services_Exception_Denied();
         }
 
+        $version = TikiLib::lib('trk')->last_log_version($itemId) + 1;
+
         $access = TikiLib::lib('access');
         if ($prefs['feature_warn_on_edit'] == 'y' && $input->conflictoverride->int() !== 1) {
             try {
@@ -1302,7 +1305,7 @@ class Services_Tracker_Controller
             TikiLib::lib('header')->add_jq_onready($js);
         }
 
-        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/dirtyCheck";');
+        TikiLib::lib('header')->add_js_module('import "@tiki/tracker-field-base/dirtyCheck";');
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $access->preventRedirect(true);
@@ -1405,22 +1408,22 @@ class Services_Tracker_Controller
                     $redirect = smarty_modifier_sefurl($itemId, 'trackeritem');
                 }
 
-                if ($input->saveAndComment->int()) {
-                    $version = TikiLib::lib('trk')->last_log_version($itemId);
-
-                    return [
-                        'FORWARD' => [
-                            'controller' => 'comment',
-                            'action' => 'post',
-                            'type' => 'trackeritem',
-                            'objectId' => $itemId,
-                            'parentId' => 0,
-                            'version' => $version,
-                            'return_url' => $redirect,
-                            'title' => tr('Comment for edit #%0', $version),
-                        ],
-                    ];
+                if ($input->addComment->bool()) {
+                    $comment = new Services_Comment_Controller();
+                    $comment->action_post(new JitFilter([
+                        'post' => 1,
+                        'anonymous_name' => $input->comment_anonymous_name->text(),
+                        'comment' => $input->comment->text(),
+                        'objectId' => $itemId,
+                        'type' => 'trackeritem',
+                        'title' => $input->title->text(),
+                        'data' => $input->data->wikicontent(),
+                        'return_url' => $input->redirect->none(),
+                        'version' => $version,
+                        'related_files' => $input->related_files->raw(),
+                    ]));
                 }
+
                 //return to page
                 if ($skipRedirect === 1 || ! $redirect) {
                     // Return item data and refresh info
@@ -1528,6 +1531,9 @@ class Services_Tracker_Controller
             'save_return' => $input->save_return->alpha() ?? 'n',
             'can_remove' => $itemObject->canRemove(),
             'skipRefresh' => $input->skipRefresh->bool(),
+            'commentTitle' => tr('Comment for edit #%0', $version),
+            'MAX_COMMENT_DATA_LENGTH' => TikiLib::lib('comments')::MAX_COMMENT_DATA_LENGTH,
+            'MAX_COMMENT_TITLE_LENGTH' => TikiLib::lib('comments')::MAX_COMMENT_TITLE_LENGTH,
         ];
     }
 
@@ -1588,6 +1594,9 @@ class Services_Tracker_Controller
             }
             if (isset($f['files'])) {
                 $fieldsProcessed[$permName] = ['files' => $f['files']];
+            }
+            if (isset($f['articleIds'])) {
+                $fieldsProcessed[$permName]['articleIds'] = $f['articleIds'];
             }
         }
 
@@ -1697,6 +1706,9 @@ class Services_Tracker_Controller
                 }
                 if (isset($fieldsProcessed[$permName]['files'])) {
                     $field['files'] = $fieldsProcessed[$permName]['files'];
+                }
+                if (isset($fieldsProcessed[$permName]['articleIds'])) {
+                    $field['articleIds'] = $fieldsProcessed[$permName]['articleIds'];
                 }
             }
         }
@@ -2396,30 +2408,51 @@ class Services_Tracker_Controller
                             ];
                         }
                     }
-                    if (TIKI_API) {
-                        $field_value = $field_option[$hist['fieldId']];
+                    // Pre-render field values here in the controller, before Smarty starts rendering the template.
+                    $field_value = $field_option[$hist['fieldId']];
+                    if (! empty($field_value['fieldId']) && $field_value['fieldId'] > 0) {
+                        $emptyTemplate = TikiLib::lib('smarty')->getEmptyInternalTemplate();
                         if (empty($diff_style)) {
-                            if (! empty($field_value['fieldId'])) {
+                            $field_value['value'] = $hist['value'];
+                            $hist['rendered_value'] = smarty_function_trackeroutput([
+                                'field' => $field_value,
+                                'list_mode' => 'csv',
+                                'history' => 'y',
+                                'item' => $item_info,
+                                'process' => 'y',
+                            ], $emptyTemplate);
+                            $field_value['value'] = $hist['new'];
+                            $hist['rendered_new'] = smarty_function_trackeroutput([
+                                'field' => $field_value,
+                                'list_mode' => 'csv',
+                                'history' => 'y',
+                                'item' => $item_info,
+                                'process' => 'y',
+                            ], $emptyTemplate);
+
+                            if (TIKI_API) {
+                                $hist['value'] = $hist['rendered_value'];
+                                $hist['new'] = $hist['rendered_new'];
                                 $field_value['value'] = $hist['value'];
-                                $hist['value'] = smarty_function_trackeroutput([
+                                $hist['rendered_value'] = smarty_function_trackeroutput([
                                     'field' => $field_value,
-                                    'list_mode' => 'csv',
+                                    'list_mode' => 'y',
                                     'history' => 'y',
                                     'item' => $item_info,
                                     'process' => 'y',
-                                ], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                                ], $emptyTemplate);
                                 $field_value['value'] = $hist['new'];
-                                $hist['new'] = smarty_function_trackeroutput([
+                                $hist['rendered_new'] = smarty_function_trackeroutput([
                                     'field' => $field_value,
-                                    'list_mode' => 'csv',
+                                    'list_mode' => 'y',
                                     'history' => 'y',
                                     'item' => $item_info,
                                     'process' => 'y',
-                                ], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                                ], $emptyTemplate);
                             }
                         } else {
                             $field_value['value'] = $hist['new'];
-                            $hist['diff'] = smarty_function_trackeroutput([
+                            $hist['rendered_diff'] = smarty_function_trackeroutput([
                                 'field' => $field_value,
                                 'list_mode' => 'y',
                                 'history' => 'y',
@@ -2427,25 +2460,11 @@ class Services_Tracker_Controller
                                 'process' => 'y',
                                 'oldValue' => $hist['value'],
                                 'diff_style' => $diff_style,
-                            ], TikiLib::lib('smarty')->getEmptyInternalTemplate());
-                        }
-                        if (! empty($field_value['fieldId'])) {
-                            $field_value['value'] = $hist['value'];
-                            $hist['rendered_value'] = smarty_function_trackeroutput([
-                                'field' => $field_value,
-                                'list_mode' => 'y',
-                                'history' => 'y',
-                                'item' => $item_info,
-                                'process' => 'y',
-                            ], TikiLib::lib('smarty')->getEmptyInternalTemplate());
-                            $field_value['value'] = $hist['new'];
-                            $hist['rendered_new'] = smarty_function_trackeroutput([
-                                'field' => $field_value,
-                                'list_mode' => 'y',
-                                'history' => 'y',
-                                'item' => $item_info,
-                                'process' => 'y',
-                            ], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                            ], $emptyTemplate);
+
+                            if (TIKI_API) {
+                                $hist['diff'] = $hist['rendered_diff'];
+                            }
                         }
                     }
                 }

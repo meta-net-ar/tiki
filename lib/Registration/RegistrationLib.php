@@ -27,6 +27,7 @@ use PhpXmlRpc\Client as XML_RPC_Client;
 use PhpXmlRpc\Encoder as XML_RPC_Encoder;
 use Services_Utilities;
 use TikiLib;
+use Tiki\Captcha\CaptchaTypeResolver;
 use Tiki\Lib\Registration\Error as RegistrationError;
 
 if (! isset($Debug)) {
@@ -136,7 +137,7 @@ class RegistrationLib extends TikiLib
 
                 // Judgment is that service is preparing though begin by 220 getting string after connection .
                 // fgets function reference : http://www.php.net/manual/en/function.fgets.php
-                if (preg_match('/^220/', $Out = fgets($Connect, 1024))) {
+                if (str_starts_with(fgets($Connect, 1024), '220')) {
                     // Inform client's reaching to server who connect.
                     fputs($Connect, "HELO $HTTP_HOST\r\n");
 
@@ -175,7 +176,7 @@ class RegistrationLib extends TikiLib
                     // Server's answering cord about MAIL and TO command checks.
                     // Server about listener's address reacts to 550 codes if there does not exist
                     // checking that mailbox is in own E-Mail account.
-                    if (! preg_match('/^250/', $From) || ! preg_match('/^250/', $To)) {
+                    if (! str_starts_with($From, '250') || ! str_starts_with($To, '250')) {
                         $Return[0] = false;
                         $Return[1] = 'not_recognized';
                         if ($Debug) {
@@ -333,7 +334,6 @@ class RegistrationLib extends TikiLib
                 $errors[] = new RegistrationError('chosenGroup', tra('Invalid group selected'));
             }
 
-            $email_valid = 'y';
             if (! validate_email($registration['email'], $this->merged_prefs['validateEmail'])) {
                 $errors[] = new RegistrationError('email', tra('Email not valid. Should be in the format "mailbox@example.com".'));
             }
@@ -357,7 +357,7 @@ class RegistrationLib extends TikiLib
 
         $result = '';
 
-        $newPass = $registration['pass'] ? $registration['pass'] : $registration["genepass"];
+        $newPass = $registration['pass'] ?: $registration["genepass"];
 
         $pending = false;
         $confirmed = false;
@@ -430,7 +430,12 @@ class RegistrationLib extends TikiLib
             if (! $pending) {
                 $smarty->assign('username', $registration['name']);
                 $logslib->add_log('register', 'created account ' . $registration['name']);
-                $result = $smarty->fetch('mail/user_welcome_msg.tpl');
+                if ($prefs['auth_webauthn_enabled'] === 'y') {
+                    TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-webauthn.js');
+                    $result = $smarty->fetch('mail/user_add_passkey_prompt.tpl');
+                } else {
+                    $result = $smarty->fetch('mail/user_welcome_msg.tpl');
+                }
             }
         }
 
@@ -669,7 +674,6 @@ class RegistrationLib extends TikiLib
                     passAgain: { equalTo: "#pass1" }';
 
             if ($prefs['user_must_choose_group'] === 'y') {
-                $choosable_groups = $this->merged_prefs['choosable_groups'];
                 $js .= ',
                     chosenGroup: {
                         required: true
@@ -677,7 +681,7 @@ class RegistrationLib extends TikiLib
                 $js_m .= ' "chosenGroup": { required: "' . tra('One of these groups is required') . '"}, ';
             }
 
-            if (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox') && $prefs['feature_antibot'] == 'y' && empty($user) && $prefs['recaptcha_enabled'] != 'y') {
+            if (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox') && $prefs['feature_antibot'] == 'y' && empty($user) && CaptchaTypeResolver::requiresManualInput($prefs)) {
                 // antibot validation
                 $js .= ',
             "captcha[input]": {

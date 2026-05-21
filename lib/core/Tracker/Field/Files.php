@@ -391,6 +391,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             'requireTitle' => $this->getOption('requireTitle'),
             'directoryPattern' => $directoryPattern,
             'fileGalleryPerTrackerItem' => $this->trackerField->getOption('fileGalleryPerTrackerItem'),
+
         ];
     }
 
@@ -596,15 +597,19 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
 
                 foreach ($this->getConfiguration('files') as $fileId => $file) {
                     $ret .= '<li>';
+                    $skipName = false;
                     if ($prefs['vimeo_upload'] == 'y' && $this->getOption('displayMode') == 'vimeo') {
                         $ret .= smarty_function_icon(['name' => 'vimeo'], $smarty->getEmptyInternalTemplate());
                     } elseif (str_starts_with($file['filetype'], 'audio/')) {
-                        $ret .= smarty_function_inline_audio_player(['fileId' => $fileId], $smarty->getEmptyInternalTemplate());
+                        $ret .= smarty_function_inline_audio_player(['fileId' => $fileId, 'type' => $file['filetype']], $smarty->getEmptyInternalTemplate());
+                        $skipName = true;
                     } else {
                         $ret .= smarty_modifier_iconify('tiki-download_file.php?fileId=' . $fileId, $file['filetype'], $fileId, 2);
                     }
 
-                    $ret .= smarty_function_object_link(['type' => 'file', 'id' => $fileId, 'title' => $file['name'], 'class' => 'label'], $smarty->getEmptyInternalTemplate());
+                    if (! $skipName) {
+                        $ret .= smarty_function_object_link(['type' => 'file', 'id' => $fileId, 'title' => $file['name'], 'class' => 'label'], $smarty->getEmptyInternalTemplate());
+                    }
 
                     $globalperms = Perms::get([ 'type' => 'file gallery', 'object' => $galleryId ]);
 
@@ -1104,40 +1109,32 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
     public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
-        if ($this->getOption('indexGeometry') && $this->getValue()) {
-            return ['geo_located', 'geo_file', 'geo_file_format', $baseKey];
-        } else {
-            $fields = [
-                $baseKey,
-                "{$baseKey}_text",
-                "{$baseKey}_names",
-                "{$baseKey}_filenames",
-                "{$baseKey}_filetypes",
-            ];
-            return $fields;
-        }
+        $fields = [
+            $baseKey,
+            "{$baseKey}_text",
+            "{$baseKey}_names",
+            "{$baseKey}_filenames",
+            "{$baseKey}_filetypes",
+            'geo_located',
+            'geo_file',
+            'geo_file_format',
+        ];
+        return $fields;
     }
 
     public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
-        if ($this->getOption('indexGeometry') && $this->getValue()) {
-            return [
-                'geo_located' => 'identifier',
-                'geo_file' => 'identifier',
-                'geo_file_format' => 'identifier',
-                $baseKey => 'identifier'
-            ];
-        } else {
-            $baseKey = $this->getBaseKey();
-            return [
-                $baseKey => 'sortable',
-                "{$baseKey}_text" => 'sortable',
-                "{$baseKey}_names" => 'multivalue',
-                "{$baseKey}_filenames" => 'multivalue',
-                "{$baseKey}_filetypes" => 'multivalue',
-            ];
-        }
+        return [
+            $baseKey => 'sortable',
+            "{$baseKey}_text" => 'sortable',
+            "{$baseKey}_names" => 'multivalue',
+            "{$baseKey}_filenames" => 'multivalue',
+            "{$baseKey}_filetypes" => 'multivalue',
+            'geo_located' => 'identifier',
+            'geo_file' => 'identifier',
+            'geo_file_format' => 'identifier',
+        ];
     }
 
     public function getGlobalFields(): array

@@ -8,7 +8,7 @@ function wikiplugin_getaccesstoken_info()
 {
     return [
         'name' => tra('Get Security Token'),
-        'documentation' => tra('PluginGetAccessToken'),
+        'documentation' => 'PluginGetAccessToken',
         'description' => tra('Display a link on a secure page using an access token'),
         'prefs' => [ 'auth_token_access', 'wikiplugin_getaccesstoken' ],
         'inline' => true,
@@ -47,6 +47,7 @@ function wikiplugin_getaccesstoken_info()
 function wikiplugin_getaccesstoken($data, $params)
 {
     global $tikilib;
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_getaccesstoken_info());
     if (empty($params['entry'])) {
         return '';
     } else {

@@ -152,7 +152,6 @@ class OLE_PPS_Root extends OLE_PPS
     {
         // Calculate Basic Setting
         list($iSBDcnt, $iBBcnt, $iPPScnt) = array(0,0,0);
-        $iSmallLen = 0;
         $iSBcnt = 0;
         for ($i = 0; $i < count($raList); $i++) {
             if($raList[$i]->Type == OLE_PPS_TYPE_FILE) {
@@ -300,11 +299,9 @@ class OLE_PPS_Root extends OLE_PPS
                     // Write Data
                     if(isset($raList[$i]->_PPS_FILE))
                     {
-                        $iLen = 0;
                         fseek($raList[$i]->_PPS_FILE, 0); // To The Top
                         while($sBuff = fread($raList[$i]->_PPS_FILE, 4096))
                         {
-                            $iLen += strlen($sBuff);
                             fwrite($FILE, $sBuff);
                         }
                     }

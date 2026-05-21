@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Mpdf\Mpdf;
 use Tiki\Lib\Auth\Tokens;
 use Tiki\Lib\Theme\ThemeLib;
 
@@ -295,7 +296,19 @@ class PdfGenerator
             if ($pdfSettings['tocheading']) {
                 $tocpreHTML = htmlspecialchars("<h1>" . $pdfSettings['tocheading'] . "</h1>", ENT_QUOTES);
             }
-            $html = "<html><tocpagebreak toc-odd-footer-name=\"footer-without-pagination\"  toc-odd-footer-value=\"1\"" . $links . " toc-preHTML=\"" . $tocpreHTML . "\" toc-resetpagenum=\"1\" toc-suppress=\"on\" />" . $html . "</html>";
+            $html = <<<HTML
+<html>
+    <tocpagebreak
+        toc-odd-footer-name="footer-without-pagination"
+        toc-odd-footer-value="1"
+        $links
+        toc-preHTML="$tocpreHTML"
+        toc-resetpagenum="1"
+        toc-suppress="on"
+    />
+    $html
+</html>
+HTML;
         }
         $this->_parseHTML($html);
         $this->_getImages($html, $tempImgArr);
@@ -321,7 +334,7 @@ class PdfGenerator
             mkdir($mpdfConfig['tempDir'], 0770, true);
         }
 
-        $mpdf = new \Mpdf\Mpdf($mpdfConfig); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
+        $mpdf = new Mpdf($mpdfConfig); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
         $mpdf->curlAllowUnsafeSslRequests = ($prefs['print_pdf_mpdf_allow_unsafe_ssl_requests'] ?? 'y') === 'y';
 
         $basePath = $params['base_path'] ?? TIKI_PATH ;
@@ -372,7 +385,6 @@ class PdfGenerator
         $themecss = '';
         if ($pdfSettings['print_pdf_mpdf_printfriendly'] === 'y') {
             $printcss = file_get_contents('themes/base_files/css/printpdf.css'); // external css
-            $bodycss = 'tiki tiki-print'; //execluding theme css in case print friendly is set to yes.
         } else {
             //getting theme css
             $themeLib = TikiLib::lib('theme');
@@ -430,14 +442,8 @@ class PdfGenerator
             if ($themePath) {
                 $themecss .= file_get_contents($themePath);
             }
-
-            $themecss .= "\nb,strong{font-weight:bold !important;}";
-            // preserving theme styles by removing media print styles to print what is shown on screen
-            $themecss = str_replace(["media print", "color : fff"], ["media p","color : #fff"], $themecss);
-            //  for bootstrap print hidden, screen hidden styles on divs
-            $printcss = file_get_contents('themes/base_files/css/printqueries.css');
-            $bodycss = '';
         }
+        $bodyClass = 'tiki tiki-print print';
 
         if (! empty($pdfSettings['coverpage_wiki'])) {
             $coverWikiPage = $pdfSettings['coverpage_wiki'];
@@ -482,7 +488,7 @@ class PdfGenerator
 
                 $coverHtml = '<div style="' . $coverStyle . '">' . $coverHtml . '</div>';
 
-                $coverMpdf = new \Mpdf\Mpdf($mpdfConfig); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
+                $coverMpdf = new Mpdf($mpdfConfig); // @phpstan-ignore class.notFound (depends on MPdf, installed through packages)
                 $coverMpdf->SetHTMLHeader();
                 $coverMpdf->SetHTMLFooter();
                 $coverMpdf->AddPage(
@@ -530,8 +536,8 @@ class PdfGenerator
             '</style>';
 
         $cssStyles = str_replace(
-            [".tiki","opacity: 0;","page-break-inside: avoid;"],
-            ["","fill: #fff;opacity:0.3;stroke:black;","page-break-inside: auto;"],
+            ["opacity: 0;","page-break-inside: avoid;"],
+            ["fill: #fff;opacity:0.3;stroke:black;","page-break-inside: auto;"],
             $allCss
         );
         //PDF import templates will not work if background color is set, need to replace in css
@@ -613,7 +619,7 @@ class PdfGenerator
         }
         $pageNo = 1;
         $pagesTotal = 1;
-        $pdfLimit = ini_get('pcre.backtrack_limit');
+        $pcreBacktrackLimit = (int) ini_get('pcre.backtrack_limit');
         //end of coverpage generation
         foreach ($pdfPages as $pdfPage) {
             $resetPage = '';
@@ -716,12 +722,24 @@ class PdfGenerator
                     } elseif ($pdfPage['footer']) {
                         $footer = $pdfPage['footer'];
                     }
-                    //Add the header to the first page
                     $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), "O");
                     $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? ''), "E");
-                    $mpdf->AddPage($pdfPage['orientation'], '', $resetPage, '', '', $pdfPage['margin_left'], $pdfPage['margin_right'], $pdfPage['margin_top'], $pdfPage['margin_bottom'], $pdfPage['margin_header'], $pdfPage['margin_footer'], '', '', '', '', '', '', '', '', '', $pdfPage['pagesize']);
+                    $mpdf->AddPageByArray(
+                        [
+                            'orientation'   => $pdfPage['orientation'],
+                            'resetpagenum'  => $resetPage,
+                            'margin-left'   => $pdfPage['margin_left'],
+                            'margin-right'  => $pdfPage['margin_right'],
+                            'margin-top'    => $pdfPage['margin_top'],
+                            'margin-bottom' => $pdfPage['margin_bottom'],
+                            //$pdfPage['margin_header'],
+                            //$pdfPage['margin_footer'],
+                            'sheet-size'    => $pdfPage['pagesize'],
+                        ]
+                    );
                     $mpdf->SetHTMLHeader($this->processHeaderFooter($header, $params['page'] ?? '')); //Add the header to other pages
                     $mpdf->SetHTMLFooter($this->processHeaderFooter($footer, $params['page'] ?? '', 'top')); //footer needs to be reset after page content is added
+                    $mpdf->SetHTMLFooter($this->processHeaderFooter($footer, $params['page'] ?? '', 'top'), 'E');
                     //checking watermark on page
                     $mpdf->SetWatermarkText($pdfPage['watermark']);
                     $mpdf->showWatermarkText = true;
@@ -750,20 +768,42 @@ class PdfGenerator
                     $pdfPage['pageContent'] = $this->getHtmlLayout($pdfPage['pageContent']);
                     $this->_getImages($pdfPage['pageContent'], $tempImgArr);
 
-                    $htmlChunk = '<html><body class="' . $bodycss . '" style="margin:0px;padding:0px;">' . $cssStyles;
+                    $htmlChunk = '<html><head>' . $cssStyles . '</head><body class="' . $bodyClass . '" style="margin:0;padding:0;">';
                     if ($prefs['print_pdf_mpdf_debug'] === 'y') {
                         $debugOutput .= $htmlChunk;
                     }
                     $mpdf->WriteHTML($htmlChunk);
-                    $pagesTotal += floor(strlen($pdfPage['pageContent']) / 3000);
+
                     //checking if page content is less than mPDF character limit, otherwise split it and loop to writeHTML
-                    for ($charLimit = 0; $charLimit <= strlen($pdfPage['pageContent']); $charLimit += $pdfLimit) {
-                        $content_slice = substr($pdfPage['pageContent'], $charLimit, $pdfLimit);
+                    $pageContentLength = strlen($pdfPage['pageContent']);
+                    $chunkStartPos = 0;
+                    while ($chunkStartPos <= $pageContentLength) {
+                        $content_slice = substr($pdfPage['pageContent'], $chunkStartPos, $pcreBacktrackLimit);
+                        if ($pageContentLength - $chunkStartPos > $pcreBacktrackLimit) {
+                            // more to come?
+                            $lastTagStart = strrpos($content_slice, '<');
+                            $lastTagEnd = strrpos($content_slice, '>');
+                            if ($lastTagStart > $lastTagEnd) {
+                                // truncate before the last unclosed tag, often a base64 data src image
+                                $newChunkStartPos = $chunkStartPos + $lastTagStart;
+                                $content_slice = substr($pdfPage['pageContent'], $chunkStartPos, $newChunkStartPos - $chunkStartPos);
+                                $chunkStartPos = $newChunkStartPos;
+                            } else {
+                                $chunkStartPos += $pcreBacktrackLimit;
+                            }
+                        } else {
+                            $chunkStartPos += $pcreBacktrackLimit;
+                        }
                         if ($content_slice) {
                             if ($prefs['print_pdf_mpdf_debug'] === 'y') {
                                 $debugOutput .= $content_slice;
                             }
-                            $mpdf->WriteHTML($content_slice);
+                            try {
+                                $mpdf->WriteHTML($content_slice);
+                            } catch (ErrorException $e) {
+                                \Feedback::error($e->getMessage());
+                                die($e->getMessage());
+                            }
                         }
                     }
                     $htmlChunk = '</body></html>';

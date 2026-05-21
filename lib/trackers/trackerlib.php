@@ -1381,6 +1381,7 @@ class TrackerLib extends TikiLib
                 $fv = $filtervalue;
                 $ev = $exactvalue;
                 $ff = (int) $filterfield;
+                $ff_array = $filterfield;
                 $nb_filtered_fields = 1;
             } else {
                 $nb_filtered_fields = count($filterfield);
@@ -1394,7 +1395,21 @@ class TrackerLib extends TikiLib
                     $ev = ! empty($exactvalue[$i]) ? $exactvalue[$i] : null;
                     $fv = ! empty($filtervalue[$i]) ? $filtervalue[$i] : null;
                 }
-                $filter = $this->get_tracker_field($ff);
+                $isCompositeFilter = is_array($ff_array)
+                    && (
+                        (isset($ff_array['sqlsearch']) && is_array($ff_array['sqlsearch']))
+                        || (isset($ff_array['usersearch']) && is_array($ff_array['usersearch']))
+                    );
+                if ($isCompositeFilter) {
+                    $filter = ['type' => null];
+                } else {
+                    $field = $this->get_tracker_field($ff);
+                    if ($field) {
+                        $filter = $field;
+                    } else {
+                        $filter = ['type' => null];
+                    }
+                }
 
                 // Determine if field is an item list field and postpone filtering till later if so
                 if ($filter["type"] == 'l' && isset($filter['options_array'][2]) && isset($filter['options_array'][2]) && isset($filter['options_array'][3])) {
@@ -2047,18 +2062,10 @@ class TrackerLib extends TikiLib
             $status = $status ? $status : $oldStatus;
             $fil['status'] = $status;
             $old_values['status'] = $oldStatus;
+            $fieldsModified = [];
 
             if ($status != $oldStatus) {
                 $this->change_status([$itemId], $status);
-            } else {
-                $this->update_items(
-                    [$itemId],
-                    [
-                        'lastModif' => $tikilib->now,
-                        'lastModifBy' => $user,
-                    ],
-                    false
-                );
             }
 
             $version = $this->last_log_version($itemId) + 1;
@@ -2165,6 +2172,7 @@ class TrackerLib extends TikiLib
                     if ($old_value != $value) {
                         // Save old value
                         $this->log($version, $currentItemId, $array['fieldId'], $old_value);
+                        $fieldsModified[$array['fieldId']] = $array;
                     }
                     $fil[$fieldId] = $value;
                 }
@@ -2181,6 +2189,7 @@ class TrackerLib extends TikiLib
                     if ($old_value != $value) {
                         // Save old value
                         $this->log($version, $currentItemId, $array['fieldId'], $old_value);
+                        $fieldsModified[$array['fieldId']] = $array;
                     }
                     $fil[$fieldId] = $value;
                 }
@@ -2375,6 +2384,23 @@ class TrackerLib extends TikiLib
             'notify_watchers' => $notify_watchers,
         ];
 
+        if (! empty($itemId) && ! empty($fieldsModified)) {
+            $rowUpdatedColumns = [];
+            $definition = \Tracker_Definition::get($trackerId);
+            foreach ($fieldsModified as $fieldId => $array) {
+                $trackerField = $definition->getFieldInstance($fieldId);
+                if ($trackerField) {
+                    $updatedColumns = $trackerField->handleTrackerItemSave($item_info);
+                    $item_info = array_merge($item_info, $updatedColumns);
+                    $rowUpdatedColumns = array_merge($rowUpdatedColumns, $updatedColumns);
+                }
+            }
+
+            if (! empty($rowUpdatedColumns)) {
+                $this->update_items([$itemId], $rowUpdatedColumns, false);
+            }
+        }
+
         // this needs to trigger no matter of the size as trackeritem categorization depends on this and other event types as well
         TikiLib::events()->trigger(
             $final_event,
@@ -2397,8 +2423,10 @@ class TrackerLib extends TikiLib
                 $value = $key->encryptData($value);
             } catch (Tiki\Encryption\NotFoundException) {
                 Feedback::error(tr('Field "%0" is encrypted with a key that no longer exists!', $field['name']));
+                return;
             } catch (Tiki\Encryption\Exception $e) {
-                Feedback::error(tr('Field "%0" is encrypted using key "%1" but where was an error enrypting the data: %2', $field['name'], $key->get('name'), $e->getMessage()));
+                Feedback::error(tr('Field "%0" is encrypted using key "%1" but there was an error encrypting the data: %2', $field['name'], $key->get('name'), $e->getMessage()));
+                return;
             }
         }
 
@@ -3094,6 +3122,21 @@ class TrackerLib extends TikiLib
                             $erroneous_values[] = $f;
                         }
                     }
+
+                    // Only gate non-empty values: empty values fall through to the mandatory-field
+                    // check above; optional encrypted fields legitimately submit empty.
+                    if (! empty($f['encryptionKeyId']) && ! empty(trim((string)($f['value'] ?? '')))) {
+                        try {
+                            $key = new Tiki\Encryption\Key($f['encryptionKeyId']);
+                            if (! $key->isKeyAccessible()) {
+                                $f['errorMsg'] = tr('Enter the encryption key for field "%0" before saving.', $f['name']);
+                                $erroneous_values[] = $f;
+                            }
+                        } catch (Tiki\Encryption\NotFoundException $e) {
+                            $f['errorMsg'] = tr('Field "%0" uses an encryption key that no longer exists.', $f['name']);
+                            $erroneous_values[] = $f;
+                        }
+                    }
                 }
             }
         }
@@ -3288,10 +3331,19 @@ class TrackerLib extends TikiLib
 
         $events = TikiLib::events();
         foreach ($itemIds as $itemId) {
+            $res = $this->items()->fetchFullRow(['itemId' => (int) $itemId]);
+            if (! $res) {
+                continue;
+            }
             $events->trigger('tiki.trackeritem.update', [
                 'type' => 'trackeritem',
                 'object' => $itemId,
+                'trackerId' => $res['trackerId'],
                 'user' => $GLOBALS['user'],
+                'values' => [],
+                'old_values' => [],
+                'values_by_permname' => [],
+                'old_values_by_permname' => [],
             ]);
         }
     }
@@ -3519,7 +3571,7 @@ class TrackerLib extends TikiLib
      * @param int $fieldId  0 has special meaning:  insert a new field
      * @return int the field id inserted or operated on.
      */
-    public function replace_tracker_field($trackerId, int $fieldId, $name, $type, $isMain, $isSearchable, $isTblVisible, $isPublic, $isHidden, $isMandatory, $position, $options, $description = '', $isMultilingual = '', $itemChoices = null, $errorMsg = '', $visibleBy = null, $editableBy = null, $descriptionIsParsed = 'n', $validation = '', $validationParam = '', $validationMessage = '', $permName = null, $rules = null, $encryptionKeyId = null, $excludeFromNotification = false, $visibleInViewMode = 'y', $visibleInEditMode = 'y', $visibleInHistoryMode = 'y'): int
+    public function replace_tracker_field($trackerId, int $fieldId, $name, $type, $isMain, $isSearchable, $isTblVisible, $isPublic, $isHidden, $isMandatory, $position, $options, $description = '', $isMultilingual = '', $itemChoices = null, $errorMsg = '', $visibleBy = null, $editableBy = null, $descriptionIsParsed = 'n', $validation = '', $validationParam = '', $validationMessage = '', $permName = null, $rules = null, $encryptionKeyId = null, $excludeFromNotification = false, $visibleInViewMode = 'y', $visibleInEditMode = 'y', $visibleInHistoryMode = 'y', $excludeFromTrackerItemLastModificationDate = 'n'): int
     {
         global $prefs;
         $fieldId = (int) $fieldId;
@@ -3583,6 +3635,7 @@ class TrackerLib extends TikiLib
             'rules' => $rules,
             'encryptionKeyId' => $encryptionKeyId,
             'excludeFromNotification' => $excludeFromNotification,
+            'excludeFromTrackerItemLastModificationDate' => $excludeFromTrackerItemLastModificationDate,
             'visibleInViewMode' => $visibleInViewMode ?? 'y',
             'visibleInEditMode' => $visibleInEditMode ?? 'y',
             'visibleInHistoryMode' => $visibleInHistoryMode ?? 'y'
@@ -3913,9 +3966,12 @@ class TrackerLib extends TikiLib
     public function get_tracker_field($fieldIdOrPermName, $useCache = true)
     {
         static $cache = [];
-        if ($useCache && (is_string($fieldIdOrPermName) || is_int($fieldIdOrPermName)) && isset($cache[$fieldIdOrPermName])) {
+        $isCacheableKey = is_string($fieldIdOrPermName) || is_int($fieldIdOrPermName);
+
+        if ($useCache && $isCacheableKey && isset($cache[$fieldIdOrPermName])) {
             return $cache[$fieldIdOrPermName];
         }
+
         if ((int)$fieldIdOrPermName > 0) {
             $res = $this->fields()->fetchFullRow(['fieldId' => (int)$fieldIdOrPermName]);
         } else {
@@ -3931,7 +3987,9 @@ class TrackerLib extends TikiLib
             if (TikiLib::lib('tiki')->isMemoryLow()) {
                 $cache = [];
             }
-            $cache[$fieldIdOrPermName] = $res;
+            if ($isCacheableKey) {
+                $cache[$fieldIdOrPermName] = $res;
+            }
             return $res;
         }
     }
@@ -4166,7 +4224,11 @@ class TrackerLib extends TikiLib
             $handler = $this->get_field_handler($field, $item);
 
             if ($handler) {
-                $value = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
+                $field_ins = $handler->getFieldData();
+                $value_ins = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
+                if (is_array($value_ins)) {
+                    $value = array_merge($value_ins, $field_ins);
+                }
             }
 
             if (! empty($value)) {
@@ -4498,7 +4560,8 @@ class TrackerLib extends TikiLib
                 $field['excludeFromNotification'],
                 $field['visibleInViewMode'],
                 $field['visibleInEditMode'],
-                $field['visibleInHistoryMode']
+                $field['visibleInHistoryMode'],
+                $field['excludeFromTrackerItemLastModificationDate']
             );
             if ($options['defaultOrderKey'] == $field['fieldId']) {
                 $options['defaultOrderKey'] = $newFieldId;
@@ -5536,7 +5599,6 @@ class TrackerLib extends TikiLib
                 }
             }
         }
-        //echo '<pre>'; print_r($cell); echo '</pre>';
     }
 
     public function get_tracker_by_name($name)
@@ -5677,14 +5739,17 @@ class TrackerLib extends TikiLib
             }
             include_once('lib/webmail/tikimaillib.php');
             if ($simpleEmail == "n") {
+                $desc = "";
                 $mail_main_value_fieldId = $tracker_definition->getMainFieldId();
-                $mail_main_value_field = $tracker_definition->getFieldInfoFromFieldId($mail_main_value_fieldId);
-                if (in_array($mail_main_value_field['type'], ['r', 'q'])) {
-                    // Item Link & auto-inc are special cases as field value is not the displayed text. There might be other such field types.
-                    $handler = $this->get_field_handler($mail_main_value_field);
-                    $desc = $handler->renderOutput(['list_mode' => 'csv']);
-                } else {
-                    $desc = $this->get_item_value($trackerId, $itemId, $mail_main_value_fieldId);
+                if ($mail_main_value_fieldId) {
+                    $mail_main_value_field = $tracker_definition->getFieldInfoFromFieldId($mail_main_value_fieldId);
+                    if (in_array($mail_main_value_field['type'], ['r', 'q'])) {
+                        // Item Link & auto-inc are special cases as field value is not the displayed text. There might be other such field types.
+                        $handler = $this->get_field_handler($mail_main_value_field);
+                        $desc = $handler->renderOutput(['list_mode' => 'csv']);
+                    } else {
+                        $desc = $this->get_item_value($trackerId, $itemId, $mail_main_value_fieldId);
+                    }
                 }
                 $smarty = TikiLib::lib('smarty');
                 $desc = $this->removeInlineSyntaxTags($desc);
@@ -6465,8 +6530,9 @@ class TrackerLib extends TikiLib
                     $r = tr('Field is encrypted with a key that no longer exists!');
                 } catch (Tiki\Encryption\Exception $e) {
                     $field['value'] = $item[$field['fieldId']] = '';
-                    $r = tr('Field data is encrypted using key "%0" but where was an error decrypting the data: %1', $key->get('name'), $e->getMessage());
+                    $r = tr('Field data is encrypted using key "%0" but there was an error decrypting the data: %1', $key->get('name'), $e->getMessage());
                     $r .= ' ' . $key->manualEntry();
+                    \TikiLib::lib('header')->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tracker-field-view-reload.js');
                 }
                 $handler = $this->get_field_handler($field, $item);
                 $field = array_merge($field, $handler->getFieldData());

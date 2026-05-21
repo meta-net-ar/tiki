@@ -1,6 +1,6 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 {block name="title"}
-    {title}{$title="{tr}Tracker Rule{/tr}"}{$title|escape}{/title}
+    {title}{tr}Tracker Rule{/tr}{/title}
 {/block}
 {block name="content"}
     <form method="post" action="{service controller=managestream action=tracker_filter}">

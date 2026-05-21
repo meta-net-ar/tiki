@@ -147,9 +147,7 @@ class Services_User_Controller
         if ($other_user) {
             $result['other_user'] = $other_user;
             if (
-                $this->lib->user_exists($other_user) &&
-                ($user == $other_user ||
-                $prefs['feature_friends'] == 'y')
+                $this->lib->user_exists($other_user) || $prefs['feature_friends'] == 'y'
             ) {
                 $info = $this->lib->get_user_info($other_user);
 
@@ -899,7 +897,7 @@ class Services_User_Controller
                 if (! $mail->send($this->lib->get_user_email($mail_user))) {
                     $errormsg = tra('Unable to send mail');
                     if (Perms::get()->admin) {
-                        $mailerrors = print_r($mail->errors, true);
+                        $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string, never prints)
                         $errormsg .= $mailerrors;
                     }
                     if (TIKI_API) {

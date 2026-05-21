@@ -31,6 +31,17 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
                         'count' => '*',
                         'legacy_index' => 0,
                     ],
+                    'labelasplaceholder' => [
+                        'name' => tr('Use label as placeholder'),
+                        'description' => tr('Display the field name as a placeholder in the input field instead of separate label.'),
+                        'deprecated' => false,
+                        'filter' => 'int',
+                        'default' => 0,
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
             'D' => [
@@ -48,6 +59,17 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
                         'filter' => 'xss',
                         'count' => '*',
                         'legacy_index' => 0,
+                    ],
+                    'labelasplaceholder' => [
+                        'name' => tr('Use label as placeholder'),
+                        'description' => tr('Display the field name as a placeholder in the input field instead of separate label.'),
+                        'deprecated' => false,
+                        'filter' => 'int',
+                        'default' => 0,
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
                     ],
                 ],
             ],
@@ -487,7 +509,13 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
     {
         if ($this->getConfiguration('type') !== 'D') {
             $value = $this->getValue($this->getDefaultValue());
-            $allValues = $value === '' ? [] : explode(',', $value);
+            $allValues = $value === '' ? []
+                : array_filter(
+                    array_map('trim', explode(',', $value)),
+                    static function ($val) {
+                        return $val !== '';
+                    }
+                );
 
             if (! empty($allValues)) {
                 foreach ($allValues as $val) {

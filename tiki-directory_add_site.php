@@ -10,20 +10,22 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 $inputConfiguration = [
     [
-        'staticKeyFilters'                => [
-            'parent'                         => 'int',               //post
-            'addtocat'                       => 'int',               //get
-            'siteId'                         => 'int',               //post
-            'save'                           => 'bool',              //post
-            'name'                           => 'string',            //post
-            'url'                            => 'url',               //post
-            'siteCats'                       => 'string',            //post
-            'isValid'                        => 'bool',              //post
-            'description'                    => 'xss',               //post
-            'country'                        => 'string',            //post
-            'sort_mode'                      => 'string',            //get
-            'offset'                         => 'int',               //get
-            'find'                           => 'bool',              //get
+        'staticKeyFilters'            => [
+            'parent'                  => 'int',       // post
+            'addtocat'                => 'int',       // get
+            'siteId'                  => 'int',       // post
+            'save'                    => 'bool',      // post
+            'name'                    => 'striptags', // post
+            'url'                     => 'url',       // post
+            'isValid'                 => 'word',      // post
+            'description'             => 'striptags', // post
+            'country'                 => 'string',    // post
+            'sort_mode'               => 'word',      // get
+            'offset'                  => 'int',       // get
+            'find'                    => 'string',    // get
+        ],
+        'staticKeyFiltersForArrays'   => [
+            'siteCats'                => 'int',       // post
         ],
     ],
 ];

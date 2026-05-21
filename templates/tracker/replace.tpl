@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -15,7 +15,9 @@
             </div>
             <div class="mb-3 mx-0">
                 <label for="description">{tr}Description{/tr}</label>
-                {textarea class="form-control" name="description" id="description" cols="40"}{$info.description|escape}{/textarea}
+                {* if the _syntax param is empty, {textarea} will work out the best one, "none" forces a plain <textarea> to be created *}
+                {$descriptionSyntax = $info.descriptionIsParsed eq 'y' ? '' : 'none'}
+                {textarea class="form-control" name="description" id="description" cols="40" _syntax=$descriptionSyntax}{$info.description|escape}{/textarea}
             </div>
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="descriptionIsParsed" id="descriptionIsParsed" {if $info.descriptionIsParsed eq 'y'}checked="checked"{/if} value="1">
@@ -81,7 +83,7 @@
                     {tr}Allow comments{/tr}
                 </label>
             </div>
-            <div class="form-check depends" data-on="useComments"
+            <div class="form-check depends" data-on="useComments">
                 <input type="checkbox" class="form-check-input" name="showComments" id="showComments" value="1"
                         {if $info.showComments eq 'y'} checked="checked"{/if}>
                 <label class="form-check-label" for="showComments">

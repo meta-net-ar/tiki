@@ -402,6 +402,7 @@ CREATE TABLE `tiki_calendar_recurrence` (
   `calendarId` int(14) NOT NULL default '0',
   `start` int(4) NOT NULL default '0',
   `end` int(4) NOT NULL default '2359',
+  `duration` int(14) default NULL,
   `allday` tinyint(1) NOT NULL default '0',
   `locationId` int(14) default NULL,
   `categoryId` int(14) default NULL,
@@ -723,6 +724,7 @@ CREATE TABLE `tiki_comments` (
   `archived` char(1) default NULL,
   `approved` char(1) NOT NULL default 'y',
   `locked` char(1) NOT NULL default 'n',
+  `is_resolved` char(1) NOT NULL default 'n',
   PRIMARY KEY (`threadId`),
   KEY `title` (`title`(191)),
   KEY `data` (`data`(191)),
@@ -730,8 +732,7 @@ CREATE TABLE `tiki_comments` (
   KEY `tc_pi` (`parentId`),
   KEY `objectType` (object(160), `objectType`),
   KEY `commentDate` (`commentDate`),
-  KEY `threaded` (message_id(40), in_reply_to(40), `parentId`),
-  KEY `idx_slvn_commentDate` (`commentDate`)
+  KEY `threaded` (message_id(40), in_reply_to(40), `parentId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `tiki_content`;
@@ -855,6 +856,7 @@ CREATE TABLE `tiki_encryption_keys` (
   `shares` int(11) NOT NULL,
   `users` text NULL,
   `secret` varchar(191) NOT NULL,
+  `verificationCanary` text NULL,
   PRIMARY KEY  (`keyId`)
 ) ENGINE=MyISAM;
 
@@ -1403,7 +1405,6 @@ CREATE TABLE `tiki_link_cache` (
   PRIMARY KEY (`cacheId`),
   KEY `url` (url(191))
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
-CREATE INDEX urlindex ON tiki_link_cache (url(191));
 
 DROP TABLE IF EXISTS `tiki_links`;
 CREATE TABLE `tiki_links` (
@@ -2197,16 +2198,6 @@ CREATE TABLE `tiki_rss_modules` (
   KEY `name` (name)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
-DROP TABLE IF EXISTS `tiki_rss_feeds`;
-CREATE TABLE `tiki_rss_feeds` (
-  `name` varchar(60) NOT NULL default '',
-  `rssVer` char(1) NOT NULL default '1',
-  `refresh` int(8) default '300',
-  `lastUpdated` int(14) default NULL,
-  `cache` longblob,
-  PRIMARY KEY (`name`,`rssVer`)
-) ENGINE=MyISAM;
-
 DROP TABLE IF EXISTS `tiki_search_stats`;
 CREATE TABLE `tiki_search_stats` (
   `term` varchar(50) NOT NULL default '',
@@ -2436,6 +2427,7 @@ CREATE TABLE `tiki_surveys` (
   `lastTaken` int(14) default NULL,
   `created` int(14) default NULL,
   `status` char(1) default NULL,
+  `redirect_after` varchar(255) default NULL,
   PRIMARY KEY (`surveyId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
@@ -2519,6 +2511,7 @@ CREATE TABLE `tiki_tracker_fields` (
   `rules` TEXT,
   `encryptionKeyId` int(11) NULL,
   `excludeFromNotification` char(1) default 'n',
+  `excludeFromTrackerItemLastModificationDate` char(1) NOT NULL default 'n',
   `visibleInViewMode` char(1) NOT NULL default 'y',
   `visibleInEditMode` char(1) NOT NULL default 'y',
   `visibleInHistoryMode` char(1) NOT NULL default 'y',
@@ -3454,7 +3447,7 @@ INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES(
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-view_blog_post.php\\?postId=(\\d+)', 'blogpost$1', 'blogpost', 'feature_blogs');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-directory_browse.php\\?parent=(\\d+)', 'directory$1', 'directory', 'feature_directory');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-view_faq.php\\?faqId=(\\d+)', 'faq$1', 'faq', 'feature_faqs');
-INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`) VALUES('tiki-download_file.php\\?fileId=(\\d+)', 'display$1', 'file', 'feature_file_galleries', 10);
+INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`, `order`) VALUES('tiki-download_file.php\\?fileId=(\\d+)', 'dl$1', 'file', 'feature_file_galleries', 10);
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)thumbnail(?:=[^&]*)?(?=(?:&amp;|&|$))', 'thumbnail$1', 'thumbnail', 'feature_file_galleries');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)display(?:=[^&]*)?(?=(?:&amp;|&|$))', 'display$1', 'display', 'feature_file_galleries');
 INSERT INTO `tiki_sefurl_regex_out` (`left`, `right`, `type`, `feature`) VALUES('tiki-download_file.php\\?fileId=(\\d+)(?:&amp;|&)preview(?:=[^&]*)?(?=(?:&amp;|&|$))', 'preview$1', 'preview', 'feature_file_galleries');
@@ -4320,4 +4313,25 @@ CREATE TABLE `tiki_password_reset_tokens` (
   UNIQUE KEY `token` (`token`),
   KEY `user` (`user`),
   KEY `expires` (`expires`)
+) ENGINE=MyISAM;
+
+DROP TABLE IF EXISTS `tiki_markdown_imports`;
+CREATE TABLE `tiki_markdown_imports` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `source_key` VARCHAR(190) NOT NULL,
+  `relpath` VARCHAR(500) NOT NULL,
+  `page_name` VARCHAR(255) NOT NULL,
+  `checksum` VARCHAR(64) NOT NULL,
+  `size_bytes` BIGINT NULL,
+  `mtime_utc` INT NULL,
+  `last_imported` INT NOT NULL,
+  `last_status` ENUM('ok','skipped','error','orphan') NOT NULL DEFAULT 'ok',
+  `orphaned_at` INT NULL,
+  `error_note` TEXT NULL,
+  `is_journal` TINYINT(1) NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_source_relpath` (`source_key`(120), `relpath`(120)),
+  KEY `idx_page` (`page_name`(190)),
+  KEY `idx_status` (`last_status`),
+  KEY `idx_orphaned` (`orphaned_at`)
 ) ENGINE=MyISAM;

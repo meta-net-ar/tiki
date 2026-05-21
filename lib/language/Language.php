@@ -10,6 +10,7 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     exit;
 }
 
+use Tiki\Lib\Language\LangStringEscaper;
 use Tiki\Sections;
 
 /**
@@ -70,20 +71,12 @@ class Language extends TikiDb_Bridge
      * since they should not apper in english strings.
      *
      * @param string $string
+     *
      * @return string modified string;
      */
-    public static function addPhpSlashes($string)
+    public static function addPhpSlashes(string $string): string
     {
-        $addPHPslashes = [
-            "\n" => '\n',
-            "\r" => '\r',
-            "\t" => '\t',
-            '\\' => '\\\\',
-            '$'  => '\$',
-            '"'  => '\"'
-        ];
-
-        return strtr($string, $addPHPslashes);
+        return LangStringEscaper::addPhpSlashes($string);
     }
 
     /**
@@ -761,7 +754,12 @@ class Language extends TikiDb_Bridge
     {
         global $prefs;
         $section = Sections::getCurrentSection();
-        if (! empty($section) && Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! empty($prefs['language_admin']) && self::isValidLocale($prefs['language_admin'])) {
+        if (
+            ! empty($section)
+            && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))
+            && ! empty($prefs['language_admin'])
+            && self::isValidLocale($prefs['language_admin'])
+        ) {
             return $prefs['language_admin'];
         }
 

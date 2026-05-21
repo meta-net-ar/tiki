@@ -72,8 +72,15 @@
                     </p>
                 {/remarksbox}
             {/if}
+            {if $unsupported_mail_queue_entries}
+                {remarksbox type="danger" title="{tr}Unsupported Email Queue Entries{/tr}"}
+                    <p>{tr _0=$unsupported_mail_queue_entries}There are %0 queued messages that use an old unsupported mail format and cannot be processed by the current queue system.{/tr}</p>
+                    <p>{tr}Please delete the unsupported entries from the mail queue administration page.{/tr}</p>
+                    <p>{tr _0='<a class="alert-link" href="tiki-admin_email_queue.php">' _1="</a>"}%0Manage the queue.%1{/tr}</p>
+                {/remarksbox}
+            {/if}
             {if $ProblemsLoadingCacheSubSystem}
-                {remarksbox type="warning" title="{tr _0=$ProblemsLoadingCacheSubSystem}%0 did not load properly{/tr}"}
+                {remarksbox type="danger" title="{tr _0=$ProblemsLoadingCacheSubSystem}%0 did not load properly{/tr}"}
                 {tr _0=$ProblemsLoadingCacheSubSystem}Tiki is configured to use <strong>%0 cache system</strong>, however, it was not loaded properly. Check if the extension has been properly loaded.{/tr}<br />
                 {/remarksbox}
             {/if}
@@ -102,7 +109,7 @@
                 {remarksbox type="error" title="{tr}Scheduler tasks failure logs{/tr}"}
                     <p>
                     {if ! empty($prefs.scheduledTasksReport) && $prefs.scheduledTasksReport === 'last_number_of_hours'}
-                        {tr}Nº of tasks failure in last {$prefs.scheduledTasksReportHours} hours:{/tr}
+                        {tr _0=$prefs.scheduledTasksReportHours}Nº of tasks failure in last %0 hours:{/tr}
                         {if ! empty($scheduler_total_count)}
                             <strong>{$scheduler_failure_count} / {$scheduler_total_count}</strong> ({tr}failures / total executions{/tr})
                         {else}
@@ -210,7 +217,7 @@
 
             {if !$isSchedulerRunConfigured}
                 {remarksbox type="warning" title="{tr}The Scheduler does not seem to have been executed recently.{/tr}"}
-                    {tr}In most Tiki installations it is useful to have the scheduler configured to execute tasks in the background{/tr}
+                    {tr}In most Tiki installations it is useful to have the scheduler configured to execute tasks in the background.{/tr}
                     {tr}Find out more about the Scheduler at{/tr}
                     <a href="https://doc.tiki.org/Scheduler" class="link" target="_blank">
                         https://doc.tiki.org/Scheduler

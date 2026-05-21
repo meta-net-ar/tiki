@@ -132,7 +132,7 @@
                     <div class="col-sm-7">
                         <input type="text" name="server" class="form-control">
                         <div class="form-text">
-                            <i>{tr}Must be in tikiroot/{$tmpdir} or tikiroot/img/wiki_up{/tr}</i>
+                            <i>{tr _0=$tmpdir}Must be in tikiroot/%0 or tikiroot/img/wiki_up{/tr}</i>
                         </div>
                     </div>
                 </div>
@@ -167,7 +167,7 @@
                 {if $passed eq 'true'}
                     File found: {$server}.
                 {else}
-                    {tr}File was not specified, or could not be found in either location. Please put the file in either directory and Go Back. If the file exists in both locations, the $tikiroot/{$filecheck} location will be preferred.{/tr}
+                    {tr _0=$filecheck}File was not specified, or could not be found in either location. Please put the file in either directory and Go Back. If the file exists in both locations, the $tikiroot/%0 location will be preferred.{/tr}
                 {/if}
 
                 <p> </p>

@@ -15,6 +15,7 @@
 use Tiki\Maintenance\Maintenance;
 use Tiki\Package\VendorHelper;
 use Tiki\Profiling\Timer;
+use Tiki\Captcha\CaptchaTypeResolver;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 //Be careful, composer autoloading isn't available until tiki-setup_base.php is required further down
@@ -218,6 +219,14 @@ Sections::onSectionChange(function ($section) {
     Language::setSectionLanguage();
 });
 
+Sections::onSectionChange(function ($section) use ($prefs) {
+    if (($prefs['feature_freetags'] ?? 'n') !== 'y') {
+        return;
+    }
+
+    TikiLib::lib('freetag')->assignCurrentObjectTagsToSmarty();
+});
+
 require_once('lib/setup/wiki.php');
 
 $user_groups = $userlib->get_user_groups($user);
@@ -275,6 +284,7 @@ if (! TIKI_API) {
             $prefs['site_closed'] === 'y'
         ) {
             // js disabled, so we need to set the cookies server-side
+            // DRY, this appears to be the default value of initializeConsentPreferences why do we have another copy here?  benoitg - 2026-03-25
             $consent = [
                 'consentGiven' => true,
                 'categories' => [
@@ -285,11 +295,16 @@ if (! TIKI_API) {
                 ],
             ];
             CookieConsentLib::setConsentPreferences($consent);
-            $feature_no_cookie = false;
+            $feature_no_cookie = false;  //This isn't a global here, so this set will have no effect! - benoitg - 2026-03-25
         }
-        // Retrieve the full consent object (This check first the browser and then user cookie consent prefs)
+        // Retrieve the full consent object
         $consent_preferences = CookieConsentLib::initializeConsentPreferences();
 
+        /*
+        I don't understand why CookieConsentLib doesn't deal with this at init.
+        Especially since it's not clearing the cookies for a category if one withdraws consent from
+        tiki-user_preferences.php, so tiki essentially lies in that situation -  benoitg - 2026-03-25
+        */
         if (! $consent_preferences['consentGiven'] || $jitRequest->offsetExists('cookie_consent')) {
             if (! $jitRequest->offsetExists('cookie_consent')) {
                 foreach ($_COOKIE as $k => $v) {
@@ -299,8 +314,7 @@ if (! TIKI_API) {
                 }
             }
             // Get cookie categories
-            $cookie_categories = CookieConsentLib::getCookieCategories();
-            $smarty->assign('cookie_categories', $cookie_categories);
+            $smarty->assign('cookie_categories', CookieConsentLib::getRequestedCookieCategories());
             $cookie_consent_html = $smarty->fetch('cookie_consent.tpl');
         }
     }
@@ -453,8 +467,9 @@ if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
 }
 
 if ($prefs['feature_antibot'] == 'y' && empty($user)) {
-    if ($prefs['recaptcha_enabled'] === 'y') {
-        if ($prefs['recaptcha_version'] == '2') {
+    $captchaType = CaptchaTypeResolver::getConfiguredType($prefs);
+    if (in_array($captchaType, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
+        if ($captchaType == 'recaptcha20') {
             if (! empty($prefs['language'])) {
                 $headerlib->add_jsfile_cdn("$url_scheme://www.google.com/recaptcha/api.js?hl=" . $prefs['language']);
             } else {
@@ -625,24 +640,14 @@ if ($prefs['feature_jquery_zoom'] === 'y') {
 }
 ');
 }
-
+// Load CodeMirror CSS early.
+// Adding it from Smarty/Ajax is too late and breaks the editor.
+// Therefore, we load these CSS files during setup (tiki-setup.php / early stage)
+// to ensure they are present in the <head> before any rendering occurs.
 if ($prefs['feature_syntax_highlighter'] == 'y') {
-    //add codemirror stuff
-    $headerlib
-        ->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
-        ->add_jsfile_dependency(CODEMIRROR_DIST_PATH . '/lib/codemirror.js')
-        ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/search/searchcursor.js')
-        ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/mode/overlay.js')
-    //add tiki stuff
-        ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css')
-        ->add_jsfile('lib/codemirror_tiki/codemirror_tiki.js');
-    //add interactjs
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/interactjs/dist/interact.min.js');
-
-    require_once("lib/codemirror_tiki/tiki_codemirror.php");
-    createCodemirrorModes();
+    $headerlib->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
+        ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css');
 }
-
 if ($prefs['feature_ajax'] === 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-confirm.js');
     $headerlib->add_jsfile('lib/ajax/autosave.js'); // Note that this file is needed even if ajax_autosave is off otherwise wysiwyg won't load.
@@ -819,6 +824,9 @@ $headerlib->add_jsfile('lib/jquery_tiki/tiki-vue.js');
 
 if (empty($user) && $prefs['feature_antibot'] == 'y') {
     $headerlib->add_jsfile_late('lib/captcha/captchalib.js');
+    if (CaptchaTypeResolver::getConfiguredType($prefs) === 'altcha') {
+        $headerlib->add_js_module('import {Altcha} from "altcha";');
+    }
 }
 
 if (! empty($prefs['header_custom_css'])) {
@@ -1068,7 +1076,6 @@ if ($prefs['openpgp_gpg_pgpmimemail'] == 'y') {
 //adding pdf creation javascript, used to integrate plugins like tablesorter, trackerfilter with mpdf.
 if ($prefs['print_pdf_from_url'] != 'none') {
     $headerlib->add_jsfile('lib/jquery_tiki/pdf.js');
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . "/html2canvas-pro/dist/html2canvas-pro.min.js", true);
 }
 
 if (file_exists(TIKI_CUSTOMIZATIONS_SETUP_PHP_FILE)) {
@@ -1104,7 +1111,7 @@ if ($prefs['feature_realtime'] == 'y') {
 
 if ($prefs['feature_calendar'] === 'y') {
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/dist/index.css");
-    $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar";');
+    $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar"; window.moduleCalendar = [];');
     $headerlib->add_js_module('import "@jquery-tiki/eventcalendar_to_pdf";');
 }
 
@@ -1117,6 +1124,7 @@ if ($prefs['tiki_monitor_performance'] == 'y') {
 $headerlib->add_js_module('import Sortable from "sortablejs"; window.Sortable = Sortable;');
 
 // Shoelace color picker
+// Why are these in global setup, and unconditional?  color picking is not a frequent user operation - benoitg - 2026-03-09
 $headerlib->add_js_module("import '@shoelace/color-picker';");
 $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/@shoelace-style/shoelace/dist/themes/light.css');
 $headerlib->add_js_module("import { textareaColorpicker } from '@tiki/ui-utils'; textareaColorpicker();");

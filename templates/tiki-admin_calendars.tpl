@@ -140,9 +140,7 @@
                                     {permission_link mode=text type=calendar id=$id title=$cal.name}
                                 </action>
                                 <action>
-                                    <a href="tiki-admin_calendars.php?offset={$offset}&amp;sort_mode={$sort_mode}&amp;drop={$id}&amp;calendarId={$id}"
-                                        onclick="confirmPopup('{tr}Delete calendar?{/tr}', '{ticket mode=get}')"
-                                    >
+                                    <a href="{bootstrap_modal controller='calendar' action='remove_calendar' calendarId=$id}">
                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
                                     </a>
                                 </action>
@@ -436,18 +434,18 @@
             </label>
             <div class="col-sm-8">
                 <div>
-                    <input type="checkbox" class="form-check-input" id="select-all-days">
+                    <input type="checkbox" class="form-check-input js-select-all" id="select-all-days" data-select-all-target="viewdays[]">
                     <label class="form-check-label me-3" for="select-all-days">
                         {tr}Select all{/tr}
                     </label>
-                    <input type="checkbox" id="select-working-days" class="form-check-input">
+                    <input type="checkbox" id="select-working-days" class="form-check-input js-select-all" data-select-all-target=".js-viewday-working">
                     <label class="form-check-label" for="select-working-days">
                         {tr}Select working days{/tr}
                     </label>
                 </div>
                 {section name="viewdays" start=0 loop=7}
                 <div class="form-check">
-                    <input type="checkbox" class="form-check-input" name="viewdays[]" value="{$smarty.section.viewdays.index}" {if !empty($info.viewdays) && in_array($smarty.section.viewdays.index,$info.viewdays)} checked="checked" {/if}>
+                    <input type="checkbox" class="form-check-input js-viewday {if $smarty.section.viewdays.index > 0 && $smarty.section.viewdays.index < 6}js-viewday-working{/if}" name="viewdays[]" value="{$smarty.section.viewdays.index}" {if !empty($info.viewdays) && in_array($smarty.section.viewdays.index,$info.viewdays)} checked="checked" {/if}>
                     <label class="form-check-label">
                         {$days_names[$smarty.section.viewdays.index]}
                     </label>

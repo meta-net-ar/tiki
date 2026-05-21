@@ -1449,7 +1449,6 @@ class Spreadsheet_Excel_Writer_Workbook extends Spreadsheet_Excel_Writer_BIFFwri
 
             $string_length = strlen($string);
             $encoding      = 0; // assume there are no Unicode strings
-            $split_string  = 0;
  
             // Block length is the total length of the strings that will be
             // written out in a single SST or CONTINUE block.

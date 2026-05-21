@@ -66,6 +66,8 @@ function wikiplugin_mautic($data, $params)
         return tra('You must configure Mautic URL before using this plugin');
     }
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_mautic_info());
+
     if (empty($params['type'])) {
         return tra('Type parameter is required');
     }

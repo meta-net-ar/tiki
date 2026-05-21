@@ -146,33 +146,8 @@ class Spreadsheet_Excel_Reader
 
 
     public function read($sFileName) {
-        $res = $this->_ole->read($sFileName);
+        $this->_ole->read($sFileName);
         $this->data = $this->_ole->getWorkBook();
-        /*
-             $res = $this->_ole->read($sFileName);
-
-             if ($this->isError($res)) {
-        //        var_dump($res);
-        return $this->raiseError($res);
-        }
-
-        $total = $this->_ole->ppsTotal();
-        for ($i = 0; $i < $total; $i++) {
-        if ($this->_ole->isFile($i)) {
-        $type = unpack("v", $this->_ole->getData($i, 0, 2));
-        if ($type[''] == 0x0809)  { // check if it's a BIFF stream
-        $this->_index = $i;
-        $this->data = $this->_ole->getData($i, 0, $this->_ole->getDataLength($i));
-        break;
-        }
-        }
-        }
-
-        if ($this->_index === null) {
-        return $this->raiseError("$file doesn't seem to be an Excel file");
-        }
-
-         */
 
         $this->pos = 0;
         return $this->_parse();
@@ -318,7 +293,6 @@ class Spreadsheet_Excel_Reader
                         }
                     //echo " 1 Type_SST\n";
                     $this->shareStrings = new SSTRecord($r, $continueRecords);
-                    //print_r($this->shareStrings->strings);
                      */
                     // echo 'SST read: '.($time_end-$time_start)."\n";
                     break;
@@ -398,8 +372,6 @@ class Spreadsheet_Excel_Reader
                 case Spreadsheet_Excel_Reader_Type_BOUNDSHEET:
                     //echo "Type.BOUNDSHEET\n";
                     $rec_offset = $this->_GetInt4d($this->data, $pos+4);
-                    $rec_typeFlag = ord($this->data[$pos+8]);
-                    $rec_visibilityFlag = ord($this->data[$pos+9]);
                     $rec_length = ord($this->data[$pos+10]);
 
                     if ($version == Spreadsheet_Excel_Reader_BIFF8){
@@ -607,7 +579,6 @@ class Spreadsheet_Excel_Reader
         //$xfindex = GetInt2d(, 4);
         $xfindex = ord($this->data[$spos+4]) | ord($this->data[$spos+5]) << 8;
         //echo 'check is date '.$xfindex.' '.$this->formatRecords['xfrecords'][$xfindex]['type']."\n";
-        //var_dump($this->formatRecords['xfrecords'][]);
         if ($this->formatRecords['xfrecords'][$xfindex]['type'] == 'date') {
             $this->curformat = $this->formatRecords['xfrecords'][$xfindex]['format'];
             $this->rectype = 'date';

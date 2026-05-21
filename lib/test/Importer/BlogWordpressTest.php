@@ -13,6 +13,7 @@ use Laminas\Http\Client\Adapter\Test as HttpClientAdapterTest;
 use Tiki\FileGallery\File;
 use TikiDb;
 use Tiki\Lib\Importer\BlogWordpress;
+use TikiLib;
 
 /**
  * @group importer

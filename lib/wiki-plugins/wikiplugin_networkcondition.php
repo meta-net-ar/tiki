@@ -34,11 +34,10 @@ function wikiplugin_networkcondition($data, $params)
 
     $ip = $tikilib->get_ip_address();
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_networkcondition_info());
+
     if (! is_null($params['ipv4list'])) {
         $list = $params['ipv4list'];
-        if (! is_array($list)) {
-            $list = explode(',', $params['ipv4list']);
-        }
 
         if (! in_array($ip, $list)) {
             return '';

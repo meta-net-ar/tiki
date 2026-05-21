@@ -84,7 +84,7 @@
 {literal}
     <div id="gantEditorTemplates" style="display:none;">
         <div class="__template__" type="GANTBUTTONS">
-        {*
+        <!--
         <div class="ganttButtonBar noprint">
             <div class="buttons">
                 <button onclick="$('#workSpace').trigger('undo.gantt');return false;" class="button textual icon requireCanWrite" title="undo" aria-label="{tr}undo{/tr}"><span class="teamworkIcon">&#39;</span></button>
@@ -123,11 +123,11 @@
                 <span id="ganttLoading">{icon name="spinner" iclass="fa-spin" _menu_text='y' _menu_icon='y' ititle="{tr}Loading{/tr}" alt="{tr}Loading{/tr}"}</span>
             </div>
         </div>
-        *}
+        -->
         </div>
 {/literal}
         <div class="__template__" type="TASKSEDITHEAD">
-            {*
+            <!--
             <table class="gdfTable" cellspacing="0" cellpadding="0">
                 <thead>
                 <tr style="height:40px">
@@ -146,11 +146,11 @@
                 </tr>
                 </thead>
             </table>
-            *}
+            -->
         </div>
 {literal}
         <div class="__template__" type="TASKROW">
-            {*
+            <!--
             <tr taskId="(#=obj.id#)" class="taskEditRow (#=obj.isParent()?'isParent':''#) (#=obj.collapsed?'collapsed':''#)" level="(#=level#)">
                 <th class="gdfCell edit text-right" style="cursor:pointer;"><span class="taskRowIndex">(#=obj.getRow()+1#)</span> <span class="teamworkIcon" style="font-size:12px;" >e</span></th>
                 <td class="gdfCell noClip text-center"><div class="taskStatus cvcColorSquare" status="(#=obj.status#)"></div></td>
@@ -168,11 +168,11 @@
                 <td class="gdfCell requireCanSeeDep"><input type="text" name="depends" autocomplete="off" value="(#=obj.depends#)" (#=obj.hasExternalDep?"readonly":""#)></td>
                 <td class="gdfCell taskAssigs">(#=obj.getAssigsString()#)</td>
             </tr>
-            *}
+            -->
         </div>
 {/literal}
         <div class="__template__" type="TASKEMPTYROW">
-            {*
+            <!--
             <tr class="taskEditRow emptyRow" >
                 <th class="gdfCell" align="right"></th>
                 <td class="gdfCell noClip" align="center"></td>
@@ -187,11 +187,11 @@
                 <td class="gdfCell requireCanSeeDep"></td>
                 <td class="gdfCell"></td>
             </tr>
-            *}
+            -->
         </div>
 {literal}
         <div class="__template__" type="TASKBAR">
-            {*
+            <!--
             <div class="taskBox taskBoxDiv" taskId="(#=obj.id#)" >
                 <div class="layout (#=obj.hasExternalDep?'extDep':''#)">
                     <div class="taskStatus" status="(#=obj.status#)"></div>
@@ -201,11 +201,11 @@
                     <div class="milestone end (#=obj.endIsMilestone?'active':''#)" ></div>
                 </div>
             </div>
-            *}
+            -->
         </div>
 {/literal}
         <div class="__template__" type="CHANGE_STATUS">
-            {*
+            <!--
             <div class="taskStatusBox">
                 <div class="taskStatus cvcColorSquare" status="STATUS_ACTIVE" title="{tr}active{/tr}"></div>
                 <div class="taskStatus cvcColorSquare" status="STATUS_DONE" title="{tr}completed{/tr}"></div>
@@ -213,11 +213,11 @@
                 <div class="taskStatus cvcColorSquare" status="STATUS_SUSPENDED" title="{tr}suspended{/tr}"></div>
                 <div class="taskStatus cvcColorSquare" status="STATUS_UNDEFINED" title="{tr}undefined{/tr}"></div>
             </div>
-            *}
+            -->
         </div>
 {literal}
         <div class="__template__" type="TASK_EDITOR">
-            {*
+            <!--
             <div class="ganttTaskEditor">
                 <h2 class="taskData">{/literal}{tr}Task editor{/tr}{literal}</h2>
                 <form method="post">
@@ -298,22 +298,22 @@
                     </div>
                 </form>
             </div>
-            *}
+            -->
         </div>
 
         <div class="__template__" type="ASSIGNMENT_ROW">
-            {*
+            <!--
             <tr taskId="(#=obj.task.id#)" assId="(#=obj.assig.id#)" class="assigEditRow" >
                 <td ><select name="resourceId" class="formElements"></select></td>
                 <td ><select type="select" name="roleId" class="formElements"></select></td>
                 <td ><input type="text" name="effort" value="(#=getMillisInHoursMinutes(obj.assig.effort)#)" size="5" class="formElements"></td>
                 <td align="center"><span class="teamworkIcon delAssig del" style="cursor: pointer">d</span></td>
             </tr>
-            *}
+            -->
         </div>
 {/literal}
         <div class="__template__" type="RESOURCE_EDITOR">
-            {*
+            <!--
             <div class="resourceEditor" style="padding: 5px;">
                 <h2></h2>
                 <table  cellspacing="1" cellpadding="0" width="100%" id="resourcesTable">
@@ -324,20 +324,20 @@
                 </table>
                 <div style="text-align: right; padding-top: 20px"><button id="resSaveButton" class="button big">{tr}Save{/tr}</button></div>
             </div>
-            *}
+            -->
         </div>
 {literal}
         <div class="__template__" type="RESOURCE_ROW">
-            {*
+            <!--
             <tr resId="(#=obj.id#)" class="resRow">
                 <td><input type="text" name="name" value="(#=obj.name#)" style="width:100%;" class="formElements"></td>
                 <td align="center"><span class="teamworkIcon delRes del" style="cursor: pointer">d</span></td>
             </tr>
-            *}
+            -->
         </div>
 
         <div class="__template__" type="GANTT_DUPLICATOR">
-            {*
+            <!--
             <div class="ganttDuplicator">
                 <h2 class="taskData">{/literal}{tr}Gantt Duplicator{/tr}{literal}</h2>
                 <form method="post">
@@ -367,7 +367,7 @@
                     </div>
                 </form>
             </div>
-            *}
+            -->
         </div>
     </div>
 {/literal}

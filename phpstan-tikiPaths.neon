@@ -22,13 +22,13 @@ parameters:
     - lib/test
 
     # Depends on code decompressed in the source tree, so isn't always there
- 
+
     # Cypth related
     # There is really no reason to exclude cypht anymore, as jason-munro/cypht is in composer.json by default.  But lib/cypht/integration/classes.php uses nested requires which seem to confuse phpstan. - benoitg - 2026-01-25
     - lib/cypht
     - lib/core/Services/Cypht/Controller.php
     - lib/core/Search/Index/Cypht.php
-    - lib/wiki-plugins/wikiplugin_cypht.php 
+    - lib/wiki-plugins/wikiplugin_cypht.php
     - modules/mod-func-webmail_unread_messages.php
     - lib/core/Tiki/Command/Webmail*
     - tiki-webmail.php
@@ -39,6 +39,7 @@ parameters:
 
     - lib/core/IDS #Depends on enygma/expose
     - lib/core/Tiki/Faker.php #Depends on fakerphp/faker
+    - lib/core/Tiki/TrackerFaker.php #Depends on fakerphp/faker
 
 
     # DEPRECATED code
@@ -46,13 +47,13 @@ parameters:
     - lib/core/TikiDb/MasterSlaveDispatch.php #Apparently not upgraded as TikiDb evolved - benoitg- 2025-12-23
     - lib/Sheet
     - lib/wiki-plugins/wikiplugin_sheet.php
-    - lib/core/Tiki/Profile/InstallHandler/Sheet.php 
+    - lib/core/Tiki/Profile/InstallHandler/Sheet.php
     - tiki-export_sheet.php
-  
+
     # DEPRECATED tests
     - tiki_tests
     - lib/test/AcceptanceTests
-  
+
     # lang/ takes too long to process
     - lang
 
@@ -61,7 +62,7 @@ parameters:
   #Permanent error configuration
   ignoreErrors:
     # Conditionally included config files
-    - 
+    -
       message: '#"db/local.php" is not a file or it does not exist.#'
       reportUnmatched: false
     -

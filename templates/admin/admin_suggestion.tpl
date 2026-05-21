@@ -6,7 +6,7 @@
         </h4>
         <p>{tr}Do you need help with your Tiki?{/tr}<br/>
                 {tr}You can reach out to a specialist:{/tr}
-                <a target="_blank" title="{tr}Tiki Consultants{/tr}" href="https://tiki.org/Consultants">https://tiki.org/Consultants</a>
+                <a target="_blank" class="alert-link" title="{tr}Tiki Consultants{/tr}" href="https://tiki.org/Consultants">https://tiki.org/Consultants</a>
         </p>
     </div>
 {/if}

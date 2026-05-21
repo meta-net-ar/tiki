@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Tiki\Captcha\CaptchaTypeResolver;
 use Tiki\Lib\Registration\Error as RegistrationError;
 use Tiki\Lib\core\WikiPlugin\Options\TrackerStatuses;
 use Tiki\Lib\core\WikiPlugin\Options\BooleanEnglishLetter;
@@ -712,6 +713,7 @@ function wikiplugin_tracker($data, $params)
     $smarty->assign('trackerEditFormId', $iTRACKER);
     $item = [];
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_tracker_info());
     extract($params, EXTR_SKIP);
 
     $thisIsThePlugin = isset($_REQUEST['iTRACKER']) && $_REQUEST['iTRACKER'] == $iTRACKER;
@@ -1862,7 +1864,7 @@ function wikiplugin_tracker($data, $params)
                 $customvalidation .= '} } } ';
                 $customvalidation .= '}, ';
                 $customvalidation_m .= 'name: { required: "' . tra("This field is required") . '"}, ';
-                if (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox') && $prefs['feature_antibot'] == 'y' && empty($user) && $prefs['recaptcha_enabled'] != 'y') {
+                if (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox') && $prefs['feature_antibot'] == 'y' && empty($user) && CaptchaTypeResolver::requiresManualInput($prefs)) {
                     // antibot validation
                     $customvalidation .= '"captcha[input]": { ';
                     $customvalidation .= 'required: true, ';
@@ -2095,7 +2097,7 @@ function wikiplugin_tracker($data, $params)
                     } else {
                         $mand = ($isFieldMandatory($f)) ? "&nbsp;<strong class='mandatory_star text-danger tips' title=':" . tra("This field is mandatory") . "'>*</strong>&nbsp;" : '';
 
-                        if (isset($showfielddesc) && $showfielddesc === 'y' && ! empty($f['description'])) {
+                        if (isset($showfieldsdesc) && $showfieldsdesc === 'y' && ! empty($f['description'])) {
                             $desc = $f['descriptionIsParsed'] == 'y' ? TikiLib::lib('parser')->parse_data($f['description']) : htmlspecialchars(tra($f['description']));
                             $desc = '<div class="trackerplugindesc">' . $desc . '</div>';
                         } else {
@@ -2253,7 +2255,7 @@ function wikiplugin_tracker($data, $params)
     <input type="hidden" value="" name="mode_wysiwyg"/>
     <input type="hidden" value="" name="mode_normal"/>
     <div class="edit-zone">
-        <textarea id="ins_fill" name="ins_fill" class="wikiedit form-control" data-syntax="" data-codemirror="" onkeyup="" rows="15" ></textarea>
+        <textarea id="ins_fill" name="ins_fill" class="wikiedit form-control" onkeyup="" rows="15" ></textarea>
     </div>
     <input type="hidden" value="n" name="wysiwyg"/>
     <div name="ins_fill_desc" class="trackerplugindesc" >

@@ -52,9 +52,12 @@ function tiki_setup_events()
         }
 
         if ($prefs['xmpp_feature'] === 'y') {
-            // Bridge Tiki event -> OO subscriber
-            $subscriber = new \Tiki\Event\Subscriber\XmppRegistrationSubscriber();
-            $events->bind('tiki.user.register.local', [$subscriber, 'onUserRegistered']);
+            // Bridge procedural events -> OO subscriber for group sync (login/register handled asynchronously)
+            $syncSubscriber = new \Tiki\Event\Subscriber\XmppUserSyncSubscriber();
+            // Avoid blocking login with XMPP sync; keep sync on group changes only
+            // $events->bind('tiki.user.login', [$syncSubscriber, 'onUserLogin']);
+            $events->bind('tiki.user.groupjoin', [$syncSubscriber, 'onUserGroupJoin']);
+            $events->bind('tiki.user.groupleave', [$syncSubscriber, 'onUserGroupLeave']);
 
             // Optional: auto-create XMPP room on wiki save (requires montefuscolo/xmpp >= 0.8, PHP 8.1+)
             // $events->bind('tiki.wiki.save', $defer('xmpp', 'create_room_from_wikipage'));

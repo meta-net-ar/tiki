@@ -171,8 +171,6 @@ class Tracker_Field_Rating extends \Tracker\Field\AbstractItemField
 
     private function getBaseFieldData()
     {
-        global $user;
-
         $mode = $this->getOption('mode', 'stars');
 
         $options_array = $this->getOption('option', [1, 2, 3, 4, 5]);

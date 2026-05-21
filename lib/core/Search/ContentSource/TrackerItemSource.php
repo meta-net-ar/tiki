@@ -37,7 +37,6 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
         $item = $this->trklib->get_tracker_item($objectId);
         // Check that the element is valid and contains a trackerId
         if (empty($item) || empty($item['trackerId'])) {
-            trigger_error("Invalid item data or missing trackerId for objectId: $objectId");
             return false;
         }
 
@@ -108,6 +107,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
                 'view_permission' => $typeFactory->identifier($permNeeded),
                 'parent_object_id' => $typeFactory->identifier($item['trackerId']),
                 'parent_object_type' => $typeFactory->identifier('tracker'),
+                'parent_object_title' => $typeFactory->sortable($definition->getName()),
 
                 'field_permissions' => $typeFactory->plaintext(json_encode($fieldPermissions)),
 
@@ -152,6 +152,7 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
             'view_permission',
             'parent_object_id',
             'parent_object_type',
+            'parent_object_title',
         ];
 
         foreach (self::getAllIndexableHandlers() as $handler) {
@@ -210,7 +211,6 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
                 $data = array_merge($data, $handler->getGlobalFields());
             } else {
                 //Skip this field if it's the main title field, it will still be part of title later, we don't want it twice in contents, and we want it at the end
-                //var_dump($handler->getBaseKey());
             }
         }
 

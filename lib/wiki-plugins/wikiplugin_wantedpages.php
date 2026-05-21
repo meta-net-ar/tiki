@@ -173,8 +173,9 @@ class WikiPluginWantedPages extends PluginsLib
         }
 
         // Check if link is wrapped in ~np~ tags (exact or partial matches within np blocks)
-        // Pattern: ~np~...((PageName))...~/np~
-        $escapedPattern = '/~np~[^~]*?\(\(' . preg_quote($toPage, '/') . '\)\).*?~\/np~/s';
+        // Pattern: ~np~...((PageName))...~/np~ and ~np~...(...(PageName))...~/np~
+        $quotedPage = preg_quote($toPage, '/');
+        $escapedPattern = '/~np~[^~]*?\((?:[a-zA-Z0-9_-]+)?\(' . $quotedPage . '\)\).*?~\/np~/s';
 
         return preg_match($escapedPattern, $fromPageContent) === 1;
     }

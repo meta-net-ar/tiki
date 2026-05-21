@@ -11,16 +11,16 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'parent'                      => 'int',               //post
-            'categId'                     => 'int',               //get
-            'remove'                      => 'int',               //get
-            'update'                      => 'bool',              //get
-            'mutual'                      => 'bool',              //get
-            'add'                         => 'bool',              //get
-            'oldcategId'                  => 'int',               //post
-            'offset'                      => 'int',               //get
-            'find'                        => 'string',            //post
-            'sort_mode'                   => 'string',            //get
+            'parent'                      => 'int',       // post
+            'categId'                     => 'int',       // get
+            'remove'                      => 'bool',      // get
+            'update'                      => 'bool',      // get
+            'mutual'                      => 'word',      // get
+            'add'                         => 'bool',      // get
+            'oldcategId'                  => 'int',       // post
+            'offset'                      => 'int',       // get
+            'find'                        => 'striptags', // post
+            'sort_mode'                   => 'word',       // get
         ],
     ],
 ];

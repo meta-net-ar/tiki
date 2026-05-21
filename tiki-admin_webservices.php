@@ -41,7 +41,7 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 $access->check_feature('feature_webservices');
 $access->check_permission('tiki_p_admin_webservices');
@@ -108,7 +108,7 @@ if (
         ]
     );
 
-    $smarty->assign('data', print_r($data, true));
+    $smarty->assign('data', print_r($data, true)); // @phpstan-ignore disallowedFunctions.printR (returns webservice response as string for admin debug display, never prints)
     $smarty->assign('templates', $templates);
     $smarty->assign('response', $response);
     if (isset($_REQUEST['deletetemplate']) && $webservice->getTemplate($_REQUEST['deletetemplate'])) {

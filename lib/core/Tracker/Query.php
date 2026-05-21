@@ -808,7 +808,6 @@ class Tracker_Query
      */
     public function query()
     {
-        $trklib = TikiLib::lib('trk');
         $tikilib = TikiLib::lib('tiki');
         $params = [];
         $fields_safe = "";
@@ -993,8 +992,9 @@ class Tracker_Query
 
         if ($this->debug == true) {
             $result = [$query, $params];
+            // @phpstan-ignore disallowedFunctions.printR (intentional debug output gated by $this->debug)
             print_r($result);
-            print_r($tikilib->fetchAll($query, $params));
+            print_r($tikilib->fetchAll($query, $params)); // @phpstan-ignore disallowedFunctions.printR (intentional debug output gated by $this->debug)
             die;
         } else {
             $result = $tikilib->fetchAll($query, $params);
@@ -1008,7 +1008,7 @@ class Tracker_Query
             }
         }
 
-        foreach ($result as $key => $row) {
+        foreach ($result as $row) {
             if (isset($newResult[$row['itemId']])) {
                 continue;
             }
@@ -1075,7 +1075,7 @@ class Tracker_Query
         }
         unset($result);
 
-        $this->limitReached = (count($newResult) > $this->limit ? true : false);
+        $this->limitReached = count($newResult) > $this->limit;
 
         return $newResult;
     }
@@ -1208,7 +1208,7 @@ class Tracker_Query
 
         $cellKeys = [];
         $cellKeysSet = false;
-        foreach ($array as $key => $val) {
+        foreach ($array as $val) {
             $tmp = '';
 
             if ($cellKeysSet == false) {
@@ -1244,8 +1244,6 @@ class Tracker_Query
      */
     public function replaceItem($data = [])
     {
-        $itemData = [];
-
         $fields = TikiLib::lib("trk")->list_tracker_fields($this->trackerId());
         for ($i = 0, $fieldCount = count($fields['data']); $i < $fieldCount; $i++) {
                 $fields['data'][$i]['value'] = $data[$fields['data'][$i][$this->fieldKey]];

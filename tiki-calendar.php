@@ -14,20 +14,22 @@ use Tiki\Lib\TikiDate;
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'allCals'               => 'text',              //post
+            'allCals'               => 'bool',              //post
             'refresh'               => 'bool',              //post
-            'find'                  => 'word',              //post
+            'find'                  => 'string',         //post
             'day'                   => 'digits',            //post
             'year'                  => 'digits',            //post
             'mon'                   => 'digits',            //post
-            'generate_availability' => 'digits',            //post
-            'sort_mode'             => 'string',            //get
-            'watch_event'           => 'string',            //post
-            'watch_action'          => 'string',            //post
-            'todate'                => 'string',            //post
-
-        ],'staticKeyFiltersForArrays' => [
-            'calIds'                    => 'int',          //post
+            'generate_availability' => 'bool',              //post
+            'sort_mode'             => 'word',              //get
+            'watch_event'           => 'word',              //post
+            'watch_action'          => 'word',              //post
+            'todate'                => 'int',               //post
+            'viewmode'              => 'word',              //post
+            'calitemId'            => 'int',                //post
+        ],
+        'staticKeyFiltersForArrays'   => [
+            'calIds'                => 'int',               //post
         ],
     ]
 ];
@@ -38,8 +40,6 @@ Sections::setCurrentSection($section);
 $calendarlib = TikiLib::lib('calendar');
 $categlib = TikiLib::lib('categ');
 include_once('lib/newsletters/nllib.php');
-
-$headerlib->add_cssfile('themes/base_files/feature_css/calendar.css', 20);
 # perms are
 #   $tiki_p_view_calendar
 #   $tiki_p_admin_calendar
@@ -88,29 +88,16 @@ if (empty($rawcals['data'])) {
     Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
-$minHourOfDay = 12;
-$maxHourOfDay = 12;
-$startOfDayMinute = 0;
-$endOfDayMinute = 0;
-$calendars = [];
-$canEditAnything = false;
+$calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
+$calendarInitialParams['initialView'] = $_REQUEST['viewmode'] ?? 'dayGridMonth';
+$smarty->assign('eventCalendarParams', $calendarInitialParams);
 
-foreach ($rawcals['data'] as $calendar) {
-    $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
-
-    $calendars[$calendar['calendarId']] = $calendar;
-
-    // for week and day views
-    $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-    $startOfDayMinute = intdiv($startOfDayUnix % 3600, 60);
-    $minHourOfDay = intdiv($startOfDayUnix, 3600);
-
-    $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-    $endOfDayMinute = intdiv($endOfDayUnix % 3600, 60);
-    $maxHourOfDay = intdiv($endOfDayUnix, 3600);
-
-    $canEditAnything = $canEditAnything || $calendar['perms']->add_events;
-}
+$calendars = $calendarInitialParams['calendars'];
+$canEditAnything = $calendarInitialParams['canEditAnything'];
+$minHourOfDay = (int)explode(':', $calendarInitialParams['minHourOfDay'])[0];
+$maxHourOfDay = (int)explode(':', $calendarInitialParams['maxHourOfDay'])[0];
+$startOfDayMinute = (int)explode(':', $calendarInitialParams['minHourOfDay'])[1];
+$endOfDayMinute = (int)explode(':', $calendarInitialParams['maxHourOfDay'])[1];
 
 $rawsubs = $calendarlib->get_subscriptions($user);
 foreach ($rawsubs['data'] as $sub) {
@@ -273,7 +260,7 @@ if (! empty($_REQUEST['generate_availability'])) {
         $nlg_availability = $nlgen->generateAvailability($busy_list, $ranges, NLGen\Grammars\Availability\AvailabilityGrammar::SPECIFIC, null);
         $smarty->assign('nlg_availability', $nlg_availability);
     } catch (Exception $e) {
-        error_log("Availability generation error: " . $e->getMessage());
+        error_log("Availability generation error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (calendar exception reporting)
         Feedback::error($e->getMessage());
         $smarty->assign('nlg_availability', '');
     }
@@ -379,7 +366,6 @@ if ($canEditAnything) {
     $smarty->assign('maxHourOfDay', $maxHourOfDay . ':00:00');
 
     TikiLib::lib('header')
-        ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
         ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
 }
 

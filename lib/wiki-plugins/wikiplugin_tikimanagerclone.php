@@ -170,6 +170,15 @@ function wikiplugin_tikimanagerclone($data, $params)
         return;
     }
 
+    $missing = WikiPlugin_Helper::validateRequiredParams('tikimanagerclone', $params);
+
+    if ($missing) {
+        return WikiParser_PluginOutput::error(
+            tra('Error'),
+            tra('Missing required parameter(s): ') . implode(', ', $missing)
+        );
+    }
+
     try {
         $utilities = new Services_Manager_Utilities();
         $utilities->tikiManagerCheck();

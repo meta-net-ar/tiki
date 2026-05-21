@@ -388,6 +388,8 @@ function wikiplugin_swiper_info()
 
 function wikiplugin_swiper($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_swiper_info());
+
     if ((! empty($params['fileIds']) && ! $params['fileIds']) && ! $params['fgalId'] && ! $data) {
         Feedback::error(tr('Paramaters missing: Please either select file gallery, give file ids or custom slide code in body.'));
         return;
@@ -546,7 +548,7 @@ function wikiplugin_swiper($data, $params)
     $thumbAfter = '';
     $thumbsSettings = '';
     if ($params['displayThumbnails'] == "y") {
-        $thumbnails = ' <div id="gallery-thumbs' . $uid . '" class="swiper-container gallery-thumbs"><div class="swiper-wrapper">' . $slidesHtml . '</div></div>'   ;
+        $thumbnails = ' <div id="gallery-thumbs' . $uid . '" class="swiper gallery-thumbs"><div class="swiper-wrapper">' . $slidesHtml . '</div></div>'   ;
         $thumbclass = 'gallery-top';
         $swiperOpts = 'var galleryThumbs' . $uid . ' = new Swiper("#gallery-thumbs' . $uid . '", {spaceBetween: 10,
             slidesPerView: 3,
@@ -650,6 +652,6 @@ function wikiplugin_swiper($data, $params)
     $headerlib->add_js(
         '$( document ).ready(function() {' . $swiperOpts . ';$("#swiper-container' . $uid . '").css("max-width",$("#swiper-container' . $uid . '").parent().width());})'
     );
-        $swiperCode = '<div id="swiper-container' . $uid . '" class="swiper-container ' . $thumbclass . '"> <div class="parallax-bg" style="background-image:url(' . $params['parallaxBgImg'] . ')" data-swiper-parallax="-23%"></div> <div class="swiper-wrapper">' . $slidesHtml . '</div><!-- Add Pagination -->' . $paginationDiv . $navigationDiv . '</div>' . $thumbnails;
+        $swiperCode = '<div id="swiper-container' . $uid . '" class="swiper ' . $thumbclass . '"> <div class="parallax-bg" style="background-image:url(' . $params['parallaxBgImg'] . ')" data-swiper-parallax="-23%"></div> <div class="swiper-wrapper">' . $slidesHtml . '</div><!-- Add Pagination -->' . $paginationDiv . $navigationDiv . '</div>' . $thumbnails;
         return $swiperCode;
 }

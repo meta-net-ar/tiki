@@ -79,7 +79,7 @@ class TreeTable extends Base
 {
     public function handle($params, Template $template)
     {
-        global $tree_table_id, $prefs;
+        global $tree_table_id;
         $headerlib = \TikiLib::lib('header');
 
         extract($params);
@@ -191,7 +191,7 @@ class TreeTable extends Base
                     'id' => $id . '_filter',
                     'selectors' => "#$id tbody tr",
                     'parentSelector' => "#$id .collapsed:not(\".leaf\"), #$id .expanded:not(\".leaf\")",
-                    'exclude' => ""
+                    'exclude' => "#$id .subHeader"
                 ],
                 $template
             );
@@ -289,7 +289,7 @@ $("#' . $id . '_showSelected").on("click", function () {
             }
         }
 
-        foreach ($_columns as $column => $columnName) {
+        foreach ($_columns as $columnName) {
             $html .= '<th>';
             $html .= htmlspecialchars($columnName);
             $html .= '</th>';
@@ -357,7 +357,7 @@ $("#' . $id . '_showSelected").on("click", function () {
                                 $html .= '</span></td>';
                             }
                         }
-                        foreach ($_columns as $column => $columnName) {
+                        foreach ($_columns as $columnName) {
                             $html .= '<td>';
                             $html .= htmlspecialchars($columnName);
                             $html .= '</td>';
@@ -396,7 +396,7 @@ $("#' . $id . '_showSelected").on("click", function () {
                         foreach ($_checkboxTooltips as $col) {
                             if (isset($row[$col])) {
                                 $cbxTit[] = tra($row[$col]);
-                            } elseif ($col = '_checkboxTitles') {
+                            } elseif ('_checkboxTitles') {
                                 $cbxTit[] = tra($_checkboxTitles[$i]);
                             }
                         }

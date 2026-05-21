@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_surveys` ADD COLUMN `redirect_after` varchar(255) default NULL;

@@ -406,7 +406,7 @@ class Comments extends TikiLib
             $xTikiHeader = $parsedMessage->getHeaderValue('X-Tiki');
             if ($xTikiHeader === 'yes') {
                 $source_imap->deleteMessages($imap, [$uid]);
-                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid came from Tiki (X-Tiki=yes)");
+                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid came from Tiki (X-Tiki=yes)"); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
                 continue;
             }
             // If the connection is done, or the mail has an error, or whatever,
@@ -414,7 +414,7 @@ class Comments extends TikiLib
             // and continue on. --rlpowell
             if (! count($parsedMessage->getAllHeaders())) {
                 $source_imap->deleteMessages($imap, [$uid]);
-                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid has no headers.");
+                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid has no headers."); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
                 continue;
             }
 
@@ -452,7 +452,7 @@ class Comments extends TikiLib
                 //this should be an admin option, but I don't know how to put it there yet.
                 $source_imap->deleteMessages($imap, [$uid]);
                 $email = $original_email_fixed;
-                error_log("Could not parse email address '$original_email_fixed', using as-is.");
+                error_log("Could not parse email address '$original_email_fixed', using as-is."); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
                 continue;
             }
             $userName = $this->table('users_users')->fetchOne('login', ['email' => $email]);
@@ -684,7 +684,7 @@ class Comments extends TikiLib
                 // mark the message to be deleted and keep processing
                 $source_imap->deleteMessages($imap, [$uid]);
             } catch (Exception $e) {
-                error_log("[MAIL-IMPORT][ERROR] Failed to post email UID=$uid: " . $e->getMessage());
+                error_log("[MAIL-IMPORT][ERROR] Failed to post email UID=$uid: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
                 Feedback::error(tr('Adding email %0 to the forum failed due to "%1"', $title, $e->getMessage()));
             }
             $importedCount++;
@@ -758,7 +758,7 @@ class Comments extends TikiLib
         if ($threadId) {
             $timestamp = (int) $this->table('tiki_comments')->fetchOne('commentDate', ['threadId' => $threadId]);
         } else {
-            $timestamp = (int) $this->now;
+            $timestamp = $this->now;
         }
 
         $queue = $this->table('tiki_forums_queue');
@@ -2552,7 +2552,7 @@ class Comments extends TikiLib
             if ($tiki_p_admin_comments == 'y') {
                 $adminFields = ', tc1.`user_ip`';
             }
-            $query = "select tc1.`threadId`, tc1.`object`, tc1.`objectType`, tc1.`parentId`, tc1.`userName`, tc1.`commentDate`, tc1.`hits`, tc1.`type`, tc1.`points`, tc1.`votes`, tc1.`average`, tc1.`title`, tc1.`data`, tc1.`summary`, tc1.`smiley`, tc1.`message_id`, tc1.`in_reply_to`, tc1.`comment_rating`, tc1.`approved`, tc1.`locked`$adminFields  from `tiki_comments` as tc1
+            $query = "select tc1.`threadId`, tc1.`object`, tc1.`objectType`, tc1.`parentId`, tc1.`userName`, tc1.`commentDate`, tc1.`hits`, tc1.`type`, tc1.`points`, tc1.`votes`, tc1.`average`, tc1.`title`, tc1.`data`, tc1.`summary`, tc1.`smiley`, tc1.`message_id`, tc1.`in_reply_to`, tc1.`comment_rating`, tc1.`approved`, tc1.`locked`, tc1.`is_resolved`$adminFields  from `tiki_comments` as tc1
                 left outer join `tiki_comments` as tc2 on tc1.`in_reply_to` = tc2.`message_id`
                 and tc1.`parentId` = ?
                 and tc2.`parentId` = ?
@@ -3575,6 +3575,8 @@ class Comments extends TikiLib
         }
         global $prefs;
 
+        // Remove file recordings of this comment
+        TikiLib::lib('filegal')->deleteObjectFiles('comment', $threadId, 'tiki.comment.recording');
         $this->delete_forum_deliberations($threadId);
 
         $comments = $this->table('tiki_comments');
@@ -3850,6 +3852,41 @@ class Comments extends TikiLib
             return $this->table('tiki_comments')->update(
                 ['archived' => 'n'],
                 ['threadId' => (int) $threadId, 'parentId' => (int) $parentId]
+            );
+        }
+        return false;
+    }
+
+    /**
+     * Mark a top-level comment thread as resolved.
+     * Resolved threads are collapsed by default in the UI.
+     *
+     * @param int $threadId the comment/thread id
+     * @return bool|TikiDb_Pdo_Result
+     */
+    public function resolveThread($threadId)
+    {
+        if ($threadId > 0) {
+            return $this->table('tiki_comments')->update(
+                ['is_resolved' => 'y'],
+                ['threadId' => (int) $threadId]
+            );
+        }
+        return false;
+    }
+
+    /**
+     * Unresolve a previously resolved comment thread.
+     *
+     * @param int $threadId the comment/thread id
+     * @return bool|TikiDb_Pdo_Result
+     */
+    public function unresolveThread($threadId)
+    {
+        if ($threadId > 0) {
+            return $this->table('tiki_comments')->update(
+                ['is_resolved' => 'n'],
+                ['threadId' => (int) $threadId]
             );
         }
         return false;

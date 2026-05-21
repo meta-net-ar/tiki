@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-class Services_Encryption_ControllerTest extends PHPUnit\Framework\TestCase
+class Services_Encryption_ControllerTest extends TikiTestCase
 {
     protected $subject;
 
@@ -50,6 +50,28 @@ class Services_Encryption_ControllerTest extends PHPUnit\Framework\TestCase
         $this->expectException(Services_Exception_Denied::class);
         $this->expectExceptionMessage('minimum');
         $this->subject->action_save_key($input);
+    }
+
+    public function testFailToCreateKeyWithDuplicateName()
+    {
+        $input = new JitFilter([
+            'name' => 'duplicate key',
+            'shares' => 1,
+            'algo' => 'aes-256-ctr',
+        ]);
+        $result = $this->subject->action_save_key($input);
+        $this->expectException(Services_Exception_DuplicateValue::class);
+        try {
+            $this->subject->action_save_key($input);
+        } finally {
+            if (! empty($result['keyId'])) {
+                try {
+                    TikiLib::lib('tiki')->table('tiki_encryption_keys')->delete(['keyId' => $result['keyId']]);
+                } catch (\Throwable $e) {
+                    // Swallow cleanup errors — don't mask the expected duplicate-name exception
+                }
+            }
+        }
     }
 
     public function testCreateKeySharedWithTikiUsers()

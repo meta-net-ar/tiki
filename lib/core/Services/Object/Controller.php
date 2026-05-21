@@ -182,6 +182,58 @@ class Services_Object_Controller
     }
 
     /**
+     * Build HTML popup content for a tracker item for use as `popup_content` in search results.
+     * Reuses the existing infobox template and trackeroutput field rendering (including REL fields).
+     * Returns null on any failure or when nothing useful can be shown.
+     */
+    public static function getTrackerItemPopupContent(int $itemId): ?string
+    {
+        $trklib = TikiLib::lib('trk');
+        $item = $trklib->get_tracker_item($itemId);
+        if (! $item) {
+            return null;
+        }
+
+        $definition = Tracker_Definition::get($item['trackerId']);
+        if (! $definition) {
+            return null;
+        }
+
+        $itemObject = Tracker_Item::fromInfo($item);
+        if (! $itemObject->canView()) {
+            return null;
+        }
+
+        $fields = [];
+        foreach ($definition->getPopupFields() as $fieldId) {
+            if ($itemObject->canViewField($fieldId) && $field = $definition->getField($fieldId)) {
+                $fields[] = $field;
+            }
+        }
+
+        if (empty($fields)) {
+            foreach ($definition->getFields() as $field) {
+                if (isset($field['fieldId']) && $itemObject->canViewField($field['fieldId'])) {
+                    $fields[] = $field;
+                }
+            }
+        }
+
+        if (empty($fields)) {
+            return null;
+        }
+
+        $smarty = TikiLib::lib('smarty');
+        $smarty->assign('fields', $fields);
+        $smarty->assign('item', $item);
+        $smarty->assign('can_modify', false);
+        $smarty->assign('can_remove', false);
+        $smarty->assign('mode', 'table');
+
+        return $smarty->fetch('object/infobox/trackeritem.tpl');
+    }
+
+    /**
      * Generic function to allow consistently formatted errors from javascript using Feedback
      *
      * @param $input JitFilter filtered input object

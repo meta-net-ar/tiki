@@ -396,7 +396,7 @@ class WikiMediawiki extends Wiki
                         if (! isset($j) || ($i > ($totalRevisions - $this->revisionsNumber))) {
                             try {
                                 $data['revisions'][] = $this->extractRevision($node);
-                            } catch (ParserException $e) {
+                            } catch (ParserException) {
                                 $this->saveAndDisplayLog(
                                     tr(
                                         'Error while parsing revision %0 of the page "%1". There could be a problem in the page syntax or in the Text_Wiki parser used by the importer.',

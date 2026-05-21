@@ -108,7 +108,7 @@ class PeerTubeLib
                 }
                 $headers[] = 'Authorization: Bearer ' . $token;
             } catch (\Exception $e) {
-                error_log("Authentication error: " . $e->getMessage());
+                error_log("Authentication error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (PeerTube HTTP/cURL error reporting)
                 throw new \Exception('Failed to obtain access token: ' . $e->getMessage());
             }
         }
@@ -123,7 +123,7 @@ class PeerTubeLib
                 rewind($verbose);
                 $verboseLog = stream_get_contents($verbose);
                 fclose($verbose);
-                error_log("cURL verbose log: $verboseLog");
+                error_log("cURL verbose log: $verboseLog"); // @phpstan-ignore disallowedFunctions.errorLog (PeerTube HTTP/cURL error reporting)
             }
             throw new \Exception("cURL error: $error");
         }
@@ -135,7 +135,7 @@ class PeerTubeLib
             $verboseLog = stream_get_contents($verbose);
             fclose($verbose);
             if (! empty($verboseLog)) {
-                error_log("cURL verbose log: $verboseLog");
+                error_log("cURL verbose log: $verboseLog"); // @phpstan-ignore disallowedFunctions.errorLog (PeerTube HTTP/cURL error reporting)
             }
         }
 
@@ -143,7 +143,7 @@ class PeerTubeLib
             $this->clearCachedToken();
             return $this->makeRequest($method, $url, $data, $auth, $rawBody);
         } elseif ($httpCode >= 400) {
-            error_log("HTTP error $httpCode: $response");
+            error_log("HTTP error $httpCode: $response"); // @phpstan-ignore disallowedFunctions.errorLog (PeerTube HTTP/cURL error reporting)
             $msg = "HTTP error $httpCode";
             $j = json_decode($response, true);
             if (is_array($j)) {
@@ -226,10 +226,7 @@ class PeerTubeLib
             $url .= '&search=' . rawurlencode($find);
         }
 
-        error_log("[PeerTube/listVideos] URL: $url");
-
         $response = $this->makeRequest('GET', $url);
-        error_log("[PeerTube/listVideos] Response: " . substr($response, 0, 1000));
         return json_decode($response);
     }
 
@@ -277,7 +274,7 @@ class PeerTubeLib
 
             throw new \Exception("HTTP error $httpCode. Response: $response");
         } catch (\Exception $e) {
-            error_log("PeerTube deleteVideo error: " . $e->getMessage() . " | UUID: $uuid | URL: $deleteUrl");
+            error_log("PeerTube deleteVideo error: " . $e->getMessage() . " | UUID: $uuid | URL: $deleteUrl"); // @phpstan-ignore disallowedFunctions.errorLog (PeerTube HTTP/cURL error reporting)
             throw new \Exception("Failed to delete video: " . $e->getMessage());
         }
     }

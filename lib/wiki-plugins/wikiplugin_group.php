@@ -107,11 +107,15 @@ function wikiplugin_group($data, $params)
         return $data . $dataelse;
     }
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_group_info());
+
     $groups = $params['groups'];
     $notgroups = $params['notgroups'];
     $allowedUsers = $params['users'];
     $userPending = [];
     $userNotPending = [];
+    $pending = [];
+    $notpending = [];
     if (! is_null($params['pending']) || ! is_null($params['notpending'])) {
         $pending = $params['pending'] ?? [];
         $notpending = $params['notpending'] ?? [];
@@ -139,9 +143,6 @@ function wikiplugin_group($data, $params)
     if (! is_null($groups) || ! empty($pending)) {
         $ok = false;
         if (! is_null($groups)) {
-            if (! is_array($groups)) {
-                $groups = explode('|', $groups);
-            }
             foreach ($userGroups as $grp) {
                 if (in_array($grp, $groups)) {
                     $ok = true;

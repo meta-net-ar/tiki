@@ -45,7 +45,7 @@ class Search_GlobalSource_ArticleAttachmentSource implements Search_GlobalSource
                         $textual[] = $data[$name]->getValue();
                     }
                 } else {
-                    error_log("File " . $rel['itemId'] . ", referenced from " . $objectType . $objectId . " no longer exists.");
+                    error_log("File " . $rel['itemId'] . ", referenced from " . $objectType . $objectId . " no longer exists."); // @phpstan-ignore disallowedFunctions.errorLog (missing file warning in search indexer)
                 }
             }
         }

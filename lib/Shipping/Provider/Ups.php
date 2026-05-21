@@ -60,7 +60,7 @@ class Ups implements ShippingProvider
             $dom->loadXML($body);
 
             return $dom;
-        } catch (ExceptionInterface $e) {
+        } catch (ExceptionInterface) {
             return null;
         }
     }
@@ -142,7 +142,7 @@ class Ups implements ShippingProvider
         $type->appendChild($dom->createElement('Code', '00'));
         $package->appendChild($packageWeight = $dom->createElement('PackageWeight'));
         $packageWeight->appendChild($unit = $dom->createElement('UnitOfMeasurement'));
-        $unit->appendChild($code = $dom->createElement('Code', 'LBS'));
+        $unit->appendChild($dom->createElement('Code', 'LBS'));
         $packageWeight->appendChild($weight = $dom->createElement('Weight'));
 
         $weight->appendChild($dom->createTextNode($data['weight'] * 2.20462262));

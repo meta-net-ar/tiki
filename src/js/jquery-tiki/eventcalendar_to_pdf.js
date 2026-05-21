@@ -5,12 +5,13 @@
 
 import moment from "moment";
 import { jsPDF } from "common-reexported/jspdf";
+import html2canvas from "html2canvas-pro";
 
 $.fn.addEventCalendarPrint = function (buttonId, calendar) {
     let viewContainer = $(this);
     var calendarId = "#" + $(this).attr("id");
     if (!viewContainer) {
-        console.warn(calendarId + " not found");
+        console.warn(calendarId + " not found"); // eslint-disable-line no-console
         return;
     }
     viewContainer.append($(buttonId));

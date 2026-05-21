@@ -19,6 +19,7 @@ $inputConfiguration = [
             'description'           => 'xss',                //post
             'save'                  => 'alpha',              //post
             'status'                => 'alpha',              //post
+            'redirect_after'        => 'url',                //post
             'remove'                => 'int',                //post
             'find'                  => 'string',             //post
         ],
@@ -27,7 +28,8 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 include_once('lib/surveys/surveylib.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN;
+use Tiki\SortModeValidator;
+$section = Sections::SECTION_ADMIN_LAYOUT;
 Sections::setCurrentSection($section);
 $access->check_feature('feature_surveys');
 
@@ -57,23 +59,45 @@ if (isset($_REQUEST["save"])) {
 
         $isUpdating = ! empty($_REQUEST["surveyId"]);
 
-        $sid = $srvlib->replace_survey($_REQUEST["surveyId"], $_REQUEST["name"], $_REQUEST["description"], $restriction, $_REQUEST["status"]);
-        if ($sid) {
-            if ($isUpdating) {
-                Feedback::success(tr('Survey updated successfully.'));
-            } else {
-                Feedback::success(tr('Survey created successfully.'));
-            }
-            $cat_type = 'survey';
-            $cat_objid = is_int($sid) ? $sid : $_REQUEST["surveyId"];
-            $cat_desc = substr($_REQUEST["description"], 0, 200);
-            $cat_name = $_REQUEST["name"];
-            $cat_href = "tiki-take_survey.php?surveyId=" . $cat_objid;
-            include_once("categorize.php");
-            $cookietab = 1;
-            $_REQUEST["surveyId"] = 0;
+        $redirect_after = isset($_REQUEST["redirect_after"]) ? trim($_REQUEST["redirect_after"]) : '';
+        // Validate redirect_after: only allow wiki page names (alphanumeric, spaces, dashes, underscores) or valid URLs
+        $redirect_after_valid = true;
+        if (! empty($redirect_after) && ! preg_match('#^https?://#', $redirect_after) && ! preg_match('/^[\w\s\-]+$/u', $redirect_after)) {
+            Feedback::error(
+                tr(
+                    'Invalid redirect value in the field "Redirect after completion". Please enter a wiki page name (letters, numbers, spaces, dashes) or a full URL starting with http:// or https://. Leave empty to redirect to the survey list.'
+                )
+            );
+            $redirect_after_valid = false;
+        }
+        if (! $redirect_after_valid) {
+            $cookietab = 2;
         } else {
-            Feedback::error(tr('Failed to save survey.'));
+            $sid = $srvlib->replace_survey(
+                $_REQUEST["surveyId"],
+                $_REQUEST["name"],
+                $_REQUEST["description"],
+                $restriction,
+                $_REQUEST["status"],
+                $redirect_after
+            );
+            if ($sid) {
+                if ($isUpdating) {
+                    Feedback::success(tr('Survey updated successfully.'));
+                } else {
+                    Feedback::success(tr('Survey created successfully.'));
+                }
+                $cat_type = 'survey';
+                $cat_objid = is_int($sid) ? $sid : $_REQUEST["surveyId"];
+                $cat_desc = substr($_REQUEST["description"], 0, 200);
+                $cat_name = $_REQUEST["name"];
+                $cat_href = "tiki-take_survey.php?surveyId=" . $cat_objid;
+                include_once("categorize.php");
+                $cookietab = 1;
+                $_REQUEST["surveyId"] = 0;
+            } else {
+                Feedback::error(tr('Failed to save survey.'));
+            }
         }
     }
 }
@@ -92,11 +116,10 @@ if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
     $srvlib->remove_survey($_REQUEST["remove"]);
     Feedback::success(tr('The survey has been deleted successfully.'));
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'created_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'created_desc',
+    ['tiki_surveys']
+);
 $offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 $find = $_REQUEST["find"] ?? '';

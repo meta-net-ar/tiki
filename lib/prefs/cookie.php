@@ -4,8 +4,19 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+
 function prefs_cookie_list()
 {
+
+    $consentCategories = CookieConsentLib::getCookieCategories();
+    $keyToName = function (array $categoryInfo): string {
+        return $categoryInfo['name'];
+    };
+    $cookieConsentDisableBuiltinCategoriesOptions = array_map($keyToName, $consentCategories);
+    unset($cookieConsentDisableBuiltinCategoriesOptions[CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL]);
+
     return [
         'cookie_name' => [
             'name' => tra('Cookie name'),
@@ -98,6 +109,17 @@ function prefs_cookie_list()
             'description' => tra('Do not give the option to refuse cookies but still inform the user about cookie usage.'),
             'type' => 'flag',
             'default' => 'n',
+            'tags' => ['experimental'],
+            'dependencies' => [
+                'cookie_consent_feature',
+            ],
+        ],
+        'cookie_consent_disable_builtin_categories' => [
+            'name' => tra('Deactivate specific cookie categories'),
+            'description' => tra('Interim pref.  Allows disabling a built-in consent category.  Tiki will not show the consent at all for that category, and will act as if the user refused consent for that category.  This pref will be removed once tiki collects what categories were actually requested by calling tiki code, and will only ask for those that were requested.'),
+            'type' => 'multilist',
+            'options' => $cookieConsentDisableBuiltinCategoriesOptions,
+            'default' => [],
             'tags' => ['experimental'],
             'dependencies' => [
                 'cookie_consent_feature',

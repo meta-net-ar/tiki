@@ -45,7 +45,7 @@
                 <thead>
                 <tr>
                     <th scope="col">
-                        {select_all checkbox_names='object[]'}
+                        {select_all checkbox_names='objects[]'}
                     </th>
                     <th scope="col">{tr}Object type{/tr}</th>
                     <th scope="col">{tr}Object Title{/tr}</th>
@@ -55,7 +55,7 @@
                 {foreach from=$result item=object}
                     <tr {permission type=$object.type object=$object.object_id name="modify_object_categories"} class="available my-1"{/permission}>
                         <td>
-                            <input class="ms-20 obj-item form-check-input " type="checkbox" name="object[]" value="{$object.object_type|escape}:{$object.object_id|escape}">
+                            <input class="ms-20 obj-item form-check-input " type="checkbox" name="objects[]" value="{$object.object_type|escape}:{$object.object_id|escape}">
                         </td>
                         <td>
                             {$object.object_type}
@@ -89,13 +89,13 @@
                     </div>
                 </div>
                 <div class="col-sm-6">
-                    <label class="col-form-label sr-only" for="to">
+                    <label class="col-form-label sr-only" for="categIds">
                         {tr}Copy to selected category{/tr}
                     </label>
                     <div class="row form-group">
                         <label for="category-select" class="sr-only">{tr}Destination categories{/tr}</label>
                        {*   Note: placeholder attribute isn’t valid on a native <select>, but Element Plus uses it to show the default placeholder text.                     *}
-                        <select id="category-select" name="to[]" class="form-select" multiple required placeholder="{tr}Select destination categories{/tr}">
+                        <select id="category-select" name="categIds[]" class="form-select" multiple required placeholder="{tr}Select destination categories{/tr}">
                             <option value="" disabled class="fw-bold">{tr}Select destination categories{/tr}</option>
                             {foreach $categories as $category}
                                 {if $category.categId neq $parentId and ($category.can_add neq '' or $category.can_remove neq '')}

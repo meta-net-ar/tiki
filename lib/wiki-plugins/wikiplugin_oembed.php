@@ -147,6 +147,6 @@ function getOEmbedData($url)
         return $oEmbedData;
     }
 
-    Feedback::error(tr('Invalid or malformed oEmbed data: %0', print_r($oEmbedData, true)));
+    Feedback::error(tr('Invalid or malformed oEmbed data: %0', print_r($oEmbedData, true))); // @phpstan-ignore disallowedFunctions.printR (returns malformed response as string for error feedback, never prints)
     return false;
 }

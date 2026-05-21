@@ -4,7 +4,8 @@
             v-if="isElementPlusActive"
             v-model="modelValue"
             placeholder="Select"
-            @change="() => emit('change', modelValue)"
+            :teleported="false"
+            @change="handleElementPlusChange"
         >
             <el-option label="true" value="1" />
             <el-option label="false" value="0" />
@@ -33,6 +34,10 @@ const modelValue = ref(props.value);
 const isElementPlusActive = ref(!!window.elementPlus);
 
 const emit = defineEmits(["change"]);
+
+const handleElementPlusChange = (value) => {
+    emit("change", value);
+};
 
 const handleChange = (event) => {
     emit("change", event.target.value);

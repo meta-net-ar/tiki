@@ -9,8 +9,7 @@
   "author": "",
   "license": "ISC",
   "description": "",
-  "dependencies": {
-    "mermaid": "^11.12.2",
+  "devDependencies": {
     "svg-pan-zoom": "^3.6.2"
   }
 }

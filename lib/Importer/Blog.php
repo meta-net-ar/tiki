@@ -324,7 +324,9 @@ class Blog extends Base
                 $categ['parentId'] = 0;
             }
 
-            $categlib->add_category($categ['parentId'], $categ['name'], $categ['description']);
+            if (! $categlib->get_category_by_name($categ['name'], $categ['parentId'])) {
+                $categlib->add_category($categ['parentId'], $categ['name'], $categ['description']);
+            }
         }
     }
 
