@@ -44,6 +44,16 @@
 
 {jq}
 $('#list_filter{{$filterCounter}}_reset').off('click').on('click', function() {
-    window.location.href = $('#list_filter{{$filterCounter}}_form').attr('action');
+    const $form = $('#list_filter{{$filterCounter}}_form');
+    $form.find(':input')
+    .not(':hidden, :submit, :button, :reset')
+    .each(function() {
+        if ($(this).is(':checkbox, :radio')) {
+            this.checked = false;
+        } else {
+            $(this).val('');
+        }
+    });
+    $form[0].submit();
 });
 {/jq}
