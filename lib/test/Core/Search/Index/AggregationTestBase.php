@@ -4,6 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+namespace Search\Index;
 
 use Search\Query\Aggregation\AggregationInterface;
 use Search\Query\Aggregation\Join\Join;
@@ -19,7 +20,7 @@ use Search\ResultSet\AggregationResult;
  * Seeds a fixed dataset into the index, then verifies aggregation results
  * match expected values. Concrete subclasses provide engine-specific setup.
  */
-abstract class AggregationTestBase extends PHPUnit\Framework\TestCase
+abstract class AggregationTestBase extends \PHPUnit\Framework\TestCase
 {
     protected $index;
 
@@ -78,7 +79,7 @@ abstract class AggregationTestBase extends PHPUnit\Framework\TestCase
      */
     protected function parseWikiAggregations(string $markup): array
     {
-        $matches = WikiParser_PluginMatcher::match($markup);
+        $matches = \WikiParser_PluginMatcher::match($markup);
         $builder = new AggregationWikiBuilder();
         $builder->apply($matches);
         return $builder->getAggregations();
@@ -99,10 +100,10 @@ abstract class AggregationTestBase extends PHPUnit\Framework\TestCase
      *
      * @param array<string, AggregationInterface> $aggregations
      */
-    protected function searchWithAggregations(array $aggregations, ?Search_Query $query = null): Search_ResultSet
+    protected function searchWithAggregations(array $aggregations, ?\Search_Query $query = null): \Search_ResultSet
     {
         if ($query === null) {
-            $query = new Search_Query();
+            $query = new \Search_Query();
             $query->filterType('trackeritem');
             $query->filterIdentifier('10', 'tracker_id');
         }
@@ -122,7 +123,7 @@ abstract class AggregationTestBase extends PHPUnit\Framework\TestCase
             $result = $query->search($this->index);
             $aggQuery = clone $query;
             $aggQuery->clearAggregations();
-            $executor = new AggregationSqlExecutor(TikiDb::get());
+            $executor = new AggregationSqlExecutor(\TikiDb::get());
             foreach ($executor->execute($aggregations, $aggQuery, $this->index) as $aggResult) {
                 $result->setAggregationResult($aggResult);
             }
@@ -616,7 +617,7 @@ abstract class AggregationTestBase extends PHPUnit\Framework\TestCase
      */
     protected function parseWikiWithJoins(string $markup): array
     {
-        $matches = WikiParser_PluginMatcher::match($markup);
+        $matches = \WikiParser_PluginMatcher::match($markup);
         $builder = new AggregationWikiBuilder();
         $builder->apply($matches);
         return [
@@ -628,7 +629,7 @@ abstract class AggregationTestBase extends PHPUnit\Framework\TestCase
     /**
      * Run aggregation + join resolution end-to-end.
      */
-    protected function searchWithAggregationsAndJoins(array $aggregations, array $joins, ?Search_Query $query = null): Search_ResultSet
+    protected function searchWithAggregationsAndJoins(array $aggregations, array $joins, ?\Search_Query $query = null): \Search_ResultSet
     {
         $result = $this->searchWithAggregations($aggregations, $query);
 

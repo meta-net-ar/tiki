@@ -223,5 +223,4 @@ class AggregationReader
         }
         return $raw;
     }
-
 }

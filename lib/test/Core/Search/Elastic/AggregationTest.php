@@ -4,8 +4,12 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+namespace Search\Elastic;
 
-class Search_Elastic_AggregationTest extends AggregationTestBase
+use Search_Elastic_Connection;
+use Search_Elastic_Index;
+
+class AggregationTest extends \Search\Index\AggregationTestBase
 {
     protected function setUp(): void
     {

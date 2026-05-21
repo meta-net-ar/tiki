@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Manticore;
 
-class AggregationTest extends \AggregationTestBase
+class AggregationTest extends \Search\Index\AggregationTestBase
 {
     use IndexBuilder;
 

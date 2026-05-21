@@ -4,10 +4,12 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+namespace Search\Query;
 
+use PHPUnit\Framework\TestCase;
 use Search\Query\Aggregation\ExpressionSanitizer;
 
-class Search_Query_AggregationExpressionSanitizerTest extends PHPUnit\Framework\TestCase
+class AggregationExpressionSanitizerTest extends TestCase
 {
     private ExpressionSanitizer $sanitizer;
 
