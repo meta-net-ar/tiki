@@ -31,6 +31,20 @@ describe("applyAutocomplete", () => {
         expect(expectedAutoCompleteElement.getAttribute("value-key")).toBe(givenValueKey);
     });
 
+    test("should set the 'transform-result-fn' attribute on the autocomplete element when a transformResultCb is provided", () => {
+        const givenInput = document.createElement("input");
+        document.body.appendChild(givenInput);
+        const givenRemoteSourceUrl = "https://foo.bar";
+        const givenTransformResultCb = vi.fn();
+
+        applyAutocomplete(givenInput, { remoteSourceUrl: givenRemoteSourceUrl, transformResultCb: givenTransformResultCb });
+
+        const expectedAutoCompleteElement = givenInput.nextElementSibling;
+        const transformResultFnName = expectedAutoCompleteElement.getAttribute("transform-result-fn");
+        expect(transformResultFnName).toBeTruthy();
+        expect(window[transformResultFnName]).toBe(givenTransformResultCb);
+    });
+
     test("should generate the autocomplete element given the source list provided instead of the remote source url", () => {
         const givenInput = document.createElement("input");
         document.body.appendChild(givenInput);
