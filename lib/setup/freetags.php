@@ -10,6 +10,23 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 
 use Tiki\Sections;
 
+/**
+ * Register callback for section changes
+ * 
+ * When the application section changes, this callback processes freetag operations.
+ * The global declarations ensure the callback accesses the current/updated values
+ * of the required variables.
+ * 
+ * Used in this callback:
+ * - $sections: check if section exists
+ * - $freetaglib: tag/untag objects, retrieve tags
+ * - $tiki_p_freetags_tag, $tiki_p_admin, $tiki_p_unassign_freetags: permission checks
+ * - $user, $userlib: get current user ID
+ * - $prefs: check antibot and multilingual settings
+ * - $captchalib: validate CAPTCHA for anonymous users
+ * - $smarty: assign tags and error messages to template
+ * - $tikilib: generate redirect URLs
+ */
 Sections::onSectionChange(function ($section) {
     global $sections, $freetaglib, $tiki_p_freetags_tag, $prefs, $smarty;
     if (isset($sections[$section])) {
