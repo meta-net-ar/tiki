@@ -132,7 +132,7 @@ if (isset($_GET['tx'])) {
                 && isset($prefs['payment_paypal_pdt_redirect'])
                 && $prefs['payment_paypal_pdt_redirect']
             ) {
-                $access->redirect($prefs['payment_paypal_pdt_redirect'] . '?invoice=' . $invoice, allowExternal: true);
+                $access->redirect($prefs['payment_paypal_pdt_redirect'] . '?invoice=' . $invoice);
             }
         }
     }
@@ -185,7 +185,8 @@ if (isset($_POST['manual_amount'], $_POST['invoice']) && preg_match('/^\d+(\.\d{
             ]
         );
         if (isset($_POST['returnurl'])) {
-            $access->redirect($_POST['returnurl'], allowExternal: true);
+            header('Location: ' . $_POST['returnurl']);
+            exit;
         }
 
         $access->redirect('tiki-payment.php?invoice=' . $_POST['invoice'], tra('Manual payment entered.'));
