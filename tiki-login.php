@@ -143,6 +143,21 @@ $requestedUser = trim($_REQUEST['user'] ?? '') ?: false;
 $pass = trim($_REQUEST['pass'] ?? '') ?: false;
 $isvalid = false;
 $isdue = false;
+$bruteForceProperties = function () use ($tikilib) {
+    return ['ip' => $tikilib->get_ip_address()];
+};
+$displayLoginBruteForceError = function (array $properties) use ($bruteForce, $smarty) {
+    $waitTime = $bruteForce->getWaitTime('login', $properties);
+    if ($waitTime > 60) {
+        $waitMessage = sprintf(tra('Too many login attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+    } else {
+        $waitMessage = sprintf(tra('Too many login attempts. Please try again in %d seconds.'), $waitTime);
+    }
+    http_response_code(429);
+    $smarty->assign('msg', $waitMessage);
+    $smarty->display('error.tpl');
+    die;
+};
 
 // admin is always local
 if ($requestedUser == 'admin') {
@@ -166,6 +181,16 @@ if (isset($_REQUEST["showTwoFactorForm"])) {
     $showTwoFactorForm = 'y';
 }
 $smarty->assign('showTwoFactorForm', $showTwoFactorForm);
+
+$isLoginAttempt = $requestedUser || ($prefs['auth_method'] == 'openid_connect' && isset($_GET['code']));
+$loginBruteForceProperties = $bruteForceProperties();
+if (
+    ($prefs['bruteforce_protection'] ?? 'n') === 'y'
+    && $isLoginAttempt
+    && ! $bruteForce->isOperationAllowed('login', $loginBruteForceProperties, false)
+) {
+    $displayLoginBruteForceError($loginBruteForceProperties);
+}
 
 // Go through the intertiki process
 if (
@@ -299,7 +324,6 @@ if (
         Feedback::errorAndDie(tra('An error occurred trying to login. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
     }
 } else {
-    // Verify user is valid
     if ($prefs['auth_webauthn_enabled'] === 'y' && ! empty($_SESSION['webauthn_user']) && $_SESSION['webauthn_user'] === $requestedUser) {
         $ret = [$userlib->update_lastlogin($requestedUser), $requestedUser, USER_VALID];
     } else {
@@ -315,6 +339,9 @@ if (
     if (! $isvalid && $error === ACCOUNT_WAITING_USER && $access->checkCsrf(null, null, null, null, null, 'page')) {
         if ($requestedUser != 'admin') { // admin has not necessarely an email
             if ($userlib->is_email_due($requestedUser)) {
+                if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                    $bruteForce->attempt('login', $bruteForceProperties());
+                }
                 $userlib->send_confirm_email($requestedUser);
                 $userlib->change_user_waiting($requestedUser, 'u');
                 $user = '';
@@ -355,6 +382,9 @@ if (
                 $is2FaPass = $twoFactorAuth->validateCode($requestedUser, $_REQUEST['twoFactorAuthCode']);
                 if (! $is2FaPass) {
                     $error = TWO_FA_INCORRECT;
+                    if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                        $bruteForce->attempt('login', $bruteForceProperties());
+                    }
                     $smarty->assign('showTwoFactorForm', 'y');
                     $_SESSION['tiki_creds_username'] = $_REQUEST['user'];
                     $_SESSION['tiki_creds_password'] = $_REQUEST['pass'];
@@ -381,7 +411,7 @@ if (
 
 if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, null, 'page'))) {
     if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
-        $bruteForce->success('login', ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()]);
+        $bruteForce->success('login', $bruteForceProperties());
     }
     $userlib->set_unsuccessful_logins($requestedUser, 0);
     if ($prefs['feature_invite'] == 'y') {
@@ -538,21 +568,9 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
         }
     }
 } else {
-    // if ($isvalid) = false - check and record bruteforce attempts
+    // if ($isvalid) = false - record bruteforce attempts
     if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
-        $isOperationAllowed = $bruteForce->isOperationAllowed('login', ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()]);
-        if ($requestedUser && ! $isOperationAllowed) {
-            $nextAllowedTime = $bruteForce->getNextAllowedTime('login', ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()]);
-            $waitTime = $nextAllowedTime - time();
-            if ($waitTime > 60) {
-                $waitMessage = sprintf(tra('Too many login attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
-            } else {
-                $waitMessage = sprintf(tra('Too many login attempts. Please try again in %d seconds.'), $waitTime);
-            }
-            $smarty->assign('msg', $waitMessage);
-            $smarty->display('error.tpl');
-            die;
-        }
+        $bruteForce->attempt('login', $bruteForceProperties());
     }
     // check if site is closed
     if ($prefs['site_closed'] === 'y') {

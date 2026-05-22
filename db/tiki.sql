@@ -4212,7 +4212,7 @@ CREATE TABLE `tiki_bruteforce_attempts` (
   `properties_hash` CHAR(64) NOT NULL,
   `attempt_time` bigint NOT NULL,
   `attempt_count` INT NOT NULL,
-  INDEX `idx_operation_hash` (`operation`, `properties_hash`),
+  UNIQUE KEY `idx_operation_hash` (`operation`, `properties_hash`),
   INDEX `idx_attempt_time` (`attempt_time`)
 ) ENGINE=MyISAM;
 
