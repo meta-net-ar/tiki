@@ -45,7 +45,7 @@ class CustomRoute
     {
         $access = TikiLib::lib('access');
         if ($redirect = $route->getRedirectPath($path)) {
-            $access->redirect($redirect);
+            $access->redirect($redirect, allowExternal: true);
         } else {
             $access->display_error($path, tra("Page cannot be found"), '404');
         }
