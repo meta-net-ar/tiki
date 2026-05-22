@@ -52,6 +52,12 @@ if ($dirlib->dir_url_exists($_REQUEST['url'])) {
     Feedback::errorAndDie(tra("URL already added to the directory. Duplicate site?"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 if ($prefs['directory_validate_urls'] == 'y') {
+    // Prevent SSRF: validate the submitted URL before the server opens a
+    // connection to check if the site is reachable.
+    $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+    if (! $ssrf->isUrlAllowed($_REQUEST['url'])) {
+        Feedback::errorAndDie(tra("URL is not allowed (targets a private or reserved address)"), \Laminas\Http\Response::STATUS_CODE_400);
+    }
     @$fsh = fopen($_REQUEST['url'], 'r');
     if (! $fsh) {
         Feedback::errorAndDie(tra("URL cannot be accessed: wrong URL or site is offline and cannot be added to the directory"), \Laminas\Http\Response::STATUS_CODE_400);
