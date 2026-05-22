@@ -8,7 +8,7 @@
         </span>
     {/if}
     {if $forum_info.vote_threads eq 'y' and ($tiki_p_ratings_view_results eq 'y' or $tiki_p_admin eq 'y')}
-        <span class="ratingResultAvg">{tr}Users rating: {/tr}</span>{rating_result_avg type=comment id=$comment.threadId }
+        <span class="ratingResultAvg">{tr}Users rating: {/tr}</span>{rating_result_avg type=comment id=$comment.threadId}
     {/if}
     {if $forum_info.vote_threads eq 'y' and $tiki_p_forum_vote eq 'y'}
         <span class="score">
@@ -24,7 +24,7 @@
         </span>
     {/if}
     {if $forum_info.vote_threads eq 'y' and ($tiki_p_ratings_view_results eq 'y' or $tiki_p_admin eq 'y')}
-        {rating_result type=comment id=$comment.threadId }
+        {rating_result type=comment id=$comment.threadId}
     {/if}
 
     {if isset($first) and $first eq 'y'}
@@ -43,7 +43,7 @@
 
     {if $thread_style != 'commentStyle_headers' and isset($comment.approved) and $comment.approved eq 'y'}
     <div class="actions">
-        {if ($prefs.feature_sefurl eq 'y') }
+        {if ($prefs.feature_sefurl eq 'y')}
             <a href="{$comments_parentId|sefurl:'forum post'}{if ($comment.threadId neq $comments_parentId)}#threadId{$comment.threadId}{/if}" class="btn btn-outline-primary me-2" title="{tr}Link to this comment{/tr}" aria-label="{tr}Link to this comment{/tr}" style="font-size: 1rem">{icon name="link"}</a>
         {else}
             <a href="tiki-view_forum_thread.php?comments_parentId={$comments_parentId}#threadId{$comment.threadId}">{tr}Link to this comment{/tr}</a>

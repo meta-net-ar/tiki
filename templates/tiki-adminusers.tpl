@@ -496,7 +496,7 @@
                             <div class="col-sm-7 col-md-6">
                                 <input type="password" class="form-control" placeholder="{tr}Password{/tr}" name="pass" id="pass1" autocomplete="new-password">
                                 <div style="margin-left:5px;">
-                                    <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none' } <span id="mypassword_text_inner"></span></div>
+                                    <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
                                     <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
                                 </div>
                                 <div style="margin-top:5px">

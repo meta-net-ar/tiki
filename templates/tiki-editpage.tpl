@@ -212,7 +212,7 @@
         {if isset($diff_style)}
             <select name="diff_style" class="wikiaction" title="{tr}Edit wiki page{/tr}|{tr}Select the style used to display differences to be translated.{/tr}">
                 {foreach  $diff_styles.options as $value => $label}
-                    {if $value eq 'htmldiff' or $value eq 'inlinediff' or $value eq 'inlinediff-full' }
+                    {if $value eq 'htmldiff' or $value eq 'inlinediff' or $value eq 'inlinediff-full'}
                         <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>
                             {tr}{$label}{/tr}
                         </option>
@@ -370,7 +370,7 @@
                             {/if}
                         </div>
 
-                        {assign var="attachments" value=( !isset($wysiwyg) || $wysiwyg neq 'y') && $prefs.feature_wiki_attachments == 'y' && ($tiki_p_wiki_attach_files eq 'y' or $tiki_p_wiki_admin_attachments eq 'y') }{* for Attach file *}
+                        {assign var="attachments" value=( !isset($wysiwyg) || $wysiwyg neq 'y') && $prefs.feature_wiki_attachments == 'y' && ($tiki_p_wiki_attach_files eq 'y' or $tiki_p_wiki_admin_attachments eq 'y')}{* for Attach file *}
                         {assign var="authors" value=$page|lower neq 'sandbox' && $tiki_p_admin_wiki eq 'y' && $prefs.wiki_authors_style_by_page eq 'y'}{* for Authors *}
                         {assign var="biblioSection" value=$page|lower neq 'sandbox' && $prefs.wikiplugin_addreference eq 'y' && $showBiblioSection}{* for Bibliography *}
                         {assign var="copyright" value=$page|lower neq 'sandbox' && $prefs.feature_copyright eq 'y' && $prefs.wiki_feature_copyrights eq 'y'}{* for Copyright *}

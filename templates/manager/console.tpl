@@ -12,7 +12,7 @@
     {if not empty($info)}
         <div class="rounded bg-dark text-light p-3">{$info|nl2br}</div>
     {else}
-        <form method="post" action="{service controller=manager action=console }">
+        <form method="post" action="{service controller=manager action=console}">
             <input required class="form-control" id="instanceId" value="{$instanceId}" type="hidden" name="instanceId">
             <div class="tiki-form-group row">
                 <label class="col-form-label col-sm-3">{tr}Write command to execute{/tr}</label>

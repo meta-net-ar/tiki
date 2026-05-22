@@ -348,7 +348,7 @@
                             <label for="filetype" class="col-md-4 col-form-label">{tr}File Type{/tr}</label>
                             <div class="col-md-8">
                                 <select id="filetype" class="form-select" name="filetype[]">
-                                    {if $fileInfo.filetype ne '' }
+                                    {if $fileInfo.filetype ne ''}
                                         <option value="{$fileInfo.filetype|escape}" selected="selected">{$fileInfo.filetype|truncate:60|escape}</option>
                                     {/if}
                                     <option value="" > {tr}No type{/tr} </option>

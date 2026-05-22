@@ -114,7 +114,7 @@
                             </div>
                             <div class="col1top-inner-wrapper flex-grow-1 ">
                                 {if $prefs.module_zones_pagetop eq 'fixed' or ($prefs.module_zones_pagetop ne 'n' && ! zone_is_empty('pagetop'))}
-                                    {modulelist zone=pagetop heading_text='{tr}Related content{/tr}' role=complementary }
+                                    {modulelist zone=pagetop heading_text='{tr}Related content{/tr}' role=complementary}
                                 {/if}
                                 <div id="feedback" role="alert">
                                     {feedback}

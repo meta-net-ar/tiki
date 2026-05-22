@@ -14,6 +14,6 @@
     {filter content="{/literal}{$type}{literal}" field="article_type"}
     {sort mode="modification_date_desc"}
     {output template="{/literal}{custom_template basetpl='article-teaser.tpl' modifiers=$type}{literal}"}
-    {FORMAT(name="art_content")}{display name="article_content" format="snippet" length="400" suffix="..." end="word" }{FORMAT}
+    {FORMAT(name="art_content")}{display name="article_content" format="snippet" length="400" suffix="..." end="word"}{FORMAT}
 {/literal}
 {/wikiplugin}

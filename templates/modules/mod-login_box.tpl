@@ -382,7 +382,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {/if}
         {if !empty($error_login)}
             {remarksbox type='errors' title="{tr}Error{/tr}"}
-                {if $error_login == $PASSWORD_INCORRECT or $error_login == $USER_NOT_FOUND }{tr}Invalid username or password{/tr}
+                {if $error_login == $PASSWORD_INCORRECT or $error_login == $USER_NOT_FOUND}{tr}Invalid username or password{/tr}
                 {elseif $error_login == $TWO_FA_INCORRECT}{tr}Invalid two-factor authenticator code{/tr}
                 {else}{$error_login|escape}{/if}
             {/remarksbox}
@@ -411,7 +411,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             </label>
             {if !isset($loginuser) or $loginuser eq ''}
                     <input class="form-control" type="text" name="user" id="login-user_{$module_logo_instance}" {if !empty($error_login)} value="{$error_user|escape}"{elseif !empty($adminuser)} value="{$adminuser|escape}"{/if} {if $prefs.desactive_login_autocomplete neq 'y'}autocomplete="username"{/if} {if $prefs.login_placeholders_enable eq 'y'}placeholder="{tr}Username{/tr}"{/if}/>
-                {jq}if ($('#login-user_{{$module_logo_instance}}:visible').length) {if ($("#login-user_{{$module_logo_instance}}").offset().top < $(window).height()) {$('#login-user_{{$module_logo_instance}}')[0].focus();} }{/jq}
+                {jq}if ($('#login-user_{{$module_logo_instance}}:visible').length) { if ($("#login-user_{{$module_logo_instance}}").offset().top < $(window).height()) {$('#login-user_{{$module_logo_instance}}')[0].focus();} }{/jq}
             {else}
                 <input class="form-control" type="hidden" name="user" id="login-user_{$module_logo_instance}" value="{$loginuser|escape}" /><b>{$loginuser|escape}</b>
             {/if}
