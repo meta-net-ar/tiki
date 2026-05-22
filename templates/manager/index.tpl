@@ -21,6 +21,7 @@
                 <th>{tr}URL{/tr}</th>
                 <th>{tr}Contact{/tr}</th>
                 <th>{tr}Blank{/tr}</th>
+                <th>{tr}Current{/tr}</th>
                 <th></th>
             </tr>
             {foreach $instances as $instance}
@@ -33,6 +34,11 @@
                     <td><a href="{$instance->weburl}" title="Visit website" target="_blank">{$instance->weburl}</a></td>
                     <td>{$instance->contact|escape}</td>
                     <td>{if $instance->app != null }{tr}False{/tr}{else}{tr}True{/tr}{/if}</td>
+                    <td>
+                        {if $instance->type == 'local' && $instance->weburl == $base_url}
+                            <span class="badge bg-primary">{tr}True{/tr}</span>
+                        {/if}
+                    </td>
                     <td class="action">
                         {actions}{strip}
                             <action>
@@ -56,23 +62,28 @@
                                 </a>
                             </action>
                             {if $instance->vcs_type =='git'}
-                            <action>
-                                <a href="{service controller=manager action=checkout instanceId=$instance->id}">
-                                    {icon name=logout _menu_text='y' _menu_icon='y' alt="{tr}Checkout{/tr}"}
-                                </a>
-                            </action>
+                                <action>
+                                    <a href="{service controller=manager action=checkout instanceId=$instance->id}">
+                                        {icon name=logout _menu_text='y' _menu_icon='y' alt="{tr}Checkout{/tr}"}
+                                    </a>
+                                </action>
                             {/if}
                             <action>
                                 <a href="{service controller=manager action=clone instanceId=$instance->id}">
                                     {icon name=copy _menu_text='y' _menu_icon='y' alt="{tr}Clone{/tr}"}
                                 </a>
                             </action>
-                            {if $instance->app != null}
                             <action>
-                                <a href="{service controller=manager action=console instanceId=$instance->id}">
-                                    {icon name=pen _menu_text='y' _menu_icon='y' alt="{tr}Console Command{/tr}"}
+                                <a href="{service controller=manager action=clone_and_redact instanceId=$instance->id}">
+                                    {icon name=copy _menu_text='y' _menu_icon='y' alt="{tr}Clone and redact{/tr}"}
                                 </a>
                             </action>
+                            {if $instance->app != null}
+                                <action>
+                                    <a href="{service controller=manager action=console instanceId=$instance->id}">
+                                        {icon name=pen _menu_text='y' _menu_icon='y' alt="{tr}Console Command{/tr}"}
+                                    </a>
+                                </action>
                             {/if}
                             <action>
                                 <a href="{service controller=manager action=temporaryuser instanceId=$instance->id}">
@@ -141,7 +152,7 @@
                 </tr>
             {foreachelse}
                 <tr>
-                    <td colspan="8">{tr}No instances defined.{/tr}</td>
+                    <td colspan="10">{tr}No instances defined.{/tr}</td>
                 </tr>
             {/foreach}
         </table>
