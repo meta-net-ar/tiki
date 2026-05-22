@@ -91,11 +91,12 @@ if ($prefs['auth_webauthn_enabled'] === 'y' && ! empty($_SESSION['webauthn_user'
     $_REQUEST['pass'] = ! empty($_REQUEST['pass']) ? trim($_REQUEST['pass']) : $userlib->genPass();
 }
 
-if ($prefs['twoFactorAuth'] === 'y' && ! empty($_SESSION['tiki_creds_username']) && ! empty($_SESSION['tiki_creds_password'])) {
-    $_REQUEST['user'] = $_SESSION['tiki_creds_username'];
-    $_REQUEST['pass'] = $_SESSION['tiki_creds_password'];
-    unset($_SESSION['tiki_creds_username']);
-    unset($_SESSION['tiki_creds_password']);
+$twoFaPrevalidated = false;
+if ($prefs['twoFactorAuth'] === 'y' && ! empty($_SESSION['tiki_2fa_token']) && ! empty($_SESSION['tiki_2fa_username'])) {
+    $_REQUEST['user'] = $_SESSION['tiki_2fa_username'];
+    $twoFaPrevalidated = true;
+    unset($_SESSION['tiki_2fa_token']);
+    unset($_SESSION['tiki_2fa_username']);
 }
 
 // Remember where user is logging in from and send them back later; using session variable for those of us who use WebISO services
@@ -300,7 +301,10 @@ if (
     }
 } else {
     // Verify user is valid
-    if ($prefs['auth_webauthn_enabled'] === 'y' && ! empty($_SESSION['webauthn_user']) && $_SESSION['webauthn_user'] === $requestedUser) {
+    if ($twoFaPrevalidated) {
+        // Password was already validated before the 2FA prompt; use a token instead of re-checking
+        $ret = [true, $requestedUser, null, null];
+    } elseif ($prefs['auth_webauthn_enabled'] === 'y' && ! empty($_SESSION['webauthn_user']) && $_SESSION['webauthn_user'] === $requestedUser) {
         $ret = [$userlib->update_lastlogin($requestedUser), $requestedUser, USER_VALID];
     } else {
         $ret = $userlib->validate_user($requestedUser, $pass);
@@ -343,8 +347,8 @@ if (
                 && $requireMfa
                 && ! empty($twoFactorSecret)
             ) {
-                $_SESSION['tiki_creds_username'] = $_REQUEST['user'];
-                $_SESSION['tiki_creds_password'] = $_REQUEST['pass'];
+                $_SESSION['tiki_2fa_token'] = bin2hex(random_bytes(32));
+                $_SESSION['tiki_2fa_username'] = $_REQUEST['user'];
                 $params = '&create2FaCodeNormalLogin&tiki_username=' . urlencode($_REQUEST['user']);
                 header('Location: ' . $base_url . 'tiki-login_scr.php?showTwoFactorForm' . $params);
                 exit;
@@ -356,8 +360,8 @@ if (
                 if (! $is2FaPass) {
                     $error = TWO_FA_INCORRECT;
                     $smarty->assign('showTwoFactorForm', 'y');
-                    $_SESSION['tiki_creds_username'] = $_REQUEST['user'];
-                    $_SESSION['tiki_creds_password'] = $_REQUEST['pass'];
+                    $_SESSION['tiki_2fa_token'] = bin2hex(random_bytes(32));
+                    $_SESSION['tiki_2fa_username'] = $_REQUEST['user'];
                     $smarty->assign('create2FaCodeNormalLogin', "y");
                     $smarty->assign('error_login', $error);
                     $smarty->assign('mid', 'tiki-login.tpl');
