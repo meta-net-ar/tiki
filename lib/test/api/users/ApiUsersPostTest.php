@@ -64,7 +64,7 @@ class ApiUsersPostTest extends ApiBaseUsersTest
         ], 'application/x-www-form-urlencoded');
 
         $body = $this->getResponseBody($response);
-        $this->assertValidErrorResponse($body, null, 'Passwords do not match');
+        $this->assertValidErrorResponse($body, 422, 'Passwords do not match');
     }
 
     public function testApiRegisterUserWithExistingUsername()
@@ -80,9 +80,8 @@ class ApiUsersPostTest extends ApiBaseUsersTest
             'email'     => 'other@api-test.tiki.org',
         ], 'application/x-www-form-urlencoded');
 
-        $this->assertResponseStatus(200, $response);
         $body = $this->getResponseBody($response);
-        $this->assertValidRegisterUserDuplicateResponse($body);
+        $this->assertValidErrorResponse($body, 422, 'User already exists');
     }
 
     public function testApiRegisterUserWithoutCredentials()
@@ -92,9 +91,8 @@ class ApiUsersPostTest extends ApiBaseUsersTest
             'email' => 'nobody@api-test.tiki.org',
         ], 'application/x-www-form-urlencoded');
 
-        $this->assertResponseStatus(200, $response);
         $body = $this->getResponseBody($response);
-        $this->assertValidRegisterUserMissingCredentialsResponse($body);
+        $this->assertValidErrorResponse($body, 422, 'required');
     }
 
     public function testApiDeleteUserWithoutPermission()

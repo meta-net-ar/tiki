@@ -90,7 +90,7 @@ class Services_User_Controller
         }
 
         if ($pass !== $passAgain) {
-            throw new Services_Exception(tr('Passwords do not match.'));
+            throw new Services_Exception(tr('Passwords do not match.'), 422);
         }
 
         $regResult = TikiLib::lib('registration')->register_new_user(
@@ -103,6 +103,11 @@ class Services_User_Controller
                 'email' => $email,
             ]
         );
+
+        if (is_array($regResult) && ! empty($regResult)) {
+            $messages = implode(', ', array_column($regResult, 'msg'));
+            throw new Services_Exception($messages, 422);
+        }
 
         if (TIKI_API && empty($regResult)) {
             $regResult = tra('User account created but pending confirmation.');

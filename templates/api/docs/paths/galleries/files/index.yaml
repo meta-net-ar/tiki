@@ -41,7 +41,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: schemas-File.yaml
+            $ref: schemas-FileListResponse.yaml
     '403':
       description: forbidden
       content:

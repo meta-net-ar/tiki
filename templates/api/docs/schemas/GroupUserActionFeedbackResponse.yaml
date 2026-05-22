@@ -1,0 +1,22 @@
+---
+description: Response from group add-users, ban-users, or delete-users actions.
+type: object
+properties:
+  feedback:
+    type: object
+    properties:
+      action:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+            icon:
+              type: string
+            title:
+              type: string
+            mes:
+              type: array
+            items:
+              type: array

@@ -9,8 +9,11 @@ get:
           schema:
             type: object
             properties:
-              list:
+              title:
+                type: string
+              formatList:
                 type: array
+                description: List of all accessible import-export formats.
                 items:
                   type: object
                   properties:
