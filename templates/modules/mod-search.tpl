@@ -147,8 +147,9 @@ $("#search_mod_input_{{$search_mod_usage_counter}}")
                     }
                 {/jq}
                 {if $smod_params.use_autocomplete eq 'y'}
-                    {capture name="selectFn"}select: function(event, item) {ldelim}
-                        $('#search-module-form{$search_mod_usage_counter}').data('page_selected', item.item.value).find("input[name=exact_match]").val("y");
+                    {capture name="selectFn"}select: function(event) {ldelim}
+                        const item = event.detail[0];
+                        window.location.href = item.url;
                         {rdelim}, open: function(event, item) {ldelim}
                         $(".search_mod_buttons", "#search-module-form{$search_mod_usage_counter}").hide();
                         {rdelim}, close: function(event, item) {ldelim}
