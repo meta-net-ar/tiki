@@ -108,6 +108,7 @@ export function getAutocompleteResources(type, options = {}) {
             remoteSourceUrl = $.service("search", "lookup", {
                 "filter~type": options.types,
                 "filter~not_exact": options.excludeIdentifiers,
+                format: jqueryTiki.feature_search_show_object_type ? "{title} ({object_type})" : "{title}",
             });
             transformResultCb = (res) => {
                 return res.resultset.result.map((item) => ({
