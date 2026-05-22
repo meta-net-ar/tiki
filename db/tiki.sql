@@ -1632,6 +1632,7 @@ INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `s
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Send Pages','tiki-send_objects.php',240,'feature_wiki,feature_comm','tiki_p_view,tiki_p_send_pages','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Received Pages','tiki-received_pages.php',245,'feature_wiki,feature_comm','tiki_p_view,tiki_p_admin_received_pages','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Structures','tiki-admin_structures.php',250,'feature_wiki,feature_wiki_structure','tiki_p_view','',0);
+INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Wiki configs','tiki-admin.php?page=wiki',260,'feature_wiki','tiki_p_admin','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s','Articles','tiki-view_articles.php',350,'feature_articles','tiki_p_read_article','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s','Articles','tiki-view_articles.php',350,'feature_articles','tiki_p_articles_read_heading','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Articles Home','tiki-view_articles.php',355,'feature_articles','tiki_p_read_article','',0);
@@ -3540,6 +3541,7 @@ UPDATE tiki_menu_options SET icon = 'flask' WHERE name = 'Sandbox';
 UPDATE tiki_menu_options SET icon = 'copy' WHERE name = 'Multiple Print';
 UPDATE tiki_menu_options SET icon = 'share' WHERE name = 'Send Pages';
 UPDATE tiki_menu_options SET icon = 'sitemap' WHERE name = 'Structures';
+UPDATE tiki_menu_options SET icon = 'cog' WHERE name = 'Wiki configs';
 UPDATE tiki_menu_options SET icon = 'newspaper' WHERE name = 'Articles Home';
 UPDATE tiki_menu_options SET icon = 'list' WHERE name = 'List Articles';
 UPDATE tiki_menu_options SET icon = 'pen' WHERE name = 'Submit Article';
