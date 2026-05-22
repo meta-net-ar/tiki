@@ -83,5 +83,5 @@ foreach ($calls as $call) {
 }
 
 if (isset($_REQUEST['return_uri'])) {
-    header("Location: {$_REQUEST['return_uri']}");
+    $access->redirect($_REQUEST['return_uri']);
 }
