@@ -52,7 +52,7 @@ try {
 $smarty->assign('create2FaCodeNormalLogin', $create2FaCodeNormalLogin);
 
 if ($prefs['login_autologin'] == 'y' && $prefs['login_autologin_redirectlogin'] == 'y' && ! empty($prefs['login_autologin_redirectlogin_url'])) {
-    $access->redirect($prefs['login_autologin_redirectlogin_url']);
+    $access->redirect($prefs['login_autologin_redirectlogin_url'], allowExternal: true);
 }
 
 if (isset($_REQUEST['clearmenucache'])) {

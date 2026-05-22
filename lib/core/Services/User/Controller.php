@@ -1232,7 +1232,10 @@ class Services_User_Controller
 
     private function redirectAndReturn($data = []): array
     {
-        header("Location:" . $_SERVER['HTTP_REFERER']);
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        if ($referer !== '') {
+            TikiLib::lib('access')->redirect($referer);
+        }
         return $data;
     }
 
