@@ -232,6 +232,7 @@ class ObjectLib extends TikiLib
             'article_type',
             'blog',
             'calendar',
+            'calendaritem',
             'directory',
             'faq',
             'file',
@@ -338,7 +339,9 @@ class ObjectLib extends TikiLib
                 'itemId' => $res['itemId'],
                 'type' => $res['type'],
                 'title' => $this->get_title($res['type'], $res['itemId']),
-                'parent_object_id_field' => array_search($res['type'], array_merge(...array_values($mappedChildParent))),
+                'parent_object_id_field' => key(array_values(array_filter($mappedChildParent, function ($item) use ($res) {
+                    return reset($item) === $res['type'];
+                }))[0]),
             ];
         }
 
