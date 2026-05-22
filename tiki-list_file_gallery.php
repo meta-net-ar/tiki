@@ -423,7 +423,7 @@ if (isset($_REQUEST['fgal_actions'])) {
         } else {
             foreach (array_values($_REQUEST['file']) as $file) {
                 $result = $filegallib->metadataAction($file, 'refresh');
-                if ($result && $result->numRows()) {
+                if ($result !== false) {
                     $failedFiles--;
                 }
             }
@@ -595,7 +595,7 @@ if (
     && $access->checkCsrf(true)
 ) {
     $result = $filegallib->metadataAction($_REQUEST['fileId'], 'refresh');
-    if ($result && $result->numRows()) {
+    if ($result !== false) {
         Feedback::success(tr('Metadata refreshed'));
     } else {
         Feedback::error(tr('Metadata not refreshed'));
