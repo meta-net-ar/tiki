@@ -200,13 +200,13 @@ if (
                             if ($key == '') {
                                 break;
                             } elseif ($key == 'user_details') {
-                                $user_details = unserialize($value->scalarval());
+                                $user_details = json_decode($value->scalarval(), true);
                             } elseif ($key == 'avatarData') {
                                 $avatarData = $value->scalarval();
                             }
                         }
                     } else {
-                        $user_details = unserialize($response_value->scalarval());
+                        $user_details = json_decode($response_value->scalarval(), true);
                     }
                 }
                 $requestedUser = $user_details['info']['login']; // use the correct capitalization
