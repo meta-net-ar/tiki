@@ -137,8 +137,11 @@ function smarty_block_self_link($params, $content, $smarty, &$repeat = false)
                     );
                     unset($params['_onclick']); // Prevent addition to $link later
                 } else {
-                                      // Escape href value to prevent XSS injection
-                    $ret = 'href="' . htmlspecialchars($ret, ENT_QUOTES, 'UTF-8') . '"';
+                    /* Escape href value to prevent XSS injection. Set double_encode to false
+                     because smarty_function_query() already produces an HTML-safe URL query
+                     (http_build_query with &amp; separator and htmlspecialchars on PHP_SELF),
+                     so existing entities must not be re-encoded (for instance &amp; would become &amp;amp;).**/
+                    $ret = 'href="' . htmlspecialchars($ret, ENT_QUOTES, 'UTF-8', false) . '"';
                 }
             }
 
