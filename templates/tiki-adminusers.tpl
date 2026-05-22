@@ -432,9 +432,16 @@
                     {button href="tiki-assignuser.php?assign_user=$thisloginescaped" _text="{tr}Assign user to Groups{/tr}" _icon_name='group'}
                 {/if}
                 {if $userinfo.waiting eq 'a'}
-                    {$thispassescaped = $userinfo.valid|escape:'url'}
+                    {$thispassescaped = $userinfo.valid|escape:'attr'}
                     {if empty($thispassescaped)}{$thispassescaped = 0}{/if}
-                    {button href='tiki-login_validate.php?user='|cat:$thisloginescaped|cat:'&pass='|cat:$thispassescaped _text="{tr}Validate user{/tr}" _icon_name='ok'}
+                    <form action="tiki-login_validate.php" method="post" class="d-inline">
+                        {ticket}
+                        <input type="hidden" name="user" value="{$userinfo.login|escape:'attr'}">
+                        <input type="hidden" name="pass" value="{$thispassescaped}">
+                        <button type="submit" class="btn btn-link">
+                            {icon name="ok"} {tr}Validate user{/tr}
+                        </button>
+                    </form>
                 {/if}
             {else}
                 <h2>{tr}Add a New User{/tr}</h2>
