@@ -23,7 +23,6 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
  */
 class AvatarLib extends TikiLib
 {
-
     /**
      * sets the avatar from a given image file's URL
      *
@@ -48,6 +47,12 @@ class AvatarLib extends TikiLib
 
         if (empty($userwatch)) {
             $userwatch = $user;
+        }
+
+        // Validate URL to prevent SSRF via user-supplied avatar URLs
+        $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+        if (! $ssrf->isUrlAllowed($url)) {
+            throw new \Exception('Avatar URL is not allowed');
         }
 
         $data = file_get_contents($url);

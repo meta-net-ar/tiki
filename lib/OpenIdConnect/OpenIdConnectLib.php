@@ -155,13 +155,37 @@ class OpenIdConnectLib
             if ($cachedValue) {
                 $jwkArr = unserialize($cachedValue);
             } else {
-                $jwkArr = json_decode(file_get_contents($this->jwksUrl), true);
-                $cachelib->cacheItem(
-                    $cacheName,
-                    serialize(
-                        $jwkArr
-                    )
-                );
+                // Validate JWKS URL to prevent SSRF
+                $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+                if (! $ssrf->isUrlAllowed($this->jwksUrl)) {
+                    throw new \Exception('JWKS URL is not allowed');
+                }
+
+                $jwkArr = file_get_contents($this->jwksUrl);
+
+                if ($jwkArr === false) {
+                    throw new \Exception('Failed to download JWKS file.');
+                }
+
+                $jwkArr = json_decode($jwkArr, true);
+
+                if (json_last_error() !== JSON_ERROR_NONE || ! is_array($jwkArr) || ! isset($jwkArr['keys'])) {
+                    throw new \Exception('Invalid or empty JWKS file.');
+                }
+
+                $jwkConverter = new JWKConverter();
+                $keys = $jwkConverter->multipleToPEM($jwkArr['keys']);
+
+                if (is_array($keys)) {
+                    $cachelib->cacheItem(
+                        $cacheName,
+                        serialize(
+                            $keys
+                        )
+                    );
+                }
+
+                return $keys;
             }
         } catch (\Throwable $e) {
             error_log(
