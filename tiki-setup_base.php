@@ -253,7 +253,7 @@ if (isset($_SERVER["REQUEST_URI"]) && ! str_contains($_SERVER['REQUEST_URI'], 't
             $session_params['secure'] = true;
             $session_params['samesite'] = 'None';
         } else {
-            $session_params['samesite'] = 'Strict';
+            $session_params['samesite'] = 'Lax';
         }
 
         session_set_cookie_params([
