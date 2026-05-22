@@ -62,6 +62,19 @@ if ($prefs['session_silent'] == 'y') {
     session_start();
 }
 
+if ($prefs['auth_webauthn_enabled'] === 'y' && ! empty($_SESSION['webauthn_user'])) {
+    $_REQUEST['user'] = $_SESSION['webauthn_user'];
+    $_REQUEST['pass'] = ! empty($_REQUEST['pass']) ? trim($_REQUEST['pass']) : $userlib->genPass();
+}
+
+$twoFaPrevalidated = false;
+if ($prefs['twoFactorAuth'] === 'y' && ! empty($_SESSION['tiki_2fa_token']) && ! empty($_SESSION['tiki_2fa_username'])) {
+    $_REQUEST['user'] = $_SESSION['tiki_2fa_username'];
+    $twoFaPrevalidated = true;
+    unset($_SESSION['tiki_2fa_token']);
+    unset($_SESSION['tiki_2fa_username']);
+}
+
 // Remember where user is logging in from and send them back later; using session variable for those of us who use WebISO services
 // Note that login from will always be a complete URL (http://...)
 if (! isset($_SESSION['loginfrom']) && isset($_SERVER['HTTP_REFERER']) && ! preg_match('|/login|', $_SERVER['HTTP_REFERER']) && ! preg_match('|logout|', $_SERVER['HTTP_REFERER'])) {
@@ -279,7 +292,14 @@ if (
     }
 } else {
     // Verify user is valid
-    $ret = $userlib->validate_user($requestedUser, $pass);
+    if ($twoFaPrevalidated) {
+        // Password was already validated before the 2FA prompt; use a token instead of re-checking
+        $ret = [true, $requestedUser, null, null];
+    } elseif ($prefs['auth_webauthn_enabled'] === 'y' && ! empty($_SESSION['webauthn_user']) && $_SESSION['webauthn_user'] === $requestedUser) {
+        $ret = [$userlib->update_lastlogin($requestedUser), $requestedUser, USER_VALID];
+    } else {
+        $ret = $userlib->validate_user($requestedUser, $pass);
+    }
     if (count($ret) == 3) {
         $ret[] = null;
     }
@@ -302,14 +322,54 @@ if (
             }
         }
     } elseif ($isvalid) {
-        $twoFactorSecret = $userlib->get_2_factor_secret($requestedUser);
-        if ($prefs['twoFactorAuth'] == 'y' && ! empty($twoFactorSecret) && ! $userlib->validate_two_factor($twoFactorSecret, $_REQUEST["twoFactorAuthCode"], $requestedUser)) {
-            $error = TWO_FA_INCORRECT;
-            $isvalid = false;
-            $smarty->assign('twoFactorForm', 'y');
-        } else {
-            $isdue = $userlib->is_due($requestedUser, $method);
-            $user = $requestedUser;
+        try {
+            $requireMfa = false;
+            $twoFactorSecret = null;
+
+            if (($prefs['twoFactorAuth'] ?? 'n') === 'y') {
+                $requireMfa = TwoFactorAuth::isMFARequired($requestedUser);
+                $twoFactorSecret = TwoFactorAuth::get2FactorSecret($requestedUser);
+            }
+
+            if (
+                ($prefs['twoFactorAuth'] ?? 'n') === 'y'
+                && isset($_REQUEST['login_mode'])
+                && $_REQUEST['login_mode'] == 'popup'
+                && $requireMfa
+                && ! empty($twoFactorSecret)
+            ) {
+                $_SESSION['tiki_2fa_token'] = bin2hex(random_bytes(32));
+                $_SESSION['tiki_2fa_username'] = $_REQUEST['user'];
+                $params = '&create2FaCodeNormalLogin&tiki_username=' . urlencode($_REQUEST['user']);
+                header('Location: ' . $base_url . 'tiki-login_scr.php?twoFactorForm' . $params);
+                exit;
+            }
+
+            if (($prefs['twoFactorAuth'] ?? 'n') === 'y' && $requireMfa && ! empty($twoFactorSecret)) {
+                $twoFactorAuth = TwoFactorAuth::getTwoFactorAuth();
+                $is2FaPass = $twoFactorAuth->validateCode($requestedUser, $_REQUEST['twoFactorAuthCode']);
+                if (! $is2FaPass) {
+                    $error = TWO_FA_INCORRECT;
+                    $smarty->assign('showTwoFactorForm', 'y');
+                    $_SESSION['tiki_2fa_token'] = bin2hex(random_bytes(32));
+                    $_SESSION['tiki_2fa_username'] = $_REQUEST['user'];
+                    $smarty->assign('create2FaCodeNormalLogin', "y");
+                    $smarty->assign('error_login', $error);
+                    $smarty->assign('mid', 'tiki-login.tpl');
+                    $smarty->display('tiki.tpl');
+                    exit;
+                }
+            }
+
+            if ($isvalid) {
+                if ($requireMfa && ($prefs['twoFactorAuth'] ?? 'n') === 'y') {
+                    $userlib->updateLastMFADate($requestedUser);
+                }
+                $isdue = $userlib->is_due($requestedUser, $method);
+                $user = $requestedUser;
+            }
+        } catch (TwoFactorAuthException $e) {
+            Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
 }
