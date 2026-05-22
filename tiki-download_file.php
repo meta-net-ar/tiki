@@ -9,6 +9,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\File\PDFHelper;
+use Tiki\BruteForce\BruteForce;
 use Tiki\Lib\Image\Image;
 use Tiki\Lib\Image\ImageFileHandler;
 
@@ -19,6 +20,7 @@ $thumbnail_format = 'jpeg';
 require_once('tiki-setup.php');
 
 global $user;
+$bruteForce = new BruteForce();
 
 if (isset($_GET['fileId']) && isset($_GET['thumbnail']) && isset($_COOKIE[ session_name() ]) && count($_GET) == 2 && isset($_SESSION['allowed'][$_GET['fileId']])) {
     $query = "select * from `tiki_files` where `fileId`=?";
@@ -329,6 +331,19 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
 
     if ($build_content) {
         if ($convertToPdf) {
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                $pdfGenerationProperties = ['ip' => $tikilib->get_ip_address()];
+                if (! $bruteForce->isOperationAllowed('pdf_generation', $pdfGenerationProperties)) {
+                    $waitTime = $bruteForce->getWaitTime('pdf_generation', $pdfGenerationProperties);
+                    if ($waitTime > 60) {
+                        $waitMessage = sprintf(tra('Too many PDF generation requests. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+                    } else {
+                        $waitMessage = sprintf(tra('Too many PDF generation requests. Please try again in %d seconds.'), $waitTime);
+                    }
+                    Feedback::errorAndDie($waitMessage, 429);
+                }
+            }
+
             $pdfFile = PDFHelper::convertToPDF($_REQUEST['fileId']);
             $content = file_get_contents($pdfFile);
             unlink($pdfFile);
@@ -337,6 +352,20 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
             // Modify the original image if needed
             if (! Image::isAvailable()) {
                 die();
+            }
+
+            $rateLimitImageTransform = isset($_GET['x']) || isset($_GET['y']) || $scale || isset($_GET['max']) || isset($_GET['format']) || isset($_GET['quality']);
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y' && $rateLimitImageTransform) {
+                $imageResizeProperties = ['ip' => $tikilib->get_ip_address()];
+                if (! $bruteForce->isOperationAllowed('image_resize', $imageResizeProperties)) {
+                    $waitTime = $bruteForce->getWaitTime('image_resize', $imageResizeProperties);
+                    if ($waitTime > 60) {
+                        $waitMessage = sprintf(tra('Too many image resize requests. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+                    } else {
+                        $waitMessage = sprintf(tra('Too many image resize requests. Please try again in %d seconds.'), $waitTime);
+                    }
+                    Feedback::errorAndDie($waitMessage, 429);
+                }
             }
 
             $content_changed = true;
