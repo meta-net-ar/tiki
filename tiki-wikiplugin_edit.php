@@ -14,5 +14,5 @@ trigger_error(tr('Note, deprecated file tiki-wikiplugin_edit.php, code moved to 
 
 TikiLib::lib('service')->render('plugin', 'replace', $jitPost);
 
-header("Location: {$_SERVER['HTTP_REFERER']}");
-exit;
+// Use the validated redirect helper to guard against open-redirect via a forged Referer header.
+TikiLib::lib('access')->redirect($_SERVER['HTTP_REFERER'] ?? '');
