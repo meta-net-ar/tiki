@@ -83,6 +83,10 @@
                 {preference name=feature_debug_console}
             </fieldset>
             <fieldset>
+                <legend class="h3">{tr}SSRF Protection{/tr}</legend>
+                {preference name=ssrf_whitelisted_hosts}
+            </fieldset>
+            <fieldset>
                 <legend class="h3">{tr}Trackers Security{/tr}</legend>
                 {preference name=tracker_adminonlyviewedititem_by_default}
             </fieldset>
