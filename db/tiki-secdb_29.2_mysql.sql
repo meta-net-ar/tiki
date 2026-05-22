@@ -4092,7 +4092,7 @@ INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES
 ('./lib/test/core/Files/CheckAttachmentGalleryTest.php', '0ec5db6ac26d3a63b8f24540ce8ba6e1', '29.2'),
 ('./lib/test/core/Files/CheckFileGalleryTest.php', 'c3239823110c2fe486389e67ee0f6c73', '29.2'),
 ('./lib/test/core/Files/index.php', 'cd1f5a887fccf3fc5dbe7a407edafe02', '29.2'),
-('./lib/test/core/InputConfiguration/InputConfigValidFiltersTest.php', '20e17698510c7d71449d35cc504dd81a', '29.2'),
+('./lib/test/core/InputConfiguration/InputConfigValidFiltersTest.php', '4989c5ad7a5774d290e9196a307ef2eb', '29.2'),
 ('./lib/test/core/InputConfiguration/index.php', 'cd1f5a887fccf3fc5dbe7a407edafe02', '29.2'),
 ('./lib/test/core/JitFilter/AccessTest.php', '94ff0898b87bf0fc23d43ea152dca8cb', '29.2'),
 ('./lib/test/core/JitFilter/FilterTest.php', 'abdb3aa795160925135fda277ff8ba5f', '29.2'),
