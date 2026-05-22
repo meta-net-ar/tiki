@@ -67,7 +67,7 @@ class OpenPGP_Zend_Mail_Transport_Smtp extends Laminas\Mail\Transport\Smtp
         }
 
         global $openpgplib;
-        $pgpmime_msg = $openpgplib->prepareEncryptWithZendMail($originalHeaders, $originalBody, $recipients);
+        $pgpmime_msg = $openpgplib->prepareEncryptWithZendMail($recipients, $originalHeaders, $originalBody);
         $headers = $pgpmime_msg[0]; // set pgp/mime headers from result array
         $this->OpenGPGStoreMailBody = $pgpmime_msg[1];    // set pgp/mime encrypted message body from result array
 
