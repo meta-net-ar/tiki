@@ -4005,7 +4005,6 @@ INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES
 ('./lib/test/Calendar/index.php', '9eb92015f38ac940708f168c20a5b697', '29.2'),
 ('./lib/test/Core/InputConfiguration/InputConfigValidFiltersTest.php', 'aeb4114ed0e32dd35ae9994a81ebab27', '29.2'),
 ('./lib/test/Core/InputConfiguration/index.php', 'cd1f5a887fccf3fc5dbe7a407edafe02', '29.2'),
-('./lib/test/Core/index.php', '9eb92015f38ac940708f168c20a5b697', '29.2'),
 ('./lib/test/FileChecks/allTikiPhpFilesTest.php', '8d6de20dccac99536793818b8f723f39', '29.2'),
 ('./lib/test/FileChecks/index.php', '9eb92015f38ac940708f168c20a5b697', '29.2'),
 ('./lib/test/Importer/AbstractImporterTestCase.php', 'ed422c83c6a65757c0600d1e33b46820', '29.2'),
