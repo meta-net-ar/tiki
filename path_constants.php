@@ -108,6 +108,7 @@ const WIKIPLUGIN_CACHE_FILES_GLOB = 'temp/cache/wikiplugin_*';
 const SATIS_TEMP_PATH = 'temp/satis';
 const UNIFIED_INDEX_TEMP_PATH = 'temp/unified-index';
 const TEMPLATES_ADMIN_PATH = 'templates/admin';
+const WEBSERVICE_TEMPLATES_PATH = 'templates/webservice_templates';
 const TEMPLATES_MODULES_PATH = 'templates/modules';
 
 /** This it for the old tiki_tests system which may not be functional - benoitg - 2023-11-16 */
