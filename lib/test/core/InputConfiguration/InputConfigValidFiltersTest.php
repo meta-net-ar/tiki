@@ -7,10 +7,9 @@
 /**
  * @group unit
 */
-namespace Tiki\Lib\Test\Core\InputConfiguration;
+namespace Tiki\Test\InputConfiguration;
 
 use TikiTestCase;
-
 class InputConfigValidFiltersTest extends TikiTestCase
 {
     /**
