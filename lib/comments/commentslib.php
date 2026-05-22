@@ -618,27 +618,57 @@ class Comments extends TikiLib
                                 if ($part['disposition'] == 'attachment') {
                                     if (! empty($part['d_parameters']['filename'])) {
                                         $part_name = $part['d_parameters']['filename'];
-                                    } elseif (preg_match(
-                                        '/filename=([^;]*)/', $part['d_parameters']['atend'], $mm
-                                    )
+                                    } elseif (
+                                        preg_match(
+                                            '/filename=([^;]*)/',
+                                            $part['d_parameters']['atend'],
+                                            $mm
+                                        )
                                     ) {      // not sure what this is but it seems to have the filename in it
                                         $part_name = $mm[1];
                                     } else {
                                         $part_name = "Unnamed File";
                                     }
                                     $this->add_thread_attachment(
-                                        $forum_info, $threadId, $errors, $part_name, $part['type'], strlen($part['body']), 1, '', '', $part['body']
+                                        $forum_info,
+                                        $threadId,
+                                        $errors,
+                                        $part_name,
+                                        $part['type'],
+                                        strlen($part['body']),
+                                        1,
+                                        '',
+                                        '',
+                                        $part['body']
                                     );
                                 } elseif ($part['disposition'] == 'inline') {
                                     if (! empty($part['parts'])) {
                                         foreach ($part['parts'] as $p) {
                                             $this->add_thread_attachment(
-                                                $forum_info, $threadId, $errors, '-', $p['type'], strlen($p['body']), 1, '', '', $p['body']
+                                                $forum_info,
+                                                $threadId,
+                                                $errors,
+                                                '-',
+                                                $p['type'],
+                                                strlen($p['body']),
+                                                1,
+                                                '',
+                                                '',
+                                                $p['body']
                                             );
                                         }
                                     } elseif (! empty($part['body'])) {
                                         $this->add_thread_attachment(
-                                            $forum_info, $threadId, $errors, '-', $part['type'], strlen($part['body']), 1, '', '', $part['body']
+                                            $forum_info,
+                                            $threadId,
+                                            $errors,
+                                            '-',
+                                            $part['type'],
+                                            strlen($part['body']),
+                                            1,
+                                            '',
+                                            '',
+                                            $part['body']
                                         );
                                     }
                                 }
@@ -658,10 +688,10 @@ class Comments extends TikiLib
                         $body,
                         $userName,
                         $title,
-                        $message_id,
-                        $in_reply_to,
                         $threadId,
-                        $parentId
+                        $parentId,
+                        $message_id,
+                        $in_reply_to
                     );
                 }
                 $pop3->deleteMsg($i);
@@ -872,10 +902,10 @@ class Comments extends TikiLib
             $info['data'],
             $info['user'],
             $info['title'],
-            $message_id,
-            $info['in_reply_to'],
             $threadId,
-            isset($info['parentId']) ? $info['parentId'] : 0
+            isset($info['parentId']) ? $info['parentId'] : 0,
+            $message_id,
+            $info['in_reply_to']
         );
 
         if ($info['email']) {
@@ -3926,10 +3956,10 @@ class Comments extends TikiLib
                     $params['comments_data'],
                     $user,
                     isset($parent_comment_info['title']) ? $parent_comment_info['title'] : $params['comments_title'],
-                    $message_id,
-                    $in_reply_to,
                     ! empty($params['comments_threadId']) ? $params['comments_threadId'] : 0,
                     isset($params['comments_parentId']) ? $params['comments_parentId'] : 0,
+                    $message_id,
+                    $in_reply_to,
                     isset($params['contributions']) ? $params['contributions'] : '',
                     $qId
                 );
@@ -3974,10 +4004,10 @@ class Comments extends TikiLib
                             $params['comments_data'],
                             $user,
                             $params['comments_title'],
-                            $message_id,
-                            $in_reply_to,
                             $threadId,
                             isset($params['comments_parentId']) ? $params['comments_parentId'] : 0,
+                            $message_id,
+                            $in_reply_to,
                             isset($params['contributions']) ? $params['contributions'] : ''
                         );
                         // Set watch if requested
