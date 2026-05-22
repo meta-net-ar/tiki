@@ -333,7 +333,7 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
     }
 
     if (! $isprefixed && ! empty($prefs['url_anonymous_page_not_found']) && empty($user)) {
-        $access->redirect($prefs['url_anonymous_page_not_found']);
+        $access->redirect($prefs['url_anonymous_page_not_found'], allowExternal: true);
     }
 
     if ($user && $prefs['feature_wiki_userpage'] == 'y' && strcasecmp($prefs['feature_wiki_userpage_prefix'], $page) == 0) {
