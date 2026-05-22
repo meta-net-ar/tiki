@@ -196,5 +196,16 @@ function prefs_wikiplugin_list($partial = false)
         'warning' => tr('Setting this to a higher value than the default of 500 may have performance implications.'),
     ];
 
+    $prefs['wikiplugin_fileaccess_allowed_paths'] = [
+        'name' => tr('Allowed filesystem roots for file-access wiki plugins'),
+        'description' => tr('Comma-separated allowlist of absolute filesystem roots for LSDIR and LOCALFILES plugins. Access is denied by default when empty.'),
+        'type' => 'text',
+        'separator' => ',',
+        'default' => '',
+        'tags' => ['advanced'],
+        'warning' => tr('Security-sensitive setting. Keep this list minimal and avoid allowing the Tiki installation directory.'),
+        'hint' => tr('Set this using system configuration (tiki.ini/local.ini) so it can be forced by host policy.'),
+    ];
+
     return $prefs;
 }
