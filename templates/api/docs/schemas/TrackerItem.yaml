@@ -1,3 +1,5 @@
+---
+description: Core tracker item fields (status, timestamps, owner). Dynamic field values are returned separately under a `fields` key.
 type: object
 properties:
   itemId:
@@ -6,11 +8,17 @@ properties:
     type: integer
   created:
     type: integer
+    nullable: true
   createdBy:
     type: string
+    nullable: true
   status:
     type: string
+    nullable: true
+    description: "Item status: 'o' (open), 'p' (pending), 'c' (closed)."
   lastModif:
     type: integer
+    nullable: true
   lastModifBy:
     type: string
+    nullable: true

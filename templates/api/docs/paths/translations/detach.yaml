@@ -31,6 +31,18 @@ post:
         application/json:
           schema:
             type: object
+            properties:
+              FORWARD:
+                type: object
+                properties:
+                  controller:
+                    type: string
+                  action:
+                    type: string
+                  type:
+                    type: string
+                  source:
+                    type: string
     '400':
       description: bad request
       content:

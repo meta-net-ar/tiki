@@ -14,7 +14,10 @@ get:
       content:
         application/json:
           schema:
-            $ref: schemas-Gallery.yaml
+            type: object
+            properties:
+              info:
+                $ref: schemas-Gallery.yaml
     '403':
       description: forbidden
       content:

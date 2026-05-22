@@ -179,21 +179,30 @@ post:
           schema:
             type: object
             properties:
+              title:
+                type: string
               field:
-                type: object
-                description: TODO
+                $ref: schemas-TrackerField.yaml
               info:
                 type: object
-                description: TODO
+                description: Field type definition for the current field type (name, description, params, etc.).
               options:
+                type: array
+              validation_types:
                 type: object
-                description: TODO
+                additionalProperties:
+                  type: string
               types:
                 type: object
-                description: TODO
+                description: Map of type code to field type definition.
+              permNameMaxAllowedSize:
+                type: integer
               fields:
-                type: object
-                description: TODO
+                type: array
+                items:
+                  $ref: schemas-TrackerField.yaml
+              encryption_keys:
+                type: array
     '403':
       description: forbidden
       content:

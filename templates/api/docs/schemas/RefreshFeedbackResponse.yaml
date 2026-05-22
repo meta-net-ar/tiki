@@ -1,0 +1,24 @@
+---
+description: |
+  Response from bulk wiki actions (delete, lock, unlock, title) in TIKI_API context.
+  Services_Utilities::refresh() returns Feedback::get() grouped by tpl key.
+type: object
+properties:
+  feedback:
+    type: object
+    properties:
+      action:
+        type: array
+        items:
+          type: object
+          properties:
+            type:
+              type: string
+            icon:
+              type: string
+            title:
+              type: string
+            mes:
+              type: array
+            items:
+              type: array

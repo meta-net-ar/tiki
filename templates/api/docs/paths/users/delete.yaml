@@ -40,7 +40,13 @@ post:
             properties:
               feedback:
                 type: object
-                description: Contains success message or error messages concerning user validation.
+                properties:
+                  tpl:
+                    type: string
+                  mes:
+                    type: string
+                  items:
+                    type: array
     '403':
       description: forbidden
       content:

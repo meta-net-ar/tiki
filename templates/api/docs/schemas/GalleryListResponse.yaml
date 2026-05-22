@@ -1,0 +1,18 @@
+---
+description: Paginated list of galleries and their files/sub-galleries.
+type: object
+properties:
+  title:
+    type: string
+  parentId:
+    type: integer
+  offset:
+    type: integer
+  maxRecords:
+    type: integer
+  count:
+    type: integer
+  result:
+    type: array
+    items:
+      $ref: schemas-File.yaml

@@ -85,14 +85,14 @@ post:
           $ref: schemas-WikiPageRequest.yaml
   responses:
     '200':
-      description: wiki page response
+      description: Created wiki page configuration view.
       content:
         application/json:
           schema:
             type: object
             properties:
               info:
-                type: object
+                $ref: schemas-WikiPageResponse.yaml
     '403':
       description: forbidden
       content:

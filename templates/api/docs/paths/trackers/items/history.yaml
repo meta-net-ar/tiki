@@ -59,20 +59,45 @@ get:
             properties:
               fieldId:
                 type: integer
+                nullable: true
               filter:
-                type: object
+                type: array
               diff_style:
                 type: string
               offset:
                 type: integer
+                nullable: true
               history:
-                type: object
+                type: array
+                description: Ordered list of change log entries for the item.
+                items:
+                  type: object
+                  properties:
+                    version:
+                      type: integer
+                    fieldId:
+                      type: integer
+                      nullable: true
+                    value:
+                      type: string
+                    user:
+                      type: string
+                      nullable: true
+                    lastModif:
+                      type: integer
+                    new:
+                      type: string
               count:
                 type: integer
               item_info:
                 $ref: schemas-TrackerItem.yaml
               field_option:
                 type: object
+                description: Map of fieldId to field definition.
+              metatag_robots:
+                type: string
+              logging:
+                type: integer
     '401':
       description: forbidden
       content:

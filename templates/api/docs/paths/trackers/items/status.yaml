@@ -28,11 +28,23 @@ post:
                 - `c`: Closed - The item is closed and no longer active
   responses:
     '200':
-      description: success
+      description: Status update confirmation — returns a FORWARD redirect instruction.
       content:
         application/json:
           schema:
             type: object
+            properties:
+              FORWARD:
+                type: object
+                properties:
+                  controller:
+                    type: string
+                  action:
+                    type: string
+                  status:
+                    type: string
+                  redirect:
+                    type: string
     '403':
       description: forbidden
       content:
