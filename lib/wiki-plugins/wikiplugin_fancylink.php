@@ -513,6 +513,11 @@ function extractUrlMetadata($url, $cacheTime = 86400)
         return false;
     }
 
+    // Prevent SSRF by validating the URL and resolved hosts.
+    $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+    if (! $ssrf->isUrlAllowed($url)) {
+        return false;
+    }
     // Check cache first
     $cacheLib = TikiLib::lib('cache');
     // Use the full URL in the cache key to avoid collisions between different domains
@@ -721,6 +726,8 @@ function resolveUrl($url, $baseUrl)
 
     return $scheme . $host . $port . $path . $url;
 }
+
+
 
 /**
  * Truncate text to a specified length

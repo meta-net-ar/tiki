@@ -154,6 +154,12 @@ class OpenIdConnectLib
                 $jwkArr = unserialize($cachedValue);
                 return $jwkArr;
             } else {
+                // Validate JWKS URL to prevent SSRF
+                $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+                if (! $ssrf->isUrlAllowed($this->jwksUrl)) {
+                    throw new \Exception('JWKS URL is not allowed');
+                }
+
                 $jwkArr = file_get_contents($this->jwksUrl);
 
                 if ($jwkArr === false) {
