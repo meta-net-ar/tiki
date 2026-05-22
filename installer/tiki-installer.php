@@ -662,7 +662,7 @@ if ($install_step == '9') {
     if (empty($_REQUEST['multi'])) {
         $userlib->user_logout($user, false, $u);    // logs out then redirects to home page or $u
     } else {
-        $access->redirect('http://' . $_REQUEST['multi'] . $tikiroot . $u);     // send to the selected multitiki
+        $access->redirect('http://' . $_REQUEST['multi'] . $tikiroot . $u, allowExternal: true);     // send to the selected multitiki
     }
     exit;
 }

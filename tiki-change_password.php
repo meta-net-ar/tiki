@@ -187,7 +187,7 @@ if (isset($_REQUEST["change"])) {
             $wizardlib->onLogin($user, $homePageUrl, $force);
             $accesslib = TikiLib::lib('access');
             if (! empty($prefs['url_after_validation']) && ! empty($_REQUEST['new_user_validation'])) {
-                $access->redirect($prefs['url_after_validation']);
+                $access->redirect($prefs['url_after_validation'], allowExternal: true);
             } else {
                 $accesslib->redirect($homePageUrl);
             }
