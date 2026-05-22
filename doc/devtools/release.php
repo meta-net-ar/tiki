@@ -301,23 +301,10 @@ function updateSecdb($version)
         sort($queries);
         fwrite($fp, "start transaction;\n");
         fwrite($fp, "DELETE FROM `tiki_secdb`;\n");
-        // Do not recreate a PRIMARY KEY on (filename, tiki_version).
-        //
-        // Historically this table used:
-        //
-        //   PRIMARY KEY (`filename`(171), `tiki_version`(20))
-        //
-        // The key only indexed a prefix of `filename`, not the full path. This caused
-        // false duplicate-key errors when different long paths shared the same first
-        // 171 characters, especially in bundled vendor/test fixtures.
-        //
-        // Increasing the prefix length is not a reliable fix because older MySQL/MyISAM
-        // versions can hit index-size limits.
-        //
-        // Since tiki_secdb is fully generated from release files (not user data),
-        // enforcing uniqueness through a truncated filename prefix is more harmful
-        // than useful. A normal filename index remains sufficient for lookups.
-        fwrite($fp, "ALTER TABLE `tiki_secdb` DROP PRIMARY KEY;\n\n");
+        // This index was originally created with a size limit that would raise an error on some versions,
+        // notably on 18.0. Since this file is executed before any patch in installer/schema, the fix had to
+        // be done here. It's a quick operation because table is empty, so no harm in leaving this here forever.
+        fwrite($fp, "ALTER TABLE `tiki_secdb` DROP PRIMARY KEY, ADD PRIMARY KEY (`filename`(186),`tiki_version`(5));\n\n");
 
         $insertString = 'INSERT INTO `tiki_secdb` (`filename`, `md5_value`, `tiki_version`) VALUES ';
 
