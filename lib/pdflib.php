@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Mpdf\Mpdf;
+use Tiki\BruteForce\BruteForce;
 use Tiki\Lib\Auth\Tokens;
 use Tiki\Lib\Theme\ThemeLib;
 
@@ -14,6 +15,7 @@ use Tiki\Lib\Theme\ThemeLib;
  */
 class PdfGenerator
 {
+    private const NONE = 'none';
     private const WEBKIT = 'webkit';
     private const WEASYPRINT = 'weasyprint';
     private const WEBSERVICE = 'webservice';
@@ -24,6 +26,7 @@ class PdfGenerator
 
     private $mode;
     private $location;
+    private static $rateLimitChecked = false;
 
     /**
      * @param string $printMode allow to force a given print mode
@@ -31,7 +34,7 @@ class PdfGenerator
     public function __construct($printMode = '')
     {
         global $prefs;
-        $this->mode = 'none';
+        $this->mode = self::NONE;
         $this->error = false;
 
         if (empty($printMode)) {
@@ -107,6 +110,8 @@ class PdfGenerator
 
     public function getPdf($file, array $params, $pdata = '')
     {
+        $this->enforceRateLimit();
+
         return TikiLib::lib('tiki')->allocate_extra(
             'print_pdf',
             function () use ($file, $params, $pdata) {
@@ -152,6 +157,38 @@ class PdfGenerator
                 return $return;
             }
         );
+    }
+
+    private function enforceRateLimit()
+    {
+        global $prefs;
+
+        if (
+            self::$rateLimitChecked
+            || $this->mode === self::NONE
+            || ($prefs['bruteforce_protection'] ?? 'n') !== 'y'
+            || PHP_SAPI === 'cli'
+        ) {
+            return;
+        }
+
+        $tikilib = TikiLib::lib('tiki');
+        $properties = [
+            'ip' => $tikilib->get_ip_address(),
+        ];
+
+        $bruteForce = new BruteForce();
+        if (! $bruteForce->isOperationAllowed('pdf_generation', $properties)) {
+            $waitTime = $bruteForce->getWaitTime('pdf_generation', $properties);
+            if ($waitTime > 60) {
+                $waitMessage = sprintf(tra('Too many PDF generation requests. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+            } else {
+                $waitMessage = sprintf(tra('Too many PDF generation requests. Please try again in %d seconds.'), $waitTime);
+            }
+            Feedback::errorAndDie($waitMessage, 429);
+        }
+
+        self::$rateLimitChecked = true;
     }
 
     /**
