@@ -10,6 +10,7 @@
 namespace Tiki\Test\InputConfiguration;
 
 use TikiTestCase;
+
 class InputConfigValidFiltersTest extends TikiTestCase
 {
     /**
