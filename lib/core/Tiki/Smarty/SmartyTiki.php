@@ -340,6 +340,18 @@ class SmartyTiki extends Smarty
                 $public_key_pins = $prefs['http_header_public_key_pins'];
             }
 
+            if (! isset($prefs['http_header_referrer_policy'])) {
+                $referrer_policy = false;
+            } else {
+                $referrer_policy = $prefs['http_header_referrer_policy'];
+            }
+
+            if (! isset($prefs['http_header_permitted_cross_domain_policies'])) {
+                $permitted_cross_domain_policies = false;
+            } else {
+                $permitted_cross_domain_policies = $prefs['http_header_permitted_cross_domain_policies'];
+            }
+
             if ($frame == 'y') {
                     $header_value = $prefs['http_header_frame_options_value'];
                     header('X-Frame-Options: ' . $header_value);
@@ -381,8 +393,9 @@ class SmartyTiki extends Smarty
                         header('Cross-Origin-Embedder-Policy: credentialless');
                         break;
                     case 'unsafe-none':
+                        header('Cross-Origin-Embedder-Policy: unsafe-none');
+                        break;
                     default:
-                        header_remove('Cross-Origin-Embedder-Policy');
                         break;
                 }
             }
@@ -413,24 +426,45 @@ class SmartyTiki extends Smarty
                         header('Cross-Origin-Opener-Policy: same-origin-plus-coep');
                         break;
                     case 'unsafe-none':
+                        header('Cross-Origin-Opener-Policy: unsafe-none');
+                        break;
                     default:
-                        header_remove('Cross-Origin-Opener-Policy');
                         break;
                 }
             }
             if ($content_security_policy == 'y') {
-                $header_value = $prefs['http_header_content_security_policy_value'];
-                header('Content-Security-Policy: ' . $header_value);
+                $header_value = trim($prefs['http_header_content_security_policy_value']);
+                if ($header_value !== '') {
+                    header('Content-Security-Policy: ' . $header_value);
+                }
             }
 
             if ($strict_transport_security == 'y') {
-                $header_value = $prefs['http_header_strict_transport_security_value'];
-                header('Strict-Transport-Security: ' . $header_value);
+                $header_value = trim($prefs['http_header_strict_transport_security_value']);
+                if ($header_value !== '') {
+                    header('Strict-Transport-Security: ' . $header_value);
+                }
             }
 
             if ($public_key_pins == 'y') {
-                $header_value = $prefs['http_header_public_key_pins_value'];
-                header('Public-Key-Pins: ' . $header_value);
+                $header_value = trim($prefs['http_header_public_key_pins_value']);
+                if ($header_value !== '') {
+                    header('Public-Key-Pins: ' . $header_value);
+                }
+            }
+
+            if ($referrer_policy === 'y') {
+                $header_value = trim($prefs['http_header_referrer_policy_value']);
+                if ($header_value !== '') {
+                    header('Referrer-Policy: ' . $header_value);
+                }
+            }
+
+            if ($permitted_cross_domain_policies === 'y') {
+                $header_value = trim($prefs['http_header_permitted_cross_domain_policies_value']);
+                if ($header_value !== '') {
+                    header('X-Permitted-Cross-Domain-Policies: ' . $header_value);
+                }
             }
         }
 

@@ -251,7 +251,14 @@ if (isset($_REQUEST['newsletterfile'])) {
         $f = [];
         if ((strlen($id) == 32) && preg_match('/^[0-9a-f]{32}$/', $id)) { // this is a valid md5 hash, so the file was just saved at preview time
             $fpath = $prefs['tmpDir'] . '/newsletterfile-' . $id;
-            $f = unserialize(file_get_contents($fpath . '.infos'));
+            $infosContent = file_get_contents($fpath . '.infos');
+            if ($infosContent === false) {
+                continue;
+            }
+            $f = json_decode($infosContent, true);
+            if (! is_array($f)) {
+                continue;
+            }
             $f['path'] = $fpath;
             $newsletterfiles[] = $f;
         } elseif ((int)$_REQUEST['nlId'] > 0) {
@@ -300,7 +307,7 @@ foreach ($info['files'] as $k => $newsletterfile) {
             $info['files'][$k]['path'] = $tmpfname;
             $info['files'][$k]['id'] = $tmpfnamekey;
             $info['files'][$k]['filename'] = $tmpfnamekey;
-            file_put_contents($tmpfname . '.infos', serialize($info['files'][$k]));
+            file_put_contents($tmpfname . '.infos', json_encode($info['files'][$k]));
         }
     }
 }
