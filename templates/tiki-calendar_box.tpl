@@ -6,7 +6,7 @@
             </a>
             {if isset($infocals.$cellcalendarId.custompriorities) and $infocals.$cellcalendarId.custompriorities eq 'y'
                 and $cellprio}
-                <span class='calprio{$cellprio}' id='calprio'>
+                <span class='calprio{$cellprio} ml-2 px-1' id='calprio'>
                     {$cellprio}
                 </span>
             {/if}
@@ -101,7 +101,7 @@
     {/if}
     <br>
     {if isset($show_status) and $show_status eq 'y'}
-        <div class="statusbox status{$cellstatus}">
+        <div class="status{$cellstatus} mb-1 px-1 font-weight-bold">
             {if $cellstatus eq 0}
                 {tr}Tentative{/tr}
             {elseif $cellstatus eq 1}

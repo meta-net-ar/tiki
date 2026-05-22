@@ -35,7 +35,7 @@ if (isset($_REQUEST["calendarIds"])) {
 } else {
     $uniqueid = $feed;
 }
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output["data"] == "EMPTY") {
     $title = $prefs['feed_' . $feed . '_title'];

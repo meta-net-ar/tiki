@@ -57,7 +57,6 @@ class Multilingual_Aligner_ShortestPathFinder
         }
         sort($nodes);
 
-        //      echo "-- _nodesInMmatrix: outputting nodes:\n"; var_dump($nodes);
 
         return $nodes;
     }
@@ -82,7 +81,6 @@ class Multilingual_Aligner_ShortestPathFinder
 
         $tries = 0;
         while (in_array(false, $this -> visited, true) && $tries <= $maxTries) {
-            //      echo "-- computeShortestPathes: \$tries=$tries\n\$this->distance=\n";var_dump($this->distance);echo "\n\$this->previousNode=\n";var_dump($this->previousNode);print "\n";
             $this -> bestPath = $this->findBestPath($this->distance, array_keys($this -> visited, false, true));
             if ($to !== null && $this -> bestPath === $to) {
                 break;
@@ -98,7 +96,6 @@ class Multilingual_Aligner_ShortestPathFinder
 
     public function findBestPath($ourDistance, $ourNodesLeft)
     {
-        //      echo "-- findBestPath: \ourDistance=\n";var_dump($ourDistance);echo "\n\$ourNodesLeft=\n";var_dump($ourNodesLeft);
         $bestPath = $this -> infiniteDistance;
         $bestNode = null;
         foreach ($ourNodesLeft as $currNode) {
@@ -108,7 +105,6 @@ class Multilingual_Aligner_ShortestPathFinder
                 $bestNode = $currNode;
             }
         }
-            //      echo "-- findBestPath: upon exit, \$bestNode=$bestNode, \ourDistance=\n";var_dump($ourDistance);echo "\n\$ourNodesLeft=\n";var_dump($ourNodesLeft);
         return $bestNode;
     }
 
@@ -127,8 +123,6 @@ class Multilingual_Aligner_ShortestPathFinder
                 $this -> previousNode[$currNode] = $obp;
             }
         }
-
-        //      echo "-- updateDistanceAndPrevious: upon exit, \$this->distance=\n";var_dump($this->distance);echo "\n\$this->previousNode=\n";var_dump($this->previousNode); echo"\n";
     }
 
     public function shortestPathTo($destination_node_num)

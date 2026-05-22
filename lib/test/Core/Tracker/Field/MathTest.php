@@ -7,6 +7,7 @@
 
 namespace TikiTests;
 
+use TikiTestCase;
 use Tracker_Definition,
 
 TikiLib, Tracker_Item;
@@ -14,20 +15,20 @@ TikiLib, Tracker_Item;
 /**
  * This is a smoke test for the Math field.  At least it shows how badly we need a better internal API... - benoitg - 2024-09-04
  */
-class TrackerFieldMathTest extends \PHPUnit\Framework\TestCase
+class TrackerFieldMathTest extends TikiTestCase
 {
     protected static $trklib;
     protected static $objectlib;
     protected static $unifiedlib;
     protected static $trackerId;
     protected static $linkedTrackerId;
-    protected static $old_pref;
+    protected static $old_prefs;
     protected static $old_user;
 
     public static function setUpBeforeClass(): void
     {
         global $prefs;
-        self::$old_pref = $prefs['feature_trackers'];
+        self::$old_prefs = $prefs;
         $prefs['feature_trackers'] = 'y';
         $prefs['short_date_format'] = '%Y-%m-%d';
         $prefs['short_time_format'] = '%H:%M';
@@ -129,14 +130,15 @@ class TrackerFieldMathTest extends \PHPUnit\Framework\TestCase
     public static function tearDownAfterClass(): void
     {
         global $prefs, $tikilib;
-        $prefs['feature_trackers'] = self::$old_pref;
+        $prefs['feature_trackers'] = self::$old_prefs['feature_trackers'];
 
         parent::tearDownAfterClass();
         self::$trklib->remove_tracker(self::$trackerId);
         self::$trklib->remove_tracker(self::$linkedTrackerId);
+        $prefs['unified_engine'] = self::$old_prefs['unified_engine'];
     }
 
-    public function testBasicFunctionnality(): void
+    public function testBasicFunctionality(): void
     {
         $birthDate = time() - (31536000); //Now - one year
         $dateChildWillBe18 = $birthDate + (31536000 * 18);

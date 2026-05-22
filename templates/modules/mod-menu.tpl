@@ -30,7 +30,7 @@
                     </button>
                 {/if}
             {/if}
-            <div class="collapse navbar-collapse {if $module_params.navbar_toggle eq 'n'}show{/if} {if $module_params.megamenu eq 'y' and $module_params.megamenu_static eq 'y' }mega-menu-static{/if}">
+            <div class="collapse navbar-collapse {if $module_params.navbar_toggle eq 'n'}show{/if} {if $module_params.megamenu eq 'y' and $module_params.megamenu_static eq 'y'}mega-menu-static{/if}">
                 {if $prefs.menus_edit_icon eq 'y' AND $tiki_p_admin eq 'y' AND $module_params.id neq '42'}
                     <div class="edit-menu">
                         <a href="tiki-admin_menu_options.php?menuId={$module_params.id}" title="{tr}Edit this menu{/tr}">{icon name="edit"}</a>

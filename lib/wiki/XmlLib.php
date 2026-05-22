@@ -361,6 +361,7 @@ class XmlLib extends TikiLib
 
         if ($this->config['debug']) {
             echo 'XML PARSING<pre>';
+            // @phpstan-ignore disallowedFunctions.printR (intentional debug output gated by config['debug'])
             print_r($infos);
             echo '</pre>';
         }

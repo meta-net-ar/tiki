@@ -711,13 +711,13 @@ setInterval(function() {
             {tr}{$php_sapi_info.message}{/tr}
         {/if}
         {if !empty($php_sapi_info.link)}
-            {tr}<a href="{$php_sapi_info.link}" class="alert-link">{$php_sapi_info.link}</a>{/tr}
+            <a href="{$php_sapi_info.link}" class="alert-link">{$php_sapi_info.link}</a>
         {/if}
         </p>
     {/if}
 
     <p>
-        {tr _0='<a href="http://www.php.net/manual/en/configuration.php" class="alert-link">http://www.php.net/manual/en/configuration.php</a>' }You can check the full documentation on how to change the configurations values in %0{/tr}
+        {tr _0='<a href="http://www.php.net/manual/en/configuration.php" class="alert-link">http://www.php.net/manual/en/configuration.php</a>'}You can check the full documentation on how to change the configurations values in %0{/tr}
     </p>
 {/remarksbox}
 

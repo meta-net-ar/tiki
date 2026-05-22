@@ -1067,6 +1067,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      */
     public function smartyModifierVardump($value)
     {
+        // @phpstan-ignore disallowedFunctions.varDump (implements the {$var|vardump} Smarty modifier for dev debugging)
         return var_dump($value);
     }
 

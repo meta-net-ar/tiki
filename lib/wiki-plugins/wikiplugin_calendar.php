@@ -85,6 +85,8 @@ function wikiplugin_calendar($data, $params)
     $tikilib = TikiLib::lib('tiki');
     $calendarlib = TikiLib::lib('calendar');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_calendar_info());
+
     if (is_null($params['calIds'])) {
         $params['calIds'] = [1];
     }
@@ -162,7 +164,6 @@ function wikiplugin_calendar($data, $params)
     $smarty->assign('uniqueId', rand());
     if ($calendarInitialParams['canEditAnything']) {
         TikiLib::lib('header')
-            ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
             ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
     }
 

@@ -44,7 +44,7 @@ $(function () {
                         }
                     });
                 } catch (e) {
-                    console.error("Error restoring structure state:", e);
+                    console.error("Error restoring structure state:", e); // eslint-disable-line no-console
                 }
             }
         } else {
@@ -77,7 +77,7 @@ $(function () {
             try {
                 localStorage.setItem(storageKey, JSON.stringify(state));
             } catch (e) {
-                console.error("Error saving structure state:", e);
+                console.error("Error saving structure state:", e); // eslint-disable-line no-console
             }
         }
     };
@@ -241,8 +241,6 @@ $(function () {
 
             arr.push(obj);
         });
-
-        // console.log(arr, $sortable.data("params"))
 
         $.post(
             $.service("wiki_structure", "save_structure"),

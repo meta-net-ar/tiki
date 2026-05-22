@@ -22,7 +22,7 @@
                      aria-label="{tr}Main navigation{/tr}">
 
                     <div class="container{if $prefs.feature_fixed_width eq 'y' and $prefs.layout_fixed_width_header neq 'y'}-fluid{/if}">
-                        {modulelist zone=top class="top_modules w-100 tiki-top-nav-{$navbar_color_variant} bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
+                        {modulelist zone=top class="top_modules w-100 d-flex flex-wrap tiki-top-nav-{$navbar_color_variant} bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
                     </div>
                 </nav>
             </header>
@@ -114,7 +114,7 @@
                             </div>
                             <div class="col1top-inner-wrapper flex-grow-1 ">
                                 {if $prefs.module_zones_pagetop eq 'fixed' or ($prefs.module_zones_pagetop ne 'n' && ! zone_is_empty('pagetop'))}
-                                    {modulelist zone=pagetop heading_text='{tr}Related content{/tr}' role=complementary }
+                                    {modulelist zone=pagetop heading_text='{tr}Related content{/tr}' role=complementary}
                                 {/if}
                                 <div id="feedback" role="alert">
                                     {feedback}

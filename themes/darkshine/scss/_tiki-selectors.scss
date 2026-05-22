@@ -313,17 +313,18 @@ body.fullscreen,
 }
 
 //orange_gradient_background
-#pagetop_modules, // :has(*) doesn't work effectively as the div sometimes contains empty divs, etc.
+#pagetop_modules:has(.module),
 .orange_gradient_background {
     background: #fec782;
     background: linear-gradient(to bottom, #fec782 0%, #fe9e27 0%, #fe9226 31%, #fe7723 75%, #fe6e22 100%, #783c1c 100%);
     padding: 15px;
 }
 
-#pagetop_modules > div {
+#pagetop_modules > .module {
     border: 3px solid #fff;
     border-radius: 0;
     margin: 15px;
+    padding: 0 !important;
 }
 
 #pagetop_modules > div .alert,
@@ -352,6 +353,10 @@ body.fullscreen,
 .card-title {
     color: var(--bs-heading-color);
     font: 1.8rem arial, verdana, helvetica, sans-serif;
+}
+
+.module .card-body {
+    --bs-card-spacer-y: 0px;
 }
 
 .bg-danger,

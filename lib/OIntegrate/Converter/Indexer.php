@@ -53,7 +53,7 @@ class Indexer implements ConverterInterface
                 $output = '<h3>' . tr('Parsed Data') . '</h3>';
                 $output .= '<pre style="max-height: 40em; overflow: auto; white-space: pre-wrap">';
                 $output .= htmlentities(
-                    print_r($data, true),
+                    print_r($data, true), // @phpstan-ignore disallowedFunctions.printR (returns data as string for HTML display, never prints)
                     ENT_QUOTES,
                     'UTF-8'
                 );

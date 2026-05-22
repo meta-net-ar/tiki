@@ -279,8 +279,6 @@ $(function () {
             dataArr.push(obj);
         });
 
-        // console.log(parentIds,dataArr,$("input[name=ticket]").val());
-
         $.post(
             $.service("menu", "save"),
             {

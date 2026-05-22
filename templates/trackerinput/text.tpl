@@ -6,6 +6,7 @@
         <input type="text" class="form-control {if !empty($field.options_map.labelasplaceholder)}labelasplaceholder{/if}"
                 id="{$field.ins_id|replace:'[':'_'|replace:']':''}" name="{$field.ins_id}"
                 value="{$field.value|default:$field.defaultvalue|escape}"
+                {if !empty($context.disabled)}disabled{/if}
                 {if !empty($field.options_map.labelasplaceholder)}placeholder="{tr}{$field.name}{/tr}"{/if}
                 {if !empty($field.options_map.size)}size="{$field.options_map.size}"{/if}
                 {if !empty($field.options_map.max)}maxlength="{$field.options_map.max}"{/if}

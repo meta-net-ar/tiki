@@ -339,6 +339,7 @@ function wikiplugin_articles($data, $params)
 
     $auto_args = ['lang', 'topicId', 'topic', 'sort', 'type', 'lang', 'categId'];
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_articles_info());
     extract($params, EXTR_SKIP);
     $filter = [];
     if ($prefs['feature_articles'] != 'y') {

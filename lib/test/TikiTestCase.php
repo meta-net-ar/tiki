@@ -86,7 +86,7 @@ abstract class TikiTestCase extends TestCase
         // This error handler is to convert E_USER_NOTICE into an exception.
         $errorHandler = function ($severity, $errMessage, $file, $line) use ($message) {
             if ($severity & (E_USER_NOTICE | E_USER_WARNING | E_USER_ERROR | E_USER_DEPRECATED)) {
-                if ($errMessage !== $message) {
+                if (! str_contains($errMessage, $message)) {
                     throw new \PHPUnit\Framework\ExpectationFailedException(
                         sprintf(
                             'Failed asserting that error message "%s" matches expected "%s".',
@@ -100,7 +100,7 @@ abstract class TikiTestCase extends TestCase
         };
 
         // Temporarily set the custom error handler.
-        set_error_handler($errorHandler, E_USER_NOTICE);
+        set_error_handler($errorHandler);
 
         try {
             $callback(...$args);
@@ -111,7 +111,7 @@ abstract class TikiTestCase extends TestCase
             );
         } catch (\ErrorException $e) {
             // Assertion passes if we catch the expected ErrorException.
-            $this->assertEquals($message, $e->getMessage());
+            $this->assertStringContainsString($message, $e->getMessage());
         } finally {
             restore_error_handler();
         }

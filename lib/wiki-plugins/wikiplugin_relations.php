@@ -59,6 +59,8 @@ function wikiplugin_relations_info()
 
 function wikiplugin_relations($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_relations_info());
+
     $object = current_object();
 
     if (! is_null($params['object']) && false !== strpos($params['object'], ':')) {

@@ -400,7 +400,6 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
         $newKey = $this->getBaseKey();
 
         if (array_search($oldKey, $array) === false) {
-            var_dump($oldKey, $array);
             throw new Error("Sanity-check:  Unable to find the expected mirrorField basekey");
         }
 
@@ -470,14 +469,14 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
         global $url_host, $base_url;
 
         return [
-        'itemId' => $this->getItemId(),
-        'trackerId' => $this->getTrackerDefinition()->getConfiguration('trackerId'),
-        'creation_date' => $this->getData('created'),
-        'created_by' => $this->getData('createdBy'),
-        'modification_date' => $this->getData('lastModif'),
-        'last_modified_by' => $this->getData('lastModifBy'),
-        'domain' => $url_host,
-        'base_url' => $base_url . (substr($base_url, -1) == '/' ? '' : '/'),
+            'itemId' => $this->getItemId(),
+            'trackerId' => $this->getTrackerDefinition()->getConfiguration('trackerId'),
+            'creation_date' => $this->getData('created'),
+            'created_by' => $this->getData('createdBy'),
+            'modification_date' => $this->getData('lastModif'),
+            'last_modified_by' => $this->getData('lastModifBy'),
+            'domain' => $url_host,
+            'base_url' => $base_url . (str_ends_with($base_url ?? '', '/') ? '' : '/'),
         ];
     }
 }

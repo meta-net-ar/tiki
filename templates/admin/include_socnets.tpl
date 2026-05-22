@@ -39,7 +39,7 @@
     <ol>
         {foreach from=$prefs["`$socPrefix`enabledProviders"]  key=k  item=pNum}
             {$providerName = $socnetsAll[$pNum]}
-            {$prefname="`$socPrefix``$providerName`_socnetEnabled" }
+            {$prefname="`$socPrefix``$providerName`_socnetEnabled"}
             {$prefs[$prefname] = 'y'}
             <strong><li>{$providerName}</li></strong>
         {/foreach}
@@ -70,7 +70,7 @@
         {if ($basePref === '_socnetEnabled')}
               {* skip this iteration *}
               {continue}
-        {elseif ($basePref === '_loginEnabled') }
+        {elseif ($basePref === '_loginEnabled')}
                 {* if we use closing buttons again... *}
                 {* start of _loginEnabled for {$providerName} *}
                 <div class="col-sm-12 {$providername} _loginEnabled" style="padding-top:5px;">{preference name=$prefname}
@@ -130,7 +130,7 @@
 
 
 {/tab}
-{tab name ="{tr}OAuth Configuration{/tr}" }
+{tab name ="{tr}OAuth Configuration{/tr}"}
 <div class="adminoptionbox">
     {remarksbox type="note" title="{tr}OAuth Callback/Redirect URL{/tr}"}
         <p>

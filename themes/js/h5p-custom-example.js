@@ -8,7 +8,6 @@
 
     // Uncomment this to output H5P events
     // H5P.externalDispatcher.on('*', function (event) {
-    //     console.log("H5P event: " + event.type);
     // });
 
     H5P.externalDispatcher.on('initialized', function (event) {

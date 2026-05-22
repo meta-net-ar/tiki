@@ -12,7 +12,7 @@
     {if not empty($info)}
         <div class="rounded bg-dark text-light p-3">{$info|nl2br}</div>
     {else}
-        <form method="post" action="{service controller=manager action=apply }" id="tiki-manager-apply-profile">
+        <form method="post" action="{service controller=manager action=apply}" id="tiki-manager-apply-profile">
             <input required class="form-control" id="instanceId" value="{$instanceId}" type="hidden" name="instanceId">
             {include file="manager/apply_fields.tpl"}
             <div class="tiki-form-group row">

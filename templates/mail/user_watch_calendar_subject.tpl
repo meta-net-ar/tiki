@@ -1,1 +1,1 @@
-{if $mail_new eq 'n'}{tr}Modified {$prefs.mail_template_custom_text}calendar item{/tr}{else}{tr}New {$prefs.mail_template_custom_text}calendar item{/tr}{/if}
+{if $mail_new eq 'n'}{tr _0=$prefs.mail_template_custom_text}Modified %0calendar item{/tr}{else}{tr _0=$prefs.mail_template_custom_text}New %0calendar item{/tr}{/if}

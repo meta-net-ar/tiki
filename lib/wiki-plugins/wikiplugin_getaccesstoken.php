@@ -47,6 +47,7 @@ function wikiplugin_getaccesstoken_info()
 function wikiplugin_getaccesstoken($data, $params)
 {
     global $tikilib;
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_getaccesstoken_info());
     if (empty($params['entry'])) {
         return '';
     } else {

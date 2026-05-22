@@ -109,6 +109,8 @@ function wikiplugin_autotoc($data, $params)
     global $prefs;
     $headerlib = TikiLib::lib('header');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_autotoc_info());
+
     $currPage = $_REQUEST['page'] ?? '';
     if (
         ! empty($currPage) &&

@@ -108,7 +108,7 @@ if (
         ]
     );
 
-    $smarty->assign('data', print_r($data, true));
+    $smarty->assign('data', print_r($data, true)); // @phpstan-ignore disallowedFunctions.printR (returns webservice response as string for admin debug display, never prints)
     $smarty->assign('templates', $templates);
     $smarty->assign('response', $response);
     if (isset($_REQUEST['deletetemplate']) && $webservice->getTemplate($_REQUEST['deletetemplate'])) {

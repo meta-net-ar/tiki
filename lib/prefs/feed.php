@@ -92,6 +92,16 @@ function prefs_feed_list()
             'default' => '300', // 5 minutes
             'detail' => tra('Feed caching is done for anonymous users only.'),
         ],
+        'feed_ttl' => [
+            'name' => tra('Feed TTL'),
+            'description' => tra('Time to live for the feed in minutes.'),
+            'type' => 'text',
+            'size' => '5',
+            'filter' => 'digits',
+            'units' => tra('minutes'),
+            'hint' => tra('Time to live is an optional sub-element of <channel> that specifies the number of minutes that indicates how long a channel can be cached before refreshing from the source.'),
+            'default' => '30',
+        ],
         'feed_articles' => [
             'name' => tra('RSS for articles'),
             'description' => tra('RSS feeds for articles'),

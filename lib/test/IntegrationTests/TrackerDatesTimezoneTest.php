@@ -33,7 +33,6 @@ class TrackerDatesTimezoneTest extends TikiTestCase
 
         parent::setUpBeforeClass();
         self::$trklib = TikiLib::lib('trk');
-
         // create tracker and couple of fields
         self::$trackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
         self::assertNotEmpty(self::$trackerId);
@@ -94,7 +93,6 @@ class TrackerDatesTimezoneTest extends TikiTestCase
             );
             self::assertNotEmpty($fieldId);
         }
-
         TikiDb::get()->query("REPLACE INTO `users_grouppermissions` VALUES('Registered', 'tiki_p_admin_trackers', '')");
         TikiDb::get()->query("REPLACE INTO `users_grouppermissions` VALUES('Registered', 'tiki_p_view_trackers', '')");
         $builder = new Perms_Builder();

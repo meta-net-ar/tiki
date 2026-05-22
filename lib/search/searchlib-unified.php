@@ -1383,6 +1383,14 @@ class UnifiedSearchLib
             $query->filterTags($filter['tags']);
         }
 
+        if (isset($filter['fields']) && $filter['fields'] && isset($filter['content'])) {
+            $fields = array_map('trim', explode(',', $filter['fields']));
+            $query->filterContent($filter['content'], $fields);
+
+            unset($filter['fields']);
+            unset($filter['content']);
+        }
+
         if (isset($filter['content']) && $filter['content']) {
             $query->filterContent($filter['content'], $this->getFilterContentFields());
         }

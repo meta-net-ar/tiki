@@ -82,6 +82,7 @@ function setupBBBMeetingInIframe(meetId) {
                     // Step 4: Embed in iframe
                     const $wrapper = $(`#${wrapperId}`);
                     if (!$wrapper.length) {
+                        // eslint-disable-next-line no-console
                         console.warn(`[BBB] Missing #${wrapperId} container.`);
                         return;
                     }
@@ -129,7 +130,6 @@ function setupBBBMeetingInIframe(meetId) {
 
         $(document).on("visibilitychange", function () {
             if (document.hidden && meetingActive && isFullPage) {
-                console.log("[BBB] Page visibility changed, exiting full page mode");
                 toggleFullPage(); // Exit fullpage when user switches tabs
             }
         });

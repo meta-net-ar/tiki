@@ -338,7 +338,7 @@
                     </div>
                     <div class="mb-3 row">
                         <div class="col-sm-12">
-                            {textarea _simple='y' _toolbars='n' _wysiwyg='n' name='profile_tester' id='profile_tester' codemirror='true' syntax='yaml' class='form-control' }{if isset($test_source)}{$test_source}{/if}{/textarea}
+                            {textarea _simple='y' _toolbars='n' _wysiwyg='n' name='profile_tester' id='profile_tester' codemirror='true' syntax='yaml' class='form-control'}{if isset($test_source)}{$test_source}{/if}{/textarea}
                         </div>
                     </div>
                 </div>

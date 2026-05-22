@@ -25,6 +25,7 @@
             {preference name=feed_img}
             {preference name=feed_language}
             {preference name=feed_cache_time}
+            {preference name=feed_ttl}
             {preference name=feed_basic_auth}
         {/tab}
         {tab name="{tr}Feeds{/tr}"}

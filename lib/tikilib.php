@@ -916,6 +916,39 @@ class TikiLib extends TikiDb_Bridge
 
         return $this->table('tiki_user_watches')->fetchOne('user', ['watchId' => $id]);
     }
+
+    /**
+     * Generate an HMAC hash for a watch unsubscribe link.
+     *
+     * The hash binds the watchId to its owner so that only someone who
+     * received the original email notification can use the link.
+     *
+     * @param int    $watchId
+     * @param string $user  Owner of the watch
+     * @return string  Hex-encoded HMAC-SHA256
+     */
+    public function generateWatchUnsubscribeHash($watchId, $user)
+    {
+        $key = $this->get_site_hash();
+        return hash_hmac('sha256', $watchId . ':' . $user, $key);
+    }
+
+    /**
+     * Verify an HMAC hash for a watch unsubscribe link.
+     *
+     * @param int    $watchId
+     * @param string $hash   Hash received from the request
+     * @return bool  True if the hash is valid for this watchId
+     */
+    public function verifyWatchUnsubscribeHash($watchId, $hash)
+    {
+        $owner = $this->get_user_notification($watchId);
+        if (! $owner) {
+            return false;
+        }
+        $expected = $this->generateWatchUnsubscribeHash($watchId, $owner);
+        return hash_equals($expected, $hash);
+    }
     /*shared*/
     /**
      * @param $id
@@ -4727,8 +4760,10 @@ class TikiLib extends TikiDb_Bridge
             }
 
             $userPreferences = $this->table('tiki_user_preferences', false);
-            $userPreferences->delete(['user' => $my_user, 'prefName' => $name]);
-            $result = $userPreferences->insert(['user' => $my_user, 'prefName' => $name,    'value' => $value]);
+            $result = $userPreferences->insertOrUpdate(
+                ['value' => $value],
+                ['user' => $my_user, 'prefName' => $name]
+            );
 
             $user_preferences[$my_user][$name] = $value;
 
@@ -5724,7 +5759,7 @@ class TikiLib extends TikiDb_Bridge
         $mail = new TikiMail(null, $prefs['sender_email'], $prefs['sender_name']);
         $mail->setSubject(tr("Plugin %0 pending approval", $pluginInfo['name']));
 
-        self::$setExternalContext(true);
+        self::setExternalContext(true);
         $smarty = TikiLib::lib('smarty');
         $smarty->assign('plugin_name', $pluginInfo['name']);
         $smarty->assign('type', $pluginInfo['last_objectType']);

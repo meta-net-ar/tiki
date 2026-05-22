@@ -75,7 +75,6 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
     private function invokeIsWikiSyntaxLink(string $value): bool
     {
         $method = new \ReflectionMethod(\Tracker_Field_Url::class, 'isWikiSyntaxLink');
-        $method->setAccessible(true);
 
         return (bool) $method->invoke(null, $value);
     }

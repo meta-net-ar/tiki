@@ -296,7 +296,7 @@ if (empty($info)) {
                 $access->redirect($infoForSlug['pageSlug'], '', 301);
                 exit;
             } else {
-                error_log("Avoiding redirect loop: " . $infoForSlug['pageSlug']);
+                error_log("Avoiding redirect loop: " . $infoForSlug['pageSlug']); // @phpstan-ignore disallowedFunctions.errorLog (redirect loop detection warning)
             }
         }
     }
@@ -333,7 +333,7 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
     }
 
     if (! $isprefixed && ! empty($prefs['url_anonymous_page_not_found']) && empty($user)) {
-        $access->redirect($prefs['url_anonymous_page_not_found']);
+        $access->redirect($prefs['url_anonymous_page_not_found'], allowExternal: true);
     }
 
     if ($user && $prefs['feature_wiki_userpage'] == 'y' && strcasecmp($prefs['feature_wiki_userpage_prefix'], $page) == 0) {

@@ -406,7 +406,7 @@ class Comments extends TikiLib
             $xTikiHeader = $parsedMessage->getHeaderValue('X-Tiki');
             if ($xTikiHeader === 'yes') {
                 $source_imap->deleteMessages($imap, [$uid]);
-                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid came from Tiki (X-Tiki=yes)");
+                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid came from Tiki (X-Tiki=yes)"); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
                 continue;
             }
             // If the connection is done, or the mail has an error, or whatever,
@@ -414,7 +414,7 @@ class Comments extends TikiLib
             // and continue on. --rlpowell
             if (! count($parsedMessage->getAllHeaders())) {
                 $source_imap->deleteMessages($imap, [$uid]);
-                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid has no headers.");
+                error_log("[MAIL-IMPORT][SKIP] Message UID=$uid has no headers."); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
                 continue;
             }
 
@@ -452,7 +452,7 @@ class Comments extends TikiLib
                 //this should be an admin option, but I don't know how to put it there yet.
                 $source_imap->deleteMessages($imap, [$uid]);
                 $email = $original_email_fixed;
-                error_log("Could not parse email address '$original_email_fixed', using as-is.");
+                error_log("Could not parse email address '$original_email_fixed', using as-is."); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
                 continue;
             }
             $userName = $this->table('users_users')->fetchOne('login', ['email' => $email]);
@@ -684,7 +684,7 @@ class Comments extends TikiLib
                 // mark the message to be deleted and keep processing
                 $source_imap->deleteMessages($imap, [$uid]);
             } catch (Exception $e) {
-                error_log("[MAIL-IMPORT][ERROR] Failed to post email UID=$uid: " . $e->getMessage());
+                error_log("[MAIL-IMPORT][ERROR] Failed to post email UID=$uid: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (mail-import operational log — tracks skipped/failed messages)
                 Feedback::error(tr('Adding email %0 to the forum failed due to "%1"', $title, $e->getMessage()));
             }
             $importedCount++;

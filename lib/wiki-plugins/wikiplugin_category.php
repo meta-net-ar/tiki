@@ -236,6 +236,7 @@ function wikiplugin_category($data, $params)
 
     $categlib = TikiLib::lib('categ');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_category_info());
     extract($params, EXTR_SKIP);
 
     $split = strtolower($split) == 'y';

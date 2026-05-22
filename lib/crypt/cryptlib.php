@@ -417,7 +417,7 @@ class CryptLib extends TikiLib
 
         // Due to appending spaces to short input data, short cleartext data cannot end with space
         $pwdLen = mb_strlen($cleartextData);
-        if ($pwdLen < 20 && $cleartextData[$pwdLen] == ' ') {
+        if ($pwdLen < 20 && str_ends_with($cleartextData, ' ')) {
             throw new Exception('Data to encrypt cannot end with a space');
         }
         // Make sure the data is at least 20 characters long
@@ -449,7 +449,11 @@ class CryptLib extends TikiLib
         $cryptData = base64_decode($cryptData64);
 
         // Decrypt
-        $cleartext = $this->decrypt($cryptData);
+        try {
+            $cleartext = $this->decrypt($cryptData);
+        } catch (\Exception $e) {
+            return false;
+        }
         return rtrim($cleartext);
     }
 
@@ -573,11 +577,17 @@ class CryptLib extends TikiLib
     private function decrypt($crypttext)
     {
         if ($this->hasSodiumCrypt()) {
+            if (strlen($crypttext) < SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + SODIUM_CRYPTO_SECRETBOX_MACBYTES) {
+                throw new \Exception(tr('Decryption failed: ciphertext is too short or corrupted.'));
+            }
             $key = str_pad(substr($this->key, 0, SODIUM_CRYPTO_SECRETBOX_KEYBYTES), SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
             $nonce = substr($crypttext, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
             $ciphertextLength = strlen($crypttext) - SODIUM_CRYPTO_SECRETBOX_NONCEBYTES;
             $crypttext = substr($crypttext, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, $ciphertextLength);
             $rawcleartext = sodium_crypto_secretbox_open($crypttext, $nonce, $key);
+            if ($rawcleartext === false) {
+                throw new \Exception(tr('Decryption failed: authentication error. The key may be incorrect.'));
+            }
         } elseif ($this->hasCrypt()) {
             $ivSize = openssl_cipher_iv_length($this->cryptMethod);
             $iv = substr($crypttext, 0, $ivSize);

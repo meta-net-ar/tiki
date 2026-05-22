@@ -1745,7 +1745,6 @@ class CalendarLib extends TikiLib
             $viewStart['day'] = $viewStart['day'] - $nbBackDays;
             $viewStart['date'] = TikiLib::make_time(0, 0, 0, $viewStart['month'], $viewStart['day'], $viewStart['year']);
         }
-        // echo '<br/>VIEWSTART'; print_r($viewStart);
         // end of the period
         $cell = [];
 
@@ -1777,7 +1776,6 @@ class CalendarLib extends TikiLib
             }
             $loop['date'] = TikiLib::make_time(0, 0, 0, $loop['month'], $loop['day'], $loop['year']);
         }
-        //echo '<pre>CELL'; print_r($cell); echo '</pre>';
         return $cell;
     }
 

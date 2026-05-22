@@ -41,7 +41,7 @@ $commentslib = TikiLib::lib('comments');
 $feed = "forum";
 $id = "forumId";
 $uniqueid = "$feed.$id=" . $_REQUEST["$id"];
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output["data"] == "EMPTY") {
     $tmp = $commentslib->get_forum($_REQUEST["forumId"]);
