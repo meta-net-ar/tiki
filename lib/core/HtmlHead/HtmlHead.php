@@ -30,7 +30,7 @@ class HtmlHead extends MetaTags
     public ?string $author          = null;
     public ?string $canonicalPath   = null;
     public ?string $canonicalUrl    = null;
-    public array $images          = [];
+    public array $images            = [];
     public ?string $publishDate     = null;
     public ?string $modifiedDate    = null;
     public ?string $pageType        = null;
@@ -133,25 +133,13 @@ class HtmlHead extends MetaTags
                 $this->initMyTiki();
                 break;
 
-            case Sections::SECTION_FREETAGS:
-                $this->initFreetags();
-                break;
-
-            case Sections::SECTION_SEARCH:
-                $this->initSearch();
-                break;
-
             case Sections::SECTION_DOCS:
-                $this->initDocs();
-                break;
-
             case Sections::SECTION_ADMIN:
-                $this->initAdmin();
-                break;
-
-            case Sections::SECTION_USER_MESSAGES:
+            case Sections::SECTION_SEARCH:
+            case Sections::SECTION_FREETAGS:
             case Sections::SECTION_WEBMAIL:
             case Sections::SECTION_CONTACTS:
+            case Sections::SECTION_USER_MESSAGES:
             case Sections::SECTION_FEATURED_LINKS:
             case Sections::SECTION_VALIDATE_EMAIL:
             case Sections::SECTION_GLOBAL:
@@ -534,57 +522,40 @@ class HtmlHead extends MetaTags
     }
 
     /**
-     * Freetags
-     */
-    protected function initFreetags(): void
-    {
-        global $tag;
-
-        if (! empty($tag)) {
-            $this->title = $tag;
-        }
-    }
-
-    /**
-     * Search
-     */
-    protected function initSearch(): void
-    {
-        $this->title = tra('Search');
-    }
-
-    /**
-     * Docs
-     */
-    protected function initDocs(): void
-    {
-        global $doc;
-
-        if (! empty($doc['name'])) {
-            $this->title = $doc['name'];
-        }
-    }
-
-    /**
-     * Admin section
-     */
-    protected function initAdmin(): void
-    {
-        global $admintitle;
-
-        if (! empty($admintitle)) {
-            $this->title = $admintitle;
-        } else {
-            $this->title = tra('Administration');
-        }
-    }
-
-    /**
      * Default
      */
     protected function initDefault(): void
     {
-        global $title, $description, $page, $headtitle, $userinfo, $user;
+        global $section, $title, $description, $page, $headtitle, $userinfo, $user;
+        global $tag, $doc, $admintitle;
+
+        if ($section === Sections::SECTION_FREETAGS) {
+            if (! empty($tag)) {
+                $this->title = $tag;
+            }
+            return;
+        }
+
+        if ($section === Sections::SECTION_SEARCH) {
+            $this->title = tra('Search');
+            return;
+        }
+
+        if ($section === Sections::SECTION_DOCS) {
+            if (! empty($doc['name'])) {
+                $this->title = $doc['name'];
+            }
+            return;
+        }
+
+        if ($section === Sections::SECTION_ADMIN) {
+            if (! empty($admintitle)) {
+                $this->title = $admintitle;
+            } else {
+                $this->title = tra('Administration');
+            }
+            return;
+        }
 
         if (! empty($title) && ! is_array($title)) {
             $this->title = $title;
