@@ -4,70 +4,48 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-
-namespace Tiki\Config;
-
-class Ini
+class Tiki_Config_Ini extends Laminas\Config\Reader\Ini
 {
     public const SECTION_SEPARATOR = ':';
     public const SECTION_EXTENDS_KEY = ';extends';
 
-    public function fromFile(string $filename, ?string $section = null): array
+    protected $filterSection = null;
+
+    public function setFilterSection($filter)
     {
-        if (! is_readable($filename)) {
-            throw new \RuntimeException("File '$filename' is not readable");
-        }
+        $this->filterSection = $filter;
+    }
 
-        $data = parse_ini_file($filename, true, INI_SCANNER_TYPED);
-
-        if ($data === false) {
-            throw new \RuntimeException("Failed to parse ini file '$filename'");
-        }
-
+    /**
+     * Process data from the parsed ini file.
+     *
+     * @param  array $data
+     * @return array
+     */
+    protected function process(array $data): array
+    {
         $data = $this->preProcessSectionInheritance($data);
-        $data = $this->expandDotNotationKeys($data);
-        $data = $this->posProcessSectionInheritance($data);
+        $config = parent::process($data);
+        $config = $this->posProcessSectionInheritance($config);
+        $config = $this->expandDotNotationKeys($config);
 
-        if ($section !== null) {
-            if (array_key_exists($section, $data)) {
-                return $data[$section];
+        if (! is_null($this->filterSection)) {
+            if (array_key_exists($this->filterSection, $config)) {
+                return $config[$this->filterSection];
             } else {
                 return [];
             }
         }
 
-        return $data;
+        return $config;
     }
 
-    public function fromString(string $content, ?string $section = null): array
-    {
-        $data = parse_ini_string($content, true, INI_SCANNER_TYPED);
-
-        if ($data === false) {
-            throw new \RuntimeException("Failed to parse ini string");
-        }
-
-        $data = $this->preProcessSectionInheritance($data);
-        $data = $this->expandDotNotationKeys($data);
-        $data = $this->posProcessSectionInheritance($data);
-
-        if ($section !== null) {
-            if (array_key_exists($section, $data)) {
-                return $data[$section];
-            } else {
-                return [];
-            }
-        }
-
-        return $data;
-    }
-
-    private function preProcessSectionInheritance(array $data): array
+    protected function preProcessSectionInheritance(array $data)
     {
         $result = [];
 
         foreach ($data as $key => $value) {
-            $tokens = explode(self::SECTION_SEPARATOR, (string)$key);
+            $tokens = explode(self::SECTION_SEPARATOR, $key);
             $section = trim($tokens[0]);
             if (count($tokens) == 2 && is_array($value)) {
                 $value[self::SECTION_EXTENDS_KEY] = trim($tokens[1]);
@@ -77,20 +55,20 @@ class Ini
         return $result;
     }
 
-    private function posProcessSectionInheritance(array $config): array
+    protected function posProcessSectionInheritance(array $config)
     {
         $result = [];
 
         foreach ($config as $key => $value) {
             if (is_array($value) && array_key_exists(self::SECTION_EXTENDS_KEY, $value)) {
-                $value = $this->resolveSectionInheritance($config, (string)$key);
+                $value = $this->resolveSectionInheritance($config, $key);
             }
             $result[$key] = $value;
         }
         return $result;
     }
 
-    private function resolveSectionInheritance(array $config, string $section): array
+    protected function resolveSectionInheritance($config, $section)
     {
         $result = [];
 
@@ -104,15 +82,27 @@ class Ini
         return $result;
     }
 
-    private function expandDotNotationKeys(array $data): array
+    /**
+     * Expand dot-notation keys within each section into nested arrays.
+     * Also handles top-level dot keys (outside any section), e.g.:
+     *   preference.feature_wiki = y  =>  ['preference' => ['feature_wiki' => 'y']]
+     *
+     * @param  array $data
+     * @return array
+     */
+    protected function expandDotNotationKeys(array $data): array
     {
         $result = [];
         foreach ($data as $section => $values) {
             if (! is_array($values)) {
-                $result[$section] = $values;
+                // This is a top-level flat key (no section), e.g. preference.feature_wiki = y
+                $this->assignNestedKey($result, (string)$section, $values);
                 continue;
             }
-            $result[$section] ??= [];
+            // Section context: expand dot keys within the section's key-value pairs
+            if (! isset($result[$section])) {
+                $result[$section] = [];
+            }
             foreach ($values as $key => $value) {
                 $this->assignNestedKey($result[$section], (string)$key, $value);
             }
@@ -124,13 +114,13 @@ class Ini
     {
         if (str_contains($key, '.')) {
             $keys = explode('.', $key);
-            $ref =& $array;
+            $ref = &$array;
             while (count($keys) > 1) {
                 $k = array_shift($keys);
                 if (! isset($ref[$k]) || ! is_array($ref[$k])) {
                     $ref[$k] = [];
                 }
-                $ref =& $ref[$k];
+                $ref = &$ref[$k];
             }
             $ref[array_shift($keys)] = $value;
         } else {

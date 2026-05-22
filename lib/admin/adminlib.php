@@ -5,7 +5,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-use Tiki\Config\Ini;
 
 /**
  *
@@ -680,8 +679,8 @@ class AdminLib extends TikiLib
                 ? null
                 : $system_configuration_identifier;
 
-            $configReader = new Ini();
-
+            $configReader = new Tiki_Config_Ini();
+            $configReader->setFilterSection($identifier);
 
             if (preg_match('/\.ini.php$/', $configFilePath)) {
                 $retrieveIniContent = function ($file) {
@@ -694,9 +693,9 @@ class AdminLib extends TikiLib
                 };
 
                 $iniContent = $retrieveIniContent($configFilePath);
-                $configData = $configReader->fromString($iniContent, $identifier);
+                $configData = $configReader->fromString($iniContent);
             } else {
-                $configData = $configReader->fromFile($configFilePath, $identifier);
+                $configData = $configReader->fromFile($configFilePath);
             }
 
             // Merge: later files override earlier files (array_replace_recursive)
