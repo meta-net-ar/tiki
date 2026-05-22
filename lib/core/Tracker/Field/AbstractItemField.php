@@ -235,12 +235,16 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
             if ($this->getConfiguration('type') === 'e' && is_string($old)) {   // category fields need an array input
                 $old = explode(',', $old);
             }
-            $this->definition = array_merge($this->definition, $this->getFieldData([$key => $old]));
-            $this->itemData[$this->getConfiguration('fieldId')] = $old;
-            $old = $this->renderInnerOutput($innerOutputContext);
-            $old = str_replace(['%%%', '<br>', '<br/>'], ["\n", ' ', ' '], $old);
-            $this->definition = $old_definition;
-            $this->itemData[$this->getConfiguration('fieldId')] = $new;
+            try {
+                $this->definition = array_merge($this->definition, $this->getFieldData([$key => $old]));
+                $this->itemData[$this->getConfiguration('fieldId')] = $old;
+                $old = $this->renderInnerOutput($innerOutputContext);
+                $old = str_replace(['%%%', '<br>', '<br/>'], ["\n", ' ', ' '], $old);
+                $this->definition = $old_definition;
+                $this->itemData[$this->getConfiguration('fieldId')] = $new;
+            } catch (\Exception $e) {
+                $old = tr('Error on field #%0: "%1"', $this->getConfiguration('fieldId'), $e->getMessage());
+            }
         }
         $new = $this->renderInnerOutput($innerOutputContext);
         $new = str_replace(['%%%', '<br>', '<br/>'], ["\n", ' ', ' '], $new);
