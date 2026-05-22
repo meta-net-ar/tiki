@@ -189,6 +189,16 @@
                 <div class="adminoptionboxchild" id="http_header_public_key_pins_childcontainer">
                     {preference name=http_header_public_key_pins_value}
                 </div>
+
+                {preference name=http_header_referrer_policy}
+                <div class="adminoptionboxchild" id="http_header_referrer_policy_childcontainer">
+                    {preference name=http_header_referrer_policy_value}
+                </div>
+
+                {preference name=http_header_permitted_cross_domain_policies}
+                <div class="adminoptionboxchild" id="http_header_permitted_cross_domain_policies_childcontainer">
+                    {preference name=http_header_permitted_cross_domain_policies_value}
+                </div>
             </fieldset>
             <fieldset>
                 <legend class="h3">{tr}.htaccess Security{/tr}{help url="Security"}</legend>

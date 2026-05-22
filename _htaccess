@@ -16,7 +16,10 @@
 # This is the sample configuration file for Apache. Must be linked to .htaccess to be active.
 # This configuration must be kept synchronized with the configuration for other Web servers .
 # If you change any rule in this file, also review and update ./web_config for IIS (Windows server).
-# See http://dev.tiki.org/Operating+System+independence#Keep_web.config_and_.htaccess_synchronized
+# nginx/Caddy/lighttpd: .htaccess is not read; mirror needed rules in the server config. Dynamic
+# HTML responses already get security headers from Tiki (PHP). For static files only, use the
+# same header names/values as in the FilesMatch block below (e.g. nginx: add_header ... always;
+# inside a location ~* \.(css|js|...)$ block). See http://dev.tiki.org/Operating+System+independence#Keep_web.config_and_.htaccess_synchronized
 
 # -- Prevent Browsing of Certain File Extensions -- #
 <FilesMatch "\.(bak|inc|lib|sh|tpl|sql|shtml|asp|xml\.dist)$">
@@ -75,6 +78,24 @@ FileETag none
 <IfModule mod_headers.c>
     # -- httpoxy mitigation -- #
     RequestHeader unset Proxy early
+
+    # -- Security Headers (static files only; Apache) -- #
+    # Tiki/PHP sends these for dynamic pages. Applying them globally duplicated headers on PHP
+    # responses. Non-Apache stacks: see DEVELOPERS note at top of this file;
+    # use the same names/values in nginx add_header inside a static location.
+    <FilesMatch "(?i)\.(css|js|mjs|map|png|jpe?g|gif|svgz?|ico|woff2?|ttf|eot|webp|json|txt|xml|mp3|mp4|webm|pdf)$">
+        Header always setifempty X-Content-Type-Options "nosniff"
+        Header always setifempty X-Frame-Options "SAMEORIGIN"
+        Header always setifempty Referrer-Policy "strict-origin-when-cross-origin"
+        Header always setifempty X-Permitted-Cross-Domain-Policies "none"
+        Header always setifempty Cross-Origin-Opener-Policy "same-origin-allow-popups"
+        Header always setifempty Cross-Origin-Resource-Policy "same-site"
+        Header always setifempty Cross-Origin-Embedder-Policy "unsafe-none"
+    </FilesMatch>
+    # Uncomment and configure the following once you have audited your CSP needs:
+    # Header always setifempty Content-Security-Policy "default-src 'self'; ..."
+    # Uncomment only on full HTTPS; add includeSubDomains/preload only after subdomain audit:
+    # Header always setifempty Strict-Transport-Security "max-age=63072000"
 
     # Option 2:
     #Header unset ETag
