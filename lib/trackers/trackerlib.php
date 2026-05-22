@@ -6550,8 +6550,12 @@ class TrackerLib extends TikiLib
                 } else {
                     $requestData = $field;
                 }
-                $linkedField = $handler->getFieldData($requestData);
-                $field = array_merge($field, $linkedField);
+                try {
+                    $linkedField = $handler->getFieldData($requestData);
+                    $field = array_merge($field, $linkedField);
+                } catch (Exception $e) {
+                    Feedback::error(tr('Error on linked field %0: %1', $field['fieldId'], $e->getMessage()));
+                }
                 $field['ins_id'] = 'ins_' . $field['fieldId'];
                 if (isset($field['value']) && $field['type'] == 'S') {
                     $item[$field['fieldId']] = $field['value'];
