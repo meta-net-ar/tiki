@@ -1154,7 +1154,7 @@ class RSSLib extends TikiDb_Bridge
         $lastModifiedSince = null;
         if ($cache_feed_result) {
             $lastModifiedSince = $cache_feed_result['lastModifiedSince'];
-            
+
             $refresh_time = max($this->cacheLifetime((int)($cache_feed_result['ttl'] ?? self::DEFAULT_FEED_TTL), TimeUnit::MINUTES), $this->cacheLifetime((int)($params['refresh'] ?? 0), TimeUnit::MINUTES));
             $cache_time = $cache_feed_result['lastUpdated'];
             $maxTime = $cache_time + $refresh_time;
