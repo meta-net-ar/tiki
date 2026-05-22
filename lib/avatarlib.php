@@ -47,6 +47,12 @@ class AvatarLib extends TikiLib
             $userwatch = $user;
         }
 
+        // Validate URL to prevent SSRF via user-supplied avatar URLs
+        $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+        if (! $ssrf->isUrlAllowed($url)) {
+            throw new \Exception('Avatar URL is not allowed');
+        }
+
         $data = file_get_contents($url);
         list($iwidth, $iheight, $itype, $iattr) = getimagesize($url);
         $itype = image_type_to_mime_type($itype);
