@@ -1105,7 +1105,7 @@ class Services_User_Controller
         }
     }
 
-    private function removeUsers(array $users, $page = false, $trackerIds = [], $files = false, $referer = false)
+    private function removeUsers(array $users, $page = false, $trackerIds = [], $files = false)
     {
         global $user;
         foreach ($users as $deleteuser) {
