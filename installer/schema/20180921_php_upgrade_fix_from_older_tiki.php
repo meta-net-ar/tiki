@@ -9,6 +9,10 @@
  */
 function upgrade_20180921_php_upgrade_fix_from_older_tiki($installer)
 {
+    // Fix upgrade from 9.x
+    $installer->query('ALTER TABLE `tiki_secdb` DROP PRIMARY KEY;'); // it might not be set
+    $installer->query('ALTER TABLE `tiki_secdb` ADD PRIMARY KEY (`filename`(215),`tiki_version`(40));');
+
     // Fix upgrade from 12.x
     $tablesToRename = [
         'metrics_assigned',

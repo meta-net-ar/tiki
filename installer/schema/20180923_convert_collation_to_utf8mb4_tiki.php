@@ -296,6 +296,8 @@ ALTER TABLE `tiki_semaphores` DROP PRIMARY KEY;
 ALTER TABLE `tiki_semaphores` ADD PRIMARY KEY (`semName`(191));
 ALTER TABLE `tiki_secdb` DROP INDEX `sdb_fn`;
 ALTER TABLE `tiki_secdb` ADD KEY `sdb_fn` (`filename`(191));
+ALTER TABLE `tiki_secdb` DROP PRIMARY KEY;
+ALTER TABLE `tiki_secdb` ADD PRIMARY KEY (`filename`(171),`tiki_version`(20));
 ALTER TABLE `tiki_score` DROP PRIMARY KEY;
 ALTER TABLE `tiki_score` ADD PRIMARY KEY (`event`(191));
 ALTER TABLE `tiki_rss_items` DROP INDEX `tiki_rss_items_item`;
