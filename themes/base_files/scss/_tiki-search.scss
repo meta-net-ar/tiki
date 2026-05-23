@@ -23,6 +23,8 @@
     margin-bottom: 1.25rem;
     box-sizing: border-box;
     max-width: 100%;
+    position: sticky;
+    top: 6rem;
 }
 
 .search-with-facets .search-facets-sidebar .form-select[multiple] {
@@ -44,6 +46,8 @@
         width: 100%;
         margin-left: 0;
         margin-bottom: 1.25rem;
+        position: static;
+        top: auto;
     }
 
     .search-with-facets .search-results-main {
