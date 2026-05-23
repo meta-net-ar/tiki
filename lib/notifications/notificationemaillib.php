@@ -23,10 +23,10 @@ function sendForumEmailNotification(
     $data,
     $author,
     $topicName,
-    $messageId = '',
-    $inReplyTo = '',
     $threadId,
     $parentId,
+    $messageId = '',
+    $inReplyTo = '',
     $contributions = '',
     $queueId = 0
 ) {
@@ -413,7 +413,12 @@ function sendWikiEmailNotification(
             if (empty($not['email'])) {
                 continue;
             }
-            $smarty->assign('watchId', $not['watchId']);
+            $smarty->assign('watchId', $not['watchId'] ?? '');
+            $watchUnsubscribeHash = '';
+            if (! empty($not['watchId']) && ! empty($not['user'])) {
+                $watchUnsubscribeHash = $tikilib->generateWatchUnsubscribeHash($not['watchId'], $not['user']);
+            }
+            $smarty->assign('watchUnsubscribeHash', $watchUnsubscribeHash);
 
             $mail_subject = $smarty->fetchLang($not['language'], "mail/user_watch_wiki_page_changed_subject.tpl");
             $mail_data = $smarty->fetchLang($not['language'], "mail/user_watch_wiki_page_changed.tpl");
@@ -472,7 +477,12 @@ function sendEmailNotification($watches, $dummy, $subjectTpl, $subjectParam, $tx
             $mail->setHeader($headerName, $headerValue);
         }
 
-        $smarty->assign('watchId', $watch['watchId']);
+        $smarty->assign('watchId', $watch['watchId'] ?? null);
+        $watchUnsubscribeHash = '';
+        if (! empty($watch['watchId']) && ! empty($watch['user'])) {
+            $watchUnsubscribeHash = $tikilib->generateWatchUnsubscribeHash($watch['watchId'], $watch['user']);
+        }
+        $smarty->assign('watchUnsubscribeHash', $watchUnsubscribeHash);
         if ($watch['user']) {
             $mail->setUser($watch['user']);
         }
@@ -708,7 +718,6 @@ function sendCategoryEmailNotification($values)
                 $mail_subject = $smarty->fetchLang($not['language'], "mail/user_watch_category_removed_subject.tpl");
                 $mail_data = $smarty->fetchLang($not['language'], "mail/user_watch_category_removed.tpl");
             } elseif ($action == 'category updated') {
-
                 $smarty->assign('oldCategoryName', $oldCategoryName);
                 $smarty->assign('oldCategoryPath', $oldCategoryPath);
                 $smarty->assign('oldDescription', $oldDescription);
@@ -718,7 +727,6 @@ function sendCategoryEmailNotification($values)
                 $mail_subject = $smarty->fetchLang($not['language'], "mail/user_watch_category_updated_subject.tpl");
                 $mail_data = $smarty->fetchLang($not['language'], "mail/user_watch_category_updated.tpl");
             } elseif ($action == 'object entered category') {
-
                 $smarty->assign('objectName', $objectName);
                 $smarty->assign('objectType', $objectType);
                 $smarty->assign('objectUrl', $objectUrl);
@@ -726,7 +734,6 @@ function sendCategoryEmailNotification($values)
                 $mail_subject = $smarty->fetchLang($not['language'], "mail/user_watch_object_entered_category_subject.tpl");
                 $mail_data = $smarty->fetchLang($not['language'], "mail/user_watch_object_entered_category.tpl");
             } elseif ($action == 'object leaved category') {
-
                 $smarty->assign('objectName', $objectName);
                 $smarty->assign('objectType', $objectType);
                 $smarty->assign('objectUrl', $objectUrl);
