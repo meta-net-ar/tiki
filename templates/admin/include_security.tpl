@@ -86,7 +86,15 @@
                 {preference name=feature_editcss}
             </fieldset>
             <fieldset>
-                <legend>{tr}User Encryption{/tr}{help url="User Encryption"}</legend>
+                <legend class="h3">{tr}SSRF Protection{/tr}</legend>
+                {preference name=ssrf_whitelisted_hosts}
+            </fieldset>
+            <fieldset>
+                <legend class="h3">{tr}Trackers Security{/tr}</legend>
+                {preference name=tracker_adminonlyviewedititem_by_default}
+            </fieldset>
+            <fieldset>
+                <legend class="h3">{tr}User Encryption{/tr}{help url="User Encryption"}</legend>
                 {preference name=feature_user_encryption}
                 <div class="adminoptionboxchild" id="feature_user_encryption_childcontainer">
                     {if $sodium_available}
