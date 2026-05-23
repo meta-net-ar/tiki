@@ -127,6 +127,79 @@ if (isset($_REQUEST["change"])) {
     } else {
         $accesslib->redirect($homePageUrl);
     }
+
+    // Only proceed if password change is allowed
+    if ($can_change_password) {
+        // Validate password change operation
+        $validation_errors = false;
+        if ($_REQUEST["pass"] != $_REQUEST["passAgain"]) {
+            Feedback::error(tra("The passwords do not match"));
+            $validation_errors = true;
+        }
+        // Check password policy
+        $polerr = $userlib->check_password_policy($_REQUEST["pass"]);
+        if (strlen($polerr) > 0) {
+            Feedback::error($polerr);
+            $validation_errors = true;
+        }
+        // Also check if new password matches current password hash
+        $current_hash = $userlib->getOne('select `hash` from `users_users` where binary `login`=?', [$user]);
+        if (! empty($current_hash) && password_verify($_REQUEST["pass"], $current_hash)) {
+            Feedback::error(tra("You can not use the same password again"));
+            $validation_errors = true;
+        }
+        // Validate email if provided
+        if (isset($_REQUEST['email'])) {
+            if (empty($_REQUEST['email']) || ! validate_email($_REQUEST['email'], $prefs['validateEmail'])) {
+                Feedback::error(tra('Your email could not be validated; make sure your email is correct'));
+                $validation_errors = true;
+            }
+        }
+
+        // Only proceed with password change if validation passed
+        if (! $validation_errors) {
+            // Perform password change operation
+            if (isset($_REQUEST['email']) && ! empty($_REQUEST['email'])) {
+                $userlib->change_user_email_only($user, $_REQUEST['email']);
+            }
+            $res = $userlib->change_user_password($user, $_REQUEST["pass"]);
+            if ($res && $prefs['pass_history_management'] === 'y') {
+                $userlib->addPasswordHistory($user, $_REQUEST["pass"]);
+            }
+
+            // Mark reset token as used only after successful password change
+            if (! empty($secure_token) && ! $is_new_user_validation && ! $must_change_password) {
+                $passwordResetLib = new \Tiki\Lib\Auth\PasswordResetLib();
+                $passwordResetLib->markPasswordResetTokenUsed($user, $secure_token);
+            }
+
+            // Handle encryption if enabled
+            if ($prefs['feature_user_encryption'] === 'y' && ! empty($authenticated_oldpass)) {
+                $cryptlib = TikiLib::lib('crypt');
+                $cryptlib->onChangeUserPassword($authenticated_oldpass, $_REQUEST["pass"]);
+            }
+
+            // Login user as part of the change operation
+            $userlib->update_expired_groups();
+            $loginlib = TikiLib::lib('login');
+            $loginlib->activateSession($user);
+            $logslib->add_log('login', 'logged from change_password', $user, '', '', $tikilib->now);
+            if ($jitRequest->oldpass->text() !== 'admin') {
+                include TIKI_PATH . '/lib/setup/default_homepage.php';
+            }
+            $homePageUrl = $prefs['tikiIndex'];
+            $wizardlib = TikiLib::lib('wizard');
+            $force = $user == 'admin';
+            $wizardlib->onLogin($user, $homePageUrl, $force);
+            $accesslib = TikiLib::lib('access');
+            if (! empty($prefs['url_after_validation']) && ! empty($_REQUEST['new_user_validation'])) {
+                $access->redirect($prefs['url_after_validation'], allowExternal: true);
+            } else {
+                $accesslib->redirect($homePageUrl);
+            }
+        }
+    }
+    // If authentication failed or validation failed, fall through to display the form
 }
 ask_ticket('change-password');
 
