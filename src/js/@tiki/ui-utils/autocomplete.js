@@ -114,7 +114,7 @@ export function getAutocompleteResources(type, options = {}) {
                 return res.resultset.result.map((item) => ({
                     value: item.title,
                     object_id: item.title,
-                    url: $(item.link).attr("href"),
+                    url: $("<div/>").append(item.link).find("a").attr("href"),
                 }));
             };
             customRemoteQueryKey = "filter~content";
