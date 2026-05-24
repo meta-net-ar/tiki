@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Translations;
 
+use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 
@@ -118,53 +119,19 @@ abstract class ApiBaseTranslationsTest extends ApiTestCase
         static::deleteTestPreferences(self::$preferences);
     }
 
-    /**
-     * Schema for GET /translations/{type}/{source} (action_manage).
-     *
-     * - filters.language is a quoted OR-string of remaining language codes, or null
-     *   when no other language is available.
-     * - translations is an array of translation objects (empty when no links exist).
-     */
     protected function getManageTranslationsSchema(): array
     {
-        return [
-            'title'        => 'string',
-            'type'         => 'string',
-            'source'       => 'string',
-            'filters'      => [
-                'type'     => 'string',
-                'language' => 'string|null',
-            ],
-            'translations' => 'array',
-            'canAttach'    => 'bool',
-            'canDetach'    => 'bool',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TranslationsManageResponse.yaml');
     }
 
     protected function getManageTranslationsWithAttachedTranslationSchema(): array
     {
-        $schema = $this->getManageTranslationsSchema();
-        $schema['translations'] = [
-            '*' => [
-                'traId'   => 'int',
-                'objId' => 'int|string',
-                'lang' => 'string',
-                'language' => 'string',
-            ],
-        ];
-        return $schema;
+        return ApiSchemaLoader::fromSchemaFile('TranslationsManageWithTranslationsResponse.yaml');
     }
 
     protected function getForwardTranslationSchema(): array
     {
-        return [
-            'FORWARD' => [
-                'controller' => 'string',
-                'action'     => 'string',
-                'type'       => 'string',
-                'source'     => 'string',
-            ],
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TranslationsForwardResponse.yaml');
     }
 
     protected function assertValidManageTranslationsResponse(array $body): void

@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Galleries;
 
+use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 use Exception;
@@ -324,104 +325,19 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    protected function getFileResponseSchema()
+    protected function getFileResponseSchema(): array
     {
-        return [
-            'title' => 'string',
-            'fileId' => 'int',
-            'info' => [
-                'fileId' => 'int',
-                'galleryId' => 'int',
-                'name' => 'string',
-                'description' => 'string|null',
-                'created' => 'int|null',
-                'filename' => 'string',
-                'filesize' => 'int|null',
-                'filetype' => 'string|null',
-                'user' => 'string|null',
-                'author' => 'string|null',
-                'hits' => 'int|null',
-                'maxhits' => 'int|null',
-                'lastDownload' => 'int|null',
-                'votes' => 'int|null',
-                'points' => 'string|null',
-                'path' => 'string|null',
-                'reference_url' => 'string|null',
-                'is_reference' => 'string|null',
-                'hash' => 'string|null',
-                'metadata' => 'string|null',
-                'lastModif' => 'int|null',
-                'lastModifUser' => 'string|null'
-            ]
-        ];
+        return ApiSchemaLoader::fromSchemaFile('FileInfoResponse.yaml');
     }
 
-    protected function getGalleryResponseSchema()
+    protected function getGalleryResponseSchema(): array
     {
-        return [
-            'galleryId' => 'int',
-            'name' => 'string',
-            'type' => 'string|null',
-            'direct' => 'string|null',
-            'template' => 'string|null',
-            'description' => 'string|null',
-            'created' => 'int|null',
-            'visible' => 'string|null',
-            'lastModif' => 'int|null',
-            'user' => 'string|null',
-            'hits' => 'int|null',
-            'votes' => 'int|null',
-            'points' => 'float|null',
-            'maxRows' => 'int|null',
-            'public' => 'string|null',
-            'show_id' => 'string|null',
-            'show_icon' => 'string|null',
-            'show_name' => 'string|null',
-            'show_size' => 'string|null',
-            'show_description' => 'string|null',
-            'max_desc' => 'int|null',
-            'show_created' => 'string|null',
-            'show_hits' => 'string|null',
-            'show_lastDownload' => 'string|null',
-            'parentId' => 'int|null',
-            'lockable' => 'string|null',
-            'show_lockedby' => 'string|null',
-            'archives' => 'int|null',
-            'sort_mode' => 'string|null',
-            'show_modified' => 'string|null',
-            'show_author' => 'string|null',
-            'show_creator' => 'string|null',
-            'subgal_conf' => 'string|null',
-            'show_last_user' => 'string|null',
-            'show_comment' => 'string|null',
-            'show_files' => 'string|null',
-            'show_explorer' => 'string|null',
-            'show_path' => 'string|null',
-            'show_slideshow' => 'string|null',
-            'show_ocr_state' => 'string|null',
-            'default_view' => 'string|null',
-            'quota' => 'int|null',
-            'size' => 'int|null',
-            'wiki_syntax' => 'string|null',
-            'backlinkPerms' => 'string|null',
-            'show_backlinks' => 'string|null',
-            'show_deleteAfter' => 'string|null',
-            'show_checked' => 'string|null',
-            'show_share' => 'string|null',
-            'image_max_size_x' => 'int|null',
-            'image_max_size_y' => 'int|null',
-            'show_source' => 'string|null',
-            'icon_fileId' => 'int|null',
-            'ocr_lang' => 'string|null',
-            'display_name_generation' => 'string|null'
-        ];
+        return ApiSchemaLoader::fromSchemaFile('Gallery.yaml');
     }
 
-    protected function getInfoGalleriesResponseSchema()
+    protected function getInfoGalleriesResponseSchema(): array
     {
-        return [
-            'info' => $this->getGalleryResponseSchema()
-        ];
+        return ApiSchemaLoader::fromSchemaFile('GalleryInfoResponse.yaml');
     }
 
     protected function getFileUploadResponseSchema()
@@ -456,30 +372,19 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         ];
     }
 
-    protected function getLockFileResponseSchema()
+    protected function getLockFileResponseSchema(): array
     {
-        return [
-            'title' => 'string',
-            'count' => 'int',
-            'locked' => 'array'
-        ];
+        return ApiSchemaLoader::fromSchemaFile('LockFileResponse.yaml');
     }
 
-    protected function getUnlockFileResponseSchema()
+    protected function getUnlockFileResponseSchema(): array
     {
-        return [
-            'title' => 'string',
-            'count' => 'int',
-            'unlocked' => 'array'
-        ];
+        return ApiSchemaLoader::fromSchemaFile('UnlockFileResponse.yaml');
     }
 
-    protected function getDeleteFileGalleryResponseSchema()
+    protected function getDeleteFileGalleryResponseSchema(): array
     {
-        return [
-            'title' => 'string',
-            'message' => 'string'
-        ];
+        return ApiSchemaLoader::fromSchemaFile('DeleteFileGalleryResponse.yaml');
     }
 
     protected function assertValidGalleryResponse($response)
