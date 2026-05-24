@@ -301,11 +301,7 @@ function updateSecdb($version)
         sort($queries);
         fwrite($fp, "start transaction;\n");
         fwrite($fp, "DELETE FROM `tiki_secdb`;\n");
-        // This index was originally created with a size limit that would raise an error on some versions,
-        // notably on 18.0. Since this file is executed before any patch in installer/schema, the fix had to
-        // be done here. It's a quick operation because table is empty, so no harm in leaving this here forever.
-        fwrite($fp, "ALTER TABLE `tiki_secdb` ADD COLUMN `filename_hash` CHAR(32) NOT NULL AFTER `filename`;\n");
-        fwrite($fp, "ALTER TABLE `tiki_secdb` DROP PRIMARY KEY, ADD PRIMARY KEY (`filename_hash`, `tiki_version`(20));\n\n");
+        fwrite($fp, "\n");
 
         $insertString = 'INSERT INTO `tiki_secdb` (`filename`, `filename_hash`, `md5_value`, `tiki_version`) VALUES ';
 
