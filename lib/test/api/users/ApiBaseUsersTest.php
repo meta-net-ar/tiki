@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Users;
 
+use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 
@@ -139,108 +140,34 @@ abstract class ApiBaseUsersTest extends ApiTestCase
         static::deleteTestPreferences(self::$preferences);
     }
 
-    /**
-     * Schema for a single user entry in the GET /users result array.
-     */
-    protected function getUserListEntrySchema(): array
-    {
-        return [
-            'userId'           => 'int|string',
-            'login'            => 'string',
-            'default_group'    => 'string|null',
-            'lastLogin'        => 'int|null',
-            'currentLogin'     => 'int|null',
-            'registrationDate' => 'int|string',
-            'pass_confirm'     => 'int|null',
-            'email_confirm'    => 'int|null',
-            'created'          => 'int|string',
-            'valid'            => 'string|null',
-            'unsuccessful_logins' => 'int',
-            'waiting'          => 'string|null',
-            'user'             => 'string',
-            'groups'           => 'array',
-            'age'              => 'int|string',
-            'editable'         => 'bool',
-            'disposable_email' => 'bool',
-            'avatar'           => 'string|null',
-        ];
-    }
-
-    /**
-     * Top-level schema for GET /users (action_list_users).
-     */
     protected function getUserListSchema(): array
     {
-        return [
-            'result' => [$this->getUserListEntrySchema()],
-            'count'  => 'int',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('UserListResponse.yaml');
     }
 
-    /**
-     * Schema for GET /users/{username} (action_info).
-     */
     protected function getUserInfoSchema(): array
     {
-        return [
-            'fullname'      => 'string',
-            'gender'        => 'string',
-            'starHtml'      => 'string',
-            'country'       => 'string',
-            'distance'      => 'string',
-            'email'         => 'string',
-            'lastSeen'      => 'int|string|null',
-            'avatarHtml'    => 'string',
-            'error'         => 'string',
-            'shared_groups' => 'string',
-            'other_user'    => 'string|null',
-            'add_friend_button' => 'string|null',
-            'friendship'    => 'array',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('UserInfoResponse.yaml');
     }
 
-    /**
-     * Schema for GET /message-count (action_get_message_count).
-     */
     protected function getMessageCountSchema(): array
     {
-        return [
-            'count' => 'int',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('MessageCountResponse.yaml');
     }
 
-    /**
-     * Schema for POST /users (action_register) success response.
-     */
     protected function getRegisterUserSchema(): array
     {
-        return [
-            'result' => 'string|null',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('RegisterUserResponse.yaml');
     }
 
     protected function getDeleteUserFeedbackSchema(): array
     {
-        return [
-            'feedback' => [
-                'tpl'   => 'string',
-                'mes'   => 'string',
-                'items' => 'array',
-            ],
-        ];
+        return ApiSchemaLoader::fromSchemaFile('DeleteUserFeedbackResponse.yaml');
     }
 
     protected function getManageGroupsFeedbackSchema(): array
     {
-        return [
-            'feedback' => [
-                'tpl'    => 'string',
-                'mes'    => 'string',
-                'items'  => 'array',
-                'toMsg'  => 'string',
-                'toList' => 'array',
-            ],
-        ];
+        return ApiSchemaLoader::fromSchemaFile('ManageGroupsFeedbackResponse.yaml');
     }
 
     protected function assertValidUserListResponse(array $body): void

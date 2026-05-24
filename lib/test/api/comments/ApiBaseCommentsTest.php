@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Comments;
 
+use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 use Exception;
@@ -503,131 +504,39 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         static::deleteTestPreferences(self::$preferences);
     }
 
-    protected function getSimpleCommentResponseSchema()
+    protected function getSimpleCommentResponseSchema(): array
     {
-        return [
-            'threadId' => 'string|int|null', // FIXME: threadId is returned as string in some cases. eg. "123"
-            'parentId' => 'int|null',
-            'type' => 'string',
-            'objectId' => 'string|int',
-            'feedback' => 'array', // list of feedback entries (can be empty)
-        ];
+        return ApiSchemaLoader::fromSchemaFile('SimpleCommentResponse.yaml');
     }
 
-    protected function getCommentResponseSchema()
+    protected function getCommentResponseSchema(): array
     {
-        $commentSchema = [
-            'threadId' => 'string|int|null',
-            'object' => 'string|int',
-            'objectType' => 'string',
-            'parentId' => 'int|null',
-            'userName' => 'string|null',
-            'commentDate' => 'int',
-            'hits' => 'int',
-            'type' => 'string',
-            'points' => 'string|numeric',
-            'votes' => 'int',
-            'average' => 'string|numeric',
-            'title' => 'string|null',
-            'data' => 'string|null',
-            'email' => 'string|null',
-            'website' => 'string|null',
-            'user_ip' => 'string|null',
-            'summary' => 'string|null',
-            'smiley' => 'string|null',
-            'message_id' => 'string|null',
-            'in_reply_to' => 'string|null',
-            'comment_rating' => 'int|null',
-            'archived' => 'string|null',
-            'approved' => 'string|null',
-            'locked' => 'string|null',
-            'parsed' => 'string|null',
-            'user_posts' => 'int|null',
-            'user_level' => 'int|null',
-            'user_email' => 'string|null',
-            'attachments' => 'array',
-            'is_reported' => 'int|bool|null',
-            'user_online' => 'string|null',
-            'user_exists' => 'int|bool|null'
-        ];
-        return $commentSchema;
+        return ApiSchemaLoader::fromSchemaFile('Comment.yaml');
     }
 
-    protected function getCommentListResponseSchema()
+    protected function getCommentListResponseSchema(): array
     {
-        $commentExtraKeys = array_merge(
-            $this->getCommentResponseSchema(),
-            [
-                'grandFather' => 'int|null',
-                'can_edit' => 'bool',
-                'replies_info' => [
-                    'replies' => [$this->getCommentResponseSchema()],
-                    'numReplies' => 'int',
-                    'totalReplies' => 'int',
-                ],
-                'replies_flat' => [$this->getCommentResponseSchema()]
-            ]
-        );
-
-        return [
-            'title' => 'string',
-            'comments' => [ $commentExtraKeys ],
-            'type' => 'string',
-            'objectId' => 'string|int',
-            'parentId' => 'int|null',
-            'count' => 'int',
-            'offset' => 'int|null',
-            'maxRecords' => 'int',
-            'sortMode' => 'string',
-            'allow_post' => 'bool',
-            'allow_remove' => 'bool',
-            'allow_lock' => 'bool',
-            'allow_unlock' => 'bool',
-            'allow_archive' => 'bool',
-            'allow_moderate' => 'bool',
-            'allow_vote' => 'bool',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('CommentListResponse.yaml');
     }
 
-    protected function getUpdateCommentResponseSchema()
+    protected function getUpdateCommentResponseSchema(): array
     {
-        return [
-            'threadId' => 'string|int|null',
-            'comment' => $this->getCommentResponseSchema(),
-        ];
+        return ApiSchemaLoader::fromSchemaFile('UpdateCommentResponse.yaml');
     }
 
-    protected function getDeleteCommentResponseSchema()
+    protected function getDeleteCommentResponseSchema(): array
     {
-        return [
-            'threadId' => 'int',
-            'status' => 'string',
-            'objectType' => 'string',
-            'objectId' => 'string|int',
-            'parsed' => 'string',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('DeleteCommentResponse.yaml');
     }
 
-    protected function getLockCommentResponseSchema()
+    protected function getLockCommentResponseSchema(): array
     {
-        return [
-            'title' => 'string',
-            'type' => 'string',
-            'objectId' => 'string|int',
-            'status' => 'string',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('LockCommentResponse.yaml');
     }
 
-    // schema for approve, reject, archive, unarchive
-    protected function getModerateCommentResponseSchema()
+    protected function getModerateCommentResponseSchema(): array
     {
-        return [
-            'threadId' => 'int',
-            'type' => 'string',
-            'objectId' => 'string|int',
-            'status' => 'string',
-            'do' => 'string',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('ModerateCommentResponse.yaml');
     }
 
     protected function assertValidCommentResponse($comment)

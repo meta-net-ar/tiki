@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Groups;
 
+use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 use Exception;
@@ -242,79 +243,24 @@ abstract class ApiBaseGroupsTest extends ApiTestCase
         static::deleteTestPreferences(self::$preferences);
     }
 
-    protected function getGroupListResponseSchema()
+    protected function getGroupListResponseSchema(): array
     {
-        return [
-            'data' => [
-                [
-                    'id' => 'int',
-                    'groupName' => 'string',
-                    'groupDesc' => 'string',
-                    'groupHome' => 'string|null',
-                    'usersTrackerId' => 'int|null',
-                    'groupTrackerId' => 'int|null',
-                    'usersFieldId' => 'int|null',
-                    'groupFieldId' => 'int|null',
-                    'registrationChoice' => 'string|null',
-                    'registrationUsersFieldIds' => 'string|null',
-                    'userChoice' => 'string|null',
-                    'groupDefCat' => 'int',
-                    'groupTheme' => 'string',
-                    'groupColor' => 'string',
-                    'isExternal' => 'string',
-                    'expireAfter' => 'int',
-                    'emailPattern' => 'string|null',
-                    'anniversary' => 'string|null',
-                    'prorateInterval' => 'string|null',
-                    'isRole' => 'string|null',
-                    'isTplGroup' => 'string|null',
-                    'perms' => 'array',
-                    'permCount' => 'int',
-                    'included' => 'array',
-                    'included_direct' => 'array',
-                ]
-            ],
-            'count' => 'int',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('GroupListResponse.yaml');
     }
 
-    protected function getGroupActionResponseSchema()
+    protected function getGroupActionResponseSchema(): array
     {
-        return [
-            'type' => 'string',
-            'icon' => 'string',
-            'title' => 'string',
-            'mes' => 'array',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('GroupActionResponse.yaml');
     }
 
-    protected function getGroupCreateUpdateResponseSchema()
+    protected function getGroupCreateUpdateResponseSchema(): array
     {
-        return [
-            'feedback' => [
-                'action' => [
-                    $this->getGroupActionResponseSchema()
-                ],
-            ]
-        ];
+        return ApiSchemaLoader::fromSchemaFile('GroupActionFeedbackResponse.yaml');
     }
 
-    protected function getGroupAddBanDelUsersResponseSchema()
+    protected function getGroupAddBanDelUsersResponseSchema(): array
     {
-        $extraparams = array_merge(
-            $this->getGroupActionResponseSchema(),
-            [
-                'mes' => 'array',
-                'items' => 'array',
-            ]
-        );
-        return [
-            'feedback' => [
-                'action' => [
-                    $extraparams
-                ],
-            ]
-        ];
+        return ApiSchemaLoader::fromSchemaFile('GroupUserActionFeedbackResponse.yaml');
     }
 
     protected function assertValidGroupListResponse($response)

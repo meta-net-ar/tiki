@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Search;
 
+use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
 use Tiki\Search\SearchIndexRebuilder;
 
@@ -138,65 +139,24 @@ abstract class ApiBaseSearchTest extends ApiTestCase
         static::deleteTestPreferences(self::$preferences);
     }
 
-    protected function getSearchRebuildResponseSchema()
+    protected function getSearchRebuildResponseSchema(): array
     {
-        return [
-            'title' => 'string',
-            'formattedStats' => 'string|null',
-            'search_engine' => 'string',
-            'search_version' => 'string',
-            'search_index' => 'string',
-            'fallback_search_engine' => 'string',
-            'fallback_search_version' => 'string',
-            'fallback_search_index' => 'string',
-            'queue_count' => 'int',
-            'log_file_browser' => 'string',
-            'fallback_log_file_browser' => 'string',
-            'log_file_console' => 'string',
-            'fallback_log_file_console' => 'string',
-            'lastLogItemWeb' => 'string',
-            'lastLogItemConsole' => 'string',
-            'isAjax' => 'bool',
-            'showForm' => 'bool',
-            'unified_last_rebuild' => 'int',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('SearchRebuildResponse.yaml');
     }
 
-    protected function getSearchProcessQueueResponseSchema()
+    protected function getSearchProcessQueueResponseSchema(): array
     {
-        return [
-            'title' => 'string',
-            "stat" => 'string|null',
-            'queue_count' => 'int',
-            'batch' => 'int',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('SearchProcessQueueResponse.yaml');
     }
 
-    protected function getSearchLookupNoResultsResponseSchema()
+    protected function getSearchLookupNoResultsResponseSchema(): array
     {
-        return [
-            'title' => 'string',
-            'resultset' => [
-                'count' => 'int',
-                'offset' => 'int',
-                'maxRecords' => 'int',
-                'result' => 'array',
-            ],
-        ];
+        return ApiSchemaLoader::fromSchemaFile('SearchLookupNoResultsResponse.yaml');
     }
 
-    protected function getSearchLookupResponseSchema()
+    protected function getSearchLookupResponseSchema(): array
     {
-        $baseSchema = $this->getSearchLookupNoResultsResponseSchema();
-        $baseSchema['resultset']['result'] = [
-            [
-                'object_type' => 'string',
-                'object_id' => 'string|int',
-                'parent_id' => 'int|string|null',
-                'title' => 'string',
-            ]
-        ];
-        return $baseSchema;
+        return ApiSchemaLoader::fromSchemaFile('SearchLookupResponse.yaml');
     }
 
     protected function assertValidRebuildResponse($response)

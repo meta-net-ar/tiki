@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Categories;
 
+use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 use Exception;
@@ -143,40 +144,14 @@ abstract class ApiBaseCategoriesTest extends ApiTestCase
         return static::$defaultCategories[$key];
     }
 
-    protected function getCategoryResponseSchema()
+    protected function getCategoryResponseSchema(): array
     {
-        return [
-            'categId' => 'int',
-            'name' => 'string|null',
-            'description' => 'string|null',
-            'parentId' => 'int|null',
-            'rootId' => 'int',
-            'hits' => 'int|null',
-            'tplGroupContainerId' => 'int|null',
-            'tplGroupPattern' => 'string|null',
-            'num_roles' => 'int',
-            'objects' => 'int',
-            'children' => 'array',
-            'descendants' => 'array',
-            'tepath' => 'array', // associative string-to-string map
-            'categpath' => 'string',
-            'relativePathString' => 'string',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('Category.yaml');
     }
 
-    protected function getCategorizeResponseSchema()
+    protected function getCategorizeResponseSchema(): array
     {
-        return [
-            'categId' => 'int|string', // for uncategorize action, the categId is returned as string. eg. "180"
-            'count' => 'int|string', // can be 'unchanged'
-            'objects' => [
-                [ // array of objects
-                    'type' => 'string',
-                    'id' => 'string|int',
-                    'catObjectId' => 'string|int', // FIXME: catObjectId is returned as string. eg. "180"
-                ]
-            ],
-        ];
+        return ApiSchemaLoader::fromSchemaFile('CategorizeResponse.yaml');
     }
 
     protected function assertValidCategoryResponse($category)

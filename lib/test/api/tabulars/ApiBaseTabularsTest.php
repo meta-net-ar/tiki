@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Tabulars;
 
+use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 
@@ -321,58 +322,14 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
         return $rows;
     }
 
-    private function getTabularListSchema()
+    private function getTabularListSchema(): array
     {
-        return [
-            'title' => 'string',
-            'formatList' => [
-                [
-                    'tabularId' => 'int',
-                    'name' => 'string',
-                    'trackerId' => 'int',
-                ]
-            ],
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TabularListResponse.yaml');
     }
 
-    private function getTabularSchema()
+    private function getTabularSchema(): array
     {
-        return [
-            'title' => 'string',
-            'tabularId' => 'int',
-            'trackerId' => 'int',
-            'name' => 'string',
-            'config' => [
-                'simple_headers' => 'int',
-                'import_update' => 'int',
-                'ignore_blanks' => 'int',
-                'import_transaction' => 'int',
-                'bulk_import' => 'int',
-                'skip_unmodified' => 'int',
-                'encoding' => 'string',
-                'format' => 'string',
-                'mapping' => 'string',
-            ],
-            'odbc_config' => 'array',
-            'api_config' => 'array',
-            'columns' => [
-                [
-                    'label' => 'string',
-                    'field' => 'string',
-                    'mode' => 'string',
-                    'displayAlign' => 'string',
-                    'isPrimary' => 'bool',
-                    'isReadOnly' => 'bool',
-                    'isExportOnly' => 'bool',
-                    'isUniqueKey' => 'bool',
-                ]
-            ],
-            'filters' => 'array',
-            'schema' => 'array',
-            'filterCollection' => 'array',
-            'has_odbc' => 'bool',
-            'encodings' => 'array',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TabularResponse.yaml');
     }
 
     protected function assertValidTabularResponse($response)

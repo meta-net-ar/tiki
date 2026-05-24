@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Wiki;
 
+use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
 
 /**
@@ -96,114 +97,29 @@ abstract class ApiBaseWikiTest extends ApiTestCase
         static::deleteTestPreferences(self::$preferences);
     }
 
-    protected function getPageResponseSchema(): array
-    {
-        return [
-            'page_id'  => 'int|string',
-            'pageName' => 'string',
-            'pageSlug' => 'string',
-            'hits' => 'int',
-            'data' => 'string',
-            'description' => 'string',
-            'lastModif' => 'int|null',
-            'comment' => 'string',
-            'version' => 'int',
-            'version_minor' => 'int',
-            'user' => 'string',
-            'ip' => 'string',
-            'flag' => 'string',
-            'points' => 'int|null',
-            'votes' => 'int|null',
-            'cache' => 'string|null',
-            'wiki_cache' => 'string|null',
-            'cache_timestamp' => 'int|null',
-            'pageRank' => 'int|null',
-            'creator' => 'string',
-            'lang' => 'string|null',
-            'lockedby' => 'string',
-            'is_html' => 'int',
-            'created' => 'int',
-            'wysiwyg' => 'string|null',
-            'wiki_authors_style' => 'string',
-            'comments_enabled' => 'string|null',
-            'keywords' => 'string|null',
-        ];
-    }
-
-    /**
-     * Top-level schema for GET /wiki (action_pages).
-     */
     protected function getPageListSchema(): array
     {
-        $extraListFields = [
-            'perms' => 'array',
-            'len' => 'int',
-            'versions' => 'int',
-        ];
-        $pageInfoListSchema = array_merge($this->getPageResponseSchema(), $extraListFields);
-
-        return [
-            'data'  => [$pageInfoListSchema],
-            'count' => 'int',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('WikiPageListResponse.yaml');
     }
 
-    /**
-     * Schema for GET /wiki/page/{page} (action_get_page).
-     */
     protected function getPageInfoSchema(): array
     {
-        $extraFields = [
-            'baseName' => 'string',
-            'prettyName' => 'string',
-            'namespace' => 'bool',
-            'namespace_parts' => 'array',
-        ];
-        $infoResponse = array_merge($this->getPageResponseSchema(), $extraFields);
-
-        return $infoResponse;
+        return ApiSchemaLoader::fromSchemaFile('WikiPageInfoEntry.yaml');
     }
 
-    /**
-     * Schema for POST /wiki and POST /wiki/page/{page} (action_create_update_page).
-     */
     protected function getCreateUpdatePageSchema(): array
     {
-        return [
-            'info' => $this->getPageInfoSchema(),
-        ];
+        return ApiSchemaLoader::fromSchemaFile('WikiCreateUpdatePageResponse.yaml');
     }
 
-    /**
-     * Schema for endpoints that return Services_Utilities::refresh() in TIKI_API context.
-     */
     protected function getRefreshFeedbackSchema(): array
     {
-        return [
-            'feedback' => [
-                'action' => [
-                    [
-                        'type' => 'string',
-                        'icon' => 'string',
-                        'title' => 'string',
-                        'mes'  => 'array',
-                        'items' => 'array',
-                    ]
-                ]
-            ]
-        ];
+        return ApiSchemaLoader::fromSchemaFile('RefreshFeedbackResponse.yaml');
     }
 
-    /**
-     * Schema for PATCH /wiki/page/{page} (action_patch_page).
-     */
     protected function getPatchPageSchema(): array
     {
-        return [
-            'status'         => 'string',
-            'page'           => 'string',
-            'updated_fields' => 'array',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('WikiPatchPageResponse.yaml');
     }
 
     protected function assertValidPageListResponse(array $body): void
