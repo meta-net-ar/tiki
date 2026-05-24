@@ -550,20 +550,11 @@ class ConsoleApplicationBuilder
         /**
          * Define our constants, based on what error (if any) was thrown
          * @see $statusCode For explanations on what these constants these do.
-         * Constants are process-global, so the check is to ensure we only define them once.
          */
-        if (! defined('DB_RUNNING')) {
-            define('DB_RUNNING', $statusCode > 1001);
-        }
-        if (! defined('DB_STATUS')) {
-            define('DB_STATUS', $statusCode > 1002);
-        }
-        if (! defined('DB_TIKI_SETUP')) {
-            define('DB_TIKI_SETUP', $statusCode > 1003);
-        }
-        if (! defined('DB_SYNCHRONAL')) {
-            define('DB_SYNCHRONAL', $statusCode > 1004);
-        }
+        define('DB_RUNNING', $statusCode > 1001);
+        define('DB_STATUS', $statusCode > 1002);
+        define('DB_TIKI_SETUP', $statusCode > 1003);
+        define('DB_SYNCHRONAL', $statusCode > 1004);
 
         /** @var Application Console application that commands are added to, and finally returned. */
         $console = new Application();
