@@ -533,10 +533,9 @@ class ConsoleApplicationBuilder
      * of the check function and the action configured for the command group
      *
      * @param int|bool $statusCode
-     * @param string|null $commandCalled Kept for compatibility. The console is always fully initialized.
      * @return Application
      */
-    public function create($statusCode = 1100, ?string $commandCalled = null): Application
+    public function create($statusCode = 1100): Application
     {
         global $tikipath;
 

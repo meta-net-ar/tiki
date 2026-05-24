@@ -245,7 +245,7 @@ class Extension
         foreach ($finder->in($path)->depth('== 0')->directories() as $themeDir) {
             try {
                 $consoleBuilder = new ConsoleApplicationBuilder();
-                $console = $consoleBuilder->create(1100, $commandName);
+                $console = $consoleBuilder->create(1100);
                 $command = $console->find($commandName);
 
                 $themeName = basename($themeDir);
