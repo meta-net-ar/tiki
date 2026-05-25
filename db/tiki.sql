@@ -2212,7 +2212,7 @@ DROP TABLE IF EXISTS `tiki_secdb`;
 CREATE TABLE tiki_secdb(
   `md5_value` varchar(32) NOT NULL,
   `filename` varchar(250) NOT NULL,
-  `filename_hash` char(32) NOT NULL,
+  `filename_hash` char(32) NOT NULL DEFAULT '',
   `tiki_version` varchar(60) NOT NULL,
   `severity` int(4) NOT NULL default '0',
   PRIMARY KEY (`filename_hash`, `tiki_version`(20)),
