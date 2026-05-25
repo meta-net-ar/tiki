@@ -33,7 +33,7 @@ class Services_Comment_Controller
 
         $objectlib = TikiLib::lib('object');
         try {
-            if ($objectId !== $input->objectId->none() || ! $objectlib->isValidObject($type, $objectId)) {
+            if ($objectId != $input->objectId->none() || ! $objectlib->isValidObject($type, $objectId)) {
                 $objectId = $input->objectId->xss();
                 throw new Services_Exception(tr('Invalid %0 ID: %1', $type, $objectId), 403);
             }
