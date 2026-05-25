@@ -17,7 +17,7 @@ use Tiki\Installer\Installer;
  *
  * @return true
  */
-function upgrade_20260525_increase_filename_len_in_pk_tiki(Installer $installer)
+function upgrade_20260825_increase_filename_len_in_pk_tiki(Installer $installer)
 {
     global $dbs_tiki;
 
