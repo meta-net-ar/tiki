@@ -961,7 +961,7 @@ class TrackerLib extends TikiLib
 
             $p_links = $semanticlib->getLinksUsing('prefixalias', ['fromPage' => $target]);
             if (count($p_links)) {
-                $ret = $p_links[0]['toPage'] . $itemId;
+                $ret = $p_links[0]['toPage'];
                 return $ret;
             } else {
                 return false;
