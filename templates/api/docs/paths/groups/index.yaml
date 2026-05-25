@@ -61,13 +61,13 @@ get:
                       type: integer
                       nullable: true
                     registrationChoice:
-                      type: string
+                      $ref: schemas-TikiBoolean.yaml
                       nullable: true
                     registrationUsersFieldIds:
                       type: string
                       nullable: true
                     userChoice:
-                      type: string
+                      $ref: schemas-TikiBoolean.yaml
                       nullable: true
                     groupDefCat:
                       type: integer
@@ -76,8 +76,7 @@ get:
                     groupColor:
                       type: string
                     isExternal:
-                      type: string
-                      description: "Tiki boolean: 'y' or 'n'."
+                      $ref: schemas-TikiBoolean.yaml
                     expireAfter:
                       type: integer
                     emailPattern:
@@ -90,10 +89,10 @@ get:
                       type: string
                       nullable: true
                     isRole:
-                      type: string
+                      $ref: schemas-TikiBoolean.yaml
                       nullable: true
                     isTplGroup:
-                      type: string
+                      $ref: schemas-TikiBoolean.yaml
                       nullable: true
                     perms:
                       type: array

@@ -28,8 +28,7 @@ get:
                       type: string
                       nullable: true
                     descriptionIsParsed:
-                      type: string
-                      description: "Tiki boolean: 'y'/'n'."
+                      $ref: schemas-TikiBoolean.yaml
                     created:
                       type: integer
                     lastModif:
