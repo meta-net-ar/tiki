@@ -117,31 +117,6 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $this->assureDefaultCharSetIsAlignedWithTikiSchema();
         $this->assureInnoDdTableRowFormatIsDynamicOrBetter();
 
-        $TWV = new TWVersion();
-        $dbversion_tiki = $TWV->version;
-
-        // If a Mysql data file exists, use that. Very fast
-        //  If data file is missing or the batch loader is not available, use the single insert method
-        $secdb = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $dbversion_tiki . '_mysql.sql';
-        $secdbData = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $dbversion_tiki . '_mysql.data';
-        if (file_exists($secdbData)) {
-            $this->assureSecdbTableCanLoadHashedFilenames();
-            // A MySQL datafile exists
-            $truncateTable = true;
-            $rc = $this->runDataFile($secdbData, 'tiki_secdb', $truncateTable);
-            if ($rc == false) {
-                // The batch loader failed
-                if (file_exists($secdb)) {
-                    // Run single inserts
-                    $this->assureSecdbTableCanLoadHashedFilenames();
-                    $this->runFile($secdb, false);
-                }
-            }
-        } elseif (file_exists($secdb)) {
-            // Run single inserts
-            $this->assureSecdbTableCanLoadHashedFilenames();
-            $this->runFile($secdb, false);
-        }
         foreach (Patch::getPatches([Patch::NOT_APPLIED]) as $patchName => $patch) {
             try {
                 $this->installPatch($patchName);
@@ -152,6 +127,29 @@ class Installer extends TikiDb_Bridge implements SplSubject
                     return false;
                 }
             }
+        }
+
+        $TWV = new TWVersion();
+        $dbversion_tiki = $TWV->version;
+
+        // If a Mysql data file exists, use that. Very fast
+        //  If data file is missing or the batch loader is not available, use the single insert method
+        $secdb = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $dbversion_tiki . '_mysql.sql';
+        $secdbData = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $dbversion_tiki . '_mysql.data';
+        if (file_exists($secdbData)) {
+            // A MySQL datafile exists
+            $truncateTable = true;
+            $rc = $this->runDataFile($secdbData, 'tiki_secdb', $truncateTable);
+            if ($rc == false) {
+                // The batch loader failed
+                if (file_exists($secdb)) {
+                    // Run single inserts
+                    $this->runFile($secdb, false);
+                }
+            }
+        } elseif (file_exists($secdb)) {
+            // Run single inserts
+            $this->runFile($secdb, false);
         }
 
         foreach ($this->scripts as $script) {
@@ -437,27 +435,6 @@ class Installer extends TikiDb_Bridge implements SplSubject
     {
         $list = $this->listTables();
         return in_array($tableName, $list);
-    }
-
-    private function assureSecdbTableCanLoadHashedFilenames(): void
-    {
-        if (! $this->tableExists('tiki_secdb')) {
-            return;
-        }
-
-        $this->query('DELETE FROM `tiki_secdb`');
-
-        $filenameHashColumn = $this->query("SHOW COLUMNS FROM `tiki_secdb` LIKE 'filename_hash'", countQueries: false);
-        if (! $filenameHashColumn || empty($filenameHashColumn->result)) {
-            $this->query("ALTER TABLE `tiki_secdb` ADD COLUMN `filename_hash` CHAR(32) NOT NULL AFTER `filename`");
-        }
-
-        $primaryKey = $this->fetchAll("SHOW INDEX FROM `tiki_secdb` WHERE Key_name = 'PRIMARY'") ?: [];
-        if (! empty($primaryKey)) {
-            $this->query('ALTER TABLE `tiki_secdb` DROP PRIMARY KEY');
-        }
-
-        $this->query("ALTER TABLE `tiki_secdb` ADD PRIMARY KEY (`filename_hash`, `tiki_version`(20))");
     }
 
     public function isInstalled()
