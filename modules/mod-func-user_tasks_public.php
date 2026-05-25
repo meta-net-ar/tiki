@@ -29,9 +29,10 @@ function module_user_tasks_public_info()
  */
 function module_user_tasks_public($mod_reference, $module_params)
 {
-    global $user, $tiki_p_tasks, $prefs, $access;
+    global $user, $tiki_p_tasks, $prefs;
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
+    $access = TikiLib::lib('access');
     if ($user && isset($tiki_p_tasks) && $tiki_p_tasks == 'y') {
         global $tasklib;
         require_once 'lib/tasks/tasklib.php';

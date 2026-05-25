@@ -21,7 +21,7 @@ class TaskLink
         $info = $tasklib->get_task($user, $taskId);
         $description = "";
 
-        if ($info === null) {
+        if (empty($info)) {
             return '';
         }
         $info_description = '';
