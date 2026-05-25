@@ -103,16 +103,14 @@ properties:
   created:
     type: integer
   wysiwyg:
-    type: string
+    $ref: schemas-TikiBoolean.yaml
     nullable: true
-    description: "Tiki boolean ('y'/'n') or null."
   wiki_authors_style:
     type: string
     nullable: true
   comments_enabled:
-    type: string
+    $ref: schemas-TikiBoolean.yaml
     nullable: true
-    description: "Tiki boolean ('y'/'n') or null."
   keywords:
     type: string
     nullable: true

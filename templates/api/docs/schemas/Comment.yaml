@@ -104,24 +104,20 @@ properties:
     type: integer
     nullable: true
   archived:
-    type: string
+    $ref: schemas-TikiBoolean.yaml
     nullable: true
-    description: "Tiki boolean: 'y', 'n', or null."
   approved:
-    type: string
+    $ref: schemas-TikiBoolean.yaml
     nullable: true
-    description: "Tiki boolean: 'y', 'n', or null."
   locked:
-    type: string
+    $ref: schemas-TikiBoolean.yaml
     nullable: true
-    description: "Tiki boolean: 'y', 'n', or null."
   grandFather:
     type: integer
     nullable: true
   isEmpty:
-    type: string
+    $ref: schemas-TikiBoolean.yaml
     nullable: true
-    description: "Tiki boolean: 'y', 'n', or null."
   version:
     type: integer
     nullable: true
@@ -149,9 +145,8 @@ properties:
       - type: boolean
     nullable: true
   user_online:
-    type: string
+    $ref: schemas-TikiBoolean.yaml
     nullable: true
-    description: "Tiki boolean: 'y', 'n', or null."
   user_exists:
     oneOf:
       - type: integer

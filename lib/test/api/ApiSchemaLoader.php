@@ -52,7 +52,11 @@ class ApiSchemaLoader
     private static function convertDefinition(array $def): mixed
     {
         if (isset($def['$ref'])) {
-            return self::resolveRef($def['$ref']);
+            $resolved = self::resolveRef($def['$ref']);
+            if (! empty($def['nullable']) && is_string($resolved) && ! str_contains($resolved, 'null')) {
+                $resolved .= '|null';
+            }
+            return $resolved;
         }
 
         // allOf: merge all object schemas into one flat associative schema.
