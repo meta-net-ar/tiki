@@ -285,11 +285,7 @@ describe("Select", () => {
                 multiple: "true",
             };
 
-            ElSelect = {
-                setup() {
-                    return () => h("div", { class: "el-select__selection" }, "Selection");
-                },
-            };
+            vi.mocked(ElSelect).mockImplementationOnce(() => h("div", { class: "el-select__selection" }, "Selection"));
 
             render(Select, { props: givenProps });
 
@@ -311,15 +307,13 @@ describe("Select", () => {
 
             const expectedValueOnChange = "bar";
 
-            ElSelect = {
-                setup(_, { emit }) {
-                    const handleClick = () => {
-                        emit("update:modelValue", expectedValueOnChange);
-                        emit("change", expectedValueOnChange);
-                    };
-                    return () => h("div", { onClick: handleClick }, "Option");
-                },
-            };
+            vi.mocked(ElSelect).mockImplementationOnce((_, ctx) => {
+                const handleClick = () => {
+                    ctx.emit("update:modelValue", expectedValueOnChange);
+                    ctx.emit("change", expectedValueOnChange);
+                };
+                return h("div", { onClick: handleClick }, "Option");
+            });
 
             render(Select, { props: givenProps });
 

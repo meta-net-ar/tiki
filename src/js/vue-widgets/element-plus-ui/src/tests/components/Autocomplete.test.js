@@ -116,24 +116,20 @@ describe("Autocomplete", () => {
                 _expose: vi.fn(),
             };
 
-            ElAutocomplete = {
-                emits: ["keyup.enter"],
-                setup(_, { emit }) {
-                    return () =>
-                        h(
-                            "div",
-                            {},
-                            h("input", {
-                                "data-testid": "autocomplete-input",
-                                onKeyup: (e) => {
-                                    if (e.key === "Enter") {
-                                        emit("keyup.enter");
-                                    }
-                                },
-                            })
-                        );
-                },
-            };
+            vi.mocked(ElAutocomplete).mockImplementationOnce((_, ctx) =>
+                h(
+                    "div",
+                    {},
+                    h("input", {
+                        "data-testid": "autocomplete-input",
+                        onKeyup: (e) => {
+                            if (e.key === "Enter") {
+                                ctx.emit("keyup.enter");
+                            }
+                        },
+                    })
+                )
+            );
 
             render(Autocomplete, { props: givenProps });
 
@@ -153,17 +149,10 @@ describe("Autocomplete", () => {
                 _expose: vi.fn(),
             };
 
-            ElAutocomplete = {
-                props: ["fetchSuggestions"],
-                setup(props) {
-                    return () =>
-                        h(
-                            "div",
-                            {},
-                            h("input", { "data-testid": "autocomplete-input", onChange: (e) => props.fetchSuggestions(e.target.value, () => {}) })
-                        );
-                },
-            };
+            vi.mocked(ElAutocomplete).mockImplementationOnce((props) => {
+                const fetchSuggestions = props["fetch-suggestions"] ?? props.fetchSuggestions;
+                return h("div", {}, h("input", { "data-testid": "autocomplete-input", onChange: (e) => fetchSuggestions(e.target.value, () => {}) }));
+            });
 
             render(Autocomplete, { props: givenProps });
             const input = screen.getByTestId("autocomplete-input");
@@ -180,17 +169,9 @@ describe("Autocomplete", () => {
                 _expose: vi.fn(),
             };
 
-            ElAutocomplete = {
-                emits: ["select"],
-                setup(_, { emit }) {
-                    return () =>
-                        h(
-                            "div",
-                            {},
-                            h("div", { "data-testid": "autocomplete-suggestion", onClick: () => emit("select", "suggestion") }, "Suggestion")
-                        );
-                },
-            };
+            vi.mocked(ElAutocomplete).mockImplementationOnce((_, ctx) =>
+                h("div", {}, h("div", { "data-testid": "autocomplete-suggestion", onClick: () => ctx.emit("select", "suggestion") }, "Suggestion"))
+            );
 
             render(Autocomplete, { props: givenProps });
 
@@ -208,20 +189,16 @@ describe("Autocomplete", () => {
                 _expose: vi.fn(),
             };
 
-            ElAutocomplete = {
-                emits: ["update:modelValue"],
-                setup(_, { emit }) {
-                    return () =>
-                        h(
-                            "div",
-                            {},
-                            h("input", {
-                                "data-testid": "autocomplete-input",
-                                onChange: (e) => emit("input", e.target.value),
-                            })
-                        );
-                },
-            };
+            vi.mocked(ElAutocomplete).mockImplementationOnce((_, ctx) =>
+                h(
+                    "div",
+                    {},
+                    h("input", {
+                        "data-testid": "autocomplete-input",
+                        onChange: (e) => ctx.emit("input", e.target.value),
+                    })
+                )
+            );
 
             render(Autocomplete, { props: givenProps });
 
