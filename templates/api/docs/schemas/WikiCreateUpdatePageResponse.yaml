@@ -1,0 +1,8 @@
+---
+description: Response from creating or updating a wiki page (POST /wiki, POST /wiki/page/{page}).
+type: object
+required:
+  - info
+properties:
+  info:
+    $ref: schemas-WikiPageInfoEntry.yaml
