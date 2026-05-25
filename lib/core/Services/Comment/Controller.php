@@ -22,6 +22,7 @@ class Services_Comment_Controller
     public function action_list($input)
     {
         global $prefs;
+        $access = TikiLib::lib('access');
 
         $type = $input->type->alphaspace();
         if ($type === 'wiki page') {
@@ -31,17 +32,28 @@ class Services_Comment_Controller
         }
 
         $objectlib = TikiLib::lib('object');
-        if ($objectId !== $input->objectId->none() || ! $objectlib->isValidObject($type, $objectId)) {
-            $objectId = $input->objectId->xss();
-            throw new Services_Exception(tr('Invalid %0 ID: %1', $type, $objectId), 403);
-        }
-
-        if (! $this->isEnabled($type, $objectId)) {
-            throw new Services_Exception(tr('Comments not allowed on this page.'), 403);
-        }
-
-        if (! $this->canView($type, $objectId)) {
-            throw new Services_Exception(tr('Permission denied.'), 403);
+        try {
+            if ($objectId !== $input->objectId->none() || ! $objectlib->isValidObject($type, $objectId)) {
+                $objectId = $input->objectId->xss();
+                throw new Services_Exception(tr('Invalid %0 ID: %1', $type, $objectId), 403);
+            }
+            if (! $this->isEnabled($type, $objectId)) {
+                throw new Services_Exception(tr('Comments not allowed on this page.'), 403);
+            }
+            if (! $this->canView($type, $objectId)) {
+                throw new Services_Exception(tr('You do not have permission to view comments.'), 403);
+            }
+        } catch (Services_Exception $e) {
+            if ($access->is_xml_http_request()) {
+                http_response_code($e->getCode() ?: 403);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => 'error',
+                    'message' => $e->getMessage()
+                ]);
+                exit;
+            }
+            throw $e;
         }
 
         $commentslib = TikiLib::lib('comments');
