@@ -1,0 +1,75 @@
+---
+description: Single user entry in GET /users list responses.
+type: object
+required:
+  - userId
+  - login
+  - default_group
+  - lastLogin
+  - currentLogin
+  - registrationDate
+  - pass_confirm
+  - email_confirm
+  - created
+  - valid
+  - unsuccessful_logins
+  - waiting
+  - user
+  - groups
+  - age
+  - editable
+  - disposable_email
+  - avatar
+properties:
+  userId:
+    oneOf:
+      - type: integer
+      - type: string
+  login:
+    type: string
+  default_group:
+    type: string
+    nullable: true
+  lastLogin:
+    type: integer
+    nullable: true
+  currentLogin:
+    type: integer
+    nullable: true
+  registrationDate:
+    oneOf:
+      - type: integer
+      - type: string
+  pass_confirm:
+    type: integer
+    nullable: true
+  email_confirm:
+    type: integer
+    nullable: true
+  created:
+    oneOf:
+      - type: integer
+      - type: string
+  valid:
+    type: string
+    nullable: true
+  unsuccessful_logins:
+    type: integer
+  waiting:
+    type: string
+    nullable: true
+  user:
+    type: string
+  groups:
+    type: array
+  age:
+    oneOf:
+      - type: integer
+      - type: string
+  editable:
+    type: boolean
+  disposable_email:
+    type: boolean
+  avatar:
+    type: string
+    nullable: true

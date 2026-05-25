@@ -1,0 +1,14 @@
+---
+description: Response from PATCH /wiki/page/{page}.
+type: object
+required:
+  - status
+  - page
+  - updated_fields
+properties:
+  status:
+    type: string
+  page:
+    type: string
+  updated_fields:
+    type: array

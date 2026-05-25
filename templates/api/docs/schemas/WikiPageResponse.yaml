@@ -4,9 +4,40 @@ description: |
   responses (GET /wiki/page/{page}). Single-page responses additionally include
   baseName, prettyName, namespace and namespace_parts.
 type: object
+required:
+  - page_id
+  - pageName
+  - pageSlug
+  - hits
+  - data
+  - description
+  - lastModif
+  - comment
+  - version
+  - version_minor
+  - user
+  - ip
+  - flag
+  - points
+  - votes
+  - cache
+  - wiki_cache
+  - cache_timestamp
+  - pageRank
+  - creator
+  - lang
+  - lockedby
+  - is_html
+  - created
+  - wysiwyg
+  - wiki_authors_style
+  - comments_enabled
+  - keywords
 properties:
   page_id:
-    type: string
+    oneOf:
+      - type: integer
+      - type: string
     description: Page ID — numeric but may be returned as a string.
   pageName:
     type: string

@@ -1,0 +1,19 @@
+---
+description: Wiki page entry in GET /wiki list responses (includes perms, len, versions).
+allOf:
+  - $ref: schemas-WikiPageResponse.yaml
+  - type: object
+    properties:
+      perms:
+        type: object
+        nullable: true
+      len:
+        type: integer
+        nullable: true
+      versions:
+        type: integer
+        nullable: true
+    required:
+      - perms
+      - len
+      - versions

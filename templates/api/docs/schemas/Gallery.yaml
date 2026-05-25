@@ -12,7 +12,7 @@ properties:
     type: string
     nullable: true
   template:
-    type: integer
+    type: string
     nullable: true
   description:
     type: string

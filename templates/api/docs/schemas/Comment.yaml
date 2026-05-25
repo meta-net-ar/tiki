@@ -1,12 +1,49 @@
 ---
 type: object
+required:
+  - threadId
+  - object
+  - objectType
+  - parentId
+  - userName
+  - commentDate
+  - hits
+  - type
+  - points
+  - votes
+  - average
+  - title
+  - data
+  - email
+  - website
+  - user_ip
+  - summary
+  - smiley
+  - message_id
+  - in_reply_to
+  - comment_rating
+  - archived
+  - approved
+  - locked
+  - parsed
+  - user_posts
+  - user_level
+  - user_email
+  - attachments
+  - is_reported
+  - user_online
+  - user_exists
 properties:
   threadId:
-    type: integer
+    oneOf:
+      - type: integer
+      - type: string
     nullable: true
-    description: Comment thread ID. May be returned as a string in some contexts.
+    description: Comment thread ID. Returned as a string in some API contexts (e.g. POST /comments).
   object:
-    type: string
+    oneOf:
+      - type: string
+      - type: integer
     description: Object identifier the comment belongs to (page name for wiki pages, numeric ID for other types).
   objectType:
     type: string
@@ -107,14 +144,18 @@ properties:
   attachments:
     type: array
   is_reported:
-    type: integer
+    oneOf:
+      - type: integer
+      - type: boolean
     nullable: true
   user_online:
     type: string
     nullable: true
     description: "Tiki boolean: 'y', 'n', or null."
   user_exists:
-    type: integer
+    oneOf:
+      - type: integer
+      - type: boolean
     nullable: true
   can_edit:
     type: boolean

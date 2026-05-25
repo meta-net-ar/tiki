@@ -1,0 +1,158 @@
+---
+description: A comment as returned in a list response. Includes all base comment fields plus list-only fields (grandFather, can_edit, replies_info, replies_flat).
+type: object
+required:
+  - threadId
+  - object
+  - objectType
+  - parentId
+  - userName
+  - commentDate
+  - hits
+  - type
+  - points
+  - votes
+  - average
+  - title
+  - data
+  - email
+  - website
+  - user_ip
+  - summary
+  - smiley
+  - message_id
+  - in_reply_to
+  - comment_rating
+  - archived
+  - approved
+  - locked
+  - parsed
+  - user_posts
+  - user_level
+  - user_email
+  - attachments
+  - is_reported
+  - user_online
+  - user_exists
+  - grandFather
+  - can_edit
+  - replies_info
+  - replies_flat
+properties:
+  threadId:
+    oneOf:
+      - type: integer
+      - type: string
+    nullable: true
+  object:
+    oneOf:
+      - type: string
+      - type: integer
+  objectType:
+    type: string
+  parentId:
+    type: integer
+    nullable: true
+  userName:
+    type: string
+    nullable: true
+  commentDate:
+    type: integer
+  hits:
+    type: integer
+  type:
+    type: string
+  points:
+    type: number
+    nullable: true
+  votes:
+    type: integer
+  average:
+    type: number
+    nullable: true
+  title:
+    type: string
+    nullable: true
+  data:
+    type: string
+    nullable: true
+  email:
+    type: string
+    nullable: true
+  website:
+    type: string
+    nullable: true
+  user_ip:
+    type: string
+    nullable: true
+  summary:
+    type: string
+    nullable: true
+  smiley:
+    type: string
+    nullable: true
+  message_id:
+    type: string
+    nullable: true
+  in_reply_to:
+    type: string
+    nullable: true
+  comment_rating:
+    type: integer
+    nullable: true
+  archived:
+    type: string
+    nullable: true
+  approved:
+    type: string
+    nullable: true
+  locked:
+    type: string
+    nullable: true
+  parsed:
+    type: string
+    nullable: true
+  user_posts:
+    type: integer
+    nullable: true
+  user_level:
+    type: integer
+    nullable: true
+  user_email:
+    type: string
+    nullable: true
+  attachments:
+    type: array
+  is_reported:
+    oneOf:
+      - type: integer
+      - type: boolean
+    nullable: true
+  user_online:
+    type: string
+    nullable: true
+  user_exists:
+    oneOf:
+      - type: integer
+      - type: boolean
+    nullable: true
+  grandFather:
+    type: integer
+    nullable: true
+  can_edit:
+    type: boolean
+  replies_info:
+    type: object
+    properties:
+      replies:
+        type: array
+        items:
+          $ref: schemas-Comment.yaml
+      numReplies:
+        type: integer
+      totalReplies:
+        type: integer
+  replies_flat:
+    type: array
+    items:
+      $ref: schemas-Comment.yaml
