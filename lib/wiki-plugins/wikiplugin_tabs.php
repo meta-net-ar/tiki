@@ -99,7 +99,7 @@ function wikiplugin_tabs_info()
                 'description' => tra(
                     'Determine the kind of border to apply to the tabs'
                 ),
-                'default'     => 'none',
+                'default'     => '',
                 'filter'      => 'text',
                 'since'       => '25.0',
                 'options' => [
