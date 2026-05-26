@@ -265,6 +265,8 @@ if (isset($_SERVER["REQUEST_URI"]) && strstr($_SERVER['REQUEST_URI'], 'tiki-real
         if (! empty($_REQUEST['embed'])) {
             $session_params['secure'] = true;
             $session_params['samesite'] = 'None';
+        } else {
+            $session_params['samesite'] = 'Lax';
         }
         session_set_cookie_params([
             'lifetime' => $session_params['lifetime'],
