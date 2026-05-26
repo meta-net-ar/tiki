@@ -644,8 +644,11 @@ if ($prefs['feature_jquery_zoom'] === 'y') {
 // Therefore, we load these CSS files during setup (tiki-setup.php / early stage)
 // to ensure they are present in the <head> before any rendering occurs.
 if ($prefs['feature_syntax_highlighter'] == 'y') {
-    $headerlib->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
+    $headerlib
+        ->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
         ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css');
+    require_once("lib/codemirror_tiki/tiki_codemirror.php");
+    addCodemirrorModesCss();
 }
 if ($prefs['feature_ajax'] === 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-confirm.js');

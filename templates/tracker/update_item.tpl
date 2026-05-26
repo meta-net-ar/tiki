@@ -66,7 +66,7 @@
                         {tr}Add a comment{/tr}
                     </label>
                 </div>
-                <div class="comment-form d-none">
+                <div class="comment-form">
                     {include file="comment/post_form_content.tpl" type='trackeritem' objectId=$itemId data='' title=$commentTitle}
                 </div>
             {/if}
@@ -98,6 +98,8 @@
             $(".modal.fade.show").one("hide.bs.modal", function () {window.needToConfirm=false;});
 
             {* Disable the comment editor textarea, so it doesn't interfere with form validation when it's hidden *}
+            {* Hide the comment form only after page load, so CodeMirror can first initialize against a visible container*}
+            $(".comment-form").addClass("d-none");
             $(".comment-form").find("textarea").prop("disabled", true);
             $("#add-comment").on("change", function() {
                 if ($(this).is(":checked")) {
