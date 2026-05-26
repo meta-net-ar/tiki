@@ -331,6 +331,9 @@ $("body").on("change", "input[name=\'' . $filterFieldHereName . '\'], select[nam
                     });
                 }
             }
+                
+            // tell the document we are ready
+            $(document).trigger("ready.dynamic_list", [$ddl]);
 
             $ddl.trigger("change");
             $ddl.parent().tikiModal();
