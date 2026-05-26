@@ -175,7 +175,7 @@ if (
                 // this is slave intertiki site
                 $response_value = $rpcauth->value();
                 $avatarData = '';
-                if ($rpcauth->valueType() == 'xmlrpcvals') {
+                if (method_exists($rpcauth, 'valueType') && $rpcauth->valueType() == 'xmlrpcvals') {
                     if ($response_value->kindOf() == 'struct') {
                         foreach ($response_value as $key => $value) {
                             if ($key == '') {
@@ -189,6 +189,19 @@ if (
                     } else {
                         $user_details = json_decode($response_value->scalarval(), true);
                     }
+                } elseif ($response_value->kindOf() == 'struct') {
+                    for (;;) {
+                        list($key, $value) = $response_value->structeach();
+                        if ($key == '') {
+                            break;
+                        } elseif ($key == 'user_details') {
+                            $user_details = json_decode($value->scalarval(), true);
+                        } elseif ($key == 'avatarData') {
+                            $avatarData = $value->scalarval();
+                        }
+                    }
+                } else {
+                    $user_details = json_decode($response_value->scalarval(), true);
                 }
                 $requestedUser = $user_details['info']['login']; // use the correct capitalization
                 if (! $userlib->user_exists($requestedUser)) {
