@@ -1193,7 +1193,12 @@ class TikiAccessLib extends TikiLib
      * @param int $code         HTTP code
      * @param string $msgtype   Type of message which determines styling (e.g., success, error, warning, etc.)
      */
-    public function redirect($url = '', $msg = '', $code = 302, $msgtype = '')
+    /**
+     * @param bool $allowExternal  Pass true only when the URL originates from a trusted source
+     *                             (admin-configured preference, inter-tiki setup, OAuth flow, etc.).
+     *                             Never pass true for URLs that are user-supplied at request time.
+     */
+    public function redirect($url = '', $msg = '', $code = 302, $msgtype = '', bool $allowExternal = false)
     {
         global $prefs;
 
@@ -1201,7 +1206,23 @@ class TikiAccessLib extends TikiLib
             return;
         }
 
-        // TODO: Validate URL
+        // Validate URL: reject absolute URLs pointing to a different host to prevent open redirects.
+        // $allowExternal must be explicitly set to true by callers that have already validated or
+        // trust the URL source (e.g. admin prefs, inter-tiki, OAuth). User-supplied URLs must
+        // always go through this check.
+        if (! $allowExternal && $url !== '') {
+            $parsed = parse_url($url);
+            if (! empty($parsed['host'])) {
+                $allowedHost = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+                // Strip port from allowed host for comparison
+                $allowedHost = strtolower(explode(':', $allowedHost)[0]);
+                $targetHost  = strtolower($parsed['host']);
+                if ($targetHost !== $allowedHost) {
+                    // Off-site redirect — fall back to the configured home page
+                    $url = $prefs['tikiIndex'];
+                }
+            }
+        }
         if ($url == '') {
             $url = $prefs['tikiIndex'];
         }

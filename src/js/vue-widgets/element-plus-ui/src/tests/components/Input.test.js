@@ -6,7 +6,7 @@ import { h } from "vue";
 
 vi.mock("element-plus", () => {
     return {
-        ElInput: vi.fn((props) => h("div", props)),
+        ElInput: vi.fn((props, ctx) => h("div", props)),
     };
 });
 
@@ -50,7 +50,7 @@ describe("Input", () => {
                 clearable: false,
                 autocomplete: "on",
             }),
-            null
+            expect.any(Object)
         );
         expect(givenProps._expose).toHaveBeenCalledWith({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
     });
@@ -81,7 +81,7 @@ describe("Input", () => {
                 clearable: true,
                 autocomplete: givenProps.autocomplete,
             }),
-            null
+            expect.any(Object)
         );
 
         // Should correctly rerender the the value prop changes
@@ -94,7 +94,7 @@ describe("Input", () => {
             expect.objectContaining({
                 modelValue: "bar",
             }),
-            null
+            expect.any(Object)
         );
         expect(givenProps._expose).toHaveBeenCalledWith({ value: expect.objectContaining({ _value: "bar", __v_isRef: true }) });
     });
@@ -109,17 +109,13 @@ describe("Input", () => {
                 _emit: vi.fn(),
             };
 
-            ElInput = {
-                emits: ["input", "change"],
-                setup(_, { emit }) {
-                    return () =>
-                        h("input", {
-                            "data-testid": DATA_TEST_ID.INPUT,
-                            onInput: () => emit("input", "bar"),
-                            onChange: () => emit("change", "bar"),
-                        });
-                },
-            };
+            vi.mocked(ElInput).mockImplementationOnce((_, ctx) =>
+                h("input", {
+                    "data-testid": DATA_TEST_ID.INPUT,
+                    onInput: () => ctx.emit("input", "bar"),
+                    onChange: () => ctx.emit("change", "bar"),
+                })
+            );
 
             render(Input, { props: givenProps });
 

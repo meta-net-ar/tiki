@@ -19,7 +19,7 @@
                         <h6>{tr}Enabled Hybridauth social networks{/tr}</h6>
                         {foreach $prefs["`$socPrefix`enabledProviders"] as $k => $pNum}
                             {$providerName = $socnetsAll[$pNum]}
-                            {$prefname="`$socPrefix``$providerName`_socnetEnabled" }
+                            {$prefname="`$socPrefix``$providerName`_socnetEnabled"}
                             {$prefs[$prefname] = 'y'}
                             <strong><li style="font-size: 15px;">{$providerName}</li></strong>
                         {/foreach}
@@ -70,7 +70,7 @@
                                     {if ($basePref === '_socnetEnabled')}
                                         {* skip this iteration *}
                                         {continue}
-                                    {elseif ($basePref === '_loginEnabled') }
+                                    {elseif ($basePref === '_loginEnabled')}
                                         <div class="col-sm-12 {$providername} _loginEnabled" style="padding-top:5px;">
                                             {preference name=$prefname}
                                             <button class="{$providername} socbutton btn btn-secondary dropdown-toggle"

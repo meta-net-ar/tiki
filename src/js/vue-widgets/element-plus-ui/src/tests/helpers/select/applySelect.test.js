@@ -1,10 +1,14 @@
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test } from "vitest";
 import $ from "jquery";
 import { attachChangeEventHandler, observeSelectElementMutations } from "../../../helpers/select/applySelect";
 
 describe("applySelect helper functions", () => {
     beforeEach(() => {
         window.$ = $;
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = "";
     });
 
     test.each([
@@ -24,12 +28,12 @@ describe("applySelect helper functions", () => {
 
             observeSelectElementMutations(givenSelect, givenElementPlusUi);
 
-            await window.happyDOM.waitUntilComplete();
+            await new Promise((resolve) => setTimeout(resolve, 0));
 
             expect(givenElementPlusUi.getAttribute(elementPlusAttribute)).toBeNull();
 
             givenSelect.setAttribute(selectAttribute, attributeValue);
-            await window.happyDOM.waitUntilComplete();
+            await new Promise((resolve) => setTimeout(resolve, 0));
 
             expect(givenElementPlusUi.getAttribute(elementPlusAttribute)).toBe(expectedValue);
         }
@@ -47,7 +51,7 @@ describe("applySelect helper functions", () => {
         selectOption.value = "foo";
         givenSelect.appendChild(selectOption);
 
-        await window.happyDOM.waitUntilComplete();
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         expect(JSON.parse(givenElementPlusUi.getAttribute("options"))).toEqual([
             { value: "", label: "", disabled: false },
@@ -70,7 +74,7 @@ describe("applySelect helper functions", () => {
         selectOptGroup.appendChild(selectOption);
         givenSelect.appendChild(selectOptGroup);
 
-        await window.happyDOM.waitUntilComplete();
+        await new Promise((resolve) => setTimeout(resolve, 0));
 
         expect(givenElementPlusUi.getAttribute("group")).toBe("true");
     });
@@ -101,7 +105,7 @@ describe("applySelect helper functions", () => {
             const selectChangeEvent = $.Event("select-change", { detail: [{ value }] });
             $(givenElementPlusUi).trigger(selectChangeEvent);
 
-            await window.happyDOM.waitUntilComplete();
+            await new Promise((resolve) => setTimeout(resolve, 0));
 
             const actualValue = [];
             for (let i = 0; i < givenSelect.selectedOptions.length; i++) {
@@ -130,7 +134,7 @@ describe("applySelect helper functions", () => {
             const selectChangeEvent = $.Event("select-change", { detail: [{ value: updatedValue }] });
             $(givenElementPlusUi).trigger(selectChangeEvent);
 
-            await window.happyDOM.waitUntilComplete();
+            await new Promise((resolve) => setTimeout(resolve, 0));
 
             if (multiple) {
                 const actualValue = [];

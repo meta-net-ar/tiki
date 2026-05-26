@@ -717,7 +717,7 @@ setInterval(function() {
     {/if}
 
     <p>
-        {tr _0='<a href="http://www.php.net/manual/en/configuration.php" class="alert-link">http://www.php.net/manual/en/configuration.php</a>' }You can check the full documentation on how to change the configurations values in %0{/tr}
+        {tr _0='<a href="http://www.php.net/manual/en/configuration.php" class="alert-link">http://www.php.net/manual/en/configuration.php</a>'}You can check the full documentation on how to change the configurations values in %0{/tr}
     </p>
 {/remarksbox}
 

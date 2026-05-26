@@ -35,7 +35,7 @@
             {section loop=$structure_path name=ix}
                 <li class="breadcrumb-item pe-2">
 
-                    {if !empty($smarty.section.ix.last) }
+                    {if !empty($smarty.section.ix.last)}
 
                         {if $structure_path[ix].page_alias}
                             {$structure_path[ix].page_alias|escape}

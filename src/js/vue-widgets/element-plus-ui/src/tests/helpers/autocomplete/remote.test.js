@@ -36,7 +36,7 @@ describe("Autocomplete remote helper functions", () => {
 
                 fetchSuggestions(query, callback, sourceRemoteUrl, sourceList);
 
-                await window.happyDOM.waitUntilComplete();
+                await new Promise((resolve) => setTimeout(resolve, 0));
 
                 expect(callback).toHaveBeenCalledWith(expectedCallbackArg);
             }

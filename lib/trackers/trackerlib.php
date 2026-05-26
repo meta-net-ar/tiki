@@ -6390,6 +6390,24 @@ class TrackerLib extends TikiLib
         }
     }
 
+    public function updateTikiObject($args)
+    {
+        $itemId = $args['object'];
+        $item = $this->get_tracker_item($itemId);
+        if (! $item) {
+            return;
+        }
+
+        $objectlib = TikiLib::lib('object');
+        if (! $objectlib->get_object_id('trackeritem', $itemId)) {
+            return;
+        }
+
+        $name = $this->get_isMain_value(null, $itemId);
+        $href = "tiki-view_tracker_item.php?itemId=$itemId&trackerId=" . $item['trackerId'];
+        $objectlib->add_object('trackeritem', $itemId, false, '', $name, $href);
+    }
+
     public function update_create_missing_pages($args)
     {
         global $user;
@@ -6550,8 +6568,12 @@ class TrackerLib extends TikiLib
                 } else {
                     $requestData = $field;
                 }
-                $linkedField = $handler->getFieldData($requestData);
-                $field = array_merge($field, $linkedField);
+                try {
+                    $linkedField = $handler->getFieldData($requestData);
+                    $field = array_merge($field, $linkedField);
+                } catch (Exception $e) {
+                    Feedback::error(tr('Error on linked field %0: %1', $field['fieldId'], $e->getMessage()));
+                }
                 $field['ins_id'] = 'ins_' . $field['fieldId'];
                 if (isset($field['value']) && $field['type'] == 'S') {
                     $item[$field['fieldId']] = $field['value'];

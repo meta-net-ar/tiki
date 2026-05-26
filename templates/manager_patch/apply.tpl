@@ -13,7 +13,7 @@
     <div class="rounded bg-dark text-light p-3">{$info|nl2br}</div>
     <a href="{service controller=manager_patch action=index instanceId=$instanceId}" class="btn btn-primary mt-3 float-end">{tr}List patches{/tr}</a>
 {else}
-    <form method="post" action="{service controller=manager_patch action=apply }" class="ajax-reuse-modal">
+    <form method="post" action="{service controller=manager_patch action=apply}" class="ajax-reuse-modal">
         <input type="hidden" name="instanceId" value="{$instance->id}">
         {foreach item=option from=$options}
             <div class="tiki-form-group row p-2">

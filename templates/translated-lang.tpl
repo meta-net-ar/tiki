@@ -3,7 +3,7 @@
 {strip}
 {if empty($submenu) || $submenu neq 'y'}
     <div class="btn-group">
-        {if $prefs.lang_available_translations_dropdown neq 'y' }
+        {if $prefs.lang_available_translations_dropdown neq 'y'}
             {* For all object types: First show the translate icon and on hover the language of the current object *}
             {if ! $js}<ul><li>{/if}
             <a href="#" class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" title="{tr}Translations{/tr}" role="button">
@@ -123,7 +123,7 @@
     {/if}
     {if ! $js}</li></ul>{/if}
 {if empty($submenu) || $submenu neq 'y'}
-    {if $prefs.lang_available_translations_dropdown eq 'y' }
+    {if $prefs.lang_available_translations_dropdown eq 'y'}
         </div>
     {/if}
     </div>

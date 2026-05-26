@@ -589,6 +589,18 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         if (! is_array($calendarId)) {
             throw new \InvalidArgumentException('The value passed to $calendarId is expected to be an array with a calendarId and an instanceId');
         }
+
+        // changing calendars makes caldav server not able to find the event, so it
+        // tries to recreate it (thus duplicate). Detect this here and force update.
+        try {
+            $existing = $this->mapCalendarObjectUriToItem($objectUri);
+            if ($existing) {
+                return $this->updateCalendarObject($calendarId, $objectUri, $calendarData);
+            }
+        } catch (DAV\Exception\NotFound $e) {
+            // URI doesn't map to any existing item => proceed with creation
+        }
+
         list($calendarId, $instanceId) = $calendarId;
 
         $this->ensureCalendarAccess($calendarId, $instanceId, null, 'add_events', 'write');

@@ -423,7 +423,7 @@
         </tbody>
     </table>
 </div>
-{if isset($ts.enabled) }
+{if isset($ts.enabled)}
     <script>
         // Otherwise, All pages are displayed, whatever was searched for
         var myfilter='{$find|escape:javascript}';

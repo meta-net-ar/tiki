@@ -11,38 +11,28 @@ use TikiDb;
 class BruteForce
 {
     private $bruteForceTable;
+    private $db;
 
     public function __construct()
     {
+        $this->db = TikiDb::get();
         $this->bruteForceTable = TikiDb::get()->table('tiki_bruteforce_attempts');
     }
 
     public function attempt($operation, $properties)
     {
+        $properties = $this->normalizeProperties($properties);
+
         foreach ($properties as $key => $value) {
             $propertyJson = json_encode([$key => $value]);
             $propertyHash = hash('sha256', $propertyJson);
 
-            $keys = [
-                'operation' => $operation,
-                'properties_hash' => $propertyHash,
-            ];
-
-            $data = [
-                'operation' => $operation,
-                'properties' => $propertyJson,
-                'properties_hash' => $propertyHash,
-                'attempt_time' => time()
-            ];
-
-            $existingRecord = $this->bruteForceTable->fetchRow(['attempt_count'], $keys);
-            if ($existingRecord) {
-                $data['attempt_count'] = $existingRecord['attempt_count'] + 1;
-                $this->bruteForceTable->update($data, $keys);
-            } else {
-                $data['attempt_count'] = 1;
-                $this->bruteForceTable->insert($data);
-            }
+            $this->db->queryException(
+                'INSERT INTO `tiki_bruteforce_attempts` (`operation`, `properties`, `properties_hash`, `attempt_time`, `attempt_count`)'
+                . ' VALUES (?, ?, ?, ?, 1)'
+                . ' ON DUPLICATE KEY UPDATE `properties` = VALUES(`properties`), `attempt_time` = VALUES(`attempt_time`), `attempt_count` = `attempt_count` + 1',
+                [$operation, $propertyJson, $propertyHash, time()]
+            );
         }
     }
 
@@ -50,6 +40,7 @@ class BruteForce
     {
         global $prefs;
 
+        $properties = $this->normalizeProperties($properties);
         $maxAttemptCount = 0;
         $latestAttemptTime = 0;
         $currentTime = time();
@@ -97,6 +88,7 @@ class BruteForce
 
     public function isOperationAllowed($operation, $properties, $registerAttempt = true)
     {
+        $properties = $this->normalizeProperties($properties);
         $info = $this->getAttemptInfo($operation, $properties);
         $nextAllowedTime = $this->calculateNextAllowedTime($info['maxAttemptCount'], $info['latestAttemptTime']);
 
@@ -119,8 +111,15 @@ class BruteForce
         return $this->calculateNextAllowedTime($info['maxAttemptCount'], $info['latestAttemptTime']);
     }
 
+    public function getWaitTime($operation, $properties)
+    {
+        return max(0, $this->getNextAllowedTime($operation, $properties) - time());
+    }
+
     public function success($operation, $properties)
     {
+        $properties = $this->normalizeProperties($properties);
+
         foreach ($properties as $key => $value) {
             $propertyJson = json_encode([$key => $value]);
             $propertyHash = hash('sha256', $propertyJson);
@@ -132,5 +131,15 @@ class BruteForce
 
             $this->bruteForceTable->deleteMultiple($keys);
         }
+    }
+
+    private function normalizeProperties($properties)
+    {
+        return array_filter(
+            $properties,
+            function ($value) {
+                return $value !== null && $value !== false && $value !== '';
+            }
+        );
     }
 }

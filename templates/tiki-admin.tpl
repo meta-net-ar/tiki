@@ -105,7 +105,7 @@
                 {/remarksbox}
             {/if}
 
-            {if ! empty($scheduler_failure_logs) }
+            {if ! empty($scheduler_failure_logs)}
                 {remarksbox type="error" title="{tr}Scheduler tasks failure logs{/tr}"}
                     <p>
                     {if ! empty($prefs.scheduledTasksReport) && $prefs.scheduledTasksReport === 'last_number_of_hours'}

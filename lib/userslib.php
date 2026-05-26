@@ -8450,7 +8450,7 @@ class UsersLib extends TikiLib
         $user_details = $userlib->get_user_details($user);
         $user_info = $userlib->get_user_info($user);
         $ret['avatarData'] = new XML_RPC_Value($user_info['avatarData'], 'base64');
-        $ret['user_details'] = new XML_RPC_Value(serialize($user_details), 'string');
+        $ret['user_details'] = new XML_RPC_Value(json_encode($user_details), 'string');
         $params[] = new XML_RPC_Value($ret, 'struct');
         $msg = new XML_RPC_Message('intertiki.setUserInfo', $params);
         $result = $client->send($msg);
@@ -8469,13 +8469,13 @@ class UsersLib extends TikiLib
                 if ($key == '') {
                     break;
                 } elseif ($key == 'user_details') {
-                    $user_details = unserialize($value->scalarval());
+                    $user_details = json_decode($value->scalarval(), true);
                 } elseif ($key == 'avatarData') {
                     $avatarData = $value->scalarval();
                 }
             }
         } else {
-            $user_details = unserialize($response_value->scalarval());
+            $user_details = json_decode($response_value->scalarval(), true);
         }
 
         $userlib->set_user_fields($user_details['info']);

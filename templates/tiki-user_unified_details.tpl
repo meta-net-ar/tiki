@@ -1,4 +1,4 @@
-{if "$userwatch" eq "$user" }
+{if "$userwatch" eq "$user"}
     {include file='tiki-mytiki_bar.tpl'}
 {/if}
 {if $infoPublic eq 'y' || true}
