@@ -49,7 +49,7 @@ function wikiplugin_html_info()
                 'name' => tra('Purify HTML'),
                 'description' => tra('Purify the HTML code.'),
                 'since' => '30',
-                'default' => 'n',
+                'default' => 'y',
                 'options' => [
                     ['text' => tra('No'), 'value' => 'n'],
                     ['text' => tra('Yes'), 'value' => 'y']
@@ -71,11 +71,11 @@ function wikiplugin_html($data, $params)
         $html  = html_entity_decode($html, ENT_NOQUOTES, 'UTF-8');
     }
     // exit($html);
-    // Purify $html before serving it
-    if (isset($params['purify']) && $params['purify'] == 'y') {
-        $html = TikiFilter::get('html')->filter($html);
-    } else {
+    if (isset($params['purify']) && $params['purify'] === 'n') {
         Feedback::warning(tr('HTML purification is off. Submitted HTML may cause XSS, bad links, or broken layout. Enable it by setting purify=\'y\' in PluginHtml.'));
+    } else {
+        // Purify $html unless explicitly disabled
+        $html = TikiFilter::get('html')->filter($html);
     }
 
     if ($params['tohead'] == 1) {
