@@ -30,7 +30,7 @@ class Services_Comment_Controller
             $objectId = $input->objectId->digits();
         }
 
-        if ($objectId !== $input->objectId->none() || ! $this->isValidObject($type, $objectId)) {
+        if ($objectId != $input->objectId->none() || ! $this->isValidObject($type, $objectId)) {
             $objectId = $input->objectId->xss();
             throw new Services_Exception(tr('Invalid %0 ID: %1', $type, $objectId), 403);
         }
