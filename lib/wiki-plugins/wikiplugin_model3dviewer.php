@@ -313,7 +313,8 @@ function resolve_model3dviewer_src($params, $absolute_links = false, $filename =
     if (! empty($params['fileId'])) {
         $src = smarty_modifier_sefurl($params['fileId'], 'file');
         $src = TikiLib::tikiUrl($src);
-        $src = $src . '&display&filename=' . $filename;
+        $separator = str_contains($src, '?') ? '&' : '?';
+        $src .= $separator . 'filename=' . rawurlencode($filename);
     } elseif (! empty($params['src'])) {
         $src = trim($params['src']);
         $src = str_replace(' ', '', $src);
