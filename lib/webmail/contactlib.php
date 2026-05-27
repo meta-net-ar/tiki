@@ -134,10 +134,10 @@ class ContactLib extends TikiLib
                 $res = $this->query(
                     $query,
                     [
-                        $contact['firstName'] ?? '',
-                        $contact['lastName'] ?? '',
-                        $contact['email'] ?? '',
-                        $contact['nickname'] ?? '',
+                        $contact['firstName'] ?? null,
+                        $contact['lastName'] ?? null,
+                        $contact['email'] ?? null,
+                        $contact['nickname'] ?? null,
                         $user,
                     ]
                 );
