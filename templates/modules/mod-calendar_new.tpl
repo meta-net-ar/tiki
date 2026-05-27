@@ -10,6 +10,7 @@
             </p>
         {/if}
         {if $viewlist eq 'list'}
+            {include file='tiki-calendar_nav.tpl' module='y'}
             {include file='tiki-calendar_listmode.tpl'}
         {else}
             <div>
