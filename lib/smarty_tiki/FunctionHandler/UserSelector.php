@@ -57,7 +57,9 @@ class UserSelector extends Base
             'noneLabel' => 'None',
             'realnames' => 'y',
             'class' => 'form-control',
-            'lazyload' => 'false'
+            'lazyload' => 'false',
+            'noneSelectable' => 'y',
+            'exclude' => '',
         ];
 
         $params = array_merge($defaults, $params);
@@ -154,6 +156,14 @@ class UserSelector extends Base
             }
         }
 
+        if (! empty($params['exclude'])) {
+            $excludeUsers = is_array($params['exclude']) ? $params['exclude'] : explode(',', $params['exclude']);
+            $excludeUsers = array_map('trim', $excludeUsers);
+            foreach ($excludeUsers as $excludeUser) {
+                unset($users[$excludeUser]);
+            }
+        }
+
         if ($params['realnames'] === 'y') {
             $dupes = [];
             foreach (array_count_values($users) as $usr => $c) {
@@ -192,7 +202,12 @@ class UserSelector extends Base
 
         $ret .= '<select name="' . $params['name'] . '" id="' . $params['id'] . '"' . $sz . $ed . $mt . ' style="' . $params['style'] . '" class="form-control">';
         if ($params['allowNone'] === 'y') {
-            $ret .= '<option value=""' . (empty($params['user']) ? ' selected="selected"' : '') . ' >' . tra($params['noneLabel']) . '</option>';
+            $noneOptionAttributes = (empty($params['user']) ? ' selected="selected"' : '');
+            if ($params['multiple'] !== 'true' && $params['noneSelectable'] !== 'y') {
+                $noneOptionAttributes .= ' disabled="disabled" hidden';
+            }
+
+            $ret .= '<option value=""' . $noneOptionAttributes . ' >' . tra($params['noneLabel']) . '</option>';
         }
         foreach ($users as $usr => $usersname) {
             $selected = isset($params['select']) && ($params['select'] === $usr || (is_array($params['select']) && in_array($usr, $params['select'])));
