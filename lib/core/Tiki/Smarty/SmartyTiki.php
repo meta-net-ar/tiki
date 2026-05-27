@@ -19,6 +19,7 @@ use Smarty\Variable;
 use Smarty_Resource_Tplwiki;
 use Smarty_Resource_Wiki;
 use SmartyTiki\Extension\SmartyTikiExtension;
+use SmartyTiki\FunctionHandler\VarDump;
 use Tiki\Sections;
 use TikiLib;
 
@@ -78,8 +79,8 @@ class SmartyTiki extends Smarty
         if (! isset($prefs['smarty_compilation'])) {
             $prefs['smarty_compilation'] = '';
         }
-        $this->compile_check = ( $prefs['smarty_compilation'] != 'never' );
-        $this->force_compile = ( $prefs['smarty_compilation'] == 'always' );
+        $this->compile_check = ($prefs['smarty_compilation'] != 'never');
+        $this->force_compile = ($prefs['smarty_compilation'] == 'always');
         $this->assign('app_name', 'Tiki');
 
         // DO NOT USE THIS, this has been added 2023-06-14 for backward compatibility with existing custom mail templates and will be removed in future versions
@@ -125,8 +126,8 @@ class SmartyTiki extends Smarty
         $smarty_orig_values = [];
         if (is_array($override_vars)) {
             foreach ($override_vars as $k => $v) {
-                $smarty_orig_values[ $k ] = $this->getTemplateVars($k);
-                $this->assign($k, $override_vars[ $k ]);
+                $smarty_orig_values[$k] = $this->getTemplateVars($k);
+                $this->assign($k, $override_vars[$k]);
             }
         }
 
@@ -135,7 +136,7 @@ class SmartyTiki extends Smarty
         // Restore original values of smarty variables
         if (count($smarty_orig_values) > 0) {
             foreach ($smarty_orig_values as $k => $v) {
-                $this->assign($k, $smarty_orig_values[ $k ]);
+                $this->assign($k, $smarty_orig_values[$k]);
             }
         }
 
@@ -353,12 +354,12 @@ class SmartyTiki extends Smarty
             }
 
             if ($frame == 'y') {
-                    $header_value = $prefs['http_header_frame_options_value'];
-                    header('X-Frame-Options: ' . $header_value);
+                $header_value = $prefs['http_header_frame_options_value'];
+                header('X-Frame-Options: ' . $header_value);
             }
             if ($xss == 'y') {
-                    $header_value = $prefs['http_header_xss_protection_value'];
-                    header('X-XSS-Protection: ' . $header_value);
+                $header_value = $prefs['http_header_xss_protection_value'];
+                header('X-XSS-Protection: ' . $header_value);
             }
             if ($content_type_options == 'y') {
                 header('X-Content-Type-Options: nosniff');
@@ -513,7 +514,7 @@ class SmartyTiki extends Smarty
     {
         global $prefs;
 
-        if (($tpl = $this->getTemplateVars('mid')) && ( $_smarty_tpl_file == 'tiki.tpl' || $_smarty_tpl_file == 'tiki-print.tpl' || $_smarty_tpl_file == 'tiki_full.tpl' )) {
+        if (($tpl = $this->getTemplateVars('mid')) && ($_smarty_tpl_file == 'tiki.tpl' || $_smarty_tpl_file == 'tiki-print.tpl' || $_smarty_tpl_file == 'tiki_full.tpl')) {
             // Set the last mid template to be used by AJAX to simulate a 'BACK' action
             if (isset($_SESSION['last_mid_template'])) {
                 $this->assign('last_mid_template', $_SESSION['last_mid_template']);
@@ -552,7 +553,7 @@ class SmartyTiki extends Smarty
             if ($_smarty_tpl_file == 'tiki-print.tpl') {
                 $this->assign('print_page', 'y');
             }
-            $data = $this->fetch($tpl, $_smarty_cache_id, $_smarty_compile_id, $parent);//must get the mid because the modules can overwrite smarty variables
+            $data = $this->fetch($tpl, $_smarty_cache_id, $_smarty_compile_id, $parent); //must get the mid because the modules can overwrite smarty variables
 
             $this->assign('mid_data', $data);
         } elseif ($_smarty_tpl_file == 'confirm.tpl' || $_smarty_tpl_file == 'error.tpl' || $_smarty_tpl_file == 'error_ticket.tpl' || $_smarty_tpl_file == 'error_simple.tpl') {
@@ -636,8 +637,8 @@ class SmartyTiki extends Smarty
      */
     public function set_request_overriders($url_arguments_prefix, $arguments_list)
     {
-        $this->url_overriding_prefix_stack[] = [ $url_arguments_prefix . '-', $arguments_list ];
-        $this->url_overriding_prefix =& $this->url_overriding_prefix_stack[ count($this->url_overriding_prefix_stack) - 1 ];
+        $this->url_overriding_prefix_stack[] = [$url_arguments_prefix . '-', $arguments_list];
+        $this->url_overriding_prefix = &$this->url_overriding_prefix_stack[count($this->url_overriding_prefix_stack) - 1];
     }
 
     /**
@@ -651,8 +652,9 @@ class SmartyTiki extends Smarty
         if (! is_array($last_override_prefix) || $url_arguments_prefix . '-' != $last_override_prefix[0]) {
             throw new Exception('URL Overriding prefix stack is in a bad state');
         }
-        $this->url_overriding_prefix =& $this->url_overriding_prefix_stack[ count($this->url_overriding_prefix_stack) - 1 ];
-        ;
+        $this->url_overriding_prefix = &$this->url_overriding_prefix_stack[
+            count($this->url_overriding_prefix_stack) - 1
+        ];
     }
 
     public function refreshLanguage()
@@ -703,21 +705,21 @@ class SmartyTiki extends Smarty
     }
 
     /**
-        * Add smarty template paths from where tpl files should be loaded. This function also gets called from lib/setup/theme.php to initialize theme specific paths.  It's dependent on
+     * Add smarty template paths from where tpl files should be loaded. This function also gets called from lib/setup/theme.php to initialize theme specific paths.  It's dependent on
 
-        * $prefs['theme'], $prefs['theme_option'], $prefs['site_layout'], $prefs['site_layout_admin']
+     * $prefs['theme'], $prefs['theme_option'], $prefs['site_layout'], $prefs['site_layout_admin']
 
-        * The load order for main templates is
-        * - theme_option path
-        * - theme path
-        * - themes/templates/
-        * - tikidomain path
-        * - tiki extension modules templates/
-        * - templates/ (at project root)
+     * The load order for main templates is
+     * - theme_option path
+     * - theme path
+     * - themes/templates/
+     * - tikidomain path
+     * - tiki extension modules templates/
+     * - templates/ (at project root)
 
 
-        * The effective template will be the one present in the last directory loaded.
-    */
+     * The effective template will be the one present in the last directory loaded.
+     */
     public function initializePaths(): void
     {
         global $prefs, $tikidomainslash;
@@ -780,7 +782,7 @@ class SmartyTiki extends Smarty
         $this->addTemplateDir($this->main_template_dir);
 
         // webservices create temporary templates
-        if (($prefs['feature_webservices'] ?? 'n') === 'y') {
+        if (isset($prefs['feature_webservices']) && $prefs['feature_webservices'] === 'y') {
             $this->addTemplateDir(realpath(TEMP_CACHE_PATH));
         }
 
@@ -823,7 +825,7 @@ class SmartyTiki extends Smarty
     {
         global $tikilib;
 
-        $perms = Perms::get([ 'type' => 'wiki page', 'object' => $page ]);
+        $perms = Perms::get(['type' => 'wiki page', 'object' => $page]);
         if (! $perms->use_as_template) {
             $tpl_source = tra('Permission denied: the specified wiki page cannot be used as Smarty template resource') . '<br />';
             // TODO: do not cache ! and return the message only once should be enough...
@@ -862,23 +864,23 @@ class SmartyTiki extends Smarty
             return (array) $info;
         }
     }
-/**
- * Sanitize template path to prevent eval injection.
- *
- * @param string $tpl_path
- * @return string Resolved real path
- * @throws Exception if the path contains forbidden eval expression.
- */
+    /**
+     * Sanitize template path to prevent eval injection.
+     *
+     * @param string $tpl_path
+     * @return string Resolved real path
+     * @throws Exception if the path contains forbidden eval expression.
+     */
     private function sanitizeTemplatePath($tpl_path)
     {
         global $prefs;
 
         if (isset($prefs['smarty_enable_string_eval']) && $prefs['smarty_enable_string_eval'] == 'n') {
-                // Block string templates
+            // Block string templates
             if (stripos($tpl_path, 'string:') === 0) {
                 throw new Exception("Template path uses forbidden Smarty resource: string:");
             }
-             //Block eval templates
+            //Block eval templates
             if (stripos($tpl_path, 'eval:') === 0) {
                 throw new Exception("Template path uses forbidden Smarty resource: eval:");
             }
