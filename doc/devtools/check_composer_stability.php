@@ -576,9 +576,9 @@ function determinePackageStatus($package, $history, $ignoreMap)
 }
 
 /**
- * Check if a package is ignored in baseline versions
+ * Check if a package is ignored in any accepted-state (non-current) branch version.
  */
-function isPackageIgnoredInBaseline($package, $versionsToCheck, $ignoreMap)
+function isPackageIgnoredInAcceptedState($package, $versionsToCheck, $ignoreMap)
 {
     $currentBranch = getCurrentBranch();
     if (! $currentBranch) {
@@ -769,7 +769,13 @@ function fetchComposerDataForVersions($versionsToCheck, $currentBranch)
 }
 
 /**
- * Get packages changed between baseline and current branch
+ * Detect packages modified by the current branch compared to a reference branch.
+ *
+ * The last analyzed branch before the current branch is used as the comparison
+ * target (not the abstract accepted-state CI concept).
+ *
+ * CI responsibility is restricted to these packages in order to avoid
+ * unrelated pipeline failures caused by dependency changes introduced elsewhere.
  */
 function getTouchedPackages($composerData, $currentBranch)
 {
@@ -780,25 +786,25 @@ function getTouchedPackages($composerData, $currentBranch)
     }
 
     $versions = array_keys($composerData);
-    $baseline = null;
+    $comparisonBranch = null;
 
     foreach ($versions as $version) {
         if ($version === $currentBranch) {
             break;
         }
-        $baseline = $version;
+        $comparisonBranch = $version;
     }
 
-    if (! $baseline || ! isset($composerData[$baseline])) {
+    if (! $comparisonBranch || ! isset($composerData[$comparisonBranch])) {
         return $touched;
     }
 
     $currentPackages = $composerData[$currentBranch]['require'] ?? [];
-    $baselinePackages = $composerData[$baseline]['require'] ?? [];
+    $comparisonPackages = $composerData[$comparisonBranch]['require'] ?? [];
 
     $allPackages = array_unique(array_merge(
         array_keys($currentPackages),
-        array_keys($baselinePackages)
+        array_keys($comparisonPackages)
     ));
 
     foreach ($allPackages as $package) {
@@ -807,11 +813,11 @@ function getTouchedPackages($composerData, $currentBranch)
         }
 
         $currentVersion = $currentPackages[$package] ?? null;
-        $baselineVersion = $baselinePackages[$package] ?? null;
+        $comparisonVersion = $comparisonPackages[$package] ?? null;
 
-        if ($currentVersion !== $baselineVersion) {
+        if ($currentVersion !== $comparisonVersion) {
             $touched[$package] = [
-                'from' => $baselineVersion,
+                'from' => $comparisonVersion,
                 'to' => $currentVersion
             ];
         }
@@ -860,7 +866,15 @@ function buildInitialPackageStructure($composerData)
 }
 
 /**
- * Analyze package stability and regressions
+ * Build the global stability and regression analysis across all analyzed branches.
+ *
+ * This function computes:
+ * - unstable package usage
+ * - stability regressions
+ * - stable version downgrades
+ *
+ * The resulting metadata is later used by the CI responsibility layer
+ * to determine whether the current branch should fail the pipeline.
  */
 function analyzePackageStabilityAndRegressions(&$packageHistory, $versionsToCheck)
 {
@@ -931,7 +945,7 @@ function analyzePackageStabilityAndRegressions(&$packageHistory, $versionsToChec
 function printPackageHistory(string $package, array $history, string $icon = '⚠️', $ignoreMap = [], $currentVersion = null): void
 {
     $isIgnored = false;
-    if ($currentVersion === 'baseline') {
+    if ($currentVersion === 'accepted_state') {
         foreach ($ignoreMap as $version => $packages) {
             if (isset($packages[$package])) {
                 $isIgnored = true;
@@ -1098,7 +1112,12 @@ function generateReport($packageHistory, $versionsToCheck, $ignoreMap = [])
 }
 
 /**
- * Process package data to identify issues and regressions
+ * Transform global package analysis data into categorized issue reports.
+ *
+ * This step prepares the reporting structures used by:
+ * - detailed reports
+ * - CI summaries
+ * - current branch responsibility analysis
  */
 function processPackageData($packageHistory, $versionsToCheck)
 {
@@ -1217,9 +1236,9 @@ function generateStabilityIssuesReport($issuesByPackage, $versionsToCheck, $igno
     echo "\n❌ Stability issues detected in packages:\n";
 
     foreach ($issuesByPackage as $package => $data) {
-        $isIgnored = isPackageIgnoredInBaseline($package, $versionsToCheck, $ignoreMap);
+        $isIgnored = isPackageIgnoredInAcceptedState($package, $versionsToCheck, $ignoreMap);
 
-        printPackageHistory($package, $data['history'], '⚠️', $ignoreMap, $isIgnored ? 'baseline' : 'current');
+        printPackageHistory($package, $data['history'], '⚠️', $ignoreMap, $isIgnored ? 'accepted_state' : 'current');
 
         if ($data['metadata']['has_regressions'] && isset($data['regression_info'])) {
             $info = $data['regression_info'];
@@ -1244,7 +1263,7 @@ function generateStableRegressionsReport($stableRegressions, $versionsToCheck, $
     echo "\n⚠️ Packages with stable version downgrades (potential regressions):\n";
 
     foreach ($stableRegressions as $package => $data) {
-        $isIgnored = isPackageIgnoredInBaseline($package, $versionsToCheck, $ignoreMap);
+        $isIgnored = isPackageIgnoredInAcceptedState($package, $versionsToCheck, $ignoreMap);
 
                 // For stable regressions, we need to determine the overall package status
                 // based on whether any versions have warnings (unstable and not mitigated)
@@ -1349,7 +1368,7 @@ function generateIssuesSummary($issuesByPackage, $stableRegressions)
 }
 
 /**
- * Split existing baseline issues into stability issues and version downgrades.
+ * Split existing accepted-state issues into stability issues and version downgrades.
  */
 function splitExistingIssuesByType($existingIssues)
 {
@@ -1375,14 +1394,14 @@ function splitExistingIssuesByType($existingIssues)
 /**
  * Summary
  */
-function renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory, $ignoreMap)
+function renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHistory, $ignoreMap)
 {
-    if ($baselineAnalysis['shouldFail']) {
+    if ($acceptedStateAnalysis['shouldFail']) {
         echo "\n## 🚨 Current Branch Introduces New Stability Issues\n\n";
 
-        if (! empty($baselineAnalysis['newIssues'])) {
+        if (! empty($acceptedStateAnalysis['newIssues'])) {
             echo "### Issues Introduced by Current Branch:\n";
-            foreach ($baselineAnalysis['newIssues'] as $issue) {
+            foreach ($acceptedStateAnalysis['newIssues'] as $issue) {
                 switch ($issue['type']) {
                     case 'new_issue':
                         $stability = $issue['stability'] ?? 'unknown';
@@ -1391,11 +1410,11 @@ function renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory
                         echo "- **{$issue['package']}**: Introduced unstable version `{$version}` ({$stability}){$reason}\n";
                         break;
                     case 'worsened_existing':
-                        $baselineStability = $issue['baseline_stability'] ?? 'unknown';
-                        $baselineVersion = $issue['baseline_version'] ?? 'unknown';
+                        $previousStability = $issue['previous_stability'] ?? 'unknown';
+                        $previousVersion = $issue['previous_version'] ?? 'unknown';
                         $currentStability = $issue['current_stability'] ?? 'unknown';
                         $currentVersion = $issue['current_version'] ?? 'unknown';
-                        echo "- **{$issue['package']}**: Made existing issue worse: from `{$baselineVersion}` ({$baselineStability}) to `{$currentVersion}` ({$currentStability})\n";
+                        echo "- **{$issue['package']}**: Made existing issue worse: from `{$previousVersion}` ({$previousStability}) to `{$currentVersion}` ({$currentStability})\n";
                         break;
                     case 'new_version_downgrade':
                         $fromVersion = $issue['from_version'] ?? 'unknown';
@@ -1418,19 +1437,19 @@ function renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory
         return;
     }
 
-    if (! empty($baselineAnalysis['existingIssues'])) {
+    if (! empty($acceptedStateAnalysis['existingIssues'])) {
         if ($hasWarnings) {
             echo "\n## ⚠️ Stability Issues Detected in Accepted State\n\n";
             echo "**Reason**: Accepted state contains packages with [WARNING] tags (not mitigated).\n\n";
         } else {
             echo "\n## ⚠️ Stability Issues Detected (All Mitigated)\n\n";
-            echo "**Status**: All accepted existing issues are documented and mitigated.\n\n";
+            echo "**Status**: All existing accepted-state issues are documented and mitigated.\n\n";
         }
 
-        [$stabilityIssues, $versionDowngrades] = splitExistingIssuesByType($baselineAnalysis['existingIssues']);
+        [$stabilityIssues, $versionDowngrades] = splitExistingIssuesByType($acceptedStateAnalysis['existingIssues']);
 
         if (! empty($stabilityIssues)) {
-            echo "### Accepted Existing Stability Issues:\n";
+            echo "### Existing Accepted-State Stability Issues:\n";
             foreach ($stabilityIssues as $issue) {
                 echo "- **{$issue['package']}**: ";
                 $issueTypes = [];
@@ -1503,7 +1522,7 @@ function renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory
             echo "   - `mitigation`: How you're handling the risk\n";
             echo "   - `reviewed`: Date of review\n";
         } else {
-            echo "\n**Pipeline Warning**: All accepted existing issues are properly mitigated.\n";
+            echo "\n**Pipeline Warning**: All existing accepted-state issues are properly mitigated.\n";
             echo "**Note**: These mitigated issues are documented and tracked for future cleanup.\n";
         }
 
@@ -1568,10 +1587,32 @@ function renderNonCiExecutiveSummary($packageHistory, $versionsToCheck)
 }
 
 /**
- * Analyze current branch against baseline to determine if it introduces new issues
- * This helps CI pipelines fail only when the current branch is responsible
+ * CI responsibility model
+ *
+ * The stability checker analyzes dependency history across all relevant
+ * Tiki branches in order to detect:
+ * - unstable package usage
+ * - stability regressions
+ * - stable version downgrades
+ *
+ * However, CI failure responsibility is limited to packages modified
+ * in the current branch.
+ *
+ * This means:
+ * - existing accepted-state issues do not fail unrelated pipelines
+ * - the current branch only fails if it introduces or worsens a problem
+ * - cross-branch comparisons are still performed to detect regressions
+ *   relative to other branches (including master)
+ *
+ * The complete dependency history is still analyzed globally.
+ * Cross-branch analysis is global, but pipeline failure responsibility
+ * is restricted to packages modified in the current branch.
+ *
+ * Determine whether the current branch introduces issues relative
+ * to already accepted branch states.
+ * To determine whether it introduces new issues or worsens existing accepted-state issues.
  */
-function analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck, $ignoreMap = [])
+function analyzeCurrentBranchAgainstAcceptedState($packageHistory, $versionsToCheck, $ignoreMap = [])
 {
     global $isCiMode, $globalComposerData;
     $currentBranch = getCurrentBranch();
@@ -1594,12 +1635,12 @@ function analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck, 
 
         $metadata = $history['_metadata'];
 
-        $baselineAnalysis = analyzePackageBaseline($package, $history, $metadata, $stableVersions, $ignoreMap);
-        if ($baselineAnalysis) {
-            $existingIssues[] = $baselineAnalysis;
+        $acceptedStateAnalysis = analyzePackageAcceptedState($package, $history, $metadata, $stableVersions, $ignoreMap);
+        if ($acceptedStateAnalysis) {
+            $existingIssues[] = $acceptedStateAnalysis;
         }
 
-        $currentBranchAnalysis = analyzePackageCurrentBranch($package, $history, $metadata, $currentBranch, $baselineAnalysis, $ignoreMap);
+        $currentBranchAnalysis = analyzePackageCurrentBranch($package, $history, $metadata, $currentBranch, $acceptedStateAnalysis, $ignoreMap);
         if ($currentBranchAnalysis) {
             $currentBranchIssues[] = $currentBranchAnalysis;
         }
@@ -1613,6 +1654,10 @@ function analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck, 
     $existingIssues = aggregateExistingIssues($existingIssues);
 
     $touchedPackages = getTouchedPackages($globalComposerData, $currentBranch);
+
+    // Only packages modified in the current branch can make the pipeline fail.
+    // Cross-branch analysis is still performed globally, but CI responsibility
+    // is assigned only to touched packages.
     $filteredIssues = [];
 
     foreach ($currentBranchIssues as $issue) {
@@ -1628,7 +1673,7 @@ function analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck, 
         echo "Issues Introduced by Current Branch: " . count($currentBranchIssues) . "\n";
         echo "Touched packages: " . count($touchedPackages) . "\n";
         echo "Issues on touched packages: " . count($filteredIssues) . "\n";
-        echo "Accepted Existing Issues: " . count($existingIssues) . "\n";
+        echo "Existing accepted-state issues: " . count($existingIssues) . "\n";
     }
 
     return [
@@ -1639,31 +1684,34 @@ function analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck, 
 }
 
 /**
- * Analyze baseline issues for a specific package
+ * Collect accepted-state stability issues for a single package.
+ *
+ * Global analysis of non-current branches; results feed the existing
+ * accepted-state issues list and do not by themselves assign current-branch CI failure.
  */
-function analyzePackageBaseline($package, $history, $metadata, $stableVersions, $ignoreMap)
+function analyzePackageAcceptedState($package, $history, $metadata, $stableVersions, $ignoreMap)
 {
-    $baselineIssue = checkBaselineStabilityIssues($package, $history, $stableVersions, $ignoreMap);
-    if ($baselineIssue) {
-        return $baselineIssue;
+    $acceptedStateIssue = checkAcceptedStateStabilityIssues($package, $history, $stableVersions, $ignoreMap);
+    if ($acceptedStateIssue) {
+        return $acceptedStateIssue;
     }
 
-    $baselineRegression = checkBaselineStabilityRegressions($package, $metadata, $stableVersions, $ignoreMap);
-    if ($baselineRegression) {
-        return $baselineRegression;
+    $acceptedStateRegression = checkAcceptedStateStabilityRegressions($package, $metadata, $stableVersions, $ignoreMap);
+    if ($acceptedStateRegression) {
+        return $acceptedStateRegression;
     }
 
     return null;
 }
 
 /**
- * Check for stability issues in baseline versions
+ * Check for stability issues in accepted-state (non-current) branch versions.
  */
-function checkBaselineStabilityIssues($package, $history, $stableVersions, $ignoreMap)
+function checkAcceptedStateStabilityIssues($package, $history, $stableVersions, $ignoreMap)
 {
-    $hasBaselineIssues = false;
-    $baselineStability = null;
-    $baselineVersion = null;
+    $hasAcceptedStateIssues = false;
+    $acceptedStateStability = null;
+    $acceptedStateVersion = null;
 
     foreach ($stableVersions as $stableVersion) {
         if (isset($history[$stableVersion])) {
@@ -1671,14 +1719,14 @@ function checkBaselineStabilityIssues($package, $history, $stableVersions, $igno
             $stability = extractStabilityFromVersion($constraint);
 
             if ($stability !== 'stable') {
-                $hasBaselineIssues = true;
-                $baselineStability = $stability;
-                $baselineVersion = $constraint;
+                $hasAcceptedStateIssues = true;
+                $acceptedStateStability = $stability;
+                $acceptedStateVersion = $constraint;
             }
         }
     }
 
-    if (! $hasBaselineIssues) {
+    if (! $hasAcceptedStateIssues) {
         return null;
     }
 
@@ -1687,45 +1735,45 @@ function checkBaselineStabilityIssues($package, $history, $stableVersions, $igno
     return [
         'package' => $package,
         'type' => 'existing_issue',
-        'stability' => $baselineStability ?? 'unknown',
-        'version' => $baselineVersion ?? 'unknown',
-        'tiki_version' => 'baseline',
+        'stability' => $acceptedStateStability ?? 'unknown',
+        'version' => $acceptedStateVersion ?? 'unknown',
+        'tiki_version' => 'accepted_state',
         'is_ignored' => $ignoreInfo['is_ignored'],
         'ignore_reason' => $ignoreInfo['ignore_reason']
     ];
 }
 
 /**
- * Check for stability regressions in baseline versions
+ * Check for stability regressions across accepted-state (non-current) branch versions.
  */
-function checkBaselineStabilityRegressions($package, $metadata, $stableVersions, $ignoreMap)
+function checkAcceptedStateStabilityRegressions($package, $metadata, $stableVersions, $ignoreMap)
 {
     if (! $metadata['has_regressions']) {
         return null;
     }
 
     $stableVersionNames = array_keys($stableVersions);
-    $baselineVersions = array_filter($metadata['versions'], function ($version) use ($stableVersionNames) {
+    $acceptedStateVersions = array_filter($metadata['versions'], function ($version) use ($stableVersionNames) {
         return in_array($version['tiki_version'], $stableVersionNames);
     });
 
-    $baselineVersions = sortVersionsByTikiOrder($baselineVersions, $stableVersionNames);
+    $acceptedStateVersions = sortVersionsByTikiOrder($acceptedStateVersions, $stableVersionNames);
 
-    $hasBaselineRegression = false;
-    for ($i = 1; $i < count($baselineVersions); $i++) {
-        $prev = $baselineVersions[$i - 1];
-        $current = $baselineVersions[$i];
+    $hasAcceptedStateRegression = false;
+    for ($i = 1; $i < count($acceptedStateVersions); $i++) {
+        $prev = $acceptedStateVersions[$i - 1];
+        $current = $acceptedStateVersions[$i];
 
         $prevStability = extractStabilityFromVersion($prev['constraint']);
         $currentStability = extractStabilityFromVersion($current['constraint']);
 
         if (getStabilityNumeric($currentStability) < getStabilityNumeric($prevStability)) {
-            $hasBaselineRegression = true;
+            $hasAcceptedStateRegression = true;
             break; // Only need to know if there's a regression, not count each one
         }
     }
 
-    if (! $hasBaselineRegression) {
+    if (! $hasAcceptedStateRegression) {
         return null;
     }
 
@@ -1734,12 +1782,12 @@ function checkBaselineStabilityRegressions($package, $metadata, $stableVersions,
     return [
         'package' => $package,
         'type' => 'existing_stability_regression',
-        'from_stability' => 'baseline',
-        'from_version' => 'baseline',
-        'from_tiki' => 'baseline',
-        'to_stability' => 'baseline',
-        'to_version' => 'baseline',
-        'to_tiki' => 'baseline',
+        'from_stability' => 'accepted_state',
+        'from_version' => 'accepted_state',
+        'from_tiki' => 'accepted_state',
+        'to_stability' => 'accepted_state',
+        'to_version' => 'accepted_state',
+        'to_tiki' => 'accepted_state',
         'is_ignored' => $ignoreInfo['is_ignored'],
         'ignore_reason' => $ignoreInfo['ignore_reason']
     ];
@@ -1768,9 +1816,13 @@ function checkPackageIgnoreStatus($package, $versions, $ignoreMap)
 }
 
 /**
- * Analyze current branch issues for a specific package
+ * Analyze whether the current branch introduces new stability issues
+ * or worsens existing accepted-state issues.
+ *
+ * This function evaluates only the current branch state, while
+ * cross-branch comparisons are computed from the complete package history.
  */
-function analyzePackageCurrentBranch($package, $history, $metadata, $currentBranch, $baselineAnalysis, $ignoreMap)
+function analyzePackageCurrentBranch($package, $history, $metadata, $currentBranch, $acceptedStateAnalysis, $ignoreMap)
 {
     if (! isset($history[$currentBranch])) {
         return null;
@@ -1780,37 +1832,37 @@ function analyzePackageCurrentBranch($package, $history, $metadata, $currentBran
     $currentStability = extractStabilityFromVersion($currentConstraint);
 
     if ($currentStability !== 'stable') {
-        if ($baselineAnalysis && $baselineAnalysis['stability'] !== 'stable') {
-            // Issue exists in baseline AND baseline is unstable - check if current branch makes it worse
-            $baselineStability = $baselineAnalysis['stability'] ?? 'unknown';
-            $baselineVersion = $baselineAnalysis['version'] ?? 'unknown';
-            $baselineWasMitigated = $baselineAnalysis['is_ignored'] ?? false;
+        if ($acceptedStateAnalysis && $acceptedStateAnalysis['stability'] !== 'stable') {
+            // Issue exists in accepted state and is unstable - check if current branch makes it worse
+            $previousStability = $acceptedStateAnalysis['stability'] ?? 'unknown';
+            $previousVersion = $acceptedStateAnalysis['version'] ?? 'unknown';
+            $acceptedStateWasMitigated = $acceptedStateAnalysis['is_ignored'] ?? false;
             $currentIsMitigated = isPackageIgnored($package, $currentBranch, $ignoreMap);
 
             // Check if current branch loses the mitigation
-            if ($baselineWasMitigated && ! $currentIsMitigated) {
+            if ($acceptedStateWasMitigated && ! $currentIsMitigated) {
                 return [
                     'package' => $package,
                     'type' => 'new_issue',
                     'stability' => $currentStability,
                     'version' => $currentConstraint,
-                    'reason' => 'Mitigation lost - package was mitigated in baseline but not in current branch'
+                    'reason' => 'Mitigation lost - package was mitigated in accepted state but not in current branch'
                 ];
             }
 
-            if (getStabilityNumeric($currentStability) < getStabilityNumeric($baselineStability)) {
+            if (getStabilityNumeric($currentStability) < getStabilityNumeric($previousStability)) {
                 return [
                     'package' => $package,
                     'type' => 'worsened_existing',
-                    'baseline_stability' => $baselineStability,
-                    'baseline_version' => $baselineVersion,
+                    'previous_stability' => $previousStability,
+                    'previous_version' => $previousVersion,
                     'current_stability' => $currentStability,
                     'current_version' => $currentConstraint
                 ];
             }
-            // Note: existing issues are already counted above when scanning baseline (if still mitigated or same)
+            // Note: existing issues are already counted above when scanning accepted state (if still mitigated or same)
         } else {
-            // New issue introduced by current branch (either no baseline analysis or baseline was stable)
+            // New issue introduced by current branch (either no accepted-state analysis or accepted state was stable)
             // Check if the new unstable package is mitigated
             $currentIsMitigated = isPackageIgnored($package, $currentBranch, $ignoreMap);
 
@@ -1871,7 +1923,11 @@ function analyzePackageCurrentBranch($package, $history, $metadata, $currentBran
 }
 
 /**
- * Analyze version downgrades for a specific package
+ * Detect stable version downgrades across branches.
+ *
+ * Downgrades are detected globally across the dependency history,
+ * but only become CI failures if the downgrade is introduced
+ * by the current branch.
  */
 function analyzePackageVersionDowngrades($package, $history, $metadata, $versionsToCheck, $currentBranch, $ignoreMap)
 {
@@ -1974,7 +2030,7 @@ function aggregateExistingIssues($existingIssues)
  * This includes both stability issues (unstable versions not mitigated) and
  * unmitigated version downgrades.
  *
- * @param array $existingIssues Array of existing issues from baseline analysis
+ * @param array $existingIssues Array of existing issues from accepted-state analysis
  * @param array $packageHistory Complete package history across all versions
  * @param array $ignoreMap Map of ignored packages per version
  * @return bool True if there are any unmitigated warnings, false otherwise
@@ -2032,22 +2088,22 @@ $packageHistory = buildPackageHistory($versionsToCheck);
 $ignoreMap = buildStabilityIgnoreMap($packageHistory);
 
 if ($isCiMode) {
-    $baselineAnalysis = analyzeCurrentBranchAgainstBaseline($packageHistory, $versionsToCheck, $ignoreMap);
+    $acceptedStateAnalysis = analyzeCurrentBranchAgainstAcceptedState($packageHistory, $versionsToCheck, $ignoreMap);
 
     $hasWarnings = false;
-    if (! empty($baselineAnalysis['existingIssues'])) {
-        $hasWarnings = hasUnmitigatedWarnings($baselineAnalysis['existingIssues'], $packageHistory, $ignoreMap);
+    if (! empty($acceptedStateAnalysis['existingIssues'])) {
+        $hasWarnings = hasUnmitigatedWarnings($acceptedStateAnalysis['existingIssues'], $packageHistory, $ignoreMap);
     }
 
-    renderExecutiveSummary($baselineAnalysis, $hasWarnings, $packageHistory, $ignoreMap);
+    renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHistory, $ignoreMap);
     echo "\n\n## Detailed Package Report\n";
     renderDetailedReport($packageHistory, $versionsToCheck, $ignoreMap, true);
 
-    $junitIssues = buildJUnitReportData($baselineAnalysis['existingIssues']);
+    $junitIssues = buildJUnitReportData($acceptedStateAnalysis['existingIssues']);
     $junitReport = generateJUnitReport($junitIssues, []);
     file_put_contents('composer-stability-report.xml', $junitReport);
 
-    $exitCode = ($baselineAnalysis['shouldFail'] || $hasWarnings) ? 1 : 0;
+    $exitCode = ($acceptedStateAnalysis['shouldFail'] || $hasWarnings) ? 1 : 0;
 
     exit($exitCode);
 } else {
