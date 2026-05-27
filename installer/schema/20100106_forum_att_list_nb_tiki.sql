@@ -1,1 +1,1 @@
-alter table `tiki_forums` add column `att_list_nb` char(1) default NULL after `att_max_size`;
+ALTER TABLE `tiki_forums` ADD COLUMN `att_list_nb` CHAR(1) DEFAULT NULL AFTER `att_max_size`;

@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_language` ADD COLUMN `lastModif` int(14) NULL;
+ALTER TABLE `tiki_language` ADD COLUMN `lastModif` INT(14) NULL;

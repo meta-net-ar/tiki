@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_blogs` ADD COLUMN `show_related` char(1) DEFAULT NULL;
+ALTER TABLE `tiki_blogs` ADD COLUMN `show_related` CHAR(1) DEFAULT NULL;

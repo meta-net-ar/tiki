@@ -1,4 +1,4 @@
 #sylvieg
-alter table users_groups drop primary key;
-alter table users_groups add column id int(11) NOT NULL auto_increment first, add primary key (id), auto_increment = 1;
-alter table users_groups add unique `groupName` (`groupName`);
+ALTER TABLE users_groups DROP PRIMARY KEY;
+ALTER TABLE users_groups ADD COLUMN id INT(11) NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY (id), AUTO_INCREMENT = 1;
+ALTER TABLE users_groups ADD UNIQUE `groupName` (`groupName`);

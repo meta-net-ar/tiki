@@ -1,2 +1,2 @@
 DELETE FROM `tiki_menu_options` WHERE `url` = 'tiki-searchresults.php';
-DELETE FROM `tiki_preferences` WHERE `name` in ('feature_search_fulltext', 'feature_search_show_forbidden_obj', 'feature_search_show_forbidden_cat');
+DELETE FROM `tiki_preferences` WHERE `name` IN ('feature_search_fulltext', 'feature_search_show_forbidden_obj', 'feature_search_show_forbidden_cat');

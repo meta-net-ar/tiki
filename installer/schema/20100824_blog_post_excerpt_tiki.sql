@@ -1,2 +1,2 @@
-ALTER TABLE `tiki_blogs` ADD COLUMN `use_excerpt` char(1) default NULL AFTER `use_author`;
-ALTER TABLE `tiki_blog_posts` ADD COLUMN `excerpt` text default NULL AFTER `data_size`;
+ALTER TABLE `tiki_blogs` ADD COLUMN `use_excerpt` CHAR(1) DEFAULT NULL AFTER `use_author`;
+ALTER TABLE `tiki_blog_posts` ADD COLUMN `excerpt` text DEFAULT NULL AFTER `data_size`;

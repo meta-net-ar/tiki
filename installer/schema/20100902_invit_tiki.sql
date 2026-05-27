@@ -1,23 +1,23 @@
 CREATE TABLE IF NOT EXISTS `tiki_invit` (
-  `id` int(11) NOT NULL auto_increment,
-  `inviter` varchar(200) NOT NULL,
-  `groups` varchar(255) default NULL,
-  `ts` int(11) NOT NULL,
-  `emailsubject` varchar(255) NOT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `inviter` VARCHAR(200) NOT NULL,
+  `groups` VARCHAR(255) DEFAULT NULL,
+  `ts` INT(11) NOT NULL,
+  `emailsubject` VARCHAR(255) NOT NULL,
   `emailcontent` text NOT NULL,
   `wikicontent` text,
-  `wikipageafter` varchar(255) default NULL,
+  `wikipageafter` VARCHAR(255) DEFAULT NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `tiki_invited` (
-  `id` int(11) NOT NULL auto_increment,
-  `id_invit` int(11) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `firstname` varchar(24) NOT NULL,
-  `lastname` varchar(24) NOT NULL,
+  `id` INT(11) NOT NULL AUTO_INCREMENT,
+  `id_invit` INT(11) NOT NULL,
+  `email` VARCHAR(255) NOT NULL,
+  `firstname` VARCHAR(24) NOT NULL,
+  `lastname` VARCHAR(24) NOT NULL,
   `used` enum('no','registered','logged') NOT NULL,
-  `used_on_user` varchar(200) default NULL,
+  `used_on_user` VARCHAR(200) DEFAULT NULL,
   PRIMARY KEY  (`id`),
   KEY `id_invit` (`id_invit`),
   KEY `used_on_user` (`used_on_user`)

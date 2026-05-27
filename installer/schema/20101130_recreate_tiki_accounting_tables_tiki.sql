@@ -1,44 +1,44 @@
 CREATE TABLE IF NOT EXISTS `tiki_acct_journal` (
-  `journalBookId` int(10) unsigned NOT NULL,
-  `journalId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `journalDate` date NULL,
-  `journalDescription` varchar(255) NOT NULL,
-  `journalCancelled` int(1) NOT NULL DEFAULT '0',
-  `journalTs` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `journalBookId` INT(10) UNSIGNED NOT NULL,
+  `journalId` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `journalDate` DATE NULL,
+  `journalDescription` VARCHAR(255) NOT NULL,
+  `journalCancelled` INT(1) NOT NULL DEFAULT '0',
+  `journalTs` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`journalId`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `tiki_acct_stack` (
-  `stackBookId` int(10) unsigned NOT NULL,
-  `stackId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `stackDate` date NULL,
-  `stackDescription` varchar(255) NOT NULL,
-  `stackTs` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `stackBookId` INT(10) UNSIGNED NOT NULL,
+  `stackId` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `stackDate` DATE NULL,
+  `stackDescription` VARCHAR(255) NOT NULL,
+  `stackTs` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`stackId`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `tiki_acct_statement` (
-  `statementBookId` int(10) unsigned NOT NULL,
-  `statementAccountId` int(10) unsigned NOT NULL DEFAULT '0',
-  `statementId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `statementBookingDate` date NULL,
-  `statementValueDate` date NULL,
-  `statementBookingText` varchar(255) NOT NULL,
-  `statementReason` varchar(255) NOT NULL,
-  `statementCounterpart` varchar(63) NOT NULL,
-  `statementCounterpartAccount` varchar(63) NOT NULL,
-  `statementCounterpartBankCode` varchar(63) NOT NULL,
-  `statementAmount` double NOT NULL,
-  `statementJournalId` int(10) unsigned NOT NULL DEFAULT '0',
-  `statementStackId` int(11) NOT NULL,
+  `statementBookId` INT(10) UNSIGNED NOT NULL,
+  `statementAccountId` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `statementId` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `statementBookingDate` DATE NULL,
+  `statementValueDate` DATE NULL,
+  `statementBookingText` VARCHAR(255) NOT NULL,
+  `statementReason` VARCHAR(255) NOT NULL,
+  `statementCounterpart` VARCHAR(63) NOT NULL,
+  `statementCounterpartAccount` VARCHAR(63) NOT NULL,
+  `statementCounterpartBankCode` VARCHAR(63) NOT NULL,
+  `statementAmount` DOUBLE NOT NULL,
+  `statementJournalId` INT(10) UNSIGNED NOT NULL DEFAULT '0',
+  `statementStackId` INT(11) NOT NULL,
   PRIMARY KEY (`statementId`)
 ) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS `tiki_acct_tax` (
-  `taxBookId` int(10) unsigned NOT NULL,
-  `taxId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `taxText` varchar(63) NOT NULL,
-  `taxAmount` double NOT NULL DEFAULT '0',
+  `taxBookId` INT(10) UNSIGNED NOT NULL,
+  `taxId` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `taxText` VARCHAR(63) NOT NULL,
+  `taxAmount` DOUBLE NOT NULL DEFAULT '0',
   `taxIsFix` enum('y','n') NOT NULL DEFAULT 'n',
   PRIMARY KEY (`taxId`)
 ) ENGINE=MyISAM;

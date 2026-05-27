@@ -6,4 +6,4 @@ UPDATE `tiki_object_attributes` toa
         WHERE tti.itemId = toa.`itemId` AND ttf.trackerId = tti.trackerId AND ttf.type = 'CAL'
         LIMIT 1
     )
-    WHERE toa.`attribute` = 'tiki.calendar.item' and toa.`type` = 'trackeritem';
+    WHERE toa.`attribute` = 'tiki.calendar.item' AND toa.`type` = 'trackeritem';

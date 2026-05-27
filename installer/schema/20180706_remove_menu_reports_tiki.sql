@@ -1,1 +1,1 @@
-DELETE FROM tiki_menu_options where url = 'tiki-edit_report.php';
+DELETE FROM tiki_menu_options WHERE url = 'tiki-edit_report.php';

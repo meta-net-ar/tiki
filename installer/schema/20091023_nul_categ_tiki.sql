@@ -1,1 +1,1 @@
-delete from `tiki_category_objects` where `categId` = 0;
+DELETE FROM `tiki_category_objects` WHERE `categId` = 0;

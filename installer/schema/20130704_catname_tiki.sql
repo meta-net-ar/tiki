@@ -1,1 +1,1 @@
-ALTER TABLE tiki_categories MODIFY name VARCHAR(200) default NULL;
+ALTER TABLE tiki_categories MODIFY name VARCHAR(200) DEFAULT NULL;

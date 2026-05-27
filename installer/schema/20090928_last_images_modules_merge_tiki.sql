@@ -1,1 +1,1 @@
-update tiki_modules set name='last_images', params='content=thumbnails' where name='last_images_th';
+UPDATE tiki_modules SET name='last_images', params='content=thumbnails' WHERE name='last_images_th';

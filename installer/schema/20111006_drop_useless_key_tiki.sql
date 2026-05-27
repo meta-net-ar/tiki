@@ -1,1 +1,1 @@
-alter table `tiki_calendar_items` drop key `fk_calitems_recurrence`;
+ALTER TABLE `tiki_calendar_items` DROP KEY `fk_calitems_recurrence`;

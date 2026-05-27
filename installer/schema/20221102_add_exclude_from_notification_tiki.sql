@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_tracker_fields` ADD `excludeFromNotification` char(1) default 'n';
+ALTER TABLE `tiki_tracker_fields` ADD `excludeFromNotification` CHAR(1) DEFAULT 'n';

@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_calendar_recurrence` ADD `duration` int(14) default NULL AFTER `end`;
+ALTER TABLE `tiki_calendar_recurrence` ADD `duration` INT(14) DEFAULT NULL AFTER `end`;

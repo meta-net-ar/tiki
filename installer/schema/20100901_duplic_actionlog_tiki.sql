@@ -1,1 +1,1 @@
-delete from `tiki_actionlog` where `objectType`='trackeritem' and `action`='Modified';
+DELETE FROM `tiki_actionlog` WHERE `objectType`='trackeritem' AND `action`='Modified';

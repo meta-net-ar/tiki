@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS `tiki_custom_route` (
-  `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
-  `description` varchar(255) NULL,
-  `type` varchar(255) NOT NULL,
-  `from` varchar(255) NOT NULL,
+  `id` INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+  `description` VARCHAR(255) NULL,
+  `type` VARCHAR(255) NOT NULL,
+  `from` VARCHAR(255) NOT NULL,
   `redirect` text NOT NULL,
-  `active` tinyint(1) NOT NULL DEFAULT '1',
-  `user_id` int(11) NOT NULL
+  `active` TINYINT(1) NOT NULL DEFAULT '1',
+  `user_id` INT(11) NOT NULL
 ) ENGINE=MyISAM;

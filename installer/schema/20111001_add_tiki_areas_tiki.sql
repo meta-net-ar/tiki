@@ -5,7 +5,7 @@
 #        assignments every time a page loads
 
 CREATE TABLE IF NOT EXISTS `tiki_areas` (
-    `categId` int(11) NOT NULL,
+    `categId` INT(11) NOT NULL,
     `perspectives` text,
     KEY `categId` (`categId`)
 ) ENGINE=MyISAM;

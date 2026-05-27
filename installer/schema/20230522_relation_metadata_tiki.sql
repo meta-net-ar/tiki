@@ -1,6 +1,6 @@
-ALTER TABLE `tiki_object_relations` ADD COLUMN `metadata_itemId` INT(12) default NULL;
+ALTER TABLE `tiki_object_relations` ADD COLUMN `metadata_itemId` INT(12) DEFAULT NULL;
 ALTER TABLE `tiki_object_relations` ADD KEY `metadata_itemId` (`metadata_itemId`);
-ALTER TABLE `tiki_object_relations` ADD COLUMN `source_fieldId` INT(12) default NULL after `source_itemId`;
+ALTER TABLE `tiki_object_relations` ADD COLUMN `source_fieldId` INT(12) DEFAULT NULL AFTER `source_itemId`;
 ALTER TABLE `tiki_object_relations` DROP KEY `relation_source_ix`;
 ALTER TABLE `tiki_object_relations` ADD KEY `relation_source_ix` (`source_type`, `source_itemId`, `source_fieldId`);
 UPDATE `tiki_object_relations` tor, `tiki_tracker_item_fields` ttif, `tiki_tracker_fields` ttf

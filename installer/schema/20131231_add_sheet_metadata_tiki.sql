@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_sheet_layout` ADD `metadata` longblob;
+ALTER TABLE `tiki_sheet_layout` ADD `metadata` LONGBLOB;

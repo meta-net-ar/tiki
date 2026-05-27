@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_sent_newsletters` ADD COLUMN `wysiwyg` char(1) default NULL;
+ALTER TABLE `tiki_sent_newsletters` ADD COLUMN `wysiwyg` CHAR(1) DEFAULT NULL;

@@ -1,1 +1,1 @@
-alter table `tiki_submissions` change `author` `author` varchar(200) default NULL;
+ALTER TABLE `tiki_submissions` CHANGE `author` `author` VARCHAR(200) DEFAULT NULL;

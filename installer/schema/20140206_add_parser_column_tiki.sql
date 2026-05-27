@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `tiki_output` (
-  `entityId` varchar(160) NOT NULL default '',
-  `objectType` varchar(32) NOT NULL default '',
-  `outputType` varchar(32) NOT NULL default '',
-  `version` int(8) NOT NULL default '0',
+  `entityId` VARCHAR(160) NOT NULL DEFAULT '',
+  `objectType` VARCHAR(32) NOT NULL DEFAULT '',
+  `outputType` VARCHAR(32) NOT NULL DEFAULT '',
+  `version` INT(8) NOT NULL DEFAULT '0',
   `outputId` INT NOT NULL PRIMARY KEY AUTO_INCREMENT
 ) ENGINE=MyISAM AUTO_INCREMENT=1;

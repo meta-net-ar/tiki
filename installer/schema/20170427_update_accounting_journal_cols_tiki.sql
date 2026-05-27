@@ -1,2 +1,2 @@
-ALTER TABLE tiki_acct_item DROP primary key;
-ALTER TABLE tiki_acct_item ADD itemId int NOT NULL AUTO_INCREMENT primary key FIRST;
+ALTER TABLE tiki_acct_item DROP PRIMARY KEY;
+ALTER TABLE tiki_acct_item ADD itemId INT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;

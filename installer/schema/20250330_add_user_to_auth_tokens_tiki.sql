@@ -1,2 +1,2 @@
 ALTER TABLE `tiki_auth_tokens`
-ADD COLUMN `user` VARCHAR(200) default NULL;
+ADD COLUMN `user` VARCHAR(200) DEFAULT NULL;

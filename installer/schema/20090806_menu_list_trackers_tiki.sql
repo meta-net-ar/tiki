@@ -1,1 +1,1 @@
-update `tiki_menu_options` set `perm`='tiki_p_list_trackers' where `url`='tiki-list_trackers.php';
+UPDATE `tiki_menu_options` SET `perm`='tiki_p_list_trackers' WHERE `url`='tiki-list_trackers.php';

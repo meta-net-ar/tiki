@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS tiki_webservice (
 CREATE TABLE IF NOT EXISTS tiki_webservice_template (
     service VARCHAR(25) NOT NULL,
     template VARCHAR(25) NOT NULL,
-    engine VARCHAR(15) NOT NULL,
+    ENGINE VARCHAR(15) NOT NULL,
     output VARCHAR(15) NOT NULL,
     content TEXT NOT NULL,
     last_modif INT,

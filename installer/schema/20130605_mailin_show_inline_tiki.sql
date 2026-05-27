@@ -1,1 +1,1 @@
-alter table tiki_mailin_accounts add column (show_inlineImages char(1));
+ALTER TABLE tiki_mailin_accounts ADD COLUMN (show_inlineImages CHAR(1));

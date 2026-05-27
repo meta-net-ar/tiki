@@ -1,1 +1,1 @@
-alter table `tiki_file_galleries` add column `quota` int(8) default 0;
+ALTER TABLE `tiki_file_galleries` ADD COLUMN `quota` INT(8) DEFAULT 0;

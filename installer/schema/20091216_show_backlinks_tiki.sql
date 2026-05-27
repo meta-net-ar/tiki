@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_file_galleries` ADD COLUMN  `show_backlinks` char(1) default NULL;
+ALTER TABLE `tiki_file_galleries` ADD COLUMN  `show_backlinks` CHAR(1) DEFAULT NULL;

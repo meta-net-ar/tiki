@@ -1,1 +1,1 @@
-ALTER TABLE users_groups ADD column `isTplGroup`char(1) DEFAULT 'n';
+ALTER TABLE users_groups ADD COLUMN `isTplGroup`CHAR(1) DEFAULT 'n';

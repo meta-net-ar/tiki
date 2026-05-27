@@ -1,2 +1,2 @@
-alter table `tiki_faq_questions` add column `created` int(14) default NULL;
-alter table `tiki_faq_questions` add key `created` (`created`);
+ALTER TABLE `tiki_faq_questions` ADD COLUMN `created` INT(14) DEFAULT NULL;
+ALTER TABLE `tiki_faq_questions` ADD KEY `created` (`created`);

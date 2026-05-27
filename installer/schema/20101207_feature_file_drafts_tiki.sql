@@ -1,13 +1,13 @@
 CREATE TABLE IF NOT EXISTS `tiki_file_drafts` (
-  `fileId` int(14) NOT NULL,
-  `filename` varchar(80) default NULL,
-  `filesize` int(14) default NULL,
-  `filetype` varchar(250) default NULL,
-  `data` longblob,
-  `user` varchar(200) default '',
-  `path` varchar(255) default NULL,
-  `hash` varchar(32) default NULL,
-  `lastModif` integer(14) DEFAULT NULL,
-  `lockedby` varchar(200) default '',
+  `fileId` INT(14) NOT NULL,
+  `filename` VARCHAR(80) DEFAULT NULL,
+  `filesize` INT(14) DEFAULT NULL,
+  `filetype` VARCHAR(250) DEFAULT NULL,
+  `data` LONGBLOB,
+  `user` VARCHAR(200) DEFAULT '',
+  `path` VARCHAR(255) DEFAULT NULL,
+  `hash` VARCHAR(32) DEFAULT NULL,
+  `lastModif` INTEGER(14) DEFAULT NULL,
+  `lockedby` VARCHAR(200) DEFAULT '',
   PRIMARY KEY (`fileId`, `user`)
 ) ENGINE=MyISAM;

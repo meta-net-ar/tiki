@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_mailin_accounts` add COLUMN `namespace` varchar(20) NULL;
+ALTER TABLE `tiki_mailin_accounts` ADD COLUMN `namespace` VARCHAR(20) NULL;

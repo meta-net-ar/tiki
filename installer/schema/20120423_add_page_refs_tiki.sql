@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS `tiki_page_references` (
   `publisher` VARCHAR(255) DEFAULT NULL,
   `location` VARCHAR(255)  DEFAULT NULL,
   `style` VARCHAR(30) DEFAULT NULL,
-  `template` varchar(255) DEFAULT NULL,
-  `last_modified` timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  
+  `template` VARCHAR(255) DEFAULT NULL,
+  `last_modified` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,  
   PRIMARY KEY (`ref_id`),
   KEY `PageId` (`page_id`)
 ) ENGINE=MyISAM;

@@ -1,1 +1,1 @@
-alter table tiki_actionlog modify comment varchar(255);
+ALTER TABLE tiki_actionlog modify COMMENT VARCHAR(255);

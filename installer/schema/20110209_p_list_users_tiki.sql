@@ -1,1 +1,1 @@
-update `users_permissions` set `feature_check` = null where `permName`='tiki_p_list_users';
+UPDATE `users_permissions` SET `feature_check` = NULL WHERE `permName`='tiki_p_list_users';

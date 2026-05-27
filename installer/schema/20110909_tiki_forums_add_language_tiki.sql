@@ -1,1 +1,1 @@
-ALTER TABLE `tiki_forums` ADD `forumLanguage` varchar(255) default NULL;
+ALTER TABLE `tiki_forums` ADD `forumLanguage` VARCHAR(255) DEFAULT NULL;
