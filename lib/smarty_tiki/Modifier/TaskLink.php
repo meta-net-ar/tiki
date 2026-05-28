@@ -22,7 +22,14 @@ class TaskLink
         $description = "";
 
         if (empty($info)) {
-            return '';
+            // Bypass permission checks to see if the task exists but the user lacks access,
+            // returning an appropriate translated message instead of silently hiding the link.
+            $adminInfo = $tasklib->get_task($user, $taskId, null, true);
+            if (empty($adminInfo)) {
+                return '<span class="tasklink-missing">[' . tra("Task missing") . ']</span>';
+            } else {
+                return '<span class="tasklink-denied">[' . tra("Task access denied") . ']</span>';
+            }
         }
         $info_description = '';
         if (isset($info['description']) && $info['description'] !== null) {
