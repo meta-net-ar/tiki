@@ -3,12 +3,18 @@
     {if !isset($module)}{$module='n'}{/if}
 
     {if empty($module_params.viewnavbar) || $module_params.viewnavbar eq 'y'}
+        {if $viewlist eq 'list'}
+            <div class="calendar-goto-container mb-3">
+                <input type="date" class="form-control date-calendar w-50" value="{$focusdate|date_format:'%Y-%m-%d'}"
+                    onchange="location.href='{query _type='relative' viewmode=$viewmode todate='__DATE__'}'.replace('__DATE__', Math.floor(new Date(this.value + 'T00:00:00').getTime() / 1000));">
+            </div>
+        {/if}
         <div class="tabrow mb-3 {if $module eq 'y'}p-0{/if}">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
                 <div class="calendar-nav d-flex gap-2 align-items-center">
                     {strip}
                         {*previous*}
-                        <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='prev' todate=$focus_prev}"
+                        <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='prev' todate=$focus_prev viewmode=$viewmode}"
                            title=":{tr _0=$viewmode|escape}Previous %0 {/tr}">
                             {icon name="previous"}
                         </a>
@@ -34,7 +40,7 @@
                         </div>
 
                         {*next*}
-                        <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='next' todate=$focus_next}"
+                        <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='next' todate=$focus_next viewmode=$viewmode}"
                            title=":{tr _0=$viewmode|escape}Next %0{/tr}">
                             {icon name="next"}
                         </a>
@@ -48,7 +54,7 @@
         <div class="text-center my-3">
             {*previous*}
             {if !empty($module_params.viewnavbar) && $module_params.viewnavbar eq 'partial'}
-                {self_link _ajax=$ajax _class="prev tips text-info" todate=$focus_prev _title=":{tr _0=$viewmode|escape}Previous %0{/tr}" _icon_name="previous"}{/self_link}
+                {self_link _ajax=$ajax _class="prev tips text-info" todate=$focus_prev viewmode=$viewmode _title=":{tr _0=$viewmode|escape}Previous %0{/tr}" _icon_name="previous"}{/self_link}
             {/if}
 
             {if $viewlist ne 'list' or $prefs.calendar_list_begins_focus ne 'y'}
@@ -70,7 +76,7 @@
 
             {*next*}
             {if !empty($module_params.viewnavbar) && $module_params.viewnavbar eq 'partial'}
-                {self_link _ajax=$ajax _class="next tips text-info" todate=$focus_next _title=":{tr _0=$viewmode|escape}Next %0{/tr}" _icon_name="next"}{/self_link}
+                {self_link _ajax=$ajax _class="next tips text-info" todate=$focus_next viewmode=$viewmode _title=":{tr _0=$viewmode|escape}Next %0{/tr}" _icon_name="next"}{/self_link}
             {/if}
         </div>
     {/if}
