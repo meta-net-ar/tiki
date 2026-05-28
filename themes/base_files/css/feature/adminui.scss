@@ -164,6 +164,8 @@ body.tiki-admin {
 
 .tiki-admin .top_modules {
     justify-content: flex-end !important;
+    position: sticky;
+    top: 0;
 }
 
 .tiki-admin aside.admin-nav .navbar-light,
