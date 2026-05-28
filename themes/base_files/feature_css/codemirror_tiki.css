@@ -67,4 +67,5 @@
 
 .CodeMirror-scroll {
     min-height: 100% !important;
+    width: inherit !important; /* to override the inaccurate inline style computed width which renders partially hidden scrollbar on empty textareas when we have a padding set on the parent .CodeMirror element */
 }
