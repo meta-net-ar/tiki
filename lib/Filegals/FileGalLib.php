@@ -3423,7 +3423,7 @@ class FileGalLib extends TikiLib
                     }
 
                     if (empty($params['name'][$key])) {
-                        $params['name'][$key] = $this->getTitleFromFilename($name);
+                        $params['name'][$key] = pathinfo($name, PATHINFO_FILENAME);
                     }
 
                     if (empty($params['deleteAfter'][$key]) || empty($params['deleteAfter_unit'][$key])) {

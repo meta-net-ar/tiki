@@ -66,7 +66,7 @@ class Tiki_FileGallery_Manipulator_MetadataExtractorTest extends TikiTestCase
         $this->file->setParam('name', 'test-data.png');
         $this->file->setParam('filename', 'test-data.png');
         (new MetadataExtractor($this->file))->run();
-        $this->assertEquals('Test Data', $this->file->name);
+        $this->assertEquals('test-data', $this->file->name);
     }
 
     public function testCreatedSoon()
