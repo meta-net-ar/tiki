@@ -20,7 +20,11 @@ class MetadataExtractor extends Manipulator
         $metadata = $filegallib->extractMetadataJson($file->getWrapper()->getReadableFile());
         $file->setParam('metadata', $metadata);
 
-        $name = pathinfo($file->name, PATHINFO_FILENAME);
+        if ($file->name === $file->filename && ! $file->galleryDefinition()->isDirect()) {
+            $name = pathinfo($file->name, PATHINFO_FILENAME);
+        } else {
+            $name = $file->name;
+        }
         $file->setParam('name', trim(strip_tags($name)));
         $file->setParam('description', strip_tags($file->description));
         $file->setParam('filename', $this->truncateFilename($file->filename));
