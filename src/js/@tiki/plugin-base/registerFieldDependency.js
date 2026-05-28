@@ -2,14 +2,17 @@ export default function registerFieldDependency(fieldId, dependencyName, depende
     const field = $(`#${fieldId}`);
     const fieldContainer = field.closest(".field-container");
     const dependency = $(`[name='params[${dependencyName}]']`);
+    const hasValidator = !!field.closest("form").data("validator");
 
     const hideField = function () {
         field.val("");
         fieldContainer.hide();
-        const isRequired = field.rules()?.required;
-        if (isRequired) {
-            field.rules("remove", "required");
-            field.attr("data-required", "true");
+        if (hasValidator) {
+            const isRequired = field.rules()?.required;
+            if (isRequired) {
+                field.rules("remove", "required");
+                field.attr("data-required", "true");
+            }
         }
     };
 
@@ -22,7 +25,7 @@ export default function registerFieldDependency(fieldId, dependencyName, depende
     dependency.on("change", function () {
         if ($(this).val() === dependencyValue) {
             fieldContainer.show();
-            if (field.attr("data-required")) {
+            if (hasValidator && field.attr("data-required")) {
                 field.rules("add", "required");
                 field.removeAttr("data-required");
             }

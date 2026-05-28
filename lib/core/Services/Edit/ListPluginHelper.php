@@ -348,6 +348,52 @@ class Services_Edit_ListPluginHelper
                                     ],
                                 ],
                             ],
+                            'aggregate_table' => [],
+                            'chartjs' => [
+                                'plugins' => [
+                                    'chart' => [
+                                        'icon' => 'listgui_carousel',
+                                        'parents' => [
+                                            'output',
+                                        ],
+                                        'params' => [
+                                            'type' => [
+                                                'options' => [
+                                                    'bar' => [],
+                                                    'line' => [],
+                                                    'pie' => [],
+                                                    'doughnut' => [],
+                                                    'radar' => [],
+                                                    'polarArea' => [],
+                                                ],
+                                                'params' => [
+                                                    'agg' => [
+                                                        'type' => 'text',
+                                                    ],
+                                                    'value' => [
+                                                        'type' => 'text',
+                                                    ],
+                                                    'label' => [
+                                                        'type' => 'text',
+                                                    ],
+                                                    'title' => [
+                                                        'type' => 'text',
+                                                    ],
+                                                    'colors' => [
+                                                        'type' => 'text',
+                                                    ],
+                                                    'width' => [
+                                                        'type' => 'number',
+                                                    ],
+                                                    'height' => [
+                                                        'type' => 'number',
+                                                    ],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
                             'count' => [],
                             'debug' => [],
                         ],
@@ -514,10 +560,120 @@ class Services_Edit_ListPluginHelper
                     'inline' => [],
                 ],
             ],
-            'group' => [    // what is this?
+            'group' => [
+                'icon' => 'listgui_filter',
                 'params' => [
-                    'boost' => [
-                        'type' => 'number',
+                    'field' => [
+                        'type' => 'field',
+                        'required' => true,
+                        'params' => [
+                            'name' => [
+                                'type' => 'text',
+                            ],
+                            'size' => [
+                                'type' => 'number',
+                            ],
+                            'min' => [
+                                'type' => 'number',
+                            ],
+                            'missing' => [
+                                'type' => 'text',
+                            ],
+                            'order' => [
+                                'type' => 'text',
+                            ],
+                            'label' => [
+                                'type' => 'text',
+                            ],
+                            'others' => [
+                                'type' => 'text',
+                            ],
+                            'others_label' => [
+                                'type' => 'text',
+                            ],
+                            'others_color' => [
+                                'type' => 'text',
+                            ],
+                            'total' => [
+                                'type' => 'text',
+                            ],
+                            'total_label' => [
+                                'type' => 'text',
+                            ],
+                            'total_color' => [
+                                'type' => 'text',
+                            ],
+                            'palette' => [
+                                'type' => 'text',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'metric' => [
+                'icon' => 'listgui_display',
+                'params' => [
+                    'name' => [
+                        'type' => 'text',
+                        'required' => true,
+                        'params' => [
+                            'op' => [
+                                'type' => 'text',
+                            ],
+                            'field' => [
+                                'type' => 'field',
+                            ],
+                            'expr' => [
+                                'type' => 'text',
+                            ],
+                            'missing' => [
+                                'type' => 'text',
+                            ],
+                            'label' => [
+                                'type' => 'text',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'having' => [
+                'icon' => 'listgui_filter',
+                'params' => [
+                    'expr' => [
+                        'type' => 'text',
+                        'required' => true,
+                    ],
+                ],
+            ],
+            'join' => [
+                'icon' => 'listgui_body',
+                'params' => [
+                    'name' => [
+                        'type' => 'text',
+                        'required' => true,
+                        'params' => [
+                            'on' => [
+                                'type' => 'text',
+                            ],
+                            'tracker' => [
+                                'type' => 'number',
+                            ],
+                            'select' => [
+                                'type' => 'text',
+                            ],
+                            'type' => [
+                                'type' => 'text',
+                            ],
+                            'field' => [
+                                'type' => 'field',
+                            ],
+                            'relation' => [
+                                'type' => 'text',
+                            ],
+                            'multivalue' => [
+                                'type' => 'text',
+                            ],
+                        ],
                     ],
                 ],
             ],

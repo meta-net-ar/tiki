@@ -475,6 +475,27 @@ class Services_Edit_PluginController
         global $prefs;
 
         $body = $input->body->wikicontent();
+
+        if (empty($body) || $body === '~same~') {
+            $page = $input->page->pagename();
+            $index = $input->index->int();
+            if ($page) {
+                $tikilib = TikiLib::lib('tiki');
+                $pageInfo = $tikilib->get_page_info($page);
+                if ($pageInfo) {
+                    $matches = WikiParser_PluginMatcher::match($pageInfo['data']);
+                    $idx = 1;
+                    foreach ($matches as $match) {
+                        if ($idx === $index) {
+                            $body = $match->getBody();
+                            break;
+                        }
+                        $idx++;
+                    }
+                }
+            }
+        }
+
         $current = [];
         $done = [];    // to keep a track on whcih plugins have already been included
         $plugins = Services_Edit_ListPluginHelper::getDefinition();
