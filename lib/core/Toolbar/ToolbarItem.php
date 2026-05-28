@@ -104,6 +104,8 @@ abstract class ToolbarItem
             return new ToolbarLinkFile($objectId);
         } elseif ($tagName == 'launchplugins') {
             return new ToolbarLaunchPlugins();
+        } elseif ($tagName == 'newreport') {
+            return new ToolbarNewReport();
         } elseif ($tagName == 'languagecheck') {
             return new ToolbarLanguageCheck();
         } elseif ($tagName == 'filerecording') {
@@ -199,6 +201,7 @@ abstract class ToolbarItem
                     'screencapture',
                     'image',
                     'launchplugins',
+                    'newreport',
 
                     'sheetsave',    // spreadsheet ones
                     'addrow',
