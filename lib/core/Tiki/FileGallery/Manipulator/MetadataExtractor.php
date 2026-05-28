@@ -21,7 +21,7 @@ class MetadataExtractor extends Manipulator
         $file->setParam('metadata', $metadata);
 
         if ($file->name === $file->filename && ! $file->galleryDefinition()->isDirect()) {
-            $name = TikiLib::lib('filegal')::getTitleFromFilename($file->name);
+            $name = pathinfo($file->name, PATHINFO_FILENAME);
         } else {
             $name = $file->name;
         }
