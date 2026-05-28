@@ -22,6 +22,7 @@ use Tiki\FileGallery\FileWrapper\WrapperInterface as FileWrapper;
 use Tiki\FileGallery\File as TikiFile;
 use Tiki\FileGallery\FileDraft as TikiFileDraft;
 use Tiki\FileGallery\ImageTransformer;
+use Tiki\FileGallery\StorageLimitException;
 use Tiki\Lib\Filegals\FileIsNotSafeException;
 use Symfony\Component\Filesystem\Filesystem;
 use TikiDb;
@@ -3507,6 +3508,8 @@ class FileGalLib extends TikiLib
 
         $batch_job = false;
         $didFileReplace = false;
+        $isAjaxUpload = TikiLib::lib('access')->is_xml_http_request();
+        $displayPageNeeded = false;
         $aux = [];
         $errors = [];
         $uploads = [];
@@ -3647,6 +3650,17 @@ class FileGalLib extends TikiLib
                         continue;
                     }
 
+                    // The file is later loaded in memory as a whole (safety scan, image
+                    // manipulation, escaping when stored in the database), so make sure enough
+                    // memory is left before starting, as a fatal error cannot be recovered from.
+                    if (! TikiLib::lib('tiki')->hasMemoryFor($aFiles['userfile']['size'][$key])) {
+                        $errors[] = tr(
+                            'The file "%0" is too large to be processed with the memory currently available on the server. Please ask an administrator to increase the memory limit.',
+                            $aFiles['userfile']['name'][$key]
+                        );
+                        continue;
+                    }
+
                     $size = $aFiles["userfile"]['size'][$key];
                     $type = $aFiles["userfile"]['type'][$key];
                     $name = stripslashes($aFiles["userfile"]['name'][$key]);
@@ -3734,18 +3748,26 @@ class FileGalLib extends TikiLib
                         $file->setParam('comment', $params['comment'][$key]);
                     }
                     $didFileReplace = true;
-                    if ($editFile) {
-                        $fileId = $file->replace($data, $type, $params["name"][$key], $name);
-                    } else {
-                        $title = $params["name"][$key];
-                        if (! $params['imagesize'][$key]) {
-                            $image_x = $params["image_max_size_x"];
-                            $image_y = $params["image_max_size_y"];
+                    try {
+                        if ($editFile) {
+                            $fileId = $file->replace($data, $type, $params["name"][$key], $name);
                         } else {
-                            $image_x = $gal_info["image_max_size_x"];
-                            $image_y = $gal_info["image_max_size_y"];
+                            $title = $params["name"][$key];
+                            if (empty($params['imagesize'][$key])) {
+                                $image_x = $params["image_max_size_x"] ?? null;
+                                $image_y = $params["image_max_size_y"] ?? null;
+                            } else {
+                                $image_x = $gal_info["image_max_size_x"] ?? null;
+                                $image_y = $gal_info["image_max_size_y"] ?? null;
+                            }
+                            $fileId = $file->replace($data, $type, $title, $name, $image_x, $image_y);
                         }
-                        $fileId = $file->replace($data, $type, $title, $name, $image_x, $image_y);
+                    } catch (StorageLimitException $e) {
+                        // The file cannot be stored, report it as a regular upload error
+                        $errors[] = $e->getMessage();
+                        $file->galleryDefinition()->delete($file);
+                        unset($data);
+                        continue;
                     }
                     if (! $fileId) {
                         $errors[] = tra('The upload was not successful due to duplicate file content') . ': ' . $name;
@@ -3766,11 +3788,11 @@ class FileGalLib extends TikiLib
                             $aux['dllink'] = $url_browse . "?fileId=" . $fileId;
                             if (! empty($_POST['totalSubmissions']) && (int) $_POST['totalSubmissions'] > 1) {
                                 if ((int) $_POST['submission'] === (int) $_POST['totalSubmissions']) {
-                                    Feedback::success(tr('Files uploaded'), true);
+                                    Feedback::success(tr('Files uploaded'), $isAjaxUpload);
                                 }
                                 $feedback_message = tr('File "%0" uploaded', $file_name);
                             } else {
-                                Feedback::success(tr('File "%0" uploaded', $file_name), true);
+                                Feedback::success(tr('File "%0" uploaded', $file_name), $isAjaxUpload);
                             }
                         }
                     }
@@ -3787,6 +3809,7 @@ class FileGalLib extends TikiLib
                         include_once('categorize.php');
                         // Print progress
                     if (empty($params['returnUrl']) && empty($params['fileId']) && empty($params['returnTransfer'])) {
+                        if ($isAjaxUpload) {
                             $smarty->assign("name", $aux['name']);
                             $smarty->assign("size", $aux['size']);
                             $smarty->assign("fileId", $aux['fileId']);
@@ -3795,10 +3818,14 @@ class FileGalLib extends TikiLib
                             $syntax = $this->getWikiSyntax($params["galleryId"][$key]);
                             $syntax = $this->process_fgal_syntax($syntax, $aux);
                             $smarty->assign('syntax', $syntax);
-                        if (! empty($_REQUEST['filegals_manager'])) {
+                            if (! empty($_REQUEST['filegals_manager'])) {
                                 $smarty->assign('filegals_manager', $_REQUEST['filegals_manager']);
-                        }
+                            }
                             $smarty->display("tiki-upload_file_progress.tpl");
+                        } else {
+                            // The page displays the uploads it is given, along with the feedback
+                            $displayPageNeeded = true;
+                        }
                     }
                 }
             }
@@ -3808,6 +3835,7 @@ class FileGalLib extends TikiLib
                 $errors = implode('. ', $errors);
                 Feedback::error($errors);
                 $errors = [];
+                $displayPageNeeded = true;
             }
         }
 
@@ -3832,9 +3860,14 @@ class FileGalLib extends TikiLib
                 'ocr_lang' => $fileInfo['ocr_lang'],
                 'ocr_state' => $fileInfo['ocr_state']
             ]);
-            $fileInfo['fileId'] = $file->replace($fileInfo['data'], $fileInfo['filetype'], $fileInfo['name'], $fileInfo['filename']);
-            $fileChangedMessage = tra('File update was successful') . ': ' . $params['name'];
-            $smarty->assign('fileChangedMessage', $fileChangedMessage);
+            try {
+                $fileInfo['fileId'] = $file->replace($fileInfo['data'], $fileInfo['filetype'], $fileInfo['name'], $fileInfo['filename']);
+                $fileChangedMessage = tra('File update was successful') . ': ' . $params['name'];
+                $smarty->assign('fileChangedMessage', $fileChangedMessage);
+            } catch (StorageLimitException $e) {
+                // The file cannot be stored, report it as a regular error and keep the properties form
+                $errors[] = $e->getMessage();
+            }
             $cat_type = 'file';
             $cat_objid = $editFileId;
             $cat_desc = substr($params["description"][0], 0, 200);
@@ -3869,6 +3902,18 @@ class FileGalLib extends TikiLib
             }
             header('location: ' . $params['returnUrl']);
             die;
+        }
+
+        // Nothing has been displayed for this upload: either it failed, or it succeeded without
+        // ajax and its progress report would have been displayed without any layout. Errors of
+        // an ajax submission are sent back as a fragment, the way the progress report is, and
+        // any other caller is told to display its page, where the feedback and the list of
+        // uploads show up. File edits are left alone, their page is displayed again in any case.
+        if ($displayPageNeeded && empty($params['fileId'])) {
+            if ($isAjaxUpload) {
+                echo \SmartyTiki\FunctionHandler\Feedback::render([], $smarty->getEmptyInternalTemplate());
+            }
+            return false;
         }
 
         // Returns fileInfo of the new file if only one file has been edited / uploaded

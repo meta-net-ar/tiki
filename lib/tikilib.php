@@ -6553,6 +6553,44 @@ class TikiLib extends TikiDb_Bridge
     }
 
     /**
+     * Check if enough memory is left to load some data in memory.
+     * @param int   $bytes    size of the data about to be loaded in memory
+     * @param float $factor   number of copies of the data expected in memory
+     * @param int   $margin   amount of memory to keep available for the rest of the request
+     * @return bool           false when the operation is expected not to fit in memory
+     */
+    public function hasMemoryFor($bytes, $factor = 3, $margin = 1048576 * 10)
+    {
+        $available_memory = $this->get_memory_avail();
+        if ($available_memory < 0) {
+            return true;       // cope with memory_limit = -1
+        }
+        return $available_memory > ($bytes * $factor) + $margin;
+    }
+
+    /**
+     * Maximum size in bytes of a single query the database server accepts. Storing a file
+     * in the database requires the whole row to be sent in one packet, so large files are
+     * limited by this setting.
+     *
+     * @return int      bytes, 0 when the value cannot be determined
+     */
+    public function getMaxAllowedPacket()
+    {
+        static $maxAllowedPacket = null;
+
+        if ($maxAllowedPacket === null) {
+            $maxAllowedPacket = 0;
+            $result = $this->fetchAll("SHOW VARIABLES LIKE 'max_allowed_packet'", null, -1, -1, TikiDb::ERR_NONE);
+            if (! empty($result[0]['Value'])) {
+                $maxAllowedPacket = (int) $result[0]['Value'];
+            }
+        }
+
+        return $maxAllowedPacket;
+    }
+
+    /**
      * @param bool $with_names
      * @param bool $translate
      * @param bool $sort_names

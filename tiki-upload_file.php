@@ -12,6 +12,7 @@
 use Tiki\TikiInit;
 
 $isUpload = false;
+$displayUploadPage = false;
 
 if (isset($_POST['upload'])) {
     $isUpload = true;
@@ -247,8 +248,12 @@ if ($isUpload) {
         if (! empty($prefs['ocr_enable']) && $prefs['ocr_enable'] === 'y' && empty($_POST['ocr_state'][0])) {
             $uploadParams['ocr_state'][0] = null;
         }
-        if ($fileInfo = $filegallib->actionHandler('uploadFile', $uploadParams)) {
+        $fileInfo = $filegallib->actionHandler('uploadFile', $uploadParams);
+        if ($fileInfo) {
             $fileId = $fileInfo['fileId'];
+        } elseif ($fileInfo === false) {
+            $displayUploadPage = ! $access->is_xml_http_request();
+            $fileInfo = null;
         }
     }
 }
@@ -298,7 +303,7 @@ if ($prefs['elementplus_upload'] === 'y') {
 }
 
 // Display the template
-if (! $isUpload || ! empty($_REQUEST['fileId'])) {
+if (! $isUpload || ! empty($_REQUEST['fileId']) || $displayUploadPage) {
     if ($prefs['elementplus_upload'] !== 'y') {
         $headerlib->add_jsfile(JS_ASSETS_PATH . '/vendor_dist/jquery-form/dist/jquery.form.min.js');
     }
