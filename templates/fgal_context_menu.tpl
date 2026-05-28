@@ -275,6 +275,8 @@
             or (!$file.lockedby and (($user and $user eq $file.user)
             or ($file.perms.tiki_p_edit_gallery_file eq 'y'
             and $file.perms.tiki_p_remove_files eq 'y')))}
+            {$delete_file_name=$file.name|default:$file.filename|default:$file.fileId}
+            {$delete_file_description=$file.description|default:''|strip_tags}
                 <form action="tiki-list_file_gallery.php" method="post">
                     {ticket}
                     <input type="hidden" name="remove" value="{$file.fileId}">
@@ -282,7 +284,12 @@
                         <input type="hidden" name="detach" value="1">
                     {/if}
                     <input type="hidden" name="galleryId" value="{$file.galleryId}">
-                    <button type="submit" class="btn btn-link px-0 pt-0" onclick="confirmPopup('{tr}Delete file?{/tr}')" aria-label="{tr}Delete file{/tr}">
+                    <button
+                        type="submit"
+                        class="btn btn-link px-0 pt-0"
+                        onclick="confirmPopup('{if $delete_file_description neq ''}{tr _0=$delete_file_name|escape:'javascript' _1=$delete_file_description|escape:'javascript'}Delete file %0?\nDescription: %1{/tr}{else}{tr _0=$delete_file_name|escape:'javascript'}Delete file %0?{/tr}{/if}')"
+                        aria-label="{tr _0=$delete_file_name|escape:'html'}Delete file %0{/tr}"
+                    >
                         {icon _menu_text=$menu_text _menu_icon=$menu_icon name='remove' alt="{tr}Delete{/tr}"}
                     </button>
                 </form>
