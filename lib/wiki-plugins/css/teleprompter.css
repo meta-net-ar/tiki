@@ -10,6 +10,18 @@
   margin-bottom: 20px;
 }
 
+.teleprompter-container:fullscreen {
+  width: 100% !important;
+  height: 100% !important;
+  background: #000;
+}
+
+.teleprompter-container:-webkit-full-screen {
+  width: 100% !important;
+  height: 100% !important;
+  background: #000;
+}
+
 .teleprompter-container:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.7);
   outline-offset: 2px;
@@ -137,11 +149,25 @@
   bottom: 10px;
   z-index: 3;
   display: flex;
-  gap: 8px;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: calc(100% - 120px);
+  padding: 4px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease-in-out;
 }
 
 .teleprompter-controls-hidden {
-  display: none;
+  display: none !important;
+}
+
+.teleprompter-control-group {
+  display: flex;
+  gap: 4px;
 }
 
 .teleprompter-btn {
@@ -151,13 +177,21 @@
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
   font-size: 12px;
+  font-weight: 600;
   line-height: 1;
-  padding: 0.4rem 0.6rem;
+  padding: 0.35rem 0.5rem;
   cursor: pointer;
+  min-width: 32px;
+  min-height: 30px;
 }
 
 .teleprompter-btn:hover {
   background: rgba(0, 0, 0, 0.7);
+}
+
+.teleprompter-btn-active {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.75);
 }
 
 .teleprompter-btn:focus-visible {
@@ -178,8 +212,28 @@
   font-family: monospace;
   line-height: 1;
   font-variant-numeric: tabular-nums;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease-in-out;
+}
+
+.teleprompter-container:hover .teleprompter-controls,
+.teleprompter-container:focus-within .teleprompter-controls,
+.teleprompter-container.teleprompter-controls-active .teleprompter-controls,
+.teleprompter-container:hover .teleprompter-timer,
+.teleprompter-container:focus-within .teleprompter-timer,
+.teleprompter-container.teleprompter-controls-active .teleprompter-timer {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .teleprompter-timer-hidden {
-  display: none;
+  display: none !important;
+}
+
+@media (max-width: 576px) {
+  .teleprompter-controls {
+    right: 12px;
+    max-width: calc(100% - 24px);
+  }
 }
