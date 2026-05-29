@@ -97,6 +97,7 @@ const TEMP_CACHE_PATH = 'temp/cache';
 const TEMP_PUBLIC_PATH = 'temp/public';
 const TEMP_MAIL_DEBUG = 'temp/mail_debug';
 const HTMLPURIFIERCACHE_CACHE_PATH = 'temp/cache/HTMLPurifierCache';
+const TEMP_PDFIMG_PATH = 'temp/pdfimg';
 
 const WIKIPLUGINS_SRC_PATH = 'lib/wiki-plugins';
 //Question: where is the string or constant that generates these files?
