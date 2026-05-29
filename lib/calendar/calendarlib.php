@@ -707,6 +707,9 @@ class CalendarLib extends TikiLib
         $res = $result->fetchRow();
 
         if ($res) {
+            if ($res['description'] === null) {
+                $res['description'] = '';
+            }
             $query
                 = "select `username`, `role`, `partstat`, `comment` from `tiki_calendar_roles` where `calitemId`=? order by `role`";
             $rezult = $this->query($query, [(int)$calitemId]);
@@ -895,6 +898,10 @@ class CalendarLib extends TikiLib
         }
 
         $data['user'] = $user;
+        // Enforce calendar-item invariant: description is always a string.
+        if (! array_key_exists('description', $data) || $data['description'] === null) {
+            $data['description'] = '';
+        }
 
         $realcolumns = ['calitemId', 'calendarId', 'start', 'end', 'locationId', 'categoryId', 'nlId', 'priority', 'uri', 'uid',
                      'status', 'url', 'lang', 'name', 'description', 'user', 'created', 'lastmodif', 'allday', 'recurrenceId', 'changed', 'recurrenceStart', 'hideParticipants'];
