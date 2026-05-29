@@ -12,11 +12,23 @@ namespace Tiki\Lib\HtmlTidy;
  */
 class HtmlTidyLib
 {
-    private $tidyAvailable;
+    private bool $tidyAvailable;
 
     public function __construct()
     {
+        global $prefs, $tiki_p_admin;
+
         $this->tidyAvailable = extension_loaded('tidy');
+
+        // Process admin session toggle from URL parameter (?tidy_html_reporting=y|n).
+        if (
+            ($prefs['error_tracking_enabled_tidy'] ?? 'n') === 'y'
+            && ($tiki_p_admin ?? 'n') === 'y'
+            && isset($_REQUEST['tidy_html_reporting'])
+            && in_array($_REQUEST['tidy_html_reporting'], ['y', 'n'], true)
+        ) {
+            $_SESSION['tidy_html_reporting'] = $_REQUEST['tidy_html_reporting'];
+        }
     }
 
     /**
@@ -32,7 +44,7 @@ class HtmlTidyLib
      * @param array $context   Context metadata for error reports (e.g. ['source' => 'rss_content'])
      * @return string Cleaned HTML, or original HTML if Tidy is unavailable
      */
-    public function cleanHtml($html, $config = null, $encoding = 'utf8', $context = [])
+    public function cleanHtml(string $html, ?array $config = null, string $encoding = 'utf8', array $context = []): string
     {
         if (! $this->tidyAvailable) {
             return $html;
@@ -64,7 +76,7 @@ class HtmlTidyLib
      * @param array $context  Context metadata for error reports (e.g. ['source' => 'Plugin: html'])
      * @return array          Parsed error entries: [['level', 'line', 'column', 'message'], ...]
      */
-    public function reportErrors($html, $context = [])
+    public function reportErrors(string $html, array $context = []): array
     {
         if (! $this->tidyAvailable) {
             return [];
@@ -72,7 +84,9 @@ class HtmlTidyLib
 
         $html_ = tidy_parse_string($html, [], 'utf8');
         tidy_diagnose($html_);
-        $errors = $this->parseTidyErrors(tidy_get_error_buffer($html_));
+        $errors = $this->filterFragmentNoise(
+            $this->parseTidyErrors(tidy_get_error_buffer($html_))
+        );
 
         if (! empty($errors) && $this->isTidyReportingEnabled()) {
             $this->dispatchErrors($errors, $context);
@@ -84,26 +98,29 @@ class HtmlTidyLib
     /**
      * @return bool True if the Tidy extension is loaded
      */
-    public function isTidyLoaded()
+    public function isTidyLoaded(): bool
     {
         return $this->tidyAvailable;
     }
 
     /**
-     * Delegates to ErrorTracking which owns all reporting state:
-     * global preference, DSN, and session toggle.
-     *
-     * @return bool
+     * Returns true when all conditions are met: DSN configured, preference on,
+     * Tidy extension loaded, and session not disabled by admin toggle.
      */
-    public function isTidyReportingEnabled()
+    public function isTidyReportingEnabled(): bool
     {
-        return \TikiLib::lib('errortracking')->isTidyEnabled();
+        global $prefs;
+
+        return ! empty($prefs['error_tracking_dsn'])
+            && ($prefs['error_tracking_enabled_tidy'] ?? 'n') === 'y'
+            && $this->tidyAvailable
+            && ($_SESSION['tidy_html_reporting'] ?? 'y') !== 'n';
     }
 
     /**
      * Merge caller-supplied Tidy config overrides with the standard defaults.
      */
-    private function buildConfig($override)
+    private function buildConfig(?array $override): array
     {
         $defaults = [
             'output-xhtml'                => false,
@@ -125,35 +142,61 @@ class HtmlTidyLib
     }
 
     /**
-     * Send each parsed error to the error tracking service as a capturable exception.
+     * Send each parsed error to the error tracking service as a message event.
      */
-    private function dispatchErrors($errors, $context)
+    private function dispatchErrors(array $errors, array|string $context): void
     {
         $errorTracking = \TikiLib::lib('errortracking');
         $source = is_array($context) ? ($context['source'] ?? 'unknown') : (string) $context;
 
         foreach ($errors as $error) {
-            $message = sprintf(
+            $errorTracking->captureMessage(sprintf(
                 'HTML Tidy %s in %s: %s (line %d, col %d)',
                 ucfirst($error['level']),
                 $source,
                 $error['message'],
                 $error['line'],
                 $error['column']
-            );
-            $errorTracking->captureException(new \Exception($message));
+            ));
         }
+    }
+
+    /**
+     * Remove false positives that Tidy generates because it treats an HTML fragment
+     * as a complete document. These messages are not actionable for plugin authors.
+     */
+    private function filterFragmentNoise(array $errors): array
+    {
+        $noise = [
+            'missing <!DOCTYPE>',
+            "isn't allowed in <head>",
+            '<head> previously mentioned',
+            'inserting implicit <body>',
+            'inserting implicit <head>',
+            'inserting implicit <html>',
+            "inserting missing 'title' element",
+            'trimming empty <head>',
+        ];
+
+        return array_values(array_filter($errors, function (array $error) use ($noise): bool {
+            foreach ($noise as $pattern) {
+                if (str_contains($error['message'], $pattern)) {
+                    return false;
+                }
+            }
+            return true;
+        }));
     }
 
     /**
      * Parse the raw Tidy error buffer string into a structured array.
      * Tidy error format: "line X column Y - Level: message"
      */
-    private function parseTidyErrors($errorBuffer)
+    private function parseTidyErrors(string $errorBuffer): array
     {
         $errors = [];
 
-        foreach (explode("\n", (string) $errorBuffer) as $line) {
+        foreach (explode("\n", $errorBuffer) as $line) {
             $line = trim($line);
             if (empty($line)) {
                 continue;

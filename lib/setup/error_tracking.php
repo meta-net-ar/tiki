@@ -27,7 +27,6 @@ class ErrorTracking
 
     protected bool $phpEnabled;
     protected bool $jsEnabled;
-    protected bool $tidyEnabled;
     protected bool $tracingEnabledPhp;
     protected bool $tracingEnabledJs;
 
@@ -53,32 +52,6 @@ class ErrorTracking
     }
 
     /**
-     * Check if HTML Tidy error reporting is enabled.
-     * Requires: DSN configured, global preference on, PHP Tidy extension loaded, session not disabled.
-     *
-     * @return bool
-     */
-    public function isTidyEnabled(): bool
-    {
-        return isset($this->dsn)
-            && $this->tidyEnabled
-            && extension_loaded('tidy')
-            && ($_SESSION['tidy_html_reporting'] ?? 'y') !== 'n';
-    }
-
-    /**
-     * Enable or disable Tidy error reporting for the current session.
-     * Lets admins suppress reporting while editing pages they cannot immediately fix,
-     * without touching the global preference.
-     *
-     * @param bool $enabled
-     */
-    public function setTidySessionReporting(bool $enabled): void
-    {
-        $_SESSION['tidy_html_reporting'] = $enabled ? 'y' : 'n';
-    }
-
-    /**
      * Check if performance tracing for PHP is enabled.
      *
      * @return bool
@@ -96,6 +69,31 @@ class ErrorTracking
     public function isTracingEnabledJs(): bool
     {
         return isset($this->dsn) && $this->jsEnabled && $this->tracingEnabledJs;
+    }
+
+    /**
+     * Capture a message event (non-exception). Use this for informational reports
+     * such as markup warnings that are not PHP exceptions.
+     *
+     * @param string $message
+     * @param array $tags Optional associative array of tags to attach to this specific event only
+     */
+    public function captureMessage(string $message, array $tags = []): void
+    {
+        if ($this->state === self::STATE_DISABLED) {
+            return;
+        }
+
+        if (empty($tags)) {
+            \Sentry\captureMessage($message);
+        } else {
+            \Sentry\withScope(function (\Sentry\State\Scope $scope) use ($message, $tags) {
+                foreach ($tags as $key => $value) {
+                    $scope->setTag($key, (string) $value);
+                }
+                \Sentry\captureMessage($message);
+            });
+        }
     }
 
     /**
@@ -277,7 +275,6 @@ class ErrorTracking
         global $prefs;
         $this->phpEnabled = ($prefs['error_tracking_enabled_php'] ?? 'n') === 'y';
         $this->jsEnabled = ($prefs['error_tracking_enabled_js'] ?? 'n') === 'y';
-        $this->tidyEnabled = ($prefs['error_tracking_enabled_tidy'] ?? 'n') === 'y';
         $this->tracingEnabledPhp = ($prefs['error_tracking_tracing_enabled_php'] ?? 'n') === 'y';
         $this->tracingEnabledJs = ($prefs['error_tracking_tracing_enabled_js'] ?? 'n') === 'y';
 
@@ -302,7 +299,7 @@ class ErrorTracking
         if ($this->isInitialised) {
             throw new Error('Error tracking can only be initialised once, so we can control where that happens');
         }
-        if (! self::LOCAL_DEBUG_MODE && (! isset($this->dsn) || (! $this->phpEnabled && ! $this->tidyEnabled) || $this->state !== self::STATE_DISABLED)) {
+        if (! self::LOCAL_DEBUG_MODE && (! isset($this->dsn) || ! $this->phpEnabled || $this->state !== self::STATE_DISABLED)) {
             return;
         }
         try {
