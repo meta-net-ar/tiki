@@ -14,8 +14,11 @@ class Hm_Custom_User_Config extends Hm_Config
      */
     public function __construct($config)
     {
+        global $user;
+
         $this->config = array_merge($this->config, $config->user_defaults);
         $this->site_config = $config;
+        $this->load($user);
     }
 
     public function get($name, $default = false)
