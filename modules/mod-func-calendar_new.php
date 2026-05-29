@@ -211,14 +211,15 @@ function module_calendar_new($mod_reference, $module_params)
         }
 
         $checkedCalIds = [];
-        if (is_array($_SESSION['ModuleCalendarViewGroups'])) {
+        $moduleCalendarViewGroups = $_SESSION['ModuleCalendarViewGroups'] ?? null;
+        if (is_array($moduleCalendarViewGroups)) {
             foreach ($calendars as $calendarId => $calendar) {
-                if (in_array($calendarId, $_SESSION['ModuleCalendarViewGroups'])) {
+                if (in_array($calendarId, $moduleCalendarViewGroups)) {
                     $checkedCalIds[] = $calendarId;
                 }
             }
-            $displayedcals = $_SESSION['ModuleCalendarViewGroups'];
-            $moduleCalendarIds = implode(',', $_SESSION['ModuleCalendarViewGroups']);
+            $displayedcals = $moduleCalendarViewGroups;
+            $moduleCalendarIds = implode(',', $moduleCalendarViewGroups);
         } else {
             $displayedcals = $calIds;
             $checkedCalIds = $calIds;
