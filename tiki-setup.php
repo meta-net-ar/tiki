@@ -229,6 +229,46 @@ Sections::onSectionChange(function ($section) use ($prefs) {
     $freetaglib->assignCurrentObjectTagsToSmarty();
 });
 
+Sections::onSectionChange(function ($section) use ($prefs) {
+    global $headerlib, $jitRequest, $user, $jqueryTiki;
+    
+    if ($prefs['feature_inline_comments'] !== 'y' || $prefs['comments_inline_annotator'] !== 'y') {
+        return;
+    }
+
+    $object = current_object();
+    
+    if (!$object) {
+        return;
+    }
+
+    $commentController = new Services_Comment_Controller();
+    
+    if (
+        !$commentController->isEnabled($object['type'], $object['object']) ||
+        !$commentController->canView($object['type'], $object['object'])
+    ) {
+        return;
+    }
+
+    $canPost = $commentController->canPost($object['type'], $object['object']);
+    $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
+
+    $headerlib->add_js_module('
+        import { initRecogito } from "@tiki/annotator/annotator";
+        
+        initRecogito({
+            containerId: "top",
+            objectUri: "' . $objectIdentifier . '",
+            userId: "' . $user . '",
+            userName: "' . $jqueryTiki["userRealName"] . '",
+            canPost: ' . ($canPost ? 'true' : 'false') . ',
+            showUserInfo: ' . ($prefs['comments_inline_annotator_with_info'] === 'y' ? 'true' : 'false') . ',
+            csrfToken: "' . $jitRequest->csrfToken() . '"
+        });
+    ');
+});
+
 require_once('lib/setup/wiki.php');
 
 $user_groups = $userlib->get_user_groups($user);
