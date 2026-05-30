@@ -103,6 +103,7 @@ export default defineConfig(({ command, mode }) => {
         { prefix: "@tiki/editor-toolbar/", src: "src/js/@tiki/editor-toolbar" },
         { prefix: "@tiki/plugin-base/", src: "src/js/@tiki/plugin-base" },
         { prefix: "@tiki/plugins/", src: "src/js/@tiki/plugins" },
+        { prefix: "@tiki/annotator/", src: "src/js/@tiki/annotator" },
         { prefix: "@tiki/tracker-field-base/", src: "src/js/@tiki/tracker-field-base" },
         { prefix: "@tiki/tracker-fields/", src: "src/js/@tiki/tracker-fields" },
     ]);
