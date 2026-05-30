@@ -526,11 +526,11 @@ class RSSLib extends TikiDb_Bridge
             $conditions['date'] = $this->modules->expr('`lastUpdated` < ? - `refresh`', [$tikilib->now]);
         }
 
-        $result = $this->modules->fetchAll(['rssId', 'url', 'actions', 'lastModifiedSince_raw'], $conditions);
+        $result = $this->modules->fetchAll(['rssId', 'url', 'actions'], $conditions);
         $feedResult['feeds'] = count($result);
         $entryReturn = ['feed' => 0, 'articles' => 0, 'feedData' => []];
         foreach ($result as $row) {
-            $entryResult = $this->update_feed($row['url'], $row['rssId'], $row['actions'], $row['lastModifiedSince_raw']);
+            $entryResult = $this->update_feed($row['url'], $row['rssId'], $row['actions']);
             if (! empty($entryResult['feed'])) {
                 $entryReturn['feed'] += $entryResult['feed'];
             }
@@ -592,7 +592,6 @@ class RSSLib extends TikiDb_Bridge
                     'lastUpdated' => $tikilib->now,
                     'sitetitle'   => $siteTitle,
                     'siteurl'     => $siteUrl,
-                    'lastModifiedSince_raw' => $success['lastModifiedSince'],
                 ],
                 ['rssId' => $rssId,]
             );
