@@ -148,7 +148,7 @@ export function initRecogito(config) {
     annotation.target = annotation.target || {};
     annotation.target.updated = new Date().toISOString();
 
-    const updateUrl = `tiki-ajax_services.php?controller=annotation&action=update&id=${encodeURIComponent(annotation.id)}`;
+    const updateUrl = `tiki-ajax_services.php?controller=annotation&action=update&threadId=${encodeURIComponent(annotation.id)}`;
     console.log('[Recogito] Update URL:', updateUrl);
 
     fetch(updateUrl, {
@@ -184,7 +184,7 @@ export function initRecogito(config) {
     console.group('[Recogito] Deleting annotation');
     console.log('[Recogito] Annotation ID:', annotation.id);
 
-    const deleteUrl = `tiki-ajax_services.php?controller=annotation&action=destroy&id=${encodeURIComponent(annotation.id)}`;
+    const deleteUrl = `tiki-ajax_services.php?controller=annotation&action=destroy&threadId=${encodeURIComponent(annotation.id)}`;
     console.log('[Recogito] Delete URL:', deleteUrl);
 
     fetch(deleteUrl, {
