@@ -132,7 +132,6 @@ class ApiCommentsGetTest extends ApiBaseCommentsTest
 
         foreach ($objectTypes as $type) {
             if (! isset(static::$defaultComments[$type])) {
-                $this->markTestSkipped("Default comment for $type not available");
                 continue;
             }
 

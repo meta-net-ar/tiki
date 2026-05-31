@@ -54,13 +54,22 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      */
     private static $preferences = [
         'feature_trackers' => 'y',
-        'unified_engine'   => 'n',
+        'feature_search' => 'n',
+        'unified_incremental_update' => 'n',
     ];
 
     public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
         static::setTestPreferences(self::$preferences);
+
+        // Sync to the in-process $prefs global so content creation does not
+        // attempt to reach search services that are absent in the CI environment.
+        global $prefs;
+        foreach (self::$preferences as $name => $value) {
+            $prefs[$name] = $value;
+        }
+
         static::createDefaultTestData();
     }
 
@@ -160,12 +169,12 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
             'n',     // isHidden
             'y',     // isMain
             10,      // position
-            [],      // options
+            '',      // options (empty string = no options)
             '',      // description
             '',      // descriptionIsParsed
             null,    // itemChoices
             '',      // errorMsg
-            [],      // visibleBy
+            null,    // visibleBy
             null,    // editableBy
             'n',     // isMultilingual
             '',      // validation

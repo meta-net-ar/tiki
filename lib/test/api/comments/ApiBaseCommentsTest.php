@@ -70,8 +70,8 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         parent::setUpBeforeClass();
         static::setTestPreferences(self::$preferences);
 
-        // Sync to the in-process $prefs global so ORM calls in lazy setUp() do not
-        // attempt to reach search services that are absent in the CI environment.
+        // Sync preferences to the in-process $prefs global so feature flags are
+        // visible to direct Tiki lib calls made during lazy setUp().
         global $prefs;
         foreach (self::$preferences as $name => $value) {
             $prefs[$name] = $value;
@@ -153,17 +153,6 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
             static::$defaultComments['blog post'] = [
                 'objectId' => $blogPostId,
                 'threadId' => $blogPostThreadId
-            ];
-        }
-
-        // Tracker item
-        $trackerItemId = static::createTrackerItem('API_Test_TrackerItem_Comments');
-        if ($trackerItemId) {
-            $trackerItemThreadId = static::createComment('trackeritem', $trackerItemId, 'Default tracker comment', 'Test comment on tracker item');
-            static::createComment('trackeritem', $trackerItemId, 'Reply to default tracker comment', 'This is a reply', $trackerItemThreadId); // add reply to the default comment to test threading in the response
-            static::$defaultComments['trackeritem'] = [
-                'objectId' => $trackerItemId,
-                'threadId' => $trackerItemThreadId
             ];
         }
 
@@ -307,7 +296,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
             'n',
             'y',
             10,
-            [],
+            '',
             '',
             ''
         );

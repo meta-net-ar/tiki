@@ -55,17 +55,14 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
     protected static $defaultTabularId = null;
 
     /**
-     * Guard for lazy one-time test-data creation.
-     */
-    private static bool $testDataCreated = false;
-
-    /**
-     * Preferences to enable required features
+     * Preferences to enable/disable features
      * @var array
      */
     private static $preferences = [
         'feature_trackers' => 'y',
         'tracker_tabular_enabled' => 'y',
+        'feature_search' => 'n',
+        'unified_incremental_update' => 'n',
     ];
 
     public static function setUpBeforeClass(): void
@@ -73,22 +70,14 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
         parent::setUpBeforeClass();
         static::setTestPreferences(self::$preferences);
 
-        // Sync to the in-process $prefs global so ORM calls in lazy setUp() do not
+        // Sync to the in-process $prefs global so content creation does not
         // attempt to reach search services that are absent in the CI environment.
         global $prefs;
         foreach (self::$preferences as $name => $value) {
             $prefs[$name] = $value;
         }
-        self::$testDataCreated = false;
-    }
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        if (! self::$testDataCreated) {
-            static::createDefaultTestData();
-            self::$testDataCreated = true;
-        }
+        static::createDefaultTestData();
     }
 
     /**
@@ -200,12 +189,12 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
             'n',
             'y',
             10,
-            [],
+            '',
             '',
             '',
             null,
             '',
-            [],
+            null,
             null,
             'n',
             '',
