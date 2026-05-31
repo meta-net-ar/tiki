@@ -267,6 +267,20 @@ function wikiplugin_pdf_info()
                         'type' => 'text',
                         'default' => '',
                     ],
+                    'coverpage_wiki' => [
+                        'name' => tra('CoverPage wiki'),
+                        'description' => tra('Name of the wiki page that will be used for the text of the coverpage.'),
+                        'required' => false,
+                        'type' => 'text',
+                        'default' => '',
+                    ],
+                    'coverpage_settings' => [
+                        'name' => tra('CoverPage settings'),
+                        'description' => tra('<code>Background color|Page border|Border color</code>. Enter settings separated by <code>|</code>,sequence is important,leave blank for default. For example <code>#fff|1|#000</code>'),
+                        'required' => false,
+                        'type' => 'text',
+                        'default' => '',
+                    ],
                     'coverpage_image_settings' => [
                         'name' => tra('Coverpage image URL'),
                         'description' => tra('Enter the full URL.'),
