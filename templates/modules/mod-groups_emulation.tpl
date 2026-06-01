@@ -91,10 +91,10 @@
         </div>
     {/if}
 
-    <form method="get" action="tiki-emulate_groups_switch.php" target="_self">
+    <form method="get" action="tiki-emulate_groups_switch.php" target="_self" onsubmit="return !!document.getElementById('mge-select-groups-{$moduleId}').value;">
         <fieldset>
             <legend><strong>{tr}Switch to Groups{/tr}</strong></legend>
-            <select name="switchgroups[]" size="{$module_rows}" multiple="multiple" class="form-select table" required="required" id="mge-select-groups-{$moduleId}">
+            <select name="switchgroups[]" size="{$module_rows}" multiple="multiple" class="form-select table" id="mge-select-groups-{$moduleId}">
                 {foreach from=$chooseGroups key=groupname item=inclusion name=ix}
                     <option value="{$groupname|escape}">{$groupname|escape}</option>
                 {/foreach}
@@ -103,24 +103,7 @@
         </fieldset>
     </form>
 
-    <script>
-        (function () {
-            var moduleId = '{$moduleId|escape:"javascript"}';
-            var select = document.getElementById('mge-select-groups-' + moduleId);
-            var button = document.getElementById('mge-simulate-btn-' + moduleId);
 
-            if (!select || !button) {
-                return;
-            }
-
-            var updateButtonState = function () {
-                button.disabled = !select.value || select.selectedOptions.length === 0;
-            };
-
-            select.addEventListener('change', updateButtonState);
-            updateButtonState();
-        }());
-    </script>
 
 {/tikimodule}
 {/strip}
