@@ -198,18 +198,6 @@ function module_calendar_new($mod_reference, $module_params)
     }
 
     if (! empty($calIds)) {
-        $tc_infos = $calendarlib->getCalendar($calIds, $viewstart, $viewend, 'day', 'events', true);
-        if ($_REQUEST['viewlistmodule'] == 'list') {
-            foreach ($tc_infos['listevents'] as $i => $e) {
-                $tc_infos['listevents'][$i]['head'] = '';
-                $tc_infos['listevents'][$i]['group_description'] = '';
-            }
-        }
-
-        foreach ($tc_infos as $tc_key => $tc_val) {
-            $smarty->assign($tc_key, $tc_val);
-        }
-
         $checkedCalIds = [];
         $moduleCalendarViewGroups = $_SESSION['ModuleCalendarViewGroups'] ?? null;
         if (is_array($moduleCalendarViewGroups)) {
@@ -223,6 +211,23 @@ function module_calendar_new($mod_reference, $module_params)
         } else {
             $displayedcals = $calIds;
             $checkedCalIds = $calIds;
+        }
+        // Select only events from checked calendars in list view
+        if (! empty($checkedCalIds)) {
+            $calIds = $checkedCalIds;
+        }
+
+        $tc_infos = $calendarlib->getCalendar($calIds, $viewstart, $viewend, 'day', 'events', true);
+
+        if ($_REQUEST['viewlistmodule'] == 'list') {
+            foreach ($tc_infos['listevents'] as $i => $e) {
+                $tc_infos['listevents'][$i]['head'] = '';
+                $tc_infos['listevents'][$i]['group_description'] = '';
+            }
+        }
+
+        foreach ($tc_infos as $tc_key => $tc_val) {
+            $smarty->assign($tc_key, $tc_val);
         }
 
         $smarty->assign('viewnavbar', $module_params['viewnavbar']);
