@@ -3,6 +3,29 @@
 @use 'element-plus/theme-chalk/el-button.css';
 @use '../all.scss';
 
+.file-gal-upload-file {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.file-gal-upload-file__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-gal-upload-file__actions {
+    display: flex;
+    gap: 4px;
+}
+
+.file-gal-upload-file__actions .el-button + .el-button {
+    margin-left: 0;
+}
+
 .uploaded-files-list {
     margin: 15px 0;
     padding: 10px;

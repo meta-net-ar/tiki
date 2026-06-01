@@ -14,5 +14,8 @@
     "devDependenciesComment": {
         "element-plus": "Pinning to 2.11.3, so patches will stop breaking, as clearly after well over a year the dev will not do it.",
         "sortablejs": "Pinning to 1.14.0 to avoid conflicts with src/common-extarnals/package.json"
+    },
+    "dependencies": {
+        "cropperjs": "2.1.1"
     }
 }

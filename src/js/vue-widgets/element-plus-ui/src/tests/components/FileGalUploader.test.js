@@ -13,6 +13,9 @@ import handleTikiFeedback from "../../helpers/fileGalUploader/handleTikiFeedback
 // stateful component object (not a vi.fn() function) for `ref.submit()` to work via expose().
 const elUploadSpy = vi.fn();
 let mockElUploadSubmit = vi.fn();
+let mockElUploadHandleRemove = vi.fn();
+let mockUploadSlotFile = null;
+let mockEditedImage = null;
 
 vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
@@ -24,8 +27,12 @@ vi.mock("element-plus", async (importOriginal) => {
         ElUpload: {
             setup(_, { attrs, slots, expose }) {
                 elUploadSpy(attrs, { slots, expose });
-                expose({ submit: mockElUploadSubmit });
-                return () => h("div", attrs, slots.default ? slots.default() : null);
+                expose({ submit: mockElUploadSubmit, handleRemove: mockElUploadHandleRemove });
+                return () =>
+                    h("div", attrs, [
+                        slots.default ? slots.default() : null,
+                        mockUploadSlotFile && slots.file ? slots.file({ file: mockUploadSlotFile }) : null,
+                    ]);
             },
         },
     };
@@ -36,6 +43,21 @@ vi.mock("../../components/ConfigWrapper.vue", () => {
         default: vi.fn((props, { slots }) => h("div", { ...props, "data-testid": "config-wrapper" }, slots.default ? slots.default() : null)),
     };
 });
+
+vi.mock("../../components/FileGalUploader/ImageEditor.vue", () => ({
+    default: {
+        props: ["file"],
+        emits: ["apply", "cancel"],
+        setup(props, { emit }) {
+            return () =>
+                h("div", { "data-testid": "image-editor" }, [
+                    h("span", props.file.name),
+                    h("button", { onClick: () => emit("apply", mockEditedImage) }, "Apply edited image"),
+                    h("button", { onClick: () => emit("cancel") }, "Cancel image editing"),
+                ]);
+        },
+    },
+}));
 
 vi.mock("element-plus/es/components/upload/src/ajax.mjs", async (importOriginal) => {
     const actual = await importOriginal();
@@ -62,6 +84,9 @@ describe("FileGalUploader", () => {
     const consoleWarnSpy = vi.spyOn(console, "warn");
 
     afterEach(() => {
+        mockUploadSlotFile = null;
+        mockEditedImage = null;
+        window.location.search = "";
         vi.clearAllMocks();
         vi.resetModules();
     });
@@ -167,6 +192,30 @@ describe("FileGalUploader", () => {
             });
 
             expect(uploadValidation).toBe(false);
+        });
+
+        test("edits and removes an image before upload", async () => {
+            const rawFile = new File(["original"], "photo.png", { type: "image/png" });
+            mockUploadSlotFile = { name: rawFile.name, raw: rawFile, status: "ready", uid: 1 };
+            mockEditedImage = new File(["edited"], "photo.png", { type: "image/png" });
+
+            render(FileGalUploader, {
+                props: {
+                    maxSize: "100",
+                    maxFiles: "1",
+                },
+            });
+
+            await screen.getByRole("button", { name: "Edit photo.png" }).click();
+            await (await screen.findByRole("button", { name: "Apply edited image" })).click();
+
+            expect(mockUploadSlotFile.raw).toBe(mockEditedImage);
+            expect(mockUploadSlotFile.raw.uid).toBe(1);
+            expect(mockUploadSlotFile.size).toBe(mockEditedImage.size);
+            expect(screen.queryByTestId("image-editor")).toBeNull();
+
+            await screen.getByRole("button", { name: "Remove photo.png" }).click();
+            expect(mockElUploadHandleRemove).toHaveBeenCalledWith(mockUploadSlotFile);
         });
 
         test("correctly executes the http request function", async () => {
