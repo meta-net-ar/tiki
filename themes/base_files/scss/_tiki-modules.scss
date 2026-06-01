@@ -1,9 +1,10 @@
 // Redundant for .module.card, but needed when nobox=y.
-.module {
+.module.no-box {
     position: relative;
     display: flex !important;
     flex-direction: column;
     justify-content: center;
+    padding: 0 var(--bs-navbar-nav-link-padding-x);
 }
 
 header.container,
