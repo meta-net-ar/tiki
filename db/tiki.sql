@@ -2529,7 +2529,7 @@ CREATE TABLE `tiki_tracker_config_history` (
   PRIMARY KEY (`historyId`),
   KEY `object_idx` (`objectType`,`objectId`,`changedAt`),
   KEY `tracker_idx` (`trackerId`,`changedAt`),
-  KEY `user_idx` (`changedBy`(100),`changedAt`)
+  KEY `user_idx` (`changedBy`,`changedAt`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 
