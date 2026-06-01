@@ -72,7 +72,7 @@
                 if (data.itemId) {
                     $.openModal({
                         remote: $.service('tracker', 'update_item', {trackerId: $(form.trackerId).val(), itemId: data.itemId}),
-                        open: () => $(map).trigger('changed');
+                        open: () => $(map).trigger('changed')
                     });
                 }
                 {{/if}}
