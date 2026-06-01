@@ -15,96 +15,72 @@
     </form>
     {jq}
     $(function () {
-        const $form = $(".map-edit-features").hide();
-        let container, activeFeature;
-
-        $form
-            .removeClass("map-edit-features")
+        var map, activeFeature, form = $('.map-edit-features').hide();
+        form
+            .removeClass('map-edit-features')
             .on("submit", function () {
                 if (! activeFeature) {
                     return false;
                 }
 
                 var form = this;
-                $.post($(form).attr("action"), $(form).serialize(), null, "json")
+                $.post($(form).attr('action'), $(form).serialize(), null, 'json')
                     .done(function (data) {
-                        $(form).trigger("insert", [data]);
+                        $(form).trigger('insert', [data]);
                     })
                     .fail(function () {
                         $.openModal({
-                            title: $(":submit", form).val(),
+                            title: $(':submit', form).val(),
                             open: () => {
-                                $(form).trigger("insert", [{}]);
-                                $(".modal.fade").on("hidden.bs.modal", function () {
-                                    $(form).trigger("cancel");
+                                $(form).trigger('insert', [{}]);
+                                $('.modal.fade').on('hidden.bs.modal', function () {
+                                    $(form).trigger('cancel');
                                 });
                             }
                         })
-                    });
+                    })
+                    ;
 
                 return false;
             })
             .each(function () {
-                container = $(this).closest(".tab, #appframe, body").find(".map-container").first().get(0);
+                map = $(this).closest('.tab, #appframe, body').find('.map-container').first()[0];
 
-                if (! container) {
+                if (! map) {
                     return;
                 }
 
                 $(this).show();
             });
 
-        {*  featuremodified: function (event) {
-            if (event.feature === activeFeature) {
-                saveFeature();
+        $(map).one('initialized', function () {
+            var vlayer = map.vectors, toolbar, modify;
+
+            function saveFeature() {
+                var format = new OpenLayers.Format.GeoJSON;
+                form.find('.feature-content').val(format.write(activeFeature));
             }
-        }
 
-        {if not empty($edit_features.standardControls)}}
-            TODO fix this for non cartograf applications
-            modify = new OpenLayers.Control.ModifyFeature(vlayer, {
-                mode: OpenLayers.Control.ModifyFeature.DRAG | OpenLayers.Control.ModifyFeature.RESHAPE,
-            });
-            toolbar = new OpenLayers.Control.EditingToolbar(vlayer);
-            toolbar.addControls([modify]);
+            form.on('insert', function (e, data) {
+                var form = this;
 
-            container.modeManager.addMode({
-                name: "Draw",
-                controls: [ toolbar ]
-            });
-        {{/if}*}
+                $(map).trigger('changed');
+                map.vectors.removeFeatures([activeFeature]);
+                activeFeature = null;
 
-        $form.on("insert", function (e, data) {
-            var form = this;
-
-            $(container).trigger("changed");
-            container.vectors.getSource().removeFeature(activeFeature);
-            activeFeature = null;
-
-            {{if !empty($edit_features.editDetails)}}
-            if (data.itemId) {
-                $.openModal({
-                    remote: $.service("tracker", "update_item", {trackerId: $(form.trackerId).val(), itemId: data.itemId}),
-                    open: () => $(container).trigger("changed")
-                });
-            }
-            {{/if}}
-
-            {{if !empty($edit_features.insertMode)}}
-                container.modeManager.switchTo({{$edit_features.insertMode|json_encode}});
-            {{/if}}
-        });
-
-        $(document).on("drawend.tiki", function (event, olEvent) {
-            if (olEvent.feature) {
-                activeFeature = olEvent.feature;
-                var format = new ol.format.GeoJSON;
-
-                if (! activeFeature.get("intent") !== "marker") {
-                    $form.find(".feature-content").val(format.writeFeature(activeFeature));
-                    $form.trigger("submit");
+                {{if !empty($edit_features.editDetails)}}
+                if (data.itemId) {
+                    $.openModal({
+                        remote: $.service('tracker', 'update_item', {trackerId: $(form.trackerId).val(), itemId: data.itemId}),
+                        open: () => $(map).trigger('changed')
+                    });
                 }
-            }
+                {{/if}}
+
+                {{if !empty($edit_features.insertMode)}}
+                    map.modeManager.switchTo({{$edit_features.insertMode|json_encode}});
+                {{/if}}
+            });
         });
     });
     {/jq}
