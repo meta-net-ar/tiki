@@ -166,7 +166,7 @@ class TrackerConfigHistoryRenderer
      */
     public static function renderRow(array $row): array
     {
-        $diffData    = $row['diff_data']   ?? json_decode($row['diff'] ?? '[]', true) ?? [];
+        $diffData    = $row['diff_data'] ?? json_decode($row['diff'] ?? '[]', true) ?? [];
         $objectType  = $row['objectType'];
 
         return [

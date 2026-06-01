@@ -20,8 +20,6 @@
  * @since       Always
  */
 
-use Tiki\Lib\Trackers\TrackerConfigHistory;
-
 /**
  * This script may only be included, so it is better to die if called directly.
  */
@@ -31,6 +29,8 @@ use Tiki\Lib\Trackers\TrackerConfigHistory;
  * Therefore, this field ID does not exist for a tracker item.
  */
 define('HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE', -1);
+
+use Tiki\Lib\Trackers\TrackerConfigHistory;
 
 /**
  * TrackerLib Class
