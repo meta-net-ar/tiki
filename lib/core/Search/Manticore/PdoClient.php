@@ -330,10 +330,10 @@ class PdoClient
             $values .= ', ' . implode(', ', $array_values);
         }
         if ($this->dataBuffer) {
-            $this->dataBuffer->setPrefix("INSERT INTO $index ($keys) VALUES ");
+            $this->dataBuffer->setPrefix("REPLACE INTO $index ($keys) VALUES ");
             $this->dataBuffer->push('(' . $values . ')');
         } else {
-            $this->prepareAndExecuteWithRetry("INSERT INTO $index ($keys) VALUES (" . $values . ")");
+            $this->prepareAndExecuteWithRetry("REPLACE INTO $index ($keys) VALUES (" . $values . ")");
         }
     }
 
