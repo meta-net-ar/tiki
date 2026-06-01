@@ -445,15 +445,23 @@ function wikiplugin_appframe_mapcontrol($data, $params, $start)
             $label = tr('Select');
             break;
         case 'modify_feature':
-            $control = 'new ol.interaction.Modify({source: vlayer.get("source"),}), new ol.interaction.Select({layers: [vlayer]})';
+            $control = 'new ol.interaction.Modify({
+            source: vlayer.get("source"),
+        }), new ol.interaction.Select({layers: [vlayer]})';
             $label = tr('Select/Modify');
             break;
         case 'draw_polygon':
-            $control = 'new ol.interaction.Draw({source: vlayer.get("source"),type: "Polygon"})';
+            $control = 'new ol.interaction.Draw({
+            source: vlayer.get("source"),
+            type: "Polygon"
+            })';
             $label = tr('Draw Polygon');
             break;
         case 'draw_path':
-            $control = 'new ol.interaction.Draw({source: vlayer.get("source"),type: "LineString"})';
+            $control = 'new ol.interaction.Draw({
+            source: vlayer.get("source"),
+            type: "LineString"
+            })';
             $label = tr('Draw Path');
             break;
         case 'reset_zoom':
@@ -479,7 +487,6 @@ function wikiplugin_appframe_mapcontrol($data, $params, $start)
             'id' => 'mapcontrol-' . ++$counter,
             'control' => $control,
             'icon' => $icon,
-            'name' => $name,
             'label' => $label,
             'mode' => $mode,
             'function' => $function,
