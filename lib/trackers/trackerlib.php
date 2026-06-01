@@ -19,6 +19,9 @@
  * @link        http://dev.tiki.org/Trackers
  * @since       Always
  */
+
+use Tiki\Lib\Trackers\TrackerConfigHistory;
+
 /**
  * This script may only be included, so it is better to die if called directly.
  */
@@ -3262,10 +3265,15 @@ class TrackerLib extends TikiLib
         ];
 
         $logOption = 'Updated';
+        $configHistoryBefore = null;
         if ($trackerId) {
             $finalEvent = 'tiki.tracker.update';
             $conditions = ['trackerId' => (int) $trackerId];
             if ($trackers->fetchCount($conditions)) {
+                $configHistoryBefore = $this->get_tracker((int) $trackerId);
+                if ($configHistoryBefore) {
+                    $configHistoryBefore['_options'] = $this->get_tracker_options((int) $trackerId) ?: [];
+                }
                 $trackers->update($data, $conditions);
             } else {
                 $data['trackerId'] = (int) $trackerId;
@@ -3318,6 +3326,10 @@ class TrackerLib extends TikiLib
                 ]
             );
         }
+
+        // --- Config History: write after-state ---
+        $configHistoryAfter = array_merge($data, ['_options' => $options]);
+        TrackerConfigHistory::logTrackerChange($logOption, (int) $trackerId, $configHistoryBefore, $configHistoryAfter);
 
         TikiLib::events()->trigger($finalEvent, [
             'type' => 'tracker',
@@ -3428,6 +3440,7 @@ class TrackerLib extends TikiLib
         ];
 
         $logOption = null;
+        $configHistoryFieldBefore = null;
 
         if ($fieldId) {
             // -------------------------------------
@@ -3437,6 +3450,8 @@ class TrackerLib extends TikiLib
                 if ($old_field['type'] == 'i' && $type != 'i') {
                     $this->remove_field_images($fieldId);
                 }
+
+                $configHistoryFieldBefore = $old_field;
 
                 $fields->update($data, ['fieldId' => (int) $fieldId]);
                 $logOption = 'modify_field';
@@ -3481,6 +3496,17 @@ class TrackerLib extends TikiLib
                     'fieldId' => $fieldId,
                     'name' => $data['name'],
                 ]
+            );
+
+            // --- Config History: write field after-state ---
+            $configHistoryAction = ($logOption === 'add_field') ? 'Created' : 'Updated';
+            $configHistoryAfterData = array_merge($data, ['fieldId' => $fieldId]);
+            TrackerConfigHistory::logFieldChange(
+                $configHistoryAction,
+                (int) $fieldId,
+                (int) ($data['trackerId'] ?? $trackerId),
+                $configHistoryFieldBefore,
+                $configHistoryAfterData
             );
 
             TikiLib::events()->trigger(
