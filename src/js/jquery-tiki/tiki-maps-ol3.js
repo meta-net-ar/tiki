@@ -788,7 +788,7 @@ import { defaults as defaultControls } from "ol/control";
                         this.activeMode = mode;
 
                         $.each(mode.controls, function (k, control) {
-                            control.activate();
+                            control.setActive(true);
                         });
                         $.each(mode.layers, function (k, layer) {
                             layer.setVisibility(true);
@@ -805,7 +805,7 @@ import { defaults as defaultControls } from "ol/control";
                         }
 
                         $.each(this.activeMode.controls, function (k, control) {
-                            control.deactivate();
+                            control.setActive(false);
                         });
                         $.each(this.activeMode.layers, function (k, layer) {
                             layer.setVisibility(false);

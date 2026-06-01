@@ -34,6 +34,10 @@ $('#appframe .map-container').on('initialized', function () {
             name: {{$mapcontrol.label|json_encode}},
             controls: controls
         });
+        controls.forEach((control) => {
+            control.setActive(false);
+            container.map.addInteraction(control);
+        });
     {{/if}}
 
     container.modeManager.register('activate', mode, function () {
