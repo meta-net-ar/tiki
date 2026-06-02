@@ -1235,11 +1235,13 @@ class UsersLib extends TikiLib
         }
 
         $clicked_on_saml_link = false;
+        $post_auth_redirect = '';
 
         // Check endpoints
         if (array_key_exists('auth', $_REQUEST) && $_REQUEST['auth'] == 'saml') {
             $saml_instance = $this->get_saml_auth();
-            $saml_instance->login();
+            $return_to = $_SESSION['loginfrom'] ?? null;
+            $saml_instance->login($return_to);
         } elseif (array_key_exists('saml_metadata', $_REQUEST)) {
             $samlSettingsInfo = $this->get_saml_settings();
             $saml_settings = new Saml2\Settings($samlSettingsInfo, true);
@@ -1277,11 +1279,8 @@ class UsersLib extends TikiLib
             $_SESSION['samlUserdata'] = $saml_instance->getAttributes();
             $_SESSION['samlNameId'] = $saml_instance->getNameId();
             $_SESSION['samlSessionIndex'] = $saml_instance->getSessionIndex();
-/*
-            if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
-                $saml_instance->redirectTo($_POST['RelayState']);
-            }
-*/
+
+            $post_auth_redirect = $_POST['RelayState'] ?? '';
         } elseif (array_key_exists('saml_sls', $_REQUEST)) {
             $saml_instance = $this->get_saml_auth();
 
@@ -1307,6 +1306,11 @@ class UsersLib extends TikiLib
 
         if ($clicked_on_saml_link || ($force_saml_login && ! $already_logged_as_admin)) {
             $this->validate_user("", "", "", "");
+
+            if (! empty($post_auth_redirect)) {
+                header('Location: ' . $post_auth_redirect);
+                exit;
+            }
         }
     }
 
