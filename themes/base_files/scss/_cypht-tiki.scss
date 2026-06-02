@@ -155,6 +155,7 @@
             }
         }
     }
+    .folders .account_icon { opacity: 1; vertical-align: 0; padding-right: 4px; }
     .folders .selected_menu:not(.menu_search) a {
         &, &:hover, i.bi { color: var(--bs-primary-text-emphasis) !important; }
     }
@@ -240,7 +241,7 @@
     }
     .btn-outline-secondary:hover {
         color: var(--bs-btn-hover-color); text-decoration: none;
-        background-color: var(--bs-secondary) !important;
+        background-color: var(--bs-secondary);
     }
     .msg_controls {
         .btn-outline-secondary:hover { color: var(--bs-btn-hover-color); }
@@ -284,9 +285,7 @@
     .toggle_link { margin-right: 10px; }
     .move_to_location .folders a:not(.btn), .move_to_location i { color: $dropdown-link-color !important; }
     .shortcut_table { width: 100%; }
-    .app-container {
-        padding: 20px;
-    }
+    .app-container { padding: 20px; background-color: inherit !important; }
     .folder_list { width: calc(var(--nav-size) - 75px); }
     .folder_list, .content_cell{
         position: relative;
@@ -412,7 +411,7 @@
     }
     .folder_cell.collapsed .folder_list {
         padding-right: 14px;
-        width: calc(var(--nav-size) - 68px);
+        width: calc(var(--nav-size) - 72px);
     }
 
     main .container {
@@ -469,6 +468,11 @@
         .block_sender_link { margin-right: 0; }
         .item_to_trackers { min-width: max-content; }
         #extra-header-buttons { margin-top: 0; }
+        .disabled_link {
+            padding: 0.25rem 0.5rem;
+            background: var(--bs-body-bg);
+            font-size: 0.875rem;
+        }
     }
 
     .advanced_search_form {
@@ -483,6 +487,16 @@
             .inner_list .form-check { margin: 0 0 0 30px; }
             .unread_count { padding-top: 4px; }
         }
+    }
+
+    .bubble_dropdown-content { z-index: 5; }
+    .bubble_dropdown-content .bi { margin-right: 5px; }
+    .contact-list-container { padding: 1.5rem; }
+
+    nav.collapsed {
+        .src_name_initial { margin: 5px 7px; }
+        .folders .menu_combined_trackers a { font-size: 0; }
+        .folders .menu_combined_trackers .account_icon { padding-right: 0; font-size: 1rem; }
     }
 }
 
@@ -582,7 +596,11 @@
             position: fixed; top: 0; right: 0; height: auto; padding: 12px 35px;
             z-index: 1000;
         }
+        input.form-control { width: 120px; }
         .account_icon { vertical-align: -1px; }
+        .folders .account_icon { vertical-align: 0; }
+        .contact-list-container { padding: 1rem; }
+        .settings_subtitle input.form-control { width: 100%; }
 
         // mobile home
         .nux_welcome ul { padding-left: 20px; }
@@ -629,9 +647,13 @@
             .message_table { margin-top: 0.1rem; }
             el-select { width: calc(50% - 0.5rem); }
             .combined_sort + el-select {  display: inline-block; width: 150px; }
+            .message_table_body .icon { width: 50px; }
         }
 
-        .time_section input[type=date] { display: block; margin-bottom: 10px; }
+        .time_section {
+            input[type=date] { display: block; margin-bottom: 10px; }
+            [id*="time_adv_remove"] { margin-left: 10px; }
+        }
         .timeandor { text-align: left; }
         .targets_section, .other_section, .submit_section,
         .time_section, .source_section, .terms_section {
@@ -641,7 +663,7 @@
         // mobile compose
         .compose_page { padding: 10px; overflow: hidden; }
         .compose_form { width: 100% !important; }
-        .toggle_recipients { right: 10px !important; }
+        .toggle_recipients { right: 6px !important; }
         .compose_bcc, .compose_cc, .compose_subject,
         .compose_to, .compose_body, .compose_server {
             margin: 5px 0;
@@ -655,7 +677,7 @@
         .long_header th { white-space: normal; word-break: normal; }
         .news_cell {
             padding-bottom: 15px !important;
-            &.checkbox_cell { width: 40px; padding: 14px 10px 10px !important; }
+            &.checkbox_cell { width: 30px; padding: 14px 5px 10px !important; }
             .msg_date { padding-top: 0; }
             .subject {
                 &, & div { padding-bottom: 0px !important; }
@@ -667,7 +689,10 @@
         .header_links { padding-bottom: 8px; }
         .msg_text { max-width: 100% !important; word-break: break-word; }
         .msg_text_inner { width: 100%; padding: 15px !important; }
-        .msg_parts { table-layout: auto; }
+        .msg_parts {
+            table-layout: auto;
+            td { width: 100% !important; }
+        }
         .msg_controls {
             top: 0.3rem; height: auto; padding-left: 0; padding-bottom: 5px;
             z-index: 1200; background-color: var(--bs-body-bg); min-height: 90px;
@@ -739,7 +764,15 @@ html body.tiki.tiki-webmail #middle.container.container-std.middle {
 
 // landscape phones (767.98px)
 @include media-breakpoint-down(md) {
-    .mobile #list_controls_menu.show { top: 25px; right: 0; }
+    .mobile .inline-cypht {
+        #list_controls_menu.show { top: 25px; right: 0; }
+        .terms_section {
+            .adv_term_nots input { margin-top: 6px; }
+        }
+        .advanced_search_form {
+            input.form-control { width: 250px; }
+        }
+    }
 }
 
 // portrait phones (575.98px)
@@ -753,7 +786,6 @@ html body.tiki.tiki-webmail #middle.container.container-std.middle {
         .terms_section {
             .d-flex { display: inline-block; }
             .adv_terms { display: inline-block; }
-            .adv_term_nots input { margin-top: 12px; }
         }
         .source_section {
             .adv_folder_link {
