@@ -1507,10 +1507,10 @@ import { defaults as defaultControls } from "ol/control";
                                             form: form,
                                         });
                                     } else if (i.geo_feature) {
-                                        var wkt = new ol.format.WKT(),
-                                            features,
-                                            layer = container.getLayer(layerName);
-                                        format = new ol.format.GeoJSON();
+                                        const wkt = new ol.format.WKT(),
+                                            layer = container.getLayer(layerName),
+                                            format = new ol.format.GeoJSON();
+                                        let features;
 
                                         try {
                                             features = format.readFeatures(i.geo_feature);
@@ -1588,9 +1588,8 @@ import { defaults as defaultControls } from "ol/control";
                                         // load a file containing geometry, set using tracker Files indexGeometry option
 
                                         let format;
-                                        const files = i.geo_file.split(",");
-
-                                        layer = container.getLayer(layerName);
+                                        const files = i.geo_file.split(","),
+                                            layer = container.getLayer(layerName);
 
                                         if (i.geo_file_format === "geojson") {
                                             format = new ol.format.GeoJSON();
@@ -1602,7 +1601,7 @@ import { defaults as defaultControls } from "ol/control";
                                         for (let f = 0; f < files.length; f++) {
                                             $.get(files[f], function (data) {
                                                 try {
-                                                    features = format.readFeatures(data, {
+                                                    const features = format.readFeatures(data, {
                                                         dataProjection: "EPSG:4326",
                                                         featureProjection: container.map.getView().getProjection(),
                                                     });
