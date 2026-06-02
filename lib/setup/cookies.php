@@ -30,6 +30,25 @@ if (isset($_SESSION['tiki_cookie_jar'])) {
 
 $smarty->assign_by_ref('cookie', $_COOKIE);
 
+/** This function is meant to replace PHPs low-level https://www.php.net/manual/en/function.setcookie.php function.  It only implements the 3 parameter version.
+ *
+ * the reason it exists is that:
+ *
+ * It is completely silly that setcookie is slightly different from the array returned by session_get_cookie_params.
+ * It is also completely silly that it will not obey smaesite in session_set_cookie_params if you pass lifetime explicitly.  Maybe it disregards other parameters in some forms, I did not check.
+ * benoitg -2025-05-12.
+ *
+ *
+ */
+function setcookie_obeySetCookieParams(string $name, string $value = "", array $options = []): bool
+{
+    $sessionParams = session_get_cookie_params();
+    // Yes, it is completely silly that the options parameter of setcookie is slightly different from the array returned by session_get_cookie_params().
+    $sessionParams['expires'] = $sessionParams['lifetime'];
+    unset($sessionParams['lifetime']);
+    $finalOptions = array_merge($sessionParams, $options);
+    return setcookie($name, $value, $finalOptions);
+}
 /**
  * This seems to be the mirror function of CookieConsentLib::setCookieSection(), but
  * I am not 100% sure since CookieConsentLib has it's own setCookie() method - benoitg - 2026-03-26
