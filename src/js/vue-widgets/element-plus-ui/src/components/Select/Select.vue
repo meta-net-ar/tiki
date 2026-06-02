@@ -136,7 +136,7 @@ export const DATA_TEST_ID = {
     <ConfigWrapper :language="language">
         <div :class="{ 'invalid': isInvalid }" :data-testid="DATA_TEST_ID.SELECT_WRAPPER" ref="wrapperRef">
             <el-select v-model="modelValue" :multiple="multiple" :filterable="filterable" :allow-create="allowCreate"
-                default-first-option :reserve-keyword="false" :placeholder="placeholder" :teleported="false"
+                default-first-option :reserve-keyword="false" :placeholder="placeholder" :teleported="false" :automatic-dropdown="true"
                 @change="handleValueChange" :multiple-limit="parseInt(max ?? 0, 10)" :clearable="clearable"
                 :collapse-tags="collapseTags" :max-collapse-tags="parseInt(maxCollapseTags ?? 0, 10)" :size="size"
                 :data-testid="DATA_TEST_ID.SELECT_ELEMENT" :remote-method="remoteMethod"

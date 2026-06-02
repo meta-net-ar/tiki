@@ -1,9 +1,8 @@
 .teleprompter-container {
   --teleprompter-font-scale: 1;
-  --teleprompter-title-size: 32px;
-  --teleprompter-title-color: inherit;
-  --teleprompter-description-size: 16px;
-  --teleprompter-description-color: inherit;
+  --teleprompter-headings-color: inherit;
+  --teleprompter-text-size: 28px;
+  --teleprompter-text-color: inherit;
   --teleprompter-block-bg: transparent;
 
   position: relative;
@@ -41,17 +40,21 @@
 
 .teleprompter-block {
   line-height: 1.6;
-  font-size: calc(var(--teleprompter-description-size) * var(--teleprompter-font-scale));
-  color: var(--teleprompter-description-color);
+  font-size: calc(var(--teleprompter-text-size) * var(--teleprompter-font-scale));
+  color: var(--teleprompter-text-color);
   text-align: left;
   background: var(--teleprompter-block-bg);
   padding: 0.75rem 0;
   margin: 0;
 }
 
-.teleprompter-block h1 {
-  font-size: calc(var(--teleprompter-title-size) * var(--teleprompter-font-scale));
-  color: var(--teleprompter-title-color);
+.teleprompter-block h1,
+.teleprompter-block h2,
+.teleprompter-block h3,
+.teleprompter-block h4,
+.teleprompter-block h5,
+.teleprompter-block h6 {
+  color: var(--teleprompter-headings-color);
   margin: 0 0 0.5em;
 }
 
@@ -98,6 +101,33 @@
 }
 
 .teleprompter-focus-none .teleprompter-focus-overlay {
+  display: none;
+}
+
+.teleprompter-progress {
+  position: absolute;
+  top: 12px;
+  right: 8px;
+  bottom: 46px;
+  z-index: 3;
+  width: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+}
+
+.teleprompter-progress-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 24px;
+  border-radius: inherit;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+
+.teleprompter-progress-disabled {
   display: none;
 }
 

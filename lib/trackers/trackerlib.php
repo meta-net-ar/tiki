@@ -6390,6 +6390,24 @@ class TrackerLib extends TikiLib
         }
     }
 
+    public function updateTikiObject($args)
+    {
+        $itemId = $args['object'];
+        $item = $this->get_tracker_item($itemId);
+        if (! $item) {
+            return;
+        }
+
+        $objectlib = TikiLib::lib('object');
+        if (! $objectlib->get_object_id('trackeritem', $itemId)) {
+            return;
+        }
+
+        $name = $this->get_isMain_value(null, $itemId);
+        $href = "tiki-view_tracker_item.php?itemId=$itemId&trackerId=" . $item['trackerId'];
+        $objectlib->add_object('trackeritem', $itemId, false, '', $name, $href);
+    }
+
     public function update_create_missing_pages($args)
     {
         global $user;

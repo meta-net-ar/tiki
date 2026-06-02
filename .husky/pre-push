@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+echo "Running local checks before push...";
+
+REPO_ROOT=$(git rev-parse --show-toplevel)
+
+php "$REPO_ROOT/doc/devtools/run_local_checks.php" ${TIKI_LOCAL_CHECKS_ARGS:-} || {
+  echo "❌ Pre-push checks failed. Push cancelled."
+  echo "To skip specific checks, run:"
+  echo 'TIKI_LOCAL_CHECKS_ARGS="--skip=2,5,9,..." git push'
+  exit 1
+}

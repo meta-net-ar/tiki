@@ -88,7 +88,7 @@
                 {remarksbox type="error" title="{tr}Database Version Problem{/tr}"}
                     {tr _0='<a class="alert-link" href="tiki-install.php">' _1="</a>"}Your database requires an update to match the current Tiki version. Please proceed to %0the installer%1. Using Tiki with an incorrect database version usually provokes errors{/tr}
                     {tr}If you have shell (SSH) access, you can also use the following, on the command line, from the root of your Tiki installation:{/tr}
-                    <kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:update</kbd>
+                    {tr _0="<kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:update</kbd>" _1="<kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:patch patch_name</kbd>"}%0 or apply the missing patches one by one with %1 in version order.{/tr}
                     <p class="mt-3"> {tr _0='<a class="alert-link" href="tiki-check.php">' _1="</a>"}Please note that the Tiki schema does not support downgrading the database. It can only perform upgrades. For more info, you may check the database status by opening the %0tiki-check page%1.{/tr}</p>
                     <div class="h6 mt-3">
                         <a class="collapse-toggle alert-link" data-bs-toggle="collapse" href="#missingpatches">

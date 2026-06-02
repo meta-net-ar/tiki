@@ -1103,7 +1103,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
         // Use a static instance to ensure the expensive purifier setup runs only once per request.
         static $purifier = null;
         if ($purifier === null) {
-            $config = \HTMLPurifier_HTML5Config::createDefault();
+            require_once('lib/htmlpurifier_tiki/HTMLPurifier.tiki.php');
+            $config = \HTMLPurifier_HTML5Config::inherit(\getHTMLPurifierTikiConfig());
 
             // Define a strict security policy based on a whitelist of allowed elements and attributes.
             $config->set('HTML.Allowed', 'a[href|title],b,strong,i,em,br,p,u');

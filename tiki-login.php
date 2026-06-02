@@ -123,6 +123,25 @@ if (isset($_REQUEST['su']) && $access->checkCsrf(true)) {
     if ($loginlib->isSwitched() && $_REQUEST['su'] == 'revert') {
         $loginlib->revertSwitch();
     } else {
+        $canSwitchUser = false;
+        $perms = Perms::get();
+        if ($perms->admin) {
+            $canSwitchUser = true;
+        } else {
+            $previous_username = $_SESSION[$user_cookie_site . '_previous'] ?? null;
+            if ($previous_username) {
+                $permsContext = new Perms_Context($previous_username);
+                $permsPrevious = Perms::get();
+                $canSwitchUser = (bool) $permsPrevious->admin;
+                unset($permsContext);
+            }
+        }
+
+        if (! $canSwitchUser) {
+            Feedback::errorAndDie(tra('You do not have permission to switch users.'), \Laminas\Http\Response::STATUS_CODE_403);
+        }
+
+        $fromUser = $user;
         if (empty($_REQUEST['username'])) {
             Feedback::errorAndDie(tra('Username field cannot be empty. Please go back and try again.'), \Laminas\Http\Response::STATUS_CODE_409);
         }
@@ -133,9 +152,23 @@ if (isset($_REQUEST['su']) && $access->checkCsrf(true)) {
             }
         }
         if ($userlib->user_exists($_REQUEST['username'])) {
-            $loginlib->switchUser($_REQUEST['username']);
+            $targetUser = $userlib->get_user_real_case($_REQUEST['username']);
+            if (strcasecmp($targetUser, $fromUser) === 0) {
+                Feedback::error(tr('You are already logged in as "%0". Please select a different user.', $targetUser));
+                $access->redirect($_SESSION['loginfrom']);
+            }
+
+            $previousUser = $_SESSION[$user_cookie_site . '_previous'] ?? null;
+            if ($loginlib->isSwitched() && $previousUser && strcasecmp($targetUser, $previousUser) === 0) {
+                $loginlib->revertSwitch();
+            } else {
+                $loginlib->switchUser($targetUser);
+            }
+
+            Feedback::success(tr('Switched user from "%0" to "%1".', $fromUser, $targetUser));
             $access->redirect();
         }
+        Feedback::error(tr('User "%0" not found', $_REQUEST['username']));
         $_SESSION["keep_login_box_visible"] = isset($_REQUEST["keep_login_box_visible"]) ? 'y' : 'n';
     }
     $access->redirect($_SESSION['loginfrom']);

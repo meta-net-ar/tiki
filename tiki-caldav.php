@@ -10,12 +10,18 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\SabreDav\BasicAuth;
+use Tiki\SabreDav\InternalAuth;
 use Tiki\SabreDav\Utilities;
 
 define('TIKI_CALDAV', true);
 
 require_once 'tiki-setup.php';
 $access->check_feature('feature_calendar');
-$authBackend = new BasicAuth();
+// Reuse current web session when available (e.g. admin UI export links),
+// while keeping HTTP Basic auth for external CalDAV clients.
+$hasBasicCredentials = ! empty($_SERVER['PHP_AUTH_USER']) || ! empty($_SERVER['HTTP_AUTHORIZATION']);
+$authBackend = $hasBasicCredentials
+    ? new BasicAuth()
+    : ((! empty($user) && $user !== 'Anonymous') ? new InternalAuth() : new BasicAuth());
 $server = Utilities::buildSabreDavServer($authBackend, 'caldav');
 $server->start();
