@@ -6,7 +6,7 @@
     <input type="number" class="numeric form-control {if !empty($field.options_map.labelasplaceholder)}labelasplaceholder{/if}" name="{$field.ins_id|escape}"
             {if $field.options_array[1]}size="{$field.options_array[1]|escape}" maxlength="{$field.options_array[1]|escape}"{/if}
             value="{$field.value|escape}" id="{$field.ins_id}"
-            {if !empty($field.options_map.labelasplaceholder)}placeholder="{tr}{$field.name}{/tr}"{/if}
+            {if !empty($field.options_map.labelasplaceholder)}placeholder="{$field.name|tra|escape:'htmlattr'}"{/if}
     >
 
     {if !empty($field.options_map.append)}
