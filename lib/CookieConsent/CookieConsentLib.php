@@ -246,7 +246,13 @@ class CookieConsentLib
             if ($feature_no_cookie) {
                 $_SESSION['tiki_cookie_jar'][$name] = $value;
             } else {
-                setcookie($name, $value, $expire, $path, $domain, $secure);
+                $options = [
+                    'expires' => $expire,
+                    'path' => $path,
+                    'domain' => $domain,
+                    'secure' => $secure
+                ];
+                setcookie_obeySetCookieParams($name, $value, $options);
             }
         }
     }
