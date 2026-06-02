@@ -6975,15 +6975,7 @@
             "TikiLib::check_duplicate_alias": true,
             "TikiLib::str_putcsv": true
         },
-        "tiki-check.php": {
-            "BenchmarkPhp::test_benchmark": true,
-            "BenchmarkPhp::test_math": true,
-            "BenchmarkPhp::test_string": true,
-            "BenchmarkPhp::test_loops": true,
-            "BenchmarkPhp::test_ifelse": true,
-            "BenchmarkPhp::test_mysql": true,
-            "BenchmarkPhp::timer_diff": true
-        }
+        "tiki-check.php": {}
     },
     "PSR2.Methods.MethodDeclaration.Underscore": {
         "lib/pdflib.php": {

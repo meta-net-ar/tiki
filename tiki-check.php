@@ -5283,7 +5283,7 @@ class BenchmarkPhp
             $options['db.name'] = $dbs_tiki;
         }
 
-        $benchmarkResult = self::test_benchmark($options);
+        $benchmarkResult = self::testBenchmark($options);
 
         $benchmark = $benchmarkResult['benchmark'];
         if (isset($benchmark['mysql'])) {
@@ -5308,7 +5308,7 @@ class BenchmarkPhp
      * @param $settings database connection settings
      * @return array Benchmark results
      */
-    protected static function test_benchmark($settings)
+    protected static function testBenchmark($settings)
     {
         $timeStart = microtime(true);
 
@@ -5320,15 +5320,15 @@ class BenchmarkPhp
         $result['sysinfo']['server_name'] = $_SERVER['SERVER_NAME'];
         $result['sysinfo']['server_addr'] = $_SERVER['SERVER_ADDR'];
 
-        self::test_math($result);
-        self::test_string($result);
-        self::test_loops($result);
-        self::test_ifelse($result);
+        self::testMath($result);
+        self::testString($result);
+        self::testLoops($result);
+        self::testIfelse($result);
         if (isset($settings['db.host']) && function_exists('mysqli_connect')) {
-            self::test_mysql($result, $settings);
+            self::testMysql($result, $settings);
         }
 
-        $result['total'] = self::timer_diff($timeStart);
+        $result['total'] = self::timerDiff($timeStart);
         return $result;
     }
 
@@ -5337,7 +5337,7 @@ class BenchmarkPhp
      * @param $result Benchmark results
      * @param int $count Number of iterations
      */
-    protected static function test_math(&$result, $count = 400000)
+    protected static function testMath(&$result, $count = 400000)
     {
         $timeStart = microtime(true);
 
@@ -5356,7 +5356,7 @@ class BenchmarkPhp
             sqrt($i);
             log10($i);
         }
-        $result['benchmark']['math'] = self::timer_diff($timeStart);
+        $result['benchmark']['math'] = self::timerDiff($timeStart);
     }
 
     /**
@@ -5364,7 +5364,7 @@ class BenchmarkPhp
      * @param $result Benchmark results
      * @param int $count Number of iterations
      */
-    protected static function test_string(&$result, $count = 400000)
+    protected static function testString(&$result, $count = 400000)
     {
         $timeStart = microtime(true);
 
@@ -5383,7 +5383,7 @@ class BenchmarkPhp
             soundex($string);
             ord($string);
         }
-        $result['benchmark']['string'] = self::timer_diff($timeStart);
+        $result['benchmark']['string'] = self::timerDiff($timeStart);
     }
 
     /**
@@ -5391,7 +5391,7 @@ class BenchmarkPhp
      * @param $result Benchmark results
      * @param int $count Number of iterations
      */
-    protected static function test_loops(&$result, $count = 4000000)
+    protected static function testLoops(&$result, $count = 4000000)
     {
         $timeStart = microtime(true);
         for ($i = 0; $i < $count; ++$i) {
@@ -5400,7 +5400,7 @@ class BenchmarkPhp
         while ($i < $count) {
             ++$i;
         }
-        $result['benchmark']['loops'] = self::timer_diff($timeStart);
+        $result['benchmark']['loops'] = self::timerDiff($timeStart);
     }
 
     /**
@@ -5408,7 +5408,7 @@ class BenchmarkPhp
      * @param $result Benchmark results
      * @param int $count Number of iterations
      */
-    protected static function test_ifelse(&$result, $count = 4000000)
+    protected static function testIfelse(&$result, $count = 4000000)
     {
         $timeStart = microtime(true);
         for ($i = 0; $i < $count; $i++) {
@@ -5419,7 +5419,7 @@ class BenchmarkPhp
                 }
             }
         }
-        $result['benchmark']['ifelse'] = self::timer_diff($timeStart);
+        $result['benchmark']['ifelse'] = self::timerDiff($timeStart);
     }
 
     /**
@@ -5428,20 +5428,20 @@ class BenchmarkPhp
      * @param $settings MySQL connection information
      * @return array
      */
-    protected static function test_mysql(&$result, $settings)
+    protected static function testMysql(&$result, $settings)
     {
         $timeStart = microtime(true);
 
         $link = mysqli_connect($settings['db.host'], $settings['db.user'], $settings['db.pw']);
-        $result['benchmark']['mysql']['connect'] = self::timer_diff($timeStart);
+        $result['benchmark']['mysql']['connect'] = self::timerDiff($timeStart);
 
         mysqli_select_db($link, $settings['db.name']);
-        $result['benchmark']['mysql']['select_db'] = self::timer_diff($timeStart);
+        $result['benchmark']['mysql']['select_db'] = self::timerDiff($timeStart);
 
         $dbResult = mysqli_query($link, 'SELECT VERSION() as version;');
         $arr_row = mysqli_fetch_array($dbResult);
         $result['sysinfo']['mysql_version'] = $arr_row['version'];
-        $result['benchmark']['mysql']['query_version'] = self::timer_diff($timeStart);
+        $result['benchmark']['mysql']['query_version'] = self::timerDiff($timeStart);
 
         $isMariaDB = stripos($arr_row['version'], 'mariadb') !== false;
         preg_match('/(\d+\.\d+)/', $arr_row['version'], $matches);
@@ -5452,11 +5452,11 @@ class BenchmarkPhp
             : "SELECT BENCHMARK(1000000, AES_ENCRYPT('hello', 'benchmark_key'));";
 
         $dbResult = mysqli_query($link, $query);
-        $result['benchmark']['mysql']['query_benchmark'] = self::timer_diff($timeStart);
+        $result['benchmark']['mysql']['query_benchmark'] = self::timerDiff($timeStart);
 
         mysqli_close($link);
 
-        $result['benchmark']['mysql']['total'] = self::timer_diff($timeStart);
+        $result['benchmark']['mysql']['total'] = self::timerDiff($timeStart);
         return $result;
     }
 
@@ -5465,7 +5465,7 @@ class BenchmarkPhp
      * @param $timeStart time to compare against now
      * @return string time elapsed
      */
-    protected static function timer_diff($timeStart)
+    protected static function timerDiff($timeStart)
     {
         return number_format(microtime(true) - $timeStart, 3);
     }
