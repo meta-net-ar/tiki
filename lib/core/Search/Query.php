@@ -384,14 +384,14 @@ class Search_Query implements Search_Query_Interface
     {
         $this->start = (int) $start;
 
-        if ($count) {
+        if ($count !== null) {
             $this->count = (int) $count;
         }
     }
 
     public function setCount($count = null)
     {
-        if ($count) {
+        if ($count !== null) {
             $this->count = (int) $count;
         }
     }

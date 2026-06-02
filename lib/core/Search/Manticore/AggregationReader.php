@@ -107,10 +107,11 @@ class AggregationReader
         array $aggsByDepth,
         array &$tree
     ): void {
+        $row = array_change_key_case($row, CASE_LOWER);
         $docCount = isset($row['count(*)']) ? (int) $row['count(*)'] : 0;
         $metricsRow = [];
         foreach ($metrics as $metric) {
-            $alias = $this->aliasOf($metric->getName());
+            $alias = strtolower($this->aliasOf($metric->getName()));
             if (! array_key_exists($alias, $row)) {
                 continue;
             }
@@ -120,7 +121,7 @@ class AggregationReader
         $parentResult = $rootResult;
         $pathKey = '';
         foreach ($groupFields as $depth => $gf) {
-            $alias = $gf['alias'];
+            $alias = strtolower($gf['alias']);
             $key = $row[$alias] ?? null;
             $pathKey .= ($depth ? '|' : '') . (string) $key;
 
@@ -181,12 +182,12 @@ class AggregationReader
      */
     private function readRootMetrics(array $spec, array $rows): array
     {
-        $row = $rows[0] ?? [];
+        $row = array_change_key_case($rows[0] ?? [], CASE_LOWER);
         $out = [];
         /** @var Metric[] $metrics */
         $metrics = $spec['metrics'];
         foreach ($metrics as $metric) {
-            $alias = $this->aliasOf($metric->getName());
+            $alias = strtolower($this->aliasOf($metric->getName()));
             if (! array_key_exists($alias, $row)) {
                 continue;
             }

@@ -126,6 +126,7 @@ class QueryFacade
             foreach ($this->aggregations as $agg) {
                 $query->addAggregation($agg);
             }
+            $query->setRange(0, 0);
         }
     }
 
