@@ -1,6 +1,6 @@
 <?php
 
-$options = getopt('h', ['help', 'skip:']);
+$options = getopt('h', ['help', 'skip:', 'skip-rebase']);
 
 if (isset($options['h']) || isset($options['help'])) {
     echo <<<HELP
@@ -9,11 +9,18 @@ Usage:
 
 Options:
   --skip=1,3,8   Skip checks by step number
+  --skip-rebase Skip the automatic rebase against the upstream/master branch
+    and use the current branch state to determine affected files
   -h, --help     Show this help message
 
 Examples:
   php doc/devtools/run_local_checks.php
   php doc/devtools/run_local_checks.php --skip=2,5,9
+  php doc/devtools/run_local_checks.php --skip-rebase
+  
+Notes:
+  By default, the script attempts to rebase the current branch on top of the
+  detected upstream master branch before running checks.
 
 HELP;
     exit(0);
@@ -25,8 +32,9 @@ if (! empty($options['skip'])) {
     $skipSteps = array_map('intval', explode(',', $options['skip']));
     echo "Skipping steps: " . implode(', ', $skipSteps) . PHP_EOL . PHP_EOL;
 }
+$skipRebase = isset($options['skip-rebase']);
 require_once __DIR__ . '/get_base_commit.php';
-$baseCommit = getBaseCommitOrAbort();
+$baseCommit = getBaseCommitOrAbort($skipRebase);
 
 exec("git diff --name-only --diff-filter=d {$baseCommit} HEAD", $affectedFiles);
 
