@@ -612,7 +612,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         // that cannot be expressed as FACET clauses.
         if (! empty($groupByAggregations)) {
             $aggBuilder = new AggregationBuilder($this);
-            $built = $aggBuilder->buildGroupByQueries($groupByAggregations, $table, $condition);
+            $built = $aggBuilder->buildGroupByQueries($groupByAggregations, $table, $condition, $selectExpressions);
             if (! empty($built['queries'])) {
                 $rowsets = [];
                 foreach ($built['queries'] as $q) {

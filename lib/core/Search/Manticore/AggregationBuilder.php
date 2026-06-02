@@ -99,7 +99,7 @@ class AggregationBuilder
      * @param AggregationInterface[] $aggregations
      * @return array{queries: list<array{sql: string, spec: array}>, specs: array<string, array>}
      */
-    public function buildGroupByQueries(array $aggregations, string $table, string $condition): array
+    public function buildGroupByQueries(array $aggregations, string $table, string $condition, array $selectExpressions = []): array
     {
         $queries = [];
         $specs = [];
@@ -111,7 +111,7 @@ class AggregationBuilder
                 continue;
             }
             if ($agg instanceof Terms) {
-                $built = $this->buildTermsGroupBy($agg, $table, $condition);
+                $built = $this->buildTermsGroupBy($agg, $table, $condition, $selectExpressions);
                 if ($built !== null) {
                     $queries[] = $built;
                     $specs[$agg->getName()] = $built['spec'];
@@ -121,7 +121,7 @@ class AggregationBuilder
         }
 
         if (! empty($rootMetrics)) {
-            $built = $this->buildRootMetricsGroupBy($rootMetrics, $table, $condition);
+            $built = $this->buildRootMetricsGroupBy($rootMetrics, $table, $condition, $selectExpressions);
             $queries[] = $built;
             $specs[self::ROOT_METRICS_FACET] = $built['spec'];
         }
@@ -252,7 +252,7 @@ class AggregationBuilder
      *
      * @return array{sql: string, spec: array}|null
      */
-    private function buildTermsGroupBy(Terms $agg, string $table, string $condition): ?array
+    private function buildTermsGroupBy(Terms $agg, string $table, string $condition, array $selectExpressions = []): ?array
     {
         $groupFields = [];
         $g = $this->buildGroupColumn($agg);
@@ -296,6 +296,9 @@ class AggregationBuilder
             $select[] = $this->buildMetricExpr($metric) . ' AS ' . $this->quoteIdent($metric->getName());
         }
         $select[] = 'COUNT(*)';
+        foreach ($selectExpressions as $key => $expr) {
+            $select[] = "$expr AS $key";
+        }
 
         $orderClause = $this->buildOrderClause($agg, $childMetrics, $aliasNames[0]);
         $size = $agg->getSize() > 0 ? $agg->getSize() : 10;
@@ -324,11 +327,14 @@ class AggregationBuilder
      * @param Metric[] $metrics
      * @return array{sql: string, spec: array}
      */
-    private function buildRootMetricsGroupBy(array $metrics, string $table, string $condition): array
+    private function buildRootMetricsGroupBy(array $metrics, string $table, string $condition, array $selectExpressions = []): array
     {
         $select = ['0 AS ' . self::ROOT_METRICS_FACET];
         foreach ($metrics as $metric) {
             $select[] = $this->buildMetricExpr($metric) . ' AS ' . $this->quoteIdent($metric->getName());
+        }
+        foreach ($selectExpressions as $key => $expr) {
+            $select[] = "$expr AS $key";
         }
 
         $sql = 'SELECT ' . implode(', ', $select)
