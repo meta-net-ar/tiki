@@ -247,7 +247,7 @@ class Services_Tracker_Utilities
             $properties['visibleInViewMode'] ?? $field['visibleInViewMode'] ?? null,
             $properties['visibleInEditMode'] ?? $field['visibleInEditMode'] ?? null,
             $properties['visibleInHistoryMode'] ?? $field['visibleInHistoryMode'] ?? null,
-            $properties['excludeFromTrackerItemLastModificationDate'] ?? $field['excludeFromTrackerItemLastModificationDate'] ?? null
+            $properties['excludeFromTrackerItemLastModificationDate'] ?? $field['excludeFromTrackerItemLastModificationDate'] ?? 'n'
         );
     }
 
@@ -461,6 +461,8 @@ class Services_Tracker_Utilities
 
                 'rules' => $field->rules->text(),
 
+                'excludeFromTrackerItemLastModificationDate' => $field->excludeFromTrackerItemLastModificationDate->alpha() ?: 'n',
+
                 'visibleInViewMode' => $field->visibleInViewMode->alpha(),
                 'visibleInEditMode' => $field->visibleInEditMode->alpha(),
                 'visibleInHistoryMode' => $field->visibleInHistoryMode->alpha(),
@@ -499,6 +501,7 @@ descriptionIsParsed = {$field['descriptionIsParsed']}
 rules = {$field['rules']}
 encryptionKeyId = {$field['encryptionKeyId']}
 excludeFromNotification = {$field['excludeFromNotification']}
+excludeFromTrackerItemLastModificationDate = {$field['excludeFromTrackerItemLastModificationDate']}
 visibleInViewMode = {$field['visibleInViewMode']}
 visibleInEditMode = {$field['visibleInEditMode']}
 visibleInHistoryMode = {$field['visibleInHistoryMode']}
