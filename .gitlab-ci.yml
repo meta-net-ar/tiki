@@ -568,6 +568,11 @@ composer-could-update-lock:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.php"
+        - "**/composer.lock"
+        - "**/*.sql"
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
       alias: mysql,
@@ -665,7 +670,6 @@ sql-engine-conversion:
     - changes:
         - "**/*.sql"
         - "installer/**/*"
-        - "**/composer.json"
         - "**/composer.lock"
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_IMAGE_NEWEST_SUPPORTED}
@@ -977,27 +981,18 @@ composer-operator-check:
   script:
   - php doc/devtools/check_caret_operator.php
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
     - changes:
-        - "**/composer.json"
-  allow_failure: false
+      - "**/composer.json"
 
 check-alphabetical-list:
   stage: unit-tests
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   needs:
     - composer
-  script:
-    - php doc/devtools/check_alphabetical_list.php
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
     - changes:
         - "**/composer.json"
         - "**/package.json"
+  script:
+    - php doc/devtools/check_alphabetical_list.php
   allow_failure: false
