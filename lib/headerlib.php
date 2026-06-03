@@ -154,6 +154,9 @@ class HeaderLib
     private ?string $outputHeadersWasStartedBy = null;
     private ?string $outputStaticJSFooterWasStartedBy = null;
 
+    /** Tracks if `add_map` has been called, only needed once */
+    private bool $mapAdded = false;
+
     private $outputHasBeenCalledCount = 0;
 
     public function __construct()
@@ -1275,6 +1278,12 @@ class HeaderLib
 
     public function add_map()
     {
+        if ($this->mapAdded) {
+            return $this;
+        }
+
+        $this->mapAdded = true;
+
         global $prefs;
 
         $tikilib = TikiLib::lib('tiki');
@@ -1313,21 +1322,20 @@ window.onload = loadScript;');
         }
         */
 
+        $mapsJs = "\$(\".map-container:not(.done)\").addClass(\"done\").visible(function() {\$(this).createMap();});\n";
+
+        // Set the zoom option after searching for a location
+        $zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
+        $mapsJs .= 'var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . "\";\n";
+
         $this->add_jsfile_external(OL_PATH . '/dist/ol.js', true)
             ->add_cssfile(OL_PATH . '/ol.css')
             ->add_jsfile_external(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.js')
             ->add_cssfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.css')
-            ->add_js(
-                ''
-            );
+            ->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js")
+            ->add_js($mapsJs);
 
-        $this->add_js(
-            '$(".map-container:not(.done)")
-                .addClass("done")
-                .visible(function() {
-                    $(this).createMap();
-            });'
-        );
+        $this->mapAdded = true;
 
         return $this;
     }

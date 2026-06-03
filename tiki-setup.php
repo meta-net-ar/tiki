@@ -612,13 +612,6 @@ if ($prefs['error_tracking_enabled_js'] == 'y' && ! empty($prefs['error_tracking
 $headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
 $headerlib->add_jsfile('lib/tiki-js.js'); //This depends on tiki-jquery.js in at least one place, so must load after - benoitg - 2023-11-21
 
-$zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
-$headerlib->add_js('var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . '";');    // Set the zoom option after searching for a location
-
-if ($prefs['geo_enabled'] === 'y') {
-    $headerlib->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js");
-}
-
 if ($prefs['feature_jquery_zoom'] === 'y') {
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/jquery-zoom/jquery.zoom.js')
         ->add_css('

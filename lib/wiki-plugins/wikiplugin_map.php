@@ -221,13 +221,8 @@ function wikiplugin_map($data, $params)
         $center = $geolib->get_default_center();
     }
 
-    TikiLib::lib('header')
-        ->add_cssfile(OL_PATH . '/ol.css')
-        ->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js")
-        ->add_jsfile(OL_PATH . '/dist/ol.js')
-        ->add_cssfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.css')
-        ->add_jsfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.js')
-    ;
+    TikiLib::lib('header')->add_map();
+
     $scope = smarty_modifier_escape(wp_map_getscope($params));
 
     $output = "<div class=\"map-container\" data-marker-filter=\"$scope\" data-map-controls=\"$controls\" data-popup-style=\"$popupStyle\"" .
