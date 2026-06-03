@@ -47,4 +47,27 @@ class WikiParser_PluginOutputTest extends PHPUnit\Framework\TestCase
 
         $this->assertStringContainsString('<li>id</li>', $output->toHtml());
     }
+
+    public function testMissingArgumentsDoesNotNestNoparseMarkersInRemarksboxTitle()
+    {
+        $parserlib = TikiLib::lib('parser');
+        $previousWikiContext = $parserlib->option['wiki_parse_context'] ?? null;
+        $parserlib->option['wiki_parse_context'] = true;
+
+        try {
+            $output = WikiParser_PluginOutput::argumentError(['begin', 'end', 'title']);
+            $wiki = $output->toWiki();
+
+            $this->assertStringContainsString('User error', $wiki);
+            $this->assertStringContainsString('Plugin argument(s) missing or invalid:', $wiki);
+            $this->assertStringNotContainsString('~np~User error', $wiki);
+            $this->assertStringNotContainsString('User error~/np~', $wiki);
+        } finally {
+            if ($previousWikiContext === null) {
+                unset($parserlib->option['wiki_parse_context']);
+            } else {
+                $parserlib->option['wiki_parse_context'] = $previousWikiContext;
+            }
+        }
+    }
 }
