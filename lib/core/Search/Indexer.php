@@ -32,8 +32,8 @@ class Search_Indexer
 
     public function __construct(Search_Index_Interface $searchIndex, $logWriter = null)
     {
-        if (! $logWriter instanceof \Laminas\Log\Writer\AbstractWriter) {
-            $logWriter = new Laminas\Log\Writer\Noop();
+        if (! $logWriter instanceof \Monolog\Handler\StreamHandler) {
+            $logWriter = new \Monolog\Handler\NullHandler();
         } else {
             // writing logs
             set_error_handler(function ($errno, $errstr, $errfile = '', $errline = 0) {
@@ -76,9 +76,8 @@ class Search_Indexer
             }, E_ALL);
         }
 
-        $logWriter->setFormatter(new Laminas\Log\Formatter\Simple());
-        $this->log = new Laminas\Log\Logger();
-        $this->log->addWriter($logWriter);
+        $this->log = new \Monolog\Logger('indexer');
+        $this->log->pushHandler($logWriter);
         $this->logWriter = $logWriter;
 
         if (method_exists($searchIndex, 'setIndexer')) {
@@ -243,7 +242,7 @@ class Search_Indexer
                 }
             }
             foreach ($this->cacheErrors as $err) {
-                $this->log->err($err['error'] . ': ' . $err['errstr'], [
+                $this->log->error($err['error'] . ': ' . $err['errstr'], [
                     'code' => $err['errno'],
                     'file' => $err['errfile'],
                     'line' => $err['errline'],
@@ -255,7 +254,7 @@ class Search_Indexer
             }
             $this->cacheErrors = [];
             // log file display feedback messages after each document line to make it easier to track
-            if (! $this->logWriter instanceof Laminas\Log\Writer\Noop) {
+            if (! $this->logWriter instanceof \Monolog\Handler\NullHandler) {
                 Feedback::printToLog($this->log);
                 Feedback::clear();
             }
