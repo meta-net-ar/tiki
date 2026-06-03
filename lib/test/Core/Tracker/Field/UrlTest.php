@@ -85,11 +85,12 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
         $this->assertSame('Second page', $links[1]['label']);
     }
 
-    public function testSingleParsedLinkIsExtracted(): void
+    public function testMultipleWikiLinkTargetsAreExtracted(): void
     {
-        $links = $this->invokeExtractLinkDataFromParsedHtml('<a href="FirstPage">First page</a>');
-
-        $this->assertCount(1, $links);
+        $this->assertSame(
+            ['FirstPage', 'SecondPage'],
+            $this->invokeExtractWikiLinkTargets('[FirstPage|First page] [SecondPage|Second page]')
+        );
     }
 
     private function invokeIsWikiSyntaxLink(string $value): bool
@@ -102,6 +103,13 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
     private function invokeExtractLinkDataFromParsedHtml(string $value): array
     {
         $method = new \ReflectionMethod(\Tracker_Field_Url::class, 'extractLinkDataFromParsedHtml');
+
+        return $method->invoke(null, $value);
+    }
+
+    private function invokeExtractWikiLinkTargets(string $value): array
+    {
+        $method = new \ReflectionMethod(\Tracker_Field_Url::class, 'extractWikiLinkTargets');
 
         return $method->invoke(null, $value);
     }
