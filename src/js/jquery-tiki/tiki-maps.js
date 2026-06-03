@@ -1,7 +1,3 @@
-/**
- * Tiki OpenLayers Map Integration
- */
-
 import { defaults as defaultControls } from "ol/control";
 
 (function () {
@@ -242,168 +238,104 @@ import { defaults as defaultControls } from "ol/control";
     }
 
     function writeCoordinates(lonlat, map, fixProjection) {
-        let coordinates = typeof lonlat.length === "number" ? lonlat : lonlat.getCoordinates();
-        const original = coordinates;
+        var original = lonlat;
 
         if (fixProjection) {
-            lonlat = ol.proj.transform(
-                coordinates,
-                map.getView().getProjection(), // source — replaces map.getProjectionObject()
-                "EPSG:4326" // target
-            );
+            lonlat = lonlat.transform(map.getView().getProjection(), new ol.proj.Projection({ code: "EPSG:4326" }));
 
             if (!lonlat) {
-                coordinates = original;
+                lonlat = original;
             }
         }
 
-        return formatLocation(coordinates[0], coordinates[1], map.getView().getZoom());
+        let coords = lonlat.getCoordinates();
+
+        return formatLocation(coords[0], coords[1], map.getView().getZoom());
     }
 
     function formatLocation(lat, lon, zoom) {
-        // Convert commas to decimal points - where those are used
-        let strLon = "" + lon;
-        strLon = strLon.replace(",", ".");
-        let strLat = "" + lat;
-        strLat = strLat.replace(",", ".");
+        // Convert , decimal points - where those are used
+        var strLon = "" + lon;
+        strLon.replace(",", ".");
+        var strLat = "" + lat;
+        strLat.replace(",", ".");
         return strLon + "," + strLat + "," + zoom;
     }
 
     $.fn.createMap = function () {
-        function setFeatureColorStyle(feature, color, fillColor) {
-            let coloredStyle;
-
-            if (!fillColor) {
-                // no fillColor provided, use semi-transparent color
-                const rgba = Array.from(ol.color.asArray(color));
-                fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 2]);
-            }
-
-            const intent = feature.get("intent");
-
-            if (intent === "vectors") {
-                coloredStyle = new ol.style.Style({
-                    fill: new ol.style.Fill({ color: fillColor }),
-                    stroke: new ol.style.Stroke({ color: color, width: 2 }),
-                });
-            } else if (intent === "marker") {
-                coloredStyle = new ol.style.Style({
-                    image: new ol.style.Icon({
-                        anchor: [feature.get("offsetx"), feature.get("offsety")],
-                        anchorXUnits: "pixels",
-                        anchorYUnits: "pixels",
-                        src: feature.get("url"),
-                    }),
-                });
-            } else {
-                // Create a colored circle style
-                coloredStyle = new ol.style.Style({
-                    image: new ol.style.Circle({
-                        radius: 12,
-                        fill: new ol.style.Fill({ color: fillColor }),
-                        stroke: new ol.style.Stroke({ color: color, width: 2 }),
-                    }),
-                });
-            }
-            // DIRECTLY set the style on the feature
-            feature.setStyle(coloredStyle);
-            return coloredStyle;
-        }
-
         this.each(function () {
-            let id = $(this).attr("id"),
+            var id = $(this).attr("id"),
                 container = this,
                 desiredControls;
-            let selectionInteraction;
-
             $(container).css("background", "white");
 
             // Shared style function for all map features (accessible from both clustered and non-clustered layers)
             container.createMapFeatureStyle = function (feature) {
-                let color;
                 // Check for custom color from container-level storage (set by colorpicker)
-                const geom = feature.getGeometry();
+                var geom = feature.getGeometry();
                 if (geom && geom.getCoordinates) {
-                    const coords = geom.getCoordinates();
+                    var coords = geom.getCoordinates();
                     if (Array.isArray(coords)) {
-                        const key = coords.join(",");
+                        var key = coords.join(",");
                         if (container.featureColors && container.featureColors[key]) {
-                            color = container.featureColors[key];
+                            return new ol.style.Style({
+                                geometry: feature.getGeometry(),
+                                image: new ol.style.Circle({
+                                    radius: 10,
+                                    fill: new ol.style.Fill({ color: container.featureColors[key] }),
+                                    stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
+                                }),
+                            });
                         }
                     }
                 }
 
                 // Check for color on feature property
-                color = color ?? feature.get("color") ?? "#999";
-                let fillColor = feature.get("fillColor");
+                const intent = feature.get("intent");
+                if (intent === "vectors") {
+                    let borderColor = feature.get("color") ?? "#999";
+                    let fillColor = feature.get("fillColor");
 
-                return setFeatureColorStyle(feature, color, fillColor);
-            };
+                    if (!fillColor) {
+                        // no separate fill colour provided so make the fill 50% opacity of the border
+                        const rgba = Array.from(ol.color.asArray(borderColor));
+                        fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 2]);
+                    }
 
-            container.setupLayerEvents = function (vectors) {
-                if (!selectionInteraction) {
-                    selectionInteraction = new ol.interaction.Select({
-                        condition: ol.events.condition.singleClick,
-                        //style: null,
-                    });
-
-                    map.addInteraction(selectionInteraction);
-
-                    selectionInteraction.on("select", function (event) {
-                        if (event.deselected.length) {
-                            event.deselected.forEach((feature) => {
-                                if (feature.executor) {
-                                    feature.executor();
-                                }
-                            });
-                        }
-                        if (event.selected.length) {
-                            event.selected.forEach(() => {
-                                container.showPopup.apply(null, [event]);
-                            });
-                        }
+                    return new ol.style.Style({
+                        fill: new ol.style.Fill({ color: fillColor }),
+                        stroke: new ol.style.Stroke({ color: borderColor, width: 2 }),
                     });
                 }
 
-                const interactions = container.map.getInteractions().getArray();
+                // Check if it's a marker with icon
+                if (intent === "marker") {
+                    return new ol.style.Style({
+                        geometry: feature.getGeometry(),
+                        image: new ol.style.Icon({
+                            anchor: [feature.get("offsetx"), feature.get("offsety")],
+                            anchorXUnits: "pixels",
+                            anchorYUnits: "pixels",
+                            src: feature.get("url"),
+                        }),
+                    });
+                }
 
-                // e.g. added by wikiplugin_appframe modify_feature
-                const modifyInteraction = interactions.find((interaction) => {
-                    return interaction instanceof ol.interaction.Modify && interaction.get("active");
+                // Default style: red triangle for unmarked features
+                return new ol.style.Style({
+                    geometry: feature.getGeometry(),
+                    image: new ol.style.RegularShape({
+                        points: 3,
+                        radius: 12,
+                        fill: new ol.style.Fill({ color: "#cc3333" }),
+                        stroke: new ol.style.Stroke({ color: "#ffffff", width: 2 }),
+                        rotation: 0,
+                    }),
                 });
-
-                if (modifyInteraction) {
-                    modifyInteraction.on("modifyend", function (event) {
-                        event.features.getArray().forEach((feature) => {
-                            if (feature.executor) {
-                                feature.executor();
-                            }
-                        });
-                    });
-                }
-
-                // e.g. added by wikiplugin_appframe draw_polygon and draw_path
-                const drawInteraction = interactions.find((interaction) => {
-                    return interaction instanceof ol.interaction.Draw && interaction.get("active");
-                });
-
-                if (drawInteraction) {
-                    drawInteraction.on("drawend", function (event) {
-                        if (event.feature) {
-                            if (!event.feature.get("color")) {
-                                event.feature.set("color", "#6699cc");
-                            }
-                            if (!event.feature.get("intent")) {
-                                event.feature.set("intent", "vectors");
-                            }
-                            $(document).trigger("drawend.tiki", [event]);
-                        }
-                    });
-                }
             };
 
             container.getLayer = function (name) {
-                let vectors;
+                var vectors;
 
                 if (name) {
                     if (!container.layers[name]) {
@@ -618,10 +550,6 @@ import { defaults as defaultControls } from "ol/control";
                             });
                         }
 
-                        vectors.setZIndex(container.map.getLayers().getLength() * 1000);
-                        container.setupLayerEvents(vectors);
-
-                        container.layers[name] = vectors;
                         container.overlays.getLayers().push(vectors);
                     }
 
@@ -640,6 +568,13 @@ import { defaults as defaultControls } from "ol/control";
                     }
                 });
             };
+
+            desiredControls = $(this).data("map-controls");
+            if (desiredControls === undefined) {
+                desiredControls = "controls,layers,search_location,current_location,streetview,navigation";
+            }
+
+            desiredControls = desiredControls.split(",");
 
             var setupHeight = function () {
                 var height = $(container).height();
@@ -667,1409 +602,1466 @@ import { defaults as defaultControls } from "ol/control";
                 $(this).attr("id", id);
             }
 
-            //setTimeout(function () {
-            ol.ImgPath = "lib/openlayers/theme/dark/";
+            setTimeout(function () {
+                ol.ImgPath = "lib/openlayers/theme/dark/";
 
-            desiredControls = $(this).data("map-controls");
-            if (desiredControls === undefined) {
-                desiredControls = "controls,layers,search_location,current_location,streetview,navigation";
-            }
+                var controls = defaultControls({
+                    // zoom control is added by default, so remove it if not needed
+                    zoom: $.inArray("controls", desiredControls) !== -1,
+                });
 
-            desiredControls = desiredControls.split(",");
+                if ($.inArray("coordinates", desiredControls) !== -1) {
+                    controls.push(
+                        new ol.control.MousePosition({
+                            projection: "EPSG:4326",
+                            coordinateFormat: function (coordinate) {
+                                return ol.coordinate.format(coordinate, "{y}, {x}", 4);
+                            },
+                        })
+                    );
+                }
 
-            const controls = defaultControls({
-                // zoom control is added by default, so remove it if not needed
-                zoom: $.inArray("controls", desiredControls) !== -1,
-            });
+                if ($.inArray("scale", desiredControls) !== -1) {
+                    controls.push(new ol.control.ScaleLine());
+                }
 
-            if ($.inArray("coordinates", desiredControls) !== -1) {
-                controls.push(
-                    new ol.control.MousePosition({
-                        projection: "EPSG:4326",
-                        coordinateFormat: function (coordinate) {
-                            return ol.coordinate.format(coordinate, "{y}, {x}", 4);
-                        },
-                    })
-                );
-            }
+                if ($.inArray("levels", desiredControls) !== -1) {
+                    controls.push(new ol.control.ZoomSlider());
+                }
 
-            if ($.inArray("scale", desiredControls) !== -1) {
-                controls.push(new ol.control.ScaleLine());
-            }
+                if (-1 !== $.inArray("layers", desiredControls)) {
+                    controls.push(new ol.control.LayerSwitcher());
+                }
 
-            if ($.inArray("levels", desiredControls) !== -1) {
-                controls.push(new ol.control.ZoomSlider());
-            }
-
-            if (-1 !== $.inArray("layers", desiredControls)) {
-                controls.push(new ol.control.LayerSwitcher());
-            }
-
-            /* no navbar, pan or layer switcher anymore?
+                /* no navbar, pan or layer switcher anymore?
                 if (layers.length > 0 && -1 !== $.inArray("navigation", desiredControls)) {
                     defaultMode.controls.push(new ol.control.NavToolbar());
                 }
 */
 
-            // Set up initial layers
-            container.layers = {};
+                // Set up initial layers
+                container.layers = {};
 
-            var tilesets = {},
-                key = "",
-                pos = -1,
-                ts = $(container).data("tilesets") || jqueryTiki.mapTileSets;
-            if (ts) {
-                if (typeof ts === "string") {
-                    ts = ts.replace(/\s*/g, "").split(",");
+                var tilesets = {},
+                    key = "",
+                    pos = -1,
+                    ts = $(container).data("tilesets") || jqueryTiki.mapTileSets;
+                if (ts) {
+                    if (typeof ts === "string") {
+                        ts = ts.replace(/\s*/g, "").split(",");
+                    }
+                    if (typeof ts === "string") {
+                        ts = [ts];
+                    }
                 }
-                if (typeof ts === "string") {
-                    ts = [ts];
-                }
-            }
-            for (var i = 0; i < ts.length; i++) {
-                pos = ts[i].indexOf("=");
-                if (pos !== -1) {
-                    key = ts[i].substr(0, pos);
-                    ts[i] = ts[i].substr(pos + 1);
-                } else {
-                    var m = ts[i].match(/\W/);
-                    if (m) {
-                        key = ts[i].substr(0, ts[i].indexOf(m[0]));
+                for (var i = 0; i < ts.length; i++) {
+                    pos = ts[i].indexOf("=");
+                    if (pos !== -1) {
+                        key = ts[i].substr(0, pos);
+                        ts[i] = ts[i].substr(pos + 1);
                     } else {
-                        key = ts[i];
+                        var m = ts[i].match(/\W/);
+                        if (m) {
+                            key = ts[i].substr(0, ts[i].indexOf(m[0]));
+                        } else {
+                            key = ts[i];
+                        }
+                    }
+                    if (ts[i].indexOf("~") !== -1) {
+                        tilesets[key] = ts[i].split("~");
+                    } else {
+                        tilesets[key] = ts[i];
                     }
                 }
-                if (ts[i].indexOf("~") !== -1) {
-                    tilesets[key] = ts[i].split("~");
-                } else {
-                    tilesets[key] = ts[i];
-                }
-            }
 
-            errorLayers = [];
-
-            var layers = [
-                new ol.layer.Group({
-                    title: tr("Base Maps"),
-                    layers: getBaseLayers(tilesets),
-                }),
-                new ol.layer.Group({
-                    title: tr("Overlays"),
-                }),
-            ];
-
-            var map = (container.map = new ol.Map({
-                target: id,
-                controls: controls,
-                view: new ol.View({
-                    center: [0, 0],
-                    zoom: 2,
-                }),
-                layers: layers,
-            }));
-
-            if (errorLayers.length) {
-                $("#tikifeedback").showError(tr("Cannot create map layer/s: " + errorLayers.join(", ")));
                 errorLayers = [];
-            }
 
-            map.getLayerGroup()
-                .getLayers()
-                .forEach(function (layer) {
-                    if (layer.get("title") === tr("Overlays")) {
-                        container.overlays = layer;
-                    }
-                });
+                var layers = [
+                    new ol.layer.Group({
+                        title: tr("Base Maps"),
+                        layers: getBaseLayers(tilesets),
+                    }),
+                    new ol.layer.Group({
+                        title: tr("Overlays"),
+                    }),
+                ];
 
-            container.vectors = container.getLayer(tr("Editable"));
+                var map = (container.map = new ol.Map({
+                    target: id,
+                    controls: controls,
+                    view: new ol.View({
+                        center: [0, 0],
+                        zoom: 2,
+                    }),
+                    layers: layers,
+                }));
 
-            container.uniqueMarkers = {};
+                if (errorLayers.length) {
+                    $("#tikifeedback").showError(tr("Cannot create map layer/s: " + errorLayers.join(", ")));
+                    errorLayers = [];
+                }
 
-            container.resetPosition = function (center) {
-                center = center || [0, 0, 3];
-
-                var view = map.getView();
-                view.setCenter(ol.proj.fromLonLat([center.lon, center.lat]));
-                view.setZoom(center.zoom);
-            };
-
-            container.resetPosition();
-
-            container.modeManager = {
-                modes: [],
-                activeMode: null,
-                addMode: function (options) {
-                    const mode = $.extend(
-                        {
-                            name: tr("Default"),
-                            icon: null,
-                            events: {
-                                activate: [],
-                                deactivate: [],
-                            },
-                            controls: [],
-                            layers: [],
-                        },
-                        options
-                    );
-
-                    mode.layers.forEach((layer) => {
-                        layer.displayInLayerSwitcher = false;
-                        layer.setVisibility(false);
-                        map.addLayer(layer);
-                    });
-
-                    mode.controls.forEach((control) => {
-                        control.setActive(false);
-                        map.addInteraction(control);
-                    });
-
-                    this.modes.push(mode);
-
-                    this.register("activate", mode.name, mode.activate);
-                    this.register("deactivate", mode.name, mode.deactivate);
-
-                    if (!this.activeMode) {
-                        this.activate(mode);
-                    }
-
-                    $(container).trigger("modechanged");
-
-                    return mode;
-                },
-                switchTo: function (modeName) {
-                    const manager = this;
-                    this.modes.forEach((mode) => {
-                        if (mode.name === modeName) {
-                            manager.activate(mode);
+                map.getLayerGroup()
+                    .getLayers()
+                    .forEach(function (layer) {
+                        if (layer.get("title") === tr("Overlays")) {
+                            container.overlays = layer;
                         }
                     });
-                },
-                register: function (eventName, modeName, callback) {
-                    this.modes.forEach(function (mode) {
-                        if (mode.name === modeName && callback) {
-                            mode.events[eventName].push(callback);
-                        }
-                    });
-                },
-                activate: function (mode) {
-                    if (this.activeMode) {
-                        this.deactivate();
-                    }
 
-                    this.activeMode = mode;
-                    const interactions = container.map.getInteractions();
+                container.vectors = container.getLayer(tr("Editable"));
 
-                    mode.controls.forEach((control) => {
-                        interactions.forEach((interaction) => {
-                            if (interaction instanceof ol.interaction.Select && interaction instanceof control.constructor) {
-                                // edit modes need to disable the default select interaction
-                                interaction.getFeatures().clear();
-                                interaction.setActive(false);
-                            }
-                        });
-                        control.setActive(true);
-                        container.setupLayerEvents(container.vectors);
-                    });
-                    mode.layers.forEach((layer) => {
-                        layer.setVisibility(true);
-                    });
-                    mode.events.activate.forEach(function (evt) {
-                        evt.apply([], container);
-                    });
+                container.uniqueMarkers = {};
 
-                    $(container).trigger("modechanged");
-                },
-                deactivate: function () {
-                    if (!this.activeMode) {
-                        return;
-                    }
+                container.resetPosition = function (center) {
+                    center = center || [0, 0, 3];
 
-                    this.activeMode.controls.forEach((control) => {
-                        control.setActive(false);
-                    });
-                    this.activeMode.layers.forEach((layer) => {
-                        layer.setVisibility(false);
-                    });
-                    this.activeMode.events.deactivate.forEach((evt) => {
-                        evt.apply([], container);
-                    });
-
-                    this.activeMode = null;
-                },
-            };
-
-            const defaultMode = {
-                controls: [selectionInteraction],
-                name: tr("Default"),
-            };
-
-            container.modeManager.addMode(defaultMode);
-
-            var $mapBootstrapDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
-
-            /* tooltips */
-
-            if ($(container).data("tooltips")) {
-                // based on https://gis.stackexchange.com/a/166745/25953
-
-                container.displayFeatureInfo = function (pixel, evt) {
-                    $mapBootstrapDummy.tooltip("hide");
-                    var feature,
-                        layer,
-                        both = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
-                            return [feature, layer];
-                        });
-                    if (!both) {
-                        return;
-                    }
-                    feature = both[0];
-                    layer = both[1];
-
-                    if (!feature) {
-                        return;
-                    }
-                    if (layer && layer instanceof ol.layer.VectorTile) {
-                        return;
-                    }
-                    $mapBootstrapDummy.css({
-                        left: pixel[0] + "px",
-                        top: pixel[1] - 15 + "px",
-                    });
-                    var clusterFeatures = feature.get("features");
-
-                    if (clusterFeatures) {
-                        if ($(container).data("clusterhover") === "none") {
-                            feature.set("content", "");
-                            for (var i = 0; i < clusterFeatures.length; i++) {
-                                feature.set("content", feature.get("content") + clusterFeatures[i].get("content") + "<br>");
-                            }
-                        } else if (clusterFeatures.length === 1) {
-                            feature = clusterFeatures[0];
-                        } else if (layer) {
-                            var f = layer.getSource().getSource().getClosestFeatureToCoordinate(evt.coordinate);
-                            if (f) {
-                                feature = f;
-                            }
-                        }
-                    }
-                    if (feature && feature.get("content")) {
-                        $mapBootstrapDummy
-                            .tooltip("dispose")
-                            .tooltip({
-                                animation: false,
-                                trigger: "manual",
-                                html: true,
-                                title: feature.get("content"),
-                                container: "body",
-                            })
-                            .tooltip("show");
-                    }
+                    var view = map.getView();
+                    view.setCenter(ol.proj.fromLonLat([center.lon, center.lat]));
+                    view.setZoom(center.zoom);
                 };
 
-                map.on("pointermove", function (evt) {
-                    if (evt.dragging) {
-                        $mapBootstrapDummy.tooltip("hide");
-                        return true;
-                    }
-                    container.displayFeatureInfo(map.getEventPixel(evt.originalEvent), evt);
-                    return true;
-                });
-            }
+                container.resetPosition();
 
-            if ($(container).data("popup-style")) {
-                container.showPopup = function (e) {
-                    let pixel, feature;
-                    const features = e.target.getFeatures();
+                container.modeManager = {
+                    modes: [],
+                    activeMode: null,
+                    addMode: function (options) {
+                        var mode = $.extend(
+                            {
+                                title: tr("Default"),
+                                icon: null,
+                                events: {
+                                    activate: [],
+                                    deactivate: [],
+                                },
+                                controls: [],
+                                layers: [],
+                            },
+                            options
+                        );
 
-                    if (features.getLength()) {
-                        feature = features.item(0);
-                        var clusterFeatures = feature.get("features");
-                        if (clusterFeatures) {
-                            if (clusterFeatures.length === 1) {
-                                feature = clusterFeatures[0];
-                            } else {
-                                selectionInteraction.getFeatures().clear();
-                                var extent = ol.extent.createEmpty();
-                                for (var i = 0; i < clusterFeatures.length; ++i) {
-                                    ol.extent.extend(extent, clusterFeatures[i].getGeometry().getExtent());
-                                }
-                                container.map.getView().fit(extent, {
-                                    duration: 2000,
-                                    padding: [10, 5, 10, 5],
-                                });
-                                return;
-                            }
-                        } else {
-                            feature = features.item(0);
+                        $.each(mode.layers, function (k, layer) {
+                            layer.displayInLayerSwitcher = false;
+                            layer.setVisibility(false);
+                            map.addLayer(layer);
+                        });
+
+                        $.each(mode.controls, function (k, control) {
+                            control.autoActivate = false;
+                            map.addControl(control);
+                        });
+
+                        this.modes.push(mode);
+
+                        this.register("activate", mode.name, mode.activate);
+                        this.register("deactivate", mode.name, mode.deactivate);
+
+                        if (!this.activeMode) {
+                            this.activate(mode);
                         }
-                    } else {
-                        return;
-                    }
 
-                    pixel = map.getEventPixel(e.mapBrowserEvent.originalEvent);
+                        $(container).trigger("modechanged");
 
-                    $mapBootstrapDummy.tooltip("dispose").css({
-                        left: pixel[0] + "px",
-                        top: pixel[1] + "px",
-                    });
+                        return mode;
+                    },
+                    switchTo: function (modeName) {
+                        var manager = this;
+                        $.each(this.modes, function (k, mode) {
+                            if (mode.name === modeName) {
+                                manager.activate(mode);
+                            }
+                        });
+                    },
+                    register: function (eventName, modeName, callback) {
+                        $.each(this.modes, function (k, mode) {
+                            if (mode.name === modeName && callback) {
+                                mode.events[eventName].push(callback);
+                            }
+                        });
+                    },
+                    activate: function (mode) {
+                        if (this.activeMode) {
+                            this.deactivate();
+                        }
 
-                    let type = feature.get("type"),
-                        object = feature.get("object");
+                        this.activeMode = mode;
 
-                    if (!type && !object) {
-                        ((type = "trackeritem"), (object = feature.get("itemId")));
-                    }
+                        $.each(mode.controls, function (k, control) {
+                            control.setActive(true);
+                        });
+                        $.each(mode.layers, function (k, layer) {
+                            layer.setVisibility(true);
+                        });
+                        $.each(mode.events.activate, function (k, f) {
+                            f.apply([], container);
+                        });
 
-                    switch ($(container).data("popup-style")) {
-                        case "dialog":
-                            var $modal = $(".footer-modal:not(.show)")
-                                .first()
-                                .addClass("modal-lg")
-                                .modal({})
-                                .one("show.bs.modal", function (event) {
-                                    $(".modal-title", $modal).empty();
-                                    $(".modal-body", $modal).empty();
-                                })
-                                .one("shown.bs.modal", function (event) {
-                                    if (type && object) {
-                                        $(container).loadInfoboxPopup({
-                                            type: type,
-                                            object: object,
-                                            feature: feature,
-                                            event: event,
-                                            element: this,
-                                            callback: function (event, $html) {
-                                                var title = $html.find("h1").remove().text() || feature.get("content");
+                        $(container).trigger("modechanged");
+                    },
+                    deactivate: function () {
+                        if (!this.activeMode) {
+                            return;
+                        }
 
-                                                $html.find("a.service-dialog").on("click", function (event) {
-                                                    const $link = $(this);
-                                                    $.closeModal({
-                                                        done: function () {
-                                                            setTimeout(function () {
-                                                                $.openModal({
-                                                                    size: "modal-lg",
-                                                                    remote: $link.attr("href"),
-                                                                });
-                                                            }, 0);
-                                                        },
-                                                    });
-                                                    return false;
-                                                });
+                        $.each(this.activeMode.controls, function (k, control) {
+                            control.setActive(false);
+                        });
+                        $.each(this.activeMode.layers, function (k, layer) {
+                            layer.setVisibility(false);
+                        });
+                        $.each(this.activeMode.events.deactivate, function (k, f) {
+                            f.apply([], container);
+                        });
 
-                                                $(".modal-title", $modal).text(title);
-                                                $(".modal-body", $modal).append($html);
-                                            },
-                                        });
-                                    }
-                                })
-                                .one("hidden.bs.modal", function () {
-                                    selectionInteraction.getFeatures().clear();
-                                })
-                                .modal("show");
+                        this.activeMode = null;
+                    },
+                };
 
-                            break;
-                        case "popup":
-                        default:
+                var defaultMode = {
+                    controls: [],
+                };
+
+                var $mapBootstrapDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
+
+                /* tooltips */
+
+                if ($(container).data("tooltips")) {
+                    // based on https://gis.stackexchange.com/a/166745/25953
+
+                    container.displayFeatureInfo = function (pixel, evt) {
+                        $mapBootstrapDummy.tooltip("hide");
+                        var feature,
+                            layer,
+                            both = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+                                return [feature, layer];
+                            });
+                        if (!both) {
+                            return;
+                        }
+                        feature = both[0];
+                        layer = both[1];
+
+                        if (!feature) {
+                            return;
+                        }
+                        if (layer && layer instanceof ol.layer.VectorTile) {
+                            return;
+                        }
+                        $mapBootstrapDummy.css({
+                            left: pixel[0] + "px",
+                            top: pixel[1] - 15 + "px",
+                        });
+                        var clusterFeatures = feature.get("features");
+
+                        if (clusterFeatures) {
+                            if ($(container).data("clusterhover") === "none") {
+                                feature.set("content", "");
+                                for (var i = 0; i < clusterFeatures.length; i++) {
+                                    feature.set("content", feature.get("content") + clusterFeatures[i].get("content") + "<br>");
+                                }
+                            } else if (clusterFeatures.length === 1) {
+                                feature = clusterFeatures[0];
+                            } else if (layer) {
+                                var f = layer.getSource().getSource().getClosestFeatureToCoordinate(evt.coordinate);
+                                if (f) {
+                                    feature = f;
+                                }
+                            }
+                        }
+                        if (feature && feature.get("content")) {
                             $mapBootstrapDummy
-                                .popover("dispose")
-                                .popover({
+                                .tooltip("dispose")
+                                .tooltip({
+                                    animation: false,
                                     trigger: "manual",
                                     html: true,
-                                    content: tr("Loading..."),
+                                    title: feature.get("content"),
                                     container: "body",
-                                    placement: "auto",
                                 })
-                                .popover("show")
-                                .on("shown.bs.popover", function (event) {
-                                    if (type && object) {
-                                        $(container).loadInfoboxPopup({
-                                            type: type,
-                                            object: object,
-                                            feature: feature,
-                                            event: event,
-                                            element: this,
-                                            callback: function (event, $html) {
-                                                var $popover = $(".popover.show").first();
-                                                $html.find("a.service-dialog").remove();
-                                                var title = $html.find("h1").remove().text() || feature.get("content");
-                                                $(".popover-header", $popover).text(title);
-                                                $(".popover-body", $popover).empty().append($html.children());
-                                                $popover.on("mouseleave", function () {
-                                                    $popover.popover("dispose");
-                                                    selectionInteraction.getFeatures().clear();
-                                                });
-                                            },
-                                        });
-                                    }
-                                });
-                            break;
-                    }
-                };
-            }
-
-            if (layers.length > 0 && -1 !== $.inArray("overview", desiredControls)) {
-                var overview = new ol.control.OverviewMap({ minRatio: 128, maxRatio: 256, maximized: true });
-                overview.desiredZoom = function () {
-                    return Math.min(Math.max(1, map.getZoom() - 6), 3);
-                };
-                overview.isSuitableOverview = function () {
-                    return this.ovmap.getZoom() === overview.desiredZoom() && this.ovmap.getExtent().contains(map.getExtent());
-                };
-                overview.updateOverview = function () {
-                    overview.ovmap.setCenter(map.getCenter());
-                    overview.ovmap.zoomTo(overview.desiredZoom());
-                    this.updateRectToMap();
-                };
-
-                map.addControl(overview);
-            }
-
-            container.markerIcons = {
-                loadedMarker: {},
-                actionQueue: {},
-                loadingMarker: [],
-                loadMarker: function (name, src) {
-                    this.loadingMarker.push(name);
-                    this.actionQueue[name] = [];
-
-                    var img = new Image(),
-                        me = this;
-                    img.onload = function () {
-                        var width = this.width,
-                            height = this.height,
-                            action;
-                        me.loadedMarker[name] = {
-                            intent: "marker",
-                            url: src,
-                            width: width,
-                            height: height,
-                            offsetx: width / 2,
-                            offsety: height,
-                        };
-
-                        while ((action = me.actionQueue[name].pop())) {
-                            action();
+                                .tooltip("show");
                         }
                     };
-                    $(img).on("error", function () {
-                        // eslint-disable-next-line no-console
-                        console.log("Map error loading marker image " + src);
-                        var index = container.markerIcons.loadingMarker.indexOf(src),
-                            action;
-                        if (index > -1) {
-                            container.markerIcons.loadingMarker.splice(index, 1);
+
+                    map.on("pointermove", function (evt) {
+                        if (evt.dragging) {
+                            $mapBootstrapDummy.tooltip("hide");
+                            return true;
                         }
-                        while ((action = me.actionQueue[name].pop())) {
-                            action();
-                        }
+                        container.displayFeatureInfo(map.getEventPixel(evt.originalEvent), evt);
+                        return true;
                     });
-                    img.src = src;
-                },
-                createMarker: function (name, lonlat, callback) {
-                    if (this.loadedMarker[name]) {
-                        this._createMarker(name, lonlat, callback);
-                        return;
-                    }
-
-                    if (-1 === $.inArray(name, this.loadingMarker)) {
-                        this.loadMarker(name, name);
-                    }
-
-                    var me = this;
-                    this.actionQueue[name].push(function () {
-                        me._createMarker(name, lonlat, callback);
-                    });
-                },
-                _createMarker: function (name, lonlat, callback) {
-                    if (lonlat) {
-                        var properties = $.extend(this.loadedMarker[name] || this.loadedMarker.default, {
-                                geometry: lonlat,
-                            }),
-                            marker;
-
-                        marker = new ol.Feature(properties);
-                        callback(marker);
-                    }
-                },
-            };
-
-            container.markerIcons.loadMarker("default", "lib/openlayers/img/marker.svg");
-            container.markerIcons.loadMarker("selection", "lib/openlayers/img/marker-gold.svg");
-
-            if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
-                container.toMyLocation = $("<a class='btn btn-sm btn-info'>")
-                    .attr("href", "")
-                    .on("click", function () {
-                        navigator.geolocation.getCurrentPosition(function (position) {
-                            var view = map.getView();
-                            view.setCenter(ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]));
-                            view.setZoom(view.getZoomForResolution(position.coords.accuracy));
-
-                            $(container).addMapMarker({
-                                lat: position.coords.latitude,
-                                lon: position.coords.longitude,
-                                unique: "selection",
-                            });
-                        });
-                        return false;
-                    })
-                    .text(tr("To My Location"));
-
-                if (-1 !== $.inArray("current_location", desiredControls)) {
-                    $(container).after(container.toMyLocation);
                 }
-            }
 
-            container.searchLocation = $("<a class='btn btn-sm btn-info'>")
-                .attr("href", "")
-                .on("click", function () {
-                    var address = prompt(tr("What address are you looking for?"), "");
+                if ($(container).data("popup-style")) {
+                    container.showPopup = function (e) {
+                        var pixel,
+                            feature,
+                            features = e.target.getFeatures();
 
-                    $(container).trigger("search", [{ address: address }]);
-                    return false;
-                })
-                .text(tr("Search Location"));
-
-            if (-1 !== $.inArray("search_location", desiredControls)) {
-                $(container).after(container.searchLocation);
-            }
-
-            var field = $(container).data("target-field");
-            var central = null,
-                useMarker = true;
-
-            if (field) {
-                field = $($(container).closest("form")[0][field]);
-
-                $(container).setupMapSelection({
-                    field: field,
-                });
-                var value = field.val();
-                central = parseCoordinates(value);
-
-                if (central) {
-                    // cope with zoom levels greater than what OSM layer[0] can cope with
-                    var geLayer;
-                    if (central.zoom > 19) {
-                        geLayer = map.getLayersByName("Google Satellite");
-                    } else if (central.zoom > 18) {
-                        geLayer = map.getLayersByName("Google Streets");
-                    }
-                    if (geLayer) {
-                        container.layer = geLayer[0];
-                        map.setBaseLayer(container.layer);
-                        map.baseLayer.setVisibility(true);
-                    }
-                }
-            }
-
-            if ($(container).data("marker-filter")) {
-                var filter = $(container).data("marker-filter");
-                $(filter).each(function () {
-                    var lat = $(this).data("geo-lat"),
-                        lon = $(this).data("geo-lon"),
-                        zoom = $(this).data("geo-zoom"),
-                        extent = $(this).data("geo-extent"),
-                        icon = $(this).data("icon-src"),
-                        object = $(this).data("object"),
-                        type = $(this).data("type"),
-                        content = $(this).clone().data({}).wrap("<span/>").parent().html();
-                    if (!extent) {
-                        if ($(this).hasClass("primary") || this.href === document.location.href) {
-                            central = { lat: lat, lon: lon, zoom: zoom ? zoom : 0 };
+                        if (features.getLength()) {
+                            feature = features.getArray()[0];
+                            var clusterFeatures = feature.get("features");
+                            if (clusterFeatures) {
+                                if (clusterFeatures.length === 1) {
+                                    feature = clusterFeatures[0];
+                                } else {
+                                    selectionInteraction.getFeatures().clear();
+                                    var extent = ol.extent.createEmpty();
+                                    for (var i = 0; i < clusterFeatures.length; ++i) {
+                                        ol.extent.extend(extent, clusterFeatures[i].getGeometry().getExtent());
+                                    }
+                                    container.map.getView().fit(extent, {
+                                        duration: 2000,
+                                        padding: [10, 5, 10, 5],
+                                    });
+                                    return;
+                                }
+                            } else {
+                                feature = features.getArray()[0];
+                            }
                         } else {
-                            $(container).addMapMarker({
-                                type: type,
-                                object: object,
-                                lon: lon,
-                                lat: lat,
-                                content: content,
-                                icon: icon ? icon : null,
-                            });
+                            return;
                         }
-                    } else if ($(this).is("img")) {
-                        var graphic = new ol.layer.Image(
-                            $(this).attr("alt"),
-                            $(this).attr("src"),
-                            ol.Bounds.fromString(extent),
-                            new ol.Size($(this).width(), $(this).height())
-                        );
 
-                        graphic.isBaseLayer = false;
-                        graphic.alwaysInRange = true;
-                        container.map.addLayer(graphic);
-                    }
-                });
-            }
+                        pixel = map.getEventPixel(e.mapBrowserEvent.originalEvent);
 
-            var provided = $(container).data("geo-center");
+                        $mapBootstrapDummy.tooltip("dispose").css({
+                            left: pixel[0] + "px",
+                            top: pixel[1] + "px",
+                        });
 
-            if (provided && !central) {
-                central = parseCoordinates(provided);
-                useMarker = false;
-            }
+                        let type = feature.get("type"),
+                            object = feature.get("object");
 
-            if (central) {
-                container.resetPosition(central);
+                        if (!type && !object) {
+                            ((type = "trackeritem"), (object = feature.get("itemId")));
+                        }
 
-                if (useMarker) {
-                    $(container).addMapMarker({
-                        lon: central.lon,
-                        lat: central.lat,
-                        unique: "selection",
+                        switch ($(container).data("popup-style")) {
+                            case "dialog":
+                                var $modal = $(".footer-modal:not(.show)")
+                                    .first()
+                                    .modal({})
+                                    .one("shown.bs.modal", function (event) {
+                                        if (type && object) {
+                                            $(container).loadInfoboxPopup({
+                                                type: type,
+                                                object: object,
+                                                feature: feature,
+                                                event: event,
+                                                element: this,
+                                                callback: function (event, $html) {
+                                                    var title = $html.find("h1").remove().text() || feature.get("content"),
+                                                        $header = $(".modal-header", $modal);
+
+                                                    $html.find("a.service-dialog").clickModal({});
+
+                                                    if ($header.length === 0) {
+                                                        $(".modal-content", $modal).append(
+                                                            $("<div class='modal-header'>").append($("<h4 class='modal-title'>").text(title))
+                                                        );
+                                                    } else {
+                                                        $(".modal-title", $modal).text(title);
+                                                    }
+
+                                                    $(".modal-content", $modal).append(
+                                                        $("<div class='modal-body'>").append($html),
+                                                        $("<div class='modal-footer'>").append(
+                                                            $(
+                                                                "<button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>" +
+                                                                    tr("Close") +
+                                                                    "</button>"
+                                                            )
+                                                        )
+                                                    );
+                                                },
+                                            });
+                                        }
+                                    })
+                                    .one("hidden.bs.modal", function () {
+                                        selectionInteraction.getFeatures().clear();
+                                    })
+                                    .modal("show");
+
+                                break;
+                            case "popup":
+                            default:
+                                $mapBootstrapDummy
+                                    .popover("dispose")
+                                    .popover({
+                                        trigger: "manual",
+                                        html: true,
+                                        content: tr("Loading..."),
+                                        container: "body",
+                                        placement: "auto",
+                                    })
+                                    .popover("show")
+                                    .on("shown.bs.popover", function (event) {
+                                        if (type && object) {
+                                            $(container).loadInfoboxPopup({
+                                                type: type,
+                                                object: object,
+                                                feature: feature,
+                                                event: event,
+                                                element: this,
+                                                callback: function (event, $html) {
+                                                    var $popover = $(".popover.show").first();
+                                                    $html.find("a.service-dialog").remove();
+                                                    var title = $html.find("h1").remove().text() || feature.get("content");
+                                                    $(".popover-header", $popover).text(title);
+                                                    $(".popover-body", $popover).empty().append($html.children());
+                                                    $popover.on("mouseleave", function () {
+                                                        $popover.popover("dispose");
+                                                        selectionInteraction.getFeatures().clear();
+                                                    });
+                                                },
+                                            });
+                                        }
+                                    });
+                                break;
+                        }
+                    };
+                }
+
+                function setupLayerEvents(vectors) {
+                    selectionInteraction = new ol.interaction.Select({
+                        condition: ol.events.condition.click,
+                    });
+
+                    map.addInteraction(selectionInteraction);
+
+                    selectionInteraction.on("select", function (event) {
+                        if (event.target.executor) {
+                            event.target.executor();
+                        }
+                        container.showPopup.apply(null, [event]);
+                    });
+
+                    selectionInteraction.on("modified", function (event) {
+                        if (event.target.executor) {
+                            event.target.executor();
+                        }
+                    });
+
+                    selectionInteraction.on("added", function (event) {
+                        if (!event.target.get("color")) {
+                            event.target.set("color", "#6699cc");
+                        }
+                        if (!event.target.get("intent")) {
+                            event.target.set("intent", "vectors");
+                        }
                     });
                 }
-            }
+                let selectionInteraction;
 
-            if (jqueryTiki.googleStreetView) {
-                container.streetview = {
-                    buttons: [],
+                setupLayerEvents(container.vectors);
+
+                if (layers.length > 0 && -1 !== $.inArray("overview", desiredControls)) {
+                    var overview = new ol.control.OverviewMap({ minRatio: 128, maxRatio: 256, maximized: true });
+                    overview.desiredZoom = function () {
+                        return Math.min(Math.max(1, map.getZoom() - 6), 3);
+                    };
+                    overview.isSuitableOverview = function () {
+                        return this.ovmap.getZoom() === overview.desiredZoom() && this.ovmap.getExtent().contains(map.getExtent());
+                    };
+                    overview.updateOverview = function () {
+                        overview.ovmap.setCenter(map.getCenter());
+                        overview.ovmap.zoomTo(overview.desiredZoom());
+                        this.updateRectToMap();
+                    };
+
+                    map.addControl(overview);
+                }
+
+                container.markerIcons = {
+                    loadedMarker: {},
+                    actionQueue: {},
+                    loadingMarker: [],
+                    loadMarker: function (name, src) {
+                        this.loadingMarker.push(name);
+                        this.actionQueue[name] = [];
+
+                        var img = new Image(),
+                            me = this;
+                        img.onload = function () {
+                            var width = this.width,
+                                height = this.height,
+                                action;
+                            me.loadedMarker[name] = {
+                                intent: "marker",
+                                url: src,
+                                width: width,
+                                height: height,
+                                offsetx: width / 2,
+                                offsety: height,
+                            };
+
+                            while ((action = me.actionQueue[name].pop())) {
+                                action();
+                            }
+                        };
+                        $(img).on("error", function () {
+                            // eslint-disable-next-line no-console
+                            console.log("Map error loading marker image " + src);
+                            var index = container.markerIcons.loadingMarker.indexOf(src),
+                                action;
+                            if (index > -1) {
+                                container.markerIcons.loadingMarker.splice(index, 1);
+                            }
+                            while ((action = me.actionQueue[name].pop())) {
+                                action();
+                            }
+                        });
+                        img.src = src;
+                    },
+                    createMarker: function (name, lonlat, callback) {
+                        if (this.loadedMarker[name]) {
+                            this._createMarker(name, lonlat, callback);
+                            return;
+                        }
+
+                        if (-1 === $.inArray(name, this.loadingMarker)) {
+                            this.loadMarker(name, name);
+                        }
+
+                        var me = this;
+                        this.actionQueue[name].push(function () {
+                            me._createMarker(name, lonlat, callback);
+                        });
+                    },
+                    _createMarker: function (name, lonlat, callback) {
+                        if (lonlat) {
+                            var properties = $.extend(this.loadedMarker[name] || this.loadedMarker.default, {
+                                    geometry: lonlat,
+                                }),
+                                marker;
+
+                            marker = new ol.Feature(properties);
+                            callback(marker);
+                        }
+                    },
                 };
 
-                if (jqueryTiki.googleStreetViewOverlay) {
-                    container.streetview.overlay = new ol.layer.XYZ(
-                        "StreetView Overlay",
-                        currentProtocol + "//mts1.google.com/vt?hl=en-US&lyrs=svv|cb_client:apiv3&style=40,18&x=${x}&y=${y}&z=${z}",
-                        { sphericalMercator: true, displayInLayerSwitcher: false }
-                    );
-                    container.map.addLayer(container.streetview.overlay);
+                container.markerIcons.loadMarker("default", "lib/openlayers/img/marker.svg");
+                container.markerIcons.loadMarker("selection", "lib/openlayers/img/marker-gold.svg");
 
-                    container.map.events.on({
-                        move: function () {
-                            if (container.streetview.overlay.visibility) {
-                                container.streetview.overlay.redraw();
+                if (navigator.geolocation && navigator.geolocation.getCurrentPosition) {
+                    container.toMyLocation = $("<a class='btn btn-sm btn-info'>")
+                        .attr("href", "")
+                        .on("click", function () {
+                            navigator.geolocation.getCurrentPosition(function (position) {
+                                var view = map.getView();
+                                view.setCenter(ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]));
+                                view.setZoom(view.getZoomForResolution(position.coords.accuracy));
+
+                                $(container).addMapMarker({
+                                    lat: position.coords.latitude,
+                                    lon: position.coords.longitude,
+                                    unique: "selection",
+                                });
+                            });
+                            return false;
+                        })
+                        .text(tr("To My Location"));
+
+                    if (-1 !== $.inArray("current_location", desiredControls)) {
+                        $(container).after(container.toMyLocation);
+                    }
+                }
+
+                container.searchLocation = $("<a class='btn btn-sm btn-info'>")
+                    .attr("href", "")
+                    .on("click", function () {
+                        var address = prompt(tr("What address are you looking for?"), "");
+
+                        $(container).trigger("search", [{ address: address }]);
+                        return false;
+                    })
+                    .text(tr("Search Location"));
+
+                if (-1 !== $.inArray("search_location", desiredControls)) {
+                    $(container).after(container.searchLocation);
+                }
+
+                var field = $(container).data("target-field");
+                var central = null,
+                    useMarker = true;
+
+                if (field) {
+                    field = $($(container).closest("form")[0][field]);
+
+                    $(container).setupMapSelection({
+                        field: field,
+                    });
+                    var value = field.val();
+                    central = parseCoordinates(value);
+
+                    if (central) {
+                        // cope with zoom levels greater than what OSM layer[0] can cope with
+                        var geLayer;
+                        if (central.zoom > 19) {
+                            geLayer = map.getLayersByName("Google Satellite");
+                        } else if (central.zoom > 18) {
+                            geLayer = map.getLayersByName("Google Streets");
+                        }
+                        if (geLayer) {
+                            container.layer = geLayer[0];
+                            map.setBaseLayer(container.layer);
+                            map.baseLayer.setVisibility(true);
+                        }
+                    }
+                }
+
+                if ($(container).data("marker-filter")) {
+                    var filter = $(container).data("marker-filter");
+                    $(filter).each(function () {
+                        var lat = $(this).data("geo-lat"),
+                            lon = $(this).data("geo-lon"),
+                            zoom = $(this).data("geo-zoom"),
+                            extent = $(this).data("geo-extent"),
+                            icon = $(this).data("icon-src"),
+                            object = $(this).data("object"),
+                            type = $(this).data("type"),
+                            content = $(this).clone().data({}).wrap("<span/>").parent().html();
+                        if (!extent) {
+                            if ($(this).hasClass("primary") || this.href === document.location.href) {
+                                central = { lat: lat, lon: lon, zoom: zoom ? zoom : 0 };
+                            } else {
+                                $(container).addMapMarker({
+                                    type: type,
+                                    object: object,
+                                    lon: lon,
+                                    lat: lat,
+                                    content: content,
+                                    icon: icon ? icon : null,
+                                });
                             }
-                        },
+                        } else if ($(this).is("img")) {
+                            var graphic = new ol.layer.Image(
+                                $(this).attr("alt"),
+                                $(this).attr("src"),
+                                ol.Bounds.fromString(extent),
+                                new ol.Size($(this).width(), $(this).height())
+                            );
+
+                            graphic.isBaseLayer = false;
+                            graphic.alwaysInRange = true;
+                            container.map.addLayer(graphic);
+                        }
                     });
                 }
 
-                var StreetViewHandler = ol.Class(ol.control, {
-                    defaultHandlerOptions: {
-                        single: true,
-                        double: false,
-                        pixelTolerance: 0,
-                        stopSingle: false,
-                        stopDouble: false,
-                    },
-                    initialize: function (options) {
-                        this.handlerOptions = ol.Util.extend({}, this.defaultHandlerOptions);
-                        ol.control.prototype.initialize.apply(this, arguments);
-                        this.handler = new ol.Handler.Click(
-                            this,
-                            {
-                                click: this.trigger,
-                            },
-                            this.handlerOptions
+                var provided = $(container).data("geo-center");
+
+                if (provided && !central) {
+                    central = parseCoordinates(provided);
+                    useMarker = false;
+                }
+
+                if (central) {
+                    container.resetPosition(central);
+
+                    if (useMarker) {
+                        $(container).addMapMarker({
+                            lon: central.lon,
+                            lat: central.lat,
+                            unique: "selection",
+                        });
+                    }
+                }
+
+                container.modeManager.addMode(defaultMode);
+
+                if (jqueryTiki.googleStreetView) {
+                    container.streetview = {
+                        buttons: [],
+                    };
+
+                    if (jqueryTiki.googleStreetViewOverlay) {
+                        container.streetview.overlay = new ol.layer.XYZ(
+                            "StreetView Overlay",
+                            currentProtocol + "//mts1.google.com/vt?hl=en-US&lyrs=svv|cb_client:apiv3&style=40,18&x=${x}&y=${y}&z=${z}",
+                            { sphericalMercator: true, displayInLayerSwitcher: false }
                         );
-                    },
-                    trigger: function (e) {
-                        var width = 600,
-                            height = 500;
+                        container.map.addLayer(container.streetview.overlay);
 
-                        var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
-
-                        var canvas = $("<div/>")[0];
-                        $(canvas).appendTo("body");
-                        $.openModal({
-                            title: tr("Panorama"),
-                            content: canvas,
-                            buttons: container.streetview.getButtons(canvas),
+                        container.map.events.on({
+                            move: function () {
+                                if (container.streetview.overlay.visibility) {
+                                    container.streetview.overlay.redraw();
+                                }
+                            },
                         });
+                    }
 
-                        canvas.getImageUrl = function () {
-                            var pov = canvas.panorama.getPov();
-                            var pos = canvas.panorama.getPosition();
-                            var base =
-                                currentProtocol +
-                                "//maps.googleapis.com/maps/api/streetview?" +
-                                "size=" +
-                                width +
-                                "x" +
-                                height +
-                                "&" +
-                                "location=" +
-                                encodeURIComponent(pos.toUrlValue()) +
-                                "&" +
-                                "heading=" +
-                                encodeURIComponent(pov.heading) +
-                                "&" +
-                                "pitch=" +
-                                encodeURIComponent(pov.pitch) +
-                                "&" +
-                                "sensor=false";
-                            return base;
-                        };
-
-                        canvas.getPosition = function () {
-                            var pos = canvas.panorama.getPosition();
-
-                            return formatLocation(pos.lat(), pos.lng(), 12);
-                        };
-
-                        canvas.panorama = new google.maps.StreetViewPanorama(canvas, {
-                            position: new google.maps.LatLng(lonlat.lat, lonlat.lon),
-                            zoomControl: false,
-                            scrollwheel: false,
-                            disableDoubleClickZoom: true,
-                        });
-                        var timeout = setTimeout(function () {
-                            alert(
-                                tr(
-                                    "StreetView is not available at this specific point on the map. Zoom in as needed and make sure to click on a blue line."
-                                )
+                    var StreetViewHandler = ol.Class(ol.control, {
+                        defaultHandlerOptions: {
+                            single: true,
+                            double: false,
+                            pixelTolerance: 0,
+                            stopSingle: false,
+                            stopDouble: false,
+                        },
+                        initialize: function (options) {
+                            this.handlerOptions = ol.Util.extend({}, this.defaultHandlerOptions);
+                            ol.control.prototype.initialize.apply(this, arguments);
+                            this.handler = new ol.Handler.Click(
+                                this,
+                                {
+                                    click: this.trigger,
+                                },
+                                this.handlerOptions
                             );
-                            $.closeModal();
-                        }, 5000);
-                        google.maps.event.addListener(canvas.panorama, "pano_changed", function () {
-                            if (!canvas.panorama.getPano()) {
+                        },
+                        trigger: function (e) {
+                            var width = 600,
+                                height = 500;
+
+                            var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
+
+                            var canvas = $("<div/>")[0];
+                            $(canvas).appendTo("body");
+                            $.openModal({
+                                title: tr("Panorama"),
+                                content: canvas,
+                                buttons: container.streetview.getButtons(canvas),
+                            });
+
+                            canvas.getImageUrl = function () {
+                                var pov = canvas.panorama.getPov();
+                                var pos = canvas.panorama.getPosition();
+                                var base =
+                                    currentProtocol +
+                                    "//maps.googleapis.com/maps/api/streetview?" +
+                                    "size=" +
+                                    width +
+                                    "x" +
+                                    height +
+                                    "&" +
+                                    "location=" +
+                                    encodeURIComponent(pos.toUrlValue()) +
+                                    "&" +
+                                    "heading=" +
+                                    encodeURIComponent(pov.heading) +
+                                    "&" +
+                                    "pitch=" +
+                                    encodeURIComponent(pov.pitch) +
+                                    "&" +
+                                    "sensor=false";
+                                return base;
+                            };
+
+                            canvas.getPosition = function () {
+                                var pos = canvas.panorama.getPosition();
+
+                                return formatLocation(pos.lat(), pos.lng(), 12);
+                            };
+
+                            canvas.panorama = new google.maps.StreetViewPanorama(canvas, {
+                                position: new google.maps.LatLng(lonlat.lat, lonlat.lon),
+                                zoomControl: false,
+                                scrollwheel: false,
+                                disableDoubleClickZoom: true,
+                            });
+                            var timeout = setTimeout(function () {
                                 alert(
                                     tr(
                                         "StreetView is not available at this specific point on the map. Zoom in as needed and make sure to click on a blue line."
                                     )
                                 );
                                 $.closeModal();
-                            }
-                            clearTimeout(timeout);
-                        });
-                    },
-                });
-
-                container.modeManager.addMode({
-                    title: "StreetView",
-                    controls: [new StreetViewHandler(), new ol.control.NavToolbar()],
-                    activate: function () {
-                        if (container.streetview.overlay) {
-                            container.streetview.overlay.setVisibility(true);
-                        }
-                    },
-                    deactivate: function () {
-                        if (container.streetview.overlay) {
-                            container.streetview.overlay.setVisibility(false);
-                        }
-                    },
-                });
-
-                container.streetview.addButton = function (label, callback) {
-                    container.streetview.buttons.unshift({
-                        label: label,
-                        callback: callback,
-                    });
-                };
-
-                container.streetview.getButtons = function (canvas) {
-                    const buttons = [];
-                    $.each(container.streetview.buttons, function (k, b) {
-                        buttons.push({
-                            text: b.label,
-                            onClick: b.callback.bind(null, canvas),
-                        });
-                    });
-
-                    return buttons;
-                };
-
-                container.streetViewToggle = $("<a/>")
-                    .css("display", "block")
-                    .attr("href", "")
-                    .on("click", function () {
-                        if (container.modeManager.activeMode && container.modeManager.activeMode.name == "StreetView") {
-                            container.modeManager.switchTo("Default");
-                            $(this).text(tr("Enable StreetView"));
-                        } else {
-                            container.modeManager.switchTo("StreetView");
-                            $(this).text(tr("Disable StreetView"));
-                        }
-                        return false;
-                    })
-                    .text(tr("Enable StreetView"));
-
-                if (-1 !== $.inArray("streetview", desiredControls)) {
-                    $(container).after(container.streetViewToggle);
-                }
-            }
-
-            // start with the search boxes outside of the map container
-            let searchboxes = $(container)
-                .closest(".tab, #appframe, #tiki-center")
-                .find("form.search-box")
-                .filter(function () {
-                    return $(this).closest(".map-container").length === 0;
-                });
-
-            // then add the ones inside
-            searchboxes = searchboxes.add($("form.search-box", container));
-
-            searchboxes
-                .off("submit")
-                .on("submit", function () {
-                    $(container).trigger("start.map.search");
-                    var form = this;
-                    $.post(
-                        "tiki-searchindex.php?filter~geo_located=y",
-                        $(this).serialize(),
-                        function (data) {
-                            if (!form.autoLayers) {
-                                form.autoLayers = [];
-                            }
-
-                            $(form.autoLayers).each(function (k, name) {
-                                container.clearLayer(name);
+                            }, 5000);
+                            google.maps.event.addListener(canvas.panorama, "pano_changed", function () {
+                                if (!canvas.panorama.getPano()) {
+                                    alert(
+                                        tr(
+                                            "StreetView is not available at this specific point on the map. Zoom in as needed and make sure to click on a blue line."
+                                        )
+                                    );
+                                    $.closeModal();
+                                }
+                                clearTimeout(timeout);
                             });
+                        },
+                    });
 
-                            $.each(data.result, function (k, i) {
-                                var layerName = $(form).data("result-layer"),
-                                    suffix = $(form).data("result-suffix");
+                    container.modeManager.addMode({
+                        title: "StreetView",
+                        controls: [new StreetViewHandler(), new ol.control.NavToolbar()],
+                        activate: function () {
+                            if (container.streetview.overlay) {
+                                container.streetview.overlay.setVisibility(true);
+                            }
+                        },
+                        deactivate: function () {
+                            if (container.streetview.overlay) {
+                                container.streetview.overlay.setVisibility(false);
+                            }
+                        },
+                    });
 
-                                if (layerName && i[layerName]) {
-                                    layerName = i[layerName] + ": ";
-                                } else if (!layerName) {
-                                    layerName = "";
+                    container.streetview.addButton = function (label, callback) {
+                        container.streetview.buttons.unshift({
+                            label: label,
+                            callback: callback,
+                        });
+                    };
+
+                    container.streetview.getButtons = function (canvas) {
+                        const buttons = [];
+                        $.each(container.streetview.buttons, function (k, b) {
+                            buttons.push({
+                                text: b.label,
+                                onClick: b.callback.bind(null, canvas),
+                            });
+                        });
+
+                        return buttons;
+                    };
+
+                    container.streetViewToggle = $("<a/>")
+                        .css("display", "block")
+                        .attr("href", "")
+                        .on("click", function () {
+                            if (container.modeManager.activeMode && container.modeManager.activeMode.name == "StreetView") {
+                                container.modeManager.switchTo("Default");
+                                $(this).text(tr("Enable StreetView"));
+                            } else {
+                                container.modeManager.switchTo("StreetView");
+                                $(this).text(tr("Disable StreetView"));
+                            }
+                            return false;
+                        })
+                        .text(tr("Enable StreetView"));
+
+                    if (-1 !== $.inArray("streetview", desiredControls)) {
+                        $(container).after(container.streetViewToggle);
+                    }
+                }
+
+                var searchboxes = $(container)
+                    .closest(".tab, #appframe, #tiki-center")
+                    .find("form.search-box")
+                    .filter(function () {
+                        return $(this).closest(".map-container").length === 0;
+                    });
+
+                searchboxes = searchboxes.add($("form.search-box", container));
+
+                searchboxes
+                    .off("submit")
+                    .on("submit", function () {
+                        $(container).trigger("start.map.search");
+                        var form = this;
+                        $.post(
+                            "tiki-searchindex.php?filter~geo_located=y",
+                            $(this).serialize(),
+                            function (data) {
+                                if (!form.autoLayers) {
+                                    form.autoLayers = [];
                                 }
 
-                                if (suffix && i[suffix]) {
-                                    layerName = layerName + i[suffix];
-                                }
+                                $(form.autoLayers).each(function (k, name) {
+                                    container.clearLayer(name);
+                                });
 
-                                if (-1 === $.inArray(layerName, form.autoLayers)) {
-                                    form.autoLayers.push(layerName);
-                                }
+                                $.each(data.result, function (k, i) {
+                                    var layerName = $(form).data("result-layer"),
+                                        suffix = $(form).data("result-suffix");
 
-                                let icon = "";
-                                try {
-                                    $(i.link).each(function () {
-                                        // if the object has an img with it (tracker status for instance) then we need to find the <a>
-                                        if ($(this).is("a")) {
-                                            // and just using $(i.link).find("a") doesn't work for some reason
-                                            icon = $(this).data("icon-src");
-                                        }
-                                    });
-                                } catch (e) {}
-
-                                if (i.geo_location) {
-                                    $(container).addMapMarker({
-                                        coordinates: i.geo_location,
-                                        content: i.title,
-                                        type: i.object_type,
-                                        object: i.object_id,
-                                        icon: icon ? icon : null,
-                                        layer: layerName,
-                                        dataSource: i,
-                                        form: form,
-                                    });
-                                } else if (i.geo_feature) {
-                                    const wkt = new ol.format.WKT(),
-                                        layer = container.getLayer(layerName),
-                                        format = new ol.format.GeoJSON();
-                                    let features;
-
-                                    try {
-                                        features = format.readFeatures(i.geo_feature);
-                                    } catch (e) {
-                                        features = null;
+                                    if (layerName && i[layerName]) {
+                                        layerName = i[layerName] + ": ";
+                                    } else if (!layerName) {
+                                        layerName = " -- ";
                                     }
 
-                                    if (!features) {
-                                        // Corrupted feature - display plain marker
+                                    if (suffix && i[suffix]) {
+                                        layerName = layerName + i[suffix];
+                                    }
+
+                                    if (-1 === $.inArray(layerName, form.autoLayers)) {
+                                        form.autoLayers.push(layerName);
+                                    }
+
+                                    let icon = "";
+                                    try {
+                                        $(i.link).each(function () {
+                                            // if the object has an img with it (tracker status for instance) then we need to find the <a>
+                                            if ($(this).is("a")) {
+                                                // and just using $(i.link).find("a") doesn't work for some reason
+                                                icon = $(this).data("icon-src");
+                                            }
+                                        });
+                                    } catch (e) {}
+
+                                    if (i.geo_location) {
                                         $(container).addMapMarker({
-                                            coordinates: $(container).getMapCenter(),
+                                            coordinates: i.geo_location,
                                             content: i.title,
                                             type: i.object_type,
                                             object: i.object_id,
-                                            icon: null,
+                                            icon: icon ? icon : null,
                                             layer: layerName,
                                             dataSource: i,
+                                            form: form,
                                         });
-                                        return;
-                                    }
+                                    } else if (i.geo_feature) {
+                                        const wkt = new ol.format.WKT(),
+                                            layer = container.getLayer(layerName),
+                                            format = new ol.format.GeoJSON();
+                                        let features;
 
-                                    $.each(features, function (k, feature) {
-                                        var initial;
-                                        feature.set("itemId", i.object_id);
-                                        feature.set("content", i.title);
-                                        if (!feature.get("color")) {
-                                            feature.set("color", "#6699cc");
-                                        }
-                                        if (!feature.get("intent")) {
-                                            feature.set("intent", "vectors");
-                                        }
-                                        if (!feature.get("popup_config")) {
-                                            feature.set("popup_config", $(form).data("popup-config"));
-                                        }
-                                        if (!feature.get("popup_fields")) {
-                                            feature.set("popup_fields", $(form).data("popup-fields"));
-                                        }
-                                        if (!feature.get("popup_tpl")) {
-                                            feature.set("popup_tpl", $(form).data("popup-tpl"));
+                                        try {
+                                            features = format.readFeatures(i.geo_feature);
+                                        } catch (e) {
+                                            features = null;
                                         }
 
-                                        initial = wkt.writeFeature(feature) + feature.get("color");
+                                        if (!features) {
+                                            // Corrupted feature - display plain marker
+                                            $(container).addMapMarker({
+                                                coordinates: $(container).getMapCenter(),
+                                                content: i.title,
+                                                type: i.object_type,
+                                                object: i.object_id,
+                                                icon: null,
+                                                layer: layerName,
+                                                dataSource: i,
+                                            });
+                                            return;
+                                        }
 
-                                        feature.executor = delayedExecutor(5000, function () {
-                                            var fields = {},
-                                                current = wkt.writeFeature(feature) + feature.get("color");
-                                            fields[i.geo_feature_field] = format.writeFeature(feature);
-
-                                            if (current === initial || layer !== container.vectors) {
-                                                return;
+                                        $.each(features, function (k, feature) {
+                                            var initial;
+                                            feature.set("itemId", i.object_id);
+                                            feature.set("content", i.title);
+                                            if (!feature.get("color")) {
+                                                feature.set("color", "#6699cc");
+                                            }
+                                            if (!feature.get("intent")) {
+                                                feature.set("intent", "vectors");
+                                            }
+                                            if (!feature.get("popup_config")) {
+                                                feature.set("popup_config", $(form).data("popup-config"));
+                                            }
+                                            if (!feature.get("popup_fields")) {
+                                                feature.set("popup_fields", $(form).data("popup-fields"));
+                                            }
+                                            if (!feature.get("popup_tpl")) {
+                                                feature.set("popup_tpl", $(form).data("popup-tpl"));
                                             }
 
-                                            $.post(
-                                                $.service("tracker", "update_item"),
-                                                {
-                                                    trackerId: i.tracker_id,
-                                                    itemId: i.object_id,
-                                                    fields: fields,
-                                                },
-                                                function () {
-                                                    initial = current;
-                                                },
-                                                "json"
-                                            ).fail(function () {
-                                                $(container).trigger("changed");
+                                            initial = wkt.writeFeature(feature) + feature.get("color");
+
+                                            feature.executor = delayedExecutor(5000, function () {
+                                                var fields = {},
+                                                    current = wkt.write(feature) + feature.get("color");
+                                                fields[i.geo_feature_field] = format.writeFeature(feature);
+
+                                                if (current === initial || layer !== container.vectors) {
+                                                    return;
+                                                }
+
+                                                $.post(
+                                                    $.service("tracker", "update_item"),
+                                                    {
+                                                        trackerId: i.tracker_id,
+                                                        itemId: i.object_id,
+                                                        fields: fields,
+                                                    },
+                                                    function () {
+                                                        initial = current;
+                                                    },
+                                                    "json"
+                                                ).fail(function () {
+                                                    $(container).trigger("changed");
+                                                });
                                             });
                                         });
+                                        layer.getSource().addFeatures(features);
+
+                                        $.each(features, function (k, feature) {
+                                            $(container).trigger("add", [i, feature]);
+                                        });
+                                    } else if (i.geo_file) {
+                                        // load a file containing geometry, set using tracker Files indexGeometry option
+
+                                        let format;
+                                        const files = i.geo_file.split(","),
+                                            layer = container.getLayer(layerName);
+
+                                        if (i.geo_file_format === "geojson") {
+                                            format = new ol.format.GeoJSON();
+                                        } else {
+                                            if (i.geo_file_format === "gpx") {
+                                                format = new ol.format.GPX();
+                                            }
+                                        }
+                                        for (let f = 0; f < files.length; f++) {
+                                            $.get(files[f], function (data) {
+                                                try {
+                                                    const features = format.readFeatures(data, {
+                                                        dataProjection: "EPSG:4326",
+                                                        featureProjection: container.map.getView().getProjection(),
+                                                    });
+                                                } catch (e) {
+                                                    // Corrupted feature - display plain marker
+                                                    $(container).addMapMarker({
+                                                        coordinates: $(container).getMapCenter(),
+                                                        content: i.title,
+                                                        type: i.object_type,
+                                                        object: i.object_id,
+                                                        icon: null,
+                                                        layer: layerName,
+                                                        dataSource: i,
+                                                    });
+                                                    return;
+                                                }
+                                                $.each(features, function (k, feature) {
+                                                    feature.set("itemId", i.object_id);
+                                                    feature.set("content", i.title);
+                                                    if (!feature.get("color")) {
+                                                        // TODO find a better default, from the searchlayer maybe?
+                                                        feature.set("color", "#ffa500");
+                                                    }
+                                                    if (!feature.get("intent")) {
+                                                        feature.set("intent", "vectors");
+                                                    }
+                                                    if (!feature.get("popup_config")) {
+                                                        feature.set("popup_config", $(form).data("popup-config"));
+                                                    }
+                                                    if (!feature.get("popup_fields")) {
+                                                        feature.set("popup_fields", $(form).data("popup-fields"));
+                                                    }
+                                                    if (!feature.get("popup_tpl")) {
+                                                        feature.set("popup_tpl", $(form).data("popup-tpl"));
+                                                    }
+                                                });
+                                                layer.getSource().addFeatures(features);
+
+                                                $.each(features, function (k, feature) {
+                                                    $(container).trigger("add", [i, feature]);
+                                                });
+                                            });
+                                        }
+                                    }
+                                });
+                            },
+                            "json"
+                        ).complete(function () {
+                            $(container).trigger("complete.map.search");
+                        });
+                        return false;
+                    })
+                    .each(function () {
+                        if ($(this).hasClass("onload")) {
+                            var fm = this,
+                                layerLoadDelay = parseInt($(fm).data("load-delay"), 10);
+
+                            if (layerLoadDelay) {
+                                setTimeout(function () {
+                                    $(fm).trigger("submit");
+                                }, layerLoadDelay * 1000);
+                            } else {
+                                $(fm).trigger("submit");
+                            }
+                        }
+
+                        var skip = false;
+                        if ($(this).data("result-refresh")) {
+                            var form = this,
+                                refresh = parseInt($(this).data("result-refresh"), 10) * 1000,
+                                interval;
+                            interval = setInterval(function () {
+                                if (skip) {
+                                    skip = false;
+                                } else {
+                                    $(form).trigger("submit");
+                                }
+                            }, refresh);
+
+                            $(container).on("unregister", function () {
+                                clearInterval(interval);
+                            });
+                        }
+
+                        $(container).on("changed", function () {
+                            $(form).trigger("submit");
+                            skip = true;
+                        });
+                    });
+                $(container).on("search", function (e, data) {
+                    function markLocation(lat, lon, bounds) {
+                        var lonlat = ol.proj.fromLonLat([lon, lat]),
+                            toViewport = function () {
+                                if (bounds) {
+                                    map.getView().zoomToExtent(bounds);
+                                } else {
+                                    map.getView().setCenter(lonlat);
+                                    map.zoomToScale(500 * ol.INCHES_PER_UNIT.m);
+                                }
+                            };
+
+                        $(container).addMapMarker({
+                            lat: lat,
+                            lon: lon,
+                            unique: "selection",
+                            click: toViewport,
+                        });
+
+                        if (typeof zoomToFoundLocation != "undefined") {
+                            // Center map to the new location and zoom
+                            var zoomFactor = -1;
+                            switch (zoomToFoundLocation) {
+                                default:
+                                case "street":
+                                    zoomFactor = 1; // these are now metres per pixel
+                                    break;
+                                case "town":
+                                    zoomFactor = 10;
+                                    break;
+                                case "region":
+                                    zoomFactor = 100;
+                                    break;
+                                case "country":
+                                    zoomFactor = 500;
+                                    break;
+                                case "continent":
+                                    zoomFactor = 20000;
+                                    break;
+                                case "world":
+                                    zoomFactor = -1;
+                                    break;
+                            }
+                            var view = map.getView();
+                            if (zoomFactor < 0) {
+                                view.setZoom(2); // whole world, more or less
+                            } else {
+                                view.setCenter(lonlat);
+                                view.setZoom(view.getZoomForResolution(zoomFactor * ol.proj.Units.METERS_PER_UNIT.m));
+                            }
+                        } else {
+                            if (!container.map.getExtent().containsLonLat(lonlat)) {
+                                // Show marker on world map
+                                toViewport();
+                            }
+                        }
+                    }
+
+                    function markGoogleLocation(result) {
+                        var loc = result.geometry.location,
+                            sw = result.geometry.viewport.getSouthWest(),
+                            ne = result.geometry.viewport.getNorthEast(),
+                            osw,
+                            one,
+                            left,
+                            bottom,
+                            right,
+                            top;
+
+                        osw = new ol.proj.fromLonLat([sw.lng(), sw.lat()]);
+                        one = new ol.proj.fromLonLat([ne.lng(), ne.lat()]);
+
+                        left = osw[0];
+                        bottom = osw[1];
+                        right = one[0];
+                        top = one[0];
+
+                        markLocation(loc.lat(), loc.lng(), [left, bottom, right, top]);
+                    }
+
+                    function getBounds(bounds) {
+                        var osw, one;
+
+                        osw = new ol.LonLat(bounds.left, bounds.bottom).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
+                        one = new ol.LonLat(bounds.right, bounds.top).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
+
+                        return new google.maps.LatLngBounds(new google.maps.LatLng(osw.lat, osw.lon), new google.maps.LatLng(one.lat, one.lon));
+                    }
+
+                    if (data.address) {
+                        if (window.google && google.maps && google.maps.Geocoder) {
+                            var geocoder = new google.maps.Geocoder(),
+                                loc = $(container).getMapCenter().split(",");
+
+                            geocoder.geocode(
+                                {
+                                    //bounds: getBounds(map.getExtent()),
+                                    address: data.address,
+                                },
+                                function (results, status) {
+                                    var $list = $("<ul/>");
+
+                                    if (status === google.maps.GeocoderStatus.OK) {
+                                        if (results.length === 1) {
+                                            markGoogleLocation(results[0]);
+                                            return;
+                                        } else if (results.length > 0) {
+                                            $.each(results, function (k, result) {
+                                                var $link = $("<a href='#'/>");
+                                                $link.text(result.formatted_address);
+                                                $link.on("click", function () {
+                                                    markGoogleLocation(result);
+                                                    return false;
+                                                });
+                                                $("<li/>").append($link).appendTo($list);
+                                            });
+                                        }
+                                    }
+
+                                    $.openModal({
+                                        title: data.address,
+                                        content: $list,
                                     });
-                                    layer.getSource().addFeatures(features);
-
-                                    $.each(features, function (k, feature) {
-                                        $(container).trigger("add", [i, feature]);
-                                    });
-                                } else if (i.geo_file) {
-                                    // load a file containing geometry, set using tracker Files indexGeometry option
-
-                                    let format;
-                                    const files = i.geo_file.split(","),
-                                        layer = container.getLayer(layerName);
-
-                                    if (i.geo_file_format === "geojson") {
-                                        format = new ol.format.GeoJSON();
+                                }
+                            );
+                        } else {
+                            $.getJSON("tiki-ajax_services.php", { geocode: data.address }, function (data) {
+                                if (data && data.status === "OK") {
+                                    markLocation(data.lat, data.lon, 500);
+                                } else {
+                                    var msg;
+                                    if (data && data.error) {
+                                        msg = data.status + ": " + data.error;
                                     } else {
-                                        if (i.geo_file_format === "gpx") {
-                                            format = new ol.format.GPX();
-                                        }
+                                        msg = tr("Location service unnavailable");
                                     }
-                                    for (let f = 0; f < files.length; f++) {
-                                        $.get(files[f], function (data) {
-                                            try {
-                                                const features = format.readFeatures(data, {
-                                                    dataProjection: "EPSG:4326",
-                                                    featureProjection: container.map.getView().getProjection(),
-                                                });
-                                            } catch (e) {
-                                                // Corrupted feature - display plain marker
-                                                $(container).addMapMarker({
-                                                    coordinates: $(container).getMapCenter(),
-                                                    content: i.title,
-                                                    type: i.object_type,
-                                                    object: i.object_id,
-                                                    icon: null,
-                                                    layer: layerName,
-                                                    dataSource: i,
-                                                });
-                                                return;
-                                            }
-                                            $.each(features, function (k, feature) {
-                                                feature.set("itemId", i.object_id);
-                                                feature.set("content", i.title);
-                                                if (!feature.get("color")) {
-                                                    // TODO find a better default, from the searchlayer maybe?
-                                                    feature.set("color", "#ffa500");
-                                                }
-                                                if (!feature.get("intent")) {
-                                                    feature.set("intent", "vectors");
-                                                }
-                                                if (!feature.get("popup_config")) {
-                                                    feature.set("popup_config", $(form).data("popup-config"));
-                                                }
-                                                if (!feature.get("popup_fields")) {
-                                                    feature.set("popup_fields", $(form).data("popup-fields"));
-                                                }
-                                                if (!feature.get("popup_tpl")) {
-                                                    feature.set("popup_tpl", $(form).data("popup-tpl"));
-                                                }
-                                            });
-                                            layer.getSource().addFeatures(features);
-
-                                            $.each(features, function (k, feature) {
-                                                $(container).trigger("add", [i, feature]);
-                                            });
-                                        });
-                                    }
+                                    $(container).parent().showError(msg);
                                 }
                             });
-                        },
-                        "json"
-                    ).complete(function () {
-                        $(container).trigger("complete.map.search");
-                    });
-                    return false;
-                })
-                .each(function () {
-                    if ($(this).hasClass("onload")) {
-                        var fm = this,
-                            layerLoadDelay = parseInt($(fm).data("load-delay"), 10);
-
-                        if (layerLoadDelay) {
-                            setTimeout(function () {
-                                $(fm).trigger("submit");
-                            }, layerLoadDelay * 1000);
-                        } else {
-                            $(fm).trigger("submit");
                         }
                     }
-
-                    var skip = false;
-                    if ($(this).data("result-refresh")) {
-                        var form = this,
-                            refresh = parseInt($(this).data("result-refresh"), 10) * 1000,
-                            interval;
-                        interval = setInterval(function () {
-                            if (skip) {
-                                skip = false;
-                            } else {
-                                $(form).trigger("submit");
-                            }
-                        }, refresh);
-
-                        $(container).on("unregister", function () {
-                            clearInterval(interval);
-                        });
-                    }
-
-                    $(container).on("changed", function () {
-                        $(form).trigger("submit");
-                        skip = true;
-                    });
                 });
-            $(container).on("search", function (e, data) {
-                function markLocation(lat, lon, bounds) {
-                    var lonlat = ol.proj.fromLonLat([lon, lat]),
-                        toViewport = function () {
-                            if (bounds) {
-                                map.getView().zoomToExtent(bounds);
-                            } else {
-                                map.getView().setCenter(lonlat);
-                                map.zoomToScale(500 * ol.INCHES_PER_UNIT.m);
-                            }
-                        };
 
-                    $(container).addMapMarker({
-                        lat: lat,
-                        lon: lon,
-                        unique: "selection",
-                        click: toViewport,
+                // Initialize colorpicker functionality
+                function initializeColorpicker() {
+                    var $colorpickerContainer = $(container).find(".map-colorpicker-container");
+                    if (!$colorpickerContainer.length) return;
+
+                    var colors = $colorpickerContainer.data("colorpicker-colors") || [];
+                    var title = $colorpickerContainer.data("colorpicker-title") || tr("Color Picker");
+                    var modalId = "mapColorpickerModal-" + id;
+
+                    // Create Bootstrap 5 Modal for colorpicker
+                    var swatchesHtml = colors
+                        .map(function (c) {
+                            return (
+                                '<button type="button" class="btn color-swatch p-0 m-1" ' +
+                                'style="background-color:' +
+                                c +
+                                '; width:32px; height:32px; border:2px solid #ccc; border-radius:4px;" ' +
+                                'data-color="' +
+                                c +
+                                '" title="' +
+                                c +
+                                '"></button>'
+                            );
+                        })
+                        .join("");
+
+                    var modalHtml =
+                        '<div class="modal fade" id="' +
+                        modalId +
+                        '" tabindex="-1" aria-labelledby="' +
+                        modalId +
+                        'Label" aria-hidden="true">' +
+                        '  <div class="modal-dialog modal-sm">' +
+                        '    <div class="modal-content">' +
+                        '      <div class="modal-header">' +
+                        '        <h5 class="modal-title" id="' +
+                        modalId +
+                        'Label">' +
+                        title +
+                        "</h5>" +
+                        '        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
+                        "      </div>" +
+                        '      <div class="modal-body">' +
+                        '        <div class="mb-3">' +
+                        '          <label for="colorPickerInput-' +
+                        id +
+                        '" class="form-label">' +
+                        tr("Select Color") +
+                        "</label>" +
+                        '          <input type="color" class="form-control form-control-color w-100" ' +
+                        '                 id="colorPickerInput-' +
+                        id +
+                        '" value="#6699cc">' +
+                        "        </div>" +
+                        '        <div class="color-swatches d-flex flex-wrap">' +
+                        swatchesHtml +
+                        "</div>" +
+                        "      </div>" +
+                        '      <div class="modal-footer">' +
+                        '        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">' +
+                        tr("Close") +
+                        "</button>" +
+                        '        <button type="button" class="btn btn-primary" id="applyColor-' +
+                        id +
+                        '">' +
+                        tr("Apply") +
+                        "</button>" +
+                        "      </div>" +
+                        "    </div>" +
+                        "  </div>" +
+                        "</div>";
+
+                    $(document.body).append(modalHtml);
+
+                    var $modal = $("#" + modalId);
+                    var $colorInput = $("#colorPickerInput-" + id);
+                    var $applyBtn = $("#applyColor-" + id);
+                    var selectedFeature = null;
+
+                    // Store colorpicker config on container
+                    container.colorpicker = {
+                        colors: colors,
+                        modal: $modal,
+                        show: function (feature) {
+                            selectedFeature = feature;
+                            var currentColor = feature.get("color") || "#6699cc";
+                            $colorInput.val(currentColor);
+                            bootstrap.Modal.getOrCreateInstance($modal[0]).show();
+                        },
+                    };
+
+                    // Handle color swatch clicks
+                    $modal.on("click", ".color-swatch", function () {
+                        var color = $(this).data("color");
+                        $colorInput.val(color);
+                        // Highlight selected swatch
+                        $modal.find(".color-swatch").css("border-color", "#ccc");
+                        $(this).css("border-color", "#000");
                     });
 
-                    if (typeof zoomToFoundLocation != "undefined") {
-                        // Center map to the new location and zoom
-                        var zoomFactor = -1;
-                        switch (zoomToFoundLocation) {
-                            default:
-                            case "street":
-                                zoomFactor = 1; // these are now metres per pixel
-                                break;
-                            case "town":
-                                zoomFactor = 10;
-                                break;
-                            case "region":
-                                zoomFactor = 100;
-                                break;
-                            case "country":
-                                zoomFactor = 500;
-                                break;
-                            case "continent":
-                                zoomFactor = 20000;
-                                break;
-                            case "world":
-                                zoomFactor = -1;
-                                break;
+                    // Handle apply button
+                    $applyBtn.on("click", function () {
+                        if (selectedFeature) {
+                            var color = $colorInput.val();
+                            applyColorToFeature(selectedFeature, color);
                         }
-                        var view = map.getView();
-                        if (zoomFactor < 0) {
-                            view.setZoom(2); // whole world, more or less
-                        } else {
-                            view.setCenter(lonlat);
-                            view.setZoom(view.getZoomForResolution(zoomFactor * ol.proj.Units.METERS_PER_UNIT.m));
+                        bootstrap.Modal.getOrCreateInstance($modal[0]).hide();
+                    });
+
+                    // Function to apply color to a feature's style
+                    function applyColorToFeature(feature, color) {
+                        // Initialize container-level color storage if not exists
+                        if (!container.featureColors) {
+                            container.featureColors = {};
                         }
-                    } else {
-                        if (!container.map.getExtent().containsLonLat(lonlat)) {
-                            // Show marker on world map
-                            toViewport();
+
+                        // Store color on feature property
+                        feature.set("color", color);
+
+                        // Also store by coordinates for persistence across cluster recalculations
+                        var geom = feature.getGeometry();
+                        var key = null;
+                        if (geom && geom.getCoordinates) {
+                            var coords = geom.getCoordinates();
+                            if (Array.isArray(coords)) {
+                                key = coords.join(",");
+                                container.featureColors[key] = color;
+                            }
                         }
-                    }
-                }
 
-                function markGoogleLocation(result) {
-                    var loc = result.geometry.location,
-                        sw = result.geometry.viewport.getSouthWest(),
-                        ne = result.geometry.viewport.getNorthEast(),
-                        osw,
-                        one,
-                        left,
-                        bottom,
-                        right,
-                        top;
+                        // Create a colored circle style
+                        var coloredStyle = new ol.style.Style({
+                            image: new ol.style.Circle({
+                                radius: 12,
+                                fill: new ol.style.Fill({ color: color }),
+                                stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
+                            }),
+                        });
 
-                    osw = new ol.proj.fromLonLat([sw.lng(), sw.lat()]);
-                    one = new ol.proj.fromLonLat([ne.lng(), ne.lat()]);
+                        // DIRECTLY set the style on the feature
+                        feature.setStyle(coloredStyle);
 
-                    left = osw[0];
-                    bottom = osw[1];
-                    right = one[0];
-                    top = one[0];
+                        // Also try to find this feature in all sources and update it there
+                        var layers = container.overlays.getLayers().getArray();
 
-                    markLocation(loc.lat(), loc.lng(), [left, bottom, right, top]);
-                }
+                        layers.forEach(function (layer) {
+                            if (layer.getSource && layer.getSource()) {
+                                var source = layer.getSource();
 
-                function getBounds(bounds) {
-                    var osw, one;
-
-                    osw = new ol.LonLat(bounds.left, bounds.bottom).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
-                    one = new ol.LonLat(bounds.right, bounds.top).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
-
-                    return new google.maps.LatLngBounds(new google.maps.LatLng(osw.lat, osw.lon), new google.maps.LatLng(one.lat, one.lon));
-                }
-
-                if (data.address) {
-                    if (window.google && google.maps && google.maps.Geocoder) {
-                        var geocoder = new google.maps.Geocoder(),
-                            loc = $(container).getMapCenter().split(",");
-
-                        geocoder.geocode(
-                            {
-                                //bounds: getBounds(map.getExtent()),
-                                address: data.address,
-                            },
-                            function (results, status) {
-                                var $list = $("<ul/>");
-
-                                if (status === google.maps.GeocoderStatus.OK) {
-                                    if (results.length === 1) {
-                                        markGoogleLocation(results[0]);
-                                        return;
-                                    } else if (results.length > 0) {
-                                        $.each(results, function (k, result) {
-                                            var $link = $("<a href='#'/>");
-                                            $link.text(result.formatted_address);
-                                            $link.on("click", function () {
-                                                markGoogleLocation(result);
-                                                return false;
-                                            });
-                                            $("<li/>").append($link).appendTo($list);
+                                // Check if this is a cluster source
+                                if (source.getSource) {
+                                    var innerSource = source.getSource();
+                                    // Find features at same coordinates
+                                    if (key) {
+                                        innerSource.getFeatures().forEach(function (f) {
+                                            var fGeom = f.getGeometry();
+                                            if (fGeom && fGeom.getCoordinates) {
+                                                var fCoords = fGeom.getCoordinates();
+                                                if (Array.isArray(fCoords) && fCoords.join(",") === key) {
+                                                    f.set("color", color);
+                                                    f.setStyle(coloredStyle);
+                                                }
+                                            }
                                         });
                                     }
+                                    // Refresh the cluster
+                                    source.refresh();
                                 }
 
-                                $.openModal({
-                                    title: data.address,
-                                    content: $list,
-                                });
+                                source.changed();
                             }
-                        );
-                    } else {
-                        $.getJSON("tiki-ajax_services.php", { geocode: data.address }, function (data) {
-                            if (data && data.status === "OK") {
-                                markLocation(data.lat, data.lon, 500);
-                            } else {
-                                var msg;
-                                if (data && data.error) {
-                                    msg = data.status + ": " + data.error;
-                                } else {
-                                    msg = tr("Location service unnavailable");
-                                }
-                                $(container).parent().showError(msg);
-                            }
+                            layer.changed();
                         });
-                    }
-                }
-            });
 
-            // Initialize colorpicker functionality
-            function initializeColorpicker() {
-                const $colorpickerContainer = $(container).find(".map-colorpicker-container");
-                if (!$colorpickerContainer.length) return;
-
-                const colors = $colorpickerContainer.data("colorpicker-colors") || [];
-                const title = $colorpickerContainer.data("colorpicker-title") || tr("Color Picker");
-                const modalId = "mapColorpickerModal-" + id;
-
-                // Create Bootstrap 5 Modal for colorpicker
-                const swatchesHtml = colors
-                    .map(function (color) {
-                        return `<button type="button" class="btn color-swatch p-0 m-1" style="background-color:${color};
-                                    width:32px; height:32px; border:2px solid #ccc; border-radius:4px;" data-color="${color}" title="${color}">
-                            </button>`;
-                    })
-                    .join("");
-
-                const modalHtml = `
-<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="${modalId}Label">${title}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-3">
-                    <label for="colorPickerInput-${id}" class="form-label">${tr("Select Color")}</label>
-                    <input type="color" class="form-control form-control-color w-100" id="colorPickerInput-${id}" value="#6699cc">
-                </div>
-                <div class="color-swatches d-flex flex-wrap">${swatchesHtml}</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${tr("Close")}</button>
-                <button type="button" class="btn btn-primary" id="applyColor-${id}">${tr("Apply")}</button>
-            </div>
-        </div> 
-    </div>
-</div>`;
-
-                $(document.body).append(modalHtml);
-
-                const $modal = $("#" + modalId);
-                const $colorInput = $("#colorPickerInput-" + id);
-                const $applyBtn = $("#applyColor-" + id);
-                let selectedFeature = null;
-
-                // Store colorpicker config on container
-                container.colorpicker = {
-                    colors: colors,
-                    modal: $modal,
-                    show: function (feature) {
-                        selectedFeature = feature;
-                        var currentColor = feature.get("color") || "#6699cc";
-                        $colorInput.val(currentColor);
-                        bootstrap.Modal.getOrCreateInstance($modal[0]).show();
-                    },
-                };
-
-                // Handle color swatch clicks
-                $modal.on("click", ".color-swatch", function () {
-                    var color = $(this).data("color");
-                    $colorInput.val(color);
-                    // Highlight selected swatch
-                    $modal.find(".color-swatch").css("border-color", "#ccc");
-                    $(this).css("border-color", "#000");
-                });
-
-                // Handle apply button
-                $applyBtn.on("click", function () {
-                    if (selectedFeature) {
-                        container.map.getInteractions().forEach(function (interaction) {
-                            if (interaction instanceof ol.interaction.Select) {
-                                interaction.getFeatures().clear();
-                            }
-                        });
-                        applyColorToFeature(selectedFeature, $colorInput.val());
-                    }
-                    bootstrap.Modal.getOrCreateInstance($modal[0]).hide();
-                });
-
-                // Function to apply color to a feature's style
-                function applyColorToFeature(feature, color) {
-                    // Initialize container-level color storage if not exists
-                    if (!container.featureColors) {
-                        container.featureColors = {};
+                        // Force a full map render
+                        map.renderSync();
                     }
 
-                    // Store color on feature property
-                    feature.set("color", color);
-
-                    // Also store by coordinates for persistence across cluster recalculations
-                    const geom = feature.getGeometry();
-                    let key = null;
-                    if (geom && geom.getCoordinates) {
-                        const coords = geom.getCoordinates();
-                        if (Array.isArray(coords)) {
-                            key = coords.join(",");
-                            container.featureColors[key] = color;
+                    // Function to re-apply all stored colors to features
+                    function reapplyStoredColors() {
+                        if (!container.featureColors || Object.keys(container.featureColors).length === 0) {
+                            return;
                         }
-                    }
-                    let coloredStyle = setFeatureColorStyle(feature, color);
 
-                    if (feature.executor) {
-                        feature.executor();
-                    }
+                        var layers = container.overlays.getLayers().getArray();
+                        layers.forEach(function (layer) {
+                            if (layer.getSource && layer.getSource()) {
+                                var source = layer.getSource();
 
-                    // Also try to find this feature in all sources and update it there
-                    const layers = container.overlays.getLayers().getArray();
+                                // For cluster sources, check the inner source
+                                var featureSource = source.getSource ? source.getSource() : source;
 
-                    layers.forEach(function (layer) {
-                        if (layer.getSource && layer.getSource()) {
-                            const source = layer.getSource();
-
-                            // Check if this is a cluster source
-                            if (source.getSource) {
-                                const innerSource = source.getSource();
-                                // Find features at same coordinates
-                                if (key) {
-                                    innerSource.getFeatures().forEach(function (f) {
-                                        const fGeom = f.getGeometry();
-                                        if (fGeom && fGeom.getCoordinates) {
-                                            const fCoords = fGeom.getCoordinates();
-                                            if (Array.isArray(fCoords) && fCoords.join(",") === key) {
-                                                f.set("color", color);
+                                featureSource.getFeatures().forEach(function (f) {
+                                    var geom = f.getGeometry();
+                                    if (geom && geom.getCoordinates) {
+                                        var coords = geom.getCoordinates();
+                                        if (Array.isArray(coords)) {
+                                            var key = coords.join(",");
+                                            if (container.featureColors[key]) {
+                                                var color = container.featureColors[key];
+                                                var coloredStyle = new ol.style.Style({
+                                                    image: new ol.style.Circle({
+                                                        radius: 12,
+                                                        fill: new ol.style.Fill({ color: color }),
+                                                        stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
+                                                    }),
+                                                });
                                                 f.setStyle(coloredStyle);
                                             }
                                         }
-                                    });
-                                }
-                                // Refresh the cluster
-                                source.refresh();
+                                    }
+                                });
                             }
-
-                            source.changed();
-                        }
-                        layer.changed();
-                    });
-
-                    // Force a full map render
-                    map.renderSync();
-                }
-
-                // Function to re-apply all stored colors to features
-                function reapplyStoredColors() {
-                    if (!container.featureColors || Object.keys(container.featureColors).length === 0) {
-                        return;
+                        });
                     }
 
-                    const layers = container.overlays.getLayers().getArray();
-                    layers.forEach(function (layer) {
-                        if (layer.getSource && layer.getSource()) {
-                            const source = layer.getSource();
+                    // Hook into feature selection to show colorpicker
+                    if (selectionInteraction) {
+                        var originalSelectHandler = null;
 
-                            // For cluster sources, check the inner source
-                            const featureSource = source.getSource ? source.getSource() : source;
-
-                            featureSource.getFeatures().forEach(function (feature) {
-                                const geom = feature.getGeometry();
-                                if (geom && geom.getCoordinates) {
-                                    const coords = geom.getCoordinates();
-                                    if (Array.isArray(coords)) {
-                                        const key = coords.join(",");
-                                        if (container.featureColors[key]) {
-                                            setFeatureColorStyle(feature, container.featureColors[key]);
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
-
-                // Hook into feature selection to show colorpicker
-                $(container).on("modechanged", function () {
-                    if (container.modeManager.activeMode.name === tr("Select/Modify")) {
                         // Add colorpicker trigger on feature selection when Shift is held
                         map.on("click", function (evt) {
                             if (evt.originalEvent.shiftKey) {
                                 map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
                                     if (feature && container.colorpicker) {
                                         // Get the actual feature (not cluster)
-                                        let targetFeature = feature;
-                                        const clusterFeatures = feature.get("features");
+                                        var targetFeature = feature;
+                                        var clusterFeatures = feature.get("features");
                                         if (clusterFeatures && clusterFeatures.length === 1) {
                                             targetFeature = clusterFeatures[0];
                                         }
@@ -2090,15 +2082,14 @@ import { defaults as defaultControls } from "ol/control";
                             reapplyStoredColors();
                         });
                     }
-                });
-            }
+                }
 
-            initializeColorpicker();
+                initializeColorpicker();
 
-            /****** $.fn.creatMap() all done, tell everyone! ******/
-            setTimeout(function () {
-                $(container).trigger("initialized");
-            }, 1000);
+                setTimeout(function () {
+                    $(container).trigger("initialized");
+                }, 100);
+            }, 250);
         });
 
         return this;
@@ -2181,7 +2172,7 @@ import { defaults as defaultControls } from "ol/control";
 
                 if (options.type === "trackeritem" && options.object && markerLayer === container.vectors) {
                     feature.executor = delayedExecutor(5000, function () {
-                        var current = writeCoordinates(feature.getGeometry().getCoordinates(), container.map, true);
+                        var current = writeCoordinates(feature.geometry.getBounds().getCenterLonLat().clone(), container.map, true);
 
                         if (current === initial) {
                             return;
@@ -2221,89 +2212,59 @@ import { defaults as defaultControls } from "ol/control";
     };
 
     $.fn.setupMapSelection = function (options) {
-        let control;
-
+        var control;
         this.each(function () {
-            const container = this,
+            var container = this,
                 field = options.field,
-                map = container.map;
+                map = this.map;
 
             if (!field.attr("disabled")) {
                 $(container).on("selectionChange", function (e, lonlat) {
                     if (lonlat) {
                         if (lonlat.lat && lonlat.lon) {
-                            lonlat = new ol.geom.Point([lonlat.lon, lonlat.lat]);
-                            field.val(writeCoordinates(lonlat, map)).trigger("change");
+                            lonlat = new ol.geom.Point(ol.proj.fromLonLat([parseFloat(lonlat.lon), parseFloat(lonlat.lat)]));
                         }
+                        field.val(writeCoordinates(lonlat, map)).trigger("change");
                     } else {
                         field.val("").trigger("change");
                     }
                 });
+                map.on("zoomend", function (e, lonlat) {
+                    var coords = field.val().split(","),
+                        lon = 0,
+                        lat = 0;
+                    if (coords.length > 1) {
+                        lon = coords[0];
+                        lat = coords[1];
+                    }
+                    field.val(formatLocation(lat, lon, map.getView().getZoom())).trigger("change");
+                });
             }
         });
-
-        control = new ol.interaction.Pointer({
-            handleUpEvent: (event) => {
-                const container = this.get(0),
-                    map = container.map;
-                let coords;
-
-                if (event.coordinates) {
-                    coords = event.coordinates;
-                } else {
-                    coords = map.getCoordinateFromPixel([event.originalEvent.offsetX, event.originalEvent.offsetY]);
-                }
-                const lonlat = ol.proj.transform(
-                    coords,
-                    map.getView().getProjection(), // source — replaces map.getProjectionObject()
-                    "EPSG:4326" // target
-                );
-
-                $(container).addMapMarker({
-                    lat: lonlat[0],
-                    lon: lonlat[1],
-                    unique: "selection",
-                });
-                $(container).trigger("selectionChange", {
-                    lat: lonlat[0],
-                    lon: lonlat[1],
-                });
-
-                if (options.click) {
-                    options.click();
-                }
-                return false;
-            },
-            handleDownEvent: (event) => {
-                return true; // return true to "handle" it and trigger handleUpEvent
-            },
-        });
-
-        control.set("mode", "selection");
 
         return control;
     };
 
     $.fn.removeMapSelection = function () {
         this.each(function () {
-            const container = this;
+            var container = this;
 
             if (container.uniqueMarkers["selection"]) {
-                container.vectors.getSource().removeFeatures([container.uniqueMarkers["selection"]]);
+                container.vectors.removeFeatures([container.uniqueMarkers["selection"]]);
             }
 
-            $(container).trigger("selectionChange", [{}]);
+            $(container).trigger("selectionChange", {});
         });
 
         return this;
     };
 
     $.fn.getMapCenter = function () {
-        let val;
+        var val;
 
         this.each(function () {
-            const coordinates = this.map.getView().getCenter();
-            val = ol.proj.transform(coordinates, this.map.getView().getProjection(), "EPSG:4326");
+            var coordinates = this.map.getView().getCenter();
+            val = ol.proj.fromLonLat(coordinates);
         });
 
         return val.join(",");
