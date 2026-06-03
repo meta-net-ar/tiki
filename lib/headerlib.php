@@ -1534,7 +1534,7 @@ window.onload = loadScript;');
             ->add_cssfile(OL_PATH . '/ol.css')
             ->add_jsfile_external(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.js')
             ->add_cssfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.css')
-            ->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js")
+            ->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps.js")
             ->add_js($mapsJs);
 
         $this->mapAdded = true;

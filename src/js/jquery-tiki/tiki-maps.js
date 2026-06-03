@@ -2086,7 +2086,9 @@ import { defaults as defaultControls } from "ol/control";
 
                 initializeColorpicker();
 
-                $(container).trigger("initialized");
+                setTimeout(function () {
+                    $(container).trigger("initialized");
+                }, 100);
             }, 250);
         });
 
