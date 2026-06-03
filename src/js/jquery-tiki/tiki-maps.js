@@ -317,7 +317,7 @@ import { defaults as defaultControls } from "ol/control";
             let selectionInteraction;
 
             $(container).css("background", "white");
-
+77
             // Shared style function for all map features (accessible from both clustered and non-clustered layers)
             container.createMapFeatureStyle = function (feature) {
                 let color;
@@ -640,6 +640,13 @@ import { defaults as defaultControls } from "ol/control";
                     }
                 });
             };
+
+            desiredControls = $(this).data("map-controls");
+            if (desiredControls === undefined) {
+                desiredControls = "controls,layers,search_location,current_location,streetview,navigation";
+            }
+
+            desiredControls = desiredControls.split(",");
 
             var setupHeight = function () {
                 var height = $(container).height();
@@ -1057,7 +1064,24 @@ import { defaults as defaultControls } from "ol/control";
                                                     return false;
                                                 });
 
-                                                $(".modal-title", $modal).text(title);
+                                                    if ($header.length === 0) {
+                                                        $(".modal-content", $modal).append(
+                                                            $("<div class='modal-header'>").append($("<h4 class='modal-title'>").text(title))
+                                                        );
+                                                    } else {
+                                                        $(".modal-title", $modal).text(title);
+                                                    }
+
+                                                    $(".modal-content", $modal).append(
+                                                        $("<div class='modal-body'>").append($html),
+                                                        $("<div class='modal-footer'>").append(
+                                                            $(
+                                                                "<button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>" +
+                                                                    tr("Close") +
+                                                                    "</button>"
+                                                            )
+                                                        )
+                                                    );
                                                 $(".modal-body", $modal).append($html);
                                             },
                                         });
@@ -1108,19 +1132,52 @@ import { defaults as defaultControls } from "ol/control";
                 };
             }
 
-            if (layers.length > 0 && -1 !== $.inArray("overview", desiredControls)) {
-                var overview = new ol.control.OverviewMap({ minRatio: 128, maxRatio: 256, maximized: true });
-                overview.desiredZoom = function () {
-                    return Math.min(Math.max(1, map.getZoom() - 6), 3);
-                };
-                overview.isSuitableOverview = function () {
-                    return this.ovmap.getZoom() === overview.desiredZoom() && this.ovmap.getExtent().contains(map.getExtent());
-                };
-                overview.updateOverview = function () {
-                    overview.ovmap.setCenter(map.getCenter());
-                    overview.ovmap.zoomTo(overview.desiredZoom());
-                    this.updateRectToMap();
-                };
+            function setupLayerEvents(vectors) {
+                    selectionInteraction = new ol.interaction.Select({
+                        condition: ol.events.condition.click,
+                    });
+
+                    map.addInteraction(selectionInteraction);
+
+                    selectionInteraction.on("select", function (event) {
+                        if (event.target.executor) {
+                            event.target.executor();
+                        }
+                        container.showPopup.apply(null, [event]);
+                    });
+
+                    selectionInteraction.on("modified", function (event) {
+                        if (event.target.executor) {
+                            event.target.executor();
+                        }
+                    });
+
+                    selectionInteraction.on("added", function (event) {
+                        if (!event.target.get("color")) {
+                            event.target.set("color", "#6699cc");
+                        }
+                        if (!event.target.get("intent")) {
+                            event.target.set("intent", "vectors");
+                        }
+                    });
+                }
+                let selectionInteraction;
+
+                setupLayerEvents(container.vectors);
+
+                if (layers.length > 0 && -1 !== $.inArray("overview", desiredControls)) {
+                    var overview = new ol.control.OverviewMap({ minRatio: 128, maxRatio: 256, maximized: true });
+                    overview.desiredZoom = function () {
+                        return Math.min(Math.max(1, map.getZoom() - 6), 3);
+                    };
+                    overview.isSuitableOverview = function () {
+                        return this.ovmap.getZoom() === overview.desiredZoom() && this.ovmap.getExtent().contains(map.getExtent());
+                    };
+                    overview.updateOverview = function () {
+                        overview.ovmap.setCenter(map.getCenter());
+                        overview.ovmap.zoomTo(overview.desiredZoom());
+                        this.updateRectToMap();
+                    };
 
                 map.addControl(overview);
             }
@@ -1322,10 +1379,12 @@ import { defaults as defaultControls } from "ol/control";
                 }
             }
 
-            if (jqueryTiki.googleStreetView) {
-                container.streetview = {
-                    buttons: [],
-                };
+            container.modeManager.addMode(defaultMode);
+
+                if (jqueryTiki.googleStreetView) {
+                    container.streetview = {
+                        buttons: [],
+                    };
 
                 if (jqueryTiki.googleStreetViewOverlay) {
                     container.streetview.overlay = new ol.layer.XYZ(
@@ -2239,7 +2298,15 @@ import { defaults as defaultControls } from "ol/control";
                         field.val("").trigger("change");
                     }
                 });
-            }
+                map.on("zoomend", function (e, lonlat) {
+                    var coords = field.val().split(","),
+                        lon = 0,
+                        lat = 0;
+                    if (coords.length > 1) {
+                        lon = coords[0];
+                        lat = coords[1];
+                    }
+                    field.val(formatLocation(lat, lon, map.getView().getZoom())).trigger("change");
         });
 
         control = new ol.interaction.Pointer({
