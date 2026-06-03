@@ -56,7 +56,7 @@
                         <td class="id">{$atts[ix].attId}</td>
                         <td class="text text-break">
                             {$atts[ix].filename|iconify}
-                            <a class="tablename text-break" href="tiki-download_wiki_attachment.php?attId={$atts[ix].attId}&amp;page={$page|escape:"url"}&amp;download=y">{$atts[ix].filename}</a>
+                            <a class="tablename" href="tiki-download_wiki_attachment.php?attId={$atts[ix].attId}&amp;page={$page|escape:"url"}&amp;download=y">{$atts[ix].filename}</a>
                         </td>
                         <td class="text"><small title="{$atts[ix].comment|escape}">{$atts[ix].comment|truncate:200:"...":true|escape}</small></td>
                         <td class="date">
