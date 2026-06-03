@@ -161,6 +161,10 @@ composer-ext-check:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/composer.json"
+        - "**/composer.lock"
   script:
     - php doc/devtools/check_composer_extensions.php
 
@@ -420,6 +424,11 @@ sql-engine:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.sql"
+        - "installer/**/*"
+        - "db/**/*"
   script:
     - php -d display_errors=On doc/devtools/check_sql_engine.php
 
@@ -427,6 +436,11 @@ schema-sql-drop:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.sql"
+        - "installer/**/*"
+        - "db/**/*"
   script:
     - php -d display_errors=On doc/devtools/check_schema_sql_drop.php
 
@@ -434,6 +448,11 @@ schema-naming-convention:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.sql"
+        - "installer/**/*"
+        - "db/**/*"
   script:
     - php -d display_errors=On doc/devtools/check_schema_naming_convention.php
 
@@ -448,8 +467,17 @@ check-security-static:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.php"
   script:
-    - php -d display_errors=On doc/devtools/securitycheck.php
+    - *calculate_affected_files
+    - |
+      if [ -n "$PHP_FILES" ]; then
+        printf '%s\n' "$PHP_FILES" | xargs php -d display_errors=On doc/devtools/securitycheck.php
+      else
+        echo "✅ No affected PHP files."
+      fi
 
 translation:
   stage: tiki-check
@@ -475,6 +503,10 @@ composer-validates:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/composer.json"
+        - "**/composer.lock"
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer validate -d vendor_bundled --no-check-all
@@ -488,7 +520,10 @@ composer-could-update-lock:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-
+  rules:
+    - changes:
+        - "**/composer.json"
+        - "**/composer.lock"
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer update -d vendor_bundled --dry-run
@@ -502,6 +537,10 @@ composer-could-update-lock:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/composer.json"
+        - "**/composer.lock"
   script:
     - cp $(command -v composer) temp/composer.phar
     - php temp/composer.phar -V | grep "version 2" || php temp/composer.phar self-update --2
@@ -529,6 +568,11 @@ composer-could-update-lock:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.php"
+        - "**/composer.lock"
+        - "**/*.sql"
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
       alias: mysql,
@@ -622,6 +666,11 @@ sql-engine-conversion:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.sql"
+        - "installer/**/*"
+        - "**/composer.lock"
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_IMAGE_NEWEST_SUPPORTED}
       alias: mysql
@@ -932,27 +981,18 @@ composer-operator-check:
   script:
   - php doc/devtools/check_caret_operator.php
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
     - changes:
-        - "**/composer.json"
-  allow_failure: false
+      - "**/composer.json"
 
 check-alphabetical-list:
   stage: unit-tests
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   needs:
     - composer
-  script:
-    - php doc/devtools/check_alphabetical_list.php
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
     - changes:
         - "**/composer.json"
         - "**/package.json"
+  script:
+    - php doc/devtools/check_alphabetical_list.php
   allow_failure: false

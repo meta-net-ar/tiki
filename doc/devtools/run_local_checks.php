@@ -1,5 +1,10 @@
 <?php
 
+// (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
+//
+// All Rights Reserved. See copyright.txt for details and a complete list of authors.
+// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 $options = getopt('h', ['help', 'skip:', 'skip-rebase']);
 
 if (isset($options['h']) || isset($options['help'])) {
@@ -136,6 +141,20 @@ $steps[] = ['Check packages alphabetical list', 'php doc/devtools/check_alphabet
 
 $failedChecks = [];
 
+$checkDevDep = true;
+if (! file_exists('./vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs')) {
+    echo "⚠️  Composer development dependencies are not installed." . PHP_EOL;
+    echo "The following checks will be skipped:" . PHP_EOL;
+    echo "  - SmartyLint" . PHP_EOL;
+    echo "  - PHPLint" . PHP_EOL;
+    echo "  - PHPCS" . PHP_EOL;
+    echo PHP_EOL;
+    echo "To enable all local checks, run:" . PHP_EOL;
+    echo "  composer -d vendor_bundled install" . PHP_EOL;
+    echo PHP_EOL;
+    $checkDevDep = false;
+}
+
 foreach ($steps as $index => [$label, $cmd]) {
     $stepNumber = $index + 1;
 
@@ -144,9 +163,14 @@ foreach ($steps as $index => [$label, $cmd]) {
         continue;
     }
 
-    echo "▶️ Step $stepNumber: $label" . PHP_EOL;
+    echo "Step $stepNumber: $label" . PHP_EOL;
     echo "   $cmd" . PHP_EOL;
+    if (str_contains($cmd, 'vendor_bundled/vendor/') && ! $checkDevDep) {
+        echo "⏭️  Skipped: Composer development dependencies are not installed." . PHP_EOL;
+        echo "    Run 'composer -d vendor_bundled install' to enable this check." . PHP_EOL;
 
+        continue;
+    }
     $output = [];
     exec($cmd . ' 2>&1', $output, $code);
 
@@ -161,7 +185,7 @@ foreach ($steps as $index => [$label, $cmd]) {
         echo "❌ Push blocked due to failure at step $stepNumber ($label)." . PHP_EOL;
         echo "Please fix the failing check above and try pushing again." . PHP_EOL;
 
-        // ⚡ FAIL FAST: Exit immediately so the user doesn't waste time waiting
+        //Exit immediately so the user doesn't waste time waiting
         exit(1);
     }
 
