@@ -96,7 +96,7 @@ if (! empty($phpFiles)) {
     ];
     $steps[] = [
         'PHPLint',
-        'php vendor_bundled/vendor/overtrue/phplint/bin/phplint ' . quoteFiles($phpFiles) . '--no-interaction --no-cache --progress path',
+        'php vendor_bundled/vendor/overtrue/phplint/bin/phplint ' . quoteFiles($phpFiles) . ' --no-interaction --no-cache --progress path',
     ];
     $steps[] = [
         'Rector',
