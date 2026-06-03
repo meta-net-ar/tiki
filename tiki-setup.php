@@ -224,7 +224,9 @@ Sections::onSectionChange(function ($section) use ($prefs) {
         return;
     }
 
-    TikiLib::lib('freetag')->assignCurrentObjectTagsToSmarty();
+    $freetaglib = TikiLib::lib('freetag');
+    $freetaglib->handleCurrentObjectTagRequest();
+    $freetaglib->assignCurrentObjectTagsToSmarty();
 });
 
 require_once('lib/setup/wiki.php');
