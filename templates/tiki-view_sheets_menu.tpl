@@ -45,7 +45,7 @@
                     <li><a onclick="sheetInstance.sheetTitle(); return false;" title="{tr}Change the title of the sheet.{/tr}">{tr}Title{/tr}</a></li>
                 </ul>
             </li>
-            <li><a onclick="sheetInstance.cellFind(); return false;">{tr}Search{/tr}</a></li>
+            <li><a onclick="sheetInstance.cellFind(); return false;">{tr}Find{/tr}</a></li>
             <li><a onclick="sheetInstance.getTdRange(null, sheetInstance.obj.formula().val()); return false;">{tr}Get Cell Range{/tr}</a></li>
             <li>
                 <a href="#" role="button">{tr}Wrap Cell Range{/tr}</a>
