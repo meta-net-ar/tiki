@@ -24,7 +24,7 @@
             <button class="btn btn-link dropdown-toggle py-2 px-0 px-lg-2 d-flex align-items-center loading" id="color-mode-theme" data-bs-toggle="dropdown" type="button" aria-expanded="false" data-bs-display="static" aria-label="{tr}Toggle theme (auto){/tr}">
                 {icon name=$default_icon}
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="color-mode-theme">
+            <ul class="dropdown-menu" aria-labelledby="color-mode-theme">
                 {foreach $default_mode item=mode}
                     <li>
                         <button type="button" class="dropdown-item d-flex align-items-center gap-1" data-bs-theme-value="{$mode['name']}" aria-pressed="false">
@@ -48,4 +48,21 @@
         </div>
     </div>
 {/if}
+{literal}
+<script>
+(function () {
+    var btn = document.getElementById('color-mode-theme');
+    if (!btn) return;
+    var menu = document.querySelector('#color-mode-theme ~ ul.dropdown-menu, #color-mode-theme + ul.dropdown-menu');
+    if (!menu) return;
+
+    btn.addEventListener('show.bs.dropdown', function () {
+        var rect = btn.getBoundingClientRect();
+        var isRightHalf = rect.left + rect.width / 2 > window.innerWidth / 2;
+        menu.classList.toggle('dropdown-menu-end', isRightHalf);
+        menu.classList.toggle('dropdown-menu-start', !isRightHalf);
+    });
+}());
+</script>
+{/literal}
 {/tikimodule}
