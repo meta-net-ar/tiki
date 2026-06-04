@@ -72,11 +72,46 @@ class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
         $this->assertSame(tr('Invalid URL syntax.'), $this->invokeIsValid('((Test-Link-Parsing', 1));
     }
 
+    public function testMultipleParsedLinksAreExtracted(): void
+    {
+        $links = $this->invokeExtractLinkDataFromParsedHtml(
+            '<a href="FirstPage">First page</a> <a href="SecondPage">Second page</a>'
+        );
+
+        $this->assertCount(2, $links);
+        $this->assertSame('FirstPage', $links[0]['href']);
+        $this->assertSame('First page', $links[0]['label']);
+        $this->assertSame('SecondPage', $links[1]['href']);
+        $this->assertSame('Second page', $links[1]['label']);
+    }
+
+    public function testMultipleWikiLinkTargetsAreExtracted(): void
+    {
+        $this->assertSame(
+            ['FirstPage', 'SecondPage'],
+            $this->invokeExtractWikiLinkTargets('[FirstPage|First page] [SecondPage|Second page]')
+        );
+    }
+
     private function invokeIsWikiSyntaxLink(string $value): bool
     {
         $method = new \ReflectionMethod(\Tracker_Field_Url::class, 'isWikiSyntaxLink');
 
         return (bool) $method->invoke(null, $value);
+    }
+
+    private function invokeExtractLinkDataFromParsedHtml(string $value): array
+    {
+        $method = new \ReflectionMethod(\Tracker_Field_Url::class, 'extractLinkDataFromParsedHtml');
+
+        return $method->invoke(null, $value);
+    }
+
+    private function invokeExtractWikiLinkTargets(string $value): array
+    {
+        $method = new \ReflectionMethod(\Tracker_Field_Url::class, 'extractWikiLinkTargets');
+
+        return $method->invoke(null, $value);
     }
 
     private function invokeIsValid(string $value, ?int $strictValidation = null)
