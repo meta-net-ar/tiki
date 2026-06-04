@@ -22,7 +22,7 @@ Examples:
   php doc/devtools/run_local_checks.php
   php doc/devtools/run_local_checks.php --skip=2,5,9
   php doc/devtools/run_local_checks.php --skip-rebase
-  
+
 Notes:
   By default, the script attempts to rebase the current branch on top of the
   detected upstream master branch before running checks.
@@ -75,7 +75,7 @@ function hasComposerChanges(array $files): bool
 $phpFiles = filesByExtension($affectedFiles, ['php']);
 $jsFiles = filesByExtension($affectedFiles, ['js']);
 $tplFiles = filesByExtension($affectedFiles, ['tpl']);
-
+$phpstanMemoryLimit = getenv('TIKI_PHPSTAN_MEMORY_LIMIT') ?: '512M';
 if (hasComposerChanges($affectedFiles)) {
     $steps = [
         ['Composer extension check', 'php doc/devtools/check_composer_extensions.php'],
