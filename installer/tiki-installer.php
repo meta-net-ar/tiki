@@ -273,6 +273,7 @@ $smarty->assign('mid', 'tiki-install.tpl');
 $smarty->assign('virt', $virt ?? null);
 $smarty->assign('multi', $multi ?? null);
 $smarty->assign('lang', $language);
+$smarty->assign('allow_create_new_user', ! file_exists($local));
 if (isset($multi)) {
     $smarty->assign('default_server_domain_name', $multi);
 } elseif (isset($_SERVER['HTTP_HOST'])) {
@@ -399,9 +400,21 @@ if (
     if (! empty($_POST['user']) && strlen($_POST['user']) > 80) {
         $dbconn = false;
         Feedback::error(tra('Invalid database user.'));
+    } elseif (empty($_POST['user'])) {
+        $dbconn = false;
+        Feedback::error(tra('No database user specified'));
     } elseif (empty($_POST['name'])) {
         $dbconn = false;
         Feedback::error(tra('No database name specified'));
+    } elseif (! installer_is_valid_mysql_identifier($_POST['name'])) {
+        $dbconn = false;
+        Feedback::error(tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+    } elseif (! installer_is_valid_mysql_identifier($_POST['user'])) {
+        $dbconn = false;
+        Feedback::error(tra("Invalid database user. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+    } elseif (! empty($_POST['create_new_user']) && file_exists($local)) {
+        $dbconn = false;
+        Feedback::error(tra('Creating a new database user is only available during initial installation.'));
     } else {
         if (isset($_POST['force_utf8'])) {
             $client_charset = 'utf8mb4';

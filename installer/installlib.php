@@ -73,6 +73,26 @@ function write_local_php($host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $client_
 }
 
 /**
+ * Validate identifiers used during installer database setup.
+ *
+ * Keep the accepted character set aligned with the installer UI to avoid
+ * surprising users while still rejecting characters that can alter SQL
+ * structure or PHP configuration output.
+ */
+function installer_is_valid_mysql_identifier($value)
+{
+    return is_string($value) && preg_match('/^[A-Za-z0-9$_-]+$/', $value) === 1;
+}
+
+/**
+ * Quote a MySQL identifier by escaping embedded backticks.
+ */
+function installer_quote_mysql_identifier($identifier)
+{
+    return '`' . str_replace('`', '``', $identifier) . '`';
+}
+
+/**
  * @param string $domain
  * @return string
  */
@@ -416,20 +436,20 @@ function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
         }
         $dbcon = ! empty($dbTiki);
         // First check that suggested database name will not cause issues
-        $dbname_clean = preg_replace('/[^a-zA-Z0-9$_-]/', "", $dbname);
-        if ($dbname_clean != $dbname) {
-            Feedback::error(tra("Some invalid characters were detected in database name. Please use alphanumeric characters (A-Z a-z 0-9) or underscore (_) or hyphen (-).", '', false, [$dbname_clean]));
+        if (! installer_is_valid_mysql_identifier($dbname)) {
+            Feedback::error(tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
             $dbcon = false;
         } elseif ($dbcon) {
             $error = '';
-            $sql = "CREATE DATABASE IF NOT EXISTS `$dbname_clean` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
+            $quotedDbname = installer_quote_mysql_identifier($dbname);
+            $sql = "CREATE DATABASE IF NOT EXISTS $quotedDbname DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;";
             $dbTiki->queryError($sql, $error);
             if (empty($error)) {
                 // assure the DB has the right default encoding (if the DB already existed)
-                $dbTiki->query("ALTER DATABASE `$dbname_clean` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
-                Feedback::success(tra("Database `%0` was created.", '', false, [$dbname_clean]));
+                $dbTiki->query("ALTER DATABASE $quotedDbname DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+                Feedback::success(tra("Database `%0` was created.", '', false, [$dbname]));
             } else {
-                Feedback::error(tra("Database `%0` creation failed. You need to create the database.", '', false, [$dbname_clean]));
+                Feedback::error(tra("Database `%0` creation failed. You need to create the database.", '', false, [$dbname]));
             }
 
             try {
@@ -447,7 +467,7 @@ function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
                 Feedback::error($e->getMessage());
             }
         } else {
-            Feedback::error(tra("Database `%0`. Unable to connect to database.", '', false, [$dbname_clean]));
+            Feedback::error(tra("Database `%0`. Unable to connect to database.", '', false, [$dbname]));
         }
     }
 
@@ -471,14 +491,25 @@ function initTikiDB($host, $user, $pass, $dbname, $client_charset, &$dbTiki)
 function createTikiDBUser(&$dbTiki, $host, $user, $pass, $dbname)
 {
     $error = '';
+    if (! installer_is_valid_mysql_identifier($dbname)) {
+        Feedback::error(tra("Invalid database name. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+        return false;
+    }
+
+    if (! installer_is_valid_mysql_identifier($user)) {
+        Feedback::error(tra("Invalid database user. Use only letters, numbers, dollar signs ($), underscores (_), or hyphens (-)."));
+        return false;
+    }
+
     if (preg_match('/^(127\.0\.\d{1,3}\.\d{1,3}|localhost)(:\d+)?$/', $host)) {
         $host = 'localhost';
     } else {
         $host = '%';
     }
 
-    $pass = addslashes($pass);
-    $sql = "GRANT ALL PRIVILEGES ON `$dbname`.* TO `$user`@`$host` IDENTIFIED BY '$pass';";
+    $sql = "GRANT ALL PRIVILEGES ON " . installer_quote_mysql_identifier($dbname) . ".* TO "
+        . $dbTiki->qstr($user) . '@' . $dbTiki->qstr($host)
+        . " IDENTIFIED BY " . $dbTiki->qstr($pass) . ';';
     $dbTiki->queryError($sql, $error);
 
     if (empty($error)) {
@@ -496,9 +527,10 @@ function createTikiDBUser(&$dbTiki, $host, $user, $pass, $dbname)
 function convert_database_to_utf8($dbname)
 {
     $db = TikiDb::get();
+    $quotedDbname = installer_quote_mysql_identifier($dbname);
 
     if ($result = $db->fetchAll('SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = ?', $dbname)) {
-        $db->query("ALTER DATABASE `$dbname` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        $db->query("ALTER DATABASE $quotedDbname CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
 
         foreach ($result as $row) {
             $db->query("ALTER TABLE `{$row['TABLE_NAME']}` CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");

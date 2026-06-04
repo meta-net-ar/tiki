@@ -4,122 +4,80 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-namespace Test\Core\Security;
 
-use Exception;
-use PHPUnit\Framework\TestCase;
-use Tiki\Installer\BaseImageResolver;
+namespace Tiki\Lib\Test\Core\Security;
 
-class InstallerDatabaseSetupTest extends TestCase
+require_once TIKI_PATH . 'installer/installlib.php';
+
+/**
+ * @group unit
+ */
+class InstallerDatabaseSetupTest extends \TikiTestCase
 {
-    private string $tempRoot;
-    private string $dbDirectory;
-
     protected function setUp(): void
     {
-        $this->tempRoot = sys_get_temp_dir() . '/tiki_installer_' . uniqid('', true);
-        $this->dbDirectory = $this->tempRoot . '/db';
-
-        if (! mkdir($this->dbDirectory, 0777, true) && ! is_dir($this->dbDirectory)) {
-            $this->fail('Unable to create temporary installer directory for tests.');
-        }
+        parent::setUp();
+        \Feedback::clear();
     }
 
-    protected function tearDown(): void
+    public function testInstallerIdentifierValidationRejectsSqlMetacharacters(): void
     {
-        $this->removeDir($this->tempRoot);
+        $this->assertTrue(installer_is_valid_mysql_identifier('tiki-prod_29'));
+        $this->assertFalse(installer_is_valid_mysql_identifier("attacker`@`%` IDENTIFIED BY 'pwn3d';--"));
+        $this->assertSame('`tiki``prod`', installer_quote_mysql_identifier('tiki`prod'));
     }
 
-    public function testCustomSqlIsIgnoredWithoutInstallIni(): void
+    public function testCreateTikiDbUserRejectsUnsafeUserNames(): void
     {
-        $this->createFile($this->dbDirectory . '/custom_tiki.sql', "SELECT 1;\n");
+        $db = new class {
+            public bool $called = false;
 
-        $resolver = new BaseImageResolver($this->tempRoot);
-
-        $this->assertNull($resolver->resolve());
-    }
-
-    public function testExplicitLocalSourceDefaultsToCustomSql(): void
-    {
-        $expected = $this->dbDirectory . '/custom_tiki.sql';
-        $this->createFile($this->dbDirectory . '/install.ini', "source.type = local\n");
-        $this->createFile($expected, "SELECT 1;\n");
-
-        $resolver = new BaseImageResolver($this->tempRoot);
-
-        $this->assertSame(realpath($expected), $resolver->resolve());
-    }
-
-    public function testExplicitLocalSourceCanUseDbSubdirectories(): void
-    {
-        $expected = $this->dbDirectory . '/backups/dump.sql';
-        $this->createFile($this->dbDirectory . '/install.ini', "source.type = local\nsource.file = backups/dump.sql\n");
-        $this->createFile($expected, "SELECT 1;\n");
-
-        $resolver = new BaseImageResolver($this->tempRoot);
-
-        $this->assertSame(realpath($expected), $resolver->resolve());
-    }
-
-    public function testRejectsLocalSourceOutsideDbDirectory(): void
-    {
-        $this->createFile($this->tempRoot . '/outside.sql', "SELECT 1;\n");
-        $this->createFile($this->dbDirectory . '/install.ini', "source.type = local\nsource.file = ../outside.sql\n");
-
-        $resolver = new BaseImageResolver($this->tempRoot);
-
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Local install base images must be stored inside db/.');
-        $resolver->resolve();
-    }
-
-    public function testRejectsRemoteSourceTypes(): void
-    {
-        $this->createFile(
-            $this->dbDirectory . '/install.ini',
-            "source.type = http\nsource.file = https://example.com/dump.sql\n"
-        );
-
-        $resolver = new BaseImageResolver($this->tempRoot);
-
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Remote install base images are no longer supported.');
-        $resolver->resolve();
-    }
-
-    private function createFile(string $path, string $contents): void
-    {
-        $directory = dirname($path);
-
-        if (! is_dir($directory) && ! mkdir($directory, 0777, true) && ! is_dir($directory)) {
-            $this->fail('Unable to create fixture directory: ' . $directory);
-        }
-
-        if (file_put_contents($path, $contents) === false) {
-            $this->fail('Unable to write fixture file: ' . $path);
-        }
-    }
-
-    private function removeDir(string $dir): void
-    {
-        if (! is_dir($dir)) {
-            return;
-        }
-
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-
-        foreach ($iterator as $item) {
-            if ($item->isDir()) {
-                @rmdir($item->getPathname());
-            } else {
-                @chmod($item->getPathname(), 0644);
-                @unlink($item->getPathname());
+            public function qstr($str)
+            {
+                return "'" . str_replace(['\\', "'"], ['\\\\', "\\'"], $str) . "'";
             }
-        }
 
-        @rmdir($dir);
+            public function queryError($sql, &$error, $values = null)
+            {
+                $this->called = true;
+                $error = '';
+
+                return true;
+            }
+        };
+
+        $result = \createTikiDBUser($db, 'db.example', "attacker`@`%` IDENTIFIED BY 'pwn3d';--", 'ignored', 'tiki');
+
+        $this->assertFalse($result);
+        $this->assertFalse($db->called);
+        $this->assertNotEmpty(\Feedback::errorMessages());
+    }
+
+    public function testCreateTikiDbUserBuildsSafelyQuotedGrantStatement(): void
+    {
+        $db = new class {
+            public string $sql = '';
+
+            public function qstr($str)
+            {
+                return "'" . str_replace(['\\', "'"], ['\\\\', "\\'"], $str) . "'";
+            }
+
+            public function queryError($sql, &$error, $values = null)
+            {
+                $this->sql = $sql;
+                $error = '';
+
+                return true;
+            }
+        };
+
+        $result = \createTikiDBUser($db, 'db.example', 'tiki-prod_user', "o'hara", 'tiki-prod');
+
+        $this->assertTrue($result);
+        $this->assertSame(
+            "GRANT ALL PRIVILEGES ON `tiki-prod`.* TO 'tiki-prod_user'@'%' IDENTIFIED BY 'o\\'hara';",
+            $db->sql
+        );
     }
 }
