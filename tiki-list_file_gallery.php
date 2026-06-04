@@ -115,7 +115,9 @@ $inputConfiguration = [
         ],
         'staticKeyFiltersForArrays' => [
             'cat_categories' => 'digits',
-            'direct'         => 'digits',
+            // Direct mapping contains adapter/path/credentials, so a digits-only
+            // filter would corrupt values like "local" or "/tmp/data".
+            'direct'         => 'text',
             'ocr_lang'       => 'text',
         ],
     ],
