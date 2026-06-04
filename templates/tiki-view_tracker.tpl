@@ -309,7 +309,7 @@
                                                     {/if}
                                                     {if $tiki_p_create_tracker_items eq 'y' and ($prefs.tracker_clone_item eq 'y' or $tracker_info.enableDuplicate eq 'y')}
                                                         <action>
-                                                            <a href="{service controller=tracker action=insert_item trackerId=$trackerId clone_from=$items[user].itemId}"
+                                                            <a href="{bootstrap_modal controller=tracker action=insert_item trackerId=$trackerId clone_from=$items[user].itemId size='modal-lg'}"
                                                                 onclick="$('[data-bs-toggle=popover]').popover('hide');"
                                                             >
                                                                 {icon name="copy" _menu_text='y' _menu_icon='y' alt="{tr}Duplicate{/tr}"}
