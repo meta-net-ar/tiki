@@ -6,13 +6,16 @@
     rows are produced for the deepest-level buckets ("cross-join" style).
     Metrics from each level appear as their own columns.
 
-    Use as: {OUTPUT(template="aggregate_table")} {/OUTPUT}
+    Use as:
+        {OUTPUT(template="aggregate_table")}
+            {tableparams title="My Report" hidecount="y" id="myTable" class="extra-class"}
+        {OUTPUT}
 
-    Optional table-level configuration via {output} arguments forwarded into
-    Smarty as $tableparams (mirrors templates/search/list/table.tpl):
-        - title: heading shown above the table
-        - class: extra CSS class on the <table>
-        - id: HTML id attribute on the <table>
+    Optional table-level configuration via a {tableparams} tag inside
+    the {OUTPUT} body (same syntax as templates/search/list/table.tpl):
+        - title:     heading shown above the table
+        - class:     extra CSS class on the <table>
+        - id:        HTML id attribute on the <table>
         - hidecount: "y" to hide the # (doc_count) column
 
     Virtual columns the post-processor injects into bucket.metrics
@@ -144,7 +147,7 @@
                                     {if isset($row._keys[$col.name])}{$row._keys[$col.name]|escape}{/if}
                                 </td>
                             {else}
-                                <td class="text-end">{if isset($row[$col.name])}{if is_numeric($row[$col.name])}{$row[$col.name]|string_format:"%g"}{else}{$row[$col.name]|escape}{/if}{/if}</td>
+                                <td class="text-end">{if isset($row[$col.name])}{if is_numeric($row[$col.name])}{$row[$col.name]|number_format:0:".":","|escape}{else}{$row[$col.name]|escape}{/if}{/if}</td>
                             {/if}
                         {/foreach}
                     </tr>
