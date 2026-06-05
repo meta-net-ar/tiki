@@ -44,7 +44,7 @@ require_once('tiki-setup.php');
 global $prefs;
 
 $headerlib = TikiLib::lib('header');
-$headerlib->add_security_headers();
+$headerlib->addSecurityHeaders();
 
 $bruteForce = new BruteForce();
 // Refresh not logged in since 30 days user's accounts list
