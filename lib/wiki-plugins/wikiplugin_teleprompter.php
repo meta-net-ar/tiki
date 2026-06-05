@@ -338,6 +338,12 @@ function wikiplugin_teleprompter($data, $params)
     $teleprompterControlsLabel = htmlspecialchars(tr('Teleprompter controls'), ENT_QUOTES);
     $pauseButtonLabel = htmlspecialchars(tr('Pause'), ENT_QUOTES);
     $restartButtonLabel = htmlspecialchars(tr('Restart'), ENT_QUOTES);
+    $slowerButtonLabel = htmlspecialchars(tr('Slower'), ENT_QUOTES);
+    $fasterButtonLabel = htmlspecialchars(tr('Faster'), ENT_QUOTES);
+    $smallerTextButtonLabel = htmlspecialchars(tr('Smaller text'), ENT_QUOTES);
+    $largerTextButtonLabel = htmlspecialchars(tr('Larger text'), ENT_QUOTES);
+    $fullscreenButtonLabel = htmlspecialchars(tr('Fullscreen'), ENT_QUOTES);
+    $exitFullscreenButtonLabel = htmlspecialchars(tr('Exit fullscreen'), ENT_QUOTES);
 
     return '<div id="' . $containerId . '" class="teleprompter-container' . $mirrorClass . $focusClass . '" role="region" aria-label="' . $teleprompterRegionLabel . '" tabindex="0">' .
         '<div id="' . $trackId . '" class="teleprompter-track">' .
@@ -346,8 +352,19 @@ function wikiplugin_teleprompter($data, $params)
         '<div class="teleprompter-focus-overlay" aria-hidden="true"><div class="tp-focus-mask tp-focus-mask-top"></div><div class="tp-focus-mask tp-focus-mask-bottom"></div><div class="tp-focus-guide"></div></div>' .
         '<div class="teleprompter-progress" aria-hidden="true"><div class="teleprompter-progress-thumb"></div></div>' .
         '<div class="teleprompter-controls' . $controlsClass . '" aria-label="' . $teleprompterControlsLabel . '">' .
+        '<div class="teleprompter-control-group">' .
         '<button type="button" class="teleprompter-btn teleprompter-btn-toggle" data-tp-toggle="1" aria-pressed="false">' . $pauseButtonLabel . '</button>' .
         '<button type="button" class="teleprompter-btn teleprompter-btn-restart" data-tp-restart="1">' . $restartButtonLabel . '</button>' .
+        '<button type="button" class="teleprompter-btn teleprompter-btn-fullscreen" data-tp-fullscreen="1" title="' . $fullscreenButtonLabel . '" aria-label="' . $fullscreenButtonLabel . '" data-tp-fullscreen-label="' . $fullscreenButtonLabel . '" data-tp-exit-fullscreen-label="' . $exitFullscreenButtonLabel . '" aria-pressed="false"><span class="fas fa-expand" aria-hidden="true"></span><span class="visually-hidden">' . $fullscreenButtonLabel . '</span></button>' .
+        '</div>' .
+        '<div class="teleprompter-control-group">' .
+        '<button type="button" class="teleprompter-btn" data-tp-speed="-1" title="' . $slowerButtonLabel . '" aria-label="' . $slowerButtonLabel . '"><span class="fas fa-backward" aria-hidden="true"></span><span class="visually-hidden">' . $slowerButtonLabel . '</span></button>' .
+        '<button type="button" class="teleprompter-btn" data-tp-speed="1" title="' . $fasterButtonLabel . '" aria-label="' . $fasterButtonLabel . '"><span class="fas fa-forward" aria-hidden="true"></span><span class="visually-hidden">' . $fasterButtonLabel . '</span></button>' .
+        '</div>' .
+        '<div class="teleprompter-control-group">' .
+        '<button type="button" class="teleprompter-btn" data-tp-font="-1" title="' . $smallerTextButtonLabel . '" aria-label="' . $smallerTextButtonLabel . '">A-</button>' .
+        '<button type="button" class="teleprompter-btn" data-tp-font="1" title="' . $largerTextButtonLabel . '" aria-label="' . $largerTextButtonLabel . '">A+</button>' .
+        '</div>' .
         '</div>' .
         '<div id="' . $timerId . '" class="teleprompter-timer' . $timerClass . '" aria-live="polite" aria-atomic="true">00:00</div>' .
         '</div>';
