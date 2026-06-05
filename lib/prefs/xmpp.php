@@ -167,6 +167,13 @@ function prefs_xmpp_list()
             'default' => 'community',
             'tags' => ['basic'],
         ],
+        'xmpp_anonymous_allow_custom_nickname' => [
+            'name' => tra('Allow anonymous visitors to choose a nickname'),
+            'description' => tra('When enabled, anonymous visitors are prompted to choose their chat nickname before sending messages. When disabled, Tiki uses an automatic visitor nickname.'),
+            'type' => 'flag',
+            'tags' => ['basic'],
+            'default' => 'n',
+        ],
         'xmpp_ws_url' => [
             'name' => tra('XMPP WebSocket URL'),
             'description' => tra('WebSocket endpoint for ConverseJS. If set, this takes precedence over the BOSH (http-bind) URL.'),
