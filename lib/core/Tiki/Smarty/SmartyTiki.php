@@ -272,7 +272,7 @@ class SmartyTiki extends Smarty
             }
         }
 
-        $headerlib->add_security_headers();
+        $headerlib->addSecurityHeaders();
 
         /**
          * By default, display is used with text/html content in UTF-8 encoding
