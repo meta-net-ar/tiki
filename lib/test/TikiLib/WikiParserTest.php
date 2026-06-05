@@ -73,6 +73,35 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         $this->assertEquals($output, TikiLib::lib('parser')->parse_data($input, $options));
     }
 
+    /**
+     * @covers ParserLib::parse_data
+     */
+    public function testNestedNoParseBlocksProtectPluginHtml(): void
+    {
+        global $prefs;
+        $prefs['feature_wiki_paragraph_formatting'] = 'y';
+
+        $input = '~np~<div class="outer">
+<span>~np~Warning~/np~</span>
+
+<div class="edit-zone">
+    <textarea name="body"></textarea>
+</div>
+
+
+<input type="hidden" name="wysiwyg" value="n" />
+</div>~/np~';
+
+        $output = TikiLib::lib('parser')->parse_data($input, ['is_html' => true]);
+
+        $this->assertStringContainsString('<span>Warning</span>', $output);
+        $this->assertStringContainsString('<textarea name="body"></textarea>', $output);
+        $this->assertStringContainsString('<input type="hidden" name="wysiwyg" value="n" />', $output);
+        $this->assertStringNotContainsString('~np~', $output);
+        $this->assertStringNotContainsString('~/np~', $output);
+        $this->assertStringNotContainsString('<br /><br /><input type="hidden" name="wysiwyg"', $output);
+    }
+
     public static function provider(): array
     {
         return [
