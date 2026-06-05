@@ -174,7 +174,7 @@
         "chrome-php/chrome": "~1.14",
         "codercat/jwk-to-pem": "~1.1",
         "composer/semver": "~3.4",
-        "cypht-org/cypht": "dev-site-module-revamp-full@dev",
+        "cypht-org/cypht": "dev-site-module-revamp@dev",
         "cweagans/composer-patches": "~2.0",
         "dragonmantank/cron-expression": "~3.5",
         "ecphp/cas-lib": "~3.0",

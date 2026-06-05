@@ -1763,16 +1763,16 @@
         },
         {
             "name": "cypht-org/cypht",
-            "version": "dev-site-module-revamp-full",
+            "version": "dev-site-module-revamp",
             "source": {
                 "type": "git",
                 "url": "https://github.com/mercihabam/cypht.git",
-                "reference": "577010cea6c5f4e4db4f3453aa9e03e47642d225"
+                "reference": "da75aa81303cc0e2c7f3aa8db9756fbbbe297949"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/mercihabam/cypht/zipball/577010cea6c5f4e4db4f3453aa9e03e47642d225",
-                "reference": "577010cea6c5f4e4db4f3453aa9e03e47642d225",
+                "url": "https://api.github.com/repos/mercihabam/cypht/zipball/da75aa81303cc0e2c7f3aa8db9756fbbbe297949",
+                "reference": "da75aa81303cc0e2c7f3aa8db9756fbbbe297949",
                 "shasum": ""
             },
             "require": {
@@ -1794,7 +1794,7 @@
                 "php": ">=8.1",
                 "sentry/sdk": "^4.0",
                 "symfony/dotenv": "^6.4",
-                "symfony/yaml": "~6.4.3",
+                "symfony/yaml": "^6.4.40",
                 "thomaspark/bootswatch": "^5.3",
                 "twbs/bootstrap": "^5.3",
                 "twbs/bootstrap-icons": "^1.11",
@@ -1859,7 +1859,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "docs": "https://cypht.org/documentation.html"
             },
-            "time": "2026-05-25T14:22:55+00:00"
+            "time": "2026-06-05T15:03:17+00:00"
         },
         {
             "name": "dasprid/enum",
