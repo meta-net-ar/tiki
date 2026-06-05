@@ -27,6 +27,9 @@ if (empty($_POST['user'])) {
 require_once('tiki-setup.php');
 global $prefs;
 
+$headerlib = TikiLib::lib('header');
+$headerlib->addSecurityHeaders();
+
 // Refresh not logged in since 30 days user's accounts list
 $userlib = TikiLib::lib('user');
 $userlib->refresh_locked_users_list();
