@@ -12,6 +12,7 @@
     Smarty as $tableparams (mirrors templates/search/list/table.tpl):
         - title: heading shown above the table
         - class: extra CSS class on the <table>
+        - hidecount: "y" to hide the # (doc_count) column
 
     Virtual columns the post-processor injects into bucket.metrics
     are honoured automatically:
@@ -54,7 +55,9 @@
                 {$aggColumns[] = ['name' => $mName, 'kind' => 'metric', 'label' => isset($rootAgg.metric_labels[$mName]) ? $rootAgg.metric_labels[$mName] : $mName]}
             {/if}
         {/foreach}
-        {$aggColumns[] = ['name' => 'doc_count', 'kind' => 'metric', 'label' => '#']}
+        {if empty($tableparams.hidecount) || $tableparams.hidecount neq 'y'}
+            {$aggColumns[] = ['name' => 'doc_count', 'kind' => 'metric', 'label' => '#']}
+        {/if}
 
         {* check if first bucket has nested children to expand *}
         {$nestedNames = []}
@@ -118,7 +121,7 @@
         <div class="list-table-heading">{wiki}{$tableparams.title|escape}{/wiki}</div>
     {/if}
     <div class="table-responsive">
-        <table class="table table-striped table-hover{if not empty($tableparams.class)} {$tableparams.class|escape}{/if} reportTable">
+        <table class="table normal table-hover table-striped{if not empty($tableparams.class)} {$tableparams.class|escape}{/if}">
             <thead>
                 <tr>
                     {foreach $aggColumns as $col}

@@ -81,7 +81,18 @@ class AggregationReader
         }
 
         $rootResult = (new AggregationResult($rootAgg->getName(), 'terms', true))
-            ->setField($rootAgg->getField());
+            ->setField($rootAgg->getField())
+            ->setLabel($rootAgg->getLabel());
+
+        $labelMap = [];
+        foreach ($metrics as $metric) {
+            if ($metric->getLabel() !== null) {
+                $labelMap[$metric->getName()] = $metric->getLabel();
+            }
+        }
+        if ($labelMap !== []) {
+            $rootResult->setMetricLabels($labelMap);
+        }
 
         // Map keyed by composite path (joined keys) -> leaf bucket array
         // built incrementally so siblings share parent buckets.
@@ -193,6 +204,7 @@ class AggregationReader
             }
             $result = new AggregationResult($metric->getName(), $metric->getKind(), false);
             $result->setField($metric->getField());
+            $result->setLabel($metric->getLabel());
             $result->setValue($this->castMetricValue($row[$alias]));
             $out[$metric->getName()] = $result;
         }

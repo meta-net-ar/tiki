@@ -73,6 +73,7 @@ class AggregationReader
     {
         $result = new AggregationResult($agg->getName(), $agg->getKind(), false);
         $result->setField($agg->getField());
+        $result->setLabel($agg->getLabel());
         if (! is_object($entry)) {
             return $result;
         }
@@ -94,6 +95,18 @@ class AggregationReader
     {
         $result = new AggregationResult($agg->getName(), 'terms', true);
         $result->setField($agg->getField());
+        $result->setLabel($agg->getLabel());
+
+        $labelMap = [];
+        foreach ($agg->getChildren() as $child) {
+            if ($child->getLabel() !== null) {
+                $labelMap[$child->getName()] = $child->getLabel();
+            }
+        }
+        if ($labelMap !== []) {
+            $result->setMetricLabels($labelMap);
+        }
+
         if (is_object($entry)) {
             if (isset($entry->sum_other_doc_count)) {
                 $result->setSumOtherDocCount((int) $entry->sum_other_doc_count);
