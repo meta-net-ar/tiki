@@ -12,6 +12,7 @@
     Smarty as $tableparams (mirrors templates/search/list/table.tpl):
         - title: heading shown above the table
         - class: extra CSS class on the <table>
+        - id: HTML id attribute on the <table>
         - hidecount: "y" to hide the # (doc_count) column
 
     Virtual columns the post-processor injects into bucket.metrics
@@ -121,7 +122,7 @@
         <div class="list-table-heading">{wiki}{$tableparams.title|escape}{/wiki}</div>
     {/if}
     <div class="table-responsive">
-        <table class="table normal table-hover table-striped{if not empty($tableparams.class)} {$tableparams.class|escape}{/if}">
+        <table {if not empty($tableparams.id)}id="{$tableparams.id|escape}" {/if}class="table normal table-hover table-striped{if not empty($tableparams.class)} {$tableparams.class|escape}{/if}">
             <thead>
                 <tr>
                     {foreach $aggColumns as $col}
