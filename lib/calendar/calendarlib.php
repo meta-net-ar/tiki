@@ -1304,6 +1304,52 @@ class CalendarLib extends TikiLib
     }
 
     /**
+     * @param $fname
+     * @param $calendarId
+     * @return int
+     */
+    public function importICS($fname, $calendarId)
+    {
+        global $prefs, $user;
+
+        $calendarData = file_get_contents($fname);
+        if (empty($calendarData) || strpos($calendarData, 'BEGIN:VCALENDAR') === false) {
+            throw new Services_Exception(tr("The ICS file is empty or invalid"));
+        }
+
+        $vObject = \Sabre\VObject\Reader::read($calendarData);
+        $nb = 0;
+
+        foreach ($vObject->getComponents() as $component) {
+            if ($component->name !== 'VEVENT') {
+                continue;
+            }
+
+            // Ignore recurrence exceptions
+            if (isset($component->{'RECURRENCE-ID'})) {
+                continue;
+            }
+            $client = new \Tiki\SabreDav\CaldavClient();
+            $data = \Tiki\SabreDav\Utilities::getDenormalizedDataFromComponent($component);
+            $data['calendarId'] = $calendarId;
+            // If the event is recurrent
+            if (! empty($data['rec'])) {
+                $rec = $data['rec'];
+                $rec->updateDetails($data);
+                // Lang is required in CalRecurrence::isValid(), so set it here
+                $rec->setLang($data['lang'] ?? $prefs['language'] ?? 'en');
+                $rec->setUser($user); // Set the user
+                $client->saveRecurringCalendarObject($rec);
+            } else {
+                // Save no recurrent event
+                $client->saveCalendarObject($data);
+            }
+            $nb++;
+        }
+        return $nb;
+    }
+
+    /**
      * Returns an array of a maximum of $maxrows upcoming (but possibly past) events in the given $order.
      * If $calendarId is set, events not in the specified calendars are filtered. $calendarId
      * can be a calendar identifier or an array of calendar identifiers. If $maxDaysEnd is
