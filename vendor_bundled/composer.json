@@ -481,6 +481,7 @@
         },
         "classmap": [
             "../installer/",
+            "../lib/",
             "../lib/language/",
             "../lib/openpgp/",
             "../lib/rating/formula/",
