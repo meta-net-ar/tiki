@@ -7,12 +7,9 @@ REPO_ROOT=$(git rev-parse --show-toplevel)
 php "$REPO_ROOT/doc/devtools/run_local_checks.php" ${TIKI_LOCAL_CHECKS_ARGS:-} || {
   echo "❌ Pre-push checks failed. Push cancelled."
   echo
-  echo "Examples:"
+  echo "Example:"
   echo '  TIKI_LOCAL_CHECKS_ARGS="--skip=1,2,5,9" git push'
-  echo '  TIKI_LOCAL_CHECKS_ARGS="--skip-rebase" git push'
-  echo '  TIKI_LOCAL_CHECKS_ARGS="--skip=2,5 --skip-rebase" git push'
   echo
   echo "Use --skip to bypass specific checks."
-  echo "Use --skip-rebase to skip the automatic rebase against the detected target branch."
   exit 1
 }

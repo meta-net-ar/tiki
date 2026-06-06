@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-$options = getopt('h', ['help', 'skip:', 'skip-rebase']);
+$options = getopt('h', ['help', 'skip:']);
 
 if (isset($options['h']) || isset($options['help'])) {
     echo <<<HELP
@@ -14,14 +14,11 @@ Usage:
 
 Options:
   --skip=1,3,8   Skip checks by step number
-  --skip-rebase Skip the automatic rebase against the upstream/master branch
-    and use the current branch state to determine affected files
   -h, --help     Show this help message
 
 Examples:
   php doc/devtools/run_local_checks.php
   php doc/devtools/run_local_checks.php --skip=2,5,9
-  php doc/devtools/run_local_checks.php --skip-rebase
 
 Notes:
   By default, the script attempts to rebase the current branch on top of the
@@ -37,50 +34,10 @@ if (! empty($options['skip'])) {
     $skipSteps = array_map('intval', explode(',', $options['skip']));
     echo "Skipping steps: " . implode(', ', $skipSteps) . PHP_EOL . PHP_EOL;
 }
-$skipRebase = isset($options['skip-rebase']);
-//require_once __DIR__ . '/get_base_commit.php';
-// 1. Get the remote name directly from Git's argument (e.g., "origin")
-$remoteName = $argv[1] ?? 'origin';
 
-// 2. Read the push details from stdin
-$input = file_get_contents('php://stdin');
-
-list($localRef, $localSha, $remoteRef, $remoteSha) = explode(' ', trim($input));
-
-echo $remoteSha;
-echo PHP_EOL . "===========================================";
-// 3. Get the base commit
-if ($remoteSha === '0000000000000000000000000000000000000000') {
-    /**
-     * SCENARIO A: Brand-new branch on the remote.
-     * Find the exact point where this feature branch split from the remote's main branch.
-     */
-    $remoteHead = trim(shell_exec("git symbol-ref refs/remotes/{$remoteName}/HEAD 2>/dev/null"));
-    $fallbackTarget = $remoteHead ? str_replace("refs/remotes/", "", $remoteHead) : "{$remoteName}/master";
-
-    // Get the fork point commit
-    $baseCommit = trim(shell_exec("git merge-base --fork-point {$fallbackTarget} HEAD"));
-    if (empty($baseCommit)) {
-        $baseCommit = trim(shell_exec("git merge-base {$fallbackTarget} HEAD"));
-    }
-} else {
-    /**
-     * SCENARIO B: The branch already exists on the remote.
-     * The base commit is simply the last commit the remote server knows about.
-     */
-    $baseCommit = $remoteSha;
-}
-
-// 4. Get your affected files
-$affectedFiles = [];
-if (!empty($baseCommit)) {
-    exec("git diff --name-only --diff-filter=d {$baseCommit} HEAD", $affectedFiles);
-    exit();
-}
-
+require_once __DIR__ . '/get_base_commit.php';
+$baseCommit = getBaseCommitOrAbort();
 exec("git diff --name-only --diff-filter=d {$baseCommit} HEAD", $affectedFiles);
-
-//exec('git diff --name-only --diff-filter=d origin/master...HEAD', $affectedFiles);
 
 if (empty($affectedFiles)) {
     echo "✅ No relevant files changed. Skipping checks." . PHP_EOL;
@@ -94,11 +51,15 @@ function filesByExtension(array $files, array $extensions): array
     }));
 }
 
-function quoteFiles(array $files): string
+function listFiles(array $files): string
 {
-    return implode(' ', array_map('escapeshellarg', $files));
+    return implode(' ', $files);
 }
 
+function addLeadSlash(array $files): string
+{
+    return implode(' ', array_map(static fn($file) => '/' . ltrim($file, '/'), $files));
+}
 function hasComposerChanges(array $files): bool
 {
     foreach ($files as $file) {
@@ -125,36 +86,30 @@ if (hasComposerChanges($affectedFiles)) {
 if (! empty($phpFiles)) {
     $steps[] = [
         'PHPCS',
-        'php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs -s --runtime-set ignore_warnings_on_exit true --parallel=1 ' . quoteFiles($phpFiles),
+        'php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs -s --runtime-set ignore_warnings_on_exit true --parallel=1 ' . listFiles($phpFiles),
     ];
     $steps[] = [
         'Static security check (PHP)',
-        'php -d display_errors=On doc/devtools/securitycheck.php ' . quoteFiles($phpFiles),
+        'php -d display_errors=On doc/devtools/securitycheck.php ' . listFiles($phpFiles),
     ];
     $steps[] = [
         'PHPLint',
-        'php vendor_bundled/vendor/overtrue/phplint/bin/phplint ' . quoteFiles($phpFiles) . ' --no-interaction --no-cache --progress path',
+        'php vendor_bundled/vendor/overtrue/phplint/bin/phplint ' . listFiles($phpFiles) . ' --no-interaction --no-cache --progress path',
     ];
     $steps[] = [
         'Rector',
-        'php bin/rector process --dry-run ' . quoteFiles($phpFiles),
-    ];
-
-    $steps[] = [
-        'PHPStan',
-//        'php bin/phpstan --configuration=phpstan-tikiCi.neon analyse ' . quoteFiles($phpFiles),
-        'php bin/phpstan --configuration=phpstan-tikiCi.neon'
+        'php bin/rector process --dry-run ' . listFiles($phpFiles),
     ];
 }
 
 if (! empty($tplFiles)) {
     $steps[] = [
         'SmartyLint',
-        'php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --rules=doc/devtools/smartyl.rules.xml ' . quoteFiles($tplFiles),
+        'php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --rules=doc/devtools/smartyl.rules.xml ' . listFiles($tplFiles),
     ];
     $steps[] = [
         'Smarty syntax check',
-        'php doc/devtools/check_smarty_syntax.php ' . quoteFiles($tplFiles),
+        'php doc/devtools/check_smarty_syntax.php ' . listFiles($tplFiles),
     ];
     $steps[] = ['Translation standards', 'php doc/devtools/check_template_translation_standards.php --all'];
 }
@@ -162,14 +117,12 @@ if (! empty($tplFiles)) {
 if (! empty($jsFiles)) {
     $steps[] = [
         'ESLint',
-        'npx eslint ' . quoteFiles($jsFiles),
+        'npx eslint ' . listFiles($jsFiles),
     ];
 }
 
-$allAffected = quoteFiles($affectedFiles);
-
-$steps[] = ['BOM encoding', 'php doc/devtools/check_bom_encoding.php ' . $allAffected];
-$steps[] = ['Unix line ending', 'php doc/devtools/check_unix_ending_line.php ' . $allAffected];
+$steps[] = ['BOM encoding', 'php doc/devtools/check_bom_encoding.php ' . listFiles($affectedFiles)];
+$steps[] = ['Unix line ending', 'php doc/devtools/check_unix_ending_line.php ' . listFiles($affectedFiles)];
 $steps[] = ['Platform binaries', 'php doc/devtools/check_platform_binaries.php'];
 
 $steps[] = ['SQL engine', 'php -d display_errors=On doc/devtools/check_sql_engine.php'];
