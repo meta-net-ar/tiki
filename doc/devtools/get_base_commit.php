@@ -5,31 +5,46 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+
+function getTikiTargetBranch(): string
+{
+    require_once __DIR__ . '/../../lib/setup/twversion.class.php';
+
+    $twVersion = new TWVersion();
+
+    if ($twVersion->branch === 'trunk') {
+        return 'master';
+    }
+
+    if ($twVersion->branch === 'stable') {
+        return preg_replace('/^(\d+)\..*$/', '$1.x', $twVersion->version);
+    }
+
+    return 'master';
+}
+
 /**
- * Automatically detects the central TikiWiki remote, performs a safety rebase,
- * handles conflicts, and returns the target base commit hash/name for diffing.
+ * Resolves the base commit hash or reference to diff against.
  *
- * @return string The base commit to diff against (e.g., 'origin/master')
+ * Prioritizes upstream '@{u}' if set. Falls back to finding the
+ * merge-base of the local target branch.
+ *
+ * @return string Upstream tag, a SHA-1 commit hash, or empty string if branch is missing.
  */
 function getBaseCommitOrAbort(): string
 {
+    exec('git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>NUL', $upstreamOutput, $returnCode);
 
-    // 1. Check if the current branch even has an upstream configured yet
-    exec("git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null", $output, $returnCode);
-
-    if ($returnCode !== 0) {
-        /**
-         * This is a brand-new branch with no upstream on the server yet.
-         * Since NOTHING has been pushed, EVERY single commit on this branch is unpushed.
-         * We track back to where the branch dynamically split from your local tracking.
-         */
-        $baseCommit = trim(shell_exec("git merge-base @{u} HEAD 2>/dev/null"));
-    } else {
-        /**
-         * The branch already exists on the remote.
-         * We only care about the new commits/amendments made since the last push.
-         */
-        $baseCommit = '@{u}';
+    if ($returnCode === 0) {
+        return '@{u}';
     }
-    return $baseCommit;
+    $targetBranch = getTikiTargetBranch();
+    // Verify if the branch actually exists in the local repository
+    exec('git show-ref --verify --quiet ' . escapeshellarg("refs/heads/$targetBranch"), $output, $existCode);
+    if ($existCode !== 0) {
+        return '';
+    }
+    return trim((string) shell_exec(
+        'git merge-base ' . escapeshellarg($targetBranch) . ' HEAD 2>NUL'
+    ));
 }
