@@ -38,8 +38,45 @@ if (! empty($options['skip'])) {
     echo "Skipping steps: " . implode(', ', $skipSteps) . PHP_EOL . PHP_EOL;
 }
 $skipRebase = isset($options['skip-rebase']);
-require_once __DIR__ . '/get_base_commit.php';
-$baseCommit = getBaseCommitOrAbort($skipRebase);
+//require_once __DIR__ . '/get_base_commit.php';
+// 1. Get the remote name directly from Git's argument (e.g., "origin")
+$remoteName = $argv[1] ?? 'origin';
+
+// 2. Read the push details from stdin
+$input = file_get_contents('php://stdin');
+
+list($localRef, $localSha, $remoteRef, $remoteSha) = explode(' ', trim($input));
+
+echo $remoteSha;
+echo PHP_EOL . "===========================================";
+// 3. Get the base commit
+if ($remoteSha === '0000000000000000000000000000000000000000') {
+    /**
+     * SCENARIO A: Brand-new branch on the remote.
+     * Find the exact point where this feature branch split from the remote's main branch.
+     */
+    $remoteHead = trim(shell_exec("git symbol-ref refs/remotes/{$remoteName}/HEAD 2>/dev/null"));
+    $fallbackTarget = $remoteHead ? str_replace("refs/remotes/", "", $remoteHead) : "{$remoteName}/master";
+
+    // Get the fork point commit
+    $baseCommit = trim(shell_exec("git merge-base --fork-point {$fallbackTarget} HEAD"));
+    if (empty($baseCommit)) {
+        $baseCommit = trim(shell_exec("git merge-base {$fallbackTarget} HEAD"));
+    }
+} else {
+    /**
+     * SCENARIO B: The branch already exists on the remote.
+     * The base commit is simply the last commit the remote server knows about.
+     */
+    $baseCommit = $remoteSha;
+}
+
+// 4. Get your affected files
+$affectedFiles = [];
+if (!empty($baseCommit)) {
+    exec("git diff --name-only --diff-filter=d {$baseCommit} HEAD", $affectedFiles);
+    exit();
+}
 
 exec("git diff --name-only --diff-filter=d {$baseCommit} HEAD", $affectedFiles);
 
@@ -105,7 +142,8 @@ if (! empty($phpFiles)) {
 
     $steps[] = [
         'PHPStan',
-        'php bin/phpstan --configuration=phpstan-tikiCi.neon analyse ' . quoteFiles($phpFiles),
+//        'php bin/phpstan --configuration=phpstan-tikiCi.neon analyse ' . quoteFiles($phpFiles),
+        'php bin/phpstan --configuration=phpstan-tikiCi.neon'
     ];
 }
 

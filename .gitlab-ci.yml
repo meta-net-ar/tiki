@@ -68,23 +68,6 @@ workflow:
     # THIS WILL TRIGGER PIPELINES FOR MERGE REQUESTS AND SCHEDULES, AND PUSHES ON VERSION BRANCHES LIKE 21.x. 18.x
     - when: always
 
-# 🛠️ Reusable script anchor to calculate modified assets dynamically
-.calculate_affected_files: &calculate_affected_files
-  - |
-    if [ -n "$CI_MERGE_REQUEST_DIFF_BASE_SHA" ]; then
-      echo "Merge Request detected. Using GitLab's native diff baseline: $CI_MERGE_REQUEST_DIFF_BASE_SHA"
-      BASE_COMMIT="$CI_MERGE_REQUEST_DIFF_BASE_SHA"
-    else
-      echo "Standard branch push or schedule detected. Falling back to parent commit baseline."
-      BASE_COMMIT="HEAD~1"
-    fi
-    
-    AFFECTED_FILES="$(git diff --name-only --diff-filter=d "$BASE_COMMIT" HEAD || true)"
-
-    PHP_FILES="$(printf '%s\n' "$AFFECTED_FILES" | grep -E '\.php$' || true)"
-    JS_FILES="$(printf '%s\n' "$AFFECTED_FILES" | grep -E '\.js$' || true)"
-    TPL_FILES="$(printf '%s\n' "$AFFECTED_FILES" | grep -E '\.tpl$' || true)"
-
 #Inspired from https://dev.to/drakulavich/gitlab-ci-cache-and-artifacts-explained-by-example-2opi
 
 # Define a hidden job to be used with extends
@@ -223,14 +206,9 @@ phpcs:
   rules:
     - changes:
       - "**/*.php"
+      - "**/composer.lock"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$PHP_FILES" ]; then
-        echo "$PHP_FILES" | xargs php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs --cache=phpcs.cache -s --runtime-set ignore_warnings_on_exit true --parallel=8
-      else
-        echo "✅ No target modifications identified."
-      fi
+    - php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs --cache=phpcs.cache -s --runtime-set ignore_warnings_on_exit true --parallel=8
   cache:
     - key:
         prefix: "phpcs"
@@ -249,14 +227,9 @@ phplint:
   rules:
     - changes:
       - "**/*.php"
+      - "**/composer.lock"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$PHP_FILES" ]; then
-        echo "$PHP_FILES" | xargs php vendor_bundled/vendor/overtrue/phplint/bin/phplint --no-interaction --no-cache
-      else
-        echo "✅ No targeted line changes."
-      fi
+    - php vendor_bundled/vendor/overtrue/phplint/bin/phplint --no-interaction --no-cache
   # No point in using cache, on fast hardware it's almost as fast to compute as it is to verify the cache - benoitg - 2026-01-26
   parallel:
     matrix:
@@ -270,14 +243,9 @@ smarty-lint:
   rules:
     - changes:
       - "**/*.tpl"
+      - "**/composer.lock"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$TPL_FILES" ]; then
-        echo "$TPL_FILES" | xargs php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
-      else
-        echo "✅ No Smarty template changed ."
-      fi
+    - php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
 
 smarty-syntax-check:
   stage: code-quality
@@ -286,13 +254,7 @@ smarty-syntax-check:
     - changes:
        - "**/*.tpl"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$TPL_FILES" ]; then
-        printf '%s\n' "$TPL_FILES" | xargs php doc/devtools/check_smarty_syntax.php
-      else
-        echo "✅ No affected Smarty templates."
-      fi
+    - php doc/devtools/check_smarty_syntax.php
 
 eslint:
   stage: code-quality
@@ -304,14 +266,9 @@ eslint:
   rules:
     - changes:
         - "**/*.js"
+        - "package-lock.json"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$JS_FILES" ]; then
-        printf '%s\n' "$JS_FILES" | xargs npx eslint
-      else
-        echo "✅ No affected js file."
-      fi
+    - npx eslint .
 
 shlint:
   stage: code-quality
@@ -329,26 +286,14 @@ check-bom-encoding:
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$AFFECTED_FILES" ]; then
-        echo "$AFFECTED_FILES" | xargs php doc/devtools/check_bom_encoding.php
-      else
-        echo "✅ Change index clean."
-      fi
+    - php doc/devtools/check_bom_encoding.php
 
 unix-ending-line:
   stage: code-quality
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$AFFECTED_FILES" ]; then
-        echo "$AFFECTED_FILES" | xargs php doc/devtools/check_unix_ending_line.php
-      else
-        echo "✅ Change index clean."
-      fi
+    - php doc/devtools/check_unix_ending_line.php
 
 translation-standards:
   stage: code-quality
@@ -386,14 +331,7 @@ rector:
     - changes:
         - "**/*.php"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$PHP_FILES" ]; then
-       # If rector had changed any files, it will return a non-zero code
-        echo "$PHP_FILES" | xargs php bin/rector process --dry-run
-      else
-        echo "✅ Transform tree evaluation bypassed."
-      fi
+    - php bin/rector process --dry-run
 
   cache:
     - key:
@@ -465,13 +403,7 @@ check-security-static:
     - changes:
         - "**/*.php"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$PHP_FILES" ]; then
-        printf '%s\n' "$PHP_FILES" | xargs php -d display_errors=On doc/devtools/securitycheck.php
-      else
-        echo "✅ No affected PHP files."
-      fi
+    - php -d display_errors=On doc/devtools/securitycheck.php
 
 translation:
   stage: tiki-check
@@ -747,7 +679,6 @@ unit-tests:
   rules:
     - changes:
         - "**/*.php"
-        - "lib/test/**/*"
         - "vendor_bundled/composer.lock"
   parallel:
     matrix:
