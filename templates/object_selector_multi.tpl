@@ -42,7 +42,7 @@
                     {icon name=search}
                 </span>
                 <input type="text" placeholder="{$object_selector_multi.placeholder|escape}..." value="" class="filter form-control" autocomplete="off">
-                <input type="button" class="btn btn-info search" value="{tr}Find{/tr}">
+                <input type="button" class="btn btn-info search" value="{tr}Search{/tr}">
             </div>
         </div>
         <div class="card-body">

@@ -66,7 +66,7 @@
                     <label class="form-check-label" for="which_date_all_simple">{tr}All votes{/tr}</label>
                 </div>
             {/if}
-            <input type="submit" class="btn btn-primary btn-sm" name="search" value="{tr}Find{/tr}">
+            <input type="submit" class="btn btn-primary btn-sm" name="search" value="{tr}Search{/tr}">
         </div>
     </div>
 </form>
@@ -102,11 +102,11 @@
     <div align="center">
         <table class="text-center">
             <tr>
-                <td class="text-center">{tr}Find{/tr}</td>
+                <td class="text-center">{tr}Search{/tr}</td>
                 <td class="text-center">
                     <form method="get" action="tiki-poll_results.php">
                         <input type="text" name="find" value="{$find|escape}">
-                        <input type="submit" class="btn btn-primary btn-sm" value="{tr}Find{/tr}" name="search">
+                        <input type="submit" class="btn btn-primary btn-sm" value="{tr}Search{/tr}" name="search">
                         <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
                         <input type="hidden" name="pollId" value="{$pollId|escape}">
                         <input type="hidden" name="list" value="y">

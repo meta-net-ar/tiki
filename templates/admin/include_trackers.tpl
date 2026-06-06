@@ -198,7 +198,7 @@
             <form action="tiki-admin.php?page=trackers" method="post">
                 {ticket}
                 <input type="text" name="find" value="{$find|escape}">
-                <input type="submit" class="btn btn-primary btn-sm" name="action" value="{tr}Find{/tr}">
+                <input type="submit" class="btn btn-primary btn-sm" name="action" value="{tr}Search{/tr}">
             </form>
         {/if}
 

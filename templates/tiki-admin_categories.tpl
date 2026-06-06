@@ -179,7 +179,7 @@
             <h2>{tr}Objects in category:{/tr} {$categ_name|escape}</h2>
             {if $objects}
                 <form method="get" action="tiki-admin_categories.php">
-                    <label>{tr}Find:{/tr}<input type="text" name="find"></label>
+                    <label>{tr}Search:{/tr}<input type="text" name="find"></label>
                     <input type="hidden" name="parentId" value="{$parentId|escape}">
                     <input type="submit" class="btn btn-primary btn-sm" value="{tr}Filter{/tr}" name="search">
                     <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
@@ -323,7 +323,7 @@ $("#add_object_type").on("change", function () {
                 <form method="get" action="tiki-admin_categories.php">
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label" for="find_objects">
-                            {tr}Find{/tr}
+                            {tr}Search{/tr}
                         </label>
                         <div class="col-sm-6 input-group">
                             <input type="text" name="find_objects" id="find_objects" class="form-control">

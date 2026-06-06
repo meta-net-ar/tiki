@@ -30,12 +30,12 @@
                 {/remarksbox}
             {/if}
             <form method="get" action="tiki-admin.php?page=profiles">
-                <h4>{tr}Find profiles{/tr} <small>{tr}Search by name, types and repository{/tr}</small></h4>
+                <h4>{tr}Search profiles{/tr} <small>{tr}Search by name, types and repository{/tr}</small></h4>
                 <div class="row">
                     <div class="col-sm-6">
                         <div class="mb-3 row">
                             <label class="col-form-label" for="profile">{tr}Profile name{/tr} </label>
-                            <input type="text" class="form-control" name="profile" placeholder="{tr}Find{/tr}..." id="profile" value="{if isset($profile)}{$profile|escape}{/if}" />
+                            <input type="text" class="form-control" name="profile" placeholder="{tr}Search{/tr}..." id="profile" value="{if isset($profile)}{$profile|escape}{/if}" />
                         </div>
                         {if isset($category_list) and count($category_list) gt 0}
                             <div class="mb-3 row">
@@ -59,7 +59,7 @@
                         <input type="hidden" name="page" value="profiles">
                         <input type="hidden" name="redirect" value=0>
                         <div class="mb-3 text-center">
-                            <input type="submit" class="btn btn-secondary" name="list" value="{tr}Find{/tr}" />
+                            <input type="submit" class="btn btn-secondary" name="list" value="{tr}Search{/tr}" />
                         </div>
                     </div>
                     <div class="col-sm-6">

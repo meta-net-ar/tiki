@@ -16,7 +16,7 @@
                                     </option>
                                 {/section}
                             </select>
-                            <input type="submit" class="wikiaction btn btn-info btn-sm" name="modTasksSearch" value="{tr}Go{/tr}" />
+                            <input type="submit" class="wikiaction btn btn-info btn-sm" name="modTasksSearch" value="{tr}Search{/tr}" />
                         </form>
                     </td>
                 </tr>

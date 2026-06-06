@@ -5,8 +5,8 @@
                 <form id="search-module-form{$search_mod_usage_counter}" method="get" action="{$smod_params.search_action}"{if $smod_params.use_autocomplete eq 'y'} onsubmit="return submitSearch{$search_mod_usage_counter}()"{/if} style="position: relative;">
                     <div class="{if $smod_params.compact eq 'y'}input-group{else}mb-3{/if}{*d-flex flex-wrap mx-0 align-items-center*}">
                     {*    <div class="{*col-auto*}{*me-2"> *}
-                            <input style="min-width: 4rem;{if $smod_params.compact eq "y"}{*width:72%;border-bottom-right-radius:0;border-top-right-radius: 0;*}{/if}" placeholder="{tr}Find{/tr}" class="form-control my-1" id="search_mod_input_{$search_mod_usage_counter}" name="{if $smod_params.search_action eq 'tiki-searchindex.php'}filter~content{else}find{/if}" {if !empty($smod_params.input_size)}size="{$smod_params.input_size}" style="width: auto"{/if} type="text" accesskey="s" value="{$smod_params.input_value|escape}">
-                            <label class="sr-only" for="search_mod_input_{$search_mod_usage_counter}">Find</label>
+                            <input style="min-width: 4rem;{if $smod_params.compact eq "y"}{*width:72%;border-bottom-right-radius:0;border-top-right-radius: 0;*}{/if}" placeholder="{tr}Search{/tr}" class="form-control my-1" id="search_mod_input_{$search_mod_usage_counter}" name="{if $smod_params.search_action eq 'tiki-searchindex.php'}filter~content{else}find{/if}" {if !empty($smod_params.input_size)}size="{$smod_params.input_size}" style="width: auto"{/if} type="text" accesskey="s" value="{$smod_params.input_value|escape}">
+                            <label class="sr-only" for="search_mod_input_{$search_mod_usage_counter}">{tr}Search{/tr}</label>
                     {*    </div>*}
                             {if $smod_params.show_object_filter eq 'y'}
                                 <label class="col-form-label" for="filterType">
