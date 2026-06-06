@@ -37,13 +37,17 @@ if (! empty($options['skip'])) {
 
 require_once __DIR__ . '/get_base_commit.php';
 $baseCommit = getBaseCommitOrAbort();
-exec("git diff --name-only --diff-filter=d {$baseCommit} HEAD", $affectedFiles);
+echo "$baseCommit:" . PHP_EOL;
+if ($baseCommit !== '') {
+    exec("git diff --name-only --diff-filter=d {$baseCommit} HEAD", $affectedFiles);
+}
 
 if (empty($affectedFiles)) {
     echo "✅ No relevant files changed. Skipping checks." . PHP_EOL;
+//    exit(1);
     exit(0);
 }
-
+exit(1);
 function filesByExtension(array $files, array $extensions): array
 {
     return array_values(array_filter($files, function ($file) use ($extensions) {
@@ -54,11 +58,6 @@ function filesByExtension(array $files, array $extensions): array
 function listFiles(array $files): string
 {
     return implode(' ', $files);
-}
-
-function addLeadSlash(array $files): string
-{
-    return implode(' ', array_map(static fn($file) => '/' . ltrim($file, '/'), $files));
 }
 function hasComposerChanges(array $files): bool
 {
