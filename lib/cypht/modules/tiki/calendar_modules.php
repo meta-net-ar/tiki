@@ -28,7 +28,7 @@ class Hm_Handler_check_calendar_invitations_imap extends Hm_Handler_Module
             get_calendar_part_imap($this->get('msg_struct'), $this);
         }
         if ($this->get('calendar_event_raw')) {
-            $event = Tiki\SabreDav\Utilities::getDenormalizedData($this->get('calendar_event_raw'));
+            $event = Tiki\SabreDav\Utilities::getDenormalizedData($this->get('calendar_event_raw'), TikiLib::lib('tiki')->get_display_timezone());
             if ($this->get('formatted_calendar_event_description')) {
                 $event['description'] = $this->get('formatted_calendar_event_description');
             }
