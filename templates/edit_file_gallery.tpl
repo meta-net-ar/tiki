@@ -61,7 +61,7 @@ if ($(this).val() != '') {
                 <div class="tiki-form-group row">
                     <label for="fgal_type" class="col-sm-4 col-form-label">{tr}Type{/tr}</label>
                     <div class="col-sm-8">
-                        {if $galleryId eq $treeRootId or $gal_info.type eq 'user' or $gal_info.type eq 'attachments' or ($gal_info.type eq 'direct' and ($gal_info.direct.adapter eq 'inherit' or $gal_info.direct.adapter eq ''))}
+                        {if $galleryId eq $treeRootId or $gal_info.type eq 'user' or $gal_info.type eq 'attachments' or ($gal_info.type eq 'direct' and $gal_info.direct.adapter eq 'inherit')}
                             {if $gal_info.type eq 'system'}
                                 {tr}System{/tr}
                             {elseif $gal_info.type eq 'user'}
@@ -82,7 +82,7 @@ if ($(this).val() != '') {
                         {/if}
                     </div>
                 </div>
-                {if $tiki_p_admin eq 'y' and not ($gal_info.type eq 'direct' and ($gal_info.direct.adapter eq 'inherit' or $gal_info.direct.adapter eq ''))}
+                {if $tiki_p_admin eq 'y' and not ($gal_info.type eq 'direct' and $gal_info.direct.adapter eq 'inherit')}
                 <fieldset class="fgal_type_dependent direct_childcontainer" {if $gal_info.type neq 'direct'}style="display:none"{/if}>
                     <legend>{tr}Direct mapping settings{/tr}</legend>
                     <div class="tiki-form-group row">
@@ -282,7 +282,7 @@ if ($(this).val() != '') {
                             </div>
                         </div>
                     </div>
-                    {if $galleryId neq $treeRootId and not ($gal_info.type eq 'direct' and ($gal_info.direct.adapter eq 'inherit' or $gal_info.direct.adapter eq ''))}
+                    {if $galleryId neq $treeRootId and not ($gal_info.type eq 'direct' and $gal_info.direct.adapter eq 'inherit')}
                         <div class="tiki-form-group row">
                             <label for="parentId" class="col-sm-4 col-form-label">{tr}Parent gallery{/tr}</label>
                             <div class="col-sm-8">
