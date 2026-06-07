@@ -5406,7 +5406,7 @@ class TrackerLib extends TikiLib
                 continue;
             }
             $last[$hist['fieldId']] = $hist['value'];
-            if (! $itemObject->canViewField($hist['fieldId'])) {
+            if ($hist['fieldId'] != -1 && ! $itemObject->canViewField($hist['fieldId'])) {
                 continue;
             }
             if (! empty($filter['version']) && $filter['version'] != $hist['version']) {
