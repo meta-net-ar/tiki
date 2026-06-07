@@ -56,6 +56,24 @@ const getOptionsProp = computed(() => {
 });
 const options = ref([]);
 const wrapperRef = ref(null);
+const remoteSearchActive = ref(false);
+const selectionMadeInRemote = ref(false);
+
+const focusInput = () => {
+    // .el-select__input lives inside el-select's shadow DOM — querySelector won't find it.
+    // Focusing el-select itself delegates focus to the inner input via the custom element.
+    (wrapperRef.value?.querySelector('.el-select__input')
+        ?? wrapperRef.value?.querySelector('el-select'))
+        ?.focus();
+};
+
+// In remote mode, option clicks inside shadow DOM cause two problems:
+// 1. mousedown moves focus to the popper div → El Plus afterBlur fires → dropdown closes.
+//    Fix: capture-phase mousedown preventDefault stops the browser focus change.
+// 2. mousedown/mouseup bubble to document retargeted as EL-SELECT → El Plus's
+//    document-level click-outside handler (using startClick/mouseup) fires → dropdown closes.
+//    Fix: direct addEventListener (not Vue template binding) stops propagation reliably in shadow DOM.
+const isRemoteOption = (event) => props.remoteSourceUrl && event.target.closest('[role="option"]');
 
 const handleValueChange = (value) => {
     // check if the checkbox with id "intertrans-active" is checked
@@ -70,11 +88,35 @@ const handleValueChange = (value) => {
         const option = options.value.find(opt => opt.value === value);
         window.vueselectIntertransHandler(option); // on envoie le label
     }
+
+    if (props.remoteSourceUrl && !multiple.value) {
+        // Single mode only: dropdown closes after selection, handleVisibleChange refocuses.
+        // Multiple mode: reserve-keyword keeps the query and dropdown open; no flag needed.
+        selectionMadeInRemote.value = true;
+    }
+};
+
+const handleVisibleChange = (isVisible) => {
+    if (!isVisible) {
+        // Dropdown closed: allow watchEffect to resync static options on next open.
+        remoteSearchActive.value = false;
+        // Single mode: refocus input after selection closes the dropdown.
+        if (selectionMadeInRemote.value) {
+            selectionMadeInRemote.value = false;
+            focusInput();
+        }
+    }
 };
 
 const remoteMethod = async (query) => {
-    if (!query) return;
+    if (!query) {
+        // Do nothing: any options/state change here triggers an async Vue re-render that
+        // fires during the next keystroke and steals focus from the inner input.
+        // remoteSearchActive stays true for the whole session; it resets when the dropdown closes.
+        return;
+    }
 
+    remoteSearchActive.value = true;
     try {
         const url = new URL(props.remoteSourceUrl);
         url.searchParams.append("q", query);
@@ -101,6 +143,34 @@ const remoteMethod = async (query) => {
 };
 
 onMounted(() => {
+    if (wrapperRef.value) {
+        // Capture-phase: prevent focus leaving input when clicking an option (fixes blur → dropdown close).
+        wrapperRef.value.addEventListener('mousedown', (e) => {
+            if (isRemoteOption(e)) e.preventDefault();
+        }, true);
+
+        // Bubble-phase: stop mousedown/mouseup reaching El Plus's document-level click-outside handler.
+        // Vue template @mouseup binding doesn't reliably stop propagation in shadow DOM, so we use
+        // addEventListener directly — matching what evaluate-injected listeners confirmed works.
+        const stopProp = (e) => { if (isRemoteOption(e)) e.stopPropagation(); };
+        wrapperRef.value.addEventListener('mousedown', stopProp);
+        wrapperRef.value.addEventListener('mouseup', stopProp);
+
+        // el-select is a custom element (shadow DOM host). document.activeElement returns the shadow
+        // host, so document.activeElement.parentElement is the Tiki container div in the light DOM
+        // — NOT wrapperRef (which lives inside the shadow DOM).
+        // El Plus's z() handler calls pn(tikaContainer) → tikaContainer.focus(), stealing focus.
+        // Fix: override .focus() on that outer container div so pn()'s call redirects to the inner
+        // input. Applied unconditionally: remoteSourceUrl may not be set yet when onMounted fires
+        // (custom element props arrive async via the elements/select.js watch).
+        const tikaContainer = wrapperRef.value.getRootNode()?.host?.parentElement;
+        if (tikaContainer instanceof HTMLElement) {
+            tikaContainer.focus = () => {
+                wrapperRef.value.querySelector('.el-select__input')?.focus();
+            };
+        }
+    }
+
     try {
         const orderingConfig = props.ordering ? JSON.parse(props.ordering) : null;
         if (orderingConfig && multiple.value && wrapperRef.value) {
@@ -118,7 +188,12 @@ onMounted(() => {
 })
 
 watchEffect(() => {
-    options.value = getOptionsProp.value;
+    // In remote search mode, El Plus owns options.value — don't override it.
+    // The reset happens when remoteMethod is called with an empty query.
+    // so that clearing the input or selecting an item never triggers a re-render here.
+    if (!remoteSearchActive.value) {
+        options.value = getOptionsProp.value;
+    }
 });
 </script>
 
@@ -136,8 +211,8 @@ export const DATA_TEST_ID = {
     <ConfigWrapper :language="language">
         <div :class="{ 'invalid': isInvalid }" :data-testid="DATA_TEST_ID.SELECT_WRAPPER" ref="wrapperRef">
             <el-select v-model="modelValue" :multiple="multiple" :filterable="filterable" :allow-create="allowCreate"
-                default-first-option :reserve-keyword="false" :placeholder="placeholder" :teleported="false" :automatic-dropdown="true"
-                @change="handleValueChange" :multiple-limit="parseInt(max ?? 0, 10)" :clearable="clearable"
+                default-first-option :reserve-keyword="Boolean(remoteSourceUrl) && multiple" :placeholder="placeholder" :teleported="false" :automatic-dropdown="true"
+                @change="handleValueChange" @visible-change="handleVisibleChange" :multiple-limit="parseInt(max ?? 0, 10)" :clearable="clearable"
                 :collapse-tags="collapseTags" :max-collapse-tags="parseInt(maxCollapseTags ?? 0, 10)" :size="size"
                 :data-testid="DATA_TEST_ID.SELECT_ELEMENT" :remote-method="remoteMethod"
                 :remote="Boolean(remoteSourceUrl)" v-bind="$attrs" :empty-values="[null, undefined]">
