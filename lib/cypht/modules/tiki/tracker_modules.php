@@ -1106,8 +1106,7 @@ class Hm_Output_add_move_to_trackers extends Hm_Output_Module
     protected function output()
     {
         $res = tiki_move_to_tracker_dropdown($this, 'Trackers', 'Move to Tracker', 'move_to_trackers', true);
-        $headers = append_to_msg_headers($this->get('msg_headers'), $res);
-        $this->out('msg_headers', $headers, false);
+        $this->concat('extra_header_buttons', $res);
     }
 }
 
@@ -1116,8 +1115,7 @@ class Hm_Output_tiki_get_create_item_trackers_output extends Hm_Output_Module
     public function output()
     {
         $res = tiki_move_to_tracker_dropdown($this, 'Create item', 'Select Tracker', 'item_to_trackers', true);
-        $headers = append_to_msg_headers($this->get('msg_headers'), $res);
-        $this->out('msg_headers', $headers, false);
+        $this->concat('extra_header_buttons', $res);
     }
 }
 
@@ -1130,8 +1128,7 @@ class Hm_Output_add_restore_message extends Hm_Output_Module
     protected function output()
     {
         $res = tiki_restore_message($this);
-        $headers = append_to_msg_headers($this->get('msg_headers'), $res);
-        $this->out('msg_headers', $headers, false);
+        $this->concat('extra_header_buttons', $res);
     }
 }
 
