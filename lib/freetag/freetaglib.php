@@ -82,6 +82,8 @@ class FreetagLib extends ObjectLib
 
     public $multilingual = false;
 
+    private bool $currentObjectTagRequestHandled = false;
+
 
     /**
      * FreetagLib
@@ -470,6 +472,54 @@ class FreetagLib extends ObjectLib
         }
 
         return ['data' => $ret, 'count' => $count];
+    }
+
+    /**
+     * Process add/remove tag requests for the current section object.
+     */
+    public function handleCurrentObjectTagRequest(): void
+    {
+        global $captchalib, $prefs, $smarty, $tiki_p_admin, $tiki_p_freetags_tag, $tiki_p_unassign_freetags, $tikilib, $user, $userlib;
+
+        if ($this->currentObjectTagRequestHandled) {
+            return;
+        }
+
+        $hasAddRequest = $tiki_p_freetags_tag === 'y' && trim($_POST['addtags'] ?? '') !== '';
+        $hasDeleteRequest = ($tiki_p_admin === 'y' || $tiki_p_unassign_freetags === 'y') && isset($_REQUEST['delTag']);
+        if (! $hasAddRequest && ! $hasDeleteRequest) {
+            return;
+        }
+
+        $object = \Tiki\Sections::currentObject();
+        if (! $object) {
+            return;
+        }
+        $this->currentObjectTagRequestHandled = true;
+
+        if ($hasAddRequest) {
+            if (empty($user)) {
+                $userid = 0;
+            } else {
+                $userid = $userlib->get_user_id($user);
+            }
+
+            if (empty($user) && $prefs['feature_antibot'] === 'y' && ! $captchalib->validate()) {
+                $smarty->assign('freetag_error', $captchalib->getErrors());
+                $smarty->assign_by_ref('freetag_msg', $_POST['addtags']);
+            } else {
+                $this->tag_object($userid, $object['object'], $object['type'], $_POST['addtags']);
+                $tikilib->refresh_index($object['type'], $object['object']);
+            }
+        }
+
+        if ($hasDeleteRequest) {
+            $this->delete_object_tag($object['object'], $object['type'], $_REQUEST['delTag']);
+            $tikilib->refresh_index($object['type'], $object['object']);
+
+            $url = $tikilib->httpPrefix() . preg_replace('/[?&]delTag=' . preg_quote(urlencode($_REQUEST['delTag']), '/') . '/', '', $_SERVER['REQUEST_URI']);
+            TikiLib::lib('access')->redirect($url);
+        }
     }
 
     /**
