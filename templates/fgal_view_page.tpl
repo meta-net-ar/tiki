@@ -1,11 +1,14 @@
 {* build link *}
+{if !empty($file)}
 {capture assign=link}
     {include 'fgal_file_link_attributes.tpl' disableTplLogging=true}
 {/capture}
+{/if}
 
 {math equation="x + 6" x=$thumbnail_size assign=thumbnailcontener_size}
 
 {* thumbnail actions wrench *}
+{if !empty($file)}
 {capture name="thumbactions"}
     {if ($prefs.fgal_show_thumbactions eq 'y' or $show_details eq 'y')}
     <div class="thumbactions mt-3">
@@ -21,6 +24,7 @@
     </div> {* thumbactions *}
     {/if}
 {/capture}
+{/if}
 <div class="d-flex flex-wrap align-items-start">
     <div class="flex-shrink-0">
         {if !empty($file)}
