@@ -479,8 +479,12 @@ class ParserLib extends TikiDb_Bridge
 
         $start = -1;
         while (false !== $start = strpos($data, '~np~', $start + 1)) {
-            if (false !== $end = strpos($data, '~/np~', $start)) {
+            $nested = false;
+            if (false !== $end = $this->findUnparsedBlockEnd($data, $start, $nested)) {
                 $content = substr($data, $start + 4, $end - $start - 4);
+                if ($nested) {
+                    $content = str_replace(['~np~', '~/np~'], '', $content);
+                }
                 if ($protect) {
                     $content = $this->protectSpecialChars($content, $this->option['is_html']);
                 }
@@ -492,6 +496,37 @@ class ParserLib extends TikiDb_Bridge
                 $data = substr($data, 0, $start) . $key . substr($data, $end + 5);
             }
         }
+    }
+
+    private function findUnparsedBlockEnd($data, $start, &$nested = false)
+    {
+        $search = $start + 4;
+        $depth = 1;
+        $firstClose = false;
+        $nested = false;
+
+        while (false !== $nextClose = strpos($data, '~/np~', $search)) {
+            if ($firstClose === false) {
+                $firstClose = $nextClose;
+            }
+
+            $nextOpen = strpos($data, '~np~', $search);
+            if ($nextOpen !== false && $nextOpen < $nextClose) {
+                $depth++;
+                $search = $nextOpen + 4;
+                continue;
+            }
+
+            $depth--;
+            if ($depth === 0) {
+                $nested = $nextClose !== $firstClose;
+                return $nextClose;
+            }
+
+            $search = $nextClose + 5;
+        }
+
+        return $firstClose;
     }
 
     //
