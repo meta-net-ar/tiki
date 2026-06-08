@@ -1449,13 +1449,15 @@ import { defaults as defaultControls } from "ol/control";
                 }
             }
 
-            var searchboxes = $(container)
+            // start with the search boxes outside of the map container
+            let searchboxes = $(container)
                 .closest(".tab, #appframe, #tiki-center")
                 .find("form.search-box")
                 .filter(function () {
                     return $(this).closest(".map-container").length === 0;
                 });
 
+            // then add the ones inside
             searchboxes = searchboxes.add($("form.search-box", container));
 
             searchboxes
@@ -1482,7 +1484,7 @@ import { defaults as defaultControls } from "ol/control";
                                 if (layerName && i[layerName]) {
                                     layerName = i[layerName] + ": ";
                                 } else if (!layerName) {
-                                    layerName = " -- ";
+                                    layerName = "";
                                 }
 
                                 if (suffix && i[suffix]) {
