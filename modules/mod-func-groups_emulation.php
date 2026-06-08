@@ -49,6 +49,7 @@ function module_groups_emulation_info()
 function module_groups_emulation($mod_reference, $module_params)
 {
     global $user, $tiki_p_admin;
+
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
 
@@ -59,6 +60,9 @@ function module_groups_emulation($mod_reference, $module_params)
     $smarty->assign('groups_are_emulated', $groups_are_emulated);
     if (isset($_SESSION['groups_emulated'])) {
         $smarty->assign('groups_emulated', unserialize($_SESSION['groups_emulated']));
+    }
+    if (isset($_SESSION['groups_emulated_requested'])) {
+        $smarty->assign('groups_emulated_requested', unserialize($_SESSION['groups_emulated_requested']));
     }
 
     // Admins can see all existing groups
@@ -83,32 +87,8 @@ function module_groups_emulation($mod_reference, $module_params)
         $chooseGroups["Registered"] = "included";
     }
 
-    $headerlib = TikiLib::lib("header");
     $moduleId = $mod_reference['moduleId'];
-    if (isset($allGroups) && $showallgroups == 'y') {
-        $headerlib->add_js('$(function() {
-            $("#module_' . $moduleId . ' #mge-all").hide();
-            $("#module_' . $moduleId . ' #mge-all-legend").on("click", function(){
-                $("#module_' . $moduleId . ' #mge-all").fadeToggle();
-            });
-        });');
-    }
-    if ($showyourgroups == 'y') {
-        $headerlib->add_js('$(function() {
-            $("#module_' . $moduleId . ' #mge-mine").hide();
-            $("#module_' . $moduleId . ' #mge-mine-legend").on("click", function(){
-                $("#module_' . $moduleId . ' #mge-mine").fadeToggle();
-            });
-        });');
-    }
-    if ($groups_are_emulated == 'y') {
-        $headerlib->add_js('$(function() {
-            $("#module_' . $moduleId . ' #mge-emulated").hide();
-            $("#module_' . $moduleId . ' #mge-emulated-legend").on("click", function(){
-                $("#module_' . $moduleId . ' #mge-emulated").fadeToggle();
-            });
-        });');
-    }
+    $smarty->assign('moduleId', $moduleId);
 
     $smarty->assign_by_ref('userGroups', $userGroups);
     $smarty->assign_by_ref('chooseGroups', $chooseGroups);
