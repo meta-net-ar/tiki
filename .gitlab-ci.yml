@@ -370,13 +370,7 @@ phpstan:
     - changes:
         - "**/*.php"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$PHP_FILES" ]; then
-        echo "$PHP_FILES" | xargs php bin/phpstan --configuration=phpstan-tikiCi.neon analyse
-      else
-        echo "✅ Static evaluation matrix bypassed."
-      fi
+    - php bin/phpstan --configuration=phpstan-tikiCi.neon
   cache:
     key: "phpstan"
     paths:
