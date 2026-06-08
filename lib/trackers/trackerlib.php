@@ -5323,6 +5323,13 @@ class TrackerLib extends TikiLib
         if (! empty($item_info['itemId'])) {
             $mid[] = 'ttifl.`itemId`=?';
             $bindvars[] = $item_info['itemId'];
+            if (! array_key_exists('status', $item_info) || empty($item_info['trackerId'])) {
+                $itemRow = $this->items()->fetchRow(['trackerId', 'status'], ['itemId' => $item_info['itemId']]);
+                if ($itemRow) {
+                    $item_info['trackerId'] = $item_info['trackerId'] ?? $itemRow['trackerId'];
+                    $item_info['status'] = $item_info['status'] ?? $itemRow['status'];
+                }
+            }
             if ($prefs['feature_categories'] == 'y') {
                 $categlib = TikiLib::lib('categ');
                 $item_categs = $categlib->get_object_categories('trackeritem', $item_info['itemId']);
@@ -5388,6 +5395,8 @@ class TrackerLib extends TikiLib
         }
 
         $itemObject = Tracker_Item::fromId($item_info['itemId']);
+        $trackerDefinition = ! empty($item_info['trackerId']) ? Tracker_Definition::get($item_info['trackerId']) : false;
+        $trackerFields = $trackerDefinition ? $trackerDefinition->getFieldsIdKeys() : [];
 
         $query = 'SELECT ttifl.`version`, ttifl.`fieldId`, ttifl.`value`, ta.`user`, ta.`lastModif` ' .
                     'FROM `tiki_tracker_item_field_logs` ttifl ' .
@@ -5405,7 +5414,12 @@ class TrackerLib extends TikiLib
                 continue;
             }
             $last[$hist['fieldId']] = $hist['value'];
-            if (! $itemObject->canViewField($hist['fieldId'])) {
+            $historyFieldId = (int) $hist['fieldId'];
+            $isStatusHistory = $historyFieldId === HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE;
+            $canViewHistory = $isStatusHistory
+                ? $itemObject->canView()
+                : isset($trackerFields[$historyFieldId]) && $itemObject->canViewField($historyFieldId);
+            if (! $canViewHistory) {
                 continue;
             }
             if (! empty($filter['version']) && $filter['version'] != $hist['version']) {

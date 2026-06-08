@@ -988,8 +988,16 @@ class Services_Comment_Controller
             $diffInfo = [];
 
             foreach ($history['data'] as $info) {
-                $field_info = $trackerLib->get_field_info($info['fieldId']);
-                $info['fieldName'] = $field_info['name'];
+                $fieldId = (int) $info['fieldId'];
+                if ($fieldId === HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE) {
+                    $info['fieldName'] = tr('Status');
+                } else {
+                    $field_info = $trackerLib->get_field_info($fieldId);
+                    if (! $field_info) {
+                        continue;
+                    }
+                    $info['fieldName'] = $field_info['name'];
+                }
                 $diffInfo[] = $info;
             }
         }
