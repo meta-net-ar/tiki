@@ -371,9 +371,16 @@ if (
                 $user = $requestedUser;
             }
         } catch (TwoFactorAuthException $e) {
-            Feedback::error($e->getMessage());
-            unset($_SESSION['tiki_creds_username'], $_SESSION['tiki_creds_password']);
-            header('Location: ' . $base_url . 'tiki-login_scr.php');
+            // Stay on the 2FA token form and show the message inline (e.g. an empty
+            // or expired code) instead of a dead-end error page, keeping the
+            // credentials so the user can enter a code and retry.
+            $smarty->assign('showTwoFactorForm', 'y');
+            $_SESSION['tiki_creds_username'] = $_REQUEST['user'];
+            $_SESSION['tiki_creds_password'] = $_REQUEST['pass'];
+            $smarty->assign('create2FaCodeNormalLogin', 'y');
+            $smarty->assign('error_login', $e->getMessage());
+            $smarty->assign('mid', 'tiki-login.tpl');
+            $smarty->display('tiki.tpl');
             exit;
         }
     }
