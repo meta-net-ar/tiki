@@ -231,7 +231,8 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                 $itemData = $this->getItemData();                   // calculated field types like auto-increment need rendering
                 $definition = $this->getTrackerDefinition();
                 $factory = $definition->getFieldFactory();
-                $field_info = $definition->getField($this->getOption('fieldIdForPagename'));
+                $pagenameFieldId = $this->getOption('fieldIdForPagename');
+                $field_info = $pagenameFieldId ? $definition->getField($pagenameFieldId) : null;
                 if ($field_info) {
                     $handler = $factory->getHandler($field_info, $itemData);
                     $page_name = $handler->renderOutput(['list_mode' => 'csv']);
@@ -371,6 +372,17 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
     public function renderOutput($context = [])
     {
         return $this->attemptParse($this->getConfiguration('page_data'));
+    }
+
+    /**
+     * Render the field value as plain text.
+     * @param mixed $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $data = $this->getFieldData();
+        return $this->attemptParse($data['page_data']);
     }
 
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)

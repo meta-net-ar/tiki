@@ -1,14 +1,14 @@
 <div id="testingstatus" style="display:none">{$field.status|escape}</div>
 {$myId = $field.fieldId|escape|cat:'_'|cat:$item.itemId|escape}
 <h5 id="showtikiorg{$myId}{if isset($context.list_mode)}_view{/if}" class="showactive{$myId}" {if $field.status neq 'ACTIV'}style="display: none;"{/if}>
-    {tr}This bug has been demonstrated on {$field.options_map.domain|escape}{/tr}
+    {tr _0=$field.options_map.domain|escape}This bug has been demonstrated on %0{/tr}
 </h5>
 <h5 class="shownone{$myId}" {if $field.status neq 'NONE'}style="display: none;"{/if}>
-    {tr}Please demonstrate your bug on {$field.options_map.domain|escape}{/tr}
+    {tr _0=$field.options_map.domain|escape}Please demonstrate your bug on %0{/tr}
 </h5>
 {if !$field.id}
     {remarksbox type="info" title="{tr}Bug needs to be created first{/tr}" close="n"}
-        <p>{tr}You will be able to demonstrate your bug on a {$field.options_map.domain|escape} instance once it has been created.{/tr}</p>
+        <p>{tr _0=$field.options_map.domain|escape}You will be able to demonstrate your bug on a %0 instance once it has been created.{/tr}</p>
     {/remarksbox}
 {else}
     <div class="showsnapshot{$myId}" style="display: none;">
@@ -35,12 +35,12 @@
     </div>
     <div class="showinvalidkeys{$myId}" {if $field.status neq 'INVKEYS'}style="display: none;"{/if}>
         {remarksbox type="error" title="{tr}Show.tiki.org is not configured properly{/tr}" close="n"}
-            <p>{tr}The public/private keys configured to connect to {$field.options_map.domain|escape} were not accepted. Please make sure you are using RSA keys. Thanks.{/tr}</p>
+            <p>{tr _0=$field.options_map.domain|escape}The public/private keys configured to connect to %0 were not accepted. Please make sure you are using RSA keys. Thanks.{/tr}</p>
         {/remarksbox}
     </div>
     <div class="showdisconnected{$myId}" {if $field.status neq 'DISCO'}style="display: none;"{/if}>
         {remarksbox type="error" title="{tr}Show.tiki.org is currently unavailable{/tr}" close="n"}
-            <p>{tr}Unable to connect to {$field.options_map.domain|escape}. Please let us know of the problem so that we can do something about it. Thanks.{/tr}</p>
+            <p>{tr _0=$field.options_map.domain|escape}Unable to connect to %0. Please let us know of the problem so that we can do something about it. Thanks.{/tr}</p>
         {/remarksbox}
     </div>
     <div class="showmaint{$myId}" {if $field.status neq 'MAINT'}style="display: none;"{/if}>
@@ -49,8 +49,8 @@
         {/remarksbox}
     </div>
     <div class="showfail{$myId}" {if $field.status neq 'FAIL'}style="display: none;"{/if}>
-        {remarksbox type="error" title="{tr}Unable to get information from {$field.options_map.domain|escape}{/tr}" close="n"}
-            <p>{tr}Unable to get information from {$field.options_map.domain|escape}. Please let us know of the problem so that we can do something about it. Thanks.{/tr}</p>
+        {remarksbox type="error" title="{tr _0=$field.options_map.domain|escape}Unable to get information from %0{/tr}" close="n"}
+            <p>{tr _0=$field.options_map.domain|escape}Unable to get information from %0. Please let us know of the problem so that we can do something about it. Thanks.{/tr}</p>
         {/remarksbox}
     </div>
     <div class="showbuilding{$myId}" {if $field.status neq 'BUILD'}style="display: none;"{/if}>
@@ -59,8 +59,8 @@
         {/remarksbox}
     </div>
     <div class="shownone{$myId}" {if $field.status neq 'NONE' or not $user}style="display: none;"{/if}>
-        {remarksbox type="info" title="{tr}About {$field.options_map.domain|escape}{/tr}" close="n"}
-            <p>{tr}To help developers solve the bug, we kindly request that you demonstrate your bug on a {$field.options_map.domain|escape} instance. To start, simply select a version and click on "Create {$field.options_map.domain|escape} instance". Once the instance is ready (in a minute or two), as indicated in the status window below, you can then access that instance, login (the initial admin username/password is "admin") and configure the Tiki to demonstrate your bug. Priority will be given to bugs that have been demonstrated on {$field.options_map.domain|escape}.{/tr}</p>
+        {remarksbox type="info" title="{tr _0=$field.options_map.domain|escape}About %0{/tr}" close="n"}
+            <p>{tr _0=$field.options_map.domain|escape}To help developers solve the bug, we kindly request that you demonstrate your bug on a %0 instance. To start, simply select a version and click on "Create %0 instance". Once the instance is ready (in a minute or two), as indicated in the status window below, you can then access that instance, login (the initial admin username/password is "admin") and configure the Tiki to demonstrate your bug. Priority will be given to bugs that have been demonstrated on %0.{/tr}</p>
         {/remarksbox}
         {tr}Version:{/tr}
         <select name="gitbranch" class="form-control">
@@ -68,11 +68,11 @@
                 <option{if $field.version eq $version} selected="selected"{/if}>{$version|escape}</option>
             {/foreach}
         </select>
-        {button href="#showtikiorg{$myId}{if isset($context.list_mode)}_view{/if}" _onclick="showtikiorg_process{$myId}('create');" _text="{tr}Create {$field.options_map.domain|escape} instance{/tr}"}
+        {button href="#showtikiorg{$myId}{if isset($context.list_mode)}_view{/if}" _onclick="showtikiorg_process{$myId}('create');" _text="{tr _0=$field.options_map.domain|escape}Create %0 instance{/tr}"}
     </div>
     <div class="showactive{$myId}" {if $field.status neq 'ACTIV'}style="display: none;"{/if}>
         {remarksbox type="info" title="{tr}Accessing the Tiki instance that demonstrates this bug{/tr}" close="n"}
-            <p>{tr _0="<a class=\"showurl{$myId}\" href=\"http://{$field.showurl|escape}\" target=\"_blank\">http://{$field.showurl|escape}</a>"}The URL for the {$field.options_map.domain|escape} instance that demonstrates this bug is at: %0.{/tr}
+            <p>{tr _0="<a class=\"showurl{$myId}\" href=\"http://{$field.showurl|escape}\" target=\"_blank\">http://{$field.showurl|escape}</a>" _1=$field.options_map.domain|escape}The URL for the %1 instance that demonstrates this bug is at: %0.{/tr}
                 <strong>{tr}Note that if you get a popup asking for a username/password, please just enter "show" and "show". This is different from the initial login and password for a new Tiki which is "admin" and "admin".{/tr}</strong>
             </p>
             <p>{tr _0="<a class=\"showlogurl{$myId}\" href=\"http://{$field.showlogurl|escape}\" target=\"_blank\">http://{$field.showlogurl|escape}</a>"}For the install log, see %0{/tr}</p>
@@ -81,7 +81,7 @@
             </p>
         {/remarksbox}
         {remarksbox type="info" title="{tr}Snapshots{/tr}" close="n"}
-            <p>{tr}Snapshots are database dumps of the configuration that developers can download for debugging. Once you have reproduced your bug on the {$field.options_map.domain|escape} instance, create a snapshot that can then be downloaded by developers for further investigation.{/tr}</p>
+            <p>{tr _0=$field.options_map.domain|escape}Snapshots are database dumps of the configuration that developers can download for debugging. Once you have reproduced your bug on the %0 instance, create a snapshot that can then be downloaded by developers for further investigation.{/tr}</p>
             <p>{tr _0="<a class=\"snapshoturl{$myId}\" href=\"http://{$field.snapshoturl|escape}\" target=\"_blank\">http://{$field.snapshoturl|escape}</a>"}Snapshots can be accessed at: %0.{/tr}
                 <strong>{tr}Note that if you get a popup asking for a username/password, please just enter "show" and "show".{/tr}</strong>
             </p>

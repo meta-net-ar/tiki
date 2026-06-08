@@ -36,7 +36,7 @@ describe("Autocomplete remote helper functions", () => {
 
                 fetchSuggestions(query, callback, sourceRemoteUrl, sourceList);
 
-                await window.happyDOM.waitUntilComplete();
+                await new Promise((resolve) => setTimeout(resolve, 0));
 
                 expect(callback).toHaveBeenCalledWith(expectedCallbackArg);
             }
@@ -49,7 +49,7 @@ describe("Autocomplete remote helper functions", () => {
 
             fetchSuggestions("foo", callback);
 
-            expect(console.error).toHaveBeenCalledWith("Either sourceRemoteUrl or sourceList must be provided to fetch suggestions");
+            expect(console.error).toHaveBeenCalledWith("Either sourceRemoteUrl or sourceList must be provided to fetch suggestions"); // eslint-disable-line no-console
             expect(callback).not.toHaveBeenCalled();
         });
 

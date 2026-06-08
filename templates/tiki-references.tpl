@@ -12,7 +12,7 @@
         <h2>{tr}References{/tr}</h2>
         <form method="get" class="small" action="tiki-references.php">
             <div class="tiki-form-group row">
-                <label class="col-form-label col-sm-4" for="find">{tr}Find{/tr}</label>
+                <label class="col-form-label col-sm-4" for="find">{tr}Search{/tr}</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control form-control-sm" id="find" name="find" value="{$find|escape}">
                 </div>
@@ -25,7 +25,7 @@
             </div>
             <div class="tiki-form-group row">
                 <div class="col-sm-8 offset-sm-4">
-                    <input type="submit" class="btn btn-primary btn-sm" value="{tr}Find{/tr}" name="search">
+                    <input type="submit" class="btn btn-primary btn-sm" value="{tr}Search{/tr}" name="search">
                 </div>
             </div>
         </form>

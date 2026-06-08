@@ -154,6 +154,9 @@ class HeaderLib
     private ?string $outputHeadersWasStartedBy = null;
     private ?string $outputStaticJSFooterWasStartedBy = null;
 
+    /** Tracks if `add_map` has been called, only needed once */
+    private bool $mapAdded = false;
+
     private $outputHasBeenCalledCount = 0;
 
     public function __construct()
@@ -220,6 +223,208 @@ class HeaderLib
     public function set_title($string)
     {
         $this->title = urlencode($string);
+    }
+
+    /**
+     * Add security headers. By default these headers are not sent.
+     * To change go to admin > security > site access
+     */
+    public function addSecurityHeaders()
+    {
+        global $prefs;
+
+        if (! headers_sent()) {
+            if (! isset($prefs['http_header_frame_options'])) {
+                $frame = false;
+            } else {
+                $frame = $prefs['http_header_frame_options'];
+            }
+            if (! isset($prefs['http_header_xss_protection'])) {
+                $xss = false;  // prevent smarty E_NOTICE
+            } else {
+                $xss = $prefs['http_header_xss_protection'];
+            }
+
+            if (! isset($prefs['http_header_content_type_options'])) {
+                $content_type_options = false;  // prevent smarty E_NOTICE
+            } else {
+                $content_type_options = $prefs['http_header_content_type_options'];
+            }
+            if (! isset($prefs['http_header_access_control_allow_credentials'])) {
+                $access_control_allow_credentials = false;
+            } else {
+                $access_control_allow_credentials = $prefs['http_header_access_control_allow_credentials'];
+            }
+            if (! isset($prefs['http_header_access_control_allow_methods'])) {
+                $access_control_allow_methods = false;
+            } else {
+                $access_control_allow_methods = $prefs['http_header_access_control_allow_methods'];
+            }
+            if (! isset($prefs['http_header_access_control_allow_headers'])) {
+                $access_control_allow_headers = false;
+            } else {
+                $access_control_allow_headers = $prefs['http_header_access_control_allow_headers'];
+            }
+            if (! isset($prefs['http_header_cross_origin_embedder_policy'])) {
+                $cross_origin_embedder_policy = false;
+            } else {
+                $cross_origin_embedder_policy = $prefs['http_header_cross_origin_embedder_policy'];
+            }
+            if (! isset($prefs['http_header_cross_origin_resource_policy'])) {
+                $cross_origin_resource_policy = false;
+            } else {
+                $cross_origin_resource_policy = $prefs['http_header_cross_origin_resource_policy'];
+            }
+            if (! isset($prefs['http_header_cross_origin_opener_policy'])) {
+                $cross_origin_opener_policy = false;
+            } else {
+                $cross_origin_opener_policy = $prefs['http_header_cross_origin_opener_policy'];
+            }
+            if (! isset($prefs['http_header_content_security_policy'])) {
+                $content_security_policy = false;  // prevent smarty E_NOTICE
+            } else {
+                $content_security_policy = $prefs['http_header_content_security_policy'];
+            }
+
+            if (! isset($prefs['http_header_strict_transport_security'])) {
+                $strict_transport_security = false;  // prevent smarty E_NOTICE
+            } else {
+                $strict_transport_security = $prefs['http_header_strict_transport_security'];
+            }
+
+            if (! isset($prefs['http_header_public_key_pins'])) {
+                $public_key_pins = false;  // prevent smarty E_NOTICE
+            } else {
+                $public_key_pins = $prefs['http_header_public_key_pins'];
+            }
+
+            if (! isset($prefs['http_header_referrer_policy'])) {
+                $referrer_policy = false;
+            } else {
+                $referrer_policy = $prefs['http_header_referrer_policy'];
+            }
+
+            if (! isset($prefs['http_header_permitted_cross_domain_policies'])) {
+                $permitted_cross_domain_policies = false;
+            } else {
+                $permitted_cross_domain_policies = $prefs['http_header_permitted_cross_domain_policies'];
+            }
+
+            if ($frame == 'y') {
+                    $header_value = $prefs['http_header_frame_options_value'];
+                    header('X-Frame-Options: ' . $header_value);
+            }
+            if ($xss == 'y') {
+                    $header_value = $prefs['http_header_xss_protection_value'];
+                    header('X-XSS-Protection: ' . $header_value);
+            }
+            if ($content_type_options == 'y') {
+                header('X-Content-Type-Options: nosniff');
+            }
+            if ($access_control_allow_credentials === 'y') {
+                header('Access-Control-Allow-Credentials: true');
+            }
+            if ($access_control_allow_methods === 'y') {
+                $header_value = trim($prefs['http_header_access_control_allow_methods_value']);
+                if ($access_control_allow_credentials === 'y' && $header_value === '*') {
+                    Feedback::error(tr("CORS configuration error: Wildcard (*) is not allowed for Access-Control-Allow-Methods when http_header_access_control_allow_credential is enabled"));
+                    header_remove('Access-Control-Allow-Methods');
+                } else {
+                    header('Access-Control-Allow-Methods: ' . $header_value);
+                }
+            }
+            if ($access_control_allow_headers === 'y') {
+                $headers_value = trim($prefs['http_header_access_control_allow_headers_value']);
+                if ($access_control_allow_credentials === 'y' && $headers_value === '*') {
+                    Feedback::error(tr("CORS configuration error: Wildcard (*) is not allowed for Access-Control-Allow-Headers when Access-Control-Allow-Credentials is enabled."));
+                    header_remove('Access-Control-Allow-Headers');
+                } else {
+                    header('Access-Control-Allow-Headers: ' . $headers_value);
+                }
+            }
+            if ($cross_origin_embedder_policy === 'y') {
+                switch (trim($prefs['http_header_cross_origin_embedder_policy_value'])) {
+                    case 'require-corp':
+                        header('Cross-Origin-Embedder-Policy: require-corp');
+                        break;
+                    case 'credentialless':
+                        header('Cross-Origin-Embedder-Policy: credentialless');
+                        break;
+                    case 'unsafe-none':
+                        header('Cross-Origin-Embedder-Policy: unsafe-none');
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if ($cross_origin_resource_policy === 'y') {
+                switch (trim($prefs['http_header_cross_origin_resource_policy_value'])) {
+                    case 'same-origin':
+                        header('Cross-Origin-Resource-Policy: same-origin');
+                        break;
+                    case 'same-site':
+                        header('Cross-Origin-Resource-Policy: same-site');
+                        break;
+                    case 'cross-origin':
+                        header('Cross-Origin-Resource-Policy: cross-origin');
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if ($cross_origin_opener_policy === 'y') {
+                switch (trim($prefs['http_header_cross_origin_opener_policy_value'])) {
+                    case 'same-origin':
+                        header('Cross-Origin-Opener-Policy: same-origin');
+                        break;
+                    case 'same-origin-allow-popups':
+                        header('Cross-Origin-Opener-Policy: same-origin-allow-popups');
+                        break;
+                    case 'same-origin-plus-coep':
+                        header('Cross-Origin-Opener-Policy: same-origin-plus-coep');
+                        break;
+                    case 'unsafe-none':
+                        header('Cross-Origin-Opener-Policy: unsafe-none');
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if ($content_security_policy == 'y') {
+                $header_value = trim($prefs['http_header_content_security_policy_value']);
+                if ($header_value !== '') {
+                    header('Content-Security-Policy: ' . $header_value);
+                }
+            }
+
+            if ($strict_transport_security == 'y') {
+                $header_value = trim($prefs['http_header_strict_transport_security_value']);
+                if ($header_value !== '') {
+                    header('Strict-Transport-Security: ' . $header_value);
+                }
+            }
+
+            if ($public_key_pins == 'y') {
+                $header_value = trim($prefs['http_header_public_key_pins_value']);
+                if ($header_value !== '') {
+                    header('Public-Key-Pins: ' . $header_value);
+                }
+            }
+
+            if ($referrer_policy === 'y') {
+                $header_value = trim($prefs['http_header_referrer_policy_value']);
+                if ($header_value !== '') {
+                    header('Referrer-Policy: ' . $header_value);
+                }
+            }
+
+            if ($permitted_cross_domain_policies === 'y') {
+                $header_value = trim($prefs['http_header_permitted_cross_domain_policies_value']);
+                if ($header_value !== '') {
+                    header('X-Permitted-Cross-Domain-Policies: ' . $header_value);
+                }
+            }
+        }
     }
 
     /**
@@ -770,7 +975,7 @@ class HeaderLib
             $topMsg .= "\n/* list of files for rank:$rank */\n";
 
             if (isset($jsfiles[$rank])) {
-                $topMsg .= '/* ' . print_r($jsfiles[$rank], true) . ' */' . "\n";
+                $topMsg .= '/* ' . print_r($jsfiles[$rank], true) . ' */' . "\n"; // @phpstan-ignore disallowedFunctions.printR (returns JS file list as string embedded in a CSS comment, never prints)
                 foreach ($jsfiles[$rank] as $f) {
                     // important - some scripts like vendor_bundled/vendor/jquery/plugins/async/jquery.async.js do not terminate their last bits with a ';'
                     // this is bad practise and that causes issues when putting them all in one file!
@@ -1275,6 +1480,12 @@ class HeaderLib
 
     public function add_map()
     {
+        if ($this->mapAdded) {
+            return $this;
+        }
+
+        $this->mapAdded = true;
+
         global $prefs;
 
         $tikilib = TikiLib::lib('tiki');
@@ -1313,21 +1524,20 @@ window.onload = loadScript;');
         }
         */
 
+        $mapsJs = "\$(\".map-container:not(.done)\").addClass(\"done\").visible(function() {\$(this).createMap();});\n";
+
+        // Set the zoom option after searching for a location
+        $zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
+        $mapsJs .= 'var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . "\";\n";
+
         $this->add_jsfile_external(OL_PATH . '/dist/ol.js', true)
             ->add_cssfile(OL_PATH . '/ol.css')
             ->add_jsfile_external(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.js')
             ->add_cssfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.css')
-            ->add_js(
-                ''
-            );
+            ->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js")
+            ->add_js($mapsJs);
 
-        $this->add_js(
-            '$(".map-container:not(.done)")
-                .addClass("done")
-                .visible(function() {
-                    $(this).createMap();
-            });'
-        );
+        $this->mapAdded = true;
 
         return $this;
     }

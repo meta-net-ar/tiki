@@ -1,7 +1,7 @@
 <div{if !empty($field.options_map.labelasplaceholder)} class="input-group"{/if}>
     <input type="email" name="{$field.ins_id}" id="{$field.ins_id}" value="{$field.value|escape}"
         class="form-control{if !empty($field.options_map.labelasplaceholder)} labelasplaceholder{/if}"
-        {if !empty($field.options_map.labelasplaceholder)}placeholder="{tr}{$field.name}{/tr}"{/if}
+        {if !empty($field.options_map.labelasplaceholder)}placeholder="{$field.name|tra|escape:'htmlattr'}"{/if}
     >
     {if $field.options_map.labelasplaceholder and $field.isMandatory eq 'y'}
         <span class="input-group-text">

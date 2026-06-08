@@ -26,7 +26,7 @@
         <div class="d-flex justify-content-center">
             <form action="tiki-directory_search.php" method="post" class="d-flex align-items-center w-70">
                 <input type="hidden" name="parent" value="{$parent|escape}">
-                <label for="how" class="mb-0 mr-2">{tr}Find:{/tr}</label>
+                <label for="how" class="mb-0 mr-2">{tr}Search:{/tr}</label>
                 <div class="mx-2"></div>
                 <select name="how" id="how" class="form-select form-select-sm mx-2">
                     <option value="or">{tr}any{/tr}</option>

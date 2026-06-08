@@ -54,7 +54,7 @@ class BarcodeScanner {
                 this.selectedCameraId = $(`#camera-select-${this.fieldId}`).find(":selected").val();
             });
         } catch (err) {
-            console.error(err);
+            console.error(err); // eslint-disable-line no-console
             if (err.name === "NotAllowedError") {
                 this.showStatus("error", "Site does not have camera permissions. Please ensure camera permissions are granted.");
             } else {

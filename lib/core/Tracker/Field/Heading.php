@@ -63,7 +63,7 @@ class Tracker_Field_Heading extends \Tracker\Field\AbstractItemField implements 
     public function renderOutput($context = [])
     {
         if (isset($context['list_mode']) && $context['list_mode'] === 'csv') {
-            return;
+            return "";
         }
         global $prefs;
         $headerlib = TikiLib::lib('header');
@@ -132,6 +132,11 @@ class Tracker_Field_Heading extends \Tracker\Field\AbstractItemField implements 
             . $data_toggle . ' style="display:none;"></span>';
 
         return $html;
+    }
+
+    public function renderText($context = [])
+    {
+        return tra($this->getConfiguration('name'));
     }
 
     public function importRemote($value)

@@ -92,15 +92,15 @@
 
 <form method="post" action="tiki-browse_categories.php" class="d-flex flex-row flex-wrap align-items-center">
     <div class="mb-3 d-flex mx-0">
-        <label class="col-form-label sr-only" for="find">{tr}Find{/tr}</label>
+        <label class="col-form-label sr-only" for="find">{tr}Search{/tr}</label>
         <div class="input-group">
             <span class="input-group-text">
                 {icon name="search"} {if $parentId ne 0}{$p_info.name|escape} {/if}
             </span>
             <input class="form-control input-sm" type="text" name="find" id="find" value="{$find|escape}">
-            <input type="submit" class="btn btn-info" value="{tr}Find{/tr}" name="search">
+            <input type="submit" class="btn btn-info" value="{tr}Search{/tr}" name="search">
         </div>
-        <span class="form-text" style="display:inline-block; margin: 0;">{help url="#" desc="{tr}Find in:{/tr} <ul><li>{tr}Name{/tr}</li><li>{tr}Description{/tr}</li></ul>"}</span>
+        <span class="form-text" style="display:inline-block; margin: 0;">{help url="#" desc="{tr}Search in:{/tr} <ul><li>{tr}Name{/tr}</li><li>{tr}Description{/tr}</li></ul>"}</span>
     </div>
     <div class="mb-3 d-flex mx-0">
         <div class="form-check">

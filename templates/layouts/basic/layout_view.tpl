@@ -20,8 +20,15 @@
 <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std d-flex min-vh-100 flex-column my-0">
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
         <div class="row">
-            <header class="page-header w-100 navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant}" id="page-header" role=banner>
-                {modulelist zone=top class="top_modules navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent  tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}'}
+            {******************************************************************* SITE HEADER STRUCTURE******************************************************************}
+            <header class="site-header" id="site-header" role="banner">
+                <nav class="{block name=navClasses}navbar w-100 navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar{/block}"
+                     id="main-navbar"
+                     role="navigation"
+                     aria-label="{tr}Main navigation{/tr}">
+
+                    {modulelist zone=top class="top_modules bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant} container-fluid" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
+                </nav>
             </header>
         </div>
     {/if}

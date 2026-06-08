@@ -7,14 +7,6 @@
 function prefs_recaptcha_list()
 {
     return  [
-        'recaptcha_enabled' => [
-            'name' => tra('Use reCAPTCHA'),
-            'description' => tra('Use reCAPTCHA, a specialized captcha service, instead of default CAPTCHA'),
-            'hint' => tra('You will need to register at [http://www.google.com/recaptcha]'),
-            'help' => 'Spam-protection',
-            'type' => 'flag',
-            'default' => 'n',
-        ],
         'recaptcha_pubkey' => [
             'name' => tra('Site key'),
             'type' => 'text',

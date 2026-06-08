@@ -1153,8 +1153,6 @@ class ParserLib extends TikiDb_Bridge
     //*
     protected function plugin_apply_filters($name, &$data, &$args)
     {
-        $tikilib = TikiLib::lib('tiki');
-
         $info = $this->plugin_info($name, $args);
 
         $default = TikiFilter::get($info['defaultfilter'] ?? 'xss');
@@ -1205,17 +1203,8 @@ class ParserLib extends TikiDb_Bridge
                     $argValue = TikiLib::htmldecode($argValue);
                 }
 
-                if (isset($paramInfo['separator'])) {
-                    if ($argValue !== null) {
-                        $vals = [];
-                        $vals = $tikilib->array_apply_filter($tikilib->multi_explode($paramInfo['separator'], $argValue), $filter);
-                        $argValue = array_values($vals);
-                    }
-                    // If $argValue is null, leave it as null (don't process separator)
-                } else {
-                    if ($argValue !== null) {
-                        $argValue = $filter->filter($argValue);
-                    }
+                if ($argValue !== null && ! isset($paramInfo['separator'])) {
+                    $argValue = $filter->filter($argValue);
                 }
             }
         }
@@ -1523,7 +1512,26 @@ class ParserLib extends TikiDb_Bridge
         if ($this->core_options) {
             $option = array_merge($this->option, $option);
         }
-        return (new WikiParser_Parsable($data))->parse($option, empty($this->core_options));
+
+        // Set context flag for translations to auto-detect wiki parsing context
+        // This is passed via parser params so plugins and blocks can access it
+        // even when Smarty is not available
+        $option['wiki_parse_context'] = true;
+
+        // Save the previous state so we can restore it after parsing
+        $previousWikiContext = $this->option['wiki_parse_context'] ?? false;
+
+        $result = (new WikiParser_Parsable($data))->parse($option, empty($this->core_options));
+
+        // Restore the previous wiki_parse_context state to prevent it from leaking
+        // into non-wiki contexts (like menu rendering)
+        if ($previousWikiContext) {
+            $this->option['wiki_parse_context'] = true;
+        } else {
+            unset($this->option['wiki_parse_context']);
+        }
+
+        return $result;
     }
 
     /**

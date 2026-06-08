@@ -51,6 +51,7 @@ class UpdateCommand extends Command
         $checkIfUpdated = $input->getOption('check-if-updated');
         $userEmail = $input->getOption('email');
         $installer = Installer::getInstance();
+        $installer->autoRegister = $autoRegister;
         $installed = $installer->tableExists('users_users');
 
         if ($installed) {
@@ -70,7 +71,7 @@ class UpdateCommand extends Command
                         $isEmailSent = $mail->send([$userEmail]);
                         if (! $isEmailSent) {
                             $msg = 'Unable to send mail';
-                            $mailerrors = print_r($mail->errors, true);
+                            $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string, never prints)
                             $msg .= $mailerrors;
                             $output->writeln('<error>' . $msg . '</error>');
                         }
@@ -113,7 +114,7 @@ class UpdateCommand extends Command
             if (count($installer->queries['failed']) > 0) {
                 $output->writeln('<warning>Queries executed unsuccessfully: ' . count($installer->queries['failed']) . '</warning>');
                 foreach ($installer->queries['failed'] as $error) {
-                    list( $query, $message, $patch ) = $error;
+                    list($query, $message, $patch) = $error;
                     if (! $patch) {
                         // Installer::query() does not set a meaningful third element when the error is caused by a PHP script. Needs some architectural work to solve properly
                         $patch = 'unknown patch script';

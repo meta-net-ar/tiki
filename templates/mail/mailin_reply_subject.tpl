@@ -1,1 +1,1 @@
-{tr}Tiki mail-in auto-reply:{/tr} {tr}{$prefs.mail_template_custom_text}page not found{/tr}
+{tr}Tiki mail-in auto-reply:{/tr} {tr _0=$prefs.mail_template_custom_text}%0page not found{/tr}

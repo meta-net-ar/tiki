@@ -7,6 +7,22 @@
 function prefs_captcha_list()
 {
     return  [
+        'captcha_type' => [
+            'name' => tra('CAPTCHA type'),
+            'description' => tra('Choose which CAPTCHA implementation is active.'),
+            'help' => 'Spam-protection',
+            'type' => 'list',
+            'options' => [
+                'default' => tra('Classic CAPTCHA'),
+                'questions' => tra('Custom Questions CAPTCHA'),
+                'recaptcha' => tra('Google reCAPTCHA'),
+                'altcha' => tra('Altcha CAPTCHA'),
+            ],
+            'dependencies' => [
+                'feature_antibot',
+            ],
+            'default' => 'default',
+        ],
         'captcha_wordLen' => [
             'name' => tra('CAPTCHA image word length'),
             'description' => tra('Number of characters the CAPTCHA will display.'),
@@ -35,15 +51,6 @@ function prefs_captcha_list()
             'type' => 'text',
             'default' => 100,
         ],
-        'captcha_questions_active' => [
-            'name' => tra('CAPTCHA questions'),
-            'description' => tra('Requires anonymous visitors to enter the answer to a question.'),
-            'type' => 'flag',
-            'dependencies' => [
-                'feature_antibot',
-            ],
-            'default' => 'n',
-        ],
         'captcha_questions' => [
             'name' => tra('CAPTCHA questions and answers'),
             'description' => tra('Add some simple questions that only humans should be able to answer, in the format: "Question?: Answer" with one per line'),
@@ -51,7 +58,7 @@ function prefs_captcha_list()
             'type' => 'textarea',
             'size' => 6,
             'dependencies' => [
-                'captcha_questions_active',
+                'feature_antibot',
             ],
             'default' => '',
         ],

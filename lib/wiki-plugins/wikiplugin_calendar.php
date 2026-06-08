@@ -85,6 +85,8 @@ function wikiplugin_calendar($data, $params)
     $tikilib = TikiLib::lib('tiki');
     $calendarlib = TikiLib::lib('calendar');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_calendar_info());
+
     if (is_null($params['calIds'])) {
         $params['calIds'] = [1];
     }
@@ -114,6 +116,11 @@ function wikiplugin_calendar($data, $params)
         [ 'object' => 'calendarId' ],
         'view_calendar'
     );
+
+    if (empty($rawcals['data'])) {
+        Feedback::error(tra("You do not have permission to view the calendar"));
+        return;
+    }
 
     $focusdate = date("Y-m-d");
     switch ($params['viewmode']) {
@@ -162,19 +169,19 @@ function wikiplugin_calendar($data, $params)
     $smarty->assign('uniqueId', rand());
     if ($calendarInitialParams['canEditAnything']) {
         TikiLib::lib('header')
-            ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
             ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
     }
 
     $checkedCalIds = [];
-    if (is_array($_SESSION['PluginCalendarViewGroups'])) {
+    $pluginCalendarViewGroups = $_SESSION['PluginCalendarViewGroups'] ?? null;
+    if (is_array($pluginCalendarViewGroups)) {
         foreach ($calendars as $calendarId => $calendar) {
-            if (in_array($calendarId, $_SESSION['PluginCalendarViewGroups'])) {
+            if (in_array($calendarId, $pluginCalendarViewGroups)) {
                 $checkedCalIds[] = $calendarId;
             }
         }
-        $displayedcals = $_SESSION['PluginCalendarViewGroups'];
-        $pluginCalendarIds = implode(',', $_SESSION['PluginCalendarViewGroups']);
+        $displayedcals = $pluginCalendarViewGroups;
+        $pluginCalendarIds = implode(',', $pluginCalendarViewGroups);
     } else {
         $displayedcals = $params['calIds'];
         $checkedCalIds = $params['calIds'];

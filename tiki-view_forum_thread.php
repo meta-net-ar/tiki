@@ -49,7 +49,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+
 use Tiki\Sections;
+
 $section = Sections::SECTION_FORUMS;
 Sections::setCurrentSection($section);
 
@@ -80,7 +82,7 @@ $pageCache = Tiki_PageCache::create()
     ->requiresPreference('memcache_forum_output')
     ->addArray($_GET)
     ->addValue('role', 'forum-page-output')
-    ->addKeys($_REQUEST, [ 'locale', 'forumId', 'comments_parentId' ])
+    ->addKeys($_REQUEST, ['locale', 'forumId', 'comments_parentId'])
     ->checkMeta(
         'forum-page-output-meta-time',
         [
@@ -381,6 +383,7 @@ if ($tiki_p_admin_forum == 'y') {
     $smarty->assign('reported', $commentslib->get_num_reported($forumId));
 }
 if ($prefs['feature_freetags'] == 'y') {
+    $freetaglib = TikiLib::lib('freetag');
     $cat_type = 'forum post';
     $cat_objid = $comments_parentId;
     $objectTags = $freetaglib->get_tags_on_object($cat_objid, $cat_type);

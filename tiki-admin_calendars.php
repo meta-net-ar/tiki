@@ -370,9 +370,7 @@ if ($prefs['feature_groupalert'] == 'y') {
 
 
 if ($userlib->user_has_permission($user, 'tiki_p_add_events')) {
-    TikiLib::lib('header')
-         ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
-         ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
+    TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
 }
 
 $smarty->assign('name', $info["name"]);

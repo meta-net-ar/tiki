@@ -46,22 +46,54 @@ class TrackerInput extends Base
             unset($context['field']);
 
             $info = '';
+            $keyNotAccessible = false;
+            $encryptionKeyId = (int)($field['encryptionKeyId'] ?? 0);
             if (! empty($field['encryptionKeyId'])) {
                 try {
                     $key = new \Tiki\Encryption\Key($field['encryptionKeyId']);
-                    $field['value'] = $key->decryptData($handler->getValue());
-                    $info = tr('Field data is encrypted using key "%0".', $key->get('name'));
+                    if (! $key->isKeyAccessible()) {
+                        $field['value'] = '';
+                        $keyNotAccessible = true;
+                        if (! empty($field['isMandatory']) && $field['isMandatory'] === 'y') {
+                            $info = tr('Field "%0" is encrypted. Please enter the key before saving.', $key->get('name'));
+                        } else {
+                            $info = tr('Field "%0" is encrypted. Leave empty or enter the key first to fill it.', $key->get('name'));
+                        }
+                        $info .= ' ' . $key->manualEntry();
+                        $context['disabled'] = true;
+                    } else {
+                        $currentValue = $handler->getValue();
+                        if (! empty($currentValue)) {
+                            $field['value'] = $key->decryptData($currentValue);
+                            if ($field['value'] === false) {
+                                unset($_SESSION['encryption_shared_keys'][$encryptionKeyId]);
+                                $field['value'] = '';
+                                $keyNotAccessible = true;
+                                $info = tr('Decryption failed for field "%0": the entered key is incorrect.', $key->get('name'))
+                                    . ' ' . $key->manualEntry();
+                                $context['disabled'] = true;
+                            }
+                        }
+                        if (! $keyNotAccessible) {
+                            $info = tr('Field data is encrypted using key "%0".', $key->get('name'));
+                        }
+                    }
                 } catch (\Tiki\Encryption\NotFoundException) {
                     return tr('Field is encrypted with a key that no longer exists!');
                 } catch (\Tiki\Encryption\Exception $e) {
                     $field['value'] = '';
-                    $info = tr('Field data is encrypted using key "%0" but where was an error decrypting the data: %1', $key->get('name'), $e->getMessage());
+                    $keyNotAccessible = true;
+                    $info = tr('Field data is encrypted using key "%0" but there was an error: %1', $key->get('name'), $e->getMessage());
                     $info .= ' ' . $key->manualEntry();
+                    $context['disabled'] = true;
                 }
                 $handler = $trklib->get_field_handler($field, $item);
                 $field = array_merge($field, $handler->getFieldData());
                 $handler = $trklib->get_field_handler($field, $item);
-                $info = '<div class="description form-text">' . $info . '</div>';
+                $infoClass = $keyNotAccessible
+                    ? 'encryption-key-required-info description form-text'
+                    : 'description form-text';
+                $info = '<div class="' . $infoClass . '">' . $info . '</div>';
             }
 
             $desc = '';
@@ -77,7 +109,21 @@ class TrackerInput extends Base
                 }
             }
 
-            return $handler->renderInput($context, $params) . $info . $desc;
+            $fieldHtml = $handler->renderInput($context, $params);
+
+            if ($keyNotAccessible) {
+                \TikiLib::lib('header')->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tracker-field-unlock.js');
+                $itemId = (int)($item['itemId'] ?? 0);
+                return '<div class="encrypted-field-wrapper"'
+                    . ' data-encryption-key-id="' . $encryptionKeyId . '"'
+                    . ' data-field-id="' . (int)$field['fieldId'] . '"'
+                    . ' data-item-id="' . $itemId . '"'
+                    . ' data-network-error="' . htmlspecialchars(tr('A network error occurred. Please try entering the key again.'), ENT_QUOTES) . '">'
+                    . $fieldHtml . $info
+                    . '</div>' . $desc;
+            }
+
+            return $fieldHtml . $info . $desc;
         }
     }
 }

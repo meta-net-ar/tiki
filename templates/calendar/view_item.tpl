@@ -228,7 +228,7 @@
         {/if}
     {/if}
     <div class="summary">
-        <span>{tr}Start{/tr} - {tr}End{/tr} : <b>{$calitem.display_datetimes}</b></span>
+        <span>{tr}Start{/tr} - {tr}End{/tr} : <b>{$calitem.display_datetimes}</b>{if $calitem.allday eq '1'} <span class="border p-1 rounded text-secondary fst-italic fs-6">{tr}All-day event{/tr}</span>{/if}</span>
     </div>
     <div class="my-3">
         <b>{tr}Description{/tr}</b><br>

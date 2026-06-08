@@ -29,7 +29,7 @@ class WikiPlugin_Casperjs_Render
         $executionResult .= "<pre>";
         foreach ($result->getScriptResults() as $key => $value) {
             if (! is_string($value)) {
-                $value = print_r($value, true);
+                $value = print_r($value, true); // @phpstan-ignore disallowedFunctions.printR (returns non-string script result as string, never prints)
             }
             $valueToPrint = str_replace('=&gt;', '=>', htmlspecialchars($value));
             if (strlen($valueToPrint) > 200) {

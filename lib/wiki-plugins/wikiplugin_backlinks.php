@@ -89,6 +89,7 @@ class WikiPluginBackLinks extends PluginsLib
         $exclude = $params['exclude'] ?? [];
         $params = $this->getParams($params, true);
         $aInfoPreset = array_keys($this->aInfoPresetNames);
+        $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_backlinks_info());
         extract($params, EXTR_SKIP);
 
         if (is_null($page)) {

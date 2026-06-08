@@ -311,8 +311,8 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                         'legacy_index' => 14,
                     ],
                     'duplicateCascade' => [
-                        'name' => tr('Duplicate cascade action'),
-                        'description' => tr('Duplicate (Duplicate tracker items feature) an item in the master/parent tracker (Tracker to link to) silently creates a slave/child item in this tracker (yes by default).'),
+                        'name' => tr('Cascade duplicate action'),
+                        'description' => tr('Duplicate (Duplicate tracker items feature) an item in the master/parent tracker (Tracker to link to) silently creates a slave/child item in this tracker (No by default).'),
                         'filter' => 'int',
                         'options' => [
                             0 => tr('No'),

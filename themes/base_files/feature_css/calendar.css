@@ -87,11 +87,6 @@
     float: right;
 }
 
-#configlinks {
-    width: 100%;
-    padding: 5px;
-}
-
 #filtercal {
     position: absolute;
     z-index: 9 !important;
@@ -182,9 +177,6 @@ a.next img {
 }
 
 @media (max-width: 767px) {
-    #configlinks {
-        padding: 5px 0;
-    }
     .viewmode div {
         position: relative;
     }

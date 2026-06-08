@@ -188,9 +188,7 @@ function module_calendar_new($mod_reference, $module_params)
     }
 
     if ($calendarInitialParams['canEditAnything']) {
-        TikiLib::lib('header')
-            ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
-            ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
+        TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
     }
 
     foreach ($calIds as $i => $cal_id) {
@@ -200,7 +198,27 @@ function module_calendar_new($mod_reference, $module_params)
     }
 
     if (! empty($calIds)) {
+        $checkedCalIds = [];
+        $moduleCalendarViewGroups = $_SESSION['ModuleCalendarViewGroups'] ?? null;
+        if (is_array($moduleCalendarViewGroups)) {
+            foreach ($calendars as $calendarId => $calendar) {
+                if (in_array($calendarId, $moduleCalendarViewGroups)) {
+                    $checkedCalIds[] = $calendarId;
+                }
+            }
+            $displayedcals = $moduleCalendarViewGroups;
+            $moduleCalendarIds = implode(',', $moduleCalendarViewGroups);
+        } else {
+            $displayedcals = $calIds;
+            $checkedCalIds = $calIds;
+        }
+        // Select only events from checked calendars in list view
+        if (! empty($checkedCalIds)) {
+            $calIds = $checkedCalIds;
+        }
+
         $tc_infos = $calendarlib->getCalendar($calIds, $viewstart, $viewend, 'day', 'events', true);
+
         if ($_REQUEST['viewlistmodule'] == 'list') {
             foreach ($tc_infos['listevents'] as $i => $e) {
                 $tc_infos['listevents'][$i]['head'] = '';
@@ -210,20 +228,6 @@ function module_calendar_new($mod_reference, $module_params)
 
         foreach ($tc_infos as $tc_key => $tc_val) {
             $smarty->assign($tc_key, $tc_val);
-        }
-
-        $checkedCalIds = [];
-        if (is_array($_SESSION['ModuleCalendarViewGroups'])) {
-            foreach ($calendars as $calendarId => $calendar) {
-                if (in_array($calendarId, $_SESSION['ModuleCalendarViewGroups'])) {
-                    $checkedCalIds[] = $calendarId;
-                }
-            }
-            $displayedcals = $_SESSION['ModuleCalendarViewGroups'];
-            $moduleCalendarIds = implode(',', $_SESSION['ModuleCalendarViewGroups']);
-        } else {
-            $displayedcals = $calIds;
-            $checkedCalIds = $calIds;
         }
 
         $smarty->assign('viewnavbar', $module_params['viewnavbar']);

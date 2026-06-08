@@ -90,7 +90,8 @@
 
                     {if !(empty($galleryId) and $propname eq 'lockedby') and ($propname neq 'name'
                         or ( $gal_info.show_name eq 'a' or $gal_info.show_name eq 'n' )) and ($propname neq 'description'
-                        or $gal_info.show_name neq 'n')}
+                        or $gal_info.show_name neq 'n'
+                        or $gal_info.show_description eq 'y' or $gal_info.show_description eq 'a')}
                         {if isset($nbCols)}
                             {$nbCols=$nbCols+1}
                         {else}
@@ -399,7 +400,7 @@
                             {else}
                                 {$propval="<a class='fgalname' $link>$propval</a>"}
                             {/if}
-                            {if $propname eq 'name' and $gal_info.show_name eq 'n' and $gal_info.show_description neq 'n'}
+                            {if $propname eq 'name' and $gal_info.show_name eq 'n' and $gal_info.show_description eq 'o'}
                                 {if $gal_info.max_desc gt 0}
                                     {$desc=$files[changes].description|truncate:$gal_info.max_desc:"...":false|nl2br}
                                 {else}
@@ -504,7 +505,8 @@
                         {else}
                             {if !(empty($galleryId) and $propname eq 'lockedby') and ($propname neq 'name'
                                 or ( $gal_info.show_name eq 'a' or $gal_info.show_name eq 'n' ))
-                                and ($propname neq 'description' or $gal_info.show_name neq 'n')}
+                                and ($propname neq 'description' or $gal_info.show_name neq 'n'
+                                    or $gal_info.show_description eq 'y' or $gal_info.show_description eq 'a')}
                                 <td>{$propval}</td>
                             {/if}
                         {/if}
@@ -537,7 +539,7 @@
                     </td>
                 {/if}
 
-                {if isset($other_columns) and isset($other_columns_selected) and ( $other_columns neq '' or $other_columns_selected neq '' )}
+                {if (isset($other_columns) and $other_columns neq '') or (isset($other_columns_selected) and $other_columns_selected neq '')}
                     <td>
                         {if $show_infos eq 'y'}
                             {if $over_infos eq ''}

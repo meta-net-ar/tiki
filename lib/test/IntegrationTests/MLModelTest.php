@@ -33,7 +33,6 @@ class MLModelTest extends TikiTestCase
         parent::setUpBeforeClass();
         self::$trklib = TikiLib::lib('trk');
         self::$mllib = TikiLib::lib('ml');
-
         // create a tracker and a field
         self::$trackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
         self::assertNotEmpty(self::$trackerId, "Check the tracker was created properly");
@@ -66,13 +65,11 @@ class MLModelTest extends TikiTestCase
 
         $definition = Tracker_Definition::get(self::$trackerId);
         $fields = $definition->getFields();
-
         foreach (self::SAMPLES as $sample) {
             $fields[0]['value'] = $sample;
             $itemId = self::$trklib->replace_item(self::$trackerId, 0, ['data' => $fields], 'o');
             self::$labels[] = self::$trklib->get_isMain_value(self::$trackerId, $itemId);
         }
-
         $mlmId = self::$mllib->set_model(null, [
             'name' => 'MLT',
             'sourceTrackerId' => self::$trackerId,

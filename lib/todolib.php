@@ -111,7 +111,6 @@ class TodoLib
     {
         switch ($todo['objectType']) {
             case 'todo':
-                // echo '<pre>ALREADY';print_r($this->alreadyNotif ($todo['todoId'])); echo '</pre>';
                 $todo['for']['after'] = $todo['after'];
                 $objects = $this->listObjectsTodo($todo['for'], $this->alreadyNotif($todo['todoId']));
 
@@ -122,12 +121,10 @@ class TodoLib
                     }
                     $this->$func($todo, $objects);
                 }
-                // echo '<pre>MAIL';print_r($objects); echo '</pre>';
                 break;
 
             default:
                 $objects = $this->listObjectsTodo($todo);
-                // echo '<pre>';print_r($objects); echo '</pre>';
                 if (! empty($objects)) {
                     $func = 'applyTodo_' . $todo['objectType'];
                     if (! method_exists($this, $func)) {

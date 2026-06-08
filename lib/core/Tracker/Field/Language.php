@@ -79,6 +79,13 @@ class Tracker_Field_Language extends \Tracker\Field\AbstractItemField implements
         );
     }
 
+    public function renderText($context = [])
+    {
+        $selected = $this->getConfiguration('value');
+        $languages = $this->getLanguages();
+        return $languages[$selected] ?? tr('None');
+    }
+
     public function handleSave($value, $oldValue)
     {
         return [

@@ -897,7 +897,7 @@ class Services_User_Controller
                 if (! $mail->send($this->lib->get_user_email($mail_user))) {
                     $errormsg = tra('Unable to send mail');
                     if (Perms::get()->admin) {
-                        $mailerrors = print_r($mail->errors, true);
+                        $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string, never prints)
                         $errormsg .= $mailerrors;
                     }
                     if (TIKI_API) {
@@ -1232,7 +1232,10 @@ class Services_User_Controller
 
     private function redirectAndReturn($data = []): array
     {
-        header("Location:" . $_SERVER['HTTP_REFERER']);
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        if ($referer !== '') {
+            TikiLib::lib('access')->redirect($referer);
+        }
         return $data;
     }
 

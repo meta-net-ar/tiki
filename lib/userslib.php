@@ -1076,7 +1076,6 @@ class UsersLib extends TikiLib
             return USER_VALID;
         } else {
             // Uncomment the following to see errors on that
-            // error_log("TIKI ERROR PAM: $error User: $user Pass: $pass");
             return PASSWORD_INCORRECT;
         }
     }
@@ -1236,11 +1235,13 @@ class UsersLib extends TikiLib
         }
 
         $clicked_on_saml_link = false;
+        $post_auth_redirect = '';
 
         // Check endpoints
         if (array_key_exists('auth', $_REQUEST) && $_REQUEST['auth'] == 'saml') {
             $saml_instance = $this->get_saml_auth();
-            $saml_instance->login();
+            $return_to = $_SESSION['loginfrom'] ?? null;
+            $saml_instance->login($return_to);
         } elseif (array_key_exists('saml_metadata', $_REQUEST)) {
             $samlSettingsInfo = $this->get_saml_settings();
             $saml_settings = new Saml2\Settings($samlSettingsInfo, true);
@@ -1278,11 +1279,8 @@ class UsersLib extends TikiLib
             $_SESSION['samlUserdata'] = $saml_instance->getAttributes();
             $_SESSION['samlNameId'] = $saml_instance->getNameId();
             $_SESSION['samlSessionIndex'] = $saml_instance->getSessionIndex();
-/*
-            if (isset($_POST['RelayState']) && OneLogin_Saml2_Utils::getSelfURL() != $_POST['RelayState']) {
-                $saml_instance->redirectTo($_POST['RelayState']);
-            }
-*/
+
+            $post_auth_redirect = $_POST['RelayState'] ?? '';
         } elseif (array_key_exists('saml_sls', $_REQUEST)) {
             $saml_instance = $this->get_saml_auth();
 
@@ -1308,6 +1306,11 @@ class UsersLib extends TikiLib
 
         if ($clicked_on_saml_link || ($force_saml_login && ! $already_logged_as_admin)) {
             $this->validate_user("", "", "", "");
+
+            if (! empty($post_auth_redirect)) {
+                header('Location: ' . $post_auth_redirect);
+                exit;
+            }
         }
     }
 
@@ -1324,7 +1327,7 @@ class UsersLib extends TikiLib
             $samlSettingsInfo = $this->get_saml_settings();
             $auth = new Saml2\Auth($samlSettingsInfo);
         } catch (Exception $e) {
-            print_r("There is a problem with the SAML settings, review them: " . $e->getMessage());
+            echo "There is a problem with the SAML settings, review them: " . $e->getMessage();
             exit();
         }
 
@@ -1419,7 +1422,6 @@ class UsersLib extends TikiLib
                     'groupgroupattr' => $prefs['auth_ldap_groupgroupattr'],
                     'debug' => $prefs['auth_ldap_debug']
             ];
-            // print_r($ldap_options);
             $this->ldap = new LdapLib($ldap_options);
         }
     }
@@ -7337,6 +7339,8 @@ class UsersLib extends TikiLib
         list($secret, $userId) = explode('.', $cookie, 2);
         $query = 'select `userId` from `tiki_user_login_cookies` where `secret`=? and `userId`=? and `expiration` > NOW()';
 
+        // $userId here is always a string because it comes from a cookie
+        // so cast the integer value from the database to a string also to match
         if ($userId === (string) $this->getOne($query, [$secret, $userId])) {
             return $userId;
         } else {
@@ -8452,7 +8456,7 @@ class UsersLib extends TikiLib
         $user_details = $userlib->get_user_details($user);
         $user_info = $userlib->get_user_info($user);
         $ret['avatarData'] = new XML_RPC_Value($user_info['avatarData'], 'base64');
-        $ret['user_details'] = new XML_RPC_Value(serialize($user_details), 'string');
+        $ret['user_details'] = new XML_RPC_Value(json_encode($user_details), 'string');
         $params[] = new XML_RPC_Value($ret, 'struct');
         $msg = new XML_RPC_Message('intertiki.setUserInfo', $params);
         $result = $client->send($msg);
@@ -8471,13 +8475,13 @@ class UsersLib extends TikiLib
                 if ($key == '') {
                     break;
                 } elseif ($key == 'user_details') {
-                    $user_details = unserialize($value->scalarval());
+                    $user_details = json_decode($value->scalarval(), true);
                 } elseif ($key == 'avatarData') {
                     $avatarData = $value->scalarval();
                 }
             }
         } else {
-            $user_details = unserialize($response_value->scalarval());
+            $user_details = json_decode($response_value->scalarval(), true);
         }
 
         $userlib->set_user_fields($user_details['info']);
@@ -9018,7 +9022,7 @@ class UsersLib extends TikiLib
             if (! $mail->send($email)) {
                 $errormsg = tr('Unable to send mail to invite "%0"', $email);
                 if (Perms::get()->admin) {
-                    $mailerrors = print_r($mail->errors, true);
+                    $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string, never prints)
                     $errormsg .= $mailerrors;
                 }
                 Feedback::error($errormsg);

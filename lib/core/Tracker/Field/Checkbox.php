@@ -94,6 +94,26 @@ class Tracker_Field_Checkbox extends \Tracker\Field\AbstractItemField implements
         }
     }
 
+    /**
+     * Return plain text representation of checkbox
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $fieldData = $this->getFieldData();
+        $value = $fieldData['value'] ?? '';
+
+        if ($value === 'y') {
+            return tra('Yes');
+        } elseif ($value === 'n') {
+            return tra('No');
+        } else {
+            return $value;
+        }
+    }
+
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
     {
         $baseKey = $this->getBaseKey();

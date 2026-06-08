@@ -10,35 +10,7 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 
 if (isset($section) and isset($sections[$section])) {
     $freetaglib = TikiLib::lib('freetag');
-    $here = $sections[$section];
-    if ($tiki_p_freetags_tag == 'y' && isset($_POST['addtags']) && trim($_POST['addtags']) != '') {
-        if (! isset($user)) {
-            $userid = 0;
-        } else {
-            $userid = $userlib->get_user_id($user);
-        }
-
-        if (empty($user) && $prefs['feature_antibot'] == 'y' && ! $captchalib->validate()) {
-            $smarty->assign('freetag_error', $captchalib->getErrors());
-            $smarty->assign_by_ref('freetag_msg', $_POST['addtags']);
-        } elseif ($object = current_object()) {
-            $freetaglib->tag_object($userid, $object['object'], $object['type'], $_POST['addtags']);
-            require_once 'lib/search/refresh-functions.php';
-            refresh_index($object['type'], $object['object']);
-        }
-    }
-
-    if (($tiki_p_admin == 'y' || $tiki_p_unassign_freetags == 'y') && isset($_REQUEST['delTag'])) {
-        if ($object = current_object()) {
-            $freetaglib->delete_object_tag($object['object'], $object['type'], $_REQUEST['delTag']);
-            require_once 'lib/search/refresh-functions.php';
-            refresh_index($object['type'], $object['object']);
-        }
-
-        $url = $tikilib->httpPrefix() . preg_replace('/[?&]delTag=' . preg_quote(urlencode($_REQUEST['delTag']), '/') . '/', '', $_SERVER['REQUEST_URI']);
-        header("Location: $url");
-        die;
-    }
+    $freetaglib->handleCurrentObjectTagRequest();
 
     $tags = [];
     if ($object = current_object()) {

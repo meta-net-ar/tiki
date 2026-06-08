@@ -128,6 +128,14 @@ function getOEmbedData($url)
     if (! filter_var($url, FILTER_VALIDATE_URL)) {
         throw new Exception(tr('The provided URL is not a valid URL.'));
     }
+
+    // Prevent SSRF: the user-supplied URL determines which host the server contacts
+    // for oEmbed discovery. Block private/reserved IPs and non-http(s) schemes.
+    $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+    if (! $ssrf->isUrlAllowed($url)) {
+        throw new Exception(tra('URL is not allowed (targets a private or reserved address).'));
+    }
+
     $parsedUrl = parse_url($url);
     $protocol = $parsedUrl['scheme'];
     $domain = $parsedUrl['host'];
@@ -147,6 +155,6 @@ function getOEmbedData($url)
         return $oEmbedData;
     }
 
-    Feedback::error(tr('Invalid or malformed oEmbed data: %0', print_r($oEmbedData, true)));
+    Feedback::error(tr('Invalid or malformed oEmbed data: %0', print_r($oEmbedData, true))); // @phpstan-ignore disallowedFunctions.printR (returns malformed response as string for error feedback, never prints)
     return false;
 }

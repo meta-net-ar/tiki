@@ -353,6 +353,8 @@
                                             {if $tiki_p_admin_importer eq "y"}
                                                 <a class="dropdown-item" href="tiki-importer.php">
                                                     {icon name="file-import"} <span class="ms-1">{tr}Importer{/tr}</span> </a>
+                                                <a class="dropdown-item" href="tiki-markdown_import.php">
+                                                    {icon name="file-import"} <span class="ms-1">{tr}Markdown Importer{/tr}</span> </a>
                                             {/if}
                                             {if $prefs.feature_integrator eq "y" and $tiki_p_admin_integrator eq "y"}
                                                 <a class="dropdown-item" href="tiki-admin_integrator.php">

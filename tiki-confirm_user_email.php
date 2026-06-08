@@ -8,6 +8,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\BruteForce\BruteForce;
+
 require_once('tiki-setup.php');
 
 if (getenv('REQUEST_METHOD') == 'HEAD') {
@@ -18,6 +20,17 @@ if (getenv('REQUEST_METHOD') == 'HEAD') {
 }
 
 global $tiki_p_admin_users;
+$bruteForce = new BruteForce();
+$bruteForceProperties = function ($requestedUser = null) use ($tikilib) {
+    return ['user' => $requestedUser, 'ip' => $tikilib->get_ip_address()];
+};
+$accountValidationWaitMessage = function (array $properties) use ($bruteForce) {
+    $waitTime = $bruteForce->getWaitTime('account_validation', $properties);
+    if ($waitTime > 60) {
+        return sprintf(tra('Too many account validation attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+    }
+    return sprintf(tra('Too many account validation attempts. Please try again in %d seconds.'), $waitTime);
+};
 
 // Admins can validate users even if preference is not active.
 if ($tiki_p_admin_users !== 'y' && (isset($prefs['email_due']) && $prefs['email_due'] < 0 ) && $prefs['validateUsers'] != 'y') {
@@ -25,7 +38,18 @@ if ($tiki_p_admin_users !== 'y' && (isset($prefs['email_due']) && $prefs['email_
 }
 
 if (isset($_REQUEST['user']) && isset($_REQUEST['pass']) && $access->checkCsrf()) {
+    $accountValidationProperties = $bruteForceProperties($_REQUEST['user']);
+    if (
+        ($prefs['bruteforce_protection'] ?? 'n') === 'y'
+        && ! $bruteForce->isOperationAllowed('account_validation', $accountValidationProperties, false)
+    ) {
+        Feedback::errorAndDie($accountValidationWaitMessage($accountValidationProperties), 429);
+    }
+
     if ($userlib->confirm_email($_REQUEST['user'], $_REQUEST['pass'])) {
+        if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+            $bruteForce->success('account_validation', $accountValidationProperties);
+        }
         if (empty($user)) {
             $_SESSION["$user_cookie_site"] = $user = $_REQUEST['user'];
         }
@@ -43,6 +67,9 @@ if (isset($_REQUEST['user']) && isset($_REQUEST['pass']) && $access->checkCsrf()
         }
         $access->redirect($redirect);
         die;
+    }
+    if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+        $bruteForce->attempt('account_validation', $accountValidationProperties);
     }
 }
 

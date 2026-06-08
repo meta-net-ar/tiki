@@ -25,13 +25,13 @@
 
 {$p.pages}
 
-{if isset($pref_filters) and not $pref_filters.advanced.selected and in_array('advanced', $p.tags)}
-    <span class="badge bg-warning tips" title=":{tr}Change your preference filter settings in order to view advanced preferences by default{/tr}">
+{if isset($pref_filters) and in_array('advanced', $p.tags)}
+    <span class="badge bg-warning tips pref-tag-badge pref-tag-advanced" title=":{tr}Change your preference filter settings in order to view advanced preferences by default{/tr}"{if $pref_filters.advanced.selected} style="display:none"{/if}>
         {tr}advanced{/tr}
     </span>
 {/if}
-{if isset($pref_filters) and not $pref_filters.experimental.selected and in_array('experimental', $p.tags)}
-    <span class="badge bg-danger tips" title=":{tr}Change your preference filter settings in order to view experimental preferences by default{/tr}">
+{if isset($pref_filters) and in_array('experimental', $p.tags)}
+    <span class="badge bg-danger tips pref-tag-badge pref-tag-experimental" title=":{tr}Change your preference filter settings in order to view experimental preferences by default{/tr}"{if $pref_filters.experimental.selected} style="display:none"{/if}>
         {tr}experimental{/tr}
     </span>
 {/if}

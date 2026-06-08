@@ -27,6 +27,7 @@ use PhpXmlRpc\Client as XML_RPC_Client;
 use PhpXmlRpc\Encoder as XML_RPC_Encoder;
 use Services_Utilities;
 use TikiLib;
+use Tiki\Captcha\CaptchaTypeResolver;
 use Tiki\Lib\Registration\Error as RegistrationError;
 
 if (! isset($Debug)) {
@@ -680,7 +681,7 @@ class RegistrationLib extends TikiLib
                 $js_m .= ' "chosenGroup": { required: "' . tra('One of these groups is required') . '"}, ';
             }
 
-            if (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox') && $prefs['feature_antibot'] == 'y' && empty($user) && $prefs['recaptcha_enabled'] != 'y') {
+            if (extension_loaded('gd') && function_exists('imagepng') && function_exists('imageftbbox') && $prefs['feature_antibot'] == 'y' && empty($user) && CaptchaTypeResolver::requiresManualInput($prefs)) {
                 // antibot validation
                 $js .= ',
             "captcha[input]": {

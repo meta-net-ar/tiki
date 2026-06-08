@@ -21,6 +21,7 @@ function prefs_markdown_list()
             'description' => tra('Enable Github-flavored markdown.'),
             'type' => 'flag',
             'default' => 'y',
+            'tags' => ['advanced', 'experimental'],
             'dependencies' => [
                 'markdown_enabled',
             ],
@@ -34,6 +35,7 @@ function prefs_markdown_list()
                 'markdown' => tra('Markdown'),
             ],
             'default' => 'tiki',
+            'tags' => ['advanced', 'experimental'],
             'dependencies' => [
                 'markdown_enabled',
             ],
@@ -45,6 +47,7 @@ function prefs_markdown_list()
             'size' => 5,
             'filter' => 'imgsize',
             'default' => '300px',
+            'tags' => ['advanced', 'experimental'],
             'dependencies' => [
                 'markdown_enabled',
                 'feature_wysiwyg',
@@ -59,6 +62,7 @@ function prefs_markdown_list()
                 'tab' => tra('Tab'),
             ],
             'default' => 'tab',
+            'tags' => ['advanced', 'experimental'],
             'dependencies' => [
                 'markdown_enabled',
                 'feature_wysiwyg',
@@ -73,6 +77,7 @@ function prefs_markdown_list()
                 'markdown' => tra('Markdown'),
             ],
             'default' => 'wysiwyg',
+            'tags' => ['advanced', 'experimental'],
             'dependencies' => [
                 'markdown_enabled',
                 'feature_wysiwyg',
@@ -83,6 +88,7 @@ function prefs_markdown_list()
             'description' => tra('Send hostname to Toast UI.'),
             'type' => 'flag',
             'default' => 'n',
+            'tags' => ['advanced', 'experimental'],
             'dependencies' => [
                 'markdown_enabled',
                 'feature_wysiwyg',

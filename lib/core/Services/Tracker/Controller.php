@@ -493,6 +493,7 @@ class Services_Tracker_Controller
                 'rules' => $rules,
                 'encryptionKeyId' => $input->encryption_key_id->int(),
                 'excludeFromNotification' => $input->exclude_from_notification->int() ? 'y' : 'n',
+                'excludeFromTrackerItemLastModificationDate' => $input->exclude_from_lastmodif->int() ? 'y' : 'n',
                 'visibleInViewMode' => $input->visible_in_view_mode->int() ? 'y' : 'n',
                 'visibleInEditMode' => $input->visible_in_edit_mode->int() ? 'y' : 'n',
                 'visibleInHistoryMode' => $input->visible_in_history_mode->int() ? 'y' : 'n',
@@ -736,17 +737,17 @@ class Services_Tracker_Controller
     {
         // TODO : Eventually, this method should filter according to the actual permissions, but because
         //        it is only to be used for tracker sync at this time, admin privileges are just fine.
-
-        if (! Perms::get()->admin_trackers) {
-            throw new Services_Exception_Denied(tr('Reserved for tracker administrators'));
-        }
-
         $trackerId = $input->trackerId->int();
         $offset = $input->offset->int();
         $maxRecords = $input->maxRecords->int();
         $status = $input->status->word();
         $format = $input->format->word();
         $modifiedSince = $input->modifiedSince->int();
+
+        $perms = Perms::get('tracker', $trackerId);
+        if (! $perms->admin_trackers) {
+            throw new Services_Exception_Denied(tr('Reserved for tracker administrators'));
+        }
 
         $definition = Tracker_Definition::get($trackerId);
 
@@ -2407,30 +2408,51 @@ class Services_Tracker_Controller
                             ];
                         }
                     }
-                    if (TIKI_API) {
-                        $field_value = $field_option[$hist['fieldId']];
+                    // Pre-render field values here in the controller, before Smarty starts rendering the template.
+                    $field_value = $field_option[$hist['fieldId']];
+                    if (! empty($field_value['fieldId']) && $field_value['fieldId'] > 0) {
+                        $emptyTemplate = TikiLib::lib('smarty')->getEmptyInternalTemplate();
                         if (empty($diff_style)) {
-                            if (! empty($field_value['fieldId'])) {
+                            $field_value['value'] = $hist['value'];
+                            $hist['rendered_value'] = smarty_function_trackeroutput([
+                                'field' => $field_value,
+                                'list_mode' => 'csv',
+                                'history' => 'y',
+                                'item' => $item_info,
+                                'process' => 'y',
+                            ], $emptyTemplate);
+                            $field_value['value'] = $hist['new'];
+                            $hist['rendered_new'] = smarty_function_trackeroutput([
+                                'field' => $field_value,
+                                'list_mode' => 'csv',
+                                'history' => 'y',
+                                'item' => $item_info,
+                                'process' => 'y',
+                            ], $emptyTemplate);
+
+                            if (TIKI_API) {
+                                $hist['value'] = $hist['rendered_value'];
+                                $hist['new'] = $hist['rendered_new'];
                                 $field_value['value'] = $hist['value'];
-                                $hist['value'] = smarty_function_trackeroutput([
+                                $hist['rendered_value'] = smarty_function_trackeroutput([
                                     'field' => $field_value,
-                                    'list_mode' => 'csv',
+                                    'list_mode' => 'y',
                                     'history' => 'y',
                                     'item' => $item_info,
                                     'process' => 'y',
-                                ], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                                ], $emptyTemplate);
                                 $field_value['value'] = $hist['new'];
-                                $hist['new'] = smarty_function_trackeroutput([
+                                $hist['rendered_new'] = smarty_function_trackeroutput([
                                     'field' => $field_value,
-                                    'list_mode' => 'csv',
+                                    'list_mode' => 'y',
                                     'history' => 'y',
                                     'item' => $item_info,
                                     'process' => 'y',
-                                ], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                                ], $emptyTemplate);
                             }
                         } else {
                             $field_value['value'] = $hist['new'];
-                            $hist['diff'] = smarty_function_trackeroutput([
+                            $hist['rendered_diff'] = smarty_function_trackeroutput([
                                 'field' => $field_value,
                                 'list_mode' => 'y',
                                 'history' => 'y',
@@ -2438,25 +2460,11 @@ class Services_Tracker_Controller
                                 'process' => 'y',
                                 'oldValue' => $hist['value'],
                                 'diff_style' => $diff_style,
-                            ], TikiLib::lib('smarty')->getEmptyInternalTemplate());
-                        }
-                        if (! empty($field_value['fieldId'])) {
-                            $field_value['value'] = $hist['value'];
-                            $hist['rendered_value'] = smarty_function_trackeroutput([
-                                'field' => $field_value,
-                                'list_mode' => 'y',
-                                'history' => 'y',
-                                'item' => $item_info,
-                                'process' => 'y',
-                            ], TikiLib::lib('smarty')->getEmptyInternalTemplate());
-                            $field_value['value'] = $hist['new'];
-                            $hist['rendered_new'] = smarty_function_trackeroutput([
-                                'field' => $field_value,
-                                'list_mode' => 'y',
-                                'history' => 'y',
-                                'item' => $item_info,
-                                'process' => 'y',
-                            ], TikiLib::lib('smarty')->getEmptyInternalTemplate());
+                            ], $emptyTemplate);
+
+                            if (TIKI_API) {
+                                $hist['diff'] = $hist['rendered_diff'];
+                            }
                         }
                     }
                 }

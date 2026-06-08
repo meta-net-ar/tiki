@@ -52,6 +52,7 @@
                     {preference name=xmpp_domain_users}
                     {preference name=xmpp_domain_guest}
                     {preference name=xmpp_anonymous_mode}
+                    {preference name=xmpp_anonymous_allow_custom_nickname}
                     {preference name=xmpp_anonymous_room}
                     {preference name=xmpp_anonymous_support_room}
                     {preference name=xmpp_registered_room}

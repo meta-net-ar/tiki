@@ -137,6 +137,7 @@ $('#$id').on('keyup', function() {
             \$('{$exclude}[data-tt-parent-id=' + \$(this).data('tt-id') + ']').hide();                            // but need hiding if the parent is 'empty'
         } else {
             \$(this).removeClass('collapsed').addClass('expanded');
+            \$('{$exclude}[data-tt-parent-id=' + \$(this).data('tt-id') + ']').show();
         }
     });
 ";

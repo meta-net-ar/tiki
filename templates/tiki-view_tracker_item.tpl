@@ -106,7 +106,7 @@
                     {/if}
                     {if $prefs.user_favorites eq 'y' and isset($itemId)}
                         <li class="dropdown-item">
-                            {favorite button_classes="favorite-icon" label="{tr}Favorite{/tr}"  type="trackeritem" object=$itemId }
+                            {favorite button_classes="favorite-icon" label="{tr}Favorite{/tr}"  type="trackeritem" object=$itemId}
                         </li>
                     {/if}
                 </ul>

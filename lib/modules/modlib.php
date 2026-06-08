@@ -533,12 +533,13 @@ class ModLib extends TikiLib
         global $page, $prefs, $user;
         $section = Sections::getCurrentSection();
         $tikilib = TikiLib::lib('tiki');
+        $pref_module_name = 'module_' . preg_replace('/[^a-zA-Z0-9]/', '_', $module["name"]);
 
-        if (! isset($prefs['module_' . $module["name"]])) {
+        if (! isset($prefs[$pref_module_name])) {
             return false;
         }
 
-        if ($prefs['module_' . $module["name"]] != 'y') {
+        if ($prefs[$pref_module_name] != 'y') {
             return false;
         }
         if (TikiLib::lib('login')->isSwitched() && isset($_SESSION["keep_login_box_visible"]) && $_SESSION["keep_login_box_visible"] == 'y') {
@@ -548,6 +549,7 @@ class ModLib extends TikiLib
         }
         // Load only Unified Admin Interface specific modules for admins on admin panels.
         $topLogin = $module['name'] === 'login_box' && $module['position'] === 'top';
+        $topLogo = $module['name'] === 'logo' && $module['position'] === 'top';
         $topQA = $module['name'] === 'quickadmin' && $module['position'] === 'top';
         $footer = $module['position'] === 'bottom';
         $isControlPanel = Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT);
@@ -558,6 +560,7 @@ class ModLib extends TikiLib
             && ! $this->isModuleAssignmentMode()
             && $module['position'] !== 'admin'
             && ! $topLogin
+            && ! $topLogo
             && ! $footer
             && ! $topQA
         ) {

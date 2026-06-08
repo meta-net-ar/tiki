@@ -41,7 +41,7 @@
         </div>
     </div>
 
-    {if $tiki_p_add_object eq 'y' and $prefs.feature_categories == 'y' }
+    {if $tiki_p_add_object eq 'y' and $prefs.feature_categories == 'y'}
         <div class="mb-3 row">
             <label class="col-sm-3 form-check-label" for="duplicate_categories">{tr}Duplicate categories{/tr}</label>
             <div class="col-sm-7">
@@ -52,7 +52,7 @@
         </div>
     {/if}
 
-    {if $tiki_p_freetags_tag eq 'y' and $prefs.feature_freetags == 'y' }
+    {if $tiki_p_freetags_tag eq 'y' and $prefs.feature_freetags == 'y'}
         <div class="mb-3 row">
             <label class="col-sm-3 form-check-label" for="duplicate_freetags">{tr}Duplicate tags{/tr}</label>
             <div class="col-sm-7">

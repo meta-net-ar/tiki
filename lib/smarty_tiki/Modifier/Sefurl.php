@@ -129,6 +129,11 @@ class Sefurl
                 }
                 if ($replacementpage) {
                     $href = \TikiLib::tikiUrlOpt($wikilib->sefurl($replacementpage, $with_next, $all_langs));
+                    if ($prefs['feature_sefurl'] === 'y') {
+                        $href .= $source;
+                    } else {
+                        $href .= "&itemId=$source";
+                    }
                     if ($prefs['feature_sefurl_title_trackeritem'] == 'y') {
                         $title = $trklib->get_title_sefurl($source);
                     }

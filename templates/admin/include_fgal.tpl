@@ -28,7 +28,6 @@
             </fieldset>
 
             {preference name=home_file_gallery}
-            {preference name=fgal_list_description}
             {preference name='fgal_use_db'}
             <div class="adminoptionboxchild fgal_use_db_childcontainer n">
                 <div class="mb-sm-3">
@@ -214,6 +213,7 @@
             {preference name='fgal_show_ocr_state'}
             {preference name='fgal_list_id'}
             {preference name='fgal_list_type'}
+            {preference name='fgal_list_description'}
             {preference name='fgal_list_name'}
             {preference name='fgal_list_size'}
             {preference name='fgal_list_created'}
@@ -364,7 +364,7 @@
                                         {if !$ocrStalled}disabled{/if}
                                         class="btn btn-primary btn-sm"
                                         name="ocrstalledreset"
-                                        value="{tr}Reset {if $ocrStalled}{$ocrStalled} {/if}OCR 'stalled' files{/tr}"
+                                        value="{if $ocrStalled}{tr _0=$ocrStalled}Reset %0 OCR 'stalled' files{/tr}{else}{tr}Reset OCR 'stalled' files{/tr}{/if}"
                                 >
                             {/if}
                         </div>

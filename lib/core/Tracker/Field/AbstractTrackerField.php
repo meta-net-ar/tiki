@@ -46,6 +46,7 @@ abstract class AbstractTrackerField
      * rules
      * encryptionKeyId
      * excludeFromNotification
+     * excludeFromTrackerItemLastModificationDate
      * visibleInViewMode
      * visibleInEditMode
      * visibleInHistoryMode
@@ -156,5 +157,29 @@ abstract class AbstractTrackerField
         } else {
             return $this->options->getParam($key, $default);
         }
+    }
+
+    /**
+     * Handle the save of a tracker item field.
+     *
+     * This method is called after the field values are saved. It can be used to
+     * determine additional updates that should be performed on the item, for
+     * example updating the lastModif/lastModifBy metadata.
+     *
+     * @param array $trackerOldDbRow The raw database row of the tracker item.
+     * @return array The values for the columns to be updated (if any).
+     */
+    public function handleTrackerItemSave(array $trackerOldDbRow): array
+    {
+        global $tikilib, $user;
+
+        if (($this->fieldRow['excludeFromTrackerItemLastModificationDate'] ?? 'n') === 'y') {
+            return [];
+        }
+
+        return [
+            \Tracker_Item::LAST_MODIF => $tikilib->now,
+            \Tracker_Item::LAST_MODIF_BY => $user,
+        ];
     }
 }

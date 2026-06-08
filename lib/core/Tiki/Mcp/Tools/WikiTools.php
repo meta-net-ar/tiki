@@ -407,7 +407,7 @@ class WikiTools
         } catch (\Services_Exception $e) {
             throw new ToolCallException("Error: " . $e->getMessage());
         } catch (\Throwable $e) {
-            error_log('[MCP] Unexpected exception in brokerCall: ' . get_class($e) . ': ' . $e->getMessage());
+            error_log('[MCP] Unexpected exception in brokerCall: ' . get_class($e) . ': ' . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (MCP protocol error — logs unexpected exceptions to system log)
             throw new ToolCallException("An unexpected error occurred.");
         }
     }
@@ -457,7 +457,7 @@ class WikiTools
         } finally {
             $output = ob_get_clean();
             if ($output !== '' && $output !== false) {
-                error_log('[MCP] Captured stray output: ' . $output);
+                error_log('[MCP] Captured stray output: ' . $output); // @phpstan-ignore disallowedFunctions.errorLog (MCP protocol — logs unexpected PHP output to system log)
             }
         }
         return $result;

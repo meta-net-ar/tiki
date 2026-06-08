@@ -253,6 +253,10 @@ function scanfiles($folder, &$files, &$filesHash)
 
         $path = "$folder/$file";
 
+        if (is_link($path)) {
+            continue;
+        }
+
         if (is_dir($path)) {
             // Directory is safe, skip recursion
             foreach ($skipDirs as $skipDir) {
@@ -793,6 +797,44 @@ include_once('lib/setup/twversion.class.php');
 $TWV = new TWVersion();
 $major = explode('.', $TWV->version)[0];
 
+function normalize_input_file($path)
+{
+    $path = ltrim($path, './');
+
+    return './' . $path;
+}
+
+function add_specified_files(array $inputFiles, array &$files, array &$filesHash)
+{
+    global $safePaths, $skipDirs;
+
+    foreach ($inputFiles as $path) {
+        $path = normalize_input_file($path);
+
+        if (! is_file($path) || is_link($path)) {
+            continue;
+        }
+
+        if (pathinfo($path, PATHINFO_EXTENSION) !== 'php') {
+            continue;
+        }
+
+        foreach ($skipDirs as $skipDir) {
+            if (str_starts_with($path, $skipDir)) {
+                continue 2; // skip this directory entirely
+            }
+        }
+
+        if (regex_match($path, $safePaths)) {
+            continue;
+        }
+
+        $analysis = analyse_file_path($path);
+        $files[] = $analysis;
+        $filesHash[$path] = $analysis;
+    }
+}
+
 /* Build Files structures */
 // a hash of filenames, each element is a hash of attributes of that file
 $filesHash = [];
@@ -804,7 +846,15 @@ $features = [];
 $files = [];
 
 // build these two files structures
-scanfiles('.', $files, $filesHash);
+// If files are passed as arguments, scan only those files.
+// Otherwise, scan the full repository.
+$inputFiles = array_slice($argv, 1);
+
+if (! empty($inputFiles)) {
+    add_specified_files($inputFiles, $files, $filesHash);
+} else {
+    scanfiles('.', $files, $filesHash);
+}
 
 /* Iterate each file, and perform checks */
 $unsafe = [];

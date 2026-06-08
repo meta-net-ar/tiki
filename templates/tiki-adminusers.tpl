@@ -32,7 +32,7 @@
             {if !$ts.enabled}
                 <form method="get" action="tiki-adminusers.php">
                     <div class="mb-3 row">
-                        <label class="col-form-label col-sm-5" for="find">{tr}Find{/tr}</label>
+                        <label class="col-form-label col-sm-5" for="find">{tr}Search{/tr}</label>
                         <div class="col-sm-7">
                             <input type="text" class="form-control form-control-sm" id="find" name="find" value="{$find|escape}">
                         </div>
@@ -96,7 +96,7 @@
                     <div class="mb-3 row">
                         <div class="col-sm-7 offset-sm-5">
                             <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
-                            <input type="submit" class="btn btn-primary btn-sm" value="{tr}Find{/tr}" name="search">
+                            <input type="submit" class="btn btn-primary btn-sm" value="{tr}Search{/tr}" name="search">
                         </div>
                     </div>
                 </form>
@@ -432,9 +432,16 @@
                     {button href="tiki-assignuser.php?assign_user=$thisloginescaped" _text="{tr}Assign user to Groups{/tr}" _icon_name='group'}
                 {/if}
                 {if $userinfo.waiting eq 'a'}
-                    {$thispassescaped = $userinfo.valid|escape:'url'}
+                    {$thispassescaped = $userinfo.valid|escape:'attr'}
                     {if empty($thispassescaped)}{$thispassescaped = 0}{/if}
-                    {button href='tiki-login_validate.php?user='|cat:$thisloginescaped|cat:'&pass='|cat:$thispassescaped _text="{tr}Validate user{/tr}" _icon_name='ok'}
+                    <form action="tiki-login_validate.php" method="post" class="d-inline">
+                        {ticket}
+                        <input type="hidden" name="user" value="{$userinfo.login|escape:'attr'}">
+                        <input type="hidden" name="pass" value="{$thispassescaped}">
+                        <button type="submit" class="btn btn-link">
+                            {icon name="ok"} {tr}Validate user{/tr}
+                        </button>
+                    </form>
                 {/if}
             {else}
                 <h2>{tr}Add a New User{/tr}</h2>
@@ -496,7 +503,7 @@
                             <div class="col-sm-7 col-md-6">
                                 <input type="password" class="form-control" placeholder="{tr}Password{/tr}" name="pass" id="pass1" autocomplete="new-password">
                                 <div style="margin-left:5px;">
-                                    <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none' } <span id="mypassword_text_inner"></span></div>
+                                    <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
                                     <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
                                 </div>
                                 <div style="margin-top:5px">

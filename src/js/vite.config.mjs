@@ -153,6 +153,7 @@ export default defineConfig(({ command, mode }) => {
         publicDir: false, //tiki already uses public for other purposes.  If we want to use this feature we can create a src/public folder for it.
         resolve: {
             alias: {
+                "@wysiwyg/summernote": resolve(__dirname, "wysiwyg/summernote/index.js"),
                 "moment-timezone": resolve(__dirname, "../../node_modules/moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js"),
                 "html2canvas": "html2canvas-pro",
                 // ui-predicate-vue3
@@ -204,6 +205,7 @@ export default defineConfig(({ command, mode }) => {
                     /^@vue-widgets\/.+/,
                     "@wysiwyg/summernote",
                     "@zxing/library",
+                    "altcha",
                     "bootstrap",
                     "clipboard",
                     "converse.js",
@@ -334,6 +336,10 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: "node_modules/@zxing/library/umd/index.min.js",
                         dest: "vendor_dist/@zxing/library/umd/index.min.js",
+                    },
+                    {
+                        src: "node_modules/altcha/dist/*.js",
+                        dest: "vendor_dist/altcha/dist",
                     },
                     {
                         src: "node_modules/animejs/lib/anime.es.js",
@@ -514,10 +520,6 @@ export default defineConfig(({ command, mode }) => {
                     {
                         src: ["node_modules/ol-layerswitcher/dist/ol-layerswitcher.js", "node_modules/ol-layerswitcher/dist/ol-layerswitcher.css"],
                         dest: "vendor_dist/ol-layerswitcher/dist",
-                    },
-                    {
-                        src: "node_modules/plotly.js/dist/topojson*",
-                        dest: "vendor_dist/plotly.js/dist/topojson",
                     },
                     {
                         src: "node_modules/plotly.js/dist/*.min.js",

@@ -15,6 +15,7 @@
 use Tiki\Maintenance\Maintenance;
 use Tiki\Package\VendorHelper;
 use Tiki\Profiling\Timer;
+use Tiki\Captcha\CaptchaTypeResolver;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 //Be careful, composer autoloading isn't available until tiki-setup_base.php is required further down
@@ -223,7 +224,9 @@ Sections::onSectionChange(function ($section) use ($prefs) {
         return;
     }
 
-    TikiLib::lib('freetag')->assignCurrentObjectTagsToSmarty();
+    $freetaglib = TikiLib::lib('freetag');
+    $freetaglib->handleCurrentObjectTagRequest();
+    $freetaglib->assignCurrentObjectTagsToSmarty();
 });
 
 require_once('lib/setup/wiki.php');
@@ -466,8 +469,9 @@ if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
 }
 
 if ($prefs['feature_antibot'] == 'y' && empty($user)) {
-    if ($prefs['recaptcha_enabled'] === 'y') {
-        if ($prefs['recaptcha_version'] == '2') {
+    $captchaType = CaptchaTypeResolver::getConfiguredType($prefs);
+    if (in_array($captchaType, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
+        if ($captchaType == 'recaptcha20') {
             if (! empty($prefs['language'])) {
                 $headerlib->add_jsfile_cdn("$url_scheme://www.google.com/recaptcha/api.js?hl=" . $prefs['language']);
             } else {
@@ -609,13 +613,6 @@ if ($prefs['error_tracking_enabled_js'] == 'y' && ! empty($prefs['error_tracking
 //templates/tiki-view_sheets_menu.tpl
 $headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
 $headerlib->add_jsfile('lib/tiki-js.js'); //This depends on tiki-jquery.js in at least one place, so must load after - benoitg - 2023-11-21
-
-$zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
-$headerlib->add_js('var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . '";');    // Set the zoom option after searching for a location
-
-if ($prefs['geo_enabled'] === 'y') {
-    $headerlib->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js");
-}
 
 if ($prefs['feature_jquery_zoom'] === 'y') {
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/jquery-zoom/jquery.zoom.js')
@@ -822,6 +819,9 @@ $headerlib->add_jsfile('lib/jquery_tiki/tiki-vue.js');
 
 if (empty($user) && $prefs['feature_antibot'] == 'y') {
     $headerlib->add_jsfile_late('lib/captcha/captchalib.js');
+    if (CaptchaTypeResolver::getConfiguredType($prefs) === 'altcha') {
+        $headerlib->add_js_module('import {Altcha} from "altcha";');
+    }
 }
 
 if (! empty($prefs['header_custom_css'])) {

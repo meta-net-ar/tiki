@@ -165,6 +165,8 @@ function wikiplugin_convene_info(): array
 
 function wikiplugin_convene($data, $params): string
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_convene_info());
+
     /** @var HeaderLib $headerlib */
     $headerlib = TikiLib::lib('header');
     /** @var TikiLib $tikilib */
@@ -174,9 +176,6 @@ function wikiplugin_convene($data, $params): string
     /** @var UserLib $userlib */
     $userlib = TikiLib::lib('user');
 
-    if (! is_array($params['voteoptions'])) {
-        $params['voteoptions'] = explode(',', $params['voteoptions']);
-    }
 
     //in case there is any feedback from a previous ajax action since this plugin does not refresh the page upon edit
     Feedback::sendHeaders();
@@ -196,15 +195,9 @@ function wikiplugin_convene($data, $params): string
     $params['id'] = empty($params['id']) ? 'pluginConvene' . $convenePluginIndex : $params['id'];
 
     // Handle new parameters
-    $default_users = ! is_null($params['defaultusers'])
-        ? (is_array($params['defaultusers']) ? $params['defaultusers'] : explode(',', $params['defaultusers']))
-        : [];
-    $default_groups = ! is_null($params['defaultgroups'])
-        ? (is_array($params['defaultgroups']) ? $params['defaultgroups'] : explode(',', $params['defaultgroups']))
-        : [];
-    $default_dates = ! is_null($params['defaultdates'])
-        ? (is_array($params['defaultdates']) ? $params['defaultdates'] : explode(',', $params['defaultdates']))
-        : [];
+    $default_users = $params['defaultusers'] ?? [];
+    $default_groups = $params['defaultgroups'] ?? [];
+    $default_dates = $params['defaultdates'] ?? [];
 
     /** For new data structure */
     if (str_starts_with($data, "[")) {

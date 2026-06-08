@@ -18,7 +18,7 @@
             {tr}Once '<em>Tiki Connect</em>' is enabled, when you click the '<strong>Send Info</strong>' button below you will be connected with <em>mother.tiki.org</em>, which is where the data will be collected.{/tr}
             <br/><br/>
             {tr}You can also send feedback about Tiki by checking the '<em>Provide Feedback</em>' checkbox (once <em>Tiki Connect</em> is enabled), next to the '<em>Show on admin login</em>' above.{/tr}
-            {tr}Icons will appear next to all the preferences where you can 'like' {$smarty.capture.likeicon|escape}{/tr}
+            {tr _0=$smarty.capture.likeicon|escape}Icons will appear next to all the preferences where you can 'like' %0{/tr}
             <br/><br/>
             {tr}Click to read more{/tr}
     ">

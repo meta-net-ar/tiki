@@ -60,7 +60,12 @@ class TikiWebServiceTemplate
     public function getTemplateFile()
     {
         $token = sprintf("%s_%s", $this->webservice->getName(), $this->name);
-        $file = "temp/cache/" . md5($token) . '.tpl';
+        $file = WEBSERVICE_TEMPLATES_PATH . '/' . md5($token) . '.tpl';
+
+        // Ensure directory exists
+        if (! is_dir(WEBSERVICE_TEMPLATES_PATH)) {
+            mkdir(WEBSERVICE_TEMPLATES_PATH, 0755, true);
+        }
 
         if (! file_exists($file) || $this->lastModif > filemtime($file)) {
             file_put_contents($file, $this->content);

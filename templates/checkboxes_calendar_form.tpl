@@ -1,25 +1,29 @@
-{button _class="{$class}" _style="{$style}" href="#" _onclick="toggle('{$filterCal}');return false;" _text='{tr}Calendars{/tr}' _icon_name='eye' _type='info'}
-<div class="d-inline-block">
-    <form class="card filtercal" id="{$filterCal}" method="get" action="{$returnURL}" name="f" style="display:none;">
-        <div class="card-header caltitle py-1 px-2">
-            <strong>{tr}Calendars{/tr}</strong>
-            <button type="button" class="btn-close float-end"  onclick="toggle('{$filterCal}')" aria-hidden="true"></button>
-        </div>
-        <ul class="list-group list-group-flush list-unstyled mt-2">
-            <li class="caltoggle">
+<div class="dropdown d-inline-block {$class}" style="{$style}">
+    <button class="btn btn-info dropdown-toggle" type="button" id="{$filterCal}_toggle" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+        {icon name='eye'} {tr}Calendars{/tr}
+    </button>
+    <div class="dropdown-menu p-0" id="{$filterCal}" aria-labelledby="{$filterCal}_toggle">
+        <form class="filtercal" method="get" action="{$returnURL}" name="f">
+            <h6 class="dropdown-header caltitle">{tr}Calendars{/tr}</h6>
+            <div class="dropdown-divider"></div>
+            <div class="px-3 py-1 caltoggle">
                 {select_all checkbox_names='calIds[]' label="{tr}Check / Uncheck All{/tr}"}
-            </li>
+            </div>
+            <div class="dropdown-divider"></div>
             {foreach $calendars as $calendarId => $calendar}
-                <li class="calcheckbox">
-                    <input type="checkbox" name="calIds[]" value="{$calendarId|escape}" id="groupcal_{$calendarId}"
-                        {if in_array($calendarId, $displayedcals)}checked="checked"{/if}>
-                    <label for="groupcal_{$calendarId}" class="calId{$calendarId}">{$calendar.name|escape} ({tr}Id #{$calendarId}{/tr})</label>
-                </li>
+                <div class="dropdown-item calcheckbox">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="calIds[]" value="{$calendarId|escape}" id="groupcal_{$calendarId}"
+                            {if in_array($calendarId, $displayedcals)}checked="checked"{/if}>
+                        <label class="form-check-label calId{$calendarId}" for="groupcal_{$calendarId}">{$calendar.name|escape} ({tr _0=$calendarId}Id #%0{/tr})</label>
+                    </div>
+                </div>
             {/foreach}
-            <li class="calinput">
+            <div class="dropdown-divider"></div>
+            <div class="px-3 py-2 calinput">
                 <input type="hidden" name="todate" value="{$focusdate}">
-                <input type="submit" class="btn btn-primary btn-sm" name="refresh" value="{tr}Refresh{/tr}">
-            </li>
-        </ul>
-    </form>  
+                <button type="submit" class="btn btn-primary btn-sm w-100" name="refresh" value="{tr}Refresh{/tr}">{tr}Refresh{/tr}</button>
+            </div>
+        </form>
+    </div>
 </div>

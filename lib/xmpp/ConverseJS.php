@@ -98,12 +98,13 @@ class ConverseJS
             }
 
             $this->set_options([
-                'authentication'   => 'anonymous',
-                'auto_login'       => true,
-                'jid'              => $prefs['xmpp_domain_guest'] ?? null,
-                'bosh_service_url' => $prefs['xmpp_server_http_bind'] ?? null,
-                'websocket_url'    => $prefs['xmpp_ws_url'] ?? null,
-                'dm_target'        => $dmTarget,
+                'authentication'      => 'anonymous',
+                'auto_login'          => true,
+                'jid'                 => $prefs['xmpp_domain_guest'] ?? null,
+                'bosh_service_url'    => $prefs['xmpp_server_http_bind'] ?? null,
+                'websocket_url'       => $prefs['xmpp_ws_url'] ?? null,
+                'dm_target'           => $dmTarget,
+                'tiki_anonymous_nick' => ($prefs['xmpp_anonymous_allow_custom_nickname'] ?? 'n') === 'y' ? 'custom' : 'visitor',
             ]);
 
             // Auto-join anonymous room if configured (community only)

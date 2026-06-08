@@ -26,6 +26,7 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 use Tiki\Sections;
+use Tiki\SortModeValidator;
 $section = Sections::SECTION_NEWSLETTERS;
 Sections::setCurrentSection($section);
 global $nllib;
@@ -125,12 +126,10 @@ if (isset($_REQUEST["info"])) {
     $smarty->assign('nl_info', $nl_info);
     $smarty->assign('subscribe', 'y');
 }
-// List newsletters
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'created_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'created_desc',
+    ['tiki_newsletters','tiki_sent_newsletters']
+);
 $offset = $_REQUEST["offset"] ?? 0;
 if (isset($_REQUEST["noshowlist"])) {
     $showlist = 'n';

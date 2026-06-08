@@ -371,7 +371,6 @@ function wikiplugin_pivottable_info()
 
 function wikiplugin_pivottable($data, $params)
 {
-
     //included globals for permission check
     global $prefs, $page, $wikiplugin_included_page, $user;
 
@@ -389,6 +388,8 @@ function wikiplugin_pivottable($data, $params)
     $headerlib->add_jsfile(PLOTLYJS_DIST_PATH . '/plotly-cartesian.min.js', true);
     $headerlib->add_jsfile(SUBTOTAL_DIST_PATH . '/subtotal.min.js', true);
     $headerlib->add_jsfile('lib/jquery_tiki/wikiplugin-pivottable.js', true);
+
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_pivottable_info());
 
     if (empty($params['height'])) {
         $params['height'] = '1000px';

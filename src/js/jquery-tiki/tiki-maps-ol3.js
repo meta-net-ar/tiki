@@ -124,6 +124,7 @@ import { defaults as defaultControls } from "ol/control";
                                             width = 3;
                                         } else {
                                             color = "#aaa";
+                                            // eslint-disable-next-line no-console
                                             console.log("Unknown road kind: " + kind);
                                         }
                                         style = new ol.style.Style({
@@ -212,6 +213,7 @@ import { defaults as defaultControls } from "ol/control";
                     layers.push(lyr);
                 } else {
                     errorLayers.push(name);
+                    // eslint-disable-next-line no-console
                     console.log(tr("Cannot create map layer: " + name));
                 }
             }
@@ -295,10 +297,9 @@ import { defaults as defaultControls } from "ol/control";
                     let fillColor = feature.get("fillColor");
 
                     if (!fillColor) {
-                        // from theme-customizer.js
-                        //fillColor = lightenDarkenColor(borderColor, -10);
-                        fillColor = borderColor;
-                        borderColor = "#666";
+                        // no separate fill colour provided so make the fill 50% opacity of the border
+                        const rgba = Array.from(ol.color.asArray(borderColor));
+                        fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 2]);
                     }
 
                     return new ol.style.Style({
@@ -1101,6 +1102,7 @@ import { defaults as defaultControls } from "ol/control";
                             }
                         };
                         $(img).on("error", function () {
+                            // eslint-disable-next-line no-console
                             console.log("Map error loading marker image " + src);
                             var index = container.markerIcons.loadingMarker.indexOf(src),
                                 action;
@@ -1621,6 +1623,7 @@ import { defaults as defaultControls } from "ol/control";
                                                     feature.set("itemId", i.object_id);
                                                     feature.set("content", i.title);
                                                     if (!feature.get("color")) {
+                                                        // TODO find a better default, from the searchlayer maybe?
                                                         feature.set("color", "#ffa500");
                                                     }
                                                     if (!feature.get("intent")) {

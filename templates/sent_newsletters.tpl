@@ -46,7 +46,7 @@
                     <td class="action">
                         {actions}
                             {strip}
-                                {if $url == "tiki-newsletter_archives.php" or $url == "tiki-send_newsletters.php" }
+                                {if $url == "tiki-newsletter_archives.php" or $url == "tiki-send_newsletters.php"}
                                     <action>
                                         <a href="{$url}?{if $nl_info}nlId={$channels[user].nlId}&amp;{/if}offset={$offset}&amp;sort_mode={$sort_mode}&amp;editionId={$channels[user].editionId}">
                                             {icon name='view' _menu_text='y' _menu_icon='y' alt="{tr}View{/tr}"}

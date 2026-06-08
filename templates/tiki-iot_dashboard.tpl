@@ -54,11 +54,11 @@
                             </div>
                         </div>
                         <div>
-                            {if $app.iot_bridge_access_token != null }
+                            {if $app.iot_bridge_access_token != null}
                                 <div>
                                     <div class="input-group">
                                         <input type="text" class="form-control" style="min-width: 150px;" value="{$app.iot_bridge_access_token}" id="existing-access-token-{$app.app_uuid}" readonly>
-                                        {if $app.iot_bridge_access_token_expire_at eq null }
+                                        {if $app.iot_bridge_access_token_expire_at eq null}
                                             <button type="button" class="btn btn-success">{tr}No expiration{/tr}</button>
                                         {else}
                                             <button type="button" class="btn btn-primary">{tr}Expires on{/tr} {$app.iot_bridge_access_token_expire_at}</button>

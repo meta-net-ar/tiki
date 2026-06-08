@@ -68,6 +68,23 @@ workflow:
     # THIS WILL TRIGGER PIPELINES FOR MERGE REQUESTS AND SCHEDULES, AND PUSHES ON VERSION BRANCHES LIKE 21.x. 18.x
     - when: always
 
+# 🛠️ Reusable script anchor to calculate modified assets dynamically
+.calculate_affected_files: &calculate_affected_files
+  - |
+    if [ -n "$CI_MERGE_REQUEST_DIFF_BASE_SHA" ]; then
+      echo "Merge Request detected. Using GitLab's native diff baseline: $CI_MERGE_REQUEST_DIFF_BASE_SHA"
+      BASE_COMMIT="$CI_MERGE_REQUEST_DIFF_BASE_SHA"
+    else
+      echo "Standard branch push or schedule detected. Falling back to parent commit baseline."
+      BASE_COMMIT="HEAD~1"
+    fi
+    
+    AFFECTED_FILES="$(git diff --name-only --diff-filter=d "$BASE_COMMIT" HEAD || true)"
+
+    PHP_FILES="$(printf '%s\n' "$AFFECTED_FILES" | grep -E '\.php$' || true)"
+    JS_FILES="$(printf '%s\n' "$AFFECTED_FILES" | grep -E '\.js$' || true)"
+    TPL_FILES="$(printf '%s\n' "$AFFECTED_FILES" | grep -E '\.tpl$' || true)"
+
 #Inspired from https://dev.to/drakulavich/gitlab-ci-cache-and-artifacts-explained-by-example-2opi
 
 # Define a hidden job to be used with extends
@@ -144,6 +161,10 @@ composer-ext-check:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/composer.json"
+        - "**/composer.lock"
   script:
     - php doc/devtools/check_composer_extensions.php
 
@@ -199,8 +220,17 @@ phpcs:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+      - "**/*.php"
   script:
-    - php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs --cache=phpcs.cache -s --runtime-set ignore_warnings_on_exit true --parallel=8
+    - *calculate_affected_files
+    - |
+      if [ -n "$PHP_FILES" ]; then
+        echo "$PHP_FILES" | xargs php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs --cache=phpcs.cache -s --runtime-set ignore_warnings_on_exit true --parallel=8
+      else
+        echo "✅ No target modifications identified."
+      fi
   cache:
     - key:
         prefix: "phpcs"
@@ -216,8 +246,17 @@ phplint:
   image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
   needs:
     - composer
+  rules:
+    - changes:
+      - "**/*.php"
   script:
-    - php vendor_bundled/vendor/overtrue/phplint/bin/phplint --no-interaction --no-cache
+    - *calculate_affected_files
+    - |
+      if [ -n "$PHP_FILES" ]; then
+        echo "$PHP_FILES" | xargs php vendor_bundled/vendor/overtrue/phplint/bin/phplint --no-interaction --no-cache
+      else
+        echo "✅ No targeted line changes."
+      fi
   # No point in using cache, on fast hardware it's almost as fast to compute as it is to verify the cache - benoitg - 2026-01-26
   parallel:
     matrix:
@@ -228,14 +267,32 @@ smarty-lint:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+      - "**/*.tpl"
   script:
-    - php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
+    - *calculate_affected_files
+    - |
+      if [ -n "$TPL_FILES" ]; then
+        echo "$TPL_FILES" | xargs php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
+      else
+        echo "✅ No Smarty template changed ."
+      fi
 
 smarty-syntax-check:
   stage: code-quality
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+       - "**/*.tpl"
   script:
-    - php doc/devtools/check_smarty_syntax.php
+    - *calculate_affected_files
+    - |
+      if [ -n "$TPL_FILES" ]; then
+        printf '%s\n' "$TPL_FILES" | xargs php doc/devtools/check_smarty_syntax.php
+      else
+        echo "✅ No affected Smarty templates."
+      fi
 
 eslint:
   stage: code-quality
@@ -244,13 +301,25 @@ eslint:
   image:
     name: ${DEPENDENCY_PROXY_PREFIX}${NODE_IMAGE}
     #entrypoint: ["/bin/sh", "-c"]
+  rules:
+    - changes:
+        - "**/*.js"
   script:
-    - npx eslint .
+    - *calculate_affected_files
+    - |
+      if [ -n "$JS_FILES" ]; then
+        printf '%s\n' "$JS_FILES" | xargs npx eslint
+      else
+        echo "✅ No affected js file."
+      fi
 
 shlint:
   stage: code-quality
   needs: []
   image: koalaman/shellcheck-alpine:latest
+  rules:
+    - changes:
+        - "**/*.sh"
   script:
     - shellcheck ./*.sh
     - shellcheck ./doc/devtools/*.sh
@@ -260,20 +329,35 @@ check-bom-encoding:
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php doc/devtools/check_bom_encoding.php
+    - *calculate_affected_files
+    - |
+      if [ -n "$AFFECTED_FILES" ]; then
+        echo "$AFFECTED_FILES" | xargs php doc/devtools/check_bom_encoding.php
+      else
+        echo "✅ Change index clean."
+      fi
 
 unix-ending-line:
   stage: code-quality
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - php doc/devtools/check_unix_ending_line.php
+    - *calculate_affected_files
+    - |
+      if [ -n "$AFFECTED_FILES" ]; then
+        echo "$AFFECTED_FILES" | xargs php doc/devtools/check_unix_ending_line.php
+      else
+        echo "✅ Change index clean."
+      fi
 
 translation-standards:
   stage: code-quality
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "templates/**/*.tpl"
   script:
     - php doc/devtools/check_template_translation_standards.php --all
 
@@ -282,8 +366,17 @@ phpstan:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.php"
   script:
-    - php bin/phpstan --configuration=phpstan-tikiCi.neon
+    - *calculate_affected_files
+    - |
+      if [ -n "$PHP_FILES" ]; then
+        echo "$PHP_FILES" | xargs php bin/phpstan --configuration=phpstan-tikiCi.neon analyse
+      else
+        echo "✅ Static evaluation matrix bypassed."
+      fi
   cache:
     key: "phpstan"
     paths:
@@ -295,9 +388,19 @@ rector:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.php"
   script:
-    # If rector would have changed any files, it will return a non-zero code
-    - php bin/rector process --dry-run
+    - *calculate_affected_files
+    - |
+      if [ -n "$PHP_FILES" ]; then
+       # If rector had changed any files, it will return a non-zero code
+        echo "$PHP_FILES" | xargs php bin/rector process --dry-run
+      else
+        echo "✅ Transform tree evaluation bypassed."
+      fi
+
   cache:
     - key:
         prefix: "rector"
@@ -315,12 +418,17 @@ check-platform-binaries:
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - sh doc/devtools/check_platform_binaries.sh
+    - php doc/devtools/check_platform_binaries.php
 
 sql-engine:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.sql"
+        - "installer/**/*"
+        - "db/**/*"
   script:
     - php -d display_errors=On doc/devtools/check_sql_engine.php
 
@@ -328,6 +436,11 @@ schema-sql-drop:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.sql"
+        - "installer/**/*"
+        - "db/**/*"
   script:
     - php -d display_errors=On doc/devtools/check_schema_sql_drop.php
 
@@ -335,6 +448,11 @@ schema-naming-convention:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.sql"
+        - "installer/**/*"
+        - "db/**/*"
   script:
     - php -d display_errors=On doc/devtools/check_schema_naming_convention.php
 
@@ -349,8 +467,17 @@ check-security-static:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.php"
   script:
-    - php -d display_errors=On doc/devtools/securitycheck.php
+    - *calculate_affected_files
+    - |
+      if [ -n "$PHP_FILES" ]; then
+        printf '%s\n' "$PHP_FILES" | xargs php -d display_errors=On doc/devtools/securitycheck.php
+      else
+        echo "✅ No affected PHP files."
+      fi
 
 translation:
   stage: tiki-check
@@ -376,6 +503,10 @@ composer-validates:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/composer.json"
+        - "**/composer.lock"
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer validate -d vendor_bundled --no-check-all
@@ -389,7 +520,10 @@ composer-could-update-lock:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-
+  rules:
+    - changes:
+        - "**/composer.json"
+        - "**/composer.lock"
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer update -d vendor_bundled --dry-run
@@ -403,6 +537,10 @@ composer-could-update-lock:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/composer.json"
+        - "**/composer.lock"
   script:
     - cp $(command -v composer) temp/composer.phar
     - php temp/composer.phar -V | grep "version 2" || php temp/composer.phar self-update --2
@@ -430,6 +568,11 @@ composer-could-update-lock:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.php"
+        - "**/composer.lock"
+        - "**/*.sql"
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
       alias: mysql,
@@ -440,6 +583,7 @@ composer-could-update-lock:
     - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
     - '[ ! -d doc/devtools/dbdiff/cache ] && mkdir doc/devtools/dbdiff/cache'
     - '[ ! -f doc/devtools/dbdiff/cache/$DBFILE ] && curl -sS https://gitlab.com/tikiwiki/tikiwiki-ci-databases/raw/master/$DBFILE.gz -o doc/devtools/dbdiff/cache/$DBFILE.gz && gzip -d doc/devtools/dbdiff/cache/$DBFILE.gz'
+    - export TIKI_CATCH_UPDATE_WARNINGS=1
     - php -d display_errors=On doc/devtools/check_schema_upgrade.php -m $DBVER -e $ENGINE --db1=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikinew
   after_script:
     - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
@@ -522,6 +666,11 @@ sql-engine-conversion:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    - changes:
+        - "**/*.sql"
+        - "installer/**/*"
+        - "**/composer.lock"
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_IMAGE_NEWEST_SUPPORTED}
       alias: mysql
@@ -601,6 +750,11 @@ console-php-works:
 unit-tests:
   extends: .template-unit-tests
   allow_failure: false
+  rules:
+    - changes:
+        - "**/*.php"
+        - "lib/test/**/*"
+        - "vendor_bundled/composer.lock"
   parallel:
     matrix:
       - PHP_VERSION: "8.5"
@@ -620,6 +774,10 @@ unit-tests-node:
     - node_modules
   image:
     name: ${DEPENDENCY_PROXY_PREFIX}${NODE_IMAGE}
+  rules:
+    - changes:
+        - "**/*.js"
+        - "package-lock.json"
   script:
     - npm run testci
   coverage: '/All files(?:[^|]*\|){4}\s*(\S+)/'
@@ -647,6 +805,16 @@ tiki-package:
     - composer
     - node_build
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  rules:
+    # Run automatically when a user clicks "Set to auto-merge" (Merge Train)
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^\d+\.x$/)'
+      when: always
+
+    # Run automatically when code lands on master/release branches (Post-merge tracking)
+    - if: '$CI_PROJECT_PATH == "tikiwiki/tiki" && $CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ /^\d+\.x$/)'
+      when: always
+
+    - when: never
   script:
     # Remove dev dependencies in composer
     - echo "=> Removing Composer dev dependencies ..."
@@ -667,6 +835,10 @@ tiki-package:
     - echo "=> Optimize language files ..."
     - find lang/ -name language.php -exec php doc/devtools/stripcomments.php {} \;
     # set Permissions
+    - echo "=> Fix permissions ..."
+    - find . -type f -exec chmod 0664 {} \;
+    - chmod 0775 setup.sh
+    - find . -type d -exec chmod 0755 {} \;
     - echo "=> Generate changelog ..."
     - 'TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"'
     - git fetch origin "$TARGET_BRANCH" --tags --depth=1000
@@ -795,6 +967,8 @@ composer-stability:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
     - when: manual
+    - changes:
+        - "**/composer.json"
   artifacts:
     when: always  # Always upload artifacts even if job fails
   allow_failure: true  # Allow job to fail without failing the pipeline
@@ -805,27 +979,20 @@ composer-operator-check:
   needs:
     - composer
   script:
-  - apt-get update && apt-get install -y jq
-  - chmod +x doc/devtools/check_caret_operator.sh
-  - ./doc/devtools/check_caret_operator.sh
+  - php doc/devtools/check_caret_operator.php
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
-  allow_failure: false
+    - changes:
+      - "**/composer.json"
 
 check-alphabetical-list:
   stage: unit-tests
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   needs:
     - composer
-  script:
-    - chmod +x doc/devtools/check_alphabetical_list.php
-    - php doc/devtools/check_alphabetical_list.php
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
+    - changes:
+        - "**/composer.json"
+        - "**/package.json"
+  script:
+    - php doc/devtools/check_alphabetical_list.php
   allow_failure: false

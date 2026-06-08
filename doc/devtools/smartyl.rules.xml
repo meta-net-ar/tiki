@@ -53,32 +53,13 @@
             <pattern>templates/mail/</pattern>
         </rule>
 
+        <rule name="Commenting.Fixme.TaskFound"/>
+        <rule name="Commenting.Todo.TaskFound"/>
+
         <!-- There are a number of tasks in the templates, adding the current list here, so we ignore only the existing -->
         <rule name="Commenting.Todo.CommentFound">
             <pattern>templates/tiki-export_comment_xml.tpl</pattern>
             <pattern>templates/tiki-index_p.tpl</pattern>
-        </rule>
-        <rule name="Commenting.Todo.TaskFound">
-            <pattern>templates/admin/include_list_sections.tpl</pattern>
-            <pattern>templates/admin/include_look.tpl</pattern>
-            <pattern>templates/admin/include_profiles.tpl</pattern>
-            <pattern>templates/admin/include_search_report_string_in_db.tpl</pattern>
-            <pattern>templates/admin/include_textarea.tpl</pattern>
-            <pattern>templates/bootstrap_menu.tpl</pattern>
-            <pattern>templates/bootstrap_smartmenu.tpl</pattern>
-            <pattern>templates/bootstrap_smartmenu_children.tpl</pattern>
-            <pattern>templates/bootstrap_smartmenu_megamenu_children.tpl</pattern>
-            <pattern>templates/mail/tracker_changed_notification.tpl</pattern>
-            <pattern>templates/modules/mod-adminbar.tpl</pattern>
-            <pattern>templates/modules/mod-shoutbox.tpl</pattern>
-            <pattern>templates/tiki-admin_actionlog.tpl</pattern>
-            <pattern>templates/tiki-admin_menu_options.tpl</pattern>
-            <pattern>templates/tiki-edit_help.tpl</pattern>
-            <pattern>templates/tiki-flaggedrev_approval_header.tpl</pattern>
-            <pattern>templates/tiki-list_kaltura_entries_actions.tpl</pattern>
-            <pattern>templates/tiki-view_forum_thread.tpl</pattern>
-            <pattern>templates/tiki-webmail_contacts.tpl</pattern>
-            <pattern>templates/trackerinput/dropdown.tpl</pattern>
         </rule>
     </ignore>
 </rules>

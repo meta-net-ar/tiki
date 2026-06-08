@@ -754,7 +754,7 @@ class Tiki_Profile_Installer
     {
         $userlib = TikiLib::lib('user');
 
-        foreach (['description', 'home', 'user_tracker', 'group_tracker', 'user_signup', 'default_category', 'theme', 'color', 'user_tracker_field', 'group_tracker_field', 'is_external', 'expire_after', 'email_pattern', 'anniversary', 'prorate_interval'] as $field) {
+        foreach (['description', 'home', 'user_tracker', 'group_tracker', 'user_signup', 'default_category', 'theme', 'color', 'user_tracker_field', 'group_tracker_field', 'is_external', 'expire_after', 'email_pattern', 'anniversary', 'prorate_interval', 'twoFactorAuthGracePeriod'] as $field) {
             if (! isset($info[$field])) {
                 $info[$field] = '';
             }

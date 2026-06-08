@@ -567,7 +567,8 @@ if (isset($_REQUEST["sort_mode"])) {
     }
 }
 if (empty($sort_mode_full)) {
-    $sort_mode_full = ['itemId_asc'];
+    // Preserve the default sort order computed from tracker properties above
+    $sort_mode_full = ! empty($sort_mode) ? [$sort_mode] : ['itemId_asc'];
 }
 
 // Expose primary sort to template

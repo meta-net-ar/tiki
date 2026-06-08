@@ -148,7 +148,7 @@ class Tracker_Field_DateTime extends \Tracker\Field\AbstractItemField implements
         } else {
             // This condition addresses the scenario where data is received from the API, and the timestamp value is provided in its raw form.
             $hasRawRequestValue = array_key_exists($ins_id, $requestData);
-            $value = $hasRawRequestValue
+            $value = ($hasRawRequestValue && is_numeric($requestData[$ins_id]))
                 ? $requestData[$ins_id]
                 : $this->getValue();
 
