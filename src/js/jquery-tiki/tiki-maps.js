@@ -371,7 +371,7 @@ import { defaults as defaultControls } from "ol/control";
             };
 
             container.getLayer = function (name) {
-                var vectors;
+                let vectors;
 
                 if (name) {
                     if (!container.layers[name]) {
@@ -588,8 +588,8 @@ import { defaults as defaultControls } from "ol/control";
 
                         vectors.setZIndex(container.map.getLayers().getLength() * 1000);
                         container.setupLayerEvents(vectors);
-                        container.map.addLayer(vectors);
 
+                        container.layers[name] = vectors;
                         container.overlays.getLayers().push(vectors);
                     }
 
