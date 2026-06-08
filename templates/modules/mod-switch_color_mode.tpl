@@ -48,21 +48,4 @@
         </div>
     </div>
 {/if}
-{literal}
-<script>
-(function () {
-    var btn = document.getElementById('color-mode-theme');
-    if (!btn) return;
-    var menu = document.querySelector('#color-mode-theme ~ ul.dropdown-menu, #color-mode-theme + ul.dropdown-menu');
-    if (!menu) return;
-
-    btn.addEventListener('show.bs.dropdown', function () {
-        var rect = btn.getBoundingClientRect();
-        var isRightHalf = rect.left + rect.width / 2 > window.innerWidth / 2;
-        menu.classList.toggle('dropdown-menu-end', isRightHalf);
-        menu.classList.toggle('dropdown-menu-start', !isRightHalf);
-    });
-}());
-</script>
-{/literal}
 {/tikimodule}
