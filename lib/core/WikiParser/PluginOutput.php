@@ -78,10 +78,21 @@ class WikiParser_PluginOutput
         $content = tr('Plugin <strong>%0</strong> cannot be executed.', $name);
 
         if (Perms::get()->admin) {
+            $parserlib = TikiLib::lib('parser');
+            $previousWikiContext = $parserlib->option['wiki_parse_context'] ?? null;
+            $parserlib->option['wiki_parse_context'] = false;
             $smarty = TikiLib::lib('smarty');
             $content .= '<form method="post" action="tiki-admin.php">';
-            foreach ($preferences as $pref) {
-                $content .= smarty_function_preference(['name' => $pref, 'visible' => 'always'], $smarty->getEmptyInternalTemplate());
+            try {
+                foreach ($preferences as $pref) {
+                    $content .= smarty_function_preference(['name' => $pref, 'visible' => 'always'], $smarty->getEmptyInternalTemplate());
+                }
+            } finally {
+                if ($previousWikiContext === null) {
+                    unset($parserlib->option['wiki_parse_context']);
+                } else {
+                    $parserlib->option['wiki_parse_context'] = $previousWikiContext;
+                }
             }
             $content .= smarty_function_ticket([], $smarty->getEmptyInternalTemplate());
             $content .= '<input type="submit" class="btn btn-primary btn-sm" value="'
