@@ -714,4 +714,22 @@ abstract class AbstractItemField implements ItemFieldInterface, IndexableInterfa
         // Specific field types can override this behavior.
         return true;
     }
+
+    /**
+     * Return a plain text representation of the field value
+     * Intended for simple contexts like titles (isMain)
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $out = $this->renderInnerOutput($context);
+
+        if (is_array($out)) {
+            $out = implode(', ', $out);
+        }
+
+        return trim(strip_tags((string) $out));
+    }
 }
