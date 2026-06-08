@@ -3325,12 +3325,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "fa493d257ad3598a715c599e70219780b7d718e1"
+                "reference": "c4072ef62addf38b459a3de1105d774a50940973"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/fa493d257ad3598a715c599e70219780b7d718e1",
-                "reference": "fa493d257ad3598a715c599e70219780b7d718e1",
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/c4072ef62addf38b459a3de1105d774a50940973",
+                "reference": "c4072ef62addf38b459a3de1105d774a50940973",
                 "shasum": ""
             },
             "require": {
@@ -3408,7 +3408,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "wiki": "https://github.com/cypht-org/cypht/wiki"
             },
-            "time": "2026-06-04T06:44:17+00:00"
+            "time": "2026-06-08T15:29:31+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -20193,7 +20193,7 @@
         "ext-openssl": "*",
         "ext-zip": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.1",
         "ext-ldap": "0",
