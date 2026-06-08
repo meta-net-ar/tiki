@@ -41,15 +41,15 @@
                     {foreach $history as $entry}
                         {if $entry.action == 'Created'}
                             <tr>
-                                <td class="date text-nowrap"><strong>{$entry.changedAt|tiki_short_datetime}</strong></td>
-                                <td class="username"><strong>{$entry.changedBy|userlink}</strong></td>
+                                <td class="date text-nowrap"><strong>{$entry.lastModif|tiki_short_datetime}</strong></td>
+                                <td class="username"><strong>{$entry.user|userlink}</strong></td>
                                 <td colspan="3"><em class="text-muted">{tr}Initial configuration recorded at creation.{/tr}</em></td>
                             </tr>
                         {elseif $entry.hasChanges}
                             {foreach $entry.changes as $change}
                                 <tr>
-                                    <td class="date text-nowrap"><strong>{$entry.changedAt|tiki_short_datetime}</strong></td>
-                                    <td class="username"><strong>{$entry.changedBy|userlink}</strong></td>
+                                    <td class="date text-nowrap"><strong>{$entry.lastModif|tiki_short_datetime}</strong></td>
+                                    <td class="username"><strong>{$entry.user|userlink}</strong></td>
                                     <td class="fw-semibold text-nowrap align-middle">{$change.label|escape}</td>
                                     <td class="diff-old text-danger font-monospace small" style="background-color: #f8d7da; white-space:pre-wrap;">- {$change.from|escape}</td>
                                     <td class="diff-new text-success font-monospace small" style="background-color: #d1e7dd; white-space:pre-wrap;">+ {$change.to|escape}</td>

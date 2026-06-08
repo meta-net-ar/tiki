@@ -2544,8 +2544,8 @@ class Services_Tracker_Controller
         }
 
         $perms = Perms::get('tracker', $trackerId);
-        if (! $perms->admin_trackers) {
-            throw new Services_Exception_Denied(tr('Reserved for tracker administrators'));
+        if (! $perms->tracker_view_history) {
+            throw new Services_Exception_Denied(tr('Reserved for users with tracker history view permission'));
         }
 
         $definition = Tracker_Definition::get($trackerId);

@@ -110,13 +110,46 @@ class TrackerConfigHistory
     public static function getHistory(string $objectType, int $objectId, int $limit = 50, int $offset = 0): array
     {
         $db = TikiDb::get();
-        return $db->fetchAll(
-            'SELECT * FROM `tiki_tracker_config_history`
+        // Fetch one extra row so we can compute the diff for the last item in the page
+        $rows = $db->fetchAll(
+            'SELECT * FROM `tiki_tracker_config_histories`
              WHERE `objectType` = ? AND `objectId` = ?
-             ORDER BY `changedAt` DESC
-             LIMIT ' . (int) $limit . ' OFFSET ' . (int) $offset,
+             ORDER BY `lastModif` DESC
+             LIMIT ' . ((int) $limit + 1) . ' OFFSET ' . (int) $offset,
             [$objectType, $objectId]
         );
+
+        $result = [];
+        for ($i = 0; $i < count($rows); $i++) {
+            if ($i == $limit) {
+                break; // We only fetched this to compute the diff for the $i-1 element
+            }
+            $currentRow = $rows[$i];
+            $currentData = json_decode($currentRow['data'] ?? '[]', true) ?? [];
+
+            $previousData = null;
+            if ($currentRow['version'] > 1) {
+                if (isset($rows[$i + 1])) {
+                    $previousData = json_decode($rows[$i + 1]['data'] ?? '[]', true) ?? [];
+                } else {
+                    $prevJson = $db->getOne(
+                        'SELECT `data` FROM `tiki_tracker_config_histories` WHERE `objectType` = ? AND `objectId` = ? AND `version` = ?',
+                        [$objectType, $objectId, $currentRow['version'] - 1]
+                    );
+                    if ($prevJson) {
+                        $previousData = json_decode($prevJson, true) ?? [];
+                    } else {
+                        $previousData = [];
+                    }
+                }
+            }
+
+            $diff = self::computeDiff($previousData, $currentData);
+            $currentRow['diff_data'] = $diff;
+            $result[] = $currentRow;
+        }
+
+        return $result;
     }
 
     /**
@@ -126,7 +159,7 @@ class TrackerConfigHistory
     {
         $db = TikiDb::get();
         return (int) $db->getOne(
-            'SELECT COUNT(*) FROM `tiki_tracker_config_history` WHERE `objectType` = ? AND `objectId` = ?',
+            'SELECT COUNT(*) FROM `tiki_tracker_config_histories` WHERE `objectType` = ? AND `objectId` = ?',
             [$objectType, $objectId]
         );
     }
@@ -198,22 +231,27 @@ class TrackerConfigHistory
         }
 
         $ip = TikiLib::lib('tiki')->get_ip_address();
+        $db = TikiDb::get();
 
-        TikiDb::get()->query(
-            'INSERT INTO `tiki_tracker_config_history`
-             (`objectType`, `objectId`, `trackerId`, `action`, `changedBy`, `changedAt`, `ip`, `before`, `after`, `diff`)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        $maxVersion = (int) $db->getOne(
+            'SELECT MAX(`version`) FROM `tiki_tracker_config_histories` WHERE `objectType` = ? AND `objectId` = ?',
+            [$objectType, $objectId]
+        );
+        $newVersion = $maxVersion > 0 ? $maxVersion + 1 : 1;
+
+        $db->query(
+            'INSERT INTO `tiki_tracker_config_histories`
+             (`objectType`, `objectId`, `action`, `user`, `lastModif`, `ip`, `version`, `data`)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 $objectType,
                 $objectId,
-                $trackerId,
                 $action,
                 $user ?? 'anonymous',
                 time(),
                 $ip,
-                $beforeClean !== null ? json_encode($beforeClean, JSON_UNESCAPED_UNICODE) : null,
-                json_encode($afterClean, JSON_UNESCAPED_UNICODE),
-                json_encode($diff, JSON_UNESCAPED_UNICODE),
+                $newVersion,
+                json_encode($afterClean, JSON_UNESCAPED_UNICODE)
             ]
         );
     }

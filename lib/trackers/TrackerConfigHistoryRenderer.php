@@ -166,18 +166,18 @@ class TrackerConfigHistoryRenderer
      */
     public static function renderRow(array $row): array
     {
-        $diffData    = $row['diff_data'] ?? json_decode($row['diff'] ?? '[]', true) ?? [];
+        $diffData    = $row['diff_data'] ?? [];
         $objectType  = $row['objectType'];
 
         return [
             'historyId'  => $row['historyId'],
             'objectType' => $objectType,
             'objectId'   => $row['objectId'],
-            'trackerId'  => $row['trackerId'],
             'action'     => $row['action'],
-            'changedBy'  => $row['changedBy'],
-            'changedAt'  => $row['changedAt'],
+            'user'       => $row['user'],
+            'lastModif'  => $row['lastModif'],
             'ip'         => $row['ip'],
+            'version'    => $row['version'],
             'changes'    => self::renderDiff($diffData, $objectType),
             'hasChanges' => ! empty($diffData),
         ];
