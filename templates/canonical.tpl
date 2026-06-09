@@ -1,10 +1,11 @@
 {if $prefs.feature_canonical_url eq 'y' and isset($mid)}
-    {if $mid eq 'tiki-show_page.tpl' or $mid eq 'tiki-index_p.tpl' or $mid eq 'tiki-show_page_raw.tpl' or $mid eq 'tiki-all_languages.tpl' or $mid eq 'tiki-show_content.tpl'}
-        <link rel="canonical" href="{$base_url_canonical}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}">
-        <meta content="{$base_url_canonical}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}" property="og:url">
-    {elseif $mid eq 'extends:layouts/internal/layout_view.tpl|tiki-show_page.tpl'}
-        <link rel="canonical" href="{$base_url_canonical}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}">
-        <meta content="{$base_url_canonical}{$page|sefurl}{if not empty($canonical_ending)}{$canonical_ending}{/if}" property="og:url">
+    {if $mid eq 'tiki-show_page.tpl' or $mid eq 'tiki-index_p.tpl' or $mid eq 'tiki-show_page_raw.tpl' or $mid eq 'tiki-all_languages.tpl' or $mid eq 'tiki-show_content.tpl' or $mid eq 'extends:layouts/internal/layout_view.tpl|tiki-show_page.tpl'}
+        {assign var=canonical_url value=$base_url_canonical|cat:($page|sefurl)}
+        {if not empty($prefs.wikiHomePage) and $page eq $prefs.wikiHomePage}
+            {assign var=canonical_url value=$base_url_canonical}
+        {/if}
+        <link rel="canonical" href="{$canonical_url}{if not empty($canonical_ending)}{$canonical_ending}{/if}">
+        <meta content="{$canonical_url}{if not empty($canonical_ending)}{$canonical_ending}{/if}" property="og:url">
     {elseif $mid eq 'tiki-view_tracker_item.tpl'}
         <link rel="canonical" href="{$base_url_canonical}{$itemId|sefurl:trackeritem:null:null:'n'}">
         <meta content="{$base_url_canonical}{$itemId|sefurl:trackeritem:null:null:'n'}" property="og:url">
