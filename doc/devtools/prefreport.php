@@ -10,6 +10,8 @@
 // also check out  doc/devtools/securitycheck.php to see in which files are
 // used each pref (and permission name too)
 //
+// For documentation link audit (broken / + / missing help), see doc/devtools/doclink_audit.php
+//
 
 require_once 'tiki-setup.php';
 $prefslib = TikiLib::lib('prefs');
