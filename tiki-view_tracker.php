@@ -19,7 +19,6 @@ $inputConfiguration = [
             'my'                 => 'username',      //get
             'ours'               => 'word',          //get
             'status'             => 'word',          //get
-            'sort_mode'          => 'alnumdash',     //get
             'remove'             => 'int',           //get
             'force'              => 'bool',          //get
             'batchaction'        => 'word',          //get
@@ -36,7 +35,7 @@ $inputConfiguration = [
         'staticKeyFiltersForArrays' => [
             'action'                => 'string',    //get
             'vals'                  => 'none',      //get
-            'sort_mode'             => 'string',    //get
+            'sort_mode'             => 'alnumdash', //get
             'filtervalue'           => 'word',
         ],
     ],
@@ -561,9 +560,9 @@ if (isset($_REQUEST["trackerId"])) {
 $sort_mode_full = [];
 if (isset($_REQUEST["sort_mode"])) {
     if (is_array($_REQUEST["sort_mode"])) {
-        $sort_mode_full = array_values($_REQUEST["sort_mode"]);
+        $sort_mode_full = array_values(array_filter($_REQUEST["sort_mode"], 'is_string'));
     } else {
-        $sort_mode_full = [$_REQUEST["sort_mode"]];
+        $sort_mode_full = [strval($_REQUEST["sort_mode"])];
     }
 }
 if (empty($sort_mode_full)) {
