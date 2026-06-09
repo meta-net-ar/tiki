@@ -242,19 +242,22 @@ import { defaults as defaultControls } from "ol/control";
     }
 
     function writeCoordinates(lonlat, map, fixProjection) {
-        var original = lonlat;
+        let coordinates = typeof lonlat.length === "number" ? lonlat : lonlat.getCoordinates();
+        const original = coordinates;
 
         if (fixProjection) {
-            lonlat = lonlat.transform(map.getView().getProjection(), new ol.proj.Projection({ code: "EPSG:4326" }));
+            lonlat = ol.proj.transform(
+                coordinates,
+                map.getView().getProjection(), // source — replaces map.getProjectionObject()
+                "EPSG:4326" // target
+            );
 
             if (!lonlat) {
-                lonlat = original;
+                coordinates = original;
             }
         }
 
-        let coords = lonlat.getCoordinates();
-
-        return formatLocation(coords[0], coords[1], map.getView().getZoom());
+        return formatLocation(coordinates[0], coordinates[1], map.getView().getZoom());
     }
 
     function formatLocation(lat, lon, zoom) {
@@ -342,16 +345,25 @@ import { defaults as defaultControls } from "ol/control";
 
             container.setupLayerEvents = function (vectors) {
                 selectionInteraction = new ol.interaction.Select({
-                    condition: ol.events.condition.click,
+                    condition: ol.events.condition.singleClick,
+                    //style: null,
                 });
 
                 map.addInteraction(selectionInteraction);
 
                 selectionInteraction.on("select", function (event) {
-                    if (event.target.executor) {
-                        event.target.executor();
+                    if (event.deselected.length) {
+                        event.deselected.forEach((feature) => {
+                            if (feature.executor) {
+                                feature.executor();
+                            }
+                        });
                     }
-                    container.showPopup.apply(null, [event]);
+                    if (event.selected.length) {
+                        event.selected.forEach(() => {
+                            container.showPopup.apply(null, [event]);
+                        });
+                    }
                 });
 
                 selectionInteraction.on("modified", function (event) {
@@ -940,7 +952,7 @@ import { defaults as defaultControls } from "ol/control";
                         features = e.target.getFeatures();
 
                     if (features.getLength()) {
-                        feature = features.getArray()[0];
+                        feature = features.item(0);
                         var clusterFeatures = feature.get("features");
                         if (clusterFeatures) {
                             if (clusterFeatures.length === 1) {
@@ -958,7 +970,7 @@ import { defaults as defaultControls } from "ol/control";
                                 return;
                             }
                         } else {
-                            feature = features.getArray()[0];
+                            feature = features.item(0);
                         }
                     } else {
                         return;
@@ -1063,8 +1075,6 @@ import { defaults as defaultControls } from "ol/control";
                     }
                 };
             }
-
-            container.setupLayerEvents(container.vectors);
 
             if (layers.length > 0 && -1 !== $.inArray("overview", desiredControls)) {
                 var overview = new ol.control.OverviewMap({ minRatio: 128, maxRatio: 256, maximized: true });
@@ -2182,7 +2192,7 @@ import { defaults as defaultControls } from "ol/control";
 
                 if (options.type === "trackeritem" && options.object && markerLayer === container.vectors) {
                     feature.executor = delayedExecutor(5000, function () {
-                        var current = writeCoordinates(feature.geometry.getBounds().getCenterLonLat().clone(), container.map, true);
+                        var current = writeCoordinates(feature.getGeometry().getCoordinates(), container.map, true);
 
                         if (current === initial) {
                             return;
