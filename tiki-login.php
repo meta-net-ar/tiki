@@ -488,6 +488,10 @@ if ($isvalid && ($isOpenIdValid || $access->checkCsrf(null, null, null, null, nu
         // User is valid and not due to change pass.. start session
         $userlib->update_expired_groups();
         TikiLib::lib('login')->activateSession($user);
+        // Reset any group emulation from the previous (anonymous) session
+        unset($_SESSION['groups_are_emulated']);
+        unset($_SESSION['groups_emulated']);
+        unset($_SESSION['groups_emulated_requested']);
 
         $url = $_SESSION['loginfrom'];
         $_SESSION['login_time'] = time();
