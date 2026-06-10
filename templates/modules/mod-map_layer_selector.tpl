@@ -27,7 +27,10 @@
 
                 $baseLayers.on("change", function () {
                     const layers = container.map.getLayers();
-                    LayerSwitcher.setVisible_(container.map, layers.item($(this).val()));
+                    const layerIndex = parseInt($(this).val());
+                    if (! isNaN(layerIndex)) {
+                        LayerSwitcher.setVisible_(container.map, layerIndex);
+                    }
                 });
 
                 const refreshLayers = function () {
