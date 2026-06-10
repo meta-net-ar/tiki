@@ -1,0 +1,11 @@
+---
+description: Response from updating a comment.
+type: object
+properties:
+  threadId:
+    oneOf:
+      - type: string
+      - type: integer
+    nullable: true
+  comment:
+    $ref: schemas-Comment.yaml

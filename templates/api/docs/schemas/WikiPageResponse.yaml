@@ -1,87 +1,156 @@
 ---
+description: |
+  Wiki page object. Returned both in list responses (GET /wiki) and single-page
+  responses (GET /wiki/page/{page}). Single-page responses additionally include
+  baseName, prettyName, namespace and namespace_parts.
 type: object
+required:
+  - page_id
+  - pageName
+  - pageSlug
+  - hits
+  - data
+  - description
+  - lastModif
+  - comment
+  - version
+  - version_minor
+  - user
+  - ip
+  - flag
+  - points
+  - votes
+  - cache
+  - wiki_cache
+  - cache_timestamp
+  - pageRank
+  - creator
+  - lang
+  - lockedby
+  - is_html
+  - created
+  - wysiwyg
+  - wiki_authors_style
+  - comments_enabled
+  - keywords
 properties:
-  data:
-    type: array
-    items:
-      page_id:
-        type: integer
-      pageName:
-        type: string
-      pageSlug:
-        type: string
-      hits:
-        type: integer
-      data:
-        type: string
-        description: raw content
-      description:
-        type: string
-      lastModif:
-        type: integer
-      comment:
-        type: string
-      version:
-        type: integer
-      version_minor:
-        type: integer
-      user:
-        type: string
-      ip:
-        type: string
-      flag:
-        type: string
-        enum:
-          - locked
-          - unlocked
-      points:
-        type: integer
-      votes:
-        type: integer
-      cache:
-        type: string
-      wiki_cache:
-        type: string
-      cache_timestamp:
-        type: integer
-      pageRank:
-        type: float
-      creator:
-        type: string
-      len:
-        type: integer
-        description: page size
-      lang:
-        type: string
-      lockedby:
-        type: string
-      is_html:
-        type: integer
-      created:
-        type: integer
-      wysiwyg:
-        $ref: schemas-TikiBoolean.yaml
-      wiki_authors_style:
-        type: string
-      comments_enabled:
-        $ref: schemas-TikiBoolean.yaml
-      keywords:
-        type: string
-      perms:
-        type: object
-      versions:
-        type: integer
-      links:
-        type: integer
-      backlinks:
-        type: integer
-      categpath:
-        type: array
-        items:
-          type: string
-      categname:
-        type: array
-        items:
-          type: string
-  count:
+  page_id:
+    oneOf:
+      - type: integer
+      - type: string
+    description: Page ID — numeric but may be returned as a string.
+  pageName:
+    type: string
+  pageSlug:
+    type: string
+    nullable: true
+  hits:
     type: integer
+  data:
+    type: string
+    description: Parsed HTML content (or raw wiki syntax when raw=1 is requested).
+  description:
+    type: string
+    nullable: true
+  lastModif:
+    type: integer
+    nullable: true
+  comment:
+    type: string
+    nullable: true
+  version:
+    type: integer
+  version_minor:
+    type: integer
+  user:
+    type: string
+  ip:
+    type: string
+    nullable: true
+  flag:
+    type: string
+    nullable: true
+    description: "'L' when the page is locked, empty otherwise."
+  points:
+    type: integer
+    nullable: true
+  votes:
+    type: integer
+    nullable: true
+  cache:
+    type: string
+    nullable: true
+  wiki_cache:
+    type: string
+    nullable: true
+  cache_timestamp:
+    type: integer
+    nullable: true
+  pageRank:
+    type: number
+    nullable: true
+  creator:
+    type: string
+    nullable: true
+  lang:
+    type: string
+    nullable: true
+  lockedby:
+    type: string
+    nullable: true
+  is_html:
+    type: integer
+  created:
+    type: integer
+  wysiwyg:
+    $ref: schemas-TikiBoolean.yaml
+    nullable: true
+  wiki_authors_style:
+    type: string
+    nullable: true
+  comments_enabled:
+    $ref: schemas-TikiBoolean.yaml
+    nullable: true
+  keywords:
+    type: string
+    nullable: true
+  perms:
+    type: object
+    nullable: true
+    description: Map of permission names to 'y'/'n'.
+  page_size:
+    type: integer
+    nullable: true
+    description: Page content size in bytes (returned by get_page_info for single-page requests).
+  outputType:
+    type: string
+    nullable: true
+    description: Output format of the page (e.g. 'wiki' or empty for default).
+  versions:
+    type: integer
+    nullable: true
+  len:
+    type: integer
+    nullable: true
+    description: Page size in bytes.
+  links:
+    type: integer
+    nullable: true
+  backlinks:
+    type: integer
+    nullable: true
+  baseName:
+    type: string
+    nullable: true
+    description: Base page name (without namespace prefix).
+  prettyName:
+    type: string
+    nullable: true
+  namespace:
+    type: boolean
+    nullable: true
+  namespace_parts:
+    type: array
+    nullable: true
+    items:
+      type: string

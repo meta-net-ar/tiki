@@ -1,0 +1,67 @@
+---
+description: Response returned when creating or updating a tracker. Contains the full tracker configuration view used to render the admin form.
+type: object
+properties:
+  accordion_pos:
+    type: integer
+  title:
+    type: string
+  trackerId:
+    type: string
+    description: Tracker ID — numeric but may be returned as a string.
+  info:
+    type: object
+    description: Full tracker configuration object (same fields as the Tracker schema).
+  statusTypes:
+    type: object
+    description: Map of status code ('o', 'p', 'c') to status definition.
+    additionalProperties:
+      type: object
+      properties:
+        name:
+          type: string
+        label:
+          type: string
+        perm:
+          type: string
+        image:
+          type: string
+        iconname:
+          type: string
+  statusList:
+    type: array
+  sortFields:
+    type: array
+  attachmentAttributes:
+    type: array
+  startDate:
+    type: string
+    nullable: true
+  startTime:
+    type: string
+    nullable: true
+  endDate:
+    type: string
+    nullable: true
+  endTime:
+    type: string
+    nullable: true
+  groupList:
+    type: array
+  groupforAlert:
+    type: boolean
+  showeachuser:
+    type: boolean
+  sectionFormats:
+    type: array
+  remoteTabulars:
+    type: array
+  relationshipBehaviourList:
+    type: array
+  displayTimezone:
+    type: string
+  fields:
+    type: array
+    description: Tracker field definitions.
+    items:
+      $ref: schemas-TrackerField.yaml

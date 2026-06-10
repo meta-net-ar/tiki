@@ -26,14 +26,38 @@ get:
           schema:
             type: object
             properties:
+              title:
+                type: string
               type:
                 type: string
               source:
                 type: string
               filters:
                 type: object
+                properties:
+                  type:
+                    type: string
+                  language:
+                    type: string
+                    nullable: true
+                    description: Quoted OR-string of available language codes, or null when no other language exists.
               translations:
-                type: object
+                type: array
+                description: Translation links; empty when no translations are attached.
+                items:
+                  type: object
+                  properties:
+                    traId:
+                      type: integer
+                    objId:
+                      type: string
+                      description: Object identifier (page name for wiki pages, numeric ID for other types).
+                    lang:
+                      type: string
+                      description: Language code (e.g. 'fr', 'de').
+                    language:
+                      type: string
+                      description: Human-readable language name.
               canAttach:
                 type: boolean
               canDetach:

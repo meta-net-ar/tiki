@@ -1,0 +1,8 @@
+---
+description: Response from GET /galleries/{galleryId} (gallery info).
+type: object
+required:
+  - info
+properties:
+  info:
+    $ref: schemas-Gallery.yaml

@@ -1,102 +1,134 @@
 ---
+description: A single file or sub-gallery entry in a file gallery listing.
 type: object
 properties:
-  title:
+  isgal:
+    type: integer
+    description: "1 if this entry is a sub-gallery, 0 if it is a file."
+  id:
+    type: integer
+  parentId:
+    type: integer
+  name:
     type: string
+  description:
+    type: string
+    nullable: true
+  size:
+    type: integer
+    nullable: true
+  created:
+    type: integer
+    nullable: true
+  filename:
+    type: string
+    nullable: true
+  type:
+    type: string
+    nullable: true
+  creator:
+    type: string
+    nullable: true
+  author:
+    type: string
+    nullable: true
+  hits:
+    type: integer
+    nullable: true
+  lastDownload:
+    type: integer
+    nullable: true
+  votes:
+    type: integer
+    nullable: true
+  points:
+    type: number
+    nullable: true
+  path:
+    type: string
+    nullable: true
+  reference_url:
+    type: string
+    nullable: true
+  is_reference:
+    type: string
+    nullable: true
+  hash:
+    type: string
+    nullable: true
+  search_data:
+    type: string
+    nullable: true
+  metadata:
+    type: string
+    nullable: true
+  lastModif:
+    type: integer
+    nullable: true
+  last_user:
+    type: string
+    nullable: true
+  lockedby:
+    type: string
+    nullable: true
+  comment:
+    type: string
+    nullable: true
+  deleteAfter:
+    type: string
+    nullable: true
+  maxhits:
+    type: string
+    nullable: true
+  archiveId:
+    type: integer
+    nullable: true
+  ocr_state:
+    type: string
+    nullable: true
+  ocr_lang:
+    type: string
+    nullable: true
+  ocr_data:
+    type: string
+    nullable: true
+  visible:
+    type: string
+    nullable: true
+  public:
+    type: string
+    nullable: true
+  fileId:
+    type: integer
   galleryId:
     type: integer
-  offset:
+  filesize:
     type: integer
-  maxRecords:
+    nullable: true
+  filetype:
+    type: string
+    nullable: true
+  user:
+    type: string
+    nullable: true
+  lastModifUser:
+    type: string
+    nullable: true
+  icon_fileId:
     type: integer
-  count:
-    type: integer
-  result:
+    nullable: true
+  files:
+    type: string
+    nullable: true
+  parentName:
+    type: string
+    nullable: true
+  perms:
     type: object
-    properties:
-      isgal:
-        type: integer
-      id:
-        type: integer
-      parentId:
-        type: integer
-      name:
-        type: string
-      description:
-        type: string
-      size:
-        type: integer
-      created:
-        type: integer
-      filename:
-        type: string
-      type:
-        type: string
-      creator:
-        type: string
-      author:
-        type: string
-      hits:
-        type: integer
-      lastDownload:
-        type: integer
-      votes:
-        type: integer
-      points:
-        type: float
-      path:
-        type: string
-      reference_url:
-        type: string
-      is_reference:
-        type: string
-      hash:
-        type: string
-      search_data:
-        type: string
-      metadata:
-        type: string
-      lastModif:
-        type: integer
-      last_user:
-        type: string
-      lockedby:
-        type: string
-      comment:
-        type: string
-      deleteAfter:
-        type: string
-      maxhits:
-        type: string
-      archiveId:
-        type: integer
-      ocr_state:
-        type: string
-      visible:
-        type: string
-      public:
-        type: string
-      fileId:
-        type: integer
-      galleryId:
-        type: integer
-      filesize:
-        type: integer
-      filetype:
-        type: string
-      user:
-        type: string
-      lastModifUser:
-        type: string
-      icon_fileId:
-        type: integer
-      files:
-        type: string
-      parentName:
-        type: string
-      perms:
-        type: object
-        example: |
-          {"tiki_p_admin_file_galleries": "y", "tiki_p_download_files": "y"}
-      wiki_syntax:
-        type: string
+    description: Map of permission names to 'y'/'n'.
+  wiki_syntax:
+    type: string
+    nullable: true
+  podcast_filename:
+    type: string
+    nullable: true

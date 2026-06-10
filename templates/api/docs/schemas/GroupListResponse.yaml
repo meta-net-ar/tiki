@@ -1,0 +1,13 @@
+---
+description: Paginated list of groups (GET /groups).
+type: object
+required:
+  - data
+  - count
+properties:
+  data:
+    type: array
+    items:
+      $ref: schemas-GroupListEntry.yaml
+  count:
+    type: integer

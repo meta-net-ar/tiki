@@ -1,0 +1,22 @@
+---
+description: FORWARD redirect response from translation attach/detach actions.
+type: object
+required:
+  - FORWARD
+properties:
+  FORWARD:
+    type: object
+    required:
+      - controller
+      - action
+      - type
+      - source
+    properties:
+      controller:
+        type: string
+      action:
+        type: string
+      type:
+        type: string
+      source:
+        type: string

@@ -192,6 +192,17 @@ class Services_Group_Controller
             $util->setVars($input, $this->filters, 'items');
             $params = $this->prepareParameters($util->extra);
             $userlib = TikiLib::lib('user');
+
+            // Check if group name is empty
+            if (empty($params['name'])) {
+                $feedback = [
+                    'tpl' => 'action',
+                    'mes' => tr('Group name cannot be empty'),
+                ];
+                Feedback::error($feedback);
+                return Services_Utilities::refresh('queryAndAnchor');
+            }
+
             //add group and inclusions
             $newGroupId = $userlib->add_group(
                 $params['name'],
@@ -352,6 +363,17 @@ class Services_Group_Controller
             //set parameters
             $util->setVars($input, $this->filters, 'items');
             $params = $this->prepareParameters($util->extra);
+
+            // Check if group name is empty
+            if (empty($params['name'])) {
+                $feedback = [
+                    'tpl' => 'action',
+                    'mes' => tr('Group name cannot be empty'),
+                ];
+                Feedback::error($feedback);
+                return Services_Utilities::refresh('queryAndAnchor');
+            }
+
             $success = $userlib->change_group(
                 $params['olgroup'],
                 $params['name'],

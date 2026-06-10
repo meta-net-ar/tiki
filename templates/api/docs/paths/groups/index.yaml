@@ -40,25 +40,35 @@ get:
                   type: object
                   properties:
                     id:
-                      type: string
+                      type: integer
                     groupName:
                       type: string
                     groupDesc:
                       type: string
                     groupHome:
                       type: string
+                      nullable: true
                     usersTrackerId:
                       type: integer
+                      nullable: true
                     groupTrackerId:
                       type: integer
+                      nullable: true
                     usersFieldId:
                       type: integer
+                      nullable: true
+                    groupFieldId:
+                      type: integer
+                      nullable: true
                     registrationChoice:
                       $ref: schemas-TikiBoolean.yaml
+                      nullable: true
                     registrationUsersFieldIds:
                       type: string
+                      nullable: true
                     userChoice:
                       $ref: schemas-TikiBoolean.yaml
+                      nullable: true
                     groupDefCat:
                       type: integer
                     groupTheme:
@@ -67,32 +77,31 @@ get:
                       type: string
                     isExternal:
                       $ref: schemas-TikiBoolean.yaml
-                    expireAfterIndex:
+                    expireAfter:
                       type: integer
                     emailPattern:
                       type: string
+                      nullable: true
                     anniversary:
                       type: string
+                      nullable: true
                     prorateInterval:
                       type: string
+                      nullable: true
                     isRole:
                       $ref: schemas-TikiBoolean.yaml
+                      nullable: true
                     isTplGroup:
                       $ref: schemas-TikiBoolean.yaml
+                      nullable: true
                     perms:
                       type: array
-                      items:
-                        type: string
                     permCount:
                       type: integer
                     included:
                       type: array
-                      items:
-                        type: string
                     included_direct:
                       type: array
-                      items:
-                        type: string
               count:
                 type: integer
 post:

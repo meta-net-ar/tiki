@@ -23,8 +23,10 @@ get:
                       type: integer
                     name:
                       type: string
+                      nullable: true
                     description:
                       type: string
+                      nullable: true
                     descriptionIsParsed:
                       $ref: schemas-TikiBoolean.yaml
                     created:
@@ -33,7 +35,13 @@ get:
                       type: integer
                     items:
                       type: integer
-                      description: Tracker items count
+                      description: Number of items in the tracker.
+                    fieldsCount:
+                      type: integer
+                      description: Number of fields defined in the tracker.
+                    system_tracker:
+                      type: boolean
+                      description: True if this is an internal system tracker (e.g. user tracker).
               count:
                 type: integer
                 description: Trackers count
@@ -51,12 +59,7 @@ post:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              trackerId:
-                type: integer
-              info:
-                type: object
+            $ref: schemas-TrackerCreateUpdateResponse.yaml
     '403':
       description: forbidden
       content:

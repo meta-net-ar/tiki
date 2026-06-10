@@ -37,6 +37,8 @@ post:
                 type: integer
               name:
                 type: string
+              message:
+                type: string
     '403':
       description: forbidden
       content:

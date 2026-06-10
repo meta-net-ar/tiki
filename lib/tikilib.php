@@ -3656,8 +3656,9 @@ class TikiLib extends TikiDb_Bridge
         }
         //  Deal with mail notifications.
         include_once(__DIR__ . '/notifications/notificationemaillib.php');
-        $foo = parse_url($_SERVER["REQUEST_URI"]);
-        $machine = self::httpPrefix(true) . dirname($foo["path"]);
+        $requestUri = $_SERVER["REQUEST_URI"] ?? '';
+        $foo = parse_url($requestUri);
+        $machine = self::httpPrefix(true) . dirname($foo["path"] ?? '/');
         sendWikiEmailNotification('wiki_page_deleted', $page, $user, $comment, 1, $page_info['data'], $machine);
 
         //Remove the bibliography references for this page
@@ -5595,8 +5596,9 @@ class TikiLib extends TikiDb_Bridge
                 include_once(__DIR__ . '/notifications/notificationemaillib.php');
                 $histlib = TikiLib::lib('hist');
                 $old = $histlib->get_version($pageName, $old_version);
-                $foo = parse_url($_SERVER["REQUEST_URI"]);
-                $machine = self::httpPrefix(true) . dirname($foo["path"]);
+                $requestUri = $_SERVER["REQUEST_URI"] ?? '';
+                $foo = parse_url($requestUri);
+                $machine = self::httpPrefix(true) . dirname($foo["path"] ?? '/');
 
                 $oldPagePlugins = WikiParser_PluginMatcher::match($old["data"]);
                 $editedPagePlugins = WikiParser_PluginMatcher::match($edit_data);

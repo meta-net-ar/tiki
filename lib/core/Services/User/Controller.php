@@ -90,7 +90,7 @@ class Services_User_Controller
         }
 
         if ($pass !== $passAgain) {
-            throw new Services_Exception(tr('Passwords do not match.'));
+            throw new Services_Exception(tr('Passwords do not match.'), 422);
         }
 
         $regResult = TikiLib::lib('registration')->register_new_user(
@@ -103,6 +103,11 @@ class Services_User_Controller
                 'email' => $email,
             ]
         );
+
+        if (is_array($regResult) && ! empty($regResult)) {
+            $messages = implode(', ', array_column($regResult, 'msg'));
+            throw new Services_Exception($messages, 422);
+        }
 
         if (TIKI_API && empty($regResult)) {
             $regResult = tra('User account created but pending confirmation.');
@@ -952,6 +957,15 @@ class Services_User_Controller
             Feedback::error(tra('No user was selected.'));
             return Services_Utilities::closeModal();
         }
+        // ensures the user selected to send a message to exists.
+        if (! $userlib->user_exists($userwatch)) {
+            if (TIKI_API) {
+                throw new Services_Exception_NotFound('The selected user does not exist.');
+            }
+            Feedback::error(tra('The selected user does not exist.'));
+            return Services_Utilities::closeModal();
+        }
+
         //sets default priority for the message to 3 if no priority was given
         if (! empty($input->priority->text())) {
             $priority = $input->priority->text();

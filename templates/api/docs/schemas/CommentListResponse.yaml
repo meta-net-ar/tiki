@@ -1,0 +1,42 @@
+---
+description: Paginated list of comments for an object.
+type: object
+properties:
+  title:
+    type: string
+  comments:
+    type: array
+    items:
+      $ref: schemas-CommentListEntry.yaml
+  type:
+    type: string
+  objectId:
+    oneOf:
+      - type: string
+      - type: integer
+  parentId:
+    type: integer
+    nullable: true
+  count:
+    type: integer
+  offset:
+    type: integer
+    nullable: true
+  maxRecords:
+    type: integer
+  sortMode:
+    type: string
+  allow_post:
+    type: boolean
+  allow_remove:
+    type: boolean
+  allow_lock:
+    type: boolean
+  allow_unlock:
+    type: boolean
+  allow_archive:
+    type: boolean
+  allow_moderate:
+    type: boolean
+  allow_vote:
+    type: boolean

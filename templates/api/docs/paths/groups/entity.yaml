@@ -118,10 +118,7 @@ post:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              feedback:
-                type: object
+            $ref: schemas-GroupActionFeedbackResponse.yaml
     '403':
       description: forbidden
       content:

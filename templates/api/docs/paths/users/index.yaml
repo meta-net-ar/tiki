@@ -32,11 +32,61 @@ get:
             properties:
               result:
                 type: array
+                nullable: true
+                description: Null when the caller lacks permission to list users.
                 items:
                   type: object
-                  descripton: TODO - document
+                  properties:
+                    userId:
+                      type: integer
+                    login:
+                      type: string
+                    default_group:
+                      type: string
+                      nullable: true
+                    lastLogin:
+                      type: integer
+                      nullable: true
+                    currentLogin:
+                      type: integer
+                      nullable: true
+                    registrationDate:
+                      type: integer
+                    pass_confirm:
+                      type: integer
+                      nullable: true
+                    email_confirm:
+                      type: integer
+                      nullable: true
+                    created:
+                      type: integer
+                    valid:
+                      type: string
+                      nullable: true
+                    unsuccessful_logins:
+                      type: integer
+                    waiting:
+                      type: string
+                      nullable: true
+                    user:
+                      type: string
+                    groups:
+                      type: array
+                      items:
+                        type: string
+                    age:
+                      type: integer
+                    editable:
+                      type: boolean
+                    disposable_email:
+                      type: boolean
+                    avatar:
+                      type: string
+                      nullable: true
               count:
                 type: integer
+                nullable: true
+                description: Null when the caller lacks permission to list users.
 post:
   description: Register/create a user
   requestBody:
@@ -71,8 +121,15 @@ post:
             type: object
             properties:
               result:
-                type: object
-                description: Contains success message or error messages concerning user validation.
+                type: string
+                nullable: true
+                description: Confirmation message on successful registration.
+    '422':
+      description: validation error
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
     '403':
       description: forbidden
       content:

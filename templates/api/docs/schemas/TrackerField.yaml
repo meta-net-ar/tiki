@@ -1,0 +1,81 @@
+---
+description: A tracker field definition including type, display and validation configuration.
+type: object
+properties:
+  fieldId:
+    type: integer
+  trackerId:
+    type: integer
+  name:
+    type: string
+  permName:
+    type: string
+  options:
+    type: string
+  type:
+    type: string
+    description: Single-character field type code (e.g. 't' = text, 'n' = numeric, 'd' = dropdown).
+  isMain:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  isTblVisible:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  position:
+    type: integer
+  isSearchable:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  isPublic:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  isHidden:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  isMandatory:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  description:
+    type: string
+  isMultilingual:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  itemChoices:
+    type: array
+  errorMsg:
+    type: string
+  visibleBy:
+    type: array
+  editableBy:
+    type: array
+  descriptionIsParsed:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  validation:
+    type: string
+  validationParam:
+    type: string
+  validationMessage:
+    type: string
+  rules:
+    type: string
+    nullable: true
+  encryptionKeyId:
+    type: integer
+    nullable: true
+  excludeFromNotification:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  visibleInViewMode:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  visibleInEditMode:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  visibleInHistoryMode:
+    type: string
+    description: "Tiki boolean: 'y'/'n'."
+  options_array:
+    type: array
+  options_map:
+    type: object

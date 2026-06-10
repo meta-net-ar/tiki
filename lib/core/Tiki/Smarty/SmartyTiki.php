@@ -587,7 +587,10 @@ class SmartyTiki extends Smarty
 
         // webservices create temporary templates
         if (($prefs['feature_webservices'] ?? 'n') === 'y') {
-            $this->addTemplateDir(realpath(TEMP_CACHE_PATH));
+            $realpath = realpath(TEMP_CACHE_PATH);
+            if ($realpath) {
+                $this->addTemplateDir($realpath);
+            }
         }
 
         //Test templates

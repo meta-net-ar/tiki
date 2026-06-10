@@ -45,8 +45,32 @@ get:
           schema:
             type: object
             properties:
+              title:
+                type: string
               resultset:
                 type: object
+                properties:
+                  count:
+                    type: integer
+                  offset:
+                    type: integer
+                  maxRecords:
+                    type: integer
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        object_type:
+                          type: string
+                        object_id:
+                          type: string
+                          description: Object identifier (may be numeric or string depending on type).
+                        parent_id:
+                          type: string
+                          nullable: true
+                        title:
+                          type: string
     '405':
       description: not available
       content:

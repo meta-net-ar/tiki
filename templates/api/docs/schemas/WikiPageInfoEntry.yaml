@@ -1,0 +1,23 @@
+---
+description: Wiki page in single-page info context (GET /wiki/page/{page}).
+allOf:
+  - $ref: schemas-WikiPageResponse.yaml
+  - type: object
+    properties:
+      baseName:
+        type: string
+        nullable: true
+      prettyName:
+        type: string
+        nullable: true
+      namespace:
+        type: boolean
+        nullable: true
+      namespace_parts:
+        type: array
+        nullable: true
+    required:
+      - baseName
+      - prettyName
+      - namespace
+      - namespace_parts

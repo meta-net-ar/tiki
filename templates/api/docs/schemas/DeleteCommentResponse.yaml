@@ -1,0 +1,16 @@
+---
+description: Response from deleting a comment.
+type: object
+properties:
+  threadId:
+    type: integer
+  status:
+    type: string
+  objectType:
+    type: string
+  objectId:
+    oneOf:
+      - type: string
+      - type: integer
+  parsed:
+    type: string

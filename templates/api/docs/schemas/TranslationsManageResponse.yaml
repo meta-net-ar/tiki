@@ -1,0 +1,35 @@
+---
+description: Response from GET /translations/{type}/{source} with no linked translations.
+type: object
+required:
+  - title
+  - type
+  - source
+  - filters
+  - translations
+  - canAttach
+  - canDetach
+properties:
+  title:
+    type: string
+  type:
+    type: string
+  source:
+    type: string
+  filters:
+    type: object
+    required:
+      - type
+      - language
+    properties:
+      type:
+        type: string
+      language:
+        type: string
+        nullable: true
+  translations:
+    type: array
+  canAttach:
+    type: boolean
+  canDetach:
+    type: boolean

@@ -1,0 +1,13 @@
+---
+description: Paginated list of users (GET /users).
+type: object
+required:
+  - result
+  - count
+properties:
+  result:
+    type: array
+    items:
+      $ref: schemas-UserListEntry.yaml
+  count:
+    type: integer

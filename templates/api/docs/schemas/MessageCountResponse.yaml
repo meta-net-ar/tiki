@@ -1,0 +1,8 @@
+---
+description: Response from GET /message-count.
+type: object
+required:
+  - count
+properties:
+  count:
+    type: integer

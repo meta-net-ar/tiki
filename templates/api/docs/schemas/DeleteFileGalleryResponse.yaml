@@ -1,0 +1,11 @@
+---
+description: Response from deleting a file or gallery.
+type: object
+required:
+  - title
+  - message
+properties:
+  title:
+    type: string
+  message:
+    type: string

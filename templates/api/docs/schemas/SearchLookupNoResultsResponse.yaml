@@ -1,0 +1,25 @@
+---
+description: Search lookup response when no results are found.
+type: object
+required:
+  - title
+  - resultset
+properties:
+  title:
+    type: string
+  resultset:
+    type: object
+    required:
+      - count
+      - offset
+      - maxRecords
+      - result
+    properties:
+      count:
+        type: integer
+      offset:
+        type: integer
+      maxRecords:
+        type: integer
+      result:
+        type: array

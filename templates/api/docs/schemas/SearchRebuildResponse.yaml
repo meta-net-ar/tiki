@@ -1,0 +1,60 @@
+---
+description: Response from POST /search/rebuild.
+type: object
+required:
+  - title
+  - formattedStats
+  - search_engine
+  - search_version
+  - search_index
+  - fallback_search_engine
+  - fallback_search_version
+  - fallback_search_index
+  - queue_count
+  - log_file_browser
+  - fallback_log_file_browser
+  - log_file_console
+  - fallback_log_file_console
+  - lastLogItemWeb
+  - lastLogItemConsole
+  - isAjax
+  - showForm
+  - unified_last_rebuild
+properties:
+  title:
+    type: string
+  formattedStats:
+    type: string
+    nullable: true
+  search_engine:
+    type: string
+  search_version:
+    type: string
+  search_index:
+    type: string
+  fallback_search_engine:
+    type: string
+  fallback_search_version:
+    type: string
+  fallback_search_index:
+    type: string
+  queue_count:
+    type: integer
+  log_file_browser:
+    type: string
+  fallback_log_file_browser:
+    type: string
+  log_file_console:
+    type: string
+  fallback_log_file_console:
+    type: string
+  lastLogItemWeb:
+    type: string
+  lastLogItemConsole:
+    type: string
+  isAjax:
+    type: boolean
+  showForm:
+    type: boolean
+  unified_last_rebuild:
+    type: integer

@@ -11,7 +11,7 @@
 use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Repositories\ScopeRepositoryInterface;
 
-require dirname(__DIR__) . '../entities/ScopeEntity.php';
+require dirname(__DIR__) . '/entities/ScopeEntity.php';
 
 class ScopeRepository implements ScopeRepositoryInterface
 {
