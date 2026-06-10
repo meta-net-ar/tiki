@@ -131,6 +131,13 @@ abstract class ApiBaseSearchTest extends ApiTestCase
      */
     protected static function cleanupTestData()
     {
+        // Disable search indexing in-process before removing pages so that
+        // remove_all_versions() does not try to update the (potentially missing)
+        // search index table and generate spurious PHP warnings.
+        global $prefs;
+        $prefs['feature_search'] = 'n';
+        $prefs['unified_incremental_update'] = 'n';
+
         foreach (static::$testPages as $pageName) {
             static::removeTestWikiPage($pageName);
         }

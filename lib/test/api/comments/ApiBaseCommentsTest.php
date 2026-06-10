@@ -76,6 +76,19 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
         foreach (self::$preferences as $name => $value) {
             $prefs[$name] = $value;
         }
+
+        // Ensure anonymous users cannot view wiki comments regardless of install defaults.
+        // A fresh Tiki install may grant this permission to Anonymous; removing it here
+        // keeps the tests deterministic across environments.
+        try {
+            \TikiDb::get()->query(
+                'DELETE FROM `tiki_group_perms` WHERE `groupName` = ? AND `permName` = ?',
+                ['Anonymous', 'tiki_p_wiki_view_comments']
+            );
+        } catch (\Exception) {
+            // Ignore if the table doesn't exist in this environment
+        }
+
         self::$testDataCreated = false;
     }
 
