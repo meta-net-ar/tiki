@@ -1043,7 +1043,20 @@ import { defaults as defaultControls } from "ol/control";
                                             callback: function (event, $html) {
                                                 var title = $html.find("h1").remove().text() || feature.get("content");
 
-                                                $html.find("a.service-dialog").clickModal({});
+                                                $html.find("a.service-dialog").on("click", function (event) {
+                                                    const $link = $(this);
+                                                    $.closeModal({
+                                                        done: function () {
+                                                            setTimeout(function () {
+                                                                $.openModal({
+                                                                    size: "modal-lg",
+                                                                    remote: $link.attr("href"),
+                                                                });
+                                                            }, 0);
+                                                        },
+                                                    });
+                                                    return false;
+                                                });
 
                                                 $(".modal-title", $modal).text(title);
                                                 $(".modal-body", $modal).append($html);
