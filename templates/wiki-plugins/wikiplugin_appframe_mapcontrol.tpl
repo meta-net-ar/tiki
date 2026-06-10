@@ -38,6 +38,7 @@ $('#appframe .map-container').on('initialized', function () {
             control.setActive(false);
             container.map.addInteraction(control);
         });
+        container.setupLayerEvents(vlayer);
     {{/if}}
 
     container.modeManager.register('activate', mode, function () {
