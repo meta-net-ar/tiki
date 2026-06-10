@@ -349,7 +349,7 @@ import { defaults as defaultControls } from "ol/control";
                     //style: null,
                 });
 
-                map.addInteraction(selectionInteraction);
+                    map.addInteraction(selectionInteraction);
 
                 selectionInteraction.on("select", function (event) {
                     if (event.deselected.length) {
@@ -779,7 +779,7 @@ import { defaults as defaultControls } from "ol/control";
                 modes: [],
                 activeMode: null,
                 addMode: function (options) {
-                    var mode = $.extend(
+                    const mode = $.extend(
                         {
                             title: tr("Default"),
                             icon: null,
@@ -793,13 +793,13 @@ import { defaults as defaultControls } from "ol/control";
                         options
                     );
 
-                    $.each(mode.layers, function (k, layer) {
+                    mode.layers.forEach((layer) => {
                         layer.displayInLayerSwitcher = false;
                         layer.setVisibility(false);
                         map.addLayer(layer);
                     });
 
-                    $.each(mode.controls, function (k, control) {
+                    mode.controls.forEach((control) => {
                         control.autoActivate = false;
                         map.addControl(control);
                     });
@@ -819,14 +819,14 @@ import { defaults as defaultControls } from "ol/control";
                 },
                 switchTo: function (modeName) {
                     var manager = this;
-                    $.each(this.modes, function (k, mode) {
+                    this.modes.forEach((mode) => {
                         if (mode.name === modeName) {
                             manager.activate(mode);
                         }
                     });
                 },
                 register: function (eventName, modeName, callback) {
-                    $.each(this.modes, function (k, mode) {
+                    this.modes.forEach(function (mode) {
                         if (mode.name === modeName && callback) {
                             mode.events[eventName].push(callback);
                         }
@@ -842,11 +842,11 @@ import { defaults as defaultControls } from "ol/control";
                     $.each(mode.controls, function (k, control) {
                         control.setActive(true);
                     });
-                    $.each(mode.layers, function (k, layer) {
+                    mode.layers.forEach((layer) => {
                         layer.setVisibility(true);
                     });
-                    $.each(mode.events.activate, function (k, f) {
-                        f.apply([], container);
+                    mode.events.activate.forEach(function (evt) {
+                        evt.apply([], container);
                     });
 
                     $(container).trigger("modechanged");
@@ -856,22 +856,22 @@ import { defaults as defaultControls } from "ol/control";
                         return;
                     }
 
-                    $.each(this.activeMode.controls, function (k, control) {
+                    this.activeMode.controls.forEach((control) => {
                         control.setActive(false);
                     });
-                    $.each(this.activeMode.layers, function (k, layer) {
+                    this.activeMode.layers.forEach((layer) => {
                         layer.setVisibility(false);
                     });
-                    $.each(this.activeMode.events.deactivate, function (k, f) {
-                        f.apply([], container);
+                    this.activeMode.events.deactivate.forEach((evt) => {
+                        evt.apply([], container);
                     });
 
                     this.activeMode = null;
                 },
             };
 
-            var defaultMode = {
-                controls: [],
+            const defaultMode = {
+                controls: [selectionInteraction],
             };
 
             var $mapBootstrapDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
@@ -1577,7 +1577,7 @@ import { defaults as defaultControls } from "ol/control";
 
                                         feature.executor = delayedExecutor(5000, function () {
                                             var fields = {},
-                                                current = wkt.write(feature) + feature.get("color");
+                                                current = wkt.writeFeature(feature) + feature.get("color");
                                             fields[i.geo_feature_field] = format.writeFeature(feature);
 
                                             if (current === initial || layer !== container.vectors) {
