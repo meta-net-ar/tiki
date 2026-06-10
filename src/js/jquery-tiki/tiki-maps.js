@@ -868,6 +868,7 @@ import { defaults as defaultControls } from "ol/control";
                         interactions.forEach((interaction) => {
                             if (interaction instanceof ol.interaction.Select && interaction instanceof control.constructor) {
                                 // edit modes need to disable the default select interaction
+                                interaction.getFeatures().clear();
                                 interaction.setActive(false);
                             }
                         });
@@ -903,6 +904,7 @@ import { defaults as defaultControls } from "ol/control";
 
             const defaultMode = {
                 controls: [selectionInteraction],
+                name: tr("Default"),
             };
 
             var $mapBootstrapDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
@@ -978,9 +980,8 @@ import { defaults as defaultControls } from "ol/control";
 
             if ($(container).data("popup-style")) {
                 container.showPopup = function (e) {
-                    var pixel,
-                        feature,
-                        features = e.target.getFeatures();
+                    let pixel, feature;
+                    const features = e.target.getFeatures();
 
                     if (features.getLength()) {
                         feature = features.item(0);
@@ -1025,7 +1026,12 @@ import { defaults as defaultControls } from "ol/control";
                         case "dialog":
                             var $modal = $(".footer-modal:not(.show)")
                                 .first()
+                                .addClass("modal-lg")
                                 .modal({})
+                                .one("show.bs.modal", function (event) {
+                                    $(".modal-title", $modal).empty();
+                                    $(".modal-body", $modal).empty();
+                                })
                                 .one("shown.bs.modal", function (event) {
                                     if (type && object) {
                                         $(container).loadInfoboxPopup({
@@ -1035,29 +1041,12 @@ import { defaults as defaultControls } from "ol/control";
                                             event: event,
                                             element: this,
                                             callback: function (event, $html) {
-                                                var title = $html.find("h1").remove().text() || feature.get("content"),
-                                                    $header = $(".modal-header", $modal);
+                                                var title = $html.find("h1").remove().text() || feature.get("content");
 
                                                 $html.find("a.service-dialog").clickModal({});
 
-                                                if ($header.length === 0) {
-                                                    $(".modal-content", $modal).append(
-                                                        $("<div class='modal-header'>").append($("<h4 class='modal-title'>").text(title))
-                                                    );
-                                                } else {
-                                                    $(".modal-title", $modal).text(title);
-                                                }
-
-                                                $(".modal-content", $modal).append(
-                                                    $("<div class='modal-body'>").append($html),
-                                                    $("<div class='modal-footer'>").append(
-                                                        $(
-                                                            "<button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>" +
-                                                                tr("Close") +
-                                                                "</button>"
-                                                        )
-                                                    )
-                                                );
+                                                $(".modal-title", $modal).text(title);
+                                                $(".modal-body", $modal).append($html);
                                             },
                                         });
                                     }
