@@ -2536,6 +2536,48 @@ class CalendarLib extends TikiLib
     }
 
     /**
+     * Upload file contents and attach them to a calendar event.
+     *
+     * @param int $calitemId The calendar item ID
+     * @param array $attachments Array of arrays with keys: filename, filetype, data
+     * @return void
+     */
+    public function uploadAndAttachEventFiles(int $calitemId, array $attachments): void
+    {
+        global $prefs;
+
+        if ($prefs['feature_file_galleries'] !== 'y' || empty($attachments)) {
+            return;
+        }
+
+        $filegallib = TikiLib::lib('filegal');
+        $galleryId = $this->getAttachmentsGalleryId();
+        $gal_info = $filegallib->get_file_gallery($galleryId);
+        if (! is_array($gal_info) || empty($gal_info['galleryId']) || ! $filegallib->can_upload_to($gal_info)) {
+            return;
+        }
+
+        $fileIds = [];
+        foreach ($attachments as $attachment) {
+            $fileId = $filegallib->upload_single_file(
+                $gal_info,
+                $attachment['filename'],
+                strlen($attachment['data']),
+                $attachment['filetype'],
+                $attachment['data']
+            );
+            if ($fileId) {
+                $fileIds[] = (int) $fileId;
+            }
+        }
+        if (empty($fileIds)) {
+            return;
+        }
+
+        $this->setEventAttachments($calitemId, $fileIds);
+    }
+
+    /**
      * Get the file gallery ID to use for calendar event attachments.
      * Falls back to global preference or root gallery.
      *
@@ -2545,6 +2587,14 @@ class CalendarLib extends TikiLib
     {
         global $prefs;
 
-        return (int) ($prefs['calendar_attachments_galleryId'] ?? $prefs['fgal_root_id'] ?? 1);
+        $id = (int) ($prefs['calendar_attachments_galleryId'] ?? 0);
+        if ($id <= 0) {
+            $id = (int) ($prefs['fgal_root_id'] ?? 0);
+        }
+        if ($id <= 0) {
+            $id = 1;
+        }
+
+        return $id;
     }
 }

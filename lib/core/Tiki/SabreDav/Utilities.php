@@ -835,6 +835,10 @@ Invitees: " . ($hideParticipants ? "Participants list has been hidden at organiz
                 self::addEventAttachmentsToMail($mail, (int) $calitem['calitemId']);
             }
             $mail->setText($body);
+            // File IDs in X-Tiki-Attachments are instance-local; send files as MIME parts only.
+            if (isset($message->message->VEVENT->{'X-Tiki-Attachments'})) {
+                $message->message->VEVENT->remove('X-Tiki-Attachments');
+            }
             $mail->addPart($message->message->serialize(), 'text/calendar; method=' . $message->method . '; name=event.ics');
             $mail->send([$recipient]);
         }
