@@ -344,42 +344,66 @@ import { defaults as defaultControls } from "ol/control";
             };
 
             container.setupLayerEvents = function (vectors) {
-                selectionInteraction = new ol.interaction.Select({
-                    condition: ol.events.condition.singleClick,
-                    //style: null,
-                });
+                if (!selectionInteraction) {
+                    selectionInteraction = new ol.interaction.Select({
+                        condition: ol.events.condition.singleClick,
+                        //style: null,
+                    });
 
                     map.addInteraction(selectionInteraction);
 
-                selectionInteraction.on("select", function (event) {
-                    if (event.deselected.length) {
-                        event.deselected.forEach((feature) => {
+                    selectionInteraction.on("select", function (event) {
+                        if (event.deselected.length) {
+                            event.deselected.forEach((feature) => {
+                                if (feature.executor) {
+                                    feature.executor();
+                                }
+                            });
+                        }
+                        if (event.selected.length) {
+                            event.selected.forEach(() => {
+                                container.showPopup.apply(null, [event]);
+                            });
+                        }
+                    });
+                }
+
+                const interactions = container.map.getInteractions().getArray();
+
+                // e.g. added by wikiplugin_appframe modify_feature
+                const modifyInteraction = interactions.filter((interaction) => {
+                    interaction instanceof ol.interaction.Modify;
+                });
+
+                if (modifyInteraction.length) {
+                    modifyInteraction[0].on("modifyend", function (event) {
+                        event.features.getArray().forEach((feature) => {
                             if (feature.executor) {
                                 feature.executor();
                             }
                         });
-                    }
-                    if (event.selected.length) {
-                        event.selected.forEach(() => {
-                            container.showPopup.apply(null, [event]);
-                        });
-                    }
+                    });
+                }
+
+                // e.g. added by wikiplugin_appframe draw_polygon and draw_path
+                const drawInteraction = interactions.filter((interaction) => {
+                    interaction instanceof ol.interaction.Draw;
                 });
 
-                selectionInteraction.on("modified", function (event) {
-                    if (event.target.executor) {
-                        event.target.executor();
-                    }
-                });
-
-                selectionInteraction.on("added", function (event) {
-                    if (!event.target.get("color")) {
-                        event.target.set("color", "#6699cc");
-                    }
-                    if (!event.target.get("intent")) {
-                        event.target.set("intent", "vectors");
-                    }
-                });
+                if (drawInteraction.length) {
+                    drawInteraction[0].on("drawend", function (event) {
+                        const features = event.target.getFeatures();
+                        if (features.getLength()) {
+                            const feature = features.item(0);
+                            if (!feature.get("color")) {
+                                feature.set("color", "#6699cc");
+                            }
+                            if (!feature.get("intent")) {
+                                feature.set("intent", "vectors");
+                            }
+                        }
+                    });
+                }
             };
 
             container.getLayer = function (name) {
@@ -838,8 +862,15 @@ import { defaults as defaultControls } from "ol/control";
                     }
 
                     this.activeMode = mode;
+                    const interactions = container.map.getInteractions();
 
-                    $.each(mode.controls, function (k, control) {
+                    mode.controls.forEach((control) => {
+                        interactions.forEach((interaction) => {
+                            if (interaction instanceof ol.interaction.Select && interaction instanceof control.constructor) {
+                                // edit modes need to disable the default select interaction
+                                interaction.setActive(false);
+                            }
+                        });
                         control.setActive(true);
                     });
                     mode.layers.forEach((layer) => {
