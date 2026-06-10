@@ -42,6 +42,9 @@ class TempTablePopulator
     /** @var array<string, array{name: string, type: string, sql_type: string, source_field: string}> indexed by source_field */
     private array $columnsBySource;
 
+    /** @var array<int, bool> positional index of columns that are group keys */
+    private array $groupKeyPositions = [];
+
     private int $maxRows = self::DEFAULT_MAX_ROWS;
 
     /** @var string[] */
@@ -52,10 +55,15 @@ class TempTablePopulator
         $this->db = $db;
         $this->schema = $schema;
         $this->columnsBySource = [];
+        $pos = 0;
         foreach ($schema['columns'] ?? [] as $col) {
             $this->validateIdentifier($col['name'], 'column name');
             if (! empty($col['source_field'])) {
                 $this->columnsBySource[$col['source_field']] = $col;
+                if (! empty($col['is_group_key'])) {
+                    $this->groupKeyPositions[$pos] = true;
+                }
+                $pos++;
             }
         }
     }
@@ -142,13 +150,16 @@ class TempTablePopulator
         $batch = [];
         $rowCount = 0;
         foreach ($query->scroll($index) as $row) {
-            $batch[] = $this->coerceRow($row);
-            $rowCount++;
-            if ($rowCount > $this->maxRows) {
-                throw new RuntimeException(sprintf(
-                    'Report exceeds aggregation row limit (%d). Tighten the filters or override the limit.',
-                    $this->maxRows
-                ));
+            $expanded = $this->expandRow($row);
+            foreach ($expanded as $expandedRow) {
+                $batch[] = $expandedRow;
+                $rowCount++;
+                if ($rowCount > $this->maxRows) {
+                    throw new RuntimeException(sprintf(
+                        'Report exceeds aggregation row limit (%d). Tighten the filters or override the limit.',
+                        $this->maxRows
+                    ));
+                }
             }
             if (count($batch) >= $batchSize) {
                 $this->flushBatch($insertPrefix, $colCount, $batch);
@@ -173,22 +184,74 @@ class TempTablePopulator
         }
     }
 
-    private function coerceRow($row): array
+    /**
+     * Expand a single scrolled row into one or more temp-table rows.
+     *
+     * When a group-key column contains an array, each element produces a
+     * separate row (cartesian product if multiple group keys have arrays).
+     * Non-group-key arrays are still coerced to a string as before.
+     *
+     * @return array<int, array> list of coerced row tuples
+     */
+    private function expandRow($row): array
     {
         if (! is_array($row) && ! ($row instanceof \ArrayAccess)) {
             throw new InvalidArgumentException(sprintf(
-                'AggregationTempTablePopulator::coerceRow() expects array or ArrayAccess, got %s',
+                'AggregationTempTablePopulator::expandRow() expects array or ArrayAccess, got %s',
                 is_object($row) ? get_class($row) : gettype($row)
             ));
         }
-        $out = [];
+
+        $coerced = [];
+        $expandPositions = [];
+        $pos = 0;
         foreach ($this->columnsBySource as $sourceField => $col) {
             $value = is_array($row)
                 ? ($row[$sourceField] ?? null)
                 : $row[$sourceField];
-            $out[] = $this->coerceValue($value, $col['type']);
+
+            if (is_array($value) && isset($this->groupKeyPositions[$pos])) {
+                if (empty($value)) {
+                    return [];
+                }
+                $coerced[] = array_map(
+                    fn($v) => $this->coerceValue($v, $col['type']),
+                    array_values($value)
+                );
+                $expandPositions[] = $pos;
+            } else {
+                $coerced[] = $this->coerceValue($value, $col['type']);
+            }
+            $pos++;
         }
-        return $out;
+
+        if ($expandPositions === []) {
+            return [$coerced];
+        }
+
+        return $this->cartesianExpand($coerced, $expandPositions);
+    }
+
+    /**
+     * Given a partially-built row where some positions hold arrays of
+     * alternatives, compute the cartesian product and return flat rows.
+     */
+    private function cartesianExpand(array $template, array $expandPositions): array
+    {
+        $results = [$template];
+        foreach ($expandPositions as $pos) {
+            $values = $template[$pos];
+            $newResults = [];
+            foreach ($results as $partial) {
+                foreach ($values as $val) {
+                    $copy = $partial;
+                    $copy[$pos] = $val;
+                    $newResults[] = $copy;
+                }
+            }
+            $results = $newResults;
+        }
+        return $results;
     }
 
     private function coerceValue($value, string $type)

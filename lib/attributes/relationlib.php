@@ -260,7 +260,7 @@ class RelationLib extends TikiDb_Bridge
                     CONCAT(tr.path, r.target_type, ':', r.target_itemId, '|')
                 FROM tiki_object_relations r
                 INNER JOIN transitive_relations tr ON r.source_type = tr.target_type AND r.source_itemId = tr.target_itemId
-                WHERE tr.depth < ? 
+                WHERE tr.depth < ?
                 AND r.relation LIKE ?
                 AND INSTR(tr.path, CONCAT('|', r.target_type, ':', r.target_itemId, '|')) = 0
             )

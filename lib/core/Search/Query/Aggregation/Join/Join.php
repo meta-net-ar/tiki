@@ -24,7 +24,6 @@ class Join
     private ?string $objectType;
     private ?int $trackerId;
     private ?string $field;
-    private ?string $relation;
     private bool $multivalue;
 
     /**
@@ -34,8 +33,7 @@ class Join
      * @param string|null $objectType  e.g. 'trackeritem' (default), or null
      * @param int|null $trackerId      restrict to a single tracker
      * @param string|null $field       lookup by this indexed field instead of object_id
-     * @param string|null $relation    relation qualifier for lookup via 'relations'
-     * @param bool $multivalue         if true, use multivalue matching
+     * @param bool $multivalue         if true, use multivalue matching for field lookup
      */
     public function __construct(
         string $name,
@@ -44,7 +42,6 @@ class Join
         ?string $objectType = 'trackeritem',
         ?int $trackerId = null,
         ?string $field = null,
-        ?string $relation = null,
         bool $multivalue = false
     ) {
         $this->name = $name;
@@ -53,7 +50,6 @@ class Join
         $this->objectType = $objectType;
         $this->trackerId = $trackerId;
         $this->field = $field;
-        $this->relation = $relation;
         $this->multivalue = $multivalue;
     }
 
@@ -88,11 +84,6 @@ class Join
     public function getField(): ?string
     {
         return $this->field;
-    }
-
-    public function getRelation(): ?string
-    {
-        return $this->relation;
     }
 
     public function isMultivalue(): bool

@@ -210,13 +210,7 @@ class WikiBuilder
         }
 
         $field = ! empty($args['field']) ? (string) $args['field'] : null;
-        $relation = ! empty($args['relation']) ? (string) $args['relation'] : null;
         $multivalue = isset($args['multivalue']) && $this->isYes($args['multivalue']);
-
-        if ($field && $relation) {
-            Feedback::error(tr('The field= and relation= parameters are mutually exclusive in {join} block.'));
-            return null;
-        }
 
         return new Join(
             (string) $args['name'],
@@ -225,7 +219,6 @@ class WikiBuilder
             $objectType,
             $trackerId,
             $field,
-            $relation,
             $multivalue
         );
     }

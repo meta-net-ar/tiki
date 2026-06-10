@@ -94,14 +94,65 @@ class AggregationReader
             $rootResult->setMetricLabels($labelMap);
         }
 
-        // Map keyed by composite path (joined keys) -> leaf bucket array
-        // built incrementally so siblings share parent buckets.
         $tree = [];
         foreach ($rows as $row) {
-            $this->mergeRowIntoTree($row, $groupFields, $metrics, $rootResult, $aggsByDepth, $tree);
+            $expanded = $this->expandJsonArrayKeys($row, $groupFields);
+            foreach ($expanded as $expandedRow) {
+                $this->mergeRowIntoTree($expandedRow, $groupFields, $metrics, $rootResult, $aggsByDepth, $tree);
+            }
         }
 
         return $rootResult;
+    }
+
+    /**
+     * If any group-key column holds a JSON-encoded array string, expand
+     * the row into multiple rows (one per array element). This handles
+     * Manticore returning multivalue JSON fields as a single bucket key.
+     *
+     * @param array<int, array{expr: string, alias: string, agg: Terms}> $groupFields
+     * @return array<int, array> list of rows (usually just [$row] if no expansion needed)
+     */
+    private function expandJsonArrayKeys(array $row, array $groupFields): array
+    {
+        $lowerRow = array_change_key_case($row, CASE_LOWER);
+        $expandableKeys = [];
+
+        foreach ($groupFields as $gf) {
+            $alias = strtolower($gf['alias']);
+            $key = $lowerRow[$alias] ?? null;
+            if ($key !== null && is_string($key) && str_starts_with($key, '[')) {
+                $decoded = json_decode($key, true);
+                if (is_array($decoded) && $decoded !== []) {
+                    $expandableKeys[$alias] = $decoded;
+                }
+            }
+        }
+
+        if ($expandableKeys === []) {
+            return [$row];
+        }
+
+        $originalKeyMap = [];
+        foreach (array_keys($row) as $k) {
+            $originalKeyMap[strtolower($k)] = $k;
+        }
+
+        $results = [$row];
+        foreach ($expandableKeys as $alias => $values) {
+            $origKey = $originalKeyMap[$alias] ?? $alias;
+            $newResults = [];
+            foreach ($results as $partial) {
+                foreach ($values as $val) {
+                    $copy = $partial;
+                    $copy[$origKey] = $val;
+                    $newResults[] = $copy;
+                }
+            }
+            $results = $newResults;
+        }
+
+        return $results;
     }
 
     /**
@@ -170,7 +221,12 @@ class AggregationReader
                 if ($depth === count($groupFields) - 1) {
                     $existingBuckets[$entry['index']]['doc_count'] += $docCount;
                     foreach ($metricsRow as $mn => $mv) {
-                        $existingBuckets[$entry['index']]['metrics'][$mn] = $mv;
+                        $existing = $existingBuckets[$entry['index']]['metrics'][$mn] ?? null;
+                        if ($existing !== null && is_numeric($existing) && is_numeric($mv)) {
+                            $existingBuckets[$entry['index']]['metrics'][$mn] = $existing + $mv;
+                        } else {
+                            $existingBuckets[$entry['index']]['metrics'][$mn] = $mv;
+                        }
                     }
                     $entry['result']->setBuckets($existingBuckets);
                 } else {

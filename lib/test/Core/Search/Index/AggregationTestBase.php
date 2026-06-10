@@ -581,33 +581,6 @@ abstract class AggregationTestBase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    /**
-     * Seed documents with relation tokens pointing at the vendor IDs,
-     * to test relation-based join (find the document whose 'relations'
-     * field contains "qualifier:type:bucketKey").
-     */
-    protected function populateVendorProfiles($index): void
-    {
-        $tf = $index->getTypeFactory();
-
-        $profiles = [
-            ['id' => 'vp1', 'vendor_key' => 'v1', 'rating' => 'A', 'rel_token' => 'tiki.vendor.profile:trackeritem:v1'],
-            ['id' => 'vp2', 'vendor_key' => 'v2', 'rating' => 'B', 'rel_token' => 'tiki.vendor.profile:trackeritem:v2'],
-            ['id' => 'vp3', 'vendor_key' => 'v3', 'rating' => 'C', 'rel_token' => 'tiki.vendor.profile:trackeritem:v3'],
-            ['id' => 'vp4', 'vendor_key' => 'v4', 'rating' => 'A', 'rel_token' => 'tiki.vendor.profile:trackeritem:v4'],
-        ];
-
-        foreach ($profiles as $p) {
-            $index->addDocument([
-                'object_type' => $tf->identifier('trackeritem'),
-                'object_id' => $tf->identifier($p['id']),
-                'tracker_id' => $tf->identifier('20'),
-                'title' => $tf->sortable('profile ' . $p['id']),
-                'rating' => $tf->identifier($p['rating']),
-                'relations' => $tf->multivalue([$p['rel_token']]),
-            ]);
-        }
-    }
 
     /**
      * Parse wiki markup that includes {join} blocks and return both
@@ -707,14 +680,14 @@ abstract class AggregationTestBase extends \PHPUnit\Framework\TestCase
         $this->assertSame('FR', $map['v4']['vi.country']);
     }
 
-    public function testJoinByRelation(): void
+    public function testJoinByTypeIdKeys(): void
     {
-        $this->populateVendorProfiles($this->index);
+        $this->populateVendors($this->index);
 
         $parsed = $this->parseWikiWithJoins(
             '{group field="vendor_id" name="vendor" size="10"}
              {metric name="rev" op="sum" field="amount"}
-             {join name="vp" on="vendor" relation="tiki.vendor.profile" tracker="20" select="rating"}'
+             {join name="vi" on="vendor" select="title,country"}'
         );
 
         $result = $this->searchWithAggregationsAndJoins(
@@ -730,12 +703,13 @@ abstract class AggregationTestBase extends \PHPUnit\Framework\TestCase
         foreach ($buckets as $b) {
             $map[(string) $b['key']] = $b['metrics'];
         }
-        ksort($map);
 
-        $this->assertSame('A', $map['v1']['vp.rating']);
-        $this->assertSame('B', $map['v2']['vp.rating']);
-        $this->assertSame('C', $map['v3']['vp.rating']);
-        $this->assertSame('A', $map['v4']['vp.rating']);
+        // Bucket keys are bare IDs (v1..v4) which match vendor object_ids
+        // since populateVendors indexes them with object_id = v1..v4
+        $this->assertSame('Acme Corp', $map['v1']['vi.title'] ?? null);
+        $this->assertSame('US', $map['v1']['vi.country'] ?? null);
+        $this->assertSame('Delta SA', $map['v4']['vi.title'] ?? null);
+        $this->assertSame('FR', $map['v4']['vi.country'] ?? null);
     }
 
     public function testJoinByFieldMultivalue(): void
@@ -765,15 +739,6 @@ abstract class AggregationTestBase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function testJoinFieldAndRelationMutuallyExclusive(): void
-    {
-        $parsed = $this->parseWikiWithJoins(
-            '{group field="vendor_id" name="vendor" size="10"}
-             {join name="vi" on="vendor" field="vendor_code" relation="tiki.vendor.profile" select="title"}'
-        );
-
-        $this->assertEmpty($parsed['joins'], 'Join with both field= and relation= should be rejected');
-    }
 
     public function testJoinNoMatchReturnsNullMetrics(): void
     {
@@ -798,6 +763,115 @@ abstract class AggregationTestBase extends \PHPUnit\Framework\TestCase
         foreach ($buckets as $b) {
             $this->assertNull($b['metrics']['vi.title']);
             $this->assertNull($b['metrics']['vi.region']);
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Multivalue group-key expansion tests
+    // ------------------------------------------------------------------
+
+    /**
+     * Verifies that grouping by a multivalue field produces individual
+     * buckets per value rather than one bucket per document's full array.
+     *
+     * Skipped on MySQL where multivalue fields are stored as hashed tokens
+     * and executeDirect does not pass through TempTablePopulator.
+     */
+    public function testGroupByMultivalueFieldExpandsValues(): void
+    {
+        if ($this->index instanceof \Search_MySql_Index) {
+            $this->markTestSkipped('MySQL stores multivalue as hashed tokens; per-value expansion not applicable.');
+        }
+
+        $this->populateMultivalueGroupData($this->index);
+
+        $aggregations = $this->parseWikiAggregations(
+            '{group field="tags" name="by_tag" size="10"}'
+        );
+
+        $query = new \Search_Query();
+        $query->filterType('trackeritem');
+        $query->filterIdentifier('30', 'tracker_id');
+
+        $result = $this->searchWithAggregations($aggregations, $query);
+        $agg = $result->getAggregation('by_tag');
+        $this->assertNotNull($agg, 'Expected aggregation "by_tag"');
+
+        $buckets = $agg->getBuckets();
+        $map = [];
+        foreach ($buckets as $b) {
+            $map[(string) $b['key']] = $b['doc_count'];
+        }
+        ksort($map);
+
+        // doc1 has [alpha, beta], doc2 has [beta, gamma], doc3 has [alpha]
+        // => alpha:2, beta:2, gamma:1
+        $this->assertSame(2, $map['alpha'] ?? null, 'alpha should appear in 2 docs');
+        $this->assertSame(2, $map['beta'] ?? null, 'beta should appear in 2 docs');
+        $this->assertSame(1, $map['gamma'] ?? null, 'gamma should appear in 1 doc');
+        $this->assertCount(3, $map, 'Should have exactly 3 buckets');
+    }
+
+    /**
+     * Verifies that grouping by a multivalue field with a metric still
+     * correctly sums per individual value.
+     *
+     * Skipped on MySQL where multivalue fields are stored as hashed tokens.
+     */
+    public function testGroupByMultivalueWithMetric(): void
+    {
+        if ($this->index instanceof \Search_MySql_Index) {
+            $this->markTestSkipped('MySQL stores multivalue as hashed tokens; per-value expansion not applicable.');
+        }
+
+        $this->populateMultivalueGroupData($this->index);
+
+        $aggregations = $this->parseWikiAggregations(
+            '{group field="tags" name="by_tag" size="10"}
+             {metric name="total" op="sum" field="score"}'
+        );
+
+        $query = new \Search_Query();
+        $query->filterType('trackeritem');
+        $query->filterIdentifier('30', 'tracker_id');
+
+        $result = $this->searchWithAggregations($aggregations, $query);
+        $agg = $result->getAggregation('by_tag');
+        $this->assertNotNull($agg);
+
+        $buckets = $agg->getBuckets();
+        $map = [];
+        foreach ($buckets as $b) {
+            $map[(string) $b['key']] = $b['metrics'];
+        }
+        ksort($map);
+
+        // doc1(score=10): [alpha, beta], doc2(score=20): [beta, gamma], doc3(score=30): [alpha]
+        // alpha: 10 + 30 = 40, beta: 10 + 20 = 30, gamma: 20
+        $this->assertEqualsWithDelta(40, $map['alpha']['total'], 0.01, 'alpha total');
+        $this->assertEqualsWithDelta(30, $map['beta']['total'], 0.01, 'beta total');
+        $this->assertEqualsWithDelta(20, $map['gamma']['total'], 0.01, 'gamma total');
+    }
+
+    protected function populateMultivalueGroupData($index): void
+    {
+        $tf = $index->getTypeFactory();
+
+        $docs = [
+            ['id' => '101', 'tags' => ['alpha', 'beta'], 'score' => 10],
+            ['id' => '102', 'tags' => ['beta', 'gamma'], 'score' => 20],
+            ['id' => '103', 'tags' => ['alpha'], 'score' => 30],
+        ];
+
+        foreach ($docs as $doc) {
+            $index->addDocument([
+                'object_type' => $tf->identifier('trackeritem'),
+                'object_id' => $tf->identifier($doc['id']),
+                'tracker_id' => $tf->identifier('30'),
+                'title' => $tf->sortable('item ' . $doc['id']),
+                'tags' => $tf->multivalue($doc['tags']),
+                'score' => $tf->numeric($doc['score']),
+            ]);
         }
     }
 }

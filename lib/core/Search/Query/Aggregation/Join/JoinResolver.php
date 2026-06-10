@@ -6,11 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Search\Query\Aggregation\Join;
 
-use Search_Expr_Or;
-use Search_Expr_Token;
 use Search_Index_Interface;
 use Search_Query;
-use Search_Query_Relation;
 use Search_ResultSet;
 use Search\ResultSet\AggregationResult;
 
@@ -122,20 +119,24 @@ class JoinResolver
     ): array {
         $query = new Search_Query();
 
-        if ($join->getRelation()) {
-            $this->buildRelationFilter($query, $join, $keys);
-        } elseif ($join->getField()) {
+        if ($join->getField()) {
             $this->buildFieldFilter($query, $join, $keys);
         } else {
             foreach ($keys as $key) {
-                $query->addObject($join->getObjectType() ?: 'trackeritem', (string) $key);
+                $keyStr = (string) $key;
+                if (str_contains($keyStr, ':')) {
+                    [$type, $id] = explode(':', $keyStr, 2);
+                    $query->addObject($type, $id);
+                } else {
+                    $query->addObject($join->getObjectType() ?: 'trackeritem', $keyStr);
+                }
             }
         }
 
         if ($join->getTrackerId() !== null) {
             $query->filterIdentifier((string) $join->getTrackerId(), 'tracker_id');
         }
-        if ($join->getField() || $join->getRelation()) {
+        if ($join->getField()) {
             $objectType = $join->getObjectType();
             if ($objectType) {
                 $query->filterType($objectType);
@@ -145,9 +146,6 @@ class JoinResolver
         $select = ['object_id', 'object_type'];
         if ($join->getField()) {
             $select[] = $join->getField();
-        }
-        if ($join->getRelation()) {
-            $select[] = 'relations';
         }
         foreach ($join->getSelect() as $field) {
             if (! in_array($field, $select, true)) {
@@ -159,46 +157,44 @@ class JoinResolver
 
         $sub = $query->search($index);
 
-        if ($join->getRelation()) {
-            return $this->buildRelationLookup($sub, $join, $keys);
-        } elseif ($join->getField()) {
+        if ($join->getField()) {
             return $this->buildFieldLookup($sub, $join);
         }
-        return $this->buildObjectIdLookup($sub);
+        return $this->buildObjectIdLookup($sub, $keys);
     }
 
     private function buildFieldFilter(Search_Query $query, Join $join, array $keys): void
     {
-        $or = new Search_Expr_Or([]);
-        $type = $join->isMultivalue() ? 'multivalue' : 'identifier';
-        foreach ($keys as $key) {
-            $or->addPart(new Search_Expr_Token((string) $key, $type, $join->getField()));
+        $expr = implode(' OR ', array_map(fn($k) => '"' . (string) $k . '"', $keys));
+        if ($join->isMultivalue()) {
+            $query->filterMultivalue($expr, $join->getField());
+        } else {
+            $query->setIdentifierFields([$join->getField()]);
+            $query->filterMultivalue($expr, $join->getField());
         }
-        $query->getExpr()->addPart($or);
-    }
-
-    private function buildRelationFilter(Search_Query $query, Join $join, array $keys): void
-    {
-        $or = new Search_Expr_Or([]);
-        $objectType = $join->getObjectType() ?: 'trackeritem';
-        foreach ($keys as $key) {
-            $token = Search_Query_Relation::token($join->getRelation(), $objectType, (string) $key);
-            $or->addPart(new Search_Expr_Token($token, 'multivalue', 'relations'));
-        }
-        $query->getExpr()->addPart($or);
     }
 
     /**
      * @return array<string, array<string, mixed>>
      */
-    private function buildObjectIdLookup(Search_ResultSet $sub): array
+    private function buildObjectIdLookup(Search_ResultSet $sub, array $keys): array
     {
+        $keySet = array_flip(array_map('strval', $keys));
+
         $lookup = [];
         foreach ($sub as $row) {
-            if (! isset($row['object_id'])) {
+            $objectId = $row['object_id'] ?? null;
+            $objectType = $row['object_type'] ?? null;
+            if ($objectId === null) {
                 continue;
             }
-            $lookup[(string) $row['object_id']] = $row;
+
+            $compositeKey = $objectType . ':' . $objectId;
+            if (isset($keySet[$compositeKey])) {
+                $lookup[$compositeKey] = $row;
+            } elseif (isset($keySet[(string) $objectId])) {
+                $lookup[(string) $objectId] = $row;
+            }
         }
         return $lookup;
     }
@@ -218,49 +214,5 @@ class JoinResolver
             $lookup[(string) $fieldVal] = $row;
         }
         return $lookup;
-    }
-
-    /**
-     * @param string[] $keys bucket keys to match against
-     * @return array<string, array<string, mixed>>
-     */
-    private function buildRelationLookup(Search_ResultSet $sub, Join $join, array $keys): array
-    {
-        $qualifier = $join->getRelation();
-        $objectType = $join->getObjectType() ?: 'trackeritem';
-
-        $tokenToKey = [];
-        foreach ($keys as $key) {
-            $rawToken = $qualifier . ':' . $objectType . ':' . (string) $key;
-            $tokenToKey[$rawToken] = (string) $key;
-            $tokenToKey[$this->hashMultivalueTokenMysql($rawToken)] = (string) $key;
-            $tokenToKey[(string) crc32($rawToken)] = (string) $key;
-        }
-
-        $lookup = [];
-        foreach ($sub as $row) {
-            $relations = $row['relations'] ?? '';
-            if (is_array($relations)) {
-                $tokens = $relations;
-            } else {
-                $tokens = preg_split('/[\s,]+/', (string) $relations, -1, PREG_SPLIT_NO_EMPTY);
-            }
-            foreach ($tokens as $token) {
-                $token = (string) $token;
-                if (isset($tokenToKey[$token])) {
-                    $bucketKey = $tokenToKey[$token];
-                    if (! isset($lookup[$bucketKey])) {
-                        $lookup[$bucketKey] = $row;
-                    }
-                }
-            }
-        }
-        return $lookup;
-    }
-
-    private function hashMultivalueTokenMysql(string $value): string
-    {
-        $hash = md5($value);
-        return strtr('token' . $hash, '1234567890', 'pqrtuvwxyz');
     }
 }

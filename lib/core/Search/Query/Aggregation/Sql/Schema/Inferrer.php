@@ -68,10 +68,11 @@ class Inferrer
     {
         $declaredTypes = [];
         $sourceFields = [];
+        $groupKeyFields = [];
         $warnings = [];
         $indexes = [];
 
-        $this->walk($aggregations, $declaredTypes, $sourceFields, $indexes, $warnings);
+        $this->walk($aggregations, $declaredTypes, $sourceFields, $indexes, $warnings, [], $groupKeyFields);
 
         $columns = [];
         foreach ($declaredTypes as $field => $type) {
@@ -80,6 +81,7 @@ class Inferrer
                 'type' => $type,
                 'sql_type' => $this->sqlTypeFor($type),
                 'source_field' => $sourceFields[$field],
+                'is_group_key' => isset($groupKeyFields[$field]),
             ];
         }
 
@@ -108,20 +110,22 @@ class Inferrer
         array &$sourceFields,
         array &$indexes,
         array &$warnings,
-        array $groupChain = []
+        array $groupChain = [],
+        array &$groupKeyFields = []
     ): void {
         foreach ($aggregations as $agg) {
             if ($agg instanceof Terms) {
                 $field = $agg->getField();
                 if ($field !== null && $field !== '') {
                     $this->declare($field, $this->resolveType($field, self::TYPE_TEXT), $declaredTypes, $sourceFields, $warnings);
+                    $groupKeyFields[$field] = true;
                 }
                 $childChain = $field !== null && $field !== ''
                     ? array_merge($groupChain, [$this->columnName($field)])
                     : $groupChain;
 
                 if ($agg->hasChildren()) {
-                    $this->walk($agg->getChildren(), $declaredTypes, $sourceFields, $indexes, $warnings, $childChain);
+                    $this->walk($agg->getChildren(), $declaredTypes, $sourceFields, $indexes, $warnings, $childChain, $groupKeyFields);
                 }
 
                 if ($groupChain === [] && $childChain !== []) {
