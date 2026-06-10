@@ -94,11 +94,16 @@ class Services_Comment_Controller
                         \$.service('comment', 'list'),
                         {type:'$type', objectId:'$objectId', offset: comment_offset},
                         function () {
-                            \$('html, body').animate({
-                                    scrollTop: \$commentContainer.offset().top
-                                }, 2000, function () {
-                                    \$commentContainer.tikiModal();
-                                });
+                            if (comment_offset == 0) {
+                                // If we want to load the first page, we have to go up.
+                                \$('html, body').animate({
+                                        scrollTop: \$commentContainer.offset().top
+                                    }, 2000, function () {
+                                        \$commentContainer.tikiModal();
+                                    });
+                            } else {
+                                \$commentContainer.tikiModal();
+                            }
                         }
                     );
                 return false;";
