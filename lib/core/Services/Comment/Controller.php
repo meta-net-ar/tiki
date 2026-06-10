@@ -95,7 +95,7 @@ class Services_Comment_Controller
                         {type:'$type', objectId:'$objectId', offset: comment_offset},
                         function () {
                             if (comment_offset == 0) {
-                                // If we want to load the first page, we have to go up.
+                                /* If we want to load the first page, we have to go up. */
                                 \$('html, body').animate({
                                         scrollTop: \$commentContainer.offset().top
                                     }, 2000, function () {
