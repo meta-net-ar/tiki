@@ -2675,8 +2675,12 @@ class Comments extends TikiLib
                     );
 
                     foreach ($history['data'] as &$hist) {
-                        $field_info = TikiLib::lib('trk')->get_field_info($hist['fieldId']);
-                        $hist['fieldName'] = $field_info['name'];
+                        if ($hist['fieldId'] == -1) {
+                            $hist['fieldName'] = tra('Status');
+                        } else {
+                            $field_info = TikiLib::lib('trk')->get_field_info($hist['fieldId']);
+                            $hist['fieldName'] = $field_info ? $field_info['name'] : '';
+                        }
                     }
 
                     if (! empty($history['data'])) {
