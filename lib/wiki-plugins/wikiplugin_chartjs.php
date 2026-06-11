@@ -99,7 +99,6 @@ function wikiplugin_chartjs_info()
 function wikiplugin_chartjs($data, $params)
 {
     global $base_url, $jitRequest, $prefs;
-    $prefsLib = TikiLib::lib('prefs');
 
     static $instance = 0;
     $instance++;
@@ -182,7 +181,7 @@ function wikiplugin_chartjs($data, $params)
         return '<div class="tiki-chartjs">' . $canvas . '</div>';
     }
 
-    $non_module_html_content = '<script src="' . $prefs['headlessbrowser_chartjs_path'] . '"></script>';
+    $non_module_html_content = '<script src="' . NODE_PUBLIC_DIST_PATH . '/chartjs-v2/dist/Chart.bundle.min.js"></script>';
     $non_module_html_content .= <<<HTML
 <div>
     $canvas
@@ -200,9 +199,8 @@ HTML;
         // @tiki-external-link-ok: Chart.js 2.x via CDN for CasperJS/PhantomJS PDF export
         $html_content = $non_module_html_content;
     } else {
-        $pref = $prefsLib->getPreference('headlessbrowser_chartjs_path');
         // If the user is using the default ChartJS path, we can use importmap to load the module
-        if ($pref && $pref['default'] === $prefs['headlessbrowser_chartjs_path']) {
+        if ($prefs['headlessbrowser_chartjs_module'] === 'y') {
             $html_content = generateJsImportmapScripts(true); // generate imports with full URL since we load the html file as file://
             $html_content .= <<<HTML
 <div>

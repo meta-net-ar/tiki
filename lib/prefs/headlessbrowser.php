@@ -44,12 +44,12 @@ function prefs_headlessbrowser_list()
             'tags' => ['experimental'],
             'default' => 'n',
         ],
-        'headlessbrowser_chartjs_path' => [
-            'name' => tra('ChartJS path'),
-            'description' => tra('Url or local path of chartJS file.'),
-            'type' => 'text',
+        'headlessbrowser_chartjs_module' => [
+            'name' => tra('Headless chrome with ChartJS ES Module'),
+            'description' => tra('Use chartJS >= 3.0  which exposes ES modules. Set this to n in case you want to use version 2.9.4 which is the last version supporting non-module usage.'),
+            'type' => 'flag',
             'tags' => ['experimental'],
-            'default' => 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js',
+            'default' => 'y',
         ],
     ];
 }
