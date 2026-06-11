@@ -55,7 +55,7 @@ class UserSelector extends Base
             'user_selector_threshold' => $prefs['user_selector_threshold'],
             'allowNone' => 'y',
             'noneLabel' => 'None',
-            'realnames' => 'y',
+            'realnames' => $prefs['user_show_realnames'],
             'class' => 'form-control',
             'lazyload' => 'false',
             'noneSelectable' => 'y',
