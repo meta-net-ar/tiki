@@ -2674,13 +2674,18 @@ class Comments extends TikiLib
                         ['version' => $ret[$key]['version']]
                     );
 
-                    foreach ($history['data'] as &$hist) {
+                    foreach ($history['data'] as $i => &$hist) {
                         $field_info = TikiLib::lib('trk')->get_field_info($hist['fieldId']);
+                        if (empty($field_info)) {
+                            // Ignoring deleted fields
+                            unset($history['data'][$i]);
+                            continue;
+                        }
                         $hist['fieldName'] = $field_info['name'];
                     }
 
                     if (! empty($history['data'])) {
-                        $ret[$key]['diffInfo'] = $history['data'];
+                        $ret[$key]['diffInfo'] = array_values($history['data']); // re-indexing the array in case we removed some items
                     }
                 }
             }
