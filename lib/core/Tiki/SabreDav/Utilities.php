@@ -11,6 +11,8 @@ use Sabre\CardDAV;
 use Sabre\DAV;
 use Sabre\DAVACL;
 use Sabre\VObject;
+use Perms;
+use Tiki\FileGallery\File;
 use Tiki\Lib\TikiDate;
 use TikiLib;
 use TikiMail;
@@ -375,6 +377,9 @@ class Utilities
         if (isset($component->{'X-Tiki-HideParticipants'})) {
             $result['hideParticipants'] = intval($convertToString($component->{'X-Tiki-HideParticipants'}));
         }
+        if (isset($component->{'X-Tiki-Attachments'})) {
+            $result['attachments'] = array_filter(array_map('intval', explode(',', $convertToString($component->{'X-Tiki-Attachments'}))));
+        }
         if (isset($component->ORGANIZER)) {
             $result['organizers'] = [];
             $result['real_organizers'] = [];
@@ -673,6 +678,19 @@ class Utilities
         if ($row['hideParticipants'] ?? false) {
             $data['X-Tiki-HideParticipants'] = '1';
         }
+        if (! empty($row['attachments'])) {
+            if (is_array($row['attachments'])) {
+                $fileIds = array_map(function ($attachment) {
+                    return is_array($attachment) ? (int) ($attachment['fileId'] ?? 0) : (int) $attachment;
+                }, $row['attachments']);
+            } else {
+                $fileIds = array_filter(array_map('intval', explode(',', (string) $row['attachments'])));
+            }
+            $fileIds = array_filter($fileIds);
+            if ($fileIds) {
+                $data['X-Tiki-Attachments'] = implode(',', $fileIds);
+            }
+        }
 
         $vcalendar = new VObject\Component\VCalendar();
         $vevent = $vcalendar->add('VEVENT', $data);
@@ -813,9 +831,45 @@ Invitees: " . ($hideParticipants ? "Participants list has been hidden at organiz
             // The other way would be via Mail-in to calendars and a reply-to address configured as a mail-in source.
             $mail = new TikiMail($args['user'], $sender_email, $sender_name);
             $mail->setSubject($subject);
+            if ($message->method === 'REQUEST' && $calitem) {
+                self::addEventAttachmentsToMail($mail, (int) $calitem['calitemId']);
+            }
             $mail->setText($body);
+            // File IDs in X-Tiki-Attachments are instance-local; send files as MIME parts only.
+            if (isset($message->message->VEVENT->{'X-Tiki-Attachments'})) {
+                $message->message->VEVENT->remove('X-Tiki-Attachments');
+            }
             $mail->addPart($message->message->serialize(), 'text/calendar; method=' . $message->method . '; name=event.ics');
             $mail->send([$recipient]);
+        }
+    }
+
+    private static function addEventAttachmentsToMail(TikiMail $mail, int $calitemId): void
+    {
+        global $prefs;
+
+        if ($prefs['feature_file_galleries'] !== 'y') {
+            return;
+        }
+
+        $attachments = TikiLib::lib('calendar')->getEventAttachments($calitemId);
+        if (empty($attachments)) {
+            return;
+        }
+
+        foreach ($attachments as $attachment) {
+            $fileId = (int) $attachment['fileId'];
+            $file = File::id($fileId);
+            if (! $file->exists() || ! Perms::get('file', $fileId)->download_files) {
+                continue;
+            }
+
+            $contents = $file->getContents();
+            if (empty($contents)) {
+                continue;
+            }
+
+            $mail->addAttachment($contents, $file->filename, $file->filetype);
         }
     }
 }

@@ -281,6 +281,8 @@ class Hm_Handler_add_to_calendar extends Hm_Handler_Module
         $data = $this->get('calendar_event');
         $data['calendarId'] = $form['calendar_id'];
         $data['user'] = $user;
+        // X-Tiki-Attachments holds sender file IDs; import files from the email instead.
+        unset($data['attachments']);
 
         $client = new \Tiki\SabreDav\CaldavClient();
         if ($data['rec']) {
@@ -300,6 +302,14 @@ class Hm_Handler_add_to_calendar extends Hm_Handler_Module
             $client->saveRecurringCalendarObject($rec);
         } else {
             $client->saveCalendarObject($data);
+        }
+
+        $item = TikiLib::lib('calendar')->find_by_uid(null, $data['uid']);
+        if ($item) {
+            TikiLib::lib('calendar')->uploadAndAttachEventFiles(
+                (int) $item['calitemId'],
+                tiki_get_invitation_email_attachments($this)
+            );
         }
 
         Hm_Msgs::add("Event created");
@@ -328,6 +338,8 @@ class Hm_Handler_update_in_calendar extends Hm_Handler_Module
             return;
         }
 
+        unset($data['attachments']);
+
         $perms = Perms::get('event', $existing['calitemId']);
         if (! $perms->change_events) {
             Hm_Msgs::add(tr("Insufficient permissions to update the event in the calendar"), "danger");
@@ -345,6 +357,11 @@ class Hm_Handler_update_in_calendar extends Hm_Handler_Module
             $data['calendarId'] = $existing['calendarId'];
             $client->saveCalendarObject($data);
         }
+
+        TikiLib::lib('calendar')->uploadAndAttachEventFiles(
+            (int) $existing['calitemId'],
+            tiki_get_invitation_email_attachments($this)
+        );
 
         Hm_Msgs::add("Event updated");
     }
@@ -524,6 +541,106 @@ class Hm_Output_add_rsvp_actions extends Hm_Output_Module
 }
 
 /**
+ * @param \ZBateson\MailMimeParser\Message $message
+ * @return array
+ */
+if (! hm_exists('tiki_extract_calendar_invite_attachments')) {
+    function tiki_extract_calendar_invite_attachments($message)
+    {
+        $attachments = [];
+        $parts = iterator_to_array($message->getAllAttachmentParts());
+        if (empty($parts)) {
+            foreach ($message->getAllParts() as $part) {
+                if ($part->getChildCount() > 0) {
+                    continue;
+                }
+                if ($part->getFilename()) {
+                    $parts[] = $part;
+                }
+            }
+        }
+
+        foreach ($parts as $part) {
+            $filetype = explode(';', $part->getContentType())[0];
+            if (in_array(strtolower($filetype), ['text/plain', 'text/html', 'text/calendar'], true)) {
+                continue;
+            }
+            $filename = $part->getFilename() ?: 'attachment';
+            if (strtolower(basename($filename)) === 'event.ics') {
+                continue;
+            }
+            $data = $part->getContent();
+            if ($data === '') {
+                continue;
+            }
+            $attachments[] = [
+                'filename' => basename($filename),
+                'filetype' => $filetype,
+                'data' => $data,
+            ];
+        }
+
+        return $attachments;
+    }
+}
+
+/**
+ * @param Hm_Handler_Module $mod
+ * @return array
+ */
+if (! hm_exists('tiki_get_invitation_email_attachments')) {
+    function tiki_get_invitation_email_attachments(Hm_Handler_Module $mod)
+    {
+        global $prefs;
+
+        if ($prefs['feature_file_galleries'] !== 'y') {
+            return [];
+        }
+
+        $list_path = $mod->request->post['list_path'] ?? $mod->get('list_path', '');
+        if (strpos($list_path, 'tracker_folder_') === 0) {
+            list($success, $form) = $mod->process_form(['imap_msg_uid', 'list_path']);
+            if (! $success) {
+                return [];
+            }
+            $email = tiki_parse_message($form['list_path'], $form['imap_msg_uid']);
+            if (! $email || empty($email['message_raw'])) {
+                return [];
+            }
+
+            return tiki_extract_calendar_invite_attachments($email['message_raw']);
+        }
+
+        $imapServerId = $mod->request->post['imap_server_id'] ?? null;
+        $imapMsgUid = $mod->request->post['imap_msg_uid'] ?? null;
+        $folder = $mod->request->post['folder'] ?? null;
+        if (! $imapServerId || ! $imapMsgUid || ! $folder) {
+            list($success, $form) = $mod->process_form(['imap_server_id', 'imap_msg_uid', 'folder']);
+            if (! $success) {
+                return [];
+            }
+            $imapServerId = $form['imap_server_id'];
+            $imapMsgUid = $form['imap_msg_uid'];
+            $folder = $form['folder'];
+        }
+
+        $mailbox = Hm_IMAP_List::get_connected_mailbox($imapServerId, $mod->cache);
+        if (! $mailbox || ! $mailbox->authed()) {
+            return [];
+        }
+
+        $raw = $mailbox->get_message_content(hex2bin($folder), $imapMsgUid, 0);
+        if (! $raw) {
+            return [];
+        }
+
+        $message = \ZBateson\MailMimeParser\Message::from($raw, false);
+
+        return tiki_extract_calendar_invite_attachments($message);
+    }
+}
+
+/**
  * Search imap message structure for text/calendar parts
  * @subpackage tiki/functions
  * @param array $struct message structure
@@ -541,7 +658,7 @@ if (! hm_exists('get_calendar_part')) {
             if (is_array($vals) && isset($vals['type'])) {
                 if ($vals['type'] . '/' . $vals['subtype'] == 'text/calendar') {
                     $part = $id;
-                    $method = $vals['attributes']['method'];
+                    $method = $vals['attributes']['method'] ?? null;
                 }
                 if ($vals['type'] . '/' . $vals['subtype'] == 'text/html') {
                     $htmlPart = $id;
