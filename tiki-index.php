@@ -61,6 +61,19 @@ use Tiki\Sections;
 $section = Sections::SECTION_WIKI_PAGE;
 Sections::setCurrentSection($section);
 
+
+global $prefs;
+global $tikiroot, $base_url;
+$homePage = $prefs['wikiHomePage'];
+$homeSlug = TikiLib::lib('wiki')->get_slug_by_page($homePage);
+$requestSlug = str_replace('+', '-', $_GET['page'] ?? ''); // Using $_REQUEST here cause redirection loop, GET gives us true query param from browser
+
+if (! empty($requestSlug) && $requestSlug === $homeSlug) {
+    $redirectTo = $base_url ?? $tikiroot ?? '/';
+    TikiLib::lib('access')->redirect($redirectTo); //default status code is 302, which is what is needed here given that home page might change
+    exit;
+}
+
 $multilinguallib = TikiLib::lib('multilingual');
 
 if ($prefs['feature_wiki_structure'] == 'y') {

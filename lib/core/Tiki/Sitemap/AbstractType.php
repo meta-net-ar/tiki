@@ -158,6 +158,9 @@ abstract class AbstractType
      */
     protected function getEntryUrl($urlTemplate, $idValue, $entryType, $title = '')
     {
+        if (self::isHomePage($idValue)) {
+            return '/';
+        }
         $url = sprintf($urlTemplate, urlencode($idValue));
         if (function_exists('filter_out_sefurl')) {
             $url = filter_out_sefurl($url, $entryType, $title);
@@ -170,6 +173,9 @@ abstract class AbstractType
      */
     protected function getEntryPriority($entry, $idField, $priority)
     {
+        if (self::isHomePage($entry[$idField])) {
+            return '1.0';
+        }
         return is_array($priority) ? ($priority[$entry[$idField]] ?? '0.6') : $priority;
     }
 
@@ -385,5 +391,13 @@ abstract class AbstractType
         $minDate = mktime(0, 0, 0, 1, 1, $year);
         $maxDate = mktime(23, 59, 59, 12, 31, $year);
         return [$minDate, $maxDate];
+    }
+
+    protected static function isHomePage(string $idValue): bool
+    {
+        global $prefs;
+        $homepageName = $prefs['wikiHomePage'] ?? 'HomePage';
+        $homePageSlug = TikiLib::lib('wiki')->get_slug_by_page($homepageName);
+        return $idValue === $homePageSlug;
     }
 }
