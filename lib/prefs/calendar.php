@@ -195,5 +195,15 @@ function prefs_calendar_list()
                 'feature_file_galleries',
             ],
         ],
+        'calendar_pdf_export_layout' => [
+            'name' => tra('PDF export layout'),
+            'description' => tra('Choose how the exported PDF should be scaled.'),
+            'type' => 'list',
+            'options' => [
+                'fit_to_width' => tr('Fit to width'),
+                'fit_on_one_page' => tr('Fit on one page'),
+            ],
+            'default' => 'fit_on_one_page',
+        ],
     ];
 }
