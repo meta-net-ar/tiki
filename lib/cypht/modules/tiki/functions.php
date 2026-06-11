@@ -468,19 +468,6 @@ if (! hm_exists('bind_tracker_item_update_event')) {
     }
 }
 
-/**
- * @subpackage tiki/functions
- * @return string ensure file was saved before removing it from remote mailbox
- */
-if (! hm_exists('append_to_msg_headers')) {
-    function append_to_msg_headers($headers, $link)
-    {
-        $headers = preg_replace('#</div><span id="extra-header-buttons"></span>#s', $link . "\\0", $headers, 1);
-
-        return $headers;
-    }
-}
-
 function find_relevant_tracker_items($keywords, $multivalueField = '', $searchArgs = [])
 {
     global $prefs;

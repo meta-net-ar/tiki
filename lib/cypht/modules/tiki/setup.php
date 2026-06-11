@@ -76,10 +76,10 @@ add_output('compose', 'post_imap_save_sent', true, 'tiki', 'compose_form_end', '
 /* message page calendar invitation hooks */
 add_handler('ajax_imap_message_content', 'check_calendar_invitations_imap', true, 'imap', 'imap_message_content', 'after');
 add_output('ajax_imap_message_content', 'add_rsvp_actions', true, 'imap', 'filter_message_headers', 'after');
-add_output('ajax_imap_message_content', 'filter_message_headers_mpdf', true, 'imap', 'filter_message_headers', 'after');
-add_output('ajax_imap_message_content', 'add_move_to_trackers', true, 'imap', 'filter_message_headers', 'after');
-add_output('ajax_imap_message_content', 'tiki_get_create_item_trackers_output', true, 'imap', 'filter_message_headers', 'after');
-add_output('ajax_imap_message_content', 'add_restore_message', true, 'imap', 'filter_message_headers', 'after');
+add_output('ajax_imap_message_content', 'filter_message_headers_mpdf', true, 'imap', 'filter_message_headers', 'before');
+add_output('ajax_imap_message_content', 'add_move_to_trackers', true, 'imap', 'filter_message_headers', 'before');
+add_output('ajax_imap_message_content', 'tiki_get_create_item_trackers_output', true, 'imap', 'filter_message_headers', 'before');
+add_output('ajax_imap_message_content', 'add_restore_message', true, 'imap', 'filter_message_headers', 'before');
 
 /* message page calendar invitation hooks (Tracker-stored messages) */
 add_handler('ajax_tiki_message_content', 'check_calendar_invitations_imap', true, 'imap', 'tiki_message_content', 'after');
