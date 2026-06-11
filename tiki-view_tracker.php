@@ -560,9 +560,9 @@ if (isset($_REQUEST["trackerId"])) {
 $sort_mode_full = [];
 if (isset($_REQUEST["sort_mode"])) {
     if (is_array($_REQUEST["sort_mode"])) {
-        $sort_mode_full = array_values(array_filter($_REQUEST["sort_mode"], 'is_string'));
+        $sort_mode_full = array_values($_REQUEST["sort_mode"]);
     } else {
-        $sort_mode_full = [strval($_REQUEST["sort_mode"])];
+        $sort_mode_full = [$_REQUEST["sort_mode"]];
     }
 }
 if (empty($sort_mode_full)) {
