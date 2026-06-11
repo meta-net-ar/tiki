@@ -665,6 +665,22 @@ if ($prefs['jquery_smartmenus_enable'] == 'y') {
                 nav[indexCurrentNav].classList.add("sm-navbar");
                 nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
                 const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
+                
+                // Enable navigation on parent menu items with children
+                // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
+                // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
+                // Note: Relies on SmartMenus internal class that may change in future versions
+                nav[indexCurrentNav].addEventListener("click", function(e) {
+                    const link = e.target.closest("a.sm-sub-toggler");
+                    if (link && nav[indexCurrentNav].contains(link)) {
+                        const href = link.getAttribute("href");
+                        if (href && href !== "#" && href !== "") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            window.location.href = href;
+                        }
+                    }
+                });
             }
         }
     ');
