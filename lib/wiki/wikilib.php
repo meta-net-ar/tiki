@@ -642,6 +642,10 @@ class WikiLib extends TikiLib
         // Create tiki_links entries
         $pages = $parserlib->get_pages($data);
         foreach ($pages as $a_page) {
+            $pageInfo = $tikilib->get_page_info($a_page, false);
+            if ($pageInfo) {
+                $a_page = $pageInfo['pageName'];
+            }
             $tikilib->replace_link($linkhandle, $a_page);
         }
     }
