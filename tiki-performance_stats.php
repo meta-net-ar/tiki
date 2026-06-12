@@ -72,7 +72,7 @@ $maximumStatOrder = validateDirection($_REQUEST['maximum_stat_order'] ?? null);
 
 $smarty->assign('performance_stats_lib', $performanceLib);
 $smarty->assign('find', $find);
-$smarty->assign('pages_count', $performanceLib->getRequestsGroupedByAmount());
+$smarty->assign('pages_count', $performanceLib->getRequestsGroupedByAmount($find));
 $smarty->assign_by_ref('average_stat_offset', $averageStatOffset);
 $smarty->assign_by_ref('average_stat_order', $averageStatOrder);
 $smarty->assign_by_ref('maximum_stat_offset', $maximumStatOffset);
