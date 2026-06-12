@@ -838,7 +838,7 @@ import { defaults as defaultControls } from "ol/control";
                     return mode;
                 },
                 switchTo: function (modeName) {
-                    var manager = this;
+                    const manager = this;
                     this.modes.forEach((mode) => {
                         if (mode.name === modeName) {
                             manager.activate(mode);
@@ -901,8 +901,11 @@ import { defaults as defaultControls } from "ol/control";
 
             const defaultMode = {
                 controls: [selectionInteraction],
-                name: tr("Default"),
+                name: "pan_zoom",
+                title: tr("Default"),
             };
+
+            container.modeManager.addMode(defaultMode);
 
             var $mapBootstrapDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
 
@@ -1319,8 +1322,6 @@ import { defaults as defaultControls } from "ol/control";
                     });
                 }
             }
-
-            container.modeManager.addMode(defaultMode);
 
             if (jqueryTiki.googleStreetView) {
                 container.streetview = {
@@ -2095,6 +2096,7 @@ import { defaults as defaultControls } from "ol/control";
 
             initializeColorpicker();
 
+            /****** $.fn.creatMap() all done, tell everyone! ******/
             setTimeout(function () {
                 $(container).trigger("initialized");
             }, 1000);
