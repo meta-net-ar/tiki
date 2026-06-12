@@ -417,7 +417,7 @@
                 {/if}
                 <input type="hidden" name="galleryId[]" value="{$galleryId}">
             {/if}
-            {if $prefs.elementplus_upload eq 'y'}
+            {if $prefs.elementplus_upload eq 'y' && ! $editFileId}
                 <div class="mb-3 row">
                     <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{if isset($gal_info.image_max_size_x)}{$gal_info.image_max_size_x}{/if}" max-height="{if isset($gal_info.image_max_size_y)}{$gal_info.image_max_size_y}{/if}" />
                 </div>
