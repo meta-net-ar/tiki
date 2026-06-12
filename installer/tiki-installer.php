@@ -155,6 +155,8 @@ $prefs = [
     'remember_closed_rboxes' => 'n',
     // \Tiki\Smarty\SmartyTiki::initializePaths
     'feature_webservices' => 'n',
+    // lib/prefs/min.php
+    'min_pass_length' => 5,
 ];
 
 require_once 'lib/init/initlib.php';
