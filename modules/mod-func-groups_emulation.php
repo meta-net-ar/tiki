@@ -16,7 +16,7 @@ function module_groups_emulation_info()
         'params' => [
             'showallgroups' => [
                 'name' => tra('Show All Groups'),
-                'description' => tra('Show All Groups') . '. ' . tra('If set to "n", the list is not shown.'),
+                'description' => tra('Show the list of all system groups and include them in the emulation dropdown.') . ' ' . tra('If set to "n", the list is not shown and groups are excluded from the dropdown. Admin only.'),
                 'filter' => 'alpha',
                 'default' => 'y',
                 'since' => '13.1',
@@ -27,7 +27,7 @@ function module_groups_emulation_info()
             ],
             'showyourgroups' => [
                 'name' => tra('Show Your Groups'),
-                'description' => tra('Show Your Groups') . '. ' . tra('If set to "n", the list is not shown.'),
+                'description' => tra('Show the list of your assigned groups and include them in the emulation dropdown.') . ' ' . tra('If set to "n", the list is not shown and groups are excluded from the dropdown.'),
                 'filter' => 'alpha',
                 'default' => 'y',
                 'since' => '13.1',
@@ -49,6 +49,12 @@ function module_groups_emulation_info()
 function module_groups_emulation($mod_reference, $module_params)
 {
     global $user, $tiki_p_admin;
+
+    // Anonymous users can only emulate anonymous permissions, which is pointless.
+    // Hide the module entirely for non-logged-in users.
+    if (empty($user) || strtolower($user) === 'anonymous') {
+        return false;
+    }
 
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
@@ -77,18 +83,20 @@ function module_groups_emulation($mod_reference, $module_params)
 
     // Extract list of groups of user, including included groups
     $userGroups = $userlib->get_user_groups_inclusion($user);
-    if ($tiki_p_admin == 'y') {
+
+    // Build the choosable groups for the dropdown, respecting params
+    $chooseGroups = [];
+    if ($showallgroups == 'y' && $tiki_p_admin == 'y') {
         $chooseGroups = $allGroups;
-    } else {
+    } elseif ($showyourgroups == 'y') {
         $chooseGroups = $userGroups;
     }
     $chooseGroups["Anonymous"] = "included";
-    if (isset($user)) {
-        $chooseGroups["Registered"] = "included";
-    }
+    $chooseGroups["Registered"] = "included";
 
     $moduleId = $mod_reference['moduleId'];
     $smarty->assign('moduleId', $moduleId);
+
 
     $smarty->assign_by_ref('userGroups', $userGroups);
     $smarty->assign_by_ref('chooseGroups', $chooseGroups);
