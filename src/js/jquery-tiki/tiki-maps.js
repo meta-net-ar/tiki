@@ -261,11 +261,11 @@ import { defaults as defaultControls } from "ol/control";
     }
 
     function formatLocation(lat, lon, zoom) {
-        // Convert , decimal points - where those are used
-        var strLon = "" + lon;
-        strLon.replace(",", ".");
-        var strLat = "" + lat;
-        strLat.replace(",", ".");
+        // Convert commas to decimal points - where those are used
+        let strLon = "" + lon;
+        strLon = strLon.replace(",", ".");
+        let strLat = "" + lat;
+        strLat = strLat.replace(",", ".");
         return strLon + "," + strLat + "," + zoom;
     }
 
