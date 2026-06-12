@@ -98,7 +98,7 @@ function wikiplugin_chartjs_info()
 
 function wikiplugin_chartjs($data, $params)
 {
-    global $base_url, $jitRequest;
+    global $base_url, $jitRequest, $prefs;
 
     static $instance = 0;
     $instance++;
@@ -181,14 +181,8 @@ function wikiplugin_chartjs($data, $params)
         return '<div class="tiki-chartjs">' . $canvas . '</div>';
     }
 
-    // PDF export related logic
-    if (HeadlessBrowserFactory::getHeadlessBrowserType() === HeadlessBrowserFactory::CASPERJS) {
-        // casperJS uses PhantomJS that does not support ES6, so no support for modules.
-        // We are going to hardcode a reference to the latest version of chart.js 2.x to allow running
-        // the PDF export of the chart without using JS modules.
-        // @tiki-external-link-ok: Chart.js 2.x via CDN for CasperJS/PhantomJS PDF export
-        $html_content = <<<HTML
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js"></script>
+    $non_module_html_content = '<script src="' . NODE_PUBLIC_DIST_PATH . '/chartjs-v2/dist/Chart.bundle.min.js"></script>';
+    $non_module_html_content .= <<<HTML
 <div>
     $canvas
 </div>
@@ -196,9 +190,19 @@ function wikiplugin_chartjs($data, $params)
     $script
 </script>
 HTML;
+
+    // PDF export related logic
+    if (HeadlessBrowserFactory::getHeadlessBrowserType() === HeadlessBrowserFactory::CASPERJS) {
+        // casperJS uses PhantomJS that does not support ES6, so no support for modules.
+        // We are going to hardcode a reference to the latest version of chart.js 2.x to allow running
+        // the PDF export of the chart without using JS modules.
+        // @tiki-external-link-ok: Chart.js 2.x via CDN for CasperJS/PhantomJS PDF export
+        $html_content = $non_module_html_content;
     } else {
-        $html_content = generateJsImportmapScripts(true); // generate imports with full URL since we load the html file as file://
-        $html_content .= <<<HTML
+        // If the user is using the default ChartJS path, we can use importmap to load the module
+        if ($prefs['headlessbrowser_chartjs_module'] === 'y') {
+            $html_content = generateJsImportmapScripts(true); // generate imports with full URL since we load the html file as file://
+            $html_content .= <<<HTML
 <div>
     $canvas
 </div>
@@ -209,6 +213,9 @@ HTML;
     $script
 </script>
 HTML;
+        } else {
+            $html_content = $non_module_html_content;
+        }
     }
     $scriptHash = md5($script);
     $cacheKey = 'chart_';
