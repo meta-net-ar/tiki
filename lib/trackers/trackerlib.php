@@ -1633,11 +1633,29 @@ class TrackerLib extends TikiLib
                         }
                         $mid .= " upper(ttif$i.`value`) like upper(?) ";
                         if (str_starts_with($v, '*') || str_starts_with($v, '%')) {
-                            $bindvars[] = '%' . substr($v, 1);
+                            $likeValue = substr($v, 1);
+                            $likePattern = '%' . $likeValue;
                         } elseif (str_ends_with($v, '*') || str_ends_with($v, '%')) {
-                            $bindvars[] = substr($v, 0, strlen($v) - 1) . '%';
+                            $likeValue = substr($v, 0, strlen($v) - 1);
+                            $likePattern = $likeValue . '%';
                         } else {
-                            $bindvars[] = '%' . $v . '%';
+                            $likeValue = $v;
+                            $likePattern = '%' . $likeValue . '%';
+                        }
+                        $bindvars[] = $likePattern;
+
+                        if ($filter['type'] === 'm') {
+                            $emailSeparators = ['@', '.', '-', '_', '+'];
+                            $normalizedValue = str_replace($emailSeparators, '', $likeValue);
+                            if ($normalizedValue !== '' && $normalizedValue === $likeValue && ctype_alnum($normalizedValue)) {
+                                // SQL is static; user input is still passed through $bindvars.
+                                $normalizedEmailSql = "ttif$i.`value`";
+                                foreach ($emailSeparators as $emailSeparator) {
+                                    $normalizedEmailSql = "REPLACE($normalizedEmailSql, '$emailSeparator', '')";
+                                }
+                                $mid .= " OR upper($normalizedEmailSql) like upper(?) ";
+                                $bindvars[] = str_replace($likeValue, $normalizedValue, $likePattern);
+                            }
                         }
                     }
                     $mid .= ')';

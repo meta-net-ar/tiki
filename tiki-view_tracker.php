@@ -29,14 +29,14 @@ $inputConfiguration = [
             'offset'             => 'int',           //get
             'maxRecords'         => 'int',           //get
             'filterfield'        => 'word',          //get
-            'filtervalue_other'  => 'word',          //get
+            'filtervalue_other'  => 'text',          //get
             'displayedFields'    => 'word',          //get
         ],
         'staticKeyFiltersForArrays' => [
             'action'                => 'string',    //get
             'vals'                  => 'none',      //get
             'sort_mode'             => 'alnumdash', //get
-            'filtervalue'           => 'word',
+            'filtervalue'           => 'text',
         ],
     ],
 ];
@@ -523,6 +523,13 @@ if (isset($_REQUEST["filtervalue"]) and is_array($_REQUEST["filtervalue"]) and i
 }
 if (! empty($_REQUEST['filtervalue_other'])) {
     $filtervalue = $_REQUEST['filtervalue_other'];
+}
+if (is_array($filtervalue)) {
+    $filtervalue = array_map(static function ($value) {
+        return is_string($value) ? trim($value) : $value;
+    }, $filtervalue);
+} elseif (is_string($filtervalue)) {
+    $filtervalue = trim($filtervalue);
 }
 
 if (! empty($filterfield)) {
