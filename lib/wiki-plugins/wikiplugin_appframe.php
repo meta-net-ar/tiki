@@ -479,6 +479,7 @@ function wikiplugin_appframe_mapcontrol($data, $params, $start)
             'id' => 'mapcontrol-' . ++$counter,
             'control' => $control,
             'icon' => $icon,
+            'name' => $name,
             'label' => $label,
             'mode' => $mode,
             'function' => $function,
