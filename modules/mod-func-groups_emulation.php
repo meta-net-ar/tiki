@@ -91,9 +91,7 @@ function module_groups_emulation($mod_reference, $module_params)
     } elseif ($showyourgroups == 'y') {
         $chooseGroups = $userGroups;
         $chooseGroups["Anonymous"] = "included";
-        if (isset($user)) {
-            $chooseGroups["Registered"] = "included";
-        }
+        $chooseGroups["Registered"] = "included";
     }
 
     $moduleId = $mod_reference['moduleId'];
