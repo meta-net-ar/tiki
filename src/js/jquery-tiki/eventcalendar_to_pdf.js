@@ -3,7 +3,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-import moment from "moment";
 import { jsPDF } from "common-reexported/jspdf";
 import html2canvas from "html2canvas-pro";
 
@@ -27,9 +26,9 @@ $.fn.addEventCalendarPrint = function (buttonId, calendar) {
                 scrollY: 0,
                 scrollX: 0,
             }).then(function (canvas) {
-                var date = moment(calendar.date);
-                var monthName = date.format("MMMM");
-                var year = date.format("YYYY");
+                var calendarTitle = $(calendarId + " .ec-title")
+                    .text()
+                    .trim();
                 var imgData = canvas.toDataURL("image/jpeg", 1.0);
                 var imgWidth = 180;
                 var pageHeight = 250;
@@ -37,7 +36,7 @@ $.fn.addEventCalendarPrint = function (buttonId, calendar) {
                 var heightLeft = imgHeight;
                 var doc = new jsPDF("p", "mm");
                 doc.setFontSize(14);
-                doc.text((210 - imgWidth) / 2, 20, monthName + " " + year);
+                doc.text((210 - imgWidth) / 2, 20, calendarTitle.replace(/\s+/g, " "));
 
                 if (imgHeight > pageHeight) {
                     imgHeight = pageHeight;
@@ -46,7 +45,7 @@ $.fn.addEventCalendarPrint = function (buttonId, calendar) {
 
                 doc.addImage(imgData, "JPEG", (210 - imgWidth) / 2, 30, imgWidth, heightLeft > pageHeight ? pageHeight : heightLeft);
 
-                doc.save(monthName + year + ".pdf");
+                doc.save(calendarTitle + ".pdf");
             });
         }, 200);
     });
