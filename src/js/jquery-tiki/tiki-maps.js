@@ -270,6 +270,46 @@ import { defaults as defaultControls } from "ol/control";
     }
 
     $.fn.createMap = function () {
+        function setFeatureColorStyle(feature, color, fillColor) {
+            let coloredStyle;
+
+            if (!fillColor) {
+                // no fillColor provided, use semi-transparent color
+                const rgba = Array.from(ol.color.asArray(color));
+                fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 2]);
+            }
+
+            const intent = feature.get("intent");
+
+            if (intent === "vectors") {
+                coloredStyle = new ol.style.Style({
+                    fill: new ol.style.Fill({ color: fillColor }),
+                    stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                });
+            } else if (intent === "marker") {
+                coloredStyle = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [feature.get("offsetx"), feature.get("offsety")],
+                        anchorXUnits: "pixels",
+                        anchorYUnits: "pixels",
+                        src: feature.get("url"),
+                    }),
+                });
+            } else {
+                // Create a colored circle style
+                coloredStyle = new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 12,
+                        fill: new ol.style.Fill({ color: fillColor }),
+                        stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                    }),
+                });
+            }
+            // DIRECTLY set the style on the feature
+            feature.setStyle(coloredStyle);
+            return coloredStyle;
+        }
+
         this.each(function () {
             let id = $(this).attr("id"),
                 container = this,
@@ -280,67 +320,24 @@ import { defaults as defaultControls } from "ol/control";
 
             // Shared style function for all map features (accessible from both clustered and non-clustered layers)
             container.createMapFeatureStyle = function (feature) {
+                let color;
                 // Check for custom color from container-level storage (set by colorpicker)
-                var geom = feature.getGeometry();
+                const geom = feature.getGeometry();
                 if (geom && geom.getCoordinates) {
-                    var coords = geom.getCoordinates();
+                    const coords = geom.getCoordinates();
                     if (Array.isArray(coords)) {
-                        var key = coords.join(",");
+                        const key = coords.join(",");
                         if (container.featureColors && container.featureColors[key]) {
-                            return new ol.style.Style({
-                                geometry: feature.getGeometry(),
-                                image: new ol.style.Circle({
-                                    radius: 10,
-                                    fill: new ol.style.Fill({ color: container.featureColors[key] }),
-                                    stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
-                                }),
-                            });
+                            color = container.featureColors[key];
                         }
                     }
                 }
 
                 // Check for color on feature property
-                const intent = feature.get("intent");
-                if (intent === "vectors") {
-                    let borderColor = feature.get("color") ?? "#999";
-                    let fillColor = feature.get("fillColor");
+                color = color ?? feature.get("color") ?? "#999";
+                let fillColor = feature.get("fillColor");
 
-                    if (!fillColor) {
-                        // no separate fill colour provided so make the fill 50% opacity of the border
-                        const rgba = Array.from(ol.color.asArray(borderColor));
-                        fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 2]);
-                    }
-
-                    return new ol.style.Style({
-                        fill: new ol.style.Fill({ color: fillColor }),
-                        stroke: new ol.style.Stroke({ color: borderColor, width: 2 }),
-                    });
-                }
-
-                // Check if it's a marker with icon
-                if (intent === "marker") {
-                    return new ol.style.Style({
-                        geometry: feature.getGeometry(),
-                        image: new ol.style.Icon({
-                            anchor: [feature.get("offsetx"), feature.get("offsety")],
-                            anchorXUnits: "pixels",
-                            anchorYUnits: "pixels",
-                            src: feature.get("url"),
-                        }),
-                    });
-                }
-
-                // Default style: red triangle for unmarked features
-                return new ol.style.Style({
-                    geometry: feature.getGeometry(),
-                    image: new ol.style.RegularShape({
-                        points: 3,
-                        radius: 12,
-                        fill: new ol.style.Fill({ color: "#cc3333" }),
-                        stroke: new ol.style.Stroke({ color: "#ffffff", width: 2 }),
-                        rotation: 0,
-                    }),
-                });
+                return setFeatureColorStyle(feature, color, fillColor);
             };
 
             container.setupLayerEvents = function (vectors) {
@@ -371,12 +368,12 @@ import { defaults as defaultControls } from "ol/control";
                 const interactions = container.map.getInteractions().getArray();
 
                 // e.g. added by wikiplugin_appframe modify_feature
-                const modifyInteraction = interactions.filter((interaction) => {
-                    interaction instanceof ol.interaction.Modify;
+                const modifyInteraction = interactions.find((interaction) => {
+                    return interaction instanceof ol.interaction.Modify && interaction.get("active");
                 });
 
-                if (modifyInteraction.length) {
-                    modifyInteraction[0].on("modifyend", function (event) {
+                if (modifyInteraction) {
+                    modifyInteraction.on("modifyend", function (event) {
                         event.features.getArray().forEach((feature) => {
                             if (feature.executor) {
                                 feature.executor();
@@ -386,21 +383,20 @@ import { defaults as defaultControls } from "ol/control";
                 }
 
                 // e.g. added by wikiplugin_appframe draw_polygon and draw_path
-                const drawInteraction = interactions.filter((interaction) => {
-                    interaction instanceof ol.interaction.Draw;
+                const drawInteraction = interactions.find((interaction) => {
+                    return interaction instanceof ol.interaction.Draw && interaction.get("active");
                 });
 
-                if (drawInteraction.length) {
-                    drawInteraction[0].on("drawend", function (event) {
-                        const features = event.target.getFeatures();
-                        if (features.getLength()) {
-                            const feature = features.item(0);
-                            if (!feature.get("color")) {
-                                feature.set("color", "#6699cc");
+                if (drawInteraction) {
+                    drawInteraction.on("drawend", function (event) {
+                        if (event.feature) {
+                            if (!event.feature.get("color")) {
+                                event.feature.set("color", "#6699cc");
                             }
-                            if (!feature.get("intent")) {
-                                feature.set("intent", "vectors");
+                            if (!event.feature.get("intent")) {
+                                event.feature.set("intent", "vectors");
                             }
+                            $(container).trigger("drawend", [event]);
                         }
                     });
                 }
@@ -873,6 +869,7 @@ import { defaults as defaultControls } from "ol/control";
                             }
                         });
                         control.setActive(true);
+                        container.setupLayerEvents(container.vectors);
                     });
                     mode.layers.forEach((layer) => {
                         layer.setVisibility(true);
@@ -1890,82 +1887,51 @@ import { defaults as defaultControls } from "ol/control";
 
             // Initialize colorpicker functionality
             function initializeColorpicker() {
-                var $colorpickerContainer = $(container).find(".map-colorpicker-container");
+                const $colorpickerContainer = $(container).find(".map-colorpicker-container");
                 if (!$colorpickerContainer.length) return;
 
-                var colors = $colorpickerContainer.data("colorpicker-colors") || [];
-                var title = $colorpickerContainer.data("colorpicker-title") || tr("Color Picker");
-                var modalId = "mapColorpickerModal-" + id;
+                const colors = $colorpickerContainer.data("colorpicker-colors") || [];
+                const title = $colorpickerContainer.data("colorpicker-title") || tr("Color Picker");
+                const modalId = "mapColorpickerModal-" + id;
 
                 // Create Bootstrap 5 Modal for colorpicker
-                var swatchesHtml = colors
-                    .map(function (c) {
-                        return (
-                            '<button type="button" class="btn color-swatch p-0 m-1" ' +
-                            'style="background-color:' +
-                            c +
-                            '; width:32px; height:32px; border:2px solid #ccc; border-radius:4px;" ' +
-                            'data-color="' +
-                            c +
-                            '" title="' +
-                            c +
-                            '"></button>'
-                        );
+                const swatchesHtml = colors
+                    .map(function (color) {
+                        return `<button type="button" class="btn color-swatch p-0 m-1" style="background-color:${color};
+                                    width:32px; height:32px; border:2px solid #ccc; border-radius:4px;" data-color="${color}" title="${color}">
+                            </button>`;
                     })
                     .join("");
 
-                var modalHtml =
-                    '<div class="modal fade" id="' +
-                    modalId +
-                    '" tabindex="-1" aria-labelledby="' +
-                    modalId +
-                    'Label" aria-hidden="true">' +
-                    '  <div class="modal-dialog modal-sm">' +
-                    '    <div class="modal-content">' +
-                    '      <div class="modal-header">' +
-                    '        <h5 class="modal-title" id="' +
-                    modalId +
-                    'Label">' +
-                    title +
-                    "</h5>" +
-                    '        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
-                    "      </div>" +
-                    '      <div class="modal-body">' +
-                    '        <div class="mb-3">' +
-                    '          <label for="colorPickerInput-' +
-                    id +
-                    '" class="form-label">' +
-                    tr("Select Color") +
-                    "</label>" +
-                    '          <input type="color" class="form-control form-control-color w-100" ' +
-                    '                 id="colorPickerInput-' +
-                    id +
-                    '" value="#6699cc">' +
-                    "        </div>" +
-                    '        <div class="color-swatches d-flex flex-wrap">' +
-                    swatchesHtml +
-                    "</div>" +
-                    "      </div>" +
-                    '      <div class="modal-footer">' +
-                    '        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">' +
-                    tr("Close") +
-                    "</button>" +
-                    '        <button type="button" class="btn btn-primary" id="applyColor-' +
-                    id +
-                    '">' +
-                    tr("Apply") +
-                    "</button>" +
-                    "      </div>" +
-                    "    </div>" +
-                    "  </div>" +
-                    "</div>";
+                const modalHtml = `
+<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="${modalId}Label">${title}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="colorPickerInput-${id}" class="form-label">${tr("Select Color")}</label>
+                    <input type="color" class="form-control form-control-color w-100" id="colorPickerInput-${id}" value="#6699cc">
+                </div>
+                <div class="color-swatches d-flex flex-wrap">${swatchesHtml}</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${tr("Close")}</button>
+                <button type="button" class="btn btn-primary" id="applyColor-${id}">${tr("Apply")}</button>
+            </div>
+        </div> 
+    </div>
+</div>`;
 
                 $(document.body).append(modalHtml);
 
-                var $modal = $("#" + modalId);
-                var $colorInput = $("#colorPickerInput-" + id);
-                var $applyBtn = $("#applyColor-" + id);
-                var selectedFeature = null;
+                const $modal = $("#" + modalId);
+                const $colorInput = $("#colorPickerInput-" + id);
+                const $applyBtn = $("#applyColor-" + id);
+                let selectedFeature = null;
 
                 // Store colorpicker config on container
                 container.colorpicker = {
@@ -1991,8 +1957,12 @@ import { defaults as defaultControls } from "ol/control";
                 // Handle apply button
                 $applyBtn.on("click", function () {
                     if (selectedFeature) {
-                        var color = $colorInput.val();
-                        applyColorToFeature(selectedFeature, color);
+                        container.map.getInteractions().forEach(function(interaction) {
+                            if (interaction instanceof ol.interaction.Select) {
+                                interaction.getFeatures().clear();
+                            }
+                        });
+                        applyColorToFeature(selectedFeature, $colorInput.val());
                     }
                     bootstrap.Modal.getOrCreateInstance($modal[0]).hide();
                 });
@@ -2008,44 +1978,37 @@ import { defaults as defaultControls } from "ol/control";
                     feature.set("color", color);
 
                     // Also store by coordinates for persistence across cluster recalculations
-                    var geom = feature.getGeometry();
-                    var key = null;
+                    const geom = feature.getGeometry();
+                    let key = null;
                     if (geom && geom.getCoordinates) {
-                        var coords = geom.getCoordinates();
+                        const coords = geom.getCoordinates();
                         if (Array.isArray(coords)) {
                             key = coords.join(",");
                             container.featureColors[key] = color;
                         }
                     }
+                    let coloredStyle = setFeatureColorStyle(feature, color);
 
-                    // Create a colored circle style
-                    var coloredStyle = new ol.style.Style({
-                        image: new ol.style.Circle({
-                            radius: 12,
-                            fill: new ol.style.Fill({ color: color }),
-                            stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
-                        }),
-                    });
-
-                    // DIRECTLY set the style on the feature
-                    feature.setStyle(coloredStyle);
+                    if (feature.executor) {
+                        feature.executor();
+                    }
 
                     // Also try to find this feature in all sources and update it there
-                    var layers = container.overlays.getLayers().getArray();
+                    const layers = container.overlays.getLayers().getArray();
 
                     layers.forEach(function (layer) {
                         if (layer.getSource && layer.getSource()) {
-                            var source = layer.getSource();
+                            const source = layer.getSource();
 
                             // Check if this is a cluster source
                             if (source.getSource) {
-                                var innerSource = source.getSource();
+                                const innerSource = source.getSource();
                                 // Find features at same coordinates
                                 if (key) {
                                     innerSource.getFeatures().forEach(function (f) {
-                                        var fGeom = f.getGeometry();
+                                        const fGeom = f.getGeometry();
                                         if (fGeom && fGeom.getCoordinates) {
-                                            var fCoords = fGeom.getCoordinates();
+                                            const fCoords = fGeom.getCoordinates();
                                             if (Array.isArray(fCoords) && fCoords.join(",") === key) {
                                                 f.set("color", color);
                                                 f.setStyle(coloredStyle);
@@ -2072,30 +2035,22 @@ import { defaults as defaultControls } from "ol/control";
                         return;
                     }
 
-                    var layers = container.overlays.getLayers().getArray();
+                    const layers = container.overlays.getLayers().getArray();
                     layers.forEach(function (layer) {
                         if (layer.getSource && layer.getSource()) {
-                            var source = layer.getSource();
+                            const source = layer.getSource();
 
                             // For cluster sources, check the inner source
-                            var featureSource = source.getSource ? source.getSource() : source;
+                            const featureSource = source.getSource ? source.getSource() : source;
 
-                            featureSource.getFeatures().forEach(function (f) {
-                                var geom = f.getGeometry();
+                            featureSource.getFeatures().forEach(function (feature) {
+                                const geom = feature.getGeometry();
                                 if (geom && geom.getCoordinates) {
-                                    var coords = geom.getCoordinates();
+                                    const coords = geom.getCoordinates();
                                     if (Array.isArray(coords)) {
-                                        var key = coords.join(",");
+                                        const key = coords.join(",");
                                         if (container.featureColors[key]) {
-                                            var color = container.featureColors[key];
-                                            var coloredStyle = new ol.style.Style({
-                                                image: new ol.style.Circle({
-                                                    radius: 12,
-                                                    fill: new ol.style.Fill({ color: color }),
-                                                    stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
-                                                }),
-                                            });
-                                            f.setStyle(coloredStyle);
+                                            setFeatureColorStyle(feature, container.featureColors[key]);
                                         }
                                     }
                                 }
@@ -2105,37 +2060,37 @@ import { defaults as defaultControls } from "ol/control";
                 }
 
                 // Hook into feature selection to show colorpicker
-                if (selectionInteraction) {
-                    var originalSelectHandler = null;
-
-                    // Add colorpicker trigger on feature selection when Shift is held
-                    map.on("click", function (evt) {
-                        if (evt.originalEvent.shiftKey) {
-                            map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
-                                if (feature && container.colorpicker) {
-                                    // Get the actual feature (not cluster)
-                                    var targetFeature = feature;
-                                    var clusterFeatures = feature.get("features");
-                                    if (clusterFeatures && clusterFeatures.length === 1) {
-                                        targetFeature = clusterFeatures[0];
+                $(container).on("modechanged", function () {
+                    if (container.modeManager.activeMode.name === "modify_feature") {
+                        // Add colorpicker trigger on feature selection when Shift is held
+                        map.on("click", function (evt) {
+                            if (evt.originalEvent.shiftKey) {
+                                map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+                                    if (feature && container.colorpicker) {
+                                        // Get the actual feature (not cluster)
+                                        let targetFeature = feature;
+                                        const clusterFeatures = feature.get("features");
+                                        if (clusterFeatures && clusterFeatures.length === 1) {
+                                            targetFeature = clusterFeatures[0];
+                                        }
+                                        container.colorpicker.show(targetFeature);
+                                        return true; // Stop iteration
                                     }
-                                    container.colorpicker.show(targetFeature);
-                                    return true; // Stop iteration
-                                }
-                            });
-                        } else {
-                            // On non-shift clicks, re-apply stored colors after a short delay
-                            setTimeout(function () {
-                                reapplyStoredColors();
-                            }, 50);
-                        }
-                    });
+                                });
+                            } else {
+                                // On non-shift clicks, re-apply stored colors after a short delay
+                                setTimeout(function () {
+                                    reapplyStoredColors();
+                                }, 50);
+                            }
+                        });
 
-                    // Also re-apply colors when map is moved or rendered
-                    map.on("moveend", function () {
-                        reapplyStoredColors();
-                    });
-                }
+                        // Also re-apply colors when map is moved or rendered
+                        map.on("moveend", function () {
+                            reapplyStoredColors();
+                        });
+                    }
+                });
             }
 
             initializeColorpicker();
