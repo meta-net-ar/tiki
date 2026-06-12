@@ -223,7 +223,6 @@ class WikiPluginWantedPages extends PluginsLib
                 'ELSE tpf.`data` ' .
             'END AS fromPageContent ' .
             'FROM `tiki_links` tl ' .
-            'LEFT JOIN `tiki_pages` tp ON (tl.`toPage` = tp.`pageName`) ' .
             'LEFT JOIN `tiki_pages` tpf ON (tl.`fromPage` = tpf.`pageName`) ' .
             'LEFT JOIN `tiki_tracker_item_fields` ttif ON (' .
                 'SUBSTRING_INDEX(SUBSTRING_INDEX(tl.`fromPage`, \':\', 3), \':\', -1) = ttif.`itemId` ' .
@@ -238,14 +237,20 @@ class WikiPluginWantedPages extends PluginsLib
         if ($categories) {
             $query .= ' INNER JOIN `tiki_objects` AS tob ON (tob.`itemId` = tl.`fromPage` AND tob.`type` = ?) INNER JOIN `tiki_category_objects` AS tc ON (tc.`catObjectId` = tob.`objectId` AND tc.`categId` IN (' . implode(', ', array_fill(0, count($categories), '?')) . '))';
         }
-        $query .= ' WHERE tp.`pageName` IS NULL';
         if ($skipalias) {
-            $query .= ' AND (tor.`relation` IS NULL OR tor.`relation` != \'tiki.link.alias\')';
+            $query .= ' WHERE (tor.`relation` IS NULL OR tor.`relation` != \'tiki.link.alias\')';
         }
         $result = $this->query($query, $categories ? array_merge(['wiki page'], $categories) : []);
         $tmp = [];
 
+        $tikilib = TikiLib::lib('tiki');
+
         while ($row = $result->fetchRow()) {
+            // Match by page name or slug
+            if ($tikilib->page_exists($row['toPage'])) {
+                continue;
+            }
+
             // For object links, we now fetch the content to check for escape tags.
             if ($this->isEscapedLink($row['fromPageContent'] ?? '', $row['toPage'])) {
                 if ($debug == 2) {
