@@ -1122,6 +1122,18 @@ class Hm_Output_tiki_get_create_item_trackers_output extends Hm_Output_Module
     }
 }
 
+class Hm_Output_tiki_get_create_item_trackers_output extends Hm_Output_Module
+{
+    public function output()
+    {
+        $res = tiki_move_to_tracker_dropdown($this, 'Create item', 'Select Tracker', 'item_to_trackers');
+        $res = ! empty($res) ? '| ' . $res : '';
+        $headers = $this->get('msg_headers');
+        $headers = preg_replace("#<a class=\"archive_link[^>]*>.*?</a>#", "\\0 " . $res, $headers);
+        $this->out('msg_headers', $headers, false);
+    }
+}
+
 /**
  * Add Restore Message button in tracker folders
  * @subpackage tiki/output
