@@ -31,7 +31,7 @@ class TranslationSanitizationTest extends \TikiTestCase
         $this->lang = 'ts_' . $testCounter++;
         $this->langDir = $this->tikiroot . 'lang/' . $this->lang;
         $this->customFile = $this->langDir . '/custom.php';
-
+        $_SERVER['REQUEST_URI'] = '/test/language/TranslationSanitizationTest.php';
         chdir($this->tikiroot);
 
         // Enable database translations
@@ -61,6 +61,8 @@ $lang = array(
         $reflection = new \ReflectionClass(LanguageTranslator::class);
         $instancesProperty = $reflection->getProperty('instances');
         $instancesProperty->setValue(null, []);
+        // Clean up to avoid leaking state between tests
+        unset($_SERVER['REQUEST_URI']);
     }
 
     protected function tearDown(): void

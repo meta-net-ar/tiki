@@ -57,8 +57,8 @@ class TikiLib_MarkdownParserTest extends TikiTestCase
         $prefs['feature_wiki_argvariable'] = 'y';
         $heading_links_pref = $prefs['wiki_heading_links'];
         $prefs['wiki_heading_links'] = 'n';
-
-        $this->assertEquals($this->html(), TikiLib::lib('parser')->parse_data('{syntax type=markdown}' . $this->markdown()));
+        $parse_data = TikiLib::lib('parser')->parse_data('{syntax type=markdown}' . $this->markdown());
+        $this->assertEquals($this->html(), $parse_data);
 
         $prefs['wiki_heading_links'] = $heading_links_pref;
     }
@@ -76,6 +76,129 @@ class TikiLib_MarkdownParserTest extends TikiTestCase
         $this->assertEquals($this->html(true), TikiLib::lib('parser')->parse_data('{syntax type=markdown}' . $this->markdown()));
 
         $prefs['wiki_heading_links'] = $heading_links_pref;
+    }
+
+    /**
+    * /**
+     * Test Markdown fenced code block parsing with standard triple fences.
+     *
+     * This method validates that the Markdown parser correctly handles:
+     * - Triple backtick fences with a language specifier (e.g. ```php)
+     * - Triple tilde fences with a language specifier (e.g. ~~~html)
+     *
+     * The test ensures that:
+     * - Code blocks are wrapped in <pre><code> tags
+     * - The appropriate language class is applied when specified
+     * - Special characters inside the code block are properly escaped
+     *
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function testEscapeMarkdownCode(): void
+    {
+        global $prefs, $user;
+
+        $user = 'admin';
+        $prefs['markdown_enabled'] = 'y';
+
+        $data = '```php
+\$rules=[
+"name"=>John,
+"email"=>johndoe@example.com,
+"link"=>http://example.com,
+]
+```';
+        $expected_html = '<div class="codelisting_container"><div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#md-codebox1"><span class="copy_code_tooltiptext">Copy to clipboard</span></div><pre class="codelisting" id="md-codebox1" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;" data-syntax="php"><div class="code">\$rules=[
+&quot;name&quot;=&gt;John,
+&quot;email&quot;=&gt;johndoe@example.com,
+&quot;link&quot;=&gt;http://example.com,
+]
+</div></pre></div>
+';
+        $parse_data = TikiLib::lib('parser')->parse_data('{syntax type=markdown}' . $data);
+        $this->assertEquals($expected_html, $parse_data);
+
+        // title test example
+        $title_example = '~~~html
+<div class="container">
+<h1>My First Bootstrap Page</h1>
+<p>This is some text.</p>
+</div>
+~~~';
+        $tilde_data = "{syntax type=markdown}" . $title_example;
+        $tilde_output = '<div class="codelisting_container"><div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#md-codebox2"><span class="copy_code_tooltiptext">Copy to clipboard</span></div><pre class="codelisting" id="md-codebox2" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;" data-syntax="html"><div class="code">&lt;div class=&quot;container&quot;&gt;
+&lt;h1&gt;My First Bootstrap Page&lt;/h1&gt;
+&lt;p&gt;This is some text.&lt;/p&gt;
+&lt;/div&gt;
+</div></pre></div>
+';
+        $parse_tilde_data = TikiLib::lib('parser')->parse_data($tilde_data);
+
+        $this->assertEquals($tilde_output, $parse_tilde_data);
+    }
+
+    /**
+     * Test markdown fenced code block parsing with variable fence lengths and syntax variations.
+     *
+     * This method ensures that the Markdown parser correctly handles:
+     * - Backtick fences of length greater than 3 (e.g. 4 backticks)
+     * - Tilde fences of length greater than 3 (e.g. 5 tildes)
+     * - Indented fences (up to 3 spaces before the opening fence)
+     * - Fences with and without language specifiers
+     *
+     * Each case validates that the parser produces the expected HTML output
+     * with proper <pre><code> wrapping, language class assignment when present,
+     * and correct escaping of special characters.
+     * @return void
+     * @throws Exception
+     */
+    public function testMarkdownCodeFencesVariations(): void
+    {
+        global $prefs;
+        $prefs['markdown_enabled'] = 'y';
+
+        // Case 1: 4 backticks with language
+        $data4 = '````js
+console.log("Hello");
+````';
+        $expected4 = '<div class="codelisting_container"><div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#md-codebox1"><span class="copy_code_tooltiptext">Copy to clipboard</span></div><pre class="codelisting" id="md-codebox1" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;" data-syntax="js"><div class="code">console.log(&quot;Hello&quot;);
+</div></pre></div>
+';
+        $this->assertEquals($expected4, TikiLib::lib('parser')->parse_data('{syntax type=markdown}' . $data4));
+
+        // Case 2: 5 tildes, no language
+        $data5 = '~~~~~
+Plain text block
+~~~~~';
+        $expected5 = '<div class="codelisting_container"><div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#md-codebox2"><span class="copy_code_tooltiptext">Copy to clipboard</span></div><pre class="codelisting" id="md-codebox2" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;"><div class="code">Plain text block
+</div></pre></div>
+';
+        $this->assertEquals($expected5, TikiLib::lib('parser')->parse_data('{syntax type=markdown}' . $data5));
+
+        // Case 3: Indented fence (3 spaces before backticks)
+        $dataIndented = "   ```python\nprint(\"Indented\")\n   ```";
+        $expectedIndented = '<div class="codelisting_container"><div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#md-codebox3"><span class="copy_code_tooltiptext">Copy to clipboard</span></div><pre class="codelisting" id="md-codebox3" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;" data-syntax="python"><div class="code">print(&quot;Indented&quot;)
+</div></pre></div>
+';
+        $this->assertEquals($expectedIndented, TikiLib::lib('parser')->parse_data('{syntax type=markdown}' . $dataIndented));
+
+        // Case 4: Fence with empty language specifier
+        $dataEmptyLang = '``` 
+No language here
+```';
+        $expectedEmptyLang = '<div class="codelisting_container"><div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#md-codebox4"><span class="copy_code_tooltiptext">Copy to clipboard</span></div><pre class="codelisting" id="md-codebox4" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;"><div class="code">No language here
+</div></pre></div>
+';
+        $this->assertEquals($expectedEmptyLang, TikiLib::lib('parser')->parse_data('{syntax type=markdown}' . $dataEmptyLang));
+
+        // Case 5: Negative test - only 2 backticks should NOT be parsed as a code block
+        $dataInvalid = "``js
+console.log('Not valid');
+``";
+        // Expectation: parser should leave it untouched, since it's not a valid fence
+        $expectedInvalid = "<p><code>js console.log('Not valid'); </code></p>\n";
+        $this->assertEquals($expectedInvalid, TikiLib::lib('parser')->parse_data('{syntax type=markdown}' . $dataInvalid));
     }
 
     public function testReplaceLinks(): void
@@ -179,6 +302,14 @@ Footnote 2 link[^second].
 
 Inline footnote^[Text of inline footnote] definition.
 
+```php
+\$rules=[
+\"name\"=>\$validate->string()->required()->min(3)->max(30)->check(),
+\"email\"=>\$validate->string()->required()->min(3)->max(60)->email()->check(),
+\"link\"=>\$validate->string()->required()->min(3)->max(60)->url()->check(),
+\"age\"=>\$validate->number()->required()->positive()->check()
+];
+```
 Duplicated footnote reference[^second].
 
 [^first]: Footnote **can have markup**
@@ -308,6 +439,13 @@ line 3 of code
 <p>Footnote 1 link<sup id="fnref:first"><a class="footnote-ref" href="#fn:first" role="doc-noteref">1</a></sup>.</p>
 <p>Footnote 2 link<sup id="fnref:second"><a class="footnote-ref" href="#fn:second" role="doc-noteref">2</a></sup>.</p>
 <p>Inline footnote<sup id="fnref:text-of-inline-footn"><a class="footnote-ref" href="#fn:text-of-inline-footn" role="doc-noteref">3</a></sup> definition.</p>
+<div class="codelisting_container"><div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#md-codebox2"><span class="copy_code_tooltiptext">Copy to clipboard</span></div><pre class="codelisting" id="md-codebox2" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;" data-syntax="php"><div class="code">$rules=[
+&quot;name&quot;=&gt;$validate-&gt;string()-&gt;required()-&gt;min(3)-&gt;max(30)-&gt;check(),
+&quot;email&quot;=&gt;$validate-&gt;string()-&gt;required()-&gt;min(3)-&gt;max(60)-&gt;email()-&gt;check(),
+&quot;link&quot;=&gt;$validate-&gt;string()-&gt;required()-&gt;min(3)-&gt;max(60)-&gt;url()-&gt;check(),
+&quot;age&quot;=&gt;$validate-&gt;number()-&gt;required()-&gt;positive()-&gt;check()
+];
+</div></pre></div>
 <p>Duplicated footnote reference<sup id="fnref:second__2"><a class="footnote-ref" href="#fn:second" role="doc-noteref">2</a></sup>.</p>
 <div class="footnotes" role="doc-endnotes"><hr /><ol><li class="footnote" id="fn:first" role="doc-endnote"><p>Footnote <strong>can have markup</strong></p>
 <p>and multiple paragraphs.&nbsp;<a class="footnote-backref" rev="footnote" href="#fnref:first" role="doc-backlink">↩</a></p></li>

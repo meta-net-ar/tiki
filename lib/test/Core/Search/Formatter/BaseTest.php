@@ -16,6 +16,17 @@ use TikiLib;
 
 class BaseTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        // Simulate query string parameters
+        $_GET['foo'] = 'bar';
+
+        // Simulate POST parameters
+        $_POST['baz'] = 'qux';
+
+        // Now $_REQUEST will contain both
+        $_REQUEST = array_merge($_GET, $_POST, $_COOKIE);
+    }
     public function testBasicFormatter()
     {
         $plugin = new Search_Formatter_Plugin_WikiTemplate("* {display name=object_id} ({display name=object_type})\n");
@@ -405,5 +416,12 @@ OUT;
         );
 
         $this->assertEquals("x", $output);
+    }
+    protected function tearDown(): void
+    {
+        $_GET = [];
+        $_POST = [];
+        $_COOKIE = [];
+        $_REQUEST = [];
     }
 }
