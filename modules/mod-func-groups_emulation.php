@@ -90,9 +90,9 @@ function module_groups_emulation($mod_reference, $module_params)
         $chooseGroups = $allGroups;
     } elseif ($showyourgroups == 'y') {
         $chooseGroups = $userGroups;
-        $chooseGroups["Anonymous"] = "included";
-        $chooseGroups["Registered"] = "included";
     }
+    $chooseGroups["Anonymous"] = "included";
+    $chooseGroups["Registered"] = "included";
 
     $moduleId = $mod_reference['moduleId'];
     $smarty->assign('moduleId', $moduleId);
