@@ -533,8 +533,8 @@
             "type": "composer",
             "url": "https://packagist.org",
             "exclude": [
-                "pear/text_wiki_mediawiki",
-                "itsjavi/bootstrap-colorpicker"
+                "itsjavi/bootstrap-colorpicker",
+                "pear/text_wiki_mediawiki"
             ]
         },
         "asset-packagist.org": {
@@ -576,8 +576,7 @@
                 "simile_timeline/simile_timeline",
                 "svg-edit/svg-edit",
                 "umakantp/smartylint",
-                "walkermatt/ol-layerswitcher",
-                "itsjavi/bootstrap-colorpicker"
+                "walkermatt/ol-layerswitcher"
             ]
         }
     }
