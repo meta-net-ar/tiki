@@ -151,3 +151,16 @@
     display: none;
 }
 
+el-select {
+  --tiki-input-placeholder-color: var(--bs-secondary-color, #6c757d) !important;
+  --el-text-color-placeholder: var(--bs-secondary-color, #6c757d) !important;
+  --el-input-text-color: var(--bs-secondary-color, #6c757d) !important;
+}
+
+select.labelasplaceholder {
+  color: var(--bs-secondary-color, #6c757d);
+
+  option:not([disabled]) {
+    color: var(--bs-body-color, inherit);
+  }
+}
