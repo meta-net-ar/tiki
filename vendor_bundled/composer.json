@@ -187,7 +187,7 @@
         "hybridauth/hybridauth": "^3.7",
         "itsjavi/bootstrap-colorpicker": "^2.5.1",
         "jasig/phpcas": "^1.3",
-        "jason-munro/cypht": "^2.0",
+        "jason-munro/cypht": "^2.6",
         "jquery-form/form": "^3.51",
         "jquery-plugins/anythingslider": "1.9.6",
         "jquery-plugins/async": "1.0",
@@ -307,7 +307,7 @@
         "tijsverkoyen/css-to-inline-styles": "^2.2.0",
         "tikiwiki/ilp-client": "^1.0",
         "walkermatt/ol-layerswitcher": ">=3.3.0",
-        "zbateson/mail-mime-parser": "^2.4",
+        "zbateson/mail-mime-parser": "^2.4 || ^3.0",
         "zf1s/zend-service-akismet": "^1.15.2"
     },
     "require-dev": {
@@ -533,8 +533,8 @@
             "type": "composer",
             "url": "https://packagist.org",
             "exclude": [
-                "itsjavi/bootstrap-colorpicker",
-                "pear/text_wiki_mediawiki"
+                "pear/text_wiki_mediawiki",
+                "itsjavi/bootstrap-colorpicker"
             ]
         },
         "asset-packagist.org": {
@@ -575,8 +575,8 @@
                 "sam152/javascript-equal-height-responsive-rows",
                 "simile_timeline/simile_timeline",
                 "svg-edit/svg-edit",
-                "umakantp/smartylint",
-                "walkermatt/ol-layerswitcher"
+                "walkermatt/ol-layerswitcher",
+                "itsjavi/bootstrap-colorpicker"
             ]
         }
     }
