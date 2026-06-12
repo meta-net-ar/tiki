@@ -5409,21 +5409,34 @@ class TrackerLib extends TikiLib
         }
         $history['data'] = [];
         foreach ($all as $hist) {
-            $hist['new'] = $last[$hist['fieldId']] ?? '';
+            $historyFieldId = (int) $hist['fieldId'];
+            $hasNewValue = array_key_exists($historyFieldId, $last);
+            $hist['new'] = $hasNewValue ? $last[$historyFieldId] : '';
             if ($hist['new'] == $hist['value']) {
                 continue;
             }
-            $last[$hist['fieldId']] = $hist['value'];
-            $historyFieldId = (int) $hist['fieldId'];
+            $last[$historyFieldId] = $hist['value'];
             $isStatusHistory = $historyFieldId === HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE;
-            $canViewHistory = $isStatusHistory
+            $isDeletedFieldHistory = ! $isStatusHistory && ! isset($trackerFields[$historyFieldId]);
+            if ($isDeletedFieldHistory && ! $hasNewValue) {
+                $hist['newValueUnavailable'] = true;
+            }
+            $canViewHistory = ($isStatusHistory || $isDeletedFieldHistory)
                 ? $itemObject->canView()
-                : isset($trackerFields[$historyFieldId]) && $itemObject->canViewField($historyFieldId);
+                : $itemObject->canViewField($historyFieldId);
             if (! $canViewHistory) {
                 continue;
             }
             if (! empty($filter['version']) && $filter['version'] != $hist['version']) {
                 continue;
+            }
+            if ($isStatusHistory) {
+                $hist['fieldName'] = tr('Status');
+            } elseif ($isDeletedFieldHistory) {
+                $hist['fieldName'] = tr('(Deleted field)');
+                $hist['isDeletedField'] = true;
+            } else {
+                $hist['fieldName'] = $trackerFields[$historyFieldId]['name'];
             }
             $history['data'][] = $hist;
         }

@@ -2674,23 +2674,8 @@ class Comments extends TikiLib
                         ['version' => $ret[$key]['version']]
                     );
 
-                    $diffInfo = [];
-                    foreach ($history['data'] as $hist) {
-                        $fieldId = (int) $hist['fieldId'];
-                        if ($fieldId === HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE) {
-                            $hist['fieldName'] = tr('Status');
-                        } else {
-                            $field_info = TikiLib::lib('trk')->get_field_info($fieldId);
-                            if (! $field_info) {
-                                continue;
-                            }
-                            $hist['fieldName'] = $field_info['name'];
-                        }
-                        $diffInfo[] = $hist;
-                    }
-
-                    if (! empty($diffInfo)) {
-                        $ret[$key]['diffInfo'] = $diffInfo;
+                    if (! empty($history['data'])) {
+                        $ret[$key]['diffInfo'] = $history['data'];
                     }
                 }
             }

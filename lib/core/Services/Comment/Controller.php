@@ -985,21 +985,7 @@ class Services_Comment_Controller
                 ['version' => $version]
             );
 
-            $diffInfo = [];
-
-            foreach ($history['data'] as $info) {
-                $fieldId = (int) $info['fieldId'];
-                if ($fieldId === HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE) {
-                    $info['fieldName'] = tr('Status');
-                } else {
-                    $field_info = $trackerLib->get_field_info($fieldId);
-                    if (! $field_info) {
-                        continue;
-                    }
-                    $info['fieldName'] = $field_info['name'];
-                }
-                $diffInfo[] = $info;
-            }
+            $diffInfo = $history['data'];
         }
         // add some specific js to set up comment post form in a modal dialog
         // so it can refresh the page after the post
