@@ -34,7 +34,7 @@
 }
 
 @mixin top-nav-light {
-    --tiki-top-bg: null;
+    --tiki-top-bg: var(--tiki-darkshine-diagonals-bg);
     --tiki-top-color: #FEA239;
     --tiki-top-hover-color: #fabe7a;
     --tiki-top-text-color: #fabe7a;
