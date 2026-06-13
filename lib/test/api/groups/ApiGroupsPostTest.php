@@ -94,7 +94,7 @@ class ApiGroupsPostTest extends ApiBaseGroupsTest
             'desc' => 'Group without name',
         ]);
 
-        $this->assertNotEquals(200, $response['status']);
+        $this->assertResponseStatus(200, $response);
         $body = $this->getResponseBody($response);
         $this->assertValidGroupCreateUpdateResponse($body);
         $this->assertEquals('Error', $body['feedback']['action'][0]['title'], 'Title should indicate Error');

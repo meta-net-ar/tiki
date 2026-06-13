@@ -32,7 +32,7 @@ class ApiCommentsGetTest extends ApiBaseCommentsTest
         );
 
         $body = $this->getResponseBody($response);
-        $this->assertValidErrorResponse($body, 403, 'Permission denied.');
+        $this->assertValidErrorResponse($body, 403, 'You do not have permission to view comments.');
     }
 
     public function testApiGetCommentsOnWikiPage()

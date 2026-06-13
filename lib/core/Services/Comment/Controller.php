@@ -49,6 +49,7 @@ class Services_Comment_Controller
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode([
                     'status' => 'error',
+                    'code' => $e->getCode() ?: 403,
                     'message' => $e->getMessage()
                 ]);
                 exit;

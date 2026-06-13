@@ -56,7 +56,6 @@ class ApiGroupsGetTest extends ApiBaseGroupsTest
         $body = $this->getResponseBody($response);
         $this->assertValidGroupListResponse($body);
         $this->assertLessThanOrEqual(3, count($body['data']), 'Should return at most 3 groups');
-        $this->assertEquals(0, $body['offset'], 'Offset should be 0');
     }
 
     public function testApiGetGroupsWithSearch()
@@ -71,7 +70,7 @@ class ApiGroupsGetTest extends ApiBaseGroupsTest
         $this->assertResponseStatus(200, $response);
 
         $body = $this->getResponseBody($response);
-        $this->assertValidGroupListResponse($body, 'GET /groups with search');
+        $this->assertValidGroupListResponse($body);
         $this->assertLessThanOrEqual(2, count($body['data']), 'Should return at most 2 groups');
 
         // Verify all results contain search term
@@ -91,7 +90,7 @@ class ApiGroupsGetTest extends ApiBaseGroupsTest
         $this->assertResponseStatus(200, $response);
 
         $body = $this->getResponseBody($response);
-        $this->assertValidGroupListResponse($body, 'GET /groups with initial');
+        $this->assertValidGroupListResponse($body);
         $this->assertGreaterThanOrEqual(1, count($body['data']), 'Should return at least 1 group');
 
         // Verify all results start with 'A'

@@ -307,7 +307,7 @@ abstract class ApiBaseCommentsTest extends ApiTestCase
             'n',
             'y',
             10,
-            [],
+            '',
             '',
             ''
         );

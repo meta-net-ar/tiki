@@ -160,12 +160,12 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
             'n',     // isHidden
             'y',     // isMain
             10,      // position
-            [],      // options
+            '',      // options
             '',      // description
             '',      // descriptionIsParsed
             null,    // itemChoices
             '',      // errorMsg
-            [],      // visibleBy
+            null,      // visibleBy
             null,    // editableBy
             'n',     // isMultilingual
             '',      // validation
