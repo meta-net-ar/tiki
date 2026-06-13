@@ -509,7 +509,7 @@ class SmartyTiki extends Smarty
     }
 
     /**
-        * Add smarty template paths from where tpl files should be loaded. This function also gets called from lib/setup/theme.php to initialize theme specific paths.  It's dependent on
+        * Add smarty template paths from where tpl files should be loaded. This function also gets called from applyCurrentTheme() to initialize theme specific paths.  It's dependent on
 
         * $prefs['theme'], $prefs['theme_option'], $prefs['site_layout'], $prefs['site_layout_admin']
 

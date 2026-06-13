@@ -24,7 +24,7 @@ class Services_ActivityStream_ManageController
 
         global $prefs, $smarty, $headerlib;
         // This controller is served via tiki-ajax_services.php, so it is not detected by
-        // the usual UAB trigger conditions based on PHP_SELF (lib/setup/theme.php).
+        // the usual UAB trigger conditions based on PHP_SELF (isAdminPageRequest in ThemeLib).
         // Activity Rules is admin-only, so we explicitly force admin section/layout here
         // to render it consistently with other admin management pages.
         \Tiki\Sections::setCurrentSection(\Tiki\Sections::SECTION_ADMIN_LAYOUT);
