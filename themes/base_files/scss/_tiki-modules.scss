@@ -12,6 +12,10 @@ header.container,
     margin-bottom: 0;
 }
 
+// add no padding on main navbar (top modules arera) to render the navbar with no gaps on sides
+#main-navbar > .container-fluid {
+    padding: 0;
+}
 
 .tiki.layout_classic .header_container .container.container-std {
     max-width: 100% !important;
@@ -55,10 +59,22 @@ header.container,
 // No JavaScript needed!
 //==================================================
 
+// Site Header (and any menu module inside)
+#site-header,
+#top_modules > .module.no-box.box-menu {
+    padding: 0;
+    > div > nav {
+        padding: 0 calc(var(--bs-gutter-x) * 0.5);
+    }
+}
+
 // Main navbar
+#page-header > .top_modules, // This is on e.g. tiki-wizard_admin.php
+#main-navbar .top_modules, // ... and this is in Classic Tiki layout only (TODO: try to unify the templates)
 #main-navbar {
     padding-top: 0;
     padding-bottom: 0;
+    flex-wrap: wrap;
 
     // Logo sizing
     .sitelogo-img {
@@ -117,7 +133,7 @@ header.container,
             content: "";
             display: block;
             /**
-            @luciash Rightly pointed out on matrix that we shouldn't rely on such a magic string.
+            @luciash Rightly pointed out on Matrix chat that we shouldn't rely on such a magic string.
             This is however well documented and proves that @sandy-12 thought about corner cases (in this case incoming links with an # anchor in the url).
             I initially thought he didn't know about:
             https://css-tricks.com/almanac/properties/s/scroll-margin/

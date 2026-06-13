@@ -789,14 +789,14 @@ body.sidebar_collapsed .admin-menu-collapser .expand-text {
     }
 }
 
-body.tiki-admin .container.container-std {
+body.tiki-admin .container-std {
     overflow: visible !important;
 }
 
 // Fix: Properly position container to account for fixed sidebar
 // When sidebar is expanded, shift the container to center content in the remaining space
 @media (min-width: 993px) {
-    body.tiki-admin.uab:not(.sidebar_collapsed) .container.container-std {
+    body.tiki-admin.uab:not(.sidebar_collapsed) .container-std {
         margin-left: var(--tiki-admin-offcanvas-width, 300px);
         max-width: calc(100% - var(--tiki-admin-offcanvas-width, 300px));
         padding-left: 2rem;
