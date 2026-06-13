@@ -1,0 +1,149 @@
+// Variables for the Kingdom theme.
+// These declarations mirror the colors that were previously hard-coded as
+// Bootstrap CSS custom properties at the end of kingdom.scss.
+
+@import "../../default/scss/variables";
+
+// Color system
+$blue: #0B3C5D;
+$cyan: #0dcaf0;
+$green: #198754;
+$yellow: #ffc107;
+$red: #dc3545;
+
+$primary: #0B3C5D;
+$secondary: #6c757d;
+$success: #198754;
+$info: #0dcaf0;
+$warning: #ffc107;
+$danger: #dc3545;
+$light: #f8f9fa;
+$dark: #212529;
+
+$colors: map-merge(
+    $colors,
+    (
+        "blue": $blue
+    )
+);
+
+$theme-colors: (
+    "primary": $primary,
+    "secondary": $secondary,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark
+);
+
+$primary-text-emphasis: rgb(4.5269230769, 24.6923076923, 38.2730769231);
+$secondary-text-emphasis: rgb(43.2, 46.8, 50);
+$success-text-emphasis: rgb(10, 54, 33.6);
+$info-text-emphasis: rgb(5.2, 80.8, 96);
+$warning-text-emphasis: rgb(102, 77.2, 2.8);
+$danger-text-emphasis: rgb(88, 21.2, 27.6);
+
+$primary-bg-subtle: rgb(219.56, 227.2, 233.8);
+$secondary-bg-subtle: rgb(225.6, 227.4, 229);
+$success-bg-subtle: rgb(209, 231, 220.8);
+$info-bg-subtle: rgb(206.6, 244.4, 252);
+$warning-bg-subtle: rgb(255, 242.6, 205.4);
+$danger-bg-subtle: rgb(248, 214.6, 217.8);
+
+$primary-border-subtle: rgb(165.05, 183.5, 197);
+$secondary-border-subtle: rgb(196.2, 199.8, 203);
+$success-border-subtle: rgb(163, 207, 186.6);
+$info-border-subtle: rgb(158.2, 233.8, 249);
+$warning-border-subtle: rgb(255, 230.2, 155.8);
+$danger-border-subtle: rgb(241, 174.2, 180.6);
+
+// Body
+$body-bg: #F8FAFD;
+$body-color: #0f2742;
+$body-emphasis-color: #000;
+
+// Links
+$link-color: rgb(31.4, 93.2, 126.2);
+$link-hover-color: rgb(21.2388324873, 63.0401015228, 85.3611675127);
+$link-decoration: none;
+
+// Typography
+$font-family-sans-serif: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+$font-family-base: $font-family-sans-serif;
+$headings-font-weight: 600;
+
+// Components
+$border-color: rgb(203.7, 216.04, 230.24);
+$focus-ring-width: .2rem;
+$focus-ring-color: rgba(11, 60, 93, 0.25);
+$component-active-color: #fff;
+$component-active-bg: #0B3C5D;
+$code-color: var(--#{$prefix}body-color);
+
+// Buttons
+$btn-font-weight: $font-weight-normal;
+$btn-primary-color: #fff;
+$btn-primary-bg: #0B3C5D;
+$btn-primary-border: #0B3C5D;
+$btn-link-color: $link-color;
+$btn-link-hover-color: $link-hover-color;
+
+// Forms
+$input-btn-focus-width: $focus-ring-width;
+$input-btn-focus-color: $focus-ring-color;
+$input-focus-border-color: #0B3C5D;
+$form-check-input-checked-color: #fff;
+$form-check-input-checked-bg-color: #0B3C5D;
+$form-check-input-checked-border-color: #0B3C5D;
+$form-check-input-indeterminate-color: #fff;
+$form-check-input-indeterminate-bg-color: #0B3C5D;
+$form-check-input-indeterminate-border-color: #0B3C5D;
+$form-range-thumb-bg: #0B3C5D;
+
+// Dropdowns
+$dropdown-link-active-color: #fff;
+$dropdown-link-active-bg: #0B3C5D;
+
+// Navs
+$nav-link-color: #0B3C5D;
+$nav-link-hover-color: rgb(5.6057692308, 30.5769230769, 47.3942307692);
+$nav-pills-link-active-color: #fff;
+$nav-pills-link-active-bg: #0B3C5D;
+
+// Navbar
+$navbar-light-color: rgb(7.15, 39, 60.45);
+$navbar-light-hover-color: #0B3C5D;
+$navbar-light-brand-color: rgb(57.2, 88.2, 89.6);
+$navbar-light-brand-hover-color: #0B3C5D;
+$navbar-dark-color: #fff;
+$navbar-dark-hover-color: #F2C94C;
+$navbar-dark-brand-color: #F2C94C;
+$navbar-dark-brand-hover-color: #F2C94C;
+$navbar-toggler-focus-width: $focus-ring-width;
+
+// Accordion
+$accordion-button-active-color: var(--#{$prefix}primary-text-emphasis);
+$accordion-button-active-bg: var(--#{$prefix}primary-bg-subtle);
+$accordion-button-focus-box-shadow: 0 0 0 var(--#{$prefix}focus-ring-width) var(--#{$prefix}focus-ring-color);
+
+// Pagination
+$pagination-active-color: #fff;
+$pagination-active-bg: #0B3C5D;
+$pagination-active-border-color: #0B3C5D;
+$pagination-focus-box-shadow: 0 0 0 var(--#{$prefix}focus-ring-width) var(--#{$prefix}focus-ring-color);
+
+// List groups and progress
+$list-group-active-color: #fff;
+$list-group-active-bg: #0B3C5D;
+$list-group-active-border-color: #0B3C5D;
+$progress-bar-bg: #0B3C5D;
+
+// Tiki SCSS variables
+$tiki-ui-default-bg: #F8FAFD;
+$tiki-ui-default-color: #0A2540;
+$tiki-ui-default-border: rgb(203.7, 216.04, 230.24);
+$tiki-ui-active-border-color: #0B3C5D;
+$tiki-ui-active-color: #0B3C5D;
+$tiki-ui-active-bg: #F8FAFD;
