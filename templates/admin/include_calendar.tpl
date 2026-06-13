@@ -47,6 +47,7 @@
         {preference name=calendar_description_is_html}
         {preference name=calendar_watch_editor}
         {preference name=calendar_holidays}
+        {preference name=calendar_pdf_export_layout}
     </fieldset>
     {include file='admin/include_apply_bottom.tpl'}
 </form>
