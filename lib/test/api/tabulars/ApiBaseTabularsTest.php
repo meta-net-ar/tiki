@@ -314,7 +314,7 @@ abstract class ApiBaseTabularsTest extends ApiTestCase
         fwrite($handle, $content);
         rewind($handle);
 
-        while (($row = fgetcsv($handle)) !== false) {
+        while (($row = fgetcsv($handle, null, ',', '"', '\\')) !== false) {
             $rows[] = $row;
         }
 

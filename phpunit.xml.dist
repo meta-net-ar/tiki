@@ -10,7 +10,6 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
          bootstrap="lib/test/bootstrap.php"
          beStrictAboutOutputDuringTests="true"
-         beStrictAboutTodoAnnotatedTests="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          colors="true"
          stopOnFailure="false"
