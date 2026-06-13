@@ -2567,16 +2567,16 @@
         },
         {
             "name": "jason-munro/cypht",
-            "version": "v2.9.0",
+            "version": "v2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "211b478f173656a9a666959da539c539907d7b8b"
+                "reference": "69d6943202726d5ba2fb92ca28e369fb3ea13672"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/211b478f173656a9a666959da539c539907d7b8b",
-                "reference": "211b478f173656a9a666959da539c539907d7b8b",
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/69d6943202726d5ba2fb92ca28e369fb3ea13672",
+                "reference": "69d6943202726d5ba2fb92ca28e369fb3ea13672",
                 "shasum": ""
             },
             "require": {
@@ -2598,7 +2598,7 @@
                 "php": ">=8.1",
                 "sentry/sdk": "^4.0",
                 "symfony/dotenv": "^6.4",
-                "symfony/yaml": "~6.4.3",
+                "symfony/yaml": "^6.4.40",
                 "thomaspark/bootswatch": "^5.3",
                 "twbs/bootstrap": "^5.3",
                 "twbs/bootstrap-icons": "^1.11",
@@ -2653,7 +2653,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "wiki": "https://github.com/cypht-org/cypht/wiki"
             },
-            "time": "2026-05-19T11:58:59+00:00"
+            "time": "2026-06-13T07:56:54+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
