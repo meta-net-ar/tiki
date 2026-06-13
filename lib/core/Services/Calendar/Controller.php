@@ -755,6 +755,9 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'preview'              => $preview,
             // related tracker items
             'trackerItems'        => ! empty($trackerItems) ? $trackerItems : [],
+            // legacy names expected by templates/calendar/view_item.tpl
+            'listroles'            => ['0' => '', '1' => tra('required'), '2' => tra('optional'), '3' => tra('non-participant')],
+            'listprioritycolors'   => ['fff', 'fdd', 'fcc', 'fbb', 'faa', 'f99', 'e88', 'd77', 'c66', 'b66', 'a66'],
         ];
     }
 

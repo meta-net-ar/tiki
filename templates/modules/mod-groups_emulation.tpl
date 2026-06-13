@@ -1,4 +1,5 @@
 {strip}
+{if $user and $user|lower neq 'anonymous'}
 {tikimodule error=$module_params.error title=$tpl_module_title name="groups_emulation" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
 
     <style>
@@ -91,6 +92,7 @@
         </div>
     {/if}
 
+    {if $chooseGroups|@count > 0}
     <form method="get" action="tiki-emulate_groups_switch.php" target="_self" onsubmit="return !!document.getElementById('mge-select-groups-{$moduleId}').value;">
         <fieldset>
             <legend><strong>{tr}Switch to Groups{/tr}</strong></legend>
@@ -102,6 +104,10 @@
             <div class="text-center mt-2"><button type="submit" class="btn btn-primary" name="emulategroups" value="setgroups" id="mge-simulate-btn-{$moduleId}">{tr}Simulate{/tr}</button></div>
         </fieldset>
     </form>
+    {/if}
 
 {/tikimodule}
+{else}
+<span class="d-none"></span>
+{/if}
 {/strip}

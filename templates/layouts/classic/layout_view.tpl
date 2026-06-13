@@ -21,18 +21,17 @@
         {/if}
         {******************************************************************* SITE HEADER STRUCTURE Same pattern as social layout for consistency ******************************************************************}
         <header class="site-header" id="site-header" role="banner">
-
-            <nav class="{block name=navClasses}navbar navbar-expand-md navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar{/block}"
+            {* Main navigation - uses block for theme customization *}
+            <nav class="{block name=navClasses}navbar navbar-expand-md navbar-{$navbar_color_variant} tiki-top-nav-{$navbar_color_variant} bg-{$navbar_color_variant}-parent tiki-main-navbar{/block}"
                  id="main-navbar"
                  role="navigation"
                  aria-label="{tr}Main navigation{/tr}">
 
-                <div class="container-fluid container-std">
-                    {modulelist zone=top class="top_modules w-100 bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant} container-fluid" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
+                <div class="container{if $prefs.feature_fixed_width neq 'y' || ($prefs.feature_fixed_width eq 'y' and $prefs.layout_fixed_width_header neq 'y')}-fluid{/if}">
+                    {modulelist zone=top class="top_modules w-100 container-fluid" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
                 </div>
 
             </nav>
-
         </header>
         {if $prefs.feature_layoutshadows eq 'y'}{eval var=$prefs.header_shadow_end}</div>{/if}
     {/if}

@@ -109,7 +109,7 @@ class Services_File_Controller
             $fileId = false;
         }
 
-        if (! empty($input->asArray('user')) && is_array($input->user->asArray())) {
+        if (! empty($input->asArray('user')) && $input->isArray('user')) {
             $asuser = $input->asArray('user')[0];
         }
         $title = $input->title->text();
@@ -260,29 +260,10 @@ class Services_File_Controller
 
         if (isset($_FILES['files']) && is_array($_FILES['files']['tmp_name']) && $util->checkCsrf()) {
             // a few other params that are still arrays but shouldn't be (mostly)
-            if (! empty($input->asArray('galleryId')) && is_array($input->galleryId->asArray())) {
-                $input->offsetSet('galleryId', $input->asArray('galleryId')[0]);
-            }
-            if (! empty($input->asArray('hit_limit')) && is_array($input->hit_limit->asArray())) {
-                $input->offsetSet('hit_limit', $input->asArray('hit_limit')[0]);
-            }
-            if (! empty($input->asArray('isbatch')) && is_array($input->isbatch->asArray())) {
-                $input->offsetSet('isbatch', $input->asArray('isbatch')[0]);
-            }
-            if (! empty($input->asArray('deleteAfter')) && is_array($input->deleteAfter->asArray())) {
-                $input->offsetSet('deleteAfter', $input->asArray('deleteAfter')[0]);
-            }
-            if (! empty($input->asArray('deleteAfter_unit')) && is_array($input->deleteAfter_unit->asArray())) {
-                $input->offsetSet('deleteAfter_unit', $input->asArray('deleteAfter_unit')[0]);
-            }
-            if (! empty($input->asArray('author')) && is_array($input->author->asArray())) {
-                $input->offsetSet('author', $input->asArray('author')[0]);
-            }
-            if (! empty($input->asArray('user')) && is_array($input->user->asArray())) {
-                $input->offsetSet('user', $input->asArray('user')[0]);
-            }
-            if (! empty($input->asArray('listtoalert')) && is_array($input->listtoalert->asArray())) {
-                $input->offsetSet('listtoalert', $input->asArray('listtoalert')[0]);
+            foreach (['galleryId', 'hit_limit', 'isbatch', 'deleteAfter', 'deleteAfter_unit', 'author', 'user', 'listtoalert'] as $arrayInputKey) {
+                if (! empty($input->asArray($arrayInputKey)) && $input->isArray($arrayInputKey)) {
+                    $input->offsetSet($arrayInputKey, $input->asArray($arrayInputKey)[0]);
+                }
             }
 
             $gal_info = $this->checkTargetGallery($input);
@@ -939,8 +920,8 @@ class Services_File_Controller
         // The file uploader sends galleryId as an array, while elFinder and older methods send it as an integer. This logic handles all cases.
 
         // First, check for the array format used by the file uploader.
-        $galleryIdFromInput = $input->galleryId->asArray();
-        if (! empty($galleryIdFromInput) && is_array($galleryIdFromInput) && isset($galleryIdFromInput[0])) {
+        $galleryIdFromInput = $input->asArray('galleryId');
+        if (! empty($galleryIdFromInput) && $input->isArray('galleryId') && isset($galleryIdFromInput[0])) {
             $galleryId = (int) $galleryIdFromInput[0];
         } elseif ($input->galleryId->int()) {
             // Second, check for an integer format, used by elFinder and other parts of Tiki.

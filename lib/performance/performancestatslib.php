@@ -48,6 +48,7 @@ class PerformanceStatsLib extends TikiLib
      */
     public function getRequestsBasedOnAverageRequestTime(int $amount = 25, int $offset = 0, string $find = '', string $order = 'DESC', string $orderType = '')
     {
+        $order = strtoupper($order) === 'ASC' ? 'ASC' : 'DESC';
         if ($orderType == 'no_of_requests') {
             return $this->query("SELECT url, round(AVG(time_taken)) AS average_time_taken, COUNT(url) AS number_of_requests FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY number_of_requests $order LIMIT $amount OFFSET $offset", ["%$find%"]);
         } else {
@@ -65,6 +66,7 @@ class PerformanceStatsLib extends TikiLib
      */
     public function getRequestsBasedOnMaximumProcessingTime(int $amount = 25, int $offset = 0, string $find = '', string $order = 'DESC')
     {
+        $order = strtoupper($order) === 'ASC' ? 'ASC' : 'DESC';
         return $this->query("SELECT url, MAX(time_taken) AS maximum_time_taken FROM tiki_performance WHERE url LIKE ? GROUP BY url ORDER BY maximum_time_taken $order LIMIT $amount OFFSET $offset", ["%$find%"]);
     }
 
@@ -75,6 +77,9 @@ class PerformanceStatsLib extends TikiLib
      */
     public function getRequestsGroupedByAmount(string $find = '')
     {
+        if ($find !== '') {
+            return $this->getOne('SELECT COUNT(DISTINCT(url)) FROM tiki_performance WHERE url LIKE ?', ["%$find%"]);
+        }
         return $this->getOne('SELECT COUNT(DISTINCT(url)) FROM tiki_performance');
     }
 

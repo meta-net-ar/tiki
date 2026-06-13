@@ -19,7 +19,6 @@ $inputConfiguration = [
             'my'                 => 'username',      //get
             'ours'               => 'word',          //get
             'status'             => 'word',          //get
-            'sort_mode'          => 'alnumdash',     //get
             'remove'             => 'int',           //get
             'force'              => 'bool',          //get
             'batchaction'        => 'word',          //get
@@ -36,7 +35,7 @@ $inputConfiguration = [
         'staticKeyFiltersForArrays' => [
             'action'                => 'string',    //get
             'vals'                  => 'none',      //get
-            'sort_mode'             => 'string',    //get
+            'sort_mode'             => 'alnumdash', //get
             'filtervalue'           => 'word',
         ],
     ],

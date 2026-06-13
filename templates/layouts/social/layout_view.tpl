@@ -16,13 +16,13 @@
         {if $prefs.theme_unified_admin_backend neq 'y' or $smarty.server.SCRIPT_NAME|strpos:'tiki-admin.php' === false}
              <header class="page-header w-100 sticky-top my-0" id="page-header" role=banner>
                 {* Main navigation - uses block for theme customization *}
-                <nav class="{block name=navClasses}navbar navbar-expand-md navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar{/block}"
+                <nav class="{block name=navClasses}navbar navbar-expand-md navbar-{$navbar_color_variant} tiki-top-nav-{$navbar_color_variant} bg-{$navbar_color_variant}-parent tiki-main-navbar{/block}"
                      id="main-navbar"
                      role="navigation"
                      aria-label="{tr}Main navigation{/tr}">
 
-                    <div class="container{if $prefs.feature_fixed_width eq 'y' and $prefs.layout_fixed_width_header neq 'y'}-fluid{/if}">
-                        {modulelist zone=top class="top_modules w-100 d-flex flex-wrap tiki-top-nav-{$navbar_color_variant} bg-{$navbar_color_variant}-parent" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
+                    <div class="container{if $prefs.feature_fixed_width neq 'y' || ($prefs.feature_fixed_width eq 'y' and $prefs.layout_fixed_width_header neq 'y')}-fluid{/if}">
+                        {modulelist zone=top class="top_modules w-100 d-flex flex-wrap" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
                     </div>
                 </nav>
             </header>
@@ -36,13 +36,13 @@
             {/if}
         {/if}
         <div class="topbar-wrapper navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-topbar-nav-{$navbar_color_variant}">
-            <div class="topbar container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-topbar-nav-{$navbar_color_variant}" id="topbar">
+            <div class="topbar container{if $prefs.feature_fixed_width neq 'y' || (isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y')}-fluid{/if} container-std navbar-{$navbar_color_variant} bg-{$navbar_color_variant}" id="topbar">
                 {modulelist zone=topbar class='topbar_modules w-100' heading_text='{tr}Navigation and related functionality and content{/tr}'}
             </div>
         </div>
         <div class="middle-wrapper">
             <div class="page-content-top-margin"  style="height: var(--tiki-page-content-top-margin)"></div>
-        <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std middle" id="middle">
+        <div class="container{if $prefs.feature_fixed_width neq 'y' || (isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y')}-fluid{/if} container-std middle" id="middle">
             <div class="row row-middle" id="row-middle">
                 {if (zone_is_empty('left') or $prefs.feature_left_column eq 'n') and (zone_is_empty('right') or $prefs.feature_right_column eq 'n')}
                     <div class="col col1 col-md-12 pb-4" id="col1">

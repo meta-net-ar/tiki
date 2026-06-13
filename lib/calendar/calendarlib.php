@@ -1304,6 +1304,52 @@ class CalendarLib extends TikiLib
     }
 
     /**
+     * @param $fname
+     * @param $calendarId
+     * @return int
+     */
+    public function importICS($fname, $calendarId)
+    {
+        global $prefs, $user;
+
+        $calendarData = file_get_contents($fname);
+        if (empty($calendarData) || strpos($calendarData, 'BEGIN:VCALENDAR') === false) {
+            throw new Services_Exception(tr("The ICS file is empty or invalid"));
+        }
+
+        $vObject = \Sabre\VObject\Reader::read($calendarData);
+        $nb = 0;
+
+        foreach ($vObject->getComponents() as $component) {
+            if ($component->name !== 'VEVENT') {
+                continue;
+            }
+
+            // Ignore recurrence exceptions
+            if (isset($component->{'RECURRENCE-ID'})) {
+                continue;
+            }
+            $client = new \Tiki\SabreDav\CaldavClient();
+            $data = \Tiki\SabreDav\Utilities::getDenormalizedDataFromComponent($component);
+            $data['calendarId'] = $calendarId;
+            // If the event is recurrent
+            if (! empty($data['rec'])) {
+                $rec = $data['rec'];
+                $rec->updateDetails($data);
+                // Lang is required in CalRecurrence::isValid(), so set it here
+                $rec->setLang($data['lang'] ?? $prefs['language'] ?? 'en');
+                $rec->setUser($user); // Set the user
+                $client->saveRecurringCalendarObject($rec);
+            } else {
+                // Save no recurrent event
+                $client->saveCalendarObject($data);
+            }
+            $nb++;
+        }
+        return $nb;
+    }
+
+    /**
      * Returns an array of a maximum of $maxrows upcoming (but possibly past) events in the given $order.
      * If $calendarId is set, events not in the specified calendars are filtered. $calendarId
      * can be a calendar identifier or an array of calendar identifiers. If $maxDaysEnd is
@@ -2536,6 +2582,48 @@ class CalendarLib extends TikiLib
     }
 
     /**
+     * Upload file contents and attach them to a calendar event.
+     *
+     * @param int $calitemId The calendar item ID
+     * @param array $attachments Array of arrays with keys: filename, filetype, data
+     * @return void
+     */
+    public function uploadAndAttachEventFiles(int $calitemId, array $attachments): void
+    {
+        global $prefs;
+
+        if ($prefs['feature_file_galleries'] !== 'y' || empty($attachments)) {
+            return;
+        }
+
+        $filegallib = TikiLib::lib('filegal');
+        $galleryId = $this->getAttachmentsGalleryId();
+        $gal_info = $filegallib->get_file_gallery($galleryId);
+        if (! is_array($gal_info) || empty($gal_info['galleryId']) || ! $filegallib->can_upload_to($gal_info)) {
+            return;
+        }
+
+        $fileIds = [];
+        foreach ($attachments as $attachment) {
+            $fileId = $filegallib->upload_single_file(
+                $gal_info,
+                $attachment['filename'],
+                strlen($attachment['data']),
+                $attachment['filetype'],
+                $attachment['data']
+            );
+            if ($fileId) {
+                $fileIds[] = (int) $fileId;
+            }
+        }
+        if (empty($fileIds)) {
+            return;
+        }
+
+        $this->setEventAttachments($calitemId, $fileIds);
+    }
+
+    /**
      * Get the file gallery ID to use for calendar event attachments.
      * Falls back to global preference or root gallery.
      *
@@ -2545,6 +2633,14 @@ class CalendarLib extends TikiLib
     {
         global $prefs;
 
-        return (int) ($prefs['calendar_attachments_galleryId'] ?? $prefs['fgal_root_id'] ?? 1);
+        $id = (int) ($prefs['calendar_attachments_galleryId'] ?? 0);
+        if ($id <= 0) {
+            $id = (int) ($prefs['fgal_root_id'] ?? 0);
+        }
+        if ($id <= 0) {
+            $id = 1;
+        }
+
+        return $id;
     }
 }

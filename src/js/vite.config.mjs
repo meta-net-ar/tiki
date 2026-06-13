@@ -354,6 +354,10 @@ export default defineConfig(({ command, mode }) => {
                         dest: "vendor_dist/chart.js/dist/chunks",
                     },
                     {
+                        src: "node_modules/chartjs-v2/dist/Chart.bundle.min.js",
+                        dest: "vendor_dist/chartjs-v2/dist",
+                    },
+                    {
                         src: "node_modules/clipboard/dist/*",
                         dest: "vendor_dist/clipboard/dist",
                     },

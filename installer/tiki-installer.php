@@ -155,6 +155,8 @@ $prefs = [
     'remember_closed_rboxes' => 'n',
     // \Tiki\Smarty\SmartyTiki::initializePaths
     'feature_webservices' => 'n',
+    // lib/prefs/min.php
+    'min_pass_length' => 5,
 ];
 
 require_once 'lib/init/initlib.php';
@@ -478,14 +480,17 @@ if ($dbconn) {
     $has_tiki_db = has_tiki_db();
     $smarty->assign('tikidb_created', $has_tiki_db);
     $unsupportedMailQueueEntries = 0;
-    try {
-        $unsupportedMailQueueEntries = (int) TikiDb::get()->getOne(
-            'SELECT COUNT(*) FROM tiki_mail_queue WHERE message LIKE ? OR message LIKE ? OR message LIKE ? OR message LIKE ?',
-            ['%Laminas\\Mail\\Message%', '%Zend\\Mail\\Message%', '%LaminasMailMessage%', '%ZendMailMessage%'],
-            TikiDb::ERR_NONE
-        );
-    } catch (Throwable $e) {
-        $unsupportedMailQueueEntries = 0;
+    // Only check when the mail queue table exists (not during early install steps before schema creation)
+    if ($installer && $installer->tableExists('tiki_mail_queue')) {
+        try {
+            $unsupportedMailQueueEntries = (int) TikiDb::get()->getOne(
+                'SELECT COUNT(*) FROM tiki_mail_queue WHERE message LIKE ? OR message LIKE ? OR message LIKE ? OR message LIKE ?',
+                ['%Laminas\\Mail\\Message%', '%Zend\\Mail\\Message%', '%LaminasMailMessage%', '%ZendMailMessage%'],
+                TikiDb::ERR_NONE
+            );
+        } catch (Throwable $e) {
+            $unsupportedMailQueueEntries = 0;
+        }
     }
 
     if ($unsupportedMailQueueEntries > 0) {
