@@ -51,41 +51,21 @@ class Services_Comment_AnnotationController
 
     public function action_create($input)
     {
-        global $user;
+        global $user, $headerlib;
 
-        // Recogito sends the annotation in W3C Web Annotation format
-        $params = new JitFilter(json_decode($input->json->none(), true));
-
-        // Extract from Recogito format
-        $annotation = $params->asArray('');  // Get the full annotation object
-
-        // Get comment text from bodies array (purpose='commenting')
-        $text = '';
-        if (!empty($annotation['bodies'])) {
-            foreach ($annotation['bodies'] as $body) {
-                if ($body['purpose'] === 'commenting') {
-                    $text = $body['value'] ?? '';
-                    break;
-                }
-            }
+        // Since fetch sends JSON in HTTP body (not query string), we must read php://input
+        $rawJson = file_get_contents('php://input');
+        if (! $rawJson) {
+            // Fallback for form-encoded data
+            $rawJson = $input->json->none();
         }
 
-        // Get quote and selector info from target
-        $quote = '';
-        $selector = [];
-        if (!empty($annotation['target']['selector'])) {
-            foreach ($annotation['target']['selector'] as $sel) {
-                if ($sel['type'] === 'TextPositionSelector') {
-                    $selector = $sel;
-                }
-                if (!empty($sel['quote'])) {
-                    $quote = $sel['quote'];
-                }
-            }
-        }
+        $params = new JitFilter(json_decode($rawJson, true) ?? []);
 
-        // Get uri (object-type:object-id identifier)
-        $identifier = urldecode($params->uri->url());
+        $text = $params->text->wikicontent();
+        $quote = $params->quote->text();
+        $ranges = $params->asArray('ranges');
+        $identifier = urldecode($params->uri->url()); // not really the uri but object-type:object-id identifier
         list($objectType, $objectId) = explode(':', $identifier, 2);
 
         if (! $this->commentController->canPost($objectType, $objectId)) {
@@ -98,7 +78,7 @@ class Services_Comment_AnnotationController
 
         // create the comment
         $threadId = $this->commentslib->post_new_comment(
-            $identifier,
+            $objectType . ':' . $objectId,
             0,
             $user,
             $title,
@@ -106,19 +86,18 @@ class Services_Comment_AnnotationController
             $messageId
         );
 
-        // Store the Recogito annotation format
         TikiLib::lib('attribute')->set_attribute(
             'comment',
             $threadId,
-            'recogito.annotation',
-            json_encode($annotation)
+            RANGE_ATTRIBUTE,
+            json_encode($ranges)
         );
 
         require_once(__DIR__ . '/../../../notifications/notificationemaillib.php');
         sendCommentNotification($objectType, $objectId, $title, $comment, $threadId, '');
 
         return [
-            'id' => $annotation['id'] ?? $threadId,
+            'id' => $threadId,
         ];
     }
 
@@ -146,31 +125,19 @@ class Services_Comment_AnnotationController
     public function action_update($input)
     {
         $threadId = $input->threadId->int();
-        $params = new JitFilter(json_decode($input->json->none(), true));
 
-        // Extract from Recogito format
-        $annotation = $params->asArray('');
-
-        // Get updated comment text from bodies
-        $text = '';
-        if (!empty($annotation['bodies'])) {
-            foreach ($annotation['bodies'] as $body) {
-                if ($body['purpose'] === 'commenting') {
-                    $text = $body['value'] ?? '';
-                    break;
-                }
-            }
+        // Since fetch sends JSON in HTTP body (not query string), we must read php://input
+        $rawJson = file_get_contents('php://input');
+        if (! $rawJson) {
+            // Fallback for form-encoded data
+            $rawJson = $input->json->none();
         }
 
-        // Get quote from target
-        $quote = '';
-        if (!empty($annotation['target']['selector'])) {
-            foreach ($annotation['target']['selector'] as $sel) {
-                if (!empty($sel['quote'])) {
-                    $quote = $sel['quote'];
-                }
-            }
-        }
+        $params = new JitFilter(json_decode($rawJson, true) ?? []);
+
+        $ranges = $params->asArray('ranges');
+        $text = $params->text->wikicontent();
+        $quote = $params->quote->text();
 
         $input->offsetSet('data', $this->formatComment($quote, $text));
         $input->offsetSet('title', $this->createTitle($text));
@@ -179,12 +146,11 @@ class Services_Comment_AnnotationController
         $ret = $this->commentController->action_edit($input);
 
         if ($ret) {
-            // Store updated Recogito annotation format
             TikiLib::lib('attribute')->set_attribute(
                 'comment',
                 $threadId,
-                'recogito.annotation',
-                json_encode($annotation)
+                RANGE_ATTRIBUTE,
+                json_encode($ranges)
             );
         }
 
@@ -226,7 +192,7 @@ class Services_Comment_AnnotationController
 
     public function action_search($input)
     {
-        global $prefs, $user;
+        global $prefs;
 
         $tikilib = TikiLib::lib('tiki');
         $userlib = TikiLib::lib('user');
@@ -250,51 +216,45 @@ class Services_Comment_AnnotationController
                 $quote = trim(substr($data[0], 6));
                 $text = trim($data[1]);
 
-                // Try to load stored Recogito annotation format, fall back to building it
-                $storedAnnotation = TikiLib::lib('attribute')->get_attribute(
-                    'comment',
-                    $comment['threadId'],
-                    'recogito.annotation'
+                $ranges = json_decode(
+                    TikiLib::lib('attribute')->get_attribute(
+                        'comment',
+                        $comment['threadId'],
+                        RANGE_ATTRIBUTE
+                    ),
+                    true
                 );
 
-                if ($storedAnnotation) {
-                    $annotation = json_decode($storedAnnotation, true);
-                } else {
-                    // Build Recogito format annotation from comment data
-                    $annotation = [
-                        'id' => $comment['threadId'],
-                        'bodies' => [
-                            [
-                                'type' => 'TextualBody',
-                                'value' => $text,
-                                'purpose' => 'commenting'
-                            ]
-                        ],
-                        'target' => [
-                            'selector' => [
-                                [
-                                    'type' => 'TextPositionSelector',
-                                    'quote' => $quote,
-                                    'start' => 0,
-                                    'end' => strlen($quote)
-                                ]
-                            ],
-                            'creator' => [
-                                'id' => $comment['userName'],
-                                'name' => $userlib->clean_user($comment['userName'])
-                            ],
-                            'created' => $tikilib->get_iso8601_datetime($comment['commentDate']),
-                            'updated' => $tikilib->get_iso8601_datetime($comment['commentDate'])
-                        ],
-                        'uri' => $identifier
-                    ];
+                $permissions = [
+                    'create' => $list['allow_post'],
+                    'update' => $comment['can_edit'],
+                    'delete' => $list['allow_remove'],
+                ];
+
+                $annotation = [
+                    'id'          => $comment['threadId'],
+                    'text'        => $text,
+                    'quote'       => $quote,
+                    'created'     => $tikilib->get_iso8601_datetime($comment['commentDate']),
+                    'updated'     => $tikilib->get_iso8601_datetime($comment['commentDate']),   // we don't have a commentUpdated column?
+                    'ranges'      => $ranges ? $ranges : [],
+                    'permissions' => $permissions,
+                ];
+
+                if ($prefs['comments_inline_annotator_with_info'] === 'y') {
+                    $annotation['commentDate'] = $tikilib->get_short_datetime($comment['commentDate']);
+                    $annotation['user']        = $comment['userName'];
+                    $annotation['realName']    = $userlib->clean_user($comment['userName']);
                 }
 
                 $comments[] = $annotation;
             }
         };
 
-        return $comments;
+        return [
+            'total' => count($comments),    // TODO pagination
+            'rows' => $comments,
+        ];
     }
 
     /**

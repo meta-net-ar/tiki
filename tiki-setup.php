@@ -231,22 +231,22 @@ Sections::onSectionChange(function ($section) use ($prefs) {
 
 Sections::onSectionChange(function ($section) use ($prefs) {
     global $headerlib, $jitRequest, $user, $jqueryTiki;
-    
+
     if ($prefs['feature_inline_comments'] !== 'y' || $prefs['comments_inline_annotator'] !== 'y') {
         return;
     }
 
     $object = current_object();
-    
-    if (!$object) {
+
+    if (! $object) {
         return;
     }
 
     $commentController = new Services_Comment_Controller();
-    
+
     if (
-        !$commentController->isEnabled($object['type'], $object['object']) ||
-        !$commentController->canView($object['type'], $object['object'])
+        ! $commentController->isEnabled($object['type'], $object['object']) ||
+        ! $commentController->canView($object['type'], $object['object'])
     ) {
         return;
     }
@@ -256,7 +256,7 @@ Sections::onSectionChange(function ($section) use ($prefs) {
 
     $headerlib->add_js_module('
         import { initRecogito } from "@tiki/annotator/annotator";
-        
+
         initRecogito({
             containerId: "top",
             objectUri: "' . $objectIdentifier . '",

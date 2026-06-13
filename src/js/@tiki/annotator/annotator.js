@@ -1,423 +1,298 @@
-// console.log('[Recogito] Module loaded!');
+import { createTextAnnotator } from '@recogito/text-annotator';
+import '@recogito/text-annotator/text-annotator.css';
 
-// import { createTextAnnotator } from '@recogito/text-annotator';
-// import '@recogito/text-annotator/text-annotator.css';
-
-// console.log('[Recogito] Dependencies imported successfully');
-
-// /**
-//  * Initialize Recogito annotator for inline comments
-//  * @param {Object} config - Configuration object
-//  * @param {string} config.containerId - DOM element ID to attach annotator
-//  * @param {string} config.objectUri - Object identifier (type:id)
-//  * @param {string} config.userId - Current user ID
-//  * @param {string} config.userName - Current user name
-//  * @param {boolean} config.canPost - Whether user can create/edit annotations
-//  * @param {boolean} config.showUserInfo - Show author name and date in popup
-//  */
-// export function initRecogito(config) {
-//   console.group('[Recogito] Initialization started');
-//   console.log('[Recogito] Config:', config);
-
-//   const container = document.getElementById(config.containerId);
-//   if (!container) {
-//     console.error(`[Recogito] ERROR: Container #${config.containerId} not found`);
-//     console.groupEnd();
-//     return null;
-//   }
-//   console.log(`[Recogito] ✓ Container found:`, container);
-
-//   // Create annotator instance
-//   console.log('[Recogito] Creating annotator instance...');
-//   const anno = createTextAnnotator(container, {
-//     annotatingEnabled: config.canPost,
-//     user: {
-//       id: config.userId,
-//       name: config.userName
-//     },
-//     // Allow selection from any text
-//     selectionMode: 'all'
-//   });
-
-//   if (!anno) {
-//     console.error('[Recogito] ERROR: Failed to create annotator instance');
-//     console.groupEnd();
-//     return null;
-//   }
-//   console.log('[Recogito] ✓ Annotator instance created:', anno);
-
-//   // Load existing annotations
-//   console.log('[Recogito] Loading existing annotations...');
-//   const searchUrl = `tiki-ajax_services.php?controller=annotation&action=search&uri=${encodeURIComponent(config.objectUri)}`;
-//   console.log('[Recogito] Search URL:', searchUrl);
-
-//   fetch(searchUrl)
-//     .then(r => {
-//       console.log('[Recogito] Search response status:', r.status);
-//       if (!r.ok) {
-//         return r.text().then(text => {
-//           console.log('[Recogito] Search error response:', text);
-//           throw new Error(`Search HTTP ${r.status}: ${text}`);
-//         });
-//       }
-//       return r.json();
-//     })
-//     .then(annotations => {
-//       console.log('[Recogito] ✓ Annotations loaded:', annotations);
-//       if (Array.isArray(annotations)) {
-//         console.log(`[Recogito] Loading ${annotations.length} annotations into annotator`);
-//         anno.loadAnnotations(annotations);
-//         console.log('[Recogito] ✓ Annotations loaded into UI');
-//       } else {
-//         console.warn('[Recogito] Response is not an array:', typeof annotations);
-//       }
-//     })
-//     .catch(err => {
-//       console.error('[Recogito] ERROR loading annotations:', err);
-//     });
-
-//   // Save new annotation
-//   anno.on('createAnnotation', annotation => {
-//     console.group('[Recogito] Creating annotation');
-//     console.log('[Recogito] Raw annotation from Recogito:', annotation);
-
-//     // Ensure proper structure for Recogito
-//     const now = new Date().toISOString();
-//     annotation.bodies = annotation.bodies || [];
-//     annotation.target = annotation.target || {};
-//     annotation.target.selector = annotation.target.selector || [];
-
-//     // Build proper W3C annotation
-//     const payload = {
-//       id: annotation.id,
-//       bodies: annotation.bodies.length > 0 ? annotation.bodies : [{
-//         type: 'TextualBody',
-//         value: '',  // Will be filled by Recogito
-//         purpose: 'commenting'
-//       }],
-//       target: {
-//         selector: annotation.target.selector,
-//         creator: {
-//           id: config.userId,
-//           name: config.userName
-//         },
-//         created: now,
-//         updated: now
-//       },
-//       uri: config.objectUri
-//     };
-
-//     console.log('[Recogito] Payload to send:', payload);
-
-//     fetch('tiki-ajax_services.php?controller=annotation&action=create', {
-//       method: 'POST',
-//       headers: { 
-//         'Content-Type': 'application/json',
-//         'X-CSRF-Token': config.csrfToken || ''
-//       },
-//       body: JSON.stringify(payload)
-//     })
-//       .then(r => {
-//         console.log('[Recogito] Create response status:', r.status);
-//         if (!r.ok) {
-//           return r.text().then(text => {
-//             console.log('[Recogito] Error response body:', text);
-//             throw new Error(`HTTP ${r.status}: ${text}`);
-//           });
-//         }
-//         return r.json();
-//       })
-//       .then(data => {
-//         console.log('[Recogito] ✓ Create response:', data);
-//         annotation.id = data.id;
-//         console.log('[Recogito] ✓ Annotation saved with ID:', annotation.id);
-//         console.groupEnd();
-//       })
-//       .catch(err => {
-//         console.error('[Recogito] ERROR creating annotation:', err);
-//         console.groupEnd();
-//       });
-//   });
-
-//   // Update annotation
-//   anno.on('updateAnnotation', (annotation, previous) => {
-//     console.group('[Recogito] Updating annotation');
-//     console.log('[Recogito] Previous:', previous);
-//     console.log('[Recogito] Updated:', annotation);
-
-//     annotation.target = annotation.target || {};
-//     annotation.target.updated = new Date().toISOString();
-
-//     const updateUrl = `tiki-ajax_services.php?controller=annotation&action=update&threadId=${encodeURIComponent(annotation.id)}`;
-//     console.log('[Recogito] Update URL:', updateUrl);
-
-//     fetch(updateUrl, {
-//       method: 'POST',
-//       headers: { 
-//         'Content-Type': 'application/json',
-//         'X-CSRF-Token': config.csrfToken || ''
-//       },
-//       body: JSON.stringify(annotation)
-//     })
-//       .then(r => {
-//         console.log('[Recogito] Update response status:', r.status);
-//         if (!r.ok) {
-//           return r.text().then(text => {
-//             console.log('[Recogito] Update error response:', text);
-//             throw new Error(`Update HTTP ${r.status}: ${text}`);
-//           });
-//         }
-//         return r.json();
-//       })
-//       .then(data => {
-//         console.log('[Recogito] ✓ Update response:', data);
-//         console.groupEnd();
-//       })
-//       .catch(err => {
-//         console.error('[Recogito] ERROR updating annotation:', err);
-//         console.groupEnd();
-//       });
-//   });
-
-//   // Delete annotation
-//   anno.on('deleteAnnotation', annotation => {
-//     console.group('[Recogito] Deleting annotation');
-//     console.log('[Recogito] Annotation ID:', annotation.id);
-
-//     const deleteUrl = `tiki-ajax_services.php?controller=annotation&action=destroy&threadId=${encodeURIComponent(annotation.id)}`;
-//     console.log('[Recogito] Delete URL:', deleteUrl);
-
-//     fetch(deleteUrl, {
-//       method: 'POST',
-//       headers: {
-//         'X-CSRF-Token': config.csrfToken || ''
-//       }
-//     })
-//       .then(r => {
-//         console.log('[Recogito] Delete response status:', r.status);
-//         if (!r.ok) {
-//           return r.text().then(text => {
-//             console.log('[Recogito] Delete error response:', text);
-//             throw new Error(`Delete HTTP ${r.status}: ${text}`);
-//           });
-//         }
-//         return r.json();
-//       })
-//       .then(data => {
-//         console.log('[Recogito] ✓ Delete response:', data);
-//         console.groupEnd();
-//       })
-//       .catch(err => {
-//         console.error('[Recogito] ERROR deleting annotation:', err);
-//         console.groupEnd();
-//       });
-//   });
-
-//   console.log('[Recogito] ✓ All event listeners attached');
-//   console.groupEnd();
-
-//   return anno;
-// }
-
-
-import Recogito from "recogito";
-
-const API =
-  "tiki-ajax_services.php?controller=annotation";
-
-export class RecogitoLegacyAdapter {
-
-  constructor({ element, uri, user, realName }) {
-    this.element = element;
-    this.uri = uri;
-    this.user = user;
-    this.realName = realName || user;
-
-    this.r = null;
+/**
+ * Transform backend response to Recogito-compatible format
+ * Backend returns: {total, rows}
+ * Recogito expects: [{id, bodies, target}, ...]
+ */
+function transformBackendResponse(data) {
+  if (!data || !data.rows) {
+    return [];
   }
 
-  async init() {
-    this.r = new Recogito({
-      content: this.element
-    });
-
-    await this.load();
-    this.bind();
-  }
-
-  // -------------------------
-  // LOAD FROM BACKEND
-  // -------------------------
-  async load() {
-
-    const res = await fetch(
-      `${API}&action=search&uri=${encodeURIComponent(this.uri)}&limit=50`
-    );
-
-    const data = await res.json();
-
-    const annotations = data.map(this.toRecogito);
-
-    this.r.setAnnotations(annotations);
-  }
-
-  // -------------------------
-  // EVENTS
-  // -------------------------
-  bind() {
-
-    this.r.on("createAnnotation", (ann) => {
-      this.save("create", ann);
-    });
-
-    this.r.on("updateAnnotation", (ann) => {
-      this.save(`update&threadId=${ann.id}`, ann);
-    });
-
-    this.r.on("deleteAnnotation", (ann) => {
-      fetch(
-        `${API}&action=destroy&threadId=${ann.id}`,
-        { method: "POST" }
-      );
-    });
-  }
-
-  // -------------------------
-  // SAVE → LEGACY PAYLOAD
-  // -------------------------
-  async save(action, recogitoAnn) {
-
-    const payload = this.toLegacy(recogitoAnn);
-
-    const res = await fetch(
-      `${API}&action=${action}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
-        body:
-          "annotations=" +
-          encodeURIComponent(JSON.stringify(payload))
-      }
-    );
-
-    const saved = await res.json();
-
-    recogitoAnn.id = saved.id;
-  }
-
-  // =====================================================
-  // 🔥 CORE RULE: LEGACY SHAPE STAYS IDENTICAL
-  // =====================================================
-  toLegacy(a) {
-
-    const body =
-      a.body?.find(b => b.purpose === "commenting")?.value || "";
-
-    const selector =
-      a.target?.selector?.[0] || {};
-
-    return {
-
-      // ===============================
-      // OLD REQUIRED FIELDS (UNCHANGED)
-      // ===============================
-      uri: this.uri,
-
-      text: body, // keep string for backend compatibility
-
-      quote: selector.quote || "",
-
-      ranges: this.toLegacyRanges(selector),
-
-      user: this.user,
-
-      realName: this.realName,
-
-      commentDate: new Date().toISOString(),
-
-      permissions: {
-        read: ["group:Registered"],
-        update: [`user:${this.user}`],
-        delete: [`user:${this.user}`],
-        admin: [`user:${this.user}`]
-      },
-
-      // ===============================
-      // 🔥 NEW: Recogito payload lives here
-      // ===============================
-      meta: {
-        schema: "recogito-v1",
-
-        recogito: a
-      }
-    };
-  }
-
-  // =====================================================
-  // convert back for UI rendering
-  // =====================================================
-  toRecogito(db) {
-
-    // if legacy annotation
-    if (!db.meta?.schema) {
-
-      return {
-        id: db.id,
-
-        body: [{
-          type: "TextualBody",
-          purpose: "commenting",
-          value: db.text
-        }],
-
-        target: {
-          selector: db.ranges || []
-        }
-      };
+  const annotations = data.rows.map(dbAnnotation => {
+    if (dbAnnotation.lib === 'recogito') {
+      return dbAnnotation;
+    } else if (dbAnnotation.ranges || dbAnnotation.text !== undefined) {
+      return convertToW3C(dbAnnotation);
     }
+    return dbAnnotation;
+  });
 
-    // already Recogito stored
-    return db.meta.recogito;
-  }
+  const w3cAnnotations = annotations
+    .map(anno => {
+      if (!anno || !anno.id) {
+        return null;
+      }
+      
+      if (!anno.bodies || !anno.target) {
+        return null;
+      }
+      
+      return anno;
+    })
+    .filter(anno => anno !== null);
 
-  // =====================================================
-  // keep compatibility layer minimal
-  // =====================================================
-  toLegacyRanges(selector) {
-
-    if (!selector) return [];
-
-    return [{
-      start: selector.startSelector?.value || "",
-      startOffset: selector.start || 0,
-
-      end: selector.endSelector?.value || "",
-      endOffset: selector.end || 0
-    }];
-  }
+  return w3cAnnotations;
 }
 
 export function initRecogito(config) {
-
-  const el = document.getElementById(config.containerId);
-
-  if (!el) {
-    console.warn("Annotator container not found:", config.containerId);
-    return;
+  const objectUri = String(config.objectUri || '').trim();
+  const csrfToken = config.csrfToken || '';
+  
+  if (!objectUri) {
+    return null;
   }
 
-  const adapter = new TikiRecogitoAdapter({
-    element: el,
-    objectUri: config.objectUri,
-    userId: config.userId,
-    userName: config.userName,
-    canPost: config.canPost,
-    showUserInfo: config.showUserInfo,
-    csrfToken: config.csrfToken
+  const container = document.getElementById(config.containerId);
+  if (!container) {
+    return null;
+  }
+
+  const anno = createTextAnnotator(container, {
+    annotatingEnabled: config.canPost,
+    user: {
+      id: config.userId,
+      name: config.userName
+    },
+    selectionMode: 'all'
   });
 
-  adapter.init();
+  if (!anno) {
+    return null;
+  }
+
+  // Load existing annotations
+  const searchUrl = `tiki-ajax_services.php?controller=annotation&action=search&uri=${encodeURIComponent(objectUri)}`;
+  fetch(searchUrl, { credentials: 'include' })
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
+    .then(data => {
+      const w3cAnnotations = transformBackendResponse(data);
+      
+      if (w3cAnnotations.length === 0) {
+        return;
+      }
+      
+      anno.setAnnotations(w3cAnnotations);
+    })
+    .catch(err => {
+      console.error('[Recogito] Load error:', err);
+    });
+
+  // Create new annotation
+  anno.on('createAnnotation', annotation => {
+    if (!objectUri || objectUri.trim() === '') {
+      return;
+    }
+
+    const payload = convertToLegacyPayload(annotation, objectUri);
+    
+    if (!payload.uri || !payload.uri.includes(':')) {
+      return;
+    }
+
+    if (csrfToken) {
+      payload.ticket = csrfToken;
+    }
+
+    const jsonBody = JSON.stringify(payload);
+
+    fetch('tiki-ajax_services.php?controller=annotation&action=create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: jsonBody
+    })
+      .then(r => {
+        if (!r.ok) {
+          return r.text().then(text => {
+            let errorMsg = text;
+            const bodyMatch = text.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+            if (bodyMatch) {
+              errorMsg = bodyMatch[1].substring(0, 500).replace(/<[^>]*>/g, '');
+            }
+            console.error('[Recogito] Create error:', errorMsg);
+            throw new Error(`HTTP ${r.status}: ${errorMsg}`);
+          });
+        }
+        return r.json();
+      })
+      .then(data => {
+        annotation.id = data.id;
+      })
+      .catch(err => console.error('[Recogito] Create error:', err));
+  });
+
+  // Update annotation
+  anno.on('updateAnnotation', annotation => {
+    const payload = convertToLegacyPayload(annotation, objectUri);
+    
+    if (csrfToken) {
+      payload.ticket = csrfToken;
+    }
+    
+    fetch(`tiki-ajax_services.php?controller=annotation&action=update&threadId=${encodeURIComponent(annotation.id)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(payload)
+    })
+      .then(r => {
+        if (!r.ok) return r.text().then(text => { 
+          const bodyMatch = text.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+          let errorMsg = bodyMatch ? bodyMatch[1].substring(0, 500).replace(/<[^>]*>/g, '') : text.substring(0, 500);
+          console.error('[Recogito] Update error:', errorMsg);
+          throw new Error(`HTTP ${r.status}: ${errorMsg}`);
+        });
+        return r.json();
+      })
+      .catch(err => console.error('[Recogito] Update error:', err));
+  });
+
+  // Delete annotation
+  anno.on('deleteAnnotation', annotation => {
+    const deleteUrl = `tiki-ajax_services.php?controller=annotation&action=destroy&threadId=${encodeURIComponent(annotation.id)}` + (csrfToken ? `&ticket=${encodeURIComponent(csrfToken)}` : '');
+    
+    fetch(deleteUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include'
+    })
+      .catch(err => console.error('[Recogito] Delete error:', err));
+  });
+
+  return anno;
+}
+
+/**
+ * Convert old OpenAnnotator format to Recogito data model
+ * Use BOTH TextQuoteSelector (robust) and TextPositionSelector (fast) for maximum compatibility
+ */
+function convertToW3C(oldAnnotation) {
+  if (!oldAnnotation) {
+    return null;
+  }
+  
+  try {
+    const quote = typeof oldAnnotation.quote === 'string' ? oldAnnotation.quote : '';
+    const text = typeof oldAnnotation.text === 'string' ? oldAnnotation.text : '';
+    let start = 0;
+    let end = 0;
+    
+    if (oldAnnotation.ranges && Array.isArray(oldAnnotation.ranges) && oldAnnotation.ranges.length > 0) {
+      const range = oldAnnotation.ranges[0];
+      if (range && typeof range === 'object') {
+        start = parseInt(range.startOffset) || 0;
+        end = parseInt(range.endOffset) || 0;
+      }
+    }
+
+    const selector = [
+      {
+        type: 'TextQuoteSelector',
+        exact: quote,
+        prefix: '',
+        suffix: ''
+      }
+    ];
+    
+    if (start >= 0 && end > start) {
+      selector.push({
+        type: 'TextPositionSelector',
+        start: start,
+        end: end
+      });
+    }
+
+    const converted = {
+      id: String(oldAnnotation.id || ''),
+      bodies: [{
+        type: 'TextualBody',
+        value: text,
+        purpose: 'commenting'
+      }],
+      target: {
+        selector: selector
+      }
+    };
+    
+    JSON.stringify(converted);
+    return converted;
+    
+  } catch (e) {
+    return {
+      id: String(oldAnnotation?.id || ''),
+      bodies: [{
+        type: 'TextualBody',
+        value: typeof oldAnnotation?.text === 'string' ? oldAnnotation.text : '',
+        purpose: 'commenting'
+      }],
+      target: {
+        selector: [{
+          type: 'TextQuoteSelector',
+          exact: typeof oldAnnotation?.quote === 'string' ? oldAnnotation.quote : '',
+          prefix: '',
+          suffix: ''
+        }]
+      }
+    };
+  }
+}
+
+/**
+ * Convert W3C annotation back to legacy payload format for backend
+ * Backend expects: {text, quote, ranges, uri}
+ */
+function convertToLegacyPayload(w3cAnnotation, objectUri) {
+  let textBody = '';
+  let selectorStart = 0;
+  let selectorEnd = 0;
+  let selectorQuote = '';
+
+  if (w3cAnnotation.bodies && Array.isArray(w3cAnnotation.bodies)) {
+    const commentBody = w3cAnnotation.bodies.find(b => b && b.purpose === 'commenting');
+    if (commentBody && commentBody.value) {
+      textBody = String(commentBody.value);
+    }
+  }
+
+  if (w3cAnnotation.target && w3cAnnotation.target.selector) {
+    const selectors = Array.isArray(w3cAnnotation.target.selector) 
+      ? w3cAnnotation.target.selector 
+      : [w3cAnnotation.target.selector];
+    
+    const quoteSelector = selectors.find(s => s && s.type === 'TextQuoteSelector');
+    const posSelector = selectors.find(s => s && s.type === 'TextPositionSelector');
+    const legacySelector = selectors.find(s => s && (s.quote || s.start !== undefined));
+    
+    if (quoteSelector) {
+      selectorQuote = quoteSelector.exact || '';
+    } else if (legacySelector && legacySelector.quote) {
+      selectorQuote = legacySelector.quote;
+    }
+    
+    if (posSelector) {
+      selectorStart = parseInt(posSelector.start) || 0;
+      selectorEnd = parseInt(posSelector.end) || 0;
+    } else if (legacySelector && legacySelector.start !== undefined) {
+      selectorStart = parseInt(legacySelector.start) || 0;
+      selectorEnd = parseInt(legacySelector.end) || 0;
+    }
+  }
+
+  const uri = String(objectUri || '').trim();
+
+  return {
+    text: textBody,
+    quote: selectorQuote,
+    ranges: [{
+      startOffset: selectorStart,
+      endOffset: selectorEnd
+    }],
+    uri: uri
+  };
 }
