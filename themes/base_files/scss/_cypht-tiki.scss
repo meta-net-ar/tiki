@@ -314,6 +314,19 @@
         #imap_filter_form {
             .imap_keyword, el-select { margin-right: 5px; }
         }
+        .list_sources .list_src {
+            display: block;
+            max-width: 100%;
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .list_sources.w-100 {
+            width: auto !important;
+            max-width: min(320px, calc(100vw - 2rem));
+            min-width: 0;
+        }
     }
 
     .menu_search {
@@ -487,6 +500,65 @@
             .inner_list .form-check { margin: 0 0 0 30px; }
             .unread_count { padding-top: 4px; }
         }
+        .adv_folder_list {
+            .wrapper {
+                align-items: center;
+                gap: 0.5rem;
+                min-width: 0;
+            }
+            .adv_folder_link {
+                min-width: 0;
+                flex: 1 1 auto;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                max-width: min(240px, 40vw);
+            }
+            .wrapper > .unread_count {
+                flex-shrink: 0;
+            }
+            .wrapper > .d-flex.gap-3 {
+                flex-shrink: 0;
+            }
+            .inner_list .wrapper > a {
+                min-width: 0;
+                flex: 1 1 auto;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                max-width: min(220px, 38vw);
+            }
+        }
+    }
+
+    .account_folder_title {
+        min-width: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
+        strong {
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
+        }
+    }
+    .folder_table {
+        table-layout: fixed;
+        width: 100%;
+        td.folder-name-cell {
+            max-width: 0;
+            overflow: hidden;
+        }
+        .folder-name-text {
+            display: inline-block;
+            max-width: calc(100% - 1.5rem);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+        }
     }
 
     .bubble_dropdown-content { z-index: 5; }
@@ -571,7 +643,11 @@
             background-color: $body-bg !important;
             .ctr_divider + div.dropdown { margin-top: 4px; }
             .path_delim + a { display: contents; }
-            .list_sources { top: 42px; width: 100% !important; }
+            .list_sources {
+                top: 40px;
+                border: 1px solid var(--bs-border-color);
+                max-width: min(300px, calc(100vw - 1.5rem));
+            }
         }
 
         .list_controls i.bi-filter-circle {
@@ -648,6 +724,41 @@
             el-select { width: calc(50% - 0.5rem); }
             .combined_sort + el-select {  display: inline-block; width: 150px; }
             .message_table_body .icon { width: 50px; }
+        }
+
+        .advanced_search_form .adv_folder_list {
+            .adv_folder_link {
+                max-width: min(180px, 50vw);
+            }
+            .inner_list .wrapper > a {
+                max-width: min(160px, 45vw);
+            }
+        }
+
+        // Search results: from + subject only on mobile
+        .adv_controls + .message_list .message_table {
+            table-layout: auto;
+            td.source,
+            td.msg_date,
+            td.icon,
+            td.dates {
+                display: none !important;
+            }
+            td.checkbox_cell {
+                width: 28px;
+            }
+            td.from {
+                width: 35%;
+                max-width: 35%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            td.subject {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
         }
 
         .time_section {
