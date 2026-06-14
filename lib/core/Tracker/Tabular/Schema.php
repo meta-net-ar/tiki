@@ -386,6 +386,7 @@ class Schema
                 $name .= '_export_' . $type . '.ics';
                 break;
             default:
+                // 'excel_paste' and 'csv' both export as CSV
                 $writer = new Writer\CsvWriter($filename, $this->getEncoding() ?? '');
                 $name .= '_export_' . $type . '.csv';
         }
@@ -403,6 +404,11 @@ class Schema
             default:
                 return new Source\CsvSource($this, $fileName, $separator, $this->getEncoding());
         }
+    }
+
+    public function getPasteSource(string $content): Source\ExcelPasteSource
+    {
+        return new Source\ExcelPasteSource($this, $content);
     }
 
     public function validate()

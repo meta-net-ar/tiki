@@ -9,6 +9,7 @@ use Tracker\Filter\Collection;
 use Tracker\Tabular\Source\ODBCSource;
 use Tracker\Tabular\Source\APISource;
 use Tracker\Tabular\Source\CsvSource;
+use Tracker\Tabular\Source\ExcelPasteSource;
 use Tracker\Tabular\Schema;
 use Tracker\Tabular\Source\PaginatedQuerySource;
 use Tracker\Tabular\Source\QuerySource;
@@ -614,6 +615,44 @@ class Services_Tracker_TabularController
                     ];
                 }
             );
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && $schema->getFormat() === 'excel_paste') {
+            $pasteData = $input->paste_data->none();
+            if (! empty(trim($pasteData))) {
+                $source = $schema->getPasteSource($pasteData);
+                $writer = new TrackerWriter();
+
+                return TikiLib::lib('tiki')->allocate_extra(
+                    'tracker_import_items',
+                    function () use ($writer, $source, $info, $schema) {
+                        $result = $writer->write($source);
+
+                        if (TIKI_API) {
+                            $data = [];
+                            $columns = $schema->getColumns();
+                            foreach ($result as $itemId) {
+                                $entry = new TrackerSourceEntry($itemId);
+                                $row = ['itemId' => $itemId];
+                                foreach ($columns as $column) {
+                                    $row[$column->getLabel()] = $row[$column->getField()] = $entry->render($column, false);
+                                }
+                                $data[] = $row;
+                            }
+                            return $data;
+                        }
+
+                        Feedback::success(tr('Your import was completed successfully.'));
+                        return [
+                            'FORWARD' => [
+                                'controller' => 'tabular',
+                                'action' => 'list',
+                                'tabularId' => $info['tabularId'],
+                            ]
+                        ];
+                    }
+                );
+            }
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && $info['odbc_config']) {
