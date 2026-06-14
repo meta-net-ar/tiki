@@ -262,13 +262,14 @@ $jqueryTiki['queued_tasks_has_pending'] = $hasActiveJobs;
 $jqueryTiki['securityTimeout'] = ! empty($prefs['site_security_timeout']) ? $prefs['site_security_timeout']
     : TikiLib::lib('access')->getDefaultTimeout();
 
-if (empty($object)) {
-    $object = current_object();
-}
-if (empty($object)) {
-    $object = ['type' => '', 'object' => ''];
-}
-$jqueryTiki['current_object'] = $object;
+$jqueryTiki['current_object'] = ['type' => '', 'object' => ''];
+
+Sections::onSectionChange(function ($section) use (&$jqueryTiki) {
+    if (empty($object)) {
+        $object = current_object();
+    }
+    $jqueryTiki['current_object'] = $object;
+});
 
 $username_pattern = " / ^ ['\-_a-zA-Z0-9\.]*$/";
 if (is_string($prefs['username_pattern'])) {
