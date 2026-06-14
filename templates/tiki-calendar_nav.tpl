@@ -1,12 +1,13 @@
 {strip}
     {if !isset($ajax)}{$ajax='y'}{/if}
     {if !isset($module)}{$module='n'}{/if}
+    {if !isset($viewmode) && isset($calendarViewMode)}{$viewmode=$calendarViewMode}{/if}
 
     {if empty($module_params.viewnavbar) || $module_params.viewnavbar eq 'y'}
         {if $viewlist eq 'list'}
             <div class="calendar-goto-container mb-3">
                 <input type="date" class="form-control date-calendar w-50" value="{$focusdate|date_format:'%Y-%m-%d'}"
-                    onchange="location.href='{query _type='relative' viewmode=$viewmode todate='__DATE__'}'.replace('__DATE__', Math.floor(new Date(this.value + 'T00:00:00').getTime() / 1000));">
+                    onchange="location.href='{query _type='relative' viewmode=$viewmode viewlist=$viewlist todate='__DATE__'}'.replace('__DATE__', Math.floor(new Date(this.value + 'T00:00:00').getTime() / 1000));">
             </div>
         {/if}
         <div class="tabrow mb-3 {if $module eq 'y'}p-0{/if}">
@@ -14,10 +15,17 @@
                 <div class="calendar-nav d-flex gap-2 align-items-center">
                     {strip}
                         {*previous*}
-                        <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='prev' todate=$focus_prev viewmode=$viewmode}"
-                           title=":{tr _0=$viewmode|escape}Previous %0 {/tr}">
-                            {icon name="previous"}
-                        </a>
+                        {if $viewlist eq 'list'}
+                            <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='prev' todate=$focus_prev viewmode=$viewmode viewlist=$viewlist}"
+                               title=":{tr _0=$viewmode|escape}Previous %0 {/tr}">
+                                {icon name="previous"}
+                            </a>
+                        {else}
+                            <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='prev' todate=$focus_prev viewmode=$viewmode}"
+                               title=":{tr _0=$viewmode|escape}Previous %0 {/tr}">
+                                {icon name="previous"}
+                            </a>
+                        {/if}
                         {*viewmodes*}
                         <div class="d-flex gap-2 flex-wrap" role="toolbar" aria-label="...">
                         {if $module neq 'y'}
@@ -40,10 +48,17 @@
                         </div>
 
                         {*next*}
-                        <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='next' todate=$focus_next viewmode=$viewmode}"
-                           title=":{tr _0=$viewmode|escape}Next %0{/tr}">
-                            {icon name="next"}
-                        </a>
+                        {if $viewlist eq 'list'}
+                            <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='next' todate=$focus_next viewmode=$viewmode viewlist=$viewlist}"
+                               title=":{tr _0=$viewmode|escape}Next %0{/tr}">
+                                {icon name="next"}
+                            </a>
+                        {else}
+                            <a class="tips btn btn-outline-primary btn-sm align-self-center flex-shrink-0" href="{query _type='relative' _ajax=$ajax _class='next' todate=$focus_next viewmode=$viewmode}"
+                               title=":{tr _0=$viewmode|escape}Next %0{/tr}">
+                                {icon name="next"}
+                            </a>
+                        {/if}
                     {/strip}
                 </div>
             </div>
@@ -58,9 +73,9 @@
             {/if}
 
             {if $viewlist ne 'list' or $prefs.calendar_list_begins_focus ne 'y'}
-                {if $calendarViewMode eq 'month'}
+                {if $viewmode eq 'month'}
                     {$daystart|tiki_date_format:"%B %Y"}
-                {elseif $calendarViewMode eq 'week'}
+                {elseif $viewmode eq 'week'}
                     {* test display_field_order and use %d/%m or %m/%d *}
                     {if ($prefs.display_field_order eq 'DMY') || ($prefs.display_field_order eq 'DYM') || ($prefs.display_field_order eq 'YDM')}
                         {$daystart|tiki_date_format:"{tr}%d/%m{/tr}/%Y"} - {$dayend|tiki_date_format:"{tr}%d/%m{/tr}/%Y"}
