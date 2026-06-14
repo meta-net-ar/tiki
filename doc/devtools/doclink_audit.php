@@ -17,13 +17,23 @@
  * Usage (from Tiki root):
  *   php doc/devtools/doclink_audit.php [--online] [--include-missing] [--csv=PATH]
  *
- * Default CSV includes only BROKEN, NON_CANONICAL, and EXTERNAL rows.
+ * Default CSV includes BROKEN, CHECK_FAILED, NON_CANONICAL, and EXTERNAL rows.
  * MISSING preferences are counted in the console summary; use --include-missing to export them.
  *
  * Broken link detection requires --online (HTTP checks against doc.tiki.org).
  *
+ * BROKEN vs CHECK_FAILED (--online):
+ *   BROKEN — doc.tiki.org responded with HTTP >= 400 (e.g. 404, 410); strong signal of a bad link.
+ *   CHECK_FAILED — the HTTP request returned no status code (0): timeout, DNS, TLS, firewall,
+ *     or curl unavailable. Not proof the page is missing; re-run when doc.tiki.org is reachable.
+ *   Before per-URL checks, the script probes https://doc.tiki.org/; if that fails, per-URL checks
+ *   are skipped entirely and a warning is printed (avoids mass false BROKEN results during outages).
+ *
  * Requires a configured Tiki instance (tiki-setup.php / database), like prefreport.php.
  * See also: doc/devtools/prefreport.php
+ *
+ * CLI bootstrap suppresses PHP warnings from the full Tiki setup and avoids OCR
+ * shell-command side effects when scanning preferences.
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -40,7 +50,7 @@ Usage (from Tiki root):
   php doc/devtools/doclink_audit.php [options]
 
 Options:
-  --online            HTTP-check doc.tiki.org links (not EXTERNAL or NON_CANONICAL slug checks)
+  --online            HTTP-check doc.tiki.org links (see file header for BROKEN/CHECK_FAILED caveats)
   --include-missing   Include MISSING preference rows in the CSV export
   --csv=PATH          CSV output path (default: dump/doclink_audit.csv)
   -h, --help          Show this help
@@ -48,7 +58,11 @@ Options:
 Default CSV columns: source_type, location, line, preference, original_value,
 resolved_url, status, http_status, suggested_slug
 
-Statuses: OK, BROKEN, MISSING, NON_CANONICAL, EXTERNAL
+Statuses: OK, BROKEN, CHECK_FAILED, MISSING, NON_CANONICAL, EXTERNAL
+
+BROKEN means HTTP >= 400 from doc.tiki.org. CHECK_FAILED means no HTTP response (outage,
+timeout, network). CHECK_FAILED is not proof a page is missing; re-run when doc.tiki.org
+is reachable. If the doc.tiki.org probe fails, per-URL checks are skipped.
 
 HELP;
     exit(0);
@@ -60,9 +74,28 @@ $csvPath = $options['csv'] ?? 'dump/doclink_audit.csv';
 
 chdir(dirname(__DIR__, 2));
 
+define('TIKI_CONSOLE', 1);
+
+$previousErrorHandler = set_error_handler(static function ($severity, $message, $file, $line) use (&$previousErrorHandler) {
+    if (in_array($severity, [E_WARNING, E_NOTICE, E_DEPRECATED, E_USER_WARNING, E_USER_NOTICE, E_USER_DEPRECATED], true)) {
+        return true;
+    }
+    if ($previousErrorHandler) {
+        return $previousErrorHandler($severity, $message, $file, $line);
+    }
+    return false;
+});
+$displayErrors = ini_get('display_errors');
+ini_set('display_errors', '0');
+
 require_once 'tiki-setup.php';
 
+ini_set('display_errors', $displayErrors);
+restore_error_handler();
+
 global $prefs;
+
+$prefs['record_untranslated'] = 'n';
 
 $prefs['feature_help'] = 'y';
 $baseHelpUrl = 'https://doc.tiki.org/';
@@ -78,6 +111,7 @@ if (! str_ends_with($baseHelpUrl, '/')) {
 $prefs['helpurl'] = $baseHelpUrl;
 
 $prefslib = TikiLib::lib('prefs');
+prime_prefslib_skipped_modules(['ocr' => 'lib/prefs/ocr.php']);
 
 $allPrefs = collect_all_preferences();
 $rows = [];
@@ -127,7 +161,9 @@ foreach ($rows as $key => $row) {
 }
 
 if ($online) {
-    apply_http_checks($rows);
+    $httpCheckResult = apply_http_checks($rows);
+} else {
+    $httpCheckResult = ['performed' => false, 'probe_ok' => false, 'probe_code' => 0];
 }
 
 $rows = array_merge($rows, $missingRows);
@@ -139,7 +175,7 @@ if (dirname($csvPath) !== '' && ! is_dir(dirname($csvPath))) {
 }
 
 write_csv($csvRows, $csvPath);
-print_summary($rows, $missingCount, $allPrefs, $online, $includeMissing, $csvPath, $csvRows);
+print_summary($rows, $missingCount, $allPrefs, $online, $includeMissing, $csvPath, $csvRows, $httpCheckResult);
 
 exit(0);
 
@@ -149,6 +185,14 @@ exit(0);
 function collect_all_preferences()
 {
     $all = [];
+    $skipExecuteModules = ['ocr'];
+
+    $collectHandler = set_error_handler(static function ($severity, $message, $file, $line) {
+        if (in_array($severity, [E_WARNING, E_NOTICE, E_DEPRECATED, E_USER_WARNING, E_USER_NOTICE, E_USER_DEPRECATED], true)) {
+            return true;
+        }
+        return false;
+    });
 
     foreach (glob('lib/prefs/*.php') as $file) {
         $module = substr(basename($file), 0, -4);
@@ -156,27 +200,142 @@ function collect_all_preferences()
             continue;
         }
 
-        $function = "prefs_{$module}_list";
+        $file = str_replace('\\', '/', $file);
 
-        if (! function_exists($function)) {
-            include_once $file;
+        if (in_array($module, $skipExecuteModules, true)) {
+            $list = extract_pref_help_from_source($file);
+        } else {
+            $function = "prefs_{$module}_list";
+
+            if (! function_exists($function)) {
+                include_once $file;
+            }
+
+            if (! function_exists($function)) {
+                continue;
+            }
+
+            $list = $function();
         }
 
-        if (! function_exists($function)) {
-            continue;
-        }
-
-        $list = $function();
         foreach ($list as $prefName => $raw) {
             $all[$prefName] = [
-                'file' => str_replace('\\', '/', $file),
+                'file' => $file,
                 'help' => $raw['help'] ?? null,
                 'line' => find_pref_line($file, $prefName),
             ];
         }
     }
 
+    if ($collectHandler !== null) {
+        restore_error_handler();
+    }
+
     return $all;
+}
+
+/**
+ * Parse preference metadata from source without executing prefs_*_list().
+ *
+ * Used for modules with heavy CLI side effects (e.g. shell commands).
+ *
+ * @return array<string, array{help?: string}>
+ */
+function extract_pref_help_from_source($file)
+{
+    $content = file_get_contents($file);
+    if ($content === false) {
+        return [];
+    }
+
+    $vars = [];
+    if (preg_match('/function\s+prefs_[a-z0-9_]+_list\s*\([^)]*\)\s*\{(.*)/is', $content, $fnMatch)) {
+        $beforeReturn = $fnMatch[1];
+        if (preg_match('/^(.*?)(?:return\s+\[|\$prefs\s*=\s*\[)/s', $beforeReturn, $preambleMatch)) {
+            if (
+                    preg_match_all(
+                        '/\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([\'"])([^\'"]*)\2/',
+                        $preambleMatch[1],
+                        $varMatches,
+                        PREG_SET_ORDER
+                    )
+            ) {
+                foreach ($varMatches as $match) {
+                    $vars[$match[1]] = $match[3];
+                }
+            }
+        }
+    }
+
+    $list = [];
+    if (preg_match_all("/^\s*['\"]([a-zA-Z0-9_]+)['\"]\s*=>\s*\[/m", $content, $prefMatches)) {
+        foreach ($prefMatches[1] as $prefName) {
+            $list[$prefName] = [];
+        }
+    }
+
+    $currentPref = null;
+    foreach (explode("\n", $content) as $line) {
+        if (preg_match("/^\s*['\"]([a-zA-Z0-9_]+)['\"]\s*=>\s*\[/", $line, $prefMatch)) {
+            $currentPref = $prefMatch[1];
+            continue;
+        }
+
+        if ($currentPref === null || ! isset($list[$currentPref])) {
+            continue;
+        }
+
+        if (preg_match("/^\s*['\"]help['\"]\s*=>\s*['\"]([^'\"]*)['\"]/", $line, $helpMatch)) {
+            $list[$currentPref]['help'] = $helpMatch[1];
+            continue;
+        }
+
+        if (preg_match("/^\s*['\"]help['\"]\s*=>\s*\$([a-zA-Z_][a-zA-Z0-9_]*)/", $line, $helpMatch)) {
+            $help = $vars[$helpMatch[1]] ?? null;
+            if (is_string($help) && $help !== '') {
+                $list[$currentPref]['help'] = $help;
+            }
+            continue;
+        }
+
+        if (preg_match('/^\s*\],/', $line)) {
+            $currentPref = null;
+        }
+    }
+
+    return $list;
+}
+
+/**
+ * Preload statically parsed pref modules into PrefsLib cache (avoids shell side effects).
+ *
+ * @param array<string, string> $modules module name => pref file path
+ */
+function prime_prefslib_skipped_modules(array $modules)
+{
+    $prefslib = TikiLib::lib('prefs');
+    $ref = new ReflectionClass($prefslib);
+    $prop = $ref->getProperty('files');
+    $prop->setAccessible(true);
+    $files = $prop->getValue($prefslib);
+
+    foreach ($modules as $module => $path) {
+        if (isset($files[$module])) {
+            continue;
+        }
+        $parsed = extract_pref_help_from_source($path);
+        $modulePrefs = [];
+        foreach ($parsed as $name => $raw) {
+            $modulePrefs[$name] = [
+                'name' => $name,
+                'type' => 'text',
+                'help' => $raw['help'] ?? null,
+            ];
+        }
+        $files[$module] = $modulePrefs;
+    }
+
+    $prop->setValue($prefslib, $files);
 }
 
 function find_pref_line($file, $prefName)
@@ -308,9 +467,9 @@ function classify_row(array $row)
         return $row;
     }
 
-    if (url_path_contains_plus($resolved)) {
+    if (url_has_non_canonical_slug($resolved)) {
         $row['status'] = 'NON_CANONICAL';
-        $row['suggested_slug'] = suggest_slug_without_plus($original, $resolved);
+        $row['suggested_slug'] = suggest_canonical_slug($original, $resolved);
         return $row;
     }
 
@@ -344,41 +503,68 @@ function is_doc_tiki_url($url)
     return $host === 'doc.tiki.org' || $host === 'www.doc.tiki.org';
 }
 
-function url_path_contains_plus($url)
+function url_has_non_canonical_slug($url)
 {
-    $path = parse_url($url, PHP_URL_PATH) ?? '';
-    $fragment = parse_url($url, PHP_URL_FRAGMENT) ?? '';
-    return str_contains($path, '+') || str_contains($fragment, '+');
+    $path = urldecode(parse_url($url, PHP_URL_PATH) ?? '');
+    $fragment = urldecode(parse_url($url, PHP_URL_FRAGMENT) ?? '');
+    return slug_contains_non_canonical_chars($path) || slug_contains_non_canonical_chars($fragment);
 }
 
-function suggest_slug_without_plus($original, $resolved)
+function slug_contains_non_canonical_chars($segment)
+{
+    return str_contains($segment, '+') || str_contains($segment, ' ');
+}
+
+function suggest_canonical_slug($original, $resolved)
 {
     if (! preg_match('/^https?:\/\//i', $original)) {
         $fragment = '';
         if (str_contains($original, '#')) {
             [$original, $fragment] = explode('#', $original, 2);
-            $fragment = '#' . $fragment;
+            $fragment = '#' . canonicalize_slug_chars($fragment);
         }
-        return str_replace('+', '-', $original) . $fragment;
+        return canonicalize_slug_chars($original) . $fragment;
     }
     $parts = parse_url($resolved);
     if ($parts === false) {
         return '';
     }
-    $path = $parts['path'] ?? '';
-    $path = str_replace('+', '-', $path);
+    $path = canonicalize_slug_chars($parts['path'] ?? '');
     $out = ($parts['scheme'] ?? 'https') . '://' . ($parts['host'] ?? 'doc.tiki.org') . $path;
     if (! empty($parts['fragment'])) {
-        $out .= '#' . str_replace('+', '-', $parts['fragment']);
+        $out .= '#' . canonicalize_slug_chars(urldecode($parts['fragment']));
     }
     return $out;
 }
 
+function canonicalize_slug_chars($text)
+{
+    return str_replace(['+', ' '], '-', $text);
+}
+
 /**
+ * HTTP-verify doc.tiki.org links and update row status from the response.
+ *
+ * Probes https://doc.tiki.org/ first; if unreachable, per-URL checks are skipped.
+ * code === 0 on an individual URL → CHECK_FAILED (connectivity/check failure).
+ * code >= 400 → BROKEN (likely a real broken URL).
+ * NON_CANONICAL rows are checked but keep their status; EXTERNAL/MISSING are skipped.
+ *
  * @param list<array<string, mixed>> $rows
+ * @return array{performed: bool, probe_ok: bool, probe_code: int}
  */
 function apply_http_checks(array &$rows)
 {
+    $probe = probe_doc_tiki_org();
+    if (! $probe['ok']) {
+        $code = $probe['code'];
+        $msg = $code === 0
+            ? 'doc.tiki.org is unreachable (no HTTP response). Skipping per-URL checks.'
+            : "doc.tiki.org probe returned HTTP {$code}. Skipping per-URL checks.";
+        fwrite(STDERR, "Warning: {$msg}\n");
+        return ['performed' => false, 'probe_ok' => false, 'probe_code' => $code];
+    }
+
     $httpCache = [];
 
     foreach ($rows as $key => $row) {
@@ -402,12 +588,25 @@ function apply_http_checks(array &$rows)
             continue;
         }
 
-        if ($code === 0 || $code >= 400) {
+        if ($code === 0) {
+            $rows[$key]['status'] = 'CHECK_FAILED';
+        } elseif ($code >= 400) {
             $rows[$key]['status'] = 'BROKEN';
         } else {
             $rows[$key]['status'] = 'OK';
         }
     }
+
+    return ['performed' => true, 'probe_ok' => true, 'probe_code' => $probe['code']];
+}
+
+/**
+ * @return array{ok: bool, code: int}
+ */
+function probe_doc_tiki_org()
+{
+    $code = check_url_http('https://doc.tiki.org/');
+    return ['ok' => $code > 0 && $code < 400, 'code' => $code];
 }
 
 function check_url_http($url)
@@ -428,7 +627,6 @@ function check_url_http($url)
 
     curl_exec($ch);
     $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($code === 405 || $code === 501 || $code === 0) {
         $ch = curl_init($url);
@@ -441,7 +639,6 @@ function check_url_http($url)
         ]);
         curl_exec($ch);
         $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
     }
 
     return $code;
@@ -453,7 +650,7 @@ function check_url_http($url)
  */
 function filter_csv_rows(array $rows, $includeMissing)
 {
-    $allowed = ['BROKEN', 'NON_CANONICAL', 'EXTERNAL'];
+    $allowed = ['BROKEN', 'CHECK_FAILED', 'NON_CANONICAL', 'EXTERNAL'];
     if ($includeMissing) {
         $allowed[] = 'MISSING';
     }
@@ -515,7 +712,8 @@ function print_summary(
     $online,
     $includeMissing,
     $csvPath,
-    array $csvRows
+    array $csvRows,
+    array $httpCheckResult
 ) {
     $prefsWithHelp = 0;
     foreach ($allPrefs as $info) {
@@ -530,6 +728,7 @@ function print_summary(
 
     $counts = [
         'BROKEN' => 0,
+        'CHECK_FAILED' => 0,
         'NON_CANONICAL' => 0,
         'EXTERNAL' => 0,
         'OK' => 0,
@@ -551,7 +750,8 @@ function print_summary(
     echo "Admin help links scanned: {$adminHelp}\n";
     echo "Hardcoded doc.tiki.org URLs scanned: {$hardcoded}\n\n";
     echo 'Broken links: ' . $counts['BROKEN'] . "\n";
-    echo 'Non-canonical links (+): ' . $counts['NON_CANONICAL'] . "\n";
+    echo 'Check failed (no HTTP response): ' . $counts['CHECK_FAILED'] . "\n";
+    echo 'Non-canonical links (+ or space): ' . $counts['NON_CANONICAL'] . "\n";
     echo 'External links: ' . $counts['EXTERNAL'] . "\n";
     echo "Missing documentation (admin-visible, no help): {$missingCount}\n\n";
 
@@ -562,15 +762,24 @@ function print_summary(
     if (! $online) {
         echo "Note: Broken link detection was not run. Use --online to verify doc.tiki.org pages.\n\n";
     } else {
-        echo "Mode: online\n\n";
+        echo "Mode: online\n";
+        if (! $httpCheckResult['probe_ok']) {
+            echo "Note: doc.tiki.org probe failed; per-URL checks were skipped. "
+                . "Re-run when doc.tiki.org is reachable.\n";
+        } elseif ($counts['CHECK_FAILED'] > 0) {
+            echo "Note: CHECK_FAILED means no HTTP response (timeout, network, etc.), not a confirmed "
+                . "404. BROKEN with http_status 404/410 is a stronger signal of a bad link.\n";
+        }
+        echo "\n";
     }
 
     $csvNote = $includeMissing
-        ? 'BROKEN, NON_CANONICAL, EXTERNAL, MISSING'
-        : 'BROKEN, NON_CANONICAL, EXTERNAL only';
+        ? 'BROKEN, CHECK_FAILED, NON_CANONICAL, EXTERNAL, MISSING'
+        : 'BROKEN, CHECK_FAILED, NON_CANONICAL, EXTERNAL only';
     echo "CSV: {$csvPath} ({$csvNote}, " . count($csvRows) . " rows)\n";
 
     print_detail_section($rows, 'BROKEN', 20);
+    print_detail_section($rows, 'CHECK_FAILED', 20);
     print_detail_section($rows, 'NON_CANONICAL', 20);
     print_detail_section($rows, 'EXTERNAL', 10);
 
