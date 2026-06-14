@@ -227,6 +227,94 @@ class Services_File_Controller
         // when stored in the database the file contents is here and should not be sent back to the client
         $info['data'] = null;
 
+        // Zip extraction support for single-file uploads coming from the Element Plus uploader
+        try {
+            $isbatch = false;
+            if (! empty($input->asArray('isbatch')) && $input->isArray('isbatch')) {
+                $isbatch = $input->asArray('isbatch')[0];
+            } elseif ($input->offsetExists('isbatch')) {
+                $isbatch = $input->isbatch->word();
+            } elseif ($input->offsetExists('isbatch[]')) {
+                $isbatch = $input->offsetGet('isbatch[]');
+            }
+
+            if ($isbatch && stripos($type, 'zip') !== false) {
+                global $user;
+                $perms = Perms::get('file gallery', $gal_info['galleryId']);
+                if ($perms->batch_upload_files) {
+                    $errors = [];
+                    $tmpFile = null;
+                    $createdTmp = false;
+                    if (isset($_FILES['data']) && is_uploaded_file($_FILES['data']['tmp_name'])) {
+                        $tmpFile = $_FILES['data']['tmp_name'];
+                    } else {
+                        $tmpFile = tempnam(sys_get_temp_dir(), 'tiki_zip_');
+                        if ($tmpFile !== false) {
+                            file_put_contents($tmpFile, $data);
+                            $createdTmp = true;
+                        }
+                    }
+
+                    if ($tmpFile && file_exists($tmpFile)) {
+                        try {
+                            $createdFiles = null;
+                            $filegallib->process_batch_file_upload(
+                                $gal_info['galleryId'],
+                                $tmpFile,
+                                $user,
+                                '',
+                                $errors,
+                                $createdFiles
+                            );
+                        } catch (Exception $e) {
+                            Feedback::error($e->getMessage());
+                        }
+                        if ($errors) {
+                            Feedback::error(['mes' => $errors]);
+                        } else {
+                            try {
+                                $filegallib->remove_file($info, '', true);
+                            } catch (Exception $e) {
+                                Feedback::error($e->getMessage());
+                            }
+
+                            // If createdFiles provided, return a safe minimal response listing them
+                            if (! empty($createdFiles) && is_array($createdFiles)) {
+                                $filesResp = [];
+                                foreach ($createdFiles as $cf) {
+                                    $name = isset($cf['name']) ? $cf['name'] : '';
+                                    // sanitize name for JSON: drop invalid UTF-8 sequences
+                                    $sanitized = @iconv('UTF-8', 'UTF-8//IGNORE', (string)$name);
+                                    if ($sanitized === false) {
+                                        $sanitized = preg_replace('/[\x00-\x1F\x7F]/', '', (string)$name);
+                                    }
+                                    $filesResp[] = [
+                                        'name' => $sanitized,
+                                        'fileId' => (int)($cf['fileId'] ?? 0),
+                                        'syntax' => isset($cf['syntax']) ? (string)$cf['syntax'] : '',
+                                    ];
+                                }
+
+                                $util->setTicket();
+                                return [
+                                    'files' => $filesResp,
+                                    'ticket' => $util->getTicket(),
+                                ];
+                            }
+                        }
+                    }
+
+                    if (! empty($createdTmp) && ! empty($tmpFile) && file_exists($tmpFile)) {
+                        @unlink($tmpFile);
+                    }
+                } else {
+                    Feedback::error(tra('You don\'t have permission to upload zipped file packages'));
+                }
+            }
+        } catch (Exception $e) {
+            Feedback::error($e->getMessage());
+        }
+
         $util->setTicket();
         return [
             'size' => $size,

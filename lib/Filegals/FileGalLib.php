@@ -753,7 +753,7 @@ class FileGalLib extends TikiLib
         return 'fgals_';
     }
 
-    public function process_batch_file_upload($galleryId, $file, $user, $description, &$errors)
+    public function process_batch_file_upload($galleryId, $file, $user, $description, &$errors, &$createdFiles = null)
     {
         $extract_dir = 'temp/' . basename($file) . '/';
         mkdir($extract_dir);
@@ -789,6 +789,10 @@ class FileGalLib extends TikiLib
             return false;
         }
         rewinddir($h);
+        // prepare createdFiles container
+        if (is_null($createdFiles)) {
+            $createdFiles = [];
+        }
         while (($file = readdir($h)) !== false) {
             if ($file != '.' && $file != '..' && is_file($extract_dir . '/' . $file)) {
                 if (false === $data = @file_get_contents($extract_dir . $file)) {
@@ -802,6 +806,14 @@ class FileGalLib extends TikiLib
                 ]);
                 $type = TikiLib::lib('mime')->from_path($file, $extract_dir . $file);
                 $fileId = $tikiFile->replace($data, $type, $file, $file);
+                if ($fileId) {
+                    // collect minimal info about created file
+                    $createdFiles[] = [
+                        'fileId' => $fileId,
+                        'name' => $file,
+                        'syntax' => $this->getWikiSyntax($galleryId, null),
+                    ];
+                }
                 unlink($extract_dir . $file);
             }
         }
