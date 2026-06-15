@@ -30,7 +30,7 @@
             {/if}
             {if $prefs.feature_community_list_country eq 'y'}
                 <td class="text">
-                    {$listuserscountry[changes]|countryflagname}&nbsp;{tr}{$listuserscountry[changes]}{/tr}&nbsp;
+                    {$listuserscountry[changes]|countryflagwithlabel}&nbsp;{tr}{$listuserscountry[changes]}{/tr}&nbsp;
                 </td>
             {/if}
             {if $prefs.feature_community_list_distance eq 'y'}

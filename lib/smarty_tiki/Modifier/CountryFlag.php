@@ -12,7 +12,8 @@ namespace SmartyTiki\Modifier;
  *
  * - type:     modifier
  * - name:     countryflag
- * - purpose:  Returns a specified user's country flag
+ * - purpose:  Returns a specified user's country flag. Takes a user login, not a country
+ *             name: use countryflagwithlabel or countryflagemoji for a country name.
  *
  * @author
  * @param string

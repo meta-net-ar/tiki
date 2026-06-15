@@ -5,10 +5,10 @@
             {section name=ix loop=$languages}
                 {$val=$languages[ix].value|escape}
                 {$langname=$languages[ix].name|escape}
-                {$flag=$languages[ix].flag|escape}
                 {$class=$languages[ix].class|escape}
-                {if $flag neq ''}
-                    <a href="tiki-switch_lang.php?languageAdmin={$val}" title="{$langname}" class="icon {$class}">{$languages[ix].flag|countryflagname}</a>
+                {$flagemoji=$languages[ix].flag|countryflagemoji}
+                {if $flagemoji neq ''}
+                    <a href="tiki-switch_lang.php?languageAdmin={$val}" title="{$langname}" aria-label="{$langname}" class="icon {$class}">{$flagemoji}</a>
                 {else}
                     {button _text="$langname" href="tiki-switch_lang.php?languageAdmin=$val" _title="$langname" _class="$class"}
                 {/if}

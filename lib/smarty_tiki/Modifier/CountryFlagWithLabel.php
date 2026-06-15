@@ -11,12 +11,15 @@ namespace SmartyTiki\Modifier;
  * Smarty modifier plugin to render a country flag emoji from a country name.
  *
  * - type:     modifier
- * - name:     countryflagname
- * - purpose:  Returns the emoji flag for a given Tiki country name (e.g. 'France', 'United_Kingdom')
+ * - name:     countryflagwithlabel
+ * - purpose:  Returns the emoji flag for a given Tiki country name (e.g. 'France', 'United_Kingdom'),
+ *             together with the translated country name as an accessible label. The label is
+ *             exposed through the title and aria-label attributes, it is not rendered as text.
+ *             Use countryflagemoji instead when the surrounding markup already provides a label.
  *
- * Example: {$country|countryflagname}
+ * Example: {$country|countryflagwithlabel}
  */
-class CountryFlagName
+class CountryFlagWithLabel
 {
     public function handle(string $countryName): string
     {

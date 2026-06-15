@@ -5,10 +5,10 @@
                 {foreach $languages as $flagarray}
                     {$val=$flagarray.value|escape}
                     {$langname=$flagarray.name|escape}
-                    {$flag=$flagarray.flag|escape}
                     {$class=$flagarray.class|escape}
-                    {if $flag neq ''}
-                        <a href="tiki-switch_lang.php?language={$val}" title="{$langname}" class="icon {$class}">{$flagarray.flag|countryflagname}</a>
+                    {$flagemoji=$flagarray.flag|countryflagemoji}
+                    {if $flagemoji neq ''}
+                        <a href="tiki-switch_lang.php?language={$val}" title="{$langname}" aria-label="{$langname}" class="icon {$class}">{$flagemoji}</a>
                     {else}
                         {button _text="$langname" href="tiki-switch_lang.php?language=$val" _title="$langname" _class="$class"}
                     {/if}
