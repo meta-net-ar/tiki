@@ -990,13 +990,7 @@ class Services_Comment_Controller
                 ['version' => $version]
             );
 
-            $diffInfo = [];
-
-            foreach ($history['data'] as $info) {
-                $field_info = $trackerLib->get_field_info($info['fieldId']);
-                $info['fieldName'] = $field_info['name'];
-                $diffInfo[] = $info;
-            }
+            $diffInfo = $history['data'];
         }
         // add some specific js to set up comment post form in a modal dialog
         // so it can refresh the page after the post
