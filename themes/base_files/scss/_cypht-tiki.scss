@@ -570,6 +570,50 @@
         .folders .menu_combined_trackers a { font-size: 0; }
         .folders .menu_combined_trackers .account_icon { padding-right: 0; font-size: 1rem; }
     }
+
+    // Keyboard shortcuts (keyboard_shortcuts/site.css)
+    .edit_shortcut_form {
+        max-width: 100%;
+        .shortcut_edit_fields {
+            display: flex;
+            flex-direction: column;
+            max-width: 32rem;
+        }
+        .shortcut_edit_title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            word-break: break-word;
+        }
+        .edit_shortcut_field .form-label {
+            font-weight: normal;
+            margin-bottom: 0.35rem;
+        }
+    }
+
+    // Block list (site.css)
+    .blocked_senders_table {
+        .blocked_sender_fld {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .blocked_behavior_fld {
+            max-width: 180px;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+        .blocked_sender_actions a {
+            cursor: pointer;
+        }
+    }
 }
 
 .mobile.tiki-cypht, .mobile.tiki-webmail {
@@ -836,6 +880,17 @@
         .message_list {
             margin-top: 0px !important;
             .list_controls.on_mobile #imap_filter_form .imap_keyword { width: 100%; }
+        }
+
+        .edit_shortcut_form {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            .shortcut_edit_fields {
+                max-width: 100%;
+            }
+        }
+        .blocked_senders_table .blocked_sender_fld {
+            max-width: 120px;
         }
     }
 
