@@ -280,6 +280,33 @@ class Services_File_Controller
 
                             // If createdFiles provided, return a safe minimal response listing them
                             if (! empty($createdFiles) && is_array($createdFiles)) {
+                                // Apply categories requested to each created file
+                                $categories = [];
+                                if ($input->isArray('cat_categories')) {
+                                    $categories = $input->asArray('cat_categories');
+                                } elseif (! empty($_REQUEST['cat_categories'])) {
+                                    $categories = $_REQUEST['cat_categories'];
+                                }
+                                if (! is_array($categories)) {
+                                    $categories = [$categories];
+                                }
+
+                                if (! empty($categories)) {
+                                    $categlib = TikiLib::lib('categ');
+                                    foreach ($createdFiles as $cf) {
+                                        $newId = (int)($cf['fileId'] ?? 0);
+                                        if ($newId > 0) {
+                                            $name = $cf['name'] ?? '';
+                                            $href = "tiki-download_file.php?fileId=$newId";
+                                            try {
+                                                $categlib->update_object_categories($categories, $newId, 'file', $description ?: null, $name ?: null, $href);
+                                            } catch (Exception $e) {
+                                                Feedback::error($e->getMessage());
+                                            }
+                                        }
+                                    }
+                                }
+
                                 $filesResp = [];
                                 foreach ($createdFiles as $cf) {
                                     $name = isset($cf['name']) ? $cf['name'] : '';
