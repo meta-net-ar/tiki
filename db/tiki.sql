@@ -1686,7 +1686,6 @@ INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `s
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s','Machine Learning','tiki-ml-list',820,'feature_machine_learning','tiki_p_machine_learning','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','List Models','tiki-ml-list',825,'feature_machine_learning','tiki_p_machine_learning','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s', 'Accounting', 'tiki-accounting_books.php', 830, 'feature_accounting', 'tiki_p_acct_view', '', 0);
-INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o', 'Accounting books', 'tiki-accounting_books.php', 835, 'feature_accounting', 'tiki_p_acct_view', '', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s','Surveys','tiki-list_surveys.php',850,'feature_surveys','tiki_p_take_survey','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','List Surveys','tiki-list_surveys.php',855,'feature_surveys','tiki_p_take_survey','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Stats','tiki-survey_stats.php',860,'feature_surveys','tiki_p_view_survey_stats','',0);
@@ -3596,7 +3595,6 @@ UPDATE tiki_menu_options SET icon = 'toggle-on' WHERE name = 'Offline mode';
 UPDATE tiki_menu_options SET icon = 'table' WHERE name = 'Manage Tabular Formats';
 UPDATE tiki_menu_options SET icon = 'robot' WHERE name = 'Machine Learning';
 UPDATE tiki_menu_options SET icon = 'layer-group' WHERE name = 'List Models';
-UPDATE tiki_menu_options SET icon = 'book' WHERE name = 'Accounting books';
 UPDATE tiki_menu_options SET icon = 'check-square' WHERE name = 'Admin Surveys';
 UPDATE tiki_menu_options SET icon = 'envelope' WHERE name = 'Send Newsletters';
 UPDATE tiki_menu_options SET icon = 'file-alt' WHERE name = 'Admin Newsletters';
