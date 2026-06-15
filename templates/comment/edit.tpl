@@ -36,8 +36,14 @@
                             <div class="card bg-body-tertiary">
                                 <div class="card-body">
                                     {foreach $diffInfo as $info}
-                                        <label>{$info.fieldName}</label> {*{$info.value} => {$info.new}<br>*}
-                                        {trackeroutput fieldId=$info.fieldId list_mode='y' history=y process=y oldValue=$info.value value=$info.new diff_style='sidediff'}
+                                        {if $info.fieldId eq HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE}
+                                            <label>{tr}Status{/tr}</label>: {$info.value} -> {$info.new}
+                                        {elseif !empty($info.isDeletedField)}
+                                            <label>{$info.fieldName}</label>: {$info.value|escape}{if empty($info.newValueUnavailable)} -> {$info.new|escape}{/if}
+                                        {else}
+                                            <label>{$info.fieldName}</label> {*{$info.value} => {$info.new}<br>*}
+                                            {trackeroutput fieldId=$info.fieldId list_mode='y' history=y process=y oldValue=$info.value value=$info.new diff_style='sidediff'}
+                                        {/if}
                                     {/foreach}
                                 </div>
                             </div>
