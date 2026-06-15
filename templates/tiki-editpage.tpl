@@ -481,7 +481,7 @@
                                     <div class="col-md-8" id="showstructs">
                                         <ul>
                                             {foreach from=$showstructs item=page_info}
-                                                <li>{$page_info.pageName}{if !empty(${$page_info.outputType}.page_alias)}({$page_info.page_alias}){/if}</li>
+                                                <li>{$page_info.pageName}{if !empty($page_info.page_alias)}({$page_info.page_alias}){/if}</li>
                                             {/foreach}
                                         </ul>
                                     </div>
