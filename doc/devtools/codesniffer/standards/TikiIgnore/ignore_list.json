@@ -108,10 +108,7 @@
         "lib/language/FileType/Php.php": {
             "class:Language_FileType_Php": true
         },
-        "lib\/language\/FileType\/Js.php": {
-            "class:Language_FileType_Js": true
-        },
-        "lib\/language\/GetStrings.php": {
+        "lib/language/GetStrings.php": {
             "class:Language_GetStrings": true
         },
         "lib/language/MergeFiles.php": {
@@ -7257,10 +7254,7 @@
         "lib/language/FileType/Php.php": {
             "Language_FileType_Php": true
         },
-        "lib\/language\/FileType\/Js.php": {
-            "Language_FileType_Js": true
-        },
-        "lib\/language\/GetStrings.php": {
+        "lib/language/GetStrings.php": {
             "Language_GetStrings": true
         },
         "lib/language/MergeFiles.php": {
