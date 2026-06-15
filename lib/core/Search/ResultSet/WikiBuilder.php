@@ -28,6 +28,10 @@ class Search_ResultSet_WikiBuilder
             if ($name == 'group') {
                 $arguments = $argumentParser->parse($match->getArguments());
 
+                if ($this->isReportingEngineGroup($arguments)) {
+                    continue;
+                }
+
                 $field = $arguments['field'] ?? 'aggregate';
                 $collect = explode(',', $arguments['collect'] ?? 'user');
                 $this->result->groupBy($field, $collect);
@@ -44,5 +48,25 @@ class Search_ResultSet_WikiBuilder
         if ($this->paginationArguments) {
             $this->result->setMaxResults($this->paginationArguments['max']);
         }
+    }
+
+    /**
+     * New reporting-engine {group} blocks use parameters like name=,
+     * size=, order= and are handled by the Aggregation\WikiBuilder.
+     * Old-style {group} blocks use collect= for in-memory grouping.
+     */
+    private function isReportingEngineGroup(array $arguments): bool
+    {
+        if ($this->result->hasAggregations()) {
+            return true;
+        }
+
+        $newStyleKeys = ['name', 'size', 'order', 'min', 'missing', 'label', 'others', 'total', 'palette'];
+        foreach ($newStyleKeys as $key) {
+            if (isset($arguments[$key])) {
+                return true;
+            }
+        }
+        return false;
     }
 }

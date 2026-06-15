@@ -133,23 +133,30 @@ Multiple {chart} blocks are supported and render side by side.
                     {/foreach}
                     {$ds = ['data' => $data, 'backgroundColor' => $bgColors]}
                 {else}
-                    {* bar/line: prefer per-bucket palette colors when set *}
-                    {$bgColors = []}
-                    {$hasBucketColors = false}
-                    {$i = 0}
-                    {foreach $buckets as $b}
-                        {if isset($b.metrics.__bucket_color__) and $b.metrics.__bucket_color__}
-                            {$bgColors[] = $b.metrics.__bucket_color__}
-                            {$hasBucketColors = true}
-                        {else}
-                            {$bgColors[] = $colors[$dsIndex % count($colors)]}
-                        {/if}
-                        {$i = $i + 1}
-                    {/foreach}
-                    {if $hasBucketColors}
-                        {$ds = ['data' => $data, 'backgroundColor' => $bgColors]}
-                    {else}
+                    {if count($valueList) > 1}
+                        {* Multi-dataset (stacked): one color per dataset/series,
+                           consistent across all buckets. Bucket palette is for
+                           distinguishing buckets, not series. *}
                         {$ds = ['data' => $data, 'backgroundColor' => $colors[$dsIndex % count($colors)]]}
+                    {else}
+                        {* Single dataset: use per-bucket palette colors when set *}
+                        {$bgColors = []}
+                        {$hasBucketColors = false}
+                        {$i = 0}
+                        {foreach $buckets as $b}
+                            {if isset($b.metrics.__bucket_color__) and $b.metrics.__bucket_color__}
+                                {$bgColors[] = $b.metrics.__bucket_color__}
+                                {$hasBucketColors = true}
+                            {else}
+                                {$bgColors[] = $colors[$dsIndex % count($colors)]}
+                            {/if}
+                            {$i = $i + 1}
+                        {/foreach}
+                        {if $hasBucketColors}
+                            {$ds = ['data' => $data, 'backgroundColor' => $bgColors]}
+                        {else}
+                            {$ds = ['data' => $data, 'backgroundColor' => $colors[$dsIndex % count($colors)]]}
+                        {/if}
                     {/if}
                 {/if}
 
