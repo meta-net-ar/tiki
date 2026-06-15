@@ -1958,7 +1958,7 @@ import { defaults as defaultControls } from "ol/control";
                 // Handle apply button
                 $applyBtn.on("click", function () {
                     if (selectedFeature) {
-                        container.map.getInteractions().forEach(function(interaction) {
+                        container.map.getInteractions().forEach(function (interaction) {
                             if (interaction instanceof ol.interaction.Select) {
                                 interaction.getFeatures().clear();
                             }
@@ -2239,8 +2239,8 @@ import { defaults as defaultControls } from "ol/control";
                         field.val("").trigger("change");
                     }
                 });
-                map.on("zoomend", function (e, lonlat) {
-                    var coords = field.val().split(","),
+                /* map.on("zoomend", function (e, lonlat) {
+                    const coords = field.val().split(","),
                         lon = 0,
                         lat = 0;
                     if (coords.length > 1) {
@@ -2248,7 +2248,10 @@ import { defaults as defaultControls } from "ol/control";
                         lat = coords[1];
                     }
                     field.val(formatLocation(lat, lon, map.getView().getZoom())).trigger("change");
-                });
+                });*/
+                // control = new ol.interaction.Pointer({
+                //     handleUpEvent: options.click,
+                // });
             }
         });
 
