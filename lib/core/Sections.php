@@ -393,6 +393,13 @@ class Sections
                     $k = $request[$info['key']];
                     // when using wiki_url_scheme the page request var is the page slug, not the page/object name
                     if ($prefs['wiki_url_scheme'] !== 'urlencode' && $info['objectType'] === 'wiki page') {
+                        global $jitRequest;
+                        if ($prefs["feature_sefurl_tracker_prefixalias"] == 'y') {
+                            $referencedPages = TikiLib::lib('wiki')->get_pages_by_alias($k);
+                            if ($referencedPages) {
+                                $k = $referencedPages[0];
+                            }
+                        }
                         $k = TikiLib::lib('wiki')->get_page_by_slug($k);
                     }
                 }

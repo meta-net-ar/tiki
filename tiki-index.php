@@ -392,6 +392,8 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
                     $_REQUEST['page'] = $newPage;
                     $_GET['itemId'] = $suffix;  // \ParserLib::parse_wiki_argvariable uses $_GET
                     $_GET['page'] = $newPage;
+                    $jitGet = new JitFilter($_GET);
+                    $jitRequest = new JitFilter($_REQUEST);
                     $smarty->assign('canonical_ending', urlencode(trim(substr($page, strlen($newPage)))));
                     $page = $newPage;
                     $info = $tikilib->get_page_info($_REQUEST['page']);
