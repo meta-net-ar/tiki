@@ -21,7 +21,7 @@ function updateAutocompleteExcludeParentIdsOptions() {
             const values = autocompleteExcludeParentIds.val();
             autocompleteExcludeParentIds.empty();
             data.forEach(function (object) {
-                const value = `${object.parent_object_id_field}:${object.itemId}`;
+                const value = `${object.parent_object_id_field}:${object.object_id}`;
                 autocompleteExcludeParentIds.append(new Option(object.title, value, values.includes(value), values.includes(value)));
             });
         },

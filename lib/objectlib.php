@@ -304,8 +304,8 @@ class ObjectLib extends TikiLib
     {
         $mappedChildParent = [
             // object type => [parent_object_id_field => parent_object_type]
-            'trackeritem' => ['parent_object_id' => 'tracker'],
-            'calendaritem' => ['parent_object_id' => 'calendar'],
+            'trackeritem' => ['tracker_id' => 'tracker'],
+            'calendaritem' => ['calendar_id' => 'calendar'],
             'file' => ['gallery_id' => 'file gallery'],
             'file gallery' => ['gallery_id' => 'file gallery'],
             'forum post' => ['forum_id' => 'forum'],
@@ -326,21 +326,22 @@ class ObjectLib extends TikiLib
             return reset($item);
         }, $mappedChildParent));
 
-        $result = $this->query(
-            "SELECT `objectId`, `itemId`, `type` FROM `tiki_objects` WHERE `type` IN (" . implode(',', array_fill(0, count($mappedChildParent), '?')) . ")",
-            $parentTypes
-        );
+        $lib = TikiLib::lib('unifiedsearch');
+        $query = $lib->buildQuery([
+            'type' => $parentTypes,
+        ]);
+
+        $result = $query->search($lib->getIndex());
 
         $out = [];
 
-        while ($res = $result->fetchRow()) {
+        foreach ($result as $res) {
             $out[] = [
-                'objectId' => $res['objectId'],
-                'itemId' => $res['itemId'],
-                'type' => $res['type'],
-                'title' => $this->get_title($res['type'], $res['itemId']),
+                'object_id' => $res['object_id'],
+                'type' => $res['object_type'],
+                'title' => $res['title'],
                 'parent_object_id_field' => key(array_values(array_filter($mappedChildParent, function ($item) use ($res) {
-                    return reset($item) === $res['type'];
+                    return reset($item) === $res['object_type'];
                 }))[0]),
             ];
         }
