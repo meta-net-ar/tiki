@@ -2061,7 +2061,7 @@ import { defaults as defaultControls } from "ol/control";
 
                 // Hook into feature selection to show colorpicker
                 $(container).on("modechanged", function () {
-                    if (container.modeManager.activeMode.name === "modify_feature") {
+                    if (container.modeManager.activeMode.name === tr("Select/Modify")) {
                         // Add colorpicker trigger on feature selection when Shift is held
                         map.on("click", function (evt) {
                             if (evt.originalEvent.shiftKey) {
