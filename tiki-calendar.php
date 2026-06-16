@@ -114,6 +114,8 @@ if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQ
     $defaultCalendarId = $_REQUEST["calIds"][0];
     $_SESSION['CalendarViewGroups'] = array_intersect($_REQUEST["calIds"], array_keys($calendars));
     if (! empty($user)) {
+        // Store default_calendars as a serialized array.
+        // This is later read using unserialize() when loading preferences.
         $tikilib->set_user_preference($user, 'default_calendars', serialize($_SESSION['CalendarViewGroups']));
     }
 } elseif (isset($_REQUEST["calIds"]) and ! is_array($_REQUEST["calIds"])) {
@@ -136,10 +138,15 @@ if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQ
 
 if ($use_default_calendars) {
     if ($prefs['feature_default_calendars'] == 'y') {
-        $_SESSION['CalendarViewGroups'] = array_intersect(is_array($prefs['default_calendars']) ? $prefs['default_calendars'] : unserialize($prefs['default_calendars']), array_keys($calendars));
+        $defaultCalendars = [];
+        if (! empty($prefs['default_calendars'])) {
+            $defaultCalendars = is_array($prefs['default_calendars']) ? $prefs['default_calendars'] : unserialize($prefs['default_calendars']);
+        }
+        $_SESSION['CalendarViewGroups'] = array_intersect($defaultCalendars, array_keys($calendars));
     } elseif (! empty($user)) {
         $user_default_calendars = $tikilib->get_user_preference($user, 'default_calendars', array_keys($calendars));
         if (is_string($user_default_calendars)) {
+            // default_calendars is stored serialized (see set_user_preference usage above)
             $user_default_calendars = unserialize($user_default_calendars);
         }
         $_SESSION['CalendarViewGroups'] = $user_default_calendars;
