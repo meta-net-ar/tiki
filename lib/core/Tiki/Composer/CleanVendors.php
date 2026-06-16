@@ -197,53 +197,56 @@ class CleanVendors
     }
 
     /**
-     * Supports:
-     *  - --log (enables both .log and .json reports in temp/dev by default)
-     *  - --log-file=/path/to/file.log
-     *  - --json-file=/path/to/file.json
-     */
+    *Logging is enabled automatically when Composer runs in verbose mode:
+    *  - -v / --verbose / -vv / -vvv (enables logging)
+    *  - --log-file=/path/to/file.log
+    *  - --json-file=/path/to/file.json
+    */
     private static function parseLogOptions(Event $event): void
     {
-        $args = (array) $event->getArguments();
+        $io = $event->getIO();
 
-        if (! in_array('--log', $args, true)) {
+        $isVerbose = $io->isVerbose();          // -v / --verbose
+        $isVeryVerbose = $io->isVeryVerbose();  // -vv
+        $isDebug = $io->isDebug();              // -vvv
+
+        if (! ($isVerbose || $isVeryVerbose || $isDebug)) {
             return;
         }
 
         self::$enableLog = true;
 
-        $tikiRoot = dirname(dirname(dirname(dirname(__DIR__))));
-
-        // Determine temp directory
+        $tikiRoot = dirname(__DIR__, 4);
         self::$logDir = self::getDefaultLogDirectory($tikiRoot);
 
-        $logFile = self::$logDir . DIRECTORY_SEPARATOR . 'composer_clean.log';
-        $jsonFile = self::$logDir . DIRECTORY_SEPARATOR . 'composer_clean.json';
-
-        foreach ($args as $arg) {
-            if (is_string($arg) && str_starts_with($arg, '--log-file=')) {
-                $logFile = (string) substr($arg, strlen('--log-file='));
-            } elseif (is_string($arg) && str_starts_with($arg, '--json-file=')) {
-                $jsonFile = (string) substr($arg, strlen('--json-file='));
-            }
-        }
+        $logFile = self::$logDir . '/composer_clean.log';
+        $jsonFile = self::$logDir . '/composer_clean.json';
 
         self::$logFile = self::normalizePath($logFile);
         self::$jsonFile = self::normalizePath($jsonFile);
 
-        $logDir = dirname(self::$logFile);
-        $jsonDir = dirname(self::$jsonFile);
+        self::ensureDirectory(dirname(self::$logFile));
+        self::ensureDirectory(dirname(self::$jsonFile));
 
-        if (! is_dir($logDir)) {
-            @mkdir($logDir, 0755, true);
-        }
-        if (! is_dir($jsonDir)) {
-            @mkdir($jsonDir, 0755, true);
+        self::initLogFile();
+    }
+
+    private static function ensureDirectory(string $dir): void
+    {
+        if (is_dir($dir)) {
+            return;
         }
 
-        @file_put_contents(
+        if (! mkdir($dir, 0755, true) && ! is_dir($dir)) {
+            throw new \RuntimeException("Failed to create directory: {$dir}");
+        }
+    }
+
+    private static function initLogFile(): void
+    {
+        file_put_contents(
             self::$logFile,
-            "=== Vendor Cleanup Log ===\n" . date('Y-m-d H:i:s') . "\n\n"
+            "=== Vendor Cleanup Log ===\n" . "Date: " . date('Y-m-d H:i:s') . "\n" . "\n\n"
         );
     }
 
