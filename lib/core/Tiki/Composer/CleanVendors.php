@@ -213,8 +213,8 @@ class CleanVendors
 
         $tikiRoot = dirname(dirname(dirname(dirname(__DIR__))));
 
-        // Default directory: temp/dev (as recommended)
-        self::$logDir = $tikiRoot . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . 'dev';
+        // Determine temp directory
+        self::$logDir = self::getDefaultLogDirectory($tikiRoot);
 
         $logFile = self::$logDir . DIRECTORY_SEPARATOR . 'composer_clean.log';
         $jsonFile = self::$logDir . DIRECTORY_SEPARATOR . 'composer_clean.json';
@@ -244,6 +244,25 @@ class CleanVendors
             self::$logFile,
             "=== Vendor Cleanup Log ===\n" . date('Y-m-d H:i:s') . "\n\n"
         );
+    }
+
+    /**
+     * Determine the default log directory using Tiki's preference system.
+     *
+     * Falls back to $tikiRoot/temp/dev if preference is not set.
+     *
+     * @param string $tikiRoot The root directory of the Tiki installation
+     * @return string The path to the temp directory (temp/dev subdirectory)
+     */
+    private static function getDefaultLogDirectory(string $tikiRoot): string
+    {
+        global $prefs;
+
+        if (isset($prefs['tmpDir']) && ! empty($prefs['tmpDir'])) {
+            return rtrim($prefs['tmpDir'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'dev';
+        }
+
+        return $tikiRoot . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . 'dev';
     }
 
     private static function normalizePath(string $path): string
