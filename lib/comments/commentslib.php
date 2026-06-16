@@ -2674,11 +2674,6 @@ class Comments extends TikiLib
                         ['version' => $ret[$key]['version']]
                     );
 
-                    foreach ($history['data'] as &$hist) {
-                        $field_info = TikiLib::lib('trk')->get_field_info($hist['fieldId']);
-                        $hist['fieldName'] = $field_info['name'];
-                    }
-
                     if (! empty($history['data'])) {
                         $ret[$key]['diffInfo'] = $history['data'];
                     }
