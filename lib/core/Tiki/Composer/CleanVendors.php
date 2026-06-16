@@ -20,6 +20,7 @@ class CleanVendors
         '.coveralls.yml',
         '.editorconfig',
         '.empty',
+        '.env.local',
         '.eslintignore',
         '.eslintrc',
         '.eslintrc.json',
@@ -389,44 +390,81 @@ class CleanVendors
         return true;
     }
 
-    private static function removeStandard(string $base, string $vendorsRoot, Event $event): void
+    // private static function removeStandard(string $base, string $vendorsRoot, Event $event): void
+    // {
+    //     $fs = new FileSystem();
+    //     $files = glob($base . '{,.}*[!.]', GLOB_MARK | GLOB_BRACE);
+
+    //     if (! $files) {
+    //         return;
+    //     }
+
+    //     foreach ($files as $file) {
+    //         $file = rtrim(str_replace('/', DIRECTORY_SEPARATOR, $file), DIRECTORY_SEPARATOR);
+
+    //         // Matching supports basename AND path tails like ".github/workflows"
+    //         if (self::isStandardPath($file)) {
+    //             $packageName = self::extractPackageName($file, $vendorsRoot);
+
+    //             try {
+    //                 $size = is_dir($file) ? self::getDirectorySize($file) : (float) @filesize($file);
+    //                 $fs->remove($file);
+
+    //                 self::$deletedFiles++;
+    //                 self::$deletedSize += (float) $size;
+    //                 self::$deletedPaths[] = $file;
+
+    //                 if ($packageName) {
+    //                     self::$affectedPackages[$packageName] = true;
+    //                 }
+    //             } catch (Exception $e) {
+    //                 $errorMsg = sprintf('Error deleting %s: %s', $file, $e->getMessage());
+    //                 $event->getIO()->writeError("<error>$errorMsg</error>");
+    //                 self::logMessage("ERROR: $errorMsg");
+    //             }
+
+    //             continue;
+    //         }
+
+    //         if (is_dir($file)) {
+    //             self::removeStandard($file . DIRECTORY_SEPARATOR, $vendorsRoot, $event);
+    //         }
+    //     }
+    // }
+
+    private static function removeStandard(string $vendorsRoot, string $vendorsRootBase, Event $event): void
     {
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($vendorsRoot, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
         $fs = new FileSystem();
-        $files = glob($base . '{,.}*[!.]', GLOB_MARK | GLOB_BRACE);
 
-        if (! $files) {
-            return;
-        }
+        foreach ($iterator as $file) {
+            $path = $file->getPathname();
 
-        foreach ($files as $file) {
-            $file = rtrim(str_replace('/', DIRECTORY_SEPARATOR, $file), DIRECTORY_SEPARATOR);
+            $normalized = strtolower(str_replace('\\', '/', $path));
 
-            // Matching supports basename AND path tails like ".github/workflows"
-            if (self::isStandardPath($file)) {
-                $packageName = self::extractPackageName($file, $vendorsRoot);
-
+            if (self::isStandardPath($path)) {
                 try {
-                    $size = is_dir($file) ? self::getDirectorySize($file) : (float) @filesize($file);
-                    $fs->remove($file);
+                    $size = $file->isDir()
+                        ? self::getDirectorySize($path)
+                        : (float) $file->getSize();
+
+                    $fs->remove($path);
 
                     self::$deletedFiles++;
-                    self::$deletedSize += (float) $size;
-                    self::$deletedPaths[] = $file;
+                    self::$deletedSize += $size;
+                    self::$deletedPaths[] = $path;
 
+                    $packageName = self::extractPackageName($path, $vendorsRootBase);
                     if ($packageName) {
                         self::$affectedPackages[$packageName] = true;
                     }
                 } catch (Exception $e) {
-                    $errorMsg = sprintf('Error deleting %s: %s', $file, $e->getMessage());
-                    $event->getIO()->writeError("<error>$errorMsg</error>");
-                    self::logMessage("ERROR: $errorMsg");
+                    $event->getIO()->writeError("Error deleting $path: " . $e->getMessage());
                 }
-
-                continue;
-            }
-
-            if (is_dir($file)) {
-                self::removeStandard($file . DIRECTORY_SEPARATOR, $vendorsRoot, $event);
             }
         }
     }
