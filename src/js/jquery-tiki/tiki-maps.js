@@ -242,31 +242,74 @@ import { defaults as defaultControls } from "ol/control";
     }
 
     function writeCoordinates(lonlat, map, fixProjection) {
-        var original = lonlat;
+        let coordinates = typeof lonlat.length === "number" ? lonlat : lonlat.getCoordinates();
+        const original = coordinates;
 
         if (fixProjection) {
-            lonlat = lonlat.transform(map.getView().getProjection(), new ol.proj.Projection({ code: "EPSG:4326" }));
+            lonlat = ol.proj.transform(
+                coordinates,
+                map.getView().getProjection(), // source — replaces map.getProjectionObject()
+                "EPSG:4326" // target
+            );
 
             if (!lonlat) {
-                lonlat = original;
+                coordinates = original;
             }
         }
 
-        let coords = lonlat.getCoordinates();
-
-        return formatLocation(coords[0], coords[1], map.getView().getZoom());
+        return formatLocation(coordinates[0], coordinates[1], map.getView().getZoom());
     }
 
     function formatLocation(lat, lon, zoom) {
-        // Convert , decimal points - where those are used
-        var strLon = "" + lon;
-        strLon.replace(",", ".");
-        var strLat = "" + lat;
-        strLat.replace(",", ".");
+        // Convert commas to decimal points - where those are used
+        let strLon = "" + lon;
+        strLon = strLon.replace(",", ".");
+        let strLat = "" + lat;
+        strLat = strLat.replace(",", ".");
         return strLon + "," + strLat + "," + zoom;
     }
 
     $.fn.createMap = function () {
+        function setFeatureColorStyle(feature, color, fillColor) {
+            let coloredStyle;
+
+            if (!fillColor) {
+                // no fillColor provided, use semi-transparent color
+                const rgba = Array.from(ol.color.asArray(color));
+                fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 2]);
+            }
+
+            const intent = feature.get("intent");
+
+            if (intent === "vectors") {
+                coloredStyle = new ol.style.Style({
+                    fill: new ol.style.Fill({ color: fillColor }),
+                    stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                });
+            } else if (intent === "marker") {
+                coloredStyle = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        anchor: [feature.get("offsetx"), feature.get("offsety")],
+                        anchorXUnits: "pixels",
+                        anchorYUnits: "pixels",
+                        src: feature.get("url"),
+                    }),
+                });
+            } else {
+                // Create a colored circle style
+                coloredStyle = new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 12,
+                        fill: new ol.style.Fill({ color: fillColor }),
+                        stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                    }),
+                });
+            }
+            // DIRECTLY set the style on the feature
+            feature.setStyle(coloredStyle);
+            return coloredStyle;
+        }
+
         this.each(function () {
             let id = $(this).attr("id"),
                 container = this,
@@ -277,101 +320,90 @@ import { defaults as defaultControls } from "ol/control";
 
             // Shared style function for all map features (accessible from both clustered and non-clustered layers)
             container.createMapFeatureStyle = function (feature) {
+                let color;
                 // Check for custom color from container-level storage (set by colorpicker)
-                var geom = feature.getGeometry();
+                const geom = feature.getGeometry();
                 if (geom && geom.getCoordinates) {
-                    var coords = geom.getCoordinates();
+                    const coords = geom.getCoordinates();
                     if (Array.isArray(coords)) {
-                        var key = coords.join(",");
+                        const key = coords.join(",");
                         if (container.featureColors && container.featureColors[key]) {
-                            return new ol.style.Style({
-                                geometry: feature.getGeometry(),
-                                image: new ol.style.Circle({
-                                    radius: 10,
-                                    fill: new ol.style.Fill({ color: container.featureColors[key] }),
-                                    stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
-                                }),
-                            });
+                            color = container.featureColors[key];
                         }
                     }
                 }
 
                 // Check for color on feature property
-                const intent = feature.get("intent");
-                if (intent === "vectors") {
-                    let borderColor = feature.get("color") ?? "#999";
-                    let fillColor = feature.get("fillColor");
+                color = color ?? feature.get("color") ?? "#999";
+                let fillColor = feature.get("fillColor");
 
-                    if (!fillColor) {
-                        // no separate fill colour provided so make the fill 50% opacity of the border
-                        const rgba = Array.from(ol.color.asArray(borderColor));
-                        fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 2]);
-                    }
-
-                    return new ol.style.Style({
-                        fill: new ol.style.Fill({ color: fillColor }),
-                        stroke: new ol.style.Stroke({ color: borderColor, width: 2 }),
-                    });
-                }
-
-                // Check if it's a marker with icon
-                if (intent === "marker") {
-                    return new ol.style.Style({
-                        geometry: feature.getGeometry(),
-                        image: new ol.style.Icon({
-                            anchor: [feature.get("offsetx"), feature.get("offsety")],
-                            anchorXUnits: "pixels",
-                            anchorYUnits: "pixels",
-                            src: feature.get("url"),
-                        }),
-                    });
-                }
-
-                // Default style: red triangle for unmarked features
-                return new ol.style.Style({
-                    geometry: feature.getGeometry(),
-                    image: new ol.style.RegularShape({
-                        points: 3,
-                        radius: 12,
-                        fill: new ol.style.Fill({ color: "#cc3333" }),
-                        stroke: new ol.style.Stroke({ color: "#ffffff", width: 2 }),
-                        rotation: 0,
-                    }),
-                });
+                return setFeatureColorStyle(feature, color, fillColor);
             };
 
             container.setupLayerEvents = function (vectors) {
-                selectionInteraction = new ol.interaction.Select({
-                    condition: ol.events.condition.click,
+                if (!selectionInteraction) {
+                    selectionInteraction = new ol.interaction.Select({
+                        condition: ol.events.condition.singleClick,
+                        //style: null,
+                    });
+
+                    map.addInteraction(selectionInteraction);
+
+                    selectionInteraction.on("select", function (event) {
+                        if (event.deselected.length) {
+                            event.deselected.forEach((feature) => {
+                                if (feature.executor) {
+                                    feature.executor();
+                                }
+                            });
+                        }
+                        if (event.selected.length) {
+                            event.selected.forEach(() => {
+                                container.showPopup.apply(null, [event]);
+                            });
+                        }
+                    });
+                }
+
+                const interactions = container.map.getInteractions().getArray();
+
+                // e.g. added by wikiplugin_appframe modify_feature
+                const modifyInteraction = interactions.find((interaction) => {
+                    return interaction instanceof ol.interaction.Modify && interaction.get("active");
                 });
 
-                map.addInteraction(selectionInteraction);
+                if (modifyInteraction) {
+                    modifyInteraction.on("modifyend", function (event) {
+                        event.features.getArray().forEach((feature) => {
+                            if (feature.executor) {
+                                feature.executor();
+                            }
+                        });
+                    });
+                }
 
-                selectionInteraction.on("select", function (event) {
-                    if (event.target.executor) {
-                        event.target.executor();
-                    }
-                    container.showPopup.apply(null, [event]);
+                // e.g. added by wikiplugin_appframe draw_polygon and draw_path
+                const drawInteraction = interactions.find((interaction) => {
+                    return interaction instanceof ol.interaction.Draw && interaction.get("active");
                 });
 
-                selectionInteraction.on("modified", function (event) {
-                    if (event.target.executor) {
-                        event.target.executor();
-                    }
-                });
-
-                selectionInteraction.on("added", function (event) {
-                    if (!event.target.get("color")) {
-                        event.target.set("color", "#6699cc");
-                    }
-                    if (!event.target.get("intent")) {
-                        event.target.set("intent", "vectors");
-                    }
-                });
+                if (drawInteraction) {
+                    drawInteraction.on("drawend", function (event) {
+                        if (event.feature) {
+                            if (!event.feature.get("color")) {
+                                event.feature.set("color", "#6699cc");
+                            }
+                            if (!event.feature.get("intent")) {
+                                event.feature.set("intent", "vectors");
+                            }
+                            $(document).trigger("drawend.tiki", [event]);
+                        }
+                    });
+                }
             };
 
             container.getLayer = function (name) {
-                var vectors;
+                let vectors;
 
                 if (name) {
                     if (!container.layers[name]) {
@@ -588,8 +620,8 @@ import { defaults as defaultControls } from "ol/control";
 
                         vectors.setZIndex(container.map.getLayers().getLength() * 1000);
                         container.setupLayerEvents(vectors);
-                        container.map.addLayer(vectors);
 
+                        container.layers[name] = vectors;
                         container.overlays.getLayers().push(vectors);
                     }
 
@@ -767,9 +799,9 @@ import { defaults as defaultControls } from "ol/control";
                 modes: [],
                 activeMode: null,
                 addMode: function (options) {
-                    var mode = $.extend(
+                    const mode = $.extend(
                         {
-                            title: tr("Default"),
+                            name: tr("Default"),
                             icon: null,
                             events: {
                                 activate: [],
@@ -781,15 +813,15 @@ import { defaults as defaultControls } from "ol/control";
                         options
                     );
 
-                    $.each(mode.layers, function (k, layer) {
+                    mode.layers.forEach((layer) => {
                         layer.displayInLayerSwitcher = false;
                         layer.setVisibility(false);
                         map.addLayer(layer);
                     });
 
-                    $.each(mode.controls, function (k, control) {
-                        control.autoActivate = false;
-                        map.addControl(control);
+                    mode.controls.forEach((control) => {
+                        control.setActive(false);
+                        map.addInteraction(control);
                     });
 
                     this.modes.push(mode);
@@ -806,15 +838,15 @@ import { defaults as defaultControls } from "ol/control";
                     return mode;
                 },
                 switchTo: function (modeName) {
-                    var manager = this;
-                    $.each(this.modes, function (k, mode) {
+                    const manager = this;
+                    this.modes.forEach((mode) => {
                         if (mode.name === modeName) {
                             manager.activate(mode);
                         }
                     });
                 },
                 register: function (eventName, modeName, callback) {
-                    $.each(this.modes, function (k, mode) {
+                    this.modes.forEach(function (mode) {
                         if (mode.name === modeName && callback) {
                             mode.events[eventName].push(callback);
                         }
@@ -826,15 +858,24 @@ import { defaults as defaultControls } from "ol/control";
                     }
 
                     this.activeMode = mode;
+                    const interactions = container.map.getInteractions();
 
-                    $.each(mode.controls, function (k, control) {
+                    mode.controls.forEach((control) => {
+                        interactions.forEach((interaction) => {
+                            if (interaction instanceof ol.interaction.Select && interaction instanceof control.constructor) {
+                                // edit modes need to disable the default select interaction
+                                interaction.getFeatures().clear();
+                                interaction.setActive(false);
+                            }
+                        });
                         control.setActive(true);
+                        container.setupLayerEvents(container.vectors);
                     });
-                    $.each(mode.layers, function (k, layer) {
+                    mode.layers.forEach((layer) => {
                         layer.setVisibility(true);
                     });
-                    $.each(mode.events.activate, function (k, f) {
-                        f.apply([], container);
+                    mode.events.activate.forEach(function (evt) {
+                        evt.apply([], container);
                     });
 
                     $(container).trigger("modechanged");
@@ -844,23 +885,26 @@ import { defaults as defaultControls } from "ol/control";
                         return;
                     }
 
-                    $.each(this.activeMode.controls, function (k, control) {
+                    this.activeMode.controls.forEach((control) => {
                         control.setActive(false);
                     });
-                    $.each(this.activeMode.layers, function (k, layer) {
+                    this.activeMode.layers.forEach((layer) => {
                         layer.setVisibility(false);
                     });
-                    $.each(this.activeMode.events.deactivate, function (k, f) {
-                        f.apply([], container);
+                    this.activeMode.events.deactivate.forEach((evt) => {
+                        evt.apply([], container);
                     });
 
                     this.activeMode = null;
                 },
             };
 
-            var defaultMode = {
-                controls: [],
+            const defaultMode = {
+                controls: [selectionInteraction],
+                name: tr("Default"),
             };
+
+            container.modeManager.addMode(defaultMode);
 
             var $mapBootstrapDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
 
@@ -935,12 +979,11 @@ import { defaults as defaultControls } from "ol/control";
 
             if ($(container).data("popup-style")) {
                 container.showPopup = function (e) {
-                    var pixel,
-                        feature,
-                        features = e.target.getFeatures();
+                    let pixel, feature;
+                    const features = e.target.getFeatures();
 
                     if (features.getLength()) {
-                        feature = features.getArray()[0];
+                        feature = features.item(0);
                         var clusterFeatures = feature.get("features");
                         if (clusterFeatures) {
                             if (clusterFeatures.length === 1) {
@@ -958,7 +1001,7 @@ import { defaults as defaultControls } from "ol/control";
                                 return;
                             }
                         } else {
-                            feature = features.getArray()[0];
+                            feature = features.item(0);
                         }
                     } else {
                         return;
@@ -982,7 +1025,12 @@ import { defaults as defaultControls } from "ol/control";
                         case "dialog":
                             var $modal = $(".footer-modal:not(.show)")
                                 .first()
+                                .addClass("modal-lg")
                                 .modal({})
+                                .one("show.bs.modal", function (event) {
+                                    $(".modal-title", $modal).empty();
+                                    $(".modal-body", $modal).empty();
+                                })
                                 .one("shown.bs.modal", function (event) {
                                     if (type && object) {
                                         $(container).loadInfoboxPopup({
@@ -992,29 +1040,25 @@ import { defaults as defaultControls } from "ol/control";
                                             event: event,
                                             element: this,
                                             callback: function (event, $html) {
-                                                var title = $html.find("h1").remove().text() || feature.get("content"),
-                                                    $header = $(".modal-header", $modal);
+                                                var title = $html.find("h1").remove().text() || feature.get("content");
 
-                                                $html.find("a.service-dialog").clickModal({});
+                                                $html.find("a.service-dialog").on("click", function (event) {
+                                                    const $link = $(this);
+                                                    $.closeModal({
+                                                        done: function () {
+                                                            setTimeout(function () {
+                                                                $.openModal({
+                                                                    size: "modal-lg",
+                                                                    remote: $link.attr("href"),
+                                                                });
+                                                            }, 0);
+                                                        },
+                                                    });
+                                                    return false;
+                                                });
 
-                                                if ($header.length === 0) {
-                                                    $(".modal-content", $modal).append(
-                                                        $("<div class='modal-header'>").append($("<h4 class='modal-title'>").text(title))
-                                                    );
-                                                } else {
-                                                    $(".modal-title", $modal).text(title);
-                                                }
-
-                                                $(".modal-content", $modal).append(
-                                                    $("<div class='modal-body'>").append($html),
-                                                    $("<div class='modal-footer'>").append(
-                                                        $(
-                                                            "<button type='button' class='btn btn-secondary' data-bs-dismiss='modal'>" +
-                                                                tr("Close") +
-                                                                "</button>"
-                                                        )
-                                                    )
-                                                );
+                                                $(".modal-title", $modal).text(title);
+                                                $(".modal-body", $modal).append($html);
                                             },
                                         });
                                     }
@@ -1063,8 +1107,6 @@ import { defaults as defaultControls } from "ol/control";
                     }
                 };
             }
-
-            container.setupLayerEvents(container.vectors);
 
             if (layers.length > 0 && -1 !== $.inArray("overview", desiredControls)) {
                 var overview = new ol.control.OverviewMap({ minRatio: 128, maxRatio: 256, maximized: true });
@@ -1280,8 +1322,6 @@ import { defaults as defaultControls } from "ol/control";
                 }
             }
 
-            container.modeManager.addMode(defaultMode);
-
             if (jqueryTiki.googleStreetView) {
                 container.streetview = {
                     buttons: [],
@@ -1449,13 +1489,15 @@ import { defaults as defaultControls } from "ol/control";
                 }
             }
 
-            var searchboxes = $(container)
+            // start with the search boxes outside of the map container
+            let searchboxes = $(container)
                 .closest(".tab, #appframe, #tiki-center")
                 .find("form.search-box")
                 .filter(function () {
                     return $(this).closest(".map-container").length === 0;
                 });
 
+            // then add the ones inside
             searchboxes = searchboxes.add($("form.search-box", container));
 
             searchboxes
@@ -1482,7 +1524,7 @@ import { defaults as defaultControls } from "ol/control";
                                 if (layerName && i[layerName]) {
                                     layerName = i[layerName] + ": ";
                                 } else if (!layerName) {
-                                    layerName = " -- ";
+                                    layerName = "";
                                 }
 
                                 if (suffix && i[suffix]) {
@@ -1565,7 +1607,7 @@ import { defaults as defaultControls } from "ol/control";
 
                                         feature.executor = delayedExecutor(5000, function () {
                                             var fields = {},
-                                                current = wkt.write(feature) + feature.get("color");
+                                                current = wkt.writeFeature(feature) + feature.get("color");
                                             fields[i.geo_feature_field] = format.writeFeature(feature);
 
                                             if (current === initial || layer !== container.vectors) {
@@ -1845,82 +1887,51 @@ import { defaults as defaultControls } from "ol/control";
 
             // Initialize colorpicker functionality
             function initializeColorpicker() {
-                var $colorpickerContainer = $(container).find(".map-colorpicker-container");
+                const $colorpickerContainer = $(container).find(".map-colorpicker-container");
                 if (!$colorpickerContainer.length) return;
 
-                var colors = $colorpickerContainer.data("colorpicker-colors") || [];
-                var title = $colorpickerContainer.data("colorpicker-title") || tr("Color Picker");
-                var modalId = "mapColorpickerModal-" + id;
+                const colors = $colorpickerContainer.data("colorpicker-colors") || [];
+                const title = $colorpickerContainer.data("colorpicker-title") || tr("Color Picker");
+                const modalId = "mapColorpickerModal-" + id;
 
                 // Create Bootstrap 5 Modal for colorpicker
-                var swatchesHtml = colors
-                    .map(function (c) {
-                        return (
-                            '<button type="button" class="btn color-swatch p-0 m-1" ' +
-                            'style="background-color:' +
-                            c +
-                            '; width:32px; height:32px; border:2px solid #ccc; border-radius:4px;" ' +
-                            'data-color="' +
-                            c +
-                            '" title="' +
-                            c +
-                            '"></button>'
-                        );
+                const swatchesHtml = colors
+                    .map(function (color) {
+                        return `<button type="button" class="btn color-swatch p-0 m-1" style="background-color:${color};
+                                    width:32px; height:32px; border:2px solid #ccc; border-radius:4px;" data-color="${color}" title="${color}">
+                            </button>`;
                     })
                     .join("");
 
-                var modalHtml =
-                    '<div class="modal fade" id="' +
-                    modalId +
-                    '" tabindex="-1" aria-labelledby="' +
-                    modalId +
-                    'Label" aria-hidden="true">' +
-                    '  <div class="modal-dialog modal-sm">' +
-                    '    <div class="modal-content">' +
-                    '      <div class="modal-header">' +
-                    '        <h5 class="modal-title" id="' +
-                    modalId +
-                    'Label">' +
-                    title +
-                    "</h5>" +
-                    '        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>' +
-                    "      </div>" +
-                    '      <div class="modal-body">' +
-                    '        <div class="mb-3">' +
-                    '          <label for="colorPickerInput-' +
-                    id +
-                    '" class="form-label">' +
-                    tr("Select Color") +
-                    "</label>" +
-                    '          <input type="color" class="form-control form-control-color w-100" ' +
-                    '                 id="colorPickerInput-' +
-                    id +
-                    '" value="#6699cc">' +
-                    "        </div>" +
-                    '        <div class="color-swatches d-flex flex-wrap">' +
-                    swatchesHtml +
-                    "</div>" +
-                    "      </div>" +
-                    '      <div class="modal-footer">' +
-                    '        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">' +
-                    tr("Close") +
-                    "</button>" +
-                    '        <button type="button" class="btn btn-primary" id="applyColor-' +
-                    id +
-                    '">' +
-                    tr("Apply") +
-                    "</button>" +
-                    "      </div>" +
-                    "    </div>" +
-                    "  </div>" +
-                    "</div>";
+                const modalHtml = `
+<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${modalId}Label" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="${modalId}Label">${title}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="colorPickerInput-${id}" class="form-label">${tr("Select Color")}</label>
+                    <input type="color" class="form-control form-control-color w-100" id="colorPickerInput-${id}" value="#6699cc">
+                </div>
+                <div class="color-swatches d-flex flex-wrap">${swatchesHtml}</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">${tr("Close")}</button>
+                <button type="button" class="btn btn-primary" id="applyColor-${id}">${tr("Apply")}</button>
+            </div>
+        </div> 
+    </div>
+</div>`;
 
                 $(document.body).append(modalHtml);
 
-                var $modal = $("#" + modalId);
-                var $colorInput = $("#colorPickerInput-" + id);
-                var $applyBtn = $("#applyColor-" + id);
-                var selectedFeature = null;
+                const $modal = $("#" + modalId);
+                const $colorInput = $("#colorPickerInput-" + id);
+                const $applyBtn = $("#applyColor-" + id);
+                let selectedFeature = null;
 
                 // Store colorpicker config on container
                 container.colorpicker = {
@@ -1946,8 +1957,12 @@ import { defaults as defaultControls } from "ol/control";
                 // Handle apply button
                 $applyBtn.on("click", function () {
                     if (selectedFeature) {
-                        var color = $colorInput.val();
-                        applyColorToFeature(selectedFeature, color);
+                        container.map.getInteractions().forEach(function (interaction) {
+                            if (interaction instanceof ol.interaction.Select) {
+                                interaction.getFeatures().clear();
+                            }
+                        });
+                        applyColorToFeature(selectedFeature, $colorInput.val());
                     }
                     bootstrap.Modal.getOrCreateInstance($modal[0]).hide();
                 });
@@ -1963,44 +1978,37 @@ import { defaults as defaultControls } from "ol/control";
                     feature.set("color", color);
 
                     // Also store by coordinates for persistence across cluster recalculations
-                    var geom = feature.getGeometry();
-                    var key = null;
+                    const geom = feature.getGeometry();
+                    let key = null;
                     if (geom && geom.getCoordinates) {
-                        var coords = geom.getCoordinates();
+                        const coords = geom.getCoordinates();
                         if (Array.isArray(coords)) {
                             key = coords.join(",");
                             container.featureColors[key] = color;
                         }
                     }
+                    let coloredStyle = setFeatureColorStyle(feature, color);
 
-                    // Create a colored circle style
-                    var coloredStyle = new ol.style.Style({
-                        image: new ol.style.Circle({
-                            radius: 12,
-                            fill: new ol.style.Fill({ color: color }),
-                            stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
-                        }),
-                    });
-
-                    // DIRECTLY set the style on the feature
-                    feature.setStyle(coloredStyle);
+                    if (feature.executor) {
+                        feature.executor();
+                    }
 
                     // Also try to find this feature in all sources and update it there
-                    var layers = container.overlays.getLayers().getArray();
+                    const layers = container.overlays.getLayers().getArray();
 
                     layers.forEach(function (layer) {
                         if (layer.getSource && layer.getSource()) {
-                            var source = layer.getSource();
+                            const source = layer.getSource();
 
                             // Check if this is a cluster source
                             if (source.getSource) {
-                                var innerSource = source.getSource();
+                                const innerSource = source.getSource();
                                 // Find features at same coordinates
                                 if (key) {
                                     innerSource.getFeatures().forEach(function (f) {
-                                        var fGeom = f.getGeometry();
+                                        const fGeom = f.getGeometry();
                                         if (fGeom && fGeom.getCoordinates) {
-                                            var fCoords = fGeom.getCoordinates();
+                                            const fCoords = fGeom.getCoordinates();
                                             if (Array.isArray(fCoords) && fCoords.join(",") === key) {
                                                 f.set("color", color);
                                                 f.setStyle(coloredStyle);
@@ -2027,30 +2035,22 @@ import { defaults as defaultControls } from "ol/control";
                         return;
                     }
 
-                    var layers = container.overlays.getLayers().getArray();
+                    const layers = container.overlays.getLayers().getArray();
                     layers.forEach(function (layer) {
                         if (layer.getSource && layer.getSource()) {
-                            var source = layer.getSource();
+                            const source = layer.getSource();
 
                             // For cluster sources, check the inner source
-                            var featureSource = source.getSource ? source.getSource() : source;
+                            const featureSource = source.getSource ? source.getSource() : source;
 
-                            featureSource.getFeatures().forEach(function (f) {
-                                var geom = f.getGeometry();
+                            featureSource.getFeatures().forEach(function (feature) {
+                                const geom = feature.getGeometry();
                                 if (geom && geom.getCoordinates) {
-                                    var coords = geom.getCoordinates();
+                                    const coords = geom.getCoordinates();
                                     if (Array.isArray(coords)) {
-                                        var key = coords.join(",");
+                                        const key = coords.join(",");
                                         if (container.featureColors[key]) {
-                                            var color = container.featureColors[key];
-                                            var coloredStyle = new ol.style.Style({
-                                                image: new ol.style.Circle({
-                                                    radius: 12,
-                                                    fill: new ol.style.Fill({ color: color }),
-                                                    stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
-                                                }),
-                                            });
-                                            f.setStyle(coloredStyle);
+                                            setFeatureColorStyle(feature, container.featureColors[key]);
                                         }
                                     }
                                 }
@@ -2060,41 +2060,42 @@ import { defaults as defaultControls } from "ol/control";
                 }
 
                 // Hook into feature selection to show colorpicker
-                if (selectionInteraction) {
-                    var originalSelectHandler = null;
-
-                    // Add colorpicker trigger on feature selection when Shift is held
-                    map.on("click", function (evt) {
-                        if (evt.originalEvent.shiftKey) {
-                            map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
-                                if (feature && container.colorpicker) {
-                                    // Get the actual feature (not cluster)
-                                    var targetFeature = feature;
-                                    var clusterFeatures = feature.get("features");
-                                    if (clusterFeatures && clusterFeatures.length === 1) {
-                                        targetFeature = clusterFeatures[0];
+                $(container).on("modechanged", function () {
+                    if (container.modeManager.activeMode.name === "modify_feature") {
+                        // Add colorpicker trigger on feature selection when Shift is held
+                        map.on("click", function (evt) {
+                            if (evt.originalEvent.shiftKey) {
+                                map.forEachFeatureAtPixel(evt.pixel, function (feature, layer) {
+                                    if (feature && container.colorpicker) {
+                                        // Get the actual feature (not cluster)
+                                        let targetFeature = feature;
+                                        const clusterFeatures = feature.get("features");
+                                        if (clusterFeatures && clusterFeatures.length === 1) {
+                                            targetFeature = clusterFeatures[0];
+                                        }
+                                        container.colorpicker.show(targetFeature);
+                                        return true; // Stop iteration
                                     }
-                                    container.colorpicker.show(targetFeature);
-                                    return true; // Stop iteration
-                                }
-                            });
-                        } else {
-                            // On non-shift clicks, re-apply stored colors after a short delay
-                            setTimeout(function () {
-                                reapplyStoredColors();
-                            }, 50);
-                        }
-                    });
+                                });
+                            } else {
+                                // On non-shift clicks, re-apply stored colors after a short delay
+                                setTimeout(function () {
+                                    reapplyStoredColors();
+                                }, 50);
+                            }
+                        });
 
-                    // Also re-apply colors when map is moved or rendered
-                    map.on("moveend", function () {
-                        reapplyStoredColors();
-                    });
-                }
+                        // Also re-apply colors when map is moved or rendered
+                        map.on("moveend", function () {
+                            reapplyStoredColors();
+                        });
+                    }
+                });
             }
 
             initializeColorpicker();
 
+            /****** $.fn.creatMap() all done, tell everyone! ******/
             setTimeout(function () {
                 $(container).trigger("initialized");
             }, 1000);
@@ -2180,7 +2181,7 @@ import { defaults as defaultControls } from "ol/control";
 
                 if (options.type === "trackeritem" && options.object && markerLayer === container.vectors) {
                     feature.executor = delayedExecutor(5000, function () {
-                        var current = writeCoordinates(feature.geometry.getBounds().getCenterLonLat().clone(), container.map, true);
+                        var current = writeCoordinates(feature.getGeometry().getCoordinates(), container.map, true);
 
                         if (current === initial) {
                             return;
@@ -2220,48 +2221,78 @@ import { defaults as defaultControls } from "ol/control";
     };
 
     $.fn.setupMapSelection = function (options) {
-        var control;
+        let control;
+
         this.each(function () {
-            var container = this,
+            const container = this,
                 field = options.field,
-                map = this.map;
+                map = container.map;
 
             if (!field.attr("disabled")) {
                 $(container).on("selectionChange", function (e, lonlat) {
                     if (lonlat) {
                         if (lonlat.lat && lonlat.lon) {
-                            lonlat = new ol.geom.Point(ol.proj.fromLonLat([parseFloat(lonlat.lon), parseFloat(lonlat.lat)]));
+                            lonlat = new ol.geom.Point([lonlat.lon, lonlat.lat]);
+                            field.val(writeCoordinates(lonlat, map)).trigger("change");
                         }
-                        field.val(writeCoordinates(lonlat, map)).trigger("change");
                     } else {
                         field.val("").trigger("change");
                     }
                 });
-                map.on("zoomend", function (e, lonlat) {
-                    var coords = field.val().split(","),
-                        lon = 0,
-                        lat = 0;
-                    if (coords.length > 1) {
-                        lon = coords[0];
-                        lat = coords[1];
-                    }
-                    field.val(formatLocation(lat, lon, map.getView().getZoom())).trigger("change");
-                });
             }
         });
+
+        control = new ol.interaction.Pointer({
+            handleUpEvent: (event) => {
+                const container = this.get(0),
+                    map = container.map;
+                let coords;
+
+                if (event.coordinates) {
+                    coords = event.coordinates;
+                } else {
+                    coords = map.getCoordinateFromPixel([event.originalEvent.offsetX, event.originalEvent.offsetY]);
+                }
+                const lonlat = ol.proj.transform(
+                    coords,
+                    map.getView().getProjection(), // source — replaces map.getProjectionObject()
+                    "EPSG:4326" // target
+                );
+
+                $(container).addMapMarker({
+                    lat: lonlat[0],
+                    lon: lonlat[1],
+                    unique: "selection",
+                });
+                $(container).trigger("selectionChange", {
+                    lat: lonlat[0],
+                    lon: lonlat[1],
+                });
+
+                if (options.click) {
+                    options.click();
+                }
+                return false;
+            },
+            handleDownEvent: (event) => {
+                return true; // return true to "handle" it and trigger handleUpEvent
+            },
+        });
+
+        control.set("mode", "selection");
 
         return control;
     };
 
     $.fn.removeMapSelection = function () {
         this.each(function () {
-            var container = this;
+            const container = this;
 
             if (container.uniqueMarkers["selection"]) {
-                container.vectors.removeFeatures([container.uniqueMarkers["selection"]]);
+                container.vectors.getSource().removeFeatures([container.uniqueMarkers["selection"]]);
             }
 
-            $(container).trigger("selectionChange", {});
+            $(container).trigger("selectionChange", [{}]);
         });
 
         return this;
