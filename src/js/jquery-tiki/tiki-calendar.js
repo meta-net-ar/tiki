@@ -141,7 +141,7 @@ $.fn.setupEventCalendar = function (
             month: { label: tr("Month"), duration: { months: 1 } },
             quarter: { label: tr("Quarter"), duration: { months: 3 } },
             semester: { label: tr("Semester"), duration: { months: 6 } },
-            year: { label: tr("Year"), duration: { months: 12 } },
+            year: { label: tr("Year"), duration: { years: 1 } },
         };
         const listPeriodNames = Object.keys(listPeriodOptions);
         const normalizeListPeriod = (period) => (listPeriodNames.includes(period) ? period : "year");
@@ -176,6 +176,12 @@ $.fn.setupEventCalendar = function (
             const selectedPeriod = listPeriodOptions[normalizedPeriod];
             activeListPeriod = normalizedPeriod;
             eventCalendarParams.initialListPeriod = normalizedPeriod;
+            if (normalizedPeriod === "year") {
+                const currentDate = moment(calendarContainer[0].getOption("date"));
+                if (currentDate.isValid()) {
+                    calendarContainer[0].setOption("date", currentDate.startOf("year").toDate());
+                }
+            }
             calendarContainer[0].setOption("duration", { ...selectedPeriod.duration });
             calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                 return moment(dayCell).format("D");

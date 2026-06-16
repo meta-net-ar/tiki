@@ -269,7 +269,8 @@ if (
     } elseif ($calendarViewMode['casedefault'] == 'semester') {
         $viewend = $tikilib->make_time(0, 0, 0, $focus_month + 6, $df, $focus_year);
     } elseif ($calendarViewMode['casedefault'] == 'year') {
-        $viewend = $tikilib->make_time(0, 0, 0, 1, $df, $focus_year + 1);
+        $viewend_month = ($viewlist == 'list' && $prefs['calendar_list_begins_focus'] == 'y') ? $focus_month : 1;
+        $viewend = $tikilib->make_time(0, 0, 0, $viewend_month, $df, $focus_year + 1);
     } else {
         $viewend = $tikilib->make_time(0, 0, 0, $focus_month + 1, 0, $focus_year);
     }
@@ -325,7 +326,7 @@ if (
 
     // then back up to the preceding Sunday;
     // $viewstart -= $wd * $d;
-    if ($wd > 0 and $viewlist != 'list') {
+    if ($wd > 0 && ($viewlist != 'list' || $prefs['calendar_list_begins_focus'] != 'y')) {
         $viewstart_d = TikiLib::date_format("%d", $viewstart);
         $viewstart_m = TikiLib::date_format("%m", $viewstart);
         $viewstart_y = TikiLib::date_format("%Y", $viewstart);

@@ -288,7 +288,7 @@ if (! empty($_SESSION['CalendarViewGroups']) && ! empty($_SESSION['CalendarViewL
         $viewstart,
         $viewend,
         0,
-        $prefs['maxRecords'],
+        -1,
         $sort_mode
     );
 
