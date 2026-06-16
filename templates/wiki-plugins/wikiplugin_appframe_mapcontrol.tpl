@@ -19,29 +19,25 @@ $('#appframe .map-container').on('initialized', function () {
             return false;
         };
     {{elseif $mapcontrol.mode}}
-        mode = "{{$mapcontrol.mode|escape}}";
+        mode = {{$mapcontrol.mode|json_encode}};
     {{else}}
         vlayer = container.vectors;
         {{if !empty($mapcontrol.control)}}
             controls.push({{$mapcontrol.control}});
         {{/if}}
 
-        controls.forEach((control) => {
-            control.setActive(false);
-            container.map.addInteraction(control);
-        });
+         mode = {{$mapcontrol.label|json_encode}};
         container.modeManager.addMode({
-            name: {{$mapcontrol.name|json_encode}},
-            title: "{{$mapcontrol.label|escape}}",
+            name: {{$mapcontrol.label|json_encode}},
             controls: controls
         });
         container.setupLayerEvents(vlayer);
     {{/if}}
 
-    container.modeManager.register('activate', {{$mapcontrol.name|json_encode}}, function () {
+    container.modeManager.register('activate', mode, function () {
         $(link).addClass('active');
     });
-    container.modeManager.register('deactivate', {{$mapcontrol.name|json_encode}}, function () {
+    container.modeManager.register('deactivate', mode, function () {
         $(link).removeClass('active');
     });
 
@@ -49,7 +45,7 @@ $('#appframe .map-container').on('initialized', function () {
         $(link).on("click", func);
     } else {
         $(link).on("click", function () {
-            container.modeManager.switchTo({{$mapcontrol.name|json_encode}});
+            container.modeManager.switchTo(mode);
             return false;
         });
     }
