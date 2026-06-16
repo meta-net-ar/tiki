@@ -406,11 +406,6 @@ class Schema
         }
     }
 
-    public function getPasteSource(string $content): Source\ExcelPasteSource
-    {
-        return new Source\ExcelPasteSource($this, $content);
-    }
-
     public function validate()
     {
         foreach ($this->columns as $column) {
