@@ -1,84 +1,163 @@
 ---
 type: object
+required:
+  - threadId
+  - object
+  - objectType
+  - parentId
+  - userName
+  - commentDate
+  - hits
+  - type
+  - points
+  - votes
+  - average
+  - title
+  - data
+  - email
+  - website
+  - user_ip
+  - summary
+  - smiley
+  - message_id
+  - in_reply_to
+  - comment_rating
+  - archived
+  - approved
+  - locked
+  - parsed
+  - user_posts
+  - user_level
+  - user_email
+  - attachments
+  - is_reported
+  - user_online
+  - user_exists
 properties:
   threadId:
-    type: integer
+    oneOf:
+      - type: integer
+      - type: string
+    nullable: true
+    description: Comment thread ID. Returned as a string in some API contexts (e.g. POST /comments).
   object:
-    type: integer
+    oneOf:
+      - type: string
+      - type: integer
+    description: Object identifier the comment belongs to (page name for wiki pages, numeric ID for other types).
   objectType:
     type: string
+    description: Type of the object being commented on (e.g. 'wiki page', 'file gallery', 'poll').
   parentId:
-    type: intege
+    type: integer
+    nullable: true
+    description: Parent thread ID for replies; null for top-level comments.
   userName:
     type: string
+    nullable: true
   commentDate:
     type: integer
+    description: Unix timestamp of the comment.
   hits:
     type: integer
   type:
-    $ref: schemas-TikiBoolean.yaml
+    type: string
+    description: Object type alias (same value as objectType, kept for backwards compatibility).
   points:
-    type: float
+    type: number
+    nullable: true
+    description: Rating points; may be returned as a numeric string.
   votes:
     type: integer
   average:
-    type: float
+    type: number
+    nullable: true
+    description: Average rating; may be returned as a numeric string.
   title:
     type: string
+    nullable: true
   data:
     type: string
+    nullable: true
   email:
     type: string
+    nullable: true
   website:
     type: string
+    nullable: true
   user_ip:
     type: string
+    nullable: true
   summary:
     type: string
+    nullable: true
   smiley:
     type: string
+    nullable: true
   message_id:
     type: string
+    nullable: true
   in_reply_to:
     type: string
+    nullable: true
   comment_rating:
     type: integer
+    nullable: true
   archived:
     $ref: schemas-TikiBoolean.yaml
+    nullable: true
   approved:
     $ref: schemas-TikiBoolean.yaml
+    nullable: true
   locked:
     $ref: schemas-TikiBoolean.yaml
+    nullable: true
   grandFather:
     type: integer
+    nullable: true
   isEmpty:
     $ref: schemas-TikiBoolean.yaml
+    nullable: true
   version:
     type: integer
+    nullable: true
   diffInfo:
     type: array
     items:
       type: string
   parsed:
     type: string
+    nullable: true
   user_posts:
     type: integer
+    nullable: true
   user_level:
     type: integer
+    nullable: true
   user_email:
     type: string
+    nullable: true
   attachments:
     type: array
   is_reported:
-    type: integer
+    oneOf:
+      - type: integer
+      - type: boolean
+    nullable: true
   user_online:
     $ref: schemas-TikiBoolean.yaml
+    nullable: true
   user_exists:
-    type: integer
+    oneOf:
+      - type: integer
+      - type: boolean
+    nullable: true
   can_edit:
     type: boolean
+    nullable: true
   replies_info:
     type: object
+    nullable: true
     properties:
       replies:
         type: array
@@ -90,5 +169,6 @@ properties:
         type: integer
   replies_flat:
     type: array
+    nullable: true
     items:
       $ref: schemas-Comment.yaml

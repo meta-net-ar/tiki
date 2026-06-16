@@ -39,25 +39,19 @@ post:
           schema:
             type: object
             properties:
-              trackerId:
-                type: integer
-              trackerName:
-                type: string
               itemId:
                 type: integer
-              fields:
-                type: object
-              forced:
-                type: object
-              trackerLogo:
-                type: string
               status:
                 type: string
-              format:
+              fields:
+                type: object
+                description: Map of field permName to scalar value.
+              itemTitle:
                 type: string
-              editItemPretty:
-                type: string
-              next:
+              processedFields:
+                type: object
+                description: Map of permName to processed/formatted value.
+              nextTicket:
                 type: string
     '403':
       description: forbidden

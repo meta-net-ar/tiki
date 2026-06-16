@@ -10,7 +10,6 @@
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
          bootstrap="lib/test/bootstrap.php"
          beStrictAboutOutputDuringTests="true"
-         beStrictAboutTodoAnnotatedTests="true"
          displayDetailsOnTestsThatTriggerWarnings="true"
          colors="true"
          stopOnFailure="false"
@@ -32,6 +31,18 @@
       <!-- Exclude files where all tests are marked as skipped -->
       <exclude>./lib/test/AcceptanceTests/</exclude>
       <exclude>./lib/test/Core/Reports/ReportsEndToEndTest.php</exclude>
+      <!-- Exclude abstract base test classes -->
+      <exclude>./lib/test/api/ApiTestCase.php</exclude>
+      <exclude>./lib/test/api/categories/ApiBaseCategoriesTest.php</exclude>
+      <exclude>./lib/test/api/comments/ApiBaseCommentsTest.php</exclude>
+      <exclude>./lib/test/api/galleries/ApiBaseGalleriesTest.php</exclude>
+      <exclude>./lib/test/api/groups/ApiBaseGroupsTest.php</exclude>
+      <exclude>./lib/test/api/search/ApiBaseSearchTest.php</exclude>
+      <exclude>./lib/test/api/tabulars/ApiBaseTabularsTest.php</exclude>
+      <exclude>./lib/test/api/trackers/ApiBaseTrackersTest.php</exclude>
+      <exclude>./lib/test/api/translations/ApiBaseTranslationsTest.php</exclude>
+      <exclude>./lib/test/api/users/ApiBaseUsersTest.php</exclude>
+      <exclude>./lib/test/api/wiki/ApiBaseWikiTest.php</exclude>
     </testsuite>
   </testsuites>
   <groups>
@@ -42,6 +53,8 @@
       <!-- require pref lang_google_api_key -->
       <group>GoogleTranslate</group>
       <group>RequiresWebserver</group>
+      <!-- API integration tests -->
+      <group>api-integration-test</group>
     </exclude>
   </groups>
   <php>

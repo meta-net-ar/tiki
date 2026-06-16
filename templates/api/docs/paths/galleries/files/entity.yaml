@@ -16,66 +16,12 @@ get:
           schema:
             type: object
             properties:
+              title:
+                type: string
               fileId:
                 type: integer
-              galleryId:
-                type: integer
-              name:
-                type: string
-              description:
-                type: string
-              created:
-                type: integer
-              filename:
-                type: string
-              filesize:
-                type: integer
-              filetype:
-                type: string
-              user:
-                type: string
-              author:
-                type: string
-              hits:
-                type: integer
-              maxhits:
-                type: integer
-              lastDownload:
-                type: integer
-              votes:
-                type: integer
-              points:
-                type: float
-              path:
-                type: string
-              reference_url:
-                type: string
-              is_reference:
-                type: string
-              hash:
-                type: string
-              search_data:
-                type: string
-              metadata:
-                type: string
-              lastModif:
-                type: integer
-              lastModifUser:
-                type: string
-              lockedby:
-                type: string
-              comment:
-                type: string
-              archiveId:
-                type: integer
-              deleteAfter:
-                type: integer
-              ocr_state:
-                type: integer
-              ocr_lang:
-                type: string
-              ocr_data:
-                type: string
+              info:
+                $ref: schemas-File.yaml
     '403':
       description: forbidden
       content:

@@ -1,0 +1,117 @@
+---
+description: Response from file upload or update operations.
+type: object
+properties:
+  size:
+    type: integer
+  name:
+    type: string
+  title:
+    type: string
+  description:
+    type: string
+    nullable: true
+  type:
+    type: string
+    nullable: true
+  fileId:
+    type: string
+    description: File ID — numeric but may be returned as a string.
+  galleryId:
+    type: integer
+  md5sum:
+    type: string
+    nullable: true
+  ticket:
+    type: string
+    nullable: true
+  syntax:
+    type: string
+    nullable: true
+  info:
+    type: object
+    description: Full file metadata for the uploaded file.
+    properties:
+      fileId:
+        type: integer
+      galleryId:
+        type: integer
+      name:
+        type: string
+      description:
+        type: string
+        nullable: true
+      created:
+        type: integer
+        nullable: true
+      filename:
+        type: string
+      filesize:
+        type: integer
+        nullable: true
+      filetype:
+        type: string
+        nullable: true
+      user:
+        type: string
+        nullable: true
+      author:
+        type: string
+        nullable: true
+      hits:
+        type: integer
+        nullable: true
+      maxhits:
+        type: integer
+        nullable: true
+      lastDownload:
+        type: integer
+        nullable: true
+      votes:
+        type: integer
+        nullable: true
+      points:
+        type: string
+        nullable: true
+      path:
+        type: string
+        nullable: true
+      reference_url:
+        type: string
+        nullable: true
+      is_reference:
+        type: string
+        nullable: true
+      hash:
+        type: string
+        nullable: true
+      metadata:
+        type: string
+        nullable: true
+      lastModif:
+        type: integer
+        nullable: true
+      lastModifUser:
+        type: string
+        nullable: true
+      lockedby:
+        type: string
+        nullable: true
+      comment:
+        type: string
+        nullable: true
+      archiveId:
+        type: integer
+        nullable: true
+      deleteAfter:
+        type: integer
+        nullable: true
+      ocr_state:
+        type: string
+        nullable: true
+      ocr_lang:
+        type: string
+        nullable: true
+      ocr_data:
+        type: string
+        nullable: true

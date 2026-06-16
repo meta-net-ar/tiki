@@ -12,7 +12,7 @@ get:
       required: true
       schema:
         type: integer
-        decritpion: The ID of the tracker item to retrieve
+        description: The ID of the tracker item to retrieve.
   responses:
     '200':
       description: tracker item response
@@ -23,13 +23,19 @@ get:
             properties:
               title:
                 type: string
+                nullable: true
+              format:
+                type: string
+                nullable: true
               itemId:
                 type: integer
               trackerId:
                 type: integer
               fields:
-                type: object
-                description: TODO definition
+                type: array
+                description: Array of field definitions with current values. Each entry contains the field schema plus a `value` key.
+                items:
+                  $ref: schemas-TrackerField.yaml
               canModify:
                 type: boolean
               item_info:
@@ -93,21 +99,17 @@ post:
           schema:
             type: object
             properties:
-              trackerId:
-                type: integer
+              feedback:
+                type: string
+                nullable: true
               itemId:
                 type: integer
-              fields:
-                type: object
-              forced:
-                type: object
               status:
                 type: string
-              format:
-                type: string
-              editItemPretty:
-                type: string
-              redirect:
+              fields:
+                type: object
+                description: Map of field permName to scalar value.
+              nextTicket:
                 type: string
     '403':
       description: forbidden
@@ -142,11 +144,17 @@ delete:
           schema:
             type: object
             properties:
+              title:
+                type: string
               trackerId:
                 type: integer
               itemId:
-                type: integer
+                type: string
               affectedCount:
+                type: integer
+              multiple:
+                type: boolean
+              removeCount:
                 type: integer
     '403':
       description: forbidden

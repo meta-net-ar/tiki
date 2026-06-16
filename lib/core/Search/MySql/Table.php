@@ -280,6 +280,10 @@ class Search_MySql_Table extends TikiDb_Table
 
     public function deleteMultipleIndex(array $conditions)
     {
+        if (! $this->exists()) {
+            return;
+        }
+
         $tables = $this->indexTables();
         $matches = $this->fetchAll(['id'], $conditions, options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
         foreach ($matches as $row) {

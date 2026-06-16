@@ -134,7 +134,7 @@ class ArtLib extends TikiLib
                 }
             }
 
-            if ($prefs['user_article_watch_editor'] != "y") {
+            if (($prefs['user_article_watch_editor'] ?? '') != "y") {
                 for ($i = count($nots) - 1; $i >= 0; --$i) {
                     if ($nots[$i]['user'] == $user) {
                         unset($nots[$i]);
@@ -273,7 +273,7 @@ class ArtLib extends TikiLib
                 $_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'];
             }
 
-            if ($prefs['user_article_watch_editor'] != "y") {
+            if (($prefs['user_article_watch_editor'] ?? '') != "y") {
                 for ($i = count($nots) - 1; $i >= 0; --$i) {
                     if ($nots[$i]['user'] == $user) {
                         unset($nots[$i]);
@@ -448,7 +448,7 @@ class ArtLib extends TikiLib
         }
         global $prefs;
 
-        if ($prefs['user_article_watch_editor'] != "y") {
+        if (($prefs['user_article_watch_editor'] ?? '') != "y") {
             for ($i = count($nots) - 1; $i >= 0; --$i) {
                 if ($nots[$i]['user'] == $user) {
                     unset($nots[$i]);

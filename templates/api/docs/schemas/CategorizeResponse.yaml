@@ -1,0 +1,35 @@
+---
+description: Response from POST /categorize or uncategorize.
+type: object
+required:
+  - categId
+  - count
+  - objects
+properties:
+  categId:
+    oneOf:
+      - type: integer
+      - type: string
+  count:
+    oneOf:
+      - type: integer
+      - type: string
+  objects:
+    type: array
+    items:
+      type: object
+      required:
+        - type
+        - id
+        - catObjectId
+      properties:
+        type:
+          type: string
+        id:
+          oneOf:
+            - type: string
+            - type: integer
+        catObjectId:
+          oneOf:
+            - type: string
+            - type: integer

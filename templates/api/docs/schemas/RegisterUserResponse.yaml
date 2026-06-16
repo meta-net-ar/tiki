@@ -1,0 +1,9 @@
+---
+description: Response from POST /users (user registration success).
+type: object
+required:
+  - result
+properties:
+  result:
+    type: string
+    nullable: true

@@ -49,6 +49,7 @@ class Services_Comment_Controller
                 header('Content-Type: application/json; charset=utf-8');
                 echo json_encode([
                     'status' => 'error',
+                    'code' => $e->getCode() ?: 403,
                     'message' => $e->getMessage()
                 ]);
                 exit;
@@ -284,7 +285,9 @@ class Services_Comment_Controller
                     }
                     if ($watch_event) {
                         Feedback::showWatchers($watch_event, $objectId, 'thread_comment_replied');
-                        Feedback::sendHeaders();
+                        if (! defined('TIKI_API') || ! TIKI_API) {
+                            Feedback::sendHeaders();
+                        }
                     }
 
                     // Set watch if requested
@@ -415,6 +418,9 @@ class Services_Comment_Controller
             if (count($errors) === 0) {
                 $commentslib->update_comment($threadId, $title, $comment['comment_rating'], $data);
 
+                // get updated comment info
+                $comment = $this->getCommentInfo($threadId);
+
                 return [
                     'threadId' => $threadId,
                     'comment' => $comment,
@@ -464,7 +470,7 @@ class Services_Comment_Controller
                 $status = 'DONE';
             }
         } else {
-            $status = 'DONE'; // Already gone
+            throw new Services_Exception_NotFound();
         }
 
 
@@ -567,7 +573,11 @@ class Services_Comment_Controller
         $type = $comment['objectType'];
         $object = $comment['object'];
 
-        if ($comment['approved'] == 'y') {
+        if ($comment['approved'] == 'r' && $do == 'reject') {
+            throw new Services_Exception(tr('Comment already rejected.'), 403);
+        }
+
+        if ($comment['approved'] == 'y' && $do == 'approve') {
             throw new Services_Exception(tr('Comment already approved.'), 403);
         }
 
@@ -613,6 +623,14 @@ class Services_Comment_Controller
 
         $type = $comment['objectType'];
         $object = $comment['object'];
+
+        if ($comment['archived'] == 'y' && $do == 'archive') {
+            throw new Services_Exception(tr('Comment already archived.'), 403);
+        }
+
+        if ($comment['archived'] == 'n' && $do == 'unarchive') {
+            throw new Services_Exception(tr('Comment already unarchived.'), 403);
+        }
 
         if (! $this->canArchive($type, $object)) {
             throw new Services_Exception(tr('Permission denied.'), 403);

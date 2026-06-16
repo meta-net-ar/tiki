@@ -89,6 +89,8 @@ $safePaths = [
 
     '/lib/Sheet/include/org/apicnet/io/OOo/objOOo/OOoCadre.php', // empty file
     '\./lib/test/.*/fixtures/.*\.php', // contains predefined data used in tests.
+    '\./lib/test/api/tiki-api-wrapper.php', // API wrapper for testing.
+    '\./lib/test/local.php', // contains database credentials for testing.
     '/lib/cypht/modules/tiki/modules.php', // bootstrap includes file.
     '/lib/cypht/modules/tiki/setup.php', // configuration file.
 
