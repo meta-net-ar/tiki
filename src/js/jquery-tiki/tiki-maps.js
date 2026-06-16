@@ -396,7 +396,7 @@ import { defaults as defaultControls } from "ol/control";
                             if (!event.feature.get("intent")) {
                                 event.feature.set("intent", "vectors");
                             }
-                            $(container).trigger("drawend", [event]);
+                            $(document).trigger("drawend.tiki", [event]);
                         }
                     });
                 }
@@ -801,7 +801,7 @@ import { defaults as defaultControls } from "ol/control";
                 addMode: function (options) {
                     const mode = $.extend(
                         {
-                            title: tr("Default"),
+                            name: tr("Default"),
                             icon: null,
                             events: {
                                 activate: [],
@@ -820,8 +820,8 @@ import { defaults as defaultControls } from "ol/control";
                     });
 
                     mode.controls.forEach((control) => {
-                        control.autoActivate = false;
-                        map.addControl(control);
+                        control.setActive(false);
+                        map.addInteraction(control);
                     });
 
                     this.modes.push(mode);
@@ -901,8 +901,7 @@ import { defaults as defaultControls } from "ol/control";
 
             const defaultMode = {
                 controls: [selectionInteraction],
-                name: "pan_zoom",
-                title: tr("Default"),
+                name: tr("Default"),
             };
 
             container.modeManager.addMode(defaultMode);
@@ -2222,51 +2221,78 @@ import { defaults as defaultControls } from "ol/control";
     };
 
     $.fn.setupMapSelection = function (options) {
-        var control;
+        let control;
+
         this.each(function () {
-            var container = this,
+            const container = this,
                 field = options.field,
-                map = this.map;
+                map = container.map;
 
             if (!field.attr("disabled")) {
                 $(container).on("selectionChange", function (e, lonlat) {
                     if (lonlat) {
                         if (lonlat.lat && lonlat.lon) {
-                            lonlat = new ol.geom.Point(ol.proj.fromLonLat([parseFloat(lonlat.lon), parseFloat(lonlat.lat)]));
+                            lonlat = new ol.geom.Point([lonlat.lon, lonlat.lat]);
+                            field.val(writeCoordinates(lonlat, map)).trigger("change");
                         }
-                        field.val(writeCoordinates(lonlat, map)).trigger("change");
                     } else {
                         field.val("").trigger("change");
                     }
                 });
-                /* map.on("zoomend", function (e, lonlat) {
-                    const coords = field.val().split(","),
-                        lon = 0,
-                        lat = 0;
-                    if (coords.length > 1) {
-                        lon = coords[0];
-                        lat = coords[1];
-                    }
-                    field.val(formatLocation(lat, lon, map.getView().getZoom())).trigger("change");
-                });*/
-                // control = new ol.interaction.Pointer({
-                //     handleUpEvent: options.click,
-                // });
             }
         });
+
+        control = new ol.interaction.Pointer({
+            handleUpEvent: (event) => {
+                const container = this.get(0),
+                    map = container.map;
+                let coords;
+
+                if (event.coordinates) {
+                    coords = event.coordinates;
+                } else {
+                    coords = map.getCoordinateFromPixel([event.originalEvent.offsetX, event.originalEvent.offsetY]);
+                }
+                const lonlat = ol.proj.transform(
+                    coords,
+                    map.getView().getProjection(), // source — replaces map.getProjectionObject()
+                    "EPSG:4326" // target
+                );
+
+                $(container).addMapMarker({
+                    lat: lonlat[0],
+                    lon: lonlat[1],
+                    unique: "selection",
+                });
+                $(container).trigger("selectionChange", {
+                    lat: lonlat[0],
+                    lon: lonlat[1],
+                });
+
+                if (options.click) {
+                    options.click();
+                }
+                return false;
+            },
+            handleDownEvent: (event) => {
+                return true; // return true to "handle" it and trigger handleUpEvent
+            },
+        });
+
+        control.set("mode", "selection");
 
         return control;
     };
 
     $.fn.removeMapSelection = function () {
         this.each(function () {
-            var container = this;
+            const container = this;
 
             if (container.uniqueMarkers["selection"]) {
-                container.vectors.removeFeatures([container.uniqueMarkers["selection"]]);
+                container.vectors.getSource().removeFeatures([container.uniqueMarkers["selection"]]);
             }
 
-            $(container).trigger("selectionChange", {});
+            $(container).trigger("selectionChange", [{}]);
         });
 
         return this;
