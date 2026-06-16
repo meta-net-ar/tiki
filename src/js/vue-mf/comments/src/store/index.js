@@ -13,6 +13,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 6,
                 dislike: 0,
+                resoved: 0,
             },
             {
                 title: "This is a reply title",
@@ -24,6 +25,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 2,
                 dislike: 0,
+                resoved: 0,
             },
             {
                 title: "",
@@ -34,6 +36,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 1,
                 dislike: 4,
+                resoved: 0,
             },
             {
                 title: "This is a reply title",
@@ -44,6 +47,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                resoved: 0,
             },
             {
                 title: "",
@@ -54,6 +58,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                resoved: 0,
             },
             {
                 title: "This is a reply title",
@@ -64,6 +69,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 1,
                 dislike: 0,
+                resoved: 0,
             },
             {
                 title: "",
@@ -74,6 +80,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 1,
+                resoved: 0,
             },
             {
                 title: "",
@@ -84,6 +91,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                resoved: 0,
             },
             {
                 title: "",
@@ -94,6 +102,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                resoved: 0,
             },
             {
                 title: "What is Lorem Ipsum?",
@@ -105,6 +114,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                resoved: 0,
             },
             {
                 title: "",
@@ -116,6 +126,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                resoved: 0,
             },
             {
                 title: "",
@@ -127,6 +138,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 2,
                 dislike: 1,
+                resoved: 0,
             },
             {
                 title: "",
@@ -138,6 +150,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                resoved: 0,
             },
             {
                 title: "",
@@ -149,6 +162,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                resoved: 0,
             },
         ],
     }),
@@ -180,6 +194,7 @@ export default defineStore("messageStore", {
                 date: date,
                 like: 0,
                 dislike: 0,
+                resoved: 0,
             };
             this.threads.push(message);
         },
@@ -199,7 +214,7 @@ export default defineStore("messageStore", {
             const index = this.threads.findIndex((element) => element.messageId === messageId);
             this.threads[index].dislike += 1;
         },
-        drawMessagesTree() {
+        drawMessagesTree(expended = "true", targetClass = "") {
             var arr = this.threads;
             arr.forEach((item) => {
                 let margins = 6;
@@ -214,6 +229,13 @@ export default defineStore("messageStore", {
                     lastChildHeight = $(this).children().last().outerHeight();
                 });
                 totalHeight -= lastChildHeight + margins;
+
+                if (expended == "false" && (parentBody.hasClass(targetClass) || parentBody.find('.'+targetClass).length > 0)) {
+                    console.log(targetClass);
+                    console.log(parentBody.hasClass(targetClass));
+                    totalHeight = 0;
+                }
+
                 $("#border-" + item.messageId).css("height", totalHeight);
             });
         },

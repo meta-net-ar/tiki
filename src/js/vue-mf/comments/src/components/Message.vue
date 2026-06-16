@@ -39,6 +39,17 @@ export default {
             setTimeout(() => {
                 useMessageStore().drawMessagesTree();
             }, 20);//TODO: find a better way to do this
+        },
+        resolved: function(messageId, event) {
+            var expanded = event.target.getAttribute('aria-expanded');
+            var target = event.target.getAttribute('data-bs-target');
+            var timeout = 20;
+            if (expanded == "true") {
+                timeout = 500;
+            }
+            setTimeout(() => {
+                useMessageStore().drawMessagesTree(expanded, target.substring(1));
+            }, timeout);//TODO: find a better way to do this
         }
     }
 }
@@ -65,7 +76,7 @@ export default {
                     <i class="icon fa-solid fa-thumbs-up fa-xs mt-3" @click="store.like(item.messageId)"></i><span class="like small text-muted mx-1 me-4">{{ item.like }}</span>
                     <i class="icon fa-solid fa-thumbs-down fa-xs mt-3" @click="store.dislike(item.messageId)"></i><span class="dislike small text-muted mx-1">{{ item.dislike }}</span>
                     <div :class="[{'d-thread-button-block' : item.parentId != 0}, 'thread-button-block float-end']">
-                        <a href="#" class="btn btn-outline-primary m-1 btn-sm" v-if="item.parentId == 0">{{ tr('Mark as resolved') }}</a>
+                        <a href="#" data-bs-toggle="collapse" :data-bs-target="`.replies-${item.messageId}`" class="btn btn-outline-primary m-1 btn-sm"  @click="resolved(item.messageId, $event)" v-if="item.parentId == 0">{{ tr('Mark as resolved') }}</a>
                         <a href="#" class="btn btn-outline-primary m-1 btn-sm">{{ tr('Pin') }}</a>
                         <a :href="'#message-'+item.messageId" class="btn btn-outline-primary m-1 btn-sm" @click="update(item.messageId)">{{ tr('Edit') }}</a>
                         <a :href="'#message-'+item.messageId" class="btn btn-outline-primary m-1 btn-sm" @click="create()">{{ tr('Reply') }}</a>
