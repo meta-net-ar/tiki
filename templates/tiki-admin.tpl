@@ -1,3 +1,5 @@
+{assign var=adminLayoutChrome value=($prefs.theme_unified_admin_backend eq 'y' && $prefs.site_layout eq 'admin')}
+{if !$adminLayoutChrome}
 <div class="admin-wrapper highlightable{* {if $prefs.theme_unified_admin_backend eq 'y'} overflow-auto{/if} *}">
     {if $prefs.theme_unified_admin_backend eq 'y'}
         <aside class="admin-nav">
@@ -34,6 +36,7 @@
             </form>
         {/if} *}
         {include file="admin/admin_navbar.tpl"}
+{/if}
         {if $prefs.sender_email eq ''}
             {remarksbox type=warning title="{tr}Warning{/tr}" close="y"}
                 {tr _0='<a href="tiki-admin.php?page=general&highlight=sender_email" class="alert-link">' _1="</a>"}Your sender email is not set. You can set it %0in the general admin panel%1.{/tr}
@@ -334,5 +337,7 @@
             {/if}
             {include file="admin/include_$include.tpl"}
         {/if}
+{if !$adminLayoutChrome}
+        </div>
     </div>
-</div>
+{/if}
