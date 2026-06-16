@@ -9,6 +9,7 @@ namespace Tiki\Command;
 use Language_CollectFiles;
 use Language_FileType_Php;
 use Language_FileType_Tpl;
+use Tiki\Lib\Language\FileType\Js as Language_FileType_Js;
 use Language_GetStrings;
 use Language_WriteFile_Factory;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -129,6 +130,7 @@ class GetStringsCommand extends Command
 
         $getStrings->addFileType(new Language_FileType_Php());
         $getStrings->addFileType(new Language_FileType_Tpl());
+        $getStrings->addFileType(new Language_FileType_Js());
 
         // skip the following directories
         $getStrings->collectFiles->setExcludeDirs($excludeDirs);
