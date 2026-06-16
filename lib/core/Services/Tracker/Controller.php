@@ -2560,16 +2560,20 @@ class Services_Tracker_Controller
             if (! $field) {
                 throw new Services_Exception_NotFound();
             }
-            $objectType  = 'trackerfield';
-            $objectId    = $fieldId;
+            $objectType   = 'trackerfield';
+            $objectId     = $fieldId;
             $contextLabel = tr('Configuration History: Field "%0"', $field['name']);
+
+            $currentData = TrackerConfigHistory::extractFieldState($field);
         } else {
-            $objectType  = 'tracker';
-            $objectId    = $trackerId;
+            $objectType   = 'tracker';
+            $objectId     = $trackerId;
             $contextLabel = tr('Configuration History: Tracker "%0"', $trackerInfo['name'] ?? $trackerId);
+
+            $currentData = TrackerConfigHistory::extractTrackerState($trackerInfo, $trackerId);
         }
 
-        $rows  = TrackerConfigHistory::getHistory($objectType, $objectId, 25, $offset);
+        $rows  = TrackerConfigHistory::getHistory($objectType, $objectId, $currentData, 25, $offset);
         $total = TrackerConfigHistory::countHistory($objectType, $objectId);
 
         return [

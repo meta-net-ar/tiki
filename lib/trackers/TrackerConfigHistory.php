@@ -13,7 +13,7 @@ use TikiLib;
 /**
  * Tracker Configuration History Service
  *
- * Records before/after diffs whenever a tracker or tracker field configuration is modified.
+ * Records configuration changes whenever a tracker or tracker field is modified.
  * This is NOT item data history (that is handled by tiki_tracker_item_field_logs).
  * This specifically audits changes to tiki_trackers and tiki_tracker_fields rows.
  *
@@ -68,6 +68,33 @@ class TrackerConfigHistory
     ];
 
     // -------------------------------------------------------------------------
+    // Public helpers for the controller to build the current live state
+    // -------------------------------------------------------------------------
+
+    /**
+     * Build the normalized state array for a tracker field row.
+     */
+    public static function extractFieldState(array $field): array
+    {
+        return self::extractKeys($field, self::FIELD_KEYS);
+    }
+
+    /**
+     * Build the normalized state array for a tracker row, merging its options.
+     */
+    public static function extractTrackerState(array $trackerInfo, int $trackerId): array
+    {
+        $state = self::extractKeys($trackerInfo, self::TRACKER_KEYS);
+
+        $options = TikiLib::lib('trk')->get_tracker_options($trackerId);
+        if (is_array($options)) {
+            $state = array_merge($state, $options);
+        }
+
+        return $state;
+    }
+
+    // -------------------------------------------------------------------------
     // Public API
     // -------------------------------------------------------------------------
 
@@ -100,56 +127,59 @@ class TrackerConfigHistory
 
     /**
      * Retrieve config history entries for a given object.
-     *
-     * @param string $objectType 'tracker'|'trackerfield'
-     * @param int    $objectId   trackerId or fieldId
-     * @param int    $limit
-     * @param int    $offset
-     * @return array
      */
-    public static function getHistory(string $objectType, int $objectId, int $limit = 50, int $offset = 0): array
-    {
+    public static function getHistory(
+        string $objectType,
+        int $objectId,
+        ?array $currentData = null,
+        int $limit = 50,
+        int $offset = 0
+    ): array {
         $db = TikiDb::get();
-        // Fetch one extra row so we can compute the diff for the last item in the page
-        $rows = $db->fetchAll(
+
+        $allRows = $db->fetchAll(
             'SELECT * FROM `tiki_tracker_config_histories`
              WHERE `objectType` = ? AND `objectId` = ?
-             ORDER BY `lastModif` DESC
-             LIMIT ' . ((int) $limit + 1) . ' OFFSET ' . (int) $offset,
+             ORDER BY `version` DESC
+             LIMIT ' . (int) ($offset + $limit + 1),
             [$objectType, $objectId]
         );
 
-        $result = [];
-        for ($i = 0; $i < count($rows); $i++) {
-            if ($i == $limit) {
-                break; // We only fetched this to compute the diff for the $i-1 element
-            }
-            $currentRow = $rows[$i];
-            $currentData = json_decode($currentRow['data'] ?? '[]', true) ?? [];
+        if (empty($allRows)) {
+            return [];
+        }
 
-            $previousData = null;
-            if ($currentRow['version'] > 1) {
-                if (isset($rows[$i + 1])) {
-                    $previousData = json_decode($rows[$i + 1]['data'] ?? '[]', true) ?? [];
-                } else {
-                    $prevJson = $db->getOne(
-                        'SELECT `data` FROM `tiki_tracker_config_histories` WHERE `objectType` = ? AND `objectId` = ? AND `version` = ?',
-                        [$objectType, $objectId, $currentRow['version'] - 1]
-                    );
-                    if ($prevJson) {
-                        $previousData = json_decode($prevJson, true) ?? [];
-                    } else {
-                        $previousData = [];
-                    }
+        $rollingState = $currentData ?? [];
+
+        $pageRows = [];
+        foreach ($allRows as $i => $row) {
+            $delta = json_decode($row['data'] ?? '[]', true) ?? [];
+
+            $stateAfter = $rollingState;
+
+            $diff = [];
+            foreach ($delta as $key => $oldValue) {
+                $newValue = $stateAfter[$key] ?? null;
+                if ((string) $oldValue !== (string) $newValue) {
+                    $diff[$key] = ['from' => $oldValue, 'to' => $newValue];
                 }
             }
 
-            $diff = self::computeDiff($previousData, $currentData);
-            $currentRow['diff_data'] = $diff;
-            $result[] = $currentRow;
+            foreach ($delta as $key => $oldValue) {
+                $rollingState[$key] = $oldValue;
+            }
+
+            if ($i >= $offset) {
+                $row['diff_data'] = $diff;
+                $pageRows[] = $row;
+            }
+
+            if (count($pageRows) >= $limit) {
+                break;
+            }
         }
 
-        return $result;
+        return $pageRows;
     }
 
     /**
@@ -209,7 +239,7 @@ class TrackerConfigHistory
         global $user;
 
         // Extract only the relevant keys for each object type
-        $keys       = $objectType === 'tracker' ? self::TRACKER_KEYS : self::FIELD_KEYS;
+        $keys        = $objectType === 'tracker' ? self::TRACKER_KEYS : self::FIELD_KEYS;
         $beforeClean = $before !== null ? self::extractKeys($before, $keys) : null;
         $afterClean  = self::extractKeys($after, $keys);
 
@@ -223,10 +253,24 @@ class TrackerConfigHistory
             }
         }
 
-        $diff = self::computeDiff($beforeClean, $afterClean);
+        $delta = [];
+        if ($action === 'Deleted') {
+            $delta = $beforeClean ?? [];
+        } elseif ($beforeClean !== null) {
+            foreach ($afterClean as $key => $newValue) {
+                $oldValue = $beforeClean[$key] ?? null;
+                if ((string) $oldValue !== (string) $newValue) {
+                    $delta[$key] = $oldValue;
+                }
+            }
+            foreach ($beforeClean as $key => $oldValue) {
+                if (! array_key_exists($key, $afterClean)) {
+                    $delta[$key] = $oldValue;
+                }
+            }
+        }
 
-        // Skip no-op saves: if this is an update with no actual changes, don't log
-        if ($action === 'Updated' && empty($diff)) {
+        if ($action === 'Updated' && empty($delta)) {
             return;
         }
 
@@ -251,7 +295,7 @@ class TrackerConfigHistory
                 time(),
                 $ip,
                 $newVersion,
-                json_encode($afterClean, JSON_UNESCAPED_UNICODE)
+                json_encode($delta, JSON_UNESCAPED_UNICODE)
             ]
         );
     }
