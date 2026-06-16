@@ -51,6 +51,15 @@ class PatchCypht
             mkdir($fixDS('temp/cypht/users'), 0777);
         }
 
+        // copy assets
+        $publicPath = realpath(__DIR__ . $fixDS('/../../../../public/generated'));
+        $assetsPath = $publicPath . '/assets';
+        if (! is_dir($assetsPath)) {
+            mkdir($assetsPath, 0755);
+        }
+        $fs->copy($vendors . $fixDS('jason-munro/cypht/assets'), $assetsPath);
+
+
         // generate Cypht config
         $php_binary = preg_replace("/(?<!\\\) /", '\ ', PHP_BINARY);
         $cypthFolder = $fixDS('jason-munro/cypht');
@@ -83,15 +92,8 @@ class PatchCypht
 
         // js custom pacthes
         $js = file_get_contents($cypht . 'site.js');
-        $js = str_replace("url: ''", "url: 'tiki-ajax_services.php?controller=cypht&action=ajax&'+window.location.search.substr(1)", $js);
-        $js = str_replace("xhr.open('POST', window.location.href)", "xhr.open('POST', 'tiki-ajax_services.php?controller=cypht&action=ajax&'+window.location.search.substr(1))", $js);
-        $js = str_replace("xhr.open('POST', '', true);", "xhr.open('POST', 'tiki-ajax_services.php?controller=cypht&action=ajax&'+window.location.search.substr(1), true);", $js);
+        $js = preg_replace('/(xhr.open\(\'POST\', )(.*)\)/', '$1\'tiki-ajax_services.php?controller=cypht&action=ajax&\'+(window.location.next?.substring(1) || window.location.search.substring(1)))', $js);
         $js = str_replace("var ajax = new Hm_Ajax_Request", "var ajax = new tiki_Hm_Ajax_Request", $js);
-        $js = preg_replace("#^.*/\* swipe event handler \*/#s", "", $js);
-        $js = file_get_contents($vendors . $fixDS("jason-munro/cypht/third_party/sortable.min.js")) . "\n\n" . $js;
-        $js = file_get_contents($vendors . $fixDS("jason-munro/cypht/third_party/jquery.are-you-sure.js")) . "\n\n" . $js;
-        $js = file_get_contents($vendors . $fixDS("jason-munro/cypht/third_party/ays-beforeunload-shim.js")) . "\n\n" . $js;
-        $js = file_get_contents($vendors . $fixDS("jason-munro/cypht/third_party/resumable.min.js")) . "\n\n" . $js;
         file_put_contents($cypht . 'site.js', $js);
     }
 }

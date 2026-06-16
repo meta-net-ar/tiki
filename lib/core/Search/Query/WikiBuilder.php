@@ -441,6 +441,11 @@ class Search_Query_WikiBuilder
         }
     }
 
+    public function wpquery_filter_cypht($query, $value)
+    {
+        $query->filterCypht($value);
+    }
+
     public function wpquery_sort_mode($query, $value, array $arguments)
     {
         if ($value == 'randommode') {

@@ -35,6 +35,8 @@ class Services_Cypht_Controller
             }
         }
 
+        Feedback::sendHeaders();
+
         // either html or already json encoded, so skip broker/accesslib output and do it here
         echo $dispatcher->session->dedup_page_links($dispatcher->output);
         exit;

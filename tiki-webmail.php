@@ -74,10 +74,11 @@ if (! empty($_SESSION['cypht']['user_data']['debug_mode_setting'])) {
 }
 
 $out = str_replace("<th></th>", "<th><pre>     <pre></th>", $dispatcher->output);
+$out = preg_replace('#</?body[^>]*>|</?html[^>]*>|#', '', $out);
 
-$smarty->assign('output_data', '<div class="inline-cypht"><input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'
+$smarty->assign('output_data', '<div class="inline-cypht"><div class="app-container"><input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'
     . $out
-    . "</div>");
+    . "</div></div>");
 $smarty->assign('mid', 'tiki-webmail.tpl');
 
 //handle message priting
@@ -90,8 +91,8 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
         if (isset($_POST['uid'])) {
             $uid = $_POST['uid'];
         }
-        if (isset($_POST['list_path'])) {
-            $list_path = $_POST['list_path'];
+        if (isset($_REQUEST['list_path'])) {
+            $list_path = $_REQUEST['list_path'];
         }
         if (isset($_POST['header_subject'])) {
             $header_subject = $_POST['header_subject'];
@@ -107,9 +108,19 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
         }
         if (isset($_POST['msg_text'])) {
             $msg_text = $_POST['msg_text'];
+            // Remove common email preheader techniques not well handled by PDF generators
+            $patterns = [
+              '/<span[^>]*mcnPreviewText[^>]*>.*?<\/span>/is',
+              '/<div[^>]*max-height:\s*0[^>]*>.*?<\/div>/is',
+              '/<div[^>]*style="[^"]*max-height:\s*0[^"]*"[^>]*>.*?<\/div>/is',
+              '/(?:͏|‌|\x{034F}|\x{200C}|\x{200B}|\x{FEFF})/u', // Remove invisible Unicode chars
+            ];
+            $msg_text = preg_replace($patterns, '', $msg_text);
         }
         if (isset($_POST['header_cc'])) {
             $header_cc = $_POST['header_cc'];
+        } else {
+            $header_cc = '';
         }
 
         $contentpage = createWebPage($header_subject, $header_date, $header_from, $header_to, $msg_text, $origin, $header_cc);
@@ -133,8 +144,13 @@ if (isset($_POST['display']) && $_POST['display'] == 'pdf') {
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . $length);
         echo $pdf;
+        exit;
     }
 }
+
+$headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
+
+$headerlib->add_js_module('import "@jquery-tiki/plugins/cypht";');
 
 $smarty->display('tiki.tpl');
 
@@ -167,9 +183,9 @@ function createWebPage($header_subject, $header_date, $header_from, $header_to, 
     body, td {font-size:13px}
     body{background: #fff !important;}
     a:link, a:active {color:#1155CC; text-decoration:none}
-    a:hover {text-decoration:underline; cursor: pointer} 
-    a:visited{color:##6611CC} img{border:0px} 
-    pre { white-space: pre; white-space: -moz-pre-wrap; white-space: -o-pre-wrap; white-space: pre-wrap; word-wrap: break-word; max-width: 800px; overflow: auto;} 
+    a:hover {text-decoration:underline; cursor: pointer}
+    a:visited{color:##6611CC} img{border:0px}
+    pre { white-space: pre; white-space: -moz-pre-wrap; white-space: -o-pre-wrap; white-space: pre-wrap; word-wrap: break-word; max-width: 800px; overflow: auto;}
     .logo { left: -7px; position: relative; }
   </style>
 </head>

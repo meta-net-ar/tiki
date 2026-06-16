@@ -41,11 +41,14 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "vue" => $tikiUrl . NODE_PUBLIC_DIST_PATH . "/vue/dist/vue.esm-browser.prod.js",
 
                 /* jquery_tiki */
+                "@jquery-tiki/plugins/cypht" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/cypht.js",
+                "@jquery-tiki/constants" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/constants.js",
                 "@jquery-tiki/tiki-calendar" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-calendar.js",
                 "@jquery-tiki/tiki-admin_menu_options" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-admin_menu_options.js",
                 "@jquery-tiki/tiki-edit_structure" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/tiki-edit_structure.js",
                 "@jquery-tiki/wikiplugin-trackercalendar" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/wikiplugin-trackercalendar.js",
                 "@jquery-tiki/fullcalendar_to_pdf" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/fullcalendar_to_pdf.js",
+                "@jquery-tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/jquery-tiki/emailFolder.js",
 
                 /* single-spa microfrontends and common files (root and styleguide) */
                 "@vue-mf/root-config" => $tikiUrl . JS_ASSETS_PATH . "/root-config.js",

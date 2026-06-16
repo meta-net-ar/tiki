@@ -256,12 +256,6 @@ function wikiplugin_cypht($data, $params)
         return tr("Cypht already started.");
     }
 
-    if (TikiLib::lib('wiki')->get_page_by_slug($_GET['page']) == $page && $prefs['feature_sefurl'] !== 'y') {
-        TikiLib::lib('access')->redirect('tiki-index.php?page_id=' . $tikilib->get_page_id_from_name($page));
-    } elseif ($prefs['feature_sefurl'] === 'y' && ! empty($_GET['page_id'])) {
-        TikiLib::lib('access')->redirect(TikiLib::lib('wiki')->sefurl($page));
-    }
-
     static $called = false;
     if ($called) {
         return tr("Only one cypht plugin per page can be used.");
@@ -363,6 +357,9 @@ function wikiplugin_cypht($data, $params)
         .inline-cypht { position: relative; }
     ");
 
+    // Ensure Bootstrap icons CSS is loaded for Cypht
+    $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
+
     /* get configuration */
     $config = new Tiki_Hm_Site_Config_File([], $session_prefix, $settings_per_page);
     $environment->define_default_constants($config);
@@ -448,8 +445,7 @@ function wikiplugin_cypht($data, $params)
         }
     }
 
-    $js = "$('.draft_folder_select, .sent_folder_select, .trash_folder_select, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select').attr('style', 'background-color: #fff !important; z-index: 1');";
-    $headerlib->add_js($js);
+    $headerlib->add_js_module('import "@jquery-tiki/plugins/cypht";');
 
     return '<div class="inline-cypht">'
         . '<input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'

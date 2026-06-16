@@ -220,7 +220,7 @@ class Services_Search_Controller
                 $transformed = [
                     'object_type' => $item['object_type'],
                     'object_id' => $use_permname != 'y' ? $item['object_id'] : (TikiLib::lib('trk')->get_field_info($item['object_id'])['permName'] ?? $item['object_id']),
-                    'parent_id' => $item['gallery_id'],
+                    'parent_id' => $item['gallery_id'] ?? $item['tracker_id'],
                     'title' => preg_replace_callback('/\{([\w\.]+)\}/', function ($matches) use ($item, $format, $titleFilter, $highlightHelper) {
                         $key = $matches[1];
                         if (isset($item[$key])) {

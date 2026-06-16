@@ -432,7 +432,7 @@ class Utilities
                 if ($user) {
                     $result['organizers'][] = $user;
                 }
-                $cn = (string)$organizer->CN;
+                $cn = isset($organizer->CN) ? (string)$organizer->CN : '';
                 if (empty($cn)) {
                     $result['real_organizers'][] = $email;
                 } else {
@@ -457,17 +457,21 @@ class Utilities
                 if (isset($attendee['PARTSTAT'])) {
                     $participant['partstat'] = (string)$attendee['PARTSTAT'];
                 }
+                if (isset($attendee['X-COMMENT'])) {
+                    $participant['comment'] = (string)$attendee['X-COMMENT'];
+                }
                 $result['participants'][] = $participant;
             }
             // fetch attendees as they are for later reference like RSVP actions via Cypht
             $result['attendees'] = [];
             foreach ($component->ATTENDEE as $attendee) {
                 $email = preg_replace("/MAILTO:\s*/i", "", (string)$attendee);
-                $cn = (string)$attendee->CN;
+                $cn = isset($attendee->CN) ? (string)$attendee->CN : '';
                 if (empty($cn)) {
-                    $cn = $email;
+                    $result['attendees'][] = $email;
+                } else {
+                    $result['attendees'][] = "$cn <$email>";
                 }
-                $result['attendees'][] = "$cn <$email>";
             }
         }
 
@@ -737,7 +741,10 @@ class Utilities
             );
         }
         foreach ($participants as $par) {
-            $vevent->add(
+            if (! isset($par['role'])) {
+                $par['role'] = 0;
+            }
+            $attendee = $vevent->add(
                 'ATTENDEE',
                 'mailto:' . $par['email'],
                 [
@@ -746,6 +753,9 @@ class Utilities
                     'PARTSTAT' => $par['partstat'],
                 ]
             );
+            if (! empty($par['comment'])) {
+                $attendee->add('X-COMMENT', $par['comment']);
+            }
         }
 
         if ((string)$vevent->UID != @$row['uid']) {

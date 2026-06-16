@@ -5,5 +5,11 @@
 {$output_data}
 
 {jq}
-$('.draft_folder_select, .sent_folder_select, .trash_folder_select, .delete_folder_select, .rename_folder_select, .rename_parent_folder_select, .parent_folder_select, .archive_folder_select').attr('style','background-color: #ffff !important');
+$('.pagetitle a, .t_navbar a').each(function() {
+    $(this).data('href', $(this).attr('href'));
+    $(this).attr('href', '#');
+    $(this).click(() => {
+        window.location.href = $(this).data('href');
+    });
+})
 {/jq}

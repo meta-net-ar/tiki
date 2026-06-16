@@ -79,7 +79,7 @@ class Tiki_Log extends AbstractLogger
         $this->level = $level;
     }
 
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         if (self::$levels[$level] < self::$levels[$this->level]) {
             //Do not log

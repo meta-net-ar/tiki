@@ -7190,6 +7190,7 @@
             "Search_Query_WikiBuilder::wpquery_filter_personalize": true,
             "Search_Query_WikiBuilder::wpquery_filter_distance": true,
             "Search_Query_WikiBuilder::wpquery_filter_similar": true,
+            "Search_Query_WikiBuilder::wpquery_filter_cypht": true,
             "Search_Query_WikiBuilder::wpquery_sort_mode": true,
             "Search_Query_WikiBuilder::wpquery_pagination_onclick": true,
             "Search_Query_WikiBuilder::wpquery_pagination_offset_jsvar": true,

@@ -92,7 +92,7 @@ class CalendarLib extends TikiLib
             }
             $res2 = $this->query("select `optionName`,`value` from `tiki_calendar_options` where `calendarId`=?", [(int)$k]);
             while ($r2 = $res2->fetchRow()) {
-                if ($r2['optionName'] == 'eventstatus') {
+                if ($r2['optionName'] == 'eventstatus' && isset($r2['value'])) {
                     $eventstatus = json_decode($r2['value']);
                     $r[$r2['optionName']] = $eventstatus;
                     //add translation tag to statuses for display
@@ -689,7 +689,7 @@ class CalendarLib extends TikiLib
                 $res['description'] = '';
             }
             $query
-                = "select `username`, `role`, `partstat` from `tiki_calendar_roles` where `calitemId`=? order by `role`";
+                = "select `username`, `role`, `partstat`, `comment` from `tiki_calendar_roles` where `calitemId`=? order by `role`";
             $rezult = $this->query($query, [(int)$calitemId]);
             $ppl = [];
             $org = [];
@@ -705,7 +705,8 @@ class CalendarLib extends TikiLib
                         'username' => $rez["username"],
                         'email' => $email,
                         'role' => $rez["role"],
-                        'partstat' => $rez['partstat']
+                        'partstat' => $rez['partstat'],
+                        'comment' => $rez['comment']
                     ];
                 }
             }
@@ -981,8 +982,8 @@ class CalendarLib extends TikiLib
                         }
                     }
                 }
-                $query = "insert into `tiki_calendar_roles` (`calitemId`,`username`,`role`,`partstat`) values (?,?,?,?)";
-                $this->query($query, [(int)$calitemId, $role['username'], $role['role'] ?? 0, $role['partstat'] ?? null]);
+                $query = "insert into `tiki_calendar_roles` (`calitemId`,`username`,`role`,`partstat`, `comment`) values (?,?,?,?,?)";
+                $this->query($query, [(int)$calitemId, $role['username'], $role['role'] ?? 0, $role['partstat'] ?? null, $role['comment'] ?? null]);
             }
         }
 
@@ -1533,7 +1534,7 @@ class CalendarLib extends TikiLib
 
     public function get_participant_by_event_uid($uid)
     {
-        $query = "select i.`calitemId`,i.`username`,i.`role`,i.`partstat` from `tiki_calendar_roles` i join `tiki_calendar_items` c on i.`calitemId` = c.`calitemId` where c.`uid` = ?";
+        $query = "select i.`calitemId`,i.`username`,i.`role`,i.`partstat`i.`comment` from `tiki_calendar_roles` i join `tiki_calendar_items` c on i.`calitemId` = c.`calitemId` where c.`uid` = ?";
         $bindvars = [$uid];
         $result = $this->fetchAll($query, $bindvars);
 

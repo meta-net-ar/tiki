@@ -81,7 +81,7 @@ class Hm_Handler_add_file_attachment extends Hm_Handler_Module
                 'size' => $tikifile->filesize
             ];
             if (! attach_file($tikifile->getContents(), $file, $this->config->get('attachment_dir'), $draft_id, $this)) {
-                Hm_Msgs::add('ERRAn error occurred attaching the file gallery file.');
+                Hm_Msgs::add(tr('An error occurred attaching the file gallery file.'), 'danger');
             }
         }
     }
@@ -100,7 +100,7 @@ class Hm_Output_tiki_contacts_page_link extends Hm_Output_Module
         if (! $this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-people-fill fs-5 me-2"></i>';
         }
-        $res .= $this->trans('Contacts') . '</a></li>';
+        $res .= '<span class="nav-label">' . $this->trans('Contacts') . '</span></a></li>';
         if ($this->format == 'HTML5') {
             return $res;
         }
@@ -392,14 +392,9 @@ class Hm_Output_filter_message_headers_mpdf extends Hm_Output_Module
 {
     protected function output()
     {
-        $headers = $this->get('msg_headers');
-        if (is_string($headers) && TikiLib::lib('tiki')->get_preference('print_pdf_from_url') == "mpdf") {
-            $headersplited = explode('|', $headers);
-            $last = array_pop($headersplited);
-            $pdf_link = ' <a class="hlink" id="print_pdf" href="#"> ' . $this->trans('PDF') . ' </a>';
-            array_push($headersplited, $pdf_link, $last);
-            $headers = implode("|", $headersplited);
-            $this->out('msg_headers', $headers, false);
+        if (TikiLib::lib('tiki')->get_preference('print_pdf_from_url') == "mpdf") {
+            $pdf_link = ' <a class="hlink text-decoration-none btn btn-sm btn-outline-secondary" id="print_pdf" href="#"> ' . $this->trans('PDF') . ' </a>';
+            $this->concat('extra_header_buttons', $pdf_link);
         }
     }
 }
@@ -454,5 +449,88 @@ class Hm_Output_enable_gmail_contacts_module_setting extends Hm_Output_Module
             $enable_gmail_contacts_module = $settings['tiki_enable_gmail_contacts_module'];
         }
         return '<tr class="general_setting"><td><label class="form-check-label">' . tr('Enable Gmail Contacts Module') . '</label></td><td><input class="form-check-input" type="checkbox" name="tiki_enable_gmail_contacts_module" value="1" ' . ($enable_gmail_contacts_module ? 'checked >' . $reset : '>') . '</td></tr>';
+    }
+}
+
+/**
+ *
+ */
+class Hm_Handler_post_imap_save_sent extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $msgUid = $this->get('sent_msg_uid');
+
+        if (! $msgUid) {
+            return;
+        }
+
+        $subject = $this->request->post['compose_subject'];
+
+        $keywords = [$subject];
+
+        foreach (explode(' ', $subject) as $word) {
+            $keywords[] = $word;
+        }
+
+        $keywords = array_map('trim', $keywords);
+        $keywords = array_filter($keywords);
+        $keywords = array_unique($keywords);
+
+        $this->session->set('keywords', $keywords);
+        $this->session->set('msg_uid', $msgUid);
+        $this->session->set('imap_server_id', $this->get('sent_imap_id'));
+    }
+}
+
+class Hm_Handler_get_msg_tracker_items extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $keywords = $this->session->get('keywords');
+        $msgUid = $this->session->get('msg_uid');
+        $imapServerId = $this->session->get('imap_server_id');
+
+        $this->session->set('keywords', '');
+        $this->session->set('msg_uid', '');
+        $this->session->set('imap_server_id', '');
+
+        $fields = TikiLib::lib('trk')->get_fields_by_type('EF');
+        $fields = array_map(function ($field) {
+            $tracker = TikiLib::lib('trk')->get_tracker($field['trackerId']);
+            return [
+                'tracker_id' => $field['trackerId'],
+                'field_id' => $field['fieldId'],
+                'title' => "{$tracker['name']} - {$field['name']}",
+            ];
+        }, $fields);
+        $this->out('tracker_fields', $fields);
+
+        if (isset($this->request->post['lookup'])) {
+            $searchArgs = [];
+            if (isset($this->request->post['sort_mode'])) {
+                $searchArgs['sort_mode'] = $this->request->post['sort_mode'];
+            }
+            if (isset($this->request->post['limit'])) {
+                $searchArgs['maxRecords'] = $this->request->post['limit'];
+            }
+            if (isset($this->request->post['tracker_id'])) {
+                $searchArgs['tracker_id'] = $this->request->post['tracker_id'];
+            }
+            if (isset($this->request->post['tracker_id'])) {
+                $searchArgs['field_id'] = $this->request->post['field_id'];
+            }
+            $this->out('tracker_items', find_relevant_tracker_items($this->request->post['lookup'], searchArgs: $searchArgs));
+            return;
+        }
+
+        if (! $keywords || ! $msgUid || ! $imapServerId) {
+            $this->out('no_message', true);
+            return;
+        }
+
+        $this->out('tracker_items', find_relevant_tracker_items(implode(' or ', $keywords)));
+        $this->out('msg_uid', $msgUid);
+        $this->out('list_path', "imap_$imapServerId" . '_' . bin2hex("Sent"));
     }
 }

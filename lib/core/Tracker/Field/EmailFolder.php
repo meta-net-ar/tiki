@@ -121,6 +121,20 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                         'filter' => 'text',
                         'default' => '',
                     ],
+                    'useItemFolders' => [
+                        'name' => tr('Use Item Folders'),
+                        'description' => tr('Allow to add custom folders in individual tracker items.'),
+                        'filter' => 'int',
+                        'default' => '0',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'depends' => [
+                            'field' => 'useFolders',
+                            'value' => '1'
+                        ],
+                    ]
                 ],
             ],
         ];
@@ -144,6 +158,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
 
         // Obtain the information from the database for display
         $emails = [];
+        $autoMoveReplies = [];
         foreach ($fileIds as $folder => $files) {
             $emails[$folder] = [];
             foreach ($files as $fileId) {
@@ -155,6 +170,10 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                     continue;
                 }
                 $emails[$folder][] = $email;
+
+                if ($email['auto_move_reply']) {
+                    $autoMoveReplies[] = explode('@', $email['message_id'])[0];
+                }
             }
         }
 
@@ -174,6 +193,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             'emails' => $emails,
             'count' => count($fileIds, COUNT_RECURSIVE),
             'value' => $value,
+            'autoMoveReplies' => $autoMoveReplies,
         ];
     }
 
@@ -215,8 +235,15 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         } else {
             $view_path .= '?';
         }
-        $view_path .= "page=message&uid=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
+
+
+        if (in_array('Draft', $parsed_fields['flags'])) {
+            $view_path .= "page=compose&draft_id=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
+        } else {
+            $view_path .= "page=message&uid=" . $parsed_fields['fileId'] . "&list_path=tracker_folder_" . $parsed_fields['itemId'] . "_" . $parsed_fields['fieldId'] . "&list_parent=tracker_" . $parsed_fields['trackerId'];
+        }
         $parsed_fields['view_path'] = $view_path;
+
         return $parsed_fields;
     }
 
@@ -283,6 +310,8 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         }
         $compose_path .= "page=compose&list_path=tracker_folder_" . $this->getItemId() . "_" . $this->getConfiguration('fieldId') . "&list_parent=tracker_" . $this->getTrackerDefinition()->getConfiguration('trackerId');
 
+        TikiLib::lib('header')->add_js_module('import "@jquery-tiki/tracker-fields/emailFolder";');
+
         return $this->renderTemplate('trackeroutput/email_folder.tpl', $context, [
             'emails' => $emails,
             'count' => $this->getConfiguration('count'),
@@ -291,6 +320,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                 return $this->folderHandle($folder);
             }, preg_split('/\s*,\s*/', $this->getOption('openedFolders'))),
             'compose_path' => $compose_path,
+            'itemId' => $this->getItemId(),
         ]);
     }
 
@@ -317,6 +347,13 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             $this->deleteEmail($existing, $value['delete'], $value['skip_trash'] ?? false);
         } elseif (isset($value['archive'])) {
             $this->archiveEmail($existing, $value['archive']);
+        } elseif (isset($value['restore'])) {
+            $this->restoreEmail($existing, $value['restore']);
+        } elseif (isset($value['replace'])) {
+            $this->updateDraftEmail($value['replace']);
+        } elseif (isset($value['newFolder'])) {
+            $folder = $this->folderHandle($value['newFolder']) . '_item_' . $this->getItemId();
+            $existing[$folder] = [];
         }
         return [
             'value' => json_encode($existing)
@@ -337,12 +374,14 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         $dates = [];
         $senders = [];
         $recipients = [];
+        $messageIds = [];
         foreach ($emails as $folder => $folder_emails) {
             foreach ($folder_emails as $email) {
                 $subjects[] = $email['subject'];
                 $dates[] = $email['date'];
                 $senders[] = $email['sender'];
                 $recipients[] = $email['recipient'];
+                $messageIds[] = explode('@', $email['message_id'])[0];
             }
         }
 
@@ -352,6 +391,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             "{$baseKey}_dates" => $typeFactory->multivalue($dates),
             "{$baseKey}_senders" => $typeFactory->multivalue($senders),
             "{$baseKey}_recipients" => $typeFactory->multivalue($recipients),
+            "{$baseKey}_message_ids" => $typeFactory->multivalue($messageIds),
         ];
         return $out;
     }
@@ -365,6 +405,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             "{$baseKey}_dates",
             "{$baseKey}_senders",
             "{$baseKey}_recipients",
+            "{$baseKey}_message_ids",
         ];
         return $fields;
     }
@@ -378,6 +419,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
             "{$baseKey}_dates" => 'multivalue',
             "{$baseKey}_senders" => 'multivalue',
             "{$baseKey}_recipients" => 'multivalue',
+            "{$baseKey}_message_ids" => 'multivalue',
         ];
         return $fields;
     }
@@ -520,7 +562,24 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         $handles = array_map(function ($folder) {
             return $this->folderHandle($folder);
         }, $custom);
-        return array_merge($folders, array_combine($handles, $custom));
+
+        $folders = array_merge($folders, array_combine($handles, $custom));
+
+        if ($this->trackerField->getOption('useItemFolders')) {
+            $value = $this->getValue();
+            $decoded = json_decode($value, true);
+            if ($decoded !== null) {
+                foreach ($decoded as $folder => $_) {
+                    $suffix = '_item_' . $this->getItemId();
+                    if (str_ends_with($folder, $suffix)) {
+                        $folderName = substr($folder, 0, -strlen($suffix));
+                        $folders[$folder] = $folderName;
+                    }
+                }
+            }
+        }
+
+        return $folders;
     }
 
     protected function folderHandle($folderName)
@@ -540,7 +599,7 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
         $fileId = $filegallib->upload_single_file($galinfo, $file['name'], $file['size'], $file['type'], $file['content']);
         if ($fileId) {
             $existing[] = $fileId;
-            TikiLib::lib('relation')->add_relation('tiki.file.attach', 'trackeritem', $this->getItemId(), 'file', $fileId);
+            TikiLib::lib('relation')->add_relation('tiki.file.attach', 'trackeritem', $this->getItemId(), 'file', $fileId, false, $this->getConfiguration('fieldId'));
         }
     }
 
@@ -578,5 +637,34 @@ class Tracker_Field_EmailFolder extends Tracker_Field_Files implements \Tracker\
                 break;
             }
         }
+    }
+
+    protected function restoreEmail(&$existing, $fileId)
+    {
+
+        if (! $this->getOption('useFolders')) {
+            Feedback::error(tr('%0 field: not configured to use folders but message was tried to be archived.', $this->getConfiguration('name')));
+            return;
+        }
+        foreach ($existing as $folder => $_) {
+            if (($key = array_search($fileId, $existing[$folder])) !== false) {
+                unset($existing[$folder][$key]);
+                $existing[$folder] = array_values($existing[$folder]);
+                $existing['inbox'][] = $fileId;
+                break;
+            }
+        }
+    }
+
+    protected function updateDraftEmail($file)
+    {
+        $filegallib = TikiLib::lib('filegal');
+        $galleryId = (int) $this->getOption('galleryId');
+        $galinfo = $filegallib->get_file_gallery($galleryId, false);
+        if (! $galinfo || empty($galinfo['galleryId'])) {
+            Feedback::error(tr('%0 field: Gallery #%1 not found', $this->getConfiguration('name'), $galleryId));
+            return;
+        }
+        $filegallib->update_single_file($galinfo, $file['name'], $file['size'], $file['type'], $file['content'], $file['fileId']);
     }
 }
