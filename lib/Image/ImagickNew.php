@@ -208,8 +208,7 @@ class ImagickNew extends ImageAbstract
         $padLeft = 20;
         $padBottom = 20;
 
-        $image = new Imagick();
-        $image->readImageBlob($this->data);
+        $image = clone $this->data;
         $height = $image->getimageheight();
 
         $draw = new ImagickDraw();
