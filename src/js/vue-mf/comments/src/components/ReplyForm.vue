@@ -1,3 +1,9 @@
+<script setup>
+import {inject} from "vue";
+
+const tr = inject('tr')
+</script>
+
 <script>
 import useMessageStore from "../store";
 
@@ -53,7 +59,7 @@ export default {
         <div class="thread-textarea">
             <i class="fa fa-question-circle" style="color: #8ca5af;"></i>
             <textarea name="message" class="thread-input form-control mt-3" rows="5" placeholder="Type your comment here, in Tiki-flavored MarkDown format."></textarea>
-            <a :href="'#reply-block-'+parentId" class="btn btn-secondary submit-btn mt-2" style="float:right;" v-on:click="updateMsg()">Preview/Publish</a>
+            <a :href="'#reply-block-'+parentId" class="btn btn-secondary submit-btn mt-2" style="float:right;" v-on:click="updateMsg()">{{ tr('Preview/Publish') }}</a>
         </div>
     </div>
 </template>

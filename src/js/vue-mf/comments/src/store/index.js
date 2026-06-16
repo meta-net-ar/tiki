@@ -230,7 +230,7 @@ export default defineStore("messageStore", {
                 });
                 totalHeight -= lastChildHeight + margins;
 
-                if (expended == "false" && (parentBody.hasClass(targetClass) || parentBody.find('.'+targetClass).length > 0)) {
+                if (expended == "false" && (parentBody.hasClass(targetClass) || parentBody.find("." + targetClass).length > 0)) {
                     console.log(targetClass);
                     console.log(parentBody.hasClass(targetClass));
                     totalHeight = 0;
