@@ -161,16 +161,24 @@ class CalendarLib extends TikiLib
         global $prefs;
         $canEditAnything = false;
         $calendars = [];
+        $minHourOfDay = '00:00:00';
+        $maxHourOfDay = '24:00:00';
+        $defaultStartOfDay = max(0, min(24 * 60 * 60, (int)($prefs['calendar_start_day'] ?? 0)));
+        $defaultEndOfDay = max(0, min(24 * 60 * 60, (int)($prefs['calendar_end_day'] ?? 24 * 60 * 60)));
         foreach ($rawcalsData as $calendar) {
             $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
             $calendars[$calendar['calendarId']] = $calendar;
             // for week and day views
-            $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
+            $startOfDayUnix = max(0, min(24 * 60 * 60, (int)($calendar['startday'] ?? $defaultStartOfDay)));
 
             $startOfDayHour = intdiv($startOfDayUnix, 3600);
             $startOfDayMinute = intdiv($startOfDayUnix % 3600, 60);
             $minHourOfDay = sprintf('%02d:%02d:00', $startOfDayHour, $startOfDayMinute);
-            $endOfDayUnix = (int)($calendar['endday'] ?? 0);
+
+            $endOfDayUnix = max(0, min(24 * 60 * 60, (int)($calendar['endday'] ?? $defaultEndOfDay)));
+            if ($endOfDayUnix <= $startOfDayUnix) {
+                $endOfDayUnix = $defaultEndOfDay > $startOfDayUnix ? $defaultEndOfDay : 24 * 60 * 60;
+            }
             $endOfDayHour = intdiv($endOfDayUnix, 3600);
             $endOfDayMinute = intdiv($endOfDayUnix % 3600, 60);
             $maxHourOfDay = sprintf('%02d:%02d:00', $endOfDayHour, $endOfDayMinute);
