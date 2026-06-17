@@ -442,13 +442,23 @@ HTML;
                 $themecss = file_get_contents($themePath);
             } else {
                 try {
+                    $debugInfo = [
+                        'theme' => $prefs['theme'],
+                        'themePath' => $themePath,
+                        'file_exists' => $themePath ? file_exists($themePath) : 'path was null/false',
+                        'printfriendly' => $pdfSettings['print_pdf_mpdf_printfriendly'],
+                        'execution_context' => php_sapi_name(),
+                        'cwd' => getcwd(),
+                        'script' => $_SERVER['SCRIPT_FILENAME'] ?? 'unknown',
+                        'is_cli' => php_sapi_name() === 'cli'
+                    ];
                     $exception = new \Exception(
                         "PDF Generation: Primary theme CSS not loaded - Bootstrap variables will be missing. " .
                         "This typically happens when: (1) PDF task runs async (feature_queued_tasks=y) " .
                         "in different execution context (CLI vs Web), (2) Theme files missing/moved, " .
                         "(3) Permission denied accessing theme directory"
                     );
-                    TikiLib::lib('errortracking')->captureException($exception);
+                    TikiLib::lib('errortracking')->captureException($exception, $debugInfo);
                 } catch (\Exception $e) {
                     // silently fail if error tracking unavailable
                 }
