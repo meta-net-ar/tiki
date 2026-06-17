@@ -44,7 +44,7 @@ class DrawflowWebhookSend implements DrawflowActionInterface
         return "
         <div class='{$this->node_identifier} draggable-node'>
             <div class='text-center'><span><span data-icon-name='paper_plane'></span>&nbsp;" . tra('Webhook send') . "</span></div>
-            <input type='text' df-{$this->node_df_identifier} data-needs-element-plus='false' class='form-control' placeholder='" . tra('Enter webhook URL') . "'>
+            <input type='text' df-{$this->node_df_identifier} class='form-control' placeholder='" . tra('Enter webhook URL') . "'>
         </div>
         <div class='draggable-node clone  bg-light px-2 py-1 border text-center w-100' data-inputs='{$this->n_input}' data-outputs='{$this->n_output}' data-for='{$this->node_identifier}'>
             <div class='node-mask' title='" . htmlentities($this->description, ENT_QUOTES) . "'>
