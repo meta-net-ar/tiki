@@ -419,6 +419,18 @@ if (! function_exists('correct_start_day')) {
 
 global $minHourOfDay, $maxHourOfDay;
 
+$formatHourOfDay = static function ($value, string $fallback): string {
+    if ($value === null || $value === '') {
+        return $fallback;
+    }
+
+    if (is_numeric($value)) {
+        return sprintf('%02d:00:00', (int)$value);
+    }
+
+    return (string)$value;
+};
+
 $slotDuration = '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT);
 switch ($prefs['calendar_view_mode']) {
     case 'week':
@@ -440,8 +452,8 @@ $smarty->assign(
         'firstDayofWeek'   => $firstDayofWeek,
         'display_timezone' => $prefs['display_timezone'],
         'language'         => Language::getCurrentLanguage(),
-        'minHourOfDay'     => $minHourOfDay ?: "00:00:00",
-        'maxHourOfDay'     => $maxHourOfDay ?: "23:00:00",
+        'minHourOfDay'     => $formatHourOfDay($minHourOfDay, "00:00:00"),
+        'maxHourOfDay'     => $formatHourOfDay($maxHourOfDay, "24:00:00"),
         'slotDuration'     => $slotDuration,
         'initialView'      => $initialView,
         'initialDate'      => "$focus_year-$focus_month-$focus_day",
