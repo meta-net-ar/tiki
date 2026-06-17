@@ -59,6 +59,28 @@ describe("applySelect helper functions", () => {
         ]);
     });
 
+    test("updates the element-plus-ui options when the native select change event is triggered", async () => {
+        const givenSelect = document.createElement("select");
+        const givenElementPlusUi = document.createElement("element-plus-ui");
+        const selectOption = document.createElement("option");
+        selectOption.value = "foo";
+        givenSelect.appendChild(selectOption);
+
+        attachChangeEventHandler(givenElementPlusUi, givenSelect);
+
+        selectOption.disabled = true;
+        $(givenSelect).trigger("change");
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(JSON.parse(givenElementPlusUi.getAttribute("options"))).toEqual([{ value: "foo", label: selectOption.textContent, disabled: true }]);
+
+        selectOption.disabled = false;
+        $(givenSelect).trigger("change");
+        await new Promise((resolve) => setTimeout(resolve, 0));
+
+        expect(JSON.parse(givenElementPlusUi.getAttribute("options"))).toEqual([{ value: "foo", label: selectOption.textContent, disabled: false }]);
+    });
+
     test("updates the element-plus-ui groups when the select grouped options change", async () => {
         const givenSelect = document.createElement("select");
         const givenElementPlusUi = document.createElement("element-plus-ui");
