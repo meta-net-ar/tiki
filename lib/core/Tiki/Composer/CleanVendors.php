@@ -375,25 +375,7 @@ class CleanVendors
 
     private static function isDirEmpty(string $dir): bool
     {
-        if (! is_dir($dir)) {
-            return true;
-        }
-
-        $handle = @opendir($dir);
-        if (! $handle) {
-            return false;
-        }
-
-        while (($entry = readdir($handle)) !== false) {
-            if ($entry === '.' || $entry === '..') {
-                continue;
-            }
-            closedir($handle);
-            return false;
-        }
-
-        closedir($handle);
-        return true;
+        return ! is_dir($dir) || ! (new \FilesystemIterator($dir, \FilesystemIterator::SKIP_DOTS))->valid();
     }
 
     private static function removeStandard(string $vendorsRoot, string $vendorsRootBase, Event $event): void
