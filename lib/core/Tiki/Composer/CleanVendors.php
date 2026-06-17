@@ -7,6 +7,8 @@
 
 namespace Tiki\Composer;
 
+require_once __DIR__ . '/../../../../path_constants.php';
+
 use Composer\Script\Event;
 use Composer\Util\FileSystem;
 use Exception;
@@ -251,22 +253,23 @@ class CleanVendors
     }
 
     /**
-     * Determine the default log directory using Tiki's preference system.
-     *
-     * Falls back to $tikiRoot/temp/dev if preference is not set.
+     * Determine the default directory used to store Composer vendor cleanup reports and diagnostics.
      *
      * @param string $tikiRoot The root directory of the Tiki installation
-     * @return string The path to the temp directory (temp/dev subdirectory)
+     * @return string The path to the temp directory
      */
     private static function getDefaultLogDirectory(string $tikiRoot): string
     {
-        global $prefs;
 
-        if (isset($prefs['tmpDir']) && ! empty($prefs['tmpDir'])) {
-            return rtrim($prefs['tmpDir'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'dev';
+        $logDir = $tikiRoot . DIRECTORY_SEPARATOR . CLEAN_VENDOR_LOG_PATH;
+
+        if (! is_dir($logDir)) {
+            if (! mkdir($logDir, 0755, true) && ! is_dir($logDir)) {
+                throw new \RuntimeException('Failed to create log directory: ' . $logDir);
+            }
         }
 
-        return $tikiRoot . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . 'dev';
+        return $logDir;
     }
 
     private static function normalizePath(string $path): string
@@ -392,48 +395,6 @@ class CleanVendors
         closedir($handle);
         return true;
     }
-
-    // private static function removeStandard(string $base, string $vendorsRoot, Event $event): void
-    // {
-    //     $fs = new FileSystem();
-    //     $files = glob($base . '{,.}*[!.]', GLOB_MARK | GLOB_BRACE);
-
-    //     if (! $files) {
-    //         return;
-    //     }
-
-    //     foreach ($files as $file) {
-    //         $file = rtrim(str_replace('/', DIRECTORY_SEPARATOR, $file), DIRECTORY_SEPARATOR);
-
-    //         // Matching supports basename AND path tails like ".github/workflows"
-    //         if (self::isStandardPath($file)) {
-    //             $packageName = self::extractPackageName($file, $vendorsRoot);
-
-    //             try {
-    //                 $size = is_dir($file) ? self::getDirectorySize($file) : (float) @filesize($file);
-    //                 $fs->remove($file);
-
-    //                 self::$deletedFiles++;
-    //                 self::$deletedSize += (float) $size;
-    //                 self::$deletedPaths[] = $file;
-
-    //                 if ($packageName) {
-    //                     self::$affectedPackages[$packageName] = true;
-    //                 }
-    //             } catch (Exception $e) {
-    //                 $errorMsg = sprintf('Error deleting %s: %s', $file, $e->getMessage());
-    //                 $event->getIO()->writeError("<error>$errorMsg</error>");
-    //                 self::logMessage("ERROR: $errorMsg");
-    //             }
-
-    //             continue;
-    //         }
-
-    //         if (is_dir($file)) {
-    //             self::removeStandard($file . DIRECTORY_SEPARATOR, $vendorsRoot, $event);
-    //         }
-    //     }
-    // }
 
     private static function removeStandard(string $vendorsRoot, string $vendorsRootBase, Event $event): void
     {

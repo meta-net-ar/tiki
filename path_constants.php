@@ -105,6 +105,13 @@ const WIKIPLUGINS_SRC_PATH = 'lib/wiki-plugins';
 //Question: where is the string or constant that generates these files?
 const WIKIPLUGIN_CACHE_FILES_GLOB = 'temp/cache/wikiplugin_*';
 
+/**
+ * Relative path used to store Composer vendor cleanup reports and diagnostics.
+ *
+ * This path is used during Composer install/update.
+ */
+const CLEAN_VENDOR_LOG_PATH = 'temp/clean_vendor_log';
+
 const SATIS_TEMP_PATH = 'temp/satis';
 const UNIFIED_INDEX_TEMP_PATH = 'temp/unified-index';
 const TEMPLATES_ADMIN_PATH = 'templates/admin';
