@@ -223,7 +223,6 @@ $(function () {
         // 's' (0 level),
         // 'o' (option without children)
         // or levels of numbers 1, 2...etc (with children)
-        var prevSectionLevel = 0;
         var position = 0;
 
         lisArr.forEach(function (el, index) {
@@ -232,9 +231,14 @@ $(function () {
             if ($(el).find("input.samepos:checked").first().length === 0) {
                 position++;
             }
+            var parentId = $(el).data("parent");
+            if (!parentId) {
+                parentId = 0;
+            }
+            var domType = $(el).data("type");
             var obj = {
                 optionId: $(el).data("id"),
-                parentId: $(el).data("parent"),
+                parentId: parentId,
                 position: null,
                 name: $(el).find("input.field-label").val(),
                 url: $(el).find("input.field-url").val(),
@@ -242,8 +246,18 @@ $(function () {
                 sectionLevel: null,
                 type: null,
             };
+
+            if (domType === "-") {
+                obj.type = "-";
+                obj.name = obj.name || "separator";
+                obj.url = obj.url || "";
+                obj.position = position;
+                dataArr.push(obj);
+                return;
+            }
+
             var firstOccurrenceObj = getFirstOccurrenceObjByParentId(obj.parentId, dataArr);
-            var lastObj = getLastObj(dataArr);
+            var lastObj = getLastNonSeparator(dataArr);
 
             if (obj.parentId === 0) {
                 obj.sectionLevel = 0;
@@ -251,33 +265,29 @@ $(function () {
             } else if (firstOccurrenceObj) {
                 obj.sectionLevel = firstOccurrenceObj.sectionLevel;
                 obj.type = firstOccurrenceObj.sectionLevel;
-            } else {
+            } else if (lastObj && lastObj.sectionLevel != null) {
                 obj.sectionLevel = lastObj.sectionLevel + 1;
                 obj.type = lastObj.sectionLevel + 1;
+            } else {
+                obj.sectionLevel = 0;
+                obj.type = "s";
             }
 
             if (!isParent(obj.optionId, parentIds) && obj.parentId !== 0) {
                 obj.type = "o";
             }
 
-            if (obj.sectionLevel < prevSectionLevel && obj.type !== "s") {
-                var levelsBack = prevSectionLevel - obj.sectionLevel;
-                for (var i = 0; i < levelsBack; i++) {
-                    dataArr.push({
-                        optionId: null,
-                        position: position,
-                        name: "separator",
-                        url: "",
-                        type: "-",
-                    });
-                    position++;
-                }
-            }
-            prevSectionLevel = obj.sectionLevel;
-
             obj.position = position;
             dataArr.push(obj);
         });
+
+        dataArr = injectClosingSeparatorsFromLevels(dataArr);
+        position = 0;
+        dataArr.forEach(function (row) {
+            row.position = ++position;
+        });
+
+        // console.log(parentIds,dataArr,$("input[name=ticket]").val());
 
         $.post(
             $.service("menu", "save"),
@@ -303,12 +313,49 @@ $(function () {
         return arr.find((el) => el.parentId === id);
     }
 
-    function getLastObj(arr) {
-        return arr[arr.length - 1];
+    function getLastNonSeparator(arr) {
+        for (var i = arr.length - 1; i >= 0; i--) {
+            if (arr[i].type !== "-") {
+                return arr[i];
+            }
+        }
+        return null;
     }
 
     function isParent(id, parentIds) {
         return parentIds.findIndex((parentId) => parentId === id) !== -1;
+    }
+
+    /** Insert '-' closers when depth jumps shallower without explicit separator rows. */
+    function injectClosingSeparatorsFromLevels(rows) {
+        var out = [];
+        var prevLvl = 0;
+        rows.forEach(function (row) {
+            if (row.type === "-") {
+                out.push(row);
+                prevLvl = Math.max(0, prevLvl - 1);
+                return;
+            }
+            var lvl = row.sectionLevel != null ? row.sectionLevel : row.type === "s" ? 0 : prevLvl;
+            if (row.type !== "s" && lvl < prevLvl) {
+                var need = prevLvl - lvl;
+                for (var j = 0; j < need; j++) {
+                    out.push({
+                        optionId: null,
+                        parentId: 0,
+                        position: null,
+                        name: "separator",
+                        url: "",
+                        icon: "",
+                        type: "-",
+                    });
+                    prevLvl--;
+                }
+            }
+            out.push(row);
+            prevLvl = lvl;
+        });
+        return out;
     }
 
     $("#col1").tikiModal(tr("Loading..."));
