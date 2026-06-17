@@ -76,6 +76,53 @@
         display: flex;
         flex-direction: column;
     }
+
+    .ec-day-grid {
+        .ec-day-head {
+            font-size: calc(0.9rem - 2px);
+        }
+
+        .ec-event {
+            min-height: 0;
+        }
+
+        .ec-event .ec-event-time {
+            font-size: calc(0.7rem - 2px);
+            line-height: 1.2;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .ec-event .ec-event-title {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            font-size: 14px;
+            line-height: 1.2;
+            max-height: 2.4em;
+            overflow: hidden;
+            overflow-wrap: anywhere;
+            text-overflow: ellipsis;
+            white-space: normal !important;
+        }
+
+        .tiki-calendar-month-event-hidden {
+            display: none !important;
+        }
+
+        .tiki-calendar-more-events {
+            font-size: 0.78rem;
+            line-height: 1.1;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .tiki-calendar-more-events:hover,
+        .tiki-calendar-more-events:focus {
+            text-decoration: underline;
+        }
+    }
 }
 
 @media (max-width: breakpoint-max(sm)) {
