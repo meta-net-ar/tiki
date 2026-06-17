@@ -2299,11 +2299,11 @@ import { defaults as defaultControls } from "ol/control";
     };
 
     $.fn.getMapCenter = function () {
-        var val;
+        let val;
 
         this.each(function () {
-            var coordinates = this.map.getView().getCenter();
-            val = ol.proj.fromLonLat(coordinates);
+            const coordinates = this.map.getView().getCenter();
+            val = ol.proj.transform(coordinates, this.map.getView().getProjection(), "EPSG:4326");
         });
 
         return val.join(",");
