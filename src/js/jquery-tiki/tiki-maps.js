@@ -1513,18 +1513,18 @@ import { defaults as defaultControls } from "ol/control";
                                 container.clearLayer(name);
                             });
 
-                            $.each(data.result, function (k, i) {
-                                var layerName = $(form).data("result-layer"),
+                            $.each(data.result, function (k, item) {
+                                let layerName = $(form).data("result-layer"),
                                     suffix = $(form).data("result-suffix");
 
-                                if (layerName && i[layerName]) {
-                                    layerName = i[layerName] + ": ";
+                                if (layerName && item[layerName]) {
+                                    layerName = item[layerName] + ": ";
                                 } else if (!layerName) {
                                     layerName = "";
                                 }
 
-                                if (suffix && i[suffix]) {
-                                    layerName = layerName + i[suffix];
+                                if (suffix && item[suffix]) {
+                                    layerName = layerName + item[suffix];
                                 }
 
                                 if (-1 === $.inArray(layerName, form.autoLayers)) {
@@ -1533,7 +1533,7 @@ import { defaults as defaultControls } from "ol/control";
 
                                 let icon = "";
                                 try {
-                                    $(i.link).each(function () {
+                                    $(item.link).each(function () {
                                         // if the object has an img with it (tracker status for instance) then we need to find the <a>
                                         if ($(this).is("a")) {
                                             // and just using $(i.link).find("a") doesn't work for some reason
@@ -1542,25 +1542,25 @@ import { defaults as defaultControls } from "ol/control";
                                     });
                                 } catch (e) {}
 
-                                if (i.geo_location) {
+                                if (item.geo_location) {
                                     $(container).addMapMarker({
-                                        coordinates: i.geo_location,
-                                        content: i.title,
-                                        type: i.object_type,
-                                        object: i.object_id,
+                                        coordinates: item.geo_location,
+                                        content: item.title,
+                                        type: item.object_type,
+                                        object: item.object_id,
                                         icon: icon ? icon : null,
                                         layer: layerName,
-                                        dataSource: i,
+                                        dataSource: item,
                                         form: form,
                                     });
-                                } else if (i.geo_feature) {
+                                } else if (item.geo_feature) {
                                     const wkt = new ol.format.WKT(),
                                         layer = container.getLayer(layerName),
                                         format = new ol.format.GeoJSON();
                                     let features;
 
                                     try {
-                                        features = format.readFeatures(i.geo_feature);
+                                        features = format.readFeatures(item.geo_feature);
                                     } catch (e) {
                                         features = null;
                                     }
@@ -1569,20 +1569,20 @@ import { defaults as defaultControls } from "ol/control";
                                         // Corrupted feature - display plain marker
                                         $(container).addMapMarker({
                                             coordinates: $(container).getMapCenter(),
-                                            content: i.title,
-                                            type: i.object_type,
-                                            object: i.object_id,
+                                            content: item.title,
+                                            type: item.object_type,
+                                            object: item.object_id,
                                             icon: null,
                                             layer: layerName,
-                                            dataSource: i,
+                                            dataSource: item,
                                         });
                                         return;
                                     }
 
                                     $.each(features, function (k, feature) {
                                         var initial;
-                                        feature.set("itemId", i.object_id);
-                                        feature.set("content", i.title);
+                                        feature.set("itemId", item.object_id);
+                                        feature.set("content", item.title);
                                         if (!feature.get("color")) {
                                             feature.set("color", "#6699cc");
                                         }
@@ -1604,7 +1604,7 @@ import { defaults as defaultControls } from "ol/control";
                                         feature.executor = delayedExecutor(5000, function () {
                                             var fields = {},
                                                 current = wkt.writeFeature(feature) + feature.get("color");
-                                            fields[i.geo_feature_field] = format.writeFeature(feature);
+                                            fields[item.geo_feature_field] = format.writeFeature(feature);
 
                                             if (current === initial || layer !== container.vectors) {
                                                 return;
@@ -1613,8 +1613,8 @@ import { defaults as defaultControls } from "ol/control";
                                             $.post(
                                                 $.service("tracker", "update_item"),
                                                 {
-                                                    trackerId: i.tracker_id,
-                                                    itemId: i.object_id,
+                                                    trackerId: item.tracker_id,
+                                                    itemId: item.object_id,
                                                     fields: fields,
                                                 },
                                                 function () {
@@ -1629,19 +1629,19 @@ import { defaults as defaultControls } from "ol/control";
                                     layer.getSource().addFeatures(features);
 
                                     $.each(features, function (k, feature) {
-                                        $(container).trigger("add", [i, feature]);
+                                        $(container).trigger("add", [item, feature]);
                                     });
-                                } else if (i.geo_file) {
+                                } else if (item.geo_file) {
                                     // load a file containing geometry, set using tracker Files indexGeometry option
 
                                     let format;
-                                    const files = i.geo_file.split(","),
+                                    const files = item.geo_file.split(","),
                                         layer = container.getLayer(layerName);
 
-                                    if (i.geo_file_format === "geojson") {
+                                    if (item.geo_file_format === "geojson") {
                                         format = new ol.format.GeoJSON();
                                     } else {
-                                        if (i.geo_file_format === "gpx") {
+                                        if (item.geo_file_format === "gpx") {
                                             format = new ol.format.GPX();
                                         }
                                     }
@@ -1656,18 +1656,18 @@ import { defaults as defaultControls } from "ol/control";
                                                 // Corrupted feature - display plain marker
                                                 $(container).addMapMarker({
                                                     coordinates: $(container).getMapCenter(),
-                                                    content: i.title,
-                                                    type: i.object_type,
-                                                    object: i.object_id,
+                                                    content: item.title,
+                                                    type: item.object_type,
+                                                    object: item.object_id,
                                                     icon: null,
                                                     layer: layerName,
-                                                    dataSource: i,
+                                                    dataSource: item,
                                                 });
                                                 return;
                                             }
                                             $.each(features, function (k, feature) {
-                                                feature.set("itemId", i.object_id);
-                                                feature.set("content", i.title);
+                                                feature.set("itemId", item.object_id);
+                                                feature.set("content", item.title);
                                                 if (!feature.get("color")) {
                                                     // TODO find a better default, from the searchlayer maybe?
                                                     feature.set("color", "#ffa500");
@@ -1688,7 +1688,7 @@ import { defaults as defaultControls } from "ol/control";
                                             layer.getSource().addFeatures(features);
 
                                             $.each(features, function (k, feature) {
-                                                $(container).trigger("add", [i, feature]);
+                                                $(container).trigger("add", [item, feature]);
                                             });
                                         });
                                     }
