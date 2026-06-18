@@ -430,14 +430,46 @@ HTML;
                 '',
                 'css/' . $prefs['theme'] . '.css'
             );
-            $themecss = file_get_contents($themePath);
+            // CRITICAL: Check if $themePath is valid before file_get_contents()
+            // If ThemeLib::getThemePath() returns null/false, it means:
+            // 1. Theme doesn't exist or isn't installed
+            // 2. File system path resolution failed on this server
+            // 3. Permissions issue preventing path detection
+            // Without this check, file_get_contents(null/false) silently returns false,
+            // causing $themecss to be false, and later concatenations make it empty string '',
+            // which means Bootstrap CSS variables are never extracted, leading to undefined array errors
+            if ($themePath && file_exists($themePath)) {
+                $themecss = file_get_contents($themePath);
+            } else {
+                try {
+                    $debugInfo = [
+                        'theme' => $prefs['theme'],
+                        'themePath' => $themePath,
+                        'file_exists' => $themePath ? file_exists($themePath) : 'path was null/false',
+                        'printfriendly' => $pdfSettings['print_pdf_mpdf_printfriendly'],
+                        'execution_context' => php_sapi_name(),
+                        'cwd' => getcwd(),
+                        'script' => $_SERVER['SCRIPT_FILENAME'] ?? 'unknown',
+                        'is_cli' => php_sapi_name() === 'cli'
+                    ];
+                    $exception = new \Exception(
+                        "PDF Generation: Primary theme CSS not loaded - Bootstrap variables will be missing. " .
+                        "This typically happens when: (1) PDF task runs async (feature_queued_tasks=y) " .
+                        "in different execution context (CLI vs Web), (2) Theme files missing/moved, " .
+                        "(3) Permission denied accessing theme directory"
+                    );
+                    TikiLib::lib('errortracking')->captureException($exception, $debugInfo);
+                } catch (\Exception $e) {
+                    // silently fail if error tracking unavailable
+                }
+            }
             // add custom.css if there
             $themePath = ThemeLib::getThemePath(
                 $prefs['theme'],
                 '',
                 'css/custom.css'
             );
-            if ($themePath) {
+            if ($themePath && file_exists($themePath)) {
                 $themecss .= file_get_contents($themePath);
             }
 
@@ -447,7 +479,7 @@ HTML;
                 $prefs['theme_option'],
                 'css/' . $prefs['theme_option'] . '.css'
             );
-            if ($themePath) {
+            if ($themePath && file_exists($themePath)) {
                 $themecss .= file_get_contents($themePath);
             }
             // and an option custom.css
@@ -456,7 +488,7 @@ HTML;
                 $prefs['theme_option'],
                 'css/custom.css'
             );
-            if ($themePath) {
+            if ($themePath && file_exists($themePath)) {
                 $themecss .= file_get_contents($themePath);
             }
 
@@ -466,7 +498,7 @@ HTML;
                 '',
                 'css/pdf.css'
             );
-            if ($themePath) {
+            if ($themePath && file_exists($themePath)) {
                 $themecss .= file_get_contents($themePath);
             }
 
@@ -476,7 +508,7 @@ HTML;
                 $prefs['theme_option'],
                 'css/pdf.css'
             );
-            if ($themePath) {
+            if ($themePath && file_exists($themePath)) {
                 $themecss .= file_get_contents($themePath);
             }
         }
@@ -1810,8 +1842,13 @@ TEXT;
             $var_name = $matches[1];
             $fallback = $matches[2] ?? null;  // Optional fallback value
 
-            // Check if the variable exists
-            $value = trim($variables[$var_name]);
+            // Check if the variable exists in extracted variables
+
+            // When variables aren't extracted, this isset() prevents:
+            // - "Undefined array key" PHP warning
+            // - "Deprecated: trim(null)" in PHP 8.1+
+            // The graceful fallback preserves the original var() in CSS output
+            $value = isset($variables[$var_name]) ? trim($variables[$var_name]) : '';
             if ($value) {
                 // If the variable contains another `var()`, recursively resolve it
                 if (preg_match('/var\(--([a-zA-Z0-9-]+)\)/U', $value)) {
@@ -1835,24 +1872,28 @@ TEXT;
 
     private function replaceCssVariables($css)
     {
-        // Extract all CSS variables from the `:root` or similar sections
+        // Extract all CSS variables from any sections (:root, [data-bs-theme], etc.)
+        // Matches: --variable-name: value;
         preg_match_all('/--([a-zA-Z0-9-]+)\s*:\s*([^;]+);/', $css, $matches);
 
+        // Reverse so the light variables are processed first (overrides happen in order)
+        $matches[1] = array_reverse($matches[1]);
+        $matches[2] = array_reverse($matches[2]);
+
+        // Create an associative array of variable names to their values
+        // Note: If arrays are empty, array_combine() returns false, so we check first
+        $variables = ! empty($matches[1]) ? array_combine($matches[1], $matches[2]) : [];
+
+        // Match again to find inline url data: values
+        preg_match_all('/--([a-zA-Z0-9-]+)\s*:\s*(url\(data:[^)]+\));/', $css, $matches);
         // Reverse so the light variables are processed first
         $matches[1] = array_reverse($matches[1]);
         $matches[2] = array_reverse($matches[2]);
 
-        // Create an associative array of variable names to their values
-        $variables = array_combine($matches[1], $matches[2]);
-
-        // match again to find inline url data: values
-        preg_match_all('/--([a-zA-Z0-9-]+)\s*:\s*(url\(data:[^)]+\));/', $css, $matches);
-        // Reverse so the light variables are processed first?
-        $matches[1] = array_reverse($matches[1]);
-        $matches[2] = array_reverse($matches[2]);
-
-        // Create an associative array of variable names to their values
-        $variables = array_merge($variables, array_combine($matches[1], $matches[2]));
+        // Merge with url data variables
+        if (! empty($matches[1])) {
+            $variables = array_merge($variables, array_combine($matches[1], $matches[2]));
+        }
 
         // Replace all `var(--variable)` occurrences in the CSS
         $css = $this->runReplaceVars($css, $variables);
