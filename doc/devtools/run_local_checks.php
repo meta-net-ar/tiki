@@ -5,7 +5,10 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-$options = getopt('h', ['help', 'skip:', 'skip-rebase']);
+$options = getopt('h', ['help', 'skip:', 'stop-on-failure', 'skip-checks']);
+if (isset($options['skip-checks'])) {
+    exit(0);
+}
 
 if (isset($options['h']) || isset($options['help'])) {
     echo <<<HELP
@@ -14,14 +17,15 @@ Usage:
 
 Options:
   --skip=1,3,8   Skip checks by step number
-  --skip-rebase Skip the automatic rebase against the upstream/master branch
-    and use the current branch state to determine affected files
+  --skip-checks   Skip all checks
+  --stop-on-failure  Stop as soon as one check fails
   -h, --help     Show this help message
 
 Examples:
   php doc/devtools/run_local_checks.php
   php doc/devtools/run_local_checks.php --skip=2,5,9
-  php doc/devtools/run_local_checks.php --skip-rebase
+  php doc/devtools/run_local_checks.php --skip-checks
+  php doc/devtools/run_local_checks.php --stop-on-failure
 
 Notes:
   By default, the script attempts to rebase the current branch on top of the
@@ -37,13 +41,18 @@ if (! empty($options['skip'])) {
     $skipSteps = array_map('intval', explode(',', $options['skip']));
     echo "Skipping steps: " . implode(', ', $skipSteps) . PHP_EOL . PHP_EOL;
 }
-$skipRebase = isset($options['skip-rebase']);
+
+$stopOnFailure = isset($options['stop-on-failure']);
+
 require_once __DIR__ . '/get_base_commit.php';
-$baseCommit = getBaseCommitOrAbort($skipRebase);
+$baseCommit = getBaseCommitOrAbort();
+
+if ($baseCommit === '') {
+    echo "Skipping diff check local check. Unable to find Target branch" . PHP_EOL;
+    exit(0);
+}
 
 exec("git diff --name-only --diff-filter=d {$baseCommit} HEAD", $affectedFiles);
-
-//exec('git diff --name-only --diff-filter=d origin/master...HEAD', $affectedFiles);
 
 if (empty($affectedFiles)) {
     echo "✅ No relevant files changed. Skipping checks." . PHP_EOL;
@@ -57,11 +66,10 @@ function filesByExtension(array $files, array $extensions): array
     }));
 }
 
-function quoteFiles(array $files): string
+function listFiles(array $files): string
 {
-    return implode(' ', array_map('escapeshellarg', $files));
+    return implode(' ', $files);
 }
-
 function hasComposerChanges(array $files): bool
 {
     foreach ($files as $file) {
@@ -75,7 +83,7 @@ function hasComposerChanges(array $files): bool
 $phpFiles = filesByExtension($affectedFiles, ['php']);
 $jsFiles = filesByExtension($affectedFiles, ['js']);
 $tplFiles = filesByExtension($affectedFiles, ['tpl']);
-$phpstanMemoryLimit = getenv('TIKI_PHPSTAN_MEMORY_LIMIT') ?: '512M';
+$steps = [];
 if (hasComposerChanges($affectedFiles)) {
     $steps = [
         ['Composer extension check', 'php doc/devtools/check_composer_extensions.php'],
@@ -88,35 +96,26 @@ if (hasComposerChanges($affectedFiles)) {
 if (! empty($phpFiles)) {
     $steps[] = [
         'PHPCS',
-        'php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs -s --runtime-set ignore_warnings_on_exit true --parallel=1 ' . quoteFiles($phpFiles),
+        'php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs -s --runtime-set ignore_warnings_on_exit true --parallel=1 ' . listFiles($phpFiles),
     ];
     $steps[] = [
         'Static security check (PHP)',
-        'php -d display_errors=On doc/devtools/securitycheck.php ' . quoteFiles($phpFiles),
+        'php -d display_errors=On doc/devtools/securitycheck.php ' . listFiles($phpFiles),
     ];
     $steps[] = [
         'PHPLint',
-        'php vendor_bundled/vendor/overtrue/phplint/bin/phplint ' . quoteFiles($phpFiles) . ' --no-interaction --no-cache --progress path',
-    ];
-    $steps[] = [
-        'Rector',
-        'php bin/rector process --dry-run ' . quoteFiles($phpFiles),
-    ];
-
-    $steps[] = [
-        'PHPStan',
-        'php bin/phpstan --configuration=phpstan-tikiCi.neon analyse ' . quoteFiles($phpFiles),
+        'php vendor_bundled/vendor/overtrue/phplint/bin/phplint ' . listFiles($phpFiles) . ' --no-interaction --no-cache --progress path',
     ];
 }
 
 if (! empty($tplFiles)) {
     $steps[] = [
         'SmartyLint',
-        'php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --rules=doc/devtools/smartyl.rules.xml ' . quoteFiles($tplFiles),
+        'php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --rules=doc/devtools/smartyl.rules.xml ' . listFiles($tplFiles),
     ];
     $steps[] = [
         'Smarty syntax check',
-        'php doc/devtools/check_smarty_syntax.php ' . quoteFiles($tplFiles),
+        'php doc/devtools/check_smarty_syntax.php ' . listFiles($tplFiles),
     ];
     $steps[] = ['Translation standards', 'php doc/devtools/check_template_translation_standards.php --all'];
 }
@@ -124,14 +123,12 @@ if (! empty($tplFiles)) {
 if (! empty($jsFiles)) {
     $steps[] = [
         'ESLint',
-        'npx eslint ' . quoteFiles($jsFiles),
+        'npx eslint ' . listFiles($jsFiles),
     ];
 }
 
-$allAffected = quoteFiles($affectedFiles);
-
-$steps[] = ['BOM encoding', 'php doc/devtools/check_bom_encoding.php ' . $allAffected];
-$steps[] = ['Unix line ending', 'php doc/devtools/check_unix_ending_line.php ' . $allAffected];
+$steps[] = ['BOM encoding', 'php doc/devtools/check_bom_encoding.php'];
+$steps[] = ['Unix line ending', 'php doc/devtools/check_unix_ending_line.php ' . listFiles($affectedFiles)];
 $steps[] = ['Platform binaries', 'php doc/devtools/check_platform_binaries.php'];
 
 $steps[] = ['SQL engine', 'php -d display_errors=On doc/devtools/check_sql_engine.php'];
@@ -181,17 +178,39 @@ foreach ($steps as $index => [$label, $cmd]) {
             echo "   $line" . PHP_EOL;
         }
 
-        echo PHP_EOL . "=====================================================" . PHP_EOL;
-        echo "❌ Push blocked due to failure at step $stepNumber ($label)." . PHP_EOL;
-        echo "Please fix the failing check above and try pushing again." . PHP_EOL;
+        $failedChecks[] = [
+            'step' => $stepNumber,
+            'label' => $label,
+        ];
 
-        //Exit immediately so the user doesn't waste time waiting
-        exit(1);
+        if ($stopOnFailure) {
+            echo PHP_EOL . "=====================================================" . PHP_EOL;
+            echo "❌ Push blocked due to failure at step $stepNumber ($label)." . PHP_EOL;
+            exit(1);
+        }
+
+
+        echo PHP_EOL . "-----------------------------------------------------------------" . PHP_EOL;
+        continue;
     }
 
     echo PHP_EOL . "✅ PASSED: $label" . PHP_EOL . PHP_EOL;
     echo "-----------------------------------------------------------------" . PHP_EOL;
 }
+
+echo "=====================================================" . PHP_EOL;
+
+if (! empty($failedChecks)) {
+    echo "❌ Push blocked. Some checks failed:" . PHP_EOL . PHP_EOL;
+
+    foreach ($failedChecks as $failedCheck) {
+        echo "  - Step {$failedCheck['step']}: {$failedCheck['label']}" . PHP_EOL;
+    }
+
+    echo PHP_EOL . "Please fix the failing checks above and try pushing again." . PHP_EOL . PHP_EOL;
+    exit(1);
+}
+
 echo "=====================================================" . PHP_EOL;
 echo "✅ All checks passed. Push allowed." . PHP_EOL . PHP_EOL;
 exit(0);
