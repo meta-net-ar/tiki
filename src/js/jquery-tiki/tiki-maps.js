@@ -257,7 +257,7 @@ import { defaults as defaultControls } from "ol/control";
             }
         }
 
-        return formatLocation(coordinates[0], coordinates[1], map.getView().getZoom());
+        return formatLocation(coordinates[0], coordinates[1], parseInt(map.getView().getZoom()));
     }
 
     function formatLocation(lat, lon, zoom) {
