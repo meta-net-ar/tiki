@@ -5,6 +5,10 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Process\Process;
+use Tiki\Zotero\CslStyleManager;
+use Tiki\Zotero\PandocLibraryFile;
+
 function wikiplugin_zoterobibliography_info()
 {
     return [
@@ -21,7 +25,7 @@ function wikiplugin_zoterobibliography_info()
                 'description' => tra('Citation style for bibliography. Leave empty for site default, or type any CSL filename (without .csl extension).'),
                 'filter' => 'text',
                 'default' => '',
-                'options' => getCommonCSLStyles(),
+                'options' => zoteroBibliographyCommonCslStyles(),
             ],
         ],
     ];
@@ -31,7 +35,7 @@ function wikiplugin_zoterobibliography_info()
  * Get common CSL styles for dropdown
  * Returns curated list of most-used academic citation styles
  */
-function getCommonCSLStyles()
+function zoteroBibliographyCommonCslStyles()
 {
     return [
         ['text' => tra('Site Default'), 'value' => ''],
@@ -51,7 +55,7 @@ function getCommonCSLStyles()
 
 function zoteroBibliographyAlert(string $type, string $message, bool $sendGlobalFeedback = false)
 {
-    if ($sendGlobalFeedback && class_exists('Feedback')) {
+    if ($sendGlobalFeedback) {
         switch ($type) {
             case 'danger':
                 Feedback::error($message);
@@ -76,46 +80,35 @@ function wikiplugin_zoterobibliography($data, $params)
         return zoteroBibliographyAlert('warning', tra('Pandoc citations not enabled'), true);
     }
 
-    $content = getContentFromContext();
+    $content = zoteroBibliographyContentFromContext();
 
     if (empty($content)) {
         return zoteroBibliographyAlert('warning', tra('Could not read content for bibliography generation'));
     }
 
-    $keys = extractCitationKeys($content);
+    $keys = zoteroBibliographyExtractCitationKeys($content);
 
     if (empty($keys)) {
         return zoteroBibliographyAlert('info', tra('No citations found in this content.'));
     }
 
-    $libraryPreference = $prefs['zotero_pandoc_library'] ?? 'storage/zotero/My Library.json';
-    $libraryPath = zoteroResolveFilePath($libraryPreference, ['storage/zotero/', zoteroStorageBaseDir() . 'zotero/']);
-    if ($libraryPath === null || ! is_file($libraryPath)) {
-        return zoteroBibliographyAlert(
-            'danger',
-            tr('Bibliography rendering failed: Library file not found: %0', $libraryPreference),
-            true
-        );
-    }
-
     $styleName = ! empty($params['style']) ? (string) $params['style'] : ($prefs['zotero_pandoc_style'] ?? 'chicago-author-date');
-    $styleName = preg_replace('/\.csl$/i', '', trim($styleName));
-    if ($styleName === '' || preg_match('/[^a-zA-Z0-9._-]/', $styleName)) {
-        return zoteroBibliographyAlert('danger', tra('Bibliography rendering failed: Invalid CSL style name.'), true);
-    }
-
-    $stylePath = zoteroResolveFilePath($styleName . '.csl', ['storage/csl-styles/', zoteroStorageBaseDir() . 'csl-styles/']);
-    if ($stylePath === null || ! is_file($stylePath)) {
+    try {
+        $library = PandocLibraryFile::fromPreference($prefs['zotero_pandoc_library'] ?? '');
+        $libraryPath = $library->getPath();
+        $styleManager = new CslStyleManager();
+        $stylePath = $styleManager->resolveStylePath($styleName);
+    } catch (RuntimeException $e) {
         return zoteroBibliographyAlert(
             'danger',
-            tr('Bibliography rendering failed: CSL style not found: %0', $styleName),
+            tr('Bibliography rendering failed: %0', $e->getMessage()),
             true
         );
     }
 
     $pandocPath = $prefs['zotero_pandoc_path'] ?? 'pandoc';
     $cachelib = TikiLib::lib('cache');
-    $cacheKey = zoteroBibliographyBuildCacheKey($keys, $libraryPath, $stylePath, $pandocPath);
+    $cacheKey = zoteroBibliographyBuildCacheKey($keys, $library->getFingerprint(), $styleManager->fileFingerprint($stylePath), $pandocPath);
 
     $cachedBibliography = $cachelib->getCached($cacheKey, 'zotero_pandoc_bibliography_');
     if ($cachedBibliography !== false) {
@@ -123,7 +116,7 @@ function wikiplugin_zoterobibliography($data, $params)
     }
 
     $renderSucceeded = false;
-    $bibliography = generateBibliography($keys, $libraryPath, $stylePath, $renderSucceeded);
+    $bibliography = zoteroBibliographyGenerate($keys, $libraryPath, $stylePath, $renderSucceeded);
 
     if ($renderSucceeded) {
         $cachelib->cacheItem($cacheKey, $bibliography, 'zotero_pandoc_bibliography_');
@@ -132,79 +125,31 @@ function wikiplugin_zoterobibliography($data, $params)
     return $bibliography;
 }
 
-function zoteroBibliographyBuildCacheKey(array $keys, string $libraryPath, string $stylePath, string $pandocPath): string
+function zoteroBibliographyBuildCacheKey(array $keys, string $libraryFingerprint, string $styleFingerprint, string $pandocPath): string
 {
     return hash(
         'sha256',
         '1'
         . "\n" . $pandocPath
-        . "\n" . zoteroBibliographyFileFingerprint($libraryPath)
-        . "\n" . zoteroBibliographyFileFingerprint($stylePath)
+        . "\n" . $libraryFingerprint
+        . "\n" . $styleFingerprint
         . "\n" . implode(';', $keys)
     );
-}
-
-function zoteroBibliographyFileFingerprint(string $path): string
-{
-    $resolvedPath = realpath($path);
-    $normalizedPath = $resolvedPath !== false ? $resolvedPath : $path;
-
-    if (! is_file($normalizedPath)) {
-        return $normalizedPath . '|missing';
-    }
-
-    $mtime = @filemtime($normalizedPath) ?: 0;
-    $size = @filesize($normalizedPath) ?: 0;
-
-    return $normalizedPath . '|' . $mtime . '|' . $size;
-}
-
-function zoteroStorageBaseDir(): string
-{
-    global $tikidomainslash;
-
-    return DEPRECATED_STORAGE_PATH . '/' . ($tikidomainslash ?? '');
-}
-
-function zoteroResolveFilePath(string $path, array $prefixCandidates = []): ?string
-{
-    $trimmed = trim($path);
-    if ($trimmed === '') {
-        return null;
-    }
-
-    $candidates = [$trimmed];
-    foreach ($prefixCandidates as $prefix) {
-        $candidates[] = rtrim($prefix, '/') . '/' . ltrim($trimmed, '/');
-    }
-
-    if (defined('TIKI_PATH')) {
-        foreach ($candidates as $candidate) {
-            if (! preg_match('/^(\/|[A-Za-z]:[\/\\\\])/', $candidate)) {
-                $candidates[] = rtrim(TIKI_PATH, '/') . '/' . ltrim($candidate, '/');
-            }
-        }
-    }
-
-    foreach ($candidates as $candidate) {
-        $resolved = realpath($candidate);
-        if ($resolved !== false && is_file($resolved)) {
-            return $resolved;
-        }
-    }
-
-    return null;
 }
 
 /**
  * Get content from current Tiki context
  * Supports: Wiki pages, Blog posts, Articles
  */
-function getContentFromContext()
+function zoteroBibliographyContentFromContext()
 {
     global $page;
 
     $tikilib = TikiLib::lib('tiki');
+
+    if (zoteroBibliographyHasSubmittedContent()) {
+        return $_REQUEST['data'];
+    }
 
     if (! empty($page)) {
         $pageInfo = $tikilib->get_page_info($page);
@@ -242,7 +187,7 @@ function getContentFromContext()
         }
     }
 
-    // Preview/edit fallback
+    // Generic preview/edit fallback for non-wiki content types.
     if (! empty($_REQUEST['data']) && is_string($_REQUEST['data'])) {
         return $_REQUEST['data'];
     }
@@ -250,11 +195,18 @@ function getContentFromContext()
     return '';
 }
 
+function zoteroBibliographyHasSubmittedContent(): bool
+{
+    return isset($_REQUEST['data'])
+        && is_string($_REQUEST['data'])
+        && (isset($_REQUEST['preview']) || isset($_REQUEST['save']));
+}
+
 /**
  * Extract citation keys from content
  * Matches: {@key}, {@key, p. 42}, {@key1; @key2}, {-@key}
  */
-function extractCitationKeys($content)
+function zoteroBibliographyExtractCitationKeys($content)
 {
     $keys = [];
 
@@ -282,58 +234,46 @@ function extractCitationKeys($content)
 /**
  * Generate bibliography HTML using Pandoc
  */
-function generateBibliography($keys, $libraryPath, $stylePath, &$renderSucceeded = false)
+function zoteroBibliographyGenerate($keys, $libraryPath, $stylePath, &$renderSucceeded = false)
 {
     global $prefs;
 
     $markdown = "---\nnocite: |\n";
     foreach ($keys as $key) {
-        $markdown .= "  @" . $key . "\n";
+        $markdown .= '  @' . $key . "\n";
     }
     $markdown .= "---\n\n";
 
     $pandocPath = $prefs['zotero_pandoc_path'] ?? 'pandoc';
 
-    $cmd = escapeshellcmd($pandocPath);
-    $cmd .= ' --citeproc';
-    $cmd .= ' --bibliography=' . escapeshellarg($libraryPath);
-    $cmd .= ' --csl=' . escapeshellarg($stylePath);
-    $cmd .= ' -f markdown';
-    $cmd .= ' -t html';
-
-    $descriptors = [
-        0 => ['pipe', 'r'],
-        1 => ['pipe', 'w'],
-        2 => ['pipe', 'w'],
+    $command = [
+        $pandocPath,
+        '--citeproc',
+        '--bibliography=' . $libraryPath,
+        '--csl=' . $stylePath,
+        '-f',
+        'markdown',
+        '-t',
+        'html',
     ];
 
-    $process = proc_open($cmd, $descriptors, $pipes);
-
-    if (! is_resource($process)) {
+    try {
+        $process = new Process($command, null, null, $markdown, null);
+        $process->run();
+    } catch (Throwable $e) {
         $renderSucceeded = false;
         return zoteroBibliographyAlert('danger', tra('Bibliography rendering failed: Could not start Pandoc'), true);
     }
 
-    fwrite($pipes[0], $markdown);
-    fclose($pipes[0]);
-
-    $output = stream_get_contents($pipes[1]);
-    fclose($pipes[1]);
-
-    $errors = stream_get_contents($pipes[2]);
-    fclose($pipes[2]);
-
-    $returnCode = proc_close($process);
-
-    if ($returnCode !== 0) {
+    if (! $process->isSuccessful()) {
         $renderSucceeded = false;
         return zoteroBibliographyAlert(
             'danger',
-            tr('Bibliography rendering failed: %0', trim($errors)),
+            tr('Bibliography rendering failed: %0', trim($process->getErrorOutput())),
             true
         );
     }
 
     $renderSucceeded = true;
-    return trim($output);
+    return trim($process->getOutput());
 }

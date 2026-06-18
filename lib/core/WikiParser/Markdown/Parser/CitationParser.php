@@ -30,6 +30,7 @@ class CitationParser implements InlineParserInterface
     public function parse(InlineParserContext $inlineContext): bool
     {
         $cursor = $inlineContext->getCursor();
+        $state = $cursor->saveState();
         $match = $cursor->match('/\{(-?)@([^}]+)\}/');
 
         if ($match === null) {
@@ -37,6 +38,7 @@ class CitationParser implements InlineParserInterface
         }
 
         if (! preg_match('/\{(-?)@([^}]+)\}/', $match, $groups)) {
+            $cursor->restoreState($state);
             return false;
         }
 
@@ -82,6 +84,11 @@ class CitationParser implements InlineParserInterface
                     'suppress_author' => $partSuppressAuthor,
                 ];
             }
+        }
+
+        if (empty($citations)) {
+            $cursor->restoreState($state);
+            return false;
         }
 
         $inlineContext->getContainer()->appendChild(new Citation($citations));

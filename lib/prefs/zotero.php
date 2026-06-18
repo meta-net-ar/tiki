@@ -76,13 +76,16 @@ function prefs_zotero_list()
         'zotero_pandoc_library' => [
             'name' => tra('Pandoc library file'),
             'help' => $zoteroHelp,
-            'description' => tra('Path to CSL-JSON file exported from Zotero (e.g., storage/zotero/My Library.json)'),
+            'description' => tra('File Gallery file containing a CSL-JSON library exported from Zotero.'),
             'type' => 'text',
-            'size' => 60,
-            'default' => 'storage/zotero/My Library.json',
+            'filter' => 'digits',
+            'size' => 5,
+            'default' => '',
+            'profile_reference' => 'file',
             'tags' => ['basic'],
             'dependencies' => [
                 'zotero_pandoc_enabled',
+                'feature_file_galleries',
             ],
         ],
         'zotero_pandoc_style' => [

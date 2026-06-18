@@ -10,7 +10,10 @@ namespace Tiki\WikiParser\Markdown\Renderer;
 use League\CommonMark\Node\Node;
 use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
+use Tiki\Process\Process;
 use Tiki\WikiParser\Markdown\Node\Citation;
+use Tiki\Zotero\CslStyleManager;
+use Tiki\Zotero\PandocLibraryFile;
 
 /**
  * Renderer for citations - calls Pandoc
@@ -37,12 +40,20 @@ class CitationRenderer implements NodeRendererInterface
         $citations = $node->getCitations();
         $pandocMarkdown = $this->citationsToPandocMarkdown($citations);
 
-        $libraryPath = $prefs['zotero_pandoc_library'] ?? 'storage/zotero/My Library.json';
-        $stylePath = 'storage/csl-styles/' . ($prefs['zotero_pandoc_style'] ?? 'chicago-author-date') . '.csl';
+        try {
+            $library = PandocLibraryFile::fromPreference($prefs['zotero_pandoc_library'] ?? '');
+            $styleManager = new CslStyleManager();
+            $stylePath = $styleManager->resolveStylePath($prefs['zotero_pandoc_style'] ?? 'chicago-author-date');
+        } catch (\RuntimeException $e) {
+            $this->logPandocError('Pandoc citation setup error: ' . $e->getMessage());
+            return '<span class="text-danger">[' . tra('Citation rendering failed') . ']</span>';
+        }
+
+        $libraryPath = $library->getPath();
         $pandocPath = $prefs['zotero_pandoc_path'] ?? 'pandoc';
 
         // Request-level static cache to avoid repeated Pandoc calls for identical citation input.
-        $cacheKey = $this->buildCacheKey($pandocMarkdown, $libraryPath, $stylePath, $pandocPath);
+        $cacheKey = $this->buildCacheKey($pandocMarkdown, $library->getFingerprint(), $styleManager->fileFingerprint($stylePath), $pandocPath);
         if (array_key_exists($cacheKey, self::$renderCache)) {
             $rendered = self::$renderCache[$cacheKey];
         } else {
@@ -68,11 +79,8 @@ class CitationRenderer implements NodeRendererInterface
         return $rendered;
     }
 
-    private function buildCacheKey(string $markdown, string $libraryPath, string $stylePath, string $pandocPath): string
+    private function buildCacheKey(string $markdown, string $libraryFingerprint, string $styleFingerprint, string $pandocPath): string
     {
-        $libraryFingerprint = $this->getFileFingerprint($libraryPath);
-        $styleFingerprint = $this->getFileFingerprint($stylePath);
-
         return hash(
             'sha256',
             self::CACHE_VERSION
@@ -81,21 +89,6 @@ class CitationRenderer implements NodeRendererInterface
             . "\n" . $styleFingerprint
             . "\n" . $markdown
         );
-    }
-
-    private function getFileFingerprint(string $path): string
-    {
-        $resolvedPath = realpath($path);
-        $normalizedPath = $resolvedPath !== false ? $resolvedPath : $path;
-
-        if (! is_file($normalizedPath)) {
-            return $normalizedPath . '|missing';
-        }
-
-        $mtime = @filemtime($normalizedPath) ?: 0;
-        $size = @filesize($normalizedPath) ?: 0;
-
-        return $normalizedPath . '|' . $mtime . '|' . $size;
     }
 
     private function citationsToPandocMarkdown(array $citations): string
@@ -107,15 +100,11 @@ class CitationRenderer implements NodeRendererInterface
             if ($cit['suppress_author']) {
                 $part .= '-';
             }
-            if (preg_match('/[\$]/', $cit['key'])) {
-                $part .= '@"' . $cit['key'] . '"';
-            } else {
-                $part .= '@' . $cit['key'];
-            }
+            $part .= '@' . $cit['key'];
 
             if (! empty($cit['locator'])) {
                 // Add label prefix for non-page locators.
-                if (! empty($cit['label']) && $cit['label'] !== 'page') {
+                if ($cit['label'] !== 'page') {
                     $part .= ' [' . $cit['label'] . ' ' . $cit['locator'] . ']';
                 } else {
                     $part .= ', ' . $cit['locator'];
@@ -130,40 +119,31 @@ class CitationRenderer implements NodeRendererInterface
 
     private function callPandoc(string $markdown, string $libraryPath, string $stylePath, string $pandocPath)
     {
-        $cmd = escapeshellcmd($pandocPath);
-        $cmd .= ' --citeproc';
-        $cmd .= ' --bibliography=' . escapeshellarg($libraryPath);
-        $cmd .= ' --csl=' . escapeshellarg($stylePath);
-        $cmd .= ' -f markdown';
-        $cmd .= ' -t html';
-
-        $descriptors = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
+        $command = [
+            $pandocPath,
+            '--citeproc',
+            '--bibliography=' . $libraryPath,
+            '--csl=' . $stylePath,
+            '-f',
+            'markdown',
+            '-t',
+            'html',
         ];
 
-        $process = proc_open($cmd, $descriptors, $pipes);
-
-        if (! is_resource($process)) {
-            error_log('Pandoc: Failed to start process');
+        try {
+            $process = new Process($command, null, null, $markdown, null);
+            $process->run();
+        } catch (\Throwable $e) {
+            $this->logPandocError('Pandoc failed to start: ' . $e->getMessage());
             return false;
         }
 
-        fwrite($pipes[0], $markdown);
-        fclose($pipes[0]);
-
-        $output = stream_get_contents($pipes[1]);
-        fclose($pipes[1]);
-
-        $errors = stream_get_contents($pipes[2]);
-        fclose($pipes[2]);
-
-        $returnCode = proc_close($process);
-        if ($returnCode !== 0) {
-            error_log("Pandoc error: $errors");
+        if (! $process->isSuccessful()) {
+            $this->logPandocError('Pandoc error: ' . $process->getErrorOutput());
             return false;
         }
+
+        $output = $process->getOutput();
 
         // Extract citation from paragraph tags.
         if (preg_match('/<p>(.*?)<\/p>/s', $output, $matches)) {
@@ -180,5 +160,10 @@ class CitationRenderer implements NodeRendererInterface
         }
 
         return $citation;
+    }
+
+    private function logPandocError(string $message): void
+    {
+        \TikiLib::lib('logs')->add_log('zotero_pandoc', $message);
     }
 }

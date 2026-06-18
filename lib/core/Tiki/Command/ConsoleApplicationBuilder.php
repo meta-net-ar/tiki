@@ -132,6 +132,8 @@ class ConsoleApplicationBuilder
                 new PreferencesDeleteCommand(),
                 new PreferencesExportCommand(),
                 new SBOMGenerateCommand(),
+                new ZoteroCslFindCommand(),
+                new ZoteroCslUpdateCommand(),
                 ],
             ],[
             'condition' => 'checkDatabaseUpToDate',
