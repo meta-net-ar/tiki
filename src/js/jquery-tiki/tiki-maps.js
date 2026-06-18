@@ -289,9 +289,7 @@ import { defaults as defaultControls } from "ol/control";
             } else if (intent === "marker") {
                 coloredStyle = new ol.style.Style({
                     image: new ol.style.Icon({
-                        anchor: [feature.get("offsetx"), feature.get("offsety")],
-                        anchorXUnits: "pixels",
-                        anchorYUnits: "pixels",
+                        anchor: [0.5, 0.8],
                         src: feature.get("url"),
                     }),
                 });
@@ -494,9 +492,7 @@ import { defaults as defaultControls } from "ol/control";
                                         return new ol.style.Style({
                                             geometry: feature.getGeometry(),
                                             image: new ol.style.Icon({
-                                                anchor: [feature.get("offsetx"), feature.get("offsety")],
-                                                anchorXUnits: "pixels",
-                                                anchorYUnits: "pixels",
+                                                anchor: [0.5, 0.8],
                                                 src: feature.get("url"),
                                             }),
                                         });
@@ -2148,9 +2144,7 @@ import { defaults as defaultControls } from "ol/control";
                 feature.setStyle(
                     new ol.style.Style({
                         image: new ol.style.Icon({
-                            anchor: [feature.get("offsetx"), feature.get("offsety")],
-                            anchorXUnits: "pixels",
-                            anchorYUnits: "pixels",
+                            anchor: [0.5, 0.8],
                             src: feature.get("url"),
                         }),
                     })
