@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-$options = getopt('h', ['help', 'skip',  'stop-on-failure', 'skip-checks']);
+$options = getopt('h', ['help', 'skip:', 'stop-on-failure', 'skip-checks']);
 if (isset($options['skip-checks'])) {
     exit(0);
 }
