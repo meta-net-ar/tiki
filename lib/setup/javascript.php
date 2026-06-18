@@ -336,7 +336,7 @@ EOT;
     }
 
     $headerlib->add_js_config($js);
-    $js ='';
+    $js = '';
 
     if (in_array('y', [$prefs['feature_draggable_modals'], ! empty($prefs['feature_resizable_modals']) ? $prefs['feature_resizable_modals'] : 'n'])) {
         $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/interactjs/dist/interact.min.js');
