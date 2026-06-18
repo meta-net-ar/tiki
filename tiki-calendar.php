@@ -270,8 +270,8 @@ if (isset($_REQUEST['sort_mode'])) {
     $sort_mode = $_REQUEST['sort_mode'];
 }
 
-$viewstart = $_REQUEST['todate'] ?? $tikilib->now;
-$viewend = $viewstart + 90 * 86400 - 1; // 1 month approx
+$viewstart = $daystart;
+$viewend = $dayend;
 
 $listevents = [];
 if (! empty($_SESSION['CalendarViewGroups']) && ! empty($_SESSION['CalendarViewList']) && $_SESSION['CalendarViewList'] === 'list') {
@@ -288,7 +288,7 @@ if (! empty($_SESSION['CalendarViewGroups']) && ! empty($_SESSION['CalendarViewL
         $viewstart,
         $viewend,
         0,
-        $prefs['maxRecords'],
+        -1,
         $sort_mode
     );
 

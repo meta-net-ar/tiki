@@ -83,10 +83,9 @@ function module_calendar_new($mod_reference, $module_params)
     $module_params = array_merge($default, $module_params);
     $defaultCalendarId = 0;
     $current_url = $base_uri;
-    if (isset($_REQUEST['viewmode'])) {
-        $save_viewmode = $_REQUEST['viewmode'];
-    }
-    if (! empty($module_params['viewmode'])) {
+    if (! empty($_REQUEST['viewmode'])) {
+        $calendarViewMode['casedefault'] = $_REQUEST['viewmode'];
+    } elseif (! empty($module_params['viewmode'])) {
         $calendarViewMode['casedefault'] = $module_params['viewmode'];
     }
 
@@ -231,6 +230,7 @@ function module_calendar_new($mod_reference, $module_params)
         }
 
         $smarty->assign('viewnavbar', $module_params['viewnavbar']);
+        $smarty->assign('calendarViewMode', $calendarViewMode['casedefault']);
         $smarty->assign('name', 'calendar_new');
         $smarty->assign('calendars', $calendars);
         $smarty->assign_by_ref('checkedCalIds', $checkedCalIds);
