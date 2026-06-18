@@ -11,8 +11,6 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
 
-$section = Sections::getCurrentSection();
-
 if ($prefs['feature_referer_stats'] == 'y') {
     if (isset($_SERVER['HTTP_REFERER'])) {
         $pref = parse_url($_SERVER['HTTP_REFERER']);
@@ -22,9 +20,15 @@ if ($prefs['feature_referer_stats'] == 'y') {
     }
 }
 
-if (StatsLib::is_stats_hit()) {
-    if (! isset($section) or ( ! Sections::isCurrentSection(Sections::SECTION_CHAT) and ! Sections::isCurrentSection(Sections::SECTION_LIVESUPPORT) )) {
-        $statslib = TikiLib::lib('stats');
-        $statslib->add_pageview();
+// Track whether we've already recorded the pageview to prevent double-counting
+$pageview_recorded = false;
+
+Sections::onSectionChange(function ($section) use (&$pageview_recorded) {
+    if (! $pageview_recorded && StatsLib::is_stats_hit()) {
+        if ($section !== Sections::SECTION_CHAT && $section !== Sections::SECTION_LIVESUPPORT) {
+            $statslib = TikiLib::lib('stats');
+            $statslib->add_pageview();
+            $pageview_recorded = true;
+        }
     }
-}
+});
