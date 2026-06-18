@@ -372,7 +372,8 @@ import { defaults as defaultControls } from "ol/control";
 
                 if (modifyInteraction) {
                     modifyInteraction.on("modifyend", function (event) {
-                        event.features.getArray().forEach((feature) => {
+                        let featuresArray = event.features.item(0).get("features") ?? event.features.getArray();
+                        featuresArray.forEach((feature) => {
                             if (feature.executor) {
                                 feature.executor();
                             }
