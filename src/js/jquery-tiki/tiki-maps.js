@@ -1531,6 +1531,26 @@ import { defaults as defaultControls } from "ol/control";
                                 if (-1 === $.inArray(layerName, form.autoLayers)) {
                                     form.autoLayers.push(layerName);
                                 }
+                                // check if an object with the same id is already in the layer
+                                if (item.object_id) {
+                                    const layer = container.getLayer(layerName),
+                                        layerFeatures = layer.getSource().getFeatures();
+
+                                    const there = layerFeatures.find((feature) => {
+                                        const subFeatures = feature.get("features");
+                                        if (subFeatures) {
+                                            return subFeatures.find((subFeature) => {
+                                                return subFeature.get("object") === item.object_id;
+                                            });
+                                        } else {
+                                            return feature.get("object") === item.object_id;
+                                        }
+                                    });
+
+                                    if (there) {
+                                        return;
+                                    }
+                                }
 
                                 let icon = "";
                                 try {
@@ -1556,7 +1576,6 @@ import { defaults as defaultControls } from "ol/control";
                                     });
                                 } else if (item.geo_feature) {
                                     const wkt = new ol.format.WKT(),
-                                        layer = container.getLayer(layerName),
                                         format = new ol.format.GeoJSON();
                                     let features;
 
