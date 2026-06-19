@@ -115,9 +115,9 @@ Sections::onSectionChange(function ($section) {
             $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
         }
         /* Force the admin layout on admin pages */
-       $prefs['site_layout_admin'] = 'admin';
-       /* Force the admin layout on setup/management pages too */
-       $prefs['site_layout'] = 'admin';
+        $prefs['site_layout_admin'] = 'admin';
+        /* Force the admin layout on setup/management pages too */
+        $prefs['site_layout'] = 'admin';
 
         include_once 'admin/define_admin_icons.php';
         foreach ($admin_icons as & $admin_icon) {
