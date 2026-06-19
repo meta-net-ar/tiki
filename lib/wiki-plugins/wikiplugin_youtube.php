@@ -130,7 +130,7 @@ function wikiplugin_youtube_info()
 
 function wikiplugin_youtube($data, $params)
 {
-    global $tikilib;
+    global $tikilib, $prefs;
 
      $plugininfo = wikiplugin_youtube_info();
     foreach ($plugininfo['params'] as $key => $param) {
@@ -141,8 +141,6 @@ function wikiplugin_youtube($data, $params)
     if (empty($params['movie'])) {
         return '{BOX(class="text-bg-light")}' . tra('Plugin YouTube error: the movie parameter is empty.') . '{BOX}';
     }
-
-    $scheme = $tikilib->httpScheme();
 
     $sYoutubeId  = getYoutubeId($params['movie']);
     if (empty($sYoutubeId)) {
@@ -184,8 +182,10 @@ function wikiplugin_youtube($data, $params)
         $params['movie'] .= '&color2=0x' . $params['background'];
     }
 
+    // Keep iframe referrer policy aligned with site preference.
+    $iframeReferrerPolicy = $prefs['http_header_referrer_policy_value'] ?? '';
 
-    $iframe = ('<iframe src="' . $params['movie'] . '" frameborder="0" width="' . $params['width'] . '" height="' . $params['height'] . '" allowfullscreen="' . $params['allowFullScreen'] . '"></iframe>');
+    $iframe = ('<iframe src="' . $params['movie'] . '" frameborder="0" width="' . $params['width'] . '" height="' . $params['height'] . '" allowfullscreen="' . $params['allowFullScreen'] . '" referrerpolicy="' . $iframeReferrerPolicy . '"></iframe>');
 
     return '~np~' . $iframe . '~/np~';
 }
