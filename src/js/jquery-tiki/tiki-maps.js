@@ -257,7 +257,7 @@ import { defaults as defaultControls } from "ol/control";
             }
         }
 
-        return formatLocation(coordinates[0], coordinates[1], map.getView().getZoom());
+        return formatLocation(coordinates[0], coordinates[1], parseInt(map.getView().getZoom()));
     }
 
     function formatLocation(lat, lon, zoom) {
@@ -289,9 +289,7 @@ import { defaults as defaultControls } from "ol/control";
             } else if (intent === "marker") {
                 coloredStyle = new ol.style.Style({
                     image: new ol.style.Icon({
-                        anchor: [feature.get("offsetx"), feature.get("offsety")],
-                        anchorXUnits: "pixels",
-                        anchorYUnits: "pixels",
+                        anchor: [0.5, 0.8],
                         src: feature.get("url"),
                     }),
                 });
@@ -374,7 +372,8 @@ import { defaults as defaultControls } from "ol/control";
 
                 if (modifyInteraction) {
                     modifyInteraction.on("modifyend", function (event) {
-                        event.features.getArray().forEach((feature) => {
+                        let featuresArray = event.features.item(0).get("features") ?? event.features.getArray();
+                        featuresArray.forEach((feature) => {
                             if (feature.executor) {
                                 feature.executor();
                             }
@@ -494,9 +493,7 @@ import { defaults as defaultControls } from "ol/control";
                                         return new ol.style.Style({
                                             geometry: feature.getGeometry(),
                                             image: new ol.style.Icon({
-                                                anchor: [feature.get("offsetx"), feature.get("offsety")],
-                                                anchorXUnits: "pixels",
-                                                anchorYUnits: "pixels",
+                                                anchor: [0.5, 0.8],
                                                 src: feature.get("url"),
                                             }),
                                         });
@@ -1517,27 +1514,47 @@ import { defaults as defaultControls } from "ol/control";
                                 container.clearLayer(name);
                             });
 
-                            $.each(data.result, function (k, i) {
-                                var layerName = $(form).data("result-layer"),
+                            $.each(data.result, function (k, item) {
+                                let layerName = $(form).data("result-layer"),
                                     suffix = $(form).data("result-suffix");
 
-                                if (layerName && i[layerName]) {
-                                    layerName = i[layerName] + ": ";
+                                if (layerName && item[layerName]) {
+                                    layerName = item[layerName] + ": ";
                                 } else if (!layerName) {
                                     layerName = "";
                                 }
 
-                                if (suffix && i[suffix]) {
-                                    layerName = layerName + i[suffix];
+                                if (suffix && item[suffix]) {
+                                    layerName = layerName + item[suffix];
                                 }
 
                                 if (-1 === $.inArray(layerName, form.autoLayers)) {
                                     form.autoLayers.push(layerName);
                                 }
+                                // check if an object with the same id is already in the layer
+                                if (item.object_id) {
+                                    const layer = container.getLayer(layerName),
+                                        layerFeatures = layer.getSource().getFeatures();
+
+                                    const there = layerFeatures.find((feature) => {
+                                        const subFeatures = feature.get("features");
+                                        if (subFeatures) {
+                                            return subFeatures.find((subFeature) => {
+                                                return subFeature.get("object") === item.object_id;
+                                            });
+                                        } else {
+                                            return feature.get("object") === item.object_id;
+                                        }
+                                    });
+
+                                    if (there) {
+                                        return;
+                                    }
+                                }
 
                                 let icon = "";
                                 try {
-                                    $(i.link).each(function () {
+                                    $(item.link).each(function () {
                                         // if the object has an img with it (tracker status for instance) then we need to find the <a>
                                         if ($(this).is("a")) {
                                             // and just using $(i.link).find("a") doesn't work for some reason
@@ -1546,25 +1563,24 @@ import { defaults as defaultControls } from "ol/control";
                                     });
                                 } catch (e) {}
 
-                                if (i.geo_location) {
+                                if (item.geo_location) {
                                     $(container).addMapMarker({
-                                        coordinates: i.geo_location,
-                                        content: i.title,
-                                        type: i.object_type,
-                                        object: i.object_id,
+                                        coordinates: item.geo_location,
+                                        content: item.title,
+                                        type: item.object_type,
+                                        object: item.object_id,
                                         icon: icon ? icon : null,
                                         layer: layerName,
-                                        dataSource: i,
+                                        dataSource: item,
                                         form: form,
                                     });
-                                } else if (i.geo_feature) {
+                                } else if (item.geo_feature) {
                                     const wkt = new ol.format.WKT(),
-                                        layer = container.getLayer(layerName),
                                         format = new ol.format.GeoJSON();
                                     let features;
 
                                     try {
-                                        features = format.readFeatures(i.geo_feature);
+                                        features = format.readFeatures(item.geo_feature);
                                     } catch (e) {
                                         features = null;
                                     }
@@ -1573,20 +1589,20 @@ import { defaults as defaultControls } from "ol/control";
                                         // Corrupted feature - display plain marker
                                         $(container).addMapMarker({
                                             coordinates: $(container).getMapCenter(),
-                                            content: i.title,
-                                            type: i.object_type,
-                                            object: i.object_id,
+                                            content: item.title,
+                                            type: item.object_type,
+                                            object: item.object_id,
                                             icon: null,
                                             layer: layerName,
-                                            dataSource: i,
+                                            dataSource: item,
                                         });
                                         return;
                                     }
 
                                     $.each(features, function (k, feature) {
                                         var initial;
-                                        feature.set("itemId", i.object_id);
-                                        feature.set("content", i.title);
+                                        feature.set("itemId", item.object_id);
+                                        feature.set("content", item.title);
                                         if (!feature.get("color")) {
                                             feature.set("color", "#6699cc");
                                         }
@@ -1608,7 +1624,7 @@ import { defaults as defaultControls } from "ol/control";
                                         feature.executor = delayedExecutor(5000, function () {
                                             var fields = {},
                                                 current = wkt.writeFeature(feature) + feature.get("color");
-                                            fields[i.geo_feature_field] = format.writeFeature(feature);
+                                            fields[item.geo_feature_field] = format.writeFeature(feature);
 
                                             if (current === initial || layer !== container.vectors) {
                                                 return;
@@ -1617,8 +1633,8 @@ import { defaults as defaultControls } from "ol/control";
                                             $.post(
                                                 $.service("tracker", "update_item"),
                                                 {
-                                                    trackerId: i.tracker_id,
-                                                    itemId: i.object_id,
+                                                    trackerId: item.tracker_id,
+                                                    itemId: item.object_id,
                                                     fields: fields,
                                                 },
                                                 function () {
@@ -1633,19 +1649,19 @@ import { defaults as defaultControls } from "ol/control";
                                     layer.getSource().addFeatures(features);
 
                                     $.each(features, function (k, feature) {
-                                        $(container).trigger("add", [i, feature]);
+                                        $(container).trigger("add", [item, feature]);
                                     });
-                                } else if (i.geo_file) {
+                                } else if (item.geo_file) {
                                     // load a file containing geometry, set using tracker Files indexGeometry option
 
                                     let format;
-                                    const files = i.geo_file.split(","),
+                                    const files = item.geo_file.split(","),
                                         layer = container.getLayer(layerName);
 
-                                    if (i.geo_file_format === "geojson") {
+                                    if (item.geo_file_format === "geojson") {
                                         format = new ol.format.GeoJSON();
                                     } else {
-                                        if (i.geo_file_format === "gpx") {
+                                        if (item.geo_file_format === "gpx") {
                                             format = new ol.format.GPX();
                                         }
                                     }
@@ -1660,18 +1676,18 @@ import { defaults as defaultControls } from "ol/control";
                                                 // Corrupted feature - display plain marker
                                                 $(container).addMapMarker({
                                                     coordinates: $(container).getMapCenter(),
-                                                    content: i.title,
-                                                    type: i.object_type,
-                                                    object: i.object_id,
+                                                    content: item.title,
+                                                    type: item.object_type,
+                                                    object: item.object_id,
                                                     icon: null,
                                                     layer: layerName,
-                                                    dataSource: i,
+                                                    dataSource: item,
                                                 });
                                                 return;
                                             }
                                             $.each(features, function (k, feature) {
-                                                feature.set("itemId", i.object_id);
-                                                feature.set("content", i.title);
+                                                feature.set("itemId", item.object_id);
+                                                feature.set("content", item.title);
                                                 if (!feature.get("color")) {
                                                     // TODO find a better default, from the searchlayer maybe?
                                                     feature.set("color", "#ffa500");
@@ -1692,7 +1708,7 @@ import { defaults as defaultControls } from "ol/control";
                                             layer.getSource().addFeatures(features);
 
                                             $.each(features, function (k, feature) {
-                                                $(container).trigger("add", [i, feature]);
+                                                $(container).trigger("add", [item, feature]);
                                             });
                                         });
                                     }
@@ -2061,7 +2077,7 @@ import { defaults as defaultControls } from "ol/control";
 
                 // Hook into feature selection to show colorpicker
                 $(container).on("modechanged", function () {
-                    if (container.modeManager.activeMode.name === "modify_feature") {
+                    if (container.modeManager.activeMode.name === tr("Select/Modify")) {
                         // Add colorpicker trigger on feature selection when Shift is held
                         map.on("click", function (evt) {
                             if (evt.originalEvent.shiftKey) {
@@ -2148,9 +2164,7 @@ import { defaults as defaultControls } from "ol/control";
                 feature.setStyle(
                     new ol.style.Style({
                         image: new ol.style.Icon({
-                            anchor: [feature.get("offsetx"), feature.get("offsety")],
-                            anchorXUnits: "pixels",
-                            anchorYUnits: "pixels",
+                            anchor: [0.5, 0.8],
                             src: feature.get("url"),
                         }),
                     })
@@ -2299,11 +2313,11 @@ import { defaults as defaultControls } from "ol/control";
     };
 
     $.fn.getMapCenter = function () {
-        var val;
+        let val;
 
         this.each(function () {
-            var coordinates = this.map.getView().getCenter();
-            val = ol.proj.fromLonLat(coordinates);
+            const coordinates = this.map.getView().getCenter();
+            val = ol.proj.transform(coordinates, this.map.getView().getProjection(), "EPSG:4326");
         });
 
         return val.join(",");
