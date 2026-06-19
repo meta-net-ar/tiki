@@ -29,7 +29,7 @@ class ZoteroCslUpdateCommand extends Command
         $manager = new CslStyleManager();
         $debugEnabled = (bool) $input->getOption('debug');
 
-        $output->writeln('Updating CSL styles from GitHub...');
+        $output->writeln('Updating CSL styles...');
         $output->writeln('Target directory: ' . $manager->getCslDir());
 
         $progress = static function (string $message) use ($output): void {

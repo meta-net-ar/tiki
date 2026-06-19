@@ -209,6 +209,7 @@ function zoteroBibliographyHasSubmittedContent(): bool
 function zoteroBibliographyExtractCitationKeys($content)
 {
     $keys = [];
+    $content = zoteroBibliographyStripMarkdownCode((string) $content);
 
     if (preg_match_all('/\{-?@([^}]+)\}/', $content, $matches)) {
         foreach ($matches[1] as $match) {
@@ -229,6 +230,21 @@ function zoteroBibliographyExtractCitationKeys($content)
     }
 
     return array_values(array_unique($keys));
+}
+
+function zoteroBibliographyStripMarkdownCode(string $content): string
+{
+    $withoutFencedCode = preg_replace('/(^|\R)[ \t]*(`{3,}|~{3,})[^\r\n]*\R.*?\R[ \t]*\2[ \t]*(?=\R|$)/s', "\n", $content);
+    if ($withoutFencedCode !== null) {
+        $content = $withoutFencedCode;
+    }
+
+    $withoutIndentedCode = preg_replace('/(^|\R)(?: {4}|\t).*(?=\R|$)/', "\n", $content);
+    if ($withoutIndentedCode !== null) {
+        $content = $withoutIndentedCode;
+    }
+
+    return preg_replace('/`+[^`\r\n]*`+/', '', $content) ?? $content;
 }
 
 /**

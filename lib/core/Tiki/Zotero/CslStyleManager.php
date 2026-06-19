@@ -13,7 +13,7 @@ use ZipArchive;
 
 class CslStyleManager
 {
-    private const CSL_STYLES_ARCHIVE_URLS = [
+    private const DEFAULT_CSL_STYLES_ARCHIVE_URLS = [
         'https://github.com/citation-style-language/styles/archive/refs/heads/master.zip',
         'https://codeload.github.com/citation-style-language/styles/zip/refs/heads/master',
     ];
@@ -189,7 +189,7 @@ class CslStyleManager
 
         $errors = [];
 
-        foreach (self::CSL_STYLES_ARCHIVE_URLS as $zipUrl) {
+        foreach ($this->cslArchiveUrls() as $zipUrl) {
             foreach ($strategies as $strategy) {
                 $adapter = $strategy['options']['adapter'] ?? 'default';
                 $this->debug($debug, 'Attempting download: url=' . $zipUrl . ' adapter=' . $adapter . ' strategy=' . $strategy['label']);
@@ -232,6 +232,22 @@ class CslStyleManager
         }
 
         throw new RuntimeException(implode(' | ', $errors));
+    }
+
+    private function cslArchiveUrls(): array
+    {
+        global $prefs;
+
+        $configured = trim((string) ($prefs['zotero_pandoc_csl_archive_url'] ?? ''));
+        if ($configured === '') {
+            return self::DEFAULT_CSL_STYLES_ARCHIVE_URLS;
+        }
+
+        if (! preg_match('/^https?:\/\//i', $configured) || filter_var($configured, FILTER_VALIDATE_URL) === false) {
+            throw new RuntimeException('Invalid CSL style archive URL: ' . $configured);
+        }
+
+        return [$configured];
     }
 
     private function extractCslFiles(string $zipFile, string $cslDir, ?callable $debug = null): int

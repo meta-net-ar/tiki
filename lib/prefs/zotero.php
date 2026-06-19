@@ -112,5 +112,19 @@ function prefs_zotero_list()
                 'zotero_pandoc_enabled',
             ],
         ],
+        'zotero_pandoc_csl_archive_url' => [
+            'name' => tra('Custom Pandoc CSL style archive URL'),
+            'help' => $zoteroHelp,
+            'description' => tra('Optional direct ZIP archive URL used by zotero:csl:update to download CSL styles. Leave empty to use the built-in official CSL archive URLs. Intranet installs can point this to an internal mirror.'),
+            'type' => 'text',
+            'filter' => 'url',
+            'size' => 80,
+            'hint' => tra('Leave empty to use the built-in official CSL archive URLs.'),
+            'default' => '',
+            'tags' => ['advanced'],
+            'dependencies' => [
+                'zotero_pandoc_enabled',
+            ],
+        ],
     ];
 }
