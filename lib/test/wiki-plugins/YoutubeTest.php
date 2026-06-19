@@ -8,25 +8,35 @@ require_once(__DIR__ . '/../../wiki-plugins/wikiplugin_youtube.php');
 
 class WikiPlugin_YoutubeTest extends PHPUnit\Framework\TestCase
 {
-    /**
-     * @dataProvider provider
-     * @param $data
-     * @param $expectedOutput
-     * @param array $params
-     */
-    public function testWikiPluginCode($data, $expectedOutput, $params = []): void
+    protected function setUp(): void
     {
-        $this->assertEquals($expectedOutput, wikiplugin_youtube($data, $params));
+        global $prefs;
+
+        $prefs['http_header_referrer_policy_value'] = 'strict-origin-when-cross-origin';
     }
 
-    public static function provider(): array
+    public function testWikiPluginCodeWithDefaultReferrerPolicy(): void
     {
-        return [
-            ['', '{BOX(class="text-bg-light")}Plugin YouTube error: the movie parameter is empty.{BOX}'],
-            ['', '~np~<iframe src="//www.youtube.com/embed/bPHuY7QL568?" frameborder="0" width="425" height="350" allowfullscreen=""></iframe>~/np~', ['movie' => 'http://www.youtube.com/watch?v=bPHuY7QL568']],
-            ['', '~np~<iframe src="//www.youtube.com/embed/deby_Yb1-ac?" frameborder="0" width="425" height="350" allowfullscreen=""></iframe>~/np~', ['movie' => 'https://www.youtube.com/watch?v=deby_Yb1-ac']],
-            ['', '~np~<iframe src="//www.youtube.com/embed/deby_Yb1-ac?" frameborder="0" width="425" height="350" allowfullscreen=""></iframe>~/np~', ['movie' => 'https://youtu.be/deby_Yb1-ac']],
-            ['', '~np~<iframe src="//www.youtube-nocookie.com/embed/deby_Yb1-ac?" frameborder="0" width="425" height="350" allowfullscreen=""></iframe>~/np~', ['movie' => 'https://youtu.be/deby_Yb1-ac', 'privacyEnhanced' => 'y']],
-        ];
+        global $prefs;
+
+        $referrerPolicy = $prefs['http_header_referrer_policy_value'];
+
+        $this->assertEquals('{BOX(class="text-bg-light")}Plugin YouTube error: the movie parameter is empty.{BOX}', wikiplugin_youtube('', []));
+        $this->assertEquals(
+            '~np~<iframe src="//www.youtube.com/embed/bPHuY7QL568?" frameborder="0" width="425" height="350" allowfullscreen="" referrerpolicy="' . $referrerPolicy . '"></iframe>~/np~',
+            wikiplugin_youtube('', ['movie' => 'http://www.youtube.com/watch?v=bPHuY7QL568'])
+        );
+        $this->assertEquals(
+            '~np~<iframe src="//www.youtube.com/embed/deby_Yb1-ac?" frameborder="0" width="425" height="350" allowfullscreen="" referrerpolicy="' . $referrerPolicy . '"></iframe>~/np~',
+            wikiplugin_youtube('', ['movie' => 'https://www.youtube.com/watch?v=deby_Yb1-ac'])
+        );
+        $this->assertEquals(
+            '~np~<iframe src="//www.youtube.com/embed/deby_Yb1-ac?" frameborder="0" width="425" height="350" allowfullscreen="" referrerpolicy="' . $referrerPolicy . '"></iframe>~/np~',
+            wikiplugin_youtube('', ['movie' => 'https://youtu.be/deby_Yb1-ac'])
+        );
+        $this->assertEquals(
+            '~np~<iframe src="//www.youtube-nocookie.com/embed/deby_Yb1-ac?" frameborder="0" width="425" height="350" allowfullscreen="" referrerpolicy="' . $referrerPolicy . '"></iframe>~/np~',
+            wikiplugin_youtube('', ['movie' => 'https://youtu.be/deby_Yb1-ac', 'privacyEnhanced' => 'y'])
+        );
     }
 }
