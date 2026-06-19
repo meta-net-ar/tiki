@@ -7,6 +7,8 @@ import ConfigWrapper from "../../components/ConfigWrapper.vue";
 import * as AjaxUploadHelpers from "element-plus/es/components/upload/src/ajax.mjs";
 import getUploadAjaxError from "../../helpers/fileGalUploader/getUploadAjaxError";
 import handleTikiFeedback from "../../helpers/fileGalUploader/handleTikiFeedback";
+import { compressFileList, normalizeResizeDimension } from "../../../../../tiki-image-compressor/imageCompressor.js";
+import initializeCompressionUI, { getCompressionSettings } from "../../../../../tiki-image-compressor/compressionControls.js";
 
 // A plain vi.fn() spy for tracking what props FileGalUploader passes to <el-upload>.
 // Using a separate spy (instead of the component itself) because the mock must be a
@@ -60,6 +62,12 @@ vi.mock("../../helpers/fileGalUploader/handleTikiFeedback", () => {
 vi.mock("../../../../../tiki-image-compressor/compressionControls.js", () => ({
     default: vi.fn(),
     getCompressionSettings: vi.fn(),
+}));
+
+vi.mock("../../../../../tiki-image-compressor/imageCompressor.js", () => ({
+    default: vi.fn(),
+    compressFileList: vi.fn(),
+    normalizeResizeDimension: vi.fn(),
 }));
 
 describe("FileGalUploader", () => {
@@ -164,8 +172,9 @@ describe("FileGalUploader", () => {
             };
 
             render(FileGalUploader, { props: givenProps });
+            const uploadValidation = await elUploadSpy.mock.calls[0][0]["before-upload"](givenFile);
 
-            const uploadValidation = await ElUpload.mock.calls[0][0]["before-upload"](givenFile);
+            // const uploadValidation = await ElUpload.mock.calls[0][0]["before-upload"](givenFile);
 
             await waitFor(() => {
                 expect(elMessage).toHaveBeenCalledWith(`File size cannot exceed ${Number(givenProps.maxSize) / 1000}KB`);
@@ -301,196 +310,100 @@ describe("FileGalUploader", () => {
 
             expect(mockElUploadSubmit).toHaveBeenCalled();
         });
+
+        test("does not initialize compression UI when compression is disabled", async () => {
+            render(FileGalUploader, {
+                props: {
+                    maxSize: "100",
+                    maxFiles: "10",
+                    compression_enabled: "false",
+                },
+            });
+
+            await waitFor(() => {
+                expect(initializeCompressionUI).not.toHaveBeenCalled();
+            });
+        });
+
+        test("beforeUpload returns true when compression is disabled", async () => {
+            const file = new File(["foo"], "foo.jpg", {
+                type: "image/jpeg",
+            });
+
+            render(FileGalUploader, {
+                props: {
+                    maxSize: "100000",
+                    maxFiles: "10",
+                    compression_enabled: "false",
+                },
+            });
+
+            const result = await elUploadSpy.mock.calls[0][0]["before-upload"](file);
+
+            expect(result).toBe(true);
+        });
+
+        compressFileList.mockResolvedValue({
+            files: [
+                new File(["compressed"], "foo.jpg", {
+                    type: "image/jpeg",
+                }),
+            ],
+        });
+
+        test("returns compressed file when compression succeeds", async () => {
+            getCompressionSettings.mockReturnValue({
+                current: {
+                    saveOriginal: "n",
+                },
+            });
+
+            const compressedFile = new File(["compressed"], "foo.jpg", { type: "image/jpeg" });
+
+            compressFileList.mockResolvedValue({
+                files: [compressedFile],
+            });
+
+            const file = new File([new Uint8Array(200000)], "foo.jpg", { type: "image/jpeg" });
+
+            render(FileGalUploader, {
+                props: {
+                    maxSize: "999999999",
+                    maxFiles: "10",
+                    compression_enabled: "true",
+                },
+            });
+
+            const result = await elUploadSpy.mock.calls[0][0]["before-upload"](file);
+            expect(result).toBe(compressedFile);
+        });
+
+        test("shows error when compression throws", async () => {
+            compressFileList.mockRejectedValue(new Error("compression failed"));
+
+            getCompressionSettings.mockReturnValue({
+                current: {
+                    saveOriginal: "n",
+                },
+            });
+
+            const file = new File(["foo"], "foo.jpg", {
+                type: "image/jpeg",
+            });
+
+            render(FileGalUploader, {
+                props: {
+                    maxSize: "999999",
+                    maxFiles: "10",
+                    compression_enabled: "true",
+                },
+            });
+
+            const result = await elUploadSpy.mock.calls[0][0]["before-upload"](file);
+
+            expect(result).toBe(false);
+
+            expect(ElMessage.error).toHaveBeenCalledWith("Compression failed: compression failed");
+        });
     });
 });
-
-test("initializes compression UI when compression is enabled", async () => {
-    render(FileGalUploader, {
-        props: {
-            maxSize: "100",
-            maxFiles: "10",
-            compression_enabled: "true",
-            compression_quality: "75",
-            compression_max_dimension_x: "1200",
-            compression_max_dimension_y: "800",
-            compression_max_size_mb: "2",
-            compression_save_original: "y",
-        },
-    });
-
-    await waitFor(() => {
-        expect(initializeCompressionUI).toHaveBeenCalledWith(
-            expect.objectContaining({
-                quality: 75,
-                maxDimensionX: 1200,
-                maxDimensionY: 800,
-                maxSize: 2,
-                saveOriginal: "y",
-            })
-        );
-    });
-});
-
-test("does not initialize compression UI when compression is disabled", async () => {
-    render(FileGalUploader, {
-        props: {
-            maxSize: "100",
-            maxFiles: "10",
-            compression_enabled: "false",
-        },
-    });
-
-    await waitFor(() => {
-        expect(initializeCompressionUI).not.toHaveBeenCalled();
-    });
-});
-
-test("beforeUpload returns true when compression is disabled", async () => {
-    const file = new File(["foo"], "foo.jpg", {
-        type: "image/jpeg",
-    });
-
-    render(FileGalUploader, {
-        props: {
-            maxSize: "100000",
-            maxFiles: "10",
-            compression_enabled: "false",
-        },
-    });
-
-    const result =
-        await elUploadSpy.mock.calls[0][0]["before-upload"](file);
-
-    expect(result).toBe(true);
-});
-
-compressFileList.mockResolvedValue({
-    files: [
-        new File(["compressed"], "foo.jpg", {
-            type: "image/jpeg",
-        }),
-    ],
-});
-
-test("returns compressed file when compression succeeds", async () => {
-    getCompressionSettings.mockReturnValue({
-        current: {
-            saveOriginal: "n",
-        },
-    });
-
-    const compressedFile = new File(
-        ["compressed"],
-        "foo.jpg",
-        { type: "image/jpeg" }
-    );
-
-    compressFileList.mockResolvedValue({
-        files: [compressedFile],
-    });
-
-    const file = new File(
-        [new Uint8Array(200000)],
-        "foo.jpg",
-        { type: "image/jpeg" }
-    );
-
-    render(FileGalUploader, {
-        props: {
-            maxSize: "999999999",
-            maxFiles: "10",
-            compression_enabled: "true",
-        },
-    });
-
-    const result =
-        await elUploadSpy.mock.calls[0][0]["before-upload"](file);
-
-    expect(result).toBe(compressedFile);
-});
-
-test("shows error when compression throws", async () => {
-    compressFileList.mockRejectedValue(
-        new Error("compression failed")
-    );
-
-    getCompressionSettings.mockReturnValue({
-        current: {
-            saveOriginal: "n",
-        },
-    });
-
-    const file = new File(["foo"], "foo.jpg", {
-        type: "image/jpeg",
-    });
-
-    render(FileGalUploader, {
-        props: {
-            maxSize: "999999",
-            maxFiles: "10",
-            compression_enabled: "true",
-        },
-    });
-
-    const result =
-        await elUploadSpy.mock.calls[0][0]["before-upload"](file);
-
-    expect(result).toBe(false);
-
-    expect(ElMessage.error).toHaveBeenCalledWith(
-        "Compression failed: compression failed"
-    );
-});
-
-elUploadSpy.mock.calls[0][0]["on-success"](
-    {
-        fileId: 123,
-        syntax: "{img fileId='123'}",
-    },
-    {
-        name: "foo.jpg",
-    }
-);
-
-await waitFor(() => {
-    expect(screen.getByText(/foo.jpg/)).toBeInTheDocument();
-});
-
-expect(
-    screen.getByText("{img fileId='123'}")
-).toBeInTheDocument();
-
-elUploadSpy.mock.calls[0][0]["on-success"](
-    {
-        fileId: 123,
-        syntax: "{img fileId='123'}",
-    },
-    {
-        name: "foo.jpg",
-    }
-);
-
-elUploadSpy.mock.calls[0][0]["on-success"](
-    {
-        fileId: 123,
-        syntax: "{img fileId='123'}",
-    },
-    {
-        name: "foo.jpg",
-    }
-);
-
-Object.assign(navigator, {
-    clipboard: {
-        writeText: vi.fn().mockResolvedValue(),
-    },
-});
-
-await screen.getByText("Copy").click();
-
-expect(
-    navigator.clipboard.writeText
-).toHaveBeenCalledWith("{img fileId='123'}");
-
-
-

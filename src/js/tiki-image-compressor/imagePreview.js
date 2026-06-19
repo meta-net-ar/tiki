@@ -172,7 +172,11 @@ async function updatePreview(settings) {
                 dimensionsEl.textContent = `${width}×${height}px`;
             }
         } catch (err) {
-            console.error("[ImagePreview] Preview update failed:", err);
+            const estimatedSizeEl = document.getElementById("compression_estimated_size");
+            if (estimatedSizeEl) {
+                estimatedSizeEl.textContent = "Preview unavailable";
+                estimatedSizeEl.className = "text-danger fw-bold";
+            }
         }
     }, PREVIEW_STATE.DEBOUNCE_DELAY);
 }
@@ -184,7 +188,6 @@ async function updatePreview(settings) {
  */
 async function loadImageFromFile(file) {
     if (!file || !file.type.startsWith("image/")) {
-        console.warn("[ImagePreview] File is not an image:", file?.name);
         return;
     }
 
@@ -213,13 +216,7 @@ async function loadImageFromFile(file) {
                 maxSize: state.current?.maxSize ?? 1,
             });
         };
-        img.onerror = () => {
-            console.error("[ImagePreview] Failed to load image:", file.name);
-        };
         img.src = e.target.result;
-    };
-    reader.onerror = () => {
-        console.error("[ImagePreview] Failed to read file:", file.name);
     };
     reader.readAsDataURL(file);
 }
@@ -249,8 +246,6 @@ async function initializeFileListener() {
             }
         };
         attachListener(fileInput, "change", handler);
-    } else {
-        console.warn(`[ImagePreview] Could not find file input #${PREVIEW_STATE.fileInputId}`);
     }
 }
 
@@ -276,7 +271,7 @@ async function initializeImagePreview(config = {}) {
         // Request compression controls to notify us of setting changes
         // The compressionControls.js will call refreshPreview() when settings change
     } catch (err) {
-        console.error("[ImagePreview] Initialization failed:", err);
+        throw err;
     }
 }
 

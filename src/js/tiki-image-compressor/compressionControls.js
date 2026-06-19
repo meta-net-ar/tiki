@@ -53,7 +53,6 @@ function validateSetting(key, value) {
         const num = parseFloat(value);
         if (isNaN(num)) return STATE.serverDefaults[key];
         if (num < rule.min || num > rule.max) {
-            console.warn(`[CompressionUI] ${key} out of range [${rule.min}, ${rule.max}], using default`);
             return STATE.serverDefaults[key];
         }
         return num;
@@ -61,7 +60,6 @@ function validateSetting(key, value) {
 
     if (rule.type === "enum") {
         if (!rule.values.includes(value)) {
-            console.warn(`[CompressionUI] Invalid ${key} value: ${value}`);
             return STATE.serverDefaults[key];
         }
         return value;
@@ -201,6 +199,10 @@ function cleanup() {
         element.removeEventListener(event, handler, options);
     });
     STATE.listeners = [];
+
+    STATE.serverDefaults = {};
+    STATE.current = {};
+    STATE.isInitialized = false;
 }
 /**
  * Ensure elements exist in DOM, wait if needed
@@ -393,7 +395,6 @@ async function initializeCompressionUI(config = {}) {
 
         STATE.isInitialized = true;
     } catch (err) {
-        console.error("[CompressionUI] Initialization failed:", err);
         STATE.isInitialized = false;
     }
 }
