@@ -319,6 +319,10 @@ class PdfGenerator
         $wikilib = TikiLib::lib('wiki');
         //checking and getting plugin_pdf parameters if set
         $pdfSettings = $this->getPDFSettings($html, $prefs, $params);
+
+        if (! empty($pdfSettings['coverpage_image_settings']) && $pdfSettings['coverpage_image_settings'] !== 'off') {
+            $pdfSettings['coverpage_image_settings'] = $this->resolveFileGalleryImageToLocalPath($pdfSettings['coverpage_image_settings']);
+        }
         //Add page title with content enabled in prefs and page indiviual settings
         if (($prefs['feature_page_title'] == 'y' && isset($params['page']) && $wikilib->get_page_hide_title($params['page']) == 0 && $pdfSettings['pagetitle'] != 'n') || $pdfSettings['pagetitle'] == 'y') {
             $html = '<h1>' . $params['page'] . '</h1>' . $html;
@@ -1070,6 +1074,42 @@ HTML;
         $pageContent = str_replace("</body>", $htmlLayout["endingPart"] . "</body>", $pageContent);
 
         return $pageContent;
+    }
+
+    /**
+     * If the given URL points to a Tiki file gallery image, extract its file ID,
+     * resolve the local filesystem path, and return that path
+     * so mPDF can read the image directly without an HTTP round-trip.
+     * Returns the original value unchanged for any other URL or when the file is
+     * not stored locally.
+     */
+    private function resolveFileGalleryImageToLocalPath(string $url): string
+    {
+        global $base_url;
+
+        // Normalize and strip base URL so we can parse both legacy and SEFURL
+        $relative = html_entity_decode(trim($url), ENT_QUOTES);
+
+        if (! empty($base_url) && str_starts_with($relative, $base_url)) {
+            $relative = substr($relative, strlen($base_url));
+        }
+        $relative = ltrim($relative, '/');
+
+        $filegalLib = TikiLib::lib('filegal');
+
+        $fileId = (int) $filegalLib->getLinkFileId($relative);
+
+        if ($fileId > 0) {
+            $file = \Tiki\FileGallery\File::id($fileId);
+            if ($file->exists()) {
+                $wrapper = $file->getWrapper();
+                if ($wrapper->isFileLocal()) {
+                    return $wrapper->getReadableFile();
+                }
+            }
+        }
+
+        return $url;
     }
 
     public function getPDFSettings($html, $prefs, $params)
