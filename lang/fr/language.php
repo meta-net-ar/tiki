@@ -25457,5 +25457,7 @@ $lang_current = array(
 "Note, deprecated file tiki-wikiplugin_edit.php, code moved to service plugin->replace" => "Note : fichier obsolète tiki-wikiplugin_edit.php, code déplacé vers service plugin->replace",
 "Top pages" => "Pages les plus populaires",
 "Last pages" => "Dernières pages",
+"Admin Icons Dashboard" => "Tableau de bord des icônes d'administration",
+"Select user to switch to" => "Sélectionner l'utilisateur vers lequel basculer",
 );
 $lang = array_replace($lang, $lang_current);
