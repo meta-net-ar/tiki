@@ -7,7 +7,7 @@
 body:not(.fixed_width) .container {
     padding-left: calc($grid-gutter-width / 2);
     padding-right: calc($grid-gutter-width / 2);
-    width: 100%;
+    width: auto;
     max-width: 100%;
 }
 
