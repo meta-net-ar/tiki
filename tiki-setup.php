@@ -264,11 +264,11 @@ if ($color_mode_table_exists) {
     $prefs['color_modes_names'] = [];
 }
 
+require_once('lib/setup/theme.php');
+
 if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
 }
-
-require_once('lib/setup/theme.php');
 
 /* Cookie consent setup, has to be after the JS decision and wiki setup */
 if (! TIKI_API) {
@@ -825,11 +825,13 @@ if (empty($user) && $prefs['feature_antibot'] == 'y') {
 }
 
 if (! empty($prefs['header_custom_css'])) {
-    $headerlib->add_css($prefs['header_custom_css']);
+    // Hopsfully temporary clean-up of inline syntax tags for Tiki 30.0
+    $headerlib->add_css($tikilib->removeInlineSyntaxTags($prefs['header_custom_css']));
 }
 
 if (! empty($prefs['header_custom_js'])) {
-    $headerlib->add_js($prefs['header_custom_js']);
+    // Hopefully temporary clean-up of inline syntax tags for Tiki 30.0
+    $headerlib->add_js($tikilib->removeInlineSyntaxTags($prefs['header_custom_js']));
 }
 
 if ($prefs['feature_file_galleries'] == 'y') {

@@ -179,7 +179,7 @@ if (! timezone) {
     }
     $jsContent .= "});\n";
 // Add the JavaScript content to the header
-    $headerlib->add_js($jsContent);
+    $headerlib->add_js_config($jsContent);
 
     $jqueryTiki['ui'] = $prefs['feature_jquery_ui'] === 'y';
     $jqueryTiki['ui_theme'] = $prefs['feature_jquery_ui_theme'];
