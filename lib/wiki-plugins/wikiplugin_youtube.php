@@ -141,7 +141,7 @@ function wikiplugin_youtube($data, $params)
     $params = array_merge($default, $params);
 
     if (empty($params['movie'])) {
-        return '^' . tra('Plugin YouTube error: the movie parameter is empty.');
+        return '^' . tra('Plugin YouTube error: the movie parameter is empty.') . '^';
     }
 
     $sYoutubeId  = getYoutubeId($params['movie']);

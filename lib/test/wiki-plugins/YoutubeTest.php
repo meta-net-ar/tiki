@@ -23,7 +23,7 @@ class WikiPlugin_YoutubeTest extends PHPUnit\Framework\TestCase
 
         $referrerPolicy = $prefs['http_header_referrer_policy_value'];
 
-        $this->assertEquals('{BOX(class="text-bg-light")}Plugin YouTube error: the movie parameter is empty.{BOX}', wikiplugin_youtube('', []));
+        $this->assertEquals('^Plugin YouTube error: the movie parameter is empty.^', wikiplugin_youtube('', []));
         $this->assertEquals(
             '~np~<iframe src="//www.youtube.com/embed/bPHuY7QL568?" frameborder="0" width="425" height="350" allowfullscreen="" referrerpolicy="' . $referrerPolicy . '"></iframe>~/np~',
             wikiplugin_youtube('', ['movie' => 'http://www.youtube.com/watch?v=bPHuY7QL568'])
