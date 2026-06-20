@@ -894,8 +894,8 @@
         }
     }
 
-    // Remove the fixed navbar as it will make Cypht navbar not visible
-    .navbar.fixed-top { display: none; }
+    // Remove the sticky navbar as it will make Cypht navbar not visible
+    header.sticky-top { display: none; }
 }
 
 //
