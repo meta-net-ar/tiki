@@ -268,15 +268,15 @@ class Services_Article_Controller
         }
 
         // Fall back to the existing value for any field not supplied.
-        $title       = isset($input['title'])       ? $input->title->text()        : $existing['title'];
-        $heading     = isset($input['heading'])     ? $input->heading->text()      : $existing['heading'];
-        $body        = isset($input['body'])        ? $input->body->text()         : $existing['body'];
-        $topicId     = isset($input['topicId'])     ? $input->topicId->int()       : (int) $existing['topicId'];
-        $type        = isset($input['type'])        ? $input->type->text()         : $existing['type'];
-        $subtitle    = isset($input['description']) ? $input->description->text()  : ($existing['subtitle'] ?? '');
-        $author      = isset($input['authorName'])  ? $input->authorName->text()   : ($existing['authorName'] ?? $user);
-        $publication = isset($input['publishDate']) ? $input->publishDate->int()   : (int) $existing['publishDate'];
-        $lang        = isset($input['lang'])        ? $input->lang->text()         : ($existing['lang'] ?? '');
+        $title       = isset($input['title']) ? $input->title->text() : $existing['title'];
+        $heading     = isset($input['heading']) ? $input->heading->text() : $existing['heading'];
+        $body        = isset($input['body']) ? $input->body->text() : $existing['body'];
+        $topicId     = isset($input['topicId']) ? $input->topicId->int() : (int) $existing['topicId'];
+        $type        = isset($input['type']) ? $input->type->text() : $existing['type'];
+        $subtitle    = isset($input['description']) ? $input->description->text() : ($existing['subtitle'] ?? '');
+        $author      = isset($input['authorName']) ? $input->authorName->text() : ($existing['authorName'] ?? $user);
+        $publication = isset($input['publishDate']) ? $input->publishDate->int() : (int) $existing['publishDate'];
+        $lang        = isset($input['lang']) ? $input->lang->text() : ($existing['lang'] ?? '');
 
         // Argument order matches ArtLib::replace_article(); passing the
         // existing articleId updates in place.
