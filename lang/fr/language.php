@@ -7858,7 +7858,6 @@ $lang_current = array(
 "Mautic Password" => "Mot de passe Mautic",
 "Site layout" => "Mise en page du site",
 "Changes the template for the overall site layout" => "Modifie le modèle de mise en page globale du site",
-"Important: when using the Classic Bootstrap (fixed top navbar) layout, be sure to set the fixed-top navbar height, below, to prevent content overlap" => "Important : lors de l'utilisation de la mise en page Classic Bootstrap (barre de navigation fixe en haut), assurez-vous de définir la hauteur de la barre fixe ci-dessous pour éviter le chevauchement du contenu",
 "Enable layout per page, etc" => "Activer une mise en page par page, etc.",
 "Specify an alternate layout for a particular wiki page, etc" => "Spécifier une mise en page alternative pour une page wiki particulière, etc.",
 "Matomo server URL" => "URL du serveur Matomo",
