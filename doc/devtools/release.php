@@ -68,12 +68,7 @@ include_once('lib/setup/twversion.class.php');
 $TWV = new TWVersion();
 
 if ($options['only-secdb']) {
-    // SecDB generation is temporarily disabled.
-    // Reason: per team discussion, SecDB is unstable and has been removed
-    // from CI and release scripts for now.
-//    passthru("$phpCommand doc/devtools/generate_secdb.php", $exitCode);
-    info(">> SecDB generation is temporarily disabled.");
-    exit(0);
+    passthru("$phpCommand doc/devtools/generate_secdb.php", $exitCode);
 }
 
 $script = $_SERVER['argv'][0];
@@ -163,13 +158,13 @@ if (! $options['no-copyright-update'] && important_step("Update '" . COPYRIGHTS_
     }
 }
 
-if (! $options['no-secdb']) {
-    // SecDB generation is temporarily disabled.
-    // Reason: per team discussion, SecDB is unstable and has been removed
-    // from CI and release scripts for now.
-    //    passthru("$phpCommand doc/devtools/generate_secdb.php", $exitCode);
-    info(">> SecDB generation is temporarily disabled.");
-    exit(0);
+if (! $options['no-secdb'] && important_step("Update SecDB file(s) 'db/tiki-secdb_{$version}_mysql.sql'")) {
+    passthru("$phpCommand doc/devtools/generate_secdb.php", $exitCode);
+    if ($exitCode === 0) {
+        print "SecDB file has been successfully created\n";
+    } else {
+        error('SecDB file update failed.');
+    }
 }
 
 if ($isPre) {
@@ -330,11 +325,7 @@ function setPermissions(string $src): void
             continue;
         }
 
-        if ($info->isDir()) {
-            chmod($path, 0755);
-        } else {
-            chmod($path, 0664);
-        }
+        chmod($path, $info->isDir() ? 0755 : 0664);
     }
 }
 
@@ -488,30 +479,6 @@ function build_packages($releaseVersion)
             die($shellout . "\n");
         }
     }
-    echo "=> Fix writable directory permissions ...";
-    $writablePaths = [
-        'temp',
-        'db',
-        'img',
-        'templates',
-    ];
-
-    foreach ($writablePaths as $path) {
-        if (! is_dir($path)) {
-            continue;
-        }
-
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::SELF_FIRST
-        );
-
-        chmod($path, 0777);
-
-        foreach ($iterator as $item) {
-            chmod($item->getPathname(), 0777);
-        }
-    }
 
     echo "Setting file permissions\n";
     setPermissions($sourceDir);
@@ -608,7 +575,7 @@ function get_options()
         'no-lang-update' => false,
         'no-changelog-update' => false,
         'no-copyright-update' => false,
-        'no-secdb' => true,
+        'no-secdb' => false,
         'no-packaging' => false,
         'no-tagging' => false,
         'force-yes' => false,
