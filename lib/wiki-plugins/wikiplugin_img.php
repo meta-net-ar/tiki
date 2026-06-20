@@ -191,6 +191,15 @@ function wikiplugin_img_info()
                 'filter' => 'text',
                 'default' => '',
             ],
+            'srcset' => [
+                'required' => false,
+                'name' => tra('Srcset'),
+                'description' => tr('Manual srcset attribute value for responsive images when using a static src. Example: %0/img-400.webp 400w, /img-665.webp 665w%1', '<code>', '</code>'),
+                'since' => '30.0',
+                'doctype' => 'text',
+                'filter' => 'text',
+                'default' => '',
+            ],
             'max' => [
                 'required' => false,
                 'name' => tra('Maximum Size'),
@@ -530,6 +539,22 @@ function wikiplugin_img_info()
                 'options' => [
                     ['text' => tra('Default'), 'value' => ''],
                     ['text' => tra('No'), 'value' => 'n'],
+                ],
+                'advanced' => true,
+            ],
+            'fetchpriority' => [
+                'required' => false,
+                'name' => tra('Fetch Priority'),
+                'filter' => 'alpha',
+                'description' => tr('Set to "high" for LCP images to load eagerly with high priority (disables lazy loading). Use "low" to defer non-critical images.'),
+                'since' => '30.0',
+                'doctype' => 'show',
+                'default' => '',
+                'options' => [
+                    ['text' => tra('Default'), 'value' => ''],
+                    ['text' => tra('High (LCP)'), 'value' => 'high'],
+                    ['text' => tra('Low'), 'value' => 'low'],
+                    ['text' => tra('Auto'), 'value' => 'auto'],
                 ],
                 'advanced' => true,
             ],
@@ -1162,6 +1187,22 @@ function wikiplugin_img($data, $params)
         }
     }
 
+    // For static src images with a manual srcset param, populate $sizes from the sizes param
+    if (! $sizes && ! empty($imgdata['srcset']) && ! empty($params['sizes'])) {
+        $size_max_breaks = ['767', '991', '1199'];
+        $sizes_arr = array_map('trim', explode(",", $params['sizes']));
+        if (count($sizes_arr) === 4) {
+            $sizes = "(max-width: " . $size_max_breaks[0] . "px) " . $sizes_arr[0] . ",";
+            $sizes .= "(max-width: " . $size_max_breaks[1] . "px) " . $sizes_arr[1] . ",";
+            $sizes .= "(max-width: " . $size_max_breaks[2] . "px) " . $sizes_arr[2] . ",";
+            $sizes .= $sizes_arr[3];
+        } elseif (count($sizes_arr) === 1) {
+            $sizes = $sizes_arr[0];
+        } else {
+            $sizes = $params['sizes'];
+        }
+    }
+
     ////////////////////////////////////////// Create the HTML img tag //////////////////////////////////////////////
     //Start tag with src and dimensions
     $src = filter_out_sefurl($src);
@@ -1177,11 +1218,13 @@ function wikiplugin_img($data, $params)
     }
 
     $printing = preg_match("/tiki-print.php/", $_SERVER['REQUEST_URI']);
+    $fetchPriority = ! empty($params['fetchpriority']) ? strtolower($params['fetchpriority']) : '';
     $lozardImg = false;
     if (
         $prefs['allowImageLazyLoad'] === 'y' &&
         ! $printing &&
-        (empty($params['lazyLoad']) || $params['lazyLoad'] !== 'n')
+        (empty($params['lazyLoad']) || $params['lazyLoad'] !== 'n') &&
+        $fetchPriority !== 'high'
     ) {
         $lozardImg = true;
     }
@@ -1209,14 +1252,20 @@ function wikiplugin_img($data, $params)
         $tagName = 'img';
         $replimg = '<img src="' . $src . '" ';
 
+        // For static src images, allow a manual srcset parameter
+        if (! $srcset && ! empty($imgdata['srcset'])) {
+            $srcset = $imgdata['srcset'];
+        }
+
         if ($srcset) {
-            $replimg .= 'srcset="' . $srcset . '" ';
+            $replimg .= 'srcset="' . htmlspecialchars($srcset, ENT_QUOTES, 'UTF-8') . '" ';
         }
         if ($sizes) {
-            $replimg .= 'sizes="' . $sizes . '" ';
+            $replimg .= 'sizes="' . htmlspecialchars($sizes, ENT_QUOTES, 'UTF-8') . '" ';
         }
         $imgdata['class'] .= ' regImage pluginImg' . $imgdata['fileId'];
-        if ($imgdata['responsive'] == 'y') {
+        $existingClasses = preg_split('/\s+/', trim($imgdata['class']));
+        if ($imgdata['responsive'] == 'y' && ! in_array('img-fluid', $existingClasses, true)) {
             $imgdata['class'] .= ' img-fluid';
         }
         if ($imgdata['featured'] == 'y') {
@@ -1228,6 +1277,15 @@ function wikiplugin_img($data, $params)
     if ($lozardImg) {
         $replimg .= 'loading="lazy" ';
         $imgdata['data-src'] = true;
+    }
+
+    if ($fetchPriority !== '') {
+        $replimg .= 'fetchpriority="' . htmlspecialchars($fetchPriority) . '" ';
+        if ($fetchPriority === 'high') {
+            // Register a head preload so the browser discovers the LCP image early.
+            // Pass srcset/sizes so the browser preloads the correct responsive variant.
+            TikiLib::lib('wiki')->addPreloadLinkForHighPriorityImage($src, $srcset, $sizes);
+        }
     }
 
     if (! empty($imgdata_dim)) {

@@ -750,6 +750,7 @@ class WikiLib extends TikiLib
             $cache_info = $this->get_cache_info($page);
             if (! empty($cache_info['cache_timestamp']) && $cache_info['cache_timestamp'] + $wiki_cache >= $this->now) {
                 $content = $cache_info['cache'];
+                $this->addPreloadLinksForCachedHighPriorityImages($content);
                 // get any cached JS and add to headerlib JS
                 $jsFiles = $headerlib->getJsFromHTML($content, false, true);
 
@@ -786,6 +787,57 @@ class WikiLib extends TikiLib
         }
 
         return $content;
+    }
+
+    private function addPreloadLinksForCachedHighPriorityImages(string $content): void
+    {
+        if (stripos($content, '<img') === false || stripos($content, 'fetchpriority') === false) {
+            return;
+        }
+
+        preg_match_all('/<img\b[^>]*>/i', $content, $images);
+        foreach ($images[0] as $image) {
+            if (! preg_match('/\bfetchpriority\s*=\s*["\']high["\']/i', $image)) {
+                continue;
+            }
+            if (! preg_match('/\bsrc\s*=\s*["\']([^"\']+)["\']/i', $image, $srcMatches)) {
+                continue;
+            }
+            $src = html_entity_decode($srcMatches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            $srcset = '';
+            $sizes = '';
+            if (preg_match('/\bsrcset\s*=\s*["\']([^"\']+)["\']/i', $image, $srcsetMatches)) {
+                $srcset = html_entity_decode($srcsetMatches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            }
+            if (preg_match('/\bsizes\s*=\s*["\']([^"\']+)["\']/i', $image, $sizesMatches)) {
+                $sizes = html_entity_decode($sizesMatches[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            }
+            $this->addPreloadLinkForHighPriorityImage($src, $srcset, $sizes);
+        }
+    }
+
+    public function addPreloadLinkForHighPriorityImage(string $src, string $srcset = '', string $sizes = ''): void
+    {
+        $href = htmlspecialchars($src, ENT_QUOTES, 'UTF-8');
+        $link = '<link rel="preload" as="image" href="' . $href . '"';
+        if ($srcset !== '') {
+            $link .= ' imagesrcset="' . htmlspecialchars($srcset, ENT_QUOTES, 'UTF-8') . '"';
+        }
+        if ($sizes !== '') {
+            $link .= ' imagesizes="' . htmlspecialchars($sizes, ENT_QUOTES, 'UTF-8') . '"';
+        }
+        $link .= ' fetchpriority="high">' . "\n";
+
+        $headerlib = TikiLib::lib('header');
+        if (strpos($headerlib->rawhtml, $link) !== false) {
+            return;
+        }
+
+        try {
+            $headerlib->add_rawhtml($headerlib->rawhtml . $link);
+        } catch (Error $e) {
+            TikiLib::lib('errortracking')->captureException($e);
+        }
     }
 
     public function update_cache($page, $data)
