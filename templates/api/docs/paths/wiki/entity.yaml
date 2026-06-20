@@ -46,3 +46,37 @@ post:
         application/json:
           schema:
             $ref: schemas-Error.yaml
+patch:
+  description: Partially update a wiki page (SEO title, description, categories, tags)
+  parameters:
+    - name: page
+      in: path
+      description: Page name
+      required: true
+      schema:
+        type: string
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: schemas-WikiPatchPageRequest.yaml
+  responses:
+    '200':
+      description: patch response
+      content:
+        application/json:
+          schema:
+            $ref: schemas-WikiPatchPageResponse.yaml
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
+    '404':
+      description: page not found
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
