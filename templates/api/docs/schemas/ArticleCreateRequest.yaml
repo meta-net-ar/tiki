@@ -1,0 +1,32 @@
+---
+type: object
+required:
+  - title
+properties:
+  title:
+    type: string
+    description: Article title (required)
+  heading:
+    type: string
+    description: Short introductory text shown above the body
+  body:
+    type: string
+    description: Main article content
+  topicId:
+    type: integer
+    description: Topic ID to assign the article to
+  type:
+    type: string
+    description: Article type (defaults to "article")
+  lang:
+    type: string
+    description: Language code of the article
+  authorName:
+    type: string
+    description: Author name to display (defaults to the current user)
+  description:
+    type: string
+    description: Subtitle / short description of the article
+  publishDate:
+    type: integer
+    description: Unix timestamp for the publish date (defaults to now)
