@@ -77,7 +77,7 @@
                             {tr}Display more information here{/tr}
                         </label>
                         <div class="col-sm-8">
-                            <input id="pref-fake" type="checkbox" name="pref-fake" data-tiki-admin-child-block="#pref-fake_childcontainer" data-tiki-admin-child-mode="normal"/>
+                            <input id="pref-fake" type="checkbox" name="pref-fake" data-tiki-admin-child-block="#pref-fake_childcontainer" data-tiki-admin-child-mode="normal">
                         </div>
                     </div>
                 </div>

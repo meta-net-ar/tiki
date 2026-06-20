@@ -403,7 +403,7 @@ class BlogLib extends TikiDb_Bridge
 
         while ($res = $result->fetchRow()) {
             $imgId = $res['imgId'];
-            $res['link'] = "<img src='tiki-view_blog_post_image.php?imgId=$imgId' alt='image' />";
+            $res['link'] = "<img src='tiki-view_blog_post_image.php?imgId=$imgId' alt='image'>";
             $parts = parse_url($_SERVER['REQUEST_URI']);
             $path = str_replace('tiki-blog_post.php', 'tiki-view_blog_post_image.php', $parts['path']);
             $res['absolute'] = $tikilib->httpPrefix() . $path . "?imgId=$imgId";

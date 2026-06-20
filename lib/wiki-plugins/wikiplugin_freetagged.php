@@ -269,7 +269,7 @@ function wikiplugin_freetagged($data, $params)
                                 $w = floor($h * $w / $info['image_y']);
                             }
                         }
-                        $obj['img'] = '<img  src="' . $obj['image'] . ($w ? ' width="' . $w . '"' : '') . ($h ? ' height="' . $h . '"' : '') . '"/>';
+                        $obj['img'] = '<img  src="' . $obj['image'] . ($w ? ' width="' . $w . '"' : '') . ($h ? ' height="' . $h . '"' : '') . '">';
                     }
                     break;
                 case 'file':

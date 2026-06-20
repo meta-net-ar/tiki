@@ -1313,7 +1313,7 @@ class StructLib extends TikiLib
               $dat = preg_replace("/tiki-index.php\?page=([^\'\" ]+)/", "$1.html", $dat);
               $dat = str_replace('?nocache=1', '', $dat);
               $cs = '';
-              $data = "<html><head><script src=\"../js/highlight.js\"></script><link rel=\"StyleSheet\"  href=\"../../../styles/$style_base.css\" type=\"text/css\" /><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /> <title>" . $res["pageName"] . "</title></head><body style=\"padding:10px\" onload=\"doProc();\">$cs<div id='tiki-center'><div class='wikitext'>" . $dat . '</div></div></body></html>';
+              $data = "<html><head><script src=\"../js/highlight.js\"></script><link rel=\"StyleSheet\"  href=\"../../../styles/$style_base.css\" type=\"text/css\"><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"> <title>" . $res["pageName"] . "</title></head><body style=\"padding:10px\" onload=\"doProc();\">$cs<div id='tiki-center'><div class='wikitext'>" . $dat . '</div></div></body></html>';
               $fw = fopen("$base/pages/" . $res['pageName'] . '.html', 'wb+');
               fwrite($fw, $data);
               fclose($fw);
@@ -1355,7 +1355,7 @@ class StructLib extends TikiLib
         // write the title page, using:
         // Browser Title, Logo, Site title, Site subtitle
         $fw = fopen("$base/content.html", 'w+');
-        $titlepage = "<h1>" . $prefs['browsertitle'] . "</h1><p><img src='../../" . $prefs['sitelogo_src'] . "' alt='" . $prefs['sitelogo_alt'] . "' style=\"text-align: center;\" /></p><h2>" . $prefs['sitetitle'] . "</h2><h3>" . $prefs['sitesubtitle'] . "</h3>";
+        $titlepage = "<h1>" . $prefs['browsertitle'] . "</h1><p><img src='../../" . $prefs['sitelogo_src'] . "' alt='" . $prefs['sitelogo_alt'] . "' style=\"text-align: center;\"></p><h2>" . $prefs['sitetitle'] . "</h2><h3>" . $prefs['sitesubtitle'] . "</h3>";
         fwrite($fw, $titlepage);
         fclose($fw);
     }

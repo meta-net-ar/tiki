@@ -166,7 +166,7 @@ function wikiplugin_chart($data, $params)
         $params['width'] = $width;
         $params['height'] = $height;
 
-        $disp = '<img src="' . _wikiplugin_chart_uri($params, 'PNG') . '"/>';
+        $disp = '<img src="' . _wikiplugin_chart_uri($params, 'PNG') . '">';
     } elseif (function_exists('image_jpeg')) {
         if (is_null($width)) {
             return WikiParser_PluginOutput::argumentError(['width']);
@@ -178,7 +178,7 @@ function wikiplugin_chart($data, $params)
         $params['width'] = $width;
         $params['height'] = $height;
 
-        $disp = '<img src="' . _wikiplugin_chart_uri($params, 'JPEG') . '"/>';
+        $disp = '<img src="' . _wikiplugin_chart_uri($params, 'JPEG') . '">';
     } elseif (function_exists('pdf_new')) {
         $disp = tra("Chart as PDF");
     } elseif (function_exists('ps_new')) {

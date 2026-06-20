@@ -82,8 +82,8 @@
                                     <fieldset>
                                         <legend class="fs-6">{tr}Rate this comment:{/tr}</legend>
                                         {rating type="comment" id=$comment.threadId}
-                                        <input type="hidden" name="id" value="{$comment.threadId}" />
-                                        <input type="hidden" name="type" value="comment" />
+                                        <input type="hidden" name="id" value="{$comment.threadId}">
+                                        <input type="hidden" name="type" value="comment">
                                     </fieldset>
                                 </form>
                                 {jq}

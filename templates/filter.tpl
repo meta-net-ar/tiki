@@ -154,7 +154,7 @@
                 {/jq}
             {/if}
             {if $prefs.storedsearch_enabled eq 'y' and $user}
-                <input type="hidden" name="storeAs" value=""/>
+                <input type="hidden" name="storeAs" value="">
                 <a href="{service controller=search_stored action=select modal=true}" id="store-query" class="btn btn-info">{tr}Save Search{/tr}</a>
                 <a href="{service controller=search_stored action=list}" class="btn btn-link">{tr}View Saved Searches{/tr}</a>
                 {jq}

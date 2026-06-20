@@ -13,7 +13,7 @@
             {tr}Select the Wysiwyg editor mode{/tr}
             <div class="row">
                 <div class="col-md-4">
-                    <input type="radio" name="editorType" value="wiki" {if empty($editorType) || $editorType eq 'wiki'}checked="checked"{/if} /> {tr}Compatible Wiki mode{/tr}
+                    <input type="radio" name="editorType" value="wiki" {if empty($editorType) || $editorType eq 'wiki'}checked="checked"{/if}> {tr}Compatible Wiki mode{/tr}
                 </div>
                 <div class="col-md-8">{tr}Use wiki syntax for saved pages{/tr}.<br>
                     <p>
@@ -26,7 +26,7 @@
             </div>
             <div class="row">
                 <div class="col-md-4">
-                    <input type="radio" name="editorType" value="html" {if $editorType eq 'html'}checked="checked"{/if} /> {tr}HTML mode{/tr}
+                    <input type="radio" name="editorType" value="html" {if $editorType eq 'html'}checked="checked"{/if}> {tr}HTML mode{/tr}
                 </div>
                 <div class="col-md-8">
                     <p>

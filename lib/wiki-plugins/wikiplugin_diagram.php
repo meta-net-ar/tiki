@@ -313,7 +313,7 @@ XML;
                 EOF;
             } else {
                 $galHtml = <<<EOF
-                    <input type="hidden" name="galleryId" value="$galleryId"/>
+                    <input type="hidden" name="galleryId" value="$galleryId">
                 EOF;
             }
 
@@ -321,14 +321,14 @@ XML;
         ~np~
         <form id="newDiagram$diagramIndex" method="post" action="tiki-editdiagram.php">
             <p>
-                <input type="submit" class="btn btn-primary btn-sm" name="label" value="$label" class="newSvgButton" />
+                <input type="submit" class="btn btn-primary btn-sm" name="label" value="$label" class="newSvgButton">
                 $galHtml
-                <input type="hidden" name="newDiagram" value="1"/>
-                <input type="hidden" name="page" value="$page"/>
-                <input type="hidden" name="template" value="$template"/>
-                <input type="hidden" name="fileName" value="$fileName"/>
-                <input type="hidden" name="xml" value='$diagramXmlStringEncoded'/>
-                <input type="hidden" name="index" value="$diagramIndex"/>
+                <input type="hidden" name="newDiagram" value="1">
+                <input type="hidden" name="page" value="$page">
+                <input type="hidden" name="template" value="$template">
+                <input type="hidden" name="fileName" value="$fileName">
+                <input type="hidden" name="xml" value='$diagramXmlStringEncoded'>
+                <input type="hidden" name="index" value="$diagramIndex">
             </p>
         </form>
         ~/np~

@@ -40,7 +40,7 @@
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
                             <a href="http://tiki.org/display588" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                <img src="img/profiles/profile_thumb_structured_master_documents.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                <img src="img/profiles/profile_thumb_structured_master_documents.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                             </a>
                             <div class="mini text-center">
                                 <div class="thumbcaption text-center">{tr}Click to expand{/tr}</div>
@@ -69,7 +69,7 @@
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
                             <a href="http://tiki.org/display587" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                <img src="img/profiles/profile_thumb_consensus_forums.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                <img src="img/profiles/profile_thumb_consensus_forums.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                             </a>
                             <div class="small text-center">
                                 {tr}Click to expand{/tr}
@@ -100,7 +100,7 @@
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
                             <a href="http://tiki.org/display586" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                <img src="img/profiles/profile_thumb_barter_market.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                <img src="img/profiles/profile_thumb_barter_market.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                             </a>
                             <div class="small text-center">
                                 {tr}Click to expand{/tr}
@@ -128,7 +128,7 @@
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
                             <a href="http://tiki.org/display615" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                <img src="img/profiles/profile_thumb_revision_approval_iso9001.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                <img src="img/profiles/profile_thumb_revision_approval_iso9001.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                             </a>
                             <div class="small text-center">
                                 {tr}Click to expand{/tr}

@@ -8,7 +8,7 @@
             {title help="Sitemap" admpage="general&cookietab=3&highlight=sitemap_enable"}{tr}Sitemap{/tr}{/title}
         <form action="tiki-admin.php?page=seoprefs" method="post" class="admin">
             {ticket}
-            <input type="hidden" name="modulesetup" />
+            <input type="hidden" name="modulesetup">
 
             {if $prefs.sitemap_enable eq 'y'}
                 <div class="adminoptionbox clearfix mb-4">
@@ -87,7 +87,7 @@
                                 <td>
                                     <div class="">
                                         <a href="tiki-editpage.php?page={$pages.pageName}#contenttabs_editpage-2">
-                                            <input type="submit" class="btn btn-outline-primary btn-sm" value="{tr}Edit{/tr}"/>
+                                            <input type="submit" class="btn btn-outline-primary btn-sm" value="{tr}Edit{/tr}">
                                         </a>
                                     </div>
                                 </td>

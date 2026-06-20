@@ -811,7 +811,7 @@
                     {ticket}
                     <div class="tiki-form-group row">
                         <div class="col-md-5 p-4 text-center">
-                            <img id="tfaQrCodeImage" class="responsive" src="data:image/{$imageType};base64,{$tfaSecretQR}"/>
+                            <img id="tfaQrCodeImage" class="responsive" src="data:image/{$imageType};base64,{$tfaSecretQR}">
                             {if $imageType eq 'svg+xml'}
                                 {assign var="fileExtension" value="svg"}
                             {else}

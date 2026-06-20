@@ -93,7 +93,7 @@
         <div class="mb-3 row">
             <label class="col-sm-3 col-form-label" for="url">{tr}URL{/tr}</label>
             <div class="col-sm-4">
-                <input type="url" name="url" id="url" class="form-control" />
+                <input type="url" name="url" id="url" class="form-control">
             </div>
         </div>
         <div class="mb-3 row">

@@ -11,14 +11,14 @@
             <div class="pe-1">
                 <label class="sr-only" for="filter~content">{tr}Search Query{/tr}</label>
                 <div class="input-group">
-                    <input class="form-control" type="search" name="filter~content" value="{$filter.content|escape}" placeholder="{tr}Search{/tr}"/>
+                    <input class="form-control" type="search" name="filter~content" value="{$filter.content|escape}" placeholder="{tr}Search{/tr}">
                 </div>
                 {foreach from=$facets item=facet}
-                    <input type="hidden" name="filter~{$facet|escape}" value="{$postfilter[$facet]|default:$filter[$facet]|escape}"/>
+                    <input type="hidden" name="filter~{$facet|escape}" value="{$postfilter[$facet]|default:$filter[$facet]|escape}">
                 {/foreach}
             </div>
             <div class="ps-1">
-                <input type="hidden" name="filter~fields" value="{$filter.fields|escape}"/>
+                <input type="hidden" name="filter~fields" value="{$filter.fields|escape}">
                 <select id="filter-fields" class="form-select" multiple placeholder="{tr}Search in fields{/tr}">
                     {foreach from=$filter_fields item=field}
                         <option value="{$field|escape}"{if in_array($field, explode(',', $filter.fields))} selected{/if}>{tr}{$field|escape}{/tr}</option>
@@ -31,7 +31,7 @@
                 {/jq}
             </div>
             <div class="ps-1">
-                <input type="submit" class="btn btn-primary btn-sm" value="{tr}Search{/tr}"/>
+                <input type="submit" class="btn btn-primary btn-sm" value="{tr}Search{/tr}">
             </div>
             {if $prefs.tracker_tabular_enabled eq 'y' && ! empty($smarty.get.tabularId)}
                 <div class="px-1">
@@ -69,7 +69,7 @@
             {/if}
             {if $prefs.storedsearch_enabled eq 'y' and $user}
                 <div class="ps-1">
-                    <input type="hidden" name="storeAs" value=""/>
+                    <input type="hidden" name="storeAs" value="">
                     <a href="{service controller=search_stored action=select modal=true}" id="store-query" class="btn btn-secondary btn-sm">{tr}Save Search{/tr}</a>
                     <a href="{service controller=search_stored action=list}" class="btn btn-link btn-sm">{tr}View Saved Searches{/tr}</a>
                     {jq}

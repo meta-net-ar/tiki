@@ -20,10 +20,10 @@
             <label for="name" class="col-form-label">
                 {tr}Workspace Name{/tr}
             </label>
-            <input type="text" name="name" value="" class="form-control"/>
+            <input type="text" name="name" value="" class="form-control">
         </div>
         <div class="submit">
-            <input type="submit" class="btn btn-primary" value="{tr}Create{/tr}"/>
+            <input type="submit" class="btn btn-primary" value="{tr}Create{/tr}">
         </div>
     </form>
 {/block}

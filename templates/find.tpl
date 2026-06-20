@@ -54,7 +54,7 @@
                         {tr}Search child file galleries{/tr}
                     </label>
                     <div class="col-sm-7">
-                        <input type="checkbox" name="find_sub" id="find_sub" class="form-check-input" {if $find_sub eq 'y'}checked="checked"{/if}/>
+                        <input type="checkbox" name="find_sub" id="find_sub" class="form-check-input" {if $find_sub eq 'y'}checked="checked"{/if}>
                     </div>
                 </div>
             {/if}

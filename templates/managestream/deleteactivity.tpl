@@ -10,8 +10,8 @@
         <pre>ID {$activityId|escape}</pre>
         <div class="submit">
             {ticket mode='confirm'}
-            <input type="hidden" name="activityId" value="{$activityId|escape}"/>
-            <input type="submit" class="btn btn-primary" value="{tr}Delete{/tr}"/>
+            <input type="hidden" name="activityId" value="{$activityId|escape}">
+            <input type="submit" class="btn btn-primary" value="{tr}Delete{/tr}">
         </div>
     </form>
 {/block}

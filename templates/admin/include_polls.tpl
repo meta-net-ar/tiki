@@ -32,7 +32,7 @@
 
                 <fieldset>
                     <legend class="h3">{tr}Settings{/tr}{help url="Polls"}</legend>
-                    <input type="hidden" name="pollprefs" />
+                    <input type="hidden" name="pollprefs">
                     {preference name=feature_poll_anonymous}
                     {preference name=feature_poll_revote}
                     {preference name=feature_poll_comments}

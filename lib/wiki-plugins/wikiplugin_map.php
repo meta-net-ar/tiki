@@ -311,15 +311,15 @@ function wp_map_plugin_searchlayer($body, $args)
 
     $filters = '';
     foreach ($args as $key => $arg) {
-        $filters .= '<input type="hidden" name="filter~' . $key . '" value="' . smarty_modifier_escape($arg) . '"/>';
+        $filters .= '<input type="hidden" name="filter~' . $key . '" value="' . smarty_modifier_escape($arg) . '">';
     }
 
     if ($maxRecords) {
-        $maxRecords = '<input type="hidden" name="maxRecords" value="' . (int)$maxRecords . '"/>';
+        $maxRecords = '<input type="hidden" name="maxRecords" value="' . (int)$maxRecords . '">';
     }
 
     if ($sort_mode) {
-        $sort_mode = '<input type="hidden" name="sort_mode" value="' . $sort_mode . '"/>';
+        $sort_mode = '<input type="hidden" name="sort_mode" value="' . $sort_mode . '">';
     }
 
     $fieldList = '';
@@ -327,7 +327,7 @@ function wp_map_plugin_searchlayer($body, $args)
         $fields = array_map(function ($field) {
             return str_replace('tracker_field_', '', $field);
         }, $fields);
-        $fieldList = '<input type="hidden" name="fields" value="' . smarty_modifier_escape(implode(',', $fields)) . '"/>';
+        $fieldList = '<input type="hidden" name="fields" value="' . smarty_modifier_escape(implode(',', $fields)) . '">';
     }
 
     $popup_config = [];
@@ -348,7 +348,7 @@ function wp_map_plugin_searchlayer($body, $args)
     $escapedSuffix = smarty_modifier_escape($suffix);
     return <<<OUT
 <form method="post" action="tiki-searchindex.php" class="search-box onload" style="display: none" data-result-refresh="$refresh" data-result-layer="$escapedLayer" data-result-suffix="$escapedSuffix" data-load-delay="$load_delay" data-popup-fields="$popup_fields" data-popup-tpl="$popup_tpl"{$popup_config}>
-    <p>$maxRecords$sort_mode$fieldList$filters<input type="submit" class="btn btn-primary btn-sm" /></p>
+    <p>$maxRecords$sort_mode$fieldList$filters<input type="submit" class="btn btn-primary btn-sm"></p>
 
 </form>
 OUT;

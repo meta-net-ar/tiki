@@ -175,7 +175,7 @@ function getSecretQR($secretKey, $interval, $user, $issuer)
     );
     $tfaSecretQR = base64_encode($writer->writeString($g2faUrl));
     return '<img src="data:image/' . $imageType . ';base64,'
-        . $tfaSecretQR . '"/>';
+        . $tfaSecretQR . '">';
 }
 
 function addTOTPPlugin($pageName, $user, $secret, $interval, $issuer)

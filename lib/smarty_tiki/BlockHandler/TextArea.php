@@ -119,8 +119,8 @@ class TextArea extends Base
             $params['section'] = 'trackers';
         }
         $html = '';
-        $html .= '<input type="hidden" name="mode_wysiwyg" value="" /><input type="hidden" name="mode_normal" value="" />';
-        $html .= '<input type="hidden" name="syntax" value="' . $params['_syntax'] . '" />';
+        $html .= '<input type="hidden" name="mode_wysiwyg" value=""><input type="hidden" name="mode_normal" value="">';
+        $html .= '<input type="hidden" name="syntax" value="' . $params['_syntax'] . '">';
 
         $auto_save_referrer = '';
         $auto_save_warning = '';
@@ -192,8 +192,8 @@ class TextArea extends Base
                 $tuiOptions = $wysiwyglib->setUpMarkdownEditor($as_id, $content, $params, $auto_save_referrer);
 
                 // TODO add dialog to choose syntax if pref says so
-                $html .= '<input type="hidden" name="wysiwyg" value="y" />';
-                $html .= '<input type="hidden" name="' . $params['name'] . '" id="' . $as_id . '" value="' . htmlspecialchars($content) . '" />';
+                $html .= '<input type="hidden" name="wysiwyg" value="y">';
+                $html .= '<input type="hidden" name="' . $params['name'] . '" id="' . $as_id . '" value="' . htmlspecialchars($content) . '">';
                 $html .= '<div id="' . $as_id . '_editor"></div>';
             } else {
                 $params['_is_html'] = true;
@@ -201,7 +201,7 @@ class TextArea extends Base
                 <textarea class="wikiedit d-none" name="{$params['name']}" id="{$as_id}">
                     {$content}
                 </textarea>
-                <input type="hidden" name="wysiwyg" value="y" />
+                <input type="hidden" name="wysiwyg" value="y">
                 HTML;
 
                 $wysiwyglib->setUpEditor($as_id, $params);
@@ -232,7 +232,7 @@ class TextArea extends Base
             $smarty->assign_by_ref('textareadata', $content);
             $html .= $smarty->fetch('wiki_edit.tpl');
 
-            $html .= "\n" . '<input type="hidden" name="wysiwyg" value="n" />';
+            $html .= "\n" . '<input type="hidden" name="wysiwyg" value="n">';
 
             // Attach language checker for plain textarea if enabled
             if ($prefs['feature_language_check'] === 'y') {

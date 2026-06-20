@@ -78,20 +78,20 @@
                         {foreach from=$custom_translations key=cfrom item=cto}
                             <tr>
                                 <td>
-                                    <input type="text" name="from[]" value="{$cfrom|escape}" class="form-control"/>
+                                    <input type="text" name="from[]" value="{$cfrom|escape}" class="form-control">
                                 </td>
                                 <td>
-                                    <input type="text" name="to[]" value="{$cto|escape}" class="form-control"/>
+                                    <input type="text" name="to[]" value="{$cto|escape}" class="form-control">
                                 </td>
                             </tr>
                         {/foreach}
                     {/if}
                     <tr>
                         <td>
-                            <input type="text" name="from[]" class="form-control" placeholder="{tr}Text{/tr}..."/>
+                            <input type="text" name="from[]" class="form-control" placeholder="{tr}Text{/tr}...">
                         </td>
                         <td>
-                            <input type="text" name="to[]" class="form-control" placeholder="{tr}Translation text{/tr}..."/>
+                            <input type="text" name="to[]" class="form-control" placeholder="{tr}Translation text{/tr}...">
                         </td>
                     </tr>
                     </tbody>
@@ -104,11 +104,11 @@
         <div class="submit text-center">
             <input type="hidden" name="confirm" value="1">
             <input type="hidden" name="language" value={$language}>
-            <input type="submit" class="btn btn-primary" name="custom_save" value="{tr}Save{/tr}" />
+            <input type="submit" class="btn btn-primary" name="custom_save" value="{tr}Save{/tr}">
         </div>
         {jq}
             $('#add_row').on("click", function() {
-            $('#custom_translations_table tbody').append('<tr><td><input type="text" name="from[]" class="form-control" placeholder="{tr}Text{/tr}..."/></td><td><input type="text" name="to[]" class="form-control" placeholder="{tr}Translation text{/tr}..."/></td></tr>');
+            $('#custom_translations_table tbody').append('<tr><td><input type="text" name="from[]" class="form-control" placeholder="{tr}Text{/tr}..."></td><td><input type="text" name="to[]" class="form-control" placeholder="{tr}Translation text{/tr}..."></td></tr>');
             });
         {/jq}
     </form>

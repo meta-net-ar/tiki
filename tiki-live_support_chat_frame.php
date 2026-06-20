@@ -14,7 +14,7 @@
      "DTD/xhtml1-transitional.dtd">
 <html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
   </head>
   <body style="margin-left:4px;"></body>
 </html>

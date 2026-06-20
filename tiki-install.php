@@ -137,9 +137,9 @@ if ($userCanAccessInstaller === true) {
     $content = '<p class="text-light mt-lg-3 mx-3">' . tr('You are attempting to run the Tiki Installer. For your protection, this installer can be used only by a site administrator.To verify that you are a site administrator, enter your <strong><em>database</em></strong> credentials (database username and password) here.') . '</p>
                 <p class="text-light mx-3">' . tr('If you have forgotten your database credentials, find the directory where you have unpacked your Tiki and have a look inside the <strong class="text-yellow-inst">db</strong> folder into the <strong class="text-yellow-inst">local.php</strong> file.') . '</p>
                 <form method="post" action="tiki-install.php" class="text-center">
-                    <p class="col-6 offset-3"><label for="dbuser" class="sr-only text-white">' . tr("Database username") . '</label> <input type="text" id="dbuser" name="dbuser" class="form-control text-center" placeholder="' . tr('Database username') . '"/></p>
-                    <p class="col-6 offset-3"><label for="dbpass" class="sr-only text-white">' . tr("Database password") . '</label> <input type="password" id="dbpass" name="dbpass" class="form-control text-center" placeholder="' . tr('Database password') . '"/></p>
-                    <p class="col-6 offset-3"><input type="submit" class="btn btn-primary" value=" ' . tr("Validate and Continue ") . '" /></p>
+                    <p class="col-6 offset-3"><label for="dbuser" class="sr-only text-white">' . tr("Database username") . '</label> <input type="text" id="dbuser" name="dbuser" class="form-control text-center" placeholder="' . tr('Database username') . '"></p>
+                    <p class="col-6 offset-3"><label for="dbpass" class="sr-only text-white">' . tr("Database password") . '</label> <input type="password" id="dbpass" name="dbpass" class="form-control text-center" placeholder="' . tr('Database password') . '"></p>
+                    <p class="col-6 offset-3"><input type="submit" class="btn btn-primary" value=" ' . tr("Validate and Continue ") . '"></p>
                 </form>
                 <p>&nbsp;</p>';
 

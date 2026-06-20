@@ -66,7 +66,7 @@
                         <tr id="row-template" class="d-none" style="display: none;">
                             <td>
                                 <div class="input-group input-group-sm">
-                                    <input type="text" class="field-label form-control" readonly disabled/>
+                                    <input type="text" class="field-label form-control" readonly disabled>
                                     <div class="input-group-text">
                                         <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" disabled>
                                             <span class="align">{tr}Left{/tr}</span>
@@ -92,10 +92,10 @@
                                 {*</ul>*}
 
                             </td>
-                            <td><input class="primary" type="radio" name="pk" aria-label="{tr}Primary Key:{/tr}" disabled /></td>
-                            <td><input class="unique-key form-check-input" type="checkbox" aria-label="{tr}Unique Key:{/tr}" /></td>
-                            <td><input class="read-only form-check-input" type="checkbox" aria-label="{tr}Read-only:{/tr}" /></td>
-                            <td><input class="export-only form-check-input" type="checkbox" aria-label="{tr}Export-Only{/tr}" /></td>
+                            <td><input class="primary" type="radio" name="pk" aria-label="{tr}Primary Key:{/tr}" disabled></td>
+                            <td><input class="unique-key form-check-input" type="checkbox" aria-label="{tr}Unique Key:{/tr}"></td>
+                            <td><input class="read-only form-check-input" type="checkbox" aria-label="{tr}Read-only:{/tr}"></td>
+                            <td><input class="export-only form-check-input" type="checkbox" aria-label="{tr}Export-Only{/tr}"></td>
                             <td class="text-end"><button class="remove" aria-label="{tr}Remove{/tr}">{icon name=remove}</button></td>
                         </tr>
                         </tbody>

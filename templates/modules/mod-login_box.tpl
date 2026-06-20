@@ -279,8 +279,8 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                     {ticket}
                     <fieldset>
                         <legend class="fs-5">{tr}Return to Main User{/tr}</legend>
-                        <input type="hidden" name="su" value="revert" />
-                        <input type="hidden" name="username" value="auto" />
+                        <input type="hidden" name="su" value="revert">
+                        <input type="hidden" name="username" value="auto">
                         <div class="text-center">
                             <button
                                 type="submit"
@@ -326,7 +326,7 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                                     {/if}
                                 {/if}
                             </label>
-                            <input type="hidden" name="su" value="1" class="form-control" />
+                            <input type="hidden" name="su" value="1" class="form-control">
                             {if $prefs.feature_help eq 'y'}
                                 {help url="Switch+User" desc="{tr}Help{/tr}" desc="{tr}Switch User:{/tr}{tr}Select a username and click 'Switch'.<br>Useful for testing permissions.{/tr}"}
                             {/if}
@@ -428,7 +428,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {capture assign="close_tags"}</form>{$close_tags}{/capture}
 
 
-        {if !empty($urllogin)}<input type="hidden" name="url" value="{$urllogin|escape}" />{/if}
+        {if !empty($urllogin)}<input type="hidden" name="url" value="{$urllogin|escape}">{/if}
         {if $module_params.nobox neq 'y'}
             <fieldset>
                 {capture assign="close_tags"}</fieldset>{$close_tags}{/capture}
@@ -463,10 +463,10 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
                 {/if}
             </label>
             {if !isset($loginuser) or $loginuser eq ''}
-                    <input class="form-control" type="text" name="user" id="login-user_{$module_logo_instance}" {if !empty($error_login)} value="{$error_user|escape}"{elseif !empty($adminuser)} value="{$adminuser|escape}"{/if} {if $prefs.desactive_login_autocomplete neq 'y'}autocomplete="username"{/if} {if $prefs.login_placeholders_enable eq 'y'}placeholder="{tr}Username{/tr}"{/if}/>
+                    <input class="form-control" type="text" name="user" id="login-user_{$module_logo_instance}" {if !empty($error_login)} value="{$error_user|escape}"{elseif !empty($adminuser)} value="{$adminuser|escape}"{/if} {if $prefs.desactive_login_autocomplete neq 'y'}autocomplete="username"{/if} {if $prefs.login_placeholders_enable eq 'y'}placeholder="{tr}Username{/tr}"{/if}>
                 {jq}if ($('#login-user_{{$module_logo_instance}}:visible').length) { if ($("#login-user_{{$module_logo_instance}}").offset().top < $(window).height()) {$('#login-user_{{$module_logo_instance}}')[0].focus();} }{/jq}
             {else}
-                <input class="form-control" type="hidden" name="user" id="login-user_{$module_logo_instance}" value="{$loginuser|escape}" /><b>{$loginuser|escape}</b>
+                <input class="form-control" type="hidden" name="user" id="login-user_{$module_logo_instance}" value="{$loginuser|escape}"><b>{$loginuser|escape}</b>
             {/if}
         </div>
         <div class="pass my-2 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} none {else} block {/if};">
@@ -517,7 +517,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             });
             {/jq}
         {/if}
-        <input type="hidden" name="login_mode" value="{$mode}" />
+        <input type="hidden" name="login_mode" value="{$mode}">
         {if $prefs.twoFactorAuth eq 'y' and ((isset($module_params.show_two_factor_auth) and $module_params.show_two_factor_auth eq 'y') or ! empty($error_login))}
         <div id="two_factor_div" class="my-3 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} block; {else} none; {/if}">
             <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor authentication code:{/tr}</label>
@@ -532,11 +532,11 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {/if}
         {if $prefs.rememberme ne 'disabled' and (empty($module_params.remember) or $module_params.remember neq 'n') and $create2FaCodeNormalLogin ne 'y'}
             {if $prefs.rememberme eq 'always'}
-                <input type="hidden" name="rme" id="login-remember-module-input_{$module_logo_instance}" value="on" />
+                <input type="hidden" name="rme" id="login-remember-module-input_{$module_logo_instance}" value="on">
             {else}
                 <div class="form-check">
                 {*    <div class="checkbox rme"> *}
-                        <input type="checkbox" class="form-check-input" name="rme" id="login-remember-module_{$module_logo_instance}" value="on" />
+                        <input type="checkbox" class="form-check-input" name="rme" id="login-remember-module_{$module_logo_instance}" value="on">
                         <label for="login-remember-module_{$module_logo_instance}">
                             {tr}Remember me{/tr}
                             ({tr}for{/tr}
@@ -615,14 +615,14 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {/if}
         {if $prefs.feature_show_stay_in_ssl_mode eq 'y' && $show_stay_in_ssl_mode eq 'y'}
             <div class="form-check">
-                <input type="checkbox" class="form-check-input" name="stay_in_ssl_mode" id="login-stayssl_{$module_logo_instance}" {if $stay_in_ssl_mode eq 'y'}checked="checked"{/if} />
+                <input type="checkbox" class="form-check-input" name="stay_in_ssl_mode" id="login-stayssl_{$module_logo_instance}" {if $stay_in_ssl_mode eq 'y'}checked="checked"{/if}>
                 <label class="form-check-label" for="login-stayssl_{$module_logo_instance}">{tr}Stay in SSL mode{/tr}</label>
             </div>
         {/if}
         {* This is needed as unchecked checkboxes are not sent. The other way of setting hidden field with same name is potentially non-standard *}
-        <input type="hidden" name="stay_in_ssl_mode_present" value="y" />
+        <input type="hidden" name="stay_in_ssl_mode_present" value="y">
         {if $prefs.feature_show_stay_in_ssl_mode neq 'y' || $show_stay_in_ssl_mode neq 'y'}
-            <input type="hidden" name="stay_in_ssl_mode" value="{$stay_in_ssl_mode|escape}" />
+            <input type="hidden" name="stay_in_ssl_mode" value="{$stay_in_ssl_mode|escape}">
         {/if}
 
 

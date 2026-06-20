@@ -397,8 +397,8 @@
 
             <form id='form_switch_user' action='tiki-login.php' method='post'>
                 {ticket}
-                <input type="hidden" name="su" value="1" class="form-control" />
-                <input type="hidden" name="username" id="login-switchuser_1" value="" class="form-control" />
+                <input type="hidden" name="su" value="1" class="form-control">
+                <input type="hidden" name="username" id="login-switchuser_1" value="" class="form-control">
             </form>
 
 
@@ -842,32 +842,32 @@
                     <div class="mb-3 row">
                         <label class="col-sm-4 col-md-4 col-form-label" for="tempuser_emails">{tr}Email addresses (comma-separated){/tr}</label>
                         <div class="col-sm-8 col-md-8">
-                            <input type="text" class="form-control" name="tempuser_emails" id="tempuser_emails" />
+                            <input type="text" class="form-control" name="tempuser_emails" id="tempuser_emails">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label class="col-sm-4 col-md-4 col-form-label" for="tempuser_groups">{tr}Groups (comma-separated){/tr}</label>
                         <div class="col-sm-8 col-md-8">
-                            <input type="text" class="form-control" name="tempuser_groups" id="tempuser_groups" />
+                            <input type="text" class="form-control" name="tempuser_groups" id="tempuser_groups">
                             {autocomplete element='#tempuser_groups' type='groupname'}
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label class="col-sm-4 col-md-4 col-form-label" for="tempuser_expiry">{tr}Valid for days (use -1 for forever){/tr}</label>
                         <div class="col-sm-8 col-md-8">
-                            <input type="text" class="form-control" name="tempuser_expiry" id="tempuser_expiry" />
+                            <input type="text" class="form-control" name="tempuser_expiry" id="tempuser_expiry">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label class="col-sm-4 col-md-4 col-form-label" for="tempuser_prefix">{tr}Username prefix{/tr}</label>
                         <div class="col-sm-8 col-md-8">
-                            <input type="text" class="form-control" name="tempuser_prefix" id="tempuser_prefix" placeholder="guest"/>
+                            <input type="text" class="form-control" name="tempuser_prefix" id="tempuser_prefix" placeholder="guest">
                         </div>
                     </div>
                     <div class="mb-3 row">
                         <label class="col-sm-4 col-md-4 col-form-label" for="tempuser_path">{tr}Autologin (non-SEFURL) path{/tr}</label>
                         <div class="col-sm-8 col-md-8">
-                            <input type="text" class="form-control" name="tempuser_path" id="tempuser_path" placeholder="index.php"/>
+                            <input type="text" class="form-control" name="tempuser_path" id="tempuser_path" placeholder="index.php">
                         </div>
                     </div>
                     <div class="mb-3 row">

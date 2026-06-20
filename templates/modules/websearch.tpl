@@ -14,10 +14,10 @@ $(function(){
     <form method="get"  id="search-form" action="#" target="Google" accept-charset="UTF-8">
         <div class="mb-3 row mx-0">
             {*<div class="col-sm-2">
-                <img src="img/googleg.gif" alt="Google" />
+                <img src="img/googleg.gif" alt="Google">
             </div>//*}
             <div class="col-sm-12">
-                <input type="text" name="q" id="text-search" class="form-control" maxlength="100" placeholder = "{tr}Search{/tr}"/>
+                <input type="text" name="q" id="text-search" class="form-control" maxlength="100" placeholder = "{tr}Search{/tr}">
             </div>
         </div>
         <div class="mb-3 row mx-0">

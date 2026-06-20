@@ -138,7 +138,7 @@
             </div>
 
             <div class="d-flex flex-grow-0 gap-2">
-                <input type="submit" class="btn btn-primary" name="update_translation" value="{tr}Update Translation{/tr}"/>
+                <input type="submit" class="btn btn-primary" name="update_translation" value="{tr}Update Translation{/tr}">
                 {if $show_translation_history}
                     <input type="hidden" name="show_translation_history" value="1">
                     {button show_translation_history=0 _text="{tr}Hide translation history{/tr}" _auto_args="*" _class="btn btn-info"}

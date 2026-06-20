@@ -324,7 +324,7 @@
                                     <div class="mb-3 row">
                                         <label class="col-form-label" for="host">{tr}Host name:{/tr}</label>
                                         <div class="mx-3">
-                                            <input type="text" class="form-control" name="host" id="host" value="{if isset($smarty.request.host)}{$smarty.request.host|escape:"html"}{elseif isset($preconfighost)}{$preconfighost|escape:"html"}{else}localhost{/if}" size="40" />
+                                            <input type="text" class="form-control" name="host" id="host" value="{if isset($smarty.request.host)}{$smarty.request.host|escape:"html"}{elseif isset($preconfighost)}{$preconfighost|escape:"html"}{else}localhost{/if}" size="40">
                                             <a href="javascript:void(0)" onclick="flip('host_help');" title="{tr}Help{/tr}">
                                                 {icon name="help"}
                                             </a>
@@ -338,7 +338,7 @@
                                     <div class="mb-3 row">
                                         <label class="col-form-label" for="name">{tr}Database name:{/tr}</label>
                                         <div class="mx-3">
-                                            <input type="text" class="form-control" id="name" name="name" size="40" value="{if isset($smarty.request.name)}{$smarty.request.name|escape:"html"}{elseif isset($preconfigname)}{$preconfigname|escape:"html"}{/if}" placeholder="{tr}Database name{/tr}"/>
+                                            <input type="text" class="form-control" id="name" name="name" size="40" value="{if isset($smarty.request.name)}{$smarty.request.name|escape:"html"}{elseif isset($preconfigname)}{$preconfigname|escape:"html"}{/if}" placeholder="{tr}Database name{/tr}">
                                             <a href="javascript:void(0)" onclick="flip('name_help');" title="{tr}Help{/tr}">
                                                 {icon name="help"}
                                             </a>
@@ -368,7 +368,7 @@
                                     </div>
 
                                     <div style="padding:5px;">
-                                        <input type="checkbox" id="create-new-user" name="create_new_user" />
+                                        <input type="checkbox" id="create-new-user" name="create_new_user">
                                         <label class="col-form-label" for="create-new-user">{tr}Create the above database user just for this Tiki database.{/tr}</label>&nbsp;
                                     </div>
                                 </fieldset>

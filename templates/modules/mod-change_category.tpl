@@ -40,8 +40,8 @@
             {if $detailed eq 'n' or ($add eq 'y' and not $isInAllManagedCategories)}
                 <div class="text-center">
                     <form method="post" target="_self">
-                        <input type="hidden" name="page" value="{$page|escape}" />
-                        <input type="hidden" name="modcatid" value="{$modcatid}" />
+                        <input type="hidden" name="page" value="{$page|escape}">
+                        <input type="hidden" name="modcatid" value="{$modcatid}">
 
                         <div class="mb-3">
                             {if $multiple eq 'y'}
@@ -72,7 +72,7 @@
 
                         {if $multiple eq 'y' and $add eq 'y'}
                             <div class="mb-3">
-                                <input type="submit" class="btn btn-primary btn-sm" name="categorize" value="{if isset($module_params.categorize)}{tr}{$module_params.categorize}{/tr}{else}{tr}Categorize{/tr}{/if}" />
+                                <input type="submit" class="btn btn-primary btn-sm" name="categorize" value="{if isset($module_params.categorize)}{tr}{$module_params.categorize}{/tr}{else}{tr}Categorize{/tr}{/if}">
                             </div>
                         {/if}
                     </form>

@@ -17,7 +17,7 @@
             <div class="mb-3 row">
                 <label class="col-sm-4 col-md-4 col-form-label" for="groups">{tr}Groups (comma-separated){/tr}</label>
                 <div class="col-sm-8 col-md-8">
-                    <input type="text" class="form-control" name="groups" id="groups" />
+                    <input type="text" class="form-control" name="groups" id="groups">
                     {autocomplete element='#groups' type='groupname'}
                 </div>
             </div>

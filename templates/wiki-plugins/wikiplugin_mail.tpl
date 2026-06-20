@@ -27,7 +27,7 @@
 {else}
     <div>
         {if $mail_popup == 'y'}
-            <p><input name="sendmailload{{$ipluginmail}}" type="submit" class="btn btn-primary" value="{$mail_label_name|escape}" /></p>
+            <p><input name="sendmailload{{$ipluginmail}}" type="submit" class="btn btn-primary" value="{$mail_label_name|escape}"></p>
             <div style="display: none;">
         {/if}
         <div id="wikiplugin_mail" class="">

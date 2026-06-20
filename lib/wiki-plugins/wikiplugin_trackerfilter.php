@@ -252,10 +252,10 @@ function wikiplugin_trackerfilter($data, $params)
         '/* Maintain state of other trackerfilter plugin forms */
                     $(".trackerfilter form").on("submit", function () {
                         var current_tracker = this;
-                        $(current_tracker).append("<input type=\"hidden\" name=\"tracker_filters[]\" value=\"" + $(current_tracker).serialize() + "\" />")
+                        $(current_tracker).append("<input type=\"hidden\" name=\"tracker_filters[]\" value=\"" + $(current_tracker).serialize() + "\">")
                         $(".trackerfilter form").each( function() {
                             if (current_tracker !== this && $("input[name=count_item]", this).val() > 0) {
-                                $(current_tracker).append("<input type=\"hidden\" name=\"tracker_filters[]\" value=\"" + $(this).serialize() + "\" />")
+                                $(current_tracker).append("<input type=\"hidden\" name=\"tracker_filters[]\" value=\"" + $(this).serialize() + "\">")
                             }
                         });
                         return true;

@@ -68,7 +68,7 @@ function wikiplugin_registermemberpayment($data, $params, $offset)
     }
 
     if (empty($fixedperiodsDDL)) {
-        $periods = '<input id="memberDuration' . $i . '" name="duration" value="1" />';
+        $periods = '<input id="memberDuration' . $i . '" name="duration" value="1">';
     } else {
         $periods = '<select id="memberDuration' . $i . '" name="duration">' . $fixedperiodsDDL . '</select>';
     }
@@ -89,8 +89,8 @@ function wikiplugin_registermemberpayment($data, $params, $offset)
             $register = "<table>
                 <tr class='registerSubmitTr'>
                     <td colspan='2'>
-                        <input type='hidden' id='name' value='$user' />
-                        <input type='submit' value='" . tr('Submit') . "' class='registerSubmit'/>
+                        <input type='hidden' id='name' value='$user'>
+                        <input type='submit' value='" . tr('Submit') . "' class='registerSubmit'>
                     </td>
                 </tr>
             </table>";
@@ -116,7 +116,7 @@ if (!user) {
     $('<tr class="grpMmbChk">\
         <td>$group Membership:</td>\
         <td>\
-            <input type="checkbox" id="memberType$i" />\
+            <input type="checkbox" id="memberType$i">\
         </td>\
     </tr>').insertBefore(submitBtnTr);
 } else {
@@ -152,7 +152,7 @@ reg
                     $.getJSON($.service('user', 'register') + '&' + frmData + '&noTemplate', function(data) {
                         if (typeof data.result == "string") {
                             if ($('#memberType$i').is(':checked')) {
-                                $('<input name="msg" />')
+                                $('<input name="msg">')
                                     .val(data.result)
                                     .prependTo(pay.find('form'));
 

@@ -168,11 +168,11 @@ function wikiplugin_sheet($data, $params)
                 ~np~
                 <form id="$formId" method="post" action="tiki-wikiplugin_edit.php">
                 <div>
-                    <input type="hidden" name="page" value="$page"/>
-                    <input type="hidden" name="content" value="$content"/>
-                    <input type="hidden" name="index" value="$index"/>
-                    <input type="hidden" name="type" value="sheet"/>
-                    <input type="hidden" name="params[id]" value="$sheetId"/>
+                    <input type="hidden" name="page" value="$page">
+                    <input type="hidden" name="content" value="$content">
+                    <input type="hidden" name="index" value="$index">
+                    <input type="hidden" name="type" value="sheet">
+                    <input type="hidden" name="params[id]" value="$sheetId">
                     $ticket
                  </div>
                 </form>
@@ -187,8 +187,8 @@ EOF;
 ~np~
 <form method="post" action="">
     <p>
-        <input type="submit" name="create_sheet" class="btn btn-primary" value="$label"/>
-        <input type="hidden" name="index" value="$index"/>
+        <input type="submit" name="create_sheet" class="btn btn-primary" value="$label">
+        <input type="hidden" name="index" value="$index">
     </p>
 </form>
 ~/np~

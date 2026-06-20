@@ -5,7 +5,7 @@
 
 <form action="tiki-admin.php?page=module" method="post" class="admin">
     {ticket}
-    <input type="hidden" name="modulesetup" />
+    <input type="hidden" name="modulesetup">
 
     <div class="t_navbar mb-4 clearfix">
             <a role="button" class="btn btn-link" href="tiki-admin_modules.php" title="{tr}List{/tr}">

@@ -74,7 +74,7 @@ describe("tikilink action", () => {
         const givenContext = {
             $note: $("<div id='note'>"),
         };
-        $("body").html(`<input id='label' value='${givenLabel}'/><input id='page' value='page' />`);
+        $("body").html(`<input id='label' value='${givenLabel}'><input id='page' value='page'>`);
 
         tikilink(givenContext);
 
@@ -88,7 +88,7 @@ describe("tikilink action", () => {
         const givenContext = {
             $note: $("<div id='note'>"),
         };
-        $("body").html(`<input id='label' value='label'/><input id='page' value='' />`);
+        $("body").html(`<input id='label' value='label'><input id='page' value=''>`);
 
         tikilink(givenContext);
 

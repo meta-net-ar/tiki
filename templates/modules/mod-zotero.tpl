@@ -1,7 +1,7 @@
 {tikimodule error=$module_params.error title=$tpl_module_title name="zotero" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
     <form class="zoterosearch" method="post" action="tiki-ajax_services.php">
         <div class="input-group">
-            <input type="text" name="zotero_tags" placeholder="Enter a tag to filter (optional)"/>
+            <input type="text" name="zotero_tags" placeholder="Enter a tag to filter (optional)">
             <button type="submit" class="btn btn-info btn-sm" name="zotero">
                 <i class="fas fa-search"></i> {tr}Search{/tr}
             </button>
@@ -55,7 +55,7 @@
                         }
                         
                         var zoteroLink = $('<a/>').text('View in Zotero').attr('href', i.url).addClass('btn btn-sm btn-outline-primary me-2');
-                        var copyInput = $('<input type="text"/>').val('{zotero key=' + i.key + '}').addClass('form-control form-control-sm d-inline-block w-auto me-2');
+                        var copyInput = $('<input type="text">').val('{zotero key=' + i.key + '}').addClass('form-control form-control-sm d-inline-block w-auto me-2');
                         entry.append(contentDiv).append(zoteroLink).append(copyInput);
                         link.text(i.title);
                         link.css('cursor', 'pointer').addClass('text-primary d-block mb-1');

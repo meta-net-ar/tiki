@@ -42,8 +42,8 @@
                     </tr>
                     {foreach from=$userStructs item=ustruct name=mstruct}
                         <tr>
-                            <td><input type="text" name="mailinSubjPatt{$smarty.foreach.mstruct.iteration}" size="25" value="{$ustruct.subj_pattern}" onchange="structSelChanged({$smarty.foreach.mstruct.iteration});"/></td>
-                            <td><input type="text" name="mailinBodyPatt{$smarty.foreach.mstruct.iteration}" size="25" value="{$ustruct.body_pattern}" onchange="structSelChanged({$smarty.foreach.mstruct.iteration});"/></td>
+                            <td><input type="text" name="mailinSubjPatt{$smarty.foreach.mstruct.iteration}" size="25" value="{$ustruct.subj_pattern}" onchange="structSelChanged({$smarty.foreach.mstruct.iteration});"></td>
+                            <td><input type="text" name="mailinBodyPatt{$smarty.foreach.mstruct.iteration}" size="25" value="{$ustruct.body_pattern}" onchange="structSelChanged({$smarty.foreach.mstruct.iteration});"></td>
                             <td>
                                 <select class="form-select" name="mailinStruct{$smarty.foreach.mstruct.iteration}" onchange="structSelChanged({$smarty.foreach.mstruct.iteration});">
                                     {foreach from=$structs item=struct}
@@ -51,23 +51,23 @@
                                     {/foreach}
                                 </select>
                             </td>
-                            <td><input type="text" name="mailinPar{$smarty.foreach.mstruct.iteration}" value="{$ustruct.pageName}" onchange="structSelChanged({$smarty.foreach.mstruct.iteration});" /></td>
+                            <td><input type="text" name="mailinPar{$smarty.foreach.mstruct.iteration}" value="{$ustruct.pageName}" onchange="structSelChanged({$smarty.foreach.mstruct.iteration});"></td>
                             <td>
-                                <input type="checkbox" name="mailinAct{$smarty.foreach.mstruct.iteration}" {if $ustruct.is_active eq 'y'}checked="checked"{/if} onchange="structSelChanged({$smarty.foreach.mstruct.iteration});" />
+                                <input type="checkbox" name="mailinAct{$smarty.foreach.mstruct.iteration}" {if $ustruct.is_active eq 'y'}checked="checked"{/if} onchange="structSelChanged({$smarty.foreach.mstruct.iteration});">
                                 &nbsp;
                                 <a href="?delete=y&mailin_struct_id={$ustruct.mailin_struct_id}" onclick="return confirm_delete();">{icon name='minus-circle' iclass='text-danger'}</a>
 
                                 {* Hidden field to track changes *}
-                                <input type="hidden" id="changed_{$smarty.foreach.mstruct.iteration}" name="changed_{$smarty.foreach.mstruct.iteration}" />
+                                <input type="hidden" id="changed_{$smarty.foreach.mstruct.iteration}" name="changed_{$smarty.foreach.mstruct.iteration}">
                                 {* Hidden field to remember mailin_struct_id *}
-                                <input type="hidden" name="mailin_struct_id_{$smarty.foreach.mstruct.iteration}" value="{$ustruct.mailin_struct_id}" />
+                                <input type="hidden" name="mailin_struct_id_{$smarty.foreach.mstruct.iteration}" value="{$ustruct.mailin_struct_id}">
                             </td>
                         </tr>
                     {/foreach}
                     {if isset($addNewRoute)}
                         <tr>
-                            <td><input type="text" name="mailinSubjPattNew" size="25" /></td>
-                            <td><input type="text" name="mailinBodyPattNew" size="25" /></td>
+                            <td><input type="text" name="mailinSubjPattNew" size="25"></td>
+                            <td><input type="text" name="mailinBodyPattNew" size="25"></td>
                             <td>
                                 <select name="mailinNewStruct" class="form-select">
                                     <option value="0" selected></option>
@@ -76,12 +76,12 @@
                                     {/foreach}
                                 </select>
                             </td>
-                            <td><input type="text" name="mailinParNew" /></td>
-                            <td><input type="checkbox" name="mailinActNew" /></td>
+                            <td><input type="text" name="mailinParNew"></td>
+                            <td><input type="checkbox" name="mailinActNew"></td>
                         </tr>
                     {/if}
                 </table>
-                <input type="submit" class="btn btn-primary btn-sm" value="Save" />
+                <input type="submit" class="btn btn-primary btn-sm" value="Save">
             </form>
         {else}
             <p>

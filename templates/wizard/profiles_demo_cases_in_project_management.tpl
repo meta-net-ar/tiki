@@ -30,7 +30,7 @@
                 <div class="row">
                     <div class="col-md-8 offset-md-2">
                         <a href="https://profiles.tiki.org/display7" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                            <img src="img/profiles/profile_thumb_ganttchart.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                            <img src="img/profiles/profile_thumb_ganttchart.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                         </a>
                         <div class="small text-center">
                             {tr}Click to expand{/tr}
@@ -58,7 +58,7 @@
                 <div class="row">
                     <div class="col-md-8 offset-md-2">
                         <a href="https://profiles.tiki.org/display5" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                            <img src="img/profiles/profile_thumb_work_custom_pricing.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                            <img src="img/profiles/profile_thumb_work_custom_pricing.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                         </a>
                         <div class="small text-center">
                             {tr}Click to expand{/tr}
@@ -88,7 +88,7 @@
                 <div class="row">
                     <div class="col-md-8 offset-md-2">
                         <a href="https://doc.tiki.org/display1340" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                            <img src="img/profiles/profile_thumb_wildcard_items.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                            <img src="img/profiles/profile_thumb_wildcard_items.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                         </a>
                         <div class="small text-center">
                             {tr}Click to expand{/tr}

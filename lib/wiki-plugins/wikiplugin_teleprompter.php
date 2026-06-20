@@ -225,7 +225,7 @@ function wikiplugin_teleprompter($data, $params)
     if (! empty($files['data'])) {
         foreach ($files['data'] as $file) {
             $alt = htmlentities((string) ($file['description'] ?? ''), ENT_COMPAT);
-            $imageHtml = '<img src="tiki-download_file.php?fileId=' . $file['fileId'] . '&amp;display" alt="' . $alt . '" />';
+            $imageHtml = '<img src="tiki-download_file.php?fileId=' . $file['fileId'] . '&amp;display" alt="' . $alt . '">';
             $teleprompterBlocks[] = '<div class="teleprompter-block teleprompter-media">' . $imageHtml . '</div>';
         }
     }

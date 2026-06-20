@@ -21,7 +21,7 @@
                     {if $module_params.megamenu_images eq 'y' and $item.image}
                         <div class="mega-menu-image col-sm-3 pe-0">
                             {* Test image link - https://picsum.photos/300/300 *}
-                            <img src="{$item.image}" alt="Megamenu image" />
+                            <img src="{$item.image}" alt="Megamenu image">
                         </div>
                     {/if}
                 </li>

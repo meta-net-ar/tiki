@@ -53,5 +53,5 @@ function wikiplugin_qr($data, $params)
         )
     );
     $tfaSecretQR = base64_encode($writer->writeString($data));
-    return '<img src="data:image/' . $imageType . ';base64,' . $tfaSecretQR . '"/>';
+    return '<img src="data:image/' . $imageType . ';base64,' . $tfaSecretQR . '">';
 }

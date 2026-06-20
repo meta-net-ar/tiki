@@ -50,7 +50,7 @@ class GDGRenderer extends GRenderer // {{{1
         $target = htmlspecialchars($target);
         $title = htmlspecialchars($title);
 
-        $this->imageMap .= "<area shape=\"rect\" coords=\"$left,$top,$right,$bottom\" href=\"$target\" alt=\"$title\" title=\"$title\"/>\n";
+        $this->imageMap .= "<area shape=\"rect\" coords=\"$left,$top,$right,$bottom\" href=\"$target\" alt=\"$title\" title=\"$title\">\n";
     }
 
     public function drawLine($x1, $y1, $x2, $y2, $style) // {{{2

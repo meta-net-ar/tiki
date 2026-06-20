@@ -1639,7 +1639,7 @@ class TikiAccessLib extends TikiLib
                    </div>
                    <div class="form-row-last">
                        <input type="hidden" class="ticket" name="ticket" value="' . $this->ticket . '" />
-                       <input type="hidden" name="confirmForm" value="y" />
+                       <input type="hidden" name="confirmForm" value="y">
                        <input type="submit" name="login" value="Log in" class="register">
                    </div>
        </form>';

@@ -14,8 +14,8 @@
         <form method="post" action="{service controller=search_stored action=delete}">
             <div class="mb-3 row">{tr _0=$label}Do you really want to remove the %0 saved search?{/tr}</div>
             <div class="mb-3 submit">
-                <input type="hidden" name="queryId" value="{$queryId|escape}"/>
-                <input class="btn btn-danger" type="submit" value="{tr}Delete{/tr}"/>
+                <input type="hidden" name="queryId" value="{$queryId|escape}">
+                <input class="btn btn-danger" type="submit" value="{tr}Delete{/tr}">
             </div>
         </form>
     {/if}

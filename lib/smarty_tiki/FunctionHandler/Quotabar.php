@@ -24,12 +24,12 @@ class Quotabar extends Base
         $value = isset($value) ? (int) $value : $length;
 
         if (empty($value)) {
-            $ret = "<img src='img/leftbarlight.gif' alt='&lt;' /><img alt='-' src='img/mainbarlight.gif' height='14' width='$length' /><img src='img/rightbarlight.gif' alt='&gt;' />";
+            $ret = "<img src='img/leftbarlight.gif' alt='&lt;'><img alt='-' src='img/mainbarlight.gif' height='14' width='$length'><img src='img/rightbarlight.gif' alt='&gt;'>";
         } elseif ($value >= $length) {
-            $ret = "<img src='img/leftbar.gif' alt='&lt;' /><img alt='-' src='img/mainbar.gif' height='14' width='$length' /><img src='img/rightbar.gif' alt='&gt;' />";
+            $ret = "<img src='img/leftbar.gif' alt='&lt;'><img alt='-' src='img/mainbar.gif' height='14' width='$length'><img src='img/rightbar.gif' alt='&gt;'>";
         } else {
             $left = $length - $value;
-            $ret = "<img src='img/leftbar.gif' alt='&lt;' /><img alt='-' src='img/mainbar.gif' height='14' width='$value' /><img alt='-' src='img/mainbarlight.gif' height='14' width='$left' /><img src='img/rightbarlight.gif' alt='&gt;' />";
+            $ret = "<img src='img/leftbar.gif' alt='&lt;'><img alt='-' src='img/mainbar.gif' height='14' width='$value'><img alt='-' src='img/mainbarlight.gif' height='14' width='$left'><img src='img/rightbarlight.gif' alt='&gt;'>";
         }
         return $ret;
     }

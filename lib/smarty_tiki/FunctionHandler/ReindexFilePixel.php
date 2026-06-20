@@ -25,6 +25,6 @@ class ReindexFilePixel extends Base
         }
 
         global $tikiroot;
-        return '<img src="' . $tikiroot . 'reindex_file.php?id=' . $id . '" width="1" height="1" />';
+        return '<img src="' . $tikiroot . 'reindex_file.php?id=' . $id . '" width="1" height="1">';
     }
 }

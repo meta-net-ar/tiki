@@ -1,6 +1,6 @@
 {if count($files)}
     {foreach $files as $file}
-        <img class="wp-preview" src="{$file}"/>
+        <img class="wp-preview" src="{$file}">
     {/foreach}
     {if $param.download === 1}
         <br />

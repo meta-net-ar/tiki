@@ -4,7 +4,7 @@
         <legend>{tr}Process{/tr}</legend>
         <div class="mb-3 row">
             <div class="form-check">
-                <label class="form-check-label"><input class="form-check-input" type="radio" name="process" id="process0" value="0"{if $process==0} checked="checked"{/if} title="{tr}Original wiki text{/tr}" />{tr}Original wiki text{/tr}</label><br>
+                <label class="form-check-label"><input class="form-check-input" type="radio" name="process" id="process0" value="0"{if $process==0} checked="checked"{/if} title="{tr}Original wiki text{/tr}">{tr}Original wiki text{/tr}</label><br>
                 <label class="form-check-label"><input class="form-check-input" type="radio" name="process" id="process1" value="1"{if $process!=0 and $process!=2} checked="checked"{/if} title="{tr}Parsed Text (HTML){/tr}">{tr}Parsed Text (HTML){/tr}</label><br>
                 <label class="form-check-label"><input class="form-check-input" type="radio" name="process" id="process2" value="2"{if $process==2} checked="checked"{/if} title="{tr}Output text only (No HTML tags){/tr}">{tr}Output text only (No HTML tags){/tr}</label><br>
             </div>

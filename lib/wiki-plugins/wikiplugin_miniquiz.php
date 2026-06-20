@@ -102,8 +102,8 @@ function wikiplugin_miniquiz($data, $params)
             }
         }
 
-        $back .= '<form method="post"><input type="hidden" name="quizit" value="1" />';
-        $back .= '<input type="hidden" name="page" value="' . $_REQUEST["page"] . '" />';
+        $back .= '<form method="post"><input type="hidden" name="quizit" value="1">';
+        $back .= '<input type="hidden" name="page" value="' . $_REQUEST["page"] . '">';
         $back .= '<div class="titlebar"><a href="tiki-view_tracker.php?trackerId=' . $params['trackerId'] . '">' . $tracker["name"] . '</a></div>';
         $back .= '<div class="wikitext">' . $tracker["description"] . '</div><br />';
         $back .= '<style>.q label { background-color: none; cursor: normal; border: 1px solid white; padding: 0 5px 0 5px; }';
@@ -119,8 +119,8 @@ function wikiplugin_miniquiz($data, $params)
                             $back .= '<b>' . $success_mess[array_rand($success_mess)] . '</b> ' . $success_comment[array_rand($success_comment)] . '<br />';
                         }
                         $back .= 'The answer was: <b>' . $item['answer'] . '</b></div><br />';
-                        $back .= '<input type="hidden" name="answer[' . $id . ']" value="' . htmlspecialchars($item['answer']) . '" />';
-                        $back .= '<input type="hidden" name="' . $id . '" value="1" />';
+                        $back .= '<input type="hidden" name="answer[' . $id . ']" value="' . htmlspecialchars($item['answer']) . '">';
+                        $back .= '<input type="hidden" name="' . $id . '" value="1">';
                     } else {
                         $back .= '<div class="wikitext" style="background-color:#ffcccc;">';
                         $back .= '<b>' . $failed_mess[array_rand($failed_mess)] . '</b> ' . $failed_comment[array_rand($failed_comment)] . '</div>';
@@ -143,7 +143,7 @@ function wikiplugin_miniquiz($data, $params)
                     if (! empty($item['qresult']) && $item['qresult'] == $answer) {
                         $back .= ' checked="checked"';
                     }
-                    $back .= ' /> ';
+                    $back .= '> ';
                     $back .= '<label for="answer' . $id . '_' . $i . '">' . $answer . '</label>';
                     $back .= '</div>';
                 }
@@ -151,7 +151,7 @@ function wikiplugin_miniquiz($data, $params)
             }
         }
 
-        $back .= "<br /><div><input type='reset' name='reset' value='Start Over' class='btn btn-info' /><input type='submit' name='action' value='Finish'  class='btn btn-primary' />";
+        $back .= "<br /><div><input type='reset' name='reset' value='Start Over' class='btn btn-info'><input type='submit' name='action' value='Finish'  class='btn btn-primary'>";
         $back .= '</div>';
         $back .= '<br /><div><b>Students</b>: <a href="tiki-view_tracker.php?trackerId=' . $params['trackerId'] . '&amp;new">Suggest a new question</a></div>';
 

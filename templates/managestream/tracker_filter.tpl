@@ -29,7 +29,7 @@
                 {tr}Target Event{/tr}
             </label>
             <div class="col-md-9">
-                <input type="text" name="targetEvent" value="{$targetEvent|escape}" class="form-control"/>
+                <input type="text" name="targetEvent" value="{$targetEvent|escape}" class="form-control">
                 <span class="form-text">
                     {tr}All event names are required to have at least 3 components.{/tr}
                 </span>
@@ -67,8 +67,8 @@
         </div>
         <div class="submit">
             {ticket mode='confirm'}
-            <input type="hidden" name="ruleId" value="{$rule.ruleId|escape}"/>
-            <input type="submit" class="btn btn-primary" value="{tr}Save{/tr}"/>
+            <input type="hidden" name="ruleId" value="{$rule.ruleId|escape}">
+            <input type="submit" class="btn btn-primary" value="{tr}Save{/tr}">
         </div>
     </form>
 {/block}

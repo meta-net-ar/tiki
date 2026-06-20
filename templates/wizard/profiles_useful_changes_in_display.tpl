@@ -30,7 +30,7 @@
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
                             <a href="http://tiki.org/display541" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                <img src="img/profiles/profile_thumb_slideshow_demo.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                <img src="img/profiles/profile_thumb_slideshow_demo.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                             </a>
                             <div class="mini text-center">
                                 <div class="thumbcaption text-center">{tr}Click to expand{/tr}</div>
@@ -60,7 +60,7 @@
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
                             <a href="http://tiki.org/display1227" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                <img src="img/profiles/profile_thumb_hidable_top_navbar.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                <img src="img/profiles/profile_thumb_hidable_top_navbar.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                             </a>
                             <div class="mini text-center">
                                 <div class="thumbcaption text-center">{tr}Click to expand{/tr}</div>

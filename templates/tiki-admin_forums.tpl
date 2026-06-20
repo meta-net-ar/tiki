@@ -624,7 +624,7 @@
                             <div class="tiki-form-group row">
                                 <label class="col-form-label offset-sm-1 col-auto" for="att_store_dir">{tr}Path{/tr}</label>
                                 <div class="col-auto">
-                                    <input type="text" name="att_store_dir" id="att_store_dir" value="{$att_store_dir|escape}" class="form-control"/>
+                                    <input type="text" name="att_store_dir" id="att_store_dir" value="{$att_store_dir|escape}" class="form-control">
                                 </div>
                             </div>
                         </div>

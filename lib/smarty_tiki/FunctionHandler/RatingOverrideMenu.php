@@ -28,7 +28,7 @@ class RatingOverrideMenu extends Base
                 $images = '';
 
                 foreach ($backgroundsSets[$i] as $i => $background) {
-                    $images .= '<img src="' . $background . '"/>';
+                    $images .= '<img src="' . $background . '">';
                 }
 
                 $html = count($option) . ' ' . $images;
@@ -44,6 +44,6 @@ class RatingOverrideMenu extends Base
         return
             "<div class='deliberationItemRatings' style='display:none;'>$menu</div>
         <span class='deliberationConfigureItemRatings button' style='float:right;'><a href='#'>" . tr('Configure Ratings') . "</a></span>
-        <input class='deliberatioRatingOverrideSelector' type='hidden' name='rating_override[]' value='" . ($optionsLength) . "'/>";
+        <input class='deliberatioRatingOverrideSelector' type='hidden' name='rating_override[]' value='" . ($optionsLength) . "'>";
     }
 }

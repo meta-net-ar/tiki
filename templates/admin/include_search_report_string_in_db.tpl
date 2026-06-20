@@ -25,12 +25,12 @@
     </label>
     <div class="col-sm-4">
         <div class="input-group">
-            <input type="text" id="string_in_db_search" name="string_in_db_search" class="form-control" value="{$searchStringAgain|escape}" />
+            <input type="text" id="string_in_db_search" name="string_in_db_search" class="form-control" value="{$searchStringAgain|escape}">
         </div>
     </div>
     <div class="col-sm-3">
         <div class="input-group">
-            <input type="submit" id="string_in_db_search_button" class="btn btn-primary" value="{tr}Search{/tr}" />
+            <input type="submit" id="string_in_db_search_button" class="btn btn-primary" value="{tr}Search{/tr}">
         </div>
     </div>
     {jq}

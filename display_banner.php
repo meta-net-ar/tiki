@@ -30,7 +30,7 @@ switch ($data["which"]) {
         break;
 
     case 'useImage':
-        $raw = "<img class=\"img-fluid\" src=\"banner_image.php?id=" . $id . "\" />";
+        $raw = "<img class=\"img-fluid\" src=\"banner_image.php?id=" . $id . "\">";
         break;
 
     case 'useFixedURL':

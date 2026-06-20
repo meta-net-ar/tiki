@@ -2,7 +2,7 @@
 <form class="mod_quick_search search-box" method="get" action="tiki-searchindex.php">
     <div class="mb-2">
         <label class="form-label" for="filter-content">{tr}Search Terms{/tr}</label>
-        <input type="text" name="filter~content" id="filter-content" value="{$qs_prefill.content|escape}" class="form-control"/>
+        <input type="text" name="filter~content" id="filter-content" value="{$qs_prefill.content|escape}" class="form-control">
     </div>
     {if $qs_types}
         <div class="mb-2">
@@ -15,13 +15,13 @@
             </select>
         </div>
     {elseif $qs_prefill}
-        <input type="hidden" name="filter~type" value="{$qs_prefill.type|escape}"/>
+        <input type="hidden" name="filter~type" value="{$qs_prefill.type|escape}">
         </form>
     {/if}
 
     {if $prefs.feature_categories eq 'y'}
         {if $qs_categories|@count == 1}
-            <input type="hidden" name="filter~categories" value="{$qs_prefill.categories|escape}"/>
+            <input type="hidden" name="filter~categories" value="{$qs_prefill.categories|escape}">
         {elseif $qs_categories|@count > 1}
             <div class="mb-2">
             <label class="form-label" for="filter-categories">{tr}Categories{/tr}</label>
@@ -36,8 +36,8 @@
     {/if}
 
     <div class="text-center">
-        <input type="submit" class="btn btn-primary" value="{tr}Search{/tr}"/>
-        <input type="hidden" name="save_query" value="{$moduleId|escape}"/>
+        <input type="submit" class="btn btn-primary" value="{tr}Search{/tr}">
+        <input type="hidden" name="save_query" value="{$moduleId|escape}">
     </div>
     <div class="results">
     </div>

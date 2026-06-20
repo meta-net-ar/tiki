@@ -15,7 +15,7 @@
             {if $img}
                 <div class="item-img-outer" style="min-width:360px;min-height:360px;">
                     <a class="item-img" href="tiki-download_file.php?fileId={$img[0]}&display" title="{$row.title}" data-box="[p]box">
-                        <img itemprop="image" src="tiki-download_file.php?fileId={$img[0]}&display&height=350" height="350" />
+                        <img itemprop="image" src="tiki-download_file.php?fileId={$img[0]}&display&height=350" height="350">
                     </a>
                 </div>
             {else}
@@ -91,7 +91,7 @@
             {if count($img) > 1}
                 {for $i = 1; $i< count($img); $i++}
                     <a class="item-thumb" href="tiki-download_file.php?fileId={$img[$i]}&display" title="{$row.name}" data-box="[p]box">
-                        <img src="tiki-download_file.php?fileId={$img[$i]}&thumbnail" width="120" height="120" />
+                        <img src="tiki-download_file.php?fileId={$img[$i]}&thumbnail" width="120" height="120">
                     </a>
                 {/for}
             {/if}

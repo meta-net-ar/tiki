@@ -42,7 +42,7 @@ class Iconify
             $icon = smarty_modifier_escape($icon);
             $width = 16 * $size;
 
-            return "<img src=\"$icon\" width=\"$width\"/>";
+            return "<img src=\"$icon\" width=\"$width\">";
         } else {
             include_once('lib/mime/mimetypes.php');
             global $mimetypes;

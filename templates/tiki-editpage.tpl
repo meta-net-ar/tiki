@@ -63,7 +63,7 @@
                 }, function(response) {
                     if (response.pdf) {
                         var pdfDataUri = 'data:application/pdf;base64,' + response.pdf;
-                        var embedHtml = "<embed width='100%' height='100%' src='" + pdfDataUri + "' type='application/pdf' />";
+                        var embedHtml = "<embed width='100%' height='100%' src='" + pdfDataUri + "' type='application/pdf'>";
                         var pdfWindow = window.open("", "_blank");
                         pdfWindow.document.open();
                         pdfWindow.document.write(embedHtml);

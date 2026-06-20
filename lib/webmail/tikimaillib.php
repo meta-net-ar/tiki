@@ -322,7 +322,7 @@ class TikiMail
         // these spans can be further styled in themes
         $html = str_replace(['<ins', '<del'], '<span', $html);
         $html = str_replace(['</ins>', '</del>'], '</span>', $html);
-        $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />' . $html;
+        $html = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">' . $html;
         $css = $this->collectCss();
         $processor = new \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles();
         $html = $processor->convert($html, $css);

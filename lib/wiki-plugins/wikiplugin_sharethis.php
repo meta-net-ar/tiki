@@ -208,7 +208,7 @@ function wikiplugin_sharethis($data, $params)
         foreach ($icons as $icon) {
             // @tiki-external-link-ok: ShareThis plugin - external icon/button service is the core feature (user explicitly enables this)
             $iconcode .= '<a id="ck_' . $icon . '" class="stbar chicklet" href="javascript:void(0);">'
-                            . '<img src="https://ws.sharethis.com/chicklets/' . $icon . '.gif" style="margin-right:3px;" />';
+                            . '<img src="https://ws.sharethis.com/chicklets/' . $icon . '.gif" style="margin-right:3px;">';
             if ($icon == 'sharethis') {
                 $iconcode .= 'ShareThis';
             }

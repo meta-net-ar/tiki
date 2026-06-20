@@ -27,7 +27,7 @@
                             </p>
                             <div class="text-center">
                                 <a href="http://tiki.org/display524" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                    <img src="img/profiles/profile_thumb_collaborative_community.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                    <img src="img/profiles/profile_thumb_collaborative_community.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                                 </a>
                                 <div class="fs-6 fst-italic">
                                     {tr}Click to expand{/tr}
@@ -55,7 +55,7 @@
                             </p>
                             <div class="text-center">
                                 <a href="http://tiki.org/display525" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                    <img src="img/profiles/profile_thumb_company_intranet.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                    <img src="img/profiles/profile_thumb_company_intranet.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                                 </a>
                                 <div class="fs-6 fst-italic">
                                     {tr}Click to expand{/tr}
@@ -85,7 +85,7 @@
                             </p>
                             <div class="text-center">
                                 <a href="http://tiki.org/display526" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                    <img src="img/profiles/profile_thumb_personal_blog_and_profile.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                    <img src="img/profiles/profile_thumb_personal_blog_and_profile.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                                 </a>
                                 <div class="fs-6 fst-italic">
                                     {tr}Click to expand{/tr}
@@ -113,7 +113,7 @@
                             </p>
                             <div class="text-center">
                                 <a href="http://tiki.org/display527" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                    <img src="img/profiles/profile_thumb_small_org_web_presence.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                    <img src="img/profiles/profile_thumb_small_org_web_presence.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                                 </a>
                                 <div class="fs-6 fst-italic">
                                     {tr}Click to expand{/tr}

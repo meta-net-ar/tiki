@@ -9,10 +9,10 @@
         <div class="col-md-12">
             <form class="row g-2 align-items-center no-ajax" method="get" action="{service controller=file action=$list_view plain=1}">
                 <div class="col">
-                    <input class="form-control " name="search" type="search" id="search-field" placeholder="{tr}Search...{/tr}"/>
-                    <input type="hidden" name="galleryId" value="{$galleryId|escape}"/>
+                    <input class="form-control " name="search" type="search" id="search-field" placeholder="{tr}Search...{/tr}">
+                    <input type="hidden" name="galleryId" value="{$galleryId|escape}">
                     <input type="hidden" name="limit" value="{$limit|default:20}">
-                    <input type="hidden" name="type" value="{$typeFilter|escape}"/>
+                    <input type="hidden" name="type" value="{$typeFilter|escape}">
                 </div>
                 <div class="col-auto">
                     <button class="btn btn-info" type="submit">{tr}Search{/tr}</button>
@@ -22,7 +22,7 @@
             <div class="d-flex justify-content-between align-items-center my-2">
                 <h4 class="mb-0">{tr}Select files{/tr}</h4>
                 <div>
-                    <input type="checkbox" id="select-all-files" class="form-check-input me-2"/>
+                    <input type="checkbox" id="select-all-files" class="form-check-input me-2">
                     <label for="select-all-files" class="form-label mb-0">{tr}Select all{/tr}</label>
                 </div>
             </div>

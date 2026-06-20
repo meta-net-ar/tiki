@@ -41,7 +41,7 @@
                             $.each(data.result, function (k, v) {
                                 const link = $(v.link);
                                 link.attr('title', tr(v.title));
-                                link.empty().append($('<img/>').attr('src', link.attr('href')));
+                                link.empty().append($('<img>').attr('src', link.attr('href')));
                                 link.on("click", function () {
                                     field.val($(this).attr('href'));
                                     icon.attr('src', $(this).attr('href'));

@@ -253,7 +253,7 @@ HTML;
     }
 
     $canvas = <<<HTML
-<img src="data:image/jpeg;charset=utf-8;base64, {$base64}"/>
+<img src="data:image/jpeg;charset=utf-8;base64, {$base64}">
 HTML;
 
     return '<div class="tiki-chartjs">' . $canvas . '</div>';

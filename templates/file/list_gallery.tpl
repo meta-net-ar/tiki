@@ -15,7 +15,7 @@
                 <div class="flex-shrink-0">
                     {if $row.filetype|truncate:6:'' eq 'image/'}
                         <label for="file-{$row.object_id}">
-                            <img src="{$row.object_id|sefurl:'thumbnail'}" class="img-thumbnail" style="width: 64px; height: auto;" />
+                            <img src="{$row.object_id|sefurl:'thumbnail'}" class="img-thumbnail" style="width: 64px; height: auto;">
                         </label>
                     {else}
                         {$row.filename|iconify:$row.filetype}

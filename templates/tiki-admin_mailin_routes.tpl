@@ -25,7 +25,7 @@
                     <td>{$ustruct.body_pattern}</td>
                     <td>{$ustruct.structName}</td>
                     <td>{$ustruct.pageName}</td>
-                    <td><input type="checkbox" disabled="disabled" {if $ustruct.is_active eq 'y'}checked="checked"{/if} />
+                    <td><input type="checkbox" disabled="disabled" {if $ustruct.is_active eq 'y'}checked="checked"{/if}>
                     </td>
                     </tr>
                 {/foreach}

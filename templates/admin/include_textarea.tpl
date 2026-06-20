@@ -523,7 +523,7 @@
                                 </label>
                                 <div class="col-sm-8">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="ignorebody" id="ignorebody" value="y"{if !empty($plugin_admin.body.input) and $plugin_admin.body.input eq 'ignore'} checked="checked"{/if}/>
+                                        <input class="form-check-input" type="checkbox" name="ignorebody" id="ignorebody" value="y"{if !empty($plugin_admin.body.input) and $plugin_admin.body.input eq 'ignore'} checked="checked"{/if}>
                                     </div>
                                 </div>
                             </div>
@@ -649,7 +649,7 @@
                                                         {tr}Argument source (if different):{/tr}
                                                     </label>
                                                     <div class="col-sm-8">
-                                                        <input class="form-control {if $t eq '__NEW__'} d-none{/if}" type="text" name="cparams[{$token|escape}][params][{$t|escape}][input]" id="cparams[{$token|escape}][params][{$t|escape}][input]" value="{$d.input|escape}"/>
+                                                        <input class="form-control {if $t eq '__NEW__'} d-none{/if}" type="text" name="cparams[{$token|escape}][params][{$t|escape}][input]" id="cparams[{$token|escape}][params][{$t|escape}][input]" value="{$d.input|escape}">
                                                     </div>
                                                 </div>
                                                 <div class="mb-3 row">
@@ -657,7 +657,7 @@
                                                         {tr}Default value{/tr}
                                                     </label>
                                                     <div class="col-sm-8">
-                                                        <input class="form-control {if $t eq '__NEW__'} d-none{/if}" type="text" name="cparams[{$token|escape}][params][{$t|escape}][default]" id="cparams[{$token|escape}][params][{$t|escape}][input]" value="{$d.default|escape}"/>
+                                                        <input class="form-control {if $t eq '__NEW__'} d-none{/if}" type="text" name="cparams[{$token|escape}][params][{$t|escape}][default]" id="cparams[{$token|escape}][params][{$t|escape}][input]" value="{$d.default|escape}">
                                                     </div>
                                                 </div>
                                                 <hr>

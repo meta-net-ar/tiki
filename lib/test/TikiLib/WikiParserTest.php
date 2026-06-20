@@ -89,14 +89,14 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
 </div>
 
 
-<input type="hidden" name="wysiwyg" value="n" />
+<input type="hidden" name="wysiwyg" value="n">
 </div>~/np~';
 
         $output = TikiLib::lib('parser')->parse_data($input, ['is_html' => true]);
 
         $this->assertStringContainsString('<span>Warning</span>', $output);
         $this->assertStringContainsString('<textarea name="body"></textarea>', $output);
-        $this->assertStringContainsString('<input type="hidden" name="wysiwyg" value="n" />', $output);
+        $this->assertStringContainsString('<input type="hidden" name="wysiwyg" value="n">', $output);
         $this->assertStringNotContainsString('~np~', $output);
         $this->assertStringNotContainsString('~/np~', $output);
         $this->assertStringNotContainsString('<br /><br /><input type="hidden" name="wysiwyg"', $output);

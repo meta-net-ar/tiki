@@ -81,7 +81,7 @@
                             {/section}
                         </select>
                     </td>
-                    <td class="text-center"><input type="submit" class="btn btn-primary btn-sm" onclick="confirmPopup()" name="remove" value="{tr}Remove{/tr}"/></td>
+                    <td class="text-center"><input type="submit" class="btn btn-primary btn-sm" onclick="confirmPopup()" name="remove" value="{tr}Remove{/tr}"></td>
                     <td class="text-center"><input type="submit" class="btn btn-primary btn-sm" name="update" value="{tr}Update{/tr}"></td>
                 </tr>
                 {sectionelse}

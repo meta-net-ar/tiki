@@ -408,7 +408,7 @@
                                 {tr}Send calendar invitations and event updates via email{/tr}
                             </div>
                             <div>
-                                <input type="checkbox" class="form-check-input" name="calitem[hideParticipants]" aria-label="{tr}Hide participants list from others{/tr}" {if $calitem.hideParticipants}checked="checked"{/if}/>
+                                <input type="checkbox" class="form-check-input" name="calitem[hideParticipants]" aria-label="{tr}Hide participants list from others{/tr}" {if $calitem.hideParticipants}checked="checked"{/if}>
                                 {tr}Hide participants list from others{/tr}
                             </div>
                         {/if}

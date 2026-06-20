@@ -352,7 +352,7 @@
                                 {/if}
                                 {if $calitem.participants|@count}
                                     <div class="float-end">
-                                    <input id="event-participants" value="{$emailString|replace:',' : ''|escape}" class="visually-hidden"/>
+                                    <input id="event-participants" value="{$emailString|replace:',' : ''|escape}" class="visually-hidden">
                                         <a href="javascript:void(0)" class="copy text-dark me-2" data-clipboard-action="copy" data-clipboard-target="#event-participants">{icon name="copy" ititle='{tr}Copy participants emails{/tr}' alt='{tr}Copy participants emails{/tr}'}</a>
                                         <a href="tiki-webmail.php?page=compose&compose_to={$emailString|escape}&compose_subject={$calitem.parsedName}" class="link-dark">
                                             {icon name='envelope' ititle='{tr}Email participants{/tr}' alt='{tr}Email participants{/tr}'}

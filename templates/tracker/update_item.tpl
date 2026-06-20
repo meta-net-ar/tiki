@@ -47,7 +47,7 @@
             </div>
             {if not empty($saveAndComment) and $saveAndComment neq 'n'}
                 <div class="form-check form-switch mb-4 mt-5">
-                    <input type="checkbox" class="form-check-input" name="addComment" id="add-comment"/>
+                    <input type="checkbox" class="form-check-input" name="addComment" id="add-comment">
                     <label class="form-check-label" for="add-comment">
                         {tr}Add a comment{/tr}
                     </label>

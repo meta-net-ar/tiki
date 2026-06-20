@@ -3,7 +3,7 @@
         <form method="get" action="tiki-switch_perspective.php">
             <div class="mb-3">
                 <div class="form-check">
-                    <input id="mod-switch-perspective-back" type="checkbox" class="form-check-input" name="back" value="1"/>
+                    <input id="mod-switch-perspective-back" type="checkbox" class="form-check-input" name="back" value="1">
                     <label for="mod-switch-perspective-back" class="form-check-label">{tr}Stay on this page{/tr}</label>
                 </div>
             </div>
@@ -16,7 +16,7 @@
                 </select>
             </div>
             <noscript>
-                <input type="submit" class="btn btn-primary btn-sm" value="{tr}Go{/tr}"/>
+                <input type="submit" class="btn btn-primary btn-sm" value="{tr}Go{/tr}">
             </noscript>
         </form>
         {if $tiki_p_perspective_admin eq 'y'}

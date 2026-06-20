@@ -161,17 +161,17 @@
                                             <div class="d-flex flex-wrap gap-3">
                                                 <div>
                                                     <input type="color" class="form-control form-control-color" name="bgcolor"
-                                                        name="w-bg-color" value="#ffffff" />
+                                                        name="w-bg-color" value="#ffffff">
                                                     <label for="bgcolor" class="form-label">{tr}Widget background color{/tr}</label>
                                                 </div>
                                                 <div>
                                                     <input type="color" class="form-control form-control-color"
-                                                        name="textcolor" name="w-text-color" value="#000000" />
+                                                        name="textcolor" name="w-text-color" value="#000000">
                                                     <label for="textcolor" class="form-label">{tr}Widget Text color{/tr}</label>
                                                 </div>
                                                 <div>
                                                     <input type="color" class="form-control form-control-color"
-                                                        name="bordercolor" name="w-border-color" value="#efefef" />
+                                                        name="bordercolor" name="w-border-color" value="#efefef">
                                                     <label for="bordercolor" class="form-label">{tr}Widget border color{/tr}</label>
                                                 </div>
                                             </div>

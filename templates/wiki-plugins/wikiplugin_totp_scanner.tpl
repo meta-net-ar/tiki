@@ -10,7 +10,7 @@
                 <button type="button" class=" camera btn btn-primary">{tr}Camera{/tr}</button>
                 <button type="button" class="send-file btn btn-primary">{tr}Send QRCode File{/tr}</button>
             </div>
-            <input type="file" class="file-chooser" accept="image/*" style="display:none;" />
+            <input type="file" class="file-chooser" accept="image/*" style="display:none;">
             <br>
             <img class="qrcode" style="display: none" src="" alt="">
             <video

@@ -325,8 +325,8 @@
                 <div id="cm-action-off-canvas" class="border border-light">
                     <div class="close-cm-canvas"><span>x</span></div>
                     <div class="my-2 p-1 p-md-5" id="cm-modal-content">
-                        <input type="hidden" name="operation" value="create"/>
-                        <input type="hidden" name="id" value=""/>
+                        <input type="hidden" name="operation" value="create">
+                        <input type="hidden" name="id" value="">
                         <div class="mb-3">
                             <label class="form-label" for="color-mode">{tr}Color mode name{/tr}</label>
                             <input
@@ -335,8 +335,7 @@
                                 name="mode"
                                 id="color-mode"
                                 class="form-control"
-                                placeholder="dark blue"
-                                />
+                                placeholder="dark blue">
                         </div>
                         <div class="mb-3">
                             <label class="form-label" for="mode-icon">{tr}Mode icon name{/tr}</label>
@@ -346,8 +345,7 @@
                                 name="icon"
                                 id="mode-icon"
                                 class="form-control"
-                                placeholder="icon name"
-                                />
+                                placeholder="icon name">
                         </div>
                         <div class="p-3 d-flex gap-2 flex-column rounded border border-light mb-2">
                             <span class="fw-bolder">Body</span>

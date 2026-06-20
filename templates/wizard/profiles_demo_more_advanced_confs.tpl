@@ -41,7 +41,7 @@
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
                             <a href="http://tiki.org/display544" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                            <img src="img/profiles/profile_thumb_shopping_cart.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                            <img src="img/profiles/profile_thumb_shopping_cart.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                             </a>
                             <div class="small text-center">
                                 {tr}Click to expand{/tr}
@@ -72,7 +72,7 @@
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
                             <a href="http://tiki.org/display512" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                <img src="img/profiles/profile_thumb_easy_geoblog.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                <img src="img/profiles/profile_thumb_easy_geoblog.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                             </a>
                             <div class="small text-center">
                                 {tr}Click to expand{/tr}
@@ -103,7 +103,7 @@
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
                             <a href="http://tiki.org/display988" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                <img src="img/profiles/profile_thumb_conditional_display_in_forms.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                <img src="img/profiles/profile_thumb_conditional_display_in_forms.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                             </a>
                             <div class="small text-center">
                                 {tr}Click to expand{/tr}
@@ -131,7 +131,7 @@
                     <div class="row">
                         <div class="col-md-8 offset-md-2">
                             <a href="http://tiki.org/display1228" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                                <img src="img/profiles/profile_thumb_execute_on_list.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                                <img src="img/profiles/profile_thumb_execute_on_list.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                             </a>
                             <div class="small text-center">
                                 {tr}Click to expand{/tr}
