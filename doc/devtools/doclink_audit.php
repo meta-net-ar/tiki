@@ -15,19 +15,10 @@
  * Excludes: admin icons, wizards, dynamic wikiplugin/trackerfield help.
  *
  * Usage (from Tiki root):
- *   php doc/devtools/doclink_audit.php [--online] [--include-missing] [--csv=PATH]
+ *   php doc/devtools/doclink_audit.php [--include-missing] [--csv=PATH]
  *
- * Default CSV includes BROKEN, CHECK_FAILED, NON_CANONICAL, and EXTERNAL rows.
+ * Default CSV includes NON_CANONICAL and EXTERNAL rows.
  * MISSING preferences are counted in the console summary; use --include-missing to export them.
- *
- * Broken link detection requires --online (HTTP checks against doc.tiki.org).
- *
- * BROKEN vs CHECK_FAILED (--online):
- *   BROKEN — doc.tiki.org responded with HTTP >= 400 (e.g. 404, 410); strong signal of a bad link.
- *   CHECK_FAILED — the HTTP request returned no status code (0): timeout, DNS, TLS, firewall,
- *     or curl unavailable. Not proof the page is missing; re-run when doc.tiki.org is reachable.
- *   Before per-URL checks, the script probes https://doc.tiki.org/; if that fails, per-URL checks
- *   are skipped entirely and a warning is printed (avoids mass false BROKEN results during outages).
  *
  * Requires a configured Tiki instance (tiki-setup.php / database), like prefreport.php.
  * See also: doc/devtools/prefreport.php
@@ -40,7 +31,7 @@ if (PHP_SAPI !== 'cli') {
     die("This script must be run from the command line.\n");
 }
 
-$options = getopt('h', ['help', 'online', 'include-missing', 'csv:']);
+$options = getopt('h', ['help', 'include-missing', 'csv:']);
 
 if (isset($options['h']) || isset($options['help'])) {
     echo <<<HELP
@@ -50,25 +41,19 @@ Usage (from Tiki root):
   php doc/devtools/doclink_audit.php [options]
 
 Options:
-  --online            HTTP-check doc.tiki.org links (see file header for BROKEN/CHECK_FAILED caveats)
   --include-missing   Include MISSING preference rows in the CSV export
   --csv=PATH          CSV output path (default: dump/doclink_audit.csv)
   -h, --help          Show this help
 
 Default CSV columns: source_type, location, line, preference, original_value,
-resolved_url, status, http_status, suggested_slug
+resolved_url, status, suggested_slug
 
-Statuses: OK, BROKEN, CHECK_FAILED, MISSING, NON_CANONICAL, EXTERNAL
-
-BROKEN means HTTP >= 400 from doc.tiki.org. CHECK_FAILED means no HTTP response (outage,
-timeout, network). CHECK_FAILED is not proof a page is missing; re-run when doc.tiki.org
-is reachable. If the doc.tiki.org probe fails, per-URL checks are skipped.
+Statuses: OK, MISSING, NON_CANONICAL, EXTERNAL
 
 HELP;
     exit(0);
 }
 
-$online = isset($options['online']);
 $includeMissing = isset($options['include-missing']);
 $csvPath = $options['csv'] ?? 'dump/doclink_audit.csv';
 
@@ -160,12 +145,6 @@ foreach ($rows as $key => $row) {
     $rows[$key] = classify_row($row);
 }
 
-if ($online) {
-    $httpCheckResult = apply_http_checks($rows);
-} else {
-    $httpCheckResult = ['performed' => false, 'probe_ok' => false, 'probe_code' => 0];
-}
-
 $rows = array_merge($rows, $missingRows);
 
 $csvRows = filter_csv_rows($rows, $includeMissing);
@@ -175,7 +154,7 @@ if (dirname($csvPath) !== '' && ! is_dir(dirname($csvPath))) {
 }
 
 write_csv($csvRows, $csvPath);
-print_summary($rows, $missingCount, $allPrefs, $online, $includeMissing, $csvPath, $csvRows, $httpCheckResult);
+print_summary($rows, $missingCount, $allPrefs, $includeMissing, $csvPath, $csvRows);
 
 exit(0);
 
@@ -367,7 +346,6 @@ function make_row(array $fields)
         'original_value' => '',
         'resolved_url' => '',
         'status' => '',
-        'http_status' => '',
         'suggested_slug' => '',
     ], $fields);
 }
@@ -490,19 +468,6 @@ function is_doc_external_url($url)
     return $host !== 'doc.tiki.org' && $host !== 'www.doc.tiki.org';
 }
 
-function is_doc_tiki_url($url)
-{
-    if (! preg_match('/^https?:\/\//i', $url)) {
-        return true;
-    }
-    $host = parse_url($url, PHP_URL_HOST);
-    if ($host === null) {
-        return true;
-    }
-    $host = strtolower($host);
-    return $host === 'doc.tiki.org' || $host === 'www.doc.tiki.org';
-}
-
 function url_has_non_canonical_slug($url)
 {
     $path = urldecode(parse_url($url, PHP_URL_PATH) ?? '');
@@ -543,114 +508,12 @@ function canonicalize_slug_chars($text)
 }
 
 /**
- * HTTP-verify doc.tiki.org links and update row status from the response.
- *
- * Probes https://doc.tiki.org/ first; if unreachable, per-URL checks are skipped.
- * code === 0 on an individual URL → CHECK_FAILED (connectivity/check failure).
- * code >= 400 → BROKEN (likely a real broken URL).
- * NON_CANONICAL rows are checked but keep their status; EXTERNAL/MISSING are skipped.
- *
- * @param list<array<string, mixed>> $rows
- * @return array{performed: bool, probe_ok: bool, probe_code: int}
- */
-function apply_http_checks(array &$rows)
-{
-    $probe = probe_doc_tiki_org();
-    if (! $probe['ok']) {
-        $code = $probe['code'];
-        $msg = $code === 0
-            ? 'doc.tiki.org is unreachable (no HTTP response). Skipping per-URL checks.'
-            : "doc.tiki.org probe returned HTTP {$code}. Skipping per-URL checks.";
-        fwrite(STDERR, "Warning: {$msg}\n");
-        return ['performed' => false, 'probe_ok' => false, 'probe_code' => $code];
-    }
-
-    $httpCache = [];
-
-    foreach ($rows as $key => $row) {
-        if (in_array($row['status'], ['MISSING', 'EXTERNAL'], true)) {
-            continue;
-        }
-
-        $url = $row['resolved_url'];
-        if ($url === '' || ! is_doc_tiki_url($url)) {
-            continue;
-        }
-
-        if (! isset($httpCache[$url])) {
-            $httpCache[$url] = check_url_http($url);
-        }
-
-        $code = $httpCache[$url];
-        $rows[$key]['http_status'] = $code > 0 ? (string) $code : '';
-
-        if ($row['status'] === 'NON_CANONICAL') {
-            continue;
-        }
-
-        if ($code === 0) {
-            $rows[$key]['status'] = 'CHECK_FAILED';
-        } elseif ($code >= 400) {
-            $rows[$key]['status'] = 'BROKEN';
-        } else {
-            $rows[$key]['status'] = 'OK';
-        }
-    }
-
-    return ['performed' => true, 'probe_ok' => true, 'probe_code' => $probe['code']];
-}
-
-/**
- * @return array{ok: bool, code: int}
- */
-function probe_doc_tiki_org()
-{
-    $code = check_url_http('https://doc.tiki.org/');
-    return ['ok' => $code > 0 && $code < 400, 'code' => $code];
-}
-
-function check_url_http($url)
-{
-    if (! function_exists('curl_init')) {
-        fwrite(STDERR, "Warning: curl extension not available; skipping HTTP checks.\n");
-        return 0;
-    }
-
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_NOBODY => true,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 15,
-        CURLOPT_USERAGENT => 'Tiki-DocLinkAudit',
-    ]);
-
-    curl_exec($ch);
-    $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-
-    if ($code === 405 || $code === 501 || $code === 0) {
-        $ch = curl_init($url);
-        curl_setopt_array($ch, [
-            CURLOPT_HTTPGET => true,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 15,
-            CURLOPT_USERAGENT => 'Tiki-DocLinkAudit',
-        ]);
-        curl_exec($ch);
-        $code = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    }
-
-    return $code;
-}
-
-/**
  * @param list<array<string, mixed>> $rows
  * @return list<array<string, mixed>>
  */
 function filter_csv_rows(array $rows, $includeMissing)
 {
-    $allowed = ['BROKEN', 'CHECK_FAILED', 'NON_CANONICAL', 'EXTERNAL'];
+    $allowed = ['NON_CANONICAL', 'EXTERNAL'];
     if ($includeMissing) {
         $allowed[] = 'MISSING';
     }
@@ -679,7 +542,6 @@ function write_csv(array $rows, $path)
         'original_value',
         'resolved_url',
         'status',
-        'http_status',
         'suggested_slug',
     ];
     fputcsv($handle, $headers, escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
@@ -693,7 +555,6 @@ function write_csv(array $rows, $path)
             $row['original_value'],
             $row['resolved_url'],
             $row['status'],
-            $row['http_status'],
             $row['suggested_slug'],
         ], escape: TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR);
     }
@@ -709,11 +570,9 @@ function print_summary(
     array $rows,
     $missingCount,
     array $allPrefs,
-    $online,
     $includeMissing,
     $csvPath,
-    array $csvRows,
-    array $httpCheckResult
+    array $csvRows
 ) {
     $prefsWithHelp = 0;
     foreach ($allPrefs as $info) {
@@ -727,8 +586,6 @@ function print_summary(
     $hardcoded = count(array_filter($linkRows, static fn ($r) => $r['source_type'] === 'admin_hardcoded'));
 
     $counts = [
-        'BROKEN' => 0,
-        'CHECK_FAILED' => 0,
         'NON_CANONICAL' => 0,
         'EXTERNAL' => 0,
         'OK' => 0,
@@ -749,8 +606,6 @@ function print_summary(
     echo 'Preferences with help (links scanned): ' . $prefsWithHelp . "\n";
     echo "Admin help links scanned: {$adminHelp}\n";
     echo "Hardcoded doc.tiki.org URLs scanned: {$hardcoded}\n\n";
-    echo 'Broken links: ' . $counts['BROKEN'] . "\n";
-    echo 'Check failed (no HTTP response): ' . $counts['CHECK_FAILED'] . "\n";
     echo 'Non-canonical links (+ or space): ' . $counts['NON_CANONICAL'] . "\n";
     echo 'External links: ' . $counts['EXTERNAL'] . "\n";
     echo "Missing documentation (admin-visible, no help): {$missingCount}\n\n";
@@ -759,27 +614,11 @@ function print_summary(
         echo "(use --include-missing to export missing entries to CSV)\n\n";
     }
 
-    if (! $online) {
-        echo "Note: Broken link detection was not run. Use --online to verify doc.tiki.org pages.\n\n";
-    } else {
-        echo "Mode: online\n";
-        if (! $httpCheckResult['probe_ok']) {
-            echo "Note: doc.tiki.org probe failed; per-URL checks were skipped. "
-                . "Re-run when doc.tiki.org is reachable.\n";
-        } elseif ($counts['CHECK_FAILED'] > 0) {
-            echo "Note: CHECK_FAILED means no HTTP response (timeout, network, etc.), not a confirmed "
-                . "404. BROKEN with http_status 404/410 is a stronger signal of a bad link.\n";
-        }
-        echo "\n";
-    }
-
     $csvNote = $includeMissing
-        ? 'BROKEN, CHECK_FAILED, NON_CANONICAL, EXTERNAL, MISSING'
-        : 'BROKEN, CHECK_FAILED, NON_CANONICAL, EXTERNAL only';
+        ? 'NON_CANONICAL, EXTERNAL, MISSING'
+        : 'NON_CANONICAL, EXTERNAL only';
     echo "CSV: {$csvPath} ({$csvNote}, " . count($csvRows) . " rows)\n";
 
-    print_detail_section($rows, 'BROKEN', 20);
-    print_detail_section($rows, 'CHECK_FAILED', 20);
     print_detail_section($rows, 'NON_CANONICAL', 20);
     print_detail_section($rows, 'EXTERNAL', 10);
 
