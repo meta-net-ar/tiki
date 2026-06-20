@@ -27,6 +27,8 @@
  * shell-command side effects when scanning preferences.
  */
 
+use Tiki\Command\ConsoleSetupException;
+
 if (PHP_SAPI !== 'cli') {
     die("This script must be run from the command line.\n");
 }
@@ -73,7 +75,17 @@ $previousErrorHandler = set_error_handler(static function ($severity, $message, 
 $displayErrors = ini_get('display_errors');
 ini_set('display_errors', '0');
 
-require_once 'tiki-setup.php';
+try {
+    require_once 'tiki-setup.php';
+} catch (ConsoleSetupException $e) {
+    restore_error_handler();
+    fwrite(STDERR, $e->getMessage() . "\n");
+    exit($e->getCode() ?: 1);
+} catch (Throwable $e) {
+    restore_error_handler();
+    ini_set('display_errors', $displayErrors);
+    throw $e;
+}
 
 ini_set('display_errors', $displayErrors);
 restore_error_handler();
@@ -102,14 +114,20 @@ $allPrefs = collect_all_preferences();
 $rows = [];
 $missingRows = [];
 $missingCount = 0;
+$unresolvedHelpCount = 0;
 
 $skipLinkFiles = ['wikiplugin.php', 'trackerfield.php'];
 
 foreach ($allPrefs as $prefName => $info) {
     $help = $info['help'] ?? null;
+    $helpUnresolved = ! empty($info['help_unresolved']);
     $hasStringHelp = is_string($help) && $help !== '';
 
     if (! $hasStringHelp) {
+        if ($helpUnresolved) {
+            $unresolvedHelpCount++;
+            continue;
+        }
         $locations = $prefslib->getPreferenceLocations($prefName);
         if (! empty($locations)) {
             $prefInfo = $prefslib->getPreference($prefName, false);
@@ -139,6 +157,8 @@ foreach ($allPrefs as $prefName => $info) {
 }
 
 $adminRows = scan_admin_templates($baseHelpUrl);
+$unparsedHelpTags = count(array_filter($adminRows, static fn ($r) => ($r['status'] ?? '') === 'PARSE_WARNING'));
+$adminRows = array_values(array_filter($adminRows, static fn ($r) => ($r['status'] ?? '') !== 'PARSE_WARNING'));
 $rows = array_merge($rows, $adminRows);
 
 foreach ($rows as $key => $row) {
@@ -154,12 +174,12 @@ if (dirname($csvPath) !== '' && ! is_dir(dirname($csvPath))) {
 }
 
 write_csv($csvRows, $csvPath);
-print_summary($rows, $missingCount, $allPrefs, $includeMissing, $csvPath, $csvRows);
+print_summary($rows, $missingCount, $allPrefs, $includeMissing, $csvPath, $csvRows, $unresolvedHelpCount, $unparsedHelpTags);
 
 exit(0);
 
 /**
- * @return array<string, array{file: string, help: mixed, line: int}>
+ * @return array<string, array{file: string, help: mixed, line: int, help_unresolved?: bool}>
  */
 function collect_all_preferences()
 {
@@ -202,6 +222,7 @@ function collect_all_preferences()
                 'file' => $file,
                 'help' => $raw['help'] ?? null,
                 'line' => find_pref_line($file, $prefName),
+                'help_unresolved' => ! empty($raw['_help_unresolved']),
             ];
         }
     }
@@ -227,62 +248,331 @@ function extract_pref_help_from_source($file)
         return [];
     }
 
+    return extract_pref_help_from_tokens($content);
+}
+
+/**
+ * Token-based parser for prefs_*_list() arrays.
+ *
+ * Supports string literals, concatenated strings, simple variables assigned to string literals,
+ * and tra()/tr() calls with a literal first argument. Complex expressions are flagged as unresolved.
+ *
+ * @return array<string, array{help?: string, _help_unresolved?: bool}>
+ */
+function extract_pref_help_from_tokens($content)
+{
+    $tokens = token_get_all($content);
+    $count = count($tokens);
     $vars = [];
-    if (preg_match('/function\s+prefs_[a-z0-9_]+_list\s*\([^)]*\)\s*\{(.*)/is', $content, $fnMatch)) {
-        $beforeReturn = $fnMatch[1];
-        if (preg_match('/^(.*?)(?:return\s+\[|\$prefs\s*=\s*\[)/s', $beforeReturn, $preambleMatch)) {
-            if (
-                    preg_match_all(
-                        '/\$([a-zA-Z_][a-zA-Z0-9_]*)\s*=\s*([\'"])([^\'"]*)\2/',
-                        $preambleMatch[1],
-                        $varMatches,
-                        PREG_SET_ORDER
-                    )
-            ) {
-                foreach ($varMatches as $match) {
-                    $vars[$match[1]] = $match[3];
+    $list = [];
+    $inReturnArray = false;
+    $returnBaseDepth = -1;
+    $squareDepth = 0;
+    $parenDepth = 0;
+
+    for ($i = 0; $i < $count; $i++) {
+        $token = $tokens[$i];
+        $text = is_array($token) ? $token[1] : $token;
+        $tokenId = is_array($token) ? $token[0] : null;
+
+        if ($text === '[') {
+            $squareDepth++;
+            continue;
+        }
+        if ($text === ']') {
+            if ($inReturnArray && $squareDepth === $returnBaseDepth) {
+                $inReturnArray = false;
+                $returnBaseDepth = -1;
+            }
+            $squareDepth--;
+            continue;
+        }
+        if ($text === '(') {
+            $parenDepth++;
+            continue;
+        }
+        if ($text === ')') {
+            $parenDepth--;
+            continue;
+        }
+
+        // Record simple variable assignments like: $foo = 'bar';
+        if ($tokenId === T_VARIABLE && $parenDepth === 0) {
+            $name = ltrim($text, '$');
+            $next = next_non_whitespace_token($tokens, $i + 1);
+            if ($next !== null && token_text($tokens[$next]) === '=') {
+                $expr = read_expression_tokens($tokens, $next + 1);
+                $value = evaluate_help_expression($expr, $vars);
+                if (is_string($value)) {
+                    $vars[$name] = $value;
                 }
             }
         }
-    }
 
-    $list = [];
-    if (preg_match_all("/^\s*['\"]([a-zA-Z0-9_]+)['\"]\s*=>\s*\[/m", $content, $prefMatches)) {
-        foreach ($prefMatches[1] as $prefName) {
-            $list[$prefName] = [];
-        }
-    }
-
-    $currentPref = null;
-    foreach (explode("\n", $content) as $line) {
-        if (preg_match("/^\s*['\"]([a-zA-Z0-9_]+)['\"]\s*=>\s*\[/", $line, $prefMatch)) {
-            $currentPref = $prefMatch[1];
-            continue;
-        }
-
-        if ($currentPref === null || ! isset($list[$currentPref])) {
-            continue;
-        }
-
-        if (preg_match("/^\s*['\"]help['\"]\s*=>\s*['\"]([^'\"]*)['\"]/", $line, $helpMatch)) {
-            $list[$currentPref]['help'] = $helpMatch[1];
-            continue;
-        }
-
-        if (preg_match("/^\s*['\"]help['\"]\s*=>\s*\$([a-zA-Z_][a-zA-Z0-9_]*)/", $line, $helpMatch)) {
-            $help = $vars[$helpMatch[1]] ?? null;
-            if (is_string($help) && $help !== '') {
-                $list[$currentPref]['help'] = $help;
+        if (! $inReturnArray && $tokenId === T_RETURN) {
+            $next = next_non_whitespace_token($tokens, $i + 1);
+            if ($next !== null && token_text($tokens[$next]) === '[') {
+                $inReturnArray = true;
+                $returnBaseDepth = $squareDepth + 1;
             }
             continue;
         }
 
-        if (preg_match('/^\s*\],/', $line)) {
-            $currentPref = null;
+        if (! $inReturnArray || $squareDepth !== $returnBaseDepth) {
+            continue;
+        }
+
+        // Parse top-level pref entry: 'pref_name' => [ ... ]
+        if ($tokenId === T_CONSTANT_ENCAPSED_STRING) {
+            $prefName = decode_php_string_literal($text);
+            if ($prefName === null || ! preg_match('/^[a-zA-Z0-9_]+$/', $prefName)) {
+                continue;
+            }
+
+            $arrow = next_non_whitespace_token($tokens, $i + 1);
+            $open = $arrow !== null ? next_non_whitespace_token($tokens, $arrow + 1) : null;
+            if (
+                $arrow === null
+                || token_text($tokens[$arrow]) !== '=>'
+                || $open === null
+                || token_text($tokens[$open]) !== '['
+            ) {
+                continue;
+            }
+
+            $parsed = parse_pref_entry_help($tokens, $open, $vars);
+            if ($parsed['help'] !== null && $parsed['help'] !== '') {
+                $list[$prefName]['help'] = $parsed['help'];
+            } elseif ($parsed['unresolved']) {
+                $list[$prefName]['_help_unresolved'] = true;
+            } else {
+                $list[$prefName] = $list[$prefName] ?? [];
+            }
         }
     }
 
     return $list;
+}
+
+/**
+ * @param array<int, mixed> $tokens
+ * @param int $entryOpenBracketPos Position of "[" after pref "=>"
+ * @param array<string, string> $vars
+ * @return array{help: ?string, unresolved: bool}
+ */
+function parse_pref_entry_help(array $tokens, int $entryOpenBracketPos, array $vars): array
+{
+    $depth = 1;
+    $help = null;
+    $unresolved = false;
+    $count = count($tokens);
+
+    for ($i = $entryOpenBracketPos + 1; $i < $count; $i++) {
+        $text = token_text($tokens[$i]);
+        if ($text === '[') {
+            $depth++;
+            continue;
+        }
+        if ($text === ']') {
+            $depth--;
+            if ($depth === 0) {
+                break;
+            }
+            continue;
+        }
+
+        if ($depth !== 1 || ! is_array($tokens[$i]) || $tokens[$i][0] !== T_CONSTANT_ENCAPSED_STRING) {
+            continue;
+        }
+
+        $key = decode_php_string_literal($tokens[$i][1]);
+        if ($key !== 'help') {
+            continue;
+        }
+        $arrow = next_non_whitespace_token($tokens, $i + 1);
+        if ($arrow === null || token_text($tokens[$arrow]) !== '=>') {
+            continue;
+        }
+
+        $expr = read_expression_tokens($tokens, $arrow + 1);
+        $resolved = evaluate_help_expression($expr, $vars);
+        if (is_string($resolved) && $resolved !== '') {
+            $help = $resolved;
+        } else {
+            $unresolved = true;
+        }
+        break;
+    }
+
+    return ['help' => $help, 'unresolved' => $unresolved];
+}
+
+/**
+ * @param array<int, mixed> $tokens
+ * @return list<mixed>
+ */
+function read_expression_tokens(array $tokens, int $startPos): array
+{
+    $expr = [];
+    $squareDepth = 0;
+    $parenDepth = 0;
+    $braceDepth = 0;
+    $count = count($tokens);
+
+    for ($i = $startPos; $i < $count; $i++) {
+        $text = token_text($tokens[$i]);
+        if ($text === '[') {
+            $squareDepth++;
+        } elseif ($text === ']') {
+            if ($squareDepth === 0 && $parenDepth === 0 && $braceDepth === 0) {
+                break;
+            }
+            $squareDepth--;
+        } elseif ($text === '(') {
+            $parenDepth++;
+        } elseif ($text === ')') {
+            $parenDepth--;
+        } elseif ($text === '{') {
+            $braceDepth++;
+        } elseif ($text === '}') {
+            $braceDepth--;
+        } elseif ($text === ',' && $squareDepth === 0 && $parenDepth === 0 && $braceDepth === 0) {
+            break;
+        } elseif ($text === ';' && $squareDepth === 0 && $parenDepth === 0 && $braceDepth === 0) {
+            break;
+        }
+
+        $expr[] = $tokens[$i];
+    }
+
+    return $expr;
+}
+
+/**
+ * @param list<mixed> $exprTokens
+ * @param array<string, string> $vars
+ */
+function evaluate_help_expression(array $exprTokens, array $vars): ?string
+{
+    $parts = [];
+    $segment = [];
+    $parenDepth = 0;
+
+    foreach ($exprTokens as $token) {
+        $text = token_text($token);
+        if ($text === '(') {
+            $parenDepth++;
+        } elseif ($text === ')') {
+            $parenDepth--;
+        }
+
+        if ($text === '.' && $parenDepth === 0) {
+            $parts[] = $segment;
+            $segment = [];
+            continue;
+        }
+        $segment[] = $token;
+    }
+    if (! empty($segment)) {
+        $parts[] = $segment;
+    }
+
+    if (empty($parts)) {
+        return null;
+    }
+
+    $resolved = '';
+    foreach ($parts as $part) {
+        $value = resolve_help_segment($part, $vars);
+        if (! is_string($value)) {
+            return null;
+        }
+        $resolved .= $value;
+    }
+
+    return $resolved;
+}
+
+/**
+ * @param list<mixed> $segmentTokens
+ * @param array<string, string> $vars
+ */
+function resolve_help_segment(array $segmentTokens, array $vars): ?string
+{
+    $segmentTokens = array_values(array_filter($segmentTokens, static function ($token) {
+        return ! is_array($token) || ! in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true);
+    }));
+    if (empty($segmentTokens)) {
+        return null;
+    }
+
+    if (count($segmentTokens) === 1) {
+        $token = $segmentTokens[0];
+        if (is_array($token) && $token[0] === T_CONSTANT_ENCAPSED_STRING) {
+            return decode_php_string_literal($token[1]);
+        }
+        if (is_array($token) && $token[0] === T_VARIABLE) {
+            return $vars[ltrim($token[1], '$')] ?? null;
+        }
+        return null;
+    }
+
+    // Handle tra('...') or tr('...') with a literal first argument.
+    if (
+        count($segmentTokens) >= 4
+        && is_array($segmentTokens[0])
+        && $segmentTokens[0][0] === T_STRING
+        && in_array(strtolower($segmentTokens[0][1]), ['tra', 'tr'], true)
+        && token_text($segmentTokens[1]) === '('
+        && is_array($segmentTokens[2])
+        && $segmentTokens[2][0] === T_CONSTANT_ENCAPSED_STRING
+    ) {
+        return decode_php_string_literal($segmentTokens[2][1]);
+    }
+
+    return null;
+}
+
+/**
+ * @param array<int, mixed> $tokens
+ */
+function next_non_whitespace_token(array $tokens, int $startPos): ?int
+{
+    $count = count($tokens);
+    for ($i = $startPos; $i < $count; $i++) {
+        if (! is_array($tokens[$i])) {
+            return $i;
+        }
+        if (! in_array($tokens[$i][0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT], true)) {
+            return $i;
+        }
+    }
+    return null;
+}
+
+function token_text($token): string
+{
+    return is_array($token) ? $token[1] : $token;
+}
+
+function decode_php_string_literal(string $literal): ?string
+{
+    $len = strlen($literal);
+    if ($len < 2) {
+        return null;
+    }
+    $quote = $literal[0];
+    if (($quote !== "'" && $quote !== '"') || $literal[$len - 1] !== $quote) {
+        return null;
+    }
+
+    $inner = substr($literal, 1, -1);
+    if ($quote === "'") {
+        return str_replace(["\\'", '\\\\'], ["'", '\\'], $inner);
+    }
+
+    $decoded = stripcslashes($inner);
+    return $decoded === '' && $inner !== '' ? null : $decoded;
 }
 
 /**
@@ -389,16 +679,30 @@ function scan_admin_templates($baseHelpUrl)
             continue;
         }
 
-        if (preg_match_all('/\{help\s+url="([^"]+)"/', $content, $matches, PREG_OFFSET_CAPTURE)) {
-            foreach ($matches[1] as $match) {
-                $url = $match[0];
+        if (preg_match_all('/\{help\b(?P<attrs>[^{}]*)\}/is', $content, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $tag = $match[0][0];
+                $tagOffset = $match[0][1];
+                $attrs = extract_smarty_attributes_from_help_tag($tag);
+                $url = $attrs['url'] ?? null;
+                if (! is_string($url) || $url === '') {
+                    $rows[] = make_row([
+                        'source_type' => 'admin_help',
+                        'location' => $file,
+                        'line' => offset_to_line($content, $tagOffset),
+                        'original_value' => $tag,
+                        'resolved_url' => '',
+                        'status' => 'PARSE_WARNING',
+                    ]);
+                    continue;
+                }
                 if (str_contains($url, '$')) {
                     continue;
                 }
                 $rows[] = make_row([
                     'source_type' => 'admin_help',
                     'location' => $file,
-                    'line' => offset_to_line($content, $match[1]),
+                    'line' => offset_to_line($content, $tagOffset),
                     'original_value' => $url,
                     'resolved_url' => resolve_url($baseHelpUrl, $url),
                 ]);
@@ -425,6 +729,37 @@ function scan_admin_templates($baseHelpUrl)
 function offset_to_line($content, $offset)
 {
     return substr_count($content, "\n", 0, $offset) + 1;
+}
+
+/**
+ * Parse attributes from a Smarty {help ...} tag.
+ *
+ * Supports single/double quotes, multiline tags, unquoted values, and any attribute order.
+ *
+ * @return array<string, string>
+ */
+function extract_smarty_attributes_from_help_tag(string $tag): array
+{
+    $attrs = [];
+    if (! preg_match('/^\{help\b(?P<body>.*)\}$/is', trim($tag), $match)) {
+        return $attrs;
+    }
+    $body = trim($match['body']);
+    if ($body === '') {
+        return $attrs;
+    }
+
+    if (preg_match_all('/([a-zA-Z_][a-zA-Z0-9_-]*)\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s}]+))/s', $body, $attrMatches, PREG_SET_ORDER)) {
+        foreach ($attrMatches as $attrMatch) {
+            $name = strtolower($attrMatch[1]);
+            $value = $attrMatch[2] !== ''
+                ? $attrMatch[2]
+                : ($attrMatch[3] !== '' ? $attrMatch[3] : ($attrMatch[4] ?? ''));
+            $attrs[$name] = trim($value);
+        }
+    }
+
+    return $attrs;
 }
 
 /**
@@ -572,7 +907,9 @@ function print_summary(
     array $allPrefs,
     $includeMissing,
     $csvPath,
-    array $csvRows
+    array $csvRows,
+    int $unresolvedHelpCount,
+    int $unparsedHelpTags
 ) {
     $prefsWithHelp = 0;
     foreach ($allPrefs as $info) {
@@ -612,6 +949,16 @@ function print_summary(
 
     if (! $includeMissing) {
         echo "(use --include-missing to export missing entries to CSV)\n\n";
+    }
+    if ($unresolvedHelpCount > 0) {
+        echo "Note: {$unresolvedHelpCount} preference help values could not be statically resolved "
+            . "(e.g., computed expressions); they were not counted as missing.\n";
+    }
+    if ($unparsedHelpTags > 0) {
+        echo "Note: {$unparsedHelpTags} {help} tags were missing a parseable url attribute.\n";
+    }
+    if ($unresolvedHelpCount > 0 || $unparsedHelpTags > 0) {
+        echo "\n";
     }
 
     $csvNote = $includeMissing
