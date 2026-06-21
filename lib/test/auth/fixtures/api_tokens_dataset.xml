@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<mysqldump xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<database name="tiki">
+    <table_data name="tiki_api_tokens">
+        <row>
+            <field name="tokenId">1</field>
+            <field name="type">manual</field>
+            <field name="user">admin</field>
+            <field name="token">legacy-api-token</field>
+            <field name="created">1700000000</field>
+            <field name="lastModif">1700000000</field>
+            <field name="hits">0</field>
+        </row>
+    </table_data>
+</database>
+</mysqldump>

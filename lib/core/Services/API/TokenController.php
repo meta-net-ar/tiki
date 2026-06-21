@@ -55,8 +55,12 @@ class Services_API_TokenController
         ]);
 
         Feedback::success(tr('New API token successfully created.'));
+        header('Cache-Control: no-store');
 
-        return $token;
+        return array_merge($token, [
+            'title' => tr('API Token Created'),
+            'override_action' => 'created',
+        ]);
     }
 
     public function action_edit($input)
@@ -102,6 +106,24 @@ class Services_API_TokenController
         $this->lib->deleteToken($tokenId);
         return [
             'status' => 'OK',
+        ];
+    }
+
+    public function actionRevokeAll()
+    {
+        $util = new Services_Utilities();
+        if (! $util->isActionPost()) {
+            throw new Services_Exception_Denied();
+        }
+
+        $this->lib->deleteAllTokens();
+        Feedback::success(tr('All API and OAuth tokens have been revoked.'));
+
+        return [
+            'FORWARD' => [
+                'controller' => 'api_token',
+                'action' => 'list',
+            ],
         ];
     }
 
