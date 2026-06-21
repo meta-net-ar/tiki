@@ -65,7 +65,7 @@
                         </div>
                     </div>
 
-            {if $prefs.cookie_consent_mode neq 'dialog'}</div></div>{/if}
+            {if $prefs.cookie_consent_mode neq 'dialog'}</div></div>{else}</div>{/if}
         </form>
 
     {if $prefs.cookie_consent_mode eq 'dialog'}</div></div></div>{/if}
