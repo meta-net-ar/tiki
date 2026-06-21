@@ -770,7 +770,10 @@ function getCompatibleVersions($dbEngine = '', $dbVersion = '')
     }
     return $compatibleVersions;
 }
-if (! $standalone) {
+
+if (file_exists(__DIR__ . '/db/local.php') && file_exists(__DIR__ . '/templates/tiki-check.tpl')) {
+    $standalone = false;
+    require_once(__DIR__ . '/tiki-setup.php');
     // TODO : Proper authentication
     $access->check_permission('tiki_p_admin');
 
@@ -783,7 +786,7 @@ if (! $standalone) {
         $headerlib->add_cssfile('themes/base_files/feature_css/tiki-check.css');
     }
 } else {
-//    $standalone = true;
+    $standalone = true;
     $render = "";
 
     /**
