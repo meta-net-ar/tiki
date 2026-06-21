@@ -168,10 +168,10 @@
             <file>%kernel.root_dir%/lib/loginlib.php</file>
         </service>
         <service id="tiki.lib.logs" class="Tiki\Lib\Logs\LogsLib">
-            <file>%kernel.root_dir%/lib/Logs/LogsLib.php</file>
+            <file>%kernel.root_dir%/lib/core/Tiki/Lib/Logs/LogsLib.php</file>
         </service>
         <service id="tiki.lib.logsqry" class="Tiki\Lib\Logs\LogsQueryLib">
-            <file>%kernel.root_dir%/lib/Logs/LogsQueryLib.php</file>
+            <file>%kernel.root_dir%/lib/core/Tiki/Lib/Logs/LogsQueryLib.php</file>
         </service>
         <service id="tiki.lib.ml" class="MachineLearningLib">
             <file>%kernel.root_dir%/lib/ml/mllib.php</file>
@@ -217,7 +217,7 @@
             <file>%kernel.root_dir%/lib/objectlib.php</file>
         </service>
         <service id="tiki.lib.openidconnect" class="Tiki\Lib\OpenIdConnect\OpenIdConnectLib">
-            <file>%kernel.root_dir%/lib/OpenIdConnect/OpenIdConnectLib.php</file>
+            <file>%kernel.root_dir%/lib/core/Tiki/Lib/OpenIdConnect/OpenIdConnectLib.php</file>
         </service>
         <service id="tiki.lib.objectselector" class="Tiki\ObjectSelector\Selector">
             <argument type="service" id="tiki.lib.object"/>
@@ -401,7 +401,7 @@
         </service>
 
         <service id="tiki.lib.iotevents" class="Tiki\Lib\iot\EventListener">
-            <file>%kernel.root_dir%/lib/iot/EventListener.php</file>
+            <file>%kernel.root_dir%/lib/core/Tiki/Lib/iot/EventListener.php</file>
         </service>
     </services>
 </container>

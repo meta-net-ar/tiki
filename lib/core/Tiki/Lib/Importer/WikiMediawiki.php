@@ -229,7 +229,7 @@ class WikiMediawiki extends Wiki
     {
         global $tikidomain;
 
-        $this->attachmentsDestDir = __DIR__ . '/../../' . DEPRECATED_IMG_WIKI_UP_PATH . '/';
+        $this->attachmentsDestDir = TIKI_PATH . '/' . DEPRECATED_IMG_WIKI_UP_PATH . '/';
         if ($tikidomain) {
             $this->attachmentsDestDir .= $tikidomain;
         }

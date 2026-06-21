@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
-include_once('lib/minical/minicallib.php');
+include_once('lib/core/Tiki/Lib/MiniCal/MiniCalLib.php');
 $access->check_feature('feature_minical');
 $access->check_user($user);
 //if ($tiki_p_minical != 'y') {

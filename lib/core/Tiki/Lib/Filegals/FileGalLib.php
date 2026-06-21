@@ -1425,7 +1425,7 @@ class FileGalLib extends TikiLib
         }
         $galleryName = $this->table('tiki_file_galleries')->fetchOne('name', ['galleryId' => $args['galleryId']]);
 
-        include_once(__DIR__ . '/../notifications/notificationemaillib.php');
+        include_once TIKI_PATH . '/lib/notifications/notificationemaillib.php';
         sendFileGalleryEmailNotification('file_gallery_changed', $args['galleryId'], $galleryName, $file->name, $file->filename, $file->description, $action, $args['user'] ?? $user, $args['object']);
     }
 
@@ -4491,7 +4491,7 @@ class FileGalLib extends TikiLib
      */
     public function extractMetadataJson($file, $ispath = true, $extended = true)
     {
-        include_once __DIR__ . '/../metadata/metadatalib.php';
+        include_once TIKI_PATH . '/lib/metadata/metadatalib.php';
         $metadata = new FileMetadata();
         $filemeta = json_encode($metadata->getMetadata($file, $ispath, $extended)->typemeta['best']);
         return $filemeta;

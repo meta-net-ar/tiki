@@ -285,7 +285,7 @@ class Tokens
                 $query = '?' . http_build_query($parameters, '', '&');
                 $url .= $query;
             }
-            include_once(__DIR__ . '/../../tiki-sefurl.php');
+            include_once TIKI_PATH . '/tiki-sefurl.php';
             $url = filter_out_sefurl($url);
             TikiLib::lib('access')->redirect($url);
             die;
@@ -477,7 +477,7 @@ class Tokens
             unset($args['TOKEN']);
         } else {
             global $prefs, $sefurl_regex_out;
-            include_once __DIR__ . '/../../tiki-sefurl.php';
+            include_once TIKI_PATH . '/tiki-sefurl.php';
             if ($prefs['feature_sefurl'] === 'y' && ! empty($sefurl_regex_out)) {
                 global $base_url;
 

@@ -21,12 +21,12 @@ class IconGenerator
 
     public function __construct(OutputInterface $output)
     {
-        $this->bootstrapIconsFilePath = __DIR__ . '/../' . BOOTSTRAP_ICONS_FONT_SRC_PATH . '/bootstrap-icons.css';
-        $this->fontAwesomeFilePath = __DIR__ . '/../' . FONTAWESOME_CSS_SRC_PATH . '/all.css';
-        $this->bootstrapJsonFilePath = __DIR__ . '/../' . GENERATED_ICONSET_PATH . '/all_bootstrap_icons.json';
-        $this->bootstrapPhpFilePath = __DIR__ . '/../' . GENERATED_ICONSET_PATH . '/all_bootstrap_icons.php';
-        $this->fontAwesomeJsonFilePath = __DIR__ . '/../' . GENERATED_ICONSET_PATH . '/all_fontawesome_icons.json';
-        $this->fontAwesomePhpFilePath = __DIR__ . '/../' . GENERATED_ICONSET_PATH . '/all_fontawesome_icons.php';
+        $this->bootstrapIconsFilePath = TIKI_PATH . '/' . BOOTSTRAP_ICONS_FONT_SRC_PATH . '/bootstrap-icons.css';
+        $this->fontAwesomeFilePath = TIKI_PATH . '/' . FONTAWESOME_CSS_SRC_PATH . '/all.css';
+        $this->bootstrapJsonFilePath = TIKI_PATH . '/' . GENERATED_ICONSET_PATH . '/all_bootstrap_icons.json';
+        $this->bootstrapPhpFilePath = TIKI_PATH . '/' . GENERATED_ICONSET_PATH . '/all_bootstrap_icons.php';
+        $this->fontAwesomeJsonFilePath = TIKI_PATH . '/' . GENERATED_ICONSET_PATH . '/all_fontawesome_icons.json';
+        $this->fontAwesomePhpFilePath = TIKI_PATH . '/' . GENERATED_ICONSET_PATH . '/all_fontawesome_icons.php';
 
         $this->state = [
             'bs' => 1,
@@ -127,7 +127,7 @@ class IconGenerator
         $fontAwesomeContent = $this->checkFileContent($this->fontAwesomeFilePath, 'fa');
 
         $modifiedIcons = $this->generateIconArraysFromCss($bootstrapIconsContent, $fontAwesomeContent);
-        if (! is_dir(__DIR__ . "/../" . GENERATED_ICONSET_PATH) && ! mkdir(__DIR__ . "/../" . GENERATED_ICONSET_PATH, 0777, true)) {
+        if (! is_dir(TIKI_PATH . '/' . GENERATED_ICONSET_PATH) && ! mkdir(TIKI_PATH . '/' . GENERATED_ICONSET_PATH, 0777, true)) {
             throw new Exception("Could not create '.GENERATED_ICONSET_PATH.' folder");
         }
         if ($this->state['bs'] != -1) {

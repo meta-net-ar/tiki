@@ -63,14 +63,14 @@ class DrawflowLogger implements DrawflowActionInterface
         $in = is_array($input) ? $input['next_payload'] : $input;
         $content = str_replace("==input==", $in, $user_input);
 
-        $dir = realpath(__DIR__ . '/../../../');
+        $dir = realpath(TIKI_PATH);
         $path = $dir . DIRECTORY_SEPARATOR . TEMP_PATH . DIRECTORY_SEPARATOR . $this->getFileName();
         if (file_put_contents($path, $content)) {
             $input['success'] = true;
             return ['success' => true, 'message' => tra('Logs succesfully written : ') . json_encode([realpath($path),$in]), 'next_payload' => $input];
         }
         $input['success'] = false;
-        $input['message'] = tra('Failed to write logs: ') . json_encode([__DIR__ . '/../../../../',$dir, $path, $in]);
+        $input['message'] = tra('Failed to write logs: ') . json_encode([TIKI_PATH, $dir, $path, $in]);
         return $input;
     }
 

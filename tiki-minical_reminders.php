@@ -10,7 +10,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 include_once("lib/init/initlib.php");
 include_once('tiki-setup_base.php');
-include_once('lib/minical/minicallib.php');
+include_once('lib/core/Tiki/Lib/MiniCal/MiniCalLib.php');
 $access->check_feature('feature_minical');
 if (! $prefs['minical_reminders']) {
     die;

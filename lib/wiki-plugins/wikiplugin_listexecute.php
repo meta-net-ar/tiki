@@ -66,7 +66,7 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
             'user_group_modify' => 'Search_Action_UserGroupModify',
             'wiki_approval' => 'Search_Action_WikiApprovalAction',
             'categorize_object' => 'Search_Action_CategorizeObjectAction',
-            'export_pdf' => 'SearchActionExportPDF',
+            'export_pdf' => \Tiki\Search\Action\SearchActionExportPDF::class,
         ]
     );
 

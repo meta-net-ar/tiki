@@ -474,14 +474,10 @@
                 "../lib/core/Tiki",
                 "../lib/core/"
             ],
-            "Tiki\\Lib\\": "../lib/",
-            "Tiki\\Lib\\Payment\\": "../lib/payment",
-            "Tiki\\Lib\\Wiki\\": "../lib/wiki",
             "SmartyTiki\\": "../lib/smarty_tiki"
         },
         "classmap": [
             "../installer/",
-            "../lib/",
             "../lib/language/",
             "../lib/openpgp/",
             "../lib/rating/formula/",

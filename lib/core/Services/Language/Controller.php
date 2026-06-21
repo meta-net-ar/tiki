@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-include(__DIR__ . '/TranslationReader.php');
+include(TIKI_PATH . '/lib/language/TranslationReader.php');
 
 class Services_Language_Controller
 {
