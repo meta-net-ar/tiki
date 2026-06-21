@@ -1674,6 +1674,8 @@ function wikiplugin_tracker($data, $params)
                     $msg = trim($data);
                     if (empty($msg)) {
                         $msg = tr('Form saved successfully.');
+                    } else {
+                        $msg = $parserlib->parse_data($msg);
                     }
                     Feedback::success($msg);
                     TikiLib::lib('access')->redirect($url[$key]);
