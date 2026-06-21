@@ -45,12 +45,6 @@ class VCSUpdateCommand extends Command
         $this
             ->setHelp(tra('Updates Tiki repository to latest version and performs necessary tasks in Tiki for a smooth update. Suitable for both development and production.'))
             ->addOption(
-                'no-secdb',
-                's',
-                InputOption::VALUE_NONE,
-                tra('Skip updating the secdb database.')
-            )
-            ->addOption(
                 'no-reindex',
                 'r',
                 InputOption::VALUE_NONE,
@@ -352,9 +346,6 @@ class VCSUpdateCommand extends Command
         if ($noDb) {
             $max -= 5;
         } else {
-            if ($input->getOption('no-secdb')) {
-                $max--;
-            }
             if ($input->getOption('no-reindex')) {
                 $max--;
             }
@@ -462,18 +453,6 @@ class VCSUpdateCommand extends Command
         $this->OutputErrors($logger, $raw, 'Problem running setup.sh', $errors, ! $input->getOption('no-db'));
 
         if (! $noDb) {
-            // generate a secdb database so when database:update is run, it also gets updated.
-            if (! $input->getOption('no-secdb')) {
-                $output->writeln('');
-                $progress->setMessage('Updating secdb');
-                $progress->advance();
-
-                $errors = ['is not writable', ''];
-                $command = 'php doc/devtools/release.php --only-secdb --no-check-vcs';
-                $raw = $this->execCommand($command);
-                $this->OutputErrors($logger, $raw, 'Problem updating secdb', $errors);
-            }
-
             // note: running database update also clears the cache
             $output->writeln('');
             $progress->setMessage('Updating database');

@@ -67,10 +67,6 @@ if (! $options['no-check-vcs'] && has_uncommited_changes('.')) {
 include_once('lib/setup/twversion.class.php');
 $TWV = new TWVersion();
 
-if ($options['only-secdb']) {
-    passthru("$phpCommand doc/devtools/generate_secdb.php", $exitCode);
-}
-
 $script = $_SERVER['argv'][0];
 $version = $_SERVER['argv'][1] ?? '';
 $subrelease = $_SERVER['argv'][2] ?? '';
@@ -117,12 +113,12 @@ if (empty($subrelease)) {
     if (! empty($pre)) {
         $packageVersion .= ".$pre";
     }
-    $secdbVersion = $version;
+    $relVersion = $version;
 } else {
     $branch = "$mainversion.x";
     $tag = "tags/$version$subrelease";
     $packageVersion = "$version.$pre$subrelease";
-    $secdbVersion = "$version$subrelease";
+    $relVersion = "$version$subrelease";
 }
 
 if (! $options['no-lang-update'] && important_step("Update language files")) {
@@ -133,7 +129,7 @@ if (! $options['no-lang-update'] && important_step("Update language files")) {
     }
     unset($removeFiles);
     info('>> Language files updated and temporary files removed.');
-    important_step('Commit updated language files', true, "[REL] Update language.php files for $secdbVersion");
+    important_step('Commit updated language files', true, "[REL] Update language.php files for $relVersion");
 }
 
 if (! $options['no-changelog-update'] && important_step("Update '" . CHANGELOG_FILENAME . "' file (using final version number '$version')")) {
@@ -142,7 +138,7 @@ if (! $options['no-changelog-update'] && important_step("Update '" . CHANGELOG_F
     exec("php doc/devtools/generate_changelog.php", $output, $returnVar);
     if ($returnVar === 0) {
         info(">> Changelog updated successfully using doc/devtools/generate_changelog.php script.");
-        important_step("Commit new " . CHANGELOG_FILENAME, true, "[REL] Update " . CHANGELOG_FILENAME . " for $secdbVersion");
+        important_step("Commit new " . CHANGELOG_FILENAME, true, "[REL] Update " . CHANGELOG_FILENAME . " for $relVersion");
     } else {
         error("Changelog update failed. generate_changelog.php exited with code $returnVar.\nOutput:\n" . implode("\n", $output));
     }
@@ -152,18 +148,9 @@ if (! $options['no-copyright-update'] && important_step("Update '" . COPYRIGHTS_
     passthru("$phpCommand doc/devtools/generate_copyright.php", $exitCode);
     if ($exitCode === 0) {
         info("\n>> Copyright updated successfully using doc/devtools/generate_copyright.php script.");
-        important_step("Commit new " . COPYRIGHTS_FILENAME, true, "[REL] Update " . COPYRIGHTS_FILENAME . " for $secdbVersion");
+        important_step("Commit new " . COPYRIGHTS_FILENAME, true, "[REL] Update " . COPYRIGHTS_FILENAME . " for $relVersion");
     } else {
         error('Copyrights update failed.');
-    }
-}
-
-if (! $options['no-secdb'] && important_step("Update SecDB file(s) 'db/tiki-secdb_{$version}_mysql.sql'")) {
-    passthru("$phpCommand doc/devtools/generate_secdb.php", $exitCode);
-    if ($exitCode === 0) {
-        print "SecDB file has been successfully created\n";
-    } else {
-        error('SecDB file update failed.');
     }
 }
 
@@ -575,17 +562,15 @@ function get_options()
         'no-lang-update' => false,
         'no-changelog-update' => false,
         'no-copyright-update' => false,
-        'no-secdb' => false,
         'no-packaging' => false,
         'no-tagging' => false,
         'force-yes' => false,
         'debug-packaging' => false,
-        'only-secdb' => false,
         'devmode' => false,
         'skip' => 0,
     ];
 
-    // Environment variables provide default values for parameter options. e.g. export TIKI_NO_SECDB=true
+    // Environment variables provide default values for parameter options. e.g. export TIKI_NO_COMMIT=true
     $prefix = "TIKI-";
     foreach ($options as $option => $optValue) {
         $envOption = $prefix . $option;
@@ -714,8 +699,6 @@ Options:
     --no-lang-update          : do not update lang/*/language.php files
     --no-changelog-update     : do not update the '" . CHANGELOG_FILENAME . "' file
     --no-copyright-update     : do not update the '" . COPYRIGHTS_FILENAME . "' file
-    --no-secdb                : do not update SecDB footprints
-    --only-secdb              : only generate a secdb database
     --no-packaging            : do not build packages files
     --no-tagging              : do not tag the release on the remote vcs repository
     --force-yes               : disable the interactive mode (same as replying 'y' to all steps)
