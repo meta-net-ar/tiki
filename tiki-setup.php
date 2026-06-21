@@ -1025,6 +1025,11 @@ if ($prefs['wikiplugin_addtocart'] == 'y') {
     $headerlib->add_jsfile('lib/payment/cartlib.js');
 }
 
+if (! Sections::getCurrentSection()) {
+    // if nothing else has set the section, set it to global as not all files do
+    Sections::setCurrentSection(Sections::SECTION_GLOBAL);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // ******************************************************************** //
 // ** IMPORTANT NOTE:                                                ** //
