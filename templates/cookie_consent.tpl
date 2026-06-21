@@ -8,7 +8,6 @@
                 </div>
                 <div class="modal-body">
                     <form method="POST">
-                        <div class="w-100 h-100">
 {else}
     <div id="{$prefs.cookie_consent_dom_id}" role="alert"
             style="position: fixed; top:0; z-index: 1050; background-color: rgba(0, 0, 0, 0.74); height: 100vh; width: 100vw;"
@@ -65,7 +64,7 @@
                         </div>
                     </div>
 
-            {if $prefs.cookie_consent_mode neq 'dialog'}</div></div>{else}</div>{/if}
+            {if $prefs.cookie_consent_mode neq 'dialog'}</div></div>{/if}
         </form>
 
     {if $prefs.cookie_consent_mode eq 'dialog'}</div></div></div>{/if}
