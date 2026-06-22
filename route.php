@@ -260,8 +260,8 @@ function tiki_route($path)
             global $tikiroot;
             $homePage = $prefs['wikiHomePage'] ?? 'HomePage';
             $homeSlug = TikiLib::lib('wiki')->get_slug_by_page($homePage);
-            $variations = TikiLib::lib('slugmanager')->generateSlugsVariations($parts[0]);
-            if (in_array($homeSlug, $variations)){
+            $requestSlug = str_replace('+', '-', $parts[0]);
+            if ($requestSlug === $homeSlug) {
                 $redirectTo = $prefs['fallbackBaseUrl'] ?? $tikiroot ?? '/';
                 //because tiki setup is not included, this does not work well TikiLib::lib('access')->redirect($redirectTo); //default status code is 302, which is what is needed here given that home page might change
                 header('Location: ' . $redirectTo, true, 302);
