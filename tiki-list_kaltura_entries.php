@@ -13,8 +13,8 @@ $inputConfiguration = [
         'staticKeyFilters'         => [
         'list'                     => 'string',               //get
         'action'                   => 'string',               //get
-        'mixId'                    => 'int',                  //get
-        'mediaId'                  => 'int',                  //get
+        'mixId'                    => 'word',                 //get
+        'mediaId'                  => 'word',                 //get
         'view'                     => 'string',               //get
         ],
     ],
@@ -156,12 +156,12 @@ try {
                 for ($i = 0; $i < $kmedialist->totalCount; $i++) {
                     if (! empty($kmedialist->objects[$i]) && $kmedialist->objects[$i] !== null) {
                         $kmedialist->objects[$i]->mediaType = $mediaTypeAsString[$kmedialist->objects[$i]->mediaType];
-                        $kmedialist->objects[$i]->statusString = $statusAsString[$kmedialist->objects[$i]->status];
                     }
                 }
             }
             $smarty->assign('klist', $kmedialist->objects);
             $smarty->assign('count', $kmedialist->totalCount);
+            $smarty->assign('statusAsString', $statusAsString);
         }
         $smarty->assign('entryType', 'media');
         $smarty->assign('view', $jitRequest->view->alpha());

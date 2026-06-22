@@ -8,7 +8,7 @@
         {/if}
         <tr>
             <th class="text-end">{tr}Status{/tr}</th>
-            <td>{$item->statusString}</td>
+            <td>{$statusAsString[$item->status]}</td>
         </tr>
         <tr>
             <th class="text-end">{tr}Media Id{/tr}</th>
