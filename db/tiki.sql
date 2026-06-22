@@ -194,6 +194,7 @@ CREATE TABLE `tiki_articles` (
   `image_data` longblob,
   `publishDate` int(14) default NULL,
   `created` int(14) default NULL,
+  `lastModif` int default NULL,
   `heading` text,
   `body` text,
   `author` varchar(200) default NULL,
