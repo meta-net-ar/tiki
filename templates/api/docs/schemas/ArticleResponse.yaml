@@ -19,9 +19,6 @@ properties:
     description: Public permalink to the article read page
   lastModif:
     type: integer
-  version:
-    type: string
-    description: Synthetic, content-derived version hash for change detection
   topicId:
     type: integer
     nullable: true

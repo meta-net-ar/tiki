@@ -38,10 +38,6 @@ class Services_Article_Controller
         $lang      = $article['lang'] ?? '';
         $lastModif = (int) ($article['lastModif'] ?? $article['publishDate'] ?? 0);
 
-        // tiki_articles.lastModif is not updated on edit, so we derive a
-        // content-based version hash here to support change detection.
-        $version = substr(md5($title . $heading . $body), 0, 12);
-
         // Public permalink to the article read page.
         $url = $base_url . 'tiki-read_article.php?articleId=' . $articleId;
 
@@ -56,7 +52,6 @@ class Services_Article_Controller
             'lang'        => $lang,
             'url'         => $url,
             'lastModif'   => $lastModif,
-            'version'     => $version,
             'topicId'     => isset($article['topicId']) ? (int) $article['topicId'] : null,
             'topicName'   => $article['topicName'] ?? null,
             'authorName'  => $article['authorName'] ?? ($article['author'] ?? null),
