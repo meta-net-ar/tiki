@@ -5,10 +5,12 @@
 {/block}
 
 {block name="content"}
-    {include 
-        file='calendar_header.tpl'
-        viewlist='listEventView'
-    }
+    {if not $modal and not $preview}
+        {include
+            file='calendar_header.tpl'
+            viewlist='listEventView'
+        }
+    {/if}
 
     {if not $preview}
         <div class="float-end">
