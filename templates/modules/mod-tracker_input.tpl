@@ -110,8 +110,8 @@
                         modeManager.switchTo(newMode);
                         return false;
                     }
-
-                    $("#" + location).val($(container).getMapCenter())
+                    const coords = $(container).getMapCenter();
+                    $("#" + location).val(coords + "," + parseInt(container.map.getView().getZoom()))
                 })
                 .appendTo(form);
 
