@@ -79,10 +79,6 @@
         "    We use version ~8.0 instead of ~9.0 because new version of this uses ",
         "    \"lcobucci/jwt\": >= 5.4 which requires php > 8.2.0 our php version is 8.1 .",
         "",
-        "  pear/xml_parser:",
-        "    This package is abandoned and no longer maintained. No replacement package was suggested. ",
-        "    We use this in lib/wiki/PageParser.php",
-        "",
         "  sentry/sentry: ",
         "    Provides the Sentry namespace",
         "    Used for our Glitchtip integration to catch PHP errors",
@@ -242,7 +238,6 @@
         "openannotation/annotator": ">=1.2.10",
         "pclzip/pclzip": "~2.8",
         "pear/pear": "~1.10",
-        "pear/xml_parser": "~1.3",
         "phpseclib/phpseclib": "~3.0",
         "phpxmlrpc/phpxmlrpc": "~4.11",
         "pragmarx/google2fa": "~9.0",
@@ -434,10 +429,8 @@
                 "laminas/laminas-loader": "Required transitively by laminas/laminas-http but will be solved in 3.0 https://github.com/laminas/laminas-http/pull/110",
                 "laminas/laminas-text":  "Reported as an abandoned package, but it is still required indirectly by laminas/laminas-captcha. See https://github.com/laminas/laminas-captcha/issues/41 to track progress on removing this dependency.",
                 "pear/structures_graph": " Reported as an abandoned package, but it is still required indirectly by pear/pear",
-                "pear/xml_parser": "This package is abandoned and no longer maintained. No replacement package was suggested.",
                 "pear/xml_util": " Reported as an abandoned package, but it is still required indirectly by pear/pear"
-            },
-            "ignore": ["PKSA-5rb8-j658-qvzz"]
+            }
         }
     },
     "autoload": {
