@@ -2274,7 +2274,6 @@ class Services_Tracker_Controller
             'statusTypes' => $trackerId ? $definition->getStatusTypes() : $trklib->status_types(),
             'statusList' => $trackerId ? preg_split('//', $definition->getConfiguration('defaultStatus', 'o'), -1, PREG_SPLIT_NO_EMPTY) : null,
             'sortFields' => $this->getSortFields($definition ?? null),
-            'attachmentAttributes' => $trackerId ? $this->getAttachmentAttributes($definition->getConfiguration('orderAttachments', 'created,filesize,hits')) : [],
             'startDate' => $trackerId ? $this->format($definition->getConfiguration('start'), '%Y-%m-%d') : '',
             'startTime' => $trackerId ? $this->format($definition->getConfiguration('start'), '%H:%M') : '',
             'endDate' => $trackerId ? $this->format($definition->getConfiguration('end'), '%Y-%m-%d') : '',
@@ -2910,32 +2909,6 @@ class Services_Tracker_Controller
         $sorts[-3] = tr('Item ID');
 
         return $sorts;
-    }
-
-    private function getAttachmentAttributes($active)
-    {
-        $active = explode(',', $active);
-
-        $available = [
-            'filename' => tr('Filename'),
-            'created' => tr('Creation date'),
-            'hits' => tr('Views'),
-            'comment' => tr('Comment'),
-            'filesize' => tr('File size'),
-            'version' => tr('Version'),
-            'filetype' => tr('File type'),
-            'longdesc' => tr('Long description'),
-            'user' => tr('User'),
-        ];
-
-        $active = array_intersect(array_keys($available), $active);
-
-        $attributes = array_fill_keys($active, null);
-        foreach ($available as $key => $label) {
-            $attributes[$key] = ['label' => $label, 'selected' => in_array($key, $active)];
-        }
-
-        return $attributes;
     }
 
     private function readDate($input, $prefix)

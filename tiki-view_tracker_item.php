@@ -563,9 +563,6 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["save_return"]) || isset($_REQUE
         } else {
             $error = $ins_fields;
             $cookietab = "2";
-            if ($tracker_info_value('useAttachments') == 'y') {
-                ++$cookietab;
-            }
             if ($tracker_info_value('useComments') == 'y') {
                 ++$cookietab;
             }
@@ -752,77 +749,6 @@ if ($tracker_info_value('useComments') == 'y') {
     }
     $smarty->assign("saveAndComment", $saveAndComment);
 }
-
-if ($tracker_info_value('useAttachments') == 'y') {
-    if (isset($_REQUEST["removeattach"])) {
-        $_REQUEST["show"] = "att";
-    }
-    if (isset($_REQUEST["editattach"])) {
-        $att = $trklib->get_item_attachment($_REQUEST["editattach"]);
-        $smarty->assign("attach_comment", $att['comment']);
-        $smarty->assign("attach_version", $att['version']);
-        $smarty->assign("attach_longdesc", $att['longdesc']);
-        $smarty->assign("attach_file", $att["filename"]);
-        $smarty->assign("attId", $att["attId"]);
-        $_REQUEST["show"] = "att";
-    }
-    if (isset($_REQUEST['attach']) && $tiki_p_attach_trackers == 'y' && isset($_FILES['userfile1'])) {
-        // Process an attachment here
-        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-            $fp = fopen($_FILES['userfile1']['tmp_name'], "rb");
-            $data = '';
-            $fhash = '';
-            if ($prefs['t_use_db'] == 'n') {
-                $fhash = md5($_FILES['userfile1']['name'] . $tikilib->now);
-                $fw = fopen($prefs['t_use_dir'] . $fhash, "wb");
-                if (! $fw) {
-                    Feedback::errorAndDie(tra('Cannot write to this file:') . $fhash, \Laminas\Http\Response::STATUS_CODE_500);
-                }
-            }
-            while (! feof($fp)) {
-                if ($prefs['t_use_db'] == 'n') {
-                    $data = fread($fp, 8192 * 16);
-                    fwrite($fw, $data);
-                } else {
-                    $data .= fread($fp, 8192 * 16);
-                }
-            }
-            fclose($fp);
-            if ($prefs['t_use_db'] == 'n') {
-                fclose($fw);
-                $data = '';
-            }
-            try {
-                if ($prefs['t_use_db'] == 'n') {
-                    $filegallib->assertUploadedFileIsSafe($prefs['t_use_dir'] . $fhash, $_FILES['userfile1']['name']);
-                } else {
-                    $filegallib->assertUploadedContentIsSafe($data, $_FILES['userfile1']['name']);
-                }
-            } catch (Exception $e) {
-                Feedback::errorAndDie($_FILES['userfile1']['name'] . ': ' . $e->getMessage(), \Laminas\Http\Response::STATUS_CODE_500);
-            }
-            $size = $_FILES['userfile1']['size'];
-            $name = $_FILES['userfile1']['name'];
-            $type = $_FILES['userfile1']['type'];
-        } else {
-            Feedback::errorAndDie($_FILES['userfile1']['name'] . ': ' . tra('Upload was not successful') . ': ' . $tikilib->uploaded_file_error($_FILES['userfile1']['error']), \Laminas\Http\Response::STATUS_CODE_500);
-        }
-        $trklib->replace_item_attachment($_REQUEST["attId"], $name, $type, $size, $data, $_REQUEST["attach_comment"], $user, $fhash, $_REQUEST["attach_version"], $_REQUEST["attach_longdesc"], $trackerId, $itemId, $tracker_info);
-        $_REQUEST["attId"] = 0;
-        $_REQUEST['show'] = "att";
-    }
-    // If anything below here is changed, please change lib/wiki-plugins/wikiplugin_attach.php as well.
-    $attextra = 'n';
-    if (str_contains($tracker_info["orderAttachments"], '|')) {
-        $attextra = 'y';
-    }
-    $attfields = explode(',', strtok($tracker_info["orderAttachments"], '|'));
-    $atts = $trklib->list_item_attachments($itemId, 0, -1, 'comment_asc', '');
-    $smarty->assign('atts', $atts["data"]);
-    $smarty->assign('attCount', $atts["count"]);
-    $smarty->assign('attfields', $attfields);
-    $smarty->assign('attextra', $attextra);
-}
 if (isset($_REQUEST['moveto']) && empty($_REQUEST['moveto'])) {
     $trackers = $trklib->list_trackers();
     $smarty->assign_by_ref('trackers', $trackers['data']);
@@ -837,9 +763,6 @@ if (isset($_REQUEST['show'])) {
         $cookietab = 2;
     } elseif ($_REQUEST['show'] == "mod") {
         $cookietab = 2;
-        if ($tracker_info_value('useAttachments') == 'y') {
-            $cookietab++;
-        }
         if ($tracker_info["useComments"] == 'y' && $tiki_p_tracker_view_comments == 'y') {
             $cookietab++;
         }

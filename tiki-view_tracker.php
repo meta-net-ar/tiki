@@ -629,13 +629,6 @@ if (isset($tracker_info['useComments']) && $tracker_info['useComments'] == 'y' &
         }
     }
 }
-if ((isset($tracker_info['useAttachments']) && $tracker_info['useAttachments'] == 'y') && (isset($tracker_info['showAttachments']) && $tracker_info['showAttachments'] == 'y')) {
-    foreach ($items["data"] as $itkey => $oneitem) {
-        $res = $trklib->get_item_nb_attachments($items["data"][$itkey]['itemId']);
-        $items["data"][$itkey]['attachments'] = $res['attachments'];
-        $items["data"][$itkey]['hits'] = $res['hits'];
-    }
-}
 foreach ($fields['data'] as $fd) {  // add field info for searchable fields not shown in the list
     $fid = $fd["fieldId"];
     if ($fd['isSearchable'] == 'y' and ! isset($listfields[$fid]) and $itemObject->canViewField($fid)) {

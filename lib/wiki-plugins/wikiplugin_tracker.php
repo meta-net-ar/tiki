@@ -902,13 +902,6 @@ function wikiplugin_tracker($data, $params)
         $logslib->add_action('Viewed', $itemId, 'trackeritem', $_SERVER['REQUEST_URI']);
     }
 
-    if (isset($_REQUEST['removeattach']) && $tracker['useAttachments'] == 'y') {
-        $owner = $trklib->get_item_attachment_owner($_REQUEST['removeattach']);
-        if ($perms['tiki_p_admin_trackers'] == 'y' || ($user && $user == $owner)) {
-            $trklib->remove_item_attachment($_REQUEST["removeattach"]);
-            unset($_REQUEST['removeattach']);
-        }
-    }
     if (isset($_REQUEST['removeImage']) && ! empty($_REQUEST['trackerId']) && ! empty($_REQUEST['itemId']) && ! empty($_REQUEST['fieldId']) && ! empty($_REQUEST['fieldName'])) {
         $img_field = ['data' => []];
         $img_field['data'][] = ['fieldId' => $_REQUEST['fieldId'], 'type' => 'i', 'name' => $_REQUEST['fieldName'], 'value' => 'blank'];

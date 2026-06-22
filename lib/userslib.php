@@ -5503,15 +5503,6 @@ class UsersLib extends TikiLib
                 'scope' => 'object',
             ],
             [
-                'name' => 'tiki_p_tracker_view_attachments',
-                'description' => tra('Can view tracker item attachments and download them'),
-                'level' => 'registered',
-                'type' => 'trackers',
-                'admin' => false,
-                'prefs' => ['feature_trackers'],
-                'scope' => 'object',
-            ],
-            [
                 'name' => 'tiki_p_comment_tracker_items',
                 'description' => tra('Can post tracker item comments'),
                 'level' => 'registered',

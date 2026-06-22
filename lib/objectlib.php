@@ -439,16 +439,6 @@ class ObjectLib extends TikiLib
                         return 'tiki_p_modify_tracker_items';
                 }
                 // no return
-            case 'trackeritemattachments':
-                switch ($action) {
-                    case 'view':
-                    case 'read':
-                        return 'tiki_p_tracker_view_attachments';
-
-                    case 'edit':
-                        return 'tiki_p_modify_tracker_items';
-                }
-                // no return
             case 'trackeritem_closed':
                 switch ($action) {
                     case 'view':

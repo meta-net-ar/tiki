@@ -194,18 +194,6 @@ class TrackerLib extends TikiLib
         ];
     }
 
-    public function get_item_nb_attachments($itemId)
-    {
-        $attachments = $this->attachments();
-
-        $ret = $attachments->fetchRow(
-            ['hits' => $attachments->sum('hits'), 'attachments' => $attachments->count()],
-            ['itemId' => $itemId]
-        );
-
-        return $ret ? $ret : [];
-    }
-
     public function get_item_nb_comments($itemId)
     {
         return $this->comments()->fetchCount(['object' => (int) $itemId, 'objectType' => 'trackeritem']);
@@ -4091,34 +4079,6 @@ class TrackerLib extends TikiLib
         return $out;
     }
 
-    /*
-    ** function only used for the popup for more infos on attachments
-    *  returns an array with field=>value
-    */
-    public function get_moreinfo($attId)
-    {
-        $query = "select o.`value`, o.`trackerId` from `tiki_tracker_options` o";
-        $query .= " left join `tiki_tracker_items` i on o.`trackerId`=i.`trackerId` ";
-        $query .= " left join `tiki_tracker_item_attachments` a on i.`itemId`=a.`itemId` ";
-        $query .= " where a.`attId`=? and o.`name`=?";
-        $result = $this->query($query, [(int) $attId, 'orderAttachments']);
-        $resu = $result->fetchRow();
-        if ($resu) {
-            $resu['orderAttachments'] = $resu['value'];
-        }
-        if (str_contains($resu['orderAttachments'], '|')) {
-            $fields = preg_split('/,/', substr($resu['orderAttachments'], strpos($resu['orderAttachments'], '|') + 1));
-            $res = $this->attachments()->fetchRow($fields, ['attId' => (int) $attId]);
-            $res["trackerId"] = $resu['trackerId'];
-            $res["longdesc"] = isset($res['longdesc']) ? TikiLib::lib('parser')->parse_data($res['longdesc'], ['objectType' => 'trackeritemattachments',
-            'objectId' => $res["trackerId"], 'fieldName' => 'longdesc']) : '';
-        } else {
-            $res = [tra("Message") => tra("No extra information for that attached file. ")];
-            $res['trackerId'] = 0;
-        }
-        return $res;
-    }
-
     public function field_types()
     {
 
@@ -5586,25 +5546,6 @@ class TrackerLib extends TikiLib
         return $to;
     }
 
-    public function export_attachment($itemId, $archive)
-    {
-        global $prefs;
-        $files = $this->list_item_attachments($itemId, 0, -1, 'attId_asc');
-        foreach ($files['data'] as $file) {
-            $localZip = "item_$itemId/" . $file['filename'];
-            $complete = $this->get_item_attachment($file['attId']);
-            if (! empty($complete['path']) && file_exists($prefs['t_use_dir'] . $complete['path'])) {
-                if (! $archive->addFile($prefs['t_use_dir'] . $complete['path'], $localZip)) {
-                    return false;
-                }
-            } elseif (! empty($complete['data'])) {
-                if (! $archive->addFromString($localZip, $complete['data'])) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
     /* fill a calendar structure with items
      * fieldIds contains one date or 2 dates
      */
@@ -7370,9 +7311,6 @@ class TrackerLib extends TikiLib
             'showComments' => $input->showComments->int() ? 'y' : 'n',
             'showLastComment' => $input->showLastComment->int() ? 'y' : 'n',
             'saveAndComment' => $input->saveAndComment->int() ? 'y' : 'n',
-            'useAttachments' => $input->useAttachments->int() ? 'y' : 'n',
-            'showAttachments' => $input->showAttachments->int() ? 'y' : 'n',
-            'orderAttachments' => (! empty($input->orderAttachments)) ? implode(',', $input->orderAttachments->word()) : '',
             'start' => $input->start->int(),
             'end' => $input->end->int(),
             'autoCreateGroup' => $input->autoCreateGroup->int() ? 'y' : 'n',
