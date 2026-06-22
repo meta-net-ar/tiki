@@ -5,7 +5,7 @@
 import { defaults as defaultControls } from "ol/control";
 
 (function () {
-    var mapNumber = 0,
+    let mapNumber = 0,
         currentProtocol = document.location.protocol,
         errorLayers = [];
 
@@ -14,7 +14,7 @@ import { defaults as defaultControls } from "ol/control";
     }
 
     function getBaseLayers(tiles) {
-        var layers = [],
+        const layers = [],
             factories = {
                 openstreetmap: function () {
                     return new ol.layer.Tile({
@@ -78,7 +78,7 @@ import { defaults as defaultControls } from "ol/control";
                     });
                 },
                 nextzen: function () {
-                    var nextzenRoadStyleCache = {},
+                    const nextzenRoadStyleCache = {},
                         nextzenStyle = function (feature, resolution) {
                             switch (feature.get("layer")) {
                                 case "water":
@@ -100,15 +100,16 @@ import { defaults as defaultControls } from "ol/control";
                                               }),
                                           })
                                         : null;
-                                case "roads":
-                                    var kind = feature.get("kind");
-                                    var railway = feature.get("railway");
-                                    var sort_key = feature.get("sort_key");
-                                    var styleKey = `${kind}/${railway}/${sort_key}`;
-                                    var style = nextzenRoadStyleCache[styleKey];
+                                case "roads": {
+                                    const kind = feature.get("kind"),
+                                        railway = feature.get("railway"),
+                                        sort_key = feature.get("sort_key"),
+                                        styleKey = `${kind}/${railway}/${sort_key}`;
+
+                                    let style = nextzenRoadStyleCache[styleKey];
                                     if (!style) {
-                                        var color;
-                                        var width = 1;
+                                        let color;
+                                        let width = 1;
                                         if (railway || kind === "rail") {
                                             color = "#7a5";
                                         } else if (kind === "major_road") {
@@ -141,6 +142,7 @@ import { defaults as defaultControls } from "ol/control";
                                         nextzenRoadStyleCache[styleKey] = style;
                                     }
                                     return style;
+                                }
                                 default:
                                     return null;
                             }
@@ -175,17 +177,18 @@ import { defaults as defaultControls } from "ol/control";
             tiles.push("openstreetmap");
         }
 
-        var visible = true;
+        let visible = true;
 
         $.each(tiles, function (k, name) {
-            var getLayer = function (name) {
-                var f = factories[name],
-                    layer;
+            const getLayer = function (name) {
+                const f = factories[name];
+                let layer;
+
                 if (f) {
                     layer = f();
                 } else {
                     if (name.match(/stamen_/)) {
-                        var flavor = name.substring(7);
+                        const flavor = name.substring(7);
 
                         layer = new ol.layer.Tile({
                             source: new ol.source.StadiaMaps({
@@ -199,9 +202,10 @@ import { defaults as defaultControls } from "ol/control";
             };
 
             if (typeof name === "object") {
-                var sublayers = [],
+                let sublayers = [],
                     names = [];
-                for (i = 0; i < name.length; i++) {
+
+                for (let i = 0; i < name.length; i++) {
                     sublayers.push(getLayer(name[i]));
                     names.push(name[i]);
                 }
@@ -215,7 +219,7 @@ import { defaults as defaultControls } from "ol/control";
                     })
                 );
             } else {
-                var lyr = getLayer(name);
+                const lyr = getLayer(name);
                 if (lyr) {
                     lyr.set("visible", visible);
                     lyr.set("type", "base");
@@ -234,12 +238,12 @@ import { defaults as defaultControls } from "ol/control";
     }
 
     function parseCoordinates(value) {
-        var matching = value.match(/^(-?[0-9]*(\.[0-9]+)?),(-?[0-9]*(\.[0-9]+)?)(,(.*))?$/);
+        const matching = value.match(/^(-?[0-9]*(\.[0-9]+)?),(-?[0-9]*(\.[0-9]+)?)(,(.*))?$/);
 
         if (matching) {
-            var lat = parseFloat(matching[3]);
-            var lon = parseFloat(matching[1]);
-            var zoom = matching[6] ? parseInt(matching[6], 10) : 0;
+            const lat = parseFloat(matching[3]),
+                lon = parseFloat(matching[1]),
+                zoom = matching[6] ? parseInt(matching[6], 10) : 0;
 
             return { lat: lat, lon: lon, zoom: zoom };
         }
@@ -414,12 +418,13 @@ import { defaults as defaultControls } from "ol/control";
                     if (!container.layers[name]) {
                         // basic feature clustering
                         if ($(container).data("cluster")) {
-                            var distance = $(container).data("cluster"),
+                            const distance = $(container).data("cluster"),
                                 clusterSource = new ol.source.Cluster({
                                     distance: distance,
                                     source: new ol.source.Vector({ wrapX: false }),
-                                }),
-                                clusterFillColor = $(container).data("clusterfillcolor"),
+                                });
+
+                            let clusterFillColor = $(container).data("clusterfillcolor"),
                                 clusterTextColor = $(container).data("clustertextcolor");
 
                             if (clusterFillColor) {
@@ -432,128 +437,128 @@ import { defaults as defaultControls } from "ol/control";
                             } else {
                                 clusterTextColor = [255, 255, 255];
                             }
-                            var styleCache = {},
-                                maxFeatureCount,
-                                /**
-                                 * Calculate size of cluster depending on zoom extent
-                                 * based on https://openlayers.org/en/latest/examples/earthquake-clusters.html
-                                 * @param resolution
-                                 */
-                                calculateClusterInfo = function (resolution) {
-                                    maxFeatureCount = 0;
-                                    var features = vectors.getSource().getFeatures();
-                                    var feature, radius;
-                                    for (var i = features.length - 1; i >= 0; --i) {
-                                        feature = features[i];
-                                        var originalFeatures = feature.get("features");
-                                        var extent = ol.extent.createEmpty();
-                                        var j = void 0,
-                                            jj = void 0;
-                                        for (j = 0, jj = originalFeatures.length; j < jj; ++j) {
-                                            ol.extent.extend(extent, originalFeatures[j].getGeometry().getExtent());
-                                        }
-                                        maxFeatureCount = Math.max(maxFeatureCount, jj);
-                                        radius = (0.4 * (ol.extent.getWidth(extent) + ol.extent.getHeight(extent))) / resolution;
-                                        feature.set("radius", radius);
-                                    }
-                                },
-                                // Get feature color key from coordinates for stable lookup
-                                getFeatureColorKey = function (feature) {
-                                    var geom = feature.getGeometry();
-                                    if (geom && geom.getCoordinates) {
-                                        var coords = geom.getCoordinates();
-                                        if (Array.isArray(coords)) {
-                                            return coords.join(",");
-                                        }
-                                    }
-                                    return null;
-                                },
-                                getFeatureColor = function (feature) {
-                                    // Try feature property first
-                                    var color = feature.get("color");
-                                    if (color) {
-                                        return color;
-                                    }
-                                    // Try coords lookup from container-level storage (set by colorpicker)
-                                    var key = getFeatureColorKey(feature);
-                                    if (key && container.featureColors && container.featureColors[key]) {
-                                        return container.featureColors[key];
-                                    }
-                                    return null;
-                                },
-                                createMarkerStyle = function (feature) {
-                                    // Check for custom color from multiple sources
-                                    var customColor = getFeatureColor(feature);
-                                    if (customColor) {
-                                        return new ol.style.Style({
-                                            geometry: feature.getGeometry(),
-                                            image: new ol.style.Circle({
-                                                radius: 10,
-                                                fill: new ol.style.Fill({ color: customColor }),
-                                                stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
-                                            }),
-                                        });
-                                    }
+                            const styleCache = {};
+                            let maxFeatureCount;
+                            /**
+                             * Calculate size of cluster depending on zoom extent
+                             * based on https://openlayers.org/en/latest/examples/earthquake-clusters.html
+                             * @param resolution
+                             */
+                            const calculateClusterInfo = function (resolution) {
+                                maxFeatureCount = 0;
+                                const features = vectors.getSource().getFeatures();
+                                for (let i = features.length - 1; i >= 0; --i) {
+                                    const feature = features[i],
+                                        originalFeatures = feature.get("features"),
+                                        extent = ol.extent.createEmpty(),
+                                        jj = originalFeatures.length;
 
-                                    if (feature.get("intent") === "marker") {
-                                        return new ol.style.Style({
-                                            geometry: feature.getGeometry(),
-                                            image: new ol.style.Icon({
-                                                anchor: [0.5, 0.8],
-                                                src: feature.get("url"),
-                                            }),
-                                        });
+                                    for (let j = 0; j < jj; ++j) {
+                                        ol.extent.extend(extent, originalFeatures[j].getGeometry().getExtent());
                                     }
-
-                                    // Default style for searchlayer features and other points without explicit intent
+                                    maxFeatureCount = Math.max(maxFeatureCount, jj);
+                                    const radius = (0.4 * (ol.extent.getWidth(extent) + ol.extent.getHeight(extent))) / resolution;
+                                    feature.set("radius", radius);
+                                }
+                            };
+                            // Get feature color key from coordinates for stable lookup
+                            const getFeatureColorKey = function (feature) {
+                                const geom = feature.getGeometry();
+                                if (geom && geom.getCoordinates) {
+                                    const coords = geom.getCoordinates();
+                                    if (Array.isArray(coords)) {
+                                        return coords.join(",");
+                                    }
+                                }
+                                return null;
+                            };
+                            const getFeatureColor = function (feature) {
+                                // Try feature property first
+                                const color = feature.get("color");
+                                if (color) {
+                                    return color;
+                                }
+                                // Try coords lookup from container-level storage (set by colorpicker)
+                                const key = getFeatureColorKey(feature);
+                                if (key && container.featureColors && container.featureColors[key]) {
+                                    return container.featureColors[key];
+                                }
+                                return null;
+                            };
+                            const createMarkerStyle = function (feature) {
+                                // Check for custom color from multiple sources
+                                const customColor = getFeatureColor(feature);
+                                if (customColor) {
                                     return new ol.style.Style({
                                         geometry: feature.getGeometry(),
-                                        image: new ol.style.RegularShape({
-                                            points: 3,
-                                            radius: 12,
-                                            fill: new ol.style.Fill({ color: "#cc3333" }),
-                                            stroke: new ol.style.Stroke({ color: "#ffffff", width: 2 }),
-                                            rotation: 0,
+                                        image: new ol.style.Circle({
+                                            radius: 10,
+                                            fill: new ol.style.Fill({ color: customColor }),
+                                            stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
                                         }),
                                     });
-                                },
-                                invisibleFill = new ol.style.Fill({
-                                    color: "rgba(255, 255, 255, 0.01)",
-                                }),
-                                selectClusterFeaturesStyle = function (feature) {
-                                    var styles = [],
-                                        features = feature.get("features");
+                                }
 
-                                    if (!features && feature) {
-                                        return createMarkerStyle(feature);
-                                    }
+                                if (feature.get("intent") === "marker") {
+                                    return new ol.style.Style({
+                                        geometry: feature.getGeometry(),
+                                        image: new ol.style.Icon({
+                                            anchor: [0.5, 0.8],
+                                            src: feature.get("url"),
+                                        }),
+                                    });
+                                }
 
-                                    if (features.length > 1) {
-                                        styles.push(
-                                            new ol.style.Style({
-                                                image: new ol.style.Circle({
-                                                    radius: feature.get("radius"),
-                                                    fill: invisibleFill,
-                                                }),
-                                            })
-                                        );
-                                    }
-                                    for (var i = features.length - 1; i >= 0; --i) {
-                                        styles.push(createMarkerStyle(features[i]));
-                                    }
-                                    return styles;
-                                };
+                                // Default style for searchlayer features and other points without explicit intent
+                                return new ol.style.Style({
+                                    geometry: feature.getGeometry(),
+                                    image: new ol.style.RegularShape({
+                                        points: 3,
+                                        radius: 12,
+                                        fill: new ol.style.Fill({ color: "#cc3333" }),
+                                        stroke: new ol.style.Stroke({ color: "#ffffff", width: 2 }),
+                                        rotation: 0,
+                                    }),
+                                });
+                            };
+                            const invisibleFill = new ol.style.Fill({
+                                color: "rgba(255, 255, 255, 0.01)",
+                            });
+                            const selectClusterFeaturesStyle = function (feature) {
+                                const styles = [],
+                                    features = feature.get("features");
+
+                                if (!features && feature) {
+                                    return createMarkerStyle(feature);
+                                }
+
+                                if (features.length > 1) {
+                                    styles.push(
+                                        new ol.style.Style({
+                                            image: new ol.style.Circle({
+                                                radius: feature.get("radius"),
+                                                fill: invisibleFill,
+                                            }),
+                                        })
+                                    );
+                                }
+                                for (let i = features.length - 1; i >= 0; --i) {
+                                    styles.push(createMarkerStyle(features[i]));
+                                }
+                                return styles;
+                            };
 
                             vectors = container.layers[name] = new ol.layer.Vector({
                                 source: clusterSource,
                                 title: name,
                                 style: function (feature, resolution) {
-                                    var features = feature.get("features");
+                                    const features = feature.get("features");
+                                    let style;
                                     if (features && features.length > 1) {
                                         calculateClusterInfo(resolution);
 
-                                        var size = features.length,
-                                            style = styleCache[size + " " + maxFeatureCount];
+                                        const size = features.length;
+                                        style = styleCache[size + " " + maxFeatureCount];
 
                                         if (!style) {
                                             style = new ol.style.Style({
@@ -603,7 +608,7 @@ import { defaults as defaultControls } from "ol/control";
                             }
 
                             if ($(container).data("popup-style")) {
-                                var selectionInteraction = new ol.interaction.Select({
+                                const selectionInteraction = new ol.interaction.Select({
                                     style: createMarkerStyle,
                                     layers: [vectors],
                                 });
@@ -635,7 +640,7 @@ import { defaults as defaultControls } from "ol/control";
             };
 
             container.clearLayer = function (name) {
-                var vectors = container.getLayer(name).getSource();
+                const vectors = container.getLayer(name).getSource();
 
                 vectors.getFeatures().forEach((f) => {
                     if ((f && f.get("itemId")) || (f && f.get("type") && f.get("object"))) {
@@ -644,8 +649,8 @@ import { defaults as defaultControls } from "ol/control";
                 });
             };
 
-            var setupHeight = function () {
-                var height = $(container).height();
+            const setupHeight = function () {
+                let height = $(container).height();
                 if (0 === height) {
                     height = ($(container).width() / 4.0) * 3.0;
                 }
@@ -717,10 +722,10 @@ import { defaults as defaultControls } from "ol/control";
             // Set up initial layers
             container.layers = {};
 
-            var tilesets = {},
-                key = "",
-                pos = -1,
-                ts = $(container).data("tilesets") || jqueryTiki.mapTileSets;
+            const tilesets = {};
+            let key = "";
+            let pos = -1;
+            let ts = $(container).data("tilesets") || jqueryTiki.mapTileSets;
             if (ts) {
                 if (typeof ts === "string") {
                     ts = ts.replace(/\s*/g, "").split(",");
@@ -729,13 +734,13 @@ import { defaults as defaultControls } from "ol/control";
                     ts = [ts];
                 }
             }
-            for (var i = 0; i < ts.length; i++) {
+            for (let i = 0; i < ts.length; i++) {
                 pos = ts[i].indexOf("=");
                 if (pos !== -1) {
                     key = ts[i].substr(0, pos);
                     ts[i] = ts[i].substr(pos + 1);
                 } else {
-                    var m = ts[i].match(/\W/);
+                    const m = ts[i].match(/\W/);
                     if (m) {
                         key = ts[i].substr(0, ts[i].indexOf(m[0]));
                     } else {
@@ -751,7 +756,7 @@ import { defaults as defaultControls } from "ol/control";
 
             errorLayers = [];
 
-            var layers = [
+            const layers = [
                 new ol.layer.Group({
                     title: tr("Base Maps"),
                     layers: getBaseLayers(tilesets),
@@ -761,7 +766,7 @@ import { defaults as defaultControls } from "ol/control";
                 }),
             ];
 
-            var map = (container.map = new ol.Map({
+            const map = (container.map = new ol.Map({
                 target: id,
                 controls: controls,
                 view: new ol.View({
@@ -791,7 +796,7 @@ import { defaults as defaultControls } from "ol/control";
             container.resetPosition = function (center) {
                 center = center || [0, 0, 3];
 
-                var view = map.getView();
+                const view = map.getView();
                 view.setCenter(ol.proj.fromLonLat([center.lon, center.lat]));
                 view.setZoom(center.zoom);
             };
@@ -909,7 +914,7 @@ import { defaults as defaultControls } from "ol/control";
 
             container.modeManager.addMode(defaultMode);
 
-            var $mapBootstrapDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
+            const $mapBootstrapDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
 
             /* tooltips */
 
@@ -918,11 +923,10 @@ import { defaults as defaultControls } from "ol/control";
 
                 container.displayFeatureInfo = function (pixel, evt) {
                     $mapBootstrapDummy.tooltip("hide");
-                    var feature,
-                        layer,
-                        both = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
-                            return [feature, layer];
-                        });
+                    let feature, layer;
+                    const both = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+                        return [feature, layer];
+                    });
                     if (!both) {
                         return;
                     }
@@ -939,18 +943,18 @@ import { defaults as defaultControls } from "ol/control";
                         left: pixel[0] + "px",
                         top: pixel[1] - 15 + "px",
                     });
-                    var clusterFeatures = feature.get("features");
+                    const clusterFeatures = feature.get("features");
 
                     if (clusterFeatures) {
                         if ($(container).data("clusterhover") === "none") {
                             feature.set("content", "");
-                            for (var i = 0; i < clusterFeatures.length; i++) {
+                            for (let i = 0; i < clusterFeatures.length; i++) {
                                 feature.set("content", feature.get("content") + clusterFeatures[i].get("content") + "<br>");
                             }
                         } else if (clusterFeatures.length === 1) {
                             feature = clusterFeatures[0];
                         } else if (layer) {
-                            var f = layer.getSource().getSource().getClosestFeatureToCoordinate(evt.coordinate);
+                            const f = layer.getSource().getSource().getClosestFeatureToCoordinate(evt.coordinate);
                             if (f) {
                                 feature = f;
                             }
@@ -987,14 +991,14 @@ import { defaults as defaultControls } from "ol/control";
 
                     if (features.getLength()) {
                         feature = features.item(0);
-                        var clusterFeatures = feature.get("features");
+                        const clusterFeatures = feature.get("features");
                         if (clusterFeatures) {
                             if (clusterFeatures.length === 1) {
                                 feature = clusterFeatures[0];
                             } else {
                                 selectionInteraction.getFeatures().clear();
-                                var extent = ol.extent.createEmpty();
-                                for (var i = 0; i < clusterFeatures.length; ++i) {
+                                const extent = ol.extent.createEmpty();
+                                for (let i = 0; i < clusterFeatures.length; ++i) {
                                     ol.extent.extend(extent, clusterFeatures[i].getGeometry().getExtent());
                                 }
                                 container.map.getView().fit(extent, {
@@ -1021,12 +1025,13 @@ import { defaults as defaultControls } from "ol/control";
                         object = feature.get("object");
 
                     if (!type && !object) {
-                        ((type = "trackeritem"), (object = feature.get("itemId")));
+                        type = "trackeritem";
+                        object = feature.get("itemId");
                     }
 
                     switch ($(container).data("popup-style")) {
-                        case "dialog":
-                            var $modal = $(".footer-modal:not(.show)")
+                        case "dialog": {
+                            const $modal = $(".footer-modal:not(.show)")
                                 .first()
                                 .addClass("modal-lg")
                                 .modal({})
@@ -1043,7 +1048,7 @@ import { defaults as defaultControls } from "ol/control";
                                             event: event,
                                             element: this,
                                             callback: function (event, $html) {
-                                                var title = $html.find("h1").remove().text() || feature.get("content");
+                                                const title = $html.find("h1").remove().text() || feature.get("content");
 
                                                 $html.find("a.service-dialog").on("click", function (event) {
                                                     const $link = $(this);
@@ -1072,6 +1077,7 @@ import { defaults as defaultControls } from "ol/control";
                                 .modal("show");
 
                             break;
+                        }
                         case "popup":
                         default:
                             $mapBootstrapDummy
@@ -1093,9 +1099,9 @@ import { defaults as defaultControls } from "ol/control";
                                             event: event,
                                             element: this,
                                             callback: function (event, $html) {
-                                                var $popover = $(".popover.show").first();
+                                                const $popover = $(".popover.show").first();
                                                 $html.find("a.service-dialog").remove();
-                                                var title = $html.find("h1").remove().text() || feature.get("content");
+                                                const title = $html.find("h1").remove().text() || feature.get("content");
                                                 $(".popover-header", $popover).text(title);
                                                 $(".popover-body", $popover).empty().append($html.children());
                                                 $popover.on("mouseleave", function () {
@@ -1112,7 +1118,7 @@ import { defaults as defaultControls } from "ol/control";
             }
 
             if (layers.length > 0 && -1 !== $.inArray("overview", desiredControls)) {
-                var overview = new ol.control.OverviewMap({ minRatio: 128, maxRatio: 256, maximized: true });
+                const overview = new ol.control.OverviewMap({ minRatio: 128, maxRatio: 256, maximized: true });
                 overview.desiredZoom = function () {
                     return Math.min(Math.max(1, map.getZoom() - 6), 3);
                 };
@@ -1136,12 +1142,12 @@ import { defaults as defaultControls } from "ol/control";
                     this.loadingMarker.push(name);
                     this.actionQueue[name] = [];
 
-                    var img = new Image(),
+                    const img = new Image(),
                         me = this;
                     img.onload = function () {
-                        var width = this.width,
-                            height = this.height,
-                            action;
+                        const width = this.width,
+                            height = this.height;
+                        let action;
                         me.loadedMarker[name] = {
                             intent: "marker",
                             url: src,
@@ -1158,8 +1164,8 @@ import { defaults as defaultControls } from "ol/control";
                     $(img).on("error", function () {
                         // eslint-disable-next-line no-console
                         console.log("Map error loading marker image " + src);
-                        var index = container.markerIcons.loadingMarker.indexOf(src),
-                            action;
+                        const index = container.markerIcons.loadingMarker.indexOf(src);
+                        let action;
                         if (index > -1) {
                             container.markerIcons.loadingMarker.splice(index, 1);
                         }
@@ -1179,19 +1185,18 @@ import { defaults as defaultControls } from "ol/control";
                         this.loadMarker(name, name);
                     }
 
-                    var me = this;
+                    const me = this;
                     this.actionQueue[name].push(function () {
                         me._createMarker(name, lonlat, callback);
                     });
                 },
                 _createMarker: function (name, lonlat, callback) {
                     if (lonlat) {
-                        var properties = $.extend(this.loadedMarker[name] || this.loadedMarker.default, {
-                                geometry: lonlat,
-                            }),
-                            marker;
+                        const properties = $.extend(this.loadedMarker[name] || this.loadedMarker.default, {
+                            geometry: lonlat,
+                        });
 
-                        marker = new ol.Feature(properties);
+                        const marker = new ol.Feature(properties);
                         callback(marker);
                     }
                 },
@@ -1205,7 +1210,7 @@ import { defaults as defaultControls } from "ol/control";
                     .attr("href", "")
                     .on("click", function () {
                         navigator.geolocation.getCurrentPosition(function (position) {
-                            var view = map.getView();
+                            const view = map.getView();
                             view.setCenter(ol.proj.fromLonLat([position.coords.longitude, position.coords.latitude]));
                             view.setZoom(view.getZoomForResolution(position.coords.accuracy));
 
@@ -1227,7 +1232,7 @@ import { defaults as defaultControls } from "ol/control";
             container.searchLocation = $("<a class='btn btn-sm btn-info'>")
                 .attr("href", "")
                 .on("click", function () {
-                    var address = prompt(tr("What address are you looking for?"), "");
+                    const address = prompt(tr("What address are you looking for?"), "");
 
                     $(container).trigger("search", [{ address: address }]);
                     return false;
@@ -1238,8 +1243,8 @@ import { defaults as defaultControls } from "ol/control";
                 $(container).after(container.searchLocation);
             }
 
-            var field = $(container).data("target-field");
-            var central = null,
+            let field = $(container).data("target-field"),
+                central = null,
                 useMarker = true;
 
             if (field) {
@@ -1248,12 +1253,12 @@ import { defaults as defaultControls } from "ol/control";
                 $(container).setupMapSelection({
                     field: field,
                 });
-                var value = field.val();
+                const value = field.val();
                 central = parseCoordinates(value);
 
                 if (central) {
                     // cope with zoom levels greater than what OSM layer[0] can cope with
-                    var geLayer;
+                    let geLayer;
                     if (central.zoom > 19) {
                         geLayer = map.getLayersByName("Google Satellite");
                     } else if (central.zoom > 18) {
@@ -1268,9 +1273,9 @@ import { defaults as defaultControls } from "ol/control";
             }
 
             if ($(container).data("marker-filter")) {
-                var filter = $(container).data("marker-filter");
+                const filter = $(container).data("marker-filter");
                 $(filter).each(function () {
-                    var lat = $(this).data("geo-lat"),
+                    const lat = $(this).data("geo-lat"),
                         lon = $(this).data("geo-lon"),
                         zoom = $(this).data("geo-zoom"),
                         extent = $(this).data("geo-extent"),
@@ -1278,6 +1283,7 @@ import { defaults as defaultControls } from "ol/control";
                         object = $(this).data("object"),
                         type = $(this).data("type"),
                         content = $(this).clone().data({}).wrap("<span/>").parent().html();
+
                     if (!extent) {
                         if ($(this).hasClass("primary") || this.href === document.location.href) {
                             central = { lat: lat, lon: lon, zoom: zoom ? zoom : 0 };
@@ -1292,7 +1298,7 @@ import { defaults as defaultControls } from "ol/control";
                             });
                         }
                     } else if ($(this).is("img")) {
-                        var graphic = new ol.layer.Image(
+                        const graphic = new ol.layer.Image(
                             $(this).attr("alt"),
                             $(this).attr("src"),
                             ol.Bounds.fromString(extent),
@@ -1306,7 +1312,7 @@ import { defaults as defaultControls } from "ol/control";
                 });
             }
 
-            var provided = $(container).data("geo-center");
+            const provided = $(container).data("geo-center");
 
             if (provided && !central) {
                 central = parseCoordinates(provided);
@@ -1347,7 +1353,7 @@ import { defaults as defaultControls } from "ol/control";
                     });
                 }
 
-                var StreetViewHandler = ol.Class(ol.control, {
+                const StreetViewHandler = ol.Class(ol.control, {
                     defaultHandlerOptions: {
                         single: true,
                         double: false,
@@ -1367,12 +1373,11 @@ import { defaults as defaultControls } from "ol/control";
                         );
                     },
                     trigger: function (e) {
-                        var width = 600,
-                            height = 500;
+                        const width = 600,
+                            height = 500,
+                            lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
 
-                        var lonlat = map.getLonLatFromViewPortPx(e.xy).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
-
-                        var canvas = $("<div/>")[0];
+                        const canvas = $("<div/>")[0];
                         $(canvas).appendTo("body");
                         $.openModal({
                             title: tr("Panorama"),
@@ -1381,31 +1386,17 @@ import { defaults as defaultControls } from "ol/control";
                         });
 
                         canvas.getImageUrl = function () {
-                            var pov = canvas.panorama.getPov();
-                            var pos = canvas.panorama.getPosition();
-                            var base =
-                                currentProtocol +
-                                "//maps.googleapis.com/maps/api/streetview?" +
-                                "size=" +
-                                width +
-                                "x" +
-                                height +
-                                "&" +
-                                "location=" +
-                                encodeURIComponent(pos.toUrlValue()) +
-                                "&" +
-                                "heading=" +
-                                encodeURIComponent(pov.heading) +
-                                "&" +
-                                "pitch=" +
-                                encodeURIComponent(pov.pitch) +
-                                "&" +
-                                "sensor=false";
-                            return base;
+                            const pov = canvas.panorama.getPov(),
+                                pos = canvas.panorama.getPosition();
+
+                            return (
+                                `${currentProtocol}//maps.googleapis.com/maps/api/streetview?size=${width}x${height}&location=${encodeURIComponent(pos.toUrlValue())}` +
+                                `&heading=${encodeURIComponent(pov.heading)}&pitch=${encodeURIComponent(pov.pitch)}&sensor=false`
+                            );
                         };
 
                         canvas.getPosition = function () {
-                            var pos = canvas.panorama.getPosition();
+                            const pos = canvas.panorama.getPosition();
 
                             return formatLocation(pos.lat(), pos.lng(), 12);
                         };
@@ -1416,7 +1407,7 @@ import { defaults as defaultControls } from "ol/control";
                             scrollwheel: false,
                             disableDoubleClickZoom: true,
                         });
-                        var timeout = setTimeout(function () {
+                        const timeout = setTimeout(function () {
                             alert(
                                 tr(
                                     "StreetView is not available at this specific point on the map. Zoom in as needed and make sure to click on a blue line."
@@ -1476,7 +1467,7 @@ import { defaults as defaultControls } from "ol/control";
                     .css("display", "block")
                     .attr("href", "")
                     .on("click", function () {
-                        if (container.modeManager.activeMode && container.modeManager.activeMode.name == "StreetView") {
+                        if (container.modeManager.activeMode && container.modeManager.activeMode.name === "StreetView") {
                             container.modeManager.switchTo("Default");
                             $(this).text(tr("Enable StreetView"));
                         } else {
@@ -1507,7 +1498,7 @@ import { defaults as defaultControls } from "ol/control";
                 .off("submit")
                 .on("submit", function () {
                     $(container).trigger("start.map.search");
-                    var form = this;
+                    const form = this;
                     $.post(
                         "tiki-searchindex.php?filter~geo_located=y",
                         $(this).serialize(),
@@ -1537,10 +1528,11 @@ import { defaults as defaultControls } from "ol/control";
                                 if (-1 === $.inArray(layerName, form.autoLayers)) {
                                     form.autoLayers.push(layerName);
                                 }
+                                const layer = container.getLayer(layerName);
+
                                 // check if an object with the same id is already in the layer
                                 if (item.object_id) {
-                                    const layer = container.getLayer(layerName),
-                                        layerFeatures = layer.getSource().getFeatures();
+                                    const layerFeatures = layer.getSource().getFeatures();
 
                                     const there = layerFeatures.find((feature) => {
                                         const subFeatures = feature.get("features");
@@ -1606,7 +1598,7 @@ import { defaults as defaultControls } from "ol/control";
                                     }
 
                                     $.each(features, function (k, feature) {
-                                        var initial;
+                                        let initial;
                                         feature.set("itemId", item.object_id);
                                         feature.set("content", item.title);
                                         if (!feature.get("color")) {
@@ -1628,8 +1620,9 @@ import { defaults as defaultControls } from "ol/control";
                                         initial = wkt.writeFeature(feature) + feature.get("color");
 
                                         feature.executor = delayedExecutor(5000, function () {
-                                            var fields = {},
+                                            const fields = {},
                                                 current = wkt.writeFeature(feature) + feature.get("color");
+
                                             fields[item.geo_feature_field] = format.writeFeature(feature);
 
                                             if (current === initial || layer !== container.vectors) {
@@ -1661,8 +1654,7 @@ import { defaults as defaultControls } from "ol/control";
                                     // load a file containing geometry, set using tracker Files indexGeometry option
 
                                     let format;
-                                    const files = item.geo_file.split(","),
-                                        layer = container.getLayer(layerName);
+                                    const files = item.geo_file.split(",");
 
                                     if (item.geo_file_format === "geojson") {
                                         format = new ol.format.GeoJSON();
@@ -1729,7 +1721,7 @@ import { defaults as defaultControls } from "ol/control";
                 })
                 .each(function () {
                     if ($(this).hasClass("onload")) {
-                        var fm = this,
+                        const fm = this,
                             layerLoadDelay = parseInt($(fm).data("load-delay"), 10);
 
                         if (layerLoadDelay) {
@@ -1741,16 +1733,17 @@ import { defaults as defaultControls } from "ol/control";
                         }
                     }
 
-                    var skip = false;
-                    if ($(this).data("result-refresh")) {
-                        var form = this,
-                            refresh = parseInt($(this).data("result-refresh"), 10) * 1000,
-                            interval;
+                    let skip = false;
+                    const $form = $(this),
+                        refresh = parseInt($(this).data("result-refresh") ?? 0) * 1000;
+
+                    if (refresh) {
+                        let interval;
                         interval = setInterval(function () {
                             if (skip) {
                                 skip = false;
                             } else {
-                                $(form).trigger("submit");
+                                $form.trigger("submit");
                             }
                         }, refresh);
 
@@ -1760,13 +1753,13 @@ import { defaults as defaultControls } from "ol/control";
                     }
 
                     $(container).on("changed", function () {
-                        $(form).trigger("submit");
+                        $form.trigger("submit");
                         skip = true;
                     });
                 });
             $(container).on("search", function (e, data) {
                 function markLocation(lat, lon, bounds) {
-                    var lonlat = ol.proj.fromLonLat([lon, lat]),
+                    const lonlat = ol.proj.fromLonLat([lon, lat]),
                         toViewport = function () {
                             if (bounds) {
                                 map.getView().zoomToExtent(bounds);
@@ -1785,7 +1778,7 @@ import { defaults as defaultControls } from "ol/control";
 
                     if (typeof zoomToFoundLocation != "undefined") {
                         // Center map to the new location and zoom
-                        var zoomFactor = -1;
+                        let zoomFactor = -1;
                         switch (zoomToFoundLocation) {
                             default:
                             case "street":
@@ -1807,7 +1800,7 @@ import { defaults as defaultControls } from "ol/control";
                                 zoomFactor = -1;
                                 break;
                         }
-                        var view = map.getView();
+                        const view = map.getView();
                         if (zoomFactor < 0) {
                             view.setZoom(2); // whole world, more or less
                         } else {
@@ -1823,39 +1816,29 @@ import { defaults as defaultControls } from "ol/control";
                 }
 
                 function markGoogleLocation(result) {
-                    var loc = result.geometry.location,
+                    const loc = result.geometry.location,
                         sw = result.geometry.viewport.getSouthWest(),
                         ne = result.geometry.viewport.getNorthEast(),
-                        osw,
-                        one,
-                        left,
-                        bottom,
-                        right,
-                        top;
-
-                    osw = new ol.proj.fromLonLat([sw.lng(), sw.lat()]);
-                    one = new ol.proj.fromLonLat([ne.lng(), ne.lat()]);
-
-                    left = osw[0];
-                    bottom = osw[1];
-                    right = one[0];
-                    top = one[0];
+                        osw = ol.proj.fromLonLat([sw.lng(), sw.lat()]),
+                        one = ol.proj.fromLonLat([ne.lng(), ne.lat()]),
+                        left = osw[0],
+                        bottom = osw[1],
+                        right = one[0],
+                        top = one[1];
 
                     markLocation(loc.lat(), loc.lng(), [left, bottom, right, top]);
                 }
 
                 function getBounds(bounds) {
-                    var osw, one;
-
-                    osw = new ol.LonLat(bounds.left, bounds.bottom).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
-                    one = new ol.LonLat(bounds.right, bounds.top).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
+                    const osw = new ol.LonLat(bounds.left, bounds.bottom).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326")),
+                        one = new ol.LonLat(bounds.right, bounds.top).transform(map.getProjectionObject(), new ol.proj.Projection("EPSG:4326"));
 
                     return new google.maps.LatLngBounds(new google.maps.LatLng(osw.lat, osw.lon), new google.maps.LatLng(one.lat, one.lon));
                 }
 
                 if (data.address) {
                     if (window.google && google.maps && google.maps.Geocoder) {
-                        var geocoder = new google.maps.Geocoder(),
+                        const geocoder = new google.maps.Geocoder(),
                             loc = $(container).getMapCenter().split(",");
 
                         geocoder.geocode(
@@ -1864,7 +1847,7 @@ import { defaults as defaultControls } from "ol/control";
                                 address: data.address,
                             },
                             function (results, status) {
-                                var $list = $("<ul/>");
+                                const $list = $("<ul/>");
 
                                 if (status === google.maps.GeocoderStatus.OK) {
                                     if (results.length === 1) {
@@ -1872,7 +1855,7 @@ import { defaults as defaultControls } from "ol/control";
                                         return;
                                     } else if (results.length > 0) {
                                         $.each(results, function (k, result) {
-                                            var $link = $("<a href='#'/>");
+                                            const $link = $("<a href='#'/>");
                                             $link.text(result.formatted_address);
                                             $link.on("click", function () {
                                                 markGoogleLocation(result);
@@ -1894,7 +1877,7 @@ import { defaults as defaultControls } from "ol/control";
                             if (data && data.status === "OK") {
                                 markLocation(data.lat, data.lon, 500);
                             } else {
-                                var msg;
+                                let msg;
                                 if (data && data.error) {
                                     msg = data.status + ": " + data.error;
                                 } else {
@@ -1912,9 +1895,9 @@ import { defaults as defaultControls } from "ol/control";
                 const $colorpickerContainer = $(container).find(".map-colorpicker-container");
                 if (!$colorpickerContainer.length) return;
 
-                const colors = $colorpickerContainer.data("colorpicker-colors") || [];
-                const title = $colorpickerContainer.data("colorpicker-title") || tr("Color Picker");
-                const modalId = "mapColorpickerModal-" + id;
+                const colors = $colorpickerContainer.data("colorpicker-colors") || [],
+                    title = $colorpickerContainer.data("colorpicker-title") || tr("Color Picker"),
+                    modalId = "mapColorpickerModal-" + id;
 
                 // Create Bootstrap 5 Modal for colorpicker
                 const swatchesHtml = colors
@@ -1950,9 +1933,9 @@ import { defaults as defaultControls } from "ol/control";
 
                 $(document.body).append(modalHtml);
 
-                const $modal = $("#" + modalId);
-                const $colorInput = $("#colorPickerInput-" + id);
-                const $applyBtn = $("#applyColor-" + id);
+                const $modal = $("#" + modalId),
+                    $colorInput = $("#colorPickerInput-" + id),
+                    $applyBtn = $("#applyColor-" + id);
                 let selectedFeature = null;
 
                 // Store colorpicker config on container
@@ -1961,7 +1944,7 @@ import { defaults as defaultControls } from "ol/control";
                     modal: $modal,
                     show: function (feature) {
                         selectedFeature = feature;
-                        var currentColor = feature.get("color") || "#6699cc";
+                        const currentColor = feature.get("color") || "#6699cc";
                         $colorInput.val(currentColor);
                         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
                     },
@@ -1969,7 +1952,7 @@ import { defaults as defaultControls } from "ol/control";
 
                 // Handle color swatch clicks
                 $modal.on("click", ".color-swatch", function () {
-                    var color = $(this).data("color");
+                    const color = $(this).data("color");
                     $colorInput.val(color);
                     // Highlight selected swatch
                     $modal.find(".color-swatch").css("border-color", "#ccc");
@@ -2128,8 +2111,8 @@ import { defaults as defaultControls } from "ol/control";
 
     $.fn.addMapMarker = function (options) {
         this.each(function () {
-            var container = this,
-                lonlat,
+            const container = this;
+            let lonlat,
                 iconModel = "default";
 
             if (options.unique) {
@@ -2141,7 +2124,7 @@ import { defaults as defaultControls } from "ol/control";
             }
 
             if (options.coordinates) {
-                var parts = options.coordinates.split(",");
+                const parts = options.coordinates.split(",");
                 if (parts.length >= 2) {
                     options.lon = parts[0];
                     options.lat = parts[1];
@@ -2176,11 +2159,10 @@ import { defaults as defaultControls } from "ol/control";
                     })
                 );
 
-                var markerLayer = container.getLayer(options.layer),
-                    markerLayerSource,
-                    initial = writeCoordinates(lonlat.clone(), container.map, true);
+                const markerLayer = container.getLayer(options.layer);
+                let initial = writeCoordinates(lonlat.clone(), container.map, true);
 
-                markerLayerSource = markerLayer.getSource();
+                let markerLayerSource = markerLayer.getSource();
 
                 if (typeof markerLayerSource.getSource === "function") {
                     markerLayerSource = markerLayerSource.getSource(); // Cluster layer source
@@ -2201,7 +2183,7 @@ import { defaults as defaultControls } from "ol/control";
 
                 if (options.type === "trackeritem" && options.object && markerLayer === container.vectors) {
                     feature.executor = delayedExecutor(5000, function () {
-                        var current = writeCoordinates(feature.getGeometry().getCoordinates(), container.map, true);
+                        const current = writeCoordinates(feature.getGeometry().getCoordinates(), container.map, true);
 
                         if (current === initial) {
                             return;
@@ -2340,7 +2322,7 @@ import { defaults as defaultControls } from "ol/control";
                         popupTpl: options.feature.get("popup_tpl"),
                     }),
                     function (data) {
-                        var content = $("<body>").append(data);
+                        const content = $("<body>").append(data);
 
                         content.find(".svgImage").css("text-align", "center").css("margin", "auto");
 
