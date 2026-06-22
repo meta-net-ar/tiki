@@ -12,3 +12,5 @@ properties:
     type: string
   updated_fields:
     type: array
+    items:
+      type: string
