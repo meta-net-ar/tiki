@@ -25459,5 +25459,6 @@ $lang_current = array(
 "Last pages" => "Dernières pages",
 "Admin Icons Dashboard" => "Tableau de bord des icônes d'administration",
 "Select user to switch to" => "Sélectionner l'utilisateur vers lequel basculer",
+"List Models" => "Liste des Modèles",
 );
 $lang = array_replace($lang, $lang_current);
