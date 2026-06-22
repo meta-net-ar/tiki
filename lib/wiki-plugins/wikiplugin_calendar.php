@@ -95,7 +95,7 @@ function wikiplugin_calendar($data, $params)
         $params['viewmode'] = 'month';
     }
     if (empty($params['viewnavbar'])) {
-        $params['viewnavbar'] = 'n';
+        $params['viewnavbar'] = ($params['viewlist'] === 'list' || $params['viewlist'] === 'both') ? 'y' : 'n';
     }
     $pluginCalendarIds = implode(',', $params['calIds']);
 

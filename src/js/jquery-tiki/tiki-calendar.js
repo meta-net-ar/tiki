@@ -106,6 +106,12 @@ $.fn.setupEventCalendar = function (
                 semester: monthRangeContainer.querySelector("#semester"),
             };
         };
+        const removeMonthRangeControls = () => {
+            const monthRangeContainer = calendarEl.querySelector("#month-range-controls");
+            if (monthRangeContainer) {
+                monthRangeContainer.remove();
+            }
+        };
         const setMonthRangeButtonState = (activeButtonId = "one-month") => {
             const { oneMonth, quarter, semester } = getMonthRangeButtons();
             if (!oneMonth || !quarter || !semester) {
@@ -130,6 +136,58 @@ $.fn.setupEventCalendar = function (
             return "one-month";
         };
         let activeMonthRangeSpan = normalizeMonthRangeSpan(eventCalendarParams.initialMonthRangeSpan);
+        const listPeriodOptions = {
+            week: { label: tr("Week"), duration: { weeks: 1 } },
+            month: { label: tr("Month"), duration: { months: 1 } },
+            quarter: { label: tr("Quarter"), duration: { months: 3 } },
+            semester: { label: tr("Semester"), duration: { months: 6 } },
+            year: { label: tr("Year"), duration: { years: 1 } },
+        };
+        const listPeriodNames = Object.keys(listPeriodOptions);
+        const normalizeListPeriod = (period) => (listPeriodNames.includes(period) ? period : "year");
+        let activeListPeriod = normalizeListPeriod(eventCalendarParams.initialListPeriod);
+        const getListPeriodButtons = () => {
+            const listPeriodContainer = calendarEl.querySelector("#list-period-controls");
+            if (!listPeriodContainer) {
+                return {};
+            }
+
+            return listPeriodNames.reduce((buttons, period) => {
+                buttons[period] = listPeriodContainer.querySelector('[data-list-period="' + period + '"]');
+                return buttons;
+            }, {});
+        };
+        const removeListPeriodControls = () => {
+            const listPeriodContainer = calendarEl.querySelector("#list-period-controls");
+            if (listPeriodContainer) {
+                listPeriodContainer.remove();
+            }
+        };
+        const setListPeriodButtonState = (activePeriod = "year") => {
+            const buttons = getListPeriodButtons();
+            listPeriodNames.forEach((period) => {
+                if (buttons[period]) {
+                    buttons[period].classList.toggle("ec-active", period === activePeriod);
+                }
+            });
+        };
+        const applyListPeriod = (period) => {
+            const normalizedPeriod = normalizeListPeriod(period);
+            const selectedPeriod = listPeriodOptions[normalizedPeriod];
+            activeListPeriod = normalizedPeriod;
+            eventCalendarParams.initialListPeriod = normalizedPeriod;
+            if (normalizedPeriod === "year") {
+                const currentDate = moment(calendarContainer[0].getOption("date"));
+                if (currentDate.isValid()) {
+                    calendarContainer[0].setOption("date", currentDate.startOf("year").toDate());
+                }
+            }
+            calendarContainer[0].setOption("duration", { ...selectedPeriod.duration });
+            calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
+                return moment(dayCell).format("D");
+            });
+            setListPeriodButtonState(normalizedPeriod);
+        };
         const formatMonthRangeTitle = (startDate, monthSpan = 1) => {
             const rangeStart = moment(startDate).startOf("month");
             if (!rangeStart.isValid()) {
@@ -207,11 +265,12 @@ $.fn.setupEventCalendar = function (
                 }
                 $(calendarEl).tikiModal();
                 if (currentViewType == "dayGridMonth" || currentViewType == "listMonth") {
+                    removeListPeriodControls();
                     if (!calendarEl.querySelector("#quarter")) {
-                        const ecStart = calendarEl.querySelector(".ec-start");
+                        const ecEnd = calendarEl.querySelector(".ec-end");
                         const buttonMonthView = document.createElement("div");
                         buttonMonthView.id = "month-range-controls";
-                        buttonMonthView.className = "ec-button-group";
+                        buttonMonthView.className = "ec-button-group calendar-period-controls";
                         const quarterText = tr("Quarter");
                         const semesterText = tr("Semester");
                         const oneMonthText = tr("One-Month");
@@ -225,7 +284,7 @@ $.fn.setupEventCalendar = function (
                             '<button class="ec-button" id="semester">' +
                             semesterText +
                             "</button>";
-                        ecStart.appendChild(buttonMonthView);
+                        ecEnd.appendChild(buttonMonthView);
                     }
 
                     const { oneMonth, quarter, semester } = getMonthRangeButtons();
@@ -242,11 +301,32 @@ $.fn.setupEventCalendar = function (
                         semester.dataset.rangeHandlerBound = "1";
                     }
                     applyMonthRange(activeMonthRangeSpan, getMonthRangeButtonId(activeMonthRangeSpan));
-                } else {
-                    const monthRangeContainer = calendarEl.querySelector("#month-range-controls");
-                    if (monthRangeContainer) {
-                        monthRangeContainer.remove();
+                } else if (currentViewType == "listYear") {
+                    removeMonthRangeControls();
+                    if (!calendarEl.querySelector("#list-period-controls")) {
+                        const ecEnd = calendarEl.querySelector(".ec-end");
+                        const listPeriodView = document.createElement("div");
+                        listPeriodView.id = "list-period-controls";
+                        listPeriodView.className = "ec-button-group calendar-period-controls";
+                        listPeriodView.innerHTML = listPeriodNames
+                            .map(function (period) {
+                                return '<button class="ec-button" data-list-period="' + period + '">' + listPeriodOptions[period].label + "</button>";
+                            })
+                            .join("");
+                        ecEnd.appendChild(listPeriodView);
                     }
+
+                    const listPeriodButtons = getListPeriodButtons();
+                    listPeriodNames.forEach((period) => {
+                        if (listPeriodButtons[period] && !listPeriodButtons[period].dataset.periodHandlerBound) {
+                            listPeriodButtons[period].addEventListener("click", () => applyListPeriod(period));
+                            listPeriodButtons[period].dataset.periodHandlerBound = "1";
+                        }
+                    });
+                    applyListPeriod(activeListPeriod);
+                } else {
+                    removeMonthRangeControls();
+                    removeListPeriodControls();
                     if (currentViewType == "timeGridWeek" || currentViewType == "listWeek") {
                         calendarContainer[0].setOption("duration", { days: 7 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
@@ -255,13 +335,6 @@ $.fn.setupEventCalendar = function (
                     }
                     if (currentViewType == "timeGridDay" || currentViewType == "listDay") {
                         calendarContainer[0].setOption("duration", { days: 1 });
-                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
-                            return moment(dayCell).format("D");
-                        });
-                    }
-
-                    if (currentViewType == "listYear") {
-                        calendarContainer[0].setOption("duration", { months: 12 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
