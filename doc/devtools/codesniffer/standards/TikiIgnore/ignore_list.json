@@ -2580,9 +2580,6 @@
         "lib/core/Tracker/Field/WebService.php": {
             "class:Tracker_Field_WebService": true
         },
-        "lib/core/Tracker/Field/File.php": {
-            "class:Tracker_Field_File": true
-        },
         "lib/core/Tracker/Field/Url.php": {
             "class:Tracker_Field_Url": true
         },
@@ -6635,7 +6632,6 @@
         "lib/trackers/trackerlib.php": {
             "TrackerLib::remove_field_images": true,
             "TrackerLib::add_item_attachment_hit": true,
-            "TrackerLib::get_item_attachment_owner": true,
             "TrackerLib::list_item_attachments": true,
             "TrackerLib::get_item_nb_comments": true,
             "TrackerLib::list_all_attachments": true,
@@ -9023,9 +9019,6 @@
         },
         "lib/core/Tracker/Field/WebService.php": {
             "Tracker_Field_WebService": true
-        },
-        "lib/core/Tracker/Field/File.php": {
-            "Tracker_Field_File": true
         },
         "lib/core/Tracker/Field/Url.php": {
             "Tracker_Field_Url": true

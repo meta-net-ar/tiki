@@ -168,11 +168,6 @@ class TrackerLib extends TikiLib
         return true;
     }
 
-    public function get_item_attachment_owner($attId)
-    {
-        return $this->attachments()->fetchOne('user', ['attId' => (int) $attId]);
-    }
-
     public function list_item_attachments($itemId, $offset = 0, $maxRecords = -1, $sort_mode = 'attId_asc', $find = '')
     {
         $attachments = $this->attachments();
@@ -257,13 +252,11 @@ class TrackerLib extends TikiLib
                 $paths = $attachments->fetchColumn('path', ['itemId' => $itemId]);
             }
 
-            $this->query('update `tiki_tracker_item_fields` ttif left join `tiki_tracker_fields` ttf using (`fieldId`) set `value`=? where ttif.`itemId`=? and ttf.`type`=?', ['', (int) $itemId, 'A']);
             $attachments->deleteMultiple(['itemId' => $itemId]);
         } elseif (! empty($attId)) {
             if ($prefs['t_use_db'] === 'n') {
                 $paths = $attachments->fetchColumn('path', ['attId' => (int) $attId]);
             }
-            $this->query('update `tiki_tracker_item_fields` ttif left join `tiki_tracker_fields` ttf using (`fieldId`) set `value`=? where ttif.`value`=? and ttf.`type`=?', ['', (string) $attId, 'A']);
             $attachments->delete(['attId' => (int) $attId]);
         }
         foreach (array_filter($paths) as $path) {
@@ -3052,11 +3045,6 @@ class TrackerLib extends TikiLib
                         ;
                     } elseif ($f['type'] == 'c' && (empty($f['value']) || $f['value'] == 'n')) {
                         $mandatory_fields[] = $f;
-                    } elseif ($f['type'] == 'A' && ! empty($itemId) && empty($f['value'])) {
-                        $val = $this->get_item_value($trackerId, $itemId, $f['fieldId']);
-                        if (empty($val)) {
-                            $mandatory_fields[] = $f;
-                        }
                     } elseif ($f['type'] == 'r' && empty(array_filter((array) $f['value']))) {  // ItemLink - '0' counts as empty
                         $mandatory_fields[] = $f;
                     } elseif (! isset($f['value']) || ! is_array($f['value']) && strlen($f['value']) == 0 || is_array($f['value']) && empty($f['value'])) {
@@ -5520,8 +5508,7 @@ class TrackerLib extends TikiLib
             if (! empty($is_new) && in_array($res['type'], ['u', 'g', 'I']) && ($res['options_array'][0] == 1 || $res['options_array'][0] == 2)) {
                 $res['value'] = ($res['type'] == 'u') ? $user : (($res['type'] == 'g') ? $_SESSION['u_info']['group'] : TikiLib::get_ip_address());
             }
-            if (in_array($res['type'], ['A', 'N'])) {
-                // attachment - image
+            if ($res['type'] == 'N') {
                 continue; //not done yet
             }
             //echo "duplic".$res['fieldId'].' '. $res['value'].'<br>';

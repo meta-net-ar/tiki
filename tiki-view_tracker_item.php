@@ -31,7 +31,6 @@ $inputConfiguration = [
             'count'             => 'int',           //get
             'remove'           => 'int',           //post
             'moveto'           => 'int',           //get
-            'removeattach'     => 'int',           //get
             'print'            => 'bool',          //get
             'pdf'              => 'bool',          //get
             'save'             => 'bool',          //post
@@ -46,14 +45,8 @@ $inputConfiguration = [
             'fieldName'        => 'word',          //post
             'returntracker'    => 'bool',          //post
             'watch'            => 'word',          //post
-            'attach'           => 'word',          //get
-            'attId'            => 'int',           //get
-            'attach_comment'   => 'word',          //get
-            'attach_version'   => 'int',           //get
-            'attach_longdesc'  => 'word',          //get
             'status'           => 'word',          //get
             'conflictoverride' => 'bool',          //get
-            'editattach'       => 'int',           //get
             'vi_tpl'           => 'text',          //get
             'ei_tpl'           => 'text',          //get
             'maxRecords'       => 'int',           //get
@@ -440,13 +433,6 @@ if (! empty($_REQUEST['moveto'])) {
         $access->redirect(filter_out_sefurl('tiki-view_tracker_item.php?itemId=' . $itemId));
     } else {
         Feedback::errorAndDie(tra("Permission denied"), \Laminas\Http\Response::STATUS_CODE_403);
-    }
-}
-if (isset($_REQUEST["removeattach"])) {
-    $owner = $trklib->get_item_attachment_owner($_REQUEST["removeattach"]);
-    if (($user && ($owner == $user)) || ($tiki_p_admin_trackers == 'y')) {
-        $access->checkCsrf(tra('Are you sure you want to remove this attachment?'));
-        $trklib->remove_item_attachment($_REQUEST["removeattach"]);
     }
 }
 if (isset($_REQUEST['print'])) {

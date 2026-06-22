@@ -1149,7 +1149,6 @@ class Services_Tracker_TabularController
         $trackerUtilities = new Services_Tracker_Utilities();
         $types = $trackerUtilities->getFieldTypes();
 
-        unset($types['A']); // Attachment (deprecated)
         unset($types['w']); // Dynamic Items List
         unset($types['h']); // Header
         unset($types['icon']); // Icon
