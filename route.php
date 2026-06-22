@@ -14,8 +14,6 @@
  *
  */
 
-require_once('tiki-setup.php');
-
 // Adding support for an other web server? Check the end of the file
 use Tiki\TikiInit;
 
@@ -252,14 +250,21 @@ function tiki_route($path)
         '|.*|',
         'tiki-index.php',
         function ($parts) {
-            global $prefs;
-            global $tikiroot, $base_url;
+            $cachelib = TikiLib::lib('cache');
+            $prefs = $cachelib->getSerialized('global_preferences');
+            if(empty($prefs)){
+                global $prefs;
+                include_once('lib/setup/prefs.php');
+                initialize_prefs();
+            }
+            global $tikiroot;
             $homePage = $prefs['wikiHomePage'] ?? 'HomePage';
             $homeSlug = TikiLib::lib('wiki')->get_slug_by_page($homePage);
-            $requestSlug = str_replace('+', '-', $parts[0]);
-            if ($requestSlug === $homeSlug) {
-                $redirectTo = $base_url ?? $tikiroot ?? '/';
-                TikiLib::lib('access')->redirect($redirectTo); //default status code is 302, which is what is needed here given that home page might change
+            $variations = TikiLib::lib('slugmanager')->generateSlugsVariations($parts[0]);
+            if (in_array($homeSlug, $variations)){
+                $redirectTo = $prefs['fallbackBaseUrl'] ?? $tikiroot ?? '/';
+                //because tiki setup is not included, this does not work well TikiLib::lib('access')->redirect($redirectTo); //default status code is 302, which is what is needed here given that home page might change
+                header('Location: ' . $redirectTo, true, 302);
                 exit;
             }
             return ['page' => urldecode($parts[0])];
