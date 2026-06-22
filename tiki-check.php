@@ -771,7 +771,7 @@ function getCompatibleVersions($dbEngine = '', $dbVersion = '')
     return $compatibleVersions;
 }
 
-if (file_exists(__DIR__ . '/db/local.php') && file_exists(__DIR__ . '/templates/tiki-check.tpl')) {
+if (file_exists(__DIR__ . '/tiki-setup.php')) {
     $standalone = false;
     require_once(__DIR__ . '/tiki-setup.php');
     // TODO : Proper authentication
@@ -850,7 +850,7 @@ if (file_exists(__DIR__ . '/db/local.php') && file_exists(__DIR__ . '/templates/
                     }
                     $render .= '<td data-th="' . $key2 . ':&nbsp;" style="';
                     if ($iNbCol != count(array_keys($value)) - 1) {
-                        $render .= 'text-align: center;white-space:nowrap;';
+                        $render .= 'white-space:nowrap;';
                     }
                     $render .= '"><span class="';
                     if (! empty($value['fitness_status'])) {
@@ -861,7 +861,7 @@ if (file_exists(__DIR__ . '/db/local.php') && file_exists(__DIR__ . '/templates/
                             case FITNESS_STATUS_BAD:
                             case FITNESS_STATUS_RISKY:
                             case FITNESS_STATUS_INFO:
-                                $render .= "button {$value['fitness_status']}";
+                                $render .= "tiki-check-status {$value['fitness_status']}";
                                 break;
                         }
                     }
@@ -901,7 +901,7 @@ if (file_exists(__DIR__ . '/db/local.php') && file_exists(__DIR__ . '/templates/
                 $render .= '<td> ' . $phpReq . ' </td>';
                 $render .= '<td> ' . $mysqlReq . ' </td>';
                 $render .= '<td> ' . $mariadbReq . ' </td>';
-                $render .= '<td><span class="button ' . $value['fitness_status'] . '">' . $value['fitness'] . '</span> </td>';
+                $render .= '<td><span class="tiki-check-status ' . $value['fitness_status'] . '">' . $value['fitness'] . '</span> </td>';
                 $render .= '<td> ' . $value['message'] . ' </td></tr>';
             }
             $render .= '</tbody></table>';
@@ -4448,19 +4448,44 @@ if (isStandaloneMode()) {
             margin: 10px 100px 10px 100px;
             }
             table { border-collapse: collapse;}
-            .button {
-                border-radius: 3px 3px 3px 3px;
-                font-size: 12.05px;
-                font-weight: bold;
-                padding: 2px 4px 3px;
-                text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-                color: #FFF;
-                text-transform: uppercase;
+            .tiki-check-status {
+                display: inline-block;
+                font-size: 0.75rem;
+                font-weight: 500;
+                line-height: 1.25;
+                padding: 0.12rem 0.5rem;
+                border-radius: 4px;
+                text-align: left;
+                text-transform: none;
+                white-space: nowrap;
+                vertical-align: middle;
+                color: #41464b;
+                background-color: #e2e3e5;
+                border: 1px solid #ced4da;
             }
-            .unsure {background: #f89406;}
-            .bad, .risky { background-color: #bd362f;}
-            .good, .safe { background-color: #5bb75b;}
-            .info {background-color: #2f96b4;}
+            .tiki-check-status.good,
+            .tiki-check-status.safe {
+                color: #0a3622;
+                background-color: #d1e7dd;
+                border-color: #a3cfbb;
+            }
+            .tiki-check-status.bad,
+            .tiki-check-status.unsafe {
+                color: #58151c;
+                background-color: #f8d7da;
+                border-color: #f1aeb5;
+            }
+            .tiki-check-status.unsure,
+            .tiki-check-status.risky {
+                color: #664d03;
+                background-color: #fff3cd;
+                border-color: #ffe69c;
+            }
+            .tiki-check-status.info {
+                color: #055160;
+                background-color: #cff4fc;
+                border-color: #9eeaf9;
+            }
            .sitetitle, h1, h2, h3, h4, h5 {
             font-family: BlinkMacSystemFont,"Segoe UI", Roboto, sans-serif;
            }

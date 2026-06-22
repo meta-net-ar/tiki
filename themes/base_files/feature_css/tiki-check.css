@@ -350,3 +350,57 @@
 .tooltip.bs-tooltip-end .tooltip-arrow::before {
   border-right-color: rgba(0, 0, 0, 0.9) !important;
 }
+
+/* Table status labels */
+.tiki-check-status {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.25;
+    padding: 0.12rem 0.5rem;
+    border-radius: 999px;
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap;
+    color: var(--bs-secondary-text-emphasis, #41464b);
+    background-color: var(--bs-secondary-bg-subtle, #e2e3e5);
+    border: 1px solid var(--bs-secondary-border-subtle, #ced4da);
+}
+
+.tiki-check-status .icon {
+    font-size: 0.7rem;
+    color: inherit;
+}
+
+.tiki-check-status.good,
+.tiki-check-status.safe {
+    color: var(--bs-success-text-emphasis, #0a3622);
+    background-color: var(--bs-success-bg-subtle, #d1e7dd);
+    border-color: var(--bs-success-border-subtle, #a3cfbb);
+}
+
+.tiki-check-status.bad,
+.tiki-check-status.unsafe {
+    color: var(--bs-danger-text-emphasis, #58151c);
+    background-color: var(--bs-danger-bg-subtle, #f8d7da);
+    border-color: var(--bs-danger-border-subtle, #f1aeb5);
+}
+
+.tiki-check-status.unsure,
+.tiki-check-status.risky {
+    color: var(--bs-warning-text-emphasis, #664d03);
+    background-color: var(--bs-warning-bg-subtle, #fff3cd);
+    border-color: var(--bs-warning-border-subtle, #ffe69c);
+}
+
+.tiki-check-status.info {
+    color: var(--bs-info-text-emphasis, #055160);
+    background-color: var(--bs-info-bg-subtle, #cff4fc);
+    border-color: var(--bs-info-border-subtle, #9eeaf9);
+}
+
+.tiki-check-status.unknown {
+    color: var(--bs-secondary-text-emphasis, #41464b);
+    background-color: var(--bs-secondary-bg-subtle, #e2e3e5);
+    border-color: var(--bs-secondary-border-subtle, #ced4da);
+}

@@ -155,7 +155,7 @@ window.showCriticalIssues = function() {
                 <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.value}</td>
                 <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
@@ -194,7 +194,7 @@ window.showCriticalIssues = function() {
                     {$item.mariadb.min}{if $item.mariadb.max && $item.mariadb.max != $item.mariadb.min} - {$item.mariadb.max}{elseif !$item.mariadb.max}+{/if}
                 </td>
                 <td class="text">
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
@@ -230,7 +230,7 @@ window.showCriticalIssues = function() {
                 <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                 <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
@@ -304,8 +304,8 @@ window.showCriticalIssues = function() {
                 {/foreach}
             {else}
                 <td class="text" colspan="2">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -331,8 +331,8 @@ window.showCriticalIssues = function() {
                 {/foreach}
             {else}
                 <td class="text">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -351,8 +351,8 @@ window.showCriticalIssues = function() {
                 {/foreach}
             {else}
                 <td class="text">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -377,8 +377,8 @@ window.showCriticalIssues = function() {
                 {/foreach}
             {else}
                 <td class="text">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -421,8 +421,8 @@ window.showCriticalIssues = function() {
                 </tbody>
             {else}
                 <td class="text">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -465,8 +465,8 @@ window.showCriticalIssues = function() {
                 </tbody>
             {else}
                 <td class="text">
-                    <span class="text-success">
-                        <span class="icon icon-ok fas fa-check-circle "></span> good
+                    <span class="tiki-check-status good">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
                 </td>
             {/if}
@@ -530,7 +530,7 @@ window.showCriticalIssues = function() {
                 <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                 <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
@@ -563,9 +563,13 @@ window.showCriticalIssues = function() {
                         <th class="text">Directory: {$d|escape}</th>
                         <td data-th="{tr}Fitness:{/tr}" class="text">&nbsp;
                             {if $dirsWritable[$k]}
-                                {icon name='ok' iclass='text-success'}
+                                <span class="tiki-check-status good">
+                                    {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
+                                </span>
                             {else}
-                                {icon name='remove' iclass='text-danger'}
+                                <span class="tiki-check-status bad">
+                                    {icon name="{$fmap['bad']['icon']}"}&nbsp;{tr}Bad{/tr}
+                                </span>
                             {/if}
                         </td>
                         <td data-th="{tr}Explanation:{/tr} " >
@@ -602,7 +606,7 @@ window.showCriticalIssues = function() {
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -638,7 +642,7 @@ window.showCriticalIssues = function() {
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -673,7 +677,7 @@ window.showCriticalIssues = function() {
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -722,7 +726,7 @@ window.showCriticalIssues = function() {
                     <th class="text"><span class="only-on-mobile">{tr}Property:{/tr}</span>&nbsp;{$key}</th>
                     <td data-th="{tr}Value:{/tr}" class="text">&nbsp;{$item.setting}</td>
                     <td data-th="{tr}Tiki Fitness:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -755,7 +759,7 @@ window.showCriticalIssues = function() {
             <tr id="Tiki_Security_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                 <th class="text"><span class="only-on-mobile">{tr}Check:{/tr}</span>&nbsp;{$key}</th>
                 <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
@@ -814,7 +818,7 @@ window.showCriticalIssues = function() {
                 <tr>
                     <th class="text">Mime type: {$key}</th>
                     <td data-th="{tr}Tiki Fitness:{/tr} " lass="text">
-                        <span class="text-{$fmap[$item.fitness_status]['class']}">
+                        <span class="tiki-check-status {$item.fitness_status|escape}">
                             {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                         </span>
                     </td>
@@ -914,7 +918,7 @@ window.showCriticalIssues = function() {
                 <tr>
                     <th class="text">{tr}Requirement:{/tr} {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -937,7 +941,7 @@ window.showCriticalIssues = function() {
                 <tr>
                     <th class="text">{tr}Requirement:{/tr} {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -990,7 +994,7 @@ window.showCriticalIssues = function() {
                 <tr id="Tiki_Packages_Composer_{$key|regex_replace:'/[^a-zA-Z0-9]/':'_'}">
                     <th class="text">{tr}Requirement:{/tr} {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
@@ -1019,7 +1023,7 @@ window.showCriticalIssues = function() {
                 <th class="text">{tr}Package name:{/tr} {$item.name}</th>
                 <td data-th="{tr}Version:{/tr}" class="text">&nbsp;{$item.version}</td>
                 <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"} {$item.status}
                     </span>
                 </td>
@@ -1051,7 +1055,7 @@ window.showCriticalIssues = function() {
                 <th class="text">{tr}Requirement:{/tr} {$item.name}</th>
                 <td data-th="{tr}Version:{/tr}" class="text">&nbsp;{$item.version}</td>
                 <td data-th="{tr}Status:{/tr} " data-th="{tr}Version : {/tr}" class="text">
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"} {$item.status}
                     </span>
                 </td>
@@ -1117,14 +1121,14 @@ td > div {
             <th class="text">{tr}{$item.requirement}{/tr}</th>
             <td data-th="{tr}Status:{/tr}" class="text">
                 {if $item.status eq 'js'}
-                    <span class="text-{$fmap['good']['class']} js-good d-none">
-                        {icon name="{$fmap['good']['icon']}"} good
+                    <span class="tiki-check-status good js-good d-none">
+                        {icon name="{$fmap['good']['icon']}"}&nbsp;{tr}Good{/tr}
                     </span>
-                    <span class="text-{$fmap['bad']['class']} js-bad d-none">
-                        {icon name="{$fmap['bad']['icon']}"} bad
+                    <span class="tiki-check-status bad js-bad d-none">
+                        {icon name="{$fmap['bad']['icon']}"}&nbsp;{tr}Bad{/tr}
                     </span>
                 {else}
-                    <span class="text-{$fmap[$item.fitness_status]['class']}">
+                    <span class="tiki-check-status {$item.fitness_status|escape}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"} {$item.status}
                     </span>
                 {/if}
