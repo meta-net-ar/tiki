@@ -163,6 +163,12 @@ import { defaults as defaultControls } from "ol/control";
                         },
                     });
                 },
+                blank: function () {
+                    // Fake layer to hide all tiles
+                    const layer = new ol.layer.Layer({ render(frameState) {} });
+                    layer.set("name", tr("Blank"));
+                    return layer;
+                },
             };
 
         if (tiles.length === 0) {
