@@ -59,7 +59,7 @@
                         {/foreach}
                     </select>
                     {if $option_groups|@count ge '2'}
-                        {if $prefs.elementplus_select neq 'y'}{$ctrlMsg="{tr}Use Ctrl+Click to select multiple options{/tr}<br>"}{/if}
+                        {if $prefs.jquery_select2 neq 'y'}{$ctrlMsg="{tr}Use Ctrl+Click to select multiple options{/tr}<br>"}{/if}
                         {remarksbox type="tip" title="{tr}Tip{/tr}"}{$ctrlMsg}{tr}Selecting multiple groups means that the option will be seen if the user belongs to one of the groups.{/tr}
                             <br>
                         {tr}If the url is ((PageName)), you do not need to put the groups, the option will be displayed only if the page can be displayed.{/tr}{/remarksbox}
