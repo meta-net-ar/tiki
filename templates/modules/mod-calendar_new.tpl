@@ -10,7 +10,10 @@
             </p>
         {/if}
         {if $viewlist eq 'list'}
-            {include file='tiki-calendar_listmode.tpl'}
+            <div class="calendar-list-compact">
+                {include file='tiki-calendar_nav.tpl' module='y'}
+                {include file='tiki-calendar_listmode.tpl'}
+            </div>
         {else}
             <div>
                 {if count($calendars) >= 1 && $viewnavbar eq 'y'}
