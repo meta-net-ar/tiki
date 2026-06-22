@@ -71,7 +71,6 @@
                         });
                     });
                     $baseLayers.trigger("change");
-                    $(`#${$baseLayers.attr('element-plus-ref')}`).trigger("change");
                 };
 
                 refreshLayers();
