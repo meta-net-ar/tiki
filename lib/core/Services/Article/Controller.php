@@ -22,19 +22,7 @@ class Services_Article_Controller
     }
 
     /**
-     * Normalise a raw tiki_articles row into the API response shape.
-     *
-     * The field names are chosen to be self-documenting for general API
-     * consumers, while also covering everything the RAG ingestion (sync.py)
-     * needs per chunk: title, content, lang, url — plus a change-detection
-     * pair (lastModif, version).
-     *
-     * Note on `version`: unlike wiki pages, Tiki articles have no integer
-     * revision counter. To give change-detection a stable signal we derive a
-     * synthetic version from a hash of the content-bearing fields. Combined
-     * with the real `lastModif` timestamp, hash(lastModif . version) changes
-     * whenever either the article is re-saved or its body/title/heading
-     * changes — which is exactly what sync.py diffs on.
+     * Normalise a raw tiki_articles row into a consistent API response shape.
      *
      * @param array $article Raw row as returned by ArtLib
      * @return array
@@ -50,7 +38,8 @@ class Services_Article_Controller
         $lang      = $article['lang'] ?? '';
         $lastModif = (int) ($article['lastModif'] ?? $article['publishDate'] ?? 0);
 
-        // Synthetic, content-derived version (see method docblock).
+        // tiki_articles.lastModif is not updated on edit, so we derive a
+        // content-based version hash here to support change detection.
         $version = substr(md5($title . $heading . $body), 0, 12);
 
         // Public permalink to the article read page.
