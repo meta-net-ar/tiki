@@ -177,7 +177,7 @@ describe("Select", () => {
             ...basicProps,
             options: JSON.stringify([
                 { value: "foo", label: "Foo", group: "Group 1" },
-                { value: "bar", label: "Bar", group: "Group 1" },
+                { value: "bar", label: "Bar", group: "Group 1", disabled: true },
                 { value: "foo 2", label: "Foo 2", group: "Group 2" },
                 { value: "bar 2", label: "Bar 2", group: "Group 2" },
             ]),
