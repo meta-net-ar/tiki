@@ -182,7 +182,7 @@ import { defaults as defaultControls } from "ol/control";
         let visible = true;
 
         $.each(tiles, function (k, name) {
-            const getLayer = function (name) {
+            const getBaseLayer = function (name) {
                 const f = factories[name];
                 let layer;
 
@@ -208,7 +208,7 @@ import { defaults as defaultControls } from "ol/control";
                     names = [];
 
                 for (let i = 0; i < name.length; i++) {
-                    sublayers.push(getLayer(name[i]));
+                    sublayers.push(getBaseLayer(name[i]));
                     names.push(name[i]);
                 }
                 layers.push(
@@ -221,7 +221,7 @@ import { defaults as defaultControls } from "ol/control";
                     })
                 );
             } else {
-                const lyr = getLayer(name);
+                const lyr = getBaseLayer(name);
                 if (lyr) {
                     lyr.set("visible", visible);
                     lyr.set("type", "base");
