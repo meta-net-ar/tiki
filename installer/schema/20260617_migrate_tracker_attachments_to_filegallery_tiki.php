@@ -17,6 +17,10 @@ use Tiki\Installer\Installer;
  * Attachments left behind by tracker items that no longer exist can't be migrated (there
  * is no item left to attach a file to), so those are removed automatically before the check.
  *
+ * Once no attachment data remains, also block on any leftover Attachment (type A) field
+ * definition: nothing removes those automatically, and they are dead weight that should be
+ * removed from their tracker before the upgrade completes.
+ *
  * @param Installer $installer
  * @return bool
  */
@@ -56,6 +60,22 @@ function upgrade_20260617_migrate_tracker_attachments_to_filegallery_tiki(Instal
         echo '  php console.php tracker:convert-attachments <trackerId> <fieldId> [galleryId]' . PHP_EOL;
         echo tr('<fieldId> must be the ID of that "Files" field. Add --preview to check the result first without making any changes.') . PHP_EOL;
         echo tr('Run the database update again once all attachments have been migrated.') . PHP_EOL;
+
+        return false;
+    }
+
+    $fieldsTable = $db->table('tiki_tracker_fields');
+    $deprecatedFields = $fieldsTable->fetchAll(['fieldId', 'trackerId', 'name'], ['type' => 'A']);
+
+    if ($deprecatedFields) {
+        echo tr('Tiki found tracker fields still using the removed deprecated Attachment field type:') . PHP_EOL;
+        foreach ($deprecatedFields as $field) {
+            $trackerInfo = $trklib->get_tracker($field['trackerId']);
+            $trackerName = $trackerInfo['name'] ?? ('#' . $field['trackerId']);
+            echo "  - {$field['name']} (fieldId={$field['fieldId']}) in tracker $trackerName (trackerId={$field['trackerId']})" . PHP_EOL;
+        }
+        echo PHP_EOL;
+        echo tr('These field definitions are no longer usable and must be removed from their tracker (Tracker admin > Fields > select the field(s) > Remove), then run the database update again.') . PHP_EOL;
 
         return false;
     }
