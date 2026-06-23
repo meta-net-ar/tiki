@@ -118,7 +118,8 @@ class ConsoleApplicationBuilder
                 new PluginRefreshRunCommand(),
                 new PatchCommand(),
                 new UpdateCommand(),
-                new DatabaseEngineConvertCommand()
+                new DatabaseEngineConvertCommand(),
+                new TrackerConvertAttachmentsCommand()
                 ],
             ],[
             'condition' => 'checkTikiSetupComplete',
@@ -188,7 +189,6 @@ class ConsoleApplicationBuilder
                 new TrackerExportCommand(),
                 new TrackerImportCommand(),
                 new TrackerRecalcCommand(),
-                new TrackerConvertAttachmentsCommand(),
                 new SitemapGenerateCommand(),
                 new TikiInfoCommand(),
                 new TrackerClearCommand(),
