@@ -65,7 +65,8 @@ function upgrade_20260617_migrate_tracker_attachments_to_filegallery_tiki(Instal
     }
 
     $fieldsTable = $db->table('tiki_tracker_fields');
-    $deprecatedFields = $fieldsTable->fetchAll(['fieldId', 'trackerId', 'name'], ['type' => 'A']);
+    // type comparison must be case-sensitive: lowercase 'a' is the unrelated, still valid TextArea field type
+    $deprecatedFields = $fieldsTable->fetchAll(['fieldId', 'trackerId', 'name'], ['type' => $fieldsTable->exactly('A')]);
 
     if ($deprecatedFields) {
         echo tr('Tiki found tracker fields still using the removed deprecated Attachment field type:') . PHP_EOL;
