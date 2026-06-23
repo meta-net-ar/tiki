@@ -5,6 +5,8 @@
 import { defaults as defaultControls } from "ol/control";
 
 (function () {
+    const defaultVectorColor = "#3399ff";
+
     let mapNumber = 0,
         currentProtocol = document.location.protocol,
         errorLayers = [];
@@ -280,72 +282,89 @@ import { defaults as defaultControls } from "ol/control";
     }
 
     $.fn.createMap = function () {
-        function setFeatureColorStyle(feature, color, fillColor) {
-            let coloredStyle;
-
-            if (!fillColor) {
-                // no fillColor provided, use semi-transparent color
-                const rgba = Array.from(ol.color.asArray(color));
-                fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 2]);
-            }
-
-            const intent = feature.get("intent");
-
-            if (intent === "vectors") {
-                coloredStyle = new ol.style.Style({
-                    fill: new ol.style.Fill({ color: fillColor }),
-                    stroke: new ol.style.Stroke({ color: color, width: 2 }),
-                });
-            } else if (intent === "marker") {
-                coloredStyle = new ol.style.Style({
-                    image: new ol.style.Icon({
-                        anchor: [0.5, 0.8],
-                        src: feature.get("url"),
-                    }),
-                });
-            } else {
-                // Create a colored circle style
-                coloredStyle = new ol.style.Style({
-                    image: new ol.style.Circle({
-                        radius: 12,
-                        fill: new ol.style.Fill({ color: fillColor }),
-                        stroke: new ol.style.Stroke({ color: color, width: 2 }),
-                    }),
-                });
-            }
-            // DIRECTLY set the style on the feature
-            feature.setStyle(coloredStyle);
-            return coloredStyle;
-        }
-
         this.each(function () {
             let id = $(this).attr("id"),
                 container = this,
                 desiredControls;
             let selectionInteraction;
 
-            $(container).css("background", "white");
-
-            // Shared style function for all map features (accessible from both clustered and non-clustered layers)
-            container.createMapFeatureStyle = function (feature) {
-                let color;
-                // Check for custom color from container-level storage (set by colorpicker)
+            // Shared style functions for all map features (accessible from both clustered and non-clustered layers)
+            // Get feature color key from coordinates for stable lookup
+            const getFeatureColorKey = (feature) => {
                 const geom = feature.getGeometry();
                 if (geom && geom.getCoordinates) {
                     const coords = geom.getCoordinates();
                     if (Array.isArray(coords)) {
-                        const key = coords.join(",");
-                        if (container.featureColors && container.featureColors[key]) {
-                            color = container.featureColors[key];
-                        }
+                        return coords.join(",");
                     }
                 }
+                return null;
+            };
 
-                // Check for color on feature property
-                color = color ?? feature.get("color") ?? "#999";
-                let fillColor = feature.get("fillColor");
+            const getFeatureColor = (feature) => {
+                // Try feature property first
+                const color = feature.get("color");
+                if (color) {
+                    return color;
+                }
+                // Try coords lookup from container-level storage (set by colorpicker)
+                const key = getFeatureColorKey(feature);
+                if (key && container.featureColors && container.featureColors[key]) {
+                    return container.featureColors[key];
+                }
+                return defaultVectorColor;
+            };
 
-                return setFeatureColorStyle(feature, color, fillColor);
+            const setFeatureColorStyle = (feature, color, fillColor) => {
+                let coloredStyle;
+
+                if (!color) {
+                    color = getFeatureColor(feature);
+                }
+
+                if (!fillColor) {
+                    fillColor = feature.get("fillColor");
+                }
+
+                if (!fillColor) {
+                    // no fillColor provided, use semi-transparent color
+                    const rgba = Array.from(ol.color.asArray(color));
+                    fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 2]);
+                }
+
+                const intent = feature.get("intent");
+
+                if (intent === "vectors") {
+                    coloredStyle = new ol.style.Style({
+                        fill: new ol.style.Fill({ color: fillColor }),
+                        stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                    });
+                } else if (intent === "marker") {
+                    coloredStyle = new ol.style.Style({
+                        image: new ol.style.Icon({
+                            anchor: [0.5, 0.8],
+                            src: feature.get("url"),
+                        }),
+                    });
+                } else {
+                    // Create a colored circle style
+                    coloredStyle = new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: 12,
+                            fill: new ol.style.Fill({ color: fillColor }),
+                            stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                        }),
+                    });
+                }
+                // DIRECTLY set the style on the feature
+                feature.setStyle(coloredStyle);
+                return coloredStyle;
+            };
+
+            $(container).css("background", "white");
+
+            container.createMapFeatureStyle = function (feature) {
+                return setFeatureColorStyle(feature);
             };
 
             container.setupLayerEvents = function (vectors) {
@@ -400,7 +419,7 @@ import { defaults as defaultControls } from "ol/control";
                     drawInteraction.on("drawend", function (event) {
                         if (event.feature) {
                             if (!event.feature.get("color")) {
-                                event.feature.set("color", "#6699cc");
+                                event.feature.set("color", defaultVectorColor);
                             }
                             if (!event.feature.get("intent")) {
                                 event.feature.set("intent", "vectors");
@@ -461,65 +480,8 @@ import { defaults as defaultControls } from "ol/control";
                                     feature.set("radius", radius);
                                 }
                             };
-                            // Get feature color key from coordinates for stable lookup
-                            const getFeatureColorKey = function (feature) {
-                                const geom = feature.getGeometry();
-                                if (geom && geom.getCoordinates) {
-                                    const coords = geom.getCoordinates();
-                                    if (Array.isArray(coords)) {
-                                        return coords.join(",");
-                                    }
-                                }
-                                return null;
-                            };
-                            const getFeatureColor = function (feature) {
-                                // Try feature property first
-                                const color = feature.get("color");
-                                if (color) {
-                                    return color;
-                                }
-                                // Try coords lookup from container-level storage (set by colorpicker)
-                                const key = getFeatureColorKey(feature);
-                                if (key && container.featureColors && container.featureColors[key]) {
-                                    return container.featureColors[key];
-                                }
-                                return null;
-                            };
                             const createMarkerStyle = function (feature) {
-                                // Check for custom color from multiple sources
-                                const customColor = getFeatureColor(feature);
-                                if (customColor) {
-                                    return new ol.style.Style({
-                                        geometry: feature.getGeometry(),
-                                        image: new ol.style.Circle({
-                                            radius: 10,
-                                            fill: new ol.style.Fill({ color: customColor }),
-                                            stroke: new ol.style.Stroke({ color: "#333", width: 2 }),
-                                        }),
-                                    });
-                                }
-
-                                if (feature.get("intent") === "marker") {
-                                    return new ol.style.Style({
-                                        geometry: feature.getGeometry(),
-                                        image: new ol.style.Icon({
-                                            anchor: [0.5, 0.8],
-                                            src: feature.get("url"),
-                                        }),
-                                    });
-                                }
-
-                                // Default style for searchlayer features and other points without explicit intent
-                                return new ol.style.Style({
-                                    geometry: feature.getGeometry(),
-                                    image: new ol.style.RegularShape({
-                                        points: 3,
-                                        radius: 12,
-                                        fill: new ol.style.Fill({ color: "#cc3333" }),
-                                        stroke: new ol.style.Stroke({ color: "#ffffff", width: 2 }),
-                                        rotation: 0,
-                                    }),
-                                });
+                                return setFeatureColorStyle(feature, getFeatureColor(feature));
                             };
                             const invisibleFill = new ol.style.Fill({
                                 color: "rgba(255, 255, 255, 0.01)",
@@ -584,12 +546,20 @@ import { defaults as defaultControls } from "ol/control";
                                                     }),
                                                 }),
                                             });
-                                            styleCache[size + " " + maxFeatureCount] = style;
+                                            styleCache["c" + size + " " + maxFeatureCount] = style;
                                         }
-                                    } else if (features && features[0]) {
-                                        feature = features[0];
-                                        // Always try to create a style - createMarkerStyle handles custom colors
-                                        style = createMarkerStyle(feature);
+                                    } else {
+                                        // not a cluster group
+                                        if (features && features[0]) {
+                                            feature = features[0];
+                                        }
+                                        style = styleCache["f" + feature.ol_uid];
+
+                                        if (!style) {
+                                            // Always try to create a style - createMarkerStyle handles custom colors
+                                            style = createMarkerStyle(feature);
+                                            styleCache["f" + feature.ol_uid] = style;
+                                        }
                                     }
                                     return style;
                                 },
@@ -619,6 +589,7 @@ import { defaults as defaultControls } from "ol/control";
                                 selectionInteraction.on("select", container.showPopup);
                             }
                         } else {
+                            // not clustered
                             vectors = container.layers[name] = new ol.layer.Vector({
                                 source: new ol.source.Vector({ wrapX: false }),
                                 title: name,
@@ -629,7 +600,6 @@ import { defaults as defaultControls } from "ol/control";
                         vectors.setZIndex(container.map.getLayers().getLength() * 1000);
                         container.setupLayerEvents(vectors);
 
-                        container.layers[name] = vectors;
                         container.overlays.getLayers().push(vectors);
                     }
 
@@ -1502,15 +1472,18 @@ import { defaults as defaultControls } from "ol/control";
                         "tiki-searchindex.php?filter~geo_located=y",
                         $(this).serialize(),
                         function (data) {
+                            if (!data.result) {
+                                return;
+                            }
                             if (!form.autoLayers) {
                                 form.autoLayers = [];
                             }
 
-                            $(form.autoLayers).each(function (k, name) {
+                            form.autoLayers.forEach((name) => {
                                 container.clearLayer(name);
                             });
 
-                            $.each(data.result, function (k, item) {
+                            data.result.forEach((item) => {
                                 let layerName = $(form).data("result-layer"),
                                     suffix = $(form).data("result-suffix");
 
@@ -1601,7 +1574,7 @@ import { defaults as defaultControls } from "ol/control";
                                         feature.set("itemId", item.object_id);
                                         feature.set("content", item.title);
                                         if (!feature.get("color")) {
-                                            feature.set("color", "#6699cc");
+                                            feature.set("color", defaultVectorColor);
                                         }
                                         if (!feature.get("intent")) {
                                             feature.set("intent", "vectors");
@@ -1918,7 +1891,7 @@ import { defaults as defaultControls } from "ol/control";
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="colorPickerInput-${id}" class="form-label">${tr("Select Color")}</label>
-                    <input type="color" class="form-control form-control-color w-100" id="colorPickerInput-${id}" value="#6699cc">
+                    <input type="color" class="form-control form-control-color w-100" id="colorPickerInput-${id}" value=${defaultVectorColor}>
                 </div>
                 <div class="color-swatches d-flex flex-wrap">${swatchesHtml}</div>
             </div>
@@ -1943,7 +1916,7 @@ import { defaults as defaultControls } from "ol/control";
                     modal: $modal,
                     show: function (feature) {
                         selectedFeature = feature;
-                        const currentColor = feature.get("color") || "#6699cc";
+                        const currentColor = feature.get("color") || defaultVectorColor;
                         $colorInput.val(currentColor);
                         bootstrap.Modal.getOrCreateInstance($modal[0]).show();
                     },
@@ -2106,7 +2079,7 @@ import { defaults as defaultControls } from "ol/control";
         });
 
         return this;
-    };
+    };;
 
     $.fn.addMapMarker = function (options) {
         this.each(function () {
