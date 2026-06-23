@@ -421,13 +421,14 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             $sort = TikiLib::lib('trk')->get_default_sort_order($trackerId, true, true);
 
             $template = $this->renderTemplate('trackerinput/itemlink_selector.tpl', $context, [
-                'placeholder' => $placeholder,
-                'status' => $status,
-                'selector_value' => $value,
-                'selector_id' => 'item' . $this->getItemId() . $this->getInsertId(),
-                'format' => $format,
-                'createTrackerItems' => $trackerPerms->create_tracker_items,
-                'sort' => $sort,
+                'placeholder'          => $placeholder,
+                'status'               => $status,
+                'selector_value'       => $value,
+                'selector_id'          => 'item' . $this->getItemId() . $this->getInsertId(),
+                'format'               => $format,
+                'createTrackerItems'   => $trackerPerms->create_tracker_items,
+                'sort'                 => $sort,
+                'selectMultipleValues' => (bool) $this->trackerField->getOption('selectMultipleValues'),
             ]);
 
             return $template;
