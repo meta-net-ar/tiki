@@ -153,18 +153,19 @@ if (str_contains($base_uri, $tikiroot . 'route.php') && ! empty($inclusion)) {
         $base_uri .= '?' . http_build_query($_GET, '', '&');
     }
     global $sections;
-    $section = Sections::getCurrentSection();
-    include_once('tiki-sefurl.php');
-    if (isset($sections[$section]['objectType'])) {
-        $objectType = $sections[$section]['objectType'];
-    } else {
-        $objectType = $section;
-    }
-    if ($objectType === Sections::SECTION_WIKI_PAGE) {
-        $objectType = Sections::SECTION_WIKI;
-    }
 
-    $base_uri = TikiLib::tikiUrlOpt(filter_out_sefurl($base_uri, $objectType));
+    Sections::onSectionChange(function ($section) use ($sections, &$base_uri) {
+        if (isset($sections[$section]['objectType'])) {
+            $objectType = $sections[$section]['objectType'];
+        } else {
+            $objectType = null;
+        }
+        if ($objectType === Sections::SECTION_WIKI_PAGE) {
+            $objectType = Sections::SECTION_WIKI;
+        }
+        include_once('tiki-sefurl.php');
+        $base_uri = TikiLib::tikiUrlOpt(filter_out_sefurl($base_uri, $objectType));
+    });
 }
 
 // SSL options

@@ -25,7 +25,7 @@
             {button _class="mt-2" href=$smarty.capture.href _text='{tr}Calendar View{/tr}' _icon_name='calendar' _type='info'}
         {/if}
     {elseif $viewlist eq 'listEventView'}
-        {button _class="mt-2" href='tiki-calendar.php' _text='{tr}List View{/tr}' _icon_name='list' _type='info'}
+        {button _class="mt-2" href='tiki-calendar.php?viewlist=list' _text='{tr}List View{/tr}' _icon_name='list' _type='info'}
     {else}
         {capture name=href}?viewlist=list{if !empty($smarty.request.todate)}&amp;todate={$smarty.request.todate}{/if}{/capture}
         

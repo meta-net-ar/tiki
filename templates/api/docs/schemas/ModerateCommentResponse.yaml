@@ -1,0 +1,16 @@
+---
+description: Response from moderating a comment (approve, reject, archive, unarchive).
+type: object
+properties:
+  threadId:
+    type: integer
+  type:
+    type: string
+  objectId:
+    oneOf:
+      - type: string
+      - type: integer
+  status:
+    type: string
+  do:
+    type: string

@@ -132,9 +132,13 @@
 
                                         {if $channels[ix].edit_structure == 'y' or $channels[ix].admin_structure == 'y'}
                                             <action>
-                                                <a href="tiki-admin_structures.php?export_tree={$channels[ix].page_ref_id|escape:"url"}">
-                                                    {icon name="structure" _menu_text='y' _menu_icon='y' alt="{tr}Dump tree{/tr}"}
-                                                </a>
+                                                <form action="tiki-admin_structures.php" method="post">
+                                                    {ticket}
+                                                    <input type="hidden" name="export_tree" value="{$channels[ix].page_ref_id|escape}">
+                                                    <button type="submit" class="btn btn-link px-0 pt-0">
+                                                        {icon name="structure" _menu_text='y' _menu_icon='y' alt="{tr}Dump tree{/tr}"}
+                                                    </button>
+                                                </form>
                                             </action>
                                         {/if}
 

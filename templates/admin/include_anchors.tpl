@@ -301,7 +301,7 @@
                                             {/if}
                                             {if $prefs.feature_theme_control eq "y" and $tiki_p_admin eq "y"}
                                                 <a class="dropdown-item" href="tiki-theme_control.php">
-                                                    {icon name=""} <span class="ms-1">{tr}Theme Control{/tr}</span> </a>
+                                                    {icon name="images"} <span class="ms-1">{tr}Theme Control{/tr}</span> </a>
                                             {/if}
                                             {if $tiki_p_admin_toolbars eq "y"}
                                                 <a class="dropdown-item" href="tiki-admin_toolbars.php">

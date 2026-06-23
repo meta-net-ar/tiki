@@ -599,7 +599,7 @@ foreach ($categories as $category) {
             '
             );
         }
-        $desc = '<small class="d-block text-muted">' . smarty_modifier_escape($category['description']) . '</small>';
+        $desc = '<small class="d-block text-muted">' . TikiLib::lib('parser')->parse_data($category['description']) . '</small>';
 
         $treeNodes[] = [
             'id' => $category['categId'],

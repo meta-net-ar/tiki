@@ -753,6 +753,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'daynames'             => $this->daynamesPlural,
             'monthnames'           => $this->monthnames,
             'preview'              => $preview,
+            'modal'                => $input->modal->int(),
             // related tracker items
             'trackerItems'        => ! empty($trackerItems) ? $trackerItems : [],
             // legacy names expected by templates/calendar/view_item.tpl

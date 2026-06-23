@@ -1,0 +1,63 @@
+---
+get:
+  description: Retrieve a single article
+  parameters:
+    - name: articleId
+      in: path
+      description: Article ID
+      required: true
+      schema:
+        type: integer
+  responses:
+    '200':
+      description: article response
+      content:
+        application/json:
+          schema:
+            $ref: schemas-ArticleResponse.yaml
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
+    '404':
+      description: article not found
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
+post:
+  description: Update an existing article
+  parameters:
+    - name: articleId
+      in: path
+      description: Article ID
+      required: true
+      schema:
+        type: integer
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          $ref: schemas-ArticleUpdateRequest.yaml
+  responses:
+    '200':
+      description: article updated response
+      content:
+        application/json:
+          schema:
+            $ref: schemas-ArticleCreateUpdateResponse.yaml
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
+    '404':
+      description: article not found
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

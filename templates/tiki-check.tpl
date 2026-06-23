@@ -929,7 +929,7 @@ setInterval(function() {
         <tbody>
             {foreach from=$trim_server_requirements key=key item=item}
                 <tr>
-                    <th class="text">Requirement: {$key}</th>
+                    <th class="text">{tr}Requirement:{/tr} {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
                     <span class="text-{$fmap[$item.fitness_status]['class']}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
@@ -952,7 +952,7 @@ setInterval(function() {
         <tbody>
             {foreach from=$trim_client_requirements key=key item=item}
                 <tr>
-                    <th class="text">Requirement: {$key}</th>
+                    <th class="text">{tr}Requirement:{/tr} {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
                     <span class="text-{$fmap[$item.fitness_status]['class']}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
@@ -980,7 +980,7 @@ setInterval(function() {
         <tbody>
         {foreach from=$user_encryption_stats key=method item=stats}
             <tr>
-                <th class="text"> Encryption Method: {$method}</th>
+                <th class="text">{tr}Encryption Method:{/tr} {$method}</th>
                 <td data-th="{tr}Encrypted Preferences:{/tr}" class="text">&nbsp;{$stats}</td>
                 <td data-th="{tr}Message:{/tr}" class="text">&nbsp;
                     {if ($method eq 'MCrypt' or $method eq 'OpenSSL') and $stats > 0}
@@ -1005,7 +1005,7 @@ setInterval(function() {
         </tr></thead><tbody>
         {foreach from=$composer_checks key=key item=item}
                 <tr>
-                    <th class="text">Requirement: {$key}</th>
+                    <th class="text">{tr}Requirement:{/tr} {$key}</th>
                     <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
                     <span class="text-{$fmap[$item.fitness_status]['class']}">
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
@@ -1033,7 +1033,7 @@ setInterval(function() {
 </thead><tbody>
         {foreach from=$packages key=key item=item}
             <tr>
-                <th class="text">Package name: {$item.name}</th>
+                <th class="text">{tr}Package name:{/tr} {$item.name}</th>
                 <td data-th="{tr}Version:{/tr}" class="text">&nbsp;{$item.version}</td>
                 <td data-th="{tr}Status:{/tr}" class="text">&nbsp;
                     <span class="text-{$fmap[$item.fitness_status]['class']}">
@@ -1065,7 +1065,7 @@ setInterval(function() {
 </thead><tbody>
         {foreach from=$ocr key=key item=item}
             <tr>
-                <th class="text">Requirement: {$item.name}</th>
+                <th class="text">{tr}Requirement:{/tr} {$item.name}</th>
                 <td data-th="{tr}Version:{/tr}" class="text">&nbsp;{$item.version}</td>
                 <td data-th="{tr}Status:{/tr} " data-th="{tr}Version : {/tr}" class="text">
                     <span class="text-{$fmap[$item.fitness_status]['class']}">
@@ -1154,12 +1154,12 @@ td > div {
 {jq}
 var ws, ws_status_update = function(req, status) {
     document.querySelectorAll('#js-' + req + ' .js-good, #js-' + req + ' .js-bad').forEach(function(el) {
-        el.classList.remove('d-none');
+        el.classList.add('d-none');
     });
     document.querySelectorAll('#js-' + req + ' .js-' + status).forEach(function(el) {
         el.classList.remove('d-none');
     });
-    document.querySelectorAll('#js-' + req + ' td').last().textContent = document.querySelectorAll('#js-' + req + ' td').last().getAttribute('data-message-' + status);
+    $('#js-' + req + ' td').last().text($('#js-' + req + ' td').last().data('message-' + status));
 }
 ws_status_update('connectivity', 'bad');
 ws_status_update('message_exchange', 'bad');

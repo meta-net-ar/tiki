@@ -32,17 +32,18 @@ get:
               email:
                 type: string
               lastSeen:
-                type: integer
+                type: string
+                nullable: true
+                description: Unix timestamp or formatted date string; null if not visible.
               avatarHtml:
                 type: string
               shared_groups:
                 type: string
+              other_user:
+                type: string
+                nullable: true
+              add_friend_button:
+                type: string
+                nullable: true
               friendship:
                 type: array
-                items:
-                  type: object
-                  properties:
-                    type:
-                      type: string
-                    label:
-                      type: string

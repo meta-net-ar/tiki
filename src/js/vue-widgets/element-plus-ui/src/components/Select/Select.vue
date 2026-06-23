@@ -46,6 +46,7 @@ const getOptionsProp = computed(() => {
             group.options.push({
                 label: item.label,
                 value: item.value,
+                disabled: item.disabled,
             });
         } else {
             acc.push({
@@ -53,6 +54,7 @@ const getOptionsProp = computed(() => {
                 options: [{
                     label: item.label,
                     value: item.value,
+                    disabled: item.disabled,
                 }],
             });
         }

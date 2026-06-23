@@ -110,8 +110,10 @@
                                 </h4>
                                 <div class="collapse table-responsive version{$comment.diffInfo[0].version}">
                                     {foreach $comment.diffInfo as $info}
-                                        {if $info.fieldId eq -1}
+                                        {if $info.fieldId eq HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE}
                                             <label>{tr}Status{/tr}</label>: {$info.value} -> {$info.new}
+                                        {elseif !empty($info.isDeletedField)}
+                                            <label>{$info.fieldName}</label>: {$info.value|escape}{if empty($info.newValueUnavailable)} -> {$info.new|escape}{/if}
                                         {else}
                                             <label>{$info.fieldName}</label>
                                             {trackeroutput fieldId=$info.fieldId list_mode='y' history=y process=y oldValue=$info.value value=$info.new diff_style='sidediff'}

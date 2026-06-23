@@ -1,0 +1,101 @@
+---
+description: Full tabular format details (GET /tabulars/{tabularId}).
+type: object
+required:
+  - title
+  - tabularId
+  - trackerId
+  - name
+  - config
+  - odbc_config
+  - api_config
+  - columns
+  - filters
+  - schema
+  - filterCollection
+  - has_odbc
+  - encodings
+properties:
+  title:
+    type: string
+  tabularId:
+    type: integer
+  trackerId:
+    type: integer
+  name:
+    type: string
+  config:
+    type: object
+    required:
+      - simple_headers
+      - import_update
+      - ignore_blanks
+      - import_transaction
+      - bulk_import
+      - skip_unmodified
+      - encoding
+      - format
+      - mapping
+    properties:
+      simple_headers:
+        type: integer
+      import_update:
+        type: integer
+      ignore_blanks:
+        type: integer
+      import_transaction:
+        type: integer
+      bulk_import:
+        type: integer
+      skip_unmodified:
+        type: integer
+      encoding:
+        type: string
+      format:
+        type: string
+      mapping:
+        type: string
+  odbc_config:
+    type: array
+  api_config:
+    type: array
+  columns:
+    type: array
+    items:
+      type: object
+      required:
+        - label
+        - field
+        - mode
+        - displayAlign
+        - isPrimary
+        - isReadOnly
+        - isExportOnly
+        - isUniqueKey
+      properties:
+        label:
+          type: string
+        field:
+          type: string
+        mode:
+          type: string
+        displayAlign:
+          type: string
+        isPrimary:
+          type: boolean
+        isReadOnly:
+          type: boolean
+        isExportOnly:
+          type: boolean
+        isUniqueKey:
+          type: boolean
+  filters:
+    type: array
+  schema:
+    type: array
+  filterCollection:
+    type: array
+  has_odbc:
+    type: boolean
+  encodings:
+    type: array

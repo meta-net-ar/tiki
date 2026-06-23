@@ -273,6 +273,12 @@ class MenuLib extends TikiLib
                 $option['parent'] = $parentId;
             } elseif ($option['type'] === '-') {
                 array_pop($current_parents_branch);
+                // Separator row still needs parent for admin save (data-parent).
+                if ($current_parents_branch) {
+                    $option['parent'] = $current_parents_branch[count($current_parents_branch) - 1];
+                } else {
+                    $option['parent'] = 0;
+                }
             }
 
             $option['type_description'] = $types[$option['type']];

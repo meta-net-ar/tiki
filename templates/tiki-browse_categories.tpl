@@ -2,7 +2,7 @@
 {title}{if $parentId ne 0}{tr}Category:{/tr} {$p_info.name}{else}{tr}Categories{/tr}{/if}{/title}
 
 {if $parentId and $p_info.description}
-    <div class="description form-text">{$p_info.description|escape|nl2br}</div>
+    <div class="description form-text">{$p_info.description|parse}</div>
 {/if}
 <div class="mb-3 mx-0 t_navbar">
     {button href="tiki-edit_categories.php" _type="link" _text="{tr}Categorize Objects{/tr}" _icon_name="structure" _title="{tr}Categorize Objects{/tr}"}

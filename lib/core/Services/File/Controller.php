@@ -141,7 +141,7 @@ class Services_File_Controller
         }
         if (isset($_FILES['data'])) {
             // used by $this->action_upload_multiple and file gallery Files fields (possibly others)
-            if (is_uploaded_file($_FILES['data']['tmp_name'])) {
+            if (is_uploaded_file($_FILES['data']['tmp_name']) || is_file($_FILES['data']['tmp_name'])) {
                 $_SESSION['lastUploadGalleryId'] = $gal_info["galleryId"];
                 $file = new JitFilter($_FILES['data']);
                 $name = $file->name->text();
@@ -584,12 +584,17 @@ class Services_File_Controller
     {
         $id = $input->id->int();
         $galleryId = $input->galleryId->int() ?: 0;
-        $recurse = $input->recurse ?: true;
+        $recurse = isset($input['recurse']) ? (bool) $input->recurse->int() : true;
 
         $perms = Perms::get('file gallery', $galleryId);
 
         if (! $perms->admin_file_galleries) {
             throw new Services_Exception_Denied();
+        }
+
+        $info = TikiLib::lib('filegal')->get_file_gallery_info($id);
+        if (! $info) {
+            throw new Services_Exception_NotFound();
         }
 
         $fileGallery = TikiLib::lib('filegal');
@@ -648,7 +653,12 @@ class Services_File_Controller
 
         $fileGallery = TikiLib::lib('filegal');
 
-        return $fileGallery->get_file_gallery_info($galleryId);
+        $galleryInfo = $fileGallery->get_file_gallery_info($galleryId);
+        if (! $galleryInfo) {
+            throw new Services_Exception_NotFound();
+        }
+
+        return $galleryInfo;
     }
 
     public function action_list_files($input)
@@ -668,6 +678,9 @@ class Services_File_Controller
         $fileGallery = TikiLib::lib('filegal');
 
         $result = $fileGallery->list_files($offset, $maxRecords, $sort_mode, $find, $galleryId);
+        if (! $result['data']) {
+            throw new Services_Exception_NotFound();
+        }
 
         return [
             'title' => tr('List files'),
@@ -791,8 +804,11 @@ class Services_File_Controller
         $fileGallery = TikiLib::lib('filegal');
         $moved = $fileGallery->move_file_gallery($galleryId, $new_parent_id);
 
+        // $moved returns a Tiki\TikiDb\PdoResult, so we need to check numrows.
+        $moved = $moved && $moved->numrows ?? false;
+
         if (! $moved) {
-            $msg = tr('An error occured while moving the file gallery: %0', $galleryId);
+            throw new Services_Exception_NotFound();
         } else {
             $msg = tr('The file gallery %0 has been moved', $galleryId);
         }
@@ -825,6 +841,11 @@ class Services_File_Controller
             }
         }
 
+        $fileInfo = $fileGallery->get_file_info($fileId);
+        if (! $fileInfo) {
+            throw new Services_Exception_NotFound();
+        }
+
         $newFileId = $fileGallery->duplicate_file($fileId, $galleryId, $newName, $description);
 
         return [
@@ -855,6 +876,11 @@ class Services_File_Controller
         }
 
         $fileGallery = TikiLib::lib('filegal');
+        $galleryInfo = $fileGallery->get_file_gallery_info($galleryId);
+        if (! $galleryInfo) {
+            throw new Services_Exception_NotFound();
+        }
+
         $newGalleryId = $fileGallery->duplicate_file_gallery($galleryId, $name, $description);
 
         return [
@@ -868,6 +894,10 @@ class Services_File_Controller
     {
         global $user;
         $fileIDs = $input->asArray('items');
+
+        if (empty($fileIDs)) {
+            throw new Services_Exception_MissingValue('items');
+        }
 
         $fileGallery = TikiLib::lib('filegal');
         $result = [];
@@ -893,6 +923,10 @@ class Services_File_Controller
     public function action_unlock_files($input)
     {
         $fileIDs = $input->asArray('items');
+
+        if (empty($fileIDs)) {
+            throw new Services_Exception_MissingValue('items');
+        }
 
         $fileGallery = TikiLib::lib('filegal');
         $result = [];

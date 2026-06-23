@@ -36,20 +36,27 @@ get:
           schema:
             type: object
             properties:
+              title:
+                type: string
+                description: Human-readable label for the comment section (e.g. the object title).
               comments:
                 type: array
                 items:
                   $ref: schemas-Comment.yaml
               type:
                 type: string
+                description: Object type (e.g. 'wiki page', 'file gallery').
               objectId:
                 type: string
+                description: Object identifier (page name for wiki pages, numeric ID for other types).
               parentId:
                 type: integer
+                nullable: true
               count:
                 type: integer
               offset:
                 type: integer
+                nullable: true
               maxRecords:
                 type: integer
               sortMode:
@@ -113,7 +120,7 @@ post:
               description: Anonymous user name
             anonymous_email:
               type: string
-              decrption: Anonymous user email
+              description: Anonymous user email
             anonymous_website:
               type: string
               description: Anonymous user website

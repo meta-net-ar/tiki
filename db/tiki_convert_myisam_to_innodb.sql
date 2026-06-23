@@ -169,7 +169,6 @@ ALTER TABLE `tiki_rss_modules` ENGINE=InnoDB;
 ALTER TABLE `tiki_schema` ENGINE=InnoDB;
 ALTER TABLE `tiki_score` ENGINE=InnoDB;
 ALTER TABLE `tiki_search_stats` ENGINE=InnoDB;
-ALTER TABLE `tiki_secdb` ENGINE=InnoDB;
 ALTER TABLE `tiki_sefurl_regex_out` ENGINE=InnoDB;
 ALTER TABLE `tiki_semantic_tokens` ENGINE=InnoDB;
 ALTER TABLE `tiki_semaphores` ENGINE=InnoDB;

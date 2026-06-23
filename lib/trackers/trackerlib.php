@@ -3150,6 +3150,9 @@ class TrackerLib extends TikiLib
     {
         global $user;
         $res = $this->items()->fetchFullRow(['itemId' => (int) $itemId]);
+        if (! $res) {
+            return false;
+        }
         $trackerId = $res['trackerId'];
         $status = $res['status'];
 
@@ -3295,7 +3298,6 @@ class TrackerLib extends TikiLib
                 'trackerId' => $trackerId,
                 'user' => $GLOBALS['user'],
                 'values' => $itemInfo,
-                'index_handled' => true,
                 'action' => 'delete',
             ]
         );
@@ -5323,6 +5325,13 @@ class TrackerLib extends TikiLib
         if (! empty($item_info['itemId'])) {
             $mid[] = 'ttifl.`itemId`=?';
             $bindvars[] = $item_info['itemId'];
+            if (! array_key_exists('status', $item_info) || empty($item_info['trackerId'])) {
+                $itemRow = $this->items()->fetchRow(['trackerId', 'status'], ['itemId' => $item_info['itemId']]);
+                if ($itemRow) {
+                    $item_info['trackerId'] = $item_info['trackerId'] ?? $itemRow['trackerId'];
+                    $item_info['status'] = $item_info['status'] ?? $itemRow['status'];
+                }
+            }
             if ($prefs['feature_categories'] == 'y') {
                 $categlib = TikiLib::lib('categ');
                 $item_categs = $categlib->get_object_categories('trackeritem', $item_info['itemId']);
@@ -5388,6 +5397,8 @@ class TrackerLib extends TikiLib
         }
 
         $itemObject = Tracker_Item::fromId($item_info['itemId']);
+        $trackerDefinition = ! empty($item_info['trackerId']) ? Tracker_Definition::get($item_info['trackerId']) : false;
+        $trackerFields = $trackerDefinition ? $trackerDefinition->getFieldsIdKeys() : [];
 
         $query = 'SELECT ttifl.`version`, ttifl.`fieldId`, ttifl.`value`, ta.`user`, ta.`lastModif` ' .
                     'FROM `tiki_tracker_item_field_logs` ttifl ' .
@@ -5400,16 +5411,34 @@ class TrackerLib extends TikiLib
         }
         $history['data'] = [];
         foreach ($all as $hist) {
-            $hist['new'] = $last[$hist['fieldId']] ?? '';
+            $historyFieldId = (int) $hist['fieldId'];
+            $hasNewValue = array_key_exists($historyFieldId, $last);
+            $hist['new'] = $hasNewValue ? $last[$historyFieldId] : '';
             if ($hist['new'] == $hist['value']) {
                 continue;
             }
-            $last[$hist['fieldId']] = $hist['value'];
-            if (! $itemObject->canViewField($hist['fieldId'])) {
+            $last[$historyFieldId] = $hist['value'];
+            $isStatusHistory = $historyFieldId === HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE;
+            $isDeletedFieldHistory = ! $isStatusHistory && ! isset($trackerFields[$historyFieldId]);
+            if ($isDeletedFieldHistory && ! $hasNewValue) {
+                $hist['newValueUnavailable'] = true;
+            }
+            $canViewHistory = ($isStatusHistory || $isDeletedFieldHistory)
+                ? $itemObject->canView()
+                : $itemObject->canViewField($historyFieldId);
+            if (! $canViewHistory) {
                 continue;
             }
             if (! empty($filter['version']) && $filter['version'] != $hist['version']) {
                 continue;
+            }
+            if ($isStatusHistory) {
+                $hist['fieldName'] = tr('Status');
+            } elseif ($isDeletedFieldHistory) {
+                $hist['fieldName'] = tr('(Deleted field)');
+                $hist['isDeletedField'] = true;
+            } else {
+                $hist['fieldName'] = $trackerFields[$historyFieldId]['name'];
             }
             $history['data'][] = $hist;
         }

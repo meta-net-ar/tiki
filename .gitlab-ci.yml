@@ -68,23 +68,6 @@ workflow:
     # THIS WILL TRIGGER PIPELINES FOR MERGE REQUESTS AND SCHEDULES, AND PUSHES ON VERSION BRANCHES LIKE 21.x. 18.x
     - when: always
 
-# 🛠️ Reusable script anchor to calculate modified assets dynamically
-.calculate_affected_files: &calculate_affected_files
-  - |
-    if [ -n "$CI_MERGE_REQUEST_DIFF_BASE_SHA" ]; then
-      echo "Merge Request detected. Using GitLab's native diff baseline: $CI_MERGE_REQUEST_DIFF_BASE_SHA"
-      BASE_COMMIT="$CI_MERGE_REQUEST_DIFF_BASE_SHA"
-    else
-      echo "Standard branch push or schedule detected. Falling back to parent commit baseline."
-      BASE_COMMIT="HEAD~1"
-    fi
-    
-    AFFECTED_FILES="$(git diff --name-only --diff-filter=d "$BASE_COMMIT" HEAD || true)"
-
-    PHP_FILES="$(printf '%s\n' "$AFFECTED_FILES" | grep -E '\.php$' || true)"
-    JS_FILES="$(printf '%s\n' "$AFFECTED_FILES" | grep -E '\.js$' || true)"
-    TPL_FILES="$(printf '%s\n' "$AFFECTED_FILES" | grep -E '\.tpl$' || true)"
-
 #Inspired from https://dev.to/drakulavich/gitlab-ci-cache-and-artifacts-explained-by-example-2opi
 
 # Define a hidden job to be used with extends
@@ -161,10 +144,6 @@ composer-ext-check:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/composer.json"
-        - "**/composer.lock"
   script:
     - php doc/devtools/check_composer_extensions.php
 
@@ -220,17 +199,8 @@ phpcs:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-      - "**/*.php"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$PHP_FILES" ]; then
-        echo "$PHP_FILES" | xargs php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs --cache=phpcs.cache -s --runtime-set ignore_warnings_on_exit true --parallel=8
-      else
-        echo "✅ No target modifications identified."
-      fi
+    - php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs --cache=phpcs.cache -s --runtime-set ignore_warnings_on_exit true --parallel=8
   cache:
     - key:
         prefix: "phpcs"
@@ -246,17 +216,8 @@ phplint:
   image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
   needs:
     - composer
-  rules:
-    - changes:
-      - "**/*.php"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$PHP_FILES" ]; then
-        echo "$PHP_FILES" | xargs php vendor_bundled/vendor/overtrue/phplint/bin/phplint --no-interaction --no-cache
-      else
-        echo "✅ No targeted line changes."
-      fi
+    - php vendor_bundled/vendor/overtrue/phplint/bin/phplint --no-interaction --no-cache
   # No point in using cache, on fast hardware it's almost as fast to compute as it is to verify the cache - benoitg - 2026-01-26
   parallel:
     matrix:
@@ -267,32 +228,14 @@ smarty-lint:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-      - "**/*.tpl"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$TPL_FILES" ]; then
-        echo "$TPL_FILES" | xargs php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
-      else
-        echo "✅ No Smarty template changed ."
-      fi
+    - php vendor_bundled/vendor/smarty/smarty-lint/smartyl -p --files=lib/test,templates,themes --rules=doc/devtools/smartyl.rules.xml
 
 smarty-syntax-check:
   stage: code-quality
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-       - "**/*.tpl"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$TPL_FILES" ]; then
-        printf '%s\n' "$TPL_FILES" | xargs php doc/devtools/check_smarty_syntax.php
-      else
-        echo "✅ No affected Smarty templates."
-      fi
+    - php doc/devtools/check_smarty_syntax.php
 
 eslint:
   stage: code-quality
@@ -301,25 +244,13 @@ eslint:
   image:
     name: ${DEPENDENCY_PROXY_PREFIX}${NODE_IMAGE}
     #entrypoint: ["/bin/sh", "-c"]
-  rules:
-    - changes:
-        - "**/*.js"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$JS_FILES" ]; then
-        printf '%s\n' "$JS_FILES" | xargs npx eslint
-      else
-        echo "✅ No affected js file."
-      fi
+    - npx eslint .
 
 shlint:
   stage: code-quality
   needs: []
   image: koalaman/shellcheck-alpine:latest
-  rules:
-    - changes:
-        - "**/*.sh"
   script:
     - shellcheck ./*.sh
     - shellcheck ./doc/devtools/*.sh
@@ -329,35 +260,20 @@ check-bom-encoding:
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$AFFECTED_FILES" ]; then
-        echo "$AFFECTED_FILES" | xargs php doc/devtools/check_bom_encoding.php
-      else
-        echo "✅ Change index clean."
-      fi
+    - php doc/devtools/check_bom_encoding.php
 
 unix-ending-line:
   stage: code-quality
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$AFFECTED_FILES" ]; then
-        echo "$AFFECTED_FILES" | xargs php doc/devtools/check_unix_ending_line.php
-      else
-        echo "✅ Change index clean."
-      fi
+    - php doc/devtools/check_unix_ending_line.php
 
 translation-standards:
   stage: code-quality
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "templates/**/*.tpl"
   script:
     - php doc/devtools/check_template_translation_standards.php --all
 
@@ -366,9 +282,6 @@ phpstan:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/*.php"
   script:
     - php bin/phpstan --configuration=phpstan-tikiCi.neon
   cache:
@@ -382,18 +295,8 @@ rector:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/*.php"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$PHP_FILES" ]; then
-       # If rector had changed any files, it will return a non-zero code
-        echo "$PHP_FILES" | xargs php bin/rector process --dry-run
-      else
-        echo "✅ Transform tree evaluation bypassed."
-      fi
+    - php bin/rector process --dry-run
 
   cache:
     - key:
@@ -418,11 +321,6 @@ sql-engine:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/*.sql"
-        - "installer/**/*"
-        - "db/**/*"
   script:
     - php -d display_errors=On doc/devtools/check_sql_engine.php
 
@@ -430,11 +328,6 @@ schema-sql-drop:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/*.sql"
-        - "installer/**/*"
-        - "db/**/*"
   script:
     - php -d display_errors=On doc/devtools/check_schema_sql_drop.php
 
@@ -442,11 +335,6 @@ schema-naming-convention:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/*.sql"
-        - "installer/**/*"
-        - "db/**/*"
   script:
     - php -d display_errors=On doc/devtools/check_schema_naming_convention.php
 
@@ -461,17 +349,8 @@ check-security-static:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/*.php"
   script:
-    - *calculate_affected_files
-    - |
-      if [ -n "$PHP_FILES" ]; then
-        printf '%s\n' "$PHP_FILES" | xargs php -d display_errors=On doc/devtools/securitycheck.php
-      else
-        echo "✅ No affected PHP files."
-      fi
+    - php -d display_errors=On doc/devtools/securitycheck.php
 
 translation:
   stage: tiki-check
@@ -497,10 +376,6 @@ composer-validates:
   stage: tiki-check
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/composer.json"
-        - "**/composer.lock"
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer validate -d vendor_bundled --no-check-all
@@ -514,10 +389,6 @@ composer-could-update-lock:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/composer.json"
-        - "**/composer.lock"
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer update -d vendor_bundled --dry-run
@@ -531,10 +402,6 @@ composer-could-update-lock:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/composer.json"
-        - "**/composer.lock"
   script:
     - cp $(command -v composer) temp/composer.phar
     - php temp/composer.phar -V | grep "version 2" || php temp/composer.phar self-update --2
@@ -562,11 +429,6 @@ composer-could-update-lock:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/*.php"
-        - "**/composer.lock"
-        - "**/*.sql"
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
       alias: mysql,
@@ -660,11 +522,6 @@ sql-engine-conversion:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  rules:
-    - changes:
-        - "**/*.sql"
-        - "installer/**/*"
-        - "**/composer.lock"
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_IMAGE_NEWEST_SUPPORTED}
       alias: mysql
@@ -732,7 +589,7 @@ console-php-works:
     - 'echo -n "ElasticSearch Version: " && curl -sS -XGET ''http://elasticsearch:9200'' | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
     - 'echo -n "Manticore Version: " && mysql -h manticore -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
     - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
-    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --display-deprecations --display-notices --display-warnings
+    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --exclude-group api-integration-test --display-deprecations --display-notices --display-warnings
   artifacts:
     when: always
     paths:
@@ -744,11 +601,6 @@ console-php-works:
 unit-tests:
   extends: .template-unit-tests
   allow_failure: false
-  rules:
-    - changes:
-        - "**/*.php"
-        - "lib/test/**/*"
-        - "vendor_bundled/composer.lock"
   parallel:
     matrix:
       - PHP_VERSION: "8.5"
@@ -762,16 +614,37 @@ unit-tests:
       - PHP_VERSION: "8.1"
         DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
 
+unit-tests-api:
+  extends: .template-unit-tests
+  allow_failure: false
+  services:
+    - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
+      alias: mysql
+      command: ["--explicit-defaults-for-timestamp=off"]
+  parallel:
+    matrix:
+      - PHP_VERSION: "8.5"
+        DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
+      - PHP_VERSION: "8.4"
+        DB_IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
+      - PHP_VERSION: "8.3"
+        DB_IMAGE: ${MARIADB_IMAGE_COMMON_LTS}
+      - PHP_VERSION: "8.2"
+        DB_IMAGE: ${MYSQL_IMAGE_OLDEST_SUPPORTED}
+      - PHP_VERSION: "8.1"
+        DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
+  script:
+    - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
+    - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
+    - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
+    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --do-not-fail-on-phpunit-warning --do-not-fail-on-phpunit-deprecation --group api-integration-test
+
 unit-tests-node:
   stage: unit-tests
   needs:
     - node_modules
   image:
     name: ${DEPENDENCY_PROXY_PREFIX}${NODE_IMAGE}
-  rules:
-    - changes:
-        - "**/*.js"
-        - "package-lock.json"
   script:
     - npm run testci
   coverage: '/All files(?:[^|]*\|){4}\s*(\S+)/'
@@ -791,67 +664,80 @@ unit-tests-icon-generator:
 # Package this Tiki build
 #
 
-tiki-package:
+.tiki-package-prepare-script: &tiki-package-prepare-script |
+  echo "=> Removing Composer dev dependencies ..."
+  composer -V | grep "version 2" || composer self-update --2
+  composer --ansi install -d vendor_bundled --no-dev --optimize-autoloader --no-progress --prefer-dist -n
+  php console.php dev:buildwsconfs --generate
+  echo "=> Cleanup ..."
+  rm -fr temp && git checkout temp
+  rm -fr bin
+  echo "=> Optimize language files ..."
+  find lang/ -name language.php -exec php doc/devtools/stripcomments.php {} \;
+  echo "=> Fix permissions ..."
+  find . -type f -exec chmod 0664 {} \;
+  chmod 0775 setup.sh
+  find . -type d -exec chmod 0755 {} \;
+
+.tiki-package-tar-script: &tiki-package-tar-script |
+  echo "=> Pack tiki ..."
+  tar --exclude *.DS_Store --exclude tests --exclude doc/devtools --exclude .git --exclude .gitignore --exclude .composercache -pczf tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz *
+
+.tiki-package-changelog-script: &tiki-package-changelog-script |
+  echo "=> Generate changelog ..."
+  TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"
+  git fetch origin "$TARGET_BRANCH" --tags --depth=1000
+  LAST_TAG=$(git tag --sort=-v:refname | head -n 1)
+  git merge-base --is-ancestor "$LAST_TAG" "origin/$TARGET_BRANCH" || git fetch --unshallow
+  php doc/devtools/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
+  mv generated_changelog.md CHANGELOG.generated.md
+
+.tiki-package-base: &tiki-package-base
   stage: package-tiki
-  variables:
-    GIT_DEPTH: "1000"
   needs:
     - composer
     - node_build
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  cache: [*cache-composercache]
+  allow_failure: true
+  artifacts:
+    paths:
+      - tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz
+    expire_in: 2 days
+
+# 1. SHALLOW PACKAGING: Fast because it uses a depth of 1 and doesn't need to fetch all tags.'
+tiki-package-shallow:
+  <<: *tiki-package-base
+  variables:
+    GIT_DEPTH: "1"
   rules:
-    # Run automatically when a user clicks "Set to auto-merge" (Merge Train)
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^\d+\.x$/)'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE != "merge_train"'
       when: always
-
-    # Run automatically when code lands on master/release branches (Post-merge tracking)
-    - if: '$CI_PROJECT_PATH == "tikiwiki/tiki" && $CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ /^\d+\.x$/)'
-      when: always
-
     - when: never
   script:
-    # Remove dev dependencies in composer
-    - echo "=> Removing Composer dev dependencies ..."
-    - composer -V | grep "version 2" || composer self-update --2
-    - composer --ansi install -d vendor_bundled --no-dev --optimize-autoloader --no-progress --prefer-dist -n # remove dev packages
-    # TODO: Remove dev dependencies in npm - benoitg - 2023-11-17
-    - php console.php dev:buildwsconfs --generate
-    # Cleanup folders that may have data, and we do not want to be packed
-    - echo "=> Cleanup ..."
-    # Assure temp folder is empty
-    - rm -fr temp && git checkout temp
-    # remove bin directory
-    - rm -fr bin
-    # Log files that are not part of GIT in the folder (exclude the ones expected)
-    - echo "=> Files in the folder not tracked in git ..."
-    - git ls-files --others | grep -v vendor_bundled/vendor/ | grep -v .composercache/ || echo "Ignore Failure"
-    # remove comments from language files
-    - echo "=> Optimize language files ..."
-    - find lang/ -name language.php -exec php doc/devtools/stripcomments.php {} \;
-    # set Permissions
-    - echo "=> Fix permissions ..."
-    - find . -type f -exec chmod 0664 {} \;
-    - chmod 0775 setup.sh
-    - find . -type d -exec chmod 0755 {} \;
-    - echo "=> Generate changelog ..."
-    - 'TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"'
-    - git fetch origin "$TARGET_BRANCH" --tags --depth=1000
-    - 'LAST_TAG=$(git tag --sort=-v:refname | head -n 1)'
-    - 'echo "Latest tag: $LAST_TAG"'
-    - 'echo "Target branch: $TARGET_BRANCH"'
-    - git merge-base --is-ancestor "$LAST_TAG" "origin/$TARGET_BRANCH" || git fetch --unshallow
-    - php doc/devtools/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
-    - mv generated_changelog.md CHANGELOG.generated.md
-    # pack
-    - echo "=> Pack tiki ..."
-    - tar --exclude *.DS_Store --exclude tests --exclude doc/devtools --exclude .git --exclude .gitignore --exclude .composercache -pczf tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz *
-  cache: [*cache-composercache]
+    - *tiki-package-prepare-script
+    - *tiki-package-tar-script
+
+# 2. DEEP PACKAGING: Slower because it needs to fetch all tags and apply only on merge requests to the master branch.
+tiki-package-deep:
+  <<: *tiki-package-base
+  variables:
+    GIT_DEPTH: "1000"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^\d+\.x$/)'
+      when: always
+    - if: '$CI_PROJECT_PATH == "tikiwiki/tiki" && $CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ /^\d+\.x$/)'
+      when: always
+    - when: never
+  script:
+    - *tiki-package-prepare-script
+    - *tiki-package-changelog-script
+    - *tiki-package-tar-script
   artifacts:
     paths:
       - tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz
       - CHANGELOG.generated.md
     expire_in: 2 days
-  allow_failure: true
 
 check-directories:
   stage: package-tiki
@@ -961,8 +847,6 @@ composer-stability:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: always
     - when: manual
-    - changes:
-        - "**/composer.json"
   artifacts:
     when: always  # Always upload artifacts even if job fails
   allow_failure: true  # Allow job to fail without failing the pipeline
@@ -973,20 +857,13 @@ composer-operator-check:
   needs:
     - composer
   script:
-  - php doc/devtools/check_caret_operator.php
-  rules:
-    - changes:
-      - "**/composer.json"
+    - php doc/devtools/check_caret_operator.php
 
 check-alphabetical-list:
   stage: unit-tests
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   needs:
     - composer
-  rules:
-    - changes:
-        - "**/composer.json"
-        - "**/package.json"
   script:
     - php doc/devtools/check_alphabetical_list.php
   allow_failure: false

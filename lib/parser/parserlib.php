@@ -3021,6 +3021,7 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         $style = $do_center ? ' style="text-align: center;"' : '';
+                        $justify = $do_center ? 'justify-content-center' : 'justify-content-start';
                         if ($prefs['wiki_heading_links'] !== 'n' && ($prefs['wiki_heading_links'] >= $hdrlevel || $prefs['wiki_heading_links'] === 'y' ) && (! isset($this->option['html_editor']) || ! $this->option['html_editor'])) {
                             $smarty = TikiLib::lib('smarty');
                             $headingLink = '<a href="#' . $thisid . '" class="heading-link" aria-label="heading link">' . smarty_function_icon(['name' => 'link'], $smarty->getEmptyInternalTemplate()) . '</a>';
@@ -3029,9 +3030,9 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         if ($prefs['feature_wiki_show_hide_before'] == 'y') {
-                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex justify-content-start" id="' . $thisid . '">' . $aclose . ' ' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose2;
+                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex ' . $justify . '" id="' . $thisid . '">' . $aclose . ' ' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose2;
                         } else {
-                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex justify-content-start" id="' . $thisid . '">' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose . $aclose2;
+                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex ' . $justify . '" id="' . $thisid . '">' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose . $aclose2;
                         }
                     } elseif (! strcmp($line, $prefs['wiki_page_separator'])) {
                         // Close open paragraph, lists, and div's

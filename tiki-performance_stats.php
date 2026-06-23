@@ -14,6 +14,7 @@ $inputConfiguration = [
         'maximum_stat_offset'      => 'digits',            //get
         'maximum_stat_order'       => 'text',              //get
         'no_of_requests'           => 'alpha',             //get
+        'details_url'              => 'text',              //get
         ],
     ],
 ];
@@ -30,6 +31,7 @@ if (! empty($_REQUEST['clear']) && $access->checkCsrf()) {
 $find = $_REQUEST['find'] ?? '';
 $averageStatOffset = $_REQUEST['average_stat_offset'] ?? 0;
 $maximumStatOffset = $_REQUEST['maximum_stat_offset'] ?? 0;
+$detailsUrl = $_REQUEST['details_url'] ?? '';
 
 /**
  * Validates a sort direction ('ASC' or 'DESC').
@@ -79,5 +81,8 @@ $smarty->assign_by_ref('maximum_stat_offset', $maximumStatOffset);
 $smarty->assign_by_ref('maximum_stat_order', $maximumStatOrder);
 $smarty->assign_by_ref('average_load_time_stats', $performanceLib->getRequestsBasedOnAverageRequestTime(25, $averageStatOffset, $find, $averageStatOrder, $orderType)->result);
 $smarty->assign_by_ref('maximum_load_time_stats', $performanceLib->getRequestsBasedOnMaximumProcessingTime(25, $maximumStatOffset, $find, $maximumStatOrder)->result);
+$smarty->assign('details_url', $detailsUrl);
+$smarty->assign('request_detail_summary', $detailsUrl ? $performanceLib->getRequestDetailsByUrl($detailsUrl) : false);
+$smarty->assign('request_detail_samples', $detailsUrl ? $performanceLib->getSlowestSamplesByUrl($detailsUrl, 25) : []);
 $smarty->assign('mid', 'tiki-performance_stats.tpl');
 $smarty->display("tiki.tpl");

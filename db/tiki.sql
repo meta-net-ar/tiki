@@ -194,6 +194,7 @@ CREATE TABLE `tiki_articles` (
   `image_data` longblob,
   `publishDate` int(14) default NULL,
   `created` int(14) default NULL,
+  `lastModif` int default NULL,
   `heading` text,
   `body` text,
   `author` varchar(200) default NULL,
@@ -1685,8 +1686,6 @@ INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `s
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Manage Tabular Formats','tiki-ajax_services.php?controller=tabular&action=manage',810,'tracker_tabular_enabled','tiki_p_tabular_admin','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s','Machine Learning','tiki-ml-list',820,'feature_machine_learning','tiki_p_machine_learning','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','List Models','tiki-ml-list',825,'feature_machine_learning','tiki_p_machine_learning','',0);
-INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s', 'Accounting', 'tiki-accounting_books.php', 830, 'feature_accounting', 'tiki_p_acct_view', '', 0);
-INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o', 'Accounting books', 'tiki-accounting_books.php', 835, 'feature_accounting', 'tiki_p_acct_view', '', 0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'s','Surveys','tiki-list_surveys.php',850,'feature_surveys','tiki_p_take_survey','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','List Surveys','tiki-list_surveys.php',855,'feature_surveys','tiki_p_take_survey','',0);
 INSERT INTO `tiki_menu_options` (`menuId`, `type`, `name`, `url`, `position`, `section`, `perm`, `groupname`, `userlevel`) VALUES (42,'o','Stats','tiki-survey_stats.php',860,'feature_surveys','tiki_p_view_survey_stats','',0);
@@ -2204,16 +2203,6 @@ CREATE TABLE `tiki_search_stats` (
   `term` varchar(50) NOT NULL default '',
   `hits` int(10) default NULL,
   PRIMARY KEY (`term`)
-) ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS `tiki_secdb`;
-CREATE TABLE tiki_secdb(
-  `md5_value` varchar(32) NOT NULL,
-  `filename` varchar(250) NOT NULL,
-  `tiki_version` varchar(60) NOT NULL,
-  `severity` int(4) NOT NULL default '0',
-  PRIMARY KEY (`filename`(171),`tiki_version`(20)),
-  KEY `sdb_fn` (filename(191))
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS `tiki_semaphores`;
@@ -3508,7 +3497,6 @@ UPDATE tiki_menu_options SET icon = 'admin_calendar' WHERE name = 'Calendar';
 UPDATE tiki_menu_options SET icon = 'admin_user' WHERE name = 'My Account';
 UPDATE tiki_menu_options SET icon = 'home' WHERE name = 'Home';
 UPDATE tiki_menu_options SET icon = 'admin_category' WHERE name = 'Categories';
-UPDATE tiki_menu_options SET icon = 'calculator' WHERE name = 'Accounting';
 UPDATE tiki_menu_options SET icon = 'admin_directory' WHERE name = 'Directory';
 UPDATE tiki_menu_options SET icon = 'receipt' WHERE name = 'Invoice';
 UPDATE tiki_menu_options SET icon = 'pen' WHERE name = 'Quizzes';
@@ -3596,7 +3584,6 @@ UPDATE tiki_menu_options SET icon = 'toggle-on' WHERE name = 'Offline mode';
 UPDATE tiki_menu_options SET icon = 'table' WHERE name = 'Manage Tabular Formats';
 UPDATE tiki_menu_options SET icon = 'robot' WHERE name = 'Machine Learning';
 UPDATE tiki_menu_options SET icon = 'layer-group' WHERE name = 'List Models';
-UPDATE tiki_menu_options SET icon = 'book' WHERE name = 'Accounting books';
 UPDATE tiki_menu_options SET icon = 'check-square' WHERE name = 'Admin Surveys';
 UPDATE tiki_menu_options SET icon = 'envelope' WHERE name = 'Send Newsletters';
 UPDATE tiki_menu_options SET icon = 'file-alt' WHERE name = 'Admin Newsletters';
@@ -4182,6 +4169,8 @@ CREATE TABLE `tiki_performance` (
     `id` int(12) NOT NULL AUTO_INCREMENT,
     `url` TEXT NOT NULL,
     `time_taken` int(12) NOT NULL,
+    `backend_time` int DEFAULT NULL,
+    `frontend_time` int DEFAULT NULL,
     PRIMARY KEY (`id`)
 ) ENGINE=MyISAM;
 

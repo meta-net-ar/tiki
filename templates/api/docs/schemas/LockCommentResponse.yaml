@@ -1,0 +1,14 @@
+---
+description: Response from locking or unlocking a comment thread.
+type: object
+properties:
+  title:
+    type: string
+  type:
+    type: string
+  objectId:
+    oneOf:
+      - type: string
+      - type: integer
+  status:
+    type: string
