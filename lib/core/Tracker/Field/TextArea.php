@@ -140,11 +140,14 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
 
     public function getFieldData(array $requestData = []): array
     {
-        $ins_id = $this->getInsertId();
-        $data = $this->processMultilingual($requestData, $ins_id);
+        return parent::getFieldData($requestData);
+    }
 
-        global $user, $prefs;
-        $language = $prefs['language'];
+    protected function postProcessFieldData(array $data, array $requestData = []): array
+    {
+        global $user;
+        $language = Language::getCurrentLanguage();
+        $ins_id = $this->getInsertId();
         $c = 0;
         if (isset($requestData[$ins_id])) {
             $value = (array) $data['value'];

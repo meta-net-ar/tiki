@@ -4198,7 +4198,7 @@ class TrackerLib extends TikiLib
                 return $cache[$cacheKey];
             }
         }
-        $query = "SELECT tif.`value`, tf.`type`, tf.`fieldId`, tf.`options`, i.`trackerId`
+        $query = "SELECT tif.`value`, tf.*, i.`trackerId` AS `itemTrackerId`
                 FROM `tiki_tracker_item_fields` tif
                 JOIN `tiki_tracker_items` i ON i.`itemId` = tif.`itemId`
                 JOIN `tiki_tracker_fields` tf ON tf.`fieldId` = tif.`fieldId`
@@ -4206,24 +4206,29 @@ class TrackerLib extends TikiLib
                 ORDER BY tf.`position`";
         $queryResult = $this->fetchAll($query, [(int) $itemId, "y"]);
 
-        if (! $trackerId) {
-            $trackerId = $queryResult[0]['trackerId'];
+        if (empty($queryResult)) {
+            return '';
         }
 
-        $item = $this->get_tracker_item($itemId);
-        $titles = [];
+        if (! $trackerId) {
+            $trackerId = $queryResult[0]['itemTrackerId'];
+        }
+        $trackerId = (int) $trackerId;
 
+        // Build the minimum item context required by handlers from already-queried data.
+        // This avoids the extra SQL done by get_tracker_item() in this hot path.
+        $item = [
+            'itemId' => (int) $itemId,
+            'trackerId' => $trackerId,
+        ];
+
+        $titles = [];
         foreach ($queryResult as $row) {
             $value = $row['value'];
-            $field = [
-                'fieldId' => $row['fieldId'],
-                'trackerId' => $trackerId,
-                'type' => $row['type'],
-                'options' => $row['options'],
-                'value' => $value
-            ];
+            $item[$row['fieldId']] = $value;
+            $row['trackerId'] = (int) $row['trackerId'];
 
-            $handler = $this->get_field_handler($field, $item);
+            $handler = $this->get_field_handler($row, $item);
 
             if ($handler) {
                 $value = $handler->renderText([
@@ -5666,13 +5671,13 @@ class TrackerLib extends TikiLib
     /**
      * Get a field handler for a specific fieldtype. The handler comes initialized with the field / item data passed.
      * @deprecated  This is just a proxy to  $definition->getFieldFactory()->getHandler() with a different calling convention.
-     * @param array $field - $field definition array, must contain at least: [
-     *        'trackerId' => 1,
-     *        'fieldId'   => 42,
-     *        'type'      => 'r',
-     *        'value'     => 'foo'
-     *    ];
-     * @param array|null $item - array('itemId1' => value1, 'itemid2' => value2)
+     * @param array $field Field data passed to the handler factory. Recommended shape is the full
+     *        `tiki_tracker_fields` row (`tf.*`) plus item value keys from `tiki_tracker_item_fields`
+     *        (for example `value`). It must contain at least:
+     *        ['trackerId' => 1, 'fieldId' => 42, 'type' => 'r'].
+     *        Additional keys are preserved and may be consumed by field handlers through getConfiguration().
+     * @param array|null $item Item context array with at least item/tracker identifiers, and optionally
+     *        field values keyed by fieldId.
      * @return \Tracker\Field\AbstractItemField $tracker_field_handler - i.e. Tracker_Field_Text
      */
     public function get_field_handler(array $field, $item = null): \Tracker\Field\AbstractItemField|false

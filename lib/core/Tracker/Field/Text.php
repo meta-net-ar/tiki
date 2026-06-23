@@ -110,7 +110,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
     {
         $data = $this->processMultilingual($requestData, $this->getInsertId());
 
-        return $data;
+        return $this->postProcessFieldData($data, $requestData);
     }
 
     public function renderInput($context = [])
@@ -155,13 +155,6 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
         if ($this->getConfiguration('type') === 't' && $context['list_mode'] !== 'csv') {   // not TextAreas or csv output
             $value = smarty_modifier_escape($value);
         }
-        if (
-            $this->getConfiguration('isMultilingual') == 'y' &&
-            $context['list_mode'] === 'csv' &&
-            ($context['multiLanguageAsJson'] ?? false) === true
-        ) {
-            $value = str_replace('"', '\"', json_encode($value, JSON_UNESCAPED_UNICODE));
-        }
 
         return $pre . $value . $post;
     }
@@ -173,6 +166,22 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
         } else {
             return parent::renderOutput($context);
         }
+    }
+
+    public function renderText($context = [])
+    {
+        if (! empty($this->trackerField->getOption('is_password'))) {
+            return '******';
+        }
+
+        $data = $this->getFieldData();
+        $value = $data['pvalue'] ?? '';
+
+        if ($this->getConfiguration('type') === 't') {
+            $value = $this->getOption('prepend', '') . $value . $this->getOption('append', '');
+        }
+
+        return trim(strip_tags((string) $value));
     }
 
     protected function processMultilingual($requestData, $id_string)
@@ -235,6 +244,11 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
             }
         }
 
+        return $data;
+    }
+
+    protected function postProcessFieldData(array $data, array $requestData = []): array
+    {
         return $data;
     }
 
