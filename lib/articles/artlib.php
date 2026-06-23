@@ -361,6 +361,7 @@ class ArtLib extends TikiLib
             'image_alt' => $image_alt,
             'lang' => $lang,
             'ispublished' => $ispublished,
+            'lastModif' => $tikilib->now,
         ];
 
         $article_table = $this->table('tiki_articles');

@@ -49,7 +49,7 @@ class ImagickNew extends ImageAbstract
                 $tmp = new Imagick();
                 try {
                     $tmp->readImageBlob($this->data);
-                    $this->data =& $tmp;
+                    $this->data = $tmp;
                     $this->loaded = true;
                 } catch (ImagickException $e) {
                     $this->data = null;

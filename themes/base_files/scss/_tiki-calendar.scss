@@ -29,6 +29,38 @@
     }
 }
 
+// Keep list mode rows readable when the calendar module is in a narrow sidebar.
+.calendar-list-compact {
+    container-type: inline-size;
+}
+
+@container (max-width: #{breakpoint-max(sm)}) {
+    .calendar-list-compact .table td.date .row {
+        --bs-gutter-x: 0.25rem;
+        --bs-gutter-y: 0.15rem;
+    }
+
+    .calendar-list-compact .table td.date .dtstart,
+    .calendar-list-compact .table td.date .dtend,
+    .calendar-list-compact .table td.date .dtstart-time {
+        flex: 0 0 100%;
+        max-width: 100%;
+        white-space: normal !important;
+        overflow-wrap: anywhere;
+    }
+
+    .calendar-list-compact .table td.date .dtstart-time {
+        text-align: start !important;
+    }
+
+    .calendar-list-compact .table td:nth-child(3),
+    .calendar-list-compact .table td:nth-child(3) .summary,
+    .calendar-list-compact .table td:nth-child(3) .description {
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+}
+
 .tiki_calendar {
     .ec-event {
         padding: 5px; 
@@ -173,6 +205,10 @@ article.tips {
 }
 nav.ec-toolbar {
     flex-wrap: wrap;
+
+    .ec-title {
+        margin-bottom: 0.5rem;
+    }
 }
 
 @media only screen and (max-width: 767px) {

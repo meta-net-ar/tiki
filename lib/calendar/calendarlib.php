@@ -1763,9 +1763,13 @@ class CalendarLib extends TikiLib
         } else {
             $next['month'] += $nbMonths[$view];
         }
-        $next['daysInMonth'] = DateCalc::daysInMonth($next['month'], $next['year']);
-        if ($next['day'] > $next['daysInMonth']) {
-            $next['day'] = $next['daysInMonth'];
+        // For day/week navigation, let make_time() roll into the next month naturally.
+        // Clamping here causes week navigation to freeze at month-end (e.g. June 30 + 7 => June 30).
+        if ($view !== 'day' && $view !== 'week') {
+            $next['daysInMonth'] = DateCalc::daysInMonth($next['month'], $next['year']);
+            if ($next['day'] > $next['daysInMonth']) {
+                $next['day'] = $next['daysInMonth'];
+            }
         }
         $next['date'] = TikiLib::make_time(0, 0, 0, $next['month'], $next['day'], $next['year']);
         $next = $this->infoDate($next['date']); // get back real day, month, year

@@ -194,6 +194,7 @@ CREATE TABLE `tiki_articles` (
   `image_data` longblob,
   `publishDate` int(14) default NULL,
   `created` int(14) default NULL,
+  `lastModif` int default NULL,
   `heading` text,
   `body` text,
   `author` varchar(200) default NULL,
@@ -2202,16 +2203,6 @@ CREATE TABLE `tiki_search_stats` (
   `term` varchar(50) NOT NULL default '',
   `hits` int(10) default NULL,
   PRIMARY KEY (`term`)
-) ENGINE=MyISAM;
-
-DROP TABLE IF EXISTS `tiki_secdb`;
-CREATE TABLE tiki_secdb(
-  `md5_value` varchar(32) NOT NULL,
-  `filename` varchar(250) NOT NULL,
-  `tiki_version` varchar(60) NOT NULL,
-  `severity` int(4) NOT NULL default '0',
-  PRIMARY KEY (`filename`(171),`tiki_version`(20)),
-  KEY `sdb_fn` (filename(191))
 ) ENGINE=MyISAM;
 
 DROP TABLE IF EXISTS `tiki_semaphores`;

@@ -132,6 +132,7 @@ class CacheLib
             $this->flush_memcache();
             $this->flush_redis();
             $this->invalidate('global_preferences');
+            $this->invalidate('tiki_default_preferences_cache');
             if (! $skipLog) {
                 $logslib->add_log($log_section, 'erased all cache content');
             }
@@ -162,6 +163,7 @@ class CacheLib
         }
         if (in_array('prefs', $dir_names)) {
             $this->invalidate('global_preferences');
+            $this->invalidate('tiki_default_preferences_cache');
         }
     }
 
