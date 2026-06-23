@@ -59,6 +59,10 @@ export function syncSelectOptions(elementPlusSelect, select) {
 }
 
 export function attachChangeEventHandler(elementPlusSelect, select) {
+    $(select).on("change", function () {
+        syncSelectOptions(elementPlusSelect, select);
+    });
+
     $(elementPlusSelect).on("select-change", function (event) {
         const selectedValues = event.detail[0].value;
         // Adding new items to the select list

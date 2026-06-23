@@ -38,27 +38,14 @@
                 </div>
             {/if}
             {jq}
-$("input[name=add_remove]").on("change", function () {
-    const userGroups = $("#select_groups").data("usergroups");
-    const mode = $("input[name=add_remove]:checked").val() === "add";
-    if ($(this).prop("checked") && userGroups) {
-        // filter the group list to ones this user is not in
-        $("option", "#select_groups").each(function () {
-            if ($.inArray($(this).val(), userGroups) > -1) {
-                $(this).prop("disabled", mode).css("opacity", mode ? .3 : 1);
-            } else {
-                $(this).prop("disabled", ! mode).css("opacity", ! mode ? .3 : 1);
-            }
-        });
-    }
-}).trigger("change");
+var $selectGroups = $("#select_groups");
 
-$("#select_groups").on("change", function () {
+$selectGroups.on("change", function () {
     const mode = $("input[name=add_remove]:checked").val() === "add";
     const $defaultGroup = $("#default_group");
 
-    const userGroups = $("#select_groups").data("usergroups");
-    const selectedGroups = $(this).val();
+    const userGroups = $selectGroups.data("usergroups") || [];
+    const selectedGroups = $(this).val() || [];
     let setAndSelectedGroups = [];
     if (mode) {
         setAndSelectedGroups = [...userGroups, ...selectedGroups];
@@ -89,6 +76,22 @@ $("#select_groups").on("change", function () {
         });
     }
 });
+
+$("input[name=add_remove]").on("change", function () {
+    const userGroups = $selectGroups.data("usergroups");
+    const mode = $("input[name=add_remove]:checked").val() === "add";
+    if ($(this).prop("checked") && userGroups) {
+        // filter the group list to ones this user is not in
+        $("option", $selectGroups).each(function () {
+            if ($.inArray($(this).val(), userGroups) > -1) {
+                $(this).prop("disabled", mode).css("opacity", mode ? .3 : 1);
+            } else {
+                $(this).prop("disabled", ! mode).css("opacity", ! mode ? .3 : 1);
+            }
+        });
+        $selectGroups.trigger("change");
+    }
+}).trigger("change");
             {/jq}
         </div>
         <div class="mb-3 row mx-0" >
