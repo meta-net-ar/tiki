@@ -9,6 +9,13 @@ require_once(__DIR__ . '/../../wiki-plugins/wikiplugin_youtube.php');
 
 class WikiPlugin_YoutubeTest extends PHPUnit\Framework\TestCase
 {
+    protected function setUp(): void
+    {
+        global $prefs;
+
+        $prefs['http_header_referrer_policy_value'] = 'strict-origin-when-cross-origin';
+    }
+
     /**
      * @dataProvider provider
      */
@@ -26,6 +33,7 @@ class WikiPlugin_YoutubeTest extends PHPUnit\Framework\TestCase
             if ($expectedSubstring !== '') {
                 $this->assertStringContainsString($expectedSubstring, $result);
             }
+            $this->assertStringContainsString('referrerpolicy="strict-origin-when-cross-origin"', $result);
         }
     }
 

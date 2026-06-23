@@ -87,6 +87,9 @@ function buildEmbedContainerAndIframe($iframeSrc, $params = [], $oEmbedData = []
     $iframe->setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
     $iframe->setAttribute('title', tra('Embedded media content'));
     $iframe->setAttribute('style', $iframeStyle);
+    if (! empty($params['referrerPolicy'])) {
+        $iframe->setAttribute('referrerpolicy', $params['referrerPolicy']);
+    }
 
     if (! empty($params['allowFullScreen']) && $params['allowFullScreen'] === 'y') {
         $iframe->setAttribute('allowfullscreen', '');
