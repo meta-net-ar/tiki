@@ -488,6 +488,10 @@ if (isset($_REQUEST['send'])) {
 
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 $smarty->assign('mid', 'tiki-share.tpl');
+
+$headerlib = TikiLib::lib('header');
+$headerlib->add_js_module("import '@jquery-tiki/tiki-share';");
+
 $smarty->display('tiki.tpl');
 
 /**
