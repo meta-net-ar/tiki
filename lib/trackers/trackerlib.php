@@ -4198,7 +4198,7 @@ class TrackerLib extends TikiLib
                 return $cache[$cacheKey];
             }
         }
-        $query = "SELECT tif.`value`, tf.`type`, tf.`fieldId`, tf.`options`, i.`trackerId`
+        $query = "SELECT tif.`value`, tf.`type`, tf.`fieldId`, tf.`options`, tf.`isMultilingual`, i.`trackerId`
                 FROM `tiki_tracker_item_fields` tif
                 JOIN `tiki_tracker_items` i ON i.`itemId` = tif.`itemId`
                 JOIN `tiki_tracker_fields` tf ON tf.`fieldId` = tif.`fieldId`
@@ -4216,11 +4216,12 @@ class TrackerLib extends TikiLib
         foreach ($queryResult as $row) {
             $value = $row['value'];
             $field = [
-                'fieldId' => $row['fieldId'],
-                'trackerId' => $trackerId,
-                'type' => $row['type'],
-                'options' => $row['options'],
-                'value' => $value
+                'fieldId'        => $row['fieldId'],
+                'trackerId'      => $trackerId,
+                'type'           => $row['type'],
+                'options'        => $row['options'],
+                'isMultilingual' => $row['isMultilingual'],
+                'value'          => $value
             ];
 
             $handler = $this->get_field_handler($field, $item);
