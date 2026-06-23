@@ -1031,10 +1031,9 @@ import { defaults as defaultControls } from "ol/control";
 
                     switch ($(container).data("popup-style")) {
                         case "dialog": {
-                            const $modal = $(".footer-modal:not(.show)")
-                                .first()
-                                .addClass("modal-lg")
-                                .modal({})
+                            const $modal = $(".footer-modal:not(.show)").first().addClass("modal-lg").modal({});
+
+                            $modal
                                 .one("show.bs.modal", function (event) {
                                     $(".modal-title", $modal).empty();
                                     $(".modal-body", $modal).empty();
