@@ -64,10 +64,17 @@ class Attachments extends Base
 
         // Get URL params specific to this smarty function that should be assigned in smarty
         $url_override_prefix = 's_f_attachments';
-        $url_overrided_arguments = [ 'sort_mode', 'remove', 'galleryId', 'comment', 'upload', 'page' ];
+        $url_overrided_arguments = [ 'sort_mode', 'remove', 'galleryId', 'comment', 'upload', 'page', 'offset', 'maxRecords' ];
         $smarty->set_request_overriders($url_override_prefix, $url_overrided_arguments);
 
         $params['sort_mode'] = $_REQUEST[$url_override_prefix . '-sort_mode'] ?? 'created_desc';
+
+        // Pagination: read offset and maxRecords from the request (prefixed)
+        $offset = max(0, (int)($_REQUEST[$url_override_prefix . '-offset'] ?? 0));
+        $maxRecords = (int)($_REQUEST[$url_override_prefix . '-maxRecords'] ?? $prefs['maxRecords']);
+        if ($maxRecords <= 0) {
+            $maxRecords = $prefs['maxRecords'];
+        }
 
         // Force some gallery display parameters before fgal_listing_conf.php reads $gal_info
         $gal_info['show_checked'] = 'n';
@@ -76,9 +83,9 @@ class Attachments extends Base
         // Get listing display config
         include_once('fgal_listing_conf.php');
 
-        // Get list of files in the gallery
+        // Get list of files in the gallery (paginated)
         if (! empty($galleryId)) {
-            $files = $filegallib->get_files(0, -1, $params['sort_mode'], '', $galleryId);
+            $files = $filegallib->get_files($offset, $maxRecords, $params['sort_mode'], '', $galleryId);
         } else {
             $files = ['data' => [], 'count' => 0];
         }
@@ -103,6 +110,8 @@ class Attachments extends Base
         $params['gal_info'] = $gal_info;
         $params['files'] = $files['data'];
         $params['count'] = $files['count'];
+        $params['offset'] = $offset;
+        $params['maxRecords'] = $maxRecords;
         $params['from_wiki_page'] = true;
 
         $return = "\n" . $smarty->plugin_fetch('fgal_attachments.tpl', $params) . "\n";
