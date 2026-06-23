@@ -155,7 +155,7 @@ function wikiplugin_youtube($data, $params)
         'quality' => 'high',
     ], $params);
 
-    global $tikilib;
+    global $tikilib, $prefs;
 
     // Extract YouTube ID and type (e.g., shorts, live, etc.)
     $youtubeInfo = getYoutubeId($params['movie']);
@@ -196,6 +196,8 @@ function wikiplugin_youtube($data, $params)
     if (! empty($queryParams)) {
         $src .= '?' . implode('&', $queryParams);
     }
+
+    $params['referrerPolicy'] = $prefs['http_header_referrer_policy_value'] ?? '';
 
     $embedHtml = buildEmbedContainerAndIframe($src, $params, $oEmbedData);
     return '~np~' . $embedHtml . '~/np~';
