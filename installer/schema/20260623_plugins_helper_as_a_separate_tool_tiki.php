@@ -7,7 +7,7 @@
 /**
  * @param $installer
  */
-function upgrade_20260623_plugins_helper_as_a_separate_tool($installer)
+function upgrade_20260623_plugins_helper_as_a_separate_tool_tiki($installer)
 {
     $installer->query(
         "UPDATE `tiki_preferences`
