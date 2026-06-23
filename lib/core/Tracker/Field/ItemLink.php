@@ -345,7 +345,11 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
         ];
 
         if ($this->canHaveMultipleValues() && ! is_array($data['value'])) {
-            $data['value'] = explode(',', $data['value']);
+            // object_selector_multi submits newline-separated "trackeritem:ID" strings
+            $parts = array_values(array_filter(array_map(function ($v) {
+                return preg_replace('/^trackeritem:/', '', trim($v));
+            }, preg_split('/[\n,]+/', $data['value']))));
+            $data['value'] = $parts;
         }
 
         return $data;
@@ -383,7 +387,8 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             return false;
         }
 
-        if ($this->canHaveMultipleValues()) {
+        if ($this->trackerField->getOption('displayFieldsListType') === 'transfer' ||
+            $this->trackerField->getOption('displayFieldsListType') === 'table') {
             return false;
         }
 
@@ -427,13 +432,14 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             $sort = TikiLib::lib('trk')->get_default_sort_order($trackerId, true, true);
 
             $template = $this->renderTemplate('trackerinput/itemlink_selector.tpl', $context, [
-                'placeholder' => $placeholder,
-                'status' => $status,
-                'selector_value' => $value,
-                'selector_id' => 'item' . $this->getItemId() . $this->getInsertId(),
-                'format' => $format,
-                'createTrackerItems' => $trackerPerms->create_tracker_items,
-                'sort' => $sort,
+                'placeholder'          => $placeholder,
+                'status'               => $status,
+                'selector_value'       => $value,
+                'selector_id'          => 'item' . $this->getItemId() . $this->getInsertId(),
+                'format'               => $format,
+                'createTrackerItems'   => $trackerPerms->create_tracker_items,
+                'sort'                 => $sort,
+                'selectMultipleValues' => (bool) $this->trackerField->getOption('selectMultipleValues'),
             ]);
 
             return $template;
