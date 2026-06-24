@@ -1024,11 +1024,14 @@ class ParserLib extends TikiDb_Bridge
     //*
     protected function convert_plugin_for_html_editor($name, $args, $plugin_result, $data, $info = [])
     {
-        $html_editor_plugin = '{' . (empty($data) ? $name : TikiLib::strtoupper($name) . '(') . ' ';
+        $html_editor_plugin = '{' . (empty($data) ? $name . ' ' : TikiLib::strtoupper($name) . '(');
         $arg_str = '';      // not using http_build_query() as it converts spaces into +
         if (! empty($args)) {
             foreach ($args as $argKey => $argValue) {
-                if (is_array($argValue)) {
+                $default = $info['params'][$argKey]['default'] ?? null;
+                if ((empty($argValue) && empty($default)) || $argValue === (string) $default) {
+                    continue;
+                } elseif (is_array($argValue)) {
                     if (isset($info['params'][$argKey]['separator'])) {
                         $sep = $info['params'][$argKey]['separator'];
                     } else {
