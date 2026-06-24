@@ -108,33 +108,6 @@ header.container,
     }
 }
 
-// Sticky navbar anchor offset
-// Prevent target anchors from being covered by the sticky navbar
-header.sticky-top {
-    ~ * {
-        h1:target:before,
-        h2:target:before,
-        h3:target:before,
-        h4:target:before,
-        h5:target:before,
-        h6:target:before {
-            content: "";
-            display: block;
-            /**
-            @luciash Rightly pointed out on Matrix chat that we shouldn't rely on such a magic string.
-            This is however well documented and proves that @sandy-12 thought about corner cases (in this case incoming links with an # anchor in the url).
-            I initially thought he didn't know about:
-            https://css-tricks.com/almanac/properties/s/scroll-margin/
-            But I think he actually wanted to avoid triggering scroll anchoring supression triggers since scroll anchoring is such a useful feature.
-            Since our header isn't fixed size (different modules can be added to it), probably the best solution is to target a height of half the viewport (ex:  height: 50vh;).  If the headers cover more than half the viewport, we have other problems to deal with.
-            benoitg - 2026-05-06
-            */
-            height: 80px; // Approximate navbar height
-            margin: -80px 0 0;
-        }
-    }
-}
-
 .box-quickadmin li {
     font-size: 0.9em;
 }

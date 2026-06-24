@@ -1,6 +1,13 @@
 // Default values for necessary Bootstrap and Tiki CSS variables in case themes don't provide them
 :root {
     --tiki-page-content-top-margin: 1.25rem; // Equivalent to 20px that was hard-coded in Tiki at one time
+    --tiki-anchor-offset: 33vh;
+}
+
+// Prevent anchor targets from being covered by fixed/sticky headers,
+// including empty inline anchors created by the ANAME plugin.
+html {
+    scroll-padding-top: var(--tiki-anchor-offset);
 }
 
 .navbar-brand {
