@@ -638,7 +638,7 @@ import { defaults as defaultControls } from "ol/control";
 
                 if (shapeLayer && $(container).data("cluster")) {
                     return container.vector_shapes;
-                } else{
+                } else {
                     return container.vectors;
                 }
             };
@@ -794,7 +794,9 @@ import { defaults as defaultControls } from "ol/control";
                 });
 
             container.vectors = container.getLayer(tr("Editable"));
-            container.vector_shapes = container.getLayer(tr("Editable"), true);
+            if ($(container).data("cluster")) {
+                container.vector_shapes = container.getLayer(tr("Editable"), true);
+            }
 
             container.uniqueMarkers = {};
 
