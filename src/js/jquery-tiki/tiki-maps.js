@@ -2098,7 +2098,7 @@ import { defaults as defaultControls } from "ol/control";
         });
 
         return this;
-    };;
+    };
 
     $.fn.addMapMarker = function (options) {
         this.each(function () {
