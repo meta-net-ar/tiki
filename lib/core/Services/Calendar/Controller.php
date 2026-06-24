@@ -279,6 +279,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 $calendarId = $calitem['calendarId'];
                 $calitem['calitemId'] = $calitemId;
                 $calitem['allday'] = empty($calitem['allday']) ? 0 : 1;
+                $calitem['sendReminder'] = empty($calitem['sendReminder']) ? 0 : 1;
                 $calitem['recurrenceId'] = $input->recurrenceId->int();
                 $calendar = $this->calendarLib->get_calendar($calendarId);
                 $calitem = $this->processParticipants($calitem);
@@ -926,7 +927,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                         'calendar event'
                     );
                 }
-                if ($prefs['feature_groupalert'] == 'y') {
+                if ($prefs['feature_groupalert'] == 'y' && $calitem['sendReminder']) {
                     if ($input->offsetExists('listtoalert')) {
                         TikiLib::lib('groupalert')->Notify(
                             $input->listtoalert->int(),

@@ -353,6 +353,9 @@ class Utilities
                 $rec->setAllday(empty($convertToString($component->{'X-Tiki-Allday'})) ? 0 : 1);
             }
         }
+        if (isset($component->{'X-Tiki-sendReminder'})) {
+            $result['sendReminder'] = empty($convertToString($component->{'X-Tiki-sendReminder'})) ? 0 : 1;
+        }
         if (isset($component->{'X-Tiki-Language'})) {
             $result['lang'] = $convertToString($component->{'X-Tiki-Language'});
             if ($rec) {
@@ -629,6 +632,11 @@ class Utilities
         }
         if (! empty($row['description'])) {
             $data['DESCRIPTION'] = $row['description'];
+        }
+        if (! empty($row['sendReminder'])) {
+            $data['X-Tiki-sendReminder'] = $row['sendReminder'];
+        } else {
+            $data['X-Tiki-sendReminder'] = 0;
         }
         if (! empty($row['location'])) {
             $data['LOCATION'] = $row['location'];
