@@ -430,173 +430,193 @@ import { defaults as defaultControls } from "ol/control";
                 }
             };
 
-            container.getLayer = function (name) {
+            /**
+             * Get or create an ol layer and store it in container.layers[]
+             *
+             * @param name         if empty, use the "Editable" layer, container.vectors
+             * @param shapeLayer   if true, use separate layer for shapes to enable clustering
+             * @returns {*}
+             */
+            container.getLayer = function (name, shapeLayer) {
                 let vectors;
 
                 if (name) {
+                    if (shapeLayer) {
+                        // the js `tr` function doesn't accept arguments, so we can't change the word order here, sorry
+                        name = name + " " + tr("Shapes");
+                    }
                     if (!container.layers[name]) {
                         // basic feature clustering
                         if ($(container).data("cluster")) {
-                            const distance = $(container).data("cluster"),
-                                clusterSource = new ol.source.Cluster({
-                                    distance: distance,
-                                    source: new ol.source.Vector({ wrapX: false }),
-                                    geometryFunction: (feature) => {
-                                        const geom = feature.getGeometry();
-                                        if (!geom) return null;
-                                        if (geom instanceof ol.geom.Polygon) {
-                                            // Use the centroid of the polygon's extent
-                                            return new ol.geom.Point(ol.extent.getCenter(geom.getExtent()));
-                                        } else {
-                                            return geom;
+                            if (!shapeLayer) {
+                                const distance = $(container).data("cluster"),
+                                    clusterSource = new ol.source.Cluster({
+                                        distance: distance,
+                                        source: new ol.source.Vector({ wrapX: false }),
+                                        geometryFunction: (feature) => {
+                                            const geom = feature.getGeometry();
+                                            if (!geom) return null;
+                                            if (geom instanceof ol.geom.Polygon) {
+                                                // Use the centroid of the polygon's extent
+                                                return new ol.geom.Point(ol.extent.getCenter(geom.getExtent()));
+                                            } else {
+                                                return geom;
+                                            }
+                                        },
+                                    });
+
+                                let clusterFillColor = $(container).data("clusterfillcolor"),
+                                    clusterTextColor = $(container).data("clustertextcolor");
+
+                                if (clusterFillColor) {
+                                    clusterFillColor = clusterFillColor.split(",");
+                                } else {
+                                    clusterFillColor = [86, 134, 200];
+                                }
+                                if (clusterTextColor) {
+                                    clusterTextColor = clusterTextColor.split(",");
+                                } else {
+                                    clusterTextColor = [255, 255, 255];
+                                }
+                                const styleCache = {};
+                                let maxFeatureCount;
+                                /**
+                                 * Calculate size of cluster depending on zoom extent
+                                 * based on https://openlayers.org/en/latest/examples/earthquake-clusters.html
+                                 * @param resolution
+                                 */
+                                const calculateClusterInfo = function (resolution) {
+                                    maxFeatureCount = 0;
+                                    const features = vectors.getSource().getFeatures();
+                                    for (let i = features.length - 1; i >= 0; --i) {
+                                        const feature = features[i],
+                                            originalFeatures = feature.get("features"),
+                                            extent = ol.extent.createEmpty(),
+                                            jj = originalFeatures.length;
+
+                                        for (let j = 0; j < jj; ++j) {
+                                            ol.extent.extend(extent, originalFeatures[j].getGeometry().getExtent());
                                         }
+                                        maxFeatureCount = Math.max(maxFeatureCount, jj);
+                                        const radius = (0.4 * (ol.extent.getWidth(extent) + ol.extent.getHeight(extent))) / resolution;
+                                        feature.set("radius", radius);
+                                    }
+                                };
+                                const createMarkerStyle = function (feature) {
+                                    return setFeatureColorStyle(feature, getFeatureColor(feature));
+                                };
+                                const invisibleFill = new ol.style.Fill({
+                                    color: "rgba(255, 255, 255, 0.01)",
+                                });
+                                const selectClusterFeaturesStyle = function (feature) {
+                                    const styles = [],
+                                        features = feature.get("features");
+
+                                    if (!features && feature) {
+                                        return createMarkerStyle(feature);
+                                    }
+
+                                    if (features.length > 1) {
+                                        styles.push(
+                                            new ol.style.Style({
+                                                image: new ol.style.Circle({
+                                                    radius: feature.get("radius"),
+                                                    fill: invisibleFill,
+                                                }),
+                                            })
+                                        );
+                                    }
+                                    for (let i = features.length - 1; i >= 0; --i) {
+                                        styles.push(createMarkerStyle(features[i]));
+                                    }
+                                    return styles;
+                                };
+
+                                vectors = container.layers[name] = new ol.layer.Vector({
+                                    source: clusterSource,
+                                    title: name,
+                                    style: function (feature, resolution) {
+                                        const features = feature.get("features");
+                                        let style;
+                                        if (features && features.length > 1) {
+                                            calculateClusterInfo(resolution);
+
+                                            const size = features.length;
+                                            style = styleCache[size + " " + maxFeatureCount];
+
+                                            if (!style) {
+                                                style = new ol.style.Style({
+                                                    image: new ol.style.Circle({
+                                                        radius: Math.max(feature.get("radius"), 20),
+                                                        stroke: new ol.style.Stroke({
+                                                            color: clusterTextColor,
+                                                        }),
+                                                        fill: new ol.style.Fill({
+                                                            color: [
+                                                                clusterFillColor[0],
+                                                                clusterFillColor[1],
+                                                                clusterFillColor[2],
+                                                                Math.min(0.8, 0.4 + size / maxFeatureCount),
+                                                            ],
+                                                        }),
+                                                    }),
+                                                    text: new ol.style.Text({
+                                                        text: features.length.toString(),
+                                                        font: "14px sans-serif",
+                                                        fill: new ol.style.Fill({
+                                                            color: clusterTextColor,
+                                                        }),
+                                                    }),
+                                                });
+                                                styleCache["c" + size + " " + maxFeatureCount] = style;
+                                            }
+                                        } else {
+                                            // not a cluster group
+                                            if (features && features[0]) {
+                                                feature = features[0];
+                                            }
+                                            style = styleCache["f" + feature.ol_uid];
+
+                                            if (!style) {
+                                                // Always try to create a style - createMarkerStyle handles custom colors
+                                                style = createMarkerStyle(feature);
+                                                styleCache["f" + feature.ol_uid] = style;
+                                            }
+                                        }
+                                        return style;
                                     },
                                 });
 
-                            let clusterFillColor = $(container).data("clusterfillcolor"),
-                                clusterTextColor = $(container).data("clustertextcolor");
-
-                            if (clusterFillColor) {
-                                clusterFillColor = clusterFillColor.split(",");
-                            } else {
-                                clusterFillColor = [86, 134, 200];
-                            }
-                            if (clusterTextColor) {
-                                clusterTextColor = clusterTextColor.split(",");
-                            } else {
-                                clusterTextColor = [255, 255, 255];
-                            }
-                            const styleCache = {};
-                            let maxFeatureCount;
-                            /**
-                             * Calculate size of cluster depending on zoom extent
-                             * based on https://openlayers.org/en/latest/examples/earthquake-clusters.html
-                             * @param resolution
-                             */
-                            const calculateClusterInfo = function (resolution) {
-                                maxFeatureCount = 0;
-                                const features = vectors.getSource().getFeatures();
-                                for (let i = features.length - 1; i >= 0; --i) {
-                                    const feature = features[i],
-                                        originalFeatures = feature.get("features"),
-                                        extent = ol.extent.createEmpty(),
-                                        jj = originalFeatures.length;
-
-                                    for (let j = 0; j < jj; ++j) {
-                                        ol.extent.extend(extent, originalFeatures[j].getGeometry().getExtent());
-                                    }
-                                    maxFeatureCount = Math.max(maxFeatureCount, jj);
-                                    const radius = (0.4 * (ol.extent.getWidth(extent) + ol.extent.getHeight(extent))) / resolution;
-                                    feature.set("radius", radius);
-                                }
-                            };
-                            const createMarkerStyle = function (feature) {
-                                return setFeatureColorStyle(feature, getFeatureColor(feature));
-                            };
-                            const invisibleFill = new ol.style.Fill({
-                                color: "rgba(255, 255, 255, 0.01)",
-                            });
-                            const selectClusterFeaturesStyle = function (feature) {
-                                const styles = [],
-                                    features = feature.get("features");
-
-                                if (!features && feature) {
-                                    return createMarkerStyle(feature);
-                                }
-
-                                if (features.length > 1) {
-                                    styles.push(
-                                        new ol.style.Style({
-                                            image: new ol.style.Circle({
-                                                radius: feature.get("radius"),
-                                                fill: invisibleFill,
-                                            }),
+                                if ($(container).data("clusterhover") === "features") {
+                                    container.map.addInteraction(
+                                        new ol.interaction.Select({
+                                            condition: function (evt) {
+                                                return evt.type === "pointermove" || evt.type === "singleclick";
+                                            },
+                                            style: selectClusterFeaturesStyle,
+                                            layers: [vectors],
                                         })
                                     );
                                 }
-                                for (let i = features.length - 1; i >= 0; --i) {
-                                    styles.push(createMarkerStyle(features[i]));
-                                }
-                                return styles;
-                            };
 
-                            vectors = container.layers[name] = new ol.layer.Vector({
-                                source: clusterSource,
-                                title: name,
-                                style: function (feature, resolution) {
-                                    const features = feature.get("features");
-                                    let style;
-                                    if (features && features.length > 1) {
-                                        calculateClusterInfo(resolution);
-
-                                        const size = features.length;
-                                        style = styleCache[size + " " + maxFeatureCount];
-
-                                        if (!style) {
-                                            style = new ol.style.Style({
-                                                image: new ol.style.Circle({
-                                                    radius: Math.max(feature.get("radius"), 20),
-                                                    stroke: new ol.style.Stroke({
-                                                        color: clusterTextColor,
-                                                    }),
-                                                    fill: new ol.style.Fill({
-                                                        color: [
-                                                            clusterFillColor[0],
-                                                            clusterFillColor[1],
-                                                            clusterFillColor[2],
-                                                            Math.min(0.8, 0.4 + size / maxFeatureCount),
-                                                        ],
-                                                    }),
-                                                }),
-                                                text: new ol.style.Text({
-                                                    text: features.length.toString(),
-                                                    font: "14px sans-serif",
-                                                    fill: new ol.style.Fill({
-                                                        color: clusterTextColor,
-                                                    }),
-                                                }),
-                                            });
-                                            styleCache["c" + size + " " + maxFeatureCount] = style;
-                                        }
-                                    } else {
-                                        // not a cluster group
-                                        if (features && features[0]) {
-                                            feature = features[0];
-                                        }
-                                        style = styleCache["f" + feature.ol_uid];
-
-                                        if (!style) {
-                                            // Always try to create a style - createMarkerStyle handles custom colors
-                                            style = createMarkerStyle(feature);
-                                            styleCache["f" + feature.ol_uid] = style;
-                                        }
-                                    }
-                                    return style;
-                                },
-                            });
-
-                            if ($(container).data("clusterhover") === "features") {
-                                container.map.addInteraction(
-                                    new ol.interaction.Select({
-                                        condition: function (evt) {
-                                            return evt.type === "pointermove" || evt.type === "singleclick";
-                                        },
-                                        style: selectClusterFeaturesStyle,
+                                if ($(container).data("popup-style")) {
+                                    const selectionInteraction = new ol.interaction.Select({
+                                        style: createMarkerStyle,
                                         layers: [vectors],
-                                    })
-                                );
-                            }
+                                    });
 
-                            if ($(container).data("popup-style")) {
-                                const selectionInteraction = new ol.interaction.Select({
-                                    style: createMarkerStyle,
-                                    layers: [vectors],
+                                    container.map.addInteraction(selectionInteraction);
+
+                                    // use select to make popup
+                                    selectionInteraction.on("select", container.showPopup);
+                                }
+                            } else {
+                                // make a plain vector layer for Polygons and Lines
+                                vectors = container.layers[name] = new ol.layer.Vector({
+                                    source: new ol.source.Vector({ wrapX: false }),
+                                    title: name,
+                                    style: container.createMapFeatureStyle,
                                 });
-
-                                container.map.addInteraction(selectionInteraction);
-
-                                // use select to make popup
-                                selectionInteraction.on("select", container.showPopup);
                             }
                         } else {
                             // not clustered
@@ -616,7 +636,11 @@ import { defaults as defaultControls } from "ol/control";
                     return container.layers[name];
                 }
 
-                return container.vectors;
+                if (shapeLayer && $(container).data("cluster")) {
+                    return container.vector_shapes;
+                } else{
+                    return container.vectors;
+                }
             };
 
             container.clearLayer = function (name) {
@@ -770,6 +794,7 @@ import { defaults as defaultControls } from "ol/control";
                 });
 
             container.vectors = container.getLayer(tr("Editable"));
+            container.vector_shapes = container.getLayer(tr("Editable"), true);
 
             container.uniqueMarkers = {};
 
@@ -1493,6 +1518,28 @@ import { defaults as defaultControls } from "ol/control";
                                 container.clearLayer(name);
                             });
 
+                            /**
+                             * check if an object with the same id is already in the layer
+                             * @param layer
+                             * @param item
+                             * @returns boolean
+                             */
+                            function checkFeatureExists(layer, item) {
+                                const layerFeatures = layer.getSource().getFeatures();
+
+                                const there = layerFeatures.find((feature) => {
+                                    const subFeatures = feature.get("features");
+                                    if (subFeatures) {
+                                        return subFeatures.find((subFeature) => {
+                                            return subFeature.get("object") === item.object_id;
+                                        });
+                                    } else {
+                                        return feature.get("object") === item.object_id;
+                                    }
+                                });
+                                return !!there;
+                            }
+
                             data.result.forEach((item) => {
                                 let layerName = $(form).data("result-layer"),
                                     suffix = $(form).data("result-suffix");
@@ -1500,6 +1547,7 @@ import { defaults as defaultControls } from "ol/control";
                                 if (layerName && item[layerName]) {
                                     layerName = item[layerName] + ": ";
                                 } else if (!layerName) {
+                                    // this will use the "Editable" layer, container.vectors
                                     layerName = "";
                                 }
 
@@ -1510,27 +1558,7 @@ import { defaults as defaultControls } from "ol/control";
                                 if (-1 === $.inArray(layerName, form.autoLayers)) {
                                     form.autoLayers.push(layerName);
                                 }
-                                const layer = container.getLayer(layerName);
-
-                                // check if an object with the same id is already in the layer
-                                if (item.object_id) {
-                                    const layerFeatures = layer.getSource().getFeatures();
-
-                                    const there = layerFeatures.find((feature) => {
-                                        const subFeatures = feature.get("features");
-                                        if (subFeatures) {
-                                            return subFeatures.find((subFeature) => {
-                                                return subFeature.get("object") === item.object_id;
-                                            });
-                                        } else {
-                                            return feature.get("object") === item.object_id;
-                                        }
-                                    });
-
-                                    if (there) {
-                                        return;
-                                    }
-                                }
+                                let layer = container.getLayer(layerName);
 
                                 let icon = "";
                                 try {
@@ -1544,6 +1572,10 @@ import { defaults as defaultControls } from "ol/control";
                                 } catch (e) {}
 
                                 if (item.geo_location) {
+                                    if (checkFeatureExists(layer, item)) {
+                                        return;
+                                    }
+
                                     $(container).addMapMarker({
                                         coordinates: item.geo_location,
                                         content: item.title,
@@ -1555,6 +1587,11 @@ import { defaults as defaultControls } from "ol/control";
                                         form: form,
                                     });
                                 } else if (item.geo_feature) {
+                                    layer = container.getLayer(layerName, true);
+                                    if (checkFeatureExists(layer, item)) {
+                                        return;
+                                    }
+
                                     const wkt = new ol.format.WKT(),
                                         format = new ol.format.GeoJSON();
                                     let features;
@@ -1639,6 +1676,10 @@ import { defaults as defaultControls } from "ol/control";
                                     });
                                 } else if (item.geo_file) {
                                     // load a file containing geometry, set using tracker Files indexGeometry option
+                                    layer = container.getLayer(layerName, true);
+                                    if (checkFeatureExists(layer, item)) {
+                                        return;
+                                    }
 
                                     let format;
                                     const files = item.geo_file.split(",");
