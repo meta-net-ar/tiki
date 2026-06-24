@@ -658,8 +658,8 @@ function wikiplugin_tracker_info()
             'rulesparent' => [
                 'required' => false,
                 'name' => tra('Field rules parent selector'),
-                'description' => tra('JQuery selector for the parent object to show or hide when executing field rules.'),
-                'default' => '.tracker-field-group:first',
+                'description' => tra('JQuery selector for the parent object to show or hide when executing field rules. Leave empty to use the default selector for the tracker rendering mode.'),
+                'default' => '',
                 'advanced' => true,
                 'filter' => 'text',
             ],
@@ -858,6 +858,9 @@ function wikiplugin_tracker($data, $params)
         }
 
         $wiki = trim($wiki);
+    }
+    if (empty($params['rulesparent'])) {
+        $params['rulesparent'] = empty($tpl) && empty($wiki) ? '.tiki-form-group:first' : '.tracker-field-group:first';
     }
 
     $fields_prefix = 'ins_';
