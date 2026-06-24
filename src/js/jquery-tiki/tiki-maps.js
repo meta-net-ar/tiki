@@ -441,6 +441,16 @@ import { defaults as defaultControls } from "ol/control";
                                 clusterSource = new ol.source.Cluster({
                                     distance: distance,
                                     source: new ol.source.Vector({ wrapX: false }),
+                                    geometryFunction: (feature) => {
+                                        const geom = feature.getGeometry();
+                                        if (!geom) return null;
+                                        if (geom instanceof ol.geom.Polygon) {
+                                            // Use the centroid of the polygon's extent
+                                            return new ol.geom.Point(ol.extent.getCenter(geom.getExtent()));
+                                        } else {
+                                            return geom;
+                                        }
+                                    },
                                 });
 
                             let clusterFillColor = $(container).data("clusterfillcolor"),
@@ -566,15 +576,15 @@ import { defaults as defaultControls } from "ol/control";
                             });
 
                             if ($(container).data("clusterhover") === "features") {
-                                container.map.interactions = container.map.getInteractions().extend([
+                                container.map.addInteraction(
                                     new ol.interaction.Select({
                                         condition: function (evt) {
                                             return evt.type === "pointermove" || evt.type === "singleclick";
                                         },
                                         style: selectClusterFeaturesStyle,
                                         layers: [vectors],
-                                    }),
-                                ]);
+                                    })
+                                );
                             }
 
                             if ($(container).data("popup-style")) {
@@ -1617,7 +1627,12 @@ import { defaults as defaultControls } from "ol/control";
                                             });
                                         });
                                     });
-                                    layer.getSource().addFeatures(features);
+
+                                    let layerSource = layer.getSource();
+                                    if (typeof layerSource.getSource === "function") {
+                                        layerSource = layerSource.getSource();
+                                    }
+                                    layerSource.addFeatures(features);
 
                                     $.each(features, function (k, feature) {
                                         $(container).trigger("add", [item, feature]);
@@ -1675,7 +1690,11 @@ import { defaults as defaultControls } from "ol/control";
                                                     feature.set("popup_tpl", $(form).data("popup-tpl"));
                                                 }
                                             });
-                                            layer.getSource().addFeatures(features);
+                                            let layerSource = layer.getSource();
+                                            if (typeof layerSource.getSource === "function") {
+                                                layerSource = layerSource.getSource();
+                                            }
+                                            layerSource.addFeatures(features);
 
                                             $.each(features, function (k, feature) {
                                                 $(container).trigger("add", [item, feature]);
