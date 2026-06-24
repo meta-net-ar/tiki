@@ -11,9 +11,15 @@
 class WYSIWYGLib
 {
     /**
-     * Shared map from Tiki language codes to editor locale codes (Summernote, Toast UI).
-     * Standard hyphenated codes (e.g., 'fr-FR', 'zh-CN') are resolved directly.
-     * Bare codes (e.g., 'ar', 'pt') or empty 'en' fallback to disk auto-discovery.
+     * Shared map from Tiki language codes to editor locale codes, used by both
+     * getEditorLang() (Summernote) and languageMapISO() (Toast UI).
+     *
+     * How getEditorLang() consumes this map:
+     *   - Hyphenated value (e.g. 'fr-FR'): used directly as the Summernote locale.
+     *   - Bare value (e.g. 'ar', 'pt'): passed as a hint to resolveSummernoteLocale()
+     *     for disk-based discovery of the best matching locale variant.
+     *   - Empty string (''): English default — Summernote needs no locale file.
+     *   - null (language absent from map): resolveSummernoteLocale() uses the raw Tiki code.
      */
     private const TIKI_EDITOR_LOCALE_MAP = [
         'ar'      => 'ar',           // Arabic (bare — resolveSummernoteLocale finds the right variant)
@@ -24,7 +30,7 @@ class WYSIWYGLib
         //'cy'    => 'cy',           // Welsh — no editor file yet
         //'da'    => 'da',           // Danish — no editor file yet
         'de'      => 'de-DE',        // German
-        'en'      => '',             // English — Toast default (no file); Summernote falls back to resolveSummernoteLocale → en-US
+        'en'      => '',             // English — Toast default (no file); Summernote uses 'en-US' (built-in, no locale file loaded)
         'en-uk'   => 'en-US',        // British English → en-US for both editors
         'es'      => 'es-ES',        // Spanish
         //'el'    => 'el',           // Greek — no editor file yet
@@ -124,19 +130,34 @@ class WYSIWYGLib
     public function getEditorLang()
     {
         $tikLang = TikiLib::lib('tiki')->get_language();
-
-        // Use hyphenated mapped codes directly; fall back to disk auto-discovery for bare/empty codes
-        $mapped = self::TIKI_EDITOR_LOCALE_MAP[$tikLang] ?? null;
-
-        if ($mapped !== null && strpos($mapped, '-') !== false) {
-            $locale = $mapped;
-        } else {
-            $locale = $this->resolveSummernoteLocale($tikLang);
-        }
-
+        $locale = $this->resolveLocaleCode($tikLang);
         $langFilePath = NODE_PUBLIC_DIST_PATH . '/summernote/dist/lang/summernote-' . $locale . '.min.js';
 
         return ['lang' => $locale, 'filePath' => $langFilePath];
+    }
+
+    /**
+     * Map a Tiki language code to the Summernote locale code.
+     * TIKI_EDITOR_LOCALE_MAP is the authoritative override for known languages;
+     * resolveSummernoteLocale() is the disk-based fallback for unmapped or bare-coded ones.
+     */
+    protected function resolveLocaleCode(string $tikLang): string
+    {
+        $mapped = self::TIKI_EDITOR_LOCALE_MAP[$tikLang] ?? null;
+
+        if ($mapped === null) {
+            // Language not in map: auto-discover locale from disk.
+            return $this->resolveSummernoteLocale($tikLang);
+        } elseif ($mapped === '') {
+            // English: Summernote renders in English by default; no locale file is loaded.
+            return 'en-US';
+        } elseif (strpos($mapped, '-') !== false) {
+            // Full hyphenated locale (e.g. 'fr-FR', 'zh-CN'): use directly.
+            return $mapped;
+        } else {
+            // Bare language hint (e.g. 'ar', 'pt'): let disk resolution find the best variant.
+            return $this->resolveSummernoteLocale($mapped);
+        }
     }
 
     /**
@@ -144,7 +165,7 @@ class WYSIWYGLib
      * Matches exact case-insensitive code, then falls back to prefix matching
      * (with country-code tiebreaker), and finally defaults to 'en-US'.
      */
-    private function resolveSummernoteLocale(string $tikLang): string
+    protected function resolveSummernoteLocale(string $tikLang): string
     {
         $langDir = NODE_PUBLIC_DIST_PATH . '/summernote/dist/lang/';
         $files = glob($langDir . 'summernote-*.min.js');
