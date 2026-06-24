@@ -191,8 +191,9 @@ Sections::onSectionChange(function ($section) {
     //8) produce $iconset to be used for generating icons
     $iconset = TikiLib::lib('iconset')->getIconsetForTheme($theme_active, $theme_option_active);
     // and add js support file
-    $headerlib->add_js('jqueryTiki.iconset = ' . json_encode($iconset->getJS()));
     $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');
+    // because theme setup now happens before javascript, we need to add this in js_config but to render after the initial setup of jqueryTiki
+    $headerlib->add_js_config('jqueryTiki.iconset = ' . json_encode($iconset->getJS()), 10);
 
     //Note: if Theme Control is active, than tiki-tc.php can modify the active theme
 
