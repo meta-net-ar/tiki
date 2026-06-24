@@ -270,10 +270,12 @@ class Sections
         if (! in_array($section, self::getAllSections(), true)) {
             throw new \InvalidArgumentException("Invalid section: $section");
         }
-        self::$currentSection = $section;
 
-        // Trigger callbacks when section changes
-        self::triggerSectionChangeCallbacks($section);
+        if (self::$currentSection !== $section) {
+            // Trigger callbacks when section changes
+            self::$currentSection = $section;
+            self::triggerSectionChangeCallbacks($section);
+        }
     }
 
     public static function getCurrentSection(): ?string
