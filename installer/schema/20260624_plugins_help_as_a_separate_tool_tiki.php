@@ -14,16 +14,16 @@ use Tiki\Installer\Installer;
  */
 function upgrade_20260624_plugins_help_as_a_separate_tool_tiki(Installer $installer)
 {
-  $res = $installer->query("SELECT `name`, `value` FROM `tiki_preferences` WHERE `name` LIKE 'toolbar\_%'");
-  while ($row = $res->fetchRow()) {
-    $name = $row['name'];
-    $value = $row['value'];
+    $res = $installer->query("SELECT `name`, `value` FROM `tiki_preferences` WHERE `name` LIKE 'toolbar\_%'");
+    while ($row = $res->fetchRow()) {
+        $name = $row['name'];
+        $value = $row['value'];
 
-    // Check if 'help' is present and 'launchplugins' is not present
-    if (preg_match('/(^|[|,])\s*help\s*([|,]|$)/', $value) && !preg_match('/(^|[|,])\s*launchplugins\s*([|,]|$)/', $value)) {
-      // Add 'launchplugins' alongside 'help'
-      $newValue = preg_replace('/(^|[|,])\s*help\s*([|,]|$)/', '$1help,launchplugins$2', $value);
-      $installer->query("UPDATE `tiki_preferences` SET `value` = ? WHERE `name` = ?", [$newValue, $name]);
+      // Check if 'help' is present and 'launchplugins' is not present
+        if (preg_match('/(^|[|,])\s*help\s*([|,]|$)/', $value) && ! preg_match('/(^|[|,])\s*launchplugins\s*([|,]|$)/', $value)) {
+          // Add 'launchplugins' alongside 'help'
+            $newValue = preg_replace('/(^|[|,])\s*help\s*([|,]|$)/', '$1help,launchplugins$2', $value);
+            $installer->query("UPDATE `tiki_preferences` SET `value` = ? WHERE `name` = ?", [$newValue, $name]);
+        }
     }
-  }
 }
