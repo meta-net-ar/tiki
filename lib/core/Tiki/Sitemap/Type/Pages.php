@@ -39,12 +39,11 @@ class Pages extends AbstractType
 
         $ranges = $this->getTypeDateRanges('Pages', $prefs['sitemap_split']);
         foreach ($ranges as $range) {
+
             // On automatic mode skip non requested ranges.
-            if (
-                $auto
+            if ($auto
                 && (intval($context['year'] ?? 0) !== intval($range['year'] ?? 0)
-                    || intval($context['month'] ?? 0) !== intval($range['month'] ?? 0))
-            ) {
+                    || intval($context['month'] ?? 0) !== intval($range['month'] ?? 0))) {
                 continue;
             }
 
@@ -58,7 +57,9 @@ class Pages extends AbstractType
             );
 
             if ($isMultilingual) {
+
                 foreach ($listPages['data'] as &$page) {
+
                     try {
                         $translations             = $multilinguallib->getTranslations('wiki page', $page['page_id']);
                         $page['has_translations'] = count($translations) > 1;
