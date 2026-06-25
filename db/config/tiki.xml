@@ -400,9 +400,7 @@
             <file>%kernel.root_dir%/lib/setup/error_tracking.php</file>
         </service>
 
-        <service id="tiki.lib.htmltidy" class="Tiki\Lib\HtmlTidy\HtmlTidyLib">
-            <file>%kernel.root_dir%/lib/htmltidy/htmltidylib.php</file>
-        </service>
+        <service id="tiki.lib.htmltidy" class="Tiki\Lib\HtmlTidy\HtmlTidyLib"/>
 
         <service id="tiki.lib.iotevents" class="Tiki\Lib\iot\EventListener">
             <file>%kernel.root_dir%/lib/iot/EventListener.php</file>

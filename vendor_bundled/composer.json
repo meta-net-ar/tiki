@@ -475,6 +475,7 @@
                 "../lib/core/"
             ],
             "Tiki\\Lib\\": "../lib/",
+            "Tiki\\Lib\\HtmlTidy\\": "../lib/htmltidy/",
             "Tiki\\Lib\\Payment\\": "../lib/payment",
             "Tiki\\Lib\\Wiki\\": "../lib/wiki",
             "SmartyTiki\\": "../lib/smarty_tiki"
