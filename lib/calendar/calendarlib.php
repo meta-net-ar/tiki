@@ -178,7 +178,7 @@ class CalendarLib extends TikiLib
         }
         return  [
             'timeFormat'       => $prefs['display_12hr_clock'] === 'y',
-            'firstDayofWeek'   => 0,//$firstDayofWeek,
+            'firstDayofWeek'   => $this->firstDayofWeek(),
             'display_timezone' => $prefs['display_timezone'],
             'language'         => $prefs['language'],
             'minHourOfDay'     => $minHourOfDay,
@@ -1674,7 +1674,7 @@ class CalendarLib extends TikiLib
         } else {
             $firstDayofWeek = $prefs['calendar_firstDayofWeek'];
         }
-        return $firstDayofWeek;
+        return (int) $firstDayofWeek;
     }
     // return detail on a date
     /**

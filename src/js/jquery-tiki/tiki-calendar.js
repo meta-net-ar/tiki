@@ -328,7 +328,7 @@ $.fn.setupEventCalendar = function (
                     removeMonthRangeControls();
                     removeListPeriodControls();
                     if (currentViewType == "timeGridWeek" || currentViewType == "listWeek") {
-                        calendarContainer[0].setOption("duration", { days: 7 });
+                        calendarContainer[0].setOption("duration", { weeks: 1 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });

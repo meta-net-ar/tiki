@@ -60,6 +60,23 @@ class Calendar_DateTest extends TikiTestCase
         $this->assertEquals('2010-09-05', TikiLib::date_format('%Y-%m-%d', $cell[5][6]['date']));
     }
 
+    public function testFirstDayOfWeekReturnsIntegerForExplicitPreference(): void
+    {
+        global $prefs;
+        $calendarlib = TikiLib::lib('calendar');
+        $originalPreference = $prefs['calendar_firstDayofWeek'];
+
+        try {
+            $prefs['calendar_firstDayofWeek'] = '0';
+            $this->assertSame(0, $calendarlib->firstDayofWeek());
+
+            $prefs['calendar_firstDayofWeek'] = '1';
+            $this->assertSame(1, $calendarlib->firstDayofWeek());
+        } finally {
+            $prefs['calendar_firstDayofWeek'] = $originalPreference;
+        }
+    }
+
     public function testPrevious(): void
     {
         global $tikilib;
