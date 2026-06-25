@@ -12,6 +12,12 @@ namespace Tiki\Lib\HtmlTidy;
  */
 class HtmlTidyLib
 {
+    /**
+     * Wraps fragments before validation so Tidy doesn't have to guess at missing
+     * structure — that guesswork shifts line numbers inconsistently between libtidy builds.
+     */
+    private const DOCUMENT_WRAPPER = '<!DOCTYPE html><html><head><title></title></head><body>';
+
     private bool $tidyAvailable;
 
     public function __construct()
@@ -74,7 +80,7 @@ class HtmlTidyLib
      *
      * @param string $html    HTML string to validate
      * @param array $context  Context metadata for error reports (e.g. ['source' => 'Plugin: html'])
-     * @return array          Parsed error entries: [['level', 'line', 'column', 'message'], ...]
+     * @return array          Parsed error entries: [['level', 'line', 'column', 'message', 'snippet'], ...]
      */
     public function reportErrors(string $html, array $context = []): array
     {
@@ -82,11 +88,19 @@ class HtmlTidyLib
             return [];
         }
 
-        $html_ = tidy_parse_string($html, [], 'utf8');
+        $wrapped = self::DOCUMENT_WRAPPER . "\n" . $html;
+        $wrapperLines = substr_count(self::DOCUMENT_WRAPPER, "\n") + 1;
+
+        $html_ = tidy_parse_string($wrapped, [], 'utf8');
         tidy_diagnose($html_);
-        $errors = $this->filterFragmentNoise(
-            $this->parseTidyErrors(tidy_get_error_buffer($html_))
+        $errors = $this->adjustLineNumbers(
+            $this->parseTidyErrors(tidy_get_error_buffer($html_)),
+            $wrapperLines
         );
+
+        if (! empty($errors)) {
+            $errors = $this->attachSnippets($errors, $html);
+        }
 
         if (! empty($errors) && $this->isTidyReportingEnabled()) {
             $this->dispatchErrors($errors, $context);
@@ -143,6 +157,7 @@ class HtmlTidyLib
 
     /**
      * Send each parsed error to the error tracking service as a message event.
+     * Includes a snippet so the message is readable without the original fragment.
      */
     private function dispatchErrors(array $errors, array|string $context): void
     {
@@ -150,42 +165,73 @@ class HtmlTidyLib
         $source = is_array($context) ? ($context['source'] ?? 'unknown') : (string) $context;
 
         foreach ($errors as $error) {
-            $errorTracking->captureMessage(sprintf(
+            $message = sprintf(
                 'HTML Tidy %s in %s: %s (line %d, col %d)',
                 ucfirst($error['level']),
                 $source,
                 $error['message'],
                 $error['line'],
                 $error['column']
-            ));
+            );
+
+            if (! empty($error['snippet'])) {
+                $message .= sprintf(' — near: "%s"', $error['snippet']);
+            }
+
+            $errorTracking->captureMessage($message);
         }
     }
 
-    /**
-     * Remove false positives that Tidy generates because it treats an HTML fragment
-     * as a complete document. These messages are not actionable for plugin authors.
-     */
-    private function filterFragmentNoise(array $errors): array
+    private function attachSnippets(array $errors, string $html): array
     {
-        $noise = [
-            'missing <!DOCTYPE>',
-            "isn't allowed in <head>",
-            '<head> previously mentioned',
-            'inserting implicit <body>',
-            'inserting implicit <head>',
-            'inserting implicit <html>',
-            "inserting missing 'title' element",
-            'trimming empty <head>',
-        ];
+        $lines = explode("\n", $html);
 
-        return array_values(array_filter($errors, function (array $error) use ($noise): bool {
-            foreach ($noise as $pattern) {
-                if (str_contains($error['message'], $pattern)) {
-                    return false;
-                }
-            }
-            return true;
-        }));
+        foreach ($errors as &$error) {
+            $line = $lines[$error['line'] - 1] ?? '';
+            $error['snippet'] = $this->extractSnippet($line, $error['column']);
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Extract a window of text centered on $column — lines can be long, and the
+     * error isn't always near the start.
+     */
+    private function extractSnippet(string $line, int $column, int $windowSize = 80): string
+    {
+        $line = trim($line);
+        if ($line === '') {
+            return '';
+        }
+
+        $columnIndex = $column - 1; // Tidy columns are 1-based, string offsets are 0-based
+        $halfWindow = (int) ($windowSize / 2);
+
+        $windowStart = max(0, $columnIndex - $halfWindow);
+        $snippet = substr($line, $windowStart, $windowSize);
+
+        if ($windowStart > 0) {
+            $snippet = '…' . $snippet;
+        }
+        if ($windowStart + $windowSize < strlen($line)) {
+            $snippet .= '…';
+        }
+
+        return $snippet;
+    }
+
+    /**
+     * Errors with line <= 0 after the shift belong to the wrapper, not the plugin.
+     */
+    private function adjustLineNumbers(array $errors, int $offset): array
+    {
+        foreach ($errors as &$error) {
+            $error['line'] -= $offset;
+        }
+        unset($error);
+
+        return array_values(array_filter($errors, fn(array $error): bool => $error['line'] >= 1));
     }
 
     /**

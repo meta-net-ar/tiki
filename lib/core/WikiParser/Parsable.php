@@ -576,7 +576,9 @@ if ( \$('#$id') ) {
                         $repeat  = false;
                         $items   = implode('', array_map(
                             fn($e) => '<li>' . htmlspecialchars($e['message'])
-                                . ' <small>(line ' . (int) $e['line'] . ', col ' . (int) $e['column'] . ')</small></li>',
+                                . ' <small>(line ' . (int) $e['line'] . ', col ' . (int) $e['column'] . ')</small>'
+                                . (! empty($e['snippet']) ? '<br><code>' . htmlspecialchars($e['snippet']) . '</code>' : '')
+                                . '</li>',
                             $tidyErrors
                         ));
                         $box = smarty_block_remarksbox(
