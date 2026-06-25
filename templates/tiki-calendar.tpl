@@ -1,4 +1,18 @@
 {include file='token_view_actions.tpl'}
+{if !empty($calendarEmptyState)}
+{title admpage="calendar"}{tr}Calendar{/tr}{/title}
+<div id="calscreen">
+    {remarksbox type="info" title="{tr}No calendars available{/tr}" close="n"}
+        <p>{tr}You don't have any calendars yet.{/tr}</p>
+        {if $tiki_p_admin_calendar eq 'y' or $tiki_p_admin eq 'y' or $tiki_p_admin_private_calendar eq 'y'}
+            <p>{tr}Create a calendar to start adding and viewing events.{/tr}</p>
+            {button href="tiki-admin_calendars.php?cookietab=2" _type="primary" _icon_name="create" _text="{tr}Create Calendar{/tr}"}
+        {else}
+            <p>{tr}Please ask an administrator to create one.{/tr}</p>
+        {/if}
+    {/remarksbox}
+</div>
+{else}
 {title admpage="calendar"}
     {if $displayedcals|@count eq 1}
     {tr}Calendar:{/tr} {$calendars[$displayedcals[0]].displayName|escape}
@@ -120,4 +134,5 @@
 </div>
 {if $prefs.feature_jscalendar eq 'y'}
     {js_insert_icon type="jscalendar"}
+{/if}
 {/if}

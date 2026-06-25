@@ -68,12 +68,11 @@ if (! isset($cookietab)) {
 $rawcals = $calendarlib->list_calendars();
 
 if (empty($rawcals['data'])) {
-    if (Perms::get(['type' => 'calendar'])->admin_calendar) {
-        $message = tr('You need to %0create a calendar%1', '<a href="tiki-admin_calendars.php?cookietab=2">', '</a>');
-    } else {
-        $message = tra('No calendars found');
-    }
-    Feedback::errorAndDie($message, \Laminas\Http\Response::STATUS_CODE_404);
+    $smarty->assign('calendarEmptyState', true);
+    $smarty->assign('mid', 'tiki-calendar.tpl');
+    $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
+    $smarty->display("tiki.tpl");
+    die;
 }
 
 $rawcals['data'] = Perms::filter(
