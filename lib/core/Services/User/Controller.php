@@ -608,6 +608,10 @@ class Services_User_Controller
                 if (! $ret[0]) {
                     Services_Utilities::modalException(tra('Invalid password'));
                 }
+
+                if (! $userlib->canLogin($user)) {
+                    Services_Utilities::modalException(tra('You are not allowed to login.'));
+                }
             }
 
             $util->setVars($input, $this->filters, 'items');

@@ -147,6 +147,10 @@ if (isset($_REQUEST["change"]) && $access->checkCsrf()) {
         // Method 3: Old password
         list($isvalid, $validated_username, $error) = $userlib->validate_user($user, $_REQUEST["oldpass"]);
         if ($isvalid) {
+            if (! $userlib->canLogin($validated_username)) {
+                Feedback::error(tra('User "%0" is not allowed to log in.', $validated_username));
+            }
+
             $is_authenticated = true;
             $can_change_password = true;
             $authenticated_oldpass = $_REQUEST['oldpass'];

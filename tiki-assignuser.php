@@ -64,6 +64,9 @@ if (isset($_REQUEST["action"])) {
             if (empty($passwordCheck[0])) {
                 Feedback::error(tr('Invalid password confirmation. Group operation was not performed.'));
                 $canProcess = false;
+            } elseif (! $userlib->canLogin($user)) {
+                Feedback::error(tr('You are not allowed to perform this group operation.'));
+                $canProcess = false;
             }
         }
     }

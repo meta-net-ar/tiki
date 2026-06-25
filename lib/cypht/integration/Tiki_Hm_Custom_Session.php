@@ -52,6 +52,11 @@ class Tiki_Hm_Custom_Session extends Hm_Session
     {
         $userlib = TikiLib::lib('user');
         list($isvalid, $user) = $userlib->validate_user($user, $pass);
+
+        if ($isvalid && ! $userlib->canLogin($user)) {
+            $isvalid = false;
+        }
+
         return $isvalid;
     }
 

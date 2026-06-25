@@ -480,6 +480,10 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             }
         } else {
             list($ok, $userwatch, $error) = $userlib->validate_user($userwatch, $pass, false, null, false);
+
+            if ($ok && ! $userlib->canLogin($userwatch)) {
+                Feedback::errorAndDie(tra("You are not allowed to login."), \Laminas\Http\Response::STATUS_CODE_403);
+            }
         }
         if (! $ok) {
             Feedback::errorAndDie(tra("Invalid password. Your current password is required to change administrative information"), \Laminas\Http\Response::STATUS_CODE_409);

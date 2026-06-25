@@ -81,6 +81,14 @@ if (! empty($user) && isset($_SESSION['login_time'])) {
     }
 }
 
+if ($user && ! $userlib->canLogin($user)) {
+    TikiLib::lib('login')->logout();
+    if (! defined('TIKI_CONSOLE') && PHP_SAPI !== 'cli') {
+        unset($GLOBALS['user']);
+        Feedback::errorAndDie(tra('You are not allowed to log in.'), \Laminas\Http\Response::STATUS_CODE_403);
+    }
+}
+
 if (version_compare(PHP_VERSION, TIKI_MIN_PHP_VERSION, '<')) {
     if (PHP_SAPI !== 'cli') {                   // if not running a command line version of php, show requirements
         header('location: tiki-install.php');

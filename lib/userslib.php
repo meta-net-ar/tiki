@@ -269,6 +269,12 @@ class UsersLib extends TikiLib
         return in_array($group, $this->list_all_groups());
     }
 
+    public function canLogin($user)
+    {
+        $query = 'select `login` from `users_users` where upper(`login`) = ? and `no_auth` = ?';
+        return $this->getOne($query, [TikiLib::strtoupper($user), 'n']);
+    }
+
     /**
      * Remember-me cookie name and session key, derived from the cookie_name preference.
      * Bootstrap sets global user_cookie_site to this value once for the whole request.

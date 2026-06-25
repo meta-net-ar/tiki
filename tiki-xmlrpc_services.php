@@ -86,6 +86,10 @@ function getUserInfo($params)
     list($ok, $username, $e) = $userlib->validate_user($username, $password);
 
     if ($ok) {
+        if (! $userlib->canLogin($username)) {
+            return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+        }
+
         $myStruct = new XML_RPC_Value(
             [
                 'nickname' => new XML_RPC_Value($username),
@@ -132,6 +136,10 @@ function newPost($params)
     list($ok, $username, $e) = $userlib->validate_user($username, $password);
     if (! $ok) {
         return new XML_RPC_Response(0, 101, 'Invalid username or password');
+    }
+
+    if (! $userlib->canLogin($username)) {
+        return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
     }
 
     // Get individual permissions for this weblog if they exist
@@ -190,6 +198,10 @@ function editPost($params)
         return new XML_RPC_Response(0, 101, 'Invalid username or password');
     }
 
+    if (! $userlib->canLogin($username)) {
+        return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+    }
+
     if (! check_individual($username, $blogid, 'tiki_p_blog_post')) {
         return new XML_RPC_Response(
             0,
@@ -242,6 +254,10 @@ function deletePost($params)
         return new XML_RPC_Response(0, 101, 'Invalid username or password');
     }
 
+    if (! $userlib->canLogin($username)) {
+        return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+    }
+
     // Now get the post information
     $post_data = $bloglib->get_post($postid);
 
@@ -285,6 +301,10 @@ function getPost($params)
     list($ok, $username, $e) = $userlib->validate_user($username, $password);
     if (! $ok) {
         return new XML_RPC_Response(0, 101, 'Invalid username or password');
+    }
+
+    if (! $userlib->canLogin($username)) {
+        return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
     }
 
     if (! check_individual($username, $blogid, 'tiki_p_blog_post')) {
@@ -346,6 +366,10 @@ function getRecentPosts($params)
     list($ok, $username, $e) = $userlib->validate_user($username, $password);
     if (! $ok) {
         return new XML_RPC_Response(0, 101, 'Invalid username or password');
+    }
+
+    if (! $userlib->canLogin($username)) {
+        return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
     }
 
     if (! check_individual($username, $blogid, 'tiki_p_blog_post')) {
