@@ -175,6 +175,21 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
         }
     }
 
+    public function renderText($context = [])
+    {
+        $value = $this->getValue();
+
+        if ($this->getConfiguration('isMultilingual') == 'y') {
+            $decoded = json_decode($value, true);
+            if (is_array($decoded)) {
+                $language = Language::getCurrentLanguage();
+                $value = $decoded[$language] ?? (reset($decoded) ?: '');
+            }
+        }
+
+        return trim(strip_tags((string) $value));
+    }
+
     protected function processMultilingual($requestData, $id_string)
     {
         global $prefs;
