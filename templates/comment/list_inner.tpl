@@ -14,7 +14,7 @@
                             <div class="comment-title">
                                 {$comment.title}
                                 {if $prefs.comments_heading_links eq 'y'}
-                                    <button type="button" class="heading-link copy-comment-link tips btn btn-link p-0" title="|{tr}Click to copy the comment link{/tr}" aria-label="{tr}Heading link{/tr}" data-thread-id="{if $comment.threadId neq $comments_parentId}threadId{$comment.threadId}{/if}">{icon name="link" _class="me-1"}</button>
+                                    <button type="button" class="heading-link copy-comment-link tips btn btn-link p-0" title="|{tr}Click to copy the comment link{/tr}" aria-label="{tr}Heading link{/tr}" data-thread-id="threadId{$comment.threadId|escape}">{icon name="link" iclass="me-1"}</button>
                                 {/if}
                             </div>
                         {/if}
@@ -24,7 +24,7 @@
                             {/if}
                             {tr _0=$comment.userName|userlink}%0{/tr}{if $prefs.comments_threshold_indent neq '0' && $level && $level gte $prefs.comments_threshold_indent}>{tr _0=$repliedTo.userName|userlink}%0{/tr}{/if} <small class="date">{tr _0=$comment.commentDate|tiki_short_datetime}%0{/tr}</small>
                             {if $prefs.comments_heading_links eq 'y' and  $prefs.comments_notitle eq 'y'}
-                                <button type="button" class="heading-link copy-comment-link tips btn btn-link p-0" title="|{tr}Click to copy the comment link{/tr}" aria-label="{tr}Heading link{/tr}" data-thread-id="{if $comment.threadId neq $comments_parentId}threadId{$comment.threadId}{/if}">{icon name="link" _class="me-1"}</button>
+                                <button type="button" class="heading-link copy-comment-link tips btn btn-link p-0" title="|{tr}Click to copy the comment link{/tr}" aria-label="{tr}Heading link{/tr}" data-thread-id="threadId{$comment.threadId|escape}">{icon name="link" iclass="me-1"}</button>
                             {/if}
                         </div>
                     </h4>
