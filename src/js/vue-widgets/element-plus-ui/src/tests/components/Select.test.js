@@ -71,7 +71,12 @@ describe("Select", () => {
         });
 
         expect(ElSelect).toHaveBeenCalledWith(
-            expect.objectContaining({ modelValue: JSON.parse(basicProps.value), remote: false, "empty-values": [null, undefined] }),
+            expect.objectContaining({
+                modelValue: JSON.parse(basicProps.value),
+                remote: false,
+                "automatic-dropdown": false,
+                "empty-values": [null, undefined],
+            }),
             expect.any(Object)
         );
 
@@ -114,6 +119,7 @@ describe("Select", () => {
                 "collapse-tags": true,
                 "max-collapse-tags": parseInt(givenProps.maxCollapseTags, 10),
                 "multiple-limit": parseInt(givenProps.max, 10),
+                "automatic-dropdown": true,
                 "empty-values": [null, undefined],
             }),
             expect.any(Object)
@@ -136,6 +142,31 @@ describe("Select", () => {
             expect.objectContaining({
                 filterable: true,
                 remote: true,
+            }),
+            expect.any(Object)
+        );
+    });
+
+    test.each([
+        { name: "missing", multipleProp: undefined, expectedMultiple: false },
+        { name: "false boolean", multipleProp: false, expectedMultiple: false },
+        { name: "false string", multipleProp: "false", expectedMultiple: false },
+        { name: "true boolean", multipleProp: true, expectedMultiple: true },
+        { name: "true string", multipleProp: "true", expectedMultiple: true },
+        { name: "jQuery boolean attribute", multipleProp: "multiple", expectedMultiple: true },
+        { name: "empty boolean attribute", multipleProp: "", expectedMultiple: true },
+    ])("normalizes the multiple prop as a boolean: $name", ({ multipleProp, expectedMultiple }) => {
+        render(Select, {
+            props: {
+                ...basicProps,
+                ...(multipleProp === undefined ? {} : { multiple: multipleProp }),
+            },
+        });
+
+        expect(ElSelect).toHaveBeenCalledWith(
+            expect.objectContaining({
+                multiple: expectedMultiple,
+                "automatic-dropdown": expectedMultiple,
             }),
             expect.any(Object)
         );
