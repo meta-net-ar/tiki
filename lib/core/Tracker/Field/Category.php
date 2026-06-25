@@ -348,6 +348,36 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
         }
     }
 
+    /**
+     * Return plain text representation of selected categories
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $data = $this->getFieldData();
+        $selected_categories = $data['selected_categories'];
+        $categories = $data['list'];
+
+        if (! is_array($selected_categories)) {
+            $selected_categories = [];
+        }
+        if (! is_array($categories)) {
+            $categories = [];
+        }
+        $out = [];
+        foreach ($categories as $category) {
+            foreach ($selected_categories as $categId) {
+                if ($category['categId'] == $categId) {
+                    $out[] = $category['name'];
+                }
+            }
+        }
+
+        return implode(', ', $out);
+    }
+
     public function handleSave($value, $oldValue)
     {
         if (is_array($value) && isset($value['incremental'])) {
