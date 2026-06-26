@@ -786,17 +786,6 @@
         {
             "type": "package",
             "package": {
-                "name": "openannotation/annotator",
-                "version": "1.2.10",
-                "dist": {
-                    "url": "https://github.com/openannotation/annotator/releases/download/v1.2.10/annotator-full.1.2.10.zip",
-                    "type": "zip"
-                }
-            }
-        },
-        {
-            "type": "package",
-            "package": {
                 "name": "openlayers/ol3",
                 "version": "3.6.0",
                 "dist": {
@@ -2204,7 +2193,6 @@
         "npm-asset/select2-bootstrap-5-theme": "^1.2",
         "npm-asset/interactjs": "^1.10",
         "onelogin/php-saml": ">=2.10.0",
-        "openannotation/annotator": ">=1.2.10",
         "openid/php-openid": "2.2.2",
         "openlayers/ol3": ">=3.6.0",
         "openlayers/openlayers": ">=5.3.0",

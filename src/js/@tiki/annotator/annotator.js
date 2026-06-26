@@ -1,166 +1,162 @@
-import { createTextAnnotator } from '@recogito/text-annotator';
-import { openAnnotationPopup } from './annotationPopup.js';
-import { convertToLegacyPayload, transformBackendResponse, convertToW3C } from './helpers.js';
-import { saveAnnotationBackend, updateAnnotationBackend, deleteAnnotationBackend, loadAnnotations } from './api.js';
+import { createTextAnnotator } from "@recogito/text-annotator";
+import { openAnnotationPopup } from "./annotationPopup.js";
+import { convertToLegacyPayload, transformBackendResponse } from "./helpers.js";
+import { saveAnnotationBackend, updateAnnotationBackend, deleteAnnotationBackend, loadAnnotations } from "./api.js";
 
-import { injectRecogitoCSS } from './annotatorStyles.js';
+import { injectRecogitoCSS } from "./annotatorStyles.js";
 
 let isCreating = false;
 
 export async function initRecogito(config) {
+    const objectUri = String(config.objectUri || "").trim();
+    const csrfToken = config.csrfToken || "";
+    const showUserInfo = config.showUserInfo || false;
 
-  const objectUri = String(config.objectUri || '').trim();
-  const csrfToken = config.csrfToken || '';
-  const showUserInfo = config.showUserInfo || false;
+    if (!objectUri) {
+        return null;
+    }
 
-  if (!objectUri) {
-    return null;
-  }
+    const container = document.getElementById(config.containerId);
 
-  const container = document.getElementById(config.containerId);
+    if (!container) {
+        return null;
+    }
 
-  if (!container) {
-    return null;
-  }
+    injectRecogitoCSS();
 
-  injectRecogitoCSS();
-
-  const anno = createTextAnnotator(container, {
-    annotatingEnabled: config.canPost,
-    user: {
-      id: config.userId,
-      name: config.userName
-    },
-    selectionMode: 'all'
-  });
-
-  if (!anno) {
-    return null;
-  }
-
-  /**
-   * Load existing annotations
-   */
-  const annotationsList = await loadAnnotations(objectUri, transformBackendResponse);
-  console.log('[Recogito][init] loaded annotations:', annotationsList);
-  anno.setAnnotations(annotationsList);
-
-  /**
-   * Click an annotation
-  */
-  anno.on('selectionChanged', async annotations => {
-    if (isCreating) return;
-
-    if (!annotations || annotations.length === 0) return;
-
-    const annotation = annotations[0];
-
-    const res = await openAnnotationPopup({
-      annotation,
-      mode: 'edit',
-      showAuthor: showUserInfo
+    const anno = createTextAnnotator(container, {
+        annotatingEnabled: config.canPost,
+        user: {
+            id: config.userId,
+            name: config.userName,
+        },
+        selectionMode: "all",
     });
 
-    if (res.action === 'cancel') {
-      anno.setSelected(undefined);
-      return;
+    if (!anno) {
+        return null;
     }
 
-    if (res.action === 'delete') {
-      anno.removeAnnotation(annotation);
-      return;
-    }
+    /**
+     * Load existing annotations
+     */
+    const annotationsList = await loadAnnotations(objectUri, transformBackendResponse);
+    anno.setAnnotations(annotationsList);
 
-    if (res.action === 'update') {
-      let body = annotation.bodies.find(b => b.purpose === 'commenting');
+    /**
+     * Click an annotation
+     */
+    anno.on("selectionChanged", async (annotations) => {
+        if (isCreating) return;
 
-      if (!body) {
-        body = {
-          purpose: 'commenting',
-          value: res.comment
-        };
-        annotation.bodies.push(body);
-      } else {
-        body.value = res.comment;
-      }
+        if (!annotations || annotations.length === 0) return;
 
-      const payload = convertToLegacyPayload(annotation, objectUri, annotation.threadId);
-      anno.updateAnnotation(annotation);
-    }
-  });
+        const annotation = annotations[0];
 
-  /**
-   * Create annotation
-   */
-  anno.on('createAnnotation', async annotation => {
-    isCreating = true;
-    if (!objectUri?.trim()) {
-      return;
-    }
+        const res = await openAnnotationPopup({
+            annotation,
+            mode: "edit",
+            showAuthor: showUserInfo,
+        });
 
-    try {
-      const result = await openAnnotationPopup({
-        annotation,
-        mode: 'create',
-        showAuthor: false
-      });
+        if (res.action === "cancel") {
+            anno.setSelected(undefined);
+            return;
+        }
 
-      if (!result.action || result?.action === 'cancel') {
-        anno.removeAnnotation(annotation.id);
-        anno.setSelected(undefined);
-        isCreating = false;
-        return;
-      }
+        if (res.action === "delete") {
+            anno.removeAnnotation(annotation);
+            return;
+        }
 
-      annotation.bodies.push({
-        purpose: 'commenting',
-        value: result?.comment || ''
-      });
+        if (res.action === "update") {
+            let body = annotation.bodies.find((b) => b.purpose === "commenting");
 
-      let payload = convertToLegacyPayload(annotation, objectUri);
-      payload = { ...payload, text: result?.comment || '' };
+            if (!body) {
+                body = {
+                    purpose: "commenting",
+                    value: res.comment,
+                };
+                annotation.bodies.push(body);
+            } else {
+                body.value = res.comment;
+            }
 
-      if (!payload.uri || !payload.uri.includes(':')) {
-        return;
-      }
+            const payload = convertToLegacyPayload(annotation, objectUri, annotation.threadId);
+            anno.updateAnnotation(annotation);
+        }
+    });
 
-      if (csrfToken) {
-        payload.ticket = csrfToken;
-      }
+    /**
+     * Create annotation
+     */
+    anno.on("createAnnotation", async (annotation) => {
+        isCreating = true;
+        if (!objectUri?.trim()) {
+            return;
+        }
 
-      isCreating = false;
-      anno.setSelected(undefined);
-      await saveAnnotationBackend(payload);
-    } finally {
-      isCreating = false;
-      anno.setSelected(undefined);
-    }
-  });
+        try {
+            const result = await openAnnotationPopup({
+                annotation,
+                mode: "create",
+                showAuthor: false,
+            });
 
-  /**
-   * Update annotation
-   */
-  anno.on('updateAnnotation', annotation => {
-    const payload = convertToLegacyPayload(annotation, objectUri, annotation.threadId);
+            if (!result.action || result?.action === "cancel") {
+                anno.removeAnnotation(annotation.id);
+                anno.setSelected(undefined);
+                isCreating = false;
+                return;
+            }
 
-    if (csrfToken) {
-      payload.ticket = csrfToken;
-    }
-    updateAnnotationBackend(payload);
-  });
+            annotation.bodies.push({
+                purpose: "commenting",
+                value: result?.comment || "",
+            });
 
-  /**
-   * Delete annotation
-   */
-  anno.on('deleteAnnotation', annotation => {
-    if(!annotation?.threadId) {
-      return;
-    }
+            let payload = convertToLegacyPayload(annotation, objectUri);
+            payload = { ...payload, text: result?.comment || "" };
 
-    deleteAnnotationBackend(annotation.threadId);
+            if (!payload.uri || !payload.uri.includes(":")) {
+                return;
+            }
 
-  });
+            if (csrfToken) {
+                payload.ticket = csrfToken;
+            }
 
-  return anno;
+            isCreating = false;
+            anno.setSelected(undefined);
+            await saveAnnotationBackend(payload);
+        } finally {
+            isCreating = false;
+            anno.setSelected(undefined);
+        }
+    });
+
+    /**
+     * Update annotation
+     */
+    anno.on("updateAnnotation", (annotation) => {
+        const payload = convertToLegacyPayload(annotation, objectUri, annotation.threadId);
+
+        if (csrfToken) {
+            payload.ticket = csrfToken;
+        }
+        updateAnnotationBackend(payload);
+    });
+
+    /**
+     * Delete annotation
+     */
+    anno.on("deleteAnnotation", (annotation) => {
+        if (!annotation?.threadId) {
+            return;
+        }
+
+        deleteAnnotationBackend(annotation.threadId);
+    });
+
+    return anno;
 }
-

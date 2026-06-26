@@ -53,14 +53,9 @@ class Services_Comment_AnnotationController
     {
         global $user, $headerlib;
 
-        // Since fetch sends JSON in HTTP body (not query string), we must read php://input
+        // Read JSON request body directly.
         $rawJson = file_get_contents('php://input');
-        if (! $rawJson) {
-            // Fallback for form-encoded data
-            $rawJson = $input->json->none();
-        }
-
-        $params = new JitFilter(json_decode($rawJson, true) ?? []);
+        $params = new JitFilter(json_decode((string) $rawJson, true) ?? []);
 
         $text = $params->text->wikicontent();
         $quote = $params->quote->text();
@@ -126,14 +121,9 @@ class Services_Comment_AnnotationController
     {
         $threadId = $input->threadId->int();
 
-        // Since fetch sends JSON in HTTP body (not query string), we must read php://input
+        // Read JSON request body directly.
         $rawJson = file_get_contents('php://input');
-        if (! $rawJson) {
-            // Fallback for form-encoded data
-            $rawJson = $input->json->none();
-        } 
-
-        $params = new JitFilter(json_decode($rawJson, true) ?? []);
+        $params = new JitFilter(json_decode((string) $rawJson, true) ?? []);
 
         // If threadId is not provided in the input, use the one from the JSON payload
         $threadId = $threadId ?? $params->threadId->int();
@@ -177,15 +167,15 @@ class Services_Comment_AnnotationController
     {
          // ensure threadId exists even if JSON was used
         $rawJson = file_get_contents('php://input');
-        $params = new JitFilter(json_decode($rawJson, true) ?? []);
+        $params = new JitFilter(json_decode((string) $rawJson, true) ?? []);
 
         $threadId = $input->threadId->int();
 
-        if (!$threadId) {
+        if (! $threadId) {
             $threadId = $params->threadId->int();
         }
 
-        if (!$threadId) {
+        if (! $threadId) {
             throw new Services_Exception("Thread not specified.");
         }
 

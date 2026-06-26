@@ -1,10 +1,10 @@
 export function injectRecogitoCSS() {
-    if (document.getElementById('recogito-test-css')) {
+    if (document.getElementById("recogito-test-css")) {
         return;
     }
 
-    const style = document.createElement('style');
-    style.id = 'recogito-test-css';
+    const style = document.createElement("style");
+    style.id = "recogito-test-css";
 
     style.textContent = `
 .r6o-annotatable .r6o-span-highlight-layer {
