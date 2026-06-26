@@ -346,7 +346,7 @@ class Services_Comment_Controller
                     }
 
                     $access = TikiLib::lib('access');
-                    if ($return_url && ! $access->is_xml_http_request()) {
+                    if ($return_url && ! $access->is_xml_http_request() && ! TIKI_API) {
                         $access->redirect($return_url, tr('Your comment was posted.'));
                     }
 

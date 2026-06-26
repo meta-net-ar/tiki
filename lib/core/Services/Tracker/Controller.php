@@ -1123,7 +1123,7 @@ class Services_Tracker_Controller
                 $util->setTicket();
                 $item['nextTicket'] = $util->getTicket();
 
-                if (! $redirect && ! $access->is_xml_http_request()) {
+                if (! $redirect && ! $access->is_xml_http_request() && ! TIKI_API) {
                     $redirect = smarty_modifier_sefurl($trackerId, 'tracker');
                 }
 
@@ -1404,7 +1404,7 @@ class Services_Tracker_Controller
                 $redirect = $input->redirect->url();
 
                 // also $prefs['tracker_legacy_insert'] === 'y'
-                if (! $redirect && ! $access->is_xml_http_request()) {
+                if (! $redirect && ! $access->is_xml_http_request() && ! TIKI_API) {
                     $redirect = smarty_modifier_sefurl($itemId, 'trackeritem');
                 }
 
