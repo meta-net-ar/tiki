@@ -40,7 +40,7 @@ class Services_Comment_AnnotationController
      * containing:
      *        string    text    comment text
      *        string    quote   quoted text on page
-     *        array     ranges  range info for quoted text
+     *        array     data    annotation info for quoted text
      *        string    uri     actually object-type:object-id identifier for the tiki object to be commented
      *
      * @return array    unused probably
@@ -64,7 +64,7 @@ class Services_Comment_AnnotationController
 
         $text = $params->text->wikicontent();
         $quote = $params->quote->text();
-        $ranges = $params->asArray('ranges');
+        $data = $params->data->none();
         $identifier = urldecode($params->uri->url()); // not really the uri but object-type:object-id identifier
         list($objectType, $objectId) = explode(':', $identifier, 2);
 
@@ -90,7 +90,7 @@ class Services_Comment_AnnotationController
             'comment',
             $threadId,
             RANGE_ATTRIBUTE,
-            json_encode($ranges)
+            json_encode($data)
         );
 
         require_once(__DIR__ . '/../../../notifications/notificationemaillib.php');
@@ -110,7 +110,7 @@ class Services_Comment_AnnotationController
      *        int       id      comment threadId
      *        string    text    comment text
      *        string    quote   quoted text on page
-     *        array     ranges  range info for quoted text
+     *        array     data    annotation info for quoted text
      *        string    uri     actually object-type:object-id identifier for the tiki object to be commented
      *        string    created datetime updated (?)
      *        string    updated datetime updated
@@ -131,17 +131,23 @@ class Services_Comment_AnnotationController
         if (! $rawJson) {
             // Fallback for form-encoded data
             $rawJson = $input->json->none();
-        }
+        } 
 
         $params = new JitFilter(json_decode($rawJson, true) ?? []);
 
-        $ranges = $params->asArray('ranges');
+        // If threadId is not provided in the input, use the one from the JSON payload
+        $threadId = $threadId ?? $params->threadId->int();
+
+        $data = $params->data->none();
         $text = $params->text->wikicontent();
         $quote = $params->quote->text();
 
         $input->offsetSet('data', $this->formatComment($quote, $text));
         $input->offsetSet('title', $this->createTitle($text));
         $input->offsetSet('edit', 1);
+
+        // ensure threadId is set in the input for the commentController
+        $input->offsetSet('threadId', $threadId);
 
         $ret = $this->commentController->action_edit($input);
 
@@ -150,7 +156,7 @@ class Services_Comment_AnnotationController
                 'comment',
                 $threadId,
                 RANGE_ATTRIBUTE,
-                json_encode($ranges)
+                json_encode($data)
             );
         }
 
@@ -169,11 +175,27 @@ class Services_Comment_AnnotationController
 
     public function action_destroy($input)
     {
-        $input->offsetSet('confirm', 1);    // TODO but not sure how?
+         // ensure threadId exists even if JSON was used
+        $rawJson = file_get_contents('php://input');
+        $params = new JitFilter(json_decode($rawJson, true) ?? []);
+
+        $threadId = $input->threadId->int();
+
+        if (!$threadId) {
+            $threadId = $params->threadId->int();
+        }
+
+        if (!$threadId) {
+            throw new Services_Exception("Thread not specified.");
+        }
+
+        $input->offsetSet('threadId', $threadId);
+        $input->offsetSet('confirm', 1);
 
         $ret = $this->commentController->action_remove($input);
 
-        $ret['id'] = $ret['threadId'];
+        $ret['id'] = $ret['threadId'] ?? $threadId;
+
         return $ret;
     }
 
@@ -197,9 +219,6 @@ class Services_Comment_AnnotationController
         $tikilib = TikiLib::lib('tiki');
         $userlib = TikiLib::lib('user');
 
-        $limit = $input->limit->int();      // unused so far
-        $offset = $input->offset->int();    // TODO pagination
-
         $identifier = urldecode($input->uri->url());
         $object = explode(':', $identifier);
 
@@ -216,7 +235,7 @@ class Services_Comment_AnnotationController
                 $quote = trim(substr($data[0], 6));
                 $text = trim($data[1]);
 
-                $ranges = json_decode(
+                $annotation_data = json_decode(
                     TikiLib::lib('attribute')->get_attribute(
                         'comment',
                         $comment['threadId'],
@@ -237,8 +256,9 @@ class Services_Comment_AnnotationController
                     'quote'       => $quote,
                     'created'     => $tikilib->get_iso8601_datetime($comment['commentDate']),
                     'updated'     => $tikilib->get_iso8601_datetime($comment['commentDate']),   // we don't have a commentUpdated column?
-                    'ranges'      => $ranges ? $ranges : [],
+                    'annotation'      => $annotation_data ? $annotation_data : [],
                     'permissions' => $permissions,
+                    'threadId'    => $comment['threadId'],
                 ];
 
                 if ($prefs['comments_inline_annotator_with_info'] === 'y') {
