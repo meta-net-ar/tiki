@@ -26,6 +26,11 @@ $map = [
 
 $s = new XML_RPC_Server($map);
 
+function xmlRpcCantLoginResponse($user)
+{
+    return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $user));
+}
+
 /**
  * @param $params
  * @return XML_RPC_Response
@@ -64,7 +69,7 @@ function sendStructurePage($params)
         list($ok, $user, $error) = $userlib->validate_user($user, $pass, '', '');
 
         if ($ok && ! $userlib->canLogin($user)) {
-            return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $user));
+            return xmlRpcCantLoginResponse($user);
         }
     }
     if (! $ok) {
@@ -115,7 +120,7 @@ function sendPage($params)
         list($ok, $username, $error) = $userlib->validate_user($username, $password, '', '');
 
         if ($ok && ! $userlib->canLogin($username)) {
-            return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $username));
+            return xmlRpcCantLoginResponse($username);
         }
     }
     if (! $ok) {
@@ -193,7 +198,7 @@ function sendArticle($params)
         [$ok, $username] = $userlib->validate_user($username, $password, '', '');
 
         if ($ok && ! $userlib->canLogin($username)) {
-            return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $username));
+            return xmlRpcCantLoginResponse($username);
         }
     }
     if (! $ok) {
