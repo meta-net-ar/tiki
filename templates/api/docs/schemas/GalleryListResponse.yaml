@@ -15,4 +15,22 @@ properties:
   result:
     type: array
     items:
-      $ref: schemas-File.yaml
+      description: |
+        Same shape as File.yaml, plus the keys only guaranteed present when
+        listing galleries (as opposed to listing the files within one gallery).
+      allOf:
+        - $ref: schemas-File.yaml
+        - type: object
+          required:
+            - show_source
+            - files
+            - parentName
+          properties:
+            show_source:
+              type: string
+              nullable: true
+            files:
+              type: integer
+            parentName:
+              type: string
+              nullable: true

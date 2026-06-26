@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Lib\Test\Api\Trackers;
 
+use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
 use TikiLib;
 use Tracker_Definition;
@@ -276,103 +277,32 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
         return static::$defaultItemIds[$index] ?? null;
     }
 
-    private function getCreateUpdateTrackerResponseSchema()
+    private function getCreateUpdateTrackerResponseSchema(): array
     {
-        return [
-            'accordion_pos' => 'int',
-            'title' => 'string',
-            'trackerId' => 'int|string',
-            'info' => 'array',
-            'statusTypes' => [
-                '*' => [ // status type key is dynamic (o, p, c)
-                    'name' => 'string',
-                    'label' => 'string',
-                    'perm' => 'string',
-                    'image' => 'string',
-                    'iconname' => 'string',
-                ]
-            ],
-            'statusList' => 'array',
-            'sortFields' => 'array',
-            'attachmentAttributes' => 'array',
-            'startDate' => 'string|null',
-            'startTime' => 'string|null',
-            'endDate' => 'string|null',
-            'endTime' => 'string|null',
-            'groupList' => 'array',
-            'groupforAlert' => 'bool',
-            'showeachuser' => 'bool',
-            'sectionFormats' => 'array',
-            'remoteTabulars' => 'array',
-            'relationshipBehaviourList' => 'array',
-            'displayTimezone' => 'string',
-            'fields' => 'array',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerCreateUpdateResponse.yaml');
     }
 
-    private function getEmptyTrackerListSchema()
+    private function getEmptyTrackerListSchema(): array
     {
-        return [
-            'list' => 'array',
-            'data' => 'array',
-            'count' => 'int',
-        ];
+        // Same shape as TrackerListResponse.yaml, but 'data' is expected to be empty here,
+        // so it is validated as a plain array instead of a non-empty array of entries.
+        return array_merge(
+            ApiSchemaLoader::fromSchemaFile('TrackerListResponse.yaml'),
+            ['data' => 'array']
+        );
     }
 
-    private function getTrackerListSchema()
+    private function getTrackerListSchema(): array
     {
-        return [
-            'list' => 'array',
-            'data' => [
-                [
-                    'trackerId' => 'int',
-                    'name' => 'string|null',
-                    'description' => 'string|null',
-                    'descriptionIsParsed' => 'string',
-                    'created' => 'int',
-                    'lastModif' => 'int',
-                    'items' => 'int',
-                    'fieldsCount' => 'int',
-                    'system_tracker' => 'bool'
-                ]
-            ],
-            'count' => 'int',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerListResponse.yaml');
     }
 
     /**
      * Schema for the item_info / info objects returned in the view response.
      */
-    private function getTrackerItemInfoSchema()
+    private function getTrackerItemInfoSchema(): array
     {
-        return [
-            'itemId'      => 'int',
-            'trackerId'   => 'int',
-            'created'     => 'int',
-            'createdBy'   => 'string|null',
-            'status'      => 'string',
-            'lastModif'   => 'int',
-            'lastModifBy' => 'string|null',
-        ];
-    }
-
-    /**
-     * Schema for a single field entry.
-     *
-     * Extends getTrackerFieldEntrySchema() with the rendered-value keys that
-     * are only present when viewing an item (not in list_fields):
-     * - value:       raw and processed scalar value (string for most types)
-     * - ins_id:               the HTML input id used for this field ("ins_{fieldId}")
-     */
-    private function getTrackerItemFieldEntrySchema()
-    {
-        return array_merge(
-            $this->getTrackerFieldEntrySchema(),
-            [
-                'value'         => 'scalar|null',
-                'ins_id'        => 'string',
-            ]
-        );
+        return ApiSchemaLoader::fromSchemaFile('TrackerItem.yaml');
     }
 
     /**
@@ -381,112 +311,23 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      * - fields:    each entry is a full field definition plus rendered values
      * - item_info / info: both carry the same item metadata object
      */
-    private function getTrackerItemViewSchema()
+    private function getTrackerItemViewSchema(): array
     {
-        return [
-            'title'     => 'string|null',
-            'format'    => 'string|null',
-            'itemId'    => 'int',
-            'trackerId' => 'int',
-            'fields'    => [$this->getTrackerItemFieldEntrySchema()],
-            'canModify' => 'bool',
-            'item_info' => $this->getTrackerItemInfoSchema(),
-            'info'      => $this->getTrackerItemInfoSchema(),
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerItemViewResponse.yaml');
     }
 
-    private function getTrackerItemsListSchema()
+    private function getTrackerItemsListSchema(): array
     {
-        return [
-            'trackerId' => 'int',
-            'offset' => 'int',
-            'maxRecords' => 'int',
-            'result' => [
-                [
-                    'itemId' => 'int',
-                    'status' => 'string',
-                    'fields' => 'array',
-                ]
-            ],
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerItemsListResponse.yaml');
     }
 
     /**
      * Schema for a single tracker field entry (as returned in the 'fields' array of list_fields).
      * options_map keys vary per field type, so it is validated as a plain array.
      */
-    private function getTrackerFieldEntrySchema()
+    private function getTrackerFieldEntrySchema(): array
     {
-        return [
-            'fieldId'                 => 'int',
-            'trackerId'               => 'int',
-            'name'                    => 'string',
-            'permName'                => 'string',
-            'options'                 => 'string',
-            'type'                    => 'string',
-            'isMain'                  => 'string',
-            'isTblVisible'            => 'string',
-            'position'                => 'int',
-            'isSearchable'            => 'string',
-            'isPublic'                => 'string',
-            'isHidden'                => 'string',
-            'isMandatory'             => 'string',
-            'description'             => 'string',
-            'isMultilingual'          => 'string',
-            'itemChoices'             => 'array',
-            'errorMsg'                => 'string',
-            'visibleBy'               => 'array',
-            'editableBy'              => 'array',
-            'descriptionIsParsed'     => 'string',
-            'validation'              => 'string',
-            'validationParam'         => 'string',
-            'validationMessage'       => 'string',
-            'rules'                   => 'string|null',
-            'encryptionKeyId'         => 'int|null',
-            'excludeFromNotification' => 'string',
-            'visibleInViewMode'       => 'string',
-            'visibleInEditMode'       => 'string',
-            'visibleInHistoryMode'    => 'string',
-            'options_array'           => 'array',
-            'options_map'             => 'array',  // keys differ per field type
-        ];
-    }
-
-    /**
-     * Schema for a single param entry within a field type definition.
-     * Only the three keys present in every param object are checked here;
-     * optional keys (default, options, legacy_index, …) are not enforced.
-     */
-    private function getFieldTypeParamSchema()
-    {
-        return [
-            'name'        => 'string',
-            'description' => 'string',
-            'filter'      => 'string',
-        ];
-    }
-
-    /**
-     * Schema for a single field type entry - shared by both 'types' and 'typesDisabled'.
-     *
-     * Only keys guaranteed to be present in every type are listed. Optional keys
-     * (readonly, deprecated, help, warning, supported_changes) are intentionally omitted:
-     * assertMatchesSchema only fails on *missing* expected keys, so their absence here
-     * does not prevent them from being present in the actual response.
-     *
-     * 'params' uses the '*' wildcard: when the array is empty the loop is a no-op;
-     * when it has entries each one is validated against getFieldTypeParamSchema().
-     */
-    private function getFieldTypeEntrySchema()
-    {
-        return [
-            'name'        => 'string',
-            'description' => 'string',
-            'prefs'       => 'array',
-            'tags'        => 'array',
-            'default'     => 'string',
-            'params'      => ['*' => $this->getFieldTypeParamSchema()],
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerField.yaml');
     }
 
     /**
@@ -494,14 +335,9 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      *
      * - duplicates:    array of duplicate permName warnings (empty in most responses)
      */
-    private function getTrackerFieldsListSchema()
+    private function getTrackerFieldsListSchema(): array
     {
-        return [
-            'fields'        => [$this->getTrackerFieldEntrySchema()],
-            'types'         => ['*' => $this->getFieldTypeEntrySchema()],
-            'typesDisabled' => ['*' => $this->getFieldTypeEntrySchema()],
-            'duplicates'    => 'array',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerFieldsListResponse.yaml');
     }
 
     /**
@@ -510,101 +346,41 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      * - fields:    full field definitions (same structure as list_fields entries)
      * - export:    INI-format string representation of all fields
      */
-    private function getExportFieldsResponseSchema()
+    private function getExportFieldsResponseSchema(): array
     {
-        return [
-            'title'     => 'string',
-            'trackerId' => 'int',
-            'fields'    => [$this->getTrackerFieldEntrySchema()],
-            'export'    => 'string',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerFieldsExportResponse.yaml');
     }
 
     /**
      * Schema for the edit_field (POST /trackers/{id}/fields/{fieldId}) response.
      *
-     * - field:                the updated field entry (getTrackerFieldEntrySchema + all_groups)
-     * - info:                 field-type definition for the current type (getFieldTypeEntrySchema)
+     * - field:                the updated field entry (TrackerField + all_groups)
+     * - info:                 field-type definition for the current type
      * - validation_types:     map of validation-type key -> label string
      * - types:                compatible target types for this field (wildcard)
      * - fields:               all fields on the tracker (array of field entries)
      */
-    private function getEditFieldResponseSchema()
+    private function getEditFieldResponseSchema(): array
     {
-        $fieldSchema = array_merge(
-            $this->getTrackerFieldEntrySchema(),
-            ['all_groups' => 'array']
-        );
-
-        return [
-            'title'                  => 'string',
-            'field'                  => $fieldSchema,
-            'info'                   => $this->getFieldTypeEntrySchema(),
-            'options'                => 'array',
-            'validation_types'       => ['*' => 'string'],
-            'types'                  => ['*' => $this->getFieldTypeEntrySchema()],
-            'permNameMaxAllowedSize' => 'int',
-            'fields'                 => [$this->getTrackerFieldEntrySchema()],
-            'encryption_keys'        => 'array',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerEditFieldResponse.yaml');
     }
 
     /**
      * Schema for the add_field (POST /trackers/{id}/fields) response.
      */
-    private function getAddFieldResponseSchema()
+    private function getAddFieldResponseSchema(): array
     {
-        return [
-            'title'               => 'string',
-            'trackerId'           => 'int',
-            'fieldId'             => 'int',
-            'name'                => 'string',
-            'permName'            => 'string',
-            'type'                => 'string',
-            'types'               => ['*' => $this->getFieldTypeEntrySchema()],
-            'description'         => 'string',
-            'descriptionIsParsed' => 'string|null',
-            'modal'               => 'string|null',
-            'fieldPrefix'         => 'string|bool',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerAddFieldResponse.yaml');
     }
 
-    private function getDeleteClearDuplicateTrackerResponseSchema()
+    private function getDeleteClearDuplicateTrackerResponseSchema(): array
     {
-        return [
-            'trackerId' => 'int|string',
-            'name' => 'string|null',
-            'message' => 'string',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerDeleteClearDuplicateResponse.yaml');
     }
 
-    private function getDeleteTrackerFieldResponseSchema()
+    private function getDeleteTrackerFieldResponseSchema(): array
     {
-        return [
-            'status' => 'string',
-            'trackerId' => 'int',
-            'fields' => 'array',
-        ];
-    }
-
-    /**
-     * Schema for a single entry in the 'history' array of the item_history response.
-     *
-     * Only keys guaranteed in every entry are listed. The initial creation entry
-     * (version=0) omits 'diff', 'rendered_value', and 'rendered_new'; subsequent
-     * entries include them. Because assertMatchesSchema only fails on *missing*
-     * expected keys, those optional keys are intentionally excluded here.
-     */
-    private function getItemHistoryEntrySchema()
-    {
-        return [
-            'version'   => 'int',
-            'fieldId'   => 'int|null',
-            'value'     => 'string',
-            'user'      => 'string|null',
-            'lastModif' => 'int',
-            'new'       => 'string',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerDeleteFieldResponse.yaml');
     }
 
     /**
@@ -612,23 +388,11 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      *
      * - history:        chronological list of field changes
      * - item_info:      item metadata plus dynamic field values keyed by fieldId string
-     *                   (reuses getTrackerItemInfoSchema; extra numbered keys are ignored)
      * - field_option:   map of fieldId string -> full field definition (wildcard)
      */
-    private function getTrackerItemHistorySchema()
+    private function getTrackerItemHistorySchema(): array
     {
-        return [
-            'fieldId'        => 'int|null',
-            'filter'         => 'array',
-            'diff_style'     => 'string',
-            'offset'         => 'int|null',
-            'history'        => [$this->getItemHistoryEntrySchema()],
-            'count'          => 'int',
-            'item_info'      => $this->getTrackerItemInfoSchema(),
-            'field_option'   => ['*' => $this->getTrackerFieldEntrySchema()],
-            'metatag_robots' => 'string',
-            'logging'        => 'int',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerItemHistoryResponse.yaml');
     }
 
     /**
@@ -638,51 +402,22 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      */
     private function getUpdateItemResponseSchema(): array
     {
-        return [
-            // Feedback::get() reads from $_SESSION which is not populated in the CLI
-            // subprocess used for API integration tests, so it returns false.
-            'feedback'   => 'array|bool',
-            'itemId'     => 'int',
-            'status'     => 'string',
-            'fields'     => ['*' => 'scalar|null'],
-            'nextTicket' => 'string',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerUpdateItemResponse.yaml');
     }
 
-    private function getUpdateItemStatusResponseSchema()
+    private function getUpdateItemStatusResponseSchema(): array
     {
-        return [
-            'FORWARD' => [
-                'controller' => 'string',
-                'action' => 'string',
-                'status' => 'string',
-                'redirect' => 'string',
-            ]
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerUpdateItemStatusResponse.yaml');
     }
 
-    private function getCreateItemResponseSchema()
+    private function getCreateItemResponseSchema(): array
     {
-        return [
-            'itemId' => 'int',
-            'status' => 'string',
-            'fields' => ['*' => 'scalar|null'],
-            'itemTitle' => 'string',
-            'processedFields' => ['*' => 'scalar|null'],
-            'nextTicket' => 'string',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerCreateItemResponse.yaml');
     }
 
-    private function getDeleteTrackerItemResponseSchema()
+    private function getDeleteTrackerItemResponseSchema(): array
     {
-        return [
-            'title'         => 'string',
-            'trackerId'     => 'int',
-            'itemId'        => 'string|int',
-            'affectedCount' => 'int',
-            'multiple'      => 'bool',
-            'removeCount'   => 'int',
-        ];
+        return ApiSchemaLoader::fromSchemaFile('TrackerDeleteItemResponse.yaml');
     }
 
     protected function assertValidCreateUpdateTrackerResponse($body)

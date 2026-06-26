@@ -1,0 +1,33 @@
+---
+description: Response from POST /trackers/{trackerId}/items/{itemId}.
+type: object
+required:
+  - feedback
+  - itemId
+  - status
+  - fields
+  - nextTicket
+properties:
+  feedback:
+    description: |
+      Feedback::get() reads from $_SESSION which is not populated in the CLI
+      subprocess used for API integration tests, so it returns false.
+    oneOf:
+      - type: array
+      - type: boolean
+  itemId:
+    type: integer
+  status:
+    type: string
+  fields:
+    type: object
+    description: Flat map of permName to current value (keys vary per tracker).
+    additionalProperties:
+      oneOf:
+        - type: string
+        - type: integer
+        - type: number
+        - type: boolean
+      nullable: true
+  nextTicket:
+    type: string

@@ -1,0 +1,26 @@
+---
+description: Response from GET /trackers/{trackerId}/fields.
+type: object
+required:
+  - fields
+  - types
+  - typesDisabled
+  - duplicates
+properties:
+  fields:
+    type: array
+    items:
+      $ref: schemas-TrackerField.yaml
+  types:
+    type: object
+    description: Map of field type code to its type definition.
+    additionalProperties:
+      $ref: schemas-FieldTypeEntry.yaml
+  typesDisabled:
+    type: object
+    description: Map of disabled field type code to its type definition.
+    additionalProperties:
+      $ref: schemas-FieldTypeEntry.yaml
+  duplicates:
+    type: array
+    description: Duplicate permName warnings (empty in most responses).
