@@ -7,9 +7,11 @@ export function observeSelectElementMutations(select, elementPlusUi) {
                     do not alter the Element Plus select options, as those already exist
                     in the UI element and would only disrupt the UI picker options.
                 */
+                const rawVal = $(select).val() ?? [];
+                const selectedVals = Array.isArray(rawVal) ? rawVal : [rawVal];
                 const newOptions = $(select)
                     .find("option")
-                    .filter((_, option) => $(option).val() && !$(select).val().includes($(option).val()));
+                    .filter((_, option) => $(option).val() && !selectedVals.includes($(option).val()));
                 if (newOptions.length) {
                     syncSelectOptions(elementPlusUi, select);
                 }
