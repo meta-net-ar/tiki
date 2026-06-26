@@ -241,6 +241,10 @@ if ($cdn_pref) {
         exit;
     }
 }
+
+// Retrieve all preferences
+require_once('lib/setup/prefs.php');
+
 if (isset($_SERVER["REQUEST_URI"]) && ! str_contains($_SERVER['REQUEST_URI'], 'tiki-realtime.php')) {
     ini_set('session.cookie_path', str_replace("\\", "/", $tikiroot));
     if ($start_session && ini_get('session.use_cookies')) {
@@ -253,7 +257,9 @@ if (isset($_SERVER["REQUEST_URI"]) && ! str_contains($_SERVER['REQUEST_URI'], 't
             $session_params['secure'] = true;
             $session_params['samesite'] = 'None';
         } else {
-            $session_params['samesite'] = 'Lax';
+            if (! empty($prefs['http_header_set_cookie_samesite'])) {
+                $session_params['samesite'] = $prefs['http_header_set_cookie_samesite'];
+            }
         }
 
         session_set_cookie_params([
@@ -322,9 +328,6 @@ if (isset($prefs['feature_fullscreen']) && $prefs['feature_fullscreen'] == 'y') 
 
 // Retrieve Tiki Extension Packages
 \Tiki\Package\ExtensionManager::refresh();
-
-// Retrieve all preferences
-require_once('lib/setup/prefs.php');
 
 if ($prefs['ids_enabled'] == 'y') {
     require_once 'lib/setup/ids.php';

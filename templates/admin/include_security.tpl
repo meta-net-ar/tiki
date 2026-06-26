@@ -185,6 +185,8 @@
                     {preference name=http_header_strict_transport_security_value}
                 </div>
 
+                {preference name=http_header_set_cookie_samesite}
+
                 {preference name=http_header_public_key_pins}
                 <div class="adminoptionboxchild" id="http_header_public_key_pins_childcontainer">
                     {preference name=http_header_public_key_pins_value}
