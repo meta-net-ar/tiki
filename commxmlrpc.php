@@ -64,7 +64,7 @@ function sendStructurePage($params)
         list($ok, $user, $error) = $userlib->validate_user($user, $pass, '', '');
 
         if ($ok && ! $userlib->canLogin($user)) {
-            return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $user));
+            return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $user));
         }
     }
     if (! $ok) {
@@ -115,7 +115,7 @@ function sendPage($params)
         list($ok, $username, $error) = $userlib->validate_user($username, $password, '', '');
 
         if ($ok && ! $userlib->canLogin($username)) {
-            return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+            return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $username));
         }
     }
     if (! $ok) {
@@ -193,7 +193,7 @@ function sendArticle($params)
         [$ok, $username] = $userlib->validate_user($username, $password, '', '');
 
         if ($ok && ! $userlib->canLogin($username)) {
-            return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+            return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $username));
         }
     }
     if (! $ok) {

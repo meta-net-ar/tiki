@@ -482,7 +482,7 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             list($ok, $userwatch, $error) = $userlib->validate_user($userwatch, $pass, false, null, false);
 
             if ($ok && ! $userlib->canLogin($userwatch)) {
-                Feedback::errorAndDie(tra("You are not allowed to login."), \Laminas\Http\Response::STATUS_CODE_403);
+                Feedback::errorAndDie(tr("You are not allowed to login."), \Laminas\Http\Response::STATUS_CODE_403);
             }
         }
         if (! $ok) {

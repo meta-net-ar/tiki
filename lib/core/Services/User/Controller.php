@@ -610,7 +610,7 @@ class Services_User_Controller
                 }
 
                 if (! $userlib->canLogin($user)) {
-                    Services_Utilities::modalException(tra('You are not allowed to login.'));
+                    Services_Utilities::modalException(tr('You are not allowed to login.'));
                 }
             }
 

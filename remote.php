@@ -117,7 +117,7 @@ function validate($params)
             $errorCode = 101;
         }
     } elseif (! $userlib->canLogin($login)) {
-        $errorMessage = tra('User "%0" is not allowed to log in.', $login);
+        $errorMessage = tr('User "%0" is not allowed to log in.', $login);
         $errorCode = 101;
     }
 

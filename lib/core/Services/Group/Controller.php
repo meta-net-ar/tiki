@@ -498,7 +498,7 @@ class Services_Group_Controller
                 }
 
                 if (! $userlib->canLogin($user)) {
-                    Services_Utilities::modalException(tra('You are not allowed to login.'));
+                    Services_Utilities::modalException(tr('You are not allowed to login.'));
                 }
             }
 
@@ -598,7 +598,7 @@ class Services_Group_Controller
                 }
 
                 if (! $userlib->canLogin($user)) {
-                    Feedback::error(tra('You are not allowed to login.'));
+                    Feedback::error(tr('You are not allowed to login.'));
                     return Services_Utilities::closeModal();
                 }
             }
@@ -707,7 +707,7 @@ class Services_Group_Controller
                 }
 
                 if (! $userlib->canLogin($user)) {
-                    Feedback::error(tra('You are not allowed to login.'));
+                    Feedback::error(tr('You are not allowed to login.'));
                     return Services_Utilities::closeModal();
                 }
             }

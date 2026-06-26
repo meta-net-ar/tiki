@@ -85,7 +85,7 @@ if ($user && ! $userlib->canLogin($user)) {
     TikiLib::lib('login')->logout();
     if (! defined('TIKI_CONSOLE') && PHP_SAPI !== 'cli') {
         unset($GLOBALS['user']);
-        Feedback::errorAndDie(tra('You are not allowed to log in.'), \Laminas\Http\Response::STATUS_CODE_403);
+        Feedback::errorAndDie(tr('You are not allowed to log in.'), \Laminas\Http\Response::STATUS_CODE_403);
     }
 }
 

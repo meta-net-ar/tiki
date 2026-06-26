@@ -164,7 +164,7 @@ if (isset($_REQUEST['su']) && $access->checkCsrf(true)) {
         if ($userlib->user_exists($_REQUEST['username'])) {
             $targetUser = $userlib->get_user_real_case($_REQUEST['username']);
             if (! $userlib->canLogin($targetUser)) {
-                Feedback::errorAndDie(tra('User "%0" is not allowed to log in.', $targetUser), \Laminas\Http\Response::STATUS_CODE_403);
+                Feedback::errorAndDie(tr('User "%0" is not allowed to log in.', $targetUser), \Laminas\Http\Response::STATUS_CODE_403);
             }
 
             if (strcasecmp($targetUser, $fromUser) === 0) {
@@ -193,7 +193,7 @@ $isvalid = false;
 $isdue = false;
 
 if ($userlib->user_exists($requestedUser) && ! $userlib->canLogin($requestedUser)) {
-    Feedback::errorAndDie(tra('User "%0" is not allowed to log in.', $requestedUser), \Laminas\Http\Response::STATUS_CODE_403);
+    Feedback::errorAndDie(tr('User "%0" is not allowed to log in.', $requestedUser), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
 $bruteForceProperties = function () use ($tikilib) {

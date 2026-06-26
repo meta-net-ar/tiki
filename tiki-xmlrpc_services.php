@@ -87,7 +87,7 @@ function getUserInfo($params)
 
     if ($ok) {
         if (! $userlib->canLogin($username)) {
-            return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+            return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $username));
         }
 
         $myStruct = new XML_RPC_Value(
@@ -139,7 +139,7 @@ function newPost($params)
     }
 
     if (! $userlib->canLogin($username)) {
-        return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+        return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $username));
     }
 
     // Get individual permissions for this weblog if they exist
@@ -199,7 +199,7 @@ function editPost($params)
     }
 
     if (! $userlib->canLogin($username)) {
-        return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+        return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $username));
     }
 
     if (! check_individual($username, $blogid, 'tiki_p_blog_post')) {
@@ -255,7 +255,7 @@ function deletePost($params)
     }
 
     if (! $userlib->canLogin($username)) {
-        return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+        return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $username));
     }
 
     // Now get the post information
@@ -304,7 +304,7 @@ function getPost($params)
     }
 
     if (! $userlib->canLogin($username)) {
-        return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+        return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $username));
     }
 
     if (! check_individual($username, $blogid, 'tiki_p_blog_post')) {
@@ -369,7 +369,7 @@ function getRecentPosts($params)
     }
 
     if (! $userlib->canLogin($username)) {
-        return new XML_RPC_Response(0, 101, tra('User "%0" is not allowed to log in.', $username));
+        return new XML_RPC_Response(0, 101, tr('User "%0" is not allowed to log in.', $username));
     }
 
     if (! check_individual($username, $blogid, 'tiki_p_blog_post')) {
