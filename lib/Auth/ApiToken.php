@@ -46,6 +46,12 @@ class ApiToken extends TikiLib
 
     public function createToken($token)
     {
+        $user = (string)$token['user'];
+
+        if (! TikiLib::lib('user')->canLogin($user)) {
+            throw new ApiTokenException(tr('User "%0" is not allowed to log in.', $user));
+        }
+        
         $this->table->deleteMultiple([
             'type' => $this->table->expr("$$ != 'manual'"),
             'expireAfter' => $this->table->expr("$$ < NOW()")

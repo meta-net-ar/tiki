@@ -425,6 +425,12 @@ class Tokens
 
         global $user;
 
+        $user = $arguments['user'] ?? $user;
+
+        if (! TikiLib::lib('user')->canLogin($user)) {
+            return null; // User is not allowed to log in, do not create token
+        }
+
         $this->db->query(
             'INSERT INTO tiki_auth_tokens ( timeout, maxhits, hits, entry, parameters, data, `groups`, email, createUser, userPrefix, user ) VALUES( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )',
             [
@@ -438,7 +444,7 @@ class Tokens
                 $email,
                 $createUser,
                 $userPrefix,
-                $arguments['user'] ?? $user,
+                $user,
 
             ]
         );
