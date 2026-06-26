@@ -147,7 +147,7 @@
                 </th>
             {/if}
             
-            {if ( $prefs.feature_categories eq 'y')}
+            {if ( $prefs.feature_categories eq 'y') and empty($from_wiki_page)}
                 {if isset($nbCols)}
                     {$nbCols=$nbCols+1}
                 {else}
@@ -525,7 +525,7 @@
                     {$file=$files[changes]}{* For fgal_context_menu.tpl. Cannot be an include parameter, because "file" is a reserved name. *}
                     <td>{include file='fgal_context_menu.tpl'}</td>
                 {/if}
-                {if ( $prefs.feature_categories eq 'y')}
+                {if ( $prefs.feature_categories eq 'y') and empty($from_wiki_page)}
                     <td>
                     {if !empty($files[changes].categories)}
                         {foreach from=$files[changes].categories item=cat name=cat}
