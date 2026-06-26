@@ -99,7 +99,7 @@ $.fn.setupEventCalendar = function (
                         document.getElementById("semester").remove();
                     }
                     if (data.type == "timeGridWeek" || data.type == "listWeek") {
-                        calendarContainer[0].setOption("duration", { days: 7 });
+                        calendarContainer[0].setOption("duration", { weeks: 1 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
