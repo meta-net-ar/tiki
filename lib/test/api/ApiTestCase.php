@@ -209,7 +209,6 @@ abstract class ApiTestCase extends \TikiTestCase
             'REQUEST_SCHEME' => 'http',
             'REMOTE_ADDR' => '127.0.0.1',
             'REMOTE_HOST' => 'localhost',
-            'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
         ];
 
         // Add authentication header if permission is provided

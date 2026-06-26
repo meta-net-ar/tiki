@@ -1,0 +1,40 @@
+---
+description: |
+  A single tracker field type definition (e.g. text, numeric, dropdown).
+  Only keys guaranteed to be present in every type are required here; optional
+  keys (readonly, deprecated, help, warning, supported_changes) are intentionally
+  not required, since their absence in a given type must not fail validation.
+type: object
+required:
+  - name
+  - description
+  - prefs
+  - tags
+  - default
+  - params
+properties:
+  name:
+    type: string
+  description:
+    type: string
+  prefs:
+    type: array
+  tags:
+    type: array
+  default:
+    type: string
+  params:
+    type: object
+    description: Map of param name to param definition. Empty for types with no extra params.
+    additionalProperties:
+      $ref: schemas-FieldTypeParam.yaml
+  readonly:
+    type: boolean
+  deprecated:
+    type: boolean
+  help:
+    type: string
+  warning:
+    type: string
+  supported_changes:
+    type: array

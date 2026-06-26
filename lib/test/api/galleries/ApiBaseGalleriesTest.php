@@ -245,84 +245,14 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         static::deleteTestPreferences(self::$preferences);
     }
 
-    protected function getGalleriesListResultSchema()
+    protected function getGalleriesListResponseSchema(): array
     {
-        return [
-            'isgal' => 'int',
-            'id' => 'int',
-            'parentId' => 'int',
-            'name' => 'string',
-            'description' => 'string|null',
-            'size' => 'int|null',
-            'created' => 'int|null',
-            'filename' => 'string|null',
-            'type' => 'string|null',
-            'creator' => 'string|null',
-            'author' => 'string|null',
-            'hits' => 'int|null',
-            'lastDownload' => 'int|null',
-            'votes' => 'int|null',
-            'points' => 'float|string|null', // FIXME: sometimes comes as string?
-            'path' => 'string|null',
-            'reference_url' => 'string|null',
-            'is_reference' => 'string|null',
-            'hash' => 'string|null',
-            'search_data' => 'string|null',
-            'metadata' => 'string|null',
-            'lastModif' => 'int|null',
-            'last_user' => 'string|null',
-            'lockedby' => 'string|null',
-            'comment' => 'string|null',
-            'deleteAfter' => 'int|string|null', // FIXME: sometimes comes as string?
-            'maxhits' => 'int|string|null', // FIXME: sometimes comes as string?
-            'archiveId' => 'int|null',
-            'ocr_state' => 'int|string|null', // FIXME: sometimes comes as string?
-            'visible' => 'string|null',
-            'public' => 'string|null',
-            'fileId' => 'int',
-            'galleryId' => 'int',
-            'filesize' => 'int|null',
-            'filetype' => 'string|null',
-            'user' => 'string|null',
-            'lastModifUser' => 'string|null',
-            'icon_fileId' => 'int|null',
-            'perms' => 'array',
-            'podcast_filename' => 'string|null'
-        ];
+        return ApiSchemaLoader::fromSchemaFile('GalleryListResponse.yaml');
     }
 
-    protected function getGalleriesListResponseSchema()
+    protected function getFilesListResponseSchema(): array
     {
-        $result = array_merge(
-            $this->getGalleriesListResultSchema(),
-            [
-                'show_source' => 'string|null',
-                'files' => 'int',
-                'parentName' => 'string|null',
-            ]
-        );
-        return [
-            'title' => 'string',
-            'parentId' => 'int',
-            'offset' => 'int',
-            'maxRecords' => 'int',
-            'count' => 'int',
-            'result' => [ $result ]
-        ];
-    }
-
-    protected function getFilesListResponseSchema()
-    {
-        return [
-            'title' => 'string',
-            'galleryId' => 'int',
-            'offset' => 'int',
-            'maxRecords' => 'int',
-            'count' => 'int',
-            'result' => [
-                $this->getGalleriesListResultSchema()
-            ]
-        ];
+        return ApiSchemaLoader::fromSchemaFile('FileListResponse.yaml');
     }
 
     protected function getFileResponseSchema(): array
@@ -340,36 +270,9 @@ abstract class ApiBaseGalleriesTest extends ApiTestCase
         return ApiSchemaLoader::fromSchemaFile('GalleryInfoResponse.yaml');
     }
 
-    protected function getFileUploadResponseSchema()
+    protected function getFileUploadResponseSchema(): array
     {
-        $info = array_merge(
-            $this->getFileResponseSchema()['info'],
-            [
-                'data' => 'string|null',
-                'lockedby' => 'string|null',
-                'comment' => 'string|null',
-                'archiveId' => 'int|null',
-                'deleteAfter' => 'int|string|null',
-                'ocr_state' => 'int|string|null',
-                'ocr_lang' => 'string|null',
-                'ocr_data' => 'string|null',
-                'search_data' => 'string|null'
-            ]
-        );
-
-        return [
-            'size' => 'int',
-            'name' => 'string',
-            'title' => 'string',
-            'description' => 'string|null',
-            'type' => 'string|null',
-            'fileId' => 'int|string', // FIXME: sometimes comes as string?
-            'galleryId' => 'int',
-            'md5sum' => 'string|null',
-            'ticket' => 'string|null',
-            'syntax' => 'string|null',
-            'info' => $info
-        ];
+        return ApiSchemaLoader::fromSchemaFile('FileUploadResponse.yaml');
     }
 
     protected function getLockFileResponseSchema(): array

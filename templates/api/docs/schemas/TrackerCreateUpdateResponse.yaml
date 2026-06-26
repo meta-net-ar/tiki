@@ -7,7 +7,9 @@ properties:
   title:
     type: string
   trackerId:
-    type: string
+    oneOf:
+      - type: integer
+      - type: string
     description: Tracker ID — numeric but may be returned as a string.
   info:
     type: object
@@ -62,6 +64,9 @@ properties:
     type: string
   fields:
     type: array
-    description: Tracker field definitions.
+    minItems: 0
+    description: |
+      Tracker field definitions. May be empty for a freshly created tracker
+      that has no fields yet.
     items:
       $ref: schemas-TrackerField.yaml

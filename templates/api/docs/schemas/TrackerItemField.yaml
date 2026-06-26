@@ -1,0 +1,22 @@
+---
+description: |
+  A tracker field definition as returned when viewing an item: extends TrackerField
+  with the rendered-value keys that are only present in that context.
+allOf:
+  - $ref: schemas-TrackerField.yaml
+  - type: object
+    required:
+      - value
+      - ins_id
+    properties:
+      value:
+        oneOf:
+          - type: string
+          - type: integer
+          - type: number
+          - type: boolean
+        nullable: true
+        description: Raw and processed scalar value (string for most field types).
+      ins_id:
+        type: string
+        description: The HTML input id used for this field ("ins_{fieldId}").

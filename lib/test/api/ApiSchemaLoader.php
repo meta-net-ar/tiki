@@ -109,6 +109,10 @@ class ApiSchemaLoader
             if (isset($def['items'])) {
                 $itemSchema = self::convertDefinition($def['items']);
                 if (is_array($itemSchema)) {
+                    // minItems: 0 allows an empty array ('*' form); otherwise non-empty is required.
+                    if (array_key_exists('minItems', $def) && (int) $def['minItems'] === 0) {
+                        return ['*' => $itemSchema];
+                    }
                     return [$itemSchema];
                 }
             }

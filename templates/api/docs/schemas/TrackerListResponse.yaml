@@ -1,0 +1,47 @@
+---
+description: Paginated list of trackers.
+type: object
+required:
+  - list
+  - data
+  - count
+properties:
+  list:
+    type: array
+  data:
+    type: array
+    items:
+      type: object
+      required:
+        - trackerId
+        - name
+        - description
+        - descriptionIsParsed
+        - created
+        - lastModif
+        - items
+        - fieldsCount
+        - system_tracker
+      properties:
+        trackerId:
+          type: integer
+        name:
+          type: string
+          nullable: true
+        description:
+          type: string
+          nullable: true
+        descriptionIsParsed:
+          type: string
+        created:
+          type: integer
+        lastModif:
+          type: integer
+        items:
+          type: integer
+        fieldsCount:
+          type: integer
+        system_tracker:
+          type: boolean
+  count:
+    type: integer

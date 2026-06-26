@@ -1,6 +1,47 @@
 ---
 description: A single file or sub-gallery entry in a file gallery listing.
 type: object
+required:
+  - isgal
+  - id
+  - parentId
+  - name
+  - description
+  - size
+  - created
+  - filename
+  - type
+  - creator
+  - author
+  - hits
+  - lastDownload
+  - votes
+  - points
+  - path
+  - reference_url
+  - is_reference
+  - hash
+  - search_data
+  - metadata
+  - lastModif
+  - last_user
+  - lockedby
+  - comment
+  - deleteAfter
+  - maxhits
+  - archiveId
+  - ocr_state
+  - visible
+  - public
+  - fileId
+  - galleryId
+  - filesize
+  - filetype
+  - user
+  - lastModifUser
+  - icon_fileId
+  - perms
+  - podcast_filename
 properties:
   isgal:
     type: integer
@@ -42,7 +83,9 @@ properties:
     type: integer
     nullable: true
   points:
-    type: number
+    oneOf:
+      - type: number
+      - type: string
     nullable: true
   path:
     type: string
@@ -75,16 +118,22 @@ properties:
     type: string
     nullable: true
   deleteAfter:
-    type: string
+    oneOf:
+      - type: integer
+      - type: string
     nullable: true
   maxhits:
-    type: string
+    oneOf:
+      - type: integer
+      - type: string
     nullable: true
   archiveId:
     type: integer
     nullable: true
   ocr_state:
-    type: string
+    oneOf:
+      - type: integer
+      - type: string
     nullable: true
   ocr_lang:
     type: string
@@ -118,8 +167,8 @@ properties:
     type: integer
     nullable: true
   files:
-    type: string
-    nullable: true
+    type: integer
+    description: Number of files contained in this sub-gallery. Only present for gallery entries (isgal=1).
   parentName:
     type: string
     nullable: true
@@ -132,3 +181,7 @@ properties:
   podcast_filename:
     type: string
     nullable: true
+  show_source:
+    type: string
+    nullable: true
+    description: "Aliases the `tfg.show_source` column for galleries; empty string for plain files."

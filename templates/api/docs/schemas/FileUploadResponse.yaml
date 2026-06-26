@@ -15,7 +15,9 @@ properties:
     type: string
     nullable: true
   fileId:
-    type: string
+    oneOf:
+      - type: integer
+      - type: string
     description: File ID — numeric but may be returned as a string.
   galleryId:
     type: integer
@@ -104,14 +106,24 @@ properties:
         type: integer
         nullable: true
       deleteAfter:
-        type: integer
+        oneOf:
+          - type: integer
+          - type: string
         nullable: true
       ocr_state:
-        type: string
+        oneOf:
+          - type: integer
+          - type: string
         nullable: true
       ocr_lang:
         type: string
         nullable: true
       ocr_data:
+        type: string
+        nullable: true
+      data:
+        type: string
+        nullable: true
+      search_data:
         type: string
         nullable: true

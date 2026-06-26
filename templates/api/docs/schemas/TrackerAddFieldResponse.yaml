@@ -1,0 +1,44 @@
+---
+description: Response from POST /trackers/{trackerId}/fields.
+type: object
+required:
+  - title
+  - trackerId
+  - fieldId
+  - name
+  - permName
+  - type
+  - types
+  - description
+  - descriptionIsParsed
+  - modal
+  - fieldPrefix
+properties:
+  title:
+    type: string
+  trackerId:
+    type: integer
+  fieldId:
+    type: integer
+  name:
+    type: string
+  permName:
+    type: string
+  type:
+    type: string
+  types:
+    type: object
+    additionalProperties:
+      $ref: schemas-FieldTypeEntry.yaml
+  description:
+    type: string
+  descriptionIsParsed:
+    type: string
+    nullable: true
+  modal:
+    type: string
+    nullable: true
+  fieldPrefix:
+    oneOf:
+      - type: string
+      - type: boolean
