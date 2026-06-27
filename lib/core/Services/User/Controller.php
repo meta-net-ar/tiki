@@ -1330,6 +1330,41 @@ class Services_User_Controller
         return true;
     }
 
+    public function actionSetUserLoginStatus($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
+        $util = new Services_Utilities();
+
+        $no_auth = $input->no_auth->text();
+
+        if ($util->notConfirmPost()) {
+            $util->setVars($input, [], 'checked');
+            if ($util->itemsCount > 0) {
+                $actionText = $no_auth === 'y' ? tr('Disable') : tr('Enable');
+                $msg = count($util->items) === 1
+                    ? tr('%0 login for the following user?', $actionText)
+                    : tr('%0 login for the following users?', $actionText);
+
+                return $util->confirm($msg, $actionText);
+            } else {
+                Services_Utilities::modalException(tra('No users were selected. Please select one or more users.'));
+            }
+        } elseif ($util->checkCsrf()) {
+            $util->setVars($input, [], 'items');
+            foreach ($util->items as $user_to_update) {
+                if ($user_to_update != 'admin') {
+                    $res = $this->lib->updateUserLoginStatus($user_to_update, $no_auth);
+                    if ($res !== true) {
+                        Feedback::error(tr('An error occurred. User %0 login status could not be updated', $user_to_update));
+                        Services_Utilities::closeModal();
+                        return false;
+                    }
+                }
+            }
+            Feedback::success(tr('User login status updated successfully.'));
+            return Services_Utilities::refresh();
+        }
+    }
 
     public function action_set_user_lock_status($input)
     {

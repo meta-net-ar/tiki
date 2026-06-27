@@ -328,6 +328,20 @@
                                                                     </a>
                                                                 </action>
                                                             {/if}
+
+                                                            {if $users[user].no_auth eq 'y'}
+                                                                <action>
+                                                                    <a href="{bootstrap_modal controller=user action=set_user_login_status checked=$username offset=$offset sort_mode=$sort_mode numrows=$numrows no_auth=n}">
+                                                                        {icon name="ok" _menu_text='y' _menu_icon='y' alt="{tr}Enable login{/tr}"}
+                                                                    </a>
+                                                                </action>
+                                                            {else}
+                                                                <action>
+                                                                    <a href="{bootstrap_modal controller=user action=set_user_login_status checked=$username offset=$offset sort_mode=$sort_mode numrows=$numrows no_auth=y}">
+                                                                        {icon name="remove" _menu_text='y' _menu_icon='y' alt="{tr}Disable login{/tr}"}
+                                                                    </a>
+                                                                </action>
+                                                            {/if}
                                                         {/if}
                                                     {/strip}
                                                 {/actions}
@@ -365,7 +379,7 @@
 
                                 $('#login-switchuser_1').val($(this).data('user'));
                                 $('#form_switch_user').trigger('submit');
-                                
+
                                 return false;
                             })
                         {/jq}

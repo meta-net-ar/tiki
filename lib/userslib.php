@@ -9246,6 +9246,25 @@ class UsersLib extends TikiLib
         return true;
     }
 
+    public function updateUserLoginStatus($user, $no_auth)
+    {
+        $cachelib = TikiLib::lib('cache');
+
+        $userexists_cache[$user] = null;
+
+        $res = $this->table('users_users')->update(['no_auth' => $no_auth], ['login' => $user]);
+
+        if (! $res->numRows()) {
+            return false;
+        }
+
+        $cachelib->invalidate('userslist');
+
+        TikiLib::events()->trigger('tiki.user.update', ['type' => 'user', 'object' => $user]);
+
+        return true;
+    }
+
     public function send_lock_status_email($user, $lock_status, $this_site)
     {
         global $prefs;
