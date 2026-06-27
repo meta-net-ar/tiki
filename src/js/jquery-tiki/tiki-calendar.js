@@ -138,14 +138,67 @@ $.fn.setupEventCalendar = function (
         let activeMonthRangeSpan = normalizeMonthRangeSpan(eventCalendarParams.initialMonthRangeSpan);
         const listPeriodOptions = {
             week: { label: tr("Week"), duration: { weeks: 1 } },
-            month: { label: tr("Month"), duration: { months: 1 } },
-            quarter: { label: tr("Quarter"), duration: { months: 3 } },
-            semester: { label: tr("Semester"), duration: { months: 6 } },
-            year: { label: tr("Year"), duration: { years: 1 } },
+            month: { label: tr("Month"), duration: { months: 1 }, focusMonths: 1 },
+            quarter: { label: tr("Quarter"), duration: { months: 3 }, focusMonths: 3 },
+            semester: { label: tr("Semester"), duration: { months: 6 }, focusMonths: 6 },
+            year: { label: tr("Year"), duration: { years: 1 }, focusMonths: 12 },
         };
         const listPeriodNames = Object.keys(listPeriodOptions);
         const normalizeListPeriod = (period) => (listPeriodNames.includes(period) ? period : "year");
         let activeListPeriod = normalizeListPeriod(eventCalendarParams.initialListPeriod);
+        // Keep the user's focus separate from aligned ranges such as January-December.
+        let activeListFocusDate = null;
+        let activeListFocusDay = null;
+        let pendingListNavigation = null;
+        const getCalendarDate = () => moment(calendarContainer[0].getOption("date"));
+        const getListFocusDate = () => (activeListFocusDate?.isValid() ? activeListFocusDate.clone() : getCalendarDate());
+        const setListFocusDate = (date, preserveFocusDay = false) => {
+            const focusDate = moment(date);
+            if (!focusDate.isValid()) {
+                return;
+            }
+            activeListFocusDate = focusDate;
+            if (!preserveFocusDay) {
+                activeListFocusDay = focusDate.date();
+            }
+        };
+        const getListDuration = (periodOptions, focusDate) => {
+            if (!eventCalendarParams.calendarListBeginsFocus) {
+                return { ...periodOptions.duration };
+            }
+            if (!periodOptions.focusMonths) {
+                return { days: 7 };
+            }
+            return { days: focusDate.clone().add(periodOptions.focusMonths, "months").diff(focusDate, "days") };
+        };
+        const getNavigatedListFocusDate = (direction) => {
+            const focusDate = getListFocusDate();
+            const periodOptions = listPeriodOptions[activeListPeriod];
+            if (!periodOptions.focusMonths) {
+                return focusDate.add(direction * 7, "days");
+            }
+            const focusDay = activeListFocusDay || focusDate.date();
+            const targetDate = focusDate.date(1).add(direction * periodOptions.focusMonths, "months");
+            return targetDate.date(Math.min(focusDay, targetDate.daysInMonth()));
+        };
+        // Native toolbar navigation changes the date first; datesSet then reapplies the exact List range.
+        const bindListNavigation = () => {
+            ["prev", "next", "today"].forEach((action) => {
+                const button = calendarEl.querySelector(".ec-" + action);
+                if (button && !button.dataset.listNavigationBound) {
+                    button.addEventListener(
+                        "click",
+                        () => {
+                            if (eventCalendarParams.initialView === "listYear") {
+                                pendingListNavigation = action;
+                            }
+                        },
+                        true
+                    );
+                    button.dataset.listNavigationBound = "1";
+                }
+            });
+        };
         const getListPeriodButtons = () => {
             const listPeriodContainer = calendarEl.querySelector("#list-period-controls");
             if (!listPeriodContainer) {
@@ -176,13 +229,12 @@ $.fn.setupEventCalendar = function (
             const selectedPeriod = listPeriodOptions[normalizedPeriod];
             activeListPeriod = normalizedPeriod;
             eventCalendarParams.initialListPeriod = normalizedPeriod;
-            if (normalizedPeriod === "year") {
-                const currentDate = moment(calendarContainer[0].getOption("date"));
-                if (currentDate.isValid()) {
-                    calendarContainer[0].setOption("date", currentDate.startOf("year").toDate());
-                }
-            }
-            calendarContainer[0].setOption("duration", { ...selectedPeriod.duration });
+            const focusDate = getListFocusDate();
+            setListFocusDate(focusDate, activeListFocusDate?.isValid());
+            const displayDate =
+                !eventCalendarParams.calendarListBeginsFocus && normalizedPeriod === "year" ? focusDate.clone().startOf("year") : focusDate;
+            calendarContainer[0].setOption("date", displayDate.toDate());
+            calendarContainer[0].setOption("duration", getListDuration(selectedPeriod, focusDate));
             calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                 return moment(dayCell).format("D");
             });
@@ -260,10 +312,20 @@ $.fn.setupEventCalendar = function (
             viewDidMount: function (data) {
                 // Normalize view type because callback payload can expose either `data.type` or `data.view.type`.
                 const currentViewType = data?.type ?? data?.view?.type;
+                const previousViewType = eventCalendarParams.initialView;
                 if (currentViewType) {
                     eventCalendarParams.initialView = currentViewType;
                 }
+                if (previousViewType === "listYear" && currentViewType !== "listYear" && activeListFocusDate?.isValid()) {
+                    calendarContainer[0].setOption("date", activeListFocusDate.toDate());
+                    activeListFocusDate = null;
+                    activeListFocusDay = null;
+                    pendingListNavigation = null;
+                } else if (currentViewType === "listYear" && previousViewType !== "listYear") {
+                    setListFocusDate(getCalendarDate());
+                }
                 $(calendarEl).tikiModal();
+                bindListNavigation();
                 if (currentViewType == "dayGridMonth" || currentViewType == "listMonth") {
                     removeListPeriodControls();
                     if (!calendarEl.querySelector("#quarter")) {
@@ -340,6 +402,16 @@ $.fn.setupEventCalendar = function (
                         });
                     }
                 }
+            },
+            datesSet: function (data) {
+                if (data?.view?.type !== "listYear" || !pendingListNavigation) {
+                    return;
+                }
+                const navigation = pendingListNavigation;
+                pendingListNavigation = null;
+                const focusDate = navigation === "today" ? getCalendarDate() : getNavigatedListFocusDate(navigation === "next" ? 1 : -1);
+                setListFocusDate(focusDate, navigation !== "today");
+                applyListPeriod(activeListPeriod);
             },
             eventDidMount: function (arg) {
                 const event = arg.event;

@@ -445,6 +445,7 @@ $smarty->assign(
         'slotDuration'     => $slotDuration,
         'initialView'      => $initialView,
         'initialDate'      => "$focus_year-$focus_month-$focus_day",
+        'calendarListBeginsFocus' => $prefs['calendar_list_begins_focus'] === 'y',
     ]
 );
 
