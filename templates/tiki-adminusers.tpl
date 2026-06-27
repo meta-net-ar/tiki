@@ -411,6 +411,12 @@
                                 <option value="unlock_users">
                                     {tr}Unlock accounts{/tr}
                                 </option>
+                                <option value="enable_users_login">
+                                    {tr}Enable login{/tr}
+                                </option>
+                                <option value="disable_users_login">
+                                    {tr}Disable login{/tr}
+                                </option>
                                 {if $prefs.feature_wiki == 'y'}
                                     <option value="email_wikipage">
                                         {tr}Send wiki page content by email{/tr}

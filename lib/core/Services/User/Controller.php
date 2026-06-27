@@ -1356,12 +1356,11 @@ class Services_User_Controller
                     $res = $this->lib->updateUserLoginStatus($user_to_update, $no_auth);
                     if ($res !== true) {
                         Feedback::error(tr('An error occurred. User %0 login status could not be updated', $user_to_update));
-                        Services_Utilities::closeModal();
-                        return false;
+                    } else {
+                        Feedback::success(tr('User %0 login status updated successfully.', $user_to_update));
                     }
                 }
             }
-            Feedback::success(tr('User login status updated successfully.'));
             return Services_Utilities::refresh();
         }
     }
@@ -1463,6 +1462,18 @@ class Services_User_Controller
         // Set the lock parameter and delegate to action_set_user_lock_status
         $input['lock'] = 'unlock';
         return $this->action_set_user_lock_status($input);
+    }
+
+    public function actionEnableUsersLogin($input)
+    {
+        $input['no_auth'] = 'n';
+        return $this->actionSetUserLoginStatus($input);
+    }
+
+    public function actionDisableUsersLogin($input)
+    {
+        $input['no_auth'] = 'y';
+        return $this->actionSetUserLoginStatus($input);
     }
 
     private function updateUserLockStatus($users, $newLockStatus)
