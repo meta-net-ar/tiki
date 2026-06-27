@@ -164,6 +164,31 @@ composer:
       - bin/
     expire_in: 2 days
 
+composer-dbdiff:
+  stage: build
+  needs: []
+  image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  variables:
+    COMPOSER_DISCARD_CHANGES: "true"
+    COMPOSER_NO_INTERACTION: "1"
+    COMPOSER_CACHE_DIR: ${CI_PROJECT_DIR}/.composercache-dbdiff
+  script:
+    - composer -V | grep "version 2" || composer self-update --2
+    - composer --ansi install -d doc/devtools/dbdiff/ --no-progress --prefer-dist -n
+  cache:
+    key:
+      prefix: "composer-dbdiff"
+      files:
+        - doc/devtools/dbdiff/composer.lock
+    paths:
+      - .composercache-dbdiff/
+    policy: pull-push
+  artifacts:
+    paths:
+      - doc/devtools/dbdiff/vendor/
+    expire_in: 2 days
+    when: always
+
 
 #
 # Code quality: linting, coding standards, etc.
@@ -402,6 +427,7 @@ composer-could-update-lock:
   stage: tiki-check
   needs:
     - composer
+    - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
@@ -494,6 +520,7 @@ sql-engine-conversion:
   stage: tiki-check
   needs:
     - composer
+    - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_IMAGE_NEWEST_SUPPORTED}

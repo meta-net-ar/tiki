@@ -183,9 +183,11 @@ class CheckSchemaUpgrade
     {
         $errors = 0;
 
-        if (! file_exists($this->tikiRoot . '/bin/dbdiff')) {
+        if (! file_exists(__DIR__ . '/dbdiff/vendor/autoload.php')) {
             $errors++;
-            $this->printMessageError('bin/dbdiff not available, did you run composer install in vendor_bundled?');
+            $this->printMessageError('dbdiff/vendor/autoload.php not available, did you run composer for dbdiff?');
+        } else {
+            require_once __DIR__ . '/dbdiff/vendor/autoload.php';
         }
 
         if (! file_exists($this->tikiRoot . '/' . PRIMARY_AUTOLOAD_FILE_PATH)) {
@@ -648,7 +650,7 @@ class CheckSchemaUpgrade
         // Build command
         $cmd = [
             'php',
-            'bin/dbdiff',
+            'doc/devtools/dbdiff/vendor/bin/dbdiff',
             "--server1={$this->oldDb['user']}:{$this->oldDb['pass']}@{$this->oldDb['host']}",
             "--server2={$this->newDb['user']}:{$this->newDb['pass']}@{$this->newDb['host']}",
             "--type=all",

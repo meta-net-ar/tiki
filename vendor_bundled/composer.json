@@ -286,7 +286,6 @@
         "zbateson/mail-mime-parser": "~3.0"
     },
     "require-dev": {
-        "dbdiff/dbdiff": "~2.0",
         "kint-php/kint": "~6.1",
         "kornrunner/dbunit": "~9.2",
         "mikey179/vfsstream": "~1.6",
