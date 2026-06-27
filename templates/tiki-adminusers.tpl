@@ -126,6 +126,7 @@
                                         {/if}
                                         <th id="lastlogin">{self_link _sort_arg='sort_mode' _sort_field='currentLogin'}{tr}Last login{/tr}{/self_link}</th>
                                         <th id="registered">{self_link _sort_arg='sort_mode' _sort_field='created'}{tr}Registered{/tr}{/self_link}</th>
+                                        <th id="canlogin">{self_link _sort_arg='sort_mode' _sort_field='no_auth'}{tr}Can login{/tr}{/self_link}</th>
                                         <th id="groups">{tr}Groups{/tr}</th>
                                         <th id="actions"></th>
                                     </tr>
@@ -197,6 +198,14 @@
                                             </td>
 
                                             <td class="text">
+                                                {if $users[user].no_auth eq 'y'}
+                                                    <span class="text-danger">{icon name="remove"} {tr}No{/tr}</span>
+                                                {else}
+                                                    <span class="text-success">{icon name="ok"} {tr}Yes{/tr}</span>
+                                                {/if}
+                                            </td>
+
+                                            <td class="text">
                                                 {foreach from=$users[user].groups key=grs item=what name=gr}
                                                     <div style="white-space:nowrap">
                                                         {if $grs != "Anonymous" and ($tiki_p_admin eq 'y' || in_array($grs, $all_groups))}
@@ -257,7 +266,7 @@
                                                         {/if}
                                                         {if $users[user].user ne 'admin' and $users[user].user ne $user and $tiki_p_admin eq 'y'}
                                                             <action>
-                                                                <a href='#' onClick="$('#login-switchuser_1').val('{$users[user].user|username|escape:javascript}'); $('#form_switch_user').trigger('submit'); return false;">
+                                                                <a href='#' data-user="{$users[user].user|username}" data-no-auth="{$users[user].no_auth}" class="login-switchuser {if $users[user].no_auth eq 'y'}text-muted{/if}">
                                                                     {icon name="user" _menu_text='y' _menu_icon='y' alt="{tr}Switch to this user{/tr}"}
                                                                 </a>
                                                             </action>
@@ -331,6 +340,11 @@
                             </tbody>
                         </table>
                         {jq}
+                            // Allow data attributes through Bootstrap's sanitization
+                            const allowList = bootstrap.Tooltip.Default.allowList;
+                            allowList['a'] = allowList['a'] || [];
+                            allowList['a'].push('data-user', 'data-no-auth');
+
                             $document.on("show.bs.popover", function ( e ) {
                                 var itemId = $(e.target).data("itemid");
                                 if (itemId) {
@@ -343,6 +357,17 @@
                                     });
                                 }
                             });
+
+                            $(document).on('click', '.login-switchuser', function() {
+                                if ($(this).data('no-auth') == 'y') {
+                                    return false;
+                                }
+
+                                $('#login-switchuser_1').val($(this).data('user'));
+                                $('#form_switch_user').trigger('submit');
+                                
+                                return false;
+                            })
                         {/jq}
                     {if !$ts.ajax}
                     </div>
