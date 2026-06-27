@@ -101,6 +101,10 @@ $smarty->assign('calendars', $calendars["data"]);
 
 // export calendar //
 if (((is_array($calendarIds) && (count($calendarIds) > 0)) or isset($_REQUEST["calendarItem"]) ) && $_REQUEST["export"] == 'y') {
+    if (isset($_REQUEST['exportAllEvents'])) {
+        $startTime = 0;
+        $stopTime = PHP_INT_MAX;
+    }
     // get calendar events
     if (! isset($_REQUEST["calendarItem"])) {
         $events = $calendarlib->list_raw_items($calendarIds, $user, $startTime, $stopTime, -1, $maxRecords, $sort_mode = 'start_asc', $find = '');
