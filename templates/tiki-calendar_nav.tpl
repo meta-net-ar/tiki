@@ -31,7 +31,7 @@
                         {if $module neq 'y'}
                             {button _ajax=$ajax href="?viewmode=week" _title=":{tr}Week{/tr}" _text="{tr}Week{/tr}" _selected_class="buttonon" _type="xs btn-primary tips" _selected="{if $viewmode == 'week'}y{else}n{/if}"}
                             {button _ajax=$ajax href="?viewmode=month" _title=":{tr}Month{/tr}" _text="{tr}Month{/tr}" _selected_class="buttonon" _type="xs btn-primary tips" _selected="{if $viewmode == 'month'}y{else}n{/if}"}
-                        {elseif empty($module_params.viewmode)}
+                        {else}
                             {button _ajax=$ajax viewmode='week' _auto_args="viewmode" _keepall='y' _title=":{tr}Week{/tr}" _text="{tr}W{/tr}" _selected_class="buttonon" _type="xs btn-primary tips" _selected="{if $viewmode == 'week'}y{else}n{/if}"}
                             {button _ajax=$ajax viewmode='month' _auto_args="viewmode" _keepall='y' _title=":{tr}Month{/tr}" _text="{tr}M{/tr}" _selected_class="buttonon" _type="xs btn-primary tips" _selected="{if $viewmode == 'month'}y{else}n{/if}"}
                         {/if}
@@ -40,6 +40,10 @@
                             {button _ajax=$ajax href="?viewmode=quarter" _title=":{tr}Quarter{/tr}" _text="{tr}Quarter{/tr}" _selected_class="buttonon" _type="xs btn-primary tips" _selected="{if $viewmode == 'quarter'}y{else}n{/if}"}
                             {button href="?viewmode=semester" _title=":{tr}Semester{/tr}" _text="{tr}Semester{/tr}" _selected_class="buttonon" _type="xs btn-primary tips" _selected="{if $viewmode == 'semester'}y{else}n{/if}"}
                             {button href="?viewmode=year" _ajax=$ajax viewmode=year _title=":{tr}Year{/tr}" _text="{tr}Year{/tr}" _selected_class="buttonon" _type="xs btn-primary tips" _selected="{if $viewmode == 'year'}y{else}n{/if}"}
+                        {else}
+                            {button _ajax=$ajax viewmode='quarter' _auto_args="viewmode" _keepall='y' _title=":{tr}Quarter{/tr}" _text="{tr}Q{/tr}" _selected_class="buttonon" _type="xs btn-primary tips" _selected="{if $viewmode == 'quarter'}y{else}n{/if}"}
+                            {button _ajax=$ajax viewmode='semester' _auto_args="viewmode" _keepall='y' _title=":{tr}Semester{/tr}" _text="{tr}S{/tr}" _selected_class="buttonon" _type="xs btn-primary tips" _selected="{if $viewmode == 'semester'}y{else}n{/if}"}
+                            {button _ajax=$ajax viewmode='year' _auto_args="viewmode" _keepall='y' _title=":{tr}Year{/tr}" _text="{tr}Y{/tr}" _selected_class="buttonon" _type="xs btn-primary tips" _selected="{if $viewmode == 'year'}y{else}n{/if}"}
                         {/if}
                         </div>
 
@@ -69,9 +73,9 @@
             {/if}
 
             {if $viewlist ne 'list' or $prefs.calendar_list_begins_focus ne 'y'}
-                {if $calendarViewMode eq 'month'}
+                {if $viewmode eq 'month'}
                     {$daystart|tiki_date_format:"%B %Y"}
-                {elseif $calendarViewMode eq 'week'}
+                {elseif $viewmode eq 'week'}
                     {* test display_field_order and use %d/%m or %m/%d *}
                     {if ($prefs.display_field_order eq 'DMY') || ($prefs.display_field_order eq 'DYM') || ($prefs.display_field_order eq 'YDM')}
                         {$daystart|tiki_date_format:"{tr}%d/%m{/tr}/%Y"} - {$dayend|tiki_date_format:"{tr}%d/%m{/tr}/%Y"}
