@@ -26,6 +26,8 @@ class TikiLib_MarkdownParserTest extends TikiTestCase
 
         $this->oldprefs = $prefs;
         $this->olduser = $user;
+
+        \Tiki\WikiParser\Markdown\Renderer\FencedCodeRenderer::resetCount();
     }
 
 
@@ -253,8 +255,8 @@ line 1 of code
 line 2 of code
 line 3 of code
 </code></pre>
-<pre class="codelisting"><code>Sample text here...
-</code></pre>
+<div class="codelisting_container"><div class="icon_copy_code far fa-clipboard" tabindex="0" data-clipboard-target="#md-codebox1"><span class="copy_code_tooltiptext">Copy to clipboard</span></div><pre class="codelisting" id="md-codebox1" dir="ltr" style="white-space:pre-wrap; overflow-wrap: break-word; word-wrap: break-word;"><div class="code">Sample text here...
+</div></pre></div>
 <table class="wikitable table table-striped table-hover">
 <thead>
 <tr>
