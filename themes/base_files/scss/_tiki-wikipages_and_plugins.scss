@@ -1113,6 +1113,7 @@ h6:hover .heading-link {
 // Autotoc
 #all-toc.hidden.sticky-top {
     height: 80vh !important;
+    z-index: 4;
 }
 
 // /* wikiplugin viewtextfile */
