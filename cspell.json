@@ -1,0 +1,153 @@
+{
+    "version": "0.2",
+    "language": "en",
+    "words": [],
+    "flagWords": [
+        "hte",
+        "teh",
+        "retrive",
+        "mispell",
+        "mispellings"
+    ],
+    "ignoreWords": [],
+    "ignorePaths": [
+        ".git/**",
+        ".github/**",
+        ".gitpod/**",
+        ".husky/**",
+        "vendor/**",
+        "vendor_bundled/**",
+        "vendor_custom/**",
+        "node_modules/**",
+        "public/**",
+        "temp/**",
+        "tmp/**",
+        "cache/**",
+        "storage/**",
+        "db/**",
+        "tests/fixtures/**",
+        "**/*.min.js",
+        "**/*.min.css",
+        "**/dist/**",
+        "**/build/**",
+        "**/coverage/**",
+        "**/*.lock"
+    ],
+    "maxNumberOfProblems": 100,
+    "minWordLength": 4,
+    "allowCompoundWords": false,
+    "dictionaries": [
+        "php",
+        "typescript",
+        "node",
+        "html",
+        "css",
+        "bash",
+        "softwareTerms",
+        "companies",
+        "misc",
+        "filetypes",
+        "english-tiki-dictionary"
+    ],
+    "dictionaryDefinitions": [
+        {
+            "name": "english-tiki-dictionary",
+            "description": "Tiki project dictionary",
+            "path": "./doc/devtools/spellchecker/dictionary.txt",
+            "useCompounds": true,
+            "repMap": [
+                [
+                    "'|`|’",
+                    "'"
+                ]
+            ]
+        }
+    ],
+    "ignoreRegExpList": [
+        "Base64",
+        "Email",
+        "UUID",
+        "HexValues",
+        "SHA",
+        "HashStrings",
+        "Urls",
+        "/https?:\\/\\/\\S+/",
+        "/\\b[0-9a-f]{32,}\\b/i",
+        "/\\b[A-Za-z0-9+/]{20,}={0,2}\\b/"
+    ],
+    "includeRegExpList": [],
+    "patterns": [
+        {
+            "name": "PHPVariables",
+            "pattern": "/\\$[A-Za-z_][A-Za-z0-9_]*/g"
+        },
+        {
+            "name": "TwigVariables",
+            "pattern": "/\\{\\{.*?\\}\\}/g"
+        }
+    ],
+    "languageSettings": [
+        {
+            "languageId": "php",
+            "locale": "*",
+            "dictionaries": [
+                "php",
+                "english-tiki-dictionary"
+            ],
+            "ignoreRegExpList": [
+                "PHPVariables"
+            ]
+        },
+        {
+            "languageId": "javascript,typescript",
+            "locale": "*",
+            "dictionaries": [
+                "typescript",
+                "node",
+                "softwareTerms",
+                "english-tiki-dictionary"
+            ]
+        },
+        {
+            "languageId": "html",
+            "locale": "*",
+            "dictionaries": [
+                "html",
+                "css",
+                "english-tiki-dictionary"
+            ]
+        },
+        {
+            "languageId": "css,scss",
+            "locale": "*",
+            "dictionaries": [
+                "css",
+                "fonts",
+                "english-tiki-dictionary"
+            ]
+        },
+        {
+            "languageId": "markdown",
+            "locale": "*",
+            "allowCompoundWords": true
+        }
+    ],
+    "overrides": [
+        {
+            "filename": "**/*.md",
+            "language": "en"
+        },
+        {
+            "filename": "**/*.json",
+            "enabled": false
+        },
+        {
+            "filename": "vendor/**",
+            "enabled": false
+        },
+        {
+            "filename": "node_modules/**",
+            "enabled": false
+        }
+    ]
+}
