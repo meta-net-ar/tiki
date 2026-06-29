@@ -49,8 +49,13 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN_LAYOUT;
+if ($prefs['theme_unified_admin_backend'] !== 'n') {
+    $section = Sections::SECTION_ADMIN_LAYOUT;
+} else {
+    $section = Sections::SECTION_ADMIN;
+}
 Sections::setCurrentSection($section);
+
 // temporary patch: tiki_p_admin includes tiki_p_admin_users but if you don't
 // clean the temp/cache each time you sqlupgrade the perms setting is not
 // synchronous with the cache

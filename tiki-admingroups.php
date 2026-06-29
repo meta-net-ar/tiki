@@ -50,8 +50,13 @@ $inputConfiguration = [
 ];
 
 require_once('tiki-setup.php');
+
 use Tiki\Sections;
-$section = Sections::SECTION_ADMIN_LAYOUT;
+if ($prefs['theme_unified_admin_backend'] !== 'n') {
+    $section = Sections::SECTION_ADMIN_LAYOUT;
+} else {
+    $section = Sections::SECTION_ADMIN;
+}
 Sections::setCurrentSection($section);
 
 if (! empty($_REQUEST['group'])) {
