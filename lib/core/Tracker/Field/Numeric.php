@@ -255,6 +255,17 @@ class Tracker_Field_Numeric extends \Tracker\Field\AbstractItemField implements 
                 }
             });
 
+        $filters->addNew($permName, 'multiexact')
+            ->setLabel($name)
+            ->setHelp(tr('Search for one or more precise values separated by OR.'))
+            ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_mem"))
+            ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
+                $value = $control->getValue();
+                if ($value) {
+                    $query->filterMultiIdentifier($value, $baseKey);
+                }
+            });
+
         $filters->addNew($permName, 'range')
             ->setLabel($name)
             ->setControl(new Tracker\Filter\Control\NumericRange("tf_{$permName}_range", $this->getOption('decimals')))
