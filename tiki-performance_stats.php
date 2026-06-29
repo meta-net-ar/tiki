@@ -21,6 +21,10 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 $performanceLib = TikiLib::lib('performancestats');
 
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
+
 $access->check_feature('tiki_monitor_performance');
 $access->check_permission('tiki_p_admin');
 
