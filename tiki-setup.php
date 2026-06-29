@@ -692,37 +692,41 @@ if ($prefs['jquery_fitvidjs'] == 'y') {
         ->add_jq_onready("fitvids('article', $customSelectors);");
 }
 if ($prefs['jquery_smartmenus_enable'] == 'y') {
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/smartmenus/dist/css/smartmenus-only-layout.css');
-    $headerlib->add_js_module('import SmartMenus from "smartmenus";
-        const nav = document.querySelectorAll("nav");
-        let collapsible_behavior = jqueryTiki.smartmenus_collapsible_behavior == "default" ? false : true;
-        let noMouseoverBehavior = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseover";
-        let hideOnClick = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseout";
+    Sections::onSectionChange(function ($section) use ($headerlib) {
+        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/smartmenus/dist/css/smartmenus-only-layout.css');
+        $headerlib->add_js_module(
+            'import SmartMenus from "smartmenus";
+const nav = document.querySelectorAll("nav");
+let collapsible_behavior = jqueryTiki.smartmenus_collapsible_behavior == "default" ? false : true;
+let noMouseoverBehavior = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseover";
+let hideOnClick = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseout";
 
-        for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
-            if (nav[indexCurrentNav].querySelector("div.collapse") !== null) {
-                nav[indexCurrentNav].classList.add("sm-navbar");
-                nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
-                const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
-                
-                // Enable navigation on parent menu items with children
-                // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
-                // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
-                // Note: Relies on SmartMenus internal class that may change in future versions
-                nav[indexCurrentNav].addEventListener("click", function(e) {
-                    const link = e.target.closest("a.sm-sub-toggler");
-                    if (link && nav[indexCurrentNav].contains(link)) {
-                        const href = link.getAttribute("href");
-                        if (href && href !== "#" && href !== "") {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            window.location.href = href;
-                        }
-                    }
-                });
+for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
+    if (nav[indexCurrentNav].querySelector("div.collapse") !== null) {
+        nav[indexCurrentNav].classList.add("sm-navbar");
+        nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
+        const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
+        
+        // Enable navigation on parent menu items with children
+        // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
+        // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
+        // Note: Relies on SmartMenus internal class that may change in future versions
+        nav[indexCurrentNav].addEventListener("click", function(e) {
+            const link = e.target.closest("a.sm-sub-toggler");
+            if (link && nav[indexCurrentNav].contains(link)) {
+                const href = link.getAttribute("href");
+                if (0 && href && href !== "#" && href !== "") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = href;
+                }
             }
-        }
-    ');
+        });
+    }
+}
+'
+        );
+    });
 }
 
 if ($prefs['feature_jquery_tablesorter'] == 'y') {
