@@ -313,6 +313,17 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
                     $query->filterIdentifier($value, $baseKey);
                 }
             });
+
+            $collection->addNew($permName, 'multiexact')
+            ->setLabel($name)
+            ->setHelp(tr('Search for one or more precise values separated by OR.'))
+            ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_mem"))
+            ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
+                $value = $control->getValue();
+                if ($value) {
+                    $query->filterMultiIdentifier($value, $baseKey);
+                }
+            });
         }
 
         return $collection;
