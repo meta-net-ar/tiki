@@ -573,13 +573,6 @@ function prefs_auth_list()
             'type' => 'flag',
             'default' => 'n',
         ],
-        'auth_api_token_rate_limit' => [
-            'name' => tra('Rate-limit failed API token authentication'),
-            'description' => tra('Apply increasing per-IP delays after failed Bearer token authentication attempts.'),
-            'perspective' => false,
-            'type' => 'flag',
-            'default' => 'y',
-        ],
         'auth_webhooks' => [
             'name' => tra('Webhook access'),
             'description' => tra('Enable Tiki to receive webhook requests from 3rd parties.'),

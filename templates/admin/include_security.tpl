@@ -545,7 +545,6 @@
             {/remarksbox}
             {preference name=auth_api_tokens}
             <div class="adminoptionboxchild" id="auth_api_tokens_childcontainer">
-                {preference name=auth_api_token_rate_limit}
                 {service_inline controller=api_token action=list}
             </div>
         {/tab}

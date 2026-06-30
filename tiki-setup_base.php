@@ -15,7 +15,6 @@ if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
 }
 
 use Tiki\Command\ConsoleSetupException;
-use Tiki\BruteForce\BruteForce;
 use Tiki\TikiDb\PdoDb;
 use Tiki\Lib\CookieConsent\CookieConsentLib;
 
@@ -522,33 +521,10 @@ if (TIKI_API) {
         }
         if ($token && ! empty($token['user'])) {
             $user = $token['user'];
-            if (($prefs['auth_api_token_rate_limit'] ?? 'y') === 'y') {
-                $bruteForce = new BruteForce();
-                $bruteForce->success('api_token_authentication', [
-                    'ip' => $tikilib->get_ip_address(),
-                ]);
-            }
             TikiLib::lib('api_token')->hit($token);
             TikiLib::lib('user')->update_lastlogin($user);
         } else {
             $user = null;
-            if (($prefs['auth_api_token_rate_limit'] ?? 'y') === 'y') {
-                $ip = $tikilib->get_ip_address();
-                $properties = ['ip' => $ip];
-                $bruteForce = new BruteForce();
-                if (! $bruteForce->isOperationAllowed('api_token_authentication', $properties)) {
-                    $waitTime = max(1, $bruteForce->getWaitTime('api_token_authentication', $properties));
-                    $logslib->add_log('security', tr('Rate limited failed API bearer authentication from IP %0.', $ip));
-                    http_response_code(429);
-                    header('Content-Type: application/json');
-                    header('Retry-After: ' . $waitTime);
-                    echo json_encode([
-                        'error' => 'too_many_requests',
-                        'message' => tr('Too many failed API authentication attempts. Please try again later.'),
-                    ]);
-                    exit;
-                }
-            }
         }
     } else {
         $user = null;

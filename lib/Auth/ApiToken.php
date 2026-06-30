@@ -128,11 +128,13 @@ class ApiToken extends TikiLib
     }
 
     /**
-     * Find a token without ever accepting the stored verifier as a bearer value.
+     * Find a token by its bearer value, without ever accepting the stored
+     * verifier as a bearer value.
      *
-     * The legacy lookup keeps pre-upgrade tokens working and upgrades them in
-     * place on first use. The installer patch eagerly performs the same
-     * migration for normal upgrades.
+     * All stored tokens are hashed verifiers: the installer patch
+     * (20260621_hash_api_tokens) converts any pre-upgrade plaintext tokens, and
+     * createToken() only ever stores verifiers, so a plaintext lookup is no
+     * longer needed.
      */
     private function findTokenByValue(string $token)
     {
@@ -140,21 +142,9 @@ class ApiToken extends TikiLib
             return false;
         }
 
-        $verifier = $this->createVerifier($token);
-        $row = $this->table->fetchFullRow(['token' => $verifier]);
-        if ($row) {
-            return $row;
-        }
+        $row = $this->table->fetchFullRow(['token' => $this->createVerifier($token)]);
 
-        $row = $this->table->fetchFullRow(['token' => $token]);
-        if (! $row) {
-            return false;
-        }
-
-        $this->table->update(['token' => $verifier], ['tokenId' => $row['tokenId']]);
-        $row['token'] = $verifier;
-
-        return $row;
+        return $row ?: false;
     }
 
     private function removeVerifier(array $token): array

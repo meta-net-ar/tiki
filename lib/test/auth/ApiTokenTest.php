@@ -62,13 +62,24 @@ class ApiTokenTest extends TikiDatabaseTestCase
         $this->assertFalse($this->apiToken->validToken($stored['token']));
     }
 
-    public function testLegacyTokenIsAcceptedAndMigratedOnUse(): void
+    public function testLookupAuthenticatesByVerifierWithoutRewritingIt(): void
     {
-        $valid = $this->apiToken->validToken('legacy-api-token');
+        // A stored token is always a hashed verifier (created here, or converted
+        // from a pre-upgrade plaintext token by the 20260621_hash_api_tokens
+        // installer patch).
+        $created = $this->apiToken->createToken([
+            'type' => 'manual',
+            'user' => 'admin',
+            'token' => 'legacy-api-token',
+        ]);
+        $storedBefore = $this->table->fetchFullRow(['tokenId' => $created['tokenId']]);
 
+        $valid = $this->apiToken->validToken('legacy-api-token');
         $this->assertSame('admin', $valid['user']);
-        $stored = $this->table->fetchFullRow(['tokenId' => 1]);
-        $this->assertSame('sha256:' . hash('sha256', 'legacy-api-token'), $stored['token']);
+
+        // Looking a token up must never rewrite the stored verifier.
+        $storedAfter = $this->table->fetchFullRow(['tokenId' => $created['tokenId']]);
+        $this->assertSame($storedBefore['token'], $storedAfter['token']);
     }
 
     public function testTokenListingsAndLookupDoNotExposeVerifier(): void

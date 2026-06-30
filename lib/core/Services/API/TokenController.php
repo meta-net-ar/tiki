@@ -55,7 +55,9 @@ class Services_API_TokenController
         ]);
 
         Feedback::success(tr('New API token successfully created.'));
-        header('Cache-Control: no-store');
+        // The response embeds the one-time plaintext token; keep it out of the
+        // browser cache/history when rendered as HTML.
+        TikiLib::lib('access')->preventCaching();
 
         return array_merge($token, [
             'title' => tr('API Token Created'),
