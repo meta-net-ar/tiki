@@ -26,65 +26,50 @@ use Tiki\Installer\Installer;
  */
 function upgrade_20260617_migrate_tracker_attachments_to_filegallery_tiki(Installer $installer)
 {
-    $db = TikiDb::get();
     $trklib = TikiLib::lib('trk');
 
-    $attachmentsTable = $db->table('tiki_tracker_item_attachments');
-    $itemsTable = $db->table('tiki_tracker_items');
+    // Auto-remove orphan attachments whose tracker items no longer exist — they cannot be migrated.
+    $installer->query('DELETE a FROM tiki_tracker_item_attachments a LEFT JOIN tiki_tracker_items i USING (itemId) WHERE i.itemId IS NULL');
 
-    $itemIds = array_unique(array_map('intval', $attachmentsTable->fetchColumn('itemId', [])));
+    $remaining = $installer->fetchAll('SELECT DISTINCT i.trackerId FROM tiki_tracker_item_attachments a JOIN tiki_tracker_items i USING (itemId)');
 
-    if ($itemIds) {
-        $existingItemIds = array_map('intval', $itemsTable->fetchColumn('itemId', ['itemId' => $itemsTable->in($itemIds)]));
-        $deletedItemIds = array_diff($itemIds, $existingItemIds);
+    if ($remaining) {
+        $trackerIds = array_column($remaining, 'trackerId');
 
-        if ($deletedItemIds) {
-            $attachmentsTable->deleteMultiple(['itemId' => $attachmentsTable->in($deletedItemIds)]);
-        }
-    }
-
-    $remainingItemIds = array_unique(array_map('intval', $attachmentsTable->fetchColumn('itemId', [])));
-
-    if ($remainingItemIds) {
-        $itemTrackerMap = $itemsTable->fetchMap('itemId', 'trackerId', ['itemId' => $itemsTable->in($remainingItemIds)]);
-        $trackerIds = array_unique(array_map('intval', array_values($itemTrackerMap)));
-
-        echo tr('Tiki found tracker item attachments still stored in the database, left over from the removed tracker "Attachments" tab and/or the deprecated Attachment field type. Affected tracker(s):') . PHP_EOL;
+        $message = tr('Tiki found tracker item attachments still stored in the database, left over from the removed tracker "Attachments" tab and/or the deprecated Attachment field type. Affected tracker(s):') . PHP_EOL;
         foreach ($trackerIds as $trackerId) {
             $trackerInfo = $trklib->get_tracker($trackerId);
             $trackerName = $trackerInfo['name'] ?? ('#' . $trackerId);
-            echo "  - $trackerName (trackerId=$trackerId)" . PHP_EOL;
+            $message .= "  - $trackerName (trackerId=$trackerId)" . PHP_EOL;
         }
-        echo PHP_EOL;
-        echo tr('Before continuing, migrate these attachments to a "Files" tracker field (create one first if the tracker does not have one yet), then run:') . PHP_EOL;
-        echo '  php console.php tracker:convert-attachments <trackerId> <fieldId> [galleryId]' . PHP_EOL;
-        echo tr('<fieldId> must be the ID of that "Files" field. Add --preview to check the result first without making any changes.') . PHP_EOL;
-        echo tr('Run the database update again once all attachments have been migrated.') . PHP_EOL;
+        $message .= PHP_EOL;
+        $message .= tr('Before continuing, migrate these attachments to a "Files" tracker field (create one first if the tracker does not have one yet), then run:') . PHP_EOL;
+        $message .= '  php console.php tracker:convert-attachments <trackerId> <fieldId> [galleryId]' . PHP_EOL;
+        $message .= tr('<fieldId> must be the ID of that "Files" field. Add --preview to check the result first without making any changes.') . PHP_EOL;
+        $message .= tr('Run the database update again once all attachments have been migrated.');
 
-        return false;
+        throw new Exception($message);
     }
 
-    $fieldsTable = $db->table('tiki_tracker_fields');
     // type comparison must be case-sensitive: lowercase 'a' is the unrelated, still valid TextArea field type
-    $deprecatedFields = $fieldsTable->fetchAll(['fieldId', 'trackerId', 'name'], ['type' => $fieldsTable->exactly('A')]);
+    $deprecatedFields = $installer->fetchAll('SELECT fieldId, trackerId, name FROM tiki_tracker_fields WHERE BINARY type = ?', ['A']);
 
     if ($deprecatedFields) {
-        echo tr('Tiki found tracker fields still using the removed deprecated Attachment field type:') . PHP_EOL;
+        $message = tr('Tiki found tracker fields still using the removed deprecated Attachment field type:') . PHP_EOL;
         foreach ($deprecatedFields as $field) {
             $trackerInfo = $trklib->get_tracker($field['trackerId']);
             $trackerName = $trackerInfo['name'] ?? ('#' . $field['trackerId']);
-            echo "  - {$field['name']} (fieldId={$field['fieldId']}) in tracker $trackerName (trackerId={$field['trackerId']})" . PHP_EOL;
+            $message .= "  - {$field['name']} (fieldId={$field['fieldId']}) in tracker $trackerName (trackerId={$field['trackerId']})" . PHP_EOL;
         }
-        echo PHP_EOL;
-        echo tr('These field definitions are no longer usable and must be removed from their tracker (Tracker admin > Fields > select the field(s) > Remove), then run the database update again.') . PHP_EOL;
+        $message .= PHP_EOL;
+        $message .= tr('These field definitions are no longer usable and must be removed from their tracker (Tracker admin > Fields > select the field(s) > Remove), then run the database update again.');
 
-        return false;
+        throw new Exception($message);
     }
 
-    $optionsTable = $db->table('tiki_tracker_options');
-    $optionsTable->deleteMultiple(['name' => $optionsTable->in(['useAttachments', 'showAttachments', 'orderAttachments'])]);
-
-    $db->table('users_permissions')->delete(['permName' => 'tiki_p_tracker_view_attachments']);
+    $installer->query("DELETE FROM tiki_tracker_options WHERE name IN ('useAttachments', 'showAttachments', 'orderAttachments')");
+    $installer->query("DELETE FROM users_permissions WHERE permName = 'tiki_p_tracker_view_attachments'");
+    $installer->query('DROP TABLE IF EXISTS `tiki_tracker_item_attachments`');
 
     return true;
 }

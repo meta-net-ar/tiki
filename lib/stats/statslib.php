@@ -596,7 +596,6 @@ class StatsLib extends TikiLib
             'trackers' => 'tiki_trackers',
             'tracker_fields' => 'tiki_tracker_fields',
             'tiki_tracker_items' => 'tiki_tracker_items',
-            'tiki_tracker_item_attachments' => 'tiki_tracker_item_attachments',
             'tiki_tracker_options' => 'tiki_tracker_options',
         ];
 

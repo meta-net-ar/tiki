@@ -2513,24 +2513,6 @@ CREATE TABLE `tiki_tracker_fields` (
   INDEX `encryptionKeyId` (`encryptionKeyId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
-DROP TABLE IF EXISTS `tiki_tracker_item_attachments`;
-CREATE TABLE `tiki_tracker_item_attachments` (
-  `attId` int(12) NOT NULL auto_increment,
-  `itemId` int(12) NOT NULL default 0,
-  `filename` varchar(80) default NULL,
-  `filetype` varchar(80) default NULL,
-  `filesize` int(14) default NULL,
-  `user` varchar(200) default NULL,
-  `data` longblob,
-  `path` varchar(255) default NULL,
-  `hits` int(10) default NULL,
-  `created` int(14) default NULL,
-  `comment` varchar(250) default NULL,
-  `longdesc` blob,
-  `version` varchar(40) default NULL,
-  PRIMARY KEY (`attId`),
-  INDEX `itemId` (`itemId`)
-) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
 DROP TABLE IF EXISTS `tiki_tracker_item_fields`;
 CREATE TABLE `tiki_tracker_item_fields` (

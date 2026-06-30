@@ -704,24 +704,6 @@ class ObjectLib extends TikiLib
                     $itemInfo['status']
                 );
                 break;
-            case 'trackeritemattachments':
-                $trklib = TikiLib::lib('trk');
-                $info = $trklib->get_item_attachment($object);
-                $info = array_merge($info, $data);
-
-                $trklib->replace_item_attachment(
-                    $object,
-                    $info['filename'],
-                    $info['filetype'],
-                    $info['filesize'],
-                    $info['data'],
-                    $info['comment'],
-                    $info['user'],
-                    null,
-                    $info['version'],
-                    $info['longdesc'],
-                );
-                break;
             case 'article':
             case 'articles':
                 $artlib = TikiLib::lib('art');
@@ -1361,8 +1343,6 @@ class ObjectLib extends TikiLib
                 return ['tiki_articles', 'articleId'];
             case 'post':
                 return ['tiki_blog_posts', 'postId'];
-            case 'trackeritemattachments':
-                return ['tiki_tracker_item_attachments', 'attId'];
             case 'surveys':
             case 'survey':
                 return ['tiki_surveys', 'surveyId'];

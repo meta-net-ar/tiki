@@ -128,10 +128,6 @@ class Tracker_Field_Image extends \Tracker\Field\AbstractItemField
         }
 
         $data = ['value' => $this->getValue()];
-        if (! empty($data['value']) && (int) $data['value'] > 0) {
-            $attachment = TikiLib::lib('trk')->get_item_attachment($data['value']);
-            $data['filename'] = $attachment['filename'];
-        }
         return $data;
     }
 

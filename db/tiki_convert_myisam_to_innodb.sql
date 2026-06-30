@@ -198,7 +198,6 @@ ALTER TABLE `tiki_todo` ENGINE=InnoDB;
 ALTER TABLE `tiki_todo_notif` ENGINE=InnoDB;
 ALTER TABLE `tiki_topics` ENGINE=InnoDB;
 ALTER TABLE `tiki_tracker_fields` ENGINE=InnoDB;
-ALTER TABLE `tiki_tracker_item_attachments` ENGINE=InnoDB;
 ALTER TABLE `tiki_tracker_item_field_logs` ENGINE=InnoDB;
 ALTER TABLE `tiki_tracker_item_fields` ENGINE=InnoDB;
 ALTER TABLE `tiki_tracker_items` ENGINE=InnoDB;

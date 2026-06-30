@@ -98,11 +98,6 @@ class TrackerLib extends TikiLib
         return $out;
     }
 
-    private function attachments()
-    {
-        return $this->table('tiki_tracker_item_attachments');
-    }
-
     private function comments()
     {
         return $this->table('tiki_comments');
@@ -159,213 +154,9 @@ class TrackerLib extends TikiLib
         }
     }
 
-    public function add_item_attachment_hit($id)
-    {
-        if (StatsLib::is_stats_hit()) {
-            $attachments = $this->attachments();
-            $attachments->update(['hits' => $attachments->increment(1)], ['attId' => (int) $id]);
-        }
-        return true;
-    }
-
-    public function list_item_attachments($itemId, $offset = 0, $maxRecords = -1, $sort_mode = 'attId_asc', $find = '')
-    {
-        $attachments = $this->attachments();
-
-        $order = $attachments->sortMode($sort_mode);
-        $fields = ['user', 'attId', 'itemId', 'filename', 'filesize', 'filetype', 'hits', 'created', 'comment', 'longdesc', 'version'];
-
-        $conditions = [
-            'itemId' => (int) $itemId,
-        ];
-
-        if ($find) {
-            $conditions['filename'] = $attachments->like("%$find%");
-        }
-
-        return [
-            'data' => $attachments->fetchAll($fields, $conditions, $maxRecords, $offset, $order),
-            'count' => $attachments->fetchCount($conditions),
-        ];
-    }
-
     public function get_item_nb_comments($itemId)
     {
         return $this->comments()->fetchCount(['object' => (int) $itemId, 'objectType' => 'trackeritem']);
-    }
-
-    public function list_all_attachments($offset = 0, $maxRecords = -1, $sort_mode = 'created_desc', $find = '')
-    {
-        $attachments = $this->attachments();
-
-        $fields = ['user', 'attId', 'itemId', 'filename', 'filesize', 'filetype', 'hits', 'created', 'comment', 'path'];
-        $order = $attachments->sortMode($sort_mode);
-        $conditions = [];
-
-        if ($find) {
-            $conditions['filename'] = $attachments->like("%$find%");
-        }
-
-        return [
-            'data' => $attachments->fetchAll($fields, $conditions, $maxRecords, $offset, $order),
-            'count' => $attachments->fetchCount($conditions),
-        ];
-    }
-
-    public function file_to_db($path, $attId)
-    {
-        if (is_readable($path)) {
-            $updateResult = $this->attachments()->update(
-                ['data' => file_get_contents($path),    'path' => ''],
-                ['attId' => (int) $attId]
-            );
-
-            if ($updateResult) {
-                unlink($path);
-            }
-        }
-    }
-
-    public function db_to_file($path, $attId)
-    {
-        $attachments = $this->attachments();
-
-        $data = $attachments->fetchOne('data', ['attId' => (int) $attId]);
-        if (false !== file_put_contents($path, $data)) {
-            $attachments->update(['data' => '', 'path' => basename($path)], ['attId' => (int) $attId]);
-        }
-    }
-
-    public function get_item_attachment($attId)
-    {
-        return $this->attachments()->fetchFullRow(['attId' => (int) $attId]);
-    }
-
-    public function remove_item_attachment($attId = 0, $itemId = 0)
-    {
-        global $prefs;
-        $attachments = $this->attachments();
-        $paths = [];
-
-        if (empty($attId) && ! empty($itemId)) {
-            if ($prefs['t_use_db'] === 'n') {
-                $paths = $attachments->fetchColumn('path', ['itemId' => $itemId]);
-            }
-
-            $attachments->deleteMultiple(['itemId' => $itemId]);
-        } elseif (! empty($attId)) {
-            if ($prefs['t_use_db'] === 'n') {
-                $paths = $attachments->fetchColumn('path', ['attId' => (int) $attId]);
-            }
-            $attachments->delete(['attId' => (int) $attId]);
-        }
-        foreach (array_filter($paths) as $path) {
-            @unlink($prefs['t_use_dir'] . $path);
-        }
-    }
-
-    public function replace_item_attachment($attId, $filename, $type, $size, $data, $comment, $user, $fhash, $version, $longdesc, $trackerId = 0, $itemId = 0, $options = '', $notif = true)
-    {
-        global $prefs;
-        $attachments = $this->attachments();
-
-        $comment = strip_tags($comment);
-        $now = $this->now;
-        if (empty($attId)) {
-            $attId = $attachments->insert(
-                [
-                    'itemId' => (int) $itemId,
-                    'filename' => $filename,
-                    'filesize' => $size,
-                    'filetype' => $type,
-                    'data' => $data,
-                    'created' => $now,
-                    'hits' => 0,
-                    'user' => $user,
-                    'comment' => $comment,
-                    'path' => $fhash,
-                    'version' => $version,
-                    'longdesc' => $longdesc,
-                ]
-            );
-        } elseif (empty($filename)) {
-            $attachments->update(
-                [
-                    'user' => $user,
-                    'comment' => $comment,
-                    'version' => $version,
-                    'longdesc' => $longdesc,
-                ],
-                ['attId' => $attId]
-            );
-        } else {
-            $path = $attachments->fetchOne('path', ['attId' => (int) $attId]);
-            if ($path) {
-                @unlink($prefs['t_use_dir'] . $path);
-            }
-
-            $attachments->update(
-                [
-                    'filename' => $filename,
-                    'filesize' => $size,
-                    'filetype' => $type,
-                    'data' => $data,
-                    'user' => $user,
-                    'comment' => $comment,
-                    'path' => $fhash,
-                    'version' => $version,
-                    'longdesc' => $longdesc,
-                ],
-                ['attId' => (int) $attId]
-            );
-        }
-
-        if (! $notif) {
-            return $attId;
-        }
-
-        $options["attachment"] = ["attId" => $attId, "filename" => $filename, "comment" => $comment];
-        $watchers = $this->get_notification_emails($trackerId, $itemId, $options);
-
-        if (count($watchers) > 0) {
-            $smarty = TikiLib::lib('smarty');
-            $trackerName = $this->trackers()->fetchOne('name', ['trackerId' => (int) $trackerId]);
-
-            $smarty->assign('mail_date', $this->now);
-            $smarty->assign('mail_user', $user);
-            $smarty->assign('mail_action', 'New File Attached to Item:' . $itemId . ' at tracker ' . $trackerName);
-            $smarty->assign('mail_itemId', $itemId);
-            $smarty->assign('mail_trackerId', $trackerId);
-            $smarty->assign('mail_trackerName', $trackerName);
-            $smarty->assign('mail_attId', $attId);
-            $smarty->assign('mail_data', $filename . "\n" . $comment . "\n" . $version . "\n" . $longdesc);
-            if (! isset($_SERVER["SERVER_NAME"])) {
-                $_SERVER["SERVER_NAME"] = $_SERVER["HTTP_HOST"];
-            }
-            include_once('lib/webmail/tikimaillib.php');
-            $smarty->assign('server_name', $_SERVER['SERVER_NAME']);
-            $desc = $this->get_isMain_value($trackerId, $itemId);
-            $smarty->assign('mail_item_desc', $desc);
-            foreach ($watchers as $w) {
-                $mail = new TikiMail($w['user']);
-
-                if (! isset($w['template'])) {
-                    $w['template'] = '';
-                }
-                $content = $this->parse_notification_template($w['template']);
-
-                $mail->setSubject($smarty->fetchLang($w['language'], $content['subject']));
-                $mail_data = $smarty->fetchLang($w['language'], $content['template']);
-                if (isset($w['templateFormat']) && $w['templateFormat'] == 'html') {
-                    $mail->setHtml($mail_data, str_replace('&nbsp;', ' ', strip_tags($mail_data)));
-                } else {
-                    $mail->setText(str_replace('&nbsp;', ' ', strip_tags($mail_data)));
-                }
-                $mail->send([$w['email']]);
-            }
-        }
-
-        return $attId;
     }
 
     public function list_last_comments($trackerId = 0, $itemId = 0, $offset = -1, $maxRecords = -1)
@@ -3223,7 +3014,6 @@ class TrackerLib extends TikiLib
 
         $this->itemFields()->deleteMultiple(['itemId' => (int) $itemId]);
         $this->comments()->deleteMultiple(['object' => (int) $itemId, 'objectType' => 'trackeritem']);
-        $this->attachments()->deleteMultiple(['itemId' => (int) $itemId]);
         $this->groupWatches()->deleteMultiple(['object' => (int) $itemId, 'event' => 'tracker_item_modified']);
         $this->userWatches()->deleteMultiple(['object' => (int) $itemId, 'event' => 'tracker_item_modified']);
         // Now delete the actual tracker item
