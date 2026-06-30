@@ -363,10 +363,6 @@ import { defaults as defaultControls } from "ol/control";
 
             $(container).css("background", "white");
 
-            container.createMapFeatureStyle = function (feature) {
-                return setFeatureColorStyle(feature);
-            };
-
             container.setupLayerEvents = function (vectors) {
                 if (!selectionInteraction) {
                     selectionInteraction = new ol.interaction.Select({
@@ -502,9 +498,6 @@ import { defaults as defaultControls } from "ol/control";
                                         feature.set("radius", radius);
                                     }
                                 };
-                                const createMarkerStyle = function (feature) {
-                                    return setFeatureColorStyle(feature, getFeatureColor(feature));
-                                };
                                 const invisibleFill = new ol.style.Fill({
                                     color: "rgba(255, 255, 255, 0.01)",
                                 });
@@ -513,7 +506,7 @@ import { defaults as defaultControls } from "ol/control";
                                         features = feature.get("features");
 
                                     if (!features && feature) {
-                                        return createMarkerStyle(feature);
+                                        return setFeatureColorStyle(feature);
                                     }
 
                                     if (features.length > 1) {
@@ -527,7 +520,7 @@ import { defaults as defaultControls } from "ol/control";
                                         );
                                     }
                                     for (let i = features.length - 1; i >= 0; --i) {
-                                        styles.push(createMarkerStyle(features[i]));
+                                        styles.push(setFeatureColorStyle(features[i]));
                                     }
                                     return styles;
                                 };
@@ -578,8 +571,8 @@ import { defaults as defaultControls } from "ol/control";
                                             style = styleCache["f" + feature.ol_uid];
 
                                             if (!style) {
-                                                // Always try to create a style - createMarkerStyle handles custom colors
-                                                style = createMarkerStyle(feature);
+                                                // Always try to create a style - setFeatureColorStyle handles custom colors
+                                                style = setFeatureColorStyle(feature);
                                                 styleCache["f" + feature.ol_uid] = style;
                                             }
                                         }
@@ -601,7 +594,7 @@ import { defaults as defaultControls } from "ol/control";
 
                                 if ($(container).data("popup-style")) {
                                     const selectionInteraction = new ol.interaction.Select({
-                                        style: createMarkerStyle,
+                                        style: setFeatureColorStyle,
                                         layers: [vectors],
                                     });
 
@@ -623,7 +616,7 @@ import { defaults as defaultControls } from "ol/control";
                             vectors = container.layers[name] = new ol.layer.Vector({
                                 source: new ol.source.Vector({ wrapX: false }),
                                 title: name,
-                                style: container.createMapFeatureStyle,
+                                style: setFeatureColorStyle,
                             });
                         }
 
