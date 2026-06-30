@@ -252,14 +252,6 @@ $tiki-dark-footer-link-hover-color: #f171af;
     --tiki-top-border-bottom-width: 5px;
 }
 
-header.navbar.fixed-top {
-    --tiki-fixed-top-border-top-width: 0px;
-    --tiki-fixed-top-border-right-width: 0px;
-    --tiki-fixed-top-border-bottom-width: 5px;
-    --tiki-fixed-top-border-left-width: 0px;
-    --tiki-topbar-light-border-color: #000;
-}
-
 // Color mode preference trumps L&F admin light navbar option
 //[data-bs-theme=dark] {                              // color mode
 //    .tiki-top-nav-light {                           // light top selector

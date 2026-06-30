@@ -58,7 +58,7 @@ body > .container, // basic layout (bootstrap)
 }
 
 .layout_classic .page-header,
-header.fixed-top {
+header.sticky-top {
     border-bottom: 1px solid var(--tiki-main-border-color);
 }
 

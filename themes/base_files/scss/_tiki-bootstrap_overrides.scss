@@ -11,12 +11,6 @@ body:not(.fixed_width) .container {
     max-width: 100%;
 }
 
-// position: fixed-top is being overridden by position:relative for some reason
-.tiki .navbar.fixed-top,
-.tiki header.fixed-top {
-    position: fixed;
-}
-
 @media(max-width:768px) {
     .tiki .col-md-12 {
     flex-basis: 100%;

@@ -206,7 +206,7 @@ invalidHandler: function(event, validator) {
         if (!$container.length) {
             $container = $("html");
             $scroller = $("body");
-            offset = $(".fixed-top").outerHeight() || 0;
+            offset = $("#page-header.sticky-top").outerHeight() || 0;
         }
         var containerScrollTop = $scroller.scrollTop(),
             $firstError = $(validator.errorList[0].element),
