@@ -74,45 +74,6 @@ class TrackerConfigHistoryRenderer
         'duplicateRules'                             => ['label' => 'Duplicate Rules',           'format' => 'duplicateRules'],
     ];
 
-    /**
-     * Human-readable names for field types (single-letter or short codes).
-     */
-    private const FIELD_TYPES = [
-        't'        => 'Text (Single Line)',
-        'a'        => 'Text Area',
-        'n'        => 'Numeric',
-        'd'        => 'Dropdown',
-        'D'        => 'Dynamic List',
-        'e'        => 'Category',
-        'f'        => 'Date/Time (timestamp)',
-        'j'        => 'JS Calendar (date picker)',
-        'u'        => 'User Selector',
-        'g'        => 'Group Selector',
-        'r'        => 'Item Link',
-        'R'        => 'Relation',
-        'REL'      => 'Relation (REL)',
-        'F'        => 'Freetags',
-        'i'        => 'Image (legacy)',
-        'FG'       => 'Files (File Gallery)',
-        'A'        => 'File Attachment',
-        'c'        => 'Checkbox',
-        's'        => 'Stars / Rating',
-        'S'        => 'Static Text',
-        'H'        => 'Heading',
-        'w'        => 'Wiki Page',
-        'wiki'     => 'Wiki Page',
-        'q'        => 'Auto-Increment',
-        'y'        => 'Country Selector',
-        'L'        => 'Language',
-        'LANG'     => 'Language (auto-assign)',
-        'I'        => 'IP Address',
-        'icon'     => 'Icon',
-        'G'        => 'Geographic Feature',
-        'url'      => 'URL',
-        'm'        => 'Email',
-        'articles' => 'Articles',
-    ];
-
     // -------------------------------------------------------------------------
     // Public API
     // -------------------------------------------------------------------------
@@ -204,7 +165,7 @@ class TrackerConfigHistoryRenderer
         return match ($fmt) {
             'yesNo'      => ($value === 'y' || $value === 1 || $value === true)
                               ? tra('Yes') : tra('No'),
-            'fieldType'  => self::FIELD_TYPES[(string) $value] ?? (string) $value,
+            'fieldType'  => \Tracker_Field_Factory::getFieldInfo((string) $value)['name'] ?? (string) $value,
             'jsonPretty' => self::prettyJson($value),
             'nullable'   => ($value === null || $value === '') ? tra('None') : (string) $value,
             'duplicateRules' => self::formatDuplicateRules($value),
