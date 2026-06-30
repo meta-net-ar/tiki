@@ -55,13 +55,13 @@
                         }
                         innerLayers.forEach(thisLayer => {
                             if (thisLayer.get("type") === "base") {
-                                $baseLayers.append($('<option/>')
+                                $baseLayers.append($('<option>')
                                     .attr('value', k)
                                     .text(tr(thisLayer.get("title")))
                                     .prop('selected', thisLayer === container.map.baseLayer));
                             } else {
                                 var label, checkbox;
-                                $optionalLayers.append(label = $('<label/>').text(thisLayer.get("title") ).prepend(
+                                $optionalLayers.append(label = $('<label>').text(thisLayer.get("title") ).prepend(
                                     checkbox = $('<input type="checkbox" class="form-check-input"/>')
                                         .prop('checked', thisLayer.isVisible())));
                                 checkbox.on("change", function (e) {

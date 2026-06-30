@@ -356,8 +356,7 @@ import { defaults as defaultControls } from "ol/control";
                         }),
                     });
                 }
-                // DIRECTLY set the style on the feature
-                feature.setStyle(coloredStyle);
+                // Don't set the style on the feature but let the layer handle it
                 return coloredStyle;
             };
 
@@ -427,6 +426,24 @@ import { defaults as defaultControls } from "ol/control";
             };
 
             /**
+             * detect if the feature in question is currently clustered
+             * @param feature
+             * @param layer
+             * @returns {boolean}
+             */
+            container.isClustered = function (feature, layer) {
+                let isClustered = false;
+                if ($(container).data("cluster")) {
+                    const clusterGroups = layer.get("source").getFeatures();
+                    isClustered = clusterGroups.some((clusterGroup) => {
+                        const members = clusterGroup.get("features");
+                        return members && members.length > 1 && members.includes(feature);
+                    });
+                }
+                return isClustered;
+            };
+
+            /**
              * Get or create an ol layer and store it in container.layers[]
              *
              * @param name         if empty, use the "Editable" layer, container.vectors
@@ -444,11 +461,15 @@ import { defaults as defaultControls } from "ol/control";
                     if (!container.layers[name]) {
                         // basic feature clustering
                         if ($(container).data("cluster")) {
+                            // Shared source for both layers (shapes and points)
+                            const sharedSource = new ol.source.Vector({ wrapX: false });
+                            const styleCache = {};
+
                             if (!shapeLayer) {
                                 const distance = $(container).data("cluster"),
                                     clusterSource = new ol.source.Cluster({
                                         distance: distance,
-                                        source: new ol.source.Vector({ wrapX: false }),
+                                        source: sharedSource,
                                         geometryFunction: (feature) => {
                                             const geom = feature.getGeometry();
                                             if (!geom) return null;
@@ -474,7 +495,6 @@ import { defaults as defaultControls } from "ol/control";
                                 } else {
                                     clusterTextColor = [255, 255, 255];
                                 }
-                                const styleCache = {};
                                 let maxFeatureCount;
                                 /**
                                  * Calculate size of cluster depending on zoom extent
@@ -568,6 +588,7 @@ import { defaults as defaultControls } from "ol/control";
                                             if (features && features[0]) {
                                                 feature = features[0];
                                             }
+
                                             style = styleCache["f" + feature.ol_uid];
 
                                             if (!style) {
@@ -579,6 +600,9 @@ import { defaults as defaultControls } from "ol/control";
                                         return style;
                                     },
                                 });
+
+                                // Store the shared source so the shapeLayer branch can find it
+                                vectors._sharedSource = sharedSource;
 
                                 if ($(container).data("clusterhover") === "features") {
                                     container.map.addInteraction(
@@ -605,10 +629,34 @@ import { defaults as defaultControls } from "ol/control";
                                 }
                             } else {
                                 // make a plain vector layer for Polygons and Lines
+
+                                // Retrieve the shared source from the already-created cluster layer
+                                const clusterLayerName = name.replace(" " + tr("Shapes"), ""),
+                                    clusterLayer = container.layers[clusterLayerName],
+                                    clusterSource = clusterLayer.getSource(),
+                                    rawSource = clusterLayer._sharedSource; // ✅ the actual VectorSource with real geometries
+
                                 vectors = container.layers[name] = new ol.layer.Vector({
-                                    source: new ol.source.Vector({ wrapX: false }),
+                                    source: rawSource,
                                     title: name,
-                                    style: container.createMapFeatureStyle,
+                                    style: function (feature) {
+                                        if (feature.getGeometry() instanceof ol.geom.Point) {
+                                            return null; // Points are handled by the cluster layer, not here
+                                        }
+                                        // Find if this feature is in a cluster of > 1
+                                        if (container.isClustered(feature, clusterLayer)) {
+                                            return null; // hide the polygon
+                                        }
+
+                                        let style = styleCache["f" + feature.ol_uid];
+                                        if (style) {
+                                            return style;
+                                        } else {
+                                            style = setFeatureColorStyle(feature);
+                                            styleCache["f" + feature.ol_uid] = style;
+                                            return style;
+                                        }
+                                    },
                                 });
                             }
                         } else {
@@ -1639,7 +1687,7 @@ import { defaults as defaultControls } from "ol/control";
 
                                             fields[item.geo_feature_field] = format.writeFeature(feature);
 
-                                            if (current === initial || layer !== container.vectors) {
+                                            if (current === initial || (layer !== container.vectors && layer !== container.vector_shapes)) {
                                                 return;
                                             }
 
@@ -2177,14 +2225,17 @@ import { defaults as defaultControls } from "ol/control";
                     feature.set("popup_tpl", $(options.form).data("popup-tpl"));
                 }
 
-                feature.setStyle(
-                    new ol.style.Style({
+                feature.setStyle(function (feature) {
+                    if (container.isClustered(feature, markerLayer)) {
+                        return null; // hide the marker
+                    }
+                    return new ol.style.Style({
                         image: new ol.style.Icon({
                             anchor: [0.5, 0.8],
                             src: feature.get("url"),
                         }),
-                    })
-                );
+                    });
+                });
 
                 const markerLayer = container.getLayer(options.layer);
                 let initial = writeCoordinates(lonlat.clone(), container.map, true);

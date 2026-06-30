@@ -10,7 +10,7 @@ $('#appframe .map-container').on('initialized', function () {
             fillOpacity: ".3",
             strokeDashstyle: "solid"
         };
-    let vlayer, mode, controls = [], func;
+    let vlayer, shapelayer, mode, controls = [], func;
 
 
     {{if !empty($mapcontrol.function)}}
@@ -22,6 +22,7 @@ $('#appframe .map-container').on('initialized', function () {
         mode = {{$mapcontrol.mode|json_encode}};
     {{else}}
         vlayer = container.vectors;
+        shapelayer = container.vector_shapes;
         {{if !empty($mapcontrol.control)}}
             controls.push({{$mapcontrol.control}});
         {{/if}}
