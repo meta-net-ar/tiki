@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // Utility functions for language, translation related controllers
+require_once(__DIR__ . '/../../../language/Language.php');
 
 class Services_Language_Utilities
 {

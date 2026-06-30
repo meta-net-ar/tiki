@@ -76,6 +76,13 @@ class LanguageTranslationsTest extends TikiTestCase
         unset($GLOBALS['prefs']['record_untranslated']);
     }
 
+    public function testConstructorRejectsPathTraversalLanguage(): void
+    {
+        $this->expectException(Language_Exception::class);
+
+        new LanguageTranslations('../lang/en');
+    }
+
     public function testUpdateTransShouldInsertNewTranslation(): void
     {
         $this->obj->updateTrans('New string', 'New translation');
