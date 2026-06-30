@@ -4272,7 +4272,10 @@ class TrackerLib extends TikiLib
             $handler = $this->get_field_handler($field, $item);
 
             if ($handler) {
-                $value = $handler->renderOutput(['list_mode' => 'y', 'isMain_context' => true]);
+                $value = $handler->renderText([
+                    'list_mode' => 'y',
+                    'isMain_context' => true
+                ]);
             }
 
             if (! empty($value)) {
