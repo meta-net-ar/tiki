@@ -1124,30 +1124,32 @@ function edit_custom_mode(el,id,name,icon){
 
     var setupThemeLayouts = function (themeDropDown, optionDropDown, layoutDropDown) {
         themeDropDown,optionDropDown.on("change", function() {
-            var theme_option = optionDropDown.find("option:selected").val();
-            var theme_name = themeDropDown.find("option:selected").val();
-            if (theme_option){
+            const theme_option = optionDropDown.find("option:selected").val();
+            let theme_name = themeDropDown.find("option:selected").val();
+            if (theme_option) {
                 theme_name += ":" + theme_option;
             }
-            var layouts = theme_layouts[theme_name];
-            var current = layoutDropDown.val();
-            layoutDropDown.empty();
-            if (!theme_name){
-                layoutDropDown.append(\$('<option/>').attr('value','').text('Site layout'));
-                layoutDropDown.attr('disabled',true);
-            } else {
-                layoutDropDown.attr('disabled',false);
-                \$.each(layouts, function(i, val) {
-                    layoutDropDown.append(\$('<option/>').attr('value',i).text(val));
-                });
-
-                //try setting the option to the previously selected option and if no layout matched, set it to the SMARTY_DEFAULT_LAYOUT constant
-                layoutDropDown.val(current);
-                if (!layoutDropDown.val()){
-                    layoutDropDown.val("$default_layout");
+            if (layoutDropDown.length) {
+                const layouts = theme_layouts[theme_name];
+                const current = layoutDropDown.val();
+                layoutDropDown.empty();
+                if (!theme_name){
+                    layoutDropDown.append(\$('<option/>').attr('value','').text('Site layout'));
+                    layoutDropDown.attr('disabled',true);
+                } else {
+                    layoutDropDown.attr('disabled',false);
+                    \$.each(layouts, function(i, val) {
+                        layoutDropDown.append(\$('<option/>').attr('value',i).text(val));
+                    });
+    
+                    //try setting the option to the previously selected option and if no layout matched, set it to the SMARTY_DEFAULT_LAYOUT constant
+                    layoutDropDown.val(current);
+                    if (!layoutDropDown.val()){
+                        layoutDropDown.val("$default_layout");
+                    }
                 }
+                layoutDropDown.trigger("change");
             }
-            layoutDropDown.trigger("change");
 
         }).trigger("change");
     };
