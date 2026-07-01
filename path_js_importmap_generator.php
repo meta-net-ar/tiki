@@ -171,6 +171,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@vue-mf/duration-picker" => $tikiUrl . JS_ASSETS_PATH . "/duration-picker.js",
                 "@vue-mf/emoji-picker" => $tikiUrl . JS_ASSETS_PATH . "/emoji-picker.js",
                 "@vue-mf/kanban" => $tikiUrl . JS_ASSETS_PATH . "/kanban.js",
+                "@vue-mf/redirect-builder" => $tikiUrl . JS_ASSETS_PATH . "/tiki-redirect-builder.js",
                 "@vue-mf/root-config" => $tikiUrl . JS_ASSETS_PATH . "/root-config.js",
                 "@vue-mf/styleguide" => $tikiUrl . JS_ASSETS_PATH . "/styleguide.js",
                 "@vue-mf/tiki-offline" => $tikiUrl . JS_ASSETS_PATH . "/tiki-offline.js",

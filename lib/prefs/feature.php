@@ -3288,5 +3288,11 @@ function prefs_feature_list($partial = false)
             'tags' => ['basic'],
             'admin' => 'wysiwyg',
         ],
+        'feature_redirects' => [
+            'name' => tra('Redirects'),
+            'description' => tra('Enable redirects for pages that have been moved or renamed.'),
+            'type' => 'flag',
+            'default' => 'y',
+        ]
     ];
 }

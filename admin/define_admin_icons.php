@@ -195,6 +195,12 @@ if ($prefs['theme_unified_admin_backend'] === 'y') {
                     'description' => tr('Site advertisements and notices'),
                     'help'        => 'Banner-Admin',
                 ],
+                'redirects' => [
+                    'title' => tr('Redirects'),
+                    'disabled' => $prefs['feature_redirects'] != 'y',
+                    'description' => tr('Manage redirects for your site'),
+                    'help' => 'Redirects'
+                ]
             ],
         ],
         'community'         => [
