@@ -4880,7 +4880,6 @@ giveRewardsToMembers
 giveRewardsToUser
 globalize
 globRecursive
-globToRegex
 glueOutputAndErrors
 gpgCheckVersion
 gpgExecProc
@@ -5872,7 +5871,6 @@ mark_task_as_trash
 maskFields
 maskSecrets
 matchAuthSource
-matches
 matchesExtension
 matchesMaintenanceVariant
 matchesRoots

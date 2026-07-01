@@ -1009,7 +1009,6 @@ glightbox-index
 Global
 global
 GlobalFactory
-GlobIgnore
 gmap
 Goal
 goal

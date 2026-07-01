@@ -481,7 +481,6 @@ GfmPurifier
 GggTrace
 GitLib
 GitWorkingCopyProvider
-GlobIgnore
 Goal
 GoalCheckCommand
 GoalEventLib

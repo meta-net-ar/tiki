@@ -7796,9 +7796,7 @@ GLightbox
 gLnk
 globalize
 globalVars
-GlobIgnore
 globRecursive
-globToRegex
 GLTFLoader
 glueOutputAndErrors
 go
