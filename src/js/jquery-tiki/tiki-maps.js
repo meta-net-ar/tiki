@@ -2320,48 +2320,69 @@ import { defaults as defaultControls } from "ol/control";
                     }
                 });
             }
-        });
 
-        control = new ol.interaction.Pointer({
-            handleUpEvent: (event) => {
-                const container = this.get(0),
-                    map = container.map;
-                let coords;
+            control = new ol.interaction.Pointer({
+                handleUpEvent: (event) => {
+                    const container = this,
+                        map = container.map;
+                    let coords;
 
-                if (event.coordinates) {
-                    coords = event.coordinates;
-                } else {
-                    coords = map.getCoordinateFromPixel([event.originalEvent.offsetX, event.originalEvent.offsetY]);
+                    if (event.coordinates) {
+                        coords = event.coordinates;
+                    } else {
+                        coords = map.getCoordinateFromPixel([event.originalEvent.offsetX, event.originalEvent.offsetY]);
+                    }
+                    const lonlat = ol.proj.transform(
+                        coords,
+                        map.getView().getProjection(), // source — replaces map.getProjectionObject()
+                        "EPSG:4326" // target
+                    );
+
+                    $(container).addMapMarker({
+                        lat: lonlat[1],
+                        lon: lonlat[0],
+                        unique: "selection",
+                    });
+                    $(container).trigger("selectionChange", {
+                        lat: lonlat[0],
+                        lon: lonlat[1],
+                    });
+
+                    if (options.click) {
+                        options.click();
+                    }
+                    return false;
+                },
+                handleDownEvent: (event) => {
+                    return true;    // return true to "handle" it and trigger handleUpEvent
+                },
+                stopDown() {
+                    return false;   // ...but still let DragPan see the down event
+                },
+            });
+
+            container.map.getView().on("propertychange", function (e) {
+                if (e.key === "resolution" && !isNaN(e.oldValue)) {
+                    const coords = field.val().split(",");
+                    let lon = 0,
+                        lat = 0;
+
+                    if (coords.length > 1) {
+                        lon = coords[0];
+                        lat = coords[1];
+                    }
+                    field.val(formatLocation(lat, lon, parseInt(map.getView().getZoom()))).trigger("change");
                 }
-                const lonlat = ol.proj.transform(
-                    coords,
-                    map.getView().getProjection(), // source — replaces map.getProjectionObject()
-                    "EPSG:4326" // target
-                );
+            });
 
-                $(container).addMapMarker({
-                    lat: lonlat[0],
-                    lon: lonlat[1],
-                    unique: "selection",
-                });
-                $(container).trigger("selectionChange", {
-                    lat: lonlat[0],
-                    lon: lonlat[1],
-                });
+            container.map.addInteraction(control);
 
-                if (options.click) {
-                    options.click();
-                }
-                return false;
-            },
-            handleDownEvent: (event) => {
-                return true; // return true to "handle" it and trigger handleUpEvent
-            },
+            //if (-1 !== $.inArray("navigation", desiredControls)) {
+                container.map.addInteraction(new ol.interaction.DblClickDragZoom());
+            //}
+
+            return control;
         });
-
-        control.set("mode", "selection");
-
-        return control;
     };
 
     $.fn.removeMapSelection = function () {
