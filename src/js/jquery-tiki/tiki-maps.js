@@ -2442,4 +2442,12 @@ import { defaults as defaultControls } from "ol/control";
             return false;
         }
     };
+
+    $(document).on("tiki.modal.redraw", ".modal.fade", function () {
+        $(".map-container:not(.done)")
+            .addClass("done")
+            .visible(function () {
+                $(this).createMap();
+            });
+    });
 })();
