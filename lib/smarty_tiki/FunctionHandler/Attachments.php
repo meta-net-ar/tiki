@@ -69,11 +69,12 @@ class Attachments extends Base
 
         $params['sort_mode'] = $_REQUEST[$url_override_prefix . '-sort_mode'] ?? '';
 
+        // Force some gallery display parameters before fgal_listing_conf.php reads $gal_info
+        $gal_info['show_checked'] = 'n';
+        $gal_info['show_creator'] = 'y';
+
         // Get listing display config
         include_once('fgal_listing_conf.php');
-
-        // Force some gallery display parameters
-        $gal_info['show_checked'] = 'n';
 
         // Get list of files in the gallery
         if (! empty($galleryId)) {
