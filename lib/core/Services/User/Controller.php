@@ -1121,11 +1121,22 @@ class Services_User_Controller
                 throw new Services_Exception($errormsg, 400);
             }
             $name = $_FILES['userfile']['name'];
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile']['tmp_name'], $_FILES['userfile']['name']);
+            } catch (Exception $e) {
+                throw new Services_Exception($e->getMessage(), 403);
+            }
+
             /**
              * @var $avatarlib AvatarLib
              */
             $avatarlib = TikiLib::lib('avatar');
-            $avatarlib->set_avatar_from_url($_FILES['userfile']['tmp_name'], $userwatch, $name);
+            try {
+                $avatarlib->setAvatarFromFile($_FILES['userfile']['tmp_name'], $userwatch, $name);
+            } catch (Exception $e) {
+                throw new Services_Exception($e->getMessage(), 400);
+            }
             return true;
         } else {
             return [

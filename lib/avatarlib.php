@@ -22,16 +22,54 @@ if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
 class AvatarLib extends TikiLib
 {
     /**
-     * sets the avatar from a given image file's URL
+     * sets the avatar from a given remote image file's URL
      *
-     * @param string $url        location of the file
+     * @param string $url        location of the remote file
      * @param string $userwatch  user the avatar is for
      * @param string $name       original name of the file
      *
      * @throws Exception
      */
-
     final public function set_avatar_from_url(string $url, string $userwatch = '', string $name = ''): void
+    {
+        // Validate URL to prevent SSRF via user-supplied avatar URLs
+        $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+        if (! $ssrf->isUrlAllowed($url)) {
+            throw new \Exception($this->getDisallowedAvatarUrlMessage($url));
+        }
+
+        $this->setAvatarFromSource($url, $userwatch, $name, true);
+    }
+
+    /**
+     * sets the avatar from a local image file path
+     *
+     * @param string $file       local file path
+     * @param string $userwatch  user the avatar is for
+     * @param string $name       original name of the file
+     *
+     * @throws Exception
+     */
+    final public function setAvatarFromFile(string $file, string $userwatch = '', string $name = ''): void
+    {
+        if (! is_file($file) || ! is_readable($file)) {
+            throw new \Exception(tr('Avatar file is not readable'));
+        }
+
+        $this->setAvatarFromSource($file, $userwatch, $name, false);
+    }
+
+    private function getDisallowedAvatarUrlMessage(string $url): string
+    {
+        $host = parse_url($url, PHP_URL_HOST);
+        if ($host && Perms::get()->admin) {
+            return tr('Avatar URL host "%0" is not allowed. Review the SSRF whitelist in Security Admin.', $host);
+        }
+
+        return tr('Avatar URL is not allowed. Ask a site administrator to review the SSRF whitelist.');
+    }
+
+    private function setAvatarFromSource(string $source, string $userwatch, string $name, bool $isRemoteUrl): void
     {
         global $user, $prefs;
 
@@ -47,23 +85,26 @@ class AvatarLib extends TikiLib
             $userwatch = $user;
         }
 
-        // Validate URL to prevent SSRF via user-supplied avatar URLs
-        $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
-        if (! $ssrf->isUrlAllowed($url)) {
-            throw new \Exception('Avatar URL is not allowed');
+        $data = @file_get_contents($source);
+        if ($data === false) {
+            throw new \Exception($isRemoteUrl ? tr('Avatar URL could not be read.') : tr('Avatar file could not be read.'));
         }
 
-        $data = file_get_contents($url);
-        list($iwidth, $iheight, $itype, $iattr) = getimagesize($url);
+        $imageInfo = @getimagesize($source);
+        if ($imageInfo === false) {
+            throw new \Exception($isRemoteUrl ? tr('Avatar URL does not point to a valid image.') : tr('Avatar file is not a valid image.'));
+        }
+        list($iwidth, $iheight, $itype, $iattr) = $imageInfo;
         $itype = image_type_to_mime_type($itype);
 
         // Get proper file size of image
-        $imgdata = get_headers($url, true);
-        if (isset($imgdata['Content-Length'])) {
-            # Return file size
-            $size = (int)$imgdata['Content-Length'];
-        } else {
-            $size = strlen($data);
+        $size = strlen($data);
+        if ($isRemoteUrl) {
+            $imgdata = @get_headers($source, true);
+            if (isset($imgdata['Content-Length'])) {
+                # Return file size
+                $size = (int)$imgdata['Content-Length'];
+            }
         }
 
         // Store full-size file gallery image if that is required
@@ -85,6 +126,9 @@ class AvatarLib extends TikiLib
         } else {
             if (function_exists('imagecreatefromstring') && (! str_contains($itype, 'gif'))) {
                 $img = imagecreatefromstring($data);
+                if ($img === false) {
+                    throw new \Exception(tr('Avatar image could not be processed.'));
+                }
                 $size_x = imagesx($img);
                 $size_y = imagesy($img);
                 /* if the square crop is set, crop the image before resizing */
@@ -94,6 +138,9 @@ class AvatarLib extends TikiLib
                     $offset_y = ($size_y - $crop_size) / 2;
                     $crop_array = ['x' => $offset_x , 'y' => $offset_y, 'width' => $crop_size, 'height' => $crop_size];
                     $img = imagecrop($img, $crop_array);
+                    if ($img === false) {
+                        throw new \Exception(tr('Avatar image could not be cropped.'));
+                    }
                     $size_x = $size_y = $crop_size;
                 }
                 if ($size_x > $size_y) {
@@ -109,24 +156,43 @@ class AvatarLib extends TikiLib
                 if ($ty > $size_y) {
                     $ty = $size_y;
                 }
-                if (chkgd2()) {
-                    $t = imagecreatetruecolor($tw, $ty);
-                    // trick to have a transparent background for png instead of black
-                    imagesavealpha($t, true);
-                    $trans_colour = imagecolorallocatealpha($t, 0, 0, 0, 127);
-                    imagefill($t, 0, 0, $trans_colour);
-                    imagecopyresampled($t, $img, 0, 0, 0, 0, $tw, $ty, $size_x, $size_y);
-                } else {
+                if (! chkgd2()) {
                     // TODO ImageGalleryRemoval23.x - replace imagick if no GD
+                    throw new \Exception(tr('Avatar image could not be resized because GD is not available.'));
+                }
+                $t = imagecreatetruecolor($tw, $ty);
+                if ($t === false) {
+                    throw new \Exception(tr('Avatar image could not be resized.'));
+                }
+                // trick to have a transparent background for png instead of black
+                imagesavealpha($t, true);
+                $trans_colour = imagecolorallocatealpha($t, 0, 0, 0, 127);
+                imagefill($t, 0, 0, $trans_colour);
+                if (! imagecopyresampled($t, $img, 0, 0, 0, 0, $tw, $ty, $size_x, $size_y)) {
+                    throw new \Exception(tr('Avatar image could not be resized.'));
                 }
                 // CHECK IF THIS TEMP IS WRITEABLE OR CHANGE THE PATH TO A WRITEABLE DIRECTORY
                 $tmpfname = tempnam($prefs['tmpDir'], "TMPIMG");
-                imagepng($t, $tmpfname);
+                if ($tmpfname === false || ! imagepng($t, $tmpfname)) {
+                    throw new \Exception(tr('Avatar image could not be saved to a temporary file.'));
+                }
                 // Now read the information
                 $fp = fopen($tmpfname, "rb");
-                $t_data = fread($fp, filesize($tmpfname));
+                if ($fp === false) {
+                    throw new \Exception(tr('Avatar image temporary file could not be read.'));
+                }
+                $tmpSize = filesize($tmpfname);
+                if ($tmpSize === false) {
+                    fclose($fp);
+                    unlink($tmpfname);
+                    throw new \Exception(tr('Avatar image temporary file could not be read.'));
+                }
+                $t_data = fread($fp, $tmpSize);
                 fclose($fp);
                 unlink($tmpfname);
+                if ($t_data === false) {
+                    throw new \Exception(tr('Avatar image temporary file could not be read.'));
+                }
                 $t_type = 'image/png';
                 $userprefslib->set_user_avatar($userwatch, 'u', '', $name, $size, $t_type, $t_data);
             } else {
