@@ -379,7 +379,7 @@ import { defaults as defaultControls } from "ol/control";
                                 }
                             });
                         }
-                        if (event.selected.length) {
+                        if (event.selected.length && container.showPopup) {
                             event.selected.forEach(() => {
                                 container.showPopup.apply(null, [event]);
                             });
