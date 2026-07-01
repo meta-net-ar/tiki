@@ -923,8 +923,8 @@ addStyleHeadFoot
 addStylePage
 addStyles
 addSubFormatter
-addSublist
 addSubList
+addSublist
 addTable
 addTag
 addTemplate
@@ -1393,8 +1393,8 @@ array_apply_filter
 array_flat
 array_searchRecursive
 array_search_function
-Article
 article
+Article
 ArticlePut
 ArticlePutProvider
 Articles
@@ -2023,8 +2023,8 @@ categorizePage
 categorizeUrl
 categorize_any
 categorize_user_tracker_item
-Category
 category
+Category
 categoryBackgroundColor
 CategoryName
 CategorySelector
@@ -2064,11 +2064,12 @@ CFG_TYPE
 ch
 chain_counter
 challenge
-change
 Change
+change
 changeButton
 changeCount
 changed
+ChangedFiles
 changedSourceFileTranslatedIntoTargetLanguage
 changeEditedItem
 CHANGELOG_FILE
@@ -2115,8 +2116,8 @@ change_user_email_only
 change_user_password
 change_user_waiting
 char
-character
 Character
+character
 characterEquivalents
 CharacterInline
 character_data
@@ -2635,8 +2636,8 @@ commandIsAvailable
 CommandUnavailableException
 command_details
 command_list
-Comment
 comment
+Comment
 commentMargin
 Comments
 comments
@@ -3303,8 +3304,8 @@ DataTransfer
 dataUri
 dataURItoBlob
 data_load
-Date
 date
+Date
 date2
 DateArgument
 DateCalc
@@ -3484,8 +3485,8 @@ del
 delayedExecutor
 delDir
 deldirfiles
-delete
 Delete
+delete
 deleteActivity
 deleteAddressBook
 deleteAllCustomTools
@@ -4140,8 +4141,8 @@ equalsIgnoreCase
 erase_dir_content
 err
 error
-ERROR
 Error
+ERROR
 errorAndDie
 ErrorChecker
 errorDetails
@@ -4218,8 +4219,8 @@ ews_init_sig_editor
 ews_sync_sig
 exactly
 exactlyOneSet
-example
 Example
+example
 Exception
 exchange_rates
 excludedEmail
@@ -4515,8 +4516,8 @@ fieldInvert
 fieldLookup
 fieldName
 FieldNotFound
-fields
 Fields
+fields
 fieldsArray
 fieldSelectoptions
 fieldsSelector
@@ -4531,8 +4532,8 @@ FIELD_MODIFICATION
 field_render_value
 FIELD_SCORE
 field_types
-File
 file
+File
 FileaccessAllowlist
 FileCanConvertToPdf
 fileContentIsSVG
@@ -4541,8 +4542,8 @@ FileDiagram
 fileDialog
 FileDraft
 fileExtension
-FileGallery
 fileGallery
+FileGallery
 fileGalleryAttachmentsCount
 FileGallerySyncCommand
 FileGalLib
@@ -4559,9 +4560,9 @@ FileList
 fileList
 filemanagerDialog
 FileMetadata
+FileName
 filename
 fileName
-FileName
 fileNameField
 filenameMatch
 FilePut
@@ -4945,8 +4946,8 @@ formSubmission
 formSubmitSpy
 formVals
 form_container
-Forum
 forum
+Forum
 ForumMaskEmail
 ForumName
 ForumProcessInboundMail
@@ -4984,6 +4985,7 @@ fromField
 fromFile
 fromFileDraft
 fromFilterType
+fromGit
 fromId
 fromInfo
 fromInput
@@ -5022,8 +5024,8 @@ fullLink
 FullName
 fullPageStyles
 fullPath
-fullscreen
 fullScreen
+fullscreen
 fullScreenBtn
 fullscreenElement
 fullscreenMethods
@@ -5131,8 +5133,8 @@ generate_provisional_password
 generate_shortest_path_matrix
 generate_unique_sequence
 generate_watch_data
-Generator
 generator
+Generator
 genericError
 genFootnoteArea
 genIndexedBlacks
@@ -5695,8 +5697,8 @@ getFieldTypeDefaultMode
 getFieldTypeName
 getFieldTypes
 getFieldTypesDisabled
-getFile
 GetFile
+getFile
 getFileAttachment
 getFileBacklinks
 getFileData
@@ -5705,8 +5707,8 @@ getFileFields
 getFileGalleryList
 getFilegalsIdsTree
 getFileInfo
-getFileList
 GetFileList
+getFileList
 getFileName
 getFilename
 getFileNamesPHP
@@ -5945,8 +5947,8 @@ getJavaScript
 getJid
 getJitsiUrl
 getJobTypePageMapping
-getJs
 getJS
+getJs
 getJsFilesWithScriptTags
 getJsFromHTML
 getJSON
@@ -6085,8 +6087,8 @@ getMessageId
 getMessages
 getMessageStorageKey
 getMessageUidParam
-getMetaData
 getMetadata
+getMetaData
 getMetadataArray
 getMetadataItemId
 getMetaField
@@ -8504,8 +8506,8 @@ INCREMENT_QUEUE
 INCREMENT_QUEUE_REBUILD
 indent
 indentPx
-index
 Index
+index
 IndexCatchUpCommand
 IndexCleanupCommand
 IndexCompareEnginesCommand
@@ -8542,8 +8544,8 @@ INFO_REQUEST
 InGroup
 Ini
 inIgnoreList
-init
 Init
+init
 initAdapter
 initalize
 initalValue
@@ -9620,6 +9622,7 @@ loadedOptions
 loadEnv
 loaderEl
 loaderInstance
+loadExistingDictionaries
 loadFile
 loadFilePath
 loadFilterDescriptor
@@ -10035,6 +10038,7 @@ mergeCells
 mergeData
 mergeDiff
 merged_prefs
+mergeRequest
 mermaidAttributeName
 mermaidEntityName
 mermaidPanZoom
@@ -10043,8 +10047,8 @@ mesh
 Mesh
 MeshStandardMaterial
 meshtml
-Message
 message
+Message
 messageContainer
 messageElement
 messageLoadedHandler
@@ -10617,8 +10621,8 @@ MysqlSearchIndexManager
 MySQLWarningException
 N
 n
-NAME
 name
+NAME
 Name
 name2
 names
@@ -11156,8 +11160,8 @@ outer
 outerHeight
 outerWidth
 outln
-output
 Output
+output
 OutputErrors
 OutputFile
 outputFormat
@@ -13168,8 +13172,8 @@ resolve_model3dviewer_src
 resource
 resources
 respondWith
-response
 Response
+response
 responses
 restartFromBeginning
 restNodes
@@ -15574,8 +15578,8 @@ sync_user_realname
 syntax
 Syntax
 sysname
-System
 system
+System
 SystemTrackerCreator
 s_create_page
 s_export_structure_tree
@@ -15592,9 +15596,9 @@ T
 ta
 tab
 Tab
+TABLE
 table
 Table
-TABLE
 tableBody
 tableBuilderTable
 tableCount
@@ -16380,8 +16384,8 @@ TrackerImportCommand
 trackerInitMultiSort
 TrackerInput
 trackerInputs
-TrackerItem
 trackerItem
+TrackerItem
 TrackerItemCheck
 trackerItemCreate
 trackerItems
@@ -16562,8 +16566,8 @@ TwoFactorAuthController
 TwoFactorAuthException
 TWVersion
 txt
-Type
 type
+Type
 typeAndId
 TypeError
 TypeFactory
@@ -17240,9 +17244,9 @@ verifyWatchUnsubscribeHash
 verify_method
 VERIFY_SERVER
 verif_url
-Version
 VERSION
 version
+Version
 version_exists
 version_is_flagged
 video
@@ -17342,8 +17346,8 @@ WikiLib
 WikiLibOutput
 WikiMediawiki
 WikiMultipleProvider
-WikiPage
 wikiPage
+WikiPage
 wikiPageAttachment
 wikiPagesFrom
 WikiPaginationUtils
@@ -18183,8 +18187,8 @@ z
 zendExists
 zeroPad
 zIndex
-Zip
 zip
+Zip
 zip_crc32
 zip_deflate
 zip_inflate

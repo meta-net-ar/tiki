@@ -1957,8 +1957,8 @@ fullKey
 fullLine
 fullLink
 fullPageStyles
-fullscreen
 fullScreen
+fullscreen
 fullScreenBtn
 fullscreenElement
 fullscreenMethods

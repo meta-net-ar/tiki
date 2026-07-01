@@ -596,8 +596,8 @@ CsvWriter
 Currency
 CurrencyConvert
 CurrencyRange
-Custom
 custom
+Custom
 customCodeview
 customCodeview.test
 CustomEntryField
@@ -780,8 +780,8 @@ EnglishUpdateCommand
 enterKeypressHandler
 EnumerableInterface
 Equals
-error
 Error
+error
 ErrorHandler
 ErrorManager
 errormanagerlib
@@ -989,6 +989,7 @@ geolib
 Geolocation
 GeoPoint
 getBasePath
+GetChangedFiles
 getSentMsgTrackerItems
 getShortcuts
 getShortcuts.test
@@ -1804,8 +1805,8 @@ Parsable
 ParsableMarkdown
 ParsableWiki
 Parse
-Parser
 parser
+Parser
 ParserException
 parserlib
 parse_tiki
@@ -3060,8 +3061,8 @@ validate-ajax
 validate-alt-image
 ValidateVersion
 validation
-Validator
 validator
+Validator
 validatorslib
 validator_barcode128
 validator_captcha
@@ -3437,8 +3438,8 @@ worksheet
 workspace
 WrapperInterface
 WriteException
-Writer
 writer
+Writer
 wsdllib
 wysiwyg
 wysiwyglib

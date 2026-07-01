@@ -155,6 +155,7 @@ CCLiteLib
 CDir
 Cell
 Change
+ChangedFiles
 ChangesWizardCompleted
 ChangesWizardDocPageIframe
 ChangesWizardNewIn13

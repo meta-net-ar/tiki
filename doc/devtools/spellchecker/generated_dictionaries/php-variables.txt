@@ -658,8 +658,8 @@ arg1
 arg2
 argArray
 argc
-ARGDATA
 argData
+ARGDATA
 argFooter
 argHeager
 argKey
@@ -839,8 +839,8 @@ attextra
 attfields
 attId
 attlabel
-attname
 attName
+attname
 attr
 attr1
 attr2
@@ -2287,8 +2287,8 @@ colR
 cols
 colsinfo
 colsize
-colspan
 colSpan
+colspan
 colstyle
 colum
 column
@@ -2562,8 +2562,8 @@ conflicts
 confs
 conlength
 conn
-connect
 Connect
+connect
 ConnectAddress
 connectCert
 connectData
@@ -3495,8 +3495,8 @@ dday
 dDay
 deadline
 debounce
-debug
 Debug
+debug
 debugger
 debugInfo
 debugLevel
@@ -5371,8 +5371,8 @@ fileIsTsv
 filekey
 filelib
 fileLink
-fileList
 filelist
+fileList
 fileMd5
 filemeta
 fileMimeTypes
@@ -5625,8 +5625,8 @@ firstprev
 firstsheet
 firstSlide
 firststate
-firstTime
 firsttime
+firstTime
 firstType
 firstUlPos
 firstUnordered
@@ -6876,8 +6876,8 @@ iconhtml
 iconifyModifier
 iconinsert
 iconmap
-iconname
 iconName
+iconname
 icons
 iconset
 iconset1
@@ -6975,8 +6975,9 @@ iframeStyles
 ifShowingHiddenModules
 if_exist
 ignore
-ignoreCase
+ignoreCallback
 ignorecase
+ignoreCase
 ignoreCounter
 ignored
 ignoredLines
@@ -7023,8 +7024,8 @@ imageArr
 imageArray
 imageBackEnd
 imageClassList
-imagedata
 imageData
+imagedata
 imageFileHandler
 imagegalpath
 imageHtml
@@ -7036,8 +7037,8 @@ imageNode
 imageObj
 imageObjt
 imageOutputPath
-imagePath
 imagepath
+imagePath
 imagePrefix
 imageReader
 imageResizeProperties
@@ -8287,8 +8288,8 @@ lastError
 lastFetchMeta
 lastForumPost
 lastHeader
-lastId
 lastID
+lastId
 lastid
 lastIdx
 lastImport
@@ -9138,8 +9139,8 @@ matomo_pref_name
 matomo_wiki_page_data
 matrixWidth
 max
-maxAge
 maxage
+maxAge
 maxAllowedSize
 maxAttachSize
 maxAttemptCount
@@ -9777,8 +9778,8 @@ mutations
 mv
 mxCell
 mxh
-mxHost
 MXHost
+mxHost
 mxHosts
 my
 myArr
@@ -10183,8 +10184,8 @@ nLimitQuestionsPerPage
 nllib
 nl_info
 nn
-no
 No
+no
 noborders
 nobox
 nocache
@@ -10831,8 +10832,8 @@ opParts
 ops
 opStatus
 opt
-optarray
 optArray
+optarray
 optcounter
 optFieldId
 optimisation
@@ -12113,8 +12114,8 @@ prefs_attempt
 prefs_keys
 prefs_usage_array
 prefUserTracker
-prefValue
 prefvalue
+prefValue
 PrefVars
 pref_errors
 pref_feature
@@ -12482,8 +12483,8 @@ queryFieldName
 queryGroup
 queryGroupHash
 queryHash
-queryId
 queryid
+queryId
 querylibs
 queryLog
 queryLogData
@@ -13545,8 +13546,8 @@ rowOnly
 rowPrefix
 rows
 rowsDeleted
-rowspan
 rowSpan
+rowspan
 rowspan2
 rowSpanNb
 rowUpdatedColumns
@@ -15352,8 +15353,8 @@ subqs
 subQueries
 subquery
 subrelease
-subrow
 subRow
+subrow
 subRule
 subs
 subscribe
@@ -15377,8 +15378,8 @@ substr
 substreamType
 subsystem
 subTableNode
-subtitle
 subTitle
+subtitle
 subtoken
 subtract_quantity
 subtree
@@ -15583,8 +15584,8 @@ tagid
 taglinelib
 taglist
 tagList
-tagname
 tagName
+tagname
 tagParts
 tagpos
 tagreg
@@ -15945,8 +15946,8 @@ themeKey
 themelib
 themeLib
 themeName
-themeOption
 themeoption
+themeOption
 themeOptionBasePath
 themeOptionPathFragment
 themeOptions
@@ -16059,8 +16060,8 @@ tikidomain2
 tikidomainslash
 tikidomainThemePath
 tikiFaker
-tikifile
 tikiFile
+tikifile
 tikiFilesReuseFiles
 tikiFolder
 tikiGalleries
@@ -16722,8 +16723,8 @@ trackerLib
 trackerlib
 trackerlist
 trackerlistParams
-trackername
 trackerName
+trackername
 trackerObjectId
 trackerOldDbRow
 trackerOptions
@@ -17482,8 +17483,8 @@ usermoduleslib
 userMonitor
 userMsg
 username
-userName
 Username
+userName
 usernameMapping
 usernameModifier
 usernamep

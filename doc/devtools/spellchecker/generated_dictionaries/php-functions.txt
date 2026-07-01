@@ -558,8 +558,8 @@ addStyleHeadFoot
 addStylePage
 addStyles
 addSubFormatter
-addSublist
 addSubList
+addSublist
 addTable
 addTag
 addTemplate
@@ -1060,6 +1060,7 @@ centerHorizontally
 centerVertically
 challenge
 change
+changed
 changedSourceFileTranslatedIntoTargetLanguage
 changeMatcher
 changeObject
@@ -2213,8 +2214,8 @@ fileGalleryAttachmentsCount
 filegal_ranking_last_files
 filegal_ranking_top_files
 filegal_ranking_top_galleries
-filename
 FileName
+filename
 filesByExtension
 files_differ
 FileWrapper
@@ -2437,6 +2438,7 @@ fromDb
 fromField
 fromFile
 fromFileDraft
+fromGit
 fromId
 fromInfo
 fromInput
@@ -3006,8 +3008,8 @@ getFieldTypeDefaultMode
 getFieldTypeName
 getFieldTypes
 getFieldTypesDisabled
-getFile
 GetFile
+getFile
 getFileAttachment
 getFileBacklinks
 getFileData
@@ -3016,8 +3018,8 @@ getFileFields
 getFileGalleryList
 getFilegalsIdsTree
 getFileInfo
-getFileList
 GetFileList
+getFileList
 getFileName
 getFileNamesPHP
 getFilePath
@@ -3241,8 +3243,8 @@ getJavaScript
 getJid
 getJitsiUrl
 getJobTypePageMapping
-getJs
 getJS
+getJs
 getJsFilesWithScriptTags
 getJsFromHTML
 getJsonCustomTranslationFileName
@@ -3356,8 +3358,8 @@ getMenuWithSelections
 getMessage
 getMessageId
 getMessages
-getMetaData
 getMetadata
+getMetaData
 getMetadataArray
 getMetadataItemId
 getMetaField
@@ -5118,8 +5120,8 @@ infobox_activity
 infobox_trackeritem
 infoDate
 inIgnoreList
-init
 Init
+init
 initAdapter
 initCell
 initchannelssession
@@ -5744,6 +5746,7 @@ loadData
 loadDbFileByMajor
 loadDefinition
 loadEnv
+loadExistingDictionaries
 loadFile
 loadFilePath
 loadFilterDescriptor
@@ -5901,6 +5904,7 @@ mergeBasicInfo
 mergeCells
 mergeData
 mergeDiff
+mergeRequest
 mermaidAttributeName
 mermaidEntityName
 mermaidTypeName
@@ -6383,8 +6387,8 @@ other_value_in_tab_line
 Ouput
 out
 outln
-output
 Output
+output
 OutputErrors
 OutputFile
 outputInlineJS
