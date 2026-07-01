@@ -45,8 +45,13 @@
         "watch:js": "vite --config=src/js/vite.config.mjs build --watch --mode=development",
         "watch:scss": "npm run watch -w src/scss",
         "watch:_custom": "copy-and-watch --watch '_custom/**/themes/**/*.{woff,woff2,ttf,otf,svg,png,gif,jpg}' '_custom/**/{lang,js}/**/*.{js,mjs}' public/generated/_custom",
+        "watch:spellchecker": "php doc/devtools/spellchecker/generate-dictionaries.php --watch",
         "watch": "concurrently --kill-others-on-fail \"npm:watch:*\"",
         "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+        "spellchecker:generate": "php doc/devtools/spellchecker/generate-dictionaries.php",
+        "spellchecker:generate:changed": "php doc/devtools/spellchecker/generate-dictionaries.php --changed",
+        "spellchecker:generate:mr": "php doc/devtools/spellchecker/generate-dictionaries.php --mr",
+        "spellcheck": "npm run spellchecker:generate:changed && cspell \"**/*\"",
         "format": "prettier .  --write",
         "clean:wsconf": "php console.php dev:buildwsconfs --clean",
         "clean:scss": "npm run clean -w src/scss",
@@ -56,6 +61,12 @@
         "postinstall": "patch-package --patch-dir=src/js/patches --error-on-fail",
         "patch": "patch-package --patch-dir=src/js/patches --error-on-fail",
         "prepare": "husky"
+    },
+    "spellcheckComments": {
+        "spellchecker:generate": "Generate dictionaries for spellchecker from all files (ignoring files in .gitignore and cspell.json ignore glob patterns)",
+        "spellchecker:generate:changed": "Generate dictionaries for spellchecker based on changed files",
+        "spellchecker:generate:mr": "Generate dictionaries for spellchecker based on merge request files accept options like --mr=origin/master , --mr=origin/branchname or --mr=upstream/master ...",
+        "spellcheck": "Run spellcheck on all files, generating dictionaries for changed files first"
     },
     "engines": {
         "npm": ">=9.0.0 <12",
