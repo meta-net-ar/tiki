@@ -31,25 +31,58 @@ final class DictionaryGenerator
             'php-constants'  => [],
             'php-variables'  => [],
             'js-identifiers' => [],
-            'vue-identifiers'=> [],
+            'vue-identifiers' => [],
             'filenames'      => [],
             'project'        => [],
         ];
     }
 
-    public function generate(): void
+    private function loadExistingDictionaries(): void
     {
-        $finder = new Finder();
+        $outDir = $this->root . '/doc/devtools/spellchecker/generated_dictionaries';
 
-        $finder
-            ->files()
-            ->in($this->root)
-            ->name(['*.php', '*.js', '*.vue']);
+        if (!is_dir($outDir)) {
+            return;
+        }
 
-        $this->applyCSpellIgnores($finder);
+        foreach (array_keys($this->dictionaries) as $name) {
 
-        foreach ($finder as $file) {
-            $this->processFile($file->getRealPath());
+            $file = $outDir . '/' . $name . '.txt';
+
+            if (!is_file($file)) {
+                continue;
+            }
+
+            foreach (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $word) {
+                $this->dictionaries[$name][$word] = true;
+            }
+        }
+    }
+
+    public function generate(string $mode = 'all', string $base = 'origin/master'): void
+    {
+        // Preserve previously generated dictionaries.
+        // New identifiers from changed files will be merged into them.
+        if ($mode !== 'all') {
+            $this->loadExistingDictionaries();
+        }
+        switch ($mode) {
+
+            case 'changed':
+                $files = ChangedFiles::changed($this->root);
+                break;
+
+            case 'mr':
+                $files = ChangedFiles::mergeRequest($this->root, $base);
+                break;
+
+            default:
+                $files = ChangedFiles::all($this->root, fn(Finder $finder) => $this->applyCSpellIgnores($finder));
+                break;
+        }
+
+        foreach ($files as $file) {
+            $this->processFile($file);
         }
 
         $this->writeDictionaries();
