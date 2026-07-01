@@ -126,7 +126,7 @@
                                         {/if}
                                         <th id="lastlogin">{self_link _sort_arg='sort_mode' _sort_field='currentLogin'}{tr}Last login{/tr}{/self_link}</th>
                                         <th id="registered">{self_link _sort_arg='sort_mode' _sort_field='created'}{tr}Registered{/tr}{/self_link}</th>
-                                        <th id="canlogin">{self_link _sort_arg='sort_mode' _sort_field='no_auth'}{tr}Can login{/tr}{/self_link}</th>
+                                        <th id="canlogin">{self_link _sort_arg='sort_mode' _sort_field='login_disabled'}{tr}Can login{/tr}{/self_link}</th>
                                         <th id="groups">{tr}Groups{/tr}</th>
                                         <th id="actions"></th>
                                     </tr>
@@ -198,7 +198,7 @@
                                             </td>
 
                                             <td class="text">
-                                                {if $users[user].no_auth eq 'y'}
+                                                {if $users[user].login_disabled eq 'y'}
                                                     <span class="text-danger">{icon name="remove"} {tr}No{/tr}</span>
                                                 {else}
                                                     <span class="text-success">{icon name="ok"} {tr}Yes{/tr}</span>
@@ -266,7 +266,7 @@
                                                         {/if}
                                                         {if $users[user].user ne 'admin' and $users[user].user ne $user and $tiki_p_admin eq 'y'}
                                                             <action>
-                                                                <a href='#' data-user="{$users[user].user|username}" data-no-auth="{$users[user].no_auth}" class="login-switchuser {if $users[user].no_auth eq 'y'}text-muted{/if}">
+                                                                <a href='#' data-user="{$users[user].user|username}" data-no-auth="{$users[user].login_disabled}" class="login-switchuser {if $users[user].login_disabled eq 'y'}text-muted{/if}">
                                                                     {icon name="user" _menu_text='y' _menu_icon='y' alt="{tr}Switch to this user{/tr}"}
                                                                 </a>
                                                             </action>
@@ -329,15 +329,15 @@
                                                                 </action>
                                                             {/if}
 
-                                                            {if $users[user].no_auth eq 'y'}
+                                                            {if $users[user].login_disabled eq 'y'}
                                                                 <action>
-                                                                    <a href="{bootstrap_modal controller=user action=set_user_login_status checked=$username offset=$offset sort_mode=$sort_mode numrows=$numrows no_auth=n}">
+                                                                    <a href="{bootstrap_modal controller=user action=set_user_login_status checked=$username offset=$offset sort_mode=$sort_mode numrows=$numrows login_disabled=n}">
                                                                         {icon name="ok" _menu_text='y' _menu_icon='y' alt="{tr}Enable login{/tr}"}
                                                                     </a>
                                                                 </action>
                                                             {else}
                                                                 <action>
-                                                                    <a href="{bootstrap_modal controller=user action=set_user_login_status checked=$username offset=$offset sort_mode=$sort_mode numrows=$numrows no_auth=y}">
+                                                                    <a href="{bootstrap_modal controller=user action=set_user_login_status checked=$username offset=$offset sort_mode=$sort_mode numrows=$numrows login_disabled=y}">
                                                                         {icon name="remove" _menu_text='y' _menu_icon='y' alt="{tr}Disable login{/tr}"}
                                                                     </a>
                                                                 </action>

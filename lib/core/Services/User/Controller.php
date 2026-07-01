@@ -1335,12 +1335,12 @@ class Services_User_Controller
         Services_Exception_Denied::checkGlobal('admin_users');
         $util = new Services_Utilities();
 
-        $no_auth = $input->no_auth->text();
+        $login_disabled = $input->login_disabled->text();
 
         if ($util->notConfirmPost()) {
             $util->setVars($input, [], 'checked');
             if ($util->itemsCount > 0) {
-                $actionText = $no_auth === 'y' ? tr('Disable') : tr('Enable');
+                $actionText = $login_disabled === 'y' ? tr('Disable') : tr('Enable');
                 $msg = count($util->items) === 1
                     ? tr('%0 login for the following user?', $actionText)
                     : tr('%0 login for the following users?', $actionText);
@@ -1353,7 +1353,7 @@ class Services_User_Controller
             $util->setVars($input, [], 'items');
             foreach ($util->items as $user_to_update) {
                 if ($user_to_update != 'admin') {
-                    $res = $this->lib->updateUserLoginStatus($user_to_update, $no_auth);
+                    $res = $this->lib->updateUserLoginStatus($user_to_update, $login_disabled);
                     if ($res !== true) {
                         Feedback::error(tr('An error occurred. User %0 login status could not be updated', $user_to_update));
                     } else {
@@ -1466,13 +1466,13 @@ class Services_User_Controller
 
     public function actionEnableUsersLogin($input)
     {
-        $input['no_auth'] = 'n';
+        $input['login_disabled'] = 'n';
         return $this->actionSetUserLoginStatus($input);
     }
 
     public function actionDisableUsersLogin($input)
     {
-        $input['no_auth'] = 'y';
+        $input['login_disabled'] = 'y';
         return $this->actionSetUserLoginStatus($input);
     }
 

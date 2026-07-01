@@ -271,7 +271,7 @@ class UsersLib extends TikiLib
 
     public function canLogin($user)
     {
-        $query = 'select `login` from `users_users` where upper(`login`) = ? and `no_auth` = ?';
+        $query = 'select `login` from `users_users` where upper(`login`) = ? and `login_disabled` = ?';
         return $this->getOne($query, [TikiLib::strtoupper($user), 'n']);
     }
 
@@ -9246,13 +9246,13 @@ class UsersLib extends TikiLib
         return true;
     }
 
-    public function updateUserLoginStatus($user, $no_auth)
+    public function updateUserLoginStatus($user, $login_disabled)
     {
         $cachelib = TikiLib::lib('cache');
 
         $userexists_cache[$user] = null;
 
-        $res = $this->table('users_users')->update(['no_auth' => $no_auth], ['login' => $user]);
+        $res = $this->table('users_users')->update(['login_disabled' => $login_disabled], ['login' => $user]);
 
         if (! $res->numRows()) {
             return false;
