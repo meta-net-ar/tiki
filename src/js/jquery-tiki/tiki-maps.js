@@ -2354,10 +2354,10 @@ import { defaults as defaultControls } from "ol/control";
                     return false;
                 },
                 handleDownEvent: (event) => {
-                    return true;    // return true to "handle" it and trigger handleUpEvent
+                    return true; // return true to "handle" it and trigger handleUpEvent
                 },
                 stopDown() {
-                    return false;   // ...but still let DragPan see the down event
+                    return false; // ...but still let DragPan see the down event
                 },
             });
 
@@ -2376,10 +2376,6 @@ import { defaults as defaultControls } from "ol/control";
             });
 
             container.map.addInteraction(control);
-
-            //if (-1 !== $.inArray("navigation", desiredControls)) {
-                container.map.addInteraction(new ol.interaction.DblClickDragZoom());
-            //}
 
             return control;
         });
