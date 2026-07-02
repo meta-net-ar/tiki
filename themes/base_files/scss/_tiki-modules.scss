@@ -22,8 +22,8 @@ header.container,
     width: 100% !important;
 }
 
-// Vertically center visible content in fixed-top navbar
-@media(min-width: 720px) {.layout_social .fixed-top .top_modules .module { align-self: center; } }
+// Vertically center visible content in sticky-top navbar
+@media(min-width: 720px) {.layout_social .sticky-top .top_modules .module { align-self: center; } }
 
 .top_modules,
 .topbar_modules,
@@ -108,21 +108,9 @@ header.container,
     }
 }
 
-// Sticky navbar specific styles
-.navbar.sticky-top {
-    top: 0;
-    z-index: 1020; // Bootstrap default
-
-    // Optional: Shadow when stuck
-    &.is-stuck {
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-}
-
-// Fixed navbar anchor offset
-// Prevent target anchors from being covered by fixed/sticky navbar
-.navbar.fixed-top,
-.navbar.sticky-top {
+// Sticky navbar anchor offset
+// Prevent target anchors from being covered by the sticky navbar
+header.sticky-top {
     ~ * {
         h1:target:before,
         h2:target:before,
@@ -447,7 +435,7 @@ li.archivedate {
 
 // --------------- logo module start ------------------ //
 // Not Basic Bootstrap (not layout_social)
-header:not(.fixed-top) a.sitelogo {
+header:not(.sticky-top) a.sitelogo {
     padding-top: $spacer * .7;
     padding-bottom: $spacer * .7;
 }
@@ -472,7 +460,7 @@ header:not(.fixed-top) a.sitelogo {
 }
 
 // Basic Bootstrap (layout_social)
-.layout_social .fixed-top .sitesubtitle {
+.layout_social .sticky-top .sitesubtitle {
     font-size: calc(var(--bs-navbar-brand-font-size) * .8);
 }
 
@@ -583,7 +571,7 @@ footer.footer .modules > .module:not(.card) {
     margin-right: auto;
 }
 
-// Font size and weight for static position logo module (fixed-top navbar is below)
+// Font size and weight for static position logo module (sticky-top navbar is below)
 .sitetitle {
     font-size: var(--tiki-site-title-font-size);
     font-weight: var(--tiki-site-title-font-weight);
@@ -594,10 +582,8 @@ footer.footer .modules > .module:not(.card) {
     font-weight: var(--tiki-site-subtitle-font-weight);
 }
 
-// Font size and weight for fixed-top position logo module (likely smaller than for static position)
-.navbar-fixed-top, // Where is this used? - gary
-.layout_social .top_modules, // This was .topbar_modules until Nov 2022 so rarely applied
-header.fixed-top {
+// Font size and weight for sticky-top position logo module (likely smaller than for static position)
+.layout_social .top_modules { // This was .topbar_modules until Nov 2022 so rarely applied
 //    .sitelogo a img {
 //        display: inline;
 //        margin-top: $tiki-navbar-fixed-height / 10;
@@ -607,16 +593,16 @@ header.fixed-top {
 //    }
     .sitetitle {
         //        float: left;
-        font-size: var(--tiki-fixed-top-site-title-font-size);
-        font-weight: var(--tiki-fixed-top-site-title-font-weight);
+        font-size: var(--tiki-sticky-top-site-title-font-size);
+        font-weight: var(--tiki-sticky-top-site-title-font-weight);
         //        line-height: 2;
         //        margin-bottom: 0;
         //        margin-left: 1rem;
       }
         .sitesubtitle {
             //        float: left;
-            font-size: var(--tiki-fixed-top-site-subtitle-font-size);
-            font-weight: var(--tiki-fixed-top-site-subtitle-font-weight);
+            font-size: var(--tiki-sticky-top-site-subtitle-font-size);
+            font-weight: var(--tiki-sticky-top-site-subtitle-font-weight);
             //        margin-left: 1.5rem;
             //    }
             #topbar_modules {
@@ -640,14 +626,6 @@ header.fixed-top {
             //    }
         }
     }
-.navbar-fixed-top,
-#navbar-collapse-social {
-    .navbar {
-        margin-bottom: 0;
-        min-height: 32px;
-
-    }
-}
 
 .box-menu .nav .nav-link {
     padding-left: 0;
@@ -697,11 +675,6 @@ header.fixed-top {
 
 #toggleSwitch_modules {
     margin: 0;
-}
-
-.tiki-header-top {
-    --tiki-fixed-top-border-top-width: 0px;
-    --tiki-fixed-top-border-bottom-width: 5px;
 }
 
 // mod-collapse styles

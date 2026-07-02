@@ -54,14 +54,6 @@
     --tiki-top-border-bottom-width: 5px;
 }
 
-header.navbar.fixed-top {
-    --tiki-fixed-top-border-top-width: 0px;
-    --tiki-fixed-top-border-right-width: 0px;
-    --tiki-fixed-top-border-bottom-width: 5px;
-    --tiki-fixed-top-border-left-width: 0px;
-    --tiki-topbar-light-border-color: #000;
-}
-
 .tiki-top-nav-light {
     @include top-nav-light;
 }

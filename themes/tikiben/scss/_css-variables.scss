@@ -101,10 +101,10 @@
     --tiki-top-border-width: 0;
     --tiki-topbar-border-width: 0;
 
-    --tiki-fixed-top-site-title-font-size: 1.8rem;          // Fixed-top position (Basic Bootstrap layout) - Title and subtitle in one line
-    --tiki-fixed-top-site-title-font-weight: 700;
-    --tiki-fixed-top-site-subtitle-font-size: 1.4rem;
-    --tiki-fixed-top-site-subtitle-font-weight: 400;
+    --tiki-sticky-top-site-title-font-size: 1.8rem;          // Sticky-top position (social layout) - Title and subtitle in one line
+    --tiki-sticky-top-site-title-font-weight: 700;
+    --tiki-sticky-top-site-subtitle-font-size: 1.4rem;
+    --tiki-sticky-top-site-subtitle-font-weight: 400;
 
     --tiki-site-title-font-size: 2rem;                      // Static position (Classic Tiki and Single Container layouts) - Title and subtitle in two lines
     --tiki-site-title-font-weight: 700;
