@@ -302,21 +302,30 @@
                     </div>
                 </div> {* / .mb-3.row *}
             {/if}
-            {if !empty($groupforalert) && $showeachuser eq 'y'}
-                <div class="mb-3 row">
-                    <label class="col-form-label col-sm-3" for="listtoalert">{tr}Choose users to alert{/tr}</label>
-                    <div class="col-sm-9">
-                        {section name=idx loop=$listusertoalert}
-                            {if $showeachuser eq 'n'}
-                                <input type="hidden" name="listtoalert[]" value="{$listusertoalert[idx].user}">
-                            {else}
-                                <input type="checkbox" class="form-check-input" id="listtoalert" name="listtoalert[]" value="{$listusertoalert[idx].user}">
-                                {$listusertoalert[idx].user}
-                            {/if}
-                        {/section}
+            {if ! empty($groupforalert)}
+                {if $showeachuser eq 'y'}
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-sm-3" for="listtoalert">{tr}Choose users to alert{/tr}</label>
+                        <div class="col-sm-9">
+                            {section name=idx loop=$listusertoalert}
+                                {if $showeachuser eq 'n'}
+                                    <input type="hidden" name="listtoalert[]" value="{$listusertoalert[idx].user}">
+                                {else}
+                                    <input type="checkbox" class="form-check-input" id="listtoalert" name="listtoalert[]" value="{$listusertoalert[idx].user}">
+                                    {$listusertoalert[idx].user}
+                                {/if}
+                            {/section}
+                        </div>
+                    </div>
+                    {* / .mb-3.row *}
+                {/if}
+                <div class="mb-3 row clearfix">
+                    <label class="col-form-label col-sm-3">{tr}Send reminder notifications{/tr}</label>
+                    <div class="col-sm-2">
+                        <input type="checkbox" class="form-check-input" name="calitem[sendReminder]" id="sendReminder" value="1" {if $calitem.sendReminder} checked="checked"{/if}>
                     </div>
                 </div>
-                {* / .mb-3.row *}
+                {* / .mb-3 *}
             {/if}
             {if $calendar.customparticipants eq 'y'}
                 <div class="mb-3 row" id="calorg">
