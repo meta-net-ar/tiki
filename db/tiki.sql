@@ -460,6 +460,7 @@ CREATE TABLE `tiki_calendar_items` (
   `lang` char(16) NOT NULL default 'en',
   `name` varchar(255) NOT NULL default '',
   `description` text,
+  `sendReminder` tinyint NOT NULL default '1',
   `recurrenceId` int(14),
   `changed` tinyint(1) DEFAULT '0',
   `recurrenceStart` int(14) default NULL,
