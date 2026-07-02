@@ -2376,9 +2376,11 @@ import { defaults as defaultControls } from "ol/control";
             });
 
             container.map.addInteraction(control);
-
-            return control;
         });
+
+        // this only returns one "control" (interaction) even though it can supposedly bind to multiple maps
+        // doesn't seem right...
+        return control;
     };
 
     $.fn.removeMapSelection = function () {
@@ -2386,7 +2388,11 @@ import { defaults as defaultControls } from "ol/control";
             const container = this;
 
             if (container.uniqueMarkers["selection"]) {
-                container.vectors.getSource().removeFeatures([container.uniqueMarkers["selection"]]);
+                let source = container.vectors.getSource();
+                if (typeof source.getSource !== "undefined") {
+                    source = source.getSource();
+                }
+                source.removeFeatures([container.uniqueMarkers["selection"]]);
             }
 
             $(container).trigger("selectionChange", [{}]);
