@@ -14,7 +14,7 @@
                 {/if}
                 {foreach from=$sect.fields item=field}
                     <dt title="{$field.name|tra|escape}" class="col-sm-3">{$field.name|tra|escape}</dt>
-                    <dd class="col-sm-9">{trackeroutput field=$field item=$item_info showlinks=n list_mode=n}</dd>
+                    <dd class="col-sm-9">{trackeroutput field=$field item=$item_info showlinks=n list_mode=n preview=$preview|default:false}</dd>
                 {/foreach}
                 {if $pos eq 0 and ($tracker_info.showCreatedView eq 'y' or $tracker_info.showLastModifView eq 'y')}
                     <hr class="my-3">

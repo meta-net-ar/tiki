@@ -34,6 +34,7 @@ function generateJsImportmapScripts(bool $useBaseUrl = false)
                 "@tiki/plugins/pagetabs" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/plugins/pagetabs.js",
                 "@tiki/tracker-field-base/dirtyCheck" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/tracker-field-base/dirtyCheck.js",
                 "@tiki/tracker-fields/emailFolder" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/tracker-fields/emailFolder.js",
+                "@tiki/tracker-fields/secret" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/tracker-fields/secret.js",
 
                 /* src/js/@tiki/ui-utils */
                 "@tiki/ui-utils" => $tikiUrl . JS_ASSETS_PATH . "/@tiki/ui-utils.js",
