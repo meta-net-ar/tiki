@@ -473,7 +473,7 @@ import { defaults as defaultControls } from "ol/control";
                                         geometryFunction: (feature) => {
                                             const geom = feature.getGeometry();
                                             if (!geom) return null;
-                                            if (geom instanceof ol.geom.Polygon) {
+                                            if (geom instanceof ol.geom.Polygon || geom instanceof ol.geom.LineString) {
                                                 // Use the centroid of the polygon's extent
                                                 return new ol.geom.Point(ol.extent.getCenter(geom.getExtent()));
                                             } else {
@@ -504,20 +504,19 @@ import { defaults as defaultControls } from "ol/control";
                                 const calculateClusterInfo = function (resolution) {
                                     maxFeatureCount = 0;
                                     const features = vectors.getSource().getFeatures();
-                                    for (let i = features.length - 1; i >= 0; --i) {
-                                        const feature = features[i],
-                                            originalFeatures = feature.get("features"),
-                                            extent = ol.extent.createEmpty(),
-                                            jj = originalFeatures.length;
+                                    features.forEach((feature) => {
+                                        const originalFeatures = feature.get("features"),
+                                            extent = ol.extent.createEmpty();
 
-                                        for (let j = 0; j < jj; ++j) {
-                                            ol.extent.extend(extent, originalFeatures[j].getGeometry().getExtent());
-                                        }
-                                        maxFeatureCount = Math.max(maxFeatureCount, jj);
+                                        originalFeatures.forEach((f) => {
+                                            ol.extent.extend(extent, f.getGeometry().getExtent());
+                                        });
+                                        maxFeatureCount = Math.max(maxFeatureCount, originalFeatures.length);
                                         const radius = (0.4 * (ol.extent.getWidth(extent) + ol.extent.getHeight(extent))) / resolution;
                                         feature.set("radius", radius);
-                                    }
+                                    });
                                 };
+
                                 const invisibleFill = new ol.style.Fill({
                                     color: "rgba(255, 255, 255, 0.01)",
                                 });
@@ -539,9 +538,7 @@ import { defaults as defaultControls } from "ol/control";
                                             })
                                         );
                                     }
-                                    for (let i = features.length - 1; i >= 0; --i) {
-                                        styles.push(setFeatureColorStyle(features[i]));
-                                    }
+                                    features.forEach((f) => styles.push(setFeatureColorStyle(f)));
                                     return styles;
                                 };
 
