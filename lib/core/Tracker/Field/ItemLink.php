@@ -269,6 +269,16 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                         ],
                         'legacy_index' => 12,
                     ],
+                    'forceObjectSelector' => [
+                        'name' => tr('Force object selector'),
+                        'description' => tr('Override the automatic widget selection. 1 forces the object selector (search panel with checkboxes for multi-select). 2 forces the dropdown. 0 lets the system decide (default behavior).'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('System default'),
+                            1 => tr('Yes'),
+                            2 => tr('No'),
+                        ],
+                    ],
                     'indexRemote' => [
                         'name' => tr('Index remote fields'),
                         'description' => tr('Index one or multiple fields from the master tracker along with the child, separated by |'),
@@ -329,8 +339,16 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             'value' => $value,
         ];
 
-        if ($this->canHaveMultipleValues() && ! is_array($data['value'])) {
-            $data['value'] = explode(',', $data['value']);
+        if ($this->canHaveMultipleValues()) {
+            if (isset($requestData[$string_id])) {
+                $parts = is_array($data['value']) ? array_values($data['value']) : preg_split('/[\s,]+/', $data['value'], -1, PREG_SPLIT_NO_EMPTY);
+                if (array_filter($parts, fn($v) => str_starts_with($v, 'trackeritem:'))) {
+                    $parts = array_values(array_filter(array_map(fn($v) => preg_replace('/^trackeritem:/', '', trim($v)), $parts)));
+                }
+                $data['value'] = $parts;
+            } elseif (! is_array($data['value'])) {
+                $data['value'] = explode(',', $data['value']);
+            }
         }
 
         return $data;
@@ -362,6 +380,15 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             return false;
         }
 
+        $force = (int) $this->trackerField->getOption('forceObjectSelector');
+        if ($force === 1) {
+            return true;
+        }
+        if ($force === 2) {
+            return false;
+        }
+
+        // Default: preserve existing behaviour — multiselect stays on dropdown
         if ($this->canHaveMultipleValues()) {
             return false;
         }
@@ -394,13 +421,14 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             $sort = TikiLib::lib('trk')->get_default_sort_order($trackerId, true, true);
 
             $template = $this->renderTemplate('trackerinput/itemlink_selector.tpl', $context, [
-                'placeholder' => $placeholder,
-                'status' => $status,
-                'selector_value' => $value,
-                'selector_id' => 'item' . $this->getItemId() . $this->getInsertId(),
-                'format' => $format,
-                'createTrackerItems' => $trackerPerms->create_tracker_items,
-                'sort' => $sort,
+                'placeholder'          => $placeholder,
+                'status'               => $status,
+                'selector_value'       => $value,
+                'selector_id'          => 'item' . $this->getItemId() . $this->getInsertId(),
+                'format'               => $format,
+                'createTrackerItems'   => $trackerPerms->create_tracker_items,
+                'sort'                 => $sort,
+                'selectMultipleValues' => (bool) $this->trackerField->getOption('selectMultipleValues'),
             ]);
 
             return $template;
