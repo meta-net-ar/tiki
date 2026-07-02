@@ -63,7 +63,7 @@ header.container {
 }
     // end Toggle
 
-.navbar-fixed-top .container {
+header.sticky-top .container {
     border: none;
 }
 
@@ -91,7 +91,7 @@ header.container {
   }
 }
 
-.fixed-top .top_modules {
+header.sticky-top .top_modules {
   background: transparent;
 }
 
