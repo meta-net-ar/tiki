@@ -356,7 +356,11 @@ class SocialNetworksLib extends LogsLib
         if ($prefs['feature_userPreferences'] == 'y') {
             $fb_avatar = json_decode($this->facebookGraph('', 'me/picture', ['type' => 'square', 'width' => '480', 'redirect' => '0','access_token' => $access_token], false, 'GET'));
             $avatarlib = TikiLib::lib('avatar');
-            $avatarlib->set_avatar_from_url($fb_avatar->data->url, $user);
+            try {
+                $avatarlib->set_avatar_from_url($fb_avatar->data->url, $user);
+            } catch (Exception $e) {
+                Feedback::error($e->getMessage());
+            }
         }
 
         return $user;
@@ -550,7 +554,11 @@ class SocialNetworksLib extends LogsLib
                     }
                     if ($displayImage) {
                         $avatarlib = TikiLib::lib('avatar');
-                        $avatarlib->set_avatar_from_url($displayImage, $user);
+                        try {
+                            $avatarlib->set_avatar_from_url($displayImage, $user);
+                        } catch (Exception $e) {
+                            Feedback::error($e->getMessage());
+                        }
                     }
                 }
             } else {

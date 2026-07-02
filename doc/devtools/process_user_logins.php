@@ -138,7 +138,7 @@ function processUsers(): void
                         if (strlen($name) > 80) {
                             $name = substr($name, 0, 80);
                         }
-                        $avatarlib->set_avatar_from_url($wrapper->getReadableFile(), $login, $name);
+                        $avatarlib->setAvatarFromFile($wrapper->getReadableFile(), $login, $name);
 
                         echo " done\n";
                     }

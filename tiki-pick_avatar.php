@@ -56,15 +56,19 @@ if (isset($_FILES['userfile1'])) {
         }
 
         $avatarlib = TikiLib::lib('avatar');
-        $avatarlib->set_avatar_from_url($_FILES['userfile1']['tmp_name'], $userwatch, $name);
+        try {
+            $avatarlib->setAvatarFromFile($_FILES['userfile1']['tmp_name'], $userwatch, $name);
 
-        /* redirect to prevent re-submit on page reload */
-        if ($tiki_p_admin == 'y' && $user !== $userwatch) {
-            header('Location: tiki-pick_avatar.php?view_user=' . $userwatch);
-        } else {
-            header('Location: tiki-pick_avatar.php');
+            /* redirect to prevent re-submit on page reload */
+            if ($tiki_p_admin == 'y' && $user !== $userwatch) {
+                header('Location: tiki-pick_avatar.php?view_user=' . $userwatch);
+            } else {
+                header('Location: tiki-pick_avatar.php');
+            }
+            exit;
+        } catch (Exception $e) {
+            Feedback::error($e->getMessage());
         }
-        exit;
     } else {
         Feedback::error($tikilib->uploaded_file_error($_FILES['userfile1']['error']));
     }
