@@ -1,0 +1,192 @@
+import { render, screen, fireEvent, waitFor } from "@testing-library/vue";
+import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
+import EnterKeyModal from "../../components/EnterKeyModal/EnterKeyModal.vue";
+
+const BASE_PROPS = {
+    keyName: "Test Key",
+    encryptionKeyId: 42,
+    fieldId: 7,
+    itemId: 0,
+};
+
+function makeModal(props = {}) {
+    // The component queries the DOM for its host element by data-field-id.
+    // Provide a fake host so MutationObserver has something to observe.
+    const host = document.createElement("tiki-enter-key-modal");
+    host.setAttribute("data-field-id", String(props.fieldId ?? BASE_PROPS.fieldId));
+    host.setAttribute("hidden", "");
+    document.body.appendChild(host);
+
+    const result = render(EnterKeyModal, { props: { ...BASE_PROPS, ...props } });
+    return { ...result, host };
+}
+
+function showModal(host) {
+    // Simulate external removal of `hidden` (what EncryptedField.vue does).
+    host.removeAttribute("hidden");
+}
+
+describe("EnterKeyModal", () => {
+    let fetchSpy;
+
+    beforeEach(() => {
+        fetchSpy = vi.spyOn(global, "fetch");
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        document.body.innerHTML = "";
+    });
+
+    test("is not visible before hidden attribute is removed", () => {
+        makeModal();
+        expect(screen.queryByRole("dialog")).toBeNull();
+    });
+
+    test("becomes visible when hidden attribute is removed from host", async () => {
+        const { host } = makeModal();
+
+        showModal(host);
+        await waitFor(() => expect(screen.getByRole("dialog")).toBeTruthy());
+    });
+
+    test("does not fetch the stored share when the modal opens", async () => {
+        const { host } = makeModal();
+
+        showModal(host);
+        await waitFor(() => expect(screen.getByRole("dialog")).toBeTruthy());
+
+        // The secret share must never be fetched without an explicit user action.
+        expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    test("fills share input when 'Use my stored share' is clicked and server returns a share", async () => {
+        const { host } = makeModal();
+
+        showModal(host);
+        await waitFor(() => expect(screen.getByRole("dialog")).toBeTruthy());
+
+        fetchSpy.mockResolvedValueOnce({
+            ok: true,
+            json: async () => "abc-share-value",
+        });
+
+        await fireEvent.click(screen.getByText(/Use my stored share/i));
+
+        await waitFor(() => expect(screen.getByLabelText(/Enter shared secret/i).value).toBe("abc-share-value"));
+        expect(screen.getByText(/Share retrieved from your account/i)).toBeTruthy();
+    });
+
+    test("shows an error when no stored share is available for the account", async () => {
+        const { host } = makeModal();
+
+        showModal(host);
+        await waitFor(() => expect(screen.getByRole("dialog")).toBeTruthy());
+
+        fetchSpy.mockResolvedValueOnce({ ok: false });
+
+        await fireEvent.click(screen.getByText(/Use my stored share/i));
+
+        await waitFor(() => expect(screen.getByText(/No stored share found/i)).toBeTruthy());
+    });
+
+    test("shows error state when enter_key returns non-OK response", async () => {
+        const { host } = makeModal({ itemId: 99 });
+
+        showModal(host);
+        await waitFor(() => screen.getByRole("dialog"));
+
+        // Type a key and submit
+        const input = screen.getByLabelText(/Enter shared secret/i);
+        await fireEvent.update(input, "wrong-key");
+
+        // enter_key responds 409
+        fetchSpy.mockResolvedValueOnce({
+            ok: false,
+            json: async () => ({ errors: [{ message: "Incorrect share." }] }),
+        });
+
+        await fireEvent.click(screen.getByText("Submit"));
+        await waitFor(() => expect(screen.getByText("Incorrect share.")).toBeTruthy());
+    });
+
+    test("dispatches tiki:unlocked on the field host and closes modal on successful unlock (new item, no decryption)", async () => {
+        const { host } = makeModal({ itemId: 0 });
+
+        // The unlock event is dispatched on the encrypted-field host element, not document
+        const fieldHost = document.createElement("tiki-encrypted-field");
+        fieldHost.setAttribute("data-field-id", String(BASE_PROPS.fieldId));
+        document.body.appendChild(fieldHost);
+
+        showModal(host);
+        await waitFor(() => screen.getByRole("dialog"));
+
+        const input = screen.getByLabelText(/Enter shared secret/i);
+        await fireEvent.update(input, "valid-share");
+
+        fetchSpy.mockResolvedValueOnce({ ok: true }); // enter_key success
+
+        const events = [];
+        const documentEvents = [];
+        fieldHost.addEventListener("tiki:unlocked", (e) => events.push(e.detail));
+        document.addEventListener("tiki:unlocked", (e) => documentEvents.push(e.detail));
+
+        await fireEvent.click(screen.getByText("Submit"));
+
+        await waitFor(() => expect(events.length).toBe(1));
+        expect(events[0]).toMatchObject({ fieldId: BASE_PROPS.fieldId });
+        // The cleartext-carrying event must never reach document-level listeners
+        expect(documentEvents.length).toBe(0);
+    });
+
+    test("dispatches tiki:unlocked with decrypted value on successful unlock (existing item)", async () => {
+        const { host } = makeModal({ itemId: 99 });
+
+        const fieldHost = document.createElement("tiki-encrypted-field");
+        fieldHost.setAttribute("data-field-id", String(BASE_PROPS.fieldId));
+        document.body.appendChild(fieldHost);
+
+        showModal(host);
+        await waitFor(() => screen.getByRole("dialog"));
+
+        const input = screen.getByLabelText(/Enter shared secret/i);
+        await fireEvent.update(input, "valid-share");
+
+        fetchSpy
+            .mockResolvedValueOnce({ ok: true }) // enter_key
+            .mockResolvedValueOnce({ ok: true, json: async () => ({ value: "decrypted!" }) }); // get_decrypted_value
+
+        const events = [];
+        fieldHost.addEventListener("tiki:unlocked", (e) => events.push(e.detail));
+
+        await fireEvent.click(screen.getByText("Submit"));
+
+        await waitFor(() => expect(events.length).toBe(1));
+        expect(events[0]).toMatchObject({ fieldId: BASE_PROPS.fieldId, value: "decrypted!" });
+    });
+
+    test("Escape key closes the modal", async () => {
+        const { host } = makeModal();
+
+        showModal(host);
+        await waitFor(() => screen.getByRole("dialog"));
+
+        const dialog = screen.getByRole("dialog");
+        await fireEvent.keyDown(dialog, { key: "Escape" });
+
+        await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+    });
+
+    test("dialog has required ARIA attributes", async () => {
+        const { host } = makeModal();
+
+        showModal(host);
+        await waitFor(() => screen.getByRole("dialog"));
+
+        const dialog = screen.getByRole("dialog");
+        expect(dialog.getAttribute("aria-modal")).toBe("true");
+        expect(dialog.getAttribute("aria-labelledby")).toBeTruthy();
+        const titleId = dialog.getAttribute("aria-labelledby");
+        expect(document.getElementById(titleId)).toBeTruthy();
+    });
+});
