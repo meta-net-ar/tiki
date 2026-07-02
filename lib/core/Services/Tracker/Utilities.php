@@ -970,6 +970,23 @@ EXPORT;
      * @return Tracker_Item|bool return new tracker item object, or false when cloning fails.
      * @throws Exception
      */
+    /**
+     * Copy Secret (SEC) field values from a source item to a freshly created
+     * duplicate at the database level. Tracker_Field_Secret::handleClone() returns
+     * an empty value so the normal (encrypting) save path does not carry the
+     * secret; the raw stored blob is duplicated here instead, which works for
+     * encrypted fields without the key in session and never re-encrypts a ciphertext.
+     */
+    private function copySecretFields($definition, $sourceItemId, $targetItemId)
+    {
+        $trk = TikiLib::lib('trk');
+        foreach ($definition->getFields() as $field) {
+            if (($field['type'] ?? '') === 'SEC') {
+                $trk->copyItemFieldValueRaw($sourceItemId, $targetItemId, $field['fieldId']);
+            }
+        }
+    }
+
     public function cloneItem($definition, $itemData, $itemId, $strict = false)
     {
         $transaction = TikiLib::lib('tiki')->begin();
@@ -988,6 +1005,8 @@ EXPORT;
             return false;
         }
         $insertIds = [$id];
+
+        $this->copySecretFields($definition, $itemId, $id);
 
         $itemObject = Tracker_Item::fromId($id);
 
@@ -1036,6 +1055,7 @@ EXPORT;
                 return true;
             }
             $insertIds[] = $new;
+            $this->copySecretFields($childDefinition, $info['itemId'], $new);
         }
         return false;
     }
