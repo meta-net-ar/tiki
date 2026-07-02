@@ -1,0 +1,9 @@
+permissions: {}
+preferences: {}
+objects:
+  - type: plugin_alias
+    ref: minimal_alias
+    data:
+      name: minimal_alias
+      implementation: bold
+      description: {}

@@ -263,6 +263,7 @@ class ConsoleApplicationBuilder
                 new ProfileExport\IncludeProfile(),
                 new ProfileExport\Menu(),
                 new ProfileExport\Module(),
+                new ProfileExport\PluginAlias(),
                 new ProfileExport\Preference(),
                 new ProfileExport\RatingConfig(),
                 new ProfileExport\RatingConfigSet(),

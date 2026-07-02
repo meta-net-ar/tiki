@@ -93,4 +93,59 @@ class Tiki_Profile_InstallHandler_PluginAlias extends Tiki_Profile_InstallHandle
         }
         return false;
     }
+
+    /**
+     * Export an existing plugin alias as a profile object.
+     *
+     * @param Tiki_Profile_Writer $writer  The profile writer instance to add the object to.
+     * @param string              $name    The plugin alias name (case-insensitive).
+     * @return bool  True on success, false if the alias does not exist or has no base plugin.
+     */
+    public static function export(Tiki_Profile_Writer $writer, $name)
+    {
+        $name = mb_strtolower($name);
+
+        $info = WikiPlugin_Negotiator_Wiki_Alias::info($name);
+
+        // Without this guard, a missing implementation would still pass canInstall() and install a dead alias.
+        if (! $info || empty($info['implementation'])) {
+            return false;
+        }
+
+        $out = [
+            'name'           => $name,
+            'implementation' => $info['implementation'],
+            'description'    => $info['description'] ?? [], // canInstall() requires this key to be present
+        ];
+
+        if (! empty($info['body'])) {
+            $out['body'] = $info['body'];
+        }
+
+        // isset(), not empty(): params can legitimately be an empty array
+        if (isset($info['params'])) {
+            $out['params'] = $info['params'];
+        }
+
+        $writer->addObject('plugin_alias', $name, $out);
+
+        return true;
+    }
+
+    /**
+     * Export a plugin alias and return the resulting profile YAML.
+     *
+     * @param string $name  The plugin alias name (case-insensitive).
+     * @return string|false  The profile YAML, or false if the alias does not exist.
+     */
+    public static function dumpExport($name)
+    {
+        $writer = new Tiki_Profile_Writer('temp', 'none');
+
+        if (! self::export($writer, $name)) {
+            return false;
+        }
+
+        return $writer->dump();
+    }
 }
