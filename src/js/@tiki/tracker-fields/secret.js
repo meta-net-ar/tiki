@@ -9,8 +9,10 @@
  *
  * The plaintext value is never inlined into the page for saved items: both the
  * edit toggle and the output reveal fetch it on demand from the SEC-only
- * endpoint. The only exception is the preview of an unsaved item, which has no
- * stored row to fetch and therefore carries the value in `data-value`.
+ * endpoint. The only exception is an unsaved item rendered outside item preview,
+ * which has no stored row to fetch and therefore carries the value in
+ * `data-value`. In item preview the reveal button is disabled entirely and no
+ * value is embedded.
  */
 (function () {
     "use strict";

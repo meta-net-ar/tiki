@@ -956,21 +956,6 @@ EXPORT;
     }
 
     /**
-     * Clone a tracker item and optionally cascade cloning to configured child items.
-     *
-     * Use this when duplicating one tracker item while allowing field handlers to
-     * transform cloned values and cascading duplication to child items whose item
-     * link field allows duplicateCascade.
-     *
-     * @param Tracker_Definition $definition Tracker definition of the source item.
-     * @param array $itemData Source item data prepared for insertion.
-     * @param int $itemId Source item ID.
-     * @param bool $strict Whether field handlers should clone in strict mode.
-     *
-     * @return Tracker_Item|bool return new tracker item object, or false when cloning fails.
-     * @throws Exception
-     */
-    /**
      * Copy Secret (SEC) field values from a source item to a freshly created
      * duplicate at the database level. Tracker_Field_Secret::handleClone() returns
      * an empty value so the normal (encrypting) save path does not carry the
@@ -987,6 +972,21 @@ EXPORT;
         }
     }
 
+    /**
+     * Clone a tracker item and optionally cascade cloning to configured child items.
+     *
+     * Use this when duplicating one tracker item while allowing field handlers to
+     * transform cloned values and cascading duplication to child items whose item
+     * link field allows duplicateCascade.
+     *
+     * @param Tracker_Definition $definition Tracker definition of the source item.
+     * @param array $itemData Source item data prepared for insertion.
+     * @param int $itemId Source item ID.
+     * @param bool $strict Whether field handlers should clone in strict mode.
+     *
+     * @return Tracker_Item|bool return new tracker item object, or false when cloning fails.
+     * @throws Exception
+     */
     public function cloneItem($definition, $itemData, $itemId, $strict = false)
     {
         $transaction = TikiLib::lib('tiki')->begin();

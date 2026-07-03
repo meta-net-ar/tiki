@@ -3095,6 +3095,12 @@ class Services_Tracker_Controller
 
     public function action_get_field_value($input)
     {
+        // Secret values must never transit through a URL (query strings end up in
+        // access logs, proxy logs and browser history), so the endpoint is POST-only.
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            throw new Services_Exception(tr('This service action only accepts POST requests.'), 405);
+        }
+
         $itemId  = $input->itemId->int();
         $fieldId = $input->fieldId->int();
 

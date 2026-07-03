@@ -126,6 +126,57 @@ class TrackerFieldSecretTest extends TestCase
         $this->assertSame(['value' => '42'], $result);
     }
 
+    // --- handleSave: encrypted field keep-on-blank skips the write ---
+
+    // For an encrypted field, $oldValue reaches handleSave() as the raw stored ciphertext
+    // (replace_item reads old values straight from the database) and modify_field()
+    // re-encrypts whatever handleSave() returns, so passing the old value through would
+    // double-encrypt it on every untouched save. 'value' => false skips the write instead.
+
+    private function makeEncryptedField(string $insertId = 'tracker_123'): \Tracker_Field_Secret
+    {
+        $mock = $this->getMockBuilder(\Tracker_Field_Secret::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['getOption', 'getValue', 'getInsertId', 'getConfiguration'])
+            ->getMock();
+
+        $mock->method('getInsertId')->willReturn($insertId);
+        $mock->method('getConfiguration')->willReturnCallback(
+            function ($key, $default = false) {
+                return ($key === 'encryptionKeyId') ? 7 : $default;
+            }
+        );
+
+        return $mock;
+    }
+
+    public function testHandleSaveEncryptedEmptySubmissionSkipsWrite(): void
+    {
+        $result = $this->makeEncryptedField()->handleSave('', 'stored_ciphertext');
+        $this->assertSame(['value' => false], $result);
+    }
+
+    public function testHandleSaveEncryptedNullSubmissionSkipsWrite(): void
+    {
+        $result = $this->makeEncryptedField()->handleSave(null, 'stored_ciphertext');
+        $this->assertSame(['value' => false], $result);
+    }
+
+    public function testHandleSaveEncryptedNewValuePassesThrough(): void
+    {
+        // A real submission still travels the normal save path (modify_field encrypts it).
+        $result = $this->makeEncryptedField()->handleSave('new_secret', 'stored_ciphertext');
+        $this->assertSame(['value' => 'new_secret'], $result);
+    }
+
+    public function testHandleSaveEncryptedClearRequestStillWipes(): void
+    {
+        // An explicit clear must keep writing '' — only keep-on-blank skips the write.
+        $field = $this->makeEncryptedField();
+        $data  = $field->getFieldData(['tracker_123_clear' => '1']);
+        $this->assertSame(['value' => ''], $field->handleSave($data['value'], 'stored_ciphertext'));
+    }
+
     // --- clear stored value: explicit per-item clear ---
 
     // These exercise the real save pipeline: getFieldData() and handleSave() run on different

@@ -124,6 +124,14 @@ class Tracker_Field_Secret extends \Tracker\Field\AbstractItemField implements \
             return ['value' => ''];
         }
         if ($value === '' || $value === null) {
+            if (! empty($this->getConfiguration('encryptionKeyId'))) {
+                // Keep-on-blank for an encrypted field must skip the write entirely:
+                // $oldValue arrives as the raw stored ciphertext (replace_item reads it
+                // straight from the database) and modify_field() re-encrypts whatever is
+                // returned here, so passing it through would double-encrypt on every save.
+                // false makes replace_item leave the stored row untouched.
+                return ['value' => false];
+            }
             return ['value' => $oldValue === null ? null : (string) $oldValue];
         }
         $max = (int) $this->getOption('max');
