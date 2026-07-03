@@ -609,7 +609,7 @@ class PdoClient
                 $this->connect(true);
                 return $this->query($sql, $tries + 1);
             }
-            throw new Exception($e->getMessage());
+            throw $e;
         }
     }
 
