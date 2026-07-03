@@ -52,12 +52,15 @@ class Tracker_Field_Secret extends \Tracker\Field\AbstractItemField implements \
             return ['value' => self::CLEAR_REQUEST];
         }
         $cloneSource = (int) ($requestData[$insertId . '_clone_source'] ?? 0);
-        if ($cloneSource > 0) {
-            // Item duplication "copy": the stored value is copied at the database
-            // level after the new item exists (see Controller::action_insert_item),
-            // so the plaintext (or ciphertext) never travels through the rendered
-            // form. The field submits empty; the source item id is surfaced to the
-            // template, which round-trips it through a hidden input.
+        $submitted = $requestData[$insertId] ?? '';
+        if ($cloneSource > 0 && (! is_string($submitted) || $submitted === '')) {
+            // Item duplication "copy" with the field left blank: the stored value is
+            // copied at the database level after the new item exists (see
+            // Controller::action_insert_item), so the plaintext (or ciphertext) never
+            // travels through the rendered form. The field submits empty; the source
+            // item id is surfaced to the template, which round-trips it through a
+            // hidden input. A value typed into the duplicate form wins over the copy —
+            // it falls through to the normal submission path below.
             return ['value' => '', 'cloneSource' => $cloneSource];
         }
         $value = $requestData[$insertId] ?? $this->getValue();

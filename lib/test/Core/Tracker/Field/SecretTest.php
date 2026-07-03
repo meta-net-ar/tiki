@@ -233,6 +233,23 @@ class TrackerFieldSecretTest extends TestCase
         $this->assertSame(['value' => 'stored'], $result);
     }
 
+    public function testGetFieldDataTypedValueWinsOverCloneSource(): void
+    {
+        // A value typed into the duplicate form replaces the copy: the marker is
+        // dropped so the controller's database-level copy is skipped too.
+        $field  = $this->makeFieldWithValue('stored', 'tracker_123');
+        $result = $field->getFieldData(['tracker_123' => 'user_typed', 'tracker_123_clone_source' => '42']);
+        $this->assertSame(['value' => 'user_typed'], $result);
+    }
+
+    public function testGetFieldDataBlankSubmissionKeepsCloneSourceMarker(): void
+    {
+        // The duplicate form submits the field explicitly blank (not absent).
+        $field  = $this->makeFieldWithValue('stored', 'tracker_123');
+        $result = $field->getFieldData(['tracker_123' => '', 'tracker_123_clone_source' => '42']);
+        $this->assertSame(['value' => '', 'cloneSource' => 42], $result);
+    }
+
     public function testGetFieldDataClearTakesPrecedenceOverCloneSource(): void
     {
         $field = $this->makeFieldWithValue('stored', 'tracker_123');

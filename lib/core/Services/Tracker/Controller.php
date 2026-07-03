@@ -882,6 +882,13 @@ class Services_Tracker_Controller
             if ($sourceItemId <= 0) {
                 continue;
             }
+            // A value typed into the duplicate form wins over the copy: it was saved
+            // through the normal submission path, so the database-level copy must not
+            // overwrite it (matches the precedence in Secret::getFieldData()).
+            $submitted = $input->offsetExists('ins_' . $fid) ? $input->offsetGet('ins_' . $fid) : '';
+            if (is_string($submitted) && $submitted !== '') {
+                continue;
+            }
             try {
                 $sourceItem = Tracker_Item::fromId($sourceItemId);
             } catch (Exception $e) {
