@@ -49,7 +49,7 @@
         "watch": "concurrently --kill-others-on-fail \"npm:watch:*\"",
         "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
         "spellchecker:generate": "php doc/devtools/spellchecker/generate-dictionaries.php",
-        "spellchecker:generate:changed": "php doc/devtools/spellchecker/generate-dictionaries.php --changed",
+        "spellchecker:generate:all": "php doc/devtools/spellchecker/generate-dictionaries.php --all",
         "spellchecker:generate:mr": "php doc/devtools/spellchecker/generate-dictionaries.php --mr",
         "spellcheck": "npm run spellchecker:generate:changed && cspell \"**/*\"",
         "format": "prettier .  --write",
@@ -63,9 +63,10 @@
         "prepare": "husky"
     },
     "spellcheckComments": {
-        "spellchecker:generate": "Generate dictionaries for spellchecker from all files (ignoring files in .gitignore and cspell.json ignore glob patterns)",
+        "spellchecker:generate": "Generate dictionaries for spellchecker from changed files by default (ignoring files in .gitignore and cspell.json ignore glob patterns)",
         "spellchecker:generate:changed": "Generate dictionaries for spellchecker based on changed files",
         "spellchecker:generate:mr": "Generate dictionaries for spellchecker based on merge request files accept options like --mr=origin/master , --mr=origin/branchname or --mr=upstream/master ...",
+        "spellchecker:generate:all": "Generate dictionaries for spellchecker from all files",
         "spellcheck": "Run spellcheck on all files, generating dictionaries for changed files first"
     },
     "engines": {

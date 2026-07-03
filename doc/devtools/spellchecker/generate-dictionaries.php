@@ -20,14 +20,13 @@ require_once __DIR__ . '/src/JsParser.php';
 require_once __DIR__ . '/src/VueParser.php';
 require_once __DIR__ . '/src/DictionaryGenerator.php';
 
-$mode = 'all';
+$mode = 'changed';
 $base = 'origin/master';
 
 $args = array_slice($argv, 1);
 
 for ($i = 0; $i < count($args); $i++) {
     switch ($args[$i]) {
-
         case '--changed':
             $mode = 'changed';
             break;
@@ -37,7 +36,7 @@ for ($i = 0; $i < count($args); $i++) {
             break;
 
         case '--base':
-            if (!isset($args[$i + 1])) {
+            if (! isset($args[$i + 1])) {
                 fwrite(STDERR, "--base requires a value.\n");
                 exit(1);
             }
@@ -61,8 +60,9 @@ for ($i = 0; $i < count($args); $i++) {
 
                 Examples:
 
-                php generate-dictionaries.php                                Run for all files (default).
+                php generate-dictionaries.php                                Run for changed files (default).
                 php generate-dictionaries.php --changed                      Run for changed files.
+                php generate-dictionaries.php --all                          Run for all files.
                 php generate-dictionaries.php --mr                           Run for merge request files.
                 php generate-dictionaries.php --mr --base upstream/master    Run for merge request files against upstream/master.
                 php generate-dictionaries.php --mr --base origin/main        Run for merge request files against origin/main.
@@ -83,7 +83,6 @@ $generator->generate($mode, $base);
 echo "Finished generating dictionaries." . PHP_EOL;
 
 switch ($mode) {
-
     case 'changed':
         $files = ChangedFiles::changed($root);
         break;
@@ -101,7 +100,7 @@ switch ($mode) {
         exit($exit);
 }
 
-if (!$files) {
+if (! $files) {
     echo "No changed files.\n";
     exit(0);
 }
