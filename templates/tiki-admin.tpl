@@ -1,5 +1,5 @@
-{assign var=adminLayoutChrome value=($prefs.theme_unified_admin_backend eq 'y' && $prefs.site_layout eq 'admin')}
-{if !$adminLayoutChrome}
+{assign var=sharedAdminLayout value=($prefs.theme_unified_admin_backend eq 'y' && (($prefs.site_layout_admin|default:$prefs.site_layout) eq 'admin'))}
+{if !$sharedAdminLayout}
 <div class="admin-wrapper highlightable{* {if $prefs.theme_unified_admin_backend eq 'y'} overflow-auto{/if} *}">
     {if $prefs.theme_unified_admin_backend eq 'y'}
         <aside class="admin-nav">
@@ -337,7 +337,7 @@
             {/if}
             {include file="admin/include_$include.tpl"}
         {/if}
-{if !$adminLayoutChrome}
+{if !$sharedAdminLayout}
         </div>
     </div>
 {/if}
