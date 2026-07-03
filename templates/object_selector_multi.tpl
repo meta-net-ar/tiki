@@ -51,23 +51,25 @@
                 <b class="text-warning">{tr}Please note:{/tr}</b>
                 {tr}Depending on your current Tiki configuration you might not see all the options available. Adjust the 'Object selector threshold' in the 'Pagination' settings to show them all.{/tr}
             </p>
-            <div class="results">
-                {foreach from=$object_selector_multi.current_selection item=object name=ix}
-                    <div class="form-check">
-                        <input id="{$object_selector_multi.id|escape}_selected_{$smarty.foreach.ix.index}" class="form-check-input" type="checkbox" value="{$object|escape}" checked>
-                        <label class="form-check-label" for="{$object_selector_multi.id|escape}_selected_{$smarty.foreach.ix.index}">
-                            {if $object|substring:0:11 eq 'trackeritem'}
-                                {tracker_item_status_icon item=$object|substring:12}
-                            {/if}
-                            {$object->getTitle($object_selector_multi.format)|escape}
-                            {if isset($object.metadata) && $object.metadata}
-                                <a href="{bootstrap_modal controller=tracker action=update_item trackerId=$object.metadata.trackerId itemId=$object.metadata.itemId skipRefresh=1 size='modal-lg'}" title="edit metadata"|tra class="btn btn-link">{icon name="clipboard-list"}</a>
-                            {elseif $object_selector_multi.relationshipTrackerId}
-                                <a href="{bootstrap_modal controller=tracker action=insert_item trackerId=$object_selector_multi.relationshipTrackerId skipRefresh=1 refreshMeta=$object_selector_multi.name refreshObject=$object|escape size='modal-lg'}" title="add metadata"|tra class="btn btn-link metadata-insert-item" data-object="{$object|escape}">{icon name="clipboard-list"}</a>
-                            {/if}
-                        </label>
-                    </div>
-                {/foreach}
+            <div class="object-selector-result-scroll">
+                <div class="results">
+                    {foreach from=$object_selector_multi.current_selection item=object name=ix}
+                        <div class="form-check">
+                            <input id="{$object_selector_multi.id|escape}_selected_{$smarty.foreach.ix.index}" class="form-check-input" type="checkbox" value="{$object|escape}" checked>
+                            <label class="form-check-label" for="{$object_selector_multi.id|escape}_selected_{$smarty.foreach.ix.index}">
+                                {if $object|substring:0:11 eq 'trackeritem'}
+                                    {tracker_item_status_icon item=$object|substring:12}
+                                {/if}
+                                {$object->getTitle($object_selector_multi.format)|escape}
+                                {if isset($object.metadata) && $object.metadata}
+                                    <a href="{bootstrap_modal controller=tracker action=update_item trackerId=$object.metadata.trackerId itemId=$object.metadata.itemId skipRefresh=1 size='modal-lg'}" title="edit metadata"|tra class="btn btn-link">{icon name="clipboard-list"}</a>
+                                {elseif $object_selector_multi.relationshipTrackerId}
+                                    <a href="{bootstrap_modal controller=tracker action=insert_item trackerId=$object_selector_multi.relationshipTrackerId skipRefresh=1 refreshMeta=$object_selector_multi.name refreshObject=$object|escape size='modal-lg'}" title="add metadata"|tra class="btn btn-link metadata-insert-item" data-object="{$object|escape}">{icon name="clipboard-list"}</a>
+                                {/if}
+                            </label>
+                        </div>
+                    {/foreach}
+                </div>
             </div>
             <p class="no-results d-none">
                 {tr}No matching results.{/tr}

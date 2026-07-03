@@ -52,25 +52,27 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="results">
-                <p class="too-many">{tr}Search and select what you are looking for from the options that appear.{/tr}</p>
-                <div class="form-check">
-                    <input name="{$object_selector.id|escape}_sel" class="form-check-input protected" type="radio" value="" {if ! $object_selector.current_selection} checked="checked" {/if} value="" id="{$object_selector.id|escape}_sel_empty">
-                    <label class="form-check-label" for="{$object_selector.id|escape}_sel_empty">&mdash;</label>
-                </div>
-                {if !empty($object_selector.current_selection)}
+            <div class="object-selector-result-scroll">
+                <div class="results">
+                    <p class="too-many">{tr}Search and select what you are looking for from the options that appear.{/tr}</p>
                     <div class="form-check">
-                        <input type="radio" class="form-check-input" checked="checked" value="{$object_selector.current_selection|escape}" name="{$object_selector.id|escape}_sel" id="{$object_selector.id|escape}_sel_selected">
-                        <label class="form-check-label" for="{$object_selector.id|escape}_sel_selected">
-                            {$object_selector.current_selection.title|escape}
-                            {if !empty($object_selector.current_selection.metadata)}
-                                <a href="{bootstrap_modal controller=tracker action=update_item trackerId=$object_selector.current_selection.metadata.trackerId itemId=$object_selector.current_selection.metadata.itemId skipRefresh=1 size='modal-lg'}" title="edit metadata"|tra class="btn btn-link">{icon name="clipboard-list"}</a>
-                            {elseif $object_selector.relationshipTrackerId}
-                                <a href="{bootstrap_modal controller=tracker action=insert_item trackerId=$object_selector.relationshipTrackerId skipRefresh=1 refreshMeta=$object_selector.name refreshObject=$object_selector.current_selection|escape size='modal-lg'}" title="add metadata"|tra class="btn btn-link metadata-insert-item" data-object="{$object_selector.current_selection|escape}">{icon name="clipboard-list"}</a>
-                            {/if}
-                        </label>
+                        <input name="{$object_selector.id|escape}_sel" class="form-check-input protected" type="radio" value="" {if ! $object_selector.current_selection} checked="checked" {/if} value="" id="{$object_selector.id|escape}_sel_empty">
+                        <label class="form-check-label" for="{$object_selector.id|escape}_sel_empty">&mdash;</label>
                     </div>
-                {/if}
+                    {if !empty($object_selector.current_selection)}
+                        <div class="form-check">
+                            <input type="radio" class="form-check-input" checked="checked" value="{$object_selector.current_selection|escape}" name="{$object_selector.id|escape}_sel" id="{$object_selector.id|escape}_sel_selected">
+                            <label class="form-check-label" for="{$object_selector.id|escape}_sel_selected">
+                                {$object_selector.current_selection.title|escape}
+                                {if !empty($object_selector.current_selection.metadata)}
+                                    <a href="{bootstrap_modal controller=tracker action=update_item trackerId=$object_selector.current_selection.metadata.trackerId itemId=$object_selector.current_selection.metadata.itemId skipRefresh=1 size='modal-lg'}" title="edit metadata"|tra class="btn btn-link">{icon name="clipboard-list"}</a>
+                                {elseif $object_selector.relationshipTrackerId}
+                                    <a href="{bootstrap_modal controller=tracker action=insert_item trackerId=$object_selector.relationshipTrackerId skipRefresh=1 refreshMeta=$object_selector.name refreshObject=$object_selector.current_selection|escape size='modal-lg'}" title="add metadata"|tra class="btn btn-link metadata-insert-item" data-object="{$object_selector.current_selection|escape}">{icon name="clipboard-list"}</a>
+                                {/if}
+                            </label>
+                        </div>
+                    {/if}
+                </div>
             </div>
             <p class="no-results d-none">
                 {tr}No matching results.{/tr}
