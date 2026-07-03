@@ -185,16 +185,26 @@ function wikiplugin_fade($body, $params, $offset = 0, $context = null)
         $collapseClass = 'collapse' . ($isExpanded ? ' show' : '');
 
         if ($hasSummary) {
-            $headerInner = '<div class="wikiplugin-fade__summary-text flex-grow-1 me-2">' . $summaryHtml . '</div>';
-            if ($userSetCustomLabel) {
-                $headerInner .= '<span class="wikiplugin-fade__extra-label small text-muted me-2 align-self-center flex-shrink-0">' . htmlspecialchars($userLabelRaw, ENT_QUOTES, 'UTF-8') . '</span>';
-            }
             $wrapperClass = 'wikiplugin-fade wikiplugin-fade--inline ' . trim($params['class'] ?? '');
             $wrapperClass .= ' wikiplugin-fade--summary';
+            if ($userSetCustomLabel) {
+                $wrapperClass .= ' wikiplugin-fade--summary-labeled';
+            }
             if ($isExpanded) {
                 $wrapperClass .= ' wikiplugin-fade--initial-open';
             }
             $wrapperClass = trim($wrapperClass);
+
+            if ($userSetCustomLabel) {
+                $headerInner = '<div class="wikiplugin-fade__summary-stack flex-grow-1 min-w-0">'
+                    . '<div class="wikiplugin-fade__summary-text">' . $summaryHtml . '</div>'
+                    . '<span class="wikiplugin-fade__extra-label small text-muted">'
+                    . htmlspecialchars($userLabelRaw, ENT_QUOTES, 'UTF-8')
+                    . '</span>'
+                    . '</div>';
+            } else {
+                $headerInner = '<div class="wikiplugin-fade__summary-text flex-grow-1 me-2">' . $summaryHtml . '</div>';
+            }
 
             return '<div id="' . htmlspecialchars($unique_outer, ENT_QUOTES, 'UTF-8') . '" class="' . htmlspecialchars($wrapperClass, ENT_QUOTES, 'UTF-8') . '"'
                 . $dataAttrs

@@ -812,30 +812,37 @@ pre.codelisting code {
 }
 
 // /* wikiplugin_fade */
-.wpfade-hidden {
-    background: url('#{$imagePath}toggle-expand-dark.png') no-repeat;
-    margin-left: -19px;
-    padding-left: 19px;
-}
-
-.wpfade-shown {
-    background: url('#{$imagePath}toggle-collapse-dark.png') no-repeat;
-    margin-left: -19px;
-    padding-left: 19px;
-}
-
+// Legacy FADE (icon=y): flex toggle with ::before icon (class toggling in wikiplugin-fade.js).
 .wpfade-span-plain {
     cursor: pointer;
 }
 
 .wpfade-span-icon {
     cursor: pointer;
-    margin-left: 19px;
 }
 
 .wpfade-div-icon {
     display: none;
-    margin-left: 19px;
+    margin-left: calc(19px + 0.35rem);
+}
+
+.wpfade-hidden::before,
+.wpfade-shown::before {
+    content: '';
+    flex-shrink: 0;
+    width: 19px;
+    height: 12px;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+.wpfade-hidden::before {
+    background-image: url('#{$imagePath}toggle-expand-dark.png');
+}
+
+.wpfade-shown::before {
+    background-image: url('#{$imagePath}toggle-collapse-dark.png');
 }
 // wikiplugin_fade: summary, print, initial expanded
 .wikiplugin-fade__summary {
@@ -908,8 +915,57 @@ pre.codelisting code {
     word-break: break-word;
 }
 
+// summary + custom label: stacked header; toggle icon matches bootstrap/card FADE PNG (::before).
+.wikiplugin-fade--summary-labeled .wikiplugin-fade__summary > a {
+    gap: 0.35rem;
+
+    &::before {
+        content: '';
+        flex-shrink: 0;
+        width: 19px;
+        height: 1.25rem;
+        align-self: flex-start;
+        margin-top: .125rem;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    &[aria-expanded='true']::before {
+        background-image: url('#{$imagePath}toggle-collapse-dark.png');
+    }
+
+    &[aria-expanded='false']::before {
+        background-image: url('#{$imagePath}toggle-expand-dark.png');
+    }
+}
+
+.wikiplugin-fade--summary-labeled .wikiplugin-fade__summary-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    min-width: 0;
+}
+
+.wikiplugin-fade--summary-labeled .wikiplugin-fade__extra-label {
+    color: var(--bs-secondary-color);
+}
+
+.wikiplugin-fade--summary-labeled .wikiplugin-fade__summary > a:hover .wikiplugin-fade__extra-label {
+    color: var(--bs-secondary-color);
+}
+
 .wikiplugin-fade__legacy-header {
     display: block;
+}
+
+.wikiplugin-fade__legacy-header .wpfade-legacy-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.wikiplugin-fade--summary .wikiplugin-fade__legacy-header .wpfade-legacy-toggle {
+    align-items: flex-start;
 }
 
 .wikiplugin-fade__content {
