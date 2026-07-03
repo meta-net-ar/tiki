@@ -1,6 +1,6 @@
 {
     "version": "0.2",
-    "language": "en, fr",
+    "language": "en",
     "words": [],
     "flagWords": [
         "hte",
@@ -42,7 +42,7 @@
         "**/*.sql"
     ],
     "maxNumberOfProblems": 100,
-    "minWordLength": 4,
+    "minWordLength": 3,
     "allowCompoundWords": false,
     "dictionaries": [
         "php",
