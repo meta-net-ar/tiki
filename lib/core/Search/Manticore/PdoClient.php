@@ -599,10 +599,18 @@ class PdoClient
         }
     }
 
-    protected function query($sql)
+    protected function query($sql, $tries = 0)
     {
         $this->debug($sql);
-        return $this->pdo->query($sql);
+        try {
+            return $this->pdo->query($sql);
+        } catch (PDOException $e) {
+            if (strstr($e->getMessage(), "server has gone away") && $tries < self::QUERY_RETRIES) {
+                $this->connect(true);
+                return $this->query($sql, $tries + 1);
+            }
+            throw new Exception($e->getMessage());
+        }
     }
 
     protected function prepareAndExecute($sql, $params = [])
