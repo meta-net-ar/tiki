@@ -6386,7 +6386,7 @@ class TrackerLib extends TikiLib
                 try {
                     $key = new Tiki\Encryption\Key($field['encryptionKeyId']);
                     $keyName = htmlspecialchars((string)($key->get('name') ?? ''), ENT_QUOTES);
-                    $fieldAttrs = ' data-field-id="' . $fieldId . '"';
+                    $fieldAttrs = ' data-field-id="' . $fieldId . '" data-item-id="' . $itemId . '"';
 
                     if ($key->isKeyAccessible()) {
                         $field['value'] = $item[$field['fieldId']] = $key->decryptData($field['value']);
@@ -6400,7 +6400,7 @@ class TrackerLib extends TikiLib
                 } catch (Tiki\Encryption\NotFoundException) {
                     $header = \TikiLib::lib('header');
                     $header->add_js_module("import '@vue-widgets/encrypted-field'");
-                    $fieldAttrs = ' data-field-id="' . $fieldId . '"';
+                    $fieldAttrs = ' data-field-id="' . $fieldId . '" data-item-id="' . $itemId . '"';
                     $r = '<tiki-encrypted-field forbidden key-name=""' . $fieldAttrs . '></tiki-encrypted-field>';
                 } catch (Tiki\Encryption\Exception $e) {
                     $field['value'] = $item[$field['fieldId']] = '';
@@ -6526,11 +6526,12 @@ class TrackerLib extends TikiLib
         $header->add_js_module("import '@vue-widgets/encrypted-field'");
         $header->add_js_module("import '@vue-widgets/enter-key-modal'");
         $header->add_js_module("import { handleEncryptedField } from '@tiki/ui-utils'; handleEncryptedField();");
-        $fieldAttrs = ' data-field-id="' . $fieldId . '"';
+        $fieldAttrs = ' data-field-id="' . $fieldId . '" data-item-id="' . $itemId . '"';
         return '<tiki-encrypted-field locked key-name="' . $keyName . '"' . $fieldAttrs . '></tiki-encrypted-field>'
-            . '<span id="encrypted-view-' . $fieldId . '" class="encrypted-view-value" style="display:none;"></span>'
+            . '<span id="encrypted-view-' . $fieldId . '-' . $itemId . '" class="encrypted-view-value" style="display:none;"></span>'
             . '<tiki-enter-key-modal'
             . ' data-field-id="' . $fieldId . '"'
+            . ' data-item-id="' . $itemId . '"'
             . ' field-id="' . $fieldId . '"'
             . ' key-name="' . $keyName . '"'
             . ' encryption-key-id="' . $encryptionKeyId . '"'

@@ -12,10 +12,14 @@
 // Edit-mode input + badge state are handled directly by EnterKeyModal.vue::applyUnlock
 // before dispatching this event, so we only handle the view-mode span here.
 function handleUnlocked(e) {
-    const { fieldId, value } = e.detail;
+    const { fieldId, itemId = 0, value } = e.detail;
 
-    const viewSpan = document.getElementById(`encrypted-view-${fieldId}`);
-    if (viewSpan && value) {
+    // The span is keyed by field + item because the same field renders once per
+    // item in list/plugin views. An empty string is a valid decrypted value, so
+    // reveal the span whenever a value (including "") was returned — only skip a
+    // null/undefined (failure) payload.
+    const viewSpan = document.getElementById(`encrypted-view-${fieldId}-${itemId}`);
+    if (viewSpan && value != null) {
         viewSpan.textContent = value;
         viewSpan.style.display = "";
     }
@@ -30,8 +34,10 @@ export default function handleEncryptedField() {
         if (!fieldEl) return;
         const fieldId = fieldEl.dataset.fieldId;
         if (!fieldId) return;
-        // Remove `hidden` from the modal — MutationObserver in EnterKeyModal picks this up
-        const modal = document.querySelector(`tiki-enter-key-modal[data-field-id="${fieldId}"]`);
+        const itemId = fieldEl.dataset.itemId ?? "0";
+        // Remove `hidden` from this row's modal (matched by field + item so we
+        // don't open the first row's modal) — MutationObserver in EnterKeyModal picks this up
+        const modal = document.querySelector(`tiki-enter-key-modal[data-field-id="${fieldId}"][data-item-id="${itemId}"]`);
         if (modal) modal.removeAttribute("hidden");
     });
 

@@ -83,6 +83,55 @@ describe("KeyShareManagementPage — toggle access", () => {
     });
 });
 
+describe("KeyShareManagementPage — holders outside the get_users window are never dropped", () => {
+    // get_users is server-capped (50 without a search term), so an authorized
+    // holder can be absent from the visible table. The posted users[] list must
+    // still preserve them, or a single grant/revoke silently revokes their share.
+    function lastSaveKeyUsers() {
+        const saveCalls = global.fetch.mock.calls.filter(([url]) => url.includes("action=save_key"));
+        const [, opts] = saveCalls[saveCalls.length - 1];
+        // body is a URLSearchParams built by the component
+        return opts.body.getAll("users[]");
+    }
+
+    test("granting a new user keeps a holder that is not in the visible list", async () => {
+        // bob holds a share but is beyond the get_users window (only alice + carol returned)
+        setupFetch({ key: { key: { name: "Payroll Key", users: "alice,bob" } }, users: ["alice", "carol"] });
+        render(KeyShareManagementPage, { props: { keyId: 1, keyName: "Payroll Key" } });
+        await waitFor(() => screen.getByText("carol"));
+
+        await fireEvent.click(screen.getByRole("button", { name: /grant/i }));
+
+        await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("action=save_key"), expect.anything()));
+        const posted = lastSaveKeyUsers();
+        expect(posted).toContain("bob"); // preserved even though invisible
+        expect(posted).toContain("alice");
+        expect(posted).toContain("carol"); // newly granted
+    });
+
+    test("revoking a visible user does not drop an invisible holder", async () => {
+        setupFetch({ key: { key: { name: "Payroll Key", users: "alice,bob" } }, users: ["alice"] });
+        render(KeyShareManagementPage, { props: { keyId: 1, keyName: "Payroll Key" } });
+        await waitFor(() => screen.getByText("alice"));
+
+        // Revoke alice (first row); bob (invisible holder) must survive.
+        await fireEvent.click(screen.getAllByRole("button", { name: /revoke/i })[0]);
+
+        await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("action=save_key"), expect.anything()));
+        const posted = lastSaveKeyUsers();
+        expect(posted).toContain("bob");
+        expect(posted).not.toContain("alice");
+    });
+
+    test("an authorized holder outside the window is still shown so it can be revoked", async () => {
+        setupFetch({ key: { key: { name: "Payroll Key", users: "alice,bob" } }, users: ["alice", "carol"] });
+        render(KeyShareManagementPage, { props: { keyId: 1, keyName: "Payroll Key" } });
+        await waitFor(() => screen.getByText("alice"));
+        // bob is not in the get_users response but must appear as a holder row
+        expect(screen.getByText("bob")).toBeTruthy();
+    });
+});
+
 describe("KeyShareManagementPage — navigation", () => {
     test("emits back event on back button click", async () => {
         const { emitted } = render(KeyShareManagementPage, { props: { keyId: 1, keyName: "Payroll Key" } });

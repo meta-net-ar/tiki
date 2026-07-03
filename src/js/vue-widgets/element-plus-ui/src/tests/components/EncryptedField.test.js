@@ -44,14 +44,16 @@ describe("EncryptedField — locked", () => {
     });
 
     test("click on unlock link removes hidden from matching modal", () => {
-        // Set up a fake host element (custom element) with data-field-id
+        // Set up a fake host element (custom element) keyed by field + item
         const host = document.createElement("tiki-encrypted-field");
         host.dataset.fieldId = "5";
+        host.dataset.itemId = "3";
         document.body.appendChild(host);
 
-        // Set up a matching modal
+        // Set up a matching modal (matched on both field and item ids)
         const modal = document.createElement("tiki-enter-key-modal");
         modal.setAttribute("data-field-id", "5");
+        modal.setAttribute("data-item-id", "3");
         modal.setAttribute("hidden", "");
         document.body.appendChild(modal);
 
@@ -68,6 +70,36 @@ describe("EncryptedField — locked", () => {
         fireEvent.click(link);
 
         expect(modal.hasAttribute("hidden")).toBe(false);
+    });
+
+    test("opens only this row's modal when the same field appears for multiple items", () => {
+        // Same fieldId 5, two items — each row has its own modal instance.
+        const host = document.createElement("tiki-encrypted-field");
+        host.dataset.fieldId = "5";
+        host.dataset.itemId = "22";
+        document.body.appendChild(host);
+
+        const modalA = document.createElement("tiki-enter-key-modal");
+        modalA.setAttribute("data-field-id", "5");
+        modalA.setAttribute("data-item-id", "11");
+        modalA.setAttribute("hidden", "");
+        document.body.appendChild(modalA);
+
+        const modalB = document.createElement("tiki-enter-key-modal");
+        modalB.setAttribute("data-field-id", "5");
+        modalB.setAttribute("data-item-id", "22");
+        modalB.setAttribute("hidden", "");
+        document.body.appendChild(modalB);
+
+        makeField({ locked: true, keyName: "HR Key" });
+        const link = screen.getByRole("link", { name: /key/i });
+        host.appendChild(link.closest("span") ?? link);
+
+        fireEvent.click(link);
+
+        // Only row 22's modal opens; row 11's stays hidden.
+        expect(modalB.hasAttribute("hidden")).toBe(false);
+        expect(modalA.hasAttribute("hidden")).toBe(true);
     });
 
     test("click does nothing when no matching modal exists", () => {

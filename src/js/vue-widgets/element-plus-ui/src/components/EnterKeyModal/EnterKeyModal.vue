@@ -22,11 +22,18 @@ const autoFilled = ref(false);
 
 // shown drives v-if — controls whether backdrop+modal exist in DOM
 const shown = ref(false);
-const modalDialogId = `tiki-cem-dialog-${String(props.fieldId)}`;
 
-// Find our host element by data-field-id (set directly by PHP)
+// A field is only unique when paired with its item: the same field renders once
+// per item in list/plugin views, so every DOM lookup, id and event is keyed by
+// both fieldId and itemId to avoid resolving to the first matching row.
+const fieldIdAttr = String(props.fieldId);
+const itemIdAttr = String(props.itemId ?? 0);
+const modalDialogId = `tiki-cem-dialog-${fieldIdAttr}-${itemIdAttr}`;
+const sharedKeyInputId = `tiki-cem-shared-key-${fieldIdAttr}-${itemIdAttr}`;
+
+// Find our host element by data-field-id + data-item-id (set directly by PHP)
 function getHost(): HTMLElement | null {
-    return document.querySelector(`tiki-enter-key-modal[data-field-id="${props.fieldId}"]`);
+    return document.querySelector(`tiki-enter-key-modal[data-field-id="${fieldIdAttr}"][data-item-id="${itemIdAttr}"]`);
 }
 
 // When shown changes, sync the host's `hidden` attribute so position:fixed
@@ -60,7 +67,7 @@ onMounted(() => {
             autoFilled.value = false;
             // Focus the password input after the modal renders
             nextTick(() => {
-                const input = document.getElementById("tiki-cem-shared-key") as HTMLInputElement | null;
+                const input = document.getElementById(sharedKeyInputId) as HTMLInputElement | null;
                 input?.focus();
             });
         }
@@ -97,7 +104,8 @@ async function loadStoredShare() {
 }
 
 function applyUnlock(value: string) {
-    // Enable the form input and populate if we have a decrypted value
+    // Enable the form input and populate if we have a decrypted value. Edit mode
+    // renders one form per item, so the fieldId-only wrapper id is unambiguous there.
     const inputWrapper = document.getElementById(`trackerinput_${props.fieldId}`);
     if (inputWrapper) {
         const input = inputWrapper.querySelector("input, textarea, select") as HTMLInputElement | null;
@@ -107,8 +115,8 @@ function applyUnlock(value: string) {
         }
     }
 
-    // Switch the encrypted-field indicator to unlocked state
-    const fieldEl = document.querySelector(`tiki-encrypted-field[data-field-id="${props.fieldId}"]`);
+    // Switch this row's encrypted-field indicator to unlocked state
+    const fieldEl = document.querySelector(`tiki-encrypted-field[data-field-id="${fieldIdAttr}"][data-item-id="${itemIdAttr}"]`);
     if (fieldEl) fieldEl.removeAttribute("locked");
 
     // Hide via Vue reactive state — watch() will add `hidden` back to host
@@ -117,7 +125,7 @@ function applyUnlock(value: string) {
     emit("unlocked", props.fieldId, value);
     // Dispatch on the field's host element (not document, no bubbling) so the
     // decrypted cleartext is only observable by listeners scoped to that field.
-    fieldEl?.dispatchEvent(new CustomEvent("tiki:unlocked", { detail: { fieldId: props.fieldId, value } }));
+    fieldEl?.dispatchEvent(new CustomEvent("tiki:unlocked", { detail: { fieldId: props.fieldId, itemId: props.itemId ?? 0, value } }));
 }
 
 async function submit() {
@@ -160,7 +168,10 @@ async function submit() {
                 }),
             });
             const valData = await valRes.json();
-            if (!valData?.value) {
+            // An empty string is a valid decrypted value — the server only signals
+            // failure with a null value (and an accompanying error message). Testing
+            // for falsy here would reject a legitimately-empty field.
+            if (valData?.value == null) {
                 state.value = "error";
                 errorMsg.value = valData?.error ?? tr("Decryption failed.");
                 return;
@@ -256,9 +267,9 @@ function close() {
                         </div>
 
                         <div class="mb-3">
-                            <label for="tiki-cem-shared-key" class="form-label"> {{ tr('Enter shared secret for key “%0”').replace('%0', keyName) }} </label>
+                            <label :for="sharedKeyInputId" class="form-label"> {{ tr('Enter shared secret for key “%0”').replace('%0', keyName) }} </label>
                             <input
-                                id="tiki-cem-shared-key"
+                                :id="sharedKeyInputId"
                                 v-model="sharedKey"
                                 type="password"
                                 name="shared_key"

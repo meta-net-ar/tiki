@@ -28,10 +28,15 @@ function handleUnlockClick(e: MouseEvent) {
     const host = link.closest("tiki-encrypted-field") as HTMLElement | null;
     const fieldId = host?.dataset?.fieldId;
     if (!fieldId) return;
+    const itemId = host?.dataset?.itemId ?? "0";
 
-    // Directly remove `hidden` from the corresponding modal — simplest possible trigger.
-    // EnterKeyModal watches for this via MutationObserver and shows itself.
-    const modal = document.querySelector(`tiki-enter-key-modal[data-field-id="${fieldId}"]`) as HTMLElement | null;
+    // Directly remove `hidden` from this row's modal — simplest possible trigger.
+    // The same field renders once per item, so match on both ids to reach the
+    // modal for this row rather than the first one on the page. EnterKeyModal
+    // watches for this via MutationObserver and shows itself.
+    const modal = document.querySelector(
+        `tiki-enter-key-modal[data-field-id="${fieldId}"][data-item-id="${itemId}"]`
+    ) as HTMLElement | null;
     if (modal) modal.removeAttribute("hidden");
 }
 </script>

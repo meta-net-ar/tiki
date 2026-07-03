@@ -473,6 +473,21 @@ class Services_Encryption_ControllerTest extends TikiTestCase
         }
     }
 
+    public function testEnterKeyGetResponseExcludesKeyMaterial()
+    {
+        $this->shareKeyWithUser(function ($result) {
+            // The GET/legacy path is not admin-gated (any holder enters their own
+            // key), so its serialized key row must be projected — the raw secret
+            // (Shamir share[0]) and verificationCanary must never leave the server.
+            $_SERVER['REQUEST_METHOD'] = 'GET';
+            $response = $this->subject->action_enter_key(new JitFilter(['keyId' => $result['keyId']]));
+            $this->assertArrayHasKey('encryption_key', $response);
+            $this->assertEquals($result['keyId'], $response['encryption_key']['keyId']);
+            $this->assertArrayNotHasKey('secret', $response['encryption_key']);
+            $this->assertArrayNotHasKey('verificationCanary', $response['encryption_key']);
+        });
+    }
+
     private function shareKeyWithUser($cb)
     {
         global $user;

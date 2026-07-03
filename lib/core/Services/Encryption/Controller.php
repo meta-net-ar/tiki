@@ -300,9 +300,12 @@ class Services_Encryption_Controller
         }
         // GET path: kept for backward compatibility with any non-Vue callers.
         // The Vue EnterKeyModal component always calls this endpoint via POST only.
+        // This action is not admin-gated (any holder enters their own key), so the
+        // key row must be projected before it is serialized — the raw secret
+        // (Shamir share[0]) and verificationCanary must never leave the server.
         return [
             'title' => tr('Enter key'),
-            'encryption_key' => $encryption_key,
+            'encryption_key' => $this->projectKeyForClient($encryption_key),
             'shared_key' => @$_SESSION['encryption_shared_keys'][$encryption_key['keyId']],
         ];
     }

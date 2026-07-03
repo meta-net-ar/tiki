@@ -22,6 +22,11 @@ const error = ref("");
 const saving = ref<string | null>(null);
 const savedMsg = ref<string | null>(null);
 const loadedKeyName = ref("");
+// The authoritative set of holders as stored on the key. get_users is capped
+// (50 without a search term), so the visible table is only a window onto the
+// user base — this list, not the table, is the source of truth for who holds a
+// share, so a grant/revoke never drops holders that fall outside that window.
+const authorizedLogins = ref<string[]>([]);
 // Recovery state: when an action fails because the admin's own key share cannot
 // be read (e.g. after a password change that bypassed the encryption rehash),
 // we let them paste their share and retry, sending it as old_share.
@@ -42,9 +47,15 @@ async function loadShares() {
 
         loadedKeyName.value = keyData?.key?.name ?? "";
         const authorizedUsers = (keyData?.key?.users ?? "").split(",").filter(Boolean);
+        authorizedLogins.value = authorizedUsers;
         const allUsers: string[] = Array.isArray(usersData) ? usersData : [];
 
-        users.value = allUsers.map((login: string) => ({
+        // Always show every current holder, even one who falls outside the
+        // (capped) get_users window, so an admin can always see and revoke them.
+        const shown = new Set(allUsers);
+        const displayLogins = [...allUsers, ...authorizedUsers.filter((u: string) => !shown.has(u))];
+
+        users.value = displayLogins.map((login: string) => ({
             name: login,
             login,
             hasAccess: authorizedUsers.includes(login),
@@ -59,7 +70,16 @@ async function loadShares() {
 async function toggleAccess(user: KeyShareUser, oldShare?: string) {
     saving.value = user.login;
     error.value = "";
-    const newUsers = users.value.filter((u) => (u.login === user.login ? !user.hasAccess : u.hasAccess)).map((u) => u.login);
+    // Derive the new holder list from the authoritative set (not the visible,
+    // capped table) and apply just this one grant/revoke — otherwise holders
+    // outside the get_users window would be silently dropped and lose their share.
+    const next = new Set(authorizedLogins.value);
+    if (user.hasAccess) {
+        next.delete(user.login);
+    } else {
+        next.add(user.login);
+    }
+    const newUsers = [...next];
 
     try {
         const body = new URLSearchParams({

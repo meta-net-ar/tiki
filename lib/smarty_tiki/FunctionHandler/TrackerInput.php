@@ -107,7 +107,7 @@ class TrackerInput extends Base
                 $fieldId = (int)$field['fieldId'];
                 $keyName = $key ? htmlspecialchars($key->get('name'), ENT_QUOTES) : '';
                 $itemId = (int)($item['itemId'] ?? 0);
-                $fieldAttrs = ' data-field-id="' . $fieldId . '"';
+                $fieldAttrs = ' data-field-id="' . $fieldId . '" data-item-id="' . $itemId . '"';
 
                 if ($encryptionState === 'unlocked') {
                     return '<tiki-encrypted-field key-name="' . $keyName . '"' . $fieldAttrs . '></tiki-encrypted-field>'
@@ -129,6 +129,7 @@ class TrackerInput extends Base
                     . $fieldHtml
                     . '<tiki-enter-key-modal'
                     . ' data-field-id="' . $fieldId . '"'
+                    . ' data-item-id="' . $itemId . '"'
                     . ' field-id="' . $fieldId . '"'
                     . ' key-name="' . $keyName . '"'
                     . ' encryption-key-id="' . $encryptionKeyId . '"'
