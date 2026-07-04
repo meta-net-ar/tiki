@@ -23,10 +23,16 @@ use Tracker_Definition;
  * ones get unlinked. ItemsList itself stores no value ('' always) — the
  * previous state must be derived from the currently linked items.
  *
- * Pins the transfer feature as shipped: the UI path always submits the
- * field as an array (the controller runs input through getFieldData(),
- * which returns the submitted array or the derived current-items array),
- * and a save that omits the field must leave the links untouched.
+ * Two kinds of tests here:
+ *
+ * - The transfer feature as shipped: the UI path always submits the field
+ *   as an array (the controller runs input through getFieldData(), which
+ *   returns the submitted array or the derived current-items array), and a
+ *   save that omits the field must leave the links untouched.
+ *
+ * - Saves that do NOT have that UI shape: a plain data-array save (import,
+ *   fixture, replace_item callers) carries the field's stored scalar ''
+ *   and must be a no-op for the links, not a fatal.
  *
  * @group integration
  * @group tracker
@@ -203,4 +209,22 @@ class TrackerFieldItemsListTest extends TikiTestCase
         $this->assertSame((string) $parent, $this->linkBackValue($thereTrackerId, $one, $linkBackFieldId));
     }
 
+    public function testDataArraySaveCarryingTheStoredScalarDoesNotFatal(): void
+    {
+        [$hereTrackerId, $thereTrackerId, $thereFieldIds] = $this->createLinkedTrackers();
+        $linkBackFieldId = $thereFieldIds['ilsLinkBack'];
+
+        $one = self::$fixtures->createItem($thereTrackerId, ['ilsThereName' => 'one']);
+
+        // Field exists before the item: a plain data-array create (import,
+        // fixture, resave) includes every definition field, so the ItemsList
+        // field arrives as the scalar '' — not the array the transfer UI sends.
+        $itemsListFieldId = $this->addItemsListField($hereTrackerId, $thereTrackerId, $thereFieldIds);
+
+        $parent = self::$fixtures->createItem($hereTrackerId, ['ilsHereName' => 'parent']);
+
+        $this->assertGreaterThan(0, $parent);
+        $this->assertSame('', (string) self::$trklib->get_item_value($hereTrackerId, $parent, $itemsListFieldId, false));
+        $this->assertSame('', $this->linkBackValue($thereTrackerId, $one, $linkBackFieldId));
+    }
 }

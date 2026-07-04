@@ -2156,7 +2156,11 @@ class TrackerLib extends TikiLib
 
             $handler = $this->get_field_handler($array, array_merge($item_info, $fil));
 
-            $old_value = isset($fil[$fieldId]) && ! empty($fil[$fieldId]) ? $fil[$fieldId] : $handler->getFieldData([])['value'];
+            // Must stay null when the item has no stored value: handlers such as
+            // AutoIncrement and GroupSelector use is_null($oldValue) to detect
+            // item creation. Fields that need a derived previous state (e.g.
+            // ItemsList) compute it themselves in their handleSave().
+            $old_value = $fil[$fieldId] ?? null;
 
             if ($handler && method_exists($handler, 'postSaveHook')) {
                 // postSaveHook will be called with final value saved
