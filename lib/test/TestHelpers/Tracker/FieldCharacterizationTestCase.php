@@ -171,6 +171,20 @@ abstract class FieldCharacterizationTestCase extends \TikiTestCase
         static::fail('expectedEnumeration() must be overridden by Enumerable field type tests');
     }
 
+    /**
+     * Whether the full renderInput()/renderOutput() HTML path is safe to
+     * exercise in the headless test harness. A few types render through
+     * Smarty plugins that pull in the WYSIWYG editor / toolbar / quicktags
+     * (e.g. TextArea's {textarea} block), which cannot be instantiated
+     * without a browser session and abort the process. Those types return
+     * false and pin only the Smarty-free CSV path in testRender(); their
+     * data contract is still covered by testGetFieldData/testRoundTrip.
+     */
+    protected static function rendersFullHtml(): bool
+    {
+        return true;
+    }
+
     public static function setUpBeforeClass(): void
     {
         self::guardStaticSetUp(function () {
@@ -288,6 +302,13 @@ abstract class FieldCharacterizationTestCase extends \TikiTestCase
         $csv = $method->invoke($handler, ['list_mode' => 'csv']);
         $this->assertExpected($expectedCsv, $csv, "renderInnerOutput(['list_mode' => 'csv'])");
 
+        // Types whose full render pulls in the editor widget are pinned on the
+        // CSV path only (see rendersFullHtml()); calling renderInput() on them
+        // would abort the harness.
+        if (! static::rendersFullHtml()) {
+            return;
+        }
+
         // Full renders go through Smarty; exact-HTML pinning is too fragile
         // (documented cross-test render state bleed), so assert markers only.
         // The call itself is still the test: a template error fails here.
@@ -302,12 +323,14 @@ abstract class FieldCharacterizationTestCase extends \TikiTestCase
         }
 
         // renderOutput() reads $_GET['page'] directly; keep the test
-        // independent of request state.
+        // independent of request state. Pass an explicit render context with a
+        // 'list_mode' key: production always renders through a context that has
+        // one, and some types (e.g. Checkbox) dereference it unguarded.
         $pageWasSet = array_key_exists('page', $_GET);
         $previousPage = $_GET['page'] ?? null;
         unset($_GET['page']);
         try {
-            $outputHtml = $handler->renderOutput();
+            $outputHtml = $handler->renderOutput(['list_mode' => '']);
         } finally {
             if ($pageWasSet) {
                 $_GET['page'] = $previousPage;
