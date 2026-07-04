@@ -4,129 +4,109 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\Test\TestHelpers\GuardedSetUpTrait;
+use Tiki\Lib\Test\TestHelpers\Tracker\TrackerFixtureFactory;
+use Tiki\Lib\Test\TestHelpers\Tracker\TrackerPermissionsFixture;
+
 /**
  * @group integration
  */
 class TrackerItemPermissionTest extends TikiTestCase
 {
+    use GuardedSetUpTrait;
+
     protected static $trklib;
     protected static $unifiedlib;
+    protected static $fixtures;
+    protected static $permsFixture;
     protected static $trackerId;
     protected static $old_pref;
     protected static $old_user;
 
     public static function setUpBeforeClass(): void
     {
-        global $prefs;
-        self::$old_pref = $prefs['feature_trackers'];
-        $prefs['feature_trackers'] = 'y';
+        self::guardStaticSetUp(function () {
+            global $prefs;
+            self::$old_pref = $prefs['feature_trackers'];
+            $prefs['feature_trackers'] = 'y';
 
-        parent::setUpBeforeClass();
-        self::$trklib = TikiLib::lib('trk');
+            parent::setUpBeforeClass();
+            self::$trklib = TikiLib::lib('trk');
+            self::$fixtures = new TrackerFixtureFactory();
+            self::$permsFixture = new TrackerPermissionsFixture();
 
-        // create tracker and couple of fields
-        self::$trackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
+            // create tracker and couple of fields
+            self::$trackerId = self::$fixtures->createTracker('Test Tracker');
 
-        $fields = [[
-            'name' => 'Name',
-            'type' => 't',
-            'isHidden' => 'n',
-            'isMandatory' => 'y',
-            'visibleBy' => null,
-            'permName' => 'test_name',
-        ], [
-            'name' => 'Admin info',
-            'type' => 't',
-            'isHidden' => 'y',
-            'isMandatory' => 'n',
-            'visibleBy' => null,
-            'permName' => 'test_admin',
-        ], [
-            'name' => 'Registered info',
-            'type' => 't',
-            'isHidden' => 'n',
-            'isMandatory' => 'n',
-            'visibleBy' => ['Registered'],
-            'permName' => 'test_registered',
-        ], [
-            'name' => 'Special info',
-            'type' => 't',
-            'isHidden' => 'n',
-            'isMandatory' => 'n',
-            'visibleBy' => ['SpecialGroup'],
-            'permName' => 'test_special',
-        ]];
-        foreach ($fields as $i => $field) {
-            self::$trklib->replace_tracker_field(
-                self::$trackerId,
-                0,
-                $field['name'],
-                $field['type'],
-                'y',
-                'y',
-                'y',
-                'y',
-                $field['isHidden'],
-                $field['isMandatory'],
-                ($i + 1) * 10,
-                '',
-                '',
-                '',
-                null,
-                '',
-                $field['visibleBy'],
-                null,
-                'n',
-                '',
-                '',
-                '',
-                $field['permName']
-            );
-        }
+            self::$fixtures->addFields(self::$trackerId, [[
+                'name' => 'Name',
+                'type' => 't',
+                'isHidden' => 'n',
+                'isMandatory' => 'y',
+                'visibleBy' => null,
+                'permName' => 'test_name',
+            ], [
+                'name' => 'Admin info',
+                'type' => 't',
+                'isHidden' => 'y',
+                'isMandatory' => 'n',
+                'visibleBy' => null,
+                'permName' => 'test_admin',
+            ], [
+                'name' => 'Registered info',
+                'type' => 't',
+                'isHidden' => 'n',
+                'isMandatory' => 'n',
+                'visibleBy' => ['Registered'],
+                'permName' => 'test_registered',
+            ], [
+                'name' => 'Special info',
+                'type' => 't',
+                'isHidden' => 'n',
+                'isMandatory' => 'n',
+                'visibleBy' => ['SpecialGroup'],
+                'permName' => 'test_special',
+            ]]);
 
-        $definition = Tracker_Definition::get(self::$trackerId);
-        $fields = $definition->getFields();
-        $fields[0]['value'] = 'Test item';
-        $fields[1]['value'] = 'Secret value';
-        $fields[2]['value'] = 'Secret value';
-        $fields[3]['value'] = 'Secret value';
+            self::$fixtures->createItem(self::$trackerId, [
+                'test_name' => 'Test item',
+                'test_admin' => 'Secret value',
+                'test_registered' => 'Secret value',
+                'test_special' => 'Secret value',
+            ]);
 
-        self::$trklib->replace_item(self::$trackerId, 0, ['data' => $fields], 'o');
+            self::$permsFixture->grantGroupPermissions([
+                'Registered' => ['tiki_p_view_trackers'],
+            ]);
 
-        TikiDb::get()->query("INSERT INTO `users_grouppermissions` VALUES('Registered', 'tiki_p_view_trackers', '')");
-        $builder = new Perms_Builder();
-        Perms::set($builder->build());
+            self::$unifiedlib = TikiLib::lib('unifiedsearch');
+            self::$unifiedlib->rebuild();
+        });
+    }
 
-        self::$unifiedlib = TikiLib::lib('unifiedsearch');
-        self::$unifiedlib->rebuild();
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->abortIfStaticSetUpFailed();
     }
 
     public static function tearDownAfterClass(): void
     {
-        global $prefs, $tikilib;
+        global $prefs;
         $prefs['feature_trackers'] = self::$old_pref;
 
         parent::tearDownAfterClass();
-        self::$trklib->remove_tracker(self::$trackerId);
+        self::$fixtures->cleanup();
 
-        if (! empty($prefs['unified_mysql_index_current'])) {
-            TikiDb::get()->query("DROP TABLE `{$prefs['unified_mysql_index_current']}`");
-            $tikilib->delete_preference('unified_mysql_index_current');
-        }
+        self::$permsFixture->dropUnifiedIndex();
 
-        self::$unifiedlib->invalidateIndicesCache();
-
-        TikiDb::get()->query("DELETE FROM `users_grouppermissions` WHERE `groupName` = 'Registered' AND `permName` = 'tiki_p_view_trackers'");
-        $builder = new Perms_Builder();
-        Perms::set($builder->build());
+        self::$permsFixture->revokeGroupPermissions();
     }
 
     public function testAdminCanSeeAllFields(): void
     {
         // impersonate admin
-        new Perms_Context('admin');
-        $perms = Perms::getInstance();
-        $perms->setGroups(['Admins']);
+        self::$permsFixture->impersonate('admin', ['Admins']);
 
         $query = self::$unifiedlib->buildQuery([
             'type' => 'trackeritem',
@@ -144,9 +124,7 @@ class TrackerItemPermissionTest extends TikiTestCase
     public function testRegisteredCanSeeSpecificFields(): void
     {
         // impersonate a regitered user
-        new Perms_Context('someone');
-        $perms = Perms::getInstance();
-        $perms->setGroups(['Registered']);
+        self::$permsFixture->impersonate('someone', ['Registered']);
 
         $query = self::$unifiedlib->buildQuery([
             'type' => 'trackeritem',

@@ -8,8 +8,8 @@ namespace Tiki\Lib\Test\Api\Trackers;
 
 use Tiki\Lib\Test\Api\ApiSchemaLoader;
 use Tiki\Lib\Test\Api\ApiTestCase;
+use Tiki\Lib\Test\TestHelpers\Tracker\TrackerFixtureFactory;
 use TikiLib;
-use Tracker_Definition;
 
 /**
  * Base class for Trackers API integration tests
@@ -19,6 +19,16 @@ use Tracker_Definition;
  */
 abstract class ApiBaseTrackersTest extends ApiTestCase
 {
+    /**
+     * Factory used to create tracker fixtures.
+     *
+     * Cleanup stays based on the ID arrays below (not the factory's own
+     * tracking) because subclasses also register trackers and items created
+     * through the API in those arrays.
+     * @var TrackerFixtureFactory|null
+     */
+    protected static $fixtures = null;
+
     /**
      * IDs of trackers created for testing
      * @var array
@@ -62,6 +72,7 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
     {
         parent::setUpBeforeClass();
         static::setTestPreferences(self::$preferences);
+        static::$fixtures = new TrackerFixtureFactory();
         static::createDefaultTestData();
     }
 
@@ -80,29 +91,20 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
     private static function createDefaultTestData(): void
     {
         $trackerId = static::createTracker('API_Test_Tracker', 'Default tracker for API integration tests');
-        if (! $trackerId) {
-            return;
-        }
 
         static::$defaultTrackerId = $trackerId;
 
-        $item1 = static::createTrackerItem($trackerId, [
+        static::$defaultItemIds[] = static::createTrackerItem($trackerId, [
             'title'       => 'First Test Item',
             'description' => 'Description of the first test item',
             'count'       => '10',
         ]);
-        if ($item1) {
-            static::$defaultItemIds[] = $item1;
-        }
 
-        $item2 = static::createTrackerItem($trackerId, [
+        static::$defaultItemIds[] = static::createTrackerItem($trackerId, [
             'title'       => 'Second Test Item',
             'description' => 'Description of the second test item',
             'count'       => '20',
         ]);
-        if ($item2) {
-            static::$defaultItemIds[] = $item2;
-        }
     }
 
     /**
@@ -110,16 +112,11 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      *
      * @param string $name        Tracker name
      * @param string $description Tracker description
-     * @return int|null           Tracker ID, or null on failure
+     * @return int                Tracker ID
      */
     protected static function createTracker($name, $description = '')
     {
-        $trklib = TikiLib::lib('trk');
-
-        $trackerId = $trklib->replace_tracker(0, $name, $description, [], 'n');
-        if (! $trackerId) {
-            return null;
-        }
+        $trackerId = static::$fixtures->createTracker($name, $description);
 
         static::$testTrackers[] = $trackerId;
 
@@ -143,39 +140,20 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      * @param string $type       Field type letter (t=text, n=numeric, etc.)
      * @param string $name       Field display name
      * @param string $permName   Permanent name (unique identifier)
-     * @return int|null          Field ID or null on failure
+     * @return int               Field ID
      */
     protected static function addTrackerField($trackerId, $type, $name, $permName)
     {
-        $trklib = TikiLib::lib('trk');
-
-        $fieldId = $trklib->replace_tracker_field(
-            $trackerId,
-            0,       // fieldId 0 = create new
-            $name,
-            $type,
-            'y',     // isTblVisible
-            'y',     // isSearchable
-            'y',     // isPublic
-            'n',     // isMandatory
-            'n',     // isHidden
-            'y',     // isMain
-            10,      // position
-            '',      // options
-            '',      // description
-            '',      // descriptionIsParsed
-            null,    // itemChoices
-            '',      // errorMsg
-            null,      // visibleBy
-            null,    // editableBy
-            'n',     // isMultilingual
-            '',      // validation
-            '',      // validationParam
-            '',      // validationMessage
-            $permName
-        );
-
-        return $fieldId ?: null;
+        // isPublic='n' and isMandatory='y' preserve the values this method
+        // always passed positionally: its previous inline argument comments
+        // mislabeled the replace_tracker_field() parameters.
+        return static::$fixtures->addField($trackerId, [
+            'name' => $name,
+            'type' => $type,
+            'permName' => $permName,
+            'isPublic' => 'n',
+            'isMandatory' => 'y',
+        ]);
     }
 
     /**
@@ -185,30 +163,15 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
      *
      * @param int   $trackerId
      * @param array $fieldValues  e.g. ['title' => 'My Item', 'description' => 'Text']
-     * @return int|null           Item ID or null on failure
+     * @return int                Item ID
      */
     protected static function createTrackerItem($trackerId, $fieldValues = [])
     {
-        $trklib = TikiLib::lib('trk');
-        $definition = Tracker_Definition::get($trackerId);
-        if (! $definition) {
-            return null;
-        }
+        $itemId = static::$fixtures->createItem($trackerId, $fieldValues);
 
-        $data = [];
-        foreach ($definition->getFields() as $field) {
-            $value = $fieldValues[$field['permName']] ?? '';
+        static::$testTrackerItems[] = $itemId;
 
-            $data[] = array_merge($field, ['value' => $value]);
-        }
-
-        $itemId = $trklib->replace_item($trackerId, 0, ['data' => $data], 'o');
-
-        if ($itemId && $itemId > 0) {
-            static::$testTrackerItems[] = $itemId;
-        }
-
-        return ($itemId && $itemId > 0) ? $itemId : null;
+        return $itemId;
     }
 
     /**
@@ -239,6 +202,7 @@ abstract class ApiBaseTrackersTest extends ApiTestCase
         static::$defaultTrackerId = null;
         static::$defaultTrackerFields = [];
         static::$defaultItemIds = [];
+        static::$fixtures = null;
 
         static::deleteTestPreferences(self::$preferences);
     }

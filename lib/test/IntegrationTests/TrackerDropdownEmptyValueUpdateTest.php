@@ -8,6 +8,8 @@
 namespace Tiki\Lib\Test\IntegrationTests;
 
 use Services_Tracker_Utilities;
+use Tiki\Lib\Test\TestHelpers\GuardedSetUpTrait;
+use Tiki\Lib\Test\TestHelpers\Tracker\TrackerFixtureFactory;
 use TikiLib;
 use TikiTestCase;
 use Tracker_Definition;
@@ -17,77 +19,59 @@ use Tracker_Definition;
  */
 class TrackerDropdownEmptyValueUpdateTest extends TikiTestCase
 {
+    use GuardedSetUpTrait;
+
     protected static $trklib;
+    protected static $fixtures;
     protected static $trackerId;
     protected static $oldPrefs;
 
     public static function setUpBeforeClass(): void
     {
-        global $prefs;
+        self::guardStaticSetUp(function () {
+            global $prefs;
 
-        self::$oldPrefs = $prefs;
-        $prefs['feature_trackers'] = 'y';
+            self::$oldPrefs = $prefs;
+            $prefs['feature_trackers'] = 'y';
 
-        parent::setUpBeforeClass();
-        self::$trklib = TikiLib::lib('trk');
-        self::$trackerId = self::$trklib->replace_tracker(null, 'Dropdown Empty Value Test ' . uniqid(), '', [], 'n');
+            parent::setUpBeforeClass();
+            self::$trklib = TikiLib::lib('trk');
+            self::$fixtures = new TrackerFixtureFactory();
+            self::$trackerId = self::$fixtures->createTracker('Dropdown Empty Value Test ' . uniqid());
 
-        $fields = [
-            [
-                'name' => 'Title',
-                'type' => 't',
-                'isHidden' => 'n',
-                'isMandatory' => 'y',
-                'permName' => 'test_title',
-            ],
-            [
-                'name' => 'Statuses',
-                'type' => 'M',
-                'isHidden' => 'n',
-                'isMandatory' => 'n',
-                'permName' => 'test_statuses',
-                'options' => json_encode([
-                    'options' => ['=Default', '1=Active', '2=Delayed', '3=Closed'],
-                ]),
-            ],
-        ];
+            self::$fixtures->addFields(self::$trackerId, [
+                [
+                    'name' => 'Title',
+                    'type' => 't',
+                    'isHidden' => 'n',
+                    'isMandatory' => 'y',
+                    'permName' => 'test_title',
+                ],
+                [
+                    'name' => 'Statuses',
+                    'type' => 'M',
+                    'isHidden' => 'n',
+                    'isMandatory' => 'n',
+                    'permName' => 'test_statuses',
+                    'options' => json_encode([
+                        'options' => ['=Default', '1=Active', '2=Delayed', '3=Closed'],
+                    ]),
+                ],
+            ]);
+        });
+    }
 
-        foreach ($fields as $i => $field) {
-            self::$trklib->replace_tracker_field(
-                self::$trackerId,
-                0,
-                $field['name'],
-                $field['type'],
-                'y',
-                'y',
-                'y',
-                'y',
-                $field['isHidden'],
-                $field['isMandatory'],
-                ($i + 1) * 10,
-                $field['options'] ?? '',
-                '',
-                '',
-                null,
-                '',
-                null,
-                null,
-                'n',
-                '',
-                '',
-                '',
-                $field['permName']
-            );
-        }
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->abortIfStaticSetUpFailed();
     }
 
     public static function tearDownAfterClass(): void
     {
         global $prefs;
 
-        if (! empty(self::$trackerId)) {
-            self::$trklib->remove_tracker(self::$trackerId);
-        }
+        self::$fixtures->cleanup();
 
         $prefs = self::$oldPrefs;
         parent::tearDownAfterClass();
@@ -133,19 +117,9 @@ class TrackerDropdownEmptyValueUpdateTest extends TikiTestCase
 
     private function createItem(string $statusesValue): int
     {
-        $definition = Tracker_Definition::get(self::$trackerId);
-        $fields = $definition->getFields();
-
-        foreach ($fields as &$field) {
-            if ($field['permName'] === 'test_title') {
-                $field['value'] = 'Test item';
-            }
-
-            if ($field['permName'] === 'test_statuses') {
-                $field['value'] = $statusesValue;
-            }
-        }
-
-        return self::$trklib->replace_item(self::$trackerId, 0, ['data' => $fields], 'o');
+        return self::$fixtures->createItem(self::$trackerId, [
+            'test_title' => 'Test item',
+            'test_statuses' => $statusesValue,
+        ]);
     }
 }

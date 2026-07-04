@@ -7,6 +7,8 @@
 
 namespace TikiTests;
 
+use Tiki\Lib\Test\TestHelpers\GuardedSetUpTrait;
+use Tiki\Lib\Test\TestHelpers\Tracker\TrackerFixtureFactory;
 use TikiTestCase;
 use Tracker_Definition,
 
@@ -17,9 +19,12 @@ TikiLib, Tracker_Item;
  */
 class TrackerFieldMathTest extends TikiTestCase
 {
+    use GuardedSetUpTrait;
+
     protected static $trklib;
     protected static $objectlib;
     protected static $unifiedlib;
+    protected static $fixtures;
     protected static $trackerId;
     protected static $linkedTrackerId;
     protected static $old_prefs;
@@ -27,104 +32,56 @@ class TrackerFieldMathTest extends TikiTestCase
 
     public static function setUpBeforeClass(): void
     {
-        global $prefs;
-        self::$old_prefs = $prefs;
-        $prefs['feature_trackers'] = 'y';
-        $prefs['short_date_format'] = '%Y-%m-%d';
-        $prefs['short_time_format'] = '%H:%M';
-        parent::setUpBeforeClass();
-        self::$trklib = TikiLib::lib('trk');
-        self::$objectlib = TikiLib::lib('object');
+        self::guardStaticSetUp(function () {
+            global $prefs;
+            self::$old_prefs = $prefs;
+            $prefs['feature_trackers'] = 'y';
+            $prefs['short_date_format'] = '%Y-%m-%d';
+            $prefs['short_time_format'] = '%H:%M';
+            parent::setUpBeforeClass();
+            self::$trklib = TikiLib::lib('trk');
+            self::$objectlib = TikiLib::lib('object');
+            self::$fixtures = new TrackerFixtureFactory();
 
-        self::$linkedTrackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
+            self::$linkedTrackerId = self::$fixtures->createTracker('Test Tracker');
 
-        $fields = [[
-        'name' => 'Date field for formatting',
-        'type' => 'f',
-        'isHidden' => 'n',
-        'isMandatory' => 'n',
-        'visibleBy' => null,
-        'permName' => 'someOtherDateField'
-        ]];
-        foreach ($fields as $i => $field) {
-            self::$trklib->replace_tracker_field(
-                self::$linkedTrackerId,
-                0,
-                $field['name'],
-                $field['type'],
-                'y',
-                'y',
-                'y',
-                'y',
-                $field['isHidden'],
-                $field['isMandatory'],
-                ($i + 1) * 10,
-                $field['options'] ?? '',
-                '',
-                '',
-                null,
-                '',
-                null,
-                null,
-                'n',
-                '',
-                '',
-                '',
-                $field['permName']
-            );
-        }
-        $linkedTrackerDefinition = Tracker_Definition::get(self::$linkedTrackerId);
-        $linkedFields = $linkedTrackerDefinition->getFields();
-        $someOtherDateFieldId = $linkedFields[0]['fieldId'];
+            $someOtherDateFieldId = self::$fixtures->addField(self::$linkedTrackerId, [
+                'name' => 'Date field for formatting',
+                'type' => 'f',
+                'isHidden' => 'n',
+                'isMandatory' => 'n',
+                'visibleBy' => null,
+                'permName' => 'someOtherDateField'
+            ]);
 
-        self::$trackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
-        $calculation = "(add childrenBirthDate (mul 31536000 18))"; //Inspired from https://doc.tiki.org/Mathematical-Calculation-Tracker-Field
-        $options = json_encode(['calculation' => $calculation,
-        'mirrorField' => $someOtherDateFieldId]);
+            self::$trackerId = self::$fixtures->createTracker('Test Tracker');
+            $calculation = "(add childrenBirthDate (mul 31536000 18))"; //Inspired from https://doc.tiki.org/Mathematical-Calculation-Tracker-Field
+            $options = json_encode(['calculation' => $calculation,
+            'mirrorField' => $someOtherDateFieldId]);
 
-        $fields = [[
-        'name' => 'Date field containing the childrens birth date',
-        'type' => 'f',
-        'isHidden' => 'n',
-        'isMandatory' => 'n',
-        'visibleBy' => null,
-        'permName' => 'childrenBirthDate'
-        ], [
-        'name' => 'Link',
-        'type' => 'math',
-        'isHidden' => 'n',
-        'isMandatory' => 'n',
-        'visibleBy' => null,
-        'permName' => 'childrenAdultOn',
-        'options' => $options
-        ]];
-        foreach ($fields as $i => $field) {
-            self::$trklib->replace_tracker_field(
-                self::$trackerId,
-                0,
-                $field['name'],
-                $field['type'],
-                'y',
-                'y',
-                'y',
-                'y',
-                $field['isHidden'],
-                $field['isMandatory'],
-                ($i + 1) * 10,
-                $field['options'] ?? '',
-                '',
-                '',
-                null,
-                '',
-                null,
-                null,
-                'n',
-                '',
-                '',
-                '',
-                $field['permName']
-            );
-        }
+            self::$fixtures->addFields(self::$trackerId, [[
+                'name' => 'Date field containing the childrens birth date',
+                'type' => 'f',
+                'isHidden' => 'n',
+                'isMandatory' => 'n',
+                'visibleBy' => null,
+                'permName' => 'childrenBirthDate'
+            ], [
+                'name' => 'Link',
+                'type' => 'math',
+                'isHidden' => 'n',
+                'isMandatory' => 'n',
+                'visibleBy' => null,
+                'permName' => 'childrenAdultOn',
+                'options' => $options
+            ]]);
+        });
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->abortIfStaticSetUpFailed();
     }
 
     public static function tearDownAfterClass(): void
@@ -133,8 +90,7 @@ class TrackerFieldMathTest extends TikiTestCase
         $prefs['feature_trackers'] = self::$old_prefs['feature_trackers'];
 
         parent::tearDownAfterClass();
-        self::$trklib->remove_tracker(self::$trackerId);
-        self::$trklib->remove_tracker(self::$linkedTrackerId);
+        self::$fixtures->cleanup();
         $prefs['unified_engine'] = self::$old_prefs['unified_engine'];
     }
 
