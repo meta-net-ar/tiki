@@ -828,16 +828,16 @@
         },
         {
             "name": "christian-riesen/base32",
-            "version": "1.6.0",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ChristianRiesen/base32.git",
-                "reference": "2e82dab3baa008e24a505649b0d583c31d31e894"
+                "reference": "03082b946c111eb6ab41a98626fee33360c5232c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ChristianRiesen/base32/zipball/2e82dab3baa008e24a505649b0d583c31d31e894",
-                "reference": "2e82dab3baa008e24a505649b0d583c31d31e894",
+                "url": "https://api.github.com/repos/ChristianRiesen/base32/zipball/03082b946c111eb6ab41a98626fee33360c5232c",
+                "reference": "03082b946c111eb6ab41a98626fee33360c5232c",
                 "shasum": ""
             },
             "require": {
@@ -881,9 +881,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ChristianRiesen/base32/issues",
-                "source": "https://github.com/ChristianRiesen/base32/tree/1.6.0"
+                "source": "https://github.com/ChristianRiesen/base32/tree/1.6.1"
             },
-            "time": "2021-02-26T10:19:33+00:00"
+            "time": "2026-07-11T19:29:43+00:00"
         },
         {
             "name": "christian-vigh-phpclasses/PdfToText",
@@ -5638,16 +5638,16 @@
         },
         {
             "name": "league/mime-type-detection",
-            "version": "1.16.0",
+            "version": "1.17.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/mime-type-detection.git",
-                "reference": "2d6702ff215bf922936ccc1ad31007edc76451b9"
+                "reference": "f5f47eff7c48ed1003069a2ca67f316fb4021c76"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/2d6702ff215bf922936ccc1ad31007edc76451b9",
-                "reference": "2d6702ff215bf922936ccc1ad31007edc76451b9",
+                "url": "https://api.github.com/repos/thephpleague/mime-type-detection/zipball/f5f47eff7c48ed1003069a2ca67f316fb4021c76",
+                "reference": "f5f47eff7c48ed1003069a2ca67f316fb4021c76",
                 "shasum": ""
             },
             "require": {
@@ -5657,7 +5657,7 @@
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^3.2",
                 "phpstan/phpstan": "^0.12.68",
-                "phpunit/phpunit": "^8.5.8 || ^9.3 || ^10.0"
+                "phpunit/phpunit": "^8.5.8 || ^9.3 || ^10.0 || ^11.0 || ^12.0"
             },
             "type": "library",
             "autoload": {
@@ -5678,7 +5678,7 @@
             "description": "Mime-type detection for Flysystem",
             "support": {
                 "issues": "https://github.com/thephpleague/mime-type-detection/issues",
-                "source": "https://github.com/thephpleague/mime-type-detection/tree/1.16.0"
+                "source": "https://github.com/thephpleague/mime-type-detection/tree/1.17.0"
             },
             "funding": [
                 {
@@ -5690,7 +5690,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-09-21T08:32:55+00:00"
+            "time": "2026-07-09T11:49:27+00:00"
         },
         {
             "name": "league/oauth2-client",
@@ -6419,19 +6419,59 @@
             "time": "2019-10-16T11:51:47+00:00"
         },
         {
-            "name": "npm-asset/babel--parser",
-            "version": "v7.29.1",
-            "source": {
-                "type": "git",
-                "url": "git@github.com:babel/babel.git",
-                "reference": "713d478674cd9f29ff84568f50df43393d6e3068"
-            },
+            "name": "npm-asset/babel--helper-string-parser",
+            "version": "7.29.7",
             "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/babel/babel/zipball/713d478674cd9f29ff84568f50df43393d6e3068",
-                "reference": "713d478674cd9f29ff84568f50df43393d6e3068"
+                "type": "tar",
+                "url": "https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.29.7.tgz"
             },
-            "type": "npm-asset"
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/babel--helper-validator-identifier",
+            "version": "7.29.7",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.29.7.tgz"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/babel--parser",
+            "version": "7.29.7",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/@babel/parser/-/parser-7.29.7.tgz"
+            },
+            "require": {
+                "npm-asset/babel--types": ">=7.29.7,<8.0.0"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
+        },
+        {
+            "name": "npm-asset/babel--types",
+            "version": "7.29.7",
+            "dist": {
+                "type": "tar",
+                "url": "https://registry.npmjs.org/@babel/types/-/types-7.29.7.tgz"
+            },
+            "require": {
+                "npm-asset/babel--helper-string-parser": ">=7.29.7,<8.0.0",
+                "npm-asset/babel--helper-validator-identifier": ">=7.29.7,<8.0.0"
+            },
+            "type": "npm-asset",
+            "license": [
+                "MIT"
+            ]
         },
         {
             "name": "npm-asset/base64-arraybuffer",
@@ -6845,15 +6885,18 @@
         },
         {
             "name": "npm-asset/prefixfree",
-            "version": "1.0.0",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/prefixfree/-/prefixfree-1.0.0.tgz"
+            "version": "v1.0.10",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:LeaVerou/prefixfree.git",
+                "reference": "846904c874a2bf436ff8a9623585f935d7ef4009"
             },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/LeaVerou/prefixfree/zipball/846904c874a2bf436ff8a9623585f935d7ef4009",
+                "reference": "846904c874a2bf436ff8a9623585f935d7ef4009"
+            },
+            "type": "npm-asset"
         },
         {
             "name": "npm-asset/prettier",
@@ -8482,16 +8525,16 @@
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.54",
+            "version": "2.0.55",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "a96a835067c39ee7a709329fe70869817da18081"
+                "reference": "d73c9e019a895be83b18a2ccccfa7e2b0a648743"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/a96a835067c39ee7a709329fe70869817da18081",
-                "reference": "a96a835067c39ee7a709329fe70869817da18081",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/d73c9e019a895be83b18a2ccccfa7e2b0a648743",
+                "reference": "d73c9e019a895be83b18a2ccccfa7e2b0a648743",
                 "shasum": ""
             },
             "require": {
@@ -8572,7 +8615,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.54"
+                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.55"
             },
             "funding": [
                 {
@@ -8588,7 +8631,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-04-27T06:59:24+00:00"
+            "time": "2026-06-14T19:53:12+00:00"
         },
         {
             "name": "pimple/pimple",
@@ -9570,16 +9613,16 @@
         },
         {
             "name": "sabre/dav",
-            "version": "4.7.0",
+            "version": "4.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabre-io/dav.git",
-                "reference": "074373bcd689a30bcf5aaa6bbb20a3395964ce7a"
+                "reference": "f36f002dce082e1d425c4a0dc8c71a6b176c3b07"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabre-io/dav/zipball/074373bcd689a30bcf5aaa6bbb20a3395964ce7a",
-                "reference": "074373bcd689a30bcf5aaa6bbb20a3395964ce7a",
+                "url": "https://api.github.com/repos/sabre-io/dav/zipball/f36f002dce082e1d425c4a0dc8c71a6b176c3b07",
+                "reference": "f36f002dce082e1d425c4a0dc8c71a6b176c3b07",
                 "shasum": ""
             },
             "require": {
@@ -9649,20 +9692,20 @@
                 "issues": "https://github.com/sabre-io/dav/issues",
                 "source": "https://github.com/fruux/sabre-dav"
             },
-            "time": "2024-10-29T11:46:02+00:00"
+            "time": "2026-07-07T08:39:09+00:00"
         },
         {
             "name": "sabre/event",
-            "version": "5.1.8",
+            "version": "5.1.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabre-io/event.git",
-                "reference": "1dd5f55421b0092006510264131a4d632d02d2c1"
+                "reference": "743f1d04811fd5b89f67878d002f6a273ccb089f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabre-io/event/zipball/1dd5f55421b0092006510264131a4d632d02d2c1",
-                "reference": "1dd5f55421b0092006510264131a4d632d02d2c1",
+                "url": "https://api.github.com/repos/sabre-io/event/zipball/743f1d04811fd5b89f67878d002f6a273ccb089f",
+                "reference": "743f1d04811fd5b89f67878d002f6a273ccb089f",
                 "shasum": ""
             },
             "require": {
@@ -9715,7 +9758,7 @@
                 "issues": "https://github.com/sabre-io/event/issues",
                 "source": "https://github.com/fruux/sabre-event"
             },
-            "time": "2026-04-27T04:19:36+00:00"
+            "time": "2026-07-07T09:13:04+00:00"
         },
         {
             "name": "sabre/http",
@@ -9842,16 +9885,16 @@
         },
         {
             "name": "sabre/vobject",
-            "version": "4.6.0",
+            "version": "4.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sabre-io/vobject.git",
-                "reference": "9432544fc369851fb8202c5d91159b2e669f0c88"
+                "reference": "63613f6c53a0a2bddfe22caba0d052e6c59f7d0e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabre-io/vobject/zipball/9432544fc369851fb8202c5d91159b2e669f0c88",
-                "reference": "9432544fc369851fb8202c5d91159b2e669f0c88",
+                "url": "https://api.github.com/repos/sabre-io/vobject/zipball/63613f6c53a0a2bddfe22caba0d052e6c59f7d0e",
+                "reference": "63613f6c53a0a2bddfe22caba0d052e6c59f7d0e",
                 "shasum": ""
             },
             "require": {
@@ -9942,7 +9985,7 @@
                 "issues": "https://github.com/sabre-io/vobject/issues",
                 "source": "https://github.com/fruux/sabre-vobject"
             },
-            "time": "2026-05-31T13:04:55+00:00"
+            "time": "2026-07-07T03:20:17+00:00"
         },
         {
             "name": "sabre/xml",
@@ -12096,16 +12139,16 @@
         },
         {
             "name": "symfony/polyfill-mbstring",
-            "version": "v1.38.1",
+            "version": "v1.38.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-mbstring.git",
-                "reference": "14c5439eec4ccff081ac14eca2dc57feb2a66d92"
+                "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/14c5439eec4ccff081ac14eca2dc57feb2a66d92",
-                "reference": "14c5439eec4ccff081ac14eca2dc57feb2a66d92",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
+                "reference": "d3d318bad5e7a1bfbd026009c8bfb8d8f99ae6b6",
                 "shasum": ""
             },
             "require": {
@@ -12157,7 +12200,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.38.1"
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.38.2"
             },
             "funding": [
                 {
@@ -12177,7 +12220,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-26T12:51:13+00:00"
+            "time": "2026-05-27T06:59:30+00:00"
         },
         {
             "name": "symfony/polyfill-php56",
@@ -14859,25 +14902,25 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.5.52",
+            "version": "8.5.53",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "1015741814413c156abb0f53d7db7bbd03c6e858"
+                "reference": "17cd4291b0ef645b6d21e5ddb6f497694c5e9bcd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/1015741814413c156abb0f53d7db7bbd03c6e858",
-                "reference": "1015741814413c156abb0f53d7db7bbd03c6e858",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/17cd4291b0ef645b6d21e5ddb6f497694c5e9bcd",
+                "reference": "17cd4291b0ef645b6d21e5ddb6f497694c5e9bcd",
                 "shasum": ""
             },
             "require": {
                 "doctrine/instantiator": "^1.5.0",
                 "ext-dom": "*",
+                "ext-filter": "*",
                 "ext-json": "*",
                 "ext-libxml": "*",
                 "ext-mbstring": "*",
-                "ext-xml": "*",
                 "ext-xmlwriter": "*",
                 "myclabs/deep-copy": "^1.13.4",
                 "phar-io/manifest": "^2.0.4",
@@ -14937,31 +14980,15 @@
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
                 "security": "https://github.com/sebastianbergmann/phpunit/security/policy",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/8.5.52"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/8.5.53"
             },
             "funding": [
                 {
-                    "url": "https://phpunit.de/sponsors.html",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/sebastianbergmann",
-                    "type": "github"
-                },
-                {
-                    "url": "https://liberapay.com/sebastianbergmann",
-                    "type": "liberapay"
-                },
-                {
-                    "url": "https://thanks.dev/u/gh/sebastianbergmann",
-                    "type": "thanks_dev"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/phpunit/phpunit",
-                    "type": "tidelift"
+                    "url": "https://phpunit.de/sponsoring.html",
+                    "type": "other"
                 }
             ],
-            "time": "2026-01-27T05:20:18+00:00"
+            "time": "2026-07-06T14:29:25+00:00"
         },
         {
             "name": "phpunit/phpunit-selenium",
