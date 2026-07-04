@@ -11,6 +11,7 @@ use Tiki\Lib\Test\TestHelpers\Tracker\TrackerFixtureFactory;
 
 /**
  * @group integration
+ * @group tracker
  * Integration tests for multi-level tracker sorting.
  */
 class TrackerMultiLevelSortingTest extends TikiTestCase

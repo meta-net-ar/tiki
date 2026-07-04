@@ -16,6 +16,7 @@ use Tracker_Definition;
 
 /**
  * @group integration
+ * @group tracker
  */
 class TrackerDropdownEmptyValueUpdateTest extends TikiTestCase
 {

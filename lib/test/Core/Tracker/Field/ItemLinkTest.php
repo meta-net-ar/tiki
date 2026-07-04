@@ -16,6 +16,9 @@ TikiLib, Tracker_Item;
 
 /**
  * This is a smoke test for the ItemLink fields.  At least it shows how badly we need a better internal API... - benoitg - 2024-07-04
+ *
+ * @group integration
+ * @group tracker
  */
 class TrackerItemLinkTest extends TikiTestCase
 {

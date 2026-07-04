@@ -16,6 +16,9 @@ TikiLib, Tracker_Item;
 
 /**
  * This is a smoke test for the Math field.  At least it shows how badly we need a better internal API... - benoitg - 2024-09-04
+ *
+ * @group integration
+ * @group tracker
  */
 class TrackerFieldMathTest extends TikiTestCase
 {

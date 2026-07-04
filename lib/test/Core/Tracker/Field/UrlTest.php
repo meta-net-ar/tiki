@@ -7,6 +7,10 @@
 
 namespace TikiTests;
 
+/**
+ * @group unit
+ * @group tracker
+ */
 class TrackerFieldUrlTest extends \PHPUnit\Framework\TestCase
 {
     /**

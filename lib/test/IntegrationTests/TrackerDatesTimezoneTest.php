@@ -12,6 +12,7 @@ use Tiki\Lib\Test\TestHelpers\Tracker\TrackerPermissionsFixture;
 
 /**
  * @group integration
+ * @group tracker
  * The purpose of these tests is to ensure consistency between storage, display
  * and filtering of tracker date/time fields with different timezone settings.
  */

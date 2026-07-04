@@ -16,6 +16,7 @@ use TikiLib;
  * Provides common setup, teardown, and helper methods
  *
  * @group api-integration-test
+ * @group tracker
  */
 abstract class ApiBaseTrackersTest extends ApiTestCase
 {

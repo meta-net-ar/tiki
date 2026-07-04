@@ -10,6 +10,7 @@ use Tiki\Lib\Test\TestHelpers\Tracker\TrackerPermissionsFixture;
 
 /**
  * @group integration
+ * @group tracker
  */
 class TrackerItemPermissionTest extends TikiTestCase
 {
