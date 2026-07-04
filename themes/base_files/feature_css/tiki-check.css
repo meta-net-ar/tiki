@@ -352,6 +352,10 @@
 }
 
 /* Table status labels */
+.tiki-check-status.d-none {
+    display: none !important;
+}
+
 .tiki-check-status {
     display: inline-block;
     font-size: 0.75rem;

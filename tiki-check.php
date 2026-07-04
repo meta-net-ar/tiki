@@ -352,7 +352,7 @@ if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalo
 
     if (! isset($smarty) || ! is_object($smarty)) {
         if (class_exists('Smarty\\Smarty')) {
-            $smarty = new Smarty();
+            $smarty = new \Smarty\Smarty();
         }
     }
     if (! isset($smarty) || ! is_object($smarty)) {
@@ -4448,6 +4448,9 @@ if (isStandaloneMode()) {
             margin: 10px 100px 10px 100px;
             }
             table { border-collapse: collapse;}
+            .tiki-check-status.d-none {
+                display: none !important;
+            }
             .tiki-check-status {
                 display: inline-block;
                 font-size: 0.75rem;

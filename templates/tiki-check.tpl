@@ -1140,13 +1140,23 @@ td > div {
     </table>
 {jq}
 var ws, ws_status_update = function(req, status) {
-    document.querySelectorAll('#js-' + req + ' .js-good, #js-' + req + ' .js-bad').forEach(function(el) {
-        el.classList.add('d-none');
-    });
-    document.querySelectorAll('#js-' + req + ' .js-' + status).forEach(function(el) {
-        el.classList.remove('d-none');
-    });
-    $('#js-' + req + ' td').last().text($('#js-' + req + ' td').last().data('message-' + status));
+    var row = document.getElementById('js-' + req);
+    if (!row) {
+        return;
+    }
+    var goodEl = row.querySelector('.js-good');
+    var badEl = row.querySelector('.js-bad');
+    if (goodEl) {
+        goodEl.classList.toggle('d-none', status !== 'good');
+    }
+    if (badEl) {
+        badEl.classList.toggle('d-none', status !== 'bad');
+    }
+    var cells = row.querySelectorAll('td');
+    var messageCell = cells[cells.length - 1];
+    if (messageCell) {
+        messageCell.textContent = messageCell.getAttribute('data-message-' + status) || '';
+    }
 }
 ws_status_update('connectivity', 'bad');
 ws_status_update('message_exchange', 'bad');
