@@ -414,6 +414,7 @@ CREATE TABLE `tiki_calendar_recurrence` (
   `lang` char(16) NOT NULL default 'en',
   `name` varchar(255) NOT NULL default '',
   `description` blob,
+  `sendReminder` tinyint NOT NULL default '1',
   `daily` tinyint(1) default 0,
   `days` int default NULL,
   `weekly` tinyint(1) default '0',
