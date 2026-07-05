@@ -14,8 +14,9 @@ development on a real task, one small reviewable unit at a time.
 
 You (the agent) conduct the process. The developer decides. Every session
 covers **one field type** and ends in **one commit → one merge request**, which
-the community discusses. Progress is tracked in
-`lib/test/Core/Tracker/Field/Characterization/COVERAGE.md`.
+the community discusses. Progress is tracked in `docs/COVERAGE.md` next to
+this file — the provisional home for this workflow's documentation until it
+can live on dev.tiki.org.
 
 The installed base is 24 years of sites worldwide, holding every data pattern
 you can imagine and many you can't: pre-1970 birthdates, option values
@@ -81,7 +82,7 @@ every session covers the unexpected patterns, not just the demo inputs.
 | `lib/test/TestHelpers/Tracker/FieldCharacterizationTestCase.php` | Abstract base: drives a field through input handling, creation and update persistence round-trips, the stored-value (edit-form) fallback, render (CSV + full HTML), indexing, capability interfaces. Pins UTC for the class. |
 | `lib/test/TestHelpers/Tracker/TrackerFixtureFactory.php` | Creates real trackers/fields/items through `TrackerLib::replace_item()` (a data-array save including **all** definition fields, missing ones as `''`); `updateItem()` re-saves an existing item (the only fixture path where `handleSave()` sees a non-null `$oldValue`); `cleanup()` removes everything |
 | `lib/test/Core/Tracker/Field/Characterization/` | One `<Type>Test.php` per characterized class; `RegistryConformanceTest.php` pins registry + capability interfaces for all 53 |
-| `lib/test/Core/Tracker/Field/Characterization/COVERAGE.md` | The checklist: which types are done, planned, conformance-only |
+| `docs/COVERAGE.md` (next to this file) | The checklist: which types are done, planned, conformance-only; also lists each type's open `known-defect` tests |
 | `lib/test/tools/tracker-capability-matrix.php` | CLI generator for the full type × capability × coverage matrix (prints markdown to stdout) |
 | `lib/test/tools/uncovered-lines.php` | Prints the uncovered line ranges of one file from a Clover coverage report — the mechanical coverage audit in step 7 |
 | `lib/core/Tracker/Field/<Type>.php` | The class under test; `lib/core/Tracker/Field/Factory.php` maps codes → classes and pref gating |
@@ -182,6 +183,30 @@ audited against at step 5. One row per:
   keyed on `$oldValue`, the update path is a mandatory row
   (`updateCaseProvider()`); otherwise one row confirming update ≡ create, or
   a waiver.
+- **Render arm.** Every render branch, not just the default one: each field
+  variant you declare in `fieldSpecs()` must show up in at least one
+  `renderInput()`/`renderOutput()` pin or carry a waiver. Render methods
+  routinely have a privileged/locked/fallback arm that only fires for some
+  option combination — declaring the variant but never rendering it leaves
+  that arm dark, and those arms are where escaping bugs hide (a real session
+  found an unescaped `implode()` in exactly such a locked-fallback arm).
+  While reading render code, every `implode()`, string concatenation or
+  direct echo into HTML is a row of its own: escaped or not, pinned at which
+  layer — paired with the dirty-store probes below.
+- **Dirty-store render probes.** If the fixture save path bypasses the
+  type's validation (no `handleSave()`, `replace_item()` stores the value
+  verbatim — see "Validation layering" above), then 24 years of installs
+  guarantee stored values that today's validation would reject. Store the
+  standard edge inputs (XSS-shaped, `'0'`, comma-containing, multibyte)
+  through the fixture and push each through every render arm — these are
+  mandatory rows, not optional extras.
+- **Out-of-class behavior.** Grep the shared save/render code for the type:
+  its class name, its letter code, its option names — in `lib/trackerlib.php`
+  and `lib/core/Services/Tracker/`. Special cases for a type baked directly
+  into `replace_item()` or a service (one session found a realname→login
+  substitution for one autoassign mode living inside `replace_item()` itself)
+  are contract rows exactly like branches inside the class — and no reading
+  of the class alone will ever surface them.
 - **Standard edge inputs** and the **type-family boundaries** below.
 
 Mark every row `case` (will be pinned) or `waive: <reason>` (unreachable in
@@ -281,7 +306,9 @@ Contract rows the three main providers can't reach — patterns:
   dedicated test method with `expectException()`.
 - **Values the UI could never submit but the DB can hold** (legacy data):
   `roundTripCaseProvider()` stores through replace_item, which skips
-  validation — use it to pin how render/getValue cope with dirty stored data.
+  validation — this is how the contract's dirty-store render probes get
+  their stored values (custom render methods per variant for the arms the
+  render provider can't reach).
 
 Fill expectations with the developer's predictions, run, and record what
 actually happens. Expected differences between prediction and reality are the
@@ -317,12 +344,28 @@ This is the disciplined path from "that looks wrong" to a decision:
 3. **A/B if you found a candidate commit.** Temporarily restore the old code
    in the working tree, rerun the probe, revert. Now you have proof, not
    suspicion.
-4. **GATE — the developer decides:** pin the behavior as a documented quirk,
-   record it for a bug report, or fix it now. A fix means test-first, as two
-   commits: first the **green feature pins** for whatever the breaking change
-   was built for (its behavior must not regress), then the **red regression
-   pins together with the minimal fix** that turns everything green. Bisect
-   stays clean and the review shows the feature was protected.
+4. **GATE — the developer decides between three outcomes:**
+   - **Downgrade to "quirky but tolerable"** — the investigation showed the
+     value is defensible; pin it green with a `(pins current behavior)` name,
+     like any step-5 quirk.
+   - **Wrong, fix later** — write a **known-defect test**: a test asserting
+     the *intended* behavior, which therefore fails today and becomes the
+     ready-made regression pin for whoever fixes it. Tag the method
+     `@group known-defect` — that group is excluded from default PHPUnit runs
+     (see `phpunit.xml.dist`), so the suite stays green while the finding
+     stays in the codebase, enumerable and runnable at any time with
+     `php phpunit --group known-defect`. The docblock states the intended
+     behavior, the current wrong behavior, and how the finding was made.
+     Fixing the bug = deleting the group tag; the test joins the default
+     suite. Never pin the wrong value green instead — a green pin of a judged
+     defect buries the finding in a passing suite, and whether it ever gets
+     fixed then depends on someone remembering. List the defect test in the
+     type's `docs/COVERAGE.md` entry.
+   - **Fix it now** — test-first, as two commits: first the **green feature
+     pins** for whatever the breaking change was built for (its behavior must
+     not regress), then the **red regression pins together with the minimal
+     fix** that turns everything green. Bisect stays clean and the review
+     shows the feature was protected.
 
 **Worked example (this really happened).** Characterizing AutoIncrement (`q`),
 the value refused to round-trip — stored nothing, ever. Instead of forcing the
@@ -358,20 +401,36 @@ The step-5 contract audit is judgment; this one is measurement, and it is
 deliberately independent of anyone's opinion of where the gaps should be —
 it compares the test against the code itself:
 
+First, **predict the output**: from the test docblock's "Not covered:" list,
+write down which line ranges you expect the report to print. Then run:
+
 ```bash
 php -d pcov.directory=lib/core/Tracker/Field lib/test/phpunit.php \
-    --filter 'Characterization.*<Type>Test' --coverage-clover /tmp/cov.xml
+    --filter 'Characterization.*<Type>Test' --coverage-clover /tmp/cov.xml \
+    --coverage-filter lib/core/Tracker/Field
 php lib/test/tools/uncovered-lines.php /tmp/cov.xml lib/core/Tracker/Field/<Type>.php
 ```
 
 Requires the pcov extension (`apt-get install php8.4-pcov`, or Xdebug in
-coverage mode); takes ~30s because the whole run is instrumented.
+coverage mode); takes ~30s because the whole run is instrumented. Do not drop
+`--coverage-filter`: without it, report generation computes 0% denominators
+for every file under phpunit's `<source>` (all of `./lib`) — thousands of
+`file_get_contents()` calls that are slow at best and, on constrained
+filesystems, die in an EMFILE-turned-TypeError inside php-code-coverage.
 
 Rule: **every line range the report prints must be explained** — either by a
 "Not covered:" waiver already in the test docblock, or by adding one now
 (with the developer's sign-off, it's a step-5 verdict), or by writing the
 missing case. An uncovered range nobody can account for means the contract
 of step 3 was incomplete: go back, add the row, cover or waive it.
+
+Compare the printout against your prediction. A range you did not predict is
+a double finding: the missing case or waiver itself, *and* a blind spot in
+the step-3 reading — before moving on, say what in the class walk-through
+missed it (a render arm never exercised? a helper not opened? an option
+variant declared but never driven?) so the next contract doesn't have the
+same hole. The audit is the backstop; the contract is supposed to get there
+first.
 
 Ranges that are normally waivable in one line: the `getManagedTypesInfo()`
 declaration array (data, not behavior); interface plumbing already pinned by
@@ -383,7 +442,9 @@ behavior somebody's data depends on.
 If the type's `getFieldData()`/`handleSave()` logic lives partly in a shared
 helper (`TrackerLib::build_date()` style), audit the helper's lines too:
 widen `pcov.directory` (e.g. `-d pcov.directory=lib`) and run the report a
-second time against the helper's file.
+second time against the helper's file. Widen `--coverage-filter` to match
+(the helper's directory alongside the field dir) — expect a slower report
+walk; acceptable once per session.
 
 No new warnings or notices beyond the known pre-existing ones (currently: two
 `checkbox.tpl` "Undefined array key defaultvalue" notices). PHPUnit surfaces
@@ -394,8 +455,9 @@ the docblock.
 
 ### 8. Close: checklist, commit, merge request
 
-- Update `COVERAGE.md`: check the box, move the entry to "Characterized" with
-  the test filename.
+- Update `docs/COVERAGE.md` (in this skill's folder): check the box, move the
+  entry to "Characterized" with the test filename, and list any `known-defect`
+  tests the session produced.
 - Optionally regenerate the matrix to review the type's capability claims:
   `php lib/test/tools/tracker-capability-matrix.php`.
 - One commit, test + checklist update together:
@@ -434,6 +496,12 @@ infrastructure, not a per-session decision.
   behavior is itself the thing under characterization.
 - PHPUnit parses annotations anywhere in a docblock — never write a data
   provider annotation as prose inside a test-method docblock.
+- Docker containers default to a soft fd limit of 1024, which the coverage
+  run can exhaust; wrap it:
+  `docker exec … sh -c 'ulimit -n 65535 && php …'`. Shared filesystems
+  (virtiofs and friends) exhaust fds on the host side on top of that — if
+  file operations start failing with "Too many open files" at a limit that
+  should be plenty, suspect the filesystem, not the process.
 
 ## Cross-cutting reflexes
 

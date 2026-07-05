@@ -3,13 +3,16 @@
 Tracks which of the 53 tracker field classes have a per-type characterization
 test and which do not yet. The process for working this list — one field type
 per session, one commit, one merge request, developer and agent together — is
-the `tiki-tracker-field-coverage` skill (`.agents/skills/`). The generated
-capability view is `php lib/test/tools/tracker-capability-matrix.php`.
+the `tiki-tracker-field-coverage` skill (the folder above this one). This
+`docs/` folder is the provisional home for the workflow's documentation; the
+intended final home is dev.tiki.org. The generated capability view is
+`php lib/test/tools/tracker-capability-matrix.php`.
 
-All 53 classes are pinned by `RegistryConformanceTest.php` in this directory
-(registry, capability interfaces, `getFieldData()` signature) regardless of
-the checkboxes below. A checked box = a per-type characterization test in
-this directory.
+The tests themselves live in `lib/test/Core/Tracker/Field/Characterization/`.
+All 53 classes are pinned by `RegistryConformanceTest.php` there (registry,
+capability interfaces, `getFieldData()` signature) regardless of the
+checkboxes below. A checked box = a per-type characterization test in that
+directory.
 
 Status: **5 characterized, 8 conformance-only by design, 40 to go.**
 
@@ -24,7 +27,8 @@ Status: **5 characterized, 8 conformance-only by design, 40 to go.**
 ## Covered by targeted tests, characterization still pending
 
 These have behavior tests in `lib/test/Core/Tracker/Field/`; the box stays
-open until a characterization test exists in this directory too.
+open until a characterization test exists in the Characterization directory
+too.
 
 - [ ] AutoIncrement — `q` — regression test `AutoIncrementTest.php` (services + data-array insert paths, itemId mode). Generated value (the field computes it at save) — use closure expectations. Backstory: the characterization attempt found a silent regression in `replace_item()` — see the worked example in the skill.
 - [ ] ItemsList — `l` — behavior test `ItemsListTest.php` (transfer-save synchronization, two-tracker fixture)
@@ -97,4 +101,8 @@ constant. Re-open only if a targeted test becomes warranted.
 ## Updating this file
 
 Check the box, move the entry to "Characterized" with the test filename, and
-adjust the status line. The update ships in the same commit as the test.
+adjust the status line. If the session produced `known-defect` tests (failing
+tests asserting intended behavior, excluded from default runs — see the
+suspicious-value subflow in the skill), list each on the type's entry:
+test method name and one line on what is wrong. The update ships in the same
+commit as the test.
