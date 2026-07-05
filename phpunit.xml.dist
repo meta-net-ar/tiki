@@ -50,6 +50,9 @@
       <group>disable</group>
       <group>marked-as-skipped</group>
       <group>marked-as-incomplete</group>
+      <!-- Failing tests that assert intended behavior for a known, not yet
+           fixed bug; run them by selecting the known-defect group -->
+      <group>known-defect</group>
       <!-- require pref lang_google_api_key -->
       <group>GoogleTranslate</group>
       <group>RequiresWebserver</group>
