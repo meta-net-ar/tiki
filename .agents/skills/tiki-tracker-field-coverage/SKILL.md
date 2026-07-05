@@ -247,6 +247,7 @@ guards single out.
 | numeric-like | negative; `'1e5'` (`is_numeric()` says yes); comma decimal `'3,5'` (European input); leading zeros `'007'`; formatting options (decimals/separators/prepend/append) at render |
 | option-list | `value=label` (equal-sign) syntax; quoted options; **an option value containing a comma** (CSV-stored multi-values shear apart); option value `'0'`; duplicated option (default-value logic); a value not in the options list — at getFieldData level and through `isValid()` |
 | free text | a value longer than any max/truncation option, in multibyte; wiki/plugin syntax if the type parses content; the multilingual configuration if the type supports it (JSON storage, string→array migration arm) |
+| user/object reference | a stored reference that no longer resolves (logins outlive deleted accounts — the storage layer never re-validates); a picker UI sentinel submitted as data (`'-Blank (no data)-'` resolved to a literal null entry and poisoned the stored CSV with a trailing comma); the "display form" of the reference submitted instead of the identifier (`'Real Name (login)'` paren-form vs raw login); permission-gated lookups that silently degrade to no-restriction or no-op when the acting user lacks the grant |
 
 If your type's family has no row here, or its row misses boundaries you
 derived, **extend this table in the same commit as the test** — one line,

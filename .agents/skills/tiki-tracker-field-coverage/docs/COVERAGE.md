@@ -15,7 +15,7 @@ checkboxes below. `[x]` = characterized through the skill process; `[/]` = a
 per-type test exists but it predates the skill — a skill pass is still
 missing; `[ ]` = no per-type test yet.
 
-Status: **5 pre-skill demos pending a skill pass, 8 conformance-only by design, 40 to go.**
+Status: **1 characterized, 5 pre-skill demos pending a skill pass, 8 conformance-only by design, 39 to go.**
 
 ## Characterized
 
@@ -30,6 +30,9 @@ each is still missing** and each is expected to grow cases when it happens.
 - [/] TextArea — `a` — `TextAreaTest.php` (value-like; full-HTML render opted out, editor widget can't run headless) (pre-skill demo — skill pass pending)
 - [/] Numeric — `n` — `NumericTest.php` (pre-skill demo — skill pass pending)
 - [/] Checkbox — `c` — `CheckboxTest.php` (pre-skill demo — skill pass pending)
+- [x] UserSelector — `u` — `UserSelectorTest.php` (only AutoSyncable type in the registry; split behavior — plain value-like at the persistence layer since there's no `handleSave()`, but autoassign/Creator/Modifier logic lives entirely in `getFieldData()`, exercised directly on bound handlers). Known-defect tests found:
+  - `testRenderInputLockedArmShouldEscapeValue` — the autoassign "locked" render arm builds its visible text with an unescaped `implode()`; only the hidden-input value is escaped. A dirty stored value (this type has no `handleSave()`/`isValid()` gate) renders unescaped HTML.
+  - `testRenderInnerOutputHistoryContextOnlyRemovesMatchingFeedback` — history-mode Feedback cleanup uses `preg_match(...) !== false`, which is true for a plain non-match too, so it strips ALL error feedback instead of just the "user not found" message it targets. Real regression from commit `2dfbd9cb` (2024), traced via `git log -L`; the 2023 version used exact `in_array()` matching correctly.
 
 ## Covered by targeted tests, characterization still pending
 
@@ -46,7 +49,6 @@ too.
 ## Planned batch: choice/date
 
 - [ ] DateTime — `f` — non-deterministic now-default: closure expectations
-- [ ] UserSelector — `u` — only AutoSyncable type in the registry
 - [ ] GroupSelector — `g` — autoassign gates on `is_null($oldValue)`; worth pinning explicitly (it was dead during the `replace_item()` regression)
 - [ ] Category — `e` — support fixture: category via categlib, cleanup removes it
 
