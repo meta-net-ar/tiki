@@ -11,18 +11,25 @@ intended final home is dev.tiki.org. The generated capability view is
 The tests themselves live in `lib/test/Core/Tracker/Field/Characterization/`.
 All 53 classes are pinned by `RegistryConformanceTest.php` there (registry,
 capability interfaces, `getFieldData()` signature) regardless of the
-checkboxes below. A checked box = a per-type characterization test in that
-directory.
+checkboxes below. `[x]` = characterized through the skill process; `[/]` = a
+per-type test exists but it predates the skill — a skill pass is still
+missing; `[ ]` = no per-type test yet.
 
-Status: **5 characterized, 8 conformance-only by design, 40 to go.**
+Status: **5 pre-skill demos pending a skill pass, 8 conformance-only by design, 40 to go.**
 
 ## Characterized
 
-- [x] Text — `t` — `TextTest.php`
-- [x] Dropdown — `d`, `D`, `R`, `M` — `DropdownTest.php`
-- [x] TextArea — `a` — `TextAreaTest.php` (value-like; full-HTML render opted out, editor widget can't run headless)
-- [x] Numeric — `n` — `NumericTest.php`
-- [x] Checkbox — `c` — `CheckboxTest.php`
+The `[/]` entries below predate the skill: they were written as happy-path
+demonstrations of the harness. A per-type test exists for each, but none of
+them has been through the skill process (coverage contract, standard edge
+inputs, dirty-store render probes, mechanical audit) — **a skill pass on
+each is still missing** and each is expected to grow cases when it happens.
+
+- [/] Text — `t` — `TextTest.php` (pre-skill demo — skill pass pending)
+- [/] Dropdown — `d`, `D`, `R`, `M` — `DropdownTest.php` (pre-skill demo — skill pass pending)
+- [/] TextArea — `a` — `TextAreaTest.php` (value-like; full-HTML render opted out, editor widget can't run headless) (pre-skill demo — skill pass pending)
+- [/] Numeric — `n` — `NumericTest.php` (pre-skill demo — skill pass pending)
+- [/] Checkbox — `c` — `CheckboxTest.php` (pre-skill demo — skill pass pending)
 
 ## Covered by targeted tests, characterization still pending
 
