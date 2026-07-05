@@ -7,7 +7,6 @@
 
 namespace Tiki\Test\Performance;
 
-require_once 'lib/test/TikiTestCase.php';
 require_once 'lib/performance/performancestatslib.php';
 
 class PerformanceStatsLibTest extends \TikiTestCase

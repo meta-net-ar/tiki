@@ -22,7 +22,7 @@ class WikiLibTest extends TestCase
     {
         global $testhelpers;
 
-        require_once(__DIR__ . '/../TestHelpers.php');
+        $testhelpers = new \TestHelpers();
         $testhelpers->simulateTikiScriptContext();
 
         require_once(__DIR__ . '/../../../lib/wiki/renderlib.php');

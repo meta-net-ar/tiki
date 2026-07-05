@@ -38,7 +38,6 @@ class ConnectClientTest extends TikiTestCase
     {
         global $TWV;
 
-        include_once(__DIR__ . '/../../../setup/twversion.class.php');
         $TWV = new TWVersion();
 
         $data = $this->obj->buildConnectData(); // TODO check status etc
