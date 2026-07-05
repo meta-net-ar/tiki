@@ -1,6 +1,6 @@
 ---
 name: tiki-tracker-field-coverage
-description: Use when adding characterization test coverage for a Tiki tracker field type together with a developer — picking the next uncovered type from the coverage checklist, deciding its tier, building the coverage contract (every code branch, every option value, every standard edge input: pinned or waived in writing), writing a record-don't-design test on FieldCharacterizationTestCase, judging every recorded value with the developer, investigating suspicious values through the real save path, and delivering one field type as one commit / one merge request. This is a guided collaborative process with mandatory stop points, not an autonomous sweep.
+description: Use when adding characterization test coverage for a Tiki tracker field type together with a developer — picking the next uncovered type from the coverage checklist, agreeing where its stored value comes from (submitted, generated at save, or an external service), building the coverage contract (every code branch, every option value, every standard edge input: pinned or waived in writing), writing a record-don't-design test on FieldCharacterizationTestCase, judging every recorded value with the developer, investigating suspicious values through the real save path, and delivering one field type as one commit / one merge request. This is a guided collaborative process with mandatory stop points, not an autonomous sweep.
 ---
 
 # Tracker field-type coverage, one field at a time
@@ -28,8 +28,8 @@ every session covers the unexpected patterns, not just the demo inputs.
 
 1. **One field type per session.** A class registering several type codes
    (Dropdown = `d`/`D`/`R`/`M`) is still one test. Only after the developer has
-   landed two solo fields may you offer to pair two trivially similar tier-1
-   types in one session — their call.
+   landed two solo fields may you offer to pair two trivially similar
+   stores-what-was-submitted types in one session — their call.
 2. **Never edit production code while characterizing.** Characterization
    records what the code does. If a recorded value looks wrong, that is the
    *suspicious-value subflow* below — never a quick fix, never silent.
@@ -59,6 +59,20 @@ every session covers the unexpected patterns, not just the demo inputs.
    timezone prefs and PHP's default timezone to UTC for you; don't defeat
    that with expectations computed from the host environment, and prefer
    `gmdate()` over `date()` in closure expectations.
+9. **Speak the developer's language, not this file's.** "Pin", "waiver",
+   "characterization", "coverage contract" are internal vocabulary of this
+   skill — the developer has not read it and is not expected to. Define
+   every such term in plain words the first time you use it in a session
+   ("pinning means: writing a test that asserts what the code does today,
+   right or wrong"; "a waiver is just a written note saying we chose not to
+   test something and why") and re-explain at any sign of confusion. Never
+   invent numbered categories when talking to the developer — say what a
+   thing does, not which bucket it's in. If the developer cannot say in
+   their own words why a case exists or what a gate is deciding, that gate
+   is not passed — their understanding is a deliverable (rule 4), and
+   undefined jargon is how it silently fails. Jargon also does its damage
+   quietly: it makes testing sound harder than it is, and a developer who
+   leaves a session thinking tests are arcane will not come back.
 
 ## The pieces you work with
 
@@ -69,6 +83,7 @@ every session covers the unexpected patterns, not just the demo inputs.
 | `lib/test/Core/Tracker/Field/Characterization/` | One `<Type>Test.php` per characterized class; `RegistryConformanceTest.php` pins registry + capability interfaces for all 53 |
 | `lib/test/Core/Tracker/Field/Characterization/COVERAGE.md` | The checklist: which types are done, planned, conformance-only |
 | `lib/test/tools/tracker-capability-matrix.php` | CLI generator for the full type × capability × coverage matrix (prints markdown to stdout) |
+| `lib/test/tools/uncovered-lines.php` | Prints the uncovered line ranges of one file from a Clover coverage report — the mechanical coverage audit in step 7 |
 | `lib/core/Tracker/Field/<Type>.php` | The class under test; `lib/core/Tracker/Field/Factory.php` maps codes → classes and pref gating |
 
 Existing tests to imitate: `TextTest.php` (simple), `DropdownTest.php` (quirky
@@ -108,21 +123,28 @@ failure). Two operational traps to state up front:
 Open `COVERAGE.md`, show the developer what is open in the current batch, and
 let them pick. Prefer checklist order; any open type is acceptable.
 
-### 2. Decide the tier — GATE
+### 2. Where does the stored value come from? — GATE
 
-Read `getFieldData()` and `handleSave()` of the class, then agree on a tier
-**before** writing anything:
+Read `getFieldData()` and `handleSave()` of the class, then agree on the
+answer **before** writing anything. Three possible answers, each changing
+how the test is written:
 
-| Tier | Meaning | Test approach |
+| The stored value… | Meaning | Test approach |
 |---|---|---|
-| 1 — value-like | submitted value == stored value | full characterization, as-is |
-| 2 — pipeline-driven | stored value is *produced* at save time (counter, computation, upload) | characterization with closure expectations for generated values; may need fixture design — see "First real tier-2 field" below |
-| 3 — external dependency | needs LDAP, BBB, remote service… | conformance-only (already covered); a per-type test only if the developer argues it's worth the fixture cost |
+| …is what was submitted (a **value-like** field) | submitted value == stored value | full characterization, as-is |
+| …is generated at save time (a **generated-value** field) | the field produces its own value: a counter, a computation, an upload | characterization with closure expectations for the generated values; may need fixture design — see "First real generated-value field" below |
+| …depends on an external service (an **external** field) | needs LDAP, BBB, remote service… | conformance-only (already covered); a per-type test only if the developer argues it's worth the fixture cost |
 
 Deciding signals: does `getFieldData()` return the request value unchanged?
 Does `handleSave()` compute something (check what it does when `$oldValue` is
 null — that means "item being created")? Does anything read `$_FILES`,
 session, or an external service?
+
+The bold names exist only so later sections of this file can refer back —
+they are ordinary words that self-explain if said aloud. With the developer,
+put the question exactly as this step's title does, and describe each answer
+by what the field does ("this one stores exactly what you type"), never as a
+category number or level (ground rule 9).
 
 ### 3. Read the class, build the coverage contract — GATE
 
@@ -182,14 +204,30 @@ predictions down. Wrong predictions are where the learning is.
 | Absent key / empty string / whitespace-only | usually three different arms, only one of them intended |
 | Non-empty stored value + absent input | the edit-form fallback; an "absent input" pin on a new item only proves the empty-stored variant |
 
-#### Type-family boundaries — add the matching rows
+#### Type-family boundaries — worked examples, NOT a catalog
 
-| Family | Rows |
+The table below is what past sessions found for the families they touched.
+It is deliberately incomplete: rows exist only for families someone has
+already characterized, and even those rows list what *that* type exposed.
+Treat it as evidence of the kind of boundary that exists, never as the list
+to satisfy — **derive your type's boundary rows from its own value domain
+and its own code**, the way these were derived: ask what 24 years of real
+data could hold in this value (extremes, legacy formats, values from other
+locales, values written by code that no longer exists) and what the code's
+guards single out.
+
+| Family | Example rows from past sessions |
 |---|---|
-| date/time | epoch `0`; a negative timestamp (pre-1970 birthdates exist in real data); a 13-digit millisecond value ending in `000` **and** one not ending in `000`; every mode of the type's format option (date-only arms usually carry the timezone arithmetic — highest-risk branch for a worldwide install base); 12-hour/Meridian inputs if the helper supports them |
+| date/time | epoch `0`; a negative timestamp (pre-1970 birthdates exist in real data); a 13-digit millisecond value ending in `000` **and** one not ending in `000`; every mode of the type's format option (date-only arms carried the timezone arithmetic); 12-hour/Meridian inputs |
 | numeric-like | negative; `'1e5'` (`is_numeric()` says yes); comma decimal `'3,5'` (European input); leading zeros `'007'`; formatting options (decimals/separators/prepend/append) at render |
 | option-list | `value=label` (equal-sign) syntax; quoted options; **an option value containing a comma** (CSV-stored multi-values shear apart); option value `'0'`; duplicated option (default-value logic); a value not in the options list — at getFieldData level and through `isValid()` |
 | free text | a value longer than any max/truncation option, in multibyte; wiki/plugin syntax if the type parses content; the multilingual configuration if the type supports it (JSON storage, string→array migration arm) |
+
+If your type's family has no row here, or its row misses boundaries you
+derived, **extend this table in the same commit as the test** — one line,
+what you added and why it bites. The table grows from sessions, not from
+anyone's up-front analysis; a family with no row means nobody has been
+there yet, not that there is nothing to find.
 
 Rows whose family doesn't apply: skip silently. Rows that apply but won't be
 pinned this session: waive in writing.
@@ -253,7 +291,9 @@ material for step 5.
 
 First **audit the contract**: walk the step-3 table; every row must now point
 at a pinned case name or carry its waiver, and waivers must appear as "Not
-covered:" lines in the test docblock. Only then go through each recorded
+covered:" lines in the test docblock. (This is the judgment audit — the
+mechanical one, line coverage against the class itself, runs in step 7 and
+will catch what this walk misses.) Only then go through each recorded
 value with the developer. Three verdicts each:
 
 - **Correct** — pin it.
@@ -269,7 +309,8 @@ This is the disciplined path from "that looks wrong" to a decision:
    a browser form goes through `Services_Tracker_Utilities::insertItem()` /
    `updateItem()`. Write a small probe script (not a test yet) driving the
    services path. Same wrong value there = real bug candidate. Different
-   value = you learned something about save-path shapes; reassess the tier.
+   value = you learned something about save-path shapes; reassess where the
+   stored value really comes from (step 2 — maybe it is generated after all).
 2. **Check history.** `git log -L<start>,<end>:<file>` on the code involved.
    A recent semantic change in a drive-by hunk of an unrelated feature commit
    is the classic shape.
@@ -311,6 +352,39 @@ The third run catches host-timezone leakage (ground rule 8): the harness pins
 prefs and PHP to UTC, but an expectation computed with `date()` at provider
 build time, or a pin recorded from a non-UTC machine, still slips through.
 
+#### Mechanical coverage audit
+
+The step-5 contract audit is judgment; this one is measurement, and it is
+deliberately independent of anyone's opinion of where the gaps should be —
+it compares the test against the code itself:
+
+```bash
+php -d pcov.directory=lib/core/Tracker/Field lib/test/phpunit.php \
+    --filter 'Characterization.*<Type>Test' --coverage-clover /tmp/cov.xml
+php lib/test/tools/uncovered-lines.php /tmp/cov.xml lib/core/Tracker/Field/<Type>.php
+```
+
+Requires the pcov extension (`apt-get install php8.4-pcov`, or Xdebug in
+coverage mode); takes ~30s because the whole run is instrumented.
+
+Rule: **every line range the report prints must be explained** — either by a
+"Not covered:" waiver already in the test docblock, or by adding one now
+(with the developer's sign-off, it's a step-5 verdict), or by writing the
+missing case. An uncovered range nobody can account for means the contract
+of step 3 was incomplete: go back, add the row, cover or waive it.
+
+Ranges that are normally waivable in one line: the `getManagedTypesInfo()`
+declaration array (data, not behavior); interface plumbing already pinned by
+`RegistryConformanceTest`; branches of capability methods
+(tabular/filter/facets) beyond the base smoke test — if the developer agrees
+the fixture cost is disproportionate. Everything else is presumed to be
+behavior somebody's data depends on.
+
+If the type's `getFieldData()`/`handleSave()` logic lives partly in a shared
+helper (`TrackerLib::build_date()` style), audit the helper's lines too:
+widen `pcov.directory` (e.g. `-d pcov.directory=lib`) and run the report a
+second time against the helper's file.
+
 No new warnings or notices beyond the known pre-existing ones (currently: two
 `checkbox.tpl` "Undefined array key defaultvalue" notices). PHPUnit surfaces
 warnings as test issues — a new warning is a finding, treat it as step 5.
@@ -332,7 +406,7 @@ the docblock.
   pinned quirks belongs to people, in the MR and wherever the team
   synchronizes; that part is out of your hands by design.
 
-## First real tier-2 field
+## First real generated-value field
 
 There is no request-shaped fixture yet (`createItemFromRequest()` does not
 exist). Note that `TrackerFixtureFactory::createItem()` already includes all

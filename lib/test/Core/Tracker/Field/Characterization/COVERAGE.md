@@ -17,7 +17,7 @@ Status: **5 characterized, 8 conformance-only by design, 40 to go.**
 
 - [x] Text — `t` — `TextTest.php`
 - [x] Dropdown — `d`, `D`, `R`, `M` — `DropdownTest.php`
-- [x] TextArea — `a` — `TextAreaTest.php` (tier 1; full-HTML render opted out, editor widget can't run headless)
+- [x] TextArea — `a` — `TextAreaTest.php` (value-like; full-HTML render opted out, editor widget can't run headless)
 - [x] Numeric — `n` — `NumericTest.php`
 - [x] Checkbox — `c` — `CheckboxTest.php`
 
@@ -26,9 +26,9 @@ Status: **5 characterized, 8 conformance-only by design, 40 to go.**
 These have behavior tests in `lib/test/Core/Tracker/Field/`; the box stays
 open until a characterization test exists in this directory too.
 
-- [ ] AutoIncrement — `q` — regression test `AutoIncrementTest.php` (services + data-array insert paths, itemId mode). Tier 2: generated value, use closure expectations. Backstory: the characterization attempt found a silent regression in `replace_item()` — see the worked example in the skill.
+- [ ] AutoIncrement — `q` — regression test `AutoIncrementTest.php` (services + data-array insert paths, itemId mode). Generated value (the field computes it at save) — use closure expectations. Backstory: the characterization attempt found a silent regression in `replace_item()` — see the worked example in the skill.
 - [ ] ItemsList — `l` — behavior test `ItemsListTest.php` (transfer-save synchronization, two-tracker fixture)
-- [ ] ItemLink — `r` — legacy `ItemLinkTest.php` (link semantics, mirror-field indexing); possibly tier 2
+- [ ] ItemLink — `r` — legacy `ItemLinkTest.php` (link semantics, mirror-field indexing); value may be generated at save — check handleSave()
 - [ ] Math — `math` — legacy `MathTest.php` (calculation; render-bleed workaround patterns)
 - [ ] Url — `L` — legacy `UrlTest.php` (URL validation)
 
@@ -44,9 +44,9 @@ open until a characterization test exists in this directory too.
 - [ ] ItemLink — `r` — support fixture: second tracker + item (see above)
 - [ ] ItemsList — `l` — two-tracker fixture exists in `ItemsListTest.php` (see above)
 - [ ] Relation — `REL`
-- [ ] Files — `FG` — tier 2 candidate: `$_FILES` upload context; file-gallery fixture
+- [ ] Files — `FG` — generated-value candidate: `$_FILES` upload context; file-gallery fixture
 - [ ] Math — `math` (see above)
-- [ ] Computed — `C` — tier 2 candidate: derived from other fields
+- [ ] Computed — `C` — generated-value candidate: derived from other fields
 
 ## Long tail
 
@@ -59,7 +59,7 @@ open until a characterization test exists in this directory too.
 - [ ] DynamicList — `w` — Enumerable
 - [ ] Email — `m`
 - [ ] EmailFolder — `EF`
-- [ ] File (Attachment) — `A` — tier 2 candidate: `$_FILES` upload context
+- [ ] File (Attachment) — `A` — generated-value candidate: `$_FILES` upload context
 - [ ] Freetags — `F`
 - [ ] GeographicFeature — `GF` — round-trip coordinates only, exclude render/geocode (decide finally during implementation)
 - [ ] Heading — `h`
@@ -79,7 +79,7 @@ open until a characterization test exists in this directory too.
 - [ ] UserSubscription — `U`
 - [ ] Wiki — `wiki`
 
-## Conformance-only by design (tier 3 — no characterization planned)
+## Conformance-only by design (external-service types — no characterization planned)
 
 External dependency makes a per-type behavior test disproportionate; each is
 pinned by `RegistryConformanceTest.php` with the exclusion reason as a
