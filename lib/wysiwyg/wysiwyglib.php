@@ -11,18 +11,20 @@
 class WYSIWYGLib
 {
     /**
-     * Shared map from Tiki language codes to editor locale codes, used by both
-     * getEditorLang() (Summernote) and languageMapISO() (Toast UI).
+     * Editorial disambiguation map from Tiki language codes to editor locale codes.
+     * Used by resolveLocaleCode() (Summernote) and languageMapISO() (Toast UI).
      *
-     * How getEditorLang() consumes this map:
-     *   - Hyphenated value (e.g. 'fr-FR'): used directly as the Summernote locale.
-     *   - Bare value (e.g. 'ar', 'pt'): passed as a hint to resolveSummernoteLocale()
-     *     for disk-based discovery of the best matching locale variant.
-     *   - Empty string (''): English default — Summernote needs no locale file.
-     *   - null (language absent from map): resolveSummernoteLocale() uses the raw Tiki code.
+     * TikiLib::get_language() returns bare codes (e.g. 'es', 'fr'), which can match
+     * more than one locale file on disk. This map makes the explicit editorial choice
+     * (e.g. 'de' → 'de-DE' rather than 'de-CH'). Languages absent from the map fall
+     * back to disk-based discovery in resolveSummernoteLocale().
+     *
+     * Special cases:
+     *   - Empty string (''): English — Summernote has no locale file; Toast uses its default.
+     *   - 'ar': bare code kept because Toast UI ships ar.js; Summernote resolves ar-AR from disk.
      */
     private const TIKI_EDITOR_LOCALE_MAP = [
-        'ar'      => 'ar',           // Arabic (bare — resolveSummernoteLocale finds the right variant)
+        'ar'      => 'ar',           // Toast UI: ar.js exists; Summernote: disk resolves ar-AR regardless
         //'bg'    => 'bg',           // Bulgarian — no editor file yet
         //'ca'    => 'ca',           // Catalan — no editor file yet
         'cn'      => 'zh-CN',        // Simplified Chinese: Tiki='cn', editors='zh-CN'
@@ -56,7 +58,8 @@ class WYSIWYGLib
         'nl'      => 'nl-NL',        // Dutch
         'no'      => 'nb-NO',        // Norwegian: Tiki='no', editors use Bokmål 'nb'
         'pl'      => 'pl-PL',        // Polish
-        'pt'      => 'pt',           // Portuguese (bare — resolveSummernoteLocale finds pt-PT or pt-BR)
+        // 'pt' is intentionally absent: Toast UI has no pt.js (only pt-br.js, covered below),
+        // and Summernote resolves pt-PT from disk without a map entry.
         'pt-br'   => 'pt-BR',        // Brazilian Portuguese
         //'ro'    => 'ro',           // Romanian — no editor file yet
         //'rm'    => 'rm',           // Romansh — no editor file yet
@@ -137,9 +140,14 @@ class WYSIWYGLib
     }
 
     /**
-     * Map a Tiki language code to the Summernote locale code.
-     * TIKI_EDITOR_LOCALE_MAP is the authoritative override for known languages;
-     * resolveSummernoteLocale() is the disk-based fallback for unmapped or bare-coded ones.
+     * Resolve the Summernote locale code for a given Tiki language code.
+     *
+     * TikiLib::get_language() returns bare codes (e.g. 'es', 'fr'). TIKI_EDITOR_LOCALE_MAP
+     * makes the editorial choice when a bare code would match multiple files on disk
+     * (e.g. 'de' → 'de-DE' rather than 'de-CH'). Languages absent from the map fall back
+     * to disk-based discovery in resolveSummernoteLocale().
+     *
+     * @see TikiLib::get_language()
      */
     protected function resolveLocaleCode(string $tikLang): string
     {
@@ -155,7 +163,7 @@ class WYSIWYGLib
             // Full hyphenated locale (e.g. 'fr-FR', 'zh-CN'): use directly.
             return $mapped;
         } else {
-            // Bare language hint (e.g. 'ar', 'pt'): let disk resolution find the best variant.
+            // Bare language hint (e.g. 'ar'): let disk resolution find the best variant.
             return $this->resolveSummernoteLocale($mapped);
         }
     }
