@@ -311,6 +311,19 @@ Contract rows the three main providers can't reach — patterns:
   their stored values (custom render methods per variant for the arms the
   render provider can't reach).
 
+Two different things get named, and they follow different rules. A **provider
+case name** is a free-form array-key string (`'non-numeric string passes
+through unchanged (pins current behavior)'`) — punctuation, spaces and
+parentheses are fine; ground rule 7 is about these. A **test method name** is
+a PHP identifier and must be `camelCaps` with **no underscores** — CI runs
+phpcs under PSR1, and `testRenderInput_lockedArm()` fails
+`PSR1.Methods.CamelCapsMethodName`. Put the layer in the method name as
+capitalised words (`testRenderInputLockedArmEscapesValue`), not with an
+underscore separator; if the layer/description is too long to read as one
+identifier, that detail belongs in the provider case name or the docblock, not
+in the method name. Same for the data-provider *method* itself
+(`renderCaseProvider`, not `render_case_provider`).
+
 Fill expectations with the developer's predictions, run, and record what
 actually happens. Expected differences between prediction and reality are the
 material for step 5.
@@ -395,6 +408,20 @@ TZ=Pacific/Kiritimati php phpunit --filter '<Type>Test' lib/test/Core/Tracker/Fi
 The third run catches host-timezone leakage (ground rule 8): the harness pins
 prefs and PHP to UTC, but an expectation computed with `date()` at provider
 build time, or a pin recorded from a non-UTC machine, still slips through.
+
+Then lint — **CI runs phpcs and a style error fails the merge-request
+pipeline**, so run it locally before the commit, not after the pipeline
+complains:
+
+```bash
+php vendor_bundled/vendor/squizlabs/php_codesniffer/bin/phpcs -s \
+    lib/test/Core/Tracker/Field/Characterization/<Type>Test.php
+```
+
+Must be clean (fix and re-run until it is; `phpcbf` on the same path
+auto-fixes most). The failure this most often catches for these tests is
+`PSR1.Methods.CamelCapsMethodName` from an underscore in a custom method name
+— see the naming note in step 4.
 
 #### Mechanical coverage audit
 
