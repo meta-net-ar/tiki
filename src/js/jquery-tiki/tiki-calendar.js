@@ -10,7 +10,8 @@ $.fn.setupEventCalendar = function (
     targetId = "calendar",
     urlEventSource = "tiki-ajax_services.php?controller=calendar&action=list_items",
     returnUrl = "tiki-calendar.php",
-    associatedWikiPage = null
+    associatedWikiPage = null,
+    defaultCalendarId = null
 ) {
     let isOpeningModal = false;
     this.each(function () {
@@ -57,6 +58,7 @@ $.fn.setupEventCalendar = function (
                     prefill_start: prefillStart,
                     modal: 1,
                     return_url: returnUrl,
+                    defaultCalendarId: defaultCalendarId,
                 };
 
                 if (browserTimezone) {
@@ -679,7 +681,8 @@ $.fn.defineParameterOfMultipleCalendar = function (
     moduleCalendarFocusdate,
     linkToFindItemsOfCalendar,
     associatedWikiPage,
-    returnUrl
+    returnUrl,
+    defaultCalendarId = null
 ) {
     let paramOfModuleCalendar = eventCalendarParams;
 
@@ -729,7 +732,8 @@ $.fn.defineParameterOfMultipleCalendar = function (
             "calendar-" + takeIndex,
             linkToFindItemsOfCalendar,
             returnUrl,
-            associatedWikiPage
+            associatedWikiPage,
+            defaultCalendarId
         );
         if (pdf_export == "y" && pdf_warning == "n") {
             const printButton = $('<a href="#" class="text-end d-none" role="button"> Export as PDF</a>').attr("id", "calendar-pdf-btn-" + takeIndex);
