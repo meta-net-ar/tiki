@@ -328,24 +328,8 @@ if (isset($_REQUEST['minor'])) {
     $_REQUEST['save'] = true;
 }
 
-if ($user && $prefs['feature_user_watches'] === 'y') {
-    $isFormSubmit = isset($jitRequest['edit']);
-    if ($tikilib->page_exists($page)) {
-        $currentlyWatching = (bool) $tikilib->user_watches($user, 'wiki_page_changed', $page, 'wiki page');
-        $default = $currentlyWatching;
-    } else {
-        // New pages get default watch checked for authors
-        $currentlyWatching = false;
-        $default = ($prefs['wiki_watch_author'] === 'y');
-    }
-
-    $requestedWatch = isset($_REQUEST['watch']) && $isFormSubmit;
-    $smarty->assign('show_watch', 'y');
-    $smarty->assign('watch_checked', ( ($default && ! $isFormSubmit) || $requestedWatch) ? 'y' : 'n');
-} else {
-    $currentlyWatching = false;
-    $requestedWatch = false;
-    $smarty->assign('show_watch_controls', 'n');
+if (! $tikilib->page_exists($page) && $user && $prefs['feature_user_watches'] === 'y' && $prefs['wiki_watch_author'] === 'y') {
+    $tikilib->add_user_watch($user, 'wiki_page_changed', $page, 'wiki page', $page, $wikilib->sefurl($page));
 }
 
 if (isset($_REQUEST['partial_save'])) {
@@ -541,15 +525,6 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
             } else {
                 $_REQUEST["edit"] = $last_part;
             }
-        }
-    }
-
-    // If the watch state is not the same
-    if ($requestedWatch !== $currentlyWatching) {
-        if ($requestedWatch) {
-            $tikilib->add_user_watch($user, 'wiki_page_changed', $page, 'wiki page', $page, $wikilib->sefurl($page));
-        } else {
-            $tikilib->remove_user_watch($user, 'wiki_page_changed', $page, 'wiki page');
         }
     }
 
@@ -1416,15 +1391,6 @@ if (
             }
         }
         /* Local reference handling */
-
-        // If the watch state is not the same
-        if ($requestedWatch !== $currentlyWatching) {
-            if ($requestedWatch) {
-                $tikilib->add_user_watch($user, 'wiki_page_changed', $page, 'wiki page', $page, $wikilib->sefurl($page));
-            } else {
-                $tikilib->remove_user_watch($user, 'wiki_page_changed', $page, 'wiki page');
-            }
-        }
 
         if (! empty($prefs['geo_locate_wiki']) && $prefs['geo_locate_wiki'] == 'y' && ! empty($_REQUEST['geolocation'])) {
             TikiLib::lib('geo')->set_coordinates('wiki page', $page, $_REQUEST['geolocation']);
