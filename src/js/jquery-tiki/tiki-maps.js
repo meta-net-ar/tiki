@@ -510,10 +510,30 @@ import { defaults as defaultControls } from "ol/control";
                                             extent = ol.extent.createEmpty();
 
                                         originalFeatures.forEach((f) => {
-                                            ol.extent.extend(extent, f.getGeometry().getExtent());
+                                            const getRepresentativePoint = (feature) => {
+                                                const geom = feature.getGeometry();
+                                                switch (geom.getType()) {
+                                                    case "Polygon":
+                                                    case "MultiPolygon":
+                                                        return geom.getInteriorPoint().getCoordinates();
+                                                    case "LineString":
+                                                    case "MultiLineString":
+                                                        return geom.getCoordinateAt(0.5); // midpoint along the line
+                                                    default:
+                                                        return geom.getCoordinates(); // Point
+                                                }
+                                            };
+
+                                            ol.extent.extendCoordinate(extent, getRepresentativePoint(f));
                                         });
+                                        // for the style cache
                                         maxFeatureCount = Math.max(maxFeatureCount, originalFeatures.length);
-                                        const radius = (0.4 * (ol.extent.getWidth(extent) + ol.extent.getHeight(extent))) / resolution;
+
+                                        const widthPx = ol.extent.getWidth(extent) / resolution;
+                                        const heightPx = ol.extent.getHeight(extent) / resolution;
+
+                                        const radius = Math.sqrt(widthPx * widthPx + heightPx * heightPx) / 2;
+                                        //const radius = (0.4 * (ol.extent.getWidth(extent) + ol.extent.getHeight(extent))) / resolution;
                                         feature.set("radius", radius);
                                     });
                                 };
