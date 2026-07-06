@@ -1,0 +1,22 @@
+// Theme-specific Tiki selectors
+
+// Avoid nav item overflow in dense topbars
+.navbar-expand .navbar-nav {
+    flex-wrap: wrap;
+}
+
+@include media-breakpoint-up(lg) {
+    .navbar-expand-lg .navbar-nav {
+        flex-wrap: wrap;
+    }
+}
+
+// Force outline button colors to follow active theme tokens
+.btn.btn-outline-primary { --bs-btn-color: var(--bs-primary); --bs-btn-border-color: var(--bs-primary); }
+.btn.btn-outline-secondary { --bs-btn-color: var(--bs-secondary); --bs-btn-border-color: var(--bs-secondary); }
+.btn.btn-outline-success { --bs-btn-color: var(--bs-success); --bs-btn-border-color: var(--bs-success); }
+.btn.btn-outline-danger { --bs-btn-color: var(--bs-danger); --bs-btn-border-color: var(--bs-danger); }
+.btn.btn-outline-warning { --bs-btn-color: var(--bs-warning); --bs-btn-border-color: var(--bs-warning); }
+.btn.btn-outline-info { --bs-btn-color: var(--bs-info); --bs-btn-border-color: var(--bs-info); }
+.btn.btn-outline-light { --bs-btn-color: var(--bs-light); --bs-btn-border-color: var(--bs-light); }
+.btn.btn-outline-dark { --bs-btn-color: var(--bs-dark); --bs-btn-border-color: var(--bs-dark); }

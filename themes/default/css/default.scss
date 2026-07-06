@@ -21,6 +21,6 @@
 @import "../../base_files/scss/_tiki-bootstrap_layout_and_components"; // 6. Remainder of required Bootstrap parts.
 @import "../../base_files/scss/_tiki-selectors.scss"; // 7. Tiki CSS selectors used globally.
 @import "../../base_files/scss/_tiki-pagetop_colors.scss"; // 8. Optionally imported to group (separately) the top and topbar zone components for styling.
-//@import "../scss/_tiki-selectors.scss"; // 9. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
+@import "../scss/_tiki-selectors.scss"; // 9. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
 
 @import "../scss/css-variables"; // 10. Imported after default CSS variables to override them.

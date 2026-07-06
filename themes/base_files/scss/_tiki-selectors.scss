@@ -22,6 +22,34 @@ $imagePathToImgDir: "../../../img/";
     --tiki-input-color: #{$input-color};
 }
 
+// Keep component active states aligned with each theme's palette instead of Bootstrap defaults.
+.nav-pills {
+    --bs-nav-pills-link-active-bg: var(--bs-primary-bg-subtle);
+    --bs-nav-pills-link-active-color: var(--bs-primary-text-emphasis);
+}
+
+.pagination {
+    --bs-pagination-active-bg: var(--bs-primary);
+    --bs-pagination-active-border-color: var(--bs-primary);
+    --bs-pagination-active-color: #fff;
+}
+
+.dropdown-menu {
+    --bs-dropdown-link-active-bg: var(--bs-primary-bg-subtle);
+    --bs-dropdown-link-active-color: var(--bs-primary-text-emphasis);
+}
+
+.progress,
+.progress-stacked {
+    --bs-progress-bar-bg: var(--bs-primary);
+}
+
+.list-group {
+    --bs-list-group-active-bg: var(--bs-primary-bg-subtle);
+    --bs-list-group-active-border-color: var(--bs-primary-border-subtle);
+    --bs-list-group-active-color: var(--bs-primary-text-emphasis);
+}
+
 
 //.layout_social,
 //.layout_social_modules {
