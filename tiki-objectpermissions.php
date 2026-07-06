@@ -42,15 +42,6 @@ $inputConfiguration = [
 ];
 
 include_once('tiki-setup.php');
-
-use Tiki\Sections;
-if ($prefs['theme_unified_admin_backend'] !== 'n') {
-    $section = Sections::SECTION_ADMIN_LAYOUT;
-} else {
-    $section = Sections::SECTION_ADMIN;
-}
-Sections::setCurrentSection($section);
-
 if (! empty($_REQUEST['objectType']) && $_REQUEST['objectType'] != 'global') {
     if (! isset($_REQUEST['objectName']) || empty($_REQUEST['objectId'])) {
         Feedback::errorAndDie(tra('Not enough information to display this page'), \Laminas\Http\Response::STATUS_CODE_409);
