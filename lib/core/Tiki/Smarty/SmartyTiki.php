@@ -370,7 +370,7 @@ class SmartyTiki extends Smarty
             }
         }
 
-        if (! defined('TIKI_IN_INSTALLER') && ! defined('TIKI_IN_TEST')) {
+        if (! defined('TIKI_IN_INSTALLER') && ! defined('TIKI_IN_TEST') && defined('TIKI_SETUP_FINISHED')) {
             require_once 'tiki-modules.php';
             // Re-assign module_pref_errors after modules are loaded to capture errors from lazy rendering
             if (Perms::get()->admin) {
