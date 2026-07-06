@@ -466,7 +466,7 @@ class Feedback
      */
     public static function showWatchers(string $watch_event, $object, $extra_event = null)
     {
-        global $prefs;
+        global $prefs, $user;
         if ($prefs['feature_user_watches'] === 'y') {
             $watches = TikiLib::lib('tiki')->get_event_watches($watch_event, $object);
 
@@ -477,6 +477,15 @@ class Feedback
                     return ! in_array($watch['user'], $watches);
                 });
                 $watches = array_merge($watches, $extra_watches);
+            }
+
+            // The editor is silently excluded from wiki_page_changed notifications unless they
+            // explicitly opted in (see sendWikiEmailNotification in notificationemaillib.php),
+            // so the displayed list must reflect the same exclusion.
+            if ($watch_event === 'wiki_page_changed' && ($prefs['wiki_watch_editor'] != 'y' || $prefs['user_wiki_watch_editor'] != 'y')) {
+                $watches = array_values(array_filter($watches, function ($watch) use ($user) {
+                    return $watch['user'] !== $user;
+                }));
             }
 
             if (count($watches)) {
