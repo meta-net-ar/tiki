@@ -984,7 +984,13 @@ class TikiAccessLib extends TikiLib
                 && $tikiroot . $prefs['tikiIndex'] != $_SERVER['PHP_SELF']
                 && ( $page != $userlib->get_user_default_homepage($user) || $page === '' )
         ) {
-            $this->redirect($prefs['tikiIndex']);
+            // Append ?challenge=1 for auth errors so the login page can emit 401.
+            $redirectTarget = $prefs['tikiIndex'];
+            if (in_array($errortype, ['401', '403']) && ! $user) {
+                $separator = str_contains($redirectTarget, '?') ? '&' : '?';
+                $redirectTarget .= $separator . 'challenge=1';
+            }
+            $this->redirect($redirectTarget);
         }
 
         $detail = [

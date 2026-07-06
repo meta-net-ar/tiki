@@ -93,7 +93,9 @@ class Feedback
 
             $_SESSION['loginfrom'] = $_SERVER['REQUEST_URI'];
 
-            $access->redirect($url, $message, msgtype: 'error');
+            // Append ?challenge=1 so the final login page can emit 401 (the 302 itself cannot carry it).
+            $separator = str_contains($url, '?') ? '&' : '?';
+            $access->redirect($url . $separator . 'challenge=1', $message, msgtype: 'error');
             die;
         }
 

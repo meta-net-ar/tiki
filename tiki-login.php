@@ -43,6 +43,11 @@ if (empty($_POST['user'])) {
 require_once('tiki-setup.php');
 global $prefs;
 
+// Emit 401 when reached via an auth challenge (via ?challenge=1 param or session loginfrom).
+if (! $user && (! empty($_GET['challenge']) || ! empty($_SESSION['loginfrom']))) {
+    http_response_code(401);
+}
+
 $headerlib = TikiLib::lib('header');
 $headerlib->addSecurityHeaders();
 
@@ -66,10 +71,12 @@ if (! empty($_REQUEST['code']) && $prefs['auth_method'] == 'openid_connect' && T
     $login_url_params = '?cas=y';
     $_REQUEST['user'] = '';
 } elseif ($prefs['twoFactorAuth'] === 'n' && (! isset($_REQUEST['user']) or isset($_REQUEST['username'])) && empty($_REQUEST['su'])) {
+    // Preserve ?challenge=1 so tiki-login_scr.php can emit 401 for monitoring tools.
+    $loginScrParams = ! empty($_GET['challenge']) ? '?challenge=1' : '';
     if (! $https_mode && $prefs['https_login'] == 'required') {
-        header('Location: ' . $base_url_https . 'tiki-login_scr.php');
+        header('Location: ' . $base_url_https . 'tiki-login_scr.php' . $loginScrParams);
     } else {
-        header('Location: ' . $base_url . 'tiki-login_scr.php');
+        header('Location: ' . $base_url . 'tiki-login_scr.php' . $loginScrParams);
     }
     die;
 }
