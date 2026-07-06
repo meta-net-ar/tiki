@@ -279,7 +279,9 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 $calendarId = $calitem['calendarId'];
                 $calitem['calitemId'] = $calitemId;
                 $calitem['allday'] = empty($calitem['allday']) ? 0 : 1;
-                $calitem['sendReminder'] = empty($calitem['sendReminder']) ? 0 : 1;
+                if (isset($calitem['sendReminder'])) {
+                    $calitem['sendReminder'] = (int) ! empty($calitem['sendReminder']);
+                }
                 $calitem['recurrenceId'] = $input->recurrenceId->int();
                 $calendar = $this->calendarLib->get_calendar($calendarId);
                 $calitem = $this->processParticipants($calitem);
@@ -887,6 +889,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 }
 
                 $client = new \Tiki\SabreDav\CaldavClient();
+
                 $client->saveCalendarObject($calitem);
                 if (! empty($calitem['calitemId'])) {
                     $calitemId = $calitem['calitemId'];
@@ -981,6 +984,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $recurrence->setLang(strLen($calitem['lang']) > 0 ? $calitem['lang'] : 'en');
         $recurrence->setName($calitem['name']);
         $recurrence->setDescription($calitem['description']);
+
+        $recurrence->setSendReminder($calitem['sendReminder']);
         $recurrence->setRecurenceDstTimezone($input->recurrenceDstTimezone->text());
         $recurrence->setUser($calitem['user']);
         $recurrence->setOrganizers($calitem['organizers']);

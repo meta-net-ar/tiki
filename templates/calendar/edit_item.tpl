@@ -322,10 +322,12 @@
                 <div class="mb-3 row clearfix">
                     <label class="col-form-label col-sm-3">{tr}Send reminder notifications{/tr}</label>
                     <div class="col-sm-2">
-                        <input type="checkbox" class="form-check-input" name="calitem[sendReminder]" id="sendReminder" value="1" {if $calitem.sendReminder} checked="checked"{/if}>
+                        <input type="checkbox" class="form-check-input" name="calitem[sendReminder]" id="sendReminder" value="1" {if ! isset($calitem.sendReminder) or $calitem.sendReminder}checked{/if}>
                     </div>
                 </div>
                 {* / .mb-3 *}
+            {else}
+                <input type="hidden" name="calitem[sendReminder]" value="{if $calitem.calitemId}{$calitem.sendReminder}{else}1{/if}">
             {/if}
             {if $calendar.customparticipants eq 'y'}
                 <div class="mb-3 row" id="calorg">
