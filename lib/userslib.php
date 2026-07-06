@@ -7428,6 +7428,12 @@ class UsersLib extends TikiLib
         return $this->getOne($query, [$user]);
     }
 
+    public function updateLastMFADate($username)
+    {
+        $query = "update `users_users` set `last_mfa_date` = ? WHERE `login` = ?";
+        $this->query($query, [time(), $username]);
+    }
+
     public function validate_two_factor($twoFactorSecret, $pin, $user)
     {
         $google2fa = new Google2FA();
