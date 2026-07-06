@@ -68,6 +68,24 @@ class Feedback
     }
 
     /**
+     * Redirect to a page with error feedback and Die
+     *
+     * @param string $message
+     * @param int $httpCode
+     *
+     * @throws Exception
+     */
+    public static function errorAndDie($message, $httpCode)
+    {
+        $smarty = TikiLib::lib('smarty');
+        $smarty->assign('errortype', $httpCode);
+        $smarty->assign('msg', $message);
+        http_response_code($httpCode);
+        $smarty->display("error.tpl");
+        die;
+    }
+
+    /**
      * Add note feedback
      *
      * This is a specific application of the add function below for notes.

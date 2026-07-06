@@ -10,6 +10,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // $Id$
 
+use Tiki\TwoFactorAuth\TwoFactorAuth;
+use Tiki\TwoFactorAuth\Exception\TwoFactorAuthException;
+
 $inputConfiguration = [
     [ 'staticKeyFilters' => [
         'user' => 'text',
