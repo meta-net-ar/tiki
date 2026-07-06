@@ -20,7 +20,7 @@ class PatchSignaturepdf
         $signaturepdf = __DIR__ . self::fixDS('/../../../signaturepdf/');
         $vendors = $event->getComposer()->getConfig()->get('vendor-dir');
 
-        $packagePath = $vendors . self::fixDS('/mercihabam/signaturepdf/');
+        $packagePath = $vendors . self::fixDS('/24eme/signaturepdf/');
 
         // When uninstalling, do nothing
         if (! is_dir($packagePath)) {

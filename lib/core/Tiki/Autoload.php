@@ -16,6 +16,7 @@ class Tiki_Autoload
      */
     protected static $mapInternalClassesNotInComposer = [
         'PdfGenerator' => 'lib/pdflib.php',
+        'Tiki\\SignaturePDF\\SignaturePDF' => 'lib/signaturepdf/SignaturePDF.php',
     ];
 
     /**

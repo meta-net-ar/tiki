@@ -195,14 +195,11 @@ TikiManager:
   requiredVersion: dev-master
 SignaturePDF:
   licence: AGPL-3.0
-  licenceUrl: "https://github.com/mercihabam/signaturepdf/blob/master/LICENSE"
-  name: mercihabam/signaturepdf
-  repository:
-    type: vcs
-    url: "https://github.com/mercihabam/signaturepdf"
+  licenceUrl: "https://github.com/24eme/signaturepdf/blob/master/LICENSE"
+  name: 24eme/signaturepdf
   requiredBy:
     - feature_signaturepdf
-  requiredVersion: dev-master
+  requiredVersion: ^1.10
   scripts:
     post-install-cmd:
       - "Tiki\\Composer\\PatchSignaturepdf::setup"

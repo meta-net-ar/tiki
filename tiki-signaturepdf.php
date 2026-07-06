@@ -4,6 +4,9 @@
  * @package tikiwiki
  */
 
+use Tiki\Package\ComposerManager;
+use Tiki\SignaturePDF\SignaturePDF;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
@@ -14,8 +17,14 @@ require_once("tiki-setup.php");
 $access->check_feature('feature_signaturepdf');
 $access->check_user($user);
 
-$serverEndpoint = $_SERVER['HTTP_HOST'] . str_replace('/tiki-signaturepdf.php', '/tiki-signaturepdf_handler.php', $_SERVER['REQUEST_URI']);
-$ch = curl_init($serverEndpoint);
+$composerManager = new ComposerManager(__DIR__);
+if (! $composerManager->isInstalled('24eme/signaturepdf')) {
+    Feedback::errorAndDie(tr("The SignaturePDF package is not installed. Please install it via the Composer Web Installer."), 400);
+}
+
+global $prefs, $tikiroot;
+
+$ch = curl_init(SignaturePDF::getHandlerUrl());
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     curl_setopt($ch, CURLOPT_POST, true);
@@ -50,7 +59,6 @@ curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($curl, $headerLine) use (&$he
 });
 
 $response = curl_exec($ch);
-curl_close($ch);
 
 if ($response === false) {
     Feedback::error("Error fetching the page: " . curl_error($ch));
@@ -74,7 +82,6 @@ function isAssetRequest()
 
 $out = preg_replace('#</?body[^>]*>|</?html[^>]*>|#', '', $response);
 
-global $tikiroot;
 $scheme = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
 $absoluteUrlBase = $scheme . "://" . $_SERVER['HTTP_HOST'] . $tikiroot;
 

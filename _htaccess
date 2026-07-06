@@ -179,17 +179,27 @@ FileETag MTime Size
     # Redirect drawio requests to the correct path
     RewriteRule ^img/lib/(.*)$ vendor/tikiwiki/diagram/img/lib/$1 [NC,L]
 
-    # -- Signature PDF assets -- #
-    RewriteRule ^tiki-signaturepdf_handler.php/vendor/(.*)$ vendor/mercihabam/signaturepdf/public/vendor/$1 [L]
-    RewriteRule ^tiki-signaturepdf_handler.php/js/(.*)$ vendor/mercihabam/signaturepdf/public/js/$1 [L]
-    RewriteRule ^tiki-signaturepdf_handler.php/css/(.*)$ vendor/mercihabam/signaturepdf/public/css/$1 [L]
-    RewriteRule ^tiki-signaturepdf_handler.php/root/(.*)$ vendor/mercihabam/signaturepdf/public/$1 [L]
+     # -- Signature PDF assets -- #
+    RewriteRule ^tiki-signaturepdf_handler.php/vendor/(.*)$ vendor/24eme/signaturepdf/public/vendor/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/js/(.*)$ vendor/24eme/signaturepdf/public/js/$1 [L]
+    RewriteRule ^tiki-signaturepdf_handler.php/css/(.*)$ vendor/24eme/signaturepdf/public/css/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/public/(.*)$ public/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/img/(.*)$ img/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/lib/(.*)$ lib/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/lang/(.*)$ lang/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/themes/(.*)$ themes/$1 [L]
     RewriteRule ^tiki-signaturepdf_handler.php/vendor_bundled/(.*)$ vendor_bundled/$1 [L]
+    
+    # -- Signature PDF assets (dev mode) -- #
+    RewriteRule ^tiki-signaturepdf.php/vendor/(.*)$ vendor/24eme/signaturepdf/public/vendor/$1 [L]
+    RewriteRule ^tiki-signaturepdf.php/js/(.*)$ vendor/24eme/signaturepdf/public/js/$1 [L]
+    RewriteRule ^tiki-signaturepdf.php/css/(.*)$ vendor/24eme/signaturepdf/public/css/$1 [L]
+    RewriteRule ^tiki-signaturepdf.php/public/(.*)$ public/$1 [L]
+    RewriteRule ^tiki-signaturepdf.php/img/(.*)$ img/$1 [L]
+    RewriteRule ^tiki-signaturepdf.php/lib/(.*)$ lib/$1 [L]
+    RewriteRule ^tiki-signaturepdf.php/lang/(.*)$ lang/$1 [L]
+    RewriteRule ^tiki-signaturepdf.php/themes/(.*)$ themes/$1 [L]
+    RewriteRule ^tiki-signaturepdf.php/vendor_bundled/(.*)$ vendor_bundled/$1 [L]
 
     # -- Apache Authorization Header -- #
     # Rewrite rules for passing authorization with Apache running in CGI or FastCGI mode

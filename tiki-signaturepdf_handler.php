@@ -14,10 +14,10 @@ use Tiki\Package\ComposerManager;
 require_once("tiki-setup.php");
 
 $composerManager = new ComposerManager(__DIR__);
-if (! $composerManager->isInstalled('mercihabam/signaturepdf')) {
+if (! $composerManager->isInstalled('24eme/signaturepdf')) {
     Feedback::error("The SignaturePDF package is not installed. Please install it via the Composer Web Installer.", true);
     echo smarty_function_feedback([], $smarty->getEmptyInternalTemplate());
     exit;
 }
 
-require __DIR__ . '/vendor/mercihabam/signaturepdf/public/index.php';
+require __DIR__ . '/vendor/24eme/signaturepdf/public/index.php';
