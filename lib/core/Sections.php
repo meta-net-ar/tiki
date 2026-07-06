@@ -273,9 +273,9 @@ class Sections
             throw new \InvalidArgumentException("Invalid section: $section");
         }
 
-        if ($prefs['theme_unified_admin_backend'] !== 'y' && $section === 'admin layout') {
+        if ($prefs['theme_unified_admin_backend'] !== 'y' && $section === self::SECTION_ADMIN_LAYOUT) {
             // Trigger SECTION_ADMIN instead of SECTION_ADMIN_LAYOUT when UAB is disabled
-            $section = 'admin';
+            $section = self::SECTION_ADMIN;
             self::$currentSection = $section;
             self::triggerSectionChangeCallbacks($section);
         }
