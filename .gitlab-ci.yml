@@ -14,6 +14,9 @@ variables:
   MYSQL_PASSWORD: tikipass
   ELASTICSEARCH_HOST: elasticsearch
   BASE_QA_IMAGE: tikiwiki/tikiwiki-ci:7.4-qa
+  # Composer 2.10+ refuses to parse tar/phar archives on PHP < 8.0 (the CI image is PHP 7.4).
+  # The archives come from trusted sources (packagist / composer.tiki.org), so allow it.
+  COMPOSER_ALLOW_UNSAFE_PHAR_METADATA: "1"
 
 workflow:
   rules:
