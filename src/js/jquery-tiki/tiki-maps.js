@@ -287,6 +287,7 @@ import { defaults as defaultControls } from "ol/control";
                 container = this,
                 desiredControls;
             let selectionInteraction;
+            const cluster = $(container).data("cluster");
 
             // Shared style functions for all map features (accessible from both clustered and non-clustered layers)
             // Get feature color key from coordinates for stable lookup
@@ -433,7 +434,7 @@ import { defaults as defaultControls } from "ol/control";
              */
             container.isClustered = function (feature, layer) {
                 let isClustered = false;
-                if ($(container).data("cluster")) {
+                if (cluster) {
                     const clusterGroups = layer.get("source").getFeatures();
                     isClustered = clusterGroups.some((clusterGroup) => {
                         const members = clusterGroup.get("features");
@@ -460,13 +461,13 @@ import { defaults as defaultControls } from "ol/control";
                     }
                     if (!container.layers[name]) {
                         // basic feature clustering
-                        if ($(container).data("cluster")) {
+                        if (cluster) {
                             // Shared source for both layers (shapes and points)
                             const sharedSource = new ol.source.Vector({ wrapX: false });
                             const styleCache = {};
 
                             if (!shapeLayer) {
-                                const distance = $(container).data("cluster"),
+                                const distance = cluster,
                                     clusterSource = new ol.source.Cluster({
                                         distance: distance,
                                         source: sharedSource,
@@ -678,7 +679,7 @@ import { defaults as defaultControls } from "ol/control";
                     return container.layers[name];
                 }
 
-                if (shapeLayer && $(container).data("cluster")) {
+                if (shapeLayer && cluster) {
                     return container.vector_shapes;
                 } else {
                     return container.vectors;
@@ -836,7 +837,7 @@ import { defaults as defaultControls } from "ol/control";
                 });
 
             container.vectors = container.getLayer(tr("Editable"));
-            if ($(container).data("cluster")) {
+            if (cluster) {
                 container.vector_shapes = container.getLayer(tr("Editable"), true);
             }
 
