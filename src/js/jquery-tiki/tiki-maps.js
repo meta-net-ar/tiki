@@ -616,7 +616,7 @@ import { defaults as defaultControls } from "ol/control";
                                 if ($(container).data("popup-style")) {
                                     const selectionInteraction = new ol.interaction.Select({
                                         style: (feature) => {
-                                            setFeatureColorStyle(feature);
+                                            return setFeatureColorStyle(feature);
                                         },
                                         layers: [vectors],
                                     });
@@ -664,7 +664,7 @@ import { defaults as defaultControls } from "ol/control";
                                 source: new ol.source.Vector({ wrapX: false }),
                                 title: name,
                                 style: (feature) => {
-                                    setFeatureColorStyle(feature);
+                                    return setFeatureColorStyle(feature);
                                 },
                             });
                         }
