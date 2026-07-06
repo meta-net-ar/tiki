@@ -161,6 +161,15 @@ function wikiplugin_map_info()
                 'filter' => 'text',
                 'advanced' => true,
             ],
+            'clusterExcludeField' => [
+                'required' => false,
+                'name' => tra('Name of field to exclude from clustering'),
+                'description' => tra('Some features like borders and rivers should not be clustered. Add the permanent name of a checkbox field to exclude some items.'),
+                'since' => '30.1',
+                'default' => "",
+                'filter' => 'text',
+                'advanced' => true,
+            ],
         ],
     ];
 }
@@ -191,6 +200,8 @@ function wikiplugin_map($data, $params)
     $cluster = (int) $params['cluster'];
     if ($params['clusterHover']) {
         $clusterHover = ' data-clusterhover="' . $params['clusterHover'] . '"';
+    } else {
+        $clusterHover = '';
     }
     if ($params['clusterFillColor']) {
         $clusterFillColor = ' data-clusterfillcolor="' . $params['clusterFillColor'] . '"';
@@ -201,6 +212,11 @@ function wikiplugin_map($data, $params)
         $clusterTextColor = ' data-clustertextcolor="' . $params['clusterTextColor'] . '"';
     } else {
         $clusterTextColor = '';
+    }
+    if ($params['clusterExcludeField']) {
+        $clusterExcludeField = ' data-clusterexcludefield="' . $params['clusterExcludeField'] . '"';
+    } else {
+        $clusterExcludeField = '';
     }
     if ($params['tilesets']) {
         $tilesets = ' data-tilesets="' . $params['tilesets'] . '"';
@@ -226,7 +242,7 @@ function wikiplugin_map($data, $params)
     $scope = smarty_modifier_escape(wp_map_getscope($params));
 
     $output = "<div class=\"map-container\" data-marker-filter=\"$scope\" data-map-controls=\"$controls\" data-popup-style=\"$popupStyle\"" .
-        " data-cluster=\"$cluster\" style=\"width: $width; height: $height;\" $center $tooltips $clusterFillColor $clusterTextColor $tilesets $clusterHover>";
+        " data-cluster=\"$cluster\" style=\"width: $width; height: $height;\" $center $tooltips $clusterFillColor $clusterTextColor $tilesets $clusterHover $clusterExcludeField>";
 
     $argumentParser = new WikiParser_PluginArgumentParser();
     $matches = WikiParser_PluginMatcher::match($data);

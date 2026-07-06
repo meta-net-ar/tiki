@@ -472,6 +472,9 @@ import { defaults as defaultControls } from "ol/control";
                                         distance: distance,
                                         source: sharedSource,
                                         geometryFunction: (feature) => {
+                                            if (feature.get("nocluster")) {
+                                                return null;
+                                            }
                                             const geom = feature.getGeometry();
                                             if (!geom) return null;
                                             if (geom instanceof ol.geom.Polygon || geom instanceof ol.geom.LineString) {
@@ -1685,6 +1688,9 @@ import { defaults as defaultControls } from "ol/control";
                                         let initial;
                                         feature.set("itemId", item.object_id);
                                         feature.set("content", item.title);
+                                        if ($(container).data("clusterexcludefield")) {
+                                            feature.set("nocluster", item[`tracker_field_${$(container).data("clusterexcludefield")}`] === "y");
+                                        }
                                         if (!feature.get("color")) {
                                             feature.set("color", defaultVectorColor);
                                         }
