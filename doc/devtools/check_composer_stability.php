@@ -21,8 +21,13 @@
  *   php check_composer_stability.php 24.x 26.x master  # Compare specific branches
  *   php check_composer_stability.php 28.x current # Compare 28.x with current branch
  *   php check_composer_stability.php current 29.x master # Compare current branch with 29.x and master
+ *   php check_composer_stability.php --ci --target master current  # CI mode with explicit merge target
  *
  * Available versions: 24.x, 27.x, 30.x, master
+ *
+ * Options:
+ *   --ci       Enable CI mode (responsibility filtering, exit codes, JUnit report)
+ *   --target   Merge target branch for touched-package detection (default: TWV-derived or CI MR target)
  *
  * Output:
  * - Lists packages with unstable versions
@@ -42,6 +47,9 @@ use Composer\Semver\Comparator;
 
 static $versionParser = null;
 $isCiMode = false;
+$cliMergeTargetBranch = null;
+$debugTouchedComposerDataRequireMd5AfterLoading = null;
+$debugTouchedComposerDataRequireCountAfterLoading = null;
 
 function getVersionParser()
 {
@@ -269,21 +277,29 @@ function getAvailableTikiVersions()
  */
 function getVersionsToCheck()
 {
-    global $argv, $isCiMode;
+    global $argv, $isCiMode, $cliMergeTargetBranch;
     $args = array_slice($argv, 1);
 
     $ciMode = false;
     $filteredArgs = [];
+    $cliMergeTargetBranch = null;
 
-    foreach ($args as $arg) {
+    for ($i = 0, $count = count($args); $i < $count; $i++) {
+        $arg = $args[$i];
         if ($arg === '--ci') {
             $ciMode = true;
+        } elseif ($arg === '--target') {
+            $i++;
+            if ($i < $count) {
+                $cliMergeTargetBranch = $args[$i];
+            } else {
+                logWarning('--target requires a branch name');
+            }
         } else {
             $filteredArgs[] = $arg;
         }
     }
 
-    global $isCiMode;
     $isCiMode = $ciMode;
 
     if (empty($filteredArgs)) {
@@ -724,10 +740,21 @@ function buildPackageHistory($versionsToCheck)
 }
 
 /**
+ * Temporary debug output for getTouchedPackages() investigation.
+ * Search for "### DEBUG-TOUCHED ###" to remove all instrumentation.
+ */
+function debugTouched($message)
+{
+    echo '### DEBUG-TOUCHED ### ' . $message . "\n";
+}
+
+/**
  * Fetch composer.json data for all versions
  */
 function fetchComposerDataForVersions($versionsToCheck, $currentBranch)
 {
+    global $debugTouchedComposerDataRequireMd5AfterLoading, $debugTouchedComposerDataRequireCountAfterLoading;
+
     $composerData = [];
 
     foreach ($versionsToCheck as $version) {
@@ -735,12 +762,22 @@ function fetchComposerDataForVersions($versionsToCheck, $currentBranch)
 
         if ($version === $currentBranch) {
             $localComposerPath = PRIMARY_COMPOSERJSON_FILE_PATH;
+            $composerRealpath = realpath($localComposerPath);
+            debugTouched('Composer path: ' . $localComposerPath);
+            debugTouched('Composer realpath: ' . ($composerRealpath !== false ? $composerRealpath : '(not resolved)'));
+            debugTouched('Composer exists: ' . (file_exists($localComposerPath) ? 'yes' : 'no'));
+            debugTouched('Composer size: ' . (file_exists($localComposerPath) ? (string) filesize($localComposerPath) : 'n/a'));
+            debugTouched('Composer md5: ' . (file_exists($localComposerPath) ? md5_file($localComposerPath) : 'n/a'));
+
             if (file_exists($localComposerPath)) {
                 $composer = getComposerJson([
                     'path' => $localComposerPath,
                     'type' => 'local'
                 ]);
                 if ($composer) {
+                    debugTouched('Loaded composer name: ' . ($composer['name'] ?? '(none)'));
+                    debugTouched('Loaded require count: ' . count($composer['require'] ?? []));
+                    debugTouched('Loaded require-dev count: ' . count($composer['require-dev'] ?? []));
                     logInfo("Using local composer.json for current branch: {$currentBranch}");
                 } else {
                     logError("Failed to parse local composer.json. Please check for JSON syntax errors.");
@@ -764,48 +801,202 @@ function fetchComposerDataForVersions($versionsToCheck, $currentBranch)
         }
 
         $composerData[$version] = $composer;
+
+        if ($version === $currentBranch) {
+            debugTouched('composerData branch: ' . $currentBranch);
+            debugTouched('composerData composer name: ' . ($composer['name'] ?? '(none)'));
+            debugTouched('composerData require count: ' . count($composer['require'] ?? []));
+            debugTouched('composerData require-dev count: ' . count($composer['require-dev'] ?? []));
+        }
+    }
+
+    if ($currentBranch && isset($composerData[$currentBranch]['require'])) {
+        $debugTouchedComposerDataRequireMd5AfterLoading = md5(json_encode($composerData[$currentBranch]['require']));
+        $debugTouchedComposerDataRequireCountAfterLoading = count($composerData[$currentBranch]['require']);
+        debugTouched('composerData require MD5 after loading: ' . $debugTouchedComposerDataRequireMd5AfterLoading);
+        debugTouched('After loading require count: ' . $debugTouchedComposerDataRequireCountAfterLoading);
     }
 
     return $composerData;
 }
 
 /**
- * Detect packages modified by the current branch compared to a reference branch.
+ * Resolve the merge-base SHA for touched-package comparison.
  *
- * The last analyzed branch before the current branch is used as the comparison
- * target (not the abstract accepted-state CI concept).
- *
- * CI responsibility is restricted to these packages in order to avoid
- * unrelated pipeline failures caused by dependency changes introduced elsewhere.
+ * Single entry point for "which commit should we compare against?".
+ * Git ref resolution is an internal implementation detail.
  */
-function getTouchedPackages($composerData, $currentBranch)
+function resolveMergeBaseSha(): ?string
 {
-    $touched = [];
-
-    if (! isset($composerData[$currentBranch])) {
-        return $touched;
-    }
-
-    $versions = array_keys($composerData);
-    $comparisonBranch = null;
-
-    foreach ($versions as $version) {
-        if ($version === $currentBranch) {
-            break;
+    $diffBaseSha = getenv('CI_MERGE_REQUEST_DIFF_BASE_SHA');
+    if ($diffBaseSha !== false && $diffBaseSha !== '') {
+        $diffBaseSha = trim($diffBaseSha);
+        if (preg_match('/^[0-9a-f]{40}$/i', $diffBaseSha) && gitCommitObjectExists($diffBaseSha)) {
+            debugTouched('Merge-base source: CI_MERGE_REQUEST_DIFF_BASE_SHA');
+            debugTouched('Merge-base SHA: ' . $diffBaseSha);
+            return $diffBaseSha;
         }
-        $comparisonBranch = $version;
+        if (preg_match('/^[0-9a-f]{40}$/i', $diffBaseSha)) {
+            logWarning(
+                'CI_MERGE_REQUEST_DIFF_BASE_SHA is not available in this repository; computing merge-base'
+            );
+        }
     }
 
-    if (! $comparisonBranch || ! isset($composerData[$comparisonBranch])) {
-        return $touched;
+    $targetBranch = resolveMergeTargetBranchName();
+    debugTouched('Merge target branch: ' . $targetBranch);
+
+    $targetRef = resolveTargetRefForMergeBase($targetBranch);
+    if ($targetRef === null) {
+        return null;
     }
 
-    $currentPackages = $composerData[$currentBranch]['require'] ?? [];
-    $comparisonPackages = $composerData[$comparisonBranch]['require'] ?? [];
+    debugTouched('Merge-base source: git merge-base');
+    debugTouched('Merge-base ref: ' . $targetRef);
 
+    $mergeBase = getGitMergeBase($targetRef, 'HEAD');
+    if ($mergeBase === null) {
+        logWarning("Could not determine merge-base between {$targetBranch} and HEAD");
+        return null;
+    }
+
+    debugTouched('Merge-base SHA: ' . $mergeBase);
+
+    return $mergeBase;
+}
+
+/**
+ * Resolve the merge target branch name (not the merge-base SHA).
+ */
+function resolveMergeTargetBranchName(): string
+{
+    global $cliMergeTargetBranch;
+
+    $mrTarget = getenv('CI_MERGE_REQUEST_TARGET_BRANCH_NAME');
+    if ($mrTarget !== false && $mrTarget !== '') {
+        return $mrTarget;
+    }
+
+    if (! empty($cliMergeTargetBranch)) {
+        return $cliMergeTargetBranch;
+    }
+
+    return getTargetBranch();
+}
+
+/**
+ * Resolve the Git ref used to compute merge-base for a target branch name.
+ *
+ * Uses origin/<branch> in GitLab CI (detached HEAD) and the local branch otherwise.
+ * Fails explicitly if the expected ref does not exist.
+ */
+function resolveTargetRefForMergeBase(string $targetBranch): ?string
+{
+    if (isGitLabCiEnvironment()) {
+        $ref = 'origin/' . $targetBranch;
+        if (! gitRefExists($ref)) {
+            logWarning(
+                "Target ref '{$ref}' not found. Ensure the target branch was fetched (check GIT_DEPTH)."
+            );
+            return null;
+        }
+        return $ref;
+    }
+
+    if (! gitRefExists($targetBranch)) {
+        logWarning("Local branch '{$targetBranch}' not found. Checkout or fetch it before running.");
+        return null;
+    }
+
+    return $targetBranch;
+}
+
+/**
+ * Whether the script is running inside a GitLab CI (or generic CI) environment.
+ */
+function isGitLabCiEnvironment(): bool
+{
+    $gitlabCi = getenv('GITLAB_CI');
+    if ($gitlabCi !== false && $gitlabCi !== '' && $gitlabCi !== '0') {
+        return true;
+    }
+
+    $ci = getenv('CI');
+    return $ci !== false && $ci !== '' && $ci !== '0';
+}
+
+/**
+ * Check whether a Git ref exists in the current repository.
+ */
+function gitRefExists(string $ref): bool
+{
+    $output = [];
+    exec('git rev-parse --verify ' . escapeshellarg($ref) . ' 2>nul', $output, $returnCode);
+
+    return $returnCode === 0 && ! empty($output[0]);
+}
+
+/**
+ * Check whether a commit object exists in the current repository.
+ */
+function gitCommitObjectExists(string $sha): bool
+{
+    exec('git cat-file -e ' . escapeshellarg($sha . '^{commit}') . ' 2>nul', $_, $returnCode);
+
+    return $returnCode === 0;
+}
+
+/**
+ * Find the merge-base between two Git refs.
+ */
+function getGitMergeBase($refA, $refB)
+{
+    $mergeBase = trim((string) shell_exec(
+        'git merge-base ' . escapeshellarg($refA) . ' ' . escapeshellarg($refB) . ' 2>nul'
+    ));
+
+    if ($mergeBase === '' || preg_match('/fatal|error/i', $mergeBase)) {
+        return null;
+    }
+
+    return $mergeBase;
+}
+
+/**
+ * Load and parse composer.json at a given Git ref.
+ */
+function getComposerJsonFromGitRef($gitRef)
+{
+    $path = PRIMARY_COMPOSERJSON_FILE_PATH;
+    $content = shell_exec(
+        'git show ' . escapeshellarg($gitRef . ':' . $path) . ' 2>nul'
+    );
+
+    if ($content === null || $content === '') {
+        return null;
+    }
+
+    $json = json_decode($content, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        logWarning('Invalid JSON in composer.json at Git ref ' . $gitRef . ': ' . json_last_error_msg());
+        return null;
+    }
+
+    return $json;
+}
+
+/**
+ * Diff two composer require sections and return touched packages.
+ */
+function diffComposerRequireSections($baseRequire, $headRequire)
+{
+    debugTouched('diffComposerRequireSections base package count: ' . count($baseRequire));
+    debugTouched('diffComposerRequireSections head package count: ' . count($headRequire));
+
+    $touched = [];
     $allPackages = array_unique(array_merge(
-        array_keys($currentPackages),
-        array_keys($comparisonPackages)
+        array_keys($baseRequire),
+        array_keys($headRequire)
     ));
 
     foreach ($allPackages as $package) {
@@ -813,18 +1004,120 @@ function getTouchedPackages($composerData, $currentBranch)
             continue;
         }
 
-        $currentVersion = $currentPackages[$package] ?? null;
-        $comparisonVersion = $comparisonPackages[$package] ?? null;
+        $headVersion = $headRequire[$package] ?? null;
+        $baseVersion = $baseRequire[$package] ?? null;
 
-        if ($currentVersion !== $comparisonVersion) {
+        if ($headVersion !== $baseVersion) {
             $touched[$package] = [
-                'from' => $comparisonVersion,
-                'to' => $currentVersion
+                'from' => $baseVersion,
+                'to' => $headVersion
             ];
         }
     }
 
+    debugTouched('Touched package count: ' . count($touched));
+
+    if (! empty($touched)) {
+        debugTouched('First touched packages:');
+        $i = 0;
+        foreach (array_keys($touched) as $package) {
+            if ($i >= 20) {
+                break;
+            }
+            $from = $touched[$package]['from'] ?? 'null';
+            $to = $touched[$package]['to'] ?? 'null';
+            debugTouched('  - ' . $package . ' (' . $from . ' -> ' . $to . ')');
+            $i++;
+        }
+    }
+
     return $touched;
+}
+
+/**
+ * Detect packages modified by the current feature branch since it diverged from its target.
+ *
+ * Uses resolveMergeBaseSha() to compare composer.json at the fork point against
+ * the current branch HEAD. CI responsibility is restricted to these packages.
+ */
+function getTouchedPackages($composerData, $currentBranch)
+{
+    if (! isset($composerData[$currentBranch])) {
+        return [];
+    }
+
+    debugTouched('Current branch: ' . $currentBranch);
+
+    $mergeBase = resolveMergeBaseSha();
+    if (! $mergeBase) {
+        return [];
+    }
+
+    $mergeBaseSummary = trim((string) shell_exec(
+        'git log --oneline -1 ' . escapeshellarg($mergeBase) . ' 2>nul'
+    ));
+    debugTouched('Merge base commit: ' . ($mergeBaseSummary !== '' ? $mergeBaseSummary : '(unknown)'));
+
+    $mergeBaseRawComposer = shell_exec(
+        'git show ' . escapeshellarg($mergeBase . ':' . PRIMARY_COMPOSERJSON_FILE_PATH) . ' 2>nul'
+    );
+    $mergeBaseRawComposer = $mergeBaseRawComposer ?? '';
+    debugTouched('Merge-base composer size: ' . strlen($mergeBaseRawComposer));
+    debugTouched('Merge-base composer md5: ' . ($mergeBaseRawComposer !== '' ? md5($mergeBaseRawComposer) : '(empty)'));
+
+    $workingTreeRawComposer = file_get_contents(PRIMARY_COMPOSERJSON_FILE_PATH);
+    debugTouched('Working tree composer size: ' . ($workingTreeRawComposer !== false ? strlen($workingTreeRawComposer) : 0));
+    debugTouched('Working tree composer md5: ' . ($workingTreeRawComposer !== false ? md5($workingTreeRawComposer) : '(failed)'));
+
+    $baseComposer = getComposerJsonFromGitRef($mergeBase);
+    if (! $baseComposer) {
+        logWarning("Could not load composer.json at merge-base {$mergeBase}");
+        return [];
+    }
+
+    debugTouched('Base composer loaded');
+    $baseRequire = $baseComposer['require'] ?? [];
+    debugTouched('Base require count: ' . count($baseRequire));
+
+    $headRequire = $composerData[$currentBranch]['require'] ?? [];
+    debugTouched('HEAD require count: ' . count($headRequire));
+    debugTouched('Inside getTouchedPackages require count: ' . count($headRequire));
+
+    debugTouched('Base require MD5: ' . md5(json_encode($baseRequire)));
+    debugTouched('Head require MD5: ' . md5(json_encode($headRequire)));
+
+    $baseToHeadDiff = array_diff_assoc($baseRequire, $headRequire);
+    $headToBaseDiff = array_diff_assoc($headRequire, $baseRequire);
+
+    debugTouched('Base->Head differences: ' . count($baseToHeadDiff));
+    if (! empty($baseToHeadDiff)) {
+        debugTouched('Sample:');
+        $i = 0;
+        foreach ($baseToHeadDiff as $package => $version) {
+            if ($i >= 10) {
+                break;
+            }
+            $headVersion = $headRequire[$package] ?? 'null';
+            debugTouched('  ' . $package . ': ' . $version . ' -> ' . $headVersion);
+            $i++;
+        }
+    }
+
+    debugTouched('Head->Base differences: ' . count($headToBaseDiff));
+    if (! empty($headToBaseDiff)) {
+        debugTouched('Sample:');
+        $i = 0;
+        foreach ($headToBaseDiff as $package => $version) {
+            if ($i >= 10) {
+                break;
+            }
+            $baseVersion = $baseRequire[$package] ?? 'null';
+            debugTouched('  ' . $package . ': ' . $version . ' (base was: ' . $baseVersion . ')');
+            $i++;
+        }
+    }
+
+    return diffComposerRequireSections($baseRequire, $headRequire);
 }
 
 /**
@@ -1434,7 +1727,7 @@ function renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHi
             }
         }
 
-        echo "\n**Pipeline Failed**: Current branch introduces stability issues that must be fixed.\n";
+        echo "\n**Pipeline Failed**: Current branch introduces stability issues that must be fixed or mitigated.\n";
         return;
     }
 
@@ -1660,6 +1953,22 @@ function analyzeCurrentBranchAgainstAcceptedState($packageHistory, $versionsToCh
     }
 
     $existingIssues = aggregateExistingIssues($existingIssues);
+
+    if ($currentBranch && isset($globalComposerData[$currentBranch]['require'])) {
+        $requireMd5BeforeTouched = md5(json_encode($globalComposerData[$currentBranch]['require']));
+        $requireCountBeforeTouched = count($globalComposerData[$currentBranch]['require']);
+        debugTouched('composerData require MD5 before getTouchedPackages(): ' . $requireMd5BeforeTouched);
+        debugTouched('Before getTouchedPackages require count: ' . $requireCountBeforeTouched);
+        global $debugTouchedComposerDataRequireMd5AfterLoading, $debugTouchedComposerDataRequireCountAfterLoading;
+        if ($debugTouchedComposerDataRequireMd5AfterLoading !== null
+            && $debugTouchedComposerDataRequireMd5AfterLoading !== $requireMd5BeforeTouched) {
+            debugTouched('composerData require MD5 MUTATED since loading');
+        }
+        if ($debugTouchedComposerDataRequireCountAfterLoading !== null
+            && $debugTouchedComposerDataRequireCountAfterLoading !== $requireCountBeforeTouched) {
+            debugTouched('composerData require count MUTATED since loading');
+        }
+    }
 
     $touchedPackages = getTouchedPackages($globalComposerData, $currentBranch);
 
