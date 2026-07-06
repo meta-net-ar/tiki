@@ -131,7 +131,6 @@ if (! empty($slidePluginData)) {
 }
 
 $pdata = formatContent($pdata, $tagsArr, $slidePluginHeadingLevelSlideSeparator);
-$pdata = formatContent($pdata, $tagsArr, $slidePluginHeadingLevelSlideSeparator);
 
 $revealJsThemesPath = REVEALJS_DIST_PATH . '/theme/';
 $revealJsCssFile = REVEALJS_DIST_PATH . '/reveal.css';
