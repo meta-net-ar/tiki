@@ -752,7 +752,8 @@ function fetchComposerDataForVersions($versionsToCheck, $currentBranch)
             }
         } else {
             $composer = getComposerJson([
-                'url' => "https://gitlab.com/tikiwiki/tiki/-/raw/$version/" . TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH . "/composer.json",
+               //'url' => "https://gitlab.com/tikiwiki/tiki/-/raw/$version/" . TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH . "/composer.json",
+               'url' => "C:/laragon/www/Tiki/temps/$version.json",
                 'type' => 'remote'
             ]);
         }
@@ -1394,7 +1395,7 @@ function splitExistingIssuesByType($existingIssues)
 /**
  * Summary
  */
-function renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHistory, $ignoreMap)
+function renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHistory, $ignoreMap, $unmitigatedCount = 0)
 {
     if ($acceptedStateAnalysis['shouldFail']) {
         echo "\n## 🚨 Current Branch Introduces New Stability Issues\n\n";
@@ -1449,7 +1450,7 @@ function renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHi
         [$stabilityIssues, $versionDowngrades] = splitExistingIssuesByType($acceptedStateAnalysis['existingIssues']);
 
         if (! empty($stabilityIssues)) {
-            echo "### Existing Accepted-State Stability Issues:\n";
+            echo "### Current Accepted-State Stability Warnings:\n";
             foreach ($stabilityIssues as $issue) {
                 echo "- **{$issue['package']}**: ";
                 $issueTypes = [];
@@ -1481,7 +1482,7 @@ function renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHi
 
         if (! empty($versionDowngrades)) {
             echo "\n";
-            echo "\n### ❌ New Regressions Against Accepted State:\n";
+            echo "\n### Current Accepted-State Historical Stable Version Downgrades:\n";
             foreach ($versionDowngrades as $issue) {
                 echo "- **{$issue['package']}**: Version downgrade detected";
 
@@ -1514,7 +1515,14 @@ function renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHi
         }
 
         if ($hasWarnings) {
-            echo "\n**Pipeline Failed**: Accepted state contains unmitigated stability warnings.\n";
+            if (! $acceptedStateAnalysis['shouldFail']) {
+                $issueLabel = $unmitigatedCount === 1 ? 'issue' : 'issues';
+                echo "\n**Current MR introduces no new dependency problems.**\n\n";
+                echo "**Repository still contains {$unmitigatedCount} unmitigated accepted-state {$issueLabel}.**\n";
+                echo "The pipeline fails due to existing dependency technical debt, not because of changes in this branch.\n";
+            } else {
+                echo "\n**Pipeline Failed**: Accepted state contains unmitigated stability warnings.\n";
+            }
             echo "**Action Suggested**:\n";
             echo "1. Fix unstable package versions in accepted state where possible, OR\n";
             echo "2. Add them to the `stability-ignore` list in `vendor_bundled/composer.json` with:\n";
@@ -2026,6 +2034,50 @@ function aggregateExistingIssues($existingIssues)
 }
 
 /**
+ * Count unmitigated warnings in existing accepted-state issues.
+ * This includes both stability issues (unstable versions not mitigated) and
+ * unmitigated version downgrades. Each package contributes at most one count:
+ * an unmitigated stability warning takes precedence over a downgrade on the
+ * same package.
+ *
+ * @param array $existingIssues Array of existing issues from accepted-state analysis
+ * @param array $packageHistory Complete package history across all versions
+ * @param array $ignoreMap Map of ignored packages per version
+ * @return int Number of unmitigated accepted-state issues
+ */
+function countUnmitigatedAcceptedStateIssues($existingIssues, $packageHistory, $ignoreMap)
+{
+    if (empty($existingIssues)) {
+        return 0;
+    }
+
+    $count = 0;
+
+    foreach ($existingIssues as $issue) {
+        $package = $issue['package'];
+        $history = $packageHistory[$package];
+
+        $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
+        if ($packageStatus['hasWarnings']) {
+            $count++;
+            continue;
+        }
+
+        if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
+            if (isset($issue['from_tiki'], $issue['to_tiki'])) {
+                $fromVersion = $issue['from_tiki'];
+                $toVersion = $issue['to_tiki'];
+                if (! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap)) {
+                    $count++;
+                }
+            }
+        }
+    }
+
+    return $count;
+}
+
+/**
  * Check if there are any unmitigated warnings in existing issues
  * This includes both stability issues (unstable versions not mitigated) and
  * unmitigated version downgrades.
@@ -2037,32 +2089,7 @@ function aggregateExistingIssues($existingIssues)
  */
 function hasUnmitigatedWarnings($existingIssues, $packageHistory, $ignoreMap)
 {
-    if (empty($existingIssues)) {
-        return false;
-    }
-
-    foreach ($existingIssues as $issue) {
-        $package = $issue['package'];
-        $history = $packageHistory[$package];
-
-        $packageStatus = determinePackageStatus($package, $history, $ignoreMap);
-        if ($packageStatus['hasWarnings']) {
-            return true;
-        }
-
-        if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
-            if (isset($issue['from_tiki']) && isset($issue['to_tiki'])) {
-                $fromVersion = $issue['from_tiki'];
-                $toVersion = $issue['to_tiki'];
-                $hasUnmitigatedDowngrade = ! isVersionDowngradeMitigated($package, $fromVersion, $toVersion, $ignoreMap);
-                if ($hasUnmitigatedDowngrade) {
-                    return true;
-                }
-            }
-        }
-    }
-
-    return false;
+    return countUnmitigatedAcceptedStateIssues($existingIssues, $packageHistory, $ignoreMap) > 0;
 }
 
 // Main execution
@@ -2090,12 +2117,17 @@ $ignoreMap = buildStabilityIgnoreMap($packageHistory);
 if ($isCiMode) {
     $acceptedStateAnalysis = analyzeCurrentBranchAgainstAcceptedState($packageHistory, $versionsToCheck, $ignoreMap);
 
-    $hasWarnings = false;
+    $unmitigatedCount = 0;
     if (! empty($acceptedStateAnalysis['existingIssues'])) {
-        $hasWarnings = hasUnmitigatedWarnings($acceptedStateAnalysis['existingIssues'], $packageHistory, $ignoreMap);
+        $unmitigatedCount = countUnmitigatedAcceptedStateIssues(
+            $acceptedStateAnalysis['existingIssues'],
+            $packageHistory,
+            $ignoreMap
+        );
     }
+    $hasWarnings = $unmitigatedCount > 0;
 
-    renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHistory, $ignoreMap);
+    renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHistory, $ignoreMap, $unmitigatedCount);
     echo "\n\n## Detailed Package Report\n";
     renderDetailedReport($packageHistory, $versionsToCheck, $ignoreMap, true);
 
