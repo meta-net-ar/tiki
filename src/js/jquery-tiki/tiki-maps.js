@@ -475,10 +475,13 @@ import { defaults as defaultControls } from "ol/control";
                                             if (feature.get("nocluster")) {
                                                 return null;
                                             }
+                                            const res = container.map.getView().getResolution();
                                             const geom = feature.getGeometry();
                                             if (!geom) return null;
-                                            if (geom instanceof ol.geom.Polygon || geom instanceof ol.geom.LineString) {
+                                            if (geom instanceof ol.geom.Polygon || geom instanceof ol.geom.MultiPolygon) {
                                                 // Use the centroid of the polygon's extent
+                                                return geom.getInteriorPoint();
+                                            } else if (geom instanceof ol.geom.LineString || geom instanceof ol.geom.MultiLineString) {
                                                 return new ol.geom.Point(ol.extent.getCenter(geom.getExtent()));
                                             } else {
                                                 return geom;
