@@ -266,6 +266,9 @@ import { defaults as defaultControls } from "ol/control";
 
             if (!lonlat) {
                 coordinates = original;
+            } else {
+                coordinates[0] = lonlat[1];
+                coordinates[1] = lonlat[0];
             }
         }
 
