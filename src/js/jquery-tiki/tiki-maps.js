@@ -186,10 +186,10 @@ import { defaults as defaultControls } from "ol/control";
                 const f = factories[name];
                 let layer;
 
-                if (f) {
-                    layer = f();
-                } else {
-                    if (name.match(/stamen_/)) {
+                try {
+                    if (f) {
+                        layer = f();
+                    } else if (name.match(/stamen_/)) {
                         const flavor = name.substring(7);
 
                         layer = new ol.layer.Tile({
@@ -198,7 +198,35 @@ import { defaults as defaultControls } from "ol/control";
                             }),
                             title: "Stamen" + flavor,
                         });
+                    } else if (name.match(/stadia_/)) {
+                        const flavor = name.substring(7);
+
+                        layer = new ol.layer.Tile({
+                            source: new ol.source.StadiaMaps({
+                                layer: `${flavor.replace(/-/g, "_")}`,
+                                retina: true,
+                            }),
+                            title: "Stadia" + flavor,
+                        });
+                    } else if (name.match(/^http.*\.json.*/)) {
+                        layer = new ol.layer.Tile({
+                            source: new ol.source.TileJSON({
+                                url: name,
+                                tileSize: 512,
+                                crossOrigin: "anonymous",
+                            }),
+                            title: name.replace(/^.*?\/(.*?)\//, "$1") + " json",
+                        });
+                    } else if (name.match(/^http.*\{z}\/\{x}\/\{y}.*/)) {
+                        layer = new ol.layer.Tile({
+                            source: new ol.source.ImageTile({
+                                url: name,
+                            }),
+                            title: name.replace(/^.*?\/(.*?)\//, "$1") + " xyz",
+                        });
                     }
+                } catch (e) {
+                    feedback(tr(`Layer "${name}" could not be created` + "\n" + e.message), "error", false, tr("Layer creation failed"));
                 }
                 return layer;
             };
@@ -867,25 +895,26 @@ import { defaults as defaultControls } from "ol/control";
                     ts = [ts];
                 }
             }
-            for (let i = 0; i < ts.length; i++) {
-                pos = ts[i].indexOf("=");
+            // parse the geo_tilesets pref (or data-tilesets) which can be in the format Label=layer_!~layer_1 etc
+            ts.forEach(function (tileSet, i) {
+                pos = tileSet.indexOf("=");
                 if (pos !== -1) {
-                    key = ts[i].substr(0, pos);
-                    ts[i] = ts[i].substr(pos + 1);
+                    key = tileSet.substr(0, pos);
+                    tileSet = tileSet.substr(pos + 1);
                 } else {
-                    const m = ts[i].match(/\W/);
+                    const m = tileSet.match(/\W/);
                     if (m) {
-                        key = ts[i].substr(0, ts[i].indexOf(m[0]));
+                        key = tileSet.substr(0, tileSet.indexOf(m[0]));
                     } else {
-                        key = ts[i];
+                        key = tileSet;
                     }
                 }
-                if (ts[i].indexOf("~") !== -1) {
-                    tilesets[key] = ts[i].split("~");
+                if (tileSet.indexOf("~") !== -1) {
+                    tilesets[key] = tileSet.split("~");
                 } else {
-                    tilesets[key] = ts[i];
+                    tilesets[key] = tileSet;
                 }
-            }
+            });
 
             errorLayers = [];
 
@@ -1825,8 +1854,8 @@ import { defaults as defaultControls } from "ol/control";
                                             format = new ol.format.GPX();
                                         }
                                     }
-                                    for (let f = 0; f < files.length; f++) {
-                                        $.get(files[f], function (data) {
+                                    files.forEach(function (file) {
+                                        $.get(file, function (data) {
                                             try {
                                                 const features = format.readFeatures(data, {
                                                     dataProjection: "EPSG:4326",
@@ -1875,7 +1904,7 @@ import { defaults as defaultControls } from "ol/control";
                                                 $(container).trigger("add", [item, feature]);
                                             });
                                         });
-                                    }
+                                    });
                                 }
                             });
                         },
