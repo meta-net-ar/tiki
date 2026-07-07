@@ -319,10 +319,10 @@ import { defaults as defaultControls } from "ol/control";
                 return defaultVectorColor;
             };
 
-            const getFeatureColorStyle = (feature, color, fillColor) => {
+            const getFeatureStyle = (feature, color, fillColor) => {
                 let coloredStyle;
 
-                if (feature.get("features")) {
+                if (feature.get("features") && feature.get("features").length) {
                     feature = feature.get("features")[0];
                 }
 
@@ -612,7 +612,7 @@ import { defaults as defaultControls } from "ol/control";
                                         features = feature.get("features");
 
                                     if (!features && feature) {
-                                        return getFeatureColorStyle(feature);
+                                        return getFeatureStyle(feature);
                                     }
 
                                     if (features.length > 1) {
@@ -625,7 +625,7 @@ import { defaults as defaultControls } from "ol/control";
                                             })
                                         );
                                     }
-                                    features.forEach((f) => styles.push(getFeatureColorStyle(f)));
+                                    features.forEach((f) => styles.push(getFeatureStyle(f)));
                                     return styles;
                                 };
 
@@ -676,8 +676,8 @@ import { defaults as defaultControls } from "ol/control";
                                             style = styleCache["f" + feature.ol_uid];
 
                                             if (!style) {
-                                                // Always try to create a style - getFeatureColorStyle handles custom colors
-                                                style = getFeatureColorStyle(feature);
+                                                // Always try to create a style - getFeatureStyle handles custom colors
+                                                style = getFeatureStyle(feature);
                                                 styleCache["f" + feature.ol_uid] = style;
                                             }
                                         }
@@ -703,7 +703,7 @@ import { defaults as defaultControls } from "ol/control";
                                 if ($(container).data("popup-style")) {
                                     const selectionInteraction = new ol.interaction.Select({
                                         style: (feature) => {
-                                            return getFeatureColorStyle(feature);
+                                            return getFeatureStyle(feature);
                                         },
                                         layers: [vectors],
                                     });
@@ -738,7 +738,7 @@ import { defaults as defaultControls } from "ol/control";
                                         if (style) {
                                             return style;
                                         } else {
-                                            style = getFeatureColorStyle(feature);
+                                            style = getFeatureStyle(feature);
                                             styleCache["f" + feature.ol_uid] = style;
                                             return style;
                                         }
@@ -751,7 +751,7 @@ import { defaults as defaultControls } from "ol/control";
                                 source: new ol.source.Vector({ wrapX: false }),
                                 title: name,
                                 style: (feature) => {
-                                    return getFeatureColorStyle(feature);
+                                    return getFeatureStyle(feature);
                                 },
                             });
                         }
@@ -2158,7 +2158,7 @@ import { defaults as defaultControls } from "ol/control";
                             container.featureColors[key] = color;
                         }
                     }
-                    let coloredStyle = getFeatureColorStyle(feature, color);
+                    let coloredStyle = getFeatureStyle(feature, color);
 
                     if (feature.executor) {
                         feature.executor();
@@ -2221,7 +2221,7 @@ import { defaults as defaultControls } from "ol/control";
                                     if (Array.isArray(coords)) {
                                         const key = coords.join(",");
                                         if (container.featureColors[key]) {
-                                            getFeatureColorStyle(feature, container.featureColors[key]);
+                                            getFeatureStyle(feature, container.featureColors[key]);
                                         }
                                     }
                                 }
