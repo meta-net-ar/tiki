@@ -28,8 +28,13 @@
 
                 $baseLayers.on("change", function () {
                     if (container.map) {
-                        const layers = container.map.getLayers();
-                        //LayerSwitcher.setVisible_(container.map, layers.item($(this).val()));
+                        $(
+                            "#" +
+                            $(".layer-switcher-base-group", ".layer-switcher")
+                            .find("label:contains('" + $(":selected", this).text() + "')")
+                            .attr("for")
+                        ).trigger("click")
+
                     }
                 });
 
@@ -56,7 +61,7 @@
                         innerLayers.forEach(thisLayer => {
                             if (thisLayer.get("type") === "base") {
                                 $baseLayers.append($('<option>')
-                                    .attr('value', k)
+                                    .attr('value', $baseLayers.find("option").length)
                                     .text(tr(thisLayer.get("title")))
                                     .prop('selected', thisLayer === container.map.baseLayer));
                             } else {
