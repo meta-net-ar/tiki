@@ -206,7 +206,13 @@ $('#appframe .anchor').each(function () {
 
     $('.anchor-toggle', anchor).on("click", function () {
         $('.anchor-head .label', anchor).toggle('fast');
-        $('.anchor-content', anchor).toggle('fast');
+        const showing =$('.anchor-content', anchor).toggle('fast').is(":visible");
+        $(anchor).closest(".anchor-container").find('.anchor').each(function () {
+            if (anchor !== this && showing) {
+                $('.anchor-head .label', this).hide('fast');
+                $('.anchor-content', this).hide('fast');
+            }
+        });
         return false;
     });
 
