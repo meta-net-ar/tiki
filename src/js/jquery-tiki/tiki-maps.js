@@ -295,12 +295,11 @@ import { defaults as defaultControls } from "ol/control";
             if (!lonlat) {
                 coordinates = original;
             } else {
-                coordinates[0] = lonlat[1];
-                coordinates[1] = lonlat[0];
+                coordinates = lonlat;
             }
         }
 
-        return formatLocation(coordinates[0], coordinates[1], parseInt(map.getView().getZoom()));
+        return formatLocation(coordinates[1], coordinates[0], parseInt(map.getView().getZoom()));
     }
 
     function formatLocation(lat, lon, zoom) {
@@ -2450,7 +2449,7 @@ import { defaults as defaultControls } from "ol/control";
                     if (event.coordinates) {
                         coords = event.coordinates;
                     } else {
-                        coords = map.getCoordinateFromPixel([event.originalEvent.offsetX, event.originalEvent.offsetY]);
+                        coords = map.getCoordinateFromPixel([event.originalEvent.layerX, event.originalEvent.layerY]);
                     }
                     const lonlat = ol.proj.transform(
                         coords,
@@ -2464,8 +2463,8 @@ import { defaults as defaultControls } from "ol/control";
                         unique: "selection",
                     });
                     $(container).trigger("selectionChange", {
-                        lat: lonlat[0],
-                        lon: lonlat[1],
+                        lat: lonlat[1],
+                        lon: lonlat[0],
                     });
 
                     if (options.click) {
