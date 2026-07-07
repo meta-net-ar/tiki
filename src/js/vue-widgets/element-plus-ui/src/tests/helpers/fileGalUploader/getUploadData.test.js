@@ -8,7 +8,7 @@ import { ElMessage } from "element-plus";
 describe("fileGalUploader getUploadData helper", () => {
     beforeAll(() => {
         window.$ = $;
-        const form = $("<form id='file_0'><input type='text' name='foo[]' value='bar' /></form>");
+        const form = $("<form id='file_0'><input type='text' name='foo' value='bar' /></form>");
         $("body").append(form);
     });
 
