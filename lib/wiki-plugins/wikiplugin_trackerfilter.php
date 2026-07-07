@@ -242,7 +242,7 @@ function wikiplugin_trackerfilter($data, $params)
      *added by Axel.mwenze on  Monday, august 05, 2019
      */
     $headerlib->add_jq_onready(
-        '$("#form-filter").on("submit", function(r) { 
+        '$("#form-filter").on("submit", function(r) {
                 $(".trackerfilter_loader").show();
                 return true;
         })'
@@ -280,7 +280,11 @@ function wikiplugin_trackerfilter($data, $params)
             }
         }
     }
-    if (! empty($_REQUEST['filter']) || ! empty($_REQUEST['reset_filter'])) {  // If we set a new filter, reset pagination for this plugin
+    // reset pagination on a new filter, but not when clicking pagination (it has tr_offset)
+    if (
+        ! empty($_REQUEST['reset_filter'])
+        || (! empty($_REQUEST['filter']) && ! isset($_REQUEST["tr_offset$iTrackerFilter"]))
+    ) {
         unset($GLOBALS['_REQUEST']["tr_offset$iTrackerFilter"]);
     }
 
