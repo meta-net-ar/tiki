@@ -148,6 +148,16 @@ export default defineConfig(({ command, mode }) => {
         "wysiwyg/summernote": resolve(__dirname, "wysiwyg/summernote/index.js"),
         "wysiwyg/plugin": resolve(__dirname, "wysiwyg/plugin.js"),
     });
+
+    const watchFilter = process.env.TIKI_WATCH_FILTER;
+    if (watchFilter) {
+        for (const key of Object.keys(rollupInput)) {
+            if (!key.startsWith(watchFilter)) {
+                delete rollupInput[key];
+            }
+        }
+    }
+
     return {
         base: "/public/generated/js", //This must NOT have a trailing slash
         publicDir: false, //tiki already uses public for other purposes.  If we want to use this feature we can create a src/public folder for it.
