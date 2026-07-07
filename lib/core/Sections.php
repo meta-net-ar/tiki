@@ -411,5 +411,22 @@ class Sections
                 ];
             }
         }
+
+        // Fallback: resolve a plain wiki page from the request when no other
+        // context is available (e.g. when called before tiki-index.php sets
+        // $cat_type/$cat_objid). The page request var may be a slug.
+        if (! empty($request['page'])) {
+            $pageName = $request['page'];
+            if ($prefs['wiki_url_scheme'] !== 'urlencode') {
+                $resolved = TikiLib::lib('wiki')->get_page_by_slug($pageName);
+                if (! empty($resolved)) {
+                    $pageName = $resolved;
+                }
+            }
+            return [
+                'type' => 'wiki page',
+                'object' => $pageName,
+            ];
+        }
     }
 }
