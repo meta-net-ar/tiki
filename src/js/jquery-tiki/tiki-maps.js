@@ -319,8 +319,12 @@ import { defaults as defaultControls } from "ol/control";
                 return defaultVectorColor;
             };
 
-            const setFeatureColorStyle = (feature, color, fillColor) => {
+            const getFeatureColorStyle = (feature, color, fillColor) => {
                 let coloredStyle;
+
+                if (feature.get("features")) {
+                    feature = feature.get("features")[0];
+                }
 
                 if (!color) {
                     color = getFeatureColor(feature);
@@ -364,6 +368,58 @@ import { defaults as defaultControls } from "ol/control";
                 return coloredStyle;
             };
 
+            const getFeatureSelectStyle = (feature, color, fillColor) => {
+                let coloredStyle;
+
+                if (feature.get("features")) {
+                    feature = feature.get("features")[0];
+                }
+
+                if (!color) {
+                    color = getFeatureColor(feature);
+                }
+
+                if (!fillColor) {
+                    fillColor = feature.get("fillColor");
+                }
+
+                if (!fillColor) {
+                    // no fillColor provided, use semi-transparent color
+                    const rgba = Array.from(ol.color.asArray(color));
+                    fillColor = ol.color.asString([rgba[0], rgba[1], rgba[2], rgba[3] / 4]);
+                }
+
+                const intent = feature.get("intent");
+
+                if (intent === "vectors") {
+                    coloredStyle = new ol.style.Style({
+                        fill: new ol.style.Fill({ color: fillColor }),
+                        stroke: new ol.style.Stroke({ color: color, width: 4 }),
+                    });
+                } else if (intent === "marker") {
+                    coloredStyle = new ol.style.Style({
+                        image: new ol.style.Icon({
+                            anchor: [0.5, 0.8],
+                            src: feature.get("url"),
+                            scale: 1.5,
+                        }),
+                    });
+                } else {
+                    // Create a colored circle style
+                    coloredStyle = new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: 12,
+                            fill: new ol.style.Fill({ color: fillColor }),
+                            stroke: new ol.style.Stroke({ color: color, width: 2 }),
+                        }),
+                    });
+                }
+                // Don't set the style on the feature but let the layer handle it
+                return coloredStyle;
+            };
+
+            container.getFeatureSelectStyle = getFeatureSelectStyle;
+
             $(container).css("background", "white");
 
             container.setupLayerEvents = function (vectors) {
@@ -399,6 +455,7 @@ import { defaults as defaultControls } from "ol/control";
                 });
 
                 if (modifyInteraction) {
+                    modifyInteraction.set("style", (feature) => getFeatureSelectStyle(feature));
                     modifyInteraction.on("modifyend", function (event) {
                         let featuresArray = event.features.item(0).get("features") ?? event.features.getArray();
                         featuresArray.forEach((feature) => {
@@ -555,7 +612,7 @@ import { defaults as defaultControls } from "ol/control";
                                         features = feature.get("features");
 
                                     if (!features && feature) {
-                                        return setFeatureColorStyle(feature);
+                                        return getFeatureColorStyle(feature);
                                     }
 
                                     if (features.length > 1) {
@@ -568,7 +625,7 @@ import { defaults as defaultControls } from "ol/control";
                                             })
                                         );
                                     }
-                                    features.forEach((f) => styles.push(setFeatureColorStyle(f)));
+                                    features.forEach((f) => styles.push(getFeatureColorStyle(f)));
                                     return styles;
                                 };
 
@@ -619,8 +676,8 @@ import { defaults as defaultControls } from "ol/control";
                                             style = styleCache["f" + feature.ol_uid];
 
                                             if (!style) {
-                                                // Always try to create a style - setFeatureColorStyle handles custom colors
-                                                style = setFeatureColorStyle(feature);
+                                                // Always try to create a style - getFeatureColorStyle handles custom colors
+                                                style = getFeatureColorStyle(feature);
                                                 styleCache["f" + feature.ol_uid] = style;
                                             }
                                         }
@@ -646,7 +703,7 @@ import { defaults as defaultControls } from "ol/control";
                                 if ($(container).data("popup-style")) {
                                     const selectionInteraction = new ol.interaction.Select({
                                         style: (feature) => {
-                                            return setFeatureColorStyle(feature);
+                                            return getFeatureColorStyle(feature);
                                         },
                                         layers: [vectors],
                                     });
@@ -681,7 +738,7 @@ import { defaults as defaultControls } from "ol/control";
                                         if (style) {
                                             return style;
                                         } else {
-                                            style = setFeatureColorStyle(feature);
+                                            style = getFeatureColorStyle(feature);
                                             styleCache["f" + feature.ol_uid] = style;
                                             return style;
                                         }
@@ -694,7 +751,7 @@ import { defaults as defaultControls } from "ol/control";
                                 source: new ol.source.Vector({ wrapX: false }),
                                 title: name,
                                 style: (feature) => {
-                                    return setFeatureColorStyle(feature);
+                                    return getFeatureColorStyle(feature);
                                 },
                             });
                         }
@@ -2101,7 +2158,7 @@ import { defaults as defaultControls } from "ol/control";
                             container.featureColors[key] = color;
                         }
                     }
-                    let coloredStyle = setFeatureColorStyle(feature, color);
+                    let coloredStyle = getFeatureColorStyle(feature, color);
 
                     if (feature.executor) {
                         feature.executor();
@@ -2164,7 +2221,7 @@ import { defaults as defaultControls } from "ol/control";
                                     if (Array.isArray(coords)) {
                                         const key = coords.join(",");
                                         if (container.featureColors[key]) {
-                                            setFeatureColorStyle(feature, container.featureColors[key]);
+                                            getFeatureColorStyle(feature, container.featureColors[key]);
                                         }
                                     }
                                 }

@@ -447,6 +447,7 @@ function wikiplugin_appframe_mapcontrol($data, $params, $start)
         case 'modify_feature':
             $control = 'new ol.interaction.Modify({
             source: shapelayer ? shapelayer.get("source") : vlayer.get("source"),
+            style: (feature) => container.getFeatureSelectStyle(feature),
         }), new ol.interaction.Select({layers: [vlayer, shapelayer]})';
             $label = tr('Select/Modify');
             break;
