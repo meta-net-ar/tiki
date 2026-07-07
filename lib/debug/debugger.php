@@ -174,7 +174,7 @@ class Debugger extends ResultType
                         }
                     }
                 }
-                $result .= print_r($var, true);
+                $result .= print_r($var, true); // @phpstan-ignore disallowedFunctions.printR (intentional debug tool — builds watch output string)
             } else {
                 $result .= "ERROR: Undefined variable $var";
             }

@@ -454,7 +454,6 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
         global $mimetypes;
         global $tikipath;
 
-
         include('lib/mime/mimetypes.php');
         $galleryId = (int)$this->getOption('galleryId');
 
@@ -666,6 +665,25 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             }
         }
         return $ret;
+    }
+
+    /**
+     * Render the field as plain text
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $value = $this->getValue();
+        if (empty($value)) {
+            return '';
+        }
+        $fileIds = array_filter(explode(',', $value));
+        $fileInfo = $this->getFileInfo($fileIds);
+        return implode(', ', array_map(function ($file) {
+            return $file['name'];
+        }, $fileInfo));
     }
 
     private function isMimeType(array $mimes, string $fileType, array $extensions): bool

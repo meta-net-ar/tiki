@@ -15,7 +15,7 @@
 {/foreach}
 {/if}
 
-{tr}To validate that {$prefs.mail_template_custom_text}account, please follow the link:{/tr}
+{tr _0=$prefs.mail_template_custom_text}To validate that %0account, please follow the link:{/tr}
 
 {$validation_url}
 

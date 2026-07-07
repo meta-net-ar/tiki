@@ -1232,7 +1232,7 @@ function wikiplugin_dbreport($data, $params)
     }
 
     if (! empty($params['audit'])) {
-        TikiLib::lib('logs')->add_log('wikiplugin_dbreport', "Page - " . $_GET['page'] . "\nParameters - " . print_r($bindvars, true));
+        TikiLib::lib('logs')->add_log('wikiplugin_dbreport', "Page - " . $_GET['page'] . "\nParameters - " . print_r($bindvars, true)); // @phpstan-ignore disallowedFunctions.printR (returns bind vars as string for Tiki log entry, never prints)
     }
 
     if (! is_null($params['audit_csv'])) {

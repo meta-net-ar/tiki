@@ -113,7 +113,7 @@
                             <textarea name="f_{$filter.fieldId}" class="d-none">
                                 {$filter.opts.field_selection|escape}
                             </textarea>
-                            {object_selector_multi _id="object_filter_{$filter.fieldId}" _name="object_filter_{$filter.fieldId}" _filter=$filter.opts.field_filter _value=$filter.opts.field_selection _format=$filter.opts.field_format }
+                            {object_selector_multi _id="object_filter_{$filter.fieldId}" _name="object_filter_{$filter.fieldId}" _filter=$filter.opts.field_filter _value=$filter.opts.field_selection _format=$filter.opts.field_format}
                             <div class="text-center mt-3 mb-3">{tr}Or{/tr}</div>
                             <select name="other_filter_{$filter.fieldId}" class="form-control">
                                 <option value=''>{tr}-- Choose an option --{/tr}</option>

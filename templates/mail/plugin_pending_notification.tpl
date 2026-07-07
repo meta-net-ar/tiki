@@ -1,7 +1,7 @@
 {$object_link="<a href='{$objectId|sefurl:$type}'>{$objectId|escape}</a>"}
 {tr _0=$plugin_name _1=$object_link}Plugin %0 is pending approval on %1.{/tr}
 
-{tr _0="{$base_url}tiki-plugins.php"}See all the {$prefs.mail_template_custom_text}pending plugins in the <a href='%0'>plugin approval page</a>.{/tr}
+{tr _0=$prefs.mail_template_custom_text _1="<a href='{$base_url|escape}tiki-plugins.php'>" _2="</a>"}See all the %0pending plugins in the %1plugin approval page%2.{/tr}
 
 {if !empty($arguments)}
     <b>{tr}Plugin arguments:{/tr}</b>

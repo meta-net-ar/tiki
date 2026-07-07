@@ -36,6 +36,14 @@ function wikiplugin_includeurl($data, $params)
         return tr('Missing parameter url for plugin %0', 'includeurl') . '<br>';
     } else {
         $url = $params['url'];
+
+        // Prevent SSRF: the response body is rendered into the wiki page,
+        // so block requests to private/reserved IPs and non-http(s) schemes.
+        $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+        if (! $ssrf->isUrlAllowed($url)) {
+            return tra('URL is not allowed (targets a private or reserved address).');
+        }
+
         $html = file_get_contents($url);
 
         // Only include the body part of the html file

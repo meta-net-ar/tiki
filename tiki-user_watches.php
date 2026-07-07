@@ -13,6 +13,7 @@ $inputConfiguration = [
         'staticKeyFilters'      => [
             'categwatch'        => 'int',          //post
             'id'                => 'int',          //post
+            'hash'              => 'word',         //get - unsubscribe hash
             'add'               => 'bool',         //post
             'event'             => 'striptags',    //post
             'delete'            => 'bool',         //post
@@ -70,14 +71,20 @@ if (isset($_REQUEST['categwatch'])) {
     }
 }
 // request from unsubscribe email link, like in templates/mail/user_watch_map_changed.tpl
-// TODO would be better to provide a token with the unsubscribe link that could be matched to the database
-// TODO so that the user doesn't have to log in to unsubscribe - similar to unsubscribe in tiki-newsletter.php
+// The link includes an HMAC hash so that only the recipient of the email can unsubscribe.
 if (isset($_REQUEST['id'])) {
-    if ($tiki_p_admin_notifications != 'y' && $user != $tikilib->get_user_notification($_REQUEST['id'])) {
+    $watchId = $_REQUEST['id'];
+    $hash = isset($_REQUEST['hash']) ? $_REQUEST['hash'] : '';
+
+    if (empty($hash) || ! $tikilib->verifyWatchUnsubscribeHash($watchId, $hash)) {
+        Feedback::errorPage(['mes' => tr('Invalid or missing unsubscribe token'), 'errortype' => 403]);
+    }
+
+    if ($tiki_p_admin_notifications != 'y' && $user != $tikilib->get_user_notification($watchId)) {
         Feedback::errorPage(['mes' => tr('Permission denied'), 'errortype' => 401]);
     }
     if ($access->checkCsrf()) {
-        $result = $tikilib->remove_user_watch_by_id($_REQUEST['id']);
+        $result = $tikilib->remove_user_watch_by_id($watchId);
     }
     if ($result && $result->numRows()) {
         Feedback::success(tr('Unsubscribed from user watch email notification'));

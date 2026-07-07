@@ -21,10 +21,10 @@
 {else}
     <div class="color-mode-navbar">
         <div class="dropdown">
-            <button class="btn btn-link dropdown-toggle py-2 px-0 px-lg-2 d-flex align-items-center loading" id="color-mode-theme" data-bs-toggle="dropdown" type="button" aria-expanded="false" data-bs-display="static" aria-label="Toggle theme (auto)">
+            <button class="btn btn-link dropdown-toggle py-2 px-0 px-lg-2 d-flex align-items-center loading" id="color-mode-theme" data-bs-toggle="dropdown" type="button" aria-expanded="false" data-bs-display="static" aria-label="{tr}Toggle theme (auto){/tr}">
                 {icon name=$default_icon}
             </button>
-            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="color-mode-theme" data-bs-popper="static">
+            <ul class="dropdown-menu" aria-labelledby="color-mode-theme">
                 {foreach $default_mode item=mode}
                     <li>
                         <button type="button" class="dropdown-item d-flex align-items-center gap-1" data-bs-theme-value="{$mode['name']}" aria-pressed="false">

@@ -54,11 +54,11 @@
                 {section name=ix loop=$atts}
                     <tr>
                         <td class="id">{$atts[ix].attId}</td>
-                        <td class="text">
+                        <td class="text text-break">
                             {$atts[ix].filename|iconify}
                             <a class="tablename" href="tiki-download_wiki_attachment.php?attId={$atts[ix].attId}&amp;page={$page|escape:"url"}&amp;download=y">{$atts[ix].filename}</a>
                         </td>
-                        <td class="text"><small>{$atts[ix].comment|escape}</small></td>
+                        <td class="text"><small title="{$atts[ix].comment|escape}">{$atts[ix].comment|truncate:200:"...":true|escape}</small></td>
                         <td class="date">
                             <small>{if $atts[ix].user}{$atts[ix].user|userlink}{/if} {$atts[ix].created|tiki_short_datetime}</small>
                         </td>

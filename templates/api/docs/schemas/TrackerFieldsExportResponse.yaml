@@ -1,0 +1,20 @@
+---
+description: Response from GET /trackers/{trackerId}/fields/export.
+type: object
+required:
+  - title
+  - trackerId
+  - fields
+  - export
+properties:
+  title:
+    type: string
+  trackerId:
+    type: integer
+  fields:
+    type: array
+    items:
+      $ref: schemas-TrackerField.yaml
+  export:
+    type: string
+    description: INI-format string representation of all fields.

@@ -56,9 +56,9 @@
 {if $presend eq 'y'}
     <div id="confirmArea">
     {remarksbox type='note' title="{tr}Please Confirm{/tr}"}
-        <b>{tr}This newsletter will be sent to {$subscribers} email addresses.{/tr}</b>
+        <b>{tr _0=$subscribers}This newsletter will be sent to %0 email addresses.{/tr}</b>
         <br>
-        {if $prefs.newsletter_throttle eq 'y'}{tr}Sending will be throttled with a batch size of {$prefs.newsletter_batch_size} and a pause period of {$prefs.newsletter_pause_length} seconds.{/tr}<br>{/if}
+        {if $prefs.newsletter_throttle eq 'y'}{tr _0=$prefs.newsletter_batch_size _1=$prefs.newsletter_pause_length}Sending will be throttled with a batch size of %0 and a pause period of %1 seconds.{/tr}<br>{/if}
         {tr}Reply to:{/tr} {if empty($replyto) AND empty($sendfrom)}{$prefs.sender_email|escape} ({tr}default{/tr})<br>{elseif !empty($replyto) AND !empty($sendfrom)}{$replyto|escape}<br>{elseif !empty($sendfrom)}{$sendfrom|escape}<br>{else}{$replyto|escape}<br>{/if}
         {tr}Send from:{/tr} {if empty($sendfrom)}{$prefs.sender_email|escape} ({tr}default{/tr})<br>{else}{$sendfrom|escape}<br>{/if}
     {/remarksbox}
@@ -138,9 +138,9 @@
 
     <div id="sendingArea" style="display:none">
         <h3>{tr}Sending Newsletter{/tr} ...</h3>
-        <h5> ... {if $prefs.newsletter_throttle eq 'y'}throttled {/if}{tr}sending to {$subscribers} addresses{/tr}</h5>
-        {if $replyto ne ''}<h5> ... {tr}with the 'Reply To' email set to: {$replyto}{/tr}</h5>{/if}
-        {if $sendfrom ne ''}<h5> ... {tr}with the 'Send From' email set to: {$sendfrom}{/tr}</h5>{/if}
+        <h5> ... {if $prefs.newsletter_throttle eq 'y'}throttled {/if}{tr _0=$subscribers}sending to %0 addresses{/tr}</h5>
+        {if $replyto ne ''}<h5> ... {tr _0=$replyto}with the 'Reply To' email set to: %0{/tr}</h5>{/if}
+        {if $sendfrom ne ''}<h5> ... {tr _0=$sendfrom}with the 'Send From' email set to: %0{/tr}</h5>{/if}
         <div id="confirmed"></div>
         <iframe id="resultIframe" name="resultIframe" frameborder="0" style="width: 600px; height: 400px"></iframe>
         {jq}

@@ -152,13 +152,13 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
         $prefs['feature_use_three_colon_centertag'] = 'n';
         $prefs['wiki_heading_links'] = 'n';
         $inData = '!::Heading::';
-        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-start" id="Heading">Heading</h1>';
+        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-center" id="Heading">Heading</h1>';
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
 
         $prefs['feature_use_three_colon_centertag'] = 'y';
         $inData = '!:::Heading:::';
-        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-start" id="Heading">Heading</h1>';
+        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-center" id="Heading">Heading</h1>';
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
 
@@ -168,13 +168,13 @@ class EditLib_ParseToWysiwyg_TextTest extends TikiTestCase
          */
         $prefs['feature_use_three_colon_centertag'] = 'n';
         $inData = '!#::Heading::';
-        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-start" id="Heading">1. Heading</h1>';
+        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-center" id="Heading">1. Heading</h1>';
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
 
         $prefs['feature_use_three_colon_centertag'] = 'y';
         $inData = '!#:::Heading:::';
-        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-start" id="Heading">1. Heading</h1>';
+        $ex = '<h1 style="text-align: center;" class="showhide_heading d-flex justify-content-center" id="Heading">1. Heading</h1>';
         $out = trim($this->el->parseToWysiwyg($inData));
         $this->assertEquals($ex, $out);
     }

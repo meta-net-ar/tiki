@@ -28,6 +28,9 @@ post:
           schema:
             type: object
             properties:
+              threadId:
+                type: integer
+                nullable: true
               comment:
                 $ref: schemas-Comment.yaml
     '403':

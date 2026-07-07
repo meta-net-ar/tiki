@@ -54,6 +54,9 @@ function wikiplugin_shopperinfo($data, $params)
 {
     global $user;
     $smarty = TikiLib::lib('smarty');
+
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_shopperinfo_info());
+
     if ($user && ($params['showifloggedin'] != 'y') || empty($params['values'])) {
         return '';
     }

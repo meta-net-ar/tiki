@@ -171,6 +171,8 @@ function wikiplugin_xmpp($data, $params)
     $servicelib = TikiLib::lib('service');
     $smarty = TikiLib::lib('smarty');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_xmpp_info());
+
     $anonMode = trim($prefs['xmpp_anonymous_mode'] ?? '');
     $isAnonymous = ($params['visibility'] ?? '') === 'anonymous';
     $dmMode = $isAnonymous && $anonMode === 'support';

@@ -90,7 +90,7 @@ class Services_User_Controller
         }
 
         if ($pass !== $passAgain) {
-            throw new Services_Exception(tr('Passwords do not match.'));
+            throw new Services_Exception(tr('Passwords do not match.'), 422);
         }
 
         $regResult = TikiLib::lib('registration')->register_new_user(
@@ -103,6 +103,11 @@ class Services_User_Controller
                 'email' => $email,
             ]
         );
+
+        if (is_array($regResult) && ! empty($regResult)) {
+            $messages = implode(', ', array_column($regResult, 'msg'));
+            throw new Services_Exception($messages, 422);
+        }
 
         if (TIKI_API && empty($regResult)) {
             $regResult = tra('User account created but pending confirmation.');
@@ -897,7 +902,7 @@ class Services_User_Controller
                 if (! $mail->send($this->lib->get_user_email($mail_user))) {
                     $errormsg = tra('Unable to send mail');
                     if (Perms::get()->admin) {
-                        $mailerrors = print_r($mail->errors, true);
+                        $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string, never prints)
                         $errormsg .= $mailerrors;
                     }
                     if (TIKI_API) {
@@ -952,6 +957,15 @@ class Services_User_Controller
             Feedback::error(tra('No user was selected.'));
             return Services_Utilities::closeModal();
         }
+        // ensures the user selected to send a message to exists.
+        if (! $userlib->user_exists($userwatch)) {
+            if (TIKI_API) {
+                throw new Services_Exception_NotFound('The selected user does not exist.');
+            }
+            Feedback::error(tra('The selected user does not exist.'));
+            return Services_Utilities::closeModal();
+        }
+
         //sets default priority for the message to 3 if no priority was given
         if (! empty($input->priority->text())) {
             $priority = $input->priority->text();
@@ -1107,11 +1121,22 @@ class Services_User_Controller
                 throw new Services_Exception($errormsg, 400);
             }
             $name = $_FILES['userfile']['name'];
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile']['tmp_name'], $_FILES['userfile']['name']);
+            } catch (Exception $e) {
+                throw new Services_Exception($e->getMessage(), 403);
+            }
+
             /**
              * @var $avatarlib AvatarLib
              */
             $avatarlib = TikiLib::lib('avatar');
-            $avatarlib->set_avatar_from_url($_FILES['userfile']['tmp_name'], $userwatch, $name);
+            try {
+                $avatarlib->setAvatarFromFile($_FILES['userfile']['tmp_name'], $userwatch, $name);
+            } catch (Exception $e) {
+                throw new Services_Exception($e->getMessage(), 400);
+            }
             return true;
         } else {
             return [
@@ -1232,7 +1257,10 @@ class Services_User_Controller
 
     private function redirectAndReturn($data = []): array
     {
-        header("Location:" . $_SERVER['HTTP_REFERER']);
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        if ($referer !== '') {
+            TikiLib::lib('access')->redirect($referer);
+        }
         return $data;
     }
 

@@ -151,9 +151,12 @@ class WikiPlugin_Helper
                 continue;
             }
 
-            // Split the string value using the separator
-            $params[$key] = $tikilib->multi_explode($paramInfo['separator'], $params[$key]);
-            $params[$key] = array_values(array_filter($params[$key]));
+            // Split the string value using the separator, then apply per-element filter
+            $defaultFilter = TikiFilter::get($info['defaultfilter'] ?? 'xss');
+            $filter = isset($paramInfo['filter']) ? TikiFilter::get($paramInfo['filter']) : $defaultFilter;
+            $params[$key] = array_values(
+                $tikilib->array_apply_filter($tikilib->multi_explode($paramInfo['separator'], $params[$key]), $filter)
+            );
         }
 
         return $params;

@@ -93,7 +93,7 @@ if ($topic and ! $tikilib->user_has_perm_on_object($user, $topic, 'topic', 'tiki
     require_once('tiki-rss_error.php');
 }
 
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output["data"] == "EMPTY") {
     $title = $prefs['feed_articles_title'];

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watchEffect } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { fetchSuggestions } from '../../helpers/autocomplete/remote';
 import ConfigWrapper from '../ConfigWrapper.vue';
 
@@ -11,8 +11,22 @@ const shouldRefocusOnBlur = ref(false);
 
 const modelValue = ref(props.value);
 const autocompleteRef = ref(null);
+const setValue = (val) => {
+    modelValue.value = val;
+};
 
-props._expose({ value: modelValue });
+// This ensures that if jQuery changes the 'value' prop/attribute, Vue reacts
+watch(
+    () => props.value,
+    (newVal) => {
+        modelValue.value = newVal;
+    }
+);
+
+props._expose({
+    value: modelValue,
+    setValue,
+});
 
 const handleFetchSuggestions = (query, callback) => {
     const wrappedCallback = (results) => {
@@ -52,9 +66,6 @@ onMounted(() => {
     }
 })
 
-watchEffect(() => {
-    modelValue.value = props.value;
-});
 </script>
 
 <script>

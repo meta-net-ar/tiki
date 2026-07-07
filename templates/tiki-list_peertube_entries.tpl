@@ -12,13 +12,13 @@
 
 <div class="row mb-3 row">
     <form method="get" class="col-md-12 d-flex flex-row flex-wrap align-items-center">
-        <label class="col-form-label col-sm-2" for="find">{tr}Find{/tr}</label>
+        <label class="col-form-label col-sm-2" for="find">{tr}Search{/tr}</label>
         <div class="input-group col-sm-8">
             <input type="text" name="find" class="form-control" id="find" value="{$find|escape}" placeholder="Search videos...">
             <input type="hidden" name="list" value="videos">
         </div>
         <div class="col-sm-2">
-            <input type="submit" class="btn btn-info btn-sm" name="search" value="{tr}Go{/tr}">
+            <input type="submit" class="btn btn-info btn-sm" name="search" value="{tr}Search{/tr}">
         </div>
     </form>
 </div>

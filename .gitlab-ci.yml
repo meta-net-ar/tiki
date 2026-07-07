@@ -296,8 +296,8 @@ rector:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    # If rector would have changed any files, it will return a non-zero code
     - php bin/rector process --dry-run
+
   cache:
     - key:
         prefix: "rector"
@@ -315,7 +315,7 @@ check-platform-binaries:
   needs: []
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
-    - sh doc/devtools/check_platform_binaries.sh
+    - php doc/devtools/check_platform_binaries.php
 
 sql-engine:
   stage: tiki-check
@@ -389,7 +389,6 @@ composer-could-update-lock:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-
   script:
     - composer -V | grep "version 2" || composer self-update --2
     - composer update -d vendor_bundled --dry-run
@@ -440,6 +439,7 @@ composer-could-update-lock:
     - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
     - '[ ! -d doc/devtools/dbdiff/cache ] && mkdir doc/devtools/dbdiff/cache'
     - '[ ! -f doc/devtools/dbdiff/cache/$DBFILE ] && curl -sS https://gitlab.com/tikiwiki/tikiwiki-ci-databases/raw/master/$DBFILE.gz -o doc/devtools/dbdiff/cache/$DBFILE.gz && gzip -d doc/devtools/dbdiff/cache/$DBFILE.gz'
+    - export TIKI_CATCH_UPDATE_WARNINGS=1
     - php -d display_errors=On doc/devtools/check_schema_upgrade.php -m $DBVER -e $ENGINE --db1=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikinew
   after_script:
     - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
@@ -589,7 +589,7 @@ console-php-works:
     - 'echo -n "ElasticSearch Version: " && curl -sS -XGET ''http://elasticsearch:9200'' | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
     - 'echo -n "Manticore Version: " && mysql -h manticore -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
     - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
-    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --display-deprecations --display-notices --display-warnings
+    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --exclude-group api-integration-test --display-deprecations --display-notices --display-warnings
   artifacts:
     when: always
     paths:
@@ -613,6 +613,31 @@ unit-tests:
         DB_IMAGE: ${MYSQL_IMAGE_OLDEST_SUPPORTED}
       - PHP_VERSION: "8.1"
         DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
+
+unit-tests-api:
+  extends: .template-unit-tests
+  allow_failure: false
+  services:
+    - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
+      alias: mysql
+      command: ["--explicit-defaults-for-timestamp=off"]
+  parallel:
+    matrix:
+      - PHP_VERSION: "8.5"
+        DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
+      - PHP_VERSION: "8.4"
+        DB_IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
+      - PHP_VERSION: "8.3"
+        DB_IMAGE: ${MARIADB_IMAGE_COMMON_LTS}
+      - PHP_VERSION: "8.2"
+        DB_IMAGE: ${MYSQL_IMAGE_OLDEST_SUPPORTED}
+      - PHP_VERSION: "8.1"
+        DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
+  script:
+    - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
+    - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
+    - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
+    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --do-not-fail-on-phpunit-warning --do-not-fail-on-phpunit-deprecation --group api-integration-test
 
 unit-tests-node:
   stage: unit-tests
@@ -639,57 +664,80 @@ unit-tests-icon-generator:
 # Package this Tiki build
 #
 
-tiki-package:
+.tiki-package-prepare-script: &tiki-package-prepare-script |
+  echo "=> Removing Composer dev dependencies ..."
+  composer -V | grep "version 2" || composer self-update --2
+  composer --ansi install -d vendor_bundled --no-dev --optimize-autoloader --no-progress --prefer-dist -n
+  php console.php dev:buildwsconfs --generate
+  echo "=> Cleanup ..."
+  rm -fr temp && git checkout temp
+  rm -fr bin
+  echo "=> Optimize language files ..."
+  find lang/ -name language.php -exec php doc/devtools/stripcomments.php {} \;
+  echo "=> Fix permissions ..."
+  find . -type f -exec chmod 0664 {} \;
+  chmod 0775 setup.sh
+  find . -type d -exec chmod 0755 {} \;
+
+.tiki-package-tar-script: &tiki-package-tar-script |
+  echo "=> Pack tiki ..."
+  tar --exclude *.DS_Store --exclude tests --exclude doc/devtools --exclude .git --exclude .gitignore --exclude .composercache -pczf tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz *
+
+.tiki-package-changelog-script: &tiki-package-changelog-script |
+  echo "=> Generate changelog ..."
+  TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"
+  git fetch origin "$TARGET_BRANCH" --tags --depth=1000
+  LAST_TAG=$(git tag --sort=-v:refname | head -n 1)
+  git merge-base --is-ancestor "$LAST_TAG" "origin/$TARGET_BRANCH" || git fetch --unshallow
+  php doc/devtools/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
+  mv generated_changelog.md CHANGELOG.generated.md
+
+.tiki-package-base: &tiki-package-base
   stage: package-tiki
-  variables:
-    GIT_DEPTH: "1000"
   needs:
     - composer
     - node_build
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
-  script:
-    # Remove dev dependencies in composer
-    - echo "=> Removing Composer dev dependencies ..."
-    - composer -V | grep "version 2" || composer self-update --2
-    - composer --ansi install -d vendor_bundled --no-dev --optimize-autoloader --no-progress --prefer-dist -n # remove dev packages
-    # TODO: Remove dev dependencies in npm - benoitg - 2023-11-17
-    - php console.php dev:buildwsconfs --generate
-    # Cleanup folders that may have data, and we do not want to be packed
-    - echo "=> Cleanup ..."
-    # Assure temp folder is empty
-    - rm -fr temp && git checkout temp
-    # remove bin directory
-    - rm -fr bin
-    # Log files that are not part of GIT in the folder (exclude the ones expected)
-    - echo "=> Files in the folder not tracked in git ..."
-    - git ls-files --others | grep -v vendor_bundled/vendor/ | grep -v .composercache/ || echo "Ignore Failure"
-    # remove comments from language files
-    - echo "=> Optimize language files ..."
-    - find lang/ -name language.php -exec php doc/devtools/stripcomments.php {} \;
-    # set Permissions
-    - echo "=> Fix permissions ..."
-    - find . -type f -exec chmod 0664 {} \;
-    - chmod 0775 setup.sh
-    - find . -type d -exec chmod 0755 {} \;
-    - echo "=> Generate changelog ..."
-    - 'TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"'
-    - git fetch origin "$TARGET_BRANCH" --tags --depth=1000
-    - 'LAST_TAG=$(git tag --sort=-v:refname | head -n 1)'
-    - 'echo "Latest tag: $LAST_TAG"'
-    - 'echo "Target branch: $TARGET_BRANCH"'
-    - git merge-base --is-ancestor "$LAST_TAG" "origin/$TARGET_BRANCH" || git fetch --unshallow
-    - php doc/devtools/generate_changelog.php --range="$LAST_TAG..origin/$TARGET_BRANCH"
-    - mv generated_changelog.md CHANGELOG.generated.md
-    # pack
-    - echo "=> Pack tiki ..."
-    - tar --exclude *.DS_Store --exclude tests --exclude doc/devtools --exclude .git --exclude .gitignore --exclude .composercache -pczf tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz *
   cache: [*cache-composercache]
+  allow_failure: true
+  artifacts:
+    paths:
+      - tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz
+    expire_in: 2 days
+
+# 1. SHALLOW PACKAGING: Fast because it uses a depth of 1 and doesn't need to fetch all tags.'
+tiki-package-shallow:
+  <<: *tiki-package-base
+  variables:
+    GIT_DEPTH: "1"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE != "merge_train"'
+      when: always
+    - when: never
+  script:
+    - *tiki-package-prepare-script
+    - *tiki-package-tar-script
+
+# 2. DEEP PACKAGING: Slower because it needs to fetch all tags and apply only on merge requests to the master branch.
+tiki-package-deep:
+  <<: *tiki-package-base
+  variables:
+    GIT_DEPTH: "1000"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_EVENT_TYPE == "merge_train" && ($CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master" || $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^\d+\.x$/)'
+      when: always
+    - if: '$CI_PROJECT_PATH == "tikiwiki/tiki" && $CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "master" || $CI_COMMIT_BRANCH =~ /^\d+\.x$/)'
+      when: always
+    - when: never
+  script:
+    - *tiki-package-prepare-script
+    - *tiki-package-changelog-script
+    - *tiki-package-tar-script
   artifacts:
     paths:
       - tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz
       - CHANGELOG.generated.md
     expire_in: 2 days
-  allow_failure: true
 
 check-directories:
   stage: package-tiki
@@ -809,15 +857,7 @@ composer-operator-check:
   needs:
     - composer
   script:
-  - apt-get update && apt-get install -y jq
-  - chmod +x doc/devtools/check_caret_operator.sh
-  - ./doc/devtools/check_caret_operator.sh
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
-  allow_failure: false
+    - php doc/devtools/check_caret_operator.php
 
 check-alphabetical-list:
   stage: unit-tests
@@ -825,11 +865,5 @@ check-alphabetical-list:
   needs:
     - composer
   script:
-    - chmod +x doc/devtools/check_alphabetical_list.php
     - php doc/devtools/check_alphabetical_list.php
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
   allow_failure: false

@@ -1831,7 +1831,6 @@ class FileGalLib extends TikiLib
         }
         if (empty($error) && $prefs['fgal_quota_per_fgal'] == 'y') {
             $list = $this->getGalleryParentsColumns($galleryId, ['galleryId', 'quota', 'size', 'name']);
-            //echo '<pre>';print_r($list);echo '</pre>';
             foreach ($list as $fgal) {
                 if (! empty($fgal['quota']) && $fgal['size'] + $size > $fgal['quota'] * 1024 * 1024) {
                     $error = tra('The upload was not completed.') . ' ' . sprintf(tra('Reason: The quota has been reached in "%s"'), $fgal['name']);
@@ -1875,7 +1874,6 @@ class FileGalLib extends TikiLib
         if (! empty($objectId)) {
             $this->internalReplaceBacklinks($objectId, $fileIds);
         }
-        //echo 'REPLACEBACKLINK'; print_r($context);print_r($fileIds);echo '<pre>'; debug_print_backtrace(); echo '</pre>';die;
     }
     protected function internalReplaceBacklinks($objectId, $fileIds = [])
     {
@@ -2027,7 +2025,6 @@ class FileGalLib extends TikiLib
             }
         }
         $fileIds = array_unique($fileIds);
-        //if (!empty($fileIds)) {echo '<pre>'; print_r($context); print_r($fileIds); echo '</pre>';}
         $this->replaceBacklinks($context, $fileIds);
         return $fileIds;
     }

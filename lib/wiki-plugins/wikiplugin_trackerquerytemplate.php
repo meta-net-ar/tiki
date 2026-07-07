@@ -146,6 +146,8 @@ function wikiplugin_trackerquerytemplate_info()
 
 function wikiplugin_trackerquerytemplate($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_trackerquerytemplate_info());
+
     if (! is_null($params['itemids'])) {
         $itemIds = $params['itemids'];
         unset($params['itemids']);

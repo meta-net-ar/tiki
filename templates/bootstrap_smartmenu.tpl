@@ -3,7 +3,7 @@
         <hr class="dropdown-divider my-2">
     </li>
 {elseif not empty($item.children)}
-    <li class="sm-nav-item nav-item{if $item.selected|default:null} active{/if} {$item.class|escape} {if $module_params.megamenu eq 'y' and $module_params.megamenu_static eq 'y' }static{/if}">
+    <li class="sm-nav-item nav-item{if $item.selected|default:null} active{/if} {$item.class|escape} {if $module_params.megamenu eq 'y' and $module_params.megamenu_static eq 'y'}static{/if}">
             <a href="{if empty($preview_type) and !empty($item.sefurl)}{$item.sefurl|escape}{else}#sm_menu_{$item.optionId|escape}{/if}" class="sm-nav-link nav-link sm-sub-toggler" data-bs-toggle="collapse" aria-expanded="false">
             {if $menu_info.use_items_icons eq "y" && $item.icon}
                 <span class="me-2">{icon name=$item.icon}</span>

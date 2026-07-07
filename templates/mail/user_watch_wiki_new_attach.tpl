@@ -9,4 +9,4 @@
 {mailurl}{$mail_page|sefurl}{/mailurl}
 
 {tr}If you don't want to receive these notifications follow this link:{/tr}
-{mailurl}tiki-user_watches.php?id={$watchId}{/mailurl}
+{mailurl}tiki-user_watches.php?id={$watchId}&hash={$watchUnsubscribeHash}{/mailurl}

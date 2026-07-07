@@ -124,6 +124,7 @@ import { defaults as defaultControls } from "ol/control";
                                             width = 3;
                                         } else {
                                             color = "#aaa";
+                                            // eslint-disable-next-line no-console
                                             console.log("Unknown road kind: " + kind);
                                         }
                                         style = new ol.style.Style({
@@ -212,6 +213,7 @@ import { defaults as defaultControls } from "ol/control";
                     layers.push(lyr);
                 } else {
                     errorLayers.push(name);
+                    // eslint-disable-next-line no-console
                     console.log(tr("Cannot create map layer: " + name));
                 }
             }
@@ -1100,6 +1102,7 @@ import { defaults as defaultControls } from "ol/control";
                             }
                         };
                         $(img).on("error", function () {
+                            // eslint-disable-next-line no-console
                             console.log("Map error loading marker image " + src);
                             var index = container.markerIcons.loadingMarker.indexOf(src),
                                 action;

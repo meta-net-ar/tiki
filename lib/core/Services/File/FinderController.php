@@ -194,7 +194,7 @@ class Services_File_FinderController
             if ($input->insertion_syntax->text()) {
                 $params['insertion_syntax'] = $input->insertion_syntax->text();
             }
-            $hashes = $input->hash->asArray();
+            $hashes = $input->asArray('hash');
             $fileInfos = [];
 
             foreach ($hashes as $hash) {
@@ -283,7 +283,7 @@ class Services_File_FinderController
             $id = $ar[1];
             if ($isgal) {
                 $visible = $this->isVisible($id, $data, $isgal);
-            } else if (isset($this->parentIds['files'][$id])) {
+            } elseif (isset($this->parentIds['files'][$id])) {
                 $visible = $this->isVisible($this->parentIds['files'][$id], $data, $isgal);
             }
         } else {

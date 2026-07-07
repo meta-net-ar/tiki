@@ -71,7 +71,12 @@ describe("Select", () => {
         });
 
         expect(ElSelect).toHaveBeenCalledWith(
-            expect.objectContaining({ modelValue: JSON.parse(basicProps.value), remote: false, "empty-values": [null, undefined] }),
+            expect.objectContaining({
+                modelValue: JSON.parse(basicProps.value),
+                remote: false,
+                "automatic-dropdown": false,
+                "empty-values": [null, undefined],
+            }),
             expect.any(Object)
         );
 
@@ -114,6 +119,7 @@ describe("Select", () => {
                 "collapse-tags": true,
                 "max-collapse-tags": parseInt(givenProps.maxCollapseTags, 10),
                 "multiple-limit": parseInt(givenProps.max, 10),
+                "automatic-dropdown": true,
                 "empty-values": [null, undefined],
             }),
             expect.any(Object)
@@ -141,12 +147,37 @@ describe("Select", () => {
         );
     });
 
+    test.each([
+        { name: "missing", multipleProp: undefined, expectedMultiple: false },
+        { name: "false boolean", multipleProp: false, expectedMultiple: false },
+        { name: "false string", multipleProp: "false", expectedMultiple: false },
+        { name: "true boolean", multipleProp: true, expectedMultiple: true },
+        { name: "true string", multipleProp: "true", expectedMultiple: true },
+        { name: "jQuery boolean attribute", multipleProp: "multiple", expectedMultiple: true },
+        { name: "empty boolean attribute", multipleProp: "", expectedMultiple: true },
+    ])("normalizes the multiple prop as a boolean: $name", ({ multipleProp, expectedMultiple }) => {
+        render(Select, {
+            props: {
+                ...basicProps,
+                ...(multipleProp === undefined ? {} : { multiple: multipleProp }),
+            },
+        });
+
+        expect(ElSelect).toHaveBeenCalledWith(
+            expect.objectContaining({
+                multiple: expectedMultiple,
+                "automatic-dropdown": expectedMultiple,
+            }),
+            expect.any(Object)
+        );
+    });
+
     test("renders correctly grouped options", () => {
         const givenProps = {
             ...basicProps,
             options: JSON.stringify([
                 { value: "foo", label: "Foo", group: "Group 1" },
-                { value: "bar", label: "Bar", group: "Group 1" },
+                { value: "bar", label: "Bar", group: "Group 1", disabled: true },
                 { value: "foo 2", label: "Foo 2", group: "Group 2" },
                 { value: "bar 2", label: "Bar 2", group: "Group 2" },
             ]),
@@ -285,11 +316,7 @@ describe("Select", () => {
                 multiple: "true",
             };
 
-            ElSelect = {
-                setup() {
-                    return () => h("div", { class: "el-select__selection" }, "Selection");
-                },
-            };
+            vi.mocked(ElSelect).mockImplementationOnce(() => h("div", { class: "el-select__selection" }, "Selection"));
 
             render(Select, { props: givenProps });
 
@@ -311,15 +338,13 @@ describe("Select", () => {
 
             const expectedValueOnChange = "bar";
 
-            ElSelect = {
-                setup(_, { emit }) {
-                    const handleClick = () => {
-                        emit("update:modelValue", expectedValueOnChange);
-                        emit("change", expectedValueOnChange);
-                    };
-                    return () => h("div", { onClick: handleClick }, "Option");
-                },
-            };
+            vi.mocked(ElSelect).mockImplementationOnce((_, ctx) => {
+                const handleClick = () => {
+                    ctx.emit("update:modelValue", expectedValueOnChange);
+                    ctx.emit("change", expectedValueOnChange);
+                };
+                return h("div", { onClick: handleClick }, "Option");
+            });
 
             render(Select, { props: givenProps });
 

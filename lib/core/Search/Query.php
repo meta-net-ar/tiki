@@ -111,6 +111,24 @@ class Search_Query implements Search_Query_Interface
         $this->addPart(new Search_Expr_Token($query), 'identifier', $field);
     }
 
+    /**
+     * Match one or more exact values on an identifier field.
+     * Multiple values are separated by " OR " in $query.
+     */
+    public function filterMultiIdentifier($query, $field)
+    {
+        $values = array_filter(array_map('trim', preg_split('/\s+OR\s+/', $query)), 'strlen');
+
+        if (count($values) <= 1) {
+            $this->filterIdentifier(reset($values) ?: $query, $field);
+        } else {
+            $tokens = array_map(function ($v) {
+                return new Search_Expr_Token($v);
+            }, $values);
+            $this->addPart(new Search_Expr_Or($tokens), 'identifier', $field);
+        }
+    }
+
     public function filterType($types)
     {
         if (is_array($types)) {

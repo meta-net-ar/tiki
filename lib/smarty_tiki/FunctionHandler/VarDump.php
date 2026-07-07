@@ -32,9 +32,10 @@ class VarDump extends Base
             $tmp = $smarty->getTemplateVars();
             if (is_array($tmp) && isset($tmp["$v"])) {
                 if (is_string($tmp[$v])) {
-                    $debugger->msg("Smarty var_dump(" . $v . ') = ' . print_r($tmp[$v], true));
+                    $debugger->msg("Smarty var_dump(" . $v . ') = ' . print_r($tmp[$v], true)); // @phpstan-ignore disallowedFunctions.printR (returns variable value as string for Smarty debugger message)
                 } else {
                     ob_start();
+                    // @phpstan-ignore disallowedFunctions.varDump (captures output via ob_start for the Smarty {var_dump} template function)
                     var_dump($tmp[$v]);
                     $d = ob_get_clean();
                     $debugger->msg("Smarty var_dump(" . $v . ') = ' . $d);

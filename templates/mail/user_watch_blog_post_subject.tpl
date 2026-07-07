@@ -1,1 +1,1 @@
-{tr}New {$prefs.mail_template_custom_text}blog post at %s{/tr}
+{tr _0=$prefs.mail_template_custom_text}New %0blog post at %s{/tr}

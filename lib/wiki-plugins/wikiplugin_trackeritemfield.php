@@ -129,6 +129,7 @@ function wikiplugin_trackeritemfield($data, $params)
     $userlib = TikiLib::lib('user');
     $trklib = TikiLib::lib('trk');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_trackeritemfield_info());
     extract($params, EXTR_SKIP);
 
     if (empty($itemId) && ! empty($_REQUEST['itemId'])) {

@@ -1,8 +1,8 @@
-{if $mail_action eq 'deleted'}{tr}Tracker item {$mail_itemId} was deleted in the tracker {tr}{$mail_trackerName}{/tr} by {tr}{$mail_user|username}{/tr} on {tr}{$mail_date|tiki_short_datetime:"":"n"}{/tr} {/tr}
-{elseif $mail_action eq 'status'}{tr}New status for ItemID {$mail_itemId} {$mail_item_desc} for the {$prefs.mail_template_custom_text}tracker {tr}{$mail_trackerName}:{/tr}{/tr} {if $status eq 'o'}{tr}open{/tr}{elseif $status eq 'p'}{tr}pending{/tr}{elseif $status eq 'c'}{tr}closed{/tr}{/if}
+{if $mail_action eq 'deleted'}{tr _0=$mail_itemId _1=$mail_trackerName _2=$mail_user|username _3=$mail_date|tiki_short_datetime:"":"n"}Tracker item %0 was deleted in the tracker %1 by %2 on %3{/tr}
+{elseif $mail_action eq 'status'}{tr _0=$mail_itemId _1=$mail_item_desc _2=$prefs.mail_template_custom_text _3=$mail_trackerName}New status for ItemID %0 %1 for the %2tracker %3:{/tr} {if $status eq 'o'}{tr}open{/tr}{elseif $status eq 'p'}{tr}pending{/tr}{elseif $status eq 'c'}{tr}closed{/tr}{/if}
 {else}{$mail_action}
 
-{tr}View the {$prefs.mail_template_custom_text}tracker item at:{/tr}
+{tr _0=$prefs.mail_template_custom_text}View the %0tracker item at:{/tr}
     {mailurl}{$mail_itemId|sefurl:'trackeritem'}{/mailurl}
 {/if}
 
@@ -31,4 +31,3 @@ Status: {$mail_field_status}
 {if isset($mail_attId)}
     {tr}Download the file at:{/tr} {mailurl}tiki-download_item_attachment.php?attId={$mail_attId}{/mailurl}
 {/if}
-

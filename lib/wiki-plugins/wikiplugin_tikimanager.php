@@ -65,6 +65,7 @@ function wikiplugin_tikimanager($data, $params)
 
     $manager_output = $utilities->getManagerOutput();
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_tikimanager_info());
     extract($params, EXTR_SKIP);
 
     $instanceIds ??= [];

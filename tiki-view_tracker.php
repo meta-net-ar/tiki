@@ -19,7 +19,6 @@ $inputConfiguration = [
             'my'                 => 'username',      //get
             'ours'               => 'word',          //get
             'status'             => 'word',          //get
-            'sort_mode'          => 'alnumdash',     //get
             'remove'             => 'int',           //get
             'force'              => 'bool',          //get
             'batchaction'        => 'word',          //get
@@ -30,14 +29,14 @@ $inputConfiguration = [
             'offset'             => 'int',           //get
             'maxRecords'         => 'int',           //get
             'filterfield'        => 'word',          //get
-            'filtervalue_other'  => 'word',          //get
+            'filtervalue_other'  => 'text',          //get
             'displayedFields'    => 'word',          //get
         ],
         'staticKeyFiltersForArrays' => [
             'action'                => 'string',    //get
             'vals'                  => 'none',      //get
-            'sort_mode'             => 'string',    //get
-            'filtervalue'           => 'word',
+            'sort_mode'             => 'alnumdash', //get
+            'filtervalue'           => 'text',
         ],
     ],
 ];
@@ -525,6 +524,13 @@ if (isset($_REQUEST["filtervalue"]) and is_array($_REQUEST["filtervalue"]) and i
 if (! empty($_REQUEST['filtervalue_other'])) {
     $filtervalue = $_REQUEST['filtervalue_other'];
 }
+if (is_array($filtervalue)) {
+    $filtervalue = array_map(static function ($value) {
+        return is_string($value) ? trim($value) : $value;
+    }, $filtervalue);
+} elseif (is_string($filtervalue)) {
+    $filtervalue = trim($filtervalue);
+}
 
 if (! empty($filterfield)) {
     $field = $trackerDefinition->getField($filterfield);
@@ -567,7 +573,8 @@ if (isset($_REQUEST["sort_mode"])) {
     }
 }
 if (empty($sort_mode_full)) {
-    $sort_mode_full = ['itemId_asc'];
+    // Preserve the default sort order computed from tracker properties above
+    $sort_mode_full = ! empty($sort_mode) ? [$sort_mode] : ['itemId_asc'];
 }
 
 // Expose primary sort to template

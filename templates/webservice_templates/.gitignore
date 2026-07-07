@@ -1,0 +1,5 @@
+# Ignore dynamically generated webservice template files
+*.tpl
+# Keep the directory structure
+!.gitignore
+!index.php

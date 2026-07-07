@@ -241,6 +241,11 @@ EOF;
             $ret = $grid->getTableHtml(true, null, false);
         } else {
             $sheet->parseValues = true;
+            // Validate URL to prevent SSRF
+            $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+            if (! $ssrf->isUrlAllowed($url)) {
+                return tra('Sheet URL is not allowed');
+            }
             $ret = file_get_contents($url);
         }
     } else {

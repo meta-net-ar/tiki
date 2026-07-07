@@ -83,6 +83,10 @@
                 {preference name=feature_debug_console}
             </fieldset>
             <fieldset>
+                <legend class="h3">{tr}SSRF Protection{/tr}</legend>
+                {preference name=ssrf_whitelisted_hosts}
+            </fieldset>
+            <fieldset>
                 <legend class="h3">{tr}Trackers Security{/tr}</legend>
                 {preference name=tracker_adminonlyviewedititem_by_default}
             </fieldset>
@@ -184,6 +188,16 @@
                 {preference name=http_header_public_key_pins}
                 <div class="adminoptionboxchild" id="http_header_public_key_pins_childcontainer">
                     {preference name=http_header_public_key_pins_value}
+                </div>
+
+                {preference name=http_header_referrer_policy}
+                <div class="adminoptionboxchild" id="http_header_referrer_policy_childcontainer">
+                    {preference name=http_header_referrer_policy_value}
+                </div>
+
+                {preference name=http_header_permitted_cross_domain_policies}
+                <div class="adminoptionboxchild" id="http_header_permitted_cross_domain_policies_childcontainer">
+                    {preference name=http_header_permitted_cross_domain_policies_value}
                 </div>
             </fieldset>
             <fieldset>

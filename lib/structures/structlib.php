@@ -1018,7 +1018,7 @@ class StructLib extends TikiLib
     public function get_navigation_info($page_ref_id)
     {
         if (! $page_ref_id || ! is_numeric($page_ref_id)) {
-            error_log("Invalid page_ref_id: " . $page_ref_id);
+            error_log("Invalid page_ref_id: " . $page_ref_id); // @phpstan-ignore disallowedFunctions.errorLog (invalid structure data warning)
             return null;
         }
         return [
@@ -1059,7 +1059,7 @@ class StructLib extends TikiLib
             }
         } else {
             // Log the error or handle it gracefully
-            error_log("Method not found: $fn");
+            error_log("Method not found: $fn"); // @phpstan-ignore disallowedFunctions.errorLog (invalid structure data warning)
             return null;
         }
     }

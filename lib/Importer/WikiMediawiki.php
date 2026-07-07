@@ -344,6 +344,18 @@ class WikiMediawiki extends Wiki
                     continue;
                 }
 
+                // Prevent SSRF: attachment URLs come from the imported XML dump
+                // which may be untrusted. Block private/reserved IP targets.
+                // Only check URLs with a scheme (http/https); relative file paths
+                // are local references and not a network SSRF vector.
+                if (preg_match('#^https?://#i', $fileUrl)) {
+                    $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+                    if (! $ssrf->isUrlAllowed($fileUrl)) {
+                        $this->saveAndDisplayLog(tr('File %0 not imported: URL targets a private or reserved address.', $fileName) . "\n", true);
+                        continue;
+                    }
+                }
+
                 if (@fopen($fileUrl, 'r')) {
                     $attachmentContent = @file_get_contents($fileUrl);
                     $newFile = fopen($this->attachmentsDestDir . $fileName, 'w');

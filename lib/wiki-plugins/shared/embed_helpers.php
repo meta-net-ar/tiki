@@ -69,8 +69,10 @@ function buildEmbedContainerAndIframe($iframeSrc, $params = [], $oEmbedData = []
     $containerStyle = implode(';', array_map(fn($k, $v) => "$k:$v", array_keys($containerStyles), $containerStyles));
     $iframeStyle = implode(';', array_map(fn($k, $v) => "$k:$v", array_keys($iframeStyles), $iframeStyles));
 
-    if (! empty($params['start']) && is_numeric($params['start']) && $params['start'] > 0) {
-        $iframeSrc .= (strpos($iframeSrc, '?') === false ? '?' : '&') . 'start=' . $params['start'];
+    foreach (['start', 'end'] as $timeParam) {
+        if (! empty($params[$timeParam]) && is_numeric($params[$timeParam]) && $params[$timeParam] > 0) {
+            $iframeSrc .= (strpos($iframeSrc, '?') === false ? '?' : '&') . $timeParam . '=' . (int) $params[$timeParam];
+        }
     }
 
     $dom = new DOMDocument();
@@ -85,6 +87,9 @@ function buildEmbedContainerAndIframe($iframeSrc, $params = [], $oEmbedData = []
     $iframe->setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
     $iframe->setAttribute('title', tra('Embedded media content'));
     $iframe->setAttribute('style', $iframeStyle);
+    if (! empty($params['referrerPolicy'])) {
+        $iframe->setAttribute('referrerpolicy', $params['referrerPolicy']);
+    }
 
     if (! empty($params['allowFullScreen']) && $params['allowFullScreen'] === 'y') {
         $iframe->setAttribute('allowfullscreen', '');

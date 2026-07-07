@@ -322,6 +322,7 @@ class ErrorTracking
                 'before_send'             => function (Event $event, ?EventHint $hint): ?Event {
                     if (true && self::LOCAL_DEBUG_MODE) {
                         echo '<pre>';
+                        // @phpstan-ignore disallowedFunctions.printR (local debug only, gated by LOCAL_DEBUG_MODE constant)
                         print_r("Incoming sentry event:<br/>");
                         //cho $event->getId();
                         echo $event->getLevel() . ': ' . $event->getMessage();
@@ -367,7 +368,9 @@ class ErrorTracking
                 'before_send_transaction' => function (Event $transaction): ?Event {
                     if (false && self::LOCAL_DEBUG_MODE) {
                         echo '<pre>';
+                        // @phpstan-ignore disallowedFunctions.printR (local debug only, block is always dead: false && LOCAL_DEBUG_MODE)
                         print_r("Incoming sentry transaction:<br/>");
+                        // @phpstan-ignore disallowedFunctions.varDump (local debug only, block is always dead: false && LOCAL_DEBUG_MODE)
                         var_dump($transaction);
                         echo '</pre>';
                     }

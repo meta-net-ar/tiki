@@ -9,9 +9,11 @@ const pkgPath = resolve(__dirname, "../../../package.json");
 
 checkEngine(pkgPath).then((result) => {
     if (result.status !== 0) {
+        // eslint-disable-next-line no-console
         console.log(result);
         process.exit(1);
     } else {
+        // eslint-disable-next-line no-console
         console.log("Engine checked!");
     }
 });

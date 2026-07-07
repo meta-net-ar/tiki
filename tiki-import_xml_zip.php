@@ -49,10 +49,9 @@ if (isset($_REQUEST['import'])) {
             $error = $xmllib->get_error();
         }
     }
-    if (isset($success)) {
+    if (! empty($success)) {
         Feedback::success(['mes' => $success]);
-    }
-    if (isset($error)) {
+    } elseif (! empty($error)) {
         Feedback::error(['mes' => $error]);
     }
 }

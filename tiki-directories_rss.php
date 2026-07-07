@@ -34,7 +34,7 @@ if ($res) {
 }
 $feed = "directories";
 $uniqueid = $feed;
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 if ($output["data"] == "EMPTY") {
     $title = $prefs['feed_directories_title'];
     $desc = $prefs['feed_directories_desc'];

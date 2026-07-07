@@ -39,7 +39,7 @@ if (isset($_REQUEST['sort_mode'])) {
 } else {
     $sort_mode = 'created_desc';
 }
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 if ($output["data"] == "EMPTY") {
     $tmp = $trklib->get_tracker($_REQUEST["$id"]);
     if (empty($tmp)) {

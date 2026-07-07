@@ -124,54 +124,6 @@
 </div>
 {tr}About WikiPlugins and security: Make sure to only grant the "tiki_p_plugin_approve" permission to trusted editors.{/tr} {tr}You can deactivate risky plugins at (<a href="tiki-admin.php?page=textarea">tiki-admin.php?page=textarea</a>).{/tr} {tr}You can approve plugin use at <a href="tiki-plugins.php">tiki-plugins.php</a>.{/tr}
 
-<br>
-<h2>{tr}Security checks{/tr}</h2>
-<div>
-    <form action="tiki-admin_security.php" method="post" class="row">
-        <div class="col-md-4 text-center mb-3">
-            <button type="submit" name="check_files_fast" class="btn btn-primary tips" title=":{tr}Fast Scan: Quickly checks for any new, unrecognized files.{/tr}">
-                <i class="fa fa-bolt"></i> {tr}Fast Scan{/tr}
-            </button>
-        </div>
-
-        <div class="col-md-4 text-center mb-3">
-            <button type="submit" name="check_files_deep" class="btn btn-warning tips" title=":{tr}Deep Scan: Verifies every file's hash. Slower but more thorough.{/tr}">
-                <i class="fa fa-search"></i> {tr}Deep Scan{/tr}
-            </button>
-        </div>
-
-        <div class="col-md-4 text-center mb-3">
-            <button type="submit" name="rebuild_secdb_confirmation" class="btn btn-danger tips"
-            title=":{tr}Rebuild Security Database: Verifies every file's hash. Slower but more thorough.{/tr}"
-                onclick="return confirm('{tr}Are you sure? This will erase the current file baseline and create a new one. Use this if the scans report errors on files you know are correct.{/tr}');">
-                <i class="fa fa-bomb"></i> {tr}Rebuild Security Database{/tr}
-            </button>
-        </div>
-    </form></div>
-<div class="table-responsive secsetting-table">
-    {if isset($filecheck) && $filecheck eq true}
-        <div class="table-responsive secfile-table">
-            <table class="table table-striped table-hover">
-                <tr>
-                    <th colspan="2">{tr}File checks{/tr}</th>
-                </tr>
-                <tr>
-                    <th>{tr}Filename{/tr}</th>
-                    <th>{tr}State{/tr}</th>
-                </tr>
-                {foreach from=$tikifiles key=key item=item}
-                    <tr class="{if $item.status eq 'ok'}success{elseif $item.status eq 'warning'}warning{else}danger{/if}">
-                        <td class="url">{$key|escape}</td>
-                        <td class="text">{$item.message}</td>
-                    </tr>
-                {/foreach}
-                {if !$tikifiles}
-                    {norecords _colspan=2}
-                {/if}
-            </table>
-        </div>
-    {/if}
-</div>
 <div>
     <a href="tiki-admin_security.php?check_file_permissions" class="btn btn-primary">{tr}Check file permissions{/tr}</a>
 </div><br>

@@ -236,6 +236,29 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
         }
     }
 
+        /**
+     * Return plain text representation of selected option(s)
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $data = $this->getFieldData();
+        $selected = $data['selected'];
+
+        if (! is_array($selected)) {
+            $selected = [];
+        }
+
+        if (! empty($context['list_mode']) && $context['list_mode'] === 'csv') {
+            return implode(', ', $selected);
+        } else {
+            $labels = array_map([$this, 'getValueLabel'], $selected);
+            return implode(', ', $labels);
+        }
+    }
+
     private function getValueLabel($value)
     {
         $possibilities = $this->getPossibleItemValues();
@@ -509,7 +532,13 @@ class Tracker_Field_Dropdown extends \Tracker\Field\AbstractItemField implements
     {
         if ($this->getConfiguration('type') !== 'D') {
             $value = $this->getValue($this->getDefaultValue());
-            $allValues = $value === '' ? [] : explode(',', $value);
+            $allValues = $value === '' ? []
+                : array_filter(
+                    array_map('trim', explode(',', $value)),
+                    static function ($val) {
+                        return $val !== '';
+                    }
+                );
 
             if (! empty($allValues)) {
                 foreach ($allValues as $val) {

@@ -1,0 +1,25 @@
+---
+description: Response from DELETE /trackers/{trackerId}/items/{itemId}.
+type: object
+required:
+  - title
+  - trackerId
+  - itemId
+  - affectedCount
+  - multiple
+  - removeCount
+properties:
+  title:
+    type: string
+  trackerId:
+    type: integer
+  itemId:
+    oneOf:
+      - type: string
+      - type: integer
+  affectedCount:
+    type: integer
+  multiple:
+    type: boolean
+  removeCount:
+    type: integer

@@ -1,0 +1,49 @@
+---
+description: Response from GET /users/{username} (user info).
+type: object
+required:
+  - fullname
+  - gender
+  - starHtml
+  - country
+  - distance
+  - email
+  - lastSeen
+  - avatarHtml
+  - error
+  - shared_groups
+  - other_user
+  - add_friend_button
+  - friendship
+properties:
+  fullname:
+    type: string
+  gender:
+    type: string
+  starHtml:
+    type: string
+  country:
+    type: string
+  distance:
+    type: string
+  email:
+    type: string
+  lastSeen:
+    oneOf:
+      - type: integer
+      - type: string
+    nullable: true
+  avatarHtml:
+    type: string
+  error:
+    type: string
+  shared_groups:
+    type: string
+  other_user:
+    type: string
+    nullable: true
+  add_friend_button:
+    type: string
+    nullable: true
+  friendship:
+    type: array

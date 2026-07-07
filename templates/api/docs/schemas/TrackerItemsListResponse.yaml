@@ -1,0 +1,30 @@
+---
+description: Response from GET /trackers/{trackerId}.
+type: object
+required:
+  - trackerId
+  - offset
+  - maxRecords
+  - result
+properties:
+  trackerId:
+    type: integer
+  offset:
+    type: integer
+  maxRecords:
+    type: integer
+  result:
+    type: array
+    items:
+      type: object
+      required:
+        - itemId
+        - status
+        - fields
+      properties:
+        itemId:
+          type: integer
+        status:
+          type: string
+        fields:
+          type: array

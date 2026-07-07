@@ -25,8 +25,9 @@ if (isset($_REQUEST["emulategroups"])) {
     if ($_REQUEST["emulategroups"] == "setgroups") {
         // User has selected a list of groups to emulate
         $_SESSION["groups_are_emulated"] = "y";
-        if (count($_REQUEST["switchgroups"])) {
+        if (! empty($_REQUEST["switchgroups"]) && is_array($_REQUEST["switchgroups"])) {
             $groups_emulated = [];
+            $groups_emulated_requested = $_REQUEST["switchgroups"];
             $dont_forget_registered = 0;
             foreach ($_REQUEST["switchgroups"] as $value) {
                 $groups_emulated[] = $value;
@@ -44,6 +45,7 @@ if (isset($_REQUEST["emulategroups"])) {
                 $groups_emulated = array_merge($groups_emulated, $included);
             }
             $groups_emulated = array_unique($groups_emulated);
+            $_SESSION['groups_emulated_requested'] = serialize($groups_emulated_requested);
         } else {
             // Let's say clicking with nothing selected is the same as reset
             // Saying it's the same as Anonymous would have the disadvantage of probably
@@ -51,6 +53,7 @@ if (isset($_REQUEST["emulategroups"])) {
             $_SESSION["groups_are_emulated"] = "n";
             $groups_emulated = [];
             $_SESSION['groups_emulated'] = serialize($groups_emulated);
+            $_SESSION['groups_emulated_requested'] = serialize([]);
         }
         $_SESSION['groups_emulated'] = serialize($groups_emulated);
     } elseif ($_REQUEST["emulategroups"] == "resetgroups") {
@@ -58,6 +61,7 @@ if (isset($_REQUEST["emulategroups"])) {
         $_SESSION["groups_are_emulated"] = "n";
         $groups_emulated = [];
         $_SESSION['groups_emulated'] = serialize($groups_emulated);
+        $_SESSION['groups_emulated_requested'] = serialize([]);
     }
     $tikilib->invalidate_usergroups_cache($user);
 }

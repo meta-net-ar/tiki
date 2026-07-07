@@ -182,8 +182,6 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
         }
 
         if (! empty($text)) {
-            var_dump($content);
-            die;
             return $this->highlightHelper->filter($text);
         }
         }*/

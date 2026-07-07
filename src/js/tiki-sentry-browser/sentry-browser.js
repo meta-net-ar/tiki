@@ -38,7 +38,7 @@ export function initSentry(config) {
 
         return Sentry;
     } catch (e) {
-        console.error("Failed to initialize Sentry:", e);
+        console.error("Failed to initialize Sentry:", e); // eslint-disable-line no-console
         throw e;
     }
 }

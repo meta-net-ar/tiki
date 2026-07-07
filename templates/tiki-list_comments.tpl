@@ -41,7 +41,7 @@
 
     {section name=ix loop=$comments}{$id=$comments[ix].threadId}
         <tr class="{cycle}{if $prefs.feature_comments_moderation eq 'y'} post-approved-{$comments[ix].approved}{/if}">
-            <td class="checkbox-cell"><div class="form-check"><input type="checkbox" class="form-check-input" name="checked[]" value="{$id}" {if isset($rejected[$id]) }checked="checked"{/if}></div></td>
+            <td class="checkbox-cell"><div class="form-check"><input type="checkbox" class="form-check-input" name="checked[]" value="{$id}" {if isset($rejected[$id])}checked="checked"{/if}></div></td>
             <td class="action">
                 {actions}
                     {strip}

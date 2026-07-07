@@ -40,6 +40,11 @@ class Search_Formatter_ValueFormatter_Datetime extends Search_Formatter_ValueFor
             $value = date_create_from_format('YmdHise', $value . 'UTC')->format('Y-m-d H:i:s');
         }
 
+        if (preg_match('/^(\d{4}-\d{2}-\d{2}) 00:00:00$/', $value, $matches) && ! preg_match('/%[HMSIpklrRTX]/', $this->format)) {
+            // Strip midnight suffix for date-only values to avoid timezone shifts
+            $value = $matches[1];
+        }
+
         if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
             // YYYY-MM-DD formatted date without time portion => assume UTC to parse it without date shifts below
             $value = date_create_from_format('Y-m-de', $value . 'UTC')->format('Y-m-d 12:00:00');

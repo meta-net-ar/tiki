@@ -103,6 +103,8 @@ function wikiplugin_trackeritemcopy_info()
 
 function wikiplugin_trackeritemcopy($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_trackeritemcopy_info());
+
     $smarty = TikiLib::lib('smarty');
     $params["linkFieldIds"] = $params["linkFieldIds"] ?? [];
 

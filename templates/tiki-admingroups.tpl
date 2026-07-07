@@ -555,7 +555,7 @@
                     <div class="mb-3 row">
                         <div class="col-md-9 offset-md-3">
                             {if !empty($grouptrackerid) and $groupitemid}
-                                {tr}Group tracker item : {$groupitemid}{/tr}
+                                {tr _0=$groupitemid}Group tracker item : %0{/tr}
                                 {button href="tiki-view_tracker_item.php?trackerId=$grouptrackerid&amp;itemId=$groupitemid&amp;show=mod" _text="{tr}Edit Item{/tr}"}
                             {elseif !empty($grouptrackerid)}
                                 {if $groupfieldid}

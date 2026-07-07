@@ -513,15 +513,38 @@
                                         </div>{* End of db-install *}
                                         {if $tikidb_created}
                                             <div class="col-sm-6">
-                                            <div class="db-upgrade card h-100">
-                                                <div class=" card-body">
-                                                    <h3 class="card-title mb-3">{tr}Upgrade{/tr}</h3>
-                                                    {remarksbox type="info" title="{tr}OK{/tr}" close="n"}{tr}Automatically upgrade your existing database to version{/tr}
-                                                        <strong>{$tiki_version_name}</strong>.
-                                                    {/remarksbox}
-                                                    <p class="text-center"><input type="submit" class="btn btn-primary" name="update" value="{tr}Upgrade{/tr}"></p>
-                                                </div>{* End of db-upgrade *}
-                                            </div>
+                                                <div class="db-upgrade card h-100">
+                                                    <div class=" card-body">
+                                                        <h3 class="card-title mb-3">{tr}Upgrade{/tr}</h3>
+                                                        {remarksbox type="info" title="{tr}OK{/tr}" close="n"}{tr}Automatically upgrade your existing database to version{/tr}
+                                                            <strong>{$tiki_version_name}</strong>.
+                                                        {/remarksbox}
+                                                        {if $unsupported_mail_queue_entries}
+                                                            {remarksbox type="danger" title="{tr}Unsupported Email Queue Entries{/tr}"}
+                                                                <p>{tr _0=$unsupported_mail_queue_entries}There are %0 queued messages that use an old unsupported mail format and cannot be processed by the current queue system. These entries will be removed during upgrade.{/tr}</p>
+                                                                <p>{tr}Please delete or send unsupported mails from the queue administration page before continuing.{/tr}</p>
+                                                            {/remarksbox}
+                                                            <div class="form-check my-3">
+                                                                <input class="form-check-input" type="checkbox" id="unsupported-mail-queue-ack" name="unsupported_mail_queue_ack" value="1">
+                                                                <label class="form-check-label" for="unsupported-mail-queue-ack">{tr}I understand that proceeding with the upgrade will permanently delete unsupported queued mail entries.{/tr}</label>
+                                                            </div>
+                                                        {/if}
+                                                        <p class="text-center"><input type="submit" class="btn {if $unsupported_mail_queue_entries}btn-danger{else}btn-primary{/if}" name="update" id="update-button" {if $unsupported_mail_queue_entries}disabled="disabled" value="{tr}Delete and Upgrade{/tr}" {else}value="{tr}Upgrade{/tr}"{/if}></p>
+                                                        {if $unsupported_mail_queue_entries}
+                                                            <script type="text/javascript">
+                                                            document.addEventListener('DOMContentLoaded', function() {
+                                                                var checkbox = document.getElementById('unsupported-mail-queue-ack');
+                                                                var button = document.getElementById('update-button');
+                                                                if (checkbox && button) {
+                                                                    checkbox.addEventListener('change', function() {
+                                                                        button.disabled = !checkbox.checked;
+                                                                    });
+                                                                }
+                                                            });
+                                                            </script>
+                                                        {/if}
+                                                    </div>{* End of db-upgrade *}
+                                                </div>
                                             </div>
                                             </div>
                                         {/if}
@@ -547,6 +570,11 @@
                     {elseif $install_step eq '5' or ($dbdone ne 'n')}
                     <div class="install-step5">
                         <h1>{if isset($smarty.post.update)}{tr}Review the Upgrade{/tr}{else}{tr}Review the Installation{/tr}{/if}</h1>
+                        {if $unsupported_mail_queue_cleaned}
+                            {remarksbox type=confirm title="{tr}Unsupported Email Queue Cleared{/tr}" close="n"}
+                                <p>{tr _0=$unsupported_mail_queue_cleaned}%0 unsupported queued email entries have been successfully removed during upgrade.{/tr}</p>
+                            {/remarksbox}
+                        {/if}
                         {remarksbox type=confirm title="{if isset($smarty.post.update)}{tr}Upgrade complete{/tr}{else}{tr}Installation complete{/tr}{/if}" close="n"}
                             <p>{tr}Your database has been configured and Tiki is ready to run!{/tr}
                                 {if isset($smarty.post.scratch, $defaultpass)}

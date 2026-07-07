@@ -58,7 +58,7 @@ class Scheduler_Task_TikiCheckerCommandTask extends Scheduler_Task_CommandTask
 
                                         if (! $mail->send([$user['email']])) {
                                             $msg = tra('Unable to send mail');
-                                            $mailerrors = print_r($mail->errors, true);
+                                            $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string, never prints)
                                             $msg .= '<br>' . $mailerrors;
                                             $this->logger->debug($msg);
                                         } else {

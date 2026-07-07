@@ -32,7 +32,7 @@
                     <td>{$instance->revision}</td>
                     <td><a href="{$instance->weburl}" title="Visit website" target="_blank">{$instance->weburl}</a></td>
                     <td>{$instance->contact|escape}</td>
-                    <td>{if $instance->app != null }{tr}False{/tr}{else}{tr}True{/tr}{/if}</td>
+                    <td>{if $instance->app != null}{tr}False{/tr}{else}{tr}True{/tr}{/if}</td>
                     <td class="action">
                         {actions}{strip}
                             <action>

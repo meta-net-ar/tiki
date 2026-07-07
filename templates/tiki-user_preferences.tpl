@@ -766,7 +766,7 @@
                                     <div class="col-md-8">
                                         <input class="form-control" type="password" name="pass1" id="pass1" autocomplete="new-password">
                                         <div style="ms-1">
-                                            <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none' } <span id="mypassword_text_inner"></span></div>
+                                            <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
                                             <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
                                         </div>
                                         <div style="mt-1">

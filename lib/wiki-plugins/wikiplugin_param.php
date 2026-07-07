@@ -54,6 +54,8 @@ function wikiplugin_param_info()
 
 function wikiplugin_param($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_param_info());
+
     $dataelse = '';
     $test = true;
 

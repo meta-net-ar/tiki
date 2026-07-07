@@ -60,6 +60,7 @@ const vueLifecycles = singleSpaVue({
         });
         //app.use(Vue3ColorPicker);
         if (import.meta.env.MODE === "development") {
+            // eslint-disable-next-line no-console
             console.log(import.meta.env);
         }
     },

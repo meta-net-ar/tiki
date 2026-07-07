@@ -20,6 +20,7 @@ class PreferencesLib
         'feature_create_webhelp',
         'scheduler_shell_command',
         'smarty_enable_string_eval',
+        'wikiplugin_fileaccess_allowed_paths',
     ];
 
     private $data = [];

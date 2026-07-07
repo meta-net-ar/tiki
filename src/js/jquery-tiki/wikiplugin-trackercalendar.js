@@ -78,7 +78,6 @@ $.fn.setupEventCalendar = function (tcPluginParams) {
             },
             viewClassNames: function (currentView) {
                 $(cal).tikiModal();
-                console.debug(currentView.view.type); // useful for debugging
             },
             headerToolbar: {
                 start: "prev,next today",

@@ -52,6 +52,7 @@ export default [
             "@stylistic/no-trailing-spaces": "error",
             "@stylistic/linebreak-style": ["error", "unix"],
             "@stylistic/semi": ["error", "always"],
+            "no-console": "error",
         },
         languageOptions: {
             ecmaVersion: 11,

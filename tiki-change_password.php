@@ -41,6 +41,9 @@ if (! isset($_REQUEST["oldpass"])) {
 
 $user = $_REQUEST["user"];
 $secure_token = $_REQUEST["token"] ?? '';
+$bruteForceProperties = function () use ($tikilib) {
+    return ['ip' => $tikilib->get_ip_address()];
+};
 
 if (isset($_REQUEST["newuser"]) && $_REQUEST["newuser"] == 'y') {
     $smarty->assign('new_user_validation', 'y');
@@ -52,15 +55,16 @@ $smarty->assign('secure_token', $secure_token);
 
 if (isset($_REQUEST["change"])) {
     $access->checkCsrf();
+    $changePasswordProperties = $bruteForceProperties();
     if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
-        if (! $bruteForce->isOperationAllowed('change_password', ['ip' => $tikilib->get_ip_address()])) {
-            $nextAllowedTime = $bruteForce->getNextAllowedTime('change_password', ['ip' => $tikilib->get_ip_address()]);
-            $waitTime = $nextAllowedTime - time();
+        if (! $bruteForce->isOperationAllowed('change_password', $changePasswordProperties)) {
+            $waitTime = $bruteForce->getWaitTime('change_password', $changePasswordProperties);
             if ($waitTime > 60) {
                 $waitMessage = sprintf(tra('Too many password change attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
             } else {
                 $waitMessage = sprintf(tra('Too many password change attempts. Please try again in %d seconds.'), $waitTime);
             }
+            http_response_code(429);
             $smarty->assign('msg', $waitMessage);
             $smarty->display('error.tpl');
             die;
@@ -160,6 +164,9 @@ if (isset($_REQUEST["change"])) {
             if ($res && $prefs['pass_history_management'] === 'y') {
                 $userlib->addPasswordHistory($user, $_REQUEST["pass"]);
             }
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                $bruteForce->success('change_password', $changePasswordProperties);
+            }
 
             // Mark reset token as used only after successful password change
             if (! empty($secure_token) && ! $is_new_user_validation && ! $must_change_password) {
@@ -187,7 +194,7 @@ if (isset($_REQUEST["change"])) {
             $wizardlib->onLogin($user, $homePageUrl, $force);
             $accesslib = TikiLib::lib('access');
             if (! empty($prefs['url_after_validation']) && ! empty($_REQUEST['new_user_validation'])) {
-                $access->redirect($prefs['url_after_validation']);
+                $access->redirect($prefs['url_after_validation'], allowExternal: true);
             } else {
                 $accesslib->redirect($homePageUrl);
             }

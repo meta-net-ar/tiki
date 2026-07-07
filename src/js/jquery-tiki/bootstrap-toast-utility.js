@@ -29,7 +29,6 @@ function completeToastClosed(id) {
         delay: 5000,
         containerClasses: "bg-danger text-light",
         onClose: function() {
-            console.log("Toast notification closed!");
         }
     }); // example with callback
 

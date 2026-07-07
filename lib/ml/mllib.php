@@ -94,7 +94,7 @@ class MachineLearningLib extends TikiDb_Bridge
         try {
             $instance = $ref->newInstanceArgs($instance_args);
         } catch (TypeError $e) {
-            Feedback::error(tr('Error instantiating %0 with arguments %1: %2', $class, print_r($instance_args, 1), $e->getMessage()));
+            Feedback::error(tr('Error instantiating %0 with arguments %1: %2', $class, print_r($instance_args, 1), $e->getMessage())); // @phpstan-ignore disallowedFunctions.printR (returns constructor args as string for error message, never prints)
             $instance = tr('(error instantiating)');
         }
         return [

@@ -38,8 +38,8 @@
                                                  value="{$filegals_manager|escape}">{/if}
             {query _type='form_input' maxRecords='NULL' type='NULL' types='NULL' find='NULL' topic='NULL' lang='NULL' exact_match='NULL' categId='NULL' cat_categories='NULL' filegals_manager='NULL' save='NULL' offset=0 searchlist='NULL' searchmap='NULL'}
             <div>
-                <input class="form-control" type="text" name="find" id="find" aria-label="{tr}Find{/tr}" value="{$find|escape}"
-                       placeholder="{if empty($whatlabel)}{tr}Find{/tr}...{else}{tr}{$whatlabel}{/tr}{/if}"
+                <input class="form-control" type="text" name="find" id="find" aria-label="{tr}Search{/tr}" value="{$find|escape}"
+                       placeholder="{if empty($whatlabel)}{tr}Search{/tr}...{else}{tr}{$whatlabel}{/tr}{/if}"
                        title="{if ! empty($find_in)}{$find_in|escape}{/if}" data-html="true" data-bs-toggle="focus">
                 {if isset($autocomplete)}
                     {autocomplete element="#find" type="{$autocomplete}"}
@@ -316,7 +316,7 @@
         {/if}
         {if (!isset($map_only) or $map_only ne 'y') or (isset($gmapbuttons) && $gmapbuttons)}
         <div class="d-flex justify-content-end">
-            <button type="submit" class="btn btn-info" name="search">{tr}Find{/tr}</button>
+            <button type="submit" class="btn btn-info" name="search">{tr}Search{/tr}</button>
         </div>
         {/if}
     </form>

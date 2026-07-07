@@ -1,0 +1,14 @@
+---
+description: Response from locking a file in a gallery.
+type: object
+required:
+  - title
+  - count
+  - locked
+properties:
+  title:
+    type: string
+  count:
+    type: integer
+  locked:
+    type: array

@@ -25,11 +25,23 @@ $calendarlib = TikiLib::lib('calendar');
 $access->check_feature('feature_calendar');
 $access->check_permission('tiki_p_admin_calendar');
 
-if (isset($_REQUEST["import"]) && isset($_REQUEST["calendarId"]) && isset($_FILES["fileCSV"])) {
-    if ($calendarlib->importCSV($_FILES["fileCSV"]["tmp_name"], $_REQUEST["calendarId"])) {
-        $smarty->assign('updated', "y");
+
+if (isset($_REQUEST["import"]) && isset($_REQUEST["calendarId"]) && isset($_FILES["fileImport"])) {
+    $fileExtension = strtolower(pathinfo($_FILES["fileImport"]["name"], PATHINFO_EXTENSION));
+    if (in_array($fileExtension, ['csv', 'ics'])) {
+        if ($fileExtension === 'csv') {
+            $result = $calendarlib->importCSV($_FILES["fileImport"]["tmp_name"], $_REQUEST["calendarId"]);
+        } else {
+            $result = $calendarlib->importICS($_FILES["fileImport"]["tmp_name"], $_REQUEST["calendarId"]);
+        }
+        if ($result) {
+            $smarty->assign('updated', 'y');
+        }
+    } else {
+        $smarty->assign('error', 'y');
     }
 }
+
 $calendars = $calendarlib->list_calendars(); // no check perm as p_admin only
 $smarty->assign_by_ref('calendars', $calendars['data']);
 

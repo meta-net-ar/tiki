@@ -2,7 +2,7 @@
 $bordered_border: solid 0.75rem #1a1a1a;
 
 html,
-.navbar.fixed-top {
+header.sticky-top {
     /*box-shadow: inset 0 0 0 0.75rem #1a1a1a;*/
     border: $bordered_border;
 }

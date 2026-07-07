@@ -1,0 +1,14 @@
+---
+description: Response from DELETE /trackers/{trackerId}/fields.
+type: object
+required:
+  - status
+  - trackerId
+  - fields
+properties:
+  status:
+    type: string
+  trackerId:
+    type: integer
+  fields:
+    type: array

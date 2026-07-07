@@ -34,7 +34,7 @@
             <div class="btn-group ms-2" style="min-width: 6rem;">
                 {* Show language dropdown only if there is more than 1 language or user has right to edit *}
                 {if ($tiki_p_admin eq 'y' or $tiki_p_admin_wiki eq 'y' or $tiki_p_edit eq 'y' or $tiki_p_edit_inline eq 'y') or (isset($translationsCount) and $translationsCount gt 1)}
-                    {if $prefs.feature_multilingual eq 'y' && $prefs.show_available_translations eq 'y' && $machine_translate_to_lang eq '' }
+                    {if $prefs.feature_multilingual eq 'y' && $prefs.show_available_translations eq 'y' && $machine_translate_to_lang eq ''}
                         {*span class="btn-i18n" *}
                         {include file='translated-lang.tpl' object_type='wiki page'}
                         {*/span *}
@@ -188,7 +188,7 @@
                                         }
                                         return false;
                                         });
-                                        if (!getCookie("wiki_plugin_edit_view")) {$(".editplugin, .icon_edit_section").hide(); } else { $("#wiki_plugin_edit_view").trigger("click"); }
+                                        if (!getCookie("wiki_plugin_edit_view")) {$(".editplugin, .icon_edit_section").hide();} else { $("#wiki_plugin_edit_view").trigger("click");}
                                     {/jq}
                                     <a class="dropdown-item" href="#" role="button" id="wiki_plugin_edit_view" title="{tr}Click to toggle on/off{/tr}">
                                         <span class="align-items-center text-with-toggle"><span class="text">{icon name='plugin' iclass="d-inline"} <span class="mx-1">{tr}Edit icons{/tr}</span> </span> {icon iclass="toggle-icon" name="toggle-off"}</span>

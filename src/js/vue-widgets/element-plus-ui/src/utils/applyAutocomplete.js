@@ -17,12 +17,12 @@ export const TEXT = {
  */
 export default function applyAutocomplete(element, remoteSourceUrl = null, sourceList = [], valueKey = null, selectCb = null) {
     if (!element) {
-        console.error(TEXT.ERROR_NO_ELEMENT);
+        console.error(TEXT.ERROR_NO_ELEMENT); // eslint-disable-line no-console
         return;
     }
 
     if (!remoteSourceUrl && !sourceList.length) {
-        console.error(TEXT.ERROR_NO_SOURCE);
+        console.error(TEXT.ERROR_NO_SOURCE); // eslint-disable-line no-console
         return;
     }
 
@@ -72,6 +72,16 @@ export default function applyAutocomplete(element, remoteSourceUrl = null, sourc
     element.setAttribute("element-plus-ref", elementUniqueId);
     element.style.display = "none";
     element.parentNode.insertBefore(elementPlusUi, element.nextSibling);
+    const syncUiValue = () => {
+        const newValue = element.value;
+        if (typeof elementPlusUi.setValue === "function") {
+            elementPlusUi.setValue(newValue);
+            return;
+        }
+        elementPlusUi.value = newValue;
+    };
+
+    element.addEventListener("change", syncUiValue);
 
     return elementPlusUi;
 }

@@ -42,7 +42,7 @@ $smarty->assign('channelList', $channelList);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_FILES['video'])) {
         if ($_FILES['video']['error'] !== UPLOAD_ERR_OK) {
-            $errors[] = tra('File upload error: ') . $_FILES['video']['error'] . ' (Details: ' . print_r($_FILES['video'], true) . ')';
+            $errors[] = tra('File upload error: ') . $_FILES['video']['error'] . ' (Details: ' . print_r($_FILES['video'], true) . ')'; // @phpstan-ignore disallowedFunctions.printR (returns $_FILES details as string for upload error message, never prints)
         } elseif ($_FILES['video']['size'] > $max_upload_size) {
             $errors[] = tra('File exceeds maximum size of ') . $max_upload_size_comment;
         } else {

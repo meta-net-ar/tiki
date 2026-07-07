@@ -293,7 +293,6 @@ class Spreadsheet_Excel_Reader
                         }
                     //echo " 1 Type_SST\n";
                     $this->shareStrings = new SSTRecord($r, $continueRecords);
-                    //print_r($this->shareStrings->strings);
                      */
                     // echo 'SST read: '.($time_end-$time_start)."\n";
                     break;
@@ -580,7 +579,6 @@ class Spreadsheet_Excel_Reader
         //$xfindex = GetInt2d(, 4);
         $xfindex = ord($this->data[$spos+4]) | ord($this->data[$spos+5]) << 8;
         //echo 'check is date '.$xfindex.' '.$this->formatRecords['xfrecords'][$xfindex]['type']."\n";
-        //var_dump($this->formatRecords['xfrecords'][]);
         if ($this->formatRecords['xfrecords'][$xfindex]['type'] == 'date') {
             $this->curformat = $this->formatRecords['xfrecords'][$xfindex]['format'];
             $this->rectype = 'date';

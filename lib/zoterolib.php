@@ -69,7 +69,7 @@ class ZoteroLib extends TikiDb_Bridge
 
             return false;
         } catch (Exception $e) {
-            error_log("Zotero get_references error: " . $e->getMessage());
+            error_log("Zotero get_references error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (Zotero API exception reporting)
             return false;
         }
     }

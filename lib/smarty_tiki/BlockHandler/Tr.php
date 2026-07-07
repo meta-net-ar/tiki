@@ -51,10 +51,32 @@ class Tr implements BlockHandlerInterface
         }
 
         if (empty($params['interactive']) || $params['interactive'] == 'y') {
-            return tra($content, $lang, false, $args);
+            $translated = tra($content, $lang, false, $args);
         } else {
-            return tra($content, $lang, true);
+            $translated = tra($content, $lang, false, []);
         }
+
+        // Auto-detect wiki parsing context for noparse wrapping
+        $shouldNoparse = false;
+
+        // Explicit parameter takes precedence
+        if (isset($params['noparse'])) {
+            $shouldNoparse = $params['noparse'] == 'y';
+        } else {
+            // Auto-detect: if we're in a wiki parsing context, apply noparse automatically
+            // Check parser options instead of Smarty variables (parser may not use Smarty)
+            $parserlib = \TikiLib::lib('parser');
+            $inWikiContext = ! empty($parserlib->option['wiki_parse_context']);
+            if ($inWikiContext) {
+                $shouldNoparse = true;
+            }
+        }
+
+        if ($shouldNoparse) {
+            $translated = '~np~' . $translated . '~/np~';
+        }
+
+        return $translated;
     }
 
     public function isCacheable(): bool

@@ -1,7 +1,7 @@
 {capture assign="viewuser"}{$userwatch|escape:"url"}{/capture}
 {title url="tiki-user_information.php?view_user=$viewuser"}{tr}User Information{/tr}{/title}
 
-{if "$userwatch" eq "$user" }
+{if "$userwatch" eq "$user"}
     {include file='tiki-mytiki_bar.tpl'}
 {/if}
 

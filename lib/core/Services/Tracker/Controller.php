@@ -737,17 +737,17 @@ class Services_Tracker_Controller
     {
         // TODO : Eventually, this method should filter according to the actual permissions, but because
         //        it is only to be used for tracker sync at this time, admin privileges are just fine.
-
-        if (! Perms::get()->admin_trackers) {
-            throw new Services_Exception_Denied(tr('Reserved for tracker administrators'));
-        }
-
         $trackerId = $input->trackerId->int();
         $offset = $input->offset->int();
         $maxRecords = $input->maxRecords->int();
         $status = $input->status->word();
         $format = $input->format->word();
         $modifiedSince = $input->modifiedSince->int();
+
+        $perms = Perms::get('tracker', $trackerId);
+        if (! $perms->admin_trackers) {
+            throw new Services_Exception_Denied(tr('Reserved for tracker administrators'));
+        }
 
         $definition = Tracker_Definition::get($trackerId);
 
@@ -1079,6 +1079,9 @@ class Services_Tracker_Controller
             );
 
             if ($itemId) {
+                if ($cloneFrom) {
+                    $this->utilities->cascadeChildItems($cloneFrom, $itemId);
+                }
                 TikiLib::lib('unifiedsearch')->processUpdateQueue();
                 TikiLib::events()->trigger('tiki.process.redirect'); // wait for indexing to complete before loading of next request to ensure updated info shown
 
@@ -1123,7 +1126,7 @@ class Services_Tracker_Controller
                 $util->setTicket();
                 $item['nextTicket'] = $util->getTicket();
 
-                if (! $redirect && ! $access->is_xml_http_request()) {
+                if (! $redirect && ! $access->is_xml_http_request() && ! TIKI_API) {
                     $redirect = smarty_modifier_sefurl($trackerId, 'tracker');
                 }
 
@@ -1189,6 +1192,7 @@ class Services_Tracker_Controller
             'skipRefresh' => $input->skipRefresh->bool(),
             'refreshMeta' => $input->refreshMeta->raw(),
             'refreshObject' => $input->refreshObject->raw(),
+            'cloneFrom' => $cloneFrom,
         ];
     }
 
@@ -1404,7 +1408,7 @@ class Services_Tracker_Controller
                 $redirect = $input->redirect->url();
 
                 // also $prefs['tracker_legacy_insert'] === 'y'
-                if (! $redirect && ! $access->is_xml_http_request()) {
+                if (! $redirect && ! $access->is_xml_http_request() && ! TIKI_API) {
                     $redirect = smarty_modifier_sefurl($itemId, 'trackeritem');
                 }
 
@@ -1983,7 +1987,7 @@ class Services_Tracker_Controller
             }
 
             $uncascaded = $trklib->findUncascadedDeletes($itemId, $trackerId);
-            $affectedCount += count($uncascaded);
+            $affectedCount += count($uncascaded['itemIds']);
 
             if ($_SERVER['REQUEST_METHOD'] == 'POST' || $_SERVER['REQUEST_METHOD'] == 'DELETE') {
                 $this->utilities->removeItemAndReferences($definition, $itemObject, $uncascaded, $input->replacement->int() ?: '');
@@ -2397,12 +2401,21 @@ class Services_Tracker_Controller
                         $has_initial_version = true;
                     }
                     if (empty($field_option[$hist['fieldId']])) {
-                        if ($hist['fieldId'] !== HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE) {
+                        if (! empty($hist['isDeletedField'])) {
+                            $field_option[$hist['fieldId']] = [
+                                'type' => 't',
+                                'name' => $hist['fieldName'],
+                                'fieldId' => $hist['fieldId'],
+                                'trackerId' => $item_info['trackerId'],
+                                'visibleInHistoryMode' => 'y',
+                                'isDeletedField' => true,
+                            ];
+                        } elseif ($hist['fieldId'] !== HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE) {
                             $field_option[$hist['fieldId']] = $trklib->get_tracker_field($hist['fieldId']);
                         } else {
                             $field_option[$hist['fieldId']] = [ // fake field to do the diff on
                                 'type' => 't',
-                                'name' => tr('Status'),
+                                'name' => $hist['fieldName'],
                                 'fieldId' => $hist['fieldId'],
                                 'trackerId' => $item_info['trackerId'],
                             ];
@@ -2410,7 +2423,7 @@ class Services_Tracker_Controller
                     }
                     // Pre-render field values here in the controller, before Smarty starts rendering the template.
                     $field_value = $field_option[$hist['fieldId']];
-                    if (! empty($field_value['fieldId']) && $field_value['fieldId'] > 0) {
+                    if (! empty($field_value['fieldId']) && $field_value['fieldId'] > 0 && empty($field_value['isDeletedField'])) {
                         $emptyTemplate = TikiLib::lib('smarty')->getEmptyInternalTemplate();
                         if (empty($diff_style)) {
                             $field_value['value'] = $hist['value'];

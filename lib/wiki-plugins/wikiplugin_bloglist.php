@@ -163,6 +163,8 @@ function wikiplugin_bloglist($data, $params)
     global $user;
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
+
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_bloglist_info());
     $params['Id'] = implode(':', $params['Id']);
     // Sanitize $params['Id'])
     $params['Id'] = preg_filter('/[^0-9:]*/', '', $params['Id']);

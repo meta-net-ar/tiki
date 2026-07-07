@@ -1,0 +1,12 @@
+---
+type: object
+properties:
+  cant:
+    type: integer
+    description: Total count of articles matching the query
+  offset:
+    type: integer
+  articles:
+    type: array
+    items:
+      $ref: schemas-ArticleResponse.yaml

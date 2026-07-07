@@ -300,7 +300,7 @@ class Tracker_Field_BigBlueButton extends \Tracker\Field\AbstractItemField imple
 
             return $allRecordings;
         } catch (Exception $e) {
-            error_log('BigBlueButton Tracker Field Error: ' . $e->getMessage());
+            error_log('BigBlueButton Tracker Field Error: ' . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (BBB integration error reporting)
             return [];
         }
     }
@@ -410,7 +410,7 @@ class Tracker_Field_BigBlueButton extends \Tracker\Field\AbstractItemField imple
                 ],
             ];
         } catch (Exception $e) {
-            error_log('BBB Metadata Fetch Error: ' . $e->getMessage());
+            error_log('BBB Metadata Fetch Error: ' . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (BBB integration error reporting)
         }
 
         return null;

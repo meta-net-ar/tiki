@@ -211,7 +211,6 @@ class Search_ContentSource_TrackerItemSource implements Search_ContentSource_Int
                 $data = array_merge($data, $handler->getGlobalFields());
             } else {
                 //Skip this field if it's the main title field, it will still be part of title later, we don't want it twice in contents, and we want it at the end
-                //var_dump($handler->getBaseKey());
             }
         }
 

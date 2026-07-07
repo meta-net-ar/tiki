@@ -331,6 +331,9 @@
                         {tr}wiki:pageName for a wiki page or tpl:tplName for a template{/tr}
                     </div>
                 </div>
+                <div class="form-text">
+                    <p>{tr _0="<code>{ldelim}DIV(class=&quot;tracker-field-group&quot;){rdelim}...{ldelim}DIV{rdelim}</code>"}When using field rules in a configured wiki template, wrap each label and field in the field rules parent selector. Example: %0{/tr}</p>
+                </div>
     {/accordion_group}
         {accordion_group title="{tr}Status{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">

@@ -89,6 +89,10 @@ index.php
 /storage/public/*
 /storage/prefsdoc
 /storage/fgal/*
+/storage/markdown-importer/repo/
+/storage/markdown-importer/.home/
+/storage/markdown-importer/.gitconfig
+/storage/markdown-importer/**/*.zip
 /temp/*
 /temp/cache/*
 /temp/mail_attachs/*

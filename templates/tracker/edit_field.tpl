@@ -112,7 +112,7 @@
                             {/if}
 
                         {elseif $def.separator}
-                            <div class="form-text">{tr}Separate multiple with &quot;{$def.separator}&quot;{/tr}</div>
+                            <div class="form-text">{tr _0=$def.separator}Separate multiple with &quot;%0&quot;{/tr}</div>
                         {/if}
                     {/if}
                     {if !empty($def.depends.field)}
@@ -347,5 +347,12 @@
         if ($(this).val() === 'password') {
             isPasswordDropdown.val('1');
         }
+    });
+
+    $(document).on("change", "select[name='option~cascade']", function() {
+        const newVal = $(this).val() === '7' ? '1' : '0';
+        const dupNative = document.querySelector("select[name='option~duplicateCascade']");
+        $(dupNative).val(newVal);
+        $(dupNative).trigger("change");
     });
 {/jq}

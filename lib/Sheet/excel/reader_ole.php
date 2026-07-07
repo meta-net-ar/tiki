@@ -224,7 +224,6 @@ class R_OLE
 
             //echo "numBlocks = $numBlocks\n";
         //byte[] streamData = new byte[numBlocks * BIG_BLOCK_SIZE];
-            //print_r($this->wrkbook);
             $streamData = '';
             $block = $this->props[$this->wrkbook]['startBlock'];
             //$count = 0;

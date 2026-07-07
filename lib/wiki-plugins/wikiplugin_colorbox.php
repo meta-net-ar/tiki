@@ -123,6 +123,8 @@ function wikiplugin_colorbox($data, $params)
     static $iColorbox = 0;
     $smarty = TikiLib::lib('smarty');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_colorbox_info());
+
     if (! is_null($params['fgalId'])) {
         if ($prefs['feature_file_galleries'] != 'y') {
             return tra('This feature is disabled') . ': feature_file_galleries';

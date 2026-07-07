@@ -15,6 +15,10 @@ $.fn.setupEventCalendar = function (
     let isOpeningModal = false;
     this.each(function () {
         const calendarEl = document.getElementById(targetId);
+        if (!calendarEl) {
+            // check if element exists because an empty array is added to window.moduleCalendar for reasons i don't understand
+            return;
+        }
         $(calendarEl).tikiModal(tr("Loading..."));
         const toTimezoneStableIso = (dateValue) => moment(dateValue).format("YYYY-MM-DD[T]HH:mm:ssZ");
         const browserTimezone = (() => {
@@ -90,6 +94,176 @@ $.fn.setupEventCalendar = function (
                 location.href = "tiki-calendar.php";
             }
         };
+        const getMonthRangeButtons = () => {
+            const monthRangeContainer = calendarEl.querySelector("#month-range-controls");
+            if (!monthRangeContainer) {
+                return {};
+            }
+
+            return {
+                oneMonth: monthRangeContainer.querySelector("#one-month"),
+                quarter: monthRangeContainer.querySelector("#quarter"),
+                semester: monthRangeContainer.querySelector("#semester"),
+            };
+        };
+        const removeMonthRangeControls = () => {
+            const monthRangeContainer = calendarEl.querySelector("#month-range-controls");
+            if (monthRangeContainer) {
+                monthRangeContainer.remove();
+            }
+        };
+        const setMonthRangeButtonState = (activeButtonId = "one-month") => {
+            const { oneMonth, quarter, semester } = getMonthRangeButtons();
+            if (!oneMonth || !quarter || !semester) {
+                return;
+            }
+            oneMonth.classList.toggle("ec-active", activeButtonId === "one-month");
+            quarter.classList.toggle("ec-active", activeButtonId === "quarter");
+            semester.classList.toggle("ec-active", activeButtonId === "semester");
+        };
+        const normalizeMonthRangeSpan = function (monthSpan) {
+            const parsedMonthSpan = Number(monthSpan);
+            return parsedMonthSpan === 3 || parsedMonthSpan === 6 ? parsedMonthSpan : 1;
+        };
+        const getMonthRangeButtonId = function (monthSpan) {
+            const normalizedMonthSpan = normalizeMonthRangeSpan(monthSpan);
+            if (normalizedMonthSpan === 3) {
+                return "quarter";
+            }
+            if (normalizedMonthSpan === 6) {
+                return "semester";
+            }
+            return "one-month";
+        };
+        let activeMonthRangeSpan = normalizeMonthRangeSpan(eventCalendarParams.initialMonthRangeSpan);
+        const listPeriodOptions = {
+            week: { label: tr("Week"), duration: { weeks: 1 } },
+            month: { label: tr("Month"), duration: { months: 1 }, focusMonths: 1 },
+            quarter: { label: tr("Quarter"), duration: { months: 3 }, focusMonths: 3 },
+            semester: { label: tr("Semester"), duration: { months: 6 }, focusMonths: 6 },
+            year: { label: tr("Year"), duration: { years: 1 }, focusMonths: 12 },
+        };
+        const listPeriodNames = Object.keys(listPeriodOptions);
+        const normalizeListPeriod = (period) => (listPeriodNames.includes(period) ? period : "year");
+        let activeListPeriod = normalizeListPeriod(eventCalendarParams.initialListPeriod);
+        // Keep the user's focus separate from aligned ranges such as January-December.
+        let activeListFocusDate = null;
+        let activeListFocusDay = null;
+        let pendingListNavigation = null;
+        const getCalendarDate = () => moment(calendarContainer[0].getOption("date"));
+        const getListFocusDate = () => (activeListFocusDate?.isValid() ? activeListFocusDate.clone() : getCalendarDate());
+        const setListFocusDate = (date, preserveFocusDay = false) => {
+            const focusDate = moment(date);
+            if (!focusDate.isValid()) {
+                return;
+            }
+            activeListFocusDate = focusDate;
+            if (!preserveFocusDay) {
+                activeListFocusDay = focusDate.date();
+            }
+        };
+        const getListDuration = (periodOptions, focusDate) => {
+            if (!eventCalendarParams.calendarListBeginsFocus) {
+                return { ...periodOptions.duration };
+            }
+            if (!periodOptions.focusMonths) {
+                return { days: 7 };
+            }
+            return { days: focusDate.clone().add(periodOptions.focusMonths, "months").diff(focusDate, "days") };
+        };
+        const getNavigatedListFocusDate = (direction) => {
+            const focusDate = getListFocusDate();
+            const periodOptions = listPeriodOptions[activeListPeriod];
+            if (!periodOptions.focusMonths) {
+                return focusDate.add(direction * 7, "days");
+            }
+            const focusDay = activeListFocusDay || focusDate.date();
+            const targetDate = focusDate.date(1).add(direction * periodOptions.focusMonths, "months");
+            return targetDate.date(Math.min(focusDay, targetDate.daysInMonth()));
+        };
+        // Native toolbar navigation changes the date first; datesSet then reapplies the exact List range.
+        const bindListNavigation = () => {
+            ["prev", "next", "today"].forEach((action) => {
+                const button = calendarEl.querySelector(".ec-" + action);
+                if (button && !button.dataset.listNavigationBound) {
+                    button.addEventListener(
+                        "click",
+                        () => {
+                            if (eventCalendarParams.initialView === "listYear") {
+                                pendingListNavigation = action;
+                            }
+                        },
+                        true
+                    );
+                    button.dataset.listNavigationBound = "1";
+                }
+            });
+        };
+        const getListPeriodButtons = () => {
+            const listPeriodContainer = calendarEl.querySelector("#list-period-controls");
+            if (!listPeriodContainer) {
+                return {};
+            }
+
+            return listPeriodNames.reduce((buttons, period) => {
+                buttons[period] = listPeriodContainer.querySelector('[data-list-period="' + period + '"]');
+                return buttons;
+            }, {});
+        };
+        const removeListPeriodControls = () => {
+            const listPeriodContainer = calendarEl.querySelector("#list-period-controls");
+            if (listPeriodContainer) {
+                listPeriodContainer.remove();
+            }
+        };
+        const setListPeriodButtonState = (activePeriod = "year") => {
+            const buttons = getListPeriodButtons();
+            listPeriodNames.forEach((period) => {
+                if (buttons[period]) {
+                    buttons[period].classList.toggle("ec-active", period === activePeriod);
+                }
+            });
+        };
+        const applyListPeriod = (period) => {
+            const normalizedPeriod = normalizeListPeriod(period);
+            const selectedPeriod = listPeriodOptions[normalizedPeriod];
+            activeListPeriod = normalizedPeriod;
+            eventCalendarParams.initialListPeriod = normalizedPeriod;
+            const focusDate = getListFocusDate();
+            setListFocusDate(focusDate, activeListFocusDate?.isValid());
+            const displayDate =
+                !eventCalendarParams.calendarListBeginsFocus && normalizedPeriod === "year" ? focusDate.clone().startOf("year") : focusDate;
+            calendarContainer[0].setOption("date", displayDate.toDate());
+            calendarContainer[0].setOption("duration", getListDuration(selectedPeriod, focusDate));
+            calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
+                return moment(dayCell).format("D");
+            });
+            setListPeriodButtonState(normalizedPeriod);
+        };
+        const formatMonthRangeTitle = (startDate, monthSpan = 1) => {
+            const rangeStart = moment(startDate).startOf("month");
+            if (!rangeStart.isValid()) {
+                return "";
+            }
+            if (monthSpan <= 1) {
+                return rangeStart.format("MMMM YYYY");
+            }
+            const rangeEnd = rangeStart.clone().add(monthSpan - 1, "months");
+            if (rangeStart.year() === rangeEnd.year()) {
+                return rangeStart.format("MMMM") + " - " + rangeEnd.format("MMMM YYYY");
+            }
+            return rangeStart.format("MMMM YYYY") + " - " + rangeEnd.format("MMMM YYYY");
+        };
+        const applyMonthRange = (monthSpan, activeButtonId) => {
+            const normalizedMonthSpan = normalizeMonthRangeSpan(monthSpan);
+            activeMonthRangeSpan = normalizedMonthSpan;
+            eventCalendarParams.initialMonthRangeSpan = normalizedMonthSpan;
+            calendarContainer[0].setOption("duration", { months: normalizedMonthSpan });
+            calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
+                return moment(dayCell).format(normalizedMonthSpan === 1 ? "D" : "M/D");
+            });
+            setMonthRangeButtonState(activeButtonId || getMonthRangeButtonId(normalizedMonthSpan));
+        };
         calendarContainer[0] = createCalendar(document.getElementById(targetId), [DayGrid, TimeGrid, Interaction, List], {
             eventTimeFormat: {
                 hour: "numeric",
@@ -128,20 +302,37 @@ $.fn.setupEventCalendar = function (
             slotDuration: eventCalendarParams.slotDuration,
             view: eventCalendarParams.initialView,
             date: eventCalendarParams.initialDate,
+            views: {
+                dayGridMonth: {
+                    titleFormat: function (startDate) {
+                        return formatMonthRangeTitle(startDate, activeMonthRangeSpan);
+                    },
+                },
+            },
             viewDidMount: function (data) {
-                // Preserve selected view across date-picker re-renders (callback can expose `data.type` or `data.view.type`).
-                const mountedViewType = data?.type ?? data?.view?.type;
-                // Use `data.type` for existing toolbar condition checks
-                const legacyToolbarViewType = data?.type;
-                if (mountedViewType) {
-                    eventCalendarParams.initialView = mountedViewType;
+                // Normalize view type because callback payload can expose either `data.type` or `data.view.type`.
+                const currentViewType = data?.type ?? data?.view?.type;
+                const previousViewType = eventCalendarParams.initialView;
+                if (currentViewType) {
+                    eventCalendarParams.initialView = currentViewType;
+                }
+                if (previousViewType === "listYear" && currentViewType !== "listYear" && activeListFocusDate?.isValid()) {
+                    calendarContainer[0].setOption("date", activeListFocusDate.toDate());
+                    activeListFocusDate = null;
+                    activeListFocusDay = null;
+                    pendingListNavigation = null;
+                } else if (currentViewType === "listYear" && previousViewType !== "listYear") {
+                    setListFocusDate(getCalendarDate());
                 }
                 $(calendarEl).tikiModal();
-                if (legacyToolbarViewType == "dayGridMonth" || legacyToolbarViewType == "listMonth") {
-                    calendarContainer[0].setOption("duration", { months: 1 });
-                    if (!document.getElementById("quarter")) {
-                        const ecStart = document.querySelector(".ec-start");
+                bindListNavigation();
+                if (currentViewType == "dayGridMonth" || currentViewType == "listMonth") {
+                    removeListPeriodControls();
+                    if (!calendarEl.querySelector("#quarter")) {
+                        const ecEnd = calendarEl.querySelector(".ec-end");
                         const buttonMonthView = document.createElement("div");
+                        buttonMonthView.id = "month-range-controls";
+                        buttonMonthView.className = "ec-button-group calendar-period-controls";
                         const quarterText = tr("Quarter");
                         const semesterText = tr("Semester");
                         const oneMonthText = tr("One-Month");
@@ -155,66 +346,72 @@ $.fn.setupEventCalendar = function (
                             '<button class="ec-button" id="semester">' +
                             semesterText +
                             "</button>";
-                        ecStart.appendChild(buttonMonthView);
+                        ecEnd.appendChild(buttonMonthView);
                     }
 
-                    const oneMonth = document.querySelector("#one-month");
-                    const quarter = document.querySelector("#quarter");
-                    const semester = document.querySelector("#semester");
+                    const { oneMonth, quarter, semester } = getMonthRangeButtons();
+                    if (oneMonth && !oneMonth.dataset.rangeHandlerBound) {
+                        oneMonth.addEventListener("click", () => applyMonthRange(1, "one-month"));
+                        oneMonth.dataset.rangeHandlerBound = "1";
+                    }
+                    if (quarter && !quarter.dataset.rangeHandlerBound) {
+                        quarter.addEventListener("click", () => applyMonthRange(3, "quarter"));
+                        quarter.dataset.rangeHandlerBound = "1";
+                    }
+                    if (semester && !semester.dataset.rangeHandlerBound) {
+                        semester.addEventListener("click", () => applyMonthRange(6, "semester"));
+                        semester.dataset.rangeHandlerBound = "1";
+                    }
+                    applyMonthRange(activeMonthRangeSpan, getMonthRangeButtonId(activeMonthRangeSpan));
+                } else if (currentViewType == "listYear") {
+                    removeMonthRangeControls();
+                    if (!calendarEl.querySelector("#list-period-controls")) {
+                        const ecEnd = calendarEl.querySelector(".ec-end");
+                        const listPeriodView = document.createElement("div");
+                        listPeriodView.id = "list-period-controls";
+                        listPeriodView.className = "ec-button-group calendar-period-controls";
+                        listPeriodView.innerHTML = listPeriodNames
+                            .map(function (period) {
+                                return '<button class="ec-button" data-list-period="' + period + '">' + listPeriodOptions[period].label + "</button>";
+                            })
+                            .join("");
+                        ecEnd.appendChild(listPeriodView);
+                    }
 
-                    oneMonth.addEventListener("click", () => {
-                        oneMonth.classList.add("ec-active");
-                        quarter.classList.remove("ec-active");
-                        semester.classList.remove("ec-active");
-                        calendarContainer[0].setOption("duration", { months: 1 });
-                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
-                            return moment(dayCell).format("D");
-                        });
+                    const listPeriodButtons = getListPeriodButtons();
+                    listPeriodNames.forEach((period) => {
+                        if (listPeriodButtons[period] && !listPeriodButtons[period].dataset.periodHandlerBound) {
+                            listPeriodButtons[period].addEventListener("click", () => applyListPeriod(period));
+                            listPeriodButtons[period].dataset.periodHandlerBound = "1";
+                        }
                     });
-                    quarter.addEventListener("click", () => {
-                        oneMonth.classList.remove("ec-active");
-                        quarter.classList.add("ec-active");
-                        semester.classList.remove("ec-active");
-                        calendarContainer[0].setOption("duration", { months: 3 });
-                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
-                            return moment(dayCell).format("M/D");
-                        });
-                    });
-                    semester.addEventListener("click", () => {
-                        oneMonth.classList.remove("ec-active");
-                        quarter.classList.remove("ec-active");
-                        semester.classList.add("ec-active");
-                        calendarContainer[0].setOption("duration", { months: 6 });
-                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
-                            return moment(dayCell).format("M/D");
-                        });
-                    });
+                    applyListPeriod(activeListPeriod);
                 } else {
-                    if (document.getElementById("quarter")) {
-                        document.getElementById("one-month").remove();
-                        document.getElementById("quarter").remove();
-                        document.getElementById("semester").remove();
-                    }
-                    if (legacyToolbarViewType == "timeGridWeek" || legacyToolbarViewType == "listWeek") {
-                        calendarContainer[0].setOption("duration", { days: 7 });
+                    removeMonthRangeControls();
+                    removeListPeriodControls();
+                    if (currentViewType == "timeGridWeek" || currentViewType == "listWeek") {
+                        calendarContainer[0].setOption("duration", { weeks: 1 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     }
-                    if (legacyToolbarViewType == "timeGridDay" || legacyToolbarViewType == "listDay") {
+                    if (currentViewType == "timeGridDay" || currentViewType == "listDay") {
                         calendarContainer[0].setOption("duration", { days: 1 });
                         calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
                             return moment(dayCell).format("D");
                         });
                     }
-
-                    if (legacyToolbarViewType == "listYear") {
-                        calendarContainer[0].setOption("duration", { months: 12 });
-                        calendarContainer[0].setOption("dayCellFormat", function (dayCell) {
-                            return moment(dayCell).format("D");
-                        });
-                    }
                 }
+            },
+            datesSet: function (data) {
+                if (data?.view?.type !== "listYear" || !pendingListNavigation) {
+                    return;
+                }
+                const navigation = pendingListNavigation;
+                pendingListNavigation = null;
+                const focusDate = navigation === "today" ? getCalendarDate() : getNavigatedListFocusDate(navigation === "next" ? 1 : -1);
+                setListFocusDate(focusDate, navigation !== "today");
+                applyListPeriod(activeListPeriod);
             },
             eventDidMount: function (arg) {
                 const event = arg.event;

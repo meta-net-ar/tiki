@@ -320,6 +320,7 @@ function wikiplugin_listpages($data, $params)
         'pagination' => 'n',
     ];
     $params = array_merge($default, $params);
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_listpages_info());
     extract($params, EXTR_SKIP);
     $filter = [];
     if (is_null($initial)) {

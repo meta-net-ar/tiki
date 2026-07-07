@@ -9,7 +9,7 @@ function wikiplugin_localfiles_info()
     return [
         'name' => tra('Local Files'),
         'documentation' => 'PluginLocalFiles',
-        'description' => tra('Show a link to local or shared files and directories.'),
+        'description' => tra('Show a link to local files and directories. Access is denied unless system preference wikiplugin_fileaccess_allowed_paths defines allowed base paths.'),
         'prefs' => ['wikiplugin_localfiles'],
         'iconname' => 'file',
         'introduced' => 12,
@@ -20,7 +20,7 @@ function wikiplugin_localfiles_info()
             'path' => [
                 'required' => false,
                 'name' => tra('Path'),
-                'description' => tra('Local file or directory path'),
+                'description' => tra('Absolute path to a local file or directory. Must be within one of the allowed base paths configured in preference wikiplugin_fileaccess_allowed_paths.'),
                 'since' => '12.0',
                 'default' => '',
                 'filter' => 'text',
@@ -28,7 +28,7 @@ function wikiplugin_localfiles_info()
             'list' => [
                 'required' => false,
                 'name' => tra('List Directory'),
-                'description' => tra('If the path above is a directory then list the contents.'),
+                'description' => tra('If the path above is a directory, list its contents. The entries "." and ".." are always excluded.'),
                 'since' => '12.0',
                 'filter' => 'alpha',
                 'default' => 'n',
@@ -61,9 +61,28 @@ function wikiplugin_localfiles($data, $params)
     // TODO refactor: defaults for plugins?
     $smartylib = TikiLib::lib('smarty');
     $files = [];
+
+    $fileaccess = \Tiki\WikiPlugin\FileaccessAllowlist::fromPreference();
+
+    if (! $fileaccess->isConfigured()) {
+        return $fileaccess->getDeniedHtml('no_roots');
+    }
+
+    $requestedPath = $params['path'] ?? '';
+    $resolvedPath = $fileaccess->resolvePath($requestedPath);
+
+    if ($resolvedPath === false) {
+        return $fileaccess->getDeniedHtml('outside_path');
+    }
+    $params['path'] = $resolvedPath;
+
     if (! is_array($params['path'])) {
         if ($params['list'] === 'y' && file_exists($params['path']) && is_dir($params['path'])) {
-            $params['path'] = scandir($params['path']);
+            // Filter out . and .. to avoid exposing parent-directory entries.
+            $params['path'] = array_values(array_filter(
+                scandir($params['path']),
+                fn($entry) => $entry !== '.' && $entry !== '..'
+            ));
         } else {
             $params['path'] = [$params['path']];
         }

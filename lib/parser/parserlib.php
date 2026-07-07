@@ -479,8 +479,12 @@ class ParserLib extends TikiDb_Bridge
 
         $start = -1;
         while (false !== $start = strpos($data, '~np~', $start + 1)) {
-            if (false !== $end = strpos($data, '~/np~', $start)) {
+            $nested = false;
+            if (false !== $end = $this->findUnparsedBlockEnd($data, $start, $nested)) {
                 $content = substr($data, $start + 4, $end - $start - 4);
+                if ($nested) {
+                    $content = str_replace(['~np~', '~/np~'], '', $content);
+                }
                 if ($protect) {
                     $content = $this->protectSpecialChars($content, $this->option['is_html']);
                 }
@@ -492,6 +496,37 @@ class ParserLib extends TikiDb_Bridge
                 $data = substr($data, 0, $start) . $key . substr($data, $end + 5);
             }
         }
+    }
+
+    private function findUnparsedBlockEnd($data, $start, &$nested = false)
+    {
+        $search = $start + 4;
+        $depth = 1;
+        $firstClose = false;
+        $nested = false;
+
+        while (false !== $nextClose = strpos($data, '~/np~', $search)) {
+            if ($firstClose === false) {
+                $firstClose = $nextClose;
+            }
+
+            $nextOpen = strpos($data, '~np~', $search);
+            if ($nextOpen !== false && $nextOpen < $nextClose) {
+                $depth++;
+                $search = $nextOpen + 4;
+                continue;
+            }
+
+            $depth--;
+            if ($depth === 0) {
+                $nested = $nextClose !== $firstClose;
+                return $nextClose;
+            }
+
+            $search = $nextClose + 5;
+        }
+
+        return $firstClose;
     }
 
     //
@@ -989,11 +1024,14 @@ class ParserLib extends TikiDb_Bridge
     //*
     protected function convert_plugin_for_html_editor($name, $args, $plugin_result, $data, $info = [])
     {
-        $html_editor_plugin = '{' . (empty($data) ? $name : TikiLib::strtoupper($name) . '(') . ' ';
+        $html_editor_plugin = '{' . (empty($data) ? $name . ' ' : TikiLib::strtoupper($name) . '(');
         $arg_str = '';      // not using http_build_query() as it converts spaces into +
         if (! empty($args)) {
             foreach ($args as $argKey => $argValue) {
-                if (is_array($argValue)) {
+                $default = $info['params'][$argKey]['default'] ?? null;
+                if ((empty($argValue) && empty($default)) || $argValue === (string) $default) {
+                    continue;
+                } elseif (is_array($argValue)) {
                     if (isset($info['params'][$argKey]['separator'])) {
                         $sep = $info['params'][$argKey]['separator'];
                     } else {
@@ -1153,8 +1191,6 @@ class ParserLib extends TikiDb_Bridge
     //*
     protected function plugin_apply_filters($name, &$data, &$args)
     {
-        $tikilib = TikiLib::lib('tiki');
-
         $info = $this->plugin_info($name, $args);
 
         $default = TikiFilter::get($info['defaultfilter'] ?? 'xss');
@@ -1205,17 +1241,8 @@ class ParserLib extends TikiDb_Bridge
                     $argValue = TikiLib::htmldecode($argValue);
                 }
 
-                if (isset($paramInfo['separator'])) {
-                    if ($argValue !== null) {
-                        $vals = [];
-                        $vals = $tikilib->array_apply_filter($tikilib->multi_explode($paramInfo['separator'], $argValue), $filter);
-                        $argValue = array_values($vals);
-                    }
-                    // If $argValue is null, leave it as null (don't process separator)
-                } else {
-                    if ($argValue !== null) {
-                        $argValue = $filter->filter($argValue);
-                    }
+                if ($argValue !== null && ! isset($paramInfo['separator'])) {
+                    $argValue = $filter->filter($argValue);
                 }
             }
         }
@@ -1523,7 +1550,26 @@ class ParserLib extends TikiDb_Bridge
         if ($this->core_options) {
             $option = array_merge($this->option, $option);
         }
-        return (new WikiParser_Parsable($data))->parse($option, empty($this->core_options));
+
+        // Set context flag for translations to auto-detect wiki parsing context
+        // This is passed via parser params so plugins and blocks can access it
+        // even when Smarty is not available
+        $option['wiki_parse_context'] = true;
+
+        // Save the previous state so we can restore it after parsing
+        $previousWikiContext = $this->option['wiki_parse_context'] ?? false;
+
+        $result = (new WikiParser_Parsable($data))->parse($option, empty($this->core_options));
+
+        // Restore the previous wiki_parse_context state to prevent it from leaking
+        // into non-wiki contexts (like menu rendering)
+        if ($previousWikiContext) {
+            $this->option['wiki_parse_context'] = true;
+        } else {
+            unset($this->option['wiki_parse_context']);
+        }
+
+        return $result;
     }
 
     /**
@@ -2978,6 +3024,7 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         $style = $do_center ? ' style="text-align: center;"' : '';
+                        $justify = $do_center ? 'justify-content-center' : 'justify-content-start';
                         if ($prefs['wiki_heading_links'] !== 'n' && ($prefs['wiki_heading_links'] >= $hdrlevel || $prefs['wiki_heading_links'] === 'y' ) && (! isset($this->option['html_editor']) || ! $this->option['html_editor'])) {
                             $smarty = TikiLib::lib('smarty');
                             $headingLink = '<a href="#' . $thisid . '" class="heading-link" aria-label="heading link">' . smarty_function_icon(['name' => 'link'], $smarty->getEmptyInternalTemplate()) . '</a>';
@@ -2986,9 +3033,9 @@ class ParserLib extends TikiDb_Bridge
                         }
 
                         if ($prefs['feature_wiki_show_hide_before'] == 'y') {
-                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex justify-content-start" id="' . $thisid . '">' . $aclose . ' ' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose2;
+                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex ' . $justify . '" id="' . $thisid . '">' . $aclose . ' ' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose2;
                         } else {
-                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex justify-content-start" id="' . $thisid . '">' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose . $aclose2;
+                            $line = $button . '<h' . ($hdrlevel) . $style . ' class="showhide_heading d-flex ' . $justify . '" id="' . $thisid . '">' . $title_text . $headingLink . '</h' . ($hdrlevel) . '>' . $aclose . $aclose2;
                         }
                     } elseif (! strcmp($line, $prefs['wiki_page_separator'])) {
                         // Close open paragraph, lists, and div's

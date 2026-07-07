@@ -140,6 +140,7 @@ function wikiplugin_fluidgrid($data, $params, $pos)
         $data2 = $data;
     }
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_fluidgrid_info());
     extract($params, EXTR_SKIP);
     $joincols  = ($joincols == 'y' || $joincols == 1 ? true : false);
 

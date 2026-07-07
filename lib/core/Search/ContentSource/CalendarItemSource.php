@@ -86,6 +86,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             // Index just participant emails. The value can be a username and not an email if 'login_is_email' pref is enabled.
             'participant_emails' => $typeFactory->multivalue(array_column($item['participants'], 'email')),
             'alert_emails' => $typeFactory->multivalue($alertEmails),
+            'send_reminder' => $typeFactory->numeric($item['sendReminder']),
             'description' => $typeFactory->plaintext($item['description']),
             'date' => $typeFactory->timestamp($item['start'], $allday),
 
@@ -123,6 +124,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             'participants',
             'participant_emails',
             'alert_emails',
+            'send_reminder',
             'description',
 
             'calendar_id',
@@ -154,6 +156,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             'participants' => 'nested',
             'participant_emails' => 'multivalue',
             'alert_emails' => 'multivalue',
+            'send_reminder' => 'numeric',
             'description' => 'plaintext',
 
             'calendar_id' => 'identifier',

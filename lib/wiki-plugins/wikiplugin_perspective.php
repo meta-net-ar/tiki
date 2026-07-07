@@ -51,6 +51,8 @@ function wikiplugin_perspective($data, $params)
         $data = substr($data, 0, strpos($data, '{ELSE}'));
     }
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_perspective_info());
+
     if (! is_null($params['perspectives'])) {
         $perspectives = $params['perspectives'];
     }

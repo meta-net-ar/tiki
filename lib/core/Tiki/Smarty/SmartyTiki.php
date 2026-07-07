@@ -258,6 +258,7 @@ class SmartyTiki extends Smarty
     ): void {
 
         global $prefs;
+        $headerlib = TikiLib::lib('header');
         $this->activateCustomErrorHandler();
 
         if (! empty($prefs['feature_htmlpurifier_output']) and $prefs['feature_htmlpurifier_output'] == 'y') {
@@ -271,168 +272,7 @@ class SmartyTiki extends Smarty
             }
         }
 
-        /**
-         * Add security headers. By default there headers are not sent.
-         * To change go to admin > security > site access
-         */
-        if (! headers_sent()) {
-            if (! isset($prefs['http_header_frame_options'])) {
-                $frame = false;
-            } else {
-                $frame = $prefs['http_header_frame_options'];
-            }
-            if (! isset($prefs['http_header_xss_protection'])) {
-                $xss = false;  // prevent smarty E_NOTICE
-            } else {
-                $xss = $prefs['http_header_xss_protection'];
-            }
-
-            if (! isset($prefs['http_header_content_type_options'])) {
-                $content_type_options = false;  // prevent smarty E_NOTICE
-            } else {
-                $content_type_options = $prefs['http_header_content_type_options'];
-            }
-            if (! isset($prefs['http_header_access_control_allow_credentials'])) {
-                $access_control_allow_credentials = false;
-            } else {
-                $access_control_allow_credentials = $prefs['http_header_access_control_allow_credentials'];
-            }
-            if (! isset($prefs['http_header_access_control_allow_methods'])) {
-                $access_control_allow_methods = false;
-            } else {
-                $access_control_allow_methods = $prefs['http_header_access_control_allow_methods'];
-            }
-            if (! isset($prefs['http_header_access_control_allow_headers'])) {
-                $access_control_allow_headers = false;
-            } else {
-                $access_control_allow_headers = $prefs['http_header_access_control_allow_headers'];
-            }
-            if (! isset($prefs['http_header_cross_origin_embedder_policy'])) {
-                $cross_origin_embedder_policy = false;
-            } else {
-                $cross_origin_embedder_policy = $prefs['http_header_cross_origin_embedder_policy'];
-            }
-            if (! isset($prefs['http_header_cross_origin_resource_policy'])) {
-                $cross_origin_resource_policy = false;
-            } else {
-                $cross_origin_resource_policy = $prefs['http_header_cross_origin_resource_policy'];
-            }
-            if (! isset($prefs['http_header_cross_origin_opener_policy'])) {
-                $cross_origin_opener_policy = false;
-            } else {
-                $cross_origin_opener_policy = $prefs['http_header_cross_origin_opener_policy'];
-            }
-            if (! isset($prefs['http_header_content_security_policy'])) {
-                $content_security_policy = false;  // prevent smarty E_NOTICE
-            } else {
-                $content_security_policy = $prefs['http_header_content_security_policy'];
-            }
-
-            if (! isset($prefs['http_header_strict_transport_security'])) {
-                $strict_transport_security = false;  // prevent smarty E_NOTICE
-            } else {
-                $strict_transport_security = $prefs['http_header_strict_transport_security'];
-            }
-
-            if (! isset($prefs['http_header_public_key_pins'])) {
-                $public_key_pins = false;  // prevent smarty E_NOTICE
-            } else {
-                $public_key_pins = $prefs['http_header_public_key_pins'];
-            }
-
-            if ($frame == 'y') {
-                    $header_value = $prefs['http_header_frame_options_value'];
-                    header('X-Frame-Options: ' . $header_value);
-            }
-            if ($xss == 'y') {
-                    $header_value = $prefs['http_header_xss_protection_value'];
-                    header('X-XSS-Protection: ' . $header_value);
-            }
-            if ($content_type_options == 'y') {
-                header('X-Content-Type-Options: nosniff');
-            }
-            if ($access_control_allow_credentials === 'y') {
-                header('Access-Control-Allow-Credentials: true');
-            }
-            if ($access_control_allow_methods === 'y') {
-                $header_value = trim($prefs['http_header_access_control_allow_methods_value']);
-                if ($access_control_allow_credentials === 'y' && $header_value === '*') {
-                    Feedback::error(tr("CORS configuration error: Wildcard (*) is not allowed for Access-Control-Allow-Methods when http_header_access_control_allow_credential is enabled"));
-                    header_remove('Access-Control-Allow-Methods');
-                } else {
-                    header('Access-Control-Allow-Methods: ' . $header_value);
-                }
-            }
-            if ($access_control_allow_headers === 'y') {
-                $headers_value = trim($prefs['http_header_access_control_allow_headers_value']);
-                if ($access_control_allow_credentials === 'y' && $headers_value === '*') {
-                    Feedback::error(tr("CORS configuration error: Wildcard (*) is not allowed for Access-Control-Allow-Headers when Access-Control-Allow-Credentials is enabled."));
-                    header_remove('Access-Control-Allow-Headers');
-                } else {
-                    header('Access-Control-Allow-Headers: ' . $headers_value);
-                }
-            }
-            if ($cross_origin_embedder_policy === 'y') {
-                switch (trim($prefs['http_header_cross_origin_embedder_policy_value'])) {
-                    case 'require-corp':
-                        header('Cross-Origin-Embedder-Policy: require-corp');
-                        break;
-                    case 'credentialless':
-                        header('Cross-Origin-Embedder-Policy: credentialless');
-                        break;
-                    case 'unsafe-none':
-                    default:
-                        header_remove('Cross-Origin-Embedder-Policy');
-                        break;
-                }
-            }
-            if ($cross_origin_resource_policy === 'y') {
-                switch (trim($prefs['http_header_cross_origin_resource_policy_value'])) {
-                    case 'same-origin':
-                        header('Cross-Origin-Resource-Policy: same-origin');
-                        break;
-                    case 'same-site':
-                        header('Cross-Origin-Resource-Policy: same-site');
-                        break;
-                    case 'cross-origin':
-                        header('Cross-Origin-Resource-Policy: cross-origin');
-                        break;
-                    default:
-                        break;
-                }
-            }
-            if ($cross_origin_opener_policy === 'y') {
-                switch (trim($prefs['http_header_cross_origin_opener_policy_value'])) {
-                    case 'same-origin':
-                        header('Cross-Origin-Opener-Policy: same-origin');
-                        break;
-                    case 'same-origin-allow-popups':
-                        header('Cross-Origin-Opener-Policy: same-origin-allow-popups');
-                        break;
-                    case 'same-origin-plus-coep':
-                        header('Cross-Origin-Opener-Policy: same-origin-plus-coep');
-                        break;
-                    case 'unsafe-none':
-                    default:
-                        header_remove('Cross-Origin-Opener-Policy');
-                        break;
-                }
-            }
-            if ($content_security_policy == 'y') {
-                $header_value = $prefs['http_header_content_security_policy_value'];
-                header('Content-Security-Policy: ' . $header_value);
-            }
-
-            if ($strict_transport_security == 'y') {
-                $header_value = $prefs['http_header_strict_transport_security_value'];
-                header('Strict-Transport-Security: ' . $header_value);
-            }
-
-            if ($public_key_pins == 'y') {
-                $header_value = $prefs['http_header_public_key_pins_value'];
-                header('Public-Key-Pins: ' . $header_value);
-            }
-        }
+        $headerlib->addSecurityHeaders();
 
         /**
          * By default, display is used with text/html content in UTF-8 encoding
@@ -530,7 +370,7 @@ class SmartyTiki extends Smarty
             }
         }
 
-        if (! defined('TIKI_IN_INSTALLER') && ! defined('TIKI_IN_TEST')) {
+        if (! defined('TIKI_IN_INSTALLER') && ! defined('TIKI_IN_TEST') && defined('TIKI_SETUP_FINISHED')) {
             require_once 'tiki-modules.php';
             // Re-assign module_pref_errors after modules are loaded to capture errors from lazy rendering
             if (Perms::get()->admin) {
@@ -747,12 +587,14 @@ class SmartyTiki extends Smarty
 
         // webservices create temporary templates
         if (($prefs['feature_webservices'] ?? 'n') === 'y') {
-            $this->addTemplateDir(realpath(TEMP_CACHE_PATH));
+            $realpath = realpath(TEMP_CACHE_PATH);
+            if ($realpath) {
+                $this->addTemplateDir($realpath);
+            }
         }
 
         //Test templates
         $this->addTemplateDir(TIKI_PATH . '/lib/test/Core/Search/');
-        //var_dump($this->getTemplateDir());
     }
 
     /**

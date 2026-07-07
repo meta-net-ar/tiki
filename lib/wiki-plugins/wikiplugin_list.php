@@ -133,6 +133,8 @@ function wikiplugin_list($data, $params)
 
     $listId = 'wplist-' . $i;
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_list_info());
+
     if (! empty($_REQUEST['download']) && $listId != $_REQUEST['listId']) {
         return;
     }

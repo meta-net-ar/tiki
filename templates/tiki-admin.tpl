@@ -1,3 +1,5 @@
+{assign var=sharedAdminLayout value=($prefs.theme_unified_admin_backend eq 'y' && (($prefs.site_layout_admin|default:$prefs.site_layout) eq 'admin'))}
+{if !$sharedAdminLayout}
 <div class="admin-wrapper highlightable{* {if $prefs.theme_unified_admin_backend eq 'y'} overflow-auto{/if} *}">
     {if $prefs.theme_unified_admin_backend eq 'y'}
         <aside class="admin-nav">
@@ -34,6 +36,7 @@
             </form>
         {/if} *}
         {include file="admin/admin_navbar.tpl"}
+{/if}
         {if $prefs.sender_email eq ''}
             {remarksbox type=warning title="{tr}Warning{/tr}" close="y"}
                 {tr _0='<a href="tiki-admin.php?page=general&highlight=sender_email" class="alert-link">' _1="</a>"}Your sender email is not set. You can set it %0in the general admin panel%1.{/tr}
@@ -72,8 +75,15 @@
                     </p>
                 {/remarksbox}
             {/if}
+            {if $unsupported_mail_queue_entries}
+                {remarksbox type="danger" title="{tr}Unsupported Email Queue Entries{/tr}"}
+                    <p>{tr _0=$unsupported_mail_queue_entries}There are %0 queued messages that use an old unsupported mail format and cannot be processed by the current queue system.{/tr}</p>
+                    <p>{tr}Please delete the unsupported entries from the mail queue administration page.{/tr}</p>
+                    <p>{tr _0='<a class="alert-link" href="tiki-admin_email_queue.php">' _1="</a>"}%0Manage the queue.%1{/tr}</p>
+                {/remarksbox}
+            {/if}
             {if $ProblemsLoadingCacheSubSystem}
-                {remarksbox type="warning" title="{tr _0=$ProblemsLoadingCacheSubSystem}%0 did not load properly{/tr}"}
+                {remarksbox type="danger" title="{tr _0=$ProblemsLoadingCacheSubSystem}%0 did not load properly{/tr}"}
                 {tr _0=$ProblemsLoadingCacheSubSystem}Tiki is configured to use <strong>%0 cache system</strong>, however, it was not loaded properly. Check if the extension has been properly loaded.{/tr}<br />
                 {/remarksbox}
             {/if}
@@ -81,7 +91,7 @@
                 {remarksbox type="error" title="{tr}Database Version Problem{/tr}"}
                     {tr _0='<a class="alert-link" href="tiki-install.php">' _1="</a>"}Your database requires an update to match the current Tiki version. Please proceed to %0the installer%1. Using Tiki with an incorrect database version usually provokes errors{/tr}
                     {tr}If you have shell (SSH) access, you can also use the following, on the command line, from the root of your Tiki installation:{/tr}
-                    <kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:update</kbd>
+                    {tr _0="<kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:update</kbd>" _1="<kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:patch patch_name</kbd>"}%0 or apply the missing patches one by one with %1 in version order.{/tr}
                     <p class="mt-3"> {tr _0='<a class="alert-link" href="tiki-check.php">' _1="</a>"}Please note that the Tiki schema does not support downgrading the database. It can only perform upgrades. For more info, you may check the database status by opening the %0tiki-check page%1.{/tr}</p>
                     <div class="h6 mt-3">
                         <a class="collapse-toggle alert-link" data-bs-toggle="collapse" href="#missingpatches">
@@ -98,11 +108,11 @@
                 {/remarksbox}
             {/if}
 
-            {if ! empty($scheduler_failure_logs) }
+            {if ! empty($scheduler_failure_logs)}
                 {remarksbox type="error" title="{tr}Scheduler tasks failure logs{/tr}"}
                     <p>
                     {if ! empty($prefs.scheduledTasksReport) && $prefs.scheduledTasksReport === 'last_number_of_hours'}
-                        {tr}Nº of tasks failure in last {$prefs.scheduledTasksReportHours} hours:{/tr}
+                        {tr _0=$prefs.scheduledTasksReportHours}Nº of tasks failure in last %0 hours:{/tr}
                         {if ! empty($scheduler_total_count)}
                             <strong>{$scheduler_failure_count} / {$scheduler_total_count}</strong> ({tr}failures / total executions{/tr})
                         {else}
@@ -327,5 +337,7 @@
             {/if}
             {include file="admin/include_$include.tpl"}
         {/if}
+{if !$sharedAdminLayout}
+        </div>
     </div>
-</div>
+{/if}

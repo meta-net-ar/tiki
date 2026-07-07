@@ -377,7 +377,7 @@ if (! hm_exists('tiki_move_to_tracker_dropdown')) {
         $trk = TikiLib::lib('trk');
         $fields = $trk->get_fields_by_type('EF');
         if (! $fields) {
-            return;
+            return '';
         }
         $field_list = [];
         foreach ($fields as $field) {
@@ -465,19 +465,6 @@ if (! hm_exists('bind_tracker_item_update_event')) {
                 }
             }
         }, ['mailbox' => $mailbox, 'folder' => $folder, 'form' => $form, 'msg_ids' => $msg_ids]);
-    }
-}
-
-/**
- * @subpackage tiki/functions
- * @return string ensure file was saved before removing it from remote mailbox
- */
-if (! hm_exists('append_to_msg_headers')) {
-    function append_to_msg_headers($headers, $link)
-    {
-        $headers = preg_replace('#</div><span id="extra-header-buttons"></span>#s', $link . "\\0", $headers, 1);
-
-        return $headers;
     }
 }
 

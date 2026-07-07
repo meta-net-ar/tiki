@@ -411,8 +411,7 @@ class TikiAccessLib extends TikiLib
         $cipherTicket = $this->encryptCsrfTicket($this->ticket);
 
         // you can set even if is the same value
-        $session_params = session_get_cookie_params();
-        setcookie(session_name() . '_CSRF', $cipherTicket, 0, $session_params['path'], $session_params['domain'], $session_params['secure'], true);
+        setcookie_obeySetCookieParams(session_name() . '_CSRF', $cipherTicket);
     }
 
 
@@ -883,7 +882,7 @@ class TikiAccessLib extends TikiLib
     private function csrfPhpErrorLog($msg)
     {
         global $prefs;
-        error_log(PHP_EOL
+        error_log(PHP_EOL // @phpstan-ignore disallowedFunctions.errorLog (access violation reporting)
             . '**** ' . tr('Start CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****' . PHP_EOL
             . '  ' . $msg . PHP_EOL
             . '  site_security_timeout' . tr('preference:') . $prefs['site_security_timeout']
@@ -895,7 +894,7 @@ class TikiAccessLib extends TikiLib
             . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] : '') . PHP_EOL);
         $get = count($_GET) ? json_encode($_GET, JSON_PRETTY_PRINT) : tr('empty');
         $post = count($_POST) ? json_encode($_POST, JSON_PRETTY_PRINT) : tr('empty');
-        error_log(
+        error_log( // @phpstan-ignore disallowedFunctions.errorLog (access violation reporting)
             PHP_EOL
             . '  $_GET: ' . $get . PHP_EOL
             . '  $_POST: ' . $post . PHP_EOL
@@ -1188,7 +1187,12 @@ class TikiAccessLib extends TikiLib
      * @param int $code         HTTP code
      * @param string $msgtype   Type of message which determines styling (e.g., success, error, warning, etc.)
      */
-    public function redirect($url = '', $msg = '', $code = 302, $msgtype = '')
+    /**
+     * @param bool $allowExternal  Pass true only when the URL originates from a trusted source
+     *                             (admin-configured preference, inter-tiki setup, OAuth flow, etc.).
+     *                             Never pass true for URLs that are user-supplied at request time.
+     */
+    public function redirect($url = '', $msg = '', $code = 302, $msgtype = '', bool $allowExternal = false)
     {
         global $prefs;
 
@@ -1196,14 +1200,30 @@ class TikiAccessLib extends TikiLib
             return;
         }
 
-        // TODO: Validate URL
+        // Validate URL: reject absolute URLs pointing to a different host to prevent open redirects.
+        // $allowExternal must be explicitly set to true by callers that have already validated or
+        // trust the URL source (e.g. admin prefs, inter-tiki, OAuth). User-supplied URLs must
+        // always go through this check.
+        if (! $allowExternal && $url !== '') {
+            $parsed = parse_url($url);
+            if (! empty($parsed['host'])) {
+                $allowedHost = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+                // Strip port from allowed host for comparison
+                $allowedHost = strtolower(explode(':', $allowedHost)[0]);
+                $targetHost  = strtolower($parsed['host']);
+                if ($targetHost !== $allowedHost) {
+                    // Off-site redirect — fall back to the configured home page
+                    $url = $prefs['tikiIndex'];
+                }
+            }
+        }
         if ($url == '') {
             $url = $prefs['tikiIndex'];
         }
 
         if (trim($msg)) {
             $session = session_id();
-            if (empty($session)) {
+            if (empty($session) && empty($_SESSION['loginfrom'])) {
                 // Can happen if session_silent is enabled. But does any instance enable session_silent?
                 // Removing this case would allow removing the $msg parameters and just have callers using Feedback::add() before calling redirect(). Chealer 2017-08-16
                 $start = strpos($url, '?') ? '&' : '?';

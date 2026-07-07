@@ -30,6 +30,8 @@ function wikiplugin_autoqueryargs_info()
 
 function wikiplugin_autoqueryargs($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_autoqueryargs_info());
+
     $arguments = ! is_null($params['arguments']) ? $params['arguments'] : [];
     if (count($arguments) > 0 && is_array($arguments)) {
         global $auto_query_args;

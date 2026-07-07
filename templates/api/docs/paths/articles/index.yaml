@@ -1,0 +1,62 @@
+---
+get:
+  description: Retrieve articles
+  parameters:
+    - name: offset
+      in: query
+      required: false
+      description: The offset to start from
+      schema:
+        type: integer
+    - name: maxRecords
+      in: query
+      required: false
+      description: The maximum number of records to return (-1 for all)
+      schema:
+        type: integer
+    - name: sortMode
+      in: query
+      required: false
+      description: Sort mode, e.g. publishDate_desc
+      schema:
+        type: string
+    - name: find
+      in: query
+      required: false
+      description: The search string to find articles
+      schema:
+        type: string
+  responses:
+    '200':
+      description: article list
+      content:
+        application/json:
+          schema:
+            $ref: schemas-ArticleListResponse.yaml
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml
+post:
+  description: Create an article
+  requestBody:
+    required: true
+    content:
+      application/x-www-form-urlencoded:
+        schema:
+          $ref: schemas-ArticleCreateRequest.yaml
+  responses:
+    '200':
+      description: article created response
+      content:
+        application/json:
+          schema:
+            $ref: schemas-ArticleCreateUpdateResponse.yaml
+    '403':
+      description: forbidden
+      content:
+        application/json:
+          schema:
+            $ref: schemas-Error.yaml

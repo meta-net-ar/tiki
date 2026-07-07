@@ -41,7 +41,17 @@ post:
             properties:
               feedback:
                 type: object
-                description: Contains results of the operation
+                properties:
+                  tpl:
+                    type: string
+                  mes:
+                    type: string
+                  items:
+                    type: array
+                  toMsg:
+                    type: string
+                  toList:
+                    type: array
     '403':
       description: forbidden
       content:

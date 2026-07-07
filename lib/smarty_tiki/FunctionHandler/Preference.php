@@ -55,6 +55,8 @@ class Preference extends Base
                 $info['params'] .= ' autocomplete="new-password" '; // by default preferences of type password should not be autocomplete
             }
 
+            $template_visible_always = isset($params['visible']) && $params['visible'] == 'always';
+
             if ($info['default'] !== $info['value']) {
                 $info['modified'] = true;
                 $params['visible'] = 'always';
@@ -64,6 +66,10 @@ class Preference extends Base
                 // Modified preferences are never hidden, so pretend it's modified when forcing display
                 $info['tags'][] = 'modified';
                 $info['tagstring'] .= ' modified';
+                if ($template_visible_always) {
+                    // Template-forced always-visible: immune to negative filters (experimental, deprecated, etc.)
+                    $info['tagstring'] .= ' always';
+                }
             }
 
             $pages_string = '';

@@ -75,7 +75,7 @@ self.addEventListener('fetch', event => {
                             return response;
                         });
                     }).catch(error => {
-                        console.warn(cachedResponse, url);
+                        console.warn(cachedResponse, url); // eslint-disable-line no-console
                         if (cachedResponse) {
                             return cachedResponse;
                         }
@@ -105,13 +105,13 @@ self.addEventListener('fetch', event => {
                                 };
 
                                 if (cachedResponse) {
-                                    console.warn("fetch", event.request.url);
+                                    console.warn("fetch", event.request.url); // eslint-disable-line no-console
                                     body = cachedResponse.body;
                                 } else {
                                     let url = normalizeRequest(event.request.referrer);
-                                    console.warn("fetch", url);
+                                    console.warn("fetch", url); // eslint-disable-line no-console
                                     return caches.match(url).then(cachedResponse => {
-                                        console.warn("cache", cachedResponse);
+                                        console.warn("cache", cachedResponse); // eslint-disable-line no-console
                                         if (cachedResponse)
                                             body = cachedResponse.body;
                                         return new Response(body, init);
@@ -127,7 +127,7 @@ self.addEventListener('fetch', event => {
         );
 
     } else {
-        console.error(event.request);
+        console.error(event.request); // eslint-disable-line no-console
     }
 });
 

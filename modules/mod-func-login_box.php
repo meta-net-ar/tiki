@@ -61,7 +61,7 @@ function module_login_box_info()
             ],
             'allowNone' => [
                 'name' => tra('Allow None'),
-                'description' => tra('Allow user selection field to be empty (without any users selected) when enabled.') . ' (y/n)',
+                'description' => tra('Show a non-selectable placeholder in the Switch User dropdown. Set to "n" to hide it entirely.') . ' (y/n)',
                 'filter' => 'alpha',
             ],
             'show_user_avatar' => [

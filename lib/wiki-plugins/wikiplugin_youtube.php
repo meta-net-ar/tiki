@@ -30,10 +30,9 @@ function wikiplugin_youtube_info()
                 'required' => false,
                 'name' => tra('Privacy-Enhanced'),
                 'description' => tra('Enable privacy-enhanced mode'),
-                'default' => '',
+                'default' => 'y',
                 'filter' => 'alpha',
                 'options' => [
-                    ['text' => '', 'value' => ''],
                     ['text' => tra('Yes'), 'value' => 'y'],
                     ['text' => tra('No'), 'value' => 'n'],
                 ],
@@ -58,6 +57,14 @@ function wikiplugin_youtube_info()
                 'required' => false,
                 'name' => tra('Start time'),
                 'description' => tra('Start time offset in seconds'),
+                'filter' => 'digits',
+                'default' => 0,
+            ],
+            'end' => [
+                'required' => false,
+                'name' => tra('End time'),
+                'description' => tra('End time offset in seconds'),
+                'since' => '30.1',
                 'filter' => 'digits',
                 'default' => 0,
             ],
@@ -144,11 +151,11 @@ function wikiplugin_youtube($data, $params)
         'borderRadius' => 'y',
         'allowFullScreen' => 'y',
         'related' => 'y',
-        'privacyEnhanced' => '',
+        'privacyEnhanced' => 'y',
         'quality' => 'high',
     ], $params);
 
-    global $tikilib;
+    global $tikilib, $prefs;
 
     // Extract YouTube ID and type (e.g., shorts, live, etc.)
     $youtubeInfo = getYoutubeId($params['movie']);
@@ -173,7 +180,7 @@ function wikiplugin_youtube($data, $params)
         $oEmbedData['height'] = 16;
     }
 
-    $privacyEnhanced = $params['privacyEnhanced'];
+    $privacyEnhanced = $params['privacyEnhanced'] ?? $params['privacyenhanced'] ?? 'y';
     $related = $params['related'];
 
     $fqdn = $privacyEnhanced === 'y' ? 'www.youtube-nocookie.com' : 'www.youtube.com';
@@ -189,6 +196,8 @@ function wikiplugin_youtube($data, $params)
     if (! empty($queryParams)) {
         $src .= '?' . implode('&', $queryParams);
     }
+
+    $params['referrerPolicy'] = $prefs['http_header_referrer_policy_value'] ?? '';
 
     $embedHtml = buildEmbedContainerAndIframe($src, $params, $oEmbedData);
     return '~np~' . $embedHtml . '~/np~';

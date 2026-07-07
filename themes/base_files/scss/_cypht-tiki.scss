@@ -88,6 +88,7 @@
             &, .icon { color: $dropdown-link-hover-color !important; }
         }
     }
+    .alert.special-folder-status-box { color: var(--bs-body-color); }
 }
 
 .tiki-cypht, .tiki-webmail {
@@ -137,9 +138,6 @@
         background-color: transparent;
         border: var(--bs-border-width) solid var(--bs-border-color);
     }
-    .search_content {
-        background-color: transparent;
-    }
     a:not(.btn):hover {
         text-decoration: var(--bs-link-decoration);
     }
@@ -157,8 +155,12 @@
             }
         }
     }
+    .folders .account_icon { opacity: 1; vertical-align: 0; padding-right: 4px; }
     .folders .selected_menu:not(.menu_search) a {
         &, &:hover, i.bi { color: var(--bs-primary-text-emphasis) !important; }
+    }
+    .folders .menu_combined_trackers .account_icon {
+        padding-right: 0.25rem; vertical-align: 0; opacity: 1;
     }
 
     .folder_list, .content_cell, .compose_page, .message_list, .msg_text, .selected_part,
@@ -168,6 +170,7 @@
         background-color: $popover-bg;
         color: $popover-body-color;
     }
+    .server_content .quick_add_multiple_server_form { padding-left: 1.5rem; padding-right: 1.5rem; }
     .sievefilters_settings > .p-3 { padding: 0; }
     #sieve_accounts > .p-2 { padding: 0.5rem 1rem; }
 
@@ -226,6 +229,7 @@
         color: $popover-body-color;
     }
     .msg_text_inner > table { background-color: #fff; }
+    .user_settings table td { padding-left: 15px; padding-right: 15px; }
 
     .msg_headers th:hover, .settings_subtitle,
     .server_section { color: inherit !important; }
@@ -237,7 +241,7 @@
     }
     .btn-outline-secondary:hover {
         color: var(--bs-btn-hover-color); text-decoration: none;
-        background-color: var(--bs-secondary) !important;
+        background-color: var(--bs-secondary);
     }
     .msg_controls {
         .btn-outline-secondary:hover { color: var(--bs-btn-hover-color); }
@@ -281,9 +285,7 @@
     .toggle_link { margin-right: 10px; }
     .move_to_location .folders a:not(.btn), .move_to_location i { color: $dropdown-link-color !important; }
     .shortcut_table { width: 100%; }
-    .app-container {
-        padding: 20px;
-    }
+    .app-container { padding: 20px; background-color: inherit !important; }
     .folder_list { width: calc(var(--nav-size) - 75px); }
     .folder_list, .content_cell{
         position: relative;
@@ -312,13 +314,36 @@
         #imap_filter_form {
             .imap_keyword, el-select { margin-right: 5px; }
         }
+        .list_sources .list_src {
+            display: block;
+            max-width: 100%;
+            min-width: 0;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+        .list_sources.w-100 {
+            width: auto !important;
+            max-width: min(320px, calc(100vw - 2rem));
+            min-width: 0;
+        }
     }
+
+    .menu_search {
+        .bi-search::before { margin-top: 4px; font-size: 1.25rem; font-weight: bold !important; }
+        .search_terms { min-height: 34px; }
+    }
+
     .search_content {
+        background-color: transparent;
         .content_title {
             flex-flow: wrap;
             .msg_controls { margin-bottom: 0; }
         }
         .list_controls { position: absolute; top: 15px; right: 15px; }
+        .advanced_search_form {
+            .source_count, .time_count, .target_count, .other_count, .term_count { margin-right: 0; }
+        }
     }
 
     /* Bootstrap-based message headers */
@@ -399,7 +424,7 @@
     }
     .folder_cell.collapsed .folder_list {
         padding-right: 14px;
-        width: calc(var(--nav-size) - 68px);
+        width: calc(var(--nav-size) - 72px);
     }
 
     main .container {
@@ -456,6 +481,11 @@
         .block_sender_link { margin-right: 0; }
         .item_to_trackers { min-width: max-content; }
         #extra-header-buttons { margin-top: 0; }
+        .disabled_link {
+            padding: 0.25rem 0.5rem;
+            background: var(--bs-body-bg);
+            font-size: 0.875rem;
+        }
     }
 
     .advanced_search_form {
@@ -464,11 +494,124 @@
             .d-flex { flex-wrap: wrap; }
             .adv_terms { width: 75% !important; }
         }
-        .table > :not(caption) > * > * { box-shadow: none; }
+        .table > :not(caption) > * > * { background-color: transparent; box-shadow: none; }
         #term_and_or1 { width: 100%; }
         .source_section {
             .inner_list .form-check { margin: 0 0 0 30px; }
             .unread_count { padding-top: 4px; }
+        }
+        .adv_folder_list {
+            .wrapper {
+                align-items: center;
+                gap: 0.5rem;
+                min-width: 0;
+            }
+            .adv_folder_link {
+                min-width: 0;
+                flex: 1 1 auto;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                max-width: min(240px, 40vw);
+            }
+            .wrapper > .unread_count {
+                flex-shrink: 0;
+            }
+            .wrapper > .d-flex.gap-3 {
+                flex-shrink: 0;
+            }
+            .inner_list .wrapper > a {
+                min-width: 0;
+                flex: 1 1 auto;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+                max-width: min(220px, 38vw);
+            }
+        }
+    }
+
+    .account_folder_title {
+        min-width: 0;
+        flex: 1 1 auto;
+        overflow: hidden;
+        strong {
+            display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
+        }
+    }
+    .folder_table {
+        table-layout: fixed;
+        width: 100%;
+        td.folder-name-cell {
+            max-width: 0;
+            overflow: hidden;
+        }
+        .folder-name-text {
+            display: inline-block;
+            max-width: calc(100% - 1.5rem);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+        }
+    }
+
+    .bubble_dropdown-content { z-index: 5; }
+    .bubble_dropdown-content .bi { margin-right: 5px; }
+    .contact-list-container { padding: 1.5rem; }
+
+    nav.collapsed {
+        .src_name_initial { margin: 5px 7px; }
+        .folders .menu_combined_trackers a { font-size: 0; }
+        .folders .menu_combined_trackers .account_icon { padding-right: 0; font-size: 1rem; }
+    }
+
+    // Keyboard shortcuts (keyboard_shortcuts/site.css)
+    .edit_shortcut_form {
+        max-width: 100%;
+        .shortcut_edit_fields {
+            display: flex;
+            flex-direction: column;
+            max-width: 32rem;
+        }
+        .shortcut_edit_title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            word-break: break-word;
+        }
+        .edit_shortcut_field .form-label {
+            font-weight: normal;
+            margin-bottom: 0.35rem;
+        }
+    }
+
+    // Block list (site.css)
+    .blocked_senders_table {
+        .blocked_sender_fld {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .blocked_behavior_fld {
+            max-width: 180px;
+            display: inline-block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+        .blocked_sender_actions a {
+            cursor: pointer;
         }
     }
 }
@@ -492,7 +635,7 @@
 
     #middle_outer {
         margin-top: 0px !important;
-        .middle-wrapper { padding-top: 20px; }
+        .middle-wrapper { padding-top: 48px; }
     }
     .page-content-top-margin { height: 0px !important; }
 }
@@ -538,10 +681,17 @@
         .message_list .content_title, .message_list .content_title > div:first-child {
             margin-bottom: 0;
         }
+        .message_list .list_controls.on_mobile .form-control { width: 120px; }
 
         .content_title {
             background-color: $body-bg !important;
             .ctr_divider + div.dropdown { margin-top: 4px; }
+            .path_delim + a { display: contents; }
+            .list_sources {
+                top: 40px;
+                border: 1px solid var(--bs-border-color);
+                max-width: min(300px, calc(100vw - 1.5rem));
+            }
         }
 
         .list_controls i.bi-filter-circle {
@@ -559,13 +709,18 @@
         .msg_headers th { width: 20%; }
 
         .sys_messages {
-            top: 0px; right: 0; width: 100%; min-height: 5px; margin-top: 5px;
+            top: 0px; left: 0; width: 100%; min-height: 5px; margin-top: 5px;
             white-space: normal;
         }
         .offline {
             position: fixed; top: 0; right: 0; height: auto; padding: 12px 35px;
             z-index: 1000;
         }
+        input.form-control { width: 120px; }
+        .account_icon { vertical-align: -1px; }
+        .folders .account_icon { vertical-align: 0; }
+        .contact-list-container { padding: 1rem; }
+        .settings_subtitle input.form-control { width: 100%; }
 
         // mobile home
         .nux_welcome ul { padding-left: 20px; }
@@ -580,7 +735,6 @@
 
         // mobile servers
         .nux_empty_combined_view { margin-left: 10px; margin-right: 10px; }
-        .settings_subtitle, .server_section { padding-left: 15px !important; }
         .add_server { margin-left: 20px; }
         .server_count { margin-right: 15px; }
 
@@ -593,7 +747,7 @@
 
         // mobile folders
         .folder_dialog { margin-left: 30px; width: 85%; }
-        .folder_list { border: inherit; border-radius: 0; }
+        .folder_list { padding-right: 1rem;  padding-bottom: 75px; border: inherit; border-radius: 0; }
         #imap_server_folder { width: 100%; }
 
         // mobile search
@@ -612,10 +766,49 @@
             #search_terms { margin: 10px 3px 3px; width: 100% !important; }
             .message_table { margin-top: 0.1rem; }
             el-select { width: calc(50% - 0.5rem); }
-            .combined_sort + el-select { width: 150px; }
+            .combined_sort + el-select {  display: inline-block; width: 150px; }
+            .message_table_body .icon { width: 50px; }
         }
 
-        .time_section input[type=date] { display: block; margin-bottom: 10px; }
+        .advanced_search_form .adv_folder_list {
+            .adv_folder_link {
+                max-width: min(180px, 50vw);
+            }
+            .inner_list .wrapper > a {
+                max-width: min(160px, 45vw);
+            }
+        }
+
+        // Search results: from + subject only on mobile
+        .adv_controls + .message_list .message_table {
+            table-layout: auto;
+            td.source,
+            td.msg_date,
+            td.icon,
+            td.dates {
+                display: none !important;
+            }
+            td.checkbox_cell {
+                width: 28px;
+            }
+            td.from {
+                width: 35%;
+                max-width: 35%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            td.subject {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+
+        .time_section {
+            input[type=date] { display: block; margin-bottom: 10px; }
+            [id*="time_adv_remove"] { margin-left: 10px; }
+        }
         .timeandor { text-align: left; }
         .targets_section, .other_section, .submit_section,
         .time_section, .source_section, .terms_section {
@@ -625,7 +818,7 @@
         // mobile compose
         .compose_page { padding: 10px; overflow: hidden; }
         .compose_form { width: 100% !important; }
-        .toggle_recipients { right: 10px !important; }
+        .toggle_recipients { right: 6px !important; }
         .compose_bcc, .compose_cc, .compose_subject,
         .compose_to, .compose_body, .compose_server {
             margin: 5px 0;
@@ -639,7 +832,7 @@
         .long_header th { white-space: normal; word-break: normal; }
         .news_cell {
             padding-bottom: 15px !important;
-            &.checkbox_cell { width: 40px; padding: 14px 10px 10px !important; }
+            &.checkbox_cell { width: 30px; padding: 14px 5px 10px !important; }
             .msg_date { padding-top: 0; }
             .subject {
                 &, & div { padding-bottom: 0px !important; }
@@ -651,13 +844,19 @@
         .header_links { padding-bottom: 8px; }
         .msg_text { max-width: 100% !important; word-break: break-word; }
         .msg_text_inner { width: 100%; padding: 15px !important; }
-        .msg_parts { table-layout: auto; }
+        .msg_parts {
+            table-layout: auto;
+            td { width: 100% !important; }
+        }
         .msg_controls {
             top: 0.3rem; height: auto; padding-left: 0; padding-bottom: 5px;
-            z-index: 1200; background-color: var(--bs-body-bg);
+            z-index: 1200; background-color: var(--bs-body-bg); min-height: 90px;
         }
         #list_controls_menu { background-color: var(--bs-body-bg); }
-        #list_controls_menu.show { justify-content: right; align-items: center; margin-top: 0.5rem; }
+        #list_controls_menu.show {
+            justify-content: right; align-items: center; margin-top: 0.5rem;
+            > a { padding-top: 7px; }
+        }
         .msg_text table { word-break: normal; }
         .checkbox_cell { padding-top: 8px !important; }
 
@@ -680,11 +879,23 @@
         }
         .message_list {
             margin-top: 0px !important;
+            .list_controls.on_mobile #imap_filter_form .imap_keyword { width: 100%; }
+        }
+
+        .edit_shortcut_form {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+            .shortcut_edit_fields {
+                max-width: 100%;
+            }
+        }
+        .blocked_senders_table .blocked_sender_fld {
+            max-width: 120px;
         }
     }
 
-    // Remove the fixed navbar as it will make Cypht navbar not visible
-    .navbar.fixed-top { display: none; }
+    // Remove the sticky navbar as it will make Cypht navbar not visible
+    header.sticky-top { display: none; }
 }
 
 //
@@ -719,7 +930,15 @@ html body.tiki.tiki-webmail #middle.container.container-std.middle {
 
 // landscape phones (767.98px)
 @include media-breakpoint-down(md) {
-    .mobile #list_controls_menu.show { top: 25px; right: 0; }
+    .mobile .inline-cypht {
+        #list_controls_menu.show { top: 25px; right: 0; }
+        .terms_section {
+            .adv_term_nots input { margin-top: 6px; }
+        }
+        .advanced_search_form {
+            input.form-control { width: 250px; }
+        }
+    }
 }
 
 // portrait phones (575.98px)
@@ -733,7 +952,6 @@ html body.tiki.tiki-webmail #middle.container.container-std.middle {
         .terms_section {
             .d-flex { display: inline-block; }
             .adv_terms { display: inline-block; }
-            .adv_term_nots input { margin-top: 12px; }
         }
         .source_section {
             .adv_folder_link {

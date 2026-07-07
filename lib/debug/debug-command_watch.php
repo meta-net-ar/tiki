@@ -167,7 +167,7 @@ class DbgCmd_Watch extends DebuggerCommand
             $tmp = $smarty->getTemplateVars();
 
             if (is_array($tmp) && isset($tmp[$v])) {
-                $result .= print_r($tmp[$v], true) . "\n";
+                $result .= print_r($tmp[$v], true) . "\n"; // @phpstan-ignore disallowedFunctions.printR (intentional debug tool — builds watch output string)
             } else {
                 $result .= 'Smarty variable "' . $v . '" not found';
             }

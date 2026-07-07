@@ -388,6 +388,8 @@ function wikiplugin_swiper_info()
 
 function wikiplugin_swiper($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_swiper_info());
+
     if ((! empty($params['fileIds']) && ! $params['fileIds']) && ! $params['fgalId'] && ! $data) {
         Feedback::error(tr('Paramaters missing: Please either select file gallery, give file ids or custom slide code in body.'));
         return;

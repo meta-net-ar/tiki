@@ -183,7 +183,7 @@ function wikiplugin_sql($data, $params)
     }
 
     if (! empty($params['audit'])) {
-        TikiLib::lib('logs')->add_log('wikiplugin_sql', "Page - " . $_GET['page'] . "\nParameters - " . print_r($bindvars, true));
+        TikiLib::lib('logs')->add_log('wikiplugin_sql', "Page - " . $_GET['page'] . "\nParameters - " . print_r($bindvars, true)); // @phpstan-ignore disallowedFunctions.printR (returns bind vars as string for Tiki log entry, never prints)
     }
 
     if (! empty($params['audit_csv'])) {

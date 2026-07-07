@@ -33,6 +33,8 @@ function wikiplugin_addreference($data, $params)
 {
     global $prefs;
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_addreference_info());
+
     if ($prefs['wikiplugin_addreference'] == 'y') {
         /** @var ReferencesLib $referenceslib */
         $referenceslib = TikiLib::lib('references');
@@ -57,9 +59,7 @@ function wikiplugin_addreference($data, $params)
         if (empty($params['biblio_code']) || (is_array($params['biblio_code']) && count($params['biblio_code']) == 0)) {
             return;
         }
-        if (! is_array($params['biblio_code'])) {
-            $params['biblio_code'] = [$params['biblio_code']];
-        }
+
         $cleanBiblioCode = [];
         foreach ($params['biblio_code'] as $code) {
             $code = Reference::trimBibliographicCode($code);

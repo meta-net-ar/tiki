@@ -338,6 +338,7 @@ function wikiplugin_module($data, $params)
 
     $out = '';
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_module_info());
     extract($params, EXTR_SKIP);
 
     if (is_null($float)) {

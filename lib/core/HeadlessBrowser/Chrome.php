@@ -45,6 +45,8 @@ class Chrome implements HeadlessBrowserInterface
 
     public function getUrlAsHtml($url, $cssSelector = null)
     {
+        global $prefs;
+
         $html = '';
         $browser = null;
 
@@ -52,7 +54,8 @@ class Chrome implements HeadlessBrowserInterface
             $browserFactory = new BrowserFactory($this->getChromeBinaryPath());
             $browser = $browserFactory->createBrowser([
                 'headless' => true,
-                'noSandbox' => true
+                'noSandbox' => true,
+                'ignoreCertificateErrors' => $prefs['headlessbrowser_chrome_ignore_certificate_errors'] == 'y',
             ]);
             $page = $browser->createPage();
             $page->navigate($url)->waitForNavigation();
@@ -75,6 +78,8 @@ class Chrome implements HeadlessBrowserInterface
 
     public function getUrlAsImage($url, $outputPath = null, $cssSelector = null, $timeout = null)
     {
+        global $prefs;
+
         $content = '';
         $browser = null;
 
@@ -82,7 +87,8 @@ class Chrome implements HeadlessBrowserInterface
             $browserFactory = new BrowserFactory($this->getChromeBinaryPath());
             $browser = $browserFactory->createBrowser([
                 'headless' => true,
-                'noSandbox' => true
+                'noSandbox' => true,
+                'ignoreCertificateErrors' => $prefs['headlessbrowser_chrome_ignore_certificate_errors'] == 'y',
             ]);
             $page = $browser->createPage();
             $page->navigate($url)->waitForNavigation('networkIdle', $timeout ?? 10000);

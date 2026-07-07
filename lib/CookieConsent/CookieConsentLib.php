@@ -303,7 +303,13 @@ class CookieConsentLib
                 // See note at the begining of fucntion.  As far as I can tell, this is unreachable code - benoitg - 2026-06-25
                 $_SESSION['tiki_cookie_jar'][$name] = $value;
             } else {
-                setcookie($name, $value, $expire, $path, $domain, $secure);
+                $options = [
+                    'expires' => $expire,
+                    'path' => $path,
+                    'domain' => $domain,
+                    'secure' => $secure
+                ];
+                setcookie_obeySetCookieParams($name, $value, $options);
             }
         }
     }

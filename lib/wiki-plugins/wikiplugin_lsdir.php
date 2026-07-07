@@ -9,7 +9,7 @@ function wikiplugin_lsdir_info()
     return [
         'name' => tra('List Directory'),
         'documentation' => 'PluginLsDir',
-        'description' => tra('List files in a directory'),
+        'description' => tra('List files in a directory. Access is denied unless system preference wikiplugin_fileaccess_allowed_paths defines allowed base paths.'),
         'prefs' => [ 'wikiplugin_lsdir' ],
         'validate' => 'all',
         'iconname' => 'file-archive',
@@ -18,7 +18,7 @@ function wikiplugin_lsdir_info()
             'dir' => [
                 'required' => true,
                 'name' => tra('Directory'),
-                'description' => tra('Full path to the server-local directory. Default is the document root.'),
+                'description' => tra('Path to a server-local directory. Must be within one of the allowed base paths configured in preference wikiplugin_fileaccess_allowed_paths.'),
                 'since' => '1',
                 'default' => '',
             ],
@@ -79,24 +79,24 @@ function wikiplugin_lsdir($data, $params)
 
     extract($params, EXTR_SKIP);
 
-    // make sure document_root has no trailing slash
-    if (! empty($_SERVER['DOCUMENT_ROOT'])) {
-        $tail = strlen($_SERVER['DOCUMENT_ROOT']) - 1;
-        if (substr($_SERVER['DOCUMENT_ROOT'], $tail) == '/') {
-            $pathprefix = substr($_SERVER['DOCUMENT_ROOT'], 0, $tail);
-        } else {
-            $pathprefix = $_SERVER['DOCUMENT_ROOT'];
-        }
+    $fileaccess = \Tiki\WikiPlugin\FileaccessAllowlist::fromPreference();
+
+    if (! $fileaccess->isConfigured()) {
+        return $fileaccess->getDeniedHtml('no_roots');
     }
 
-    // make sure dir has starting slash
-    if (! empty($dir)) {
-        if (! str_starts_with($dir, '/')) {
-            $dir = '/' . $dir;
-        }
+    $dirCandidates = [$dir];
+    if (! str_starts_with($dir, '/') && ! empty($_SERVER['DOCUMENT_ROOT'])) {
+        $dirCandidates[] = rtrim($_SERVER['DOCUMENT_ROOT'], '/\\') . '/' . $dir;
     }
 
-    $dir = $pathprefix . $dir;
+    $resolvedAllowedDir = $fileaccess->resolvePathFromCandidates($dirCandidates);
+
+    if ($resolvedAllowedDir === false) {
+        return $fileaccess->getDeniedHtml('outside_dir');
+    }
+
+    $dir = $resolvedAllowedDir;
 
     // make sure urlprefix has a trailing slash
     if (! empty($urlprefix)) {
@@ -127,7 +127,7 @@ function wikiplugin_lsdir($data, $params)
     $dh = @opendir($dir);
 
     if (! $dh) {
-        $error = "<span class='attention'><b>$dir</b> " . tra("could not be opened because it doesn't exist or permission was denied") . "</span>";
+        $error = "<span class='attention'><b>" . htmlspecialchars($dir, ENT_QUOTES, 'UTF-8') . '</b> ' . tra("could not be opened because it doesn't exist or permission was denied") . '</span>';
         return $error;
     }
 
@@ -157,9 +157,11 @@ function wikiplugin_lsdir($data, $params)
             break 1;
         }
         if (! empty($urlprefix)) {
-            $ret .= "<a href='$urlprefix$filename' class='wiki'>$filename</a><br />";
+            $safeUrl  = htmlspecialchars($urlprefix . $filename, ENT_QUOTES, 'UTF-8');
+            $safeName = htmlspecialchars($filename, ENT_QUOTES, 'UTF-8');
+            $ret .= "<a href='$safeUrl' class='wiki'>$safeName</a><br />";
         } else {
-            $ret .= "$filename<br />";
+            $ret .= htmlspecialchars($filename, ENT_QUOTES, 'UTF-8') . '<br />';
         }
         if ($limit > 0) {
             $count++;

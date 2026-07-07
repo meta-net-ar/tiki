@@ -103,9 +103,16 @@ if (isset($_REQUEST["save"])) {
             $msg .= tra("URL already added to the directory. Duplicate site? ");
         }
         if ($prefs['directory_validate_urls'] == 'y') {
-            @$fsh = fopen($_REQUEST['url'], 'r');
-            if (! $fsh) {
-                $msg .= tra("URL cannot be accessed wrong URL or site is offline and cannot be added to the directory. ");
+            // Prevent SSRF: validate the submitted URL before the server opens a
+            // connection to check if the site is reachable.
+            $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+            if (! $ssrf->isUrlAllowed($_REQUEST['url'])) {
+                $msg .= tra("URL is not allowed (targets a private or reserved address). ");
+            } else {
+                @$fsh = fopen($_REQUEST['url'], 'r');
+                if (! $fsh) {
+                    $msg .= tra("URL cannot be accessed wrong URL or site is offline and cannot be added to the directory. ");
+                }
             }
         }
     }

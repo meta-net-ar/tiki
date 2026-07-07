@@ -33,7 +33,7 @@ if ($res) {
 
 $feed = "wiki";
 $uniqueid = $feed;
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output["data"] == "EMPTY") {
     $title = $prefs['feed_wiki_title'];

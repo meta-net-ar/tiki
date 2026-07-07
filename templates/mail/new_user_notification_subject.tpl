@@ -1,1 +1,1 @@
-{tr}New {$prefs.mail_template_custom_text}user registration{/tr} {tr}at{/tr} {$mail_site}
+{tr _0=$prefs.mail_template_custom_text}New %0user registration{/tr} {tr}at{/tr} {$mail_site}

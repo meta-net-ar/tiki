@@ -68,12 +68,11 @@ if (! isset($cookietab)) {
 $rawcals = $calendarlib->list_calendars();
 
 if (empty($rawcals['data'])) {
-    if (Perms::get(['type' => 'calendar'])->admin_calendar) {
-        $message = tr('You need to %0create a calendar%1', '<a href="tiki-admin_calendars.php?cookietab=2">', '</a>');
-    } else {
-        $message = tra('No calendars found');
-    }
-    Feedback::errorAndDie($message, \Laminas\Http\Response::STATUS_CODE_404);
+    $smarty->assign('calendarEmptyState', true);
+    $smarty->assign('mid', 'tiki-calendar.tpl');
+    $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
+    $smarty->display("tiki.tpl");
+    die;
 }
 
 $rawcals['data'] = Perms::filter(
@@ -260,7 +259,7 @@ if (! empty($_REQUEST['generate_availability'])) {
         $nlg_availability = $nlgen->generateAvailability($busy_list, $ranges, NLGen\Grammars\Availability\AvailabilityGrammar::SPECIFIC, null);
         $smarty->assign('nlg_availability', $nlg_availability);
     } catch (Exception $e) {
-        error_log("Availability generation error: " . $e->getMessage());
+        error_log("Availability generation error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (calendar exception reporting)
         Feedback::error($e->getMessage());
         $smarty->assign('nlg_availability', '');
     }
@@ -270,8 +269,8 @@ if (isset($_REQUEST['sort_mode'])) {
     $sort_mode = $_REQUEST['sort_mode'];
 }
 
-$viewstart = $_REQUEST['todate'] ?? $tikilib->now;
-$viewend = $viewstart + 90 * 86400 - 1; // 1 month approx
+$viewstart = $daystart;
+$viewend = $dayend;
 
 $listevents = [];
 if (! empty($_SESSION['CalendarViewGroups']) && ! empty($_SESSION['CalendarViewList']) && $_SESSION['CalendarViewList'] === 'list') {
@@ -288,7 +287,7 @@ if (! empty($_SESSION['CalendarViewGroups']) && ! empty($_SESSION['CalendarViewL
         $viewstart,
         $viewend,
         0,
-        $prefs['maxRecords'],
+        -1,
         $sort_mode
     );
 

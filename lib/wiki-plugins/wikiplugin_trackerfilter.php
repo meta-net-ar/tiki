@@ -347,7 +347,6 @@ function wikiplugin_trackerfilter($data, $params)
         $values = [];
         $exactValues = [];
         wikiplugin_trackerfilter_build_trackerlist_filter($_REQUEST, $formats, $ffs, $values, $exactValues, $tracker_definition);
-        // echo '<pre>BUILD_FILTER'; print_r($ffs); print_r($exactValues); echo '</pre>';
 
         $params['fields'] = $fields ?? [];
         if (empty($params['trackerId'])) {
@@ -389,7 +388,6 @@ function wikiplugin_trackerfilter($data, $params)
 
     $smarty->assign_by_ref('sortchoice', $sortchoice);
     $smarty->assign_by_ref('filters', $filters);
-    //echo '<pre>';print_r($filters); echo '</pre>';
     $smarty->assign_by_ref('trackerId', $trackerId);
     $smarty->assign('line', ($line == 'y' || $line == 'in') ? 'y' : 'n');
     $smarty->assign('indrop', $line == 'in' ? 'y' : 'n');

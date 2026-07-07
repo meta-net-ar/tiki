@@ -72,6 +72,9 @@ function wikiplugin_perm($data, $params)
     $userlib = TikiLib::lib('user');
     $perms = "";
     $notperms = "";
+
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_perm_info());
+
     if (! is_null($params['perms'])) {
         $perms = $params['perms'];
     }

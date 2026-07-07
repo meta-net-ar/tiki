@@ -46,7 +46,7 @@
                 {if !empty($row.page)}
                     <a href="{$row.page|sefurl}">Page: {$row.page}</a>
                 {elseif $row.tabularId}
-                    <a href="{service controller='tabular' action='edit' tabularId=$row.tabularId }">Tabular: {$row.trackerName}</a>
+                    <a href="{service controller='tabular' action='edit' tabularId=$row.tabularId}">Tabular: {$row.trackerName}</a>
                 {else}
                     <a href="{service controller='tracker' action='edit_field' trackerId=$row.trackerId fieldId=$row.fieldId}" class="click-modal">Field: {$row.fieldId} {$row.fieldName}</a><br>
                     <a href="{$row.trackerId|sefurl:'trackerfields'}">Tracker: {$row.trackerName}</a>

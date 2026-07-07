@@ -17,7 +17,7 @@
                 {/if}
                 <a {$link}
                     {if $prefs.feature_shadowbox eq 'y' && empty($filegals_manager)}
-                        {if $imagetypes eq 'y' }
+                        {if $imagetypes eq 'y'}
                                 data-box="box[g]"
                         {elseif $key_type eq 'text/html'}
                                 data-box="shadowbox[gallery];type=iframe"

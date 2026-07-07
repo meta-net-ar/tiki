@@ -27,10 +27,12 @@
         <input type="submit" class="btn btn-primary" value="{tr}OK{/tr}">
     </form>
     <br>
-    <a href="tiki-import_xml_zip.php">Import wiki pages in an XML Zip file from another Tiki</a>
+    <a href="tiki-import_xml_zip.php">{tr}Import wiki pages in an XML Zip file from another Tiki{/tr}</a>
+    <br>
+    <a href="tiki-markdown_import.php">{tr}Import markdown files and convert to wiki pages{/tr}</a>
 
 {elseif isset($softwareSpecificOptions)}
-    <h2>Options:</h2>
+    <h2>{tr}Options:{/tr}</h2>
     <form method="post" enctype="multipart/form-data" action="tiki-importer.php" onsubmit="return confirm('{tr}WARNING: make sure to have a backup before running the script. If you do not have a backup this is the last chance to cancel the importer by clicking on the cancel button.{/tr}');";>
         {ticket}    
         <input type="hidden" name="importerClassName" value="{$importerClassName}">

@@ -419,7 +419,6 @@ class AdminLib extends TikiLib
             $pageContents = preg_replace("/tiki-index.php\?page=([^\'\"\$]+)/", "$1.html", $pageContents);
             $pageContents = preg_replace("/tiki-editpage.php\?page=([^\'\"\$]+)/", "", $pageContents);
             //preg_match_all("/tiki-index.php\?page=([^ ]+)/",$dat,$cosas);
-            //print_r($cosas);
 
             $data = "<html>";
             $data .= "<head>";

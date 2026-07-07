@@ -77,7 +77,7 @@
                         {elseif $x eq 'filetype'}
                             <td>{$atts[ix].filename|iconify}</td>
                         {else}
-                            <td>{$atts[ix].$x}</td>
+                            <td class="text-break">{if $x eq 'comment' or $x eq 'longdesc'}<small title="{$atts[ix].$x|escape}">{$atts[ix].$x|truncate:200:"...":true|escape}</small>{else}{$atts[ix].$x}{/if}</td>
                         {/if}
                     {/foreach}
                     <td>

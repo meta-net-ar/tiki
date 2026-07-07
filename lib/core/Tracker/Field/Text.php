@@ -175,6 +175,21 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
         }
     }
 
+    public function renderText($context = [])
+    {
+        $value = $this->getValue();
+
+        if ($this->getConfiguration('isMultilingual') == 'y') {
+            $decoded = json_decode($value, true);
+            if (is_array($decoded)) {
+                $language = Language::getCurrentLanguage();
+                $value = $decoded[$language] ?? (reset($decoded) ?: '');
+            }
+        }
+
+        return trim(strip_tags((string) $value));
+    }
+
     protected function processMultilingual($requestData, $id_string)
     {
         global $prefs;
@@ -576,6 +591,18 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
 
                         if ($value) {
                             $query->filterIdentifier($value, $baseKey . '_exact');
+                        }
+                    })
+                    ;
+
+                $filters->addNew($permName, 'multiexact')
+                    ->setLabel($name)
+                    ->setHelp(tr('Search for one or more precise values separated by OR.'))
+                    ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_mem"))
+                    ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
+                        $value = $control->getValue();
+                        if ($value) {
+                            $query->filterMultiIdentifier($value, $baseKey . '_exact');
                         }
                     })
                     ;

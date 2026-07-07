@@ -29,7 +29,7 @@
             </div>
             <div class="mb-3 row">
                 <label for="description" class="col-form-label">{tr}Description{/tr}</label>
-                {textarea _simple='y' _toolbars='n' _wysiwyg='n' name='description' id='description' codemirror='true' rows='5' class='form-control' }{$description|escape}{/textarea}
+                {textarea _simple='y' _toolbars='n' _wysiwyg='n' name='description' id='description' codemirror='true' rows='5' class='form-control'}{$description|escape}{/textarea}
             </div>
             <div class="mb-3 row">
                 <input type="submit" class="btn btn-primary" value="{tr}Create{/tr}"/>

@@ -872,6 +872,7 @@ class nusoap_base {
      */
     public function varDump($data) {
         ob_start();
+        // @phpstan-ignore disallowedFunctions.varDump (captures output via ob_start/ob_get_contents to return as string, never prints)
         var_dump($data);
         $ret_val = ob_get_contents();
         ob_end_clean();
@@ -3130,7 +3131,6 @@ class soap_transport_http extends nusoap_base {
             return false;
         } else {
             //echo '<pre>';
-            //var_dump(curl_getinfo($this->ch));
             //echo '</pre>';
         }
         // close curl

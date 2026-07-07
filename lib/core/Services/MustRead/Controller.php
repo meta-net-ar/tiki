@@ -35,7 +35,7 @@ class Services_MustRead_Controller
 
         return [
             'title' => tr('Must Read'),
-            'list' => $result,
+            'listMR' => $result,
             'canAdd' => Tracker_Item::newItem($prefs['mustread_tracker'])->canModify(),
             'selection' => $selection ? $selection->getId() : null,
             'notification' => $input->notification->word(),

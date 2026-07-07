@@ -30,7 +30,7 @@ if (! isset($_REQUEST["parent"])) {
 }
 $feed = "directory";
 $uniqueid = $feed . "?parent=" . $_REQUEST["parent"];
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 if ($output["data"] == "EMPTY") {
     $title = tra("Tiki RSS feed for directory sites");
     $rc = $dirlib->dir_get_category($_REQUEST["parent"]);

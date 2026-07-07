@@ -51,8 +51,7 @@ body.fullscreen.tiki.navbar-padding {
     line-height: $tiki-navbar-fixed-height;
 }
 
-.layout_fixed_top_modules .top_modules,
-.navbar-fixed-top {
+.layout_social .top_modules {
     height: $tiki-navbar-fixed-height;
      .sitelogo img {
         width: auto !important;
@@ -84,7 +83,7 @@ header.header {
     }
 }
 
-.layout_fixed_top_modules .navbar-fixed-top .navbar {
+.layout_social .top_modules .navbar {
     margin-bottom: 0;
 }
 

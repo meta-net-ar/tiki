@@ -22,6 +22,7 @@ $excludePattern = [
     // composer related folders
     $dir . '/' . TIKI_VENDOR_NONBUNDLED_PATH,
     $dir . '/' . TIKI_VENDOR_BUNDLED_TOPLEVEL_PATH,
+    $dir . '/' . PUBLIC_GENERATED_PATH,
 
     // temp folder (generated files)
     $dir . '/' . TEMP_PATH,

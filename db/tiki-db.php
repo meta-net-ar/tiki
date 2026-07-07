@@ -18,6 +18,20 @@ use Tiki\TikiInit;
 
 require_once('lib/init/initlib.php');
 
+$fail = static function (string $msg, int $code = 1001): void {
+    if (defined('TIKI_CONSOLE')) {
+        throw new ConsoleSetupException($msg, $code);
+    }
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, $msg . PHP_EOL);
+        exit(1);
+    }
+    header('HTTP/1.0 503 Service Unavailable', true, 503);
+    header('Retry-After: 300');
+    echo $msg;
+    exit(1);
+};
+
 // Define lang and load translation functions
 if (! empty($_REQUEST['lang'])) {
     $language = $prefs['site_language'] = $prefs['language'] = $_REQUEST['lang'];
@@ -286,17 +300,3 @@ function mydumpstack($stack)
     }
     return $o;
 }
-
-$fail = static function (string $msg, int $code = 1001): void {
-    if (defined('TIKI_CONSOLE')) {
-        throw new ConsoleSetupException($msg, $code);
-    }
-    if (PHP_SAPI === 'cli') {
-        fwrite(STDERR, $msg . PHP_EOL);
-        exit(1);
-    }
-    header('HTTP/1.0 503 Service Unavailable', true, 503);
-    header('Retry-After: 300');
-    echo $msg;
-    exit(1);
-};

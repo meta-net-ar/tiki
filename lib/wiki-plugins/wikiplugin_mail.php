@@ -167,6 +167,8 @@ function wikiplugin_mail($data, $params)
     static $ipluginmail = 0;
     $smarty->assign_by_ref('ipluginmail', $ipluginmail);
     $default = ['group' => []];
+
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_mail_info());
     $params = array_merge($default, $params);
     $default = ['mail_subject' => '', 'mail_mess' => '', 'mail_user_dd' => '', 'mail_group_dd' => []];
     $_REQUEST = array_merge($default, $_REQUEST);

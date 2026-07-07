@@ -296,7 +296,7 @@ if (empty($info)) {
                 $access->redirect($infoForSlug['pageSlug'], '', 301);
                 exit;
             } else {
-                error_log("Avoiding redirect loop: " . $infoForSlug['pageSlug']);
+                error_log("Avoiding redirect loop: " . $infoForSlug['pageSlug']); // @phpstan-ignore disallowedFunctions.errorLog (redirect loop detection warning)
             }
         }
     }
@@ -333,7 +333,7 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
     }
 
     if (! $isprefixed && ! empty($prefs['url_anonymous_page_not_found']) && empty($user)) {
-        $access->redirect($prefs['url_anonymous_page_not_found']);
+        $access->redirect($prefs['url_anonymous_page_not_found'], allowExternal: true);
     }
 
     if ($user && $prefs['feature_wiki_userpage'] == 'y' && strcasecmp($prefs['feature_wiki_userpage_prefix'], $page) == 0) {
@@ -392,6 +392,8 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
                     $_REQUEST['page'] = $newPage;
                     $_GET['itemId'] = $suffix;  // \ParserLib::parse_wiki_argvariable uses $_GET
                     $_GET['page'] = $newPage;
+                    $jitGet = new JitFilter($_GET);
+                    $jitRequest = new JitFilter($_REQUEST);
                     $smarty->assign('canonical_ending', urlencode(trim(substr($page, strlen($newPage)))));
                     $page = $newPage;
                     $info = $tikilib->get_page_info($_REQUEST['page']);

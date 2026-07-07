@@ -11,7 +11,7 @@
                 </div>
                 <input type="text" id="tagBox" class="form-control" name="tag" value="{$tagString|escape}">
                 <div class="input-group-append input-group-append">
-                    <input type="submit" class="btn btn-primary tips" value="{tr}Go{/tr}">
+                    <input type="submit" class="btn btn-primary tips" value="{tr}Search{/tr}">
                 </div>
             </div>
         </div>
@@ -184,7 +184,7 @@
         </div>
         <div class="d-flex flex-row flex-wrap align-items-center mb-4 row">
             <div class="input-group col-sm-6">
-                <input type="text" name="find" value="{$find|escape}" class="form-control form-control-sm" placeholder="{tr}Find{/tr}...">
+                <input type="text" name="find" value="{$find|escape}" class="form-control form-control-sm" placeholder="{tr}Search{/tr}...">
                 <input type="submit" class="btn btn-info btn-sm" value="{tr}Filter{/tr}">
             </div>
             <input type="hidden" name="old_type" value="{$type|escape}">

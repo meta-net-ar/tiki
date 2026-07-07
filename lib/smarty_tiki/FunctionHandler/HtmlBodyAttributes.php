@@ -50,8 +50,12 @@ class HtmlBodyAttributes extends Base
             $class .= ' sandbox ';
         }
 
-        if ($prefs['site_layout']) {
-            $class .= ' layout_' . $prefs['site_layout'];
+        if (Sections::getCurrentSection() === Sections::SECTION_ADMIN_LAYOUT) {
+            $class .= ' layout_admin';
+        } else {
+            if ($prefs['site_layout']) {
+                $class .= ' layout_' . $prefs['site_layout'];
+            }
         }
 
         if (! empty($_REQUEST['filegals_manager'])) {

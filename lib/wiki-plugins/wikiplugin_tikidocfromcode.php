@@ -54,6 +54,8 @@ class WikiPluginTikiDocFromCode extends PluginsLib
             $helpurl = 'http://doc.tiki.org/';
         }
 
+        $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_tikidocfromcode_info());
+
         $params = $this->getParams($params);
         $aPlugins = [];
         extract($params, EXTR_SKIP);

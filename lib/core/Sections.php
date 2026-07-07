@@ -270,10 +270,12 @@ class Sections
         if (! in_array($section, self::getAllSections(), true)) {
             throw new \InvalidArgumentException("Invalid section: $section");
         }
-        self::$currentSection = $section;
 
-        // Trigger callbacks when section changes
-        self::triggerSectionChangeCallbacks($section);
+        if (self::$currentSection !== $section) {
+            // Trigger callbacks when section changes
+            self::$currentSection = $section;
+            self::triggerSectionChangeCallbacks($section);
+        }
     }
 
     public static function getCurrentSection(): ?string
@@ -393,6 +395,13 @@ class Sections
                     $k = $request[$info['key']];
                     // when using wiki_url_scheme the page request var is the page slug, not the page/object name
                     if ($prefs['wiki_url_scheme'] !== 'urlencode' && $info['objectType'] === 'wiki page') {
+                        global $jitRequest;
+                        if ($prefs["feature_sefurl_tracker_prefixalias"] == 'y') {
+                            $referencedPages = TikiLib::lib('wiki')->get_pages_by_alias($k);
+                            if ($referencedPages) {
+                                $k = $referencedPages[0];
+                            }
+                        }
                         $k = TikiLib::lib('wiki')->get_page_by_slug($k);
                     }
                 }
@@ -401,6 +410,23 @@ class Sections
                     'object' => $k,
                 ];
             }
+        }
+
+        // Fallback: resolve a plain wiki page from the request when no other
+        // context is available (e.g. when called before tiki-index.php sets
+        // $cat_type/$cat_objid). The page request var may be a slug.
+        if (! empty($request['page'])) {
+            $pageName = $request['page'];
+            if ($prefs['wiki_url_scheme'] !== 'urlencode') {
+                $resolved = TikiLib::lib('wiki')->get_page_by_slug($pageName);
+                if (! empty($resolved)) {
+                    $pageName = $resolved;
+                }
+            }
+            return [
+                'type' => 'wiki page',
+                'object' => $pageName,
+            ];
         }
     }
 }

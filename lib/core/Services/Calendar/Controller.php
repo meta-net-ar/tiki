@@ -279,6 +279,9 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 $calendarId = $calitem['calendarId'];
                 $calitem['calitemId'] = $calitemId;
                 $calitem['allday'] = empty($calitem['allday']) ? 0 : 1;
+                if (isset($calitem['sendReminder'])) {
+                    $calitem['sendReminder'] = (int) ! empty($calitem['sendReminder']);
+                }
                 $calitem['recurrenceId'] = $input->recurrenceId->int();
                 $calendar = $this->calendarLib->get_calendar($calendarId);
                 $calitem = $this->processParticipants($calitem);
@@ -753,8 +756,12 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
             'daynames'             => $this->daynamesPlural,
             'monthnames'           => $this->monthnames,
             'preview'              => $preview,
+            'modal'                => $input->modal->int(),
             // related tracker items
             'trackerItems'        => ! empty($trackerItems) ? $trackerItems : [],
+            // legacy names expected by templates/calendar/view_item.tpl
+            'listroles'            => ['0' => '', '1' => tra('required'), '2' => tra('optional'), '3' => tra('non-participant')],
+            'listprioritycolors'   => ['fff', 'fdd', 'fcc', 'fbb', 'faa', 'f99', 'e88', 'd77', 'c66', 'b66', 'a66'],
         ];
     }
 
@@ -899,6 +906,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                 }
 
                 $client = new \Tiki\SabreDav\CaldavClient();
+
                 $client->saveCalendarObject($calitem);
                 if (! empty($calitem['calitemId'])) {
                     $calitemId = $calitem['calitemId'];
@@ -922,7 +930,7 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
                         'calendar event'
                     );
                 }
-                if ($prefs['feature_groupalert'] == 'y') {
+                if ($prefs['feature_groupalert'] == 'y' && $calitem['sendReminder']) {
                     if ($input->offsetExists('listtoalert')) {
                         TikiLib::lib('groupalert')->Notify(
                             $input->listtoalert->int(),
@@ -1001,6 +1009,8 @@ class Services_Calendar_Controller extends Services_Calendar_BaseController
         $recurrence->setLang(strLen($calitem['lang']) > 0 ? $calitem['lang'] : 'en');
         $recurrence->setName($calitem['name']);
         $recurrence->setDescription($calitem['description']);
+
+        $recurrence->setSendReminder($calitem['sendReminder']);
         $recurrence->setRecurenceDstTimezone($input->recurrenceDstTimezone->text());
         $recurrence->setUser($calitem['user']);
         $recurrence->setOrganizers($calitem['organizers']);
