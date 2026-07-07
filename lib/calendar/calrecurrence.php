@@ -24,6 +24,7 @@ class CalRecurrence extends TikiLib
     private $lang;
     private $name;
     private $description;
+    private $sendReminder;
     private $daily;
     private $days;
     private $weekly;
@@ -73,7 +74,7 @@ class CalRecurrence extends TikiLib
     {
         $dataExists = false;
         if ($this->getId() > 0) {
-            $query = "SELECT calendarId, start, end, duration, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, daily, days,"
+            $query = "SELECT calendarId, start, end, duration, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, sendReminder, daily, days,"
                      . "weekly, weeks, weekdays, monthly, months, dayOfMonth, monthlyType, monthlyWeekdayValue, monthlyFirstlastWeekdayValue, yearly, years, yearlyType, dateOfYear,"
                      . "yearlyWeekdayValue, yearlyFirstlastWeekdayValue, yearlyWeekMonth, nbRecurrences, startPeriod, endPeriod, user, created, lastModif, uri, uid, recurrenceDstTimezone "
                      . "FROM tiki_calendar_recurrence WHERE recurrenceId = ?";
@@ -94,6 +95,7 @@ class CalRecurrence extends TikiLib
                 $this->setLang($row['lang']);
                 $this->setName($row['name']);
                 $this->setDescription($row['description']);
+                $this->setSendReminder(empty($row['sendReminder']) ? 0 : 1);
                 $this->setDaily($row['daily'] == 1);
                 $this->setDays($row['days']);
                 $this->setWeekly($row['weekly'] == 1);
@@ -138,6 +140,7 @@ class CalRecurrence extends TikiLib
             $this->setLang('');
             $this->setName('');
             $this->setDescription('');
+            $this->setSendReminder(1);
             $this->setDaily(0);
             $this->setDays(1);
             $this->setWeekly(0);
@@ -202,6 +205,9 @@ class CalRecurrence extends TikiLib
         }
         if (isset($data['description'])) {
             $this->setDescription($data['description']);
+        }
+        if (isset($data['sendReminder'])) {
+            $this->setSendReminder($data['sendReminder']);
         }
         if (isset($data['user'])) {
             $this->setUser($data['user']);
@@ -368,10 +374,10 @@ class CalRecurrence extends TikiLib
      */
     private function create()
     {
-        $query = "INSERT INTO tiki_calendar_recurrence (calendarId, start, end, duration, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, "
+        $query = "INSERT INTO tiki_calendar_recurrence (calendarId, start, end, duration, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, sendReminder, "
                  . "daily, days, weekly, weeks, weekdays, monthly, months, dayOfMonth, monthlyType, monthlyWeekdayValue, monthlyFirstlastWeekdayValue, yearly, years, yearlyType, dateOfYear, "
                  . "yearlyWeekdayValue, yearlyFirstlastWeekdayValue, yearlyWeekMonth, nbRecurrences, startPeriod, endPeriod, user, created, lastModif, uri, uid, recurrenceDstTimezone) "
-                 . "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                 . "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         $now = $this->now;
         $bindvars = [
                         $this->getCalendarId(),
@@ -388,6 +394,7 @@ class CalRecurrence extends TikiLib
                         $this->getLang(),
                         $this->getName(),
                         $this->getDescription(),
+                        $this->getSendReminder(),
                         $this->isDaily() ? 1 : 0,
                         $this->getDays(),
                         $this->isWeekly() ? 1 : 0,
@@ -435,7 +442,7 @@ class CalRecurrence extends TikiLib
     private function update($updateManuallyChangedEvents = false)
     {
         $query = "UPDATE tiki_calendar_recurrence SET calendarId = ?, start = ?, end = ?, duration = ?, allday = ?, locationId = ?, categoryId = ?, nlId = ?, priority = ?, status = ?, "
-                 . "url = ?, lang = ?, name = ?, description = ?, daily = ?, days = ?, weekly = ?, weeks = ?, weekdays = ?, monthly = ?, months = ?, dayOfMonth = ?, monthlyType = ?, monthlyWeekdayValue = ?, monthlyFirstlastWeekdayValue = ?, yearly = ?, years = ?, yearlyType = ?, dateOfYear = ?, yearlyWeekdayValue = ?, yearlyFirstlastWeekdayValue = ?, yearlyWeekMonth = ?, nbRecurrences = ?, "
+                 . "url = ?, lang = ?, name = ?, description = ?, sendReminder = ?, daily = ?, days = ?, weekly = ?, weeks = ?, weekdays = ?, monthly = ?, months = ?, dayOfMonth = ?, monthlyType = ?, monthlyWeekdayValue = ?, monthlyFirstlastWeekdayValue = ?, yearly = ?, years = ?, yearlyType = ?, dateOfYear = ?, yearlyWeekdayValue = ?, yearlyFirstlastWeekdayValue = ?, yearlyWeekMonth = ?, nbRecurrences = ?, "
                  . "startPeriod = ?, endPeriod = ?, user = ?, lastModif = ?, uri = ?, uid = ?, recurrenceDstTimezone = ? WHERE recurrenceId = ?";
         $now = time();
         $bindvars = [
@@ -453,6 +460,7 @@ class CalRecurrence extends TikiLib
                         $this->getLang(),
                         $this->getName(),
                         $this->getDescription(),
+                        $this->getSendReminder(),
                         $this->isDaily() ? 1 : 0,
                         $this->getDays(),
                         $this->isWeekly() ? 1 : 0,
@@ -522,6 +530,7 @@ class CalRecurrence extends TikiLib
                 'lang'         => $this->getLang(),
                 'name'         => $this->getName(),
                 'description'  => $this->getDescription(),
+                'sendReminder'  => $this->getsendReminder(),
                 'user'         => $this->getUser(),
                 'created'      => $this->getCreated(),
                 'lastmodif'    => $this->getCreated(),
@@ -569,7 +578,7 @@ class CalRecurrence extends TikiLib
 
 
 
-        $query = "SELECT calitemId,calendarId, start, end, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, "
+        $query = "SELECT calitemId,calendarId, start, end, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, sendReminder, "
                  . "user, created, lastModif, changed, recurrenceStart "
                  . "FROM tiki_calendar_items WHERE recurrenceId = ? ORDER BY start";
         $bindvars = [(int)$this->getId()];
@@ -633,6 +642,7 @@ class CalRecurrence extends TikiLib
                     'lang'         => $this->getLang(),
                     'name'         => $this->getName(),
                     'description'  => $this->getDescription(),
+                    'sendReminder'  => $this->getSendReminder(),
                     'user'         => $this->getUser(),
                     'created'      => $this->getCreated(),
                     'lastmodif'    => $this->getCreated(),
@@ -697,7 +707,7 @@ class CalRecurrence extends TikiLib
      */
     public function getOverrides($changed = null)
     {
-        $query = "SELECT calitemId,calendarId, start, end, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, "
+        $query = "SELECT calitemId,calendarId, start, end, allday, locationId, categoryId, nlId, priority, status, url, lang, name, description, sendReminder, "
                  . "user, created, lastModif, changed, recurrenceStart "
                  . "FROM tiki_calendar_items WHERE recurrenceId = ?";
         $bindvars = [(int)$this->getId()];
@@ -754,6 +764,9 @@ class CalRecurrence extends TikiLib
         }
         if ($this->getDescription() != $oldRec->getDescription()) {
             $result[] = "description";
+        }
+        if ($this->getSendReminder() != $oldRec->getSendReminder()) {
+            $result[] = "sendReminder";
         }
         if ($this->isDaily() && ($this->getDays() != $oldRec->getDays())) {
             $result[] = "_days";
@@ -986,6 +999,11 @@ class CalRecurrence extends TikiLib
         }
         if (! empty($this->getDescription())) {
             $data['DESCRIPTION'] = $this->getDescription();
+        }
+        if (! empty($this->getSendReminder())) {
+            $data['X-Tiki-sendReminder'] = $this->getSendReminder();
+        } else {
+            $data['X-Tiki-sendReminder'] = 0;
         }
         $locations = TikiLib::lib('calendar')->list_locations($this->getCalendarId());
         if (! empty($locations[$this->getLocationId()])) {
@@ -1331,6 +1349,19 @@ class CalRecurrence extends TikiLib
     public function setDescription($value)
     {
         $this->description = $value;
+    }
+
+    public function getSendReminder()
+    {
+        return $this->sendReminder;
+    }
+
+    /**
+     * @param $value
+     */
+    public function setSendReminder($value)
+    {
+        $this->sendReminder = $value;
     }
 
     public function isDaily()
