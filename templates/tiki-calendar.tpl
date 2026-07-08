@@ -122,10 +122,9 @@
             {else}
                 {jq}
                     var printingParams = {pdf_export: '{{$pdf_export}}', pdf_warning: '{{$pdf_warning}}', pref_print_pdf_from_url: '{{$prefs.print_pdf_from_url}}'};
-                    $('.calendar-container').defineParameterOfMultipleCalendar({{$eventCalendarParams|json_encode}}, printingParams, '.calendar-container', {{$eventCalendarParams.initialDate|json_encode}}, undefined, undefined, undefined);
+                    $('.calendar-container').defineParameterOfMultipleCalendar({{$eventCalendarParams|json_encode}}, printingParams, '.calendar-container', {{$eventCalendarParams.initialDate|json_encode}}, undefined, undefined, undefined, {{$defaultCalendarId}});
                 {/jq}
             {/if}
-            
             <div class='calendar-container'></div>
         </div>
         
