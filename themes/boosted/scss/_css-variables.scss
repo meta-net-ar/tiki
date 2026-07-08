@@ -142,8 +142,10 @@
 }
 
 // Improve appearance when two areas with same background color meet
-.navbar-wrapper:has(.tiki-admin-aside-nav-light) {
-    box-shadow: 5px 0 10px -5px #e3e1e1;
+@media (min-width: 992px) {
+    .navbar-wrapper:has(.tiki-admin-aside-nav-light, .tiki-admin-aside-nav-dark) {
+        box-shadow: 5px 0 10px -5px #e3e1e1;
+    }
 }
 
 // Dark navbar minus top nav
