@@ -10,6 +10,7 @@ namespace Tiki\Test\Core\Services\User;
 use JitFilter;
 use PHPUnit\Framework\TestCase;
 use Services_User_Controller as ServicesUserController;
+use TikiLib;
 
 class ServicesUserControllerTest extends TestCase
 {
@@ -31,6 +32,12 @@ class ServicesUserControllerTest extends TestCase
         // Fake referer used by controller redirects
         $_SERVER['HTTP_REFERER'] = 'http://example.com/some/page';
 
+        // redirectAndReturn() calls TikiAccessLib::redirect(), which ends the
+        // request with exit(); preventRedirect() makes it a no-op so the
+        // controller's return value can still be asserted (same pattern used
+        // by lib/core/Services/Tracker/Controller.php and searchlib-unified.php).
+        TikiLib::lib('access')->preventRedirect(true);
+
         self::$originalTimezone = $prefs['display_timezone'];
         $this->originalUserSyncPref = $prefs['user_localtimezonesync'];
     }
@@ -41,6 +48,8 @@ class ServicesUserControllerTest extends TestCase
 
         $prefs['display_timezone'] = self::$originalTimezone;
         $prefs['user_localtimezonesync'] = $this->originalUserSyncPref;
+
+        TikiLib::lib('access')->preventRedirect(false);
 
         unset($_SESSION['temp_timezone']);
         unset($_SERVER['HTTP_REFERER']);
