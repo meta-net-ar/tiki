@@ -116,10 +116,17 @@
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
 }
 
+aside.admin-nav .navbar {
+    border: none;
+}
+
 // Improve appearance when two areas with same background color meet
-//.navbar-wrapper:has(.tiki-admin-aside-nav-light) {
-//    box-shadow: 5px 0 10px -5px #e3e1e1;
-//}
+@media (min-width: 992px) {
+    .navbar-wrapper:has(.tiki-admin-aside-nav-light, .tiki-admin-aside-nav-dark) {
+        border-right: 2px solid #000;
+        box-shadow: 5px 0 10px -5px #e3e1e1;
+    }
+}
 
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
@@ -147,6 +154,8 @@
         background-image:  url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%2366bad6'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
     }
 }
+
+
 
 // When color mode switch isn't active
 .tiki-admin-top-nav-light, // Legacy
