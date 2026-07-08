@@ -203,6 +203,7 @@ function buildStabilityIgnoreMap($packageHistory)
  */
 function isPackageIgnored($package, $version, $ignoreMap)
 {
+    // Packages in composer.json extra.stability-ignore are treated as [MITIGATED]
     return isset($ignoreMap[$version][$package]);
 }
 
@@ -273,12 +274,14 @@ function getAvailableTikiVersions()
  */
 function getVersionsToCheck()
 {
+    // global $isCiMode: write file-scope flag so logging/reporting functions see --ci
     global $argv, $isCiMode;
     $args = array_slice($argv, 1);
 
     $isCiMode = false;
     $filteredArgs = [];
 
+    // Strip --ci from args; remaining tokens are branch names or "current"
     for ($i = 0, $count = count($args); $i < $count; $i++) {
         $arg = $args[$i];
         if ($arg === '--ci') {
@@ -351,6 +354,8 @@ function getSmartVersionOrder()
     }
 
     if ($currentBranch !== $targetBranch) {
+        // Insert the current feature branch right after its merge target
+        // so chronological comparisons include it in the right place
         $orderedVersions = array_merge(
             array_slice($orderedVersions, 0, $targetPosition + 1),
             [$currentBranch],
@@ -399,15 +404,18 @@ function isLessStable($version1, $version2)
         $stability1 = extractStabilityFromVersion($version1);
         $stability2 = extractStabilityFromVersion($version2);
 
+        // If stabilities differ, compare stability levels
         if ($stability1 !== $stability2) {
             $levels = array_keys(STABILITY_LEVELS);
             return array_search($stability1, $levels) < array_search($stability2, $levels);
         }
 
+        // For same stability, compare actual versions
         $normalized1 = getVersionParser()->normalize($version1);
         $normalized2 = getVersionParser()->normalize($version2);
         return Comparator::lessThan($normalized1, $normalized2);
     } catch (\UnexpectedValueException $e) {
+        // Fallback when Composer cannot normalize the constraint
         return version_compare($version1, $version2) < 0;
     }
 }
@@ -435,6 +443,7 @@ function getNormalizedBaseVersion(string $constraint): string
 {
     $parser = getVersionParser();
 
+    // Return raw dev branches as-is since they cannot be normalized
     if (str_starts_with($constraint, 'dev-') || $constraint === 'dev-master') {
         return $constraint;
     }
@@ -536,6 +545,7 @@ function isConstraintStyleChange($prevBase, $currentBase)
     }
     $prevParts = explode('.', $prevBase);
     $currentParts = explode('.', $currentBase);
+    // Treat ^1.2 vs ~1.2 as a constraint-style change, not a version downgrade
     return $prevParts[0] === $currentParts[0] && $prevParts[1] === $currentParts[1];
 }
 
@@ -570,6 +580,7 @@ function determinePackageStatus($package, $history, $ignoreMap)
     }
 
     if (! $hasUnstableVersions) {
+        // [MITIGATED] only applies when unstable versions exist and are all ignored
         $allVersionsMitigated = false;
     }
 
@@ -777,6 +788,7 @@ function fetchComposerDataForVersions($versionsToCheck, $currentBranch)
  */
 function resolveMergeBaseSha(): ?string
 {
+    // Prefer GitLab-provided MR diff base; fall back to git merge-base if unavailable
     $diffBaseSha = getenv('CI_MERGE_REQUEST_DIFF_BASE_SHA');
     if ($diffBaseSha !== false && $diffBaseSha !== '') {
         $diffBaseSha = trim($diffBaseSha);
@@ -1064,6 +1076,7 @@ function analyzePackageStabilityAndRegressions(&$packageHistory, $versionsToChec
                 $previousStability !== null &&
                 getStabilityNumeric($currentStability) < getStabilityNumeric($previousStability)
             ) {
+                // Stability regression across Tiki branches (e.g. stable -> beta)
                 $history['_metadata']['has_regressions'] = true;
                 if ($currentStability === 'stable' && $previousStability === 'stable') {
                     $history['_metadata']['has_stable_regressions'] = true;
@@ -1071,6 +1084,7 @@ function analyzePackageStabilityAndRegressions(&$packageHistory, $versionsToChec
             }
 
             if ($currentStability === 'stable' && $currentBase && $highestBaseVersionSeen) {
+                // Stable numeric downgrade (e.g. ^2.1 -> ^1.8); skip constraint-style changes
                 $highestBase = getNormalizedBaseVersion($highestBaseVersion);
                 if ($highestBase && version_compare($currentBase, $highestBase) < 0) {
                     if (isConstraintStyleChange($currentBase, $highestBase)) {
@@ -1793,9 +1807,11 @@ function analyzeCurrentBranchAgainstAcceptedState($packageHistory, $versionsToCh
     $currentBranch = getCheckedOutBranchName();
 
     if (! $currentBranch || ! $isCiMode) {
+        // Accepted-state / responsibility checks apply only in CI on a real branch
         return ['shouldFail' => false, 'newIssues' => [], 'existingIssues' => []];
     }
 
+    // Stable branches = all compared versions except the current feature branch
     $stableVersions = array_filter($versionsToCheck, function ($version) use ($currentBranch) {
         return $version !== $currentBranch;
     });
@@ -2063,6 +2079,7 @@ function analyzePackageCurrentBranch($package, $history, $metadata, $currentBran
         $highestStableTikiVersion = null;
 
         foreach ($versions as $version) {
+            // Only consider branches before the current one to establish the accepted baseline
             if ($version['tiki_version'] === $currentBranch) {
                 break;
             }
@@ -2128,6 +2145,7 @@ function analyzePackageVersionDowngrades($package, $history, $metadata, $version
                 continue;
             }
 
+            // Downgrades on the current branch are handled by analyzePackageCurrentBranch()
             if ($current['tiki_version'] === $currentBranch) {
                 continue;
             } else {
@@ -2296,6 +2314,7 @@ if ($isCiMode) {
             $ignoreMap
         );
     }
+    // Warn (exit 1) on legacy accepted-state issues not covered by ignore rules
     $hasWarnings = $unmitigatedCount > 0;
 
     renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHistory, $ignoreMap, $unmitigatedCount);
@@ -2306,6 +2325,7 @@ if ($isCiMode) {
     $junitReport = generateJUnitReport($junitIssues, []);
     file_put_contents('composer-stability-report.xml', $junitReport);
 
+    // Fail on new issues in touched packages, or on unmitigated accepted-state warnings
     $exitCode = ($acceptedStateAnalysis['shouldFail'] || $hasWarnings) ? 1 : 0;
 
     exit($exitCode);
