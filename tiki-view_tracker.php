@@ -29,14 +29,14 @@ $inputConfiguration = [
             'offset'             => 'int',           //get
             'maxRecords'         => 'int',           //get
             'filterfield'        => 'word',          //get
-            'filtervalue_other'  => 'word',          //get
+            'filtervalue_other'  => 'text',          //get
             'displayedFields'    => 'word',          //get
         ],
         'staticKeyFiltersForArrays' => [
             'action'                => 'string',    //get
             'vals'                  => 'none',      //get
             'sort_mode'             => 'alnumdash', //get
-            'filtervalue'           => 'word',
+            'filtervalue'           => 'text',
         ],
     ],
 ];
