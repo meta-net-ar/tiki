@@ -46,8 +46,6 @@ use Composer\Semver\Comparator;
 
 static $versionParser = null;
 $isCiMode = false;
-$debugTouchedComposerDataRequireMd5AfterLoading = null;
-$debugTouchedComposerDataRequireCountAfterLoading = null;
 
 function getVersionParser()
 {
@@ -278,19 +276,17 @@ function getVersionsToCheck()
     global $argv, $isCiMode;
     $args = array_slice($argv, 1);
 
-    $ciMode = false;
+    $isCiMode = false;
     $filteredArgs = [];
 
     for ($i = 0, $count = count($args); $i < $count; $i++) {
         $arg = $args[$i];
         if ($arg === '--ci') {
-            $ciMode = true;
+            $isCiMode = true;
         } else {
             $filteredArgs[] = $arg;
         }
     }
-
-    $isCiMode = $ciMode;
 
     if (empty($filteredArgs)) {
         // No specific versions specified, use smart detection
@@ -339,7 +335,6 @@ function getVersionsToCheck()
  */
 function getSmartVersionOrder()
 {
-    global $isCiMode;
     $targetBranch = getTargetBranch();
     $currentBranch = getCheckedOutBranchName();
     $availableVersions = getAvailableTikiVersions();
@@ -714,7 +709,6 @@ function logInfo($message, $context = [], $returnValue = null)
  */
 function buildPackageHistory($versionsToCheck)
 {
-    global $isCiMode;
     $packageHistory = [];
     $currentBranch = getCheckedOutBranchName();
 
@@ -730,21 +724,10 @@ function buildPackageHistory($versionsToCheck)
 }
 
 /**
- * Temporary debug output for getTouchedPackages() investigation.
- * Search for "### DEBUG-TOUCHED ###" to remove all instrumentation.
- */
-function debugTouched($message)
-{
-    echo '### DEBUG-TOUCHED ### ' . $message . "\n";
-}
-
-/**
  * Fetch composer.json data for all versions
  */
 function fetchComposerDataForVersions($versionsToCheck, $currentBranch)
 {
-    global $debugTouchedComposerDataRequireMd5AfterLoading, $debugTouchedComposerDataRequireCountAfterLoading;
-
     $composerData = [];
 
     foreach ($versionsToCheck as $version) {
@@ -752,22 +735,12 @@ function fetchComposerDataForVersions($versionsToCheck, $currentBranch)
 
         if ($version === $currentBranch) {
             $localComposerPath = PRIMARY_COMPOSERJSON_FILE_PATH;
-            $composerRealpath = realpath($localComposerPath);
-            debugTouched('Composer path: ' . $localComposerPath);
-            debugTouched('Composer realpath: ' . ($composerRealpath !== false ? $composerRealpath : '(not resolved)'));
-            debugTouched('Composer exists: ' . (file_exists($localComposerPath) ? 'yes' : 'no'));
-            debugTouched('Composer size: ' . (file_exists($localComposerPath) ? (string) filesize($localComposerPath) : 'n/a'));
-            debugTouched('Composer md5: ' . (file_exists($localComposerPath) ? md5_file($localComposerPath) : 'n/a'));
-
             if (file_exists($localComposerPath)) {
                 $composer = getComposerJson([
                     'path' => $localComposerPath,
                     'type' => 'local'
                 ]);
                 if ($composer) {
-                    debugTouched('Loaded composer name: ' . ($composer['name'] ?? '(none)'));
-                    debugTouched('Loaded require count: ' . count($composer['require'] ?? []));
-                    debugTouched('Loaded require-dev count: ' . count($composer['require-dev'] ?? []));
                     logInfo("Using local composer.json for current branch: {$currentBranch}");
                 } else {
                     logError("Failed to parse local composer.json. Please check for JSON syntax errors.");
@@ -791,20 +764,6 @@ function fetchComposerDataForVersions($versionsToCheck, $currentBranch)
         }
 
         $composerData[$version] = $composer;
-
-        if ($version === $currentBranch) {
-            debugTouched('composerData branch: ' . $currentBranch);
-            debugTouched('composerData composer name: ' . ($composer['name'] ?? '(none)'));
-            debugTouched('composerData require count: ' . count($composer['require'] ?? []));
-            debugTouched('composerData require-dev count: ' . count($composer['require-dev'] ?? []));
-        }
-    }
-
-    if ($currentBranch && isset($composerData[$currentBranch]['require'])) {
-        $debugTouchedComposerDataRequireMd5AfterLoading = md5(json_encode($composerData[$currentBranch]['require']));
-        $debugTouchedComposerDataRequireCountAfterLoading = count($composerData[$currentBranch]['require']);
-        debugTouched('composerData require MD5 after loading: ' . $debugTouchedComposerDataRequireMd5AfterLoading);
-        debugTouched('After loading require count: ' . $debugTouchedComposerDataRequireCountAfterLoading);
     }
 
     return $composerData;
@@ -822,8 +781,6 @@ function resolveMergeBaseSha(): ?string
     if ($diffBaseSha !== false && $diffBaseSha !== '') {
         $diffBaseSha = trim($diffBaseSha);
         if (preg_match('/^[0-9a-f]{40}$/i', $diffBaseSha) && gitCommitObjectExists($diffBaseSha)) {
-            debugTouched('Merge-base source: CI_MERGE_REQUEST_DIFF_BASE_SHA');
-            debugTouched('Merge-base SHA: ' . $diffBaseSha);
             return $diffBaseSha;
         }
         if (preg_match('/^[0-9a-f]{40}$/i', $diffBaseSha)) {
@@ -834,23 +791,17 @@ function resolveMergeBaseSha(): ?string
     }
 
     $targetBranch = resolveMergeTargetBranchName();
-    debugTouched('Merge target branch: ' . $targetBranch);
 
     $targetRef = resolveTargetRefForMergeBase($targetBranch);
     if ($targetRef === null) {
         return null;
     }
 
-    debugTouched('Merge-base source: git merge-base');
-    debugTouched('Merge-base ref: ' . $targetRef);
-
     $mergeBase = getGitMergeBase($targetRef, 'HEAD');
     if ($mergeBase === null) {
         logWarning("Could not determine merge-base between {$targetBranch} and HEAD");
         return null;
     }
-
-    debugTouched('Merge-base SHA: ' . $mergeBase);
 
     return $mergeBase;
 }
@@ -974,9 +925,6 @@ function getComposerJsonFromGitRef($gitRef)
  */
 function diffComposerRequireSections($baseRequire, $headRequire)
 {
-    debugTouched('diffComposerRequireSections base package count: ' . count($baseRequire));
-    debugTouched('diffComposerRequireSections head package count: ' . count($headRequire));
-
     $touched = [];
     $allPackages = array_unique(array_merge(
         array_keys($baseRequire),
@@ -999,22 +947,6 @@ function diffComposerRequireSections($baseRequire, $headRequire)
         }
     }
 
-    debugTouched('Touched package count: ' . count($touched));
-
-    if (! empty($touched)) {
-        debugTouched('First touched packages:');
-        $i = 0;
-        foreach (array_keys($touched) as $package) {
-            if ($i >= 20) {
-                break;
-            }
-            $from = $touched[$package]['from'] ?? 'null';
-            $to = $touched[$package]['to'] ?? 'null';
-            debugTouched('  - ' . $package . ' (' . $from . ' -> ' . $to . ')');
-            $i++;
-        }
-    }
-
     return $touched;
 }
 
@@ -1030,28 +962,10 @@ function getTouchedPackages($composerData, $currentBranch)
         return [];
     }
 
-    debugTouched('Current branch: ' . $currentBranch);
-
     $mergeBase = resolveMergeBaseSha();
     if (! $mergeBase) {
         return [];
     }
-
-    $mergeBaseSummary = trim((string) shell_exec(
-        'git log --oneline -1 ' . escapeshellarg($mergeBase) . ' 2>nul'
-    ));
-    debugTouched('Merge base commit: ' . ($mergeBaseSummary !== '' ? $mergeBaseSummary : '(unknown)'));
-
-    $mergeBaseRawComposer = shell_exec(
-        'git show ' . escapeshellarg($mergeBase . ':' . PRIMARY_COMPOSERJSON_FILE_PATH) . ' 2>nul'
-    );
-    $mergeBaseRawComposer = $mergeBaseRawComposer ?? '';
-    debugTouched('Merge-base composer size: ' . strlen($mergeBaseRawComposer));
-    debugTouched('Merge-base composer md5: ' . ($mergeBaseRawComposer !== '' ? md5($mergeBaseRawComposer) : '(empty)'));
-
-    $workingTreeRawComposer = file_get_contents(PRIMARY_COMPOSERJSON_FILE_PATH);
-    debugTouched('Working tree composer size: ' . ($workingTreeRawComposer !== false ? strlen($workingTreeRawComposer) : 0));
-    debugTouched('Working tree composer md5: ' . ($workingTreeRawComposer !== false ? md5($workingTreeRawComposer) : '(failed)'));
 
     $baseComposer = getComposerJsonFromGitRef($mergeBase);
     if (! $baseComposer) {
@@ -1059,47 +973,8 @@ function getTouchedPackages($composerData, $currentBranch)
         return [];
     }
 
-    debugTouched('Base composer loaded');
     $baseRequire = $baseComposer['require'] ?? [];
-    debugTouched('Base require count: ' . count($baseRequire));
-
     $headRequire = $composerData[$currentBranch]['require'] ?? [];
-    debugTouched('HEAD require count: ' . count($headRequire));
-    debugTouched('Inside getTouchedPackages require count: ' . count($headRequire));
-
-    debugTouched('Base require MD5: ' . md5(json_encode($baseRequire)));
-    debugTouched('Head require MD5: ' . md5(json_encode($headRequire)));
-
-    $baseToHeadDiff = array_diff_assoc($baseRequire, $headRequire);
-    $headToBaseDiff = array_diff_assoc($headRequire, $baseRequire);
-
-    debugTouched('Base->Head differences: ' . count($baseToHeadDiff));
-    if (! empty($baseToHeadDiff)) {
-        debugTouched('Sample:');
-        $i = 0;
-        foreach ($baseToHeadDiff as $package => $version) {
-            if ($i >= 10) {
-                break;
-            }
-            $headVersion = $headRequire[$package] ?? 'null';
-            debugTouched('  ' . $package . ': ' . $version . ' -> ' . $headVersion);
-            $i++;
-        }
-    }
-
-    debugTouched('Head->Base differences: ' . count($headToBaseDiff));
-    if (! empty($headToBaseDiff)) {
-        debugTouched('Sample:');
-        $i = 0;
-        foreach ($headToBaseDiff as $package => $version) {
-            if ($i >= 10) {
-                break;
-            }
-            $baseVersion = $baseRequire[$package] ?? 'null';
-            debugTouched('  ' . $package . ': ' . $version . ' (base was: ' . $baseVersion . ')');
-            $i++;
-        }
-    }
 
     return diffComposerRequireSections($baseRequire, $headRequire);
 }
@@ -1952,22 +1827,6 @@ function analyzeCurrentBranchAgainstAcceptedState($packageHistory, $versionsToCh
     }
 
     $existingIssues = aggregateExistingIssues($existingIssues);
-
-    if ($currentBranch && isset($globalComposerData[$currentBranch]['require'])) {
-        $requireMd5BeforeTouched = md5(json_encode($globalComposerData[$currentBranch]['require']));
-        $requireCountBeforeTouched = count($globalComposerData[$currentBranch]['require']);
-        debugTouched('composerData require MD5 before getTouchedPackages(): ' . $requireMd5BeforeTouched);
-        debugTouched('Before getTouchedPackages require count: ' . $requireCountBeforeTouched);
-        global $debugTouchedComposerDataRequireMd5AfterLoading, $debugTouchedComposerDataRequireCountAfterLoading;
-        if ($debugTouchedComposerDataRequireMd5AfterLoading !== null
-            && $debugTouchedComposerDataRequireMd5AfterLoading !== $requireMd5BeforeTouched) {
-            debugTouched('composerData require MD5 MUTATED since loading');
-        }
-        if ($debugTouchedComposerDataRequireCountAfterLoading !== null
-            && $debugTouchedComposerDataRequireCountAfterLoading !== $requireCountBeforeTouched) {
-            debugTouched('composerData require count MUTATED since loading');
-        }
-    }
 
     $touchedPackages = getTouchedPackages($globalComposerData, $currentBranch);
 
