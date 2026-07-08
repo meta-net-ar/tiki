@@ -90,7 +90,7 @@ $imagePath: "../images/";
     #editpageform .actions .btn-link,
     .module:not(.card) .btn-link,
     .no-decorations a, // This may need more specificity to prevent instances inside styling-element, etc.
-    .no-box a, // This may need more specificity to prevent instances inside styling-element, etc.
+    .no-box > a, // This may need more specificity to prevent instances inside styling-element, etc.
     .top_modules > .module {
         color: var(--tiki-nonmode-link-color);
         &:hover {
@@ -164,6 +164,8 @@ main > form:not(#editpageform), // Categories
 main > .tab-content, // Wiki list pages
 #editpageform .tab-content, // Edit wiki page
 main > .table-responsive, // Wiki last changes
+
+div:not(.color-mode-content) .tab-content, // PluginTabs, etc.
 
 // Blogs
 .card.blogpost,
