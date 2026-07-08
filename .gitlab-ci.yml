@@ -925,7 +925,7 @@ composer-stability:
     - php doc/devtools/check_composer_stability.php --ci
   rules:
     - changes:
-        - "**/comer.json"
+        - "**/composer.json"
   artifacts:
     when: always
     reports:

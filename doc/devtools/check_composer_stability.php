@@ -21,13 +21,12 @@
  *   php check_composer_stability.php 24.x 26.x master  # Compare specific branches
  *   php check_composer_stability.php 28.x current # Compare 28.x with current branch
  *   php check_composer_stability.php current 29.x master # Compare current branch with 29.x and master
- *   php check_composer_stability.php --ci --target master current  # CI mode with explicit merge target
+ *   php check_composer_stability.php --ci current  # CI mode
  *
  * Available versions: 24.x, 27.x, 30.x, master
  *
  * Options:
  *   --ci       Enable CI mode (responsibility filtering, exit codes, JUnit report)
- *   --target   Merge target branch for touched-package detection (default: TWV-derived or CI MR target)
  *
  * Output:
  * - Lists packages with unstable versions
@@ -47,7 +46,6 @@ use Composer\Semver\Comparator;
 
 static $versionParser = null;
 $isCiMode = false;
-$cliMergeTargetBranch = null;
 $debugTouchedComposerDataRequireMd5AfterLoading = null;
 $debugTouchedComposerDataRequireCountAfterLoading = null;
 
@@ -93,7 +91,7 @@ function getTargetBranch()
 /**
  * Get the current working branch name
  */
-function getCurrentBranch()
+function getCheckedOutBranchName()
 {
     if (getenv('CI_COMMIT_REF_NAME')) {
         return getenv('CI_COMMIT_REF_NAME');
@@ -277,24 +275,16 @@ function getAvailableTikiVersions()
  */
 function getVersionsToCheck()
 {
-    global $argv, $isCiMode, $cliMergeTargetBranch;
+    global $argv, $isCiMode;
     $args = array_slice($argv, 1);
 
     $ciMode = false;
     $filteredArgs = [];
-    $cliMergeTargetBranch = null;
 
     for ($i = 0, $count = count($args); $i < $count; $i++) {
         $arg = $args[$i];
         if ($arg === '--ci') {
             $ciMode = true;
-        } elseif ($arg === '--target') {
-            $i++;
-            if ($i < $count) {
-                $cliMergeTargetBranch = $args[$i];
-            } else {
-                logWarning('--target requires a branch name');
-            }
         } else {
             $filteredArgs[] = $arg;
         }
@@ -308,7 +298,7 @@ function getVersionsToCheck()
     }
 
     $availableVersions = getAvailableTikiVersions();
-    $currentBranch = getCurrentBranch();
+    $currentBranch = getCheckedOutBranchName();
     $versionsToCheck = [];
 
     foreach ($filteredArgs as $arg) {
@@ -351,7 +341,7 @@ function getSmartVersionOrder()
 {
     global $isCiMode;
     $targetBranch = getTargetBranch();
-    $currentBranch = getCurrentBranch();
+    $currentBranch = getCheckedOutBranchName();
     $availableVersions = getAvailableTikiVersions();
 
     if (! $currentBranch || $currentBranch === $targetBranch) {
@@ -596,7 +586,7 @@ function determinePackageStatus($package, $history, $ignoreMap)
  */
 function isPackageIgnoredInAcceptedState($package, $versionsToCheck, $ignoreMap)
 {
-    $currentBranch = getCurrentBranch();
+    $currentBranch = getCheckedOutBranchName();
     if (! $currentBranch) {
         return false;
     }
@@ -726,7 +716,7 @@ function buildPackageHistory($versionsToCheck)
 {
     global $isCiMode;
     $packageHistory = [];
-    $currentBranch = getCurrentBranch();
+    $currentBranch = getCheckedOutBranchName();
 
     global $globalComposerData;
     $globalComposerData = fetchComposerDataForVersions($versionsToCheck, $currentBranch);
@@ -870,15 +860,9 @@ function resolveMergeBaseSha(): ?string
  */
 function resolveMergeTargetBranchName(): string
 {
-    global $cliMergeTargetBranch;
-
     $mrTarget = getenv('CI_MERGE_REQUEST_TARGET_BRANCH_NAME');
     if ($mrTarget !== false && $mrTarget !== '') {
         return $mrTarget;
-    }
-
-    if (! empty($cliMergeTargetBranch)) {
-        return $cliMergeTargetBranch;
     }
 
     return getTargetBranch();
@@ -1686,6 +1670,21 @@ function splitExistingIssuesByType($existingIssues)
 }
 
 /**
+ * Format a bracketed, comma-separated package list for CI summary lines.
+ */
+function formatPackageListForSummary(array $issues): string
+{
+    if ($issues === []) {
+        return '';
+    }
+
+    $packages = array_values(array_unique(array_column($issues, 'package')));
+    sort($packages, SORT_STRING);
+
+    return ' [' . implode(', ', $packages) . ']';
+}
+
+/**
  * Summary
  */
 function renderExecutiveSummary($acceptedStateAnalysis, $hasWarnings, $packageHistory, $ignoreMap, $unmitigatedCount = 0)
@@ -1916,7 +1915,7 @@ function renderNonCiExecutiveSummary($packageHistory, $versionsToCheck)
 function analyzeCurrentBranchAgainstAcceptedState($packageHistory, $versionsToCheck, $ignoreMap = [])
 {
     global $isCiMode, $globalComposerData;
-    $currentBranch = getCurrentBranch();
+    $currentBranch = getCheckedOutBranchName();
 
     if (! $currentBranch || ! $isCiMode) {
         return ['shouldFail' => false, 'newIssues' => [], 'existingIssues' => []];
@@ -1987,9 +1986,13 @@ function analyzeCurrentBranchAgainstAcceptedState($packageHistory, $versionsToCh
     $shouldFail = ! empty($filteredIssues);
 
     if ($isCiMode) {
-        echo "Issues Introduced by Current Branch: " . count($currentBranchIssues) . "\n";
+        echo "Issues detected on current branch: "
+            . count($currentBranchIssues)
+            . formatPackageListForSummary($currentBranchIssues) . "\n";
         echo "Touched packages: " . count($touchedPackages) . "\n";
-        echo "Issues on touched packages: " . count($filteredIssues) . "\n";
+        echo "Issues on touched packages (CI responsibility): "
+            . count($filteredIssues)
+            . formatPackageListForSummary($filteredIssues) . "\n";
         echo "Existing accepted-state issues: " . count($existingIssues) . "\n";
     }
 
@@ -2409,7 +2412,7 @@ if (! $currentVersion) {
 }
 
 $versionsToCheck = getVersionsToCheck();
-$currentBranch = getCurrentBranch();
+$currentBranch = getCheckedOutBranchName();
 $targetBranch = getTargetBranch();
 
 echo "Current Tiki Branch: {$currentVersion}\n";
