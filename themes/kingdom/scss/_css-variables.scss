@@ -428,8 +428,11 @@ body:not(.tiki-admin) .tiki-top-nav-dark .sm-nav-link[aria-expanded=true] {
     --tiki-topbar-box-shadow: 0 2px 12px rgba(10, 37, 64, 0.2);
 }
 
-.navbar-wrapper:has(.tiki-admin-aside-nav-light) {
-    box-shadow: 5px 0 14px -6px rgba(11, 60, 93, 0.25);
+// Improve appearance when two areas with same background color meet
+@media (min-width: 992px) {
+    .navbar-wrapper:has(.tiki-admin-aside-nav-light, .tiki-admin-aside-nav-dark) {
+        box-shadow: 5px 0 14px -6px rgba(11, 60, 93, 0.25);
+    }
 }
 
 .tiki-admin-top-nav-light,
