@@ -316,8 +316,12 @@ import { defaults as defaultControls } from "ol/control";
             let id = $(this).attr("id"),
                 container = this,
                 desiredControls;
-            let selectionInteraction;
-            const cluster = $(container).data("cluster");
+            let selectionInteraction,
+                cluster = $(container).data("cluster");
+
+            if (cluster === "") {
+                cluster = 25;   // default cluster size, probably should be a pref?
+            }
 
             // Shared style functions for all map features (accessible from both clustered and non-clustered layers)
             // Get feature color key from coordinates for stable lookup
@@ -1781,6 +1785,10 @@ import { defaults as defaultControls } from "ol/control";
                                         feature.set("content", item.title);
                                         if ($(container).data("clusterexcludefield")) {
                                             feature.set("nocluster", item[`tracker_field_${$(container).data("clusterexcludefield")}`] === "y");
+                                        }
+                                        if ($(container).data("clusterincludefield")) {
+                                            const includeValue = item[`tracker_field_${$(container).data("clusterincludefield")}`];
+                                            feature.set("nocluster", includeValue === "n" || includeValue === null);
                                         }
                                         if (!feature.get("color")) {
                                             feature.set("color", defaultVectorColor);
