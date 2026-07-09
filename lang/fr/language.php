@@ -12041,6 +12041,7 @@ $lang_current = array(
 "PDF.js feature is disabled. If you do not have permission to enable, ask the site administrator to activate 'fgal_pdfjs_feature'." => "La fonctionnalité PDF.js est désactivée. Si vous n'avez pas la permission de l'activer, demandez à l'administrateur du site d'activer 'fgal_pdfjs_feature'.",
 "PluginMediaPlayer: The file is not a text file." => "PluginMediaPlayer: Le fichier n'est pas un fichier texte.",
 "PluginMediaPlayer: Unable to open the file %0. It may not exist or is inaccessible." => "PluginMediaPlayer: Impossible d'ouvrir le fichier %0. Il peut ne pas exister ou il est inaccessible.",
+"PluginMediaPlayer failed to reach the remote server: %0." => "Le plugin MediaPlayer n'a pas pu atteindre le serveur distant: %0.",
 "Download file" => "Télécharger le fichier",
 "Member List" => "Liste des membres",
 "List and allow editing of group members" => "Lister et autoriser la modification des membres du groupe",

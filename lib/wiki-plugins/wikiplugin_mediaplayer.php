@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use Tiki\Package\VendorHelper;
 
 const AUDIO_ACCEPTED_FORMATS = ['mp3', 'ogg', 'wav', 'aac', 'flac', 'opus'];
@@ -159,16 +161,23 @@ function wikiplugin_mediaplayer($data, $params)
                     }
                 }
             } else {
-                // External link.
-                $headers = get_headers($sourceLink, 1);
-
-                // Check if the file exists on the remote server.
-                if ($headers === false || ! isset($headers['Content-Disposition'])) {
-                    Feedback::error(tr("PluginMediaPlayer: File %0 not found on the remote server.", $params['src']));
+                // get file Headers information
+                $headers = [];
+                $client = new Client();
+                try {
+                    $response = $client->head($sourceLink);
+                    $headers = $response->getHeaders();
+                } catch (ClientException $e) {
+                    $message = tr('PluginMediaPlayer: File %0 not found on the remote server.', $params['src']);
+                    if ($e->getResponse()->getStatusCode() !== 404) {
+                        $message = tr('PluginMediaPlayer failed to reach the remote server: %0.', $e->getResponse()->getReasonPhrase());
+                    }
+                    Feedback::error($message);
                     return '';
                 }
+
                 if (isset($headers['Content-Disposition'])) {
-                    $disposition = $headers['Content-Disposition'];
+                    $disposition = $headers['Content-Disposition'][0];
                     if (preg_match('/filename="(.+)"/', $disposition, $matches)) {
                         $filename = $matches[1];
                         $extension = pathinfo($filename, PATHINFO_EXTENSION);

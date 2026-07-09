@@ -602,6 +602,8 @@ function wikiplugin_img($data, $params)
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
 
+    $pluginInfo = wikiplugin_img_info();
+
     $imgdata = [];
     $imgdata['galleryId'] = '';
     $imgdata['alt'] = '';

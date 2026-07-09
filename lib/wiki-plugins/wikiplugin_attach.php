@@ -172,6 +172,8 @@ function wikiplugin_attach($data, $params)
 
     $wikilib = TikiLib::lib('wiki');
     $tikilib = TikiLib::lib('tiki');
+    $params = WikiPlugin_Helper::applyParamsDefaults($params, wikiplugin_attach_info());
+
     extract($params, EXTR_SKIP);
 
     $loop = [];
@@ -216,7 +218,7 @@ function wikiplugin_attach($data, $params)
         if (! $tikilib->page_exists($page)) {
             return "''" . tr('Page "%0" does not exist', $page) . "''";
         }
-        if ($tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'tiki_p_wiki_view_attachments') || $tikilib->user_has_perm_on_object($user, $_REQUEST['page'], 'wiki page', 'tiki_p_wiki_admin_attachments')) {
+        if ($tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'tiki_p_wiki_view_attachments')) {
             $atts = $wikilib->list_wiki_attachments($page, 0, -1, 'created_desc', '');
             $url = "&amp;page=$page";
         }
