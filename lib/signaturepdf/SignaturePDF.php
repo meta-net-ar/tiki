@@ -39,7 +39,7 @@ class SignaturePDF
     {
         global $prefs;
         $devPort = $prefs['signaturepdf_dev_port'];
-        return "http://localhost:$devPort/tiki-base" . self::sanitizeRequestUriDev($_SERVER['REQUEST_URI']);
+        return "http://localhost:$devPort" . self::sanitizeRequestUriDev($_SERVER['REQUEST_URI']);
     }
 
     private static function sanitizeRequestUriDev(string $requestUri): string
