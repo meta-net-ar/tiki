@@ -218,7 +218,7 @@ class OutputHandler extends DataHandler
 
         if (isset($sheet->metadata) && isset($sheet->metadata->widths)) {
             foreach ($sheet->metadata->widths as $width) {
-                $this->output .= "<col style='width:" . ($width * 1) . "px;' />";
+                $this->output .= "<col style='width:" . ($width * 1) . "px;'>";
             }
         } else {
             $beginCol = $sheet->getRangeBeginCol();
@@ -226,7 +226,7 @@ class OutputHandler extends DataHandler
             for ($i = $beginCol; $i < $endCol; $i++) {
                 $style = $sheet->cellInfo[0][$i]['style'];
                 $width = $sheetlib->get_attr_from_css_string($style, "width", "118px");
-                $this->output .= "<col style='width: $width;' width='$width' />\n";
+                $this->output .= "<col style='width: $width;' width='$width'>\n";
             }
         }
     }

@@ -155,7 +155,7 @@
             <input type="hidden" name="comments_offset" value="0">{*Reset offset to 0 when applying a new filter *}
             <input type="hidden" name="comments_threadId" value="{$comments_threadId|escape}">
             <input type="hidden" name="comments_parentId" value="{$comments_parentId|escape}">
-            <input type="hidden" name="comments_threshold" value="{$comments_threshold|escape}" />
+            <input type="hidden" name="comments_threshold" value="{$comments_threshold|escape}">
             <input type="hidden" name="thread_sort_mode" value="{$thread_sort_mode|escape}">
             <input type="hidden" name="topics_offset" value="{$smarty.request.topics_offset|escape}">
             <input type="hidden" name="topics_find" value="{$smarty.request.topics_find|escape}">

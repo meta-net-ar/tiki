@@ -3,7 +3,7 @@
 <html id="print" lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}">
     <head>
         {include file='header.tpl'}
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
     </head>
     <body{html_body_attributes}>
     <span id="nav-button" class="fas fa-list tocbutton" onclick="toggleNav()"></span>

@@ -11,8 +11,8 @@
         {if isset($addFreetags)}
             <form method="post" action="">
                 <div>
-                    <input type="text" name="tags" value=""/>
-                    <input type="submit" class="btn btn-primary btn-sm" name="mod_add_tags" value="{tr}Add tags{/tr}"/>
+                    <input type="text" name="tags" value="">
+                    <input type="submit" class="btn btn-primary btn-sm" name="mod_add_tags" value="{tr}Add tags{/tr}">
                 </div>
             </form>
         {/if}

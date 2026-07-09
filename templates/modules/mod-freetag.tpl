@@ -8,12 +8,12 @@
             <div class="col-sm-12">
                 <form name="addTags" method="post">
                     <div class="mb-3">
-                        <input type="text" name="addtags" class="form-control"{if !empty($freetag_msg)} value="{$freetag_msg}"{/if} />
+                        <input type="text" name="addtags" class="form-control"{if !empty($freetag_msg)} value="{$freetag_msg}"{/if}>
                         {if $prefs.feature_antibot eq 'y' && $user eq ''}
                             <table>{include file="antibot.tpl"}</table>
                         {/if}
                     </div>
-                    <input type="submit" class="btn btn-primary btn-sm" name="Add" value="{tr}Add{/tr}" />
+                    <input type="submit" class="btn btn-primary btn-sm" name="Add" value="{tr}Add{/tr}">
                     {help url="Tags" desc="{tr}Put tags separated by spaces. For tags with more than one word, use no spaces and put words together or enclose them with double quotes{/tr}"}
 
                 </form>

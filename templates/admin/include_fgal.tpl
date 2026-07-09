@@ -308,8 +308,7 @@
                                         type="submit"
                                         class="btn btn-primary btn-sm"
                                         name="filegalfixvndmsfiles"
-                                        value="{tr}Fix vnd.ms-* mime type files{/tr}"
-                                    />
+                                        value="{tr}Fix vnd.ms-* mime type files{/tr}">
                                 {/remarksbox}
                             </div>
                         {/if}
@@ -330,16 +329,16 @@
                                         <tr>
                                             <td>{$mime}</td>
                                             <td>
-                                                <input name="mimes[{$mime}]" class="form-control" type="text" value="{$cmd|escape:html}" />
+                                                <input name="mimes[{$mime}]" class="form-control" type="text" value="{$cmd|escape:html}">
                                             </td>
                                         </tr>
                                     {/foreach}
                                     <tr>
                                         <td class="odd">
-                                            <input name="newMime" type="text" class="form-control" />
+                                            <input name="newMime" type="text" class="form-control">
                                         </td>
                                         <td class="odd">
-                                            <input name="newCmd" type="text" class="form-control" />
+                                            <input name="newCmd" type="text" class="form-control">
                                         </td>
                                     </tr>
                                     </tbody>

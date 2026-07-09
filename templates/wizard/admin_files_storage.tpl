@@ -12,7 +12,7 @@
                 <fieldset>
                     {icon name="files-o" size=2 iclass="adminWizardIconright float-end ms-2"}
                     <legend id="elFinder">elFinder</legend>
-                    <input type="checkbox" class="form-check-input" aria-labelledby="elFinder" name="useElFinderAsDefault" {if !isset($useElFinderAsDefault) or $useElFinderAsDefault eq true}checked='checked'{/if} /> {tr}Set elFinder as the default file gallery viewer{/tr}.
+                    <input type="checkbox" class="form-check-input" aria-labelledby="elFinder" name="useElFinderAsDefault" {if !isset($useElFinderAsDefault) or $useElFinderAsDefault eq true}checked='checked'{/if}> {tr}Set elFinder as the default file gallery viewer{/tr}.
                     <div class="adminoptionboxchild">
                         {tr}See also{/tr} <a href="http://doc.tiki.org/elFinder" target="_blank">{tr}elFinder{/tr} @ doc.tiki.org</a>
                     </div>

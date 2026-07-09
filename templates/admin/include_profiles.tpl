@@ -35,7 +35,7 @@
                     <div class="col-sm-6">
                         <div class="mb-3 row">
                             <label class="col-form-label" for="profile">{tr}Profile name{/tr} </label>
-                            <input type="text" class="form-control" name="profile" placeholder="{tr}Search{/tr}..." id="profile" value="{if isset($profile)}{$profile|escape}{/if}" />
+                            <input type="text" class="form-control" name="profile" placeholder="{tr}Search{/tr}..." id="profile" value="{if isset($profile)}{$profile|escape}{/if}">
                         </div>
                         {if isset($category_list) and count($category_list) gt 0}
                             <div class="mb-3 row">
@@ -59,7 +59,7 @@
                         <input type="hidden" name="page" value="profiles">
                         <input type="hidden" name="redirect" value=0>
                         <div class="mb-3 text-center">
-                            <input type="submit" class="btn btn-secondary" name="list" value="{tr}Search{/tr}" />
+                            <input type="submit" class="btn btn-secondary" name="list" value="{tr}Search{/tr}">
                         </div>
                     </div>
                     <div class="col-sm-6">
@@ -176,7 +176,7 @@
                     <div class="t_navbar">
                         {listfilter selectors=".profile_export_list > li"}
                         <label for="select_all_prefs_to_export">{tr}Toggle Visible{/tr}</label>
-                        <input type="checkbox" id="select_all_prefs_to_export" />
+                        <input type="checkbox" id="select_all_prefs_to_export">
                         <label for="export_show_added">{tr}Show added preferences{/tr}</label>
                         <input type="checkbox" name="export_show_added" id="export_show_added" {if !empty($smarty.request.export_show_added)} checked="checked"{/if} >
                     </div>
@@ -215,7 +215,7 @@
                             {foreach from=$modules_for_export key="name" item="data"}
                                 <li class="form-check">
                                     <input type="checkbox" class="form-check-input" name="modules_to_export[{$name}]" value="{$data.name|escape}"
-                                           id="modcheckbox_{$name}"{if isset($modules_to_export[$name])} checked="checked"{/if} />
+                                           id="modcheckbox_{$name}"{if isset($modules_to_export[$name])} checked="checked"{/if}>
                                     <label for="modcheckbox_{$name}" class="form-check-label">
                                         {$data.data.name|escape} :
                                         <em>
@@ -231,7 +231,7 @@
                             {foreach from=$pages_for_export item="page"}
                                 <li class="form-check">
                                     <input type="checkbox" class="form-check-input" name="pages_to_export[{$page.page_id}]" value="{$page.page_id}"
-                                           id="pages_checkbox_{$page.page_id}"{if isset($pages_to_export[$page.page_id])} checked="checked"{/if} />
+                                           id="pages_checkbox_{$page.page_id}"{if isset($pages_to_export[$page.page_id])} checked="checked"{/if}>
                                     <label for="pages_checkbox_{$page.page_id}" class="form-check-label">
                                         {$page.pageName|escape}
                                     </label>
@@ -243,7 +243,7 @@
                                 {foreach from=$trackers_for_export item="tracker"}
                                     <li class="form-check">
                                         <input type="checkbox" class="form-check-input" name="trackers_to_export[{$tracker.trackerId}]" value="{$tracker.trackerId}"
-                                               id="trackers_checkbox_{$tracker.trackerId}"{if isset($trackers_to_export[$tracker.trackerId])} checked="checked"{/if} />
+                                               id="trackers_checkbox_{$tracker.trackerId}"{if isset($trackers_to_export[$tracker.trackerId])} checked="checked"{/if}>
                                         <label for="trackers_checkbox_{$tracker.trackerId}" class="form-check-label">
                                             {$tracker.name|escape}
                                         </label>
@@ -253,7 +253,7 @@
                         {/if}
                     </div>
                     <div class="text-center submit input_submit_container">
-                        <input type="submit" class="btn btn-primary" name="export" value="{tr}Export{/tr}" />
+                        <input type="submit" class="btn btn-primary" name="export" value="{tr}Export{/tr}">
                     </div>
                 </fieldset>
             </fieldset>
@@ -301,7 +301,7 @@
                 {preference name=profile_sources}
                 {preference name=profile_channels}
                 <div class="text-center submit">
-                    <input type="submit" class="btn btn-primary" name="config" value="{tr}Save{/tr}"/>
+                    <input type="submit" class="btn btn-primary" name="config" value="{tr}Save{/tr}">
                 </div>
             </form>
         </fieldset>
@@ -317,7 +317,7 @@
                     <div class="adminoptionlabel mb-3 row">
                         <label for="profile_tester_name" class="col-form-label col-sm-4">{tr}Test profile name{/tr} </label>
                         <div class="col-sm-4 mb-3">
-                        <input class="form-control" type="text" name="profile_tester_name" id="profile_tester_name" value="{if isset($profile_tester_name)}{$profile_tester_name}{else}Test{/if}" />
+                        <input class="form-control" type="text" name="profile_tester_name" id="profile_tester_name" value="{if isset($profile_tester_name)}{$profile_tester_name}{else}Test{/if}">
                         </div>
                         <div class="col-sm-4">
                             {html_options

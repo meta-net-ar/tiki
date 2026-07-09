@@ -253,7 +253,7 @@ $("#' . $id . '_openall").on("click", function () {
         }
 
         if ($_showSelected == 'y') {
-            $html .= ' <input type="checkbox" id="' . $id . '_showSelected" title="' . tra('Show only selected') . '" />';
+            $html .= ' <input type="checkbox" id="' . $id . '_showSelected" title="' . tra('Show only selected') . '">';
             $html .= ' <label for="' . $id . '_showSelected">' . tra('Show only selected') . '</label>';
 
             $headerlib->add_jq_onready(
@@ -409,9 +409,9 @@ $("#' . $id . '_showSelected").on("click", function () {
 
                     $html .= '<td class="checkBoxCell" style="white-space: nowrap;">';
                     $html .= '<input type="checkbox" class="form-check-input" name="' . htmlspecialchars($_checkbox[$i]) . '[]" value="' . $rowVal . '"' .
-                        ($cbxVal == 'y' ? ' checked="checked"' : '') . ' title="' . $cbxTit . '" />';
+                        ($cbxVal == 'y' ? ' checked="checked"' : '') . ' title="' . $cbxTit . '">';
                     if ($cbxVal == 'y') {
-                        $html .= '<input type="hidden" name="old_' . htmlspecialchars($_checkbox[$i]) . '[]" value="' . $rowVal . '" />';
+                        $html .= '<input type="hidden" name="old_' . htmlspecialchars($_checkbox[$i]) . '[]" value="' . $rowVal . '">';
                     }
                     $html .= '</td>';
                 }

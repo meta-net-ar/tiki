@@ -18,7 +18,7 @@
                     </div>
                     <div class="card-body">
                         <p>
-                            <a href="{$row.object_id|sefurl:'file'}" data-type="file" data-object="{$row.object_id|escape}"><img src="{$row.object_id|sefurl:'thumbnail'}"/><span class="sr-only">{$row.title|escape}</span></a>
+                            <a href="{$row.object_id|sefurl:'file'}" data-type="file" data-object="{$row.object_id|escape}"><img src="{$row.object_id|sefurl:'thumbnail'}"><span class="sr-only">{$row.title|escape}</span></a>
                         </p>
                         <p class="small">
                             {$row.modification_date|tiki_short_datetime}

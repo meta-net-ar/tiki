@@ -23,7 +23,7 @@
                         </td>
                         <td >
                             <div  class="form-switch">
-                                    <input type="checkbox" class="form-check-input" name="wiki page" id="{{$wikiPage}}" checked />
+                                    <input type="checkbox" class="form-check-input" name="wiki page" id="{{$wikiPage}}" checked>
                             </div>
                         </td>
                     </tr>
@@ -51,7 +51,7 @@
                         </td>
                         <td >
                             <div  class="form-switch">
-                                <input type="checkbox" class="form-check-input" name="article" id="{{$article.id}}" checked />
+                                <input type="checkbox" class="form-check-input" name="article" id="{{$article.id}}" checked>
                             </div>
                         </td>
                     </tr>
@@ -80,7 +80,7 @@
                         </td>
                         <td >
                             <div  class="form-switch">
-                                <input type="checkbox" class="form-check-input" name="trackeritem" id="{{$item.id}}" checked />
+                                <input type="checkbox" class="form-check-input" name="trackeritem" id="{{$item.id}}" checked>
                             </div>
                         </td>
                     </tr>

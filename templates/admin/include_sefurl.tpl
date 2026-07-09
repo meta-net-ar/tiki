@@ -79,7 +79,7 @@
                     {/capture}
                 {/strip}
                 <div class="col-md-8">
-                    <input type="text" class="form-control" id="feature_sefurl_paths" name="feature_sefurl_paths" value="{$smarty.capture.paths|escape}" />
+                    <input type="text" class="form-control" id="feature_sefurl_paths" name="feature_sefurl_paths" value="{$smarty.capture.paths|escape}">
                     <span class="form-text">
                         {tr}List of Url Parameters that should go in the path{/tr}
                     </span>

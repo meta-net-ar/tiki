@@ -165,18 +165,18 @@
                                                     <input type="text" class="form-control" id="known_hosts_contact" name="known_hosts[{$k}][contact]" value="{$i.contact}">
                                                 </td>
                                                 <td>
-                                                    <input type="checkbox" class="form-check-input" id="known_hosts_can_register" name="known_hosts[{$k}][allowusersregister]" {if isset($i.allowusersregister) && $i.allowusersregister eq 'y'}checked="checked"{/if} />
+                                                    <input type="checkbox" class="form-check-input" id="known_hosts_can_register" name="known_hosts[{$k}][allowusersregister]" {if isset($i.allowusersregister) && $i.allowusersregister eq 'y'}checked="checked"{/if}>
                                                 </td>
                                             </tr>
                                         {/foreach}
                                     {/if}
                                     <tr>
                                         <td>{tr}New:{/tr}</td>
-                                        <td><label class="sr-only" for="new_host_name">{tr}New{/tr}</label><input type="text" class="form-control" id="new_host_name" name="newhost[name]" value=""/></td>
-                                        <td><label class="sr-only" for="new_host_key">{tr}Key{/tr}</label><input type="text" class="form-control" id="new_host_key" name="newhost[key]" value=""/></td>
-                                        <td><label class="sr-only" for="new_host_ip">{tr}IP{/tr}</label><input type="text" class="form-control" id="new_host_ip" name="newhost[ip]" value=""/></td>
-                                        <td><label class="sr-only" for="new_host_contact">{tr}Contact{/tr}</label><input type="text" class="form-control" id="new_host_contact" name="newhost[contact]" value=""/></td>
-                                        <td><label class="sr-only" for="new_host_can_register">{tr}Can register{/tr}</label><input type="checkbox" id="new_host_can_register" name="newhost[allowusersregister]"/></td>
+                                        <td><label class="sr-only" for="new_host_name">{tr}New{/tr}</label><input type="text" class="form-control" id="new_host_name" name="newhost[name]" value=""></td>
+                                        <td><label class="sr-only" for="new_host_key">{tr}Key{/tr}</label><input type="text" class="form-control" id="new_host_key" name="newhost[key]" value=""></td>
+                                        <td><label class="sr-only" for="new_host_ip">{tr}IP{/tr}</label><input type="text" class="form-control" id="new_host_ip" name="newhost[ip]" value=""></td>
+                                        <td><label class="sr-only" for="new_host_contact">{tr}Contact{/tr}</label><input type="text" class="form-control" id="new_host_contact" name="newhost[contact]" value=""></td>
+                                        <td><label class="sr-only" for="new_host_can_register">{tr}Can register{/tr}</label><input type="checkbox" id="new_host_can_register" name="newhost[allowusersregister]"></td>
                                     </tr>
                                     </tbody>
                                 </table>

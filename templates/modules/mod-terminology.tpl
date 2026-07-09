@@ -4,15 +4,15 @@
         <div class="mb-3 row mx-0">
             <label class="col-sm-2 col-form-label" for="name">{tr}Search term:{/tr}</label>
             {if $term_root_category_id != ''}
-                <input type="hidden" name="categId" value="{$term_root_category_id}"/>
-                <input type="hidden" name="create_page_with_search_category" value="y"/>
+                <input type="hidden" name="categId" value="{$term_root_category_id}">
+                <input type="hidden" name="create_page_with_search_category" value="y">
             {/if}
             <div class="col-sm-5">
-                <input name="find" id="name" class="form-control" type="text" accesskey="s" value=""/>
-                <input type="hidden" name="exact_match" value="On"/>
-                <input type="hidden" name="hits_link_to_all_languages" value="On"/>
-                <input type="hidden" name="create_new_pages_using_template_name" value="{$create_new_pages_using_template_name}"/>
-                <input type="hidden" name="term_srch" value="y"/>
+                <input name="find" id="name" class="form-control" type="text" accesskey="s" value="">
+                <input type="hidden" name="exact_match" value="On">
+                <input type="hidden" name="hits_link_to_all_languages" value="On">
+                <input type="hidden" name="create_new_pages_using_template_name" value="{$create_new_pages_using_template_name}">
+                <input type="hidden" name="term_srch" value="y">
             </div>
         </div>
         <div class="mb-3 row mx-0">
@@ -27,7 +27,7 @@
         </div>
         <div class="mb-3 row mx-0">
             <div class="col-sm-2 offset-sm-2">
-                <input type="submit" class="wikiaction btn btn-info btn-sm" name="search" value="{tr}Search{/tr}"/>
+                <input type="submit" class="wikiaction btn btn-info btn-sm" name="search" value="{tr}Search{/tr}">
             </div>
             <div class="col-sm-8">
                 <div class="form-text">{tr}If not found, you will be given a chance to create it.{/tr}</div>

@@ -3,8 +3,8 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>{tr}System error.{/tr}</title>
-    <link rel="stylesheet" href="public/generated/js/vendor_dist/bootstrap/dist/css/bootstrap.min.css" type="text/css" />
-    <link rel="stylesheet" href="public/generated/js/vendor_dist/@fortawesome/fontawesome-free/css/all.css" type="text/css" />
+    <link rel="stylesheet" href="public/generated/js/vendor_dist/bootstrap/dist/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="public/generated/js/vendor_dist/@fortawesome/fontawesome-free/css/all.css" type="text/css">
 
     <style type="text/css" media="screen">
         html {ldelim}

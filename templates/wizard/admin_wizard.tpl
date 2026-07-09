@@ -40,7 +40,7 @@
                     </a>
                 </p>
 
-                <input type="submit" class="btn btn-warning" name="use-default-prefs" value="{tr}Start Configuration Profiles Wizard (Macros){/tr}" />
+                <input type="submit" class="btn btn-warning" name="use-default-prefs" value="{tr}Start Configuration Profiles Wizard (Macros){/tr}">
             </div>
         </div>
         <div class="d-flex mb-5">
@@ -60,7 +60,7 @@
                         {icon name="help"}
                     </a>
                 </p>
-                <input type="submit" class="btn btn-info" name="continue" value="{tr}Start Configuration Wizard{/tr}" />
+                <input type="submit" class="btn btn-info" name="continue" value="{tr}Start Configuration Wizard{/tr}">
             </div>
         </div>
         {if $showChangesWizard}
@@ -84,7 +84,7 @@
                     </a>
                 </p>
 
-                <input type="submit" class="btn btn-success" name="use-changes-wizard" value="{tr}Start Changes Wizard{/tr}" />
+                <input type="submit" class="btn btn-success" name="use-changes-wizard" value="{tr}Start Changes Wizard{/tr}">
             </div>
         </div>
         <hr>

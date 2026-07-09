@@ -386,7 +386,7 @@ class HeaderMetaTagsTest extends TikiTestCase
 
     /**
      * W3C HTML5: Meta tags are void elements
-     * W3C HTML5 Specification: Void elements can use either <meta> or <meta /> syntax
+     * W3C HTML5 Specification: Void elements can use either <meta> or <meta> syntax
      * Both are valid, but non-self-closing is preferred for consistency
      */
     public function testW3CMetaTagSyntax(): void
@@ -425,7 +425,7 @@ class HeaderMetaTagsTest extends TikiTestCase
         // This is informational - we don't fail, but we note if any are found
         if ($selfClosingCount > 0) {
             $this->addToAssertionCount(1); // Mark that we did check something
-            // Both <meta> and <meta /> are valid W3C HTML5, but <meta> is preferred
+            // Both <meta> and <meta> are valid W3C HTML5, but <meta> is preferred
         } else {
             $this->assertTrue(true, 'W3C HTML5: Using preferred non-self-closing meta tag syntax');
         }

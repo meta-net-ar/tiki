@@ -193,9 +193,9 @@ Duplicated footnote reference[^second].
     {
         if ($with_heading_links) {
             $res = '<hr />
-<h2 class="showhide_heading" id="User:_admin">User: admin<a href="#User:_admin" class="heading-link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h2>
-<h2 class="showhide_heading" id="Plugin_test:_12">Plugin test: <sup><strong>12</strong></sup><a href="#Plugin_test:_12" class="heading-link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h2>
-<h1 class="showhide_heading" id="h1_Heading_8-_">h1 Heading 😎<a href="#h1_Heading_8-_" class="heading-link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon" /></a></h1>';
+<h2 class="showhide_heading" id="User:_admin">User: admin<a href="#User:_admin" class="heading-link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon"></a></h2>
+<h2 class="showhide_heading" id="Plugin_test:_12">Plugin test: <sup><strong>12</strong></sup><a href="#Plugin_test:_12" class="heading-link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon"></a></h2>
+<h1 class="showhide_heading" id="h1_Heading_8-_">h1 Heading 😎<a href="#h1_Heading_8-_" class="heading-link"><img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link" title="Question" class="icon"></a></h1>';
         } else {
             $res = '<hr />
 <h2>User: admin</h2>
@@ -304,7 +304,7 @@ line 3 of code
 </table>
 <p><a href="http://example.org">link text</a></p>
 <p><a href="http://example.org/" title="title text!">link with title</a></p>
-<p>Autoconverted link <a target="_blank" class="wiki external"  href="https://example.org">https://example.org<img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link-external" title="Question" class="icon" /></a> (enable linkify to see)</p>
+<p>Autoconverted link <a target="_blank" class="wiki external"  href="https://example.org">https://example.org<img src="img/icons/green_question.png" alt="Question" width="16" height="16" name="link-external" title="Question" class="icon"></a> (enable linkify to see)</p>
 <p>Footnote 1 link<sup id="fnref:first"><a class="footnote-ref" href="#fn:first" role="doc-noteref">1</a></sup>.</p>
 <p>Footnote 2 link<sup id="fnref:second"><a class="footnote-ref" href="#fn:second" role="doc-noteref">2</a></sup>.</p>
 <p>Inline footnote<sup id="fnref:text-of-inline-footn"><a class="footnote-ref" href="#fn:text-of-inline-footn" role="doc-noteref">3</a></sup> definition.</p>

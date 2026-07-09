@@ -260,7 +260,7 @@
 
         <form name='editusr' method="post" action="tiki-admin_modules.php">
             {ticket}
-            <input type="hidden" name="um_tgt_module" value="{$um_tgt_module|escape}" hidden="hidden" />
+            <input type="hidden" name="um_tgt_module" value="{$um_tgt_module|escape}" hidden="hidden">
             <div class="tiki-form-group row">
                 <label class="col-sm-2 col-form-label" for="um_name">{tr}Name{/tr}</label>
                 <div class="col-sm-10">

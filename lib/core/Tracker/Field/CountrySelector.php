@@ -236,7 +236,7 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
     private function renderImage($code, $label)
     {
         $smarty = TikiLib::lib('smarty');
-        return '<img src="img/flags/' . smarty_modifier_escape($code) . '.png" title="' . smarty_modifier_escape($label) . '" alt="' . smarty_modifier_escape($label) . '" />';
+        return '<img src="img/flags/' . smarty_modifier_escape($code) . '.png" title="' . smarty_modifier_escape($label) . '" alt="' . smarty_modifier_escape($label) . '">';
     }
 
     public function renderInput($context = [])

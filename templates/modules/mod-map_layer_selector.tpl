@@ -52,7 +52,7 @@
                         } else {
                             var label, checkbox;
                             optionalLayers.append(label = $('<label/>').text(thisLayer.name).prepend(
-                                checkbox = $('<input type="checkbox" class="form-check-input"/>')
+                                checkbox = $('<input type="checkbox" class="form-check-input">')
                                     .prop('checked', thisLayer.getVisibility())));
                             checkbox.on("change", function (e) {
                                 thisLayer.setVisibility($(this).is(':checked'));

@@ -14,7 +14,7 @@
                     <input type="hidden" name="filters">
                     <input type="hidden" name="lm_criteria" value="{$filter['content']}">
                     <div class="col-3">
-                        <input type="submit" class="btn btn-info" value="{tr}Search preferences{/tr}"/>
+                        <input type="submit" class="btn btn-info" value="{tr}Search preferences{/tr}">
                     </div>
                 </form>
             </div>

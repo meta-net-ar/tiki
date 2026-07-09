@@ -129,7 +129,7 @@ $.exerciseGroup = function (exercises, scope) {
                         .data('justification', o.justification ? o.justification : ''));
                 });
             } else {
-                input = $('<input type="text"/>');
+                input = $('<input type="text">');
                 input.attr('size', answer.length);
             }
 
@@ -200,7 +200,7 @@ JS;
     return <<<HTML
 <form class="exercise-form" method="get" action="#">
     <p>$yourScoreIs</p>
-    <input type="submit" class="btn btn-primary btn-sm" value="$checkYourScore"/>
+    <input type="submit" class="btn btn-primary btn-sm" value="$checkYourScore">
 </form>
 HTML;
 }

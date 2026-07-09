@@ -83,7 +83,7 @@
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-1">{tr}Add:{/tr}</label>
                 <div class="input-group col-sm-7">
-                    <input type='text' class="form-control" name='ext_add' />
+                    <input type='text' class="form-control" name='ext_add'>
                     <input type='submit' class="btn btn-primary" name='add_fields' value="{tr}Add{/tr}">
                 </div>
             </div>

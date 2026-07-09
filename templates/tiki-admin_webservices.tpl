@@ -41,7 +41,7 @@
         <div class="mb-3 row">
             <label class="col-form-label col-sm-4" for="ws_url">{tr}URL:{/tr}</label>
             <div class="col-sm-8">
-                <input type="text" name="url" id="ws_url" size="75" value="{$url|escape}" class="form-control"/>
+                <input type="text" name="url" id="ws_url" size="75" value="{$url|escape}" class="form-control">
             </div>
         </div>
         <div class="mb-3 row">
@@ -62,9 +62,9 @@
             </div>
             <div class="col-sm-8 offset-sm-4">
                 <p id="ws_operation" style="display: none;">{tr}Operation:{/tr}
-                    <input type="text" name="operation" size="30" value="{$operation|escape}" class="form-control"/>
+                    <input type="text" name="operation" size="30" value="{$operation|escape}" class="form-control">
                 </p>
-                <p><input type="submit" class="btn btn-primary btn-sm" name="parse" value="{tr}Lookup{/tr}"/></p>
+                <p><input type="submit" class="btn btn-primary btn-sm" name="parse" value="{tr}Lookup{/tr}"></p>
             </div>
         </div>
         {if $edit}
@@ -142,7 +142,7 @@
                             <tr>
                                 <th>
                                     {$template.engine|escape}/{$template.output|escape}
-                                    <input type="submit" class="btn btn-primary btn-sm" name="add[{$number}]" value="{tr}Add{/tr}"/>
+                                    <input type="submit" class="btn btn-primary btn-sm" name="add[{$number}]" value="{tr}Add{/tr}">
                                 </th>
                                 <td>
                                     <pre>{$template.content|escape}</pre>
@@ -164,7 +164,7 @@
                         {else}
                             <input type="text" name="new_name" class="form-control">
                         {/if}
-                        <input type="submit" class="btn btn-primary btn-sm mt-2" name="register" value="{tr}Register Service{/tr}"/>
+                        <input type="submit" class="btn btn-primary btn-sm mt-2" name="register" value="{tr}Register Service{/tr}">
                     </p>
                 {else}
                     <h3>{tr}Registered Templates{/tr}</h3>
@@ -213,7 +213,7 @@
                             </tr>
                             <tr>
                                 <td style="padding: 0 .5em">
-                                    <input type="text" name="nt_name" value="{$nt_name|escape}" class="form-control"/></td>
+                                    <input type="text" name="nt_name" value="{$nt_name|escape}" class="form-control"></td>
                                 <td style="padding: 0 .5em">
                                     <select id="nt_engine" name="nt_engine" class="form-control">
                                         <option value=""></option>
@@ -245,7 +245,7 @@
                             </tr>
                             <tr>
                                 <td colspan="4">
-                                    <input type="submit" class="btn btn-primary btn-sm" name="create_template" value="{tr}Register Template{/tr}"/>
+                                    <input type="submit" class="btn btn-primary btn-sm" name="create_template" value="{tr}Register Template{/tr}">
                                 </td>
                             </tr>
                         </table>

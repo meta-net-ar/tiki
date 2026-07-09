@@ -23,14 +23,14 @@
                     {tr}Name{/tr}
             </label>
             <div class="col-sm-10">
-                <input type="text" name="name" value="{$name|escape}" class="form-control"/>
+                <input type="text" name="name" value="{$name|escape}" class="form-control">
             </div>
         </div>
         {if $area}
             <div class="mb-3 row">
                 <div class="col-sm-12">
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="area" value="1" {if $area eq 'y'}checked="checked"{/if} />
+                        <input class="form-check-input" type="checkbox" name="area" value="1" {if $area eq 'y'}checked="checked"{/if}>
                         <label class="form-check-label">{tr}Bind area{/tr}</label>
                     </div>
                 </div>
@@ -45,18 +45,18 @@
                     <a href="#" class="key">{$key|escape}</a> (<span class="label">{$group.name|escape}</span>)
                     <ul style="display: none">
                         <li>
-                            <input class="name" type="text" name="groups~{$key|escape}~name" value="{$group.name|escape}"/>
-                            <input class="permissions" type="hidden" name="groups~{$key|escape}~permissions" value="{$group.permissions|join:','}"/>
+                            <input class="name" type="text" name="groups~{$key|escape}~name" value="{$group.name|escape}">
+                            <input class="permissions" type="hidden" name="groups~{$key|escape}~permissions" value="{$group.permissions|join:','}">
                         </li>
                         <li>
                             <label>
-                                <input class="managingGroup" type="radio" name="managingGroup" value="{$key|escape}" {if !empty($group.managing)}checked="checked"{/if} />
+                                <input class="managingGroup" type="radio" name="managingGroup" value="{$key|escape}" {if !empty($group.managing)}checked="checked"{/if}>
                                 {tr}Is managing group{/tr}
                             </label>
                         </li>
                         <li>
                             <label>
-                                <input class="autojoin form-check-input" type="checkbox" name="groups~{$key|escape}~autojoin" value="1" {if !empty($group.autojoin)}checked="checked"{/if} />
+                                <input class="autojoin form-check-input" type="checkbox" name="groups~{$key|escape}~autojoin" value="1" {if !empty($group.autojoin)}checked="checked"{/if}>
                                 {tr}Workspace creator joins this group{/tr}
                             </label>
                         </li>
@@ -83,11 +83,11 @@
                     </a>
                     <ul style="display: none">
                         <li>
-                            <input class="name" type="text" name="pages~{$key|escape}~name" value="{$page.name|escape}"/>
-                            <input class="namespace" type="hidden" name="pages~{$key|escape}~namespace" value="{$page.namespace|escape}" />
+                            <input class="name" type="text" name="pages~{$key|escape}~name" value="{$page.name|escape}">
+                            <input class="namespace" type="hidden" name="pages~{$key|escape}~namespace" value="{$page.namespace|escape}">
                         </li>
                         <li>
-                            <input class="content" type="hidden" name="pages~{$key|escape}~content" value="{$page.content|escape}"/>
+                            <input class="content" type="hidden" name="pages~{$key|escape}~content" value="{$page.content|escape}">
                             <a class="edit-content" href="{service controller=workspace action=edit_content}">{tr}Edit content template{/tr}</a>
                         </li>
                     </ul>
@@ -99,7 +99,7 @@
         </ul>
 
         <div class="submit text-center">
-            <input type="submit" class="btn btn-primary" value="{tr}Save{/tr}"/>
+            <input type="submit" class="btn btn-primary" value="{tr}Save{/tr}">
         </div>
     </form>
 {/block}

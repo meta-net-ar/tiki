@@ -12,7 +12,7 @@
             </div>
             <fieldset>
                 <legend class="visually-hidden">{tr}Edit Comment{/tr}</legend>
-                <input type="hidden" name="edit" value="1"/>
+                <input type="hidden" name="edit" value="1">
                 <div class="card-body">
                 {if $prefs.comments_notitle neq 'y'}
                     <div class="mb-3 row">
@@ -26,7 +26,7 @@
                 <div class="card-footer">
                     {if empty($comment.version)}
                         <div class="mb-3 comment-post">
-                            <input type="submit" class="clearfix comment-editclass btn btn-primary" value="{tr}Save{/tr}"/>
+                            <input type="submit" class="clearfix comment-editclass btn btn-primary" value="{tr}Save{/tr}">
                             <div class="btn btn-link">
                                 <a href="#" onclick="$(this).closest('.comment-container').reload(); $(this).closest('.ui-dialog').remove(); return false;" role="button">{tr}Cancel{/tr}</a>
                             </div>
@@ -49,8 +49,8 @@
                             </div>
                         {/if}
                         <div class="submit">
-                            <input type="hidden" name="version" value="{$comment.version|escape}"/>
-                            <input type="submit" class="comment-post btn btn-primary" value="{tr}Post{/tr}"/>
+                            <input type="hidden" name="version" value="{$comment.version|escape}">
+                            <input type="submit" class="comment-post btn btn-primary" value="{tr}Post{/tr}">
                             <div class="btn btn-link">
                                 <a href="#" onclick="$(this).closest('.comment-container').reload(); $(this).closest('.ui-dialog').remove(); return false;" role="button">{tr}Cancel{/tr}</a>
                             </div>

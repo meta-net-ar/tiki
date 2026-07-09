@@ -586,7 +586,7 @@
                     <div class="col-lg-8">
                     <h2>{tr}Members{/tr} <span class="badge bg-secondary">{$membersCount}</span></h2>
                     <form id="checkform2" method="post">
-                    <input type="hidden" name="group" value="{$group|escape}"/>
+                    <input type="hidden" name="group" value="{$group|escape}">
                     <div class="ts-wrapperdiv">
                 {/if}
                 <table id="groupsMembers" class="table normal table-striped table-hover" {if $tiki_p_admin eq 'y'}data-count="{$membersCount}"{/if}>

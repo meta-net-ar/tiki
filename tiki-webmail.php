@@ -76,7 +76,7 @@ if (! empty($_SESSION['cypht']['user_data']['debug_mode_setting'])) {
 $out = str_replace("<th></th>", "<th><pre>     <pre></th>", $dispatcher->output);
 $out = preg_replace('#</?body[^>]*>|</?html[^>]*>|#', '', $out);
 
-$smarty->assign('output_data', '<div class="inline-cypht"><div class="app-container"><input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'
+$smarty->assign('output_data', '<div class="inline-cypht"><div class="app-container"><input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '">'
     . $out
     . "</div></div>");
 $smarty->assign('mid', 'tiki-webmail.tpl');
@@ -176,8 +176,8 @@ function createWebPage($header_subject, $header_date, $header_from, $header_to, 
 <head>
   <meta name="robots" content="noindex, nofollow">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <link type="text/css" rel="stylesheet" href="lib/cypht/site.css" />
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link type="text/css" rel="stylesheet" href="lib/cypht/site.css">
   <title></title>
   <style type="text/css">
     body, td {font-size:13px}

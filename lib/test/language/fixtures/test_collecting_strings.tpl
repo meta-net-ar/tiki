@@ -3,8 +3,8 @@
                 <p>{tr _0=$opcode_cache}Using <strong>%0</strong>.These stats affect all PHP applications running on the server.{/tr}</p>
 
                 <p>
-                    <img src="http://chart.apis.google.com/chart?cht=p3&amp;chs=250x100&amp;chd=t:{$opcode_stats.memory_used},{$opcode_stats.memory_avail}&amp;chl={tr}Used{/tr}|{tr}Available{/tr}&amp;chtt={tr}Memory{/tr}" width="250" height="100"/>
-                    <img src="http://chart.apis.google.com/chart?cht=p3&amp;chs=250x100&amp;chd=t:{$opcode_stats.hit_hit},{$opcode_stats.hit_miss}&amp;chl={tr}Hit{/tr}|{tr}Miss{/tr}&amp;chtt={tr}Cache Hits{/tr}" width="250" height="100"/>
+                    <img src="http://chart.apis.google.com/chart?cht=p3&amp;chs=250x100&amp;chd=t:{$opcode_stats.memory_used},{$opcode_stats.memory_avail}&amp;chl={tr}Used{/tr}|{tr}Available{/tr}&amp;chtt={tr}Memory{/tr}" width="250" height="100">
+                    <img src="http://chart.apis.google.com/chart?cht=p3&amp;chs=250x100&amp;chd=t:{$opcode_stats.hit_hit},{$opcode_stats.hit_miss}&amp;chl={tr}Hit{/tr}|{tr}Miss{/tr}&amp;chtt={tr}Cache Hits{/tr}" width="250" height="100">
                 </p>
 
                 {if $opcode_stats.warning_fresh}

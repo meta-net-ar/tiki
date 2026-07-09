@@ -3,7 +3,7 @@
     {* the modal form to select users *}
     <div class="modal-content">
         <form class="wikiplugin-xmpp-form" action="{{ action }}" method="POST">
-            <input type="hidden" name="room" value="{{ room }}" />
+            <input type="hidden" name="room" value="{{ room }}">
             <div class="modal-header">
                 <h4 class="modal-title" id="myModalLabel">{{ title }}</h4>
             </div>
@@ -12,14 +12,14 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-dismiss" data-bs-dismiss="modal">{tr}Close{/tr}</button>
-                <input type="submit" class="btn btn-primary" value="{tr}Add{/tr}"/>
+                <input type="submit" class="btn btn-primary" value="{tr}Add{/tr}">
             </div>
         </form>
     </div></script>
 <script type="text/template" id="wikiplugin_xmpp_tplitem">
     {* the form items *}
     <div class="col-md-6">
-        <input type="checkbox" class="form-check-input" name="item[][jid]" id="input_{{ name }}" value="{{ jid }}"/>
+        <input type="checkbox" class="form-check-input" name="item[][jid]" id="input_{{ name }}" value="{{ jid }}">
         <label class="form-check-label" for="input_{{ name }}">
             <span>{{ fullname }}</span>
         </label>

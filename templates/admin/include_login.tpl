@@ -574,10 +574,10 @@
                     <p>
                         {tr _0='<a href="https://github.com/danielmiessler/SecLists/tree/master/Passwords" target="_blank">' _1='</a>'}Raw password files can be obtained from %0Daniel Miessler's Collection%1.{/tr} {tr}Tiki's default password blacklist files were generated from Missler's top 1 million password file.{/tr}</p>
 
-                        <input type="file" name="passwordlist" accept="text/plain" class="form-control mb-2" />
+                        <input type="file" name="passwordlist" accept="text/plain" class="form-control mb-2">
                         <div class="col-sm-4">
                             {tr}Use 'LOAD DATA INFILE':{/tr}
-                            <input type="checkbox" name="loaddata" />
+                            <input type="checkbox" name="loaddata">
                             {help desc="{tr}Allows much larger files to be uploaded, but requires MySQL on localhost with extra permissions.{/tr}"}
                         </div>
                         <div class="col-sm-8">
@@ -606,15 +606,15 @@
                             <h3>{tr}Generate and Save a Password Blacklist{/tr}{help desc="{tr}Saving places a text file with the generated passwords in your storage/pass_blacklists folder and enables it
                             as an option for use. Fields default to the password standards set in Tiki. You should not have to change these, unless you plan on changing your password
                             requirements in the future.{/tr}"}</h3>
-                            {tr}Number of passwords (limit):{/tr} <input type="number" name="limit" value="{$limit}" />
+                            {tr}Number of passwords (limit):{/tr} <input type="number" name="limit" value="{$limit}">
                             {help desc="{tr}This sets the number of passwords that your blacklist will use. The words from the begining of of the file will be selected over the lower,
                                         so if you have a list of words arranged with the most common at the top, it will select only the most common works to blacklist.
                                         Typical usage ranges between 1,000 & 10,000, although many more could be used. Twitter blacklists 396.{/tr}"}<br>
-                            {tr}Minimum Password Length:{/tr} <input type="number" name="length" value="{$length}" />
+                            {tr}Minimum Password Length:{/tr} <input type="number" name="length" value="{$length}">
                             {help desc="{tr}The minimum password length for your password. This will filter out any password that has an illegal length.{/tr}"}<br>
-                            {tr}Require Numbers &amp; Letters:{/tr} <input type="checkbox" name="charnum" {if $charnum}checked{/if} />
+                            {tr}Require Numbers &amp; Letters:{/tr} <input type="checkbox" name="charnum" {if $charnum}checked{/if}>
                             {help desc="{tr}If checked, will filter out any password that does not have both upper and lower case letters.{/tr}"}<br>
-                            {tr}Require Special Characters:{/tr} <input type="checkbox" name="special" {if $special}checked{/if} />
+                            {tr}Require Special Characters:{/tr} <input type="checkbox" name="special" {if $special}checked{/if}>
                             {help desc="{tr}If checked, will filter out any passwords that do not have special characters.{/tr}"}<br>
                             <input
                                 type="submit"

@@ -17,16 +17,16 @@
     {/if}
     <tr class="condition-row">
         <td>
-            <input type="text" placeholder="{tr}Unique Name{/tr}" size="30" data-name="label" name="events[{$eventType}][{$rowCount}][ruleId]" value="" />
+            <input type="text" placeholder="{tr}Unique Name{/tr}" size="30" data-name="label" name="events[{$eventType}][{$rowCount}][ruleId]" value="">
         </td>
         <td>
-            <input type="text" placeholder="{tr}Type (e.g. user){/tr}" size="20" name="events[{$eventType}][{$rowCount}][recipientType]" value="" />
+            <input type="text" placeholder="{tr}Type (e.g. user){/tr}" size="20" name="events[{$eventType}][{$rowCount}][recipientType]" value="">
         </td>
         <td>
-            <input type="text" size="30" placeholder="{tr}Field value (e.g. user){/tr}" name="events[{$eventType}][{$rowCount}][recipient]" value="" />
+            <input type="text" size="30" placeholder="{tr}Field value (e.g. user){/tr}" name="events[{$eventType}][{$rowCount}][recipient]" value="">
         </td>
         <td>
-            <input type="text" placeholder="{tr}Pt. value{/tr}" size="10" name="events[{$eventType}][{$rowCount}][score]" value="" />
+            <input type="text" placeholder="{tr}Pt. value{/tr}" size="10" name="events[{$eventType}][{$rowCount}][score]" value="">
         </td>
         <td class="text-end">
             <a class="delete-row" href="#" role="button">{icon name=delete title="Delete"}</a>
@@ -35,11 +35,11 @@
     <tr class="advanced-row">
         <td class="text-end">{tr}Valid Triggering Object IDs{/tr}</td>
         <td>
-            <input placeholder="Object Ids" type="text" size="20" name="events[{$eventType}][{$rowCount}][expiration]" value="" />
+            <input placeholder="Object Ids" type="text" size="20" name="events[{$eventType}][{$rowCount}][expiration]" value="">
         </td>
         <td class="text-end">{tr}Min. Time Between Scoring{/tr}</td>
         <td>
-            <input placeholder="In seconds" type="text" size="10" name="events[{$eventType}][{$rowCount}][validObjectIds]" value="" />
+            <input placeholder="In seconds" type="text" size="10" name="events[{$eventType}][{$rowCount}][validObjectIds]" value="">
         </td>
     </tr>
     {* Not sure why this JQuery is needed again since it's in include_score.tpl, but it doesn't appear to wokr without it*}

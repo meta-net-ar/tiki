@@ -32,7 +32,7 @@
                 {textarea _simple='y' _toolbars='n' _wysiwyg='n' name='description' id='description' codemirror='true' rows='5' class='form-control'}{$description|escape}{/textarea}
             </div>
             <div class="mb-3 row">
-                <input type="submit" class="btn btn-primary" value="{tr}Create{/tr}"/>
+                <input type="submit" class="btn btn-primary" value="{tr}Create{/tr}">
             </div>
         </div>
     </div>
@@ -79,7 +79,7 @@
             </tbody>
         </table>
         <div class="mb-3 row">
-            <input type="submit" class="btn btn-primary" value="{tr}Select{/tr}"/>
+            <input type="submit" class="btn btn-primary" value="{tr}Select{/tr}">
         </div>
         </div>
     </div>

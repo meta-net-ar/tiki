@@ -150,14 +150,14 @@ function wikiplugin_annotation($data, $params)
 <form method="post" action="tiki-wikiplugin_edit.php" class="form save-annotations">
     <div style="display:none">
         $ticketHtml
-        <input type="hidden" name="page" value="$page"/>
-        <input type="hidden" name="type" value="annotation"/>
-        <input type="hidden" name="index" value="$uid"/>
-        <input type="hidden" name="message" value="$message"/>
+        <input type="hidden" name="page" value="$page">
+        <input type="hidden" name="type" value="annotation">
+        <input type="hidden" name="index" value="$uid">
+        <input type="hidden" name="message" value="$message">
         <textarea id="$cid-content" name="content"></textarea>
     </div>
     <div class="tiki-form-group row">
-        <input type="submit" class="btn btn-primary btn-sm" value="$labelSave"/>
+        <input type="submit" class="btn btn-primary btn-sm" value="$labelSave">
         <label>
             <input type="checkbox" id="$cid-editable">
             {$editableStr}

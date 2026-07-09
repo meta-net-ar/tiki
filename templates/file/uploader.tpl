@@ -29,7 +29,7 @@
             </div>
             <div class="custom-file-title mb-3" style="display: none;">
                 <label class="form-label custom-file-title-label" for="inputFileTitle">{tr}Title{/tr}</label> <span class="text-danger">*</span>
-                <input id="inputFileTitle" class="custom-file-title-input form-control" type="text" name="title" />
+                <input id="inputFileTitle" class="custom-file-title-input form-control" type="text" name="title">
                 <label class="form-label invalid-feedback feedback-required-title">{tr}This field is required before file can be uploaded.{/tr}</label>
                 <label class="form-label invalid-feedback feedback-one-at-time">{tr}Only one file can be uploaded at a time{/tr}</label>
             </div>

@@ -1536,10 +1536,10 @@ class NlLib extends TikiLib
             if (stristr($html, '<base') === false) {
                 if (stristr($html, '<head') === false) {
                     $news_css = $this->getNewsletterCss();
-                    $news_head = "<html><head><base href=\"$base_url\" /><style>{$news_css}</style></head>";
+                    $news_head = "<html><head><base href=\"$base_url\"><style>{$news_css}</style></head>";
                     $html = str_ireplace('<html>', $news_head, $html);
                 } else {
-                    $html = str_ireplace('<head>', "<head><base href=\"$base_url\" />", $html);
+                    $html = str_ireplace('<head>', "<head><base href=\"$base_url\">", $html);
                 }
             }
 

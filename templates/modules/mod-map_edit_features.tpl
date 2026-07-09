@@ -3,14 +3,14 @@
     <form class="map-edit-features" method="post" action="{service controller=tracker action=insert_item}">
         <div class="submit">
             {ticket}
-            <input type="hidden" name="trackerId" value="{$edit_features.trackerId|escape}"/>
-            <input type="hidden" name="controller" value="tracker"/>
-            <input type="hidden" name="action" value="insert_item"/>
-            <input class="feature-content" id="{$edit_features.field.fieldId|escape}" type="hidden" name="forced~{$edit_features.field.permName|escape}"/>
+            <input type="hidden" name="trackerId" value="{$edit_features.trackerId|escape}">
+            <input type="hidden" name="controller" value="tracker">
+            <input type="hidden" name="action" value="insert_item">
+            <input class="feature-content" id="{$edit_features.field.fieldId|escape}" type="hidden" name="forced~{$edit_features.field.permName|escape}">
             {foreach from=$edit_features.hiddenInput key=f item=v}
-                <input id="{$f|escape}" type="hidden" name="forced~{$f|escape}" value="{$v|escape}"/>
+                <input id="{$f|escape}" type="hidden" name="forced~{$f|escape}" value="{$v|escape}">
             {/foreach}
-            <input type="submit" class="btn btn-primary btn-sm" name="create" value="{tr}Create{/tr}"/>
+            <input type="submit" class="btn btn-primary btn-sm" name="create" value="{tr}Create{/tr}">
         </div>
     </form>
     {jq}

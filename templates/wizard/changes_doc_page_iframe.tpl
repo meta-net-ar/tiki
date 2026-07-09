@@ -7,7 +7,7 @@
     </div>
     <br/><br/><br/>
     <div class="flex-grow-1 ms-3">
-        <img class="float-sm-end" src="img/icons/large/doc_site_logo.png" width="70" alt="{tr}Documentation site{/tr}" title="{tr}Documentation site{/tr}"/>
+        <img class="float-sm-end" src="img/icons/large/doc_site_logo.png" width="70" alt="{tr}Documentation site{/tr}" title="{tr}Documentation site{/tr}">
         {tr}Related pages from the Official Documentation site <em>https://doc.tiki.org</em>{/tr}.
         <div>
             <div class="simplebox">

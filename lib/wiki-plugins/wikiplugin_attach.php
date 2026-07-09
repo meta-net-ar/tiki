@@ -282,7 +282,7 @@ function wikiplugin_attach($data, $params)
 
             if ($image) {
                 $link .= '<img src="tiki-download_wiki_attachment.php?attId=' . $attachment['attId'] . $url . '" class="wiki"';
-                $link .= ' alt="' . $description . '"/>';
+                $link .= ' alt="' . $description . '">';
             } else {
                 $link .= '<a href="tiki-download_wiki_attachment.php?attId=' . $attachment['attId'] . $url . '&amp;download=y" class="wiki"';
                 $link .= ' title="' . $description . '">';

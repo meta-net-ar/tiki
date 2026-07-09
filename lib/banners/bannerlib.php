@@ -103,7 +103,7 @@ class BannerLib extends TikiLib
             case 'useFixedURL':
                 $raw
                     = "<div class='banner $class'><a target='$target' href='banner_click.php?id=" . $res["bannerId"] . '\'>'
-                    . '<img src="' . $res["fixedURLData"] . '" alt="banner" /></a></div>';
+                    . '<img src="' . $res["fixedURLData"] . '" alt="banner"></a></div>';
 
                 break;
 

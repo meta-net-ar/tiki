@@ -96,7 +96,7 @@
 
                                 {if $editable_menu_info.use_items_icons eq 'y'}
                                     <div class="label-group input-group-sm">
-                                        <input name="menu-icon" class="field-icon form-control" placeholder="Icon" value="{$option.icon}" id="icon-{$option.name}" />
+                                        <input name="menu-icon" class="field-icon form-control" placeholder="Icon" value="{$option.icon}" id="icon-{$option.name}">
                                         {autocomplete type="icon" element="#icon-{$option.name}"}
                                     </div>
                                 {/if}

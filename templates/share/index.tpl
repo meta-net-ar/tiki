@@ -46,7 +46,7 @@
                                 {if isset($checkboxes_on) and $checkboxes_on eq 'y'}
                                     <td>
                                         <div>
-                                            <input class="checkboxes" type="checkbox" name="checked[]" value="{$token.tokenId|escape}" {if isset($token.tokenId.checked) && $token.tokenId.checked eq 'y'}checked="checked"{/if} />
+                                            <input class="checkboxes" type="checkbox" name="checked[]" value="{$token.tokenId|escape}" {if isset($token.tokenId.checked) && $token.tokenId.checked eq 'y'}checked="checked"{/if}>
                                         </div>
                                     </td>
                                 {/if}

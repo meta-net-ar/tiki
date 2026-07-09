@@ -1122,7 +1122,7 @@ class ParserLib extends TikiDb_Bridge
                 ' data-syntax="' . htmlentities(htmlentities($html_editor_plugin, ENT_QUOTES, 'UTF-8'), ENT_NOQUOTES, 'UTF-8') . '"' .
                 ' data-body="' . htmlentities(htmlentities($data, ENT_QUOTES, 'UTF-8'), ENT_QUOTES, 'UTF-8') . '"' .
                 ' data-args="' . htmlentities($arg_str, ENT_QUOTES, 'UTF-8') . '">' .
-                '<img src="' . $icon . '" width="16" height="16" class="plugin_icon" />' .
+                '<img src="' . $icon . '" width="16" height="16" class="plugin_icon">' .
                 $plugin_result . '<!-- end tiki_plugin --></' . $elem . '>~/np~';
 
         return  $ret;
@@ -2555,7 +2555,7 @@ class ParserLib extends TikiDb_Bridge
 
             if (isset($tiki_p_edit_dynvar) && $tiki_p_edit_dynvar == 'y') {
                 $span1 = "<span style='display:inline;' id='dyn_" . $dvar . "_display'><a class='dynavar' onclick='javascript:toggle_dynamic_var(\"$dvar\");' title='" . tra('Click to edit dynamic variable', '', true) . ": $dvar'>$value</a></span>";
-                $span2 = "<span style='display:none;' id='dyn_" . $dvar . "_edit'><input type='text' class='input-sm' name='dyn_" . $dvar . "' value='" . $value . "' />" . '<input type="submit" class="btn btn-primary btn-sm" name="_dyn_update" value="' . tra('Update variable', '', true) . '"/></span>';
+                $span2 = "<span style='display:none;' id='dyn_" . $dvar . "_edit'><input type='text' class='input-sm' name='dyn_" . $dvar . "' value='" . $value . "'>" . '<input type="submit" class="btn btn-primary btn-sm" name="_dyn_update" value="' . tra('Update variable', '', true) . '"></span>';
             } else {
                 $span1 = "<span class='dynavar' style='display:inline;' id='dyn_" . $dvar . "_display'>$value</span>";
                 $span2 = '';

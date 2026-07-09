@@ -3,9 +3,9 @@
   <head>
     <meta charset="UTF-8">
     <title>{tr}API Documentation{/tr}</title>
-    <link rel="stylesheet" type="text/css" href="{$asset_path}swagger-ui.css" />
-    <link rel="icon" type="image/png" href="{$asset_path}favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="{$asset_path}favicon-16x16.png" sizes="16x16" />
+    <link rel="stylesheet" type="text/css" href="{$asset_path}swagger-ui.css">
+    <link rel="icon" type="image/png" href="{$asset_path}favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="{$asset_path}favicon-16x16.png" sizes="16x16">
     <style>
       html
       {
@@ -33,7 +33,7 @@
 
   <body>
     <div id="loading-spinner"  style="display:block; position: absolute; top: 50%; left: 50%;">
-        <img src="../img/spinner.gif" alt="{tr}Loading...{/tr}" />
+        <img src="../img/spinner.gif" alt="{tr}Loading...{/tr}">
     </div>
     <div id="swagger-ui"></div>
 

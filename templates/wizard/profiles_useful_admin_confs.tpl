@@ -75,7 +75,7 @@
                 <div class="row">
                     <div class="col-md-8 offset-md-2">
                         <a href="https://profiles.tiki.org/display8" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                            <img src="img/profiles/profile_thumb_scheduler_presets_20.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                            <img src="img/profiles/profile_thumb_scheduler_presets_20.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                         </a>
                         <div class="mini text-center">
                             <div class="thumbcaption text-center">{tr}Click to expand{/tr}</div>
@@ -103,7 +103,7 @@
                 <div class="row">
                     <div class="col-md-8 offset-md-2">
                         <a href="https://profiles.tiki.org/display9" class="thumbnail internal" data-box="box" title="{tr}Click to expand{/tr}">
-                            <img src="img/profiles/profile_thumb_activity_stream.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}" />
+                            <img src="img/profiles/profile_thumb_activity_stream.png" alt="Click to expand" class="regImage pluginImg" title="{tr}Click to expand{/tr}">
                         </a>
                         <div class="mini text-center">
                             <div class="thumbcaption text-center">{tr}Click to expand{/tr}</div>

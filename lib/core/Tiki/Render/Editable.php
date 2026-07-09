@@ -96,11 +96,11 @@ class Tiki_Render_Editable
             ];
             if ($params['_wysiwyg'] === 'y') {
                 TikiLib::lib('wysiwyg')->setUpEditor($fieldId, $params);
-                $editable = '<input type="hidden" id="allowhtml" name="allowhtml" value="1" /><textarea name="' . $fieldId . '" id="' . $fieldId . '" style="display:none" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>';
+                $editable = '<input type="hidden" id="allowhtml" name="allowhtml" value="1"><textarea name="' . $fieldId . '" id="' . $fieldId . '" style="display:none" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>';
             } elseif ($this->layout == 'block') {
                 $editable = '<textarea class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>';
             } else {
-                $editable = '<input type="text" class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" value="' . htmlspecialchars($value) . '" />';
+                $editable = '<input type="text" class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" value="' . htmlspecialchars($value) . '">';
             }
             $editable = '<div style="display: none">' . $editable . '</div>';
         } else {

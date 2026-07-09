@@ -1933,33 +1933,33 @@ function wikiplugin_tracker($data, $params)
 
             //check if tracker has custom form classes, else default to form-horizontal
             $formClasses = (isset($tracker['useFormClasses']) && $tracker['useFormClasses'] == 'y') ? $tracker['formClasses'] : "form-horizontal";
-            $back .= '<form class="' . $formClasses . '" name="editItemForm' . $iTRACKER . '" id="editItemForm' . $iTRACKER . '" enctype="multipart/form-data" method="post"' . (! is_null($target) ? ' target="' . $target . '"' : '') . ' action="' . $_SERVER['REQUEST_URI'] . '" ' . $ajax_datas . '><input type="hidden" name="trackit" value="' . $trackerId . '" />';
-            $back .= '<input type="hidden" name="refresh" value="1" />';
+            $back .= '<form class="' . $formClasses . '" name="editItemForm' . $iTRACKER . '" id="editItemForm' . $iTRACKER . '" enctype="multipart/form-data" method="post"' . (! is_null($target) ? ' target="' . $target . '"' : '') . ' action="' . $_SERVER['REQUEST_URI'] . '" ' . $ajax_datas . '><input type="hidden" name="trackit" value="' . $trackerId . '">';
+            $back .= '<input type="hidden" name="refresh" value="1">';
         }
         $back .= smarty_function_ticket([], $smarty->getEmptyInternalTemplate());
-        $back .= '<input type="hidden" name="iTRACKER" value="' . $iTRACKER . '" />';
+        $back .= '<input type="hidden" name="iTRACKER" value="' . $iTRACKER . '">';
         if (isset($_REQUEST['page'])) {
-            $back .= '<input type="hidden" name="page" value="' . $_REQUEST["page"] . '" />';
+            $back .= '<input type="hidden" name="page" value="' . $_REQUEST["page"] . '">';
         }
          // for registration
         if (isset($_REQUEST['name'])) {
-            $back .= '<input type="hidden" name="name" value="' . $_REQUEST["name"] . '" />';
+            $back .= '<input type="hidden" name="name" value="' . $_REQUEST["name"] . '">';
         }
         if (isset($_REQUEST['pass'])) {
-            $back .= '<input type="hidden" name="pass" value="' . $_REQUEST["pass"] . '" />';
-            $back .= '<input type="hidden" name="passAgain" value="' . $_REQUEST["pass"] . '" />';
+            $back .= '<input type="hidden" name="pass" value="' . $_REQUEST["pass"] . '">';
+            $back .= '<input type="hidden" name="passAgain" value="' . $_REQUEST["pass"] . '">';
         }
         if (isset($_REQUEST['email'])) {
-            $back .= '<input type="hidden" name="email" value="' . $_REQUEST["email"] . '" />';
+            $back .= '<input type="hidden" name="email" value="' . $_REQUEST["email"] . '">';
         }
         if (isset($_REQUEST['antibotcode'])) {
-            $back .= '<input type="hidden" name="antibotcode" value="' . $_REQUEST["antibotcode"] . '" />';
+            $back .= '<input type="hidden" name="antibotcode" value="' . $_REQUEST["antibotcode"] . '">';
         }
         if (isset($_REQUEST['chosenGroup'])) { // for registration
-            $back .= '<input type="hidden" name="chosenGroup" value="' . $_REQUEST["chosenGroup"] . '" />';
+            $back .= '<input type="hidden" name="chosenGroup" value="' . $_REQUEST["chosenGroup"] . '">';
         }
         if (isset($_REQUEST['register'])) {
-            $back .= '<input type="hidden" name="register" value="' . $_REQUEST["register"] . '" />';
+            $back .= '<input type="hidden" name="register" value="' . $_REQUEST["register"] . '">';
         }
         if (BooleanEnglishLetter::tryFrom($showtitle) === BooleanEnglishLetter::Yes) {
             $back .= '<div class="h1">' . htmlspecialchars($tracker["name"]) . '</div>';
@@ -2257,12 +2257,12 @@ function wikiplugin_tracker($data, $params)
                 . '</label>';
             $back .= <<<FILL
 <div class="col-md-9 tracker_input_value" >
-    <input type="hidden" value="" name="mode_wysiwyg"/>
-    <input type="hidden" value="" name="mode_normal"/>
+    <input type="hidden" value="" name="mode_wysiwyg">
+    <input type="hidden" value="" name="mode_normal">
     <div class="edit-zone">
         <textarea id="ins_fill" name="ins_fill" class="wikiedit form-control" onkeyup="" rows="15" ></textarea>
     </div>
-    <input type="hidden" value="n" name="wysiwyg"/>
+    <input type="hidden" value="n" name="wysiwyg">
     <div name="ins_fill_desc" class="trackerplugindesc" >
 FILL;
             if (isset($params['fieldsfilldescription']) && ! empty($params['fieldsfilldescription'])) {
@@ -2307,16 +2307,16 @@ FILL;
 
             if (! empty($transactionPreviousLabel) && ! empty($transactionPreviousURL)) {
                 $back .= '<input class="btn btn-secondary button submit previous" type="submit" name="tr_previous" value="'
-                    . tra($transactionPreviousLabel) . '"/> ';
+                    . tra($transactionPreviousLabel) . '"> ';
             }
             if (! empty($reset)) {
-                    $back .= '<input class="btn btn-warning button reset" type="reset" name="tr_reset" value="' . tra($reset) . '" />';
+                    $back .= '<input class="btn btn-warning button reset" type="reset" name="tr_reset" value="' . tra($reset) . '">';
             }
             if (! empty($preview)) {
-                    $back .= '<input class="btn btn-primary button submit preview" type="submit" name="tr_preview" value="' . tra($preview) . '" />';
+                    $back .= '<input class="btn btn-primary button submit preview" type="submit" name="tr_preview" value="' . tra($preview) . '">';
             }
             foreach ($action as $key => $act) {
-                    $back .= '<input class="button submit mx-2 ' . $action_style[$key] . '" type="submit" name="action' . $key . '" value="' . tra($act) . '" onclick="needToConfirm=false" />';
+                    $back .= '<input class="button submit mx-2 ' . $action_style[$key] . '" type="submit" name="action' . $key . '" value="' . tra($act) . '" onclick="needToConfirm=false">';
             }
             $back .= '</div></div>';
         }

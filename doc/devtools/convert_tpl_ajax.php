@@ -124,7 +124,7 @@ $form = str_replace(
     '',
     "<form action='#'>
 <label for='toggle'>" . (empty($_REQUEST['toggle']) ? 'Show replacements' : "Showing $count_r replacements") . ":</label>
-<input type='checkbox' id='toggle' name='toggle' onclick='this.form.submit();'$checked />
+<input type='checkbox' id='toggle' name='toggle' onclick='this.form.submit();'$checked>
 $tpl_sel
 </form>"
 );

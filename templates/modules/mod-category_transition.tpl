@@ -3,7 +3,7 @@
         <form method="post" action="">
             {foreach from=$mod_transitions item=trans}
                 <div class="form-check">
-                    <input class="form-check-input" id="transition-{$trans.transitionId|escape}" type="radio" name="transition" value="{$trans.transitionId|escape}" {if ! $trans.enabled}disabled="disabled"{/if} />
+                    <input class="form-check-input" id="transition-{$trans.transitionId|escape}" type="radio" name="transition" value="{$trans.transitionId|escape}" {if ! $trans.enabled}disabled="disabled"{/if}>
                     <label class="form-check-label" for="transition-{$trans.transitionId|escape}">{$trans.name|escape}</label>
                     {if ! $trans.enabled}
                         <a href="#trans{$trans.transitionId|escape}" class="mouseover">Why?</a>
@@ -39,7 +39,7 @@
                         $(this.href.substr(this.href.lastIndexOf('#'))).toggle('fast');
                     } );
             {/literal}{/jq}
-            <div><input type="submit" class="btn btn-primary btn-sm" title="{tr}Apply Changes{/tr}" value="{tr}Apply{/tr}"/></div>
+            <div><input type="submit" class="btn btn-primary btn-sm" title="{tr}Apply Changes{/tr}" value="{tr}Apply{/tr}"></div>
         </form>
     {else}
         <div>

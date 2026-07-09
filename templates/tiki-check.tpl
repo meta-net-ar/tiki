@@ -251,7 +251,7 @@ setInterval(function() {
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
-                <td data-th="{tr}OK:{/tr}" class="text">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                <td data-th="{tr}OK:{/tr}" class="text">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if}></td>
                 <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
             </tr>
         {foreachelse}
@@ -551,7 +551,7 @@ setInterval(function() {
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                 </td>
-                <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if}></td>
                 <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
             </tr>
         {foreachelse}
@@ -623,7 +623,7 @@ setInterval(function() {
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
-                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if}></td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
                 </tr>
             {foreachelse}
@@ -659,7 +659,7 @@ setInterval(function() {
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
-                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if}></td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
                 </tr>
             {foreachelse}
@@ -694,7 +694,7 @@ setInterval(function() {
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
-                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if}></td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
                 </tr>
         {foreachelse}
@@ -743,7 +743,7 @@ setInterval(function() {
                         {icon name="{$fmap[$item.fitness_status]['icon']}"}&nbsp;{$item.fitness}
                     </span>
                     </td>
-                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if} /></td>
+                    <td data-th="{tr}OK:{/tr}" class="test">&nbsp;<input type="checkbox" name="{$key}" {if $item.fitness_status eq $FITNESS_STATUS_GOOD}disabled{/if} {if !empty($item.ack)}checked{/if}></td>
                     <td data-th="{tr}Explanation:{/tr}" class="text">&nbsp;{$item.message}</td>
                 </tr>
         {foreachelse}

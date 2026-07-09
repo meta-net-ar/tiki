@@ -79,7 +79,7 @@ class Captcha_ReCaptcha30 extends Laminas\Captcha\ReCaptcha
 
         return <<<EOF
         <script src="{$api_server}?render={$this->getSiteKey()}"></script>
-        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response" value="" />
+        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response" value="">
         <style>.grecaptcha-badge {z-index: 1001;}</style>
         <script>
             grecaptcha.ready(function() {
@@ -100,7 +100,7 @@ EOF;
     public function renderAjax()
     {
         return <<<EOF
-        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response" value="" />
+        <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response" value="">
         <style>.grecaptcha-badge {z-index: 1001;}</style>
         <script>
                 grecaptcha.ready(function() {

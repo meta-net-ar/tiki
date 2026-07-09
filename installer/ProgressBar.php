@@ -103,7 +103,7 @@ JS;
                 <div class="progressbar" style="{$progressbar_presentation_style} {$container_layout_style}">
                     <div class="progressbar_wrapper" style="{$progressbar_wrapper_style}">
                         <div class="progressbar_header" style="{$progressbar_header}">
-                            <img src="img/tiki/Tiki_WCG.png" alt="Tiki Logo" style=""/>
+                            <img src="img/tiki/Tiki_WCG.png" alt="Tiki Logo" style="">
                             <h1 style="{$progressbar_h_style}{$progressbar_h1_style}">Database Installation</h1>
                         </div>
                         <div class="progress_body" style="">

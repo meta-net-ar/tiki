@@ -8,7 +8,7 @@
 <form class="simple workspace-ui-content-form" method="post" action="{service controller=workspace action=edit_content}">
     <label>
         {tr}Wiki Page Source{/tr}
-        <input type="text" name="page" value="{$page|escape}"/>
+        <input type="text" name="page" value="{$page|escape}">
     </label>
     <p><strong>{tr}OR{/tr}</strong></p>
     <label>
@@ -16,7 +16,7 @@
         <textarea name="content">{$content|escape}</textarea>
     </label>
     <div class="submit">
-        <input type="submit" class="btn btn-primary btn-sm" value="{tr}Set{/tr}"/>
+        <input type="submit" class="btn btn-primary btn-sm" value="{tr}Set{/tr}">
     </div>
 </form>
 {/block}

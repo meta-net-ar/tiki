@@ -354,7 +354,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         }
         $data['element_id'] = 'area_' . uniqid();
         if ($firstTime && $this->getOption('wysiwyg') === 'y' && $prefs['wysiwyg_htmltowiki'] != 'y') { // html wysiwyg
-            $is_html = '<input type="hidden" id="allowhtml" value="1" />';
+            $is_html = '<input type="hidden" id="allowhtml" value="1">';
             $firstTime = false;
         } else {
             $is_html = '';

@@ -10,8 +10,8 @@
                     {tr _0='<strong><span class="detected-tz-name"></span></strong>' _1='<strong><span class="effective-tz-name"></span></strong>'}The detected timezone is %0, and you have not configured a preferred timezone. So the system uses %1 by default.{/tr}
                 </p>
                 <p class="mb-3">{tr}What would you like to do?{/tr}</p>
-                <input type="hidden" name="client_timezone" id="client-timezone" value=""/>
-                <input type="hidden" name="prefered_timezone" id="prefered-timezone" value=""/>
+                <input type="hidden" name="client_timezone" id="client-timezone" value="">
+                <input type="hidden" name="prefered_timezone" id="prefered-timezone" value="">
                 <div class="d-grid gap-2">
                     <button
                         title="{tr}Details: {/tr}{tr}This will permanently change your profile timezone.{/tr}"

@@ -65,7 +65,7 @@ function enlight_xpath($url, $xpath)
             $loaded = true;
         }
         if ($purifier) {
-            $data = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8" /></head><body>' . $purifier->purify($data) . '</body></html>';
+            $data = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head><body>' . $purifier->purify($data) . '</body></html>';
             //$data = $purifier->purify($data);
         }
     }
