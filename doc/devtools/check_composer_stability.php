@@ -646,10 +646,10 @@ function buildJUnitReportData($existingIssues)
             ];
         }
 
-        if (isset($issue['has_regression']) && $issue['has_regression']) {
+        if ($issue['has_regression']) {
             $junitIssues[$package]['metadata']['has_regressions'] = true;
         }
-        if (isset($issue['has_unstable']) && $issue['has_unstable']) {
+        if ($issue['has_unstable']) {
             $junitIssues[$package]['metadata']['has_unstable'] = true;
         }
     }
@@ -713,6 +713,25 @@ function logInfo($message, $context = [], $returnValue = null)
     }
 
     return $returnValue;
+}
+
+/**
+ * Detect stability regressions across ordered version entries.
+ *
+ * @param array<int, array<string, mixed>> $versions
+ */
+function hasStabilityRegressionInVersions($versions)
+{
+    for ($i = 1; $i < count($versions); $i++) {
+        $prevStability = extractStabilityFromVersion($versions[$i - 1]['constraint']);
+        $currentStability = extractStabilityFromVersion($versions[$i]['constraint']);
+
+        if (getStabilityNumeric($currentStability) < getStabilityNumeric($prevStability)) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -1543,14 +1562,11 @@ function splitExistingIssuesByType($existingIssues)
     $versionDowngrades = [];
 
     foreach ($existingIssues as $issue) {
-        if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
+        if ($issue['has_downgrade']) {
             $versionDowngrades[] = $issue;
         }
 
-        if (
-            (isset($issue['has_unstable']) && $issue['has_unstable']) ||
-            (isset($issue['has_regression']) && $issue['has_regression'])
-        ) {
+        if ($issue['has_unstable'] || $issue['has_regression']) {
             $stabilityIssues[] = $issue;
         }
     }
@@ -1947,28 +1963,14 @@ function checkAcceptedStateStabilityRegressions($package, $metadata, $stableVers
         return null;
     }
 
-    $stableVersionNames = array_keys($stableVersions);
+    $stableVersionNames = array_values($stableVersions);
     $acceptedStateVersions = array_filter($metadata['versions'], function ($version) use ($stableVersionNames) {
         return in_array($version['tiki_version'], $stableVersionNames);
     });
 
     $acceptedStateVersions = sortVersionsByTikiOrder($acceptedStateVersions, $stableVersionNames);
 
-    $hasAcceptedStateRegression = false;
-    for ($i = 1; $i < count($acceptedStateVersions); $i++) {
-        $prev = $acceptedStateVersions[$i - 1];
-        $current = $acceptedStateVersions[$i];
-
-        $prevStability = extractStabilityFromVersion($prev['constraint']);
-        $currentStability = extractStabilityFromVersion($current['constraint']);
-
-        if (getStabilityNumeric($currentStability) < getStabilityNumeric($prevStability)) {
-            $hasAcceptedStateRegression = true;
-            break; // Only need to know if there's a regression, not count each one
-        }
-    }
-
-    if (! $hasAcceptedStateRegression) {
+    if (! hasStabilityRegressionInVersions($acceptedStateVersions)) {
         return null;
     }
 
@@ -2252,7 +2254,7 @@ function countUnmitigatedAcceptedStateIssues($existingIssues, $packageHistory, $
             continue;
         }
 
-        if (isset($issue['has_downgrade']) && $issue['has_downgrade']) {
+        if ($issue['has_downgrade']) {
             if (isset($issue['from_tiki'], $issue['to_tiki'])) {
                 $fromVersion = $issue['from_tiki'];
                 $toVersion = $issue['to_tiki'];
