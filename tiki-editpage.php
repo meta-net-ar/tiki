@@ -318,6 +318,30 @@ if (isset($_REQUEST["current_page_id"]) && empty($info)) {
     if (isset($_REQUEST["add_child"])) {
         $smarty->assign('add_child', "true");
     }
+} elseif (isset($_REQUEST['insert_into_struct']) && isset($_REQUEST['current_page_id'])) {
+    // Link an existing page into the structure and redirect, without touching its content
+    $access->checkCsrf();
+
+    $structure_info = $structlib->s_get_structure_info($_REQUEST['current_page_id']);
+    if (empty($structure_info)) {
+        Feedback::errorAndDie(tra("Invalid structure_id or page_ref_id"), \Laminas\Http\Response::STATUS_CODE_409);
+    }
+    if (
+        ($tiki_p_edit != 'y' && ! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit'))
+        ||
+        (($tiki_p_edit_structures != 'y' &&
+            ! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit_structures')))
+    ) {
+        Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
+    }
+
+    link_page_into_structure($_REQUEST['current_page_id'], isset($_REQUEST['add_child']), $page);
+
+    $url = $wikilib->sefurl($page);
+    if (! empty($_REQUEST['page_ref_id'])) {
+        $url .= (! str_contains($url, '?') ? '?' : '&') . 'page_ref_id=' . $_REQUEST['page_ref_id'];
+    }
+    $access->redirect($url);
 } else {
     $structure_info = [];
     $smarty->assign('current_page_id', 0);
@@ -355,6 +379,48 @@ $smarty->assign('page_ref_id', $page_ref_id);
 function compare_import_versions($a1, $a2)
 {
     return $a1["version"] - $a2["version"];
+}
+
+/**
+ * Links a page into a structure relative to $current_page_id and inherits permissions.
+ *
+ * @param int $current_page_id structure node to insert relative to
+ * @param bool $addChild insert as first child instead of next sibling
+ * @param string $pageName page being linked in
+ * @return int the new page_ref_id
+ */
+function link_page_into_structure($current_page_id, $addChild, $pageName)
+{
+    global $tikilib, $userlib, $prefs, $user;
+    $structlib = TikiLib::lib('struct');
+
+    $page_info = $structlib->s_get_page_info($current_page_id);
+    if ($addChild) {
+        //Insert page after last child of current page
+        $subpages = $structlib->s_get_pages($current_page_id);
+        $max = count($subpages);
+        $last_child_ref_id = null;
+        if ($max !== 0) {
+            $last_child = $subpages[$max - 1];
+            $last_child_ref_id = $last_child["page_ref_id"];
+        }
+        $page_ref_id = $structlib->s_create_page($current_page_id, $last_child_ref_id, $pageName, '', $page_info['structure_id']);
+    } else {
+        //Insert page after current page
+        $page_ref_id = $structlib->s_create_page($page_info["parent_id"], $current_page_id, $pageName, '', $page_info['structure_id']);
+    }
+
+    // Inherit direct object permissions for pages added to a structure, if the user can edit the structure and the page
+    if (! isset($prefs['feature_wiki_no_inherit_perms_structure']) || $prefs['feature_wiki_no_inherit_perms_structure'] === 'n') {
+        if (
+            $tikilib->user_has_perm_on_object($user, $pageName, 'wiki page', 'tiki_p_edit_structures', 'tiki_p_edit') ||
+            ($tikilib->user_has_perm_on_object($user, $pageName, 'wiki page', 'tiki_p_admin_wiki'))
+        ) {
+            $userlib->copy_object_permissions($page_info["pageName"], $pageName, 'wiki page');
+        }
+    }
+
+    return $page_ref_id;
 }
 
 $serviceLib = TikiLib::lib('service');
@@ -1400,31 +1466,8 @@ if (
 
         //Page may have been inserted from a structure page view
         if (isset($_REQUEST['current_page_id'])) {
-            $page_info = $structlib->s_get_page_info($_REQUEST['current_page_id']);
-            $pageAlias = $page_info['page_alias'];
-            if (isset($_REQUEST["add_child"])) {
-                //Insert page after last child of current page
-                $subpages = $structlib->s_get_pages($_REQUEST["current_page_id"]);
-                $max = count($subpages);
-                $last_child_ref_id = null;
-                if ($max !== 0) {
-                    $last_child = $subpages[$max - 1];
-                    $last_child_ref_id = $last_child["page_ref_id"];
-                }
-                $page_ref_id = $structlib->s_create_page($_REQUEST['current_page_id'], $last_child_ref_id, $_REQUEST["page"], '', $page_info['structure_id']);
-            } else {
-                //Insert page after current page
-                $page_ref_id = $structlib->s_create_page($page_info["parent_id"], $_REQUEST['current_page_id'], $_REQUEST["page"], '', $page_info['structure_id']);
-            }
-            // Inherit direct object permissions for pages added to a structure, if the user can edit the structure and the page
-            if (! isset($prefs['feature_wiki_no_inherit_perms_structure']) || $prefs['feature_wiki_no_inherit_perms_structure'] === 'n') {
-                if (
-                    $tikilib->user_has_perm_on_object($user, $_REQUEST["page"], 'wiki page', 'tiki_p_edit_structures', 'tiki_p_edit') ||
-                    ($tikilib->user_has_perm_on_object($user, $_REQUEST["page"], 'wiki page', 'tiki_p_admin_wiki'))
-                ) {
-                    $userlib->copy_object_permissions($page_info["pageName"], $_REQUEST["page"], 'wiki page');
-                }
-            }
+            $pageAlias = $structlib->s_get_page_info($_REQUEST['current_page_id'])['page_alias'];
+            link_page_into_structure($_REQUEST['current_page_id'], isset($_REQUEST["add_child"]), $_REQUEST["page"]);
         }
 
         /* Local reference handling */
