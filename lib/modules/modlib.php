@@ -1148,9 +1148,6 @@ class ModLib extends TikiLib
             $module_params = array_merge($defaults, $module_params); // not sure why style doesn't get set sometime but is used in the tpl
 
             $mod_reference = array_merge(['moduleId' => null, 'ord' => 0, 'position' => 0, 'rows' => 10, 'cache_time' => 0], $mod_reference);
-            if (! is_numeric($mod_reference['rows']) || $mod_reference['rows'] <= 0) {
-                $mod_reference['rows'] = 10;
-            }
 
             $info = $this->get_module_info($mod_reference);
             $cachefile = $this->get_cache_file($mod_reference, $info);
