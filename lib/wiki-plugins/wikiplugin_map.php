@@ -255,7 +255,7 @@ function wikiplugin_map($data, $params)
         $center = $geolib->get_default_center();
     }
 
-    TikiLib::lib('header')->add_map();
+    wp_map_add_map();
 
     $scope = \SmartyTiki\Modifier\Escape::apply(wp_map_getscope($params));
 
@@ -425,12 +425,17 @@ function wp_map_color_filter($color)
 }
 
 /** This used to be in headerlib and called from tiki-setup.php.  Moved here, but untested - benoitg - 2024-04-19 */
-function wp_map_add_map()
+function wp_map_add_map(): void
 {
+    /** Tracks if `add_map` has been called, only needed once */
+    static $mapAdded = false;
+    if ($mapAdded) {
+        return;
+    }
+    $headerlib = TikiLib::lib('header');
     global $prefs;
 
     $tikilib = TikiLib::lib('tiki');
-    $headerlib = TikiLib::lib('header');
     $enabled = $tikilib->get_preference('geo_tilesets', ['openstreetmap'], true);
 
     $google = array_intersect(['google_street', 'google_physical', 'google_satellite', 'google_hybrid'], $enabled);
@@ -460,29 +465,24 @@ window.onload = loadScript;');
     }
 
     /* Needs additional testing
-    $visual = array_intersect(array('visualearth_road', 'visualearth_aerial', 'visualearth_hybrid'), $enabled);
-    if (count($visual) > 0) {
-        $headerlib->add_jsfile_cdn('http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.1');
-    }
-    */
+        $visual = array_intersect(array('visualearth_road', 'visualearth_aerial', 'visualearth_hybrid'), $enabled);
+        if (count($visual) > 0) {
+            $this->add_jsfile_cdn('http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.1');
+        }
+        */
 
-    if ($prefs['geo_openlayers_version'] === 'ol3') {
-        $headerlib->add_jsfile_external('vendor_bundled/vendor/openlayers/openlayers/ol.js', true)
-            ->add_cssfile('vendor_bundled/vendor/openlayers/openlayers/ol.css')
-            ->add_jsfile_external('vendor_bundled/vendor/walkermatt/ol-layerswitcher/dist/ol-layerswitcher.js')
-            ->add_cssfile('vendor_bundled/vendor/walkermatt/ol-layerswitcher/src/ol-layerswitcher.css')
-            ->add_js(
-                ''
-            );
-    } else {
-        $headerlib->add_jsfile_external('lib/openlayers/OpenLayers.js', true);
-    }
+    $mapsJs = "\$(\".map-container:not(.done)\").addClass(\"done\").visible(function() {\$(this).createMap();});\n";
 
-    $headerlib->add_js(
-        '$(".map-container:not(.done)")
-                .addClass("done")
-                .visible(function() {
-                    $(this).createMap();
-            });'
-    );
+    // Set the zoom option after searching for a location
+    $zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
+    $mapsJs .= 'var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . "\";\n";
+
+    $headerlib->add_jsfile_external(OL_PATH . '/dist/ol.js', true)
+        ->add_cssfile(OL_PATH . '/ol.css')
+        ->add_jsfile_external(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.js')
+        ->add_cssfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.css')
+        ->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps.js")
+        ->add_js($mapsJs);
+
+    $mapAdded = true;
 }

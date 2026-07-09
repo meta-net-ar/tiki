@@ -63,6 +63,7 @@ function getHTMLPurifierTikiConfig()
         $conf->set('Attr.EnableID', 1);
         $conf->set('HTML.Doctype', 'XHTML 1.0 Transitional');
         $conf->set('HTML.TidyLevel', 'light');
+        $conf->set('Core.EscapeNonASCIICharacters', false);
         if ($def = $conf->maybeGetRawHTMLDefinition()) {
             $def->addAttribute('a', 'target', 'Enum#_blank,_self,_target,_top');
             $def->addAttribute('a', 'name', 'CDATA');

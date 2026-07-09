@@ -197,7 +197,7 @@ if (isset($prefs['session_storage']) && $prefs['session_storage'] == 'db') {
     if ($db instanceof PdoDb) {
         require_once('lib/tikisession-pdo.php');
     }
-} elseif (isset($prefs['session_storage']) && $prefs['session_storage'] == 'memcache' && \Tiki\Cache\Memcachelib::getInstance()->isEnabled()) {
+} elseif (isset($prefs['session_storage']) && $prefs['session_storage'] == 'memcache' && \Tiki\Cache\MemcacheLib::getInstance()->isEnabled()) {
     require_once('lib/tikisession-memcache.php');
 }
 
@@ -321,12 +321,7 @@ if (isset($_SERVER["REQUEST_URI"]) && ! str_contains($_SERVER['REQUEST_URI'], 't
 }
 
 // Moved here from tiki-setup.php because smarty use a copy of session
-if (isset($prefs['feature_fullscreen']) && $prefs['feature_fullscreen'] == 'y') {
-    require_once('lib/setup/fullscreen.php');
-} else {
-    //Some templates depend on this
-    $_SESSION['fullscreen'] = 'n';
-}
+require_once('lib/setup/fullscreen.php'); //Do not make this require conditional, some templates depend on this
 
 // Retrieve Tiki Extension Packages
 \Tiki\Package\ExtensionManager::refresh();

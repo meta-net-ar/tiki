@@ -255,9 +255,9 @@ class Model3DViewerTest extends TikiTestCase
         $this->assertStringContainsString('~np~', $result);
         $this->assertStringContainsString('model3dviewer', $result);
 
-        $scripts = $this->headerlib->js_modules[0] ?? [];
+        $scripts = $this->headerlib->output_js();
         $this->assertNotEmpty($scripts, 'Expected JS module to be added');
-        $lastJs = end($scripts);
+        $lastJs = $scripts;
         $this->assertStringContainsString('example.com/model.glb', $lastJs);
         $this->assertStringContainsString('autoRotate: true', $lastJs);
         $this->assertStringContainsString('loop: true', $lastJs);
@@ -290,9 +290,9 @@ class Model3DViewerTest extends TikiTestCase
         $this->assertStringContainsString('~np~', $result);
         $this->assertStringContainsString('model3dviewer', $result);
 
-        $scripts = $this->headerlib->js_modules[0] ?? [];
-        $this->assertNotEmpty($scripts);
-        $lastJs = end($scripts);
+        $scripts = $this->headerlib->output_js();
+        $this->assertNotEmpty($scripts, 'Expected JS module to be added');
+        $lastJs = $scripts;
         $this->assertStringContainsString('autoRotate: false', $lastJs);
         $this->assertStringContainsString('autoplay: true', $lastJs);
         $this->assertStringContainsString('loop: false', $lastJs);
@@ -309,9 +309,9 @@ class Model3DViewerTest extends TikiTestCase
 
         $result = wikiplugin_model3dviewer('', $params);
 
-        $scripts = $this->headerlib->js_modules[0] ?? [];
-        $this->assertNotEmpty($scripts);
-        $lastJs = end($scripts);
+        $scripts = $this->headerlib->output_js();
+        $this->assertNotEmpty($scripts, 'Expected JS module to be added');
+        $lastJs = $scripts;
         $this->assertStringContainsString('backgroundColor: "#aabbcc"', $lastJs);
     }
 }

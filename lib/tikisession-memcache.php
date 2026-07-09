@@ -17,8 +17,8 @@ class MemcacheSession implements SessionHandlerInterface
     {
         session_set_save_handler($this);
 
-        $this->enabled = \Tiki\Cache\Memcachelib::getInstance()->isEnabled();
-        $this->lib = \Tiki\Cache\Memcachelib::getInstance();
+        $this->enabled = \Tiki\Cache\MemcacheLib::getInstance()->isEnabled();
+        $this->lib = \Tiki\Cache\MemcacheLib::getInstance();
     }
 
     /**

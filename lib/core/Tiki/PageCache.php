@@ -9,7 +9,7 @@
  * Cache the page output (page as in http output, not wiki page) using memcache.
  * Important notes:
  * 1- This class will interrupt script processing on cache hit.  See dieAndOutputOrStore
- * 2- This cache uses \Tiki\Cache\Memcachelib directly, NOT Cachelib, which should probably be changed... benoitg- 2024-02-16
+ * 2- This cache uses \Tiki\Cache\MemcacheLib directly, NOT Cachelib, which should probably be changed... benoitg- 2024-02-16
  *
  */
 class Tiki_PageCache
@@ -28,11 +28,11 @@ class Tiki_PageCache
     /** This is the raw memcache key for the cache metadata */
     private $metaKey = null;
     private $headerLibCopy = null;
-    private ?\Tiki\Cache\Memcachelib $cache = null;
+    private ?\Tiki\Cache\MemcacheLib $cache = null;
 
     private function __construct()
     {
-        $this->cache = \Tiki\Cache\Memcachelib::getInstance();
+        $this->cache = \Tiki\Cache\MemcacheLib::getInstance();
     }
 
     /** This is NOT a singleton */
@@ -143,24 +143,24 @@ class Tiki_PageCache
                 $cachedOutput = $this->cache->get($this->key);
             }
             if ($debug) {
-                var_dump("TikiPageCache: " . $this->key, $cachedOutput, $maxAge);
+                var_dump("TikiPageCache: " . $this->key, $cachedOutput, $maxAge); //@phpstan-ignore disallowedFunctions.varDump (this is gated debug code)
             }
                 $maxAge = $maxAge ?? self::DEFAULT_MAX_AGE;
             if ($cachedOutput) {
                 $remainingTime = $maxAge - (time() - $cachedOutput['timestamp']);
                 if ($remainingTime <= 0) {
                     if ($debug) {
-                        var_dump("TikiPageCache:  Stale cache, $remainingTime seconds remaining");
+                        var_dump("TikiPageCache:  Stale cache, $remainingTime seconds remaining"); //@phpstan-ignore disallowedFunctions.varDump (this is gated debug code)
                     }
                     $cachedOutput = null;
                 } else {
                     if ($debug) {
-                        var_dump("TikiPageCache:  Cache hit, $remainingTime seconds remaining");
+                        var_dump("TikiPageCache:  Cache hit, $remainingTime seconds remaining"); //@phpstan-ignore disallowedFunctions.varDump (this is gated debug code)
                     }
                 }
             } else {
                 if ($debug) {
-                    var_dump("TikiPageCache:  Cache miss at " . time());
+                    var_dump("TikiPageCache:  Cache miss at " . time()); //@phpstan-ignore disallowedFunctions.varDump (this is gated debug code)
                 }
             }
 
@@ -215,7 +215,7 @@ class Tiki_PageCache
                 ob_start();
         } else {
             if ($debug) {
-                    var_dump("TikiPageCache:  Cache disabled");
+                    var_dump("TikiPageCache:  Cache disabled"); //@phpstan-ignore disallowedFunctions.varDump (this is gated debug code)
             }
         }
         return $this;

@@ -216,9 +216,6 @@ class HeaderLib
     private ?string $outputHeadersWasStartedBy = null;
     private ?string $outputStaticJSFooterWasStartedBy = null;
 
-    /** Tracks if `add_map` has been called, only needed once */
-    private bool $mapAdded = false;
-
     public function __construct()
     {
         $smarty = TikiLib::lib('smarty');
@@ -732,10 +729,11 @@ class HeaderLib
     }
 
     /**
-     * NOT RECOMMENDED
+     * @deprecated
      *
      * A hack to remove all css previously added.  This is used by some fullscreen external libraries.
      *
+     * @todo This is now a NO-OP, it needs to be replaced at call time.
      * @return void
      */
     public function unsafeClearAllCss(): void
@@ -746,30 +744,18 @@ class HeaderLib
 
     public function replace_cssfile($old, $new, $rank): HeaderLib
     {
-        /*foreach ($this->cssfiles[$rank] as $i => $css) {
-        if ($css == $old) {
-        $this->cssfiles[$rank][$i] = $new;
-        break;
-        }
-        }
-        return $this;*/
+        $this->drop_cssfile($old);
+        $this->add_cssfile($new, $rank);
+        return $this;
     }
 
     public function drop_cssfile($file): HeaderLib
     {
-        /*$out = [];
-        foreach ($this->cssfiles as $rank => $data) {
-        foreach ($data as $f) {
-        if ($f != $file) {
-            $out[$rank][] = $f;
-        }
-        }
-        }
-        $this->cssfiles = $out;
-        return $this;*/
+        $this->removeLoadableContent([
+        'content' => $file
+        ]);
+        return $this;
     }
-
-
 
     public function add_rssfeed($href, $title, $rank = 0): HeaderLib
     {
@@ -826,12 +812,14 @@ class HeaderLib
         ksort($this->rssfeeds);
         $retVal = generateJsImportmapScripts();
         $retVal .= "\n";
+
         $retVal .= <<<'EOT'
         <script type="module">
             import * as tikiHeaderlib from "@jquery-tiki/headerlib";
             window.tikiHeaderlib = tikiHeaderlib;  //Make it accessible to legacy js scripts.
-        </script>;
+        </script>
         EOT;
+
         if ($this->title) {
             $retVal = '<title>' . \SmartyTiki\Modifier\Escape::apply($this->title) . "</title>\n\n";
         }
@@ -875,6 +863,7 @@ class HeaderLib
             }
             $retVal .= "\n";
         }
+
         return $retVal;
     }
 
@@ -1234,7 +1223,7 @@ class HeaderLib
 
 
     /**
-     * @TODO:  Aside from tests, $wrap = false il only used by unit tests and wikiplugin_tracker.  Rename/remove this.
+     * @TODO:  Aside from tests, $wrap = false is only used by unit tests and wikiplugin_tracker.  Rename/remove this.
      *
      * @param boolean $raw
      * @return string
@@ -1270,12 +1259,14 @@ class HeaderLib
     }
 
     /**
-     * @TODO:  THIS NEEDS TO BE REPLACED OR PORTED - benoitg
+     * @TODO:  THIS NEEDS TO BE REPLACED OR PORTED It's only used for caching in wikilib.php - benoitg
      * Gets JavaScript and jQuery scripts as an array (for AJAX)
      * @return array[strings]
      */
     public function getJs(): array
     {
+        throw new Error("TODO:  Replace this, it's not longer functional, the internal structure it manipulates do not exist.");
+        /*
         //TODO: see if this should set $this->outputStaticJSFooterWasStartedBy)
         ksort($this->js);
         ksort($this->jq_onready);
@@ -1296,10 +1287,11 @@ class HeaderLib
                     $js .= "$j\n";
                 }
             }
-            $js .= "}) /* end on ready */;\n";
+            $js .= "});\n";
             $out[] = $js;
         }
         return $out;
+        */
     }
 
     public static function wrapJsOnReady(string $inJs)
@@ -1613,70 +1605,6 @@ class HeaderLib
         $files = $this->collect_css_files();
 
         return array_merge($files['default'], $files['screen']);
-    }
-
-    public function add_map()
-    {
-        if ($this->mapAdded) {
-            return $this;
-        }
-
-        $this->mapAdded = true;
-
-        global $prefs;
-
-        $tikilib = TikiLib::lib('tiki');
-        $enabled = $tikilib->get_preference('geo_tilesets', ['openstreetmap'], true);
-
-        $google = array_intersect(['google_street', 'google_physical', 'google_satellite', 'google_hybrid'], $enabled);
-        if (count($google) > 0 || $prefs['geo_google_streetview'] == 'y') {
-            $args = [
-                'v' => '3',
-            ];
-
-            if (! empty($prefs['gmap_key'])) {
-                $args['key'] = $prefs['gmap_key'];
-            }
-
-            $url = $tikilib->httpScheme() . '://maps.googleapis.com/maps/api/js?' . http_build_query($args, '', '&');
-
-            if (TikiLib::lib('access')->is_xml_http_request()) {
-                $this->add_js('function loadScript() {
-var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = "' . $url . '";
-    document.body.appendChild(script);
-}
-
-window.onload = loadScript;');
-            } else {
-                $this->add_jsfile_external($url, true);
-            }
-        }
-
-        /* Needs additional testing
-        $visual = array_intersect(array('visualearth_road', 'visualearth_aerial', 'visualearth_hybrid'), $enabled);
-        if (count($visual) > 0) {
-            $this->add_jsfile_cdn('http://dev.virtualearth.net/mapcontrol/mapcontrol.ashx?v=6.1');
-        }
-        */
-
-        $mapsJs = "\$(\".map-container:not(.done)\").addClass(\"done\").visible(function() {\$(this).createMap();});\n";
-
-        // Set the zoom option after searching for a location
-        $zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'] ?? $prefs['geo_zoomlevel_to_found_location'] ?? 'street';
-        $mapsJs .= 'var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . "\";\n";
-
-        $this->add_jsfile_external(OL_PATH . '/dist/ol.js', true)
-            ->add_cssfile(OL_PATH . '/ol.css')
-            ->add_jsfile_external(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.js')
-            ->add_cssfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.css')
-            ->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps.js")
-            ->add_js($mapsJs);
-
-        $this->mapAdded = true;
-
-        return $this;
     }
 
     /**

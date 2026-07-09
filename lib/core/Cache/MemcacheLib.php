@@ -9,7 +9,7 @@ namespace Tiki\Cache;
 use Memcached;
 
 /**
- * Class Memcachelib
+ * Class MemcacheLib
  *
  * Simple central point for configuring and using memcache support.
  *
@@ -18,7 +18,7 @@ use Memcached;
  */
 class MemcacheLib
 {
-    private $memcache = false;
+    private ?Memcached $memcache = null;
     public $options;
     public $key_prefix;
     private $functional = false;
@@ -32,7 +32,7 @@ class MemcacheLib
     }
 
     /**
-     * Memcachelib constructor.
+     * MemcacheLib constructor.
      * @param bool $memcached_servers
      * @param bool $memcached_options
      */
