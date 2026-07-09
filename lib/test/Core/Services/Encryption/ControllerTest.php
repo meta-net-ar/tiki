@@ -26,6 +26,17 @@ class Services_Encryption_ControllerTest extends TikiTestCase
         $this->subject->setUp();
     }
 
+    protected function tearDown(): void
+    {
+        // Several tests here drive the POST paths of enter_key and the CSRF
+        // ticket flow, which dirty request/session superglobals. Reset them so
+        // stale state does not leak into later test classes — e.g. a left-over
+        // REQUEST_METHOD/ticket broke WikiToolsTest's confirmed broker calls
+        // ("No pages were selected") when this class ran before it.
+        unset($_SERVER['REQUEST_METHOD'], $_POST['ticket'], $_SESSION['CSRF_TOKEN']);
+        parent::tearDown();
+    }
+
     public function testCreateSimpleKey()
     {
         $input = new JitFilter([
