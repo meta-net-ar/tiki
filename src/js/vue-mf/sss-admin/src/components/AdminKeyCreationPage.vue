@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { useClipboard } from "../composables/useClipboard";
+import { getCsrfTicket } from "../csrf";
 const tr = window.tr || ((s: string) => s);
 
 const props = defineProps<{
@@ -103,6 +104,7 @@ async function save() {
             if (regenerate.value) body.set("regenerate", "1");
         }
         selectedUsers.value.forEach((u) => body.append("users[]", u));
+        body.set("ticket", await getCsrfTicket());
 
         const res = await fetch("tiki-ajax_services.php?controller=encryption&action=save_key", {
             method: "POST",

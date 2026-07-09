@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from "vue";
 import { useClipboard } from "../composables/useClipboard";
+import { getCsrfTicket } from "../csrf";
 
 const tr = window.tr || ((s: string) => s);
 
@@ -117,7 +118,7 @@ async function deleteKey(keyId: number) {
         const res = await fetch("tiki-ajax_services.php?controller=encryption&action=delete_key", {
             method: "POST",
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({ keyId: String(keyId) }),
+            body: new URLSearchParams({ keyId: String(keyId), ticket: await getCsrfTicket() }),
         });
         if (!res.ok) {
             error.value = tr("Failed to delete key.");

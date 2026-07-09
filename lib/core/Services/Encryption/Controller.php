@@ -24,11 +24,52 @@ class Services_Encryption_Controller
         return 'security';
     }
 
+    /**
+     * Enforce a valid CSRF ticket on state-changing POST requests.
+     *
+     * The mutating admin actions (save_key, delete_key) are reached only via
+     * POST from the SSS admin Vue front-end. On a web POST we require a matching
+     * origin and a valid ticket; access->checkCsrf() throws Services_Exception
+     * with a 401 code when the ticket is missing or invalid.
+     *
+     * The guard is limited to genuine web POST requests. TIKI_API is defined by
+     * tiki-setup.php on every web entry point (false for normal requests, true
+     * for the token-authenticated API where CSRF does not apply), so its absence
+     * means we are outside the web bootstrap — e.g. the CLI/unit-test harness,
+     * which carries no CSRF material. Skipping there also avoids the
+     * confirmation-dialog/die() branch of checkCsrf() outside a browser POST.
+     *
+     * unsetTicket is false so the stable per-session ticket stays reusable across
+     * the SPA's successive admin actions even when short-lived CSRF tokens are on.
+     */
+    private function enforceCsrfTicket(): void
+    {
+        if (! defined('TIKI_API') || ($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+            return;
+        }
+        TikiLib::lib('access')->checkCsrf(null, null, null, false, null, 'services');
+    }
+
+    /**
+     * Return the current session CSRF ticket so the SSS admin Vue front-end can
+     * include it in its mutating POST requests. Admin-gated like the other read
+     * actions on this controller; the ticket is session-bound and same-origin
+     * policy prevents a cross-origin attacker from reading the response body.
+     */
+    public function action_get_ticket()
+    {
+        Services_Exception_Denied::checkGlobal('tiki_p_admin');
+        $access = TikiLib::lib('access');
+        $access->setTicket();
+        return ['ticket' => $access->getTicket()];
+    }
+
     public function action_save_key($input)
     {
         global $user, $prefs;
 
         Services_Exception_Denied::checkGlobal('tiki_p_admin');
+        $this->enforceCsrfTicket();
 
         $keyId = $input->keyId->int();
         $name = $input->name->text();
@@ -210,6 +251,7 @@ class Services_Encryption_Controller
     public function action_delete_key($input)
     {
         Services_Exception_Denied::checkGlobal('tiki_p_admin');
+        $this->enforceCsrfTicket();
         return $this->encryptionlib->delete_key($input->keyId->int());
     }
 

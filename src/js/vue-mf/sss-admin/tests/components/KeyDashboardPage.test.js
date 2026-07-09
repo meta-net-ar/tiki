@@ -1,11 +1,13 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/vue";
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import KeyDashboardPage from "../../src/components/KeyDashboardPage.vue";
+import { __resetCsrfTicket } from "../../src/csrf";
 
 const KEYS_RESPONSE = [
     { keyId: 1, name: "Payroll Key", description: "HR payroll data", shares: 2, users: "alice,bob", atRisk: false },
     { keyId: 2, name: "Legal Key", description: "", shares: 0, users: "", atRisk: true },
 ];
+const TEST_TICKET = "TESTTICKET-123";
 
 function mockFetch(responses) {
     let callIndex = 0;
@@ -20,6 +22,7 @@ function mockFetch(responses) {
 }
 
 beforeEach(() => {
+    __resetCsrfTicket();
     global.fetch = mockFetch([KEYS_RESPONSE]);
 });
 
@@ -63,7 +66,36 @@ describe("KeyDashboardPage — delete key", () => {
         const deleteButtons = screen.getAllByTitle(/delete/i);
         await fireEvent.click(deleteButtons[0]);
 
-        expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("action=delete_key"), expect.objectContaining({ method: "POST" }));
+        // The delete POST is now issued after an async getCsrfTicket() hop, so wait for it.
+        await waitFor(() =>
+            expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("action=delete_key"), expect.objectContaining({ method: "POST" }))
+        );
+    });
+
+    test("includes the CSRF ticket in the delete_key POST body", async () => {
+        global.confirm = vi.fn().mockReturnValue(true);
+        global.fetch = vi.fn().mockImplementation((url) => {
+            if (url.includes("action=get_ticket")) {
+                return Promise.resolve({ ok: true, json: () => Promise.resolve({ ticket: TEST_TICKET }) });
+            }
+            if (url.includes("action=delete_key")) {
+                return Promise.resolve({ ok: true, json: () => Promise.resolve({}) });
+            }
+            return Promise.resolve({ ok: true, json: () => Promise.resolve(KEYS_RESPONSE) });
+        });
+
+        render(KeyDashboardPage);
+        await waitFor(() => screen.getByText("Payroll Key"));
+
+        const deleteButtons = screen.getAllByTitle(/delete/i);
+        await fireEvent.click(deleteButtons[0]);
+
+        await waitFor(() =>
+            expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("action=delete_key"), expect.objectContaining({ method: "POST" }))
+        );
+
+        const deleteCall = global.fetch.mock.calls.find(([url]) => url.includes("action=delete_key"));
+        expect(new URLSearchParams(deleteCall[1].body).get("ticket")).toBe(TEST_TICKET);
     });
 
     test("does not call delete endpoint when user cancels", async () => {

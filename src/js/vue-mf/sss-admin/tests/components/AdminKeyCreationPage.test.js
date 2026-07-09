@@ -1,13 +1,18 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/vue";
 import { describe, expect, test, vi, beforeEach, afterEach } from "vitest";
 import AdminKeyCreationPage from "../../src/components/AdminKeyCreationPage.vue";
+import { __resetCsrfTicket } from "../../src/csrf";
 
 const USERS_RESPONSE = ["alice", "bob", "carol"];
 const ALGOS_RESPONSE = ["aes-256-ctr", "aes-256-gcm"];
 const SAVE_RESPONSE = { keyId: 1, shares: ["share-alice", "share-bob"] };
+const TEST_TICKET = "TESTTICKET-123";
 
 function setupFetch(overrides = {}) {
     global.fetch = vi.fn().mockImplementation((url) => {
+        if (url.includes("action=get_ticket")) {
+            return Promise.resolve({ ok: true, json: () => Promise.resolve({ ticket: overrides.ticket ?? TEST_TICKET }) });
+        }
         if (url.includes("action=get_algos")) {
             return Promise.resolve({ ok: true, json: () => Promise.resolve(overrides.algos ?? ALGOS_RESPONSE) });
         }
@@ -27,7 +32,10 @@ function setupFetch(overrides = {}) {
     });
 }
 
-beforeEach(() => setupFetch());
+beforeEach(() => {
+    __resetCsrfTicket();
+    setupFetch();
+});
 
 afterEach(() => {
     vi.restoreAllMocks();
@@ -67,6 +75,21 @@ describe("AdminKeyCreationPage — create mode", () => {
         await waitFor(() =>
             expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("action=save_key"), expect.objectContaining({ method: "POST" }))
         );
+    });
+
+    test("includes the CSRF ticket in the save_key POST body", async () => {
+        render(AdminKeyCreationPage, { props: { mode: "create" } });
+        await waitFor(() => screen.getByRole("button", { name: /apply/i }));
+
+        const inputs = screen.getAllByRole("textbox");
+        await fireEvent.update(inputs[0], "Payroll Key");
+        await fireEvent.click(screen.getByRole("button", { name: /apply/i }));
+
+        await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("action=save_key"), expect.any(Object)));
+
+        const saveCall = global.fetch.mock.calls.find(([url]) => url.includes("action=save_key"));
+        const body = saveCall[1].body;
+        expect(new URLSearchParams(body).get("ticket")).toBe(TEST_TICKET);
     });
 
     test("shows error message on save failure", async () => {

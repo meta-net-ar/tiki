@@ -241,6 +241,38 @@ class Services_Encryption_ControllerTest extends TikiTestCase
         $this->subject->action_get_algos(new JitFilter([]));
     }
 
+    /*
+     * CSRF ticket enforcement on save_key/delete_key (added via enforceCsrfTicket)
+     * is intentionally NOT unit-tested here. Exercising the rejection means calling
+     * access->checkCsrf(), whose failure path runs csrfError() -> error_log(), which
+     * this Tiki PHPUnit harness intercepts and reports as a test error before the
+     * Services_Exception can surface (it also depends on getcookie()/absolute_urls
+     * web-bootstrap state absent under CLI). That web-context coupling is why the
+     * regression guard lives in the shared-secrets E2E suite (TC-08: anonymous and
+     * bogus-ticket POSTs to save_key must not create a key). The unit layer covers
+     * the pieces that ARE cleanly testable: the get_ticket endpoint below and, on the
+     * front-end, that the ticket is sent (sss-admin Vitest suites).
+     */
+
+    public function testGetTicketReturnsTicketForAdmin()
+    {
+        $response = $this->subject->action_get_ticket();
+        $this->assertArrayHasKey('ticket', $response);
+        $this->assertNotEmpty($response['ticket']);
+    }
+
+    public function testGetTicketDeniedForNonAdmin()
+    {
+        $perms = new Perms();
+        $perms->setResolverFactories([
+            new Perms_ResolverFactory_StaticFactory('root', new Perms_Resolver_Default(false)),
+        ]);
+        Perms::set($perms);
+
+        $this->expectException(Services_Exception_Denied::class);
+        $this->subject->action_get_ticket();
+    }
+
     public function testGetKeyResponseExcludesKeyMaterial()
     {
         $this->shareKeyWithUser(function ($result) {
