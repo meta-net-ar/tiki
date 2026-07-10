@@ -9,8 +9,7 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 }
 
 $groupHome = $userlib->get_user_default_homepage($user);
-$perspectivelib = TikiLib::lib('perspective');
-if ($groupHome != '' && ! $perspectivelib->get_current_perspective($prefs)) {
+if ($groupHome != '') {
     if (! preg_match('/^(\/|https?:)/', $groupHome)) {
         $prefs['wikiHomePage'] = $groupHome;
         $wikilib = TikiLib::lib('wiki');
