@@ -2474,7 +2474,7 @@ class FileGalLib extends TikiLib
             $filename = substr($filename, 0, 80);
         }
         $query = "select `fileId`,`path`,`galleryId`,`filename`,`filetype`,`data`,`filesize`,`name`,`description`,
-                `created` from `tiki_files` where `filename`=? ORDER BY created DESC LIMIT 1";
+                `created` from `tiki_files` where `filename`=? AND `archiveId` = 0 ORDER BY created DESC LIMIT 1";
         $result = $this->query($query, [$filename]);
         return $result->fetchRow();
     }
