@@ -839,28 +839,17 @@ composer-stability:
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   needs:
     - composer
-  # The stability checker returns 0=success, 1=new issues, 2=baseline warnings.
-  # GitLab runners use `set -e` by default, which stops on any non-zero code.
-  # Temporarily disabling `-e` lets us capture exit code 2, then re-enable it.
   script:
-    - |
-      set +e
-      php doc/devtools/check_composer_stability.php --ci
-      EXIT_CODE=$?
-      set -e
-      exit $EXIT_CODE
+    - php doc/devtools/check_composer_stability.php --ci
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: always
-    - if: $CI_PIPELINE_SOURCE == "push"
-      when: always
+    - changes:
+        - "**/composer.json"
   artifacts:
     when: always
     reports:
       junit: composer-stability-report.xml
-  allow_failure:
-    exit_codes: 
-    - 2
+  allow_failure: false
+ 
 
 composer-operator-check:
   stage: composer-stability

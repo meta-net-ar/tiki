@@ -215,7 +215,7 @@
         "league/flysystem-aws-s3-v3": "~3.30",
         "league/flysystem-ftp": "~3.30",
         "league/flysystem-sftp-v3": "~3.30",
-        "league/flysystem-webdav": "~3.30",
+        "league/flysystem-webdav": "dev-master",
         "league/html-to-markdown": "~5.1",
         "league/oauth1-client": "~1.11",
         "league/oauth2-client": "~2.9",
