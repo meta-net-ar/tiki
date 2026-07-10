@@ -2553,7 +2553,7 @@ class FileGalLib extends TikiLib
         $query = "select tf.*, tfg.galleryId as validGalleryId
                 from `tiki_files` tf
                 left join `tiki_file_galleries` tfg on (tf.`galleryId`=tfg.`galleryId`)
-                where tf.`filename`=? ORDER BY tf.created DESC LIMIT 1";
+                where tf.`filename`=? AND tf.`archiveId` = 0 ORDER BY tf.created DESC LIMIT 1";
         $result = $this->query($query, [$filename]);
         $file = $result->fetchRow();
         $this->verifyFileGalleryIntegrity($file);
