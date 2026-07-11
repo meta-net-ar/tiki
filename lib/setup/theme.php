@@ -214,8 +214,8 @@ Sections::onSectionChange(function ($section) {
         // add meta tag
         $headerlib->add_meta("theme-color", "");
         // iOS Safari
-        $headerlib->add_meta("apple-mobile-web-app-capable", "yes");
-        $headerlib->add_meta("apple-mobile-web-app-status-bar-style", "black-translucent");
+        $headerlib->add_meta("mobile-web-app-capable", "yes");
+        $headerlib->add_meta("mobile-web-app-status-bar-style", "black-translucent");
         // add jq to set content of theme-color Meta Tag to the current theme navbar color
         $headerlib->add_jq_onready($jq, 5);
     }
