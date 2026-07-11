@@ -23,7 +23,9 @@
  * Requires a configured Tiki instance (tiki-setup.php / database), like prefreport.php.
  * See also: doc/devtools/prefreport.php
  *
- * OCR preference metadata is parsed from source to avoid executing prefs_ocr_list().
+ * Preference help is parsed from lib/prefs source when possible; pref modules with
+ * dynamically generated entries (wikiplugin, trackerfield, etc.) are executed for a
+ * complete catalog. OCR is parsed from source only (no shell side effects).
  */
 
 if (PHP_SAPI !== 'cli') {
@@ -139,18 +141,18 @@ exit(0);
 function collect_all_preferences()
 {
     $all = [];
-    $skipExecuteModules = ['ocr'];
+    $staticOnlyModules = ['ocr'];
 
     foreach (array_filter(
         glob('lib/prefs/*.php'),
         static fn ($path) => basename($path) !== 'index.php'
     ) as $file) {
         $module = substr(basename($file), 0, -4);
-
         $file = str_replace('\\', '/', $file);
+        $staticHelp = extract_pref_help_from_source($file);
 
-        if (in_array($module, $skipExecuteModules, true)) {
-            $list = extract_pref_help_from_source($file);
+        if (in_array($module, $staticOnlyModules, true)) {
+            $list = $staticHelp;
         } else {
             $function = "prefs_{$module}_list";
 
@@ -166,11 +168,20 @@ function collect_all_preferences()
         }
 
         foreach ($list as $prefName => $raw) {
+            $static = $staticHelp[$prefName] ?? [];
+            $help = $static['help'] ?? null;
+            $helpUnresolved = ! empty($static['_help_unresolved']);
+
+            if (($help === null || $help === '') && is_array($raw) && is_string($raw['help'] ?? null) && $raw['help'] !== '') {
+                $help = $raw['help'];
+                $helpUnresolved = false;
+            }
+
             $all[$prefName] = [
                 'file' => $file,
-                'help' => $raw['help'] ?? null,
+                'help' => $help,
                 'line' => find_pref_line($file, $prefName),
-                'help_unresolved' => ! empty($raw['_help_unresolved']),
+                'help_unresolved' => $helpUnresolved,
             ];
         }
     }
@@ -179,11 +190,9 @@ function collect_all_preferences()
 }
 
 /**
- * Parse preference metadata from source without executing prefs_*_list().
+ * Parse preference help metadata from source without executing prefs_*_list().
  *
- * Used for modules with heavy CLI side effects (e.g. shell commands).
- *
- * @return array<string, array{help?: string}>
+ * @return array<string, array{help?: string, _help_unresolved?: bool}>
  */
 function extract_pref_help_from_source($file)
 {
@@ -198,8 +207,9 @@ function extract_pref_help_from_source($file)
 /**
  * Token-based parser for prefs_*_list() arrays.
  *
- * Supports string literals, concatenated strings, simple variables assigned to string literals,
- * and tra()/tr() calls with a literal first argument. Complex expressions are flagged as unresolved.
+ * Supports return [...] and $var = [...] pref definitions. Handles string literals,
+ * concatenated strings, simple variables assigned to string literals, and tra()/tr()
+ * calls with a literal first argument. Complex expressions are flagged as unresolved.
  *
  * @return array<string, array{help?: string, _help_unresolved?: bool}>
  */
@@ -209,8 +219,8 @@ function extract_pref_help_from_tokens($content)
     $count = count($tokens);
     $vars = [];
     $list = [];
-    $inReturnArray = false;
-    $returnBaseDepth = -1;
+    $inPrefArray = false;
+    $prefArrayBaseDepth = -1;
     $squareDepth = 0;
     $parenDepth = 0;
 
@@ -224,9 +234,9 @@ function extract_pref_help_from_tokens($content)
             continue;
         }
         if ($text === ']') {
-            if ($inReturnArray && $squareDepth === $returnBaseDepth) {
-                $inReturnArray = false;
-                $returnBaseDepth = -1;
+            if ($inPrefArray && $squareDepth === $prefArrayBaseDepth) {
+                $inPrefArray = false;
+                $prefArrayBaseDepth = -1;
             }
             $squareDepth--;
             continue;
@@ -240,11 +250,17 @@ function extract_pref_help_from_tokens($content)
             continue;
         }
 
-        // Record simple variable assignments like: $foo = 'bar';
-        if ($tokenId === T_VARIABLE && $parenDepth === 0) {
+        if ($tokenId === T_VARIABLE && $parenDepth === 0 && ! $inPrefArray) {
             $name = ltrim($text, '$');
             $next = next_non_whitespace_token($tokens, $i + 1);
             if ($next !== null && token_text($tokens[$next]) === '=') {
+                $afterEq = next_non_whitespace_token($tokens, $next + 1);
+                if ($afterEq !== null && token_text($tokens[$afterEq]) === '[') {
+                    $inPrefArray = true;
+                    $prefArrayBaseDepth = $squareDepth + 1;
+                    continue;
+                }
+
                 $expr = read_expression_tokens($tokens, $next + 1);
                 $value = evaluate_help_expression($expr, $vars);
                 if (is_string($value)) {
@@ -253,16 +269,16 @@ function extract_pref_help_from_tokens($content)
             }
         }
 
-        if (! $inReturnArray && $tokenId === T_RETURN) {
+        if (! $inPrefArray && $tokenId === T_RETURN) {
             $next = next_non_whitespace_token($tokens, $i + 1);
             if ($next !== null && token_text($tokens[$next]) === '[') {
-                $inReturnArray = true;
-                $returnBaseDepth = $squareDepth + 1;
+                $inPrefArray = true;
+                $prefArrayBaseDepth = $squareDepth + 1;
             }
             continue;
         }
 
-        if (! $inReturnArray || $squareDepth !== $returnBaseDepth) {
+        if (! $inPrefArray || $squareDepth !== $prefArrayBaseDepth) {
             continue;
         }
 
