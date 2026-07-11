@@ -102,7 +102,10 @@ div.highlight.adminoptionbox {
     width: 1.8rem;
     padding: .2rem;
 }
-
+.package-row-highlight td {
+  background-color: rgba(255, 193, 7, 0.2) !important;
+  color: #856404 !important;
+}
 // Input fields with browse file type - fixes the button height glitch in FF
 input[type="file"] {
     height: auto;

@@ -140,6 +140,7 @@ $packageprefs = TikiLib::lib('prefs')->getPackagePrefs();
 asort($packageprefs);
 $smarty->assign('packageprefs', $packageprefs);
 
+$smarty->assign('package_highlight', $_GET['package_highlight'] ?? null);
 $smarty->assign('composer_environment_warning', $composerManager->checkThatCanInstallPackages());
 $smarty->assign('composer_available', $composerManager->composerIsAvailable());
 $smarty->assign('composer_packages_installed', $installableList);
