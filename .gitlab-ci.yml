@@ -842,14 +842,14 @@ composer-stability:
   script:
     - php doc/devtools/check_composer_stability.php --ci
   rules:
-    - if: $CI_COMMIT_BRANCH == "master"
-      when: never
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: always
-    - when: manual
+    - changes:
+        - "**/composer.json"
   artifacts:
-    when: always  # Always upload artifacts even if job fails
-  allow_failure: true  # Allow job to fail without failing the pipeline
+    when: always
+    reports:
+      junit: composer-stability-report.xml
+  allow_failure: false
+ 
 
 composer-operator-check:
   stage: composer-stability

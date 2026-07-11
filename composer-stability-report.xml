@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Composer Stability Check">
+  <testsuite name="Package Stability" tests="5">
+    <testcase name="candy-chat/xmpp-prebind-php" classname="PackageStability">
+      <failure type="StabilityIssue" message="Stability issues detected">Package: candy-chat/xmpp-prebind-php
+- Unstable versions used
+</failure>
+    </testcase>
+    <testcase name="jason-munro/cypht" classname="PackageStability">
+      <failure type="StabilityIssue" message="Stability issues detected">Package: jason-munro/cypht
+- Unstable versions used
+</failure>
+    </testcase>
+    <testcase name="npm-asset/select2" classname="PackageStability">
+      <failure type="StabilityIssue" message="Stability issues detected">Package: npm-asset/select2
+- Unstable versions used
+</failure>
+    </testcase>
+    <testcase name="rubix/extras" classname="PackageStability">
+      <failure type="StabilityIssue" message="Stability issues detected">Package: rubix/extras
+- Unstable versions used
+</failure>
+    </testcase>
+    <testcase name="garethp/php-ews" classname="PackageStability">
+      <failure type="StabilityIssue" message="Stability issues detected">Package: garethp/php-ews
+- Unstable versions used
+</failure>
+    </testcase>
+  </testsuite>
+</testsuites>
