@@ -10,7 +10,7 @@
  *
  * Scans:
  *   - lib/prefs/*.php (preference "help" metadata)
- *   - templates/admin/*.tpl ({help url="..."} and hardcoded doc.tiki.org URLs)
+ *   - templates/ recursively ({help url="..."} and hardcoded doc.tiki.org URLs; wizards excluded)
  *
  * Excludes: admin icons, wizards, dynamic wikiplugin/trackerfield help.
  *
@@ -113,10 +113,10 @@ foreach ($allPrefs as $prefName => $info) {
     $rows[] = preference_link_row($prefName, $info, $baseHelpUrl);
 }
 
-$adminRows = scan_admin_templates($baseHelpUrl);
-$unparsedHelpTags = count(array_filter($adminRows, static fn ($r) => ($r['status'] ?? '') === 'PARSE_WARNING'));
-$adminRows = array_values(array_filter($adminRows, static fn ($r) => ($r['status'] ?? '') !== 'PARSE_WARNING'));
-$rows = array_merge($rows, $adminRows);
+$templateRows = scan_templates($baseHelpUrl);
+$unparsedHelpTags = count(array_filter($templateRows, static fn ($r) => ($r['status'] ?? '') === 'PARSE_WARNING'));
+$templateRows = array_values(array_filter($templateRows, static fn ($r) => ($r['status'] ?? '') !== 'PARSE_WARNING'));
+$rows = array_merge($rows, $templateRows);
 
 foreach ($rows as $key => $row) {
     $rows[$key] = classify_row($row);
@@ -636,14 +636,39 @@ function resolve_url($baseHelpUrl, $value)
 }
 
 /**
+ * @return list<string>
+ */
+function collect_template_files()
+{
+    $files = [];
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator('templates', FilesystemIterator::SKIP_DOTS)
+    );
+
+    foreach ($iterator as $fileInfo) {
+        if (! $fileInfo->isFile() || $fileInfo->getExtension() !== 'tpl') {
+            continue;
+        }
+        $path = str_replace('\\', '/', $fileInfo->getPathname());
+        if (str_starts_with($path, 'templates/wizard/')) {
+            continue;
+        }
+        $files[] = $path;
+    }
+
+    sort($files);
+
+    return $files;
+}
+
+/**
  * @return list<array<string, mixed>>
  */
-function scan_admin_templates($baseHelpUrl)
+function scan_templates($baseHelpUrl)
 {
     $rows = [];
 
-    foreach (glob('templates/admin/*.tpl') as $file) {
-        $file = str_replace('\\', '/', $file);
+    foreach (collect_template_files() as $file) {
         $content = read_required_file($file);
 
         if (preg_match_all('/\{help\b(?P<attrs>[^{}]*)\}/is', $content, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
@@ -654,7 +679,7 @@ function scan_admin_templates($baseHelpUrl)
                 $url = $attrs['url'] ?? null;
                 if (! is_string($url) || $url === '') {
                     $rows[] = make_row([
-                        'source_type' => 'admin_help',
+                        'source_type' => 'template_help',
                         'location' => $file,
                         'line' => offset_to_line($content, $tagOffset),
                         'original_value' => $tag,
@@ -667,7 +692,7 @@ function scan_admin_templates($baseHelpUrl)
                     continue;
                 }
                 $rows[] = make_row([
-                    'source_type' => 'admin_help',
+                    'source_type' => 'template_help',
                     'location' => $file,
                     'line' => offset_to_line($content, $tagOffset),
                     'original_value' => $url,
@@ -680,7 +705,7 @@ function scan_admin_templates($baseHelpUrl)
             foreach ($urlMatches[0] as $match) {
                 $url = rtrim($match[0], '.,;');
                 $rows[] = make_row([
-                    'source_type' => 'admin_hardcoded',
+                    'source_type' => 'template_hardcoded',
                     'location' => $file,
                     'line' => offset_to_line($content, $match[1]),
                     'original_value' => $url,
@@ -886,8 +911,8 @@ function print_summary(
     }
 
     $linkRows = array_filter($rows, static fn ($r) => ($r['status'] ?? '') !== 'MISSING');
-    $adminHelp = count(array_filter($linkRows, static fn ($r) => $r['source_type'] === 'admin_help'));
-    $hardcoded = count(array_filter($linkRows, static fn ($r) => $r['source_type'] === 'admin_hardcoded'));
+    $templateHelp = count(array_filter($linkRows, static fn ($r) => $r['source_type'] === 'template_help'));
+    $hardcoded = count(array_filter($linkRows, static fn ($r) => $r['source_type'] === 'template_hardcoded'));
 
     $counts = [
         'NON_CANONICAL' => 0,
@@ -908,7 +933,7 @@ function print_summary(
     echo "\n# Documentation Link Audit\n\n";
     echo 'Preferences defined: ' . count($allPrefs) . "\n";
     echo 'Preferences with help (links scanned): ' . $prefsWithHelp . "\n";
-    echo "Admin help links scanned: {$adminHelp}\n";
+    echo "Template {help} links scanned: {$templateHelp}\n";
     echo "Hardcoded doc.tiki.org URLs scanned: {$hardcoded}\n\n";
     echo 'Non-canonical links (+ or space): ' . $counts['NON_CANONICAL'] . "\n";
     echo 'External links: ' . $counts['EXTERNAL'] . "\n";
