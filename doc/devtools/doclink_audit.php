@@ -60,22 +60,7 @@ chdir(dirname(__DIR__, 2));
 
 require_once 'tiki-setup.php';
 
-global $prefs;
-
-$prefs['record_untranslated'] = 'n';
-
-$prefs['feature_help'] = 'y';
 $baseHelpUrl = 'https://doc.tiki.org/';
-if (! empty($prefs['helpurl'])) {
-    $baseHelpUrl = $prefs['helpurl'];
-    if (str_starts_with($baseHelpUrl, 'http://doc.tiki.org')) {
-        $baseHelpUrl = 'https://doc.tiki.org' . substr($baseHelpUrl, strlen('http://doc.tiki.org'));
-    }
-}
-if (! str_ends_with($baseHelpUrl, '/')) {
-    $baseHelpUrl .= '/';
-}
-$prefs['helpurl'] = $baseHelpUrl;
 
 $prefslib = TikiLib::lib('prefs');
 prime_prefslib_skipped_modules(['ocr' => 'lib/prefs/ocr.php']);
@@ -156,11 +141,11 @@ function collect_all_preferences()
     $all = [];
     $skipExecuteModules = ['ocr'];
 
-    foreach (glob('lib/prefs/*.php') as $file) {
+    foreach (array_filter(
+        glob('lib/prefs/*.php'),
+        static fn ($path) => basename($path) !== 'index.php'
+    ) as $file) {
         $module = substr(basename($file), 0, -4);
-        if ($module === 'index') {
-            continue;
-        }
 
         $file = str_replace('\\', '/', $file);
 
