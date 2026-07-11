@@ -181,6 +181,21 @@ FileETag MTime Size
     # Redirect drawio requests to the correct path
     RewriteRule ^img/lib/(.*)$ vendor/tikiwiki/diagram/img/lib/$1 [NC,L]
 
+    # Redirect /HomePage
+    RewriteRule ^$ tiki-index.php?page=HomePage [QSA,L]
+    RewriteRule ^HomePage/?$ / [R=301,L]
+    RewriteRule ^en/?$ / [R=301,L]
+    RewriteRule ^fr/Accueil/?$   /fr/        [R=301,L]
+    RewriteRule ^fr/?$  tiki-index.php?page=Accueil&curr_lang=fr   [QSA,L]
+
+    # Prefixed pretty URLs
+    RewriteRule ^en/([A-Za-z0-9_-]+)/?$  tiki-index.php?page=$1&curr_lang=en  [QSA,L]
+    RewriteRule ^fr/([A-Za-z0-9_-]+)/?$  tiki-index.php?page=$1&curr_lang=fr  [QSA,L]
+
+    # Tracker/plugin redirects under language prefixes
+    RewriteRule ^en/tiki-index\.php$  tiki-index.php?curr_lang=en  [QSA,L]
+    RewriteRule ^fr/tiki-index\.php$  tiki-index.php?curr_lang=fr  [QSA,L]
+
     # -- Apache Authorization Header -- #
     # Rewrite rules for passing authorization with Apache running in CGI or FastCGI mode
     RewriteCond %{HTTP:Authorization} ^(.*)
