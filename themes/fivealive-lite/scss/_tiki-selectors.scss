@@ -48,11 +48,9 @@ body.fullscreen.tiki.navbar-padding {
 .layout_social .topbar_modules .sitetitle,
 .layout_social_modules .topbar_modules .sitetitle {
     font-size: 1.8rem;
-    line-height: $tiki-navbar-fixed-height;
 }
 
 .layout_social .top_modules {
-    height: $tiki-navbar-fixed-height;
      .sitelogo img {
         width: auto !important;
         margin-right: 1.5em;
@@ -69,8 +67,6 @@ body.fullscreen.tiki.navbar-padding {
         float: left;
         font-size: 1.5em;
         margin: 0 0 0 1.5em;
-        line-height: $tiki-navbar-fixed-height;
-        height: $tiki-navbar-fixed-height;
         color: #ffffff;
     }
 }
