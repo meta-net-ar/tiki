@@ -196,12 +196,21 @@ function collect_all_preferences()
  */
 function extract_pref_help_from_source($file)
 {
+    return extract_pref_help_from_tokens(read_required_file($file));
+}
+
+/**
+ * @return string
+ */
+function read_required_file($file)
+{
     $content = file_get_contents($file);
     if ($content === false) {
-        return [];
+        fwrite(STDERR, "Failed to read file: {$file}\n");
+        exit(1);
     }
 
-    return extract_pref_help_from_tokens($content);
+    return $content;
 }
 
 /**
@@ -635,10 +644,7 @@ function scan_admin_templates($baseHelpUrl)
 
     foreach (glob('templates/admin/*.tpl') as $file) {
         $file = str_replace('\\', '/', $file);
-        $content = file_get_contents($file);
-        if ($content === false) {
-            continue;
-        }
+        $content = read_required_file($file);
 
         if (preg_match_all('/\{help\b(?P<attrs>[^{}]*)\}/is', $content, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
             foreach ($matches as $match) {
