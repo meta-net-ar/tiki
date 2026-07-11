@@ -23,11 +23,8 @@
  * Requires a configured Tiki instance (tiki-setup.php / database), like prefreport.php.
  * See also: doc/devtools/prefreport.php
  *
- * CLI bootstrap suppresses PHP warnings from the full Tiki setup and avoids OCR
- * shell-command side effects when scanning preferences.
+ * OCR preference metadata is parsed from source to avoid executing prefs_ocr_list().
  */
-
-use Tiki\Command\ConsoleSetupException;
 
 if (PHP_SAPI !== 'cli') {
     die("This script must be run from the command line.\n");
@@ -61,34 +58,7 @@ $csvPath = $options['csv'] ?? 'dump/doclink_audit.csv';
 
 chdir(dirname(__DIR__, 2));
 
-define('TIKI_CONSOLE', 1);
-
-$previousErrorHandler = set_error_handler(static function ($severity, $message, $file, $line) use (&$previousErrorHandler) {
-    if (in_array($severity, [E_WARNING, E_NOTICE, E_DEPRECATED, E_USER_WARNING, E_USER_NOTICE, E_USER_DEPRECATED], true)) {
-        return true;
-    }
-    if ($previousErrorHandler) {
-        return $previousErrorHandler($severity, $message, $file, $line);
-    }
-    return false;
-});
-$displayErrors = ini_get('display_errors');
-ini_set('display_errors', '0');
-
-try {
-    require_once 'tiki-setup.php';
-} catch (ConsoleSetupException $e) {
-    restore_error_handler();
-    fwrite(STDERR, $e->getMessage() . "\n");
-    exit($e->getCode() ?: 1);
-} catch (Throwable $e) {
-    restore_error_handler();
-    ini_set('display_errors', $displayErrors);
-    throw $e;
-}
-
-ini_set('display_errors', $displayErrors);
-restore_error_handler();
+require_once 'tiki-setup.php';
 
 global $prefs;
 
@@ -186,13 +156,6 @@ function collect_all_preferences()
     $all = [];
     $skipExecuteModules = ['ocr'];
 
-    $collectHandler = set_error_handler(static function ($severity, $message, $file, $line) {
-        if (in_array($severity, [E_WARNING, E_NOTICE, E_DEPRECATED, E_USER_WARNING, E_USER_NOTICE, E_USER_DEPRECATED], true)) {
-            return true;
-        }
-        return false;
-    });
-
     foreach (glob('lib/prefs/*.php') as $file) {
         $module = substr(basename($file), 0, -4);
         if ($module === 'index') {
@@ -225,10 +188,6 @@ function collect_all_preferences()
                 'help_unresolved' => ! empty($raw['_help_unresolved']),
             ];
         }
-    }
-
-    if ($collectHandler !== null) {
-        restore_error_handler();
     }
 
     return $all;
@@ -598,6 +557,7 @@ function prime_prefslib_skipped_modules(array $modules)
             $modulePrefs[$name] = [
                 'name' => $name,
                 'type' => 'text',
+                'default' => '',
                 'help' => $raw['help'] ?? null,
             ];
         }
