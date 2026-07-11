@@ -6,19 +6,22 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 /**
- * Documentation Link Auditor — audit admin-panel documentation links.
+ * Documentation Link Auditor — validate documentation links in source.
  *
- * Scans:
- *   - lib/prefs/*.php (preference "help" metadata)
+ * Scans existing help links in:
+ *   - lib/prefs/*.php (preference "help" metadata and hardcoded doc.tiki.org URLs)
  *   - templates/ recursively ({help url="..."} and hardcoded doc.tiki.org URLs; wizards excluded)
  *
- * Excludes: admin icons, wizards, dynamic wikiplugin/trackerfield help.
+ * Reports NON_CANONICAL slugs (+ or space) and EXTERNAL URLs. Does not HTTP-check doc.tiki.org
+ * (use Restore Help Pages on doc.tiki.org for missing wiki pages).
+ *
+ * Skips link rows from dynamic wikiplugin/trackerfield pref modules.
  *
  * Usage (from Tiki root):
  *   php doc/devtools/doclink_audit.php [--include-missing] [--csv=PATH]
  *
- * Default CSV includes NON_CANONICAL and EXTERNAL rows.
- * MISSING preferences are counted in the console summary; use --include-missing to export them.
+ * Default CSV includes NON_CANONICAL and EXTERNAL rows only.
+ * MISSING preferences (experimental) are counted in the console summary; use --include-missing to export them.
  *
  * Requires a configured Tiki instance (tiki-setup.php / database), like prefreport.php.
  * See also: doc/devtools/prefreport.php
@@ -38,18 +41,21 @@ if (isset($options['h']) || isset($options['help'])) {
     echo <<<HELP
 Documentation Link Auditor
 
+Validates existing documentation links in lib/prefs and templates.
+Reports non-canonical doc.tiki.org slugs (+ or space) and external URLs.
+
 Usage (from Tiki root):
   php doc/devtools/doclink_audit.php [options]
 
 Options:
-  --include-missing   Include MISSING preference rows in the CSV export
+  --include-missing   Include MISSING preference rows in the CSV export (experimental)
   --csv=PATH          CSV output path (default: dump/doclink_audit.csv)
   -h, --help          Show this help
 
 Default CSV columns: source_type, location, line, preference, original_value,
 resolved_url, status, suggested_slug
 
-Statuses: OK, MISSING, NON_CANONICAL, EXTERNAL
+CSV default: NON_CANONICAL and EXTERNAL rows. Statuses: OK, MISSING, NON_CANONICAL, EXTERNAL
 
 HELP;
     exit(0);
@@ -113,9 +119,9 @@ foreach ($allPrefs as $prefName => $info) {
     $rows[] = preference_link_row($prefName, $info, $baseHelpUrl);
 }
 
+$rows = array_merge($rows, scan_pref_hardcoded_urls());
+
 $templateRows = scan_templates($baseHelpUrl);
-$unparsedHelpTags = count(array_filter($templateRows, static fn ($r) => ($r['status'] ?? '') === 'PARSE_WARNING'));
-$templateRows = array_values(array_filter($templateRows, static fn ($r) => ($r['status'] ?? '') !== 'PARSE_WARNING'));
 $rows = array_merge($rows, $templateRows);
 
 foreach ($rows as $key => $row) {
@@ -131,9 +137,17 @@ if (dirname($csvPath) !== '' && ! is_dir(dirname($csvPath))) {
 }
 
 write_csv($csvRows, $csvPath);
-print_summary($rows, $missingCount, $allPrefs, $includeMissing, $csvPath, $csvRows, $unresolvedHelpCount, $unparsedHelpTags);
+print_summary($rows, $missingCount, $allPrefs, $includeMissing, $csvPath, $csvRows, $unresolvedHelpCount);
 
 exit(0);
+
+/**
+ * @return list<string>
+ */
+function get_pref_php_files()
+{
+    return array_values(array_filter(glob('lib/prefs/*.php'), static fn ($path) => basename($path) !== 'index.php'));
+}
 
 /**
  * @return array<string, array{file: string, help: mixed, line: int, help_unresolved?: bool}>
@@ -143,10 +157,7 @@ function collect_all_preferences()
     $all = [];
     $staticOnlyModules = ['ocr'];
 
-    foreach (array_filter(
-        glob('lib/prefs/*.php'),
-        static fn ($path) => basename($path) !== 'index.php'
-    ) as $file) {
+    foreach (get_pref_php_files() as $file) {
         $module = substr(basename($file), 0, -4);
         $file = str_replace('\\', '/', $file);
         $staticHelp = extract_pref_help_from_source($file);
@@ -579,12 +590,14 @@ function prime_prefslib_skipped_modules(array $modules)
 
 function find_pref_line($file, $prefName)
 {
-    $lines = file($file);
-    if ($lines === false) {
-        return 0;
+    static $linesByFile = [];
+
+    if (! isset($linesByFile[$file])) {
+        $linesByFile[$file] = explode("\n", read_required_file($file));
     }
+
     $pattern = "/['\"]" . preg_quote($prefName, '/') . "['\"]\s*=>/";
-    foreach ($lines as $num => $line) {
+    foreach ($linesByFile[$file] as $num => $line) {
         if (preg_match($pattern, $line) && ! preg_match('/^\s*\/\//', $line)) {
             return $num + 1;
         }
@@ -635,6 +648,53 @@ function resolve_url($baseHelpUrl, $value)
     return $baseHelpUrl . $value;
 }
 
+function is_auditable_template_help_url($url)
+{
+    $url = trim($url);
+
+    return $url !== '' && $url !== '#' && ! str_contains($url, '$');
+}
+
+/**
+ * @return list<array<string, mixed>>
+ */
+function scan_pref_hardcoded_urls()
+{
+    $rows = [];
+
+    foreach (get_pref_php_files() as $file) {
+        $file = str_replace('\\', '/', $file);
+        $rows = array_merge($rows, collect_hardcoded_doc_tiki_url_rows(read_required_file($file), $file, 'preference_hardcoded'));
+    }
+
+    return $rows;
+}
+
+/**
+ * @return list<array<string, mixed>>
+ */
+function collect_hardcoded_doc_tiki_url_rows($content, $file, $sourceType)
+{
+    $rows = [];
+
+    if (! preg_match_all('#https?://doc\.tiki\.org[^\s"\'<>|]+#i', $content, $urlMatches, PREG_OFFSET_CAPTURE)) {
+        return $rows;
+    }
+
+    foreach ($urlMatches[0] as $match) {
+        $url = rtrim($match[0], '.,;');
+        $rows[] = make_row([
+            'source_type' => $sourceType,
+            'location' => $file,
+            'line' => offset_to_line($content, $match[1]),
+            'original_value' => $url,
+            'resolved_url' => $url,
+        ]);
+    }
+
+    return $rows;
+}
+
 /**
  * @return list<string>
  */
@@ -671,48 +731,30 @@ function scan_templates($baseHelpUrl)
     foreach (collect_template_files() as $file) {
         $content = read_required_file($file);
 
-        if (preg_match_all('/\{help\b(?P<attrs>[^{}]*)\}/is', $content, $matches, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
-            foreach ($matches as $match) {
-                $tag = $match[0][0];
-                $tagOffset = $match[0][1];
-                $attrs = extract_smarty_attributes_from_help_tag($tag);
-                $url = $attrs['url'] ?? null;
-                if (! is_string($url) || $url === '') {
-                    $rows[] = make_row([
-                        'source_type' => 'template_help',
-                        'location' => $file,
-                        'line' => offset_to_line($content, $tagOffset),
-                        'original_value' => $tag,
-                        'resolved_url' => '',
-                        'status' => 'PARSE_WARNING',
-                    ]);
-                    continue;
-                }
-                if (str_contains($url, '$')) {
+        $helpTagCount = preg_match_all(
+            '/\{help\b\s+url\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s}]+))/is',
+            $content,
+            $matches,
+            PREG_OFFSET_CAPTURE
+        );
+        if ($helpTagCount) {
+            foreach ($matches[0] as $i => $fullMatch) {
+                $url = $matches[1][$i][0] !== '' ? $matches[1][$i][0]
+                    : ($matches[2][$i][0] !== '' ? $matches[2][$i][0] : $matches[3][$i][0]);
+                if (! is_auditable_template_help_url($url)) {
                     continue;
                 }
                 $rows[] = make_row([
                     'source_type' => 'template_help',
                     'location' => $file,
-                    'line' => offset_to_line($content, $tagOffset),
+                    'line' => offset_to_line($content, $fullMatch[1]),
                     'original_value' => $url,
                     'resolved_url' => resolve_url($baseHelpUrl, $url),
                 ]);
             }
         }
 
-        if (preg_match_all('#https?://doc\.tiki\.org[^\s"\'<>]+#i', $content, $urlMatches, PREG_OFFSET_CAPTURE)) {
-            foreach ($urlMatches[0] as $match) {
-                $url = rtrim($match[0], '.,;');
-                $rows[] = make_row([
-                    'source_type' => 'template_hardcoded',
-                    'location' => $file,
-                    'line' => offset_to_line($content, $match[1]),
-                    'original_value' => $url,
-                    'resolved_url' => $url,
-                ]);
-            }
-        }
+        $rows = array_merge($rows, collect_hardcoded_doc_tiki_url_rows($content, $file, 'template_hardcoded'));
     }
 
     return $rows;
@@ -721,37 +763,6 @@ function scan_templates($baseHelpUrl)
 function offset_to_line($content, $offset)
 {
     return substr_count($content, "\n", 0, $offset) + 1;
-}
-
-/**
- * Parse attributes from a Smarty {help ...} tag.
- *
- * Supports single/double quotes, multiline tags, unquoted values, and any attribute order.
- *
- * @return array<string, string>
- */
-function extract_smarty_attributes_from_help_tag(string $tag): array
-{
-    $attrs = [];
-    if (! preg_match('/^\{help\b(?P<body>.*)\}$/is', trim($tag), $match)) {
-        return $attrs;
-    }
-    $body = trim($match['body']);
-    if ($body === '') {
-        return $attrs;
-    }
-
-    if (preg_match_all('/([a-zA-Z_][a-zA-Z0-9_-]*)\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s}]+))/s', $body, $attrMatches, PREG_SET_ORDER)) {
-        foreach ($attrMatches as $attrMatch) {
-            $name = strtolower($attrMatch[1]);
-            $value = $attrMatch[2] !== ''
-                ? $attrMatch[2]
-                : ($attrMatch[3] !== '' ? $attrMatch[3] : ($attrMatch[4] ?? ''));
-            $attrs[$name] = trim($value);
-        }
-    }
-
-    return $attrs;
 }
 
 /**
@@ -858,7 +869,7 @@ function write_csv(array $rows, $path)
     $handle = fopen($path, 'w');
     if ($handle === false) {
         fwrite(STDERR, "Could not write CSV to {$path}\n");
-        return;
+        exit(1);
     }
 
     $headers = [
@@ -900,8 +911,7 @@ function print_summary(
     $includeMissing,
     $csvPath,
     array $csvRows,
-    int $unresolvedHelpCount,
-    int $unparsedHelpTags
+    int $unresolvedHelpCount
 ) {
     $prefsWithHelp = 0;
     foreach ($allPrefs as $info) {
@@ -912,7 +922,10 @@ function print_summary(
 
     $linkRows = array_filter($rows, static fn ($r) => ($r['status'] ?? '') !== 'MISSING');
     $templateHelp = count(array_filter($linkRows, static fn ($r) => $r['source_type'] === 'template_help'));
-    $hardcoded = count(array_filter($linkRows, static fn ($r) => $r['source_type'] === 'template_hardcoded'));
+    $hardcoded = count(array_filter(
+        $linkRows,
+        static fn ($r) => in_array($r['source_type'], ['template_hardcoded', 'preference_hardcoded'], true)
+    ));
 
     $counts = [
         'NON_CANONICAL' => 0,
@@ -944,13 +957,7 @@ function print_summary(
     }
     if ($unresolvedHelpCount > 0) {
         echo "Note: {$unresolvedHelpCount} preference help values could not be statically resolved "
-            . "(e.g., computed expressions); they were not counted as missing.\n";
-    }
-    if ($unparsedHelpTags > 0) {
-        echo "Note: {$unparsedHelpTags} {help} tags were missing a parseable url attribute.\n";
-    }
-    if ($unresolvedHelpCount > 0 || $unparsedHelpTags > 0) {
-        echo "\n";
+            . "(e.g., computed expressions); they were not counted as missing.\n\n";
     }
 
     $csvNote = $includeMissing
