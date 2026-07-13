@@ -192,7 +192,7 @@
         "henrique-borba/php-sieve-manager": "~1.0",
         "hybridauth/hybridauth": "~3.11",
         "jasig/phpcas": "~1.6",
-        "jason-munro/cypht": "~2.0",
+        "jason-munro/cypht": "~2.6",
         "jquery/jquery-sheet": "3.1",
         "kaltura/api-client-library": "~21.18",
         "laminas/laminas-captcha": "~2.9",
@@ -219,11 +219,11 @@
         "maestroerror/php-heic-to-jpg": "~1.0",
         "manticoresoftware/manticoresearch-php": "~3.2",
         "matthiasmullie/minify": "~1.3",
-        "mautic/api-library": "~3.0",
+        "mautic/api-library": "~3.1",
         "melbahja/seo": "~3.0",
         "meyfa/php-svg": "~0.16",
         "michelf/php-smartypants": "~1.8",
-        "monolog/monolog": "~3.0",
+        "monolog/monolog": "~3.9",
         "montefuscolo/xmpp": "~0.8",
         "nlgen/nlgen": "~0.18",
         "npm-asset/boomerangjs": "~1.687",
@@ -367,30 +367,6 @@
                 "reviewer": "Joseph Kausi",
                 "alternatives": "No alternatives for ctype function polyfills.",
                 "impact": "Symfony components fail. System likely unusable due to cascading failures."
-            },
-            "jason-munro/cypht": {
-                "reason": "Intentionally using dev-master to align with Cypht's master branch during active development of Tiki.",
-                "mitigation": "Deep integration with custom patches. Reviewed regularly. When Tiki branches to a stable version, it should switch to the latest stable Cypht release.",
-                "reviewed": "2026-07-13",
-                "reviewer": "Joseph Kausi",
-                "alternatives": "Use latest stable in stable branches.",
-                "impact": "Webmail completely non-functional. Users lose email access."
-            },
-            "mautic/api-library": {
-                "reason": "Required by Tiki 29.x+ to support Mautic integration. Currently using dev-master due to needed features not yet available in stable.",
-                "mitigation": "Monitored for upstream changes. Plan to migrate to stable once required features are released.",
-                "reviewed": "2026-07-13",
-                "reviewer": "Joseph Kausi",
-                "alternatives": "No alternatives for the moment, A lot of work would be needed to migrate away from Mautic integration.",
-                "impact": "Mautic integration completely non-functional. Users lose Mautic integration."
-            },
-            "monolog/monolog": {
-                "reason": "Required by Tiki 29.x+ to support logging. Currently using dev-master due to needed features not yet available in stable.",
-                "mitigation": "Monitored for upstream changes. Plan to migrate to stable once required features are released.",
-                "reviewed": "2026-07-13",
-                "reviewer": "Joseph Kausi",
-                "alternatives": "No alternatives for the moment, A lot of work would be needed to migrate away from Monolog integration.",
-                "impact": "Logging completely non-functional. Users lose logging."
             }
         }
     },
