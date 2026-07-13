@@ -305,14 +305,7 @@ if (isset($_REQUEST["current_page_id"]) && empty($info)) {
     }
 
     $structure_info = $structlib->s_get_structure_info($_REQUEST['current_page_id']);
-    if (
-        ($tiki_p_edit != 'y' && ! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit'))
-        ||
-        (($tiki_p_edit_structures != 'y' &&
-            ! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit_structures')))
-    ) {
-        Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
-    }
+    assertCanEditPageInStructure($structure_info);
 
     $smarty->assign('current_page_id', $_REQUEST["current_page_id"]);
     if (isset($_REQUEST["add_child"])) {
@@ -326,11 +319,7 @@ if (isset($_REQUEST["current_page_id"]) && empty($info)) {
     if (empty($structure_info)) {
         Feedback::errorAndDie(tra("Invalid page_ref_id"), \Laminas\Http\Response::STATUS_CODE_409);
     }
-    $canEditPage = $tiki_p_edit === 'y' || $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit');
-    $canEditStructure = $tiki_p_edit_structures === 'y' || $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit_structures');
-    if (! $canEditPage || ! $canEditStructure) {
-        Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
-    }
+    assertCanEditPageInStructure($structure_info);
 
     link_page_into_structure($_REQUEST['current_page_id'], isset($_REQUEST['add_child']), $page);
 
@@ -376,6 +365,22 @@ $smarty->assign('page_ref_id', $page_ref_id);
 function compare_import_versions($a1, $a2)
 {
     return $a1["version"] - $a2["version"];
+}
+
+/**
+ * Dies with a 401 unless the user can edit both the page and its structure.
+ *
+ * @param array $structure_info return value of s_get_structure_info()/s_get_page_info()
+ */
+function assertCanEditPageInStructure($structure_info)
+{
+    global $tikilib, $user, $tiki_p_edit, $tiki_p_edit_structures;
+
+    $canEditPage = $tiki_p_edit === 'y' || $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit');
+    $canEditStructure = $tiki_p_edit_structures === 'y' || $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit_structures');
+    if (! $canEditPage || ! $canEditStructure) {
+        Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
+    }
 }
 
 /**
