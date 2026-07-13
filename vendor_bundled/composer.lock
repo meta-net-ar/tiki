@@ -18214,5 +18214,5 @@
         "ext-soap": "0",
         "ext-sockets": "0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
