@@ -53,7 +53,11 @@
                             {if isset($other_columns)}
                                 {$other_columns}
                             {/if}
-                            {self_link sort_mode=$propname|cat:'_asc'}{$fgal_listing_conf.$propname.name}{/self_link}<br>
+                            {if !empty($item.description)}
+                                {self_link sort_mode=$propname|cat:'_asc' _title=$item.description _class='tips'}{$fgal_listing_conf.$propname.name}{/self_link}<br>
+                            {else}
+                                {self_link sort_mode=$propname|cat:'_asc'}{$fgal_listing_conf.$propname.name}{/self_link}<br>
+                            {/if}
                         {/capture}
                     {/if}
                 {/if}
@@ -61,7 +65,7 @@
                 {if isset($gal_info.$key_name) and ( $gal_info.$key_name eq 'y' or $gal_info.$key_name eq 'i'
                     or $gal_info.$key_name eq 'a' or $propname eq 'name' )}
                     {$propval=$item.name}
-                    {$link_title=''}
+                    {$link_title=$item.description|default:''}
                     {$td_args=''}
 
                     {if $gal_info.$key_name eq 'i' or $propname eq 'type' or ( $propname eq 'lockedby'
@@ -129,9 +133,15 @@
                     {$nbCols=1}
                 {/if}
                 <th>
-                    {self_link _sort_arg=$sort_arg _sort_field=$other_columns_selected _title=$fgal_listing_conf.$other_columns_selected.name}
-                        {$fgal_listing_conf.$other_columns_selected.name}
-                    {/self_link}
+                    {if !empty($fgal_listing_conf.$other_columns_selected.description)}
+                        {self_link _sort_arg=$sort_arg _sort_field=$other_columns_selected _title=$fgal_listing_conf.$other_columns_selected.description _class='tips'}
+                            {$fgal_listing_conf.$other_columns_selected.name}
+                        {/self_link}
+                    {else}
+                        {self_link _sort_arg=$sort_arg _sort_field=$other_columns_selected _title=$fgal_listing_conf.$other_columns_selected.name}
+                            {$fgal_listing_conf.$other_columns_selected.name}
+                        {/self_link}
+                    {/if}
                 </th>
             {/if}
 
