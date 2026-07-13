@@ -32,7 +32,7 @@ $fgal_listing_conf = [
     'author' => ['name' => tra('Creator')],  //this used to be Author but updated Nov2010
     'last_user' => ['name' => tra('Last modified by')], //this used to be 'Last editor' but updated Nov2010
     'comment' => ['name' => tra('Comment')],
-    'files' => ['name' => tra('Files')],
+    'files' => ['name' => tra('Files'), 'description' => tra('Number of files contained in a sub-gallery (not applicable to individual files)')],
     'hits' => ['name' => tra('Hits')],
     'lastDownload' => ['name' => tra('Last download')],
     'lockedby' => ['name' => tra('Locked by'), 'icon' => 'lock'],
