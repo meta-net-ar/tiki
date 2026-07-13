@@ -37,6 +37,7 @@ $body-tertiary-bg:          #250f46;
 $body-emphasis-color:       #6cf8e7;
 
 // Links
+$link-color: $cyan;
 
 // Components
 $component-active-bg:         $pink; // Repeating vapor default $primary !default;
@@ -59,14 +60,14 @@ $nav-link-color:                    var(--#{$prefix}link-color); // !default;
 $nav-link-hover-color:              var(--#{$prefix}link-hover-color); // default;
 
 // Navbar
-//$navbar-light-color:                #000;
-//$navbar-light-hover-color:          $gray-800;
-//$navbar-light-active-color:         $gray-900;
-//$navbar-light-disabled-color:       $gray-700;
-$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .95); // !default;
-$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8); // !default;
-$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // !default;
-$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // !default;
+$navbar-light-color:                #000;
+$navbar-light-hover-color:          $gray-800;
+$navbar-light-active-color:         $gray-900;
+$navbar-light-disabled-color:       $gray-700;
+//$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .95); // !default; Reference was lost somehow.
+//$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8); // !default;
+//$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // !default;
+//$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // !default;
 $navbar-light-brand-color:          $navbar-light-active-color; // !default;
 $navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
 

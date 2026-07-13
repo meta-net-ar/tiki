@@ -20,22 +20,36 @@ $imagePath: "../images/";
 // Body
 body,
 body.fullscreen,
-.layout_social header.navbar.navbar-dark.bg-dark,
-.layout_social header.navbar.navbar-light.bg-light {
+.layout_social header.navbar.bg-dark,
+.layout_social header.navbar.bg-light,
+.layout_basic header .navbar.bg-dark,
+.layout_basic header .navbar.bg-light {
     background: var(--tiki-darkshine-diagonals-bg);
+}
+
+div.page-content-top-margin {
+    --tiki-page-content-top-margin: 0px;
 }
 
 .layout_classic #middle,
 .layout_basic .row-middle,
-.layout_social .middle.container,
 .tiki-admin .row-middle {
     //    background: #f3f3f3;
     border: solid 15px #600;
-    border-top: none;
+//    border-top: none;
+}
+.layout_social .topbar_modules {
+    border: solid #600;
+    border-width: 15px 15px 3px 15px;
 }
 
-.top_modules {
-    justify-content: center !important;
+.layout_social .middle.container {
+    border: solid #600;
+    border-width: 0px 15px 15px 15px;
+}
+
+.col1, .col2, .col3 {
+    padding-top: var(--tiki-page-content-top-margin);
 }
 
 #bottom_modules {
@@ -195,21 +209,8 @@ body.fullscreen,
 //   }
 //}
 
-header.sticky-top .navbar.bg-light .navbar-nav > .nav-item:hover,
-header.sticky-top .navbar.bg-dark .navbar-nav > .nav-item:hover,
-header.sticky-top .navbar.bg-light > li:active,
-header.sticky-top .navbar.bg-dark > li:active,
-header.sticky-top .navbar.bg-dark .nav-link:hover,
-header.sticky-top .navbar.bg-light .nav-link:active,
-header.sticky-top .navbar-light .navbar-brand,
-header.sticky-top .navbar.bg-light .nav-link:hover,
-header.sticky-top .navbar.bg-light .nav-link:active,
-header.sticky-top .navbar.bg-light button.dropdown-toggle:hover,
-header.sticky-top .navbar.bg-light button.dropdown-toggle:active {
-    color: #fff;
-    text-decoration: none;
-    background: linear-gradient(to bottom, #555555 0%, #4f4f4f 5%, #4c4b4b 13%, #3d3d3d 55%, #2e2e2e 58%, #121212 100%);
-}
+// header.sticky-top .navbar.bg-light .navbar-nav > .nav-item:hover, etc. rules removed because they are overridden by CSS variable values in _css-variables.scss.
+
 
 .top_modules.bg-light,
 .top_modules.bg-dark {
@@ -231,12 +232,12 @@ header.sticky-top .navbar.bg-light button.dropdown-toggle:active {
     padding-right: 0;
 }
 
-.tiki.layout_classic .topbar_modules,
+.tiki.layout_classic #topbar .topbar_modules, // #topbar added to strengthen selector and override _tiki-pagetop_colors.scss rule
 .tiki.layout_basic .topbar_modules,
 .tiki.layout_social:not(.uab.tiki_admin) .topbar_modules {
     background: #000 url('#{$imagePath}stripes_small.gif') repeat-x !important;
-    border: solid 15px #600000 !important;
-    border-bottom: 1px solid #916047 !important;
+//    border: solid 15px #600000 !important;
+//    border-bottom: 1px solid #916047 !important;
 
     .navbar-nav .nav-item {
         color: #000 !important;
@@ -276,6 +277,7 @@ header.sticky-top .navbar.bg-light button.dropdown-toggle:active {
 .tiki.layout_basic .topbar_modules {
     border-left: none !important;
     border-right: none !important;
+    border-bottom: 3px solid #600 !important; // #916047 !important;
 }
 
 
