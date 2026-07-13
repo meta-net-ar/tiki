@@ -581,7 +581,7 @@ class AdminLib extends TikiLib
         $show_warning = false;
 
         // Get local.php path including for multitiki
-        $configFilePath = TikiInit::getCredentialsFile();
+        $configFilePath = \Tiki\TikiInit::getCredentialsFile();
         if (file_exists($configFilePath)) {
             include($configFilePath);
 

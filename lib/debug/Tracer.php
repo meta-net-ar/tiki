@@ -143,4 +143,3 @@ if (file_exists($configFilePath) && ! defined('TIKI_IN_TEST')) {
 }
 global $tiki_traces_fpath, $tiki_traces_are_on, $tiki_traces_active_ids, $tracer;
 $tracer = new Tracer($tiki_traces_fpath, $tiki_traces_are_on, $tiki_traces_active_ids);
-
