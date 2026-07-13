@@ -161,6 +161,12 @@ body.tiki-admin {
     z-index: 1050;
 }
 
+/* Add some padding so the module on the left/right-most end is not "glued" to the edge of the viewport */
+.layout_admin #page-header .top_modules {
+    padding-right: calc(var(--bs-gutter-x) * 0.5);
+    padding-left: calc(var(--bs-gutter-x) * 0.5);
+}
+
 .tiki-admin .top_modules {
     justify-content: flex-end !important;
     position: sticky;
