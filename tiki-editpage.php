@@ -324,14 +324,11 @@ if (isset($_REQUEST["current_page_id"]) && empty($info)) {
 
     $structure_info = $structlib->s_get_structure_info($_REQUEST['current_page_id']);
     if (empty($structure_info)) {
-        Feedback::errorAndDie(tra("Invalid structure_id or page_ref_id"), \Laminas\Http\Response::STATUS_CODE_409);
+        Feedback::errorAndDie(tra("Invalid page_ref_id"), \Laminas\Http\Response::STATUS_CODE_409);
     }
-    if (
-        ($tiki_p_edit != 'y' && ! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit'))
-        ||
-        (($tiki_p_edit_structures != 'y' &&
-            ! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit_structures')))
-    ) {
+    $canEditPage = $tiki_p_edit === 'y' || $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit');
+    $canEditStructure = $tiki_p_edit_structures === 'y' || $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_edit_structures');
+    if (! $canEditPage || ! $canEditStructure) {
         Feedback::errorAndDie(tra("You do not have permission to edit this page."), \Laminas\Http\Response::STATUS_CODE_401);
     }
 
