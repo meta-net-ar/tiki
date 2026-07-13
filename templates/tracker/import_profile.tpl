@@ -4,7 +4,7 @@
     {title}{$title}{/title}
 {/block}
 {function name="render_editor" content=""}
-    {textarea _simple='y' _toolbars='n' _wysiwyg='n' name='yaml' id='importFromProfileYaml' codemirror='true' syntax='yaml' class='form-control' style="height: 400px;" required="required"}{/textarea}
+    {textarea _simple='y' _toolbars='n' _wysiwyg='n' name='yaml' id='importFromProfileYaml' codemirror='true' _syntax='yaml' class='form-control' style="height: 400px;" required="required"}{/textarea}
 {/function}
 {$loadtextarea={render_editor}}
 {block name="content"}
