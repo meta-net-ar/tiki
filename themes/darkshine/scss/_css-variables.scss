@@ -14,6 +14,10 @@
 
 @import "variables";
 
+:root {
+    --tiki-darkshine-navbar-bg: #90140c url("../images/stripes.png") repeat-x 50% 0 !important
+}
+
 // Used for L&F nav color choice and color mode override
 @mixin top-nav-dark {
     --tiki-top-bg: var(--tiki-darkshine-navbar-bg); // #{$tiki-top-navbar-bg};

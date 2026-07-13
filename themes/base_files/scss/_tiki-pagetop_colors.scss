@@ -11,15 +11,16 @@
 body:not(.tiki-admin) .tiki-top-nav-light,
 body:not(.tiki-admin) .tiki-top-nav-dark
 {
-    background: var(--tiki-top-bg);
+    background: var(--tiki-top-bg) !important; // !important added to deal with Smartmenus undefined background
     color: var(--tiki-top-text-color); // Turns out it's necessary to provide a variable for this. Previously written: The idea for this was text, etc. that isn't a link, but probably anything in these nav zones that isn't a link will have its own CSS rules already.
     a:not(.navbar-brand,.dropdown-item,.dropdown a,.btn,.sm-sub-link,.alert-link),
     .dropdown-toggle,                  // Moved from tiki-selectors (this and next line)
     .nav-link.dropdown-toggle,
     .btn.btn-link,
-    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-item .sm-nav-link
+    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-item .sm-nav-link,
+    .sm-toggler .sm-toggler-anchor
     {
-        color: var(--tiki-top-color);
+        color: var(--tiki-top-color) !important;
         &:hover {
             color: var(--tiki-top-hover-color);
             background: var(--tiki-top-hover-bg);
@@ -27,6 +28,12 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     }
     border: var(--tiki-top-border); // Style and color, for example, solid black
     border-width: var(--tiki-top-border-width); // For example, 1px, or 0px 0px 4px 0px
+}
+
+// Shadow is only appropriate on header.sticky-top, to indicate header overlies page content
+body.layout_social:not(.tiki-admin) .tiki-top-nav-light,
+body.layout_social:not(.tiki-admin) .tiki-top-nav-dark
+{
     box-shadow: var(--tiki-top-box-shadow);
 }
 
@@ -60,12 +67,12 @@ body:not(.tiki-admin) .tiki-top-nav-dark
 }
 
 
-// Apply background: transparent to children of uppermost parent to prevent nested gradients
+// Apply background: transparent to children of uppermost parent to prevent nested gradients and possible interference with box-shadow on page header
 .tiki.layout_basic:not(.tiki-admin) {
-    .page-header .top_modules,
-    .page-header .top_modules .navbar,
+    .top_modules, // In template, page-header was changed to site-header, so changing here now
+    .top_modules .navbar,
     .topbar_modules .navbar {
-        background: transparent;
+        background: transparent !important;
         --bs-bg-opacity: 0;
         box-shadow: none;
         border: none;
@@ -77,7 +84,7 @@ body:not(.tiki-admin) .tiki-top-nav-dark
     .topbar,
     .topbar_modules,
     .topbar_modules .navbar {
-        background: transparent;
+        background: transparent !important;
         --bs-bg-opacity: 0;
         box-shadow: none;
         border: none;
@@ -85,11 +92,11 @@ body:not(.tiki-admin) .tiki-top-nav-dark
 }
 
 .layout_social:not(.tiki-admin) {
-    header .top_modules,
-    header .top_modules .navbar,
+    .top_modules,
+    .top_modules .navbar,
     .topbar,
     .topbar .navbar {
-        background: transparent;
+        background: transparent !important;
         --bs-bg-opacity: 0;
         box-shadow: none;
         border: none;
