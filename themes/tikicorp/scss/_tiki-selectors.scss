@@ -211,10 +211,9 @@ h1.pagetitle a {
     margin: 20px 40px;
 }
 
-header.sticky-top {
+header.sticky-top > nav {
     margin: 0 40px 0 40px;
     border-radius: 0 0 20px 20px;
-    padding: 20px;
 }
 
 .header_outer,
@@ -223,10 +222,15 @@ header.sticky-top {
     border-radius: 20px;
 }
 
+.middle_outer {
+    margin-top: -30px;
+}
+
 .topbar-wrapper, // Classic Bootstrap and classic Tiki layouts
 .layout_basic .topbar_modules { // Single container layout
     border-radius: 20px;
-    margin: 32px 40px 0px;
+    margin: 0 40px 0;
+    padding: 40px 20px 20px 20px;
 }
 
 //  Dropdowns
