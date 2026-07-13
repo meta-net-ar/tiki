@@ -136,7 +136,7 @@ class Tracer
     }
 }
 
-$configFilePath = TikiInit::getCredentialsFile();
+$configFilePath = \Tiki\TikiInit::getCredentialsFile();
 
 if (file_exists($configFilePath) && ! defined('TIKI_IN_TEST')) {
     include $configFilePath;
