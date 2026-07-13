@@ -396,6 +396,14 @@
                 "reviewer": "Joseph Kausi",
                 "alternatives": "Wait for stable release. In Tiki 28.x+, this is handled by the JS build system.",
                 "impact": "Enhanced select input functionality lost. Users lose search, tagging, and advanced selection features in forms."
+            },
+            "garethp/php-ews": {
+                "reason": "Required by Cypht from https://github.com/cypht-org/cypht/pull/1278. Currently using dev-master due to needed features not yet available in stable.",
+                "mitigation": "Monitored for upstream changes. Plan to migrate to stable once required features are released.",
+                "alternative": "No alternatives for the moment, A lot of work would be needed to migrate away from Exchange integration.",
+                "reviewed": "2026-07-13",
+                "reviewer": "Joseph Kausi",
+                "impact": "Exchange integration completely non-functional."   
             }
         }
     },
