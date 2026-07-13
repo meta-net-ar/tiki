@@ -1837,7 +1837,7 @@ CREATE TABLE `tiki_modules` (
   `type` char(1) default NULL,
   `title` varchar(255) default NULL,
   `cache_time` int(14) default NULL,
-  `rows` int(4) default NULL,
+  `rows` int NOT NULL DEFAULT 10,
   `params` text,
   `groups` text,
   PRIMARY KEY (`moduleId`),
