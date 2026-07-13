@@ -367,6 +367,30 @@
                 "reviewer": "Joseph Kausi",
                 "alternatives": "No alternatives for ctype function polyfills.",
                 "impact": "Symfony components fail. System likely unusable due to cascading failures."
+            },
+            "jason-munro/cypht": {
+                "reason": "Intentionally using dev-master to align with Cypht's master branch during active development of Tiki.",
+                "mitigation": "Deep integration with custom patches. Reviewed regularly. When Tiki branches to a stable version, it should switch to the latest stable Cypht release.",
+                "reviewed": "2026-07-13",
+                "reviewer": "Joseph Kausi",
+                "alternatives": "Use latest stable in stable branches.",
+                "impact": "Webmail completely non-functional. Users lose email access."
+            },
+            "mautic/api-library": {
+                "reason": "Required by Tiki 29.x+ to support Mautic integration. Currently using dev-master due to needed features not yet available in stable.",
+                "mitigation": "Monitored for upstream changes. Plan to migrate to stable once required features are released.",
+                "reviewed": "2026-07-13",
+                "reviewer": "Joseph Kausi",
+                "alternatives": "No alternatives for the moment, A lot of work would be needed to migrate away from Mautic integration.",
+                "impact": "Mautic integration completely non-functional. Users lose Mautic integration."
+            },
+            "monolog/monolog": {
+                "reason": "Required by Tiki 29.x+ to support logging. Currently using dev-master due to needed features not yet available in stable.",
+                "mitigation": "Monitored for upstream changes. Plan to migrate to stable once required features are released.",
+                "reviewed": "2026-07-13",
+                "reviewer": "Joseph Kausi",
+                "alternatives": "No alternatives for the moment, A lot of work would be needed to migrate away from Monolog integration.",
+                "impact": "Logging completely non-functional. Users lose logging."
             }
         }
     },
