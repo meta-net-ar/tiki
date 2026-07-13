@@ -596,7 +596,7 @@ class TikiLib extends TikiDb_Bridge
                 $dbhost = $info['host'];
                 $database = $info['database'];
 
-                require TIKI_CONFIG_FILE_PATH;
+                require TikiInit::getCredentialsFile();
                 $dbsqlplugin = new PDO("$dbdriver:host=$dbhost;dbname=$database", $dbuserid, $dbpassword);
                 $connectionMap[$name] = new PdoDb($dbsqlplugin);
             }

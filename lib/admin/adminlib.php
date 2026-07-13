@@ -580,8 +580,10 @@ class AdminLib extends TikiLib
         global $system_configuration_files;
         $show_warning = false;
 
-        if (file_exists(TIKI_CONFIG_FILE_PATH)) {
-            include(TIKI_CONFIG_FILE_PATH);
+        // Get local.php path including for multitiki
+        $configFilePath = \Tiki\TikiInit::getCredentialsFile();
+        if (file_exists($configFilePath)) {
+            include($configFilePath);
 
             foreach ($system_configuration_files as $configFile) {
                 if (isset($configFile) && file_exists($configFile)) {
