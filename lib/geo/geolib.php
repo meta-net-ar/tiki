@@ -97,7 +97,7 @@ class GeoLib
      */
     public function parse_coordinates($string)
     {
-        if (preg_match("/^(-?\d*(\.\d+)?),(-?\d*(\.\d+)?)(,(\d+))?$/", $string, $parts)) {
+        if (preg_match("/^(-?\d*(\.\d+)?)\s*?,\s*?(-?\d*(\.\d+)?)\s*?(,\s*?(\d+))?$/", $string, $parts)) {
             $coords = [
                 'lat' => $parts[3],
                 'lon' => $parts[1],
