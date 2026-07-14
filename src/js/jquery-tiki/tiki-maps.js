@@ -535,6 +535,7 @@ import { defaults as defaultControls } from "ol/control";
                 return isClustered;
             };
 
+            const popupStyle = $(container).data("popup-style");
             /**
              * Get or create an ol layer and store it in container.layers[]
              *
@@ -731,7 +732,7 @@ import { defaults as defaultControls } from "ol/control";
                                     );
                                 }
 
-                                if ($(container).data("popup-style")) {
+                                if (popupStyle) {
                                     const selectionInteraction = new ol.interaction.Select({
                                         style: (feature) => {
                                             return getFeatureStyle(feature);
@@ -1082,15 +1083,14 @@ import { defaults as defaultControls } from "ol/control";
 
             container.modeManager.addMode(defaultMode);
 
-            const $mapBootstrapDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
-
             /* tooltips */
 
             if ($(container).data("tooltips")) {
                 // based on https://gis.stackexchange.com/a/166745/25953
+                const $mapBootstrapTooltipDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
 
                 container.displayFeatureInfo = function (pixel, evt) {
-                    $mapBootstrapDummy.tooltip("hide");
+                    $mapBootstrapTooltipDummy.tooltip("hide");
                     let feature, layer;
                     const both = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
                         return [feature, layer];
@@ -1107,7 +1107,7 @@ import { defaults as defaultControls } from "ol/control";
                     if (layer && layer instanceof ol.layer.VectorTile) {
                         return;
                     }
-                    $mapBootstrapDummy.css({
+                    $mapBootstrapTooltipDummy.css({
                         left: pixel[0] + "px",
                         top: pixel[1] - 15 + "px",
                     });
@@ -1129,7 +1129,7 @@ import { defaults as defaultControls } from "ol/control";
                         }
                     }
                     if (feature && feature.get("content")) {
-                        $mapBootstrapDummy
+                        $mapBootstrapTooltipDummy
                             .tooltip("dispose")
                             .tooltip({
                                 animation: false,
@@ -1144,7 +1144,7 @@ import { defaults as defaultControls } from "ol/control";
 
                 map.on("pointermove", function (evt) {
                     if (evt.dragging) {
-                        $mapBootstrapDummy.tooltip("hide");
+                        $mapBootstrapTooltipDummy.tooltip("hide");
                         return true;
                     }
                     container.displayFeatureInfo(map.getEventPixel(evt.originalEvent), evt);
@@ -1152,7 +1152,13 @@ import { defaults as defaultControls } from "ol/control";
                 });
             }
 
-            if ($(container).data("popup-style")) {
+            if (popupStyle) {
+                // popover needs to use a different element from tooltips now
+                const $mapBootstrapPopoverDummy =
+                    popupStyle !== "dialog"
+                        ? $("<div>").attr("id", "map-popover").css("position", "absolute").appendTo($(".ol-viewport", container))
+                        : null;
+
                 container.showPopup = function (e) {
                     let pixel, feature;
                     const features = e.target.getFeatures();
@@ -1184,7 +1190,7 @@ import { defaults as defaultControls } from "ol/control";
 
                     pixel = map.getEventPixel(e.mapBrowserEvent.originalEvent);
 
-                    $mapBootstrapDummy.tooltip("dispose").css({
+                    $mapBootstrapPopoverDummy.tooltip("dispose").css({
                         left: pixel[0] + "px",
                         top: pixel[1] + "px",
                     });
@@ -1197,7 +1203,7 @@ import { defaults as defaultControls } from "ol/control";
                         object = feature.get("itemId");
                     }
 
-                    switch ($(container).data("popup-style")) {
+                    switch (popupStyle) {
                         case "dialog": {
                             const $modal = $(".footer-modal:not(.show)").first().addClass("modal-lg").modal({});
 
@@ -1247,7 +1253,7 @@ import { defaults as defaultControls } from "ol/control";
                         }
                         case "popup":
                         default:
-                            $mapBootstrapDummy
+                            $mapBootstrapPopoverDummy
                                 .popover("dispose")
                                 .popover({
                                     trigger: "manual",
@@ -1269,10 +1275,14 @@ import { defaults as defaultControls } from "ol/control";
                                                 const $popover = $(".popover.show").first();
                                                 $html.find("a.service-dialog").remove();
                                                 const title = $html.find("h1").remove().text() || feature.get("content");
-                                                $(".popover-header", $popover).text(title);
-                                                $(".popover-body", $popover).empty().append($html.children());
+                                                let $h3 = $popover.find("h3").text("");
+                                                if ($h3.length === 0) {
+                                                    $h3 = $("<h3>").addClass("popover-header");
+                                                }
+                                                $popover.find(".popover-arrow").after($h3.text(title));
+                                                $(".popover-body", $popover).empty().append($html.html());
                                                 $popover.on("mouseleave", function () {
-                                                    $popover.popover("dispose");
+                                                    $popover.remove();
                                                     selectionInteraction.getFeatures().clear();
                                                 });
                                             },
