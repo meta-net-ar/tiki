@@ -1087,7 +1087,10 @@ import { defaults as defaultControls } from "ol/control";
 
             if ($(container).data("tooltips")) {
                 // based on https://gis.stackexchange.com/a/166745/25953
-                const $mapBootstrapTooltipDummy = $("<div>").attr("id", "map-tooltip").css("position", "absolute").appendTo($(".ol-viewport", container));
+                const $mapBootstrapTooltipDummy = $("<div>")
+                    .attr("id", "map-tooltip")
+                    .css("position", "absolute")
+                    .appendTo($(".ol-viewport", container));
 
                 container.displayFeatureInfo = function (pixel, evt) {
                     $mapBootstrapTooltipDummy.tooltip("hide");
