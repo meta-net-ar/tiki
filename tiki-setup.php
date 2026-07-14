@@ -693,7 +693,7 @@ if ($prefs['jquery_fitvidjs'] == 'y') {
 }
 if ($prefs['jquery_smartmenus_enable'] == 'y') {
     Sections::onSectionChange(function ($section) use ($headerlib) {
-        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/smartmenus/dist/css/smartmenus-only-layout.css');
+        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/smartmenus/dist/css/smartmenus-only-layout.css', 10);
         $headerlib->add_js_module(
             'import SmartMenus from "smartmenus";
 const nav = document.querySelectorAll("nav");
