@@ -91,11 +91,6 @@
                         </ol>
                     </div>
                 {else}
-                    {if $error_ref}
-                        {assign var="display_error_ref" value=$error_ref}
-                    {else}
-                        {assign var="display_error_ref" value=$smarty.now|date_format:"%Y%m%d-%H%M%S"}
-                    {/if}
                     <h1>{tr}An error occurred while performing the request.{/tr}</h1>
                     <div class="wikitext" style="border: solid 1px #ccc; margin: 1em auto; padding: 1em; text-align: left; width: 90%;">
                         {if $msg}
@@ -111,7 +106,7 @@
                             {/if}
                             </p>
                         {/if}
-                        <p><strong>{tr}Error reference:{/tr}</strong> <code>{$display_error_ref}</code></p>
+                        <p><strong>{tr}Error reference:{/tr}</strong> <code>{$error_ref}</code></p>
                         <hr />
                         <p>Things to check:</p>
                         <ol class="fancylist">

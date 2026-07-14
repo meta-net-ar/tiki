@@ -197,7 +197,8 @@ class TikiDbLegacyErrorHandler implements TikiDb_ErrorHandler
         $smarty->assign('built_query', $q);
         $smarty->assign('stacktrace', $stacktrace);
         $smarty->assign('requires_update', $installer->requiresUpdate());
-        $smarty->assign('error_ref', date('Ymd-His') . '-' . substr(md5($msg . $query), 0, 6));
+        $errorRef = date('Ymd-His') . '-' . substr(md5($msg . $query), 0, 6);
+        $smarty->assign('error_ref', $errorRef);
 
         header("Cache-Control: no-cache, pre-check=0, post-check=0");
 
@@ -206,7 +207,7 @@ class TikiDbLegacyErrorHandler implements TikiDb_ErrorHandler
         }
         http_response_code(500);
         $smarty->display('database-connection-error.tpl');
-        $this->log($msg . ' - ' . $q);
+        $this->log($errorRef . ' - ' . $msg . ' - ' . $q);
 
         exit(1);
     }
