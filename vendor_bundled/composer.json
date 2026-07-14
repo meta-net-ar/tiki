@@ -190,7 +190,7 @@
         "h5p/h5p-editor": "~1.25",
         "henrique-borba/php-sieve-manager": "~1.0",
         "hybridauth/hybridauth": "~3.12",
-        "jason-munro/cypht": "~2.0",
+        "jason-munro/cypht": "~2.6",
         "jquery/jquery-sheet": "3.1",
         "kaltura/api-client-library": "~22.7",
         "laminas/laminas-captcha": "~2.18",
@@ -358,14 +358,6 @@
                 "reviewer": "Joseph Kausi",
                 "alternatives": "No alternatives for prebinding. Custom implementation would be complex.",
                 "impact": "XMPP chat completely non-functional. Users cannot authenticate or connect."
-            },
-            "jason-munro/cypht": {
-                "reason": "Intentionally using dev-master to align with Cypht's master branch during active development of Tiki.",
-                "mitigation": "Deep integration with custom patches. Reviewed regularly. When Tiki branches to a stable version, it should switch to the latest stable Cypht release.",
-                "reviewed": "2025-08-27",
-                "reviewer": "Joseph Kausi",
-                "alternatives": "Use latest stable in stable branches.",
-                "impact": "Webmail completely non-functional. Users lose email access."
             },
             "garethp/php-ews": {
                 "reason": "Required by Cypht. Currently using dev-master due to needed features not yet available in stable.",
