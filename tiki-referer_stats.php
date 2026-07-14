@@ -21,6 +21,10 @@ $inputConfiguration = [
 
 require_once('tiki-setup.php');
 include_once('lib/refererstats/refererlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
+
 $access->check_feature('feature_referer_stats');
 $access->check_permission('tiki_p_view_referer_stats');
 

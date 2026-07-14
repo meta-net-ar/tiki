@@ -27,6 +27,10 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
+
 $access->check_permission('tiki_p_admin');
 
 $auto_query_args = ['offset', 'numrows', 'maxRecords', 'find', 'sort_mode'];

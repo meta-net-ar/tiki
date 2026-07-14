@@ -30,6 +30,7 @@ use Tiki\Lib\Alchemy\AlchemyLib;
 use Tiki\Lib\Unoconv\UnoconvStrategy;
 use Tiki\Lib\Unoconv\UnoserverStrategy;
 use Tiki\Package\ComposerManager;
+use Tiki\Sections;
 
 // Define fitness status constants early
 define('FITNESS_STATUS_GOOD', 'good');
@@ -85,6 +86,8 @@ if ($standalone) {
     }
 } else {
     require_once('tiki-setup.php');
+    $section = Sections::SECTION_ADMIN_LAYOUT;
+    Sections::setCurrentSection($section);
 }
 // AJAX dashboard refresh
 if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard' && ! $standalone) {
