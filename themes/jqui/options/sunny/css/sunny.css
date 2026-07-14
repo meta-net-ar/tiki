@@ -174,7 +174,7 @@
 
 /* Pagetop navbars and admin interface */
 .tiki-top-nav-light {
-    --tiki-top-bg:  url('../../sunny/images/ui-bg_gloss-wave_70_ffdd57_500x100.png') 50% 50% repeat-x; /*linear-gradient(to bottom,  #fffcf2 0%,#fffcf1 45%,#fffcf0 52%,#fffbeb 53%,#fff9e5 100%); */
+    --tiki-top-bg: linear-gradient(to bottom,  #fffcf2 0%,#fffcf1 45%,#fffcf0 52%,#fffbeb 53%,#fff9e5 100%);
     --tiki-top-color: #000000; /*var(--tiki-jui-widget-header-color);*/ /*#e0e0e0;*/
     --tiki-site-title-color: var(--tiki-top-color);
     --tiki-top-hover-color: #8b8371;
@@ -187,7 +187,7 @@
     background:  url('../../sunny/images/ui-bg_gloss-wave_70_ffdd57_500x100.png') 50% 50% repeat-x !important;
 }
 
-.tiki-top-nav-light { background: url('../../sunny/images/ui-bg_gloss-wave_70_ffdd57_500x100.png') 50% 50% repeat-x; }
+/*.tiki-top-nav-light { background: url('../../sunny/images/ui-bg_gloss-wave_70_ffdd57_500x100.png') 50% 50% repeat-x; }*/
 
 .tiki-topbar-nav-light {
     --tiki-topbar-bg: var(--tiki-jui-highlight-bg);

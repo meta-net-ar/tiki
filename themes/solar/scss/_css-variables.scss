@@ -44,7 +44,7 @@
 }
 
 @mixin top-nav-light {
-    --tiki-top-bg: rgba(var(--bs-light-rgb), var(--bs-bg-opacity));
+    --tiki-top-bg: #fdf6e3;
     --tiki-top-color: #{$navbar-light-color};
     --tiki-top-hover-color: #{$navbar-light-hover-color};
     --tiki-top-text-color: #{$navbar-light-color};
