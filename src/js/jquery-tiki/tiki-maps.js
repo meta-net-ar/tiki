@@ -1863,8 +1863,9 @@ import { defaults as defaultControls } from "ol/control";
                                     }
                                     files.forEach(function (file) {
                                         $.get(file, function (data) {
+                                            let features;
                                             try {
-                                                const features = format.readFeatures(data, {
+                                                features = format.readFeatures(data, {
                                                     dataProjection: "EPSG:4326",
                                                     featureProjection: container.map.getView().getProjection(),
                                                 });
@@ -1881,7 +1882,7 @@ import { defaults as defaultControls } from "ol/control";
                                                 });
                                                 return;
                                             }
-                                            $.each(features, function (k, feature) {
+                                            features.forEach((feature) => {
                                                 feature.set("itemId", item.object_id);
                                                 feature.set("content", item.title);
                                                 if (!feature.get("color")) {
@@ -1907,7 +1908,7 @@ import { defaults as defaultControls } from "ol/control";
                                             }
                                             layerSource.addFeatures(features);
 
-                                            $.each(features, function (k, feature) {
+                                            features.forEach((feature)=> {
                                                 $(container).trigger("add", [item, feature]);
                                             });
                                         });
