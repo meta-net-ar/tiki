@@ -106,7 +106,6 @@
                             {/if}
                             </p>
                         {/if}
-                        <p><strong>{tr}Error reference:{/tr}</strong> <code>{$error_ref}</code></p>
                         <hr />
                         <p>Things to check:</p>
                         <ol class="fancylist">
