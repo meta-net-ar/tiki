@@ -8,8 +8,8 @@
 // Themes using this file should define the variables used in this file as described on https://themes.tiki.org/CSS Variables in Tiki
 
 // Top module zone and parent divs
-body:not(.tiki-admin) .tiki-top-nav-light,
-body:not(.tiki-admin) .tiki-top-nav-dark
+body:not(.tiki-admin.layout_admin) .tiki-top-nav-light,
+body:not(.tiki-admin.layout_admin) .tiki-top-nav-dark
 {
     background: var(--tiki-top-bg) !important; // !important added to deal with Smartmenus undefined background
     color: var(--tiki-top-text-color); // Turns out it's necessary to provide a variable for this. Previously written: The idea for this was text, etc. that isn't a link, but probably anything in these nav zones that isn't a link will have its own CSS rules already.
@@ -31,8 +31,8 @@ body:not(.tiki-admin) .tiki-top-nav-dark
 }
 
 // Shadow is only appropriate on header.sticky-top, to indicate header overlies page content
-body.layout_social:not(.tiki-admin) .tiki-top-nav-light,
-body.layout_social:not(.tiki-admin) .tiki-top-nav-dark
+body.layout_social:not(.tiki-admin.uab) .tiki-top-nav-light,
+body.layout_social:not(.tiki-admin.uab) .tiki-top-nav-dark
 {
     box-shadow: var(--tiki-top-box-shadow);
 }
@@ -68,7 +68,7 @@ body.layout_social:not(.tiki-admin) .tiki-top-nav-dark
 
 
 // Apply background: transparent to children of uppermost parent to prevent nested gradients and possible interference with box-shadow on page header
-.tiki.layout_basic:not(.tiki-admin) {
+.tiki.layout_basic:not(.tiki-admin.uab) {
     .top_modules, // In template, page-header was changed to site-header, so changing here now
     .top_modules .navbar,
     .topbar_modules .navbar {
@@ -79,7 +79,7 @@ body.layout_social:not(.tiki-admin) .tiki-top-nav-dark
     }
 }
 
-.tiki.layout_classic:not(.tiki-admin) {
+.tiki.layout_classic:not(.tiki-admin.uab) {
     .top_modules .navbar,
     .topbar,
     .topbar_modules,
@@ -91,7 +91,7 @@ body.layout_social:not(.tiki-admin) .tiki-top-nav-dark
     }
 }
 
-.layout_social:not(.tiki-admin) {
+.layout_social:not(.tiki-admin.uab) {
     .top_modules,
     .top_modules .navbar,
     .topbar,
