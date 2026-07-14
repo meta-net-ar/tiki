@@ -67,3 +67,11 @@ input[type="radio"],
 .card.module.no-decorations {
     box-shadow: none;
 }
+
+.bs-vertical,
+.sm-navbar--vertical {
+    .nav-link {
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+    }
+}
