@@ -31,6 +31,7 @@ use Tiki\Lib\Unoconv\UnoconvStrategy;
 use Tiki\Lib\Unoconv\UnoserverStrategy;
 use Tiki\Package\ComposerManager;
 use Smarty\Smarty;
+use Tiki\Sections;
 
 // Define fitness status constants early
 define('FITNESS_STATUS_GOOD', 'good');
@@ -65,6 +66,30 @@ if (isset($_REQUEST['tiki-check-ping'])) {
     die('pong:' . (int)$_REQUEST['tiki-check-ping']);
 }
 
+$standalone = ! file_exists('./templates/tiki-check.tpl');
+
+if ($standalone) {
+    function tra(string $content, ...$params): string
+    {
+        foreach ($params as $data) {
+            if (is_array($data) && count($data) > 0) {
+                foreach ($data as $index => $value) {
+                    $content = str_replace("%$index", $value, $content);
+                }
+            }
+        }
+        return $content;
+    }
+    function tr(string $content): string
+    {
+        $args = func_get_args();
+        return tra($content, array_slice($args, 1));
+    }
+} else {
+    require_once('tiki-setup.php');
+    $section = Sections::SECTION_ADMIN_LAYOUT;
+    Sections::setCurrentSection($section);
+}
 // AJAX dashboard refresh
 if (isset($_REQUEST['ajax']) && $_REQUEST['ajax'] === 'dashboard') {
     // Set up standalone mode for AJAX

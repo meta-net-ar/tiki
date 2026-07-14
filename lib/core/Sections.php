@@ -267,8 +267,17 @@ class Sections
 
     public static function setCurrentSection(string $section): void
     {
+        global $prefs;
+
         if (! in_array($section, self::getAllSections(), true)) {
             throw new \InvalidArgumentException("Invalid section: $section");
+        }
+
+        if ($prefs['theme_unified_admin_backend'] !== 'y' && $section === self::SECTION_ADMIN_LAYOUT) {
+            // Trigger SECTION_ADMIN instead of SECTION_ADMIN_LAYOUT when UAB is disabled
+            $section = self::SECTION_ADMIN;
+            self::$currentSection = $section;
+            self::triggerSectionChangeCallbacks($section);
         }
 
         if (self::$currentSection !== $section) {
