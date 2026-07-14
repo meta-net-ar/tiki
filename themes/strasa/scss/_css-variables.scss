@@ -34,12 +34,12 @@
 }
 
 @mixin top-nav-light {
-    --tiki-top-bg: var(--tiki-strasa-darkblue-bg);
-    --tiki-top-color: #{$navbar-dark-color};
-    --tiki-top-hover-color: #{$navbar-dark-hover-color};
-    --tiki-top-text-color: #{$navbar-dark-hover-color};
-    --tiki-site-title-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
-    --tiki-site-subtitle-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-top-bg: var(--tiki-strasa-lightblue-bg-inverted); // var(--tiki-strasa-darkblue-bg);
+    --tiki-top-color: #{$navbar-light-color};
+    --tiki-top-hover-color: #{$navbar-light-hover-color};
+    --tiki-top-text-color: #{$navbar-light-hover-color};
+    --tiki-site-title-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-light-brand-color, var(--tiki-top-color)};
     --tiki-top-border: none;
     --tiki-top-box-shadow: 0px 1px 10px #393939;
 }
