@@ -1267,6 +1267,14 @@ import { defaults as defaultControls } from "ol/control";
                                 })
                                 .popover("show")
                                 .on("shown.bs.popover", function (event) {
+                                    const $popover = $(".popover.show").first();
+                                    let $h3 = $popover.find("h3").text("");
+                                    if ($h3.length === 0) {
+                                        $h3 = $("<h3>").addClass("popover-header");
+                                        $popover.find(".popover-arrow").after($h3.text(""));
+                                    }
+                                    $popover.find(".popover-body").empty();
+
                                     if (type && object) {
                                         $(container).loadInfoboxPopup({
                                             type: type,
@@ -1275,20 +1283,28 @@ import { defaults as defaultControls } from "ol/control";
                                             event: event,
                                             element: this,
                                             callback: function (event, $html) {
-                                                const $popover = $(".popover.show").first();
                                                 $html.find("a.service-dialog").remove();
                                                 const title = $html.find("h1").remove().text() || feature.get("content");
-                                                let $h3 = $popover.find("h3").text("");
-                                                if ($h3.length === 0) {
-                                                    $h3 = $("<h3>").addClass("popover-header");
-                                                }
-                                                $popover.find(".popover-arrow").after($h3.text(title));
-                                                $(".popover-body", $popover).empty().append($html.html());
+                                                $("h3", $popover).text(title);
+                                                $(".popover-body", $popover).empty().html($html.html());
                                                 $popover.on("mouseleave", function () {
-                                                    $popover.remove();
+                                                    $popover.find("h3").text("");
+                                                    $popover.find(".popover-body").empty();
+                                                    $mapBootstrapPopoverDummy.popover("dispose");
                                                     selectionInteraction.getFeatures().clear();
                                                 });
                                             },
+                                        });
+                                    } else {
+                                        const $el = $(feature.get("content"));
+                                        // just a marker, info it in the link
+                                        $popover.find("h3").text($el.text());
+                                        $popover.find(".popover-body").empty().text($el.attr("title"));
+                                        $popover.on("mouseleave", function () {
+                                            $popover.find("h3").text("");
+                                            $popover.find(".popover-body").empty();
+                                            $mapBootstrapPopoverDummy.popover("hide");
+                                            selectionInteraction.getFeatures().clear();
                                         });
                                     }
                                 });
