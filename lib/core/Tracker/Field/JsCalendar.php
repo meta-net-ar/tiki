@@ -149,6 +149,14 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
 
     public function isValid($ins_fields_data)
     {
+        // Prefer the value being saved (e.g. forced input) over the stored item value.
+        $fieldId = $this->getFieldId();
+        $value = $ins_fields_data[$fieldId]['value'] ?? $this->getValue();
+
+        if (! empty($value) && ! is_numeric($value)) {
+            return tr('Invalid UNIX timestamp "%0"', $value);
+        }
+
         if ($notBefore = $this->getOption('notBefore')) {
             $notBeforeTimestamp = $ins_fields_data[$notBefore]['value'];
             if ((string)$notBeforeTimestamp !== (string)(int)$notBeforeTimestamp) {
