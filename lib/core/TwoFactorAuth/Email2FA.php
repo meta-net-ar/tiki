@@ -7,7 +7,6 @@
 namespace Tiki\TwoFactorAuth;
 
 use Exception;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Tiki\TwoFactorAuth\Exception\TwoFactorAuthException;
 use TikiDb;
 use TikiLib;
@@ -17,14 +16,12 @@ class Email2FA implements TwoFactorAuthInterface
 {
     private $twoFATable;
     private $userlib;
-    private $session;
     private $crypt;
 
     public function __construct()
     {
         $this->twoFATable = TikiDb::get()->table('tiki_2fa_email_tokens');
         $this->userlib = TikiLib::lib('user');
-        $this->session = new Session();
         $this->crypt = TikiLib::lib('crypt');
     }
 
@@ -32,7 +29,7 @@ class Email2FA implements TwoFactorAuthInterface
     {
         global $prefs;
 
-        $lastRequestTime = $this->session->get('last_2fa_request_time') ?? 0;
+        $lastRequestTime = $_SESSION['last_2fa_request_time'] ?? 0;
         if (time() - $lastRequestTime < 60) {
             $errMsg = tr('Please wait about 60 seconds before requesting a new 2fa token.');
             throw new TwoFactorAuthException($errMsg);
@@ -81,7 +78,7 @@ class Email2FA implements TwoFactorAuthInterface
             throw new TwoFactorAuthException($errMsg);
         }
 
-        $this->session->set('last_2fa_request_time', time());
+        $_SESSION['last_2fa_request_time'] = time();
 
         return ! $isEmail ? $token : true;
     }

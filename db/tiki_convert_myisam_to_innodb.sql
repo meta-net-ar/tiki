@@ -317,3 +317,4 @@ ALTER TABLE `tiki_address_books` ENGINE = InnoDB;
 ALTER TABLE `tiki_address_cards` ENGINE = InnoDB;
 ALTER TABLE `tiki_performance` ENGINE = InnoDB;
 ALTER TABLE `tiki_password_blacklist` ENGINE = InnoDB;
+ALTER TABLE `tiki_2fa_email_tokens` ENGINE = InnoDB;

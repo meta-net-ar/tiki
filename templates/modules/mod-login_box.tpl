@@ -1,24 +1,189 @@
-{* $Id$ *}
+{$TWO_FA_INCORRECT = TWO_FA_INCORRECT}
+{$USER_NOT_FOUND = USER_NOT_FOUND}
+{$PASSWORD_INCORRECT = PASSWORD_INCORRECT}
 {jq notonready=true}
 function capLock(e, el){
     kc = e.keyCode ? e.keyCode : e.which;
     sk = e.shiftKey ? e.shiftKey : (kc == 16 ? true : false);
     if ((kc >= 65 && kc <= 90 && !sk) || (kc >= 97 && kc <= 122 && sk)) {
-        $('.divCapson', $(el).parents('div:first')).show();
+        $('.divCapson', $(el).parents('div').first()).show();
     } else {
-        $('.divCapson', $(el).parents('div:first')).hide();
+        $('.divCapson', $(el).parents('div').first()).hide();
     }
 }
 {/jq}
 {jq}
-$("#loginbox-{{$module_logo_instance}}").submit( function () {
-    if ($("#login-user_{{$module_logo_instance}}").val() && $("#login-pass_{{$module_logo_instance}}").val()) {
-        return true;
-    } else {
-        $("#login-user_{{$module_logo_instance}}").focus();
-        return false;
+var currentLoggedInUser = "{{$user|escape:'javascript'}}";
+$(document).ready(function () {
+    var twoFAType = "{{$prefs.twoFactorAuthType}}";
+    var is2FAEnabled = "{{$prefs.twoFactorAuth}}";
+    var moduleLogoInstance = "{{$module_logo_instance}}";
+    var login_error = "{{$error_login}}";
+
+    function show2FactorInputElement(btn, event) {
+        const btnStep = parseInt(btn.attr('step')) + 1;
+        btn.attr('step', btnStep);
+        $(event.currentTarget).find('#two_factor_div').siblings().not('#two_factor_div').hide();
+        $(event.currentTarget).find('#two_factor_div').show();
+        $(btn).parent().show();
     }
+
+    function handleEmail2FA(username, btn, event) {
+        $.ajax({
+            url: $.service("two_fa_auth", "IsMFARequired"),
+            type: 'POST',
+            data: { username: username },
+            success: async function (res) {
+                if (!res) {
+                    $(event.currentTarget).off('submit').submit();
+                } else {
+                    if (twoFAType === '{{$GOOGLE_2FA}}') {
+                        show2FactorInputElement(btn, event);
+                    } else {
+                        generate2FACode(username, btn, event);
+                    }
+                }
+            },
+            error: function(req, status, error) {
+                displayFeedback("error", error);
+            }
+        });
+    }
+
+    function generate2FACode(username, btn, event) {
+        $.ajax({
+            url: $.service("two_fa_auth", "GenerateCode"),
+            type: 'POST',
+            data: { username: username },
+            success: function (data) {
+                if (data.success) {
+                    displayFeedback("success", data.message);
+                    show2FactorInputElement(btn, event);
+                } else {
+                    displayFeedback("error", data.message);
+                }
+            },
+            error: function(req, status, error) {
+                displayFeedback("error", error);
+            }
+        });
+    }
+
+    function getTwoFactorSecretGoogle2FA(username) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: $.service("two_fa_auth", "Get2FactorSecret"),
+                type: 'POST',
+                data: { username: username },
+                success: function (data) {
+                    if (data.success) {
+                        resolve(data.twoFactorSecret);
+                    } else {
+                        displayFeedback("error", data.message);
+                        resolve(null);
+                    }
+                },
+                error: function (req, status, error) {
+                    displayFeedback("error", error);
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function validateUserCredentials(username, password) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: $.service("user", "ValidateUser"),
+                type: 'POST',
+                data: { username: username, password: password },
+                success: function (res) {
+                    resolve(res);
+                },
+                error: function (req, status, error) {
+                    displayFeedback("error", error);
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    $("#loginbox-{{$module_logo_instance}}").on("submit", async function (event) {
+        event.preventDefault();
+
+        var btn = $("button.submit", this);
+        const originalBtnHtml = btn.html();
+
+        const spinnerHtml = `
+            <div class="spinner-border spinner-border-sm text-light" role="status">
+            <span class="sr-only">Loading...</span>
+            </div>
+        `;
+
+        btn.html(spinnerHtml + tr("Logging in..."));
+        btn.prop("disabled", true);
+
+        try {
+            const isLoginScreen = parseInt($(event.currentTarget).parent('#login_form_div').length);
+            const isNormalLogin = "{{$create2FaCodeNormalLogin}}";
+
+            if (isNormalLogin === 'y') {
+                let btnStep = parseInt(btn.attr('step')) + 1;
+                btn.attr('step', btnStep);
+            }
+
+            const username = $("#login-user_{{$module_logo_instance}}").val();
+            const password = $("#login-pass_{{$module_logo_instance}}").val();
+            let btnStep = parseInt(btn.attr('step'));
+
+            if (isNormalLogin === 'y') {
+                $(this).off('submit').submit();
+                return false;
+            }
+
+            if ((username && password)) {
+                if (is2FAEnabled === 'y') {
+                    const twoFASecret = await getTwoFactorSecretGoogle2FA(username);
+
+                    if (btnStep === 1) {
+                        const isValidateUser = await validateUserCredentials(username, password);
+                        if (!isValidateUser) {
+                            displayFeedback("error", tr("Invalid username or password"));
+                            return false;
+                        }
+                    }
+
+                    if (btnStep > 1 || isLoginScreen === 0 || (twoFASecret == 'n' && twoFAType === '{{$GOOGLE_2FA}}')) {
+                        $(this).off('submit').submit();
+                        return false;
+                    }
+                    await handleEmail2FA(username, btn, event);
+
+                } else {
+                    $(this).off('submit').submit();
+                }
+            } else {
+                $("#login-user_{{$module_logo_instance}}").trigger("focus");
+                return false;
+            }
+
+        } catch (error) {
+            displayFeedback("error", tr("An unexpected error occurred"));
+        } finally {
+            btn.html(originalBtnHtml);
+            btn.prop("disabled", false);
+        }
+    });
 });
+function displayFeedback(type, message) {
+    const feedbackClass = type === "success" ? "alert-success" : "alert-danger";
+    $("#login_feeback_{{$module_logo_instance}}").html(
+        `<div class="alert ${feedbackClass} alert-dismissible">
+            ${message}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        </div>`
+    );
+}
 if (jqueryTiki.no_cookie) {
     $('.box-login_box input').each(function(){
         $(this).change(function() {
@@ -182,6 +347,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").click(function () {
             <br /><a class="linkmodule" href="tiki-login_scr.php?user=admin">{tr}Log in as admin{/tr}</a>
         {/if}
     {else}
+        <div id="login_form_div">
         {assign var='close_tags' value=''}
         {if $mode eq "popup"}
             <div class="siteloginbar_popup dropdown btn-group float-sm-right drop-left">
@@ -195,6 +361,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").click(function () {
         <form name="loginbox" class="form{if $mode eq "header"} form-inline{/if}" id="loginbox-{$module_logo_instance}" action="{$login_module.login_url|escape}"
                 method="post"
                 {if $prefs.desactive_login_autocomplete eq 'y'} autocomplete="off"{/if}
+                data-normalLogin="{$create2FaCodeNormalLogin}"
         >
         {ticket}
         {capture assign="close_tags"}</form>{$close_tags}{/capture}
@@ -207,12 +374,13 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").click(function () {
         {/if}
         {if !empty($error_login)}
             {remarksbox type='errors' title="{tr}Error{/tr}"}
-                {if $error_login == -5}{tr}Invalid username or password{/tr}
-                {elseif $error_login == -3}{tr}Invalid username or password{/tr}
+                {if $error_login == $PASSWORD_INCORRECT or $error_login == $USER_NOT_FOUND}{tr}Invalid username or password{/tr}
+                {elseif $error_login == $TWO_FA_INCORRECT}{tr}Invalid two-factor authenticator code{/tr}
                 {else}{$error_login|escape}{/if}
             {/remarksbox}
         {/if}
-        <div class="user form-group row mx-0 clearfix">
+        <div id="login_feeback_{$module_logo_instance}"></div>
+        <div class="user form-group row mx-0 clearfix" style="display: {if $create2FaCodeNormalLogin === 'y'} none; {else} block; {/if}">
             {if !isset($module_logo_instance)}{assign var=module_logo_instance value=' '}{/if}
             <label for="login-user_{$module_logo_instance}">
                 {if $prefs.login_is_email eq 'y'}
@@ -235,7 +403,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").click(function () {
                 <input class="form-control" type="hidden" name="user" id="login-user_{$module_logo_instance}" value="{$loginuser|escape}" /><b>{$loginuser|escape}</b>
             {/if}
         </div>
-        <div class="pass form-group row mx-0 clearfix">
+        <div class="pass form-group row mx-0 clearfix" style="display: {if $create2FaCodeNormalLogin === 'y'} none; {else} block; {/if}">
             <label for="login-pass_{$module_logo_instance}">{tr}Password:{/tr}</label>
             <input onkeypress="capLock(event, this)" type="password" name="pass" class="form-control" id="login-pass_{$module_logo_instance}" autocomplete="{if $prefs.desactive_login_autocomplete eq 'y'}new-password{else}current-password{/if}">
             {if $module_params.show_forgot eq 'y' && $prefs.forgotPass eq 'y'}
@@ -245,13 +413,20 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").click(function () {
                 {icon name='error' istyle="vertical-align:middle"} {tr}CapsLock is on.{/tr}
             </div>
         </div>
-        {if $module_params.show_two_factor_auth eq 'y' and $prefs.twoFactorAuth eq 'y'}
-        <div class="pass form-group row mx-0 clearfix">
-            <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor Authenticator Code:{/tr}</label>
+        <input type="hidden" name="login_mode" value="{$mode}" />
+        {if $prefs.twoFactorAuth eq 'y' and ((isset($module_params.show_two_factor_auth) and $module_params.show_two_factor_auth eq 'y') or ! empty($error_login))}
+        <div id="two_factor_div" class="pass form-group row mx-0 clearfix" style="display: {if $create2FaCodeNormalLogin === 'y'} block; {else} none; {/if}">
+            <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor authentication code:{/tr}</label>
             <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" id="login-2fa_{$module_logo_instance}">
+            {if $prefs.twoFactorAuthType eq $EMAIL_2FA}
+                <small class="text-muted">{tr}Please type the 6 digit security code sent to your email address{/tr}</small>
+                <a class="mt-1 d-block" href="#" onclick="$('#loginbox-{{$module_logo_instance}}').data('normalLogin', '2fa-regen').submit()" title="{tr}Click here if you've not received the code and want to send a new one.{/tr}">{tr}I didn't receive the code{/tr}</a>
+            {else}
+                <small class="text-muted">{tr}Please type the 6 digit security code (TOTP) provided by your authenticator application{/tr}</small>
+            {/if}
         </div>
         {/if}
-        {if $prefs.rememberme ne 'disabled' and (empty($module_params.remember) or $module_params.remember neq 'n')}
+        {if $prefs.rememberme ne 'disabled' and (empty($module_params.remember) or $module_params.remember neq 'n') and $create2FaCodeNormalLogin ne 'y'}
             {if $prefs.rememberme eq 'always'}
                 <input type="hidden" name="rme" id="login-remember-module-input_{$module_logo_instance}" value="on" />
             {else}
@@ -290,9 +465,9 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").click(function () {
         {/if}
 
         <div class="form-group text-center">
-            <button class="btn btn-primary button submit" type="submit" name="login">{tr}Log in{/tr} <!--i class="fa fa-arrow-circle-right"></i--></button>
+            <button class="btn btn-primary button submit" type="submit" name="login" step="1">{tr}Log in{/tr}</button>
         </div>
-        {if $module_params.show_register eq 'y' or $module_params.show_two_factor_auth}
+        {if $module_params.show_register eq 'y' or $prefs.twoFactorAuth eq 'y'}
             <div {if $mode eq 'header'}class="text-right" style="display:inline;"{/if}>
                 {strip}
                     <div {if $mode eq 'header'}style="display: inline-block"{/if}><ul class="{if $mode neq 'header'}list-unstyled"{else}list-inline"{/if}>
@@ -303,7 +478,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").click(function () {
                             {if $mode eq 'header' && $module_params.show_forgot eq 'y' && $prefs.forgotPass eq 'y'}
                                 &nbsp;|&nbsp;
                             {/if}
-                            <li class="pass{if $mode eq 'popup'} dropdown-item{/if} list-item"><a href="tiki-login_scr.php?twoFactorForm" title="{tr}Login with two-factor authenticator{/tr}">{if $mode eq 'popup'} {tr}Login with 2FA{/tr}{else}{tr}Login with two-factor authenticator{/tr}{/if}</a></li>
+                            <li class="pass{if $mode eq 'popup'} dropdown-item{/if} list-item"><a href="tiki-login_scr.php?showTwoFactorForm" title="{tr}Login with two-factor authenticator{/tr}">{if $mode eq 'popup'} {tr}Login with 2FA{/tr}{else}{tr}Login with two-factor authenticator{/tr}{/if}</a></li>
                         {/if}
                     </ul></div>
                 {/strip}
@@ -355,6 +530,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").click(function () {
             {/foreach}
         </div>
         {$close_tags}
+        </div>
         {if $prefs.auth_method eq 'openid' and !$user and (!isset($registration) || $registration neq 'y')}
             <form method="get" action="tiki-login_openid.php">
                 <fieldset>

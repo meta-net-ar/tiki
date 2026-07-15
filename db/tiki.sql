@@ -76,6 +76,16 @@ CREATE TABLE `sessions` (
   KEY `expiry` (expiry)
 ) ENGINE=MyISAM;
 
+DROP TABLE IF EXISTS `tiki_2fa_email_tokens`;
+CREATE TABLE `tiki_2fa_email_tokens` (
+  `userId` int(8) NOT NULL,
+  `type` varchar(10) NOT NULL,
+  `token` varchar(60) NOT NULL,
+  `attempts` int NOT NULL DEFAULT 0,
+  `created` bigint NOT NULL,
+  PRIMARY KEY (`userId`)
+) ENGINE=MyISAM;
+
 DROP TABLE IF EXISTS `tiki_actionlog`;
 CREATE TABLE `tiki_actionlog` (
   `actionId` int(8) NOT NULL auto_increment,
@@ -2947,6 +2957,7 @@ CREATE TABLE `users_users` (
   `openid_url` varchar(255) default NULL,
   `waiting` char(1) default NULL,
   `twoFactorSecret` varchar(16) default NULL,
+  `last_mfa_date` bigint default NULL,
   PRIMARY KEY (`userId`),
   UNIQUE KEY `login` (login (191)),
   KEY `registrationDate` (`registrationDate`),
