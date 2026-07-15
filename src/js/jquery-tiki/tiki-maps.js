@@ -320,7 +320,8 @@ import { defaults as defaultControls } from "ol/control";
                 cluster = $(container).data("cluster");
 
             if (cluster === "") {
-                cluster = 25;   // default cluster size, probably should be a pref?
+                // default cluster size, probably should be a pref?
+                cluster = 25;
             }
 
             // Shared style functions for all map features (accessible from both clustered and non-clustered layers)
@@ -1937,7 +1938,7 @@ import { defaults as defaultControls } from "ol/control";
                                             }
                                             layerSource.addFeatures(features);
 
-                                            features.forEach((feature)=> {
+                                            features.forEach((feature) => {
                                                 $(container).trigger("add", [item, feature]);
                                             });
                                         });
