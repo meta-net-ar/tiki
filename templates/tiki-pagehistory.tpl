@@ -317,13 +317,13 @@
                                 {actions}
                                     {strip}
                                         <action>
-                                            {self_link page=$page preview=$info.version _icon_name="view" _menu_text='y' _menu_icon='y'}
+                                            {self_link _noauto="y" page=$page preview=$info.version _icon_name="view" _menu_text='y' _menu_icon='y'}
                                                 {tr}View{/tr}
                                             {/self_link}
                                         </action>
                                         {if $tiki_p_wiki_view_source eq "y" and $prefs.feature_source eq "y"}
                                             <action>
-                                                {self_link page=$page source=$info.version _icon_name="code" _menu_text='y' _menu_icon='y'}
+                                                {self_link _noauto="y" page=$page source=$info.version _icon_name="code" _menu_text='y' _menu_icon='y'}
                                                     {tr}Source{/tr}
                                                 {/self_link}
                                             </action>
@@ -412,32 +412,32 @@
                                 {actions}
                                     {strip}
                                         <action>
-                                            {self_link page=$page preview=$element.version _icon_name="view" _menu_text='y' _menu_icon='y'}
+                                            {self_link _noauto="y" page=$page preview=$element.version _icon_name="view" _menu_text='y' _menu_icon='y'}
                                                 {tr}View{/tr}
                                             {/self_link}
                                         </action>
                                         {if $tiki_p_wiki_view_source eq "y" and $prefs.feature_source eq "y"}
                                             <action>
-                                                {self_link page=$page source=$element.version _icon_name="code" _menu_text='y' _menu_icon='y'}
+                                                {self_link _noauto="y" page=$page source=$element.version _icon_name="code" _menu_text='y' _menu_icon='y'}
                                                     {tr}Source{/tr}
                                                 {/self_link}
                                             </action>
                                         {/if}
                                         {if $prefs.default_wiki_diff_style eq "old"}
                                             <action>
-                                                {self_link page=$page diff2=$element.version diff_style="sideview" _icon_name="copy" _menu_text='y' _menu_icon='y'}
+                                                {self_link _noauto="y" page=$page diff2=$element.version diff_style="sideview" _icon_name="copy" _menu_text='y' _menu_icon='y'}
                                                     {tr}Compare{/tr}
                                                 {/self_link}
                                             </action>
                                             <action>
-                                                {self_link page=$page diff2=$element.version diff_style="unidiff" _icon_name="difference" _menu_text='y' _menu_icon='y'}
+                                                {self_link _noauto="y" page=$page diff2=$element.version diff_style="unidiff" _icon_name="difference" _menu_text='y' _menu_icon='y'}
                                                     {tr}Difference{/tr}
                                                 {/self_link}
                                             </action>
                                         {/if}
                                         {if $tiki_p_rollback eq 'y' && $lock neq true && $current neq $element.version}
                                             <action>
-                                                {self_link _script="tiki-rollback.php" page=$page version=$element.version _icon_name="undo" _menu_text='y' _menu_icon='y'}
+                                                {self_link _noauto="y" _script="tiki-rollback.php" page=$page version=$element.version _icon_name="undo" _menu_text='y' _menu_icon='y'}
                                                     {tr _0=$element.version}Revert to version %0{/tr}
                                                 {/self_link}
                                             </action>
