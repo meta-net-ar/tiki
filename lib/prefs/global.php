@@ -257,6 +257,41 @@ function prefs_global_list($partial = false)
             ],
             'default' => [],
         ],
+        'twoFactorAuthType' => [
+            'name' => tra('Two-factor authentication type'),
+            'description' => tra('Select the type of two-factor authentication to use.'),
+            'type' => 'list',
+            'options' => [
+                'google2FA' => tra('TOTP (Google Authenticator)'),
+                'email2FA' => tra('Email'),
+            ],
+            'dependencies' => [
+                'twoFactorAuth',
+            ],
+            'default' => 'google2FA',
+        ],
+        'twoFactorAuthEmailTokenLength' => [
+            'name' => tra('Email 2FA token length'),
+            'description' => tra('Number of characters in the email 2FA token.'),
+            'type' => 'text',
+            'filter' => 'digits',
+            'size' => 3,
+            'dependencies' => [
+                'twoFactorAuth',
+            ],
+            'default' => '6',
+        ],
+        'twoFactorAuthEmailTokenTTL' => [
+            'name' => tra('Email 2FA token lifetime (minutes)'),
+            'description' => tra('How long (in minutes) the email 2FA token remains valid.'),
+            'type' => 'text',
+            'filter' => 'digits',
+            'size' => 5,
+            'dependencies' => [
+                'twoFactorAuth',
+            ],
+            'default' => '30',
+        ],
         'useGroupTheme' => [
             'name' => tra('Group theme'),
             'description' => tra('Enable groups to each have their own visual theme.'),

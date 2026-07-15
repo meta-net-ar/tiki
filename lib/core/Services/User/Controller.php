@@ -1165,6 +1165,15 @@ class Services_User_Controller
         return true;
     }
 
+    public function action_ValidateUser($input)
+    {
+        $username = $input->username->text();
+        $password = $input->password->text();
+        $userlib = TikiLib::lib('user');
+        $ret = $userlib->validate_user($username, $password);
+        return $ret[0];
+    }
+
     public function action_set_user_lock_status($input)
     {
         Services_Exception_Denied::checkGlobal('admin_users');
