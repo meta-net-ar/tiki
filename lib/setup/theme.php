@@ -48,7 +48,8 @@ Sections::onSectionChange(function ($section) {
     import * as bootstrap from "bootstrap";
     window.bootstrap = bootstrap;
 ');
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/clipboard/dist/clipboard.min.js');
+    // Load before standard scripts (e.g. tiki-jquery.js) so ClipboardJS is available when copy handlers init
+    $headerlib->add_jsfile_external(NODE_PUBLIC_DIST_PATH . '/clipboard/dist/clipboard.min.js');
 
     if ($prefs['feature_fixed_width'] === 'y' && ! empty($prefs['layout_fixed_width'])) {
         $headerlib->add_css(
