@@ -692,10 +692,30 @@
             {remarksbox type="error" title="{tr}Two-factor authentication is required{/tr}" close="n"}{tr}Your access to the site is restricted until you enable <strong>Two-factor authentication</strong>. Please enable Two-factor authentication to keep using normally the site.{/tr}{/remarksbox}
         {/if}
         {remarksbox type="tip"}
-        {tr}Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,
-            Tiki will require a code from your mobile phone during login. This code is created by the Google Authenticator®.{/tr}
+        {if $prefs.twoFactorAuthType eq 'email2FA'}
+            {tr}Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,
+                Tiki will send a verification code to your registered email address during login.{/tr}
+        {else}
+            {tr}Two-factor authentication is a security measure that requires an extra code when you log in. When enabled,
+                Tiki will require a code from your mobile phone during login. This code is created by a TOTP authenticator app (e.g. Google Authenticator).{/tr}
+        {/if}
         {/remarksbox}
-        {if $tfaSecret }
+        {if $prefs.twoFactorAuthType eq 'email2FA'}
+            <form action="tiki-user_preferences.php" method="post" class="form-horizontal">
+                {ticket}
+                {if $twoFactorSecret}
+                    <p>{tr}Email-based two-factor authentication is currently enabled for your account.{/tr}</p>
+                    <div class="submit text-center">
+                        <input type="submit" class="btn btn-danger btn-sm" name="removetwofactor" value="{tr}Disable Two-Factor Auth{/tr}">
+                    </div>
+                {else}
+                    <p>{tr}Click the button below to enable email-based two-factor authentication. A verification code will be sent to your registered email address each time you log in.{/tr}</p>
+                    <div class="submit text-center">
+                        <input type="submit" class="btn btn-primary btn-sm" name="twofactor" value="{tr}Enable Two-Factor Auth{/tr}">
+                    </div>
+                {/if}
+            </form>
+        {elseif $tfaSecret}
             <form action="tiki-user_preferences.php" method="post" class="form-horizontal">
                 {ticket}
                 <div class="form-group row mt-3">
