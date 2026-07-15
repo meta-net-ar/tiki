@@ -247,6 +247,7 @@ if (! timezone) {
     $jqueryTiki['cookie_consent_dom_id'] = $prefs['cookie_consent_dom_id'];
     $jqueryTiki['cookie_consent_mode'] = $prefs['cookie_consent_mode'];
     $jqueryTiki['cookie_consent_expires'] = $prefs['cookie_consent_expires'];
+    $jqueryTiki['cookie_consent_disable'] = $prefs['cookie_consent_disable'] === "y";
     $jqueryTiki['cookie_consent_name'] = CookieConsentLib::COOKIE_CONSENT_NAME;
     $jqueryTiki['cookie_consent_categories'] = json_encode(array_keys(CookieConsentLib::getRequestedCookieCategories()));
     $jqueryTiki['cookie_consent_value'] = json_encode(CookieConsentLib::getConsentPreferences(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
