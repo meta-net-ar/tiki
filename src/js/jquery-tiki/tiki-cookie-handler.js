@@ -166,8 +166,8 @@ $(document).ready(() => {
         setTimeout(() => {
             const cookieDialogElement = $(`#${jqueryTiki.cookie_consent_dom_id}`);
             cookieDialogElement.modal({
-                backdrop: jqueryTiki.cookie_consent_disable === "y" ? "static" : true,
-                keyboard: jqueryTiki.cookie_consent_disable === "y" ? false : true,
+                backdrop: jqueryTiki.cookie_consent_disable ? true : "static",
+                keyboard: !jqueryTiki.cookie_consent_disable,
             });
             cookieDialogElement.modal("show").css({
                 backgroundColor: "transparent",
