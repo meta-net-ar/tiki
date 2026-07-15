@@ -62,11 +62,48 @@ class Language_GetStrings
     protected $outputFiles = false;
 
     /**
-     * Directory used as base to search for strings
-     * and to construct paths to language.php files.
+     * Directory scanned recursively for translatable strings.
      * @var string
      */
-    protected $baseDir;
+    protected $scanDir;
+
+    /**
+     * Directory containing the per-language subdirectories where the language
+     * files are written (e.g. 'lang' or '_custom/shared/lang').
+     * @var string
+     */
+    protected $langDir;
+
+    /**
+     * Name of the PHP array variable written to the language files.
+     * When null, the standard names are used: '$lang' for English and
+     * '$lang_current' for the other languages.
+     * @var string|null
+     */
+    protected $langVariable = null;
+
+    /**
+     * Path of the base English file included in non-English language files to provide
+     * defaults for untranslated strings. Set to null to write files without the include
+     * (e.g. custom language files, which are merged on top of the base translations at runtime).
+     * @var string|null
+     */
+    protected $baseEnglishFile = 'lang/en/language.php';
+
+    /**
+     * Whether to write the standard header (copyright and translator notes)
+     * to the language files.
+     * @var bool
+     */
+    protected $withHeader = true;
+
+    /**
+     * Function written at the end of the language file to merge the language array into $lang
+     * ('array_replace' or 'array_merge'). When null, standard files use 'array_replace' for
+     * non-English languages and no merge line for English.
+     * @var string|null
+     */
+    protected $mergeFunction = null;
 
     /**
      * Indicates whether to skip the removal of the old or unused strings from the language files.
@@ -93,6 +130,15 @@ class Language_GetStrings
      *   - 'lang' => 'langCode' or 'lang' => array(list of lang codes):
      *     language code or list of language codes whose language.php will be
      *     updated. If empty, all language.php files are updated.
+     *   - 'scanDir' => directory scanned for translatable strings.
+     *     Default is the current working directory.
+     *   - 'langDir' => directory containing the per-language subdirectories where
+     *     the language files are written. Default is 'lang' in the current working directory.
+     *   - 'baseDir' => legacy option: a single directory used both as scan directory
+     *     and as parent of the lang/ directory. Overrides 'scanDir' and 'langDir'.
+     *   - 'langVariable', 'baseEnglishFile', 'withHeader', 'mergeFunction': layout of the
+     *     written files (see the corresponding properties). Defaults produce standard
+     *     language.php files.
      *
      * @param Language_CollectFiles $collectFiles
      * @param Language_WriteFile_Factory $writeFileFactory factory to create Language_WriteFile objects
@@ -103,6 +149,7 @@ class Language_GetStrings
     {
         $this->collectFiles = $collectFiles;
         $this->writeFileFactory = $writeFileFactory;
+        $options = $options ?? [];
 
         if (isset($options['outputFiles'])) {
             $this->outputFiles = true;
@@ -113,10 +160,21 @@ class Language_GetStrings
                 throw new Language_Exception("Invalid directory {$options['baseDir']}.");
             }
 
-            $this->baseDir = $options['baseDir'];
-        } else {
-            $this->baseDir = getcwd();
+            $options['scanDir'] = $options['baseDir'];
+            $options['langDir'] = $options['baseDir'] . '/lang';
         }
+
+        if (isset($options['scanDir'])) {
+            if (! is_dir($options['scanDir'])) {
+                throw new Language_Exception("Invalid directory {$options['scanDir']}.");
+            }
+
+            $this->scanDir = $options['scanDir'];
+        } else {
+            $this->scanDir = getcwd();
+        }
+
+        $this->langDir = $options['langDir'] ?? getcwd() . '/lang';
 
         if (isset($options['fileName'])) {
             $this->fileName = $options['fileName'];
@@ -128,12 +186,28 @@ class Language_GetStrings
             $this->setLanguages();
         }
 
-        if (isset($options['skipRemove'])) {
+        if (! empty($options['skipRemove'])) {
             $this->skipRemove = true;
         }
 
-        if (isset($options['includeDatabase'])) {
+        if (! empty($options['includeDatabase'])) {
             $this->includeDatabase = true;
+        }
+
+        if (isset($options['langVariable'])) {
+            $this->langVariable = $options['langVariable'];
+        }
+
+        if (array_key_exists('baseEnglishFile', $options)) {
+            $this->baseEnglishFile = $options['baseEnglishFile'];
+        }
+
+        if (isset($options['withHeader'])) {
+            $this->withHeader = (bool) $options['withHeader'];
+        }
+
+        if (isset($options['mergeFunction'])) {
+            $this->mergeFunction = $options['mergeFunction'];
         }
     }
 
@@ -191,7 +265,7 @@ class Language_GetStrings
             }
 
             foreach ($languages as $lang) {
-                if (! file_exists($this->baseDir . '/lang/' . $lang)) {
+                if (! file_exists($this->langDir . '/' . $lang)) {
                     throw new Language_Exception('Invalid language code.');
                 }
             }
@@ -313,9 +387,8 @@ class Language_GetStrings
                 foreach ($matches[1] ?? [] as $str) {
                     if (! isset($dbStrings[$str])) {
                         $dbStrings[$str] = [
-                            'name'   => $str,
-                            'source' => 'database', // to be able to distinguish from file strings
-                            'files'  => [],
+                            'name'  => $str,
+                            'files' => [],
                         ];
                     }
 
@@ -340,18 +413,14 @@ class Language_GetStrings
         $strings = [];
 
         foreach ($files as $file) {
-            $fileStrings = $this->collectStrings($file);
-            $source = Language_WriteFile::isCustomDir(dirname($file)) ? 'custom' : 'standard'; // Define the source for file-based strings: 'custom' for user overrides, 'standard' for core.
-
-            foreach ($fileStrings as $str) {
-                $this->mergeStringEntry($strings, $str, $source, [$file]);
+            foreach ($this->collectStrings($file) as $str) {
+                $this->mergeStringEntry($strings, $str, [$file]);
             }
         }
 
         if ($this->includeDatabase) {
-            $databaseStrings = $this->collectStringsFromDatabase();
-            foreach ($databaseStrings as $str => $entry) {
-                $this->mergeStringEntry($strings, $str, $entry['source'], $entry['files'] ?? []);
+            foreach ($this->collectStringsFromDatabase() as $entry) {
+                $this->mergeStringEntry($strings, $entry['name'], $entry['files']);
             }
         }
 
@@ -359,41 +428,25 @@ class Language_GetStrings
     }
 
     /**
-     * Merges a string entry into the provided strings array.
-     *
-     * If the string entry with the given name does not exist, it initializes it with the provided sources and files.
-     * If it already exists, it merges the new sources and files into the existing entry, avoiding duplicates.
+     * Merges a string entry into the provided strings array,
+     * merging the lists of files where the string was found and avoiding duplicates.
      *
      * @param array  &$strings Reference to the array of string entries to be updated.
      * @param string $name     The name/key of the string entry to merge.
-     * @param mixed  $source   The source(s) of the string entry. Can be a string or an array of strings.
      * @param array  $files    (Optional) List of files associated with the string entry.
      *
      * @return void
      */
-    private function mergeStringEntry(array &$strings, string $name, $source, array $files = []): void
+    private function mergeStringEntry(array &$strings, string $name, array $files = []): void
     {
-        $sources = ! is_array($source) ? [$source] : $source;
-
         if (! isset($strings[$name])) {
-            $strings[$name] = [
-                'name'   => $name,
-                'source' => $sources,
-            ];
+            $strings[$name] = ['name' => $name];
             if ($this->outputFiles) {
-                $strings[$name]['files'] = $files;
+                $strings[$name]['files'] = array_values($files);
             }
             return;
         }
 
-        // Merge Sources
-        foreach ($sources as $s) {
-            if (! in_array($s, $strings[$name]['source'], true)) {
-                $strings[$name]['source'][] = $s;
-            }
-        }
-
-        // Merge Files
         if ($this->outputFiles) {
             foreach ($files as $file) {
                 if (! in_array($file, $strings[$name]['files'], true)) {
@@ -405,22 +458,29 @@ class Language_GetStrings
 
     public function writeToFiles($strings)
     {
-        $isCustomDir = Language_WriteFile::isCustomDir($this->baseDir);
-
-        // Segregate strings by source: custom output files only receive strings from _custom/ files and the database;
-        // standard output files only receive strings from core Tiki files.
-        $filteredStrings = array_filter($strings, function ($s) use ($isCustomDir) {
-            $sources = $s['source'] ?? [];
-            if ($isCustomDir) {
-                return in_array('custom', $sources, true) || in_array('database', $sources, true);
-            }
-            return in_array('standard', $sources, true);
-        });
-
         foreach ($this->languages as $lang) {
-            $filePath = $this->baseDir . '/lang/' . $lang . '/' . $this->fileName;
+            $filePath = $this->langDir . '/' . $lang . '/' . $this->fileName;
             $writeFile = $this->writeFileFactory->factory($filePath);
-            $writeFile->writeStringsToFile($filteredStrings, $this->outputFiles, $lang, $this->baseDir, $this->skipRemove);
+
+            // Standard language files use '$lang' with no merge line for English, and
+            // '$lang_current' merged with array_replace for the other languages. Both are
+            // overridden when a specific variable was configured (e.g. custom files use
+            // '$lang_custom' merged with array_merge for every language).
+            if ($this->langVariable !== null) {
+                $langVariable = $this->langVariable;
+                $mergeFunction = $this->mergeFunction;
+            } elseif ($lang === 'en') {
+                $langVariable = '$lang';
+                $mergeFunction = null;
+            } else {
+                $langVariable = '$lang_current';
+                $mergeFunction = $this->mergeFunction ?? 'array_replace';
+            }
+
+            // The English file needs no include of itself
+            $baseEnglishFile = $lang === 'en' ? null : $this->baseEnglishFile;
+
+            $writeFile->writeStringsToFile($strings, $this->outputFiles, $lang, $this->skipRemove, $langVariable, $baseEnglishFile, $this->withHeader, $mergeFunction);
         }
     }
 
@@ -431,7 +491,8 @@ class Language_GetStrings
      */
     protected function getAllLanguages()
     {
-        $dirs = dir($this->baseDir . '/lang');
+        $languages = [];
+        $dirs = dir($this->langDir);
 
         while (false !== ($entry = $dirs->read())) {
             if ($entry == '.' || $entry == '..') {
@@ -454,7 +515,7 @@ class Language_GetStrings
         }
 
         $this->collectFiles->setExtensions($this->extensions);
-        $files = $this->collectFiles->run($this->baseDir);
+        $files = $this->collectFiles->run($this->scanDir);
         $strings = $this->scanFiles($files);
         $this->writeToFiles($strings);
     }

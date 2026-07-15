@@ -53,7 +53,9 @@ class GetStringsCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setHelp(tra('Scans all Tiki files and adds new English strings to language files. Also reorganizes existing strings.'))
+            ->setHelp(tra('Scans all Tiki files and adds new English strings to language files. Also reorganizes existing strings.') . "\n"
+                . 'With --custom, scans the site customizations (' . TIKI_CUSTOMIZATIONS_SRC_PATH . ' directory and, with --include-database, wiki pages) instead, and updates '
+                . TIKI_CUSTOMIZATIONS_SHARED_PATH . '/' . LANG_PATH_FRAGMENT . '/<lang>/' . LANG_CUSTOM_PHP_BASENAME . ' without touching the core lang/ files.')
             ->addOption(
                 'lang',
                 'l',
@@ -73,10 +75,17 @@ class GetStringsCommand extends Command
                 tra('Directories that should be excluded from searching')
             )
             ->addOption(
+                'custom',
+                null,
+                InputOption::VALUE_NONE,
+                'Extract strings from the ' . TIKI_CUSTOMIZATIONS_SRC_PATH . ' directory (and wiki pages, with --include-database) and write them to '
+                    . TIKI_CUSTOMIZATIONS_SHARED_PATH . '/' . LANG_PATH_FRAGMENT . '/<lang>/' . LANG_CUSTOM_PHP_BASENAME
+            )
+            ->addOption(
                 'include-database',
                 null,
                 InputOption::VALUE_NONE,
-                'Include strings from the tiki_pages database table (wiki pages). Applies only to _custom language files, not core files. eg. --include-database'
+                'Include strings from the tiki_pages database table (wiki pages). Only used with --custom. eg. --custom --include-database'
             )
             ->addOption(
                 'include',
@@ -123,15 +132,47 @@ class GetStringsCommand extends Command
         // Files are processed after the base directory, so adding a file here allows to scan it even if its directory was excluded.
         $includeFiles = ['./' . LANG_PATH_FRAGMENT . '/langmapping.php', './' . IMG_FLAGNAMES_FILE];
 
-        if ($input->getOption('basedir')) {
-            $options['baseDir'] = $input->getOption('basedir');
+        $options['fileName'] = $input->getOption('filename') ?: null;
+        $options['skipRemove'] = $input->getOption('skip-remove') ?: null;
+
+        if ($input->getOption('custom') && $input->getOption('basedir')) {
+            $output->writeln('<error>--custom and --basedir cannot be combined: --custom already defines where to scan and where to write.</error>');
+            return Command::INVALID;
+        }
+
+        if ($input->getOption('custom')) {
+            // scan all of _custom/ and write to _custom/shared/lang/
+            $options['scanDir'] = TIKI_CUSTOMIZATIONS_SRC_PATH;
+            $options['langDir'] = TIKI_CUSTOMIZATIONS_SHARED_PATH . '/' . LANG_PATH_FRAGMENT;
+            $options['fileName'] = $input->getOption('filename') ?: LANG_CUSTOM_PHP_BASENAME;
+
+            // Custom language files are written without the core file header and hold their
+            // strings in $lang_custom, merged on top of the base translations at runtime.
+            $options['langVariable'] = '$lang_custom';
+            $options['mergeFunction'] = 'array_merge';
+            $options['withHeader'] = false;
+            $options['baseEnglishFile'] = null;
+
+            $options['includeDatabase'] = $input->getOption('include-database') ?: null;
+
+            // Do not scan the generated language files themselves
+            $excludeDirs = [$options['langDir']];
+            $includeFiles = [];
+        } elseif ($input->getOption('basedir')) {
+            $baseDir = $input->getOption('basedir');
+
+            $resolvedBaseDir = realpath($baseDir) ?: $baseDir;
+            $customRoot = realpath(TIKI_CUSTOMIZATIONS_SRC_PATH);
+            if ($customRoot && str_starts_with($resolvedBaseDir, $customRoot)) {
+                $output->writeln('<error>To extract strings from ' . TIKI_CUSTOMIZATIONS_SRC_PATH . ', use --custom instead of --basedir: it scans all the customizations and writes the language files where Tiki reads them from.</error>');
+                return Command::INVALID;
+            }
+
+            $options['baseDir'] = $baseDir;
 
             // when a custom base dir is set, default $includeFiles and $excludeDirs are not used
             $includeFiles = [];
             $excludeDirs = [];
-
-            // Handle includeDatabase option when using a custom baseDir (applies only to custom language files).
-            $options['includeDatabase'] = $input->getOption('include-database') ?: null;
         }
         if ($input->getOption('exclude')) {
             $excludeDirs = explode(',', $input->getOption('exclude'));
@@ -139,8 +180,6 @@ class GetStringsCommand extends Command
         if ($input->getOption('include')) {
             $includeFiles = explode(',', $input->getOption('include'));
         }
-        $options['fileName'] = $input->getOption('filename') ?: null;
-        $options['skipRemove'] = $input->getOption('skip-remove') ?: null;
 
         $getStrings = new Language_GetStrings(new Language_CollectFiles(), new Language_WriteFile_Factory(), $options);
 
@@ -155,6 +194,12 @@ class GetStringsCommand extends Command
         $getStrings->collectFiles->setIncludeFiles($includeFiles);
 
         $langs = $getStrings->getLanguages();
+        if (empty($langs)) {
+            $fileName = $options['fileName'] ?: 'language.php';
+            $langDir = $options['langDir'] ?? ($options['baseDir'] ?? '.') . '/' . LANG_PATH_FRAGMENT;
+            $output->writeln("<error>No language files to update: no <lang> directory containing $fileName was found in $langDir. Create the file(s) first, e.g. $langDir/fr/$fileName.</error>");
+            return Command::FAILURE;
+        }
         sort($langs);
         $output->writeln(count($langs) . ' Languages: ' . implode(' ', $langs));
 

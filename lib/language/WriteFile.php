@@ -52,21 +52,33 @@ class Language_WriteFile
     /**
      * Update language.php file with new strings.
      *
+     * The layout of the generated file is entirely defined by the $langVariable, $baseEnglishFile,
+     * $withHeader and $mergeFunction parameters; the defaults produce a standard non-English
+     * language.php file.
+     *
      * @param array $strings English strings collected from source files
      * @param bool $outputFiles whether file paths were string was found should be included or not in the output
      * @param string $language current language being processed
-     * @param string|null $targetDir directory where language files should be written (null means same as the current working directory)
      * @param bool $skipRemove whether to skip removing the old or unused strings from the language files. To skip, set to true. The existing translations in the destination file will not be overwritten or removed from the file if not found in the incoming translations.
+     * @param string $langVariable name of the PHP array variable the translations are written to (e.g. '$lang_current', '$lang_custom')
+     * @param string|null $baseEnglishFile path of the base English file to include for untranslated defaults, or null for no include
+     * @param bool $withHeader whether to write the standard header (copyright and translator notes)
+     * @param string|null $mergeFunction function merging $langVariable into $lang at the end of the file ('array_replace' or 'array_merge'), or null for no merge line
      * @return null
      */
-    public function writeStringsToFile(array $strings, $outputFiles = false, string $language = "", $targetDir = null, $skipRemove = false)
-    {
+    public function writeStringsToFile(
+        array $strings,
+        $outputFiles = false,
+        string $language = "",
+        bool $skipRemove = false,
+        string $langVariable = '$lang_current',
+        ?string $baseEnglishFile = 'lang/en/language.php',
+        bool $withHeader = true,
+        ?string $mergeFunction = 'array_replace'
+    ) {
         $lang = [];
         if (empty($strings)) {
             return false;
-        }
-        if (empty($targetDir)) {
-            $targetDir = getcwd();
         }
 
         $backupTranslations = [];
@@ -120,9 +132,7 @@ class Language_WriteFile
         if ($handle) {
             fwrite($handle, "<?php\n");
 
-            $isCustomDir = self::isCustomDir($targetDir);
-
-            $this->writeLanguageFile($handle, $entries, $outputFiles, $language, $isCustomDir);
+            $this->writeLanguageFile($handle, $entries, $outputFiles, $language, $langVariable, $baseEnglishFile, $withHeader, $mergeFunction);
 
             fclose($handle);
         }
@@ -202,29 +212,32 @@ TXT;
     }
 
     /**
-     * Write language strings to file, handling both standard and custom directories
+     * Write the language file content: optional header, optional include of the base
+     * English file, the translations array and an optional line merging it into $lang.
      *
      * @param resource $handle File handle to write to
      * @param array $entries Language entries to write
      * @param bool $outputFiles Whether to include file paths in output
      * @param string $language Current language code
-     * @param bool $isCustomDir Whether this is a custom directory
+     * @param string $langVariable Name of the PHP array variable the translations are written to
+     * @param string|null $baseEnglishFile Path of the base English file to include, or null for no include
+     * @param bool $withHeader Whether to write the standard header
+     * @param string|null $mergeFunction Function merging $langVariable into $lang, or null for no merge line
      */
-    protected function writeLanguageFile($handle, array $entries, bool $outputFiles, string $language, bool $isCustomDir): void
+    protected function writeLanguageFile($handle, array $entries, bool $outputFiles, string $language, string $langVariable, ?string $baseEnglishFile, bool $withHeader, ?string $mergeFunction): void
     {
-        if ($isCustomDir) {
-            $this->writeLanguageArray($handle, $entries, $outputFiles, $language, '$lang_custom');
-            fwrite($handle, "\$lang = array_merge(\$lang, \$lang_custom);\n");
-        } else {
+        if ($withHeader) {
             fwrite($handle, $this->fileHeader());
+        }
 
-            if ($language != "en") {
-                fwrite($handle, "include('lang/en/language.php'); // Needed for providing a sensible default text for untranslated strings with context like : \"edit_C(verb)\"\n");
-                $this->writeLanguageArray($handle, $entries, $outputFiles, $language, '$lang_current');
-                fwrite($handle, "\$lang = array_replace(\$lang, \$lang_current);\n");
-            } else {
-                $this->writeLanguageArray($handle, $entries, $outputFiles, $language, '$lang');
-            }
+        if ($baseEnglishFile !== null) {
+            fwrite($handle, "include('$baseEnglishFile'); // Needed for providing a sensible default text for untranslated strings with context like : \"edit_C(verb)\"\n");
+        }
+
+        $this->writeLanguageArray($handle, $entries, $outputFiles, $language, $langVariable);
+
+        if ($mergeFunction !== null) {
+            fwrite($handle, "\$lang = {$mergeFunction}(\$lang, {$langVariable});\n");
         }
     }
 
@@ -237,25 +250,5 @@ TXT;
         }
 
         fwrite($handle, ");\n");
-    }
-
-    /**
-     * Checks if the directory is a custom theme directory.
-     *
-     * @param string $dir The directory path to check
-     * @return bool Returns true if it's a custom theme directory, false otherwise
-     */
-    public static function isCustomDir($dir): bool
-    {
-        global $tikipath;
-        $resolvedDir = realpath($dir);
-        if ($resolvedDir === false) {
-            $resolvedDir = $dir;
-        }
-        // Ensure trailing slash for root
-        $root = rtrim($tikipath, '/') . '/';
-
-        // Match paths where the first directory after $root is "_custom"
-        return preg_match('#^' . preg_quote($root, '#') . '_custom(?:/|$)#', $resolvedDir) === 1;
     }
 }
