@@ -10,8 +10,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "prebuild": "node scripts/check_custom.js",
     "prewatch": "node scripts/check_custom.js",
-    "build": "sass --load-path=../../templates --load-path=../../themes ../../themes ../../_custom:../../public/generated/_custom --silence-deprecation=color-functions,global-builtin,import,if-function",
-    "watch": "sass --watch --load-path=../../templates --load-path=../../themes ../../themes ../../_custom:../../public/generated/_custom --silence-deprecation=color-functions,global-builtin,import,if-function",
+    "build": "sass --load-path=../../templates --load-path=../../themes ../../themes ../../_custom/sites:../../public/generated/_custom/sites ../../_custom/shared/themes:../../public/generated/_custom/shared/themes --silence-deprecation=color-functions,global-builtin,import,if-function",
+    "watch": "sass --load-path=../../templates --load-path=../../themes ../../themes ../../_custom/sites:../../public/generated/_custom/sites ../../_custom/shared/themes:../../public/generated/_custom/shared/themes --silence-deprecation=color-functions,global-builtin,import,if-function --watch",
     "clean": "git clean -f -x \"../../themes/**/*.css\" \"../../themes/**/*.css.map\" \"../../public/generated/_custom/**/*.css\" \"../../public/generated/_custom/**/*.css.map\""
   },
   "author": "",
