@@ -698,9 +698,9 @@
         {if $tfaSecret }
             <form action="tiki-user_preferences.php" method="post" class="form-horizontal">
                 {ticket}
-                <div class="form-group row">
-                    <div class="col-md-5">
-                        <img class="responsive" src="data:image/{$imageType};base64,{$tfaSecretQR}"/>
+                <div class="form-group row mt-3">
+                    <div class="col-md-5 mb-3">
+                        <img class="img-fluid" src="data:image/{$imageType};base64,{$tfaSecretQR}"/>
                     </div>
                     <div class="col-md-7 align-content-center">
                         <div class="d-flex align-items-center" style="height: 100%">
