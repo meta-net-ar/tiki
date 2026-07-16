@@ -456,11 +456,32 @@ class Search_MySql_Table extends TikiDb_Table
         return $stopwordTableName;
     }
 
+    /**
+     * Encode Tiki-supported identifiers for InnoDB's filename character set.
+     *
+     * Tiki-created database names are limited to ASCII letters, digits, dollar
+     * signs, underscores, and hyphens. MySQL preserves letters, digits, and
+     * underscores in filenames, so only the remaining two characters require
+     * encoding. Search index names use a subset of the same character set.
+     */
+    private static function encodeInnoDBIdentifier(string $identifier): string
+    {
+        return strtr($identifier, [
+            '$' => '@0024',
+            '-' => '@002d',
+        ]);
+    }
+
     private function addFullText($fieldName)
     {
         $stopwordTableName = $this->setupStopwordTable();
         $dbName = $this->db->getOne("SELECT DATABASE()");
-        $this->db->query("SET SESSION innodb_ft_user_stopword_table = ?", ["{$dbName}/{$stopwordTableName}"]);
+        $innodbStopwordTableName = sprintf(
+            '%s/%s',
+            self::encodeInnoDBIdentifier($dbName),
+            self::encodeInnoDBIdentifier($stopwordTableName)
+        );
+        $this->db->query("SET SESSION innodb_ft_user_stopword_table = ?", [$innodbStopwordTableName]);
 
         $table = $this->escapeIdentifier($this->definition[$fieldName]['table']);
         $this->schemaBuffer->setPrefix("ALTER TABLE $table ");
