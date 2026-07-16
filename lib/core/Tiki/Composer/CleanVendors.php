@@ -106,7 +106,6 @@ class CleanVendors
         'samples',
         'security.md',
         'support.md',
-        'test',
         'test.html',
         'tests',
         'todo',
