@@ -88,20 +88,35 @@ function getTargetBranch()
 }
 
 /**
- * Get the current working branch name
+ * Returns the name of the currently checked-out branch.
+ *
+ * In GitLab CI, the predefined CI_COMMIT_REF_NAME variable is preferred,
+ * as jobs may run in a detached HEAD state.
+ *
+ * Returns null when no branch is checked out (for example, a detached HEAD)
+ * or when the current branch cannot be determined.
  */
-function getCheckedOutBranchName()
+function getCheckedOutBranchName(): ?string
 {
-    if (getenv('CI_COMMIT_REF_NAME')) {
-        return getenv('CI_COMMIT_REF_NAME');
+    $ciRef = getenv('CI_COMMIT_REF_NAME');
+    if ($ciRef !== false && $ciRef !== '') {
+        return $ciRef;
     }
 
-    $gitOutput = shell_exec('git rev-parse --abbrev-ref HEAD 2>nul');
-    if ($gitOutput && ! preg_match('/fatal|error/i', $gitOutput)) {
-        return trim($gitOutput);
+    $output = [];
+    $returnCode = 0;
+
+    exec(
+        'git symbolic-ref -q --short HEAD 2>nul',
+        $output,
+        $returnCode
+    );
+
+    if ($returnCode !== 0 || empty($output[0])) {
+        return null;
     }
 
-    return null;
+    return trim($output[0]);
 }
 
 /**
@@ -918,17 +933,22 @@ function gitCommitObjectExists(string $sha): bool
 /**
  * Find the merge-base between two Git refs.
  */
-function getGitMergeBase($refA, $refB)
+function getGitMergeBase($refA, $refB): ?string
 {
-    $mergeBase = trim((string) shell_exec(
-        'git merge-base ' . escapeshellarg($refA) . ' ' . escapeshellarg($refB) . ' 2>nul'
-    ));
+    $output = [];
+    $returnCode = 0;
 
-    if ($mergeBase === '' || preg_match('/fatal|error/i', $mergeBase)) {
+    exec(
+        'git merge-base ' . escapeshellarg($refA) . ' ' . escapeshellarg($refB) . ' 2>nul',
+        $output,
+        $returnCode
+    );
+
+    if ($returnCode !== 0 || empty($output[0])) {
         return null;
     }
 
-    return $mergeBase;
+    return trim($output[0]);
 }
 
 /**

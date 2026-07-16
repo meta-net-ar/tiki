@@ -923,9 +923,9 @@ composer-stability:
     - composer
   script:
     - php doc/devtools/check_composer_stability.php --ci
-  # rules:
-  #   - changes:
-  #       - "**/composer.json"
+  rules:
+    - changes:
+        - "**/composer.json"
   artifacts:
     when: always
     reports:
