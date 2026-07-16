@@ -35,7 +35,7 @@
         "    The tilde (~) operator offers tighter control:",
         "       - ~3.0 allows updates up to <3.1.0 (safe minor & patch updates)",
         "       - ~3.0.0 allows only patch updates (<3.0.1)",
-        "    Recommendation: use version constraints like ~3.0 rather than ~3.0.0,", 
+        "    Recommendation: use version constraints like ~3.0 rather than ~3.0.0,",
         "       Using ~3.0 ensures we continue to receive non-breaking feature improvements without being locked into a specific minor release for an extended period.",
         "    Major version bumps (e.g., from 3.x to 4.x) must be handled explicitly in a dedicated commit.",
         "    This ensures that we are aware of potential breaking changes and can test accordingly.",
@@ -376,6 +376,13 @@
     "config": {
         "process-timeout": 5000,
         "bin-dir": "../bin",
+        "policy": {
+            "advisories": {
+                "ignore-id": [
+                    "PKSA-zk1n-qbm6-d3rq"
+                ]
+            }
+        },
         "_comment": "platform-check CANNOT be enabled, because it would check the ext-* requirements of our dependencies not just ours.  See the workarounds below.  So anything that uses the autoloader, including console.php wouldn't work on a server without ext-soap installed.  Note that platform-check will NOT check the maximum php version anyway, even if we put it in our requires.  In platform, php: The oldest version we support, so composer doesn't pick packages that are incompatible with it (nothing to do with what is checked if we enable platform-check).  On the other hand: ext-*: 0 are workarounds.  ext-ldap is in the require of laminas/laminas-ldap. ext-soap is in the require of laminas/laminas-soap.  We couldn't composer install without this workaround if php-ldap or php-soap aren't installed",
         "platform-check": false,
         "platform": {
@@ -393,6 +400,9 @@
             "php-http/discovery": true
         },
         "audit": {
+            "ignore": {
+                "PKSA-zk1n-qbm6-d3rq": "Tiki does not use SimpleFakeCredentialGenerator or username-based fake credential lists. Its WebAuthn login uses discoverable credentials and resolves the user from the submitted credential ID, so the affected code path is unreachable. Upgrade to web-auth/webauthn-lib 5.x is deferred while Tiki supports PHP 8.1."
+            },
             "ignore-abandoned": {
                 "candy-chat/xmpp-prebind-php": "Work scheduled for removal next month.",
                 "laminas/laminas-loader": "Required transitively by laminas/laminas-http but will be solved in 3.0 https://github.com/laminas/laminas-http/pull/110",
