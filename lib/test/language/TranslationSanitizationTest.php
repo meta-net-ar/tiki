@@ -317,6 +317,46 @@ $lang = array_replace($lang, $lang_custom);
         $this->assertStringContainsString('~np~', $result);
         $this->assertStringContainsString('~/np~', $result);
 
+        // Mail translations explicitly opt out because their output is not parsed as wiki text.
+        $smarty->assign([
+            'mail_action' => '',
+            'mail_itemId' => 1381,
+            'mail_item_desc' => 'Ken',
+            'mail_trackerName' => 'Contacts',
+            'mail_user' => 'Ken',
+            'mail_date' => 1,
+            'mail_data' => '',
+            'server_name' => 'example.test',
+        ]);
+        $result = $smarty->fetchLang($this->lang, 'mail/tracker_changed_notification.tpl');
+        $this->assertStringContainsString('View the tracker item at:', $result);
+        $this->assertStringNotContainsString('~np~', $result);
+        $this->assertStringNotContainsString('~/np~', $result);
+
+        $result = $smarty->fetchLang($this->lang, 'mail/tracker_changed_notification_subject.tpl');
+        $this->assertStringContainsString('item', $result);
+        $this->assertStringNotContainsString('~np~', $result);
+        $this->assertStringNotContainsString('~/np~', $result);
+
+        $smarty->assign([
+            'info' => ['name' => 'News', 'description' => 'Description'],
+            'code' => 'confirmation-code',
+        ]);
+        $result = $smarty->fetchLang($this->lang, 'mail/confirm_newsletter_subscription.tpl');
+        $this->assertStringContainsString('To the newsletter:', $result);
+        $this->assertStringNotContainsString('~np~', $result);
+        $this->assertStringNotContainsString('~/np~', $result);
+
+        $repeat = false;
+        $result = $handler->handle(
+            ['lang' => $this->lang],
+            'Edit',
+            $template,
+            $repeat
+        );
+        $this->assertStringContainsString('~np~', $result);
+        $this->assertStringContainsString('~/np~', $result);
+
         // Clean up
         unset($parserlib->option['wiki_parse_context']);
     }
