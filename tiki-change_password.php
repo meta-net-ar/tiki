@@ -88,8 +88,7 @@ if (
 }
 $smarty->assign('secure_token', $secure_token);
 
-if (isset($_REQUEST["change"])) {
-    $access->checkCsrf();
+if (isset($_REQUEST["change"]) && $access->checkCsrf()) {
     $changePasswordProperties = $bruteForceProperties();
     if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
         if (! $bruteForce->isOperationAllowed('change_password', $changePasswordProperties)) {
