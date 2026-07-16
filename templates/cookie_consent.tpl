@@ -23,47 +23,57 @@
                         </div>
                     </div>
 
-                    <div id="customConsentSectionBanner" class="row mb-4">
-                        <div class="col-12 d-flex flex-wrap gap-3 gap-md-4">
-                            {foreach $cookie_categories as $category => $data}
-                                <div class="form-check form-switch d-flex align-items-center flex-shrink-0">
-                                    <input class="form-check-input me-2" type="checkbox" id="toggle{$category|capitalize}"
-                                        name="cookie_consent_{$category}"
-                                        {if $category == 'essential'}
-                                            checked disabled aria-disabled="true"
-                                        {elseif $data.consent}
-                                            checked
-                                        {/if}>
-                                    <label class="form-check-label me-2 fw-semibold" for="toggle{$category|capitalize}">
-                                        {tr}{$data.name}{/tr}
-                                    </label>
-                                    <button type="button" class="btn btn-link p-0 text-decoration-none text-dark"
-                                            data-bs-toggle="tooltip" data-bs-placement="right"
-                                            title="{tr}{$data.description}{/tr}"
-                                            aria-label="{tr}{$data.description}{/tr}">
-                                        <i class="fas fa-info-circle"></i>
-                                    </button>
-                                </div>
-                            {/foreach}
-                        </div>
-                    </div>
-
-                    <div class="row">
+                    <div class="row" id="cookieConsentInitialActions">
                         <div class="col-12 d-flex flex-wrap gap-2 justify-content-center justify-content-md-end">
-                            {if $prefs.cookie_consent_disable eq 'n'}
-                                <button type="submit" class="btn btn-outline-danger"
-                                        id="cookie_decline_unnecessary_button">
-                                    {tr}Refuse unnecessary{/tr}
-                                </button>
-                            {/if}
-                            <button type="submit" class="btn btn-secondary"
-                                    id="cookie_save_button">
-                                {tr}Save preferences{/tr}
+                            <button type="button" class="btn btn-secondary collapsed"
+                                    id="cookie_preferences_button" data-bs-toggle="collapse"
+                                    data-bs-target="#cookieConsentPreferences" aria-expanded="false"
+                                    aria-controls="cookieConsentPreferences">
+                                {tr}Preferences{/tr}
                             </button>
                             <button type="submit" class="btn btn-primary"
                                     id="cookie_consent_preference" name="cookie_consent_preference">
                                 {tr}Accept all{/tr}
                             </button>
+                        </div>
+                    </div>
+
+                    <div id="cookieConsentPreferences" class="collapse">
+                        <div id="customConsentSectionBanner" class="row mt-4 mb-4">
+                            <div class="col-12 d-flex flex-wrap gap-3 gap-md-4">
+                                {foreach from=$cookie_categories key=category item=data}
+                                    <div class="form-check form-switch d-flex align-items-center flex-shrink-0">
+                                        <input class="form-check-input me-2" type="checkbox" id="toggle{$category|capitalize}"
+                                               name="cookie_consent_{$category}"
+                                               {if $category == 'essential'}checked disabled aria-disabled="true"
+                                               {elseif $data.consent}checked{/if}>
+                                        <label class="form-check-label me-2 fw-semibold" for="toggle{$category|capitalize}">
+                                            {tr}{$data.name}{/tr}
+                                        </label>
+                                        <button type="button" class="btn btn-link p-0 text-decoration-none text-dark"
+                                                data-bs-toggle="tooltip" data-bs-placement="right"
+                                                title="{tr}{$data.description}{/tr}"
+                                                aria-label="{tr}{$data.description}{/tr}">
+                                            <i class="fas fa-info-circle"></i>
+                                        </button>
+                                    </div>
+                                {/foreach}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-12 d-flex flex-wrap gap-2 justify-content-center justify-content-md-end">
+                                {if $prefs.cookie_consent_disable eq 'n'}
+                                    <button type="submit" class="btn btn-outline-danger"
+                                            id="cookie_decline_unnecessary_button">
+                                        {tr}Refuse unnecessary{/tr}
+                                    </button>
+                                {/if}
+                                <button type="submit" class="btn btn-secondary"
+                                        id="cookie_save_button">
+                                    {tr}Save preferences{/tr}
+                                </button>
+                            </div>
                         </div>
                     </div>
 
