@@ -32,6 +32,11 @@ button.dropdown-toggle + .dropdown-menu  .btn.dropdown-item {
     border-radius: 0;
     background-color: transparent; }
 
+    // This is needed to prevent a page-top gap.
+a.skipnav {
+    position: absolute;
+}
+
 // Forms
     // Tiki - match to button radius inside the input
 .input-group {
