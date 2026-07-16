@@ -23,23 +23,25 @@
                         </div>
                     </div>
 
-                    <div class="row" id="cookieConsentInitialActions">
-                        <div class="col-12 d-flex flex-wrap gap-2 justify-content-center justify-content-md-end">
-                            <button type="button" class="btn btn-secondary collapsed"
-                                    id="cookie_preferences_button" data-bs-toggle="collapse"
-                                    data-bs-target="#cookieConsentPreferences" aria-expanded="false"
-                                    aria-controls="cookieConsentPreferences">
-                                {tr}Preferences{/tr}
-                            </button>
-                            <button type="submit" class="btn btn-primary"
-                                    id="cookie_consent_preference" name="cookie_consent_preference">
-                                {tr}Accept all{/tr}
-                            </button>
+                    {if $prefs.cookie_consent_simplified_ui eq 'y'}
+                        <div class="row" id="cookieConsentInitialActions">
+                            <div class="col-12 d-flex flex-wrap gap-2 justify-content-center justify-content-md-end">
+                                <button type="button" class="btn btn-secondary collapsed"
+                                        id="cookie_preferences_button" data-bs-toggle="collapse"
+                                        data-bs-target="#cookieConsentPreferences" aria-expanded="false"
+                                        aria-controls="cookieConsentPreferences">
+                                    {tr}Preferences{/tr}
+                                </button>
+                                <button type="submit" class="btn btn-primary"
+                                        id="cookie_consent_preference" name="cookie_consent_preference">
+                                    {tr}Accept all{/tr}
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    {/if}
 
-                    <div id="cookieConsentPreferences" class="collapse">
-                        <div id="customConsentSectionBanner" class="row mt-4 mb-4">
+                    <div id="cookieConsentPreferences"{if $prefs.cookie_consent_simplified_ui eq 'y'} class="collapse"{/if}>
+                        <div id="customConsentSectionBanner" class="row{if $prefs.cookie_consent_simplified_ui eq 'y'} mt-4{/if} mb-4">
                             <div class="col-12 d-flex flex-wrap gap-3 gap-md-4">
                                 {foreach from=$cookie_categories key=category item=data}
                                     <div class="form-check form-switch d-flex align-items-center flex-shrink-0">
@@ -73,6 +75,12 @@
                                         id="cookie_save_button">
                                     {tr}Save preferences{/tr}
                                 </button>
+                                {if $prefs.cookie_consent_simplified_ui neq 'y'}
+                                    <button type="submit" class="btn btn-primary"
+                                            id="cookie_consent_preference" name="cookie_consent_preference">
+                                        {tr}Accept all{/tr}
+                                    </button>
+                                {/if}
                             </div>
                         </div>
                     </div>

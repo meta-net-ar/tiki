@@ -101,6 +101,16 @@ function prefs_cookie_list()
                 'cookie_consent_feature',
             ],
         ],
+        'cookie_consent_simplified_ui' => [
+            'name' => tra('Simplified cookie consent interface'),
+            'description' => tra('Initially show only the Preferences and Accept all buttons. Cookie categories and the remaining actions are shown after the user selects Preferences.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'tags' => ['experimental'],
+            'dependencies' => [
+                'cookie_consent_feature',
+            ],
+        ],
         'cookie_consent_dom_id' => [
             'name' => tra('Cookie consent dialog ID'),
             'description' => tra('DOM id for the dialog container div.'),
