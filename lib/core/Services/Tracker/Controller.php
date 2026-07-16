@@ -896,6 +896,7 @@ class Services_Tracker_Controller
 
         $id = 0;
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $itemData['validate'] = ! $input->skipValidation->bool();
             $itemObject = $this->utilities->cloneItem($definition, $itemData, $itemId);
             $id = $itemObject->getId();
             if ($id === false) {
