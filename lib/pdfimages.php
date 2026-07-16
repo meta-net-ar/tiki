@@ -42,7 +42,7 @@ class PdfImagesLib
      */
     public function setVersion()
     {
-        $process = Process::fromShellCommandline(escapeshellarg($this->binaryPath) . ' -v 2>&1');
+        $process = Process::fromShellCommandline($this->binaryPath . ' -v 2>&1');
         $process->run();
         $output = $process->getOutput();
         preg_match('/[\d\.]+/', $output, $version);
@@ -108,8 +108,8 @@ class PdfImagesLib
             throw new Exception($this->destination . ' is not writable');
         }
 
-        $this->source = escapeshellarg($sourcePDF);
-        $this->destination = escapeshellarg($destinationFolder);
+        $this->source = $sourcePDF;
+        $this->destination = $destinationFolder;
     }
 
     /**
@@ -128,7 +128,7 @@ class PdfImagesLib
             $arguments = ' -' . implode(' -', $this->arguments) . ' ';
         }
 
-        $process = Process::fromShellCommandline($this->binaryPath . $arguments . $this->source . ' ' . $this->destination);
+        $process = new Process([$this->binaryPath, $arguments, $this->source, $this->destination]);
         $process->run();
         $exitCode = $process->getExitCode();
         $error = $process->getErrorOutput();

@@ -83,8 +83,6 @@ class ocrLib extends TikiLib
 
     public function whereIsExecutable(string $executable): ?string
     {
-        $executable = escapeshellarg($executable);
-
         if (TikiInit::isWindows()) {
             $possibleCommands = [
                 'where ' . $executable . ' 2>&1'
@@ -96,7 +94,7 @@ class ocrLib extends TikiLib
             ];
         }
         foreach ($possibleCommands as $cmd) {
-            $process = Process::fromShellCommandline('tesseract --version');
+            $process = Process::fromShellCommandline($cmd);
             $process->run();
             $output = $process->getOutput();
             $exitCode = $process->getExitCode();
