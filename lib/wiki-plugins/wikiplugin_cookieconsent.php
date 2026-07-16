@@ -13,7 +13,8 @@ function wikiplugin_cookieconsent_info()
         'documentation' => 'PluginCookieConsent',
         'description' => tra('Display content based on whether cookie consent has been granted by the user.'),
         'prefs' => ['wikiplugin_cookieconsent', 'cookie_consent_feature'],
-        'body' => tra('Wiki syntax containing the content that can be hidden or shown.'),
+        'body' => tr('Wiki syntax containing the content that can be hidden or shown. The body may contain %0{ELSE}%1.
+            Text after the marker will be displayed if consent has not been granted.', '<code>', '</code>'),
         'filter' => 'wikicontent',
         'introduced' => 10,
         'iconname' => 'information',
@@ -43,6 +44,20 @@ function wikiplugin_cookieconsent_info()
                 'default' => 'wp-cookie-consent-required',
                 'filter' => 'text',
             ],
+            'cookie_category_needed' => [
+                'required' => false,
+                'name' => tra('Cookie category needed'),
+                'description' => tra('Category of cookies needed to be consented to for this content to be displayed. Defaults to "Essential"'),
+                'options' => [
+                    ['text' => tra('Essential'), 'value' => CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL],
+                    ['text' => tra('Functional'), 'value' => CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL],
+                    ['text' => tra('Analytics'), 'value' => CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ANALYTICS],
+                    ['text' => tra('Marketing'), 'value' => CookieConsentLib::BUILTIN_COOKIE_CATEGORY_MARKETING],
+                ],
+                'since' => '30.0',
+                'default' => CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL,
+                'filter' => 'text',
+            ],
         ]
     ];
 }
@@ -57,9 +72,16 @@ function wikiplugin_cookieconsent($body, $params)
 
     $class = $params['element_class'];
 
-    if (! CookieConsentLib::isCategoryAllowed(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL)) {
-        $body = '';
+    $parts = explode('{ELSE}', $body);
+    if (! CookieConsentLib::isCategoryAllowed($params['cookie_category_needed'])) {
+        if (count($parts) > 1) {
+            $body = $parts[1];
+        } else {
+            $body = '';
+        }
         $class .= ($class ? ' ' : '') . $params['no_consent_class'];
+    } else {
+        $body = $parts[0];
     }
 
     $tag1 = $tag2 = '';
