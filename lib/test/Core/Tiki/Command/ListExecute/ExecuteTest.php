@@ -40,8 +40,6 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
 
         parent::setUp();
 
-        require_once(__DIR__ . '/../../../../TestHelpers.php');
-
         $testhelpers->simulateTikiScriptContext();
 
         TikiLib::lib('tiki')->query('TRUNCATE TABLE tiki_plugin_security');

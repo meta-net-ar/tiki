@@ -7,8 +7,6 @@ namespace Tiki\Tests\Core;
 use Tiki\SortModeValidator;
 use PHPUnit\Framework\TestCase;
 
-require_once __DIR__ . '/../../core/SortModeValidator.php';
-
 class SortModeValidatorTest extends TestCase
 {
     protected function setUp(): void

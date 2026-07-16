@@ -244,8 +244,6 @@ $lang = array_replace($lang, $lang_custom);
      */
     public function testSmartyTrBlockEscaping()
     {
-        require_once(__DIR__ . '/../../../lib/smarty_tiki/BlockHandler/Tr.php');
-
         $smarty = \TikiLib::lib('smarty');
         $template = $smarty->createTemplate('eval:dummy');
 
@@ -286,8 +284,6 @@ $lang = array_replace($lang, $lang_custom);
      */
     public function testWikiContextDetection()
     {
-        require_once(__DIR__ . '/../../../lib/smarty_tiki/BlockHandler/Tr.php');
-
         $smarty = \TikiLib::lib('smarty');
         $template = $smarty->createTemplate('eval:dummy');
         $parserlib = \TikiLib::lib('parser');

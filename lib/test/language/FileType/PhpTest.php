@@ -4,8 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once(__DIR__ . '/../../../language/FileType.php');
-require_once(__DIR__ . '/../../../language/FileType/Php.php');
 
 class Language_FileType_PhpTest extends TikiTestCase
 {

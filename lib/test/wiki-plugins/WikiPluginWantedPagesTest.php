@@ -10,9 +10,6 @@ namespace Tiki\Lib\Test\WikiPlugins;
 use TikiTestCase;
 use TikiLib;
 
-require_once(__DIR__ . '/../../wiki-plugins/wikiplugin_wantedpages.php');
-require_once(__DIR__ . '/../../test/TestHelpers.php');
-
 class WikiPluginWantedPagesTest extends TikiTestCase
 {
     private $orig_user;
