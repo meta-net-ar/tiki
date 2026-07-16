@@ -387,6 +387,14 @@
     "config": {
         "process-timeout": 5000,
         "bin-dir": "../bin",
+        "policy": {
+            "advisories": {
+                "ignore-id": [
+                    "PKSA-5jz8-6tcw-pbk4",
+                    "PKSA-zk1n-qbm6-d3rq"
+                ]
+            }
+        },
         "_comment": [
             "platform-check CANNOT be enabled, because it would check the ext-* requirements of our dependencies not just ours.",
             "See the workarounds below.  So for example anything that uses the autoloader, including console.php wouldn't work on a server ",
@@ -422,7 +430,8 @@
         "auditComment": "PKSA-5rb8-j658-qvzz: Ignore this audit advisory while Tiki supports PHP 8.1. The audit ignore only suppresses composer audit output; installation compatibility is handled separately by the altcha repository override.",
         "audit": {
             "ignore": {
-                "PKSA-5jz8-6tcw-pbk4": "phpunit dev-only dependency, no fix available in PHP 8.1-compatible 10.x line. Fix exists in phpunit 12.5.22+ which requires PHP >= 8.3."
+                "PKSA-5jz8-6tcw-pbk4": "phpunit dev-only dependency, no fix available in PHP 8.1-compatible 10.x line. Fix exists in phpunit 12.5.22+ which requires PHP >= 8.3.",
+                "PKSA-zk1n-qbm6-d3rq": "Tiki does not use SimpleFakeCredentialGenerator or username-based fake credential lists. Its WebAuthn login uses discoverable credentials and resolves the user from the submitted credential ID, so the affected code path is unreachable. Upgrade to web-auth/webauthn-lib 5.x is deferred while Tiki supports PHP 8.1."
             },
             "ignore-abandoned": {
                 "candy-chat/xmpp-prebind-php": "Work scheduled for removal next month.",
