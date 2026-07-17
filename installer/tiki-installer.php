@@ -657,6 +657,9 @@ if ($install_step == '9') {
     TikiLib::lib('cache')->empty_cache();
     if ($install_type == 'scratch') {
         initialize_prefs(true);
+        // Create the home page now, so it exists before anything resolves the site home url. Otherwise
+        // sefurl() falls back to the edit url and the admin lands on an empty editor instead of the home page.
+        TikiLib::lib('wiki')->createDefaultHomePage();
         TikiLib::lib('unifiedsearch')->rebuild();
         $u = isset($defaultpass) ? 'tiki-change_password.php?user=admin&oldpass=' . $defaultpass . '&newuser=y' : 'tiki-change_password.php?user=admin&newuser=y';
         $tikilib = TikiLib::lib('tiki');
