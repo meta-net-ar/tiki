@@ -176,7 +176,4 @@ function module_login_box($mod_reference, &$module_params)
     if (! isset($module_params['allowNone'])) {
         $module_params['allowNone'] = 'y';
     }
-    if (! isset($module_params['show_user_avatar'])) {
-        $module_params['show_user_avatar'] = 'y';
-    }
 }

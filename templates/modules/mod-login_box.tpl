@@ -362,6 +362,7 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                 {if isset($module_params.show_user_avatar) && $module_params.show_user_avatar eq 'y'}
                     <div class="dropdown-toggle login_link mod-login-avatar" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {$user|avatarize:n:n:n:n}
+                        {if isset($module_params.show_user_name) || $module_params.show_user_name eq 'y'}{$user|username:n:n:n}{/if}
                     </div>
                 {else}
                     <button type="button" class="dropdown-toggle login_link btn btn-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
