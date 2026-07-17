@@ -131,7 +131,6 @@ if (isset($_REQUEST['article']) && $prefs['feature_articles'] == 'y') {
             $_REQUEST['article'],
             [
                 'active' => isset($_POST['enable']),
-                'expiry' => $jitPost->expiry->int(),
                 'atype' => $jitPost->type->text(),
                 'custom_atype' => $jitPost->asArray('custom_atype'),
                 'topic' => $jitPost->topic->int(),

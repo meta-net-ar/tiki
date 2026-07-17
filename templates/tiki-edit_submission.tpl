@@ -244,18 +244,6 @@
             </span>
         </div>
     </div>
-    <div class="mb-3 row" id='show_expdate' {if $types.$type.show_expdate eq 'y' || $types.$type.show_post_expire ne 'y'}style="display:;"{else}style="display:none;"{/if}>
-        <label class="col-sm-3 col-form-label">{tr}Expiration Date{/tr}</label>
-        <div class="col-sm-7">
-            {html_select_date prefix="expire_" time=$expireDate start_year="-10" end_year="+10" field_order=$prefs.display_field_order}
-            {tr}at{/tr}
-            <span dir="ltr">
-                {html_select_time prefix="expire_" time=$expireDate display_seconds=false use_24_hours=$use_24hr_clock}
-                &nbsp;
-                {$siteTimeZone}
-            </span>
-        </div>
-    </div>
     {if $tiki_p_use_HTML eq 'y'}
         {if $smarty.session.wysiwyg neq 'y'}
         <div class="mb-3 row">

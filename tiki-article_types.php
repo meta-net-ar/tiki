@@ -8,6 +8,37 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+$inputConfiguration = [
+    [
+        'staticKeyFilters'                => [
+            'add_type'                    => 'bool',                //post
+            'new_type'                    => 'string',              //post
+            'remove_type'                 => 'word',                //get
+            'update_type'                 => 'bool',                //post
+            'use_ratings'                 => 'bool',                //post
+            'show_pre_publ'               => 'bool',                //post
+            'heading_only'                => 'bool',                //post
+            'allow_comments'              => 'bool',                //post
+            'comment_can_rate_article'    => 'bool',                //post
+            'show_image'                  => 'bool',                //post
+            'show_avatar'                 => 'bool',                //post
+            'show_author'                 => 'bool',                //post
+            'show_pubdate'                => 'bool',                //post
+            'show_reads'                  => 'bool',                //post
+            'show_size'                   => 'bool',                //post
+            'show_topline'                => 'bool',                //post
+            'show_subtitle'               => 'bool',                //post
+            'show_image_caption'          => 'bool',                //post
+            'show_linkto'                 => 'bool',                //post
+            'creator_edit'                => 'bool',                //post
+            'new_attribute'               => 'string',              //post
+            'att_remove'                  => 'int',                 //post
+        ],
+        'staticKeyFiltersForArrays'       => [
+            'type_array'                  => 'string',              //post
+        ],
+    ]
+];
 $section = 'cms';
 require_once('tiki-setup.php');
 $artlib = TikiLib::lib('art');
@@ -23,56 +54,31 @@ if (isset($_REQUEST["add_type"])) {
     $artlib->remove_type($_REQUEST["remove_type"]);
 } elseif (isset($_REQUEST["update_type"])) {
     foreach (array_keys($_REQUEST["type_array"]) as $this_type) {
-        if (! isset($_REQUEST["use_ratings"][$this_type])) {
-            $_REQUEST["use_ratings"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_pre_publ"][$this_type])) {
-            $_REQUEST["show_pre_publ"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_post_expire"][$this_type])) {
-            $_REQUEST["show_post_expire"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["heading_only"][$this_type])) {
-            $_REQUEST["heading_only"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["allow_comments"][$this_type])) {
-            $_REQUEST["allow_comments"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["comment_can_rate_article"][$this_type])) {
-            $_REQUEST["comment_can_rate_article"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_image"][$this_type])) {
-            $_REQUEST["show_image"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_avatar"][$this_type])) {
-            $_REQUEST["show_avatar"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_author"][$this_type])) {
-            $_REQUEST["show_author"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_pubdate"][$this_type])) {
-            $_REQUEST["show_pubdate"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_expdate"][$this_type])) {
-            $_REQUEST["show_expdate"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_reads"][$this_type])) {
-            $_REQUEST["show_reads"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_size"][$this_type])) {
-            $_REQUEST["show_size"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_topline"][$this_type])) {
-            $_REQUEST["show_topline"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_subtitle"][$this_type])) {
-            $_REQUEST["show_subtitle"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_image_caption"][$this_type])) {
-            $_REQUEST["show_image_caption"][$this_type] = 'n';
-        }
-        if (! isset($_REQUEST["show_linkto"][$this_type])) {
-            $_REQUEST["show_linkto"][$this_type] = 'n';
+        $defaultFields = [
+            "use_ratings",
+            "show_pre_publ",
+            "heading_only",
+            "allow_comments",
+            "comment_can_rate_article",
+            "show_image",
+            "show_avatar",
+            "show_author",
+            "show_pubdate",
+            "show_reads",
+            "show_size",
+            "show_topline",
+            "show_subtitle",
+            "show_image_caption",
+            "show_linkto",
+            "creator_edit"
+        ];
+
+        // Initialize fields with 'n' if not defined
+        foreach ($defaultFields as $field) {
+            $_REQUEST[$field] = is_array($_REQUEST[$field] ?? null) ? $_REQUEST[$field] : [];
+            if (! isset($_REQUEST[$field][$this_type])) {
+                $_REQUEST[$field][$this_type] = 'n';
+            }
         }
         if (! isset($_REQUEST["creator_edit"][$this_type])) {
             $_REQUEST["creator_edit"][$this_type] = 'n';
@@ -82,7 +88,6 @@ if (isset($_REQUEST["add_type"])) {
             $this_type,
             $_REQUEST["use_ratings"][$this_type],
             $_REQUEST["show_pre_publ"][$this_type],
-            $_REQUEST["show_post_expire"][$this_type],
             $_REQUEST["heading_only"][$this_type],
             $_REQUEST["allow_comments"][$this_type],
             $_REQUEST["comment_can_rate_article"][$this_type],
@@ -90,7 +95,6 @@ if (isset($_REQUEST["add_type"])) {
             $_REQUEST["show_avatar"][$this_type],
             $_REQUEST["show_author"][$this_type],
             $_REQUEST["show_pubdate"][$this_type],
-            $_REQUEST["show_expdate"][$this_type],
             $_REQUEST["show_reads"][$this_type],
             $_REQUEST["show_size"][$this_type],
             $_REQUEST["show_topline"][$this_type],

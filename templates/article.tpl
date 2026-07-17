@@ -13,12 +13,9 @@
 
         <span class="titleb">
             {if $show_author eq 'y' && ($authorName or $author)} {icon name="user" iclass="tips" ititle=":{tr}Published By{/tr}"} {if $authorName}{$authorName|escape}{else}{$author|username}{/if}
-                {if $show_pubdate eq 'y' || $show_expdate eq 'y' || $show_reads eq 'y'} - {/if}
+                {if $show_pubdate eq 'y'  || $show_reads eq 'y'} - {/if}
             {/if}
             {if $show_pubdate eq 'y' && $publishDate}{$publishDate|tiki_short_datetime}
-                {if $show_expdate eq 'y' || $show_reads eq 'y'} - {/if}
-            {/if}
-            {if $show_expdate eq 'y' && $expireDate}{tr}Expires{/tr} {$expireDate|tiki_short_datetime}
                 {if $show_reads eq 'y'} - {/if}
             {/if}
             {if $show_reads eq 'y'}({$reads} {tr}Reads{/tr}){/if}

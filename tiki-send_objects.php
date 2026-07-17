@@ -204,7 +204,6 @@ if (isset($_REQUEST['send'])) {
                     new XML_RPC_Value($page_info['image_y'], 'int'),
                     new XML_RPC_Value(base64_encode($page_info['image_data']), 'string'),
                     new XML_RPC_Value($page_info['publishDate'], 'int'),
-                    new XML_RPC_Value($page_info['expireDate'], 'int'),
                     new XML_RPC_Value($page_info['created'], 'int'),
                     new XML_RPC_Value(base64_encode($page_info['heading']), 'string'),
                     new XML_RPC_Value(base64_encode($page_info['body']), 'string'),

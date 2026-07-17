@@ -66,10 +66,6 @@
                     {assign var=numbercol value=$numbercol+1}
                     <th>{self_link _sort_arg='sort_mode' _sort_field='publishDate'}{tr}Publish Date{/tr}{/self_link}</th>
                 {/if}
-                {if $prefs.art_list_expire eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
-                    <th>{self_link _sort_arg='sort_mode' _sort_field='expireDate'}{tr}Expiry Date{/tr}{/self_link}</th>
-                {/if}
                 {if $prefs.art_list_visible eq 'y'}
                     {assign var=numbercol value=$numbercol+1}
                     <th><span>{tr}Visible{/tr}</span></th>
@@ -153,9 +149,6 @@
                     {/if}
                     {if $prefs.art_list_date eq 'y'}
                         <td class="date">{$listpages[changes].publishDate|tiki_short_date}</td>
-                    {/if}
-                    {if $prefs.art_list_expire eq 'y'}
-                        <td class="date">{$listpages[changes].expireDate|tiki_short_date}</td>
                     {/if}
                     {if $prefs.art_list_visible eq 'y'}
                         <td class="text">{tr}{$listpages[changes].disp_article}{/tr}</td>

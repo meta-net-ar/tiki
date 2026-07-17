@@ -94,7 +94,7 @@ function wikiplugin_articles_info()
                 'default' => 'publishDate_desc',
                 'since' => '2.0',
                 'accepted' => tra('random or column names to add _asc _desc to: ')
-                    . 'created, author, title, publishDate, expireDate, articleId, topline, subtitle, lang, linkto, authorName, topicId, topicName, state, size, heading, body, isfloat, useImage, image_name, image_caption, image_type, image_size, image_x, image_y, image_data, list_image_x, list_image_y, nbreads, votes, points, type, rating, ispublished'],
+                    . 'created, author, title, publishDate, articleId, topline, subtitle, lang, linkto, authorName, topicId, topicName, state, size, heading, body, isfloat, useImage, image_name, image_caption, image_type, image_size, image_x, image_y, image_data, list_image_x, list_image_y, nbreads, votes, points, type, rating, ispublished'],
             'order' => [
                 'required' => false,
                 'name' => tra('Specific order'),
@@ -216,7 +216,7 @@ function wikiplugin_articles_info()
             'overrideDates' => [
                 'required' => false,
                 'name' => tra('Override Dates'),
-                'description' => tra('Whether to comply with the article type\'s "show before publish" and "show after expiration" settings (not complied with by default)'),
+                'description' => tra('Whether to comply with the article type\'s "show before publish" settings (not complied with by default)'),
                 'filter' => 'alpha',
                 'default' => 'n',
                 'since' => '1',

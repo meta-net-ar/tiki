@@ -112,7 +112,6 @@
                 {preference name=art_list_type}
                 {preference name=art_list_topic}
                 {preference name=art_list_date}
-                {preference name=art_list_expire}
                 {preference name=art_list_visible}
                 {preference name=art_list_lang}
                 {preference name=art_list_author}

@@ -52,7 +52,6 @@ class Services_Article_Controller
             if (! $id) {
                 $tikilib = TikiLib::lib('tiki');
                 $publication = $tikilib->now;
-                $expire = $publication + 3600 * 24 * 365;
                 $rating = 10;
 
                 $artlib = TikiLib::lib('art');
@@ -68,7 +67,6 @@ class Services_Article_Controller
                     $data['description'],
                     $data['content'],
                     $publication,
-                    $expire,
                     $GLOBALS['user'],
                     $id,
                     0,

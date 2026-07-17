@@ -192,7 +192,6 @@ CREATE TABLE `tiki_articles` (
   `list_image_y` int(4) default NULL,
   `image_data` longblob,
   `publishDate` int(14) default NULL,
-  `expireDate` int(14) default NULL,
   `created` int(14) default NULL,
   `heading` text,
   `body` text,
@@ -212,7 +211,6 @@ CREATE TABLE `tiki_articles` (
   KEY `author` (`author`(32)),
   KEY `topicId` (`topicId`),
   KEY `publishDate` (`publishDate`),
-  KEY `expireDate` (`expireDate`),
   KEY `type` (`type`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
@@ -221,14 +219,12 @@ CREATE TABLE `tiki_article_types` (
   `type` varchar(50) NOT NULL,
   `use_ratings` varchar(1) default NULL,
   `show_pre_publ` varchar(1) default NULL,
-  `show_post_expire` varchar(1) default 'y',
   `heading_only` varchar(1) default NULL,
   `allow_comments` varchar(1) default 'y',
   `show_image` varchar(1) default 'y',
   `show_avatar` varchar(1) default NULL,
   `show_author` varchar(1) default 'y',
   `show_pubdate` varchar(1) default 'y',
-  `show_expdate` varchar(1) default NULL,
   `show_reads` varchar(1) default 'y',
   `show_size` varchar(1) default 'n',
   `show_topline` varchar(1) default 'n',
@@ -238,14 +234,13 @@ CREATE TABLE `tiki_article_types` (
   `creator_edit` varchar(1) default NULL,
   `comment_can_rate_article` char(1) default NULL,
   PRIMARY KEY (`type`),
-  KEY `show_pre_publ` (`show_pre_publ`),
-  KEY `show_post_expire` (`show_post_expire`)
+  KEY `show_pre_publ` (`show_pre_publ`)
 ) ENGINE=MyISAM ;
 
 INSERT IGNORE INTO tiki_article_types(type) VALUES ('Article');
 INSERT IGNORE INTO tiki_article_types(type,use_ratings) VALUES ('Review','y');
-INSERT IGNORE INTO tiki_article_types(type,show_post_expire) VALUES ('Event','n');
-INSERT IGNORE INTO tiki_article_types(type,show_post_expire,heading_only,allow_comments) VALUES ('Classified','n','y','n');
+INSERT IGNORE INTO tiki_article_types(type) VALUES ('Event');
+INSERT IGNORE INTO tiki_article_types(type,heading_only,allow_comments) VALUES ('Classified','y','n');
 
 DROP TABLE IF EXISTS `tiki_banners`;
 CREATE TABLE `tiki_banners` (
@@ -2130,7 +2125,6 @@ CREATE TABLE `tiki_received_articles` (
   `image_y` int(4) default NULL,
   `image_data` longblob,
   `publishDate` int(14) default NULL,
-  `expireDate` int(14) default NULL,
   `created` int(14) default NULL,
   `heading` text,
   `body` longblob,
@@ -2372,7 +2366,6 @@ CREATE TABLE `tiki_submissions` (
   `image_y` int(4) default NULL,
   `image_data` longblob,
   `publishDate` int(14) default NULL,
-  `expireDate` int(14) default NULL,
   `created` int(14) default NULL,
   `bibliographical_references` text,
   `resume` text,
