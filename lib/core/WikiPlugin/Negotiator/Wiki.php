@@ -296,6 +296,10 @@ class WikiPlugin_Negotiator_Wiki
             return true;
         }
 
+        if ($this->fingerprint === '') {
+            return true;
+        }
+
         $val = $this->fingerprintCheck();
 
         switch ($val) {
@@ -474,6 +478,10 @@ class WikiPlugin_Negotiator_Wiki
     private function fingerprint()
     {
         $validate = ($this->info['validate'] ?? '');
+
+        if ($validate && $this->name === 'listexecute' && ParserLib::listExecuteArgsBypassPluginFingerprint($this->args)) {
+            return '';
+        }
 
         if ($validate == 'all' || $validate == 'body') {
             $validateBody = str_replace('<x>', '', $this->body);    // de-sanitize plugin body to make fingerprint consistant with 5.x

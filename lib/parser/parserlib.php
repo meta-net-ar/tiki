@@ -959,10 +959,25 @@ class ParserLib extends TikiDb_Bridge
         $pluginSecurity->update(['status' => 'accept', 'approval_by' => $user, 'body' => ''], ['fingerprint' => $fp]);
     }
 
+    public static function listExecuteArgsBypassPluginFingerprint(array $args): bool
+    {
+        global $tiki_p_plugin_approve;
+
+        if (($tiki_p_plugin_approve ?? 'n') !== 'y') {
+            return false;
+        }
+
+        return isset($args['approval']);
+    }
+
     //*
     public function plugin_fingerprint($name, $meta, $data, $args)
     {
         $validate = ($meta['validate'] ?? '');
+
+        if ($validate && $name === 'listexecute' && self::listExecuteArgsBypassPluginFingerprint($args)) {
+            return '';
+        }
 
         $data = $this->unprotectSpecialChars($data, true);
 
