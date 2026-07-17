@@ -362,10 +362,11 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                 {if isset($module_params.show_user_avatar) && $module_params.show_user_avatar eq 'y'}
                     <div class="dropdown-toggle login_link mod-login-avatar" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         {$user|avatarize:n:n:n:n}
+                        {if not isset($module_params.show_user_name) || $module_params.show_user_name eq 'y'}{$user|username:n:n:n}{/if}
                     </div>
                 {else}
                     <button type="button" class="dropdown-toggle login_link btn btn-link" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {if isset($module_params.show_user_name) && $module_params.show_user_name eq 'y'}{$user|username:n:n:n}{/if}
+                        {if not isset($module_params.show_user_name) || $module_params.show_user_name eq 'y'}{$user|username:n:n:n}{/if}
                         {if (!isset($module_params.show_user_avatar) || $module_params.show_user_avatar neq 'y') and (!isset($module_params.show_user_name) || $module_params.show_user_name neq 'y')}{tr}Log out{/tr}{/if}
                         <span class="sr-only">{tr}Toggle dropdown{/tr}</span>
                     </button>
@@ -373,7 +374,7 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                 {if empty($module_params.menu_id)}
                     <div class="dropdown-menu dropdown-menu-end">
                         <a class="dropdown-item" href="tiki-user_information.php" title="{tr}My Account{/tr}">
-                            {if isset($module_params.show_user_name) && $module_params.show_user_name eq 'y'}{tr}My Account{/tr}{else}{tr}{$user|username|escape|replace:'&amp;':'&'}{/tr}{/if}
+                            {if not isset($module_params.show_user_name) || $module_params.show_user_name eq 'y'}{tr}My Account{/tr}{else}{tr}{$user|username|escape|replace:'&amp;':'&'}{/tr}{/if}
                         </a>
                         <a class="dropdown-item" href="tiki-logout.php" title="{tr}Log out{/tr}">
                             {tr}Log out{/tr}
