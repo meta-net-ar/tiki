@@ -10,13 +10,3 @@
         flex-wrap: wrap;
     }
 }
-
-// Force outline button colors to follow active theme tokens
-$outline-colors: primary, secondary, success, danger, warning, info, light, dark;
-
-@each $color in $outline-colors {
-    .btn.btn-outline-#{$color} {
-        --bs-btn-color: var(--bs-#{$color});
-        --bs-btn-border-color: var(--bs-#{$color});
-    }
-}
