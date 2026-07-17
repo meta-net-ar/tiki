@@ -554,7 +554,7 @@ class Services_Tracker_TabularController
         $done = false;
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && is_uploaded_file($_FILES['file']['tmp_name'])) {
-            if ($fileIsTSV) {
+            if ($fileIsTsv) {
                 Services_Tracker_Utilities::parseTsvContentToCsv('file');
                 $separator = ',';
             }
