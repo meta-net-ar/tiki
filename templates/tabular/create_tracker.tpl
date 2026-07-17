@@ -33,6 +33,7 @@
                 <select class="form-select file-delimiter">
                     <option value="comma" selected>{tr}Comma (,){/tr}</option>
                     <option value="semicolon">{tr}Semicolon (;){/tr}</option>
+                    <option value="tab">{tr}Tab (\t){/tr}</option>
                 </select>
                 <input type="hidden" id="delimiter" name="delimiter" value="comma">
             </div>
@@ -40,7 +41,7 @@
         <div class="tiki-form-group row file-container">
             <label class="col-form-label col-sm-3" for="file">{tr}File{/tr}</label>
             <div class="col-sm-9">
-                <input type="file" name="file" id="file" accept="text/csv" class="form-control" required>
+                <input type="file" name="file" id="file" accept=".csv, .tsv, text/csv, text/tsv" class="form-control" required>
                 <div id="file-size-error" class="alert alert-danger mt-3" style="display:none">
                     {tr _0=$config.upload_max_filesize}<strong>Error:</strong> Selected file has <span id="file-size"></span> bytes. The max file size upload is %0 bytes.{/tr}
                 </div>
@@ -192,7 +193,15 @@
 
         $('.file-delimiter').on('change', function(e) {
             var currentValue = $(this).val();
-            delimiter = ((currentValue == 'comma') ? ',' : ';');
+
+            if (currentValue == 'comma') {
+                delimiter = ',';
+            } else if (currentValue == 'semicolon') {
+                delimiter = ';';
+            } else if (currentValue == 'tab') {
+                delimiter = '\t';
+            }
+
             delimiterElement.val(currentValue);
             fileSelect.trigger("change");
         });
@@ -221,9 +230,12 @@
                 reader.onload = function (e) {
                     if (delimiter == ';') {
                         var rows = Plotly.d3.dsv(';').parse(e.target.result);
+                    } else if (delimiter == '\t') {
+                        var rows = Plotly.d3.dsv('\t').parse(e.target.result);
                     } else {
                         var rows = Plotly.d3.csv.parse(e.target.result);
                     }
+                    
                     var columns = Object.keys(rows[0]);
 
                     for(i = 0; i < columns.length; i++) {

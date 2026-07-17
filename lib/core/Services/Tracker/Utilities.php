@@ -722,4 +722,41 @@ EXPORT;
         $currency = new Math_Formula_Currency($data['amount'], $data['currency'], $rates);
         return $currency->convertTo($defaultCurrency)->getAmount();
     }
+
+    public static function parseTsvContentToCsv($filename)
+    {
+        $fileContent = file_get_contents($_FILES[$filename]['tmp_name']);
+        $rows = explode("\n", $fileContent);
+        $csvRows = [];
+
+        foreach ($rows as $row) {
+            if (trim($row) === '') {
+                continue;
+            }
+            // since field may have comma or quotes or tab in it
+            $fields = str_getcsv($row, "\t");
+            if (substr($row, -1) === "\t") {
+                $fields[] = '';
+            }
+            $pFields = []; // escape processed fields
+
+            foreach ($fields as $field) {
+                $field = $field ?? '';
+                $hasCommaOrQuoteOrTab = (
+                    strpos($field, ',') !== false ||
+                    strpos($field, '"') !== false ||
+                    strpos($field, "\t") !== false
+                );
+
+                if ($hasCommaOrQuoteOrTab) {
+                    $pFields[] = '"' . str_replace('"', '""', $field) . '"';
+                } else {
+                    $pFields[] = $field;
+                }
+            }
+            $csvRows[] = implode(',', $pFields);
+        }
+        $_FILES[$filename]['tmp_name'] = tempnam(sys_get_temp_dir(), 'modified_');
+        file_put_contents($_FILES[$filename]['tmp_name'], implode("\n", $csvRows));
+    }
 }

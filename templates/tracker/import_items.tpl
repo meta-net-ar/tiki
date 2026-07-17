@@ -51,8 +51,12 @@
         </select>
     </div>
     <div class="mb-3 row mx-0">
-        <label for="separator">{tr}Separator{/tr}</label>
-        <input type="text" name="separator" value="," size="2" class="form-control">
+        <label for="separator">{tr}Select separator:{/tr}</label>
+        <select name="separator" class="form-select file-delimiter">
+            <option value="," selected>{tr}Comma{/tr}(,)</option>
+            <option value=";">{tr}Semicolon{/tr}(;)</option>
+            <option value="\t">{tr}Tab{/tr}(\t)</option>
+        </select>
     </div>
     <div class="form-check">
         <input type="checkbox" class="form-check-input" name="add_items" id="add_items" value="1">
