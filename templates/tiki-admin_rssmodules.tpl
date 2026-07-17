@@ -262,21 +262,6 @@
                     </div>
                 {/if}
                 <div class="mb-3 row">
-                    <label for="article_expiry" class="col-form-label col-sm-3">{tr}Expiration{/tr}</label>
-                    <div class="col-sm-9">
-                        <div class="input-group">
-                            <input
-                                id="article_expiry"
-                                type="text"
-                                name="expiry"
-                                class="form-control"
-                                value="{$articleConfig.expiry|escape}"
-                            >
-                            <span class="input-group-text">{tr}days{/tr}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="mb-3 row">
                     <label for="article_future_publish" class="col-form-label col-sm-3">{tr}Publish in the future{/tr}</label>
                     <div class="col-sm-9">
                         <div class="input-group">

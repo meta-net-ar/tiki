@@ -768,8 +768,6 @@ class RSSLib extends TikiDb_Bridge
             $publication = $tikilib->now + $configuration['future_publish'] * 60;
         }
 
-        $expire = $publication + 3600 * 24 * $configuration['expiry'];
-
         if (strpos($data['content'], trim($data['description'])) === 0 && strlen($data['description']) < 1024) {
             $data['content'] = substr($data['content'], strlen(trim($data['description'])));
         }
@@ -795,7 +793,6 @@ class RSSLib extends TikiDb_Bridge
                 $data['description'],
                 $data['content'],
                 $publication,
-                $expire,
                 'admin',
                 $subid,
                 0,
@@ -838,7 +835,6 @@ class RSSLib extends TikiDb_Bridge
                 $data['description'],
                 $data['content'],
                 $publication,
-                $expire,
                 'admin',
                 $id,
                 0,
@@ -917,7 +913,6 @@ class RSSLib extends TikiDb_Bridge
 
         $default = [
             'active' => false,
-            'expiry' => 365,
             'atype' => 'Article',
             'topic' => 0,
             'future_publish' => -1,

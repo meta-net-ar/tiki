@@ -614,7 +614,6 @@ class ObjectLib extends TikiLib
                     $info['heading'],
                     $info['body'],
                     $info['publishDate'],
-                    $info['expireDate'],
                     $info['author'],
                     $info['articleId'],
                     $info['image_x'],

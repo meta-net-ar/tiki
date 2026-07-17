@@ -1,13 +1,6 @@
 {title admpage="articles" help="Articles"}{tr}Submissions{/tr}{/title}
 <div class="t_navbar mb-4">
     {button href="tiki-edit_submission.php" class="btn btn-primary" _icon_name="create" _text="{tr}New Submission{/tr}"}
-    <button form="deleteexpired_form" type="submit" class="btn btn-danger" title="{tr}Deletes expired submissions 1000 at a time to avoid timeouts{/tr}" onclick="confirmPopup('{tr}Are you sure you want to permanently remove all expired submitted articles?{/tr}')">
-        {icon name='delete' _menu_text='y' _menu_icon='y' alt="{tr}Delete Expired Submissions{/tr}"}
-    </button>
-    <form id="deleteexpired_form" action="tiki-list_submissions.php" method="post">
-        {ticket}
-        <input type="hidden" name="deleteexpired" value="y">
-    </form>
     {if $tiki_p_read_article eq 'y'}
         {button href="tiki-list_articles.php" class="btn btn-info mt-3" _icon_name="list" _text="{tr}List Articles{/tr}"}
     {/if}
@@ -53,12 +46,6 @@
                         <a href="tiki-list_submissions.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'publishDate_desc'}publishDate_asc{else}publishDate_desc{/if}">{tr}Publish Date{/tr}</a>
                     </th>
                 {/if}
-                {if $prefs.art_list_expire eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
-                    <th>
-                        <a href="tiki-list_submissions.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'expireDate_desc'}expireDate_asc{else}expireDate_desc{/if}">{tr}Expiry Date{/tr}</a>
-                    </th>
-                {/if}
                 {if $prefs.art_list_size eq 'y'}
                     {assign var=numbercol value=$numbercol+1}
                     <th style="text-align:right;">
@@ -102,9 +89,6 @@
                     {/if}
                     {if $prefs.art_list_date eq 'y'}
                         <td class="date">{$listpages[changes].publishDate|tiki_short_date}</td>
-                    {/if}
-                    {if $prefs.art_list_expire eq 'y'}
-                        <td class="date">{$listpages[changes].expireDate|tiki_short_date}</td>
                     {/if}
                     {if $prefs.art_list_size eq 'y'}
                         <td class="integer">{$listpages[changes].size|kbsize}</td>

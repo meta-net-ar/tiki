@@ -98,7 +98,6 @@
                 {if $listpages[ix].show_subtitle eq 'y' and $listpages[ix].subtitle}<div class="articlesubtitle">{$listpages[ix].subtitle|escape}</div>{/if}
                 {if ($listpages[ix].show_author eq 'y')
                     or ($listpages[ix].show_pubdate eq 'y')
-                    or ($listpages[ix].show_expdate eq 'y')
                     or ($listpages[ix].show_reads eq 'y')
                 }
                     <span class="titleb">
@@ -112,21 +111,13 @@
                                      {icon name="user" iclass="tips" ititle=":{tr}Published By{/tr}"} {$listpages[ix].author|username}
                                 </span>
                             {/if}
-                            {if $listpages[ix].show_pubdate eq 'y' or $listpages[ix].show_expdate eq 'y' or $listpages[ix].show_reads eq 'y'}
+                            {if $listpages[ix].show_pubdate eq 'y' or $listpages[ix].show_reads eq 'y'}
                                 -
                             {/if}
                         {/if}
                         {if $listpages[ix].show_pubdate eq 'y'}
                             <span class="pubdate">
                                  {$listpages[ix].publishDate|tiki_short_datetime}
-                            </span>
-                            {if $listpages[ix].show_expdate eq 'y' or $listpages[ix].show_reads eq 'y'}
-                                -
-                            {/if}
-                        {/if}
-                        {if $listpages[ix].show_expdate eq 'y'}
-                            <span class="expdate">
-                                {tr}Expires{/tr} {$listpages[ix].expireDate|tiki_short_datetime}
                             </span>
                             {if $listpages[ix].show_reads eq 'y'}
                                 -

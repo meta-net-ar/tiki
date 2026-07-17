@@ -153,9 +153,7 @@ if ($prefs["article_custom_attributes"] == 'y') {
 }
 $smarty->assign('body', $article_data["body"]);
 $smarty->assign('publishDate', $article_data["publishDate"]);
-$smarty->assign('expireDate', $article_data["expireDate"]);
 $smarty->assign('show_pubdate', $article_data["show_pubdate"]);
-$smarty->assign('show_expdate', $article_data["show_expdate"]);
 $smarty->assign('edit_data', 'y');
 $body = $article_data["body"];
 $heading = $article_data["heading"];

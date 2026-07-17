@@ -177,12 +177,6 @@
                     {jscalendar id="publishDate" date=$publishDate fieldname="publishDate" showtime='y' }
                 </div>
             </div>
-            <div class="mb-3 row clearfix">
-                <label class="col-form-label col-md-4">{tr}Expiration Date{/tr}</label>
-                <div class="col-md-8">
-                    {jscalendar id="expireDate" date=$expireDate fieldname="expireDate" showtime='y' }
-                </div>
-            </div>
         {/tab}
         {tab name="{tr}Image{/tr}"}
             <h2>{tr}Image{/tr}</h2>

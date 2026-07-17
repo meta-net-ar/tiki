@@ -119,7 +119,6 @@ class CommLib extends TikiLib
             $info["heading"],
             $info["body"],
             $info["publishDate"],
-            $info["expireDate"],
             $info["author"],
             0,
             $info["image_x"],
@@ -214,7 +213,6 @@ class CommLib extends TikiLib
         $image_x,
         $image_y,
         $publishDate,
-        $expireDate,
         $heading,
         $body,
         $type,
@@ -225,7 +223,7 @@ class CommLib extends TikiLib
         $hash = md5($title . $heading . $body);
 
         $query = "update `tiki_received_articles` set `title`=?, `authorName`=?, `heading`=?, `body`=?, `size`=?, `hash`=?, `useImage`=?, `image_x`=?, ";
-        $query .= " `image_y`=?, `publishDate`=?, `expireDate`=?, `type`=?, `rating`=?  where `receivedArticleId`=?";
+        $query .= " `image_y`=?, `publishDate`=?, `type`=?, `rating`=?  where `receivedArticleId`=?";
 
         $result = $this->query(
             $query,
@@ -240,7 +238,6 @@ class CommLib extends TikiLib
                 (int)$image_x,
                 (int)$image_y,
                 (int)$publishDate,
-                $expireDate,
                 $type,
                 (int)$rating,
                 (int)$receivedArticleId
@@ -277,7 +274,6 @@ class CommLib extends TikiLib
         $image_y,
         $image_data,
         $publishDate,
-        $expireDate,
         $created,
         $heading,
         $body,
@@ -293,9 +289,9 @@ class CommLib extends TikiLib
         $query = "insert into `tiki_received_articles`(`receivedDate`,`receivedFromSite`," .
                             " `receivedFromUser`,`title`,`authorName`,`size`, `useImage`,`image_name`," .
                             " `image_type`,`image_size`,`image_x`,`image_y`,`image_data`,`publishDate`," .
-                            " `expireDate`,`created`,`heading`,`body`,`hash`,`author`,`type`,`rating`) "
+                            "`created`,`heading`,`body`,`hash`,`author`,`type`,`rating`) "
                             ;
-        $query .= " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        $query .= " values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
         $result = $this->query(
             $query,
@@ -314,7 +310,6 @@ class CommLib extends TikiLib
                 $image_y,
                 $image_data,
                 (int)$publishDate,
-                (int)$expireDate,
                 (int)$created,
                 $heading,
                 $body,
