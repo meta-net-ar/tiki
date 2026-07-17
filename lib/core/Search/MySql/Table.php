@@ -37,6 +37,7 @@ class Search_MySql_Table extends TikiDb_Table
     private $schemaBuffer;
     private $dataBuffer;
     private $tfTranslator;
+    private $fullTextTablesToAnalyze = [];
 
     private $max_columns_per_table = -1;
 
@@ -493,12 +494,14 @@ class Search_MySql_Table extends TikiDb_Table
         $this->schemaBuffer->push("ADD FULLTEXT INDEX $escapedIndex ($escapedField)");
         // InnoDB presently supports one FULLTEXT index creation at a time
         $this->schemaBuffer->flush();
+        $this->fullTextTablesToAnalyze[$this->definition[$fieldName]['table']] = true;
     }
 
     private function emptyBuffer()
     {
         $this->schemaBuffer->clear();
         $this->dataBuffer->clear();
+        $this->fullTextTablesToAnalyze = [];
     }
 
     private function addToBuffer($table, $keySet, $valueSet)
@@ -513,6 +516,26 @@ class Search_MySql_Table extends TikiDb_Table
     {
         $this->schemaBuffer->flush();
         $this->dataBuffer->flush();
+
+        /*
+         * Tiki creates FULLTEXT indexes lazily, after the search table has been populated.
+         * On affected MySQL and MariaDB versions, adding another FULLTEXT index can make an
+         * existing MATCH() return an invalid relevance value. Using that value in Tiki's
+         * weighted score calculation then fails with "DOUBLE value is out of range"
+         * (error 1690, SQLSTATE 22003).
+         *
+         * MySQL tracks this trigger and error in https://bugs.mysql.com/bug.php?id=118535.
+         * ANALYZE TABLE is a tested workaround for Tiki's MySQL/MariaDB backend, not a
+         * permanent upstream fix.
+         */
+        foreach (array_keys($this->fullTextTablesToAnalyze) as $table) {
+            $table = $this->escapeIdentifier($table);
+            $this->db->query(
+                "ANALYZE TABLE $table",
+                options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]
+            );
+        }
+        $this->fullTextTablesToAnalyze = [];
     }
 
     private function calculateMaxColumnsPerTable()
