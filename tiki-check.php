@@ -790,39 +790,6 @@ if (file_exists(__DIR__ . '/tiki-setup.php')) {
     $render = "";
 
     /**
-     * Standalone translation fallback with %0, %1... replacements.
-     *
-     * @param string $string
-     * @param mixed ...$args
-     * @return string
-     */
-    function tra($string, ...$args)
-    {
-        $text = (string) $string;
-        if (! empty($args)) {
-            $replacements = array();
-            foreach ($args as $idx => $value) {
-                $replacements['%' . $idx] = (string) $value;
-            }
-            $text = strtr($text, $replacements);
-        }
-
-        return $text;
-    }
-
-    /**
-     * Alias to tra() for standalone fallback compatibility.
-     *
-     * @param string $string
-     * @param mixed ...$args
-     * @return string
-     */
-    function tr($string, ...$args)
-    {
-        return tra($string, ...$args);
-    }
-
-    /**
       * @param $var
       * @param $style
       */
