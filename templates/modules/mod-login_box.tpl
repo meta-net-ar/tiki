@@ -19,16 +19,11 @@ $(document).ready(function () {
     var is2FAEnabled = "{{$prefs.twoFactorAuth}}";
     var isWebauthnEnabled = "{{$prefs.auth_webauthn_enabled}}";
     var moduleLogoInstance = "{{$module_logo_instance}}";
-    var login_error = "{{$error_login}}";
-
-    if (login_error == {{$TWO_FA_INCORRECT}}) {
-        displayFeedback("error", "{tr}Invalid two-factor authenticator code{/tr}");
-    }
 
     function show2FactorInputElement(btn, event) {
         const btnStep = parseInt(btn.attr('step')) + 1;
         btn.attr('step', btnStep);
-        $(event.currentTarget).find('#two_factor_div').siblings().not('#two_factor_div').hide();
+        $(event.currentTarget).find('#two_factor_div').siblings().not('#two_factor_div').not('[id^="login_feeback"]').hide();
         $(event.currentTarget).find('#two_factor_div').show();
         $(event.currentTarget).find('div#webauthn_div').hide();
         $(btn).parent().show();
@@ -518,7 +513,7 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             {/jq}
         {/if}
         <input type="hidden" name="login_mode" value="{$mode}" />
-        {if $prefs.twoFactorAuth eq 'y' and ((isset($module_params.show_two_factor_auth) and $module_params.show_two_factor_auth eq 'y') or ! empty($error_login))}
+        {if $prefs.twoFactorAuth eq 'y'}
         <div id="two_factor_div" class="my-3 {if $mode eq 'header'}mx-2{/if}" style="display: {if $create2FaCodeNormalLogin === 'y'} block; {else} none; {/if}">
             <label for="login-2fa_{$module_logo_instance}">{tr}Two-factor authentication code:{/tr}</label>
             <input type="text" name="twoFactorAuthCode" autocomplete="off" class="form-control" id="login-2fa_{$module_logo_instance}">
