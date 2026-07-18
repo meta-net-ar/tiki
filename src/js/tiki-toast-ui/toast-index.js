@@ -310,8 +310,6 @@ export default function tikiToastEditor(options) {
                 keyup: function (editorType, ev) {
                     if (ev.key === "(") {
                         const popup = document.createElement("ul");
-                        // ...
-
                         thisEditor.addWidget(popup, "top");
                     }
 
@@ -330,14 +328,13 @@ export default function tikiToastEditor(options) {
                          * WYSIWYG: [startOffset, endOffset]
                          * Markdown: [[lineStart, colStart], [lineEnd, colEnd]]
                          */
-                        function normalizeSelection(select, isWysiwyg)
-                        {
+                        function normalizeSelection(select, isWysiwyg) {
                             if (isWysiwyg) {
                                 const [startOffset, endOffset] = selection;
-                                return {start: startOffset, end: endOffset, mode: "wysiwyg"};
+                                return { start: startOffset, end: endOffset, mode: "wysiwyg" };
                             } else {
                                 const [[startLine, startCh], [endLine, endCh]] = selection;
-                                return {start: [startLine, startCh], end: [endLine, endCh], mode: "markdown"};
+                                return { start: [startLine, startCh], end: [endLine, endCh], mode: "markdown" };
                             }
                         }
 
@@ -349,7 +346,7 @@ export default function tikiToastEditor(options) {
                          * @param normalized
                          * @returns {*}
                          */
-                        function moveBeforeTrigger(normalized) {
+                        function moveCursonBeforeTrigger(normalized) {
                             const adjusted = { ...normalized };
 
                             if (normalized.mode === "wysiwyg") {
@@ -363,27 +360,7 @@ export default function tikiToastEditor(options) {
                         }
 
                         /**
-                         * Get the position after the '@' trigger character.
-                         * Based on ToastUI’s cursor behavior the cursor lands after the `@` symbol,
-                         * so you need to step back one character (-1)
-                         * @param normalized
-                         * @returns {*}
-                         */
-                        function moveAfterTrigger(normalized) {
-                            const adjusted = { ...normalized };
-
-                            if (normalized.mode === "wysiwyg") {
-                                adjusted.start = normalized.end - 1;
-                            } else {
-                                const [line, ch] = normalized.end;
-                                adjusted.start = [line, ch - 1];
-                            }
-                            return adjusted;
-                        }
-
-                        /**
-                         * Checks if '@' is at a valid mention position.
-                         * Uses regex instead of complex cursor math.
+                         * Checks if '@' is at a valid mention position to not confused with email address.
                          * textBeforeAt is the single character immediately before '@'
                          * If empty string, '@' is at the very start of the document
                          * Valid if: start of document, whitespace, or newline
@@ -395,16 +372,13 @@ export default function tikiToastEditor(options) {
 
                         let cursorPosition = normalizeSelection(selection, thisEditor.isWysiwygMode());
 
-                        let beforeTrigger = moveBeforeTrigger(cursorPosition);
+                        let beforeTrigger = moveCursonBeforeTrigger(cursorPosition);
 
                         let content = thisEditor.getSelectedText(beforeTrigger.start, beforeTrigger.end);
 
                         let isValidTrigger = isValidMentionContext(content);
 
                         if (isValidTrigger) {
-                            let afterTrigger = moveAfterTrigger(cursorPosition);
-                            // Remove '@' to avoid duplication
-                            thisEditor.replaceSelection("", afterTrigger.start, afterTrigger.end);
                             renderUserMentionModal("editwiki");
                         }
                     }
