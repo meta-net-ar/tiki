@@ -408,7 +408,7 @@
         {tab name="{tr}Shibboleth{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">{tr}Shibboleth{/tr}{help url="AuthShib" desc="{tr}Shibboleth Authentication {/tr}"}</legend>
+                <legend class="h3">{tr}Shibboleth{/tr}{help url="Shibboleth-Authentication" desc="{tr}Shibboleth Authentication {/tr}"}</legend>
                 {if $prefs.auth_method ne 'shib'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to Shibboleth for these changes to take effect{/tr}
