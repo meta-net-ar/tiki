@@ -1831,6 +1831,89 @@ class WikiLib extends TikiLib
         TikiLib::lib('attribute')->set_attribute('wiki page', $pageName, 'tiki.wiki.page_hide_title', $isHideTitle);
     }
 
+    /**
+     * Create the default home page, with the introduction content shown on a brand new Tiki.
+     *
+     * @param string $pageName  The page to create. Defaults to the wikiHomePage preference.
+     * @return bool             True when the page was created, false when it already exists or no name is known.
+     */
+    public function createDefaultHomePage($pageName = '')
+    {
+        global $prefs;
+
+        $tikilib = TikiLib::lib('tiki');
+
+        if (empty($pageName)) {
+            $pageName = $prefs['wikiHomePage'];
+        }
+
+        if (empty($pageName) || $tikilib->page_exists($pageName)) {
+            return false;
+        }
+
+        $homePageLang = Language::getCurrentLanguage();
+
+        // Default HomePage content
+        $homePageContent = '';
+        $is_html = false;
+        if (($prefs['feature_wysiwyg'] === 'y') && $prefs['wysiwyg_htmltowiki'] !== 'y') {
+            $is_html = true;
+
+            // FIXME: Still relies on wiki syntax not parsed, in particular if wysiwyg_wiki_parsed is disabled
+            $homePageContent .= '<h1>' . tr('Congratulations') . "</h1>\n";
+            $homePageContent .= tr('This is the default homepage for your Tiki. If you are seeing this page, your installation was successful.') . "\n\n<br>";
+            $homePageContent .= tr('You can change this page after logging in. Please review the [http://doc.tiki.org/Wiki-syntax|wiki syntax] for editing details.') . "\n\n\n<br>";
+            $homePageContent .= '<h2>' . tr('Get started') . ".</h2>\n";
+            $homePageContent .= tr('To begin configuring your site:') . "\n";
+            $homePageContent .= "<ul>\n";
+            $homePageContent .= "<li>" . tr('1) Log in with your newly created password.') . "</li>\n";
+            $homePageContent .= "<li>" . tr('2) Manually [tiki-admin.php?page=features|Enable specific Tiki features] that you didn\'t enable with the Admin wizard.') . "</li>\n";
+            $homePageContent .= "<li>" . tr('3) Run [tiki-admin.php?page=profiles|Tiki Profiles] to quickly get up and running.') . "</li>\n";
+            $homePageContent .= "</ul>\n\n<br>";
+            $homePageContent .= '<h2>' . tr('Need help?') . "</h2>\n";
+            $homePageContent .= tr('For more information:') . "\n<br>";
+            $homePageContent .= '*' . tr('[https://tiki.org/Introduction|Learn more about Tiki].') . "\n<br>";
+            $homePageContent .= '*' . tr('[https://tiki.org/|Get help], including the [http://doc.tiki.org|official documentation] and [http://tiki.org/forums|support forums].') . "\n<br>";
+            $homePageContent .= '*' . tr('[https://tiki.org/Join|Join the Tiki community].') . "\n<br>";
+        } else {
+            $homePageContent .= '!' . tr('Congratulations') . "\n";
+            $homePageContent .= tr('This is the default homepage for your Tiki. If you are seeing this page, your installation was successful.') . "\n\n";
+            $homePageContent .= tr('You can change this page after logging in. Please review the [http://doc.tiki.org/Wiki-syntax|wiki syntax] for editing details.') . "\n\n\n";
+            $homePageContent .= '!!' . tr('Get started.') . "\n";
+            $homePageContent .= tr('To begin configuring your site:') . "\n";
+            $homePageContent .= "{FANCYLIST()}\n";
+            $homePageContent .= tr('1) Log in with your newly created password.') . "\n";
+            $homePageContent .= tr('2) Manually [tiki-admin.php?page=features|Enable specific Tiki features] that you didn\'t enable with the Admin wizard.') . "\n";
+            $homePageContent .= tr('3) Run [tiki-admin.php?page=profiles|Tiki Profiles] to quickly get up and running.') . "\n";
+            $homePageContent .= "{FANCYLIST}\n\n";
+            $homePageContent .= '!!' . tr('Need help?') . "\n";
+            $homePageContent .= tr('For more information:') . "\n";
+            $homePageContent .= '*' . tr('[https://tiki.org/Introduction|Learn more about Tiki].') . "\n";
+            $homePageContent .= '*' . tr('[https://tiki.org/|Get help], including the [http://doc.tiki.org|official documentation] and [http://tiki.org/forums|support forums].') . "\n";
+            $homePageContent .= '*' . tr('[https://tiki.org/Join|Join the Tiki community].') . "\n";
+        }
+
+        $tikilib->create_page(
+            $pageName,
+            0,
+            $homePageContent,
+            $tikilib->now,
+            'Tiki initialization',
+            'admin',
+            '0.0.0.0',
+            '',
+            $homePageLang,
+            $is_html,   // is_html
+            null,
+            $is_html ? 'y' : 'n',   // wysiwyg,
+            ''
+        );
+
+        $this->set_page_hide_title($pageName, 0);   // set the page title of the Home Page to hidden
+
+        return true;
+    }
+
     public function get_without_namespace($pageName)
     {
         global $prefs;
