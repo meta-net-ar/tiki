@@ -334,10 +334,10 @@ export default function tikiToastEditor(options) {
                         {
                             if (isWysiwyg) {
                                 const [startOffset, endOffset] = selection;
-                                return {start: startOffset, end: endOffset, mode: 'wysiwyg'};
+                                return {start: startOffset, end: endOffset, mode: "wysiwyg"};
                             } else {
                                 const [[startLine, startCh], [endLine, endCh]] = selection;
-                                return {start: [startLine, startCh], end: [endLine, endCh], mode: 'markdown'};
+                                return {start: [startLine, startCh], end: [endLine, endCh], mode: "markdown"};
                             }
                         }
 
@@ -352,7 +352,7 @@ export default function tikiToastEditor(options) {
                         function moveBeforeTrigger(normalized) {
                             const adjusted = { ...normalized };
 
-                            if (normalized.mode === 'wysiwyg') {
+                            if (normalized.mode === "wysiwyg") {
                                 adjusted.start = normalized.start - 2;
                             } else {
                                 const [line, ch] = normalized.start;
@@ -372,7 +372,7 @@ export default function tikiToastEditor(options) {
                         function moveAfterTrigger(normalized) {
                             const adjusted = { ...normalized };
 
-                            if (normalized.mode === 'wysiwyg') {
+                            if (normalized.mode === "wysiwyg") {
                                 adjusted.start = normalized.end - 1;
                             } else {
                                 const [line, ch] = normalized.end;
@@ -390,7 +390,7 @@ export default function tikiToastEditor(options) {
                          */
                         function isValidMentionContext(textBeforeAt) {
                             const charBeforeAt = textBeforeAt.substring(0, 1);
-                            return charBeforeAt === ' ' || /^(@|\s@)$/.test(charBeforeAt);
+                            return charBeforeAt === " " || /^(@|\s@)$/.test(charBeforeAt);
                         }
 
                         let cursorPosition = normalizeSelection(selection, thisEditor.isWysiwygMode());
