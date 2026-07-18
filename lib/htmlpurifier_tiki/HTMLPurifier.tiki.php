@@ -61,7 +61,6 @@ function getHTMLPurifierTikiConfig()
         $conf->set('HTML.DefinitionID', 'allow target');
         $conf->set('HTML.DefinitionRev', 1);
         $conf->set('Attr.EnableID', 1);
-        $conf->set('HTML.Doctype', 'XHTML 1.0 Transitional');
         $conf->set('HTML.TidyLevel', 'light');
         if ($def = $conf->maybeGetRawHTMLDefinition()) {
             $def->addAttribute('a', 'target', 'Enum#_blank,_self,_target,_top');
