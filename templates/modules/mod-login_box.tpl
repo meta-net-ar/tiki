@@ -352,6 +352,11 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                                 {tr}Switch{/tr}
                             </button>
                         </div>
+                        {if ! empty($prefs.textBelowLoginbox)}
+                            <div class="mt-3">
+                                {tr}{$prefs.textBelowLoginbox}{/tr}
+                            </div>
+                        {/if}
                     </fieldset>
                 </form>
             {/if}

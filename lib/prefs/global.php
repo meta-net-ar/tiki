@@ -501,6 +501,14 @@ function prefs_global_list($partial = false)
             'hint' => tra('Go to [tiki-admingroups.php|Admin Groups] to select which tracker and fields to display.'),
             'default' => 'n',
         ],
+        'textBelowLoginbox' => [
+            'name' => tra('Text below login box'),
+            'description' => tra('Text to display below the login box.'),
+            'filter' => 'text',
+            'type' => 'textarea',
+            'size' => '5',
+            'default' => '',
+        ],
         'eponymousGroups' => [
             'name' => tra('Create a new group for each user'),
             'description' => tra('Automatically create a group for each user in order to, for example, assign permissions on the individual-user level.'),
