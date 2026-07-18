@@ -14,6 +14,7 @@ function prefs_realtime_list()
             'size' => 5,
             'filter' => 'digits',
             'default' => '',
+            'help' => 'Realtime',
             'shorthint' => tr('If not specified, port %0 will be used', 8080),
             'tags' => ['advanced'],
             'dependencies' => [
@@ -26,11 +27,12 @@ function prefs_realtime_list()
             'type' => 'text',
             'size' => 5,
             'default' => '',
+
             'shorthint' => tr('Leave blank to use the instance URL and realtime_port'),
             'tags' => ['advanced'],
             'dependencies' => [
                 'feature_realtime',
             ],
-        ]
+        ] // TODO: update the documentation for the realtime preferences
     ];
 }

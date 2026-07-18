@@ -6,11 +6,13 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_long_list()
 {
+    $dateAndTimeFormatsHelp = 'Date-and-Time#Date_and_Time_Formats';
+
     return [
         'long_date_format' => [
             'name' => tra('Long date format'),
             'description' => tra('Specify how Tiki displays the date (longer version)'),
-            'help' => 'Date-and-Time#Date_and_Time_Formats',
+            'help' => $dateAndTimeFormatsHelp,
             'type' => 'text',
             'size' => '30',
             'default' => '%A %B %e, %Y',
@@ -20,7 +22,7 @@ function prefs_long_list()
         'long_time_format' => [
             'name' => tra('Long time format'),
             'description' => tra('Specify how Tiki displays the time (longer version)'),
-            'help' => 'Date-and-Time#Date_and_Time_Formats',
+            'help' => $dateAndTimeFormatsHelp,
             'type' => 'text',
             'size' => '30',
             'default' => '%H:%M:%S %Z',

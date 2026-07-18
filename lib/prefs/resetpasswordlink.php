@@ -16,3 +16,4 @@ function prefs_resetpasswordlink_list()
         ],
     ];
 }
+// TODO: add resetpasswordlink link's documentation

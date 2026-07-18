@@ -13,6 +13,7 @@ function prefs_lowercase_list()
             'type' => 'flag',
             'help' => 'Login-Config#Case_Sensitivity',
             'default' => 'n',
+            'help' => 'Login-Config#Case_Sensitivity',
         ],
     ];
 }

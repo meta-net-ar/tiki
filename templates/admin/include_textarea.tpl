@@ -15,7 +15,7 @@
         {tab name="{tr}General Settings{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">{tr}Features{/tr}{help url="Text+Area"}</legend>
+                <legend class="h3">{tr}Features{/tr}{help url="Text-Area"}</legend>
                 {preference name=feature_fullscreen}
                 {preference name=feature_filegals_manager}
                 {preference name=feature_dynamic_content}
@@ -235,7 +235,7 @@
             <br>
             {remarksbox type="note" title="{tr}About plugin aliases{/tr}"}
                 {tr}Tiki plugin aliases allow you to define your own custom configurations of existing plugins.{/tr}<br>
-                {tr}Find out more here:{/tr}{help url="Plugin+Alias"}
+                {tr}Find out more here:{/tr}{help url="Plugin-Alias"}
             {/remarksbox}
             {tabset name='plugin_alias'}
                 {tab name='{tr}Available alias{/tr}'}

@@ -11,6 +11,7 @@ function prefs_desactive_list()
             'name' => tra("Disable browser's autocomplete feature for username and password fields"),
             'description' => tra('Use to deactivate the autocomplete in the log-in box. The autocomplete features can be optionally set in the user’s browser to remember the form input and proposes the remember the password. If enabled, the user log-in name and password cannot be remembered. You should enable this feature for highly secure sites.'),
             'type' => 'flag',
+            'help' => 'Login-General-Preferences',
             'default' => 'n',
         ],
     ];

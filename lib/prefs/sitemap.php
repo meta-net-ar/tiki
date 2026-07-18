@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_sitemap_list()
 {
+    $sitemapHelp = 'Sitemap';
+
     return [
         'sitemap_enable' => [
             'name' => tra('Sitemap protocol'),
@@ -21,7 +23,7 @@ function prefs_sitemap_list()
             'name' => tra('Generation Method'),
             'description' => tra('Choose how sitemap files are generated and updated.'),
             'type' => 'list',
-            'help' => 'Sitemap',
+            'help' => $sitemapHelp,
             'options' => [
                 'auto' => tra('Automatic'),
                 'manual' => tra('Manual'),
@@ -41,6 +43,7 @@ function prefs_sitemap_list()
             'since' => '30',
             'tags' => ['advanced'],
             'default' => 'none',
+            'help' => $sitemapHelp,
         ],
     ];
 }

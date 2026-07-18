@@ -158,7 +158,8 @@ function prefs_wikiplugin_list($partial = false)
         'dependencies' => ['wikiplugin_snarf'],
         'filter' => 'int',
         'units' => tra('seconds'),
-        'type' => 'text'
+        'type' => 'text',
+        'help' => 'Pluginsnarf',
     ];
 
     // temporary pref for developpment of the list plugin GUI
@@ -169,7 +170,8 @@ function prefs_wikiplugin_list($partial = false)
         'default' => 'y',
         'dependencies' => ['wikiplugin_list'],
         'filter' => 'alpha',
-        'type' => 'flag'
+        'type' => 'flag',
+        'help' => 'Pluginlist',
     ];
 
     // temporary pref for developpment of the list plugin converter from trackerlist
@@ -181,7 +183,8 @@ function prefs_wikiplugin_list($partial = false)
         'default' => 'n',
         'dependencies' => ['wikiplugin_list', 'wikiplugin_trackerlist'],
         'filter' => 'alpha',
-        'type' => 'flag'
+        'type' => 'flag',
+        'help' => 'PluginTrackerList-To-PluginList-Converter',
     ];
 
     $prefs['wikiplugin_maximum_passes'] = [
@@ -194,6 +197,7 @@ function prefs_wikiplugin_list($partial = false)
         'units' => tr('passes'),
         'tags' => ['experimental'],
         'warning' => tr('Setting this to a higher value than the default of 500 may have performance implications.'),
+        'help' => 'Plugins',
     ];
 
     $prefs['wikiplugin_fileaccess_allowed_paths'] = [

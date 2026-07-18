@@ -15,6 +15,7 @@ function prefs_queued_list()
             'default' => 'n',
             'dependencies' => ['feature_queued_tasks'],
             'tags' => ['advanced'],
+            // TODO: create the documentation
         ],
     ];
 }

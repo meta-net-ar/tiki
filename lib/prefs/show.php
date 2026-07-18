@@ -13,6 +13,7 @@ function prefs_show_list()
             'type' => 'flag',
             'dependencies' => ['feature_multilingual'],
             'default' => 'y',
+            'help' => 'i18n',
         ],
     ];
 }

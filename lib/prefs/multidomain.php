@@ -26,6 +26,7 @@ function prefs_multidomain_list()
             'size' => 10,
             'hint' => tra('One domain per line with a comma separating it from the perspective ID. For example: tiki.org,1'),
             'default' => '',
+            'help' => ' ',
         ],
         'multidomain_switchdomain' => [
             'name' => tra('Switch domain when switching perspective'),
@@ -36,6 +37,7 @@ function prefs_multidomain_list()
                 'feature_perspective', 'multidomain_active'
             ],
             'default' => 'n',
+            'help' => 'Perspectives',
         ],
         'multidomain_default_not_categorized' => [
             'name' => tra('Default domain for non categorized content'),
@@ -44,6 +46,7 @@ function prefs_multidomain_list()
             'type' => 'text',
             'size' => 255,
             'default' => '',
+            'help' => 'Multi-Domain', // TODO: Update help page for this preference
         ],
     ];
 }

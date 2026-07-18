@@ -20,6 +20,8 @@ function prefs_article_list()
         $comment_sort_orders[ $key . '_desc' ] = $label . ' ' . tr('descending');
     }
 
+    $articlesGeneralSettingsHelp = 'Articles-General-Settings';
+
     return [
         'article_comments_per_page' => [
             'name' => tra('Number per page'),
@@ -29,6 +31,7 @@ function prefs_article_list()
             'filter' => 'digits',
             'units' => tra('comments'),
             'default' => 10,
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_comments_default_ordering' => [
             'name' => tra('Display order'),
@@ -36,18 +39,21 @@ function prefs_article_list()
             'type' => 'list',
             'options' => $comment_sort_orders,
             'default' => 'points_desc',
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_paginate' => [
             'name' => tra('Paginate articles'),
             'description' => tra('Divide articles into multiple pages with pagebreak markers.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_remembers_creator' => [
             'name' => tra('Article creator remains article owner'),
             'description' => tra('Last article editor does not automatically become author (owner).'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_user_rating' => [
             'name' => tra('User ratings on articles'),
@@ -55,6 +61,7 @@ function prefs_article_list()
             'type' => 'flag',
             'hint' => tr('Permissions involved: %0. Also, when configuring articles, "Admin Types > Comment can rate article" needs to be set.', 'rate_article, ratings_view_results'),
             'default' => 'n',
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_user_rating_options' => [
             'name' => tra('Article rating options'),
@@ -63,6 +70,7 @@ function prefs_article_list()
             'separator' => ',',
             'filter' => 'int',
             'default' => "0,1,2,3,4,5",
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_image_size_x' => [
             'name' => tra('Default maximum width for custom article images'),
@@ -73,6 +81,7 @@ function prefs_article_list()
             'units' => tra('pixels'),
             'hint' => tra('"0" for no maximum'),
             'default' => '0',
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_image_size_y' => [
             'name' => tra('Default maximum height for custom article images'),
@@ -83,6 +92,7 @@ function prefs_article_list()
             'units' => tra('pixels'),
             'hint' => tra('"0" for no maximum') ,
             'default' => '0',
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_default_list_image_size_x' => [
             'name' => tra('Default maximum width for custom article images in list mode (on View Articles)'),
@@ -93,6 +103,7 @@ function prefs_article_list()
             'units' => tra('pixels'),
             'hint' => tra('"0" to default to the view mode maximum'),
             'default' => '0',
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_default_list_image_size_y' => [
             'name' => tra('Default maximum height of custom article images in list mode (on View Articles page)'),
@@ -103,6 +114,7 @@ function prefs_article_list()
             'units' => tra('pixels'),
             'hint' => tra('"0" to default to the view mode maximum'),
             'default' => '0',
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_image_file_size_max' => [
             'name' => tra('Article image maximum file size'),
@@ -112,12 +124,14 @@ function prefs_article_list()
             'filter' => 'digits',
             'units' => tra('kilobytes'),
             'default' => 500000,
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_custom_attributes' => [
             'name' => tra('Custom attributes for article types'),
             'description' => tra('Enable additional custom fields for article types'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_sharethis_publisher' => [
             'name' => tra('Your ShareThis publisher identifier (optional)'),
@@ -126,6 +140,7 @@ function prefs_article_list()
             'size' => '40',
             'hint' => tra('record your ShareThis publisher ID'),
             'default' => '',
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_related_articles' => [
             'name' => tr('Related articles'),
@@ -135,6 +150,7 @@ function prefs_article_list()
             'dependencies' => [
                 'feature_freetags',
             ],
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_use_new_list_articles' => [
             'name' => tr('Use new articles'),
@@ -142,6 +158,7 @@ function prefs_article_list()
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['experimental'],
+            'help' => $articlesGeneralSettingsHelp,
         ],
         'article_feature_copyrights' => [
             'name' => tra('Article copyright'),
@@ -151,6 +168,7 @@ function prefs_article_list()
                 'feature_articles',
             ],
             'default' => 'n',
+            'help' => $articlesGeneralSettingsHelp,
         ],
     ];
 }

@@ -6,10 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_calendar_list()
 {
+    $calendarHelp = 'Calendar';
+
     return [
         'calendar_view_days' => [
             'name' => tra('Days to display in the calendar'),
+            'description' => tra('Choose which weekdays are shown by default in calendar views.'),
             'type' => 'multicheckbox',
+            'help' => $calendarHelp,
             'options' => [
                 0 => tra('Sunday'),
                 1 => tra('Monday'),
@@ -23,8 +27,9 @@ function prefs_calendar_list()
         ],
         'calendar_view_mode' => [
             'name' => tra('Default view mode'),
-            'description' => '',
+            'description' => tra('Sets the initial calendar view for users (day, week, month, quarter, semester, or year).'),
             'type' => 'list',
+            'help' => $calendarHelp,
             'options' => [
                 'day' => tra('Day'),
                 'week' => tra('Week'),
@@ -38,8 +43,9 @@ function prefs_calendar_list()
         ],
         'calendar_list_begins_focus' => [
             'name' => tra('View list begins'),
-            'description' => '',
+            'description' => tra('In list view, start from the day you picked or from the start of the range.'),
             'type' => 'list',
+            'help' => $calendarHelp,
             'options' => [
                 'y' => tra('Focus date'),
                 'n' => tra('Period beginning'),
@@ -48,8 +54,9 @@ function prefs_calendar_list()
         ],
         'calendar_firstDayofWeek' => [
             'name' => tra('First day of the week'),
-            'description' => '',
+            'description' => tra('Defines whether weeks start on Sunday, Monday, or based on the user language.'),
             'type' => 'list',
+            'help' => $calendarHelp,
             'options' => [
                 '0' => tra('Sunday'),
                 '1' => tra('Monday'),
@@ -61,6 +68,7 @@ function prefs_calendar_list()
             'name' => tra('Split hours in periods of'),
             'description' => tra('Times shown in week and day view.'),
             'type' => 'list',
+            'help' => $calendarHelp,
             'units' => tra('minutes'),
             'options' => [
                 '1' => '1',
@@ -75,6 +83,7 @@ function prefs_calendar_list()
             'name' => tra('Minute Interval'),
             'description' => tra('Interval to show between minutes on time selectors'),
             'type' => 'list',
+            'help' => $calendarHelp,
             'units' => tra('minutes'),
             'options' => [
                 '1' => '1',
@@ -88,37 +97,42 @@ function prefs_calendar_list()
         'calendar_start_year' => [
             'name' => tra('First year in the dropdown'),
             'units' => tra('years'),
-            'description' => '',
+            'description' => tra('Earliest year in year selection dropdowns.'),
             'type' => 'text',
+            'help' => $calendarHelp,
             'size' => '5',
             'hint' => tra('Enter a year or use +/- N to specify a year relative to the current year. Year selection is valid when the JS Calendar __is not__ enabled'),
             'default' => '-3',
         ],
         'calendar_end_year' => [
             'name' => tra('Last year in the dropdown'),
-            'description' => '',
+            'description' => tra('Latest year in year selection dropdowns.'),
             'units' => tra('years'),
             'type' => 'text',
+            'help' => $calendarHelp,
             'size' => '5',
             'hint' => tra('Enter a year or use +/- N to specify a year relative to the current year'),
             'default' => '+5',
         ],
         'calendar_sticky_popup' => [
             'name' => tra('Sticky popup'),
-            'description' => '',
+            'description' => tra('Keep calendar popups open until you close them.'),
             'type' => 'flag',
+            'help' => $calendarHelp,
             'default' => 'n',
         ],
         'calendar_view_tab' => [
             'name' => tra('Item view tab'),
-            'description' => '',
+            'description' => tra('Show event details in tabs.'),
             'type' => 'flag',
+            'help' => $calendarHelp,
             'default' => 'n',
         ],
         'calendar_addtogooglecal' => [
             'name' => tra('Show "Add to Google Calendar" icon'),
-            'description' => '',
+            'description' => tra('Show "Add to Google Calendar" on events (needs the plugin).'),
             'type' => 'flag',
+            'help' => $calendarHelp,
             'dependencies' => [
                 'wikiplugin_addtogooglecal'
             ],
@@ -126,32 +140,37 @@ function prefs_calendar_list()
         ],
         'calendar_export' => [
             'name' => tra('Show "Export Calendars" button'),
-            'description' => '',
+            'description' => tra('Allow to export calendars as iCal or CSV.'),
             'type' => 'flag',
+            'help' => $calendarHelp,
             'default' => 'n',
         ],
         'calendar_export_item' => [
             'name' => tra('Show "Export Calendar Item" Button'),
             'description' => tra('Allow exporting a single calendar event as an iCal file'),
             'type' => 'flag',
+            'help' => $calendarHelp,
             'default' => 'n',
         ],
         'calendar_description_is_html' => [
             'name' => tra('Treat calendar item descriptions as HTML'),
             'description' => tra('Use this if you use the WYSIWYG editor for calendars. This is to handle legacy data from Tiki pre 7.0.'),
             'type' => 'flag',
+            'help' => $calendarHelp,
             'default' => 'y',
         ],
         'calendar_watch_editor' => [
             'name' => tra('Enable watch events when you are the editor'),
             'description' => tra('Check this to receive email notifications of events you changed yourself.'),
             'type' => 'flag',
+            'help' => $calendarHelp,
             'default' => 'y',
         ],
         'calendar_event_click_action' => [
             'name' => tra('Event click action'),
             'description' => tra('View or edit item on click'),
             'type' => 'list',
+            'help' => $calendarHelp,
             'options' => [
                 'edit_item' => tr('Edit'),
                 'view_item' => tr('View'),
@@ -160,8 +179,9 @@ function prefs_calendar_list()
         ],
         'calendar_start_day' => [
             'name' => tra('Calendar start of day'),
-            'description' => '',
+            'description' => tra('Start of the visible day in day/week view (seconds after midnight).'),
             'type' => 'text',
+            'help' => $calendarHelp,
             'filter' => 'int',
             'size' => 5,
             'units' => tra('seconds'),
@@ -169,8 +189,9 @@ function prefs_calendar_list()
         ],
         'calendar_end_day' => [
             'name' => tra('Calendar end of day'),
-            'description' => '',
+            'description' => tra('End of the visible day in day/week view (seconds after midnight).'),
             'type' => 'text',
+            'help' => $calendarHelp,
             'filter' => 'int',
             'size' => 5,
             'units' => tra('seconds'),
@@ -180,6 +201,7 @@ function prefs_calendar_list()
             'name' => tra('Holidays calendar'),
             'description' => tra('Choose a calendar to store non-working days which are used in date calculations involving working days.'),
             'type' => 'text',
+            'help' => $calendarHelp,
             'default' => '',
             'profile_reference' => 'calendar',
         ],
@@ -194,6 +216,7 @@ function prefs_calendar_list()
             'dependencies' => [
                 'feature_file_galleries',
             ],
+            'help' => 'File-Gallery',
         ],
         'calendar_pdf_export_layout' => [
             'name' => tra('PDF export layout'),
@@ -204,6 +227,7 @@ function prefs_calendar_list()
                 'fit_on_one_page' => tr('Fit on one page'),
             ],
             'default' => 'fit_on_one_page',
+            'help' => 'PDF',
         ],
     ];
 }

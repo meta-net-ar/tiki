@@ -16,6 +16,8 @@ function prefs_payment_list()
     if ($ilpLib->isEnabled() || ( ! empty($prefs['payment_system']) && $prefs['payment_system'] === 'ilp')) {
         $availablePaymentSystems['ilp'] = tra('Inter Ledger Protocol');
     }
+    $shoppingCartHelp = 'Shopping-Cart';
+    $paymentTabHelp = 'Payment-Tab';
 
     return [
         'payment_feature' => [
@@ -37,6 +39,7 @@ function prefs_payment_list()
             'options' => $availablePaymentSystems,
             'dependencies' => [ 'payment_feature' ],
             'default' => 'paypal',
+            'help' => $paymentTabHelp,
         ],
         'payment_paypal_business' => [
             'name' => tra('PayPal ID'),
@@ -47,6 +50,7 @@ function prefs_payment_list()
             'dependencies' => [ 'payment_feature' ],
             'size' => 50,
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
 
         'payment_paypal_password' => [
@@ -58,7 +62,7 @@ function prefs_payment_list()
             'dependencies' => [ 'payment_feature' ],
             'size' => 50,
             'default' => '',
-            ''
+            'help' => $paymentTabHelp,
         ],
 
         'payment_paypal_signature' => [
@@ -70,6 +74,7 @@ function prefs_payment_list()
             'dependencies' => [ 'payment_feature' ],
             'size' => 50,
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_paypal_environment' => [
             'name' => tra('PayPal environment'),
@@ -82,6 +87,7 @@ function prefs_payment_list()
             ],
             'dependencies' => [ 'payment_paypal_business' ],
             'default' => 'https://www.paypal.com/cgi-bin/webscr',
+            'help' => $paymentTabHelp,
         ],
         'payment_paypal_ipn' => [
             'name' => tra('PayPal instant payment notification (IPN)'),
@@ -89,6 +95,7 @@ function prefs_payment_list()
             'type' => 'flag',
             'dependencies' => [ 'payment_paypal_business' ],
             'default' => 'y',
+            'help' => $paymentTabHelp,
         ],
         'payment_paypal_pdt' => [
             'name' => tra('Payment data transfer (PDT)'),
@@ -96,6 +103,7 @@ function prefs_payment_list()
             'type' => 'flag',
             'dependencies' => [ 'payment_paypal_business' ],
             'default' => 'y',
+            'help' => $paymentTabHelp,
         ],
         'payment_paypal_pdt_token' => [
             'name' => tra('Payment data transfer (PDT) token'),
@@ -104,6 +112,7 @@ function prefs_payment_list()
             'dependencies' => [ 'payment_paypal_pdt' ],
             'size' => 100,
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_paypal_pdt_redirect' => [
             'name' => tra('Redirect after PDT payment'),
@@ -112,6 +121,7 @@ function prefs_payment_list()
             'dependencies' => [ 'payment_paypal_pdt' ],
             'size' => 256,
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_currency' => [
             'name' => tra('Currency'),
@@ -120,6 +130,7 @@ function prefs_payment_list()
             'size' => 3,
             'filter' => 'alpha',
             'default' => 'USD',
+            'help' => $paymentTabHelp,
         ],
         'payment_default_delay' => [
             'name' => tra('Default acceptable payment delay'),
@@ -129,6 +140,7 @@ function prefs_payment_list()
             'units' => tra('days'),
             'size' => 3,
             'default' => 30,
+            'help' => $paymentTabHelp,
         ],
         'payment_cclite_registries' => [
             'name' => tra('Cclite registries'),
@@ -139,6 +151,7 @@ function prefs_payment_list()
             'size' => 40,
             'separator' => ',',
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_cclite_currencies' => [
             'name' => tra('Cclite registry currencies'),
@@ -149,6 +162,7 @@ function prefs_payment_list()
             'size' => 40,
             'separator' => ',',
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_cclite_gateway' => [
             'name' => tra('Cclite server URL'),
@@ -158,6 +172,7 @@ function prefs_payment_list()
             'size' => 60,
         'dependencies' => [ 'payment_cclite_registries' ],
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_cclite_merchant_key' => [
             'name' => tra('Cclite merchant key'),
@@ -165,6 +180,7 @@ function prefs_payment_list()
             'type' => 'text',
             'dependencies' => [ 'payment_cclite_registries' ],
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_cclite_merchant_user' => [
             'name' => tra('Cclite merchant user'),
@@ -172,6 +188,7 @@ function prefs_payment_list()
             'type' => 'text',
             'dependencies' => [ 'payment_cclite_registries' ],
             'default' => 'manager',
+            'help' => $paymentTabHelp,
         ],
         'payment_cclite_mode' => [
             'name' => tra('Cclite enable payments'),
@@ -183,6 +200,7 @@ function prefs_payment_list()
             ],
             'dependencies' => [ 'payment_cclite_registries' ],
             'default' => 'test',
+            'help' => $paymentTabHelp,
         ],
         'payment_cclite_hashing_algorithm' => [
             'name' => tra('Hashing algorithm'),
@@ -195,13 +213,15 @@ function prefs_payment_list()
             ],
             'dependencies' => [ 'payment_cclite_registries' ],
             'default' => 'sha1',
+            'help' => $paymentTabHelp,
         ],
         'payment_cclite_notify' => [
             'name' => tra('Cclite payment notification'),
-            'description' => tra('To do'),
+            'description' => tra('Enable payment notification for automatic payment completion. The Cclite server will notify Tiki when a payment is confirmed and the payment will be entered automatically.'),
             'type' => 'flag',
             'dependencies' => [ 'payment_cclite_registries' ],
             'default' => 'y',
+            'help' => $paymentTabHelp,
         ],
         'payment_manual' => [
             'name' => tra('Wiki page with manual payment instructions'),
@@ -209,6 +229,7 @@ function prefs_payment_list()
             'type' => 'text',
             'dependencies' => [ 'payment_feature' ],
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_invoice_prefix' => [
             'name' => tra('Invoice prefix'),
@@ -216,6 +237,7 @@ function prefs_payment_list()
             'type' => 'text',
             'dependencies' => [ 'payment_feature' ],
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_tikicredits_types' => [
             'name' => tra('Types of credit to use'),
@@ -224,6 +246,7 @@ function prefs_payment_list()
             'dependencies' => [ 'payment_feature', 'feature_credits' ],
             'separator' => ',',
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_tikicredits_xcrates' => [
             'name' => tra('Exchange rate for types of credit to use'),
@@ -232,24 +255,28 @@ function prefs_payment_list()
             'dependencies' => [ 'payment_feature', 'feature_credits' ],
             'separator' => ',',
             'default' => '',
+            'help' => $paymentTabHelp,
         ],
         'payment_user_only_his_own' => [
             'name' => tra('User can only see own outstanding payments'),
             'description' => tra('Unless the user has administer-payment permissions, a user can only see his or her own outstanding payments'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $paymentTabHelp,
         ],
         'payment_user_only_his_own_past' => [
             'name' => tra('User can only see own past or cancelled payments'),
             'description' => tra('Unless the user has administer-payment permissions, the user can only see his or her own past or cancelled payments'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $paymentTabHelp,
         ],
         'payment_anonymous_allowed' => [
             'name' => tra('Anonymous users can pay outstanding invoices'),
             'description' => tra('Anonymous users can see outstanding invoices to pay them through a simple shopping cart (without the need to set up the advanced cart).'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $paymentTabHelp,
         ],
         'payment_cart_inventory' => [
             'name' => tra('Manage product inventory'),
@@ -257,6 +284,7 @@ function prefs_payment_list()
             'type' => 'flag',
             'dependencies' => [ 'payment_cart_product_tracker', 'payment_cart_inventory_type_field', 'payment_cart_inventory_total_field', 'payment_cart_inventory_lesshold_field' ],
             'default' => 'n',
+            'help' => $shoppingCartHelp,
         ],
         'payment_cart_product_tracker' => [
             'name' => tra('Products tracker ID'),
@@ -264,6 +292,7 @@ function prefs_payment_list()
             'type' => 'text',
             'filter' => 'digits',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker',
         ],
         'payment_cart_product_tracker_name' => [
@@ -271,6 +300,7 @@ function prefs_payment_list()
             'description' => tra('Name of tracker that is the products tracker, needed for advanced cart features; the item ID will be the product code.'),
             'type' => 'text',
             'default' => '',
+            'help' => $shoppingCartHelp,
         ],
         'payment_cart_inventory_type_field' => [
             'name' => tra('Inventory type field ID'),
@@ -279,6 +309,7 @@ function prefs_payment_list()
             'filter' => 'digits',
             'size' => 3,
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name="params[trackerId]"]',
             'parentkey' => 'tracker_id',
@@ -290,6 +321,7 @@ function prefs_payment_list()
             'filter' => 'digits',
             'size' => 3,
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name="params[trackerId]"]',
             'parentkey' => 'tracker_id',
@@ -301,6 +333,7 @@ function prefs_payment_list()
             'filter' => 'digits',
             'size' => 3,
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name="params[trackerId]"]',
             'parentkey' => 'tracker_id',
@@ -313,6 +346,7 @@ function prefs_payment_list()
             'units' => tra('minutes'),
             'size' => 3,
             'default' => 15,
+            'help' => $shoppingCartHelp,
         ],
         'payment_cart_bundles' => [
             'name' => tra('Bundled products feature for cart'),
@@ -320,12 +354,14 @@ function prefs_payment_list()
             'type' => 'flag',
             'dependencies' => [ 'payment_cart_product_name_fieldname', 'payment_cart_products_inbundle_fieldname', 'payment_cart_product_price_fieldname', 'payment_cart_orders_tracker_name', 'payment_cart_orderitems_tracker_name' ],
             'default' => 'n',
+            'help' => $shoppingCartHelp,
         ],
         'payment_cart_product_name_fieldname' => [
             'name' => tra('Product name field name'),
             'description' => tra('In the products tracker, the name of the field for the product name that will be used as the label of the product, for example in a bundle.'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name="payment_cart_product_tracker"]',
             'parentkey' => 'tracker_id',
@@ -335,6 +371,7 @@ function prefs_payment_list()
             'description' => tra('In the products tracker, the name of the field for a comma-separated list of product IDs of products in the bundle (that is, if the field contains anything, then this product is a bundle). You can also specify the number of the sub-products; for example, 23:("colon")2,24 means item 23 (x2) + item 24 (x1).'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_product_tracker]',
             'parentkey' => 'tracker_id',
@@ -344,6 +381,7 @@ function prefs_payment_list()
             'description' => tra('In the products tracker, the name of the field for the product price'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_product_tracker]',
             'parentkey' => 'tracker_id',
@@ -353,6 +391,7 @@ function prefs_payment_list()
             'description' => tra('In the products tracker, the field name for the associated event ID. This is needed for the associated events cart feature, and requires an events tracker to be set up in which the item ID there is the event ID to be associated with.'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_product_tracker]',
             'parentkey' => 'tracker_id',
@@ -365,6 +404,7 @@ function prefs_payment_list()
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_product_tracker]',
             'parentkey' => 'tracker_id',
+            'help' => $shoppingCartHelp,
         ],
         'payment_cart_orders' => [
             'name' => tra('Record cart orders in trackers'),
@@ -372,6 +412,7 @@ function prefs_payment_list()
             'type' => 'flag',
             'dependencies' => [ 'payment_cart_order_tracker', 'payment_cart_orderitems_tracker' ],
             'default' => '',
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker',
         ],
         'payment_cart_order_tracker' => [
@@ -381,12 +422,14 @@ function prefs_payment_list()
             'filter' => 'digits',
             'default' => 0,
             'profile_reference' => 'tracker',
+            'help' => $shoppingCartHelp,
         ],
         'payment_cart_order_user_field' => [
             'name' => tra('Order user field'),
             'description' => tra('User making the order field'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_order_tracker]',
             'parentkey' => 'tracker_id',
@@ -396,6 +439,7 @@ function prefs_payment_list()
             'description' => tra('Date and time of the order field'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_order_tracker]',
             'parentkey' => 'tracker_id',
@@ -405,6 +449,7 @@ function prefs_payment_list()
             'description' => tra('Total cost of the order field'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_order_tracker]',
             'parentkey' => 'tracker_id',
@@ -414,6 +459,7 @@ function prefs_payment_list()
             'description' => tra('Payment system invoice Id field'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_order_tracker]',
             'parentkey' => 'tracker_id',
@@ -423,6 +469,7 @@ function prefs_payment_list()
             'description' => tra('Payment system order weight field in grammes'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_order_tracker]',
             'parentkey' => 'tracker_id',
@@ -434,6 +481,7 @@ function prefs_payment_list()
             'type' => 'text',
             'filter' => 'digits',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker',
         ],
         'payment_cart_orderitems_order_field' => [
@@ -441,6 +489,7 @@ function prefs_payment_list()
             'description' => tra("ItemLink field pointing to the Item's Order"),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_orderitems_tracker]',
             'parentkey' => 'tracker_id',
@@ -450,6 +499,7 @@ function prefs_payment_list()
             'description' => tra("ItemLink field pointing to the Item's Product"),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_orderitems_tracker]',
             'parentkey' => 'tracker_id',
@@ -459,6 +509,7 @@ function prefs_payment_list()
             'description' => tra('Total price for the Item'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_orderitems_tracker]',
             'parentkey' => 'tracker_id',
@@ -468,6 +519,7 @@ function prefs_payment_list()
             'description' => tra('Number of products in this Item'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_orderitems_tracker]',
             'parentkey' => 'tracker_id',
@@ -477,51 +529,57 @@ function prefs_payment_list()
             'description' => tra('User Selector field who added this Item'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_orderitems_tracker]',
             'parentkey' => 'tracker_id',
         ],
         'payment_cart_orderitems_inputedprice_field' => [
             'name' => tra('Item inputedprice field'),
-            'description' => tra('Unknown'),
+            'description' => tra('Numeric field storing the entered or calculated price share for bundled products in an order line item.'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_orderitems_tracker]',
             'parentkey' => 'tracker_id',
         ],
         'payment_cart_orderitems_eventcode_field' => [
             'name' => tra('Item event code field'),
-            'description' => tra(''),
+            'description' => tra('ItemLink field pointing to the associated event (events tracker item) for this order line item.'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_orderitems_tracker]',
             'parentkey' => 'tracker_id',
         ],
         'payment_cart_orderitems_eventstart_field' => [
             'name' => tra('Item event start field'),
-            'description' => tra(''),
+            'description' => tra('Date/time field storing the associated event start date for this order line item.'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_orderitems_tracker]',
             'parentkey' => 'tracker_id',
         ],
         'payment_cart_orderitems_eventend_field' => [
             'name' => tra('Item event end field'),
-            'description' => tra(''),
+            'description' => tra('Date/time field storing the associated event end date for this order line item.'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_orderitems_tracker]',
             'parentkey' => 'tracker_id',
         ],
         'payment_cart_orderitems_parentcode_field' => [
             'name' => tra('Item parent code field'),
-            'description' => tra(''),
+            'description' => tra('Numeric field storing the parent bundle product ID when this order line item is part of a bundle.'),
             'type' => 'text',
             'default' => 0,
+            'help' => $shoppingCartHelp,
             'profile_reference' => 'tracker_field',
             'parent' => 'input[name=payment_cart_orderitems_tracker]',
             'parentkey' => 'tracker_id',
@@ -530,15 +588,15 @@ function prefs_payment_list()
         'payment_cart_anonymous' => [
             'name' => tra('Allow anonymous shopping'),
             'description' => tra('Allow shopping by anonymous users and record the orders in trackers.'),
-            'help' => 'Shopping-Cart',
             'dependencies' => [ 'auth_token_access', 'payment_cart_anonshopper_profile', 'payment_cart_anon_reviewpage', 'payment_cart_anon_group' ],
             'type' => 'flag',
             'default' => 'n',
+            'help' => $shoppingCartHelp,
         ],
         'payment_cart_anonshopper_profile' => [
             'name' => tra('Anonymous shopper info profile'),
             'description' => tra('Wiki page containing the profile for creating order items for anonymous users (page name must not have spaces)'),
-            'help' => 'AnonShopperProfile',
+            'help' => $shoppingCartHelp,
             'type' => 'text',
             'default' => '',
             'profile_reference' => 'wiki page',
@@ -546,6 +604,7 @@ function prefs_payment_list()
         'payment_cart_anon_reviewpage' => [
             'name' => tra('Anonymous users order review page'),
             'description' => tra('Wiki page where anonymous users can review their orders'),
+            'help' => $shoppingCartHelp,
             'type' => 'text',
             'default' => '',
             'profile_reference' => 'wiki page',
@@ -553,13 +612,14 @@ function prefs_payment_list()
         'payment_cart_anon_group' => [
             'name' => tra('Temporary shopper group'),
             'description' => tra('Group name of group with permission to access review page via a token'),
+            'help' => $shoppingCartHelp,
             'type' => 'text',
             'default' => '',
         ],
         'payment_cart_associatedevent' => [
             'name' => tra('Enable association of product orders with events'),
             'description' => tra('Enable association of products with events (or projects, etc.).'),
-            'help' => 'Shopping-Cart',
+            'help' => $shoppingCartHelp,
             'dependencies' => [ 'payment_cart_orders', 'payment_cart_associated_event_fieldname', 'payment_cart_event_tracker', 'payment_cart_event_tracker_name', 'payment_cart_eventstart_fieldname', 'payment_cart_eventend_fieldname' ],
             'type' => 'flag',
             'default' => 'n',
@@ -567,6 +627,7 @@ function prefs_payment_list()
         'payment_cart_event_tracker' => [
             'name' => tra('Events tracker ID'),
             'description' => tra('Tracker ID of tracker that is the events tracker'),
+            'help' => $shoppingCartHelp,
             'type' => 'text',
             'filter' => 'digits',
             'size' => 3,
@@ -576,6 +637,7 @@ function prefs_payment_list()
         'payment_cart_event_tracker_name' => [
             'name' => tra('Events tracker name'),
             'description' => tra('Name of tracker that is the events tracker'),
+            'help' => $shoppingCartHelp,
             'type' => 'text',
             'default' => '',
         ],
@@ -583,17 +645,20 @@ function prefs_payment_list()
             'name' => tra('Event start field name'),
             'description' => tra('Field name in events tracker of start date/time'),
             'type' => 'text',
+            'help' => $shoppingCartHelp,
             'default' => '',
         ],
         'payment_cart_eventend_fieldname' => [
             'name' => tra('Event end field name'),
             'description' => tra('Field name in events tracker of end date/time'),
             'type' => 'text',
+            'help' => $shoppingCartHelp,
             'default' => '',
         ],
         'payment_cart_exchange' => [
             'name' => tra('Allow exchange of products'),
-            'help' => 'Shopping-Cart',
+            'description' => tra('Enable exchanging an existing order item for a different product in the same product class. Uses Add to cart exchange parameters and updates the order item in the tracker on payment.'),
+            'help' => $shoppingCartHelp,
             'dependencies' => [ 'payment_cart_orderitems_tracker', 'payment_cart_product_tracker', 'payment_cart_product_classid_fieldname', 'payment_cart_productclasses_tracker_name' ],
             'type' => 'flag',
             'default' => '',
@@ -601,6 +666,7 @@ function prefs_payment_list()
         'payment_cart_orders_tracker_name' => [
             'name' => tra('Orders tracker name'),
             'description' => tra('Name of tracker that is the orders tracker'),
+            'help' => $shoppingCartHelp,
             'type' => 'text',
             'default' => '',
         ],
@@ -609,10 +675,12 @@ function prefs_payment_list()
             'description' => tra('Name of tracker that is the order items tracker'),
             'type' => 'text',
             'default' => '',
+            'help' => $shoppingCartHelp,
         ],
         'payment_cart_productclasses_tracker_name' => [
             'name' => tra('Product classes tracker name'),
             'description' => tra('Name of tracker that is the product classes tracker'),
+            'help' => $shoppingCartHelp,
             'type' => 'text',
             'default' => '',
         ],
@@ -622,10 +690,12 @@ function prefs_payment_list()
             'type' => 'text',
             'filter' => 'text',
             'default' => 'Cart Check-Out',
+            'help' => $shoppingCartHelp,
         ],
         'payment_ilp_base_url' => [
             'name' => tra('ILP server base url'),
             'description' => tra('Inter Ledger Protocol invoice server base url.'),
+            'help' => $paymentTabHelp,
             'type' => 'text',
             'filter' => 'text',
             'default' => '',
@@ -637,6 +707,7 @@ function prefs_payment_list()
             'type' => 'text',
             'filter' => 'text',
             'default' => '',
+            'help' => $paymentTabHelp,
             'tags' => ['experimental'],
         ],
         'payment_ilp_ssl' => [
@@ -644,6 +715,7 @@ function prefs_payment_list()
             'description' => tra('Enforce SSL connecting  to ILP server.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $paymentTabHelp,
             'tags' => ['experimental'],
         ],
         'payment_ilp_scale' => [
@@ -652,6 +724,7 @@ function prefs_payment_list()
             'type' => 'text',
             'filter' => 'digit',
             'default' => '9',
+            'help' => $paymentTabHelp,
             'tags' => ['experimental'],
         ]
     ];

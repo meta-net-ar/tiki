@@ -6,12 +6,15 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_categorypath_list()
 {
+    $categoryHelp = 'Category';
+
     return [
         'categorypath_excluded' => [
             'name' => tra('Exclude these category IDs'),
             'description' => tra('Category path won\'t appear for these category IDs.'),
             'separator' => ',',
             'type' => 'text',
+            'help' => $categoryHelp,
             'size' => '15',
             'profile_reference' => 'category',
             'default' => [''], //empty string needed to keep preference from setting unexpectedly
@@ -20,6 +23,7 @@ function prefs_categorypath_list()
             'name' => tr('Category path format'),
             'description' => tr('Alter how the category path will be rendered.'),
             'type' => 'list',
+            'help' => $categoryHelp,
             'default' => 'link_when_visible',
             'options' => [
                 'link_when_visible' => tr('Links to the category when the category is visible'),

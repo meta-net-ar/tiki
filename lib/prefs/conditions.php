@@ -6,12 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_conditions_list()
 {
+    $termsAndConditionsHelp = 'Terms-and-Conditions';
+
     return [
         'conditions_enabled' => [
             'name' => tr('Terms and Conditions'),
             'description' => tr('Automatically present a terms of use page to be accepted by users accessing the site.'),
             'dependencies' => ['feature_wiki'],
-            'help' => 'Terms-and-Conditions',
+            'help' => $termsAndConditionsHelp,
             'type' => 'flag',
             'default' => 'n',
         ],
@@ -22,6 +24,7 @@ function prefs_conditions_list()
             'filter' => 'pagename',
             'default' => tr('Terms'),
             'profile_reference' => 'wiki_page',
+            'help' => $termsAndConditionsHelp,
         ],
         'conditions_minimum_age' => [
             'name' => tr('Minimum age'),
@@ -31,6 +34,7 @@ function prefs_conditions_list()
             'filter' => 'int',
             'units' => tra('years'),
             'default' => 0,
+            'help' => $termsAndConditionsHelp,
         ],
     ];
 }

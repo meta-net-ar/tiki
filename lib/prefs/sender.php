@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_sender_list()
 {
+    $generalPreferencesHelp = 'General-Preferences';
+
     return [
         'sender_email' => [
             'name' => tra('Sender email'),
@@ -14,6 +16,7 @@ function prefs_sender_list()
             'size' => 40,
             'default' => '',
             'tags' => ['basic'],
+            'help' => $generalPreferencesHelp,
         ],
         'sender_name' => [
             'name' => tra('Sender full name'),
@@ -21,6 +24,7 @@ function prefs_sender_list()
             'type' => 'text',
             'size' => 40,
             'default' => '',
+            'help' => $generalPreferencesHelp,
         ],
     ];
 }

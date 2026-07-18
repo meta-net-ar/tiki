@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_morelikethis_list()
 {
+    $freetagsGeneralSettingsHelp = 'Freetags-General-Settings';
+
     return [
 
         // Used in templates/tiki-admin-include-freetags.tpl
@@ -18,6 +20,7 @@ function prefs_morelikethis_list()
                 'weighted' => tra('Weighted'),
             ],
             'default' => 'basic',
+            'help' => $freetagsGeneralSettingsHelp,
         ],
         'morelikethis_basic_mincommon' => [
             'name' => tra('Minimum number of tags in common'),
@@ -37,6 +40,7 @@ function prefs_morelikethis_list()
                 '10' => '10',
             ],
             'default' => '2',
+            'help' => $freetagsGeneralSettingsHelp,
         ],
     ];
 }

@@ -22,6 +22,7 @@ class PrefsGen
     //We are using socPrefix etc. with an easier testing and incorporating changes in mind
     //for extra socnets login libs and also maybe Packages in the future
     protected static string $socPrefix = 'socnets_';
+    public static string $socnetsHelp = 'Social-Networks-General-Tab';
     public static string $socLoginSuffix = 'tiki-login_hybridauth.php?provider=';
     public static string $socBaseSuffix = 'tiki-login_hybridauth.php';
 
@@ -246,6 +247,7 @@ class PrefsGen
         }
 
         $value2['name'] = $providerName . " " . $value2['name'];
+        $value2['help'] = self::$socnetsHelp;
 
         return $value2;
     }
@@ -307,6 +309,7 @@ class PrefsGen
                 'tags' => ['experimental'],
                 'options' => $allProviders,
                 'default' => $allProviders,
+                'help' => self::$socnetsHelp,
                 ],
                 //TODO rename to remove confusion with loginEnabled
             self::$socPrefix . 'enabledProviders' => [
@@ -316,6 +319,7 @@ class PrefsGen
                 'tags' => ['experimental'],
                 'options' => $allProviders,
                 'default' => [],
+                'help' => self::$socnetsHelp,
                 ],
             self::$socPrefix . 'enabledProvidersNames' => [
                 'name' => tra('Enabled social network names- Do not use in forms:'),
@@ -324,6 +328,7 @@ class PrefsGen
                 'tags' => ['experimental'],
                 'default' => self::getEnabledProvidersNames(),
                 'hidden' => 'y',
+                'help' => self::$socnetsHelp,
                 //TODO does this array and hidden work? It looks like it is not...
                 ],
             self::$socPrefix . 'socLoginBaseUrl' => [
@@ -332,6 +337,7 @@ class PrefsGen
                 'type' => 'text',
                 'tags' => ['experimental'],
                 'default' => self::getSocLoginBaseUrl(),
+                'help' => self::$socnetsHelp,
                 ],
         ];
         $prefs3 = array_merge($prefs1, self::getPrefsAllProviders());

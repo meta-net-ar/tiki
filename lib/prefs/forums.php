@@ -9,7 +9,9 @@ function prefs_forums_list()
     return [
         'forums_ordering' => [
             'name' => tra('Default order'),
+            'description' => tra('Default sort order used to list forums in forum administration and listings.'),
             'type' => 'list',
+            'help' => 'Forum-Admin',
             'options' => [
                 'created_asc' => tra('Creation date (asc)'),
                 'created_desc' => tra('Creation Date (desc)'),
@@ -26,7 +28,9 @@ function prefs_forums_list()
         ],
         'forums_section_ordering' => [
             'name' => tra('Section order'),
+            'description' => tra('Default sort order used to list forum sections.'),
             'type' => 'list',
+            'help' => 'Forum-Listing',
             'options' => [
                 'section_asc' => tra('Name (asc)'),
                 'section_desc' => tra('Name (desc)'),

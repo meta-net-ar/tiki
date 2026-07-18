@@ -6,11 +6,13 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_captcha_list()
 {
+    $spamProtectionHelp = 'Spam-protection';
+
     return  [
         'captcha_type' => [
             'name' => tra('CAPTCHA type'),
             'description' => tra('Choose which CAPTCHA implementation is active.'),
-            'help' => 'Spam-protection',
+            'help' => $spamProtectionHelp,
             'type' => 'list',
             'options' => [
                 'default' => tra('Classic CAPTCHA'),
@@ -36,6 +38,7 @@ function prefs_captcha_list()
             ],
             'default' => 6,
             'units' => tra('characters'),
+            'help' => $spamProtectionHelp,
         ],
         'captcha_width' => [
             'name' => tra('CAPTCHA image width'),
@@ -43,6 +46,7 @@ function prefs_captcha_list()
             'type' => 'text',
             'units' => tra('pixels'),
             'default' => 180,
+            'help' => $spamProtectionHelp,
         ],
         'captcha_noise' => [
             'name' => tra('CAPTCHA image noise'),
@@ -50,6 +54,7 @@ function prefs_captcha_list()
             'hint' => tra('Choose a smaller number for less noise and easier reading.'),
             'type' => 'text',
             'default' => 100,
+            'help' => $spamProtectionHelp,
         ],
         'captcha_questions' => [
             'name' => tra('CAPTCHA questions and answers'),
@@ -61,6 +66,7 @@ function prefs_captcha_list()
                 'feature_antibot',
             ],
             'default' => '',
+            'help' => $spamProtectionHelp,
         ],
     ];
 }

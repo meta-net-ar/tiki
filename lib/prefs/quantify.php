@@ -13,6 +13,7 @@ function prefs_quantify_list()
             'type' => 'flag',
             'dependencies' => ['feature_multilingual'],
             'default' => 'n',
+            'help' => 'i18n',
         ],
     ];
 }

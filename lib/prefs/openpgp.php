@@ -7,12 +7,15 @@
 
 function prefs_openpgp_list()
 {
+    $openpgpHelp = 'OpenPGP';
+
     return [
         'openpgp_gpg_pgpmimemail' => [
             'name' => tra('PGP/MIME encrypted email messaging'),
             'description' => tra('Use OpenPGP PGP/MIME-compliant encrypted email messaging. All email messaging, notifications, and newsletters are sent as PGP/MIME-encrypted messages, signed with the signer key, and are completely opaque to outsiders. All user accounts need to be properly configured in a gnupg keyring with public keys associated with their tiki-account-related email addresses.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $openpgpHelp,
             'warning' => tra('Enable only if gpg, keyring, and tikiaccounts are properly configured for PGP/MIME functionality. NOTE: Requires that all accounts have their public-keys configured into gnupg-keyring, so do not allow non-administred registrations (or e.g. non-configured emails for newsletters etc) to site if this feature turned on.'),
         ],
         'openpgp_gpg_home' => [
@@ -22,6 +25,7 @@ function prefs_openpgp_list()
             'size' => 60,
             'filter' => 'text',
             'default' => '/home/www/.gnupg/',
+            'help' => $openpgpHelp,
         ],
         'openpgp_gpg_path' => [
             'name' => tra('Path to gpg executable'),
@@ -30,6 +34,7 @@ function prefs_openpgp_list()
             'size' => 60,
             'filter' => 'text',
             'default' => '/usr/bin/gpg',
+            'help' => $openpgpHelp,
         ],
         'openpgp_gpg_signer_passphrase_store' => [
             'name' => tra('Read signer pass phrase from prefs or from a file'),
@@ -40,6 +45,7 @@ function prefs_openpgp_list()
                 'file' => tra('file'),
             ],
             'default' => 'preferences',
+            'help' => $openpgpHelp,
         ],
         'openpgp_gpg_signer_passphrase' => [
             'name' => tra('Signer pass phrase'),
@@ -48,6 +54,7 @@ function prefs_openpgp_list()
             'size' => 60,
             'shorthint' => tr('leave empty if read from file'),
             'default' => '',
+            'help' => $openpgpHelp,
         ],
         'openpgp_gpg_signer_passfile' => [
             'name' => tra('Path to signer pass phrase filename'),
@@ -55,6 +62,7 @@ function prefs_openpgp_list()
             'type' => 'text',
             'size' => 60,
             'default' => '/home/www/.gnupg/signer/signerpass',
+            'help' => $openpgpHelp,
         ],
     ];
 }

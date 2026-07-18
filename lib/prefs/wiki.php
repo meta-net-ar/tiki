@@ -57,6 +57,19 @@ function prefs_wiki_list($partial = false)
         $comment_sort_orders[ $key . '_desc' ] = $label . ' ' . tr('descending');
     }
 
+    $wikiGeneralPreferencesHelp = 'Wiki-General-Preferences';
+    $performanceWikiHelp = 'Performance-Wiki';
+    $commentsHelp = 'comments';
+    $dynamicVariableHelp = 'Dynamic-Variable';
+    $wikiPageListingsHelp = 'Wiki-Page-Listings';
+    $watchHelp = 'Watch';
+    $wikiConfigHelp = 'Wiki-Config';
+    $backlinksHelp = 'Backlinks';
+    $ratingHelp = 'Rating';
+    $wikiFeaturesHelp = 'Wiki-Features';
+    $semanticAliasHelp = 'Page-Alias';
+    $autoTocHelp = 'Auto-TOC';
+
     return [
         'wiki_default_language' => [
             'name' => tra('Favorite language for new pages'),
@@ -66,6 +79,7 @@ function prefs_wiki_list($partial = false)
             'options' => $map,
             'default' => '',
             'tags' => ['basic'],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_page_regex' => [
             'name' => tra('Wiki link format'),
@@ -78,6 +92,7 @@ function prefs_wiki_list($partial = false)
                 'strict' => tra('Strict'),
             ],
             'default' => 'complete',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_url_scheme' => [
             'name' => tr('Wiki URL scheme'),
@@ -91,24 +106,28 @@ function prefs_wiki_list($partial = false)
                 'action' => 'regenerate_slugs',
             ]),
             'keywords' => 'slug manager',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_show_version' => [
             'name' => tra('Show the page version'),
             'description' => tra('Display the page version information when viewing the page.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_page_name_above' => [
             'name' => tra('Display the page name above the page area'),
             'description' => tra('Display the page name in small text at the top of each page (above the page\'s content).'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_page_name_inside' => [
             'name' => tra('Display the page name inside the page content'),
             'description' => tra('Display the page name inside the page content.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_pagename_strip' => [
             'name' => tra('Page name display stripper'),
@@ -116,6 +135,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'text',
             'size' => 5,
             'default' => '',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_authors_style' => [
             'name' => tra('Wiki author list style'),
@@ -130,12 +150,14 @@ function prefs_wiki_list($partial = false)
             ],
             'default' => 'none',
             'tags' => ['basic'],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_authors_style_by_page' => [
             'name' => tra('Specify wiki author list style per page'),
             'description' => tra('Enable the style in which the author list is displayed to be modified on a per-page basis.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_actions_bar' => [
             'name' => tra('Wiki page edit buttons location'),
@@ -147,11 +169,13 @@ function prefs_wiki_list($partial = false)
                 'both' => tra('Both'),
             ],
             'default' => 'bottom',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_collapse_expand_all_headings' => [
             'name' => tra('Collapse/expand all collapsible heading buttons'),
             'description' => tra('Enable the button allowing to collapse or expand all collapsible headings.'),
             'type' => 'flag',
+            'help' => $wikiGeneralPreferencesHelp,
             'default' => 'n',
         ],
         'wiki_page_navigation_bar' => [
@@ -164,6 +188,7 @@ function prefs_wiki_list($partial = false)
                 'both' => tra('Both'),
             ],
             'default' => 'bottom',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_topline_position' => [
             'name' => tra('Wiki top line location'),
@@ -176,12 +201,14 @@ function prefs_wiki_list($partial = false)
                 'none' => tra('Neither'),
             ],
             'default' => 'top',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_sharethis_encourage' => [
             'name' => tra('Display ShareThis icon prominently'),
             'description' => tra('Encourage sharing by displaying the ShareThis icon (the default is placing the icon in a drop-down list that requires a click to view).'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_cache' => [
             'name' => tra('Cache wiki pages (global)'),
@@ -199,12 +226,14 @@ function prefs_wiki_list($partial = false)
                 7200 => '2 ' . tra('hours'),
             ],
             'default' => 7200,
+            'help' => 'Wiki-Config#Cache_Wiki_pages',
         ],
         'wiki_last_modified_header' => [
             'name' => tra('Last modified header'),
             'description' => tra('Allow to ensure that a wiki page has not changed since the previous caching. This option helps clients (browsers, crawlers) to use less bandwidth and improve crawling and indexing of wiki pages.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $performanceWikiHelp,
         ],
         'wiki_comments_allow_per_page' => [
             'name' => tra('Allow comments per wiki page'),
@@ -216,6 +245,7 @@ function prefs_wiki_list($partial = false)
                 'o' => tra('Enable (default Off)'),
             ],
             'default' => 'n',
+            'help' => $commentsHelp,
         ],
         'wiki_feature_copyrights' => [
             'name' => tra('Wiki copyright'),
@@ -225,6 +255,7 @@ function prefs_wiki_list($partial = false)
                 'feature_wiki',
             ],
             'default' => 'n',
+            'help' => 'copyright',
         ],
         'wiki_badchar_prevent' => [
             'name' => tra('Prevent special characters in page names'),
@@ -232,6 +263,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_ranking_reload_probability' => [
             'name' => tra('Page ranking reload probability'),
@@ -240,12 +272,14 @@ function prefs_wiki_list($partial = false)
             'size' => 7,
             'filter' => 'digits',
             'default' => 1000,
+            'help' => $performanceWikiHelp,
         ],
         'wiki_encourage_contribution' => [
             'name' => tra('Encourage contribution to wiki pages by anonymous'),
             'description' => tra('When a page is not editable because the user is anonymous, display the edit buttons anyway. The visitor will be prompted with a log-in screen and will be encouraged to register in order to be able to edit the page.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_timeout_warning' => [
             'name' => tra('Warn before page lock timeout'),
@@ -253,18 +287,20 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_dynvar_style' => [
             'name' => tra('Dynamic variables'),
             'description' => tra('Global snippets of text that can be included in wiki pages and edited in place.'),
             'type' => 'list',
-            'help' => 'Dynamic-Variable',
+            'help' => $dynamicVariableHelp,
             'options' => [
                 'disable' => tra('Disabled'),
                 'single' => tra('Single (%varname%)'),
                 'double' => tra('Double (%%varname%%)'),
             ],
             'default' => 'single',
+            'help' => $dynamicVariableHelp,
         ],
         'wiki_dynvar_multilingual' => [
             'name' => tra('Multilingual dynamic variables'),
@@ -274,15 +310,16 @@ function prefs_wiki_list($partial = false)
                 'feature_multilingual',
             ],
             'default' => 'n',
+            'help' => $dynamicVariableHelp,
         ],
         'wiki_edit_plugin' => [
             'name' => tra('Allow plugin-specific edits'),
             'description' =>
-                tra('Add an icon next to each plugin usage to enable editing the plugin in a popup form, without needing to edit the whole page.')
-                . ' ' . tra('This feature is unavailable outside wiki pages, whether or not this preference is enabled.') // This may be by design, or just because it was faster to implement.
-                ,
+                tr('Add an icon next to each plugin usage to enable editing the plugin in a popup form, without needing to edit the whole page. %0 This feature is unavailable outside wiki pages, whether or not this preference is enabled.', '<br>'),
+                // This may be by design, or just because it was faster to implement.
             'type' => 'flag',
             'default' => 'y',
+            'help' => 'Plugins',
         ],
         'wiki_edit_section' => [
             'name' => tra('Allow section-specific edits'),
@@ -290,6 +327,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_edit_section_level' => [
             'name' => tra('Section-specific edits maximum level'),
@@ -305,6 +343,7 @@ function prefs_wiki_list($partial = false)
                 '6' => '6',
             ],
             'default' => '0',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_edit_icons_toggle' => [
             'name' => tra('Only display focused edit icons (for sections and/or plugins) on request'),
@@ -312,6 +351,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_edit_minor' => [
             'name' => tra('Allow minor edits of wiki pages'),
@@ -321,259 +361,332 @@ function prefs_wiki_list($partial = false)
                 'textFilter' => 'tiki_p_minor',
             ],
             'default' => 'n',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_comments_displayed_default' => [
             'name' => tra('Display comment list by default'),
+            'description' => tra('Automatically load and show wiki page comments when the page is viewed.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $commentsHelp,
         ],
         'wiki_comments_form_displayed_default' => [
             'name' => tra('Display Post new comment form by default'),
+            'description' => tra('Show the post new comment form expanded when wiki page comments are displayed.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $commentsHelp,
         ],
         'wiki_comments_print' => [
             'name' => tra('Also print comments'),
+            'description' => tra('Include wiki page comments in the printable version of the page.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $commentsHelp,
         ],
         'wiki_comments_per_page' => [
             'name' => tra('Number per page'),
+            'description' => tra('Number of wiki page comments shown per page in the comment list.'),
             'type' => 'text',
             'size' => '5',
             'units' => tra('comments'),
             'default' => 10,
+            'help' => $commentsHelp,
         ],
         'wiki_comments_default_ordering' => [
             'name' => tra('Display order'),
+            'description' => tra('Default sort order for wiki page comments (by date, points, or other fields).'),
             'type' => 'list',
             'options' => $comment_sort_orders,
             'default' => 'points_desc',
+            'help' => $commentsHelp,
         ],
         'wiki_comments_simple_ratings' => [
             'name' => tra('Simple wiki comment ratings'),
             'description' => tra('Enable users to rate comments based on a simple numeric scale.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $ratingHelp,
         ],
         'wiki_comments_simple_ratings_options' => [
             'name' => tra('Wiki rating options'),
             'description' => tra('List of options available for the rating of wiki comments.'),
             'type' => 'text',
             'default' => "0,1,2,3,4,5",
+            'help' => $ratingHelp,
         ],
         'wiki_uses_slides' => [
             'name' => tra('Add a slideshow button on wiki pages'),
+            'description' => tra('Show a Slideshow link on wiki pages when the Slideshow feature is enabled and the page supports it.'),
             'type' => 'flag',
-            'help' => 'Slideshow',
             'default' => 'n',
             'tags' => ['basic'],
+            'help' => 'Slideshow',
         ],
         'wiki_creator_admin' => [
             'name' => tra('Page creators are administrators of their pages'),
+            'description' => tra('Grant the page creator all wiki permissions on pages they created.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiFeaturesHelp,
         ],
         'wiki_watch_author' => [
             'name' => tra('Create watch for author on page creation'),
+            'description' => tra('Pre-check the watch option when a user creates a new wiki page so the author is notified of later changes.'),
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => [
                 'feature_user_watches',
             ],
+            'help' => $watchHelp,
         ],
         'wiki_watch_comments' => [
             'name' => tra('Enable watches on comments'),
+            'description' => tra('Allow users to watch wiki page comments and send email notifications when new comments are posted.'),
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => [
                 'feature_user_watches',
             ],
+            'help' => $watchHelp,
         ],
         'wiki_watch_editor' => [
             'name' => tra('Enable watch events when you are the editor'),
+            'description' => tra('Allow users to receive watch notifications for wiki pages they edited themselves (opt-in per user).'),
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => [
                 'feature_user_watches',
             ],
+            'help' => $watchHelp,
         ],
         'wiki_watch_minor' => [
             'name' => tra('Watch minor edits'),
+            'description' => tra('Send watch notifications for minor wiki edits. When disabled, minor edits do not trigger notifications.'),
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => [
                 'feature_user_watches',
             ],
+            'help' => $watchHelp,
         ],
         'wiki_list_id' => [
             'name' => tra('Page ID'),
+            'description' => tra('Show the page ID column in wiki page listings.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Wiki-Config#Page_ID',
         ],
         'wiki_list_name' => [
             'name' => tra('Name'),
+            'description' => tra('Show the page name column in wiki page listings.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $wikiConfigHelp,
         ],
         'wiki_list_name_len' => [
             'name' => tra('Page name maximum displayed length'),
+            'description' => tra('Maximum number of characters shown for page names in wiki page listings.'),
             'hint' => tra($truncationHint),
             'type' => 'text',
             'size' => '3',
             'units' => tra('characters'),
             'filter' => 'digits',
             'default' => '40',
+            'help' => $wikiConfigHelp,
         ],
         'wiki_list_hits' => [
             'name' => tra('Hits'),
+            'description' => tra('Show the page hits column in wiki page listings (requires Statistics).'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => 'Using-Wiki-Pages',
         ],
         'wiki_list_lastmodif' => [
             'name' => tra('Last modification date'),
+            'description' => tra('Show the last modification date column in wiki page listings.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_creator' => [
             'name' => tra('Creator'),
+            'description' => tra('Show the page creator column in wiki page listings.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_user' => [
             'name' => tra('Last modified by'),
+            'description' => tra('Show the last editor column in wiki page listings.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_lastver' => [
             'name' => tra('Version'),
+            'description' => tra('Show the current version number column in wiki page listings.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_comment' => [
             'name' => tra('Comment of the latest edit'),
+            'description' => tra('Show the latest edit comment in wiki page listings.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_comment_len' => [
             'name' => tra("Maximum displayed length of the latest edit's comment"),
+            'description' => tra('Maximum number of characters shown for the latest edit comment in wiki page listings.'),
             'hint' => tra($truncationHint),
             'type' => 'text',
             'size' => '3',
             'units' => tra('characters'),
             'default' => '200',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_description' => [
             'name' => tra('Description'),
+            'description' => tra('Show the page description in wiki page listings.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_description_len' => [
             'name' => tra('Description maximum displayed length'),
+            'description' => tra('Maximum number of characters shown for page descriptions in wiki page listings.'),
             'hint' => tra($truncationHint),
             'type' => 'text',
             'size' => '3',
             'units' => tra('characters'),
             'filter' => 'digits',
             'default' => '200',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_status' => [
             'name' => tra('Status'),
+            'description' => tra('Show the locked or unlocked status column in wiki page listings.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_versions' => [
             'name' => tra('Versions'),
+            'description' => tra('Show the version column in wiki page listings (links to page history when permitted).'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_links' => [
             'name' => tra('Links'),
+            'description' => tra('Show the outbound links count column in wiki page listings.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_backlinks' => [
             'name' => tra('Backlinks'),
             'description' => tra('Present a list of pages that link to the current page.'),
-            'help' => 'Backlinks',
+            'help' => $backlinksHelp,
             'type' => 'flag',
             'default' => 'n',
         ],
         'wiki_list_size' => [
             'name' => tra('Size'),
+            'description' => tra('Show the page size column in wiki page listings.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_language' => [
             'name' => tra('Language'),
+            'description' => tra('Show the page language column in wiki page listings.'),
             'type' => 'flag',
             'dependencies' => [
                 'feature_multilingual',
             ],
             'default' => 'n',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_categories' => [
             'name' => tra('Categories'),
+            'description' => tra('Show assigned category names in wiki page listings.'),
             'type' => 'flag',
             'dependencies' => [
                 'feature_categories',
             ],
             'default' => 'n',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_categories_path' => [
             'name' => tra('Categories path'),
+            'description' => tra('Show full category paths instead of category names in wiki page listings.'),
             'type' => 'flag',
             'dependencies' => [
                 'feature_categories',
             ],
             'default' => 'n',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_sortorder' => [
             'name' => tra('Default sort order'),
+            'description' => tra('Default column used to sort wiki page listings.'),
             'type' => 'list',
             'options' => $wiki_sort_columns,
             'default' => 'lastModif',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_sortdirection' => [
             'name' => tra('Sort Direction'),
+            'description' => tra('Default sort direction for wiki page listings.'),
             'type' => 'radio',
             'options' => [
                 'desc' => tra('Descending'),
                 'asc' => tra('Ascending'),
             ],
             'default' => 'desc',
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_list_rating' => [
             'name' => tra('Rating'),
+            'description' => tra('Show the page rating column in wiki page listings (requires Polls and wiki ratings).'),
             'type' => 'flag',
             'dependencies' => [
                 'feature_polls',
                 'feature_wiki_ratings',
             ],
             'default' => 'n',
-            'tags' => ['experimental'] // Column content is most unclear. Assumes poll option labels are numbers. Chealer 2017-05-22
+            'tags' => ['experimental'], // Column content is most unclear. Assumes poll option labels are numbers. Chealer 2017-05-22
+            'help' => $wikiPageListingsHelp,
         ],
         'wiki_discuss_visibility' => [
             'name' => tra('Visibility of discussion'),
-            'description' => tra('Just a button among others (default), or special section'),
+            'description' => tra('Where to show wiki page discussion controls: in the page button bar or in a dedicated section above it.'),
             'type' => 'list',
             'options' => [
                 'button' => tra('In the button bar (default)'),
                 'above' => tra('Special section above button bar'),
             ],
             'default' => 'button',
+            'help' => $wikiFeaturesHelp,
         ],
         'wiki_forum_id' => [
             'name' => tra('Forum for discussion'),
+            'description' => tra('Forum used for wiki page discussions when Discuss pages on forums is enabled.'),
             'type' => 'list',
             'options' => $wiki_forums,
             'default' => '',
+            'help' => $wikiFeaturesHelp,
         ],
+
         'wiki_keywords' => [
             'name' => tra('Keywords'),
             'description' => tra('Allow management of keywords on a per-page basis.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiFeaturesHelp,
         ],
         'wiki_likepages_samelang_only' => [
             'name' => tra('Similar pages only listed in same language'),
@@ -581,12 +694,14 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'dependencies' => [ 'feature_multilingual' ],
             'default' => 'n',
+            'help' => $wikiFeaturesHelp,
         ],
         'wiki_mandatory_edit_summary' => [
             'name' => tra('Mandatory wiki page edit summary'),
             'description' => tra('Reject save attempts that do not include an edit summary describing the changes made.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_freetags_edit_position' => [
             'name' => tra('Position of tags selection'),
@@ -598,6 +713,7 @@ function prefs_wiki_list($partial = false)
                 'freetagstab' => tra('Tags tab'),
             ],
             'default' => 'properties',
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_structure_bar_position' => [
             'name' => tra('Structure navigation bar location'),
@@ -610,6 +726,7 @@ function prefs_wiki_list($partial = false)
                 'none' => tra('Neither'),
             ],
             'default' => 'top',
+            'help' => $wikiFeaturesHelp,
         ],
         'wiki_backlinks_name_len' => [
             'name' => tra('Backlink page names maximum displayed length'),
@@ -620,6 +737,7 @@ function prefs_wiki_list($partial = false)
             'filter' => 'digits',
             'dependencies' => [ 'feature_backlinks' ],
             'default' => 0,
+            'help' => $backlinksHelp,
         ],
         'wiki_backlinks_show_post' => [
             'name' => tra('Show blog posts'),
@@ -627,6 +745,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => ['feature_backlinks'],
+            'help' => $backlinksHelp,
         ],
         'wiki_backlinks_show_forum_post' => [
             'name' => tra('Show forum posts'),
@@ -634,6 +753,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => ['feature_backlinks'],
+            'help' => $backlinksHelp,
         ],
         'wiki_backlinks_show_comment' => [
             'name' => tra('Show comments'),
@@ -641,6 +761,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => ['feature_backlinks'],
+            'help' => $backlinksHelp,
         ],
         'wiki_backlinks_show_article' => [
             'name' => tra('Show articles'),
@@ -648,6 +769,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => ['feature_backlinks'],
+            'help' => $backlinksHelp,
         ],
         'wiki_backlinks_show_trackeritem' => [
             'name' => tra('Show tracker items'),
@@ -655,6 +777,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => ['feature_backlinks'],
+            'help' => $backlinksHelp,
         ],
         'wiki_backlinks_show_tracker' => [
             'name' => tra('Show trackers'),
@@ -662,6 +785,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => ['feature_backlinks'],
+            'help' => $backlinksHelp,
         ],
         'wiki_backlinks_show_trackerfield' => [
             'name' => tra('Show tracker fields'),
@@ -669,6 +793,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => ['feature_backlinks'],
+            'help' => $backlinksHelp,
         ],
         'wiki_backlinks_show_calendar_event' => [
             'name' => tra('Show calendar events'),
@@ -676,19 +801,22 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => ['feature_backlinks'],
+            'help' => $backlinksHelp,
         ],
         'wiki_simple_ratings' => [
             'name' => tra('Simple wiki ratings'),
             'description' => tra('Enable users to rate wiki pages based on a simple numeric scale.'),
             'type' => 'flag',
             'default' => 'n',
-            'tags' => ['experimental'] // Confusion with "Rating" (non-simple), results display seems broken in 15.x and trunk as of 2017-05-22 (probably the bug reported in ticket #5971). Poor configuration, fails to validate options. No documentation. Chealer
+            'tags' => ['experimental'], // Confusion with "Rating" (non-simple), results display seems broken in 15.x and trunk as of 2017-05-22 (probably the bug reported in ticket #5971). Poor configuration, fails to validate options. No documentation. Chealer
+            'help' => $ratingHelp,
         ],
         'wiki_simple_ratings_options' => [
             'name' => tra('Wiki rating options'),
             'description' => tra('List of options available for the rating of wiki pages'),
             'type' => 'text',
             'default' => "0,1,2,3,4,5",
+            'help' => $ratingHelp,
         ],
         'wiki_pagealias_tokens' => [
             'name' => tra('Semantic link types to use as page alias markers'),
@@ -696,12 +824,13 @@ function prefs_wiki_list($partial = false)
             'type' => 'text',
             'dependencies' => ['feature_wiki_pagealias'],
             'default' => 'alias',
+            'help' => $semanticAliasHelp,
         ],
         'wiki_prefixalias_tokens' => [
             'name' => tra('Redirect pages using these prefix-alias semantic links'),
             'description' => tra('Comma-separated list of page name prefixes for pages that will be redirected to other pages with a semantic link'),
             'type' => 'text',
-            'help' => 'Semantic-Alias',
+            'help' => $semanticAliasHelp,
             'size' => '30',
             'dependencies' => [
                 'feature_wiki_1like_redirection',
@@ -714,18 +843,20 @@ function prefs_wiki_list($partial = false)
             'description' => tr('Enable the separation of a wiki page\'s content into a set of two or more paginated pages.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $wikiFeaturesHelp,
         ],
         'wiki_page_separator' => [
             'name' => tr('Wiki page separator'),
             'description' => tr('The separator to use in wiki page content to mark the end of each page section'),
             'type' => 'text',
             'default' => '...page...',
+            'help' => $wikiFeaturesHelp,
         ],
         'wiki_auto_toc' => [
             'name' => tr('Wiki auto-toc'),
             'description' => tr('Automatic table of contents generation for wiki pages. The generated table of contents will display as a fixed-position aside next to the page contents. This setting can be toggled per page, in the page properties.'),
             'type' => 'flag',
-            'help' => 'Auto-TOC',
+            'help' => $autoTocHelp,
             'default' => 'n',
             'keywords' => 'autotoc',
         ],
@@ -738,6 +869,7 @@ function prefs_wiki_list($partial = false)
                 'wiki_auto_toc',
             ],
             'keywords' => 'autotoc',
+            'help' => $autoTocHelp,
         ],
         'wiki_toc_pos' => [
             'name' => tr('Table of contents position'),
@@ -753,6 +885,7 @@ function prefs_wiki_list($partial = false)
                 'wiki_auto_toc',
             ],
             'keywords' => 'autotoc auto-toc',
+            'help' => $autoTocHelp,
         ],
         'wiki_toc_offset' => [
             'name' => tr('Table of contents offset'),
@@ -765,6 +898,7 @@ function prefs_wiki_list($partial = false)
                 'wiki_auto_toc',
             ],
             'keywords' => 'autotoc auto-toc',
+            'help' => $autoTocHelp,
         ],
         'wiki_toc_default' => [
             'name' => tr('Table of contents on every page'),
@@ -779,6 +913,7 @@ function prefs_wiki_list($partial = false)
                 'wiki_auto_toc',
             ],
             'keywords' => 'autotoc auto-toc',
+            'help' => $autoTocHelp,
         ],
         'wiki_toc_tabs' => [
             'name' => tr('Tabs'),
@@ -793,6 +928,7 @@ function prefs_wiki_list($partial = false)
                 'wiki_auto_toc',
             ],
             'keywords' => 'autotoc auto-toc',
+            'help' => $autoTocHelp,
         ],
         'wiki_page_hide_title' => [
             'name' => tr('Add an option to hide the page title per wiki page'),
@@ -800,6 +936,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => [],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_customize_title_tag' => [
             'name' => tr('Adding the content of the title tag'),
@@ -810,7 +947,8 @@ function prefs_wiki_list($partial = false)
                 'y' => tra('Yes'),
                 'n' => tra('No')
             ],
-            'dependencies' => []
+            'dependencies' => [],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_heading_links' => [
             'name' => tr('Anchor links on headings'),
@@ -828,6 +966,7 @@ function prefs_wiki_list($partial = false)
             ],
             'default' => 'y',
             'dependencies' => [],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_plugin_include_link_original' => [
             'name' => tr('Force link to included page'),
@@ -835,6 +974,7 @@ function prefs_wiki_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => ['wikiplugin_include'],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_date_field' => [
             'name' => tr('Date Field'),
@@ -850,6 +990,7 @@ function prefs_wiki_list($partial = false)
             'dependencies' => [
                 'feature_search',
             ],
+            'help' => $wikiFeaturesHelp,
         ],
         'wiki_description_edit_tab_input' => [
             'name' => tr('Display input at top of Edit tab'),
@@ -858,7 +999,8 @@ function prefs_wiki_list($partial = false)
             'default' => 'n',
             'dependencies' => [
                 'feature_wiki_description'
-            ]
+            ],
+            'help' => $wikiGeneralPreferencesHelp,
         ],
         'wiki_page_actions_groups' => [
             'name' => tra('Groups that can see wiki page actions button'),
@@ -870,7 +1012,7 @@ function prefs_wiki_list($partial = false)
             ],
             'default' => [],
             'tags' => ['basic'],
-            'help' => 'Page-Actions-Button',
+            'help' => $wikiGeneralPreferencesHelp,
             'profile_reference' => 'group',
             'separator' => ',',
             'hint' => tra('Leave empty to show to all groups'),

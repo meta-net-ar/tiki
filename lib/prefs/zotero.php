@@ -6,10 +6,12 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_zotero_list()
 {
+    $zoteroHelp = 'Zotero';
+
     return [
         'zotero_enabled' => [
             'name' => tra('Zotero bibliography'),
-            'help' => 'Zotero',
+            'help' => $zoteroHelp,
             'description' => tra('Connect Tiki to the <a href="https://www.zotero.org">Zotero</a> online bibliography management system.'),
             'type' => 'flag',
             'hint' => tr('You must supply the following items: Zotero Client Key, Zotero Client Secret, Zotero Group, and Zotero Reference Style.'),
@@ -21,6 +23,7 @@ function prefs_zotero_list()
             'type' => 'text',
             'size' => 20,
             'default' => '',
+            'help' => $zoteroHelp,
         ],
         'zotero_client_secret' => [
             'name' => tra('Zotero client secret'),
@@ -28,6 +31,7 @@ function prefs_zotero_list()
             'type' => 'text',
             'size' => 20,
             'default' => '',
+            'help' => $zoteroHelp,
         ],
         'zotero_group_id' => [
             'name' => tra('Zotero group ID'),
@@ -36,6 +40,7 @@ function prefs_zotero_list()
             'filter' => 'digits',
             'size' => 7,
             'default' => '',
+            'help' => $zoteroHelp,
         ],
         'zotero_style' => [
             'name' => tra('Zotero reference style'),
@@ -44,6 +49,7 @@ function prefs_zotero_list()
             'filter' => 'text',
             'size' => 20,
             'default' => '',
+            'help' => $zoteroHelp,
         ],
     ];
 }

@@ -29,6 +29,7 @@ function prefs_jquery_list($partial = false)
     return [
         'jquery_effect' => [
             'name' => tra('Effect for modules'),
+            'description' => tra('Default jQuery animation effect used when showing or hiding modules.'),
             'type' => 'list',
             'options' => $jquery_effect_options,
             'help' => 'JQuery#Effects',
@@ -37,6 +38,7 @@ function prefs_jquery_list($partial = false)
         ],
         'jquery_effect_tabs' => [
             'name' => tra('Effect for tabs'),
+            'description' => tra('Default jQuery animation effect used when switching between tabs.'),
             'type' => 'list',
             'options' => $jquery_effect_options,
             'help' => 'JQuery#Effects',
@@ -44,7 +46,9 @@ function prefs_jquery_list($partial = false)
         ],
         'jquery_effect_speed' => [
             'name' => tra('Speed'),
+            'description' => tra('Animation speed for module show/hide effects.'),
             'type' => 'list',
+            'help' => 'UI-Effects',
             'options' => [
                 'fast' => tra('Fast'),
                 'normal' => tra('Normal'),
@@ -54,7 +58,9 @@ function prefs_jquery_list($partial = false)
         ],
         'jquery_effect_direction' => [
             'name' => tra('Direction'),
+            'description' => tra('Animation direction for module show/hide effects.'),
             'type' => 'list',
+            'help' => 'UI-Effects',
             'options' => [
                 'vertical' => tra('Vertical'),
                 'horizontal' => tra('Horizontal'),
@@ -67,7 +73,9 @@ function prefs_jquery_list($partial = false)
         ],
         'jquery_effect_tabs_speed' => [
             'name' => tra('Speed'),
+            'description' => tra('Animation speed for tab switching effects (fast, normal, or slow).'),
             'type' => 'list',
+            'help' => 'UI-Effects',
             'options' => [
                 'fast' => tra('Fast'),
                 'normal' => tra('Normal'),
@@ -77,7 +85,9 @@ function prefs_jquery_list($partial = false)
         ],
         'jquery_effect_tabs_direction' => [
             'name' => tra('Direction'),
+            'description' => tra('Animation direction for tab switching effects.'),
             'type' => 'list',
+            'help' => 'UI-Effects',
             'options' => [
                 'vertical' => tra('Vertical'),
                 'horizontal' => tra('Horizontal'),
@@ -112,6 +122,7 @@ function prefs_jquery_list($partial = false)
             'description' => tra('Add "SmartMenus" to Bootstrap menus. See smartmenus.org for more.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => 'Menu',
             'tags' => ['advanced'],
             'keywords' => 'smart menu',
         ],
@@ -119,6 +130,7 @@ function prefs_jquery_list($partial = false)
             'name' => tra('SmartMenus collapsible behavior'),
             'description' => tra('Parent items behavior in collapsible (mobile) view.'),
             'type' => 'list',
+            'help' => 'Menu',
             'options' => [
                 'default' => tra('Default'),
                 'toggle' => tra('Toggle'),

@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_error_list()
 {
+    $generalPreferencesHelp = 'General-Preferences';
+
     return [
         'error_reporting_adminonly'  => [
             'name'        => tra('PHP errors visible to admin only'),
@@ -15,6 +17,7 @@ function prefs_error_list()
             'type'        => 'flag',
             'description' => tr('PHP Errors will be shown to only the Admin user.'),
             'default'     => 'y',
+            'help' => $generalPreferencesHelp,
         ],
         'error_reporting_level'      => [
             'name'        => tra('PHP Error reporting level'),
@@ -28,6 +31,7 @@ function prefs_error_list()
                 1    => tra('According to the PHP configuration'),
             ],
             'default'     => 2039,    //    E_ALL & ~E_NOTICE
+            'help' => $generalPreferencesHelp,
         ],
         'error_tracking_enabled_php' => [
             'name'        => tra('Track PHP errors'),
@@ -37,6 +41,7 @@ function prefs_error_list()
             'dependencies' => [
                 'error_tracking_dsn'
             ],
+            'help' => $generalPreferencesHelp,
         ],
         'error_tracking_enabled_js'  => [
             'name'        => tra('Track JavaScript errors'),
@@ -46,6 +51,7 @@ function prefs_error_list()
             'dependencies' => [
                 'error_tracking_dsn'
             ],
+            'help' => $generalPreferencesHelp,
         ],
         'error_tracking_dsn'         => [
             'name'        => tra('Data Source Name (DSN)'),
@@ -53,6 +59,7 @@ function prefs_error_list()
             'type'        => 'text',
             'filter'      => 'url',
             'default'     => '',
+            'help' => $generalPreferencesHelp,
         ],
         'error_tracking_sample_rate' => [
             'name'        => tra('Sample rate'),
@@ -60,6 +67,7 @@ function prefs_error_list()
             'type'        => 'text',
             'default'     => '1',
             'tags'        => ['advanced'],
+            'help' => $generalPreferencesHelp,
         ],
         'error_tracking_tracing_enabled_php' => [
             'name'        => tra('Enable PHP performance tracing (Sentry/GlitchTip)'),
@@ -70,6 +78,7 @@ function prefs_error_list()
             'dependencies' => [
                 'error_tracking_enabled_php'
             ],
+            'help' => $generalPreferencesHelp,
         ],
         'error_tracking_tracing_enabled_js' => [
             'name'        => tra('Enable JavaScript performance tracing (Sentry/GlitchTip)'),
@@ -80,6 +89,7 @@ function prefs_error_list()
             'dependencies' => [
                 'error_tracking_enabled_js'
             ],
+            'help' => $generalPreferencesHelp,
         ],
         'error_tracking_traces_sample_rate' => [
             'name'        => tra('Traces sample rate'),
@@ -87,12 +97,14 @@ function prefs_error_list()
             'type'        => 'text',
             'default'     => '0.1',
             'tags'        => ['advanced'],
+            'help' => $generalPreferencesHelp,
         ],
         'error_generic_non_admins'   => [
             'name'        => tra('Show generic error message'),
             'description' => tra('Show a generic error message for non admins users. The error is logged to the database.'),
             'type'        => 'flag',
             'default'     => 'n',
+            'help' => $generalPreferencesHelp,
         ],
         'error_generic_message'      => [
             'name'        => tra('Generic error message'),
@@ -100,6 +112,7 @@ function prefs_error_list()
             'type'        => 'text',
             'filter'      => 'text',
             'default'     => 'There was an issue with your request, please try again later.',
+            'help' => $generalPreferencesHelp,
         ],
     ];
 }

@@ -19,6 +19,7 @@ function prefs_workspace_list()
                 'feature_perspective',
                 'feature_categories',
             ],
+            'help' => 'Workspace-UI',
         ],
         'workspace_root_category' => [
             'name' => tr('Workspace root category'),
@@ -29,6 +30,7 @@ function prefs_workspace_list()
             'perspective' => false,
             'warning' => tr('This value is automatically managed and should not need to be modified manually.'),
             'profile_reference' => 'category',
+            'help' => 'Workspace-UI#Workspace_organization',
         ],
     ];
 }

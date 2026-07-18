@@ -5,7 +5,7 @@
     <a class="alert-link" href="tiki-admin.php?page=rss">{tr}Click Here{/tr}</a>.
     <hr/>
     {tr}To use feeds in a text area (Wiki page, etc), a <a class="alert-link" href="tiki-admin_modules.php">module</a> or a template, use {literal}{rss id=x}{/literal}, where x is the ID of the feed.{/tr}
-    {tr}To use them to generate articles, use the <a class="alert-link" href="https://doc.tiki.org/Article+generator" target="_blank">Article generator</a> for that specific feed{/tr}.
+    {tr}To use them to generate articles, use the <a class="alert-link" href="https://doc.tiki.org/Article-generator" target="_blank">Article generator</a> for that specific feed{/tr}.
 {/remarksbox}
 
 {if $preview eq 'y'}
@@ -220,7 +220,7 @@
             <h2>{tr _0='"'|cat:$articleConfig.feed_name|cat:'"'|escape}Article Generator for %0{/tr}</h2>
             {remarksbox type="tip" title="{tr}Tips{/tr}"}
                     {tr}Once you have defined the settings below, each new item in this rss feed will generate a new article{/tr}.
-                    <a target="tikihelp" href="https://doc.tiki.org/Article+generator" class="tikihelp alert-link" style="float:none" title="{tr}Article Generator:{/tr}
+                    <a target="tikihelp" href="https://doc.tiki.org/Article-generator" class="tikihelp alert-link" style="float:none" title="{tr}Article Generator:{/tr}
                         {tr}Documentation{/tr}">
                         {icon name="help"}
                     </a>

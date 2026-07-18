@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_webcron_list()
 {
+    $cronHelp = 'Cron';
+
     return [
         'webcron_enabled' => [
             'name' => tra('Enabled'),
@@ -17,12 +19,14 @@ function prefs_webcron_list()
         'webcron_type' => [
             'name' => tra('How to trigger Web Cron'),
             'type' => 'list',
+            'description' => tra('How scheduled tasks are triggered: by an external service calling the Web Cron URL, by JavaScript on page loads, or both.'),
             'options' => [
                 'url' => tra('Calling the Web Cron URL'),
                 'js' => tra('Adding JavaScript that calls Web Cron'),
                 'both' => tra('URL and JavaScript'),
             ],
             'default' => 'both',
+            'help' => $cronHelp,
         ],
         'webcron_run_interval' => [
             'name' => tra('Run interval'),
@@ -32,12 +36,14 @@ function prefs_webcron_list()
             'filter' => 'digits',
             'units' => tra('seconds'),
             'default' => 60,
+            'help' => $cronHelp,
         ],
         'webcron_token' => [
             'name' => tra('Token'),
             'description' => tra('The token to use when running the cron manually'),
             'type' => 'text',
             'default' => md5(phpseclib3\Crypt\Random::string(100)),
+            'help' => $cronHelp,
         ],
-    ];
+    ]; // TODO: update cron help page
 }

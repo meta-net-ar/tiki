@@ -7,11 +7,13 @@
 function prefs_wizard_list()
 {
     return [
-            'wizard_admin_hide_on_login' => [
+        'wizard_admin_hide_on_login' => [
             'name' => tra('Hide admin wizard on log-in when an admin user logs in'),
+            'description' => tra('When enabled, administrators are not redirected to the setup wizard after logging in.'),
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['basic'],
-            ],
+            'help' => 'Admin-Wizard',
+        ],
     ];
 }

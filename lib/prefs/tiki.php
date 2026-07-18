@@ -6,6 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_tiki_list()
 {
+    $contentDeliveryNetworkHelp = 'Content-Delivery-Network';
+    $navigationsHelp = 'Navigation';
+    $generalSecurityHelp = 'General-Security';
+    $paginationLinksHelp = 'Pagination-Links';
+    $minifyJavascriptHelp = 'performance#Minify_JavaScript';
+    $minifyCssHelp = 'performance#Minify_CSS';
+    $performanceSessionsHelp = 'Performance-Sessions';
+
     return [
         'tiki_version_check_frequency' => [
             'name' => tra('Check frequency'),
@@ -23,6 +31,7 @@ function prefs_tiki_list()
             ],
             'default' => 604800,
             'tags' => ['basic'],
+            'help' => 'Automatic-updates',
         ],
         'tiki_release_cycle' => [
             'name' => tr('Upgrade cycle'),
@@ -44,7 +53,7 @@ function prefs_tiki_list()
             'type' => 'flag',
             'default' => 'n',
             'admin' => 'tiki-performance_stats.php',
-            'help' => 'Real User Measurement',
+            'help' => 'Real-User-Measurement',
         ],
         'tiki_minify_javascript' => [
             'name' => tra('Minify JavaScript'),
@@ -53,6 +62,7 @@ function prefs_tiki_list()
             'perspective' => false,
             'default' => 'n',
             'tags' => ['basic'],
+            'help' => $minifyJavascriptHelp,
         ],
         'tiki_minify_late_js_files' => [
             'name' => tra('Minify late JavaScript'),
@@ -60,6 +70,7 @@ function prefs_tiki_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => 'n',
+            'help' => $minifyJavascriptHelp,
         ],
         'tiki_minify_css' => [
             'name' => tra('Minify CSS'),
@@ -68,6 +79,7 @@ function prefs_tiki_list()
             'perspective' => false,
             'default' => 'n',
             'tags' => ['basic'],
+            'help' => $minifyCssHelp,
         ],
         'tiki_minify_css_single_file' => [
             'name' => tra('Minify CSS into a single file'),
@@ -77,6 +89,7 @@ function prefs_tiki_list()
             'warning' => tra('This setting may not work out of the box for all styles. Import needs to use @import url("...") and not @import "..."'),
             'default' => 'n',
             'tags' => ['basic'],
+            'help' => $minifyCssHelp,
         ],
         'tiki_same_day_time_only' => [
             'name' => tra('Skip date for same day'),
@@ -84,6 +97,7 @@ function prefs_tiki_list()
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => 'Date-and-time',
         ],
         'tiki_cachecontrol_session' => [
             'name' => tra('Cache-control header'),
@@ -92,6 +106,7 @@ function prefs_tiki_list()
             'filter' => 'striptags',
             'hint' => tra('Example: no-cache, pre-check=0, post-check=0'),
             'default' => '',
+            'help' => $performanceSessionsHelp,
         ],
         'tiki_cachecontrol_nosession' => [
             'name' => tra('Cache-control header (no session)'),
@@ -100,6 +115,7 @@ function prefs_tiki_list()
             'filter' => 'striptags',
             'dependencies' => [ 'session_silent' ],
             'default' => '',
+            'help' => $performanceSessionsHelp,
         ],
         'tiki_cachecontrol_maxage' => [
             'name' => tra('Cache-Control Max Age'),
@@ -107,12 +123,13 @@ function prefs_tiki_list()
             'type' => 'text',
             'filter' => 'digits',
             'default' => '86400',
+            'help' => 'performance',
         ],
         'tiki_cdn' => [
             'name' => tra('Content delivery networks'),
             'description' => tra('Use alternate domains to serve static files from this Tiki site to avoid sending cookies, improve local caching and generally improve user-experience performance.'),
             'hint' => tra('List of URI prefixes to include before static files (one per line), for example: http://cdn1.example.org'),
-            'help' => 'Content-Delivery-Network',
+            'help' => $contentDeliveryNetworkHelp,
             'type' => 'textarea',
             'size' => 4,
             'filter' => 'url',
@@ -122,7 +139,7 @@ function prefs_tiki_list()
             'name' => tra('Content delivery networks in SSL'),
             'description' => tra('Use alternate domains to serve static files from this Tiki site to avoid sending cookies, improve local caching and generally improve user-experience performance. Leave empty to disable CDN in SSL mode.'),
             'hint' => tra('List of URI prefixes to include before static files (one per line), for example: https://sslcdn1.example.org'),
-            'help' => 'Content-Delivery-Network',
+            'help' => $contentDeliveryNetworkHelp,
             'type' => 'textarea',
             'size' => 4,
             'filter' => 'url',
@@ -131,7 +148,7 @@ function prefs_tiki_list()
         'tiki_cdn_check' => [
             'name' => tra('Check CDN files exists'),
             'description' => tra('Check that minified JS and CSS files exist before including them in the page.'),
-            'help' => 'Content-Delivery-Network',
+            'help' => $contentDeliveryNetworkHelp,
             'type' => 'flag',
             'filter' => 'alpha',
             'default' => 'y',
@@ -147,6 +164,7 @@ function prefs_tiki_list()
             ],
             'default' => 'unchanged',
             'tags' => ['basic'],
+            'help' => $navigationsHelp,
         ],
         'tiki_domain_redirects' => [
             'name' => tra('Domain redirects'),
@@ -155,6 +173,7 @@ function prefs_tiki_list()
             'hint' => tra('One entry per line, with each entry a comma-separated list: old domain, new domain'),
             'size' => 8,
             'default' => '',
+            'help' => $navigationsHelp,
         ],
         'tiki_check_file_content' => [
             'name' => tra('Validate uploaded file content'),
@@ -162,6 +181,7 @@ function prefs_tiki_list()
             'type' => 'flag',
             'extensions' => ['fileinfo'],
             'default' => 'y',
+            'help' => $generalSecurityHelp,
         ],
         'tiki_allow_trust_input' => [
             'name' => tra('Allow the tiki_p_trust_input permission.'),
@@ -169,6 +189,7 @@ function prefs_tiki_list()
             'warning' => tra('Note: all permissions are granted to the Admins group including this one, so if you enable this you may expose your site to XSS (Cross Site Scripting) attacks for admin users.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $generalSecurityHelp,
         ],
         'tiki_object_selector_threshold' => [
             'name' => tr('Object selector threshold'),
@@ -178,6 +199,7 @@ function prefs_tiki_list()
             'default' => 250,
             'units' => tra('records'),
             'filter' => 'int',
+            'help' => $paginationLinksHelp,
         ],
         'tiki_object_selector_searchfield' => [
             'name' => tr('Object selector search field'),
@@ -185,21 +207,24 @@ function prefs_tiki_list()
             'type' => 'text',
             'default' => 'title',
             'filter' => 'text',
+            'help' => $paginationLinksHelp,
         ],
         'tiki_object_selector_wildcardsearch' => [
             'name' => tr('Object selector wildcard search'),
-            'description' => tr(''),
+            'description' => tr('Wrap object selector filter text with wildcards so partial title matches are returned instead of exact matches only.'),
             'type' => 'flag',
             'default' => 'y',
             'filter' => 'alpha',
+            'help' => $paginationLinksHelp,
         ],
         'tiki_key' => [
             'name' => tr('Client key for this site'),
+            'description' => tra('Shared secret for this Intertiki client; must match the key configured on the master server.'),
             'type' => 'text',
-            'description' => tra('This must match the shared key entered in the Master’s key field.'),
             'size' => 32,
             'filter' => 'text',
             'default' => '',
+            'help' => 'Intertiki-Client',
         ],
     ];
 }

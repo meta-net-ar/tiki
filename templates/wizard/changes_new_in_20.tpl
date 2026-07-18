@@ -18,7 +18,7 @@
             {icon name="help" size=1}
         </a>
         <fieldset>
-            <legend>{tr}OCR Indexing{/tr}{help url="OCR+Indexing"}</legend>
+            <legend>{tr}OCR Indexing{/tr}{help url="OCR-Indexing"}</legend>
             {preference name=ocr_enable}
                 <div class="adminoptionboxchild" id="ocr_enable_childcontainer">
                     {preference name=ocr_every_file}

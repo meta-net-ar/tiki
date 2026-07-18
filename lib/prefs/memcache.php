@@ -6,11 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_memcache_list()
 {
+    $memcachedHelp = 'Memcached';
+
     return [
         'memcache_enabled' => [
             'name' => tra('Memcache'),
             'description' => tra('Enable connection to memcached servers to store temporary information.'),
             'type' => 'flag',
+            'help' => $memcachedHelp,
             'hint' => tra('Requires the PHP memcache extension.'),
             'extensions' => [ 'memcached' ],
             'default' => 'n',
@@ -24,6 +27,7 @@ function prefs_memcache_list()
             'serialize' => 'prefs_memcache_serialize_servers',
             'unserialize' => 'prefs_memcache_unserialize_servers',
             'size' => 10,
+            'help' => $memcachedHelp,
             'default' => false,
             'dependencies' => ['memcache_enabled'],
         ],
@@ -34,6 +38,7 @@ function prefs_memcache_list()
             'size' => 10,
             'type' => 'text',
             'default' => 'tiki_',
+            'help' => 'https://github.com/memcached/memcached/wiki/ProgrammingTricks',
             'dependencies' => ['memcache_enabled'],
         ],
         'memcache_expiration' => [
@@ -43,26 +48,33 @@ function prefs_memcache_list()
             'size' => 10,
             'filter' => 'digits',
             'units' => tra('seconds'),
+            'help' => 'https://github.com/memcached/memcached/wiki/Programming#expiration',
             'default' => 3600,
             'dependencies' => ['memcache_enabled'],
         ],
         'memcache_wiki_data' => [
             'name' => tra('Cache wiki data in memcache'),
+            'description' => tra('Store wiki page data in memcache to reduce database lookups when loading pages.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => 'https://docs.memcached.org',
             'dependencies' => ['memcache_enabled'],
         ],
         'memcache_wiki_output' => [
             'name' => tra('Cache wiki output in memcache'),
+            'description' => tra('Cache rendered wiki page HTML output in memcache to speed up page delivery.'),
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => ['memcache_enabled'],
+            'help' => $memcachedHelp,
         ],
         'memcache_forum_output' => [
             'name' => tra('Cache forum output in memcache'),
+            'description' => tra('Cache rendered forum thread HTML output in memcache to speed up page delivery.'),
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => ['memcache_enabled'],
+            'help' => $memcachedHelp,
         ],
     ];
 }

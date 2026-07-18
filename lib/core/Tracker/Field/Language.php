@@ -12,6 +12,7 @@ class Tracker_Field_Language extends \Tracker\Field\AbstractItemField implements
             'LANG' => [
                 'name' => tr('Language'),
                 'description' => tr('Assign a language to the tracker item to enable multilingual trackers.'),
+                'help' => 'Language-Tracker-Field',
                 'prefs' => ['trackerfield_language', 'feature_multilingual'],
                 'tags' => ['advanced'],
                 'default' => 'y',

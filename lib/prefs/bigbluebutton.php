@@ -6,13 +6,17 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_bigbluebutton_list()
 {
+    $bigBlueButtonHelp = 'BigBlueButton';
+    $bigBlueButtonKeywords = 'big blue button web conferencing audio video chat screensharing whiteboard';
+    $bigBlueButtonBasicKeywords = 'big blue button';
+
     return [
         'bigbluebutton_feature' => [
             'name' => tra('BigBlueButton web conferencing'),
             'description' => tra('Integration with the BigBlueButton collaboration server for web conference and screen sharing.'),
             'type' => 'flag',
-            'keywords' => 'big blue button web conferencing audio video chat screensharing whiteboard',
-            'help' => 'BigBlueButton',
+            'keywords' => $bigBlueButtonKeywords,
+            'help' => $bigBlueButtonHelp,
             'tags' => ['basic'],
             'default' => 'n',
             'extensions' => [
@@ -25,7 +29,8 @@ function prefs_bigbluebutton_list()
             'type' => 'text',
             'filter' => 'url',
             'hint' => tra('http://host.example.org/'),
-            'keywords' => 'big blue button web conferencing audio video chat screensharing whiteboard',
+            'keywords' => $bigBlueButtonKeywords,
+            'help' => $bigBlueButtonHelp,
             'size' => 40,
             'tags' => ['basic'],
             'default' => '',
@@ -33,10 +38,11 @@ function prefs_bigbluebutton_list()
         'bigbluebutton_shared_secret' => [
             'name' => tra('BigBlueButton shared secret'),
             'description' => tra('A secret key used to generate checksums for the BigBlueButton server to assure that requests are authentic.'),
-            'keywords' => 'big blue button web conferencing audio video chat screensharing whiteboard',
+            'keywords' => $bigBlueButtonKeywords,
             'type' => 'text',
             'size' => 40,
             'filter' => 'text',
+            'help' => $bigBlueButtonHelp,
             'tags' => ['basic'],
             'default' => '',
         ],
@@ -44,18 +50,20 @@ function prefs_bigbluebutton_list()
             'name' => tr('BigBlueButton recording maximum duration'),
             'description' => tr('A maximum duration for the meetings must be submitted to BigBlueButton to prevent the recordings from being excessively long if a user leaves the conference window open.'),
             'units' => tra('minutes'),
-            'keywords' => 'big blue button',
+            'keywords' => $bigBlueButtonBasicKeywords,
             'type' => 'text',
             'filter' => 'digits',
             'size' => 6,
+            'help' => $bigBlueButtonHelp,
             'default' => 5 * 60,
             'tags' => ['basic'],
         ],
         'bigbluebutton_dynamic_configuration' => [
             'name' => tr('BigBlueButton dynamic configuration'),
             'description' => tr('Uses the advanced options of BigBlueButton to configure the XML per room.'),
-            'keywords' => 'big blue button',
+            'keywords' => $bigBlueButtonBasicKeywords,
             'type' => 'flag',
+            'help' => $bigBlueButtonHelp,
             'default' => 'n',
             'tags' => ['advanced', 'experimental'],
         ],
@@ -68,6 +76,7 @@ function prefs_bigbluebutton_list()
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced', 'experimental'],
+            'help' => $bigBlueButtonHelp,
         ],
     ];
 }

@@ -46,14 +46,16 @@ function prefs_wikiplugininline_list($partial = false)
     }
 
     $prefs = [];
+    $inlineDescription = tr('Hide the edit plugin icon on wiki pages so this plugin renders as inline content without the visual edit UI.');
 
     foreach ($parserlib->plugin_get_list() as $plugin) {
         $info = $parserlib->plugin_info($plugin);
 
         $prefs['wikiplugininline_' . $plugin] = [
             'name' => tr('Inline plugin %0', $info['name']),
-            'description' => '',
+            'description' => $inlineDescription,
             'type' => 'flag',
+            'help' => $info['documentation'] ?? ('Plugin' . $plugin),
             'default' => isset($defaultInline[$plugin]) ? 'y' : 'n',
         ];
 

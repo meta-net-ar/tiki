@@ -34,7 +34,7 @@
                 {remarksbox type=tip title="{tr}About the Unified Index{/tr}"}
                 {tr}The Unified Index provides many underlying features for Tiki, including object selectors for translations amongst other things.{/tr}
                 {tr}Disabling this will cause some parts of Tiki to be unavailable.{/tr}<br>
-                    <a href="http://doc.tiki.org/Unified+Index" class="alert-link">{tr}Find out more about it here.{/tr}</a>
+                    <a href="http://doc.tiki.org/Search-and-List-from-Unified-Index" class="alert-link">{tr}Find out more about it here.{/tr}</a>
                 {/remarksbox}
 
                 {preference name=feature_search visible="always"}
@@ -320,7 +320,7 @@
         {tab name="{tr}Tools{/tr}"}
             <br>
             {include file='admin/include_search_report_string_in_db.tpl'}
-            <h2 class="card-title">{tr}Experiment with LIST plugin syntax{/tr}{help url="LIST+-+Troubleshooting+The+List+Plugin#Using_the_Experiment_with_Plugin_LIST_page" desc="{tr}Help link{/tr}"}</h2>
+            <h2 class="card-title">{tr}Experiment with LIST plugin syntax{/tr}{help url="PluginList---Troubleshooting-The-List-Plugin#Using_the_Experiment_with_Plugin_LIST_page" desc="{tr}Help link{/tr}"}</h2>
             <a href="tiki-pluginlist_experiment.php">{tr}After you have found the correct contents, you may copy-paste them in a LIST plugin.{/tr}</a>
             <hr>
         {/tab}

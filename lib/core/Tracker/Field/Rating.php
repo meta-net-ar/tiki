@@ -48,6 +48,7 @@ class Tracker_Field_Rating extends \Tracker\Field\AbstractItemField
             '*' => [
                 'name' => tr('Stars (deprecated)'),
                 'description' => tr('Display a star rating'),
+                'help' => 'Stars-Field',
                 'readonly' => true,
                 'deprecated' => true,
                 'prefs' => ['trackerfield_stars'],
@@ -66,6 +67,7 @@ class Tracker_Field_Rating extends \Tracker\Field\AbstractItemField
             's' => [
                 'name' => tr('Stars (system - deprecated)'),
                 'description' => tr('Display a star rating'),
+                'help' => 'Stars-Field',
                 'readonly' => true,
                 'deprecated' => true,
                 'prefs' => ['trackerfield_starsystem'],

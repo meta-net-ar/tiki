@@ -150,7 +150,7 @@
                         <label for="assign_params">{tr}Parameters{/tr}</label>
                     </a>
                     <textarea id="assign_params" name="assign_params"s="1" cols="60" class="form-control">{$assign_params|escape}</textarea>
-                    {help url="Module+Parameters" desc="{tr}Enter the parameters in URL format, e.g. 'nobox=y&class=rbox-data'{/tr}"}
+                    {help url="Module-Settings-Parameters" desc="{tr}Enter the parameters in URL format, e.g. 'nobox=y&class=rbox-data'{/tr}"}
                     {self_link um_edit=$assign_name cookietab="2" _anchor="editcreate"}{tr}Edit custom module{/tr} {icon name="next"}{/self_link}
                 </div>
             {/if}

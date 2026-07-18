@@ -26,11 +26,14 @@ function prefs_ocr_list()
         $pdfimagesPath = 'pdfimages';
     }
 
+    $gallerySearchIndexingHelp = 'Gallery-Search-Indexing';
+
     return [
         'ocr_enable' => [
             'name' => tra('OCR Files'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $gallerySearchIndexingHelp,
             'description' => tra('Extract and index text from supported file types.'),
             'keywords' => 'ocr optical character recognition',
             'dependencies' => ['feature_file_galleries'],
@@ -42,12 +45,14 @@ function prefs_ocr_list()
             'type' => 'flag',
             'description' => tra('Attempt to OCR every supported file.'),
             'default' => 'n',
+            'help' => $gallerySearchIndexingHelp,
         ],
         'ocr_file_level' => [
             'name' => tra('Allow file level OCR languages'),
             'type' => 'flag',
             'description' => tra('Allow users to change the default languages that will be used to OCR a file.'),
             'default' => 'y',
+            'help' => $gallerySearchIndexingHelp,
         ],
         'ocr_limit_languages' => [
             'name' => tra('OCR limit languages'),
@@ -57,6 +62,7 @@ function prefs_ocr_list()
             'options' => $ocrLangs,
             'dependencies' => ['ocr_file_level'],
             'default' => [''],
+            'help' => $gallerySearchIndexingHelp,
         ],
         'ocr_tesseract_path' => [
             'name' => tra('tesseract path'),
@@ -66,6 +72,7 @@ function prefs_ocr_list()
             'size' => '256',
             'filter' => 'text',
             'default' => $tesseractPath,
+            'help' => $gallerySearchIndexingHelp,
         ],
         'ocr_pdfimages_path' => [
             'name' => tra('pdfimages path'),
@@ -75,6 +82,7 @@ function prefs_ocr_list()
             'size' => '256',
             'filter' => 'text',
             'default' => $pdfimagesPath,
+            'help' => $gallerySearchIndexingHelp,
         ],
     ];
 }

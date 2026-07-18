@@ -6,13 +6,15 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_markdown_list()
 {
+    $wysiwygHelp = 'wysiwyg';
+
     return [
         'markdown_enabled' => [
             'name' => tr('Markdown'),
             'description' => tr('Support markdown syntax.'),
             'type' => 'flag',
             'default' => 'n',
-            'help' => 'Markdown',
+            'help' => 'Tiki-Flavored-Markdown',
             'keywords' => 'Markdown',
             'tags' => ['advanced', 'experimental'],
         ],
@@ -25,6 +27,7 @@ function prefs_markdown_list()
             'dependencies' => [
                 'markdown_enabled',
             ],
+            'help' => 'https://github.github.com/gfm/',
         ],
         'markdown_default' => [
             'name' => tr('Default syntax'),
@@ -39,6 +42,7 @@ function prefs_markdown_list()
             'dependencies' => [
                 'markdown_enabled',
             ],
+            'help' => 'Markdown-Syntax#How_to_enable_Markdown_in_Tiki',
         ],
         'markdown_wysiwyg_height' => [
             'name' => tr('WYSIWYG Height'),
@@ -48,6 +52,7 @@ function prefs_markdown_list()
             'filter' => 'imgsize',
             'default' => '300px',
             'tags' => ['advanced', 'experimental'],
+            'help' => $wysiwygHelp,
             'dependencies' => [
                 'markdown_enabled',
                 'feature_wysiwyg',
@@ -57,6 +62,7 @@ function prefs_markdown_list()
             'name' => tr('WYSIWYG Preview Style'),
             'description' => tr('Vertical or tabbed.'),
             'type' => 'list',
+            'help' => $wysiwygHelp,
             'options' => [
                 'vertical' => tra('Vertical'),
                 'tab' => tra('Tab'),
@@ -78,6 +84,7 @@ function prefs_markdown_list()
             ],
             'default' => 'wysiwyg',
             'tags' => ['advanced', 'experimental'],
+            'help' => $wysiwygHelp,
             'dependencies' => [
                 'markdown_enabled',
                 'feature_wysiwyg',
@@ -89,6 +96,7 @@ function prefs_markdown_list()
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced', 'experimental'],
+            'help' => $wysiwygHelp,
             'dependencies' => [
                 'markdown_enabled',
                 'feature_wysiwyg',

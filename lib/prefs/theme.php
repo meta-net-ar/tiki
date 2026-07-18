@@ -30,6 +30,8 @@ function prefs_theme_list($partial = false)
     $iconsets = $themelib->list_base_iconsets();
     $iconsets['theme_specific_iconset'] = tr('Icons of the displayed theme'); //add a specific option to allow theme specific icon set to be used
 
+    $themesHelp = 'Themes';
+
     return [
         'theme' => [
             'name' => tr('Site theme'),
@@ -37,13 +39,13 @@ function prefs_theme_list($partial = false)
             'type' => 'list',
             'default' => 'default',
             'options' => $themes,
-            'help' => 'Themes',
+            'help' => $themesHelp,
             'tags' => ['basic'],
         ],
         'theme_option' => [
             'name' => tra('Site theme option'),
             'type' => 'list',
-            'help' => 'Themes',
+            'help' => $themesHelp,
             'description' => tra('Supplemental style sheet for the selected theme'),
             'options' => $theme_options,
             'default' => '',
@@ -57,11 +59,12 @@ function prefs_theme_list($partial = false)
             'filter' => 'url',
             'default' => '',
             'tags' => ['basic'],
+            'help' => 'Look-and-Feel-Theme',
         ],
         'theme_unified_admin_backend' => [
             'name' => tra('Unified Admin Backend'),
             'type' => 'flag',
-            'help' => 'Themes',
+            'help' => $themesHelp,
             'description' => tra('Use modern layout for control panels.'),
             'default' => 'y',
             'tags' => ['basic'],
@@ -69,7 +72,7 @@ function prefs_theme_list($partial = false)
         'theme_admin' => [
             'name' => tra('Admin theme'),
             'type' => 'list',
-            'help' => 'Themes',
+            'help' => $themesHelp,
             'description' => tra('Theme for the settings panels and other administration pages'),
             'options' => $admin_themes,
             'default' => '',
@@ -78,7 +81,7 @@ function prefs_theme_list($partial = false)
         'theme_option_admin' => [
             'name' => tra('Admin theme option'),
             'type' => 'list',
-            'help' => 'Themes',
+            'help' => $themesHelp,
             'description' => tra('Supplemental style sheet for the selected theme'),
             'options' => $theme_options,
             'default' => '',
@@ -91,14 +94,14 @@ function prefs_theme_list($partial = false)
                 'dark'  => tra('Dark'),
                 'light' => tra('Light'),
             ],
-            'help'        => 'Themes',
+            'help'        => $themesHelp,
             'description' => tra('Select a dark or light navbar (containing horizontal menu, etc.), as styled by the theme.'),
             'default'     => 'dark',
         ],
         'theme_option_includes_main' => [
             'name' => tra('Option theme includes main theme CSS'),
             'type' => 'flag',
-            'help' => 'Themes',
+            'help' => $themesHelp,
             'description' => tra('Don\'t include the main theme stylesheet because its contents are included in the option stylesheet.'),
             'default' => 'n',
         ],
@@ -109,7 +112,7 @@ function prefs_theme_list($partial = false)
                 'dark' => tra('Dark'),
                 'light' => tra('Light'),
             ],
-            'help' => 'Themes',
+            'help' => $themesHelp,
             'description' => tra('Select a dark or light navbar (containing horizontal menu, etc.), as styled by the theme.'),
             'default' => 'light',
         ],
@@ -126,7 +129,7 @@ function prefs_theme_list($partial = false)
             'name' => tra('Theme Customizer tool'),
             'description' => tra('Activate the theme customizer tool to enable easy theme customization.'),
             'type' => 'flag',
-            'help' => 'Themes',
+            'help' => $themesHelp,
             'default' => 'n',
             'tags' => ['experimental'],
             'view' => TikiLib::lib('service')->getUrl(['controller' => 'styleguide', 'action' => 'show']),
@@ -134,7 +137,7 @@ function prefs_theme_list($partial = false)
         'theme_header_and_address_bar_color' => [
             'name' => tra('Header bar and Address bar color'),
             'type' => 'flag',
-            'help' => 'Themes',
+            'help' => $themesHelp,
             'description' => tra('Change the color of header bar and address bar according to the theme.'),
             'default' => 'n',
             'tags' => ['basic'],

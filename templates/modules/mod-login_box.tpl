@@ -328,7 +328,7 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                             </label>
                             <input type="hidden" name="su" value="1" class="form-control" />
                             {if $prefs.feature_help eq 'y'}
-                                {help url="Switch+User" desc="{tr}Help{/tr}" desc="{tr}Switch User:{/tr}{tr}Select a username and click 'Switch'.<br>Useful for testing permissions.{/tr}"}
+                                {help url="Switch-User" desc="{tr}Help{/tr}" desc="{tr}Switch User:{/tr}{tr}Select a username and click 'Switch'.<br>Useful for testing permissions.{/tr}"}
                             {/if}
                             {user_selector
                                 groupIds=$module_params.groups

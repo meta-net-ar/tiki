@@ -6,30 +6,41 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_tracker_list()
 {
+    $itemsListAndItemLinkTrackerFieldsHelp = 'Items-List-and-Item-Link-Tracker-Fields';
+    $trackerSettingsHelp = 'Tracker-Settings';
+    $articlesGeneralSettingsHelp = 'Articles-General-Settings';
+    $forceFilledTrackerHelp = 'Force-Filled-Tracker';
+    $currencyAmountTrackerFieldHelp = 'Currency-Amount-Tracker-Field';
+    $emailBounceHandlingHelp = 'Email-bounce-handling';
+
     return [
         'tracker_remote_sync' => [
             'name' => tr('Synchronize remote tracker'),
             'description' => tr('Enable a tracker to be cloned on a remote host, and synchronize the data locally on demand.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Tracker-Synchronization',
         ],
         'tracker_refresh_itemlink_detail' => [
             'name' => tr('Refresh item link items when the master is modified'),
             'description' => tr('To be used when item link is used in trackers so that the index remains in good shape when data on the master that is indexed with the detail is modified and used to search on.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $itemsListAndItemLinkTrackerFieldsHelp,
         ],
         'tracker_refresh_itemslist_detail' => [
             'name' => tr('Refresh items list items when related items are created or modified'),
             'description' => tr('Use this to enable the ItemsList fields to refresh their content in the search index when related tracker items are created or modified.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $itemsListAndItemLinkTrackerFieldsHelp,
         ],
         'tracker_clone_item' => [
             'name' => tr('Duplicate tracker items'),
             'description' => tr('Allow copying tracker item information to a new tracker item. If the item has an item-link linked, it will automatically create new child item. This last can be turned on and off per case on the item-link tracker fields options.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_insert_allowed' => [
             'name' => tr('Trackers available for insertion from wiki pages'),
@@ -39,6 +50,7 @@ function prefs_tracker_list()
             'separator' => ',',
             'default' => [],
             'profile_reference' => 'tracker',
+            'help' => 'Plugininsert',
         ],
         'tracker_change_field_type' => [
             'name' => tr('Change field types'),
@@ -46,24 +58,28 @@ function prefs_tracker_list()
             'type' => 'flag',
             'default' => 'y',
             'warning' => tra('Use with care!'),
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_show_comments_below' => [
             'name' => tr('Show comments below items'),
             'description' => tr('Show comments for a tracker item below the item itself as in other trackers, instead of enclosed in a tab'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_legacy_insert' => [
             'name' => tr('Insert and edit items in a tab'),
             'description' => tr('Edit tracker items in a tab instead of a popup dialog.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Tracker-Settings',
         ],
         'tracker_status_in_objectlink' => [
             'name' => tr('Show tracker status in objectlink'),
             'description' => tr('Show the status when doing an objectlink. This can be used to show the status in tracker screens but not in outputs.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_wikirelation_synctitle' => [
             'name' => tr('Sync wiki page name to linked tracker field'),
@@ -71,6 +87,7 @@ function prefs_tracker_list()
             'type' => 'flag',
             'tags' => ['advanced'],
             'default' => 'n',
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_wikirelation_redirectpage' => [
             'name' => tr('Redirect page views to the linked tracker item'),
@@ -79,14 +96,16 @@ function prefs_tracker_list()
             'type' => 'flag',
             'tags' => ['advanced'],
             'default' => 'n',
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_article_tracker' => [
              'name' => tr('Tracker for articles'),
              'description' => tr('Have a tracker to supplement article information'),
              'type' => 'flag',
-            'tags' => ['advanced'],
+             'tags' => ['advanced'],
              'default' => 'n',
              'dependencies' => ['feature_articles', 'feature_trackers', 'tracker_article_trackerId'],
+             'help' => $articlesGeneralSettingsHelp,
          ],
          'tracker_article_trackerId' => [
              'name' => tr('Tracker ID of tracker for articles'),
@@ -97,6 +116,7 @@ function prefs_tracker_list()
              'filter' => 'digits',
              'default' => '',
              'profile_reference' => 'tracker',
+             'help' => $articlesGeneralSettingsHelp,
          ],
         'tracker_article_indexing' => [
             'name' => tr("Index article info in tracker item"),
@@ -105,6 +125,7 @@ function prefs_tracker_list()
             'tags' => ['advanced'],
             'default' => 'n',
             'dependencies' => ['feature_articles', 'feature_trackers', 'tracker_article_trackerId', 'tracker_article_tracker'],
+            'help' => 'Incoming-Feeds',
         ],
         'tracker_tabular_enabled' => [
             'name' => tr('Tracker Import-Export'),
@@ -121,11 +142,12 @@ function prefs_tracker_list()
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => ['feature_trackers'],
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_force_fill' => [
             'name' => tr('Require users to fill in tracker information'),
             'description' => tr("Require users to fill in a tracker form if not done already by prompting them with a modal dialog."),
-            'help' => 'Force-Fill-Tracker',
+            'help' => $forceFilledTrackerHelp,
             'type' => 'flag',
             'tags' => ['advanced'],
             'default' => 'n',
@@ -140,6 +162,7 @@ function prefs_tracker_list()
             'filter' => 'digits',
             'default' => '',
             'dependencies' => ['tracker_force_fill'],
+            'help' => $forceFilledTrackerHelp,
         ],
         'tracker_force_mandatory_field' => [
             'name' => tr('Mandatory tracker field to check for required filling in'),
@@ -148,6 +171,7 @@ function prefs_tracker_list()
             'tags' => ['advanced'],
             'default' => '',
             'dependencies' => ['tracker_force_fill'],
+            'help' => $forceFilledTrackerHelp,
         ],
         'tracker_force_tracker_fields' => [
             'name' => tr('Fields that are asked for in the modal for force-filling'),
@@ -156,6 +180,7 @@ function prefs_tracker_list()
             'tags' => ['advanced'],
             'default' => '',
             'dependencies' => ['tracker_force_fill'],
+            'help' => $forceFilledTrackerHelp,
         ],
         'tracker_prefixalias_on_links' => [
             'name' => tr('Tracker item links use prefix alias'),
@@ -163,6 +188,7 @@ function prefs_tracker_list()
             'type' => 'flag',
             'default' => 'y',
             'dependencies' => ['feature_trackers','feature_sefurl', 'feature_sefurl_tracker_prefixalias'],
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_adminonlyviewedititem_by_default' => [
             'name' => tr('All new trackers are restricted to wiki page access only by default'),
@@ -170,6 +196,7 @@ function prefs_tracker_list()
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => ['feature_trackers'],
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_display_categories' => [
             'name' => tr('Display categories in trackers list'),
@@ -177,18 +204,21 @@ function prefs_tracker_list()
             'type' => 'flag',
             'default' => 'n',
             'dependencies' => ['feature_categories'],
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_display_wiki_only_status' => [
             'name' => tr('Display Wiki-Only status in trackers list'),
             'description' => tr('Show whether trackers are restricted to wiki page access for non-admin users.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Tracker-Settings'
         ],
         'tracker_report_resize_button' => [
             'name' => tr('Tracker report resize button'),
             'description' => tr('Add a button to resize long tracker reports.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_list_order' => [
             'name' => tr('Tracker list order'),
@@ -208,6 +238,7 @@ function prefs_tracker_list()
                 'items_desc' => tra('Number of Items Descending'),
             ],
             'default' => 'created_desc',
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_history_diff_style' => [
             'name' => tr('Tracker History Diff Style'),
@@ -221,6 +252,7 @@ function prefs_tracker_list()
                 'unidiff' => tr('Unified diff'),
             ],
             'default' => 'sidediff',
+            'help' => 'History',
         ],
         'tracker_field_rules' => [
             'name' => tr('Tracker Field Rules'),
@@ -233,6 +265,7 @@ function prefs_tracker_list()
             ],
             'tags' => [ 'experimental' ],
             'warning' => tra('Experimental new feature, expect some issues.'),
+            'help' => 'Tracker-Field-Rules',
         ],
         'tracker_autoincrement_resettable' => [
             'name' => tr('Allow autoincrement fields start value to be reset to a new value'),
@@ -241,12 +274,14 @@ function prefs_tracker_list()
             'default' => 'n',
             'tags' => ['experimental'],
             'warning' => tra('Use with care, potential for data loss.'),
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_currency_default_locale' => [
             'name' => tr('Default locale for currency formatting'),
             'description' => tr('Currency fields use a system locale to format the output of currency values. Set the default one here when none is selected in the field themselves. Visit "Server Check" page for a list of available system locales.'),
             'type' => 'text',
             'default' => '',
+            'help' => $trackerSettingsHelp,
         ],
         'tracker_system_currency' => [
             'name' => tr('Exchange rates tracker'),
@@ -256,6 +291,7 @@ function prefs_tracker_list()
                 'trackerfield_currency',
             ],
             'default' => 'n',
+            'help' => $currencyAmountTrackerFieldHelp,
         ],
         'tracker_system_currency_tracker' => [
             'name' => tr('Choose tracker'),
@@ -266,6 +302,7 @@ function prefs_tracker_list()
             ],
             'default' => '',
             'profile_reference' => 'tracker',
+            'help' => $currencyAmountTrackerFieldHelp,
         ],
         'tracker_system_currency_rate' => [
             'name' => tr('Rate field'),
@@ -278,6 +315,7 @@ function prefs_tracker_list()
             'parent' => 'input[name=tracker_system_currency_tracker]',
             'parentkey' => 'tracker_id',
             'profile_reference' => 'tracker_field',
+            'help' => $currencyAmountTrackerFieldHelp,
         ],
         'tracker_system_currency_currency' => [
             'name' => tr('Currency field'),
@@ -290,6 +328,7 @@ function prefs_tracker_list()
             'parent' => 'input[name=tracker_system_currency_tracker]',
             'parentkey' => 'tracker_id',
             'profile_reference' => 'tracker_field',
+            'help' => $currencyAmountTrackerFieldHelp,
         ],
         'tracker_system_currency_date' => [
             'name' => tr('Date field'),
@@ -302,6 +341,7 @@ function prefs_tracker_list()
             'parent' => '[name=tracker_system_currency_tracker]',
             'parentkey' => 'tracker_id',
             'profile_reference' => 'tracker_field',
+            'help' => $currencyAmountTrackerFieldHelp,
         ],
         'tracker_system_currency_direction' => [
             'name' => tr('Rate direction'),
@@ -312,7 +352,8 @@ function prefs_tracker_list()
                 'reverse' => tr('Reverse (Base/Target)'),
             ],
             'default' => 'straight',
-        ],
+            'help' => $currencyAmountTrackerFieldHelp,
+        ], // TODO: Update documentation page for system currency
         'tracker_system_bounces' => [
             'name' => tr('Email bounces tracker'),
             'description' => tr('Allow defining a specific tracker to hold email bounces registered in Tiki and block sending emails out of Tiki to specific mailboxes.'),
@@ -321,6 +362,7 @@ function prefs_tracker_list()
                 'trackerfield_currency',
             ],
             'default' => 'n',
+            'help' => $emailBounceHandlingHelp,
         ],
         'tracker_system_bounces_tracker' => [
             'name' => tr('Choose tracker'),
@@ -331,6 +373,7 @@ function prefs_tracker_list()
             ],
             'default' => '',
             'profile_reference' => 'tracker',
+            'help' => $emailBounceHandlingHelp,
         ],
         'tracker_system_bounces_mailbox' => [
             'name' => tr('Mailbox field'),
@@ -343,6 +386,7 @@ function prefs_tracker_list()
             'parent' => 'input[name=tracker_system_bounces_tracker]',
             'parentkey' => 'tracker_id',
             'profile_reference' => 'tracker_field',
+            'help' => $emailBounceHandlingHelp,
         ],
         'tracker_system_bounces_emailfolder' => [
             'name' => tr('Email folder field'),
@@ -355,6 +399,7 @@ function prefs_tracker_list()
             'parent' => 'input[name=tracker_system_bounces_tracker]',
             'parentkey' => 'tracker_id',
             'profile_reference' => 'tracker_field',
+            'help' => $emailBounceHandlingHelp,
         ],
         'tracker_system_bounces_soft_total' => [
             'name' => tr('Total soft bounces field'),
@@ -367,6 +412,7 @@ function prefs_tracker_list()
             'parent' => 'input[name=tracker_system_bounces_tracker]',
             'parentkey' => 'tracker_id',
             'profile_reference' => 'tracker_field',
+            'help' => $emailBounceHandlingHelp,
         ],
         'tracker_system_bounces_hard_total' => [
             'name' => tr('Total hard bounces field'),
@@ -379,6 +425,7 @@ function prefs_tracker_list()
             'parent' => 'input[name=tracker_system_bounces_tracker]',
             'parentkey' => 'tracker_id',
             'profile_reference' => 'tracker_field',
+            'help' => $emailBounceHandlingHelp,
         ],
         'tracker_system_bounces_blacklisted' => [
             'name' => tr('Blacklisted field'),
@@ -391,6 +438,7 @@ function prefs_tracker_list()
             'parent' => 'input[name=tracker_system_bounces_tracker]',
             'parentkey' => 'tracker_id',
             'profile_reference' => 'tracker_field',
+            'help' => $emailBounceHandlingHelp,
         ],
         'tracker_item_select_feature' => [
             'name' => tr('Toggle selection option for all tracker field types that let us pick multiple options'),
@@ -401,6 +449,7 @@ function prefs_tracker_list()
             'default' => 5,
             'filter' => 'int',
             'dependencies' => ['feature_trackers'],
+            'help' => $trackerSettingsHelp,
         ]
     ];
 }

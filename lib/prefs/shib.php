@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_shib_list()
 {
+    $shibbolethAuthenticationHelp = 'Shibboleth-Authentication';
+
     return [
         'shib_group' => [
             'name' => tra('Default group'),
@@ -14,13 +16,15 @@ function prefs_shib_list()
             'size' => 40,
             'perspective' => false,
             'default' => 'Shibboleth',
+            'help' => $shibbolethAuthenticationHelp,
         ],
         'shib_usegroup' => [
             'name' => tra('Create with default group'),
-            'A default group will be created. If no group is specified a default of Shibboleth will be used.',
+            'description' => tr('A default group will be created. If no group is specified a default of Shibboleth will be used.'),
             'type' => 'flag',
             'perspective' => false,
             'default' => 'n',
+            'help' => $shibbolethAuthenticationHelp,
         ],
         'shib_affiliation' => [
             'name' => tra('Valid affiliations'),
@@ -30,6 +34,7 @@ function prefs_shib_list()
             'hint' => tra('Separate multiple affiliations with commas'),
             'perspective' => false,
             'default' => '',
+            'help' => $shibbolethAuthenticationHelp,
         ],
         'shib_skip_admin' => [
             'name' => tra('Use Tiki authentication for Admin log-in'),
@@ -37,6 +42,7 @@ function prefs_shib_list()
             'description' => tra('The user “admin” will be authenticated by <b>only</b> using Tiki’s user database. This option has no effect on users other than “admin”.'),
             'perspective' => false,
             'default' => 'n',
+            'help' => $shibbolethAuthenticationHelp,
         ],
         'shib_create_user_tiki' => [
             'name' => tra('Create user if not registered in Tiki'),
@@ -44,6 +50,7 @@ function prefs_shib_list()
             'perspective' => false,
             'description' => tr('If a user was externally authenticated, but not found in the Tiki user database, Tiki will create an entry in its user database.'),
             'default' => 'n',
+            'help' => $shibbolethAuthenticationHelp,
         ],
     ];
 }

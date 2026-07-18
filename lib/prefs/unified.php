@@ -6,6 +6,11 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_unified_list()
 {
+    $searchGeneralSettingsHelp = 'Search-General-Settings';
+    $configureElasticsearchServiceHelp = 'How-to-configure-Tiki-for-Elasticsearch-Service';
+    $manticoreSearchHelp = 'Manticore-Search';
+    $pluginListHelp = 'PluginList';
+
     return [
         'unified_engine' => [
             'name' => tra('Unified search engine'),
@@ -17,12 +22,14 @@ function prefs_unified_list()
                 'manticore' => tra('Manticore Search'),
             ],
             'default' => 'mysql',
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_check_unused_indexes' => [
             'name' => tra('Check for unused indexes'),
             'description' => tra('Check for unused indexes and remove them to free up space and maintain optimal search performance.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_search_default_operator' => [
             'name' => tra('Default Boolean Operator'),
@@ -34,6 +41,7 @@ function prefs_unified_list()
                 1 => tra('AND'),
                 0 => tra('OR'),
             ],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_incremental_update' => [
             'name' => tra('Incremental Index Update'),
@@ -41,6 +49,7 @@ function prefs_unified_list()
             'type' => 'flag',
             'warning' => tra('This may lead to lower performance and accuracy than processing the index on a periodic basis.'),
             'default' => 'y',
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_field_weight' => [
             'name' => tra('Field weights'),
@@ -51,6 +60,7 @@ function prefs_unified_list()
             'size' => 5,
             'filter' => 'text',
             'default' => "title:2.5\nallowed_groups:0.0001\ncategories:0.0001\ndeep_categories:0.0001",
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_numeric_field_scroll' => [
             'name' => tra('Numeric field data modification via scroll'),
@@ -62,6 +72,7 @@ function prefs_unified_list()
             ],
             'default' => 'none',
             'keywords' => 'wheel',
+            'help' => 'Tracker-Settings',
         ],
         'unified_default_content' => [
             'name' => tra('Default content fields'),
@@ -71,12 +82,14 @@ function prefs_unified_list()
             'filter' => 'word',
             'default' => ['contents', 'title'],
             'size' => 80,
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_tokenize_version_numbers' => [
             'name' => tra('Tokenize version numbers'),
             'description' => tra('Tokenize version number strings so that major versions are found when sub-versions are mentioned. For example, searching for 2.7 would return documents containing 2.7.4, but not 1.2.7.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_user_cache' => [
             'name' => tra('Cache per user and query for Tiki built-in search'),
@@ -87,12 +100,14 @@ function prefs_unified_list()
             'units' => tra('minutes'),
             'default' => '0',
             'tags' => ['advanced'],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_forum_deepindexing' => [
             'name' => tra('Index forum replies together with initial post'),
             'description' => tra('Forum replies will be indexed together with the initial post as a single document instead of being indexed separately.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_relation_object_indexing' => [
             'name' => tra('Relation types to index within object.'),
@@ -103,6 +118,7 @@ function prefs_unified_list()
             'dependencies' => [
                 'unified_elastic_index_current',
             ],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_cached_formatters' => [
             'name' => tra('Cache individual search formatters'),
@@ -111,6 +127,7 @@ function prefs_unified_list()
             'separator' => ',',
             'default' => [],
             'tags' => ['advanced'],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_trackeritem_category_names' => [
             'name' => tra('Index Tracker Category names'),
@@ -123,6 +140,7 @@ function prefs_unified_list()
                 'feature_categories',
                 'feature_search',
             ],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_cache_formatted_result' => [
             'name' => tra('Cache result-specific formatted results'),
@@ -131,6 +149,7 @@ function prefs_unified_list()
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced'],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_cache_relation' => [
             'name' => tra('Cache relation field formatted values'),
@@ -139,6 +158,7 @@ function prefs_unified_list()
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced'],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_excluded_categories' => [
             'name' => tra('Excluded categories'),
@@ -147,6 +167,7 @@ function prefs_unified_list()
             'separator' => ',',
             'default' => [],
             'profile_reference' => 'category',
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_excluded_plugins' => [
             'name' => tra('Excluded plugins'),
@@ -155,6 +176,7 @@ function prefs_unified_list()
             'filter' => 'word',
             'separator' => ',',
             'default' => [],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_included_plugins' => [
             'name' => tra('Additional plugins searchable by default'),
@@ -187,12 +209,14 @@ function prefs_unified_list()
                 "sub",
                 "sup",
             ],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_exclude_nonsearchable_fields' => [
             'name' => tra('Don\'t index non searchable fields'),
             'description' => tra('Indexing will skip adding all tracker fields that are not marked as "searchable". This will free index space but also make it impossible to use those fields in search index queries.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_exclude_nonsearchable_fields_from_facets' => [
             'name' => tra('Exclude non searchable fields from facets'),
@@ -204,6 +228,7 @@ function prefs_unified_list()
                 'search_use_facets',
                 'feature_trackers',
             ],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_elastic_url' => [
             'name' => tra('Elasticsearch URL'),
@@ -212,6 +237,7 @@ function prefs_unified_list()
             'filter' => 'url',
             'default' => 'http://localhost:9200',
             'size' => 40,
+            'help' => 'Federated-Search',
         ],
         'unified_elastic_auth' => [
             'name' => tra('Elasticsearch Authentication'),
@@ -222,6 +248,7 @@ function prefs_unified_list()
                 'basic' => tra('Basic Authentication'),
             ],
             'default' => '',
+            'help' => 'Elasticsearch',
         ],
         'unified_elastic_user' => [
             'name' => tra('Elasticsearch User'),
@@ -232,6 +259,7 @@ function prefs_unified_list()
             'dependencies' => [
                 'unified_elastic_auth'
             ],
+            'help' => $configureElasticsearchServiceHelp,
         ],
         'unified_elastic_pass' => [
             'name' => tra('Elasticsearch Password'),
@@ -242,6 +270,7 @@ function prefs_unified_list()
             'dependencies' => [
                 'unified_elastic_auth'
             ],
+            'help' => $configureElasticsearchServiceHelp,
         ],
         'unified_elastic_index_prefix' => [
             'name' => tra('Elasticsearch index prefix'),
@@ -250,6 +279,7 @@ function prefs_unified_list()
             'filter' => 'word',
             'default' => 'tiki_',
             'size' => 10,
+            'help' => $configureElasticsearchServiceHelp,
         ],
         'unified_elastic_index_current' => [
             'name' => tra('Elasticsearch current index'),
@@ -259,6 +289,7 @@ function prefs_unified_list()
             'filter' => 'word',
             'size' => '20',
             'default' => '',
+            'help' => $configureElasticsearchServiceHelp,
         ],
         'unified_elastic_camel_case' => [
             'name' => tr('Tokenize CamelCase words'),
@@ -266,6 +297,7 @@ function prefs_unified_list()
             'warning' => tr('Conflicts with Tokenize Version Numbers.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $configureElasticsearchServiceHelp,
         ],
         'unified_elastic_field_limit' => [
             'name' => tra('Elasticsearch field limit per index'),
@@ -275,12 +307,14 @@ function prefs_unified_list()
             'filter' => 'digits',
             'description' => tra('The maximum number of fields per search index in Elasticsearch version 5.x and above'),
             'default' => '1000',
+            'help' => $configureElasticsearchServiceHelp,
         ],
         'unified_elastic_mysql_search_fallback' => [
             'name' => tra('Use MySQL Full-Text Search (fallback)'),
             'type' => 'flag',
             'description' => tra('In case of Elasticsearch is active and unavailable, use MySQL Full-Text Search as fallback'),
             'default' => 'n',
+            'help' => $configureElasticsearchServiceHelp,
         ],
         'unified_elastic_index_max_result_window' => [
             'name' => tra('Index max result window for ElasticSearch'),
@@ -289,6 +323,7 @@ function prefs_unified_list()
             'size' => '3',
             'units' => tra('records'),
             'default' => '',
+            'help' => $configureElasticsearchServiceHelp,
         ],
         'unified_mysql_index_current' => [
             'name' => tra('MySQL full-text search current index'),
@@ -298,6 +333,7 @@ function prefs_unified_list()
             'filter' => 'word',
             'size' => '20',
             'default' => '',
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_mysql_index_rebuilding' => [
             'name' => tra('The current MariaDB/MySQL index name that is being rebuilt (Internal)'),
@@ -312,6 +348,7 @@ function prefs_unified_list()
             'description' => tra('Due to frm file constraints, number of search fields that one index can hold is usually limited to about 1500. This can be exceeded if you have numerous tracker fields. Enabling this option will try to shorten the field names internally that should allow you to use 300-500 more fields. Switching this option requires full index rebuild.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_mysql_restore_indexes' => [
             'name' => tra('Restore old MySQL indexes during reindex'),
@@ -319,6 +356,7 @@ function prefs_unified_list()
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['experimental'],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_manticore_url' => [
             'name' => tra('Manticore URL'),
@@ -327,6 +365,7 @@ function prefs_unified_list()
             'filter' => 'url',
             'default' => 'http://127.0.0.1',
             'size' => 40,
+            'help' => $manticoreSearchHelp,
         ],
         'unified_manticore_http_port' => [
             'name' => tra('Manticore HTTP(S) Port'),
@@ -335,6 +374,7 @@ function prefs_unified_list()
             'default' => '9308',
             'filter' => 'digits',
             'size' => 10,
+            'help' => $manticoreSearchHelp,
         ],
         'unified_manticore_mysql_port' => [
             'name' => tra('Manticore MySQL Port'),
@@ -343,6 +383,7 @@ function prefs_unified_list()
             'default' => '9306',
             'filter' => 'digits',
             'size' => 10,
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_manticore_index_prefix' => [
             'name' => tra('Manticore index prefix'),
@@ -351,6 +392,7 @@ function prefs_unified_list()
             'filter' => 'word',
             'default' => 'tiki_',
             'size' => 10,
+            'help' => $manticoreSearchHelp,
         ],
         'unified_manticore_index_current' => [
             'name' => tra('Manticore current index'),
@@ -360,6 +402,7 @@ function prefs_unified_list()
             'filter' => 'word',
             'size' => '20',
             'default' => '',
+            'help' => $manticoreSearchHelp,
         ],
         'unified_manticore_index_rebuilding' => [
             'name' => tra('The current Manticore index name that is being rebuilt (Internal)'),
@@ -368,6 +411,7 @@ function prefs_unified_list()
             'filter' => 'word',
             'size' => '20',
             'default' => '',
+            'help' => $manticoreSearchHelp,
         ],
         'unified_manticore_morphology' => [
             'name' => tr('Morphology processing'),
@@ -381,6 +425,7 @@ function prefs_unified_list()
             'description' => tr("Manticore has a hard-limit of 256 full-text indexed fields per index. If your installation has more, some will be indexed as string attributes and perform the slower regex search. You can add a comma-separated list of fields to always index as full-text here."),
             'type' => 'textarea',
             'default' => 'title,contents',
+            'help' => $manticoreSearchHelp,
         ],
         'unified_identifier_fields' => [
             'name' => tr('Unified index identifier fields (Internal)'),
@@ -399,6 +444,7 @@ function prefs_unified_list()
             'dependencies' => [
                 'feature_search',
             ],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_stopwords' => [
             'name' => tr('Stop Word List'),
@@ -407,6 +453,7 @@ function prefs_unified_list()
             'default' => ["a", "an", "and", "are", "as", "at", "be", "but", "by", "for", "if", "in", "into", "is", "it", "not", "of", "on", "or", "s", "such", "t", "that", "the", "their", "then", "there", "these", "they", "this", "to", "was", "will", "with"],
             'separator' => ',',
             'hint' => tr('This list is applied to the selected search engine. Note for MySQL: It completely replaces the native InnoDB stopword list. If left empty, will disable stopword filtering.'),
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_trim_sorted_search' => [
             'name' => tra('Automatically trim Elasticsearch results on date-sorted query'),
@@ -416,6 +463,7 @@ function prefs_unified_list()
             'dependencies' => [
                 'feature_search',
             ],
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_highlight_results' => [
             'name' => tra('Highlight results pages'),
@@ -423,6 +471,7 @@ function prefs_unified_list()
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => 'Search-Results',
         ],
         'unified_search_textarea_admin' => [
             'name' => tra('Plugins tab of the textarea control panel loads with an empty list'),
@@ -434,12 +483,14 @@ function prefs_unified_list()
             ],
             'tags' => ['experimental'], // See warning
             'warning' => tra('Some plugins may not appear. When using the MySQL engine, can have problems with short plugin names (for MyISAM, those under "ft_min_word_len").'), // See ticket #6313
+            'help' => 'Plugins',
         ],
         'unified_elastic_possessive_stemmer' => [
             'name' => tr('Possessive Stemmer'),
             'description' => tr("The possessive stemmer removes possessives (trailing \"'s\") from words before indexing them."),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $searchGeneralSettingsHelp,
         ],
         'unified_list_cache_default_on' => [
             'name' => tra('LIST plugin cache default on'),
@@ -447,7 +498,7 @@ function prefs_unified_list()
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced'],
-            'help' => 'PluginList',
+            'help' => $pluginListHelp,
         ],
         'unified_list_cache_default_expiry' => [
             'name' => tra('LIST plugin cache default expiry'),
@@ -455,7 +506,7 @@ function prefs_unified_list()
             'type' => 'text',
             'default' => '30',
             'tags' => ['advanced'],
-            'help' => 'PluginList',
+            'help' => $pluginListHelp,
         ],
         'unified_last_rebuild_stats_mysql' => [
             'name' => tra('Last rebuild statistics'),
@@ -483,3 +534,4 @@ function prefs_unified_list()
         ],
     ];
 }
+// TODO: Add help for each preference

@@ -91,7 +91,7 @@
                 {preference name=tracker_adminonlyviewedititem_by_default}
             </fieldset>
             <fieldset>
-                <legend class="h3">{tr}User Encryption{/tr}{help url="User Encryption"}</legend>
+                <legend class="h3">{tr}User Encryption{/tr}{help url="User-Encryption"}</legend>
                 {preference name=feature_user_encryption}
                 <div class="adminoptionboxchild" id="feature_user_encryption_childcontainer">
                     {if $sodium_available}
@@ -208,7 +208,7 @@
 
         {tab name="{tr}Spam Protection{/tr}"}
             {remarksbox type="tip" title="{tr}Tip{/tr}"}
-                {tr _0='<a href="http://doc.tiki.org/Forum+Admin#Forum_moderation" target="_blank" class="alert-link">' _1="</a>" _2="<strong>" _3="</strong>" _4='<a href="tiki-admin_actionlog.php" target="_blank" class="alert-link">' _5="</a>" _6='<a href="tiki-adminusers.php" target="_blank" class="alert-link">' _7="</a>" _8='<a href="tiki-list_comments.php" target="_blank" class="alert-link">' _9="</a>"}You can additionally protect from spam enabling the '%0moderation queue on forums%1', or through %2banning%3 multiple ip's from the '%4Action log%5', from '%6Users registration%7', or from the '%8Comments moderation queue%9' itself{/tr}.
+                {tr _0='<a href="http://doc.tiki.org/Forum-Admin#Forum_moderation" target="_blank" class="alert-link">' _1="</a>" _2="<strong>" _3="</strong>" _4='<a href="tiki-admin_actionlog.php" target="_blank" class="alert-link">' _5="</a>" _6='<a href="tiki-adminusers.php" target="_blank" class="alert-link">' _7="</a>" _8='<a href="tiki-list_comments.php" target="_blank" class="alert-link">' _9="</a>"}You can additionally protect from spam enabling the '%0moderation queue on forums%1', or through %2banning%3 multiple ip's from the '%4Action log%5', from '%6Users registration%7', or from the '%8Comments moderation queue%9' itself{/tr}.
             {/remarksbox}
             <fieldset>
                 <legend class="h3">{tr}CAPTCHA Options{/tr}</legend>
@@ -341,7 +341,7 @@
             <br>
             {remarksbox type="note" title="{tr}About encryption{/tr}"}
                 {tr}Encryption page allows you to create different encryption keys and share them securely with team members.{/tr}<br>
-                {tr}Find out more here:{/tr}{help url="Encryption"}
+                {tr}Find out more here:{/tr}{help url="User-Encryption"}
             {/remarksbox}
             {if $encryption_enabled neq 'y'}
                 {remarksbox type="error" title="{tr}Error{/tr}"}
