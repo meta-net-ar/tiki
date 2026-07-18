@@ -31,7 +31,7 @@
             <fieldset>
                 <legend class="h3">
                     {tr}Default user preferences{/tr}
-                    {help url="UsersDefaultPrefs" desc="{tr}Users Default Preferences{/tr}"}
+                    {help url="User-Preferences" desc="{tr}Users Default Preferences{/tr}"}
                 </legend>
                 <div class="adminoptionbox">
                     {preference name=feature_userPreferences}
