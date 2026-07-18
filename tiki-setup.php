@@ -442,31 +442,32 @@ if ($prefs['pwa_feature'] == 'y') { //pwa test propose, pages to cache
     $smarty->assign('pagespwa', json_encode($pages));
 }
 
-$customRobots = null;
-if ($prefs['metatag_robotscustom'] == 'y') {
-    if (empty($object)) {
-        $object = current_object();
-    }
-    if ($object && $object['type'] == 'wiki page') {
-        $wikilib = TikiLib::lib('wiki');
-        $customRobots = $wikilib->getPageMetatagRobotscustom($object['object']);
-        if (! empty($customRobots)) {
-            $smarty->assign('metatag_robotscustom', $customRobots);
-            $headerlib->setXRobotsTag($customRobots);
-        }
-    }
-}
 
-// Apply robots directives from robots.txt as meta tags and X-Robots-Tag header.
-if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
-    $robotsFromTxt = $headerlib->getRobots();
-    if (! empty($robotsFromTxt)) {
-        $smarty->assign('metatag_robots', $robotsFromTxt);
-        if (empty($customRobots)) {
-            $headerlib->setXRobotsTag($robotsFromTxt);
+Sections::onSectionChange(function ($section) use ($prefs, $headerlib, $smarty) {
+    $customRobots = null;
+    if ($prefs['metatag_robotscustom'] == 'y') {
+        $object = current_object();
+        if ($object && $object['type'] == 'wiki page') {
+            $wikilib = TikiLib::lib('wiki');
+            $customRobots = $wikilib->getPageMetatagRobotscustom($object['object']);
+            if (! empty($customRobots)) {
+                $smarty->assign('metatag_robotscustom', $customRobots);
+                $headerlib->setXRobotsTag($customRobots);
+            }
         }
     }
-}
+
+    // Apply robots directives from robots.txt as meta tags and X-Robots-Tag header.
+    if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
+        $robotsFromTxt = $headerlib->getRobots();
+        if (! empty($robotsFromTxt)) {
+            $smarty->assign('metatag_robots', $robotsFromTxt);
+            if (empty($customRobots)) {
+                $headerlib->setXRobotsTag($robotsFromTxt);
+            }
+        }
+    }
+});
 
 if ($prefs['feature_antibot'] == 'y' && empty($user)) {
     $captchaType = CaptchaTypeResolver::getConfiguredType($prefs);
@@ -918,27 +919,29 @@ if ($prefs['feature_tasks'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-tasks.js');
 }
 
-if ($prefs['feature_inline_comments'] === 'y' && $prefs['comments_inline_annotator'] === 'y') {
-    if (empty($object)) {
-        $object = current_object();
-    }
-    $commentController = new Services_Comment_Controller();
+Sections::onSectionChange(function ($section) {
+    global $headerlib, $prefs, $user;
+    if ($prefs['feature_inline_comments'] === 'y' && $prefs['comments_inline_annotator'] === 'y') {
+        if (empty($object)) {
+            $object = current_object();
+        }
+        $commentController = new Services_Comment_Controller();
 
-    if (
-        $object &&
-        $commentController->isEnabled($object['type'], $object['object']) &&
-        $commentController->canView($object['type'], $object['object'])
-    ) {
-        $canPost = $commentController->canPost($object['type'], $object['object']);
-        // spoof a URI from type and id
-        $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
+        if (
+            $object &&
+            $commentController->isEnabled($object['type'], $object['object']) &&
+            $commentController->canView($object['type'], $object['object'])
+        ) {
+            $canPost = $commentController->canPost($object['type'], $object['object']);
+            // spoof a URI from type and id
+            $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
 
-        $headerlib
-            ->add_js_module('import moment from "moment"; window.moment = moment;')
-            ->add_jsfile('vendor_bundled/vendor/openannotation/annotator/annotator-full.min.js')
-            ->add_cssfile('vendor_bundled/vendor/openannotation/annotator/annotator.min.css')
-            // language=JavaScript
-            ->add_jq_onready('
+            $headerlib
+                ->add_js_module('import moment from "moment"; window.moment = moment;')
+                ->add_jsfile('vendor_bundled/vendor/openannotation/annotator/annotator-full.min.js')
+                ->add_cssfile('vendor_bundled/vendor/openannotation/annotator/annotator.min.css')
+                // language=JavaScript
+                ->add_jq_onready('
 var annotatorContent = $("#top").annotator({readOnly: ' . ($canPost ? 'false' : 'true') . '});
 annotatorContent.annotator("addPlugin", "Store", {
     prefix: "tiki-ajax_services.php?controller=annotation&action=",
@@ -971,10 +974,10 @@ annotatorContent.annotator("addPlugin", "Permissions", {
         return annotation.permissions[action];
     }
 });');
-        // handling for extra info
-        if ($prefs['comments_inline_annotator_with_info'] === 'y') {
-            $headerlib->add_jq_onready(
-                '// a little glue to show the author name and date
+            // handling for extra info
+            if ($prefs['comments_inline_annotator_with_info'] === 'y') {
+                $headerlib->add_jq_onready(
+                    '// a little glue to show the author name and date
 $(".annotator-outer.annotator-viewer").on("load", function (event, annotations) {
     $(this).find(".annotator-user").text(annotations[0].realName + " - " + annotations[0].commentDate);
 });
@@ -985,10 +988,11 @@ $("#top").on("annotationCreated", function (e, annotation) {
         momentDate.format(jqueryTiki.shortTimeFormat);
     annotation.realName = jqueryTiki.userRealName || jqueryTiki.username;
 });'
-            );
+                );
+            }
         }
     }
-}
+});
 
 $headerlib->add_jsfile('lib/jquery_tiki/pluginedit.js');
 
