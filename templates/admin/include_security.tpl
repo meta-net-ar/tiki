@@ -341,7 +341,7 @@
             <br>
             {remarksbox type="note" title="{tr}About encryption{/tr}"}
                 {tr}Encryption page allows you to create different encryption keys and share them securely with team members.{/tr}<br>
-                {tr}Find out more here:{/tr}{help url="Encryption"}
+                {tr}Find out more here:{/tr}{help url="User-Encryption"}
             {/remarksbox}
             {if $encryption_enabled neq 'y'}
                 {remarksbox type="error" title="{tr}Error{/tr}"}
