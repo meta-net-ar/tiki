@@ -70,7 +70,13 @@ final class ChangedFiles
             );
         }
 
-        exec($command, $output);
+        exec($command . ' 2>&1', $output, $exitCode);
+
+        if ($exitCode !== 0) {
+            fwrite(STDERR, "Warning: could not compute changed files (" . implode(' ', $output) . "). Skipping.\n");
+
+            return [];
+        }
 
         $files = [];
 

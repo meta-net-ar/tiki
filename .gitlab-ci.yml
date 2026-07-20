@@ -255,7 +255,7 @@ spellchecker:
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
   script:
     - TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"
-    - php doc/devtools/spellchecker/generate-dictionaries.php --mr --base "$TARGET_BRANCH"
+    - php doc/devtools/spellchecker/generate-dictionaries.php --mr --base "origin/$TARGET_BRANCH"
 
 shlint:
   stage: code-quality
