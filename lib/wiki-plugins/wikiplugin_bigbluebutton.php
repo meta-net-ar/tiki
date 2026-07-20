@@ -178,7 +178,7 @@ function wikiplugin_bigbluebutton($data, $params)
     } catch (InvalidArgumentException $e) {
         // Input or missing parameter errors
         return WikiParser_PluginOutput::error(tr('Invalid parameter'), $e->getMessage());
-    } catch (Exception) {
-        return WikiParser_PluginOutput::internalError(tr('BigBlueButton is misconfigured or inaccessible.'));
+    } catch (Exception $e) {
+        return WikiParser_PluginOutput::internalError(tr('BigBlueButton is misconfigured or inaccessible: %0', $e->getMessage()));
     }
 }
