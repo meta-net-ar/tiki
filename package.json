@@ -1,5 +1,5 @@
 {
-    "//" : [
+    "//": [
         "Note about updating package.json:",
         "The behaviour of package-lock.json files upon running npm install has many subtleties, that are not especially obvious.",
         "The short version is that when you update package.json, you have two general choices to get package-lock.json up to date.",
@@ -23,114 +23,127 @@
         "  In one case, for an unknown reason a non-conflicting package was installed in a duplicate node_module after a simple npm install after a version update (looks like a npm bug).",
         "  It was fixed with a simple npm update"
     ],
-    "name" : "tiki",
-    "version" : "0.0.1",
-    "type" : "module",
-    "scriptsComments" : {
-        "checkEnvironment:validNodeModules" : "The idea is to stop everything if a dev updated from git and forgot to run npm install.  npm ls will do that (we check it's return code).  Unfortunately it is verbose (no easy cross platform way to suppress the output and keep the return code) and takes almost as long to run as a npm install...  Maybe just keep it until PHP developers get used to re-running composer and node - benoitg - 2023-11-24."
+    "name": "tiki",
+    "version": "0.0.1",
+    "type": "module",
+    "scriptsComments": {
+        "checkEnvironment:validNodeModules": "The idea is to stop everything if a dev updated from git and forgot to run npm install.  npm ls will do that (we check it's return code).  Unfortunately it is verbose (no easy cross platform way to suppress the output and keep the return code) and takes almost as long to run as a npm install...  Maybe just keep it until PHP developers get used to re-running composer and node - benoitg - 2023-11-24."
     },
-    "scripts" : {
-        "checkEnvironment:engine" : "node src/js/build_utils/engineCheck.js",
-        "checkEnvironment:validNodeModules" : "npm ls",
-        "checkEnvironmentComment" : "The idea is to emulate running all processes sequentially with && (fail if any return a non zero exit code), but be compatible with the different shells on windows",
-        "checkEnvironment" : "run-s --print-label \"checkEnvironment:*\"",
-        "prebuild" : "run-s --print-label \"checkEnvironment\"",
-        "build:generateIconList" : "node lib/iconGeneratorNodeWrapper.js",
-        "build:js" : "vite --config=src/js/vite.config.mjs build --mode=production",
-        "build:scss" : "npm run build -w src/scss",
-        "build:_custom" : "copy-and-watch '_custom/**/themes/**/*.{woff,woff2,ttf,otf,svg,png,gif,jpg}' '_custom/**/{lang,js}/**/*.{js,mjs}' public/generated/_custom",
-        "build" : "concurrently --max-processes=1 --kill-others-on-fail \"npm:build:*\"",
-        "prewatch" : "npm run checkEnvironment",
-        "watch:generateIconList" : "npm run build:generateIconList",
-        "watch:js" : "vite --config=src/js/vite.config.mjs build --watch --mode=development",
-        "watch:scss" : "npm run watch -w src/scss",
-        "watch:_custom" : "copy-and-watch --watch '_custom/**/themes/**/*.{woff,woff2,ttf,otf,svg,png,gif,jpg}' '_custom/**/{lang,js}/**/*.{js,mjs}' public/generated/_custom",
-        "watch" : "concurrently --kill-others-on-fail \"npm:watch:*\"",
-        "lint" : "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
-        "format" : "prettier .  --write",
-        "clean:wsconf" : "php console.php dev:buildwsconfs --clean",
-        "clean:scss" : "npm run clean -w src/scss",
-        "clean" : "concurrently \"npm:clean:*\"",
-        "test" : "vitest --config=src/js/vite.config.mjs --coverage",
-        "testci" : "vitest --config=src/js/vite.config.mjs --coverage --run",
-        "postinstall" : "patch-package --patch-dir=src/js/patches --error-on-fail",
-        "patch" : "patch-package --patch-dir=src/js/patches --error-on-fail",
-        "prepare" : "husky"
+    "scripts": {
+        "checkEnvironment:engine": "node src/js/build_utils/engineCheck.js",
+        "checkEnvironment:validNodeModules": "npm ls",
+        "checkEnvironmentComment": "The idea is to emulate running all processes sequentially with && (fail if any return a non zero exit code), but be compatible with the different shells on windows",
+        "checkEnvironment": "run-s --print-label \"checkEnvironment:*\"",
+        "prebuild": "run-s --print-label \"checkEnvironment\"",
+        "build:generateIconList": "node lib/iconGeneratorNodeWrapper.js",
+        "build:js": "vite --config=src/js/vite.config.mjs build --mode=production",
+        "build:scss": "npm run build -w src/scss",
+        "build:_custom": "copy-and-watch '_custom/**/themes/**/*.{woff,woff2,ttf,otf,svg,png,gif,jpg}' '_custom/**/{lang,js}/**/*.{js,mjs}' public/generated/_custom",
+        "build": "concurrently --max-processes=1 --kill-others-on-fail \"npm:build:*\"",
+        "prewatch": "npm run checkEnvironment",
+        "watch:generateIconList": "npm run build:generateIconList",
+        "watch:js": "vite --config=src/js/vite.config.mjs build --watch --mode=development",
+        "watch:scss": "npm run watch -w src/scss",
+        "watch:_custom": "copy-and-watch --watch '_custom/**/themes/**/*.{woff,woff2,ttf,otf,svg,png,gif,jpg}' '_custom/**/{lang,js}/**/*.{js,mjs}' public/generated/_custom",
+        "watch:spellchecker": "php doc/devtools/spellchecker/generate-dictionaries.php --watch",
+        "watch": "concurrently --kill-others-on-fail \"npm:watch:*\"",
+        "lint": "eslint --ext .js,.vue --ignore-path .gitignore --fix src",
+        "spellchecker:generate": "php doc/devtools/spellchecker/generate-dictionaries.php",
+        "spellchecker:generate:all": "php doc/devtools/spellchecker/generate-dictionaries.php --all",
+        "spellchecker:generate:mr": "php doc/devtools/spellchecker/generate-dictionaries.php --mr",
+        "spellcheck": "npm run spellchecker:generate:changed && cspell \"**/*\"",
+        "format": "prettier .  --write",
+        "clean:wsconf": "php console.php dev:buildwsconfs --clean",
+        "clean:scss": "npm run clean -w src/scss",
+        "clean": "concurrently \"npm:clean:*\"",
+        "test": "vitest --config=src/js/vite.config.mjs --coverage",
+        "testci": "vitest --config=src/js/vite.config.mjs --coverage --run",
+        "postinstall": "patch-package --patch-dir=src/js/patches --error-on-fail",
+        "patch": "patch-package --patch-dir=src/js/patches --error-on-fail",
+        "prepare": "husky"
     },
-    "engines" : {
-        "npm" : ">=9.0.0 <12",
-        "node" : ">=20.0.0 <25"
+    "spellcheckComments": {
+        "spellchecker:generate": "Generate dictionaries for spellchecker from changed files by default (ignoring files in .gitignore and cspell.json ignore glob patterns)",
+        "spellchecker:generate:changed": "Generate dictionaries for spellchecker based on changed files",
+        "spellchecker:generate:mr": "Generate dictionaries for spellchecker based on merge request files accept options like --mr=origin/master , --mr=origin/branchname or --mr=upstream/master ...",
+        "spellchecker:generate:all": "Generate dictionaries for spellchecker from all files",
+        "spellcheck": "Run spellcheck on all files, generating dictionaries for changed files first"
     },
-    "enginesComment" : {
-        "npm" : "Npm arrived at version 9 in the middle of node 18 lifecycle, but version 9 is required to keep the version of package-lock.json at v3",
-        "node" : "We track supported vite node version, which is 18 as of vite 5"
+    "engines": {
+        "npm": ">=9.0.0 <12",
+        "node": ">=20.0.0 <25"
     },
-    "dependencies" : {
-        "single-spa-css" : "^4.0.1",
-        "single-spa-vue" : "^3.0.1",
-        "ui-predicate-vue3" : "1.1.0"
+    "enginesComment": {
+        "npm": "Npm arrived at version 9 in the middle of node 18 lifecycle, but version 9 is required to keep the version of package-lock.json at v3",
+        "node": "We track supported vite node version, which is 18 as of vite 5"
     },
-    "depencenciesComment" : {
-        "single-spa-css" : "https://github.com/single-spa/single-spa-css/releases",
-        "single-spa-vue" : "https://github.com/single-spa/single-spa-vue/releases",
-        "ui-predicate-vue3" : "https://www.npmjs.com/package/ui-predicate-vue3 — Vue 3 adapter for ui-predicate (replaces vendored lib in vue-mf/tracker-rules)"
+    "dependencies": {
+        "single-spa-css": "^4.0.1",
+        "single-spa-vue": "^3.0.1",
+        "ui-predicate-vue3": "1.1.0"
     },
-    "devDependencies" : {
-        "@commitlint/cli" : "^20.2.0",
-        "@commitlint/config-conventional" : "^20.2.0",
-        "@stylistic/eslint-plugin" : "^5.6.1",
-        "@testing-library/vue" : "^8.1.0",
-        "@vitejs/plugin-vue" : "^6.0.3",
-        "@vitest/coverage-istanbul" : "^4.0.16",
-        "check-engine" : "^1.14.0",
-        "concurrently" : "^9.2.1",
-        "copy-and-watch" : "^0.1.8",
-        "es-module-shims" : "^2.7.0",
-        "eslint" : "^9.39.2",
-        "eslint-config-prettier" : "^10.1.8",
-        "eslint-plugin-prettier" : "^5.5.4",
-        "eslint-plugin-vue" : "^10.6.2",
-        "happy-dom" : "^20.0.11",
-        "husky" : "^9.1.7",
-        "npm-run-all2" : "^8.0.4",
-        "patch-package" : "^8.0.1",
-        "prettier" : "^3.7.4",
-        "rollup-plugin-visualizer" : "^6.0.5",
-        "tinyglobby" : "^0.2.15",
-        "unplugin-auto-import" : "^20.3.0",
-        "unplugin-vue-components" : "^30.0.0",
-        "vite" : "^7.3.0",
-        "vite-plugin-static-copy" : "^3.1.4",
-        "vitest" : "^4.0.16"
+    "depencenciesComment": {
+        "single-spa-css": "https://github.com/single-spa/single-spa-css/releases",
+        "single-spa-vue": "https://github.com/single-spa/single-spa-vue/releases",
+        "ui-predicate-vue3": "https://www.npmjs.com/package/ui-predicate-vue3 — Vue 3 adapter for ui-predicate (replaces vendored lib in vue-mf/tracker-rules)"
     },
-    "devDepencenciesCommentWillAlsoBeAvailableAsDevDependenciesInWorkspace" : {
+    "devDependencies": {
+        "@commitlint/cli": "^20.2.0",
+        "@commitlint/config-conventional": "^20.2.0",
+        "@stylistic/eslint-plugin": "^5.6.1",
+        "@testing-library/vue": "^8.1.0",
+        "@vitejs/plugin-vue": "^6.0.3",
+        "@vitest/coverage-istanbul": "^4.0.16",
+        "check-engine": "^1.14.0",
+        "concurrently": "^9.2.1",
+        "copy-and-watch": "^0.1.8",
+        "cspell": "^10.0.1",
+        "es-module-shims": "^2.7.0",
+        "eslint": "^9.39.2",
+        "eslint-config-prettier": "^10.1.8",
+        "eslint-plugin-prettier": "^5.5.4",
+        "eslint-plugin-vue": "^10.6.2",
+        "happy-dom": "^20.0.11",
+        "husky": "^9.1.7",
+        "npm-run-all2": "^8.0.4",
+        "patch-package": "^8.0.1",
+        "prettier": "^3.7.4",
+        "rollup-plugin-visualizer": "^6.0.5",
+        "tinyglobby": "^0.2.15",
+        "unplugin-auto-import": "^20.3.0",
+        "unplugin-vue-components": "^30.0.0",
+        "vite": "^7.3.0",
+        "vite-plugin-static-copy": "^3.1.4",
+        "vitest": "^4.0.16"
+    },
+    "devDepencenciesCommentWillAlsoBeAvailableAsDevDependenciesInWorkspace": {
         "@commitlint/*": "https://github.com/conventional-changelog/commitlint/blob/master/CHANGELOG.md",
-        "@stylistic/eslint-plugin" : "https://github.com/eslint-stylistic/eslint-stylistic/blob/main/CHANGELOG.md",
-        "@vitejs/plugin-vue" : "https://github.com/vitejs/vite-plugin-vue/blob/main/packages/plugin-vue/CHANGELOG.md",
-        "es-module-shims" : "https://github.com/guybedford/es-module-shims. Copied to be available as an external, but not in common-externals, because it will not be included from import-maps",
-        "eslint" : "",
-        "eslint-config-prettier" : "",
-        "eslint-plugin-prettier" : "",
-        "eslint-plugin-vue" : "",
-        "happy-dom" : "https://github.com/capricorn86/happy-dom/releases",
-        "npm-run-all2" : "Used to parallelize npm build operations.  https://github.com/bcomnes/npm-run-all2/blob/master/CHANGELOG.md",
-        "prettier" : "",
-        "sass" : "https://github.com/sass/dart-sass/blob/main/CHANGELOG.md",
-        "tinyglobby" : "Only used directly in vite.config.mjs.  Migrated from glob to align with vite and avoid problem with bad engine specifier in glob that skipped node 21.  https://github.com/SuperchupuDev/tinyglobby/blob/main/CHANGELOG.md",
-        "unplugin-auto-import" : "https://github.com/unplugin/unplugin-auto-import/releases",
-        "unplugin-vue-components" : "https://github.com/unplugin/unplugin-vue-components/releases",
-        "vite" : "https://github.com/vitejs/vite/blob/main/packages/vite/CHANGELOG.md",
-        "vite-plugin-static-copy" : "https://github.com/sapphi-red/vite-plugin-static-copy/blob/main/CHANGELOG.md",
-        "vitest" : "https://github.com/vitest-dev/vitest/releases"
+        "@stylistic/eslint-plugin": "https://github.com/eslint-stylistic/eslint-stylistic/blob/main/CHANGELOG.md",
+        "@vitejs/plugin-vue": "https://github.com/vitejs/vite-plugin-vue/blob/main/packages/plugin-vue/CHANGELOG.md",
+        "es-module-shims": "https://github.com/guybedford/es-module-shims. Copied to be available as an external, but not in common-externals, because it will not be included from import-maps",
+        "eslint": "",
+        "eslint-config-prettier": "",
+        "eslint-plugin-prettier": "",
+        "eslint-plugin-vue": "",
+        "happy-dom": "https://github.com/capricorn86/happy-dom/releases",
+        "npm-run-all2": "Used to parallelize npm build operations.  https://github.com/bcomnes/npm-run-all2/blob/master/CHANGELOG.md",
+        "prettier": "",
+        "sass": "https://github.com/sass/dart-sass/blob/main/CHANGELOG.md",
+        "tinyglobby": "Only used directly in vite.config.mjs.  Migrated from glob to align with vite and avoid problem with bad engine specifier in glob that skipped node 21.  https://github.com/SuperchupuDev/tinyglobby/blob/main/CHANGELOG.md",
+        "unplugin-auto-import": "https://github.com/unplugin/unplugin-auto-import/releases",
+        "unplugin-vue-components": "https://github.com/unplugin/unplugin-vue-components/releases",
+        "vite": "https://github.com/vitejs/vite/blob/main/packages/vite/CHANGELOG.md",
+        "vite-plugin-static-copy": "https://github.com/sapphi-red/vite-plugin-static-copy/blob/main/CHANGELOG.md",
+        "vitest": "https://github.com/vitest-dev/vitest/releases"
     },
-    "overrides" : {
-        "dompurify" : "3.3.3",
-        "jspdf" : "4.2.1",
-        "svgedit" : {
-            "jspdf" : "4.2.1"
+    "overrides": {
+        "dompurify": "3.3.3",
+        "jspdf": "4.2.1",
+        "svgedit": {
+            "jspdf": "4.2.1"
         }
     },
-    "overridesComment" : {
+    "overridesComment": {
         "jspdf": [
             "npm audit flagged jspdf <= 4.2.0 (critical). Pin 4.2.1 so the root install and svgedit (nested 4.0.0) resolve to a patched release."
         ],
@@ -145,24 +158,24 @@
         ]
     },
     "workspaces": [
-    "src/js/avatar-generator",
-    "src/js/common-externals*",
-    "src/js/common-reexported",
-    "src/js/jquery-tiki",
-    "src/js/tiki-figlet",
-    "src/js/tiki-iot",
-    "src/js/tiki-glightbox",
-    "src/js/tiki-html5-qrcode",
-    "src/js/tiki-lottie",
-    "src/js/tiki-mermaid",
-    "src/js/tiki-model3dviewer",
-    "src/js/tiki-sentry-browser",
-    "src/js/tiki-toast-ui",
-    "src/js/tiki-ui-utils",
-    "src/js/tiki-vue-sfc-loader",
-    "src/js/vue-mf/*",
-    "src/js/vue-widgets/*",
-    "src/js/wysiwyg",
-    "src/scss"
-  ]
+        "src/js/avatar-generator",
+        "src/js/common-externals*",
+        "src/js/common-reexported",
+        "src/js/jquery-tiki",
+        "src/js/tiki-figlet",
+        "src/js/tiki-iot",
+        "src/js/tiki-glightbox",
+        "src/js/tiki-html5-qrcode",
+        "src/js/tiki-lottie",
+        "src/js/tiki-mermaid",
+        "src/js/tiki-model3dviewer",
+        "src/js/tiki-sentry-browser",
+        "src/js/tiki-toast-ui",
+        "src/js/tiki-ui-utils",
+        "src/js/tiki-vue-sfc-loader",
+        "src/js/vue-mf/*",
+        "src/js/vue-widgets/*",
+        "src/js/wysiwyg",
+        "src/scss"
+    ]
 }

@@ -1,0 +1,232 @@
+{
+    "version": "0.2",
+    "language": "en",
+    "words": [],
+    "flagWords": [
+        "hte",
+        "teh",
+        "retrive",
+        "mispell",
+        "mispellings"
+    ],
+    "ignoreWords": [],
+    "ignorePaths": [
+        ".git/**",
+        ".github/**",
+        ".gitpod/**",
+        ".husky/**",
+        "vendor/**",
+        "vendor_bundled/**",
+        "vendor_custom/**",
+        "node_modules/**",
+        "public/**",
+        "lib/test/**",
+        "lib/language/**",
+        "lib/pass_blacklists/**",
+        "temp/**",
+        "lang/**",
+        "tmp/**",
+        "cache/**",
+        "storage/**",
+        "db/**",
+        "tests/fixtures/**",
+        "**/*.min.js",
+        "**/*.min.css",
+        "**/dist/**",
+        "**/build/**",
+        "**/lib/openlayers/authors.txt",
+        "**/coverage/**",
+        "**/copyright.txt",
+        "**/*.lock",
+        "**/*.log",
+        "**/*.sql"
+    ],
+    "maxNumberOfProblems": 100,
+    "minWordLength": 3,
+    "allowCompoundWords": false,
+    "dictionaries": [
+        "php",
+        "typescript",
+        "node",
+        "html",
+        "css",
+        "bash",
+        "softwareTerms",
+        "companies",
+        "misc",
+        "filetypes",
+        "english-tiki-dictionary",
+        "sql",
+        "tiki-php-functions",
+        "tiki-php-classes",
+        "tiki-js",
+        "tiki-vue",
+        "tiki-filenames",
+        "tiki-project",
+        "tiki-php-variables",
+        "tiki-php-constants"
+    ],
+    "dictionaryDefinitions": [
+        {
+            "name": "english-tiki-dictionary",
+            "description": "Tiki project dictionary",
+            "path": "./doc/devtools/spellchecker/dictionary.txt",
+            "useCompounds": true,
+            "repMap": [
+                [
+                    "'|`|’",
+                    "'"
+                ]
+            ]
+        },
+        {
+            "name": "tiki-php-functions",
+            "path": "./doc/devtools/spellchecker/generated_dictionaries/php-functions.txt"
+        },
+        {
+            "name": "tiki-php-classes",
+            "path": "./doc/devtools/spellchecker/generated_dictionaries/php-classes.txt"
+        },
+        {
+            "name": "tiki-js",
+            "path": "./doc/devtools/spellchecker/generated_dictionaries/js-identifiers.txt"
+        },
+        {
+            "name": "tiki-vue",
+            "path": "./doc/devtools/spellchecker/generated_dictionaries/vue-identifiers.txt"
+        },
+        {
+            "name": "tiki-filenames",
+            "path": "./doc/devtools/spellchecker/generated_dictionaries/filenames.txt"
+        },
+        {
+            "name": "tiki-php-constants",
+            "path": "./doc/devtools/spellchecker/generated_dictionaries/php-constants.txt"
+        },
+        {
+            "name": "tiki-project",
+            "path": "./doc/devtools/spellchecker/generated_dictionaries/project.txt"
+        },
+        {
+            "name": "tiki-php-variables",
+            "path": "./doc/devtools/spellchecker/generated_dictionaries/php-variables.txt"
+        }
+    ],
+    "ignoreRegExpList": [
+        "Base64",
+        "Email",
+        "UUID",
+        "HexValues",
+        "SHA",
+        "HashStrings",
+        "Urls",
+        "/https?:\\/\\/\\S+/",
+        "/\\b[0-9a-f]{32,}\\b/i",
+        "/\\$[a-zA-Z_][a-zA-Z0-9_]*/g",
+        "/\\b[a-z]+[A-Z][a-zA-Z0-9]*\\b/g",
+        "/\\b[A-Z_]{3,}\\b/g",
+        "/\\([^)]*\\)/g",
+        "/https?:\\/\\/\\S+/g",
+        "/\\b[0-9a-f]{16,}\\b/i",
+        "/\\b[A-Za-z0-9+/]{20,}={0,2}\\b/",
+        "/\\$[A-Za-z_][A-Za-z0-9_]*/g",
+        "/\\b[A-Za-z_][A-Za-z0-9_]*\\s*\\(/g",
+        "/\\b(class|function|extends|implements|interface|namespace|use|public|private|protected|static|const|return|new|parent)\\b/",
+        "/\\$[A-Za-z_][A-Za-z0-9_]*/g",
+        "/\\b[A-Za-z_][A-Za-z0-9_]*\\s*\\(/g",
+        "/\\b(?:new|class|function|const|let|var|if|for|while|switch|return|public|private|protected|static|async|await)\\b/",
+        "/->/",
+        "/::/",
+        "/=>/",
+        "/===?/",
+        "/!==?/",
+        "/\\$\\{[^}]+\\}/g",
+        "/\\.[A-Za-z_][A-Za-z0-9_]*/g",
+        "/\\b(?:[A-Za-z_][A-Za-z0-9_]*\\\\)+[A-Za-z_][A-Za-z0-9_]*\\b/g",
+        "/#\\[[^\\]]+\\]/g",
+        "/\\$\\{[^}]+\\}/g",
+        "/\\b[A-Za-z_][A-Za-z0-9_]*\\s*:/g",
+        "/(?:[A-Za-z]:\\\\|\\/)[^\\s\"']+/g",
+        "/:[A-Za-z_][A-Za-z0-9_]*/g",
+        "/\\b[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)+\\b/g",
+        "/\\b(?:[A-Z][a-zA-Z0-9]*)(?:_[A-Z][a-zA-Z0-9]*)+\\b/g",
+        "/\\b(?:[A-Za-z_][A-Za-z0-9_]*\\\\)+[A-Za-z_][A-Za-z0-9_]*\\b/g",
+        "/\\$?[A-Za-z_][A-Za-z0-9_]*(?:->\\w+)+/g",
+        "/(?<=\\[['\"])[A-Za-z_][A-Za-z0-9_]*(?=['\"]\\])/g"
+    ],
+    "includeRegExpList": [],
+    "patterns": [
+        {
+            "name": "PHPVariables",
+            "pattern": "/\\$[A-Za-z_][A-Za-z0-9_]*/g"
+        },
+        {
+            "name": "TwigVariables",
+            "pattern": "/\\{\\{.*?\\}\\}/g"
+        }
+    ],
+    "languageSettings": [
+        {
+            "languageId": "php",
+            "locale": "*",
+            "dictionaries": [
+                "php",
+                "english-tiki-dictionary"
+            ],
+            "ignoreRegExpList": [
+                "PHPVariables"
+            ]
+        },
+        {
+            "languageId": "javascript,typescript",
+            "locale": "*",
+            "dictionaries": [
+                "typescript",
+                "node",
+                "softwareTerms",
+                "english-tiki-dictionary"
+            ]
+        },
+        {
+            "languageId": "html",
+            "locale": "*",
+            "dictionaries": [
+                "html",
+                "css",
+                "english-tiki-dictionary"
+            ]
+        },
+        {
+            "languageId": "css,scss",
+            "locale": "*",
+            "dictionaries": [
+                "css",
+                "fonts",
+                "english-tiki-dictionary"
+            ]
+        },
+        {
+            "languageId": "markdown",
+            "locale": "*",
+            "allowCompoundWords": true
+        }
+    ],
+    "overrides": [
+        {
+            "filename": "**/*.md",
+            "language": "en"
+        },
+        {
+            "filename": "**/*.json",
+            "enabled": false
+        },
+        {
+            "filename": "vendor/**",
+            "enabled": false
+        },
+        {
+            "filename": "node_modules/**",
+            "enabled": false
+        }
+    ]
+}
