@@ -2,12 +2,12 @@
 
 import ReplyForm from "./ReplyForm.vue";
 import {inject, onMounted} from "vue";
-
-const tr = inject('tr')
-</script>
-<script>
 import useMessageStore from "../store";
 
+const tr = inject('tr')
+const store = useMessageStore();
+</script>
+<script>
 export default {
     name: 'Message',
     props: {
@@ -40,15 +40,11 @@ export default {
                 useMessageStore().drawMessagesTree();
             }, 20);//TODO: find a better way to do this
         },
-        resolved: function(messageId, event) {
-            var expanded = event.target.getAttribute('aria-expanded');
-            var target = event.target.getAttribute('data-bs-target');
-            var timeout = 20;
-            if (expanded == "true") {
-                timeout = 500;
-            }
+        toggleResolved: function(messageId) {
+            const resolved = useMessageStore().toggleResolved(messageId);
+            const timeout = resolved === 1 ? 20 : 500;
             setTimeout(() => {
-                useMessageStore().drawMessagesTree(expanded, target.substring(1));
+                useMessageStore().drawMessagesTree();
             }, timeout);//TODO: find a better way to do this
         }
     }
@@ -76,7 +72,7 @@ export default {
                     <i class="icon fa-solid fa-thumbs-up fa-xs mt-3" @click="store.like(item.messageId)"></i><span class="like small text-muted mx-1 me-4">{{ item.like }}</span>
                     <i class="icon fa-solid fa-thumbs-down fa-xs mt-3" @click="store.dislike(item.messageId)"></i><span class="dislike small text-muted mx-1">{{ item.dislike }}</span>
                     <div :class="[{'d-thread-button-block' : item.parentId != 0}, 'thread-button-block float-end']">
-                        <a href="#" data-bs-toggle="collapse" :data-bs-target="`.replies-${item.messageId}`" class="btn btn-outline-primary m-1 btn-sm"  @click="resolved(item.messageId, $event)" v-if="item.parentId == 0">{{ tr('Mark as resolved') }}</a>
+                        <a href="#" data-bs-toggle="collapse" :data-bs-target="`.replies-${item.messageId}`" class="btn resolved-btn m-1 btn-sm" :class="item.resoved === 1 ? 'bg-success border-success text-white' : 'btn-outline-primary'" :aria-expanded="item.resoved !== 1" @click="toggleResolved(item.messageId)" v-if="item.parentId == 0">{{ item.resoved === 1 ? tr('Resolved') : tr('Mark as resolved') }}</a>
                         <a href="#" class="btn btn-outline-primary m-1 btn-sm">{{ tr('Pin') }}</a>
                         <a :href="'#message-'+item.messageId" class="btn btn-outline-primary m-1 btn-sm" @click="update(item.messageId)">{{ tr('Edit') }}</a>
                         <a :href="'#message-'+item.messageId" class="btn btn-outline-primary m-1 btn-sm" @click="create()">{{ tr('Reply') }}</a>
@@ -92,5 +88,14 @@ export default {
 </template>
 
 <style scoped lang="scss">
+.message-footer a.resolved-btn.btn-outline-primary:hover {
+    background-color: var(--bs-btn-active-bg);
+    border-color: var(--bs-btn-active-bg);
+}
 
+.message-footer a.resolved-btn.bg-success:hover {
+    background-color: #ffffff;
+    border-color: #198754;
+    color: #198754;
+}
 </style>

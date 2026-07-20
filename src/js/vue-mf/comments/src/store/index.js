@@ -13,7 +13,7 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 6,
                 dislike: 0,
-                resoved: 0,
+                resoved: 1,
             },
             {
                 title: "This is a reply title",
@@ -214,14 +214,23 @@ export default defineStore("messageStore", {
             const index = this.threads.findIndex((element) => element.messageId === messageId);
             this.threads[index].dislike += 1;
         },
-        drawMessagesTree(expended = "true", targetClass = "") {
+        toggleResolved(messageId) {
+            const index = this.threads.findIndex((element) => element.messageId === messageId);
+            this.threads[index].resoved = this.threads[index].resoved === 1 ? 0 : 1;
+            return this.threads[index].resoved;
+        },
+        drawMessagesTree() {
             var arr = this.threads;
             arr.forEach((item) => {
                 let margins = 6;
                 let totalHeight = 0;
                 let lastChildHeight = 0;
+                let targetClass = "";
+                let resolved = false;
                 if (item.parentId === 0) {
+                    targetClass = "replies-" + item.messageId;
                     margins = 16;
+                    resolved = item.resoved === 1;
                 }
                 let parentBody = $("#body-" + item.messageId).parent(".thread-block");
                 totalHeight = parentBody.outerHeight();
@@ -230,9 +239,7 @@ export default defineStore("messageStore", {
                 });
                 totalHeight -= lastChildHeight + margins;
 
-                if (expended == "false" && (parentBody.hasClass(targetClass) || parentBody.find("." + targetClass).length > 0)) {
-                    console.log(targetClass);
-                    console.log(parentBody.hasClass(targetClass));
+                if (resolved && targetClass !== "" && (parentBody.hasClass(targetClass) || parentBody.find("." + targetClass).length > 0)) {
                     totalHeight = 0;
                 }
 
