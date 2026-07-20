@@ -11,6 +11,7 @@ namespace Tiki\Lib\Test\Api\Trackers;
  *
  * @group api-integration-test
  * @group api-trackers
+ * @group tracker
  */
 class ApiTrackersGetTest extends ApiBaseTrackersTest
 {
