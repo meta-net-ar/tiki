@@ -509,7 +509,7 @@ if ($dbconn) {
     if ($unsupportedMailQueueEntries > 0) {
         $smarty->assign('unsupported_mail_queue_entries', $unsupportedMailQueueEntries);
     }
-    if ($install_step == '6' && $has_tiki_db) {
+    if ($install_step == '7' && $has_tiki_db) {
         if (isset($_POST['install_type']) && $_POST['install_type'] === 'scratch') {
             require_once('lib/setup/prefs.php');
             // fix some prefs thwt get reset here
@@ -599,7 +599,7 @@ if (
     // TODO: Equivalent for IIS
 
 
-    if ($install_step == '6' || $install_step == '7') {
+    if ($install_step == '7' || $install_step == '8') {
         if (str_contains($_SERVER['SERVER_SOFTWARE'], 'Apache')) {
             if (! file_exists('.htaccess')) {
                 if (! isset($_REQUEST['htaccess_process'])) {
@@ -656,7 +656,7 @@ if (! isset($install_type)) {
     }
 }
 
-if ($install_step == '9') {
+if ($install_step == '10') {
     if (! isset($_POST['nolockenter'])) {
         touch('db/' . $tikidomainslash . 'lock');
     }
@@ -781,7 +781,7 @@ if ($install_step == '2') {
         $gd_test = 'n';
     }
     $smarty->assign('gd_test', $gd_test);
-} elseif ($install_step == 6 && ! empty($_POST['validPatches'])) {
+} elseif ($install_step == 7 && ! empty($_POST['validPatches'])) {
     foreach ($_POST['validPatches'] as $patch) {
         Patch::$list[$patch]->record();
     }
@@ -910,7 +910,7 @@ if (isset($_POST['fix_double_encoding']) && ! empty($_POST['previous_encoding'])
     $smarty->assign('double_encode_fix_attempted', 'y');
 }
 
-if ($install_step == '4') {
+if ($install_step == '5') {
     // Show the innodb option in the (re)install section if InnoDB is present
     if (isset($installer) and $installer->hasInnoDB()) {
         $smarty->assign('hasInnoDB', true);
@@ -927,7 +927,7 @@ if ($install_step == '4') {
     $smarty->assign('database_charset', $value);
 }
 
-if (((isset($value) && $value == 'utf8mb4') || $install_step == '7') && ($db = TikiDb::get()) && ! empty($dbs_tiki)) {
+if (((isset($value) && $value == 'utf8mb4') || $install_step == '8') && ($db = TikiDb::get()) && ! empty($dbs_tiki)) {
     $result = $db->fetchAll(
         'SELECT TABLE_COLLATION FROM INFORMATION_SCHEMA.TABLES '
             . ' WHERE TABLE_SCHEMA = ? AND TABLE_COLLATION NOT LIKE "utf8mb4%" '
@@ -939,7 +939,7 @@ if (((isset($value) && $value == 'utf8mb4') || $install_step == '7') && ($db = T
     }
 }
 
-if ($install_step == '6') {
+if ($install_step == '7') {
     $smarty->assign('disableAccounts', list_disable_accounts());
 }
 
