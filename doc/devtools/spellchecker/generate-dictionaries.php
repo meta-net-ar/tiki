@@ -20,6 +20,10 @@ require_once __DIR__ . '/src/JsParser.php';
 require_once __DIR__ . '/src/VueParser.php';
 require_once __DIR__ . '/src/DictionaryGenerator.php';
 
+use TikiDevTools\Spellchecker\ChangedFiles;
+use TikiDevTools\Spellchecker\Config;
+use TikiDevTools\Spellchecker\DictionaryGenerator;
+
 $mode = 'changed';
 $base = 'origin/master';
 

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace TikiDevTools\Spellchecker;
+
 use Symfony\Component\Finder\Finder;
 
 final class DictionaryGenerator
@@ -41,15 +43,14 @@ final class DictionaryGenerator
     {
         $outDir = $this->root . '/doc/devtools/spellchecker/generated_dictionaries';
 
-        if (!is_dir($outDir)) {
+        if (! is_dir($outDir)) {
             return;
         }
 
         foreach (array_keys($this->dictionaries) as $name) {
-
             $file = $outDir . '/' . $name . '.txt';
 
-            if (!is_file($file)) {
+            if (! is_file($file)) {
                 continue;
             }
 
@@ -67,7 +68,6 @@ final class DictionaryGenerator
             $this->loadExistingDictionaries();
         }
         switch ($mode) {
-
             case 'changed':
                 $files = ChangedFiles::changed($this->root);
                 break;
@@ -91,7 +91,6 @@ final class DictionaryGenerator
     private function applyCSpellIgnores(Finder $finder): void
     {
         foreach ($this->config->getIgnorePaths() as $pattern) {
-
             // directory/**
             if (preg_match('#^([^*?]+)/\*\*$#', $pattern, $m)) {
                 $finder->exclude($m[1]);
@@ -111,7 +110,7 @@ final class DictionaryGenerator
             }
 
             // exact filename
-            if (!str_contains($pattern, '*')) {
+            if (! str_contains($pattern, '*')) {
                 $finder->notName($pattern);
             }
         }
@@ -125,7 +124,6 @@ final class DictionaryGenerator
         $this->add('filenames', $base);
 
         switch ($ext) {
-
             case 'php':
                 $this->processPhp($file);
                 break;
@@ -197,7 +195,7 @@ final class DictionaryGenerator
     {
         $outDir = $this->root . '/doc/devtools/spellchecker/generated_dictionaries';
 
-        if (!is_dir($outDir)) {
+        if (! is_dir($outDir)) {
             mkdir($outDir, 0777, true);
         }
 

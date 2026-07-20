@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace TikiDevTools\Spellchecker;
+
 use Symfony\Component\Finder\Finder;
 
 final class ChangedFiles
@@ -73,8 +75,7 @@ final class ChangedFiles
         $files = [];
 
         foreach ($output as $file) {
-
-            if (!preg_match('/\.(php|js|vue)$/', $file)) {
+            if (! preg_match('/\.(php|js|vue)$/', $file)) {
                 continue;
             }
 

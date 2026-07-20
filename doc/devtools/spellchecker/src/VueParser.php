@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace TikiDevTools\Spellchecker;
+
 final class VueParser
 {
     private JsParser $jsParser;

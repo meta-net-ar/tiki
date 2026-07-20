@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace TikiDevTools\Spellchecker;
+
 final class Config
 {
     private array $config;
@@ -9,7 +11,7 @@ final class Config
     public function __construct(string $file)
     {
         if (! is_file($file)) {
-            throw new RuntimeException("Cannot find $file");
+            throw new \RuntimeException("Cannot find $file");
         }
 
         $this->config = json_decode(
@@ -33,7 +35,6 @@ final class Config
     public function ignoredByRegex(string $word): bool
     {
         foreach ($this->getIgnoreRegex() as $regex) {
-
             if ($regex[0] !== '/') {
                 continue;
             }

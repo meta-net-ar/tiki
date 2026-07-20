@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace TikiDevTools\Spellchecker;
+
 final class PhpParser
 {
     /**
@@ -34,15 +36,13 @@ final class PhpParser
         $count = count($tokens);
 
         for ($i = 0; $i < $count; $i++) {
-
             $token = $tokens[$i];
 
-            if (!is_array($token)) {
+            if (! is_array($token)) {
                 continue;
             }
 
             switch ($token[0]) {
-
                 case T_CLASS:
                     $this->collectNextString($tokens, $i, $result['classes']);
                     break;
@@ -95,10 +95,9 @@ final class PhpParser
         $count = count($tokens);
 
         for ($j = $i + 1; $j < $count; $j++) {
-
             $token = $tokens[$j];
 
-            if (!is_array($token)) {
+            if (! is_array($token)) {
                 continue;
             }
 
@@ -114,10 +113,9 @@ final class PhpParser
         $count = count($tokens);
 
         for ($j = $i + 1; $j < $count; $j++) {
-
             $token = $tokens[$j];
 
-            if (!is_array($token)) {
+            if (! is_array($token)) {
                 continue;
             }
 
@@ -148,10 +146,9 @@ final class PhpParser
         $count = count($tokens);
 
         for ($j = $i + 1; $j < $count; $j++) {
-
             $token = $tokens[$j];
 
-            if (!is_array($token)) {
+            if (! is_array($token)) {
                 continue;
             }
 
@@ -173,11 +170,9 @@ final class PhpParser
         $name = '';
 
         for ($j = $i + 1; $j < $count; $j++) {
-
             $token = $tokens[$j];
 
             if (is_string($token)) {
-
                 if ($token === ';' || $token === '{') {
                     break;
                 }
