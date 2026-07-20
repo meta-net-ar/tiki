@@ -1513,6 +1513,10 @@ class Services_Tracker_Controller
             }
         }
 
+        // Users who would be notified when saving, so the template can hide the notify switch when the list is empty
+        $trklib = TikiLib::lib('trk');
+        $notifyWatchers = $trklib->get_notification_emails($trackerId, $itemId, $trklib->get_tracker_options($trackerId));
+
         return [
             'title' => $title,
             'trackerId' => $trackerId,
@@ -1520,6 +1524,7 @@ class Services_Tracker_Controller
             'fields' => $displayedFields,
             'forced' => $forcedFields,
             'status' => $status,
+            'notifyWatchers' => $notifyWatchers,
             'skip_preview' => $input->skip_preview->word(),
             'skip_form' => $input->skip_form->word(),
             'skip_form_message' => $skip_form_message,
