@@ -3683,6 +3683,8 @@ class TrackerLib extends TikiLib
             $handler->handleFieldRemove();
         }
 
+        $configHistoryBefore = TrackerConfigHistory::extractFieldState($field);
+
         $conditions = [
             'fieldId' => (int) $fieldId,
         ];
@@ -3705,6 +3707,9 @@ class TrackerLib extends TikiLib
             ]
         );
         $this->remove_object('trackerfield', $fieldId);
+
+        TrackerConfigHistory::logFieldChange('Deleted', (int) $fieldId, (int) $trackerId, $configHistoryBefore, []);
+
         TikiLib::events()->trigger(
             'tiki.trackerfield.delete',
             ['type' => 'trackerfield', 'object' => $fieldId]

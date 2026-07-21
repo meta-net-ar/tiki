@@ -138,7 +138,7 @@ class TrackerConfigHistory
         $db = TikiDb::get();
 
         $allRows = $db->fetchAll(
-            'SELECT * FROM `tiki_tracker_config_history`
+            'SELECT * FROM `tiki_tracker_configs_history`
              WHERE `objectType` = ? AND `objectId` = ?
              ORDER BY `version` DESC
              LIMIT ' . (int) ($offset + $limit + 1),
@@ -189,7 +189,7 @@ class TrackerConfigHistory
     {
         $db = TikiDb::get();
         return (int) $db->getOne(
-            'SELECT COUNT(*) FROM `tiki_tracker_config_history` WHERE `objectType` = ? AND `objectId` = ?',
+            'SELECT COUNT(*) FROM `tiki_tracker_configs_history` WHERE `objectType` = ? AND `objectId` = ?',
             [$objectType, $objectId]
         );
     }
@@ -278,13 +278,13 @@ class TrackerConfigHistory
         $db = TikiDb::get();
 
         $maxVersion = (int) $db->getOne(
-            'SELECT MAX(`version`) FROM `tiki_tracker_config_history` WHERE `objectType` = ? AND `objectId` = ?',
+            'SELECT MAX(`version`) FROM `tiki_tracker_configs_history` WHERE `objectType` = ? AND `objectId` = ?',
             [$objectType, $objectId]
         );
         $newVersion = $maxVersion > 0 ? $maxVersion + 1 : 1;
 
         $db->query(
-            'INSERT INTO `tiki_tracker_config_history`
+            'INSERT INTO `tiki_tracker_configs_history`
              (`objectType`, `objectId`, `action`, `user`, `lastModif`, `ip`, `version`, `data`)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
