@@ -106,6 +106,10 @@ class Search_Action_Delete implements Search_Action_Action
                     throw new Search_Action_Exception(tr('Cannot find file to delete: %0.', $object_id));
                 }
 
+                if (! $filegallib->userCanRemoveFile($info)) {
+                    throw new Search_Action_Exception(tr('Permission denied'));
+                }
+
                 $filegallib->remove_file($info);
 
                 break;

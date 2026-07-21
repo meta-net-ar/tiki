@@ -328,11 +328,13 @@ if (isset($_REQUEST['movesel']) && $access->checkCsrf()) {
 
 if (isset($_REQUEST['fgal_actions'])) {
     if ($_REQUEST['fgal_actions'] === 'delsel_x') {
-        $access->check_permission_either(['admin_file_galleries', 'remove_files']);
         if (isset($_REQUEST['file']) && $access->checkCsrf(true)) {
             $failedFiles = $totalFiles = count($_REQUEST['file']);
             foreach (array_values($_REQUEST['file']) as $file) {
                 if ($info = $filegallib->get_file_info($file)) {
+                    if (! $filegallib->userCanRemoveFile($info)) {
+                        continue;
+                    }
                     $result = $filegallib->remove_file($info, $gal_info);
                     if ($result && $result->numRows()) {
                         $failedFiles--;
