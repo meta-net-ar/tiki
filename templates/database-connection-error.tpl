@@ -93,6 +93,20 @@
                 {else}
                     <h1>{tr}An error occurred while performing the request.{/tr}</h1>
                     <div class="wikitext" style="border: solid 1px #ccc; margin: 1em auto; padding: 1em; text-align: left; width: 90%;">
+                        {if $msg}
+                            <p><strong>{tr}Error type:{/tr}</strong>
+                            {if $msg|strstr:'Access denied'}
+                                {tr}Database permission error{/tr}
+                            {elseif $msg|strstr:'connect'}
+                                {tr}Database connection error{/tr}
+                            {elseif $msg|strstr:'doesn'}
+                                {tr}Database schema error (missing table or column){/tr}
+                            {else}
+                                {tr}Database query error{/tr}
+                            {/if}
+                            </p>
+                        {/if}
+                        <hr />
                         <p>Things to check:</p>
                         <ol class="fancylist">
                             <li><p>Did you complete the <a href="tiki-install.php">Tiki Installer?</a></p></li>

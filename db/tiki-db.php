@@ -203,6 +203,7 @@ class TikiDbLegacyErrorHandler implements TikiDb_ErrorHandler
         if (defined('TIKI_CONSOLE')) {
             throw new ConsoleSetupException($msg, 1001);
         }
+        http_response_code(500);
         $smarty->display('database-connection-error.tpl');
         $this->log($msg . ' - ' . $q);
 
