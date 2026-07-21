@@ -242,7 +242,7 @@
                             {tr}Version{/tr}
                         </th>
                         <th>
-                            {icon name='edit' iclass='tips' ititle="{tr}WYSIWYG or HTML allowed:{/tr}{tr}HTML syntax is allowed either by page setting or use of the WYSIWIG editor{/tr}"}
+                            {icon name='edit' iclass='tips' ititle="{tr}WYSIWYG or HTML allowed:{/tr}{tr}HTML syntax is allowed either by page setting or use of the WYSIWYG editor{/tr}"}
                         </th>
                         {if $prefs.markdown_enabled eq 'y'}
                             <th>

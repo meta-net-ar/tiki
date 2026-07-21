@@ -100,6 +100,7 @@
 
     {if isset($tableHeaders)}
         {remarksbox}{tr}Results for {/tr}<b>{$searchStringAgain|escape}</b> {tr}in table {/tr} <b>{$tableName}</b>, {tr}column{/tr} <b>{$columnName}</b>:{/remarksbox}
+        {$pagePreviewTitle = "{tr}Page preview{/tr}"|escape:'attr'}
         <div class="table-responsive">    
             <table class="table">
                 <tr>
@@ -114,7 +115,7 @@
                         {$value = $val|truncate:30|escape}
                         {if $tableName=='tiki_pages' && ($column=='pageName' || $column=='pageSlug' || $column=='data' || $column=='description') && $val}
                             {if $column=='data'}
-                                <td><a tabindex='0' target='_blank' data-bs-trigger='hover' title='{tr}Page preview{/tr}' class="ajaxtips" data-ajaxtips="{service controller='wiki' action='get_page' page=$row['pageName']}">
+                                <td><a tabindex='0' target='_blank' data-bs-trigger='hover' title="{$pagePreviewTitle}" class="ajaxtips" data-ajaxtips="{service controller='wiki' action='get_page' page=$row['pageName']}">
                                         {$row['snippet']}
                                     </a>
                                 </td>
