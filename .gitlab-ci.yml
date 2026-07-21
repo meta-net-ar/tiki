@@ -690,6 +690,44 @@ unit-tests-icon-generator:
   script:
     - php console.php build:generateiconlist
 
+# End-to-end browser tests (Playwright) — fully self-contained:
+# provisions a disposable Tiki (dedicated test database + schema install) and
+# serves it with PHP's built-in web server, so no pre-existing instance is
+# needed. See tests/e2e/README.md.
+# Manual + allow_failure while runtimes are validated on shared runners;
+# promote to automatic once stable.
+e2e-tests:
+  stage: unit-tests
+  needs:
+    - composer
+    - node_modules
+  when: manual
+  allow_failure: true
+  # Official Playwright image (Node + browsers); version must match the
+  # @playwright/test devDependency in the root package.json.
+  image: ${DEPENDENCY_PROXY_PREFIX}mcr.microsoft.com/playwright:v1.58.2-noble
+  services:
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MARIADB_IMAGE_COMMON_LTS}
+      alias: mysql
+      command: ["--explicit-defaults-for-timestamp=off"]
+  variables:
+    TIKI_E2E_WEBSERVER: "1"
+    TIKI_E2E_DB_HOST: mysql
+    TIKI_E2E_DB_NAME: ${MYSQL_DATABASE}
+    TIKI_E2E_DB_USER: ${MYSQL_USER}
+    TIKI_E2E_DB_PASS: ${MYSQL_PASSWORD}
+  script:
+    - apt-get update -qq && apt-get install -y -qq php-cli php-mysql php-xml php-mbstring php-zip php-gd php-intl php-curl > /dev/null
+    - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
+    - tests/e2e/bin/e2e-provision.sh
+    - npx playwright install chromium
+    - npx playwright test --config=tests/e2e/playwright.config.ts
+  artifacts:
+    when: always
+    paths:
+      - tests/e2e/playwright-report
+    expire_in: 2 days
+
 #
 # Package this Tiki build
 #
