@@ -160,7 +160,7 @@ class TrackerConfigHistory
             $diff = [];
             foreach ($delta as $key => $oldValue) {
                 $newValue = $stateAfter[$key] ?? null;
-                if ((string) $oldValue !== (string) $newValue) {
+                if (self::normalizeValue($oldValue) !== self::normalizeValue($newValue)) {
                     $diff[$key] = ['from' => $oldValue, 'to' => $newValue];
                 }
             }
@@ -216,7 +216,7 @@ class TrackerConfigHistory
             $newVal = $after[$key] ?? null;
 
             // Normalise for comparison: cast both to string for scalar fields
-            if ((string) $oldVal !== (string) $newVal) {
+            if (self::normalizeValue($oldVal) !== self::normalizeValue($newVal)) {
                 $diff[$key] = ['from' => $oldVal, 'to' => $newVal];
             }
         }
@@ -227,6 +227,18 @@ class TrackerConfigHistory
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Normalize a value to a string for diff comparison.
+     * Arrays are JSON-encoded so they compare meaningfully instead of casting to "Array".
+     */
+    private static function normalizeValue(mixed $value): string
+    {
+        if (is_array($value)) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE) ?? '';
+        }
+        return (string) ($value ?? '');
+    }
 
     private static function write(
         string $objectType,
@@ -259,7 +271,7 @@ class TrackerConfigHistory
         } elseif ($beforeClean !== null) {
             foreach ($afterClean as $key => $newValue) {
                 $oldValue = $beforeClean[$key] ?? null;
-                if ((string) $oldValue !== (string) $newValue) {
+                if (self::normalizeValue($oldValue) !== self::normalizeValue($newValue)) {
                     $delta[$key] = $oldValue;
                 }
             }
