@@ -248,15 +248,15 @@
                                     {$propval=$propval|kbsize:true}
                                 {elseif $propname eq 'ocr_state'}
                                     {if $propval === '1'}
-                                        {$propval='{tr}Finished processing{/tr}'}
+                                        {$propval="{tr}Finished processing{/tr}"}
                                     {elseif $propval === '2'}
-                                        {$propval='{tr}Currently processing{/tr}'}
+                                        {$propval="{tr}Currently processing{/tr}"}
                                     {elseif $propval === '3'}
-                                        {$propval='{tr}Queued for processing{/tr}'}
+                                        {$propval="{tr}Queued for processing{/tr}"}
                                     {elseif $propval === '4'}
-                                        {$propval='{tr}Processing stalled{/tr}'}
+                                        {$propval="{tr}Processing stalled{/tr}"}
                                     {else}
-                                        {$propval='{tr}No scheduled processing{/tr}'}
+                                        {$propval="{tr}No scheduled processing{/tr}"}
                                     {/if}
                                 {elseif $propname eq 'backlinks' and ! empty($files[changes].nbBacklinks)}
                                     {$propval=$files[changes].nbBacklinks}
@@ -444,15 +444,15 @@
                             {$propval=$propval|nl2br}
                         {elseif $propname eq 'ocr_state'}
                             {if $propval === '1'}
-                                {capture assign=propval}{icon style='outline' name='check-circle' title='{tr}Finished processing{/tr}'}{/capture}
+                                {capture assign=propval}{icon style='outline' name='check-circle' title="{tr}Finished processing{/tr}"}{/capture}
                             {elseif $propval === '2'}
-                                {capture assign=propval}{icon style='outline' name='sync' title='{tr}Currently processing{/tr}'}{/capture}
+                                {capture assign=propval}{icon style='outline' name='sync' title="{tr}Currently processing{/tr}"}{/capture}
                             {elseif $propval === '3'}
-                                {capture assign=propval}{icon style='outline' name='circle' title='{tr}Queued for processing{/tr}'}{/capture}
+                                {capture assign=propval}{icon style='outline' name='circle' title="{tr}Queued for processing{/tr}"}{/capture}
                             {elseif $propval === '4'}
-                                {capture assign=propval}{icon style='outline' name='pause-circle' title='{tr}Processing stalled{/tr}'}{/capture}
+                                {capture assign=propval}{icon style='outline' name='pause-circle' title="{tr}Processing stalled{/tr}"}{/capture}
                             {else}
-                                {capture assign=propval}{icon style='outline' name='times-circle' title='{tr}No scheduled processing{/tr}'}{/capture}
+                                {capture assign=propval}{icon style='outline' name='times-circle' title="{tr}No scheduled processing{/tr}"}{/capture}
                             {/if}
                         {elseif $propname eq 'lockedby' and $propval neq ''}
                             {if $gal_info.show_lockedby eq 'i' or $gal_info.show_lockedby eq 'a'}
