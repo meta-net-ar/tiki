@@ -1,0 +1,30 @@
+<?php
+
+// TC-04 teardown: removes tracker + key
+// Invoked by common/fixtures.ts (useSuiteFixtures) with the setup script's
+// JSON output base64-encoded as the first argument.
+// Usage: php tc04_teardown.php {base64(setup JSON)}
+
+error_reporting(0);
+
+if (PHP_SAPI !== 'cli') {
+    die;
+}
+require_once __DIR__ . '/../../../../tiki-setup.php';
+require_once __DIR__ . '/../helpers.php';
+
+bootstrap_admin();
+
+$setupData = json_decode(base64_decode($argv[1] ?? ''), true) ?: [];
+$trackerId = (int) ($setupData['trackerId'] ?? 0);
+$keyId     = (int) ($setupData['keyId'] ?? 0);
+
+if (! $trackerId || ! $keyId) {
+    echo json_encode(['success' => false, 'error' => 'missing trackerId/keyId args']);
+    exit(1);
+}
+
+delete_tracker_by_id($trackerId);
+delete_key_by_id($keyId);
+
+echo json_encode(['success' => true, 'trackerId' => $trackerId, 'keyId' => $keyId]);
