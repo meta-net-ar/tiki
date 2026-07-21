@@ -1,5 +1,5 @@
-DROP TABLE IF EXISTS `tiki_tracker_config_histories`;
-CREATE TABLE `tiki_tracker_config_histories` (
+DROP TABLE IF EXISTS `tiki_tracker_config_history`;
+CREATE TABLE `tiki_tracker_config_history` (
   `historyId` int NOT NULL auto_increment,
   `objectType` enum('tracker','trackerfield') NOT NULL,
   `objectId` int NOT NULL,

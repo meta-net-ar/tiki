@@ -9,7 +9,7 @@
 
 {block name="navigation"}
     <div class="t_navbar mb-4">
-        {button href="tiki-admin_tracker_fields.php?trackerId=$trackerId" _icon_name="backward" _text="{tr}Return to field administration{/tr}" _class="btn btn-info me-2"}
+        {button href="tiki-admin_tracker_fields.php?trackerId=$trackerId" _icon_name="arrow-left" _text="{tr}Return to field administration{/tr}" _class="btn btn-info me-2"}
         {if $fieldId}
             {button href="{service controller=tracker action=config_history trackerId=$trackerId}" _icon_name="history" _text="{tr}View Tracker-Level History{/tr}" _class="btn btn-outline-secondary"}
         {/if}
