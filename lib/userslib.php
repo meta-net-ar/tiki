@@ -2204,11 +2204,16 @@ class UsersLib extends TikiLib
     private function set_user_password($userId, $pass)
     {
 
-        $hash = password_hash($pass, PASSWORD_DEFAULT);
+        $hash = $this->hashPassword($pass);
         $query = 'update `users_users` set `hash`=? where `userId`=?';
         $result = $this->query($query, [$hash, $userId]);
 
     //todo: a little error checking would be nice.
+    }
+
+    public function hashPassword($pass)
+    {
+        return password_hash($pass, PASSWORD_DEFAULT);
     }
 
     /**

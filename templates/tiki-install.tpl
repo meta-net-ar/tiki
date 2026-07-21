@@ -435,6 +435,7 @@
                     </div>{* End of install-step3 *}
 
                     {elseif $install_step eq '4'}
+                    {include file='password_jq.tpl' ignorejq='y'}
                     <div class="install-step4">
                         <h1>{tr}Set admin credentials{/tr}</h1>
                         <p>{tr}Tiki requires an administrator account to manage the site.{/tr} {tr}You must create the administrator account before continuing.{/tr}</p>
@@ -453,17 +454,29 @@
                                 <div class="mb-3 row">
                                     <label class="col-form-label" for="admin_pass">{tr}Admin password:{/tr}</label>
                                     <div class="col-sm-6">
-                                        <input type="password" class="form-control" name="admin_pass" id="admin_pass" value="{if isset($smarty.request.admin_pass)}{$smarty.request.admin_pass|escape:"html"}{/if}" size="40" />
+                                        <input type="password" class="form-control" name="admin_pass" id="pass1" value="{if isset($smarty.request.admin_pass)}{$smarty.request.admin_pass|escape:"html"}{/if}" size="40" />
+                                        <div>
+                                            <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
+                                            <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="mb-3 row">
                                     <label class="col-form-label" for="admin_pass2">{tr}Confirm password:{/tr}</label>
                                     <div class="col-sm-6">
-                                        <input type="password" class="form-control" name="admin_pass2" id="admin_pass2" value="{if isset($smarty.request.admin_pass2)}{$smarty.request.admin_pass2|escape:"html"}{/if}" size="40" />
+                                        <input type="password" class="form-control" name="admin_pass2" id="pass2" value="{if isset($smarty.request.admin_pass2)}{$smarty.request.admin_pass2|escape:"html"}{/if}" size="40" />
+                                        <div id="mypassword2_text">
+                                            <div id="match" style="display:none">
+                                                {icon name='ok' istyle='color:#0ca908'} {tr}Passwords match{/tr}
+                                            </div>
+                                            <div id="nomatch" style="display:none">
+                                                {icon name='error' istyle='color:#ff0000'} {tr}Passwords do not match{/tr}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </fieldset>
-                            <div class="mb-3 text-center">
+                            <div class="mb-3">
                                 <input type="submit" class="btn btn-primary" value="{tr}Continue{/tr}">
                             </div>
                         </form>
@@ -515,7 +528,7 @@
                             {if $logged eq 'y'}{* we are logged if no admin account is found or if the admin user is logged in*}
                                 <div class="install-upgrade">
                                 <form method="post" action="tiki-install.php" class="card-deck">
-                                    <input type="hidden" name="install_step" value="5">
+                                    <input type="hidden" name="install_step" value="6">
                                     {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
                                     {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
                                     <div class="row">
@@ -679,7 +692,7 @@
 
                     <p>&nbsp;</p>
                     <div class="text-center">
-                        <input type="hidden" name="install_step" value="6">
+                        <input type="hidden" name="install_step" value="7">
                         <input type="hidden" name="install_type" value="{$install_type}">
                         <input type="submit" class="btn btn-primary" value=" {tr}Continue{/tr} ">
                         {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}

@@ -257,6 +257,8 @@ $tikidomainslash = (! empty($tikidomain) ? $tikidomain . '/' : '');
 
 $title = tra('Tiki Installer');
 
+$ADMIN_CREDS_SESSION_KEY = "install-admin-creds-$multi";
+
 $_SESSION["install-logged-$multi"] = 'y';
 
 // Init smarty
@@ -538,6 +540,13 @@ $smarty->assign('dbdone', 'n');
 $smarty->assign('logged', $logged);
 $smarty->assign('installer', $installer);
 // Installation steps
+
+// Require filling in admin credentials before proceeding to next steps
+if ($install_step > 5 && (! is_array($_SESSION[$ADMIN_CREDS_SESSION_KEY]) || empty($_SESSION[$ADMIN_CREDS_SESSION_KEY]['username']) || empty($_SESSION[$ADMIN_CREDS_SESSION_KEY]['password']))) {
+    $install_step = 4;
+    Feedback::error(tra('Please specify the administrator username and password before proceeding.'));
+}
+
 if (
     $dbconn
     && isset($_SESSION["install-logged-$multi"])
@@ -549,12 +558,6 @@ if (
         $installer->attach(new ProgressBar());
 
         $installer->cleanInstall();
-        // Set Administrator password
-        $randompass = TikiLib::lib('user')->genPass();
-        set_system_administrator_password($randompass);
-        $smarty->assign('defaultpass', $randompass);
-        $default_password_field = '<input type="hidden" name="defaultpass" value="' . $randompass . '">';
-        $smarty->assign('default_password_field', $default_password_field);
         if ($has_tiki_db) {
             $logmsg = 'database "' . $dbs_tiki . '" destroyed and reinstalled';
         } else {
@@ -645,12 +648,6 @@ if (
 if (! isset($install_type)) {
     if (isset($_POST['install_type'])) {
         $install_type = $_POST['install_type'];
-        if ($install_type == 'scratch' && isset($_POST['defaultpass'])) {
-            $defaultpass = $_POST['defaultpass'];
-            $smarty->assign('defaultpass', $defaultpass);
-            $default_password_field = '<input type="hidden" name="defaultpass" value="' . $defaultpass . '">';
-            $smarty->assign('default_password_field', $default_password_field);
-        }
     } else {
         $install_type = '';
     }
@@ -674,15 +671,22 @@ if ($install_step == '10') {
         // sefurl() falls back to the edit url and the admin lands on an empty editor instead of the home page.
         TikiLib::lib('wiki')->createDefaultHomePage();
         TikiLib::lib('unifiedsearch')->rebuild();
-        // Always pass oldpass so first admin password setup cannot rely on a forgeable flag
-        $u = 'tiki-change_password.php?user=admin&oldpass=' . urlencode($defaultpass ?? 'admin') . '&newuser=y';
         $tikilib = TikiLib::lib('tiki');
         $tikilib->set_preference('tiki_install_version', $TWV->version);
-    } else {
-        $u = '';
+
+        $admin_username = $_SESSION[$ADMIN_CREDS_SESSION_KEY]['username'];
+        $admin_password = $_SESSION[$ADMIN_CREDS_SESSION_KEY]['password'];
+
+        $installer->query("UPDATE `users_users` SET `login` = ?, `pass` = ? WHERE `users_users`.`userId`=1", [
+            $admin_username,
+            TikiLib::lib('user')->hashPassword($admin_password)
+        ]);
+
+        unset($_SESSION[$ADMIN_CREDS_SESSION_KEY]);
     }
+
     if (empty($_REQUEST['multi'])) {
-        $userlib->user_logout($user, false, $u);    // logs out then redirects to home page or $u
+        $userlib->user_logout($user, false);    // logs out then redirects to home page or $u
     } else {
         $access->redirect('http://' . $_REQUEST['multi'] . $tikiroot . $u, allowExternal: true);     // send to the selected multitiki
     }
@@ -908,6 +912,43 @@ $smarty->assign('double_encode_fix_attempted', 'n');
 if (isset($_POST['fix_double_encoding']) && ! empty($_POST['previous_encoding'])) {
     fix_double_encoding($dbs_tiki, $_POST['previous_encoding']);
     $smarty->assign('double_encode_fix_attempted', 'y');
+}
+
+if ($install_step == '5') {
+    $errored = false;
+    
+    if (empty($_POST['admin_user'])) {
+        Feedback::error(tra('Admin username is required'));
+        $errored = true;
+    }
+
+    if (empty($_POST['admin_pass'])) {
+        Feedback::error(tra('Admin password is required'));
+        $errored = true;
+    }
+
+    if (empty($_POST['admin_pass2'])) {
+        Feedback::error(tra('Admin password confirmation is required'));
+        $errored = true;
+    }
+
+    if ($_POST['admin_pass'] !== $_POST['admin_pass2']) {
+        Feedback::error(tra('Admin password and confirmation do not match'));
+        $errored = true;
+    }
+
+    if ($errored) {
+        $install_step = '4';
+        $smarty->assign('install_step', $install_step);
+    } else {
+        $admin_username = $_POST['admin_user'];
+        $admin_password = $_POST['admin_pass'];
+        
+        $_SESSION[$ADMIN_CREDS_SESSION_KEY] = [
+            'username' => $admin_username,
+            'password' => $admin_password,
+        ];
+    }
 }
 
 if ($install_step == '5') {
