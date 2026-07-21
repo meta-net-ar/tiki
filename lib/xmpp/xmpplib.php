@@ -46,14 +46,111 @@ class XMPPLib extends TikiLib
      */
 
     /**
-     * Return the JID of a user (custom preference or built from the domain)
+     * Return the local JID on the Tiki-managed XMPP domain.
      */
-    public function getUserJidForLogin(string $login): string
+    public function getLocalJidForLogin(?string $login): string
     {
         global $prefs;
 
+        $login = trim((string) $login);
+        if ($login === '') {
+            return '';
+        }
+
         $domain = $prefs['xmpp_domain_users'] ?: $this->server_host;
-        return sprintf('%s@%s', $login, $domain);
+        return $login . '@' . $domain;
+    }
+
+    /**
+     * Backward-compatible alias for the local Tiki-managed JID.
+     */
+    public function getUserJidForLogin(?string $login): string
+    {
+        return $this->getLocalJidForLogin($login);
+    }
+
+    /**
+     * Return a structured array with all JID information for a user.
+     *
+     * Keys:
+     *   - 'jid'         => the JID to use to connect (external preferred, otherwise local)
+     *   - 'isLocal'     => true when the effective JID is the local Tiki-managed JID
+     *   - 'isExternal'  => true when the user has a distinct external JID
+     *   - 'localJid'    => the local Tiki-managed JID (login@xmpp_domain_users)
+     *   - 'externalJid' => the external JID string, or null when none is set
+     *
+     * @return array{jid: string, isLocal: bool, isExternal: bool, localJid: string|null, externalJid: string|null}
+     */
+    public function getJidInfoForUser(string $username): array
+    {
+        $empty = ['jid' => '', 'isLocal' => false, 'isExternal' => false, 'localJid' => null, 'externalJid' => null];
+
+        $username = trim($username);
+        if ($username === '') {
+            return $empty;
+        }
+
+        $userslib = TikiLib::lib('user');
+        $info = $userslib->get_user_info($username);
+        if (! $info || empty($info['login'])) {
+            // Avoid building JIDs from group names or unknown users
+            return $empty;
+        }
+        $login = trim($info['login']);
+
+        $localJid = $this->getLocalJidForLogin($login);
+
+        $ext = trim(TikiLib::lib('tiki')->get_user_preference($login, 'xmpp_jid', ''));
+        if ($ext !== '' && $this->isValidJid($ext) && strcasecmp($ext, $localJid) !== 0) {
+            return [
+                'jid'         => $ext,
+                'isLocal'     => false,
+                'isExternal'  => true,
+                'localJid'    => $localJid ?: null,
+                'externalJid' => $ext,
+            ];
+        }
+
+        if ($localJid === '') {
+            return $empty;
+        }
+
+        return [
+            'jid'         => $localJid,
+            'isLocal'     => true,
+            'isExternal'  => false,
+            'localJid'    => $localJid,
+            'externalJid' => null,
+        ];
+    }
+
+    /**
+    * Validate that a string is a well-formed XMPP JID.
+    * Required because user-supplied JIDs are rendered by ConverseJS.
+    */
+    public function isValidJid(string $jid): bool
+    {
+        $localpart = '[^"&\'\/:<>@\s\x00-\x1F\x7F]+';
+        $domain = '[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*';
+        $resource = '[^"&\'<>\s\x00-\x1F\x7F]+';
+
+        return (bool) preg_match('/^' . $localpart . '@' . $domain . '(\/' . $resource . ')?$/', $jid);
+    }
+
+    /**
+     * Return the last JID synced to Prosody for room affiliations.
+     */
+    public function getLastSyncedJidForUser(string $user): string
+    {
+        return trim(TikiLib::lib('tiki')->get_user_preference($user, 'xmpp_last_synced_jid', ''));
+    }
+
+    /**
+     * Persist the last JID synced to Prosody for room affiliations.
+     */
+    public function saveLastSyncedJidForUser(string $user, string $jid): void
+    {
+        TikiLib::lib('tiki')->set_user_preference($user, 'xmpp_last_synced_jid', trim($jid));
     }
 
     /**
@@ -183,39 +280,11 @@ class XMPPLib extends TikiLib
     }
 
     /**
-     * Get effective JID (external preferred or local JID with fallback)
+     * Get effective JID (external preferred or local JID with fallback).
      */
     public function getEffectiveJidForUser(string $username): string
     {
-        $username = trim($username);
-        if ($username === '') {
-            return '';
-        }
-
-        $userslib = TikiLib::lib('user');
-        $info = $userslib->get_user_info($username);
-        if (! $info || empty($info['login'])) {
-            // Avoid building JIDs from group names or unknown users
-            return '';
-        }
-        $login = trim($info['login']);
-
-        $ext = trim($info['preferences']['xmpp_jid'] ?? '');
-        if (! empty($ext) && strpos($ext, '@') !== false) {
-            return $ext;
-        }
-
-        global $prefs;
-        $domain = '';
-        if (! empty($prefs['xmpp_domain_users'])) {
-            $domain = $prefs['xmpp_domain_users'];
-        } elseif (! empty($prefs['xmpp_domain'])) {
-            $domain = $prefs['xmpp_domain'];
-        } else {
-            $domain = parse_url($prefs['tiki_url'], PHP_URL_HOST);
-        }
-
-        return "{$login}@{$domain}";
+        return $this->getJidInfoForUser($username)['jid'];
     }
 
     /**
@@ -228,36 +297,74 @@ class XMPPLib extends TikiLib
         if ($prefs['xmpp_feature'] !== 'y') {
             return;
         }
+
         $jid = $this->getEffectiveJidForUser($u);
         if (! $jid) {
             return;
         }
+
         $currentRooms = $this->getSavedUserRooms($u);
         $expectedRooms = $this->resolveRoomsFromGroups($u);
+        $previousJid = $this->getLastSyncedJidForUser($u);
+
+        if ($previousJid !== '' && strcasecmp($previousJid, $jid) !== 0) {
+            $knownRooms = array_values(array_unique(array_filter(array_merge($currentRooms, $expectedRooms))));
+            foreach ($knownRooms as $r) {
+                $room = $r;
+                try {
+                    $room = $this->buildRoomJid($r);
+                    $this->setUserAffiliation($room, $previousJid, 'none');
+                } catch (\Throwable $e) {
+                    $this->logXmppSyncError($u, $room, $previousJid, 'remove previous affiliation', $e);
+                }
+            }
+
+            // Force a clean re-apply for the new preferred JID.
+            $currentRooms = [];
+        }
 
         $toAdd = array_diff($expectedRooms, $currentRooms);
         $toRemove = array_diff($currentRooms, $expectedRooms);
 
         foreach ($toAdd as $r) {
+            $room = $r;
             try {
                 $room = $this->buildRoomJid($r);
                 $this->ensureRoomExists($room);
                 $this->setUserAffiliation($room, $jid, 'member');
             } catch (\Throwable $e) {
-                // Handle sync error silently
+                $this->logXmppSyncError($u, $room, $jid, 'add affiliation', $e);
             }
         }
 
         foreach ($toRemove as $r) {
+            $room = $r;
             try {
                 $room = $this->buildRoomJid($r);
                 $this->setUserAffiliation($room, $jid, 'none'); // remove membership and force exit
             } catch (\Throwable $e) {
-                // Handle sync error silently
+                $this->logXmppSyncError($u, $room, $jid, 'remove affiliation', $e);
             }
         }
 
         $this->saveUserRooms($u, $expectedRooms);
+        $this->saveLastSyncedJidForUser($u, $jid);
+    }
+
+    private function logXmppSyncError(string $user, string $room, string $jid, string $action, \Throwable $e): void
+    {
+        TikiLib::lib('logs')->add_log(
+            'xmpp',
+            tr(
+                'Failed to %0 during XMPP sync for user %1 in room %2 on JID %3: %4',
+                $action,
+                $user,
+                $room,
+                $jid,
+                $e->getMessage()
+            ),
+            $user
+        );
     }
 
     /**
@@ -292,10 +399,11 @@ class XMPPLib extends TikiLib
         $query = 'SELECT'
         . '     MAX(CASE WHEN `prefName`="xmpp_jid" THEN `value` END) AS `jid`,'
         . '     MAX(CASE WHEN `prefName`="xmpp_password" THEN `value` END) AS `password`,'
-        . '     MAX(CASE WHEN `prefName`="xmpp_custom_server_http_bind" THEN `value` END) AS `http_bind`,'
+        . '     MAX(CASE WHEN `prefName`="xmpp_custom_server_endpoint" THEN `value` END) AS `endpoint`,'
+        . '     MAX(CASE WHEN `prefName`="xmpp_custom_server_http_bind" THEN `value` END) AS `legacy_http_bind`,'
         . '     MAX(CASE WHEN `prefName`="realName" THEN `value` END) AS `nickname`'
         . ' FROM `tiki_user_preferences` WHERE `user`=?'
-        . '     AND `prefName` IN ("xmpp_jid", "xmpp_password", "xmpp_custom_server_http_bind", "realName")';
+        . '     AND `prefName` IN ("xmpp_jid", "xmpp_password", "xmpp_custom_server_endpoint", "xmpp_custom_server_http_bind", "realName")';
 
         $query = $this->query($query, [$user]);
         $login = $query->fetchRow();
@@ -305,23 +413,54 @@ class XMPPLib extends TikiLib
         }
 
         $info = [
-            'domain'    => $this->server_host,
-            'http_bind' => $this->server_http_bind,
-            'jid'       => $prefs['xmpp_server_host'] ? JID::buildJid($login['jid'], $prefs['xmpp_server_host']) : '',
-            'password'  => $login['password'] ?: '',
-            'username'  => $login['jid'],
-            'nickname'  => $login['nickname'] ?: $user,
+            'domain'          => $this->server_host,
+            'http_bind'       => $this->server_http_bind,
+            'websocket_url'   => $prefs['xmpp_ws_url'] ?? '',
+            'custom_endpoint' => false,
+            'jid'             => $prefs['xmpp_server_host'] ? JID::buildJid($login['jid'], $prefs['xmpp_server_host']) : '',
+            'password'        => $login['password'] ?: '',
+            'username'        => $login['jid'],
+            'nickname'        => $login['nickname'] ?: $user,
         ];
 
         $jid_parts = JID::parseJid($login['jid']);
         if ($jid_parts) {
-            $info['jid']       = $login['jid'];
-            $info['username']  = $jid_parts['node'];
-            $info['domain']    = $jid_parts['domain'];
-            $info['http_bind'] = $login['http_bind'] ?: $this->server_http_bind;
+            $info['jid']      = $login['jid'];
+            $info['username'] = $jid_parts['node'];
+            $info['domain']   = $jid_parts['domain'];
+
+            $endpoint = trim($login['endpoint'] ?: $login['legacy_http_bind'] ?: '');
+            if ($endpoint) {
+                $transportOptions = $this->getEndpointTransportOptions($endpoint);
+                if ($transportOptions) {
+                    $info = array_merge($info, $transportOptions);
+                    $info['custom_endpoint'] = true;
+                }
+            }
         }
 
         return $info;
+    }
+
+    private function getEndpointTransportOptions(string $endpoint): array
+    {
+        $scheme = strtolower(parse_url($endpoint, PHP_URL_SCHEME) ?: '');
+
+        if (in_array($scheme, ['ws', 'wss'], true)) {
+            return [
+                'http_bind'     => '',
+                'websocket_url' => $endpoint,
+            ];
+        }
+
+        if (in_array($scheme, ['http', 'https'], true)) {
+            return [
+                'http_bind'     => $endpoint,
+                'websocket_url' => '',
+            ];
+        }
+
+        return [];
     }
 
     public function check_token($givenUser, $givenToken)
@@ -558,6 +697,12 @@ class XMPPLib extends TikiLib
         $xmppclient->set_auth($params);
 
         $nickname = $xmpp['nickname'] ?? $user;
+        $usesExternalJid = false;
+
+        if (! empty($user)) {
+            $jidInfo = $this->getJidInfoForUser($user);
+            $usesExternalJid = $jidInfo['isExternal'];
+        }
 
         // Auto-join only if user is logged in
         if (! empty($user)) {
@@ -579,19 +724,27 @@ class XMPPLib extends TikiLib
             }
         }
 
-        $xmppclient->set_options(
-            [
-                'bosh_service_url'           => $xmpp['http_bind'],
-                'websocket_url'              => isset($xmpp['websocket_url']) ? $xmpp['websocket_url'] : '',
-                'jid'                        => $xmppclient->get_option('jid') ?: $xmpp['jid'],
-                'nickname'                   => $nickname,
-                'view_mode'                  => $params['view_mode'],
-                'show_controlbox_by_default' => $params['show_controlbox_by_default'] === 'y',
-                'show_occupants_by_default'  => $params['show_occupants_by_default'] === 'y',
-                'dm_target'                  => $params['dm_target'] ?? '',
-                'anonymous'                  => $params['anonymous'] ?? '',
-            ]
-        );
+        $renderOptions = [
+            'jid'                        => $xmppclient->get_option('jid') ?: $xmpp['jid'],
+            'nickname'                   => $nickname,
+            'view_mode'                  => $params['view_mode'],
+            'show_controlbox_by_default' => $params['show_controlbox_by_default'] === 'y',
+            'show_occupants_by_default'  => $params['show_occupants_by_default'] === 'y',
+            'dm_target'                  => $params['dm_target'] ?? '',
+            'anonymous'                  => $params['anonymous'] ?? '',
+        ];
+
+        if (! $usesExternalJid || ! empty($xmpp['custom_endpoint'])) {
+            if (! empty($xmpp['http_bind'])) {
+                $renderOptions['bosh_service_url'] = $xmpp['http_bind'];
+            }
+
+            if (! empty($xmpp['websocket_url'])) {
+                $renderOptions['websocket_url'] = $xmpp['websocket_url'];
+            }
+        }
+
+        $xmppclient->set_options($renderOptions);
 
         $xmppclient->render();
     }

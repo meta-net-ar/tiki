@@ -129,37 +129,67 @@ class ConverseJS
                     'tiki' => $this->get_oauth_parameters(),
                 ]]);
         } elseif ($authMethod === 'http') {
-            $this->set_options([
-                'authentication'   => 'login',
-                'auto_login'       => true,
-                'jid'              => $user . '@' . $prefs['xmpp_domain_users'],
-                'password' => TikiLib::lib('xmpp')->getXmppSessionToken($user),
-                'bosh_service_url' => $prefs['xmpp_server_http_bind'],
-                'websocket_url'    => $prefs['xmpp_ws_url'],
-            ]);
+            if (! empty($user)) {
+                $this->set_options($this->getUserAuthOptions($user));
+            }
         } else {
             global $user, $prefs;
             if (! empty($user)) {
-                $xmpplib = TikiLib::lib('xmpp');
-
-                $jid = $xmpplib->getUserJidForLogin($user);
-
-                $transport_opts = [];
-                if (! empty($prefs['xmpp_ws_url'])) {
-                    $transport_opts['websocket_url'] = $prefs['xmpp_ws_url'];
-                }
-                if (! empty($prefs['xmpp_server_http_bind'])) {
-                    $transport_opts['bosh_service_url'] = $prefs['xmpp_server_http_bind'];
-                }
-
-                $this->set_options(array_merge([
-                    'authentication' => 'login',
-                    'auto_login'     => true,
-                    'jid'            => $jid,
-                    'password'       => $xmpplib->getXmppSessionToken($user),
-                ], $transport_opts));
+                $this->set_options($this->getUserAuthOptions($user));
             }
         }
+    }
+
+    private function getUserAuthOptions(string $user): array
+    {
+        $xmpplib = TikiLib::lib('xmpp');
+        $xmpp = $xmpplib->get_user_connection_info($user);
+        $jidInfo = $xmpplib->getJidInfoForUser($user);
+        $usesExternalJid = $jidInfo['isExternal'];
+        $transportOptions = $this->getTransportOptions($xmpp, $usesExternalJid);
+
+        if ($usesExternalJid) {
+            $options = [
+                'authentication' => 'login',
+                'auto_login'     => false,
+                'jid'            => $jidInfo['jid'],
+                'websocket_url'  => '',
+            ];
+
+            return array_merge($options, $transportOptions);
+        }
+
+        return array_merge([
+            'authentication' => 'login',
+            'auto_login'     => true,
+            'jid'            => $jidInfo['localJid'] ?? '',
+            'password'       => $xmpplib->getXmppSessionToken($user),
+        ], $transportOptions);
+    }
+
+    private function getTransportOptions(array $xmpp, bool $usesExternalJid): array
+    {
+        global $prefs;
+
+        $transportOptions = [];
+
+        if ($usesExternalJid && empty($xmpp['custom_endpoint'])) {
+            return $transportOptions;
+        }
+
+        if (! empty($xmpp['websocket_url'])) {
+            $transportOptions['websocket_url'] = $xmpp['websocket_url'];
+        } elseif (! $usesExternalJid && ! empty($prefs['xmpp_ws_url'])) {
+            $transportOptions['websocket_url'] = $prefs['xmpp_ws_url'];
+        }
+
+        if (! empty($xmpp['http_bind'])) {
+            $transportOptions['bosh_service_url'] = $xmpp['http_bind'];
+        } elseif (! $usesExternalJid && ! empty($prefs['xmpp_server_http_bind'])) {
+            $transportOptions['bosh_service_url'] = $prefs['xmpp_server_http_bind'];
+        }
+
+        return $transportOptions;
     }
 
     public function set_options($options)
@@ -279,7 +309,8 @@ class ConverseJS
 
         ksort($options);
 
-        $optionString = json_encode($options, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        // Do not use JSON_UNESCAPED_SLASHES to avoid </script> injection.
+        $optionString = json_encode($options, JSON_PRETTY_PRINT);
         $output .= 'converse.initialize(' . $optionString . ');' . PHP_EOL;
         return TikiLib::lib('header')->add_jq_onready($output, 10);
     }
