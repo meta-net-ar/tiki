@@ -69,8 +69,8 @@ export default {
             <div :id="'message-'+item.messageId" class="thread-messages ps-2">
                 <p class="card-text">{{ item.message }}</p>
                 <div class="message-footer ms-3">
-                    <i class="icon fa-solid fa-thumbs-up fa-xs mt-3" @click="store.like(item.messageId)"></i><span class="like small text-muted mx-1 me-4">{{ item.like }}</span>
-                    <i class="icon fa-solid fa-thumbs-down fa-xs mt-3" @click="store.dislike(item.messageId)"></i><span class="dislike small text-muted mx-1">{{ item.dislike }}</span>
+                    <i class="icon fa-solid fa-thumbs-up fa-xs mt-3" :class="{ 'text-primary': item.likedBy.includes(store.currentUser) }" @click="store.like(item.messageId, store.currentUser)"></i><span class="like small text-muted mx-1 me-4">{{ item.like }}</span>
+                    <i class="icon fa-solid fa-thumbs-down fa-xs mt-3" :class="{ 'text-danger': item.dislikedBy.includes(store.currentUser) }" @click="store.dislike(item.messageId, store.currentUser)"></i><span class="dislike small text-muted mx-1">{{ item.dislike }}</span>
                     <div :class="[{'d-thread-button-block' : item.parentId != 0}, 'thread-button-block float-end']">
                         <a href="#" data-bs-toggle="collapse" :data-bs-target="`.replies-${item.messageId}`" class="btn resolved-btn m-1 btn-sm" :class="item.resoved === 1 ? 'bg-success border-success text-white' : 'btn-outline-primary'" :aria-expanded="item.resoved !== 1" @click="toggleResolved(item.messageId)" v-if="item.parentId == 0">{{ item.resoved === 1 ? tr('Resolved') : tr('Mark as resolved') }}</a>
                         <a href="#" class="btn btn-outline-primary m-1 btn-sm">{{ tr('Pin') }}</a>
@@ -88,6 +88,14 @@ export default {
 </template>
 
 <style scoped lang="scss">
+.message-footer .icon.text-primary {
+    color: #0d6efd !important;
+}
+
+.message-footer .icon.text-danger {
+    color: #dc3545 !important;
+}
+
 .message-footer a.resolved-btn.btn-outline-primary:hover {
     background-color: var(--bs-btn-active-bg);
     border-color: var(--bs-btn-active-bg);

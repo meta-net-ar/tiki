@@ -2,6 +2,8 @@ import { defineStore } from "pinia";
 
 export default defineStore("messageStore", {
     state: () => ({
+        // TODO: replace with the actual logged-in user once auth is wired into this module
+        currentUser: "Angelo",
         threads: [
             {
                 title: "There should be no titles in replies, only for the thread",
@@ -13,6 +15,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 6,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 1,
             },
             {
@@ -25,6 +29,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 2,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -36,6 +42,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 1,
                 dislike: 4,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -47,6 +55,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -58,6 +68,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -69,6 +81,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 1,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -80,6 +94,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 1,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -91,6 +107,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -102,6 +120,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -114,6 +134,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -126,6 +148,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -138,6 +162,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 2,
                 dislike: 1,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -150,6 +176,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
             {
@@ -162,6 +190,8 @@ export default defineStore("messageStore", {
                 date: "2024-07-3, 15:01",
                 like: 0,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             },
         ],
@@ -194,6 +224,8 @@ export default defineStore("messageStore", {
                 date: date,
                 like: 0,
                 dislike: 0,
+                likedBy: [],
+                dislikedBy: [],
                 resoved: 0,
             };
             this.threads.push(message);
@@ -206,13 +238,37 @@ export default defineStore("messageStore", {
                 return item;
             });
         },
-        like(messageId) {
-            const index = this.threads.findIndex((element) => element.messageId === messageId);
-            this.threads[index].like += 1;
+        like(messageId, user) {
+            const thread = this.threads[this.threads.findIndex((element) => element.messageId === messageId)];
+            const dislikedIndex = thread.dislikedBy.indexOf(user);
+            if (dislikedIndex !== -1) {
+                thread.dislikedBy.splice(dislikedIndex, 1);
+                thread.dislike -= 1;
+            }
+            const likedIndex = thread.likedBy.indexOf(user);
+            if (likedIndex !== -1) {
+                thread.likedBy.splice(likedIndex, 1);
+                thread.like -= 1;
+            } else {
+                thread.likedBy.push(user);
+                thread.like += 1;
+            }
         },
-        dislike(messageId) {
-            const index = this.threads.findIndex((element) => element.messageId === messageId);
-            this.threads[index].dislike += 1;
+        dislike(messageId, user) {
+            const thread = this.threads[this.threads.findIndex((element) => element.messageId === messageId)];
+            const likedIndex = thread.likedBy.indexOf(user);
+            if (likedIndex !== -1) {
+                thread.likedBy.splice(likedIndex, 1);
+                thread.like -= 1;
+            }
+            const dislikedIndex = thread.dislikedBy.indexOf(user);
+            if (dislikedIndex !== -1) {
+                thread.dislikedBy.splice(dislikedIndex, 1);
+                thread.dislike -= 1;
+            } else {
+                thread.dislikedBy.push(user);
+                thread.dislike += 1;
+            }
         },
         toggleResolved(messageId) {
             const index = this.threads.findIndex((element) => element.messageId === messageId);
