@@ -27,7 +27,7 @@ class TikiFilter
      * Provides an object implementing Laminas\Filter\FilterInterface based on the input
      *
      * @param FilterInterface|string $filter        A filter shortcut name, or the filter itself.
-     * @return TikiFilter_Alnum|TikiFilter_Alpha|TikiFilter_AttributeType|TikiFilter_HtmlPurifier|TikiFilter_IsoDate|TikiFilter_Lang|TikiFilter_None|Tiki\TikiFilter\PhpCliPath|TikiFilter_PregFilter|TikiFilter_PreventXss|TikiFilter_RawUnsafe|TikiFilter_Raw|TikiFilter_RelativeURL|TikiFilter_WikiContent|Boolean|Digits|FilterInterface|PregReplace|StripTags|ToInt|TikiFilter_Array
+     * @return TikiFilter_Alnum|TikiFilter_Alpha|TikiFilter_AttributeType|TikiFilter_HtmlPurifier|TikiFilter_IsoDate|TikiFilter_Lang|TikiFilter_None|TikiFilter_PregFilter|TikiFilter_PreventXss|TikiFilter_RawUnsafe|TikiFilter_Raw|TikiFilter_RelativeURL|TikiFilter_WikiContent|Boolean|Digits|FilterInterface|PregReplace|StripTags|ToInt|TikiFilter_Array
      *
      * @link https://dev.tiki.org/Filtering+Best+Practices
      * @link https://zendframework.github.io/zend-filter/
@@ -91,11 +91,6 @@ class TikiFilter
                 // may return a blank string
                 // Allows values for languages (such as 'en') available on the site
                 return new TikiFilter_Lang();
-            case 'phpclipath':
-                // Test Return ""
-                // may return a blank string
-                // Allows only paths pointing to a valid PHP CLI binary
-                return new Tiki\TikiFilter\PhpCliPath();
             case 'imgsize':
                 // may return a blank string
                 // Allows digits optionally followed by a space and/or certain size units

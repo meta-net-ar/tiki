@@ -275,32 +275,6 @@ class PhpExecutableFinder
     }
 
     /**
-     * Validate that a path points to a legitimate PHP CLI binary.
-     *
-     * The path must be an existing executable file whose name follows the PHP CLI
-     * naming convention (php, php-cli, php8.2, php8.2-cli, optionally .exe) and it
-     * must report a parseable PHP version when run with --version. The name is
-     * checked before anything is executed, so arbitrary executables are rejected
-     * without ever being run.
-     *
-     * @param string $path
-     *
-     * @return bool
-     */
-    public function isValidPhpCliPath(string $path): bool
-    {
-        if (! is_file($path) || ! is_executable($path)) {
-            return false;
-        }
-
-        if (! preg_match('/^php([0-9]+(\.[0-9]+)?)?(-cli)?(\.exe)?$/i', basename($path))) {
-            return false;
-        }
-
-        return $this->getPhpVersion($path) !== '';
-    }
-
-    /**
      * In case we want to reset the cached value for PHP Cli during the object lifecycle
      *
      * @return void
