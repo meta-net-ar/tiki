@@ -3189,14 +3189,12 @@ class UsersLib extends TikiLib
         $perspectiveId = $perspectivelib->get_current_perspective($prefs);
 
         if ($perspectiveId) {
-            // Redirect to the perspective homepage only when the perspective has just changed.
-            // wikiHomePage is already set correctly in $prefs by load_perspective_preferences().
-            $perspectiveChanged = ($perspectiveId !== ($_SESSION['last_perspective'] ?? null));
-            $_SESSION['last_perspective'] = $perspectiveId;
-            if ($perspectiveChanged) {
-                return $prefs['wikiHomePage'];
+            // Always redirect to the perspective homepage while a perspective with its own homepage is selected, not just the first time it is switched to.
+            $perspectivePreferences = $perspectivelib->get_preferences($perspectiveId);
+            if (! empty($perspectivePreferences['wikiHomePage'])) {
+                return $perspectivePreferences['wikiHomePage'];
             }
-            // Perspective unchanged — fall through to group home logic below.
+            // Perspective has no homepage of its own — fall through to group home logic below.
         }
 
         if ($prefs['useGroupHome'] !== 'y') {
