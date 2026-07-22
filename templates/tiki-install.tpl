@@ -53,20 +53,20 @@
                             {* step 4 *}
                             {call name="printStepItem"
                                 step="4"
-                                title="{tr}Set admin credentials{/tr}"
+                                title={$tikidb_created|ternary:"{tr}Install/Upgrade{/tr}":"{tr}Install{/tr}"}
                                 disabled=$install_step <= 4 && $dbcon !='y' || !isset($smarty.post.scratch) || isset($smarty.post.update)
                                 active=$install_step==4}
 
                             {* step 5 *}
                             {call name="printStepItem"
-                                step="6"
-                                title={$tikidb_created|ternary:"{tr}Install/Upgrade{/tr}":"{tr}Install{/tr}"}
+                                step="5"
+                                title="{tr}Set admin credentials{/tr}"
                                 disabled=$install_step <= 5 && $dbcon !='y' || !isset($smarty.post.scratch) || isset($smarty.post.update)
-                                active=$install_step==4}
+                                active=$install_step==5}
 
                             {* step 6 *}
                             {call name="printStepItem"
-                                step="5"
+                                step="6"
                                 title={isset($smarty.post.update)|ternary:"{tr}Review the Upgrade{/tr}":"{tr}Review the Installation{/tr}"}
                                 disabled=$install_step <= 6 && !$tikidb_is20
                                 active=$install_step==6}
@@ -435,55 +435,7 @@
                     </div>{* End of install-step3 *}
 
                     {elseif $install_step eq '4'}
-                    {include file='password_jq.tpl' ignorejq='y'}
                     <div class="install-step4">
-                        <h1>{tr}Set admin credentials{/tr}</h1>
-                        <p>{tr}Tiki requires an administrator account to manage the site.{/tr} {tr}You must create the administrator account before continuing.{/tr}</p>
-                        <form action="tiki-install.php" method="post">
-                            <input type="hidden" name="install_step" value="5">
-                            {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
-                            {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
-                            <fieldset>
-                                <legend>{tr}Administrator account{/tr}</legend>
-                                <div class="mb-3 row">
-                                    <label class="col-form-label" for="admin_user">{tr}Admin username:{/tr}</label>
-                                    <div class="col-sm-6">
-                                        <input type="text" class="form-control" name="admin_user" id="admin_user" value="{if isset($smarty.request.admin_user)}{$smarty.request.admin_user|escape:"html"}{/if}" size="40" />
-                                    </div>
-                                </div>
-                                <div class="mb-3 row">
-                                    <label class="col-form-label" for="admin_pass">{tr}Admin password:{/tr}</label>
-                                    <div class="col-sm-6">
-                                        <input type="password" class="form-control" name="admin_pass" id="pass1" value="{if isset($smarty.request.admin_pass)}{$smarty.request.admin_pass|escape:"html"}{/if}" size="40" />
-                                        <div>
-                                            <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
-                                            <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="mb-3 row">
-                                    <label class="col-form-label" for="admin_pass2">{tr}Confirm password:{/tr}</label>
-                                    <div class="col-sm-6">
-                                        <input type="password" class="form-control" name="admin_pass2" id="pass2" value="{if isset($smarty.request.admin_pass2)}{$smarty.request.admin_pass2|escape:"html"}{/if}" size="40" />
-                                        <div id="mypassword2_text">
-                                            <div id="match" style="display:none">
-                                                {icon name='ok' istyle='color:#0ca908'} {tr}Passwords match{/tr}
-                                            </div>
-                                            <div id="nomatch" style="display:none">
-                                                {icon name='error' istyle='color:#ff0000'} {tr}Passwords do not match{/tr}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                            <div class="mb-3">
-                                <input type="submit" class="btn btn-primary" value="{tr}Continue{/tr}">
-                            </div>
-                        </form>
-                    </div>{* End of install-step4 *}
-
-                    {elseif $install_step eq '5'}
-                    <div class="install-step5">
                         <h1>{if $tikidb_created}{tr}Install & Upgrade{/tr}{else}{tr}Install{/tr}{/if}</h1>
                         {if $max_exec_set_failed eq 'y'}
                             {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
@@ -528,7 +480,7 @@
                             {if $logged eq 'y'}{* we are logged if no admin account is found or if the admin user is logged in*}
                                 <div class="install-upgrade">
                                 <form method="post" action="tiki-install.php" class="card-deck">
-                                    <input type="hidden" name="install_step" value="6">
+                                    <input type="hidden" name="install_step" value="5">
                                     {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
                                     {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
                                     <div class="row">
@@ -627,6 +579,55 @@
                             {/if}
                             </div>{* End of install-upgrade *}
                         {/if}
+                    </div>{* End of install-step4 *}
+
+                    {elseif $install_step eq '5'}
+                    {include file='password_jq.tpl' ignorejq='y'}
+                    <div class="install-step5">
+                        <h1>{tr}Set admin credentials{/tr}</h1>
+                        <p>{tr}Tiki requires an administrator account to manage the site.{/tr} {tr}You must create the administrator account before continuing.{/tr}</p>
+                        <form action="tiki-install.php" method="post">
+                            <input type="hidden" name="install_step" value="6">
+                            <input type="hidden" name="install_type" value="{$install_type}">
+                            {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
+                            {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
+                            <fieldset>
+                                <legend>{tr}Administrator account{/tr}</legend>
+                                <div class="mb-3 row">
+                                    <label class="col-form-label" for="admin_user">{tr}Admin username:{/tr}</label>
+                                    <div class="col-sm-6">
+                                        <input type="text" class="form-control" name="admin_user" id="admin_user" value="{if isset($smarty.request.admin_user)}{$smarty.request.admin_user|escape:"html"}{/if}" size="40" />
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-form-label" for="admin_pass">{tr}Admin password:{/tr}</label>
+                                    <div class="col-sm-6">
+                                        <input type="password" class="form-control" name="admin_pass" id="pass1" value="{if isset($smarty.request.admin_pass)}{$smarty.request.admin_pass|escape:"html"}{/if}" size="40" />
+                                        <div>
+                                            <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
+                                            <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3 row">
+                                    <label class="col-form-label" for="admin_pass2">{tr}Confirm password:{/tr}</label>
+                                    <div class="col-sm-6">
+                                        <input type="password" class="form-control" name="admin_pass2" id="pass2" value="{if isset($smarty.request.admin_pass2)}{$smarty.request.admin_pass2|escape:"html"}{/if}" size="40" />
+                                        <div id="mypassword2_text">
+                                            <div id="match" style="display:none">
+                                                {icon name='ok' istyle='color:#0ca908'} {tr}Passwords match{/tr}
+                                            </div>
+                                            <div id="nomatch" style="display:none">
+                                                {icon name='error' istyle='color:#ff0000'} {tr}Passwords do not match{/tr}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <div class="mb-3">
+                                <input type="submit" class="btn btn-primary" value="{tr}Continue{/tr}">
+                            </div>
+                        </form>
                     </div>{* End of install-step5 *}
 
                     {elseif $install_step eq '6' or ($dbdone ne 'n')}

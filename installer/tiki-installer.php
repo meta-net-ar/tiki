@@ -542,8 +542,14 @@ $smarty->assign('installer', $installer);
 // Installation steps
 
 // Require filling in admin credentials before proceeding to next steps
-if ($install_step > 5 && (! is_array($_SESSION[$ADMIN_CREDS_SESSION_KEY]) || empty($_SESSION[$ADMIN_CREDS_SESSION_KEY]['username']) || empty($_SESSION[$ADMIN_CREDS_SESSION_KEY]['password']))) {
-    $install_step = 4;
+if (
+    $install_step > 5 && isset($_POST['scratch']) && (
+        ! is_array($_SESSION[$ADMIN_CREDS_SESSION_KEY])
+        || empty($_SESSION[$ADMIN_CREDS_SESSION_KEY]['username'])
+        || empty($_SESSION[$ADMIN_CREDS_SESSION_KEY]['password'])
+    )
+) {
+    $install_step = 5;
     Feedback::error(tra('Please specify the administrator username and password before proceeding.'));
 }
 
@@ -915,7 +921,13 @@ if (isset($_POST['fix_double_encoding']) && ! empty($_POST['previous_encoding'])
     $smarty->assign('double_encode_fix_attempted', 'y');
 }
 
-if ($install_step == '5') {
+// Do not ask for admin credentials if we are upgrading
+if ($install_step == '6' && $install_type == 'update') {
+    $install_step = '7';
+    $smarty->assign('install_step', $install_step);
+}
+
+if ($install_step == '6') {
     $errored = false;
 
     if (empty($_POST['admin_user'])) {
@@ -939,7 +951,7 @@ if ($install_step == '5') {
     }
 
     if ($errored) {
-        $install_step = '4';
+        $install_step = '5';
         $smarty->assign('install_step', $install_step);
     } else {
         $admin_username = $_POST['admin_user'];
