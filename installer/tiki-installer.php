@@ -677,9 +677,10 @@ if ($install_step == '10') {
         $admin_username = $_SESSION[$ADMIN_CREDS_SESSION_KEY]['username'];
         $admin_password = $_SESSION[$ADMIN_CREDS_SESSION_KEY]['password'];
 
-        $installer->query("UPDATE `users_users` SET `login` = ?, `pass` = ? WHERE `users_users`.`userId`=1", [
+        $installer->query("UPDATE `users_users` SET `login` = ?, `hash` = ?, `pass_confirm` = ? WHERE `users_users`.`userId`=1", [
             $admin_username,
-            TikiLib::lib('user')->hashPassword($admin_password)
+            TikiLib::lib('user')->hashPassword($admin_password),
+            TikiLib::lib('tiki')->now
         ]);
 
         unset($_SESSION[$ADMIN_CREDS_SESSION_KEY]);
@@ -916,7 +917,7 @@ if (isset($_POST['fix_double_encoding']) && ! empty($_POST['previous_encoding'])
 
 if ($install_step == '5') {
     $errored = false;
-    
+
     if (empty($_POST['admin_user'])) {
         Feedback::error(tra('Admin username is required'));
         $errored = true;
@@ -943,7 +944,7 @@ if ($install_step == '5') {
     } else {
         $admin_username = $_POST['admin_user'];
         $admin_password = $_POST['admin_pass'];
-        
+
         $_SESSION[$ADMIN_CREDS_SESSION_KEY] = [
             'username' => $admin_username,
             'password' => $admin_password,
