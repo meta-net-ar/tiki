@@ -5,7 +5,8 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use Tiki\Package\VendorHelper;
 
 const AUDIO_ACCEPTED_FORMATS = ['mp3', 'ogg', 'wav', 'aac', 'flac', 'opus'];
@@ -167,10 +168,16 @@ function wikiplugin_mediaplayer($data, $params)
                 try {
                     $response = $client->head($sourceLink);
                     $headers = $response->getHeaders();
-                } catch (ClientException $e) {
-                    $message = tr('PluginMediaPlayer: File %0 not found on the remote server.', $params['src']);
-                    if ($e->getResponse()->getStatusCode() !== 404) {
+                } catch (ConnectException $e) {
+                    Feedback::error(tr('PluginMediaPlayer failed to reach the remote server: %0.', $e->getMessage()));
+                    return '';
+                } catch (RequestException $e) {
+                    if ($e->hasResponse() && $e->getResponse()->getStatusCode() === 404) {
+                        $message = tr('PluginMediaPlayer: File %0 not found on the remote server.', $params['src']);
+                    } elseif ($e->hasResponse()) {
                         $message = tr('PluginMediaPlayer failed to reach the remote server: %0.', $e->getResponse()->getReasonPhrase());
+                    } else {
+                        $message = tr('PluginMediaPlayer failed to reach the remote server: %0.', $e->getMessage());
                     }
                     Feedback::error($message);
                     return '';
@@ -264,7 +271,7 @@ function wikiplugin_mediaplayer($data, $params)
                     position: relative;
                     height: 900px;
                 }
-                
+
                 .iframe-container iframe {
                     border: 0;
                     height: 100%;
@@ -273,19 +280,19 @@ function wikiplugin_mediaplayer($data, $params)
                     top: 0;
                     width: 100%;
                 }
-                
+
                 @media (max-width: 767px) {
                     .iframe-container {
                         height: 500px;
-                    } 
+                    }
                 }
-                
+
                 @media (min-width: 768px) AND (max-width: 991px) {
                     .iframe-container {
                         height: 600px;
                     }
                 }
-                
+
                 @media (min-width: 992px) AND (max-width: 1209px){
                     .iframe-container {
                         height: 700px;
@@ -369,7 +376,7 @@ function wikiplugin_mediaplayer($data, $params)
         } elseif ($params['type'] === 'pdf') {
             $js = '
 var found = false;
-$.each(navigator.plugins, function(i, plugins) { // navigator.plugins is unspecified according to https://developer.mozilla.org/fr/docs/Web/API/NavigatorPlugins/plugins . Something other in NavigatorPlugins may be standard. 
+$.each(navigator.plugins, function(i, plugins) { // navigator.plugins is unspecified according to https://developer.mozilla.org/fr/docs/Web/API/NavigatorPlugins/plugins . Something other in NavigatorPlugins may be standard.
     $.each(plugins, function(i, plugin) {
         if (plugin.type === "application/pdf") {
             found = true;
