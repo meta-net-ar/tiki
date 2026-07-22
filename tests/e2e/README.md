@@ -296,9 +296,41 @@ state into — or depend on state from — a developer instance.
 ## CI Integration
 
 The `e2e-tests` job in `.gitlab-ci.yml` (stage `unit-tests`) runs the suite fully
-self-contained: official Playwright image + MariaDB service container +
-`bin/e2e-provision.sh` + `php -S` via the Playwright `webServer` hook. The HTML report
-is collected as a job artifact.
+self-contained — no pre-existing Tiki instance is involved:
+
+1. **Image & services** — the official Playwright image (Node + browsers, version pinned
+   to the `@playwright/test` devDependency) plus a MariaDB service container (`mysql` alias).
+2. **Dependencies via `needs`** — the job downloads artifacts from three build-stage jobs:
+   `composer` (`vendor_bundled/`), `node_modules`, and `node_build` (`public/generated/`
+   JS/CSS bundles + theme CSS). The `node_build` artifacts are essential: without them
+   every page loads without Bootstrap JS and all tab/modal interactions time out.
+3. **PHP CLI** — installed via apt inside the job (`php-cli`, DB/XML/intl/… extensions,
+   and `php-bcmath`, required by the Shamir secret-sharing library behind
+   shared-secrets key creation).
+4. **Provision** — `bin/e2e-provision.sh` writes `db/local.php` against the MariaDB
+   service, installs the Tiki schema, and sets the admin password (self-contained mode,
+   `TIKI_E2E_WEBSERVER=1`).
+5. **Run** — `npx playwright test` serves the checkout with `php -S` via the Playwright
+   `webServer` hook and runs all suites.
 
 The job is `when: manual` + `allow_failure: true` while runtimes are validated on the
-shared runners; promote it to automatic once stable.
+shared runners; promote it to automatic once stable. To launch it, open the pipeline on
+the merge request and press the ▶ play button on `e2e-tests` (stage `unit-tests`).
+
+### Accessing the HTML report artifact
+
+The job always uploads `tests/e2e/playwright-report/` as an artifact (pass or fail,
+kept 2 days). To view it:
+
+1. Open the finished `e2e-tests` job page in GitLab.
+2. In the right sidebar under **Job artifacts**, click **Browse**.
+3. Navigate to `tests/e2e/playwright-report/` and click `index.html` — GitLab renders
+   it directly, giving the interactive Playwright report (pass/fail per test,
+   screenshots, videos, and traces for failures).
+
+Direct URL pattern:
+`https://gitlab.com/tikiwiki/tiki/-/jobs/<job-id>/artifacts/file/tests/e2e/playwright-report/index.html`
+
+Alternatively, **Download** the artifact zip and open
+`tests/e2e/playwright-report/index.html` locally, or unzip it and run
+`npx playwright show-trace <path-to>/trace.zip` to step through a failure.
