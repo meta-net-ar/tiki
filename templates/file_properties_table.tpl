@@ -32,15 +32,15 @@
             {$propval = "<a href='$propval'>`$gal_info.name`</a>"}
         {elseif $propname eq 'ocr_state'}
             {if $propval === '1'}
-                {$propval='{tr}Finished processing{/tr}'}
+                {$propval="{tr}Finished processing{/tr}"}
             {elseif $propval === '2'}
-                {$propval='{tr}Currently processing{/tr}'}
+                {$propval="{tr}Currently processing{/tr}"}
             {elseif $propval === '3'}
-                {$propval='{tr}Queued for processing{/tr}'}
+                {$propval="{tr}Queued for processing{/tr}"}
             {elseif $propval === '4'}
-                {$propval='{tr}Processing stalled{/tr}'}
+                {$propval="{tr}Processing stalled{/tr}"}
             {else}
-                {$propval='{tr}No scheduled processing{/tr}'}
+                {$propval="{tr}No scheduled processing{/tr}"}
             {/if}
         {/if}
 
