@@ -1,5 +1,5 @@
 <a name="listexecute_{$iListExecute}"></a>
-<form method="post" action="#listexecute_{$iListExecute}" class="d-flex flex-column flex-wrap list-executable" id="listexecute-{$iListExecute}" data-id="{$id}"{if $tsOn} data-page-reload="1"{/if}>
+<form method="post" action="#listexecute_{$iListExecute}" class="d-flex flex-column flex-wrap list-executable" id="listexecute-{$iListExecute}" data-id="{$id}" data-count="{$count}"{if $tsOn} data-page-reload="1"{/if}>
     <input type="hidden" name="plugin" value="{$fingerprint}">
     <input type="hidden" name="objects{$iListExecute}[]" value="" class="listexecute-all">
     {ticket}
