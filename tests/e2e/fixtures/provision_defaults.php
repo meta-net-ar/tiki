@@ -8,7 +8,9 @@
 // Usage: php tests/e2e/fixtures/provision_defaults.php
 // Output: JSON {"changed": ["pref", ...]}
 
-error_reporting(0);
+// Fatals must stay visible on stderr (stdout is reserved for the JSON contract).
+error_reporting(E_ERROR);
+ini_set('display_errors', 'stderr');
 
 if (PHP_SAPI !== 'cli') {
     die;

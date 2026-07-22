@@ -99,9 +99,19 @@ export function useSuiteFixtures(test: TestType<any, any>): SuiteFixtures {
             fx.loaded = true;
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
+            // execSync errors keep the child's output in .stdout/.stderr, not
+            // in .message — without them a CI log only says "Command failed".
+            const { stdout, stderr } = err as { stdout?: Buffer; stderr?: Buffer };
+            const output = [
+                stderr?.toString().trim() && `  stderr: ${stderr.toString().trim()}`,
+                stdout?.toString().trim() && `  stdout: ${stdout.toString().trim()}`,
+            ]
+                .filter(Boolean)
+                .join("\n");
             console.warn(
                 `[${scripts.label}] Fixture setup failed — skipping suite.\n` +
-                    `  FIXTURE_CMD=${FIXTURE_CMD}\n  Error: ${msg}`
+                    `  FIXTURE_CMD=${FIXTURE_CMD}\n  Error: ${msg}` +
+                    (output ? `\n${output}` : "")
             );
             test.skip(
                 true,

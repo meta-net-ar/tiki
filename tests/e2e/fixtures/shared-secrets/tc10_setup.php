@@ -4,7 +4,9 @@
 // Returns JSON {trackerId, fieldId, keyId, share}
 // share = Test1's share string (needed for manual entry test)
 
-error_reporting(0);
+// Fatals must stay visible on stderr (stdout is reserved for the JSON contract).
+error_reporting(E_ERROR);
+ini_set('display_errors', 'stderr');
 
 if (PHP_SAPI !== 'cli') {
     die;

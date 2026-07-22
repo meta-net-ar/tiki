@@ -6,7 +6,9 @@
 // Usage: ddev exec php /var/www/html/tests/e2e/fixtures/enable_encryption.php
 // Output: JSON {"feature_user_encryption":"y","changed":true|false}
 
-error_reporting(0);
+// Fatals must stay visible on stderr (stdout is reserved for the JSON contract).
+error_reporting(E_ERROR);
+ini_set('display_errors', 'stderr');
 
 if (PHP_SAPI !== 'cli') {
     die;

@@ -701,6 +701,9 @@ e2e-tests:
   needs:
     - composer
     - node_modules
+    # node_build artifacts provide public/generated/ (JS bundles + CSS) —
+    # without them Bootstrap JS 404s and every tab/modal interaction times out.
+    - node_build
   when: manual
   allow_failure: true
   # Official Playwright image (Node + browsers); version must match the
@@ -717,7 +720,9 @@ e2e-tests:
     TIKI_E2E_DB_USER: ${MYSQL_USER}
     TIKI_E2E_DB_PASS: ${MYSQL_PASSWORD}
   script:
-    - apt-get update -qq && apt-get install -y -qq php-cli php-mysql php-xml php-mbstring php-zip php-gd php-intl php-curl > /dev/null
+    # php-bcmath is required by teqneers/shamir (Secret::share) — shared-secrets
+    # key creation fatals without it, silently skipping the fixture-based suites.
+    - apt-get update -qq && apt-get install -y -qq php-cli php-mysql php-xml php-mbstring php-zip php-gd php-intl php-curl php-bcmath > /dev/null
     - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
     - tests/e2e/bin/e2e-provision.sh
     - npx playwright install chromium

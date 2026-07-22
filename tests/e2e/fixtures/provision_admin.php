@@ -8,7 +8,9 @@
 // Usage: php tests/e2e/fixtures/provision_admin.php {password}
 // Output: JSON {"admin":"updated"}
 
-error_reporting(0);
+// Fatals must stay visible on stderr (stdout is reserved for the JSON contract).
+error_reporting(E_ERROR);
+ini_set('display_errors', 'stderr');
 
 if (PHP_SAPI !== 'cli') {
     die;

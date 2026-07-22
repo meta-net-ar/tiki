@@ -4,7 +4,9 @@
 // Usage: ddev exec php /var/www/html/tests/e2e/fixtures/create_test_users.php 2>/dev/null
 // Outputs JSON: {"created":[], "updated":[]}
 
-error_reporting(0);
+// Fatals must stay visible on stderr (stdout is reserved for the JSON contract).
+error_reporting(E_ERROR);
+ini_set('display_errors', 'stderr');
 
 if (PHP_SAPI !== 'cli') {
     die;

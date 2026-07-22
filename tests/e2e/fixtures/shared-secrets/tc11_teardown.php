@@ -5,7 +5,9 @@
 // JSON output base64-encoded as the first argument.
 // Usage: php tc11_teardown.php {base64(setup JSON)}
 
-error_reporting(0);
+// Fatals must stay visible on stderr (stdout is reserved for the JSON contract).
+error_reporting(E_ERROR);
+ini_set('display_errors', 'stderr');
 
 if (PHP_SAPI !== 'cli') {
     die;
