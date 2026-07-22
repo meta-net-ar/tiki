@@ -39,13 +39,7 @@
                 </thead>
                 <tbody>
                     {foreach $history as $entry}
-                        {if $entry.action == 'Created'}
-                            <tr>
-                                <td class="date text-nowrap"><strong>{$entry.lastModif|tiki_short_datetime}</strong></td>
-                                <td class="username"><strong>{$entry.user|userlink}</strong></td>
-                                <td colspan="3"><em class="text-muted">{tr}Initial configuration recorded at creation.{/tr}</em></td>
-                            </tr>
-                        {elseif $entry.hasChanges}
+                        {if $entry.hasChanges}
                             {foreach $entry.changes as $change}
                                 <tr>
                                     <td class="date text-nowrap"><strong>{$entry.lastModif|tiki_short_datetime}</strong></td>

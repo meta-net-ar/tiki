@@ -3273,9 +3273,7 @@ class TrackerLib extends TikiLib
             $conditions = ['trackerId' => (int) $trackerId];
             if ($trackers->fetchCount($conditions)) {
                 $configHistoryBefore = $this->get_tracker((int) $trackerId);
-                if ($configHistoryBefore) {
-                    $configHistoryBefore['_options'] = $this->get_tracker_options((int) $trackerId) ?: [];
-                }
+                $configHistoryBefore['_options'] = $this->get_tracker_options((int) $trackerId) ?: [];
                 $trackers->update($data, $conditions);
             } else {
                 $data['trackerId'] = (int) $trackerId;
@@ -3639,6 +3637,9 @@ class TrackerLib extends TikiLib
             $this->remove_object("trackerfield", $field['fieldId']);
         }
 
+        $configHistoryBefore = $this->get_tracker((int) $trackerId);
+        $configHistoryBefore['_options'] = $this->get_tracker_options((int) $trackerId) ?: [];
+
         $conditions = [
             'trackerId' => (int) $trackerId,
         ];
@@ -3652,6 +3653,8 @@ class TrackerLib extends TikiLib
         $userVotings->delete(['id' => $userVotings->like("tracker.$trackerId.%")]);
 
         $this->remove_object('tracker', $trackerId);
+
+        TrackerConfigHistory::logTrackerChange('Deleted', (int) $trackerId, $configHistoryBefore, []);
 
         $logslib = TikiLib::lib('logs');
         $logslib->add_action('Removed', $trackerId, 'tracker');

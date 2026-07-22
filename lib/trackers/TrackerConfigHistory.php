@@ -101,28 +101,28 @@ class TrackerConfigHistory
     /**
      * Log a tracker-level configuration change.
      *
-     * @param string     $action    'Created'|'Updated'|'Deleted'
+     * @param string     $action    'Updated'|'Deleted'
      * @param int        $trackerId The tracker ID
-     * @param array|null $before    State before save (null for Created)
-     * @param array      $after     State after save
+     * @param array|null $oldState  State before save (null skips write)
+     * @param array      $newState  State after save
      */
-    public static function logTrackerChange(string $action, int $trackerId, ?array $before, array $after): void
+    public static function logTrackerChange(string $action, int $trackerId, ?array $oldState, array $newState): void
     {
-        self::write('tracker', $trackerId, $trackerId, $action, $before, $after);
+        self::write('tracker', $trackerId, $trackerId, $action, $oldState, $newState);
     }
 
     /**
      * Log a tracker field configuration change.
      *
-     * @param string     $action    'Created'|'Updated'|'Deleted'
+     * @param string     $action    'Updated'|'Deleted'
      * @param int        $fieldId   The field ID
      * @param int        $trackerId Parent tracker ID
-     * @param array|null $before    State before save (null for Created)
-     * @param array      $after     State after save
+     * @param array|null $oldState  State before save (null skips write)
+     * @param array      $newState  State after save
      */
-    public static function logFieldChange(string $action, int $fieldId, int $trackerId, ?array $before, array $after): void
+    public static function logFieldChange(string $action, int $fieldId, int $trackerId, ?array $oldState, array $newState): void
     {
-        self::write('trackerfield', $fieldId, $trackerId, $action, $before, $after);
+        self::write('trackerfield', $fieldId, $trackerId, $action, $oldState, $newState);
     }
 
     /**
@@ -245,45 +245,48 @@ class TrackerConfigHistory
         int $objectId,
         int $trackerId,
         string $action,
-        ?array $before,
-        array $after
+        ?array $oldState,
+        array $newState
     ): void {
         global $user;
 
-        // Extract only the relevant keys for each object type
-        $keys        = $objectType === 'tracker' ? self::TRACKER_KEYS : self::FIELD_KEYS;
-        $beforeClean = $before !== null ? self::extractKeys($before, $keys) : null;
-        $afterClean  = self::extractKeys($after, $keys);
+        if ($oldState === null) {
+            return;
+        }
 
-        // Merge options sub-array into tracker snapshot if present
+        $keys          = $objectType === 'tracker' ? self::TRACKER_KEYS : self::FIELD_KEYS;
+        $cleanOldState = self::extractKeys($oldState, $keys);
+        $cleanNewState = self::extractKeys($newState, $keys);
+
+        // Merge tracker options (passed as '_options' key) into the snapshot
         if ($objectType === 'tracker') {
-            if ($before !== null && isset($before['_options']) && is_array($before['_options'])) {
-                $beforeClean = array_merge($beforeClean, $before['_options']);
+            if (isset($oldState['_options'])) {
+                $cleanOldState = array_merge($cleanOldState, $oldState['_options']);
             }
-            if (isset($after['_options']) && is_array($after['_options'])) {
-                $afterClean = array_merge($afterClean, $after['_options']);
+            if (isset($newState['_options'])) {
+                $cleanNewState = array_merge($cleanNewState, $newState['_options']);
             }
         }
 
         $delta = [];
         if ($action === 'Deleted') {
-            $delta = $beforeClean ?? [];
-        } elseif ($beforeClean !== null) {
-            foreach ($afterClean as $key => $newValue) {
-                $oldValue = $beforeClean[$key] ?? null;
+            $delta = $cleanOldState;
+        } else {
+            // Updated: build reverse-delta (store old values for every changed key)
+            foreach ($cleanNewState as $key => $newValue) {
+                $oldValue = $cleanOldState[$key] ?? null;
                 if (self::normalizeValue($oldValue) !== self::normalizeValue($newValue)) {
                     $delta[$key] = $oldValue;
                 }
             }
-            foreach ($beforeClean as $key => $oldValue) {
-                if (! array_key_exists($key, $afterClean)) {
+            foreach ($cleanOldState as $key => $oldValue) {
+                if (! array_key_exists($key, $cleanNewState)) {
                     $delta[$key] = $oldValue;
                 }
             }
-        }
-
-        if ($action === 'Updated' && empty($delta)) {
-            return;
+            if (empty($delta)) {
+                return;
+            }
         }
 
         $ip = TikiLib::lib('tiki')->get_ip_address();
@@ -303,7 +306,7 @@ class TrackerConfigHistory
                 $objectType,
                 $objectId,
                 $action,
-                $user ?? 'anonymous',
+                $user ?: 'anonymous',
                 time(),
                 $ip,
                 $newVersion,
