@@ -295,8 +295,20 @@ state into — or depend on state from — a developer instance.
 
 ## CI Integration
 
-The `e2e-tests` job in `.gitlab-ci.yml` (stage `unit-tests`) runs the suite fully
-self-contained — no pre-existing Tiki instance is involved:
+The dedicated `e2e-tests` stage in `.gitlab-ci.yml` runs the suite fully
+self-contained — no pre-existing Tiki instance is involved. It contains one
+manual job per scope, all sharing the `.e2e-base` template:
+
+| Job | Runs |
+|---|---|
+| `e2e-all` | every suite under `suites/` |
+| `e2e-suite: [smoke]` | framework + environment smoke checks |
+| `e2e-suite: [shared-secrets]` | the Shared Secrets domain |
+| `e2e-suite: [wiki-pages]` | the wiki-pages domain |
+
+The per-suite jobs come from a `parallel:matrix` on the `E2E_SUITE` variable —
+after `mkdir suites/<domain>/`, adding the domain name to that matrix list is
+the only CI change needed to get a dedicated play button for it.
 
 1. **Image & services** — the official Playwright image (Node + browsers, version pinned
    to the `@playwright/test` devDependency) plus a MariaDB service container (`mysql` alias).
@@ -311,22 +323,23 @@ self-contained — no pre-existing Tiki instance is involved:
    service, installs the Tiki schema, and sets the admin password (self-contained mode,
    `TIKI_E2E_WEBSERVER=1`).
 5. **Run** — `npx playwright test` serves the checkout with `php -S` via the Playwright
-   `webServer` hook and runs all suites. The PHP server's stderr (per-request log lines
+   `webServer` hook and runs the job's scope (everything for `e2e-all`; the
+   `suites/${E2E_SUITE}/` subtree for a matrix job). The PHP server's stderr (per-request log lines
    plus any PHP errors) is redirected to `tests/e2e/php-server.log` — piped into the job
    output it exceeds GitLab's 4MB log limit and truncates the test results. The file is
    uploaded as an artifact, and an `after_script` greps it for PHP fatals so they still
    show in the job log.
 
-The job is `when: manual` + `allow_failure: true` while runtimes are validated on the
-shared runners; promote it to automatic once stable. To launch it, open the pipeline on
-the merge request and press the ▶ play button on `e2e-tests` (stage `unit-tests`).
+All jobs are `when: manual` + `allow_failure: true` while runtimes are validated on the
+shared runners; promote them to automatic once stable. To launch one, open the pipeline
+on the merge request and press the ▶ play button on the job (stage `e2e-tests`).
 
 ### Accessing the HTML report artifact
 
-The job always uploads `tests/e2e/playwright-report/` and `tests/e2e/php-server.log`
+Every job uploads `tests/e2e/playwright-report/` and `tests/e2e/php-server.log`
 as artifacts (pass or fail, kept 2 days). To view the report:
 
-1. Open the finished `e2e-tests` job page in GitLab.
+1. Open the finished job page in GitLab.
 2. In the right sidebar under **Job artifacts**, click **Browse**.
 3. Navigate to `tests/e2e/playwright-report/` and click `index.html` — GitLab renders
    it directly, giving the interactive Playwright report (pass/fail per test,

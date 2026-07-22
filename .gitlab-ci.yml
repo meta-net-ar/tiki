@@ -3,6 +3,7 @@ stages:
   - code-quality
   - tiki-check
   - unit-tests
+  - e2e-tests
   - package-tiki
   - vendors-security
   - vendors_update
@@ -694,10 +695,11 @@ unit-tests-icon-generator:
 # provisions a disposable Tiki (dedicated test database + schema install) and
 # serves it with PHP's built-in web server, so no pre-existing instance is
 # needed. See tests/e2e/README.md.
-# Manual + allow_failure while runtimes are validated on shared runners;
-# promote to automatic once stable.
-e2e-tests:
-  stage: unit-tests
+# All jobs are manual + allow_failure while runtimes are validated on shared
+# runners; promote to automatic once stable. `e2e-all` runs every suite;
+# the `e2e-suite` matrix offers one play button per domain.
+.e2e-base:
+  stage: e2e-tests
   needs:
     - composer
     - node_modules
@@ -726,7 +728,9 @@ e2e-tests:
     - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
     - tests/e2e/bin/e2e-provision.sh
     - npx playwright install chromium
-    - npx playwright test --config=tests/e2e/playwright.config.ts
+    # E2E_SUITE selects one domain (empty = all suites). Anchored to suites/<domain>/
+    # because the bare name is a regex over the full path and could over-match.
+    - npx playwright test --config=tests/e2e/playwright.config.ts ${E2E_SUITE:+suites/${E2E_SUITE}/}
   after_script:
     # PHP server output goes to a file (see playwright.config.ts) to keep the
     # job log under GitLab's 4MB limit; surface fatals here for quick triage.
@@ -737,6 +741,20 @@ e2e-tests:
       - tests/e2e/playwright-report
       - tests/e2e/php-server.log
     expire_in: 2 days
+
+e2e-all:
+  extends: .e2e-base
+
+# One manual job per domain. Adding a new domain to the matrix list is the
+# only change needed here after `mkdir tests/e2e/suites/<domain>/`.
+e2e-suite:
+  extends: .e2e-base
+  parallel:
+    matrix:
+      - E2E_SUITE:
+          - smoke
+          - shared-secrets
+          - wiki-pages
 
 #
 # Package this Tiki build
