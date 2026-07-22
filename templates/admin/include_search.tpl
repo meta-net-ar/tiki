@@ -152,13 +152,13 @@
 
         {if $prefs.feature_file_galleries eq 'y'}
             <fieldset>
-                <legend class="h3">{tr}File galleries searches{/tr}{help url="Search-within-files" desc='{tr}You will need to rebuild the search index to see these changes{/tr}'}</legend>
+                <legend class="h3">{tr}File galleries searches{/tr}{help url="Search-within-files" desc="{tr}You will need to rebuild the search index to see these changes{/tr}"}</legend>
                 {preference name=fgal_enable_auto_indexing}
                 {preference name=fgal_enable_email_indexing}
                 {preference name=fgal_asynchronous_indexing}
                 <div class="adminoptionboxchild">
                     <fieldset>
-                        <legend class="h3">{tr}Handlers{/tr}{help url="Search-within-files" desc='{tr}If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.{/tr}'}</legend>
+                        <legend class="h3">{tr}Handlers{/tr}{help url="Search-within-files" desc="{tr}If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.{/tr}"}</legend>
                         <div class="adminoptionbox">
                             <div class="adminoptionlabel">{tr}Add custom handlers to make your files &quot;searchable&quot; content{/tr}.
                                 <ul>
