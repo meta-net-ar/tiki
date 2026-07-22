@@ -103,7 +103,7 @@ node_modules:
 node_build:
   stage: build
   needs:
-    - node_modules  
+    - node_modules
     #This is only because we still have some scss files installed from composer - 2023-11-17
     #- composer
   image:
@@ -727,10 +727,15 @@ e2e-tests:
     - tests/e2e/bin/e2e-provision.sh
     - npx playwright install chromium
     - npx playwright test --config=tests/e2e/playwright.config.ts
+  after_script:
+    # PHP server output goes to a file (see playwright.config.ts) to keep the
+    # job log under GitLab's 4MB limit; surface fatals here for quick triage.
+    - grep -E 'PHP (Fatal|Parse) error' tests/e2e/php-server.log | tail -20 || true
   artifacts:
     when: always
     paths:
       - tests/e2e/playwright-report
+      - tests/e2e/php-server.log
     expire_in: 2 days
 
 #

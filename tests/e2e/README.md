@@ -311,7 +311,11 @@ self-contained — no pre-existing Tiki instance is involved:
    service, installs the Tiki schema, and sets the admin password (self-contained mode,
    `TIKI_E2E_WEBSERVER=1`).
 5. **Run** — `npx playwright test` serves the checkout with `php -S` via the Playwright
-   `webServer` hook and runs all suites.
+   `webServer` hook and runs all suites. The PHP server's stderr (per-request log lines
+   plus any PHP errors) is redirected to `tests/e2e/php-server.log` — piped into the job
+   output it exceeds GitLab's 4MB log limit and truncates the test results. The file is
+   uploaded as an artifact, and an `after_script` greps it for PHP fatals so they still
+   show in the job log.
 
 The job is `when: manual` + `allow_failure: true` while runtimes are validated on the
 shared runners; promote it to automatic once stable. To launch it, open the pipeline on
@@ -319,8 +323,8 @@ the merge request and press the ▶ play button on `e2e-tests` (stage `unit-test
 
 ### Accessing the HTML report artifact
 
-The job always uploads `tests/e2e/playwright-report/` as an artifact (pass or fail,
-kept 2 days). To view it:
+The job always uploads `tests/e2e/playwright-report/` and `tests/e2e/php-server.log`
+as artifacts (pass or fail, kept 2 days). To view the report:
 
 1. Open the finished `e2e-tests` job page in GitLab.
 2. In the right sidebar under **Job artifacts**, click **Browse**.

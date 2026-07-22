@@ -59,9 +59,13 @@ export default defineConfig({
     // The suite only requests direct .php URLs, which the built-in server
     // executes without needing Apache rewrite rules. Workers > 1 let the
     // browser fetch assets in parallel.
+    // The server logs every request (3 lines each) plus PHP errors to stderr,
+    // which Playwright would otherwise pipe into the test output — a full CI
+    // run produces ~4MB of [WebServer] lines and blows GitLab's job log limit.
+    // Redirect stderr to a file instead; CI uploads it as an artifact.
     webServer: SELF_CONTAINED
         ? {
-              command: `php -S 127.0.0.1:${E2E_PORT}`,
+              command: `php -S 127.0.0.1:${E2E_PORT} 2> tests/e2e/php-server.log`,
               cwd: TIKI_ROOT,
               url: `http://127.0.0.1:${E2E_PORT}/tiki-login.php`,
               reuseExistingServer: !process.env.CI,

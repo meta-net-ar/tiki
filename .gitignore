@@ -105,6 +105,7 @@ index.php
 /tests/e2e/playwright-report
 /tests/e2e/.local
 /tests/e2e/.env
+/tests/e2e/php-server.log
 
 /tiki-*.log
 /tiki-emptycache.php
