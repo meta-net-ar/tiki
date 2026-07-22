@@ -43,7 +43,7 @@
         {/if}
 {/if}
 {if $actions}
-<form method="post" action="#{$id}" class="d-flex flex-row flex-wrap align-items-center list-executable" id="listexecute-{$iListExecute}" data-id="{$id}"{if $tsOn} data-page-reload="1"{/if}>
+<form method="post" action="#{$id}" class="d-flex flex-row flex-wrap align-items-center list-executable" id="listexecute-{$iListExecute}" data-id="{$id}" data-count="{$count}"{if $tsOn} data-page-reload="1"{/if}>
 <input type="hidden" name="plugin" value="{$fingerprint}">
 {ticket}
 {/if}
