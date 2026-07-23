@@ -590,7 +590,7 @@ composer_core()
     then
         if [ ${LOGCOMPOSERFLAG} = "0" ] ; then
             #until php -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --no-dev
-            until "${PHPCLI}" -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --optimize-autoloader --no-interaction ${DEVELOPMENT} 2>&1 | sed '/Warning: Ambiguous class resolution/d'
+            until COMPOSER_ALLOW_UNSAFE_PHAR_METADATA=1 "${PHPCLI}" -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --optimize-autoloader --no-interaction ${DEVELOPMENT} 2>&1 | sed '/Warning: Ambiguous class resolution/d'
             # setting memory_limit here prevents suhosin ALERT - script tried to increase memory_limit to 536870912 bytes
             do
                 if [ $N -eq 7 ];
@@ -608,7 +608,7 @@ composer_core()
             done
         fi
         if [ ${LOGCOMPOSERFLAG} = "1" ] ; then
-            until "${PHPCLI}" -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --optimize-autoloader --no-interaction ${DEVELOPMENT} > ${TIKI_COMPOSER_INSTALL_LOG}
+            until COMPOSER_ALLOW_UNSAFE_PHAR_METADATA=1 "${PHPCLI}" -dmemory_limit=-1 temp/composer.phar install --working-dir vendor_bundled --prefer-dist --optimize-autoloader --no-interaction ${DEVELOPMENT} > ${TIKI_COMPOSER_INSTALL_LOG}
             # setting memory_limit here prevents suhosin ALERT - script tried to increase memory_limit to 536870912 bytes
             do
                 if [ $N -eq 7 ];
