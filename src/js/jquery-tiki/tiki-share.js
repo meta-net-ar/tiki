@@ -42,6 +42,13 @@ $(function () {
         return v || "";
     }
 
+    function shareScrollToMessage() {
+        var el = document.getElementById("ajaxmsg");
+        if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    }
+
     function shareSplitAddresses(s) {
         if (!s || !$.trim(s)) {
             return [];
@@ -56,17 +63,10 @@ $(function () {
             });
     }
 
-    function shareIsValidEmailLocal(part) {
-        if (!part || part.length > 254) {
-            return false;
-        }
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(part);
-    }
-
     $form.on("submit", function (e) {
         e.preventDefault();
         var doEmail = $('input[name="do_email"]:checked').val() === "1";
-        var emailDetailsVisible = $(".share-email-details").length && !$(".share-email-details").hasClass("hidden");
+        var emailDetailsVisible = $(".share-email-details").length && !$(".share-email-details").hasClass("d-none");
         var authToken = $form.data("auth-token-access") === 1 || $form.data("auth-token-access") === "1";
         var report = $('input[name="report"]').val() === "y";
         if (doEmail && emailDetailsVisible && !report) {
@@ -76,16 +76,6 @@ $(function () {
                 showMessage(tr("Enter at least one recipient email address."), "error");
                 return false;
             }
-            var bad = [];
-            for (var i = 0; i < parts.length; i++) {
-                if (!shareIsValidEmailLocal(parts[i])) {
-                    bad.push(parts[i]);
-                }
-            }
-            if (bad.length) {
-                showMessage(tr("Invalid email(s):") + " " + bad.join(", "), "error");
-                return false;
-            }
             var sender = ($('input[name="email"]').val() || "").trim();
             if (parts.length > 0 && !sender) {
                 showMessage(tr("Your email is mandatory"), "error");
@@ -93,7 +83,10 @@ $(function () {
             }
         }
         $form.tikiModal(tr("Please wait...."));
-        var postData = $form.serializeArray();
+        var postData = $form.serializeArray().filter(function (e) {
+            return e.name !== "addresses";
+        });
+        postData.push({ name: "addresses", value: shareGetAddressesRaw() });
         var formURL = "tiki-share.php?send=share";
         $.ajax({
             url: formURL,
@@ -114,6 +107,7 @@ $(function () {
                             "</div>"
                     );
                 }
+                shareScrollToMessage();
                 $form.tikiModal("");
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -125,6 +119,7 @@ $(function () {
                     msg += " " + errorThrown;
                 }
                 $("#ajaxmsg").html("<div class='alert alert-danger'>" + $("<div/>").text(msg).html() + "</div>");
+                shareScrollToMessage();
                 $form.tikiModal("");
             },
         });
@@ -132,21 +127,21 @@ $(function () {
     });
 
     $(".share-email-hide").on("click", function () {
-        $(".share-email-details").addClass("hidden");
+        $(".share-email-details").addClass("d-none");
     });
     $(".share-email-show").on("click", function () {
-        $(".share-email-details").removeClass("hidden");
+        $(".share-email-details").removeClass("d-none");
     });
     $(".share-message-hide").on("click", function () {
-        $(".share-message-details").addClass("hidden");
+        $(".share-message-details").addClass("d-none");
     });
     $(".share-message-show").on("click", function () {
-        $(".share-message-details").removeClass("hidden");
+        $(".share-message-details").removeClass("d-none");
     });
     $(".share-forum-hide").on("click", function () {
-        $(".share-forum-details").addClass("hidden");
+        $(".share-forum-details").addClass("d-none");
     });
     $(".share-forum-show").on("click", function () {
-        $(".share-forum-details").removeClass("hidden");
+        $(".share-forum-details").removeClass("d-none");
     });
 });

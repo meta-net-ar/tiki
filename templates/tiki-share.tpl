@@ -147,7 +147,7 @@
                         </label>
                         <div class="col-sm-9">
                             {if $prefs.elementplus_select == 'y'}
-                                {user_selector contact='true' lazy=true user = '' multiple='true' editable='y' mustmatch='false' group='all' name='addresses' id='addresses' class='form-control' user_selector_threshold=0 style='width:99%'}
+                                {user_selector realnames='n' allowcreate='y' lazy=true user = '' multiple='true' editable='y' mustmatch='false' group='all' name='addresses' id='addresses' class='form-control' user_selector_threshold=0 style='width:99%'}
                                 <span class="form-text">
                                     {tr}Separate multiple email addresses with a comma and a space{/tr}
                                 </span>
@@ -354,7 +354,7 @@
                         {/remarksbox}
                     {/if}
                 </div>
-                <div class="card-body share-message-details hidden">
+                <div class="card-body share-message-details d-none">
                 {if $send_msg}
                     <div class="mb-3 row clearfix">
                         <label for="messageto" class="col-form-label col-sm-3">
@@ -459,7 +459,7 @@
                         {/remarksbox}
                     {/if}
                 </div>
-                <div class="card-body share-forum-details hidden">
+                <div class="card-body share-forum-details d-none">
                     {if count($forums)>0}
                         <div class="mb-3 row">
                             <label class="col-form-label col-sm-3">

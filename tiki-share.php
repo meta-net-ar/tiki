@@ -502,6 +502,7 @@ $smarty->display('tiki.tpl');
  */
 function normalizeShareEmailAddresses($raw): array
 {
+    $userlib = TikiLib::lib('user');
     if (is_array($raw)) {
         $parts = $raw;
     } else {
@@ -514,6 +515,12 @@ function normalizeShareEmailAddresses($raw): array
         if ($p === '') {
             continue;
         }
+
+        $resolved = $userlib->get_user_email($p);
+        if (! empty($resolved)) {
+            $p = $resolved;
+        }
+
         $key = strtolower($p);
         if (isset($seen[$key])) {
             continue;
@@ -545,7 +552,9 @@ function checkAddresses($recipients, $error = true)
     $invalid = [];
     $valid = [];
     foreach ($normalized as $recipient) {
-        if (function_exists('validate_email')) {
+        if (! filter_var($recipient, FILTER_VALIDATE_EMAIL)) {
+            $ok = false;
+        } elseif (function_exists('validate_email')) {
             $ok = validate_email($recipient, $prefs['validateEmail']);
         } else {
             $ret = $registrationlib->SnowCheckMail($recipient, '', 'mini');
@@ -595,7 +604,9 @@ function sendMail($sender, $recipients, $subject, $tokenlist = []): bool
         return false;
     }
 
-    if (function_exists('validate_email')) {
+    if (! filter_var($sender, FILTER_VALIDATE_EMAIL)) {
+        $ok = false;
+    } elseif (function_exists('validate_email')) {
         $ok = validate_email($sender, $prefs['validateEmail']);
     } else {
         $ret = $registrationlib->SnowCheckMail($sender, '', 'mini');
