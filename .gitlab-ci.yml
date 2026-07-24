@@ -574,6 +574,14 @@ console-php-works:
   image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
+      # TODO:  All these aliases (mysql, elasticsearch, manticore) 
+      # need to be scoped with the version of the image or some other unique hash.
+      # Otherwise there are conflicts if a big docker machine runs them concurrently.
+      # If you get messages like:
+      # WARNING: Skipping alias "mysql" for service "mysql:5.7.44" (services[0]): alias is already in use by another service.
+      # WARNING: Possibly zombie container runner-k5qwkzlfy-project-44278468-concurrent-15-573f5bc5b25f298f-mysql-0-wait-for-service is disconnected from network bridge
+      # This is the problem.  The test may fail or succeed, but the result cannot be trusted.
+      # benoitg - 2026-07-24 
       alias: mysql
       command: ["--explicit-defaults-for-timestamp=off"]
     - name: ${DEPENDENCY_PROXY_PREFIX}elasticsearch:5
@@ -590,6 +598,14 @@ console-php-works:
     - 'echo -n "Manticore Version: " && mysql -h manticore -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
     - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
     - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit $PHPUNIT_EXTRA_PARAMS --log-junit temp/ci/phpunit-report.xml --exclude-group api-integration-test --display-deprecations --display-notices --display-warnings
+
+unit-tests-php-latest-coverage:
+  #We only generate one coverage report, for the lastest PHP.  Gitlab won't properly process if more than one parallel run has coverage artifacts.
+  extends: .template-unit-tests
+  allow_failure: false
+  variables:
+    XDEBUG_MODE: coverage
+    PHPUNIT_EXTRA_PARAMS: --coverage-cobertura temp/ci/phpunit-coverage.xml --coverage-text --colors=never
   artifacts:
     when: always
     reports:
@@ -598,17 +614,16 @@ console-php-works:
         coverage_format: cobertura
         path: temp/ci/phpunit-coverage.xml
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
-
-unit-tests:
-  extends: .template-unit-tests
-  allow_failure: false
   parallel:
     matrix:
       - PHP_VERSION: "8.5"
         DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
-        #We only generate one coverage report, for the lastest PHP
-        XDEBUG_MODE: coverage
-        PHPUNIT_EXTRA_PARAMS: --coverage-cobertura temp/ci/phpunit-coverage.xml --coverage-text --colors=never
+
+unit-tests-php-previousVersions:
+  extends: .template-unit-tests
+  allow_failure: false
+  parallel:
+    matrix:
       - PHP_VERSION: "8.4"
         DB_IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
       - PHP_VERSION: "8.3"
