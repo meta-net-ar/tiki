@@ -1,10 +1,6 @@
 <div class="highlightable">
 
     {include file='token_view_actions.tpl'}
-    {if !$viewItemPretty.override}
-        {title help="trackers"}{$tracker_item_main_value}{/title}
-    {/if}
-
 
     {if ! isset($print_page) || $print_page ne 'y'}
 
