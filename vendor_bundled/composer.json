@@ -176,7 +176,7 @@
         "ext-openssl": "*",
         "ext-iconv": "*",
         "ext-zip": "*",
-        "npm-asset/select2": "^4.0",
+        "npm-asset/select2": "~4.0.0",
         "npm-asset/ttskch--select2-bootstrap4-theme": "^1.5",
         "npm-asset/sortablejs": "^1.13",
         "npm-asset/systemjs": "^6.12",
@@ -256,7 +256,15 @@
                 "reviewer": "Joseph Kausi",
                 "alternatives": "No direct drop-in replacement was suggested. Alternatives are migrating to another ML ecosystem or maintaining a fork.",
                 "impact": "Machine learning features become non-functional, including model training/prediction and ML-based data analysis capabilities."
-            }
+            },
+	    "npm-asset/select2": {
+                "reason": "24.x branch still uses version 4 of select2 lib but it had a breaking change between 4.0 and 4.1",
+                "mitigation": "Stick to version 4.0.x for the time being - otherwise, multiselect boxes are visually broken.",
+                "reviewed": "2026-07-24",
+                "reviewer": "Victor Emanouilov",
+                "alternatives": "Update Tiki to use newer version 4.1 but since the lib is replaced in future Tiki versions, it is not recommended.",
+                "impact": "Broken multiselect boxes"
+	    }
         }
     },
     "replace": {
