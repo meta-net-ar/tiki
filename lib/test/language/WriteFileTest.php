@@ -345,4 +345,23 @@ class Language_WriteFileTest extends TikiTestCase
 
         $this->assertEquals($expected, file_get_contents($this->filePath));
     }
+
+    public function testWriteStringsToFileShouldKeepTranslationOfStringStillFoundByTheScan(): void
+    {
+        $this->parseFile->expects($this->once())->method('getTranslations')->willReturn(
+            ['Existing string' => 'Chaîne existante']
+        );
+
+        $obj = $this->getMockBuilder('Language_WriteFile')
+                    ->onlyMethods(['fileHeader'])
+                    ->setConstructorArgs([$this->parseFile])
+                    ->getMock();
+        $obj->expects($this->once())->method('fileHeader')->willReturn('');
+
+        $strings = ['Existing string' => ['name' => 'Existing string']];
+
+        $obj->writeStringsToFile($strings, false, 'fr', false, '$lang_current', null, true, 'array_replace');
+
+        $this->assertStringContainsString('"Existing string" => "Chaîne existante",', file_get_contents($this->filePath));
+    }
 }

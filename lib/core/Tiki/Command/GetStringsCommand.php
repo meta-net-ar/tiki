@@ -109,7 +109,7 @@ class GetStringsCommand extends Command
                 'skip-remove',
                 null,
                 InputOption::VALUE_NONE,
-                'Skip removing the old or unused strings from the language files. eg. --skip-remove'
+                'Keep strings no longer found by the scan instead of removing them. Without this option, any string missing from the current scan is always removed. eg. --skip-remove'
             );
     }
 

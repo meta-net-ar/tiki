@@ -59,7 +59,7 @@ class Language_WriteFile
      * @param array $strings English strings collected from source files
      * @param bool $outputFiles whether file paths were string was found should be included or not in the output
      * @param string $language current language being processed
-     * @param bool $skipRemove whether to skip removing the old or unused strings from the language files. To skip, set to true. The existing translations in the destination file will not be overwritten or removed from the file if not found in the incoming translations.
+     * @param bool $skipRemove when true, strings no longer found by the scan are kept instead of removed, along with their existing translation. When false (the default), any such string is removed.
      * @param string $langVariable name of the PHP array variable the translations are written to (e.g. '$lang_current', '$lang_custom')
      * @param string|null $baseEnglishFile path of the base English file to include for untranslated defaults, or null for no include
      * @param bool $withHeader whether to write the standard header (copyright and translator notes)

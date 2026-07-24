@@ -106,8 +106,8 @@ class Language_GetStrings
     protected $mergeFunction = null;
 
     /**
-     * Indicates whether to skip the removal of the old or unused strings from the language files.
-     * When set to true, the old or unused strings will not be removed.
+     * Indicates whether to keep strings no longer found by the scan instead of removing them
+     * from the language files. When false (the default), any such string is removed.
      *
      * @var bool
      */
