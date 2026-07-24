@@ -139,10 +139,10 @@ class Search_Formatter
                         $finalValue = $translatedValue;
                     }
                 }
-                if (! $finalValue && $rawValue) {
+                if (is_null($finalValue) && ! is_null($rawValue)) {
                     $finalValue = $rawValue;
                 }
-                if ($finalValue || ! isset($row[$k])) {
+                if (! is_null($finalValue) || ! isset($row[$k])) {
                     // Only set if not a blank value so the defaults prevail but make sure to set it if default is not specified
                     $row[$k] = $finalValue;
                 }
