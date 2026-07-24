@@ -589,14 +589,15 @@ console-php-works:
     - 'echo -n "ElasticSearch Version: " && curl -sS -XGET ''http://elasticsearch:9200'' | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
     - 'echo -n "Manticore Version: " && mysql -h manticore -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
     - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
-    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --exclude-group api-integration-test --display-deprecations --display-notices --display-warnings
+    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit $PHPUNIT_EXTRA_PARAMS --log-junit temp/ci/phpunit-report.xml --exclude-group api-integration-test --display-deprecations --display-notices --display-warnings
   artifacts:
     when: always
-    paths:
-      - report.xml
     reports:
-      junit: report.xml
-    expire_in: 2 days
+      junit: temp/ci/phpunit-report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: temp/ci/phpunit-coverage.xml
+  coverage: '/^\s*Lines:\s*\d+.\d+\%/'
 
 unit-tests:
   extends: .template-unit-tests
@@ -605,6 +606,9 @@ unit-tests:
     matrix:
       - PHP_VERSION: "8.5"
         DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
+        #We only generate one coverage report, for the lastest PHP
+        XDEBUG_MODE: coverage
+        PHPUNIT_EXTRA_PARAMS: --coverage-cobertura temp/ci/phpunit-coverage.xml --coverage-text --colors=never
       - PHP_VERSION: "8.4"
         DB_IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
       - PHP_VERSION: "8.3"

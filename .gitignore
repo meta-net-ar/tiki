@@ -29,8 +29,6 @@ auto-imports.d.ts
 #dbdiff
 tikiold.sql
 tikinew.sql
-#phpunit report
-report.xml
 /.composercache
 /before
 /after
