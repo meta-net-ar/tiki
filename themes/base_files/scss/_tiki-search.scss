@@ -7,6 +7,10 @@
 .searchresults li {
     margin: 10px 0 0;
 }
+.object-selector-result-scroll {
+  max-height: 80vh;
+  overflow-y: auto;
+}
 
 .search-with-facets {
     &::after {
