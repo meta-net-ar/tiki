@@ -16,64 +16,6 @@ namespace Tiki\Lib\Trackers;
  */
 class TrackerConfigHistoryRenderer
 {
-    /**
-     * Human-readable labels and optional value formatters for each field key.
-     *
-     * Format: 'key' => ['label' => string, 'format' => string (optional)]
-     *
-     * Formatters: 'yesNo', 'fieldType', 'jsonPretty', 'nullable', 'trackerStatus', 'raw'
-     */
-    private const FIELD_LABELS = [
-        // Field-level keys
-        'name'                                       => ['label' => 'Field Name'],
-        'permName'                                   => ['label' => 'Permanent Name'],
-        'type'                                       => ['label' => 'Field Type',               'format' => 'fieldType'],
-        'isMain'                                     => ['label' => 'Is Title Field',           'format' => 'yesNo'],
-        'isSearchable'                               => ['label' => 'Searchable',               'format' => 'yesNo'],
-        'isTblVisible'                               => ['label' => 'Visible in List',          'format' => 'yesNo'],
-        'isPublic'                                   => ['label' => 'Public',                   'format' => 'yesNo'],
-        'isHidden'                                   => ['label' => 'Hidden',                   'format' => 'yesNo'],
-        'isMandatory'                                => ['label' => 'Mandatory',                'format' => 'yesNo'],
-        'position'                                   => ['label' => 'Position'],
-        'options'                                    => ['label' => 'Options',                  'format' => 'jsonPretty'],
-        'description'                                => ['label' => 'Description'],
-        'isMultilingual'                             => ['label' => 'Multilingual',             'format' => 'yesNo'],
-        'itemChoices'                                => ['label' => 'Item Choices'],
-        'errorMsg'                                   => ['label' => 'Error Message'],
-        'visibleBy'                                  => ['label' => 'Visible By'],
-        'editableBy'                                 => ['label' => 'Editable By'],
-        'descriptionIsParsed'                        => ['label' => 'Description Is Wiki-Parsed', 'format' => 'yesNo'],
-        'validation'                                 => ['label' => 'Validation Rule'],
-        'validationParam'                            => ['label' => 'Validation Parameter'],
-        'validationMessage'                          => ['label' => 'Validation Message'],
-        'rules'                                      => ['label' => 'Field Rules',              'format' => 'jsonPretty'],
-        'encryptionKeyId'                            => ['label' => 'Encryption Key',           'format' => 'nullable'],
-        'excludeFromNotification'                    => ['label' => 'Exclude from Notifications', 'format' => 'yesNo'],
-        'excludeFromTrackerItemLastModificationDate' => ['label' => 'Exclude from Last Modification Date', 'format' => 'yesNo'],
-        'visibleInViewMode'                          => ['label' => 'Visible in View Mode',     'format' => 'yesNo'],
-        'visibleInEditMode'                          => ['label' => 'Visible in Edit Mode',     'format' => 'yesNo'],
-        'visibleInHistoryMode'                       => ['label' => 'Visible in History Mode',  'format' => 'yesNo'],
-        // Tracker-level keys
-        'name_tracker'                               => ['label' => 'Tracker Name'],
-        'description_tracker'                        => ['label' => 'Description'],
-        // Common tracker option keys (from tiki_tracker_options)
-        'defaultStatus'                              => ['label' => 'Default Item Status',      'format' => 'trackerStatus'],
-        'newItemStatus'                              => ['label' => 'New Item Status',           'format' => 'trackerStatus'],
-        'modifyItemStatus'                           => ['label' => 'Modify Item Status',        'format' => 'trackerStatus'],
-        'useComments'                                => ['label' => 'Allow Comments',            'format' => 'yesNo'],
-        'showStatus'                                 => ['label' => 'Show Status',               'format' => 'yesNo'],
-        'showStatusAdminOnly'                        => ['label' => 'Show Status (Admins Only)', 'format' => 'yesNo'],
-        'outboundEmail'                              => ['label' => 'Notification Email'],
-        'requireApproval'                            => ['label' => 'Require Approval',          'format' => 'yesNo'],
-        'useRatings'                                 => ['label' => 'Use Ratings',               'format' => 'yesNo'],
-        'showRatings'                                => ['label' => 'Show Ratings',              'format' => 'yesNo'],
-        'writerCanModify'                            => ['label' => 'Item Author Can Modify',    'format' => 'yesNo'],
-        'writerCanRemove'                            => ['label' => 'Item Author Can Remove',    'format' => 'yesNo'],
-        'userCanSeeOwn'                              => ['label' => 'Users Can See Their Own Items', 'format' => 'yesNo'],
-        'tabularSync'                                => ['label' => 'Tabular Sync'],
-        'duplicateRules'                             => ['label' => 'Duplicate Rules',           'format' => 'duplicateRules'],
-    ];
-
     // -------------------------------------------------------------------------
     // Public API
     // -------------------------------------------------------------------------
@@ -88,18 +30,16 @@ class TrackerConfigHistoryRenderer
      *   'to'       => Formatted new value (string)
      *   'sentence' => Plain-English sentence e.g. "Changed Mandatory from No to Yes"
      *
-     * @param array $diff   Result of TrackerConfigHistory::computeDiff()
-     * @param string $objectType 'tracker'|'trackerfield'
+     * @param array $diff Result of TrackerConfigHistory::getHistory() diff_data
      * @return array
      */
-    public static function renderDiff(array $diff, string $objectType = 'trackerfield'): array
+    public static function renderDiff(array $diff): array
     {
         $lines = [];
 
         foreach ($diff as $key => $change) {
-            $meta  = self::FIELD_LABELS[$key] ?? ['label' => self::humaniseKey($key)];
-            $label = tra($meta['label']);
-            $fmt   = $meta['format'] ?? 'raw';
+            $label = tra(self::humaniseKey($key));
+            $fmt   = self::inferFormat($key, $change['from'] ?? $change['to']);
 
             $from = self::format($fmt, $change['from']);
             $to   = self::format($fmt, $change['to']);
@@ -127,19 +67,18 @@ class TrackerConfigHistoryRenderer
      */
     public static function renderRow(array $row): array
     {
-        $diffData    = $row['diff_data'] ?? [];
-        $objectType  = $row['objectType'];
+        $diffData = $row['diff_data'] ?? [];
 
         return [
             'historyId'  => $row['historyId'],
-            'objectType' => $objectType,
+            'objectType' => $row['objectType'],
             'objectId'   => $row['objectId'],
             'action'     => $row['action'],
             'user'       => $row['user'],
             'lastModif'  => $row['lastModif'],
             'ip'         => $row['ip'],
             'version'    => $row['version'],
-            'changes'    => self::renderDiff($diffData, $objectType),
+            'changes'    => self::renderDiff($diffData),
             'hasChanges' => ! empty($diffData),
         ];
     }
@@ -155,6 +94,19 @@ class TrackerConfigHistoryRenderer
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    private static function inferFormat(string $key, $value): string
+    {
+        return match ($key) {
+            'type'                                                            => 'fieldType',
+            'options', 'rules'                                                => 'jsonPretty',
+            'defaultStatus', 'newItemStatus', 'modifyItemStatus',
+            'modItemStatus'                                                   => 'trackerStatus',
+            'duplicateRules'                                                  => 'duplicateRules',
+            'encryptionKeyId'                                                 => 'nullable',
+            default => ($value === 'y' || $value === 'n') ? 'yesNo' : 'raw',
+        };
+    }
 
     private static function format(string $fmt, $value): string
     {

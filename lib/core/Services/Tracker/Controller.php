@@ -2535,9 +2535,9 @@ class Services_Tracker_Controller
     {
         Services_Exception_Denied::checkAuth();
 
-        $trackerId = $input->trackerId->int();
-        $fieldId   = $input->fieldId->int();
-        $offset    = $input->offset->int() ?: 0;
+        $trackerId = (int) $input->trackerId->int();
+        $fieldId   = (int) $input->fieldId->int();
+        $offset    = (int) ($input->offset->int() ?: 0);
 
         if (! $trackerId) {
             throw new Services_Exception_MissingValue('trackerId');
@@ -2560,29 +2560,23 @@ class Services_Tracker_Controller
             if (! $field) {
                 throw new Services_Exception_NotFound();
             }
-            $objectType   = 'trackerfield';
-            $objectId     = $fieldId;
-            $contextLabel = tr('Configuration History: Field "%0"', $field['name']);
-
-            $currentData = TrackerConfigHistory::extractFieldState($field);
+            $contextLabel  = tr('Configuration History: Field "%0"', $field['name']);
+            $configHistory = TrackerConfigHistory::forField($fieldId, $trackerId);
+            $currentData   = $configHistory->extractCurrentState($field);
         } else {
-            $objectType   = 'tracker';
-            $objectId     = $trackerId;
-            $contextLabel = tr('Configuration History: Tracker "%0"', $trackerInfo['name'] ?? $trackerId);
-
-            $currentData = TrackerConfigHistory::extractTrackerState($trackerInfo, $trackerId);
+            $contextLabel  = tr('Configuration History: Tracker "%0"', $trackerInfo['name'] ?? $trackerId);
+            $configHistory = TrackerConfigHistory::forTracker($trackerId);
+            $currentData   = $configHistory->extractCurrentState($trackerInfo);
         }
 
-        $rows  = TrackerConfigHistory::getHistory($objectType, $objectId, $currentData, 25, $offset);
-        $total = TrackerConfigHistory::countHistory($objectType, $objectId);
+        $rows  = $configHistory->getHistory($currentData, 25, $offset);
+        $total = $configHistory->count();
 
         return [
             'title'        => $contextLabel,
             'trackerId'    => $trackerId,
             'fieldId'      => $fieldId,
             'tracker_info' => $trackerInfo,
-            'objectType'   => $objectType,
-            'objectId'     => $objectId,
             'offset'       => $offset,
             'total'        => $total,
             'history'      => TrackerConfigHistoryRenderer::renderRows($rows),

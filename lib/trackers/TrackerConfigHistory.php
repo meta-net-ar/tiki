@@ -24,74 +24,39 @@ use TikiLib;
 class TrackerConfigHistory
 {
     /**
-     * Columns to snapshot for tiki_tracker_fields rows.
+     * System/identity columns excluded from snapshots per object type.
+     * Every other column returned by trackerlib is treated as configurable.
      */
-    public const FIELD_KEYS = [
-        'name',
-        'permName',
-        'type',
-        'isMain',
-        'isSearchable',
-        'isTblVisible',
-        'isPublic',
-        'isHidden',
-        'isMandatory',
-        'position',
-        'options',
-        'description',
-        'isMultilingual',
-        'itemChoices',
-        'errorMsg',
-        'visibleBy',
-        'editableBy',
-        'descriptionIsParsed',
-        'validation',
-        'validationParam',
-        'validationMessage',
-        'rules',
-        'encryptionKeyId',
-        'excludeFromNotification',
-        'excludeFromTrackerItemLastModificationDate',
-        'visibleInViewMode',
-        'visibleInEditMode',
-        'visibleInHistoryMode',
+    private const EXCLUDED_KEYS = [
+        // '_options': transport key used to carry the options array into log(); never a real tracked key.
+        // 'options': legacy tiki_tracker_options row that old code stored as a single JSON blob.
+        'tracker'      => ['trackerId', 'items', 'created', 'lastModif', '_options', 'options'],
+        'trackerfield' => ['fieldId', 'trackerId'],
     ];
 
-    /**
-     * Columns to snapshot for tiki_trackers rows.
-     * Options from tiki_tracker_options are merged in under their own keys.
-     */
-    public const TRACKER_KEYS = [
-        'name',
-        'description',
-        'descriptionIsParsed',
-    ];
+    private string $objectType;
+    private int $objectId;
+    private int $trackerId;
 
-    // -------------------------------------------------------------------------
-    // Public helpers for the controller to build the current live state
-    // -------------------------------------------------------------------------
-
-    /**
-     * Build the normalized state array for a tracker field row.
-     */
-    public static function extractFieldState(array $field): array
+    public function __construct(string $objectType, int $objectId, int $trackerId)
     {
-        return self::extractKeys($field, self::FIELD_KEYS);
+        $this->objectType = $objectType;
+        $this->objectId   = $objectId;
+        $this->trackerId  = $trackerId;
     }
 
-    /**
-     * Build the normalized state array for a tracker row, merging its options.
-     */
-    public static function extractTrackerState(array $trackerInfo, int $trackerId): array
+    // -------------------------------------------------------------------------
+    // Named constructors
+    // -------------------------------------------------------------------------
+
+    public static function forTracker(int $trackerId): self
     {
-        $state = self::extractKeys($trackerInfo, self::TRACKER_KEYS);
+        return new self('tracker', $trackerId, $trackerId);
+    }
 
-        $options = TikiLib::lib('trk')->get_tracker_options($trackerId);
-        if (is_array($options)) {
-            $state = array_merge($state, $options);
-        }
-
-        return $state;
+    public static function forField(int $fieldId, int $trackerId): self
+    {
+        return new self('trackerfield', $fieldId, $trackerId);
     }
 
     // -------------------------------------------------------------------------
@@ -99,172 +64,50 @@ class TrackerConfigHistory
     // -------------------------------------------------------------------------
 
     /**
-     * Log a tracker-level configuration change.
+     * Build the current live state used as anchor for history replay.
+     * For tracker type, tracker options are merged in automatically.
+     */
+    public function extractCurrentState(array $data): array
+    {
+        $state = $this->filterState($data);
+
+        if ($this->objectType === 'tracker') {
+            $options = TikiLib::lib('trk')->get_tracker_options($this->trackerId);
+            if (is_array($options)) {
+                $state = $this->filterState(array_merge($state, $options));
+            }
+        }
+
+        return $state;
+    }
+
+    /**
+     * Log a configuration change.
      *
-     * @param string     $action    'Updated'|'Deleted'
-     * @param int        $trackerId The tracker ID
-     * @param array|null $oldState  State before save (null skips write)
-     * @param array      $newState  State after save
+     * @param string     $action   'Updated'|'Deleted'
+     * @param array|null $oldState State before the change (null skips write)
+     * @param array      $newState State after the change
      */
-    public static function logTrackerChange(string $action, int $trackerId, ?array $oldState, array $newState): void
+    public function log(string $action, ?array $oldState, array $newState): void
     {
-        self::write('tracker', $trackerId, $trackerId, $action, $oldState, $newState);
-    }
-
-    /**
-     * Log a tracker field configuration change.
-     *
-     * @param string     $action    'Updated'|'Deleted'
-     * @param int        $fieldId   The field ID
-     * @param int        $trackerId Parent tracker ID
-     * @param array|null $oldState  State before save (null skips write)
-     * @param array      $newState  State after save
-     */
-    public static function logFieldChange(string $action, int $fieldId, int $trackerId, ?array $oldState, array $newState): void
-    {
-        self::write('trackerfield', $fieldId, $trackerId, $action, $oldState, $newState);
-    }
-
-    /**
-     * Retrieve config history entries for a given object.
-     */
-    public static function getHistory(
-        string $objectType,
-        int $objectId,
-        ?array $currentData = null,
-        int $limit = 50,
-        int $offset = 0
-    ): array {
-        $db = TikiDb::get();
-
-        $allRows = $db->fetchAll(
-            'SELECT * FROM `tiki_tracker_configs_history`
-             WHERE `objectType` = ? AND `objectId` = ?
-             ORDER BY `version` DESC
-             LIMIT ' . (int) ($offset + $limit + 1),
-            [$objectType, $objectId]
-        );
-
-        if (empty($allRows)) {
-            return [];
-        }
-
-        $rollingState = $currentData ?? [];
-
-        $pageRows = [];
-        foreach ($allRows as $i => $row) {
-            $delta = json_decode($row['data'] ?? '[]', true) ?? [];
-
-            $stateAfter = $rollingState;
-
-            $diff = [];
-            foreach ($delta as $key => $oldValue) {
-                $newValue = $stateAfter[$key] ?? null;
-                if (self::normalizeValue($oldValue) !== self::normalizeValue($newValue)) {
-                    $diff[$key] = ['from' => $oldValue, 'to' => $newValue];
-                }
-            }
-
-            foreach ($delta as $key => $oldValue) {
-                $rollingState[$key] = $oldValue;
-            }
-
-            if ($i >= $offset) {
-                $row['diff_data'] = $diff;
-                $pageRows[] = $row;
-            }
-
-            if (count($pageRows) >= $limit) {
-                break;
-            }
-        }
-
-        return $pageRows;
-    }
-
-    /**
-     * Count history entries for a given object (for pagination).
-     */
-    public static function countHistory(string $objectType, int $objectId): int
-    {
-        $db = TikiDb::get();
-        return (int) $db->getOne(
-            'SELECT COUNT(*) FROM `tiki_tracker_configs_history` WHERE `objectType` = ? AND `objectId` = ?',
-            [$objectType, $objectId]
-        );
-    }
-
-    /**
-     * Compute a diff array {key => {from, to}} between two state snapshots.
-     * Public so the renderer can also call it on-demand.
-     *
-     * @param array|null $before
-     * @param array      $after
-     * @return array
-     */
-    public static function computeDiff(?array $before, array $after): array
-    {
-        if ($before === null) {
-            return []; // Creation: no before to diff against
-        }
-
-        $diff = [];
-        $allKeys = array_unique(array_merge(array_keys($before), array_keys($after)));
-
-        foreach ($allKeys as $key) {
-            $oldVal = $before[$key] ?? null;
-            $newVal = $after[$key] ?? null;
-
-            // Normalise for comparison: cast both to string for scalar fields
-            if (self::normalizeValue($oldVal) !== self::normalizeValue($newVal)) {
-                $diff[$key] = ['from' => $oldVal, 'to' => $newVal];
-            }
-        }
-
-        return $diff;
-    }
-
-    // -------------------------------------------------------------------------
-    // Private helpers
-    // -------------------------------------------------------------------------
-
-    /**
-     * Normalize a value to a string for diff comparison.
-     * Arrays are JSON-encoded so they compare meaningfully instead of casting to "Array".
-     */
-    private static function normalizeValue(mixed $value): string
-    {
-        if (is_array($value)) {
-            return json_encode($value, JSON_UNESCAPED_UNICODE) ?? '';
-        }
-        return (string) ($value ?? '');
-    }
-
-    private static function write(
-        string $objectType,
-        int $objectId,
-        int $trackerId,
-        string $action,
-        ?array $oldState,
-        array $newState
-    ): void {
         global $user;
 
         if ($oldState === null) {
             return;
         }
 
-        $keys          = $objectType === 'tracker' ? self::TRACKER_KEYS : self::FIELD_KEYS;
-        $cleanOldState = self::extractKeys($oldState, $keys);
-        $cleanNewState = self::extractKeys($newState, $keys);
+        $cleanOldState = $this->filterState($oldState);
+        $cleanNewState = $this->filterState($newState);
 
-        // Merge tracker options (passed as '_options' key) into the snapshot
-        if ($objectType === 'tracker') {
+        // Tracker options are passed via '_options' key by the caller.
+        // Re-apply filterState after merge so EXCLUDED_KEYS also strips any legacy option keys
+        // (e.g. a 'options' blob row that old Tiki code stored in tiki_tracker_options).
+        if ($this->objectType === 'tracker') {
             if (isset($oldState['_options'])) {
-                $cleanOldState = array_merge($cleanOldState, $oldState['_options']);
+                $cleanOldState = $this->filterState(array_merge($cleanOldState, $oldState['_options']));
             }
             if (isset($newState['_options'])) {
-                $cleanNewState = array_merge($cleanNewState, $newState['_options']);
+                $cleanNewState = $this->filterState(array_merge($cleanNewState, $newState['_options']));
             }
         }
 
@@ -272,7 +115,7 @@ class TrackerConfigHistory
         if ($action === 'Deleted') {
             $delta = $cleanOldState;
         } else {
-            // Updated: build reverse-delta (store old values for every changed key)
+            // Updated: build reverse-delta (store old value for every changed key)
             foreach ($cleanNewState as $key => $newValue) {
                 $oldValue = $cleanOldState[$key] ?? null;
                 if (self::normalizeValue($oldValue) !== self::normalizeValue($newValue)) {
@@ -294,7 +137,7 @@ class TrackerConfigHistory
 
         $maxVersion = (int) $db->getOne(
             'SELECT MAX(`version`) FROM `tiki_tracker_configs_history` WHERE `objectType` = ? AND `objectId` = ?',
-            [$objectType, $objectId]
+            [$this->objectType, $this->objectId]
         );
         $newVersion = $maxVersion > 0 ? $maxVersion + 1 : 1;
 
@@ -303,8 +146,8 @@ class TrackerConfigHistory
              (`objectType`, `objectId`, `action`, `user`, `lastModif`, `ip`, `version`, `data`)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
             [
-                $objectType,
-                $objectId,
+                $this->objectType,
+                $this->objectId,
                 $action,
                 $user ?: 'anonymous',
                 time(),
@@ -316,16 +159,85 @@ class TrackerConfigHistory
     }
 
     /**
-     * Filter an array to only the specified keys.
+     * Retrieve config history entries with reverse-delta replay applied.
+     *
+     * @param array|null $currentData Current live state as anchor for replay
+     * @param int        $limit       Max entries per page
+     * @param int        $offset      Pagination offset
      */
-    private static function extractKeys(array $data, array $keys): array
+    public function getHistory(?array $currentData = null, int $limit = 50, int $offset = 0): array
     {
-        $result = [];
-        foreach ($keys as $key) {
-            if (array_key_exists($key, $data)) {
-                $result[$key] = $data[$key];
+        $db = TikiDb::get();
+
+        $allRows = $db->fetchAll(
+            'SELECT * FROM `tiki_tracker_configs_history`
+             WHERE `objectType` = ? AND `objectId` = ?
+             ORDER BY `version` DESC
+             LIMIT ' . (int) ($offset + $limit + 1),
+            [$this->objectType, $this->objectId]
+        );
+
+        if (empty($allRows)) {
+            return [];
+        }
+
+        $rollingState = $currentData ?? [];
+        $pageRows     = [];
+
+        foreach ($allRows as $i => $row) {
+            $delta      = json_decode($row['data'] ?? '[]', true) ?? [];
+            $stateAfter = $rollingState;
+
+            $diff = [];
+            foreach ($delta as $key => $oldValue) {
+                $newValue = $stateAfter[$key] ?? null;
+                if (self::normalizeValue($oldValue) !== self::normalizeValue($newValue)) {
+                    $diff[$key] = ['from' => $oldValue, 'to' => $newValue];
+                }
+            }
+
+            foreach ($delta as $key => $oldValue) {
+                $rollingState[$key] = $oldValue;
+            }
+
+            if ($i >= $offset) {
+                $row['diff_data'] = $diff;
+                $pageRows[]       = $row;
+            }
+
+            if (count($pageRows) >= $limit) {
+                break;
             }
         }
-        return $result;
+
+        return $pageRows;
+    }
+
+    /**
+     * Count history entries for pagination.
+     */
+    public function count(): int
+    {
+        $db = TikiDb::get();
+        return (int) $db->getOne(
+            'SELECT COUNT(*) FROM `tiki_tracker_configs_history` WHERE `objectType` = ? AND `objectId` = ?',
+            [$this->objectType, $this->objectId]
+        );
+    }
+
+    // Private helpers
+
+    private function filterState(array $data): array
+    {
+        $excluded = self::EXCLUDED_KEYS[$this->objectType] ?? [];
+        return array_diff_key($data, array_flip($excluded));
+    }
+
+    private static function normalizeValue(mixed $value): string
+    {
+        if (is_array($value)) {
+            return json_encode($value, JSON_UNESCAPED_UNICODE) ?? '';
+        }
+        return (string) ($value ?? '');
     }
 }

@@ -3329,7 +3329,7 @@ class TrackerLib extends TikiLib
 
         // --- Config History: write after-state ---
         $configHistoryAfter = array_merge($data, ['_options' => $options]);
-        TrackerConfigHistory::logTrackerChange($logOption, (int) $trackerId, $configHistoryBefore, $configHistoryAfter);
+        TrackerConfigHistory::forTracker((int) $trackerId)->log($logOption, $configHistoryBefore, $configHistoryAfter);
 
         TikiLib::events()->trigger($finalEvent, [
             'type' => 'tracker',
@@ -3501,13 +3501,10 @@ class TrackerLib extends TikiLib
             // --- Config History: write field after-state ---
             $configHistoryAction = ($logOption === 'add_field') ? 'Created' : 'Updated';
             $configHistoryAfterData = array_merge($data, ['fieldId' => $fieldId]);
-            TrackerConfigHistory::logFieldChange(
-                $configHistoryAction,
+            TrackerConfigHistory::forField(
                 (int) $fieldId,
-                (int) ($data['trackerId'] ?? $trackerId),
-                $configHistoryFieldBefore,
-                $configHistoryAfterData
-            );
+                (int) ($data['trackerId'] ?? $trackerId)
+            )->log($configHistoryAction, $configHistoryFieldBefore, $configHistoryAfterData);
 
             TikiLib::events()->trigger(
                 $logOption == 'add_field' ? 'tiki.trackerfield.create' : 'tiki.trackerfield.update',
@@ -3654,7 +3651,7 @@ class TrackerLib extends TikiLib
 
         $this->remove_object('tracker', $trackerId);
 
-        TrackerConfigHistory::logTrackerChange('Deleted', (int) $trackerId, $configHistoryBefore, []);
+        TrackerConfigHistory::forTracker((int) $trackerId)->log('Deleted', $configHistoryBefore, []);
 
         $logslib = TikiLib::lib('logs');
         $logslib->add_action('Removed', $trackerId, 'tracker');
@@ -3686,8 +3683,6 @@ class TrackerLib extends TikiLib
             $handler->handleFieldRemove();
         }
 
-        $configHistoryBefore = TrackerConfigHistory::extractFieldState($field);
-
         $conditions = [
             'fieldId' => (int) $fieldId,
         ];
@@ -3711,7 +3706,7 @@ class TrackerLib extends TikiLib
         );
         $this->remove_object('trackerfield', $fieldId);
 
-        TrackerConfigHistory::logFieldChange('Deleted', (int) $fieldId, (int) $trackerId, $configHistoryBefore, []);
+        TrackerConfigHistory::forField((int) $fieldId, (int) $trackerId)->log('Deleted', $field, []);
 
         TikiLib::events()->trigger(
             'tiki.trackerfield.delete',
