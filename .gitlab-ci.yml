@@ -667,6 +667,13 @@ unit-tests-node:
   script:
     - npm run testci
   coverage: '/All files(?:[^|]*\|){4}\s*(\S+)/'
+  artifacts:
+    when: always
+    reports:
+      junit: temp/ci/js-junit-report.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: temp/ci/js_coverage/cobertura-coverage.xml
 
 # This test is only required because we don't have a combined node and php image currently. - benoitg - 2025-03-08
 unit-tests-icon-generator:
