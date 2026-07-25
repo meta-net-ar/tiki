@@ -20,7 +20,11 @@ class SmartyTikiErrorHandler
         $activation = [];
         $previousErrorHandler = set_error_handler([$this, 'handleError']);
         if (! $previousErrorHandler) {
-            throw new Error("This should not be possible, there should be a custom error handler, if only tiki's");
+            // Smarty may run before Tiki's global handler is installed (e.g. perms.php
+            // renders the token-access notification during early setup). Fall back to PHP.
+            $previousErrorHandler = function () {
+                return false;
+            };
         }
         if (is_array($previousErrorHandler) && $previousErrorHandler[0] === $this) {
             //Something in smarty called display or fetch from display or fetch.
