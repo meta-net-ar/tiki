@@ -45,7 +45,7 @@
     <div>
         {if empty($thread_info.topic.threadId)}
             <span>
-                {if ($prev_topic and $prev_topic ne $comments_parentId) or $next_topic}{if $prev_topic and $prev_topic ne $comments_parentId}<a href="tiki-view_forum_thread.php?comments_parentId={$prev_topic}&amp;topics_offset={$topics_prev_offset}{$topics_sort_mode_param}{$topics_threshold_param}{$topics_find_param}{$comments_per_page_param}{$thread_style_param}{$thread_sort_mode_param}{$comments_threshold_param}" class="link">{icon name="angle-left"}{tr}Previous topic{/tr}</a>{if $next_topic} | {/if}{/if}
+                {if ($prev_topic and $prev_topic ne $comments_parentId) or $next_topic}{if $prev_topic and $prev_topic ne $comments_parentId}<a href="tiki-view_forum_thread.php?comments_parentId={$prev_topic}&amp;topics_offset={$topics_prev_offset}{$topics_sort_mode_param}{$topics_threshold_param}{$topics_find_param}{$comments_per_page_param}{$thread_style_param}{$thread_sort_mode_param}{$comments_threshold_param}" class="link">{icon name="angle-left"} {tr}Previous topic{/tr}</a>{if $next_topic} | {/if}{/if}
                 {if $next_topic}<a href="tiki-view_forum_thread.php?comments_parentId={$next_topic}&amp;topics_offset={$topics_next_offset}{$topics_sort_mode_param}{$topics_threshold_param}{$topics_find_param}{$comments_per_page_param}{$thread_style_param}{$thread_sort_mode_param}{$comments_threshold_param}" class="link">{tr}Next topic{/tr} {icon name="angle-right"}</a>{/if}{/if}
             </span>
         {else}
@@ -54,9 +54,8 @@
             </span>
         {/if}
     </div>
-    </div>
-    <div class="text-end">
-{block name=thread_actions}
+<div class="text-end">
+    {block name=thread_actions}
 &nbsp;
         <div class="btn-group">
             {if ! $js}<ul><li>{/if}
@@ -125,10 +124,8 @@
             </div>
             {if ! $js}</li></ul>{/if}
         </div>
-    </div>
-    </div>
-{/block}
-
+    {/block}
+</div>
 
 {if $openpost eq 'y'}
     {$postclass="forumpostopen"}
