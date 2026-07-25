@@ -743,7 +743,12 @@ export default defineConfig(({ command, mode }) => {
             include: ["src/js/**/tests/**/*.test.js"],
             globals: true,
             environment: "happy-dom",
+            reporters: [["default"], ["junit"]],
+            outputFile: {
+                junit: "./temp/ci/js-junit-report.xml",
+            },
             coverage: {
+                enabled: true,
                 include: [
                     "src/js/vue-widgets/**/*.{vue,js}",
                     "src/js/wysiwyg/**/*.js",
@@ -751,7 +756,13 @@ export default defineConfig(({ command, mode }) => {
                     "src/js/@tiki/ui-utils/handle*.js",
                 ],
                 exclude: ["**/*.ce.js", "**/*.test.js", "**/elements/**"],
-                provider: "istanbul",
+                provider: "v8",
+                reporter: [ ["text"],
+                            ["cobertura"]
+                        ],
+
+                //It's a bit dumb, one cannot specify the specific file with the cobertura reporter.  It will write to cobertura-coverage.xml
+                reportsDirectory: "./temp/ci/js_coverage",
             },
             server: {
                 deps: {
