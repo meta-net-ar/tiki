@@ -584,7 +584,7 @@ function build_packages($releaseVersion)
     unlink($composerInstaller);
 
     echo 'Installing dependencies through composer' . "\n";
-    $shellout = shell_exec('php ' . escapeshellarg($workDir . '/composer.phar') . ' install -d ' . escapeshellarg($sourceDir . '/vendor_bundled') . ' --prefer-dist --no-dev 2>&1');
+    $shellout = shell_exec('COMPOSER_ALLOW_UNSAFE_PHAR_METADATA=1 php ' . escapeshellarg($workDir . '/composer.phar') . ' install -d ' . escapeshellarg($sourceDir . '/vendor_bundled') . ' --prefer-dist --no-dev 2>&1');
     if ($options['debug-packaging']) {
         echo $shellout . "\n";
     }
