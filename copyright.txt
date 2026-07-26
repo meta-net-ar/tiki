@@ -12,7 +12,7 @@ This is how we implement the Tiki Social Contract.
 http://tiki.org/Social+Contract
 
 List of members of the Community
-As of 2026-05-29, the community has:
+As of 2026-07-26, the community has:
   * 754 members on SourceForge.net,
   * Array of those people who made at least one code commit
 
@@ -134,8 +134,8 @@ Number of Commits: 16
 
 Nickname: Domeshow Emmanuel
 First Commit: Tue Dec 14 17:12:09 2021 +0000
-Last Commit: Fri Dec 20 09:34:55 2024 +0000
-Number of Commits: 14
+Last Commit: Sat Jun 20 00:45:36 2026 +0300
+Number of Commits: 15
 
 Nickname: Ed
 First Commit: Wed Nov 10 23:43:26 2021 +0000
@@ -144,8 +144,8 @@ Number of Commits: 1
 
 Nickname: Elifeleti Mukisa Dan
 First Commit: Mon Aug 19 15:05:26 2024 +0000
-Last Commit: Sat May 23 13:38:12 2026 +0000
-Number of Commits: 34
+Last Commit: Mon Jul 6 16:31:22 2026 +0000
+Number of Commits: 36
 
 Nickname: Elvis Ansima
 First Commit: Wed Aug 17 16:41:06 2022 +0000
@@ -169,8 +169,8 @@ Number of Commits: 2
 
 Nickname: Espoir Baraka
 First Commit: Thu Dec 12 10:17:11 2024 +0000
-Last Commit: Tue Oct 21 18:46:26 2025 +0200
-Number of Commits: 9
+Last Commit: Sun Jun 21 12:51:14 2026 +0200
+Number of Commits: 10
 
 Nickname: Eutyche odimba
 First Commit: Fri Oct 29 12:30:52 2021 +0200
@@ -314,8 +314,8 @@ Number of Commits: 3
 
 Nickname: King KAMBALE DAVID
 First Commit: Fri Oct 11 15:26:34 2024 +0000
-Last Commit: Fri May 15 14:23:57 2026 +0000
-Number of Commits: 6
+Last Commit: Fri Jul 17 18:07:58 2026 +0000
+Number of Commits: 8
 
 Nickname: Kishiko
 First Commit: Fri Apr 20 11:50:25 2018 +0000
@@ -579,8 +579,8 @@ Number of Commits: 1
 
 Nickname: Victor Emanouilov
 First Commit: Tue Dec 18 11:48:14 2018 +0200
-Last Commit: Tue Apr 21 13:59:28 2026 +0300
-Number of Commits: 743
+Last Commit: Fri Jul 24 15:44:03 2026 +0300
+Number of Commits: 745
 
 Nickname: Volker Wysk
 First Commit: Sun Aug 29 18:05:36 2021 +0200
@@ -1891,7 +1891,7 @@ Nickname: jonnybradley
 Name: jonny Bradley
 First Commit: 2007-08-15
 Last Commit: Thu Aug 1 18:20:37 2019 +0000
-Number of Commits: 3908
+Number of Commits: 3903
 SF Role: Admin
 
 Nickname: josefgc
@@ -2182,7 +2182,7 @@ Nickname: lphuberdeau
 Name: Louis-Philippe Huberdeau
 First Commit: 2004-04-10
 Last Commit: Wed Feb 18 17:41:34 2015 +0000
-Number of Commits: 693
+Number of Commits: 692
 SF Role: Developer
 
 Nickname: lrrcenter
@@ -2279,7 +2279,7 @@ SF Role: Developer
 Nickname: manivannans
 First Commit: 2013-10-24
 Last Commit: Tue May 19 13:21:35 2015 +0000
-Number of Commits: 57
+Number of Commits: 56
 SF Role: Developer
 
 Nickname: marc-etienne
@@ -3435,8 +3435,8 @@ SF Role: Admin
 
 Nickname: ushindi bienvenu
 First Commit: Tue Jul 1 22:42:12 2025 +0000
-Last Commit: Fri May 29 17:01:58 2026 +0200
-Number of Commits: 17
+Last Commit: Sun Jul 26 21:16:24 2026 +0200
+Number of Commits: 25
 
 Nickname: uxeric
 First Commit: 2015-08-17
