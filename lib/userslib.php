@@ -428,8 +428,9 @@ class UsersLib extends TikiLib
     * @param twoFactorCode: ???
     * @param validate_phase: If true, user followed the link from validation email after creation of account
     * @param for_login: If true, we are validating user for login purpose. If false, we are only checking that user is valid (for check of current password for example)
+    * @param record_failure: If false, unsuccessful attempts are not recorded (no lockout / waiting side effects)
     */
-    public function validate_user($user, $pass, $validate_phase = false, $twoFactorCode = null, $for_login = true)
+    public function validate_user($user, $pass, $validate_phase = false, $twoFactorCode = null, $for_login = true, $record_failure = true)
     {
         global $prefs;
 
@@ -485,7 +486,7 @@ class UsersLib extends TikiLib
         // first attempt a login via the standard Tiki system
         //
         if (! ($auth_shib || $auth_cas || $auth_saml) || $isAdminGroupMember) { //redflo: does this mean, that users in cas and shib are not replicated to tiki tables? Does this work well?
-            list($result, $user) = $this->validate_user_tiki($user, $pass, $validate_phase);
+            list($result, $user) = $this->validate_user_tiki($user, $pass, $validate_phase, $record_failure);
         } else {
             $result = null;
         }
@@ -544,6 +545,9 @@ class UsersLib extends TikiLib
         if ($noSpecialAuthEnabled || $adminCanSkip || $ldapUserHasTikiLoginAccess) {
             // if the user verified ok, log them in
             if ($userTiki) {//user validated in tiki, update lastlogin and be done
+                if (! $for_login) {
+                    return [true, $user, $result];
+                }
                 if ($auth_ldap) {
                     return [$this->_ldap_sync_and_update_lastlogin($user, $pass), $user, $result, 'tiki'];
                 }
@@ -1949,7 +1953,7 @@ class UsersLib extends TikiLib
      * @param user: username
      * @param pass: password
      */
-    public function validate_user_tiki($user, $pass, $validate_phase = false)
+    public function validate_user_tiki($user, $pass, $validate_phase = false, $record_failure = true)
     {
         global $prefs;
 
@@ -2016,7 +2020,9 @@ class UsersLib extends TikiLib
                 }
                 return [USER_VALID, $user];
             } else {
-                $this->handleUnsuccessfulLogin($user);
+                if ($record_failure) {
+                    $this->handleUnsuccessfulLogin($user);
+                }
                 return [PASSWORD_INCORRECT, $user];      // if the password was incorrect, dont give the md5's a spin
             }
         }
@@ -2034,7 +2040,9 @@ class UsersLib extends TikiLib
             return [USER_VALID, $user];
         }
 
-        $this->handleUnsuccessfulLogin($user);
+        if ($record_failure) {
+            $this->handleUnsuccessfulLogin($user);
+        }
 
         return [PASSWORD_INCORRECT, $user];
     }
