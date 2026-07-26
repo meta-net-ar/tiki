@@ -17,9 +17,25 @@ Sections::onSectionChange(function ($section) {
     // globals that probably shouldn't be...
     global $iconset, $admin_icons;
 
+    // Section detection can change after tiki-setup.php has selected the
+    // fallback global section. Keep only the assets for the current section.
+    static $sectionThemeCssFiles = [];
+
     $themelib = TikiLib::lib('theme');
     $headerlib = TikiLib::lib('header');
     $smarty = TikiLib::lib('smarty');
+
+    foreach ($sectionThemeCssFiles as $cssFile) {
+        $headerlib->drop_cssfile($cssFile);
+    }
+    $sectionThemeCssFiles = [];
+
+    $addSectionThemeCssFile = static function ($cssFile, $rank = 0) use ($headerlib, &$sectionThemeCssFiles) {
+        if (! empty($cssFile)) {
+            $headerlib->add_cssfile($cssFile, $rank);
+            $sectionThemeCssFiles[] = $cssFile;
+        }
+    };
 
     list($theme_active, $theme_option_active) = ThemeLib::getActiveThemeAndOption();
 
@@ -82,9 +98,9 @@ Sections::onSectionChange(function ($section) {
     } elseif ($theme_active == 'custom_url' && ! empty($prefs['theme_custom_url'])) { //custom URL, use only if file exists at the custom location
         $custom_theme = $prefs['theme_custom_url'];
         if (preg_match('/^(http(s)?:)?\/\//', $custom_theme)) { // Use external link if url begins with http://, https://, or // (auto http/https)
-            $headerlib->add_cssfile($custom_theme, 'external');
+            $addSectionThemeCssFile($custom_theme, 'external');
         } else {
-            $headerlib->add_cssfile($custom_theme);
+            $addSectionThemeCssFile($custom_theme);
         }
     } else {
         //first load the main theme css
@@ -92,25 +108,25 @@ Sections::onSectionChange(function ($section) {
         if ($theme_css) {
             // exclude the main theme css if the option's css also includes it (pref is set)
             if ($prefs['theme_option_includes_main'] != 'y' || empty($theme_option_active)) {
-                $headerlib->add_cssfile($theme_css);
+                $addSectionThemeCssFile($theme_css);
             }
             //than load the theme option css file if needed
             if (! empty($theme_option_active)) {
                 $option_css = ThemeLib::getThemeCssFilePath($theme_active, $theme_option_active);
-                $headerlib->add_cssfile($option_css);
+                $addSectionThemeCssFile($option_css);
             }
         } else {
             trigger_error("The requested theme's CSS file could not be read. Falling back to default theme.", E_USER_WARNING);
             $theme_active = 'default';
             $theme_option_active = '';
             $theme_css = ThemeLib::getThemeCssFilePath($theme_active, null);
-            $headerlib->add_cssfile($theme_css);
+            $addSectionThemeCssFile($theme_css);
         }
     }
 
     //6) include UAB admin CSS and layout in case we are on an admin or management page
     if (Sections::getCurrentSection() === Sections::SECTION_ADMIN_LAYOUT) {
-        $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
+        $addSectionThemeCssFile('themes/base_files/css/feature/adminui.css');
         if (! str_contains($_SERVER['PHP_SELF'], 'tiki-admin_modules.php')) {
             $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin']);
         }
@@ -133,7 +149,7 @@ Sections::onSectionChange(function ($section) {
         $main_theme_path = $themelib->get_theme_path($theme_active);
         $main_theme_custom_css = "{$main_theme_path}/css/custom.css";
         if (is_readable($main_theme_custom_css)) {
-            $headerlib->add_cssfile($main_theme_custom_css, 53);
+            $addSectionThemeCssFile($main_theme_custom_css, 53);
         }
     }
 
@@ -142,7 +158,7 @@ Sections::onSectionChange(function ($section) {
         $custom_css = $themelib->get_theme_path('', '', 'custom.css');
     }
     if (is_readable($custom_css)) {
-        $headerlib->add_cssfile($custom_css, 53);
+        $addSectionThemeCssFile($custom_css, 53);
     }
     if (! isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 'y') {    // if favicons are disabled in preferences, skip the lot of it.
         $favicon_path = $themelib->get_theme_path($prefs['theme'], $prefs['theme_option'], 'favicon-16x16.png', 'favicons');
