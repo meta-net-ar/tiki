@@ -13,6 +13,7 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
 global $prefs;
 if ($prefs['feature_categories'] == 'y' && $prefs['categories_used_in_tpl'] == 'y') {
     Sections::onSectionChange(function ($section) {
+        global $prefs;
 
         $objectCategoryIds = [];
         $objectCategoryIdsNoJail = [];
@@ -31,5 +32,9 @@ if ($prefs['feature_categories'] == 'y' && $prefs['categories_used_in_tpl'] == '
 
         TikiLib::lib('smarty')->assign_by_ref('objectCategoryIds', $objectCategoryIds);
         // use in smarty {if isset($objectCategoryIds) and in_array(54, $objectCategoryIds)} My stuff ..{/if}
+
+        if ($prefs['feature_areas'] == 'y') {
+            TikiLib::lib('areas')->HandleObjectCategories($objectCategoryIdsNoJail);
+        }
     });
 }
