@@ -22,6 +22,49 @@ const loadLocale = async (localeName) => {
     }
 };
 
+const isPopperElementInteraction = (event) => {
+    const path = typeof event.composedPath === 'function' ? event.composedPath() : [];
+    const target = path[0];
+
+    const interactiveTags = [
+        'A',
+        'AREA',
+        'AUDIO',
+        'BUTTON',
+        'DETAILS',
+        'EMBED',
+        'IFRAME',
+        'IMG',
+        'INPUT',
+        'LABEL',
+        'OPTION',
+        'SELECT',
+        'SUMMARY',
+        'TEXTAREA',
+        'VIDEO',
+    ];
+
+    if (interactiveTags.includes(target?.tagName)) {
+        return false;
+    }
+
+    return path.some((node) => {
+        if (!(node instanceof Element)) {
+            return false;
+        }
+
+        return node.classList?.contains('el-popper');
+    });
+};
+
+const handlePointerDownCapture = (event) => {
+    // In Shadow DOM, clicking a dropdown item shifts focus away from the input, thus cancelling item selection.
+    // This prevents the native focus change so Element Plus does not treat selection as blur.
+    if (isPopperElementInteraction(event)) {
+        event.preventDefault();
+    }
+};
+
 onMounted(() => {
     loadLocale(props.language);
 });
@@ -29,6 +72,8 @@ onMounted(() => {
 
 <template>
     <el-config-provider :locale="locale">
-        <slot />
+        <div @pointerdown="handlePointerDownCapture">
+            <slot />
+        </div>
     </el-config-provider>
 </template>

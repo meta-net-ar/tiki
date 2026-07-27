@@ -1,6 +1,5 @@
 import { afterAll, describe, expect, test, vi } from "vitest";
 import adjustImageSize from "../../../helpers/fileGalUploader/adjustImageSize";
-import { waitFor } from "@testing-library/vue";
 
 describe("fileGalUploader adjustImageSize helper", () => {
     test.todo("returns the image data after resizing it to the ratio of the given max width and height", async () => {
@@ -21,10 +20,13 @@ describe("fileGalUploader adjustImageSize helper", () => {
         const givenImageType = "image/jpeg";
 
         let imageInstance;
-        class MockImage extends Image {
+        class MockImage {
             constructor() {
-                super();
                 imageInstance = this;
+            }
+
+            set src(_value) {
+                // Prevent implicit load in the test environment.
             }
         }
         vi.stubGlobal("Image", MockImage);
@@ -35,8 +37,6 @@ describe("fileGalUploader adjustImageSize helper", () => {
 
         imageInstance.onerror(givenError);
 
-        await waitFor(() => {
-            expect(result).rejects.toEqual(givenError);
-        });
+        await expect(result).rejects.toEqual(givenError);
     });
 });
