@@ -3,7 +3,7 @@ import { onMounted, ref, watch } from 'vue';
 import { fetchSuggestions } from '../../helpers/autocomplete/remote';
 import ConfigWrapper from '../ConfigWrapper.vue';
 
-const props = defineProps(['_expose', 'value', 'remoteSourceUrl', 'sourceList', 'emitCustomEvent', 'placeholder', 'valueKey', 'language']);
+const props = defineProps(['_expose', 'value', 'remoteSourceUrl', 'sourceList', 'emitCustomEvent', 'placeholder', 'valueKey', 'language', 'focus']);
 
 const valueKey = props.valueKey || 'value';
 const placeholder = props.placeholder || TEXT.INPUT_PLACEHOLDER;
@@ -63,6 +63,10 @@ const handlePressEnter = () => {
 onMounted(() => {
     if (!props.remoteSourceUrl && !props.sourceList) {
         console.error(TEXT.ERROR_NO_REQUIRED_PROPS);
+    }
+    if (props.focus) {
+        debugger;
+        autocompleteRef.value?.inputRef?.focus();
     }
 })
 

@@ -15,7 +15,7 @@ export const TEXT = {
  *
  * @returns {HTMLElement} elementPlusUi element that was created to handle the autocompletion
  */
-export default function applyAutocomplete(element, remoteSourceUrl = null, sourceList = [], valueKey = null, selectCb = null) {
+export default function applyAutocomplete(element, remoteSourceUrl = null, sourceList = [], valueKey = null, selectCb = null, focus = false) {
     if (!element) {
         console.error(TEXT.ERROR_NO_ELEMENT); // eslint-disable-line no-console
         return;
@@ -49,6 +49,10 @@ export default function applyAutocomplete(element, remoteSourceUrl = null, sourc
 
     if (element.getAttribute("placeholder")) {
         elementPlusUi.setAttribute("placeholder", element.getAttribute("placeholder"));
+    }
+
+    if (focus) {
+        elementPlusUi.setAttribute("focus", true);
     }
 
     elementPlusUi.addEventListener("input", (event) => {
