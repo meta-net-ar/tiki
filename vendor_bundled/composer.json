@@ -482,6 +482,7 @@
         "classmap": [
             "../installer/",
             "../lib/language/",
+            "../lib/trackers/",
             "../lib/openpgp/",
             "../lib/rating/formula/",
             "../lib/setup",

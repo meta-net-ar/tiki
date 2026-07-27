@@ -30,8 +30,6 @@
  */
 define('HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE', -1);
 
-require_once __DIR__ . '/TrackerConfigHistory.php';
-
 use Tiki\Lib\Trackers\TrackerConfigHistory;
 
 /**
