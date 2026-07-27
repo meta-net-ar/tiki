@@ -45,7 +45,7 @@
     "smartmenus": "^2.0.0-alpha.1",
     "timeago": "^1.6.7",
     "pivottable": "^2.23.0",
-    "plotly.js": "^3.0.3",
+    "plotly.js": "^3.5.1",
     "reveal.js": "5.1.0",
     "sortablejs": "=1.14.0",
     "subtotal": "^1.11.0-alpha.0",
