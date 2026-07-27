@@ -7644,7 +7644,7 @@ class UsersLib extends TikiLib
             $result = $this->query($query, [$hash, $new_pass_confirm, '', $user]);
         }
 
-        if ($result && $result->numRows() === 1) {
+        if ($result && $result->numRows() === 1 || ($pass_first_login && empty($pass))) {
             // invalidate the cache so that after a fresh install, the admin (who has no user details at the install) can log in
             $cachelib = TikiLib::lib('cache');
             $cachelib->invalidate('user_details_' . $user);
