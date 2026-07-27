@@ -8,11 +8,10 @@
     "author": "Tiki Wiki CMS",
     "license": "LGPL-2.0-only",
     "devDependencies": {
-        "element-plus": "2.13.2",
+        "element-plus": "^2.14.1",
         "sortablejs": "1.14.0"
     },
     "devDependenciesComment": {
-        "element-plus": "Pinning to 2.11.3, so patches will stop breaking, as clearly after well over a year the dev will not do it.",
         "sortablejs": "Pinning to 1.14.0 to avoid conflicts with src/common-extarnals/package.json"
     }
 }
