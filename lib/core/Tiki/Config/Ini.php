@@ -22,7 +22,7 @@ class Tiki_Config_Ini extends Laminas\Config\Reader\Ini
      * @param  array $data
      * @return array
      */
-    protected function process(array $data)
+    protected function process(array $data): array
     {
         $data = $this->preProcessSectionInheritance($data);
         $config = parent::process($data);
