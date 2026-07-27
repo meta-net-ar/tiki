@@ -81,7 +81,7 @@ $systemConfiguration = new Config(
 );
 if (isset($_SERVER['TIKI_INI_FILE'])) {
     if (! is_readable($_SERVER['TIKI_INI_FILE'])) {
-        $error = $_SERVER['TIKI_INI_FILE'] . ' could not be read' . PHP_EOL ;
+        $error = $_SERVER['TIKI_INI_FILE'] . ' could not be read' . PHP_EOL;
         if (defined('TIKI_CONSOLE')) {
             throw new ConsoleSetupException($error, 1001);
         }
@@ -92,40 +92,53 @@ if (isset($_SERVER['TIKI_INI_FILE'])) {
     $configReader = new Tiki_Config_Ini();
     $configReader->setFilterSection(isset($_SERVER['TIKI_INI_IDENTIFIER']) ? $_SERVER['TIKI_INI_IDENTIFIER'] : null);
     $configData = $configReader->fromFile($_SERVER['TIKI_INI_FILE']);
-    $systemConfiguration = $systemConfiguration->merge(new Laminas\Config\Config($configData));
+    $systemConfiguration = $systemConfiguration->merge(new Config($configData));
 }
-if (isset($system_configuration_file)) {
-    if (! is_readable($system_configuration_file)) {
-        $error = $system_configuration_file . ' could not be read' . PHP_EOL ;
+
+// Normalize to array: support both legacy $system_configuration_file (string)
+// and the newer $system_configuration_files (array of file paths).
+// When using the array form, files listed later override keys from earlier files.
+if (isset($system_configuration_files)) {
+    if (! is_array($system_configuration_files)) {
+        // Safety: should be an array
+        $system_configuration_files = [];
+    }
+} else {
+    $system_configuration_files = ! empty($system_configuration_file) ? [$system_configuration_file] : [];
+}
+
+foreach ($system_configuration_files as $configFile) {
+    if (! empty($configFile) && ! is_readable($configFile)) {
+        $error = $configFile . ' could not be read' . PHP_EOL;
         if (defined('TIKI_CONSOLE')) {
             throw new ConsoleSetupException($error, 1001);
         }
         echo $error;
         exit(1);
     }
-    if (! isset($system_configuration_identifier)) {
-        $system_configuration_identifier = null;
+
+    if (! empty($configFile) && is_readable($configFile)) {
+        if (! isset($system_configuration_identifier)) {
+            $system_configuration_identifier = null;
+        }
+        $configReader = new Tiki_Config_Ini();
+        $configReader->setFilterSection($system_configuration_identifier);
+
+        if (preg_match('/\.ini.php$/', $configFile)) {
+            $retrieveIniContent = function ($configFile) {
+                ob_start();
+                include($configFile);
+                $content = ob_get_contents();
+                ob_end_clean();
+                return $content;
+            };
+            $configData = $configReader->fromString($retrieveIniContent($configFile));
+        } else {
+            $configData = $configReader->fromFile($configFile);
+        }
+
+        $systemConfiguration = $systemConfiguration->merge(new Config($configData));
     }
-    $configReader = new Tiki_Config_Ini();
-    $configReader->setFilterSection($system_configuration_identifier);
-
-    if (preg_match('/\.ini.php$/', $system_configuration_file)) {
-        $retrieveIniContent = function ($system_configuration_file) {
-            ob_start();
-            include($system_configuration_file);
-            $system_configuration_file_content = ob_get_contents();
-            ob_end_clean();
-
-            return $system_configuration_file_content;
-        };
-
-        $system_configuration_content = $retrieveIniContent($system_configuration_file);
-        $configData = $configReader->fromString($system_configuration_content);
-    } else {
-        $configData = $configReader->fromFile($system_configuration_file);
-    }
-
-    $systemConfiguration = $systemConfiguration->merge(new Config($configData));
 }
 
 if ($re === false) {
