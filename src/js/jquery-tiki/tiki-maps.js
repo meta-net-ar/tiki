@@ -1194,11 +1194,6 @@ import { defaults as defaultControls } from "ol/control";
 
                     pixel = map.getEventPixel(e.mapBrowserEvent.originalEvent);
 
-                    $mapBootstrapPopoverDummy.tooltip("dispose").css({
-                        left: pixel[0] + "px",
-                        top: pixel[1] + "px",
-                    });
-
                     let type = feature.get("type"),
                         object = feature.get("object");
 
@@ -1258,6 +1253,11 @@ import { defaults as defaultControls } from "ol/control";
                         case "popup":
                         default:
                             $mapBootstrapPopoverDummy
+                                .tooltip("dispose")
+                                .css({
+                                    left: pixel[0] + "px",
+                                    top: pixel[1] + "px",
+                                })
                                 .popover("dispose")
                                 .popover({
                                     trigger: "manual",
