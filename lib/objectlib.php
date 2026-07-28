@@ -966,6 +966,40 @@ class ObjectLib extends TikiLib
     }
 
     /**
+     * Fetch the index entries of a list of objects.
+     *
+     * The lookup is split in batches, both because a single query can only hold a limited
+     * number of clauses and because a query only returns as many results as its range allows.
+     *
+     * @param array $objects list of ['type' => ..., 'id' => ...]
+     * @param array $selectionFields index fields to return, all of them when empty
+     * @return array
+     */
+    private function searchObjects(array $objects, array $selectionFields = [])
+    {
+        $lib = TikiLib::lib('unifiedsearch');
+        $index = $lib->getIndex();
+        $rows = [];
+
+        foreach (array_chunk($objects, Search_Query::MAX_OBJECTS_PER_QUERY) as $chunk) {
+            $query = $lib->buildQuery([]);
+            foreach ($chunk as $object) {
+                $query->addObject($object['type'], $object['id']);
+            }
+            if ($selectionFields) {
+                $query->setSelectionFields($selectionFields);
+            }
+            $query->setRange(0, count($chunk));
+
+            foreach ($query->search($index) as $row) {
+                $rows[] = $row;
+            }
+        }
+
+        return $rows;
+    }
+
+    /**
      * Optimized way to get relation object values that are used in a format descriptor
      * @param array $objects
      * @param string $format
@@ -996,28 +1030,22 @@ class ObjectLib extends TikiLib
         if (TikiLib::lib('tiki')->isMemoryLow()) {
             ObjectLib::$titleCache = [];
         }
-        $lib = TikiLib::lib('unifiedsearch');
         $metaItemIds = [];
-        $query = $lib->buildQuery([]);
         foreach ($objects as $object) {
-            $query->addObject($object['type'], $object['id']);
             if (! empty($object['metaItemId'])) {
                 $metaItemIds[$object['type'] . ':' . $object['id']] = $object['metaItemId'];
             }
         }
         $format_pattern = '/\{([\w\.]+)\}/';
-        if (preg_match_all($format_pattern, $format, $m)) {
-            $query->setSelectionFields($m[1]);
-        }
-        $result = $query->search($lib->getIndex());
+        $selectionFields = preg_match_all($format_pattern, $format, $m) ? $m[1] : [];
+
+        $result = $this->searchObjects($objects, $selectionFields);
         $metadata = [];
         if ($metaItemIds) {
-            $query = $lib->buildQuery([]);
-            foreach ($metaItemIds as $metaItemId) {
-                $query->addObject('trackeritem', $metaItemId);
-            }
-            $metaResult = $query->search($lib->getIndex());
-            foreach ($metaResult as $row) {
+            $metaObjects = array_map(function ($metaItemId) {
+                return ['type' => 'trackeritem', 'id' => $metaItemId];
+            }, $metaItemIds);
+            foreach ($this->searchObjects($metaObjects) as $row) {
                 $key = array_search($row['object_id'], $metaItemIds);
                 if ($key !== false) {
                     $metadata[$key] = $row;

@@ -6,6 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Search_Query implements Search_Query_Interface
 {
+    /**
+     * Every addObject() call adds one clause to a single boolean query, and Lucene refuses
+     * boolean queries holding more than maxClauseCount clauses (1024 by default). Callers
+     * looking up an arbitrary number of objects must split the lookup in batches of at most
+     * this many objects.
+     */
+    public const MAX_OBJECTS_PER_QUERY = 500;
+
     private $objectList;
     private $expr;
     private $sortOrder;
