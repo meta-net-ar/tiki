@@ -24,6 +24,33 @@ class Config implements \ArrayAccess, \IteratorAggregate, \Countable
         return $this->data;
     }
 
+    public static function normalizePreferenceDirectoryPaths(array $data): array
+    {
+        foreach ($data as $key => $value) {
+            if ($key === 'preference' && is_array($value)) {
+                foreach (['fgal_use_dir', 't_use_dir', 'w_use_dir'] as $preference) {
+                    if (
+                        isset($value[$preference])
+                        && is_string($value[$preference])
+                        && $value[$preference] !== ''
+                        && ! str_ends_with($value[$preference], '\\')
+                        && ! str_ends_with($value[$preference], '/')
+                    ) {
+                        $value[$preference] .= '/';
+                    }
+                }
+                $data[$key] = $value;
+                continue;
+            }
+
+            if (is_array($value)) {
+                $data[$key] = self::normalizePreferenceDirectoryPaths($value);
+            }
+        }
+
+        return $data;
+    }
+
     public function setReadOnly(): void
     {
         $this->readOnly = true;
