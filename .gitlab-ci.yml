@@ -30,7 +30,9 @@ variables:
   MARIADB_IMAGE_NEWEST_SUPPORTED: mariadb:11.8.5
   MYSQL_IMAGE_OLDEST_SUPPORTED: mysql:8.0.29
   MYSQL_IMAGE_NEWEST_SUPPORTED: mysql:8.4.7
-  MANTICORE_NEWEST_SUPPORTED: 15.1.0
+  MANTICORE_IMAGE_NEWEST_SUPPORTED: manticoresearch/manticore:15.1.0
+  ELASTICSEARCH_IMAGE_NEWEST_SUPPORTED: elasticsearch:5
+
   #Only for older version upgrade tests these days
   MYSQL_5_IMAGE: mysql:5.7.44
   NODE_IMAGE: node:24
@@ -423,29 +425,30 @@ composer-could-update-lock:
   allow_failure:
       exit_codes: 1
 
-.template-tiki-schema-upgrade: &template-tiki-schema-upgrade
+.template-tiki-schema-upgrade:
   stage: tiki-check
   needs:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  variables:
+    MYSQL_SERVICE_ALIAS: mysql-${CI_JOB_ID}
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
-      alias: mysql,
+      alias: ${MYSQL_SERVICE_ALIAS}
       command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
   script:
-    - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode);SET GLOBAL log_bin_trust_function_creators = 1;"'
-    - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
+    - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode);SET GLOBAL log_bin_trust_function_creators = 1;"'
+    - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
     - '[ ! -d doc/devtools/dbdiff/cache ] && mkdir doc/devtools/dbdiff/cache'
     - '[ ! -f doc/devtools/dbdiff/cache/$DBFILE ] && curl -sS https://gitlab.com/tikiwiki/tikiwiki-ci-databases/raw/master/$DBFILE.gz -o doc/devtools/dbdiff/cache/$DBFILE.gz && gzip -d doc/devtools/dbdiff/cache/$DBFILE.gz'
     - export TIKI_CATCH_UPDATE_WARNINGS=1
-    - php -d display_errors=On doc/devtools/check_schema_upgrade.php -m $DBVER -e $ENGINE --db1=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikinew
-  after_script:
-    - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - echo "SHOW CREATE DATABASE tikinew" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - mysqldump --column-statistics=0  --default-character-set=utf8mb4 -u root --password=$MYSQL_ROOT_PASSWORD -h mysql tikiold > tikiold.sql
-    - mysqldump --column-statistics=0  --default-character-set=utf8mb4 -u root --password=$MYSQL_ROOT_PASSWORD -h mysql tikinew > tikinew.sql
+    - php -d display_errors=On doc/devtools/check_schema_upgrade.php -m $DBVER -e $ENGINE --db1=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikinew
+    - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - echo "SHOW CREATE DATABASE tikinew" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - mysqldump --column-statistics=0  --default-character-set=utf8mb4 -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} tikiold > tikiold.sql
+    - mysqldump --column-statistics=0  --default-character-set=utf8mb4 -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} tikinew > tikinew.sql
   artifacts:
     paths:
       - tikiold.sql
@@ -453,68 +456,43 @@ composer-could-update-lock:
     expire_in: 2 days
     when: always
 
-.template-tiki-schema-upgrade-mysql8: &template-tiki-schema-upgrade-mysql8
-  <<: *template-tiki-schema-upgrade
+.template-tiki-schema-upgrade-mysql8:
+  extends: .template-tiki-schema-upgrade
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}$IMAGE
-      command: [ "--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
-      alias: mysql
+      alias: ${MYSQL_SERVICE_ALIAS}
+      command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]
 
-db-upgrade-30-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_30.sql
-    DBVER: 30
+
+db-upgrade-recent:
+  extends: .template-tiki-schema-upgrade-mysql8
+  variables: 
     IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
     ENGINE: InnoDB
+  parallel:
+    matrix:
+      - DBFILE: ci_30.sql
+        DBVER: 30
+      - DBFILE: ci_29.sql
+        DBVER: 29
+      - DBFILE: ci_28.sql
+        DBVER: 28
+      - DBFILE: ci_27.sql
+        DBVER: 27
 
-db-upgrade-29-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_29.sql
-    DBVER: 29
-    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-    ENGINE: InnoDB
-
-db-upgrade-28-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_28.sql
-    DBVER: 28
-    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-    ENGINE: InnoDB
-
-db-upgrade-27-mysql:
-  <<: *template-tiki-schema-upgrade-mysql8
-  variables:
-    DBFILE: ci_27.sql
-    DBVER: 27
-    IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-    ENGINE: InnoDB
-
-db-upgrade-26-mysql:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_26.sql
-    DBVER: 26
+db-upgrade-older:
+  extends: .template-tiki-schema-upgrade
+  variables: 
     IMAGE: ${MYSQL_5_IMAGE}
     ENGINE: InnoDB
-
-db-upgrade-25-mysql:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_25.sql
-    DBVER: 25
-    IMAGE: ${MYSQL_5_IMAGE}
-    ENGINE: InnoDB
-
-db-upgrade-24-mysql:
-  <<: *template-tiki-schema-upgrade
-  variables:
-    DBFILE: ci_24.sql
-    DBVER: 24
-    IMAGE: ${MYSQL_5_IMAGE}
-    ENGINE: InnoDB
+  parallel:
+    matrix:
+      - DBFILE: ci_26.sql
+        DBVER: 26
+      - DBFILE: ci_25.sql
+        DBVER: 25
+      - DBFILE: ci_24.sql
+        DBVER: 24
 
 sql-engine-conversion:
   stage: tiki-check
@@ -522,19 +500,20 @@ sql-engine-conversion:
     - composer
     - composer-dbdiff
   image: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  variables:
+    MYSQL_SERVICE_ALIAS: mysql-${CI_JOB_ID}
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${MYSQL_IMAGE_NEWEST_SUPPORTED}
-      alias: mysql
+      alias: ${MYSQL_SERVICE_ALIAS}
   script:
-    - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode)"'
-    - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - php -d display_errors=On doc/devtools/check_sql_engine_conversion.php --db1=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@mysql:tikinew
-  after_script:
-    - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - echo "SHOW CREATE DATABASE tikinew" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql
-    - mysqldump --column-statistics=0 -u root --password=$MYSQL_ROOT_PASSWORD -h mysql tikiold > tikiold.sql
-    - mysqldump --column-statistics=0 -u root --password=$MYSQL_ROOT_PASSWORD -h mysql tikinew > tikinew.sql
+    - 'mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} --skip-column-names -B -e "SELECT CONCAT(''Version: '', VERSION(), CHAR(13), ''sql_mode: '', @@GLOBAL.sql_mode)"'
+    - echo "GRANT ALL ON tikiold.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - echo "GRANT ALL ON tikinew.* TO '${MYSQL_USER}';" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - php -d display_errors=On doc/devtools/check_sql_engine_conversion.php --db1=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikiold --db2=$MYSQL_USER:$MYSQL_PASSWORD@${MYSQL_SERVICE_ALIAS}:tikinew
+    - echo "SHOW CREATE DATABASE tikiold" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - echo "SHOW CREATE DATABASE tikinew" | mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS}
+    - mysqldump --column-statistics=0 -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} tikiold > tikiold.sql
+    - mysqldump --column-statistics=0 -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} tikinew > tikinew.sql
   artifacts:
     paths:
       - tikiold.sql
@@ -572,31 +551,30 @@ console-php-works:
   needs:
     - composer
   image: ${DEPENDENCY_PROXY_PREFIX}tikiwiki/tikiwiki-ci:${PHP_VERSION}-qa
-  services:
-    - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
-      # TODO:  All these aliases (mysql, elasticsearch, manticore) 
-      # need to be scoped with the version of the image or some other unique hash.
-      # Otherwise there are conflicts if a big docker machine runs them concurrently.
-      # If you get messages like:
-      # WARNING: Skipping alias "mysql" for service "mysql:5.7.44" (services[0]): alias is already in use by another service.
-      # WARNING: Possibly zombie container runner-k5qwkzlfy-project-44278468-concurrent-15-573f5bc5b25f298f-mysql-0-wait-for-service is disconnected from network bridge
-      # This is the problem.  The test may fail or succeed, but the result cannot be trusted.
-      # benoitg - 2026-07-24 
-      alias: mysql
-      command: ["--explicit-defaults-for-timestamp=off"]
-    - name: ${DEPENDENCY_PROXY_PREFIX}elasticsearch:5
-      alias: elasticsearch
-    - name: ${DEPENDENCY_PROXY_PREFIX}manticoresearch/manticore:${MANTICORE_NEWEST_SUPPORTED}
-      alias: manticore
   variables:
     EXTRA: 1
     MCL: 1
+    # This allows concurrent jobs on the same runner not to interfere with one another.
+    # These aliases must remain within 15 characters and not start with a number (on docker linux). 
+    # So with the id being up to 7 characters, it means no more than 8 in the prefix.
+    # Rejected approach: Set FF_NETWORK_PER_BUILD globally.  WOuld be perfect, expcept I couldn't get dns resolution to work on the build host. - benoitg - 2026-07-27
+    MYSQL_SERVICE_ALIAS: mysql-${CI_JOB_ID}
+    ELASTICSEARCH_SERVICE_ALIAS: elastic-${CI_JOB_ID}
+    MANTICORE_SERVICE_ALIAS: manti-${CI_JOB_ID}
+  services:
+    - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
+      alias: ${MYSQL_SERVICE_ALIAS}
+      command: ["--explicit-defaults-for-timestamp=off"]
+    - name: ${DEPENDENCY_PROXY_PREFIX}${ELASTICSEARCH_IMAGE_NEWEST_SUPPORTED}
+      alias: ${ELASTICSEARCH_SERVICE_ALIAS}
+    - name: ${DEPENDENCY_PROXY_PREFIX}${MANTICORE_IMAGE_NEWEST_SUPPORTED}
+      alias: ${MANTICORE_SERVICE_ALIAS}
   script:
     - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
-    - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
-    - 'echo -n "ElasticSearch Version: " && curl -sS -XGET ''http://elasticsearch:9200'' | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
-    - 'echo -n "Manticore Version: " && mysql -h manticore -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
-    - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
+    - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
+    - 'echo -n "ElasticSearch Version: " && curl -sS -XGET http://${ELASTICSEARCH_SERVICE_ALIAS}:9200 | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
+    - 'echo -n "Manticore Version: " && mysql -h ${MANTICORE_SERVICE_ALIAS} -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
+    - echo '<?php $host_tiki = "'${MYSQL_SERVICE_ALIAS}'"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
     - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit $PHPUNIT_EXTRA_PARAMS --log-junit temp/ci/phpunit-report.xml --exclude-group api-integration-test --display-deprecations --display-notices --display-warnings
 
 unit-tests-php-latest-coverage:
@@ -608,6 +586,9 @@ unit-tests-php-latest-coverage:
     PHPUNIT_EXTRA_PARAMS: --coverage-cobertura temp/ci/phpunit-coverage.xml --coverage-text --colors=never
   artifacts:
     when: always
+    paths:
+      # This is only so we can inspect it it the pipeline interface.  It can be commented out in normal use, gitlab doesn't need it to process the files.
+      - temp/ci/phpunit-coverage.xml
     reports:
       junit: temp/ci/phpunit-report.xml
       coverage_report:
@@ -638,7 +619,7 @@ unit-tests-api:
   allow_failure: false
   services:
     - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
-      alias: mysql
+      alias: ${MYSQL_SERVICE_ALIAS}
       command: ["--explicit-defaults-for-timestamp=off"]
   parallel:
     matrix:
@@ -654,8 +635,8 @@ unit-tests-api:
         DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
   script:
     - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
-    - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h mysql --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
-    - echo '<?php $host_tiki = "mysql"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
+    - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
+    - echo '<?php $host_tiki = "'${MYSQL_SERVICE_ALIAS}'"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
     - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --do-not-fail-on-phpunit-warning --do-not-fail-on-phpunit-deprecation --group api-integration-test
 
 unit-tests-node:
