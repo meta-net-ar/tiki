@@ -25,7 +25,7 @@ class Search_GlobalSource_Geolocation implements Search_GlobalSource_Interface
             $coordsArray = null;
         }
 
-        $alreadyLocated = isset($data['geo_located']) && $data['geo_located'] == 'y';
+        $alreadyLocated = isset($data['geo_located']) && $data['geo_located']->getValue() === 'y';
 
         return [
             'geo_located' => $typeFactory->identifier(($coordinates || $alreadyLocated) ? 'y' : 'n'),
