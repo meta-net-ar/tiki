@@ -123,9 +123,9 @@ function wikiplugin_map_info()
             'cluster' => [
                 'required' => false,
                 'name' => tra('Cluster Distance'),
-                'description' => tra('Distance between features before they are "clustered", 0 (off) to 100. (requires Open Layers v3+, default is 0)'),
+                'description' => tra('Distance in pixels between features before they are "clustered", 0 (off) to 100. (default is 25)'),
                 'since' => '20.0',
-                'default' => 0,
+                'default' => '0',
                 'filter' => 'digits',
                 'advanced' => true,
             ],
@@ -161,6 +161,24 @@ function wikiplugin_map_info()
                 'filter' => 'text',
                 'advanced' => true,
             ],
+            'clusterExcludeField' => [
+                'required' => false,
+                'name' => tra('Name of field to exclude from clustering'),
+                'description' => tra('Some features like borders and rivers should not be clustered. Add the permanent name of a checkbox field to exclude some items.'),
+                'since' => '30.1',
+                'default' => "",
+                'filter' => 'text',
+                'advanced' => true,
+            ],
+            'clusterIncludeField' => [
+                'required' => false,
+                'name' => tra('Name of field to include in clustering'),
+                'description' => tra('If not set then include by default, otherwise do not include unless the value is "y". Add the permanent name of a checkbox field to include some items.'),
+                'since' => '30.1',
+                'default' => "",
+                'filter' => 'text',
+                'advanced' => true,
+            ],
         ],
     ];
 }
@@ -188,9 +206,15 @@ function wikiplugin_map($data, $params)
         $tooltips = '';
     }
 
-    $cluster = (int) $params['cluster'];
+    if (isset($params['cluster'])) {
+        $cluster = ' data-cluster="' . $params['cluster'] . '"';
+    } else {
+        $cluster = '';
+    }
     if ($params['clusterHover']) {
         $clusterHover = ' data-clusterhover="' . $params['clusterHover'] . '"';
+    } else {
+        $clusterHover = '';
     }
     if ($params['clusterFillColor']) {
         $clusterFillColor = ' data-clusterfillcolor="' . $params['clusterFillColor'] . '"';
@@ -201,6 +225,16 @@ function wikiplugin_map($data, $params)
         $clusterTextColor = ' data-clustertextcolor="' . $params['clusterTextColor'] . '"';
     } else {
         $clusterTextColor = '';
+    }
+    if ($params['clusterExcludeField']) {
+        $clusterExcludeField = ' data-clusterexcludefield="' . $params['clusterExcludeField'] . '"';
+    } else {
+        $clusterExcludeField = '';
+    }
+    if ($params['clusterIncludeField']) {
+        $clusterIncludeField = ' data-clusterincludefield="' . $params['clusterIncludeField'] . '"';
+    } else {
+        $clusterIncludeField = '';
     }
     if ($params['tilesets']) {
         $tilesets = ' data-tilesets="' . $params['tilesets'] . '"';
@@ -226,7 +260,7 @@ function wikiplugin_map($data, $params)
     $scope = smarty_modifier_escape(wp_map_getscope($params));
 
     $output = "<div class=\"map-container\" data-marker-filter=\"$scope\" data-map-controls=\"$controls\" data-popup-style=\"$popupStyle\"" .
-        " data-cluster=\"$cluster\" style=\"width: $width; height: $height;\" $center $tooltips $clusterFillColor $clusterTextColor $tilesets $clusterHover>";
+        " style=\"width: $width; height: $height;\" $center $tooltips $cluster $clusterFillColor $clusterTextColor $tilesets $clusterHover $clusterExcludeField $clusterIncludeField>";
 
     $argumentParser = new WikiParser_PluginArgumentParser();
     $matches = WikiParser_PluginMatcher::match($data);

@@ -45,6 +45,8 @@ class Tracker_Field_GeographicFeature extends \Tracker\Field\AbstractItemField i
     {
         $ins_id = $this->getInsertId();
         $value = $this->getValue();
+        // prevent single quotes breaking the value
+        $value = str_replace("'", '%27', $value);
         //This input is useful for facilitating the execution of rules
         $hiddenInput = "<input type='hidden' name='$ins_id' value='$value'>";
         $translatedText = tr("Feature cannot be set or modified through this interface.");

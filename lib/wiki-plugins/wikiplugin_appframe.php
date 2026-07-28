@@ -206,7 +206,13 @@ $('#appframe .anchor').each(function () {
 
     $('.anchor-toggle', anchor).on("click", function () {
         $('.anchor-head .label', anchor).toggle('fast');
-        $('.anchor-content', anchor).toggle('fast');
+        const showing =$('.anchor-content', anchor).toggle('fast').is(":visible");
+        $(anchor).closest(".anchor-container").find('.anchor').each(function () {
+            if (anchor !== this && showing) {
+                $('.anchor-head .label', this).hide('fast');
+                $('.anchor-content', this).hide('fast');
+            }
+        });
         return false;
     });
 
@@ -441,24 +447,28 @@ function wikiplugin_appframe_mapcontrol($data, $params, $start)
             }
             break;
         case 'select_feature':
-            $control = 'new OpenLayers.Control.SelectFeature(vlayer)';
+            $control = 'new ol.interaction.Select({layers: [vlayer]})';
             $label = tr('Select');
             break;
         case 'modify_feature':
-            $control = 'new OpenLayers.Control.ModifyFeature(vlayer, {
-            mode: OpenLayers.Control.ModifyFeature.DRAG | OpenLayers.Control.ModifyFeature.RESHAPE,
-            standalone: true,
-            virtualStyle: drawStyle,
-            vertexRenderIntent: "vertex"
-        }), new OpenLayers.Control.SelectFeature(vlayer)';
+            $control = 'new ol.interaction.Modify({
+            source: shapelayer ? shapelayer.get("source") : vlayer.get("source"),
+            style: (feature) => container.getFeatureSelectStyle(feature),
+        }), new ol.interaction.Select({layers: [vlayer, shapelayer]})';
             $label = tr('Select/Modify');
             break;
         case 'draw_polygon':
-            $control = 'new OpenLayers.Control.DrawFeature(vlayer, OpenLayers.Handler.Polygon, {handlerOptions:{style:drawStyle}})';
+            $control = 'new ol.interaction.Draw({
+            source: shapelayer ? shapelayer.get("source") : vlayer.get("source"),
+            type: "Polygon"
+            })';
             $label = tr('Draw Polygon');
             break;
         case 'draw_path':
-            $control = 'new OpenLayers.Control.DrawFeature(vlayer, OpenLayers.Handler.Path, {handlerOptions:{style:drawStyle}})';
+            $control = 'new ol.interaction.Draw({
+            source: shapelayer ? shapelayer.get("source") : vlayer.get("source"),
+            type: "LineString"
+            })';
             $label = tr('Draw Path');
             break;
         case 'reset_zoom':
