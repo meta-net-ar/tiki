@@ -65,7 +65,7 @@ class Tiki_Profile_InstallHandler_Article extends Tiki_Profile_InstallHandler
             $data['heading'],
             $data['body'],
             $dateConverter->convert($data['publication_date']),
-            'admin',
+            TikiLib::lib('user')->getDefaultAdminLogin(),
             0,
             0,
             0,

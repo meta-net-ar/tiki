@@ -529,7 +529,7 @@ function sendErrorEmailNotification($errno, $errstr, $errfile = '?', $errline = 
             $err = "";
     }
 
-    $email = $tikilib->get_user_email('admin');
+    $email = $tikilib->get_user_email(TikiLib::lib('user')->getDefaultAdminLogin());
 
     mail(
         $email,

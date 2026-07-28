@@ -54,7 +54,7 @@ class TikiAccessLib extends TikiLib
         // first check that user is logged in
         $this->check_user($user);
 
-        if (($user != 'admin') && ($tiki_p_admin != 'y')) {
+        if (($user != TikiLib::lib('user')->getDefaultAdminLogin()) && ($tiki_p_admin != 'y')) {
             $msg = tra("You do not have the permission that is needed to use this feature");
             if ($feature_name) {
                 $msg = $msg . ": " . $feature_name;

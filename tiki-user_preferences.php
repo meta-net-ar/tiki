@@ -453,7 +453,7 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
         ]
     );
 }
-if ($prefs['auth_method'] == 'ldap' && $user == 'admin' && $prefs['ldap_skip_admin'] == 'y') {
+if ($prefs['auth_method'] == 'ldap' && $user == TikiLib::lib('user')->getDefaultAdminLogin() && $prefs['ldap_skip_admin'] == 'y') {
     $change_password = 'y';
     $smarty->assign('change_password', $change_password);
 }
@@ -485,7 +485,7 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             Feedback::errorAndDie(tra("Invalid password. Your current password is required to change administrative information"), \Laminas\Http\Response::STATUS_CODE_409);
         }
     }
-    if (! empty($_POST['email']) && ($prefs['login_is_email'] != 'y' || $user == 'admin') && $_POST['email'] != $userlib->get_user_email($userwatch)) {
+    if (! empty($_POST['email']) && ($prefs['login_is_email'] != 'y' || $user == TikiLib::lib('user')->getDefaultAdminLogin()) && $_POST['email'] != $userlib->get_user_email($userwatch)) {
         if (validate_email($_POST['email'])) {
             $userlib->change_user_email($userwatch, $_POST['email'], $pass);
             Feedback::success(sprintf(tra('Email is set to %s'), $_POST['email']));
@@ -631,7 +631,7 @@ if (isset($_POST['deleteaccount']) && $access->checkCsrf(true)) {
         die();
     }
     // Prevent deletion of the built-in admin account
-    if ($deleteUser === 'admin') {
+    if ($deleteUser === TikiLib::lib('user')->getDefaultAdminLogin()) {
         $smarty->assign('msg', tra('The built-in admin account cannot be deleted.'));
         $smarty->display('error.tpl');
         die();

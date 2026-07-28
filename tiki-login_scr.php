@@ -63,7 +63,7 @@ if (isset($_REQUEST['clearmenucache'])) {
     TikiLib::lib('menu')->empty_menu_cache();
 }
 if (isset($_REQUEST['user'])) {
-    if ($_REQUEST['user'] == 'admin' && (! isset($_SESSION["groups_are_emulated"]) || $_SESSION["groups_are_emulated"] != "y")) {
+    if (TikiLib::lib('user')->user_has_permission($_REQUEST['user'], 'tiki_p_admin') && (! isset($_SESSION["groups_are_emulated"]) || $_SESSION["groups_are_emulated"] != "y")) {
         $smarty->assign('showloginboxes', 'y');
         $smarty->assign('adminuser', $_REQUEST['user']);
     } else {

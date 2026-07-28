@@ -21,7 +21,7 @@ class UserFilesLib extends TikiLib
      */
     public function userfiles_quota($user)
     {
-        if ($user == 'admin') {
+        if ($user == $this->getDefaultAdminLogin()) {
             return 0;
         }
 

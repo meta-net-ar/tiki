@@ -210,7 +210,7 @@ $displayLoginBruteForceError = function (array $properties) use ($bruteForce, $s
 };
 
 // admin is always local
-if ($requestedUser == 'admin') {
+if ($requestedUser == TikiLib::lib('user')->getDefaultAdminLogin()) {
     $prefs['feature_intertiki'] = 'n';
 }
 // Determine the intertiki domain
@@ -395,7 +395,7 @@ if (
     // sending the user to the new password change screen without letting him use tiki
     // The user must re-enter the old password so no security risk here
     if (! $isvalid && $error === ACCOUNT_WAITING_USER && $access->checkCsrf(null, null, null, null, null, 'page')) {
-        if ($requestedUser != 'admin') { // admin has not necessarely an email
+        if ($requestedUser != TikiLib::lib('user')->getDefaultAdminLogin()) { // admin has not necessarely an email
             if ($userlib->is_email_due($requestedUser)) {
                 if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
                     $bruteForce->attempt('login', $bruteForceProperties());

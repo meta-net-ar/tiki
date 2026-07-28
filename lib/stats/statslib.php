@@ -15,7 +15,7 @@ class StatsLib extends TikiLib
     public static function is_stats_hit()
     {
         global $prefs, $user;
-        return $prefs['feature_stats'] === 'y' && ( $prefs['count_admin_pvs'] === 'y' || $user != 'admin' );
+        return $prefs['feature_stats'] === 'y' && ( $prefs['count_admin_pvs'] === 'y' || $user != TikiLib::lib('user')->getDefaultAdminLogin() );
     }
 
     // obsolete, but keeped for compatibility purposes

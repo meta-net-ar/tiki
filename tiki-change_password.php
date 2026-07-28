@@ -244,7 +244,7 @@ if (isset($_REQUEST["change"]) && $access->checkCsrf()) {
             }
             $homePageUrl = $prefs['tikiIndex'];
             $wizardlib = TikiLib::lib('wizard');
-            $force = $user == 'admin';
+            $force = TikiLib::lib('user')->user_has_permission($user, 'tiki_p_admin') ? true : false;
             $wizardlib->onLogin($user, $homePageUrl, $force);
             $accesslib = TikiLib::lib('access');
             if (! empty($prefs['url_after_validation']) && ! empty($_REQUEST['new_user_validation'])) {

@@ -67,9 +67,10 @@ if (isset($_REQUEST["edittopic"])) {
             $errors = true;
             $smarty->assign('email', $_REQUEST['email']);
         } else {
-            $tikilib->add_user_watch('admin', 'topic_article_created', $_REQUEST['topicid'], 'cms', $topic_info['name'], 'tiki-edit_topic.php?topicId=' . $_REQUEST['topicid'], $_REQUEST['email']);
-            $tikilib->add_user_watch('admin', 'topic_article_edited', $_REQUEST['topicid'], 'cms', $topic_info['name'], 'tiki-edit_topic.php?topicId=' . $_REQUEST['topicid'], $_REQUEST['email']);
-            $tikilib->add_user_watch('admin', 'topic_article_deleted', $_REQUEST['topicid'], 'cms', $topic_info['name'], 'tiki-edit_topic.php?topicId=' . $_REQUEST['topicid'], $_REQUEST['email']);
+            $adminUser = TikiLib::lib('user')->getDefaultAdminLogin();
+            $tikilib->add_user_watch($adminUser, 'topic_article_created', $_REQUEST['topicid'], 'cms', $topic_info['name'], 'tiki-edit_topic.php?topicId=' . $_REQUEST['topicid'], $_REQUEST['email']);
+            $tikilib->add_user_watch($adminUser, 'topic_article_edited', $_REQUEST['topicid'], 'cms', $topic_info['name'], 'tiki-edit_topic.php?topicId=' . $_REQUEST['topicid'], $_REQUEST['email']);
+            $tikilib->add_user_watch($adminUser, 'topic_article_deleted', $_REQUEST['topicid'], 'cms', $topic_info['name'], 'tiki-edit_topic.php?topicId=' . $_REQUEST['topicid'], $_REQUEST['email']);
         }
     }
     if (empty($errors)) {

@@ -13,7 +13,7 @@ class Tiki_Profile_InstallHandler_FileGallery extends Tiki_Profile_InstallHandle
         }
 
         $defaults = [
-            'owner' => 'admin',
+            'owner' => TikiLib::lib('user')->getDefaultAdminLogin(),
             'public' => 'n',
             'galleryId' => null,
             'parent' => 1,

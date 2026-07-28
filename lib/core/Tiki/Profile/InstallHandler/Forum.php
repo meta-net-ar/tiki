@@ -18,7 +18,7 @@ class Tiki_Profile_InstallHandler_Forum extends Tiki_Profile_InstallHandler
             'parentId' => 0,
             'description' => '',
             'flood_interval' => 120,
-            'moderator' => 'admin',
+            'moderator' => TikiLib::lib('user')->getDefaultAdminLogin(),
             'per_page' => 10,
             'prune_max_age' => 3 * 24 * 3600,
             'prune_unreplied_max_age' => 30 * 24 * 3600,

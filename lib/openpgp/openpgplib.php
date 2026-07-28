@@ -523,7 +523,7 @@ class OpenPGPLib
 
         // get user email for publickey armor block retrieval
         $user_email = '';
-        if ($user != 'admin') {
+        if ($user != $userlib->getDefaultAdminLogin()) {
             $user_email = $userlib->get_user_email($user);
         } else {
             // NOTE: This function is in this lib-class, not in $userlib!

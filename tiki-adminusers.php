@@ -474,7 +474,7 @@ if (isset($_REQUEST['user']) and $_REQUEST['user']) {
             } elseif ($prefs['login_is_email'] == 'n' && (strlen($_REQUEST['login']) > $prefs['max_username_length'] || strlen($_REQUEST['login']) < $prefs['min_username_length']) && $userinfo['login'] != $_POST['login']) {
                 $errors[] = sprintf(tra('Username %s must be less than %s characters and more than %s character(s).'), $_REQUEST['login'], $prefs['max_username_length'], $prefs['min_username_length']);
             } else {
-                if ($userinfo['login'] != $_POST['login'] && $userinfo['login'] != 'admin') {
+                if ($userinfo['login'] != $_POST['login'] && $userlib->user_has_permission($userinfo['login'], 'tiki_p_admin')) {
                     if ($userlib->user_exists($_POST['login'])) {
                         $errors[] = tra('User already exists');
                     } elseif (! preg_match($userlib::USERNAME_MANDATORY_VALIDATION_PATTERN, $_POST['login'])) {

@@ -121,7 +121,7 @@ class MarkdownConvertCommand extends Command
                     $is_wysiwyg = true;
                 }
                 $converted = '{syntax type="' . $syntax . '" ' . $editor . '} ' . $converted;
-                $tikilib->update_page($pageInfo['pageName'], $converted, tra('automatic conversion'), 'admin', '127.0.0.1', null, 0, '', null, null, null, '', '', true);
+                $tikilib->update_page($pageInfo['pageName'], $converted, tra('automatic conversion'), TikiLib::lib('user')->getDefaultAdminLogin(), '127.0.0.1', null, 0, '', null, null, null, '', '', true);
             } else {
                 $io->note("Converted:");
                 $io->writeln($converted);

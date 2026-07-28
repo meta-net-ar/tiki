@@ -247,7 +247,7 @@ class Services_User_Controller
                     if (
                         $prefs['feature_community_mouseover_score'] == 'y' &&
                         ! empty($info['score']) &&
-                        $other_user !== 'admin' &&
+                        $other_user !== TikiLib::lib('user')->getDefaultAdminLogin() &&
                         $other_user !== 'system' &&
                         $other_user !== 'Anonymous'
                     ) {
@@ -1270,7 +1270,7 @@ class Services_User_Controller
     {
         global $user;
         foreach ($users as $deleteuser) {
-            if ($deleteuser != 'admin') {
+            if ($deleteuser != TikiLib::lib('user')->getDefaultAdminLogin()) {
                 // remove the user's objects, wiki page first
                 if ($page) {
                     global $prefs;
@@ -1476,7 +1476,7 @@ class Services_User_Controller
     {
         global $user;
         foreach ($users as $user_to_lock) {
-            if ($user_to_lock != 'admin') {
+            if ($user_to_lock != TikiLib::lib('user')->getDefaultAdminLogin()) {
                 $res = $this->lib->update_user_lock_status($user_to_lock, $newLockStatus);
                 if ($res !== true) {
                     Feedback::error(tr('An error occurred. User %0 lock status could not be updated', $user_to_lock));

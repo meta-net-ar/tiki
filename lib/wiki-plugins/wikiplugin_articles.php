@@ -428,7 +428,7 @@ function wikiplugin_articles($data, $params)
         $categIds = [ 'AND' => $categId];
     }
 
-    $listpages = $artlib->list_articles($start, $max, $sort, '', $dateStartTS, $dateEndTS, 'admin', $type, $topicId, 'y', $topic, $categIds, '', '', $lang, '', '', ($overrideDates == 'y'), 'y', $filter);
+    $listpages = $artlib->list_articles($start, $max, $sort, '', $dateStartTS, $dateEndTS, TikiLib::lib('user')->getDefaultAdminLogin(), $type, $topicId, 'y', $topic, $categIds, '', '', $lang, '', '', ($overrideDates == 'y'), 'y', $filter);
     if ($prefs['feature_multilingual'] == 'y' && is_null($translationOrphan)) {
         $multilinguallib = TikiLib::lib('multilingual');
         $listpages['data'] = $multilinguallib->selectLangList('article', $listpages['data'], $pageLang);

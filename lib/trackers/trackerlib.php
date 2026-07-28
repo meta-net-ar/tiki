@@ -5836,7 +5836,7 @@ class TrackerLib extends TikiLib
 
             $handler = $this->get_field_handler($field);
             if ($handler) {
-                $userOk = (! $watcher || $watcher === 'admin');
+                $userOk = (! $watcher || $watcher === $this->getDefaultAdminLogin());
                 if (! $userOk && is_array($field['visibleBy']) && ! empty($field['visibleBy'])) {
                     foreach ($field['visibleBy'] as $group) {
                         $userOk = $userslib->user_is_in_group($watcher, $group);

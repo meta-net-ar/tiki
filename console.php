@@ -82,7 +82,7 @@ $output = new ConsoleOutput();
 $console = new ConsoleApplicationBuilder();
 $console = $console->create($statusCode);
 if (DB_TIKI_SETUP) {
-    $asUser = $input->getParameterOption(['--as-user']) ?: 'admin';
+    $asUser = $input->getParameterOption(['--as-user']) ?: TikiLib::lib('user')->getDefaultAdminLogin();
     if (TikiLib::lib('user')->user_exists($asUser)) {
         $permissionContext = new Perms_Context($asUser);
     }

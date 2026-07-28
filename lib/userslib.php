@@ -438,7 +438,7 @@ class UsersLib extends TikiLib
             session_unset();
             session_destroy();
         }
-        if ($prefs['auth_method'] === 'cas' && $user !== 'admin' && $user !== '' && $prefs['cas_force_logout'] === 'y') {
+        if ($prefs['auth_method'] === 'cas' && $user !== $this->getDefaultAdminLogin() && $user !== '' && $prefs['cas_force_logout'] === 'y') {
             PhpCAS::logoutWithRedirectService($url);
         }
 
@@ -517,7 +517,7 @@ class UsersLib extends TikiLib
         $userlib = TikiLib::lib('user');
         $isAdminGroupMember = in_array($user, $userlib->get_members('Admins'), true);
 
-        if ($user != 'admin' && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster'])) {
+        if ($user != $this->getDefaultAdminLogin() && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster'])) {
             // slave intertiki sites should never check passwords locally, just for admin
             return false;
         }
@@ -570,7 +570,7 @@ class UsersLib extends TikiLib
         }
 
         // If preference login_multiple_forbidden is set, don't let user login if already logged in
-        if ($result == USER_VALID && $prefs['login_multiple_forbidden'] == 'y' && $for_login == true && $user != 'admin') {
+        if ($result == USER_VALID && $prefs['login_multiple_forbidden'] == 'y' && $for_login == true && $user != $this->getDefaultAdminLogin()) {
             $tikilib = TikiLib::lib('tiki');
             $grabSessionOnAlreadyLoggedIn = ! empty($prefs['login_grab_session']) ? $prefs['login_grab_session'] : 'n';
             if ($grabSessionOnAlreadyLoggedIn === 'y') {
@@ -962,7 +962,7 @@ class UsersLib extends TikiLib
                     }
                 } else {
                     // Update user
-                    if ($username != 'admin') { // Prevent change groups of the admin account
+                    if ($username != $this->getDefaultAdminLogin()) { // Prevent change groups of the admin account
                         if (isset($prefs['saml_options_sync_group']) && $prefs['saml_options_sync_group'] == 'y') {
                             if (! empty($saml_groups)) {
                                 $this->assign_user_to_groups($username, $saml_groups);
@@ -1222,7 +1222,7 @@ class UsersLib extends TikiLib
             && (isset($_SESSION[$user_cookie_site]) || $prefs['cas_autologin'] == 'y')
             && basename($_SERVER['SCRIPT_NAME']) != 'tiki-login.php'
             && basename($_SERVER['SCRIPT_NAME']) != 'tiki-logout.php'
-            && (! isset($_SESSION[$user_cookie_site]) || $_SESSION[$user_cookie_site] != 'admin' )
+            && (! isset($_SESSION[$user_cookie_site]) || $_SESSION[$user_cookie_site] != $this->getDefaultAdminLogin() )
             && empty($_POST)
             && ( ( $prefs['cas_authentication_timeout'] && isset($_SESSION['cas_validation_time']) && $tikilib->now - $_SESSION['cas_validation_time'] > $prefs['cas_authentication_timeout'] )
                 || ( isset($_SESSION['cas_is_validating']) && $_SESSION['cas_is_validating'] === true && $tikilib->now - $_SESSION['cas_validation_time'] > 5 ) )
@@ -1381,7 +1381,7 @@ class UsersLib extends TikiLib
             }
         }
 
-        $already_logged_as_admin = isset($_SESSION["$user_cookie_site"]) && $_SESSION["$user_cookie_site"] == 'admin';
+        $already_logged_as_admin = isset($_SESSION["$user_cookie_site"]) && $_SESSION["$user_cookie_site"] == $this->getDefaultAdminLogin();
         $force_saml_login = ! (isset($prefs['saml_options_skip_admin']) && $prefs['saml_options_skip_admin'] == 'y');
 
         if ($clicked_on_saml_link || ($force_saml_login && ! $already_logged_as_admin)) {
@@ -1718,7 +1718,7 @@ class UsersLib extends TikiLib
      */
     public function ldap_sync_user($user, $pass)
     {
-        if ($user == 'admin') {
+        if ($user == $this->getDefaultAdminLogin()) {
             return true;
         }
 
@@ -1815,7 +1815,7 @@ class UsersLib extends TikiLib
      */
     private function _ldap_sync_groups($user, $pass)
     {
-        if ($user == 'admin') {
+        if ($user == $this->getDefaultAdminLogin()) {
             return true;
         }
 
@@ -3044,7 +3044,7 @@ class UsersLib extends TikiLib
     {
         $cachelib = TikiLib::lib('cache');
 
-        if ($user == 'admin') {
+        if ($user == $this->getDefaultAdminLogin()) {
             return false;
         }
 
@@ -3100,7 +3100,7 @@ class UsersLib extends TikiLib
         global $user;
         $cachelib = TikiLib::lib('cache');
 
-        if ($from == 'admin') {
+        if ($from == $this->getDefaultAdminLogin()) {
             return false;
         }
 
@@ -3525,7 +3525,7 @@ class UsersLib extends TikiLib
             $res['groups'] = ( $inclusion ) ? $this->get_user_groups_inclusion($res['login']) : $this->get_user_groups($res['login']);
             $res['age'] = ( ! isset($res['registrationDate']) ) ? 0 : $this->now - $res['registrationDate'];
 
-            if ($prefs['login_is_email'] == 'y' && isset($res['login']) && $res['login'] != 'admin') {
+            if ($prefs['login_is_email'] == 'y' && isset($res['login']) && $res['login'] != $this->getDefaultAdminLogin()) {
                 $res['email'] = $res['login'];
             }
 
@@ -7384,7 +7384,7 @@ class UsersLib extends TikiLib
     {
         global $prefs;
 
-        if (($prefs['login_is_email'] == 'y' && $user != 'admin')) {
+        if (($prefs['login_is_email'] == 'y' && $user != $this->getDefaultAdminLogin())) {
             return $this->user_exists($user) ? $user : '';
         } else {
             return $this->getOne('select `email` from `users_users` where binary `login`=?', [$user]);
@@ -7606,7 +7606,7 @@ class UsersLib extends TikiLib
         $errors = [];
 
         // Validate password here
-        if (( $prefs['auth_method'] != 'cas' || $user == 'admin' ) && strlen($pass) < $prefs['min_pass_length']) {
+        if (( $prefs['auth_method'] != 'cas' || $user == $this->getDefaultAdminLogin() ) && strlen($pass) < $prefs['min_pass_length']) {
             $errors[] = tr('Password should be at least %0 characters long.', $prefs['min_pass_length']);
         }
 
@@ -7746,7 +7746,7 @@ class UsersLib extends TikiLib
         $force = false;
 
         //Do not force user (admin) to enable 2FA
-        if ($user == 'admin') {
+        if ($user == $this->getDefaultAdminLogin()) {
             return false;
         }
         //Force all users to enable 2FA
@@ -8960,7 +8960,7 @@ class UsersLib extends TikiLib
             if (! $u) {
                 continue;
             }
-            if ($u == 'admin') {
+            if ($u == $this->getDefaultAdminLogin()) {
                 $finalusers[] = $u;
             } elseif ($key == 'userId' && preg_match('/\(([0-9]+)\)$/', $u, $matches)) {
                 $finalusers[] = $this->get_user_login($matches[1]);
@@ -9255,7 +9255,7 @@ class UsersLib extends TikiLib
     {
         $cachelib = TikiLib::lib('cache');
 
-        if ($user == 'admin') {
+        if ($user == $this->getDefaultAdminLogin()) {
             return false;
         }
 
