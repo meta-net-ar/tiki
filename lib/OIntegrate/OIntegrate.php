@@ -7,6 +7,7 @@
 namespace Tiki\Lib\OIntegrate;
 
 use DeclFilter;
+use Feedback;
 use Symfony\Component\Yaml\Yaml;
 use Tiki\Lib\OIntegrate\Converter\Direct;
 use Tiki\Lib\OIntegrate\Converter\EncodeHtml;
@@ -157,6 +158,10 @@ class OIntegrate
         }
         $response->data = $this->unserialize($mediaType, $content);
 
+        if ($response->data === null) {
+            Feedback::error(tr('Webservice response could not be parsed as JSON or YAML (URL: %0).', $url));
+        }
+
         $filter = new DeclFilter();
         $filter->addCatchAllFilter('xss');
 
@@ -218,7 +223,11 @@ class OIntegrate
                 $out = json_decode($fixed, true);
                 return $out;
             case 'text/x-yaml':
-                return Yaml::parse($data);
+                try {
+                    return Yaml::parse($data);
+                } catch (\Symfony\Component\Yaml\Exception\ParseException) {
+                    return null;
+                }
             default:
                 // Attempt anything...
                 if ($out = $this->unserialize('application/json', $data)) {
