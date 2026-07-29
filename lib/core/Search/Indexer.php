@@ -135,12 +135,6 @@ class Search_Indexer
     public function rebuild($lastStats = [], $progress = null)
     {
         $this->log('Starting rebuild');
-
-        // check the connection is working before proceeding
-        if (! $this->searchIndex->exists()) {
-            return [tr('Search index does not exist')];
-        }
-
         $contentTypes = array_fill_keys(array_keys($this->contentSources), 0);
 
         if ($progress) {
