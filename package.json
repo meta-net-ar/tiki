@@ -51,8 +51,8 @@
         "clean:wsconf" : "php console.php dev:buildwsconfs --clean",
         "clean:scss" : "npm run clean -w src/scss",
         "clean" : "concurrently \"npm:clean:*\"",
-        "test" : "vitest --config=src/js/vite.config.mjs --coverage",
-        "testci" : "vitest --config=src/js/vite.config.mjs --coverage --run",
+        "test" : "vitest --config=src/js/vite.config.mjs",
+        "testci" : "vitest --config=src/js/vite.config.mjs --reporter=junit --coverage --run",
         "postinstall" : "patch-package --patch-dir=src/js/patches --error-on-fail",
         "patch" : "patch-package --patch-dir=src/js/patches --error-on-fail",
         "prepare" : "husky"

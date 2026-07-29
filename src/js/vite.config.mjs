@@ -743,19 +743,17 @@ export default defineConfig(({ command, mode }) => {
             include: ["src/js/**/tests/**/*.test.js"],
             globals: true,
             environment: "happy-dom",
-            reporters: [["default"], ["junit"]],
+            reporters: [["default"]], // ["junit"] will be enabled by the testci script with --reporter=junit
             outputFile: {
                 junit: "./temp/ci/js-junit-report.xml",
             },
             coverage: {
-                enabled: true,
+                //enabled: true, //Coverage will be enabled by the testci script with the --coverage argument
                 include: [
-                    "src/js/vue-widgets/**/*.{vue,js}",
-                    "src/js/wysiwyg/**/*.js",
-                    "src/js/avatar-generator/**/*.js",
-                    "src/js/@tiki/ui-utils/handle*.js",
+                    "src/js/**/*.{vue,js,mjs}",
+                    "lib/**/*.{js,mjs}" //Legacy code.  Won't get tested until moved to src/js, but we want accurate coverage totals.
                 ],
-                exclude: ["**/*.ce.js", "**/*.test.js", "**/elements/**"],
+                exclude: ["**/*.ce.js", "**/*.test.js"],
                 provider: "v8",
                 reporter: [ ["text"],
                             ["cobertura"]
