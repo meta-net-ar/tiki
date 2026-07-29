@@ -52,15 +52,41 @@ class Language_WriteFile
     /**
      * Update language.php file with new strings.
      *
+     * The layout of the generated file is entirely defined by the $langVariable, $baseEnglishFile,
+     * $withHeader and $mergeFunction parameters; the defaults produce a standard non-English
+     * language.php file.
+     *
      * @param array $strings English strings collected from source files
      * @param bool $outputFiles whether file paths were string was found should be included or not in the output
      * @param string $language current language being processed
+     * @param bool $skipRemove when true, strings no longer found by the scan are kept instead of removed, along with their existing translation. When false (the default), any such string is removed.
+     * @param string $langVariable name of the PHP array variable the translations are written to (e.g. '$lang_current', '$lang_custom')
+     * @param string|null $baseEnglishFile path of the base English file to include for untranslated defaults, or null for no include
+     * @param bool $withHeader whether to write the standard header (copyright and translator notes)
+     * @param string|null $mergeFunction function merging $langVariable into $lang at the end of the file ('array_replace' or 'array_merge'), or null for no merge line
      * @return null
      */
-    public function writeStringsToFile(array $strings, $outputFiles = false, string $language = "")
-    {
+    public function writeStringsToFile(
+        array $strings,
+        $outputFiles = false,
+        string $language = "",
+        bool $skipRemove = false,
+        string $langVariable = '$lang_current',
+        ?string $baseEnglishFile = 'lang/en/language.php',
+        bool $withHeader = true,
+        ?string $mergeFunction = 'array_replace'
+    ) {
+        $lang = [];
         if (empty($strings)) {
             return false;
+        }
+
+        $backupTranslations = [];
+        if ($skipRemove) {
+            // If the language file is not empty, we need to backup the translations
+            // to restore them later
+            include($this->filePath);
+            $backupTranslations = $lang ?? [];
         }
 
         // backup original language file
@@ -90,27 +116,24 @@ class Language_WriteFile
             $entries[$string['name']] = $string;
         }
 
+        foreach ($backupTranslations as $key => $value) {
+            if (array_key_exists($key, $entries)) {
+                $entries[$key]['translation'] = $value;
+            } else {
+                $entries[$key] = [
+                    'name' => $key,
+                    'translation' => $value,
+                ];
+            }
+        }
 
         $handle = fopen($this->tmpFilePath, 'w');
 
         if ($handle) {
             fwrite($handle, "<?php\n");
-            fwrite($handle, $this->fileHeader());
-            if ($language != "en") {
-                fwrite($handle, "include('lang/en/language.php'); // Needed for providing a sensible default text for untranslated strings with context like : \"edit_C(verb)\"\n");
-                fwrite($handle, "\$lang_current = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
-            } else {
-                fwrite($handle, "\$lang = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import (till they add support for the PHP short array syntax)
-            }
 
-            foreach ($entries as $entry) {
-                fwrite($handle, $this->formatString($entry, $outputFiles, $language));
-            }
+            $this->writeLanguageFile($handle, $entries, $outputFiles, $language, $langVariable, $baseEnglishFile, $withHeader, $mergeFunction);
 
-            fwrite($handle, ");\n");
-            if ($language != "en") {
-                fwrite($handle, "\$lang = array_replace(\$lang, \$lang_current);\n");
-            }
             fclose($handle);
         }
 
@@ -186,5 +209,46 @@ TXT;
         }
 
         return $string;
+    }
+
+    /**
+     * Write the language file content: optional header, optional include of the base
+     * English file, the translations array and an optional line merging it into $lang.
+     *
+     * @param resource $handle File handle to write to
+     * @param array $entries Language entries to write
+     * @param bool $outputFiles Whether to include file paths in output
+     * @param string $language Current language code
+     * @param string $langVariable Name of the PHP array variable the translations are written to
+     * @param string|null $baseEnglishFile Path of the base English file to include, or null for no include
+     * @param bool $withHeader Whether to write the standard header
+     * @param string|null $mergeFunction Function merging $langVariable into $lang, or null for no merge line
+     */
+    protected function writeLanguageFile($handle, array $entries, bool $outputFiles, string $language, string $langVariable, ?string $baseEnglishFile, bool $withHeader, ?string $mergeFunction): void
+    {
+        if ($withHeader) {
+            fwrite($handle, $this->fileHeader());
+        }
+
+        if ($baseEnglishFile !== null) {
+            fwrite($handle, "include('$baseEnglishFile'); // Needed for providing a sensible default text for untranslated strings with context like : \"edit_C(verb)\"\n");
+        }
+
+        $this->writeLanguageArray($handle, $entries, $outputFiles, $language, $langVariable);
+
+        if ($mergeFunction !== null) {
+            fwrite($handle, "\$lang = {$mergeFunction}(\$lang, {$langVariable});\n");
+        }
+    }
+
+    private function writeLanguageArray($handle, array $entries, bool $outputFiles, string $language, string $variableName): void
+    {
+        fwrite($handle, "{$variableName} = array(\n"); // do not use short array syntax here yet for Transifex.com translation resource import
+
+        foreach ($entries as $entry) {
+            fwrite($handle, $this->formatString($entry, $outputFiles, $language));
+        }
+
+        fwrite($handle, ");\n");
     }
 }
