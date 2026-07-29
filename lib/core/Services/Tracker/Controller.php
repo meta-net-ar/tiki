@@ -2751,8 +2751,8 @@ class Services_Tracker_Controller
     public function action_import_items($input)
     {
         $trackerId = $input->trackerId->int();
-        $separator = $input->separator->text();
-        $fileIsTsv = ! ($separator == "," || $separator == ';');
+        $separator = Services_Tracker_Utilities::normalizeCsvSeparator($input->separator->text());
+        $fileIsTsv = $separator === "\t";
 
         $perms = Perms::get('tracker', $trackerId);
         if (! $perms->admin_trackers) {

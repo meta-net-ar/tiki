@@ -547,8 +547,8 @@ class Services_Tracker_TabularController
     {
         $lib = TikiLib::lib('tabular');
         $info = $lib->getInfo($input->tabularId->int());
-        $separator = $input->separator->text();
-        $fileIsTsv = ! ($separator == "," || $separator == ';');
+        $separator = Services_Tracker_Utilities::normalizeCsvSeparator($input->separator->text());
+        $fileIsTsv = $separator === "\t";
 
         Services_Exception_Denied::checkObject('tiki_p_tabular_import', 'tabular', $info['tabularId']);
 
@@ -559,7 +559,7 @@ class Services_Tracker_TabularController
         $successImportMsg = tr('Your import was completed successfully.');
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && is_uploaded_file($_FILES['file']['tmp_name'])) {
-            if ($fileIsTSV) {
+            if ($fileIsTsv && $schema->getFormat() === 'csv') {
                 Services_Tracker_Utilities::parseTsvContentToCsv('file');
                 $separator = ',';
             }

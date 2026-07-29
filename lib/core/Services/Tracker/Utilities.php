@@ -728,6 +728,22 @@ EXPORT;
         return $currency->convertTo($defaultCurrency)->getAmount();
     }
 
+    /**
+     * A form cannot submit a literal tab, so that option arrives as the word "tab"
+     * (or as an escaped "\t" from forms that have not been updated yet).
+     *
+     * @param string $separator
+     * @return string
+     */
+    public static function normalizeCsvSeparator(string $separator): string
+    {
+        if ($separator === 'tab' || $separator === '\t') {
+            return "\t";
+        }
+
+        return $separator !== '' ? $separator : ',';
+    }
+
     public static function parseTsvContentToCsv($filename)
     {
         $fileContent = file_get_contents($_FILES[$filename]['tmp_name']);
