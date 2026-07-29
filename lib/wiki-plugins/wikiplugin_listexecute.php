@@ -90,12 +90,18 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
     }
 
     $selectedObjects = $_POST["objects$iListExecute"] ?? [];
+    // the console command can target a single page of results instead of every object found
+    $resultsPage = max(0, (int) ($_POST['list_results_page'] ?? 0));
+    $applyToEveryResult = in_array('ALL', $selectedObjects) && ! $resultsPage;
 
     if (! empty($selectedObjects)) {
         $searchQuery = clone $query;
-        if (in_array('ALL', $selectedObjects)) {
+        if ($applyToEveryResult) {
             // unified search needs a hard limit and we want to apply the action to as many items as possible
             $query->setRange(0, 9999);
+        } elseif (in_array('ALL', $selectedObjects)) {
+            // only the requested page of results, using the pagination size in use on the target page
+            $query->setRange(($resultsPage - 1) * $paginationArguments['max'], $paginationArguments['max']);
         } else {
             // select only the items to apply the action to
             foreach ($selectedObjects as $identifier) {
@@ -225,7 +231,7 @@ function wikiplugin_listexecute($data, $params, $offset, $parser)
     if (isset($_POST['list_action']) && ! empty($selectedObjects)) {
         $action = $_POST['list_action'];
 
-        if ($result->count() > 9999) {
+        if ($applyToEveryResult && $result->count() > 9999) {
             Feedback::error(tr("There are too many search result items to apply %0 action to.", $_POST['list_action']));
         } elseif (isset($actions[$action])) {
             TikiLib::setExternalContext(true);
