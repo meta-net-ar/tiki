@@ -53,6 +53,11 @@ class DeclFilter implements \Laminas\Filter\FilterInterface
      */
     public function filter($data)
     {
+        if (! is_array($data)) {
+            $wrapped = $this->filter(['value' => $data]);
+            return $wrapped['value'];
+        }
+
         $keys = array_keys($data);
 
         foreach ($keys as $key) {
