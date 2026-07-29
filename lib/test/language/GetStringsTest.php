@@ -276,7 +276,12 @@ class Language_GetStringsTest extends TikiTestCase
      */
     public function testWriteToFilesShouldCallWriteStringsThreeTimes(): void
     {
-        $strings = ['string1', 'string2', 'string3', 'string4'];
+        $strings = [
+            'string1' => ['name' => 'string1'],
+            'string2' => ['name' => 'string2'],
+            'string3' => ['name' => 'string3'],
+            'string4' => ['name' => 'string4'],
+        ];
 
         $this->writeFile->expects($this->exactly(3))->method('writeStringsToFile')->with($strings, false);
         $this->obj->setLanguages(['en', 'es', 'pt-br']);
@@ -303,7 +308,12 @@ class Language_GetStringsTest extends TikiTestCase
      */
     public function testWriteToFilesShouldCallWriteStringsWithOutputFileParam(): void
     {
-        $strings = ['string1', 'string2', 'string3', 'string4'];
+        $strings = [
+            'string1' => ['name' => 'string1'],
+            'string2' => ['name' => 'string2'],
+            'string3' => ['name' => 'string3'],
+            'string4' => ['name' => 'string4'],
+        ];
 
         $this->writeFile->expects($this->atLeastOnce())->method('writeStringsToFile')->with($strings, true);
         $this->writeFileFactory->expects($this->atLeastOnce())->method('factory')->willReturn($this->writeFile);
@@ -318,7 +328,12 @@ class Language_GetStringsTest extends TikiTestCase
      */
     public function testWriteToFilesShouldUseCustomFileName(): void
     {
-        $strings = ['string1', 'string2', 'string3', 'string4'];
+        $strings = [
+            'string1' => ['name' => 'string1'],
+            'string2' => ['name' => 'string2'],
+            'string3' => ['name' => 'string3'],
+            'string4' => ['name' => 'string4'],
+        ];
 
         $this->writeFile->expects($this->once())->method('writeStringsToFile')->with($strings, false);
         $this->writeFileFactory->expects($this->once())->method('factory')->with($this->stringContains('language_r.php'))->willReturn($this->writeFile);
@@ -384,5 +399,83 @@ class Language_GetStringsTest extends TikiTestCase
             return $collectStringsCalls[$collectStringsIndex++][1];
         });
         $this->assertEquals($strings, $obj->scanFiles($files));
+    }
+
+    /**
+     * @throws Language_Exception
+     */
+    public function testWriteToFilesShouldUseStandardFormatPerLanguage(): void
+    {
+        $strings = ['string1' => ['name' => 'string1']];
+
+        $calls = [];
+        $this->writeFile->method('writeStringsToFile')->willReturnCallback(function (...$args) use (&$calls) {
+            $calls[] = $args;
+        });
+        $this->writeFileFactory->method('factory')->willReturn($this->writeFile);
+
+        $this->obj->setLanguages(['en', 'es']);
+        $this->obj->writeToFiles($strings);
+
+        // English is the reference file: written to $lang, no base file include, no merge line
+        $this->assertSame(['en', false, '$lang', null, true, null], array_slice($calls[0], 2));
+        // Other languages include the English base and are written to $lang_current merged with array_replace
+        $this->assertSame(['es', false, '$lang_current', 'lang/en/language.php', true, 'array_replace'], array_slice($calls[1], 2));
+    }
+
+    /**
+     * @throws Language_Exception
+     */
+    public function testWriteToFilesShouldUseConfiguredFormatForAllLanguages(): void
+    {
+        $strings = ['string1' => ['name' => 'string1']];
+
+        $calls = [];
+        $this->writeFile->method('writeStringsToFile')->willReturnCallback(function (...$args) use (&$calls) {
+            $calls[] = $args;
+        });
+        $this->writeFileFactory->method('factory')->willReturn($this->writeFile);
+
+        $obj = new Language_GetStrings($this->collectFiles, $this->writeFileFactory, [
+            'baseDir' => $this->baseDir,
+            'langVariable' => '$lang_custom',
+            'mergeFunction' => 'array_merge',
+            'withHeader' => false,
+            'baseEnglishFile' => null,
+        ]);
+        $obj->setLanguages(['en', 'es']);
+        $obj->writeToFiles($strings);
+
+        // A configured variable applies to every language, English included
+        $this->assertSame(['en', false, '$lang_custom', null, false, 'array_merge'], array_slice($calls[0], 2));
+        $this->assertSame(['es', false, '$lang_custom', null, false, 'array_merge'], array_slice($calls[1], 2));
+    }
+
+    /**
+     * @throws Language_Exception
+     */
+    public function testRunShouldScanScanDirAndWriteToLangDirIndependently(): void
+    {
+        vfsStream::setup('root', null, [
+            'src' => ['a.php' => ''],
+            'lang' => ['en' => ['language.php' => '']],
+        ]);
+
+        $scanDir = vfsStream::url('root/src');
+        $langDir = vfsStream::url('root/lang');
+
+        $this->collectFiles->expects($this->once())->method('run')->with($scanDir)->willReturn([]);
+
+        $obj = $this->getMockBuilder('Language_GetStrings')
+                    ->onlyMethods(['writeToFiles'])
+                    ->setConstructorArgs([
+                        $this->collectFiles,
+                        $this->writeFileFactory,
+                        ['scanDir' => $scanDir, 'langDir' => $langDir, 'lang' => 'en']])
+                    ->getMock();
+
+        $this->fileType->expects($this->once())->method('getExtensions')->willReturn(['.php']);
+        $obj->addFileType($this->fileType);
+        $obj->run();
     }
 }

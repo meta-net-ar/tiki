@@ -278,4 +278,88 @@ class Language_WriteFileTest extends TikiTestCase
             $this->filePath
         );
     }
+
+    public function testWriteStringsToFileShouldWriteEnglishStandardFormat(): void
+    {
+        $this->parseFile->expects($this->once())->method('getTranslations')->willReturn([]);
+
+        $obj = $this->getMockBuilder('Language_WriteFile')
+                    ->onlyMethods(['fileHeader'])
+                    ->setConstructorArgs([$this->parseFile])
+                    ->getMock();
+        $obj->expects($this->once())->method('fileHeader')->willReturn("// File header\n\n");
+
+        $strings = ['First string' => ['name' => 'First string']];
+
+        $obj->writeStringsToFile($strings, false, 'en', false, '$lang', null, true, null);
+
+        $expected = "<?php\n"
+            . "// File header\n\n"
+            . "\$lang = array(\n"
+            . "// \"First string\" => \"First string\",\n"
+            . ");\n";
+
+        $this->assertEquals($expected, file_get_contents($this->filePath));
+    }
+
+    public function testWriteStringsToFileShouldWriteCustomFormat(): void
+    {
+        $this->parseFile->expects($this->once())->method('getTranslations')->willReturn(['Second string' => 'Deuxième chaîne']);
+
+        $strings = [
+            'First string' => ['name' => 'First string'],
+            'Second string' => ['name' => 'Second string'],
+        ];
+
+        $this->obj->writeStringsToFile($strings, false, 'fr', false, '$lang_custom', null, false, 'array_merge');
+
+        $expected = "<?php\n"
+            . "\$lang_custom = array(\n"
+            . "// \"First string\" => \"First string\",\n"
+            . "\"Second string\" => \"Deuxième chaîne\",\n"
+            . ");\n"
+            . "\$lang = array_merge(\$lang, \$lang_custom);\n";
+
+        $this->assertEquals($expected, file_get_contents($this->filePath));
+    }
+
+    public function testWriteStringsToFileWithSkipRemoveShouldKeepStringsMissingFromTheScan(): void
+    {
+        $this->langFile->setContent(
+            "<?php\n\$lang_custom = array(\n\"Old string\" => \"Vieille chaîne\",\n);\n\$lang = array_merge(\$lang, \$lang_custom);\n"
+        );
+        $this->parseFile->expects($this->once())->method('getTranslations')->willReturn([]);
+
+        $strings = ['New string' => ['name' => 'New string']];
+
+        $this->obj->writeStringsToFile($strings, false, 'fr', true, '$lang_custom', null, false, 'array_merge');
+
+        $expected = "<?php\n"
+            . "\$lang_custom = array(\n"
+            . "// \"New string\" => \"New string\",\n"
+            . "\"Old string\" => \"Vieille chaîne\",\n"
+            . ");\n"
+            . "\$lang = array_merge(\$lang, \$lang_custom);\n";
+
+        $this->assertEquals($expected, file_get_contents($this->filePath));
+    }
+
+    public function testWriteStringsToFileShouldKeepTranslationOfStringStillFoundByTheScan(): void
+    {
+        $this->parseFile->expects($this->once())->method('getTranslations')->willReturn(
+            ['Existing string' => 'Chaîne existante']
+        );
+
+        $obj = $this->getMockBuilder('Language_WriteFile')
+                    ->onlyMethods(['fileHeader'])
+                    ->setConstructorArgs([$this->parseFile])
+                    ->getMock();
+        $obj->expects($this->once())->method('fileHeader')->willReturn('');
+
+        $strings = ['Existing string' => ['name' => 'Existing string']];
+
+        $obj->writeStringsToFile($strings, false, 'fr', false, '$lang_current', null, true, 'array_replace');
+
+        $this->assertStringContainsString('"Existing string" => "Chaîne existante",', file_get_contents($this->filePath));
+    }
 }
