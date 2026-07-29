@@ -577,7 +577,7 @@ console-php-works:
     - 'echo -n "ElasticSearch Version: " && curl -sS -XGET http://${ELASTICSEARCH_SERVICE_ALIAS}:9200 | grep ''"number"'' | sed ''s/.*:.*"\(.*\)".*/\1/'''
     - 'echo -n "Manticore Version: " && mysql -h ${MANTICORE_SERVICE_ALIAS} -P 9306 -e "status" | grep "Server version:" | sed "s/^[^:]*:[[:space:]]*//"'
     - echo '<?php $host_tiki = "'${MYSQL_SERVICE_ALIAS}'"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
-    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit $PHPUNIT_EXTRA_PARAMS --log-junit temp/ci/phpunit-report.xml --exclude-group api-integration-test --display-deprecations --display-notices --display-warnings
+    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit $PHPUNIT_EXTRA_PARAMS --log-junit temp/ci/phpunit-report.xml --display-deprecations --display-notices --display-warnings
 
 unit-tests-php-latest-with-coverage:
   #We only generate one coverage report, for the lastest PHP.  Gitlab won't properly process if more than one parallel run has coverage artifacts.
@@ -649,31 +649,6 @@ generate-gitlab-line-coverage-php:
         coverage_format: cobertura
         #cobertura_split will generate files appending numbers, such as phpunit-coverage-1.xml
         path: temp/ci/phpunit-coverage-*.xml
-
-unit-tests-api:
-  extends: .template-unit-tests
-  allow_failure: false
-  services:
-    - name: ${DEPENDENCY_PROXY_PREFIX}${DB_IMAGE}
-      alias: ${MYSQL_SERVICE_ALIAS}
-      command: ["--explicit-defaults-for-timestamp=off"]
-  parallel:
-    matrix:
-      - PHP_VERSION: "8.5"
-        DB_IMAGE: ${MARIADB_IMAGE_NEWEST_SUPPORTED}
-      - PHP_VERSION: "8.4"
-        DB_IMAGE: ${MYSQL_IMAGE_NEWEST_SUPPORTED}
-      - PHP_VERSION: "8.3"
-        DB_IMAGE: ${MARIADB_IMAGE_COMMON_LTS}
-      - PHP_VERSION: "8.2"
-        DB_IMAGE: ${MYSQL_IMAGE_OLDEST_SUPPORTED}
-      - PHP_VERSION: "8.1"
-        DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
-  script:
-    - 'echo -n "PHP Version: " && php -v | grep "^PHP"'
-    - 'echo -n "MySQL/MariaDB Version: " && mysql -u root --password=$MYSQL_ROOT_PASSWORD -h ${MYSQL_SERVICE_ALIAS} --skip-column-names -B -e "SELECT VERSION()" 2>/dev/null'
-    - echo '<?php $host_tiki = "'${MYSQL_SERVICE_ALIAS}'"; $user_tiki = "tikiuser"; $pass_tiki = "tikipass"; $dbs_tiki = "tikitest"; $client_charset = "utf8mb4"; ' > lib/test/local.php
-    - php -d display_errors=On vendor_bundled/vendor/phpunit/phpunit/phpunit --colors=always --log-junit report.xml --do-not-fail-on-phpunit-warning --do-not-fail-on-phpunit-deprecation --group api-integration-test
 
 unit-tests-node:
   stage: unit-tests
