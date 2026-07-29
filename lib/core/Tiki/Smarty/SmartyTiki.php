@@ -295,7 +295,10 @@ class SmartyTiki extends Smarty
 
         TikiLib::events()->trigger('tiki.process.render', []);
 
-        $this->assign('admin_username', TikiLib::lib('user')->getDefaultAdminLogin());
+        if (! defined('TIKI_IN_INSTALLER')) {
+            $this->assign('admin_username', TikiLib::lib('user')->getDefaultAdminLogin());
+        }
+
         $this->assign_layout_sections($template, $cache_id, $compile_id, $parent);
         try {
             parent::display($template, $cache_id, $compile_id);

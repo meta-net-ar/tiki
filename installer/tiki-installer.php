@@ -683,11 +683,18 @@ if ($install_step == '10') {
         $admin_username = $_SESSION[$ADMIN_CREDS_SESSION_KEY]['username'];
         $admin_password = $_SESSION[$ADMIN_CREDS_SESSION_KEY]['password'];
 
-        $installer->query("UPDATE `users_users` SET `login` = ?, `hash` = ?, `pass_confirm` = ? WHERE `users_users`.`userId`=1", [
+        $installer->query("UPDATE `users_users` SET `login` = ?, `hash` = ?, `pass_confirm` = ?, `avatarName` = ? WHERE `users_users`.`userId`=1", [
             $admin_username,
             TikiLib::lib('user')->hashPassword($admin_password),
-            TikiLib::lib('tiki')->now
+            TikiLib::lib('tiki')->now,
+            $admin_username
         ]);
+
+        // Initialize System File Galleries with the admin user.
+        $installer->query("INSERT INTO `tiki_file_galleries` (`galleryId`, `name`, `type`, `description`, `visible`, `user`, `public`, `parentId`) VALUES ('1','File Galleries', 'system', '', 'y', ?, 'y', -1)", [$admin_username]);
+        $installer->query("INSERT INTO `tiki_file_galleries` (`galleryId`, `name`, `type`, `description`, `visible`, `user`, `public`, `parentId`) VALUES ('2','Users File Galleries', 'system', '', 'y', ?, 'y', -1)", [$admin_username]);
+        $installer->query("INSERT INTO `tiki_file_galleries` (`galleryId`, `name`, `type`, `description`, `visible`, `user`, `public`, `parentId`) VALUES ('3','Wiki Attachments', 'system', '', 'y', ?, 'y', -1)", [$admin_username]);
+        $installer->query("INSERT INTO `tiki_file_galleries` (`galleryId`, `name`, `type`, `description`, `visible`, `user`, `public`, `parentId`) VALUES ('4','Trash Files', 'system', '', 'y', ?, 'y', -1)", [$admin_username]);
 
         unset($_SESSION[$ADMIN_CREDS_SESSION_KEY]);
     }
