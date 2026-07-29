@@ -22,7 +22,10 @@ $inputConfiguration = [
         'page' => 'pagename',
         'returnto' => 'pagename',
         'watch' => 'digits',
-        'cancel_edit' => 'url'
+        'cancel_edit' => 'url',
+        'current_page_id' => 'int',
+        'add_child' => 'bool',
+        'insert_into_struct' => 'bool',
     ] ],
 ];
 require_once('tiki-setup.php');
@@ -214,6 +217,65 @@ if ($prefs['namespace_enabled'] == 'y' && isset($_REQUEST['namespace'])) {
 $smarty->assign('page', $page);
 $info = $tikilib->get_page_info($page);
 $smarty->assign('quickedit', isset($_GET['quickedit']));
+
+if (
+    isset($_REQUEST['insert_into_struct'])
+    && ! empty($_REQUEST['current_page_id'])
+    && ! empty($page)
+    && $tikilib->page_exists($page)
+) {
+    $currentRefId = (int) $_REQUEST['current_page_id'];
+    $currentNodeInfo = $structlib->s_get_page_info($currentRefId);
+    $currentStructureInfo = $structlib->s_get_structure_info($currentRefId);
+
+    if (! empty($currentNodeInfo) && ! empty($currentStructureInfo)) {
+        if (
+            ($tiki_p_edit != 'y' && ! $tikilib->user_has_perm_on_object($user, $currentStructureInfo["pageName"], 'wiki page', 'tiki_p_edit'))
+            || ($tiki_p_edit_structures != 'y' && ! $tikilib->user_has_perm_on_object($user, $currentStructureInfo["pageName"], 'wiki page', 'tiki_p_edit_structures'))
+        ) {
+            Feedback::errorAndDie(tra("You do not have permission to edit this structure."), \Laminas\Http\Response::STATUS_CODE_401);
+        }
+
+        $alreadyInStructure = false;
+        $structurePages = $structlib->s_get_structure_pages($currentStructureInfo['page_ref_id']);
+        foreach ($structurePages as $structurePage) {
+            if (($structurePage['pageName'] ?? '') === $page) {
+                $alreadyInStructure = true;
+                break;
+            }
+        }
+
+        if (! $alreadyInStructure) {
+            $targetParentRefId = $currentRefId;
+            $afterRefId = null;
+
+            if (empty($_REQUEST['add_child'])) {
+                $targetParentRefId = (int) $currentNodeInfo['parent_id'];
+                $afterRefId = $currentRefId;
+            } else {
+                $subpages = $structlib->s_get_pages($currentRefId);
+                $max = count($subpages);
+                if ($max > 0) {
+                    $afterRefId = (int) $subpages[$max - 1]["page_ref_id"];
+                }
+            }
+
+            if ($targetParentRefId > 0) {
+                $structlib->s_create_page($targetParentRefId, $afterRefId, $page, '', $currentStructureInfo['structure_id']);
+                Feedback::success(tr('Page %0 was added to structure %1.', $page, $currentStructureInfo['pageName']));
+            }
+        } else {
+            Feedback::warning(tr('Page %0 is already part of this structure.', $page));
+        }
+
+        $url = smarty_function_sefurl([
+            'page' => $currentNodeInfo['pageName'],
+            'structure' => $currentStructureInfo['pageName'],
+            'page_ref_id' => $currentRefId,
+        ], $smarty->getEmptyInternalTemplate());
+        $access->redirect($url);
+    }
+}
 
 // 2010-01-26: Keep in active until translation refactoring is done.
 if ($editlib->isNewTranslationMode() || $editlib->isUpdateTranslationMode()) {
@@ -1614,10 +1676,48 @@ if ($wikilib->contains_badchars($page) && ! $tikilib->page_exists($page)) {
 }
 
 $smarty->assign('showstructs', []);
-if ($structlib->page_is_in_structure($_REQUEST["page"])) {
-    $structs = $structlib->get_page_structures($_REQUEST["page"]);
-    $smarty->assign('showstructs', $structs);
+$smarty->assign('editableStructures', []);
+$smarty->assign('structuresToAdd', []);
+$smarty->assign('showStructuresTab', false);
+$smarty->assign('pageIsNew', ! $tikilib->page_exists($page));
+$smarty->assign('creationStructureInfo', null);
+if ($prefs['feature_wiki_structure'] === 'y' && strtolower($page) !== 'sandbox' && ! empty($page)) {
+    $showstructs = [];
+    if ($structlib->page_is_in_structure($page)) {
+        $showstructs = $structlib->get_page_structures($page);
+    }
+    $smarty->assign('showstructs', $showstructs);
+
+    if (! $tikilib->page_exists($page) && ! empty($_REQUEST['current_page_id'])) {
+        $creationStructureInfo = $structlib->s_get_structure_info((int) $_REQUEST['current_page_id']);
+        if (! empty($creationStructureInfo)) {
+            $smarty->assign('creationStructureInfo', $creationStructureInfo);
+        }
+    }
+
+    $pageStructureNames = array_fill_keys(array_column($showstructs, 'pageName'), true);
+    $editableStructures = [];
+    if ($tiki_p_edit_structures === 'y') {
+        $structuresList = $structlib->list_structures(0, -1, 'pageName_asc');
+        foreach ($structuresList['data'] ?? [] as $struct) {
+            if (($struct['edit_structure'] ?? 'n') !== 'y') {
+                continue;
+            }
+            $struct['in_structure'] = isset($pageStructureNames[$struct['pageName']]);
+            $editableStructures[] = $struct;
+        }
+    }
+    $smarty->assign('editableStructures', $editableStructures);
+    $smarty->assign(
+        'structuresToAdd',
+        array_values(array_filter($editableStructures, static fn ($struct) => empty($struct['in_structure'])))
+    );
+    $smarty->assign(
+        'showStructuresTab',
+        $tiki_p_edit_structures === 'y' || count($showstructs) > 0
+    );
 }
+
 // Flag for 'page bar' that currently 'Edit' mode active
 // so no need to show comments & attachments, but need
 // to show 'wiki quick help'

@@ -111,6 +111,9 @@ Note: The show content block must be defined at root level to use the include. A
             {if $structure eq 'y' and (($prefs.wiki_structure_bar_position ne 'bottom') && ($prefs.wiki_structure_bar_position ne 'none'))}
                 {include file='tiki-wiki_structure_bar.tpl'}
             {/if}
+            {if $prefs.feature_wiki_structure eq 'y' and $structure eq 'n' and !empty($showAddToStructureBar) and (($prefs.wiki_structure_bar_position ne 'bottom' and $prefs.wiki_structure_bar_position ne 'none') or $prefs.wiki_structure_bar_position eq 'none')}
+                {include file='tiki-wiki_add_to_structure.tpl'}
+            {/if}
 
             {if $prefs.feature_wiki_ratings eq 'y'}
                 {include file='poll.tpl'}
@@ -166,6 +169,9 @@ Note: The show content block must be defined at root level to use the include. A
         
         {if $structure eq 'y' and (($prefs.wiki_structure_bar_position eq 'bottom') or ($prefs.wiki_structure_bar_position eq 'both'))}
             {include file='tiki-wiki_structure_bar.tpl'}
+        {/if}
+        {if $prefs.feature_wiki_structure eq 'y' and $structure eq 'n' and !empty($showAddToStructureBar) and ($prefs.wiki_structure_bar_position eq 'bottom' or $prefs.wiki_structure_bar_position eq 'both')}
+            {include file='tiki-wiki_add_to_structure.tpl'}
         {/if}
 
         {if $pages > 1 and $prefs.wiki_page_navigation_bar neq 'top'}
