@@ -73,10 +73,10 @@ class ListExecuteCommand extends Command
 
         $tikilib = TikiLib::lib('tiki');
         if (empty($prefs['fallbackBaseUrl'])) {
-            $io->warning("Some commands may need to determine the URL of the website and will not be able to do so reliably because fallbackBaseUrl is not set in the admin.");
+            $io->warning(tr("Some commands may need to determine the URL of the website and will not be able to do so reliably because fallbackBaseUrl is not set in the admin."));
         }
         if (! $pageInfo = $tikilib->get_page_info($page)) {
-            $io->error("Page $page not found.");
+            $io->error(tr("Page %0 not found.", $page));
             return Command::FAILURE;
         }
 
@@ -84,20 +84,19 @@ class ListExecuteCommand extends Command
         $invalidObjects = array_filter($objects, fn($identifier) => ! $this->isValidObjectIdentifier($identifier));
 
         if ($invalidObjects) {
-            $io->error('Invalid object identifier(s): ' . implode(', ', $invalidObjects)
-                . '. Expected format is object_type:object_id.');
+            $io->error(tr("Invalid object identifier(s): %0. Expected format is object_type:object_id.", implode(', ', $invalidObjects)));
             return Command::FAILURE;
         }
 
         $resultsPage = $input->getOption('results-page');
 
         if (! is_null($resultsPage) && ! (ctype_digit((string) $resultsPage) && $resultsPage > 0)) {
-            $io->error("Invalid results page: $resultsPage. Expected the number of a page of results, 1 being the first one.");
+            $io->error(tr("Invalid results page: %0. Expected the number of a page of results, 1 being the first one.", $resultsPage));
             return Command::FAILURE;
         }
 
         if ($objects && ! is_null($resultsPage)) {
-            $io->error('The objects and results-page options cannot be combined, the given objects are already a selection.');
+            $io->error(tr("The objects and results-page options cannot be combined, the given objects are already a selection."));
             return Command::FAILURE;
         }
 
@@ -141,10 +140,9 @@ class ListExecuteCommand extends Command
                     $status = $parserLib->plugin_can_execute($match->getName(), $match->getBody(), $argumentParser->parse($match->getArguments()));
 
                     if ($status !== true) {
-                        $outputMessage = "Action $action failed on page $page. ";
-                        $outputMessage .= $status == 'rejected' ?
-                            'ListExecute plugin was rejected.' :
-                            'ListExecute plugin is pending for approval.';
+                        $outputMessage = $status == 'rejected' ?
+                            tr("Action %0 failed on page %1. ListExecute plugin was rejected.", $action, $page) :
+                            tr("Action %0 failed on page %1. ListExecute plugin is pending for approval.", $action, $page);
 
                         $io->error($outputMessage);
                         return Command::FAILURE;
@@ -155,14 +153,15 @@ class ListExecuteCommand extends Command
 
         TikiLib::lib('parser')->parse_data($pageInfo['data']);
 
-        $message = "Action $action executed on page $page";
         if ($objects) {
-            $message .= ' for ' . implode(', ', $objects);
+            $message = tr("Action %0 executed on page %1 for %2.", $action, $page, implode(', ', $objects));
         } elseif ($resultsPage) {
-            $message .= " for results page $resultsPage";
+            $message = tr("Action %0 executed on page %1 for results page %2.", $action, $page, $resultsPage);
+        } else {
+            $message = tr("Action %0 executed on page %1.", $action, $page);
         }
 
-        $io->success("$message.");
+        $io->success($message);
         return Command::SUCCESS;
     }
 
