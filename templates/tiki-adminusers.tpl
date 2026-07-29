@@ -156,7 +156,7 @@
                                     {capture assign=username}{$users[user].user|escape}{/capture}
                                         <tr>
                                             <td class="checkbox-cell">
-                                                {if $users[user].user ne 'admin'}
+                                                {if $users[user].user ne $admin_username}
                                                     <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="checked[]" value="{$users[user].user|escape}" {if isset($users[user].checked) && $users[user].checked eq 'y'}checked="checked" {/if}>
                                                 {/if}
                                             </td>
@@ -267,7 +267,7 @@
                                                                 {icon name="edit" _menu_text='y' _menu_icon='y' alt="{tr}Edit account settings{/tr}"}
                                                             </a>
                                                         </action>
-                                                        {if $prefs.feature_userPreferences eq 'y' || $user eq 'admin'}
+                                                        {if $prefs.feature_userPreferences eq 'y' || $user eq admin_username}
                                                             <action>
                                                                 <a href="tiki-user_preferences.php?userId={$users[user].userId}">
                                                                     {icon name="settings" _menu_text='y' _menu_icon='y' alt="{tr}Change user preferences{/tr}"}
@@ -282,14 +282,14 @@
                                                                 </a>
                                                             </action>
                                                         {/if}
-                                                        {if $users[user].user ne 'admin' and $users[user].user ne $user and $tiki_p_admin eq 'y'}
+                                                        {if $users[user].user ne $admin_username and $users[user].user ne $user and $tiki_p_admin eq 'y'}
                                                             <action>
                                                                 <a href='#' onClick="$('#login-switchuser_1').val('{$users[user].user|username|escape:javascript}'); $('#form_switch_user').trigger('submit'); return false;">
                                                                     {icon name="user" _menu_text='y' _menu_icon='y' alt="{tr}Switch to this user{/tr}"}
                                                                 </a>
                                                             </action>
                                                         {/if}
-                                                        {if $users[user].user ne 'admin'}
+                                                        {if $users[user].user ne $admin_username}
                                                             {if $users[user].waiting eq 'a'}
                                                                 {* Use a form for the next three actions since they change the database.
                                                                     No confirm needed, confirmPopup() only checks if the ticket has expired
@@ -475,7 +475,7 @@
             {if isset($userinfo.userId) && $userinfo.userId}
                 <h2>{tr}Edit user{/tr} {$userinfo.login|escape}</h2>
                 {$thisloginescaped=$userinfo.login|escape:'url'}
-                {if $userinfo.login ne 'admin' and $userinfo.editable}
+                {if $userinfo.login ne $admin_username and $userinfo.editable}
                     {button href="tiki-assignuser.php?assign_user=$thisloginescaped" _text="{tr}Assign user to Groups{/tr}" _icon_name='group'}
                 {/if}
                 {if $userinfo.waiting eq 'a'}
@@ -503,7 +503,7 @@
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-md-2 col-form-label" for="login">{if $prefs.login_is_email eq 'y'}{tr}Email{/tr}{else}{tr}User{/tr}{/if}</label>
                         <div class="col-sm-7 col-md-6">
-                            {if $userinfo.login neq 'admin'}
+                            {if $userinfo.login neq $admin_username}
                                 <input type="text" id='login' class="form-control" name='login' value="{$userinfo.login|escape}">
                                 {if $prefs.login_is_email eq 'y'}
                                     <br>
@@ -535,7 +535,7 @@
                         --> AND Tiki won't create the user in the Tiki auth system
                         --> AND Tiki won't create the user in the ldap
                     *}
-                    {if $prefs.auth_method eq 'ldap' and ( $prefs.ldap_create_user_tiki eq 'n' or $prefs.ldap_skip_admin eq 'y' ) and $prefs.ldap_create_user_ldap eq 'n' and $userinfo.login neq 'admin' and $auth_ldap_permit_tiki_users eq 'n'}
+                    {if $prefs.auth_method eq 'ldap' and ( $prefs.ldap_create_user_tiki eq 'n' or $prefs.ldap_skip_admin eq 'y' ) and $prefs.ldap_create_user_ldap eq 'n' and $userinfo.login neq $admin_username and $auth_ldap_permit_tiki_users eq 'n'}
                         <div class="mb-3 row">
                             <div class="offset-sm-2">
                                 <b>{tr}No password is required{/tr}</b>
@@ -582,7 +582,7 @@
                                 </div>
                             </div>
                         {/if}
-                        {if $userinfo.login neq 'admin' && $prefs.change_password neq 'n'}
+                        {if $userinfo.login neq $admin_username && $prefs.change_password neq 'n'}
                             <div class="mb-3 row">
                                 <div class="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                                     <div class="form-check">
@@ -606,7 +606,7 @@
                             </div>
                         </div>
                     {/if}
-                    {if $userinfo.login neq 'admin' and ($prefs.validateUsers eq 'y' or $prefs.validateRegistration eq 'y')}
+                    {if $userinfo.login neq $admin_username and ($prefs.validateUsers eq 'y' or $prefs.validateRegistration eq 'y')}
                         <div class="mb-3 row">
                             <div class="col-sm-9 offset-sm-3 col-md-10 offset-md-2">
                                 <div class="form-check">

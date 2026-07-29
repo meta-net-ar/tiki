@@ -49,7 +49,7 @@
                                             <div class="pass_due">{tr _0=$prefs.pass_due}Password change is forced when password is older than %0 day.{/tr}</tr>
                                         {/if}
                                     {/if}
-                                    {if ( $prefs.auth_method != 'cas' || $user == 'admin' ) && $prefs.min_pass_length gt 0}
+                                    {if ( $prefs.auth_method != 'cas' || $user == $admin_username ) && $prefs.min_pass_length gt 0}
                                         <div class="min_pass_length">{tr _0=$prefs.min_pass_length}Password should be at least %0 characters long.{/tr}</div>
                                     {/if}
                                     {if $prefs.pass_chr_case eq "y"}

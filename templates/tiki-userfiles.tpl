@@ -8,7 +8,7 @@
     <div style="height:20px; width:200px; border:1px solid black; background-color:#666666; text-align:left; margin:0 auto;">
         <div style="background-color:red; height:100%; width:{$cellsize}px;"></div>
     </div>
-    {if $user neq 'admin'}
+    {if $user neq $admin_username}
         <small>{tr}Used space:{/tr} {$percentage}% {tr}up to{/tr} {$limitmb} Mb</small>
     {else}
         <small>{tr}Used space:{/tr} {tr}no limit for admin{/tr}</small>

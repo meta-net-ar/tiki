@@ -10,7 +10,7 @@
                     <td>{tr}User:{/tr}</td>
                     <td>
                         <strong>{$userinfo.login|escape}</strong>
-                        {if $prefs.login_is_email eq 'y' and $userinfo.login neq 'admin'}
+                        {if $prefs.login_is_email eq 'y' and $userinfo.login neq $admin_username}
                             <em>({tr}Use the email as username{/tr})</em>
                         {/if}
                     </td>
@@ -140,7 +140,7 @@
 
         {else}
             {tr}The feature 'User Preferences' is currently disabled in this site{/tr}.<br/>
-            {if $userwatch=='admin'}
+            {if $userwatch==$admin_username}
                 {remarksbox title="{tr}Enable the feature{/tr}" type="errors"}
                     <table>
                         <tr>
