@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import $ from "jquery";
-import applySelect from "../../utils/applySelect";
+import applySelect, { transformContainerSelects } from "../../utils/applySelect";
 import * as applySelectHelpers from "../../helpers/select/applySelect";
 
 describe("applySelect", () => {
@@ -9,10 +9,26 @@ describe("applySelect", () => {
     });
 
     afterEach(() => {
+        vi.restoreAllMocks();
         document.body.innerHTML = "";
     });
 
-    test("transforms select element into el-select components", async () => {
+    test("does not transform select elements without an explicit opt-in marker", async () => {
+        window.elementPlus = {
+            select: {},
+        };
+
+        const givenSelect = document.createElement("select");
+        document.body.appendChild(givenSelect);
+
+        transformContainerSelects(document.body);
+
+        expect(givenSelect.getAttribute("element-plus-ref")).toBeNull();
+        expect(document.querySelector("el-select")).toBeNull();
+        expect(givenSelect.style.display).toBe("");
+    });
+
+    test("transforms opted-in select elements into el-select components", async () => {
         window.elementPlus = {
             select: {},
         };
@@ -21,11 +37,10 @@ describe("applySelect", () => {
         const syncSelectOptionsSpy = vi.spyOn(applySelectHelpers, "syncSelectOptions");
         const attachChangeEventHandlerSpy = vi.spyOn(applySelectHelpers, "attachChangeEventHandler");
 
-        applySelect();
-
         const givenSelects = [];
         for (let i = 0; i < 5; i++) {
             const select = document.createElement("select");
+            select.classList.add("tiki-elementplus-select");
             select.setAttribute("placeholder", `Select ${i}`);
             if (i % 2 === 0) {
                 select.multiple = true;
@@ -42,7 +57,7 @@ describe("applySelect", () => {
 
         document.body.append(...givenSelects);
 
-        await new Promise((resolve) => setTimeout(resolve, 0));
+        transformContainerSelects(document.body);
 
         givenSelects.forEach((select, index) => {
             const elementPlusUi = document.querySelector(`#${select.getAttribute("element-plus-ref")}`);
@@ -68,12 +83,11 @@ describe("applySelect", () => {
             select: preferences,
         };
 
-        applySelect();
-
         const givenSelect = document.createElement("select");
+        givenSelect.setAttribute("data-elementplus-select", "true");
         document.body.appendChild(givenSelect);
 
-        await new Promise((resolve) => setTimeout(resolve, 0));
+        transformContainerSelects(document.body);
 
         const elementPlusUi = document.querySelector("el-select");
         expect(elementPlusUi.getAttribute("clearable")).toBe(expectedBoolean);
@@ -83,7 +97,22 @@ describe("applySelect", () => {
         expect(elementPlusUi.getAttribute("allow-create")).toBe(expectedBoolean);
     });
 
-    test("applies the small size to the el-select component if the select element has the form-control-sm class", async () => {
+    test("does not transform opted-in selects more than once", async () => {
+        window.elementPlus = {
+            select: {},
+        };
+
+        const givenSelect = document.createElement("select");
+        givenSelect.classList.add("tiki-elementplus-select");
+        document.body.appendChild(givenSelect);
+
+        transformContainerSelects(document.body);
+        transformContainerSelects(document.body);
+
+        expect(document.querySelectorAll("el-select")).toHaveLength(1);
+    });
+
+    test("observes and transforms opted-in selects added after applySelect runs", async () => {
         window.elementPlus = {
             select: {},
         };
@@ -91,10 +120,28 @@ describe("applySelect", () => {
         applySelect();
 
         const givenSelect = document.createElement("select");
-        givenSelect.classList.add("form-control-sm");
+        givenSelect.classList.add("tiki-elementplus-select");
         document.body.appendChild(givenSelect);
 
         await new Promise((resolve) => setTimeout(resolve, 0));
+
+        const elementPlusUi = document.querySelector(`#${givenSelect.getAttribute("element-plus-ref")}`);
+        expect(elementPlusUi).toBeTruthy();
+        expect(elementPlusUi.tagName).toBe("EL-SELECT");
+        expect(givenSelect.style.display).toBe("none");
+    });
+
+    test("applies the small size to the el-select component if the select element has the form-control-sm class", async () => {
+        window.elementPlus = {
+            select: {},
+        };
+
+        const givenSelect = document.createElement("select");
+        givenSelect.classList.add("tiki-elementplus-select");
+        givenSelect.classList.add("form-control-sm");
+        document.body.appendChild(givenSelect);
+
+        transformContainerSelects(document.body);
 
         const elementPlusUi = document.querySelector("el-select");
         expect(elementPlusUi.getAttribute("size")).toBe("small");
@@ -105,14 +152,13 @@ describe("applySelect", () => {
             select: {},
         };
 
-        applySelect();
-
         const givenSelect = document.createElement("select");
+        givenSelect.classList.add("tiki-elementplus-select");
         const givenRemoteSourceUrl = "http://foo/bar";
         givenSelect.setAttribute("data-remote-source-url", givenRemoteSourceUrl);
         document.body.appendChild(givenSelect);
 
-        await new Promise((resolve) => setTimeout(resolve, 0));
+        transformContainerSelects(document.body);
 
         const elementPlusUi = document.querySelector("el-select");
         expect(elementPlusUi.getAttribute("remote-source-url")).toBe(givenRemoteSourceUrl);
