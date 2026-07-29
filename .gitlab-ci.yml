@@ -587,13 +587,10 @@ unit-tests-php-latest-coverage:
   artifacts:
     when: always
     paths:
-      # This is only so we can inspect it it the pipeline interface.  It can be commented out in normal use, gitlab doesn't need it to process the files.
+      # This is needed for php-gitlab-coverage to massage it for gitlab
       - temp/ci/phpunit-coverage.xml
     reports:
       junit: temp/ci/phpunit-report.xml
-      coverage_report:
-        coverage_format: cobertura
-        path: temp/ci/phpunit-coverage.xml
   coverage: '/^\s*Lines:\s*\d+.\d+\%/'
   parallel:
     matrix:
@@ -613,6 +610,43 @@ unit-tests-php-previousVersions:
         DB_IMAGE: ${MYSQL_IMAGE_OLDEST_SUPPORTED}
       - PHP_VERSION: "8.1"
         DB_IMAGE: ${MARIADB_IMAGE_OLDEST_SUPPORTED}
+
+# This job is needed beause of the 10MB gitlab limitation when processing cobertura xml files to 
+# show line by line coverage in diffs.
+# https://gitlab.com/gitlab-org/gitlab/-/work_items/328772
+# That limitation is silent, making it very hard to notice and debug..
+php-gitlab-coverage:
+  stage: unit-tests
+  needs:
+    - unit-tests-php-latest-coverage
+  image: 
+    name: ${DEPENDENCY_PROXY_PREFIX}${BASE_QA_IMAGE}
+  script:
+    # Yes this is is a very bad idea for supply chain attacks.  But ironically because of:
+    # https://gitlab.com/gitlab-org/gitlab-runner/-/work_items/26501 and related bugs, we cannot use 
+    # the cobertura_split distroless docker image, despite wasting hours (gitlab keeps trying to inject the shell as an extra postional parameter.
+    # Since this is a gitlab-specific workaround and this step generates no executable artifacts, 
+    # and we are moving to forgejo, this is acceptable.
+    # Rejected (but attempted) alternative:
+    # Use gitlab native step runners to hack this.  Not supported by gitlab-ci-local so not workable.
+    # Use dind:  Requires privileged runners, and once we start dowan that path...
+    # Other rejecte approach:
+    # Build  cobertura_split each pipeline from source.  Slow and expensive in pipeline minutes.  And just as susceptible to supply chain attacks as this, and creates the same dependenci to github.
+    # So there we go.  - benoitg  2026-07-28
+    - curl -L -o cobertura_split https://github.com/mike-kfed/lcov2cobertura/releases/download/1.0.9/cobertura_split-x86_64-unknown-linux-musl
+    - chmod +x cobertura_split
+    - ./cobertura_split ${CI_PROJECT_DIR}/temp/ci/phpunit-coverage.xml
+    - echo "Generated files:"
+    - ls -lah ${CI_PROJECT_DIR}/temp/ci/phpunit-coverage-*.xml
+  artifacts:
+    paths:
+      # This is only needed if you want to inspect the artifacts in gitlab's pipeline interface.
+      - temp/ci/phpunit-coverage-*.xml
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        #cobertura_split will generate files appending numbers, such as phpunit-coverage-1.xml
+        path: temp/ci/phpunit-coverage-*.xml
 
 unit-tests-api:
   extends: .template-unit-tests
