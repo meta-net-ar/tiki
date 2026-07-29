@@ -51,7 +51,7 @@ if (! empty($_REQUEST['remove'])) {
     if (! ($removeInfo = $filegallib->get_file_info($_REQUEST['remove']))) {
         Feedback::errorAndDie(tra("Incorrect param"), \Laminas\Http\Response::STATUS_CODE_400);
     }
-    if (! ($tiki_p_admin_file_galleries == 'y' || ($user && ($user == $gal_info['user'] || $user == $removeInfo['user'])))) {
+    if (! $filegallib->userCanRemoveFile($removeInfo)) {
         Feedback::errorAndDie(tra("You do not have permission to remove files from this gallery"), \Laminas\Http\Response::STATUS_CODE_401);
     }
     $access->checkCsrf(($removeInfo['archiveId'] ? tra('Remove archive: ') : tra('Remove file gallery: ')) . (! empty($removeInfo['name']) ? $removeInfo['name'] . ' - ' : '') . $removeInfo['filename']);
@@ -63,6 +63,10 @@ if (isset($_REQUEST['fgal_actions'])) {
         foreach (array_values($_REQUEST['file']) as $fileId) {
             if (! ($removeInfo = $filegallib->get_file_info($fileId))) {
                 Feedback::errorAndDie(tra("Incorrect param"), \Laminas\Http\Response::STATUS_CODE_400);
+            }
+
+            if (! $filegallib->userCanRemoveFile($removeInfo)) {
+                continue;
             }
             $filegallib->remove_file($removeInfo, $gal_info);
         }

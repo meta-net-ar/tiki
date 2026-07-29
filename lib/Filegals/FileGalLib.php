@@ -366,6 +366,60 @@ class FileGalLib extends TikiLib
     }
 
     /**
+     * Single source of truth for "may the current user delete this file?".
+     *
+     * Every file-deletion entry point must go through here so the permission model
+     * cannot drift between views (gallery UI, elFinder, WebDAV, API, search action).
+     * The low-level remove_file() below performs no permission check of its own.
+     *
+     * A user may remove a file when any of the following is true:
+     *   - has tiki_p_admin_file_galleries on the gallery, or
+     *   - owns the gallery (their own user gallery), or
+     *   - owns (uploaded) the file, or
+     *   - has tiki_p_remove_files on the gallery.
+     *
+     * @param array      $fileInfo file row; needs at least fileId, user, galleryId
+     * @param array|null $galInfo  gallery row (needs user); loaded from galleryId if omitted
+     * @param array|null $perms    perm object for the gallery; loaded if omitted
+     * @return bool
+     */
+    public function userCanRemoveFile($fileInfo, $galInfo = null, $perms = null)
+    {
+        global $user;
+
+        if (! is_array($fileInfo) || empty($fileInfo['fileId'])) {
+            return false;
+        }
+
+        $galleryId = $fileInfo['galleryId'] ?? null;
+
+        if (! is_array($galInfo) || ! array_key_exists('user', $galInfo)) {
+            $galInfo = $galleryId ? $this->get_file_gallery_info($galleryId) : ['user' => ''];
+        }
+
+        if (! is_array($perms)) {
+            $perms = TikiLib::lib('tiki')->get_perm_object($galleryId, 'file gallery', $galInfo, false);
+        }
+
+        if (($perms['tiki_p_admin_file_galleries'] ?? 'n') === 'y') {
+            return true;
+        }
+
+        // Owners may delete their own files or files in their own user gallery.
+        if (! empty($user)) {
+            if (isset($galInfo['user']) && $user === $galInfo['user']) {
+                return true;
+            }
+            if (isset($fileInfo['user']) && $user === $fileInfo['user']) {
+                return true;
+            }
+        }
+
+        // Otherwise deleting a file requires the dedicated remove permission.
+        return ($perms['tiki_p_remove_files'] ?? 'n') === 'y';
+    }
+
+    /**
      * @param $fileInfo
      * @param string $galInfo
      * @param bool $disable_notifications
@@ -2990,6 +3044,17 @@ class FileGalLib extends TikiLib
             // add markup to be inserted onclick
             // add information for share column if is active
             if ($object_type === 'file') {
+                // Expose the shared "can this user delete this file?" decision so the
+                // listing/context-menu delete button matches what the server will allow.
+                if (! isset($galInfoCache[$res['galleryId']])) {
+                    $galInfoCache[$res['galleryId']] = $this->get_file_gallery_info($res['galleryId']);
+                }
+                $res['canRemove'] = $this->userCanRemoveFile(
+                    ['fileId' => $res['id'], 'galleryId' => $res['galleryId'], 'user' => $res['user'] ?? $res['creator'] ?? ''],
+                    $galInfoCache[$res['galleryId']],
+                    $res['perms']
+                );
+
                 $res['wiki_syntax'] = $this->process_fgal_syntax($wiki_syntax, $res);
 
                 if ($prefs['auth_token_access'] == 'y') {
@@ -3245,7 +3310,7 @@ class FileGalLib extends TikiLib
      */
     private function actionHandlerRemoveFile($params)
     {
-        global $prefs;
+        global $prefs, $user;
 
         // mandatory params: int fileId
         // optional params: boolean draft, array gal_info
@@ -3269,11 +3334,8 @@ class FileGalLib extends TikiLib
                 }
             }
 
-            global $tiki_p_admin_file_galleries, $user;
-            if ($tiki_p_admin_file_galleries != 'y' && ( ! $user || $user != $params['gal_info']['user'] )) {
-                if ($user != $info['user']) {
-                    Feedback::errorAndDie(tra('You do not have permission to remove files from this gallery'), \Laminas\Http\Response::STATUS_CODE_401);
-                }
+            if (! $this->userCanRemoveFile($info, $params['gal_info'])) {
+                Feedback::errorAndDie(tra('You do not have permission to remove files from this gallery'), \Laminas\Http\Response::STATUS_CODE_401);
             }
 
             $backlinks = $this->getFileBacklinks($params['fileId']);

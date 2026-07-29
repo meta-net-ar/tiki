@@ -275,10 +275,8 @@
             </a>
         {/if}
 
-        {if $file.perms.tiki_p_admin_file_galleries eq 'y'
-            or (!$file.lockedby and (($user and $user eq $file.user)
-            or ($file.perms.tiki_p_edit_gallery_file eq 'y'
-            and $file.perms.tiki_p_remove_files eq 'y')))}
+        {* $file.canRemove comes from filegallib::userCanRemoveFile() (the shared permission model used by every delete path) *}
+        {if $file.canRemove and ($file.perms.tiki_p_admin_file_galleries eq 'y' or ! $file.lockedby)}
             {$delete_file_name=$file.name|default:$file.filename|default:$file.fileId}
             {$delete_file_description=$file.description|default:''|strip_tags}
                 <form action="tiki-list_file_gallery.php" method="post">

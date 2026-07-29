@@ -621,9 +621,8 @@ class Services_File_Controller
             throw new Services_Exception_NotFound(tr('Requested file does not exist'));
         }
 
-        $perms = Perms::get('file gallery', $fileInfo['galleryId']);
-
-        if (! $perms->admin_file_galleries) {
+        // Shared delete check, consistent with the gallery view, elFinder and WebDAV.
+        if (! $fileGallery->userCanRemoveFile($fileInfo)) {
             throw new Services_Exception_Denied();
         }
 

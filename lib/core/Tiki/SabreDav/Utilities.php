@@ -49,10 +49,12 @@ class Utilities
         }
     }
 
-    public static function checkDeleteFilePermission($galleryDefinition)
+    public static function checkDeleteFilePermission($galleryDefinition, $fileInfo = null)
     {
-        $perms = TikiLib::lib('tiki')->get_perm_object('', 'file gallery', $galleryDefinition->getInfo());
-        if ($perms['tiki_p_remove_files'] != 'y' && $perms['tiki_p_admin_file_galleries'] != 'y') {
+        $galInfo = $galleryDefinition->getInfo();
+        $perms = TikiLib::lib('tiki')->get_perm_object($galInfo['galleryId'] ?? '', 'file gallery', $galInfo);
+        // Use the shared model so WebDAV deletion matches the standard gallery and elFinder views.
+        if (! TikiLib::lib('filegal')->userCanRemoveFile($fileInfo ?? [], $galInfo, $perms)) {
             throw new DAV\Exception\Forbidden('Permission denied.');
         }
     }
