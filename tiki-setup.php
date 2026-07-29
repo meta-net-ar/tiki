@@ -396,10 +396,6 @@ if ($prefs['feature_freetags'] == 'y') {
 }
 if ($prefs['feature_categories'] == 'y') {
     require_once('lib/setup/categories.php');
-    if ($prefs['feature_areas'] == 'y' &&  $prefs['categories_used_in_tpl'] == 'y') {
-        $areaslib = TikiLib::lib('areas');
-        $areaslib->HandleObjectCategories($objectCategoryIdsNoJail);
-    }
 }
 if ($prefs['feature_userlevels'] == 'y') {
     require_once('lib/setup/userlevels.php');
