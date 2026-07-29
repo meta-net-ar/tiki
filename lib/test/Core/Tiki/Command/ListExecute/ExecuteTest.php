@@ -165,6 +165,125 @@ class Tiki_Command_ListExecute_ExecuteTest extends TikiTestCase
         $prefs['fallbackBaseUrl'] = $prefValue;
     }
 
+    /**
+     * Test responsible for executing a list execute command restricted to specific objects
+     *
+     * @throws Exception
+     */
+    public function testListExecuteOnSpecificObjects()
+    {
+        $this->updatePluginStatus('accept');
+
+        $this->commandTester->execute(
+            [
+                'page'      => self::PAGE_NAME,
+                'action'    => 'action',
+                '--objects' => ['trackeritem:1', 'trackeritem:2'],
+            ]
+        );
+
+        $pageName = self::PAGE_NAME;
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $expected = "[OK] Action action executed on page {$pageName} for trackeritem:1, trackeritem:2.";
+        $this->assertStringContainsString($expected, $actual);
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+    }
+
+    /**
+     * Test responsible for rejecting object identifiers not following the object_type:object_id format
+     *
+     * @throws Exception
+     */
+    public function testListExecuteOnMalformedObjects()
+    {
+        $this->updatePluginStatus('accept');
+
+        $this->commandTester->execute(
+            [
+                'page'      => self::PAGE_NAME,
+                'action'    => 'action',
+                '--objects' => ['trackeritem:1', 'trackeritem', ':3'],
+            ]
+        );
+
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $expected = '[ERROR] Invalid object identifier(s): trackeritem, :3. Expected format is object_type:object_id.';
+        $this->assertStringContainsString($expected, $actual);
+        $this->assertStringNotContainsString('executed on page', $actual);
+        $this->assertEquals(1, $this->commandTester->getStatusCode());
+    }
+
+    /**
+     * Test responsible for executing a list execute command restricted to a single page of results
+     *
+     * @throws Exception
+     */
+    public function testListExecuteOnResultsPage()
+    {
+        $this->updatePluginStatus('accept');
+
+        $this->commandTester->execute(
+            [
+                'page'           => self::PAGE_NAME,
+                'action'         => 'action',
+                '--results-page' => 2,
+            ]
+        );
+
+        $pageName = self::PAGE_NAME;
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $expected = "[OK] Action action executed on page {$pageName} for results page 2.";
+        $this->assertStringContainsString($expected, $actual);
+        $this->assertEquals(0, $this->commandTester->getStatusCode());
+    }
+
+    /**
+     * Test responsible for rejecting results pages that are not a page number
+     *
+     * @throws Exception
+     */
+    public function testListExecuteOnInvalidResultsPage()
+    {
+        $this->updatePluginStatus('accept');
+
+        $this->commandTester->execute(
+            [
+                'page'           => self::PAGE_NAME,
+                'action'         => 'action',
+                '--results-page' => 0,
+            ]
+        );
+
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $this->assertStringContainsString('[ERROR] Invalid results page: 0.', $actual);
+        $this->assertStringNotContainsString('executed on page', $actual);
+        $this->assertEquals(1, $this->commandTester->getStatusCode());
+    }
+
+    /**
+     * Test responsible for rejecting a selection of objects combined with a page of results
+     *
+     * @throws Exception
+     */
+    public function testListExecuteOnObjectsCombinedWithResultsPage()
+    {
+        $this->updatePluginStatus('accept');
+
+        $this->commandTester->execute(
+            [
+                'page'           => self::PAGE_NAME,
+                'action'         => 'action',
+                '--objects'      => ['trackeritem:1'],
+                '--results-page' => 1,
+            ]
+        );
+
+        $actual = trim(preg_replace('/\s+/', ' ', $this->commandTester->getDisplay()));
+        $this->assertStringContainsString('[ERROR] The objects and results-page options cannot be combined', $actual);
+        $this->assertStringNotContainsString('executed on page', $actual);
+        $this->assertEquals(1, $this->commandTester->getStatusCode());
+    }
+
     protected function updatePluginStatus($status)
     {
         $this->pluginSecurity = TikiLib::get()->table('tiki_plugin_security');

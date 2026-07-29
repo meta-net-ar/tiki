@@ -47,6 +47,20 @@ class ListExecuteCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Specify query string defining the request variables to be used on the wiki page. E.g. "days=30&alert=2"'
             )
+            ->addOption(
+                'objects',
+                null,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Execute the action only on the given objects instead of all the ones listed. Format: object_type:object_id'
+                    . ' (you can use multiple times, once for each object). E.g. --objects="trackeritem:42" --objects="wiki page:HomePage"'
+            )
+            ->addOption(
+                'results-page',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Execute the action only on the given page of results, 1 being the first one, using the pagination size'
+                    . ' set on the target page. When omitted, the action is executed on every object listed.'
+            )
             ;
     }
 
@@ -66,13 +80,37 @@ class ListExecuteCommand extends Command
             return Command::FAILURE;
         }
 
+        $objects = $input->getOption('objects');
+        $invalidObjects = array_filter($objects, fn($identifier) => ! $this->isValidObjectIdentifier($identifier));
+
+        if ($invalidObjects) {
+            $io->error('Invalid object identifier(s): ' . implode(', ', $invalidObjects)
+                . '. Expected format is object_type:object_id.');
+            return Command::FAILURE;
+        }
+
+        $resultsPage = $input->getOption('results-page');
+
+        if (! is_null($resultsPage) && ! (ctype_digit((string) $resultsPage) && $resultsPage > 0)) {
+            $io->error("Invalid results page: $resultsPage. Expected the number of a page of results, 1 being the first one.");
+            return Command::FAILURE;
+        }
+
+        if ($objects && ! is_null($resultsPage)) {
+            $io->error('The objects and results-page options cannot be combined, the given objects are already a selection.');
+            return Command::FAILURE;
+        }
+
+        $selectedObjects = $objects ?: ['ALL'];
+
         if ($request = $input->getOption('request')) {
             parse_str($request, $_POST);
         }
 
         $_POST['list_action'] = $action;
+        $_POST['list_results_page'] = $resultsPage;
         for ($i = 1; $i <= 10; $i++) {
-            $_POST['objects' . $i] = ['ALL'];
+            $_POST['objects' . $i] = $selectedObjects;
         }
         $_POST['list_input'] = $input->getArgument('input');
 
@@ -117,7 +155,25 @@ class ListExecuteCommand extends Command
 
         TikiLib::lib('parser')->parse_data($pageInfo['data']);
 
-        $io->success("Action $action executed on page $page.");
+        $message = "Action $action executed on page $page";
+        if ($objects) {
+            $message .= ' for ' . implode(', ', $objects);
+        } elseif ($resultsPage) {
+            $message .= " for results page $resultsPage";
+        }
+
+        $io->success("$message.");
         return Command::SUCCESS;
+    }
+
+    private function isValidObjectIdentifier(string $identifier): bool
+    {
+        if (! str_contains($identifier, ':')) {
+            return false;
+        }
+
+        [$type, $id] = explode(':', $identifier, 2);
+
+        return $type !== '' && $id !== '';
     }
 }
