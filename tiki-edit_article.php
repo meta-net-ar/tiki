@@ -827,6 +827,40 @@ $smarty->assign('seodata', $seodata);
 
 $schemainfo['schemaOrgMarkup'] = $attributelib->get_attribute('article', $articleId, "tiki.schema.markup") ?: '';
 
+$headline = htmlentities($article_data['title'] ?? '');
+$description = htmlentities($article_data['subtitle'] ?? '');
+$image = isset($article_data['image_data']) ? urlencode(htmlentities($article_data['image_data'])) : '';
+$author =  htmlentities($article_data['authorName'] ?? '');
+$publishDate = isset($article_data['publishDate']) ? date('d-m-Y', $article_data['publishDate']) : '';
+
+
+$default_schema = <<<END
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{$headline}",
+  "description": "{$description}",
+  "image": "{$image}",
+  "author": {
+    "@type": "Person",
+    "name": "{$author}",
+    "url": ""
+  },
+  "publisher": {
+    "@type": "",
+    "name": ""
+  },
+  "datePublished": "{$publishDate}",
+  "dateModified": "{$publishDate}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://"
+  }
+}
+END;
+
+$saved_schema = json_encode(json_decode($schemainfo['schemaOrgMarkup'])->schema, JSON_HEX_APOS | JSON_HEX_QUOT);
+
 TikiLib::lib('header')->add_js_module('
 import "@vue-mf/root-config"; 
 import \'@vue-mf/schema-markup-builder\'');
@@ -840,7 +874,7 @@ window.registerApplication({
         return condition;
     },
     customProps: {
-        schemajson: \'' . ($schemainfo['schemaOrgMarkup'] ? json_encode(json_decode($schemainfo['schemaOrgMarkup'])->schema) : '') . '\',
+        schemajson: \'' . ($saved_schema == "null" ? json_encode(json_decode($default_schema, true), JSON_HEX_APOS | JSON_HEX_QUOT) : $saved_schema) . '\',
     },
 })
 

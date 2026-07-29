@@ -894,6 +894,24 @@ TikiLib::lib('header')->add_js_module('
 import "@vue-mf/root-config"; 
 import \'@vue-mf/schema-markup-builder\'');
 
+global $base_url;
+
+$url = $base_url . $info["pageSlug"];  
+$description = htmlentities($info["description"]);
+$website_title = htmlentities($prefs['sitetitle']);
+
+$default_schema = <<<END
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "$website_title",
+  "url": "{$url}",
+  "description": "{$description}"
+}
+END;
+
+$saved_schema = json_encode(json_decode($schemainfo['schemaOrgMarkup'])->schema, JSON_HEX_APOS | JSON_HEX_QUOT);
+
 TikiLib::lib('header')->add_jq_onready('
 window.registerApplication({
     name: "@vue-mf/schema-markup-builder",
@@ -903,8 +921,7 @@ window.registerApplication({
         return condition;
     },
     customProps: {
-        //trackerfieldMap : "' . json_encode($schemaOrgAttributeMap) . '",
-        schemajson: \'' . ($schemainfo['schemaOrgMarkup'] ? json_encode(json_decode($schemainfo['schemaOrgMarkup'])->schema) : '') . '\',
+        schemajson: \'' . ($saved_schema == "null" ? json_encode(json_decode($default_schema, true), JSON_HEX_APOS | JSON_HEX_QUOT) : $saved_schema) . '\',
     },
 })
 
