@@ -147,6 +147,12 @@ class UnifiedSearchLib
     public function rebuildInProgress()
     {
         global $prefs;
+
+        $searchIndex = $this->checkCurrentEngine();
+        if ($searchIndex['error']) {
+            return false;
+        }
+
         if ($prefs['unified_engine'] == 'elastic') {
             $name = $this->getIndexLocation('data');
             $connection = $this->getElasticConnection(true);
@@ -180,6 +186,15 @@ class UnifiedSearchLib
                 Feedback::error(tr('If you are sure the previous rebuild task has finished, you can clean the current lock by executing the following console command: php console.php preferences:delete unified_manticore_index_rebuilding'));
             }
             return [];
+        }
+
+        // check the connection is working before proceeding
+        $engineStatus = $this->checkCurrentEngine();
+        if ($engineStatus['error']) {
+            return ['default' => [
+                'error' => true,
+                'error_message' => $engineStatus['feedback'],
+            ]];
         }
 
         $tikilib = TikiLib::lib('tiki');
@@ -1853,11 +1868,30 @@ class UnifiedSearchLib
     }
 
     /**
-     * Check Elasticsearch service
-     *
+     * Check search engine service availability depending on pref setting
+
      * @return array
      */
-    public function checkElasticsearch()
+    public function checkCurrentEngine(): array
+    {
+        global $prefs;
+
+        switch ($prefs['unified_engine']) {
+            case 'elastic':
+                return $this->checkElasticsearch();
+            case 'mysql':
+                return $this->checkMySql();
+            case 'manticore':
+                return $this->checkManticore();
+            default:
+                return [
+                    'error'    => false,
+                    'feedback' => '',
+                ];
+        }
+    }
+
+    public function checkElasticsearch(): array
     {
         global $prefs;
         $searchIndex = [
@@ -1888,7 +1922,7 @@ class UnifiedSearchLib
      *
      * @return array
      */
-    public function checkMySql()
+    public function checkMySql(): array
     {
         global $prefs, $dbs_tiki;
 
@@ -1927,7 +1961,7 @@ class UnifiedSearchLib
      *
      * @return array
      */
-    public function checkManticore()
+    public function checkManticore(): array
     {
         global $prefs;
         $searchIndex = [

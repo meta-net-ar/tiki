@@ -96,6 +96,10 @@ class SearchIndexRebuilder
             // Rebuild the main search index
             $stat = $unifiedsearchlib->rebuild($logLevel, false, $progress, $skipErrorTracking);
 
+            if (! empty($stat['default']['error'])) {
+                return $stat;
+            }
+
             // Handle progress bar if provided
             if ($progress) {
                 $progress->setMessage(tr('Rebuilding preferences index'));
