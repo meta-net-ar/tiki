@@ -7690,9 +7690,9 @@ class UsersLib extends TikiLib
 
             TikiLib::events()->trigger('tiki.user.update', ['type' => 'user', 'object' => $user]);
             return true;
-        } else {
-            throw new Exception(tr('An error occurred while updating the password.'));
         }
+
+        return false;
     }
 
     public function addPasswordHistory($user, $pass)
