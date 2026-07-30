@@ -745,7 +745,7 @@ if ($prefs['feature_jquery_tagcanvas'] == 'y') {
 }
 
 if ($prefs['feature_shadowbox'] == 'y') {
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/glightbox/dist/glightbox.min.css');
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/glightbox/dist/css/glightbox.min.css');
     $headerlib->add_css('
 .gcounter {
     position: absolute;
@@ -764,8 +764,8 @@ if ($prefs['feature_shadowbox'] == 'y') {
     display: none !important;
 }
 ');
-    $localPlyrCSS = NODE_PUBLIC_DIST_PATH . '/glightbox/dist/plyr.css';
-    $localPlyrJS = NODE_PUBLIC_DIST_PATH . '/glightbox/dist/plyr.min.js';
+    $localPlyrCSS = NODE_PUBLIC_DIST_PATH . '/plyr/dist/plyr.css';
+    $localPlyrJS = NODE_PUBLIC_DIST_PATH . '/plyr/dist/plyr.min.js';
     $headerlib->add_js_module(<<<JS
     import initGlightbox from "@tiki-glightbox";
     window.applyGlightbox = initGlightbox({
@@ -813,7 +813,7 @@ if ($prefs['feature_jquery_validation'] == 'y') {
 $headerlib->add_js_module('import "@jquery-tiki/asyncLoop";');
 
 $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/jquery.treetable.js');
-$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/jquery.treetable.css');
+$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/css/jquery.treetable.css');
 
 //This must always be loaded (early), as it's curently used by any Vue3 module using single-spa to make onDOMElementRemoved() available
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-vue.js');

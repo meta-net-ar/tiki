@@ -19,8 +19,8 @@ class InlineAudioPlayer extends \Smarty\FunctionHandler\Base
         $uniqueId = uniqid('audio-player-');
 
         $headerlib = TikiLib::lib('header');
-        $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/glightbox/dist/plyr.min.js');
-        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/glightbox/dist/plyr.css');
+        $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/plyr/dist/plyr.min.js');
+        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/plyr/dist/plyr.css');
         $headerlib->add_js(<<<JS
             new Plyr('#$uniqueId', {
                 controls: ['play', 'progress', 'current-time', 'duration', 'settings']
