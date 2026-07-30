@@ -2186,6 +2186,24 @@ class UsersLib extends TikiLib
 
         return true;
     }
+    /**
+     * Updates date and time of user's lastActivity.
+     *
+     * @param user: Username
+     */
+    public function update_lastActivity($user)
+    {
+        $query = 'update `users_users` set `lastActivity`=? where `login`=? and (`waiting` <> \'a\' OR `waiting` IS NULL)';
+        $this->query(
+            $query,
+            [
+                (int)$this->now,
+                $user
+            ]
+        );
+
+        return true;
+    }
 
     /**
      * Creates a new user in the LDAP directory
@@ -3532,7 +3550,7 @@ class UsersLib extends TikiLib
         if (! $useCache || ! $user_details = $cachelib->getSerialized($cacheKey)) {
             $user_details = [];
 
-            $query = 'SELECT `userId`, `login`, `email`, `lastLogin`, `currentLogin`,' .
+            $query = 'SELECT `userId`, `login`, `email`, `lastLogin`, `lastActivity`, `currentLogin`,' .
                             ' `registrationDate`, `created`, `avatarName`, `avatarSize`,' .
                             ' `avatarFileType`, `avatarLibName`, `avatarType`' .
                             ' FROM `users_users` WHERE `login` = ?';

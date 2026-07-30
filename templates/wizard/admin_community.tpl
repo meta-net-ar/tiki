@@ -53,7 +53,6 @@
                         {preference name=feature_community_mouseover_score}
                         {preference name=feature_community_mouseover_country}
                         {preference name=feature_community_mouseover_email}
-                        {preference name=feature_community_mouseover_lastlogin}
                         {preference name=feature_community_mouseover_distance}
                     </div>
                     {preference name=feature_contact}
