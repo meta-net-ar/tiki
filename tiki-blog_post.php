@@ -39,6 +39,7 @@ $inputConfiguration = [
     ],
 ];
 
+
 require_once('tiki-setup.php');
 use Tiki\Sections;
 $section = Sections::SECTION_BLOGS;
@@ -159,6 +160,7 @@ if ($postId > 0) {
         $cat_lang = $_POST['lang'];
     }
 }
+
 include_once('freetag_list.php');
 
 $smarty->assign('preview', 'n');
@@ -260,6 +262,10 @@ if (isset($_POST['save']) && ! $contribution_needed && $access->checkCsrf()) {
         $smarty->assign('postId', $postId);
     }
 
+    $attributelib = TikiLib::lib('attribute');
+    $attributelib->set_attribute('blog post', $postId, "tiki.schema.markup", $_POST['schemaOrgMarkup'] ?? '');
+
+
     if ($prefs['geo_locate_blogpost'] == 'y' && ! empty($_POST['geolocation'])) {
         TikiLib::lib('geo')->set_coordinates('blog post', $postId, $_POST['geolocation']);
     }
@@ -305,6 +311,66 @@ if ($prefs['feature_contribution'] == 'y') {
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
+
+
+$attributelib = TikiLib::lib('attribute');
+$schemainfo['schemaOrgMarkup'] = $attributelib->get_attribute('blog post', $postId, "tiki.schema.markup") ?: '';
+
+$created_date = date('d-m-Y', $data['created']);
+$title = htmlentities($data['title'] ?: '');
+$excerpt = htmlentities($data['excerpt'] ?: '');
+$user = htmlentities($data['user'] ?: '');
+
+$default_schema = <<<END
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "{$title}",
+  "description": "{$excerpt}",
+  "image": "https://image",
+  "author": {
+    "@type": "Person",
+    "name": "{$user}",
+    "url": ""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{$user}"
+  },
+  "datePublished": "{$created_date}",
+  "dateModified": "{$created_date}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://link"
+  }
+}
+END;
+
+$saved_schema = json_encode(json_decode($schemainfo['schemaOrgMarkup'])->schema, JSON_HEX_APOS | JSON_HEX_QUOT);
+
+TikiLib::lib('header')->add_js_module('
+import "@vue-mf/root-config"; 
+import \'@vue-mf/schema-markup-builder\'');
+
+TikiLib::lib('header')->add_jq_onready('
+window.registerApplication({
+    name: "@vue-mf/schema-markup-builder",
+    app: () => importShim("@vue-mf/schema-markup-builder"),
+    activeWhen: (location) => {
+        let condition = true;
+        return condition;
+    },
+    customProps: {
+        schemajson: \'' . ($saved_schema == "null" ? json_encode(json_decode($default_schema, true), JSON_HEX_APOS | JSON_HEX_QUOT) : $saved_schema) . '\',
+    },
+})
+
+onDOMElementRemoved("single-spa-application:@vue-mf/schema-markup-builder", function () {
+    window.unregisterApplication("@vue-mf/schema-markup-builder");
+});');
+
+$smarty->assign('schemainfo', $schemainfo); //TODO : schema info will now come from properties as plain json, now built in frontend not backend, so we can add more fields without changing backend code
+
 
 // Display the Index Template
 $smarty->assign('mid', 'tiki-blog_post.tpl');

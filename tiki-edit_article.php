@@ -49,6 +49,9 @@ $inputConfiguration = [
             'author'                      => 'string',        //post
             'geolocation'                 => 'string',        //get
             'freetag_string'              => 'string',        //post
+            'schemaOrgMarkup'             => 'string',        //post
+            'metaTitle'                    => 'string',        //post
+            'metaDescription'              => 'string',        //post
         ],
     ],
 ];
@@ -709,6 +712,12 @@ if (isset($_REQUEST['save']) && empty($errors)) {
     // Remove preview cache because it won't be used any more
     @$artlib->delete_image_cache('preview', $previewId);
 
+    // save seo data in attributes
+    $attributelib = TikiLib::lib('attribute');
+    $attributelib->set_attribute('article', $artid, "tiki.schema.markup", $_REQUEST['schemaOrgMarkup'] ?? '');
+    $attributelib->set_attribute('article', $artid, "tiki.seo.title", $_REQUEST['metaTitle'] ?? '');
+    $attributelib->set_attribute('article', $artid, "tiki.seo.description", $_REQUEST['metaDescription'] ?? '');
+
     include_once('tiki-sefurl.php');
     $url = smarty_modifier_sefurl($artid, 'article');
     header('location: ' . $url);
@@ -808,6 +817,74 @@ $smarty->assign('displayTimezone', TikiLib::lib('tiki')->get_display_timezone())
 
 // Enforce alt-text requirement when “Use Own Image” is enabled
 $headerlib->add_js_module('import "@jquery-tiki/validate-alt-image";');
+
+$attributelib = TikiLib::lib('attribute');
+
+$seodata = [];
+$seodata['metaTitle'] = $attributelib->get_attribute('article', $articleId, "tiki.seo.title") ?: '';
+$seodata['metaDescription'] = $attributelib->get_attribute('article', $articleId, "tiki.seo.description") ?: '';
+$smarty->assign('seodata', $seodata);
+
+$schemainfo['schemaOrgMarkup'] = $attributelib->get_attribute('article', $articleId, "tiki.schema.markup") ?: '';
+
+$headline = htmlentities($article_data['title'] ?? '');
+$description = htmlentities($article_data['subtitle'] ?? '');
+$image = isset($article_data['image_data']) ? urlencode(htmlentities($article_data['image_data'])) : '';
+$author = htmlentities($article_data['authorName'] ?? '');
+$publishDate = isset($article_data['publishDate']) ? date('d-m-Y', $article_data['publishDate']) : '';
+
+
+$default_schema = <<<END
+{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "{$headline}",
+  "description": "{$description}",
+  "image": "{$image}",
+  "author": {
+    "@type": "Person",
+    "name": "{$author}",
+    "url": ""
+  },
+  "publisher": {
+    "@type": "",
+    "name": ""
+  },
+  "datePublished": "{$publishDate}",
+  "dateModified": "{$publishDate}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://"
+  }
+}
+END;
+
+$saved_schema = json_encode(json_decode($schemainfo['schemaOrgMarkup'])->schema, JSON_HEX_APOS | JSON_HEX_QUOT);
+
+TikiLib::lib('header')->add_js_module('
+import "@vue-mf/root-config"; 
+import \'@vue-mf/schema-markup-builder\'');
+
+TikiLib::lib('header')->add_jq_onready('
+window.registerApplication({
+    name: "@vue-mf/schema-markup-builder",
+    app: () => importShim("@vue-mf/schema-markup-builder"),
+    activeWhen: (location) => {
+        let condition = true;
+        return condition;
+    },
+    customProps: {
+        schemajson: \'' . ($saved_schema == "null" ? json_encode(json_decode($default_schema, true), JSON_HEX_APOS | JSON_HEX_QUOT) : $saved_schema) . '\',
+    },
+})
+
+onDOMElementRemoved("single-spa-application:@vue-mf/schema-markup-builder", function () {
+    window.unregisterApplication("@vue-mf/schema-markup-builder");
+});');
+
+$smarty->assign('schemainfo', $schemainfo); //TODO : schema info will now come from properties as plain json, now built in frontend not backend, so we can add more fields without changing backend code
+
+
 
 // Display the Index Template
 $smarty->assign('mid', 'tiki-edit_article.tpl');

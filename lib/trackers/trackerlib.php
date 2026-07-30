@@ -7398,6 +7398,7 @@ class TrackerLib extends TikiLib
             'relationshipBehaviour' => $input->relationshipBehaviour->text(),
             'allowInlineEditing' => $input->allowInlineEditing->int() ? 'y' : 'n',
             'allowChooseFieldsToDisplay' => $input->allowChooseFieldsToDisplay->int() ? 'y' : 'n',
+            'schemaOrgMarkup' => $input->schemaOrgMarkup->text(),
         ];
     }
 }

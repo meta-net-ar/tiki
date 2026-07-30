@@ -2266,6 +2266,15 @@ class Services_Tracker_Controller
             $info['val_duplicateRules'] = json_decode($info['duplicateRules'], true);
         }
 
+        $fieldList = $trklib->list_tracker_fields($trackerId);
+        $fieldMap = [];
+        foreach ($fieldList['data'] as $field) {
+            $fieldMap[] = [
+                'id' => $field['permName'],
+                'name' => $field['name'],
+            ];
+        }
+
         return [
             'accordion_pos' => $accordion_pos,
             'title' => $trackerId ? tr('Edit') . " " . tr('%0', $definition->getConfiguration('name')) : tr('Create Tracker'),
@@ -2287,6 +2296,10 @@ class Services_Tracker_Controller
             'relationshipBehaviourList' => array_keys(Tiki\Relation\Semantics::BEHAVIOUR_LIST),
             'displayTimezone' => TikiLib::lib('tiki')->get_display_timezone(),
             'fields' => $trackerId ? $definition->getFields() : [],
+            'schema_json_generator_app_id' => "vue-mf-schema-markup-builder-" . $trackerId . "-" . time(),
+            'fieldMap' => $fieldMap,
+            //'trkfields' => $trackerlib->list_tracker_fields($trackerId),
+            // here nous pouvons passer des donnees a replace.tpl
         ];
     }
 

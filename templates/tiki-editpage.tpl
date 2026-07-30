@@ -603,6 +603,15 @@
                                 </div>
                             {/if}
                             <hr>
+                            <div class="mb-3 mx-0">
+                                <input type="hidden" name="schemaOrgMarkup" id="schemaOrgMarkup" value="{$schemainfo.schemaOrgMarkup|escape}">
+                                <div id="single-spa-application:@vue-mf/schema-markup-builder" class="schema-builder"></div>
+                            </div>
+                            {jq}
+                               document.addEventListener('schema-builder:update', function(e){
+                                $('#schemaOrgMarkup').val(JSON.stringify(e.detail));
+                               });
+                            {/jq}
                         {/if}
 
                         {assign var="comments_enabled_section" value=($prefs.wiki_comments_allow_per_page neq 'n')} {* for Allow comments on this page *}

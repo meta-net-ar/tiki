@@ -377,6 +377,34 @@
                 </fieldset>
             {/if}
         {/tab}
+        {tab name="{tr}SEO{/tr}"}
+            <h2>{tr}SEO{/tr}</h2>
+            <div class="mb-3 row clearfix">
+                <label for="metaTitle" class="col-form-label col-md-4">{tr}Meta Title{/tr}</label>
+                <div class="col-md-8">
+                    <input type="text" name="metaTitle" id="metaTitle" value="{$seodata.metaTitle|escape}" maxlength="255" class="form-control">
+                </div>
+            </div>
+            <div class="mb-3 row clearfix">
+                <label for="metaDescription" class="col-form-label col-md-4">{tr}Meta Description{/tr}</label>
+                <div class="col-md-8">
+                    <textarea name="metaDescription" id="metaDescription" rows=5 maxlength=255 class="form-control">{$seodata.metaDescription|escape}</textarea>
+                    <span class="form-text">{tr}Description of the article for search engines.{/tr}</span>
+                </div>
+            </div>
+            <div class="mb-3 row clearfix">
+                <label class="col-md-4 col-form-label" for="schemaOrgMarkup">{tr}Schema.org JSON-LD Markup{/tr}</label>
+                <div class="col-md-8">
+                    <input type="hidden" name="schemaOrgMarkup" id="schemaOrgMarkup" value="{$schemainfo.schemaOrgMarkup|escape}">
+                    <div id="single-spa-application:@vue-mf/schema-markup-builder" class="schema-builder"></div>
+                </div>
+                {jq}
+                    document.addEventListener('schema-builder:update', function(e){
+                        $('#schemaOrgMarkup').val(JSON.stringify(e.detail));
+                    });
+                {/jq}
+            </div>
+        {/tab}
     {/tabset}
     <div class="mb-3 clearfix text-center">
         <input type="submit" class="wikiaction btn btn-secondary" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false;">

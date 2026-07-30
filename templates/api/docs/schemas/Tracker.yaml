@@ -375,3 +375,6 @@ properties:
       By default, last import time gets reset every time an import happens. Check this option if you want the last import time to be static and kept what is entered above. Possible values:
       - `y`: skips resetting the last import time
       - `n`: doesn't skip
+schemaOrgMarkup:
+  type: string
+  description: The schema.org markup of the tracker, in JSON-LD format.

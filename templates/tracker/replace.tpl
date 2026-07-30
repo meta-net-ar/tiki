@@ -696,6 +696,45 @@
                 </select>
             </div>
         {/accordion_group}
+
+        {accordion_group title="{tr}Schema.org Data{/tr}"}
+            <div class="mb-3 mx-0">
+                <input type="hidden" name="schemaOrgMarkup" id="schemaOrgMarkup-{$schema_json_generator_app_id}" value="{json_encode(json_decode($info.schemaOrgMarkup))|escape}">
+                <div id="single-spa-application:{$schema_json_generator_app_id}" class="schema-builder"></div>
+            </div>
+            <script type="module" name="App">
+                import "@vue-mf/schema-markup-builder";
+            </script>
+            <script>
+                var schemaBuilderSpaAppName = "{$schema_json_generator_app_id}"; //not const or let, which will trigger error, using Date to ensure uniqueness, the modal can be opened and closed multiple times
+                console.log("Registering single-spa application " + schemaBuilderSpaAppName);
+                window.registerApplication({
+                    name: schemaBuilderSpaAppName,
+                    app: () => importShim("@vue-mf/schema-markup-builder"),
+                    activeWhen: (location) => {
+                        let condition = true;
+                        return condition;
+                    },
+                    customProps: {
+                        trackerfieldMap : {json_encode($fieldMap)},
+                        schemajson: `{json_encode(json_decode($info.schemaOrgMarkup)->schema)}`,
+                    },
+                });
+                document.addEventListener("hide.bs.modal", function (event) {
+                    if(event.target.querySelector(".schema-builder")){
+                        console.log("Modal with schema builder closed, unregistering single-spa application " + schemaBuilderSpaAppName);
+                        window.unregisterApplication(schemaBuilderSpaAppName);
+                    }
+                });
+                //onDOMElementRemoved("single-spa-application:" + schemaBuilderSpaAppName, function () { //this is not working for the modal, it unmount the app see source lib\jquery_tiki\tiki-vue.js
+                  //  window.unregisterApplication(schemaBuilderSpaAppName);
+                //});
+
+                document.addEventListener('schema-builder:update', function(e){
+                    $('#schemaOrgMarkup-{$schema_json_generator_app_id}').val(JSON.stringify(e.detail));
+                });
+            </script>
+        {/accordion_group}
     {/accordion}
     <div class="mb-3 mx-0 submit">
         <input type="hidden" name="confirm" value="1">

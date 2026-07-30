@@ -9,6 +9,8 @@
  */
 
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Melbahja\Seo\Schema;
+use Melbahja\Seo\Schema\Thing;
 
 require_once('check_composer_exists.php');
 
@@ -814,6 +816,16 @@ if (! empty($prefs['wiki_page_actions_groups'])) {
         );
     }
 }
+
+$attributelib = TikiLib::lib('attribute');
+$schema = $attributelib->get_attribute('wiki page', $page, "tiki.schema.markup");
+
+if (isset($schema)) {
+    $schema = json_decode($schema)->schema ?? null;
+    $headerlib = TikiLib::lib('header');
+    $headerlib->add_rawhtml($schema ? '<script type="application/ld+json">' . json_encode($schema, JSON_PRETTY_PRINT) . '</script>' : '');
+}
+
 $smarty->assign('show_wiki_actions', $showWikiActions);
 $smarty->assign('info', $info);
 $smarty->assign('mid', 'tiki-show_page.tpl');

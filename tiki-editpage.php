@@ -948,6 +948,51 @@ if ($prefs['sitemap_enable'] === 'y') {
         $smarty->assign('for_sitemap', 'y');
     }
 }
+
+$attributelib = TikiLib::lib('attribute');
+$schemainfo['schemaOrgMarkup'] = $attributelib->get_attribute('wiki page', $page, "tiki.schema.markup") ?: '';
+
+TikiLib::lib('header')->add_js_module('
+import "@vue-mf/root-config"; 
+import \'@vue-mf/schema-markup-builder\'');
+
+global $base_url;
+
+$url = $base_url . $info["pageSlug"];
+$description = htmlentities($info["description"]);
+$website_title = htmlentities($prefs['sitetitle']);
+
+$default_schema = <<<END
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "$website_title",
+  "url": "{$url}",
+  "description": "{$description}"
+}
+END;
+
+$saved_schema = json_encode(json_decode($schemainfo['schemaOrgMarkup'])->schema, JSON_HEX_APOS | JSON_HEX_QUOT);
+
+TikiLib::lib('header')->add_jq_onready('
+window.registerApplication({
+    name: "@vue-mf/schema-markup-builder",
+    app: () => importShim("@vue-mf/schema-markup-builder"),
+    activeWhen: (location) => {
+        let condition = true;
+        return condition;
+    },
+    customProps: {
+        schemajson: \'' . ($saved_schema == "null" ? json_encode(json_decode($default_schema, true), JSON_HEX_APOS | JSON_HEX_QUOT) : $saved_schema) . '\',
+    },
+})
+
+onDOMElementRemoved("single-spa-application:@vue-mf/schema-markup-builder", function () {
+    window.unregisterApplication("@vue-mf/schema-markup-builder");
+});');
+
+$smarty->assign('schemainfo', $schemainfo); //TODO : schema info will now come from properties as plain json, now built in frontend not backend, so we can add more fields without changing backend code
+
 $wiki_authors_style = '';
 if ($prefs['wiki_authors_style_by_page'] === 'y') {
     if (isset($_REQUEST['wiki_authors_style']) && $tiki_p_admin_wiki === 'y') {
@@ -1340,6 +1385,16 @@ if (
             if (isset($_REQUEST['for_sitemap'])) {
                 $attributelib = TikiLib::lib('attribute');
                 $attributelib->set_attribute('wiki page', $page, 'tiki.object.sitemap', $_REQUEST['for_sitemap']);
+            }
+
+            // Save Schema.org attributes
+            // Note: Attribute names must be lowercase with dots and max 25 chars per Tiki standards
+            $attributelib = TikiLib::lib('attribute');
+            if (isset($_REQUEST['schemaOrgMarkup'])) {
+                $attributelib->set_attribute('wiki page', $page, 'tiki.schema.markup', $_REQUEST['schemaOrgMarkup']);
+            } else {
+                // Delete attribute if field is not set (user may have cleared it)
+                $attributelib->set_attribute('wiki page', $page, 'tiki.schema.markup', '');
             }
 
             // Handle translation bits

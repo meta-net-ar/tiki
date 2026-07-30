@@ -5,6 +5,8 @@
  */
 
 use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Melbahja\Seo\Schema;
+use Melbahja\Seo\Schema\Thing;
 
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
@@ -699,6 +701,39 @@ $info["lastModifByReal"] = $tikilib->get_user_preference($info["lastModifBy"], '
 if ($tracker_info_value('doNotShowEmptyField') == 'y') {
     $trackerlib = TikiLib::lib('trk');
     $fields['data'] = $trackerlib->mark_fields_as_empty($fields['data']);
+}
+
+//easy to pick data from $Info (field id is k=>v)
+/*
+$info array (10)
+itemId => integer 838
+trackerId => integer 6
+created => integer 1775220792
+createdBy => string (5) "admin"
+status => string (1) "o"
+lastModif => integer 1775220792
+lastModifBy => string (5) "admin"
+17 => string (514) "Some initial ideas for generating automated structured data from Trackers Po...
+createdByReal => string (20) "System Administrator"
+lastModifByReal => string (20) "System Administrator"
+*/
+
+$schema = $tracker_info["schemaOrgMarkup"] ?? null; //the json data
+
+// the markup can contain placeholders values ({{trackerfieldPermName}}), to be replaced by value on render
+
+// TODO : make switch to build schema based on data, check empty for date & author then fill with $info (contains createdBy, createdByReal, created, lastModif, lastModifBy, lastModifByReal and all fieldId=>value) based on config (tracker_field) or static text (static_text
+// Then repeat the same logic to wiki page now)
+
+if (isset($schema)) {
+    foreach ($fieldDefinitions as $fieldDefinition) {
+        $fid = $fieldDefinition["fieldId"];
+        $permName = $fieldDefinition["permName"]; //used as id in the placeholder of the json data, ex: {{trackerfieldPermName}}
+        $schema = str_replace('{{' . $permName . '}}', $info[$fid] ?? '', $schema);
+    }
+    $schema = json_decode($schema)->schema;
+    $headerlib = TikiLib::lib('header');
+    $headerlib->add_rawhtml($schema ? '<script type="application/ld+json">' . json_encode($schema, JSON_PRETTY_PRINT) . '</script>' : '');
 }
 
 $smarty->assign('trackerId', $trackerId);
