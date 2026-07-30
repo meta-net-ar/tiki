@@ -355,6 +355,17 @@ class Utilities
                 $rec->setAllday(empty($convertToString($component->{'X-Tiki-Allday'})) ? 0 : 1);
             }
         }
+        // Detect all-day events, including imported ICS files
+        $isAllDay = ! $component->DTSTART->hasTime();
+        if (isset($component->{'X-Tiki-Allday'})) {
+            $isAllDay = ! empty($convertToString($component->{'X-Tiki-Allday'}));
+        }
+        if ($isAllDay) {
+            $result['allday'] = 1;
+            if ($rec) {
+                $rec->setAllday(1);
+            }
+        }
         if (isset($component->{'X-Tiki-sendReminder'})) {
             $result['sendReminder'] = empty($convertToString($component->{'X-Tiki-sendReminder'})) ? 0 : 1;
         }
