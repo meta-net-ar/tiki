@@ -2977,6 +2977,7 @@ CREATE TABLE `users_users` (
   `default_group` varchar(255),
   `lastLogin` int(14) default NULL,
   `currentLogin` int(14) default NULL,
+  `lastActivity` int(14) default NULL,
   `registrationDate` int(14) default NULL,
   `pass_confirm` int(14) default NULL,
   `email_confirm` int(14) default NULL,

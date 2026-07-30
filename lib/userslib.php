@@ -2201,7 +2201,6 @@ class UsersLib extends TikiLib
                 $user
             ]
         );
-
         return true;
     }
 
