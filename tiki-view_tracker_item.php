@@ -718,7 +718,7 @@ createdByReal => string (20) "System Administrator"
 lastModifByReal => string (20) "System Administrator"
 */
 
-$schema = $tracker_info["schemaOrgMarkup"]; //the json data
+$schema = $tracker_info["schemaOrgMarkup"] ?? null; //the json data
 
 // the markup can contain placeholders values ({{trackerfieldPermName}}), to be replaced by value on render
 
