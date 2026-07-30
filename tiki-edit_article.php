@@ -830,7 +830,7 @@ $schemainfo['schemaOrgMarkup'] = $attributelib->get_attribute('article', $articl
 $headline = htmlentities($article_data['title'] ?? '');
 $description = htmlentities($article_data['subtitle'] ?? '');
 $image = isset($article_data['image_data']) ? urlencode(htmlentities($article_data['image_data'])) : '';
-$author =  htmlentities($article_data['authorName'] ?? '');
+$author = htmlentities($article_data['authorName'] ?? '');
 $publishDate = isset($article_data['publishDate']) ? date('d-m-Y', $article_data['publishDate']) : '';
 
 

@@ -896,7 +896,7 @@ import \'@vue-mf/schema-markup-builder\'');
 
 global $base_url;
 
-$url = $base_url . $info["pageSlug"];  
+$url = $base_url . $info["pageSlug"];
 $description = htmlentities($info["description"]);
 $website_title = htmlentities($prefs['sitetitle']);
 
