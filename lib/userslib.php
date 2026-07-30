@@ -2191,7 +2191,7 @@ class UsersLib extends TikiLib
      *
      * @param user: Username
      */
-    public function update_lastActivity($user)
+    public function updateLastActivity($user)
     {
         $query = 'update `users_users` set `lastActivity`=? where `login`=? and (`waiting` <> \'a\' OR `waiting` IS NULL)';
         $this->query(
