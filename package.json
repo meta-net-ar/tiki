@@ -128,17 +128,19 @@
         "devalue" : "5.8.1",
         "glob" : "10.5.0",
         "svelte" : "5.51.0",
-        "@vue/component-compiler-utils" : {
-            "postcss" : "8.5.16"
-        },
         "jspdf" : "4.2.1",
         "svgedit" : {
             "jspdf" : "4.2.1"
-        }
+        },
+        "postcss" : "8.5.25"
     },
     "overridesComment" : {
         "jspdf": [
             "npm audit flagged jspdf <= 4.2.0 (critical). Pin 4.2.1 so the root install and svgedit (nested 4.0.0) resolve to a patched release."
+        ],
+        "postcss": [
+            "vue3-sfc-loader -> @vue/component-compiler-utils still pulls PostCSS 7.0.x (npm audit range <=8.5.17: parsing/XSS/sourceMappingURL issues).",
+            "Force PostCSS 8.5.25 everywhere (already used by Vite). Remove when upstream stops depending on PostCSS 7."
         ],
         "dompurify": [
             "This override forces all packages to use DOMPurify v3.4.12 to fix security issues present in DOMPurify v2.x and patched releases in the v3 line.",
@@ -151,9 +153,6 @@
         ],
         "glob": [
             "copy-and-watch pins glob 10.3.12 (vulnerable CLI <=10.4.5). Override to 10.5.0; Tiki uses glob programmatically, not the CLI -c/--cmd flag."
-        ],
-        "postcss": [
-            "vue3-sfc-loader pulls @vue/component-compiler-utils with a nested vulnerable postcss. Scoped override to 8.5.16 (build-time SFC compilation only)."
         ],
         "svelte": [
             "Svelte is pinned to 5.51.0 (and devalue to 5.8.1) for @event-calendar/core 4.x compatibility: Svelte >= 5.51.1 breaks calendar interactions (https://github.com/vkurko/calendar/issues/623). devalue is overridden separately so we can take the npm audit fix without upgrading Svelte. Upgrade path: @event-calendar/core 5.4.1+ then remove both svelte and devalue overrides."
