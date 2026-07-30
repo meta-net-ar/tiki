@@ -23,7 +23,7 @@ const vueLifecycles = singleSpaVue({
     },
     handleInstance: (app) => {
         if (import.meta.env.MODE === "development") {
-            console.log(import.meta.env);
+            //console.log(import.meta.env);
         }
     },
 });
@@ -36,25 +36,8 @@ const cssLifecycle = singleSpaCss({
     ],
 });
 
-export const bootstrap = [
-    cssLifecycle.bootstrap,
-    vueLifecycles.bootstrap,
-    async function () {
-        console.log("Bootstrap complete for schema builder");
-    },
-];
-export const mount = [
-    cssLifecycle.mount,
-    vueLifecycles.mount,
-    async function () {
-        console.log("Mount complete for schema builder");
-    },
-];
-export const unmount = [
-    cssLifecycle.unmount,
-    vueLifecycles.unmount,
-    async function () {
-        console.log("Unmount complete for schema builder");
-    },
-];
+export const bootstrap = [cssLifecycle.bootstrap, vueLifecycles.bootstrap];
+export const mount = [cssLifecycle.mount, vueLifecycles.mount];
+export const unmount = [cssLifecycle.unmount, vueLifecycles.unmount];
+
 export const SchemaBuilder = App;
