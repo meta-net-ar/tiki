@@ -1066,7 +1066,6 @@ class Services_Tracker_Controller
             } else {
                 $validate = true;
             }
-
             $itemId = $this->utilities->insertItem(
                 $definition,
                 [
@@ -1075,6 +1074,7 @@ class Services_Tracker_Controller
                     'processedFields' => $processedFields,
                     'deletedFiles' => $deletedFiles,
                     'validate' => $validate,
+                    'notify_watchers' => $input->notify_watchers->word(),
                 ]
             );
 

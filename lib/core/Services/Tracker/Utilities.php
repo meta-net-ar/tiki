@@ -6,19 +6,42 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Services_Tracker_Utilities
 {
+    /**
+     * Create a new tracker item from normalized item data.
+     *
+     * Use this when a service/controller already has a tracker definition and
+     * needs to insert an item using status, raw fields, optional processed fields,
+     * validation flags, bulk-import flags, sync flags, and deleted file metadata.
+     *
+     * @param Tracker_Definition $definition Tracker definition containing field metadata and tracker configuration.
+     * @param array $item Item payload. Expected keys include status, fields, and optional processedFields, validate, bulk_import, skip_sync, deletedFiles.
+     *
+     * @return int|false The created tracker item ID, or false when validation or saving fails.
+     */
     public function insertItem($definition, $item)
     {
-        $newItem = $this->replaceItem($definition, 0, $item['status'], $item['fields'], $item['processedFields'] ?? [], [
+        return $this->replaceItem($definition, 0, $item['status'], $item['fields'], $item['processedFields'] ?? [], [
             'validate' => $item['validate'] ?? true,
             'skip_categories' => false,
             'bulk_import' => $item['bulk_import'] ?? false,
             'skip_sync' => $item['skip_sync'] ?? false,
-            'deleted_files' => $item['deletedFiles'] ?? []
+            'deleted_files' => $item['deletedFiles'] ?? [],
+            'notify_watchers' => $item['notify_watchers'] ?? null,
         ]);
-
-        return $newItem;
     }
 
+    /**
+     * Update an existing tracker item from normalized item data.
+     *
+     * Use this when saving edits to an existing item and you need the same
+     * replacement pipeline as insertItem(), including validation, bulk import,
+     * synchronization control, deleted files, and watcher notification options.
+     *
+     * @param Tracker_Definition $definition Tracker definition containing field metadata and tracker configuration.
+     * @param array $item Item payload. Expected keys include itemId, status, fields, and optional processedFields, validate, bulk_import, skip_sync, deletedFiles, notify_watchers.
+     *
+     * @return int|false The updated tracker item ID/result, or false when validation or saving fails.
+     */
     public function updateItem($definition, $item)
     {
         return $this->replaceItem($definition, $item['itemId'], $item['status'], $item['fields'], $item['processedFields'] ?? [], [
@@ -27,11 +50,22 @@ class Services_Tracker_Utilities
             'bulk_import' => $item['bulk_import'] ?? false,
             'skip_sync' => $item['skip_sync'] ?? false,
             'deleted_files' => $item['deletedFiles'] ?? [],
-            'notify_watchers' => $item['notify_watchers']
+            'notify_watchers' => $item['notify_watchers'] ?? null
         ]);
     }
 
-    public function resaveItem($itemId)
+    /**
+     * Re-save an existing tracker item without changing submitted field values.
+     *
+     * Use this to trigger tracker item save-side effects such as recalculation,
+     * reindexing, field handlers, or synchronization-safe refreshes while skipping
+     * validation, category processing, and external sync.
+     *
+     * @param $itemId Tracker item ID to re-save.
+     *
+     * @return void
+     */
+    public function resaveItem($itemId): void
     {
         $tracker = TikiLib::lib('trk')->get_item_info($itemId);
         if (! $tracker) {
@@ -49,6 +83,18 @@ class Services_Tracker_Utilities
         ]);
     }
 
+    /**
+     * Validate a tracker item field map against tracker field rules.
+     *
+     * Use this before saving tracker item data when you need user-readable
+     * validation messages for missing mandatory fields or invalid field values.
+     *
+     * @param Tracker_Definition $definition Tracker definition used for validation rules.
+     * @param array $item Item data containing itemId and fields.
+     * @param array $fields Optional initialized field data. When empty, fields are initialized from $item.
+     *
+     * @return array List of translated validation error messages. Empty array means valid.
+     */
     public function validateItem($definition, $item, $fields = [])
     {
         $trackerId = $definition->getConfiguration('trackerId');
@@ -77,10 +123,26 @@ class Services_Tracker_Utilities
                 $errors[] = tr('Invalid value in %0', $f['name']);
             }
         }
-
         return $errors;
     }
 
+    /**
+     * Insert or update a tracker item using Tiki's tracker library.
+     *
+     * Use this internal method as the common persistence pipeline for item creation,
+     * update, and re-save operations. It initializes field values, merges processed
+     * field metadata, optionally validates, optionally removes categorized fields,
+     * then delegates to trklib->replace_item().
+     *
+     * @param Tracker_Definition $definition Tracker definition containing fields and tracker configuration.
+     * @param int|string $itemId Existing item ID, or 0 to create a new item.
+     * @param string|null $status Tracker item status.
+     * @param array $fieldMap Submitted field values keyed by field ID, ins_FIELDID, or permanent name.
+     * @param array $processedFields Field data already processed by field handlers.
+     * @param array $options Save options: validate, skip_categories, bulk_import, skip_sync, deleted_files, notify_watchers.
+     *
+     * @return int|false Tracker item ID/result, or false on validation/save failure.
+     */
     private function replaceItem($definition, $itemId, $status, $fieldMap, $processedFields, array $options)
     {
         $trackerId = $definition->getConfiguration('trackerId');
@@ -108,19 +170,30 @@ class Services_Tracker_Utilities
                 unset($fields[$fieldId]);
             }
         }
-
         if (! $options['validate'] || count($errors) == 0) {
-            $newItem = $trklib->replace_item($trackerId, $itemId, ['data' => $fields], $status, 0, $options['bulk_import'], $options['skip_sync'], $options['deleted_files'] ?? [], $options['notify_watchers'] ?? null);
+            $newItem = $trklib->replace_item($trackerId, $itemId, ['data' => $fields], $status, 0, $options['bulk_import'], $options['skip_sync'], $options['deleted_files'], $options['notify_watchers']);
             return $newItem;
         }
 
         foreach ($errors as $err) {
             Feedback::error($err);
         }
-
         return false;
     }
 
+    /**
+     * Convert a submitted field map into the full tracker field data structure.
+     *
+     * Use this before validation or saving to normalize user input into the format
+     * expected by trklib. It supports field IDs, legacy ins_FIELDID keys, and
+     * permanent field names, then fills missing fields with existing item values.
+     *
+     * @param Tracker_Definition $definition Tracker definition used to resolve fields.
+     * @param int|string $itemId Existing item ID, or 0 for a new item.
+     * @param array $fieldMap Submitted field values.
+     *
+     * @return array Field data keyed by field ID.
+     */
     private function initializeItemFields($definition, $itemId, $fieldMap)
     {
         $fields = [];
@@ -156,10 +229,19 @@ class Services_Tracker_Utilities
                 $fields[$fieldId] = $field;
             }
         }
-
         return $fields;
     }
 
+    /**
+     * Create a new tracker field.
+     *
+     * Use this when adding a field to an existing tracker from service code.
+     * If it is the first field in the tracker, it is automatically configured
+     * as main, visible in tables, and mandatory by default.
+     *
+     * @param array $data Field definition data including trackerId, name, type, description, permName, and optional field properties.
+     *
+     */
     public function createField(array $data)
     {
         $definition = Tracker_Definition::get($data['trackerId']);
@@ -201,6 +283,19 @@ class Services_Tracker_Utilities
         );
     }
 
+    /**
+     * Update an existing tracker field or import a field with a preserved ID.
+     *
+     * Use this to modify tracker field metadata while keeping unspecified
+     * properties from the current field definition. It also supports importing
+     * fields where the field ID may not yet exist locally.
+     *
+     * @param int|string $trackerId Tracker ID containing the field.
+     * @param int|string $fieldId Field ID to update, or 0 when creating/importing a new field.
+     * @param array $properties Field properties to override.
+     *
+     * @return void
+     */
     public function updateField($trackerId, $fieldId, array $properties)
     {
         $definition = Tracker_Definition::get($trackerId);
@@ -252,12 +347,18 @@ class Services_Tracker_Utilities
     }
 
     /**
-     * @param array $conditions     e.g. array('trackerId' => 42)
-     * @param int $maxRecords       default -1 (all)
-     * @param int $offset           default -1
-     * @param array $fields         array of fields to fetch (by permNames)
+     * Fetch tracker items matching conditions and return selected fields by permanent name.
      *
-     * @return mixed
+     * Use this for service-level list/export operations where item IDs, status,
+     * and a normalized fields array are needed. Supports status filtering,
+     * item ID filtering, modified-since filtering, pagination, and selected fields.
+     *
+     * @param array $conditions Query conditions. Must include trackerId. Optional: status, modifiedSince, itemId.
+     * @param int $maxRecords Maximum records to fetch. -1 means all.
+     * @param int $offset Offset for pagination.
+     * @param array $fields Optional list of field permanent names to include.
+     *
+     * @return array List of items with itemId, status, and fields.
      */
     public function getItems(array $conditions, $maxRecords = -1, $offset = -1, $fields = [])
     {
@@ -296,6 +397,17 @@ class Services_Tracker_Utilities
         return $items;
     }
 
+    /**
+     * Fetch a single tracker item by tracker ID and item ID.
+     *
+     * Use this when a complete normalized item structure is needed for an
+     * existing tracker item, including its field values keyed by permanent name.
+     *
+     * @param int $trackerId Tracker ID.
+     * @param int $itemId Tracker item ID.
+     *
+     * @return array|false Item data, or false when not found.
+     */
     public function getItem($trackerId, $itemId)
     {
         $items = $this->getItems(
@@ -311,6 +423,17 @@ class Services_Tracker_Utilities
         return $item;
     }
 
+    /**
+     * Build the display title for a tracker item from its main fields.
+     *
+     * Use this when a tracker item needs a human-readable label based on the
+     * fields marked as main in the tracker definition.
+     *
+     * @param Tracker_Definition $definition Tracker definition.
+     * @param array $item Item data containing fields keyed by permanent name.
+     *
+     * @return string Concatenated title parts.
+     */
     public function getTitle($definition, $item)
     {
         $parts = [];
@@ -325,6 +448,17 @@ class Services_Tracker_Utilities
         return implode(' ', $parts);
     }
 
+    /**
+     * Process raw tracker field values into rendered/normalized values.
+     *
+     * Use this when item values should be converted through each field handler,
+     * for example before display, export, or downstream service usage.
+     *
+     * @param Tracker_Definition $definition Tracker definition.
+     * @param array $item Item data containing fields keyed by permanent name.
+     *
+     * @return array Item data with processed field values.
+     */
     public function processValues($definition, $item)
     {
         $trklib = TikiLib::lib('trk');
@@ -343,6 +477,17 @@ class Services_Tracker_Utilities
         return $item;
     }
 
+    /**
+     * Fetch field values for one tracker item using a field ID to a permanent-name map.
+     *
+     * Use this internal helper when building compact item payloads where only
+     * selected fields are needed and values should come from tracker field handlers.
+     *
+     * @param int|string $itemId Tracker item ID.
+     * @param array $keyMap Map of fieldId => permanent name.
+     *
+     * @return array Field values keyed by permanent name.
+     */
     private function getItemFields($itemId, $keyMap)
     {
         $trklib = TikiLib::lib('trk');
@@ -359,6 +504,16 @@ class Services_Tracker_Utilities
         return $out;
     }
 
+    /**
+     * Create a new tracker.
+     *
+     * Use this when service code needs to create a tracker shell with name,
+     * description, and description parsing configuration.
+     *
+     * @param array $data Tracker data including name, description, and descriptionIsParsed.
+     *
+     * @return int|mixed New tracker ID or library result.
+     */
     public function createTracker($data)
     {
         $trklib = TikiLib::lib('trk');
@@ -371,6 +526,17 @@ class Services_Tracker_Utilities
         );
     }
 
+    /**
+     * Update tracker metadata and options.
+     *
+     * Use this when changing a tracker's name, description, parsed-description
+     * flag, or other tracker option values.
+     *
+     * @param int $trackerId Tracker ID to update.
+     * @param array $data Tracker data including name, description, descriptionIsParsed, plus option values.
+     *
+     * @return mixed Result returned by trklib->replace_tracker().
+     */
     public function updateTracker($trackerId, $data)
     {
         $trklib = TikiLib::lib('trk');
@@ -385,6 +551,16 @@ class Services_Tracker_Utilities
         return $trklib->replace_tracker($trackerId, $name, $description, $data, $descriptionIsParsed);
     }
 
+    /**
+     * Delete all items from a tracker and reset import-sync metadata when present.
+     *
+     * Use this for tracker clearing operations where the tracker definition remains,
+     * but all contained items should be removed.
+     *
+     * @param int $trackerId Tracker ID to clear.
+     *
+     * @return int Number of successfully removed items.
+     */
     public function clearTracker($trackerId)
     {
         $table = TikiDb::get()->table('tiki_tracker_items');
@@ -410,10 +586,24 @@ class Services_Tracker_Utilities
         return $success;
     }
 
+    /**
+     * Import one tracker field from filtered input.
+     *
+     * Use this during tracker structure imports to create or update a field,
+     * optionally preserving the original field ID and position. Required field
+     * type preferences are enabled automatically when needed.
+     *
+     * @param int $trackerId Destination tracker ID.
+     * @param JitFilter $field Filtered imported field data.
+     * @param bool $preserve Whether to preserve the imported field ID.
+     * @param int $lastposition Whether to append to the end when set to 1.
+     *
+     * @return void
+     */
     public function importField($trackerId, $field, $preserve, $lastposition = 0)
     {
         if ($lastposition == 1 || ! $field->position->int()) {
-            // No position parameter was provided or user requested that new fields are added to the bottom
+            // No position parameter was provided, or user requested that new fields are added to the bottom
             $trklib = TikiLib::lib('trk');
             $position = $trklib->get_last_position($trackerId) + 10;
         } else {
@@ -480,6 +670,16 @@ class Services_Tracker_Utilities
         $this->updateField($trackerId, $fieldId, $data);
     }
 
+    /**
+     * Export a tracker field definition as INI-style text.
+     *
+     * Use this when serializing tracker field configuration for structure export
+     * or migration tooling.
+     *
+     * @param array $field Tracker field data.
+     *
+     * @return string INI-style exported field definition.
+     */
     public function exportField($field)
     {
         return <<<EXPORT
@@ -510,6 +710,17 @@ isMultilingual = {$field['isMultilingual']}
 EXPORT;
     }
 
+    /**
+     * Serialize field option input according to a tracker field type definition.
+     *
+     * Use this when converting option form input into the compact serialized
+     * string stored on tracker field definitions.
+     *
+     * @param array|JitFilter $input Option input values.
+     * @param string|array $typeInfo Field type code or field type metadata.
+     *
+     * @return string Serialized tracker options.
+     */
     public function buildOptions($input, $typeInfo)
     {
         if (is_string($typeInfo)) {
@@ -525,6 +736,16 @@ EXPORT;
         return $options->serialize();
     }
 
+    /**
+     * Parse serialized tracker field options into structured parameters.
+     *
+     * Use this when displaying or editing stored tracker field options.
+     *
+     * @param string $raw      Serialized option string.
+     * @param array  $typeInfo Field type metadata.
+     *
+     * @return array Parsed option parameters.
+     */
     public function parseOptions($raw, $typeInfo)
     {
         $options = Tracker_Options::fromSerialized($raw, $typeInfo);
@@ -532,7 +753,15 @@ EXPORT;
         return $options->getAllParameters();
     }
 
-    public function getFieldTypesDisabled()
+    /**
+     * List tracker field types whose required preferences are disabled.
+     *
+     * Use this to show unavailable field types or warnings during tracker
+     * administration/import.
+     *
+     * @return array Disabled field types keyed by type code.
+     */
+    public function getFieldTypesDisabled(): array
     {
         $completeList = Tracker_Field_Factory::getFieldTypes();
 
@@ -547,7 +776,17 @@ EXPORT;
         return $list;
     }
 
-    public function getFieldTypes($filter = [])
+    /**
+     * List enabled tracker field types, optionally filtered by type code.
+     *
+     * Use this to populate field type selectors with only field types whose
+     * required preferences are active.
+     *
+     * @param array $filter Optional list of field type codes to include.
+     *
+     * @return array Enabled field types keyed by type code.
+     */
+    public function getFieldTypes($filter = []): array
     {
         $completeList = Tracker_Field_Factory::getFieldTypes();
 
@@ -566,7 +805,17 @@ EXPORT;
         return $list;
     }
 
-    private function isEnabled($info)
+    /**
+     * Check whether all preferences required by a field type are enabled.
+     *
+     * Use this internal helper to decide whether a tracker field type can be
+     * created or selected in the current site configuration.
+     *
+     * @param array $info Field type metadata containing a prefs list.
+     *
+     * @return bool True when all required preferences are enabled.
+     */
+    private function isEnabled($info): bool
     {
         global $prefs;
 
@@ -575,11 +824,22 @@ EXPORT;
                 return false;
             }
         }
-
         return true;
     }
 
-    public function getFieldsFromIds($definition, $fieldIds)
+    /**
+     * Resolve multiple tracker field IDs to field definitions.
+     *
+     * Use this when an operation receives field IDs and needs validated field
+     * metadata before continuing.
+     *
+     * @param Tracker_Definition $definition Tracker definition.
+     * @param array $fieldIds   Field IDs to resolve.
+     *
+     * @return array Field definitions.
+     * @throws Services_Exception When any field does not exist.
+     */
+    public function getFieldsFromIds($definition, $fieldIds): array
     {
         $fields = [];
         foreach ($fieldIds as $fieldId) {
@@ -595,13 +855,37 @@ EXPORT;
         return $fields;
     }
 
+    /**
+     * Remove a tracker item.
+     *
+     * Use this for deleting one tracker item through the tracker library while
+     * enabling the library's cleanup behavior.
+     *
+     * @param int $itemId Tracker item ID.
+     *
+     * @return mixed Result returned by trklib->remove_tracker_item().
+     */
     public function removeItem($itemId)
     {
         $trklib = TikiLib::lib('trk');
         return $trklib->remove_tracker_item($itemId, true);
     }
 
-    public function removeItemAndReferences($definition, $itemObject, $uncascaded, $replacement)
+    /**
+     * Remove a tracker item and update references that point to it.
+     *
+     * Use this when deleting an item that may be referenced by other tracker
+     * items. Field handlers get a chance to handle deletion before references
+     * are replaced and the item is removed inside a transaction.
+     *
+     * @param Tracker_Definition $definition  Tracker definition for the item being removed.
+     * @param Tracker_Item $itemObject  Item object to remove.
+     * @param array $uncascaded  Reference metadata containing itemIds and fieldIds.
+     * @param mixed $replacement Replacement value for references.
+     *
+     * @return void
+     */
+    public function removeItemAndReferences($definition, $itemObject, $uncascaded, $replacement): void
     {
         $tx = TikiDb::get()->begin();
 
@@ -620,12 +904,35 @@ EXPORT;
         $tx->commit();
     }
 
-    public function removeTracker($trackerId)
+    /**
+     * Remove an entire tracker.
+     *
+     * Use this for tracker deletion operations where the tracker itself and its
+     * associated configuration/items should be removed by the tracker library.
+     *
+     * @param int $trackerId Tracker ID to remove.
+     *
+     * @return void
+     */
+    public function removeTracker($trackerId): void
     {
         $trklib = TikiLib::lib('trk');
         $trklib->remove_tracker($trackerId);
     }
 
+    /**
+     * Duplicate a tracker, optionally copying categories and object permissions.
+     *
+     * Use this when creating a new tracker based on an existing tracker structure,
+     * with optional category assignment and permission cloning.
+     *
+     * @param int $trackerId Source tracker ID.
+     * @param string $name Name for the duplicated tracker.
+     * @param int|bool $duplicateCategories Whether to copy tracker categories.
+     * @param int|bool $duplicatePermissions Whether to copy tracker object permissions.
+     *
+     * @return int New tracker ID.
+     */
     public function duplicateTracker($trackerId, $name, $duplicateCategories, $duplicatePermissions)
     {
         $trklib = TikiLib::lib('trk');
@@ -649,12 +956,18 @@ EXPORT;
     }
 
     /**
-     * @param Tracker_Definition $definition
-     * @param array $itemData
-     * @param int $itemId
-     * @param boolean $strict
+     * Clone a tracker item and optionally cascade cloning to configured child items.
      *
-     * @return Tracker_Item|bool Return the new tracker item of false in case of failure
+     * Use this when duplicating one tracker item while allowing field handlers to
+     * transform cloned values and cascading duplication to child items whose item
+     * link field allows duplicateCascade.
+     *
+     * @param Tracker_Definition $definition Tracker definition of the source item.
+     * @param array $itemData Source item data prepared for insertion.
+     * @param int $itemId Source item ID.
+     * @param bool $strict Whether field handlers should clone in strict mode.
+     *
+     * @return Tracker_Item|bool return new tracker item object, or false when cloning fails.
      * @throws Exception
      */
     public function cloneItem($definition, $itemData, $itemId, $strict = false)
@@ -727,6 +1040,17 @@ EXPORT;
         return false;
     }
 
+    /**
+     * Convert an amount from a supplied currency to the default currency.
+     *
+     * Use this as a calculation helper when tracker data stores an amount,
+     * currency, and date and needs normalization to the configured default
+     * currency based on exchange rates.
+     *
+     * @param array $data Conversion data with amount, currency, and date.
+     *
+     * @return float|int Converted amount in the default currency.
+     */
     public static function convertToDefaultCurrency($data)
     {
         $trk = TikiLib::lib('trk');
@@ -757,6 +1081,17 @@ EXPORT;
         return $separator !== '' ? $separator : ',';
     }
 
+    /**
+     * Convert an uploaded TSV file into a temporary CSV file.
+     *
+     * Use this before CSV import handling when the uploaded source file is
+     * tab-separated. The method preserves empty trailing fields and escapes
+     * CSV-sensitive values.
+     *
+     * @param string $filename Key in the $_FILES array.
+     *
+     * @return void
+     */
     public static function parseTsvContentToCsv($filename)
     {
         $fileContent = file_get_contents($_FILES[$filename]['tmp_name']);
