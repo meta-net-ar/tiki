@@ -264,7 +264,7 @@ export default function tikiToastEditor(options) {
     }
     // open modal box dialog box
     function openLinkDialogBox(id, type_link, label_title, label_text, inputDomId, syntax_text, page) {
-        window.registerApplication({
+        window.registerSingleSpaApp({
             name: id,
             app: () => importShim("@vue-mf/toolbar-dialogs"),
             activeWhen: (location) => {
@@ -284,10 +284,6 @@ export default function tikiToastEditor(options) {
                 },
                 syntax: syntax_text,
             },
-        });
-
-        onDOMElementRemoved(`"${id}"`, function () {
-            window.unregisterApplication(`"${id}"`);
         });
     }
 

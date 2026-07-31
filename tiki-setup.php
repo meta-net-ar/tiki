@@ -581,6 +581,12 @@ if (isset($prefs['fgal_elfinder_feature']) && $prefs['fgal_elfinder_feature'] ==
     //Loading CSS hasn't been moved yet, as there are css load order issues if we blindly move it there.  benoitg - 2023-04-20
     $headerlib->add_cssfile('vendor_bundled/vendor/studio-42/elfinder/css/elfinder.min.css')->add_cssfile('vendor_bundled/vendor/studio-42/elfinder/css/theme.css');
 }
+/**
+ * The single-spa-register.js file provides a shared helper for registering single-spa microfrontend applications in Tiki.
+ * It centralizes the registration logic for single-spa apps and ensures that each application is registered only once,
+ * preventing duplicate registration errors when JavaScript assets are loaded multiple times or when multiple modules attempt to register the same microfrontend.
+ */
+$headerlib->add_jsfile(JS_ASSETS_PATH . '/single-spa-register.js');
 
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-jquery.js');
 

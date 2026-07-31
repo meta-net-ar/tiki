@@ -137,7 +137,7 @@ class ToolbarPicker extends ToolbarDialog
 
             if (! $this->isWysiwyg) {
                 TikiLib::lib('header')->add_jq_onready('
-                window.registerApplication({
+                window.registerSingleSpaApp({
                     name: ' . json_encode($this->singleSpaAppName) . ',
                     app: () => importShim("@vue-mf/emoji-picker"),
                     activeWhen: (location) => {
@@ -152,9 +152,6 @@ class ToolbarPicker extends ToolbarDialog
                             emoji: "sunglasses"
                         }
                     },
-                })
-                onDOMElementRemoved(' . json_encode($this->singleSpaDomId) . ', function () {
-                    window.unregisterApplication(' . json_encode($this->singleSpaAppName) . ');
                 });');
             }
         } elseif (! $pickerAdded && $this->name === 'specialchar') {
@@ -177,7 +174,7 @@ class ToolbarPicker extends ToolbarDialog
         return '
         this.append("' . $picker . '");
         this.find("button").addClass("dropdown-toggle"); // this class is added so that the button is treated as a dropdown by summernote
-    window.registerApplication({
+    window.registerSingleSpaApp({
         name: ' . json_encode($this->singleSpaAppName) . ',
         app: () => importShim("@vue-mf/emoji-picker"),
         activeWhen: (location) => {
