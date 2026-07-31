@@ -80,7 +80,12 @@ class File extends DAV\File
 
     public function delete()
     {
-        Utilities::checkDeleteFilePermission($this->file->galleryDefinition());
+        $fileInfo = [
+            'fileId' => $this->file->fileId,
+            'galleryId' => $this->file->galleryId,
+            'user' => $this->file->user,
+        ];
+        Utilities::checkDeleteFilePermission($this->file->galleryDefinition(), $fileInfo);
 
         $this->file->delete();
     }
