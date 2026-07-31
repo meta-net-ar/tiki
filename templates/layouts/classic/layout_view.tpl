@@ -39,11 +39,11 @@
     <div class="middle_outer" id="middle_outer" >
         {block name=module_header}{/block}
         <div class="topbar-wrapper navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-topbar-nav-{$navbar_color_variant}">
-            <div class="topbar container{if $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-topbar-nav-{$navbar_color_variant}" id="topbar">
+            <div class="topbar container{if $smarty.session.fullscreen|isset && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-topbar-nav-{$navbar_color_variant}" id="topbar">
                 {modulelist zone=topbar class="topbar_modules w-100 navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-topbar-nav-{$navbar_color_variant}" heading_text='{tr}Navigation and related functionality and content{/tr}'}
             </div>
         </div>
-        <div class="container{if $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std middle" id="middle">
+        <div class="container{if $smarty.session.fullscreen|isset && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std middle" id="middle">
             <div class="page-content-top-margin"  style="height: var(--tiki-page-content-top-margin)"></div>
             <div class="row row-middle" id="row-middle">
                 {if (zone_is_empty('left') or $prefs.feature_left_column eq 'n') and (zone_is_empty('right') or $prefs.feature_right_column eq 'n')}
@@ -204,17 +204,18 @@
         </div> {* container middle *}
     </div> {* middle_outer - was missing *}
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
-    {if $prefs.feature_layoutshadows eq 'y'}
-    <div id="footer-shadow">{eval var=$prefs.footer_shadow_start}{/if}
+        {if $prefs.feature_layoutshadows eq 'y'}
+            <div id="footer-shadow">{eval var=$prefs.footer_shadow_start}
+        {/if}
         <footer class="footer main-footer mt-auto" id="footer">
             <div class="footer_liner">
-                <div class="container{if $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std">
+                <div class="container{if $smarty.session.fullscreen|isset && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std"> {* The if on this line is unreachable code.  We are in a larger block that won't execute if fullscreen if off.  I do not know what the intent is - benoitg - 2026-07-31 *}
                     {modulelist zone=bottom class='bottom_modules p-3 mx-n2point5' heading_text='{tr}Site information, links, etc.{/tr}' role=contentinfo}
                 </div>
             </div>
         </footer>
         {if $prefs.feature_layoutshadows eq 'y'}{eval var=$prefs.footer_shadow_end}</div>{/if}
-{/if}
+    {/if}
 
     {if $prefs.feature_layoutshadows eq 'y'}{eval var=$prefs.main_shadow_end}</div>{/if}
 
