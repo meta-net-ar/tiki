@@ -27,7 +27,7 @@ class HtmlBodyAttributes extends Base
         $smarty = \TikiLib::lib('smarty');
         $back = '';
         $onload = '';
-        $class = 'tiki ' . 'd-flex ' . 'flex-column ' . 'min-vh-100 ' . 'm-0 ' . ' ' . $params['class'] ?? '';
+        $class = 'tiki ' . 'd-flex ' . 'flex-column ' . 'min-vh-100 ' . 'm-0 ' . ' ' . ($params['class'] ?? '');
 
         //filename of script called (i.e. tiki-index, tiki-user_information, tiki-view_forum, etc), then sanitize chars
         $script_filename = pathinfo($_SERVER['SCRIPT_NAME'], PATHINFO_FILENAME);
