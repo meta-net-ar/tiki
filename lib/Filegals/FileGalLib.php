@@ -1064,6 +1064,10 @@ class FileGalLib extends TikiLib
 
     public function change_file_handler($mime_type, $cmd)
     {
+        if (! $this->isSafeHandlerCommand($cmd)) {
+            return false;
+        }
+
         $handlers = $this->table('tiki_file_handlers');
 
         $mime_type = trim($mime_type);
@@ -1103,38 +1107,72 @@ class FileGalLib extends TikiLib
         }
     }
 
+    /**
+     * Built-in MIME → candidate handler command templates.
+     * Partially duplicated in tiki-check.php for standalone mode checks.
+     */
+    private function getHandlerCommandPossibilities()
+    {
+        return [
+            'application/ms-excel' => ['xls2csv %1'],
+            'application/msexcel' => ['xls2csv %1'],
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => ['xlsx2csv.py %1'],
+            'application/ms-powerpoint' => ['catppt %1'],
+            'application/mspowerpoint' => ['catppt %1'],
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation' => ['pptx2txt.pl %1 -'],
+            'application/msword' => ['catdoc %1', 'strings %1'],
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => ['docx2txt.pl %1 -'],
+            'application/pdf' => ['pstotext %1', 'pdftotext %1 -'],
+            'application/postscript' => ['pstotext %1'],
+            'application/ps' => ['pstotext %1'],
+            'application/rtf' => ['catdoc %1'],
+            'application/sgml' => ['col -b %1', 'strings %1'],
+            'application/vnd.ms-excel' => ['xls2csv %1'],
+            'application/vnd.ms-powerpoint' => ['catppt %1'],
+            'application/x-msexcel' => ['xls2csv %1'],
+            'application/x-pdf' => ['pstotext %1', 'pdftotext %1 -'],
+            'application/x-troff-man' => ['man -l %1'],
+            'application/zip' => ['unzip -l %1'],
+            'text/enriched' => ['col -b %1', 'strings %1'],
+            'text/html' => ['elinks -dump -no-home %1'],
+            'text/richtext' => ['col -b %1', 'strings %1'],
+            'text/sgml' => ['col -b %1', 'strings %1'],
+            'text/tab-separated-values' => ['col -b %1', 'strings %1'],
+        ];
+    }
+
+    /**
+     * Binary basenames allowed in file-handler command templates.
+     * Derived from the built-in possibilities list.
+     */
+    private function getAllowedHandlerBinaries()
+    {
+        static $allowed;
+
+        if ($allowed !== null) {
+            return $allowed;
+        }
+
+        $allowed = [];
+        foreach ($this->getHandlerCommandPossibilities() as $options) {
+            foreach ($options as $opt) {
+                $optArray = explode(' ', $opt, 2);
+                $exec = reset($optArray);
+                if ($exec !== false && $exec !== '') {
+                    $allowed[$exec] = true;
+                }
+            }
+        }
+
+        return $allowed;
+    }
+
     public function get_file_handlers($for_execution = false)
     {
         $cachelib = TikiLib::lib('cache');
 
         if ($for_execution && ! $default = $cachelib->getSerialized('file_handlers')) {
-            // n.b. this array is partially duplicated in tiki-check.php for standalone mode checks
-            $possibilities = [
-                'application/ms-excel' => ['xls2csv %1'],
-                'application/msexcel' => ['xls2csv %1'],
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' => ['xlsx2csv.py %1'],
-                'application/ms-powerpoint' => ['catppt %1'],
-                'application/mspowerpoint' => ['catppt %1'],
-                'application/vnd.openxmlformats-officedocument.presentationml.presentation' => ['pptx2txt.pl %1 -'],
-                'application/msword' => ['catdoc %1', 'strings %1'],
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => ['docx2txt.pl %1 -'],
-                'application/pdf' => ['pstotext %1', 'pdftotext %1 -'],
-                'application/postscript' => ['pstotext %1'],
-                'application/ps' => ['pstotext %1'],
-                'application/rtf' => ['catdoc %1'],
-                'application/sgml' => ['col -b %1', 'strings %1'],
-                'application/vnd.ms-excel' => ['xls2csv %1'],
-                'application/vnd.ms-powerpoint' => ['catppt %1'],
-                'application/x-msexcel' => ['xls2csv %1'],
-                'application/x-pdf' => ['pstotext %1', 'pdftotext %1 -'],
-                'application/x-troff-man' => ['man -l %1'],
-                'application/zip' => ['unzip -l %1'],
-                'text/enriched' => ['col -b %1', 'strings %1'],
-                'text/html' => ['elinks -dump -no-home %1'],
-                'text/richtext' => ['col -b %1', 'strings %1'],
-                'text/sgml' => ['col -b %1', 'strings %1'],
-                'text/tab-separated-values' => ['col -b %1', 'strings %1'],
-            ];
+            $possibilities = $this->getHandlerCommandPossibilities();
 
             $default = [];
             $executables = [];
@@ -1233,6 +1271,10 @@ class FileGalLib extends TikiLib
         }
 
         return function (FileWrapper $wrapper) use ($command) {
+            if (! $this->isSafeHandlerCommand($command)) {
+                return false;
+            }
+
             $tmpfname = $wrapper->getReadableFile();
 
             $cmd = str_replace('%1', escapeshellarg($tmpfname), $command);
@@ -1247,6 +1289,60 @@ class FileGalLib extends TikiLib
 
             return false;
         };
+    }
+
+    /**
+     * Ensure a handler template is safe to pass to popen()/`/bin/sh -c`.
+     *
+     * The binary (first token, basename) must be one of the built-in
+     * extractors from getHandlerCommandPossibilities(). Absolute paths are
+     * allowed (including Windows paths with '\' and drive letters) as long as
+     * the basename matches. Shell metacharacters are rejected so DB-stored
+     * overrides cannot inject extra commands. The %1 file path is still
+     * escaped separately via escapeshellarg().
+     */
+    private function isSafeHandlerCommand($command)
+    {
+        $command = trim($command);
+        if ($command === '') {
+            return false;
+        }
+
+        // Deny shell control characters; allow '\' and ':' for Windows paths,
+        // and '=' / '~' for common tool flags and home-relative paths.
+        if (preg_match('/[;|&$`<>()\'"!\r\n]/', $command)) {
+            return false;
+        }
+
+        return $this->isAllowedHandlerBinary($this->getHandlerCommandBinary($command));
+    }
+
+    private function getHandlerCommandBinary($command)
+    {
+        $parts = preg_split('/\s+/', trim($command), 2);
+        $binary = $parts[0] ?? '';
+
+        return basename(str_replace('\\', '/', $binary));
+    }
+
+    private function isAllowedHandlerBinary($basename)
+    {
+        if ($basename === '') {
+            return false;
+        }
+
+        $allowed = $this->getAllowedHandlerBinaries();
+        if (isset($allowed[$basename])) {
+            return true;
+        }
+
+        // Windows executables: pdftotext.exe → pdftotext
+        if (preg_match('/\.(exe|bat|cmd)$/i', $basename)) {
+            $withoutExt = preg_replace('/\.(exe|bat|cmd)$/i', '', $basename);
+            return isset($allowed[$withoutExt]);
+        }
+
+        return false;
     }
 
     public function get_search_text_for_data($file)
