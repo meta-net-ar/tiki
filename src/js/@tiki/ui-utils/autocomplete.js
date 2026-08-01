@@ -48,7 +48,6 @@ export function getAutocompleteResources(type, options = {}) {
     let remoteSourceUrl = "";
     let sourceList = [];
     let valueKey = null;
-    let focus = false;
 
     const urlParams = new URLSearchParams(window.location.search);
     const excludepage = urlParams.get("page");
