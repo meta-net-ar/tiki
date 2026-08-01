@@ -1,8 +1,8 @@
 import { applyAutocomplete } from "@vue-widgets/el-autocomplete";
 
 export default function autocomplete(element, resourceType, options = {}) {
-    const { url, sourceList, valueKey, focus } = getAutocompleteResources(resourceType, options);
-    const autoCompleteArgs = [element, url, sourceList, valueKey, focus];
+    const { url, sourceList, valueKey } = getAutocompleteResources(resourceType, options);
+    const autoCompleteArgs = [element, url, sourceList, valueKey];
 
     if (resourceType == "pagename" && ($(element).attr("name") == "highlight" || /^search_mod_input_\d|highlight$/.test($(element).attr("id")))) {
         const selectCb = (event) => {
@@ -34,6 +34,8 @@ export default function autocomplete(element, resourceType, options = {}) {
     if (options.onEnter) {
         handlePressEnter(component, options.onEnter);
     }
+
+    return component;
 }
 
 const handlePressEnter = (component, callback) => {
@@ -102,11 +104,8 @@ export function getAutocompleteResources(type, options = {}) {
             sourceList = options.source.map((value) => ({ value }));
             break;
     }
-    if (options.focus) {
-        focus = true;
-    }
 
     const url = remoteSourceUrl ? window.location.origin + (window.tikiroot || "/") + remoteSourceUrl : null;
 
-    return { url, sourceList, valueKey, focus };
+    return { url, sourceList, valueKey };
 }

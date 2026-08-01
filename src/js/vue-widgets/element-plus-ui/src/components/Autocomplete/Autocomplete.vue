@@ -24,6 +24,9 @@ watch(
 );
 
 props._expose({
+    focus: () => {
+        autocompleteRef.value?.focus();
+    },
     value: modelValue,
     setValue,
 });
@@ -63,10 +66,6 @@ const handlePressEnter = () => {
 onMounted(() => {
     if (!props.remoteSourceUrl && !props.sourceList) {
         console.error(TEXT.ERROR_NO_REQUIRED_PROPS);
-    }
-    if (props.focus) {
-        debugger;
-        autocompleteRef.value?.inputRef?.focus();
     }
 })
 
