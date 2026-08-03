@@ -25460,5 +25460,9 @@ $lang_current = array(
 "Admin Icons Dashboard" => "Tableau de bord des icônes d'administration",
 "Select user to switch to" => "Sélectionner l'utilisateur vers lequel basculer",
 "List Models" => "Liste des Modèles",
+"List Shared URLs" => "Liste des URL partagées",
+"Machine Learning" => "Apprentissage automatique",
+"Offline mode" => "Mode hors ligne",
+"Wiki configs" => "Configurations Wiki",
 );
 $lang = array_replace($lang, $lang_current);
