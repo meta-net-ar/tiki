@@ -30,7 +30,7 @@
  */
 define('HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE', -1);
 
-use Tiki\Lib\Trackers\TrackerConfigHistory;
+use Tiki\Tracker\TrackerConfigHistory;
 
 /**
  * TrackerLib Class

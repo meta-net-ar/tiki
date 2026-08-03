@@ -1,6 +1,6 @@
 <?php
 
-namespace Tiki\Lib\Trackers;
+namespace Tiki\Tracker;
 
 use TikiDb;
 use TikiLib;
