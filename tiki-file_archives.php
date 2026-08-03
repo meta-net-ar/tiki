@@ -40,7 +40,7 @@ if (! empty($_REQUEST['remove'])) {
         $smarty->display('error.tpl');
         die;
     }
-    if (! ($tiki_p_admin_file_galleries == 'y' || ($user && ($user == $gal_info['user'] || $user == $removeInfo['user'])))) {
+    if (! $filegallib->userCanRemoveFile($removeInfo)) {
         $smarty->assign('errortype', 401);
         $smarty->assign('msg', tra("You do not have permission to remove files from this gallery"));
         $smarty->display("error.tpl");
@@ -57,6 +57,10 @@ if (isset($_REQUEST['fgal_actions'])) {
                 $smarty->assign('msg', tra("Incorrect param"));
                 $smarty->display('error.tpl');
                 die;
+            }
+
+            if (! $filegallib->userCanRemoveFile($removeInfo)) {
+                continue;
             }
             $filegallib->remove_file($removeInfo, $gal_info);
         }
