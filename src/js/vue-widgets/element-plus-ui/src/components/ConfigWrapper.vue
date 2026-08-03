@@ -9,6 +9,10 @@ const props = defineProps({
     },
     minuteStep: Number,
     enforceStep: Number,
+    id : {
+        type: String,
+        default: null
+    }
 });
 
 const locale = shallowRef(null);

@@ -298,21 +298,89 @@ export default function tikiToastEditor(options) {
             el: document.querySelector("#" + editorDomId),
             events: {
                 change: function () {
-                    // update the hidden input with the markdown content
+                    // update the hidden input with the Markdown content
                     document.querySelector("#" + inputDomId).value = thisEditor.getMarkdown();
                     execAutoSave();
                 },
                 load: function (editor) {
                     let md = editor.getMarkdown();
-                    // maybe some more init here?
-                    $("#editwiki_editor").resizable();
+
+                    $("#" + editorDomId).resizable();
                 },
                 keyup: function (editorType, ev) {
                     if (ev.key === "(") {
                         const popup = document.createElement("ul");
-                        // ...
-
                         thisEditor.addWidget(popup, "top");
+                    }
+
+                    // add support for Tiki mentions
+                    if (ev.key === "@") {
+                        /**
+                         * While used getSelection() method in WYSIWYG mode, it returns an array [startCursorOffset, endCursorOffset]
+                         * and in Markdown mode, an array [[startLineOffset, startCursorOffset], [endLineOffset, endCursorOffset]].
+                         * so we need to adjust the start position accordingly because the position of the cursor is after the '@' symbol,
+                         * then we need to move back the cursor position by 2 to get the correct position before the '@' symbol.
+                         */
+                        let selection = thisEditor.getSelection();
+
+                        /**
+                         * Normalize selection for both modes into a common structure
+                         * WYSIWYG: [startOffset, endOffset]
+                         * Markdown: [[lineStart, colStart], [lineEnd, colEnd]]
+                         */
+                        function normalizeSelection(select, isWysiwyg) {
+                            if (isWysiwyg) {
+                                const [startOffset, endOffset] = selection;
+                                return { start: startOffset, end: endOffset, mode: "wysiwyg" };
+                            } else {
+                                const [[startLine, startCh], [endLine, endCh]] = selection;
+                                return { start: [startLine, startCh], end: [endLine, endCh], mode: "markdown" };
+                            }
+                        }
+
+                        /**
+                         * Get the position before the '@' trigger character.
+                         * Based on ToastUI’s cursor behavior the cursor lands after the `@` symbol,
+                         * so you need to step back two characters (-2)
+                         *
+                         * @param normalized
+                         * @returns {*}
+                         */
+                        function moveCursonBeforeTrigger(normalized) {
+                            const adjusted = { ...normalized };
+
+                            if (normalized.mode === "wysiwyg") {
+                                adjusted.start = normalized.start - 2;
+                            } else {
+                                const [line, ch] = normalized.start;
+                                adjusted.start = [line, ch - 2];
+                            }
+
+                            return adjusted;
+                        }
+
+                        /**
+                         * Checks if '@' is at a valid mention position to not confused with email address.
+                         * textBeforeAt is the single character immediately before '@'
+                         * If empty string, '@' is at the very start of the document
+                         * Valid if: start of document, whitespace, or newline
+                         */
+                        function isValidMentionContext(textBeforeAt) {
+                            const charBeforeAt = textBeforeAt.substring(0, 1);
+                            return charBeforeAt === " " || /^(@|\s@)$/.test(charBeforeAt);
+                        }
+
+                        let cursorPosition = normalizeSelection(selection, thisEditor.isWysiwygMode());
+
+                        let beforeTrigger = moveCursonBeforeTrigger(cursorPosition);
+
+                        let content = thisEditor.getSelectedText(beforeTrigger.start, beforeTrigger.end);
+
+                        let isValidTrigger = isValidMentionContext(content);
+
+                        if (isValidTrigger) {
+                            renderUserMentionModal("editwiki");
+                        }
                     }
                 },
                 command: function (payload) {
