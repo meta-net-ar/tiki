@@ -81,8 +81,8 @@ class ConfigureCommand extends Command
 // \$api_tiki = 'adodb';
 
 // Want configurations managed at the system level or restrict some preferences? http://doc.tiki.org/System+Configuration
-// \$system_configuration_file = 'db/tiki.ini.php';
-// \$system_configuration_file = '/etc/tiki.ini';
+// Multiple configuration files (files listed later override earlier ones):
+// \$system_configuration_files = ['db/local.ini', 'db/system_local.ini'];
 // \$system_configuration_identifier = 'example.com';
 
 LOCALPHP;
