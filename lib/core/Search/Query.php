@@ -137,6 +137,20 @@ class Search_Query implements Search_Query_Interface
         }
     }
 
+    public function filterNotIdentifier($query, $field)
+    {
+        if (is_array($query)) {
+            $tokens = [];
+            foreach ($query as $q) {
+                $tokens[] = new Search_Expr_Token($q);
+            }
+            $part = new Search_Expr_Or($tokens);
+        } else {
+            $part = new Search_Expr_Token($query);
+        }
+        $this->addPart(new Search_Expr_Not($part), 'identifier', $field);
+    }
+
     public function filterType($types)
     {
         if (is_array($types)) {

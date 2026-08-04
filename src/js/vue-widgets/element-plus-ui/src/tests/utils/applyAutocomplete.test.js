@@ -7,7 +7,7 @@ describe("applyAutocomplete", () => {
         document.body.appendChild(givenInput);
         const givenRemoteSourceUrl = "https://foo.bar";
 
-        applyAutocomplete(givenInput, givenRemoteSourceUrl);
+        applyAutocomplete(givenInput, { remoteSourceUrl: givenRemoteSourceUrl });
 
         const expectedAutoCompleteElement = givenInput.nextElementSibling;
         expect(expectedAutoCompleteElement.tagName).toBe("EL-AUTOCOMPLETE");
@@ -17,18 +17,34 @@ describe("applyAutocomplete", () => {
         expect(givenInput.style.display).toBe("none");
     });
 
-    test("should set the placeholder and value-key attributes on the autocomplete element when provided", () => {
+    test("should set the placeholder, value-key, and remoteQueryKey attributes on the autocomplete element when provided", () => {
         const givenInput = document.createElement("input");
         document.body.appendChild(givenInput);
         const givenRemoteSourceUrl = "https://foo.bar";
         const givenValueKey = "foo";
+        const givenRemoteQueryKey = "bar";
         givenInput.setAttribute("placeholder", "bar");
 
-        applyAutocomplete(givenInput, givenRemoteSourceUrl, [], givenValueKey);
+        applyAutocomplete(givenInput, { remoteSourceUrl: givenRemoteSourceUrl, valueKey: givenValueKey, remoteQueryKey: givenRemoteQueryKey });
 
         const expectedAutoCompleteElement = givenInput.nextElementSibling;
         expect(expectedAutoCompleteElement.getAttribute("placeholder")).toBe("bar");
         expect(expectedAutoCompleteElement.getAttribute("value-key")).toBe(givenValueKey);
+        expect(expectedAutoCompleteElement.getAttribute("remote-query-key")).toBe(givenRemoteQueryKey);
+    });
+
+    test("should set the 'transform-result-fn' attribute on the autocomplete element when a transformResultCb is provided", () => {
+        const givenInput = document.createElement("input");
+        document.body.appendChild(givenInput);
+        const givenRemoteSourceUrl = "https://foo.bar";
+        const givenTransformResultCb = vi.fn();
+
+        applyAutocomplete(givenInput, { remoteSourceUrl: givenRemoteSourceUrl, transformResultCb: givenTransformResultCb });
+
+        const expectedAutoCompleteElement = givenInput.nextElementSibling;
+        const transformResultFnName = expectedAutoCompleteElement.getAttribute("transform-result-fn");
+        expect(transformResultFnName).toBeTruthy();
+        expect(window[transformResultFnName]).toBe(givenTransformResultCb);
     });
 
     test("should generate the autocomplete element given the source list provided instead of the remote source url", () => {
@@ -36,7 +52,7 @@ describe("applyAutocomplete", () => {
         document.body.appendChild(givenInput);
         const givenSourceList = ["foo", "bar"];
 
-        applyAutocomplete(givenInput, null, givenSourceList);
+        applyAutocomplete(givenInput, { sourceList: givenSourceList });
 
         const expectedAutoCompleteElement = givenInput.nextElementSibling;
         expect(expectedAutoCompleteElement.getAttribute("source-list")).toBe(JSON.stringify(givenSourceList));
@@ -47,9 +63,9 @@ describe("applyAutocomplete", () => {
         document.body.appendChild(givenInput);
         const givenRemoteSourceUrl = "https://foo.bar";
 
-        const firstAutoCompleteElement = applyAutocomplete(givenInput, givenRemoteSourceUrl);
+        const firstAutoCompleteElement = applyAutocomplete(givenInput, { remoteSourceUrl: givenRemoteSourceUrl });
 
-        const secondAutoCompleteElement = applyAutocomplete(givenInput, givenRemoteSourceUrl);
+        const secondAutoCompleteElement = applyAutocomplete(givenInput, { remoteSourceUrl: givenRemoteSourceUrl });
 
         expect(firstAutoCompleteElement).toBe(secondAutoCompleteElement);
     });
@@ -59,7 +75,7 @@ describe("applyAutocomplete", () => {
         document.body.appendChild(givenInput);
         const givenSelectCb = vi.fn();
 
-        applyAutocomplete(givenInput, null, [{ value: "foo" }], null, givenSelectCb);
+        applyAutocomplete(givenInput, { sourceList: [{ value: "foo" }], selectCb: givenSelectCb });
 
         const expectedAutoCompleteElement = givenInput.nextElementSibling;
         const expectedEventDetails = new CustomEvent("select", {
@@ -77,7 +93,7 @@ describe("applyAutocomplete", () => {
 
         const dispatchEventSpy = vi.spyOn(givenInput, "dispatchEvent");
 
-        applyAutocomplete(givenInput, null, [{ value: "foo" }]);
+        applyAutocomplete(givenInput, { sourceList: [{ value: "foo" }] });
 
         const expectedAutoCompleteElement = givenInput.nextElementSibling;
         const expectedEventDetails = new CustomEvent("input", { detail: ["bar"] });
@@ -92,7 +108,7 @@ describe("applyAutocomplete", () => {
         document.body.appendChild(givenInput);
         givenInput.value = "foo";
 
-        applyAutocomplete(givenInput, null, [{ value: "foo" }]);
+        applyAutocomplete(givenInput, { sourceList: [{ value: "foo" }] });
 
         const expectedAutoCompleteElement = givenInput.nextElementSibling;
         const expectedEventDetails = new CustomEvent("input");
@@ -102,8 +118,8 @@ describe("applyAutocomplete", () => {
     });
 
     test.each([
-        ["element", [null], TEXT.ERROR_NO_ELEMENT],
-        ["remoteSourceUrl neither the sourceList", [document.createElement("input"), null, []], TEXT.ERROR_NO_SOURCE],
+        ["element", [null, {}], TEXT.ERROR_NO_ELEMENT],
+        ["remoteSourceUrl neither the sourceList", [document.createElement("input"), {}], TEXT.ERROR_NO_SOURCE],
     ])(`should log an error when the %s is not provided`, (_, args, errorMessage) => {
         const consoleErrorSpy = vi.spyOn(console, "error");
 
