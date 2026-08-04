@@ -45,9 +45,17 @@ function module_search_info()
                 'set_value_as_array' => true,
                 'options' => array_combine(TikiLib::lib('object')->get_supported_types(), TikiLib::lib('object')->get_supported_types()),
             ],
+            'autocomplete_only_parent_ids' => [
+                'name' => tra('Autocomplete only parent'),
+                'description' => tra('List of parent objects to fetch autocomplete suggestions from. Format used: parent_object_id_field:parent_object_id. Ex.: tracker:12345'),
+                'type' => 'select',
+                'separator' => ',',
+                'set_value_as_array' => true,
+                'options' => [],
+            ],
             'autocomplete_exclude_parent_ids' => [
                 'name' => tra('Autocomplete exclude parent'),
-                'description' => tra('List of parent objects to not fetch autocomplete suggestions from. Format used: parent_object_id_field:parent_object_id. Ex.: tracker:12345'),
+                'description' => tra('List of parent objects to not fetch autocomplete suggestions from. Format used: parent_object_id_field:parent_object_id. Ex.: tracker:12345. Note that this will have no effect if autocomplete_only_parent_ids is set.'),
                 'type' => 'select',
                 'separator' => ',',
                 'set_value_as_array' => true,
