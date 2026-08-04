@@ -294,7 +294,7 @@ if (isset($_SERVER["REQUEST_URI"]) && ! str_contains($_SERVER['REQUEST_URI'], 't
                         exit;
                     }
                 } else {
-                    $sequence = $tikilib->generate_unique_sequence(16);
+                    $sequence = $tikilib->generate_unique_sequence(16, true);
                     $_SESSION['extra_validation'] = $sequence;
                     setcookie($extra_cookie_name, $sequence, [
                         'expires' => time() + 365 * 24 * 3600,
