@@ -17,6 +17,10 @@ export function observeSelectElementMutations(select, elementPlusUi) {
                 }
             }
 
+            if (mutation.removedNodes.length) {
+                syncSelectOptions(elementPlusUi, select);
+            }
+
             // jquery-validation error highlighting
             if (mutation.attributeName === "class") {
                 if (mutation.target.classList.contains("is-invalid")) {

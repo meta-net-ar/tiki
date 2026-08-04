@@ -1425,9 +1425,16 @@ class ModLib extends TikiLib
                     } else {
                         $inner['value'] = implode($inner['separator'], (array) $module_params[$name]);
                     }
+
+                    // Init dynamic parameter options with current values
+                    if (isset($inner['options']) && empty($inner['options'])) {
+                        $inner['options'] = array_combine($inner['value'], $inner['value']);
+                    }
                 } else {
                     $inner['value'] = $module_params[$name];
                 }
+            } elseif (isset($inner['default'])) {
+                $inner['value'] = $inner['default'];
             } else {
                 $inner['value'] = null;
             }

@@ -3,7 +3,18 @@ import { onMounted, ref, watch } from 'vue';
 import { fetchSuggestions } from '../../helpers/autocomplete/remote';
 import ConfigWrapper from '../ConfigWrapper.vue';
 
-const props = defineProps(['_expose', 'value', 'remoteSourceUrl', 'sourceList', 'emitCustomEvent', 'placeholder', 'valueKey', 'language']);
+const props = defineProps([
+    '_expose',
+    'value',
+    'remoteSourceUrl',
+    'sourceList',
+    'emitCustomEvent',
+    'placeholder',
+    'valueKey',
+    'language',
+    'transformResultFn',
+    'remoteQueryKey',
+]);
 
 const valueKey = props.valueKey || 'value';
 const placeholder = props.placeholder || TEXT.INPUT_PLACEHOLDER;
@@ -30,14 +41,14 @@ props._expose({
 
 const handleFetchSuggestions = (query, callback) => {
     const wrappedCallback = (results) => {
-        callback(results);
+        callback(props.transformResultFn ? window[props.transformResultFn](results) : results);
 
         if (!results || results.length === 0) {
              // If there are no results, set a flag indicating that the next blur event is likely programmatic and should be counteracted by a refocus.
             shouldRefocusOnBlur.value = true;
         }
     };
-    fetchSuggestions(query, wrappedCallback, props.remoteSourceUrl, (props.sourceList ? JSON.parse(props.sourceList): []));
+    fetchSuggestions(query, wrappedCallback, props.remoteSourceUrl, (props.sourceList ? JSON.parse(props.sourceList): []), props.remoteQueryKey);
 }
 
 const handleBlur = () => {

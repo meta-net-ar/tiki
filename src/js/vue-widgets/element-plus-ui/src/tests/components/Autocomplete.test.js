@@ -142,12 +142,18 @@ describe("Autocomplete", () => {
         test.each([
             ["the remote source URL is provided", "https://foo/bar", null],
             ["the source list is provided", null, JSON.stringify([{ value: "foo" }, { value: "bar" }])],
-        ])("calls the fetchSuggestions function when %s", async (_, remoteSourceUrl, sourceList) => {
+            ["the remote source URL and a 'transformResultFn' are provided", "https://foo/bar", null, "fooTransformFn"],
+        ])("calls the fetchSuggestions function when %s", async (_, remoteSourceUrl, sourceList, transformResultFn) => {
             const givenProps = {
                 remoteSourceUrl,
                 sourceList,
+                transformResultFn,
                 _expose: vi.fn(),
             };
+
+            if (transformResultFn) {
+                window[transformResultFn] = vi.fn();
+            }
 
             vi.mocked(ElAutocomplete).mockImplementationOnce((props) => {
                 const fetchSuggestions = props["fetch-suggestions"] ?? props.fetchSuggestions;
@@ -158,8 +164,22 @@ describe("Autocomplete", () => {
             const input = screen.getByTestId("autocomplete-input");
             await fireEvent.change(input, { target: { value: "foo" } });
 
-            expect(fetchSuggestions).toHaveBeenCalledWith("foo", expect.any(Function), remoteSourceUrl, sourceList ? JSON.parse(sourceList) : []);
+            expect(fetchSuggestions).toHaveBeenCalledWith(
+                "foo",
+                expect.any(Function),
+                remoteSourceUrl,
+                sourceList ? JSON.parse(sourceList) : [],
+                givenProps.remoteQueryKey
+            );
             expect(givenProps._expose).toHaveBeenCalled({ value: expect.objectContaining({ _value: givenProps.value, __v_isRef: true }) });
+
+            const fecthSuggestionsCb = fetchSuggestions.mock.calls[0][1];
+            const mockResults = [{ value: "foo" }, { value: "bar" }];
+            fecthSuggestionsCb(mockResults);
+
+            if (transformResultFn) {
+                expect(window[transformResultFn]).toHaveBeenCalledWith(mockResults);
+            }
         });
 
         test("calls props.emitCustomEvent when ElAutocomplete emits a select event", async () => {

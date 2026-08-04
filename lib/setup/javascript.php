@@ -258,6 +258,7 @@ if (! timezone) {
     $jqueryTiki['feature_queued_tasks'] = ($prefs['feature_queued_tasks'] ?? 'n') === 'y';
     $jqueryTiki['queued_tasks_js_processing_disabled'] = ($prefs['queued_tasks_js_processing_disabled'] ?? 'n') === 'y';
     $jqueryTiki['calendar_pdf_export_layout'] = $prefs['calendar_pdf_export_layout'];
+    $jqueryTiki['feature_search_show_object_type'] = $prefs['feature_search_show_object_type'] === 'y';
 // Check if user has active tasks (Pending or InProgress) to enable smart polling
     $hasActiveJobs = false;
     if (($prefs['feature_queued_tasks'] ?? 'n') === 'y') {

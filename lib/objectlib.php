@@ -232,11 +232,13 @@ class ObjectLib extends TikiLib
             'article_type',
             'blog',
             'calendar',
+            'calendaritem',
             'directory',
             'faq',
             'file',
             'file gallery',
             'forum',
+            'forum post',
             'perspective',
             'poll',
             'quiz',
@@ -291,6 +293,60 @@ class ObjectLib extends TikiLib
         } else {
             return false;
         }
+    }
+
+    /**
+     * Returns all possible parent objects of the given object types.
+     * @param array $objectTypes
+     * @return array
+     */
+    public function getSemanticParentObjects($objectTypes = [])
+    {
+        $mappedChildParent = [
+            // object type => [parent_object_id_field => parent_object_type]
+            'trackeritem' => ['tracker_id' => 'tracker'],
+            'calendaritem' => ['calendar_id' => 'calendar'],
+            'file' => ['gallery_id' => 'file gallery'],
+            'file gallery' => ['gallery_id' => 'file gallery'],
+            'forum post' => ['forum_id' => 'forum'],
+            'forum' => ['forum_section' => 'forum'],
+            'user' => ['groups' => 'group'],
+            'trackerfield' => ['tracker_id' => 'tracker'],
+            'structure' => ['structure_parent_id' => 'structure'],
+            'article' => ['topic_id' => 'article_topic'],
+        ];
+
+        $mappedChildParent = array_intersect_key($mappedChildParent, array_flip($objectTypes));
+
+        if (empty($mappedChildParent)) {
+            return [];
+        }
+
+        $parentTypes = array_values(array_map(function ($item) {
+            return reset($item);
+        }, $mappedChildParent));
+
+        $lib = TikiLib::lib('unifiedsearch');
+        $query = $lib->buildQuery([
+            'type' => $parentTypes,
+        ]);
+
+        $result = $query->search($lib->getIndex());
+
+        $out = [];
+
+        foreach ($result as $res) {
+            $out[] = [
+                'object_id' => $res['object_id'],
+                'type' => $res['object_type'],
+                'title' => $res['title'],
+                'parent_object_id_field' => key(array_values(array_filter($mappedChildParent, function ($item) use ($res) {
+                    return reset($item) === $res['object_type'];
+                }))[0]),
+            ];
+        }
+
+        return $out;
     }
 
     public function insert_object($type, $itemId, $description = '', $name = '', $href = '')
