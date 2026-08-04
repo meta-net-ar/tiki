@@ -362,6 +362,18 @@ $("input[name=ins_' . $this->getOption('fieldIdHere') . '], select[name=ins_' . 
 
     public function handleSave($value, $oldValue)
     {
+        if (! is_array($value)) {
+            // Nothing submitted for this field (non-transfer input, or a save
+            // that did not include it): the linked items are managed from the
+            // other tracker's side, so there is nothing to synchronize.
+            return ['value' => ''];
+        }
+        if (! is_array($oldValue)) {
+            // This field stores no value of its own, so the stored value can
+            // never describe the previous state. Derive it from the current
+            // set of linked items instead.
+            $oldValue = $this->getItemIds();
+        }
         $oldValue = array_map('intval', $oldValue);
         $value = array_map('intval', $value);
         $removing = array_values(array_diff($oldValue, $value));

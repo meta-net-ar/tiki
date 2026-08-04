@@ -7,6 +7,8 @@
 
 namespace TikiTests;
 
+use Tiki\Lib\Test\TestHelpers\GuardedSetUpTrait;
+use Tiki\Lib\Test\TestHelpers\Tracker\TrackerFixtureFactory;
 use TikiTestCase;
 use Tracker_Definition,
 
@@ -14,12 +16,18 @@ TikiLib, Tracker_Item;
 
 /**
  * This is a smoke test for the ItemLink fields.  At least it shows how badly we need a better internal API... - benoitg - 2024-07-04
+ *
+ * @group integration
+ * @group tracker
  */
 class TrackerItemLinkTest extends TikiTestCase
 {
+    use GuardedSetUpTrait;
+
     protected static $trklib;
     protected static $objectlib;
     protected static $unifiedlib;
+    protected static $fixtures;
     protected static $trackerId;
     protected static $linkedTrackerId;
     protected static $old_prefs;
@@ -27,99 +35,53 @@ class TrackerItemLinkTest extends TikiTestCase
 
     public static function setUpBeforeClass(): void
     {
-        global $prefs;
-        self::$old_prefs = $prefs;
-        $prefs['feature_trackers'] = 'y';
-        parent::setUpBeforeClass();
-        self::$trklib = TikiLib::lib('trk');
-        self::$objectlib = TikiLib::lib('object');
+        self::guardStaticSetUp(function () {
+            global $prefs;
+            self::$old_prefs = $prefs;
+            $prefs['feature_trackers'] = 'y';
+            parent::setUpBeforeClass();
+            self::$trklib = TikiLib::lib('trk');
+            self::$objectlib = TikiLib::lib('object');
+            self::$fixtures = new TrackerFixtureFactory();
 
-        self ::$linkedTrackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
+            self::$linkedTrackerId = self::$fixtures->createTracker('Test Tracker');
 
-        $fields = [[
-        'name' => 'Name',
-        'type' => 't',
-        'isHidden' => 'n',
-        'isMandatory' => 'y',
-        'visibleBy' => null,
-        'permName' => 'test_linked_name',
-        ]];
-        foreach ($fields as $i => $field) {
-            self::$trklib->replace_tracker_field(
-                self::$linkedTrackerId,
-                0,
-                $field['name'],
-                $field['type'],
-                'y',
-                'y',
-                'y',
-                'y',
-                $field['isHidden'],
-                $field['isMandatory'],
-                ($i + 1) * 10,
-                $field['options'] ?? '',
-                '',
-                '',
-                null,
-                '',
-                null,
-                null,
-                'n',
-                '',
-                '',
-                '',
-                $field['permName']
-            );
-        }
-        $linkedTrackerDefinition = Tracker_Definition::get(self::$linkedTrackerId);
-        $linkedFields = $linkedTrackerDefinition->getFields();
-        self::$trackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
-        $options = json_encode(['trackerId' => $linkedFields[0]['trackerId'],
-        'fieldId' => $linkedFields[0]['fieldId']]);
+            $linkedFieldId = self::$fixtures->addField(self::$linkedTrackerId, [
+                'name' => 'Name',
+                'type' => 't',
+                'isHidden' => 'n',
+                'isMandatory' => 'y',
+                'visibleBy' => null,
+                'permName' => 'test_linked_name',
+            ]);
 
-        $fields = [[
-        'name' => 'Name',
-        'type' => 't',
-        'isHidden' => 'n',
-        'isMandatory' => 'y',
-        'visibleBy' => null,
-        'permName' => 'test_name'
-        ], [
-        'name' => 'Link',
-        'type' => 'r',
-        'isHidden' => 'y',
-        'isMandatory' => 'n',
-        'visibleBy' => null,
-        'permName' => 'test_link',
-        'options' => $options
-        ]];
-        foreach ($fields as $i => $field) {
-            self::$trklib->replace_tracker_field(
-                self::$trackerId,
-                0,
-                $field['name'],
-                $field['type'],
-                'y',
-                'y',
-                'y',
-                'y',
-                $field['isHidden'],
-                $field['isMandatory'],
-                ($i + 1) * 10,
-                $field['options'] ?? '',
-                '',
-                '',
-                null,
-                '',
-                null,
-                null,
-                'n',
-                '',
-                '',
-                '',
-                $field['permName']
-            );
-        }
+            self::$trackerId = self::$fixtures->createTracker('Test Tracker');
+            $options = json_encode(['trackerId' => self::$linkedTrackerId,
+            'fieldId' => $linkedFieldId]);
+
+            self::$fixtures->addFields(self::$trackerId, [[
+                'name' => 'Name',
+                'type' => 't',
+                'isHidden' => 'n',
+                'isMandatory' => 'y',
+                'visibleBy' => null,
+                'permName' => 'test_name'
+            ], [
+                'name' => 'Link',
+                'type' => 'r',
+                'isHidden' => 'y',
+                'isMandatory' => 'n',
+                'visibleBy' => null,
+                'permName' => 'test_link',
+                'options' => $options
+            ]]);
+        });
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->abortIfStaticSetUpFailed();
     }
 
     public static function tearDownAfterClass(): void
@@ -128,8 +90,7 @@ class TrackerItemLinkTest extends TikiTestCase
         $prefs['feature_trackers'] = self::$old_prefs['feature_trackers'];
 
         parent::tearDownAfterClass();
-        self::$trklib->remove_tracker(self::$trackerId);
-        self::$trklib->remove_tracker(self::$linkedTrackerId);
+        self::$fixtures->cleanup();
     }
 
     public function testBasicFunctionnality(): void

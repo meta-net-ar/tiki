@@ -6,16 +6,24 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use Tiki\Lib\TikiDate;
+use Tiki\Lib\Test\TestHelpers\GuardedSetUpTrait;
+use Tiki\Lib\Test\TestHelpers\Tracker\TrackerFixtureFactory;
+use Tiki\Lib\Test\TestHelpers\Tracker\TrackerPermissionsFixture;
 
 /**
  * @group integration
+ * @group tracker
  * The purpose of these tests is to ensure consistency between storage, display
  * and filtering of tracker date/time fields with different timezone settings.
  */
 class TrackerDatesTimezoneTest extends TikiTestCase
 {
+    use GuardedSetUpTrait;
+
     protected static $trklib;
     protected static $unifiedlib;
+    protected static $fixtures;
+    protected static $permsFixture;
     protected static $trackerId;
     protected static $old_prefs;
     protected static $old_tz;
@@ -24,110 +32,80 @@ class TrackerDatesTimezoneTest extends TikiTestCase
 
     public static function setUpBeforeClass(): void
     {
-        global $prefs;
-        self::$old_prefs = $prefs;
-        self::$old_tz = date_default_timezone_get();
-        $prefs['feature_trackers'] = 'y';
-        $prefs['short_date_format'] = '%Y-%m-%d';
-        $prefs['short_time_format'] = '%H:%M';
+        self::guardStaticSetUp(function () {
+            global $prefs;
+            self::$old_prefs = $prefs;
+            self::$old_tz = date_default_timezone_get();
+            $prefs['feature_trackers'] = 'y';
+            $prefs['short_date_format'] = '%Y-%m-%d';
+            $prefs['short_time_format'] = '%H:%M';
 
-        parent::setUpBeforeClass();
-        self::$trklib = TikiLib::lib('trk');
-        // create tracker and couple of fields
-        self::$trackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
-        self::assertNotEmpty(self::$trackerId);
-        $fields = [[
-            'name' => 'Date (legacy DateTime field)',
-            'type' => 'f',
-            'isHidden' => 'n',
-            'isMandatory' => 'n',
-            'permName' => 'test_date_legacy',
-            'options' => json_encode(['datetime' => 'd']),
-        ], [
-            'name' => 'DateTime (legacy DateTime field)',
-            'type' => 'f',
-            'isHidden' => 'n',
-            'isMandatory' => 'n',
-            'permName' => 'test_datetime_legacy',
-            'options' => json_encode(['datetime' => 'dt']),
-        ], [
-            'name' => 'Date (JsCalendar field)',
-            'type' => 'j',
-            'isHidden' => 'n',
-            'isMandatory' => 'n',
-            'permName' => 'test_date',
-            'options' => json_encode(['datetime' => 'd']),
-        ], [
-            'name' => 'DateTime (JsCalendar field)',
-            'type' => 'j',
-            'isHidden' => 'n',
-            'isMandatory' => 'n',
-            'permName' => 'test_datetime',
-            'options' => json_encode(['datetime' => 'dt']),
-        ]];
-        foreach ($fields as $i => $field) {
-            $fieldId = self::$trklib->replace_tracker_field(
-                self::$trackerId,
-                0,
-                $field['name'],
-                $field['type'],
-                'y',
-                'y',
-                'y',
-                'y',
-                $field['isHidden'],
-                $field['isMandatory'],
-                ($i + 1) * 10,
-                $field['options'] ?? '',
-                '',
-                '',
-                null,
-                '',
-                null,
-                null,
-                'n',
-                '',
-                '',
-                '',
-                $field['permName']
-            );
-            self::assertNotEmpty($fieldId);
-        }
-        TikiDb::get()->query("REPLACE INTO `users_grouppermissions` VALUES('Registered', 'tiki_p_admin_trackers', '')");
-        TikiDb::get()->query("REPLACE INTO `users_grouppermissions` VALUES('Registered', 'tiki_p_view_trackers', '')");
-        $builder = new Perms_Builder();
-        Perms::set($builder->build());
+            parent::setUpBeforeClass();
+            self::$trklib = TikiLib::lib('trk');
+            self::$fixtures = new TrackerFixtureFactory();
+            self::$permsFixture = new TrackerPermissionsFixture();
+            // create tracker and couple of fields
+            self::$trackerId = self::$fixtures->createTracker('Test Tracker');
+            self::$fixtures->addFields(self::$trackerId, [[
+                'name' => 'Date (legacy DateTime field)',
+                'type' => 'f',
+                'isHidden' => 'n',
+                'isMandatory' => 'n',
+                'permName' => 'test_date_legacy',
+                'options' => json_encode(['datetime' => 'd']),
+            ], [
+                'name' => 'DateTime (legacy DateTime field)',
+                'type' => 'f',
+                'isHidden' => 'n',
+                'isMandatory' => 'n',
+                'permName' => 'test_datetime_legacy',
+                'options' => json_encode(['datetime' => 'dt']),
+            ], [
+                'name' => 'Date (JsCalendar field)',
+                'type' => 'j',
+                'isHidden' => 'n',
+                'isMandatory' => 'n',
+                'permName' => 'test_date',
+                'options' => json_encode(['datetime' => 'd']),
+            ], [
+                'name' => 'DateTime (JsCalendar field)',
+                'type' => 'j',
+                'isHidden' => 'n',
+                'isMandatory' => 'n',
+                'permName' => 'test_datetime',
+                'options' => json_encode(['datetime' => 'dt']),
+            ]]);
+            self::$permsFixture->grantGroupPermissions([
+                'Registered' => ['tiki_p_admin_trackers', 'tiki_p_view_trackers'],
+            ]);
 
-        // impersonate a regitered user
-        new Perms_Context('someone');
-        $perms = Perms::getInstance();
-        $perms->setGroups(['Registered']);
+            // impersonate a regitered user
+            self::$permsFixture->impersonate('someone', ['Registered']);
 
-        self::$unifiedlib = TikiLib::lib('unifiedsearch');
-        self::$unifiedlib->rebuild();
+            self::$unifiedlib = TikiLib::lib('unifiedsearch');
+            self::$unifiedlib->rebuild();
+        });
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->abortIfStaticSetUpFailed();
     }
 
     public static function tearDownAfterClass(): void
     {
-        global $prefs, $tikilib;
+        global $prefs;
 
-        if (! empty($prefs['unified_mysql_index_current'])) {
-            TikiDb::get()->query("DROP TABLE `{$prefs['unified_mysql_index_current']}`");
-            $tikilib->delete_preference('unified_mysql_index_current');
-        }
-
-        self::$unifiedlib->invalidateIndicesCache();
+        self::$permsFixture->dropUnifiedIndex();
 
         $prefs = self::$old_prefs;
         date_default_timezone_set(self::$old_tz);
 
         parent::tearDownAfterClass();
-        self::$trklib->remove_tracker(self::$trackerId);
+        self::$fixtures->cleanup();
 
-        TikiDb::get()->query("DELETE FROM `users_grouppermissions` WHERE `groupName` = 'Registered' AND `permName` = 'tiki_p_admin_trackers'");
-        TikiDb::get()->query("DELETE FROM `users_grouppermissions` WHERE `groupName` = 'Registered' AND `permName` = 'tiki_p_view_trackers'");
-        $builder = new Perms_Builder();
-        Perms::set($builder->build());
+        self::$permsFixture->revokeGroupPermissions();
     }
 
     public function testTimeStorageInUTC(): void
@@ -494,6 +472,9 @@ class TrackerDatesTimezoneTest extends TikiTestCase
         }
     }
 
+    // Kept inline instead of using TrackerFixtureFactory::createItem(): the
+    // Tracker_Item::prepareInput() path with ins_* date inputs is part of the
+    // date-handling behavior these tests characterize.
     private function createItem($fieldValues)
     {
         $definition = Tracker_Definition::get(self::$trackerId);

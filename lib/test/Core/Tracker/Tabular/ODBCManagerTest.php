@@ -11,6 +11,10 @@ use PHPUnit\Framework\TestCase;
 use Tracker\Tabular\ODBCManager;
 use ReflectionClass;
 
+/**
+ * @group unit
+ * @group tracker
+ */
 class ODBCManagerTest extends TestCase
 {
     protected $mock;
