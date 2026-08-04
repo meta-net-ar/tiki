@@ -17,7 +17,7 @@ class Tracker_Options
     {
         $options = new Tracker_Options();
         $options->info = $info;
-        $options->data = json_decode($json, true);
+        $options->data = json_decode($json ?? '', true) ?? [];
 
         return $options;
     }
