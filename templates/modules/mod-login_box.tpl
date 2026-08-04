@@ -352,11 +352,6 @@ $('label[for="login-remember-module_{{$module_logo_instance}}"]').on('click', fu
                                 {tr}Switch{/tr}
                             </button>
                         </div>
-                        {if ! empty($textBelowLoginbox)}
-                            <div class="mt-3">
-                                {$textBelowLoginbox}
-                            </div>
-                        {/if}
                     </fieldset>
                 </form>
             {/if}
@@ -659,6 +654,11 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
             </div>
         {/if}
         {$close_tags}
+        </div>
+    {/if}
+    {if $mode eq "module" && ! empty($textBelowLoginbox)}
+        <div class="mt-3">
+            {$textBelowLoginbox}
         </div>
     {/if}
     {if $mode eq "header"}</div>{/if}
