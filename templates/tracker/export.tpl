@@ -6,8 +6,12 @@
 
 {block name="content"}
     {remarksbox type="warning" title="{tr}Deprecated{/tr}"}
-        {tr}To export tracker or tracker items please{/tr} <a href="tiki-admin.php?page=trackers&highlight=tracker_tabular_enabled" class="alert-link" target="_blank" title="{tr}enable{/tr}">{tr}enable{/tr}</a> {tr}and use{/tr} <a href="tiki-tabular-manage" class="alert-link" target="_blank" title="{tr}Tracker Import-Export{/tr}">{tr}Tracker Import-Export{/tr}</a>. {tr}It is easy to use, optimised and far more powerful.{/tr}
-        {tr}For complete documentation, please visit{/tr} <a href="https://doc.tiki.org/Tracker-Tabular" class="alert-link" target="_blank" title="{tr}Tracker Import-Export{/tr}"> {tr}Tracker Import-Export{/tr} {icon name="documentation"}</a>
+        {capture assign=tabularLink}
+            <a href="{service controller=tabular action=manage}" class="alert-link" target="_blank">Tracker Import-Export</a>
+        {/capture}
+        {tr _0='<a href="tiki-admin.php?page=trackers&highlight=tracker_tabular_enabled" class="alert-link" target="_blank">' _1='</a>' _2=$tabularLink _3='</a>'}To export a tracker or tracker items, please %0enable%1 and use %2Tracker Import-Export%3. It is easy to use, optimized, and far more powerful.{/tr}
+
+        {tr _0='<a href="https://doc.tiki.org/Tracker-Tabular" class="alert-link" target="_blank">' _1='</a>'}For complete documentation, please visit %0Tracker Import-Export%1.{/tr}
     {/remarksbox}
 {accordion}
     {accordion_group title="{tr}Export Tracker Items{/tr}"}
