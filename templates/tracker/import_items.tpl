@@ -24,7 +24,11 @@
         {/capture}
         {tr _0='<a href="tiki-admin.php?page=trackers&highlight=tracker_tabular_enabled" class="alert-link" target="_blank" title="enable">' _1='</a>' _2=$tabularLink _3='</a>'}To import items into a tracker, please %0enable%1 and use %2Tracker Import-Export%3. It is easy to use, optimized, and far more powerful.{/tr}
 
-        {tr _0='<a href="https://doc.tiki.org/Tracker-Tabular" class="alert-link" target="_blank" title="Tracker Import-Export">' _1=' {icon name="documentation"}</a>'}For complete documentation, please visit %0Tracker Import-Export%1.{/tr}
+        {capture assign=docIcon}
+            {icon name="documentation"}
+        {/capture}
+
+        {tr _0='<a href="https://doc.tiki.org/Tracker-Tabular" class="alert-link" target="_blank" title="Tracker Import-Export">' _1=$docIcon _2='</a>'}For complete documentation, please visit %0Tracker Import-Export%1%2.{/tr}
     {/remarksbox}
     {remarksbox type="note" title="{tr}Note{/tr}"}
         <ul>
