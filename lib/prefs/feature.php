@@ -2754,6 +2754,13 @@ function prefs_feature_list($partial = false)
             'description' => tra('Show user email in community mouseover cards.'),
             'default' => 'y',
         ],
+        'feature_community_mouseover_lastlogin' => [
+            'name' => tra('Last login'),
+            'description' => tra('Show user last login date in community mouseover cards.'),
+            'type' => 'flag',
+            'help' => $userPreferencesHelp,
+            'default' => 'y',
+        ],
         'feature_community_mouseover_distance' => [
             'name' => tra('Distance'),
             'description' => tra('Show the geographic distance (in km) from the current user to the hovered user in community mouseover cards.'),

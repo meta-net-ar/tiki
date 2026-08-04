@@ -277,7 +277,9 @@ class Services_User_Controller
                     }
                 }
 
-                $result['currentLogin'] = $info['currentLogin'] ? $info['currentLogin'] : null;
+                if ($prefs['feature_community_mouseover_lastlogin'] == 'y') {
+                    $result['currentLogin'] = $info['currentLogin'] ? $info['currentLogin'] : null;
+                }
                 $result['lastActivity'] = $info['lastActivity'] ? $info['lastActivity'] : null;
 
                 if ($prefs['feature_community_mouseover_picture'] == 'y') {
