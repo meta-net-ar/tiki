@@ -40,6 +40,8 @@ export default function autocomplete(element, resourceType, options = {}) {
     if (options.onEnter) {
         handlePressEnter(component, options.onEnter);
     }
+
+    return component;
 }
 
 const handlePressEnter = (component, callback) => {

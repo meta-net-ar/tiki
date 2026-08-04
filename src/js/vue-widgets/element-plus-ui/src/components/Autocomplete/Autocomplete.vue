@@ -35,6 +35,9 @@ watch(
 );
 
 props._expose({
+    focus: () => {
+        autocompleteRef.value?.focus();
+    },
     value: modelValue,
     setValue,
 });
