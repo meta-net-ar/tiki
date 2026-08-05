@@ -501,7 +501,7 @@ function prefs_global_list($partial = false)
             'hint' => tra('Go to [tiki-admingroups.php|Admin Groups] to select which tracker and fields to display.'),
             'default' => 'n',
         ],
-        'textBelowLoginbox' => [
+        'textBelowLoginBox' => [
             'name' => tra('Text below login box'),
             'description' => tra('Text to display below the login box.'),
             'hint' => tra("Supports Tiki syntax"),
