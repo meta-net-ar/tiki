@@ -1,14 +1,20 @@
-## Summary
+## This MR is a backport
 
-_BACKPORT / CHERRY-PICK MRs only. Backports are costly and can add regressions, so we justify the ones we keep. "Just in case" won't be merged._
+_If it is not, delete everything below, including the heading above._
+
+_Backports are costly and can add regressions, so we justify the ones we keep. "Just in case" won't be merged._
 
 *Policy: https://dev.tiki.org/Backport-Policy*
 
 ## 1. Based on
-- **Backport of**: _#MR-number_
-- **Cherry-picked from**: _#commit-hash(es)_
+
+<!-- Cherry-pick with `git cherry-pick -x`, then run
+     `php doc/devtools/gitlab/backport_mr.php 27.x` to get these bullets filled in. -->
+- **Backport of**: _!MR-number_
+- **Cherry-picked from**: _commit-hash(es)_
 - **From branch**: _normally the one just above the target_
 - **Target branch**: _ex: 27.x_
+- **Final target branch**: _last branch in the chain if it is not this MR's target_
 
 ## 2. Tested since the upstream merge
 _Where, how, by whom. Ex: dogfooded on dev.tiki.org, checked X. Same-day backport? Say why it is safe._
@@ -34,7 +40,6 @@ _Operators run old releases to avoid surprises, so every change must appear here
 
 ## 6. Checklist
 - [ ] Backport chain followed: each active branch between source and target has this fix
-- [ ] Commits cherry-picked one by one, squash OFF
+- [ ] Cherry-picked with `-x`, one by one, squash OFF
 - [ ] `CherryPickDownTo` label on the highest-version MR (Source MR)
 - [ ] A reviewer who can look promptly is assigned
- 
