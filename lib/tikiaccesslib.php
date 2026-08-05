@@ -365,7 +365,10 @@ class TikiAccessLib extends TikiLib
         $key = str_pad(substr($key, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES), SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES);
         $nonce = random_bytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
 
-        return base64_encode($nonce . sodium_crypto_aead_xchacha20poly1305_ietf_encrypt($value, '', $nonce, $key));
+        # Perform url-safe base64 encoding.
+        $encoded = base64_encode($nonce . sodium_crypto_aead_xchacha20poly1305_ietf_encrypt($value, '', $nonce, $key));
+        $urlsafe = str_replace(['+', '/', '='], ['-', '_', ''], $encoded);
+        return $urlsafe;
     }
 
     /**
@@ -377,7 +380,15 @@ class TikiAccessLib extends TikiLib
     {
         $key = TikiLib::lib('tiki')->get_site_hash();
         $key = str_pad(substr($key, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES), SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES);
+
+        # Perform url-safe base64 decoding.
+        $value = str_replace(['-', '_'], ['+', '/'], $value);
+        $mod4 = strlen($value) % 4;
+        if ($mod4) {
+            $value .= substr('====', $mod4);
+        }
         $value = base64_decode($value);
+
         $nonce = substr($value, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
         $cipherText = substr($value, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
 
