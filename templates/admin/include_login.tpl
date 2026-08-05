@@ -161,6 +161,7 @@
                     {preference name=tracker_force_tracker_fields}
                 </div>
                 {preference name=groupTracker}
+                {preference name=textBelowLoginBox}
                 <legend class="h3">{tr}Other login settings{/tr}</legend>
                 {preference name=email_due}
                 {preference name=unsuccessful_logins}
