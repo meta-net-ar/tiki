@@ -802,7 +802,12 @@ if ($tracker_info_value('useAttachments') == 'y') {
                 Feedback::errorAndDie($_FILES['userfile1']['name'] . ': ' . $e->getMessage(), \Laminas\Http\Response::STATUS_CODE_500);
             }
             $size = $_FILES['userfile1']['size'];
-            $name = $_FILES['userfile1']['name'];
+            $name = (string) ($_FILES['userfile1']['name'] ?? '');
+            if (trim($name) === '') {
+                // Some upload clients/browsers may not send a usable filename.
+                // Persist a deterministic fallback so attachments have a visible title.
+                $name = 'attachment-' . $tikilib->now;
+            }
             $type = $_FILES['userfile1']['type'];
         } else {
             Feedback::errorAndDie($_FILES['userfile1']['name'] . ': ' . tra('Upload was not successful') . ': ' . $tikilib->uploaded_file_error($_FILES['userfile1']['error']), \Laminas\Http\Response::STATUS_CODE_500);
@@ -812,11 +817,26 @@ if ($tracker_info_value('useAttachments') == 'y') {
         $_REQUEST['show'] = "att";
     }
     // If anything below here is changed, please change lib/wiki-plugins/wikiplugin_attach.php as well.
-    $attextra = 'n';
-    if (str_contains($tracker_info["orderAttachments"], '|')) {
-        $attextra = 'y';
+    // orderAttachments configures which columns are shown. Empty values used to produce a blank
+    // column list, so the filename (and thus any visible title) never appeared.
+    $orderAttachmentsRaw = trim($tracker_info['orderAttachments'] ?? '');
+    $attextra = str_contains($orderAttachmentsRaw, '|') ? 'y' : 'n';
+    $orderAttachments = explode('|', $orderAttachmentsRaw, 2)[0];
+
+    $attfields = array_values(array_filter(
+        array_map('trim', explode(',', $orderAttachments)),
+        static fn ($v) => $v !== ''
+    ));
+
+    // Keep only fields that list_item_attachments() actually returns (exclude ids used for queries).
+    $allowedFields = array_values(array_diff($trklib->getItemAttachmentFields(), ['attId', 'itemId']));
+    $attfields = array_values(array_intersect($attfields, $allowedFields));
+
+    // Always show the filename so the attachment has a visible title.
+    if (! in_array('filename', $attfields, true)) {
+        array_unshift($attfields, 'filename');
     }
-    $attfields = explode(',', strtok($tracker_info["orderAttachments"], '|'));
+
     $atts = $trklib->list_item_attachments($itemId, 0, -1, 'comment_asc', '');
     $smarty->assign('atts', $atts["data"]);
     $smarty->assign('attCount', $atts["count"]);

@@ -269,6 +269,11 @@ function wikiplugin_attach($data, $params)
     foreach ($loop as $n) {
         $n--;
         $attachment = $atts['data'][$n];
+        $displayName = trim($attachment['filename'] ?? '');
+        if ($displayName === '') {
+            $displayName = 'attachment-' . $attachment['attId'];
+        }
+
         if ((! $name and ! $id) or $id == $attachment['attId'] or $name == $attachment['filename']) {
             $link = "";
             if ($bullets) {
@@ -276,7 +281,7 @@ function wikiplugin_attach($data, $params)
             }
             $description = (! empty($showdesc) && ! empty($attachment['comment']))
                 ? $attachment['comment']
-                : $attachment['filename'];
+                : $displayName;
 
             if (! empty($dls)) {
                 $description .= ' ' . $attachment['hits'];
@@ -289,7 +294,7 @@ function wikiplugin_attach($data, $params)
                 $link .= '<a href="tiki-download_wiki_attachment.php?attId=' . $attachment['attId'] . $url . '&amp;download=y" class="wiki"';
                 $link .= ' title="' . $description . '">';
                 if (! empty($icon)) {
-                    $iconhtml = smarty_modifier_iconify($attachment['filename']);
+                    $iconhtml = smarty_modifier_iconify($displayName);
                     $link .= $iconhtml . '&nbsp';
                 }
 
@@ -298,7 +303,7 @@ function wikiplugin_attach($data, $params)
                 } elseif (! empty($inline) && ! empty($data)) {
                     $link .= $data;
                 } else {
-                    $link .= strip_tags($attachment['filename']);
+                    $link .= strip_tags($displayName);
                 }
 
                 $link .= '</a>';

@@ -173,12 +173,20 @@ class TrackerLib extends TikiLib
         return $this->attachments()->fetchOne('user', ['attId' => (int) $attId]);
     }
 
+    /**
+     * Field names returned for tracker item attachments (listing / display).
+     */
+    public function getItemAttachmentFields(): array
+    {
+        return ['user', 'attId', 'itemId', 'filename', 'filesize', 'filetype', 'hits', 'created', 'comment', 'longdesc', 'version'];
+    }
+
     public function list_item_attachments($itemId, $offset = 0, $maxRecords = -1, $sort_mode = 'attId_asc', $find = '')
     {
         $attachments = $this->attachments();
 
         $order = $attachments->sortMode($sort_mode);
-        $fields = ['user', 'attId', 'itemId', 'filename', 'filesize', 'filetype', 'hits', 'created', 'comment', 'longdesc', 'version'];
+        $fields = $this->getItemAttachmentFields();
 
         $conditions = [
             'itemId' => (int) $itemId,
