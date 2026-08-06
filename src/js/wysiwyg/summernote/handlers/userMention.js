@@ -1,6 +1,10 @@
 export default function (textarea) {
     let debounceTimer;
     return function (event) {
+        if (!window.jqueryTiki.user_mention_enabled) {
+            return;
+        }
+
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(async () => {
             const range = textarea.summernote("editor.getLastRange");
