@@ -3,6 +3,7 @@
 import ReplyForm from "./ReplyForm.vue";
 import {inject, onMounted} from "vue";
 import useMessageStore from "../store";
+import {highlightMatches} from "../utils/highlight";
 
 const tr = inject('tr')
 const store = useMessageStore();
@@ -18,6 +19,20 @@ export default {
     },
     mounted() {
         useMessageStore().drawMessagesTree();
+    },
+    computed: {
+        highlightedTitle() {
+            return highlightMatches(this.item.title, useMessageStore().searchQuery);
+        },
+        highlightedMessage() {
+            return highlightMatches(this.item.message, useMessageStore().searchQuery);
+        },
+        isSearchMatch() {
+            return useMessageStore().itemMatchesSearch(this.item);
+        },
+        repliesVisible() {
+            return useMessageStore().isThreadForciblyVisible(this.item.messageId);
+        },
     },
     methods: {
         create: function() {
@@ -46,13 +61,19 @@ export default {
             setTimeout(() => {
                 useMessageStore().drawMessagesTree();
             }, timeout);//TODO: find a better way to do this
+        },
+        toggleThreadVisibility: function(messageId) {
+            useMessageStore().toggleManualExpand(messageId);
+            setTimeout(() => {
+                useMessageStore().drawMessagesTree();
+            }, 20);//TODO: find a better way to do this
         }
     }
 }
 </script>
 
 <template>
-    <div :id="'body-'+item.messageId" class="message-body card-body text-start">
+    <div :id="'body-'+item.messageId" class="message-body card-body text-start" :class="{ 'search-match': isSearchMatch }">
         <!-- div :class="[{'t-left-border-background' : item.parentId !== 0}]"></div -->
         <div :class="[{'t-left-border' : item.parentId !== 0}]"></div>
         <div :id="'border-'+item.messageId" class="thread-border"></div>
@@ -63,16 +84,17 @@ export default {
             <span class="mx-1 pt-1">on {{item.date}}</span>
             <span class="text-muted pt-1">(17:01 their time)</span>
         </p>
-        <h5 class="card-title thread-title ps-2" v-if="item.title != ''">{{ item.title }}</h5>
+        <h5 class="card-title thread-title ps-2" v-if="item.title != ''" v-html="highlightedTitle"></h5>
         <hr class="ms-2" v-if="item.parentId == 0 && item.title != ''" />
         <div>
             <div :id="'message-'+item.messageId" class="thread-messages ps-2">
-                <p class="card-text">{{ item.message }}</p>
+                <p class="card-text" v-html="highlightedMessage"></p>
                 <div class="message-footer ms-3">
                     <i class="icon fa-solid fa-thumbs-up fa-xs mt-3" :class="{ 'text-primary': item.likedBy.includes(store.currentUser) }" @click="store.like(item.messageId, store.currentUser)"></i><span class="like small text-muted mx-1 me-4">{{ item.like }}</span>
                     <i class="icon fa-solid fa-thumbs-down fa-xs mt-3" :class="{ 'text-danger': item.dislikedBy.includes(store.currentUser) }" @click="store.dislike(item.messageId, store.currentUser)"></i><span class="dislike small text-muted mx-1">{{ item.dislike }}</span>
                     <div :class="[{'d-thread-button-block' : item.parentId != 0}, 'thread-button-block float-end']">
                         <a href="#" data-bs-toggle="collapse" :data-bs-target="`.replies-${item.messageId}`" class="btn resolved-btn m-1 btn-sm" :class="item.resoved === 1 ? 'bg-success border-success text-white' : 'btn-outline-primary'" :aria-expanded="item.resoved !== 1" @click="toggleResolved(item.messageId)" v-if="item.parentId == 0">{{ item.resoved === 1 ? tr('Resolved') : tr('Mark as resolved') }}</a>
+                        <a href="#" class="btn btn-outline-secondary m-1 btn-sm" :class="{ active: repliesVisible }" :aria-expanded="repliesVisible" @click.prevent="toggleThreadVisibility(item.messageId)" v-if="item.parentId == 0 && item.resoved === 1">{{ repliesVisible ? tr('Hide replies') : tr('Show replies') }}</a>
                         <a href="#" class="btn btn-outline-primary m-1 btn-sm">{{ tr('Pin') }}</a>
                         <a :href="'#message-'+item.messageId" class="btn btn-outline-primary m-1 btn-sm" @click="update(item.messageId)">{{ tr('Edit') }}</a>
                         <a :href="'#message-'+item.messageId" class="btn btn-outline-primary m-1 btn-sm" @click="create()">{{ tr('Reply') }}</a>
@@ -88,6 +110,18 @@ export default {
 </template>
 
 <style scoped lang="scss">
+.message-body.search-match {
+    background-color: rgba(255, 193, 7, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(255, 193, 7, 0.5);
+    border-radius: 4px;
+}
+
+.message-body :deep(mark) {
+    background-color: #fff3a3;
+    padding: 0 1px;
+    border-radius: 2px;
+}
+
 .message-footer .icon.text-primary {
     color: #0d6efd !important;
 }

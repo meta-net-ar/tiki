@@ -20,7 +20,7 @@ defineProps({
     <div class="row">
         <div :class="[
           {'card thread-card bg-body mt-5 pt-2 pb-2' : item.parentId == 0},
-          item.parentId != 0 ? `ps-5 thread-replies replies-${item.parentId} collapse${resolved ? '' : ' show'}` : '',
+          item.parentId != 0 ? `ps-5 thread-replies replies-${item.parentId} collapse${(resolved && !store.isThreadForciblyVisible(item.parentId)) ? '' : ' show'}` : '',
           'col-md-12 thread-block'
         ]" v-for="item in messages">
             <Message :item=item />

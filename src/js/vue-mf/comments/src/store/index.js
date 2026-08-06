@@ -4,6 +4,8 @@ export default defineStore("messageStore", {
     state: () => ({
         // TODO: replace with the actual logged-in user once auth is wired into this module
         currentUser: "Angelo",
+        searchQuery: "",
+        manuallyExpandedThreads: [], // messageIds of resolved root threads whose replies were manually expanded via the "Show replies" button.
         threads: [
             {
                 title: "There should be no titles in replies, only for the thread",
@@ -211,8 +213,52 @@ export default defineStore("messageStore", {
             });
             return response;
         },
+        // Whether a single item (not its descendants) matches the current search query.
+        itemMatchesSearch: (state) => (item) => {
+            const query = state.searchQuery.trim().toLowerCase();
+            if (!query) {
+                return false;
+            }
+            return (
+                item.title.toLowerCase().includes(query) || item.message.toLowerCase().includes(query) || item.author.toLowerCase().includes(query)
+            );
+        },
+        // Whether a resolved thread's replies were manually expanded despite the collapse.
+        isManuallyExpanded: (state) => (messageId) => state.manuallyExpandedThreads.includes(messageId),
+        // Whether an item, or any of its descendants, matches the current search query.
+        subtreeMatchesSearch(state) {
+            return (messageId) => {
+                if (!state.searchQuery.trim()) {
+                    return false;
+                }
+                const item = state.threads.find((element) => element.messageId === messageId);
+                if (!item) {
+                    return false;
+                }
+                if (this.itemMatchesSearch(item)) {
+                    return true;
+                }
+                return state.threads.some((child) => child.parentId === messageId && this.subtreeMatchesSearch(child.messageId));
+            };
+        },
+        // Root threads to display: all of them when not searching, otherwise only those whose subtree (self or a descendant) matches the query.
+        getFilteredParentMessages(state) {
+            const parents = state.threads.filter((item) => item.parentId === 0);
+            if (!state.searchQuery.trim()) {
+                return parents;
+            }
+
+            return parents.filter((root) => this.subtreeMatchesSearch(root.messageId));
+        },
+        // Whether a resolved thread's replies should be shown despite the collapse: either the user expanded them manually, or the current search matches inside.
+        isThreadForciblyVisible(state) {
+            return (messageId) => this.isManuallyExpanded(messageId) || this.subtreeMatchesSearch(messageId);
+        },
     },
     actions: {
+        setSearchQuery(query) {
+            this.searchQuery = query;
+        },
         addMessage(title, parentId, author, message, date) {
             let num = this.threads.length + 1;
             var message = {
@@ -275,6 +321,16 @@ export default defineStore("messageStore", {
             this.threads[index].resoved = this.threads[index].resoved === 1 ? 0 : 1;
             return this.threads[index].resoved;
         },
+        // Toggles messageId in/out of manuallyExpandedThreads; never touches resoved,
+        // so this only affects display, not the actual resolved status.
+        toggleManualExpand(messageId) {
+            const index = this.manuallyExpandedThreads.indexOf(messageId);
+            if (index !== -1) {
+                this.manuallyExpandedThreads.splice(index, 1);
+            } else {
+                this.manuallyExpandedThreads.push(messageId);
+            }
+        },
         drawMessagesTree() {
             var arr = this.threads;
             arr.forEach((item) => {
@@ -286,7 +342,10 @@ export default defineStore("messageStore", {
                 if (item.parentId === 0) {
                     targetClass = "replies-" + item.messageId;
                     margins = 16;
-                    resolved = item.resoved === 1;
+                    // Treat the thread as "not resolved" for tree-line purposes when its replies
+                    // are actually being shown (manual expand or search match), so the connecting
+                    // line still gets drawn instead of being zeroed out below.
+                    resolved = item.resoved === 1 && !this.isThreadForciblyVisible(item.messageId);
                 }
                 let parentBody = $("#body-" + item.messageId).parent(".thread-block");
                 totalHeight = parentBody.outerHeight();

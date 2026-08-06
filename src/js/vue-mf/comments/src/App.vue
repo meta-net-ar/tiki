@@ -43,7 +43,7 @@
 
     const store = useMessageStore();
 
-    const msgs = computed(() => store.getParentMessages);
+    const msgs = computed(() => store.getFilteredParentMessages);
 </script>
 
 <script>
