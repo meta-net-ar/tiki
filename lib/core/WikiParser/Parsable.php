@@ -435,9 +435,9 @@ if ( \$('#$id') ) {
         global $prefs;
 
         if ($this->option['is_markdown'] && $prefs['markdown_enabled'] === 'y') {
-            $parsable = new WikiParser_ParsableMarkdown($data);
+            $parsable = new WikiParser_ParsableMarkdown();
         } else {
-            $parsable = new WikiParser_ParsableWiki($data);
+            $parsable = new WikiParser_ParsableWiki();
         }
         $parsable->setOptions($this->option);
         return $parsable->wikiParse($data, $noparsed);
