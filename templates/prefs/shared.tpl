@@ -84,7 +84,7 @@
             {icon name="ok" class="pref_dependency tips text-success" title="{tr}Requires package:{/tr} "|cat:$dep.label|escape|cat:" (OK)"}
         {else}
             <div class="alert alert-warning pref_dependency d-inline-block"{if not $p.modified and not $p.value} style="display:none;"{/if}>
-                {tr}A Tiki package is missing:{/tr} <a href="tiki-admin.php?page=packages" class="alert-link">{$dep.label|escape}</a>
+                {tr}A Tiki package is missing:{/tr} <a href="tiki-admin.php?page=packages&amp;package_highlight={$dep.label|escape:'url'}" class="alert-link">{$dep.label|escape}</a>
             </div>
         {/if}
     {/foreach}
