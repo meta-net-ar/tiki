@@ -26,12 +26,12 @@ export default function (areaId, toolbar, options) {
             }
         },
 
-        onKeydown: function (event) {
-            if (event.key === "@") {
-                event.preventDefault();
-                renderUserMentionModal(areaId);
-            }
-        },
+        // onKeydown: function (event) {
+        //     if (event.key === "@") {
+        //         event.preventDefault();
+        //         renderUserMentionModal(areaId);
+        //     }
+        // },
 
         onCodeviewToggled: function () {
             Handlers.customCodeview(target);
@@ -78,10 +78,58 @@ export default function (areaId, toolbar, options) {
                 // Initialize language checker if enabled via options
                 initializeLanguageCheck(target, options);
             },
-            onKeydown: function (event) {
-                if (event.key === "@") {
-                    event.preventDefault();
-                    renderUserMentionModal(areaId);
+            onInput: function (event) {
+                console.log("onInput triggered", event);
+            },
+            onKeydown: async function (event) {
+                const range = $(target).summernote("editor.getLastRange");
+                const editorNode = range.ec;
+                if (event.key === "@" || editorNode.textContent.includes("@")) {
+                    const editableNode = editorNode?.nodeType === Node.TEXT_NODE ? editorNode.parentNode : editorNode;
+
+                    if (!editableNode || typeof editableNode.appendChild !== "function") {
+                        return;
+                    }
+
+                    const text = (editorNode?.textContent || "").substring(0, range.eo);
+                    console.log("range:", range, text);
+                    const suggestions = await fetchMentions(text);
+
+                    if (!suggestions.length) {
+                        return;
+                    }
+
+                    const mentionTarget = $("<span />").text(text);
+                    const end = $("<span />").text((editorNode?.textContent || "").substring(range.eo));
+                    console.log("mentionTarget:", text, "end:", end.text(), "node:", editableNode.textContent, editableNode);
+                    editableNode.childNodes.forEach((child) => {
+                        if (child === editorNode) {
+                            editableNode.replaceChild(mentionTarget[0], child);
+                            editableNode.insertBefore(end[0], mentionTarget[0].nextSibling);
+                        }
+                    });
+
+                    // put the cursor at the end of the mentionTarget
+                    const newRange = document.createRange();
+                    newRange.setStart(mentionTarget[0], mentionTarget[0].childNodes.length);
+                    newRange.setEnd(mentionTarget[0], mentionTarget[0].childNodes.length);
+                    const selection = window.getSelection();
+                    selection.removeAllRanges();
+                    selection.addRange(newRange);
+
+                    const dropdown = getSuggestionsDropdown(mentionTarget[0].getBoundingClientRect());
+                    suggestions.forEach((suggestion) => {
+                        const item = $('<a class="dropdown-item" href="#">').text(suggestion);
+                        item.on("click", (e) => {
+                            e.preventDefault();
+                            mentionTarget.text(`@${suggestion} `);
+                            $(target).summernote("editor.setLastRange", range);
+                            dropdown.remove();
+                        });
+                        dropdown.append(item[0]);
+                    });
+
+                    document.body.appendChild(dropdown);
                 }
             },
             onCodeviewToggled: function () {
