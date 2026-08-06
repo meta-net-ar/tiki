@@ -20,7 +20,6 @@ export default function (textarea) {
                     return;
                 }
 
-                // Use the live selection rect — no DOM mutation needed
                 const sel = window.getSelection();
                 const caretRect = sel?.rangeCount ? sel.getRangeAt(0).getBoundingClientRect() : null;
                 if (!caretRect) {
@@ -32,7 +31,6 @@ export default function (textarea) {
                     const item = $('<a class="dropdown-item" href="#">').text(suggestion);
                     item.on("click", (e) => {
                         e.preventDefault();
-                        // Select the typed @partial so pasteHTML replaces it instead of appending
                         const typedMention = text.match(/@\w*$/)?.[0] ?? "";
                         if (typedMention) {
                             const currentRange = textarea.summernote("editor.getLastRange");
@@ -44,8 +42,7 @@ export default function (textarea) {
                             sel.addRange(nativeRange);
                             textarea.summernote("editor.saveRange");
                         }
-                        // pasteHTML (inside insertAt's AJAX success) leaves cursor at the start;
-                        // observe the editable for the insertion and move cursor to the end
+
                         const editable = textarea.data("summernote").layoutInfo.editable[0];
                         const observer = new MutationObserver((mutations) => {
                             observer.disconnect();
