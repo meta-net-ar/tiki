@@ -166,6 +166,13 @@
                         {preference name=zotero_group_id}
                         {preference name=zotero_style}
                     </div>
+                    {preference name=zotero_pandoc_enabled}
+                    <div class="adminoptionboxchild" id="zotero_pandoc_enabled_childcontainer">
+                        {preference name=zotero_pandoc_library}
+                        {preference name=zotero_pandoc_style}
+                        {preference name=zotero_pandoc_path}
+                        {preference name=zotero_pandoc_csl_archive_url}
+                    </div>
                     {preference name=webmonetization_enabled}
                     <div class="adminoptionboxchild" id="webmonetization_enabled_childcontainer">
                         {preference name=webmonetization_default_payment_pointer}

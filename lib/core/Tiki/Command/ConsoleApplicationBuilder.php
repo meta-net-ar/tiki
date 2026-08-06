@@ -133,6 +133,8 @@ class ConsoleApplicationBuilder
                 new PreferencesDeleteCommand(),
                 new PreferencesExportCommand(),
                 new SBOMGenerateCommand(),
+                new ZoteroCslFindCommand(),
+                new ZoteroCslUpdateCommand(),
                 ],
             ],[
             'condition' => 'checkDatabaseUpToDate',
@@ -532,16 +534,12 @@ class ConsoleApplicationBuilder
      * Iterates over all commands in the list, and registers / doesn't register the commands in accordance with the result
      * of the check function and the action configured for the command group
      *
-     * @param int|bool $statusCode
+     * @param int $statusCode
      * @return Application
      */
     public function create($statusCode = 1100): Application
     {
         global $tikipath;
-
-        if (is_bool($statusCode)) {
-            $statusCode = 1100;
-        }
 
         if (self::$lastInstance) {
             return self::$lastInstance;
@@ -561,6 +559,9 @@ class ConsoleApplicationBuilder
         $console->setAutoExit(false);
         $console->setName(tra('Tiki Console Tool'));
         $console->setCatchExceptions(false);
+
+        $commandCalled = $_SERVER['argv'][1] ?? false;
+        $stopAfterRequestedCommand = ! in_array($commandCalled, ['list', 'help'], true);
 
         /**
          * @var  $condition string  The name of the check method to be executed
@@ -623,6 +624,10 @@ class ConsoleApplicationBuilder
                     }
                 }
                 $console->add($command);
+                // If the command exactly matches one that was requested, stop processing further commands as they will not be used anyhow.
+                if ($stopAfterRequestedCommand && $commandCalled === $command->getName()) {
+                    break 2;
+                }
             }
         }
 
