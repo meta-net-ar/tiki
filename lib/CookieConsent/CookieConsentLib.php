@@ -46,6 +46,43 @@ class CookieConsentLib
         ];
     }
 
+    private static function getDisabledCookieCategoryKeys(): array
+    {
+        $disabledCategoriesInfo = \TikiLib::lib('prefs')->getPreference('cookie_consent_disable_builtin_categories');
+        return $disabledCategoriesInfo['value'];
+    }
+
+    /**
+     * Stub function to minimize code churn.  In the future this will return all consent categories that were requested
+     * by tiki code for the current request.
+     *
+     * Right now, it will return the categories not included in the temporary cookie_consent_disable_builtin_categories prefs
+     *
+     * @return array Cookie categories requested by tiki code in the current request.
+     */
+    public static function getRequestedCookieCategories(): array
+    {
+
+        $requestedCategories = self::getCookieCategories();
+        $currentCategories = self::getConsentPreferences()['categories'];
+
+        $disabledCategories = self::getDisabledCookieCategoryKeys();
+        if ($disabledCategories) {
+            //Strip out the disabled categories
+            foreach ($disabledCategories as $disabledCategoryKey) {
+                if (isset($requestedCategories[$disabledCategoryKey])) {
+                    unset($requestedCategories[$disabledCategoryKey]);
+                } else {
+                    \Feedback::error(tr("Category %0 from pref cookie_consent_disable_builtin_categories not found in: %1", $disabledCategoryKey, implode(', ', array_keys($requestedCategories))));
+                }
+            }
+        }
+        foreach ($requestedCategories as $key => & $value) {
+            $value['consent'] = $currentCategories[$key];
+        }
+        return $requestedCategories;
+    }
+
     /**
      * Initialize the consent preferences based on existing cookies.
      *

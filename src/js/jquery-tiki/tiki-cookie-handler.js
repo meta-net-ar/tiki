@@ -70,6 +70,10 @@ window.CookieHandler = (() => {
         jqueryTiki.cookie_consent_value = cookieConsentValue;
         setCookieBrowser(COOKIE_CONSENT_NAME, cookieConsentValue, "", exp);
         $(document).trigger("cookies.consent.agree");
+
+        if (document.location.href.match(/[?&]cookie_consent/)) {
+            document.location.replace(document.location.href.replace(/[?&]cookie_consent/g, ""));
+        }
     }
 
     function capitalize(str) {
