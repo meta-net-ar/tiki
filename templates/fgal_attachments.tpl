@@ -19,10 +19,20 @@
 
     {* Generate table if view permissions granted and if count of attached files > 0 *}
     {if ($tiki_p_wiki_view_attachments == 'y' || $tiki_p_wiki_admin_attachments == 'y') && count($files) > 0}
+        {if $count > $maxRecords}
+            <div class="clearboth mb-2">
+                {pagination_links count=$count step=$maxRecords offset=$offset offset_arg="s_f_attachments-offset"}{/pagination_links}
+            </div>
+        {/if}
         <fieldset>
             <legend>{tr}Attached files{/tr}</legend>
             {include file='list_file_gallery_content.tpl'}
         </fieldset>
+        {if $count > $maxRecords}
+            <div class="clearboth mt-2">
+                {pagination_links count=$count step=$maxRecords offset=$offset offset_arg="s_f_attachments-offset"}{/pagination_links}
+            </div>
+        {/if}
     {/if}
 
     {if ($tiki_p_wiki_attach_files eq 'y' or $tiki_p_wiki_admin_attachments eq 'y')
