@@ -25,11 +25,15 @@
 
                     <div id="customConsentSectionBanner" class="row mb-4">
                         <div class="col-12 d-flex flex-wrap gap-3 gap-md-4">
-                            {foreach from=$cookie_categories key=category item=data}
+                            {foreach $cookie_categories as $category => $data}
                                 <div class="form-check form-switch d-flex align-items-center flex-shrink-0">
                                     <input class="form-check-input me-2" type="checkbox" id="toggle{$category|capitalize}"
-                                           name="cookie_consent_{$category}"
-                                           {if $category == 'essential'}checked disabled aria-disabled="true"{/if}>
+                                        name="cookie_consent_{$category}"
+                                        {if $category == 'essential'}
+                                            checked disabled aria-disabled="true"
+                                        {elseif $data.consent}
+                                            checked
+                                        {/if}>
                                     <label class="form-check-label me-2 fw-semibold" for="toggle{$category|capitalize}">
                                         {tr}{$data.name}{/tr}
                                     </label>
