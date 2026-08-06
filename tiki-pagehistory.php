@@ -237,8 +237,10 @@ foreach ($history as &$h) { // as $h has been used by reference before it needs 
 }
 $history_versions = array_reverse($history_versions);
 $history_sessions = array_reverse($history_sessions);
-$history_versions[] = (int) $info['version'];   // current is last one
-$history_sessions[] = 0;
+if (empty($history_versions) || end($history_versions) !== (int) $info['version']) {
+    $history_versions[] = (int) $info['version'];   // current is last one (only if not already in history)
+    $history_sessions[] = 0;
+}
 $smarty->assign_by_ref('history', $history);
 
 // for pagination
