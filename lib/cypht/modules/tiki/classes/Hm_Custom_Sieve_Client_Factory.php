@@ -4,6 +4,26 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+require_once APP_PATH . 'modules/sievefilters/hm-sieve.php';
+
+/**
+ * Custom sieve client factory class. To use this, you must set the ENABLE_CUSTOM_SIEVE_FACTORY environment variable to true.
+ */
+class Hm_Custom_Sieve_Client_Factory extends Hm_Sieve_Client_Factory
+{
+    public function init($user_config = null, $imap_account = null, $is_nux_supported = false)
+    {
+        if (($imap_account && ! empty($imap_account['sieve_config_host'])) && $imap_account['sieve_config_host'] !== 'localhost') {
+            $factory = new Hm_Sieve_Client_Factory();
+            $client = $factory->init($user_config, $imap_account, $is_nux_supported);
+        } else {
+            $client = new Tiki_Hm_Sieve_Custom_Client($user_config, $imap_account['name'] ?? '');
+        }
+        return $client;
+    }
+}
+
 /**
  * Pretent storing sieve filters and scripts without Sieve client.
  * Use Tiki user preferences for storage to make Sieve filters UI
@@ -83,5 +103,10 @@ class Tiki_Hm_Sieve_Custom_Client
     public function isTikiStorage()
     {
         return true;
+    }
+
+    public function getExtensions()
+    {
+        return [];
     }
 }

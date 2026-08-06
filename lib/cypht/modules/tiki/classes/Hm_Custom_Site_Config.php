@@ -1,43 +1,19 @@
 <?php
 
-// (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
-//
-// All Rights Reserved. See copyright.txt for details and a complete list of authors.
-// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-class Tiki_Hm_Site_Config_File extends Hm_Site_Config_File
+/**
+ * Custom site configuration class. To use this, you must set the SITE_CONFIG_TYPE environment variable to 'custom'.
+ */
+class Hm_Custom_Site_Config extends Hm_Site_Config_File
 {
-    /**
-     * @var array<string, mixed>
-     */
     public $user_defaults = [];
-    public $config = [];
     public $settings_per_page;
-    /**
-     * Load data based on source
-     * Overrides default configuration for Tiki integration
-     * @param array $source source location for site configuration
-     */
-    public function __construct($source = [], $session_prefix = 'cypht', $settings_per_page = false)
+
+    public function __construct()
     {
-        global $user;
-        parent::__construct($source);
-        // override
+        parent::__construct();
+
         $headerlib = TikiLib::lib('header');
-        $this->set('session_type', 'custom');
-        $this->set('session_class', 'Tiki_Hm_Custom_Session');
-        $this->set('cache_class', 'Tiki_Hm_Custom_Cache');
-        $this->set('auth_class', 'Tiki_Hm_Custom_Auth');
-        $this->set('session_prefix', $session_prefix);
-        $this->set('auth_type', 'custom');
-        $this->set('output_class', 'Tiki_Hm_Output_HTTP');
-        $this->set('cookie_path', ini_get('session.cookie_path'));
-        $this->set('sieve_client_factory', 'Tiki_Hm_Sieve_Client_Factory');
-        if ($user && (empty($_SESSION[$session_prefix]['user_data']) || count($_SESSION[$session_prefix]['user_data']) == 2)) {
-            $user_config = new Tiki_Hm_User_Config($this);
-            $user_config->load($user);
-            $_SESSION[$session_prefix]['user_data'] = $user_config->dump();
-        }
-        $this->settings_per_page = $settings_per_page;
+
         $output_modules = $this->get('output_modules');
         $handler_modules = $this->get('handler_modules');
         foreach ($output_modules as $page => $_) {
@@ -49,15 +25,15 @@ class Tiki_Hm_Site_Config_File extends Hm_Site_Config_File
             }
             if (isset($output_modules[$page]['header_css'])) {
                 unset($output_modules[$page]['header_css']);
-                $headerlib->add_cssfile('lib/cypht/site.css');
+                $headerlib->add_cssfile('vendor_bundled/vendor/cypht-org/cypht/site.css');
                 $headerlib->add_css('html, body { background-color: var(--bs-body-bg) !important; }');
             }
             if (isset($output_modules[$page]['page_js'])) {
                 unset($output_modules[$page]['page_js']);
-                $headerlib->add_jsfile('lib/cypht/jquery.touch.js');
-                $headerlib->add_jsfile('lib/cypht/site.js');
+                $headerlib->add_jsfile('vendor_bundled/vendor/cypht-org/cypht/site.js');
             }
         }
+
         // cleanup side menu
         unset($output_modules['ajax_hm_folders']['contacts_page_link']);
         unset($output_modules['ajax_hm_folders']['settings_save_link']);
@@ -75,18 +51,31 @@ class Tiki_Hm_Site_Config_File extends Hm_Site_Config_File
                 }
             }
         }
+
         $this->set('output_modules', $output_modules);
         $this->set('handler_modules', $handler_modules);
+    }
+
+    public function initSession($session_prefix = 'cypht')
+    {
+        $this->set('session_prefix', $session_prefix);
+
         if (empty($_SESSION[$session_prefix]['user_data']['timezone_setting'])) {
             $this->user_defaults['timezone_setting'] = TikiLib::lib('tiki')->get_display_timezone();
             if (isset($_SESSION[$session_prefix]['user_data'])) {
                 $_SESSION[$session_prefix]['user_data']['timezone_setting'] = $this->user_defaults['timezone_setting'];
             }
         }
+
         if (isset($_SESSION[$session_prefix]['user_data']['allow_external_images_setting'])) {
             $this->set('allow_external_image_sources', $_SESSION[$session_prefix]['user_data']['allow_external_images_setting']);
         }
-        // handle oauth2 config
+
+        $this->handleOAuth2Config($session_prefix);
+    }
+
+    private function handleOAuth2Config($session_prefix)
+    {
         $oauth2 = [
             'gmail' => [
                 'client_id' => '',
@@ -103,7 +92,9 @@ class Tiki_Hm_Site_Config_File extends Hm_Site_Config_File
                 'auth_uri' => '',
                 'token_uri' => '',
                 'refresh_uri' => '',
-            ],];
+            ],
+        ];
+
         if (isset($_SESSION[$session_prefix]['user_data']['tiki_enable_oauth2_over_imap_setting'])) {
             $this->set('tiki_enable_oauth2_over_imap', $_SESSION[$session_prefix]['user_data']['tiki_enable_oauth2_over_imap_setting']);
         }

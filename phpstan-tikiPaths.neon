@@ -26,12 +26,12 @@ parameters:
     # Cypth related
     # There is really no reason to exclude cypht anymore, as jason-munro/cypht is in composer.json by default.  But lib/cypht/integration/classes.php uses nested requires which seem to confuse phpstan. - benoitg - 2026-01-25
     - lib/cypht
-    - lib/core/Services/Cypht/Controller.php
     - lib/core/Search/Index/Cypht.php
     - lib/wiki-plugins/wikiplugin_cypht.php
     - modules/mod-func-webmail_unread_messages.php
     - lib/core/Tiki/Command/Webmail*
     - tiki-webmail.php
+    - lib/cypht/integration/print_pdf.php
     # TikiManager related
     - lib/core/Services/Manager
 

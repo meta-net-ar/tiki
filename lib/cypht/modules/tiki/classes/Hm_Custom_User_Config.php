@@ -1,18 +1,10 @@
 <?php
 
-// (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
-//
-// All Rights Reserved. See copyright.txt for details and a complete list of authors.
-// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 /**
- * Override user config handling in Cypht.
- * Store settings in Tiki user preferences and load them from there.
- * Ignore encryption and decryption of the settings due to missing password key when loading.
+ * Custom user configuration class. To use this, you must set the USER_CONFIG_TYPE environment variable to 'custom'.
  */
-class Tiki_Hm_User_Config extends Hm_Config
+class Hm_Custom_User_Config extends Hm_Config
 {
-    public $config = [];
-    /* username */
     private $username;
     private $site_config;
 
@@ -22,16 +14,30 @@ class Tiki_Hm_User_Config extends Hm_Config
      */
     public function __construct($config)
     {
+        global $user;
+
         $this->config = array_merge($this->config, $config->user_defaults);
         $this->site_config = $config;
+        $this->load($user);
+    }
+
+    public function get($name, $default = false)
+    {
+        return parent::get($name, $default);
     }
 
     /**
-     * Load the settings for a user
-     * @param string $username username
-     * @param string $key key to decrypt the user data (not used)
+     * Set a config value
+     * @param string $name config value name
+     * @param string $value config value
      * @return void
      */
+    public function set($name, $value)
+    {
+        parent::set($name, $value);
+        $this->save($this->username);
+    }
+
     public function load($username, $key = null)
     {
         $this->username = $username;
@@ -87,7 +93,7 @@ class Tiki_Hm_User_Config extends Hm_Config
         $this->config = $data;
         $this->set_tz();
         if ($username) {
-            $temp_config = new Tiki_Hm_User_Config($this->site_config);
+            $temp_config = new self($this->site_config);
             $temp_config->load($username);
             $existing = $temp_config->dump();
             $older = 'current';
@@ -152,18 +158,6 @@ class Tiki_Hm_User_Config extends Hm_Config
         }
         $this->restore_servers($removed);
         $_SESSION[$this->site_config->get('session_prefix')]['user_data'] = $this->dump();
-    }
-
-    /**
-     * Set a config value
-     * @param string $name config value name
-     * @param string $value config value
-     * @return void
-     */
-    public function set($name, $value)
-    {
-        $this->config[$name] = $value;
-        $this->save($this->username);
     }
 
     /**

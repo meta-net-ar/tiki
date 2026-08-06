@@ -6975,6 +6975,19 @@
             "TikiLib::check_duplicate_alias": true,
             "TikiLib::str_putcsv": true
         },
+        "lib/cypht/modules/tiki/classes/Hm_Custom_User_Config.php": {
+            "Hm_Custom_User_Config::filter_servers": true
+        },
+        "lib/cypht/modules/tiki/classes/Hm_Custom_Auth.php": {
+            "Hm_Custom_Auth::check_credentials": true
+        },
+        "lib/cypht/modules/tiki/classes/Hm_Custom_Session.php": {
+            "Hm_Custom_Session::is_active": true,
+            "Hm_Custom_Session::close_early": true,
+            "Hm_Custom_Session::record_unsaved": true,
+            "Hm_Custom_Session::dedup_page_links": true,
+            "Hm_Custom_Session::session_prefix": true
+        },
         "tiki-check.php": {
             "BenchmarkPhp::test_benchmark": true,
             "BenchmarkPhp::test_math": true,

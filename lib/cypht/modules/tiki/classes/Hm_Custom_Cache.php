@@ -1,17 +1,12 @@
 <?php
 
 /**
- * Redis cache
- * @package framework
- * @subpackage cache
+ * Custom cache class. To use this, you must set the ENABLE_CUSTOM_CACHE environment variable to true.
  */
-class Tiki_Hm_Tiki_Cache
+class Hm_Custom_Cache extends Hm_Noop_Cache
 {
     private $cachelib;
 
-    /**
-     * @param Hm_Config $config site config object
-     */
     public function __construct()
     {
         $this->cachelib = TikiLib::lib('cache');
@@ -21,10 +16,10 @@ class Tiki_Hm_Tiki_Cache
      * @param string $key name of value to cache
      * @param mixed $val value to cache
      * @param integer $lifetime how long to cache (if applicable for the backend)
-     * @param boolean $session store in the session instead of the enabled cache
+     * @param boolean $crypt_key
      * @return boolean
      */
-    public function set($key, $val)
+    public function set($key, $val, $lifetime, $crypt_key)
     {
         return $this->cachelib->cacheItem($key, Hm_transform::stringify($val));
     }

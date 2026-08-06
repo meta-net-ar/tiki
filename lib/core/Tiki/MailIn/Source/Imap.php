@@ -8,8 +8,13 @@ namespace Tiki\MailIn\Source;
 
 use Tiki\MailIn\Exception\MailInException;
 use Tiki\MailIn\Exception\TransportException;
-use Hm_IMAP;
 use ZBateson\MailMimeParser\MailMimeParser;
+
+define('APP_PATH', CYPHT_PATH . '/'); // Essential for Cypht framework to bundle different of its components.
+require_once CYPHT_PATH . '/lib/framework.php';
+require_once CYPHT_PATH . '/modules/imap/hm-imap.php';
+
+use Hm_IMAP;
 
 class Imap implements SourceInterface
 {
@@ -125,7 +130,6 @@ class Imap implements SourceInterface
      */
     public function connect(): Hm_IMAP // @phpstan-ignore class.notFound (this exists, but cypht defines is conditionally for some reason, which confuses phpstan)
     {
-        global $tikipath;
         try {
             $config = [
                 'server'    => $this->host,
@@ -136,9 +140,6 @@ class Imap implements SourceInterface
                 'password'  => $this->password,
                 'use_cache' => true,
             ];
-            require_once $tikipath . '/lib/cypht/integration/classes.php';
-            require_once APP_PATH . 'modules/core/message_functions.php';
-            require_once APP_PATH . 'modules/imap/hm-imap.php';
 
             $imap = new Hm_IMAP(); // @phpstan-ignore class.notFound (this exists, but cypht defines is conditionally for some reason, which confuses phpstan)
             $authenticate = $imap->connect($config);
