@@ -223,6 +223,7 @@ if (
     && ! empty($_REQUEST['current_page_id'])
     && ! empty($page)
     && $tikilib->page_exists($page)
+    && $access->checkCsrf()
 ) {
     $currentRefId = (int) $_REQUEST['current_page_id'];
     $currentNodeInfo = $structlib->s_get_page_info($currentRefId);
@@ -311,23 +312,6 @@ if (isset($_REQUEST["current_page_id"]) && empty($info)) {
     if (isset($_REQUEST["add_child"])) {
         $smarty->assign('add_child', "true");
     }
-} elseif (isset($_REQUEST['insert_into_struct']) && isset($_REQUEST['current_page_id'])) {
-    // Link an existing page into the structure and redirect, without touching its content
-    $access->checkCsrf();
-
-    $structure_info = $structlib->s_get_structure_info($_REQUEST['current_page_id']);
-    if (empty($structure_info)) {
-        Feedback::errorAndDie(tra("Invalid page_ref_id"), \Laminas\Http\Response::STATUS_CODE_409);
-    }
-    assertCanEditPageInStructure($structure_info);
-
-    link_page_into_structure($_REQUEST['current_page_id'], isset($_REQUEST['add_child']), $page);
-
-    $url = $wikilib->sefurl($page);
-    if (! empty($_REQUEST['page_ref_id'])) {
-        $url .= (! str_contains($url, '?') ? '?' : '&') . 'page_ref_id=' . $_REQUEST['page_ref_id'];
-    }
-    $access->redirect($url);
 } else {
     $structure_info = [];
     $smarty->assign('current_page_id', 0);
