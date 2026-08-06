@@ -63,6 +63,16 @@ const getOptionsProp = computed(() => {
 });
 const options = ref([]);
 const wrapperRef = ref(null);
+const deduplicateOptionsByValue = (items) => {
+    const seenValues = new Set();
+    return items.filter((item) => {
+        if (seenValues.has(item.value)) {
+            return false;
+        }
+        seenValues.add(item.value);
+        return true;
+    });
+};
 
 const handleValueChange = (value) => {
     // check if the checkbox with id "intertrans-active" is checked
@@ -97,10 +107,10 @@ const remoteMethod = async (query) => {
 
         const data = await response.json();
         const loadedOptions = data.map(item => (typeof item === "string" ? { value: item, label: item } : item));
-        const newOptions = [
+        const newOptions = deduplicateOptionsByValue([
             ...options.value.filter(item => modelValue.value?.includes(item.value)),
             ...loadedOptions,
-        ];
+        ]);
         options.value = newOptions;
     } catch (error) {
         console.error('Error loading remote options:', error);

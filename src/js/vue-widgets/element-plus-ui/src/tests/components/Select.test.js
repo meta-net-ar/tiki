@@ -273,6 +273,28 @@ describe("Select", () => {
             expect(renderedOption2.getAttribute("label")).toBe(expectedData[0].label);
         });
 
+        test("does not duplicate an already-selected option returned by remote search", async () => {
+            const givenProps = {
+                ...basicProps,
+                multiple: "true",
+                value: JSON.stringify(["foo"]),
+                remoteSourceUrl: "http://foo.bar",
+            };
+            const expectedData = [
+                { value: "foo", label: "Foo remote" },
+                { value: "baz", label: "Baz remote" },
+            ];
+
+            getFetchSpy(expectedData);
+
+            render(Select, { props: givenProps });
+
+            await ElSelect.mock.calls[0][0]["remote-method"]("query");
+
+            const renderedOptions = screen.getAllByTestId(DATA_TEST_ID.SELECT_OPTION);
+            expect(renderedOptions.map((option) => option.getAttribute("value"))).toEqual(["foo", "baz"]);
+        });
+
         test("should not trigger the remote search when the query is empty", async () => {
             const givenProps = {
                 ...basicProps,
