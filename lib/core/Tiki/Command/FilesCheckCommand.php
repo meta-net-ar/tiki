@@ -38,12 +38,6 @@ class FilesCheckCommand extends Command
 
         $output->writeln('');
 
-        $checkAttachmentGallery = new CheckAttachmentGallery('t');
-        $result = $checkAttachmentGallery->analyse();
-        $this->printResults($output, $result, tr('Tracker Attachments'));
-
-        $output->writeln('');
-
         $checkAttachmentGallery = new CheckAttachmentGallery('w');
         $result = $checkAttachmentGallery->analyse();
         $this->printResults($output, $result, tr('Wiki Attachments'));

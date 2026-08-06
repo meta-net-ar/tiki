@@ -2115,13 +2115,6 @@ function wikiplugin_trackerlist($data, $params)
                 }
             }
 
-            if (! empty($items['data']) && ($definition->isEnabled('useAttachments') && $definition->isEnabled('showAttachments'))) {
-                foreach ($items["data"] as $itkey => $oneitem) {
-                    $res = $trklib->get_item_nb_attachments($items["data"][$itkey]['itemId']);
-                    $items["data"][$itkey]['attachments']  = $res['attachments'];
-                }
-            }
-
             if (! empty($compute) && ! empty($items['data'])) {
                 $fs = preg_split('/ *: */', $compute);
                 foreach ($fs as $fieldId) {

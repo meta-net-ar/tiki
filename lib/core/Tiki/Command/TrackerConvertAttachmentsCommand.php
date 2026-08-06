@@ -16,6 +16,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use TikiDb;
 use TikiLib;
 use Tracker_Definition;
 use Tracker_Item;
@@ -70,6 +71,7 @@ class TrackerConvertAttachmentsCommand extends Command
         global $prefs;
 
         $trklib = TikiLib::lib('trk');
+        $attachmentsTable = TikiDb::get()->table('tiki_tracker_item_attachments');
         $trackerId = $input->getArgument('trackerId');
         $fieldId = $input->getArgument('fieldId');
         $galleryId = $input->getArgument('galleryId');
@@ -157,10 +159,16 @@ class TrackerConvertAttachmentsCommand extends Command
                 continue;
             }
 
-            $atts = $trklib->list_item_attachments($itemId, 0, -1, 'comment_asc', '');
+            $atts = $attachmentsTable->fetchAll(
+                ['user', 'attId', 'itemId', 'filename', 'filesize', 'filetype', 'hits', 'created', 'comment', 'longdesc', 'version', 'path'],
+                ['itemId' => (int) $itemId],
+                -1,
+                0,
+                $attachmentsTable->sortMode('comment_asc')
+            );
             $fileIdList = [];
 
-            $numAttachments = sizeof($atts['data']);
+            $numAttachments = count($atts);
 
             if ($numAttachments === 0) {
                 $output->writeln('<info>Tracker Item "' . $itemId . '" skipped (no attachments)</info>');
@@ -171,8 +179,8 @@ class TrackerConvertAttachmentsCommand extends Command
                 $itemsProcessed++;
             }
 
-            foreach ($atts['data'] as $attachment) {
-                $attachment = $trklib->get_item_attachment($attachment['attId']);
+            foreach ($atts as $attachment) {
+                $attachment = $attachmentsTable->fetchFullRow(['attId' => (int) $attachment['attId']]);
 
                 if (! $attachment) {
                     $output->writeln('<error>Warning: Unable to get item attachment with attId "' . $attachment['attId'] . '"</error>');
@@ -291,9 +299,15 @@ class TrackerConvertAttachmentsCommand extends Command
 
                 if ($result == $itemId) {
                     if ($remove) {
-                        foreach ($atts['data'] as $attachment) {
+                        foreach ($atts as $attachment) {
                             if (! in_array($attachment['attId'], $failedAttIds)) {
-                                $trklib->remove_item_attachment($attachment['attId'], $itemId);
+                                if ($prefs['t_use_db'] === 'n') {
+                                    $path = $attachmentsTable->fetchOne('path', ['attId' => (int) $attachment['attId']]);
+                                    if ($path) {
+                                        @unlink($prefs['t_use_dir'] . $path);
+                                    }
+                                }
+                                $attachmentsTable->delete(['attId' => (int) $attachment['attId']]);
                             } else {
                                 $output->writeln('<info>(Attachment ' . $attachment['attId'] . ' ' . $attachment['filename'] . ' not removed)</info>');
                                 $numAttachments--;

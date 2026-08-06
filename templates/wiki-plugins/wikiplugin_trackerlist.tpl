@@ -179,10 +179,6 @@
                                     {$postcols = $postcols + 1}
                                     <th{if $tracker_info.showLastComment ne 'y'} style="width:5%"{/if}>{tr}Comments{/tr}</th>
                                 {/if}
-                                {if $tracker_info.useAttachments eq 'y' and $tracker_info.showAttachments eq 'y'}
-                                    {$postcols = $postcols + 1}
-                                    <th style="width:5%">{tr}atts{/tr}</th>
-                                {/if}
                                 {if ($showdelete eq 'y' || $showpenditem eq 'y' || $showopenitem eq 'y' || $showcloseitem eq 'y') && ($perms.tiki_p_admin_trackers eq 'y' or $perms.tiki_p_remove_tracker_items eq 'y' or $perms.tiki_p_remove_tracker_items_pending eq 'y' or $perms.tiki_p_remove_tracker_items_closed eq 'y')}
                                     {$postcols = $postcols + 1}
                                     <th>{tr}Action{/tr}</th>
@@ -236,7 +232,6 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
                                     {if $showlastmodif eq 'y'}<td></td>{/if}
                                     {if $showlastmodifby eq 'y'}<td></td>{/if}
                                     {if $showcomments ne 'n' and $tracker_info.useComments eq 'y' and ($tracker_info.showComments eq 'y' || $tracker_info.showLastComment eq 'y') and $perms.tiki_p_tracker_view_comments ne 'n'}<td></td>{/if}
-                                    {if $tracker_info.useAttachments eq 'y' and $tracker_info.showAttachments eq 'y'}<td></td>{/if}
                                     {if ($showdelete eq 'y' || $showpenditem eq 'y' || $showopenitem eq 'y' || $showcloseitem eq 'y') && ($perms.tiki_p_admin_trackers eq 'y' or $perms.tiki_p_remove_tracker_items eq 'y' or $perms.tiki_p_remove_tracker_items_pending eq 'y' or $perms.tiki_p_remove_tracker_items_closed eq 'y')}
                                         <td></td>
                                     {/if}
@@ -398,10 +393,6 @@ the section loop so that the vars are not replaced by nested pretty tracker exec
                 {/if}
                 {if $showcomments ne 'n' and $tracker_info.useComments eq 'y' and ($tracker_info.showComments eq 'y' or $tracker_info.showLastComment eq 'y') and $perms.tiki_p_tracker_view_comments ne 'n'}
                     <td style="text-align:center;{$tdinstyle}">{if $rowurl}<a href="{$rowurl|replacei:'#itemId':$items[user].itemId}" {$tdastyle}>{/if}{if $tracker_info.showComments eq 'y'}{$items[user].comments}{/if}{if $tracker_info.showComments eq 'y' and $tracker_info.showLastComment eq 'y'}<br>{/if}{if $tracker_info.showLastComment eq 'y' and !empty($items[user].lastComment)}{$items[user].lastComment.userName|escape}-{$items[user].lastComment.commentDate|tiki_short_date}{/if}{if $rowurl}</a>{/if}</td>
-                {/if}
-                {if $tracker_info.useAttachments eq 'y' and $tracker_info.showAttachments eq 'y'}
-                    <td style="text-align:center;"><a href="tiki-view_tracker_item.php?trackerId={$listTrackerId}&amp;itemId={$items[user].itemId}&amp;show=att"
-            link="{tr}List Attachments{/tr}">{icon name="attach"}</a>{$items[user].attachments}</td>
                 {/if}
                 {if ($showdelete eq 'y' || $showpenditem eq 'y' || $showopenitem eq 'y' || $showcloseitem eq 'y') && ($perms.tiki_p_admin_trackers eq 'y' or $perms.tiki_p_remove_tracker_items eq 'y' or $perms.tiki_p_remove_tracker_items_pending eq 'y' or $perms.tiki_p_remove_tracker_items_closed eq 'y')}
                     <td>

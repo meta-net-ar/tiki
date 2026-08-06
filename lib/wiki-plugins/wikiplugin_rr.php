@@ -427,15 +427,6 @@ function wikiplugin_rr($data, $params)
     $trklib = TikiLib::lib('trk');
 
     if (isset($_REQUEST['itemId'])) {
-        $atts = $trklib->list_item_attachments($_REQUEST['itemId'], 0, -1, 'created_desc', '');
-        if (! empty($atts['data'][0]['attId'])) {
-            $params['attId'] = $atts['data'][0]['attId'];
-        }
-        $info = $trklib->get_item_attachment($params["attId"]);
-        $md5data = md5($info['data']);
-    }
-
-    if (isset($_REQUEST['itemId'])) {
         // This fetches the whole row from the mysql tables for that tracker item
         $item_info = $trklib->get_item_info($_REQUEST['itemId']);
         // This $item_info['lastModif'] displays just the lastModification of the item.
@@ -571,41 +562,8 @@ function wikiplugin_rr($data, $params)
 
     $r_html = $r_dir . DIRECTORY_SEPARATOR . $userinfilename . $sha1 . ".html";
 
-    if (! is_null($params["attId"])) {
-        $info = $trklib->get_item_attachment($params["attId"]);
-
-        if ($info['data']) {
-            #$filepath = tempnam( '/tmp', 'r' );
-            $filepath = "/tmp/" . $userinfilename . $sha1;
-            file_put_contents($filepath, $info['data']);
-        } else {
-            $filepath = $prefs['t_use_dir'] . $info['path'];
-        }
-
-        if (empty($info['filetype']) || $info['filetype'] == 'application/x-octetstream' || $info['filetype'] == 'application/octet-stream') {
-            include_once('lib/mime/mimelib.php');
-            $info['filetype'] = TikiLib::lib('mime')->from_path($filepath, 'application/octet-stream'); # New code after Tiki9 r42542: http://code.tiki.org/Commit+42542
-        }
-    } else {
-    }
-
     $type = $params["type"];
 
-    if (! is_null($params["attId"]) && ($type == "text/csv" || $type == "text/comma-separated-values")) {
-        // record filetype, data_file (path and file name), and data (contents) to be displayed, if desired, from R
-        $data = "file_type <- \"$type\"\ndata_file <- \"$filepath\"\ndata <- read.csv(\"$filepath\")\n$data";
-    } elseif (! is_null($params["attId"]) && $type == "text/plain") {
-        // record filetype, data_file (path and file name), and data (contents) to be displayed, if desired, from R
-        // read.delim & read.delim2 expect tabs as field separators (read.delim2 uses comma "," as decimal point; whereas read.delim uses point ".")
-        $data = "file_type <- \"$type\"\ndata_file <- \"$filepath\"\ndata <- read.delim2(\"$filepath\")\n$data";
-    } elseif (! is_null($params["attId"]) && $type == "text/xml") {
-        // record filetype, data_file (path and file name), and data (contents) to be displayed, if desired, from R
-        $data = "library(XML)\nfile_type <- \"$type\"\ndata_file <- xml(\"$filepath\")\ndata <- xmlTreeParse(data_file,  getDTD = F )\n$data";
-    } elseif (! is_null($params["attId"]) && $type != "text/csv" && $type != "text/comma-separated-values" && $type != "text/xml" && $type != "text/plain") {
-        $data = "data <- \"This file type is not recognized: $type.<br />Read the <a href=http://doc.tiki.org/PluginR>documentation</a> about the allowed filetypes\"\nfile_type <- \"$type\"\ndata_file <- \"$filepath\"\n$data";
-    } else {
-        // do nothing
-    }
     # Clean the <br /> , <p> and </p> tags added by the Tiki or smarty parsers on smarty templates in tiki7
     $data = str_replace(["<br />", "<p>", "</p>"], "", $data);
 

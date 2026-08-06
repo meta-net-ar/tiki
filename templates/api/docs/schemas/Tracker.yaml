@@ -254,27 +254,6 @@ properties:
       Whether to save and comment. Possible values are:
       - `0`: Do not save and comment.
       - `1`: Save and comment.
-  useAttachments:
-    type: integer
-    description: |
-      Whether to allow attachments. Possible values are:
-      - `0`: Do not use attachments.
-      - `1`: Use attachments.
-  showAttachments:
-    type: integer
-    description: |
-      Whether to show attachments. Possible values are:
-      - `0`: Do not show attachments.
-      - `1`: Show attachments.
-  orderAttachments:
-    type: array
-    description: |
-      The order of attachments. Possible values are:
-      - `filename`: Filename
-      - `created`: Created date
-      - `filesize`: File size
-      - `hits`: Hits
-      - `desc`: Description
   start:
     type: integer
     description: The start date of the tracker

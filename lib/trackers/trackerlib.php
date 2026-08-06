@@ -98,11 +98,6 @@ class TrackerLib extends TikiLib
         return $out;
     }
 
-    private function attachments()
-    {
-        return $this->table('tiki_tracker_item_attachments');
-    }
-
     private function comments()
     {
         return $this->table('tiki_comments');
@@ -159,232 +154,9 @@ class TrackerLib extends TikiLib
         }
     }
 
-    public function add_item_attachment_hit($id)
-    {
-        if (StatsLib::is_stats_hit()) {
-            $attachments = $this->attachments();
-            $attachments->update(['hits' => $attachments->increment(1)], ['attId' => (int) $id]);
-        }
-        return true;
-    }
-
-    public function get_item_attachment_owner($attId)
-    {
-        return $this->attachments()->fetchOne('user', ['attId' => (int) $attId]);
-    }
-
-    public function list_item_attachments($itemId, $offset = 0, $maxRecords = -1, $sort_mode = 'attId_asc', $find = '')
-    {
-        $attachments = $this->attachments();
-
-        $order = $attachments->sortMode($sort_mode);
-        $fields = ['user', 'attId', 'itemId', 'filename', 'filesize', 'filetype', 'hits', 'created', 'comment', 'longdesc', 'version'];
-
-        $conditions = [
-            'itemId' => (int) $itemId,
-        ];
-
-        if ($find) {
-            $conditions['filename'] = $attachments->like("%$find%");
-        }
-
-        return [
-            'data' => $attachments->fetchAll($fields, $conditions, $maxRecords, $offset, $order),
-            'count' => $attachments->fetchCount($conditions),
-        ];
-    }
-
-    public function get_item_nb_attachments($itemId)
-    {
-        $attachments = $this->attachments();
-
-        $ret = $attachments->fetchRow(
-            ['hits' => $attachments->sum('hits'), 'attachments' => $attachments->count()],
-            ['itemId' => $itemId]
-        );
-
-        return $ret ? $ret : [];
-    }
-
     public function get_item_nb_comments($itemId)
     {
         return $this->comments()->fetchCount(['object' => (int) $itemId, 'objectType' => 'trackeritem']);
-    }
-
-    public function list_all_attachments($offset = 0, $maxRecords = -1, $sort_mode = 'created_desc', $find = '')
-    {
-        $attachments = $this->attachments();
-
-        $fields = ['user', 'attId', 'itemId', 'filename', 'filesize', 'filetype', 'hits', 'created', 'comment', 'path'];
-        $order = $attachments->sortMode($sort_mode);
-        $conditions = [];
-
-        if ($find) {
-            $conditions['filename'] = $attachments->like("%$find%");
-        }
-
-        return [
-            'data' => $attachments->fetchAll($fields, $conditions, $maxRecords, $offset, $order),
-            'count' => $attachments->fetchCount($conditions),
-        ];
-    }
-
-    public function file_to_db($path, $attId)
-    {
-        if (is_readable($path)) {
-            $updateResult = $this->attachments()->update(
-                ['data' => file_get_contents($path),    'path' => ''],
-                ['attId' => (int) $attId]
-            );
-
-            if ($updateResult) {
-                unlink($path);
-            }
-        }
-    }
-
-    public function db_to_file($path, $attId)
-    {
-        $attachments = $this->attachments();
-
-        $data = $attachments->fetchOne('data', ['attId' => (int) $attId]);
-        if (false !== file_put_contents($path, $data)) {
-            $attachments->update(['data' => '', 'path' => basename($path)], ['attId' => (int) $attId]);
-        }
-    }
-
-    public function get_item_attachment($attId)
-    {
-        return $this->attachments()->fetchFullRow(['attId' => (int) $attId]);
-    }
-
-    public function remove_item_attachment($attId = 0, $itemId = 0)
-    {
-        global $prefs;
-        $attachments = $this->attachments();
-        $paths = [];
-
-        if (empty($attId) && ! empty($itemId)) {
-            if ($prefs['t_use_db'] === 'n') {
-                $paths = $attachments->fetchColumn('path', ['itemId' => $itemId]);
-            }
-
-            $this->query('update `tiki_tracker_item_fields` ttif left join `tiki_tracker_fields` ttf using (`fieldId`) set `value`=? where ttif.`itemId`=? and ttf.`type`=?', ['', (int) $itemId, 'A']);
-            $attachments->deleteMultiple(['itemId' => $itemId]);
-        } elseif (! empty($attId)) {
-            if ($prefs['t_use_db'] === 'n') {
-                $paths = $attachments->fetchColumn('path', ['attId' => (int) $attId]);
-            }
-            $this->query('update `tiki_tracker_item_fields` ttif left join `tiki_tracker_fields` ttf using (`fieldId`) set `value`=? where ttif.`value`=? and ttf.`type`=?', ['', (string) $attId, 'A']);
-            $attachments->delete(['attId' => (int) $attId]);
-        }
-        foreach (array_filter($paths) as $path) {
-            @unlink($prefs['t_use_dir'] . $path);
-        }
-    }
-
-    public function replace_item_attachment($attId, $filename, $type, $size, $data, $comment, $user, $fhash, $version, $longdesc, $trackerId = 0, $itemId = 0, $options = '', $notif = true)
-    {
-        global $prefs;
-        $attachments = $this->attachments();
-
-        $comment = strip_tags($comment);
-        $now = $this->now;
-        if (empty($attId)) {
-            $attId = $attachments->insert(
-                [
-                    'itemId' => (int) $itemId,
-                    'filename' => $filename,
-                    'filesize' => $size,
-                    'filetype' => $type,
-                    'data' => $data,
-                    'created' => $now,
-                    'hits' => 0,
-                    'user' => $user,
-                    'comment' => $comment,
-                    'path' => $fhash,
-                    'version' => $version,
-                    'longdesc' => $longdesc,
-                ]
-            );
-        } elseif (empty($filename)) {
-            $attachments->update(
-                [
-                    'user' => $user,
-                    'comment' => $comment,
-                    'version' => $version,
-                    'longdesc' => $longdesc,
-                ],
-                ['attId' => $attId]
-            );
-        } else {
-            $path = $attachments->fetchOne('path', ['attId' => (int) $attId]);
-            if ($path) {
-                @unlink($prefs['t_use_dir'] . $path);
-            }
-
-            $attachments->update(
-                [
-                    'filename' => $filename,
-                    'filesize' => $size,
-                    'filetype' => $type,
-                    'data' => $data,
-                    'user' => $user,
-                    'comment' => $comment,
-                    'path' => $fhash,
-                    'version' => $version,
-                    'longdesc' => $longdesc,
-                ],
-                ['attId' => (int) $attId]
-            );
-        }
-
-        if (! $notif) {
-            return $attId;
-        }
-
-        $options["attachment"] = ["attId" => $attId, "filename" => $filename, "comment" => $comment];
-        $watchers = $this->get_notification_emails($trackerId, $itemId, $options);
-
-        if (count($watchers) > 0) {
-            $smarty = TikiLib::lib('smarty');
-            $trackerName = $this->trackers()->fetchOne('name', ['trackerId' => (int) $trackerId]);
-
-            $smarty->assign('mail_date', $this->now);
-            $smarty->assign('mail_user', $user);
-            $smarty->assign('mail_action', 'New File Attached to Item:' . $itemId . ' at tracker ' . $trackerName);
-            $smarty->assign('mail_itemId', $itemId);
-            $smarty->assign('mail_trackerId', $trackerId);
-            $smarty->assign('mail_trackerName', $trackerName);
-            $smarty->assign('mail_attId', $attId);
-            $smarty->assign('mail_data', $filename . "\n" . $comment . "\n" . $version . "\n" . $longdesc);
-            if (! isset($_SERVER["SERVER_NAME"])) {
-                $_SERVER["SERVER_NAME"] = $_SERVER["HTTP_HOST"];
-            }
-            include_once('lib/webmail/tikimaillib.php');
-            $smarty->assign('server_name', $_SERVER['SERVER_NAME']);
-            $desc = $this->get_isMain_value($trackerId, $itemId);
-            $smarty->assign('mail_item_desc', $desc);
-            foreach ($watchers as $w) {
-                $mail = new TikiMail($w['user']);
-
-                if (! isset($w['template'])) {
-                    $w['template'] = '';
-                }
-                $content = $this->parse_notification_template($w['template']);
-
-                $mail->setSubject($smarty->fetchLang($w['language'], $content['subject']));
-                $mail_data = $smarty->fetchLang($w['language'], $content['template']);
-                if (isset($w['templateFormat']) && $w['templateFormat'] == 'html') {
-                    $mail->setHtml($mail_data, str_replace('&nbsp;', ' ', strip_tags($mail_data)));
-                } else {
-                    $mail->setText(str_replace('&nbsp;', ' ', strip_tags($mail_data)));
-                }
-                $mail->send([$w['email']]);
-            }
-        }
-
-        return $attId;
     }
 
     public function list_last_comments($trackerId = 0, $itemId = 0, $offset = -1, $maxRecords = -1)
@@ -3064,11 +2836,6 @@ class TrackerLib extends TikiLib
                         ;
                     } elseif ($f['type'] == 'c' && (empty($f['value']) || $f['value'] == 'n')) {
                         $mandatory_fields[] = $f;
-                    } elseif ($f['type'] == 'A' && ! empty($itemId) && empty($f['value'])) {
-                        $val = $this->get_item_value($trackerId, $itemId, $f['fieldId']);
-                        if (empty($val)) {
-                            $mandatory_fields[] = $f;
-                        }
                     } elseif ($f['type'] == 'r' && empty(array_filter((array) $f['value']))) {  // ItemLink - '0' counts as empty
                         $mandatory_fields[] = $f;
                     } elseif (! isset($f['value']) || ! is_array($f['value']) && strlen($f['value']) == 0 || is_array($f['value']) && empty($f['value'])) {
@@ -3247,7 +3014,6 @@ class TrackerLib extends TikiLib
 
         $this->itemFields()->deleteMultiple(['itemId' => (int) $itemId]);
         $this->comments()->deleteMultiple(['object' => (int) $itemId, 'objectType' => 'trackeritem']);
-        $this->attachments()->deleteMultiple(['itemId' => (int) $itemId]);
         $this->groupWatches()->deleteMultiple(['object' => (int) $itemId, 'event' => 'tracker_item_modified']);
         $this->userWatches()->deleteMultiple(['object' => (int) $itemId, 'event' => 'tracker_item_modified']);
         // Now delete the actual tracker item
@@ -4089,34 +3855,6 @@ class TrackerLib extends TikiLib
         }
 
         return $out;
-    }
-
-    /*
-    ** function only used for the popup for more infos on attachments
-    *  returns an array with field=>value
-    */
-    public function get_moreinfo($attId)
-    {
-        $query = "select o.`value`, o.`trackerId` from `tiki_tracker_options` o";
-        $query .= " left join `tiki_tracker_items` i on o.`trackerId`=i.`trackerId` ";
-        $query .= " left join `tiki_tracker_item_attachments` a on i.`itemId`=a.`itemId` ";
-        $query .= " where a.`attId`=? and o.`name`=?";
-        $result = $this->query($query, [(int) $attId, 'orderAttachments']);
-        $resu = $result->fetchRow();
-        if ($resu) {
-            $resu['orderAttachments'] = $resu['value'];
-        }
-        if (str_contains($resu['orderAttachments'], '|')) {
-            $fields = preg_split('/,/', substr($resu['orderAttachments'], strpos($resu['orderAttachments'], '|') + 1));
-            $res = $this->attachments()->fetchRow($fields, ['attId' => (int) $attId]);
-            $res["trackerId"] = $resu['trackerId'];
-            $res["longdesc"] = isset($res['longdesc']) ? TikiLib::lib('parser')->parse_data($res['longdesc'], ['objectType' => 'trackeritemattachments',
-            'objectId' => $res["trackerId"], 'fieldName' => 'longdesc']) : '';
-        } else {
-            $res = [tra("Message") => tra("No extra information for that attached file. ")];
-            $res['trackerId'] = 0;
-        }
-        return $res;
     }
 
     public function field_types()
@@ -5560,8 +5298,7 @@ class TrackerLib extends TikiLib
             if (! empty($is_new) && in_array($res['type'], ['u', 'g', 'I']) && ($res['options_array'][0] == 1 || $res['options_array'][0] == 2)) {
                 $res['value'] = ($res['type'] == 'u') ? $user : (($res['type'] == 'g') ? $_SESSION['u_info']['group'] : TikiLib::get_ip_address());
             }
-            if (in_array($res['type'], ['A', 'N'])) {
-                // attachment - image
+            if ($res['type'] == 'N') {
                 continue; //not done yet
             }
             //echo "duplic".$res['fieldId'].' '. $res['value'].'<br>';
@@ -5586,25 +5323,6 @@ class TrackerLib extends TikiLib
         return $to;
     }
 
-    public function export_attachment($itemId, $archive)
-    {
-        global $prefs;
-        $files = $this->list_item_attachments($itemId, 0, -1, 'attId_asc');
-        foreach ($files['data'] as $file) {
-            $localZip = "item_$itemId/" . $file['filename'];
-            $complete = $this->get_item_attachment($file['attId']);
-            if (! empty($complete['path']) && file_exists($prefs['t_use_dir'] . $complete['path'])) {
-                if (! $archive->addFile($prefs['t_use_dir'] . $complete['path'], $localZip)) {
-                    return false;
-                }
-            } elseif (! empty($complete['data'])) {
-                if (! $archive->addFromString($localZip, $complete['data'])) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
     /* fill a calendar structure with items
      * fieldIds contains one date or 2 dates
      */
@@ -7370,9 +7088,6 @@ class TrackerLib extends TikiLib
             'showComments' => $input->showComments->int() ? 'y' : 'n',
             'showLastComment' => $input->showLastComment->int() ? 'y' : 'n',
             'saveAndComment' => $input->saveAndComment->int() ? 'y' : 'n',
-            'useAttachments' => $input->useAttachments->int() ? 'y' : 'n',
-            'showAttachments' => $input->showAttachments->int() ? 'y' : 'n',
-            'orderAttachments' => (! empty($input->orderAttachments)) ? implode(',', $input->orderAttachments->word()) : '',
             'start' => $input->start->int(),
             'end' => $input->end->int(),
             'autoCreateGroup' => $input->autoCreateGroup->int() ? 'y' : 'n',

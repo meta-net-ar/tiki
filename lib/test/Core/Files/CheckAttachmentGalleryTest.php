@@ -12,7 +12,6 @@ use org\bovigo\vfs\vfsStream;
 use PHPUnit\Framework\TestCase;
 use Tiki\Files\CheckAttachmentGallery;
 use TikiLib;
-use TrackerLib;
 use WikiLib;
 
 class CheckAttachmentGalleryTest extends TestCase
@@ -291,9 +290,6 @@ class CheckAttachmentGalleryTest extends TestCase
             case 'w':
                 $id = $lib->wiki_attach_file('test', $base_name, '.txt', (int)$size, $string, 0, 0, $fhash, time());
                 break;
-            case 't':
-                $id = $lib->replace_item_attachment(null, $base_name, '.txt', (int)$size, $string, 0, 0, $fhash, '', '', 0, 0, [], []);
-                break;
             case 'f':
                 $id = $lib->forum_attach_file(0, 0, $base_name, '.txt', (int)$size, $string, $fhash, $dir, 0);
                 break;
@@ -321,7 +317,7 @@ class CheckAttachmentGalleryTest extends TestCase
      */
     protected function removeAttachmentsFromDb()
     {
-        $types = ['f', 't', 'w'];
+        $types = ['f', 'w'];
 
         foreach ($types as $type) {
             $lib = $this->getLib($type);
@@ -338,7 +334,7 @@ class CheckAttachmentGalleryTest extends TestCase
      *
      * @param $type
      *
-     * @return WikiLib|TrackerLib|Comments
+     * @return WikiLib|Comments
      * @throws Exception
      */
     protected function getLib($type)
@@ -346,8 +342,6 @@ class CheckAttachmentGalleryTest extends TestCase
         switch ($type) {
             case 'w':
                 return TikiLib::lib('wiki');
-            case 't':
-                return TikiLib::lib('trk');
             case 'f':
                 return TikiLib::lib('comments');
         }
@@ -366,9 +360,6 @@ class CheckAttachmentGalleryTest extends TestCase
         switch ($type) {
             case 'w':
                 $lib->remove_wiki_attachment($id);
-                break;
-            case 't':
-                $lib->remove_item_attachment($id);
                 break;
             case 'f':
                 $lib->remove_thread_attachment($id);
@@ -395,7 +386,6 @@ class CheckAttachmentGalleryTest extends TestCase
     {
         return [
             'forum' => ['f'],
-            'tracker' => ['t'],
             'wiki' => ['w'],
         ];
     }

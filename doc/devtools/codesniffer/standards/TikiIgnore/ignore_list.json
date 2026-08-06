@@ -2580,9 +2580,6 @@
         "lib/core/Tracker/Field/WebService.php": {
             "class:Tracker_Field_WebService": true
         },
-        "lib/core/Tracker/Field/File.php": {
-            "class:Tracker_Field_File": true
-        },
         "lib/core/Tracker/Field/Url.php": {
             "class:Tracker_Field_Url": true
         },
@@ -6634,17 +6631,7 @@
         },
         "lib/trackers/trackerlib.php": {
             "TrackerLib::remove_field_images": true,
-            "TrackerLib::add_item_attachment_hit": true,
-            "TrackerLib::get_item_attachment_owner": true,
-            "TrackerLib::list_item_attachments": true,
-            "TrackerLib::get_item_nb_attachments": true,
             "TrackerLib::get_item_nb_comments": true,
-            "TrackerLib::list_all_attachments": true,
-            "TrackerLib::file_to_db": true,
-            "TrackerLib::db_to_file": true,
-            "TrackerLib::get_item_attachment": true,
-            "TrackerLib::remove_item_attachment": true,
-            "TrackerLib::replace_item_attachment": true,
             "TrackerLib::list_last_comments": true,
             "TrackerLib::get_last_position": true,
             "TrackerLib::get_tracker_item": true,
@@ -6703,7 +6690,6 @@
             "TrackerLib::get_field_id": true,
             "TrackerLib::get_field_id_from_type": true,
             "TrackerLib::get_page_field": true,
-            "TrackerLib::get_moreinfo": true,
             "TrackerLib::field_types": true,
             "TrackerLib::build_help_for_type": true,
             "TrackerLib::status_types": true,
@@ -6749,7 +6735,6 @@
             "TrackerLib::item_has_history": true,
             "TrackerLib::move_item": true,
             "TrackerLib::copy_item": true,
-            "TrackerLib::export_attachment": true,
             "TrackerLib::get_tracker_by_name": true,
             "TrackerLib::get_field_by_name": true,
             "TrackerLib::get_field_by_names": true,
@@ -9026,9 +9011,6 @@
         },
         "lib/core/Tracker/Field/WebService.php": {
             "Tracker_Field_WebService": true
-        },
-        "lib/core/Tracker/Field/File.php": {
-            "Tracker_Field_File": true
         },
         "lib/core/Tracker/Field/Url.php": {
             "Tracker_Field_Url": true

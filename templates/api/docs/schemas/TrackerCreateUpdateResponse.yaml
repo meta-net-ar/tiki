@@ -34,8 +34,6 @@ properties:
     type: array
   sortFields:
     type: array
-  attachmentAttributes:
-    type: array
   startDate:
     type: string
     nullable: true
