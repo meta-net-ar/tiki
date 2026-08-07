@@ -95,7 +95,7 @@ class CookieConsentLib
         $consentPreferences = [
             'action' => 'customized',
             'consentGiven' => false, // Helps determine if the user has given consent or not
-            'categories' => array_map(fn() => false, array_keys(self::getCookieCategories())) // Default to false for all categories
+            'categories' => array_fill_keys(array_keys(self::getCookieCategories()), false) // Default to false for all categories
         ];
 
         // First, try to read the consent cookie from browser cookie
