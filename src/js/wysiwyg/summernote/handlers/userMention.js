@@ -32,9 +32,9 @@ export default function (textarea) {
                 }
 
                 const dropdown = getSuggestionsDropdown(caretRect);
-                suggestions.forEach((suggestion) => {
-                    const item = $('<a class="dropdown-item" href="#">').text(suggestion);
-                    item.on("click", (e) => {
+                suggestions.forEach(({ username, realname, avatar }) => {
+                    const item = getSuggestionDropdownItem(username, realname, avatar);
+                    $(item).on("click", (e) => {
                         e.preventDefault();
                         const typedMention = text.match(/@\w*$/)?.[0] ?? "";
 
@@ -58,6 +58,7 @@ export default function (textarea) {
 
                         const editable = textarea.data("summernote").layoutInfo.editable[0];
 
+                        // Reposition the cursor after the mention is inserted
                         const observer = new MutationObserver((mutations) => {
                             observer.disconnect();
                             let lastAdded = null;
@@ -81,13 +82,13 @@ export default function (textarea) {
                         observer.observe(editable, { childList: true, subtree: true });
 
                         const extra = mentionSpan ? { target: $(mentionSpan) } : undefined;
-                        insertAt(textarea.attr("id"), `@${suggestion}`, false, false, true, extra);
+                        insertAt(textarea.attr("id"), `@${username}`, false, false, true, extra);
 
                         textarea.summernote("focus");
 
                         dropdown.remove();
                     });
-                    dropdown.append(item[0]);
+                    dropdown.append(item);
                 });
 
                 document.body.appendChild(dropdown);
