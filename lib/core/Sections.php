@@ -364,11 +364,15 @@ class Sections
         // Pretty tracker pages return the tracker item object instead of the parent wiki page object
         // We expose the parent wiki page type and objectId for the benefit of modules, plugins or smarty functions which may want to access the parent page categories and permissions
         if (self::isCurrentSection(self::SECTION_WIKI_PAGE) && isset($request['itemId'])) {
+            $parentObject = $cat_objid;
+            if (empty($parentObject) && ! empty($request['page'])) {
+                $parentObject = $request['page'];
+            }
             return [
                 'type' => 'trackeritem',
                 'object' => (int)$request['itemId'],
                 'parentType' => $cat_type,
-                'parentObject' => $cat_objid,
+                'parentObject' => $parentObject,
             ];
         }
 
