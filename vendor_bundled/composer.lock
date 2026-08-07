@@ -2802,16 +2802,16 @@
         },
         {
             "name": "jason-munro/cypht",
-            "version": "v1.4.7",
+            "version": "v1.4.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "93a0924b94885959acb90d3e87eb8b38d67add8c"
+                "reference": "6f948dcb6966f757c83b3b0d78dfec909747a633"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/93a0924b94885959acb90d3e87eb8b38d67add8c",
-                "reference": "93a0924b94885959acb90d3e87eb8b38d67add8c",
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/6f948dcb6966f757c83b3b0d78dfec909747a633",
+                "reference": "6f948dcb6966f757c83b3b0d78dfec909747a633",
                 "shasum": ""
             },
             "require": {
@@ -2879,7 +2879,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "wiki": "https://github.com/cypht-org/cypht/wiki"
             },
-            "time": "2025-09-30T12:22:00+00:00"
+            "time": "2026-07-24T13:13:50+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -6420,27 +6420,33 @@
         },
         {
             "name": "npm-asset/babel--helper-string-parser",
-            "version": "7.29.7",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/@babel/helper-string-parser/-/helper-string-parser-7.29.7.tgz"
+            "version": "v7.29.8",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:babel/babel.git",
+                "reference": "5de11ca9234379b78ef95df72aebbec93f28bf45"
             },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/babel/babel/zipball/5de11ca9234379b78ef95df72aebbec93f28bf45",
+                "reference": "5de11ca9234379b78ef95df72aebbec93f28bf45"
+            },
+            "type": "npm-asset"
         },
         {
             "name": "npm-asset/babel--helper-validator-identifier",
-            "version": "7.29.7",
-            "dist": {
-                "type": "tar",
-                "url": "https://registry.npmjs.org/@babel/helper-validator-identifier/-/helper-validator-identifier-7.29.7.tgz"
+            "version": "v7.29.8",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:babel/babel.git",
+                "reference": "5de11ca9234379b78ef95df72aebbec93f28bf45"
             },
-            "type": "npm-asset",
-            "license": [
-                "MIT"
-            ]
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/babel/babel/zipball/5de11ca9234379b78ef95df72aebbec93f28bf45",
+                "reference": "5de11ca9234379b78ef95df72aebbec93f28bf45"
+            },
+            "type": "npm-asset"
         },
         {
             "name": "npm-asset/babel--parser",
@@ -6459,10 +6465,10 @@
         },
         {
             "name": "npm-asset/babel--types",
-            "version": "7.29.7",
+            "version": "7.29.8",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/@babel/types/-/types-7.29.7.tgz"
+                "url": "https://registry.npmjs.org/@babel/types/-/types-7.29.8.tgz"
             },
             "require": {
                 "npm-asset/babel--helper-string-parser": ">=7.29.7,<8.0.0",
@@ -6832,10 +6838,10 @@
         },
         {
             "name": "npm-asset/nanoid",
-            "version": "3.3.11",
+            "version": "3.3.16",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.11.tgz"
+                "url": "https://registry.npmjs.org/nanoid/-/nanoid-3.3.16.tgz"
             },
             "type": "npm-asset",
             "license": [
@@ -6868,13 +6874,13 @@
         },
         {
             "name": "npm-asset/postcss",
-            "version": "8.5.14",
+            "version": "8.5.19",
             "dist": {
                 "type": "tar",
-                "url": "https://registry.npmjs.org/postcss/-/postcss-8.5.14.tgz"
+                "url": "https://registry.npmjs.org/postcss/-/postcss-8.5.19.tgz"
             },
             "require": {
-                "npm-asset/nanoid": ">=3.3.11,<4.0.0",
+                "npm-asset/nanoid": ">=3.3.12,<4.0.0",
                 "npm-asset/picocolors": ">=1.1.1,<2.0.0",
                 "npm-asset/source-map-js": ">=1.2.1,<2.0.0"
             },
@@ -10606,16 +10612,16 @@
         },
         {
             "name": "studio-42/elfinder",
-            "version": "2.1.69",
+            "version": "2.1.70",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Studio-42/elFinder.git",
-                "reference": "8f2c3ffafcdd52cf4515f1eec172f4eee44552ad"
+                "reference": "e7ea668fd569fc9903fb1c431d47d58f2daad2f2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Studio-42/elFinder/zipball/8f2c3ffafcdd52cf4515f1eec172f4eee44552ad",
-                "reference": "8f2c3ffafcdd52cf4515f1eec172f4eee44552ad",
+                "url": "https://api.github.com/repos/Studio-42/elFinder/zipball/e7ea668fd569fc9903fb1c431d47d58f2daad2f2",
+                "reference": "e7ea668fd569fc9903fb1c431d47d58f2daad2f2",
                 "shasum": ""
             },
             "require": {
@@ -10662,7 +10668,7 @@
             "homepage": "http://elfinder.org",
             "support": {
                 "issues": "https://github.com/Studio-42/elFinder/issues",
-                "source": "https://github.com/Studio-42/elFinder/tree/2.1.69"
+                "source": "https://github.com/Studio-42/elFinder/tree/2.1.70"
             },
             "funding": [
                 {
@@ -10670,7 +10676,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-05-07T12:53:30+00:00"
+            "time": "2026-08-03T12:51:01+00:00"
         },
         {
             "name": "svg-edit/svg-edit",
@@ -11797,16 +11803,16 @@
         },
         {
             "name": "symfony/polyfill-intl-grapheme",
-            "version": "v1.38.1",
+            "version": "v1.41.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/polyfill-intl-grapheme.git",
-                "reference": "e9247d281d694a5120554d9afaf54e070e88a603"
+                "reference": "bb899c1db0aa8127dc3afe8cda4a67eb24915f8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/e9247d281d694a5120554d9afaf54e070e88a603",
-                "reference": "e9247d281d694a5120554d9afaf54e070e88a603",
+                "url": "https://api.github.com/repos/symfony/polyfill-intl-grapheme/zipball/bb899c1db0aa8127dc3afe8cda4a67eb24915f8d",
+                "reference": "bb899c1db0aa8127dc3afe8cda4a67eb24915f8d",
                 "shasum": ""
             },
             "require": {
@@ -11855,7 +11861,7 @@
                 "shim"
             ],
             "support": {
-                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.38.1"
+                "source": "https://github.com/symfony/polyfill-intl-grapheme/tree/v1.41.0"
             },
             "funding": [
                 {
@@ -11875,7 +11881,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-05-26T05:58:03+00:00"
+            "time": "2026-07-28T08:25:59+00:00"
         },
         {
             "name": "symfony/polyfill-intl-icu",
@@ -15831,16 +15837,16 @@
         },
         {
             "name": "squizlabs/php_codesniffer",
-            "version": "3.13.5",
+            "version": "3.13.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer.git",
-                "reference": "0ca86845ce43291e8f5692c7356fccf3bcf02bf4"
+                "reference": "4c378e1a528ea066890fc2397cbdd2f94eb2fc91"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/0ca86845ce43291e8f5692c7356fccf3bcf02bf4",
-                "reference": "0ca86845ce43291e8f5692c7356fccf3bcf02bf4",
+                "url": "https://api.github.com/repos/PHPCSStandards/PHP_CodeSniffer/zipball/4c378e1a528ea066890fc2397cbdd2f94eb2fc91",
+                "reference": "4c378e1a528ea066890fc2397cbdd2f94eb2fc91",
                 "shasum": ""
             },
             "require": {
@@ -15906,7 +15912,7 @@
                     "type": "thanks_dev"
                 }
             ],
-            "time": "2025-11-04T16:30:35+00:00"
+            "time": "2026-08-06T00:17:32+00:00"
         },
         {
             "name": "symfony/browser-kit",
@@ -16144,11 +16150,11 @@
         "ext-iconv": "*",
         "ext-zip": "*"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "platform-overrides": {
         "ext-ldap": "0",
         "ext-soap": "0",
         "php": "7.4"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
