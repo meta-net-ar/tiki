@@ -14,8 +14,8 @@
     {/foreach}
 </ol>
 
-<a class="add-vimeo-media btn btn-primary btn-sm" href="{bootstrap_modal controller=vimeo action=upload targetName="{$field.html_name}"}" role="button">{tr}Add Media{/tr}</a>
-<a class="list-vimeo-media btn btn-primary btn-sm" href="{bootstrap_modal controller=vimeo action=list targetName="{$field.html_name}"}" role="button">{tr}List Media{/tr}</a>
+<a class="add-vimeo-media btn btn-primary btn-sm" href="tiki-vimeo_upload.php" role="button" target="_blank">{tr}Add Media{/tr}</a>
+<a class="list-vimeo-media btn btn-primary btn-sm" href="tiki-list_vimeo_entries.php" role="button" target="_blank">{tr}List Media{/tr}</a>
 
 {foreach from=$data.extras item=entryId}
     <input type="hidden" name="{$field.html_name|escape}[]" value="{$entryId|escape}">
