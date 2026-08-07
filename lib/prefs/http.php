@@ -301,6 +301,21 @@ function prefs_http_list()
             ),
             'help' => 'https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Headers',
         ],
+        'http_header_set_cookie_samesite' => [
+            'name' => tra('HTTP header set-cookie samesite attribute'),
+            'type' => 'list',
+            'options' => [
+                '' => tra('Obey webserver configuration'),
+                'Strict' => tra('Strict'),
+                'Lax' => tra('Lax'),
+                'None' => tra('None'),
+            ],
+            'default' => '',
+            'perspective' => false,
+            'tags' => ['advanced'],
+            'description' => tra('Specifies the value of the HTTP header set-cookie samesite attribute.'),
+            'help' => 'https://doc.tiki.org/HTTP-Headers',
+        ],
         'http_header_strict_transport_security' => [
             'name' => tra('HTTP header strict-transport-security'),
             'description' => tra('The Strict-Transport-Security header (often abbreviated as HSTS) is a security feature that lets a web site tell browsers that it should only be communicated with using HTTPS, instead of using HTTP.'),

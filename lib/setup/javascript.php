@@ -253,6 +253,7 @@ if (! timezone) {
     $jqueryTiki['cookie_consent_name'] = CookieConsentLib::COOKIE_CONSENT_NAME;
     $jqueryTiki['cookie_consent_categories'] = json_encode(array_keys(CookieConsentLib::getRequestedCookieCategories()));
     $jqueryTiki['cookie_consent_value'] = json_encode(CookieConsentLib::getConsentPreferences(), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    $jqueryTiki['http_header_set_cookie_samesite'] = $prefs['http_header_set_cookie_samesite'] ?: session_get_cookie_params()['samesite'];
     $jqueryTiki['BUILTIN_COOKIE_CATEGORY_ESSENTIAL'] = json_encode(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL);
     $jqueryTiki['wiki_url_scheme'] = $prefs['wiki_url_scheme'];
     $jqueryTiki['feature_queued_tasks'] = ($prefs['feature_queued_tasks'] ?? 'n') === 'y';
