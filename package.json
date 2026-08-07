@@ -124,36 +124,35 @@
         "vitest" : "https://github.com/vitest-dev/vitest/releases"
     },
     "overrides" : {
-        "dompurify" : "3.4.11",
+        "dompurify" : "3.4.12",
         "devalue" : "5.8.1",
         "glob" : "10.5.0",
         "svelte" : "5.51.0",
-        "@vue/component-compiler-utils" : {
-            "postcss" : "8.5.16"
-        },
         "jspdf" : "4.2.1",
         "svgedit" : {
             "jspdf" : "4.2.1"
-        }
+        },
+        "postcss" : "8.5.25"
     },
     "overridesComment" : {
         "jspdf": [
             "npm audit flagged jspdf <= 4.2.0 (critical). Pin 4.2.1 so the root install and svgedit (nested 4.0.0) resolve to a patched release."
         ],
+        "postcss": [
+            "vue3-sfc-loader -> @vue/component-compiler-utils still pulls PostCSS 7.0.x (npm audit range <=8.5.17: parsing/XSS/sourceMappingURL issues).",
+            "Force PostCSS 8.5.25 everywhere (already used by Vite). Remove when upstream stops depending on PostCSS 7."
+        ],
         "dompurify": [
-            "This override forces all packages to use DOMPurify v3.x to fix security issues present in DOMPurify v2.x and patched releases in the v3 line.",
+            "This override forces all packages to use DOMPurify v3.4.12 to fix security issues present in DOMPurify v2.x and patched releases in the v3 line.",
             "Upgrading from v2 to v3 is safe for our project because we do not support Internet Explorer (IE).",
             "As noted by Victor Buzinaro in https://github.com/cure53/DOMPurify/issues/785, the only breaking change introduced in v3 is the removal of IE-specific support.",
             "After reviewing the changes between versions 2.5.8 and 3.3.0 (https://github.com/cure53/DOMPurify/compare/2.5.8...3.3.0), we confirmed there are no functional breaking changes that affect our usage.",
             "Toast UI Editor currently depends on DOMPurify v2.x, but its DOMPurify integration",
             "(introduced in https://github.com/nhn/tui.editor/commit/6e5730914902071b54c529673e964a24b58e3eec#diff-e70b3ac7e7e963527907ae78c682a077c1b87015783bdcb150084e023ce17528) is compatible with v3.",
-            "For this reason, enforcing DOMPurify v3.x is safe for us. Pinned to 3.4.11 for npm audit advisories through 3.4.10. Remove this override when upstream packages pin a secure DOMPurify without conflicts."
+            "For this reason, enforcing DOMPurify v3.4.x is safe for us. Pinned to 3.4.12 for npm audit advisories. Remove this override when upstream packages pin a secure DOMPurify without conflicts."
         ],
         "glob": [
             "copy-and-watch pins glob 10.3.12 (vulnerable CLI <=10.4.5). Override to 10.5.0; Tiki uses glob programmatically, not the CLI -c/--cmd flag."
-        ],
-        "postcss": [
-            "vue3-sfc-loader pulls @vue/component-compiler-utils with a nested vulnerable postcss. Scoped override to 8.5.16 (build-time SFC compilation only)."
         ],
         "svelte": [
             "Svelte is pinned to 5.51.0 (and devalue to 5.8.1) for @event-calendar/core 4.x compatibility: Svelte >= 5.51.1 breaks calendar interactions (https://github.com/vkurko/calendar/issues/623). devalue is overridden separately so we can take the npm audit fix without upgrading Svelte. Upgrade path: @event-calendar/core 5.4.1+ then remove both svelte and devalue overrides."
