@@ -9,6 +9,12 @@ namespace Tiki\Config;
 
 class Config implements \ArrayAccess, \IteratorAggregate, \Countable
 {
+    private const DIRECTORY_PREFERENCES = [
+        'fgal_use_dir',
+        't_use_dir',
+        'w_use_dir',
+    ];
+
     private array $data;
     private bool $allowModifications;
     private bool $readOnly = false;
@@ -24,31 +30,49 @@ class Config implements \ArrayAccess, \IteratorAggregate, \Countable
         return $this->data;
     }
 
-    public static function normalizePreferenceDirectoryPaths(array $data): array
+    public static function normalizeDirectoryPrefs(array $data): array
     {
         foreach ($data as $key => $value) {
             if ($key === 'preference' && is_array($value)) {
-                foreach (['fgal_use_dir', 't_use_dir', 'w_use_dir'] as $preference) {
-                    if (
-                        isset($value[$preference])
-                        && is_string($value[$preference])
-                        && $value[$preference] !== ''
-                        && ! str_ends_with($value[$preference], '\\')
-                        && ! str_ends_with($value[$preference], '/')
-                    ) {
-                        $value[$preference] .= '/';
-                    }
-                }
-                $data[$key] = $value;
+                $data[$key] = self::normalizeDirectoryPrefsArray($value);
                 continue;
             }
 
             if (is_array($value)) {
-                $data[$key] = self::normalizePreferenceDirectoryPaths($value);
+                $data[$key] = self::normalizeDirectoryPrefs($value);
             }
         }
 
         return $data;
+    }
+
+    /**
+     * Normalize directory-based preference values to include a trailing slash.
+     *
+     * Applies only to preferences listed in DIRECTORY_PREFERENCES. Non-listed
+     * preferences, empty strings, non-string values, and values already ending
+     * with '/' or '\\' are returned unchanged.
+     */
+    public static function normalizeDirectoryPrefValue(string $name, mixed $value): mixed
+    {
+        if (! in_array($name, self::DIRECTORY_PREFERENCES, true) || ! is_string($value) || $value === '') {
+            return $value;
+        }
+
+        if (str_ends_with($value, '/') || str_ends_with($value, '\\')) {
+            return $value;
+        }
+
+        return $value . '/';
+    }
+
+    private static function normalizeDirectoryPrefsArray(array $preferences): array
+    {
+        foreach ($preferences as $name => $value) {
+            $preferences[$name] = self::normalizeDirectoryPrefValue((string) $name, $value);
+        }
+
+        return $preferences;
     }
 
     public function setReadOnly(): void
