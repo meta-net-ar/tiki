@@ -117,7 +117,10 @@ if (count($filter) || count($postfilter)) {
         }
         $excludedFacets = tiki_searchindex_get_excluded_facets();
         if (! $isCached) {
+            $originalQuery = $filter['content'];
+            $filter['content'] = ($prefs['unified_engine'] === 'mysql') ? preg_replace('/\w+/', '$0*', $originalQuery) : $originalQuery;
             $results = tiki_searchindex_get_results($filter, $postfilter, $offset, $maxRecords);
+            $filter['content'] = $originalQuery;
             $facets = array_filter(array_map(
                 function ($facet) use ($excludedFacets) {
                     $name = $facet->getName();
