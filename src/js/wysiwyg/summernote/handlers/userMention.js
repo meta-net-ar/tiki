@@ -1,6 +1,11 @@
 export default function (textarea) {
     let debounceTimer;
     return function (event) {
+        const dropdown = document.getElementById("user-mentions-dropdown");
+        if (dropdown) {
+            handleArrowNavigation(event, dropdown);
+        }
+
         if (!window.jqueryTiki.user_mention_enabled) {
             return;
         }
@@ -32,18 +37,27 @@ export default function (textarea) {
                     item.on("click", (e) => {
                         e.preventDefault();
                         const typedMention = text.match(/@\w*$/)?.[0] ?? "";
+
+                        // Wrap the typed @partial in a temp span passed as extra.target so
+                        // insertAt uses replaceWith() instead of pasteHTML(), bypassing summernote's range entirely which causes cursor position issues.
+                        let mentionSpan = null;
                         if (typedMention) {
-                            const currentRange = textarea.summernote("editor.getLastRange");
                             const nativeRange = document.createRange();
-                            nativeRange.setStart(currentRange.ec, currentRange.eo - typedMention.length);
-                            nativeRange.setEnd(currentRange.ec, currentRange.eo);
-                            const sel = window.getSelection();
-                            sel.removeAllRanges();
-                            sel.addRange(nativeRange);
-                            textarea.summernote("editor.saveRange");
+                            nativeRange.setStart(editorNode, range.eo - typedMention.length);
+                            nativeRange.setEnd(editorNode, range.eo);
+                            mentionSpan = document.createElement("span");
+                            nativeRange.surroundContents(mentionSpan);
+
+                            // Keep cursor at the end of the span to avoid a visual jump while AJAX is pending
+                            const caretAfter = document.createRange();
+                            caretAfter.selectNodeContents(mentionSpan);
+                            caretAfter.collapse(false);
+                            window.getSelection().removeAllRanges();
+                            window.getSelection().addRange(caretAfter);
                         }
 
                         const editable = textarea.data("summernote").layoutInfo.editable[0];
+
                         const observer = new MutationObserver((mutations) => {
                             observer.disconnect();
                             let lastAdded = null;
@@ -52,6 +66,7 @@ export default function (textarea) {
                                     lastAdded = node;
                                 }
                             }
+
                             if (lastAdded) {
                                 const r = document.createRange();
                                 r.setStartAfter(lastAdded);
@@ -62,9 +77,14 @@ export default function (textarea) {
                                 textarea.summernote("editor.saveRange");
                             }
                         });
+
                         observer.observe(editable, { childList: true, subtree: true });
-                        insertAt(textarea.attr("id"), `@${suggestion}`, false, false, true);
+
+                        const extra = mentionSpan ? { target: $(mentionSpan) } : undefined;
+                        insertAt(textarea.attr("id"), `@${suggestion}`, false, false, true, extra);
+
                         textarea.summernote("focus");
+
                         dropdown.remove();
                     });
                     dropdown.append(item[0]);
@@ -74,4 +94,33 @@ export default function (textarea) {
             }
         }, 500);
     };
+}
+
+function handleArrowNavigation(event, dropdown) {
+    const items = Array.from(dropdown.querySelectorAll(".dropdown-item"));
+    const activeItem = dropdown.querySelector(".dropdown-item.active");
+    const activeIndex = activeItem ? items.indexOf(activeItem) : -1;
+
+    if (event.key === "ArrowDown") {
+        event.preventDefault();
+        activeItem?.classList.remove("active");
+        items[(activeIndex + 1) % items.length]?.classList.add("active");
+        return;
+    }
+    if (event.key === "ArrowUp") {
+        event.preventDefault();
+        activeItem?.classList.remove("active");
+        items[(activeIndex - 1 + items.length) % items.length]?.classList.add("active");
+        return;
+    }
+    if (event.key === "Enter" && activeItem) {
+        event.preventDefault();
+        activeItem.click();
+        return;
+    }
+    if (event.key === "Escape") {
+        event.preventDefault();
+        dropdown.remove();
+        return;
+    }
 }
