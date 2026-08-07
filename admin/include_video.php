@@ -67,15 +67,19 @@ $vimeoText = "";
 if ($prefs['vimeo_upload'] === 'y') {
     $vimeolib = TikiLib::lib('vimeo');
 
-    $result = $vimeolib->testConnection();
+    try {
+        $result = $vimeolib->testConnection();
 
-    if ($result === true) {
-        $vimeoText = "<div class='adminoptionbox'>" . tr(
-            "Vimeo instance is reachable with correct API credentials. Visit <a href='%0'>the video list</a>.",
-            'tiki-list_vimeo_entries.php'
-        ) . "</div>";
-    } else {
-        $vimeoText = "<div class='adminoptionbox error'>" . $result . "</div>";
+        if ($result === true) {
+            $vimeoText = "<div class='adminoptionbox'>" . tr(
+                "Vimeo instance is reachable with correct API credentials. Visit <a href='%0'>the video list</a>.",
+                'tiki-list_vimeo_entries.php'
+            ) . "</div>";
+        } else {
+            $vimeoText = "<div class='adminoptionbox error'>" . $result . "</div>";
+        }
+    } catch (\Exception $e) {
+        $vimeoText = "<div class='adminoptionbox error'>" . tr("Vimeo Integration Error:") . ' ' . $e->getMessage() . "</div>";
     }
 } else {
     $vimeoText = "<div class='adminoptionbox error'>" . tr("Vimeo feature disabled") . "</div>";

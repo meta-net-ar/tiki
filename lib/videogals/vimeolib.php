@@ -32,6 +32,10 @@ class VimeoLib
             throw new \Exception(tr("Vimeo configuration is missing (consumer key, secret, or access token)."));
         }
 
+        if (! class_exists(\Vimeo\Vimeo::class)) {
+            throw new \Exception(tr("Vimeo PHP SDK is not installed. Please run 'composer require vimeo/vimeo-api' in vendor_bundled."));
+        }
+
         $this->client = new \Vimeo\Vimeo($clientId, $clientSecret, $accessToken);
         return $this->client;
     }
