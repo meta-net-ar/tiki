@@ -34,11 +34,14 @@
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item"
-                            href="tiki-vimeo_video.php?videoId={$videoInfo->id}&action=delete"
-                            onclick="return confirm('{tr}Are you sure you want to delete this video?{/tr}')">
-                                <i class="fas fa-trash me-2"></i> {tr}Delete{/tr}
-                            </a>
+                            <form method="post" action="tiki-vimeo_video.php" onsubmit="return confirm('{tr}Are you sure you want to delete this video?{/tr}')" style="margin:0">
+                                {ticket}
+                                <input type="hidden" name="videoId" value="{$videoInfo->id|escape}">
+                                <input type="hidden" name="action" value="delete">
+                                <button type="submit" class="dropdown-item text-danger btn btn-link p-0">
+                                    <i class="fas fa-trash me-2"></i> {tr}Delete{/tr}
+                                </button>
+                            </form>
                         </li>
                     </ul>
                 </div>
