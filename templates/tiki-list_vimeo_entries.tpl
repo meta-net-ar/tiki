@@ -5,7 +5,7 @@
   <div class="alert alert-danger">
     <h2>{tr}Errors detected{/tr}</h2>
     {section name=ix loop=$errors}
-      {$errors[ix]}<br>
+      {$errors[ix]|escape}<br>
     {/section}
   </div>
 {/if}

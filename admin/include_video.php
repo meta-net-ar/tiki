@@ -79,7 +79,7 @@ if ($prefs['vimeo_upload'] === 'y') {
             $vimeoText = "<div class='adminoptionbox error'>" . $result . "</div>";
         }
     } catch (\Exception $e) {
-        $vimeoText = "<div class='adminoptionbox error'>" . tr("Vimeo Integration Error:") . ' ' . $e->getMessage() . "</div>";
+        $vimeoText = "<div class='adminoptionbox error'>" . tr("Vimeo Integration Error:") . ' ' . htmlspecialchars($e->getMessage(), ENT_QUOTES, 'UTF-8') . "</div>";
     }
 } else {
     $vimeoText = "<div class='adminoptionbox error'>" . tr("Vimeo feature disabled") . "</div>";

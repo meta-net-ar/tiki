@@ -112,6 +112,7 @@
             <br> 
             {if $vimeoText}
                 {remarksbox type="info" title="{tr}Vimeo Configuration Status{/tr}"}
+                    {* $vimeoText is constructed in admin/include_video.php; external error strings are escaped there *}
                     <div class="mb-3">{$vimeoText}</div>
                 {/remarksbox}
             {/if}
