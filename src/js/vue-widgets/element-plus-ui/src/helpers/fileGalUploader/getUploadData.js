@@ -2,7 +2,7 @@ import { ElMessage } from "element-plus";
 import adjustImageSize from "./adjustImageSize";
 import fileToBase64 from "./fileToBase64";
 
-export default async function (file, maxWidth, maxHeight) {
+export default async function (file, maxWidth, maxHeight, isbatch = false) {
     const result = {
         name: file.name,
         type: file.type,
@@ -25,6 +25,10 @@ export default async function (file, maxWidth, maxHeight) {
     form.forEach((item) => {
         result[item.name] = item.value;
     });
+
+    if (isbatch) {
+        result["isbatch[]"] = "on";
+    }
 
     return result;
 }

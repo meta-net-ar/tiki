@@ -59,4 +59,14 @@ describe("fileGalUploader getUploadData helper", () => {
 
         expect(elMessage).toHaveBeenCalledWith("Failed to get file data");
     });
+
+    test("includes isbatch when requested", async () => {
+        const givenFile = new File(["foo"], "foo.txt", { type: "text/plain" });
+        const givenFileBase64Data = "data:text/plain;base64,base64 Mock data";
+        vi.spyOn(fileToBase64, "default").mockResolvedValueOnce(givenFileBase64Data);
+
+        const result = await getUploadData(givenFile, undefined, undefined, true);
+
+        expect(result["isbatch[]"]).toBe("on");
+    });
 });

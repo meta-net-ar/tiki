@@ -8,9 +8,12 @@ import ConfigWrapper from '../ConfigWrapper.vue';
 import handleTikiFeedback from '../../helpers/fileGalUploader/handleTikiFeedback';
 import getUploadAjaxError from '../../helpers/fileGalUploader/getUploadAjaxError';
 
-const props = defineProps(['accept', 'maxSize', 'maxFiles', 'maxWidth', 'maxHeight', 'vimeoUrl', 'language']);
+const props = defineProps(['accept', 'maxSize', 'maxFiles', 'maxWidth', 'maxHeight', 'vimeoUrl', 'language', 'batchUploadAllowed']);
 const maxSize = JSON.parse(props.maxSize);
 const maxFiles = JSON.parse(props.maxFiles);
+const maxWidth = props.maxWidth ? parseInt(props.maxWidth) : null;
+const maxHeight = props.maxHeight ? parseInt(props.maxHeight) : null;
+const batchUploadAllowed = props.batchUploadAllowed === 'y' || props.batchUploadAllowed === 'true' || props.batchUploadAllowed === true;
 
 const uploadRef = ref(null);
 const insertIntoEditor = ref(false);
@@ -18,6 +21,7 @@ const uploadedFiles = ref([]);
 const totalFilesToUpload = ref(0);
 const completedUploads = ref(0);
 const submitCalled = ref(false);
+const unzipZip = ref(false);
 
 onMounted(() => {
     const searcParams = new URLSearchParams(location.search);
@@ -141,7 +145,7 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
             :multiple="true"
             :auto-upload="false"
             ref="uploadRef"
-            :data="getUploadData"
+            :data="(file) => getUploadData(file, maxWidth, maxHeight, unzipZip.value)"
             :before-upload="beforeUpload"
             :on-error="handleUploadError"
             :on-success="handleUploadSuccess"
@@ -158,6 +162,12 @@ export const DEFAULT_ACTION_URL = 'tiki-ajax_services.php?controller=file&action
             Drop file here or <em>click to upload</em>
             </div>
         </el-upload>
+
+        <div v-if="batchUploadAllowed" class="form-check mt-3 mb-3">
+            <label class="form-check-label">
+                <input type="checkbox" class="form-check-input" v-model="unzipZip" /> Unzip zip files
+            </label>
+        </div>
 
         <div v-if="uploadedFiles.length > 0" class="uploaded-files-list">
             <h4>Uploaded Files:</h4>
