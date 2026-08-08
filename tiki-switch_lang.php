@@ -45,6 +45,14 @@ if ($item_path == '/') {
     $orig_url = $prefs['tikiIndex'];
 }
 
+function getWikiPageParamFromSefurl($slug)
+{
+    $wikiLib = TikiLib::lib('wiki');
+    $page = $wikiLib->get_page_by_slug(rawurldecode($slug));
+
+    return rawurlencode($wikiLib->get_slug_by_page($page));
+}
+
 if ($prefs['feature_sefurl'] == 'y' && ! str_contains($orig_url, '.php')) {
     if (preg_match('/cat[0-9]+-?/', $orig_url)) {
         include_once('tiki-sefurl.php');
@@ -56,7 +64,7 @@ if ($prefs['feature_sefurl'] == 'y' && ! str_contains($orig_url, '.php')) {
             $orig_url = preg_replace_callback(
                 '#\/([^\/\?]+)\?(.*)?$#',
                 function ($matches) {
-                    return '/tiki-index.php?page=' . rawurlencode(rawurldecode($matches[1])) . '&' . ($matches[2] ?? '');
+                    return '/tiki-index.php?page=' . getWikiPageParamFromSefurl($matches[1]) . '&' . ($matches[2] ?? '');
                 },
                 $orig_url
             );
@@ -64,7 +72,7 @@ if ($prefs['feature_sefurl'] == 'y' && ! str_contains($orig_url, '.php')) {
             $orig_url = preg_replace_callback(
                 '#\/([^\/\?]+)$#',
                 function ($matches) {
-                    return '/tiki-index.php?page=' . rawurlencode(rawurldecode($matches[1]));
+                    return '/tiki-index.php?page=' . getWikiPageParamFromSefurl($matches[1]);
                 },
                 $orig_url
             );
@@ -74,7 +82,7 @@ if ($prefs['feature_sefurl'] == 'y' && ! str_contains($orig_url, '.php')) {
     $orig_url = preg_replace_callback(
         '#\/([^\/\?]+)(\?.*)?$#',
         function ($matches) {
-            return '/tiki-index.php?page=' . rawurlencode(rawurldecode($matches[1]));
+            return '/tiki-index.php?page=' . getWikiPageParamFromSefurl($matches[1]);
         },
         $orig_url
     );
