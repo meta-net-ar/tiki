@@ -45,12 +45,47 @@ $bruteForceProperties = function () use ($tikilib) {
     return ['ip' => $tikilib->get_ip_address()];
 };
 
-if (isset($_REQUEST["newuser"]) && $_REQUEST["newuser"] == 'y') {
+$pass_confirm = $userlib->getOne('select `pass_confirm` from `users_users` where binary `login`=?', [$user]);
+$must_change_password = ($pass_confirm === 0 || $pass_confirm === null);
+
+/**
+ * New-user password setup is only allowed after a server-side validation step
+ * (email/admin validation) that stored a session marker for this exact user.
+ * Never trust client-supplied new_user_validation / newuser alone.
+ */
+$getPendingNewUserPasswordUser = static function (): ?string {
+    $pending = $_SESSION['pending_new_user_password']['user'] ?? null;
+    if (is_string($pending) && $pending !== '') {
+        return $pending;
+    }
+    $fromValidation = $_SESSION['last_validation']['user'] ?? null;
+    if (is_string($fromValidation) && $fromValidation !== '') {
+        return $fromValidation;
+    }
+    return null;
+};
+
+$pending_new_user = $getPendingNewUserPasswordUser();
+$server_new_user_validation = $must_change_password
+    && $pending_new_user !== null
+    && hash_equals($pending_new_user, (string) $user);
+
+if ($server_new_user_validation) {
+    $smarty->assign('new_user_validation', 'y');
+} elseif (isset($_REQUEST["newuser"]) && $_REQUEST["newuser"] == 'y' && $must_change_password) {
     $smarty->assign('new_user_validation', 'y');
 }
 
 $smarty->assign('userlogin', $_REQUEST["user"]);
-$smarty->assign('oldpass', $_REQUEST["oldpass"]);
+if (
+    empty($_REQUEST['oldpass'])
+    && $server_new_user_validation
+    && ! empty($_SESSION['last_validation']['pass'])
+) {
+    $smarty->assign('oldpass', $_SESSION['last_validation']['pass']);
+} else {
+    $smarty->assign('oldpass', $_REQUEST["oldpass"]);
+}
 $smarty->assign('secure_token', $secure_token);
 
 if (isset($_REQUEST["change"])) {
@@ -75,9 +110,6 @@ if (isset($_REQUEST["change"])) {
     $is_authenticated = false;
     $authenticated_oldpass = null;
     $can_change_password = false;
-    $is_new_user_validation = isset($_REQUEST["new_user_validation"]) && $_REQUEST["new_user_validation"] === 'y';
-    $pass_confirm = $userlib->getOne('select `pass_confirm` from `users_users` where binary `login`=?', [$user]);
-    $must_change_password = ($pass_confirm === 0 || $pass_confirm === null);
 
     // Method 1: Activation code
     if (! empty($_REQUEST['actpass'])) {
@@ -112,11 +144,16 @@ if (isset($_REQUEST["change"])) {
             $is_authenticated = true;
             $can_change_password = true;
             $authenticated_oldpass = $_REQUEST['oldpass'];
+        } elseif ($server_new_user_validation) {
+            // After email validation, provpass may be present in the form but not yet a login hash
+            $is_authenticated = true;
+            $can_change_password = true;
         } else {
             Feedback::error(tra("Invalid old password"));
         }
-    } elseif ($is_new_user_validation) {
-        // Method 4: New user validation (no authentication required - legitimate exception)
+    } elseif ($server_new_user_validation) {
+        // Method 4: New user validation — session-bound after real account validation only
+        $is_authenticated = true;
         $can_change_password = true;
     } elseif ($must_change_password) {
         // Method 5: User must change password - old password is required
@@ -168,8 +205,11 @@ if (isset($_REQUEST["change"])) {
                 $bruteForce->success('change_password', $changePasswordProperties);
             }
 
+            // One-time marker: do not allow reuse of the validation session for another change
+            unset($_SESSION['pending_new_user_password'], $_SESSION['last_validation']);
+
             // Mark reset token as used only after successful password change
-            if (! empty($secure_token) && ! $is_new_user_validation && ! $must_change_password) {
+            if (! empty($secure_token) && ! $server_new_user_validation && ! $must_change_password) {
                 $passwordResetLib = new \Tiki\Lib\Auth\PasswordResetLib();
                 $passwordResetLib->markPasswordResetTokenUsed($user, $secure_token);
             }
