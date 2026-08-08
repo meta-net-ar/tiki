@@ -279,4 +279,8 @@ function module_search($mod_reference, $smod_params)    // modifies $smod_params
             $smod_params['advanced_search'] = 'n';
         }
     }
+
+    if (! $smod_params['autocomplete_objecttypes']) {
+        $smod_params['autocomplete_objecttypes'] = module_search_info()['params']['autocomplete_objecttypes']['default'];
+    }
 }
