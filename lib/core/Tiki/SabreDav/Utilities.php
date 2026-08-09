@@ -346,10 +346,15 @@ class Utilities
         if (isset($component->URL)) {
             $result['url'] = $convertToString($component->URL);
         }
+        // Detect all-day events, including imported ICS files
+        $isAllDay = ! $component->DTSTART->hasTime();
         if (isset($component->{'X-Tiki-Allday'})) {
-            $result['allday'] = empty($convertToString($component->{'X-Tiki-Allday'})) ? 0 : 1;
+            $isAllDay = ! empty($convertToString($component->{'X-Tiki-Allday'}));
+        }
+        if ($isAllDay) {
+            $result['allday'] = 1;
             if ($rec) {
-                $rec->setAllday(empty($convertToString($component->{'X-Tiki-Allday'})) ? 0 : 1);
+                $rec->setAllday(1);
             }
         }
         if (isset($component->{'X-Tiki-sendReminder'})) {
