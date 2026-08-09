@@ -129,9 +129,7 @@
                                         <td>&nbsp;</td>
                                         <td><label for="known_hosts_name">{tr}Name{/tr}</label>{help desc="{tr}Arbitrary name used to uniquely identify this configuration (does not effect operation). Recommend use of a name that indicates the client server (ex: doc.tw.o){/tr}"}</td>
                                         <td><label for="known_hosts_key">{tr}Key{/tr}</label>{help desc="{tr}This is the shared key you define. It has to match the client configuration for your server. It can be as short or as long as you like. It is recommended you follow the same kind of password policies your organization would have for something like a wireless WEP key.{/tr}"}</td>
-                                        <td><label for="known_hosts_iptype">{tr}Protocol{/tr}</label>{help desc="{tr}The type of connection a client can make the request over. Select either 'IPv4 only', 'IPv6 only' or 'both' to limit over which connections you will allow the client server to connect."{/tr}}</td>
-                                        <td><label for="known_hosts_ip">{tr}IPv4{/tr}</label>{help desc="{tr}The physical IPv4 address the client machine will be making requests to the server from. If the client is on the same machine, you should be able to use 127.0.0.1{/tr}"}</td>
-                                        <td><label for="known_hosts_ip6">{tr}IPv6{/tr}</label>{help desc="{tr}The physical IPv6 address the client machine will be making requests to the server from. If the client is on the same machine, you should be able to use ::1{/tr}"}</td>
+                                        <td><label for="known_hosts_ip">{tr}IP{/tr}</label>{help desc="{tr}The physical IP address the client machine will be making requests to the server from. If the client is on the same machine, you should be able to use 127.0.0.1, If you think the client’s IP address may change depending on their location, please enter a list of those IP addresses, separated by commas (e.g., 102.22.140.7, 198.165.12.7, ::1). They can be either IPv4 or IPv6.{/tr}"}</td>
                                         <td><label for="known_hosts_contact">{tr}Contact{/tr}</label>{help desc="{tr}Username of primary contact on client machine. Useful for adminstration{/tr}"}</td>
                                         <td><label for="known_hosts_can_register">{tr}Can register{/tr}</label></td>
                                     </tr>
@@ -161,17 +159,7 @@
                                                         readonly="readonly" title="|{tr}To change the host key you need to remove and add it as a new one{/tr}">
                                                 </td>
                                                 <td>
-                                                    <select class="form-control host-ip-type" id="known_hosts_iptype" name="known_hosts[{$k}][iptype]" value="{$i.iptype}">
-                                                        <option value="ipv4" {if $i.iptype eq 'ipv4'}selected{/if}>IPv4 only</option>
-                                                        <option value="ipv6" {if $i.iptype eq 'ipv6'}selected{/if}>IPv6 only</option>
-                                                        <option value="both" {if $i.iptype eq 'both'}selected{/if}>Both</option>
-                                                    </select>
-                                                </td>
-                                                <td>
-                                                    <div class="ipv4-wrapper"><input type="text" class="form-control" id="known_hosts_ip" name="known_hosts[{$k}][ip]" value="{$i.ip}"></div>
-                                                </td>
-                                                <td>
-                                                    <div class="ipv6-wrapper"><input type="text" class="form-control" id="known_hosts_ip6" name="known_hosts[{$k}][ip6]" value="{$i.ip6}"></div>
+                                                    <input type="text" class="form-control" id="known_hosts_ip" name="known_hosts[{$k}][ip]" value="{$i.ip}">
                                                 </td>
                                                 <td>
                                                     <input type="text" class="form-control" id="known_hosts_contact" name="known_hosts[{$k}][contact]" value="{$i.contact}">
@@ -186,19 +174,7 @@
                                         <td>{tr}New:{/tr}</td>
                                         <td><label class="sr-only" for="new_host_name">{tr}New{/tr}</label><input type="text" class="form-control" id="new_host_name" name="newhost[name]" value=""/></td>
                                         <td><label class="sr-only" for="new_host_key">{tr}Key{/tr}</label><input type="text" class="form-control" id="new_host_key" name="newhost[key]" value=""/></td>
-                                        <td>
-                                            <select class="form-control host-ip-type" id="new_host_iptype" name="newhost[iptype]" value="">
-                                                <option value="ipv4">IPv4 only</option>
-                                                <option value="ipv6">IPv6 only</option>
-                                                <option value="both" selected>Both</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <div class="ipv4-wrapper"><label class="sr-only" for="new_host_ip">{tr}IPv4{/tr}</label><input type="text" class="form-control" id="new_host_ip" name="newhost[ip]" value=""/></div>
-                                        </td>
-                                        <td>
-                                            <div class="ipv6-wrapper"><label class="sr-only" for="new_host_ip6">{tr}IPv6{/tr}</label><input type="text" class="form-control" id="new_host_ip6" name="newhost[ip6]" value=""/></div>
-                                        </td>
+                                        <td><label class="sr-only" for="new_host_ip">{tr}IP{/tr}</label><input type="text" class="form-control" id="new_host_ip" name="newhost[ip]" value=""/></td>
                                         <td><label class="sr-only" for="new_host_contact">{tr}Contact{/tr}</label><input type="text" class="form-control" id="new_host_contact" name="newhost[contact]" value=""/></td>
                                         <td><label class="sr-only" for="new_host_can_register">{tr}Can register{/tr}</label><input type="checkbox" id="new_host_can_register" name="newhost[allowusersregister]"/></td>
                                     </tr>
@@ -206,41 +182,8 @@
                                 </table>
                             </div>
                         </div>
-                {jq}
-                    function updateIpFields(typeSelect) {
-                        var type = typeSelect.val();
-                        var td = typeSelect.closest('td');
-                        var wrapv4 = td.next().find('.ipv4-wrapper');
-                        var wrapv6 = td.next().next().find('.ipv6-wrapper');
-
-                        wrapv4.show();
-                        wrapv6.show();
-                        if (type === 'ipv4') {
-                            wrapv6.hide();
-                        } else if (type === 'ipv6') {
-                            wrapv4.hide();
-                        }
-                    }
-
-                    function masterTabActive() {
-                        return $('a.nav-link.active[href="#contentadmin_interwiki-2"]').length > 0;
-                    }
-
-                    // On loading the page.
-                    if (masterTabActive()) {
-                        $('select.host-ip-type').each(function () {
-                            updateIpFields($(this));
-                        });
-                    }
-
-                    // Bind on dropdown change
-                    $(document).on('change', 'select.host-ip-type', function () {
-                        if (!masterTabActive()) return;
-                        updateIpFields($(this));
-                    });
-                {/jq}
-                </div>
-            </fieldset>
+                    </div>
+                </fieldset>
             {/tab}
         {/if}
     {/tabset}

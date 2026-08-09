@@ -65,38 +65,6 @@ $map = [
 $s = new XML_RPC_Server($map);
 
 /**
- * @param $key
- * @return Boolean
- */
-function check_key($key)
-{
-    global $prefs;
-    $tikilib = TikiLib::lib('tiki');
-    $logslib = TikiLib::lib('logs');
-
-    if (! isset($prefs['known_hosts'][$key])) {
-        return false;
-    }
-
-    $ip = $tikilib->get_ip_address();
-    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-        if (isset($prefs['known_hosts'][$key]['ip6']) and $prefs['known_hosts'][$key]['ip6'] == $ip) {
-            return true;
-        }
-    } elseif (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-        if (isset($prefs['known_hosts'][$key]['ip']) and $prefs['known_hosts'][$key]['ip'] == $ip) {
-            return true;
-        }
-    } else {
-        $msg = tra("Unsupported IP type, doesn't match IPv4 or IPv6");
-        $logslib->add_log('intertiki', $msg . ' from ' . $prefs['known_hosts'][$key]['name']);
-        return false;
-    }
-
-    return false;
-}
-
-/**
  * @param $params
  * @return XML_RPC_Response
  */
@@ -122,9 +90,9 @@ function validate($params)
     $hashkey = $params->getParam(4);
     $hashkey = $hashkey->scalarval();
 
-
-    if (! check_key($key)) {
-        $msg = tra('Invalid server key');
+    $arrayOfIpAdresses = explode(',', trim($prefs['known_hosts'][$key]['ip']));
+    if (! isset($prefs['known_hosts'][$key]) or ! in_array($tikilib->get_ip_address(), $arrayOfIpAdresses)) {
+        $msg = tra('Please check the key and IP address of the slave Tiki you entered in your master Tiki.');
 
         if (! empty($prefs['intertiki_errfile'])) {
             logit($prefs['intertiki_errfile'], $msg, $key, INTERTIKI_BADKEY, $prefs['known_hosts'][$key]['name']);
@@ -133,7 +101,6 @@ function validate($params)
         $logslib->add_log('intertiki', $msg . ' from ' . $prefs['known_hosts'][$key]['name'], $login);
         return new XML_RPC_Response(0, 101, $msg);
     }
-
     [$isvalid] = $userlib->validate_user($login, $pass);
 
     if (! $isvalid) {
@@ -201,8 +168,9 @@ function set_user_info($params)
     $login = $params->getParam(1);
     $login = $login->scalarval();
 
-    if (! check_key($key)) {
-        $msg = tra('Invalid server key');
+    $arrayOfIpAdresses = explode(',', trim($prefs['known_hosts'][$key]['ip']));
+    if (! isset($prefs['known_hosts'][$key]) or ! in_array($tikilib->get_ip_address(), $arrayOfIpAdresses)) {
+        $msg = tra('Please check the key and IP address of the slave Tiki you entered in your master Tiki.');
 
         if ($prefs['intertiki_errfile']) {
             logit($prefs['intertiki_errfile'], $msg, $key, INTERTIKI_BADKEY, $prefs['known_hosts'][$key]['name']);
@@ -234,8 +202,9 @@ function logout($params)
     $login = $params->getParam(1);
     $login = $login->scalarval();
 
-    if (! check_key($key)) {
-        $msg = tra('Invalid server key');
+    $arrayOfIpAdresses = explode(',', trim($prefs['known_hosts'][$key]['ip']));
+    if (! isset($prefs['known_hosts'][$key]) or ! in_array($tikilib->get_ip_address(), $arrayOfIpAdresses)) {
+        $msg = tra('Please check the key and IP address of the slave Tiki you entered in your master Tiki.');
 
         if ($prefs['intertiki_errfile']) {
             logit($prefs['intertiki_errfile'], $msg, $key, INTERTIKI_BADKEY, $prefs['known_hosts'][$key]['name']);
@@ -274,8 +243,9 @@ function cookie_check($params)
     $hash = $params->getParam(1);
     $hash = $hash->scalarval();
 
-    if (! check_key($key)) {
-        $msg = tra('Invalid server key');
+    $arrayOfIpAdresses = explode(',', trim($prefs['known_hosts'][$key]['ip']));
+    if (! isset($prefs['known_hosts'][$key]) or ! in_array($tikilib->get_ip_address(), $arrayOfIpAdresses)) {
+        $msg = tra('Please check the key and IP address of the slave Tiki you entered in your master Tiki.');
 
         if ($prefs['intertiki_errfile']) {
             logit($prefs['intertiki_errfile'], $msg, $key, INTERTIKI_BADKEY, $prefs['known_hosts'][$key]['name']);
@@ -320,8 +290,9 @@ function get_user_info($params)
     $login = $params->getParam(1);
     $login = $login->scalarval();
 
-    if (! check_key($key)) {
-        $msg = tra('Invalid server key');
+    $arrayOfIpAdresses = explode(',', trim($prefs['known_hosts'][$key]['ip']));
+    if (! isset($prefs['known_hosts'][$key]) or ! in_array($tikilib->get_ip_address(), $arrayOfIpAdresses)) {
+        $msg = tra('Please check the key and IP address of the slave Tiki you entered in your master Tiki.');
 
         if ($prefs['intertiki_errfile']) {
             logit($prefs['intertiki_errfile'], $msg, $key, INTERTIKI_BADKEY, $prefs['known_hosts'][$key]['name']);
@@ -365,8 +336,9 @@ function get_registration_prefs($params)
     $key = $params->getParam(0);
     $key = $key->scalarval();
 
-    if (! check_key($key)) {
-        $msg = tra('Invalid server key');
+    $arrayOfIpAdresses = explode(',', trim($prefs['known_hosts'][$key]['ip']));
+    if (! isset($prefs['known_hosts'][$key]) or ! in_array($tikilib->get_ip_address(), $arrayOfIpAdresses)) {
+        $msg = tra('Please check the key and IP address of the slave Tiki you entered in your master Tiki.');
 
         if ($prefs['intertiki_errfile']) {
             logit($prefs['intertiki_errfile'], $msg, $key, INTERTIKI_BADKEY, $prefs['known_hosts'][$key]['name']);
@@ -402,8 +374,9 @@ function register_user($params)
     $login = $params->getParam(1);
     $login = $login->scalarval();
 
-    if (! check_key($key)) {
-        $msg = tra('Invalid server key');
+    $arrayOfIpAdresses = explode(',', trim($prefs['known_hosts'][$key]['ip']));
+    if (! isset($prefs['known_hosts'][$key]) or ! in_array($tikilib->get_ip_address(), $arrayOfIpAdresses)) {
+        $msg = tra('Please check the key and IP address of the slave Tiki you entered in your master Tiki.');
 
         if ($prefs['intertiki_errfile']) {
             logit($prefs['intertiki_errfile'], $msg, $key, INTERTIKI_BADKEY, $prefs['known_hosts'][$key]['name']);
