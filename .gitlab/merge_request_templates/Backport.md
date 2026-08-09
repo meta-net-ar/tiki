@@ -23,14 +23,13 @@ _Where, how, by whom. Ex: dogfooded on dev.tiki.org, checked X. Same-day backpor
 Name a specific org, client, or scenario. Not "someone asked me".
 _Ex: clients on 27.x LTS lose Intertiki once linked to a newer Tiki._
 
-Then tick at least one:
+If not merged, keeping the current code in the target branch (tick at least one):
 
-- [ ] Security vulnerability
-- [ ] Fatal error or major bug
-- [ ] Regression in the target branch
-- [ ] Compatibility with a supported platform, dependency, API, or service
-- [ ] Needed by a specific client, funded project, or production site
-- [ ] Blocks install, upgrade, or normal use
+- [ ] Causes fatal error or major bug
+- [ ] Produces a regression (e.g., in usability, UX)
+- [ ] Breaks compatibility with a supported platform, dependency, API, or service
+- [ ] Blocks specific client, funded project, or production site
+- [ ] Blocks installation, upgrade, or normal use
 
 ## 4. Why it is safe, or worth the risk
 _Ex: self-contained (new wikiplugin). No code execution change (string, return code, translation). Already broken in the target branch._
