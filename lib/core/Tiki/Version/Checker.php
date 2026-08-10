@@ -23,23 +23,29 @@ class Tiki_Version_Checker
 
     public function check($callback)
     {
+        global $prefs, $TWV;
+
         $upgrades = [];
         $branchupdate = null;
+        $isVcsVersion = $this->version->isVcs();
 
         // Perform Original EoL and Upgrade Check from .cycle file
         $content = call_user_func($callback, "https://tiki.org/{$this->cycle}.cycle");
         $versions = $this->getSupportedVersions($content);
         $supportedInBranch = $this->findSupportedInBranch($versions);
-        $this->isSupportedInCycle = (bool)$supportedInBranch;
+        $this->isSupportedInCycle = (bool) $supportedInBranch;
         $latestOverall = $this->getLatestVersion($versions);
 
-        if ($supportedInBranch) {
+        // Do not show an upgrade notice for a non-trunk VCS checkout when the
+        // tagged release has the same major and minor version (for example, 30.1vcs and 30.1).
+        if ($supportedInBranch && (! $isVcsVersion || $this->isDevelopmentBranch($TWV) || ! $this->isSameBaseVersion($supportedInBranch))) {
             if ($supportedInBranch->isStableUpgradeTo($this->version)) {
-                $upgrades[] = new Tiki_Version_Upgrade($this->version, $supportedInBranch, "error");
+                $messageType = $isVcsVersion ? 'note' : 'error';
+                $upgrades[] = new Tiki_Version_Upgrade($this->version, $supportedInBranch, $messageType);
                 $branchupdate = $supportedInBranch;
             }
         }
-        if ($latestOverall && $latestOverall !== $branchupdate) {
+        if ($latestOverall && $latestOverall !== $branchupdate && (! $isVcsVersion || $this->isDevelopmentBranch($TWV) || ! $this->isSameBaseVersion($latestOverall))) {
             // If current is unstable OR max is a stable upgrade to current
             if (! $this->version->isStable() || $latestOverall->isStableUpgradeTo($this->version)) {
                 $fromVersion = $this->isSupportedInCycle ? $supportedInBranch : $this->version;
@@ -50,7 +56,8 @@ class Tiki_Version_Checker
         }
 
         // Enhance with Approaching EoL Date Check (if feature enabled and version is supported)
-        global $prefs, $TWV;
+        // NOTE: intentionally NOT gated by $isVcsVersion - a git checkout of a
+        // supported branch approaching EoL should still be warned about its upcoming EoL date.
         if ($this->isSupportedInCycle && ($prefs['feature_eol_date_notifier'] ?? 'n') === 'y') {
             $eolMessages = $this->checkEolDates($TWV);
             $upgrades = array_merge($upgrades, $eolMessages);
@@ -59,13 +66,25 @@ class Tiki_Version_Checker
         return $upgrades;
     }
 
+    private function isDevelopmentBranch(TWVersion $versionManager): bool
+    {
+        $branch = strtolower((string) ($versionManager->branch ?? ''));
+
+        return $branch === 'trunk';
+    }
+
+    private function isSameBaseVersion(Tiki_Version_Version $otherVersion): bool
+    {
+        return $this->version->getMajor() === $otherVersion->getMajor()
+            && $this->version->getMinor() === $otherVersion->getMinor();
+    }
 
     /**
     * To check for approaching EoL dates for SUPPORTED versions.
     * @param TWVersion $versionManager The TWVersion object.
     * @return array An array of Tiki_Version_Upgrade objects.
     */
-    private function checkEolDates($versionManager): array
+    private function checkEolDates(TWVersion $versionManager): array
     {
         $messages = [];
         $majorVersion = $this->version->getMajor();

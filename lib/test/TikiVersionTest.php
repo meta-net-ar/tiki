@@ -214,6 +214,66 @@ class TikiVersionTest extends PHPUnit\Framework\TestCase
         $this->assertEquals([], $response);
     }
 
+    public function testCurrentGitVersionDoesNotTriggerReleasedUpgradeNotice()
+    {
+        $checker = new Tiki_Version_Checker();
+        $checker->setCycle('regular');
+        $checker->setVersion('30.1vcs');
+
+        $response = $checker->check(
+            function () {
+                return <<<O
+                        30.1
+                        30.0
+                        29.0
+                        O;
+            }
+        );
+
+        $this->assertSame([], $response);
+    }
+
+    public function testGitVersionTriggersNoteForDifferentBaseVersion()
+    {
+        $checker = new Tiki_Version_Checker();
+        $checker->setCycle('regular');
+        $checker->setVersion('30.0vcs');
+
+        $response = $checker->check(
+            function () {
+                return '30.1';
+            }
+        );
+
+        $this->assertCount(1, $response);
+        $this->assertSame('note', $response[0]->getType());
+    }
+
+    public function testTrunkBranchShowsDevelopmentVersionWarningForVcsVersion()
+    {
+        global $TWV;
+        $TWV = new TWVersion();
+        $TWV->branch = 'trunk';
+
+        $checker = new Tiki_Version_Checker();
+        $checker->setCycle('regular');
+        $checker->setVersion('30.1vcs');
+
+        $response = $checker->check(
+            function () {
+                return <<<O
+                        30.1
+                        30.0
+                        29.0
+                        O;
+            }
+        );
+
+        $this->assertCount(1, $response);
+        $this->assertSame('note', $response[0]->getType());
+        $this->assertStringContainsString('development version', $response[0]->getMessage());
+    }
+
     /**
      * @dataProvider upgradeMessages
      */
