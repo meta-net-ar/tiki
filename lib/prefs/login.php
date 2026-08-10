@@ -189,7 +189,7 @@ function prefs_login_list()
             'default' => 'n',
             'help' => $loginGeneralPreferencesHelp,
         ],
-        'login_textBelowLoginBox' => [
+        'login_text_below_login_box' => [
             'name' => tra('Text below login box'),
             'description' => tra('Text to display below the login box.'),
             'hint' => tra("Supports Tiki syntax"),
