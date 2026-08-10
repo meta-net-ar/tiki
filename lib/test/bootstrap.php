@@ -59,6 +59,9 @@ $tikilib = new TikiLib();
 
 // update db if needed
 require_once 'lib/init/initlib.php';
+// tr()/tra() must be defined before the installer runs: schema patches load libs
+// (e.g. TrackerLib) whose constructors call tr()
+require_once 'lib/init/tra.php';
 $installer = Installer::getInstance();
 
 $output = new ConsoleOutput();
@@ -85,7 +88,6 @@ $cachelib = TikiLib::lib('cache');
 $wikilib = TikiLib::lib('wiki');
 $userlib = TikiLib::lib('user');
 $headerlib = TikiLib::lib('header');
-require_once 'lib/init/tra.php';
 $access = TikiLib::lib('access');
 
 $_SESSION = [
