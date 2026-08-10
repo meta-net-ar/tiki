@@ -8,7 +8,7 @@
     </IfModule>
 </FilesMatch>
 
-<FilesMatch "(?i)\.(css|js|jpe?g|png|ico|gif|svgz?|bmp|json|xml|ttf|eot|woff2?|otf|swf|webmanifest|map|less|scss)$">
+<FilesMatch "(?i)\.(css|js|jpe?g|png|ico|gif|svgz?|bmp|webm|json|xml|ttf|eot|woff2?|otf|swf|webmanifest|map|less|scss)$">
     #the map and less & scssfiles are allowed for developer deugging tools.
     <IfModule mod_authz_core.c>
         Require all granted
