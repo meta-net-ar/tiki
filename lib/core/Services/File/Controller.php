@@ -692,13 +692,22 @@ class Services_File_Controller
             throw new Services_Exception_NotFound();
         }
 
+        $files = $result['data'];
+        if (! $input->metadata->int()) {
+            // These fields can be huge, so send them only when asked
+            $files = array_map(function ($file) {
+                unset($file['metadata'], $file['search_data'], $file['ocr_data']);
+                return $file;
+            }, $files);
+        }
+
         return [
             'title' => tr('List files'),
             'galleryId' => $galleryId,
             'offset' => $offset,
             'maxRecords' => $maxRecords,
             'count' => $result['count'],
-            'result' => $result['data'],
+            'result' => $files,
         ];
     }
 
