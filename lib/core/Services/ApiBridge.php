@@ -240,7 +240,13 @@ class Services_ApiBridge
 
     protected function renderVersion()
     {
-        global $TWV;
+        global $TWV, $prefs;
+
+        if (($prefs['auth_api_tiki_version'] ?? 'y') !== 'y') {
+            TikiLib::lib('access')->display_error('API', tra('The version endpoint is disabled.'), 403);
+            return;
+        }
+
         echo json_encode(['version' => $TWV->version]);
     }
 }

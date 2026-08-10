@@ -573,6 +573,15 @@ function prefs_auth_list()
             'type' => 'flag',
             'default' => 'n',
         ],
+        'auth_api_tiki_version' => [
+            'name' => tra('API version endpoint'),
+            'description' => tra('Report the Tiki version at /api/version. Requires no authentication, so disable it to keep the version private.'),
+            'help' => 'Api',
+            'perspective' => false,
+            'dependencies' => ['auth_api_tokens'],
+            'type' => 'flag',
+            'default' => 'y',
+        ],
         'auth_webhooks' => [
             'name' => tra('Webhook access'),
             'description' => tra('Enable Tiki to receive webhook requests from 3rd parties.'),

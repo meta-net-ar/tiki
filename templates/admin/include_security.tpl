@@ -374,6 +374,7 @@
             <div class="adminoptionboxchild" id="auth_api_tokens_childcontainer">
                 {service_inline controller=api_token action=list}
             </div>
+            {preference name=auth_api_tiki_version}
         {/tab}
         {tab name="{tr}Webhooks{/tr}" key="webhooks"}
             <br>
