@@ -53,8 +53,6 @@
       <!-- require pref lang_google_api_key -->
       <group>GoogleTranslate</group>
       <group>RequiresWebserver</group>
-      <!-- API integration tests -->
-      <group>api-integration-test</group>
     </exclude>
   </groups>
   <php>
