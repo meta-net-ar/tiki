@@ -826,6 +826,11 @@ pre.codelisting code {
     margin-left: calc(19px + 0.35rem);
 }
 
+.wikiplugin-fade--initial-open .wpfade-div-plain,
+.wikiplugin-fade--initial-open .wpfade-div-icon {
+    display: block;
+}
+
 .wpfade-hidden::before,
 .wpfade-shown::before {
     content: '';
@@ -845,40 +850,6 @@ pre.codelisting code {
     background-image: url('#{$imagePath}toggle-collapse-dark.png');
 }
 // wikiplugin_fade: summary, print, initial expanded
-.wikiplugin-fade__summary {
-    margin-bottom: 0;
-}
-
-.wikiplugin-fade--inline {
-    border: 0;
-    box-shadow: none;
-    background: transparent;
-}
-
-.wikiplugin-fade--inline .wikiplugin-fade__summary.card-header {
-    background: transparent;
-    border: 0;
-    padding: 0;
-}
-
-.wikiplugin-fade--inline .wikiplugin-fade__summary > a {
-    cursor: pointer;
-    border-radius: .25rem;
-    color: var(--bs-link-color);
-    transition: background-color .15s ease, color .15s ease, box-shadow .15s ease;
-}
-
-.wikiplugin-fade--inline .wikiplugin-fade__summary > a:hover {
-    background-color: var(--bs-secondary-bg);
-    color: var(--bs-link-hover-color);
-}
-
-.wikiplugin-fade--inline .wikiplugin-fade__summary > a:focus-visible {
-    outline: 0;
-    box-shadow: 0 0 0 .2rem rgba(var(--bs-primary-rgb), .25);
-    border-color: var(--bs-primary);
-}
-
 .wikiplugin-fade__header > a {
     cursor: pointer;
 }
@@ -888,8 +859,8 @@ pre.codelisting code {
     outline-offset: 2px;
 }
 
-// Classic Bootstrap FADE (bootstrap=y, no summary): left expand/collapse icon; state tracks aria-expanded (see wikiplugin-fade.js).
-.wikiplugin-fade.card .wikiplugin-fade__header > a::before {
+// Bootstrap FADE with icon=y: left expand/collapse icon, state tracks aria-expanded (see wikiplugin-fade.js).
+.wikiplugin-fade--icon.card .wikiplugin-fade__header > a::before {
     content: '';
     flex-shrink: 0;
     width: 19px;
@@ -901,42 +872,35 @@ pre.codelisting code {
     background-position: center;
 }
 
-.wikiplugin-fade.card .wikiplugin-fade__header > a[aria-expanded='true']::before {
+.wikiplugin-fade--icon.card .wikiplugin-fade__header > a[aria-expanded='true']::before {
     background-image: url('#{$imagePath}toggle-collapse-dark.png');
 }
 
-.wikiplugin-fade.card .wikiplugin-fade__header > a[aria-expanded='false']::before {
+.wikiplugin-fade--icon.card .wikiplugin-fade__header > a[aria-expanded='false']::before {
     background-image: url('#{$imagePath}toggle-expand-dark.png');
 }
 
+// Indent the body so it lines up with the header text rather than the icon.
+.wikiplugin-fade--icon.card .card-body {
+    padding-left: calc(var(--bs-card-spacer-x, 1rem) + 19px + .35rem);
+}
+
+// Right-hand chevron, kept when icon is unset so existing bootstrap=y pages render as before.
+.wikiplugin-fade__chevron {
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: .125rem;
+}
+
+.wikiplugin-fade__header > a[aria-expanded='true'] .wikiplugin-fade__chevron {
+    --fa: "\f077";
+}
+
+.wikiplugin-fade__label-text,
 .wikiplugin-fade__summary-text {
     min-width: 0;
     line-height: 1.4;
     word-break: break-word;
-}
-
-// summary + custom label: stacked header; toggle icon matches bootstrap/card FADE PNG (::before).
-.wikiplugin-fade--summary-labeled .wikiplugin-fade__summary > a {
-    gap: 0.35rem;
-
-    &::before {
-        content: '';
-        flex-shrink: 0;
-        width: 19px;
-        height: 1.25rem;
-        align-self: flex-start;
-        margin-top: .125rem;
-        background-repeat: no-repeat;
-        background-position: center;
-    }
-
-    &[aria-expanded='true']::before {
-        background-image: url('#{$imagePath}toggle-collapse-dark.png');
-    }
-
-    &[aria-expanded='false']::before {
-        background-image: url('#{$imagePath}toggle-expand-dark.png');
-    }
 }
 
 .wikiplugin-fade--summary-labeled .wikiplugin-fade__summary-stack {
@@ -946,11 +910,7 @@ pre.codelisting code {
     min-width: 0;
 }
 
-.wikiplugin-fade--summary-labeled .wikiplugin-fade__extra-label {
-    color: var(--bs-secondary-color);
-}
-
-.wikiplugin-fade--summary-labeled .wikiplugin-fade__summary > a:hover .wikiplugin-fade__extra-label {
+.wikiplugin-fade--summary-labeled .wikiplugin-fade__summary-text {
     color: var(--bs-secondary-color);
 }
 
@@ -966,10 +926,6 @@ pre.codelisting code {
 
 .wikiplugin-fade--summary .wikiplugin-fade__legacy-header .wpfade-legacy-toggle {
     align-items: flex-start;
-}
-
-.wikiplugin-fade__content {
-    padding: .15rem 0 .5rem 0;
 }
 
 @media print {

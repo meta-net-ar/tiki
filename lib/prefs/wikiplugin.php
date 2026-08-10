@@ -117,7 +117,6 @@ function prefs_wikiplugin_list($partial = false)
         $out['wikiplugin_list_convert_trackerlist'] = ['default' => 'n'];
         $out['wikiplugin_maximum_passes'] = ['default' => 500];
         $out['wikiplugin_fade_default_expanded'] = ['default' => 'n'];
-        $out['wikiplugin_fade_mobile_expand'] = ['default' => 'n'];
 
         return $out;
     }
@@ -216,13 +215,6 @@ function prefs_wikiplugin_list($partial = false)
     $prefs['wikiplugin_fade_default_expanded'] = [
         'name' => tra('Fade plugin default expanded'),
         'description' => tra('When wiki authors omit the expanded parameter, start Fade plugin sections open (expanded) or closed (collapsed).'),
-        'type' => 'flag',
-        'default' => 'n',
-        'dependencies' => ['wikiplugin_fade'],
-    ];
-    $prefs['wikiplugin_fade_mobile_expand'] = [
-        'name' => tra('Fade plugin expand on small screens'),
-        'description' => tra('On narrow viewports, show Fade plugin details expanded by default to reduce repeated tapping.'),
         'type' => 'flag',
         'default' => 'n',
         'dependencies' => ['wikiplugin_fade'],

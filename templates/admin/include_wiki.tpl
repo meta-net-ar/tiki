@@ -127,7 +127,6 @@
                     {preference name=wikiplugin_fade}
                     <div class="adminoptionboxchild" id="wikiplugin_fade_childcontainer">
                         {preference name=wikiplugin_fade_default_expanded}
-                        {preference name=wikiplugin_fade_mobile_expand}
                     </div>
                     {preference name=wikiplugin_fancylink}
                 </fieldset>

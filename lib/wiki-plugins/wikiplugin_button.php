@@ -213,7 +213,7 @@ function wikiplugin_button_info()
                 'required' => false,
                 'name' => tra('Fade Action'),
                 'description' => tra('Structured FADE action for grouped collapsibles.'),
-                'since' => '30.0',
+                'since' => '30.1',
                 'filter' => 'alpha',
                 'default' => '',
                 'advanced' => true,
@@ -228,8 +228,12 @@ function wikiplugin_button_info()
             '_fade_group' => [
                 'required' => false,
                 'name' => tra('Fade Group'),
-                'description' => tra('FADE group identifier (letters, digits, underscore, hyphen).'),
-                'since' => '30.0',
+                'description' => tr(
+                    'FADE group identifier (letters, digits, underscore, hyphen). Must match the %0fade_group%1 param of the PluginFade blocks to act on.',
+                    '<code>',
+                    '</code>'
+                ),
+                'since' => '30.1',
                 'filter' => 'text',
                 'default' => '',
                 'advanced' => true,
