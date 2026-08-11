@@ -2513,6 +2513,7 @@ CREATE TABLE `tiki_tracker_fields` (
   INDEX `encryptionKeyId` (`encryptionKeyId`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1 ;
 
+
 DROP TABLE IF EXISTS `tiki_tracker_configs_history`;
 CREATE TABLE `tiki_tracker_configs_history` (
   `historyId` int NOT NULL auto_increment,
