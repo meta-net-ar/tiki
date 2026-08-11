@@ -160,6 +160,12 @@ Sections::onSectionChange(function ($section) {
     if (is_readable($custom_css)) {
         $addSectionThemeCssFile($custom_css, 53);
     }
+
+    //8) include optional Theme Customizer generated CSS if present
+    if ($prefs['theme_customizer'] === 'y' && is_readable(THEME_CUSTOMIZER_GENERATED_CSS_PATH)) {
+        $headerlib->add_cssfile(THEME_CUSTOMIZER_GENERATED_CSS_PATH . '?' . filemtime(THEME_CUSTOMIZER_GENERATED_CSS_PATH), 54);
+    }
+
     if (! isset($prefs['site_favicon_enable']) || $prefs['site_favicon_enable'] === 'y') {    // if favicons are disabled in preferences, skip the lot of it.
         $favicon_path = $themelib->get_theme_path($prefs['theme'], $prefs['theme_option'], 'favicon-16x16.png', 'favicons');
         if ($favicon_path) {  // if there is a 16x16 png favicon in the theme folder, then find and display others if they exist
@@ -202,7 +208,7 @@ Sections::onSectionChange(function ($section) {
         unset($favicon_path);  // no longer needed, so bye bye
     }
 
-    //8) produce $iconset to be used for generating icons
+    //9) produce $iconset to be used for generating icons
     $iconset = TikiLib::lib('iconset')->getIconsetForTheme($theme_active, $theme_option_active);
     // and add js support file
     $headerlib->add_jsfile('lib/jquery_tiki/iconsets.js');

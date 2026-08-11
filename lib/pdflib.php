@@ -606,6 +606,7 @@ HTML;
                 $basecss . $themecss . $printcss . $extcss .
                 $this->bootstrapReplace() .
                 $prefs["header_custom_css"] .
+                ($prefs['theme_customizer'] === 'y' && is_readable(THEME_CUSTOMIZER_GENERATED_CSS_PATH) ? file_get_contents(THEME_CUSTOMIZER_GENERATED_CSS_PATH) : '') .
             '</style>';
 
         $cssStyles = str_replace(
