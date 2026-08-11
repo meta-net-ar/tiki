@@ -155,8 +155,7 @@ class Services_Language_Controller
         $languages = $this->utilities->getLanguages();
 
         //get custom php file location
-        $custom_php_file = $this->utilities->getLanguageDirectory($language);
-        $custom_php_file .= LANG_CUSTOM_PHP_BASENAME;
+        $custom_php_file = $this->utilities->getCustomPhpPath($language);
         if (! file_exists($custom_php_file)) {
             $custom_php_file = null;
         }
