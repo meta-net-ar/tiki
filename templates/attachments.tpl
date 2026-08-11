@@ -115,7 +115,7 @@
                     </div>
 
                     <div class="tiki-form-group row">
-                        <label class="col-sm-2 col-form-label" for="attach-comment">{tr}Comment{/tr}</label>
+                        <label class="col-sm-2 col-form-label" for="attach-comment">{tr}Description{/tr}</label>
                         <div class="col-sm-8">
                             <input class="form-control" type="text" name="attach_comment" maxlength="250" id="attach-comment" placeholder="{tr}File upload comment{/tr}...">
                         </div>

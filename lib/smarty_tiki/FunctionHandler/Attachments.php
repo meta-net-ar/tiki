@@ -64,28 +64,55 @@ class Attachments extends Base
 
         // Get URL params specific to this smarty function that should be assigned in smarty
         $url_override_prefix = 's_f_attachments';
-        $url_overrided_arguments = [ 'sort_mode', 'remove', 'galleryId', 'comment', 'upload', 'page', 'offset', 'maxRecords' ];
+        $url_overrided_arguments = [ 'sort_mode', 'view', 'offset', 'maxRecords', 'fileId', 'maxWidth', 'remove', 'galleryId', 'comment', 'upload', 'page' ];
         $smarty->set_request_overriders($url_override_prefix, $url_overrided_arguments);
 
         $params['sort_mode'] = $_REQUEST[$url_override_prefix . '-sort_mode'] ?? 'created_desc';
 
-        // Pagination: read offset and maxRecords from the request (prefixed)
-        $offset = max(0, (int)($_REQUEST[$url_override_prefix . '-offset'] ?? 0));
-        $maxRecords = (int)($_REQUEST[$url_override_prefix . '-maxRecords'] ?? $prefs['maxRecords']);
-        if ($maxRecords <= 0) {
-            $maxRecords = $prefs['maxRecords'];
+        $params['view'] = $_REQUEST[$url_override_prefix . '-view'] ?? 'list';
+        if (! in_array($params['view'], ['browse', 'list', 'page'])) {
+            $params['view'] = 'list';
         }
+        if (! isset($_REQUEST[$url_override_prefix . '-view']) && ! empty($_REQUEST[$url_override_prefix . '-fileId'])) {
+            $params['view'] = 'page';
+        }
+
+        // Pagination: read offset from the request (prefixed)
+        $params['offset'] = max(0, (int)($_REQUEST[$url_override_prefix . '-offset'] ?? 0));
+
+        if ($params['view'] === 'page') {
+            $params['maxRecords'] = 1;
+        } elseif ($params['view'] === 'browse') {
+            $params['maxRecords'] = -1;
+        } else {
+            $params['maxRecords'] = (int)($_REQUEST[$url_override_prefix . '-maxRecords'] ?? $prefs['maxRecords']);
+            if ($params['maxRecords'] <= 0) {
+                $params['maxRecords'] = $prefs['maxRecords'];
+            }
+        }
+
+        $params['maxWidth'] = (int)($_REQUEST[$url_override_prefix . '-maxWidth'] ?? 300);
+        if ($params['maxWidth'] <= 0) {
+            $params['maxWidth'] = 300;
+        }
+
+        $requestedFileId = (int)($_REQUEST[$url_override_prefix . '-fileId'] ?? 0);
+        $params['fileId'] = $requestedFileId > 0 ? $requestedFileId : 0;
 
         // Force some gallery display parameters before fgal_listing_conf.php reads $gal_info
         $gal_info['show_checked'] = 'n';
         $gal_info['show_creator'] = 'y';
+
+        // Pre-set $view so fgal_listing_conf.php (which reads $_REQUEST['view'] otherwise) doesn't
+        // pick up an unrelated 'view' request param and overwrite it with something else.
+        $view = $params['view'];
 
         // Get listing display config
         include_once('fgal_listing_conf.php');
 
         // Get list of files in the gallery (paginated)
         if (! empty($galleryId)) {
-            $files = $filegallib->get_files($offset, $maxRecords, $params['sort_mode'], '', $galleryId);
+            $files = $filegallib->get_files($params['offset'], $params['maxRecords'], $params['sort_mode'], '', $galleryId);
         } else {
             $files = ['data' => [], 'count' => 0];
         }
@@ -110,9 +137,19 @@ class Attachments extends Base
         $params['gal_info'] = $gal_info;
         $params['files'] = $files['data'];
         $params['count'] = $files['count'];
-        $params['offset'] = $offset;
-        $params['maxRecords'] = $maxRecords;
         $params['from_wiki_page'] = true;
+        $params['thumbnail_size'] = $prefs['fgal_thumb_max_size'];
+
+        if ($params['view'] === 'page') {
+            $params['file'] = $files['data'][0] ?? null;
+
+            if ($params['fileId'] > 0 && empty($params['file']) && ! empty($galleryId)) {
+                $singleFile = $filegallib->get_file_info($params['fileId']);
+                if (! empty($singleFile) && (int)$singleFile['galleryId'] === (int)$galleryId) {
+                    $params['file'] = $singleFile;
+                }
+            }
+        }
 
         $return = "\n" . $smarty->plugin_fetch('fgal_attachments.tpl', $params) . "\n";
 
