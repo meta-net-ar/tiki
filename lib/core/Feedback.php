@@ -493,7 +493,7 @@ class Feedback
             if (count($watches)) {
                 $usersList = [];
                 foreach ($watches as $watch) {
-                    $usersList[] = "<a href='tiki-user_information.php?user=" . $watch['user'] . "' class='fw-bold'>" . $watch['user'] . "</a>";
+                    $usersList[] = "<a href='tiki-user_information.php?view_user=" . urlencode($watch['user']) . "' class='fw-bold'>" . htmlspecialchars($watch['user']) . "</a>";
                 }
 
                 if (! empty($usersList)) {
