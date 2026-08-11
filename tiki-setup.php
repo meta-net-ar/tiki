@@ -830,6 +830,10 @@ if (! empty($prefs['header_custom_css'])) {
     $headerlib->add_css($tikilib->removeInlineSyntaxTags($prefs['header_custom_css']));
 }
 
+if (! empty($prefs['header_custom_generated_css'])) {
+    $headerlib->add_css($prefs['header_custom_generated_css']);
+}
+
 if (! empty($prefs['header_custom_js'])) {
     // Hopefully temporary clean-up of inline syntax tags for Tiki 30.0
     $headerlib->add_js($tikilib->removeInlineSyntaxTags($prefs['header_custom_js']));

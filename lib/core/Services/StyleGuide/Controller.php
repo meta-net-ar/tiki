@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+// phpcs:disable PSR1.Methods.CamelCapsMethodName.NotCamelCaps
 class Services_StyleGuide_Controller
 {
     public function setUp()
@@ -52,5 +53,24 @@ class Services_StyleGuide_Controller
             'title' => tr('Theme Customizer'),
             'sections' => $sections,
         ];
+    }
+
+    public function action_save_generated_css($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin');
+        $customCss = $input->header_custom_generated_css->text();
+        $tikilib = TikiLib::lib('tiki');
+
+        try {
+            $updated = $tikilib->set_preference('header_custom_generated_css', $customCss);
+            if ($updated) {
+                Feedback::success(tr('The custom generated CSS preference has been updated'));
+            } else {
+                Feedback::warning(tr('An error occurred while updating the custom generated CSS preference'));
+            }
+        } catch (Exception $e) {
+            Feedback::error(tr("Couldn't update the custom generated CSS preference: %0", $e->getMessage()));
+        }
+        return true;
     }
 }

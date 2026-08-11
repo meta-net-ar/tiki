@@ -606,6 +606,7 @@ HTML;
                 $basecss . $themecss . $printcss . $extcss .
                 $this->bootstrapReplace() .
                 $prefs["header_custom_css"] .
+                $prefs["header_custom_generated_css"] .
             '</style>';
 
         $cssStyles = str_replace(

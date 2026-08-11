@@ -21,8 +21,11 @@
     </div>
 
     <div class="col">
-        <label for="header_custom_css">{tr}Custom CSS{/tr}</label>
-        <textarea name="header_custom_css" class="form-control" rows="10"></textarea>
+        <label for="header_custom_generated_css">{tr}Custom CSS{/tr}</label>
+        <textarea name="header_custom_generated_css" class="form-control" rows="10">{$prefs['header_custom_generated_css']|escape}</textarea>
+        <span class="text-muted">{tr}By clicking 'Apply Custom CSS' the CSS code will be applied as default custom CSS for your Tiki site.{/tr}</span>
+        <br />
+        <input disabled class="btn btn-primary mt-3" type="submit" title="{tr}Apply custom CSS{/tr}" value="{tr}Apply custom CSS{/tr}" id="apply-custom-generated-css">
     </div>
 
     <div class="tc-footer">
