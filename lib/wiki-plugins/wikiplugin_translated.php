@@ -44,10 +44,17 @@ function wikiplugin_translated($data, $params)
         return WikiParser_PluginOutput::error(tr('Plugin Translated error'), tr('Incorrect parameter.'));
     }
 
-    $h = opendir("img/flags/");
-    while ($file = readdir($h)) {
-        if (! str_starts_with($file, '.') and str_ends_with($file, '.png')) {
-            $avflags[] = substr($file, 0, strlen($file) - 4);
+    $avflags = [];
+
+    $iterator = new FilesystemIterator('img/flags', FilesystemIterator::SKIP_DOTS);
+
+    foreach ($iterator as $fileInfo) {
+        $file = $fileInfo->getFilename();
+        if (str_ends_with($file, '.png')) {
+            // Skip hidden files (like ._flag.png) if necessary,
+            if ($file[0] !== '.') {
+                $avflags[] = substr($file, 0, -4);
+            }
         }
     }
     if (in_array($flag, $avflags)) {

@@ -105,15 +105,20 @@ if (! empty($checked)) {
     $markup = replace_with_self_links($markup, $tpl);
 }
 
- $fp = opendir('templates/');
+$iterator = new FilesystemIterator('templates/', FilesystemIterator::SKIP_DOTS);
 
-$tpl_sel = '<select name=\'tpl\' id=\'tpl\' onclick=\'this.form.submit();\'><option>Select tpl</option>';
-while (false !== ($f = readdir($fp))) {
-    preg_match('/^(.*)\.tpl$/', $f, $m);
-    if (count($m) > 0) {
-        $tpl_sel .= '<option value=\'' . $m[1] . '\'';
-        $tpl_sel .= $m[1] == $tpl ? ' selected=\"selected\">' : '>';
-        $tpl_sel .= $m[1] . '.tpl</option>';
+$tpl_sel = '<select name="tpl" id="tpl" onchange="this.form.submit();"><option>Select tpl</option>';
+
+foreach ($iterator as $fileInfo) {
+    $filename = $fileInfo->getFilename();
+
+    if (str_ends_with($filename, '.tpl')) {
+        $basename = substr($filename, 0, -4); // Remove .tpl
+
+        $selected = ($basename === $tpl) ? ' selected="selected"' : '';
+
+        $tpl_sel .= '<option value="' . htmlspecialchars($basename) . '"' . $selected . '>';
+        $tpl_sel .= htmlspecialchars($filename) . '</option>';
     }
 }
 $tpl_sel .= '</select>';

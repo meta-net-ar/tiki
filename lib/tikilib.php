@@ -3155,8 +3155,8 @@ class TikiLib extends TikiDb_Bridge
                     $objectLink = ! empty($sheet['title']) ? '[' . $uri . '|' . $sheet['title'] . ']' : '';
                     break;
                 case str_starts_with($slug, 'survey'):
-                    include_once('lib/surveys/surveylib.php');
                     $surveyId = substr($slug, 6);
+                    $srvlib = TikiLib::lib('survey');
                     $survey = $srvlib->get_survey($surveyId);
                     $objectLink = ! empty($survey['name']) ? '[' . $uri . '|' . $survey['name'] . ']' : '';
                     break;
@@ -6519,14 +6519,12 @@ class TikiLib extends TikiDb_Bridge
         }
 
         $flags = [];
-        $h = opendir("img/flags/");
-        while ($file = readdir($h)) {
-            if (str_contains($file, ".png")) {
-                $parts = explode('.', $file);
-                $flags[] = $parts[0];
+        $iterator = new FilesystemIterator("img/flags/", FilesystemIterator::SKIP_DOTS);
+        foreach ($iterator as $fileInfo) {
+            if ($fileInfo->isFile() && str_ends_with($fileInfo->getFilename(), '.png')) {
+                $flags[] = $fileInfo->getBasename('.png');
             }
         }
-        closedir($h);
         if ($langsort) {
             foreach ($flags as $flagname => $flagtra) {
                 unset($flags[$flagname]);
@@ -7520,14 +7518,29 @@ function detect_browser_language()
     $available_aprox = [];
 
     if (is_dir("lang")) {
-        $dh = opendir("lang");
-        while ($lang = readdir($dh)) {
-            if (! str_contains($lang, '.') and is_dir("lang/$lang") and file_exists("lang/$lang/language.php") and ($prefs['restrict_language'] === 'n' || empty($prefs['available_languages']) || in_array($lang, $prefs['available_languages']))) {
-                $available[strtolower($lang)] = $lang;
-                $available_aprox[substr(strtolower($lang), 0, 2)] = $lang;
+        $iterator = new FilesystemIterator("lang", FilesystemIterator::SKIP_DOTS);
+        foreach ($iterator as $fileInfo) {
+            if (! $fileInfo->isDir()) {
+                continue;
+            }
+            $lang = $fileInfo->getFilename();
+
+            if (! file_exists($fileInfo->getPathname() . '/language.php')) {
+                continue;
+            }
+
+            if (
+                $prefs['restrict_language'] === 'n' ||
+                empty($prefs['available_languages']) ||
+                in_array($lang, $prefs['available_languages'])
+            ) {
+                $langLower = strtolower($lang);
+                $available[$langLower] = $lang;
+                $available_aprox[substr($langLower, 0, 2)] = $lang;
             }
         }
     }
+
 
     // Check better language
     // Priority has been changed in 2.0 to that defined in RFC 4647

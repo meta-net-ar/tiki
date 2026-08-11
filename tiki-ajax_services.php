@@ -220,15 +220,29 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
  */
 function read_icon_dir($dir, &$icons, $max, $query)
 {
-    $fp = opendir($dir);
-    while (false !== ($f = readdir($fp))) {
-        preg_match('/^([^\.].*)\..*$/', $f, $m);
+    if (! is_dir($dir)) {
+        return;
+    }
+    $iterator = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+
+    foreach ($iterator as $fileInfo) {
+        if (count($icons) >= $max) {
+            break;
+        }
+
+        $filename = $fileInfo->getFilename();
+        $path = $fileInfo->getPathname();
+
+        // Get name without extension
+        $nameOnly = pathinfo($filename, PATHINFO_FILENAME);
+
         if (
-            count($m) > 0 && count($icons) < $max &&
-                stripos($m[1], $query) !== false &&
-                ! in_array($dir . '/' . $f, $icons)
+            $fileInfo->isFile() &&
+            ! str_starts_with($filename, '.') &&
+            stripos($nameOnly, $query) !== false &&
+            ! in_array($path, $icons)
         ) {
-            $icons[] = $dir . '/' . $f;
+            $icons[] = $path;
         }
     }
 }

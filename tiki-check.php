@@ -5584,56 +5584,34 @@ class BenchmarkPhp
  * @param array $files Array of filenames. Suspicious files will be added to this array.
  * @param string $sourceDir Path of the directory to check
  */
-function check_for_remote_readable_files(array &$files, $sourceDir = 'db')
+function check_for_remote_readable_files(array &$files, string $sourceDir = 'db'): void
 {
-    //fix dir slash
-    $sourceDir = str_replace('\\', '/', $sourceDir);
-
-    if (! str_ends_with($sourceDir, '/')) {
-        $sourceDir .= '/';
-    }
-
     if (! is_dir($sourceDir)) {
         return;
     }
 
-    $sourceDirHandler = opendir($sourceDir);
+    // Create a recursive iterator that ignores "." and ".." automatically
+    $directory = new RecursiveDirectoryIterator($sourceDir, FilesystemIterator::SKIP_DOTS);
+    $iterator = new RecursiveIteratorIterator($directory);
 
-    if ($sourceDirHandler === false) {
-        return;
-    }
-
-    while ($file = readdir($sourceDirHandler)) {
-        // Skip ".", ".."
-        if ($file == '.' || $file == '..') {
+    foreach ($iterator as $fileInfo) {
+        if (! $fileInfo->isFile()) {
             continue;
         }
 
-        $sourceFilePath = $sourceDir . $file;
+        $fileName = $fileInfo->getFilename();
 
-        if (is_dir($sourceFilePath)) {
-            check_for_remote_readable_files($files, $sourceFilePath);
-        }
-
-        if (! is_file($sourceFilePath)) {
+        // 1. Check for temp/editor files (#file#, file~, .swp, .swo)
+        // PHP 8.1+ regex or simple logic
+        if (preg_match('/(^#.*#|~|\.sw[op])$/', $fileName)) {
+            $files[] = $fileName;
             continue;
         }
 
-        $pattern = '/(^#.*#|~|.sw[op])$/';
-        preg_match($pattern, $file, $matches);
-
-        if (! empty($matches[1])) {
+        // 2. Match "local" files NOT ending in .php (backups, saves, etc.)
+        // We use str_contains and str_ends_with for better readability
+        if (preg_match('/local(?!.*[.]php$).*$/', $file)) {
             $files[] = $file;
-            continue;
-        }
-
-        // Match "local.php.bak", "local.php.bck", "local.php.save", "local.php." or "local.txt", for example
-        $pattern = '/local(?!.*[.]php$).*$/'; // The negative lookahead prevents local.php and other files which will be interpreted as PHP from matching.
-        preg_match($pattern, $file, $matches);
-
-        if (! empty($matches[0])) {
-            $files[] = $file;
-            continue;
         }
     }
 }

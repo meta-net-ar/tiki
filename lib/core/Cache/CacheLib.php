@@ -183,43 +183,44 @@ class CacheLib
         $total = 0;
         $count = 0;
         $back = [];
-        $all = opendir($path);
-
         // If using multiple Tikis but flushing cache on default install...
+        // Load virtuals if default install
+        $virtuals = false;
         if (empty($tikidomain) && is_file(TIKI_CONFIG_PATH . '/virtuals.inc')) {
             $virtuals = array_map('trim', file(TIKI_CONFIG_PATH . '/virtuals.inc'));
-        } else {
-            $virtuals = false;
         }
 
-        while ($file = readdir($all)) {
+        $iterator = new \FilesystemIterator($path, \FilesystemIterator::SKIP_DOTS);
+
+        foreach ($iterator as $fileInfo) {
+            $fileName = $fileInfo->getBasename();
+
+            // Skip hidden/system/virtual files
             if (
-                substr($file, 0, 1) == "." or
-                    $file == "index.php" or
-                    $file == "README" or
-                    $file == "web.config" or
-                    ($virtuals && in_array($file, $virtuals))
+                str_starts_with($fileName, ".") ||
+                in_array($fileName, ["index.php", "README", "web.config"]) ||
+                ($virtuals && in_array($fileName, $virtuals))
             ) {
                 continue;
             }
 
-            if (is_dir($path . '/' . $file) and $file <> ".." and $file <> ".") {
-                $du = $this->count_cache_files($path . '/' . $file);
+            $fullPath = $fileInfo->getPathname();
+
+            if ($fileInfo->isDir()) {
+                // Recurse into subdirectory
+                $du = $this->count_cache_files($fullPath);
                 $total += $du['total'];
                 $count += $du['count'];
-                unset($file);
-            } elseif (! is_dir($path . '/' . $file)) {
-                if (isset($begin) && substr($file, 0, strlen($begin)) != $begin) {
-                    continue; // the file name doesn't begin with the good beginning
+            } elseif ($fileInfo->isFile()) {
+                if (isset($begin) && ! str_starts_with($fileName, $begin)) {
+                    continue; // file doesn't match prefix
                 }
-                $stats = @stat($path . '/' . $file); // avoid the warning if safe mode on
-                $total += $stats['size'];
+
+                $stats = @stat($fullPath); // avoid warnings if safe mode on
+                $total += $stats['size'] ?? 0;
                 $count++;
-                unset($file);
             }
         }
-        closedir($all);
-        unset($all);
         $back['total'] = $total;
         $back['count'] = $count;
         return $back;
@@ -266,113 +267,134 @@ class CacheLib
         return;
     }
 
-    private function erase_dir_content($path)
+    private function erase_dir_content(string $path): void
     {
         global $tikidomain, $prefs;
 
         $path = rtrim($path, '/');
-        if (! $path or ! is_dir($path)) {
-            return 0;
+        if (! $path || ! is_dir($path)) {
+            return;
         }
-        if ($dir = opendir($path)) {
-            // If using multiple Tikis but flushing cache on default install...
-            if (empty($tikidomain) && is_file(TIKI_CONFIG_PATH . '/virtuals.inc')) {
-                $virtuals = array_map('trim', file(TIKI_CONFIG_PATH . '/virtuals.inc'));
-            } else {
-                $virtuals = false;
-            }
 
-            // Next case is needed to clean also cached data created through mod PluginR
+        // Handle multi-Tiki virtuals
+        $virtuals = [];
+        if (empty($tikidomain) && is_file(TIKI_CONFIG_PATH . '/virtuals.inc')) {
+            $virtuals = array_map('trim', file(TIKI_CONFIG_PATH . '/virtuals.inc'));
+        }
+
+        // Handle PluginR .RData exception
+        $extracheck = '';
+        if (
+            (isset($prefs['wikiplugin_rr']) && $prefs['wikiplugin_rr'] === 'y') ||
+            (isset($prefs['wikiplugin_r']) && $prefs['wikiplugin_r'] === 'y')
+        ) {
+            $extracheck = 'RData';
+        }
+
+        // Folders to never delete (unoconv/libreoffice)
+        $unoconvFolders = ['.cache', '.config'];
+
+        $deletedOkSoFar = true;
+        $errorMessage = '';
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($iterator as $fileInfo) {
+            $filename = $fileInfo->getFilename();
+            $fullPath = $fileInfo->getPathname();
+
+            // Skip special files
             if (
-                (isset($prefs['wikiplugin_rr']) && $prefs['wikiplugin_rr'] == 'y') ||
-                (isset($prefs['wikiplugin_r']) && $prefs['wikiplugin_r'] == 'y')
+                ($filename[0] === '.' && substr($filename, -5) !== $extracheck) ||
+                in_array($filename, ['index.php', 'README', 'README.md', 'web.config'], true) ||
+                in_array($filename, $virtuals, true) ||
+                in_array($filename, $unoconvFolders, true)
             ) {
-                // .RData case needed to clean also cached data created through mod PluginR
-                $extracheck = 'RData';
-            } else {
-                $extracheck = '';
+                continue;
             }
 
-            // Folders created by unoconv/libreoffice that should be removed
-            $unoconvFolders = ['.cache', '.config'];
-            $deletedOkSoFar = true;
-            $errorMessage = '';
-
-            while (false !== ($file = readdir($dir))) {
-                if (
-                    ( substr($file, 0, 1) == "." && substr($file, -5) != $extracheck ) or
-                    $file == "index.php" or
-                    $file == "README" or
-                    $file == "README.md" or
-                    $file == "web.config" or
-                    ($virtuals && in_array($file, $virtuals)) and
-                    ! in_array($file, $unoconvFolders)
-                ) {
-                    continue;
-                }
-
-                if (is_dir($path . "/" . $file)) {
-                    $this->erase_dir_content($path . "/" . $file);
-                    @rmdir($path . "/" . $file);    // dir won't be empty if there are multitiki dirs inside
-                } else {
-                    $filePath = $path . "/" . $file;
-                    if (file_exists($filePath)) {
-                        if (! unlink($filePath)) {
-                            if ($deletedOkSoFar) {
-                                $errorMessage = tr('Cache file %0 failed to be deleted', $path . "/" . $file);
-                                // don't display the error for each file
-                                $deletedOkSoFar = false;
-                            } else {
-                                $errorMessage .= '<br>' . tr('Other cache files failed to be deleted');
-                            }
+            try {
+                if ($fileInfo->isDir()) {
+                    @rmdir($fullPath); // Directory may still contain multitiki dirs
+                } elseif ($fileInfo->isFile()) {
+                    if (! unlink($fullPath)) {
+                        if ($deletedOkSoFar) {
+                            $errorMessage = tr('Cache file %0 failed to be deleted', $fullPath);
+                            $deletedOkSoFar = false;
+                        } else {
+                            $errorMessage .= '<br>' . tr('Other cache files failed to be deleted');
                         }
                     }
                 }
+            } catch (\Throwable $e) {
+                // Catch any unexpected errors like permission issues
+                if ($deletedOkSoFar) {
+                    $errorMessage = tr('Cache file %0 failed to be deleted', $fullPath);
+                    $deletedOkSoFar = false;
+                } else {
+                    $errorMessage .= '<br>' . tr('Other cache files failed to be deleted');
+                }
             }
-            if ($errorMessage) {
-                Feedback::error($errorMessage);
-            }
+        }
 
-            closedir($dir);
+        if ($errorMessage) {
+            Feedback::error($errorMessage);
         }
     }
 
-    public function cache_templates($path, $newlang)
+
+    public function cache_templates(string $path, string $newlang): void
     {
         global $prefs;
+
+        if (! $path || ! is_dir($path)) {
+            return;
+        }
+
         $smarty = TikiLib::lib('smarty');
         $smarty->refreshLanguage();
 
         $oldlang = $prefs['language'];
         $prefs['language'] = $newlang;
-        if (! $path or ! is_dir($path)) {
-            return 0;
-        }
-        if ($dir = opendir($path)) {
-            while (false !== ($file = readdir($dir))) {
-                $a = explode(".", $file);
-                $ext = strtolower(end($a));
-                if (str_starts_with($file, ".") or $file == 'CVS') {
-                    continue;
-                }
-                if (is_dir($path . "/" . $file)) {
-                    $prefs['language'] = $oldlang;
-                    $this->cache_templates($path . "/" . $file, $newlang);
-                    $prefs['language'] = $newlang;
-                } else {
-                    if ($ext == "tpl") {
-                        $template_file = substr($path . "/" . $file, 10);
-                        try {
-                            $_tpl = $smarty->createTemplate($template_file, null, null, null, false);
-                            $_tpl->compileTemplateSource();
-                        } catch (Exception $e) {
-                            $errors_found = true;
-                        }
-                    }
+
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $fileInfo) {
+            $filename = $fileInfo->getFilename();
+
+            // Skip hidden files and CVS folders
+            if (str_starts_with($filename, '.') || $filename === 'CVS') {
+                continue;
+            }
+
+            // If directory, do nothing; recursion handled by iterator
+            if ($fileInfo->isDir()) {
+                continue;
+            }
+
+            // Only process .tpl files
+            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            if ($ext === 'tpl') {
+                // Remove first 10 chars for Smarty template path (original behavior)
+                $template_file = substr($fileInfo->getPathname(), 10);
+
+                try {
+                    $_tpl = $smarty->createTemplate($template_file, null, null, null, false);
+                    $_tpl->compileTemplateSource();
+                } catch (\Throwable $e) {
+                    // Log or ignore errors; preserves old behavior
+                    $errors_found = true;
                 }
             }
-            closedir($dir);
         }
+
+        // Restore old language after traversal
         $prefs['language'] = $oldlang;
     }
 
