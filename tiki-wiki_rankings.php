@@ -26,12 +26,16 @@ if (! isset($_REQUEST["limit"])) {
     $limit = $_REQUEST["limit"];
 }
 
-if (isset($_REQUEST["categId"]) && $_REQUEST["categId"] > 0) {
-    $smarty->assign('categIdstr', $_REQUEST["categId"]);
-    $categs = explode(",", $_REQUEST["categId"]);
-} else {
-    $categs = [];
+$categs = [];
+if (isset($_REQUEST["categId"])) {
+    foreach (explode(",", (string) $_REQUEST["categId"]) as $categId) {
+        $categId = (int) $categId;
+        if ($categId > 0) {
+            $categs[] = $categId;
+        }
+    }
 }
+$smarty->assign('categIdstr', implode(',', $categs));
 $smarty->assign('categId', $categs);
 
 $allrankings = [
