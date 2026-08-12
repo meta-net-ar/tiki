@@ -27,6 +27,8 @@ class AuthTokensTest extends TikiDatabaseTestCase
 
     public function setUp(): void
     {
+        $GLOBALS['user'] = 'admin';
+
         $this->db = TikiDb::get();
 
         $this->dt = new DateTime();
