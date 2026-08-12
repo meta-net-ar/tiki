@@ -341,7 +341,8 @@ class Sections
     public static function currentObject($request = null)
     {
         global $cat_type, $cat_objid, $postId, $prefs;
-        $section = self::getCurrentSection();
+        // PHP 8.5 deprecates null as an array offset; normalize to ''.
+        $section = self::getCurrentSection() ?? '';
 
         if (! is_array($request)) {
             $request = $_REQUEST; // use the global request object
