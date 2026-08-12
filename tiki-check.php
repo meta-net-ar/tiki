@@ -5610,8 +5610,8 @@ function check_for_remote_readable_files(array &$files, string $sourceDir = 'db'
 
         // 2. Match "local" files NOT ending in .php (backups, saves, etc.)
         // We use str_contains and str_ends_with for better readability
-        if (preg_match('/local(?!.*[.]php$).*$/', $file)) {
-            $files[] = $file;
+        if (preg_match('/local(?!.*[.]php$).*$/', $fileName)) {
+            $files[] = $fileName;
         }
     }
 }
