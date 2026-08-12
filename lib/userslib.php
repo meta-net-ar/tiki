@@ -2473,7 +2473,9 @@ class UsersLib extends TikiLib
         $email = '',
         $notconfirmed = false,
         $notvalidated = false,
-        $neverloggedin = false
+        $neverloggedin = false,
+        $loginDisabled = false,
+        $accoundLocked = false,
     ) {
         global $prefs;
 
@@ -2544,9 +2546,9 @@ class UsersLib extends TikiLib
             $mbindvars = $bindvars;
         }
 
-        if ($notconfirmed && $notvalidated) {
+        if ($notconfirmed && $notvalidated && $accoundLocked) {
             $mid .= $mid == '' ? ' where' : ' and';
-            $mid .= ' (uu.`waiting` = \'u\' or uu.`waiting` = \'a\')';
+            $mid .= ' (uu.`waiting` = \'u\' or uu.`waiting` = \'a\' or uu.`waiting` = \'l\')';
             $mmid = $mid;
         } else {
             if ($notconfirmed) {
@@ -2560,6 +2562,12 @@ class UsersLib extends TikiLib
                 $mid .= ' uu.`waiting` = \'a\'';
                 $mmid = $mid;
             }
+
+            if ($accoundLocked) {
+                $mid .= $mid == '' ? ' where' : ' and';
+                $mid .= ' uu.`waiting` = \'l\'';
+                $mmid = $mid;
+            }
         }
 
         if ($neverloggedin) {
@@ -2567,6 +2575,13 @@ class UsersLib extends TikiLib
             $mid .= ' (uu.`lastLogin` is null or uu.`lastLogin` = 0)';
             $mmid = $mid;
         }
+
+        if ($loginDisabled) {
+            $mid .= $mid == '' ? ' where' : ' and';
+            $mid .= ' uu.`login_disabled` = \'y\'';
+            $mmid = $mid;
+        }
+
         $query = "select uu.* from `users_users` uu $mid order by " . $this->convertSortMode($sort_mode);
         $query_count = "select count(*) from `users_users` uu $mmid";
         $ret = $this->fetchAll($query, $bindvars, $maxRecords, $offset);

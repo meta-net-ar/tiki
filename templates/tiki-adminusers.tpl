@@ -87,6 +87,24 @@
                             <div class="offset-sm-5 col-sm-7">
                                 <div class="form-check">
                                     <label class="form-check-label">
+                                        <input class="form-check-input" id="filterLoginDisabled" name="filterLoginDisabled" type="checkbox"{if !empty($smarty.request.filterLoginDisabled)} checked="checked"{/if}>{tr}Can't login{/tr}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="offset-sm-5 col-sm-7">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input class="form-check-input" id="filterLocked" name="filterLocked" type="checkbox"{if !empty($smarty.request.filterLocked)} checked="checked"{/if}>{tr}Account locked{/tr}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="offset-sm-5 col-sm-7">
+                                <div class="form-check">
+                                    <label class="form-check-label">
                                         <input class="form-check-input" id="filterNotValidated" name="filterNotValidated" type="checkbox"{if !empty($smarty.request.filterNotValidated)} checked="checked"{/if}>{tr}User not validated{/tr}
                                     </label>
                                 </div>
