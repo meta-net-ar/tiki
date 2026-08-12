@@ -17,11 +17,9 @@ $inputConfiguration = [
     ],
 ];
 require_once 'tiki-setup.php';
-require_once 'lib/trackers/TrackerConfigHistory.php';
-require_once 'lib/trackers/TrackerConfigHistoryRenderer.php';
 use Tiki\Sections;
-use Tiki\Lib\Trackers\TrackerConfigHistory;
-use Tiki\Lib\Trackers\TrackerConfigHistoryRenderer;
+use Tiki\Tracker\TrackerConfigHistory;
+use Tiki\Tracker\TrackerConfigHistoryRenderer;
 
 $section = Sections::SECTION_TRACKERS;
 Sections::setCurrentSection($section);
@@ -201,10 +199,11 @@ if (! empty($tracker_info['outboundEmail'])) {
 }
 
 // 5. Configuration history — property-level diffs via TrackerConfigHistory (item-161718)
-$currentData = TrackerConfigHistory::extractTrackerState($tracker_info, $trackerId);
-$raw_history  = TrackerConfigHistory::getHistory('tracker', $trackerId, $currentData, 5);
+$configHistory = TrackerConfigHistory::forTracker($trackerId);
+$currentData = $configHistory->extractCurrentState($tracker_info);
+$raw_history  = $configHistory->getHistory($currentData, 5);
 $config_history       = TrackerConfigHistoryRenderer::renderRows($raw_history);
-$config_history_total = TrackerConfigHistory::countHistory('tracker', $trackerId);
+$config_history_total = $configHistory->count();
 $config_history_full_url = 'index.php?controller=tracker&action=config_history&trackerId=' . $trackerId;
 
 $smarty->assign('tracker_info', $tracker_info);
