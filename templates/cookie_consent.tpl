@@ -1,4 +1,13 @@
 {strip}
+{$cookieDeclineUnnecessaryButton = ''}
+{if $prefs.cookie_consent_disable eq 'n'}
+    {capture assign=cookieDeclineUnnecessaryButton}
+        <button type="submit" class="btn btn-outline-danger"
+                id="cookie_decline_unnecessary_button">
+            {tr}Refuse unnecessary{/tr}
+        </button>
+    {/capture}
+{/if}
 {if $prefs.cookie_consent_mode eq 'dialog'}
     <div class="modal" tabindex="-1" role="dialog" id="{$prefs.cookie_consent_dom_id}">
         <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
@@ -26,6 +35,7 @@
                     {if $prefs.cookie_consent_simplified_ui eq 'y'}
                         <div class="row" id="cookieConsentInitialActions">
                             <div class="col-12 d-flex flex-wrap gap-2 justify-content-center justify-content-md-end">
+                                {$cookieDeclineUnnecessaryButton}
                                 <button type="button" class="btn btn-secondary collapsed"
                                         id="cookie_preferences_button" data-bs-toggle="collapse"
                                         data-bs-target="#cookieConsentPreferences" aria-expanded="false"
@@ -40,8 +50,8 @@
                         </div>
                     {/if}
 
-                    <div id="cookieConsentPreferences"{if $prefs.cookie_consent_simplified_ui eq 'y'} class="collapse"{/if}>
-                        <div id="customConsentSectionBanner" class="row{if $prefs.cookie_consent_simplified_ui eq 'y'} mt-4{/if} mb-4">
+                    <div id="cookieConsentPreferences"{if $prefs.cookie_consent_simplified_ui eq 'y'} class="collapse mt-4 pt-4 border-top"{/if}>
+                        <div id="customConsentSectionBanner" class="row mb-3">
                             <div class="col-12 d-flex flex-wrap gap-3 gap-md-4">
                                 {foreach from=$cookie_categories key=category item=data}
                                     <div class="form-check form-switch d-flex align-items-center flex-shrink-0">
@@ -65,12 +75,7 @@
 
                         <div class="row">
                             <div class="col-12 d-flex flex-wrap gap-2 justify-content-center justify-content-md-end">
-                                {if $prefs.cookie_consent_disable eq 'n'}
-                                    <button type="submit" class="btn btn-outline-danger"
-                                            id="cookie_decline_unnecessary_button">
-                                        {tr}Refuse unnecessary{/tr}
-                                    </button>
-                                {/if}
+                                {if $prefs.cookie_consent_simplified_ui neq 'y'}{$cookieDeclineUnnecessaryButton}{/if}
                                 <button type="submit" class="btn btn-secondary"
                                         id="cookie_save_button">
                                     {tr}Save preferences{/tr}
