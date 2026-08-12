@@ -11,6 +11,10 @@ watch(
         store.drawMessagesTree();
     }
 );
+
+function scrollToFirstMatch() {
+    document.querySelector(".message-body.search-match")?.scrollIntoView({ behavior: "smooth", block: "center" });
+}
 </script>
 <script>
 export default {
@@ -29,6 +33,8 @@ export default {
                     placeholder="Type to filter/search..."
                     :value="store.searchQuery"
                     @input="store.setSearchQuery($event.target.value)"
+                    @blur="scrollToFirstMatch"
+                    @keyup.enter="scrollToFirstMatch"
                 >
             </div>
         </div>
