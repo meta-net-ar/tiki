@@ -14,6 +14,25 @@ class TikiDb_Initializer_Pdo
         return extension_loaded("pdo") && in_array('mysql', PDO::getAvailableDrivers());
     }
 
+    /**
+     * Prefers Pdo\Mysql::* (PHP 8.4+) over the deprecated PDO::MYSQL_* constants.
+     *
+     * @param string $name Constant name without the MYSQL_ prefix, e.g. "ATTR_INIT_COMMAND"
+     * @return int|null
+     */
+    private function mysqlAttrConstant(string $name)
+    {
+        if (class_exists('Pdo\\Mysql') && defined('Pdo\\Mysql::' . $name)) {
+            return constant('Pdo\\Mysql::' . $name);
+        }
+
+        if (defined('PDO::MYSQL_' . $name)) {
+            return constant('PDO::MYSQL_' . $name);
+        }
+
+        return null;
+    }
+
     public function getConnection(array $credentials)
     {
         // Set the host string for PDO dsn.
@@ -33,9 +52,10 @@ class TikiDb_Initializer_Pdo
 
         if ($credentials['charset']) {
             $charset_query = "SET NAMES {$credentials['charset']}";
+            $initCommandAttr = $this->mysqlAttrConstant('ATTR_INIT_COMMAND');
 
-            if (defined('PDO::MYSQL_ATTR_INIT_COMMAND')) {
-                $pdo_options[PDO::MYSQL_ATTR_INIT_COMMAND] = $charset_query;
+            if ($initCommandAttr !== null) {
+                $pdo_options[$initCommandAttr] = $charset_query;
             } else {
                 $pdo_post_queries[] = $charset_query;
             }
@@ -104,13 +124,13 @@ class TikiDb_Initializer_Pdo
 
             if ($isSSL_verify_ca) {
                 // Using 1 .pem file (CA) ie --ssl-mode=VERIFY_CA
-                $pdo_options[PDO::MYSQL_ATTR_SSL_CA] = $fileroot . $caCert;
-                $pdo_options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+                $pdo_options[$this->mysqlAttrConstant('ATTR_SSL_CA')] = $fileroot . $caCert;
+                $pdo_options[$this->mysqlAttrConstant('ATTR_SSL_VERIFY_SERVER_CERT')] = false;
             } elseif ($isSSL_verify_identity) {
                 // Using 3 .pem files (CA, Client cert and Client Key) ie --ssl-mode=VERIFY_IDENTITY
-                $pdo_options[PDO::MYSQL_ATTR_SSL_KEY] = $fileroot . $clientKey;
-                $pdo_options[PDO::MYSQL_ATTR_SSL_CERT] = $fileroot . $clientCert;
-                $pdo_options[PDO::MYSQL_ATTR_SSL_CA] = $fileroot . $caCert;
+                $pdo_options[$this->mysqlAttrConstant('ATTR_SSL_KEY')] = $fileroot . $clientKey;
+                $pdo_options[$this->mysqlAttrConstant('ATTR_SSL_CERT')] = $fileroot . $clientCert;
+                $pdo_options[$this->mysqlAttrConstant('ATTR_SSL_CA')] = $fileroot . $caCert;
             }
         }
     }
