@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Tracker\TrackerConfigHistory;
+use Tiki\Tracker\TrackerConfigHistoryRenderer;
+
 class Services_Tracker_Controller
 {
     /**
@@ -2514,6 +2517,69 @@ class Services_Tracker_Controller
             'field_option' => $field_option,
             'metatag_robots' => 'NOINDEX, NOFOLLOW',
             'logging' => $logging,
+        ];
+    }
+
+    /**
+     * Display configuration change history for a tracker or a specific field.
+     *
+     * GET params:
+     *   trackerId    int   Required. The parent tracker.
+     *   fieldId      int   Optional. When present, shows field-level history; otherwise tracker-level.
+     *   offset       int   Pagination offset (default 0).
+     *
+     * @param JitFilter $input
+     * @return array
+     */
+    public function action_config_history($input)
+    {
+        Services_Exception_Denied::checkAuth();
+
+        $trackerId = (int) $input->trackerId->int();
+        $fieldId   = (int) $input->fieldId->int();
+        $offset    = (int) ($input->offset->int() ?: 0);
+
+        if (! $trackerId) {
+            throw new Services_Exception_MissingValue('trackerId');
+        }
+
+        $perms = Perms::get('tracker', $trackerId);
+        if (! $perms->tracker_view_history) {
+            throw new Services_Exception_Denied(tr('Reserved for users with tracker history view permission'));
+        }
+
+        $definition = Tracker_Definition::get($trackerId);
+        if (! $definition) {
+            throw new Services_Exception_NotFound();
+        }
+
+        $trackerInfo = TikiLib::lib('trk')->get_tracker($trackerId);
+
+        if ($fieldId) {
+            $field = $definition->getField($fieldId);
+            if (! $field) {
+                throw new Services_Exception_NotFound();
+            }
+            $contextLabel  = tr('Configuration History: Field "%0"', $field['name']);
+            $configHistory = TrackerConfigHistory::forField($fieldId, $trackerId);
+            $currentData   = $configHistory->extractCurrentState($field);
+        } else {
+            $contextLabel  = tr('Configuration History: Tracker "%0"', $trackerInfo['name'] ?? $trackerId);
+            $configHistory = TrackerConfigHistory::forTracker($trackerId);
+            $currentData   = $configHistory->extractCurrentState($trackerInfo);
+        }
+
+        $rows  = $configHistory->getHistory($currentData, 25, $offset);
+        $total = $configHistory->count();
+
+        return [
+            'title'        => $contextLabel,
+            'trackerId'    => $trackerId,
+            'fieldId'      => $fieldId,
+            'tracker_info' => $trackerInfo,
+            'offset'       => $offset,
+            'total'        => $total,
+            'history'      => TrackerConfigHistoryRenderer::renderRows($rows),
         ];
     }
 

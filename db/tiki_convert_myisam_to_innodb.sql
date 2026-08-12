@@ -197,6 +197,7 @@ ALTER TABLE `tiki_theme_control_sections` ENGINE=InnoDB;
 ALTER TABLE `tiki_todo` ENGINE=InnoDB;
 ALTER TABLE `tiki_todo_notif` ENGINE=InnoDB;
 ALTER TABLE `tiki_topics` ENGINE=InnoDB;
+ALTER TABLE `tiki_tracker_configs_history` ENGINE=InnoDB;
 ALTER TABLE `tiki_tracker_fields` ENGINE=InnoDB;
 ALTER TABLE `tiki_tracker_item_field_logs` ENGINE=InnoDB;
 ALTER TABLE `tiki_tracker_item_fields` ENGINE=InnoDB;
