@@ -21,9 +21,3 @@ Helper tools
 * findstyledef.sh, findstyledef.pl
   made by ohertel
   Provide a report on CSS classes referenced in tpl and php files
-
-* csscheck.sh, stripbraces.pl, stripcomments.pl
-  made by mdavey
-  Provide a report on CSS classes used in a stylesheet
-  See https://themes.tiki.org/RecipeRestoreCss for details
-
