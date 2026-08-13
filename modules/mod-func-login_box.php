@@ -119,7 +119,7 @@ function module_login_box($mod_reference, &$module_params)
     $smarty->assign('login_text_explanation', $tikilib->get_preference('login_text_explanation'));
     $smarty->assign('EMAIL_2FA', TwoFactorAuth::EMAIL_2FA);
     $smarty->assign('TOTP_2FA', TwoFactorAuth::TOTP_2FA);
-    $smarty->assign('textBelowLoginBox', TikiLib::lib('parser')->parse_data($prefs['textBelowLoginBox']));
+    $smarty->assign('login_text_below_login_box', TikiLib::lib('parser')->parse_data($prefs['login_text_below_login_box']));
 
     $urlPrefix = in_array($prefs['https_login'], ['encouraged', 'required', 'force_nocheck']) ? $base_url_https : $base_url;
     $smarty->assign('registration', 'n');   // stops the openid form appearing in the module, only on tiki-login_scr.php

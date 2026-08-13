@@ -656,9 +656,9 @@ $(".collapse-toggle", ".siteloginbar_popup .dropdown-menu").on("click", function
         {$close_tags}
         </div>
     {/if}
-    {if $mode eq "module" && ! empty($textBelowLoginBox)}
+    {if $mode eq "module" && ! empty($login_text_below_login_box)}
         <div class="mt-3 textbelowlogin">
-            {$textBelowLoginBox}
+            {$login_text_below_login_box}
         </div>
     {/if}
     {if $mode eq "header"}</div>{/if}
