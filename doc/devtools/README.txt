@@ -10,10 +10,6 @@ Main tools
 * release.sh
   create tarballs for release/testing
 
-* tikirelease.sh
-  made by mose
-  script for lazy release manager. edit it before use !!
-
 * ggg-trace.php
   made by George G. Geller
   For tracing and debugging php code -- output a text file.
