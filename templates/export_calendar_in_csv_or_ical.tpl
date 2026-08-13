@@ -3,6 +3,7 @@
     <div class="my-2">
         <form id="{$exportCal}" class="card p-sm-1 d-none" method="post" action="tiki-calendar_export_ical.php" name="f">
             <input type="hidden" name="export" value="y">
+            <input type="hidden" name="exportAllEvents" value="y">
             <div class="card-header caltitle py-2 px-3 d-flex justify-content-between align-items-center">
                 <strong class="mb-0">{tr}Export calendars{/tr}</strong>
                 <button type="button" class="btn-close" onclick="toggle('{$exportCal}')" aria-label="Close"></button>
