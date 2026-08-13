@@ -89,7 +89,7 @@ node_modules:
   stage: build
   needs: []
   script:
-    - npm ci --prefer-offline
+    - src/ci/build_frontend.sh install
   extends: .node_dependencies_cache
   cache:
     policy: pull-push
@@ -109,9 +109,7 @@ node_build:
   image:
     name: ${DEPENDENCY_PROXY_PREFIX}${NODE_IMAGE}
   script:
-    - free -h
-    - NODE_OPTIONS="--max-old-space-size=4096" npm run build
-    - free -h
+    - src/ci/build_frontend.sh build
   artifacts:
     expire_in: 2 days
     paths:
@@ -685,25 +683,6 @@ unit-tests-icon-generator:
 # Package this Tiki build
 #
 
-.tiki-package-prepare-script: &tiki-package-prepare-script |
-  echo "=> Removing Composer dev dependencies ..."
-  composer -V | grep "version 2" || composer self-update --2
-  composer --ansi install -d vendor_bundled --no-dev --optimize-autoloader --no-progress --prefer-dist -n
-  php console.php dev:buildwsconfs --generate
-  echo "=> Cleanup ..."
-  rm -fr temp && git checkout temp
-  rm -fr bin
-  echo "=> Optimize language files ..."
-  find lang/ -name language.php -exec php doc/devtools/stripcomments.php {} \;
-  echo "=> Fix permissions ..."
-  find . -type f -exec chmod 0664 {} \;
-  chmod 0775 setup.sh
-  find . -type d -exec chmod 0755 {} \;
-
-.tiki-package-tar-script: &tiki-package-tar-script |
-  echo "=> Pack tiki ..."
-  tar --exclude *.DS_Store --exclude tests --exclude doc/devtools --exclude .git --exclude .gitignore --exclude .composercache -pczf tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz *
-
 .tiki-package-changelog-script: &tiki-package-changelog-script |
   echo "=> Generate changelog ..."
   TARGET_BRANCH="${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:-$CI_DEFAULT_BRANCH}"
@@ -736,8 +715,7 @@ tiki-package-shallow:
       when: always
     - when: never
   script:
-    - *tiki-package-prepare-script
-    - *tiki-package-tar-script
+    - PACKAGE_FILENAME="tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz" src/ci/build_package.sh
 
 # 2. DEEP PACKAGING: Slower because it needs to fetch all tags and apply only on merge requests to the master branch.
 tiki-package-deep:
@@ -751,9 +729,8 @@ tiki-package-deep:
       when: always
     - when: never
   script:
-    - *tiki-package-prepare-script
     - *tiki-package-changelog-script
-    - *tiki-package-tar-script
+    - PACKAGE_FILENAME="tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz" src/ci/build_package.sh
   artifacts:
     paths:
       - tiki-${CI_COMMIT_SHORT_SHA}-${CI_COMMIT_REF_SLUG}.tar.gz
