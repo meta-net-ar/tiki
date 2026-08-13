@@ -47,7 +47,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
 
     public function getModifierCallback(string $modifierName)
     {
-        if ($tikilib = TikiLib::lib('tiki')) {
+        // No TikiLib outside a full Tiki bootstrap, see SecurityPolicy::isTrustedModifier()
+        if (class_exists('TikiLib') && ($tikilib = TikiLib::lib('tiki'))) {
             $allowed_builtin_php_functions = array_filter($tikilib->get_preference('smarty_security_allowed_builtin_php_functions', [], true));
             if (in_array($modifierName, $allowed_builtin_php_functions) && is_callable($modifierName)) {
                 return function (...$args) use ($modifierName) {
@@ -77,6 +78,10 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\CompactIsoDate(), 'handle'];
             case 'countryflag':
                 return [new \SmartyTiki\Modifier\CountryFlag(), 'handle'];
+            case 'countryflagwithlabel':
+                return [new \SmartyTiki\Modifier\CountryFlagWithLabel(), 'handle'];
+            case 'countryflagemoji':
+                return [new \SmartyTiki\Modifier\CountryFlagEmoji(), 'handle'];
             case 'count':
                 return [$this, 'smartyModifierCount'];
             case 'd':

@@ -197,8 +197,7 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
         }
 
         foreach ($current as $index => $value) {
-            $label = $flags[$value] ?? '';
-
+            $label = is_array($flags) ? ($flags[$value] ?? '') : null;
             if ($context['list_mode'] != 'csv') {
                 if ($this->getOption('name_flag') != 1) {
                     $out .= $this->renderImage($value, $label);
@@ -235,8 +234,7 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
 
     private function renderImage($code, $label)
     {
-        $smarty = TikiLib::lib('smarty');
-        return '<img src="img/flags/' . smarty_modifier_escape($code) . '.png" title="' . smarty_modifier_escape($label) . '" alt="' . smarty_modifier_escape($label) . '" />';
+        return \Tiki\CountryFlagHelper::toHtml($code, $label);
     }
 
     public function renderInput($context = [])

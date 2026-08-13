@@ -113,7 +113,7 @@
                 <td class="text">{$items[user].name|escape}</td>
                 <td class="text"><a href="{$items[user].url}" target="_new">{$items[user].url}</a></td>
                 {if $prefs.directory_country_flag eq 'y'}
-                    <td class="text"><img src='img/flags/{$items[user].country}.png' alt='{$items[user].country}'> </td>
+                    <td class="text">{$items[user].country|countryflagwithlabel}</td>
                 {/if}
                 <td class="text text-center">{$items[user].hits}</td>
                 <td class="text text-center">{if $items[user].isValid eq 'y'} Yes {else} No {/if}</td>

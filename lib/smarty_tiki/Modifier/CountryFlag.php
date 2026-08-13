@@ -12,7 +12,8 @@ namespace SmartyTiki\Modifier;
  *
  * - type:     modifier
  * - name:     countryflag
- * - purpose:  Returns a specified user's country flag
+ * - purpose:  Returns a specified user's country flag. Takes a user login, not a country
+ *             name: use countryflagwithlabel or countryflagemoji for a country name.
  *
  * @author
  * @param string
@@ -29,7 +30,7 @@ class CountryFlag
         if ($flag == 'Other' || empty($flag)) {
             return '';
         }
-        return "<img alt='" . tra(str_replace('_', ' ', $flag)) . "' src='img/flags/" . str_replace(' ', '_', $flag) .
-            ".png' title='" . tra(str_replace('_', ' ', $flag)) . "' />";
+        $label = tra(str_replace('_', ' ', $flag));
+        return \Tiki\CountryFlagHelper::toHtml(str_replace(' ', '_', $flag), $label);
     }
 }
