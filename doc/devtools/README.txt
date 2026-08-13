@@ -10,10 +10,6 @@ Main tools
 * release.sh
   create tarballs for release/testing
 
-* tikiwiki.spec
-  made by dheltzel
-  script to build a rpm package from tarball release.
-
 * tikirelease.sh
   made by mose
   script for lazy release manager. edit it before use !!
