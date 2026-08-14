@@ -108,6 +108,15 @@ class Tiki_Profile_InstallHandler_TrackerItem extends Tiki_Profile_InstallHandle
             }
         }
 
+        // ItemsList stores linked item IDs. Rendered display values from profiles
+        // cannot be restored here without resolving them, so only already-resolved
+        // ID arrays are passed to replace_item().
+        foreach ($fields['data'] as $key => $entry) {
+            if (($entry['type'] ?? '') === 'l' && ! is_array($entry['value'] ?? null)) {
+                unset($fields['data'][$key]);
+            }
+        }
+
         if ($this->mode == 'update') {
             foreach ($fields['data'] as $key => $entry) {
                 if (! in_array($entry['fieldId'], $providedfields)) {
