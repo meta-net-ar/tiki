@@ -67,6 +67,8 @@ class ObjectRelation implements \ArrayAccess
                 return $this->metadata;
             case 'title':
                 return $this->getTitle();
+            default:
+                return null;
         }
     }
 

@@ -57,13 +57,7 @@ class UserLink
         if ($max_length) {
             $fullname = smarty_modifier_truncate($fullname, $max_length, '...', true);
         }
-
-        if (empty($popup) && $prefs['feature_community_mouseover'] == 'n') {
-            $popup = 'n';
-        } else {
-            $popup = 'y';
-        }
-
+        $popup = 'y';
         return \TikiLib::lib('user')->build_userinfo_tag($other_user, htmlspecialchars($fullname, ENT_QUOTES), $class, $popup);
     }
 }

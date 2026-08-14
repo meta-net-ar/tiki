@@ -6,9 +6,9 @@
     $("input[name=action0]").hide();
 {/jq}
 
-<div class="adminWizardContent">
-    <fieldset>
-        <legend>{tr}Extra information about you{/tr}</legend>
+<div class="adminWizardContent align-top">
+    <fieldset class="my-3 mx-0">
+        <legend class="mb-3 fw-bold">{tr}Extra information about you{/tr}</legend>
         <div class="userWizardIconright">{icon name='database' alt="{tr}User Tracker{/tr}"}</div>
         {if $userTrackerData}
             {$userTrackerData}

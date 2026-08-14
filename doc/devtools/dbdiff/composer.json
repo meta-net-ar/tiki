@@ -1,11 +1,5 @@
 {
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/TikiWiki/DBDiff.git"
-        }
-    ],
-    "require-dev": {
-        "dbdiff/dbdiff": "dev-master"
+    "require": {
+        "dbdiff/dbdiff": "~2.0"
     }
 }

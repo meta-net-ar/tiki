@@ -35,11 +35,10 @@
                 </a>
             </span>
         {else}
-            <span class="tabbut">
-                <a href="tiki-user_tasks.php?taskId={$taskId}&amp;save=on&amp;move_into_trash=on" class="tablink">
-                    {icon name='trash' title="{tr}Move to trash{/tr}"} {tr}Move to Trash{/tr}
-                </a>
-            </span>
+            <button type="submit" name="move_into_trash" value="on" class="tablink" style="background:none; border:none; cursor:pointer;">
+               {icon name='trash'} {tr}Move to Trash{/tr}
+            </button>
+            <input type="hidden" name="save" value="on" />
         {/if}
     {/if}
 

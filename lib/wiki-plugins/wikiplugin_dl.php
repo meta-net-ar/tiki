@@ -30,7 +30,6 @@ function wikiplugin_dl_info()
                     ['text' => tra('Standard (left-aligned)'), 'value' => 's'],
                     ['text' => tra('Horizontal (inline) '), 'value' => 'h'],
                 ],
-                'default' => '',
             ],
         ],
     ];
@@ -38,13 +37,10 @@ function wikiplugin_dl_info()
 
 function wikiplugin_dl($data, $params)
 {
-    global $tikilib;
-
-    global $replacement;
     if (isset($param)) {
         extract($params, EXTR_SKIP);
     }
-    if (isset($params["type"])) {
+    if (! is_null($params["type"])) {
         $dlt = $params["type"];
         if ($dlt == "horizontal" or $dlt == "dl-horizontal" or $dlt == "horiz" or $dlt == "h" or $dlt == "inline") {
             $result = '<dl class="dl-horizontal">';

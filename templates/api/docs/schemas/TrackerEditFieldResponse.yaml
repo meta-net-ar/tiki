@@ -1,0 +1,49 @@
+---
+description: Response from POST /trackers/{trackerId}/fields/{fieldId}.
+type: object
+required:
+  - title
+  - field
+  - info
+  - options
+  - validation_types
+  - types
+  - permNameMaxAllowedSize
+  - fields
+  - encryption_keys
+properties:
+  title:
+    type: string
+  field:
+    description: The updated field entry, with the all_groups option list.
+    allOf:
+      - $ref: schemas-TrackerField.yaml
+      - type: object
+        required:
+          - all_groups
+        properties:
+          all_groups:
+            type: array
+  info:
+    $ref: schemas-FieldTypeEntry.yaml
+  options:
+    type: array
+  validation_types:
+    type: object
+    description: Map of validation-type key to label string.
+    additionalProperties:
+      type: string
+  types:
+    type: object
+    description: Compatible target types for this field.
+    additionalProperties:
+      $ref: schemas-FieldTypeEntry.yaml
+  permNameMaxAllowedSize:
+    type: integer
+  fields:
+    type: array
+    description: All fields on the tracker.
+    items:
+      $ref: schemas-TrackerField.yaml
+  encryption_keys:
+    type: array

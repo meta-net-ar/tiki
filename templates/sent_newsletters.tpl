@@ -46,7 +46,7 @@
                     <td class="action">
                         {actions}
                             {strip}
-                                {if $url == "tiki-newsletter_archives.php" or $url == "tiki-send_newsletters.php" }
+                                {if $url == "tiki-newsletter_archives.php" or $url == "tiki-send_newsletters.php"}
                                     <action>
                                         <a href="{$url}?{if $nl_info}nlId={$channels[user].nlId}&amp;{/if}offset={$offset}&amp;sort_mode={$sort_mode}&amp;editionId={$channels[user].editionId}">
                                             {icon name='view' _menu_text='y' _menu_icon='y' alt="{tr}View{/tr}"}
@@ -78,7 +78,7 @@
                                             <input type="hidden" name="offset" value="{$offset}">
                                             <input type="hidden" name="sort_mode" value="{$sort_mode}">
                                             <input type="hidden" name="remove" value="{$channels[user].editionId}">
-                                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup()">
+                                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup()" aria-label="{tr}Remove{/tr}">
                                                 {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                             </button>
                                         </form>
@@ -98,14 +98,14 @@
         {if $prev_offset >= 0}
             [<a class="prevnext" href="{$url}?nlId={$nlId}&amp;{$cur}_offset={$prev_offset}&amp;{$bak}_offset={$offset_bak}&amp;{$cur}_sort_mode={$sort_mode}&amp;{$bak}_sort_mode={$sort_mode_bak}&amp;cookietab={$tab}">{tr}Prev{/tr}</a>]&nbsp;
             {/if}
-        {tr}Page:{/tr} {$actual_page}/{$cant_pages}
+        {tr}Page:{/tr} {$actual_page}/{$count_pages}
         {if $next_offset >= 0}
             &nbsp;[<a class="prevnext" href="{$url}?nlId={$nlId}&amp;{$cur}_offset={$next_offset}&amp;{$bak}_offset={$offset_bak}&amp;{$cur}_sort_mode={$sort_mode}&amp;{$bak}_sort_mode={$sort_mode_bak}&amp;cookietab={$tab}">{tr}Next{/tr}</a>]
     {/if}
         {if $prefs.direct_pagination eq 'y'}
             <br>
-            {section loop=$cant_pages name=foo}
-                {assign var=selector_offset value=$smarty.section.foo.index|times:$prefs.maxRecords}
+            {section loop=$count_pages name=foo}
+                {$selector_offset=$smarty.section.foo.index|times:$prefs.maxRecords}
                     <a class="prevnext" href="{$url}?nlId={$nlId}&amp;{$cur}_offset={$selector_offset}&amp;{$bak}_offset={$offset_bak}&amp;{$cur}_sort_mode={$sort_mode}&amp;{$bak}_sort_mode={$sort_mode_bak}&amp;cookietab={$tab}">
                 {$smarty.section.foo.index_next}</a>&nbsp;
             {/section}

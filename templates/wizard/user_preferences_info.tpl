@@ -136,19 +136,6 @@
                         </tr>
                     {/if}
                 {/section}
-                <tr>
-                    <td>{tr}User information:{/tr}</td>
-                    <td>
-                        <select name="user_information">
-                            <option value='private' {if $user_information eq 'private'}selected="selected"{/if}>
-                                {tr}Private{/tr}
-                            </option>
-                            <option value='public' {if $user_information eq 'public'}selected="selected"{/if}>
-                                {tr}Public{/tr}
-                            </option>
-                        </select>
-                    </td>
-                </tr>
             </table>
 
         {else}

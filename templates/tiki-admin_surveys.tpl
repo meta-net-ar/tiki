@@ -76,7 +76,8 @@
                                             <input type="hidden" name="offset" value="{$offset}">
                                             <input type="hidden" name="sort_mode" value="{$sort_mode}">
                                             <input type="hidden" name="remove" value="{$channels[user].surveyId}">
-                                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup()">
+                                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0"
+                                            onclick="confirmPopup('{tr}Are you sure you want to delete this survey?{/tr}')" aria-label="{tr}Remove{/tr}">
                                                 {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                             </button>
                                         </form>
@@ -91,7 +92,7 @@
             </table>
         </div>
 
-        {pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
     {/tab}
 
     {tab name="{tr}Create/Edit Surveys{/tr}"}
@@ -138,6 +139,13 @@
                         <option value="o" {if $info.status eq 'o'}selected='selected'{/if}>{tr}Open{/tr}</option>
                         <option value="c" {if $info.status eq 'c'}selected='selected'{/if}>{tr}Closed{/tr}</option>
                     </select>
+                </div>
+            </div>
+            <div class="tiki-form-group row">
+                <label for="redirect_after" class="col-sm-2 col-form-label">{tr}Redirect after completion{/tr}</label>
+                <div class="col-sm-10">
+                    <input type="text" name="redirect_after" id="redirect_after" class="form-control" value="{$info.redirect_after|escape}" placeholder="{tr}e.g. ThankYou or https://example.com/thanks{/tr}">
+                    <div class="form-text">{tr}Wiki page name or full URL to redirect to after survey completion. Leave empty to redirect to the survey list.{/tr}</div>
                 </div>
             </div>
             <div class="tiki-form-group row">

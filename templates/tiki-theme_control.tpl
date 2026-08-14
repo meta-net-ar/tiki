@@ -1,8 +1,9 @@
 {title help="Theme Control"}{tr}Theme Control:{/tr} {tr}Categories{/tr}{/title}
-<div class="t_navbar btn-group mb-4">
-    {button href="tiki-theme_control_objects.php" class="btn btn-primary" _text="{tr}Control by Objects{/tr}"}
-    {button href="tiki-theme_control_sections.php" class="btn btn-primary" _text="{tr}Control by Sections{/tr}"}
+<div class="t_navbar btn-group mb-3">
+    {button href="tiki-theme_control_objects.php" _class="btn btn-link" _text="{tr}Control by Objects{/tr}"}
+    {button href="tiki-theme_control_sections.php" _class="btn btn-link" _text="{tr}Control by Sections{/tr}"}
 </div>
+<div class="styling-element">
 <h2>{tr}Assign themes to categories{/tr}</h2>
 <form action="tiki-theme_control.php" method="post" class="mb-2">
     {ticket}
@@ -38,7 +39,7 @@
         <table class="table">
             <tr>
                 <td> {* th changed to td to prevent ARIA empty header error *}
-                    <button type="submit" class="btn btn-danger btn-sm" name="delete" title="{tr}Delete selected{/tr}" {if !$channels}disabled{/if}>
+                    <button type="submit" class="btn btn-danger btn-sm" name="delete" title="{tr}Delete selected{/tr}" aria-label="{tr}Delete selected{/tr}" {if !$channels}disabled{/if}>
                         {icon name="delete"}
                     </button>
                 </td>
@@ -69,4 +70,5 @@
         </table>
     </div>
 </form>
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+</div>

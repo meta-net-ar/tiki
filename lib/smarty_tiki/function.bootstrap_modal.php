@@ -7,6 +7,6 @@
 
 function smarty_function_bootstrap_modal($params, \Smarty\Template $template)
 {
-    $smartyFunctionBootstrapModalHandler = new \smartytiki\FunctionHandler\BootstrapModal();
+    $smartyFunctionBootstrapModalHandler = new \SmartyTiki\FunctionHandler\BootstrapModal();
     return $smartyFunctionBootstrapModalHandler->handle($params, $template);
 }

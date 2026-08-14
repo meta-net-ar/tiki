@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 function wikiplugin_events_info()
 {
     return [
@@ -21,7 +24,6 @@ function wikiplugin_events_info()
                 'description' => tr('ID numbers for the site calendars whose events are to be displayed, separated by
                     vertical bars (%0)', '<code>|</code>'),
                 'since' => '2.0',
-                'default' => '',
                 'filter' => 'text',
                 'profile_reference' => 'calendar',
             ],
@@ -123,50 +125,14 @@ function wikiplugin_events($data, $params)
 {
     global $tiki_p_admin, $tiki_p_view_calendar, $user;
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $calendarlib = TikiLib::lib('calendar');
     $invalideid = false;
 
     extract($params, EXTR_SKIP);
 
-    if (empty($params['calendarid'])) {
-        Feedback::error(tr('The %0 parameter is missing', 'calendarid'));
-        return;
-    }
-
-    if (! isset($maxdays)) {
-        $maxdays = 365;
-    }
-    if (! isset($max)) {
-        $max = 10;
-    }
-    if (! isset($datetime)) {
-        $datetime = 1;
-    }
-    if (! isset($desc)) {
-        $desc = 1;
-    }
-    if (! isset($usePagination)) {
-        $usePagination = 'n';
-    }
-
-    // attendees
-    if (! isset($attendees)) {
-        $attendees = 'n';
-    }
-
-    // Pagination
-    if (! isset($timespan)) {
-        $timespan = "future";
-    }
-
     if ($usePagination == 'y') {
-        if (! isset($_REQUEST["offset"])) {
-            $start = 0;
-        } else {
-            $start = $_REQUEST["offset"];
-        }
+        $start = $_REQUEST["offset"] ?? 0;
     }
 
 
@@ -206,9 +172,9 @@ function wikiplugin_events($data, $params)
 
     // Pagination
     if ($timespan == 'future') {
-        $events = $calendarlib->upcoming_events(
+        $calendarlib->upcoming_events(
             $max,
-            array_intersect($calIds, $viewable) ? array_intersect($calIds, $viewable) : [],
+            array_intersect($calIds, $viewable) ?: [],
             $maxdays,
             'start_asc',
             1,
@@ -218,7 +184,7 @@ function wikiplugin_events($data, $params)
     }
 
     if ($timespan == 'all') {
-        $events = $calendarlib->all_events(
+        $calendarlib->all_events(
             $max,
             array_intersect($calIds, $viewable),
             $maxdays,
@@ -230,7 +196,7 @@ function wikiplugin_events($data, $params)
     }
 
     if ($timespan == 'past') {
-        $events = $calendarlib->past_events(
+        $calendarlib->past_events(
             $max,
             array_intersect($calIds, $viewable),
             $maxdays,
@@ -242,14 +208,14 @@ function wikiplugin_events($data, $params)
     }
 
 
-    if (isset($calendarid)) {
+    if (! is_null($calendarid)) {
         $calParamIds = explode('|', $calendarid);
         if (array_diff($calParamIds, $calIds)) {
             $invalideid = true;
             $calParamIds = [];
         }
     }
-    $events = $calendarlib->upcoming_events($max, array_intersect($calParamIds, $viewable) ? array_intersect($calParamIds, $viewable) : [], $maxdays);
+    $events = $calendarlib->upcoming_events($max, array_intersect($calParamIds, $viewable) ?: [], $maxdays);
 
     $smarty->assign_by_ref('datetime', $datetime);
     $smarty->assign_by_ref('desc', $desc);
@@ -261,7 +227,7 @@ function wikiplugin_events($data, $params)
         $start = $start ?? 0;
         $smarty->assign('maxEvents', $max);
         $smarty->assign_by_ref('offset', $start);
-        $smarty->assign_by_ref('cant', $events['cant']);
+        $smarty->assign_by_ref('count', $events['count']);
     }
 
     // attendees

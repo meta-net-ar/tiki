@@ -1,4 +1,4 @@
-{assign var="listTemplate" value=$list}
+{$listTemplate=$list}
 {*
     We assign $list to another name before calling the extends line below because
     the extends line below comes with another variable $list, which is also an array
@@ -10,13 +10,13 @@
 {block name="title"}
     {title help="" admpage="workspace"}{$title|escape}{/title}
 {/block}
-
+<div class="styling-element">
 {block name="navigation"}
     <div class="navbar">
-        <a class="btn btn-primary" href="{bootstrap_modal controller=workspace action=add_template}">
+        <a class="btn btn-primary" role="button" href="{bootstrap_modal controller=workspace action=add_template}">
             {icon name="create"} {tr}Create Workspace Template{/tr}
         </a>
-        <a class="btn btn-primary" href="{bootstrap_modal controller=workspace action=create}">
+        <a class="btn btn-primary" role="button" href="{bootstrap_modal controller=workspace action=create}">
             {icon name="create"} {tr}Create Workspace{/tr}
         </a>
     </div>
@@ -40,7 +40,7 @@
                     </td>
                     <td>
                         {permission name=admin}
-                            <a title="{tr}Edit{/tr}" class="btn btn-primary btn-sm service-dialog reload" href="{service controller=workspace action=edit_template id=$template.templateId}">{icon name="edit"} {tr}Edit{/tr}</a>
+                            <a title="{tr}Edit{/tr}" class="btn btn-primary btn-sm service-dialog reload" role="button" href="{service controller=workspace action=edit_template id=$template.templateId}">{icon name="edit"} {tr}Edit{/tr}</a>
                             <span class="btn btn-link btn-sm">
                                 {permission_link mode=text type=workspace id=$template.templateId title=$template.name}
                             </span>
@@ -51,3 +51,4 @@
         </table>
     </div>
 {/block}
+</div>

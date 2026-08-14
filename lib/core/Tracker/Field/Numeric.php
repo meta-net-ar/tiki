@@ -22,7 +22,7 @@ class Tracker_Field_Numeric extends \Tracker\Field\AbstractItemField implements 
                 'prefs' => ['trackerfield_numeric'],
                 'tags' => ['basic'],
                 'default' => 'y',
-                'supported_changes' => ['d', 'D', 'R', 'M', 't', 'a', 'n', 'q', 'b', 'DUR'],
+                'supported_changes' => ['d', 'D', 'R', 'M', 't', 'a', 'n', 'q', 'b', 'DUR', 'SLIDER'],
                 'params' => [
                     'samerow' => [
                         'name' => tr('Same Row'),
@@ -85,6 +85,16 @@ class Tracker_Field_Numeric extends \Tracker\Field\AbstractItemField implements 
                             1 => tr('Yes'),
                         ],
                     ],
+                    'incrementWithEmpty' => [
+                        'name' => tr('Increment with empty'),
+                        'description' => tr('Increment the value from the last item in database when the field is empty.'),
+                        'filter' => 'int',
+                        'default' => 0,
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -137,6 +147,19 @@ class Tracker_Field_Numeric extends \Tracker\Field\AbstractItemField implements 
     public function renderInput($context = [])
     {
         return $this->renderTemplate('trackerinput/numeric.tpl', $context);
+    }
+
+    public function handleSave($value, $oldValue)
+    {
+        if ($this->getOption('incrementWithEmpty') && empty($value)) {
+            $value = TikiLib::lib('trk')->get_maximum_value($this->getConfiguration('fieldId'));
+            if (! $value) {
+                $value = 1;
+            } else {
+                $value += 1;
+            }
+        }
+        return ['value' => $value];
     }
 
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)
@@ -229,6 +252,17 @@ class Tracker_Field_Numeric extends \Tracker\Field\AbstractItemField implements 
                 $value = $control->getValue();
                 if ($value) {
                     $query->filterIdentifier($value, $baseKey);
+                }
+            });
+
+        $filters->addNew($permName, 'multiexact')
+            ->setLabel($name)
+            ->setHelp(tr('Search for one or more precise values separated by OR.'))
+            ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_mem"))
+            ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
+                $value = $control->getValue();
+                if ($value) {
+                    $query->filterMultiIdentifier($value, $baseKey);
                 }
             });
 

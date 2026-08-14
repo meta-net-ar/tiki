@@ -16,14 +16,15 @@ $inputConfiguration = [
             'assign_user'                 => 'username',  //post
             'action'                      => 'string',    //post
             'group'                       => 'word',      //post
-            'set_default'                 => 'bool',      //post
+            'set_default'                 => 'alpha',     //post
             'login'                       => 'word',      //post
             'defaultgroup'                => 'word',      //post
-            'save'                        => 'bool',      //post
+            'save'                        => 'alpha',     //post
             'sort_mode'                   => 'word',      //post
             'offset'                      => 'int',       //get
             'find'                        => 'string',    //post
             'maxRecords'                  => 'int',       //post
+            'confirmpassword'             => 'password',  //post
         ],
     ]
 ];
@@ -86,8 +87,7 @@ if (isset($_REQUEST["action"])) {
             if (! $userlib->group_exists($_REQUEST["group"])) {
                 Feedback::error(tr('Invalid group'));
             } elseif (
-                $tiki_p_admin_users == 'y'
-                || ($tiki_p_admin_users == 'y' && array_key_exists($_REQUEST["group"], $groups))
+                $tiki_p_admin_users == 'y' || array_key_exists($_REQUEST["group"], $groups)
             ) {
                 $result = $userlib->assign_user_to_group($_REQUEST["assign_user"], $_REQUEST["group"]);
                 if ($result && $result->numRows()) {
@@ -141,7 +141,7 @@ $user_info = $userlib->get_user_info($assign_user, true);
 $smarty->assign_by_ref('user_info', $user_info);
 if (! empty($_REQUEST['save']) && $access->checkCsrf()) {
     foreach ($_REQUEST as $r => $v) {
-        if (strpos($r, 'new_') === 0) {
+        if (str_starts_with($r, 'new_')) {
             $g = substr($r, 4);
             if ($_REQUEST['new_' . $g] != $_REQUEST['old_' . $g]) {
                 $t = strtotime($_REQUEST['new_' . $g]);
@@ -173,19 +173,11 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 
 $smarty->assign_by_ref('offset', $offset);
 
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 
 if (isset($_REQUEST['maxRecords'])) {
@@ -210,7 +202,7 @@ foreach ($users['data'] as $key => $gr) {
     }
 }
 
-$smarty->assign_by_ref('cant_pages', $users["cant"]);
+$smarty->assign_by_ref('pages_count', $users["count"]);
 
 // Get users (list of users)
 $smarty->assign_by_ref('users', $users["data"]);

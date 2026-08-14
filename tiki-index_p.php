@@ -8,8 +8,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'wiki page';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
+
 $structlib = TikiLib::lib('struct');
 
 $wikilib = TikiLib::lib('wiki');
@@ -73,15 +76,13 @@ if (! in_array($page, $_SESSION["breadCrumb"])) {
     if (count($_SESSION["breadCrumb"]) > $prefs['userbreadCrumb']) {
         array_shift($_SESSION["breadCrumb"]);
     }
-
-    array_push($_SESSION["breadCrumb"], $page);
 } else {
     // If the page is in the array move to the last position
     $pos = array_search($page, $_SESSION["breadCrumb"]);
 
     unset($_SESSION["breadCrumb"][$pos]);
-    array_push($_SESSION["breadCrumb"], $page);
 }
+$_SESSION["breadCrumb"][] = $page;
 
 // Now increment page hits since we are visiting this page
 $tikilib->add_hit($page);

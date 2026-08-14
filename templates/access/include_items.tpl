@@ -5,19 +5,5 @@
             {$extra["warning"]|escape}
         </div>
     {/if}
-    {if isset($items) && $items|count > 0}
-        {if $items|count < 16}
-            <ul id="list-items">
-                {foreach $items as $name}
-                    <li class="mx-4">
-                        {$name|escape}
-                    </li>
-                {/foreach}
-            </ul>
-        {else}
-            {foreach $items as $name}
-                {$name|escape}{if !$name@last}, {/if}
-            {/foreach}
-        {/if}
-    {/if}
+    {include file="access/render_list.tpl" list=$items}
 </div>

@@ -8,8 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $wikilib = TikiLib::lib('wiki');
 include_once('lib/tasks/tasklib.php');
 //get_strings tra('My Account Home');
@@ -22,8 +24,6 @@ if (isset($_REQUEST["view_user"])) {
         } else {
             Feedback::errorAndDie(tra("You do not have permission to view other users data"), \Laminas\Http\Response::STATUS_CODE_403);
         }
-    } else {
-        $userwatch = $user;
     }
 }
 $smarty->assign('userwatch', $userwatch);
@@ -34,12 +34,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 }
 $smarty->assign('sort_mode', $sort_mode);
 
-//Offset and Step param for pagination
-$offset = 0;
+//Step param for pagination
 $step = 5;
-if (isset($_REQUEST["offset"])) {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 
 if ($prefs['feature_wiki'] == 'y') {
     $mytiki_pages = $tikilib->get_user_preference($user, 'mytiki_pages', 'y');
@@ -133,7 +130,7 @@ if ($prefs['feature_tasks'] == 'y') {
     $mytiki_tasks = $tikilib->get_user_preference($user, 'mytiki_tasks', 'y');
     if ($mytiki_tasks == 'y') {
         $tasks_offset = $offset;
-        $tasks_count = $tasklib->list_tasks($user, 0, -1, null, 'priority_asc', true, false, true)['cant'];
+        $tasks_count = $tasklib->list_tasks($user, 0, -1, null, 'priority_asc', true, false, true)['count'];
         //always reset the offset to the last page when the offset in parameter is greater than the number of pages to have in the pagination
         if ($offset > $tasks_count) {
             $tasks_offset = $tasks_count === 0 ? -1 : ((ceil($tasks_count / $step) - 1) * $step);
@@ -152,7 +149,7 @@ if ($prefs['feature_messages'] == 'y' && $tiki_p_messages == 'y') {
         $smarty->assign_by_ref('unread', $unread);
 
         $msgs_offset = $offset;
-        $msgs_count = TikiLib::lib('message')->list_user_messages($user, 0, -1, 'date_desc', '', 'isRead', 'n', '', 'messages')['cant'];
+        $msgs_count = TikiLib::lib('message')->list_user_messages($user, 0, -1, 'date_desc', '', 'isRead', 'n', '', 'messages')['count'];
         //always reset the offset to the last page when the offset in parameter is greater than the number of pages to have in the pagination
         if ($offset > $msgs_count) {
             $msgs_offset = $msgs_count === 0 ? -1 : ((ceil($msgs_count / $step) - 1) * $step);

@@ -6,7 +6,7 @@
 
 {block name="navigation"}
     <div class="mb-3">
-        <a class="btn btn-link" href="{bootstrap_modal controller=calendar_availability action=create size='modal-lg'}">{icon name=create} {tr}New{/tr}</a>
+        <a class="btn btn-link" href="{bootstrap_modal controller=calendar_availability action=create size='modal-lg'}" role="button">{icon name=create} {tr}New{/tr}</a>
     </div>
 {/block}
 

@@ -11,13 +11,15 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'            => [
-             'submit'                   => 'bool',          //post
+             'submit'                   => 'alpha',          //post
              'search'                   => 'array',         //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $access->check_permission('tiki_p_admin');
 
 if (! empty($_REQUEST['submit'])) {

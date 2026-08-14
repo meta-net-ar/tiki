@@ -1,0 +1,17 @@
+{
+  "name": "tiki-sentry-browser",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@sentry/browser": "Cannot currently be put in common-external because the esm module isn't independently usable - benoitg - 2026-03-10"
+  },
+  "devDependencies": {
+    "@sentry/browser": "^10.0.0"
+  }
+}

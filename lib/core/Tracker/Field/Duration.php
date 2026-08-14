@@ -403,7 +403,7 @@ onDOMElementRemoved("single-spa-application:@vue-mf/duration-picker-" + ' . json
 
         $output = 'P';
         foreach ($value as $unit => $amount) {
-            if (in_array($unit, ['hours', 'minutes', 'seconds']) && ! strstr($output, 'T')) {
+            if (in_array($unit, ['hours', 'minutes', 'seconds']) && ! str_contains($output, 'T')) {
                 $output .= 'T';
             }
             $output .= "$amount" . substr(ucfirst($unit), 0, 1);

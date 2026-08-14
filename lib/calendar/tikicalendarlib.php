@@ -4,8 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$calendarlib = TikiLib::lib('calendar');
 
+if (! class_exists('CalendarLib', false)) {
+    require_once __DIR__ . '/calendarlib.php';
+}
 /**
  *
  */
@@ -135,8 +137,8 @@ class TikiCalendarLib extends CalendarLib
                                 if ($res['user'] != '') {
                                     include_once('lib/smarty_tiki/modifier.username.php');
                                     $res['user'] = smarty_modifier_username($res['user']);
-                                    $des = isset($res['description']) ? $res['description'] : '';
-                                    if (! strpos($des, '%s')) {
+                                    $des = $res['description'] ?? '';
+                                    if (! str_contains($des, '%s')) {
                                         $br = ( $des == '' ) ? '' : '<br />';
                                         $res['description'] = '<i>' . tra('by') . ' %s</i>' . $br . $des;
                                     }

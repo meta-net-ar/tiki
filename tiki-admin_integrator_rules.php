@@ -12,45 +12,52 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
              'repID'               => 'int',          //post
+             'ruleID'              => 'int',          //post
+             'ord'                 => 'digits',       //post
              'srcrep'              => 'int',          //get
-             'srch'                => 'alpha',        //post
-             'repl'                => 'alpha',        //post
-             'description'         => 'alpha',         //post
-             'type'                => 'bool',         //post
+             'srch'                => 'text',         //post
+             'repl'                => 'text',         //post
+             'description'         => 'text',         //post
+             'rxmod'               => 'alpha',        //post
+             'type'                => 'alpha',        //post
              'file'                => 'text',         //post
-             'casesense'           => 'bool',         //post
-             'html'                => 'bool',         //post
-             'all'                 => 'bool',         //post
-             'enabled'             => 'bool',         //post
-             'copy'                => 'bool',         //post
-             'save'                => 'bool',         //post
-             'preview'             => 'bool',         //post
+             'casesense'           => 'alpha',        //post
+             'html'                => 'alpha',        //post
+             'all'                 => 'alpha',        //post
+             'enabled'             => 'alpha',        //post
+             'copy'                => 'alpha',        //post
+             'save'                => 'alpha',        //post
+             'preview'             => 'alpha',        //post
              'action'              => 'text',         //post
-             'code'                => 'bool',         //post
+             'code'                => 'alpha',        //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
 require_once('lib/integrator/integrator.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 // If Integrator is ON, check permissions...
 $access->check_feature('feature_integrator');
 $access->check_permission(['tiki_p_admin_integrator']);
 // Setup local variables from request or set default values
-$repID = (isset($_REQUEST["repID"]) && strlen($_REQUEST["repID"]) > 0) ? $_REQUEST["repID"] : 0;
-$ruleID = (isset($_REQUEST["ruleID"]) && strlen($_REQUEST["ruleID"]) > 0) ? $_REQUEST["ruleID"] : 0;
-$ord = (isset($_REQUEST["ord"]) && strlen($_REQUEST["ord"]) > 0) ? $_REQUEST["ord"] : 0;
-$srcrep = (isset($_REQUEST["srcrep"]) && strlen($_REQUEST["srcrep"]) > 0) ? $_REQUEST["srcrep"] : 0;
-$srch = isset($_REQUEST["srch"]) ? $_REQUEST["srch"] : '';
-$repl = isset($_REQUEST["repl"]) ? $_REQUEST["repl"] : '';
-$description = isset($_REQUEST["description"]) ? $_REQUEST["description"] : '';
-$rxmod = isset($_REQUEST["rxmod"]) ? $_REQUEST["rxmod"] : '';
-$file = isset($_REQUEST["file"]) ? $_REQUEST["file"] : '';
-$type = isset($_REQUEST["type"]) ? ($_REQUEST["type"] == 'on' ? 'y' : 'n') : 'n';
-$casesense = isset($_REQUEST["casesense"]) ? ($_REQUEST["casesense"] == 'on' ? 'y' : 'n') : 'n';
-$code = isset($_REQUEST["code"]) ? ($_REQUEST["code"] == 'on' ? 'y' : 'n') : 'n';
-$html = isset($_REQUEST["html"]) ? ($_REQUEST["html"] == 'on' ? 'y' : 'n') : 'n';
-$all = isset($_REQUEST["all"]) ? ($_REQUEST["all"] == 'on' ? 'y' : 'n') : 'n';
-$enabled = isset($_REQUEST["enabled"]) ? ($_REQUEST["enabled"] == 'on' ? 'y' : 'n') : 'n';
+$repID  = ($_REQUEST['repID'] ?? '') ?: 0;
+$ruleID = ($_REQUEST['ruleID'] ?? '') ?: 0;
+$ord    = ($_REQUEST['ord'] ?? '') ?: 0;
+$srcrep = ($_REQUEST['srcrep'] ?? '') ?: 0;
+$srch = $_REQUEST["srch"] ?? '';
+$repl = $_REQUEST["repl"] ?? '';
+$description = $_REQUEST["description"] ?? '';
+$rxmod = $_REQUEST["rxmod"] ?? '';
+$file = $_REQUEST["file"] ?? '';
+$type     = ($_REQUEST['type'] ?? '') === 'on' ? 'y' : 'n';
+$casesense = ($_REQUEST['casesense'] ?? '') === 'on' ? 'y' : 'n';
+$code     = ($_REQUEST['code'] ?? '') === 'on' ? 'y' : 'n';
+$html     = ($_REQUEST['html'] ?? '') === 'on' ? 'y' : 'n';
+$all      = ($_REQUEST['all'] ?? '') === 'on' ? 'y' : 'n';
+$enabled  = ($_REQUEST['enabled'] ?? '') === 'on' ? 'y' : 'n';
+
 if (! isset($_REQUEST["repID"]) || $repID <= 0) {
     Feedback::errorAndDie(tra("No repository"), \Laminas\Http\Response::STATUS_CODE_404);
 }
@@ -99,7 +106,7 @@ if (isset($_REQUEST["preview"])) {
         $rep = $integrator->get_repository($repID);
         // Check if file given and present at configured location
         $f = $integrator->get_rep_file($rep, $file);
-        if ((substr($rep["path"], 0, 7) != 'http://') && (substr($rep["path"], 0, 8) != 'https://') && ! file_exists($f)) {
+        if ((! str_starts_with($rep["path"], 'http://')) && (! str_starts_with($rep["path"], 'https://')) && ! file_exists($f)) {
             Feedback::errorAndDie(tra("File not found ") . $f, \Laminas\Http\Response::STATUS_CODE_404);
         }
         // Get file content to string
@@ -153,7 +160,6 @@ if (isset($_REQUEST["action"])) {
 
         default:
             Feedback::errorAndDie(tra("Requested action in not supported on repository"), \Laminas\Http\Response::STATUS_CODE_500);
-            break;
     }
 }
 // Get repository name

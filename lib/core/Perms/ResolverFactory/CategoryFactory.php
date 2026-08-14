@@ -306,7 +306,7 @@ class Perms_ResolverFactory_CategoryFactory implements Perms_ResolverFactory
 
     private function sanitize($name)
     {
-        if (strpos($name, 'tiki_p_') === 0) {
+        if (str_starts_with($name, 'tiki_p_')) {
             return substr($name, strlen('tiki_p_'));
         } else {
             return $name;

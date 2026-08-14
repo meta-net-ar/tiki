@@ -20,6 +20,7 @@ class SystemTrackerCreator
 {
     protected $trackerId;
     protected $fieldIds;
+    private $trklib;
 
     public function __construct()
     {

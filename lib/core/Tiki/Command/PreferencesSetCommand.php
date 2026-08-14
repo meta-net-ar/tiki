@@ -36,6 +36,8 @@ class PreferencesSetCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        global $system_configuration_files;
+
         $logslib = TikiLib::lib('logs');
         $preference = $input->getArgument('name');
         $value = $input->getArgument('value');
@@ -72,8 +74,32 @@ class PreferencesSetCommand extends Command
             $value = explode(',', $value);
         }
 
-        if ($tikilib->set_preference($preference, $value)) {
-            $output->writeln(sprintf('Preference %s was set.', $preference));
+        if ($result = $tikilib->set_preference($preference, $value)) {
+            if ($result['success']) {
+                $userValue = is_array($value) ? implode(',', $value) : $value;
+                $output->writeln(sprintf('Preference %s was successfully set to %s in the database.', $preference, $userValue));
+                if ($result['forced_by_config']) {
+                    $configValue = $result['config_value'];
+                    if (! empty($system_configuration_files)) {
+                        $configFile = implode(', ', $system_configuration_files);
+                    } else {
+                        $configFile = 'unknown configuration file';
+                    }
+                    if ($userValue === $configValue) {
+                        $output->writeln(sprintf(
+                            '<comment>Note: The preference is overridden by ini file %s to effective value %s, which matches the set value.</comment>',
+                            $configFile,
+                            $configValue
+                        ));
+                    } else {
+                        $output->writeln(sprintf(
+                            '<comment>Warning: The set above will have no effect on this Tiki instance because the preference is overridden by ini file %s to effective value %s.</comment>',
+                            $configFile,
+                            $configValue
+                        ));
+                    }
+                }
+            }
         } else {
             $output->writeln('<error>Unable to set preference.</error>');
         }

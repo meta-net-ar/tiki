@@ -9,6 +9,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\File\PDFHelper;
+use Tiki\BruteForce\BruteForce;
 use Tiki\Lib\Image\Image;
 use Tiki\Lib\Image\ImageFileHandler;
 
@@ -19,6 +20,7 @@ $thumbnail_format = 'jpeg';
 require_once('tiki-setup.php');
 
 global $user;
+$bruteForce = new BruteForce();
 
 if (isset($_GET['fileId']) && isset($_GET['thumbnail']) && isset($_COOKIE[ session_name() ]) && count($_GET) == 2 && isset($_SESSION['allowed'][$_GET['fileId']])) {
     $query = "select * from `tiki_files` where `fileId`=?";
@@ -52,18 +54,68 @@ $zip = false;
 $error = '';
 
 if (! $skip) {
-    if (isset($_REQUEST['fileId']) && ! is_array($_REQUEST['fileId'])) {
-        if (isset($_GET['draft'])) {
-            $info = \Tiki\FileGallery\FileDraft::id($_REQUEST['fileId'])->getParams();
+    if (isset($_REQUEST['fileId']) || isset($_REQUEST['galId'])) {
+        $isBatch = (isset($_REQUEST['fileId']) && is_array($_REQUEST['fileId'])) || ! empty($_REQUEST['galId']);
+
+        if (! $isBatch) {
+            if (isset($_GET['draft'])) {
+                $info = \Tiki\FileGallery\FileDraft::id($_REQUEST['fileId'])->getParams();
+            } else {
+                $info = $filegallib->get_file($_REQUEST['fileId']);
+            }
         } else {
-            $info = $filegallib->get_file($_REQUEST['fileId']);
+            // Collect file entries in structured format: ['fileId' => int, 'path' => string]
+            $fileEntries = [];
+
+            // Convert plain fileIds from request to structured format
+            $requestFileIds = $_REQUEST['fileId'] ?? [];
+            if (! is_array($requestFileIds)) {
+                $requestFileIds = [$requestFileIds];
+            }
+            foreach ($requestFileIds as $fid) {
+                $fileEntries[] = ['fileId' => $fid, 'path' => ''];
+            }
+
+            // Process galleries recursively to collect files with paths
+            if (! empty($_REQUEST['galId'])) {
+                $galIds = is_array($_REQUEST['galId']) ? $_REQUEST['galId'] : [$_REQUEST['galId']];
+
+                $visited = [];
+                $processGallery = function ($galId, $currentPath) use (&$fileEntries, $filegallib, &$processGallery, &$visited) {
+                    if (in_array($galId, $visited)) {
+                        return;
+                    }
+                    $visited[] = $galId;
+
+                    $res = $filegallib->get_files(0, -1, 'name_asc', '', $galId, false, true, false, true, false, false, false, false);
+                    if (! empty($res['data'])) {
+                        foreach ($res['data'] as $item) {
+                            // Galleries have both fileId and galleryId; use 'id' for the actual gallery ID
+                            if (! empty($item['isgal']) || (isset($item['galleryId']) && $item['id'] == $item['galleryId'])) {
+                                $subGalId = $item['id'];
+                                if ($subGalId != $galId && ! in_array($subGalId, $visited)) {
+                                    $processGallery($subGalId, $currentPath . $item['name'] . '/');
+                                }
+                            } elseif (isset($item['fileId'])) {
+                                $fileEntries[] = ['fileId' => $item['fileId'], 'path' => $currentPath];
+                            }
+                        }
+                    }
+                };
+
+                foreach ($galIds as $gId) {
+                    $gInfo = $filegallib->get_file_gallery_info($gId);
+                    if ($gInfo) {
+                        $processGallery($gId, $gInfo['name'] . '/');
+                    }
+                }
+            }
+            $zipName = $_REQUEST['zipName'] ?? '';
+            $info = $filegallib->zip($fileEntries, $error, $zipName);
+            $zip = true;
         }
     } elseif (isset($_REQUEST['galleryId']) && isset($_REQUEST['name'])) {
         $info = $filegallib->get_file_by_name($_REQUEST['galleryId'], $_REQUEST['name']);
-    } elseif (isset($_REQUEST['fileId']) && is_array($_REQUEST['fileId'])) {
-        $zipName = $_REQUEST['zipName'] ?? '';
-        $info = $filegallib->zip($_REQUEST['fileId'], $error, $zipName);
-        $zip = true;
     } elseif (! empty($_REQUEST['randomGalleryId'])) {
         $info = $filegallib->get_file(0, $_REQUEST['randomGalleryId']);
     } elseif (! empty($_GET['data'])) {
@@ -92,57 +144,14 @@ if (! $skip) {
             TikiLib::lib('cache')->cacheItem($src, serialize($info), 'external_downloaded_files');
         }
     } else {
-        $access->display_error('', tra('Incorrect param'), 400);
+        $access->display_error('', tra('Incorrect param. No file or gallery selected for download.'), 400);
     }
     if (! is_array($info)) {
         $access->display_error(null, tra('File has been deleted'), 404);
     }
-    if ($prefs['auth_token_access'] != 'y' || ! $is_token_access) {
-        // Check permissions except if the user comes with a valid Token
-
-        if ($tiki_p_admin_file_galleries != 'y' && $info['backlinkPerms'] == 'y' && $filegallib->hasOnlyPrivateBacklinks($info['fileId'])) {
-            if (! $user && $prefs['permission_denied_login_box'] === 'y' && empty($_SESSION['loginfrom'])) {
-                $_SESSION['loginfrom'] = $_SERVER['HTTP_REFERER'];
-            }
-            $access->display_error('', tra('Permission denied'), 401);
-        }
-
-        $attachment_perms = false;
-        if ($prefs['feature_use_fgal_for_wiki_attachments'] === 'y' && $tiki_p_admin_file_galleries !== 'y') {
-            $gal_info = $filegallib->get_file_gallery_info($info['galleryId']);
-            if ($gal_info['type'] == 'attachments') {
-                $perms = Perms::get(['object' => $gal_info['name'], 'type' => 'wiki page']);
-                if (($perms->view && $perms->wiki_view_attachments) || $perms->wiki_admin_attachments) {
-                    $attachment_perms = true;
-                }
-            }
-        }
-
-        if (! $zip && ! $attachment_perms && $tiki_p_admin_file_galleries != 'y' && ! $userlib->user_has_perm_on_object($user, $info['fileId'], 'file', 'tiki_p_download_files') && ! $filegallib->isBacklinkedFromAViewableTrackerItem($info['fileId'])) {
-            if (! $user && $prefs['permission_denied_login_box'] === 'y' && empty($_SESSION['loginfrom'])) {
-                $_SESSION['loginfrom'] = $_SERVER['HTTP_REFERER'];
-            }
-            $access->display_error('', tra('Permission denied'), 401);
-        }
-        if (isset($_GET['thumbnail']) && is_numeric($_GET['thumbnail'])) { //check also perms on thumb
-            $info_thumb = $filegallib->get_file($_GET['thumbnail']);
-            if (! $zip && ! $attachment_perms && $tiki_p_admin_file_galleries != 'y' && ! $userlib->user_has_perm_on_object($user, $info_thumb['fileId'], 'file', 'tiki_p_download_files')) {
-                if (! $user && $prefs['permission_denied_login_box'] === 'y' && empty($_SESSION['loginfrom'])) {
-                    $_SESSION['loginfrom'] = $_SERVER['HTTP_REFERER'];
-                }
-                $access->display_error('', tra('Permission denied'), 401);
-            }
-        }
-        if ($prefs['feature_use_fgal_for_user_files'] === 'y' && $tiki_p_admin_file_galleries !== 'y' && $prefs['userfiles_private'] === 'y') {
-            $gal_info = $filegallib->get_file_gallery_info($info['galleryId']);
-            if ($gal_info['type'] === 'user' && $gal_info['visible'] !== 'y' && $gal_info['user'] !== $user) {
-                $access->display_error('', tra('Permission denied'), 401);
-            }
-        }
-    }
+    $utilities = new Services_File_Utilities();
+    $utilities->enforceFileDownloadPermissions($info, $zip);
 }
-
-TikiLib::lib('header')->setXRobotsTag($robots);
 
 //if the file is remote, display, and don't cache
 $attributelib = TikiLib::lib('attribute');
@@ -174,7 +183,21 @@ if (! isset($_GET['thumbnail']) && ! isset($_GET['icon'])) {
 
     if ($prefs['feature_actionlog'] == 'y') {
         $logslib = TikiLib::lib('logs');
-        $logslib->add_action('Downloaded', $info['galleryId'], 'file gallery', 'fileId=' . $info['fileId']);
+        if (! empty($info['galleryId']) && ! empty($info['fileId'])) {
+            $logslib->add_action(
+                'Downloaded',
+                $info['galleryId'],
+                'file gallery',
+                'fileId=' . $info['fileId']
+            );
+        } else {
+            $logslib->add_action(
+                'Downloaded',
+                'external',
+                'file gallery',
+                'source_url=' . $src
+            );
+        }
     }
 
     if (! empty($_REQUEST['lock']) && $access->checkCsrf(true)) {
@@ -191,7 +214,6 @@ if (! isset($_GET['thumbnail']) && ! isset($_GET['icon'])) {
 }
 
 session_write_close(); // close the session in case of large downloads to enable further browsing
-error_reporting(E_ALL);
 while (ob_get_level() > 1) {
     ob_end_clean();
 }// Be sure output buffering is turned off
@@ -249,10 +271,6 @@ if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $last_modified == strtotime(cur
     unset($tmp);
 }
 
-header("Pragma: ");
-header('Expires: ');
-header('Cache-Control: ' . ( ! empty($user) ? 'private' : 'public' ) . ',must-revalidate,post-check=0,pre-check=0');
-
 if ($use_client_cache) {
     header('Status: 304 Not Modified', true, 304);
     exit;
@@ -260,6 +278,18 @@ if ($use_client_cache) {
     if (! empty($last_modified)) {
         header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $last_modified) . ' GMT');
     }
+}
+
+$maxAge = (int)($prefs['tiki_cachecontrol_maxage'] ?? 86400);
+$downloadableByAnonymous = $userlib->user_has_perm_on_object(null, $info['fileId'], 'file', 'tiki_p_download_files');
+
+if ($downloadableByAnonymous) {
+    header('Cache-Control: public, max-age=' . $maxAge . ', must-revalidate');
+    header('Expires: ' . gmdate('D, d M Y H:i:s', time() + $maxAge) . ' GMT');
+} else {
+    header('Cache-Control: private, no-cache, no-store, must-revalidate');
+    header('Expires: ' . gmdate('D, d M Y H:i:s', time()) . ' GMT');
+    header('Pragma: no-cache');
 }
 
 // Indicates if a 'office' document should be converted to pdf for download or display in browser.
@@ -301,6 +331,19 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
 
     if ($build_content) {
         if ($convertToPdf) {
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                $pdfGenerationProperties = ['ip' => $tikilib->get_ip_address()];
+                if (! $bruteForce->isOperationAllowed('pdf_generation', $pdfGenerationProperties)) {
+                    $waitTime = $bruteForce->getWaitTime('pdf_generation', $pdfGenerationProperties);
+                    if ($waitTime > 60) {
+                        $waitMessage = sprintf(tra('Too many PDF generation requests. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+                    } else {
+                        $waitMessage = sprintf(tra('Too many PDF generation requests. Please try again in %d seconds.'), $waitTime);
+                    }
+                    Feedback::errorAndDie($waitMessage, 429);
+                }
+            }
+
             $pdfFile = PDFHelper::convertToPDF($_REQUEST['fileId']);
             $content = file_get_contents($pdfFile);
             unlink($pdfFile);
@@ -309,6 +352,20 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
             // Modify the original image if needed
             if (! Image::isAvailable()) {
                 die();
+            }
+
+            $rateLimitImageTransform = isset($_GET['x']) || isset($_GET['y']) || $scale || isset($_GET['max']) || isset($_GET['format']) || isset($_GET['quality']);
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y' && $rateLimitImageTransform) {
+                $imageResizeProperties = ['ip' => $tikilib->get_ip_address()];
+                if (! $bruteForce->isOperationAllowed('image_resize', $imageResizeProperties)) {
+                    $waitTime = $bruteForce->getWaitTime('image_resize', $imageResizeProperties);
+                    if ($waitTime > 60) {
+                        $waitMessage = sprintf(tra('Too many image resize requests. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+                    } else {
+                        $waitMessage = sprintf(tra('Too many image resize requests. Please try again in %d seconds.'), $waitTime);
+                    }
+                    Feedback::errorAndDie($waitMessage, 429);
+                }
             }
 
             $content_changed = true;
@@ -337,12 +394,12 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
                         $icon_x = $_GET['max'];
                         $icon_y = $_GET['max'];
                     } else {
-                        $icon_x = isset($_GET['x']) ? $_GET['x'] : 0;
-                        $icon_y = isset($_GET['y']) ? $_GET['y'] : 0;
+                        $icon_x = $_GET['x'] ?? 0;
+                        $icon_y = $_GET['y'] ?? 0;
                     }
 
                     $ext = pathinfo($info['filename']); // TODO replace with mimelib functions
-                    $format = isset($ext['extension']) ? $ext['extension'] : $format;
+                    $format = $ext['extension'] ?? $format;
                     $content = $tmp->icon($format, $icon_x, $icon_y);
                     $format = $tmp->getIconDefaultFormat();
                     $info['filetype'] = 'image/' . $format;
@@ -376,10 +433,8 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
                     } elseif (isset($_GET['thumbnail'])) {
                     // We resize to a thumbnail size if needed
                         if (is_numeric($_GET['thumbnail'])) {
-                            if (empty($info_thumb)) {
-                                $info_thumb = $filegallib->get_file($_GET['thumbnail']);
-                            }
-                            $file_thumb = new \Tiki\TikiFile\File($info_thumb);
+                            $info_thumb = $filegallib->get_file($_GET['thumbnail']);
+                            $file_thumb = new Tiki\FileGallery\File($info_thumb);
                             $image = Image::create($file_thumb->getContents());
                             $content = null; // Explicitely free memory before getting cache
                             if ($image->isEmpty()) {
@@ -420,7 +475,7 @@ if (isset($_GET['preview']) || isset($_GET['thumbnail']) || isset($_GET['display
                 }
             } while ($tryIconFallback);
         }
-        if (strpos($info['filetype'], 'image/svg') !== false) {
+        if (str_contains($info['filetype'], 'image/svg')) {
             $info['filetype'] = 'image/svg+xml';
             $content = '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' . "\n" . $content;
         }
@@ -452,7 +507,11 @@ if (
             || $info['filetype'] == 'application/octet-stream' || $info['filetype'] == 'unknown'
 ) {
     $info['filetype'] = $mimelib->from_path($info['filename'], $filepath);
-} elseif (isset($_GET['thumbnail']) && (strpos($info['filetype'], 'image') === false || ($content_changed && strpos($info['filetype'], 'image/svg') === false))) {  // use thumb format
+} elseif (
+    isset($_GET['thumbnail'])
+    && (! str_contains($info['filetype'], 'image')
+        || ($content_changed && ! str_contains($info['filetype'], 'image/svg')))
+) {  // use thumb format
     $info['filetype'] = $mimelib->from_content($info['filename'], $content);
 }
 header('Content-type: ' . $info['filetype']);
@@ -472,7 +531,7 @@ if (! empty($filepath) && is_file($filepath) && ! $content_changed) {
     $filesize = filesize($filepath);
     header("Accept-Ranges: bytes");
     if (empty($_SERVER['HTTP_RANGE'])) {
-        if (strpos($info['filetype'], 'text/') === false || $downloading) {
+        if (! str_contains($info['filetype'], 'text/') || $downloading) {
             header('Content-Length: ' . $filesize);
             readfile($filepath);
         } else {
@@ -513,7 +572,7 @@ if (! empty($filepath) && is_file($filepath) && ! $content_changed) {
         }
     }
 } else {
-    if (strpos($info['filetype'], 'text/') !== false && ! $downloading) {
+    if (str_contains($info['filetype'], 'text/') && ! $downloading) {
         $content = htmlspecialchars($content);
     }
     if (function_exists('mb_strlen')) {

@@ -126,7 +126,7 @@ class Captcha_Questions extends Laminas\Captcha\AbstractWord
         }
 
         $this->id = $value['id'];
-        $word = $this->getWord();
+        $word = strtolower($this->getWord());
 
         if (empty($word)) {
             $this->error(self::MISSING_VALUE);

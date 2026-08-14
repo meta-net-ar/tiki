@@ -17,10 +17,7 @@ class TikiFilter_PreventXss implements Laminas\Filter\FilterInterface
         }
     }
 
-    /* RemoveXSS initially developped by kallahar - quickwired.com, modified for Tiki
-     * Original code could be found here:
-     * http://quickwired.com/smallprojects/php_xss_filter_function.php
-     */
+    /* RemoveXSS initially developed by kallahar - quickwired.com, modified for Tiki */
     public function RemoveXSS($val)
     {
         static $ra_as_tag_only = null;
@@ -150,7 +147,7 @@ class TikiFilter_PreventXss implements Laminas\Filter\FilterInterface
         while (
             $this->RemoveXSSchars($val)
             || $this->RemoveXSSregexp($ra_as_tag_only, $val, '(\<|\[\\\\xC0\]\[\\\\xBC\])\??')
-            || $this->RemoveXSSregexp($ra_as_attribute, $val, '[\s\/"\']')
+            || $this->RemoveXSSregexp($ra_as_attribute, $val, '[\s\\\\\/"\']')
             || $this->RemoveXSSregexp($ra_as_content, $val, '[\.\\\\+\*\?\[\^\]\$\(\)\{\}\=\!\<\|\:;\-\/`#"\']', '(?!\s*[a-z0-9])', true)
             || $this->RemoveXSSregexp($ra_javascript, $val, '', ':', true)
             ///     || RemoveXSSregexp($ra_style, $val, '[^a-z0-9]', '=') // Commented as it has been considered as a bit too aggressive

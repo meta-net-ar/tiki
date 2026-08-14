@@ -133,11 +133,8 @@ class Tracker_Field_ShowTikiOrg extends \Tracker\Field\AbstractItemField
             $ret['username'] = 'user';
         }
 
-        $conn = new SSH2($this->getOption('domain'));
-
         try {
             if (! is_readable($this->getOption('privateKey'))) {
-                Feedback::error(tra("Unable to read the ssh private key file, in the ShowTikiOrg tracker field"));
                 $ret['status'] = 'INVKEYS';
                 return $ret;
             }
@@ -147,12 +144,13 @@ class Tracker_Field_ShowTikiOrg extends \Tracker\Field\AbstractItemField
             return $ret;
         }
 
-        if (! $privateKeyLoaded) {
-            $ret['status'] = 'INVKEYS';
+        try {
+            $conn = new SSH2($this->getOption('domain'));
+            $conntry = $conn->login($this->getOption('remoteShellUser'), $privateKeyLoaded);
+        } catch (\Throwable $e) {
+            $ret['status'] = 'DISCO';
             return $ret;
         }
-
-        $conntry = $conn->login($this->getOption('remoteShellUser'), $privateKeyLoaded);
 
         if (! $conntry) {
             $ret['status'] = 'DISCO';
@@ -160,10 +158,15 @@ class Tracker_Field_ShowTikiOrg extends \Tracker\Field\AbstractItemField
         }
 
         $infostring = "info -i $id -U $userid";
-        $infooutput = $conn->exec($infostring);
+        try {
+            $infooutput = $conn->exec($infostring);
+        } catch (\Throwable $e) {
+            $ret['status'] = 'DISCO';
+            return $ret;
+        }
         $ret['debugoutput'] = $infostring . " " . $infooutput;
 
-        if (strpos($infooutput, 'MAINTENANCE: ') !== false) {
+        if (str_contains($infooutput, 'MAINTENANCE: ')) {
             $maintpos = strpos($infooutput, 'MAINTENANCE: ');
             $maintreason = substr($infooutput, $maintpos + 13);
             $maintreason = substr($maintreason, 0, strpos($maintreason, '"'));

@@ -5,6 +5,7 @@
     {button href="tiki-blog_post.php" _type="link" class="btn btn-link" _icon_name="create" _text="{tr}New Blog Post{/tr}"}
     {button href="tiki-list_blogs.php" _type="link" class="btn btn-link" _icon_name="list" _text="{tr}List Blogs{/tr}"}
 </div>
+<div class="styling-element">
 {if $posts or ($find ne '')}
     {include file='find.tpl'}
 {/if}
@@ -41,7 +42,7 @@
         </tr>
 
 
-        {section name=changes loop=$posts}{assign var=id value=$posts[changes].postId}
+        {section name=changes loop=$posts}{$id=$posts[changes].postId}
             <tr>
                 <td class="checkbox-cell"><input class="form-check-input" aria-label="{tr}Select{/tr}" type="checkbox" name="checked[]" value="{$id}"></td>
                 <td class="text">{object_link type="blog post" id=$posts[changes].postId title=$posts[changes].title}</td>
@@ -75,7 +76,7 @@
                                     <input type="hidden" name="offset" value="{$offset}">
                                     <input type="hidden" name="sort_mode" value="{$sort_mode}">
                                     <input type="hidden" name="remove" value="{$posts[changes].postId}">
-                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Delete this item{/tr}?')">
+                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr}Delete this item{/tr}?')" aria-label="{tr}Remove{/tr}">
                                         {icon name='delete' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                     </button>
                                 </form>
@@ -103,4 +104,5 @@
     </form>
 {/if}
 
-{pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+</div>

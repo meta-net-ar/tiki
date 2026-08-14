@@ -18,7 +18,7 @@ class TikiCryptKey extends CryptKey
 
     public function getKeyPath()
     {
-        return new Key($this->key);
+        return $this->key; //This used to be new Key($this->key), which is impossible, Lcobucci\JWT\Signer\Key is an interface.  Returned $this->key as per League\OAuth2\Server\CryptKey base implementation, but it doesn't mean that it works.  benoitg - 2026-02-16.
     }
 
     public function isNullKey()

@@ -13,6 +13,12 @@ use Tiki\Installer\Installer;
  */
 function upgrade_20240531_tiki_file_attach_relation_to_emails_tiki($installer)
 {
+    global $prefs;
+
+    // temporarily disable incremental updates to speed up the relation inserts for bigger databases
+    $old_incremental = $prefs['unified_incremental_update'];
+    $prefs['unified_incremental_update'] = 'n';
+
     $relationlib = TikiLib::lib('relation');
     $rows = $installer->fetchAll("SELECT ttif.itemId, ttif.fieldId, ttif.value FROM `tiki_tracker_item_fields` ttif left join tiki_tracker_fields ttf on ttif.fieldId = ttf.fieldId WHERE ttf.type = 'EF'");
     foreach ($rows as $row) {
@@ -34,4 +40,6 @@ function upgrade_20240531_tiki_file_attach_relation_to_emails_tiki($installer)
             }
         }
     }
+
+    $prefs['unified_incremental_update'] = $old_incremental;
 }

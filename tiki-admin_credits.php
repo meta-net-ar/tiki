@@ -20,9 +20,8 @@ $inputConfiguration = [
             'use_credit_amount'     => 'float',       //post
             'restore_credit_type'   => 'striptags',   //post
             'restore_credit_amount' => 'float',       //post
-            'credit_types'          => 'striptags',   //post
             'display_text'          => 'striptags',   //post
-            'is_static_level'       => 'bool',        //post
+            'is_static_level'       => 'alpha',        //post
             'save'                  => 'bool',        //post
             'credit_type'           => 'striptags',   //post
             'new_credit_type'       => 'striptags',   //post
@@ -36,14 +35,21 @@ $inputConfiguration = [
         ],
         'staticKeyFiltersForArrays' => [
             'credits'               => 'striptags',   //post
+            'credit_types'          => 'striptags',   //post
             'delete'                => 'int',        //post
         ],
     ],
 ];
-require_once 'tiki-setup.php';
+
+require_once('tiki-setup.php');
 require_once('admin/include_credits.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $creditslib = TikiLib::lib('credits');
 //get_strings tra('Admin credits')
+$accesslib = TikiLib::lib('access');
+$accesslib->check_permission('tiki_p_admin');
 
 if ($tiki_p_admin_users != 'y') {
     Feedback::errorAndDie(tra('You do not have the permission that is needed to use this feature'), \Laminas\Http\Response::STATUS_CODE_403);

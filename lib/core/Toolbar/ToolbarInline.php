@@ -48,7 +48,7 @@ class ToolbarInline extends ToolbarItem
                 $label = tra('Inline Code');
                 $icon = tra('img/icons/page_white_code.png');
                 $iconname = 'code';
-                $wysiwyg = 'code';
+                $wysiwyg = '';
                 $syntax = '-+text+-';
                 $markdown = '`text`';
                 $markdown_wysiwyg = 'code';

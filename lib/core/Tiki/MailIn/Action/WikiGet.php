@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\MailIn\Action;
 
+use Language;
 use Tiki\MailIn\Account;
 use Tiki\MailIn\Source\Message;
 use TikiLib;
@@ -42,7 +43,7 @@ class WikiGet extends WikiPut
 
             $account->sendReply($message, $mail);
         } else {
-            $l = $prefs['language'];
+            $l = Language::getCurrentLanguage();
             $mail_data = $smarty->fetchLang($l, "mail/mailin_reply_subject.tpl");
 
             $mail = $account->getReplyMail($message);

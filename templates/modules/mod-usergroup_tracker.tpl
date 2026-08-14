@@ -1,5 +1,5 @@
 {if $user}
-{if !isset($tpl_module_title)}{assign var=tpl_module_title value="{tr}Login{/tr}"}{/if}
+{if !isset($tpl_module_title)}{$tpl_module_title="{tr}Login{/tr}"}{/if}
 {tikimodule error=$module_params.error title=$tpl_module_title name="login_infos" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
 
 <div><a class="linkmodule" href="tiki-logout.php">{tr}Log out{/tr}</a></div>
@@ -15,7 +15,13 @@
 {if $prefs.groupTracker eq 'y'}
 <div>{tr}Group information:{/tr}</div>
 <div class="card-body">
-&nbsp;&nbsp;<a href="tiki-view_tracker_item.php?view=+group" class="linkmodule">{$default_group|escape}</a>
+{if $user_groups && count($user_groups) > 0}
+    {foreach from=$user_groups item=group}
+        &nbsp;&nbsp;<a href="tiki-view_tracker_item.php?view=+group&group={$group|escape}" class="linkmodule">{$group|escape}</a><br>
+    {/foreach}
+{else}
+    &nbsp;&nbsp;<span class="text-muted">{tr}No groups available{/tr}</span>
+{/if}
 </div>
 {/if}
 

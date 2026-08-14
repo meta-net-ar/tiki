@@ -8,21 +8,32 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'sheet';
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
             'sheetId'              => 'int',                 //post
-            'edit_mode'            => 'bool',                //post
+            'edit_mode'            => 'alpha',               //post
             'title'                => 'striptags',           //post
             'find'                 => 'striptags',           //post
             'edit'                 => 'bool',                //post
             'description'          => 'xss',                 //post
+            'parseValues'          => 'alpha',               //post
+            'creator'              => 'username',            //post
+            'parentSheetId'        => 'int',                 //post
+            'sort_mode'            => 'alnumdash',           //get
+            'offset'               => 'int',                 //get
         ],
     ],
 ];
 
 require_once('tiki-setup.php');
+
+use Tiki\Sections;
+$section = Sections::SECTION_SHEET;
+Sections::setCurrentSection($section);
 
 $sheetlib = TikiLib::lib("sheet");
 
@@ -37,9 +48,6 @@ if (! isset($_REQUEST["sheetId"])) {
     $info = [];
     $smarty->assign('headtitle', tra('Spreadsheets'));
 } else {
-    if (isset($_REQUEST['edit_mode']) && $_REQUEST['edit_mode'] == 1) {
-        $cookietab = 2;
-    }
     if ($_SERVER['REQUEST_METHOD'] == 'GET') {
         try {
             $info = $sheetlib->get_sheet_info($_REQUEST['sheetId']);
@@ -69,12 +77,7 @@ if (! isset($_REQUEST["sheetId"])) {
 }
 
 $access->check_permission('tiki_p_view_sheet');
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign('sheetId', $_REQUEST["sheetId"]);
 // Init smarty variables to blank values
@@ -93,7 +96,7 @@ if (isset($_REQUEST["edit_mode"]) && $_REQUEST["edit_mode"]) {
         $smarty->assign('title', $info["title"]);
         $smarty->assign('description', $info["description"]);
         $smarty->assign('creator', $info['author']);
-        $smarty->assign('parentSheetId', isset($info['parentSheetId']) ? $info['parentSheetId'] : 0);
+        $smarty->assign('parentSheetId', $info['parentSheetId'] ?? 0);
         $info = $sheetlib->get_sheet_layout($_REQUEST["sheetId"]);
         $smarty->assign('className', $info["className"]);
         $smarty->assign('headerRow', $info["headerRow"]);
@@ -130,7 +133,7 @@ if (isset($_REQUEST["edit"])) {
         $_REQUEST["sheetId"],
         $_REQUEST["title"],
         $_REQUEST["description"],
-        isset($_REQUEST['creator']) ? $_REQUEST['creator'] : $user,
+        $_REQUEST['creator'] ?? $user,
         $_REQUEST['parentSheetId'],
         $_REQUEST
     );
@@ -149,25 +152,19 @@ if (isset($_REQUEST["removesheet"]) && $access->checkCsrf()) {
 }
 $cat_objid = $_REQUEST['sheetId'];
 include_once('categorize_list.php');
-
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'title_asc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'title_asc',
+    ['tiki_sheets']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 // Get the list of sheets available for this user (or public galleries)
 $sheets = $sheetlib->list_sheets($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $sheets["cant"]);
+$smarty->assign_by_ref('pages_count', $sheets["count"]);
 $smarty->assign_by_ref('sheets', $sheets["data"]);
 
 include_once('tiki-section_options.php');

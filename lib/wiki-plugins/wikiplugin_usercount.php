@@ -24,7 +24,6 @@ function wikiplugin_usercount_info()
                 'since' => '14.1',
                 'separator' => ':',
                 'filter' => 'groupname',
-                'default' => '',
             ],
         ],
     ];
@@ -32,13 +31,12 @@ function wikiplugin_usercount_info()
 
 function wikiplugin_usercount($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_usercount_info());
+
     $userlib = TikiLib::lib('user');
 
-    extract($params, EXTR_SKIP);
-
-    if (isset($params['groups'])) {
-        $groups = $params['groups'];
-        $numusers = $userlib->count_users_consolidated($groups);
+    if (! is_null($params['groups'])) {
+        $numusers = $userlib->count_users_consolidated($params['groups']);
     } else {
         $numusers = $userlib->count_users($data);
     }

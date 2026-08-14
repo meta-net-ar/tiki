@@ -9,7 +9,11 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use Tiki\Sections;
 use TikiLib;
+use Language;
+use Services_LanguageCheck_Controller;
+use Exception;
 
 /**
  * smarty_block_textarea : add a textarea to a template.
@@ -22,13 +26,17 @@ use TikiLib;
  *    _wysiwyg: force wysiwyg editor
  *    _is_html: parse as html
  *    _preview: add a preview in a tab
- *
+ *    _syntax: Specify syntax to be used.
+ *              If blank then \WikiParser_Parsable::guess_syntax is used.
+ *              Use "none" to make a plain text area
+ *    codemirror: if set to 'true' and feature_syntax_highlighter is enabled,
+ *             initializes the textarea using CodeMirror instead of the default editor.
  * usage: {textarea id='my_area' name='my_area'}{tr}My Text{/tr}{/textarea}
  */
 /**
  * @param array $params
  * @param string $content
- * @param Smarty_Tiki $smarty
+ * @param \Tiki\Smarty\SmartyTiki $smarty
  * @param boolean $repeat
  * @return string
  * @throws Exception
@@ -46,9 +54,9 @@ class TextArea extends Base
         }
 
         // some defaults
-        $params['_toolbars'] = isset($params['_toolbars']) ? $params['_toolbars'] : 'y';
-        $params['_simple'] = isset($params['_simple']) ? $params['_simple'] : 'n';
-        $params['_preview'] = isset($params['_preview']) ? $params['_preview'] : 'n';
+        $params['_toolbars'] = $params['_toolbars'] ?? 'y';
+        $params['_simple'] = $params['_simple'] ?? 'n';
+        $params['_preview'] = $params['_preview'] ?? 'n';
 
         if (! isset($params['_wysiwyg'])) {
             if ($params['_simple'] === 'n') {
@@ -66,22 +74,24 @@ class TextArea extends Base
             }
         }
 
-        $params['_is_html'] = isset($params['_is_html']) ? $params['_is_html'] : $is_html;
+        $params['_is_html'] = $params['_is_html'] ?? $is_html;
 
-        $params['name'] = isset($params['name']) ? $params['name'] : 'edit';
-        $params['id'] = isset($params['id']) ? $params['id'] : 'editwiki';
-        $params['area_id'] = isset($params['area_id']) ? $params['area_id'] : $params['id'];    // legacy param for toolbars?
-        $params['class'] = isset($params['class']) ? $params['class'] : 'wikiedit form-control';
-        $params['comments'] = isset($params['comments']) ? $params['comments'] : 'n';
-        $params['autosave'] = isset($params['autosave']) ? $params['autosave'] : 'y';
+        $params['name'] = $params['name'] ?? 'edit';
+        $params['id'] = $params['id'] ?? 'editwiki';
+        $params['area_id'] = $params['area_id'] ?? $params['id'];    // legacy param for toolbars?
+        $params['class'] = $params['class'] ?? 'wikiedit form-control';
+        $params['comments'] = $params['comments'] ?? 'n';
+        $params['autosave'] = $params['autosave'] ?? 'y';
 
-        if (empty($params['syntax'])) { // work out if we have Tiki or Markdown syntax
+        $smarty->assign('textarea_id', $params['id']);
+
+        if (empty($params['_syntax'])) { // work out if we have Tiki or Markdown syntax
             $wikiParserParsable = new \WikiParser_Parsable($content);
             $syntaxPluginResult = $wikiParserParsable->guess_syntax($content);// for the toolbars
             if (isset($syntaxPluginResult['syntax'])) {
-                $params['syntax'] = $syntaxPluginResult['syntax'];
+                $params['_syntax'] = $syntaxPluginResult['syntax'];
             } else {
-                $params['syntax'] = 'tiki';
+                $params['_syntax'] = 'tiki';
             }// to pick the editor
             if (isset($syntaxPluginResult['editor']) && empty($content) && empty($params['_wysiwyg'])) {
                 $params['_wysiwyg'] = $syntaxPluginResult['editor'] === 'wysiwyg' ? 'y' : 'n';
@@ -90,22 +100,27 @@ class TextArea extends Base
 
         //codemirror integration
         if ($prefs['feature_syntax_highlighter'] === 'y') {
-            $params['data-codemirror'] = isset($params['codemirror']) ? $params['codemirror'] : '';
-            $params['data-syntax'] = $params['syntax'];
+            $params['data-codemirror'] = $params['codemirror'] ?? '';
+            $params['data-syntax'] = $params['_syntax'];
+            //add codemirror stuff
+            require_once("lib/codemirror_tiki/tiki_codemirror.php");
+            addCodemirror();
         }
         //keep params html5 friendly
         unset($params['codemirror']);
 
         // mainly for modules admin - preview is for the module, not the custom module so don;t need to confirmExit
-        $params['_previewConfirmExit'] = isset($params['_previewConfirmExit']) ? $params['_previewConfirmExit'] : 'y';
+        $params['_previewConfirmExit'] = $params['_previewConfirmExit'] ?? 'y';
 
         if (empty($params['section'])) {
-            global $section;
-            $params['section'] = $section ? $section : 'wiki page';
+            $section = Sections::getCurrentSection();
+            $params['section'] = $section ?: Sections::SECTION_WIKI_PAGE;
+        } elseif ($params['section'] === 'trackeritem') {
+            $params['section'] = 'trackers';
         }
         $html = '';
         $html .= '<input type="hidden" name="mode_wysiwyg" value="" /><input type="hidden" name="mode_normal" value="" />';
-        $html .= '<input type="hidden" name="syntax" value="' . $params['syntax'] . '" />';
+        $html .= '<input type="hidden" name="syntax" value="' . $params['_syntax'] . '" />';
 
         $auto_save_referrer = '';
         $auto_save_warning = '';
@@ -130,7 +145,7 @@ class TextArea extends Base
             ) . "\n";
                 $html = str_replace('class="alert alert-warning alert-dismissible"', 'class="alert alert-warning alert-dismissible" style="display:none;"', $html); // quickfix to stop this box appearing before doc.ready
         }
-        $params['switcheditor'] = isset($params['switcheditor']) ? $params['switcheditor'] : 'y';
+        $params['switcheditor'] = $params['switcheditor'] ?? 'y';
         $smarty->assign('comments', $params['comments']);   // 3 probably removable assigns
         $smarty->assign('switcheditor', $params['switcheditor']);
         $smarty->assign('toolbar_section', $params['section']);
@@ -172,7 +187,7 @@ class TextArea extends Base
                 $params['name'] = 'edit';
             }
 
-            if ($params['syntax'] === 'markdown') {
+            if ($params['_syntax'] === 'markdown') {
                 // markdown
                 $tuiOptions = $wysiwyglib->setUpMarkdownEditor($as_id, $content, $params, $auto_save_referrer);
 
@@ -182,10 +197,9 @@ class TextArea extends Base
                 $html .= '<div id="' . $as_id . '_editor"></div>';
             } else {
                 $params['_is_html'] = true;
-                $parsedContent = TikiLib::lib('edit')->parseToWysiwyg($content, false, false, ['wysiwyg' => true, 'html_editor' => true]);
                 $html .= <<<HTML
                 <textarea class="wikiedit d-none" name="{$params['name']}" id="{$as_id}">
-                    {$parsedContent}
+                    {$content}
                 </textarea>
                 <input type="hidden" name="wysiwyg" value="y" />
                 HTML;
@@ -197,8 +211,11 @@ class TextArea extends Base
 
             // setup for wiki editor
 
+            if (empty($params['disabled'])) {
+                unset($params['disabled']);
+            }
+
             $params['rows'] = ! empty($params['rows']) ? $params['rows'] : 20;
-    //      $params['cols'] = !empty($params['cols']) ? $params['cols'] : 80;
 
             $textarea_attributes = '';
             foreach ($params as $k => $v) {
@@ -206,19 +223,76 @@ class TextArea extends Base
                     $textarea_attributes .= ' ' . $k . '="' . $v . '"';
                 }
             }
-            if (empty($textarea_id)) {
-                $smarty->assign('textarea_id', $params['id']);
-            }
             $smarty->assign('textarea__toolbars', $params['_toolbars']);
             if ($textarea_attributes != '') {
                 $smarty->assign('textarea_attributes', $textarea_attributes);
             }
-            $smarty->assign('textarea_syntax', $params['syntax']);
-            $smarty->assign('objectId', isset($params['objectId']) ? $params['objectId'] : null);
+            $smarty->assign('textarea_syntax', $params['_syntax']);
+            $smarty->assign('objectId', $params['objectId'] ?? null);
             $smarty->assign_by_ref('textareadata', $content);
             $html .= $smarty->fetch('wiki_edit.tpl');
 
             $html .= "\n" . '<input type="hidden" name="wysiwyg" value="n" />';
+
+            // Attach language checker for plain textarea if enabled
+            if ($prefs['feature_language_check'] === 'y') {
+                global $user;
+
+                $lcAutoBool = $prefs['language_check_auto_detect'] === 'y';
+
+                // Always determine the effective language (even when auto-detect is on, we need to know it for validation)
+                $contentLang = isset($params['lang']) && $params['lang'] ? $params['lang'] : '';
+                if (! $contentLang && ! empty($params['objectId']) && ! empty($params['section']) && $params['section'] === 'wiki page') {
+                    $info = TikiLib::lib('tiki')->get_page_info($params['objectId']);
+                    if (! empty($info['lang'])) {
+                        $contentLang = $info['lang'];
+                    }
+                }
+                if ($contentLang) {
+                    $effectiveLanguage = $contentLang;
+                } else {
+                    $effectiveLanguage = Language::getCurrentLanguage();
+                }
+
+                // Always check if language is supported by LanguageTool (regardless of auto-detect setting)
+                $isLanguageSupported = false;
+                try {
+                    $ltUrl = Services_LanguageCheck_Controller::getLanguageToolUrl($prefs);
+                    $client = TikiLib::lib('tiki')->get_http_client();
+                    $client->setUri(rtrim($ltUrl, '/') . '/v2/languages');
+                    $client->setMethod(\Laminas\Http\Request::METHOD_GET);
+                    $client->setOptions(['timeout' => 5]);
+                    $response = $client->send();
+                    if ($response->isSuccess()) {
+                        $data = json_decode($response->getBody(), true);
+                        if (is_array($data)) {
+                            $supportedCodes = [];
+                            foreach ($data as $langInfo) {
+                                $code = $langInfo['code'] ?? ($langInfo['longCode'] ?? null);
+                                if ($code) {
+                                    $supportedCodes[] = strtolower($code);
+                                    $shortCode = explode('-', $code)[0];
+                                    if ($shortCode) {
+                                        $supportedCodes[] = strtolower($shortCode);
+                                    }
+                                }
+                            }
+                            $effectiveLangLower = strtolower($effectiveLanguage);
+                            $effectiveLangShort = strtolower(explode('-', $effectiveLanguage)[0]);
+                            $isLanguageSupported = in_array($effectiveLangLower, $supportedCodes) || in_array($effectiveLangShort, $supportedCodes);
+                        }
+                    }
+                } catch (Exception $e) {
+                    // If we can't check, assume unsupported to avoid silent failures
+                    $isLanguageSupported = false;
+                }
+
+                $auto = $lcAutoBool ? 'true' : 'false';
+                $debounce = (int) ($prefs['language_check_debounce_ms'] ?? 1000);
+                $lcDefault = json_encode($effectiveLanguage);
+                $lcIsSupported = $isLanguageSupported ? 'true' : 'false';
+                $headerlib->add_js_module("import initTextareaLanguageCheck from \"@jquery-tiki/languageCheckTextarea\"; initTextareaLanguageCheck('#$as_id', { enabled: true, debounceMs: $debounce, autoDetect: $auto, defaultLanguage: $lcDefault, actualLanguage: $lcDefault, isLanguageSupported: $lcIsSupported });");
+            }
         }   // wiki or wysiwyg
 
         $js_editconfirm = '';
@@ -358,7 +432,7 @@ class TextArea extends Base
             $headerlib->add_jsfile('lib/jquery_tiki/edit_preview.js');
         }
 
-        if ($prefs['markdown_enabled'] === 'y' && ($params['syntax'] === 'tiki' || $params['syntax'] === 'markdown')) {
+        if ($prefs['markdown_enabled'] === 'y' && ($params['_syntax'] === 'tiki' || $params['_syntax'] === 'markdown')) {
             $headerlib->add_js(/** @lang JavaScript */ '
     function addSyntaxPlugin(domId, $form) {
         const $textarea = $("#" + domId),

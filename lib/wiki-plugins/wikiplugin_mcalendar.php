@@ -183,11 +183,7 @@ function wikiplugin_mcalendar_info()
 
 function wikiplugin_mcalendar($data, $params)
 {
-    global $tikilib;
-
     extract($params, EXTR_SKIP);
-
-    $out = '';
 
     if (! isset($template)) {
         $template = '%baktun%.%katun%.%tun%.%winal%.%kin% %tzolkin13% %tzolkin20name% %haabkin% %haabwinalname%';

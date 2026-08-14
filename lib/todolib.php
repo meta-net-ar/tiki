@@ -111,7 +111,6 @@ class TodoLib
     {
         switch ($todo['objectType']) {
             case 'todo':
-                // echo '<pre>ALREADY';print_r($this->alreadyNotif ($todo['todoId'])); echo '</pre>';
                 $todo['for']['after'] = $todo['after'];
                 $objects = $this->listObjectsTodo($todo['for'], $this->alreadyNotif($todo['todoId']));
 
@@ -122,12 +121,10 @@ class TodoLib
                     }
                     $this->$func($todo, $objects);
                 }
-                // echo '<pre>MAIL';print_r($objects); echo '</pre>';
                 break;
 
             default:
                 $objects = $this->listObjectsTodo($todo);
-                // echo '<pre>';print_r($objects); echo '</pre>';
                 if (! empty($objects)) {
                     $func = 'applyTodo_' . $todo['objectType'];
                     if (! method_exists($this, $func)) {
@@ -195,6 +192,7 @@ class TodoLib
     {
         $db = TikiDb::get();
         $query = 'DELETE FROM `tiki_todo_notif` WHERE `todoId` NOT IN (SELECT `todoId` FROM `tiki_todo`)';
+        $db->query($query);
     }
 
     /**
@@ -305,10 +303,9 @@ class TodoLib
      */
     public function notifyTodo_tracker($todo, $objects)
     {
-        global $prefs;
         $smarty = TikiLib::lib('smarty');
         $trklib = TikiLib::lib('trk');
-        $tikilib = TikiLib::lib('tiki');
+        \TikiLib::lib('tiki'); //Load TikiLib for side effects
         foreach ($objects as $object) {
             // get the creator
             $creators = [$object['field_values'][0]['value']];

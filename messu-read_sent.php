@@ -8,8 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'user_messages';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_USER_MESSAGES;
+Sections::setCurrentSection($section);
 $messulib = TikiLib::lib('message');
 $access->check_user($user);
 $access->check_feature('feature_messages');

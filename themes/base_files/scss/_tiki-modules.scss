@@ -1,6 +1,10 @@
 // Redundant for .module.card, but needed when nobox=y.
-.module {
+.module.no-box {
     position: relative;
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 var(--bs-navbar-nav-link-padding-x);
 }
 
 header.container,
@@ -8,14 +12,18 @@ header.container,
     margin-bottom: 0;
 }
 
+// add no padding on main navbar (top modules area) to render the navbar with no gaps on sides
+#main-navbar > .container-fluid {
+    padding: 0;
+}
 
 .tiki.layout_classic .header_container .container.container-std {
     max-width: 100% !important;
     width: 100% !important;
 }
 
-// Vertically center visible content in fixed-top navbar
-@media(min-width: 720px) {.layout_social .fixed-top .top_modules .module { align-self: center; } }
+// Vertically center visible content in sticky-top navbar
+@media(min-width: 720px) {.layout_social .sticky-top .top_modules .module { align-self: center; } }
 
 .top_modules,
 .topbar_modules,
@@ -44,6 +52,62 @@ header.container,
 //}
 
 //***** Site Header & Identity *****/
+
+//==================================================
+// NAVBAR - SEMANTIC STRUCTURE
+// Clean navbar using Bootstrap 5 utilities
+// No JavaScript needed!
+//==================================================
+
+// Site Header (and any menu module inside)
+#site-header,
+#top_modules > .module.no-box.box-menu {
+    padding: 0;
+    > div > nav {
+        padding: 0 calc(var(--bs-gutter-x) * 0.5);
+    }
+}
+
+// Main navbar
+#page-header > .top_modules, // This is on e.g. tiki-wizard_admin.php
+#main-navbar .top_modules, // ... and this is in Classic Tiki layout only (TODO: try to unify the templates)
+#main-navbar {
+    padding-top: 0;
+    padding-bottom: 0;
+    flex-wrap: wrap;
+
+    // Logo sizing
+    .sitelogo-img {
+        max-height: 65px; // Default fallback if not set in module
+        width: auto;
+        height: auto;
+        object-fit: contain;
+
+        // Responsive: smaller on mobile
+        @media (max-width: 767px) {
+            max-height: 45px;
+        }
+    }
+
+    // Navbar brand (logo + title container)
+    .navbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.5rem 0;
+
+//        .sitetitle {             (Handled by CSS variables)
+//            font-size: 1.25rem;
+//            font-weight: 500;
+//        }
+//
+//        .sitesubtitle {
+//            font-size: 0.875rem;
+//            opacity: 0.8;
+//        }
+    }
+}
+
 .box-quickadmin li {
     font-size: 0.9em;
 }
@@ -77,8 +141,8 @@ li.archivedate {
 // /***** Boxes *****/
 // ** Modules **/
 // When the module title is a link, make it the card-title color.
-.card.module .card-title a {
-    color: var(--bs-card-title-color);
+.card.module .tiki-card-header-title a {
+    color: var(--bs-card-cap-color);
 }
 
 .minichatdiv {
@@ -191,6 +255,131 @@ li.archivedate {
 }
 
 // /* Facebook module styling */
+.fb-module-feed {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.fb-post {
+    background: #fff;
+    border: 1px solid #dddfe2;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+.fb-author {
+    font-weight: 600;
+    font-size: 15px;
+    color: #050505;
+    margin-bottom: 8px;
+}
+
+.fb-text {
+    font-size: 14px;
+    color: #050505;
+    line-height: 1.5;
+    margin-bottom: 10px;
+    word-wrap: break-word;
+}
+
+.fb-image {
+    margin: 0 -12px 10px -12px;
+    line-height: 0;
+
+    img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 4px;
+    }
+}
+
+.fb-attachment-image {
+    margin: 0 -12px 10px -12px;
+    line-height: 0;
+    
+    img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 4px;
+    }
+}
+
+.fb-attachment-link {
+    background: #f0f2f5;
+    border: 1px solid #dddfe2;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+}
+
+.fb-att-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #050505;
+    margin-bottom: 4px;
+
+    a {
+        color: #050505;
+        text-decoration: none;
+        
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}
+
+.fb-att-desc {
+    font-size: 13px;
+    color: #65676b;
+    line-height: 1.4;
+}
+
+.fb-footer {
+    margin-top: 8px;
+}
+
+.fb-meta {
+    font-size: 13px;
+    color: #65676b;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.fb-type {
+    font-weight: 500;
+}
+
+.fb-see-more {
+    display: inline-block;
+    background: #1877f2;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s;
+
+    &:hover {
+        background: #166fe5;
+        color: #fff;
+        text-decoration: none;
+    }
+}
+
+.fb-pagination {
+    text-align: center;
+    padding: 12px 0;
+    border-top: 1px solid #dddfe2;
+}
+
+// Legacy styles (kept for backward compatibility)
 .fb-story {
     font-style: italic;
 }
@@ -219,7 +408,7 @@ li.archivedate {
 
 // --------------- logo module start ------------------ //
 // Not Basic Bootstrap (not layout_social)
-header:not(.fixed-top) a.sitelogo {
+header:not(.sticky-top) a.sitelogo {
     padding-top: $spacer * .7;
     padding-bottom: $spacer * .7;
 }
@@ -243,10 +432,10 @@ header:not(.fixed-top) a.sitelogo {
     }
 }
 
-// Basic Bootstrap (layout_social)
-.layout_social .fixed-top .sitesubtitle {
-    font-size: calc(var(--bs-navbar-brand-font-size) * .8);
-}
+// // Basic Bootstrap (layout_social)
+// .layout_social .sticky-top .sitesubtitle {
+//     font-size: calc(var(--bs-navbar-brand-font-size) * .8);
+// }
 
 // Remove Bootstrap default top and bottom padding on navbars in modules (nested navbars)
 .layout_social header .top_modules .navbar {
@@ -269,7 +458,13 @@ li.login_link ul li a {
 }
 
 .siteloginbar_popup img {
-    height: 24px;
+    border-radius: var(--bs-border-radius);
+    height: 2.5rem;
+}
+
+.siteloginbar_poppedup.dropdown-menu {
+    width: 300px;
+    max-width: 90vw;
 }
 
 .navbar-form .siteloginbar_poppedup .form-control,
@@ -349,7 +544,7 @@ footer.footer .modules > .module:not(.card) {
     margin-right: auto;
 }
 
-// Font size and weight for static position logo module (fixed-top navbar is below)
+// Font size and weight for static position logo module (sticky-top navbar is below)
 .sitetitle {
     font-size: var(--tiki-site-title-font-size);
     font-weight: var(--tiki-site-title-font-weight);
@@ -360,10 +555,8 @@ footer.footer .modules > .module:not(.card) {
     font-weight: var(--tiki-site-subtitle-font-weight);
 }
 
-// Font size and weight for fixed-top position logo module (likely smaller than for static position)
-.navbar-fixed-top, // Where is this used? - gary
-.layout_social .top_modules, // This was .topbar_modules until Nov 2022 so rarely applied
-header.fixed-top {
+// Font size and weight for sticky-top position logo module (likely smaller than for static position)
+.layout_social .top_modules { // This was .topbar_modules until Nov 2022 so rarely applied
 //    .sitelogo a img {
 //        display: inline;
 //        margin-top: $tiki-navbar-fixed-height / 10;
@@ -373,16 +566,16 @@ header.fixed-top {
 //    }
     .sitetitle {
         //        float: left;
-        font-size: var(--tiki-fixed-top-site-title-font-size);
-        font-weight: var(--tiki-fixed-top-site-title-font-weight);
+        font-size: var(--tiki-sticky-top-site-title-font-size);
+        font-weight: var(--tiki-sticky-top-site-title-font-weight);
         //        line-height: 2;
         //        margin-bottom: 0;
         //        margin-left: 1rem;
       }
         .sitesubtitle {
             //        float: left;
-            font-size: var(--tiki-fixed-top-site-subtitle-font-size);
-            font-weight: var(--tiki-fixed-top-site-subtitle-font-weight);
+            font-size: var(--tiki-sticky-top-site-subtitle-font-size);
+            font-weight: var(--tiki-sticky-top-site-subtitle-font-weight);
             //        margin-left: 1.5rem;
             //    }
             #topbar_modules {
@@ -406,14 +599,6 @@ header.fixed-top {
             //    }
         }
     }
-.navbar-fixed-top,
-#navbar-collapse-social {
-    .navbar {
-        margin-bottom: 0;
-        min-height: 32px;
-
-    }
-}
 
 .box-menu .nav .nav-link {
     padding-left: 0;
@@ -450,4 +635,55 @@ header.fixed-top {
         .q23 { width: 50%; }
         .tips em { display: block; word-break: break-word; }
     }
+}
+
+// admin toogle
+.modules-admin-toggle-container {
+    width: 100%;
+    height: 35px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+  }
+
+#toggleSwitch_modules {
+    margin: 0;
+}
+
+// mod-collapse styles
+.btn-toggle:not(.collapsed) .show-text {
+    display: none;
+}
+.btn-toggle:not(.collapsed) .hide-text {
+    display: inline;
+}
+.btn-toggle.collapsed .show-text {
+    display: inline;
+}
+.btn-toggle.collapsed .hide-text {
+    display: none;
+}
+
+// Quickadmin module Permissions link
+#quickadmin div.dropdown-item {
+    padding: 0 var(--bs-dropdown-item-padding-x);
+    & .btn-link {
+        color: var(--bs-dropdown-link-color);
+        padding: 0;
+    }
+}
+
+// Remove unnecessary card-body horizontal padding in menu module in fixed-width layout side columns to reduce text wrapping and overflow
+.fixed_width {
+    .col1,
+    .col2 {
+        .box-menu .card-body {
+            --bs-card-spacer-x: 0rem;
+        }
+    }
+}
+
+// Remove redundant card-body vertical padding in menu module, when nobox not eq y (nav already has top and bottom margins).
+.box-menu .card-body {
+    --bs-card-spacer-y: 0rem;
 }

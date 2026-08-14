@@ -77,7 +77,7 @@
             <input type="hidden" name="casesensitive" value="{$casesensitive}">
             <input type="hidden" name="paddingLength" value="{$paddingLength}">
             <input type="submit" class="btn btn-primary btn-sm" name="replace" value="{tr}Replace selected{/tr}">
-            {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
         {/if}
     </form>
 </div>

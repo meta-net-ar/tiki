@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_useringroup_info()
 {
-    global $prefs;
     $info = [
         'name' => tra('UserInGroup'),
         'documentation' => 'PluginUserInGroup',
@@ -57,30 +56,12 @@ function wikiplugin_useringroup_info()
 
 function wikiplugin_useringroup($data, $params)
 {
-    global $tikilib, $prefs, $info;
     $userlib = TikiLib::lib('user');
 
-    $plugindata = [];
+    $result = $params['falsetext'];
 
-    $plugindata['truetext'] = 'true';
-    $plugindata['falsetext'] = 'false';
-
-    extract($params, EXTR_SKIP);
-
-    if (! isset($params['testgroup'])) {
-        return ("<span class='error'>Error: sorry you need to specify a testgroup parameter</span>");
-    }
-
-    if (! isset($params['userId'])) {
-        return ("<span class='error'>Error: sorry you need to specify a userId parameter</span>");
-    }
-
-    $plugindata = array_merge($plugindata, $params);
-
-    $result = $plugindata['falsetext'];
-
-    if ($userlib->user_is_in_group($plugindata['userId'], $plugindata['testgroup'])) {
-        $result = $plugindata['truetext'];
+    if ($userlib->user_is_in_group($params['userId'], $params['testgroup'])) {
+        $result = $params['truetext'];
     }
 
     return $result;

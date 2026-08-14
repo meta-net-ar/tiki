@@ -18,16 +18,18 @@ get:
               fields:
                 type: array
                 items:
-                  type: object
-                  description: Field definition
+                  $ref: schemas-TrackerField.yaml
               types:
                 type: object
-                description: All field types supported by the system
+                description: Map of type code to field type definition (enabled types).
+              typesDisabled:
+                type: object
+                description: Map of type code to field type definition (disabled types).
               duplicates:
                 type: array
                 items:
-                  type: object
-                  description: List of fields with conflicting permanent names
+                  type: string
+                description: List of permNames that conflict with another field in the tracker.
     '403':
       description: forbidden
       content:
@@ -129,6 +131,8 @@ post:
           schema:
             type: object
             properties:
+              title:
+                type: string
               trackerId:
                 type: integer
               fieldId:
@@ -141,10 +145,15 @@ post:
                 type: string
               types:
                 type: object
+                description: Map of type code to field type definition.
               description:
                 type: string
               descriptionIsParsed:
                 type: string
+                nullable: true
+              modal:
+                type: string
+                nullable: true
               fieldPrefix:
                 type: string
     '403':
@@ -183,10 +192,13 @@ delete:
           schema:
             type: object
             properties:
+              status:
+                type: string
               trackerId:
                 type: integer
               fields:
-                type: object
+                type: array
+                description: Remaining field definitions after deletion.
     '403':
       description: forbidden
       content:

@@ -57,14 +57,23 @@ function wikiplugin_twitter_info()
                 'name' => tra('Link Color'),
                 'description' => tra('Text color for individual tweets. Default is theme default.'),
                 'since' => '7.0',
+                'default' => '',
                 'accepted' => tra('Valid HTML color codes (with beginning #) or names.'),
                 'filter' => 'text'
+            ],
+            'tweetlimit' => [
+                'required' => false,
+                'name' => tra('Tweet Limit'),
+                'description' => tra('Display a specific number of items between 1 and 20. Default is 10.'),
+                'filter' => 'digits',
+                'default' => 10
             ],
             'tweetbg' => [
                 'required' => false,
                 'name' => tra('Border Color'),
                 'description' => tra('Change the border color used by the widget. Default is theme default.'),
                 'since' => '7.0',
+                'default' => '',
                 'accepted' => tra('Valid HTML color codes (with beginning #) or names.'),
                 'filter' => 'text'
             ],
@@ -95,6 +104,7 @@ function wikiplugin_twitter_info()
                 'description' => tra('Default is with Header'),
                 'since' => '13.1',
                 'filter' => 'text',
+                'default' => '',
                 'options' => [
                     ['text' => tra('Header'), 'value' => ''],
                     ['text' => tra('No Header'), 'value' => 'y'],
@@ -107,6 +117,7 @@ function wikiplugin_twitter_info()
                 'description' => tra('Default is with Footer'),
                 'since' => '13.1',
                 'filter' => 'text',
+                'default' => '',
                 'options' => [
                     ['text' => tra('Footer'), 'value' => ''],
                     ['text' => tra('No Footer'), 'value' => 'y'],
@@ -119,6 +130,7 @@ function wikiplugin_twitter_info()
                 'description' => tra('Default is with Borders'),
                 'since' => '13.1',
                 'filter' => 'text',
+                'default' => '',
                 'options' => [
                     ['text' => tra('Borders'), 'value' => ''],
                     ['text' => tra('No Borders'), 'value' => 'y'],
@@ -131,6 +143,7 @@ function wikiplugin_twitter_info()
                 'description' => tra('Default is with Scrollbar'),
                 'since' => '13.1',
                 'filter' => 'text',
+                'default' => '',
                 'options' => [
                     ['text' => tra('Scrollbar'), 'value' => ''],
                     ['text' => tra('No Scrollbar'), 'value' => 'y'],
@@ -143,6 +156,7 @@ function wikiplugin_twitter_info()
                 'description' => tra('Transparent Shell Background. Default is theme default'),
                 'since' => '7.0',
                 'filter' => 'text',
+                'default' => '',
                 'options' => [
                     ['text' => tra('Theme default'), 'value' => ''],
                     ['text' => tra('Transparent'), 'value' => 'transparent'],
@@ -154,64 +168,47 @@ function wikiplugin_twitter_info()
 
 function wikiplugin_twitter($data, $params)
 {
-    // Initialize default values
-    $datachromehtml_ = '';
-    $width_ = 'auto';
-    $height_ = 300;
-    $theme_ = 'light';
-
-    $default = ['shellbg' => '', 'shellcolor' => '', 'tweetbg' => '', 'tweetcolor' => '', 'width' => 'auto', 'height' => 300];
-    $params = array_merge($default, $params);
     extract($params, EXTR_SKIP);
 
     // Variables sanitizing
-    $tweetlimit = isset($tweetlimit) ? (int)$tweetlimit : 0;
-    $tweetbg = isset($tweetbg) ? preg_replace('/[^#0-9a-zA-Z]/', '', $tweetbg) : '';
-    $tweetcolor = isset($tweetcolor) ? preg_replace('/[^#0-9a-zA-Z]/', '', $tweetcolor) : '';
-    $tweet = isset($tweet) ? preg_replace('/[^#0-9a-zA-Z%\/=]/', '', $tweet) : '';
-    $widgetId = isset($widgetId) ? preg_replace('/[^0-9]/', '', $widgetId) : '';
+    $tweetbg = preg_replace('/[^#0-9a-zA-Z]/', '', $tweetbg);
+    $tweetcolor = preg_replace('/[^#0-9a-zA-Z]/', '', $tweetcolor);
+    $tweet = preg_replace('/[^#0-9a-zA-Z%\/=]/', '', $tweet);
+    $widgetId = preg_replace('/[^0-9]/', '', $widgetId);
 
     $datachrome = [];
-    if (isset($noheader) && $noheader == 'y') {
+    if ($noheader == 'y') {
         $datachrome[] = 'noheader';
     }
-    if (isset($nofooter) && $nofooter == 'y') {
+    if ($nofooter == 'y') {
         $datachrome[] = 'nofooter';
     }
-    if (isset($noborders) && $noborders == 'y') {
+    if ($noborders == 'y') {
         $datachrome[] = 'noborders';
     }
-    if (isset($noscrollbar) && $noscrollbar == 'y') {
+    if ($noscrollbar == 'y') {
         $datachrome[] = 'noscrollbar';
     }
-    if (isset($shellbg) && $shellbg == 'transparent') {
-        $datachrome[] = 'transparent' ;
-    }
+
+    $datachrome[] = $shellbg ;
+    $attributes = "";
     if (count($datachrome) > 0) {
-        $datachromehtml_ = isset($datachromehtml) ? "data-chrome=' " . implode(' ', $datachrome) . "' " : '';
+        $attributes = " data-chrome='" . implode(' ', $datachrome) . "'";
     }
-    if (isset($theme) && $theme != 'dark') {
-        $theme_ = 'light';
+    if ($width != 'auto') {
+        $width = preg_replace('/[^0-9]/', '', $width);
     }
-    if (isset($width) && $width != 'auto') {
-        $width_ = isset($width) ? preg_replace('/[^0-9]/', '', $width) : '';
-    }
-    $height_ = isset($height) ? (int)$height : 300;
+
+    $attributes .= empty($tweetlimit) ? '' : " data-tweet-limit='$tweetlimit'";
+    $attributes .= empty($tweetcolor) ? "" : " data-link-color='$tweetcolor'";
+    $attributes .= empty($tweetbg) ? "" : " data-border-color='$tweetbg'";
+    $attributes .= " data-theme='$theme' data-height='$height' data-width='$width'";
 
     // Inspiration: http://stackoverflow.com/questions/14303710/how-to-customize-twitter-widget-style
-    // and https://dev.twitter.com/web/embedded-timelines
+    // and https://docs.x.com/x-for-websites/oembed-api#embedded-timelines
     // Note: the $widgetId is more important than the $tweet in defining what is displayed
     $html = "<a class=\"twitter-timeline\"  href=\"https://twitter.com/$tweet\" data-widget-id=\"$widgetId\"
-$datachromehtml_ 
-" . (empty($tweetlimit) ? '' : " data-tweet-limit='$tweetlimit'\n") .
-    (empty($tweetcolor) ? "" : " data-link-color='$tweetcolor'\n") .
-    (empty($tweetbg) ? "" : " data-border-color='$tweetbg'\n") .
-    "data-theme='$theme_' 
-height='$height_'
-width='$width_'
-" .
-    "data-show-replies='false'
-data-aria-polite='polite'>Tweets from @$tweet</a>
+" . $attributes . "data-show-replies='false' data-aria-polite='polite'>Tweets from @$tweet</a>
 <script>
 !function(d,s,id){
     var js,fjs=d.getElementsByTagName(s)[0];
@@ -225,9 +222,5 @@ data-aria-polite='polite'>Tweets from @$tweet</a>
 
 }(document,'script','twitter-wjs');
 </script>";
-
-    //debug return '~np~'.nl2br(htmlspecialchars($html)).'~/np~';
-    //debug return '~np~'.$html.nl2br(htmlspecialchars($html)).'~/np~';
-
     return '~np~' . $html . '~/np~';
 }

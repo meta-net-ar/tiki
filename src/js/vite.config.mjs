@@ -3,12 +3,12 @@ import vue from "@vitejs/plugin-vue";
 import { resolve } from "path";
 import { visualizer } from "rollup-plugin-visualizer";
 import { viteStaticCopy } from "vite-plugin-static-copy";
-import { glob } from "glob";
+import { globSync } from "tinyglobby";
 import path from "node:path";
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers';
-import postcssRootToHost from "./postcssRootToHost";
+import postcssRootToHost from "./postcssRootToHost.js";
 /*
 
 Overarching principles:
@@ -96,54 +96,84 @@ Currently (2023-09-27), this is problematic for common CSS.  If input module1 an
 
 export default defineConfig(({ command, mode }) => {
     let rollupInput = {};
-    /* Proof of concept.  Inspired by the documentation for input on https://rollupjs.org/configuration-options/#input but needs to be generalized further so it's not only used for jquery-tiki.  But it does work to generate stuff in subdirectories!
 
-    We now need a function that computes everything from the glob - benoitg - 2023-11-10 */
-    Object.assign(
-        rollupInput,
-        Object.fromEntries(
-            glob.sync("src/js/jquery-tiki/**/*.js", { ignore: ["**/node_modules/**", "**/*.test.js"] }).map((file) => {
-                //console.log(path.relative(__dirname, file));
-                return [
-                    // This remove `src/js/jquery-tiki` as well as the file extension from each
-                    // file, so e.g. src/js/jquery-tiki/nested/foo.js becomes src/js/jquery-tiki/nested/foo
-                    "jquery-tiki/" + path.relative("src/js/jquery-tiki", file.slice(0, file.length - path.extname(file).length)),
-                    // This expands the relative paths to absolute paths, so e.g.
-                    resolve(__dirname, path.relative(__dirname, file)),
-                ];
-            })
-        )
-    );
+    addGlobEntries(rollupInput, [
+        { prefix: "jquery-tiki/", src: "src/js/jquery-tiki" },
+        { prefix: "common-reexported/", src: "src/js/common-reexported" },
+        { prefix: "@tiki/editor-toolbar/", src: "src/js/@tiki/editor-toolbar" },
+        { prefix: "@tiki/plugin-base/", src: "src/js/@tiki/plugin-base" },
+        { prefix: "@tiki/plugins/", src: "src/js/@tiki/plugins" },
+        { prefix: "@tiki/tracker-field-base/", src: "src/js/@tiki/tracker-field-base" },
+        { prefix: "@tiki/tracker-fields/", src: "src/js/@tiki/tracker-fields" },
+    ]);
+
     Object.assign(rollupInput, {
-        //Watch out, __dirname is the path of the config file, no matter how vite is called...
+        //Watch out, import.meta.dirname is the path of the config file, no matter how vite is called...
+        "avatar-generator": resolve(import.meta.dirname, "avatar-generator/index.js"),
         "color-picker": resolve("node_modules/@shoelace-style/shoelace/dist/components/color-picker/color-picker.js"),
-        "duration-picker": resolve(__dirname, "vue-mf/duration-picker/src/duration-picker.js"),
-        "emoji-picker": resolve(__dirname, "vue-mf/emoji-picker/src/emoji-picker.js"),
-        "element-plus-ui/autocomplete": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/autocomplete.js"),
-        "element-plus-ui/datepicker": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/datepicker.js"),
-        "element-plus-ui/fileGalUploader": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/fileGalUploader.js"),
-        "element-plus-ui/select": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/select.js"),
-        "element-plus-ui/transfer": resolve(__dirname, "vue-widgets/element-plus-ui/src/elements/transfer.js"),
-        kanban: resolve(__dirname, "vue-mf/kanban/src/kanban.js"),
-        "root-config": resolve(__dirname, "vue-mf/root-config/src/root-config.js"),
-        styleguide: resolve(__dirname, "vue-mf/styleguide/src/styleguide.js"),
-        "tiki-offline": resolve(__dirname, "vue-mf/tiki-offline/src/tiki-offline.js"),
-        "toolbar-dialogs": resolve(__dirname, "vue-mf/toolbar-dialogs/src/toolbar-dialogs.js"),
-        "tiki-iot-dashboard": resolve(__dirname, "tiki-iot/dashboard.js"),
-        "tiki-iot-dashboard-all": resolve(__dirname, "tiki-iot/dashboard-all.js"),
-        "tiki-vue-sfc-loader": resolve(__dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
+        "duration-picker": resolve(import.meta.dirname, "vue-mf/duration-picker/src/duration-picker.js"),
+        "emoji-picker": resolve(import.meta.dirname, "vue-mf/emoji-picker/src/emoji-picker.js"),
+        "element-plus-ui/autocomplete": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/autocomplete.js"),
+        "element-plus-ui/datepicker": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/datepicker.js"),
+        "element-plus-ui/fileGalUploader": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/fileGalUploader.js"),
+        "element-plus-ui/fileInput": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/fileInput.js"),
+        "element-plus-ui/input": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/input.js"),
+        "element-plus-ui/message": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/message.js"),
+        "element-plus-ui/select": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/select.js"),
+        "element-plus-ui/slider": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/slider.js"),
+        "element-plus-ui/transfer": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/transfer.js"),
+        "element-plus-ui/backtop": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/elements/backtop.js"),
+        "element-plus-ui/datepicker-root-css": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/components/DatePicker/datePicker.scss"),
+        "element-plus-ui/autocomplete-root-css": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/components/Autocomplete/autocomplete.scss"),
+        "element-plus-ui/input-root-css": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/components/Input/input.scss"),
+        "element-plus-ui/select-root-css": resolve(import.meta.dirname, "vue-widgets/element-plus-ui/src/components/Select/select.scss"),
+        "tiki-html5-qrcode": resolve(import.meta.dirname, "tiki-html5-qrcode/index.js"),
+        kanban: resolve(import.meta.dirname, "vue-mf/kanban/src/kanban.js"),
+        "root-config": resolve(import.meta.dirname, "vue-mf/root-config/src/root-config.js"),
+        "tiki-3d-model-viewer": resolve(import.meta.dirname, "tiki-model3dviewer/model3dviewer.js"),
+        "tiki-glightbox": resolve(import.meta.dirname, "tiki-glightbox/glightbox-index.js"),
+        "tiki-sentry-browser": resolve(import.meta.dirname, "tiki-sentry-browser/sentry-browser.js"),
+        "tiki-figlet": resolve(import.meta.dirname, "tiki-figlet/figlet.js"),
+        styleguide: resolve(import.meta.dirname, "vue-mf/styleguide/src/styleguide.js"),
+        "tiki-offline": resolve(import.meta.dirname, "vue-mf/tiki-offline/src/tiki-offline.js"),
+        "toolbar-dialogs": resolve(import.meta.dirname, "vue-mf/toolbar-dialogs/src/toolbar-dialogs.js"),
+        "tracker-rules": resolve(import.meta.dirname, "vue-mf/tracker-rules/src/tracker-rules.js"),
+        "tiki-iot-dashboard": resolve(import.meta.dirname, "tiki-iot/dashboard.js"),
+        "tiki-iot-dashboard-all": resolve(import.meta.dirname, "tiki-iot/dashboard-all.js"),
+        "tiki-mermaid": resolve(import.meta.dirname, "tiki-mermaid/mermaid.js"),
+        "tiki-lottie": resolve(import.meta.dirname, "tiki-lottie/lottie.js"),
+        "tiki-vue-sfc-loader": resolve(import.meta.dirname, "tiki-vue-sfc-loader/src/tiki-vue-sfc-loader.js"),
+        "tiki-toast-ui": resolve(import.meta.dirname, "tiki-toast-ui/toast-index.js"),
+        "@tiki/modules/search": resolve(__dirname, "@tiki/modules/search.js"),
+        "@tiki/ui-utils": resolve(import.meta.dirname, "@tiki/ui-utils/index.js"),
+        "wysiwyg/summernote": resolve(import.meta.dirname, "wysiwyg/summernote/index.js"),
+        "wysiwyg/plugin": resolve(import.meta.dirname, "wysiwyg/plugin.js"),
     });
     return {
         base: "/public/generated/js", //This must NOT have a trailing slash
         publicDir: false, //tiki already uses public for other purposes.  If we want to use this feature we can create a src/public folder for it.
         resolve: {
             alias: {
-                "moment-timezone": resolve(__dirname, "../../node_modules/moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js"),
-            }
+                "@wysiwyg/summernote": resolve(import.meta.dirname, "wysiwyg/summernote/index.js"),
+                "moment-timezone": resolve(import.meta.dirname, "../../node_modules/moment-timezone/builds/moment-timezone-with-data-10-year-range.min.js"),
+                "html2canvas": "html2canvas-pro",
+                // ui-predicate-vue3
+                "ui-predicate-vue3/dist/ui-predicate-vue3.css": resolve(
+                    import.meta.dirname,
+                    "../../node_modules/ui-predicate-vue3/dist/ui-predicate-vue3.css"
+                ),
+                // npm "main" is Parcel IIFE assigning to undeclared parcelRequire — invalid in ESM (strict). Bundle CJS sources.
+                "ui-predicate-core": resolve(
+                    import.meta.dirname,
+                    "../../node_modules/ui-predicate-core/src/index.js"
+                ),
+            },
         },
         build: {
-            outDir: resolve(__dirname, "../../public/generated/js"),
+            outDir: resolve(import.meta.dirname, "../../public/generated/js"),
             emptyOutDir: true,
+            // Allow large tools: SVGEdit, Avatar Generator, SFC Loader, Emoji Picker, 3D Viewer.
+            chunkSizeWarningLimit: 2500,
             minify: mode === "production",
             sourcemap: mode === "production",
             cssCodeSplit: true,
@@ -152,33 +182,60 @@ export default defineConfig(({ command, mode }) => {
             target: "es2022", //https://caniuse.com/?search=es2022 Who cares about IE these days...
             optimizeDeps: {
                 disabled: false,
-                include: ['@event-calendar/core'],
+                include: ["@event-calendar/core"],
                 //If you ever need to debug a dependency and see your changes do this (ref: https://dev.to/hontas/using-vite-with-linked-dependencies-37n7):
                 //exclude: ["svelte"],
             },
             rollupOptions: {
                 // NOTE: Keep the list alphabetically sorted.
                 external: [
+                    /* src/js/common-reexported section
+                    */
+                    /^common-reexported\/.+/,
+
+                    /* src/js/common-externals section
+                    Loaded through path_js_importmap_generator.php or directly in inline modules
+                    As of 2026-03-11, some modules are missing from this list.  They must be found, added here, and functionality checked - benoitg
+                    */
+                    "@dicebear/collection",
+                    "@dicebear/core",
+                    /^@jquery-tiki\/.+/,
+                    "@lottiefiles/dotlottie-wc",
+                    "@popperjs/core",
                     /^@vue-mf\/.+/,
                     /^@vue-widgets\/.+/,
-                    /^@jquery-tiki\/.+/,
-                    "@popperjs/core",
+                    "@wysiwyg/summernote",
+                    "@zxing/library",
+                    "altcha",
                     "bootstrap",
                     "clipboard",
                     "converse.js",
                     "dompurify",
                     "driver.js",
+                    "html2canvas-pro",
                     "jquery",
                     "jquery-ui",
                     "jquery-validation",
-                    /^moment\/.+/,
-                    "select2",
+                    "mermaid",
+                    "moment",
+                    /^moment\/.+/, //Moment submodules
                     "pivottablejs",
+                    "plyr",
                     "reveal.js",
                     "sortablejs",
                     "subtotal",
                     "summernote",
+                    "svgedit",
+                    "three",
+                    "underscore",
                     "vue",
+                    "vue3-sfc-loader",
+
+                    /* src/js/common-externals-legacy-cjs section
+                    Loaded manually through headerlib add_js_file()
+                    */
+                    "swiper",
+                    "tablesorter",
                 ],
                 input: rollupInput,
                 output: {
@@ -212,33 +269,6 @@ export default defineConfig(({ command, mode }) => {
             postcss: {
                 plugins: [postcssRootToHost()],
             },
-            /**
-             * This workaround suppresses warnings from Sass about mixed declarations
-             * after nested rules. The issue originates from Bootstrap (twbs) and is
-             * tracked here: https://github.com/twbs/bootstrap/issues/40621.
-             *
-             * The fix involves configuring the `scss` preprocessor to silence the specific
-             * deprecation warnings (`mixed-decls`). This is implemented using the `silenceDeprecations`
-             * option with the value `['mixed-decls']`.
-             *
-             * IMPORTANT: This workaround can be removed once Bootstrap is updated to
-             * version 5.3.4 (or later), which includes the resolution to this issue
-             * (see: https://github.com/twbs/bootstrap/pull/40623).
-             *
-             * Original suppressed warning:
-             * DEPRECATION WARNING: Sass's behavior for declarations that appear after nested rules
-             * will change in future versions.
-             *
-             * Future developers should verify whether the workaround is still required
-             * by consulting the linked issue and confirming that the fix is included in the
-             * version of Bootstrap used by the project.
-             */
-             preprocessorOptions: {
-                scss: {
-                    api: 'modern-compiler', // or "modern", "legacy"
-                    silenceDeprecations: ['mixed-decls'],
-                },
-            }
         },
         plugins: [
             vue({
@@ -265,344 +295,500 @@ export default defineConfig(({ command, mode }) => {
                 //Interesting discussion: https://github.com/vitejs/vite/discussions/8364
 
                 targets: [
-                    /* Things to remember when adding to this list:
+                    /*
+                    Essentially, this builds a common CDN repository
+                    Things to remember when adding to this list:
                     - The reason we copy these is that tiki must run without internet access, so we can't rely on CDNs.  But do try to keep the structure these packages have on CDNs.  Typically, that means copying the dist folder under dist.  To check quickly, look up the package on https://unpkg.com/ , you can then browse what is distributed for each version.
                     - We want to save space, so if there is multiple formats distributed, only pick one (typically ESM)
                     - For many modules that just means:
                         {
-                            src: "node_modules/module-name/dist/*",",
+                            src: "node_modules/module-name/dist",",
                             dest: "vendor_dist/module-name/dist",
+                            rename: { stripBase: 3 }, // Notes the 3, since viteStaticCopy 4, you have to specify how many level of path flatening you want.  This gives more control, but be careful, if there is no dist folder, the value you will want is likely 2. benoitg - 2026-07-30
                         },
-                    But make sure to look into the dist folder, so we don't add a bunch of useless stuff, but don't miss required support files (such as language files)
+                    But make sure to look into the dist folder, so we don't add a bunch of useless stuff,
+                    but don't miss required support files (such as language files) ether
                     */
 
-                    /* jquery_tiki */
-                    {
-                        src: "node_modules/@event-calendar/*",
-                        dest: "vendor_dist/@event-calendar",
-                    },
-                    {
-                        src: "node_modules/bootstrap/dist/css/bootstrap.min.*",
-                        dest: "vendor_dist/bootstrap/dist/css",
-                    },
-                    {
-                        src: "node_modules/bootstrap/dist/js/bootstrap.esm.min.js",
-                        dest: "vendor_dist/bootstrap/dist/js",
-                    },
-                    {
-                        src: "node_modules/@popperjs/core/dist/esm/*",
-                        dest: "vendor_dist/@popperjs/core/dist/esm",
-                    },
-                    {
-                        src: "node_modules/bootstrap-icons/font/*",
-                        dest: "vendor_dist/bootstrap-icons/font",
-                    },
-                    /* module system */
+                    /* Importmap polyfills used in path_js_importmap_generator module system */
                     {
                         src: "node_modules/es-module-shims/dist/es-module-shims.js",
                         dest: "vendor_dist/es-module-shims/dist",
+                        rename: { stripBase: 3 },
                     },
-                    /* tiki_themes */
+
+                    // TODO: This is an indirect runtime dependency of chart.js.  So why isn't it made a direct dependency in common-externals if we have to copy files from it?  -  benoitg - 2026-03-09
                     {
-                        src: "node_modules/@fortawesome/fontawesome-free/css/all.css",
-                        dest: "vendor_dist/@fortawesome/fontawesome-free/css",
+                        src: "node_modules/@kurkle/color/dist/color.esm.js",
+                        dest: "vendor_dist/@kurkle/color/dist",
+                        rename: { stripBase: 4 },
+                    },
+
+                    /* BEGIN common_externals section
+                    These should all ALSO be in rollupOptions / external */
+                    {
+                        src: "node_modules/@dicebear", //Both @@dicebear/core and @dicebear/collection.  They do not have a normal dist structure
+                        dest: "vendor_dist/@dicebear",
+                        rename: { stripBase: 2 },
                     },
                     {
-                        src: "node_modules/@fortawesome/fontawesome-free/webfonts/*",
-                        dest: "vendor_dist/@fortawesome/fontawesome-free/webfonts",
+                        src: "node_modules/@lottiefiles/dotlottie-wc/dist/*.js",
+                        dest: "vendor_dist/@lottiefiles/dotlottie-wc/dist",
+                        rename: { stripBase: 4 },
+                    },
+                    {
+                        src: "node_modules/@shoelace-style/shoelace/dist/themes/*.css",
+                        dest: "vendor_dist/@shoelace-style/shoelace/dist",
+                        rename: { stripBase: 4 },
                     },
                     {
                         src: "node_modules/@zxing/library/umd/index.min.js",
                         dest: "vendor_dist/@zxing/library/umd/index.min.js",
+                        rename: { stripBase: 4 },
                     },
-                    /* vue_widgets */
+                    {
+                        src: "node_modules/altcha/dist/*.js",
+                        dest: "vendor_dist/altcha/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/animejs/lib/anime.es.js",
+                        dest: "vendor_dist/anime/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/chart.js/dist/chart.js*",
+                        dest: "vendor_dist/chart.js/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/chart.js/dist/chunks/helpers.dataset.js",
+                        dest: "vendor_dist/chart.js/dist/chunks",
+                        rename: { stripBase: 4 },
+                    },
+                    {
+                        src: "node_modules/chartjs-v2/dist/Chart.bundle.min.js",
+                        dest: "vendor_dist/chartjs-v2/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/clipboard/dist",
+                        dest: "vendor_dist/clipboard/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: [
+                            "node_modules/codemirror/lib",
+                            "node_modules/codemirror/addon/search/searchcursor.js",
+                            "node_modules/codemirror/addon/mode",
+                            "node_modules/codemirror/theme",
+                            "node_modules/codemirror/mode",
+                        ],
+                        dest: "vendor_dist/codemirror",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: "node_modules/converse.js/dist/*.min.*",
+                        dest: "vendor_dist/converse.js/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/converse.js/dist/webfonts",
+                        dest: "vendor_dist/converse.js/dist/webfonts",
+                        rename: { stripBase: 4 },
+                    },
+                    {
+                        src: "node_modules/converse.js/dist/sounds",
+                        dest: "vendor_dist/converse.js/dist/sounds",
+                        rename: { stripBase: 4 },
+                    },
+                    {
+                        src: "node_modules/converse.js/dist/locales",
+                        dest: "vendor_dist/converse.js/dist/locales",
+                        rename: { stripBase: 4 },
+                    },
+                    {
+                        src: "node_modules/converse.js/dist/emoji.json",
+                        dest: "vendor_dist/converse.js/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/recordrtc/RecordRTC.js",
+                        dest: "vendor_dist/recordrtc",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: "node_modules/interactjs/dist",
+                        dest: "vendor_dist/interactjs/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: ["node_modules/d3-milestones/build/d3-milestones.css", "node_modules/d3-milestones/build/d3-milestones.min.js"],
+                        dest: "vendor_dist/d3-milestones/build",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/dompurify/dist/purify.(es)*",
+                        dest: "vendor_dist/dompurify/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: ["node_modules/drawflow/dist/drawflow.min.css"],
+                        dest: "vendor_dist/drawflow/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/driver.js/dist/driver.js.mjs",
+                        dest: "vendor_dist/driver.js/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/driver.js/dist/driver.css",
+                        dest: "vendor_dist/driver.js/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/fitvids/dist/fitvids.js",
+                        dest: "vendor_dist/fitvids/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: ["node_modules/fieldslinker/fieldsLinker.css", "node_modules/fieldslinker/fieldsLinker.js"],
+                        dest: "vendor_dist/fieldslinker",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: ["node_modules/glightbox/dist/css/glightbox.min.css"],
+                        dest: "vendor_dist/glightbox/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: [
+                            "node_modules/plyr/dist/plyr.css",
+                            "node_modules/plyr/dist/plyr.min.js",
+                        ],
+                        dest: "vendor_dist/plyr/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/html2canvas-pro/dist/html2canvas-pro.esm.js",
+                        dest: "vendor_dist/html2canvas-pro/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/interactjs/dist",
+                        dest: "vendor_dist/interactjs/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: ["node_modules/gridstack/dist/gridstack.min.css", "node_modules/gridstack/dist/gridstack-extra.min.css"],
+                        dest: "vendor_dist/gridstack/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/jqdoublescroll/jquery.doubleScroll.js",
+                        dest: "vendor_dist/jqdoublescroll",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: [
+                            "node_modules/jquery-treetable/css/jquery.treetable.css",
+                            "node_modules/jquery-treetable/jquery.treetable.js"
+                        ],
+                        dest: "vendor_dist/jquery-treetable",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: "node_modules/jquery-zoom/(icon.png|jquery.zoom.js)",
+                        dest: "vendor_dist/jquery-zoom",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: "node_modules/jquery/dist",
+                        dest: "vendor_dist/jquery/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/jquery-form/dist",
+                        dest: "vendor_dist/jquery-form/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/jquery-migrate/dist",
+                        dest: "vendor_dist/jquery-migrate/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: ["node_modules/jquery-tagcanvas/jquery.tagcanvas.min.js"],
+                        dest: "vendor_dist/jquery-tagcanvas",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: "node_modules/jquery-ui/dist",
+                        dest: "vendor_dist/jquery-ui/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/jquery-validation/dist",
+                        dest: "vendor_dist/jquery-validation/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: [
+                            "node_modules/mermaid/dist/mermaid.esm.min.mjs",
+                            "node_modules/mermaid/dist/chunks/mermaid.esm.min",
+                        ],
+                        dest: "vendor_dist/mermaid/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/moment/dist",
+                        dest: "vendor_dist/moment/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        // This is a nightmare.
+                        // It was added https://gitlab.com/tikiwiki/tiki/-/merge_requests/5950,
+                        // out of alphabetical order.
+                        // But then https://gitlab.com/tikiwiki/tiki/-/merge_requests/7598 added it
+                        // in setup.php on every page if fgal_use_record_rtc_screen is on!
+                        // Which would be bad enough, but it's not the same version as the rest of tiki
+                        // uses above from the importmap.  benoitg - 2026-03-09
+                        src: "node_modules/moment/min",
+                        dest: "vendor_dist/moment/min",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: [
+                            "node_modules/ol/dist/ol.js",
+                            "node_modules/ol/ol.css",
+                        ],
+                        dest: "vendor_dist/ol",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: [
+                            "node_modules/ol-layerswitcher/dist/ol-layerswitcher.js",
+                            "node_modules/ol-layerswitcher/dist/ol-layerswitcher.css",
+                        ],
+                        dest: "vendor_dist/ol-layerswitcher/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: [
+                            "node_modules/plotly.js/dist/*.min.js",
+                            "node_modules/plotly.js/dist/plotly-locale*",
+                            "node_modules/plotly.js/dist/plot-schema.json",
+                            "node_modules/plotly.js/dist/plotly-geo-assets.js",
+                        ],
+                        dest: "vendor_dist/plotly.js/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/reveal.js/dist",
+                        dest: "vendor_dist/reveal.js/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/signature_pad/dist/signature_pad.umd.min.js",
+                        dest: "vendor_dist/signature_pad/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/smartmenus/dist",
+                        dest: "vendor_dist/smartmenus/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/sortablejs/modular",
+                        dest: "vendor_dist/sortablejs/modular",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/subtotal/dist/subtotal.min.js",
+                        dest: "vendor_dist/subtotal/dist",
+                        rename: { stripBase: 3 },
+                    },
+                                        {
+                        src: "node_modules/svgedit/dist/editor",  //Could be pared down, but we do need most of the subdirectories
+                        dest: "vendor_dist/svgedit/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: [
+                            "node_modules/swagger-ui-dist/swagger-ui-bundle.js",
+                            "node_modules/swagger-ui-dist/swagger-ui.css",
+                            "node_modules/swagger-ui-dist/favicon-16x16.png",
+                            "node_modules/swagger-ui-dist/favicon-32x32.png",
+                        ],
+                        dest: "vendor_dist/swagger-ui-dist",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: "node_modules/three/build/three.*.min.js",
+                        dest: "vendor_dist/three/build",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: [
+                            "node_modules/timeago/jquery.timeago.js",
+                            "node_modules/timeago/locales"
+                        ],
+                        dest: "vendor_dist/timeago/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/vue/dist/vue.esm-browser.js",
+                        dest: "vendor_dist/vue/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/vue3-sfc-loader/dist/vue3-sfc-loader.esm.js",
+                        dest: "vendor_dist/vue3-sfc-loader/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    /* END common-externals section */
+
+                    /* BEGIN src/js/common-externals-legacy-cjs section
+                    These should all ALSO be in rollupOptions / external */
+                    {
+                        src: [
+                            "node_modules/swiper/*.min.js",
+                            "node_modules/swiper/*.min.css",
+                        ],
+                        dest: "vendor_dist/swiper",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: [
+                            "node_modules/tablesorter/dist/js/jquery.tablesorter.combined.js",
+                            "node_modules/tablesorter/dist/js/parsers/parser-input-select.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-columnSelector.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-filter-formatter-jui.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-grouping.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-math.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-pager.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-output.min.js",
+                            "node_modules/tablesorter/dist/js/widgets/widget-sort2Hash.min.js",
+                        ],
+                        dest: "vendor_dist/tablesorter/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/underscore/underscore-esm-min.js",
+                        dest: "vendor_dist/underscore",
+                        rename: { stripBase: 2 },
+                    },
+                    /* END src/js/common-externals-legacy-cjs section */
+
+                    /** BEGIN src/js/jquery_tiki section
+                     * - These should be in common-externals* if they are not compiled in!  - benoitg - 2026-03-11
+                     */
+                    {
+                        src: "node_modules/@event-calendar/core/dist/index.css",
+                        dest: "vendor_dist/@event-calendar/core/dist",
+                        rename: { stripBase: 4 },
+                    },
+                    {
+                        src: [
+                            "node_modules/boomerangjs/boomerang.js",
+                            "node_modules/boomerangjs/plugins/rt.js",
+                        ],
+                        dest: "vendor_dist/boomerangjs/",
+                        rename: { stripBase: 2 },
+                    },
+                    {
+                        src: [
+                            "node_modules/bootstrap/dist/css/bootstrap.min.*",
+                            "node_modules/bootstrap/dist/js/bootstrap.esm.min.js",
+                        ],
+                        dest: "vendor_dist/bootstrap/dist",
+                        rename: { stripBase: 3 },
+                    },
+                    {
+                        src: "node_modules/bootstrap-icons/font",
+                        dest: "vendor_dist/bootstrap-icons",
+                        rename: { stripBase: 2 },
+                    },
+                    /* END src/js/jquery_tiki section */
+
+                    /**
+                     * src/js/tiki-toast-ui
+                     * Toast UI Editor: We place the CSS file here because inserting it directly into the toast-index.js file
+                     * causes part of the editor to be styled while another part remains unstyled. Therefore, we preferred to use the CSS file directly
+                     */
+                    {
+                        src: [
+                            "node_modules/@toast-ui/editor/dist/toastui-editor.css",
+                            "node_modules/@toast-ui/editor/dist/i18n",
+                        ],
+                        dest: "vendor_dist/@toast-ui/editor/dist",
+                        rename: { stripBase: 4 },
+                    },
+                    {
+                        src: [
+                            "node_modules/vis-timeline/dist/vis-timeline-graph2d.esm.js",
+                            "node_modules/vis-timeline/dist/vis-timeline-graph2d.min.css",
+                        ],
+                        dest: "vendor_dist/vis-timeline/dist",
+                        rename: { stripBase: 3 },
+                    },
+
+                    /* src/js/vue-mf/styleguide */
+                    {
+                        src: "node_modules/@popperjs/core/dist/esm",
+                        dest: "vendor_dist/@popperjs/core/dist",
+                        rename: { stripBase: 4 },
+                    },
+
+                    /* src/js/vue_widgets */
                     {
                         src: "node_modules/element-plus/dist/locale/*.min.mjs",
-                        dest: "vendor_dist/element-plus/dist/locale",
+                        dest: "vendor_dist/element-plus/dist",
+                        rename: { stripBase: 3 },
                     },
                     {
                         src: [
                             "node_modules/element-plus/theme-chalk/base.css",
                             "node_modules/element-plus/theme-chalk/el-message.css",
                             "node_modules/element-plus/theme-chalk/el-message-box.css",
+                            "node_modules/element-plus/theme-chalk/el-popper.css",
+                            "node_modules/element-plus/theme-chalk/el-backtop.css",
                         ],
-                        dest: "vendor_dist/element-plus/css",
-                    },
-                    /* common_externals */
-                    {
-                        src: "node_modules/@shoelace-style/shoelace/dist/themes/*.css",
-                        dest: "vendor_dist/@shoelace-style/shoelace/dist/themes",
-                    },
-                    {
-                        // This is an indirect runtime dependency of chart.js
-                        src: "node_modules/@kurkle/color/dist/color.esm.js",
-                        dest: "vendor_dist/@kurkle/color/dist",
-                    },
-                    {
-                        src: "node_modules/animejs/lib/anime.es.js",
-                        dest: "vendor_dist/anime/dist",
-                    },
-                    {
-                        src: "node_modules/chart.js/dist/chart.js*",
-                        dest: "vendor_dist/chart.js/dist",
-                    },
-                    {
-                        src: "node_modules/chart.js/dist/chunks/helpers.segment.js*",
-                        dest: "vendor_dist/chart.js/dist/chunks",
-                    },
-                    {
-                        src: "node_modules/clipboard/dist/*",
-                        dest: "vendor_dist/clipboard/dist",
-                    },
-                    {
-                        src: "node_modules/codemirror/lib/*",
-                        dest: "vendor_dist/codemirror/lib",
-                    },
-                    {
-                        src: "node_modules/codemirror/addon/search/searchcursor.js",
-                        dest: "vendor_dist/codemirror/addon/search",
-                    },
-                    {
-                        src: "node_modules/codemirror/addon/mode/*",
-                        dest: "vendor_dist/codemirror/addon/mode",
-                    },
-                    {
-                        src: "node_modules/codemirror/theme/*",
-                        dest: "vendor_dist/codemirror/theme",
-                    },
-                    {
-                        src: "node_modules/codemirror/mode/*",
-                        dest: "vendor_dist/codemirror/mode",
-                    },
-                    {
-                        src: "node_modules/converse.js/dist/*.min.*",
-                        dest: "vendor_dist/converse.js/dist",
-                    },
-                    {
-                        src: "node_modules/converse.js/dist/webfonts/*",
-                        dest: "vendor_dist/converse.js/dist/webfonts",
-                    },
-                    {
-                        src: "node_modules/converse.js/dist/sounds/*",
-                        dest: "vendor_dist/converse.js/dist/sounds",
-                    },
-                    {
-                        src: "node_modules/converse.js/dist/locales/*",
-                        dest: "vendor_dist/converse.js/dist/locales",
-                    },
-                    {
-                        src: "node_modules/converse.js/dist/emojis.js",
-                        dest: "vendor_dist/converse.js/dist",
-                    },
-                    {
-                        src: "node_modules/recordrtc/RecordRTC.js",
-                        dest: "vendor_dist/recordrtc",
-                    },
-                    {
-                        src : "node_modules/interactjs/dist/*",
-                        dest : "vendor_dist/interactjs/dist",
-                    },
-                    {
-                        src: "node_modules/dompurify/dist/purify.(es|min)*",
-                        dest: "vendor_dist/dompurify/dist",
-                    },
-                    {
-                        src: ["node_modules/drawflow/dist/drawflow.min.css"],
-                        dest: "vendor_dist/drawflow/dist",
-                    },
-                    {
-                        src: "node_modules/driver.js/dist/driver.js.mjs",
-                        dest: "vendor_dist/driver.js/dist",
-                    },
-                    {
-                        src: "node_modules/driver.js/dist/driver.css",
-                        dest: "vendor_dist/driver.js/dist",
-                    },
-                    {
-                        src: "node_modules/fitvids/dist/fitvids.js",
-                        dest: "vendor_dist/fitvids/dist",
-                    },
-                    {
-                        src: "node_modules/html2canvas-pro/dist/html2canvas-pro.min.js",
-                        dest: "vendor_dist/html2canvas-pro/dist",
-                    },
-                    {
-                        src: "node_modules/interactjs/dist/*",
-                        dest: "vendor_dist/interactjs/dist",
-                    },
-                    {
-                        src: ["node_modules/gridstack/dist/gridstack.min.css", "node_modules/gridstack/dist/gridstack-extra.min.css"],
-                        dest: "vendor_dist/gridstack/dist",
-                    },
-                    {
-                        src: "node_modules/jqdoublescroll/jquery.doubleScroll.js",
-                        dest: "vendor_dist/jqdoublescroll",
-                    },
-                    {
-                        src: ["node_modules/jquery-treetable/css/jquery.treetable.css", "node_modules/jquery-treetable/jquery.treetable.js"],
-                        dest: "vendor_dist/jquery-treetable",
-                    },
-                    {
-                        src: "node_modules/jquery-zoom/(icon.png|jquery.zoom.js)",
-                        dest: "vendor_dist/jquery-zoom",
-                    },
-                    {
-                        src: "node_modules/moment/min/*",
-                        dest: "vendor_dist/moment/min",
-                    },
-                    {
-                        src: "node_modules/jquery/dist/*",
-                        dest: "vendor_dist/jquery/dist",
-                    },
-                    {
-                        src: "node_modules/jquery-colorbox/jquery.colorbox-min.js",
-                        dest: "vendor_dist/jquery-colorbox",
-                    },
-                    {
-                        src: "node_modules/jquery-colorbox/example*", // Examples are used as themes in Tiki instead of the default Design of Colorbox.
-                        dest: "vendor_dist/jquery-colorbox",
-                    },
-                    {
-                        src: "node_modules/jquery-form/dist/*",
-                        dest: "vendor_dist/jquery-form/dist",
-                    },
-                    {
-                        src: "node_modules/jquery-migrate/dist/*",
-                        dest: "vendor_dist/jquery-migrate/dist",
-                    },
-                    {
-                        src: "node_modules/jquery-ui/dist/*",
-                        dest: "vendor_dist/jquery-ui/dist",
-                    },
-                    {
-                        src: "node_modules/jquery-validation/dist/*",
-                        dest: "vendor_dist/jquery-validation/dist",
-                    },
-                    {
-                        src: "node_modules/mermaid/dist/!(mermaid.js|mermaid.min.js)*.(js|mjs)*",
-                        dest: "vendor_dist/mermaid/dist",
-                    },
-                    {
-                        src: "node_modules/minicart/dist/*.js",
-                        dest: "vendor_dist/minicart/dist",
-                    },
-                    {
-                        src: "node_modules/moment/dist/*",
-                        dest: "vendor_dist/moment/dist",
-                    },
-                    {
-                        src: "node_modules/ol/dist/ol.js",
-                        dest: "vendor_dist/ol/dist",
-                    },
-                    {
-                        src: "node_modules/ol/ol.css",
-                        dest: "vendor_dist/ol",
-                    },
-                    {
-                        src: ["node_modules/ol-layerswitcher/dist/ol-layerswitcher.js","node_modules/ol-layerswitcher/dist/ol-layerswitcher.css"],
-                        dest: "vendor_dist/ol-layerswitcher/dist",
-                    },
-                    {
-                        src: ["node_modules/pivottable/dist/pivot.css", "node_modules/pivottable/dist/*.min.js"],
-                        dest: "vendor_dist/pivottable/dist",
-                    },
-                    {
-                        src: "node_modules/plotly.js/dist/topojson*",
-                        dest: "vendor_dist/plotly.js/dist/topojson",
-                    },
-                    {
-                        src: "node_modules/plotly.js/dist/*.min.js",
-                        dest: "vendor_dist/plotly.js/dist",
-                    },
-                    {
-                        src: "node_modules/plotly.js/dist/plotly-locale*",
-                        dest: "vendor_dist/plotly.js/dist",
-                    },
-                    {
-                        src: "node_modules/plotly.js/dist/plot-schema.json",
-                        dest: "vendor_dist/plotly.js/dist",
-                    },
-                    {
-                        src: "node_modules/plotly.js/dist/plotly-geo-assets.js",
-                        dest: "vendor_dist/plotly.js/dist",
-                    },
-                    {
-                        src: "node_modules/reveal.js/dist/*",
-                        dest: "vendor_dist/reveal.js/dist"
-                    },
-                    {
-                        src: "node_modules/select2/dist/js/select2.min.js",
-                        dest: "vendor_dist/select2/dist",
-                    },
-                    {
-                        src: "node_modules/select2/dist/css/select2.min.css",
-                        dest: "vendor_dist/select2/dist",
-                    },
-                    {
-                        src: "node_modules/select2-bootstrap-5-theme/dist/*.min.css",
-                        dest: "vendor_dist/select2-bootstrap-5-theme/dist",
-                    },
-                    {
-                        src: "node_modules/signature_pad/dist/signature_pad.umd.min.js",
-                        dest: "vendor_dist/signature_pad/dist",
-                    },
-                    {
-                        src: "node_modules/smartmenus/dist/*",
-                        dest: "vendor_dist/smartmenus/dist",
-                    },
-                    {
-                        src: "node_modules/sortablejs/modular/*",
-                        dest: "vendor_dist/sortablejs/modular",
-                    },
-                    {
-                        src: "node_modules/subtotal/dist/subtotal.min.js",
-                        dest: "vendor_dist/subtotal/dist",
-                    },
-                    {
-                        src: "node_modules/svg-pan-zoom/dist/*.min.js",
-                        dest: "vendor_dist/svg-pan-zoom/dist",
-                    },
-                    {
-                        src: ["node_modules/swagger-ui-dist/swagger-ui-bundle.js","node_modules/swagger-ui-dist/swagger-ui.css","node_modules/swagger-ui-dist/favicon-16x16.png","node_modules/swagger-ui-dist/favicon-32x32.png"],
-                        dest: "vendor_dist/swagger-ui-dist",
-                    },
-                    {
-                        src: "node_modules/tablesorter/dist/js/jquery.tablesorter.combined.js",
-                        dest: "vendor_dist/tablesorter/dist/js",
-                    },
-                    {
-                        src: "node_modules/tablesorter/dist/js/parsers/parser-input-select.min.js",
-                        dest: "vendor_dist/tablesorter/dist/js/parsers",
-                    },
-                    {
-                        src: ["node_modules/tablesorter/dist/js/widgets/widget-columnSelector.min.js", "node_modules/tablesorter/dist/js/widgets/widget-filter-formatter-jui.min.js", "node_modules/tablesorter/dist/js/widgets/widget-grouping.min.js", "node_modules/tablesorter/dist/js/widgets/widget-math.min.js", "node_modules/tablesorter/dist/js/widgets/widget-pager.min.js", "node_modules/tablesorter/dist/js/widgets/widget-output.min.js", "node_modules/tablesorter/dist/js/widgets/widget-sort2Hash.min.js"],
-                        dest: "vendor_dist/tablesorter/dist/js/widgets",
-                    },
-                    {
-                        src: "node_modules/vue/dist/vue.esm-browser.js",
-                        dest: "vendor_dist/vue/dist",
-                    },
+                        dest: "vendor_dist/element-plus/css", //Why are we not following the structure of the original package.  See comment at the begining of this section - benoitg - 2026-07-30
+                        rename: { stripBase: 3 },
+                    },
+
+                    /* src/js/wysiwyg  - These should be in common-externals* if they are not compiled in!  - benoitg - 2026-03-11 */
                     {
                         src: [
                             "node_modules/summernote/dist/summernote-bs5.min.js",
-                            "node_modules/summernote/dist/summernote-bs5.min.css"
+                            "node_modules/summernote/dist/summernote-bs5.min.css",
+                            "node_modules/summernote/dist/font",
+                            "node_modules/summernote/dist/lang/*.min.js",
                         ],
                         dest: "vendor_dist/summernote/dist",
+                        rename: { stripBase: 3 },
                     },
+
+                    /* Assets for src/scss (theme system) */
                     {
-                        src: "node_modules/summernote/dist/font/*",
-                        dest: "vendor_dist/summernote/dist/font",
+                        src: [
+                            "node_modules/@fortawesome/fontawesome-free/css/all.css",
+                            "node_modules/@fortawesome/fontawesome-free/webfonts",
+                        ],
+                        dest: "vendor_dist/@fortawesome/fontawesome-free",
+                        rename: { stripBase: 3 },
                     },
-                    {
-                        src: "node_modules/summernote/dist/lang/*.min.js",
-                        dest: "vendor_dist/summernote/dist/lang",
-                    }
+
                 ],
             }),
             AutoImport({
+                //dts: false,
                 resolvers: [ElementPlusResolver()],
             }),
             Components({
+                //dts: false,
                 resolvers: [ElementPlusResolver()],
             }),
             /* Uncomment this in development to see which dependencies contribute to bundle size */
@@ -611,23 +797,62 @@ export default defineConfig(({ command, mode }) => {
         server: {
             watch: {
                 //This is also used by vitest to exclude files from watch
-                ignored: ["**/node_modules/**", "**/.git/**", "**/.gitlab-ci-local/**", "**/vendor_bundled/**"],
+                ignored: ["**/node_modules", "**/.git", "**/.gitlab-ci-local", "**/vendor_bundled","**/temp"],
             },
         },
         test: {
             include: ["src/js/**/tests/**/*.test.js"],
             globals: true,
             environment: "happy-dom",
+            reporters: [["default"]], // ["junit"] will be enabled by the testci script with --reporter=junit
+            outputFile: {
+                junit: "./temp/ci/js-junit-report.xml",
+            },
             coverage: {
-                include: ["src/js/vue-widgets/**/*.{vue,js}", "src/js/jquery-tiki/wysiwyg/**/*.js", "src/js/jquery-tiki/ui-utils/handleDatePicker.js", "src/js/jquery-tiki/ui-utils/handleTransferList.js"],
-                exclude: ["**/*.ce.js", "**/*.test.js", "**/elements/**"],
-                provider: 'istanbul'
+                //enabled: true, //Coverage will be enabled by the testci script with the --coverage argument
+                include: [
+                    "src/js/**/*.{vue,js,mjs}",
+                    "lib/**/*.{js,mjs}" //Legacy code.  Won't get tested until moved to src/js, but we want accurate coverage totals.
+                ],
+                exclude: ["**/*.ce.js", "**/*.test.js"],
+                provider: "v8",
+                reporter: [ ["text"],
+                            ["cobertura"]
+                        ],
+
+                //It's a bit dumb, one cannot specify the specific file with the cobertura reporter.  It will write to cobertura-coverage.xml
+                reportsDirectory: "./temp/ci/js_coverage",
             },
             server: {
                 deps: {
                     inline: [/element-plus/],
-                }
+                },
             },
         },
     };
 });
+
+/**
+ * Adds glob-based entries to rollupInput from multiple source folders.
+ * @param {object} rollupInput - The rollupInput object to update.
+ * @param {Array} entries - An array of objects with the following properties:
+ *   - prefix: prefix used for the key names (e.g., "jquery-tiki/")
+ *   - src: path to the source folder to scan (e.g., "src/js/jquery-tiki")
+ */
+function addGlobEntries(rollupInput, entries) {
+    entries.forEach(({ prefix, src }) => {
+        Object.assign(
+            rollupInput,
+            Object.fromEntries(
+                //do NOT change this to /**/*.js, this is to implement an easy migration path for single file modules like the old lib/jquery-tiki
+                globSync(`${src}/*.js`, {
+                    ignore: ["**/node_modules", "**/*.test.js"]
+                }).map(file => {
+                    const relativePath = path.relative(src, file.slice(0, file.length - path.extname(file).length));
+                    const fullPath = resolve(import.meta.dirname, path.relative(import.meta.dirname, file));
+                    return [`${prefix}${relativePath}`, fullPath];
+                })
+            )
+        );
+    });
+}

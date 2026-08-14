@@ -5,7 +5,7 @@
         {foreach item=gr from=$listgroups}
             {if $gr.registrationChoice eq 'y'}
                 <div class="registergroup">
-                    <input type="radio" name="chosenGroup" id="gr_{$gr.id}" value="{$gr.groupName|escape}">
+                    <input type="radio" class="form-check-input" name="chosenGroup" id="gr_{$gr.id}" value="{$gr.groupName|escape}">
                     <label for="gr_{$gr.id}">
                         {if !empty($gr.groupDesc)}
                             {tr}{$gr.groupDesc|escape}{/tr}
@@ -21,12 +21,6 @@
     {* Groups *}
     {if isset($theChoiceGroup)}
         <input type="hidden" name="chosenGroup" value="{$theChoiceGroup|escape}">
-        {jq}
-$.getJSON('group_tracker_ajax.php', {chosenGroup:'{{$theChoiceGroup}}'}, function(data) {
-    $("#registerTracker").html(data['res']).tikiModal();
-});
-        {/jq}
-        <div id="registerTracker"></div>
     {elseif isset($listgroups)}
         <div class="mb-3 row">
             <label class="col-sm-4 col-form-label">
@@ -36,7 +30,7 @@ $.getJSON('group_tracker_ajax.php', {chosenGroup:'{{$theChoiceGroup}}'}, functio
                 {foreach item=gr from=$listgroups}
                     {if $gr.registrationChoice eq 'y'}
                         <div class="registergroup">
-                            <input type="radio" name="chosenGroup" id="gr_{$gr.id}" value="{$gr.groupName|escape}"
+                            <input type="radio" class="form-check-input" name="chosenGroup" id="gr_{$gr.id}" value="{$gr.groupName|escape}"
                                     {if !empty($smarty.post.chosenGroup) and $smarty.post.chosenGroup eq $gr.groupName|escape}checked="checked"{/if}>
                             <label for="gr_{$gr.id}">
                                 {if !empty($gr.groupDesc)}

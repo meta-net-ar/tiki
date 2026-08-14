@@ -6,6 +6,7 @@
     <div class="t_navbar mb-4 clearfix">
         {include file='admin/include_apply_top.tpl'}
     </div>
+    <div class="styling-element">
     <fieldset>
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_sefurl visible="always"}
@@ -95,5 +96,6 @@
         {preference name=url_fragment_format}
         {preference name=url_fragment_guesser}
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

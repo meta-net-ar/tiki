@@ -559,4 +559,17 @@ class EditLib_ParseToWiki_TextTest extends TikiTestCase
         $out = preg_replace('/\n/', '\n', $out); // fix LF encoding for comparison
         $this->assertEquals($ex, $out);
     }
+
+    public function testComplexStyledTags(): void
+    {
+        $inData = '<div style="font-size: 12px; color: red; background-color: yellow;">This is a complex styled div</div>';
+        $ex = "{DIV(type=\"div\" style=\"font-size: 12px; color: red; background-color: yellow;\")}\nThis is a complex styled div{DIV}";
+        $out = $this->el->parseToWiki($inData);
+        $this->assertEquals($ex, $out);
+
+        $inData = '<p style="font-weight: bold; position: relative; top: 10px;">This is a complex styled paragraph</p>';
+        $ex = "{DIV(type=\"p\" style=\"font-weight: bold; position: relative; top: 10px;\")}\nThis is a complex styled paragraph{DIV}";
+        $out = $this->el->parseToWiki($inData);
+        $this->assertEquals($ex, $out);
+    }
 }

@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Symfony\Component\Mime\Address;
+
 class Search_Action_EmailAction implements Search_Action_Action
 {
     public function getValues()
@@ -34,7 +37,7 @@ class Search_Action_EmailAction implements Search_Action_Action
     public function execute(JitFilter $data)
     {
         try {
-            $mail = new TikiMail();
+            $mail = $this->createMail();
 
             if ($replyto = $this->dereference($data->replyto->raw())) {
                 $mail->setReplyTo($replyto[0]);
@@ -174,6 +177,16 @@ class Search_Action_EmailAction implements Search_Action_Action
         return false;
     }
 
+    public function requiresConfirm()
+    {
+        return false;
+    }
+
+    protected function createMail(): TikiMail
+    {
+        return new TikiMail();
+    }
+
     private function parse($content, $is_html = null)
     {
         $content = "~np~$content~/np~";
@@ -203,34 +216,83 @@ class Search_Action_EmailAction implements Search_Action_Action
         if (empty($email_or_username)) {
             return [];
         }
-        if (strpbrk($email_or_username, ',;') !== false) {
-            $list = preg_split('/\s*[,;]\s*/', $email_or_username);
-            $res = [];
-            foreach ($list as $email_or_username) {
-                $res = array_merge($res, $this->dereference($email_or_username));
-            }
-            return array_filter($res);
-        }
         $email_or_username = trim($this->stripNp($email_or_username));
-        if (preg_match_all('/([^<]*?)<([^@>]+@[^>]+)>/', $email_or_username, $m)) {
-            $emails = [];
-            foreach ($m[0] as $key => $_) {
-                $name = trim($m[1][$key], ",;\n\r\t ");
-                $emails[$name] = $m[2][$key];
+
+        try {
+            $resolvedAddresses = [];
+            foreach ($this->parseAddressList($email_or_username) as $address) {
+                $name = $address->getName();
+                if ($name !== '') {
+                    $resolvedAddresses[$name] = $address->getAddress();
+                } else {
+                    $resolvedAddresses[] = $address->getAddress();
+                }
             }
-            return $emails;
-        } elseif (preg_match_all('/[^@]+@[^,;]+/', $email_or_username, $m)) {
-            return array_map(function ($email) {
-                return trim($email, ",;\n\r\t ");
-            }, $m[0]);
-        } elseif (strstr($email_or_username, '@')) {
-            return [$email_or_username];
-        } else {
-            $users = TikiLib::lib('trk')->parse_user_field($email_or_username);
-            return array_filter(array_map(function ($username) {
-                return TikiLib::lib('user')->get_user_email($username);
-            }, $users));
+            $resolvedAddresses = array_filter($resolvedAddresses);
+            if (! empty($resolvedAddresses)) {
+                return $resolvedAddresses;
+            }
+        } catch (\Throwable $e) {
+            // Keep fallback below only for usernames.
         }
+
+        if (str_contains($email_or_username, '@')) {
+            return [];
+        }
+
+        $users = TikiLib::lib('trk')->parse_user_field($email_or_username);
+        return array_filter(array_map(function ($username) {
+            return TikiLib::lib('user')->get_user_email($username);
+        }, $users));
+    }
+
+    /**
+     * Parse an RFC-compliant mailbox list into individual Address objects.
+     *
+     * Supports comma-separated, semicolon-separated, and line-separated entries
+     * while honoring quoted names that may contain delimiters.
+     */
+    private function parseAddressList(string $addresses): array
+    {
+        $parsed = [];
+        $buffer = '';
+        $inQuotes = false;
+        $escape = TikiLib::TIKI_GLOBAL_CSV_ESCAPE_CHAR;
+
+        foreach (str_split($addresses) as $character) {
+            if ($character === '"' && ! $this->isEscaped($buffer, $escape)) {
+                $inQuotes = ! $inQuotes;
+            }
+
+            if (! $inQuotes && ($character === ',' || $character === ';' || $character === "\n" || $character === "\r")) {
+                $candidate = trim($buffer);
+                if ($candidate !== '') {
+                    $parsed[] = $candidate;
+                }
+                $buffer = '';
+                continue;
+            }
+
+            $buffer .= $character;
+        }
+
+        $candidate = trim($buffer);
+        if ($candidate !== '') {
+            $parsed[] = $candidate;
+        }
+
+        return Address::createArray($parsed);
+    }
+
+    private function isEscaped(string $buffer, string $escape): bool
+    {
+        $escapeCount = 0;
+
+        for ($index = strlen($buffer) - 1; $index >= 0 && $buffer[$index] === $escape; $index--) {
+            $escapeCount++;
+        }
+
+        return $escapeCount % 2 === 1;
     }
 
     private function dereferenceName($email_or_username)
@@ -239,7 +301,7 @@ class Search_Action_EmailAction implements Search_Action_Action
             return null;
         }
         $email_or_username = $this->stripNp($email_or_username);
-        if (strstr($email_or_username, '@')) {
+        if (str_contains($email_or_username, '@')) {
             return null;
         } else {
             $users = TikiLib::lib('trk')->parse_user_field($email_or_username);
@@ -253,36 +315,18 @@ class Search_Action_EmailAction implements Search_Action_Action
 
     private function getPDFAttachment($pageName)
     {
-
         if (! Perms::get('wiki page', $pageName)->view) {
             return [];
         }
 
-        require_once('tiki-setup.php');
-        require_once 'lib/pdflib.php';
-        $generator = new PdfGenerator();
-        if (! empty($generator->error)) {
-            Feedback::error($generator->error);
+        try {
+            $exporter = new \Tiki\PagePdfExporter();
+            $pageInfo = $exporter->validatePageAccess($pageName);
+            $pageInfo['pageName'] = $pageName; // Ensure pageName is set
+            return $exporter->generatePdfFromWikiPage($pageInfo);
+        } catch (\Exception $e) {
+            Feedback::error($e->getMessage());
             return false;
-        } else {
-            $params = [ 'page' => $pageName ];
-
-            // If the page doesn't exist then display an error
-            if (! ($info = TikiLib::lib('tiki')->get_page_info($pageName))) {
-                Feedback::error(sprintf(tra('Page %s cannot be found'), $pageName));
-                return false;
-            }
-
-            $pdata = TikiLib::lib('parser')->parse_data($info["data"], [
-                'page' => $pageName,
-                'is_html' => $info["is_html"],
-                'print' => 'y',
-                'namespace' => $info["namespace"]
-            ]);
-            //replacing bootstrap classes for print version.
-            $pdata = str_replace(['col-sm','col-md','col-lg'], 'col-xs', $pdata);
-
-            return $generator->getPdf('tiki-print.php', $params, $pdata);
         }
     }
 

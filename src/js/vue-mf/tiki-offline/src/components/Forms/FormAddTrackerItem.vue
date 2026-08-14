@@ -15,7 +15,7 @@
                             <div v-if="tracker.options.show_status" class="tracker-field-group mb-3">
                                 <label for="trackerinput_status">{{ tr('Status') }}</label>
                                 <div id="trackerinput_status">
-                                    <select name="status" class="form-control" v-model="editedItem.values.status" v-select2>
+                                    <select name="status" class="form-control" v-model="editedItem.values.status">
                                         <option v-for="(stinfo, st) in tracker.options.status_types" :value="st" :class="`tracker-${stinfo.iconname}`">
                                             {{ stinfo.label }}
                                         </option>

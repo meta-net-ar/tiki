@@ -6,8 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_cclite_info()
 {
-    global $prefs;
-
     return [
         'name' => tra('Cclite'),
         'documentation' => 'PluginCclite',
@@ -45,7 +43,7 @@ function wikiplugin_cclite_info()
 
 function wikiplugin_cclite($data, $params)
 {
-    global $prefs, $user;
+    global $user;
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
     $headerlib = TikiLib::lib('header');
@@ -56,12 +54,6 @@ function wikiplugin_cclite($data, $params)
         return '{REMARKSBOX(type=note, title=Cclite)}' . tra('You need to be logged in to view this information.')
                 . '{REMARKSBOX}';
     }
-
-    $default = [ 'mode' => 'summary', 'registry' => '' ];
-    if (is_array($default['registry']) && ! empty($default['registry'])) {
-        $default['registry'] = $default['registry'][0];
-    }
-    $params = array_merge($default, $params);
 
     switch ($params['mode']) {
         case 'recent':

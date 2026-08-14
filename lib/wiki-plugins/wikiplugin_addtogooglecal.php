@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 function wikiplugin_addtogooglecal_info()
 {
     return [
@@ -21,7 +24,6 @@ function wikiplugin_addtogooglecal_info()
                 'description' => tra('The item ID of the calendar to add to Google calendar.'),
                 'accepted' => tra('A calendar item ID number'),
                 'filter' => 'digits',
-                'default' => '',
                 'since' => '6.0',
                 'profile_reference' => 'calendar',
             ],
@@ -50,10 +52,6 @@ function wikiplugin_addtogooglecal($data, $params)
     $access->check_feature('feature_calendar');
     $calendarlib = TikiLib::lib('calendar');
 
-    if (! isset($params['calitemid'])) {
-        return WikiParser_PluginOutput::argumentError(['calitemid']);
-    }
-
     $cal_item_id = $params['calitemid'];
     $cal_id = $calendarlib->get_calendarid($cal_item_id);
 
@@ -72,8 +70,7 @@ function wikiplugin_addtogooglecal($data, $params)
     $gcal_action = 'TEMPLATE';
     $gcal_text = urlencode(str_replace(["\n","\r"], ['',''], strip_tags($calitem['parsedName'])));
     $gcal_details = urlencode(str_replace(["\n","\r"], ['',''], $calitem['parsed']));
-    $gcal_location = urlencode(str_replace(["\n","\r"], ['',''], strip_tags($calitem['locationName'])));
-    $curtikidate = new TikiDate();
+    $gcal_location = urlencode(str_replace(["\n","\r"], ['',''], strip_tags($calitem['locationName'] ?? '')));
     // Google requires date to be formatted in UTC
     $old_tz = date_default_timezone_get();
     date_default_timezone_set('UTC');
@@ -81,6 +78,6 @@ function wikiplugin_addtogooglecal($data, $params)
     $date_to = date('Ymd', $calitem['end']) . 'T' . date('His', $calitem['end']) . 'Z';
     date_default_timezone_set($old_tz);
     $gcal_dates = $date_from . '/' . $date_to;
-    return '<a target="_blank" title="' . tr('Add Event to Google Calendar') . '" class="btn btn-primary" href="https://www.google.com/calendar/event?action=' . $gcal_action . '&text=' . $gcal_text . '&dates=' . $gcal_dates . '&location=' . $gcal_location . '&details=' . $gcal_details . '">
-            <i class="fas fa-calendar-plus"></i></a>';
+    return '<a target="_blank" title="' . tr('Add Event to Google Calendar') . '" class="btn btn-primary btn-sm" href="https://www.google.com/calendar/event?action=' . $gcal_action . '&text=' . $gcal_text . '&dates=' . $gcal_dates . '&location=' . $gcal_location . '&details=' . $gcal_details . '">
+            <i class="fas fa-calendar-plus"></i> ' . tr('Add Event to Google Calendar') . '</a>';
 }

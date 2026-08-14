@@ -8,7 +8,7 @@
         </tr>
 
         {foreach from=$listevents item=event}
-            {assign var=calendarId value=$event.calendarId}
+            {$calendarId=$event.calendarId}
             <tr class="{cycle}{if $event.start <= $smarty.now and $event.end >= $smarty.now} selected{/if} vevent">
                 <td class="date">
                     <div class="row">
@@ -36,7 +36,7 @@
                     <a href="{bootstrap_modal controller='calendar' action='view_item' size='modal-lg' calitemId=$event.calitemId}" title="{tr}View{/tr}">
                     {if isset($infocals.$calendarId.customfgcolor) && $infocals.$calendarId.customfgcolor ne ''}<span style="color:#{$infocals.$calendarId.customfgcolor};">{/if}
                     <span class="summary">{$event.name|escape}</span></a><br>
-                    <span class="description" style="font-style:italic">{$event.parsed}</span>
+                    <span class="description font-italic">{$event.parsed}</span>
                     {if !empty($event.web)}
                         <br><a href="{$event.web}" target="_other" class="calweb" title="{$event.web}">{icon name='link-external'}</a>
                         {if isset($infocals.$calendarId.customfgcolor) && $infocals.$calendarId.customfgcolor ne ''}</span>{/if}
@@ -52,7 +52,7 @@
                                     </a>
                                 </action>
                                 <action>
-                                    <a class="text-danger" href="#"  onclick="deletecalItem({$event.calitemId}, '{$event.name|escape}')">
+                                    <a class="text-danger" href="#"  onclick="deletecalItem({$event.calitemId}, '{$event.name|escape}')" role="button">
                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                     </a>
                                 </action>

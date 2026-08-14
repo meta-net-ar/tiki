@@ -139,17 +139,9 @@ function module_last_youtube_playlist_videos($mod_reference, $module_params)
         }
 
         // Define an object that will be used to make all API requests.
-        $youtube = new Google_Service_YouTube($client);
+        $youtube = new Google_Service_YouTube($client); // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
 
-        /*
-         * TODO: orderby is not supported by V3 API, probably sort locally
-        if (!empty($module_params['orderby'])) {
-            $orderby = $module_params['orderby'];
-            $feedUrl = 'http://gdata.youtube.com/feeds/api/playlists/' . $id . '?orderby='. $orderby;
-        } else {
-            $feedUrl = 'http://gdata.youtube.com/feeds/api/playlists/' . $id . '?orderby=position';
-        }
-        */
+
 
         try {
             // Get playlist information
@@ -170,9 +162,9 @@ function module_last_youtube_playlist_videos($mod_reference, $module_params)
 
             // Prepare params for video display
             $params = [];
-            $params['width'] = isset($module_params['width']) ? $module_params['width'] : 425;
-            $params['height'] = isset($module_params['height']) ? $module_params['height'] : 350;
-            $params['allowFullScreen'] = isset($module_params['allowFullScreen']) ? $module_params['allowFullScreen'] : true;
+            $params['width'] = $module_params['width'] ?? 425;
+            $params['height'] = $module_params['height'] ?? 350;
+            $params['allowFullScreen'] = $module_params['allowFullScreen'] ?? true;
 
             // Get information from all videos from playlist
             // Limit to $module_rows first videos if $module_rows is set
@@ -183,7 +175,7 @@ function module_last_youtube_playlist_videos($mod_reference, $module_params)
                 $data[$id]['videos'][$videoId]['uploaded'] = $videoEntry['snippet']['publishedAt'];
                 $data[$id]['videos'][$videoId]['description'] = $videoEntry['snippet']['description'];
                 $params['movie'] = $videoId;
-                $pluginstr = wikiplugin_youtube('', $params);
+                $pluginstr = TikiLib::lib('parser')->invokePlugin('youtube', '', $params);
                 $len = strlen($pluginstr);
                 //need to take off the ~np~ and ~/np~ at the beginning and end of the string returned by wikiplugin_youtube
                 $data[$id]['videos'][$videoId]['xhtml'] = substr($pluginstr, 4, $len - 4 - 5);
@@ -192,11 +184,11 @@ function module_last_youtube_playlist_videos($mod_reference, $module_params)
                 }
                 $count_videos++;
             }
-        } catch (Google_Service_Exception $e) {
+        } catch (Google_Service_Exception $e) { // @phpstan-ignore class.notFound (depends on google/apiclient which isn't installed by default)
             $errorBody = json_decode($e->getMessage(), true);
 
             // Handling specific errors
-            if ($errorBody['error']['code'] == 403 && strpos($errorBody['error']['message'], 'blocked') !== false) {
+            if ($errorBody['error']['code'] == 403 && str_contains($errorBody['error']['message'], 'blocked')) {
                 Feedback::error(tr('Your API Key is blocked or restricted. Please update your API Key settings in Google Cloud to allow requests from this domain.'));
             } else {
                 Feedback::error(tr('Error fetching YouTube playlist: ') . $errorBody['error']['message']) ;
@@ -212,8 +204,8 @@ function module_last_youtube_playlist_videos($mod_reference, $module_params)
         $data[$id]['videos'][0]['title'] = tra('No Playlist ID was provided');
     }
 
-    $smarty->assign('verbose', isset($module_params['verbose']) ? $module_params['verbose'] : 'y');
-    $smarty->assign('link_url', isset($module_params['link_url']) ? $module_params['link_url'] : '');
-    $smarty->assign('link_text', isset($module_params['link_text']) ? $module_params['link_text'] : 'More Videos');
+    $smarty->assign('verbose', $module_params['verbose'] ?? 'y');
+    $smarty->assign('link_url', $module_params['link_url'] ?? '');
+    $smarty->assign('link_text', $module_params['link_text'] ?? 'More Videos');
     $smarty->assign_by_ref('data', $data[$id]);
 }

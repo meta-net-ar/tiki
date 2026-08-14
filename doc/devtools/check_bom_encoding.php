@@ -32,10 +32,11 @@ $extensions = [
     'xml'
 ];
 
-$paramList = isset($_SERVER['argv']) ? $_SERVER['argv'] : [];
+$paramList = $_SERVER['argv'] ?? [];
 $listFiles = [];
 foreach ($paramList as $paramFile) {
-    $file = $dir . $paramFile;
+    $file = $dir . '/' . ltrim($paramFile, '/');
+
     if (file_exists($file) && basename(__FILE__) != basename($file)) {
         $listFiles[] = $file;
     }

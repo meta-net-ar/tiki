@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters' => [
@@ -36,11 +39,22 @@ $inputConfiguration = [
             'group'                     => 'groupname',
             'create_eponymous_groups'   => 'text',
             'show_eponymous'            => 'word',
+            'clean'                     => 'alpha',         //post
+            'add'                       => 'alpha',         //get
+            'export'                    => 'alpha',         //post
+            'username'                  => 'alpha',         //post
+            'email'                     => 'alpha',         //post
+            'lastLogin'                 => 'alpha',         //post
+            'encoding'                  => 'alpha',         //post
+            'import'                    => 'alpha',         //post
         ],
     ]
 ];
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 
 if (! empty($_REQUEST['group'])) {
     if (! $userlib->group_exists($_REQUEST['group'])) {
@@ -160,29 +174,17 @@ if (! isset($_REQUEST['maxRecords'])) {
     $numrows = $_REQUEST['maxRecords'];
 }
 $smarty->assign_by_ref('maxRecords', $numrows);
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'groupName_asc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'groupName_asc',
+    ['users_groups']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["initial"])) {
-    $initial = $_REQUEST["initial"];
-} else {
-    $initial = '';
-}
+$initial = $_REQUEST["initial"] ?? '';
 $smarty->assign('initial', $initial);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $users = $userlib->get_groups($offset, $numrows, $sort_mode, $find, $initial, show_eponymous: $show_eponymous);
 
@@ -190,7 +192,7 @@ $users = $userlib->get_groups($offset, $numrows, $sort_mode, $find, $initial, sh
 $ts = Table_Check::setVars('admingroups', true);
 if ($ts['enabled'] && ! $ts['ajax']) {
     //set tablesorter code
-    Table_Factory::build('TikiAdminGroups', ['id' => $ts['tableid'], 'total' => $users['cant']]);
+    Table_Factory::build('TikiAdminGroups', ['id' => $ts['tableid'], 'total' => $users['count']]);
 }
 
 $inc = [];
@@ -269,6 +271,10 @@ if (! empty($_REQUEST["group"])) {
             }
         }
     }
+
+    if ($prefs['twoFactorAuth'] == 'y') {
+        $smarty->assign('twoFactorAuthGracePeriod', $re['twoFactorAuthGracePeriod']);
+    }
     $groupperms = $re["perms"];
     //$allgroups = $userlib->list_all_groups();
     $allgroups = $userlib->list_can_include_groups($re["groupName"]);
@@ -310,18 +316,18 @@ if (! empty($_REQUEST["group"])) {
     $smarty->assign('memberslist', $memberslist);
 
     //banned members of a group
-    $bannedOffset = isset($_REQUEST['bannedOffset']) ? $_REQUEST['bannedOffset'] : 0;
-    $bannedMax = isset($_REQUEST['bannedMax']) ? $_REQUEST['bannedMax'] : $prefs['maxRecords'];
+    $bannedOffset = $_REQUEST['bannedOffset'] ?? 0;
+    $bannedMax = $_REQUEST['bannedMax'] ?? $prefs['maxRecords'];
     if (empty($_REQUEST['bannedSort'])) {
         $bannedSort = ['source_itemId' => 'asc'];
-    } elseif (! empty($_REQUEST['bannedSort']) && substr($_REQUEST['bannedSort'], -4) === 'desc') {
+    } elseif (str_ends_with($_REQUEST['bannedSort'], 'desc')) {
         $bannedSort = ['source_itemId' => 'desc'];
     } else {
         $bannedSort = ['source_itemId' => 'asc'];
     }
     $bannedlist = $userlib->get_group_banned_users($_REQUEST['group'], $bannedOffset, $bannedMax, null, $bannedSort);
     $smarty->assign('bannedlist', $bannedlist['data']);
-    $smarty->assign('bannedCount', $bannedlist['cant']);
+    $smarty->assign('bannedCount', $bannedlist['count']);
 
     $userslist = $userlib->list_all_users($_REQUEST['group']);
 
@@ -357,7 +363,7 @@ if (! empty($_REQUEST["group"])) {
             'TikiAdminGroupsBanned',
             [
                 'id' => 'bannedMembers',
-                'total' => $bannedlist['cant'],
+                'total' => $bannedlist['count'],
                 'ajax' => [
                     'requiredparams' => [
                         'group' => $_REQUEST['group']
@@ -408,7 +414,6 @@ if (! empty($_REQUEST['group']) && isset($_REQUEST['export'])) {
     header("Expires: 0");
     header("Cache-Control: must-revalidate, post-check=0,pre-check=0");
     header("Pragma: public");
-    TikiLib::lib('header')->setXRobotsTag($robots);
     echo $data;
     die;
 }
@@ -487,7 +492,7 @@ if (! empty($groupcolor)) {
 }
 $smarty->assign('groupperms', $groupperms);
 $smarty->assign_by_ref('userChoice', $userChoice);
-$smarty->assign_by_ref('cant_pages', $users["cant"]);
+$smarty->assign_by_ref('pages_count', $users["count"]);
 $smarty->assign('group_info', $re);
 $smarty->assign('isRole', $isRole);
 $smarty->assign('isTplGroup', $isTplGroup);

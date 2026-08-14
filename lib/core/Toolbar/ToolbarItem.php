@@ -3,6 +3,7 @@
 namespace Tiki\Lib\core\Toolbar;
 
 use TikiLib;
+use Tiki\Sections;
 
 abstract class ToolbarItem
 {
@@ -14,6 +15,7 @@ abstract class ToolbarItem
     protected string $domElementId = '';
     protected string $class = '';
     protected string $syntax = '';
+    protected string $editorSyntaxType = '';
     protected string $markdown = '';
     protected string $markdown_wysiwyg = '';
     private array $requiredPrefs = [];
@@ -59,10 +61,10 @@ abstract class ToolbarItem
 
     public static function getTag(string $tagName, bool $wysiwyg = false, bool $is_html = false, bool $is_markdown = false, string $domElementId = '', string|null $objectId = ''): ?ToolbarItem
     {
-        global $section;
+        $section = Sections::getCurrentSection();
 
         //we detect sheet first because it has unique buttons
-        if ($section == 'sheet' && $tag = ToolbarSheet::fromName($tagName)) {
+        if (Sections::isCurrentSection(Sections::SECTION_SHEET) && $tag = ToolbarSheet::fromName($tagName)) {
             return $tag;
         } elseif ($wysiwyg && $tag = ToolbarSummernoteOnly::fromName($tagName, $is_html, $is_markdown)) {
             return $tag;
@@ -102,6 +104,10 @@ abstract class ToolbarItem
             return new ToolbarLinkFile($objectId);
         } elseif ($tagName == 'launchplugins') {
             return new ToolbarLaunchPlugins();
+        } elseif ($tagName == 'languagecheck') {
+            return new ToolbarLanguageCheck();
+        } elseif ($tagName == 'filerecording') {
+            return new ToolbarFileRecording($domElementId, $wysiwyg);
         }
         return null;
     }
@@ -212,7 +218,9 @@ abstract class ToolbarItem
                     'tikitable',
                     'task',
                     'codeblock',
-                    'linkfile'
+                    'linkfile',
+                    'languagecheck',
+                    'filerecording',
                 ],
                 $plugins
             )
@@ -281,7 +289,7 @@ abstract class ToolbarItem
             'plugin' => $plugin,
         ];
 
-        if (strpos($icon, 'img/icons/') !== false) {
+        if (str_contains($icon, 'img/icons/')) {
             $data['icon'] = $icon;
         } else {
             $data['iconname'] = $icon;
@@ -390,6 +398,7 @@ abstract class ToolbarItem
         return $tag;
     }
 
+
     public function getWikiHtml(): string
     {
         $onClick = $this->getOnClick();
@@ -412,6 +421,18 @@ abstract class ToolbarItem
     public function setSyntax(string $syntax): ToolbarItem
     {
         $this->syntax = $syntax;
+
+        return $this;
+    }
+
+    public function getEditorSyntaxType(): string
+    {
+        return $this->editorSyntaxType;
+    }
+
+    public function setEditorSyntaxType(string $editorSyntaxType): ToolbarItem
+    {
+        $this->editorSyntaxType = $editorSyntaxType;
 
         return $this;
     }
@@ -569,10 +590,9 @@ abstract class ToolbarItem
 
     public function getSelfLink(string $click, string $title, string $class): string
     {
-        global $prefs;
         $smarty = TikiLib::lib('smarty');
         $params = [];
-        $params['_onclick'] = $click . (substr($click, strlen($click) - 1) != ';' ? ';' : '') . 'return false;';
+        $params['_onclick'] = $click . (! str_ends_with($click, ';') ? ';' : '') . 'return false;';
         $params['_class'] = 'toolbar btn btn-sm px-2 tips bottom' . (! empty($class) ? ' ' . $class : '');
         $params['_ajax'] = 'n';
         $content = $title;
@@ -585,7 +605,8 @@ abstract class ToolbarItem
         }
 
         if (
-            strpos($class, 'qt-plugin') !== false && ($this->iconname == 'plugin'
+            str_contains($class, 'qt-plugin')
+            && ($this->iconname == 'plugin'
                 || $this->icon == 'img/icons/plugin.png')
         ) {
             $params['_menu_text'] = 'y';

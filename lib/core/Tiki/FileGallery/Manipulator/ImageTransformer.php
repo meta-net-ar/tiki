@@ -106,8 +106,6 @@ class ImageTransformer extends Manipulator
                     Feedback::error(tra('Cannot resize the file:') . ' ' . $work_file);
                 }
 
-                imagedestroy($image_p);
-
                 if (! $imageWriter($image_resized_p, $work_file)) {
                     Feedback::error(tra('Cannot write the file:') . ' ' . $work_file);
                 } else {

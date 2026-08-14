@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -19,7 +21,8 @@ $inputConfiguration = [
     ],
 ];
 include_once('tiki-setup.php');
-global $discountlib;
+global $discountlib, $prefs;
+
 include_once('lib/payment/discountlib.php');
 $access->check_permission(['tiki_p_admin']);
 
@@ -58,7 +61,7 @@ if (! empty($_REQUEST['del'])) {
 
 if (! empty($_REQUEST['id'])) {
     if ($info = $discountlib->get_discount($_REQUEST['id'])) {
-        if (strstr($info['value'], '%')) {
+        if (str_contains($info['value'], '%')) {
             $info['percent'] = (int)$info['value'];
         }
         $smarty->assign_by_ref('info', $info);
@@ -66,14 +69,14 @@ if (! empty($_REQUEST['id'])) {
     }
 }
 
-$offset = isset($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
+$offset = $_REQUEST['offset'] ?? 0;
 $max = $prefs['maxRecords'];
 $discounts = $discountlib->list_discounts($offset, $max);
 $discounts['offset'] = $offset;
 $discounts['max'] = $max;
 $smarty->assign_by_ref('discounts', $discounts);
 
-setcookie('tab', $tab);
+CookieConsentLib::tikiSetCookie('tab', $tab, CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
 $smarty->assign_by_ref('cookietab', $tab);
 $smarty->assign('mid', 'tiki-discount.tpl');
 $smarty->display('tiki.tpl');

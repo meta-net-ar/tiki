@@ -13,22 +13,22 @@
 [{$messu_mailbox_number} / {$prefs.messu_mailbox_size}] {tr}messages{/tr}. {if $messu_mailbox_number ge $prefs.messu_mailbox_size}{tr}Mailbox is full! Delete or archive some messages if you want to receive more messages.{/tr}{/if}
 {/if}
 
-<form class="d-flex flex-row flex-wrap align-items-center mb-4" action="messu-mailbox.php" method="get">
-    <div class="mb-3 col-sm-3">
+<form class="d-flex flex-wrap align-items-center mb-4" action="messu-mailbox.php" method="get">
+    <div class="col-sm-3">
         <label for="mess-mailmessages">{tr}Messages:{/tr}</label>
         <select name="flags" id="mess-mailmessages" class="form-select">
+            <option value="_" {if $flag eq ''}selected="selected"{/if}>{tr}All{/tr}</option>
             <option value="isRead_y" {if $flag eq 'isRead' and $flagval eq 'y'}selected="selected"{/if}>{tr}Read{/tr}</option>
             <option value="isRead_n" {if $flag eq 'isRead' and $flagval eq 'n'}selected="selected"{/if}>{tr}Unread{/tr}</option>
             <option value="isFlagged_y" {if $flag eq 'isFlagged' and $flagval eq 'y'}selected="selected"{/if}>{tr}Flagged{/tr}</option>
             <option value="isFlagged_n" {if $flag eq 'isflagged' and $flagval eq 'n'}selected="selected"{/if}>{tr}Unflagged{/tr}</option>
-            <option value="" {if $flag eq ''}selected="selected"{/if}>{tr}All{/tr}</option>
         </select>
     </div>
 
-    <div class="mb-3 col-sm-3">
+    <div class="col-sm-3">
         <label for="mess-mailprio">{tr}Priority:{/tr}</label>
         <select name="priority" id="mess-mailprio" class="form-select">
-            <option value="" {if $priority eq ''}selected="selected"{/if}>{tr}All{/tr}</option>
+            <option value="0" {if $priority eq ''}selected="selected"{/if}>{tr}All{/tr}</option>
             <option value="1" {if $priority eq 1}selected="selected"{/if}>{tr}1{/tr}</option>
             <option value="2" {if $priority eq 2}selected="selected"{/if}>{tr}2{/tr}</option>
             <option value="3" {if $priority eq 3}selected="selected"{/if}>{tr}3{/tr}</option>
@@ -37,7 +37,7 @@
         </select>
     </div>
 
-    <div class="mb-3 col-sm-4">
+    <div class="col-sm-4">
         <label for="mess-mailcont">{tr}Containing:{/tr}</label>
         <div class="input-group">
             <input type="text" name="find" id="mess-mailcont" value="{$find|escape}" class="form-control">
@@ -75,11 +75,11 @@
                     <td class="prio{$items[user].priority}"><input type="checkbox" name="msg[{$items[user].msgId}]"></td>
                     <td class="prio{$items[user].priority}">
                         {if $items[user].isFlagged eq 'y'}
-                            <button type="submit" name="flagmsg" value="n_{$items[user].msgId}" class="btn btn-link pt-0">
+                            <button type="submit" name="flagmsg" value="n_{$items[user].msgId}" class="btn btn-link pt-0" aria-label="{tr}Flagged: Click to unflag{/tr}">
                                 <i class="fa fa-flag tips" aria-hidden="true" title="{tr}Flagged: Click to unflag{/tr}"></i>
                             </button>
                         {else}
-                            <button type="submit" name="flagmsg" value="y_{$items[user].msgId}" class="btn btn-link pt-0">
+                            <button type="submit" name="flagmsg" value="y_{$items[user].msgId}" class="btn btn-link pt-0" aria-label="{tr}Not Flagged: Click to flag{/tr}">
                                 <i class="far fa-flag tips" aria-hidden="true" title="{tr}Not Flagged: Click to flag{/tr}"></i>
                             </button>
                         {/if}
@@ -105,7 +105,7 @@
         </table>
     </div>
     {if $items}
-        <div class="mb-3 col-12">
+        <div class="mb-3 row">
             {tr}Perform action with checked:{/tr}
         <input
             type="submit"
@@ -116,17 +116,15 @@
         >
         <input type="submit" class="btn btn-primary btn-sm" name="archive" value="{tr}Archive{/tr}">
         <input type="submit" class="btn btn-primary btn-sm no-timeout" name="download" value="{tr}Download{/tr}">
-        <div class="input-group mt-3">
-            <select name="action" class="form-select form-select-sm">
-                <option value="isRead_y">{tr}Mark as read{/tr}</option>
-                <option value="isRead_n">{tr}Mark as unread{/tr}</option>
-                <option value="isFlagged_y">{tr}Mark as flagged{/tr}</option>
-                <option value="isFlagged_n">{tr}Mark as unflagged{/tr}</option>
-            </select>
-            <input type="submit" class="btn btn-primary btn-sm" name="mark" value="{tr}Mark{/tr}">
-        </div>
+        <select name="action" class="form-select ms-4 me-2">
+            <option value="isRead_y">{tr}Mark as read{/tr}</option>
+            <option value="isRead_n">{tr}Mark as unread{/tr}</option>
+            <option value="isFlagged_y">{tr}Mark as flagged{/tr}</option>
+            <option value="isFlagged_n">{tr}Mark as unflagged{/tr}</option>
+        </select>
+        <input type="submit" class="btn btn-primary btn-sm" name="mark" value="{tr}Mark{/tr}">
         </div>
     {/if}
 </form>
-{if $mess_maxRecords ne ''}{assign var=maxRecords value=$mess_maxRecords}{else}{assign var=maxRecords value=$prefs.maxRecords}{/if}
-{pagination_links cant=$cant_pages step=$maxRecords offset=$offset}{/pagination_links}
+{if $mess_maxRecords ne ''}{$maxRecords=$mess_maxRecords}{else}{$maxRecords=$prefs.maxRecords}{/if}
+{pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}

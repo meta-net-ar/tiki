@@ -15,6 +15,7 @@ function prefs_max_list()
             'filter' => 'digits',
             'units' => tra('characters'),
             'default' => 50,
+            'help' => 'Login-General-Preferences',
         ],
     ];
 }

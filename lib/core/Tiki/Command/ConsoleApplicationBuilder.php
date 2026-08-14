@@ -118,7 +118,8 @@ class ConsoleApplicationBuilder
                 new PluginRefreshRunCommand(),
                 new PatchCommand(),
                 new UpdateCommand(),
-                new DatabaseEngineConvertCommand()
+                new DatabaseEngineConvertCommand(),
+                new TrackerConvertAttachmentsCommand()
                 ],
             ],[
             'condition' => 'checkTikiSetupComplete',
@@ -132,6 +133,8 @@ class ConsoleApplicationBuilder
                 new PreferencesDeleteCommand(),
                 new PreferencesExportCommand(),
                 new SBOMGenerateCommand(),
+                new ZoteroCslFindCommand(),
+                new ZoteroCslUpdateCommand(),
                 ],
             ],[
             'condition' => 'checkDatabaseUpToDate',
@@ -145,6 +148,7 @@ class ConsoleApplicationBuilder
                 new PackageEnableCommand(),
                 new DailyReportSendCommand(),
                 new FakerCommentsCommand(),
+                new FakerRedactCommand(),
                 new FakerTrackerCommand(),
                 new GalleryMigrateCommand(),
                 new GoalCheckCommand(),
@@ -155,6 +159,7 @@ class ConsoleApplicationBuilder
                 new FilesDeleteoldCommand(),
                 new FilesIndexCommand(),
                 new FilesMoveCommand(),
+                new FilesSubgalleriesCreateCommand(),
                 new IndexRebuildCommand(),
                 new IndexOptimizeCommand(),
                 new IndexCleanupCommand(),
@@ -163,6 +168,7 @@ class ConsoleApplicationBuilder
                 new ListExecuteCommand(),
                 new MailInPollCommand(),
                 new MailQueueSendCommand(),
+                new MigrateMiniCalCommand(),
                 new NotificationDigestCommand(),
                 new ObjectsNotifyMaintainersCommand(),
                 new ObjectsExportCommand(),
@@ -185,7 +191,6 @@ class ConsoleApplicationBuilder
                 new TrackerExportCommand(),
                 new TrackerImportCommand(),
                 new TrackerRecalcCommand(),
-                new TrackerConvertAttachmentsCommand(),
                 new SitemapGenerateCommand(),
                 new TikiInfoCommand(),
                 new TrackerClearCommand(),
@@ -194,22 +199,29 @@ class ConsoleApplicationBuilder
                 new LogDeleteCommand(),
                 new UserUnlockCommand(),
                 new UsersListCommand(),
+                new PagePrintCommand(),
                 new UsersPasswordCommand(),
                 new UsersTemporaryCommand(),
                 new TokensClearCommand(),
+                new McpTokenCreateCommand(),
                 new CookiesClearCommand(),
                 new StatsCommand(),
                 new MLTrainCommand(),
                 new TranslationExportCommand(),
                 new TranslationPercentageCommand(),
                 new MarkdownConvertCommand(),
+                new MarkdownImporterCommand(),
                 new SieveFiltersCommand(),
                 new CalendarSyncCommand(),
                 new SchedulerRunCommand(),
+                new SchedulerStatsCommand(),
+                new SchedulerMonitorCommand(),
                 new WebmailUnreadPagesCommand(),
                 new WebmailUnreadGlobalCommand(),
+                new TaskQueueProcessCommand(),
                 new Disable2FACommand(),
                 new ForumProcessInboundMail(),
+                new SecurityFileGenerateCommand(),
                 ],
             ],[
             'condition' => 'checkIsOCRAvailable',
@@ -269,21 +281,10 @@ class ConsoleApplicationBuilder
                 ],
             'commands' => [new RedactDBCommand(),],
             ],[
-            'condition' => 'checkIsDevModeAndDatabase',
-            'actions'   => [
-                UnavailableException::CHECK_VCS => self::ACTION_NOT_CALLABLE,
-                UnavailableException::CHECK_DEV => self::ACTION_NOT_PUBLISHED,
-                UnavailableException::CHECK_DEFAULT => self::ACTION_NOT_AVAILABLE,
-                ],
-            'commands'  => [
-                new VendorSecurityCommand(),
-                ],
-            ],[
             'condition' => 'checkIsVCS',
             'actions'   => [UnavailableException::CHECK_DEFAULT => self::ACTION_NOT_CALLABLE],
             'commands'  => [
                 new VCSUpdateCommand(),
-                new SemiAutoMergeCommand(),
                 new DevConfigureCommand(),
                 new DevbuildwsconfsCommand(),
                 ],
@@ -294,6 +295,15 @@ class ConsoleApplicationBuilder
                 ],
             'commands'  => [
                 new PerformanceCheckCommand(),
+                ],
+            ],[
+                'condition' => 'checkOldImageGalleryExists',
+                'actions' => [
+                UnavailableException::CHECK_UPDATED => self::ACTION_NOT_PUBLISHED,
+                UnavailableException::CHECK_DEFAULT => self::ACTION_NOT_CALLABLE,
+                ],
+                'commands' => [
+                new GalleryMigrateCommand(),
                 ],
             ]];
     }
@@ -329,16 +339,16 @@ class ConsoleApplicationBuilder
     }
 
     /**
-     * Check if Tiki is being run as Git or SVN.
+     * Check if Tiki is being run as Git.
      *
-     * @throws CommandUnavailableException When SVN or GIT is not available.
+     * @throws CommandUnavailableException When GIT is not available.
      */
     protected function checkIsVCS(): void
     {
-        if (! (is_dir('.svn') || file_exists('.git'))) {
+        if (! file_exists('.git')) {
             //.git may be a directory (normal case) or a file (in the case of a git workspace)
             throw new UnavailableException(
-                'You must be running Tiki as a VCS see: https://dev.tiki.org/Get-code',
+                tra('You must be running Tiki as a VCS see:') . ' https://dev.tiki.org/Get-code',
                 UnavailableException::CHECK_VCS
             );
         }
@@ -356,7 +366,7 @@ class ConsoleApplicationBuilder
         // check to see if something from the dev-mode packages has been auto-loaded
         if (! class_exists(\PHPUnit\Framework\TestCase::class)) {
             throw new UnavailableException(
-                'You need to be running in dev mode. To Fix run: php console.php dev:configure',
+                tra('You need to be running in dev mode. To Fix run: php console.php dev:configure'),
                 UnavailableException::CHECK_DEV
             );
         }
@@ -369,9 +379,9 @@ class ConsoleApplicationBuilder
      */
     protected function checkIsDbRunning(): void
     {
-        if (! DB_RUNNING) {
+        if (! defined('DB_RUNNING') || ! DB_RUNNING) {
             throw new UnavailableException(
-                'Your database must be running and have valid credentials in the local.php file. See http://doc.tiki.org/Installation for more information.',
+                tra('Your database must be running and have valid credentials in the local.php file. See http://doc.tiki.org/Installation for more information.'),
                 UnavailableException::CHECK_RUNNING
             );
         }
@@ -387,9 +397,9 @@ class ConsoleApplicationBuilder
     {
         // we want to provide the right feedback, so lets check pre-requirements first.
         $this->checkIsDbRunning();
-        if (! DB_STATUS) {
+        if (! defined('DB_STATUS') || ! DB_STATUS) {
             throw new UnavailableException(
-                'Cannot initiate Database. Probably because the database needs updating.',
+                tra('Cannot initiate Database. Probably because the database needs updating.'),
                 UnavailableException::CHECK_INSTALLED
             );
         }
@@ -397,7 +407,7 @@ class ConsoleApplicationBuilder
 
     /**
      * Checks if tiki-setup.php has completed successfully, without any database errors.
-     * The database has previously been loaded, and much of tiki-check is likely to hae completed. However
+     * The database has previously been loaded, and much of tiki-check is likely to have completed. However
      * it is likely that critical changes were made to Tiki that causes severe database errors.
      *
      * @throws CommandUnavailableException When tiki-setup.php did not complete. (core database errors)
@@ -405,9 +415,9 @@ class ConsoleApplicationBuilder
     protected function checkTikiSetupComplete(): void
     {
         $this->checkIsDatabaseInstalled();
-        if (! DB_TIKI_SETUP) {
+        if (! defined('DB_TIKI_SETUP') || ! DB_TIKI_SETUP) {
             throw new UnavailableException(
-                'Database errors prevented tiki-setup from completing. Try running php console.php database:update',
+                tra('Database errors prevented tiki-setup from completing. Try running php console.php database:update'),
                 UnavailableException::CHECK_TIKI_SETUP
             );
         }
@@ -425,9 +435,9 @@ class ConsoleApplicationBuilder
         // we want to provide the right feedback, so lets check pre-requirements first.
         $this->checkTikiSetupComplete();
 
-        if (! DB_SYNCHRONAL) {
+        if (! defined('DB_SYNCHRONAL') || ! DB_SYNCHRONAL) {
             throw new UnavailableException(
-                'The database needs to be updated. Solved by: php console.php database:update',
+                tra('The database needs to be updated. Solved by: php console.php database:update'),
                 UnavailableException::CHECK_UPDATED
             );
         }
@@ -441,7 +451,7 @@ class ConsoleApplicationBuilder
     protected function checkProfileInfoExists(): void
     {
         if (! file_exists(TIKI_PATH . '/profiles/info.ini')) {
-            throw new UnavailableException('The /profiles/info.ini file does not exist', 311);
+            throw new UnavailableException(tra('The /profiles/info.ini file does not exist'), 311);
         }
         $this->checkIsDatabaseInstalled();
     }
@@ -472,7 +482,7 @@ class ConsoleApplicationBuilder
         global $prefs;
 
         if (! empty($prefs['ocr_enable']) && $prefs['ocr_enable'] !== 'y') {
-            throw new UnavailableException('You need to enable your Tiki OCR preference before continuing.', 313);
+            throw new UnavailableException(tra('You need to enable your Tiki OCR preference before continuing.'), 313);
         }
         $this->checkDatabaseUpToDate();
     }
@@ -499,10 +509,23 @@ class ConsoleApplicationBuilder
         global $prefs;
 
         if (! empty($prefs['tiki_monitor_performance']) && $prefs['tiki_monitor_performance'] !== 'y') {
-            throw new UnavailableException('You need to enable your Monitor Tiki Performance preference before continuing.', 313);
+            throw new UnavailableException(tra('You need to enable your Monitor Tiki Performance preference before continuing.'), 313);
         }
 
         $this->checkDatabaseUpToDate();
+    }
+
+    protected function checkOldImageGalleryExists(): void
+    {
+        $this->checkIsDatabaseInstalled();
+
+        $installer = \Tiki\Installer\Installer::getInstance();
+        if (! $installer->tableExists('tiki_images')) {
+            throw new UnavailableException(
+                'Image Gallery tables not found',
+                UnavailableException::CHECK_UPDATED
+            );
+        }
     }
 
     /**
@@ -511,7 +534,7 @@ class ConsoleApplicationBuilder
      * Iterates over all commands in the list, and registers / doesn't register the commands in accordance with the result
      * of the check function and the action configured for the command group
      *
-     * @param boolean $returnLastInstance
+     * @param int $statusCode
      * @return Application
      */
     public function create($statusCode = 1100): Application
@@ -534,10 +557,11 @@ class ConsoleApplicationBuilder
         /** @var Application Console application that commands are added to, and finally returned. */
         $console = new Application();
         $console->setAutoExit(false);
-        $console->setName('Tiki Console Tool');
+        $console->setName(tra('Tiki Console Tool'));
         $console->setCatchExceptions(false);
 
         $commandCalled = $_SERVER['argv'][1] ?? false;
+        $stopAfterRequestedCommand = ! in_array($commandCalled, ['list', 'help'], true);
 
         /**
          * @var  $condition string  The name of the check method to be executed
@@ -601,7 +625,7 @@ class ConsoleApplicationBuilder
                 }
                 $console->add($command);
                 // If the command exactly matches one that was requested, stop processing further commands as they will not be used anyhow.
-                if ($commandCalled === $command->getName()) {
+                if ($stopAfterRequestedCommand && $commandCalled === $command->getName()) {
                     break 2;
                 }
             }
@@ -612,7 +636,7 @@ class ConsoleApplicationBuilder
             try {
                 $utilities = new \Services_Manager_Utilities();
                 $utilities->loadEnv(false);
-            } catch (\TikiManager\Config\Exception\ConfigurationErrorException $e) {
+            } catch (\TikiManager\Config\Exception\ConfigurationErrorException $e) {// @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
                 $commandErrorCode = function (InputInterface $input, OutputInterface $output) use ($e) {
                     $output->writeln('Tiki Manager commands not available at this stage.');
                     $output->writeln('<error>' . $e->getMessage() . '</error>');

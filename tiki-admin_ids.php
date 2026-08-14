@@ -10,7 +10,7 @@ $inputConfiguration = [
              'rule_id'             => 'int',          //post
              'rule'                => 'int',          //get
              'new_rule'            => 'bool',         //post
-             'rule_regex'          => 'alpha',        //post
+             'rule_regex'          => 'text',         //post
              'editrule'            => 'bool',         //post
              'rule_description'    => 'text',         //post
              'rule_tags'           => 'text',         //post
@@ -20,6 +20,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 
 if ($prefs['ids_enabled'] == 'n') {
     $access->display_error('', tra("Tiki IDS is not enabled"), '403', false);

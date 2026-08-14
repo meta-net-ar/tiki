@@ -1,0 +1,14 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`initSummernote > on init, should unwrap custom buttons 1`] = `
+"
+            
+                <button>tool1</button>
+                <span>tool1 custom element</span>
+            
+            
+                <button>tool2</button>
+                <span>tool2 custom element</span>
+            
+        "
+`;

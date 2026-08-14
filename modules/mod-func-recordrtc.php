@@ -7,7 +7,7 @@
 use Tiki\Package\VendorHelper;
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -82,11 +82,6 @@ function module_recordrtc($mod_reference, &$module_params)    // modifies $smod_
         $smarty->assign('module_error', tra('Record RTC is not available.'));
         return;
     }
-
-    $headerlib = TikiLib::lib('header');
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/moment/min/moment.min.js', true);
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/recordrtc/RecordRTC.js', true);
-    $headerlib->add_jsfile('lib/jquery_tiki/recordrtc.js', true);
 
     $recordingTypes = module_recordrtc_recording_types();
     $smarty->assign('mod_recordrtc_recording_types', $recordingTypes);

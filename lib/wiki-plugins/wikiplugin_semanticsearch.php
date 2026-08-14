@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Smarty\SmartyTiki;
+
 function wikiplugin_semanticsearch_info()
 {
     return [
@@ -66,13 +69,6 @@ function wikiplugin_semanticsearch_info()
 
 function wikiplugin_semanticsearch($data, $params)
 {
-    global $prefs;
-    $defaults = [];
-    $plugininfo = wikiplugin_semanticsearch_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'] ?? null;
-    }
-    $params = array_merge($defaults, $params);
 
     if (empty($params['searchformwiki']) && empty($params['searchformtpl'])) {
         $params['searchformtpl'] = 'templates/search_customsearch/default_form.tpl';
@@ -112,7 +108,7 @@ function wikiplugin_semanticsearch($data, $params)
         return $msg . '<br/>' . $e;
     }
 
-    $smarty = new Smarty_Tiki();
+    $smarty = new SmartyTiki();
     $smarty->assign('id', $id);
     $query = $_REQUEST['query'];
     $smarty->assign('query', $query);
@@ -133,7 +129,6 @@ function wikiplugin_semanticsearch($data, $params)
     if ($query) {
         $results = $index->search($query);
         foreach ($results as $result) {
-            //$html .= print_r($result, true);
             $smartyResult = [];
             //This is just so the template will parse
             $smartyResult['object_type'] = 'wiki page' ;

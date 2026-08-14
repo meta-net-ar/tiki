@@ -47,6 +47,16 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
 
     public function getModifierCallback(string $modifierName)
     {
+        // No TikiLib outside a full Tiki bootstrap, see SecurityPolicy::isTrustedModifier()
+        if (class_exists('TikiLib') && ($tikilib = TikiLib::lib('tiki'))) {
+            $allowed_builtin_php_functions = array_filter($tikilib->get_preference('smarty_security_allowed_builtin_php_functions', [], true));
+            if (in_array($modifierName, $allowed_builtin_php_functions) && is_callable($modifierName)) {
+                return function (...$args) use ($modifierName) {
+                    return call_user_func_array($modifierName, $args);
+                };
+            }
+        }
+
         switch ($modifierName) {
             case 'a_or_an':
                 return [new \SmartyTiki\Modifier\AorAn(), 'handle'];
@@ -68,6 +78,10 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\CompactIsoDate(), 'handle'];
             case 'countryflag':
                 return [new \SmartyTiki\Modifier\CountryFlag(), 'handle'];
+            case 'countryflagwithlabel':
+                return [new \SmartyTiki\Modifier\CountryFlagWithLabel(), 'handle'];
+            case 'countryflagemoji':
+                return [new \SmartyTiki\Modifier\CountryFlagEmoji(), 'handle'];
             case 'count':
                 return [$this, 'smartyModifierCount'];
             case 'd':
@@ -88,6 +102,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\FileCanConvertToPdf(), 'handle'];
             case 'file_diagram':
                 return [new \SmartyTiki\Modifier\FileDiagram(), 'handle'];
+            case 'forummaskemail':
+                return [new \SmartyTiki\Modifier\ForumMaskEmail(), 'handle'];
             case 'forumname':
                 return [new \SmartyTiki\Modifier\ForumName(), 'handle'];
             case 'forumtopiccount':
@@ -232,6 +248,8 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 return [new \SmartyTiki\Modifier\YesNo(), 'handle'];
             case 'zone_is_empty':
                 return [$this, 'smartyModifierZoneIsEmpty'];
+            case 'safe_html':
+                return [$this, 'smartyModifierSafeHtml'];
         }
         return null;
     }
@@ -419,6 +437,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'feedback':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Feedback();
                 break;
+            case 'queued_tasks_banner':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\QueuedTasksBanner();
+                break;
             case 'fgal_browse':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\FgalBrowse();
                 break;
@@ -451,6 +472,9 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 break;
             case 'icon':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Icon();
+                break;
+            case 'inline_audio_player':
+                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InlineAudioPlayer();
                 break;
             case 'initials_filter_links':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\InitialsFilterLinks();
@@ -617,12 +641,6 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
             case 'show_short':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\ShowShort();
                 break;
-            case 'svn_lastup':
-                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SvnLastup();
-                break;
-            case 'svn_rev':
-                $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\SvnRev();
-                break;
             case 'syntax':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\Syntax();
                 break;
@@ -666,7 +684,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\VarDump();
                 break;
                 break;
-            case 'wiki_diff':
+            case 'wikidiff':
                 $this->functionHandlers[$functionName] = new \SmartyTiki\FunctionHandler\WikiDiff();
                 break;
             case 'wikistructure':
@@ -846,12 +864,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * @param array  $matches
     * @param int    $flags
     * @param int    $offset
-    * @return int|flase
+    * @return array matches
     * @see https://php.net/manual/en/function.preg-match.php for details about the params description
     */
     public function smartyModifierPregMatch($pattern, $subject, $matches = null, $flags = 0, $offset = 0)
     {
-        return preg_match($pattern, $subject, $matches, $flags, $offset);
+        // return matches here as Smarty doesn't support modifier or function arguments by reference
+        preg_match($pattern, $subject, $matches, $flags, $offset);
+        return $matches;
     }
 
     /**
@@ -863,12 +883,14 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     * @param array  $matches
     * @param int    $flags
     * @param int    $offset
-    * @return int|flase
+    * @return array matches
     * @see https://php.net/manual/en/function.preg-match.php for details about the params description
     */
     public function smartyModifierPregMatchAll($pattern, $subject, $matches = null, $flags = 0, $offset = 0)
     {
-        return preg_match_all($pattern, $subject, $matches, $flags, $offset);
+        // return matches here as Smarty doesn't support modifier or function arguments by reference
+        preg_match_all($pattern, $subject, $matches, $flags, $offset);
+        return $matches;
     }
 
     /**
@@ -925,7 +947,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      * Name:     substring<br>
      * Purpose:  Returns a substring of string.  Same arguments as
      *           PHP substr function.
-     * @link based on substr(): http://www.zend.com/manual/function.substr.php
+     * @link based on substr(): https://www.php.net/manual/en/function.substr.php
      * @author   Mike Kerr <tiki.kerrnel at kerris dot com>
      * @param string
      * @param position: start position of substring (default=0, negative starts N from end)
@@ -1050,6 +1072,7 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
      */
     public function smartyModifierVardump($value)
     {
+        // @phpstan-ignore disallowedFunctions.varDump (implements the {$var|vardump} Smarty modifier for dev debugging)
         return var_dump($value);
     }
 
@@ -1070,5 +1093,35 @@ class SmartyTikiExtension extends \Smarty\Extension\Base
     public function smartyModifierStrtotime($datetime, $baseTimestamp = null)
     {
         return strtotime($datetime, $baseTimestamp);
+    }
+
+    /**
+     * @param string|null $string The HTML string to sanitize.
+     * @return string The sanitized, safe HTML.
+    */
+    public function smartyModifierSafeHtml(?string $string): string
+    {
+        if (empty($string)) {
+            return '';
+        }
+
+        // Use a static instance to ensure the expensive purifier setup runs only once per request.
+        static $purifier = null;
+        if ($purifier === null) {
+            require_once('lib/htmlpurifier_tiki/HTMLPurifier.tiki.php');
+            $config = \HTMLPurifier_HTML5Config::inherit(\getHTMLPurifierTikiConfig());
+
+            // Define a strict security policy based on a whitelist of allowed elements and attributes.
+            $config->set('HTML.Allowed', 'a[href|title],b,strong,i,em,br,p,u');
+            $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true]);
+
+            // Add defense-in-depth attributes for all links.
+            $config->set('HTML.TargetBlank', true);
+            $config->set('HTML.Nofollow', true);
+
+            $purifier = new \HTMLPurifier($config);
+        }
+
+        return $purifier->purify($string);
     }
 }

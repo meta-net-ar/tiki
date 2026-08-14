@@ -11,24 +11,27 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'parent'                      => 'int',               //post
-            'categId'                     => 'int',               //get
-            'remove'                      => 'int',               //post
-            'save'                        => 'bool',              //post
-            'allowSites'                  => 'bool',              //post
-            'showCount'                   => 'bool',              //post
-            'name'                        => 'string',            //post
-            'description'                 => 'xss',               //post
-            'childrenType'                => 'string',            //post
-            'viewableChildren'            => 'string',            //post
-            'editorGroup'                 => 'string',            //post
-            'offset'                      => 'int',               //get
-            'find'                        => 'string',            //post
-            'sort_mode'                   => 'string',            //get
+            'parent'                      => 'int',       // post
+            'categId'                     => 'int',       // get
+            'remove'                      => 'int',       // post
+            'save'                        => 'bool',      // post
+            'allowSites'                  => 'word',      // post
+            'showCount'                   => 'word',      // post
+            'name'                        => 'striptags', // post
+            'description'                 => 'striptags', // post
+            'childrenType'                => 'string',     // post
+            'viewableChildren'            => 'digits',    // post
+            'editorGroup'                 => 'groupname', // post
+            'offset'                      => 'int',       // get
+            'find'                        => 'striptags', // post
+            'sort_mode'                   => 'word',       // get
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_DIRECTORY;
+Sections::setCurrentSection($section);
 include_once('lib/directory/dirlib.php');
 $access->check_feature('feature_directory');
 $access->check_permission('tiki_p_admin_directory_cats');
@@ -107,21 +110,13 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$offset = $_REQUEST["offset"] ?? 0;
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign_by_ref('offset', $offset);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $smarty->assign('find', $find);
 $items = $dirlib->dir_list_categories($_REQUEST["parent"], $offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 $groups = $userlib->list_all_groups();
 $smarty->assign_by_ref('groups', $groups);
@@ -131,7 +126,6 @@ $cat_type = 'directory';
 $cat_objid = $_REQUEST['categId'];
 include_once("categorize_list.php");
 // This page should be displayed with Directory section options
-$section = 'directory';
 include_once('tiki-section_options.php');
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

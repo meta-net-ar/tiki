@@ -38,7 +38,6 @@
             {preference name='sitemap_enable'}
             {preference name='feature_sefurl_routes'}
             {preference name='fallbackBaseUrl'}
-            {preference name='wiki_make_ordered_list_items_display_unique_numbers'}
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}New Wiki Plugins{/tr}</legend>
@@ -144,7 +143,7 @@
 
                 {remarksbox type="info" title="{tr}H5P Info{/tr}"}
                 {tr}Service URL to purge unused libraries can be found here. Can be used in a cron task{/tr}<br>
-                    <a href="{service controller='h5p' action='cron' token=$prefs.h5p_cron_token}" class="btn btn-link">
+                    <a href="{service controller='h5p' action='cron' token=$prefs.h5p_cron_token}" role="button" class="btn btn-link">
                         {service controller='h5p' action='cron' token=$prefs.h5p_cron_token}
                     </a>
                 {/remarksbox}

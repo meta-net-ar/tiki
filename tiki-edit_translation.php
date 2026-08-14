@@ -13,10 +13,10 @@ $inputConfiguration = [
         'staticKeyFilters'                => [
             'id'                     => 'int',              //post
             'page'                   => 'pagename',         //post
-            'type'                   => 'string',           //post
+            'type'                   => 'text',           //post
             'langpage'               => 'lang',             //post
             'target_lang'            => 'lang',             //post
-            'translation_name'       => 'string',           //post
+            'translation_name'       => 'text',           //post
         ],
     ],
 ];
@@ -152,7 +152,6 @@ function execute_module_translation()
 
 function smarty_assign_default_target_lang($src_lang, $targ_lang_requested, $existing_translations, $user_langs)
 {
-    global $tracer;
     $multilinguallib = TikiLib::lib('multilingual');
     $smarty = TikiLib::lib('smarty');
 

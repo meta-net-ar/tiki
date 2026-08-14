@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use TikiManager\Application\Instance;
 use TikiManager\Libs\VersionControl\Git;
-use TikiManager\Libs\VersionControl\Svn;
 use TikiManager\Libs\VersionControl\Src;
 
 class Services_Manager_Utilities
@@ -35,16 +34,9 @@ class Services_Manager_Utilities
         $available = [];
         $vcs = null;
 
-        $output = `git --version`;
-        if (strstr($output, 'version') && ($instance instanceof Instance)) {
+        $output = shell_exec("git --version");
+        if (str_contains($output, 'version') && ($instance instanceof Instance)) {
             $vcs = new Git($instance);
-        }
-
-        if (! $vcs) {
-            $output = `svn --version`;
-            if (strstr($output, 'version')) {
-                $vcs = new Svn($instance);
-            }
         }
 
         if (! $vcs && ($instance instanceof Instance)) {
@@ -53,7 +45,7 @@ class Services_Manager_Utilities
 
         if (! empty($vcs)) {
             $versions = $vcs->getAvailableBranches();
-            foreach ($versions as $key => $version) {
+            foreach ($versions as $version) {
                 preg_match('/(\d+\.|trunk|master)/', $version->branch, $matches);
                 if (! array_key_exists(0, $matches)) {
                     continue;

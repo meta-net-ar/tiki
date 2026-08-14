@@ -22,11 +22,11 @@ class ReportCacheClearCommand extends Command
     {
         $this
             ->setName('reportcache:clear')
-            ->setDescription('Clean user reports cache')
+            ->setDescription(tra('Clean user reports cache'))
             ->addArgument(
                 'days',
                 InputArgument::REQUIRED,
-                'Number of days to clean older report cache'
+                tra('Number of days to clean older report cache')
             );
     }
 

@@ -38,6 +38,7 @@
                     {preference name=wiki_page_name_above}
                     {preference name=wiki_page_name_inside}
                     {preference name=wiki_page_hide_title}
+                    {preference name=wiki_customize_title_tag}
                     {preference name=wiki_heading_links}
                     {preference name=feature_wiki_description}
                     <div class="adminoptionboxchild" id="wiki_description_childcontainer">
@@ -53,6 +54,7 @@
                     {preference name=wiki_collapse_expand_all_headings}
                     {preference name=wiki_page_navigation_bar}
                     {preference name=wiki_topline_position}
+                    {preference name=wiki_page_actions_groups}
                     {preference name=page_bar_position}
                 </fieldset>
             </div>
@@ -122,6 +124,7 @@
                         {preference name=wikiplugin_footnotearea}
                         {preference name=footnote_popovers}
                     </div>
+                    {preference name=wikiplugin_fancylink}
                 </fieldset>
             </div>
         {/tab}
@@ -324,7 +327,6 @@
                         <div class="offset-sm-4 colsm-8">
                             {tr}If the page name display stripper conflicts with the namespace separator, the namespace is used and the page name display is not stripped.{/tr}
                         </div>
-                        {preference name=wiki_pagename_strip}
                         {preference name=namespace_force_links}
                     </div>
                 </fieldset>
@@ -428,23 +430,19 @@
             </div>
             <div class="adminoptionbox clearfix">
                 <fieldset class="mb-3 w-100">
-                    <legend class="h3">{tr}Dump files{/tr}</legend>
-                    {tr}Dump files archive wiki pages for various usages such as off-line browsing or distribution on optical disks.{/tr}
-                    {remarksbox type="warning" title="{tr}Warning{/tr}"}
-                    {tr}The HTML files generated may refer to files not included in the dump.{/tr} {tr}Dumps do not include files attached to wiki pages.{/tr}
-                    {if $isDump}<li>{tr}Dumping will overwrite the preexisting dump.{/tr}</li>{/if}
-                    {/remarksbox}
-                    <input type="submit" class="btn btn-primary btn-sm" name="createdump" value="{tr}Create Dump File{/tr}">
-                    <input type="submit" class="btn btn-primary btn-sm" name="downloaddump" value="{tr}Download Dump File{/tr}" {if !$isDump} disabled="disabled"{/if}>
-                    <input type="submit" class="btn btn-primary btn-sm" name="removedump" data-bs-target="_blank" value="{tr}Remove Dump File{/tr}" {if !$isDump} disabled="disabled"{/if}>
-            </fieldset>
-            </div>
-            <div class="adminoptionbox clearfix">
-                <fieldset class="mb-3 w-100">
                     <legend class="h3">{tr}Mass replace and page permissions report{/tr}</legend>
                     <div class="adminoptionbox clearfix">
                         {button href="tiki-search_replace.php" _text="{tr}Mass search and replace{/tr}" _icon_name="exchange-alt" _type="primary"}
                         {button href="tiki-report_direct_object_perms.php" _text="{tr}Report wiki pages with direct object permissions{/tr}" _icon_name="paperclip" _type="primary"}
+                    </div>
+                </fieldset>
+            </div>
+            <div class="adminoptionbox clearfix">
+                <fieldset class="mb-3 w-100">
+                    <legend class="h3">{tr}Wiki page importers{/tr}</legend>
+                    <div class="adminoptionbox clearfix">
+                        {button href="tiki-markdown_import.php" _text="{tr}Import markdown files and convert to wiki pages{/tr}" _icon_name="file-import" _type="secondary"} <br /><br />
+                        {button href="tiki-import_xml_zip.php" _text="{tr}Import wiki pages in an XML Zip file from another Tiki{/tr}" _icon_name="file-import" _type="secondary"}
                     </div>
                 </fieldset>
             </div>

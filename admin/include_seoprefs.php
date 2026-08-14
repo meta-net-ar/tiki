@@ -7,7 +7,7 @@
 require_once('tiki-setup.php');
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -36,11 +36,11 @@ if ($prefs['wiki_customize_title_tag'] === 'y') {
 
 if (isset($_REQUEST['rebuild'])) {
     $sitemap->generate($base_url);
-    Feedback::success(tr('New sitemap created!'));
+    Feedback::success(tra('New sitemap created!'));
     $access->redirect('tiki-admin.php?page=seoprefs');
 }
 
-$smarty->assign('title', tr('Sitemap'));
+$smarty->assign('title', tra('Sitemap'));
 $smarty->assign('listPages', $listPages['data']);
 $smarty->assign('Url', $base_url . 'tiki-sitemap.php?file=' . $sitemap->getSitemapFilename());
 $smarty->assign('sitemapAvailable', file_exists($sitemap->getSitemapPath(false)));

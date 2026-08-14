@@ -13,8 +13,8 @@ $inputConfiguration = [
         'staticKeyFilters'         => [
         'list'                     => 'string',               //get
         'action'                   => 'string',               //get
-        'mixId'                    => 'int',                  //get
-        'mediaId'                  => 'int',                  //get
+        'mixId'                    => 'word',                 //get
+        'mediaId'                  => 'word',                 //get
         'view'                     => 'string',               //get
         ],
     ],
@@ -111,8 +111,8 @@ try {
     $page = ($offset / $page_size) + 1;
 
     if ($_REQUEST['list'] == 'mix' or ! isset($_REQUEST['list'])) {
+        $kalturaadminlib = TikiLib::lib('kalturaadmin');
         if ($_REQUEST['view'] != 'browse') {
-            $kalturaadminlib = TikiLib::lib('kalturaadmin');
             $kmixlist = $kalturaadminlib->listMix($sort_mode, $page, $page_size, $find);
 
             for ($i = 0; $i < $kmixlist->totalCount; $i++) {
@@ -137,12 +137,11 @@ try {
                 }
             }
         } else {
-            $kalturaadminlib = TikiLib::lib('kalturaadmin');
             $kmixlist = $kalturaadminlib->listMix($sort_mode, $page, $page_size, $find);
         }
 
         $smarty->assign('klist', $kmixlist->objects);
-        $smarty->assign('cant', $kmixlist->totalCount);
+        $smarty->assign('count', $kmixlist->totalCount);
         $smarty->assign('entryType', 'mix');
         $smarty->assign('view', $_REQUEST['view']);
         $smarty->assign('modifiedAt', $modifiedAt);
@@ -157,12 +156,12 @@ try {
                 for ($i = 0; $i < $kmedialist->totalCount; $i++) {
                     if (! empty($kmedialist->objects[$i]) && $kmedialist->objects[$i] !== null) {
                         $kmedialist->objects[$i]->mediaType = $mediaTypeAsString[$kmedialist->objects[$i]->mediaType];
-                        $kmedialist->objects[$i]->statusString = $statusAsString[$kmedialist->objects[$i]->status];
                     }
                 }
             }
             $smarty->assign('klist', $kmedialist->objects);
-            $smarty->assign('cant', $kmedialist->totalCount);
+            $smarty->assign('count', $kmedialist->totalCount);
+            $smarty->assign('statusAsString', $statusAsString);
         }
         $smarty->assign('entryType', 'media');
         $smarty->assign('view', $jitRequest->view->alpha());

@@ -1,34 +1,41 @@
-// Cyborg 5.3.3 -- This overrides and supplements node_modules/bootswatch/dist/cyborg/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Cyborg 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/cyborg/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/cyborg/_variables.scss"; // Bootswatch theme variables file
+
+//
 // Color system
 
-$red:     #F00000; //#c00;  default
+$blue:      #2DA1D7; // Lightened slightly for contrast against bg-light.
+$red:     #EB0000; // #F00000; //#c00;  default
 
 $primary:       #207CA7; // $blue;  // default
-//$secondary:     $gray-600;  // default
-$success:       #639400; // #558000; // $green !default;
-//$info:          $cyan;  // default
+$secondary:     $gray-600;  // default
+$success:       #558000; //#639400; // #558000; // $green !default;
+$info:          $cyan;  // default
 $warning:       #B35F00; // $yellow !default;
-//$danger:        $red;  // default
-$light:         #3D3D3D; //  $gray-800 !default; Darkened for increased contrast with link color
-//$dark:          $gray-400;  // default
+$danger:        $red;  // default
+$light:         #303030; // #737373; //  $gray-800 !default; Darkened for increased contrast with body color
+$dark: #000000;  // default
+
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 //$min-contrast-ratio:   2.25;  // default
-// Options
-// Prefix for :root CSS variables
 
-$variable-prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix;  // default
+// Options
+$enable-dark-mode:            false;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
-
 $body-bg:       #060606;  // default
 $body-color:    #999999; // $gray-400 !default; Lightened to meet WCAG minimum
 
 // Copied from variables-dark and renamed
-$body-secondary-color:         rgba($body-color, .75);  // default
+$body-secondary-color:         #B0B0B0BF; // rgba($body-color, .75);  // default
 $body-secondary-bg:            $gray-800;  // default
 $body-tertiary-color:          rgba($body-color, .5);  // default
 $body-tertiary-bg:             mix($gray-800, $gray-900, 50%);  // default
@@ -39,10 +46,10 @@ $border-color:                 $gray-700;  // default
 $link-color:                              #56B5E1; // #2799CE; //#2389B8; // $primary !default;
 
 // Typography
-
 $font-family-sans-serif:        Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;
 $font-size-base:                1.1rem;
 $mark-bg:                     #4D2900;
+$blockquote-footer-color:     #A3A3A3; // $gray-600 !default;
 
 // Tables
 $table-color:                   var(--#{$prefix}body-color);  // default // $white !default;
@@ -51,11 +58,11 @@ $table-color:                   var(--#{$prefix}body-color);  // default // $whi
 // Forms
 $input-bg:                          var(--#{$prefix}tertiary-bg); // Changed from body-bg for visibility
 $input-disabled-bg:                 var(--#{$prefix}secondary-bg);  // default // $gray-400 !default;
-$input-color:                       var(--#{$prefix}body-color);
-$input-border-color:                var(--#{$prefix}body-color);
+$input-color:                       var(--#{$prefix}body-color); // Changed from $gray-900 !default
+$input-border-color:                var(--#{$prefix}body-color); // Changed from $white !default
 $form-file-button-color:          $white;  // default
 
-$form-text-color: var(--#{$prefix}body-color);
+$form-text-color: var(--#{$prefix}body-color); // Changed from Bootstrap default - var(--#{$prefix}secondary-color) !default;
 $form-feedback-valid-color:         $success; // !default;
 $form-feedback-invalid-color:       $danger; // !default;
 
@@ -70,10 +77,10 @@ $form-invalid-border-color:         $form-feedback-invalid-color; // !default;
 // Navbar
 $navbar-dark-hover-color:           $white;  // default
 
-$navbar-light-color:                $link-color;
+$navbar-light-color:                #81ADC5;
 $navbar-light-hover-color:          rgba($black, .7);  // default
-$navbar-light-active-color:         rgba($black, .9);  // default
-$navbar-light-disabled-color:       rgba($black, .3);  // default
+$navbar-light-active-color:         #72BADCFF; // rgba($black, .9);  // default
+$navbar-light-disabled-color: #3C6980FF; // rgba($black, .3);  // default
 $navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
 $navbar-light-toggler-border-color: rgba($black, .1);  // default
 $navbar-light-brand-color:          $navbar-light-active-color;  // default
@@ -98,6 +105,9 @@ $progress-bg:                       var(--#{$prefix}secondary-bg);  // default;
 
 // List group
 // Breadcrumbs
+// Figures
+$figure-caption-color:  #919191;
+
 // Close
 // Code
 

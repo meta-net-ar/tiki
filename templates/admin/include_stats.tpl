@@ -31,14 +31,14 @@
             </fieldset>
         {/tab}
 
-        {tab name="{tr}Piwik Analytics{/tr}"}
+        {tab name="{tr}Matomo Analytics{/tr}"}
             <br>
             <fieldset>
-                {preference name=site_piwik_analytics_server_url}
-                {preference name=site_piwik_site_id}
-                {preference name=site_piwik_code syntax="javascript"}
-                {preference name=site_piwik_group_option}
-                {preference name=site_piwik_groups}
+                {preference name=site_matomo_analytics_server_url}
+                {preference name=site_matomo_site_id}
+                {preference name=site_matomo_code syntax="javascript"}
+                {preference name=site_matomo_group_option}
+                {preference name=site_matomo_groups}
             </fieldset>
         {/tab}
     {/tabset}

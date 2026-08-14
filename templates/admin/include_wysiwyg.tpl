@@ -7,6 +7,7 @@
         </a>
         {include file='admin/include_apply_top.tpl'}
     </div>
+    <div class="styling-element">
     {if $prefs.wysiwyg_htmltowiki neq 'y'}
         {remarksbox type="warning" title="{tr}Page links{/tr}"}{tr}Note that if the SEFURL feature is on, page links created using wysiwyg might not be automatically updated when pages are renamed. This is addressed through the "Use Wiki syntax in WYSIWYG" feature.{/tr}{/remarksbox}
     {/if}
@@ -37,6 +38,16 @@
         {preference name="wysiwyg_fonts"}
     </fieldset>
     <fieldset>
+        <legend class="h3">{tr}Language Checking{/tr}</legend>
+        {preference name=feature_language_check}
+        <div class="adminoptionboxchild" id="feature_language_check_childcontainer">
+            {preference name=language_tool_url}
+            {preference name=language_tool_username}
+            {preference name=language_check_auto_detect}
+            {preference name=language_check_debounce_ms}
+        </div>
+    </fieldset>
+    <fieldset>
         <legend class="heading">{tr}Related features{/tr}</legend>
         {preference name=feature_wiki_paragraph_formatting}
         <div class="adminoptionboxchild" id="feature_wiki_paragraph_formatting_childcontainer">
@@ -47,5 +58,6 @@
             {preference name=ajax_autosave}
         </div>
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

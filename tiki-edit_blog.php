@@ -8,15 +8,14 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'blogs';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
             'blogId'                      => 'int',          //post
-            'heading'                     => 'int',           //post
-            'post_heading'                => 'bool',          //post
+            'heading'                     => 'xss',           //post
+            'post_heading'                => 'xss',           //post
             'save'                        => 'bool',          //post
-            'preview'                     => 'int',           //post
+            'preview'                     => 'bool',          //post
             'public'                      => 'bool',          //post
             'allow_comments'              => 'bool',          //post
             'show_avatar'                 => 'bool',          //post
@@ -43,16 +42,15 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_BLOGS;
+Sections::setCurrentSection($section);
 $bloglib = TikiLib::lib('blog');
 
 $access->check_feature('feature_blogs');
 $access->check_permission('tiki_p_create_blogs');
 
-if (isset($_REQUEST["blogId"])) {
-    $blogId = $_REQUEST["blogId"];
-} else {
-    $blogId = 0;
-}
+$blogId = $_REQUEST["blogId"] ?? 0;
 
 $smarty->assign('individual', 'n');
 
@@ -61,6 +59,8 @@ $tikilib->get_perm_object($blogId, 'blog');
 $smarty->assign('blogId', $blogId);
 $smarty->assign('title', '');
 $smarty->assign('description', '');
+$smarty->assign('MAX_BLOG_TITLE_LENGTH', BlogLib::MAX_BLOG_TITLE_LENGTH);
+$smarty->assign('MAX_BLOG_DESCRIPTION_LENGTH', BlogLib::MAX_BLOG_DESCRIPTION_LENGTH);
 $smarty->assign('public', 'y');
 $smarty->assign('use_find', 'n');
 $smarty->assign('add_date', 'y');
@@ -120,7 +120,7 @@ if (isset($_REQUEST["blogId"]) && $_REQUEST["blogId"] > 0) {
     $smarty->assign('alwaysOwner', $data["always_owner"]);
 }
 
-if (isset($_REQUEST["heading"]) and $tiki_p_edit_templates == 'y') {
+if (isset($_REQUEST["heading"])) {
     // Sanitization cleanup
     $heading = preg_replace('/st<x>yle="[^"]*"/', 'style_dangerous', $_REQUEST["heading"]);
 } elseif (! isset($data["heading"])) {
@@ -132,7 +132,7 @@ if (isset($_REQUEST["heading"]) and $tiki_p_edit_templates == 'y') {
     $heading = $data["heading"];
 }
 
-if (isset($_REQUEST["post_heading"]) and $tiki_p_edit_templates == 'y') {
+if (isset($_REQUEST["post_heading"])) {
     // Sanitization cleanup
     $post_heading = preg_replace('/st<x>yle="[^"]*"/', 'style_dangerous', $_REQUEST["post_heading"]);
 } elseif (! isset($data["post_heading"])) {
@@ -165,7 +165,7 @@ if (isset($_REQUEST["save"]) && $prefs['feature_categories'] == 'y' && $prefs['f
     $allow_post_categorization = isset($_REQUEST["allow_post_categorization"]) ? 'y' : 'n';
     $show_avatar = isset($_REQUEST['show_avatar']) ? 'y' : 'n';
     $show_related = isset($_REQUEST['show_related']) ? 'y' : 'n';
-    $related_max = isset($_REQUEST['related_max']) ? $_REQUEST['related_max'] : 5;
+    $related_max = $_REQUEST['related_max'] ?? 5;
     $use_excerpt = isset($_REQUEST['use_excerpt']) ? 'y' : 'n';
     $use_find = isset($_REQUEST['use_find']) ? 'y' : 'n';
     $use_title = isset($_REQUEST['use_title']) ? 'y' : 'n';
@@ -177,6 +177,15 @@ if (isset($_REQUEST["save"]) && $prefs['feature_categories'] == 'y' && $prefs['f
     $alwaysOwner = isset($_REQUEST['alwaysOwner']) ? 'y' : 'n';
 
     if (isset($_REQUEST["save"])) {
+        if (isset($_REQUEST["title"], $_REQUEST["description"])) {
+            $validateTitleFieldLength = Feedback::validateFieldLength("Title", $_REQUEST["title"], BlogLib::MAX_BLOG_TITLE_LENGTH);
+            $validateDescriptionFieldLength = Feedback::validateFieldLength("Description", $_REQUEST["description"], BlogLib::MAX_BLOG_DESCRIPTION_LENGTH);
+            if (! $validateTitleFieldLength || ! $validateDescriptionFieldLength) {
+                $smarty->assign('mid', 'tiki-edit_blog.tpl');
+                $smarty->display("tiki.tpl");
+                die;
+            }
+        }
         $bid = $bloglib->replace_blog(
             $_REQUEST["title"],
             $_REQUEST["description"],
@@ -227,7 +236,7 @@ if (isset($_REQUEST['preview']) || $category_needed) {
     $smarty->assign('use_author', isset($_REQUEST["use_author"]) ? 'y' : 'n');
     $smarty->assign('show_avatar', isset($_REQUEST["show_avatar"]) ? 'y' : 'n');
     $smarty->assign('show_related', isset($_REQUEST["show_related"]) ? 'y' : 'n');
-    $smarty->assign('related_max', isset($_REQUEST['related_max']) ? $_REQUEST['related_max'] : 5);
+    $smarty->assign('related_max', $_REQUEST['related_max'] ?? 5);
     $smarty->assign('use_excerpt', isset($_REQUEST['use_excerpt']) ? 'y' : 'n');
     $smarty->assign('add_date', isset($_REQUEST["add_date"]) ? 'y' : 'n');
     $smarty->assign('allow_comments', isset($_REQUEST["allow_comments"]) ? 'y' : 'n');

@@ -29,7 +29,6 @@ class TikiObject extends Type
                     'article' => tr('Article'),
                     'blog' => tr('Blog'),
                     'forum' => tr('Forum'),
-                    'gallery' => tr('Image Gallery'),
                     'wiki page' => tr('Wiki Page'),
                 ],
             ],

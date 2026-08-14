@@ -19,7 +19,7 @@ class DebugPrintTree
 {
     public function handle($data)
     {
-        $out = print_r($data, true);
+        $out = print_r($data, true); // @phpstan-ignore disallowedFunctions.printR (intentional Smarty debug modifier — formats data tree as string for template rendering)
         $out = preg_replace_callback('/([ \t]*)(\[[^\]]+\][ \t]*\=\>[ \t]*[a-z0-9 \t_]+)\n[ \t]*\(/iU', [$this, 'replaceCallback'], $out);
         $out = preg_replace_callback('/(.*)([ \t]*[a-z0-9 \t_]+)\n[ \t]*\(/iU', [$this, 'replaceCallback'], $out);
         $out = preg_replace('/^\s*\)\s*$/m', '</div>', $out);

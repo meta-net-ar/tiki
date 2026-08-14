@@ -12,6 +12,8 @@ vi.mock("element-plus", async (importOriginal) => {
     return {
         ...actual,
         ElDatePicker: vi.fn((props, { slots }) => h("div", props, slots.default ? slots.default() : null)),
+        ElSelect: vi.fn((props, { slots }) => h("div", props, slots.default ? slots.default() : null)),
+        ElOption: vi.fn((props) => h("div", props)),
     };
 });
 
@@ -187,26 +189,22 @@ describe("DatePicker", () => {
 
             const willUpdateToDate = new Date("2025-01-25");
 
-            ElDatePicker = {
-                emits: ["change", "update:modelValue"],
-                setup(_, { emit }) {
-                    return () =>
-                        h(
-                            "div",
-                            {},
-                            h(
-                                "button",
-                                {
-                                    onClick: () => {
-                                        emit("change", willUpdateToDate);
-                                        emit("update:modelValue", willUpdateToDate);
-                                    },
-                                },
-                                "Select"
-                            )
-                        );
-                },
-            };
+            vi.mocked(ElDatePicker).mockImplementationOnce((_, ctx) =>
+                h(
+                    "div",
+                    {},
+                    h(
+                        "button",
+                        {
+                            onClick: () => {
+                                ctx.emit("change", willUpdateToDate);
+                                ctx.emit("update:modelValue", willUpdateToDate);
+                            },
+                        },
+                        "Select"
+                    )
+                )
+            );
 
             render(DatePicker, {
                 props: givenProps,
@@ -227,23 +225,22 @@ describe("DatePicker", () => {
             ["datetimerange", [new Date().toISOString(), new Date().toISOString()].join(","), true],
         ])("when the type is %s, emits the change event and updates the exposed data when the timezone changes", async (type, value, isRange) => {
             const willUpdateToTimezone = "Africa/Abidjan";
-            vi.spyOn(ElSelect, "setup").mockImplementationOnce((props, { emit }) => {
-                return () =>
+            vi.mocked(ElSelect).mockImplementationOnce((props, ctx) =>
+                h(
+                    "div",
+                    props,
                     h(
-                        "div",
-                        {},
-                        h(
-                            "button",
-                            {
-                                onClick: () => {
-                                    emit("change", willUpdateToTimezone);
-                                    emit("update:modelValue", willUpdateToTimezone);
-                                },
+                        "button",
+                        {
+                            onClick: () => {
+                                ctx.emit("change", willUpdateToTimezone);
+                                ctx.emit("update:modelValue", willUpdateToTimezone);
                             },
-                            "Select"
-                        )
-                    );
-            });
+                        },
+                        "Select"
+                    )
+                )
+            );
             const givenProps = {
                 _expose: vi.fn(),
                 _emit: vi.fn(),

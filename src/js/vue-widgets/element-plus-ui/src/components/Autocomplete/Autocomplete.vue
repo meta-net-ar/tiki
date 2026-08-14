@@ -1,16 +1,63 @@
 <script setup>
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { fetchSuggestions } from '../../helpers/autocomplete/remote';
 import ConfigWrapper from '../ConfigWrapper.vue';
 
-const props = defineProps(['value', 'remoteSourceUrl', 'sourceList', 'emitCustomEvent', 'placeholder', 'valueKey', 'language']);
+const props = defineProps([
+    '_expose',
+    'value',
+    'remoteSourceUrl',
+    'sourceList',
+    'emitCustomEvent',
+    'placeholder',
+    'valueKey',
+    'language',
+    'transformResultFn',
+    'remoteQueryKey',
+]);
 
 const valueKey = props.valueKey || 'value';
 const placeholder = props.placeholder || TEXT.INPUT_PLACEHOLDER;
+const shouldRefocusOnBlur = ref(false);
 
 const modelValue = ref(props.value);
+const autocompleteRef = ref(null);
+const setValue = (val) => {
+    modelValue.value = val;
+};
 
-const handleFetchSuggestions = (query, callback) => fetchSuggestions(query, callback, props.remoteSourceUrl, (props.sourceList ? JSON.parse(props.sourceList): []));
+// This ensures that if jQuery changes the 'value' prop/attribute, Vue reacts
+watch(
+    () => props.value,
+    (newVal) => {
+        modelValue.value = newVal;
+    }
+);
+
+props._expose({
+    value: modelValue,
+    setValue,
+});
+
+const handleFetchSuggestions = (query, callback) => {
+    const wrappedCallback = (results) => {
+        callback(props.transformResultFn ? window[props.transformResultFn](results) : results);
+
+        if (!results || results.length === 0) {
+             // If there are no results, set a flag indicating that the next blur event is likely programmatic and should be counteracted by a refocus.
+            shouldRefocusOnBlur.value = true;
+        }
+    };
+    fetchSuggestions(query, wrappedCallback, props.remoteSourceUrl, (props.sourceList ? JSON.parse(props.sourceList): []), props.remoteQueryKey);
+}
+
+const handleBlur = () => {
+    // Refocuses the input if the blur was triggered programmatically by a "no results" event.
+    if (shouldRefocusOnBlur.value) {
+        autocompleteRef.value?.inputRef?.focus();
+        shouldRefocusOnBlur.value = false;
+    }
+};
 
 const handleSelect = (value) => {
     props.emitCustomEvent('select', value);
@@ -29,6 +76,7 @@ onMounted(() => {
         console.error(TEXT.ERROR_NO_REQUIRED_PROPS);
     }
 })
+
 </script>
 
 <script>
@@ -46,6 +94,7 @@ export const DATA_TEST_ID = {
 <template>
     <ConfigWrapper :language="language">
         <el-autocomplete
+            ref="autocompleteRef"
             v-model="modelValue"
             :debounce="500"
             :trigger-on-focus="false"
@@ -53,9 +102,11 @@ export const DATA_TEST_ID = {
             :data-testid="DATA_TEST_ID.AUTOCOMPLETE_ELEMENT"
             :placeholder="placeholder"
             :value-key="valueKey"
+            :highlight-first-item="true"
             @select="handleSelect"
             @input="handleInput"
             @keyup.enter="handlePressEnter"
+            @blur="handleBlur"
             clearable
             :teleported="false"
         >

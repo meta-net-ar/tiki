@@ -1,4 +1,4 @@
-{if $wp_member_requestpending neq 'y' }
+{if $wp_member_requestpending neq 'y'}
 <form method="post" action="#pluginMemberpayment{$iPluginMemberpayment}">
     <p>
     {if !empty($wp_member_title) or !empty($wp_member_anniversary_day)}

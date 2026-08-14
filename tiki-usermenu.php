@@ -4,7 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 
 $inputConfiguration = [
     [
@@ -14,20 +13,24 @@ $inputConfiguration = [
             'addbk'             => 'bool',          //post
             'url'               => 'url',           //post
             'save'              => 'bool',          //post
-            'name'              => 'string',        //post
+            'name'              => 'striptags',     //post
             'position'          => 'int',           //post
-            'mode'              => 'string',        //post
-            'sort_mode'         => 'string',        //post
+            'mode'              => 'alpha',         //post
+            'sort_mode'         => 'alnumdash',     //post
             'offset'            => 'int',           //post
-            'find'              => 'string',        //post
+            'find'              => 'striptags',     //post
         ],
         'staticKeyFiltersForArrays' => [
-            'menu'          => 'string',    //post
+            'menu'          => 'int',    //post
         ],
     ],
 ];
+
 require_once('tiki-setup.php');
 include_once('lib/usermenu/usermenulib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 
 $access->check_feature('feature_usermenu');
 $access->check_user($user);
@@ -57,7 +60,7 @@ if ($_REQUEST["menuId"]) {
 } else {
     $info = [];
     $info['name'] = '';
-    $info['url'] = isset($_REQUEST['url']) ? $_REQUEST['url'] : '';
+    $info['url'] = $_REQUEST['url'] ?? '';
     $info['mode'] = 'w';
     $info['position'] = $usermenulib->get_max_position($user) + 1;
 }
@@ -78,17 +81,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 if (isset($_SESSION['thedate'])) {
@@ -97,7 +92,7 @@ if (isset($_SESSION['thedate'])) {
     $pdate = $tikilib->now;
 }
 $channels = $usermenulib->list_usermenus($user, $offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 include_once('tiki-mytiki_shared.php');
 $smarty->assign('mid', 'tiki-usermenu.tpl');

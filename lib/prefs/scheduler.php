@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_scheduler_list($partial = false)
 {
+    $generalPreferencesHelp = 'General-Preferences';
+
     return [
         'scheduler_stalled_timeout' => [
             'name' => tr('Scheduler stalled after (minutes)'),
@@ -14,20 +16,31 @@ function prefs_scheduler_list($partial = false)
             'filter' => 'digits',
             'default' => 15,
             'tags' => ['advanced'],
+            'help' => $generalPreferencesHelp,
         ],
         'scheduler_notify_on_stalled' => [
-            'name' => tr('Notify on stalled schedulers'),
-            'description' => tr('Send an email notification when a stalled scheduler is detected.'),
+            'name' => tr('Notify on stalled, healed and failed schedulers'),
+            'description' => tr('Send an email notification when a stalled, healed or failed scheduler is detected.'),
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['advanced'],
+            'help' => $generalPreferencesHelp,
+        ],
+        'scheduler_notify_admins' => [
+            'name' => tr('Notify all administrators'),
+            'description' => tr('Notify all administrators (in addition to any specific users listed below).'),
+            'type' => 'flag',
+            'default' => 'y',
+            'tags' => ['advanced'],
+            'help' => $generalPreferencesHelp,
         ],
         'scheduler_users_to_notify_on_stalled' => [
-            'name' => tr('Users to notify on stalled task'),
-            'description' => tr('List of users/emails separated by comma to be notified when a scheduler task is set to stalled.</br><code>Ex: admin,operations@example.com</code></br><strong>If empty, the email will be sent to all administrators.</strong>'),
+            'name' => tr('Users to notify on stalled, healed and failed tasks'),
+            'description' => tr('List of users/emails separated by comma to be notified when a scheduler task is stalled, healed, or failed.</br><code>Ex: admin,operations@example.com</code></br><strong>If empty and "Notify admins" is checked, notifications will be sent to all administrators.</strong>'),
             'type' => 'text',
             'default' => '',
             'tags' => ['advanced'],
+            'help' => $generalPreferencesHelp,
         ],
         'scheduler_healing_timeout' => [
             'name' => tr('Self healing after (minutes)'),
@@ -37,20 +50,7 @@ function prefs_scheduler_list($partial = false)
             'default' => 30,
             'filter' => 'digits',
             'tags' => ['advanced'],
-        ],
-        'scheduler_notify_on_healing' => [
-            'name' => tr('Notify on healed schedulers'),
-            'description' => tr('Send an email notification when a stalled scheduler is healed.'),
-            'type' => 'flag',
-            'default' => 'y',
-            'tags' => ['advanced'],
-        ],
-        'scheduler_users_to_notify_on_healed' => [
-            'name' => tr('Users to notify on healed task'),
-            'description' => tr('List of users/emails separated by comma to be notified when a scheduler task is set to healed.</br><code>Ex: admin,operations@example.com</code></br><strong>If empty, the email will be sent to all administrators.</strong>'),
-            'type' => 'text',
-            'default' => '',
-            'tags' => ['advanced'],
+            'help' => $generalPreferencesHelp,
         ],
         'scheduler_keep_logs' => [
             'name' => tr('Number of logs to keep'),
@@ -60,6 +60,7 @@ function prefs_scheduler_list($partial = false)
             'default' => 10000,
             'filter' => 'digits',
             'tags' => ['advanced'],
+            'help' => $generalPreferencesHelp,
         ],
         'scheduler_delay' => [
             'name' => tr('Delay scheduled time (minutes)'),
@@ -68,6 +69,7 @@ function prefs_scheduler_list($partial = false)
             'filter' => 'digits',
             'default' => 0,
             'tags' => ['advanced'],
+            'help' => $generalPreferencesHelp,
         ],
         'scheduler_last_run_warning_minutes' => [
             'name' => tra('Minutes hold warning message'),
@@ -77,6 +79,7 @@ function prefs_scheduler_list($partial = false)
             'units' => tra('minutes'),
             'size' => 3,
             'default' => 60,
+            'help' => $generalPreferencesHelp,
         ],
         'scheduler_last_run_timestamp' => [
             'name' => tra('Timestamp scheduler last run'),
@@ -84,6 +87,7 @@ function prefs_scheduler_list($partial = false)
             'type' => 'text',
             'filter' => 'digits',
             'default' => '',
+            // TODO: add documentation for this preference
         ],
         'scheduler_shell_command' => [
             'name' => tr('Allow shell command execution'),
@@ -91,6 +95,7 @@ function prefs_scheduler_list($partial = false)
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced'],
+            'help' => $generalPreferencesHelp,
         ],
     ];
 }

@@ -8,34 +8,38 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'calendar';
+
+use Tiki\Lib\TikiDate;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'allCals'               => 'text',              //post
+            'allCals'               => 'bool',              //post
             'refresh'               => 'bool',              //post
-            'find'                  => 'word',              //post
+            'find'                  => 'string',         //post
             'day'                   => 'digits',            //post
             'year'                  => 'digits',            //post
             'mon'                   => 'digits',            //post
-            'generate_availability' => 'digits',            //post
-            'sort_mode'             => 'string',            //get
-            'watch_event'           => 'string',            //post
-            'watch_action'          => 'string',            //post
-            'todate'                => 'string',            //post
-
-        ],'staticKeyFiltersForArrays' => [
-            'calIds'                    => 'int',          //post
+            'generate_availability' => 'bool',              //post
+            'sort_mode'             => 'word',              //get
+            'watch_event'           => 'word',              //post
+            'watch_action'          => 'word',              //post
+            'todate'                => 'int',               //post
+            'viewmode'              => 'word',              //post
+            'calitemId'            => 'int',                //post
+        ],
+        'staticKeyFiltersForArrays'   => [
+            'calIds'                => 'int',               //post
         ],
     ]
 ];
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_CALENDAR;
+Sections::setCurrentSection($section);
 $calendarlib = TikiLib::lib('calendar');
 $categlib = TikiLib::lib('categ');
 include_once('lib/newsletters/nllib.php');
-
-$headerlib->add_cssfile('themes/base_files/feature_css/calendar.css', 20);
 # perms are
 #   $tiki_p_view_calendar
 #   $tiki_p_admin_calendar
@@ -64,12 +68,11 @@ if (! isset($cookietab)) {
 $rawcals = $calendarlib->list_calendars();
 
 if (empty($rawcals['data'])) {
-    if (Perms::get(['type' => 'calendar'])->admin_calendar) {
-        $message = tr('You need to %0create a calendar%1', '<a href="tiki-admin_calendars.php?cookietab=2">', '</a>');
-    } else {
-        $message = tra('No calendars found');
-    }
-    Feedback::errorAndDie($message, \Laminas\Http\Response::STATUS_CODE_404);
+    $smarty->assign('calendarEmptyState', true);
+    $smarty->assign('mid', 'tiki-calendar.tpl');
+    $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
+    $smarty->display("tiki.tpl");
+    die;
 }
 
 $rawcals['data'] = Perms::filter(
@@ -84,28 +87,16 @@ if (empty($rawcals['data'])) {
     Feedback::errorAndDie(tra("You do not have permission to view the calendar"), \Laminas\Http\Response::STATUS_CODE_401);
 }
 
-$minHourOfDay = 12;
-$maxHourOfDay = 12;
-$calendars = [];
-$canEditAnything = false;
+$calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
+$calendarInitialParams['initialView'] = $_REQUEST['viewmode'] ?? 'dayGridMonth';
+$smarty->assign('eventCalendarParams', $calendarInitialParams);
 
-foreach ($rawcals['data'] as $calendar) {
-    $calendar['perms'] = Perms::get([ 'type' => 'calendar', 'object' => $calendar['calendarId']]);
-
-    $calendars[$calendar['calendarId']] = $calendar;
-
-    // for week and day views
-    $startOfDayUnix = (int)($calendar['startday'] ?? $prefs['calendar_startday'] ?? 0);
-    $startOfDayHour = $startOfDayUnix / 3600;
-    $startOfDayMinute = ($startOfDayUnix % 3600) / 60;
-    $minHourOfDay = date('H:i:s', mktime($startOfDayHour, $startOfDayMinute, 0));
-    $endOfDayUnix = (int)($calendar['endday'] ?? 0);
-    $endOfDayHour = $endOfDayUnix / 3600;
-    $endOfDayMinute = ($endOfDayUnix % 3600) / 60;
-    $maxHourOfDay = date('H:i:s', mktime($endOfDayHour, $endOfDayMinute, 0));
-
-    $canEditAnything = $calendar['perms']->add_events || $calendar['perms']->add_events;
-}
+$calendars = $calendarInitialParams['calendars'];
+$canEditAnything = $calendarInitialParams['canEditAnything'];
+$minHourOfDay = (int)explode(':', $calendarInitialParams['minHourOfDay'])[0];
+$maxHourOfDay = (int)explode(':', $calendarInitialParams['maxHourOfDay'])[0];
+$startOfDayMinute = (int)explode(':', $calendarInitialParams['minHourOfDay'])[1];
+$endOfDayMinute = (int)explode(':', $calendarInitialParams['maxHourOfDay'])[1];
 
 $rawsubs = $calendarlib->get_subscriptions($user);
 foreach ($rawsubs['data'] as $sub) {
@@ -134,11 +125,11 @@ if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQ
     if (! empty($user)) {
         $tikilib->set_user_preference($user, 'default_calendars', serialize($_SESSION['CalendarViewGroups']));
     }
-} elseif (! isset($_SESSION['CalendarViewGroups']) || ! empty($_REQUEST['allCals'])) {
+} elseif (! isset($_SESSION['CalendarViewGroups'])) {
     $use_default_calendars = true;
 } elseif (isset($_REQUEST["refresh"]) and ! isset($_REQUEST["calIds"])) {
     $_SESSION['CalendarViewGroups'] = [];
-} elseif (! empty($user) || ! isset($_SESSION['CalendarViewGroups'])) {
+} elseif (! empty($user)) {
     $use_default_calendars = true;
 }
 
@@ -168,6 +159,9 @@ if (! empty($_REQUEST["calitemId"])) {
 } else {
     $calitemId = '';
 }
+global $base_uri;
+$current_url = $base_uri;
+$smarty->assign('returnURL', $current_url);
 $smarty->assign('currentcalitemId', $calitemId);
 
 $smarty->assign('displayedcals', $_SESSION['CalendarViewGroups']);
@@ -182,21 +176,16 @@ if (is_array($_SESSION['CalendarViewGroups'])) {
     }
 }
 $smarty->assign_by_ref('checkedCalIds', $checkedCalIds);
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 
-if (isset($_REQUEST['mon']) && ! empty($_REQUEST['mon'])) {
+if (! empty($_REQUEST['mon'])) {
     $request_month = $_REQUEST['mon'];
 }
-if (isset($_REQUEST['day']) && ! empty($_REQUEST['day'])) {
+if (! empty($_REQUEST['day'])) {
     $request_day = $_REQUEST['day'];
 }
-if (isset($_REQUEST['year']) && ! empty($_REQUEST['year'])) {
+if (! empty($_REQUEST['year'])) {
     $request_year = $_REQUEST['year'];
 }
 
@@ -221,71 +210,101 @@ $viewdays = array_map("correct_start_day", array_unique($viewdays));
 $viewdays2 = array_values($viewdays);
 
 if (! empty($_REQUEST['generate_availability'])) {
-    $ranges = [];
-    foreach ($viewdays as $day) {
-        $ranges[$day] = [[$minHourOfDay, 0], [$maxHourOfDay, 0]];
+    try {
+        if (empty($viewdays) || ! is_array($viewdays)) {
+            throw new Exception(tr('Invalid view days parameter'));
+        }
+        if (empty($focusdate) || ! is_numeric($focusdate)) {
+            throw new Exception(tr('Invalid focus date'));
+        }
+        $ranges = [];
+        foreach ($viewdays as $day) {
+            if (! is_numeric($day)) {
+                continue;
+            }
+            $ranges[$day] = [
+                [$minHourOfDay, $startOfDayMinute], [$maxHourOfDay, $endOfDayMinute]
+            ];
+        }
+        $busy_list = [];
+        $weekday = TikiLib::date_format('%w', $focusdate);
+        $week_start = $focusdate;
+        if ($weekday > 0) {
+            $week_start -= $weekday * 86400;
+        }
+        $week_end = $week_start + (7 * 86400) - 1;
+        $week_events = $calendarlib->list_raw_items(
+            $_SESSION['CalendarViewGroups'],
+            $user,
+            $week_start,
+            $week_end,
+            0,
+            -1
+        );
+        foreach ($week_events as $week_event) {
+            if (empty($week_event['start']) || empty($week_event['end'])) {
+                continue;
+            }
+            $dow = TikiLib::date_format("%w", $week_event['start']);
+            $start_time = TikiLib::date_format("%H %i", $week_event['start']);
+            $end_time = TikiLib::date_format("%H %i", $week_event['end']);
+            if (empty($start_time) || empty($end_time)) {
+                continue;
+            }
+            list($sh, $sm) = explode(' ', $start_time);
+            list($eh, $em) = explode(' ', $end_time);
+            $busy_list[] = [$dow, [$sh, $sm], [$eh, $em]];
+        }
+        $nlgen = new NLGen\Grammars\Availability\AvailabilityGenerator();
+        $nlg_availability = $nlgen->generateAvailability($busy_list, $ranges, NLGen\Grammars\Availability\AvailabilityGrammar::SPECIFIC, null);
+        $smarty->assign('nlg_availability', $nlg_availability);
+    } catch (Exception $e) {
+        error_log("Availability generation error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (calendar exception reporting)
+        Feedback::error($e->getMessage());
+        $smarty->assign('nlg_availability', '');
     }
-    $busy_list = [];
-    $weekday = TikiLib::date_format('%w', $focusdate);
-    $week_start = $focusdate;
-    if ($weekday > 0) {
-        $week_start -= $weekday * 86400;
-    }
-    $week_end = $week_start + 7 * 86400 - 1;
-    $week_events = $calendarlib->list_raw_items($_SESSION['CalendarViewGroups'], $user, $week_start, $week_end, 0, -1);
-    foreach ($week_events as $week_event) {
-        $dow = TikiLib::date_format("%w", $week_event['start']);
-        [$sh, $sm] = explode(' ', TikiLib::date_format("%H %i", $week_event['start']));
-        [$eh, $em] = explode(' ', TikiLib::date_format("%H %i", $week_event['end']));
-        $busy_list[] = [$dow, [$sh, $sm], [$eh, $em]];
-    }
-    $nlgen = new NLGen\Grammars\Availability\AvailabilityGenerator();
-    $nlg_availability = $nlgen->generateAvailability($busy_list, $ranges, NLGen\Grammars\Availability\AvailabilityGrammar::SPECIFIC, null);
-    $smarty->assign('nlg_availability', $nlg_availability);
 }
 
 if (isset($_REQUEST['sort_mode'])) {
     $sort_mode = $_REQUEST['sort_mode'];
 }
 
-$viewstart = $_REQUEST['todate'] ?? $tikilib->now;
-$viewend = $viewstart + 90 * 86400 - 1; // 1 month approx
+$viewstart = $daystart;
+$viewend = $dayend;
 
-if ($_SESSION['CalendarViewGroups']) {
-    if (array_key_exists('CalendarViewList', $_SESSION) && $_SESSION['CalendarViewList'] == "list") {
-        if (! isset($sort_mode)) {
-            $sort_mode = "start_asc";
-        }
-        $smarty->assign_by_ref('sort_mode', $sort_mode);
+$listevents = [];
+if (! empty($_SESSION['CalendarViewGroups']) && ! empty($_SESSION['CalendarViewList']) && $_SESSION['CalendarViewList'] === 'list') {
+    // This logic is only for the 'list' view. The 'table' view is handled by AJAX.
 
-        $listevents = $calendarlib->list_raw_items(
-            $_SESSION['CalendarViewGroups'],
-            $user,
-            $viewstart,
-            $viewend,
-            0,
-            $prefs['maxRecords'],
-            $sort_mode
-        );
-
-        $listevents = Perms::filter(
-            ['type' => 'calendaritem'],
-            'object',
-            $listevents,
-            ['object' => 'calitemId'],
-            ['view_events']
-        );
-
-        foreach ($listevents as & $event) {
-            $event['perms'] = Perms::get([ 'type' => 'calendaritem', 'object' => $event['calitemId']]);
-        }
-    } else {
-        $listevents = $calendarlib->list_items($_SESSION['CalendarViewGroups'], $user, $viewstart, $viewend, 0, -1);
+    if (! isset($sort_mode)) {
+        $sort_mode = "start_asc";
     }
-    $smarty->assign_by_ref('listevents', $listevents);
-} else {
-    $listevents = [];
+    $smarty->assign_by_ref('sort_mode', $sort_mode);
+
+    $listevents = $calendarlib->list_raw_items(
+        $_SESSION['CalendarViewGroups'],
+        $user,
+        $viewstart,
+        $viewend,
+        0,
+        -1,
+        $sort_mode
+    );
+
+    $listevents = Perms::filter(
+        ['type' => 'calendaritem'],
+        'object',
+        $listevents,
+        ['object' => 'calitemId'],
+        ['view_events']
+    );
+
+    foreach ($listevents as & $event) {
+        $event['perms'] = Perms::get([ 'type' => 'calendaritem', 'object' => $event['calitemId']]);
+    }
+    unset($event);
 }
+$smarty->assign_by_ref('listevents', $listevents);
 
 $mloop = TikiLib::date_format("%m", $viewstart);
 $dloop = TikiLib::date_format("%d", $viewstart);
@@ -339,14 +358,13 @@ if ($prefs['feature_theme_control'] == 'y'  and isset($_REQUEST['calIds'])) {
 include_once('tiki-section_options.php');
 
     $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
-// Disable fullcalendar's force events to be one-line tall
+// Disable eventcalendar's force events to be one-line tall
 $headerlib->add_css('.ec-event > .ec-content { white-space: normal; }');
 if ($canEditAnything) {
     $smarty->assign('minHourOfDay', $minHourOfDay . ':00:00');
     $smarty->assign('maxHourOfDay', $maxHourOfDay . ':00:00');
 
     TikiLib::lib('header')
-        ->add_cssfile('themes/base_files/feature_css/calendar.css', 20)
         ->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
 }
 

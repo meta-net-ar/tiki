@@ -130,7 +130,7 @@ function wikiplugin_tikimanagerupdate($data, $params)
         return WikiParser_PluginOutput::error(tra('Error'), $e->getMessage());
     }
 
-    $availbleInstances = TikiManager\Application\Instance::getInstances(true);
+    $availbleInstances = TikiManager\Application\Instance::getInstances(true);   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
     $availbleInstancesIds = array_map(function ($element) {
         return $element->id;
     }, $availbleInstances);

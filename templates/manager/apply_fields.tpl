@@ -9,7 +9,7 @@
         <div class="col-sm-9">
             <div class="input-group">
                 <input value="{$default_repository}" class="form-control" id="repository" type="text" name="repository" aria-label="e.g profiles.tiki.org" aria-describedby="button-load">
-                <button class="btn btn-outline-secondary" type="button" id="button-load">Load</button>
+                <button class="btn btn-outline-secondary" type="button" id="button-load">{tr}Load{/tr}</button>
             </div>
         </div>
 

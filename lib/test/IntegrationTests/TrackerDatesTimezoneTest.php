@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 /**
  * @group integration
  * The purpose of these tests is to ensure consistency between storage, display
@@ -30,7 +33,6 @@ class TrackerDatesTimezoneTest extends TikiTestCase
 
         parent::setUpBeforeClass();
         self::$trklib = TikiLib::lib('trk');
-
         // create tracker and couple of fields
         self::$trackerId = self::$trklib->replace_tracker(null, 'Test Tracker', '', [], 'n');
         self::assertNotEmpty(self::$trackerId);
@@ -91,7 +93,6 @@ class TrackerDatesTimezoneTest extends TikiTestCase
             );
             self::assertNotEmpty($fieldId);
         }
-
         TikiDb::get()->query("REPLACE INTO `users_grouppermissions` VALUES('Registered', 'tiki_p_admin_trackers', '')");
         TikiDb::get()->query("REPLACE INTO `users_grouppermissions` VALUES('Registered', 'tiki_p_view_trackers', '')");
         $builder = new Perms_Builder();
@@ -412,7 +413,7 @@ class TrackerDatesTimezoneTest extends TikiTestCase
         $utilities = new Services_Tracker_Utilities();
         $utilities->clearTracker(self::$trackerId);
 
-        $itemId = $this->createItem([
+        $this->createItem([
             'test_date_legacy' => '2021-06-01',
             'test_datetime_legacy' => '2021-06-01 10:00:00',
             'test_date' => $d,
@@ -517,7 +518,7 @@ class TrackerDatesTimezoneTest extends TikiTestCase
         $itemObject = Tracker_Item::newItem(self::$trackerId);
         $processedFields = $itemObject->prepareInput(new JitFilter($input));
         foreach ($processedFields as $k => $f) {
-            $fields[$k]['value'] = isset($f['value']) ? $f['value'] : '';
+            $fields[$k]['value'] = $f['value'] ?? '';
         }
         return self::$trklib->replace_item(self::$trackerId, 0, ['data' => $fields], 'o');
     }

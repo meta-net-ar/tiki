@@ -6,8 +6,8 @@
     {if $tiki_p_vote_poll ne 'n' && ($user || $prefs.feature_poll_anonymous == 'y' || $prefs.feature_antibot eq 'y')}
         {section name=ix loop=$channels}
             <div class="form-check">
-                <input class="form-check-input" type="radio" name="polls_optionId" value="{$channels[ix].optionId|escape}"{if $polls_optionId == $channels[ix].optionId} checked="checked"{/if}>
-                <label class="form-check-label" for="polls_optionId">{tr}{$channels[ix].title|escape}{/tr}</label>
+                <input class="form-check-input" type="radio" name="polls_optionId" id="polls_option_{$channels[ix].optionId|escape}" value="{$channels[ix].optionId|escape}"{if $polls_optionId == $channels[ix].optionId} checked="checked"{/if}>
+                <label class="form-check-label" for="polls_option_{$channels[ix].optionId|escape}">{tr}{$channels[ix].title|escape}{/tr}</label>
             </div>
         {/section}
     {else}
@@ -29,7 +29,7 @@
             ({tr}Votes:{/tr} {$menu_info.votes})
         {/if}
     </div>
-    {if $prefs.feature_poll_comments and $comments_cant and !isset($module_params)}
+    {if $prefs.feature_poll_comments and $comments_count and !isset($module_params)}
         <br>
         {include file='comments_button.tpl'}
     {/if}

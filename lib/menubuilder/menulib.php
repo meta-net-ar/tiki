@@ -32,8 +32,8 @@ class MenuLib extends TikiLib
 
         $query = "select * from `tiki_menus` $mid order by " . $this->convertSortMode($sort_mode);
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $query_cant = "select count(*) from `tiki_menus` $mid";
-        $cant = $this->getOne($query_cant, $bindvars);
+        $query_count = "select count(*) from `tiki_menus` $mid";
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -44,25 +44,29 @@ class MenuLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
     public function replace_menu($menuId, $name, $description = '', $type = 'd', $icon = null, $use_items_icons = 'n', $parse = 'n')
     {
         // Check the name
-        if (isset($menuId) and $menuId > 0) {
+        if ($menuId > 0) {
             $query = "update `tiki_menus` set `name`=?,`description`=?,`type`=?, `icon`=?, `use_items_icons`=?, `parse`=? where `menuId`=?";
             $bindvars = [$name,$description,$type,$icon,$use_items_icons,$parse,(int) $menuId];
             $this->empty_menu_cache($menuId);
+            $result = $this->query($query, $bindvars);
+            return $menuId;
         } else {
             // was: replace into. probably we need a delete here
             $query = "insert into `tiki_menus` (`name`,`description`,`type`,`icon`,`use_items_icons`,`parse`) values(?,?,?,?,?,?)";
             $bindvars = [$name,$description,$type,$icon,$use_items_icons,$parse];
+            $result = $this->query($query, $bindvars);
+            if ($result && $result->numRows()) {
+                return $this->lastInsertId();
+            }
+            return false;
         }
-
-        $result = $this->query($query, $bindvars);
-        return true;
     }
 
     public function clone_menu($menuId, $name, $description = '')
@@ -91,14 +95,20 @@ class MenuLib extends TikiLib
     public function reset_app_menu()
     {
         $tiki_sql = file_get_contents('db/tiki.sql');
-        preg_match_all('/^(?:INSERT|UPDATE) (?:INTO )?`?tiki_menu_options`? .*$/mi', $tiki_sql, $matches);
+
+        //handle multi-line INSERT statements
+        preg_match_all('/(?:INSERT\s+INTO\s+`?tiki_menu_options`?.*?;|UPDATE\s+tiki_menu_options\s+SET.*?;)/ims', $tiki_sql, $matches);
 
         if ($matches && count($matches[0])) {
             $menuoptions = $this->table('tiki_menu_options');
             $menuoptions->deleteMultiple([ 'menuId' => 42 ]);
 
             foreach ($matches[0] as $query) {
-                $this->query($query);
+                // remove extra whitespace and newlines
+                $query = preg_replace('/\s+/', ' ', trim($query));
+                if (! empty($query)) {
+                    $this->query($query);
+                }
             }
             $this->empty_menu_cache(42);
         }
@@ -227,7 +237,7 @@ class MenuLib extends TikiLib
     public function prepare_options_for_editing($options)
     {
         if (isset($options['data'])) {
-            $cant = $options['cant'];
+            $count = $options['count'];
             $options = $options['data'];
         }
 
@@ -254,15 +264,21 @@ class MenuLib extends TikiLib
             if ($option['type'] === 's' || $option['type'] === 'r') {
                 array_splice($current_parents_branch, 0);
                 $option['parent'] = 0;
-                array_push($current_parents_branch, $option['optionId']);
+                $current_parents_branch[] = $option['optionId'];
             } elseif (is_numeric($option['type'])) {
                 array_splice($current_parents_branch, (int) $option['type']);
                 $option['parent'] = $parentId;
-                array_push($current_parents_branch, $option['optionId']);
+                $current_parents_branch[] = $option['optionId'];
             } elseif ($option['type'] === 'o') {
                 $option['parent'] = $parentId;
             } elseif ($option['type'] === '-') {
                 array_pop($current_parents_branch);
+                // Separator row still needs parent for admin save (data-parent).
+                if ($current_parents_branch) {
+                    $option['parent'] = $current_parents_branch[count($current_parents_branch) - 1];
+                } else {
+                    $option['parent'] = 0;
+                }
             }
 
             $option['type_description'] = $types[$option['type']];
@@ -270,14 +286,10 @@ class MenuLib extends TikiLib
             return $option;
         }, $options);
 
-        $treeOut = array_filter($treeOut, function ($option) {
-            return $option['type'] !== '-';
-        });
-
-        if (isset($cant)) {
+        if (isset($count)) {
             $options = [
                 'data' => $treeOut,
-                'cant' => $cant
+                'count' => $count
             ];
         }
 
@@ -326,7 +338,7 @@ class MenuLib extends TikiLib
         }
         $url = str_replace('+', ' ', str_replace('&amp;', '&', urldecode($_SERVER['REQUEST_URI'])));
         $option['url'] = str_replace('+', ' ', str_replace('&amp;', '&', urldecode($option['url'])));
-        if (strstr($option['url'], 'structure=') && ! strstr($url, 'structure=')) {
+        if (str_contains($option['url'], 'structure=') && ! str_contains($url, 'structure=')) {
             // try to find al the occurence of the page in structures
             $option['url'] = preg_replace('/&structure=.*/', '', $option['url']);
         }
@@ -366,7 +378,7 @@ class MenuLib extends TikiLib
     {
         if (! empty($params['subMenu'])) {
             $subMenu = [];
-            $cant = 0;
+            $count = 0;
             $in = false;
             $optionLevel = $level = 0;
             foreach ($channels['data'] as $position => $option) {
@@ -381,7 +393,7 @@ class MenuLib extends TikiLib
                     break;
                 } elseif ($in) {
                     $subMenu[] = $option;
-                    $cant++;
+                    $count++;
                 } elseif (! $in && $option['optionId'] == $params['subMenu']) {
                     $level = $optionLevel;
                     $in = true;
@@ -390,14 +402,14 @@ class MenuLib extends TikiLib
                     ++$optionLevel;
                 }
             }
-            $channels = ['data' => $this->lower($subMenu), 'cant' => $cant];
+            $channels = ['data' => $this->lower($subMenu), 'count' => $count];
         }
         $selecteds = [];
         $optionLevel = 0;
         if (is_numeric($sectionLevel)) {
             // must extract only the submenu level sectionLevel where the current url is
             $findUrl = false;
-            $cant = 0;
+            $count = 0;
             foreach ($channels['data'] as $position => $option) {
                 if (is_numeric($option['type'])) {
                     $optionLevel = $option['type'];
@@ -414,34 +426,34 @@ class MenuLib extends TikiLib
                     if (! empty($subMenu)) {
                         unset($subMenu);
                     }
-                    $cant = 0;
+                    $count = 0;
                 }
                 if ($optionLevel >= $sectionLevel - 1 && ! empty($option['url']) && $this->menuOptionMatchesUrl($option)) {
                     $findUrl = true;
                 }
                 if ($optionLevel >= $sectionLevel) {
                     $subMenu[] = $option;
-                    ++$cant;
+                    ++$count;
                     if (empty($selectedPosition) && $option['type'] != 'o' && $option['type'] != '-') {
                         // not pretty but works - optionLevel will get "shifted up" by $sectionLevel later in lower()
-                        $selecteds[$optionLevel - $sectionLevel] = $cant - 1;
+                        $selecteds[$optionLevel - $sectionLevel] = $count - 1;
                     }
                     if (! empty($option['url']) && $this->menuOptionMatchesUrl($option)) {
                         $findUrl = true;
-                        $selectedPosition = $cant - 1;
+                        $selectedPosition = $count - 1;
                     }
                 }
                 if ($option['type'] != '-' && $option['type'] != 'o') {
                     ++$optionLevel;
                 }
             }
-            if (! empty($subMenu) && $findUrl && $cant) {
+            if (! empty($subMenu) && $findUrl && $count) {
                 $subMenu = $this->lower($subMenu);
                 $channels['data'] = $subMenu;
-                $channels['cant'] = $cant;
+                $channels['count'] = $count;
             } else {
                 $channels['data'] = [];
-                $channels['cant'] = 0;
+                $channels['count'] = 0;
             }
         } else {
             foreach ($channels['data'] as $position => $option) {
@@ -474,7 +486,7 @@ class MenuLib extends TikiLib
         }
         if (is_numeric($toLevel)) {
             $subMenu = [];
-            $cant = 0;
+            $count = 0;
             foreach ($channels['data'] as $position => $option) {
                 if (is_numeric($option['type'])) {
                     $optionLevel = $option['type'];
@@ -485,13 +497,13 @@ class MenuLib extends TikiLib
                 }
                 if ($optionLevel <= $toLevel) {
                     $subMenu[] = $option;
-                    $cant++;
+                    $count++;
                 }
                 if ($option['type'] != '-' && $option['type'] != 'o') {
                     ++$optionLevel;
                 }
             }
-            $channels = ['data' => $subMenu, 'cant' => $cant];
+            $channels = ['data' => $subMenu, 'count' => $count];
         }
         // set sections open/close according to cookie
         global $prefs;
@@ -673,7 +685,7 @@ class MenuLib extends TikiLib
 
         $sort = $options->expr($this->convertSortMode($sort_mode));
         $result = $options->fetchAll($options->all(), $conditions, $maxRecords, $offset, $sort);
-        $cant = $options->fetchCount($conditions);
+        $count = $options->fetchCount($conditions);
 
         // ensure page-specific permissions are not affecting menu building
         $globalperms = Perms::get();
@@ -708,7 +720,7 @@ class MenuLib extends TikiLib
             if (! $full) {
                 $display = true;
                 if (isset($res['section']) and $res['section']) {
-                    if (strstr($res['section'], '|')) {
+                    if (str_contains($res['section'], '|')) {
                         $display = false;
                         $sections = preg_split('/\s*\|\s*/', $res['section']);
                         foreach ($sections as $sec) {
@@ -730,7 +742,7 @@ class MenuLib extends TikiLib
                 }
                 if ($display && $tiki_p_admin != 'y') {
                     if (isset($res['perm']) and $res['perm']) {
-                        if (strstr($res['perm'], '|')) {
+                        if (str_contains($res['perm'], '|')) {
                             $display = false;
                             $sections = preg_split('/\s*\|\s*/', $res['perm']);
                             foreach ($sections as $sec) {
@@ -773,7 +785,7 @@ class MenuLib extends TikiLib
 
         return [
             'data' => array_values($ret),
-            'cant' => $cant,
+            'count' => $count,
             'no_editable_page' => $no_editable_page,
             ];
     }
@@ -785,10 +797,10 @@ class MenuLib extends TikiLib
 
         $sorted_channels = [];
 
-        if (! isset($channels['data']) || $channels['cant'] == 0) {
+        if (! isset($channels['data']) || $channels['count'] == 0) {
             return $channels;
         }
-        $cant = $channels['cant'];
+        $count = $channels['count'];
         $channels = $channels['data'];
 
         $temp_max = count($channels);
@@ -810,9 +822,9 @@ class MenuLib extends TikiLib
             }
         }
 
-        if (isset($cant)) {
+        if (isset($count)) {
             $sorted_channels = ['data' => $sorted_channels,
-                    'cant' => $cant];
+                    'count' => $count];
         }
 
         return $sorted_channels;

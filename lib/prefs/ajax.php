@@ -11,7 +11,7 @@ function prefs_ajax_list()
         'ajax_autosave' => [
             'name' => tra('Ajax auto-save'),
             'description' => tra('Save content during editing, enabling work to be recovered after any interruption. Also enable a real-time preview. This option is required for WYSIWYG plugin processing.'),
-            'help' => 'Lost-Edit-Protection',
+            'help' => 'Lost-edit',
             'type' => 'flag',
             'dependencies' => [
                 'feature_ajax',
@@ -19,7 +19,6 @@ function prefs_ajax_list()
             ],
             'default' => 'y',
         ],
-
         'ajax_inline_edit' => [
             'name' => tr('Inline editing'),
             'description' => tr('Enable inline editing of certain values. Currently limited to tracker item fields.'),
@@ -34,10 +33,10 @@ function prefs_ajax_list()
             'dependencies' => ['ajax_inline_edit'],
         ],
         'ajax_edit_previews' => [
-            'name' => tr('Preview Edits'),
-            'description' => tr('Add a preview tab to text areas.'),
+            'name' => tr('Preview Edit Tabs in Text Areas'),
+            'description' => tr('Enable edit and preview tabs in supported text areas.'),
             'type' => 'flag',
-            'default' => 'y',
+            'default' => 'n',
         ],
-    ];
+    ]; // TODO: improve help
 }

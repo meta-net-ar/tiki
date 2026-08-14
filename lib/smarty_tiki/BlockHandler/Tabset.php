@@ -9,6 +9,7 @@ namespace SmartyTiki\BlockHandler;
 
 use Smarty\BlockHandler\Base;
 use Smarty\Template;
+use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 /**
  *
@@ -26,11 +27,12 @@ use Smarty\Template;
  *  {/tabset}
  * \endcode
  */
+
 class Tabset extends Base
 {
     public function handle($params, $content, Template $template, &$repeat)
     {
-        global $prefs, $smarty_tabset_name, $smarty_tabset, $smarty_tabset_i_tab, $cookietab;
+        global $prefs, $smarty_tabset_name, $smarty_tabset, $smarty_tabset_i_tab, $cookietab, $cookietabTabset;
         $smarty = \TikiLib::lib('smarty');
         if ($smarty->getTemplateVars('print_page') == 'y' || $prefs['layout_tabs_optional'] === 'n') {
             $params['toggle'] = 'n';
@@ -49,12 +51,12 @@ class Tabset extends Base
             // work out cookie value if there
             if (isset($_REQUEST['cookietab'])) {   // overrides cookie if added to request as in tiki-admin.php?page=look&cookietab=6
                 $cookietab = empty($_REQUEST['cookietab']) ? 1 : $_REQUEST['cookietab'];
-                setCookieSection($smarty_tabset_name, $cookietab, 'tabs');  // too late to set it here as output has started
+                CookieConsentLib::tikiSetCookie($smarty_tabset_name, $cookietab, CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, 0, '', 'tabs');
             }
 
             // If the tabset specifies the tab, override any kind of memory but only if not doing "no tabs" mode
             if (isset($params['cookietab']) && $cookietab !== 'n') {
-                $cookietab = $params['cookietab'];
+                $cookietabTabset = $params['cookietab'];
             }
 
             $smarty_tabset_i_tab = 1;
@@ -64,6 +66,8 @@ class Tabset extends Base
 
             return '';
         } else {
+            $tabsetCookietab = isset($params['cookietab']) && $cookietab !== 'n' ? $cookietabTabset : $cookietab;
+            $cookietabTabset = null;
             $content = trim($content);
             if (empty($content)) {
                 return '';
@@ -78,14 +82,14 @@ class Tabset extends Base
             //closing
             if ($prefs['feature_tabs'] == 'y') {
                 if (empty($params['toggle']) || $params['toggle'] != 'n') {
-                    if ($cookietab == 'n') {
+                    if ($tabsetCookietab == 'n') {
                         $button_params['_text'] = tra('Tab View');
                     } else {
                         $button_params['_text'] = tra('No Tabs');
                     }
                     $button_params['_size'] = 'mini';
                     $button_params['_auto_args'] = '*';
-                    $button_params['_onclick'] = "setCookie('$smarty_tabset_name','" . ($cookietab == 'n' ? 1 : 'n') . "', 'tabs') ;";
+                    $button_params['_onclick'] = "setCookie('$smarty_tabset_name','" . ($tabsetCookietab == 'n' ? 1 : 'n') . "', 'tabs', 'session', " . "window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);";
                     $button_params['_class'] = 'btn-sm'; // btn-secondary removed because btn-primary is also being applied somehow.
                     $notabs = smarty_function_button($button_params, $smarty->getEmptyInternalTemplate());
                     $notabs = "<div class='float-end'>$notabs</div>";
@@ -96,7 +100,7 @@ class Tabset extends Base
             } else {
                 return $content;
             }
-            if ($cookietab == 'n') {
+            if ($tabsetCookietab == 'n') {
                 return $ret . $notabs . $content;
             }
 

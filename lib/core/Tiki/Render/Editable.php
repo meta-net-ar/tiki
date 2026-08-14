@@ -30,11 +30,11 @@ class Tiki_Render_Editable
             $this->label = $parameters['label'];
         }
 
-        if (empty($parameters['field']['id']) || empty($parameters['field']['id'])) {
-            throw new Exception(tr('Internal error: mandatory parameter field is missing'));
+        if (empty($parameters['field'])) {
+            $this->field = ['id' => null, 'type' => null];
+        } else {
+            $this->field = $parameters['field'];
         }
-
-        $this->field = $parameters['field'];
 
         if ($this->field['type'] != 'form' && empty($parameters['object_store_url'])) {
             throw new Exception(tr('Internal error: mandatory parameter object_store_url is missing'));
@@ -98,9 +98,9 @@ class Tiki_Render_Editable
                 TikiLib::lib('wysiwyg')->setUpEditor($fieldId, $params);
                 $editable = '<input type="hidden" id="allowhtml" name="allowhtml" value="1" /><textarea name="' . $fieldId . '" id="' . $fieldId . '" style="display:none" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>';
             } elseif ($this->layout == 'block') {
-                $editable = $this->wrapNp('<textarea class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>');
+                $editable = '<textarea class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" rows="' . $params['rows'] . '">' . htmlspecialchars($value) . '</textarea>';
             } else {
-                $editable = $this->wrapNp('<input type="text" class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" value="' . htmlspecialchars($value) . '" />');
+                $editable = '<input type="text" class="form-control" name="' . $fieldId . '" id="' . $fieldId . '" value="' . htmlspecialchars($value) . '" />';
             }
             $editable = '<div style="display: none">' . $editable . '</div>';
         } else {
@@ -112,10 +112,5 @@ class Tiki_Render_Editable
         }
 
         return "<$tag class=\"$class\" data-field-fetch-url=\"$fieldFetch\" data-object-store-url=\"$objectStore\" data-group=\"$group\" data-label=\"$label\" data-field-id=\"$fieldId\" data-field-type=\"$fieldType\">$value" . smarty_function_icon(['name' => 'edit', 'iclass' => 'ml-2'], $smarty->getEmptyInternalTemplate()) . "</$tag>$editable";
-    }
-
-    private function wrapNp($content)
-    {
-        return '~np~' . str_replace(['~np~', '~/np~'], '', $content) . '~/np~';
     }
 }

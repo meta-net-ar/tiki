@@ -30,6 +30,11 @@ class Search_Formatter
         $this->alternateOutput = $output;
     }
 
+    public function getAlternateOutput()
+    {
+        return $this->alternateOutput;
+    }
+
     public function setContext(?string $context)
     {
         $this->context = $context;
@@ -61,7 +66,7 @@ class Search_Formatter
             . $this->render($this->plugin, $list, Search_Formatter_Plugin_Interface::FORMAT_WIKI);
     }
 
-    public function getPopulatedList($list, $preload = true)
+    public function getPopulatedList($list, $preload = true, $onlyPreloaded = false)
     {
         global $prefs;
 
@@ -79,8 +84,8 @@ class Search_Formatter
                 return $formattedList;
             }
         }
-
         $list = Search_ResultSet::create($list);
+        $date_fields = $list->getDateFields();
         $defaultValues = $this->plugin->getFields();
 
         $fields = array_keys($defaultValues);
@@ -121,6 +126,10 @@ class Search_Formatter
             }
 
             foreach ($pre as $k => $rawValue) {
+                if ($preload && $onlyPreloaded && ! in_array($k, $fields)) {
+                    continue;
+                }
+
                 $finalValue = null;
 
                 // process multilingual fields
@@ -130,10 +139,10 @@ class Search_Formatter
                         $finalValue = $translatedValue;
                     }
                 }
-                if (! $finalValue && $rawValue) {
+                if (is_null($finalValue) && ! is_null($rawValue)) {
                     $finalValue = $rawValue;
                 }
-                if ($finalValue || ! isset($row[$k])) {
+                if (! is_null($finalValue) || ! isset($row[$k])) {
                     // Only set if not a blank value so the defaults prevail but make sure to set it if default is not specified
                     $row[$k] = $finalValue;
                 }
@@ -170,7 +179,7 @@ class Search_Formatter
         }
 
         $formattedList = $list->replaceEntries($data);
-
+        $formattedList->setDateFields($date_fields);
         if ($prefs['unified_cache_formatted_result'] === 'y') {
             $cachelib->cacheItem($cacheKey, serialize($formattedList), 'searchformat');
         }
@@ -197,6 +206,10 @@ class Search_Formatter
             }
         }
         $input = new JitFilter(@$_REQUEST);
+        if ($input->controller->text() == 'wiki' && $input->action->text() == 'execute') {
+            // ajax list-execute actions should not re-render the filters
+            return '';
+        }
         $fields = [];
         foreach ($filters as $filter) {
             if (! $filter->getControl()->isUsable()) {
@@ -216,19 +229,19 @@ class Search_Formatter
         }
 
         $url = parse_url($_SERVER["REQUEST_URI"] ?? '', PHP_URL_PATH);
-        $filters = [];
-        foreach ($_GET as $key => $val) {
-            if (substr($key, 0, 3) != 'tf_') {
-                $filters[$key] = $val;
+        $hiddenParams = [];
+        foreach ($_REQUEST as $key => $val) {
+            if (! str_starts_with($key, 'tf_') && $key !== 'filter' && $key !== 'reset_filter') {
+                $hiddenParams[$key] = $val;
             }
         }
-        $url .= '?' . http_build_query($filters);
 
         if ($fields) {
             $smarty = TikiLib::lib('smarty');
             $smarty->assign('filterFields', $fields);
             $smarty->assign('filterCounter', $this->counter);
             $smarty->assign('filterUrl', $url);
+            $smarty->assign('filterHiddenParams', $hiddenParams);
             return '~np~' . $smarty->fetch('templates/search/list/filter.tpl') . '~/np~';
         }
 
@@ -256,11 +269,11 @@ class Search_Formatter
         if ($target == $pluginFormat || $pluginFormat == Search_Formatter_Plugin_Interface::FORMAT_CSV) {
             // noop
         } elseif ($target == Search_Formatter_Plugin_Interface::FORMAT_WIKI && $pluginFormat == Search_Formatter_Plugin_Interface::FORMAT_HTML) {
-            if (substr($out, 0, 4) != '~np~' && substr($out, -5) != '~/np~') {
+            if (! str_starts_with($out, '~np~') && substr($out, -5) != '~/np~') {
                 $out = "~np~$out~/np~";
             }
         } elseif ($target == Search_Formatter_Plugin_Interface::FORMAT_HTML && $pluginFormat == Search_Formatter_Plugin_Interface::FORMAT_WIKI) {
-            if (substr($out, 0, 5) != '~/np~' && substr($out, -4) != '~np~') {
+            if (! str_starts_with($out, '~/np~') && substr($out, -4) != '~np~') {
                 $out = "~/np~$out~np~";
             }
         } elseif ($target == Search_Formatter_Plugin_Interface::FORMAT_CSV) {

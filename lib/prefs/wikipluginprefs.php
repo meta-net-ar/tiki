@@ -13,6 +13,7 @@ function prefs_wikipluginprefs_list()
             'dependencies' => ['sender_email'],
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Plugins',
         ],
     ];
 }

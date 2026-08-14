@@ -1,0 +1,1 @@
+DROP TABLE `tiki_rss_feeds`;

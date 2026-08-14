@@ -79,7 +79,7 @@ class Tiki_Log extends AbstractLogger
         $this->level = $level;
     }
 
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         if (self::$levels[$level] < self::$levels[$this->level]) {
             //Do not log
@@ -91,7 +91,7 @@ class Tiki_Log extends AbstractLogger
             if (count($context) == 1 && isset($context[0])) {
                 $msg .= ' ' . $context[0];
             } else {
-                $msg .= ' ' . print_r($context, 1);
+                $msg .= ' ' . print_r($context, 1); // @phpstan-ignore disallowedFunctions.printR (returns log context as string, never prints)
             }
         }
         $logslib = TikiLib::lib('logs');

@@ -14,7 +14,6 @@ class RatingResultAvg extends Base
 {
     public function handle($params, Template $template)
     {
-        global $prefs;
         $ratinglib = \TikiLib::lib('rating');
         $votings = $ratinglib->votings($params['id'], $params['type']);
         $options = $ratinglib->get_options($params['type'], $params['id']);

@@ -173,7 +173,7 @@ class Tracker_Field_TikiManager extends \Tracker\Field\AbstractItemField
         $showactions = array_filter($this->getOption('showactions', []));
         $hideactions = array_filter($this->getOption('hideactions', []));
 
-        $instances = TikiManager\Application\Instance::getInstances(false);
+        $instances = TikiManager\Application\Instance::getInstances(false);   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
         $instances = array_filter($instances, function ($i) use ($instanceIds) {
             return empty($instanceIds) || in_array($i->getId(), $instanceIds);
         });

@@ -59,6 +59,7 @@
                     {preference name=smarty_security_disabled_tags}
                     {preference name=smarty_security_allowed_modifiers}
                     {preference name=smarty_security_disabled_modifiers}
+                    {preference name=smarty_security_allowed_builtin_php_functions}
                     {preference name=smarty_security_dirs}
                 </div>
                 {preference name=feature_purifier}
@@ -77,19 +78,20 @@
                 {preference name=tiki_check_file_content}
                 {preference name=tiki_allow_trust_input}
                 {preference name=feature_quick_object_perms}
-                {preference name=zend_http_sslverifypeer}
-                {preference name=zend_http_use_curl}
+                {preference name=http_sslverifypeer}
+                {preference name=http_use_curl}
                 {preference name=feature_debug_console}
-                {preference name=feature_view_tpl}
-                {preference name=feature_edit_templates}
-                {preference name=feature_editcss}
+            </fieldset>
+            <fieldset>
+                <legend class="h3">{tr}SSRF Protection{/tr}</legend>
+                {preference name=ssrf_whitelisted_hosts}
             </fieldset>
             <fieldset>
                 <legend class="h3">{tr}Trackers Security{/tr}</legend>
                 {preference name=tracker_adminonlyviewedititem_by_default}
             </fieldset>
             <fieldset>
-                <legend class="h3">{tr}User Encryption{/tr}{help url="User Encryption"}</legend>
+                <legend class="h3">{tr}User Encryption{/tr}{help url="User-Encryption"}</legend>
                 {preference name=feature_user_encryption}
                 <div class="adminoptionboxchild" id="feature_user_encryption_childcontainer">
                     {if $sodium_available}
@@ -146,6 +148,33 @@
 
                 {preference name=http_header_content_type_options}
 
+                {preference name=http_header_access_control_allow_credentials}
+
+                {preference name=http_header_access_control_allow_methods}
+                <div class="adminoptionboxchild" id="http_header_access_control_allow_methods_childcontainer">
+                    {preference name=http_header_access_control_allow_methods_value}
+                </div>
+
+                {preference name=http_header_access_control_allow_headers}
+                <div class="adminoptionboxchild" id="http_header_access_control_allow_headers_childcontainer">
+                    {preference name=http_header_access_control_allow_headers_value}
+                </div>
+
+                {preference name=http_header_cross_origin_embedder_policy}
+                <div class="adminoptionboxchild" id="http_header_cross_origin_embedder_policy_childcontainer">
+                    {preference name=http_header_cross_origin_embedder_policy_value}
+                </div>
+
+                {preference name=http_header_cross_origin_resource_policy}
+                <div class="adminoptionboxchild" id="http_header_cross_origin_resource_policy_childcontainer">
+                    {preference name=http_header_cross_origin_resource_policy_value}
+                </div>
+
+                {preference name=http_header_cross_origin_opener_policy}
+                <div class="adminoptionboxchild" id="http_header_cross_origin_opener_policy_childcontainer">
+                    {preference name=http_header_cross_origin_opener_policy_value}
+                </div>
+
                 {preference name=http_header_content_security_policy}
                 <div class="adminoptionboxchild" id="http_header_content_security_policy_childcontainer">
                     {preference name=http_header_content_security_policy_value}
@@ -156,34 +185,63 @@
                     {preference name=http_header_strict_transport_security_value}
                 </div>
 
+                {preference name=http_header_set_cookie_samesite}
+
                 {preference name=http_header_public_key_pins}
                 <div class="adminoptionboxchild" id="http_header_public_key_pins_childcontainer">
                     {preference name=http_header_public_key_pins_value}
                 </div>
+
+                {preference name=http_header_referrer_policy}
+                <div class="adminoptionboxchild" id="http_header_referrer_policy_childcontainer">
+                    {preference name=http_header_referrer_policy_value}
+                </div>
+
+                {preference name=http_header_permitted_cross_domain_policies}
+                <div class="adminoptionboxchild" id="http_header_permitted_cross_domain_policies_childcontainer">
+                    {preference name=http_header_permitted_cross_domain_policies_value}
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend class="h3">{tr}.htaccess Security{/tr}{help url="Security"}</legend>
+                {preference name=security_warn_htaccess_mismatch}
             </fieldset>
         {/tab}
 
         {tab name="{tr}Spam Protection{/tr}"}
             {remarksbox type="tip" title="{tr}Tip{/tr}"}
-                {tr _0='<a href="http://doc.tiki.org/Forum+Admin#Forum_moderation" target="_blank" class="alert-link">' _1="</a>" _2="<strong>" _3="</strong>" _4='<a href="tiki-admin_actionlog.php" target="_blank" class="alert-link">' _5="</a>" _6='<a href="tiki-adminusers.php" target="_blank" class="alert-link">' _7="</a>" _8='<a href="tiki-list_comments.php" target="_blank" class="alert-link">' _9="</a>"}You can additionally protect from spam enabling the '%0moderation queue on forums%1', or through %2banning%3 multiple ip's from the '%4Action log%5', from '%6Users registration%7', or from the '%8Comments moderation queue%9' itself{/tr}.
+                {tr _0='<a href="http://doc.tiki.org/Forum-Admin#Forum_moderation" target="_blank" class="alert-link">' _1="</a>" _2="<strong>" _3="</strong>" _4='<a href="tiki-admin_actionlog.php" target="_blank" class="alert-link">' _5="</a>" _6='<a href="tiki-adminusers.php" target="_blank" class="alert-link">' _7="</a>" _8='<a href="tiki-list_comments.php" target="_blank" class="alert-link">' _9="</a>"}You can additionally protect from spam enabling the '%0moderation queue on forums%1', or through %2banning%3 multiple ip's from the '%4Action log%5', from '%6Users registration%7', or from the '%8Comments moderation queue%9' itself{/tr}.
             {/remarksbox}
             <fieldset>
-                <legend class="h3">{tr}CAPTCHA{/tr}</legend>
+                <legend class="h3">{tr}CAPTCHA Options{/tr}</legend>
                 {preference name=feature_antibot}
                 <div class="adminoptionboxchild" id="feature_antibot_childcontainer">
-                    {preference name=captcha_wordLen}
-                    {preference name=captcha_width}
-                    {preference name=captcha_noise}
-                    {preference name=recaptcha_enabled}
-                    <div class="adminoptionboxchild" id="recaptcha_enabled_childcontainer">
-                        {preference name=recaptcha_pubkey}
-                        {preference name=recaptcha_privkey}
-                        {preference name=recaptcha_theme}
-                        {preference name=recaptcha_version}
-                    </div>
-                    {preference name=captcha_questions_active}
-                    <div class="adminoptionboxchild" id="captcha_questions_active_childcontainer">
-                        {preference name=captcha_questions}
+                    {preference name=captcha_type}
+                    {remarksbox type="tip" title="{tr}Tip{/tr}" close="n"}
+                        {tr}Use the selector above to choose the active CAPTCHA implementation. The selected CAPTCHA must also be configured in its section below before it can be used. Other CAPTCHA settings remain available but inactive until selected.{/tr}
+                    {/remarksbox}
+                    <div class="adminoptionboxchild">
+                        <h5 class="mt-3">{tr}Classic CAPTCHA{/tr}</h5>
+                        <div class="adminoptionboxchild" id="captcha_wordLen_childcontainer">
+                            {preference name=captcha_wordLen}
+                            {preference name=captcha_width}
+                            {preference name=captcha_noise}
+                        </div>
+                        <h5 class="mt-4">{tr}Custom Questions CAPTCHA{/tr}</h5>
+                        <div class="adminoptionboxchild" id="captcha_questions_childcontainer">
+                            {preference name=captcha_questions}
+                        </div>
+                        <h5 class="mt-4">{tr}Google reCAPTCHA{/tr}</h5>
+                        <div class="adminoptionboxchild">
+                            {preference name=recaptcha_pubkey}
+                            {preference name=recaptcha_privkey}
+                            {preference name=recaptcha_theme}
+                            {preference name=recaptcha_version}
+                        </div>
+                        <h5 class="mt-4">{tr}Altcha CAPTCHA{/tr}</h5>
+                        <div class="adminoptionboxchild">
+                            {preference name=altcha_hmac_key}
+                        </div>
                     </div>
                 </div>
             </fieldset>
@@ -197,12 +255,6 @@
             </div>
 
             {preference name=feature_comments_moderation}
-            {preference name=comments_akismet_filter}
-            <div class="adminoptionboxchild" id="comments_akismet_filter_childcontainer">
-                {preference name=comments_akismet_apikey}
-                {preference name=comments_akismet_check_users}
-            </div>
-
             {preference name=useRegisterPasscode}
             <div class="adminoptionboxchild" id="useRegisterPasscode_childcontainer">
                 {preference name=registerPasscode}
@@ -225,6 +277,7 @@
             {preference name=use_load_threshold}
             <div class="adminoptionboxchild" id="use_load_threshold_childcontainer">
                 {preference name=load_threshold}
+                {preference name=load_retry_after}
                 {preference name=site_busy_title}
                 {preference name=site_busy_msg}
                 <div class="col-sm-8 offset-sm-4">
@@ -290,7 +343,7 @@
             <br>
             {remarksbox type="note" title="{tr}About encryption{/tr}"}
                 {tr}Encryption page allows you to create different encryption keys and share them securely with team members.{/tr}<br>
-                {tr}Find out more here:{/tr}{help url="Encryption"}
+                {tr}Find out more here:{/tr}{help url="User-Encryption"}
             {/remarksbox}
             {if $encryption_enabled neq 'y'}
                 {remarksbox type="error" title="{tr}Error{/tr}"}
@@ -356,7 +409,7 @@
                                             {icon name='pencil' href='tiki-admin.php?page=security&encryption_key='|cat:$key.keyId}
                                         </td>
                                         <td>
-                                            <button type="submit" name="key_delete" value="{$key.keyId}" class="btn btn-link text-danger" style="cursor: pointer" onclick="confirmPopup('{tr}Remove key? Encrypted data will be lost!{/tr}', '{ticket mode=get}')">
+                                            <button type="submit" name="key_delete" value="{$key.keyId}" class="btn btn-link text-danger" style="cursor: pointer" onclick="confirmPopup('{tr}Remove key? Encrypted data will be lost!{/tr}', '{ticket mode=get}')" aria-label="{tr}Delete{/tr}">
                                                 {icon name='delete'}
                                             </button>
                                         </td>
@@ -429,7 +482,7 @@
                                 {tr}Old shared key{/tr}
                             </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control" name="old_share" value="">
+                                <input type="password" class="form-control" name="old_share" value="">
                                 <a class="tikihelp text-info" title="{tr}Old shared key:{/tr} {tr}You need to input one of the existing shared keys in order to regenerate the secret shares.{/tr}">
                                     {icon name=information}
                                 </a>
@@ -447,9 +500,9 @@
                             </label>
                             <div class="col-sm-8">
                                 {if $prefs.feature_user_encryption eq 'y'}
-                                    {user_selector multiple='true' name='users' class='form-control' user=$encryption_key.users select=$encryption_key.users_array editable=y}
+                                    {user_selector multiple='true' name='users[]' class='form-control' user=$encryption_key.users select=$encryption_key.users_array editable=y}
                                 {else}
-                                    Depends on "User encryption".
+                                    {tr}Depends on "User encryption".{/tr}
                                 {/if}
                             </div>
                         </div><br>
@@ -506,6 +559,15 @@
             <div class="adminoptionboxchild" id="auth_webhooks_childcontainer">
                 {service_inline controller=webhook action=list}
             </div>
+        {/tab}
+        {tab name='{tr}Attack Protection{/tr}' key='attack_protection'}
+            <fieldset>
+                <legend class="h3">{tr}Brute Force Protection{/tr}</legend>
+                {preference name=bruteforce_protection}
+                {preference name=bruteforce_initial_delay}
+                {preference name=bruteforce_growth_rate}
+                {preference name=bruteforce_forget_time}
+            </fieldset>
         {/tab}
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}

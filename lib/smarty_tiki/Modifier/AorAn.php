@@ -20,7 +20,7 @@ class AorAn
     public function handle($string, $caps = false)
     {
         global $prefs;
-        if (substr($prefs['language'], 0, 2) != 'en') {
+        if (! str_starts_with($prefs['language'], 'en')) {
             return $string;
         }
         $vowels = ['a', 'e', 'i', 'o', 'u'];

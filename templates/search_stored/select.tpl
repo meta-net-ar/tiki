@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -20,7 +20,7 @@
                 <span class="form-text">{tr}This will help you recognize your stored queries if ever you want to modify or remove them.{/tr}</span>
             </div>
             <div class="mb-3 row">
-                <label for="priority" class="col-form-label">Priority</label>
+                <label for="priority" class="col-form-label">{tr}Priority{/tr}</label>
                 <select id="priority" name="priority" class="form-select">
                     {foreach $priorities as $key => $info}
                         <option value="{$key|escape}">{$info.label|escape} - {$info.description|escape}</option>
@@ -29,7 +29,7 @@
             </div>
             <div class="mb-3 row">
                 <label for="description" class="col-form-label">{tr}Description{/tr}</label>
-                <textarea class="form-control" id="description" name="description" rows="5" data-codemirror="true" data-syntax="tiki">{$description|escape}</textarea>
+                {textarea _simple='y' _toolbars='n' _wysiwyg='n' name='description' id='description' codemirror='true' rows='5' class='form-control'}{$description|escape}{/textarea}
             </div>
             <div class="mb-3 row">
                 <input type="submit" class="btn btn-primary" value="{tr}Create{/tr}"/>

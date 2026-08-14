@@ -6,8 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Command;
 
-use Laminas\Log\Writer\Stream as WriterStream;
-use Laminas\Log\Logger;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\FormatterHelper;
@@ -17,6 +15,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Tiki\Profiling\Timer;
+use Tiki\Search\SearchIndexRebuilder;
 
 #[AsCommand(
     name: 'index:rebuild',
@@ -44,6 +43,12 @@ class IndexRebuildCommand extends Command
                 'p',
                 InputOption::VALUE_NONE,
                 'Show progress bar'
+            )
+            ->addOption(
+                'skip-error-tracking',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip Tiki error tracking and only log errors to log file (if enabled). Useful if you rebuild generates a lot of noise in your external error tracking system.'
             );
     }
 
@@ -103,13 +108,10 @@ class IndexRebuildCommand extends Command
 
         $num_queries_before = $num_queries;
 
-        // Apply 'Search index rebuild memory limit' setting if available
-        if (! empty($prefs['allocate_memory_unified_rebuild'])) {
-            $memory_limiter = new \Tiki_MemoryLimit($prefs['allocate_memory_unified_rebuild']);
-        }
-
+        // Set up progress bar if requested
+        $progress = null;
         if ($input->getOption('progress') && ! $cron) {
-            $lastStats = \TikiLib::lib('tiki')->get_preference('unified_last_rebuild_stats', [], true);
+            $lastStats = \TikiLib::lib('tiki')->get_preference('unified_last_rebuild_stats_' . $prefs['unified_engine'], [], true);
             if (isset($lastStats['default']['counts'])) {
                 if (isset($lastStats['default']['times']['total'])) {
                     $steps = $lastStats['default']['times']['total'] * 1000 + 5000; // milliseconds plus 5 seconds for prefs (guess)
@@ -133,28 +135,12 @@ class IndexRebuildCommand extends Command
             $progress->setFormat('custom');
             $progress->setMessage(tr('Rebuilding...'));
             $progress->start();
-        } else {
-            $progress = null;
         }
+        $skipErrorTracking = $input->getOption('skip-error-tracking') ? true : false;
 
-        $result = $unifiedsearchlib->rebuild($log, false, $progress);
-
-        if ($progress) {
-            $progress->setMessage(tr('Rebuilding preferences index'));
-            $progress->advance();
-        }
-
-        // Also rebuild admin index
-        \TikiLib::lib('prefs')->rebuildIndex();
-
-        if ($progress) {
-            $progress->finish();
-        }
-
-        // Back up original memory limit if possible
-        if (isset($memory_limiter)) {
-            unset($memory_limiter);
-        }
+        // Use shared service to rebuild index directly (console commands always execute directly)
+        $searchIndexRebuilder = new SearchIndexRebuilder();
+        $result = $searchIndexRebuilder->rebuildIndex($log, false, $progress, $skipErrorTracking);
 
         \Feedback::printToConsole($output, $cron);
 
@@ -199,7 +185,12 @@ class IndexRebuildCommand extends Command
                 if (isset($unusedIndices['indices']) && count($unusedIndices['indices'])) {
                     $io->section("\nUnused Indexes Detected");
                     $io->listing($unusedIndices['indices']);
-                    $io->note("If you don't need them (for debugging), run the command: php console.php index:cleanup");
+                    $io->note("If you don't need them (for debugging), run the following command:");
+                    $io->writeln("<info>php console.php index:cleanup</info> (Delete unused indexes)");
+                    $io->writeln("<comment> --dry-run </comment> List unused indexes without deleting");
+                    $io->writeln("<comment> --all </comment> Delete all indexes, ignoring prefix");
+                    $io->writeln("<comment> --all --dry-run </comment> List all indexes without deleting");
+                    $io->writeln("<comment> -i <index_name> </comment> Remove a specific index");
                 } elseif (isset($unusedIndices['error'])) {
                     $io->error($unusedIndices['error']);
                 }
@@ -218,9 +209,9 @@ class IndexRebuildCommand extends Command
 
                 if ($log && is_array($currentEngine) && count($currentEngine)) {
                     list($engine) = $currentEngine;
-                    $logToFile = new WriterStream($unifiedsearchlib->getLogFilename($log, strtolower($engine)), 'a');
-                    $loggerInstance = new Logger();
-                    $loggerInstance->addWriter($logToFile);
+                    $logToFile = new \Monolog\Handler\StreamHandler($unifiedsearchlib->getLogFilename($log, strtolower($engine)), \Monolog\Logger::INFO);
+                    $loggerInstance = new \Monolog\Logger('index_rebuild');
+                    $loggerInstance->pushHandler($logToFile);
                     $loggerInstance->info("Execution time: " . $executionTime);
                 }
 

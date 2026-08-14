@@ -46,7 +46,9 @@
         <service id="tiki.controller.file" class="Services_File_Controller"/>
         <service id="tiki.controller.h5p" class="Services_H5P_Controller"/>
         <service id="tiki.controller.kaltura" class="Services_Kaltura_Controller"/>
+        <service id="tiki.controller.peertube" class="Services_PeerTube_Controller"/>
         <service id="tiki.controller.language" class="Services_Language_Controller"/>
+        <service id="tiki.controller.languagecheck" class="Services_LanguageCheck_Controller"/>
         <service id="tiki.controller.manager" class="Services_Manager_Controller"/>
         <service id="tiki.controller.manager_field" class="Services_Manager_FieldController"/>
         <service id="tiki.controller.manager_patch" class="Services_Manager_PatchController"/>
@@ -76,6 +78,7 @@
         <service id="tiki.controller.search_manifold" class="Services_Search_ManifoldController"/>
         <service id="tiki.controller.search_stored" class="Services_Search_StoredController"/>
         <service id="tiki.controller.semaphore" class="Services_Edit_SemaphoreController"/>
+        <service id="tiki.controller.share" class="Services_Share_Controller"/>
         <service id="tiki.controller.showtikiorg" class="Services_ShowTikiOrg_Controller"/>
         <service id="tiki.controller.social" class="Services_User_SocialController"/>
         <service id="tiki.controller.styleguide" class="Services_StyleGuide_Controller"/>
@@ -98,7 +101,9 @@
         <service id="tiki.controller.ids" class="Services_IDS_Controller"/>
         <service id="tiki.controller.performance" class="Services_Performance_Controller"/>
         <service id="tiki.controller.colormodes" class="Services_ColorModes_Controller"/>
+        <service id="tiki.controller.webauthn" class="Tiki\Services\Webauthn\WebauthnController"/>
         <service id="tiki.controller.two_fa_auth" class="Tiki\Services\TwoFactorAuth\TwoFactorAuthController"/>
         <service id="tiki.controller.iotapps" class="Services_IotApps_Controller"/>
+        <service id="tiki.controller.queued_tasks" class="Tiki\Services\QueueManager\QueueManagerController"/>
     </services>
 </container>

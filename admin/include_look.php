@@ -5,7 +5,10 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+
+use Tiki\Lib\Theme\ThemeLib;
+
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -40,12 +43,12 @@ $smarty->assign('themePrefs', $themePrefs);
 $default_themes_modes = [];
 $custom_themes_modes = [];
 try {
-     $default_themes_modes = TikiDb::get()->fetchAll("SELECT * FROM tiki_custom_color_modes WHERE custom='n'", null, -1, -1, 'exception');
-     $custom_themes_modes = TikiDb::get()->fetchAll("SELECT * FROM tiki_custom_color_modes WHERE custom='y'", null, -1, -1, 'exception');
+    $default_themes_modes = TikiDb::get()->fetchAll("SELECT * FROM tiki_custom_color_modes WHERE custom='n'", null, -1, -1, 'exception');
+    $custom_themes_modes = TikiDb::get()->fetchAll("SELECT * FROM tiki_custom_color_modes WHERE custom='y'", null, -1, -1, 'exception');
 } catch (Exception $e) {
     $smarty->assign('color_mode_error', true);
     //$message = '<span title="' . tra("You need to update your database to start using color modes on your website") . '">' . tra("Your database needs to be updated") . '<i class="bi bi-question"></i></span>';
-   //$smarty->assign('message', $message);
+    //$smarty->assign('message', $message);
 }
 
 $smarty->assign('default_modes', $default_themes_modes);
@@ -62,46 +65,45 @@ if (empty($thumbfile)) {
 $smarty->assign('thumbfile', $thumbfile);
 
 // hash of themes and their options and their thumbnail images
-if ($prefs['feature_jquery'] == 'y') {
-    $js = 'var theme_options = {';
-    foreach ($themes as $theme => $value) {
-        $js .= "\n'$theme':['" . $themelib->get_thumbnail_file($theme, '') . '\',{';
-        $options = $themelib->list_theme_options($theme);
-        if ($options) {
-            foreach ($options as $option) {
-                $js .= "'$option':'" . $themelib->get_thumbnail_file($theme, $option) . '\',';
-            }
-            $js = substr($js, 0, strlen($js) - 1) . '}';
-        } else {
-            $js .= '}';
+$js = 'var theme_options = {';
+foreach ($themes as $theme => $value) {
+    $js .= "\n'$theme':['" . $themelib->get_thumbnail_file($theme, '') . '\',{';
+    $options = $themelib->list_theme_options($theme);
+    if ($options) {
+        foreach ($options as $option) {
+            $js .= "'$option':'" . $themelib->get_thumbnail_file($theme, $option) . '\',';
         }
-        $js .= '],';
+        $js = substr($js, 0, strlen($js) - 1) . '}';
+    } else {
+        $js .= '}';
     }
-    $js = substr($js, 0, strlen($js) - 1);
-    $js .= '};';
+    $js .= '],';
+}
+$js = substr($js, 0, strlen($js) - 1);
+$js .= '};';
 
-    //Setup theme layouts array matching themes and theme:options with their respective layouts
-    $js .= 'var theme_layouts = ';
-    foreach ($themes as $theme => $value) {
-        $theme_layouts[$theme] = ThemeLib::listUserSelectableLayouts($theme);
-        $options = $themelib->list_theme_options($theme);
-        if ($options) {
-            foreach ($options as $option) {
-                $theme_layouts[$theme . ':' . $option] = ThemeLib::listUserSelectableLayouts($theme, $option);
-            }
+//Setup theme layouts array matching themes and theme:options with their respective layouts
+$js .= 'var theme_layouts = ';
+foreach ($themes as $theme => $value) {
+    $theme_layouts[$theme] = ThemeLib::listUserSelectableLayouts($theme);
+    $options = $themelib->list_theme_options($theme);
+    if ($options) {
+        foreach ($options as $option) {
+            $theme_layouts[$theme . ':' . $option] = ThemeLib::listUserSelectableLayouts($theme, $option);
         }
     }
-    //encode $theme_layouts into json to allow js below to fetch layouts based on theme selected by user
-    $theme_layouts_js = json_encode($theme_layouts);
-    $js .= $theme_layouts_js . ";";
+}
+//encode $theme_layouts into json to allow js below to fetch layouts based on theme selected by user
+$theme_layouts_js = json_encode($theme_layouts);
+$js .= $theme_layouts_js . ";";
 
-    // JS to handle theme/option changes client-side
-    // the var (theme_options) has to be declared in the same block for AJAX call scope
-    $none = json_encode(tr('None'));
-    // get the Tiki default layout from path_constants.php and pass it below to the JS
-    $default_layout = SMARTY_DEFAULT_LAYOUT;
-    $headerlib->add_js(
-        <<<JS
+// JS to handle theme/option changes client-side
+// the var (theme_options) has to be declared in the same block for AJAX call scope
+$none = json_encode(tr('None'));
+// get the Tiki default layout from path_constants.php and pass it below to the JS
+$default_layout = SMARTY_DEFAULT_LAYOUT;
+$headerlib->add_js(
+    <<<JS
 $js
 
 var css_vars_list = {
@@ -113,7 +115,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-body-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-body-color" value="#adb5bd" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-body-color" value="#adb5bd" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -125,7 +127,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-body-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-body-bg" value="#212529" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-body-bg" value="#212529" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -137,7 +139,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-emphasis-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-emphasis-color" value="#ffffff" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-emphasis-color" value="#ffffff" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -149,7 +151,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-secondary-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-secondary-bg" value="#343a40" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-secondary-bg" value="#343a40" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -161,7 +163,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-tertiary-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-tertiary-bg" value="#2b3035" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-tertiary-bg" value="#2b3035" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -173,7 +175,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-primary-text-emphasis</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-primary-text-emphasis" value="#6ea8fe" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-primary-text-emphasis" value="#6ea8fe" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -185,7 +187,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-secondary-text-emphasis</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-secondary-text-emphasis" value="#a7acb1" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-secondary-text-emphasis" value="#a7acb1" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -197,7 +199,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-success-text-emphasis</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-success-text-emphasis" value="#75b798" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-success-text-emphasis" value="#75b798" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -209,7 +211,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-info-text-emphasis</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-info-text-emphasis" value="#6edff6" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-info-text-emphasis" value="#6edff6" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -221,7 +223,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-warning-text-emphasis</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-warning-text-emphasis" value="#ffda6a" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-warning-text-emphasis" value="#ffda6a" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -233,7 +235,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-danger-text-emphasis</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-danger-text-emphasis" value="#ea868f" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-danger-text-emphasis" value="#ea868f" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -245,7 +247,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-light-text-emphasis</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-light-text-emphasis" value="#f8f9fa" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-light-text-emphasis" value="#f8f9fa" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -257,7 +259,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-dark-text-emphasis</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-dark-text-emphasis" value="#dee2e6" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-dark-text-emphasis" value="#dee2e6" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -269,7 +271,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-primary-bg-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-primary-bg-subtle" value="#031633" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-primary-bg-subtle" value="#031633" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -281,7 +283,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-secondary-bg-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-secondary-bg-subtle" value="#161719" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-secondary-bg-subtle" value="#161719" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -293,7 +295,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-success-bg-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-success-bg-subtle" value="#051b11" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-success-bg-subtle" value="#051b11" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -305,7 +307,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-info-bg-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-info-bg-subtle" value="#032830" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-info-bg-subtle" value="#032830" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -317,7 +319,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-warning-bg-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-warning-bg-subtle" value="#332701" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-warning-bg-subtle" value="#332701" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -329,7 +331,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-danger-bg-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-danger-bg-subtle" value="#2c0b0e" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-danger-bg-subtle" value="#2c0b0e" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -341,7 +343,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-light-bg-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-light-bg-subtle" value="#343a40" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-light-bg-subtle" value="#343a40" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -353,7 +355,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-dark-bg-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-dark-bg-subtle" value="#1a1d20" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-dark-bg-subtle" value="#1a1d20" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -365,7 +367,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-primary-border-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-primary-border-subtle" value="#084298" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-primary-border-subtle" value="#084298" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -377,7 +379,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-secondary-border-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-secondary-border-subtle" value="#41464b" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-secondary-border-subtle" value="#41464b" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -389,7 +391,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-success-border-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-success-border-subtle" value="#0f5132" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-success-border-subtle" value="#0f5132" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -401,7 +403,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-info-border-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-info-border-subtle" value="#087990" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-info-border-subtle" value="#087990" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -413,7 +415,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-warning-border-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-warning-border-subtle" value="#997404" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-warning-border-subtle" value="#997404" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -425,7 +427,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-danger-border-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-danger-border-subtle" value="#842029" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-danger-border-subtle" value="#842029" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -437,7 +439,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-light-border-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-light-border-subtle" value="#495057" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-light-border-subtle" value="#495057" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -449,7 +451,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-dark-border-subtle</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-dark-border-subtle" value="#343a40" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-dark-border-subtle" value="#343a40" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -461,7 +463,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-top-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-top-bg" value="#ffffff" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-top-bg" value="#ffffff" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -473,7 +475,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-top-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-top-color" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-top-color" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -485,7 +487,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-top-hover-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-top-hover-color" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-top-hover-color" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -497,7 +499,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-top-hover-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-top-hover-bg" value="#ffffff" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-top-hover-bg" value="#ffffff" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -509,7 +511,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-top-border</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-top-border" value="#111" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-top-border" value="#111" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -521,7 +523,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-topbar-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-topbar-bg" value="#ffffff" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-topbar-bg" value="#ffffff" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -533,7 +535,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-topbar-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-topbar-color" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-topbar-color" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -545,7 +547,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-topbar-hover-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-topbar-hover-color" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-topbar-hover-color" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -557,7 +559,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-topbar-hover-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-topbar-hover-bg" value="#ffffff" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-topbar-hover-bg" value="#ffffff" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -569,7 +571,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-topbar-border</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-topbar-border" value="#eee" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-topbar-border" value="#eee" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -581,7 +583,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-site-title-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-site-title-color" value="#ffffff" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-site-title-color" value="#ffffff" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -593,7 +595,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-top-nav-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-top-nav-bg" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-top-nav-bg" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -605,7 +607,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-top-nav-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-top-nav-color" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-top-nav-color" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -617,7 +619,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-top-nav-hover-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-top-nav-hover-color" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-top-nav-hover-color" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -629,7 +631,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-top-nav-hover-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-top-nav-hover-bg" value="#ffffff" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-top-nav-hover-bg" value="#ffffff" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -641,7 +643,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-aside-nav-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-aside-nav-bg" value="#ffffff" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-aside-nav-bg" value="#ffffff" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -653,7 +655,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-aside-nav-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-aside-nav-color" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-aside-nav-color" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -665,7 +667,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-aside-nav-hover-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-aside-nav-hover-color" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-aside-nav-hover-color" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -677,7 +679,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-dropdown-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-dropdown-bg" value="#ffffff" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-dropdown-bg" value="#ffffff" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -689,7 +691,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-dropdown-link-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-dropdown-link-color" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-dropdown-link-color" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -701,7 +703,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-dropdown-link-hover-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-dropdown-link-hover-color" value="#000000" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-dropdown-link-hover-color" value="#000000" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -713,7 +715,7 @@ var css_vars_list = {
                 <label class="col-form-label">--tiki-admin-dropdown-link-hover-bg</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--tiki-admin-dropdown-link-hover-bg" value="#ffffff" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--tiki-admin-dropdown-link-hover-bg" value="#ffffff" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -725,7 +727,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-heading-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-heading-color" value="inherit" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-heading-color" value="inherit" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -737,7 +739,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-link-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-link-color" value="#6ea8fe" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-link-color" value="#6ea8fe" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -770,7 +772,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-link-hover-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-link-hover-color" value="#8bb9fe" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-link-hover-color" value="#8bb9fe" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -818,7 +820,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-form-valid-border-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-form-valid-border-color" value="#75b798" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-form-valid-border-color" value="#75b798" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -830,7 +832,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-form-invalid-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-form-invalid-color" value="#ea868f" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-form-invalid-color" value="#ea868f" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -842,7 +844,7 @@ var css_vars_list = {
                 <label class="col-form-label">--bs-form-invalid-border-color</label>
             </div>
             <div class="col-auto">
-                <input type="color" class="form-control form-control-color" name="--bs-form-invalid-border-color" value="#ea868f" title="Choose your color">
+                <input type="color" class="form-control form-control-color" name="--bs-form-invalid-border-color" value="#ea868f" title="tra(Choose your color)">
             </div>
         </div>`,
     ],
@@ -946,7 +948,7 @@ function handle_mode_create_edit(el){
     $("#cm-modal-content input[name='mode']").parent().find('.error').remove();
 
     if(mode_icon.length<3){
-        error.text("Please fill the icon name");
+        error.text(tra("Please fill the icon name"));
         $("#cm-modal-content input[name='icon']").parent().append(error);
         $(el).attr('disabled',false);
         $(el).html('save');
@@ -967,7 +969,7 @@ function handle_mode_create_edit(el){
     })
 
     if(Object.keys(colors_vars).length<1){
-        error.text("Please customize at least one color");
+        error.text(tra("Please customize at least one color"));
         $("#cm-modal-content .css_colors").append(error);
         $(el).attr('disabled',false);
         $(el).html('save');
@@ -1074,19 +1076,22 @@ function edit_custom_mode(el,id,name,icon){
     var setupThemeSelects = function (themeDropDown, optionDropDown, showPreview) {
         // pick up theme drop-down change
         themeDropDown.on("change", function() {
-            var ops = theme_options[themeDropDown.val()];
+            var t = themeDropDown.find("option:selected").val();
+            var o = optionDropDown.find("option:selected").val();
+            
+            var ops = theme_options[t];
             var none = true;
-            var current = optionDropDown.val();
+            var current = o;
             optionDropDown.empty().attr('disabled',false)
                     .append(\$('<option/>').attr('value','').text($none));
-            if (themeDropDown.val()) {
+            if (t) {
                 \$.each(ops[1], function(i, val) {
                     optionDropDown.append(\$('<option/>').attr('value',i).text(i));
                     none = false;
                 });
             }
             optionDropDown.val(current);
-            if (!optionDropDown.val()){
+            if (!o){
                 optionDropDown.val('');
             }
 
@@ -1094,14 +1099,11 @@ function edit_custom_mode(el,id,name,icon){
                 optionDropDown.attr('disabled',true);
             }
             optionDropDown.trigger("change");
-            if (jqueryTiki.select2) {
-                optionDropDown.trigger("change:select2");
-            }
         }).trigger("change");
         optionDropDown.on("change", function() {
             if (showPreview !== undefined) {
-                var t = themeDropDown.val();
-                var o = optionDropDown.val();
+                var t = themeDropDown.find("option:selected").val();
+                var o = optionDropDown.find("option:selected").val();
                 var f = theme_options[t][1][o];
 
                 if ( ! f ) {
@@ -1122,29 +1124,32 @@ function edit_custom_mode(el,id,name,icon){
 
     var setupThemeLayouts = function (themeDropDown, optionDropDown, layoutDropDown) {
         themeDropDown,optionDropDown.on("change", function() {
-            var theme_name = themeDropDown.val();
-            if (optionDropDown.val()){
-                theme_name += ":" + optionDropDown.val();
+            const theme_option = optionDropDown.find("option:selected").val();
+            let theme_name = themeDropDown.find("option:selected").val();
+            if (theme_option) {
+                theme_name += ":" + theme_option;
             }
-            var layouts = theme_layouts[theme_name];
-            var current = layoutDropDown.val();
-            layoutDropDown.empty();
-            if (!theme_name){
-                layoutDropDown.append(\$('<option/>').attr('value','').text('Site layout'));
-                layoutDropDown.attr('disabled',true);
-            } else {
-                layoutDropDown.attr('disabled',false);
-                \$.each(layouts, function(i, val) {
-                    layoutDropDown.append(\$('<option/>').attr('value',i).text(val));
-                });
-
-                //try setting the option to the previously selected option and if no layout matched, set it to the SMARTY_DEFAULT_LAYOUT constant
-                layoutDropDown.val(current);
-                if (!layoutDropDown.val()){
-                    layoutDropDown.val($default_layout);
+            if (layoutDropDown.length) {
+                const layouts = theme_layouts[theme_name];
+                const current = layoutDropDown.val();
+                layoutDropDown.empty();
+                if (!theme_name){
+                    layoutDropDown.append(\$('<option/>').attr('value','').text('Site layout'));
+                    layoutDropDown.attr('disabled',true);
+                } else {
+                    layoutDropDown.attr('disabled',false);
+                    \$.each(layouts, function(i, val) {
+                        layoutDropDown.append(\$('<option/>').attr('value',i).text(val));
+                    });
+    
+                    //try setting the option to the previously selected option and if no layout matched, set it to the SMARTY_DEFAULT_LAYOUT constant
+                    layoutDropDown.val(current);
+                    if (!layoutDropDown.val()){
+                        layoutDropDown.val("$default_layout");
+                    }
                 }
+                layoutDropDown.trigger("change");
             }
-            layoutDropDown.trigger("change");
 
         }).trigger("change");
     };
@@ -1153,5 +1158,4 @@ function edit_custom_mode(el,id,name,icon){
     setupThemeLayouts(\$('.tab-content select[name=theme_admin]'), \$('.tab-content select[name=theme_option_admin]'), \$('.tab-content select[name=site_layout_admin]') );
 });
 JS
-    );
-}
+);

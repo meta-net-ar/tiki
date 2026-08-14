@@ -1,6 +1,6 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 {block name="content"}
     {include file='access/include_items.tpl'}
@@ -25,33 +25,71 @@
             <label for="select_groups" class="col-form-label">
                 {tr}These groups:{/tr}
             </label>
-            <select name="checked_groups[]" multiple="multiple" size="{$countgrps}" class="form-control" id="select_groups" data-usergroups='{$userGroups}'>
+            <select name="checked_groups[]" multiple="multiple" size="{$countgrps}" class="form-control" id="select_groups" data-usergroups="{$userGroups|escape}">
                 {section name=ix loop=$all_groups}
                     {if $all_groups[ix] != 'Anonymous' && $all_groups[ix] != 'Registered'}
                         <option value="{$all_groups[ix]|escape}">{$all_groups[ix]|escape}</option>
                     {/if}
                 {/section}
             </select>
-            {if $prefs.jquery_select2 !== 'y'}
+            {if $prefs.elementplus_select !== 'y'}
                 <div class="form-text">
                     {tr}Use Ctrl+Click or Command+Click to select multiple options{/tr}
                 </div>
             {/if}
             {jq}
-$("input[name=add_remove]").on("change", function () {
-    var userGroups = $("#select_groups").data("usergroups"), mode = false;
-    if ($(this).prop("checked") && userGroups) {
-        if ($(this).val() === "add") {    // filter the group list to ones this user is not in
-            mode = true;
+var $selectGroups = $("#select_groups");
+
+$selectGroups.on("change", function () {
+    const mode = $("input[name=add_remove]:checked").val() === "add";
+    const $defaultGroup = $("#default_group");
+
+    const userGroups = $selectGroups.data("usergroups") || [];
+    const selectedGroups = $(this).val() || [];
+    let setAndSelectedGroups = [];
+    if (mode) {
+        setAndSelectedGroups = [...userGroups, ...selectedGroups];
+    } else {
+        setAndSelectedGroups = [...selectedGroups];
+    }
+
+    // add or remove selected groups from default group
+    setAndSelectedGroups.forEach(function (group) {
+        const pattern = group;
+        const $matches = $defaultGroup.find("option").filter(function() {
+            // groups can contains single and/or double quotes so use regex
+            return $(this).val() === pattern;
+        });
+
+        if (mode && $matches.length === 0) {
+            $defaultGroup.prepend($("<option>").val(group).text(group));
+        } else if (! mode && $matches.length > 0) {
+            $matches.remove();
         }
-        $("option", "#select_groups").each(function () {
+    });
+
+    if (mode) {
+        $defaultGroup.find("option").each(function () {
+            if (setAndSelectedGroups.indexOf($(this).val()) === -1) {
+                $(this).remove();
+            }
+        });
+    }
+});
+
+$("input[name=add_remove]").on("change", function () {
+    const userGroups = $selectGroups.data("usergroups");
+    const mode = $("input[name=add_remove]:checked").val() === "add";
+    if ($(this).prop("checked") && userGroups) {
+        // filter the group list to ones this user is not in
+        $("option", $selectGroups).each(function () {
             if ($.inArray($(this).val(), userGroups) > -1) {
                 $(this).prop("disabled", mode).css("opacity", mode ? .3 : 1);
             } else {
                 $(this).prop("disabled", ! mode).css("opacity", ! mode ? .3 : 1);
             }
         });
-        $("#select_groups").trigger("change.select2");
+        $selectGroups.trigger("change");
     }
 }).trigger("change");
             {/jq}

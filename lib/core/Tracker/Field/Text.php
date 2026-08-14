@@ -91,6 +91,16 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
                             1 => tr('Yes'),
                         ],
                     ],
+                    'is_password' => [
+                        'name' => tr('Display as password'),
+                        'description' => tr('If enabled, the field will hide its value and provide a toggle to show it. The value will not be searchable.'),
+                        'filter' => 'int',
+                        'default' => 0,
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -105,11 +115,18 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
 
     public function renderInput($context = [])
     {
+        if (! empty($this->trackerField->getOption('is_password'))) {
+            $value = $this->getValue();
+            return '<input type="password" name="' . $this->getHTMLFieldName() . '" value="' . htmlspecialchars($value) . '" class="form-control">';
+        }
         return $this->renderTemplate('trackerinput/text.tpl', $context);
     }
 
     public function renderInnerOutput($context = [])
     {
+        if (! empty($this->trackerField->getOption('is_password'))) {
+            return '******';
+        }
         $pre = '';
         $post = '';
 
@@ -158,10 +175,25 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
         }
     }
 
+    public function renderText($context = [])
+    {
+        $value = $this->getValue();
+
+        if ($this->getConfiguration('isMultilingual') == 'y') {
+            $decoded = json_decode($value, true);
+            if (is_array($decoded)) {
+                $language = Language::getCurrentLanguage();
+                $value = $decoded[$language] ?? (reset($decoded) ?: '');
+            }
+        }
+
+        return trim(strip_tags((string) $value));
+    }
+
     protected function processMultilingual($requestData, $id_string)
     {
         global $prefs;
-        $language = $prefs['language'];
+        $language = Language::getCurrentLanguage();
         $multilingual = $this->getConfiguration('isMultilingual') == 'y';
 
         if (! isset($requestData[$id_string])) {
@@ -243,7 +275,7 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
     {
         $length = $this->getOption('max');
 
-        if ($length) {
+        if ($length && ! is_null($value)) {
             $f_len = function_exists('mb_strlen') ? 'mb_strlen' : 'strlen';
             $f_substr = function_exists('mb_substr') ? 'mb_substr' : 'substr';
 
@@ -454,11 +486,11 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
                     return hex2bin($value);
                 })
                 ->setParseIntoTransform(function (&$info, $value) use ($permName) {
-                    $info['fields'][$permName] = bin2hex($value);
+                    $info['fields'][$permName] = is_null($value) ? null : bin2hex($value);
                 })
                 ;
         } else {
-            $lang = $prefs['language'];
+            $lang = Language::getCurrentLanguage();
             $schema->addNew($permName, 'current')
                 ->setLabel(tr('%0 (%1)', $name, $lang))
                 ->setReadOnly(true)
@@ -562,9 +594,21 @@ class Tracker_Field_Text extends \Tracker\Field\AbstractItemField implements \Tr
                         }
                     })
                     ;
+
+                $filters->addNew($permName, 'multiexact')
+                    ->setLabel($name)
+                    ->setHelp(tr('Search for one or more precise values separated by OR.'))
+                    ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_mem"))
+                    ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
+                        $value = $control->getValue();
+                        if ($value) {
+                            $query->filterMultiIdentifier($value, $baseKey . '_exact');
+                        }
+                    })
+                    ;
             }
         } else {
-            $language = $prefs['language'];
+            $language = Language::getCurrentLanguage();
             $filters->addNew($permName, "fulltext-current")
                 ->setLabel($name)
                 ->setHelp(tr('Full-text search in the current language.'))

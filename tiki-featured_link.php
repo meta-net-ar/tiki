@@ -16,6 +16,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FEATURED_LINKS;
+Sections::setCurrentSection($section);
 include_once('lib/featured_links/flinkslib.php');
 
 $access->check_feature('feature_featuredLinks');
@@ -27,7 +30,6 @@ if (! isset($_REQUEST["url"]) || ! $flinkslib->get_featured_link($_REQUEST['url'
     $flinkslib->add_featured_link_hit($_REQUEST["url"]);
 }
 
-$section = 'featured_links';
 include_once('tiki-section_options.php');
 
 $smarty->assign_by_ref('url', $_REQUEST["url"]);

@@ -1,11 +1,12 @@
-// Lux 5.3.3 -- This overrides and adds to node_modules/bootswatch/dist/lumen/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Lux 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/lux/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/lux/_variables.scss"; // Bootswatch theme variables file
 
 //
 // Color system
-//
 
 //$blue:    #007bff;  // default
 //$indigo:  #6610f2;  // default
@@ -18,7 +19,7 @@ $green: #56c07b;
 //$teal:    #20c997;  // default
 $cyan: #39a0cb;
 
-//$primary:       $gray-900;  // default
+$primary:       #1a1a1a; // $gray-900;  // default
 $secondary:     #E5E5E5FF; // $white;  // default =- Darkened slightly so btn-secondary is recognizable as a button.
 $success:       #2E844C; //$green;  // default
 $info:          #1A7DA8; // $cyan;  // default
@@ -27,15 +28,36 @@ $danger:        #D4403A; // $red;  // default
 $light:         $white;  // default
 $dark:          $gray-800;  // default
 
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
+$theme-colors: (
+    "primary": $primary,
+    "secondary": $secondary,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark
+);
+
+$primary-text-emphasis:   #000; // shade-color($primary, 80%); // 60%) !default;
+$secondary-text-emphasis: shade-color($secondary, 80%); // 60%) !default;
+$success-text-emphasis:   shade-color($success, 80%); // 60%) !default;
+$info-text-emphasis:      shade-color($info, 80%); // 60%) !default;
+$warning-text-emphasis:   shade-color($warning, 80%); // 60%) !default;
+$danger-text-emphasis:    shade-color($danger, 80%); // 60%) !default;
+$light-text-emphasis:     $gray-700 !default;
+$dark-text-emphasis:      $gray-700 !default;
+
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 // Options
-// Prefix for :root CSS variables
-$prefix:                      bs-;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 $body-bg: #fff;
+$body-color: #434648; // #55595c;
 $body-emphasis-color:       $black;  // default
 
 // Links

@@ -25,14 +25,12 @@ function wikiplugin_sql_info()
                 'description' => tr('DSN name of the database being queried. The DSN name needs to first be defined at
                     %0', '<code>tiki-admin_dsn.php</code>'),
                 'since' => '1',
-                'default' => ''
             ],
             'raw' => [
                 'required' => false,
                 'name' => tra('Raw return'),
                 'description' => tra('Return with table formatting (default) or raw data with no table formatting'),
                 'since' => '11.0',
-                'default' => '0',
                 'filter' => 'digits',
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -84,10 +82,6 @@ function wikiplugin_sql($data, $params)
     global $tikilib, $prefs, $user;
     extract($params, EXTR_SKIP);
 
-    if (! isset($db)) {
-        return tra('Missing db param');
-    }
-
     $perms = Perms::get([ 'type' => 'dsn', 'object' => $db ]);
     if (! $perms->dsn_query) {
         return tra('You do not have the permission that is needed to use this feature');
@@ -107,7 +101,7 @@ function wikiplugin_sql($data, $params)
                     } else {
                         $bindvars[$key] = $variable[1] . $GLOBALS[$varName] . $variable[3];
                     }
-                } elseif (strpos($value, "$") === 0) {
+                } elseif (str_starts_with($value, "$")) {
                     $varName = substr($value, 1);
                     $originalVarValue = $varValue = '{{' . $varName . '}}';
                     TikiLib::lib('parser')->parse_wiki_argvariable($varName);
@@ -127,7 +121,6 @@ function wikiplugin_sql($data, $params)
     }
 
     $ret = '';
-    $sql_oke = true;
     $dbmsg = '';
 
     if ($db = $tikilib->get_db_by_name($db)) {
@@ -135,8 +128,7 @@ function wikiplugin_sql($data, $params)
     } else {
         return '~np~' . tra('Could not obtain valid DSN connection.') . '~/np~';
     }
-
-    $setup_table = ( isset($raw) or isset($delim) ) ? false : true;
+    $setup_table = ! ((! is_null($raw) or ! is_null($delim)));
     $class = 'even';
     while ($result && $res = $result->fetchRow()) {
         if ($setup_table) {
@@ -151,7 +143,7 @@ function wikiplugin_sql($data, $params)
             $ret .= "</tr></thead>";
         }
 
-        if (! isset($raw) && ! isset($delim)) {
+        if (is_null($raw) && is_null($delim)) {
             $ret .= "<tr>";
         }
 
@@ -162,12 +154,12 @@ function wikiplugin_sql($data, $params)
         }
 
         $first_field = true;
-        foreach ($res as $name => $val) {
-            if (isset($delim) && ! $first_field) {
+        foreach ($res as $val) {
+            if (! is_null($delim) && ! $first_field) {
                 $ret .= $delim;
             }
 
-            if (isset($raw) || isset($delim)) {
+            if (! is_null($raw) || ! is_null($delim)) {
                 $ret .= "$val";
             } else {
                 $ret .= "<td class=\"$class\">$val</td>";
@@ -176,14 +168,14 @@ function wikiplugin_sql($data, $params)
             $first_field = false;
         }
 
-        if (! isset($raw) && ! isset($delim)) {
+        if (is_null($raw) && is_null($delim)) {
             $ret .= "<tr>";
         } elseif (isset($delim)) {
             $ret .= "<br>";
         }
     }
 
-    if ($ret && ! isset($raw)) {
+    if ($ret && is_null($raw)) {
         $ret .= "</table>";
     }
     if ($dbmsg) {
@@ -191,7 +183,7 @@ function wikiplugin_sql($data, $params)
     }
 
     if (! empty($params['audit'])) {
-        TikiLib::lib('logs')->add_log('wikiplugin_sql', "Page - " . $_GET['page'] . "\nParameters - " . print_r($bindvars, true));
+        TikiLib::lib('logs')->add_log('wikiplugin_sql', "Page - " . $_GET['page'] . "\nParameters - " . print_r($bindvars, true)); // @phpstan-ignore disallowedFunctions.printR (returns bind vars as string for Tiki log entry, never prints)
     }
 
     if (! empty($params['audit_csv'])) {
@@ -199,7 +191,7 @@ function wikiplugin_sql($data, $params)
         $contentRow[] = [
             $tikilib->date_format($prefs['short_date_format'] . ' ' . $prefs['long_time_format'], $tikilib->now),
             $user,
-            isset($_GET['page']) ? $_GET['page'] : '',
+            $_GET['page'] ?? '',
             $bindvars
         ];
 

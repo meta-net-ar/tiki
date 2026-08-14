@@ -1,0 +1,17 @@
+{
+    "name": "wysiwyg",
+    "version": "1.0.0",
+    "description": "?",
+    "main": "index.js",
+    "type": "module",
+    "dependencies": {
+        "svgedit": "~7.4.1"
+    },
+    "dependenciesComment": {
+        "svgedit": "version 7.4.1 fixes jspdf security vulnerabilities (GHSA-8mvj-3j78-4qmw, GHSA-f8cm-6447-x5h2)  Indeed tiki-svgedit_draw.js directly dependinds on it and incorrectly references files in node_modules and dist.  This probably wastes a large amount of compile time AND will not actually work at runtime from a tarball.  But this was already broken and I don't have time to deal with it right now.  it needs moving to common-externals, and refactoring the way it's referenced from tiki-svgedit_draw.js - benoitg- 2026-03-09"
+    },
+    "devDependenciesComment": {},
+    "devDependencies": {
+        "summernote": "^0.9.1"
+    }
+}

@@ -32,7 +32,7 @@
 {/if}
     <form method='post' id="admin_forums">
         <div id="{$ts.tableid}-div" class="{if $js}table-responsive{/if} ts-wrapperdiv" {if !empty($ts.enabled)}style="visibility:hidden;"{/if}>
-            <table id="{$ts.tableid}" class="table table-striped table-hover" data-count="{$cant|escape}">
+            <table id="{$ts.tableid}" class="table table-striped table-hover" data-count="{$count|escape}">
                 {$numbercol = 0}
                 <thead>
                 <tr>
@@ -79,16 +79,16 @@
                         <td>
                             <a class="link" href="{$channels[user].forumId|sefurl:'forum'}" title="{tr}View{/tr}">{$channels[user].name|escape}</a>
                         </td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].threads}<span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].threads}</span></td>
                         <td class="integer">
                             <input type="number" name="order[]" value="{$channels[user].forumOrder|escape}" aria-label="{tr}Order{/tr}">
                             <input type="hidden" name="forumsId[]" value="{$channels[user].forumId|escape}">
                         </td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].comments}<span></td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].users}<span></td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].age}<span></td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].posts_per_day|string_format:"%.2f"}<span></td>
-                        <td class="integer"><span class="badge bg-secondary">{$channels[user].hits}<span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].comments}</span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].users}</span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].age}</span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].posts_per_day|string_format:"%.2f"}</span></td>
+                        <td class="integer"><span class="badge bg-secondary">{$channels[user].hits}</span></td>
                         <td class="action">
                             {actions}
                             {strip}
@@ -172,7 +172,7 @@
         {/if}
     </form>
 {if !$ts.enabled}
-    {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
 {/if}
 {/tab}
 {if !$ts.ajax}
@@ -193,17 +193,17 @@
                 <div class="tiki-form-group row">
                     <label class="col-sm-4 col-form-label" for="name">{tr}Name{/tr}</label>
                     <div class="col-sm-8">
-                        <input type="text" name="name" class="form-control" id="name" value="{$name|escape}">
+                        <input maxlength="{$MAX_FORUM_NAME_LENGTH}" type="text" name="name" class="form-control" id="name" value="{$name|escape}">
                     </div>
                 </div>
                 <div class="tiki-form-group row">
                     <label class="col-sm-4 col-form-label" for="description">{tr}Description{/tr}</label>
                     <div class="col-sm-8">
-                        <textarea name="description" rows="4" class="form-control" id="description">{$description|escape}</textarea>
+                        {textarea maxlength="{$MAX_FORUM_DESCRIPTION_LENGTH}" name="description" rows="4" class="form-control" id="description"}{$description|escape}{/textarea}
                     </div>
                 </div>
                 <div class="tiki-form-group row">
-                    <label class="col-sm-4 col-form-label" for="new_section">{tr}Section{/tr}</label>
+                    <label class="col-sm-4 col-form-label" for="section">{tr}Section{/tr}</label>
                     <div class="col-sm-4">
                         <select name="section" id="section" aria-label="{tr}New section{/tr}" class="form-control">
                             <option value="" {if $forumSection eq ""}selected="selected"{/if}>{tr}None{/tr}</option>
@@ -214,7 +214,7 @@
                         </select>
                     </div>
                     <div class="col-sm-4">
-                        <input name="new_section" id="new_section" class="form-control" type="text">
+                        <input maxlength="{$MAX_FORUM_SECTION_LENGTH}" name="new_section" id="new_section" class="form-control" type="text">
                     </div>
                 </div>
 
@@ -269,7 +269,7 @@
                 <div class="tiki-form-group row">
                     <label class="col-sm-4 col-form-label" for="moderator_group">{tr}Moderator group{/tr}</label>
                     <div class="col-sm-8">
-                        <input id="moderator_group" type="text" class="form-control" name="moderator_group" id="moderator_group" value="{$moderator_group|escape}">
+                        <input id="moderator_group" type="text" class="form-control" name="moderator_group" value="{$moderator_group|escape}">
                         {autocomplete element='#moderator_group' type='groupname'}
                     </div>
                 </div>
@@ -282,7 +282,7 @@
                 <div class="tiki-form-group row">
                     <label class="col-sm-4 col-form-label" for="forum_password">{tr}Forum password{/tr}</label>
                     <div class="col-sm-8">
-                        <input type="text" name="forum_password" id="forum_password" class="form-control" value="{$forum_password|escape}">
+                        <input maxlength="{$MAX_FORUM_PASSWORD_LENGTH}" type="text" name="forum_password" id="forum_password" class="form-control" value="{$forum_password|escape}">
                     </div>
                 </div>
                 <div class="tiki-form-group row">
@@ -368,27 +368,43 @@
                     <legend class="col-sm-4 col-form-label">{tr}Add messages from this email to the forum{/tr}</legend>
                     <div class="col-sm-8">
                         <div class="tiki-form-group row">
-                            <label class="col-sm-4 col-form-label" for="inbound_pop_server">{tr}POP3 server{/tr}</label>
+                            <label class="col-sm-4 col-form-label" for="inbound_imap_server">{tr}IMAP server{/tr}</label>
                             <div class="col-sm-8">
-                                <input type="text" name="inbound_pop_server" id="inbound_pop_server" class="form-control" value="{$inbound_pop_server|escape}">
+                                <input type="text" name="inbound_imap_server" id="inbound_imap_server" class="form-control" value="{$inbound_imap_server|escape}">
                             </div>
                         </div>
                         <div class="tiki-form-group row">
-                            <label class="col-sm-4 col-form-label" for="inbound_pop_port">{tr}POP3 port{/tr}</label>
+                            <label class="col-sm-4 col-form-label" for="inbound_imap_port">{tr}IMAP port{/tr}</label>
                             <div class="col-sm-8">
-                                <input type="text" name="inbound_pop_port" id="inbound_pop_port" class="form-control" value="{$inbound_pop_port|escape}">
+                                <input type="text" name="inbound_imap_port" id="inbound_imap_port" class="form-control" value="{$inbound_imap_port|escape}">
                             </div>
                         </div>
                         <div class="tiki-form-group row">
-                            <label class="col-sm-4 col-form-label" for="inbound_pop_user">{tr}User{/tr}</label>
+                            <label class="col-sm-4 col-form-label" for="inbound_imap_user">{tr}User{/tr}</label>
                             <div class="col-sm-8">
-                                <input type="text" name="inbound_pop_user" id="inbound_pop_user" class="form-control" value="{$inbound_pop_user|escape}" autocomplete="off">
+                                <input type="text" name="inbound_imap_user" id="inbound_imap_user" class="form-control" value="{$inbound_imap_user|escape}" autocomplete="off">
                             </div>
                         </div>
                         <div class="tiki-form-group row">
-                            <label class="col-sm-4 col-form-label" for="inbound_pop_password">{tr}Password{/tr}</label>
+                            <label class="col-sm-4 col-form-label" for="inbound_imap_password">{tr}Password{/tr}</label>
                             <div class="col-sm-8">
-                                <input type="password" name="inbound_pop_password" id="inbound_pop_password" class="form-control" value="{$inbound_pop_password|escape}" autocomplete="new-password">
+                                <input type="password" name="inbound_imap_password" id="inbound_imap_password" class="form-control" value="{$inbound_imap_password|escape}" autocomplete="new-password">
+                            </div>
+                        </div>
+                        <div class="tiki-form-group row">
+                            <label class="col-sm-4 col-form-label" for="inbound_imap_ssl">{tr}SSL support{/tr}</label>
+                            <div class="col-sm-8">
+                                <select id="inbound_imap_ssl" name="inbound_imap_ssl" class="form-control">
+                                    <option value=""{if not $inbound_imap_ssl} selected="selected"{/if}>
+                                    {tr}No{/tr}
+                                    </option>
+                                    <option value="SSL"{if $inbound_imap_ssl eq 'SSL'} selected="selected"{/if}>
+                                    {tr}SSL{/tr}
+                                    </option>
+                                    <option value="TLS"{if $inbound_imap_ssl eq 'TLS'} selected="selected"{/if}>
+                                    {tr}TLS{/tr}
+                                    </option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -625,7 +641,7 @@
                     <label class="col-sm-4 form-check-label" for="att_list_nb">{tr}Shows number of attachments of the all thread in forum list{/tr}</label>
                     <div class="col-sm-8">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="att_list_nb" name="att_list_nb"{if $att_list_nb eq 'y'} checked="checked"{/if} id="att_list_nb">
+                            <input class="form-check-input" type="checkbox" id="att_list_nb" name="att_list_nb"{if $att_list_nb eq 'y'} checked="checked"{/if}>
                         </div>
                     </div>
                 </div>

@@ -63,7 +63,7 @@ class Key
                 throw new Services_Exception_Denied(tr('Could not decrypt key.'));
             }
             return $key;
-        } catch (Services_Exception_Denied $e) {
+        } catch (\Throwable $e) {
             throw new KeyException($e->getMessage());
         }
     }
@@ -73,5 +73,24 @@ class Key
         $smarty = TikiLib::lib('smarty');
         $href = smarty_function_bootstrap_modal(['controller' => 'encryption', 'action' => 'enter_key', 'keyId' => $this->encryption_key['keyId']], $smarty->getEmptyInternalTemplate());
         return '<a href="' . $href . '" class="encryption-key-entry">' . tr('Try with a manually entered key.') . '</a>';
+    }
+
+    /**
+     * Checks whether the encryption key can be decrypted with the current user's share.
+     *
+     * Catches both {@see KeyException} (expected auth failure) and \Throwable (unexpected
+     * service-layer errors from {@see decryptKey()}) so this method always returns a bool
+     * and never propagates exceptions to callers that only need a yes/no answer.
+     *
+     * @return bool  True if the key is accessible, false otherwise
+     */
+    public function isKeyAccessible(): bool
+    {
+        try {
+            $this->decryptKey();
+            return true;
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 }

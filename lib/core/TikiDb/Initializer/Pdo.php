@@ -4,11 +4,33 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\TikiDb\PdoDb;
+
 class TikiDb_Initializer_Pdo
 {
     public function isSupported()
     {
         return extension_loaded("pdo") && in_array('mysql', PDO::getAvailableDrivers());
+    }
+
+    /**
+     * Prefers Pdo\Mysql::* (PHP 8.4+) over the deprecated PDO::MYSQL_* constants.
+     *
+     * @param string $name Constant name without the MYSQL_ prefix, e.g. "ATTR_INIT_COMMAND"
+     * @return int|null
+     */
+    private function mysqlAttrConstant(string $name)
+    {
+        if (class_exists('Pdo\\Mysql') && defined('Pdo\\Mysql::' . $name)) {
+            return constant('Pdo\\Mysql::' . $name);
+        }
+
+        if (defined('PDO::MYSQL_' . $name)) {
+            return constant('PDO::MYSQL_' . $name);
+        }
+
+        return null;
     }
 
     public function getConnection(array $credentials)
@@ -30,9 +52,10 @@ class TikiDb_Initializer_Pdo
 
         if ($credentials['charset']) {
             $charset_query = "SET NAMES {$credentials['charset']}";
+            $initCommandAttr = $this->mysqlAttrConstant('ATTR_INIT_COMMAND');
 
-            if (defined('PDO::MYSQL_ATTR_INIT_COMMAND')) {
-                $pdo_options[PDO::MYSQL_ATTR_INIT_COMMAND] = $charset_query;
+            if ($initCommandAttr !== null) {
+                $pdo_options[$initCommandAttr] = $charset_query;
             } else {
                 $pdo_post_queries[] = $charset_query;
             }
@@ -51,7 +74,7 @@ class TikiDb_Initializer_Pdo
             $dbTiki->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
             //  $dbTiki->setAttribute(PDO::ATTR_ORACLE_NULLS, PDO::NULL_EMPTY_STRING);
 
-            $db = new TikiDb_Pdo($dbTiki);
+            $db = new PdoDb($dbTiki);
 
             foreach ($pdo_post_queries as $query) {
                 $db->query($query);
@@ -81,15 +104,15 @@ class TikiDb_Initializer_Pdo
         $keyFiles = glob($fileroot . "*.pem");
         if (! empty($keyFiles)) {
             foreach ($keyFiles as $filename) {
-                if (strpos($filename, '-key.pem') !== false) {
+                if (str_contains($filename, '-key.pem')) {
                     $clientKey = basename($filename);
                     continue;
                 }
-                if (strpos($filename, '-cert.pem') !== false) {
+                if (str_contains($filename, '-cert.pem')) {
                     $clientCert = basename($filename);
                     continue;
                 }
-                if (strpos($filename, '-ca.pem') !== false) {
+                if (str_contains($filename, '-ca.pem')) {
                     $caCert = basename($filename);
                     continue;
                 }
@@ -101,13 +124,13 @@ class TikiDb_Initializer_Pdo
 
             if ($isSSL_verify_ca) {
                 // Using 1 .pem file (CA) ie --ssl-mode=VERIFY_CA
-                $pdo_options[PDO::MYSQL_ATTR_SSL_CA] = $fileroot . $caCert;
-                $pdo_options[PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT] = false;
+                $pdo_options[$this->mysqlAttrConstant('ATTR_SSL_CA')] = $fileroot . $caCert;
+                $pdo_options[$this->mysqlAttrConstant('ATTR_SSL_VERIFY_SERVER_CERT')] = false;
             } elseif ($isSSL_verify_identity) {
                 // Using 3 .pem files (CA, Client cert and Client Key) ie --ssl-mode=VERIFY_IDENTITY
-                $pdo_options[PDO::MYSQL_ATTR_SSL_KEY] = $fileroot . $clientKey;
-                $pdo_options[PDO::MYSQL_ATTR_SSL_CERT] = $fileroot . $clientCert;
-                $pdo_options[PDO::MYSQL_ATTR_SSL_CA] = $fileroot . $caCert;
+                $pdo_options[$this->mysqlAttrConstant('ATTR_SSL_KEY')] = $fileroot . $clientKey;
+                $pdo_options[$this->mysqlAttrConstant('ATTR_SSL_CERT')] = $fileroot . $clientCert;
+                $pdo_options[$this->mysqlAttrConstant('ATTR_SSL_CA')] = $fileroot . $caCert;
             }
         }
     }

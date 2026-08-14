@@ -62,7 +62,7 @@ setup
 debug()
 {
     echo "COMMAND: $COMMAND"
-    echo "SVNTAG: $SVNTAG"
+    echo "GITBRANCH: $GITBRANCH"
     echo "TUSER: $TUSER"
     echo "ID: $ID"
 }

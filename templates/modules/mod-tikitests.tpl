@@ -1,6 +1,6 @@
 {if $tiki_p_admin_tikitests eq 'y' or $tiki_p_play_tikitests eq 'y' or $tiki_p_edit_tikitests eq 'y'}
     {if !isset($tpl_module_title)}
-        {eval var="{tr}TikiTests Menu{/tr}" assign="tpl_module_title"}
+        {capture assign="tpl_module_title"}{tr}TikiTests Menu{/tr}{/capture}
     {/if}
     {tikimodule error=$module_params.error title=$tpl_module_title name="tikitests" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
         {if $tiki_p_admin_tikitests eq 'y' or $tiki_p_play_tikitests eq 'y'}

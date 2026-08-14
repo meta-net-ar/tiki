@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -39,9 +39,9 @@ class PollLib extends PollLibShared
         }
 
         $query = "select * from `tiki_polls` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_polls` $mid";
+        $query_count = "select count(*) from `tiki_polls` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -53,7 +53,7 @@ class PollLib extends PollLibShared
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -70,16 +70,16 @@ class PollLib extends PollLibShared
         if ($find) {
             $findesc = '%' . $find . '%';
             $mid = " where (`active`=? or `active`=? or `active`=?) and `publishDate`<=? and (`title` like ?)";
-            $bindvars = ['a', 'c', 'o', (int) $this->now, $findesc];
+            $bindvars = ['a', 'c', 'o', $this->now, $findesc];
         } else {
             $mid = " where (`active`=? or `active`=? or `active`=?) and `publishDate`<=? ";
-            $bindvars = ['a', 'c', 'o', (int) $this->now];
+            $bindvars = ['a', 'c', 'o', $this->now];
         }
 
         $query = "select * from `tiki_polls` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_polls` $mid";
+        $query_count = "select count(*) from `tiki_polls` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -88,7 +88,7 @@ class PollLib extends PollLibShared
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -105,16 +105,16 @@ class PollLib extends PollLibShared
         if ($find) {
             $findesc = '%' . $find . '%';
             $mid = " where `publishDate`<=? and (`title` like ?)";
-            $bindvars = [(int) $this->now, $findesc];
+            $bindvars = [$this->now, $findesc];
         } else {
             $mid = " where `publishDate`<=? ";
-            $bindvars = [(int) $this->now];
+            $bindvars = [$this->now];
         }
 
         $query = "select * from `tiki_polls` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_polls` $mid";
+        $query_count = "select count(*) from `tiki_polls` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -123,45 +123,45 @@ class PollLib extends PollLibShared
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
     /**
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function set_last_poll()
     {
         $query = "select max(`publishDate`) from `tiki_polls` where `publishDate`<=?";
-        $last = $this->getOne($query, [(int) $this->now]);
+        $last = $this->getOne($query, [$this->now]);
         $query = "update `tiki_polls` set `active`=? where `publishDate`=?";
         return $this->query($query, ['c', $last]);
     }
 
     /**
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function close_all_polls()
     {
         $query = "select max(`publishDate`) from `tiki_polls` where `publishDate`<=?";
-        $last = $this->getOne($query, [(int) $this->now]);
+        $last = $this->getOne($query, [$this->now]);
         $query = "update `tiki_polls` set `active`=? where `publishDate`<?";
         return $this->query($query, ['x', (int) $last]);
     }
 
     /**
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function active_all_polls()
     {
         $query = "update `tiki_polls` set `active`=? where `publishDate`<=?";
-        return $this->query($query, ['a', (int) $this->now]);
+        return $this->query($query, ['a', $this->now]);
     }
 
     /**
      * @param $optionId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_poll_option($optionId)
     {

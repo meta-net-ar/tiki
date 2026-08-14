@@ -15,7 +15,6 @@ if (! isset($_REQUEST["id"])) {
 }
 
 require_once('tiki-setup.php');
-TikiLib::lib('header')->setXRobotsTag($robots);
 $access->check_feature('feature_articles');
 
 include_once('lib/commcenter/commlib.php');

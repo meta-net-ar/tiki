@@ -10,7 +10,7 @@ use Tiki\Package\ExtensionManager;
 use Tiki\Process\PhpExecutableFinder;
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -122,10 +122,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 $installableList = $composerManager->getInstalled();
-$lastResult = $composerManager->getComposer()->getLastResult();
-if ($lastResult !== null && ! empty($lastResult['errors'])) {
-    $smarty->assign('composer_installed_errors', $lastResult['errors']);
-}
 
 if ($installableList === false) {
     $packagesMissing = false;
@@ -144,6 +140,7 @@ $packageprefs = TikiLib::lib('prefs')->getPackagePrefs();
 asort($packageprefs);
 $smarty->assign('packageprefs', $packageprefs);
 
+$smarty->assign('package_highlight', $_GET['package_highlight'] ?? null);
 $smarty->assign('composer_environment_warning', $composerManager->checkThatCanInstallPackages());
 $smarty->assign('composer_available', $composerManager->composerIsAvailable());
 $smarty->assign('composer_packages_installed', $installableList);

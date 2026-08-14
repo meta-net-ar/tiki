@@ -71,9 +71,9 @@ class LsAdminlib extends TikiLib
         }
 
         $query = "select * from `tiki_live_support_messages` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_live_support_messages` $mid";
+        $query_count = "select count(*) from `tiki_live_support_messages` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -82,7 +82,7 @@ class LsAdminlib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
 
         return $retval;
     }
@@ -122,10 +122,10 @@ class LsAdminlib extends TikiLib
             }
         }
 
-        $query = 'select * from `tiki_live_support_requests` $mid order by ' . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_live_support_requests` $mid";
+        $query = "select * from `tiki_live_support_requests` $mid order by " . $this->convertSortMode($sort_mode);
+        $query_count = "select count(*) from `tiki_live_support_requests` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -136,7 +136,7 @@ class LsAdminlib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
         return $retval;
     }
 

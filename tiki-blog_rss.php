@@ -9,7 +9,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
-TikiLib::lib('header')->setXRobotsTag($robots);
 $bloglib = TikiLib::lib('blog');
 $rsslib = TikiLib::lib('rss');
 
@@ -35,7 +34,7 @@ if ($tiki_p_read_blog != 'y') {
 $feed = 'blog';
 $id = 'blogId';
 $uniqueid = "$feed.$id=" . $_REQUEST["$id"];
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output['data'] == 'EMPTY') {
     $tmp = $bloglib->get_blog($_REQUEST["$id"]);

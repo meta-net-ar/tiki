@@ -122,6 +122,10 @@ class APIWriter
                 $result = false;
             }
 
+            if (is_array($result) && count($result) == 1 && ! empty($result[0])) {
+                $result = $result[0];
+            }
+
             if ($result && ! $id && method_exists($entry, 'backfillPK')) {
                 foreach (explode('.', $this->config['modify_data_path']) as $field) {
                     if ($field !== '' && $result[$field]) {
@@ -268,7 +272,7 @@ class APIWriter
             $formatted_row = $format;
             if (@json_decode($format) !== null) {
                 foreach ($columns as $column) {
-                    $formatted_row = str_replace('%' . $column->getLabel() . '%', preg_replace(["/\r/", "/\n/"], ["", "\\n"], addslashes($row[$column->getLabel()])), $formatted_row);
+                    $formatted_row = str_replace('%' . $column->getLabel() . '%', substr(json_encode((string) $row[$column->getLabel()], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), 1, -1), $formatted_row);
                 }
             } else {
                 foreach ($columns as $column) {

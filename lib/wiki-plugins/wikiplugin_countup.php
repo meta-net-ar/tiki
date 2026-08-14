@@ -21,7 +21,6 @@ function getFontOptions()
 
 function wikiplugin_countup_info()
 {
-    $fontWeightOptions = [];
     $fontWeightOptions = [
         ['text' => '', 'value' => ''],
         ['text' => tra('normal'), 'value' => 'normal'],
@@ -302,7 +301,6 @@ function wikiplugin_countup_info()
                 'description' => tra('Numeric ID of an icon in a file gallery. This will be set as the counter background image'),
                 'since' => '25.0',
                 'filter' => 'int',
-                'default' => 0,
                 'advanced' => true
             ],
             'backgroundColor' => [
@@ -327,7 +325,6 @@ function wikiplugin_countup_info()
                     'Please be sure to respect the syntax given in the documentation to see the effect.'),
                 'since' => '25.0',
                 'filter' => 'string',
-                'default' => '',
                 'advanced' => true
             ]
         ]
@@ -345,37 +342,30 @@ function wikiplugin_countup($data, $params)
     extract($params, EXTR_SKIP);
 
     $counterId = uniqid(); // Counter identifier to distinguish counters as we can add multiple counters on a wiki page
-    $mainContainerStyle = (isset($height) ? "height: $height" . "px; " : "height: 300px; ")
-        . (isset($width) ? "width: $width" . "px; " : "width: 400px; ")
-        . (isset($backgroundColor) ? "background-color: $backgroundColor; " : "")
-        . (isset($backgroundImage) ? "background-image: url('tiki-download_file.php?fileId=$backgroundImage'); background-repeat: no-repeat; background-position: center; background-size: cover; " : "")
-        . (isset($shadow) ? "box-shadow: $shadow; " : ""
+    $mainContainerStyle = "height: $height" . "px; "
+        . "width: $width" . "px; "
+        . "background-color: $backgroundColor; "
+        . (! is_null($backgroundImage) ? "background-image: url('tiki-download_file.php?fileId=$backgroundImage'); background-repeat: no-repeat; background-position: center; background-size: cover; " : "")
+        . (! is_null($shadow) ? "box-shadow: $shadow; " : ""
     );
-    $titleStyle = (isset($titleFontFamily) ? "font-family : $titleFontFamily; " : "")
-        . (isset($titleFontWeight) ? "font-weight : $titleFontWeight; " : "")
-        . (isset($titleFontStyle) ? "font-style : $titleFontStyle; " : "")
-        . (isset($titleFontSize) ? "font-size: $titleFontSize" . "px; " : "")
-        . (isset($titleFontColor) ? "color: $titleFontColor;" : ""
-    );
-    $descriptionStyle = (isset($descriptionFontFamily) ? "font-family : $descriptionFontFamily; " : "")
-        . (isset($descriptionFontWeight) ? "font-weight : $descriptionFontWeight; " : "")
-        . (isset($descriptionFontStyle) ? "font-style : $descriptionFontStyle; " : "")
-        . (isset($descriptionFontSize) ? "font-size: $descriptionFontSize" . "px; " : "")
-        . (isset($descriptionFontColor) ? "color: $descriptionFontColor;" : ""
-    );
-    $numberStyle = (isset($numberFontFamily) ? "font-family : $numberFontFamily; " : "")
-        . (isset($numberFontWeight) ? "font-weight : $numberFontWeight; " : "")
-        . (isset($numberFontStyle) ? "font-style : $titleFontStyle; " : "")
-        . (isset($numberFontSize) ? "font-size: $numberFontSize" . "px; " : "")
-        . (isset($numberFontColor) ? "color: $numberFontColor;" : ""
-    );
+    $titleStyle = (! is_null($titleFontFamily) ? "font-family : $titleFontFamily; " : "")
+        . "font-weight : $titleFontWeight; "
+        . "font-style : $titleFontStyle; "
+        . "font-size: $titleFontSize" . "px; "
+        . "color: $titleFontColor;";
+    $descriptionStyle = (! is_null($descriptionFontFamily) ? "font-family : $descriptionFontFamily; " : "")
+        . "font-weight : $descriptionFontWeight; "
+        . "font-style : $descriptionFontStyle; "
+        . "font-size: $descriptionFontSize" . "px; "
+        . "color: $descriptionFontColor;";
+    $numberStyle = (! is_null($numberFontFamily) ? "font-family : $numberFontFamily; " : "")
+        . "font-weight : $numberFontWeight; "
+        . "font-style : $numberFontStyle; "
+        . "font-size: $numberFontSize" . "px; "
+        . "color: $numberFontColor;";
 
-    if (! isset($speed)) {
-        $speed = 0.2;
-    }
-    if (! isset($delay)) {
-        $delay = 1;
-    }
+    $speed ??= 0.2;
+    $delay ??= 1;
     $cleanedTitle = preg_replace('/[^A-Za-z0-9_]/', '', $title); // Remove white spaces and some specials chars to prevent bug when calling the update function and  getting the counter DOM elemnt by id.
     $js = '
         //Number counter update function

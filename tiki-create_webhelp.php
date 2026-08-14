@@ -43,17 +43,24 @@ function copys($source, $dest)
 /**
  * @param $dir
  */
-function deldirfiles($dir)
+function deldirfiles(string $dir): void
 {
-    $current_dir = opendir($dir);
-    while ($entryname = readdir($current_dir)) {
-        if (is_dir("$dir/$entryname") and ($entryname != '.' and $entryname != '..')) {
-            deldirfiles("$dir/$entryname");
-        } elseif ($entryname != '.' and $entryname != '..') {
-            unlink("$dir/$entryname");
+    if (! is_dir($dir)) {
+        return;
+    }
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS),
+        RecursiveIteratorIterator::CHILD_FIRST
+    );
+
+    foreach ($iterator as $fileInfo) {
+        $path = $fileInfo->getPathname();
+        if ($fileInfo->isDir() && ! $fileInfo->isLink()) {
+            @rmdir($path);
+        } else {
+            @unlink($path);
         }
     }
-    closedir($current_dir);
 }
 
 $access->check_feature('feature_create_webhelp');

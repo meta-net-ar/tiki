@@ -1,0 +1,47 @@
+#!/bin/sh
+# commit message file path
+msg_file="$1"
+
+# Remove Windows CRLF endings
+msg=$(tr -d '\r' < "$msg_file")
+
+print_msg="Your commit message:
+--------------------
+$msg
+--------------------
+"
+
+# regex Tiki tags
+regex='^(((\[(BP|DB|DOC|ENH|FIX|KIL|MOD|MRG|NEW|REF|REL|REM|SEC|TRA|UI|UPD|UX)\]){1,5}(( [^ ][^][]+[^ ]:{1,2} )|( [^]:[ ]+[^:]+$))|[^]:[:space:][]{3,})).*'
+
+if echo "$msg" | grep -Eq "$regex"; then
+  exit 0
+else
+  echo "$print_msg"
+  echo "❌ Error: Your commit message is not properly formatted."
+  echo ""
+  echo "To be included in the release changelog the message (its first line)"
+  echo "should start with at least one of the valid Tiki commit tags:"
+  echo "BP|DB|DOC|ENH|FIX|KIL|MOD|MRG|NEW|REF|REL|REM|SEC|TRA|UI|UPD|UX"
+  echo "(use max. 5 tags without any spaces between them, e.g., [ENH][FIX], [NEW], [TRA], [REF][UI][UX], …)."
+  echo "The tags must be followed by:"
+  echo "- exactly one space,"
+  echo "- name of the affected feature, lib or a function, (optional but recommended)"
+  echo "- a colon and one space as a separator, (optional)"
+  echo "- a short description of the changes you have made. (ideally)"
+  echo "Please use English language with colons and spaces as appropriate (at least on the first line"
+  echo "in case of multi-line commit message) to ensure it is nicely readable.)"
+  echo ""
+  echo "Keep in mind it should be simple and clear when read by Tiki users and/or merge request reviewers!"
+  echo ""
+  echo "Correct: \"[FIX] Blog posts: blog titles were broken by a regression\""
+  echo "Invalid: \"[FIX]Blog posts : blog titles were broken by a regression\""
+  echo ""
+  echo "To omit the message from the list of major changes entirely, simply use a plain text message"
+  echo "without using any tags instead. For example: just a quick typo fix"
+  echo ""
+  echo "For the correct formatting and details see: https://dev.tiki.org/Commit-Tags"
+  echo ""
+  exit 1
+fi
+

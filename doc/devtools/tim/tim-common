@@ -1,6 +1,6 @@
 # Set defaults
 WEBROOT='/var/www'
-SVN_CACHE='/usr/local/src/tiki'
+GIT_CACHE='/usr/local/src/tiki'
 LOCKSDIR='/var/local/tim/'
 PREFIX='/usr/local/sbin/'
 
@@ -10,7 +10,6 @@ if [[ -f /usr/local/etc/tim.conf ]]; then . /usr/local/etc/tim.conf ;fi
 if [[ -f /etc/tim.conf ]]; then . /etc/tim.conf ;fi
 if [[ -f ~/.tim.conf ]]; then . ~/.tim.conf ;fi
 
-# SVN uppable stuff
 BRANCHES="trunk 12.x 15.x 17.x 18.x"
 
 # Set our common variables
@@ -50,7 +49,7 @@ mk_info()
     read -r -d '' header <<EOT
 This Tiki instance was created on the Tiki show community website
 Creation date: `date -u +%Y-%m-%d_%H-%M-%S`
-Version: $([ ! -z $GITBRANCH ] && echo $GITBRANCH || echo $SVNTAG)
+Version: $([ ! -z $GITBRANCH ] && echo $GITBRANCH)
 Related to Wish: http://dev.tiki.org/item${ID}
 Created as http://${SUBDOMAIN}.show.tiki.org/
 Installation log: http://${SUBDOMAIN}.show.tiki.org/install_log.txt
@@ -72,14 +71,6 @@ Branch: `git branch | grep '*' | sed 's/* //'`
 Commit: `git rev-parse HEAD`
 `git log --max-count=1 | grep Author | sed 's/Author:/Last Changed Author:/'`
 `git log --max-count=1 | grep Date | sed 's/Date:  /Last Changed Date:/'`
-
-$FORMER_HIST
-EOT
-else
-    read -r -d '' infotext <<EOT
-$header
-== `date` TIM action: `echo $COMMAND | tr '[:lower:]' '[:upper:]'`
-`svn info`
 
 $FORMER_HIST
 EOT

@@ -5,7 +5,7 @@
         {button href="tiki-list_articles.php" class="btn btn-info mt-3" _icon_name="list" _text="{tr}List Articles{/tr}"}
     {/if}
 </div>
-
+<div class="styling-element">
 {if $listpages or ($find ne '') or ($types ne '') or ($topics ne '') or ($lang ne '') or ($categId ne '')}
     <div class="row mx-0">
         <div class="col-md-6">
@@ -19,7 +19,7 @@
     <input type="hidden" name="maxRecords" value="{$maxRecords|escape}">
     <div class="table-responsive"> {*the table-responsive class cuts off dropdown menus when chosen is selected*}
         <table class="table table-striped table-hover">
-            {assign var=numbercol value=0}
+            {$numbercol=0}
             <tr>
                 {if $tiki_p_remove_submission eq 'y' or $tiki_p_approve_submission eq 'y'}
                     <th class="auto">
@@ -29,46 +29,46 @@
                     </th>
                 {/if}
                 {if $prefs.art_list_title eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>
                         <a href="tiki-list_submissions.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'title_desc'}title_asc{else}title_desc{/if}">{tr}Title{/tr}</a>
                     </th>
                 {/if}
                 {if $prefs.art_list_topic eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>
                         <a href="tiki-list_submissions.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'topicName_desc'}topicName_asc{else}topicName_desc{/if}">{tr}Topic{/tr}</a>
                     </th>
                 {/if}
                 {if $prefs.art_list_date eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>
                         <a href="tiki-list_submissions.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'publishDate_desc'}publishDate_asc{else}publishDate_desc{/if}">{tr}Publish Date{/tr}</a>
                     </th>
                 {/if}
                 {if $prefs.art_list_size eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th style="text-align:right;">
                         <a href="tiki-list_submissions.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'size_desc'}size_asc{else}size_desc{/if}">{tr}Size{/tr}</a>
                     </th>
                 {/if}
                 {if $prefs.art_list_img eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>{tr}Image{/tr}</th>
                 {/if}
                 {if $prefs.art_list_author eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>
                         <a href="tiki-list_submissions.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'author_desc'}author_asc{else}author_desc{/if}">{tr}User{/tr}</a>
                     </th>
                 {/if}
                 {if $prefs.art_list_authorName eq 'y'}
-                    {assign var=numbercol value=$numbercol+1}
+                    {$numbercol=$numbercol+1}
                     <th>
                         <a href="tiki-list_submissions.php?offset={$offset}&amp;sort_mode={if $sort_mode eq 'authorName_desc'}authorName_asc{else}authorName_desc{/if}">{tr}Author{/tr}</a>
                     </th>
                 {/if}
-                {assign var=numbercol value=$numbercol+1}
+                {$numbercol=$numbercol+1}
                 <th></th>
             </tr>
 
@@ -127,7 +127,7 @@
                                         <form action="tiki-list_submissions.php" method="post">
                                             {ticket}
                                             <input type="hidden" name="remove" value="{$listpages[changes].subId}">
-                                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr _0=$listpages[changes].subId}Are you sure you want to permanently remove the submitted article with identifier %0?{/tr}')">
+                                            <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup('{tr _0=$listpages[changes].subId}Are you sure you want to permanently remove the submitted article with identifier %0?{/tr}')" aria-label="{tr}Remove{/tr}">
                                                 {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                             </button>
                                         </form>
@@ -138,7 +138,7 @@
                     </td>
                 </tr>
             {sectionelse}
-                {assign var=numbercol value=$numbercol+1}
+                {$numbercol=$numbercol+1}
                 {norecords _colspan=$numbercol}
             {/section}
             {if $tiki_p_remove_submission eq 'y' or $tiki_p_approve_submission eq 'y'} 
@@ -167,8 +167,9 @@
         </div>
     {/if}
 
-    {pagination_links cant=$cant_pages step=$maxRecords offset=$offset}{/pagination_links}
+    {pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}
 </form>
+</div>
 {jq}
     var checkboxes = $('.checkboxes');
     checkboxes.on("change", function(){

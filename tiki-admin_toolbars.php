@@ -14,14 +14,13 @@ $inputConfiguration = [
                 [
         'staticKeyFilters'                    => [
                 'save'                        => 'alpha',          //post
-                'load'                        => 'alpha',          //post
                 'pref'                        => 'striptags',      //post
                 'section'                     => 'striptags',      //post
                 'comments'                    => 'bool',           //post
                 'view_mode'                   => 'striptags',      //post
                 'reset_all_custom_tools'      => 'bool',           //post
-                'reset'                       => 'bool',           //post
-                'reset_global'                => 'bool',           //post
+                'reset'                       => 'alpha',           //post
+                'reset_global'                => 'alpha',           //post
                 'save_tool'                   => 'bool',           //post
                 'tool_name'                   => 'striptags',      //post
                 'tool_label'                  => 'striptags',      //post
@@ -37,8 +36,10 @@ $inputConfiguration = [
 
 $auto_query_args = ['section', 'comments', 'autoreload', 'view_mode'];
 
-require_once 'tiki-setup.php';
-
+require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $access->check_permission('tiki_p_admin');
 
 $sections = [ 'global' => tra('Global'), 'admin' => tra('Admin')];
@@ -81,27 +82,29 @@ $sections = array_merge($sections, $sections2);
 
 if (isset($_REQUEST['section']) && in_array($_REQUEST['section'], array_keys($sections))) {
     $section = $_REQUEST['section'];
+    Sections::setCurrentSection($section);
 } else {
     $keys = array_keys($sections);
     $section = reset($keys);
+    Sections::setCurrentSection($section);
 }
 if (isset($_REQUEST['comments']) && $_REQUEST['comments'] == 'on') {
     $show_comments = true;
 } else {
     $show_comments = false;
 }
-
+$comments_suffix = $show_comments ? '_comments' : '';
 foreach ($sections as $skey => $sval) {
     if (
-        isset($prefs['toolbar_' . $skey . ($show_comments ? '_comments' : '') . 'modified'])
-        && $prefs['toolbar_' . $skey . ($show_comments ? '_comments' : '') . 'modified'] == 'y'
+        isset($prefs['toolbar_' . $skey . $comments_suffix . 'modified'])
+        && $prefs['toolbar_' . $skey . $comments_suffix . 'modified'] == 'y'
     ) {
         $sections[$skey] = $sval . ' *';
     }
 }
 
-$view_mode = isset($_REQUEST['view_mode']) ? $_REQUEST['view_mode'] : '';
-if ($view_mode === 'sheet' && $section !== 'sheet') {
+$view_mode = $_REQUEST['view_mode'] ?? '';
+if ($view_mode === 'sheet' && ! Sections::isCurrentSection(Sections::SECTION_SHEET)) {
     $view_mode = '';
     $_REQUEST['view_mode'] = '';
 }
@@ -113,13 +116,13 @@ if (! empty($_REQUEST['reset_all_custom_tools']) && $access->checkCsrf()) {
 }
 
 if (isset($_REQUEST['save'], $_REQUEST['pref'])) {
-    $prefName = 'toolbar_' . $section . ($show_comments ? '_comments' : '');
+    $prefName = 'toolbar_' . $section . $comments_suffix;
     $tikilib->set_preference($prefName, $_REQUEST['pref']);
     $tikilib->set_preference($prefName . 'modified', 'y');
 }
 
-if ((isset($_REQUEST['reset']) && $section != 'global') || (isset($_REQUEST['reset_global']) && $section == 'global')) {
-    $prefName = 'toolbar_' . $section . ($show_comments ? '_comments' : '');
+if ((isset($_REQUEST['reset']) && ! Sections::isCurrentSection(Sections::SECTION_GLOBAL)) || (isset($_REQUEST['reset_global']) && Sections::isCurrentSection(Sections::SECTION_GLOBAL))) {
+    $prefName = 'toolbar_' . $section . $comments_suffix;
     $tikilib->delete_preference($prefName);
     $tikilib->set_preference($prefName . 'modified', 'n');
     header('location: ?' . smarty_function_query(['_urlencode' => 'n'], $smarty->getEmptyInternalTemplate()));
@@ -139,18 +142,18 @@ if (! empty($_REQUEST['save_tool']) && ! empty($_REQUEST['tool_name'])) {   // i
     header('location: ?' . smarty_function_query(['_urlencode' => 'n'], $smarty->getEmptyInternalTemplate()));
 }
 
-$current = $tikilib->get_preference('toolbar_' . $section . ($show_comments ? '_comments' : ''));
+$current = $tikilib->get_preference('toolbar_' . $section . $comments_suffix);
 if (empty($current)) {
-    $current = $tikilib->get_preference('toolbar_global' . ($show_comments ? '_comments' : ''));
+    $current = $tikilib->get_preference('toolbar_global' . $comments_suffix);
     $smarty->assign('not_global', false);
 } else {
     $smarty->assign('not_global', true);
 }
 $smarty->assign('not_default', false);
-if ($section == 'global') {
+if (Sections::isCurrentSection(Sections::SECTION_GLOBAL)) {
     $cachelib = TikiLib::lib('cache');
     if ($defprefs = $cachelib->getSerialized("tiki_default_preferences_cache")) {
-        if ($defprefs['toolbar_global' . ($show_comments ? '_comments' : '')] != $current) {
+        if ($defprefs['toolbar_global' . $comments_suffix] != $current) {
             $smarty->assign('not_default', true);
         }
     }
@@ -158,10 +161,10 @@ if ($section == 'global') {
 
 if (! empty($_REQUEST['delete_tool']) && ! empty($_REQUEST['tool_name'])) { // input from the tool edit form
     ToolbarItem::deleteTool($_REQUEST['tool_name']);
-    if (strpos($_REQUEST['tool_name'], $current) !== false) {
+    if (str_contains($_REQUEST['tool_name'], $current)) {
         $current = str_replace($_REQUEST['tool_name'], '', $current);
         $current = str_replace(',,', ',', $current);
-        $prefName = 'toolbar_' . $section . ($show_comments ? '_comments' : '');
+        $prefName = 'toolbar_' . $section . $comments_suffix;
         $tikilib->set_preference($prefName, $current);
     }
 }
@@ -212,17 +215,17 @@ foreach ($qtlist as $name) {
     }
     $tag->setDomElementId('dummy');
 
-    $wys = strlen($tag->getWysiwygToken(false)) ? 'qt-wys' : '';
-    $wyswik = strlen($tag->getWysiwygWikiToken('dummy', false)) ? 'qt-wyswik' : '';
+    $wys = strlen($tag->getWysiwygToken()) ? 'qt-wys' : '';
+    $wyswik = strlen($tag->getWysiwygWikiToken()) ? 'qt-wyswik' : '';
     $test_html = $tag->getWikiHtml();
     $wiki = strlen($test_html) > 0 ? 'qt-wiki' : '';
-    $wiki = strpos($test_html, 'qt-sheet') !== false ? 'qt-sheet' : $wiki;
+    $wiki = str_contains($test_html, 'qt-sheet') ? 'qt-sheet' : $wiki;
     $cust = ToolbarItem::isCustomTool($name) ? 'qt-custom' : '';
     $avail = $tag->isAccessible() ? '' : 'qt-noaccess';
     $icon = $tag->getIconHtml();
     $margins = $test_html === '||' ? 'mx-auto' : '';
 
-    if (strpos($name, 'wikiplugin_') !== false) {
+    if (str_contains($name, 'wikiplugin_')) {
         $plug = 'qt-plugin';
         $label = substr($name, 11);
         $qt_p_list[] = $name;
@@ -235,8 +238,8 @@ foreach ($qtlist as $name) {
     }
 
     $label = htmlspecialchars($label);
-    $label .= '<input type="hidden" name="token" value="' . $tag->getWysiwygToken(false) . '" />';
-    $label .= '<input type="hidden" name="syntax" value="' . htmlspecialchars($tag->getSyntax('dummy')) . '" />';
+    $label .= '<input type="hidden" name="token" value="' . $tag->getWysiwygToken() . '" />';
+    $label .= '<input type="hidden" name="syntax" value="' . htmlspecialchars($tag->getSyntax()) . '" />';
     $label .= '<input type="hidden" name="type" value="' . $tag->getType() . '" />';
     $label .= '<input type="hidden" name="label" value="' . $tag->getLabel() . '" />';
 
@@ -254,10 +257,10 @@ foreach ($qtlist as $name) {
     } elseif ($view_mode === 'wysiwyg_wiki') {
         $visible = ! empty($wyswik);
     } elseif ($view_mode === 'sheet') {
-        $visible = (strpos($wiki, 'qt-sheet') !== false);
+        $visible = (str_contains($wiki, 'qt-sheet'));
     }
 
-    $text_label = $tag->getLabel($name);
+    $text_label = $tag->getLabel();
 
     $qtelement[$name] = [
         'name' => $name,
@@ -299,6 +302,7 @@ foreach ($parserlib->plugin_get_list() as $name) {
 $smarty->assign('plugins', $plugins);
 
 $smarty->assign('show_comments', $show_comments);
+$smarty->assign('comments', $show_comments ? 'on' : 'no');
 $smarty->assign('loaded', $section);
 $smarty->assign('rows', range(0, $rowCount - 1));
 $smarty->assign('rowCount', $rowCount);

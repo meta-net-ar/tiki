@@ -29,6 +29,9 @@ $access = TikiLib::lib('access');
 $tikilib = TikiLib::lib('tiki');
 $headerlib = TikiLib::lib('header');
 
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Sections;
+
 /*
  * Determine the settings used to display the thread
  */
@@ -79,15 +82,16 @@ $comments_aux = [];
 if (isset($_REQUEST['comzone'])) {
     $comments_show = 'n';
     $comzone_state = $_REQUEST['comzone'];
+
     if ($comzone_state == 'show' || $comzone_state == 'o') {
         $comments_show = 'y';
-        if (! isset($_COOKIE['comzone']) || $_COOKIE['comzone'] == 'c') {
-            setcookie('comzone', 'o');
+        if ((! isset($_COOKIE['comzone']) || $_COOKIE['comzone'] == 'c') && CookieConsentLib::isCategoryAllowed(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL)) {
+            CookieConsentLib::tikiSetCookie('comzone', 'o', CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
         }
     }
     if ($comzone_state == 'hide' || $comzone_state == 'c') {
-        if (! isset($_COOKIE['comzone']) || $_COOKIE['comzone'] == 'o') {
-            setcookie('comzone', 'c');
+        if ((! isset($_COOKIE['comzone']) || $_COOKIE['comzone'] == 'o') && CookieConsentLib::isCategoryAllowed(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL)) {
+            CookieConsentLib::tikiSetCookie('comzone', 'c', CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
         }
     }
 } else {
@@ -135,7 +139,7 @@ $comments_father = $comments_parsed["path"];
 
 $comments_complete_father = $comments_father . $comments_t_query;
 
-if (strstr($comments_complete_father, "?")) {
+if (str_contains($comments_complete_father, "?")) {
     $comments_complete_father .= '&amp;';
 } else {
     $comments_complete_father .= '?';
@@ -260,7 +264,7 @@ if ($_REQUEST["comments_threadId"] > 0) {
             $comment_info["data"] = "\n> " . $comment_info["data"];
         }
     }
-    $smarty->assign('comment_data', isset($_REQUEST['comments_data']) ? $_REQUEST['comments_data'] : $comment_info['data']);
+    $smarty->assign('comment_data', $_REQUEST['comments_data'] ?? $comment_info['data']);
 
     if (! array_key_exists("title", $comment_info)) {
         if (array_key_exists("comments_title", $_REQUEST)) {
@@ -273,7 +277,7 @@ if ($_REQUEST["comments_threadId"] > 0) {
 
     if ($prefs['forum_reply_forcetitle'] == 'y') {
         $comment_title = '';
-    } elseif ($prefs['forum_comments_no_title_prefix'] != 'y' && strpos($comment_info['title'], tra('Re:')) !== 0) {
+    } elseif ($prefs['forum_comments_no_title_prefix'] != 'y' && ! str_starts_with($comment_info['title'], tra('Re:'))) {
         $comment_title = tra('Re:') . ' ' . $comment_info['title'];
     } else {
         $comment_title = $comment_info['title'];
@@ -352,8 +356,7 @@ if ($forum_check[0] == 'forum') {
 
 $smarty->assign(
     'comments_grandParentId',
-    isset($_REQUEST['comments_grandParentId'])
-    ? $_REQUEST['comments_grandParentId'] : ''
+    $_REQUEST['comments_grandParentId'] ?? ''
 );
 
 if (isset($_REQUEST["post_reply"]) && isset($_REQUEST["comments_reply_threadId"])) {
@@ -383,28 +386,28 @@ $comments_coms = $commentslib->get_comments(
 );
 
 if ($comments_prefix_var == 'forum:') {
-    $comments_cant = $commentslib->count_comments('topic:' . $_REQUEST['comments_parentId']); // comments in the topic not in the forum
+    $comments_count = $commentslib->count_comments('topic:' . $_REQUEST['comments_parentId']); // comments in the topic not in the forum
 } else {
-    $comments_cant = $commentslib->count_comments($comments_objectId);
+    $comments_count = $commentslib->count_comments($comments_objectId);
 }
-$comments_cant_page = $comments_coms['cant'];
+$comments_count_page = $comments_coms['count'];
 
 $smarty->assign('comments_below', $comments_coms["below"]);
-$smarty->assign('comments_cant', $comments_cant);
+$smarty->assign('comments_count', $comments_count);
 
 // Offset management
 $comments_maxRecords = $comments_per_page;
 
 if ($comments_maxRecords != 0) {
-    $comments_cant_pages = ceil($comments_cant_page / $comments_maxRecords);
+    $comments_count_pages = ceil($comments_count_page / $comments_maxRecords);
     $smarty->assign('comments_actual_page', 1 + ($comments_offset / $comments_maxRecords));
 } else {
-    $comments_cant_pages = 1;
+    $comments_count_pages = 1;
     $smarty->assign('comments_actual_page', 1);
 }
-$smarty->assign('comments_cant_pages', $comments_cant_pages);
+$smarty->assign('comments_count_pages', $comments_count_pages);
 
-if ($comments_cant_page > ($comments_offset + $comments_maxRecords)) {
+if ($comments_count_page > ($comments_offset + $comments_maxRecords)) {
     $smarty->assign('comments_next_offset', $comments_offset + $comments_maxRecords);
 } else {
     $smarty->assign('comments_next_offset', -1);
@@ -446,8 +449,7 @@ if ($prefs['feature_contribution'] == 'y') {
     include_once('contribution.php');
 }
 // see if comments are allowed on this specific wiki page
-global $section;
-if ($section == 'wiki page') {
+if (Sections::getCurrentSection() === Sections::SECTION_WIKI_PAGE) {
     if ($prefs['wiki_comments_allow_per_page'] != 'n') {
         global $info;
         if (! empty($info['comments_enabled'])) {

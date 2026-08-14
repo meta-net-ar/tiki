@@ -6,48 +6,47 @@
 
 {block name="content"}
     <div class="row file-browser">
-        <div class="col-md-9">
-            <form class="d-flex flex-row flex-wrap align-items-center no-ajax" method="get" action="{service controller=file action=$list_view plain=1}">
-                <div class="mb-3 row">
-                    <label class="form-label sr-only" for="search-field">{tr}Search{/tr}</label>
-                    <input class="form-control" name="search" type="search" id="search-field" placeholder="{tr}Search...{/tr}"/>
+        <div class="col-md-12">
+            <form class="row g-2 align-items-center no-ajax" method="get" action="{service controller=file action=$list_view plain=1}">
+                <div class="col">
+                    <input class="form-control " name="search" type="search" id="search-field" placeholder="{tr}Search...{/tr}"/>
                     <input type="hidden" name="galleryId" value="{$galleryId|escape}"/>
+                    <input type="hidden" name="limit" value="{$limit|default:20}">
                     <input type="hidden" name="type" value="{$typeFilter|escape}"/>
                 </div>
-                <button class="btn btn-info">{tr}Search{/tr}</button>
-            </form>
-            <h4>{tr}Select files{/tr}</h4>
-            <div class="gallery-list">
-                {service_inline controller=file action=$list_view galleryId=$galleryId plain=1 type=$typeFilter}
-            </div>
-        </div>
-        <div class="col-md-3 selection hidden">
-            <form method="post" action="{service controller=file action=browse galleryId=$galleryId}" data-gallery-id="{$galleryId|escape}" data-limit="{$limit|escape}" data-limit-reached-message="{tr}Too many files selected. De-select some files before adding more.{/tr}">
-                <h4>{tr}Current Selection{/tr}</h4>
-                <ul class="nav nav-pills nav-stacked">
-                    {foreach $files as $file}
-                        <li>
-                            <a href="{$file.fileId|sefurl:'file'}" data-type="file" data-object="{$file.fileId|escape}">
-                                {$file.name|iconify:$file.type:$file.fileId}
-                                {$file.label|escape}
-                            </a>
-                            <input type="hidden" name="file[]" value="{$file.fileId|escape}"/>
-                        </li>
-                    {/foreach}
-                </ul>
-                <div class="form-text">
-                    {tr}Click to remove{/tr}
+                <div class="col-auto">
+                    <button class="btn btn-info" type="submit">{tr}Search{/tr}</button>
                 </div>
-                <div class="submit">
+            </form>
+
+            <div class="d-flex justify-content-between align-items-center my-2">
+                <h4 class="mb-0">{tr}Select files{/tr}</h4>
+                <div>
+                    <input type="checkbox" id="select-all-files" class="form-check-input me-2"/>
+                    <label for="select-all-files" class="form-label mb-0">{tr}Select all{/tr}</label>
+                </div>
+            </div>
+
+            <form method="post" action="{service controller=file action=browse galleryId=$galleryId}">
+                <div class="gallery-list flex-grow-1 overflow-auto border" style="max-height: 60vh;">
+                    {service_inline controller=file action=$list_view galleryId=$galleryId plain=1 type=$typeFilter limit=$limit}
+                </div>
+
+                <div class="submit sticky-bottom bg-light py-3 mt-3">
                     {if $canUpload}
-                        <a class="btn btn-secondary upload-files custom-handling" href="{service controller=file action=uploader galleryId=$galleryId limit=$limit type=$typeFilter}">{tr}Upload Files{/tr}</a>
+                        <a class="btn btn-secondary upload-files custom-handling me-2" href="{service controller=file action=uploader galleryId=$galleryId limit=$limit type=$typeFilter}">
+                            {tr}Upload Files{/tr}
+                        </a>
                     {/if}
-                    <input type="submit" class="btn btn-primary" value="{tr}Select{/tr}">
+                    <input type="submit" class="btn btn-primary" value="{tr}Attach selected file(s){/tr}">
                 </div>
             </form>
         </div>
     </div>
+
     {jq}
-        $('.file-browser').trigger('selection-update');
+        $('#select-all-files').on('change', function () {
+            $('.gallery-list .file-select').prop('checked', this.checked).trigger('change');
+        });
     {/jq}
 {/block}

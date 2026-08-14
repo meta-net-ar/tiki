@@ -169,7 +169,7 @@ class UnifiedSearchLib
      * @return array|bool
      * @throws Exception
      */
-    public function rebuild($loggit = 0, $fallback = false, $progress = null)
+    public function rebuild($loggit = 0, $fallback = false, $progress = null, $skipErrorTracking = false)
     {
         global $prefs;
         $engineResults = null;
@@ -263,7 +263,8 @@ class UnifiedSearchLib
         try {
             $indexDecorator = new Search_Index_TypeAnalysisDecorator($index);
             $indexer = $this->buildIndexer($indexDecorator, $loggit);
-            $lastStats = $tikilib->get_preference('unified_last_rebuild_stats', [], true);
+            $indexer->setErrorTrackingEnabled(! $skipErrorTracking);
+            $lastStats = $tikilib->get_preference('unified_last_rebuild_stats_' . $prefs['unified_engine'], [], true);
 
             $stat = $tikilib->allocate_extra(
                 'unified_rebuild',
@@ -371,9 +372,9 @@ class UnifiedSearchLib
             $stats['fallback'] = $this->rebuild($loggit, true);
             $prefs['unified_engine'] = $defaultEngine;
 
-            $log = new Laminas\Log\Writer\Stream($this->getLogFilename($loggit, $defaultEngine), 'a');
-            $loggerInstance = new Laminas\Log\Logger();
-            $loggerInstance->addWriter($log);
+            $log = new Monolog\Handler\StreamHandler($this->getLogFilename($loggit, $defaultEngine), Monolog\Logger::DEBUG);
+            $loggerInstance = new Monolog\Logger('fallback');
+            $loggerInstance->pushHandler($log);
 
             $loggerInstance->info('Fallback:');
             $loggerInstance->info("  Engine $fallbackEngineName" . (empty($fallbackVersion) ? '' : ", version $fallbackVersion"));
@@ -397,8 +398,8 @@ class UnifiedSearchLib
             TikiLib::lib('storedsearch')->reloadAll();
         }
 
-        $tikilib->set_preference('unified_last_rebuild', $tikilib->now);
-        $tikilib->set_preference('unified_last_rebuild_stats', $stats);
+        $tikilib->set_preference('unified_last_rebuild_' . $prefs['unified_engine'], $tikilib->now);
+        $tikilib->set_preference('unified_last_rebuild_stats_' . $prefs['unified_engine'], $stats);
 
         $this->isRebuildingNow = false;
         $access->preventRedirect(false);
@@ -506,9 +507,17 @@ class UnifiedSearchLib
             self::INCREMENT_QUEUE,
             [
                 'object_type' => $type,
-                'object_id' => $objectId
+                'object_id' => $objectId,
             ]
         );
+    }
+
+    public function deleteObject($type, $objectId)
+    {
+        $index = $this->getIndex('data-write');
+        $index = new Search_Index_TypeAnalysisDecorator($index);
+        $indexer = $this->buildIndexer($index);
+        $indexer->removeDocument($type, $objectId);
     }
 
     /**
@@ -569,6 +578,10 @@ class UnifiedSearchLib
             $types['sheet'] = tra('sheet');
         }
 
+        if ($prefs['feature_wiki_structure'] == 'y') {
+            $types['structure'] = tra('structure');
+        }
+
         if (
             $prefs['feature_wiki_comments'] == 'y'
             || $prefs['feature_article_comments'] == 'y'
@@ -624,7 +637,6 @@ class UnifiedSearchLib
         $files['console'] = $this->getLogFilename(2);
         $resultLines = [];
         foreach ($files as $type => $filename) {
-            $count = 1;
             $handle = fopen($filename, "r");
             if ($handle) {
                 $resultLines[$type]['logs'] = [];
@@ -632,9 +644,8 @@ class UnifiedSearchLib
                 while (($line = fgets($handle)) !== false) {
                     $pos = strpos($line, $needle);
                     if (empty($needle) || $pos !== false) {
-                        array_push($resultLines[$type]['logs'], $line);
+                        $resultLines[$type]['logs'][] = $line;
                     }
-                    $count++;
                 }
                 fclose($handle);
             }
@@ -714,7 +725,7 @@ class UnifiedSearchLib
         $logWriter = null;
 
         if ($loggit) {
-            $logWriter = new Laminas\Log\Writer\Stream($this->getLogFilename($loggit), 'w');
+            $logWriter = new Monolog\Handler\StreamHandler($this->getLogFilename($loggit), Monolog\Logger::DEBUG);
         }
 
         $indexer = new Search_Indexer($index, $logWriter);
@@ -747,11 +758,11 @@ class UnifiedSearchLib
         // trackeritem object type needs to further split fields by tracker ID, so we know which are relevant to each tracker item object
         if (isset($fields['object_types']['trackeritem'])) {
             $types_by_tracker_id = [];
-            $all_fields = TikiLib::lib('trk')->table('tiki_tracker_fields')->fetchMap('permName', 'trackerId', []);
-            foreach ($all_fields as $permName => $trackerId) {
+            $all_fields = TikiLib::lib('trk')->table('tiki_tracker_fields')->fetchAll(['permName', 'trackerId']);
+            foreach ($all_fields as $row) {
                 foreach ($fields['object_types']['trackeritem'] as $field) {
-                    if (str_starts_with($field, 'tracker_field_' . $permName)) {
-                        $types_by_tracker_id['trackeritem' . $trackerId][] = $field;
+                    if (str_starts_with($field, 'tracker_field_' . $row['permName'])) {
+                        $types_by_tracker_id['trackeritem' . $row['trackerId']][] = $field;
                     }
                 }
             }
@@ -812,6 +823,15 @@ class UnifiedSearchLib
             $aggregator->addGlobalSource(new Search_GlobalSource_ArticleAttachmentSource($articleSource));
         }
 
+        // Article topics and types are handled through the ArticleSource's getReferenceMap()
+        if (isset($types['article_topic']) || isset($types['article_type'])) {
+            if (! isset($articleSource)) {
+                $articleSource = new Search_ContentSource_ArticleSource();
+                $aggregator->addContentSource('article', $articleSource);
+                $aggregator->addGlobalSource(new Search_GlobalSource_ArticleAttachmentSource($articleSource));
+            }
+        }
+
         if (isset($types['file'])) {
             $fileSource = new Search_ContentSource_FileSource();
             $aggregator->addContentSource('file', $fileSource);
@@ -821,6 +841,10 @@ class UnifiedSearchLib
 
         if (isset($types['sheet'])) {
             $aggregator->addContentSource('sheet', new Search_ContentSource_SheetSource());
+        }
+
+        if (isset($types['structure'])) {
+            $aggregator->addContentSource('structure', new Search_ContentSource_StructureSource());
         }
 
         if (isset($types['comment'])) {
@@ -1006,8 +1030,8 @@ class UnifiedSearchLib
      */
     public function getLastRebuildDocsCount($index = 'default')
     {
-        global $tikilib;
-        $lastStats = $tikilib->get_preference('unified_last_rebuild_stats', [], true);
+        global $tikilib, $prefs;
+        $lastStats = $tikilib->get_preference('unified_last_rebuild_stats_' . $prefs['unified_engine'], [], true);
         if (! isset($lastStats[$index]['counts'])) {
             return 0;
         }
@@ -1039,7 +1063,7 @@ class UnifiedSearchLib
                     if (version_compare($root->version->number, '1.0.0') === -1) {
                         $status = $connection->rawApi('/_status');
                         foreach ($status->indices as $indexName => $data) {
-                            if (strpos($indexName, $prefs['unified_elastic_index_prefix']) === 0) {
+                            if (str_starts_with($indexName, $prefs['unified_elastic_index_prefix'])) {
                                 $info[tr('Index %0', $indexName)] = tr(
                                     '%0 documents, totaling %1',
                                     $data->docs->num_docs,
@@ -1056,7 +1080,7 @@ class UnifiedSearchLib
                         $status = $connection->getIndexStatus();
 
                         foreach ($status->indices as $indexName => $data) {
-                            if (strpos($indexName, $prefs['unified_elastic_index_prefix']) === 0) {
+                            if (str_starts_with($indexName, $prefs['unified_elastic_index_prefix'])) {
                                 if (isset($data->primaries)) {  // v2
                                     $info[tr('Index %0', $indexName)] = tr(
                                         '%0 documents, totaling %1 bytes',
@@ -1109,7 +1133,7 @@ class UnifiedSearchLib
      */
     private function getMySqlEngineInfo(): array
     {
-        global $tikilib;
+        global $tikilib, $prefs;
 
         $info = [];
         $totalDocuments = $this->getLastRebuildDocsCount();
@@ -1138,7 +1162,7 @@ class UnifiedSearchLib
             $info[tr('MySQL Index %0', $indexName)] = tr('%0 documents', $index['tbl_rows'] ?: 0);
         }
 
-        $lastRebuild = $tikilib->get_preference('unified_last_rebuild');
+        $lastRebuild = $tikilib->get_preference('unified_last_rebuild_' . $prefs['unified_engine']);
         if (! empty($lastRebuild)) {
             $info['MySQL Last Rebuild Index'] = $tikilib->get_long_date($lastRebuild) . ', ' . $tikilib->get_long_time($lastRebuild);
         }
@@ -1341,6 +1365,12 @@ class UnifiedSearchLib
             throw new Exception('Invalid filter type provided in query. It must be an array.');
         }
 
+        // Support expert sort configuration via meta-parameter
+        if (isset($filter['_sort']) && $filter['_sort']) {
+            $query->setOrder($filter['_sort']);
+            unset($filter['_sort']);
+        }
+
         if (isset($filter['type']) && $filter['type']) {
             $query->filterType($filter['type']);
         }
@@ -1353,14 +1383,16 @@ class UnifiedSearchLib
             $query->filterTags($filter['tags']);
         }
 
+        if (isset($filter['fields']) && $filter['fields'] && isset($filter['content'])) {
+            $fields = array_map('trim', explode(',', $filter['fields']));
+            $query->filterContent($filter['content'], $fields);
+
+            unset($filter['fields']);
+            unset($filter['content']);
+        }
+
         if (isset($filter['content']) && $filter['content']) {
-            $o = TikiLib::lib('tiki')->get_preference('unified_default_content', ['contents'], true);
-            if (count($o) == 1 && empty($o[0])) {
-                // Use "contents" field by default, if no default is specified
-                $query->filterContent($filter['content'], ['contents']);
-            } else {
-                $query->filterContent($filter['content'], $o);
-            }
+            $query->filterContent($filter['content'], $this->getFilterContentFields());
         }
 
         if (isset($filter['autocomplete']) && $filter['autocomplete']) {
@@ -1400,6 +1432,43 @@ class UnifiedSearchLib
             unset($filter['not_prefix']);
         }
 
+        if (isset($filter['exact']) && is_array($filter['exact'])) {
+            foreach ($filter['exact'] as $field => $value) {
+                $query->filterIdentifier($value, $field);
+            }
+
+            unset($filter['exact']);
+        }
+
+        if (isset($filter['not_exact']) && is_array($filter['not_exact'])) {
+            foreach ($filter['not_exact'] as $field => $value) {
+                $query->filterNotIdentifier($value, $field);
+            }
+
+            unset($filter['not_exact']);
+        }
+
+        if (isset($filter['multi'])) {
+            if (
+                isset($filter['multi']['fields']) && is_array($filter['multi']['fields']) &&
+                    isset($filter['multi']['value'])
+            ) {
+                $fields = $filter['multi']['fields'];
+                $value = $filter['multi']['value'];
+
+                foreach ($fields as $k => $v) {
+                    if ($v === 'content') {
+                        unset($fields[$k]);
+                        $fields = array_merge($fields, $this->getFilterContentFields());
+                    }
+                }
+
+                $query->filterContent($value, $fields);
+            }
+
+            unset($filter['multi']);
+        }
+
         if (
             isset($filter['distance']) && is_array($filter['distance']) &&
                     isset($filter['distance']['distance'], $filter['distance']['lat'], $filter['distance']['lon'])
@@ -1410,10 +1479,17 @@ class UnifiedSearchLib
         }
 
         if (isset($filter['range']) && is_array($filter['range']) && isset($filter['range']['from'], $filter['range']['to'])) {
-            $field = isset($filter['range']['field']) ? $filter['range']['field'] : 'date';
+            $field = $filter['range']['field'] ?? 'date';
             $query->filterRange($filter['range']['from'], $filter['range']['to'], $field);
 
             unset($filter['range']);
+        }
+
+        if (isset($filter['multivalue']) && is_array($filter['multivalue'])) {
+            foreach ($filter['multivalue'] as $field => $value) {
+                $query->filterMultivalue($value, $field);
+            }
+            unset($filter['multivalue']);
         }
 
         unset($filter['type']);
@@ -1426,12 +1502,24 @@ class UnifiedSearchLib
         unset($filter['autocomplete']);
         unset($filter['groups']);
 
+
         foreach ($filter as $key => $value) {
             if ($value) {
                 $query->filterContent($value, $key);
             }
         }
+
         return $query;
+    }
+
+    private function getFilterContentFields()
+    {
+        $fields = TikiLib::lib('tiki')->get_preference('unified_default_content', ['contents'], true);
+        if (count($fields) == 1 && empty($fields[0])) {
+            $fields = ['contents'];
+        }
+
+        return $fields;
     }
 
     public function getFacetProvider()
@@ -1492,7 +1580,7 @@ class UnifiedSearchLib
             ];
 
             foreach (TikiLib::lib('federatedsearch')->getIndices() as $indexname => $index) {
-                if (strstr($indexname, ':')) {
+                if (str_contains($indexname, ':')) {
                     $parts = explode(':', $indexname);
                     $prefix = array_pop($parts);
                 } else {
@@ -1511,7 +1599,7 @@ class UnifiedSearchLib
                         $out = $indexMap[$index];
                     } else {
                         foreach ($indexMap as $candidate => $name) {
-                            if (0 === strpos($index, $candidate . '_')) {
+                            if (str_starts_with($index, $candidate . '_')) {
                                 $indexMap[$index] = $name;
                                 $out = $name;
                                 break;
@@ -1555,7 +1643,7 @@ class UnifiedSearchLib
 
         $tikilib = TikiLib::lib('tiki');
 
-        $last_rebuild = $tikilib->get_preference('unified_last_rebuild');
+        $last_rebuild = $tikilib->get_preference('unified_last_rebuild_' . $prefs['unified_engine']);
         $threshold = strtotime('+ ' . $prefs['search_index_outdated'] . ' days', $last_rebuild);
 
         $types = $this->getSupportedTypes();
@@ -1662,6 +1750,14 @@ class UnifiedSearchLib
 
         if (isset($types['group'])) {
             // todo: unable to track groups by dates
+        }
+
+        if (isset($types['structure'])) {
+            $structlib = TikiLib::lib('struct');
+            $structures = $structlib->list_structures(0, 1, 'last_modified_desc');
+            if (! empty($structures['data'][0]['last_modified']) && $structures['data'][0]['last_modified'] > $threshold) {
+                return true;
+            }
         }
 
         if (isset($types['survey'])) {
@@ -1899,6 +1995,7 @@ class UnifiedSearchLib
         global $prefs;
 
         $indices = [];
+
         list($engine, $version, $currentIndex) = $currentEngine;
 
         switch ($engine) {
@@ -1907,17 +2004,17 @@ class UnifiedSearchLib
                     $indexPrefix = $prefs['unified_elastic_index_prefix'];
                     $connUrl = $prefs['unified_elastic_url'];
                     $manager = new ElasticSearchIndexManager($currentIndex, $indexPrefix, $connUrl);
-                    $indices['indices'] = $manager->getUnusedIndexes();
+                    $indices['indices'] = $manager->getIndexes(true);
                 } catch (\Exception $e) {
-                    $indices['error'] = "An error occurred while getting indices for Elasticsearch: " . $e->getMessage();
+                    $indices['error'] = tr('An error occurred while getting indices for Elasticsearch: %0', $e->getMessage());
                 }
                 break;
             case 'MySQL':
                 try {
                     $mysqlManager = new MysqlSearchIndexManager($currentIndex);
-                    $indices['indices'] = $mysqlManager->getUnusedIndexes();
+                    $indices['indices'] = $mysqlManager->getIndexes(true);
                 } catch (\Exception $e) {
-                    $indices['error'] = "An error occurred while getting indices for MYSQL: " . $e->getMessage();
+                    $indices['error'] = tr('An error occurred while getting indices for MYSQL: %0', $e->getMessage());
                 }
                 break;
             case 'Manticore':
@@ -1926,9 +2023,9 @@ class UnifiedSearchLib
                     $dsn = $prefs['unified_manticore_url'];
                     $pdoPort = $prefs['unified_manticore_mysql_port'] ?: 9306;
                     $manticoreManager = new ManticoreSearchIndexManager($currentIndex, $indexPrefix, $dsn, $pdoPort);
-                    $indices['indices'] = $manticoreManager->getUnusedIndexes();
+                    $indices['indices'] = $manticoreManager->getIndexes(true);
                 } catch (\Exception $e) {
-                    $indices['error'] = "An error occurred while getting indices for Manticore: " . $e->getMessage();
+                    $indices['error'] = tr('An error occurred while getting indices for Manticore: %0', $e->getMessage());
                 }
                 break;
             default:

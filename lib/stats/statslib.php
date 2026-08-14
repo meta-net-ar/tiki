@@ -25,12 +25,12 @@ class StatsLib extends TikiLib
      * @param $maxRecords
      * @param string $sort_mode
      * @param string $find
-     * @param bool $onlyCant
+     * @param bool $onlyCount
      * @return array
      */
-    public function list_orphan_pages($offset = 0, $maxRecords = -1, $sort_mode = 'pageName_desc', $find = '', $onlyCant = false)
+    public function list_orphan_pages($offset = 0, $maxRecords = -1, $sort_mode = 'pageName_desc', $find = '', $onlyCount = false)
     {
-        return $this->list_pages($offset, $maxRecords, $sort_mode, $find, '', true, true, true, true, false, '', $onlyCant);
+        return $this->list_pages($offset, $maxRecords, $sort_mode, $find, '', true, true, true, true, false, '', $onlyCount);
     }
 
     /**
@@ -50,7 +50,7 @@ class StatsLib extends TikiLib
         }
         $stats["visits"] = $this->getOne("select sum(`hits`) from `tiki_pages`", []);
         $or = $this->list_orphan_pages(0, -1, 'pageName_desc', '', true);
-        $stats["orphan"] = $or["cant"];
+        $stats["orphan"] = $or["count"];
         $links = $this->getOne("select count(*) from `tiki_links`", []);
 
         if ($stats["pages"]) {
@@ -292,12 +292,12 @@ class StatsLib extends TikiLib
             $object = $id . "?" . $object;
         }
 
-        $cant = $this->getOne(
+        $count = $this->getOne(
             "select count(*) from `tiki_stats` where `object`=? and `type`=? and `day`=?",
             [$object, $type, (int) $dayzero]
         );
 
-        if ($cant) {
+        if ($count) {
             $query = "update `tiki_stats` set `hits`=`hits`+1 where `object`=? and `type`=? and `day`=?";
         } else {
             $query = "insert into `tiki_stats` (`object`,`type`,`day`,`hits`) values(?,?,?,1)";
@@ -345,7 +345,7 @@ class StatsLib extends TikiLib
         $i = 0;
 
         while ($res = $result->fetchRow()) {
-            if (strpos($res["object"], "?")) {
+            if (str_contains($res["object"], "?")) {
                 list($stats[$i]['ID'],$stats[$i]['object']) = explode("?", $res["object"], 2);
             } else {
                 $stats[$i]['object'] = $res["object"];
@@ -390,11 +390,11 @@ class StatsLib extends TikiLib
             $mid .= " and `day` < '" . $endDate . "' ";
         }
 
-        $query_cant = "SELECT sum(`hits`) AS `hits` FROM `tiki_stats` WHERE `object`=? AND `type`=? " .
+        $query_count = "SELECT sum(`hits`) AS `hits` FROM `tiki_stats` WHERE `object`=? AND `type`=? " .
                                         $mid .
                                         " GROUP BY `object`,`type`";
-        $cant = $this->getOne($query_cant, $bindvars);
-        return $cant;
+        $count = $this->getOne($query_count, $bindvars);
+        return $count;
     }
 
     /**
@@ -544,9 +544,9 @@ class StatsLib extends TikiLib
         $conditions = ['day' => (int) $dayzero,];
 
         $pageviews = $this->table('tiki_pageviews');
-        $cant = $pageviews->fetchCount($conditions);
+        $count = $pageviews->fetchCount($conditions);
 
-        if ($cant) {
+        if ($count) {
             $pageviews->update(['pageviews' => $pageviews->increment(1),], $conditions);
         } else {
             $pageviews->insert(['day' => (int) $dayzero,'pageviews' => 1,]);
@@ -592,11 +592,27 @@ class StatsLib extends TikiLib
     public function trackerStats()
     {
         $stats = [];
-        $stats["trackers"] = $this->query("show table status WHERE `Name` = 'tiki_trackers'", []);
-        $stats["tracker_fields"] = $this->query("show table status WHERE `Name` = 'tiki_tracker_fields'", []);
-        $stats["tiki_tracker_items"] = $this->query("show table status WHERE `Name` = 'tiki_tracker_items'", []);
-        $stats["tiki_tracker_item_attachments"] = $this->query("show table status WHERE `Name` = 'tiki_tracker_item_attachments'", []);
-        $stats["tiki_tracker_options"] = $this->query("show table status WHERE `Name` = 'tiki_tracker_options'", []);
+        $tables = [
+            'trackers' => 'tiki_trackers',
+            'tracker_fields' => 'tiki_tracker_fields',
+            'tiki_tracker_items' => 'tiki_tracker_items',
+            'tiki_tracker_options' => 'tiki_tracker_options',
+        ];
+
+        foreach ($tables as $key => $table) {
+            // Accurate row count
+            $stats[$key]['rowCount'] = (int) $this->getOne("SELECT COUNT(*) FROM `$table`", []);
+
+            // Table size via SHOW TABLE STATUS
+            $stat = $this->query("SHOW TABLE STATUS WHERE `Name` = ?", [$table]);
+            $dataLength = 0;
+
+            if (isset($stat->result[0])) {
+                $dataLength = (int) $stat->result[0]['Data_length'];
+            }
+
+            $stats[$key]['dataLengthMb'] = $dataLength / 1024 / 1024;
+        }
         return $stats;
     }
 }

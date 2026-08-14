@@ -32,7 +32,7 @@
             </div>
         {/if}
         {if $prefs.feature_webdav eq 'y'}
-            {assign var=virtual_path value=$file.id|virtual_path:'filegal'}
+            {$virtual_path=$file.id|virtual_path:'filegal'}
             <a style="behavior: url(#default#AnchorClick);" href="{$virtual_path}" folder="{$virtual_path}">
                 {icon name="file-archive-open"}{tr}Open as WebFolder{/tr}
             </a>
@@ -96,6 +96,23 @@
                     {icon name='edit' _menu_text=$menu_text _menu_icon=$menu_icon alt="{tr}Edit{/tr}"}
                 </a>
             {/if}
+        {elseif $prefs.cryptpad_feature eq 'y' and (
+            preg_match('/\.(docx|xlsx|pptx|odt|ods|odp)$/i', $file.filename)
+            or $file.type|strpos:'application/vnd.openxmlformats' === 0
+            or $file.type|strpos:'application/vnd.oasis.opendocument' === 0
+            or ($file.type eq 'application/vnd.ms-excel' and preg_match('/\.xlsx$/i', $file.filename))
+            or ($file.type eq 'application/vnd.ms-powerpoint' and preg_match('/\.pptx$/i', $file.filename))
+            or ($file.type eq 'application/msword' and preg_match('/\.docx$/i', $file.filename))
+        )}
+            {if $file.perms.tiki_p_upload_files eq 'y'}
+                <a href="tiki-edit_cryptpad.php?fileId={$file.id}&edit&galleryId={$file.galleryId}">
+                    {icon name='edit' _menu_text=$menu_text _menu_icon=$menu_icon alt="{tr}Edit in CryptPad{/tr}"}
+                </a>
+            {elseif $file.perms.tiki_p_download_files eq 'y'}
+                <a href="tiki-edit_cryptpad.php?fileId={$file.id}&edit&galleryId={$file.galleryId}">
+                    {icon name='view' _menu_text=$menu_text _menu_icon=$menu_icon alt="{tr}Open in CryptPad{/tr}"}
+                </a>
+            {/if}
         {elseif $prefs.h5p_enabled eq 'y' and $file.type eq 'application/zip' and preg_match('/\.h5p$/i', $file.filename)}
             <a href="{service controller='h5p' action='embed' fileId=$file.id}">
                 {icon name='view' _menu_text=$menu_text _menu_icon=$menu_icon alt="{tr}Display{/tr}"}
@@ -119,9 +136,9 @@
                 <a href="{$file.id|sefurl:file}">
             {/if}
                 {if $prefs.feature_file_galleries_save_draft eq 'y' and $file.nbDraft gt 0}
-                    {assign var=download_action_title value="{tr}Download current version{/tr}"}
+                    {$download_action_title="{tr}Download current version{/tr}"}
                 {else}
-                    {assign var=download_action_title value="{tr}Download{/tr}"}
+                    {$download_action_title="{tr}Download{/tr}"}
                 {/if}
                 {icon _menu_text=$menu_text _menu_icon=$menu_icon name='floppy' alt="$download_action_title"}
             </a>
@@ -132,24 +149,28 @@
         </a>
 
         {if $gal_info.archives gt -1}
-            {if isset($file.nbArchives) and $file.nbArchives gt 0}
-                {assign var=nb_archives value=$file.nbArchives}
+            {$has_archives = isset($file.nbArchives) and $file.nbArchives gt 0}
+            {if $has_archives}
                 <a href="tiki-file_archives.php?fileId={$file.fileId}{if !empty($filegals_manager)}&amp;filegals_manager={$filegals_manager|escape}{/if}">
-                    {icon _menu_text=$menu_text _menu_icon=$menu_icon name='file-archive' alt="{tr}Archives{/tr} ($nb_archives)"}
+            {else}
+                <span class="text-muted" title="{tr}There are no archives yet.{/tr}">
+            {/if}
+                {icon _menu_text=$menu_text _menu_icon=$menu_icon name='file-archive' alt="{tr}Archives{/tr}{if $has_archives} ({$file.nbArchives}){/if}"}
+            {if $has_archives}
                 </a>
             {else}
-                {icon _menu_text=$menu_text _menu_icon=$menu_icon name='file-archive' alt="{tr}Archives{/tr}"}
+                </span>
             {/if}
-            {assign var=replace_action_title value="{tr}Upload new version{/tr}"}
+            {$replace_action_title="{tr}Upload new version{/tr}"}
         {else}
-            {assign var=replace_action_title value="{tr}Replace{/tr}"}
+            {$replace_action_title="{tr}Replace{/tr}"}
         {/if}
 
         {if $prefs.feature_file_galleries_save_draft eq 'y'}
             {if $file.nbDraft gt 0}
-                {assign var=replace_action_title value="{tr}Replace draft{/tr}"}
+                {$replace_action_title="{tr}Replace draft{/tr}"}
             {else}
-                {assign var=replace_action_title value="{tr}Upload draft{/tr}"}
+                {$replace_action_title="{tr}Upload draft{/tr}"}
             {/if}
         {/if}
         {* can edit if I am admin or the owner of the file or the locker of the file or if I have the perm to edit file on this gallery *}
@@ -237,7 +258,7 @@
         {/if}
 
         {if $prefs.feature_webdav eq 'y'}
-            {assign var=virtual_path value=$file.fileId|virtual_path}
+            {$virtual_path=$file.fileId|virtual_path}
 
             {self_link _icon_name="file-archive-open" _menu_text=$menu_text _menu_icon=$menu_icon _onclick="javascript:open_webdav('$virtual_path')" _noauto="y" _ajax="n"}
                 {if $prefs.feature_file_galleries_save_draft eq 'y'}
@@ -254,10 +275,10 @@
             </a>
         {/if}
 
-        {if $file.perms.tiki_p_admin_file_galleries eq 'y'
-            or (!$file.lockedby and (($user and $user eq $file.user)
-            or ($file.perms.tiki_p_edit_gallery_file eq 'y'
-            and $file.perms.tiki_p_remove_files eq 'y')))}
+        {* $file.canRemove comes from filegallib::userCanRemoveFile() (the shared permission model used by every delete path) *}
+        {if $file.canRemove and ($file.perms.tiki_p_admin_file_galleries eq 'y' or ! $file.lockedby)}
+            {$delete_file_name=$file.name|default:$file.filename|default:$file.fileId}
+            {$delete_file_description=$file.description|default:''|strip_tags}
                 <form action="tiki-list_file_gallery.php" method="post">
                     {ticket}
                     <input type="hidden" name="remove" value="{$file.fileId}">
@@ -265,7 +286,12 @@
                         <input type="hidden" name="detach" value="1">
                     {/if}
                     <input type="hidden" name="galleryId" value="{$file.galleryId}">
-                    <button type="submit" class="btn btn-link px-0 pt-0" onclick="confirmPopup('{tr}Delete file?{/tr}')">
+                    <button
+                        type="submit"
+                        class="btn btn-link px-0 pt-0"
+                        onclick="confirmPopup('{if $delete_file_description neq ''}{tr _0=$delete_file_name|escape:'javascript' _1=$delete_file_description|escape:'javascript'}Delete file %0?\nDescription: %1{/tr}{else}{tr _0=$delete_file_name|escape:'javascript'}Delete file %0?{/tr}{/if}')"
+                        aria-label="{tr _0=$delete_file_name|escape:'html'}Delete file %0{/tr}"
+                    >
                         {icon _menu_text=$menu_text _menu_icon=$menu_icon name='remove' alt="{tr}Delete{/tr}"}
                     </button>
                 </form>

@@ -1,6 +1,6 @@
 {if ! $data && $editPerm}
 <button id="add-signature-{$index}" class="add-signature btn btn-primary" data-index="{$index}" data-editable="{$editPerm}">
-    Add signature{if $name} ({$name}){/if}
+    {tr}Add signature{/tr}{if $name} ({$name}){/if}
 </button>
 
 <div id="signature_{$index}" data-index="{$index}" class="signature-container" style="{if !$data}display:none{/if}">
@@ -13,11 +13,11 @@
     </div>
     <div class="buttons row">
         <div class="text-start col-sm">
-            <button class="cancel-signature btn btn-link">Cancel</button>
+            <button class="cancel-signature btn btn-link">{tr}Cancel{/tr}</button>
         </div>
         <div class="text-end col-sm">
-            <button class="clear btn btn-link">Clear</button>
-            <button class="save btn btn-primary">Save</button>
+            <button class="clear btn btn-link">{tr}Clear{/tr}</button>
+            <button class="save btn btn-primary">{tr}Save{/tr}</button>
         </div>
     </div>
 </div>

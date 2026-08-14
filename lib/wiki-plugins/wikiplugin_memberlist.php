@@ -23,7 +23,6 @@ function wikiplugin_memberlist_info()
                 'since' => '4.0',
                 'separator' => ':',
                 'filter' => 'groupname',
-                'default' => '',
             ],
             'showDescriptions' => [
                 'required' => false,
@@ -65,7 +64,6 @@ function wikiplugin_memberlist_info()
                 'description' => tr('Show only groups containing a certain user. Enter %0%user%%1 to show groups for
                     the current logged-in user.', '<code>', '</code>'),
                 'since' => '8.0',
-                'default' => '',
                 'filter' => 'username',
             ],
             'sort_mode' => [
@@ -110,7 +108,6 @@ function wikiplugin_memberlist_info()
                 'description' => tra('Only groups including the group that you specify will be listed'),
                 'since' => '8.0',
                 'filter' => 'groupname',
-                'default' => '',
             ],
             'email_to_added_user' => [
                 'required' => false,
@@ -157,7 +154,7 @@ function wikiplugin_memberlist_info()
 
 function wikiplugin_memberlist($data, $params)
 {
-    global $prefs, $user, $page;
+    global $prefs, $user;
     $mail = false;
     $tikilib = TikiLib::lib('tiki');
     $userlib = TikiLib::lib('user');
@@ -165,18 +162,9 @@ function wikiplugin_memberlist($data, $params)
     static $execution = 0;
     $exec_key = 'memberlist-execution-' . ++$execution;
 
-    if (! isset($params['groups'])) {
-        return "^Missing group list^";
-    }
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_memberlist_info());
 
     $groups = (array)$params['groups'];
-
-    $defaults = [];
-    $plugininfo = wikiplugin_memberlist_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
 
     if ($prefs['feature_user_watches'] == 'y') {
         if (! empty($user)) {
@@ -192,7 +180,7 @@ function wikiplugin_memberlist($data, $params)
         $groups = $userlib->list_all_groups();
     }
 
-    if (! empty($params['membersOnly'])) {
+    if (! is_null($params['membersOnly'])) {
         if ($params['membersOnly'] === '%user%') {
             $params['membersOnly'] = $GLOBALS['user'];
         }
@@ -207,7 +195,7 @@ function wikiplugin_memberlist($data, $params)
         unset($in_group);
     }
 
-    if (! empty($params['including'])) {
+    if (! is_null($params['including'])) {
         $includinggroups = $userlib->get_including_groups($params['including']);
         $in_group = [];
         foreach ($groups as $group) {
@@ -236,7 +224,7 @@ function wikiplugin_memberlist($data, $params)
             wikiplugin_memberlist_leave($validGroups, $_POST['leave']);
         }
         if (isset($_POST['remove'])) {
-            if (isset($params['email_to_removed_user']) && $params['email_to_removed_user'] == 'y' || isset($_POST['text_area'])) {
+            if ($params['email_to_removed_user'] == 'y' || isset($_POST['text_area'])) {
                 $mail = 'true';
             }
             wikiplugin_memberlist_remove($validGroups, $_POST['remove'], $mail, $params);
@@ -247,7 +235,7 @@ function wikiplugin_memberlist($data, $params)
                 $valgroup[] = $key;
                 $addit['add'][$key] = $value;
             }
-            if (isset($params['email_to_added_user']) && $params['email_to_added_user'] == 'y' || isset($_POST['text_area'])) {
+            if ($params['email_to_added_user'] == 'y' || isset($_POST['text_area'])) {
                 $mail = 'true';
             }
             $validrem = wikiplugin_memberlist_get_group_details($valgroup, $params['max'], $params['sort_mode'], $readOnly);
@@ -287,12 +275,10 @@ function wikiplugin_memberlist($data, $params)
             $group['info'] = $userlib->get_group_info($name);
         }
     }
+    $showgroupname = false;
 
-    $showgroupname = "";
     if ($params['showgroupname'] === "y") {
         $showgroupname = true;
-    } else {
-        $showgroupname = false;
     }
 
     $smarty = TikiLib::lib('smarty');
@@ -434,7 +420,7 @@ function wikiplugin_memberlist_add($groups, $adds, $asdefault = false, $mail = f
                             if ($mail == 'true') {
                                 $added_user[$name] = $_SESSION['u_info']['login'];
                                 $par_data['gname'] = $group;
-                                $par_data['app_data'] = isset($_POST['text_area']) ? $_POST['text_area'] : '';
+                                $par_data['app_data'] = $_POST['text_area'] ?? '';
                             }
                         }
                     }
@@ -456,7 +442,7 @@ function wikiplugin_memberlist_remove($groups, $removes, $mail = false, $params 
                     if ($mail == 'true') {
                         $removed_user[$name] = $_SESSION['u_info']['login'];
                         $par_data['gname'] = $group;
-                        $par_data['app_data'] = isset($_POST['text_area']) ? $_POST['text_area'] : '';
+                        $par_data['app_data'] = $_POST['text_area'] ?? '';
                     }
                 }
             }

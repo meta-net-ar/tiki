@@ -42,7 +42,7 @@ class Services_Connect_Client
         }
         $arr = $votes->$pref;
 
-        if (substr($vote, 0, 2) === 'un') {
+        if (str_starts_with($vote, 'un')) {
             $vote  = substr($vote, 2);
             unset($arr[ array_search($vote, $arr)]);
         } elseif (! in_array($vote, $arr)) {

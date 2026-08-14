@@ -1,11 +1,14 @@
-// Sketchy 5.3.3 -- This file contains variables that override or add to those in node_modules/bootswatch/dist/sketchy/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Sketchy 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/sketchy/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/sketchy/_variables.scss"; // Bootswatch theme variables file
 
 //
 // Color system
-//
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 //$primary:       $gray-800;  // default
 //$secondary:     $gray-700;  // default
@@ -16,12 +19,9 @@ $warning:       #946F00; // $yellow;  // default
 //$light:         $white;  // default
 //$dark:          $gray-700;  // default
 
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
-
 // Options
-//Prefix
-$prefix: bs-;
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 $body-color: $gray-800;  // default
@@ -30,10 +30,16 @@ $body-color: $gray-800;  // default
 $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
 
 // Components
+$component-active-color:       $white;  // default
+$component-active-bg:         $warning; // $primary;  // default
+
 // Fonts
 // Tables
 // Forms
 $input-border-color:                var(--#{$prefix}border-color);  // default // $gray-800;  // default
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
 // Form validation
 $form-valid-color: #218739;
@@ -48,6 +54,9 @@ $navbar-light-color:                $gray-800;  // default
 $navbar-light-hover-color:          $gray-800;  // default
 $navbar-light-active-color:         $gray-800;  // default
 $navbar-light-toggler-border-color: $gray-800;  // default
+
+// Dropdowns
+$dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Pagination
 // Cards

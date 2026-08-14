@@ -7,20 +7,21 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
-            'username'             => 'digits',            //post
-            'path'                 => 'bool',              //post
-            'site'                 => 'digits',            //post
+            'username'             => 'username',          //post
+            'path'                 => 'text',              //post
+            'site'                 => 'url',               //post
             'password'             => 'password',          //post
             'dbg'                  => 'bool',              //post
-            'find'                 => 'string',            //post
+            'find'                 => 'text',              //post
             'addpage'              => 'bool',              //post
             'pageName'             => 'pagename',          //post
             'clearpages'           => 'bool',              //post
             'addstructure'         => 'bool',              //post
-            'structure'            => 'string',            //post
+            'structure'            => 'int',               //post
             'clearstructures'      => 'bool',              //post
             'addarticle'           => 'bool',              //post
             'articleId'            => 'int',               //post
+            'cleararticles'        => 'alpha',             //post
             'send'                 => 'bool',              //post
         ],
         'staticKeyFiltersForArrays' => [
@@ -90,11 +91,7 @@ if (isset($_REQUEST['dbg'])) {
     $smarty->assign('dbg', $_REQUEST['dbg']);
 }
 
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = '';
-}
+$find = $_REQUEST['find'] ?? '';
 
 $smarty->assign('find', $find);
 
@@ -137,8 +134,8 @@ if (isset($_REQUEST['send'])) {
     $_REQUEST['path'] = preg_replace('/^\/?/', '/', $_REQUEST['path']);
     $_REQUEST['site'] = parse_url($_REQUEST['site'], PHP_URL_HOST);
     $client = new XML_RPC_Client($_REQUEST['path'], $_REQUEST['site'], 80);
-    $client->return_type = 'xml';
-    $client->setDebug((isset($_REQUEST['dbg']) && $_REQUEST['dbg'] == 'on') ? true : false);
+    $client->setOption('return_type', 'xml');
+    $client->setDebug(isset($_REQUEST['dbg']) && $_REQUEST['dbg'] == 'on');
     foreach ($sendstructures as $structure) {
         $spages = $structlib->s_get_structure_pages($structure);
         $pos = 0;

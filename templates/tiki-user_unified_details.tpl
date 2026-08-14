@@ -1,4 +1,4 @@
-{if "$userwatch" eq "$user" }
+{if "$userwatch" eq "$user"}
     {include file='tiki-mytiki_bar.tpl'}
 {/if}
 {if $infoPublic eq 'y' || true}
@@ -32,13 +32,13 @@
                     </div>
                     {if $prefs['feature_display_my_to_others'] eq 'y'}
                         <ul class="list-group profile-navigation">
-                            <a id="tab_show_user" data-bs-target="#tab_user" href="#" class="tab_option list-group-item active">{tr}User Information{/tr}</a>
-                            {if $prefs['feature_wiki'] eq 'y'}<a id="tab_show_wikis" data-bs-target="#tab_wikis" href="#" class="tab_option list-group-item">{tr}Wiki Pages{/tr}</a>{/if}
-                            {if $prefs['feature_blogs'] eq 'y'}<a id="tab_show_blogs" data-bs-target="#tab_blogs" href="#" class="tab_option list-group-item">{tr}Blogs{/tr}</a>{/if}
-                            {if $prefs['feature_trackers'] eq 'y'}<a id="tab_show_trackers" data-bs-target="#tab_trackers" href="#" class="tab_option list-group-item">{tr}Trackers{/tr}</a>{/if}
-                            {if $prefs['feature_articles'] eq 'y'}<a id="tab_show_articles" data-bs-target="#tab_articles" href="#" class="tab_option list-group-item">{tr}Articles{/tr}</a>{/if}
-                            {if $prefs['feature_forums'] eq 'y'}<a id="tab_show_forums" data-bs-target="#tab_forums" href="#" class="tab_option list-group-item">{tr}Forum Threads{/tr}</a>{/if}
-                            {if $prefs['feature_file_galleries'] eq 'y'}<a id="tab_show_galleries" data-bs-target="#tab_files" href="#" class="tab_option list-group-item">{tr}Files{/tr}</a>{/if}
+                            <a id="tab_show_user" data-bs-target="#tab_user" href="#" role="button" class="tab_option list-group-item active">{tr}User Information{/tr}</a>
+                            {if $prefs['feature_wiki'] eq 'y'}<a id="tab_show_wikis" data-bs-target="#tab_wikis" href="#" role="button" class="tab_option list-group-item">{tr}Wiki Pages{/tr}</a>{/if}
+                            {if $prefs['feature_blogs'] eq 'y'}<a id="tab_show_blogs" data-bs-target="#tab_blogs" href="#" role="button" class="tab_option list-group-item">{tr}Blogs{/tr}</a>{/if}
+                            {if $prefs['feature_trackers'] eq 'y'}<a id="tab_show_trackers" data-bs-target="#tab_trackers" href="#" role="button" class="tab_option list-group-item">{tr}Trackers{/tr}</a>{/if}
+                            {if $prefs['feature_articles'] eq 'y'}<a id="tab_show_articles" data-bs-target="#tab_articles" href="#" role="button" class="tab_option list-group-item">{tr}Articles{/tr}</a>{/if}
+                            {if $prefs['feature_forums'] eq 'y'}<a id="tab_show_forums" data-bs-target="#tab_forums" href="#" role="button" class="tab_option list-group-item">{tr}Forum Threads{/tr}</a>{/if}
+                            {if $prefs['feature_file_galleries'] eq 'y'}<a id="tab_show_galleries" data-bs-target="#tab_files" href="#" role="button" class="tab_option list-group-item">{tr}Files{/tr}</a>{/if}
                         </ul>
                     {/if}
                 </div>
@@ -265,7 +265,7 @@
                 {if $user eq $userinfo.object_id}
                 <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">{tr}Friendship Network{/tr}</h3>
+                    <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{tr}Friendship Network{/tr}</h3>
                 </div>
                 <div class="card-body">
                     {module module=friend_list nobox=y}

@@ -1,0 +1,15 @@
+profile:
+  name: "Basic Wiki Test Profile"
+  description: "A basic test profile for wiki functionality"
+
+preferences:
+  feature_wiki: "y"
+  feature_wiki_comments: "y"
+  feature_wiki_history: "y"
+
+objects:
+  - type: wiki_page
+    data:
+      name: "TestSamplePage"
+      content: "This is a sample wiki page created by a test profile."
+      description: "Sample page for testing"

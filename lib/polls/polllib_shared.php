@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -128,9 +128,9 @@ class PollLibShared extends TikiLib
         }
 
         $query = "select * from `tiki_polls` where `active`=? and `publishDate`>=? and `publishDate`<=? $mid";
-        $query_cant = "select count(*) from `tiki_polls` where `active`=? and `publishDate`>=? and `publishDate`<=? $mid";
+        $query_count = "select count(*) from `tiki_polls` where `active`=? and `publishDate`>=? and `publishDate`<=? $mid";
         $result = $this->query($query, $bindvars);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
 
         $ret = [];
         while ($res = $result->fetchRow()) {
@@ -139,7 +139,7 @@ class PollLibShared extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -149,7 +149,7 @@ class PollLibShared extends TikiLib
      * @param $optionId
      * @param $previous_vote
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result|bool
+     * @return Tiki\TikiDb\PdoResult|bool
      */
     public function poll_vote($user, $pollId, $optionId, $previous_vote)
     {
@@ -232,7 +232,7 @@ class PollLibShared extends TikiLib
     /**
      * @param $pollId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_poll($pollId)
     {
@@ -313,7 +313,7 @@ class PollLibShared extends TikiLib
      * @param $title
      * @param $position
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function replace_poll_option($pollId, $optionId, $title, $position)
     {
@@ -341,13 +341,10 @@ class PollLibShared extends TikiLib
             $query = "update `tiki_polls` set `title`=?,`active`=?,`publishDate`=?, `voteConsiderationSpan`=? where `pollId`=?";
             $result = $this->query($query, [$title, $active, $publishDate, $voteConsiderationSpan, $pollId]);
         } else {
-            $query = "insert into tiki_polls(`title`,`active`,`publishDate`,`votes`, `voteConsiderationSpan`) values(?,?,?,?,?)";
+            $query = "insert into `tiki_polls` (`title`,`active`,`publishDate`,`votes`, `voteConsiderationSpan`) values(?,?,?,?,?)";
             $result = $this->query($query, [$title, $active, $publishDate, 0, $voteConsiderationSpan]);
 
-            $pollId = $this->getOne(
-                "select max(`pollId`) from `tiki_polls` where `title`=? and `publishDate`=?",
-                [$title, $publishDate]
-            );
+            $pollId = $this->lastInsertId();
         }
         return $pollId;
     }
@@ -357,7 +354,7 @@ class PollLibShared extends TikiLib
      * @param        $pollId
      * @param string $title
      *
-     * @return TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function poll_categorize($catObjectId, $pollId, $title = '')
     {
@@ -476,7 +473,7 @@ class PollLibShared extends TikiLib
      * @param $ip
      * @param $optionId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function delete_vote($pollId, $user, $ip, $optionId)
     {

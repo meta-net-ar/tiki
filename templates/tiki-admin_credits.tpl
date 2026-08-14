@@ -81,7 +81,7 @@
 <h2>{tr}Use User Credits{/tr}</h2>
 <form method="post" action="tiki-admin_credits.php" class="mb-3">
     <label class="form-label" for="use_credit_type">{tr}Use:{/tr}</label>
-    <select class="form-select" name="use_credit_type" id="use_credit_type" class="mb-2">
+    <select class="form-select mb-2" name="use_credit_type" id="use_credit_type">
         {foreach key=id item=data from=$credit_types}
             <option value="{$id}">{$id|escape}</option>
         {/foreach}
@@ -148,7 +148,7 @@
                     <option value='y'>{tr}Yes{/tr}</option>
                     </select>
                 </td>
-                <td><input class="form-control" type="number" name="scaling_divisor" aria-label="{tr}Scaling Divisor{/tr} value="1" size="6"></td>
+                <td><input class="form-control" type="number" name="scaling_divisor" aria-label="{tr}Scaling Divisor{/tr}" value="1" size="6"></td>
             </tr>
         </table>
     </div>

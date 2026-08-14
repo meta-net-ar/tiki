@@ -1,3 +1,4 @@
+{include file='token_view_actions.tpl'}
 {title help="Newsletters"}{tr}Newsletters{/tr}{/title}
 
 {if $tiki_p_admin_newsletters eq "y"}
@@ -9,6 +10,7 @@
     </div>
 {/if}
 <br>
+<div class="styling-element">
 {if $subscribe eq 'y'}
     <h2>
         {tr}Subscribe to Newsletter{/tr}
@@ -119,5 +121,6 @@
             {/section}
         </table>
     </div>
-    {pagination_links cant=$cant offset=$offset step=$maxRecords}{/pagination_links}
+    {pagination_links count=$count offset=$offset step=$maxRecords}{/pagination_links}
 {/if}
+</div>

@@ -58,4 +58,9 @@ class Search_Action_WikiApprovalAction implements Search_Action_Action
     {
         return false;
     }
+
+    public function requiresConfirm()
+    {
+        return false;
+    }
 }

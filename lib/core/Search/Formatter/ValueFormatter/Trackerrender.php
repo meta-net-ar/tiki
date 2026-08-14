@@ -36,44 +36,54 @@ class Search_Formatter_ValueFormatter_Trackerrender extends Search_Formatter_Val
     public function render($name, $value, array $entry)
     {
         if ($name === 'tracker_status') {
+            if (empty($entry['tracker_id'])) {
+                if (($entry['object_type'] ?? '') === 'trackeritem') {
+                    trigger_error('Trackerrender: tracker_id missing for tracker_status rendering of item ' . ($entry['object_id'] ?? 'unknown'), E_USER_WARNING);
+                }
+                return $value;
+            }
+            $options  = TikiLib::lib('trk')->get_tracker_options($entry['tracker_id']);
             switch ($value) {
                 case 'o':
                     $status = 'open';
-                    $istatus = tra('Open');
+                    $istatus = $options['altOpenStatus'] ?: tra('Open');
                     break;
                 case 'p':
                     $status = 'pending';
-                    $istatus = tra('Pending');
+                    $istatus = $options['altPendingStatus'] ?: tra('Pending');
                     break;
                 default:
                 case 'c':
                     $status = 'closed';
-                    $istatus = tra('Closed');
+                    $istatus = $options['altClosedStatus'] ?: tra('Closed');
                     break;
             }
 
             $smarty = TikiLib::lib('smarty');
             return smarty_function_icon(['name' => 'status-' . $status, 'iclass' => 'tips', 'ititle' => ':'
                 . $istatus ], $smarty->getEmptyInternalTemplate());
-        } elseif (substr($name, 0, 14) !== 'tracker_field_' && $name !== 'title') {
+        } elseif (! str_starts_with($name, 'tracker_field_') && $name !== 'title') {
             return $value;
         }
 
-        $tracker = Tracker_Definition::get($entry['tracker_id']);
+        try {
+            $tracker = Tracker_Definition::get($entry['tracker_id']);
+        } catch (\Exception $e) {
+            if (($entry['object_type'] ?? '') === 'trackeritem') {
+                trigger_error('Trackerrender: ' . $e->getMessage() . ' for item ' . ($entry['object_id'] ?? 'unknown'), E_USER_WARNING);
+            }
+            return $value;
+        }
         if (! is_object($tracker)) {
             return $value;
         }
         if ($name === 'title') {
             // function getField works with either id of permName
-            $nameOrId = $tracker->getMainFieldId($entry['tracker_id']);
+            $nameOrId = $tracker->getMainFieldId();
         } else {
             $nameOrId = substr($name, 14);
         }
         $field = $tracker->getField($nameOrId);
-
-        if ($name === 'title') {
-            $name = 'tracker_field_' . $field['permName'];
-        }
 
         if (! $field) {
             if (Perms::get()->tracker_admin) {
@@ -83,10 +93,14 @@ class Search_Formatter_ValueFormatter_Trackerrender extends Search_Formatter_Val
             }
         }
 
+        if ($name === 'title') {
+            $name = 'tracker_field_' . $field['permName'];
+        }
+
         // check translations of multilingual fields
         global $prefs;
         if ($field['isMultilingual'] === 'y' && isset($entry[$name . '_' . $prefs['language']])) {
-            $name = $name . '_' . $prefs['language'];
+            $name = $name . '_' . Language::getCurrentLanguage();
             $value = $entry[$name];
         }
         // TextArea fields need the raw wiki syntax here for it to get wiki parsed if necessary

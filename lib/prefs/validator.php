@@ -12,6 +12,7 @@ function prefs_validator_list()
             'type' => 'text',
             'size' => 20,
             'default' => '',
+            'help' => 'Login-General-Preferences',
         ],
     ];
 }

@@ -14,14 +14,14 @@
                                 <option value="{$itemId}">{$label|escape}</option>
                             {/foreach}
                         </select>
-                        <a class="btn btn-primary insert-tracker-item" href="{service controller=tracker action=insert_item trackerId=$field.options_map.trackerId next=$data.next|escape}">{tr}OK{/tr}</a>
+                        <a class="btn btn-primary insert-tracker-item" href="{service controller=tracker action=insert_item trackerId=$field.options_map.trackerId next=$data.next|escape}" role="button">{tr}OK{/tr}</a>
                     </div>
                 </div>
             {else}
-                <a class="btn btn-primary insert-tracker-item" href="{service controller=tracker action=insert_item trackerId=$field.options_map.trackerId next=$data.next|escape}">{tr}{$field.options_map.addItems|escape}{/tr}</a>
+                <a class="btn btn-primary insert-tracker-item" href="{service controller=tracker action=insert_item trackerId=$field.options_map.trackerId next=$data.next|escape}" role="button">{tr}{$field.options_map.addItems|escape}{/tr}</a>
             {/if}
             {if !empty($field.options_map.preSelectFieldThere)}
-                <a class="btn btn-primary update-tracker-links" href="{service controller=tracker action=link_items trackerId=$field.options_map.trackerId next=$data.next|escape}">{tr}Update{/tr}</a>
+                <a class="btn btn-primary update-tracker-links" href="{service controller=tracker action=link_items trackerId=$field.options_map.trackerId next=$data.next|escape}" role="button">{tr}Update{/tr}</a>
             {jq}
                 var preselectedValue = function() {
                     var preselectedEl = $("#il{{$field.ins_id}}").closest('form').find('[name=ins_{{$field.options_map.preSelectFieldHere}}]');
@@ -80,7 +80,23 @@
             {/jq}
         {/if}
     {else}
-        <select name="{$field.html_name}" {if $data.preselection and $data.crossSelect neq 'y'}disabled="disabled"{/if} {if $data.selectMultipleValues}multiple="multiple"{/if} class="form-select" {if $field.isMandatory eq 'y'} required{/if}>
+        <select name="{$field.html_name}"
+            {if $data.preselection and $data.crossSelect neq 'y'}disabled="disabled"{/if}
+            {if $data.selectMultipleValues}multiple="multiple"{/if}
+            class="form-select"
+            {if $field.isMandatory eq 'y'} required{/if}
+            {if $field.options_map.lazyload}
+                data-remote-source-url="{service external=true
+                    controller=tracker
+                    action=findItems
+                    trackerId=$field.options_map.trackerId
+                    field=$field.options_map.fieldId
+                    listFields=$data.listFields
+                    displayFieldsListSort=$field.options_map.displayFieldsListSort
+                    limit=50
+                }"
+            {/if}
+        >
             {if $field.isMandatory ne 'y' || empty($field.value)}
                 <option value=""></option>
             {/if}
@@ -91,7 +107,7 @@
             {/foreach}
         </select>
         {if $field.options_map.addItems and $data.createTrackerItems}
-            <a class="btn btn-primary insert-tracker-item" href="{service controller=tracker action=insert_item trackerId=$field.options_map.trackerId next=$data.next|escape}" data-href="{service controller=tracker action=insert_item trackerId=$field.options_map.trackerId next=$data.next|escape}">{tr}{$field.options_map.addItems|escape}{/tr}</a>
+            <a class="btn btn-primary insert-tracker-item" href="{service controller=tracker action=insert_item trackerId=$field.options_map.trackerId next=$data.next|escape}" data-href="{service controller=tracker action=insert_item trackerId=$field.options_map.trackerId next=$data.next|escape}" role="button">{tr}{$field.options_map.addItems|escape}{/tr}</a>
             {if !empty($field.options_map.preSelectFieldThere)}
             {jq}
                 $("#il{{$field.ins_id}}").find('.insert-tracker-item').on('click', function() {
@@ -107,7 +123,7 @@
                             .attr('value', data.itemId)
                             .text(data.{{if not empty($data.otherFieldPermName)}fields.{$data.otherFieldPermName}{else}itemTitle{/if}})
                             .appendTo($select);
-                        $select.val(data.itemId).trigger("change.select2").trigger("change");
+                        $select.val(data.itemId).trigger("change");
                         $.closeModal();
                     }
                 });

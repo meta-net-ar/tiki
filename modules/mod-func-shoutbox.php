@@ -21,7 +21,7 @@
  */
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -118,14 +118,14 @@ function module_shoutbox($mod_reference, $module_params)
             }
         }
 
-        $maxrows = isset($module_params['maxrows']) ? $module_params['maxrows'] : 5;
+        $maxrows = $module_params['maxrows'] ?? 5;
         $shout_msgs = $shoutboxlib->list_shoutbox(0, $maxrows, 'timestamp_desc', '');
         $smarty->assign('shout_msgs', $shout_msgs['data']);
 
         // Subst module parameters
-        $smarty->assign('tooltip', isset($module_params['tooltip']) ? $module_params['tooltip'] : 0);
-        $smarty->assign('buttontext', isset($module_params['buttontext']) ? $module_params['buttontext'] : tra('Post'));
-        $smarty->assign('waittext', isset($module_params['waittext']) ? $module_params['waittext'] : tra('Please wait...'));
+        $smarty->assign('tooltip', $module_params['tooltip'] ?? 0);
+        $smarty->assign('buttontext', $module_params['buttontext'] ?? tra('Post'));
+        $smarty->assign('waittext', $module_params['waittext'] ?? tra('Please wait...'));
 
         $smarty->assign(
             'tweet',

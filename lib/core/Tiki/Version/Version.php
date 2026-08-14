@@ -26,7 +26,7 @@ class Tiki_Version_Version
         if ($version instanceof self) {
             return $version;
         } else {
-            preg_match('/^(\d+)\.(\d+)?(\.([\d\.]+))?((alpha|beta|rc|pre|svn|vcs)(\d*))?$/i', $version, $parts);
+            preg_match('/^(\d+)\.(\d+)?(\.([\d\.]+))?((alpha|beta|rc|pre|vcs)(\d*))?$/i', $version, $parts);
             for ($i = 0; 8 > $i; ++$i) {
                 if (! isset($parts[$i])) {
                     $parts[$i] = null;
@@ -40,6 +40,11 @@ class Tiki_Version_Version
     public function getMajor()
     {
         return $this->major;
+    }
+
+    public function isStable()
+    {
+        return empty($this->sub);
     }
 
     public function isUpgradeTo($version)
@@ -57,6 +62,15 @@ class Tiki_Version_Version
         } else {
             return false;
         }
+    }
+
+    public function isStableUpgradeTo($version)
+    {
+        if (! $this->isStable()) {
+            return false;
+        }
+
+        return $this->isUpgradeTo($version);
     }
 
     public function __toString()

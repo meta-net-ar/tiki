@@ -8,7 +8,7 @@ class Search_Formatter_ValueFormatter_Sorthandle extends Search_Formatter_ValueF
 {
     public function render($name, $value, array $entry)
     {
-        if (substr($name, 0, 14) !== 'tracker_field_') {
+        if (! str_starts_with($name, 'tracker_field_')) {
             return "";
         }
 

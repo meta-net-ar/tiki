@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="content"}
-    <form action="{service controller='edit' action='convert_syntax'}" method="post" id="editor-settings" data-area-id="{$domId}" class="no-ajax">
+    <form action="{service controller='edit' action='post_editor_settings'}" method="post" id="editor-settings" data-area-id="{$domId}" class="no-ajax">
         <input type="hidden" name="page" value="{$page}">
         {if $prefs.feature_wysiwyg eq 'y' and $prefs.wysiwyg_optional eq 'y'}
             <div class="mb-3">

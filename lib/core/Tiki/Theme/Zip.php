@@ -59,7 +59,7 @@ class Zip
             $this->setFileName($fileName);
         }
         $fileExtension = strtolower($fileNamePieces[$fileCountPieces - 1]);
-        $isZipFile = $fileExtension === 'zip' ? true : false;
+        $isZipFile = $fileExtension === 'zip';
         return $isZipFile;
     }
 
@@ -79,16 +79,16 @@ class Zip
             $fileName = $zip->getNameIndex($i);
             $fileInfo = pathinfo($fileName);
             $fileExtension = ! empty($fileInfo['extension']) ? $fileInfo['extension'] : '';
-            if ($fileExtension == 'sql' && strpos($fileInfo['dirname'], 'installer/schema') !== false) {
+            if ($fileExtension == 'sql' && str_contains($fileInfo['dirname'], 'installer/schema')) {
                 $this->schemas[] = $fileInfo['basename'];
             }
-            if ($fileExtension == 'yaml' && strpos($fileInfo['dirname'], '/profiles') !== false) {
+            if ($fileExtension == 'yaml' && str_contains($fileInfo['dirname'], '/profiles')) {
                 $this->profiles[] = $fileInfo['basename'];
             }
-            if ($fileExtension == 'ini' && strpos($fileInfo['dirname'], '/config') !== false) {
+            if ($fileExtension == 'ini' && str_contains($fileInfo['dirname'], '/config')) {
                 $this->configFiles[] = $fileInfo['basename'];
             }
-            if ($fileExtension == 'css' && strpos($fileInfo['dirname'], '/css') !== false) {
+            if ($fileExtension == 'css' && str_contains($fileInfo['dirname'], '/css')) {
                 $this->existCssFolder = true;
                 $themeName = $this->getThemeName();
                 if (empty($themeName) && preg_match('/themes\/([^\/]*)/', dirname($fileInfo['dirname']), $matches)) {

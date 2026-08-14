@@ -7,6 +7,7 @@
 use Tiki\Installer\Installer;
 
 require_once('tiki-setup.php');
+global $prefs;
 
 isMonitorRestrited();
 getMonitorRole();
@@ -18,7 +19,7 @@ $opcode_stats = TikiLib::lib('admin')->getOpcodeCacheStatus();
 # admin/include_performance.php
 $txtUsed = tr('Used');
 $txtAvailable = tr('Available');
-if ($opcode_cache == 'WinCache') {
+if (isset($opcode_cache) && $opcode_cache == 'WinCache') {
     // Somehow WinCache seems to flip the representations
     $txtAvailable = tr('Used');
     $txtUsed = tr('Available');
@@ -46,7 +47,16 @@ if (isValidMonitor('DbRequiresUpdate')) {
 }
 
 if (isValidMonitor('SearchIndexRebuildLast')) {
-    $result['SearchIndexRebuildLast'] = $tikilib->get_preference('unified_last_rebuild');
+    $result['SearchIndexRebuildLast'] = $tikilib->get_preference('unified_last_rebuild_' . $prefs['unified_engine']);
+}
+
+if (isValidMonitor('SchedulerLastRun')) {
+    $result['SchedulerLastRun'] = (int) $tikilib->get_preference('scheduler_last_run_timestamp', 0);
+}
+
+if (isValidMonitor('SchedulerHealthy')) {
+    $schedulerUtils = new Scheduler_Utils();
+    $result['SchedulerHealthy'] = $schedulerUtils->isSchedulerRunConfigured() ? 1 : 0;
 }
 
 // Get probes result
@@ -66,38 +76,41 @@ if (! empty($probes)) {
 // Always check the monitoring_error_code parameter or header, regardless of probes
 $monitoringErrorCode = (int) getRequestParam('monitoring_error_code', 'X-Tiki-Monitoring-Error-Code');
 
-if ($probes['result'] === 'FAIL' && $monitoringErrorCode >= 200 && $monitoringErrorCode < 600) {
+if (isset($probes['result']) && $probes['result'] === 'FAIL' && $monitoringErrorCode >= 200 && $monitoringErrorCode < 600) {
     http_response_code($monitoringErrorCode);
     if ($_SERVER['REQUEST_METHOD'] === 'HEAD') {
         exit();
     }
 }
 
-$display = json_encode($result);
-echo $display;
+header('Content-Type: application/json');
+echo json_encode($result);
 
 /**
  * Check monitor is restricted by IP
+ * Security: Uses get_ip_address() which properly validates reverse proxy headers
  *
  * @return null
  */
 function isMonitorRestrited()
 {
     global $prefs;
+    $tikilib = TikiLib::lib('tiki');
 
     $tikiMonitorRestriction = ! empty($prefs['monitor_restricted_ips']) ? explode(',', preg_replace('/\s+/', '', $prefs['monitor_restricted_ips'])) : [];
-    $sIpToCheck = null;
-    if (! empty($tikiMonitorRestriction)) {
-        if (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && ! empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            $aListIp = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
-            $sIpToCheck = $aListIp[0];
-        } elseif (isset($_SERVER['REMOTE_ADDR']) && ! empty($_SERVER['REMOTE_ADDR'])) {
-            $sIpToCheck = $_SERVER['REMOTE_ADDR'];
-        }
+
+    if (empty($tikiMonitorRestriction)) {
+        // No IP restrictions configured, allow access
+        return;
     }
 
-    if (in_array($sIpToCheck, $tikiMonitorRestriction) === false) {
-        header('location: index.php');
+    // Use the secure get_ip_address() method
+    $sIpToCheck = $tikilib->get_ip_address();
+
+    if (! in_array($sIpToCheck, $tikiMonitorRestriction, true)) {
+        // Return 403 Forbidden instead of 302 redirect for better security semantics
+        http_response_code(403);
+        echo 'Access Forbidden: Your IP address is not authorized to access this resource.';
         exit();
     }
 }
@@ -259,12 +272,11 @@ function getProbes($result)
                 preg_match('/\(\S+\s+(\S+)\s+(\S+)\)/', $probe, $matches);
                 $probeMonitor = ! empty($matches[1]) ? $matches[1] : '';
                 $probeMonitorValue = ! empty($matches[2]) ? $matches[2] : '';
-                $monitorValue = isset($result[$probeMonitor]) ? $result[$probeMonitor] : '';
+                $monitorValue = $result[$probeMonitor] ?? '';
 
                 if (str_contains($probeMonitor, '.')) {
                     $subMonitor = explode('.', $probeMonitor);
-                    $monitorValue = isset($result[$subMonitor[0]][$subMonitor[1]])
-                        ? $result[$subMonitor[0]][$subMonitor[1]] : '';
+                    $monitorValue = $result[$subMonitor[0]][$subMonitor[1]] ?? '';
                 }
                 if (empty($monitorValue)) {
                     $probesDetails[$probeDetailLine] = "FAIL";

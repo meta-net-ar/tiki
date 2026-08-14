@@ -111,7 +111,7 @@ function module_domain_password($mod_reference, $module_params)
                 $can_update[$cntModule] = $module_params['can_update'];
             }
 
-            $isSaving = isset($_REQUEST['saveButton' . $cntModule]) ? true : false;
+            $isSaving = isset($_REQUEST['saveButton' . $cntModule]);
 
             // Determine user
             $use_currentuser[$cntModule] = 'y';

@@ -1,0 +1,16 @@
+---
+type: object
+description: Results are wrapped in a 'data' array and `messages` contains human-readable status messages.
+properties:
+  data:
+    type: array
+    items:
+      $ref: schemas-CategorizeSingleCateg.yaml
+  messages:
+    type: array
+    items:
+      type: string
+  err_messages:
+    type: array
+    items:
+      type: string

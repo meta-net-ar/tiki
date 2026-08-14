@@ -17,7 +17,7 @@ use Smarty\Template;
  *    Defaults to the current URL.
  *
  * params:
- *  - cant: Total number of items. [required]
+ *  - count: Total number of items. [required]
  *  - offset: Current offset. Defaults to 0.
  *  - reloff: Current relative offset (to keep the original offset unchanged). If not specified, reloff is not used and offset is changed.
  *  - itemname: Untranslated string to use as the item name. Defaults to 'Page'.
@@ -36,7 +36,9 @@ use Smarty\Template;
  *      (dots are not replaced by links, it's just a separation text):
  *      1 2 3 ... k-2 k-1 k k+1 k+2 ...  n-2 n-1 n
  *  - offset_arg: Name of the URL argument that contains the offset. Defaults to 'offset'.
- *    - zero_based_offset: Items addressed as zero-based (defaults to 'y'). If 'n' then "one based" offset used (1 to cant + 1)
+ *  - offset_min: Lowest reachable offset. The "previous" link is disabled (and clamped) at this offset. Defaults to 0.
+ *      Useful when the offset is 1-based (e.g. comparing adjacent versions where offset 0 is invalid).
+ *    - zero_based_offset: Items addressed as zero-based (defaults to 'y'). If 'n' then "one based" offset used (1 to count + 1)
  *        (jb tiki5: only fully tested without reloffset and step=1)
  *    - show_numbers: Show/hide direct_pagination links, current and total numbers (Defaults to 'y')
  *  - _ajax : if set to 'n', will force disabling AJAX even if the ajax xajax feature is enabled (defaults to 'y')    AJAX_TODO
@@ -55,7 +57,7 @@ class PaginationLinks extends Base
 
         if (isset($params['resultset'])) {
             $resultSet = $params['resultset'];
-            $params['cant'] = count($resultSet);
+            $params['count'] = count($resultSet);
             $params['offset'] = $resultSet->getOffset();
             $params['step'] = $resultSet->getMaxRecords();
             $params['estimate'] = $resultSet->getEstimate();
@@ -65,7 +67,7 @@ class PaginationLinks extends Base
         $default_type = 'absolute_path';
 
         // Check main params and return no pagination links if there is a mistake
-        if (! isset($params['cant']) || $params['cant'] <= 0) {
+        if (! isset($params['count']) || $params['count'] <= 0) {
             return '';
         }
         if (isset($params['step']) && $params['step'] == -1) {
@@ -76,6 +78,9 @@ class PaginationLinks extends Base
         }
         if (! isset($params['offset_arg'])) {
             $params['offset_arg'] = 'offset';
+        }
+        if (! isset($params['offset_min'])) {
+            $params['offset_min'] = 0;
         }
         if (! isset($params['zero_based_offset'])) {
             $params['zero_based_offset'] = 'y';
@@ -95,17 +100,17 @@ class PaginationLinks extends Base
             $zero_based_min = 0;
             $zero_based_maxminus = 1;
         }
-        $params['_ajax'] = isset($params['_ajax']) ? $params['_ajax'] : 'y';
+        $params['_ajax'] = $params['_ajax'] ?? 'y';
         if (
             isset($params['reloff']) && (
-                $params['reloff'] + $params['offset'] >= $params['cant']
+                $params['reloff'] + $params['offset'] >= $params['count']
                 || $params['reloff'] + $params['offset'] < $zero_based_min
             )
         ) {
             return '';
         }
 
-        if (! isset($params['reloff']) && ($params['offset'] >= $params['cant'] + $zero_based_min || $params['offset'] < $zero_based_min)) {
+        if (! isset($params['reloff']) && ($params['offset'] >= $params['count'] + $zero_based_min || $params['offset'] < $zero_based_min)) {
             return '';
         }
 
@@ -139,9 +144,9 @@ class PaginationLinks extends Base
 
         if (! isset($params['step']) || $params['step'] <= 0) {
             $params['step'] = 1;
-            $nb_pages = $params['cant'];
+            $nb_pages = $params['count'];
         } else {
-            $nb_pages = ceil($params['cant'] / $params['step']);
+            $nb_pages = ceil($params['count'] / $params['step']);
         }
 
         if ($nb_pages == 0 || ($nb_pages == 1 && $prefs['pagination_hide_if_one_page'] == 'y')) {
@@ -186,14 +191,14 @@ class PaginationLinks extends Base
             )) . '&amp;' . $params['offset_arg'] . '=' . $params['offset'];
             $real_offset = $params['offset'] + $params['reloff'];
         } else {
-            $prev_offset_val = max($zero_based_min, $params['offset'] - $params['step']);
+            $prev_offset_val = max($zero_based_min, $params['offset_min'], $params['offset'] - $params['step']);
             $prev_offset = $params['offset_arg'] . '=' . $prev_offset_val;
-            $next_offset_val = min($params['cant'] - $zero_based_maxminus, $params['offset'] + $params['step']);
+            $next_offset_val = min($params['count'] - $zero_based_maxminus, $params['offset'] + $params['step']);
             $next_offset = $params['offset_arg'] . '=' . $next_offset_val;
             $prev_fast_offset_val = max($zero_based_min, $params['offset'] - $params['step'] * ceil($nb_pages / 10));
             $prev_fast_offset = $params['offset_arg'] . '=' . $prev_fast_offset_val;
             $next_fast_offset_val = min(
-                $params['cant'] - $zero_based_maxminus,
+                $params['count'] - $zero_based_maxminus,
                 $params['offset'] + $params['step'] * ceil($nb_pages / 10)
             );
             $next_fast_offset = $params['offset_arg'] . '=' . $next_fast_offset_val;
@@ -215,7 +220,7 @@ class PaginationLinks extends Base
         ) : 0;
         $max_links = (1 + $max_ending_links + $max_middle_links) * 2 + 1;
 
-        if ($params['cant'] > 0) {
+        if ($params['count'] > 0) {
             $make_prevnext_link = function ($url, $content, $params, $class = 'prevnext', $linkoffset = 0) {
                 $smarty = \TikiLib::lib('smarty');
 
@@ -250,7 +255,7 @@ class PaginationLinks extends Base
                 $html .= '<ul class="pagination justify-content-center">';
 
                 if ($prefs['nextprev_pagination'] != 'n' || $params['show_numbers'] !== 'y') {
-                    if ($params['offset'] == 0) {
+                    if ($params['offset'] <= $params['offset_min']) {
                         $html .= '<li class="page-item disabled"><span class="page-link">' .
                             ($params['noimg'] ? tr('Previous') : '«') . '</span></li>';
                     } else {
@@ -313,7 +318,7 @@ class PaginationLinks extends Base
                 }
 
                 if ($prefs['nextprev_pagination'] != 'n' || $params['show_numbers'] !== 'y') {
-                    if ($params['offset'] + $params['step'] >= $params['cant']) {
+                    if ($params['offset'] + $params['step'] >= $params['count']) {
                         $html .= '<li class="page-item disabled"><span class="page-link">' .
                             ($params['noimg'] ? tr('Next') : '»') . '</span></li>';
                     } else {
@@ -330,7 +335,7 @@ class PaginationLinks extends Base
                 $html .= '</ul>';
             }
 
-            if (isset($params['estimate']) && $params['estimate'] > $params['cant']) {
+            if (isset($params['estimate']) && $params['estimate'] > $params['count']) {
                 $html .= '<div class="alert alert-info">' . tr(
                     'More results may be available. Refine criteria to access the estimated %0 results.',
                     $params['estimate']

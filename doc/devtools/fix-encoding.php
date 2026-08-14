@@ -18,7 +18,7 @@ if ($client_charset !== 'utf8') {
     die('Please. Client charset to utf8.');
 }
 
-if ('' === trim(`which enca`)) {
+if ('' === trim(shell_exec("which enca"))) {
     die('enca must be installed.');
 }
 
@@ -41,9 +41,9 @@ foreach ($text_fields as $field) {
 
         file_put_contents('/tmp/data', $value['value']);
 
-        $output = trim(`enca -L none /tmp/data`);
+        $output = trim(shell_exec("enca -L none /tmp/data"));
 
-        if (0 === strpos($output, 'Universal transformation format 8 bits; UTF-8')) {
+        if (str_starts_with($output, 'Universal transformation format 8 bits; UTF-8')) {
             $db->query("UPDATE `$table_name` SET `$column_name`=CONVERT(CONVERT(CONVERT(CONVERT(`$column_name` USING binary) USING utf8) USING latin1) USING binary) WHERE `$column_name` = ?", [$value['value']]);
         }
     }

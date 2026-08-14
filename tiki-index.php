@@ -8,6 +8,8 @@
  * @licence Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
  */
 
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+
 require_once('check_composer_exists.php');
 
 $inputConfiguration = [
@@ -53,9 +55,11 @@ $inputConfiguration = [
 ];
 
 // Initialization
-$section = 'wiki page';
 $isHomePage = (! isset($_REQUEST['page']));
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 
 $multilinguallib = TikiLib::lib('multilingual');
 
@@ -217,28 +221,11 @@ if ($prefs['tracker_wikirelation_redirectpage'] == 'y' && ! isset($_REQUEST['adm
     }
 }
 
-// Inline wysiwyg editor
-if (
-    $prefs['wysiwyg_inline_editing'] == 'y' && $page &&
-        (   ($tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'edit')) ||
-            ($tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'edit_inline')) )
-) {
-    TikiLib::lib('wysiwyg')->setUpInlineEditor($page);
-    $inlineEditorContent = TikiLib::lib('edit')->parseToWysiwyg($info['data'], false, false, ['wysiwyg' => true, 'html_editor' => true]);
-    $smarty->assign('inline_editor_content', $inlineEditorContent);
-} elseif (getCookie('wysiwyg_inline_edit', 'preview')) {
-    setCookieSection('wysiwyg_inline_edit', 0, 'preview');  // kill cookie if pref off or no perms
-}
-
 // Process page display options
 $wikilib->processPageDisplayOptions(TikiLib::lib('header'));
 
 #Propagate the fullscreen parameter to templates
-if (isset($_REQUEST['fullscreen'])) {
-    $fullscreen = $_REQUEST['fullscreen'];
-} else {
-    $fullscreen = 'n';
-}
+$fullscreen = $_REQUEST['fullscreen'] ?? 'n';
 $smarty->assign('fullscreen', $fullscreen);
 
 if (! $info || isset($_REQUEST['date']) || isset($_REQUEST['version'])) {
@@ -275,6 +262,22 @@ if (! $info || isset($_REQUEST['date']) || isset($_REQUEST['version'])) {
     }
 }
 
+// Inline wysiwyg editor
+// Placed here to ensure $info is already populated from get_page_info() above
+if (
+    $prefs['wysiwyg_inline_editing'] == 'y' && $page &&
+        (   ($tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'edit')) ||
+            ($tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'edit_inline')) )
+) {
+    TikiLib::lib('wysiwyg')->setUpInlineEditor($page);
+    $inlineEditorContent = TikiLib::lib('edit')->parseToWysiwyg($info['data'], false, false, ['wysiwyg' => true, 'html_editor' => true]);
+    $smarty->assign('inline_editor_content', $inlineEditorContent);
+} elseif (getCookie('wysiwyg_inline_edit', 'preview')) {
+    TikiLib::lib('wysiwyg')->setUpInlineEditor($page);      // init ckeditor
+} elseif (CookieConsentLib::getCookie('wysiwyg_inline_edit', 'preview')) {
+    CookieConsentLib::tikiSetCookie('wysiwyg_inline_edit', 0, CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, 0, 'preview'); // kill cookie if pref off or no perms
+}
+
 if (empty($info)) {
     // If not found maybe was because of old wiki url encode strategy, and the slugs not being regenerated after. The
     // right page to display in this case is one where applying a different slug degeneration to the requested page
@@ -293,7 +296,7 @@ if (empty($info)) {
                 $access->redirect($infoForSlug['pageSlug'], '', 301);
                 exit;
             } else {
-                error_log("Avoiding redirect loop: " . $infoForSlug['pageSlug']);
+                error_log("Avoiding redirect loop: " . $infoForSlug['pageSlug']); // @phpstan-ignore disallowedFunctions.errorLog (redirect loop detection warning)
             }
         }
     }
@@ -330,7 +333,7 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
     }
 
     if (! $isprefixed && ! empty($prefs['url_anonymous_page_not_found']) && empty($user)) {
-        $access->redirect($prefs['url_anonymous_page_not_found']);
+        $access->redirect($prefs['url_anonymous_page_not_found'], allowExternal: true);
     }
 
     if ($user && $prefs['feature_wiki_userpage'] == 'y' && strcasecmp($prefs['feature_wiki_userpage_prefix'], $page) == 0) {
@@ -389,6 +392,8 @@ if (empty($info) && ! ($user && $prefs['feature_wiki_userpage'] == 'y' && strcas
                     $_REQUEST['page'] = $newPage;
                     $_GET['itemId'] = $suffix;  // \ParserLib::parse_wiki_argvariable uses $_GET
                     $_GET['page'] = $newPage;
+                    $jitGet = new JitFilter($_GET);
+                    $jitRequest = new JitFilter($_REQUEST);
                     $smarty->assign('canonical_ending', urlencode(trim(substr($page, strlen($newPage)))));
                     $page = $newPage;
                     $info = $tikilib->get_page_info($_REQUEST['page']);
@@ -467,12 +472,6 @@ if (
 ) {
     $tikilib->check_duplicate_alias($info['data'], $page);
 }
-//Uncomment if we decide to translate wiki markup. For now we are going
-//with translating rendered html content
-//$translatedWikiMarkup = '';
-//if (isset($_REQUEST['machine_translate_to_lang'])) {
-//  $translatedWikiMarkup = generate_machine_translated_markup($info, $_REQUEST['machine_translate_to_lang']);
-//}
 
 if (isset($_REQUEST['approve'], $_REQUEST['revision']) && $_REQUEST['revision'] <= $info['version']) {
     $flaggedrevisionlib = TikiLib::lib('flaggedrevision');
@@ -523,7 +522,7 @@ $pageCache = Tiki_PageCache::create()
     ->requiresPreference('memcache_wiki_output')
     ->addValue('role', 'wiki-page-output')
     ->addValue('page', $page)
-    ->addValue('locale', $prefs['language'])
+    ->addValue('locale', Language::getCurrentLanguage())
     ->addKeys($_GET, array_keys($_GET))
     ->checkMeta('wiki-page-output-meta-timestamp', ['page' => $page,])
     ->dieAndOutputOrStore();
@@ -535,6 +534,31 @@ if ($page_ref_id) {
 // Now check permissions to access this page
 if (! $pageRenderer->canView) {
     $access->display_error($page, tra('You do not have permission to view this page.'), '401');
+}
+
+$smarty->assign('structuresToAdd', []);
+$smarty->assign('showAddToStructureBar', false);
+if (
+    $prefs['feature_wiki_structure'] === 'y'
+    && empty($page_ref_id)
+    && strtolower($page) !== 'sandbox'
+    && $tikilib->page_exists($page)
+    && $tiki_p_edit_structures === 'y'
+) {
+    $pageStructureNames = array_fill_keys(array_column($structs_with_perm, 'pageName'), true);
+    $structuresToAdd = [];
+    $structuresList = $structlib->list_structures(0, -1, 'pageName_asc');
+    foreach ($structuresList['data'] ?? [] as $struct) {
+        if (($struct['edit_structure'] ?? 'n') !== 'y') {
+            continue;
+        }
+        if (isset($pageStructureNames[$struct['pageName']])) {
+            continue;
+        }
+        $structuresToAdd[] = $struct;
+    }
+    $smarty->assign('structuresToAdd', $structuresToAdd);
+    $smarty->assign('showAddToStructureBar', count($structuresToAdd) > 0);
 }
 
 // Convert page to structure
@@ -563,13 +587,12 @@ if (! in_array($page, $_SESSION['breadCrumb'])) {
     if (count($_SESSION['breadCrumb']) > $prefs['userbreadCrumb']) {
         array_shift($_SESSION['breadCrumb']);
     }
-    array_push($_SESSION['breadCrumb'], $page);
 } else {
     // If the page is in the array move to the last position
     $pos = array_search($page, $_SESSION['breadCrumb']);
     unset($_SESSION['breadCrumb'][$pos]);
-    array_push($_SESSION['breadCrumb'], $page);
 }
+$_SESSION['breadCrumb'][] = $page;
 
 // Now increment page hits since we are visiting this page
 $tikilib->add_hit($page);
@@ -761,40 +784,40 @@ if ($prefs['feature_forums'] && $prefs['feature_wiki_discuss'] == 'y' && $prefs[
     $comments_data = tra('Use this thread to discuss the page:') . " [tiki-index.php?page=" . rawurlencode($page) . "|$page]";
     $threadId = $commentslib->check_for_topic($page, $prefs['wiki_forum_id']);
     $comments_coms = $commentslib->get_forum_topics($prefs['wiki_forum_id'], 0, -1);
-    $discuss_replies_cant = 0;
+    $discuss_replies_count = 0;
     foreach ($comments_coms as $topic) {
         if ($topic['threadId'] == $threadId) {
-            $discuss_replies_cant = $topic['replies'];
+            $discuss_replies_count = $topic['replies'];
             break;
         }
     }
-    $smarty->assign('discuss_replies_cant', $discuss_replies_cant);
+    $smarty->assign('discuss_replies_count', $discuss_replies_count);
 }
 
 if (strtolower($_REQUEST["page"]) === 'sandbox') {
     $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 }
+
+// Check if the user is allowed to see wiki actions
+$showWikiActions = true; // Default to showing for all users
+if (! empty($prefs['wiki_page_actions_groups'])) {
+    $allowedGroups = (array)$prefs['wiki_page_actions_groups'];
+
+    if (! empty($allowedGroups)) {
+        $userGroups = Perms::get()->getGroups();
+
+        // Check if any user groups are in allowed groups (case-insensitive)
+        $showWikiActions = (bool)array_uintersect(
+            $userGroups,
+            $allowedGroups,
+            'strcasecmp'
+        );
+    }
+}
+$smarty->assign('show_wiki_actions', $showWikiActions);
 $smarty->assign('info', $info);
 $smarty->assign('mid', 'tiki-show_page.tpl');
 $smarty->display('tiki-show_page.tpl');
-
-// xdebug_dump_function_profile(XDEBUG_PROFILER_CPU);
-// debug: print all objects
-
-
-/**
- * generate machine translation of markup
- * @param $pageInfo
- * @param $targetLang
- * @return string
- */
-function generate_machine_translated_markup($pageInfo, $targetLang)
-{
-    make_sure_machine_translation_is_enabled();
-    $pageContent = $pageInfo['data'];
-    $sourceLang = $pageInfo['lang'];
-    return translate_text($pageContent, $sourceLang, $targetLang);
-}
 
 /**
  * generate machine translation of content

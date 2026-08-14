@@ -1,5 +1,5 @@
 <div id="{$table_id}-div" class="{if $js}table-responsive{/if} ts-wrapperdiv" {if !empty($ts.enabled)}style="visibility:hidden;"{/if}>
-    <table id="{$table_id}" class="table table-striped table-hover" data-count="{$payments.cant|escape}">
+    <table id="{$table_id}" class="table table-striped table-hover" data-count="{$payments.count|escape}">
         <thead>
         <tr>
             <th id="id">{tr}ID{/tr}</th>
@@ -36,7 +36,7 @@
                                         <form method="post">
                                             {ticket}
                                             <input type="hidden" name="cancel" value="{$payment.paymentRequestId}">
-                                            <button type="submit" class="btn btn-link px-0 pt-0" onclick="confirmPopup('{tr _0=$payment.paymentRequestId}Cancel payment %0?{/tr}')">
+                                            <button type="submit" class="btn btn-link px-0 pt-0" onclick="confirmPopup('{tr _0=$payment.paymentRequestId}Cancel payment %0?{/tr}')" aria-label="{tr}Cancel this payment request{/tr}">
                                                 {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Cancel this payment request{/tr}"}
                                             </button>
                                         </form>
@@ -51,5 +51,5 @@
     </table>
 </div>
 {if !$ts.enabled}
-    {pagination_links cant=$payments.cant step=$payments.max offset=$payments.offset offset_arg=$payments.offset_arg}{/pagination_links}
+    {pagination_links count=$payments.count step=$payments.max offset=$payments.offset offset_arg=$payments.offset_arg}{/pagination_links}
 {/if}

@@ -56,9 +56,9 @@ class CustomRouteLib extends TikiLib
                 (preg_match('/^[0-z\\\\]/', $from) || preg_match('/[0-z\\\\]$/', $from))
         ) {
             // $from for TYPE_TRACKER_FIELD routes gets evaluated as a preg_match pattern so must have non alphanum delimiters
-            if (strpos($from, '|') === false) {
+            if (! str_contains($from, '|')) {
                 $from = "|$from|";
-            } elseif (strpos($from, '/') === false) {
+            } elseif (! str_contains($from, '/')) {
                 $from = "/$from/";
             } else {
                 $from = "@$from@";

@@ -1,5 +1,6 @@
 {title help="Live Support"}{tr}Live support system{/tr}{/title}
 
+<div class="styling-element">
 <div class="t_navbar mb-4">
     {button href='#' _onclick="javascript:window.open('tiki-live_support_console.php','','menubar=no,scrollbars=yes,resizable=yes,height=400,width=600');" class="btn btn-primary" _text="{tr}Open operator console{/tr}"}
     {button href='#' _onclick="javascript:window.open('tiki-live_support_client.php','','menubar=no,scrollbars=yes,resizable=yes,height=450,width=300');" class="btn btn-primary" _text="{tr}Open client window{/tr}"}
@@ -62,7 +63,7 @@
             <a href='tiki-live_support_admin.php?removeuser={$online_operators[ix].user|escape}'>{icon name='trash' alt="{tr}Del{/tr}" title="{tr}Del{/tr}"}</a>
             <form action="tiki-live_support_admin.php" method="post" >
                 {ticket}
-                <button type="submit" name="offline" value={$online_operators[ix].user|escape} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
+                <button type="submit" name="offline" value={$online_operators[ix].user|escape} class="tips btn btn-link btn-sm px-0 pt-0 pb-0" aria-label="{tr}Refresh{/tr}">
                     {icon name="stop-watching" _menu_text='y' _menu_icon='y' alt="{tr}Refresh{/tr}"} {tr}offline{/tr}
                 </button>
             </form>
@@ -96,7 +97,7 @@
                         <b>{$offline_operators[ix].user|escape}</b>
                     </td>
                     <td>
-                        <table >
+                        <table>
                             <tr>
                                 <td>{tr}Accepted requests:{/tr}</td>
                                 <td>{$offline_operators[ix].accepted_requests}</td>
@@ -112,7 +113,7 @@
                             <form action="tiki-live_support_admin.php" method="post">
                                 {ticket}
                                 <input type="hidden" name="removeuser" value="{$offline_operators[ix].user}">
-                                <button type="submit" class="btn btn-link px-0 pt-0" title=":{tr}Delete{/tr}" onclick="confirmPopup()">
+                                <button type="submit" class="btn btn-link px-0 pt-0" title=":{tr}Delete{/tr}" onclick="confirmPopup()" aria-label="{tr}Delete{/tr}">
                                 {icon name='trash' _menu_text='n' _menu_icon='y' alt="{tr}Delete{/tr}"}
                                 </button>
                             </form>
@@ -152,3 +153,4 @@
         </div>
     </form>
 {/if}
+</div>

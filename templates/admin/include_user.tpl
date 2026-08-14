@@ -31,14 +31,13 @@
             <fieldset>
                 <legend class="h3">
                     {tr}Default user preferences{/tr}
-                    {help url="UsersDefaultPrefs" desc="{tr}Users Default Preferences{/tr}"}
+                    {help url="User-Preferences" desc="{tr}Users Default Preferences{/tr}"}
                 </legend>
                 <div class="adminoptionbox">
                     {preference name=feature_userPreferences}
                     {preference name=feature_mytiki}
                     {preference name=users_prefs_xmpp_jid}
-                    {preference name=users_prefs_xmpp_password}
-                    {preference name=users_prefs_xmpp_custom_server_http_bind}
+                    {preference name=users_prefs_xmpp_custom_server_endpoint}
                     <div class="adminoptionboxchild" id="feature_mytiki_childcontainer">
                         <legend class="h4">{tr}My Account Items{/tr}</legend>
                         {preference name=users_prefs_mytiki_pages}
@@ -56,6 +55,7 @@
                     {preference name=users_prefs_tasks_maxRecords}
                     {preference name=users_prefs_diff_versions}
                     {preference name=users_prefs_remember_closed_rboxes}
+                    {preference name=users_prefs_notify_oneself}
                 </div>
                 </fieldset>
                 <fieldset>
@@ -107,8 +107,7 @@
                 <div class="adminoptionbox">
                     {preference name=users_prefs_user_information}
                     {preference name=user_show_realnames}
-                    {preference name='urlOnUsername'}
-                    {preference name=users_prefs_show_mouseover_user_info}
+                    {preference name=urlOnUsername}
                     {preference name=user_in_search_result}
                     {preference name=highlight_group}
                     {preference name=feature_display_my_to_others}
@@ -179,6 +178,7 @@
                 {preference name=feature_groupalert}
                 {preference name=feature_webmail}
                 {preference name=feature_notify_users_mention}
+                {preference name=users_prefs_switch_user_notification}
             </fieldset>
         {/tab}
         {tab name="{tr}User Files{/tr}"}

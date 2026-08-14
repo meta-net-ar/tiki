@@ -8,13 +8,17 @@
  * set some default params (mainly utf8 as tiki is utf8) + use the mailCharset pref from a user
  */
 
-use Laminas\Mail\Exception\ExceptionInterface as ZendMailException;
-use SlmMail\Exception\ExceptionInterface as SlmMailException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Exception\RfcComplianceException;
+use Symfony\Component\Mime\Header\ParameterizedHeader;
+use Symfony\Component\Mime\Part\DataPart;
 
 class TikiMail
 {
     /**
-     * @var \Laminas\Mail\Message
+     * @var Email
      */
     private $mail;
     private $charset;
@@ -22,10 +26,10 @@ class TikiMail
 
     /**
      * @param string|null $user to username
-     * @param string|null $from from email
-     * @param string|null $fromName from Name
+     * @param string $from from email
+     * @param string $fromName from Name
      */
-    public function __construct($user = null, $from = null, $fromName = null)
+    public function __construct($user = null, $from = '', $fromName = '')
     {
         global $user_preferences, $prefs;
 
@@ -54,16 +58,15 @@ class TikiMail
         if (! empty($from)) {
             $this->mail = tiki_get_basic_mail();
             try {
-                $this->mail->setFrom($from, $fromName);
-                $this->mail->setSender($from);
-            } catch (Exception $e) {
+                $this->mail->from(new Address($from, $fromName));
+            } catch (Exception) {
                 // was already set, then do nothing
             }
         } else {
             $this->mail = tiki_get_admin_mail($fromName);
         }
         if (! empty($to)) {
-            $this->mail->addTo($to);
+            $this->mail->to($to);
         }
 
         if (empty($this->charset)) {
@@ -75,33 +78,24 @@ class TikiMail
     {
     }
 
-    public function setSender($email, $name = null)
+    public function setSender($email, $name = '')
     {
-        if (! $name) {
-            $name = null;
-        }
-        $this->mail->setSender($email, $name);
+        $this->mail->sender(new Address($email, $name));
     }
 
-    public function setFrom($email, $name = null)
+    public function setFrom($email, $name = '')
     {
-        if (! $name) {
-            $name = null;   // zend now requires "Name must be a string" (or null, not false)
-        }
-        $this->mail->setFrom($email, $name);
+        $this->mail->from(new Address($email, $name));
     }
 
-    public function setReplyTo($email, $name = null)
+    public function setReplyTo($email, $name = '')
     {
-        if (! $name) {
-            $name = null;   // zend now requires "Name must be a string" (or null, not false)
-        }
-        $this->mail->setReplyTo($email, $name);
+        $this->mail->replyTo(new Address($email, $name));
     }
 
     public function setSubject($subject)
     {
-        $this->mail->setSubject($subject);
+        $this->mail->subject($subject);
     }
 
     public function setHtml($html, $text = null, $images_dir = null)
@@ -110,111 +104,16 @@ class TikiMail
         if ($prefs['mail_apply_css'] != 'n') {
             $html = $this->applyStyle($html);
         }
+        $this->mail->html($html, $this->charset);
 
-        $body = $this->mail->getBody();
-        if (! ($body instanceof \Laminas\Mime\Message) && ! empty($body)) {
-            $this->convertBodyToMime($body);
-            $body = $this->mail->getBody();
-        }
-
-        if (! $body instanceof Laminas\Mime\Message) {
-            $body = new Laminas\Mime\Message();
-        }
-
-        $partHtml = false;
-        $partText = false;
-
-        $parts = [];
-        foreach ($body->getParts() as $part) {
-            /* @var $part Laminas\Mime\Part */
-            if ($part->getType() == Laminas\Mime\Mime::TYPE_HTML) {
-                $partHtml = $part;
-                $part->setContent($html);
-                if ($this->charset) {
-                    $part->setCharset($this->charset);
-                }
-            } elseif ($part->getType() == Laminas\Mime\Mime::TYPE_TEXT) {
-                $partText = $part;
-                if ($text) {
-                    $part->setContent($text);
-                    if ($this->charset) {
-                        $part->setCharset($this->charset);
-                    }
-                }
-            } else {
-                $parts[] = $part;
-            }
-        }
-
-        if (! $partText && $text) {
-            $partText = new Laminas\Mime\Part($text);
-            $partText->setType(Laminas\Mime\Mime::TYPE_TEXT);
-            if ($this->charset) {
-                $partText->setCharset($this->charset);
-            }
-        }
-        if ($partText) {
-            $parts[] = $partText;
-        }
-
-        if (! $partHtml) {
-            $partHtml = new Laminas\Mime\Part($html);
-            $partHtml->setType(Laminas\Mime\Mime::TYPE_HTML);
-            if ($this->charset) {
-                $partHtml->setCharset($this->charset);
-            }
-        }
-        $parts[] = $partHtml;
-
-        $body->setParts($parts);
-        $this->mail->setBody($body);
-        // use multipart/alternative for mail clients to display html and fall back to plain text parts
         if ($text) {
-            $this->mail->getHeaders()->get('content-type')->setType('multipart/alternative');
+            $this->mail->text($text, $this->charset);
         }
     }
 
     public function setText($text = '')
     {
-        $body = $this->mail->getBody();
-        if ($body instanceof \Laminas\Mime\Message) {
-            $parts = $body->getParts();
-            $textPartFound = false;
-            foreach ($parts as $part) {
-                /* @var $part Laminas\Mime\Part */
-                if ($part->getType() == Laminas\Mime\Mime::TYPE_TEXT) {
-                    $part->setContent($text);
-                    if ($this->charset) {
-                        $part->setCharset($this->charset);
-                    }
-                    $textPartFound = true;
-                    break;
-                }
-            }
-            if (! $textPartFound) {
-                $part = new Laminas\Mime\Part($text);
-                $part->setType(Laminas\Mime\Mime::TYPE_TEXT);
-                if ($this->charset) {
-                    $part->setCharset($this->charset);
-                }
-                $parts[] = $part;
-            }
-            $body->setParts($parts);
-        } else {
-            $this->mail->setBody($text);
-            if ($this->charset) {
-                $headers = $this->mail->getHeaders();
-                $contentType = $headers->get('Content-type');
-
-                if (! empty($contentType)) {
-                    $headers->removeHeader($contentType);
-                }
-
-                $headers->addHeaderLine(
-                    'Content-type: text/plain; charset=' . $this->charset
-                );
-            }
-        }
+        $this->mail->text($text, $this->charset);
     }
 
     public function setCc($address)
@@ -234,87 +133,89 @@ class TikiMail
     public function setHeader($name, $value)
     {
         $headers = $this->mail->getHeaders();
+        if (is_string($value)) {
+            $value = explode(',', trim($value));
+        }
         switch ($name) {
             case 'Message-Id':
-                $headers->addHeader(Laminas\Mail\Header\MessageId::fromString('Message-ID: ' . trim($value)));
+                $headers->addIdHeader('Message-ID', $value);
                 break;
             case 'In-Reply-To':
-                $headers->addHeader(Laminas\Mail\Header\InReplyTo::fromString('In-Reply-To: ' . trim($value)));
+                $headers->addIdHeader('In-Reply-To', $value);
                 break;
             case 'References':
-                $headers->addHeader(Laminas\Mail\Header\References::fromString('References: ' . trim($value)));
+                $headers->addIdHeader('References', $value);
                 break;
             default:
-                $this->mail->getHeaders()->addHeaderLine($name, $value);
+                $headers->addTextHeader($name, implode(',', $value));
                 break;
         }
     }
 
     public function addPart($content, $type)
     {
-        $body = $this->mail->getBody();
-        if (! ($body instanceof \Laminas\Mime\Message)) {
-            $this->convertBodyToMime($body);
-            $body = $this->mail->getBody();
+        // handle type lib/core/Tiki/SabreDav/Utilities.php: 'text/calendar; method=PUBLISH; name=event.ics'
+        $parts = explode(';', $type);
+        $contentType = trim(array_shift($parts));
+
+        $params = [];
+        foreach ($parts as $param) {
+            $param = trim($param);
+            if (str_contains($param, '=')) {
+                list($key, $value) = explode('=', $param, 2);
+                $params[strtolower(trim($key))] = trim($value, '" ');
+            }
         }
-        $part = new Laminas\Mime\Part($content);
-        $part->setType($type);
-        $part->setCharset($this->charset);
-        $body->addPart($part);
-        $headers = $this->mail->getHeaders();
-        $headers->removeHeader('Content-type');
-        $headers->addHeaderLine(
-            'Content-type: multipart/mixed; boundary="' . $body->getMime()->boundary() . '"'
-        );
+
+        $filename = $params['name'] ?? null;
+        if (empty($filename)) {
+            $ext = explode('/', $contentType);
+            $ext = end($ext);
+            if (str_contains($ext, '+')) { // Handle types like application/xml+svg
+                $extParts = explode('+', $ext);
+                $ext = end($extParts);
+            }
+            $filename = 'part_' . uniqid() . '.' . $ext;
+        }
+
+        $dataPart = new DataPart($content, $filename, $contentType);
+
+        $headers = $dataPart->getPreparedHeaders();
+        $headers->remove('Content-Type');
+        $contentTypeHeader = new ParameterizedHeader('Content-Type', $contentType, ['method' => $params[' method']]);
+        $headers->add($contentTypeHeader);
+        $this->mail->addPart($dataPart);
     }
 
     /**
-     * Get the Laminas Message object
+     * Get the Symfony Message object
      *
-     * @return \Laminas\Mail\Message
+     * @return Email
      */
     public function getMessage()
     {
         return $this->mail;
     }
 
-    public function setLaminasMessageBody($mail)
-    {
-        $emailBody = $mail->getBody();
-        if ($emailBody instanceof \Laminas\Mime\Message) {
-            foreach ($emailBody->getParts() as $part) {
-                if ($part->getType() == \Laminas\Mime\Mime::TYPE_HTML) {
-                    $this->setHtml($part->getContent());
-                } elseif ($part->getType() == \Laminas\Mime\Mime::TYPE_TEXT) {
-                    $this->setText($part->getContent());
-                } else {
-                    $this->addPart($part->getContent(), $part->getType());
-                }
-            }
-        } else {
-            $this->setText($emailBody);
-        }
-    }
-
     public function send($recipients, $type = 'mail')
     {
         global $tikilib, $prefs;
         $logslib = TikiLib::lib('logs');
-
         $logEmailRes = [];
         $logEmailRes['subject'] = trim($this->mail->getSubject());
         foreach ($this->mail->getFrom() as $address) {
-            $logEmailRes['from_email'] = $address->getEmail();
+            $logEmailRes['from_email'] = $address->getAddress();
             $logEmailRes['from_name'] = $address->getName();
             break;
         }
 
-        $this->mail->getHeaders()->removeHeader('to');
+        $this->mail->getHeaders()->remove('to'); // Ensure 'To' header is managed by addCc/addBcc for sending
+        $addedRecipients = [];
         foreach ((array) $recipients as $to) {
             try {
                 $this->mail->addTo($to);
-            } catch (Laminas\Mail\Exception\InvalidArgumentException $e) {
-                $title = 'mail error';
+                $addedRecipients[] = trim($to);
+            } catch (RfcComplianceException $e) {
                 $error = $e->getMessage();
                 $this->errors[] = $error;
                 $error = ' [' . $error . ']';
@@ -325,44 +226,42 @@ class TikiMail
             }
         }
 
-        $email_body = $this->mail->getBody();
+        if (empty($addedRecipients)) {
+            return false;
+        }
+
         if ($prefs['email_footer']) {
-            if (is_string($email_body)) {
-                $new_body = $email_body . PHP_EOL . PHP_EOL . $prefs['email_footer'];
-                $this->mail->setBody($new_body);
-            } else {
-                $has_html = false;
-                $has_text = false;
-                foreach ($email_body->getParts() as $part) {
-                    $content = $part->getContent();
-                    if ($part->getType() === 'text/html') {
-                        $has_html = true;
-                        $content = str_replace('</body>', '<br><br>' . $prefs['email_footer'] . '</body>', $content);
-                    } else {    // hopefully plain text
-                        $has_text = true;
-                        $content = $content . PHP_EOL . PHP_EOL . $prefs['email_footer'];
-                    }
-                    $part->setContent($content);
-                }
-                $this->mail->setBody($email_body);
-                if ($has_html && $has_text) {
-                    // use multipart/alternative for mail clients to display html and fall back to plain text parts
-                    $this->mail->getHeaders()->get('content-type')->setType('multipart/alternative');
+            $footer = PHP_EOL . PHP_EOL . $prefs['email_footer'];
+            $htmlFooter = '<br><br>' . $prefs['email_footer'];
+
+            $currentTextBody = $this->mail->getTextBody();
+            $currentHtmlBody = $this->mail->getHtmlBody();
+
+            if ($currentTextBody) {
+                $this->mail->text($currentTextBody . $footer, $this->charset);
+            }
+
+            if ($currentHtmlBody) {
+                if (str_contains($currentHtmlBody, '</body>')) {
+                    $this->mail->html(str_replace('</body>', $htmlFooter . '</body>', $currentHtmlBody), $this->charset);
+                } else {
+                    $this->mail->html($currentHtmlBody . $htmlFooter, $this->charset);
                 }
             }
         }
 
-        if ($prefs['zend_mail_queue'] == 'y') {
+        if ($prefs['mailer_queue'] == 'y') {
             $query = "INSERT INTO `tiki_mail_queue` (message) VALUES (?)";
             $bindvars = [serialize($this->mail)];
             $tikilib->query($query, $bindvars, -1, 0);
             $title = 'mail';
         } else {
             try {
+                // This is the key line to investigate if there's a problem
                 tiki_send_email($this->mail);
                 $title = 'mail';
                 $error = '';
-            } catch (ZendMailException | SlmMailException $e) {
+            } catch (TransportExceptionInterface | \Throwable $e) {
                 $title = 'mail error';
                 $error = $e->getMessage();
                 $this->errors[] = $error;
@@ -370,7 +269,7 @@ class TikiMail
             }
 
             if ($title == 'mail error' || $prefs['log_mail'] == 'y') {
-                foreach ((array) $recipients as $u) {
+                foreach ($addedRecipients as $u) {
                     $emailStatus = empty($error) ? 'success' : 'error';
                     $logEmailRes['to'] = $u;
                     $logEmailRes[$emailStatus] = empty($error) ? 'Email has been sent' : $error;
@@ -381,29 +280,9 @@ class TikiMail
         return $title == 'mail';
     }
 
-    protected function convertBodyToMime($text)
-    {
-        $textPart = new Laminas\Mime\Part($text);
-        $textPart->setType(Laminas\Mime\Mime::TYPE_TEXT);
-        $newBody = new Laminas\Mime\Message();
-        $newBody->addPart($textPart);
-        $this->mail->setBody($newBody);
-    }
-
     public function addAttachment($data, $filename, $mimetype)
     {
-        $body = $this->mail->getBody();
-        if (! ($body instanceof \Laminas\Mime\Message)) {
-            $this->convertBodyToMime($body);
-            $body = $this->mail->getBody();
-        }
-
-        $attachment = new Laminas\Mime\Part($data);
-        $attachment->setFileName($filename);
-        $attachment->setType($mimetype);
-        $attachment->setEncoding(Laminas\Mime\Mime::ENCODING_BASE64);
-        $attachment->setDisposition(Laminas\Mime\Mime::DISPOSITION_INLINE);
-        $body->addPart($attachment);
+        $this->mail->attach($data, $filename, $mimetype);
     }
 
     private function collectCss()
@@ -423,10 +302,10 @@ class TikiMail
         $contents = array_map(function ($file) {
             if ($file[0] == '/') {
                 return file_get_contents($file);
-            } elseif (substr($file, 0, 4) == 'http') {
+            } elseif (str_starts_with($file, 'http')) {
                 return TikiLib::lib('tiki')->httprequest($file);
             } else {
-                if (strpos($file, 'themes/') === 0) {   // only use the tiki base and current theme files
+                if (str_starts_with($file, 'themes/')) {   // only use the tiki base and current theme files
                     return file_get_contents(TIKI_PATH . '/' . $file);
                 }
             }
@@ -449,63 +328,4 @@ class TikiMail
         $html = $processor->convert($html, $css);
         return $html;
     }
-}
-
-/**
- * Format text, sender and date for a plain text email reply
- * - Split into 75 char long lines prepended with >
- *
- * @param $text     email text to be quoted
- * @param $from     email from name/address to be quoted
- * @param $date     date of mail to be quoted
- * @return string   text ready for replying in a plain text email
- */
-function format_email_reply(&$text, $from, $date)
-{
-    $lines = preg_split('/[\n\r]+/', wordwrap($text));
-
-    for ($i = 0, $icount_lines = count($lines); $i < $icount_lines; $i++) {
-        $lines[$i] = '> ' . $lines[$i] . "\n";
-    }
-    $str = ! empty($from) ? $from . ' wrote' : '';
-    $str .= ! empty($date) ? ' on ' . $date : '';
-    $str = "\n\n\n" . $str . "\n" . implode($lines);
-
-    return $str;
-}
-
-/**
- * Attempt to close any unclosed HTML tags
- * Needs to work with what's inside the BODY
- * originally from http://snipplr.com/view/3618/close-tags-in-a-htmlsnippet/
- *
- * @param $html         html input
- * @return string       corrected html out
- */
-function closetags($html)
-{
-    #put all opened tags into an array
-    preg_match_all("#<([a-z]+)( .*)?(?!/)>#iU", $html, $result);
-    $openedtags = $result[1];
-
-    #put all closed tags into an array
-    preg_match_all("#</([a-z]+)>#iU", $html, $result);
-    $closedtags = $result[1];
-    $len_opened = count($openedtags);
-
-    # all tags are closed
-    if (count($closedtags) == $len_opened) {
-        return $html;
-    }
-    $openedtags = array_reverse($openedtags);
-
-    # close tags
-    for ($i = 0; $i < $len_opened; $i++) {
-        if (! in_array($openedtags[$i], $closedtags)) {
-            $html .= "</" . $openedtags[$i] . ">";
-        } else {
-            unset($closedtags[array_search($openedtags[$i], $closedtags)]);
-        }
-    }
-    return $html;
 }

@@ -129,7 +129,7 @@ class Tracker_Field_Location extends \Tracker\Field\AbstractItemField implements
                 'value' => $value,
                 'x' => $parts[0],
                 'y' => $parts[1],
-                'z' => isset($parts[2]) ? $parts[2] : 0,
+                'z' => $parts[2] ?? 0,
             ];
         } else {
             return [
@@ -143,6 +143,7 @@ class Tracker_Field_Location extends \Tracker\Field\AbstractItemField implements
 
     public function renderInput($context = [])
     {
+        TikiLib::lib('header')->add_map();
         return $this->renderTemplate('trackerinput/location.tpl', $context);
     }
 
@@ -170,14 +171,14 @@ class Tracker_Field_Location extends \Tracker\Field\AbstractItemField implements
         if (! empty(array_filter($sourceFieldsList))) {
             $event = $this->getOption('sourceSearchEvent');
 
-            $emptyValue = ! $value || strpos($value, '0,0,') !== false;
+            $emptyValue = ! $value || str_contains($value, '0,0,');
 
             if ($event === 'save' && $emptyValue || $event === 'savealways') {
                 $value = $this->searchForLocation($sourceFieldsList);
             }
         }
 
-        if (strpos($value, '0,0,') !== false) {
+        if (str_contains($value, '0,0,')) {
             $value = '';
         }
 

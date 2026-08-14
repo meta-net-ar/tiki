@@ -1,5 +1,5 @@
 {title help="Directory Categories" url="tiki-directory_admin_categories.php?parent=$parent"}{tr}Admin directory categories{/tr}{/title}
-
+<div class="styling-element">
 {* Display the title using parent *}
 {include file='tiki-directory_admin_bar.tpl'}
 
@@ -149,7 +149,7 @@
                                     <input type="hidden" name="offset" value="{$offset}">
                                     <input type="hidden" name="sort_mode" value="{$sort_mode}">
                                     <input type="hidden" name="remove" value="{$items[user].categId}">
-                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup()">
+                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup()" aria-label="{tr}Remove{/tr}">
                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                     </button>
                                 </form>
@@ -163,4 +163,5 @@
         {/section}
     </table>
 </div>
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+</div>

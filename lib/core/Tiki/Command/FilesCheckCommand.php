@@ -15,7 +15,7 @@ use Tiki\Files\CheckAttachmentGallery;
 use Tiki\Files\CheckFileGallery;
 
 /**
- * Command to check the status of the files in File and Image Gallery
+ * Command to check the status of the files in File Gallery
  */
 #[AsCommand(
     name: 'files:check',
@@ -35,12 +35,6 @@ class FilesCheckCommand extends Command
         $checkFileGallery = new CheckFileGallery();
         $result = $checkFileGallery->analyse();
         $this->printResults($output, $result, tr('File Gallery'));
-
-        $output->writeln('');
-
-        $checkAttachmentGallery = new CheckAttachmentGallery('t');
-        $result = $checkAttachmentGallery->analyse();
-        $this->printResults($output, $result, tr('Tracker Attachments'));
 
         $output->writeln('');
 

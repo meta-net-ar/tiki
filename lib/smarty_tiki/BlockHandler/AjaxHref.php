@@ -28,7 +28,7 @@ class AjaxHref extends Base
 
         if (! empty($params['_onclick'])) {
             $onclick = $params['_onclick'];
-            if (substr($onclick, -1) != ';') {
+            if (! str_ends_with($onclick, ';')) {
                 $onclick .= ';';
             }
         } else {

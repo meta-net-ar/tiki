@@ -6,7 +6,7 @@
     {/if}
 
     {if $blogId gt 0}
-        {assign var=thisblog value=$blogId|sefurl:blog}
+        {$thisblog=$blogId|sefurl:blog}
         {button href=$thisblog class="btn btn-info" _text="{tr}View Blog{/tr}"}
     {/if}
 
@@ -23,12 +23,13 @@
 {/if}
 
 {if $preview eq 'y'}
-    <div align="center" class="attention" style="font-weight:bold">{tr}Note: Remember that this is only a preview, and has not yet been saved!{/tr}</div>
-    <article class="blogpost post post_single">
+    <div class="alert alert-warning fw-bold">{tr}Note: Remember that this is only a preview, and has not yet been saved!{/tr}</div>
+    <article class="blogpost post post_single border-0 pb-5 bg-transparent">
         {include file='blog_wrapper.tpl' blog_post_context='preview'}
     </article>
 {/if}
 
+<div class="styling-element">
 {capture name=actionUrlParam}{strip}
     {if $postId > 0 && $blogId > 0}
         ?blogId={$blogId}&postId={$postId}
@@ -60,7 +61,7 @@
         <div class="mb-3 row">
             <div class="col-md-12">
                 <label class="col-form-label" for="blog_title">{tr}Title{/tr}</label>
-                <input type="text" maxlength="255" class="form-control" name="title" id="blog_title" {if isset($post_info.title)}value="{$post_info.title|escape}"{/if}>
+                <input type="text" maxlength="{$MAX_BLOG_POST_TITLE_LENGTH}" class="form-control" name="title" id="blog_title" {if isset($post_info.title)}value="{$post_info.title|escape}"{/if}>
             </div>
         </div>
         {if isset($blog_data) and $blog_data.use_excerpt eq 'y'}
@@ -149,3 +150,4 @@
         <input type="submit" class="btn btn-link" name="cancel" onclick='document.location="{$referer|escape:'html'}";needToConfirm=false;return false;' value="{tr}Cancel{/tr}">
     </div>
 </form>
+</div>

@@ -30,7 +30,7 @@ function collect($dir)
         $list = file("$dir/CVS/Entries");
         foreach ($list as $l) {
             // if (count($dirs) > 20) return true;
-            if (strstr($l, '/')) {
+            if (str_contains($l, '/')) {
                 $s = explode('/', rtrim($l));
                 $filepath = $dir . '/' . $s[1];
                 if ($s[0] == 'D') {

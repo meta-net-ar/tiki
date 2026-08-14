@@ -1,0 +1,19 @@
+---
+type: object
+properties:
+  seo_title:
+    type: string
+    description: Content of the SEO title tag, used for search engine optimization (max 160 characters)
+  seo_description:
+    type: string
+    description: Page meta description used for search engine optimization (max 200 characters)
+  categories:
+    type: array
+    items:
+      type: integer
+    description: Full replacement list of category IDs assigned to the page
+  tags:
+    type: array
+    items:
+      type: string
+    description: Full replacement list of freetags assigned to the page. Multi-word tags are supported.

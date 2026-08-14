@@ -4,11 +4,25 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\Lib\Unoconv\UnoconvLib;
+use Tiki\Lib\Unoconv\UnoconvStrategy;
+use Tiki\Lib\Unoconv\UnoserverStrategy;
 
 function prefs_alchemy_list()
 {
+    $mediaAlchemystHelp = 'Media-Alchemyst';
+
     $prefs = [
+        'alchemy_converter_type' => [
+            'name' => tra('Document Converter'),
+            'description' => tra('Select the converter to use for office documents.'),
+            'type' => 'list',
+            'options' => [
+                UnoconvStrategy::NAME => tra('Unoconv'),
+                UnoserverStrategy::NAME => tra('Unoserver')
+            ],
+            'default' => UnoconvStrategy::NAME,
+            'help' => $mediaAlchemystHelp,
+        ],
         'alchemy_ffmpeg_path' => [
             'name' => tra('ffmpeg path'),
             'description' => tra('Path to the location of the ffmpeg binary'),
@@ -29,6 +43,7 @@ function prefs_alchemy_list()
             'name' => tra('Alchemy Image library'),
             'description' => tra('Select either Image Magick or GD Graphics Library.'),
             'type' => 'list',
+            'help' => 'https://imagine.readthedocs.io/en/latest/usage/introduction.html#drivers',
             'options' => [
                 'imagick' => tra('Imagemagick'),
                 'gd' => tra('GD')
@@ -41,6 +56,7 @@ function prefs_alchemy_list()
             'type' => 'text',
             'size' => '256',
             'default' => '/usr/bin/unoconv',
+            'help' => $mediaAlchemystHelp,
         ],
         'alchemy_gs_path' => [
             'name' => tra('ghostscript path'),
@@ -48,6 +64,7 @@ function prefs_alchemy_list()
             'type' => 'text',
             'size' => '256',
             'default' => '/usr/bin/gs',
+            'help' => $mediaAlchemystHelp,
         ],
         'alchemy_unoconv_timeout' => [
             'name' => tra('unoconv timeout'),
@@ -56,6 +73,7 @@ function prefs_alchemy_list()
             'type' => 'text',
             'default' => 60,
             'units' => tra('seconds'),
+            'help' => $mediaAlchemystHelp,
         ],
         'alchemy_unoconv_port' => [
             'name' => tra('unoconv port'),
@@ -63,7 +81,17 @@ function prefs_alchemy_list()
             'type' => 'text',
             'size' => '5',
             'filter' => 'digits',
-            'default' => UnoconvLib::DEFAULT_PORT,
+            'default' => UnoconvStrategy::DEFAULT_PORT,
+            'help' => $mediaAlchemystHelp,
+        ],
+        'alchemy_unoserver_port' => [
+            'name' => tra('unoserver port'),
+            'description' => tra('unoserver daemon port.'),
+            'type' => 'text',
+            'size' => '5',
+            'filter' => 'digits',
+            'default' => UnoserverStrategy::DEFAULT_PORT,
+            'help' => $mediaAlchemystHelp,
         ],
     ];
 

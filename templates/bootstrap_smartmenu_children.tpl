@@ -1,12 +1,14 @@
-{if not empty($item.children)}
+{if $item.type eq '-' or ($item.type eq 's' and empty($item.name)) or (empty($item.name) and empty($item.sefurl) and empty($item.children) and empty($item.block))}
+    <li role="separator" class="px-3"><hr class="dropdown-divider my-2"></li>
+{elseif not empty($item.children)}
     <li class="sm-sub-item {if $item.selected|default:null} active{/if} {$item.class|escape}">
-        <a href="{$item.sefurl|escape}" class="sm-sub-link dropdown-item sm-sub-toggler" data-bs-toggle="dropdown">
+        <a href="#sm_submenu_{$item.optionId|escape}" class="sm-sub-link dropdown-item sm-sub-toggler" data-bs-toggle="collapse" aria-expanded="false">
             {if $menu_info.use_items_icons eq "y" && $item.icon}
                 <span class="me-2">{icon name=$item.icon}</span>
             {/if}
-            <span class="mwnu-item-label me-auto">{tr}{$item.name}{/tr}</span>
+            <span class="menu-item-label me-auto">{tr}{$item.name}{/tr}</span>&nbsp;<small>{icon name="caret-down"}</small>
         </a>
-        <ul class="sm-sub dropdown-menu">
+        <ul id="sm_submenu_{$item.optionId|escape}" class="sm-sub dropdown-menu collapse">
             {* {if $sub}
                 <li class="dropdown-header">{tr}{$item.name}{/tr}</li>
                 <li class="dropdown-divider"></li>

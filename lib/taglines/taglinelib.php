@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -32,16 +32,16 @@ class TagLineLib extends TikiLib
             $bindvars = [];
         }
         $query = "select * from `tiki_cookies` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_cookies` $mid";
+        $query_count = "select count(*) from `tiki_cookies` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
         while ($res = $result->fetchRow()) {
             $ret[] = $res;
         }
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -49,7 +49,7 @@ class TagLineLib extends TikiLib
      * @param $cookieId
      * @param $cookie
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function replace_cookie($cookieId, $cookie)
     {
@@ -70,7 +70,7 @@ class TagLineLib extends TikiLib
     /**
      * @param $cookieId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_cookie($cookieId)
     {
@@ -95,7 +95,7 @@ class TagLineLib extends TikiLib
     }
 
     /**
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function remove_all_cookies()
     {

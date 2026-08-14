@@ -17,7 +17,6 @@ class QuerySourceEntry implements SourceEntryInterface
 
     public function render(\Tracker\Tabular\Schema\Column $column, $allow_multiple)
     {
-        $field = $column->getField();
         $value = $this->raw($column);
 
         $extra = [];

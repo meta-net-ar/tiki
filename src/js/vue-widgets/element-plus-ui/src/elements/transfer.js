@@ -26,7 +26,7 @@ customElements.define(
                 },
                 { immediate: true, deep: true }
             );
-            return () => h(Transfer, { ...internalState, emitValueChange, emitCustomEvent }, ctx.slots);
+            return () => h(Transfer, { ...internalState, emitValueChange, emitCustomEvent, _emit: ctx.emit }, ctx.slots);
         },
         {
             styles: [styles],

@@ -11,17 +11,32 @@
             <div class="pe-1">
                 <label class="sr-only" for="filter~content">{tr}Search Query{/tr}</label>
                 <div class="input-group">
-                    <input class="form-control" type="search" name="filter~content" value="{$filter.content|escape}"/>
-                    <input type="submit" class="btn btn-info" value="{tr}Search{/tr}"/>
+                    <input class="form-control" type="search" name="filter~content" value="{$filter.content|escape}" placeholder="{tr}Search{/tr}"/>
                 </div>
                 {foreach from=$facets item=facet}
                     <input type="hidden" name="filter~{$facet|escape}" value="{$postfilter[$facet]|default:$filter[$facet]|escape}"/>
                 {/foreach}
             </div>
+            <div class="ps-1">
+                <input type="hidden" name="filter~fields" value="{$filter.fields|escape}"/>
+                <select id="filter-fields" class="form-select" multiple placeholder="{tr}Search in fields{/tr}">
+                    {foreach from=$filter_fields item=field}
+                        <option value="{$field|escape}"{if in_array($field, explode(',', $filter.fields))} selected{/if}>{tr}{$field|escape}{/tr}</option>
+                    {/foreach}
+                </select>
+                {jq}
+                    $('#filter-fields').on('change', function () {
+                        $('input[name="filter~fields"]').val($(this).val().join(','));
+                    });
+                {/jq}
+            </div>
+            <div class="ps-1">
+                <input type="submit" class="btn btn-primary btn-sm" value="{tr}Search{/tr}"/>
+            </div>
             {if $prefs.tracker_tabular_enabled eq 'y' && ! empty($smarty.get.tabularId)}
                 <div class="px-1">
                     <input type="hidden" name="tabularId" value="{$smarty.get.tabularId|escape}">
-                    <button class="tabular-export btn btn-secondary">
+                    <button class="tabular-export btn btn-secondary btn-sm">
                         {icon name=export} {tr}Export{/tr}
                     </button>
                     {jq}
@@ -36,7 +51,7 @@
                 </div>
             {elseif $prefs.tracker_tabular_enabled eq 'y' && ! empty($filter.tracker_id)}
                 <div class="px-1">
-                    <button class="tabular-export btn btn-secondary">
+                    <button class="tabular-export btn btn-secondary btn-sm">
                         {icon name=export} {tr}Export{/tr}
                     </button>
                     {jq}
@@ -55,8 +70,8 @@
             {if $prefs.storedsearch_enabled eq 'y' and $user}
                 <div class="ps-1">
                     <input type="hidden" name="storeAs" value=""/>
-                    <a href="{service controller=search_stored action=select modal=true}" id="store-query" class="btn btn-secondary">{tr}Save Search{/tr}</a>
-                    <a href="{service controller=search_stored action=list}" class="btn btn-link">{tr}View Saved Searches{/tr}</a>
+                    <a href="{service controller=search_stored action=select modal=true}" id="store-query" class="btn btn-secondary btn-sm">{tr}Save Search{/tr}</a>
+                    <a href="{service controller=search_stored action=list}" class="btn btn-link btn-sm">{tr}View Saved Searches{/tr}</a>
                     {jq}
                         $('#store-query').clickModal({
                             success: function (data) {

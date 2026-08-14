@@ -4,6 +4,8 @@
 
 {remarksbox type=warning title="{tr}Warning{/tr}" close="y"}
     {tr}Mini Calendar feature is deprecated in Tiki 27 and will be removed starting from Tiki 28. You are advised to migrate to Tiki Calendars.{/tr}
+    <br>
+    {tr}To migrate: run{/tr} <code>php console.php calendar:migrate:minical --help</code> for more details.
 {/remarksbox}
 
 <div class="t_navbar mb-4">
@@ -81,7 +83,7 @@
                                         {ticket}
                                         <input type="hidden" name="view" value="{$view}">
                                         <input type="hidden" name="remove" value="{$slots[ix].events[jj].eventId}">
-                                        <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup()">
+                                        <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup()" aria-label="{tr}Remove{/tr}">
                                             {icon name='remove' alt="{tr}Remove{/tr}" style="vertical-align:middle;"}
                                         </button>
                                     </form>
@@ -194,7 +196,7 @@
         </div>
     </form>
 
-    {pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
 {/if}
 
 <a id="add"></a>

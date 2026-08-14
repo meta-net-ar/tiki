@@ -1,6 +1,8 @@
-<a id="notification-link" href="{bootstrap_modal controller=monitor action=unread quantity=6}" title="{tr}Notifications{/tr}" class="nav-link">
-    {icon name="notification"}
-</a>
+<div class="nav">
+    <a id="notification-link" href="{bootstrap_modal controller=monitor action=unread quantity=6}" title=":{tr}Notifications{/tr}" class="nav-link tips">
+        {icon name="notification"}
+    </a>
+</div>
 {if !empty($prefs.monitor_count_refresh_interval)}
     {jq}
     var key = 'notification_count_{{$user|default:anonymous}}';
@@ -27,7 +29,7 @@
         $.localStorage.load(key, function (data) {
             $('.badge', link).remove();
             if (data.count > 0) {
-                $('<span class="badge">').text(data.count).prependTo(link);
+                $('<span class="badge text-bg-danger">').text(data.count).prependTo(link);
             }
         }, function (callback) {
             $.getJSON($.service('monitor', 'unread', {nodata: 1}), function (data) {

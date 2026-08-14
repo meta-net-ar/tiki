@@ -290,7 +290,7 @@ class Search_Elastic_QueryBuilder
                     "operator" => "and",
                 ],
             ]];
-        } elseif ($node->getType() == 'plaintext' && strstr($value, '*')) {
+        } elseif ($node->getType() == 'plaintext' && str_contains($value, '*')) {
             return ["wildcard" => [
                 $this->getNodeField($node) => strtolower($value),
             ]];

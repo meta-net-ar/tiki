@@ -59,8 +59,8 @@ class Services_Wiki_Controller
             false,
             true,
             $input->onlyOrphans->text() == 'y',
-            $input->filter->asArray(),
-            $input->onlyCant->text() == 'y'
+            $input->asArray(),
+            $input->onlyCount->text() == 'y'
         );
     }
 
@@ -72,7 +72,8 @@ class Services_Wiki_Controller
     public function action_get_page($input)
     {
         $page = $input->page->text();
-        $info = TikiLib::lib('wiki')->get_page_info($page);
+        $skipCache = (bool) $input->nocache->int();
+        $info = TikiLib::lib('wiki')->get_page_info($page, true, $skipCache);
         if (! $info) {
             throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
         }
@@ -82,11 +83,63 @@ class Services_Wiki_Controller
             throw new Services_Exception_Denied();
         }
 
+        // raw=1: return raw wiki syntax for programmatic consumers (MCP, API).
+        // Requires edit permission — raw source may contain plugin calls,
+        // SQL queries, and other content that get_parse() would filter.
+        if ($input->raw->int()) {
+            if (! $perms->edit) {
+                throw new Services_Exception_Denied(tr('Edit permission required for raw page source'));
+            }
+            return $info;
+        }
+
         $canBeRefreshed = false;
         $data = TikiLib::lib('wiki')->get_parse($page, $canBeRefreshed);
         $result = array_merge($info, ['data' => $data]);
 
         return $result;
+    }
+
+    /**
+     * Get version history for a wiki page.
+     *
+     * @param $input JitFilter with: page (text), offset (int), maxRecords (int)
+     * @return array{versions: array, total: int}
+     * @throws Services_Exception_NotFound
+     * @throws Services_Exception_Denied
+     */
+    public function action_history($input)
+    {
+        $page = $input->page->text();
+        $info = TikiLib::lib('tiki')->get_page_info($page, false);
+        if (! $info) {
+            throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
+        }
+
+        $perms = Perms::get('wiki page', $page);
+        if (! $perms->view) {
+            throw new Services_Exception_Denied();
+        }
+
+        $offset = $input->offset->int();
+        $limit = $input->maxRecords->int() ?: -1;
+
+        $history = TikiLib::lib('hist')->get_page_history($page, false, $offset, $limit);
+
+        $versions = [];
+        foreach ($history as $entry) {
+            $versions[] = [
+                'version' => (int)($entry['version'] ?? 0),
+                'lastModif' => (int)($entry['lastModif'] ?? 0),
+                'user' => $entry['user'] ?? '',
+                'comment' => $entry['comment'] ?? '',
+            ];
+        }
+
+        return [
+            'versions' => $versions,
+            'total' => (int)($info['version'] ?? count($versions)),
+        ];
     }
 
     /**
@@ -483,7 +536,7 @@ class Services_Wiki_Controller
             //return to page
             if (
                 count($util->items) === 1 && ($all || $util->extra['one'])
-                && strpos($_SERVER['HTTP_REFERER'], $allinfo['pageName']) !== false
+                && strpos($_SERVER['HTTP_REFERER'] ?? '', $allinfo['pageName']) !== false
             ) {
                 //go to tiki index if the page the user was on has been deleted - avoids no page found error.
                 global $prefs, $base_url;
@@ -891,52 +944,6 @@ class Services_Wiki_Controller
     }
 
     /**
-     * Listpages "perform with checked" action to zip pages
-     *
-     * @param $input
-     * @return array
-     * @throws Exception
-     * @throws Services_Exception
-     * @throws Services_Exception_Denied
-     */
-    public function action_zip($input)
-    {
-        Services_Exception_Denied::checkGlobal('admin');
-        $util = new Services_Utilities();
-        //first pass - show confirm modal popup
-        if ($util->notConfirmPost()) {
-            $util->setVars($input, $this->filters, 'checked');
-            if ($util->itemsCount > 0) {
-                if ($util->itemsCount === 1) {
-                    $msg = tr('Download a zipped file of the following page?');
-                } else {
-                    $msg = tr('Download a zipped file of the following pages?');
-                }
-                return $util->confirm($msg, tra('Zip'));
-            } else {
-                Services_Utilities::modalException(tra('No pages were selected. Please select one or more pages.'));
-            }
-        //after confirm submit - perform action
-        } elseif ($util->checkCsrf()) {
-            $util->setVars($input, $this->filters, 'items');
-            include_once('lib/wiki/xmllib.php');
-            $xmllib = new XmlLib();
-            $zipFile = 'dump/xml.zip';
-            $config['debug'] = false;
-            if ($xmllib->export_pages($util->items, null, $zipFile, $config)) {
-                if (! $config['debug']) {
-                    global $base_url;
-                    return ['url' => $base_url . $zipFile];
-                }
-            } else {
-                Feedback::error(['mes' => $xmllib->get_error()]);
-            }
-            //return to page
-            return Services_Utilities::closeModal();
-        }
-    }
-
-    /**
      * Listpages "perform with checked" action to add page name as title to pages
      *
      * @param $input
@@ -1009,6 +1016,104 @@ class Services_Wiki_Controller
     }
 
     /**
+     * Partially updates a wiki page (SEO title, description, categories, tags)
+     * @param $input
+     * @return array
+     * @throws Services_Exception_NotFound
+     * @throws Services_Exception_Denied
+     */
+    public function action_patch_page($input)
+    {
+        global $user, $prefs;
+
+        $page = $input->page->pagename();
+        $tikilib = TikiLib::lib('tiki');
+        $info = $tikilib->get_page_info($page);
+
+        if (! $info) {
+            throw new Services_Exception_NotFound(tr('Page "%0" not found', $page));
+        }
+
+        $perms = Perms::get('wiki page', $page);
+        if (! $perms->edit) {
+            throw new Services_Exception_Denied();
+        }
+
+        $updated = [];
+
+        // Update SEO title (stored as a wiki page attribute)
+        // Uses JitFilter 'text' filter which applies StripTags — safe for unicode (ä, ö, ü, ß, etc.)
+        if (isset($input['seo_title'])) {
+            $seoTitle = $input->seo_title->text();
+            // Use mb_strlen for correct character count with multibyte characters (e.g. German, Japanese)
+            if (mb_strlen($seoTitle, 'UTF-8') > 160) {
+                throw new Services_Exception(tr('seo_title exceeds maximum length of 160 characters.'));
+            }
+            $attributelib = TikiLib::lib('attribute');
+            $attributelib->set_attribute('wiki page', $page, 'tiki.wiki.page_title', $seoTitle);
+            $updated[] = 'seo_title';
+        }
+
+        // Update SEO description (stored in tiki_pages.description)
+        // Uses JitFilter 'text' filter which applies StripTags — safe for unicode
+        if (isset($input['seo_description'])) {
+            $seoDesc = $input->seo_description->text();
+            // Use mb_strlen for correct character count with multibyte characters
+            if (mb_strlen($seoDesc, 'UTF-8') > 200) {
+                throw new Services_Exception(tr('seo_description exceeds maximum length of 200 characters.'));
+            }
+            $tikilib->update_page(
+                $page,
+                $info['data'],
+                'API PATCH update',
+                $user,
+                $tikilib->get_ip_address(),
+                $seoDesc,
+                1
+            );
+            $updated[] = 'seo_description';
+        }
+
+        // Update categories (full replace of assigned categories)
+        if (isset($input['categories'])) {
+            if ($prefs['feature_categories'] === 'y') {
+                $categlib = TikiLib::lib('categ');
+                $categlib->update_object_categories(
+                    $input->asArray('categories'),
+                    $page,
+                    'wiki page',
+                    $info['description'],
+                    $page,
+                    'tiki-index.php?page=' . urlencode($page)
+                );
+                $updated[] = 'categories';
+            }
+        }
+
+        // Update tags / freetags (full replace)
+        // Multi-word tags are auto-quoted so freetaglib handles them as single tags
+        if (isset($input['tags'])) {
+            global $tiki_p_freetags_tag;
+            if ($prefs['feature_freetags'] === 'y' && $tiki_p_freetags_tag === 'y') {
+                $freetaglib = TikiLib::lib('freetag');
+                $freetaglib->add_object('wiki page', $page, false, $info['description'], $page, 'tiki-index.php?page=' . urlencode($page));
+                $tagParts = array_map(function ($tag) {
+                    return strpos($tag, ' ') !== false ? '"' . $tag . '"' : $tag;
+                }, $input->asArray('tags'));
+                $tagString = implode(' ', $tagParts);
+                $freetaglib->update_tags($user, $page, 'wiki page', $tagString, false, $info['lang']);
+                $updated[] = 'tags';
+            }
+        }
+
+        return [
+            'status'         => 'success',
+            'page'           => $page,
+            'updated_fields' => $updated,
+        ];
+    }
+
+    /**
      * Perform a plugin execution with specific input data (e.g. for ListExecute plugin)
      */
     public function action_execute($input)
@@ -1030,13 +1135,21 @@ class Services_Wiki_Controller
             $_GET = $_REQUEST = $input->asArray();
         }
 
-        ParserLib::$pluginCache = [$plugin => ''];
-
-        TikiLib::lib('parser')->parse_data($info['data']);
+        $data = TikiLib::lib('parser')->parse_data($info['data'], ['mark_plugins' => [$plugin]]);
+        $start = mb_strpos($data, "~$plugin~");
+        $end = mb_strpos($data, "~/$plugin~");
+        if ($start !== false && $end !== false) {
+            $start += mb_strlen("~$plugin~");
+            $data = mb_substr($data, $start, $end - $start);
+        } else {
+            $data = tr("Plugin not found.");
+        }
 
         Feedback::sendHeaders();
+        $data .= TikiLib::lib('header')->output_js();
+
         return [
-            'result' => ParserLib::$pluginCache[$plugin],
+            'result' => $data,
         ];
     }
 }

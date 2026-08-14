@@ -10,7 +10,7 @@
     <div class="tiki-form-group row">
         <label for="url" class="col-sm-3 col-form-label">{tr}Remote Server Address{/tr}</label>
         <div class="col-sm-9">
-            <input type="text" maxlength="255" class="form-control" name="url" value="">
+            <input type="text" maxlength="255" class="form-control" name="url" id="url" value="">
         </div>
     </div>
     <div class="tiki-form-group text-center">

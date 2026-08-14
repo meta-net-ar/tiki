@@ -11,7 +11,7 @@
                         <table>{include file="antibot.tpl"}</table>
                     {/if}
                     {if $prefs.feature_socialnetworks eq 'y' && $user neq ''}
-                        {if $prefs.socialnetworks_twitter_consumer_key neq '' && $tweet}
+                        {if $prefs.socialnetworks_twitter_client_id neq '' && $tweet}
                             <div class="form-check">
                                 <input type="hidden" name="tweet" value="-1" />
                                 <input type="checkbox" class="form-check-input" id="shout_tweet" name="shout_tweet" value='1' />
@@ -33,12 +33,12 @@
 
         {section loop=$shout_msgs name=ix}
             <div class="shoutboxmodmsg">
-                {assign var=userlink value=$shout_msgs[ix].user|userlink:"linkmodule"}
+                {$userlink=$shout_msgs[ix].user|userlink:"linkmodule"}
                 {capture name=date}{strip} {* Print date *}
                     {$shout_msgs[ix].timestamp|tiki_short_time}, {$shout_msgs[ix].timestamp|tiki_short_date}
                 {/strip}{/capture}
                 {* Show user message in style according to 'tooltip' module parameter *}
-                {assign var=cdate value=$smarty.capture.date}
+                {$cdate=$smarty.capture.date}
                 {if $tooltip == 1}{* TODO: Improve $userlink modifier one day to handle other attibutes better? *}
                     <b>{strip}{$userlink|replace:"\" href=":"&lt;br /&gt;&lt;em&gt;{tr}Shout date:{/tr} $cdate&lt;/em&gt;\" href="}{/strip}</b>:
                 {else}
@@ -47,7 +47,7 @@
                 {$shout_msgs[ix].message}
                 {if $tiki_p_admin_shoutbox eq 'y' || $user == $shout_msgs[ix].user}
                     {if 0 and $prefs.feature_ajax eq 'y'}
-                        <a class="text-danger" aria-label="{tr}Delete{/tr}"  onclick="removeShout({$shout_msgs[ix].msgId});return false" href="#" title="|{tr}Delete this shout{/tr}">[icon name="delete"}</a> <a class="mx-1 text-primary" href="tiki-shoutbox.php?msgId={$shout_msgs[ix].msgId}" title="|{tr}Edit this shout{/tr}">{icon name="edit"}</a>
+                        <a class="text-danger" aria-label="{tr}Delete{/tr}" onclick="removeShout({$shout_msgs[ix].msgId});return false" href="#" title="|{tr}Delete this shout{/tr}" role="button">[icon name="delete"}</a> <a class="mx-1 text-primary" href="tiki-shoutbox.php?msgId={$shout_msgs[ix].msgId}" title="|{tr}Edit this shout{/tr}">{icon name="edit"}</a>
                     {else}
                         <a class="text-danger mx-1" aria-label="{tr}Delete{/tr}"  href="tiki-shoutbox.php?remove={$shout_msgs[ix].msgId}">{icon name="delete"}</a> <a href="tiki-shoutbox.php?msgId={$shout_msgs[ix].msgId}" class="mx-1 text-primary">{icon name="edit"}</a>
                     {/if}

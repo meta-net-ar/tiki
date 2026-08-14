@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included! Die if called directly...
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -82,7 +82,7 @@ class Importer extends Comments
 
             $pid = 0;
             if ($row['parentId'] != 0 && ! $hash[$row['parentId']]) {
-                array_push($fHash, $row);
+                $fHash[] = $row;
                 $fPosts2++;
                 continue;
             } elseif ($row['parentId'] != 0) {
@@ -162,7 +162,7 @@ class Importer extends Comments
 
         while ($a = strpos($record, ',')) {
             // If field is a string...
-            if (preg_match("/^'/", substr($record, 0, $a))) {
+            if (str_starts_with(substr($record, 0, $a), "'")) {
                 $offset = 1;
                 while ($b = strpos($record, "'", $offset)) {
                     // If close quote is not escaped
@@ -179,14 +179,14 @@ class Importer extends Comments
                 // Otherwise, it is numeric.
             } else {
                 $field = substr($record, 0, $a);
-                if (strpos($field, 'NULL') !== false && strlen($field) == 4) {
+                if (str_contains($field, 'NULL') && strlen($field) == 4) {
                     $field = null;
                 }
-                array_push($fields, $field);
+                $fields[] = $field;
                 $record = substr($record, $a + 1);
             }
         }
-        array_push($fields, $record);
+        $fields[] = $record;
 
         return $fields;
     }
@@ -226,7 +226,7 @@ class Importer extends Comments
                     $a = substr($fL, 3);
                     $b = strpos($a, '`');
                     $c = substr($a, 0, $b);
-                    array_push($headings, $c);
+                    $headings[] = $c;
                     $fL = fgets($fH);
                 }
             }
@@ -249,7 +249,7 @@ class Importer extends Comments
                     }
 
                     //first row may have column names - get rid of these
-                    if (strpos($records[0], ') VALUES (') !== false) {
+                    if (str_contains($records[0], ') VALUES (')) {
                         $split = strpos($records[0], ') VALUES (');
                         $records[0] = substr($records[0], $split + 10);
                     }
@@ -287,7 +287,7 @@ class Importer extends Comments
                                 for ($z = 0, $zcount_fields = count($fields); $z < $zcount_fields; $z++) {
                                     $rec[$headings[$z]] = $fields[$z];
                                 }
-                                array_push($thash, $rec);
+                                $thash[] = $rec;
                             }
                         }
                     }
@@ -330,7 +330,7 @@ class Importer extends Comments
                 $forum['id'] = $fields['forumId'];
                 $forum['name'] = $fields['name'];
                 $forum['comments'] = $fields['comments'];
-                array_push($forums, $forum);
+                $forums[] = $forum;
             } else {
                 return -1;
             }

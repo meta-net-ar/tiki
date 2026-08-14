@@ -13,7 +13,7 @@ use Tracker\Field\AbstractItemField;
  * Letter key: ~math~
  *
  */
-class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\IndexableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface
+class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\IndexableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, Search_FacetProvider_Interface
 {
     private static $runner;
     /**
@@ -64,6 +64,16 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
                             'text_sort' => tr('Text'),
                         ],
                     ],
+                    'overridable' => [
+                        'name' => tr('Overridable'),
+                        'description' => tr('Allow the value to be overridden by the user. Useful when calculated value is stored in the field to avoid recalculations but still need a way to override it.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                    ],
                 ],
             ],
         ];
@@ -86,7 +96,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
 
     public function renderInput($context = [])
     {
-        return tr('Value will be re-calculated on save. Current value: %0', $this->getValue());
+        return $this->renderTemplate('trackerinput/math.tpl', $context);
     }
 
     public function renderOutput($context = [])
@@ -146,7 +156,7 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
             $providedFields = $this->replaceBaseKeyInArrayValues($mirrorProvidedFields);
         }
         $baseKey = $this->getBaseKey();
-        array_push($providedFields, $this->getBaseKey());
+        $providedFields[] = $this->getBaseKey();
         return $providedFields;
     }
 
@@ -166,6 +176,21 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
         return [];
     }
 
+    /***
+     * Generate facets for search results
+     *
+     * @return array
+     */
+    public function getFacets()
+    {
+        $baseKey = $this->getBaseKey();
+
+        return [
+            Search_Query_Facet_Term::fromField($baseKey)
+                ->setLabel($this->getConfiguration('name'))
+        ];
+    }
+
     /**
      * Recalculate formula after saving all other fields in the tracker item
      * @param array $data - field values to save - passed by reference as
@@ -175,6 +200,9 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
      */
     public function handleFinalSave(array &$data)
     {
+        if ($this->getOption('overridable') && $this->getValue()) {
+            return $this->getValue();
+        }
         try {
             $this->prepareFieldValues($data);
             $data = array_merge($data, $this->calcMetadata());
@@ -285,6 +313,17 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
                     $query->filterIdentifier($value, $baseKey);
                 }
             });
+
+            $collection->addNew($permName, 'multiexact')
+            ->setLabel($name)
+            ->setHelp(tr('Search for one or more precise values separated by OR.'))
+            ->setControl(new Tracker\Filter\Control\TextField("tf_{$permName}_mem"))
+            ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey) {
+                $value = $control->getValue();
+                if ($value) {
+                    $query->filterMultiIdentifier($value, $baseKey);
+                }
+            });
         }
 
         return $collection;
@@ -358,7 +397,6 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
                 } elseif ($item) {
                     $item[$mirrorFieldId] = $this->getData($this->getConfiguration('permName'));
                 }
-                //var_dump($mirrorFieldInfo, $item);
                 $handler = TikiLib::lib('trk')->get_field_handler($mirrorFieldInfo, $item);
                 $this->mirrorFieldBaseKey = $handler->getBaseKey();
             }
@@ -373,7 +411,6 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
         $newKey = $this->getBaseKey();
 
         if (array_search($oldKey, $array) === false) {
-            var_dump($oldKey, $array);
             throw new Error("Sanity-check:  Unable to find the expected mirrorField basekey");
         }
 
@@ -443,14 +480,14 @@ class Tracker_Field_Math extends \Tracker\Field\AbstractItemField implements \Tr
         global $url_host, $base_url;
 
         return [
-        'itemId' => $this->getItemId(),
-        'trackerId' => $this->getTrackerDefinition()->getConfiguration('trackerId'),
-        'creation_date' => $this->getData('created'),
-        'created_by' => $this->getData('createdBy'),
-        'modification_date' => $this->getData('lastModif'),
-        'last_modified_by' => $this->getData('lastModifBy'),
-        'domain' => $url_host,
-        'base_url' => $base_url . (substr($base_url, -1) == '/' ? '' : '/'),
+            'itemId' => $this->getItemId(),
+            'trackerId' => $this->getTrackerDefinition()->getConfiguration('trackerId'),
+            'creation_date' => $this->getData('created'),
+            'created_by' => $this->getData('createdBy'),
+            'modification_date' => $this->getData('lastModif'),
+            'last_modified_by' => $this->getData('lastModifBy'),
+            'domain' => $url_host,
+            'base_url' => $base_url . (str_ends_with($base_url ?? '', '/') ? '' : '/'),
         ];
     }
 }

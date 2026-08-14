@@ -53,13 +53,6 @@ $customfields = [];
 $customfields = $registrationlib->get_customfields($userwatch);
 $smarty->assign_by_ref('customfields', $customfields);
 $smarty->assign('infoPublic', 'y');
-if ($tiki_p_admin != 'y') {
-    $user_information = $tikilib->get_user_preference($userwatch, 'user_information', 'public');
-    // If the user is trying to pull info on themselves, allow it.
-    if ($user_information == 'private' && $userwatch != $user) {
-        $smarty->assign('infoPublic', 'n');
-    }
-}
 if ($user) {
     $smarty->assign('sent', 0);
     if (isset($_POST['send']) && $access->checkCsrf()) {
@@ -116,10 +109,8 @@ $smarty->assign_by_ref('gender', $gender);
 $smarty->assign_by_ref('userbreadCrumb', $userbreadCrumb);
 $homePage = $tikilib->get_user_preference($userwatch, 'homePage', '');
 $smarty->assign_by_ref('homePage', $homePage);
-$avatar = $tikilib->get_user_avatar($userwatch);
+$avatar = $tikilib->get_user_avatar($userwatch, '', 'large');
 $smarty->assign('avatar', $avatar);
-$user_information = $tikilib->get_user_preference($userwatch, 'user_information', 'public');
-$smarty->assign('user_information', $user_information);
 $userinfo = $userlib->get_user_info($userwatch);
 $email_isPublic = $tikilib->get_user_preference($userwatch, 'email is public', 'n');
 if ($email_isPublic != 'n') {
@@ -159,7 +150,7 @@ if ($prefs['feature_display_my_to_others'] == 'y') {
     }
     if ($prefs['feature_trackers'] == 'y') {
         $trklib = TikiLib::lib('trk');
-        $user_items = $trklib->get_user_items($userwatch);
+        $user_items = $trklib->get_user_items($userwatch, false);
     }
     if ($prefs['feature_articles'] == 'y') {
         $artlib = TikiLib::lib('art');

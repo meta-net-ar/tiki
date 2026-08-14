@@ -16,9 +16,9 @@ class ToolbarSwitchEditor extends ToolbarUtilityItem
 
 
         if ($prefs['markdown_enabled'] === 'y') {
-            $label = 'Syntax and Editor Settings';
+            $label = tra('Syntax and Editor Settings');
         } else {
-            $label = 'Switch Editor (wiki or WYSIWYG)';
+            $label = tra('Switch Editor (wiki or WYSIWYG)');
         }
 
         $this->setLabel(tra($label))
@@ -50,7 +50,7 @@ class ToolbarSwitchEditor extends ToolbarUtilityItem
         $smarty = TikiLib::lib('smarty');
         $servicelib = TikiLib::lib('service');
 
-        $params = ['controller' => 'edit', 'action' => 'editor_settings', 'modal' => 1, 'domId' => $this->domElementId, 'syntax' => $this->getSyntax()];
+        $params = ['controller' => 'edit', 'action' => 'editor_settings', 'modal' => 1, 'domId' => $this->domElementId, 'syntax' => $this->getEditorSyntaxType()];
 
         $icon = smarty_function_icon(['name' => $this->iconname], $smarty->getEmptyInternalTemplate());
         $url = $servicelib->getUrl($params);
@@ -67,7 +67,7 @@ class ToolbarSwitchEditor extends ToolbarUtilityItem
     public function getWysiwygJs(): string
     {
         $servicelib = TikiLib::lib('service');
-        $syntax = $this->getSyntax();
+        $syntax = $this->getEditorSyntaxType();
         $params = ['controller' => 'edit', 'action' => 'editor_settings', 'modal' => 1, 'domId' => $this->domElementId, 'type' => 'wysiwyg', 'syntax' => $syntax];
         return '$.openModal({show: true, remote: "' . $servicelib->getUrl($params) . '"});';
     }

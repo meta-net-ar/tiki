@@ -99,7 +99,7 @@ function wikiplugin_tabs_info()
                 'description' => tra(
                     'Determine the kind of border to apply to the tabs'
                 ),
-                'default'     => 'none',
+                'default'     => '',
                 'filter'      => 'text',
                 'since'       => '25.0',
                 'options' => [
@@ -312,7 +312,6 @@ function wikiplugin_tabs_info()
 
 function wikiplugin_tabs($data, $params)
 {
-    $tikilib = TikiLib::lib('tiki');
     if (! empty($params['name'])) {
         $tabsetname = $params['name'];
     } else {

@@ -1,0 +1,20 @@
+---
+description: Response from POST /comments (create comment).
+type: object
+properties:
+  threadId:
+    oneOf:
+      - type: string
+      - type: integer
+    nullable: true
+  parentId:
+    type: integer
+    nullable: true
+  type:
+    type: string
+  objectId:
+    oneOf:
+      - type: string
+      - type: integer
+  feedback:
+    type: array

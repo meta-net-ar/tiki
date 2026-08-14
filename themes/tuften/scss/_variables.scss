@@ -1,34 +1,15 @@
-//Custom styles for the Tuften theme.
+// Variables for the Tuften theme
+// Contains overriding declarations of Bootstrap variables and possible related value aliases to implement an override.
+// For example, if `$component-active-bg: $primary;` then ``$dropdown-link-active-bg: $component-active-bg;` also needs to be explicitly restated for the theme value to override the Bootstrap default.
+
+// Enable SCSS color functions and import default variable values
+@use "sass:color";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated), required before import of variables.scss.
+@import "../../default/scss/variables"; // 2. Import directly to allow removal of redundant Bootstrap default declarations in this file.
+
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Colors
-$white:    #fff;  // default
-$gray-100: #f8f9fa;  // default
-$gray-200: #e9ecef;  // default
-$gray-300: #dee2e6;  // default
-$gray-400: #ced4da;  // default
-$gray-500: #adb5bd;  // default
-$gray-600: #868e96;  // default
-$gray-700: #495057;  // default
-$gray-800: #343a40;  // default
-$gray-900: #212529;  // default
-$black:    #000;  // default
-$light: #fffff8;
-$dark: $gray-800;
-
-$blue:    #446e9b;  // default
-$indigo:  #6610f2;  // default
-$purple:  #6f42c1;  // default
-$pink:    #e83e8c;  // default
-$red:     #cd0200;  // default
-$orange:  #fd7e14;  // default
-$yellow:  #d47500;  // default
-$green:   #3cb521;  // default
-$teal:    #20c997;  // default
-$cyan:    #3399f3;  // default
-
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
 
 $primary: #a25D25;
 $secondary: #783C12;
@@ -36,16 +17,18 @@ $success: #357935;
 $info: #20809D;
 $warning: #D79F12; //#8B6504;
 $danger: #c02F2a;
+$light: #fffff8;
+$dark: #000000;
 
 $theme-colors: (
- 	"primary":        	#a25D25,
- 	"secondary": #783C12, //rgba(223, 110, 30, 0.5),
- 	"success":         	#357935,
- 	"info":           	#20809D,
- 	"warning":         	#D79F12, //#8B6504,
- 	"danger":          	#c02f2a,
-	"light":			#fffff8,
- 	"dark":				#000000
+        "primary": $primary,
+        "secondary": $secondary,
+        "success": $success,
+        "info": $info,
+        "warning": $warning,
+        "danger": $danger,
+        "light": $light,
+        "dark": $dark
 );
 
 // Options
@@ -64,7 +47,7 @@ $body-color: $gray-800;
 
 // Links
 $link-color:            #222;
-$link-hover-color:      darken($link-color, 15%);
+$link-hover-color:      color.adjust($link-color, $lightness: -15%, $space: hsl);
 $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
 $link-hover-decoration: none; // underline;
 
@@ -94,10 +77,10 @@ $blockquote-footer-font-size: $small-font-size;  // default
 
 // Tables
 $table-bg:                      transparent;
-$table-bg-accent:               darken( $body-bg, 4% ); //#f9f9f9;
+$table-bg-accent:               color.adjust( $body-bg, $lightness: -4%, $space: hsl ); //#f9f9f9;
 $table-bg-hover:                transparent; //#f5f5f5;
 $table-bg-active:               transparent; // $table-bg-hover;
-$table-border-color:            darken( $body-bg, 5% ); // #ddd;
+$table-border-color:            color.adjust( $body-bg, $lightness: -5%, $space: hsl ); // #ddd;
 
 // Buttons + Forms
 //
@@ -121,6 +104,62 @@ $legend-border-color:            #e5e5e5;
 $input-group-addon-bg:           var(--#{$prefix}tertiary-bg);  // default // $gray-300;
 $input-group-addon-border-color: $input-border;
 
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+
+//// Navs
+//// Navbar
+//$navbar-light-color:             var(--#{$prefix}body-color); // #777;
+////$navbar-light-bg:                var(--#{$prefix}body-bg); // #f8f8f8;  -- Obsolete background variables here and below
+////$navbar-light-border:            darken( $navbar-light-bg, 6.5% );
+//$nav-link-font-size:                1.1rem;
+//
+//// Navbar links
+//$navbar-light-color:                $link-color; //#777;
+//$navbar-light-hover-color:          $link-hover-color; // #333;
+////$navbar-light-hover-bg:             transparent;
+//$navbar-light-active-color:         #555;
+////$navbar-light-active-bg:            darken( $navbar-light-bg, 6.5% );
+//$navbar-light-disabled-color:       #ccc;
+////$navbar-light-disabled-bg:          transparent;
+//
+//// Navbar brand label
+//$navbar-light-brand-color:               $navbar-light-color;
+//$navbar-light-brand-hover-color:         color.adjust( $navbar-light-brand-color, $lightness: -10%, $space: hsl );
+//$navbar-light-brand-hover-bg:            transparent;
+//
+//$navbar-dark-color:                      color.adjust( $gray-300, $lightness: 15%, $space: hsl) ;
+////$navbar-dark-bg:                         #222;
+////$navbar-dark-border:                     darken( $navbar-dark-bg, 10%) ;
+//
+//// Inverted navbar links
+//$navbar-dark-hover-color: #242424;
+////$navbar-dark-hover-bg:              transparent;
+//$navbar-dark-active-color:          $navbar-dark-hover-color;
+////$navbar-dark-active-bg:             darken($tiki-navbar-dark-bg, 10%);
+//$navbar-dark-disabled-color:        #444;
+////$navbar-dark-disabled-bg:           transparent;
+//
+//// Inverted navbar brand label
+//$navbar-dark-brand-color:                $navbar-dark-color;
+//$navbar-dark-brand-hover-color:          #fff;
+////$navbar-dark-brand-hover-bg:             transparent;
+//
+////$navbar-dark-toggle-hover-bg:            #333;
+////$navbar-dark-toggle-icon-bar-bg:         #fff;
+//$navbar-dark-toggle-border-color:        #333;
+//
+//$nav-tabs-border-color:                     #ddd;
+//
+//$nav-tabs-link-hover-border-color:          $gray-300;
+//
+//$nav-tabs-link-active-hover-bg:             $body-bg;
+//$nav-tabs-link-active-hover-color:          $gray-500;
+//$nav-tabs-link-active-hover-border-color:   #ddd;
+//
+//$nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // $btn-link-disabled-color;
+
 // Dropdowns
 $dropdown-border-color:             var(--#{$prefix}border-color-translucent);  // default
 $dropdown-divider-bg:               $dropdown-border-color;  // default
@@ -136,8 +175,8 @@ $dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg);  // default //
 $dropdown-link-active-color:        $component-active-color;  // default
 $dropdown-link-active-bg:           $component-active-bg;  // default
 
-$dropdown-active-color:     $component-active-color;
-$dropdown-active-bg:        $component-active-bg;
+$dropdown-active-color:     $component-active-color; // default
+$dropdown-active-bg:        $component-active-bg; // default
 $dropdown-header-color:     var(--#{$prefix}body-color);
 
 $dropdown-dark-color:               $gray-300;  // default
@@ -152,59 +191,7 @@ $dropdown-dark-link-active-color:   $dropdown-link-active-color;  // default
 $dropdown-dark-link-active-bg:      $dropdown-link-active-bg;  // default
 $dropdown-dark-link-disabled-color: $gray-500;  // default
 $dropdown-dark-header-color:        var(--#{$prefix}body-color);
-
-// Navs
-// Navbar
-$navbar-light-color:             var(--#{$prefix}body-color); // #777;
-//$navbar-light-bg:                var(--#{$prefix}body-bg); // #f8f8f8;  -- Obsolete background variables here and below
-//$navbar-light-border:            darken( $navbar-light-bg, 6.5% );
-$nav-link-font-size:                1.1rem;
-
-// Navbar links
-$navbar-light-color:                $link-color; //#777;
-$navbar-light-hover-color:          $link-hover-color; // #333;
-//$navbar-light-hover-bg:             transparent;
-$navbar-light-active-color:         #555;
-//$navbar-light-active-bg:            darken( $navbar-light-bg, 6.5% );
-$navbar-light-disabled-color:       #ccc;
-//$navbar-light-disabled-bg:          transparent;
-
-// Navbar brand label
-$navbar-light-brand-color:               $navbar-light-color;
-$navbar-light-brand-hover-color:         darken( $navbar-light-brand-color, 10% );
-$navbar-light-brand-hover-bg:            transparent;
-
-$navbar-dark-color:                      lighten( $gray-300, 15%) ;
-//$navbar-dark-bg:                         #222;
-//$navbar-dark-border:                     darken( $navbar-dark-bg, 10%) ;
-
-// Inverted navbar links
-$navbar-dark-hover-color:           #fff;
-//$navbar-dark-hover-bg:              transparent;
-$navbar-dark-active-color:          $navbar-dark-hover-color;
-//$navbar-dark-active-bg:             darken($navbar-dark-bg, 10%);
-$navbar-dark-disabled-color:        #444;
-//$navbar-dark-disabled-bg:           transparent;
-
-// Inverted navbar brand label
-$navbar-dark-brand-color:                $navbar-dark-color;
-$navbar-dark-brand-hover-color:          #fff;
-//$navbar-dark-brand-hover-bg:             transparent;
-
-//$navbar-dark-toggle-hover-bg:            #333;
-//$navbar-dark-toggle-icon-bar-bg:         #fff;
-$navbar-dark-toggle-border-color:        #333;
-
-$nav-tabs-border-color:                     #ddd;
-
-$nav-tabs-link-hover-border-color:          $gray-300;
-
-$nav-tabs-link-active-hover-bg:             $body-bg;
-$nav-tabs-link-active-hover-color:          $gray-500;
-$nav-tabs-link-active-hover-border-color:   #ddd;
-
-$nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // $btn-link-disabled-color;
-
+$dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Pagination
 $pagination-disabled-color: $btn-link-disabled-color;
@@ -212,7 +199,11 @@ $pagination-disabled-color: $btn-link-disabled-color;
 // Jumbotron
 $jumbotron-bg: #f5f5e9;
 
-// Cards
+// Cards #fbebe0
+
+// Accordion
+$accordion-button-active-bg: #f5f5e9;
+
 // $card-bg:                    lighten($body-bg, 2.5%); // #fff; Todo
 
 // Tooltips

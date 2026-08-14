@@ -4,7 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'wiki page';
+
+use Tiki\Lib\Wiki\WikiLibOutput;
+
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 $inputConfiguration = [
     [
@@ -14,7 +16,7 @@ $inputConfiguration = [
         'preview'                  => 'digits',            //get
         'flaggedrev'               => 'bool',              //post
         'approve'                  => 'digits',            //post
-        'unapprove'                => 'digits`',           //post
+        'unapprove'                => 'digits',            //post
         'paginate'                 => 'bool',              //post
         'diff_style'               => 'string',            //post
         'history_offset'           => 'digits',            //post
@@ -40,7 +42,11 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 $histlib = TikiLib::lib('hist');
+$wikilib = TikiLib::lib('wiki');
 require_once('lib/wiki/renderlib.php');
 
 $access->check_feature('feature_wiki');
@@ -129,7 +135,7 @@ $smarty->assign('history_pagesize', $history_pagesize);
 
 // fetch page history, but omit the actual page content (to save memory)
 $history = $histlib->get_page_history($page, false, $history_offset, $paginate ? $history_pagesize : -1);
-$smarty->assign('history_cant', $histlib->get_nb_history($page) - 1);
+$smarty->assign('history_count', $histlib->get_nb_history($page) - 1);
 
 if ($prefs['flaggedrev_approval'] == 'y') {
     $flaggedrevisionlib = TikiLib::lib('flaggedrevision');
@@ -165,7 +171,7 @@ if ($prefs['flaggedrev_approval'] == 'y') {
 }
 
 if (! isset($_REQUEST['show_all_versions'])) {
-    $_SESSION['show_all_versions'] = isset($_SESSION['show_all_versions']) ? $_SESSION['show_all_versions'] : 'y';
+    $_SESSION['show_all_versions'] = $_SESSION['show_all_versions'] ?? 'y';
 } else {
     $_SESSION['show_all_versions'] = $_REQUEST['show_all_versions'] === 'n' ? 'n' : 'y';
 }
@@ -227,16 +233,18 @@ $history_sessions = [];
 reset($history);
 foreach ($history as &$h) { // as $h has been used by reference before it needs to be so again (it seems)
     $history_versions[] = (int)$h['version'];
-    $history_sessions[] = isset($h['session']) ? (int)$h['session'] : 0;
+    $history_sessions[] = (int)($h['session'] ?? 0);
 }
 $history_versions = array_reverse($history_versions);
 $history_sessions = array_reverse($history_sessions);
-$history_versions[] = (int) $info['version'];   // current is last one
-$history_sessions[] = 0;
+if (empty($history_versions) || end($history_versions) !== (int) $info['version']) {
+    $history_versions[] = (int) $info['version'];   // current is last one (only if not already in history)
+    $history_sessions[] = 0;
+}
 $smarty->assign_by_ref('history', $history);
 
 // for pagination
-$smarty->assign('ver_cant', count($history_versions));
+$smarty->assign('ver_count', count($history_versions));
 
 if (isset($_REQUEST['clear_versions'])) {
     unset($_REQUEST['clear_versions']);
@@ -338,16 +346,20 @@ if (isset($source)) {
     if ($source == '' && isset($rversion)) {
         $source = $rversion;
     }
+    $syntax_type = 'tiki';
     if ($source == $info["version"] || $source == 0) {
-        $smarty->assign('sourced', $info["data"]);
+        $smarty->assign('sourced', $tikilib->removeInlineSyntaxTags($info["data"]));
         $smarty->assign('source', $info['version']);
+        $syntax_type = $wikilib->getWikiPageSyntaxType($info["data"]);
     } else {
         $version = $histlib->get_version($page, $source);
         if ($version) {
-            $smarty->assign('sourced', $version["data"]);
+            $smarty->assign('sourced', $tikilib->removeInlineSyntaxTags($version["data"]));
             $smarty->assign('source', $source);
+            $syntax_type = $wikilib->getWikiPageSyntaxType($version["data"]);
         }
     }
+    $smarty->assign('syntax_type', $syntax_type);
 }
 $smarty->assign('preview', false);
 if (isset($preview)) {
@@ -427,7 +439,9 @@ if ($prefs['feature_multilingual'] == 'y') {
             }
         }
         // Build URI / Redirect
-        $diff_style = isset($_REQUEST['diff_style']) ? rawurlencode($_REQUEST['diff_style']) : rawurlencode($info['is_html'] === '1' ? 'htmldiff' : $prefs['default_wiki_diff_style']);
+        $diff_style = rawurlencode(
+            $_REQUEST['diff_style'] ?? ($info['is_html'] === '1' ? 'htmldiff' : $prefs['default_wiki_diff_style'])
+        );
         $comment = rawurlencode("Updating from $page at version {$info['version']}");
         if ($newver == 0) {
             $newver = $info['version'];

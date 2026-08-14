@@ -3,6 +3,6 @@
         {preference show_tags=false name=$name}
     {/foreach}
     <div class="text-center">
-        <button type="submit" class="btn btn-primary btn-sm">Save</span></button>
+        <button type="submit" class="btn btn-primary btn-sm">{tr}Save{/tr}</span></button>
     </div>
 </form>

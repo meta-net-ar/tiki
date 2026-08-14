@@ -5,7 +5,9 @@
  * or were fixed since the last baseline run.
  */
 
-//error_reporting(0);
+if (PHP_SAPI !== 'cli') {
+    die("This script must be run from the command line.\n");
+}
 
 set_include_path(get_include_path() . PATH_SEPARATOR . '../..');
 

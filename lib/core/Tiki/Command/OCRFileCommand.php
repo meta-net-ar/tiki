@@ -27,7 +27,7 @@ class OCRFileCommand extends Command
             ->addArgument(
                 'File ID',
                 InputArgument::OPTIONAL,
-                'File ID of the file to OCR.'
+                tra('File ID of the file to OCR.')
             );
     }
 

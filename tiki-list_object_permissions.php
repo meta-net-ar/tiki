@@ -243,7 +243,7 @@ foreach ($types as $type) {
             $objects = $bloglib->list_blogs();
 
             foreach ($objects['data'] as $object) {
-                $objectName = isset($object['name']) ? $object['name'] : null;
+                $objectName = $object['name'] ?? null;
                 $r = list_perms($object['blogId'], $type, $objectName, $filterGroup);
                 if (count($r['special']) > 0) {
                     $res[$type]['objects'][] = ['objectId' => $r['objectId'], 'special' => $r['special'], 'objectName' => $objectName, 'objectType' => $type];
@@ -258,7 +258,7 @@ foreach ($types as $type) {
             $sheetlib = TikiLib::lib('sheet');
             $objects = $sheetlib->list_sheets();
             foreach ($objects['data'] as $object) {
-                $r = list_perms($object['sheetId'], $type, isset($object['name']) ? $object['name'] : null, $filterGroup);
+                $r = list_perms($object['sheetId'], $type, $object['name'] ?? null, $filterGroup);
                 if (count($r['special']) > 0) {
                     $res[$type]['objects'][] = ['objectId' => $r['objectId'], 'special' => $r['special'], 'objectName' => $object['name'], 'objectType' => $type];
                 }

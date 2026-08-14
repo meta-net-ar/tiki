@@ -24,7 +24,11 @@
                 {/if}
                 {$contributors[author]}
             {/section}.<br>
-            {tr}Page last modified on{/tr} {$lastModif|tiki_long_datetime}.
+            {if $version == 1}
+                {tr _0=$lastModif|tiki_long_datetime}Page last modified on %0 : Initial version{/tr}.
+            {else}
+                {tr _0=$lastModif|tiki_long_datetime}Page last modified on %0{/tr}.
+            {/if}
         </footer>
     {elseif isset($prefs.wiki_authors_style) && $prefs.wiki_authors_style eq 'collaborative'}
         <footer class="editdate">
@@ -35,13 +39,21 @@
             {/if}
             {$contributors[author]}
             {/section}.<br>
-            {tr}Page last modified on{/tr} {$lastModif|tiki_long_datetime}.
+            {if $version == 1}
+                {tr _0=$lastModif|tiki_long_datetime}Page last modified on %0 : Initial version{/tr}.
+            {else}
+                {tr _0=$lastModif|tiki_long_datetime}Page last modified on %0{/tr}.
+            {/if}
         </footer>
     {elseif isset($prefs.wiki_authors_style) && $prefs.wiki_authors_style eq 'none'}
     {else}
         <footer class="editdate">
             {tr}Created by:{/tr} {$creator}
-            {tr}Last Modification:{/tr} {$lastModif|tiki_long_datetime} {tr}by{/tr} {$lastUser|userlink}
+            {if $version == 1}
+                {tr _0=$lastModif|tiki_long_datetime _1=$lastUser|userlink}Last Modification: %0 by %1 : Initial version{/tr}
+            {else}
+                {tr _0=$lastModif|tiki_long_datetime _1=$lastUser|userlink}Last Modification: %0 by %1{/tr}
+            {/if}
         </footer>
     {/if}
 

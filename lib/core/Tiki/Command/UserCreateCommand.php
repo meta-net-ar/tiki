@@ -28,25 +28,25 @@ class UserCreateCommand extends Command
             ->addArgument(
                 'login',
                 InputArgument::REQUIRED,
-                'User login'
+                tra('User login')
             )
             ->addOption(
                 'email',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'User email (ignored if login_is_email is enabled)'
+                tra('User email (ignored if login_is_email is enabled)')
             )
             ->addOption(
                 'password',
                 'p',
                 InputOption::VALUE_OPTIONAL,
-                'User password'
+                tra('User password')
             )
             ->addOption(
                 'groups',
                 'G',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'List of supplementary groups of the new account (you can use multiple times)'
+                tra('List of supplementary groups of the new account (you can use multiple times)')
             );
     }
 
@@ -94,12 +94,12 @@ class UserCreateCommand extends Command
         $user = $userlib->add_user($login, $password, $email, null, null, null, null, $groups);
 
         if (empty($user)) {
-            throw new \Exception("Error creating user", 1);
+            throw new \Exception(tra("Error creating user"), 1);
         }
 
         $user = $userlib->get_user_info($user);
         $output->write(json_encode($user, JSON_PRETTY_PRINT));
-        $logslib->add_action('adminusers', 'system', 'system', 'New user created with username ' . $user['login']);
+        $logslib->add_action('adminusers', 'system', 'system', tra('New user created with username ') . $user['login']);
         return Command::SUCCESS;
     }
 }

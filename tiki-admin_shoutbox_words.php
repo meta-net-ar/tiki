@@ -11,6 +11,9 @@
 // Admin to the filtering of bad shoutbox words
 // First commit on cvs by damosoft aka damian
 // Initialization
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
@@ -24,6 +27,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/shoutbox/shoutboxlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_shoutbox');
 $access->check_permission('tiki_p_admin_shoutbox');
 //get_strings tra('Shoutbox Words')
@@ -39,29 +45,20 @@ if (isset($_REQUEST["add"])) {
 if (! empty($_REQUEST["remove"]) && $access->checkCsrf()) {
     $shoutboxlib->remove_bad_word($_REQUEST["remove"]);
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'word_asc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'word_asc',
+    ['tiki_shoutbox_words']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $words = $shoutboxlib->get_bad_words($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $words["cant"]);
+$smarty->assign_by_ref('pages_count', $words["count"]);
 // Get users (list of users)
 $smarty->assign_by_ref('words', $words["data"]);
 // disallow robots to index page:

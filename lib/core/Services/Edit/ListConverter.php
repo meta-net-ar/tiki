@@ -11,6 +11,7 @@
  *
  * Currently, trackerlist and trackerfilter are supported
  */
+define('MAX_PAGINATION', 9999);
 class Services_Edit_ListConverter
 {
     public $wikiFields;
@@ -145,9 +146,9 @@ class Services_Edit_ListConverter
                     $this->columnOptions['sort'] = $value === 'y';
                     break;
                 case 'sort_mode':
-                    if (strpos($value, 'lastModif_') === 0) {
+                    if (str_starts_with($value, 'lastModif_')) {
                         $sortMode = ['mode' => 'modification_date_' . str_replace('lastModif_', '', 'n' . $value)];
-                    } elseif (strpos($value, 'created_') === 0) {
+                    } elseif (str_starts_with($value, 'created_')) {
                         $sortMode = ['mode' => 'creation_date_' . str_replace('created_', '', 'n' . $value)];
                     } else {
                         $sortMode = ['mode' => $value];    // e.g. f_xxx_desc
@@ -169,6 +170,7 @@ class Services_Edit_ListConverter
                     if ($value > 0) {
                         $pagination = ['max' => $value];
                     } else {
+                        $pagination['max'] = MAX_PAGINATION;
                         $this->missed[$param] = $value;
                     }
                     break;
@@ -340,11 +342,11 @@ class Services_Edit_ListConverter
         }
 
         if (! empty($this->columnOptions['wiki'])) {
-            $result .= "{OUTPUT()}\n";
+            $result .= "{OUTPUT(" . (! empty($pagination) ? 'pagination="y"' : '') . ")}\n";
             $result .= $this->convertWiki($this->columnOptions['wiki']);
             $result .= "{OUTPUT}\n";
         } else {
-            $result .= "{OUTPUT(template=\"table\")}\n";
+            $result .= "{OUTPUT(template=\"table\"" . (! empty($pagination) ? ' pagination="y"' : '') . ")}\n";
             $result .= $this->arrayToInlinePluginString('column', $this->columns);
 
             if ($tableSorter['sortable'] === 'y') {
@@ -363,8 +365,12 @@ class Services_Edit_ListConverter
     {
         $errors = tr("The following parameters could not be converted to plugin list at this stage:\n");
 
-        foreach ($this->missed as $name => $value) {
-            $errors .= "Param $name=$value not converted\n";
+        if (empty($this->missed)) {
+            return "";
+        } else {
+            foreach ($this->missed as $name => $value) {
+                $errors .= "Param $name=$value not converted\n";
+            }
         }
 
         return "~tc~$errors~/tc~\n";

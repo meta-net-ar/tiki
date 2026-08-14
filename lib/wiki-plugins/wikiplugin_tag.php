@@ -23,7 +23,6 @@ function wikiplugin_tag_info()
                 'description' => tr('Any valid HTML tag, 0% by default', '<code>span</code>'),
                 'since' => '1',
                 'filter' => 'text',
-                'default' => 'span',
             ],
             'style' => [
                 'required' => false,
@@ -31,7 +30,6 @@ function wikiplugin_tag_info()
                 'description' => tra('Equivalent to the style attribute of an HTML tag.'),
                 'since' => '1',
                 'filter' => 'text',
-                'default' => '',
             ],
         ],
     ];
@@ -40,14 +38,14 @@ function wikiplugin_tag_info()
 function wikiplugin_tag($data, $params)
 {
     extract($params, EXTR_SKIP);
-    if (! isset($tag)) {
+    if (is_null($tag)) {
         $tag = 'span';
     } else {
         // remove eveyrything what's not a word to allow only tags without attributes
         $tag = preg_replace("/[^\w]/", "", $tag);
     }
 
-    if (isset($style)) {
+    if (! is_null($style)) {
         // trim quotes from the begin and end of style
         $style = ' style="' . trim($style, "\'\"") . '"';
     } else {

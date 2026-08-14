@@ -71,7 +71,7 @@ class FederatedSearchLib
             $sub->applyTransform($trans);
         }
 
-        if (strstr($indexName, ':')) {
+        if (str_contains($indexName, ':')) {
             $parts = explode(':', $indexName);
             $prefix = array_pop($parts);
         } else {

@@ -18,6 +18,7 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
             'CAL' => [
                 'name' => tr('Date and Time (Calendar Item)'),
                 'description' => tr('Associate calendar items with tracker items.'),
+                'help' => 'Date-Tracker-Fields',
                 'prefs' => ['trackerfield_calendaritem'],
                 'tags' => ['advanced', 'experimental'],
                 'warning' => tra('Experimental: (work in progress, use with care)'),
@@ -39,6 +40,16 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
                             0 => tr('No'),
                             1 => tr('Yes'),
                         ],
+                    ],
+                    'overrideCalendarItemTime' => [
+                        'name' => tr('Override Calendar Item Time'),
+                        'description' => tr('When saving the tracker item, should it override the calendar item date and time with this field\'s value or should it prefer the calendar item date and time?'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('Prefer Calendar Item Time'),
+                            1 => tr('Override Calendar Item Time'),
+                        ],
+                        'default' => 0,
                     ],
                 ],
             ],
@@ -118,11 +129,25 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
             if ($itemId) {
                 $trackerId = $this->getConfiguration('trackerId');
 
+                if ($this->getOption('datetime') == 'd') {
+                    // convert to UTC @12:00am, so we don't depend on user's timezone when displaying later
+                    $start = new Tiki\Lib\TikiDate();
+                    $start->setDate($value);
+                    $start->setTZbyID(TikiLib::lib('tiki')->get_display_timezone());
+                    $start->convertTimeToUTC(0, 0, 0);
+                    $start = $start->getTime();
+                    $end = $start;
+                } else {
+                    $start = $value;
+                    $end = $value + 3600;
+                }
+
                 if (! $event) { // new calendar item please
                     $data = [
                         'calendarId' => $calendarId,
-                        'start'      => $value,
-                        'end'        => $value + 3600,
+                        'start'      => $start,
+                        'end'        => $end,
+                        'allday'     => $this->getOption('datetime') == 'd' ? 1 : 0,
                         //      'locationId',
                         //      'categoryId',
                         //      'nlId',
@@ -146,8 +171,15 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
                     $calitemId = $this->calendarLib->getMaxItemId();
 
                     $this->setCalendarItemId($calitemId);
-                } elseif ($event['start'] != $value) {
-                    $value = (int) $event['start'];
+                } elseif ($event['start'] != $start) {
+                    if ($this->getOption('overrideCalendarItemTime')) {
+                        $event['start'] = $start;
+                        $event['end'] = $end;
+                        $client = new \Tiki\SabreDav\CaldavClient();
+                        $client->saveCalendarObject($event);
+                    } else {
+                        $value = (int) $event['start'];
+                    }
                 }
             }
         }
@@ -234,7 +266,7 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
     {
         global $tikiroot;
 
-        /** @var Smarty_Tiki $smarty */
+        /** @var \Tiki\Smarty\SmartyTiki $smarty */
         $smarty = TikiLib::lib('smarty');
 
         $smarty->assign('datePickerHtml', parent::renderInput($context));
@@ -270,7 +302,7 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
      */
     private function getCalendarItemId()
     {
-        $calitemId = $this->attributeLib->get_attribute('trackeritem', $this->getItemId(), 'tiki.calendar.item');
+        $calitemId = $this->attributeLib->get_attribute('trackeritem', $this->getItemId(), 'tiki.calendar.item', $this->getFieldId());
         return $calitemId;
     }
 
@@ -279,7 +311,7 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
      */
     private function removeCalendarItemId()
     {
-        $this->attributeLib->set_attribute('trackeritem', $this->getItemId(), 'tiki.calendar.item', '');
+        $this->attributeLib->set_attribute('trackeritem', $this->getItemId(), 'tiki.calendar.item', '', null, $this->getFieldId());
     }
 
     /**
@@ -291,7 +323,9 @@ class Tracker_Field_CalendarItem extends Tracker_Field_JsCalendar
             'trackeritem',
             $this->getItemId(),
             'tiki.calendar.item',
-            $calitemId
+            $calitemId,
+            null,
+            $this->getFieldId()
         );
     }
 }

@@ -11,6 +11,11 @@ class Sefurl
 {
     public function handle($source, $type = 'wiki', $with_next = '', $all_langs = '', $with_title = 'y', $title = '')
     {
+
+        if ($source === null) {
+            throw new \InvalidArgumentException('sefurl modifier requires a non-null source value.');
+        }
+
         global $prefs;
         $wikilib = \TikiLib::lib('wiki');
         $tikilib = \TikiLib::lib('tiki');
@@ -56,7 +61,7 @@ class Sefurl
                 break;
 
             case 'calendaritem':
-                $href = "tiki-ajax_services.php?controller=calendar&action=view_item&calitemId=$source";
+                $href = $sefurl ? "tiki-calendar-view_item?calitemId=$source" : "tiki-ajax_services.php?controller=calendar&action=view_item&calitemId=$source";
                 break;
 
             case 'calendar event':
@@ -79,7 +84,7 @@ class Sefurl
                 $attributes = $attributelib->get_attributes('file', $source);
 
                 if ($type == 'file') {
-                    $prefix = 'display';
+                    $prefix = 'dl';
                     $suffix = null;
                 } else {
                     $prefix = $type;
@@ -92,6 +97,19 @@ class Sefurl
                     $href = $sefurl ? "$prefix$source" : "tiki-download_file.php?fileId=$source$suffix";
                 }
 
+                break;
+
+            case 'filedetails':
+                // For file details page with galleryId and fileId
+                // Source format: "galleryId:fileId" (e.g., "5:34")
+                $parts = explode(':', $source);
+                if (count($parts) == 2) {
+                    $galleryId = $parts[0];
+                    $fileId = $parts[1];
+                    $href = $sefurl ? "filedetails$galleryId-$fileId" : "tiki-list_file_gallery.php?galleryId=$galleryId&fileId=$fileId&view=page";
+                } else {
+                    $href = "tiki-list_file_gallery.php?galleryId=$source&view=page";
+                }
                 break;
 
             case 'draft':
@@ -111,11 +129,21 @@ class Sefurl
                 }
                 if ($replacementpage) {
                     $href = \TikiLib::tikiUrlOpt($wikilib->sefurl($replacementpage, $with_next, $all_langs));
+                    if ($prefs['feature_sefurl'] === 'y') {
+                        if (preg_match('/' . preg_quote($href) . '[\W]/', $replacementpage)) {
+                            // you can use "product-" with a trailing hyphen, for example, as your alias,
+                            // so the url would be: pagenme-id-title-as-slug
+                            $href = $replacementpage;
+                        }
+                        $href .= $source;
+                    } else {
+                        $href .= "&itemId=$source";
+                    }
                     if ($prefs['feature_sefurl_title_trackeritem'] == 'y') {
                         $title = $trklib->get_title_sefurl($source);
                     }
                 } else {
-                    $href = 'tiki-view_tracker_item.php?itemId=' . $source;
+                    $href = $sefurl ? "item$source" : "tiki-view_tracker_item.php?itemId=$source";
                 }
                 break;
 
@@ -172,10 +200,22 @@ class Sefurl
             case 'survey':
                 $href = "tiki-take_survey.php?surveyId=" . urlencode($source);
                 break;
+
+            case 'poll':
+            case 'pollresults':
+                $href = $sefurl ? "pollresults$source" : "tiki-poll_results.php?pollId=$source";
+                break;
+            case 'user':
+                $href = $sefurl ? "profile-" . urlencode($source) : "tiki-user_information.php?view_user=" . urlencode($source);
+                break;
+            case 'assignuser':
+                $href = $sefurl ? "assign-user-" . urlencode($source) : "tiki-assignuser.php?assign_user=" . urlencode($source);
+                break;
+
             case 'faq':
             case 'faqs':
                 $type = 'faq';
-                $href = 'tiki-list_faqs.php?galleryId=' . $source;
+                $href = $sefurl ? "faq$source" : "tiki-view_faq.php?faqId=$source";
                 break;
             default:
                 $href = $source;

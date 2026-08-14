@@ -29,12 +29,23 @@ class OrderBuilder
 
     protected function buildOne(Order $order)
     {
-        $field = strtolower($order->getField());
-
+        $field = $order->getField();
+        $isJsonField = ($this->index && $this->index->isFieldInJson($field));
+        if (! $isJsonField) {
+            $field = strtolower($field);
+        }
         if ($order->getMode() == Order::MODE_SCRIPT) {
             $arguments = $order->getArguments();
             return $arguments['source'] . ' ' . $order->getOrder();
         } elseif ($field !== Order::FIELD_SCORE) {
+            if ($isJsonField) {
+                // TODO: distance?
+                $jsonPath = $this->index->getJsonPathForField($field);
+                if ($order->getMode() == Order::MODE_NUMERIC) {
+                    $jsonPath = "INTEGER($jsonPath)";
+                }
+                return $jsonPath . ' ' . $order->getOrder();
+            }
             $mapping = $this->index ? $this->index->getFieldMapping($field) : [];
             if ($order->getMode() == Order::MODE_NUMERIC && $mapping && ! in_array('float', $mapping['types']) && substr($field, -6) != '_nsort') {
                 $this->index->ensureHasField($field . '_nsort');

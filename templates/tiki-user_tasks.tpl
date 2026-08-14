@@ -25,10 +25,10 @@
 {if (not $show_form)}
     {include file='find.tpl'}
 {/if}
-{if $cant eq 1}
-    <span class="taskcount">{$cant}&nbsp;{tr}Task{/tr}</span>
+{if $count eq 1}
+    <span class="taskcount">{$count}&nbsp;{tr}Task{/tr}</span>
 {else}
-    <span class="taskcount">{$cant}&nbsp;{tr}Tasks{/tr}</span>
+    <span class="taskcount">{$count}&nbsp;{tr}Tasks{/tr}</span>
 {/if}
 
 <div class="wiki-edithelp" id='edithelpzone' >

@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
 {
     /**
@@ -31,6 +34,7 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
             'j' => [
                 'name'              => tr('Date and Time (Date Picker)'),
                 'description'       => tr('Provide a jQuery UI date picker to select a date and, optionally, a time.'),
+                'help'              => 'Date-Tracker-Fields',
                 'prefs'             => ['trackerfield_jscalendar'],
                 'tags'              => ['advanced'],
                 'default'           => 'y',
@@ -96,13 +100,27 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
             $requestData[$ins_id] = $requestData[$ins_id]['date'];
         }
 
-        $value = (isset($requestData[$ins_id]))
+        $valueFromRequest = isset($requestData[$ins_id]);
+        $value = $valueFromRequest
             ? $requestData[$ins_id]
             : $this->getValue();
 
-        if (! empty($value) && ! is_int((int) $value)) {    // prevent corrupted date values getting saved (e.g. from inline edit sometimes)
-            $value = '';
-            Feedback::error(tr('Date Picker Field: "%0" is not a valid internal date value', $value));
+        if (! empty($value)) {
+            try {
+                // prevent corrupted date values getting saved (e.g. from inline edit sometimes)
+                $this->validateTimestamp($value);
+
+                // Guard skips values already at UTC midnight. Only normalize when the value comes from a form submission, never from stored data.
+                if ($valueFromRequest && $this->getOption('datetime') === 'd' && is_numeric($value) && (int) $value % 86400 !== 0) {
+                    // Normalize to midnight UTC, mirroring DateTime handler (see DateTime::getFieldData).
+                    $timezone = $requestData[$ins_id . '_timezone'] ?? TikiLib::lib('tiki')->get_display_timezone();
+                    $server_offset = TikiDate::tzServerOffset($timezone, (int) $value);
+                    $value = (int) $value + $server_offset;
+                }
+            } catch (Services_Exception $e) {
+                $value = '';
+                Feedback::error(tr('Date Picker Field: %0', $e->getMessage()));
+            }
         }
 
         return [
@@ -124,6 +142,8 @@ class Tracker_Field_JsCalendar extends Tracker_Field_DateTime
         $params['notBefore'] = $this->getOption('notBefore') ? '#trackerinput_' . $this->getOption('notBefore') : '';
         $params['notAfter']  = $this->getOption('notAfter') ? '#trackerinput_' . $this->getOption('notAfter') : '';
         $params['timezone'] = TikiLib::lib('tiki')->get_display_timezone();
+        $params['minutestep'] = $this->getValidatedMinuteStep();
+        $params['enforcestep'] = (int) ($this->trackerField->getOption('enforceStep') ?: 0);
 
         return smarty_function_jscalendar($params, $smarty->getEmptyInternalTemplate());
     }

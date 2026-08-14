@@ -48,7 +48,7 @@ class DatabaseQueryLogConsoleFormatter
                 $entryText
             ];
 
-            array_push($rows, $row);
+            $rows[] = $row;
         }
 
         $table->setRows($rows);

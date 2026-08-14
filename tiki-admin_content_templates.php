@@ -15,31 +15,33 @@ $inputConfiguration = [
             'remove'                  => 'int',          //post
             'removesection'           => 'string',       //post
             'rtemplateId'             => 'int',          //post
-            'preview'                 => 'bool',         //post
-            'section_html'            => 'bool',         //post
+            'preview'                 => 'alpha',        //post
+            'section_html'            => 'alpha',        //post
             'name'                    => 'alpha',        //post
-            'section_wiki'            => 'bool',         //post
-            'section_file_galleries'  => 'bool',         //post
-            'section_newsletters'     => 'bool',         //post
-            'section_events'          => 'bool',         //post
-            'section_cms'             => 'bool',         //post
+            'section_wiki'            => 'alpha',        //post
+            'section_file_galleries'  => 'alpha',        //post
+            'section_newsletters'     => 'alpha',        //post
+            'section_events'          => 'alpha',        //post
+            'section_cms'             => 'alpha',        //post
             'page_name'               => 'pagename',     //post
             'template_type'           => 'string',       //post
-            'save'                    => 'bool',         //post
-            'section_wiki_html'       => 'bool',         //post
+            'save'                    => 'alpha',        //post
+            'section_wiki_html'       => 'alpha',        //post
             'locked'                  => 'string',       //post
             'sort_mode'               => 'string',       //get
             'offset'                  => 'digits',       //get
             'find'                    => 'string',       //post
-            'mode_normal'             => 'bool',         //post
-            'mode_wysiwyg'            => 'bool',         //post
+            'mode_normal'             => 'alpha',        //post
+            'mode_wysiwyg'            => 'alpha',        //post
             'content'                 => 'xss',          //post
         ],
     ],
 ];
 
-$section = 'admin';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $access->check_feature(['feature_wiki_templates','feature_cms_templates','feature_file_galleries_templates'], '', 'features', true);
 
 $templateslib = TikiLib::lib('template');
@@ -274,21 +276,13 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $templateslib->list_all_templates($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 
 // wysiwyg decision
 if ($_REQUEST['templateId']) {

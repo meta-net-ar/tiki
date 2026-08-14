@@ -8,19 +8,24 @@
         {/if}
         {if is_array( $p.value )}
             <input name="{$p.preference|escape}" id="{$p.id|escape}" value="{$p.value|join:$p.separator|escape}" class="form-control" size="{$p.size|default:40|escape}"
-                type="text" {$p.params}>
+                type="text" {$p.params}{if $p.parameters.disabled} disabled="disabled"{/if}>
         {else}
             <input name="{$p.preference|escape}" id="{$p.id|escape}" value="{$p.value|escape}" class="form-control" size="{$p.size|default:40|escape}"
-                type="text" {$p.params}>
+                   type="text" {$p.params}{if $p.parameters.disabled} disabled="disabled"{/if}>
         {/if}
         {if !empty($p.units)}
                 <span class="input-group-text">{$p.units}</span>
             </div>
         {/if}
         {if !empty($p.fgal_picker)}
-            {$fileId = {ldelim}|cat:'fileId'|cat:{rdelim}}
-                    <a class="btn btn-primary" title="{tr}Upload image{/tr}" href="#"
-                        onclick="$('#{$p.id|escape}').trigger('select'); openFgalsWindow('tiki-upload_file.php?filegals_manager={$p.id|escape}&insertion_syntax={$fileId|sefurl:display}', true);return false;">
+            {$fileId = "%fileId%"}
+                    <a
+                        class="btn btn-primary"
+                        title="{tr}Upload image{/tr}"
+                        href="#"
+                        onclick="$('#{$p.id|escape}').trigger('select'); openFgalsWindow('tiki-upload_file.php?filegals_manager={$p.id|escape}&insertion_syntax={$fileId|sefurl:display}&galleryId=1', true);return false;"
+                        role="button"
+                    >
                     {icon name='image'}&nbsp;{tr}Upload image{/tr}
                     </a>
             </div>

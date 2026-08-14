@@ -112,7 +112,7 @@ class PackageInformationCache
             return;
         }
 
-        /** @var \Cachelib $cachelib */
+        /** @var \Tiki\Cache\CacheLib $cachelib */
         $cachelib = TikiLib::lib('cache');
 
         $cachelib->cacheItem(
@@ -184,7 +184,7 @@ class PackageInformationCache
         $packagesModificationTime = (int)filemtime(__DIR__ . DIRECTORY_SEPARATOR . ComposerManager::CONFIG_PACKAGE_FILE);
         $lastModif = max($configModificationTime, $configModificationTimeBundled, $lockModificationTime, $lockModificationTimeBundled, $packagesModificationTime);
         error_reporting($errorLevel);
-        /** @var \Cachelib $cachelib */
+        /** @var \Tiki\Cache\CacheLib $cachelib */
         $cachelib = TikiLib::lib('cache');
 
         $cache = $cachelib->getCached(

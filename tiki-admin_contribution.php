@@ -18,17 +18,21 @@ $inputConfiguration = [
             'feature_contribution_mandatory_forum'           => 'bool',         //post
             'feature_contribution_mandatory_comment'         => 'bool',         //post
             'feature_contribution_mandatory_blog'            => 'bool',         //post
+            'feature_contribution_display_in_comment'        => 'bool',         //post
             'feature_contributor_wiki'                       => 'bool',         //post
-            'new_contribution_name'                          => 'alpha',        //post
-            'description'                                    => 'alpha',        //post
+            'new_contribution_name'                          => 'text',         //post
+            'description'                                    => 'text',         //post
             'replace'                                        => 'bool',         //post
-            'name'                                           => 'alpha',        //post
+            'name'                                           => 'text',         //post
             'remove'                                         => 'int',          //post
             'save'                                           => 'bool',         //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_contribution');
 
 $contributionlib = TikiLib::lib('contribution');
@@ -90,7 +94,7 @@ if (isset($_REQUEST['setting']) && $access->checkCsrf()) {
 if (isset($_REQUEST['add']) && isset($_REQUEST['new_contribution_name']) && $access->checkCsrf()) {
     $result = $contributionlib->add_contribution(
         $_REQUEST['new_contribution_name'],
-        isset($_REQUEST['description']) ? $_REQUEST['description'] : ''
+        $_REQUEST['description'] ?? ''
     );
     if ($result && $result->numRows()) {
         Feedback::success(tr('Contribution added'));
@@ -107,7 +111,7 @@ if (
     $result = $contributionlib->replace_contribution(
         $_REQUEST['contributionId'],
         $_REQUEST['name'],
-        isset($_REQUEST['description']) ? $_REQUEST['description'] : ''
+        $_REQUEST['description'] ?? ''
     );
     if ($result && $result->numRows()) {
         Feedback::success(tr('Contribution modified'));

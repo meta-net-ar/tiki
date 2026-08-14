@@ -19,6 +19,7 @@ class Patch
     public const NOT_APPLIED = 0;
     public const ALREADY_APPLIED = 1;
     public const NEWLY_APPLIED = 2;
+    public const FAILED = -1;
 
     private $name;
     private $status = null;
@@ -37,7 +38,7 @@ class Patch
      */
     public function setStatus($status)
     {
-        if (! in_array($status, [self::NOT_APPLIED, self::ALREADY_APPLIED, self::NEWLY_APPLIED])) {
+        if (! in_array($status, [self::NOT_APPLIED, self::ALREADY_APPLIED, self::NEWLY_APPLIED, self::FAILED])) {
             throw new DomainException();
         }
         $this->status = $status;

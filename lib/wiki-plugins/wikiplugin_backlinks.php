@@ -4,7 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once "lib/wiki/pluginslib.php";
+
+use Tiki\Lib\Wiki\PluginsLibUtil;
+use Tiki\Lib\Wiki\PluginsLib;
 
 class WikiPluginBackLinks extends PluginsLib
 {
@@ -25,7 +27,7 @@ class WikiPluginBackLinks extends PluginsLib
 
     public function getDescription()
     {
-        return wikiplugin_backlinks_help();
+        return wikiplugin_backlinks_info()['description'];
     }
 
     public function getVersion()
@@ -35,7 +37,6 @@ class WikiPluginBackLinks extends PluginsLib
 
     public function get_backlink_from_tracker_item($trackerObjectId)
     {
-        $backlink = "";
         $ids = explode(":", $trackerObjectId);
         $itemId = (int)$ids[0];
         $trackerId = (int)$ids[1];
@@ -85,20 +86,22 @@ class WikiPluginBackLinks extends PluginsLib
         //To be able to read prefs
         global $prefs;
         $wikilib = TikiLib::lib('wiki');
-        $exclude = isset($params['exclude']) ? $params['exclude'] : [];
+        $exclude = $params['exclude'] ?? [];
         $params = $this->getParams($params, true);
         $aInfoPreset = array_keys($this->aInfoPresetNames);
+        $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_backlinks_info());
         extract($params, EXTR_SKIP);
 
-        if (! isset($page)) {
-            $page = null;
+        if (is_null($page)) {
+            // get current page name
+            global $page;
         }
 
         /////////////////////////////////
         // Create a valid list for $info
         /////////////////////////////////
         //
-        if ($info) {
+        if (! is_null($info)) {
             $info_temp = [];
             foreach ($info as $sInfo) {
                 if (in_array(trim($sInfo), $aInfoPreset)) {
@@ -141,7 +144,7 @@ class WikiPluginBackLinks extends PluginsLib
                 }
             }
         }
-        if (isset($include_self) && $include_self) {
+        if ($include_self) {
             $aBackRequest[] = $page;
         }
         if (! $aBackRequest) {
@@ -158,10 +161,10 @@ class WikiPluginBackLinks extends PluginsLib
         // Start of Output
         /////////////////////////////////
         //
-        if (! isset($noheader) || ! $noheader) {
+        if (! $noheader) {
             // Create header
-            if (! empty($aPages["cant"])) {
-                $count = $aPages["cant"];
+            if (! empty($aPages["count"])) {
+                $count = $aPages["count"];
             } else {
                 $count = 0;
             }
@@ -210,7 +213,6 @@ function wikiplugin_backlinks_info()
                 'since' => '1',
                 'advanced' => true,
                 'filter' => 'pagename',
-                'default' => '[pagename]',
                 'profile_reference' => 'wiki_page',
             ],
             'info' => [
@@ -221,7 +223,6 @@ function wikiplugin_backlinks_info()
                 'advanced' => true,
                 'separator' => '|',
                 'filter' => 'text',
-                'default' => false,
             ],
             'exclude' => [
                 'required' => false,
@@ -230,7 +231,6 @@ function wikiplugin_backlinks_info()
                     %0HomePage|Sandbox%1', '<code>', '</code>'),
                 'since' => '1',
                 'advanced' => true,
-                'default' => '',
                 'separator' => '|',
                 'filter' => 'pagename',
                 'profile_reference' => 'wiki_page',
@@ -255,6 +255,7 @@ function wikiplugin_backlinks_info()
                 'description' => tra('With or without header (default is with header)'),
                 'since' => '1',
                 'filter' => 'digits',
+                'default' => 0,
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('With header'), 'value' => '0'],
@@ -267,7 +268,7 @@ function wikiplugin_backlinks_info()
 
 function wikiplugin_backlinks($data, $params)
 {
-    $plugin = new wikipluginbacklinks();
+    $plugin = new WikiPluginBackLinks();
     $data = $plugin->run($data, $params);
     if (TikiLib::lib('parser')->option['is_markdown']) {
         $data = "\n" . $data;

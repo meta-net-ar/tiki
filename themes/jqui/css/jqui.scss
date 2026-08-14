@@ -1,5 +1,11 @@
-//   This is the SCSS template for
-/*  the Jqui theme stylesheet for Tiki Wiki CMS Groupware. */
+@charset "UTF-8";
+/*!
+ * The jQui theme by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2002-2025 The Tiki Community as described in copyright.txt
+ * Licensed under MIT
+ * The jQui theme and its child themes use some design elements from https://jqueryui.com/themeroller/, copyright OpenJS Foundation and other contributors, https://openjsf.org/,  in accordance with the terms of use.
+ * The jQui child themes are an experiment in creating no-compile child themes (CSS only, no SCSS files) making extensive use of CSS variables.
+ */
 
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 
@@ -12,5 +18,6 @@
 @import "../../base_files/scss/_tiki-selectors.scss"; // 7. Tiki CSS selectors used globally.
 @import "../../base_files/scss/_tiki-pagetop_colors.scss"; // 8. Optionally imported to group (separately) the top and topbar zone components for styling.
 @import "../scss/_tiki-selectors.scss"; // 9. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
+@import "../options/tiki-selectors.css"; // 9. Tiki CSS selectors, including those of external scripts, to be styled by the theme's variables.
 
 @import "../scss/css-variables"; // 10. Imported after default CSS variables to override them.

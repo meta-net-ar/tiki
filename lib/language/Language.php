@@ -5,10 +5,13 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
+
+use Tiki\Lib\Language\LangStringEscaper;
+use Tiki\Sections;
 
 /**
  * @package   Tiki
@@ -68,20 +71,12 @@ class Language extends TikiDb_Bridge
      * since they should not apper in english strings.
      *
      * @param string $string
+     *
      * @return string modified string;
      */
-    public static function addPhpSlashes($string)
+    public static function addPhpSlashes(string $string): string
     {
-        $addPHPslashes = [
-            "\n" => '\n',
-            "\r" => '\r',
-            "\t" => '\t',
-            '\\' => '\\\\',
-            '$'  => '\$',
-            '"'  => '\"'
-        ];
-
-        return strtr($string, $addPHPslashes);
+        return LangStringEscaper::addPhpSlashes($string);
     }
 
     /**
@@ -106,7 +101,7 @@ class Language extends TikiDb_Bridge
             '\"'   => '"'
         ];
 
-        if (preg_match('/\{0-7]{1,3}|\x[0-9A-Fa-f]{1,2}/', $string, $match)) {
+        if (preg_match('/\\\\([0-7]{1,3}|x[0-9A-Fa-f]{1,2})/', $string, $match)) {
             trigger_error("Octal or hexadecimal string '" . $match[1] . "' not supported", E_WARNING);
         }
 
@@ -129,6 +124,7 @@ class Language extends TikiDb_Bridge
             case 'he':
             case 'ku':
             case 'ug':
+            case 'ur':
                 return true;
         }
         return false;
@@ -143,7 +139,7 @@ class Language extends TikiDb_Bridge
     public static function isRTL()
     {
         global $prefs;
-        return self::isLanguageRTL($prefs['language']);
+        return self::isLanguageRTL(Language::getCurrentLanguage());
     }
 
     /**
@@ -157,7 +153,7 @@ class Language extends TikiDb_Bridge
         global $prefs;
 
         $args = func_get_args();
-        $key = 'disk_languages' . implode(',', $args) . $prefs['language'];
+        $key = 'disk_languages' . implode(',', $args) . self::getCurrentLanguage();
         $cachelib = TikiLib::lib('cache');
 
         if (! $languages = $cachelib->getSerialized($key)) {
@@ -174,28 +170,21 @@ class Language extends TikiDb_Bridge
      * @param $path
      * @return array
      */
-    private static function list_disk_languages($path)
+    private static function list_disk_languages($path = 'lang')
     {
-        $languages = [];
-
-        if (! $path) {
-            $path = "lang";
-        }
-
         if (! is_dir($path)) {
             return [];
         }
 
-        $h = opendir($path);
+        $languages = [];
+        $iterator = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
 
-        while ($file = readdir($h)) {
-            if (strpos($file, '.') === false && $file != 'CVS' && $file != 'index.php' && is_dir("$path/$file") && file_exists("$path/$file/language.php")) {
-                $languages[] = $file;
+        foreach ($iterator as $fileInfo) {
+            $name = $fileInfo->getFilename();
+            if ($fileInfo->isDir() && ! str_contains($name, '.') && $name !== 'CVS' && file_exists($fileInfo->getPathname() . '/language.php')) {
+                $languages[] = $name;
             }
         }
-
-        closedir($h);
-
         return $languages;
     }
 
@@ -218,7 +207,7 @@ class Language extends TikiDb_Bridge
      * @param $language
      * @return bool
      */
-    public function is_valid_language($language)
+    public static function is_valid_language($language)
     {
         return preg_match("/^[a-zA-Z-_]*$/", $language)
             && file_exists('lang/' . $language . '/language.php');
@@ -670,5 +659,145 @@ class Language extends TikiDb_Bridge
         // now lets sort the list so it comes back all pretty :)
         asort($LangCodes);
         return $LangCodes;
+    }
+
+    /**
+     * Indicates whether a locale identifier is valid
+     *
+     * @param string $localeIdentifier A locale identifier, such as "en"
+     * @return bool true if and only if the given locale identifier is valid and allowed
+     */
+    public static function isValidLocale(string $localeIdentifier = ''): bool
+    {
+        global $prefs;
+
+        $availableLanguages = $prefs['available_languages'];
+
+        if (is_string($availableLanguages)) {
+            $availableLanguages = json_decode($availableLanguages, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                $availableLanguages = [];
+            }
+        }
+
+        return preg_match("/[a-zA-Z-_]+$/", $localeIdentifier)
+            && file_exists('lang/' . $localeIdentifier . '/language.php')
+            && ($prefs['restrict_language'] === 'n' || empty($availableLanguages) || in_array($localeIdentifier, $availableLanguages));
+    }
+
+    /**
+     * Sets the language
+     *
+     * @param string $localeIdentifier the identifier of the locale to set
+     * @param bool $languageAdmin whether to set the admin language
+     * @return bool true on success, false on failure (if $localeIdentifier is not a valid and allowed locale identifier)
+     */
+    public static function setCurrentLanguage(string $localeIdentifier = '', bool $languageAdmin = false): bool
+    {
+        $smarty = TikiLib::lib('smarty');
+        $tikilib = TikiLib::lib('tiki');
+        global $prefs, $user;
+
+        $prefName = $languageAdmin ? 'language_admin' : 'language';
+
+        if (self::isValidLocale($localeIdentifier)) {
+            $prefs[$prefName] = $localeIdentifier;
+            $smarty->refreshLanguage();
+            $tikilib->set_user_preference($user, $prefName, $localeIdentifier);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Determine the user's preferred language (switchLang GET param or browser detection)
+     *
+     * @return string|null
+    */
+    protected static function determineUserLanguage(): ?string
+    {
+        global $prefs, $tikilib;
+
+        if ($prefs['feature_multilingual'] != 'y' || $prefs['change_language'] != 'y') {
+            return null;
+        }
+
+        // User manually switched language via GET
+        if (isset($_GET['switchLang'])) {
+            return $_GET['switchLang'];
+        }
+
+        // Detect browser language if enabled and user has no preference
+        if ($prefs['feature_detect_language'] === 'y' && ! $tikilib->userHasPreference('language')) {
+            $browserLanguage = detect_browser_language();
+            if (self::isValidLocale($browserLanguage)) {
+                return $browserLanguage;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Determine admin section language override
+     *
+     * @return string|null
+     */
+    protected static function determineAdminLanguage(): ?string
+    {
+        global $prefs;
+        $section = Sections::getCurrentSection();
+        if (
+            ! empty($section)
+            && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))
+            && ! empty($prefs['language_admin'])
+            && self::isValidLocale($prefs['language_admin'])
+        ) {
+            return $prefs['language_admin'];
+        }
+
+        return null;
+    }
+
+    /**
+     * Sets the current language based on section and user preferences
+     * Should be called after the Section is set and autoloader is available
+     *
+     * @return void
+    */
+    public static function setSectionLanguage(): void
+    {
+        global $prefs;
+
+        // Step 1: determine user language or fallback
+        $lang = self::determineUserLanguage() ?? self::getCurrentLanguage();
+
+        // Step 2: admin override
+        $adminLang = self::determineAdminLanguage();
+        if ($adminLang !== null) {
+            $lang = $adminLang;
+        }
+
+        // Step 3: ensure valid locale
+        if (! self::isValidLocale($lang)) {
+            $lang = $prefs['site_language'];
+        }
+
+        // Step 4: apply language
+        self::setCurrentLanguage($lang);
+    }
+
+    public static function getCurrentLanguage(): string
+    {
+        global $user, $user_preferences, $prefs;
+        $language = 'en';
+        if (isset($user) && ! empty($user_preferences[$user]['language'])) {
+            $language = $user_preferences[$user]['language'];
+        } elseif (! empty($prefs['language'])) {
+            $language = $prefs['language'];
+        } else {
+            $language = $prefs['site_language'] ?? $language;
+        }
+        return $language;
     }
 }

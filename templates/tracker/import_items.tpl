@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="navigation"}
@@ -19,8 +19,16 @@
 {/if}
 <form class="no-ajax" action="{service controller=tracker action=import_items trackerId=$trackerId}" method="post" enctype="multipart/form-data">
     {remarksbox type="warning" title="{tr}Deprecated{/tr}"}
-        {tr}To import items into a tracker please{/tr} <a href="tiki-admin.php?page=trackers&highlight=tracker_tabular_enabled" class="alert-link" target="_blank" title="{tr}enable{/tr}">{tr}enable{/tr}</a> {tr}and use{/tr} <a href="tiki-tabular-manage" class="alert-link" target="_blank" title="{tr}Tracker Import-Export{/tr}">{tr}Tracker Import-Export{/tr}</a>. {tr}It is easy to use, optimised and far more powerful.{/tr}
-        {tr}For complete documentation, please visit{/tr} <a href="https://doc.tiki.org/Tracker-Tabular" class="alert-link" target="_blank" title="{tr}Tracker Import-Export{/tr}"> {tr}Tracker Import-Export{/tr} {icon name="documentation"}</a>
+        {capture assign=tabularLink}
+            <a href="{service controller=tabular action=manage}" class="alert-link" target="_blank">Tracker Import-Export</a>
+        {/capture}
+        {tr _0='<a href="tiki-admin.php?page=trackers&highlight=tracker_tabular_enabled" class="alert-link" target="_blank" title="enable">' _1='</a>' _2=$tabularLink _3='</a>'}To import items into a tracker, please %0enable%1 and use %2Tracker Import-Export%3. It is easy to use, optimized, and far more powerful.{/tr}
+
+        {capture assign=docIcon}
+            {icon name="documentation"}
+        {/capture}
+
+        {tr _0='<a href="https://doc.tiki.org/Tracker-Tabular" class="alert-link" target="_blank" title="Tracker Import-Export">' _1=$docIcon _2='</a>'}For complete documentation, please visit %0Tracker Import-Export%1%2.{/tr}
     {/remarksbox}
     {remarksbox type="note" title="{tr}Note{/tr}"}
         <ul>
@@ -51,8 +59,12 @@
         </select>
     </div>
     <div class="mb-3 row mx-0">
-        <label for="separator">{tr}Separator{/tr}</label>
-        <input type="text" name="separator" value="," size="2" class="form-control">
+        <label for="separator">{tr}Select separator:{/tr}</label>
+        <select name="separator" class="form-select file-delimiter">
+            <option value="," selected>{tr}Comma{/tr}(,)</option>
+            <option value=";">{tr}Semicolon{/tr}(;)</option>
+            <option value="tab">{tr}Tab{/tr}(\t)</option>
+        </select>
     </div>
     <div class="form-check">
         <input type="checkbox" class="form-check-input" name="add_items" id="add_items" value="1">

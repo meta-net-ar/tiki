@@ -61,7 +61,7 @@ class MimeLib
         } elseif ($type === 'text/html' && self::get_extension($filename) == 'svg') {
             $type = 'image/svg+xml';
         } elseif ($type === 'text/html' && $prefs['vimeo_upload'] === 'y' && is_numeric($filename)) {
-            if (strpos($content, 'vimeo.com') !== false) {
+            if (str_contains($content, 'vimeo.com')) {
                 $type = 'video/vimeo';
             }
         } else {
@@ -82,7 +82,7 @@ class MimeLib
     private static function get_extension($filename)
     {
         $ext = pathinfo($filename);
-        return isset($ext['extension']) ? $ext['extension'] : '';
+        return $ext['extension'] ?? '';
     }
 
     /**
@@ -96,7 +96,7 @@ class MimeLib
 
         if (isset($mimetypes)) {
             $ext = self::get_extension($filename);
-            $mimetype = isset($mimetypes[$ext]) ? $mimetypes[$ext] : '';
+            $mimetype = $mimetypes[$ext] ?? '';
 
             if (! empty($mimetype)) {
                 return $mimetype;

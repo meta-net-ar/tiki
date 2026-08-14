@@ -1,7 +1,32 @@
-// This file contains CSS rules for this theme that aren't covered by Bootstrap, such as additional Tiki theme properties.
-// To do: Use variables for global Tiki properties and customize a Tiki variables file per-theme.
+// Lux for Tiki Bootstrap 5.3
 
-// navbars with too many items overflows the container
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
+//$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
+// Links
+// Components
+// Typography
+// Tables
+// Buttons
+// Forms
+// Navs
+// Navbar
+    // navbars with too many items overflows the container
 .navbar-expand .navbar-nav {
     flex-wrap: wrap;
 }
@@ -12,14 +37,75 @@
     }
 }
 
-// Prevent wrapping in tight admin navbars
+    // Prevent wrapping in tight admin navbars
 .tiki-admin .nav-item {
     margin-right: 1rem;
 }
 
-// Increase height to compensate for theme's extra padding
-.tiki .select2-container--bootstrap-5 .select2-selection {
-    min-height: calc(2.2em + 0.75rem + 2px);
-    border-radius: 0 !important;
+.topbar .nav-link {
+    padding-top: 1.1rem;
+    padding-bottom: 1.1rem;
 }
 
+// Dropdowns
+// Pagination
+// Cards
+// Accordion
+// Badges
+// Alerts
+// Progress bars
+// List group
+[data-bs-theme="light"] {
+    .list-group-item-primary {
+        color: #2C2F30BF;
+    }
+    .list-group-item-secondary {
+        color: #303536BF;
+    }
+    .list-group-item-success {
+        color: #303536BF;
+    }
+    .list-group-item-info {
+        color: #303536BF;
+    }
+    .list-group-item-warning {
+        color: #36393ABF;
+    }
+    .list-group-item-danger {
+        color: #333738BF;
+    }
+    //    .list-group-item-light {
+    //        color: #303536BF;
+    //    }
+    .list-group-item-dark {
+        color: #2F3132BF;
+    }
+}
+
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
+// Dark mode
+[data-bs-theme=dark] {
+    mark {
+        color: #B9C0C6;
+    }
+    .accordion-button.collapsed {
+        color: #828282;
+    }
+    .alert.alert-primary {
+        color: #858585;
+        .alert-link {
+            color: #858585;
+        }
+    }
+    .btn.btn-outline-success { color: #359757; border-color: #359757; }
+    .btn.btn-outline-danger { color: #D95854; border-color: #D95854; }
+    .btn.btn-outline-warning { color: #BD740F; border-color: #BD740F; }
+    .btn.btn-outline-info { color: #1E8EBE; border-color: #1E8EBE; }
+    .list-group-item.list-group-item-action.list-group-item-secondary { color: #BCC3C8BF; }
+    .list-group-item.list-group-item-action.list-group-item-light { color: #C1C9CDBF; }
+}
+
+// External libraries

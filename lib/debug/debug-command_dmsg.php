@@ -10,8 +10,6 @@
  */
 
 require_once('lib/debug/debugger-ext.php');
-
-global $debugger;
 require_once('lib/debug/debugger.php');
 
 /**

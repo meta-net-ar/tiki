@@ -53,7 +53,7 @@
             {preference name=wikiplugin_googlechart}
             {preference name=wikiplugin_includetpl}
             {preference name=wikiplugin_like}
-            {preference name=wikiplugin_piwik}
+            {preference name=wikiplugin_matomo}
             {preference name=wikiplugin_tour}
             {preference name=wikiplugin_useringroup}
             {preference name=wikiplugin_xmlupdate}
@@ -120,11 +120,11 @@
                     </fieldset>
                 {/tab}
 
-                {tab name="{tr}Piwik Analytics{/tr}"}
+                {tab name="{tr}Matomo Analytics{/tr}"}
                     <fieldset>
-                        <legend class="visually-hidden">{tr}Piwik Analytics{/tr}</legend>
-                        {preference name=site_piwik_analytics_server_url}
-                        {preference name=site_piwik_site_id}
+                        <legend class="visually-hidden">{tr}Matomo Analytics{/tr}</legend>
+                        {preference name=site_matomo_analytics_server_url}
+                        {preference name=site_matomo_site_id}
                     </fieldset>
                 {/tab}
             {/tabset}
@@ -144,8 +144,8 @@
                 </div>
                 {preference name=jquery_timeago}
                 {preference name=user_unique_email}
-                {preference name=recaptcha_enabled}
-                <div class="adminoptionboxchild" id="recaptcha_enabled_childcontainer">
+                {preference name=captcha_type}
+                <div class="adminoptionboxchild" id="captcha_type_childcontainer">
                     {preference name=recaptcha_pubkey}
                     {preference name=recaptcha_privkey}
                     {preference name=recaptcha_theme}

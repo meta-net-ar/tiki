@@ -1,0 +1,341 @@
+// Copied from Modern Touch
+// 1. For themes that use an unchanging color or gradient or image background for the body,
+// but in which the content areas, defined below, change according to color mode preference.
+
+// 2. Import variables
+@import "variables";
+
+// Image path (for images that aren't likely to be subject to site admin customization)
+$imagePath: "../images/";
+
+// - - - - - - - - - - - - - 3. Background not affected by color mode switching
+
+
+// - - - - - - - - - - - - - 4. CSS for color mode exceptions -
+// links, text, and other elements that display directly on the body background.
+
+[data-bs-theme=light],
+[data-bs-theme=dark] {
+    .special-case_colors {
+        a:not(.dropdown-item) {
+            color: var(--tiki-nonmode-link-color) !important; // #d0d2d2
+        }
+
+        ul:not(.dropdown-menu) > .nav-item > .nav-link {
+            --bs-nav-link-color: var(--tiki-nonmode-nav-link-color) !important; // #d0d2d2
+        }
+
+        color: var(--tiki-nonmode-color) !important; // #d0d2d2
+    }
+
+    h1.pagetitle,
+    h1.pagetitle a,
+    .breadcrumb,
+    .breadcrumb a,
+    .admin-content > h2,
+    main > h2, // tiki-batch_upload_files.php
+    main > h3, // My Notes
+    #fgalform label[for="clickall_1"] // Select all thumbnails
+    {
+        color: var(--tiki-nonmode-color) !important; // #d0d2d2
+    }
+
+    .admin-content .tab-content .tab-pane h1.pagetitle a {
+        color: var(--bs-body-color) !important;
+    }
+
+    .wikitopline,
+    .t_navbar,
+    .tiki_admin .pagetitle + .description,
+    .admin-content > p, // tiki-plugins
+    .tiki_trackers .pagetitle + .description,
+    .tiki-view_tracker .tab-pane.active h2,
+    .t_navbar + .description.form-text, // File gallery thumbnails (not elFinder)
+    .no-decorations, // This may need more specificity to prevent instances inside styling-element, etc.
+    .no-box, // This may need more specificity to prevent instances inside styling-element, etc.
+    #editpageform fieldset
+    {
+        color: var(--tiki-nonmode-color) !important; // #d0d2d2
+    }
+
+    .wikitopline a,
+    main > .t_navbar .btn-link, // Shoutbox
+    form .t_navbar .btn-link, // The class 'admin' was added to the form for this rule. More specifically it should be 'no-tabs'.
+    form .t_navbar .link-list,
+    form .row .col-lg-12.clearfix .btn-link,
+    form .row .col-lg-12.clearfix .link-list,
+    form.theme-has_tabs .btn-link, // Admin search
+    .admin-content > .t_navbar .btn-link,
+    .tiki-list_articles .t_navbar .btn-link,
+    .fgalname.tips,
+    .parent-gallery-link a {
+        color: var(--tiki-nonmode-link-color) !important; // #d0d2d2
+    }
+
+    // - - - - - - // Color mode exceptions, which are outside the color-mode switching areas and have consistent colors during color mode switches // - - - - - - //
+    .color-mode-exception {
+        color: var(--tiki-nonmode-color);
+    }
+
+    #fullscreenbutton,
+    .col1 .tiki-form-group .btn-link, // trackers
+    .popover-body a,
+    .popover-body .btn-link,
+    .col1 .nohighlight .filter a:not(.btn), // search page
+    .col1 > .cattree a, // categories
+    .col1 > .breadcrumb a, // categories
+    main > a.link,
+    #fgalexplorer_open a, #fgalexplorer_closed a,
+    .gallerypath a,
+    #editpageform .actions .btn-link,
+    .module:not(.card) .btn-link,
+    .no-decorations a, // This may need more specificity to prevent instances inside styling-element, etc.
+    .no-box > a, // This may need more specificity to prevent instances inside styling-element, etc.
+    .top_modules > .module {
+        color: var(--tiki-nonmode-link-color);
+        &:hover {
+            color: var(--tiki-nonmode-link-hover-color);
+        }
+    }
+
+    .top_modules > .module:not(.box-logo) {
+        & a:not(.btn), // Too general?
+        & h2,
+        & .siteloginbar_popup > button {
+            color: var(--tiki-nonmode-link-color);
+        }
+
+        color: var(--tiki-nonmode-link-color);
+
+        &:hover {
+            color: var(--tiki-nonmode-link-hover-color);
+        }
+    }
+
+    //.description,
+    .pwa-queue {
+        color: var(--tiki-nonmode-color);
+    }
+
+    // Original color mode exceptions in Modern Touch end
+    // Foreground colors for the above
+      .tiki_wiki_page.cat_no-content-bg .content {
+            & > * {
+                color: var(--tiki-nonmode-color) !important; // #d0d2d2
+            }
+
+            & > a:not(.dropdown-item),
+            a:not(.dropdown-item) {
+                color: var(--tiki-nonmode-link-color) !important; // #d0d2d2
+            }
+
+            & > ul:not(.dropdown-menu) > .nav-item > .nav-link {
+                --bs-nav-link-color: var(--tiki-nonmode-nav-link-color) !important; // #d0d2d2
+            }
+            .card {
+                color: var(--bs-body-color);
+                a {
+                    color: var(--bs-link-color) !important;
+                    &:hover,
+                    .active {
+                        color: var(--bs-link-hover-color) !important;
+                    }
+                }
+            }
+        }
+
+}
+
+
+
+// - - - - - - - - - - - - -  5. Color mode content - areas that change their color styles depending on color mode
+
+.color-mode-content, // Additional class (Not Bootstrap or general Tiki) that can be given to a page element to have the colors change during color-mode switching.
+.styling-element, // Compact equivalent of .color-mode-content
+.tiki_wiki_page:not(.cat_no-content-bg) .content:not(:has(.wikiinfo)), // Wiki page content
+#page-bar,
+.col1 > .actions,
+.col1 > h2,
+.article,
+.col1 > .alert-link,
+.col1 > p,
+footer.form-text,  // Wiki and article rating form
+main > form:not(#editpageform), // Categories
+main > .tab-content, // Wiki list pages
+#editpageform .tab-content, // Edit wiki page
+main > .table-responsive, // Wiki last changes
+
+div:not(.color-mode-content) .tab-content, // PluginTabs, etc.
+
+// Blogs
+.card.blogpost,
+.card.blogpost .card-header,
+.card.blogpost .card-footer,
+.col1 > #searchBlogs,
+.tiki_blogs .description.form-text,
+.tiki_blogs .card.blogpost,
+.comment-container,
+#v-pills-tabs_editblog.tab-content,
+
+// Articles
+.tiki-edit_article .tab-pane.active,
+
+// Forums
+#forumpost, // Edit forum post
+#forumpostopen,
+form#view_forum, // View forum
+div#filter-panel, // Filter posts
+article.card.post, // Forum post view
+div#forumpostopen, // Forum post form
+
+// Trackers
+.tiki-view_tracker_item .tab-pane.active, // View tracker item
+form[name="checkform"] .table-responsive, // View tracker items
+.form.save-fields, // View tracker fields
+
+// Calendar
+#calscreen,
+
+// Galleries
+.col1 > .tree.root,
+#searchListFgal,
+.fgal_file,
+.thumbnailcontener, // File gallery thumbnail images (not elFinder view);
+.tiki-batch_upload_files main form,
+.tiki .elFinderDialog,
+
+// Spreadsheets
+.tiki-sheets main .tab-content,
+.tiki-history_sheets form .tab-content,
+.tiki-export_sheet .admin-content form,
+.tiki-import_sheet .admin-content form,
+
+// Search
+.tiki_search .col1 > div.nohighlight,
+.tiki_search .searchresults,
+.find,
+
+// Categories
+.col1 > .cattree,
+.col1 > .category-browser,
+
+// Tags
+.col1 > form.freetagsearch,
+.col1 > .freetagresult,
+
+// My Account
+.tiki_mytiki .tab-content,
+.tiki-user_information .tab-content, // My Information
+
+.tiki-pluginlist_experiment .preview_contents,   // tiki-pluginlist_experiment.php
+
+// Admin
+.admin-content .admin_modules, // Admin dashboard
+.admin-content > .adminoptionbox, // "
+.admin-content > .find,
+.admin-content > .table-responsive,
+.tiki-admin .tab-content, // Admin section config forms (.tiki_admin and .tiki-admin work for most admin pages but .tiki-admin is needed for actionlog)
+.tiki-admin_modules,
+
+/// Admin groups
+.tiki-admingroups .tab-content,
+
+.tiki-wizard_admin form, // Wizards
+
+// External wikis
+.col1 > form,
+
+// Modals
+.modal-content
+{
+    background: var(--bs-body-bg);
+    color:  var(--bs-body-color); // $content-color;
+    padding: var(--tikiben-spacer);
+    border-radius: var(--tikiben-border-radius);
+    margin-bottom: var(--tikiben-spacer) !important;
+    border: 1px solid var(--tikiben-border-color);
+}
+
+.alert {
+    margin-bottom: 25px !important
+}
+
+.wikipreview {
+    padding: var(--tikiben-spacer);
+}
+
+// Related adjustments
+.tiki_wiki_page .content,
+.tiki-admin .tab-content,
+main > .tab-content,
+div#forumpostopen,
+.tiki-view_tracker_item .tab-pane.active {
+    padding: 15px;
+}
+
+.comment-container {
+    padding: 15px;
+}
+
+.thumbnailcontener {
+    padding-top: var(--tikiben-spacer);
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.popover a {
+    color: var(--bs-link-color);
+}
+
+.tab-content {
+    padding-top: 0 !important;
+}
+
+// - - - - - - - - - - - - -  6. When wiki article has no background
+// Use to set a transparent background for wiki pages, etc. with nontransparent sections for a bento-design content display against a different-colored body background.
+
+.tiki_wiki_page.cat_no-content-bg {
+    .content {
+        background: transparent !important;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+    }
+    .color-mode-content {
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        padding: 10px;
+        border-radius: 0;
+        margin-bottom: 25px;
+    }
+    .card {
+        background: var(--bs-body-bg); // $card-bg;
+        border-right: 1px solid var(--bs-border-color); // #dbdbdb;
+        border-bottom: 1px solid var(--bs-border-color); // #dbdbdb;
+        box-shadow: 0 4px 15px -5px #555; // var(--bs-tertiary-bg); //#555;
+        margin-bottom: 25px !important;
+        a { color: var(--bs-link-color); }
+    }
+}
+
+
+
+// Use to set a transparent background for wiki pages, etc. with nontransparent sections for a tikiben-design content display against a different-colored html or body background.
+.tiki.cat_no-content-bg {
+    article.wikitext {
+        background: transparent !important;
+    }
+    h1.pagetitle,
+    .color-mode-content {
+        background: var(--bs-body-bg);
+        color: var(--bs-body-color);
+        padding: var(--tikiben-spacer);
+        border-radius: var(--tikiben-border-radius);
+        margin-bottom: var(--tikiben-spacer) !important;
+    }
+}
+
+.row.color-mode-content {
+    margin-left: 0;
+    margin-right: 0;
+}

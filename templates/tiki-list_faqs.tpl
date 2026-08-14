@@ -59,7 +59,7 @@
                                                 <input type="hidden" name="offset" value="{$offset}">
                                                 <input type="hidden" name="sort_mode" value="{$sort_mode}">
                                                 <input type="hidden" name="remove" value="{$channels[user].faqId}">
-                                                <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup()">
+                                                <button type="submit" class="btn btn-link px-0 pt-0 pb-0" onclick="confirmPopup()" aria-label="{tr}Remove{/tr}">
                                                     {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                                 </button>
                                             </form>
@@ -75,7 +75,7 @@
             </table>
         </div>
 
-        {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
     {/tab}
 
     {if $tiki_p_admin_faqs eq 'y'}
@@ -97,12 +97,12 @@
                         {tr}Title:{/tr}
                     </label>
                     <div class="col-md-8">
-                        <input type="text" class="form-control" name="title" maxlength="200" value="{$title|escape}">
+                        <input type="text" class="form-control" name="title" maxlength="{$MAX_FAQ_TITLE_LENGTH}" value="{$title|escape}">
                         {jq}
                             $("input[name=title]").on("keyup", function () {
                                 var length = $(this).val().length;
-                                if(length > 200) {
-                                    alert("{tr}You have reached the number of characters allowed (200 max) for the FAQ title field.{/tr}");
+                                if(length > {$MAX_FAQ_TITLE_LENGTH}) {
+                                    alert("{tr _0=$MAX_FAQ_TITLE_LENGTH}You have reached the number of characters allowed (%0 max) for the FAQ title field.{/tr}");
                                 }
                             });
                         {/jq}

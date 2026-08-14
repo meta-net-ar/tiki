@@ -12,6 +12,7 @@ use Tracker\Tabular\Source\CsvSource;
 use Tracker\Tabular\Schema;
 use Tracker\Tabular\Source\PaginatedQuerySource;
 use Tracker\Tabular\Source\QuerySource;
+use Tracker\Tabular\Source\TrackerSourceEntry;
 use Tracker\Tabular\Writer\APIWriter;
 use Tracker\Tabular\Writer\HtmlWriter;
 use Tracker\Tabular\Writer\ODBCWriter;
@@ -70,30 +71,39 @@ class Services_Tracker_TabularController
     {
         Services_Exception_Denied::checkGlobal('tiki_p_tabular_admin');
 
+        $format = [];
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $lib = TikiLib::lib('tabular');
+            $format["name"] = $input->name->text();
+            $format["prefill"] = $input->prefill->text();
+            if (empty($input->trackerId->int()) || empty($input->name->text())) {
+                Feedback::error(tr('Both Tracker ID and Name are required.'));
+            } else {
+                $lib = TikiLib::lib('tabular');
 
-            $tabularId = $lib->create($input->name->text(), $input->trackerId->int(), $input->use_odbc->int() ? $input->odbc->none() : []);
+                $format["trackerId"] = $input->trackerId->int();
+                $tabularId = $lib->create($format["name"], $format["trackerId"], $input->use_odbc->int() ? $input->odbc->none() : []);
 
-            $forward = [
-                'controller' => 'tabular',
-                'action' => 'edit',
-                'tabularId' => $tabularId
-            ];
+                $forward = [
+                    'controller' => 'tabular',
+                    'action' => 'edit',
+                    'tabularId' => $tabularId
+                ];
 
-            if (! empty($input->prefill->text())) {
-                $forward['prefill'] = true;
+                if (! empty($input->prefill->text())) {
+                    $forward['prefill'] = true;
+                }
+
+                if (! empty($input->prefill_odbc->text())) {
+                    $forward['prefill_odbc'] = true;
+                }
+
+                return ['FORWARD' => $forward];
             }
-
-            if (! empty($input->prefill_odbc->text())) {
-                $forward['prefill_odbc'] = true;
-            }
-
-            return ['FORWARD' => $forward];
         }
 
         return [
             'title' => tr('Create Import-Export Format'),
+            'format' => $format,
             'has_odbc' => function_exists('odbc_connect'),
         ];
     }
@@ -105,6 +115,10 @@ class Services_Tracker_TabularController
         $prefill = $input->prefill->bool();
         $prefill_odbc = $input->prefill_odbc->bool();
         $trackerId = $info['trackerId'];
+
+        if (empty($info['tabularId'])) {
+            throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
+        }
 
         Services_Exception_Denied::checkObject('tiki_p_tabular_admin', 'tabular', $info['tabularId']);
 
@@ -341,6 +355,10 @@ class Services_Tracker_TabularController
         $lib = TikiLib::lib('tabular');
         $info = $lib->getInfo($input->tabularId->int());
 
+        if (empty($info['tabularId'])) {
+            throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
+        }
+
         Services_Exception_Denied::checkObject('tiki_p_tabular_export', 'tabular', $info['tabularId']);
 
         $schema = $this->getSchema($info);
@@ -537,6 +555,12 @@ class Services_Tracker_TabularController
     {
         $lib = TikiLib::lib('tabular');
         $info = $lib->getInfo($input->tabularId->int());
+        $separator = Services_Tracker_Utilities::normalizeCsvSeparator($input->separator->text());
+        $fileIsTsv = $separator === "\t";
+
+        if (empty($info['tabularId'])) {
+            throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
+        }
 
         Services_Exception_Denied::checkObject('tiki_p_tabular_import', 'tabular', $info['tabularId']);
 
@@ -545,20 +569,39 @@ class Services_Tracker_TabularController
 
         $done = false;
         $successImportMsg = tr('Your import was completed successfully.');
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $hasUploadedFile = isset($_FILES['file']) && (is_uploaded_file($_FILES['file']['tmp_name']) || is_file($_FILES['file']['tmp_name']));
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && is_uploaded_file($_FILES['file']['tmp_name'])) {
-            $source = $schema->getSource($_FILES['file']['tmp_name']);
+            if (! $hasUploadedFile) {
+                throw new Services_Exception_MissingValue("file");
+            }
+
+            if ($fileIsTsv && $schema->getFormat() === 'csv') {
+                Services_Tracker_Utilities::parseTsvContentToCsv('file');
+                $separator = ',';
+            }
+            $source = $schema->getSource($_FILES['file']['tmp_name'], $separator);
             $writer = new TrackerWriter();
 
             return TikiLib::lib('tiki')->allocate_extra(
                 'tracker_import_items',
-                function () use ($writer, $source, $info, $successImportMsg) {
-                    $writer->write($source);
+                function () use ($writer, $source, $info, $schema, $successImportMsg) {
+                    $result = $writer->write($source);
 
                     unlink($_FILES['file']['tmp_name']);
 
                     if (TIKI_API) {
-                        return ['feedback' => $successImportMsg];
+                        $data = [];
+                        $columns = $schema->getColumns();
+                        foreach ($result as $itemId) {
+                            $entry = new TrackerSourceEntry($itemId);
+                            $row = ['itemId' => $itemId];
+                            foreach ($columns as $column) {
+                                $row[$column->getLabel()] = $row[$column->getField()] = $entry->render($column, false);
+                            }
+                            $data[] = $row;
+                        }
+                        return $data;
                     }
 
                     Feedback::success($successImportMsg);
@@ -638,12 +681,22 @@ class Services_Tracker_TabularController
         $lib = TikiLib::lib('tabular');
         $info = $lib->getInfo($input->tabularId->int());
 
+        if (empty($info['tabularId'])) {
+            throw new Services_Exception_NotFound(tr('Format %0 not found', $input->tabularId->int()));
+        }
+
         Services_Exception_Denied::checkObject('tiki_p_tabular_import', 'tabular', $info['tabularId']);
 
         $schema = $this->getSchema($info);
         $schema->validate();
 
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && is_uploaded_file($_FILES['file']['tmp_name'])) {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            $hasUploadedFile = isset($_FILES['file']) && (is_uploaded_file($_FILES['file']['tmp_name']) || is_file($_FILES['file']['tmp_name']));
+
+            if (! $hasUploadedFile) {
+                throw new Services_Exception_MissingValue('file');
+            }
+
             $source = $schema->getSource($_FILES['file']['tmp_name']);
             $writer = new TrackerWriter();
 
@@ -894,7 +947,14 @@ class Services_Tracker_TabularController
 
             if (is_uploaded_file($_FILES['file']['tmp_name'])) {
                 try {
-                    $delimiter = $input->delimiter->text() == 'comma' ? ',' : ';';
+                    $delimiter = ',';
+
+                    if ($input->delimiter->text() == 'semicolon') {
+                        $delimiter = ';';
+                    } elseif ($input->delimiter->text() == 'tab') {
+                        $delimiter = "\t";
+                    }
+
                     $source = new CsvSource($schema, $_FILES['file']['tmp_name'], $delimiter);
                     $writer = new TrackerWriter();
                     $done = $writer->write($source);
@@ -932,6 +992,7 @@ class Services_Tracker_TabularController
                 'import_transaction' => 0,
                 'bulk_import' => 0,
                 'skip_unmodified' => 0,
+                'skip_validation' => 0,
                 'upload_max_filesize' => $uploadMaxFileSize
             ],
         ];
@@ -1088,7 +1149,6 @@ class Services_Tracker_TabularController
         $trackerUtilities = new Services_Tracker_Utilities();
         $types = $trackerUtilities->getFieldTypes();
 
-        unset($types['A']); // Attachment (deprecated)
         unset($types['w']); // Dynamic Items List
         unset($types['h']); // Header
         unset($types['icon']); // Icon

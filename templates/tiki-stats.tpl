@@ -47,7 +47,7 @@
         {if $pdf_export eq 'y' and $tiki_p_export_pdf eq 'y'}
             <div class="text-end">
                 <div class="btn-group">
-                    <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" title="{tr}Stats Actions{/tr}">
+                    <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" title="{tr}Stats Actions{/tr}" role="button">
                         {icon name="menu-extra"}
                     </a>
                     <div class="dropdown-menu dropdown-menu-end">
@@ -396,7 +396,7 @@
                             <td>
                             {$data.dataLengthMb} Mb
                             </td>
-                            <td>
+                            <td style="text-align:right;">
                             {$data.rowCount}
                             </td>
                         </tr>
@@ -466,12 +466,12 @@
         {/if}
     {/tab}
 
-    {if $prefs.site_piwik_analytics_server_url || $prefs.site_piwik_site_id}
-        {tab name="{tr}Piwik Analytics{/tr}"}
-            <h2 id="site_stats">{tr}Piwik Analytics Dashboard{/tr}</h2>
-            {remarksbox type="tip" title="{tr}Tip{/tr}"}{tr}Defaul dashboard is set to Piwik default dashboard. You can customize the modules to be displayed using the Dashboard setting; Create new dashboard.{/tr}{/remarksbox}
+    {if $prefs.site_matomo_analytics_server_url || $prefs.site_matomo_site_id}
+        {tab name="{tr}Matomo Analytics{/tr}"}
+            <h2 id="site_stats">{tr}Matomo Analytics Dashboard{/tr}</h2>
+            {remarksbox type="tip" title="{tr}Tip{/tr}"}{tr}Default dashboard is set to Matomo default dashboard. You can customize the modules to be displayed using the Dashboard setting; Create new dashboard.{/tr}{/remarksbox}
             <div id="dashboard">
-                {wikiplugin _name=piwik moduleToWidgetize="Dashboard,index" period="month" _height="880" _scrolling="yes"}{/wikiplugin}
+                {wikiplugin _name=matomo moduleToWidgetize="Dashboard,index" period="month" _height="880" _scrolling="yes"}{/wikiplugin}
             </div>
         {/tab}
     {/if}

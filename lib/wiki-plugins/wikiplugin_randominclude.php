@@ -19,16 +19,15 @@ function wikiplugin_randominclude_info()
 
 function wikiplugin_randominclude($data, $params)
 {
-    global $user, $page;
-    $userlib = TikiLib::lib('user');
+    global $page;
     $tikilib = TikiLib::lib('tiki');
     static $included_pages, $data;
 
     $params = [$page];
     $query = 'SELECT count(*) AS `max` FROM `tiki_pages` WHERE `pageName`!=?';
-    $cant = $tikilib->getOne($query, $params);
-    if ($cant) {
-        $pick = mt_rand(0, $cant - 1);
+    $count = $tikilib->getOne($query, $params);
+    if ($count) {
+        $pick = mt_rand(0, $count - 1);
 
         $query = 'select `pageName` from `tiki_pages` WHERE `pageName`!=?';
         $incpage = $tikilib->getOne($query, $params, 1, $pick);

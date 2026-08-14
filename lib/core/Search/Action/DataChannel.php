@@ -118,6 +118,11 @@ class Search_Action_DataChannel implements Search_Action_Action
         return false;
     }
 
+    public function requiresConfirm()
+    {
+        return false;
+    }
+
     private function getChannelConfig(array $channels)
     {
         global $prefs;

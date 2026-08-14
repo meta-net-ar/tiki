@@ -7,74 +7,69 @@
     &,
     & .card-header,
     & .card-footer {
-    background-color: transparent;
-    border: none;
+   background-color: transparent;
+   border: none;
     }
 }
 
-.blogheading {
-    display: block;
-    width: 100%;
-    clear: both;
-}
+//.blogheading { Selector not found in templates
+//    display: block;
+//    width: 100%;
+//    clear: both;
+//}
 
-.blogdesc {
-    display: block;
-    width: 40%;
-    padding: 8px;
-    margin-top: 8px;
-    margin-left: 6px;
-}
+//.blogdesc { Selector not found in templates
+//    display: block;
+//    width: 40%;
+//    padding: 8px;
+//    margin-top: 8px;
+//    margin-left: 6px;
+//}
 
-.bloginfo {
-    display: block;
-}
+//.bloginfo { Replaced with utility class
+//    display: block;
+//}
 
-.blogactions {
-    float: right;
-}
+//.blogactions { Replaced with utility class
+//    float: right;
+//}
 
-.postinfo {
-    margin-bottom: 20px;
-    margin-top: 10px;
-    div {
-        margin-top: 30%;
-    }
-}
+//.postinfo { Selector not found in templates
+//    margin-bottom: 20px;
+//    margin-top: 10px;
+//    div {
+//        margin-top: 30%;
+//    }
+//}
 
-div.posthead {
-    text-align: left;
-    padding: 3px;
-}
+//div.posthead { Selector not found in templates
+//    text-align: left;
+//    padding: 3px;
+//}
 
-span.posthead {
-    display: block;
-}
+//span.posthead { Selector not found in templates
+//    display: block;
+//}
 
-.postbody-title .panel-title { // Needs to be updated or removed
-    font-size: 1.4em;
-}
+//.postbody-title .panel-title { Selector not found in templates
+//    font-size: 1.4em;
+//}
 
-//body.tiki_blogs .post_single {
+//body.tiki_blogs .post_single { Replaced with utility class
 //    padding-bottom: 30px;
 //}
 
-small.description {
-    display: block;
-}
+//small.description { Selector not found in templates
+//    display: block;
+//}
 
-.description {
-    font-size: .95em;
-    font-style: italic;
-}
+//// Related content
+//.related_posts,
+//.related_articles { Replaced with utility class
+//    margin-top: 3em;
+//}
 
-// Related content
-.related_posts,
-.related_articles {
-    margin-top: 3em;
-}
-
-.related_posts h4,
-.related_articles h4 {
-    margin: 0;
-}
+//.related_posts h4,
+//.related_articles h4 { Replaced with utility class
+//    margin: 0;
+//}

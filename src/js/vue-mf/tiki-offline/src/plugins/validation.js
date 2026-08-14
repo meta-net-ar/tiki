@@ -81,7 +81,7 @@ const addFormValidation = (formId, tracker) => {
                 if (!$container.length) {
                     $container = $("html");
                     $scroller = $("body");
-                    offset = $(".fixed-top").outerHeight() || 0;
+                    offset = $("#page-header.sticky-top").outerHeight() || 0;
                 }
                 var containerScrollTop = $scroller.scrollTop(),
                     $firstError = $(validator.errorList[0].element),
@@ -102,11 +102,7 @@ const addFormValidation = (formId, tracker) => {
                     },
                     1000,
                     function () {
-                        if ($firstError.is("select") && jqueryTiki.select2) {
-                            $firstError.select2("focus");
-                        } else {
-                            $firstError.trigger("focus");
-                        }
+                        $firstError.trigger("focus");
                     }
                 );
             }

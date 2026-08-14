@@ -20,7 +20,7 @@ if (isset($tiki_p_edit_dynvar) && $tiki_p_edit_dynvar == 'y') {
         }
 
         foreach ($_REQUEST as $name => $value) {
-            if (substr($name, 0, 4) == 'dyn_' and $name != '_dyn_update') {
+            if (str_starts_with($name, 'dyn_') and $name != '_dyn_update') {
                 $tikilib->update_dynamic_variable(substr($name, 4), $_REQUEST[$name], $lang);
             }
         }

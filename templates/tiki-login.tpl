@@ -4,7 +4,7 @@
             mode="module"
             show_register="y"
             show_forgot="y"
-            show_two_factor_auth="{$twoFactorForm}"
+            show_two_factor_auth="{$showTwoFactorForm}"
             error=""
             flip=""
             decorations=""

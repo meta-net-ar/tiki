@@ -17,7 +17,7 @@ class Search_Formatter_ValueFormatter_Timeago extends Search_Formatter_ValueForm
         }
 
         if ($prefs['jquery_timeago'] === 'y' && $value) {
-            TikiLib::lib('header')->add_jq_onready('$("time.timeago").timeago();');
+            TikiLib::lib('header')->add_jq_onready('$("time.timeago").tikiTimeago();');
             return '<time class="timeago" datetime="' . TikiLib::date_format('c', $value, false, 5, false) . '">' . $value . '</time>';
         } else {
             return parent::render($name, $value, $entry);

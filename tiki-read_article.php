@@ -10,9 +10,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Lib\Image\Image;
 use Tiki\Wiki\WikiPaginationUtils;
-
-$section = 'cms';
-$here = [];
+use Tiki\Sections;
 
 $inputConfiguration = [
     [
@@ -21,13 +19,12 @@ $inputConfiguration = [
         'switchlang'               => 'bool',            //post
         'page'                     => 'int',             //post
         ],
-         'staticKeyFiltersForArrays' => [
-            $here['itemkey']       => 'digits',       //post
-            $here['key']           => 'digits',       //post
-         ],
     ],
 ];
+
 require_once('tiki-setup.php');
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
 
 $access->check_feature('feature_articles');
@@ -68,12 +65,7 @@ if ($prefs['feature_categories'] == 'y') {
 //This is basicaly a copy of part of the freetag code from tiki-setup.php and should be only there. The problem is that the section name for articles is "cms" and the object name for article in the table tiki_objects is "article". Maybe it is a good idea to use "cms" on tiki_objects instead "article" and then this block of code can be removed. Another solution?
 if ($prefs['feature_freetags'] == 'y') {
     $freetaglib = TikiLib::lib('freetag');
-    $here = $sections[$section];
-    if (isset($here['itemkey']) and isset($_REQUEST[$here['itemkey']])) {
-        $objectTags = $freetaglib->get_tags_on_object($_REQUEST[$here['itemkey']], "article " . $_REQUEST[$here['key']]);
-    } elseif (isset($here['key']) and isset($_REQUEST[$here['key']])) {
-        $objectTags = $freetaglib->get_tags_on_object($_REQUEST[$here['key']], "article");
-    }
+    $objectTags = $freetaglib->get_tags_on_object($_REQUEST['articleId'], "article");
     $tags = [];
     if ($objectTags) {
         $tags = $objectTags['data'];

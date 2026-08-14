@@ -289,7 +289,7 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
                 }
             }
             $start += 1000;
-            $hasMore = $start < $res['cant'];
+            $hasMore = $start < $res['count'];
         }
 
         return $this->dirsCache[$path];
@@ -309,15 +309,15 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
             $id = $row['id'];
             $id = 'd_' . $id;
             $dirs = $this->filegallib->list_file_galleries(0, -1, 'name_desc', '', '', $row['id']);
-            $r['dirs'] = $dirs['cant'];
+            $r['dirs'] = $dirs['count'];
             $r['mime'] = "directory";
             $r['size'] = 0;
         } else {
-            $id = isset($row['id']) ? $row['id'] : $row['fileId'];
+            $id = $row['id'] ?? $row['fileId'];
             $id = 'f_' . $id;
             $filetype = $row['filetype'];
             // elFinder assigns standard mime types like application/vnd.ms-word to ms doc, we use application/msword etc in tiki for some obscure reason :(
-            if (strpos($filetype, 'application/ms') !== false) {
+            if (str_contains($filetype, 'application/ms')) {
                 $filetype = str_replace('application/ms', 'application/vnd.ms-', $filetype);
                 $filetype = str_replace('ms--', 'ms-', $filetype);  // in case it was application/ms-word
             }
@@ -500,9 +500,9 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
         $path = '';
         foreach ($parentsIds as $id) {
             $dir = $this->stat($id);
-            $path .= isset($dir['name']) ? $dir['name'] : '' . $this->separator;
+            $path .= $dir['name'] ?? '' . $this->separator;
         }
-        return $path . isset($file['name']) ? $file['name'] : '';
+        return $path . $file['name'] ?? '';
     }
 
     /**
@@ -590,7 +590,7 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
      **/
     protected function _subdirs($path)
     {
-        return ($stat = $this->stat($path)) && isset($stat['dirs']) ? $stat['dirs'] : false;
+        return ($stat = $this->stat($path)) && $stat['dirs'] ?? false;
     }
 
     /**
@@ -635,9 +635,7 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
      **/
     protected function _scandir($path)
     {
-        return isset($this->dirsCache[$path])
-            ? $this->dirsCache[$path]
-            : $this->cacheDir($path);
+        return $this->dirsCache[$path] ?? $this->cacheDir($path);
     }
 
     /**
@@ -882,9 +880,11 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
     {
         $fileId = $this->pathToId($path);
         $galleryId = $this->options['accessControlData']['parentIds']['files'][$fileId];
-        $perms = TikiLib::lib('tiki')->get_perm_object($galleryId, 'file gallery', TikiLib::lib('filegal')->get_file_gallery_info($galleryId));
-        if ($perms['tiki_p_remove_files'] === 'y') {
-            $fileInfo = TikiLib::lib('filegal')->get_file_info($fileId, false, false);
+        $galInfo = TikiLib::lib('filegal')->get_file_gallery_info($galleryId);
+        $perms = TikiLib::lib('tiki')->get_perm_object($galleryId, 'file gallery', $galInfo);
+        $fileInfo = TikiLib::lib('filegal')->get_file_info($fileId, false, false);
+        // Use the shared permission model so elFinder deletion matches the standard gallery view.
+        if ($this->filegallib->userCanRemoveFile($fileInfo, $galInfo, $perms)) {
             return $this->filegallib->remove_file($fileInfo);
         } else {
             return false;
@@ -957,10 +957,10 @@ class elFinderVolumeTikiFiles extends elFinderVolumeDriver
         $fileId = 0;
 
         // elFinder assigns standard mime types like application/vnd.ms-word to ms doc, we use application/msword etc in tiki for some obscure reason :(
-        if (strpos($stat['mime'], 'application/vnd.ms-') !== false) {
+        if (str_contains($stat['mime'], 'application/vnd.ms-')) {
             $stat['mime'] = str_replace('application/vnd.ms-', 'application/ms', $stat['mime']);
         } elseif ($stat['mime'] === 'unknown' || $stat['mime'] === 'application/octet-stream') {
-            if (strpos($name, '.h5p') === strlen($name) - 4) {  // cover some Tiki-specific mime types
+            if (str_ends_with($name, '.h5p')) {  // cover some Tiki-specific mime types
                 $stat['mime'] = 'application/zip';
             }
         }

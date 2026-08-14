@@ -8,23 +8,27 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'      => [
             'categwatch'        => 'int',          //post
             'id'                => 'int',          //post
+            'hash'              => 'word',         //get - unsubscribe hash
             'add'               => 'bool',         //post
-            'event'             => 'string',       //post
+            'event'             => 'striptags',    //post
             'delete'            => 'bool',         //post
+            'langwatch'         => 'lang',         //post
         ],'staticKeyFiltersForArrays' => [
-            'cat_categories'          => 'string',    //post
+            'cat_categories'          => 'int',       //post
             'checked'                 => 'int',       //post
         ],
     ],
 ];
-include_once('tiki-setup.php');
 
+include_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $access->check_user($user);
 $access->check_feature('feature_user_watches');
 
@@ -67,14 +71,20 @@ if (isset($_REQUEST['categwatch'])) {
     }
 }
 // request from unsubscribe email link, like in templates/mail/user_watch_map_changed.tpl
-// TODO would be better to provide a token with the unsubscribe link that could be matched to the database
-// TODO so that the user doesn't have to log in to unsubscribe - similar to unsubscribe in tiki-newsletter.php
+// The link includes an HMAC hash so that only the recipient of the email can unsubscribe.
 if (isset($_REQUEST['id'])) {
-    if ($tiki_p_admin_notifications != 'y' && $user != $tikilib->get_user_notification($_REQUEST['id'])) {
+    $watchId = $_REQUEST['id'];
+    $hash = isset($_REQUEST['hash']) ? $_REQUEST['hash'] : '';
+
+    if (empty($hash) || ! $tikilib->verifyWatchUnsubscribeHash($watchId, $hash)) {
+        Feedback::errorPage(['mes' => tr('Invalid or missing unsubscribe token'), 'errortype' => 403]);
+    }
+
+    if ($tiki_p_admin_notifications != 'y' && $user != $tikilib->get_user_notification($watchId)) {
         Feedback::errorPage(['mes' => tr('Permission denied'), 'errortype' => 401]);
     }
     if ($access->checkCsrf()) {
-        $result = $tikilib->remove_user_watch_by_id($_REQUEST['id']);
+        $result = $tikilib->remove_user_watch_by_id($watchId);
     }
     if ($result && $result->numRows()) {
         Feedback::success(tr('Unsubscribed from user watch email notification'));
@@ -86,7 +96,8 @@ if (isset($_REQUEST['id'])) {
 if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
     if (isset($_REQUEST['event'])) {
         if (! isset($notification_types[$_REQUEST['event']])) {
-            Feedback::errorPage(tr('Unknown watch type'));
+            Feedback::error(tr('Please select a type to watch'));
+            $access->redirect('tiki-user_watches.php');
         }
         $watch_object = '*';
         $watch_type = $notification_types[$_REQUEST['event']]['type'];
@@ -130,9 +141,8 @@ if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
                 $errors += $result ? 0 : 1;
             } else {
                 $tikilib->remove_user_watch($user, 'new_in_category', '*');
-                /** @var  TikiDb_Pdo_Result|TikiDb_Adodb_Result $result */
                 $result = $tikilib->add_user_watch($user, 'new_in_category', '*', 'category', "tiki-browse_category.php");
-                $errors += $result && $result->numRows() ? 0 : 1;
+                $errors += $result ? 0 : 1;
             }
             if ($errors) {
                 Feedback::error('Errors encountered in adding category user watches');
@@ -143,15 +153,19 @@ if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
     }
 }
 // no confirmation needed as it is easy to add back a watch
-if (isset($_REQUEST["delete"]) && isset($_REQUEST['checked']) && $access->checkCsrf()) {
-    $checked = is_array($_REQUEST['checked']) ? $_REQUEST['checked'] : [$_REQUEST['checked']];
-    /* CSRL doesn't work if param as passed not in the uri */
-    foreach ($checked as $item) {
-        $result = $tikilib->remove_user_watch_by_id($item);
-        if ($result && $result->numRows()) {
-            Feedback::success(tr('User watch deleted'));
-        } else {
-            Feedback::error(tr('User watch not deleted'));
+if (isset($_REQUEST["delete"]) && $access->checkCsrf()) {
+    if (empty($_REQUEST["checked"])) {
+        Feedback::error(tr("Please, select at least one item to delete"));
+    } else {
+        $checked = is_array($_REQUEST['checked']) ? $_REQUEST['checked'] : [$_REQUEST['checked']];
+        /* CSRL doesn't work if param as passed not in the uri */
+        foreach ($checked as $item) {
+            $result = $tikilib->remove_user_watch_by_id($item);
+            if ($result && $result->numRows()) {
+                Feedback::success(tr('User watch deleted'));
+            } else {
+                Feedback::error(tr('User watch not deleted'));
+            }
         }
     }
 }

@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Smarty\Exception as SmartyException;
+
 function wikiplugin_appframe_info()
 {
     return [
@@ -102,27 +105,27 @@ function wikiplugin_appframe_info()
 
 function wikiplugin_appframe($data, $params)
 {
-    $minHeight = isset($params['min']) ? (int) $params['min'] : 300;
-    $maxHeight = isset($params['max']) ? (int) $params['max'] : -1;
+    $minHeight = (int) ($params['min'] ?? 300);
+    $maxHeight = (int) ($params['max'] ?? -1);
     $fullPage = 0;
-    if (isset($params['fullpage']) && $params['fullpage'] == 'y') {
+    if ($params['fullpage'] == 'y') {
         $fullPage = 1;
     }
     $fullscreen = 0;
-    if (isset($params['fullscreen']) && $params['fullscreen'] == 'y') {
+    if ($params['fullscreen'] == 'y') {
         $fullscreen = 1;
     }
 
-    $absolute = (int)(isset($params['absolute']) ? $params['absolute'] == 'y' : false);
-    $top = isset($params['top']) ? $params['top'] : 0;
+    $absolute = (int)($params['absolute'] == 'y');
+    $top = $params['top'];
 
     $headerlib = TikiLib::lib('header');
 
-    if (isset($params['hideleft']) && $params['hideleft'] == 'y') {
+    if ($params['hideleft'] == 'y') {
         $headerlib->add_js('$("body").addClass("hide_zone_left");');
     }
 
-    if (isset($params['hideright']) && $params['hideright'] == 'y') {
+    if ($params['hideright'] == 'y') {
         $headerlib->add_js('$("body").addClass("hide_zone_right");');
     }
 
@@ -203,7 +206,13 @@ $('#appframe .anchor').each(function () {
 
     $('.anchor-toggle', anchor).on("click", function () {
         $('.anchor-head .label', anchor).toggle('fast');
-        $('.anchor-content', anchor).toggle('fast');
+        const showing =$('.anchor-content', anchor).toggle('fast').is(":visible");
+        $(anchor).closest(".anchor-container").find('.anchor').each(function () {
+            if (anchor !== this && showing) {
+                $('.anchor-head .label', this).hide('fast');
+                $('.anchor-content', this).hide('fast');
+            }
+        });
         return false;
     });
 
@@ -412,7 +421,7 @@ function wikiplugin_appframe_template($data, $params, $start)
 
         $smarty->assign('input', $data);
         return $smarty->fetch($file);
-    } catch (SmartyException $e) {
+    } catch (SmartyException) {
         return tr('Template file not found: %0', $file);
     }
 }
@@ -422,7 +431,6 @@ function wikiplugin_appframe_mapcontrol($data, $params, $start)
     static $counter = 0;
     $function = null;
     $control = null;
-    $label = null;
     $mode = null;
 
     switch ($name = $params->type->word()) {
@@ -439,24 +447,28 @@ function wikiplugin_appframe_mapcontrol($data, $params, $start)
             }
             break;
         case 'select_feature':
-            $control = 'new OpenLayers.Control.SelectFeature(vlayer)';
+            $control = 'new ol.interaction.Select({layers: [vlayer]})';
             $label = tr('Select');
             break;
         case 'modify_feature':
-            $control = 'new OpenLayers.Control.ModifyFeature(vlayer, {
-            mode: OpenLayers.Control.ModifyFeature.DRAG | OpenLayers.Control.ModifyFeature.RESHAPE,
-            standalone: true,
-            virtualStyle: drawStyle,
-            vertexRenderIntent: "vertex"
-        }), new OpenLayers.Control.SelectFeature(vlayer)';
+            $control = 'new ol.interaction.Modify({
+            source: shapelayer ? shapelayer.get("source") : vlayer.get("source"),
+            style: (feature) => container.getFeatureSelectStyle(feature),
+        }), new ol.interaction.Select({layers: [vlayer, shapelayer]})';
             $label = tr('Select/Modify');
             break;
         case 'draw_polygon':
-            $control = 'new OpenLayers.Control.DrawFeature(vlayer, OpenLayers.Handler.Polygon, {handlerOptions:{style:drawStyle}})';
+            $control = 'new ol.interaction.Draw({
+            source: shapelayer ? shapelayer.get("source") : vlayer.get("source"),
+            type: "Polygon"
+            })';
             $label = tr('Draw Polygon');
             break;
         case 'draw_path':
-            $control = 'new OpenLayers.Control.DrawFeature(vlayer, OpenLayers.Handler.Path, {handlerOptions:{style:drawStyle}})';
+            $control = 'new ol.interaction.Draw({
+            source: shapelayer ? shapelayer.get("source") : vlayer.get("source"),
+            type: "LineString"
+            })';
             $label = tr('Draw Path');
             break;
         case 'reset_zoom':

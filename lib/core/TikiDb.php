@@ -8,7 +8,7 @@ use Tiki\Installer\Installer;
 
 /**
  * Class TikiDb, a singleton representing the entire Tiki database,
- * Implemented by TikiDb_Pdo and TikiDb_Adodb
+ * Implemented by Tiki\TikiDb\PdoDb
  */
 abstract class TikiDb
 {
@@ -98,12 +98,12 @@ abstract class TikiDb
      * @param int $offset
      * @param bool $reporterrors
      * @param $options additional sql options
-     * @return TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     abstract public function query($query = null, $values = null, $numrows = -1, $offset = -1, $reporterrors = self::ERR_DIRECT, array $options = []);
     /**
-     * same as above but return the PDO statement or Adodb result, so it can be scrolled in a memory-efficient way
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * same as above but return the PDO statement result, so it can be scrolled in a memory-efficient way
+     * @return Tiki\TikiDb\PdoResult
      */
     abstract public function scrollableQuery($query = null, $values = null, $numrows = -1, $offset = -1, $reporterrors = self::ERR_DIRECT, array $options = []);
 
@@ -309,14 +309,40 @@ abstract class TikiDb
         return $sort_mode;
     }
 
-    public function validateSortColumn($table, $column)
+    /**
+     * Inspects the database schema to retrieve a complete list of physical column names
+     * for one or more tables.
+     *
+     * This is a utility method designed to dynamically discover a table's structure. Its
+     * primary use case is to build user-friendly feedback, such as generating a list of
+     * "allowed" sortable fields in an error message without having to hardcode them.
+     * It can also be used for other meta-programming tasks like dynamically building
+     * forms or data mappers.
+     *
+     * The function is efficient for multiple calls within a single page request due to the
+     * underlying query cache.
+     *
+     * @param string|array $tables The name of the database table (or an array of names) to inspect.
+     * @return array               A flat, de-duplicated array of all column names found in the specified table(s).
+    */
+    public function getColumnNamesForTable(string|array $tables): array
     {
-        // Removing the _desc or _asc suffix
-        $base_column = preg_replace('/_(desc|asc)$/', '', $column);
-        $query = "SHOW COLUMNS FROM $table LIKE '$base_column'";
-        $result = $this->query($query);
+        if (! is_array($tables)) {
+            $tables = [$tables];
+        }
 
-        return $result->numrows > 0;
+        $columnNames = [];
+        foreach ($tables as $table) {
+            // The query result is cached by the query cache for the duration of the request,
+            // so this is efficient even if called multiple times.
+            $columns = $this->fetchAll("SHOW COLUMNS FROM `$table`");
+            if ($columns) {
+                foreach ($columns as $column) {
+                    $columnNames[] = $column['Field'];
+                }
+            }
+        }
+        return array_unique($columnNames);
     }
 
     public function getQuery()

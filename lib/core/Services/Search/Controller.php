@@ -6,6 +6,11 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Symfony\Component\Console\Helper\FormatterHelper;
 use Tiki\Profiling\Timer;
+use Tiki\Search\SearchIndexRebuilder;
+use Tiki\TaskQueue\QueuedTaskBanner;
+use Tiki\TaskQueue\Exception\QueueManagerException;
+use Tiki\TaskQueue\Tasks\RebuildIndexTask;
+use Tiki\TaskQueue\QueueManager;
 
 class Services_Search_Controller
 {
@@ -31,60 +36,25 @@ class Services_Search_Controller
         $num_queries_before = $num_queries;
 
         $unifiedsearchlib = TikiLib::lib('unifiedsearch');
-        $currentEngine = $unifiedsearchlib->getCurrentEngineDetails();
-        $unusedIndices = $unifiedsearchlib->listAllUnusedIndexes($currentEngine);
-
-        if (isset($unusedIndices['indices']) && count($unusedIndices['indices'])) {
-            $unusedIndicesMessage = "You have the following unused indexes:\n";
-            $unusedIndicesMessage .= '<ul>';
-            foreach ($unusedIndices['indices'] as $m => $indices) {
-                $unusedIndicesMessage .= "<li>" . $indices . "</li>";
-            }
-            $unusedIndicesMessage .= '</ul>';
-            $unusedIndicesMessage .= "If you don't need them (for debugging), run the following command:";
-            $unusedIndicesMessage .= "<ul><li>php console.php index:cleanup</li></ul>";
-            Feedback::note(['mes' => $unusedIndicesMessage]);
-        } elseif (isset($unusedIndices['error'])) {
-            Feedback::error(['mes' => tr($unusedIndices['error'])]);
-        }
 
         $access = TikiLib::lib('access');
         $stat = null;
 
 
         if ($input->getlaststats->int()) {
-            $stat = $prefs['unified_last_rebuild_stats'];
+            $stat = $prefs['unified_last_rebuild_stats_' . $prefs['unified_engine']];
         } elseif ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Apply 'Search index rebuild memory limit' setting if available
-            if (! empty($prefs['allocate_memory_unified_rebuild'])) {
-                $memory_limiter = new Tiki_MemoryLimit($prefs['allocate_memory_unified_rebuild']);
+            $searchIndexRebuilder = new SearchIndexRebuilder();
+            $stat = $searchIndexRebuilder->executeOrQueueIndexRebuild($input->loggit->int() ?? 0);
+
+            // If it was queued, return early
+            if ($stat === null) {
+                return [
+                    'title' => tr('Rebuild Index'),
+                    'showForm' => false,
+                    'isAjax' => $access->is_xml_http_request()
+                ];
             }
-
-            $stat = $unifiedsearchlib->rebuild($input->loggit->int());
-
-            TikiLib::lib('cache')->invalidateAll('search_valueformatter');
-
-            // Also rebuild admin index
-            TikiLib::lib('prefs')->rebuildIndex();
-
-            // Back up original memory limit if possible
-            if (isset($memory_limiter)) {
-                unset($memory_limiter);
-            }
-
-            //clean error messages related with search index
-            $removeIndexErrorsCallback = function ($item) {
-                if ($item['type'] == 'error') {
-                    foreach ($item['mes'] as $me) {
-                        if (strpos($me, 'does not exist in the current index') !== false) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            };
-
-            Feedback::removeIf($removeIndexErrorsCallback);
         }
 
         $num_queries_after = $num_queries;
@@ -98,7 +68,7 @@ class Services_Search_Controller
         if (! empty($stat)) {
             $list = false;
             $unifiedsearchlib->formatStats($stat, function ($line) use (&$msg, &$list) {
-                if (substr($line, 0, 2) === '  ') {
+                if (str_starts_with($line, '  ')) {
                     if (! $list) {
                         $list = true;
                         $msg .= "<ul>";
@@ -135,13 +105,13 @@ class Services_Search_Controller
         $executionTime = FormatterHelper::formatTime($timer->stop());
 
         if ($input->loggit->int()) {
-            $log = new Laminas\Log\Writer\Stream($unifiedsearchlib->getLogFilename($input->loggit->int(), $prefs['unified_engine']), 'a');
-            $loggerInstance = new Laminas\Log\Logger();
-            $loggerInstance->addWriter($log);
+            $log = new Monolog\Handler\StreamHandler($unifiedsearchlib->getLogFilename($input->loggit->int(), $prefs['unified_engine']), Monolog\Logger::DEBUG);
+            $loggerInstance = new Monolog\Logger('search_controller');
+            $loggerInstance->pushHandler($log);
             $loggerInstance->info("Execution time: " . $executionTime);
         }
 
-        if ($num_queries) {
+        if ($num_queries && $prefs['feature_queued_tasks'] ?? 'n' !== 'y') {
             $msg = '<ul>';
             $msg .= '<li>' . tr('Execution time:') . ' ' . $executionTime . '</li>';
             $msg .= '<li>' . tr('Current Memory usage:') . ' ' . FormatterHelper::formatMemory(memory_get_usage()) . '</li>';
@@ -158,9 +128,9 @@ class Services_Search_Controller
             'search_engine' => $engine,
             'search_version' => $version,
             'search_index' => $index,
-            'fallback_search_engine' => isset($fallbackEngineName) ? $fallbackEngineName : '',
-            'fallback_search_version' => isset($fallbackVersion) ? $fallbackVersion : '',
-            'fallback_search_index' => isset($fallbackIndex) ? $fallbackIndex : '',
+            'fallback_search_engine' => $fallbackEngineName ?? '',
+            'fallback_search_version' => $fallbackVersion ?? '',
+            'fallback_search_index' => $fallbackIndex ?? '',
             'queue_count' => $unifiedsearchlib->getQueueCount(),
             'log_file_browser' => $unifiedsearchlib->getLogFilename(1),
             'fallback_log_file_browser' => $unifiedsearchlib->getLogFilename(1, $fallbackEngine),
@@ -169,7 +139,8 @@ class Services_Search_Controller
             'lastLogItemWeb' => $lastLogItem['web'] ?: tr('Unable to get info from log file.'),
             'lastLogItemConsole' => $lastLogItem['console'] ?: tr('Unable to get info from log file.'),
             'isAjax' => $access->is_xml_http_request(),
-            'showForm' => empty($stat)
+            'showForm' => empty($stat),
+            'unified_last_rebuild' => $prefs['unified_last_rebuild_' . $prefs['unified_engine']]
         ];
     }
 
@@ -207,6 +178,7 @@ class Services_Search_Controller
             $filter = (! empty($filterData) && is_array($filterData)) ? $filterData : [];
             $format = $input->format->text() ?: '{title}';
             $use_permname = $input->use_permname->text();
+            $raw = $input->raw->int();
             $titleFilter = null;
             $highlightHelper = null;
 
@@ -243,12 +215,12 @@ class Services_Search_Controller
 
             $result = $query->search($lib->getIndex());
 
-            $result->applyTransform(function ($item) use ($format, $smarty, $titleFilter, $highlightHelper, $use_permname) {
+            $result->applyTransform(function ($item) use ($format, $smarty, $titleFilter, $highlightHelper, $use_permname, $raw) {
                 $transformed = [
                     'object_type' => $item['object_type'],
                     'object_id' => $use_permname != 'y' ? $item['object_id'] : (TikiLib::lib('trk')->get_field_info($item['object_id'])['permName'] ?? $item['object_id']),
-                    'parent_id' => $item['gallery_id'],
-                    'title' => preg_replace_callback('/\{([\w\.]+)\}/', function ($matches) use ($item, $format, $titleFilter, $highlightHelper) {
+                    'parent_id' => $item['gallery_id'] ?? $item['tracker_id'],
+                    'title' => preg_replace_callback('/\{([\w\.]+)\}/', function ($matches) use ($item, $format, $titleFilter, $highlightHelper, $raw) {
                         $key = $matches[1];
                         if (isset($item[$key])) {
                             // if this is a trackeritem we do not want only the name but also the trackerid listed when setting up a field
@@ -256,6 +228,12 @@ class Services_Search_Controller
                             // example: setup of trackerfield item-link: choose some fields from a list. currently this list show all fields of all trackers
                             if ($item['object_type'] == 'trackerfield') {
                                 return $item[$key] . ' (Tracker-' . $item['tracker_id'] . ', Field-' . $item['object_id'] . ')';
+                            } elseif ($raw) {
+                                // Caller explicitly asked for the exact stored value for this
+                                // token (e.g. an ItemLink's raw itemId), so skip the "_text"
+                                // rendered-label substitution below entirely.
+                                $value = $item[$key];
+                                return is_array($value) ? implode(',', $value) : $value;
                             } else {
                                 $value = $item[$key];
                                 if (is_array($value)) {
@@ -271,7 +249,7 @@ class Services_Search_Controller
                                 }
                                 return $value;
                             }
-                        } elseif (substr($key, 0, 5) == 'meta.') {
+                        } elseif (str_starts_with($key, 'meta.')) {
                             return '';
                         } elseif ($format == '{title}') {
                             return tr('empty');
@@ -279,9 +257,19 @@ class Services_Search_Controller
                             return '';
                         }
                     }, $format),
+                    'link' => smarty_function_object_link(['type' => $item['object_type'], 'id' => $item['object_id']], $smarty->getEmptyInternalTemplate())
                 ];
                 if ($item['object_type'] == 'trackeritem') {
                     $transformed['status_icon'] = smarty_function_tracker_item_status_icon(['item' => $item['object_id']], $smarty->getEmptyInternalTemplate());
+
+                    try {
+                        $popupContent = Services_Object_Controller::getTrackerItemPopupContent((int) $item['object_id']);
+                        if ($popupContent !== null) {
+                            $transformed['popup_content'] = $popupContent;
+                        }
+                    } catch (Exception $e) {
+                        trigger_error($e->getMessage(), E_USER_WARNING);
+                    }
                 }
                 return $transformed;
             });

@@ -6,7 +6,25 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_captcha_list()
 {
+    $spamProtectionHelp = 'Spam-protection';
+
     return  [
+        'captcha_type' => [
+            'name' => tra('CAPTCHA type'),
+            'description' => tra('Choose which CAPTCHA implementation is active.'),
+            'help' => $spamProtectionHelp,
+            'type' => 'list',
+            'options' => [
+                'default' => tra('Classic CAPTCHA'),
+                'questions' => tra('Custom Questions CAPTCHA'),
+                'recaptcha' => tra('Google reCAPTCHA'),
+                'altcha' => tra('Altcha CAPTCHA'),
+            ],
+            'dependencies' => [
+                'feature_antibot',
+            ],
+            'default' => 'default',
+        ],
         'captcha_wordLen' => [
             'name' => tra('CAPTCHA image word length'),
             'description' => tra('Number of characters the CAPTCHA will display.'),
@@ -20,6 +38,7 @@ function prefs_captcha_list()
             ],
             'default' => 6,
             'units' => tra('characters'),
+            'help' => $spamProtectionHelp,
         ],
         'captcha_width' => [
             'name' => tra('CAPTCHA image width'),
@@ -27,6 +46,7 @@ function prefs_captcha_list()
             'type' => 'text',
             'units' => tra('pixels'),
             'default' => 180,
+            'help' => $spamProtectionHelp,
         ],
         'captcha_noise' => [
             'name' => tra('CAPTCHA image noise'),
@@ -34,15 +54,7 @@ function prefs_captcha_list()
             'hint' => tra('Choose a smaller number for less noise and easier reading.'),
             'type' => 'text',
             'default' => 100,
-        ],
-        'captcha_questions_active' => [
-            'name' => tra('CAPTCHA questions'),
-            'description' => tra('Requires anonymous visitors to enter the answer to a question.'),
-            'type' => 'flag',
-            'dependencies' => [
-                'feature_antibot',
-            ],
-            'default' => 'n',
+            'help' => $spamProtectionHelp,
         ],
         'captcha_questions' => [
             'name' => tra('CAPTCHA questions and answers'),
@@ -51,9 +63,10 @@ function prefs_captcha_list()
             'type' => 'textarea',
             'size' => 6,
             'dependencies' => [
-                'captcha_questions_active',
+                'feature_antibot',
             ],
             'default' => '',
+            'help' => $spamProtectionHelp,
         ],
     ];
 }

@@ -10,7 +10,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -34,28 +34,30 @@ function addEntity(array &$entities, array $availableTrackers, int $trackerId): 
     return true;
 }
 
-foreach ($trackerIds as $id) {
-    $id = intval($id);
-    if (! addEntity($entities, $availableTrackers, $id)) {
-        continue;
-    };
-    $tracker = $availableTrackers[$id];
+if (! empty($trackerIds)) {
+    foreach ($trackerIds as $id) {
+        $id = intval($id);
+        if (! addEntity($entities, $availableTrackers, $id)) {
+            continue;
+        };
+        $tracker = $availableTrackers[$id];
 
-    if (! $skipRelations) {
-        $relationalFields = $tracker->getAllRelationalFieldInstances();
-        foreach ($relationalFields as $field) {
-            $relationInfo = $field->getRelationInfo();
-            if ($relationInfo) { //If relation info is null, the relation exists, but isn't valid
-                if (! addEntity($entities, $availableTrackers, $relationInfo->first->instance->getId())) {
-                    //Don't add the relationship at all if one side is unavailable
-                    break;
+        if (! $skipRelations) {
+            $relationalFields = $tracker->getAllRelationalFieldInstances();
+            foreach ($relationalFields as $field) {
+                $relationInfo = $field->getRelationInfo();
+                if ($relationInfo) { //If relation info is null, the relation exists, but isn't valid
+                    if (! addEntity($entities, $availableTrackers, $relationInfo->first->instance->getId())) {
+                        //Don't add the relationship at all if one side is unavailable
+                        break;
+                    }
+                    if (! addEntity($entities, $availableTrackers, $relationInfo->second->instance->getId())) {
+                        //Don't add the relationship at all if one side is unavailable
+                        break;
+                    }
+                    //Usage of the id will remove duplicates
+                    $relationships[$relationInfo->id] = $relationInfo;
                 }
-                if (! addEntity($entities, $availableTrackers, $relationInfo->second->instance->getId())) {
-                    //Don't add the relationship at all if one side is unavailable
-                    break;
-                }
-                //Usage of the id will remove duplicates
-                $relationships[$relationInfo->id] = $relationInfo;
             }
         }
     }
@@ -114,8 +116,7 @@ function exportMermaidER(string $title, array $entities, array $relationships, b
         }o  o{  Zero or more (no upper limit)
         }|  |{  One or more (no upper limit)
         */
-        $relationshipValue = '';
-        $relationshipValue .= $leftMax > 1 ? '}' : '|';
+        $relationshipValue = $leftMax > 1 ? '}' : '|';
         $relationshipValue .= $leftMin === 0 ? 'o' : '|';
         $relationshipValue .= '..';//For now in tiki all relationships are non-identifying
         $relationshipValue .= $rightMin === 0 ? 'o' : '|';
@@ -169,48 +170,16 @@ function mermaidTypeName(string $originalId): string
  * @return string HTML markup
  */
 
-function renderMermaid(string $mermaidData): string
+function handleMermaid(string $mermaidData, string $width = '100%', string $height = '60vh')
 {
     global $headerlib;
-    $jsModule = <<<END
-    import mermaid from 'mermaid';
-    mermaid.initialize({
-        startOnLoad: false,
-        maxTextSize: 200000
-        });
-    
-    const drawDiagram = async function (element) {
-
-        const graphDefinition = element.innerHTML;
-    
-        const { svg } = await mermaid.render('graphDiv', graphDefinition);
-        element.innerHTML = svg.replace(/[ ]*max-width:[ 0-9\.]*px;/i , '');
-        return element.querySelector("svg") ;
-    };
-    let element = document.querySelector('.mermaid');
-    try {
-        let svgElement = await drawDiagram(element);
-        svgElement.style.height = "60vh";
-        svgElement.style.width = "100%";
-        const mermaidPanZoom = svgPanZoom(svgElement, {
-          zoomEnabled: true,
-          controlIconsEnabled: true,
-          fit: true,
-          center: true
-        });
-    }
-    catch(e) {
-        let errorDiv = document.createElement("div");
-        errorDiv.className = "alert alert-danger";
-        errorDiv.role = "alert";
-        errorDiv.innerHTML = e;
-        element.prepend(errorDiv);
-    }
-    END;
-    $headerlib->add_js_module($jsModule);
-    $output = '<pre class="mermaid border" style="overflow: auto; width: 100%; height: 100%" id="content">';
-    $output .= $mermaidData;
+    $inputIddenOrTextarea = "<input type='hidden' class='code' value='$mermaidData'>";
+    $output = "<div class='containerDiagram'>";
+    $output .= $inputIddenOrTextarea;
+    $output .= "<pre class='mermaid border' style='overflow: auto; width: $width; height: $height''>";
     $output .= '</pre>';
     $output .= "<input type='hidden' name='rawFormat' id='raw'>";
+    $output .= "</div>";
+    $headerlib->add_js_module("import handleMermaid from '@mermaidPack'; handleMermaid();");
     return $output;
 }

@@ -196,7 +196,7 @@
                                     <td class="text">{$data.display_text|escape}</td>
                                     <td class="text">{$data.remain|escape}</td>
                                     <td class="integer">{$data.price|escape}</td>
-                                    <td class="text"><input type="radio" name="tiki_credit_type" value="{$id|escape}" {if !$data.enough}disabled="disabled"{/if} /></td>
+                                    <td class="text"><input type="radio" class="form-check-input" name="tiki_credit_type" value="{$id|escape}" {if !$data.enough}disabled="disabled"{/if} /></td>
                                 </tr>
                                 {/foreach}
                                 <tr>

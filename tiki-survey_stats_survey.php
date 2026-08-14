@@ -4,21 +4,23 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'surveys';
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
         'surveyId'           => 'int',               //get
-        'clear'              => 'int',               //get
-        'sort_mode'          => 'word',              //get
+        'clear'              => 'int',               //post
+        'sort_mode'          => 'alnumdash',         //get
         'offset'             => 'int',               //get
-        'find'               => 'string',            //post
+        'find'               => 'text',              //post
+        'print'              => 'alpha',             //get
         ],
     ],
 ];
 require_once('tiki-setup.php');
 include_once('lib/surveys/surveylib.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_SURVEYS;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_surveys');
 
 $tikilib->get_perm_object($_REQUEST['surveyId'], 'survey');
@@ -38,17 +40,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 
@@ -56,10 +50,10 @@ $usersthatvoted = $srvlib->list_users_that_voted($_REQUEST["surveyId"]);
 $smarty->assign('usersthatvoted', $usersthatvoted);
 $questions = $srvlib->list_survey_questions($_REQUEST["surveyId"], 0, -1, $sort_mode, $find);
 
-$cant_pages = ceil($questions["cant"] / $maxRecords);
-$smarty->assign_by_ref('cant_pages', $cant_pages);
+$pages_count = ceil($questions["count"] / $maxRecords);
+$smarty->assign_by_ref('pages_count', $pages_count);
 $smarty->assign('actual_page', 1 + ($offset / $maxRecords));
-if ($questions["cant"] > ($offset + $maxRecords)) {
+if ($questions["count"] > ($offset + $maxRecords)) {
     $smarty->assign('next_offset', $offset + $maxRecords);
 } else {
     $smarty->assign('next_offset', -1);

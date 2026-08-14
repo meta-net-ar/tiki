@@ -11,13 +11,20 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'    => [
-            'menuId'          => 'int',        //get
-            'preview_css'     => 'bool',       //post
-            'preview_type'    => 'striptags',  //post
+            'menuId'             => 'int',        //get
+            'deletemenu'         => 'int',        //post
+            'preview_type'       => 'striptags',  //post
+            'preview_bootstrap'  => 'alpha',      //post
+            'find'               => 'striptags',  //get
+            'sort_mode'          => 'alnumdash', //get
+            'offset'             => 'int',        //get
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $menulib = TikiLib::lib('menu');
 $access->check_permission(['tiki_p_edit_menu_option']);
 if (! isset($_REQUEST["menuId"])) {
@@ -30,10 +37,15 @@ $auto_query_args = [
     'preview_bootstrap',
 ];
 
-if (! empty($_REQUEST["deletemenu"])) {
-    $content = $_REQUEST["deletemenu"];
-    $content = explode("=", $content)[1];
-    $menulib->remove_menu_option($content);
+if (! empty($_REQUEST["deletemenu"]) && $access->checkCsrf()) {
+    $optionId = (int) $_REQUEST["deletemenu"];
+    if ($optionId > 0) {
+        // Verify the option exists and belongs to the current menu
+        $option = $menulib->get_menu_option($optionId);
+        if ($option && $option['menuId'] == $_REQUEST["menuId"]) {
+            $menulib->remove_menu_option($optionId);
+        }
+    }
 }
 
 $smarty->assign('menuId', $_REQUEST["menuId"]);
@@ -47,7 +59,7 @@ $smarty->assign('preview_css', isset($_REQUEST['preview_css']) && $_REQUEST['pre
 $headerlib->add_js('var permNames = ' . json_encode(TikiLib::lib('user')->get_permission_names_for('all')) . ';');
 $feature_prefs = [];
 foreach ($prefs as $k => $v) {  // attempt to filter out non-feature prefs (still finds 133!)
-    if (strpos($k, 'feature') !== false && preg_match_all('/_/m', $k, $m) === 1) {
+    if (str_contains($k, 'feature') && preg_match_all('/_/m', $k, $m) === 1) {
         $feature_prefs[] = $k;
     }
 }
@@ -56,7 +68,7 @@ $headerlib->add_js('var prefNames = ' . json_encode($feature_prefs) . ';');
 $options = $menulib->list_menu_options($_REQUEST["menuId"], 0, -1, 'position_asc', '', true, 0, true, true);
 $smarty->assign_by_ref('no_editable_page', $options["no_editable_page"]);
 $options = $menulib->prepare_options_for_editing($options);
-$smarty->assign_by_ref('cant_pages', $options["cant"]);
+$smarty->assign_by_ref('pages_count', $options["count"]);
 $smarty->assign_by_ref('options', $options["data"]);
 if (isset($info['groupname']) && ! is_array($info['groupname'])) {
     $info['groupname'] = explode(',', $info['groupname']);

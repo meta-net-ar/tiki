@@ -7,7 +7,7 @@
 //this script may only be included - so its better to die if called directly.
 declare(strict_types=1);
 
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -27,12 +27,16 @@ if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
 class Feedback
 {
     /**
-     * Add error feedback
+     * Add error feedback.
      *
-     * This is a specific application of the add function below for errors.
+     * This method stores the error message in the session-based feedback stack.
+     * As a result, the feedback will persist across HTTP redirects and will be
+     * displayed on the next page load via the {feedback} Smarty function.
      *
-     * @param $feedback
-     * @param bool $sendHeaders
+     * This is a specific application of the add() method for errors.
+     *
+     * @param mixed $feedback Error message or feedback array
+     * @param bool $sendHeaders Whether to immediately send feedback headers (AJAX use)
      * @throws Exception
      */
     public static function error($feedback, $sendHeaders = false)
@@ -79,15 +83,51 @@ class Feedback
 
     public static function errorAndDie(string $message, int $httpCode, ?string $errorPage = null): never
     {
+        global $access, $user, $prefs;
+        if (($httpCode == 401 || $httpCode == 403) && ! $user && $prefs['permission_denied_login_box'] == 'y') {
+            if ($prefs['login_autologin'] == 'y' && $prefs['login_autologin_redirectlogin'] == 'y' && ! empty($prefs['login_autologin_redirectlogin_url'])) {
+                $url = $prefs['login_autologin_redirectlogin_url'];
+            } else {
+                $url = $prefs['permission_denied_url'] ?: 'tiki-login.php';
+            }
+
+            $_SESSION['loginfrom'] = $_SERVER['REQUEST_URI'];
+
+            // Append ?challenge=1 so the final login page can emit 401 (the 302 itself cannot carry it).
+            $separator = str_contains($url, '?') ? '&' : '?';
+            $access->redirect($url . $separator . 'challenge=1', $message, msgtype: 'error');
+            die;
+        }
+
         $errorPage = $errorPage ?? "error.tpl";
         $smarty = TikiLib::lib('smarty');
         $smarty->assign('errortype', $httpCode);
         $smarty->assign('msg', $message);
-        http_response_code($httpCode);
+        //This errorAndDie is meant for fatal errors.  Http headers may have already been sent, which would crash the following line.  We want this function to terminate properly even then - benoitg - 2026-01-27
+        if (! headers_sent()) {
+            http_response_code($httpCode);
+        }
         $smarty->display($errorPage);
         die;
     }
-
+    /**
+     * Checks if the number of characters allowed in a field has been exceeded.
+     * Displays an error if this is the case.
+     *
+     * @param string $field_name The name of the field to check.
+     * @param string $field_string The string value of the field.
+     * @param int $max_field_length The maximum allowed length for the field.
+     * @return bool Returns true if the field is valid, false otherwise.
+     */
+    public static function validateFieldLength(string $field_name, string $field_string, int $max_field_length): bool
+    {
+        if (mb_strlen($field_string) > $max_field_length) {
+            $errorMessage = tr("You have exceeded the number of characters allowed (%0 max) for the %1 field", $max_field_length, $field_name);
+            Feedback::error($errorMessage);
+            return false;
+        }
+        return true;
+    }
     /**
      * Add note feedback
      *
@@ -264,14 +304,16 @@ class Feedback
      *
      * @throws Exception
      */
-    public static function sendHeaders()
+    public static function sendHeaders(): void
     {
-        require_once 'lib/smarty_tiki/function.feedback.php';
-        $feedback = rawurlencode(str_replace(["\n", "\r", "\t"], '', smarty_function_feedback(
-            [], // Encode since HTTP headers are ASCII-only. Other characters can go through, but header()'s documentation has no word on their treatment. Chealer 2017-06-20
-            TikiLib::lib('smarty')->getEmptyInternalTemplate()
-        )));
-        header('X-Tiki-Feedback: ' . $feedback);
+        if (PHP_SAPI !== 'cli') {
+            require_once 'lib/smarty_tiki/function.feedback.php';
+            $feedback = rawurlencode(str_replace(["\n", "\r", "\t"], '', smarty_function_feedback(
+                [], // Encode since HTTP headers are ASCII-only. Other characters can go through, but header()'s documentation has no word on their treatment. Chealer 2017-06-20
+                TikiLib::lib('smarty')->getEmptyInternalTemplate()
+            )));
+            header('X-Tiki-Feedback: ' . $feedback);
+        }
     }
 
     /**
@@ -302,7 +344,7 @@ class Feedback
                         $message = $type . ': ' . str_replace('<br />', "\n", $message['mes']);
                     }
 
-                    if ($type === 'success' || $type === 'note') {
+                    if ($type === 'success' || $type === 'note' || $type === 'feedback') {
                         if (! $output->isVeryVerbose()) {
                             continue;
                         }
@@ -326,7 +368,7 @@ class Feedback
     /**
      * Print any feedback out to a log file
      *
-     * @param \Laminas\Log\Logger $log
+     * @param \Monolog\Logger $log
      * @param bool $clear - remove existing entries from the local storage after sending to log file
      */
     public static function printToLog($log, $clear = false)
@@ -348,10 +390,10 @@ class Feedback
 
                     switch ($type) {
                         case 'error':
-                            $log->err($message);
+                            $log->error($message);
                             break;
                         case 'warning':
-                            $log->warn($message);
+                            $log->warning($message);
                             break;
                         case 'feedback':
                         case 'success':
@@ -362,7 +404,7 @@ class Feedback
                             break;
                     }
                 } else {
-                    $log->err($message);
+                    $log->error($message);
                 }
             }
         }
@@ -424,9 +466,9 @@ class Feedback
      *
      * @return void
      */
-    public static function showWatchers($watch_event, $object, $extra_event = null)
+    public static function showWatchers(string $watch_event, $object, $extra_event = null)
     {
-        global $prefs;
+        global $prefs, $user;
         if ($prefs['feature_user_watches'] === 'y') {
             $watches = TikiLib::lib('tiki')->get_event_watches($watch_event, $object);
 
@@ -439,17 +481,29 @@ class Feedback
                 $watches = array_merge($watches, $extra_watches);
             }
 
+            // The editor is silently excluded from wiki_page_changed notifications unless they
+            // explicitly opted in (see sendWikiEmailNotification in notificationemaillib.php),
+            // so the displayed list must reflect the same exclusion.
+            if ($watch_event === 'wiki_page_changed' && ($prefs['wiki_watch_editor'] != 'y' || $prefs['user_wiki_watch_editor'] != 'y')) {
+                $watches = array_values(array_filter($watches, function ($watch) use ($user) {
+                    return $watch['user'] !== $user;
+                }));
+            }
+
             if (count($watches)) {
-                $message = "<ul>";
+                $usersList = [];
                 foreach ($watches as $watch) {
-                    $message .= "<li class='fw-bold'><a href='tiki-user_information.php?user=" . $watch['user'] . "'>" . $watch['user'] . "</a></li>";
+                    $usersList[] = "<a href='tiki-user_information.php?view_user=" . urlencode($watch['user']) . "' class='fw-bold'>" . htmlspecialchars($watch['user']) . "</a>";
                 }
-                $message .= "</ul>";
-                self::note([
-                    'title' => tr('Notification sent to:'),
-                    'mes' => $message,
-                    'icon' => 'bell'
-                ]);
+
+                if (! empty($usersList)) {
+                    $message = implode(", ", $usersList);
+                    self::note([
+                        'title' => tr('Notification sent to:'),
+                        'mes' => $message,
+                        'icon' => 'bell'
+                    ]);
+                }
             }
         }
     }

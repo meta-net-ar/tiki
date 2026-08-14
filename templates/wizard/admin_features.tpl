@@ -1,6 +1,6 @@
 <div class="d-flex">
     <div class="flex-shrink-0">
-        <span class="fa-stack fa-lg" style="width: 100px;" title="Configuration Wizard">
+        <span class="fa-stack fa-lg" style="width: 100px;" title="{tr}Configuration Wizard{/tr}">
             {icon name='admin_general' iclass='fa-stack-2x'}
             {icon name='magic' iclass='fa-flip-horizontal fa-stack-1x ms-4 mt-4'}
         </span>

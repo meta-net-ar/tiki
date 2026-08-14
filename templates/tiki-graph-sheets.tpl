@@ -79,10 +79,10 @@
         {if $hasgd}
             <div class="mb-3 row">
                 <div class="col-sm-2 mb-2">
-                    <input type="text" name="width" value="500" size="4" class="form-control">
+                    <input type="number" name="width" value="500" size="4" class="form-control">
                 </div>
                 <div class="col-sm-2 mb-2">
-                    <input type="text" name="height" value="400" size="4" class="form-control">
+                    <input type="number" name="height" value="400" size="4" class="form-control">
                 </div>
                 <div class="col-sm-8">
                     <input type="submit" class="btn btn-primary" name="renderer" value="PNG">

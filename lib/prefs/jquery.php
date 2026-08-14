@@ -29,6 +29,7 @@ function prefs_jquery_list($partial = false)
     return [
         'jquery_effect' => [
             'name' => tra('Effect for modules'),
+            'description' => tra('Default jQuery animation effect used when showing or hiding modules.'),
             'type' => 'list',
             'options' => $jquery_effect_options,
             'help' => 'JQuery#Effects',
@@ -37,6 +38,7 @@ function prefs_jquery_list($partial = false)
         ],
         'jquery_effect_tabs' => [
             'name' => tra('Effect for tabs'),
+            'description' => tra('Default jQuery animation effect used when switching between tabs.'),
             'type' => 'list',
             'options' => $jquery_effect_options,
             'help' => 'JQuery#Effects',
@@ -44,7 +46,9 @@ function prefs_jquery_list($partial = false)
         ],
         'jquery_effect_speed' => [
             'name' => tra('Speed'),
+            'description' => tra('Animation speed for module show/hide effects.'),
             'type' => 'list',
+            'help' => 'UI-Effects',
             'options' => [
                 'fast' => tra('Fast'),
                 'normal' => tra('Normal'),
@@ -54,7 +58,9 @@ function prefs_jquery_list($partial = false)
         ],
         'jquery_effect_direction' => [
             'name' => tra('Direction'),
+            'description' => tra('Animation direction for module show/hide effects.'),
             'type' => 'list',
+            'help' => 'UI-Effects',
             'options' => [
                 'vertical' => tra('Vertical'),
                 'horizontal' => tra('Horizontal'),
@@ -67,7 +73,9 @@ function prefs_jquery_list($partial = false)
         ],
         'jquery_effect_tabs_speed' => [
             'name' => tra('Speed'),
+            'description' => tra('Animation speed for tab switching effects (fast, normal, or slow).'),
             'type' => 'list',
+            'help' => 'UI-Effects',
             'options' => [
                 'fast' => tra('Fast'),
                 'normal' => tra('Normal'),
@@ -77,7 +85,9 @@ function prefs_jquery_list($partial = false)
         ],
         'jquery_effect_tabs_direction' => [
             'name' => tra('Direction'),
+            'description' => tra('Animation direction for tab switching effects.'),
             'type' => 'list',
+            'help' => 'UI-Effects',
             'options' => [
                 'vertical' => tra('Vertical'),
                 'horizontal' => tra('Horizontal'),
@@ -87,44 +97,6 @@ function prefs_jquery_list($partial = false)
                 'down' => tra('Down'),
             ],
             'default' => 'vertical',
-        ],
-        'jquery_select2' => [
-            'name' => tra('jQuery Select2 Select Boxes'),
-            'description' => tra('Styled replacement for dropdown select lists and multiple-select inputs.'),
-            'type' => 'flag',
-            'default' => 'n',
-            'dependencies' => [
-                'jquery',
-            ],
-            'conflicts' => [
-                'elementplus_select',
-            ],
-        ],
-        'jquery_select2_sortable' => [
-            'name' => tra('Sortable Select2 Multi-selects'),
-            'description' => tra('Enable drag and drop re-ordering of Select2 multi-select options.'),
-            'type' => 'flag',
-            'default' => 'n',
-            'dependencies' => [
-                'feature_jquery_ui',
-                'jquery_select2'
-            ],
-        ],
-        'jquery_colorbox_theme' => [
-            'name' => tra('Visual style of Colorbox (a.k.a. "Shadowbox")'),
-            'type' => 'list',
-            'perspective' => false,
-            'options' => [
-                'example1' => tra('One'),
-                'example2' => tra('Two'),
-                'example3' => tra('Three'),
-                'example4' => tra('Four'),
-                'example5' => tra('Five'),
-            ],
-            'default' => 'example1',
-            'dependencies' => [
-                'feature_shadowbox',
-            ],
         ],
         'jquery_fitvidjs' => [
             'name' => tra('FitVids.js'),
@@ -150,6 +122,7 @@ function prefs_jquery_list($partial = false)
             'description' => tra('Add "SmartMenus" to Bootstrap menus. See smartmenus.org for more.'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => 'Menu',
             'tags' => ['advanced'],
             'keywords' => 'smart menu',
         ],
@@ -157,6 +130,7 @@ function prefs_jquery_list($partial = false)
             'name' => tra('SmartMenus collapsible behavior'),
             'description' => tra('Parent items behavior in collapsible (mobile) view.'),
             'type' => 'list',
+            'help' => 'Menu',
             'options' => [
                 'default' => tra('Default'),
                 'toggle' => tra('Toggle'),

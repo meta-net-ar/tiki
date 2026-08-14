@@ -53,16 +53,24 @@ class ServiceLib
 
         $url = '';
         if (isset($prefs['feature_sefurl']) && $prefs['feature_sefurl'] == 'y') {
-            $url = "tiki-{$params['controller']}";
-
-            if (isset($params['action'])) {
-                $url .= "-{$params['action']}";
+            if (! isset($params['controller'])) {
+                trigger_error(
+                    'getUrl() called with array missing "controller" key. Use string parameter for direct URLs. Parameters: ' . json_encode($params),
+                    E_USER_NOTICE
+                );
+                $url = 'tiki-ajax_services.php';
             } else {
-                $url .= "-x";
-            }
+                $url = "tiki-{$params['controller']}";
 
-            unset($params['controller']);
-            unset($params['action']);
+                if (isset($params['action'])) {
+                    $url .= "-{$params['action']}";
+                } else {
+                    $url .= "-x";
+                }
+
+                unset($params['controller']);
+                unset($params['action']);
+            }
         } else {
             $url = 'tiki-ajax_services.php';
         }

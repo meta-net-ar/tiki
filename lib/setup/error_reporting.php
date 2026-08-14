@@ -11,7 +11,7 @@ use Tiki\Errors;
 require_once 'lib/tikilib.php';
 
 global $prefs, $tiki_p_admin;
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) != false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -40,12 +40,6 @@ if (php_sapi_name() != 'cli') { // This handler collects errors to display at th
         $previousErrorHandler = Closure::fromCallable($previousErrorHandler);
         TikiLib::lib('errortracking')->setPreviousErrorHandler($previousErrorHandler);
     };
-}
-
-if (($prefs['log_sql'] ?? 'n') == 'y' && $api_tiki == 'adodb') {
-    $dbTiki->LogSQL();
-    global $ADODB_PERF_MIN;
-    $ADODB_PERF_MIN = $prefs['log_sql_perf_min'];
 }
 
 // TODO: check this only once per session or only if a feature ask for it

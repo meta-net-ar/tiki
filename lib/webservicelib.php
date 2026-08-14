@@ -4,7 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once 'lib/ointegratelib.php';
+
+use Tiki\Lib\OIntegrate\OIntegrate as OIntegrate;
+use Tiki\Lib\OIntegrate\Response;
+use Tiki\Lib\TikiWebServiceTemplate;
+
 require_once 'soap/soaplib.php';
 require_once 'soap/wsdllib.php';
 
@@ -168,7 +172,7 @@ class Tiki_Webservice
     {
         $parameters = [];
 
-        foreach ($this->getParameters() as $key => $name) {
+        foreach ($this->getParameters() as $name) {
             if (isset($params[$name])) {
                 $parameters[$name] = $params[$name];
             } else {
@@ -187,7 +191,7 @@ class Tiki_Webservice
     /**
      * @param $params
      * @param bool $fullReponse
-     * @return bool|OIntegrate_Response
+     * @return bool|Tiki\Lib\OIntegrate\Response
      */
     public function performRequest($params, $fullReponse = false, $clearCache = false)
     {
@@ -204,12 +208,12 @@ class Tiki_Webservice
                     if (! empty($this->operation)) {
                         $options = [ 'encoding' => 'UTF-8' ];
 
-                        if ($prefs['use_proxy'] == 'y' && ! strpos($built, 'localhost')) {
+                        if ($prefs['use_proxy'] == 'y' && ! str_contains($built, 'localhost')) {
                             $options['proxy_host'] = $prefs['proxy_host'];
                             $options['proxy_port'] = $prefs['proxy_port'];
                         }
 
-                        $response = new OIntegrate_Response();
+                        $response = new Response();
                         $soaplib->allowCookies = $this->allowCookies;
                         try {
                             $response->data = $soaplib->performRequest($built, $this->operation, $map, $options, $fullReponse);
@@ -255,7 +259,7 @@ class Tiki_Webservice
 
     /**
      * @param $name
-     * @return Tiki_Webservice_Template
+     * @return \Tiki\Lib\TikiWebServiceTemplate
      */
     public function addTemplate($name)
     {
@@ -263,7 +267,7 @@ class Tiki_Webservice
             return;
         }
 
-        $template = new Tiki_Webservice_Template();
+        $template = new TikiWebServiceTemplate();
         $template->webservice = $this;
         $template->name = strtolower($name);
 
@@ -298,7 +302,7 @@ class Tiki_Webservice
         );
 
         while ($row = $result->fetchRow()) {
-            $template = new Tiki_Webservice_Template();
+            $template = new TikiWebServiceTemplate();
             $template->webservice = $this;
             $template->name = $row['template'];
             $template->lastModif = $row['last_modif'];
@@ -315,7 +319,7 @@ class Tiki_Webservice
 
     /**
      * @param $name
-     * @return Tiki_Webservice_Template
+     * @return \Tiki\Lib\TikiWebServiceTemplate
      */
     public function getTemplate($name)
     {
@@ -331,7 +335,7 @@ class Tiki_Webservice
         );
 
         while ($row = $result->fetchRow()) {
-            $template = new Tiki_Webservice_Template();
+            $template = new TikiWebServiceTemplate();
             $template->webservice = $this;
             $template->name = $name;
             $template->lastModif = $row['last_modif'];
@@ -347,76 +351,5 @@ class Tiki_Webservice
     public function getName()
     {
         return $this->name;
-    }
-}
-
-
-/**
- * Tiki_Webservice_Template
- *
- */
-class Tiki_Webservice_Template
-{
-    public $webservice;
-    public $name;
-    public $engine;
-    public $output;
-    public $content;
-    public $lastModif;
-
-    public function save()
-    {
-        global $tikilib;
-
-        $tikilib->query(
-            "DELETE FROM tiki_webservice_template WHERE service = ? AND template = ?",
-            [ $this->webservice->getName(), $this->name ]
-        );
-
-        $tikilib->query(
-            "INSERT INTO tiki_webservice_template (service, template, engine, output, content, last_modif) VALUES(?,?,?,?,?,?)",
-            [
-                $this->webservice->getName(),
-                $this->name,
-                $this->engine,
-                $this->output,
-                $this->content,
-                time(),
-            ]
-        );
-
-        if ($this->engine === 'index') {
-            if ($this->output === 'mindex') {
-                Feedback::warning(tra('You will need to rebuild the search index to see these changes'));
-            }
-
-            require_once 'lib/search/refresh-functions.php';
-            refresh_index('webservice', $this->name);
-        }
-    }
-
-    /**
-     * @return string
-     */
-    public function getTemplateFile()
-    {
-        $token = sprintf("%s_%s", $this->webservice->getName(), $this->name);
-        $file = TEMP_CACHE_PATH . "/" . md5($token) . '.tpl';
-
-        if (! file_exists($file) || $this->lastModif > filemtime($file)) {
-            file_put_contents($file, $this->content);
-        }
-
-        return realpath($file);
-    }
-
-    /**
-     * @param OIntegrate_Response $response
-     * @param $outputContext
-     * @return mixed|string
-     */
-    public function render(OIntegrate_Response $response, $outputContext)
-    {
-        return $response->render($this->engine, $this->output, $outputContext, $this->getTemplateFile());
     }
 }

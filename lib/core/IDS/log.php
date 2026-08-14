@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
-class IDS_log extends \Expose\Log
+class IDS_log extends \Expose\Log  // @phpstan-ignore class.notFound (depends on enygma/expose, installed through packages)
 {
     protected $logger = null;
 

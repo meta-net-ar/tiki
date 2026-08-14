@@ -71,7 +71,7 @@ class DbgPermissions extends DebuggerCommand
                 $perms[] = [
                     'name' => $key,
                     'value' => $val,
-                    'description' => isset($descriptions[$key]) ? $descriptions[$key] : 'No description'
+                    'description' => $descriptions[$key] ?? 'No description'
                 ];
             }
         }

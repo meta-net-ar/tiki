@@ -1,93 +1,51 @@
-// Variables for Darkroom theme
+// Variables for Darkroom theme, including overrides of Bootstrap SCSS variables as well as any Tiki SCSS variables
+// Contains overriding declarations of Bootstrap variables and possible related value aliases to implement an override.
+// For example, if `$component-active-bg: $primary;` then ``$dropdown-link-active-bg: $component-active-bg;` also needs to be explicitly restated for the theme value to override the Bootstrap default.
+
+// Enable SCSS color functions and import default variable values
+@use "sass:color";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated), required before import of variables.scss.
+@import "../../default/scss/variables"; // 2. Import directly to allow removal of redundant Bootstrap default declarations in this file.
 
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
 // Color system
-
-$black: #000;
-$gray-900: #f8f9fa;
-$gray-800: #e9ecef;
-$gray-700: #dee2e6;
-$gray-600: #ced4da;
-$gray-500: #adb5bd;
-$gray-400: #868e96;
-$gray-300: #495057;
-$gray-200: #343a40;
-$gray-100: #212529;
-$white: #fff;
-$dark: #474747;
-
 $red:     #E60032; // #ff0039 Updated for Tiki to meet WCAG color contrast guidelines
 $green:   #2F8712; // #3fb618 Updated for Tiki to meet WCAG color contrast guidelines
 
-$primary: #ababab;//#193c5a
-$secondary: #dddddd;
-$success: #5cb85c;//#3d6c2a
-$info: #5bc0de;//#1b6083
-$warning: #f0ad4e;//darken(#f0ad4e,30%)
-$danger: #d9534f;
+$primary: #B5B5B5; // #ababab;//#193c5a // $blue !default
+$secondary: #dddddd; // $gray-600 !default
+$success: #7FC77F; // #7FC77F; // #5cb85c;//#3d6c2a // $green !default
+$info: #62C2DF; // #5bc0de;//#1b6083 // $cyan !default
+$warning: #f0ad4e;// darken(#f0ad4e,30%) // $yellow !default
+$danger: #ECA3A2; // #E89692; //#d9534f; // $red !default
+$light: #fff; // $gray-100 !default
+$dark: #474747; // $gray-900 !default
 
 $theme-colors: (
-        "primary": #ababab,
-        "secondary": #dddddd,
-        "success": #5cb85c,
-        "info": #5bc0de,
-        "warning": #f0ad4e,
-        "danger": #d9534f,
-        "light": #fff,
-        "dark": #474747
+    "primary": $primary,
+    "secondary": $secondary,
+    "success": $success,
+    "info": $info,
+    "warning": $warning,
+    "danger": $danger,
+    "light": $light,
+    "dark": $dark
 );
 
-$green-300: tint-color($green, 40%);  // default // Bootstrap 53
-$red-300: tint-color($red, 40%);  // default // Bootstrap 53
-
-// scss-docs-start theme-text-variables
-$primary-text-emphasis:   shade-color($primary, 60%);  // default
-$secondary-text-emphasis: shade-color($secondary, 60%);  // default
-$success-text-emphasis:   shade-color($success, 60%);  // default
-$info-text-emphasis:      shade-color($info, 60%);  // default
-$warning-text-emphasis:   shade-color($warning, 60%);  // default
-$danger-text-emphasis:    shade-color($danger, 60%);  // default
-$light-text-emphasis:     $gray-700;  // default
-$dark-text-emphasis:      $gray-700;  // default
-// scss-docs-end theme-text-variables
-
-// scss-docs-start theme-bg-subtle-variables
-$primary-bg-subtle:       tint-color($primary, 80%);  // default
-$secondary-bg-subtle:     tint-color($secondary, 80%);  // default
-$success-bg-subtle:       tint-color($success, 80%);  // default
-$info-bg-subtle:          tint-color($info, 80%);  // default
-$warning-bg-subtle:       tint-color($warning, 80%);  // default
-$danger-bg-subtle:        tint-color($danger, 80%);  // default
-$light-bg-subtle:         mix($gray-100, $white);  // default
-$dark-bg-subtle:          $gray-400;  // default
-// scss-docs-end theme-bg-subtle-variables
-
-// scss-docs-start theme-border-subtle-variables
-$primary-border-subtle:   tint-color($primary, 60%);  // default
-$secondary-border-subtle: tint-color($secondary, 60%);  // default
-$success-border-subtle:   tint-color($success, 60%);  // default
-$info-border-subtle:      tint-color($info, 60%);  // default
-$warning-border-subtle:   tint-color($warning, 60%);  // default
-$danger-border-subtle:    tint-color($danger, 60%);  // default
-$light-border-subtle:     $gray-200;  // default
-$dark-border-subtle:      $gray-500;  // default
-// scss-docs-end theme-border-subtle-variables
+:root {
+    --tiki-darkroom-bg: linear-gradient(to bottom, #818181 0%, #393939 100%);
+}
 
 // Options
 $enable-dark-mode:            false;
-// Prefix
-$prefix: bs-;
-
-// Spacing
 
 // Body
-$body-text-align:           null;  // default
-$body-color: #e8e8e8;
-$body-bg:                   #474747;
+$body-color:                #e8e8e8; // $gray-900 !default
+$body-bg:                   #474747; // $white !default
 
 $body-secondary-color:      #BFBFBF; // rgba($body-color, .20);
-$body-secondary-bg:         $gray-200;  // default
+$body-secondary-bg:         #0c0c0c;
 
 $body-tertiary-color:       rgba($body-color, .40);
 $body-tertiary-bg:          $gray-100;  // default
@@ -95,20 +53,16 @@ $body-tertiary-bg:          $gray-100;  // default
 $body-emphasis-color:       $white;
 
 // Links
-$link-color: #ababab;
+$link-color: #B5B5B5; // #ababab;
 $link-hover-color: #858585;
 $link-hover-decoration: none;
 $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
 
-// Grid containers
 // Components
 $component-active-color: #ffffff;
 $component-active-bg: #030511;
 
-//==Pills
-$nav-pills-active-link-hover-bg: $component-active-bg;
-$nav-pills-active-link-hover-color: $component-active-color;
-
+// Typography
 $text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #DEDEDE; // #b9b9b9;
 $abbr-border-color: $gray-200;
 $headings-small-color: $gray-200;
@@ -117,60 +71,42 @@ $blockquote-border-color: $gray-400;
 $page-header-border-color: $gray-500;
 $hr-border: $gray-500;
 
-
-// Typography
 $font-family-sans-serif:  system-ui, sans-serif; // "Trebuchet MS", "Bitstream Vera Sans", sans-serif; - From https://modernfontstacks.com/
 $font-family-serif: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif; // Georgia, "Times New Roman", Times, serif;
 $font-family-monospace: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace; // Menlo, Monaco, Consolas, "Courier New", monospace;
 $font-family-base: $font-family-sans-serif;
 
 $headings-font-weight: 500;
+$mark-color: $body-color;
+$mark-bg: #586A79;
 
 // Tables
 $table-color:                 $white; // var(--#{$prefix}emphasis-color) !default;
-//$table-bg:                    var(--#{$prefix}body-bg) !default;
-//$table-accent-bg:             transparent !default;
 $table-bg: #4e4e4e;
-//$table-accent-bg: darken(#474747,5%);
 $table-hover-bg: #555555;
 $table-active-bg: $table-hover-bg;
 $table-head-bg: #292929;
 $table-border-color: #292929;
-
 $table-bg-scale:       0%; //        -80% !default;
-// scss-docs-end table-variables
 
 // Buttons
-//$btn-primary-color: #d8d8d8;
-//$btn-primary-bg: #4b4b4b;
-//$btn-primary-border: #4b4b4b;
-
-$btn-font-weight: normal;
-
 $btn-secondary-color: #dddddd;
-//$btn-secondary-bg: $btn-primary-bg;
-//$btn-secondary-border: $btn-primary-border;
 
 $btn-success-color: #ffffff;
 $btn-success-bg: $success;
-//$btn-success-border: darken($btn-success-bg,5%);
 
 $btn-info-color: #ffffff;
 $btn-info-bg: $info;
-//$btn-info-border: darken($btn-info-bg,5%);
 
 $btn-warning-color: #ffffff;
 $btn-warning-bg: $warning;
-//$btn-warning-border: darken($btn-warning-bg,5%);
 
 $btn-danger-color: #ffffff;
 $btn-danger-bg: $danger;
-//$btn-danger-border: darken($btn-danger-bg,5%);
 
 $btn-link-disabled-color: $gray-800;
 
 // Forms
-//$input-bg: #242424;
 $input-bg:                              var(--#{$prefix}body-bg);  // default
 $input-bg-disabled: $gray-800;
 $input-color: #cfcfcf;
@@ -182,45 +118,41 @@ $legend-border-color: #e5e5e5;
 $input-group-addon-bg: #4F4F4F;
 $input-group-addon-border-color: $input-border-color;
 
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-check-input-checked-bg-image:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$form-check-input-checked-color}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>"); //  !default;
+
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+
 // Form validation
-$form-valid-color:         #24C67B;
-$form-invalid-color:       #ED919C;
+$form-valid-color:         #27D383;
+$form-invalid-color:       #F1A2AB;
 
 // Navs
 $nav-link-color: #BDBDBD;
+$nav-pills-active-link-hover-bg: $component-active-bg;
+$nav-pills-active-link-hover-color: $component-active-color;
+
+$nav-tabs-border-color: #dddddd;
+$nav-tabs-link-hover-border-color: $gray-700;
 
 // Navbar
-
 $navbar-light-color: #fff;
 $navbar-light-hover-color: #f4f4f4;
 $navbar-light-hover-bg: transparent;
 $navbar-light-active-color: #f4f4f4;
-//$navbar-default-link-active-bg//Deprecated?: transparent;
-//darken($navbar-default-bg,6.5%);
 $navbar-light-disabled-color: #cccccc;
-$navbar-light-disabled-bg: transparent;
-$navbar-dark-color: $navbar-light-color;
-$navbar-dark-hover-color: $navbar-light-hover-color;
-$navbar-dark-active-color: $navbar-light-active-color;
-
-//Navbarbrandlabel
+$navbar-light-disabled-bg: transparent; // No Bootstrap equivalent
 $navbar-light-brand-color: $navbar-light-color;
-$navbar-light-brand-hover-color: darken($navbar-light-color,10%);
+$navbar-light-brand-hover-color: color.adjust($navbar-light-color,$lightness: -10%, $space: hsl);
 $navbar-light-brand-hover-bg: transparent;
 
 $navbar-dark-color:                 $navbar-light-color;
 $navbar-dark-hover-color:           $navbar-light-hover-color;
 $navbar-dark-active-color:          $navbar-light-active-color;
 $navbar-dark-disabled-color:        $navbar-light-disabled-color;
-
-//==Tabs
-$nav-tabs-border-color: #dddddd;
-$nav-tabs-link-hover-border-color: $gray-700;
-$nav-tabs-active-link-hover-bg: $body-bg;
-$nav-tabs-active-link-hover-color: $gray-500;
-$nav-tabs-active-link-hover-border-color: #dddddd;
-$nav-tabs-justified-link-border-color: #dddddd;
-$nav-tabs-justified-active-link-border-color: $body-bg;
+$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
 
 // Dropdowns
 $dropdown-bg: #242424;
@@ -228,26 +160,20 @@ $dropdown-border-color: rgba(0,0,0,.15);
 $dropdown-divider-bg: #e5e5e5;
 
 $dropdown-link-color: $link-color;
-$dropdown-link-hover-color: $gray-800;
+$dropdown-link-hover-color: $gray-200;
 $dropdown-link-hover-bg: transparent;
+$dropdown-link-active-color: $white;
 
-$dropdown-link-active-color: $component-active-color;
-$dropdown-link-active-bg: $component-active-bg;
 $dropdown-link-disabled-color: $gray-600;
-$dropdown-header-color: $gray-600;
 
 $dropdown-dark-color:               $link-color;
 $dropdown-dark-bg:                  $dropdown-bg;
-$dropdown-dark-border-color:        $dropdown-border-color;
-$dropdown-dark-divider-bg:          $dropdown-divider-bg;
-$dropdown-dark-box-shadow:          null;  // default
-$dropdown-dark-link-color:          $dropdown-dark-color;  // default
-$dropdown-dark-link-hover-color:    $white;  // default
-$dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
+
+$dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Pagination
 $pagination-color: #C9C9C9;
-$pagination-bg: $gray-300;
+$pagination-bg: #475762;
 $pagination-border: $gray-500;
 
 $pagination-hover-color: $link-hover-color;
@@ -258,115 +184,77 @@ $pagination-active-color: #000;
 $pagination-active-bg: $primary;
 $pagination-active-border: $primary;
 
-$pagination-disabled-color: $gray-800;
-$pagination-disabled-bg: #303030;
+$pagination-disabled-color: $gray-400;
+$pagination-disabled-bg: #3b464d;
 $pagination-disabled-border: #dddddd;
-
-// Jumbotron (obsolete)
-$jumbotron-padding: 30px;
-$jumbotron-color: inherit;
-$jumbotron-bg: lighten($body-bg,10%);
-$jumbotron-heading-color: inherit;
 
 // Placeholders
 // Cards
 $card-bg: #474747;
-$card-inner-border: #474747;
+//$card-inner-border: #474747; // No Bootstrap equivalent
 $card-border-color: transparent;
-$card-footer-bg: #474747;
-$card-primary-bg: #ababab;
-
-
-$card-primary-bg: #474747;
-$card-primary-text: #ffffff;
-$card-primary-border: #ababab;
-$card-primary-header-bg: #ababab;
 
 // Accordion
 $accordion-bg: #2A2A2D;
 $accordion-button-active-color: #fff;
 
+$accordion-button-icon:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>"); // !default for dark mode
+$accordion-button-active-icon:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color-dark}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>"); // !default for dark mode
+
 // Tooltips
 $tooltip-color: #ffffff;
 $tooltip-bg: #000000;
-$tooltip-opacity: .9;
-$tooltip-arrow-color: $tooltip-bg;
 
 // Popovers
 $popover-bg: #292929;
-$popover-border-color: darken($popover-bg,3%);
-$popover-header-bg: darken($popover-bg,3%);
+$popover-border-color: color.adjust($popover-bg,$lightness: -3%, $space: hsl);
+$popover-header-bg: color.adjust($popover-bg,$lightness: -3%, $space: hsl);
 $popover-arrow-color: $popover-bg;
 
 // Toasts
 // Badges
 $badge-color: #ffffff;
-$badge-link-hover-color: #ffffff;
-$badge-bg: $gray-300;
-$badge-active-color: $link-color;
-$badge-active-bg: #ffffff;
 
 // Modals
-$modal-content-bg: $body-bg;
-$modal-content-border-color: rgba(0,0,0,.2);
-$modal-backdrop-bg: darken(#d9534f,30%);
-$modal-header-border-color: #e5e5e5;
-$modal-footer-border-color: $modal-header-border-color;
-
 // Alerts
-// Progressbars
+// Progress bars
 $progress-bar-color: #000;
 
 //Listgroup
-$list-group-bg: lighten($body-bg,8%);
+$list-group-bg: color.adjust($body-bg,$lightness: 8%, $space: hsl);
 $list-group-disabled-color: #e9eecf;
 $list-group-disabled-bg: #303030;
-$list-group-disabled-text-color: $list-group-disabled-color;
-$list-group-link-color: $body-color;
-$list-group-link-hover-color: $list-group-link-color;
-$list-group-link-heading-color: $body-color;
 
 // Image thumbnails
 $thumbnail-bg: $body-bg;
-$thumbnail-border: #dddddd;
-$thumbnail-caption-color: $body-color;
+$thumbnail-border-color: #dddddd;
 
 // Figures
 // Breadcrumbs
-$breadcrumb-bg: #303030;
-$breadcrumb-color: $gray-300;
+$breadcrumb-bg: #303030; // null !default
 $breadcrumb-active-color: $gray-500;
 $breadcrumb-padding-y: .75rem;
 $breadcrumb-padding-x: .75rem;
 
 // Carousel
-$carousel-text-shadow:  01px 2px rgba(0,0,0,.6);
+$carousel-text-shadow:  1px 2px rgba(0,0,0,.6);
 $carousel-control-color: #ffffff;
 $carousel-indicator-active-bg: #ffffff;
 $carousel-indicator-border-color: #ffffff;
 $carousel-caption-color: #ffffff;
 
 // Close
-$close-font-weight: bold;
-$close-color: #000000;
-$close-text-shadow: 01px0#ffffff;
+$close-font-weight: bold; // No Bootstrap equivalent
+$btn-close-color: #000000;
+$close-text-shadow: 1px 0 #ffffff; // No Bootstrap equivalent
 
-// Spinners
-// Close
-// Offcanvas
 // Code
 $code-color: #c7254e;
-$code-bg: #f9f2f4;
 $kbd-color: #ffffff;
 $kbd-bg: #333333;
-$pre-bg: #f5f5f5;
-$pre-color: $gray-800;
-$pre-border-color: #cccccc;
 
-// - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
+// - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
 
-$dropdown-item: $dropdown-link-color;
-// Blockquote
-$blockquote-color: #595959;  // default // was #7a7a7a, updated for WAI compliance
-$blockquote-footer-color: $blockquote-color;  // default // Bootstrap 5
+$tiki-blockquote-color: #595959;  // default // was #7a7a7a, updated for WAI compliance
+$tiki-blockquote-footer-color: $tiki-blockquote-color;  // default // Bootstrap 5
 $tiki-blockquote-left-border-color: #e5e5e5;  // default

@@ -1,5 +1,11 @@
-// Amelia for Bootstrap 5
-// Variables
+// Variables for Amelia theme, including overrides of Bootstrap SCSS variables as well as any Tiki SCSS variables
+// Contains overriding declarations of Bootstrap variables and possible related value aliases to implement an override.
+// For example, if `$component-active-bg: $primary;` then ``$dropdown-link-active-bg: $component-active-bg;` also needs to be explicitly restated for the theme value to override the Bootstrap default.
+
+// Enable SCSS color functions and import default variable values
+@use "sass:color";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated), required before import of variables.scss.
+@import "../../default/scss/variables"; // 2. Import directly to allow removal of redundant Bootstrap default declarations in this file.
 
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
@@ -27,30 +33,23 @@ $secondary: #E2CBCB;
 $success: #A5E4A0;
 $info: #D5CDEA;
 $warning: #E4D081;
-$danger: #EEC9AF;
-$dark: #FDF7F9; // #ad1d28;
-$light: #0F7D85; // #5AE3ED;
+$danger: #ef98b5;
+$dark: #450c0c; //#6e0d0d; // #0F7D85; // #ad1d28;
+$light: #c8e8eb; // #5AE3ED; // #FDF7F9;
 
 $theme-colors: (
-    "primary":           #F5CDC2, // #f5af9f, //#F3C9C9, // #ad1d28,
-    "secondary":         #E2CBCB, // #c05a50, // #82241b,
-    "success":           #A5E4A0, // #81da78, // #48ca3b,
-    "info":              #D5CDEA, // #907bc7, // #4d3a7d,
-    "warning":           #E4D081, // #e0c96b,
-    "danger":            #ef98b5, // #EEC9AF, // #d98c56,
-    "light":             #0F7D85, // #5AE3ED, // #18cbd8,
-    "dark":              #FDF7F9, //  #ad1d28, // $black,
+        "primary": $primary,
+        "secondary": $secondary,
+        "success": $success,
+        "info": $info,
+        "warning": $warning,
+        "danger": $danger,
+        "light": $light,
+        "dark": $dark
 );
 
-
-
 // Options
-// Prefix for :root CSS variables
 
-$variable-prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix;  // default
-// Gradient
-// Spacing
 // Body
 $body-bg: #0b646b; // #108a93; WAI
 $body-color: #fff;
@@ -64,27 +63,20 @@ $body-tertiary-bg:          $gray-800;
 
 $body-emphasis-color:       $white; // $black default
 
-// Utility maps
 // Links
 $link-color: #FCF6E8; // lighten(#E4D081FF, 15%); //lighten($warning, 15%);
+$link-decoration:                         underline;
 $link-shade-percentage:                   20%;  // default // BS53
 $link-hover-color: shift-color($link-color, $link-shade-percentage); // !default;
 $link-hover-decoration: underline;
 
-// Paragraphs
-// Grid breakpoints
-// Grid containers
-// Grid columns
-// Container padding
 //Components
 $padding-base-vertical: .5rem;
 $padding-large-vertical: .9rem;
-
 $component-active-color:       #ddb9af; // $white;  // default
 $component-active-bg:         #981919; // $primary;  // default
 
 // Typography
-//Fonts
 $font-family-sans-serif: Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;   //"Cabin", Arial, sans-serif;
 $headings-font-family: Superclarendon, 'Bookman Old Style', 'URW Bookman', 'URW Bookman L', 'Georgia Pro', Georgia, serif; // 'Lobster', cursive;
 $headings-font-style: italic;
@@ -99,6 +91,7 @@ $table-bg: transparent;
 $table-head-bg: #108a93;
 $table-head-color: #fff;
 
+// Buttons
 // Forms
 $form-text-color:                       var(--#{$prefix}body-color);
 $input-bg: var(--#{$prefix}body-bg); // $gray-100;
@@ -106,14 +99,16 @@ $input-color: var(--#{$prefix}body-color); // $gray-800;
 $input-placeholder-color: var(--#{$prefix}secondary-color); // #585E65;
 $input-group-addon-bg: var(--#{$prefix}tertiary-bg);
 
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
+
 // Form validation
-// Z-index master list
 $form-feedback-invalid-color:       $danger;  // default // BS53
 $form-invalid-color:                $form-feedback-invalid-color;  // default // BS53
 
 // Navs
-$nav-link-color:                  var(--#{$prefix}link-color);  // default // #444;
-//$nav-link-color:                  var(--#{$prefix}link-color);
+$nav-link-color:                  $link-color; // #1A1A1A; // var(--#{$prefix}link-color);  // default // #444;
 $nav-link-hover-color:            var(--#{$prefix}link-hover-color);
 
 $nav-tabs-border-color:             $gray-300;
@@ -127,21 +122,22 @@ $nav-link-disabled-color: var(--#{$prefix}secondary-color);  // default // darke
 $nav-pills-link-active-bg:          $component-active-bg; // !default;darken($body-bg, 8%);
 
 // Navbar
+$navbar-light-color:                $black; // $link-color; // $black;
+$navbar-light-hover-color:          rgba($black, .7);  // default
+$navbar-light-active-color:         rgba($black, .9);  // default
+$navbar-light-disabled-color:       rgba($black, .3);  // default
+//$navbar-color: $link-color;
+//$navbar-light-hover-color: $link-hover-color;
+//$navbar-link-active-color: $link-hover-color;
+$navbar-light-brand-color:          $navbar-light-active-color; // !default;
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
+
 $navbar-dark-color:                 $link-color;
 $navbar-dark-hover-color:           rgba($white, .75); // !default; // lighten($navbar-dark-color, 25%);
 $navbar-dark-active-color:          $navbar-dark-color;
 $navbar-dark-disabled-color:        rgba($white, .25); //  !default;lighten($navbar-dark-color, 50%);
-
-$navbar-light-color:                $link-color; // $black;
-$navbar-light-hover-color:          rgba($black, .7);  // default
-$navbar-light-active-color:         rgba($black, .9);  // default
-$navbar-light-disabled-color:       rgba($black, .3);  // default
-
-$navbar-color: $link-color;
-$navbar-light-hover-color: $link-hover-color;
-$navbar-link-active-color: $link-hover-color;
-
-// Navbar links
+$navbar-dark-brand-color:           $navbar-dark-active-color; // !default;
+$navbar-dark-brand-hover-color:     $navbar-dark-active-color; // !default;
 
 // Dropdowns
 $dropdown-color:                   #444;
@@ -154,9 +150,7 @@ $dropdown-link-hover-bg:           #15b5c1;
 $dropdown-dark-color:               $gray-300;
 $dropdown-dark-bg:                  $gray-800;
 $dropdown-dark-link-hover-bg:       rgba($white, .15);  // default
-
-// Pagination
-$pagination-bg: #0C5055;
+$dropdown-link-active-bg:           $component-active-bg; //  !default;
 
 // Pagination
 $pagination-bg: var(--#{$prefix}body-bg);  // default
@@ -169,8 +163,6 @@ $pagination-active-bg:              $component-active-bg;  // default
 $pagination-disabled-color: $pagination-focus-color;
 $pagination-disabled-bg: #094344;
 
-    // Jumbotron (retired)
-$jumbotron-bg: darken($body-bg, 5%); // Todo
 
 // Cards
 $card-bg: #0D6C73;
@@ -178,40 +170,12 @@ $card-border-color: #0d747c;
 $card-cap-bg: #0D676E;
 
 // Accordion
-
-// scss-docs-start accordion-variables
-$accordion-padding-y:                     1rem;  // default
-$accordion-padding-x:                     1.25rem;  // default
-$accordion-color:                         var(--#{$prefix}body-color);  // default
-$accordion-bg:                            var(--#{$prefix}body-bg);  // default
-//$accordion-border-width:                  $border-width;  // default
-$accordion-border-color:                  var(--#{$prefix}border-color);  // default
-//$accordion-border-radius:                 $border-radius;  // default
-//$accordion-inner-border-radius:           subtract($accordion-border-radius, $accordion-border-width);  // default
-
-//$accordion-body-padding-y:                $accordion-padding-y;  // default
-//$accordion-body-padding-x:                $accordion-padding-x;  // default
-
-//$accordion-button-padding-y:              $accordion-padding-y;  // default
-//$accordion-button-padding-x:              $accordion-padding-x;  // default
-$accordion-button-color:                  $accordion-color !default;
-$accordion-button-bg:                     #6e0d0d; // #ddb9af; // var(--#{$prefix}accordion-bg) !default;
-//$accordion-transition:                    $btn-transition, border-radius .15s ease !default;
+$accordion-button-bg:                     $dark; // #6e0d0d; // #ddb9af; // var(--#{$prefix}accordion-bg) !default;
 $accordion-button-active-bg:              #981919; // tint-color($component-active-bg, 90%) !default;
 $accordion-button-active-color:           #ddb9af; //shade-color($primary, 10%) !default;
 
-//$accordion-button-focus-border-color:     $input-focus-border-color !default;
-//$accordion-button-focus-box-shadow:       $btn-focus-box-shadow !default;
-
-$accordion-icon-width:                    1.25rem;  // default
-$accordion-icon-color:                    $accordion-button-color;  // default
-$accordion-icon-active-color:             $accordion-button-active-color;  // default
-$accordion-icon-transition:               transform .2s ease-in-out;  // default
-$accordion-icon-transform:                rotate(-180deg);  // default
-
 $accordion-button-icon:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");  // default
 $accordion-button-active-icon:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>");  // default
-// scss-docs-end accordion-variables
 
 // Tooltips
 // Popovers
@@ -220,7 +184,6 @@ $popover-body-color: #fff;
 $popover-header-bg: #18cbd8;
 $popover-header-color: #fff;
 
-// Toasts
 // Badges
 $badge-color: #000;
 
@@ -235,12 +198,11 @@ $progress-bg:                       $gray-200;  // default
 $progress-bar-color:                $black; // $white !default;
 $progress-bar-bg:                   $primary;  // default
 
-    // List group
+// List group
 $list-group-bg: var(--#{$prefix}body-bg);  // default
 $list-group-color: var(--#{$prefix}body-color); // !default;
 $list-group-disabled-color: var(--#{$prefix}secondary-color); // !default;darken($list-group-color, 10%);
 
-// Image thumbnails
 // Figures
 $figure-caption-color: $gray-100;
 
@@ -248,19 +210,11 @@ $figure-caption-color: $gray-100;
 $breadcrumb-bg: #0C5055;
 $breadcrumb-active-color: #BDBDBD;
 
-// Carousel
-// Close
-// Offcanvas
 // Code
 $code-color:                        $pink;  // default // BS53
 
-// - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
+// - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
 
-$bg-dark: #ad1d28 !important;
-$navbar-dark-bg: #ad1d28 !important;
-
-$blockquote-color: #E6E8EA;
+$blockquote-color: #E6E8EA; // Needs to be changed to $tiki-blockquote-color
 $tiki-blockquote-left-border-color: #E6E8EA;
-$dropdown-item: $dropdown-link-color;
-
-//$megamenu-dropdown-link-color: $dropdown-link-color;
+//$tiki-megamenu-dropdown-link-color: $dropdown-link-color;

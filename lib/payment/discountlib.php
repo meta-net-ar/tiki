@@ -61,7 +61,7 @@ class DiscountLib extends TikiDb_Bridge
         $bindvars = [];
         $discounts['data'] = $this->fetchAll($query, $bindvars, $max, $offset);
         $query = 'select count(*) from `tiki_discount`';
-        $discounts['cant'] = $this->getOne($query, $bindvars);
+        $discounts['count'] = $this->getOne($query, $bindvars);
         return $discounts;
     }
 }

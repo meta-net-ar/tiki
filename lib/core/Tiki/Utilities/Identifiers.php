@@ -6,6 +6,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Utilities;
 
+use Exception;
+use Ramsey\Uuid\Uuid;
+
 class Identifiers
 {
     /**
@@ -29,5 +32,25 @@ class Identifiers
         $values[] = $_SERVER['REMOTE_PORT'] ?? '';
         $uniqueid = hash('crc32b', implode('', $values));
         return $uniqueid;
+    }
+
+    /**
+     * This will return a universally unique identifiers (UUIDs)
+     * leveraging ramsey/uuid library.
+     *
+     * @param string $version The UUIDs version to generate
+     * @return string A UUIDs string of $version version (4 or 7)
+     * @throws Exception When the given version is not 4 or 7
+     */
+    public static function generateUUID(int $version = 4): string
+    {
+        switch ($version) {
+            case 4:
+                return Uuid::uuid4()->toString();
+            case 7:
+                return Uuid::uuid7()->toString();
+            default:
+                throw new Exception(tr("UUID version %0 not supported by Tiki.\n Supported versions are 4 and 7.", $version));
+        }
     }
 }

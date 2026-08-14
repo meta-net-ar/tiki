@@ -38,7 +38,6 @@ class Services_Tracker_TodoController
         }
 
         $todolib = TikiLib::lib('todo');
-        $trklib = TikiLib::lib('trk');
 
         return [
             'title' => tr('Events'),

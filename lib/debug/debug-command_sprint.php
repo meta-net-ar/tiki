@@ -56,7 +56,7 @@ class DbgSPrint extends DebuggerCommand
                 $tmp = $smarty->getTemplateVars();
 
                 if (is_array($tmp) && isset($tmp[$v])) {
-                    $result .= $v . ' = ' . print_r($tmp[$v], true) . "\n";
+                    $result .= $v . ' = ' . print_r($tmp[$v], true) . "\n"; // @phpstan-ignore disallowedFunctions.printR (intentional debug tool — builds sprint output string)
                 } else {
                     $result .= 'Smarty variable "' . $v . '" not found';
                 }

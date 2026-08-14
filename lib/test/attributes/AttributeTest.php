@@ -4,10 +4,16 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$attributelib = TikiLib::lib('attribute');
+
 
 class AttributeTest extends TikiTestCase
 {
+    private static $attributelib;
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+        self::$attributelib = TikiLib::lib('attribute');
+    }
     protected function setUp(): void
     {
         parent::setUp();

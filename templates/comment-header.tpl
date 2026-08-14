@@ -1,9 +1,9 @@
 <header class="card-header clearfix postbody-title media-overflow-visible"> {*the card-header class cut off dropdowns so need media-overflow-visible class in BS3. Also true for card-header in BS4? *}
     {if $prefs.feature_comments_locking neq 'y' or
         ( $comment.locked neq 'y' and $thread_is_locked neq 'y' )}
-        {assign var='this_is_locked' value='n'}
+        {$this_is_locked='n'}
     {else}
-        {assign var='this_is_locked' value='y'}
+        {$this_is_locked='y'}
     {/if}
 
     {if $thread_style != 'commentStyle_headers' and $this_is_locked eq 'n' and isset($comment.threadId) and $comment.threadId > 0}
@@ -124,7 +124,7 @@
     {if isset($first) and $first eq 'y'}
     <h2 class=" card-title">
         <span>{$comment.title|escape}</span>
-        {if ($prefs.feature_sefurl eq 'y') }
+        {if ($prefs.feature_sefurl eq 'y')}
         <a class="heading-link" href="{$comments_parentId|sefurl:'forum post'}{if ($comment.threadId neq $comments_parentId)}#threadId{$comment.threadId}{/if}" aria-label="{tr}Heading link{/tr}">{icon name="link"}</a>
         {else}
         <a class="heading-link" href="?tiki-view_forum_thread.php?comments_parentId={$comments_parentId}#threadId{$comment.threadId}" aria-label="{tr}Heading link{/tr}>{icon name="link"}</a>

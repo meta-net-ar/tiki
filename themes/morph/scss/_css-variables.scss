@@ -1,39 +1,54 @@
-//--------------------------- Tiki CSS variables
+// CSS variables for the Morph theme
+// These and other CSS variable values can be customized (overridden) to suit the website by adding CSS rules to the Look and Feel CSS Customization textarea.
+
+// This file contains CSS variables / custom properties for:
+// * Top and topbar navbars (base_files/scss/_tiki-pagetop_colors.scss)
+// * Admin pages navbar and side menu (base_files/css/feature/adminui.scss
+// * For the above, dark and light L&F navbar preference styling, and color mode properties
+// * Other styling as necessary for the theme
+
+// Values for CSS variables can be an SCSS variable, a hex code or other CSS value, or a CSS variable, etc. Tiki themes use a combination of these. Some ideas:
+// * Use an SCSS variable for consistency if the value is already declared in _variables.scss (Interpolation info: https://developersink.com/css/css-custom-properties-sass-variables/ )
+// * Use a hex color code, or other CSS value. if consistency with an SCSS variable value isn't an issue or for the simplest and easiest declaration of the value.
+// * Refer to a previously-declared CSS variable to maintain consistent application of the color or other property within the scope of the CSS variable declaration.
+
+@import "../../../node_modules/bootswatch/dist/morph/_variables.scss"; // Bootswatch theme variables file
+@import "variables";
 
 // Used for L&F nav color choice and color mode override
 @mixin top-nav-dark {
-    --tiki-top-bg: #202428;
-    --tiki-top-color: var(--bs-link-color);
-    --tiki-top-hover-color: var(--bs-link-hover-color);
-    --tiki-top-text-color: var(--bs-link-hover-color);
+    --tiki-top-bg: #{$dark};
+    --tiki-top-color: #{$navbar-dark-color};
+    --tiki-top-hover-color: #{$navbar-dark-hover-color};
+    --tiki-top-text-color: #{$navbar-dark-hover-color};
+     --tiki-site-title-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
     --tiki-top-box-shadow: 5px 5px 10px rgba(55, 94, 148, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.4);
-    --bs-navbar-brand-color: #{$navbar-dark-brand-color};
-    --bs-navbar-brand-hover-color: #{$navbar-dark-brand-hover-color};
 }
 
 @mixin topbar-nav-dark {
     --tiki-topbar-bg: #202428;
-    --tiki-topbar-color: var(--bs-link-color);
-    --tiki-topbar-hover-color: var(--bs-link-hover-color);
-    --tiki-topbar-text-color: var(--bs-link-hover-color);
+    --tiki-topbar-color: #{$navbar-dark-color};
+    --tiki-topbar-hover-color: #{$navbar-dark-hover-color};
+    --tiki-topbar-text-color: #{$navbar-dark-hover-color};
     --tiki-topbar-box-shadow: 5px 5px 10px rgba(55, 94, 148, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.4);
 }
 
 @mixin top-nav-light {
     --tiki-top-bg: rgba(240, 245, 250, 1);
-    --tiki-top-color: rgba(0, 0, 0, 0.6);
+    --tiki-top-color: #{$navbar-light-color};
     --tiki-top-hover-color: #485785;
     --tiki-top-text-color: #485785;
     --tiki-top-box-shadow: 5px 5px 10px rgba(55, 94, 148, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.4);
-    --bs-navbar-brand-color: #{$navbar-light-brand-color};
-    --bs-navbar-brand-hover-color: #{$navbar-light-brand-hover-color};
+    --tiki-site-title-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
+    --tiki-site-subtitle-color: #{$navbar-dark-brand-color, var(--tiki-top-color)};
 }
 
 @mixin topbar-nav-light {
     --tiki-topbar-bg: rgba(240, 245, 250, 1);
-    --tiki-topbar-color: #485785;
-    --tiki-topbar-hover-color: #485785;
-    --tiki-topbar-text-color: #485785;
+    --tiki-topbar-color: #{$navbar-light-color};
+    --tiki-topbar-hover-color: #{$navbar-light-hover-color};
+    --tiki-topbar-text-color: #{$navbar-light-hover-color};
     --tiki-topbar-box-shadow: 5px 5px 10px rgba(55, 94, 148, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.4);
 }
 
@@ -57,6 +72,8 @@
 [data-bs-theme=dark] {                              // color mode
     .tiki-top-nav-light {                           // light top selector
         @include top-nav-dark;                      // dark values
+        --tiki-site-title-color: #{$navbar-dark-color};
+        --tiki-site-subtitle-color: #{$navbar-dark-color};
     }
     .tiki-topbar-nav-light {
         @include topbar-nav-dark;
@@ -66,10 +83,10 @@
 // Color mode preference trumps L&F admin dark navbar option
 [data-bs-theme=light] {                              // color mode
     .tiki-top-nav-dark {                           // dark top selector
-        @include top-nav-light;                      // light values
+        @include top-nav-dark;                      // light values
     }
     .tiki-topbar-nav-dark {
-        @include topbar-nav-light;
+        @include topbar-nav-dark;
     }
 }
 
@@ -78,15 +95,15 @@
 // Light navbar minus top nav
 @mixin admin-nav-light {
     --tiki-admin-top-nav-bg: rgba(240, 245, 250, 1);
-    --tiki-admin-navbar-bg: rgba(240, 245, 250, 1);
-    --tiki-admin-top-nav-color: #485785;
-    --tiki-admin-top-nav-hover-color: #485785;
-    --tiki-admin-top-nav-hover-bg: none ;
+    --tiki-admin-top-nav-color: #{$navbar-light-color};
+    --tiki-admin-top-nav-hover-color: #{$navbar-light-hover-color};;
+    --tiki-admin-top-nav-hover-bg: none;
+    --tiki-admin-top-box-shadow: 0px 1px 10px #e1e0e0;
     --tiki-admin-aside-nav-bg: rgba(240, 245, 250, 1);
-    --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
-    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
+    --tiki-admin-aside-nav-color: #{$navbar-light-color};
+    --tiki-admin-aside-nav-hover-color:  #{$navbar-light-hover-color};
     --tiki-admin-dropdown-bg: #{$dropdown-bg};
-    --tiki-admin-dropdown-link-color: #485785;
+    --tiki-admin-dropdown-link-color: #{$dropdown-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-link-hover-bg};
     button.accordion-button {
@@ -95,16 +112,23 @@
     }
 }
 
+// Improve appearance when two areas with same background color meet
+@media (min-width: 992px) {
+    .navbar-wrapper:has(.tiki-admin-aside-nav-light, .tiki-admin-aside-nav-dark) {
+        box-shadow: 5px 0 10px -5px #c9c9ca;
+    }
+}
+
 // Dark navbar minus top nav
 @mixin admin-nav-dark {
-    --tiki-admin-top-nav-bg: #B0C0D5;
-    --tiki-admin-top-nav-hover-color: #{$link-color};
+    --tiki-admin-top-nav-bg: #{$dark};
+    --tiki-admin-top-nav-hover-color: #{$navbar-dark-color};
     --tiki-admin-top-nav-hover-bg: #{$navbar-dark-hover-color};
-    --tiki-admin-aside-nav-bg: #B0C0D5;
-    --tiki-admin-aside-nav-color: var(--tiki-admin-top-nav-color);
-    --tiki-admin-aside-nav-hover-color: var(--tiki-admin-top-nav-hover-color);
-    --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color};
+    --tiki-admin-aside-nav-bg: #{$dark};
+    --tiki-admin-aside-nav-color: #{$navbar-dark-color};
+    --tiki-admin-aside-nav-hover-color: #{$navbar-dark-hover-color};
     --tiki-admin-dropdown-bg: #{$dropdown-dark-bg};
+    --tiki-admin-dropdown-link-color: #{$dropdown-dark-link-color};
     --tiki-admin-dropdown-link-hover-color: #{$dropdown-dark-link-hover-color};
     --tiki-admin-dropdown-link-hover-bg: #{$dropdown-dark-link-hover-bg};
     button.accordion-button {
@@ -114,17 +138,16 @@
 }
 
 // When color mode switch isn't active
-:root {
-    .tiki .tiki-admin-top-nav-light, // Legacy
-    .tiki.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-light {
-        @include admin-nav-light;
-    }
-    .tiki .tiki-admin-top-nav-dark,
-    .tiki.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
-    .tiki .tiki-admin-aside-nav-dark {
-        @include admin-nav-dark;
-    }
+.tiki-admin-top-nav-light, // Legacy
+.tiki-admin .navbar-light-parent.tiki-top-nav-light, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-light {
+    @include admin-nav-light;
+}
+
+.tiki-admin-top-nav-dark,
+.tiki-admin .navbar-dark-parent.tiki-top-nav-dark, // UAB - Specificity increased to override
+.tiki-admin-aside-nav-dark {
+    @include admin-nav-dark;
 }
 
 // Color mode preference trumps L&F admin light navbar option
@@ -168,4 +191,17 @@
     .ec-event-title {
         color: var(--bs-body-color) !important;
     }
+}
+
+[data-bs-theme="light"] {
+    --bs-form-invalid-border-color: #BF2231; // Normal declaration method for form valid/invalid didn't work
+    --bs-form-invalid-color: #BF2231;
+    --bs-form-valid-border-color: #157045;
+    --bs-form-valid-color: #157045;
+}
+
+[data-bs-theme="dark"] {
+    --tiki-lighty-col1-bg: #212529;
+    --tiki-vert-nav-link-color: rgba(var(--bs-link-color-rgb));
+    --tiki-vert-nav-link-hover-color: rgba(var(--bs-link-hover-color-rgb));
 }

@@ -104,7 +104,7 @@ class Search_ContentSource_FileSource implements Search_ContentSource_Interface,
                                 }
                             }
                         }
-                        if (strstr($view_path, '?')) {
+                        if (str_contains($view_path, '?')) {
                             $view_path .= '&';
                         } else {
                             $view_path .= '?';

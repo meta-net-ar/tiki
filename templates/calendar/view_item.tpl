@@ -5,7 +5,34 @@
 {/block}
 
 {block name="content"}
-    <h5 class="mb-3">{$calitem.parsedName}</h5>
+    {if not $modal and not $preview}
+        {include
+            file='calendar_header.tpl'
+            viewlist='listEventView'
+        }
+    {/if}
+
+    {if not $preview}
+        {include file='calendar_header.tpl' viewlist='listEventView'}
+
+        <div class="float-end">
+            {permission name='change_events' type='calendaritem' object=$calitem.calitemId}
+                <a href="{service controller='calendar' action='edit_item' calitemId=$calitem.calitemId|escape}" class="btn btn-primary edit-calendar-item-btn">
+                    {tr}Edit{/tr}
+                </a>
+            {/permission}
+            {if $tiki_p_add_events eq 'y'}
+                <a 
+                    href="{service controller='calendar' action='edit_item' calitemId=0 copy_from=$calitem.calitemId|escape modal=1 return_url='tiki-calendar.php'}"
+                    class="btn btn-light edit-calendar-item-btn cleanable-false"
+                    title="{tr}Create a new event based on this one{/tr}">
+                    {icon name='copy'} {tr}Duplicate{/tr}
+                </a>
+            {/if}
+        </div>
+    {/if}
+  
+    <h5 class="mt-3 mb-3">{tr}Title{/tr} : {$calitem.parsedName}</h5>
     <div class="summary mb-4">
         {$thiscustombgcolor = $calendar.custombgcolor}
         {$thiscustomfgcolor = $calendar.customfgcolor}
@@ -39,7 +66,7 @@
                     {tr}Each{/tr} {$recurrence.dayOfMonth|join:', '} {tr}of the month{/tr}
                 {elseif $recurrence.monthlyType eq 'firstlastweekday'}
                     {tr}Every{/tr}
-                    {if $recurrence.monthlyFirstlastWeekdayValue[0] eq '1'}
+                    {if $recurrence.monthlyFirstlastWeekdayValue == 1}
                         {tr}First Weekday{/tr}
                     {else}
                         {tr}Last Weekday{/tr}
@@ -205,56 +232,73 @@
         {/if}
     {/if}
     <div class="summary">
-        {$calitem.display_datetimes}
+        <span>{tr}Start{/tr} - {tr}End{/tr} : <b>{$calitem.display_datetimes}</b>{if $calitem.allday eq '1'} <span class="border p-1 rounded text-secondary fst-italic fs-6">{tr}All-day event{/tr}</span>{/if}</span>
     </div>
-    <div class="description">
+    <div class="my-3">
+        <b>{tr}Description{/tr}</b><br>
         {$calitem.parsed|default:"<em>{tr}No description{/tr}</em>"}
     </div>
+    {if !empty($trackerItems)}
+        <div class="row px-3 py-2">
+            <label class="col-form-label col-sm-3">{tr}Related tracker items{/tr} : </label>
+            <div class="col-sm-9 mb-0 pt-2">
+                <ul>
+                    {foreach from=$trackerItems item=trackerItem}
+                        <li>{object_link type="trackeritem" id=$trackerItem}</li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    {/if}
     <div class="small mt-3">
         <div class="table-responsive">
             <table class="table table-borderless p-0 table-sm{if $preview} table-secondary{/if}">
                 {* custom properties *}
                 {if $calendar.customstatus eq 'y'}
                     <tr>
-                        <td colspan="2">
+                        <th class="px-0 py-1">{tr}Status:{/tr}</th>
+                        <td class="px-0 py-1">
                             {if $calitem.status eq "Tentative"}
-                                <label class="badge bg-secondary mb-1">{tr}Tentative{/tr}</label>
+                                {icon name="question-circle" ititle='{tr}Tentative{/tr}' alt='{tr}Tentative{/tr}' iclass="text-warning me-1"}
+                                <span class="text-warning">{tr}Tentative{/tr}</span>
                             {elseif $calitem.status eq "Confirmed"}
-                                <label class="badge bg-success mb-1">{tr}Confirmed{/tr}</label>
+                                {icon name="check-circle" ititle='{tr}Confirmed{/tr}' alt='{tr}Confirmed{/tr}' iclass="text-success me-1"}
+                                <span class="text-success">{tr}Confirmed{/tr}</span>
                             {elseif $calitem.status eq "Cancelled"}
-                                <label class="badge bg-danger mb-1">{tr}Cancelled{/tr}</label>
+                                {icon name="status-closed" ititle='{tr}Cancelled{/tr}' alt='{tr}Cancelled{/tr}' iclass="text-danger me-1" istyle="color: red;"}
+                                <span class="text-danger">{tr}Cancelled{/tr}</span>
                             {else}
-                                <label class="badge bg-info mb-1">{tr}{$calitem.status|escape}{/tr}</label>
+                                <span class="text-muted">{tr}{$calitem.status|escape}{/tr}</span>
                             {/if}
                         </td>
                     </tr>
                 {/if}
                 {if $calendar.custompriorities eq 'y'}
                     <tr class="priority">
-                        <th style="background-color:#{$listprioritycolors[$calitem.priority]}">
+                        <th class="px-0 py-1" style="background-color:#{$listprioritycolors[$calitem.priority]}">
                             {tr}Priority:{/tr}
                         </th>
-                        <td>{if $calitem.priority neq ''}{$calitem.priority|escape}{else}<em class="text-secondary">{tr}No priority set for this event{/tr}</em>{/if}</td>
+                        <td class="px-0 py-1">{if $calitem.priority neq ''}{$calitem.priority|escape}{else}<em class="text-secondary">{tr}No priority set for this event{/tr}</em>{/if}</td>
                     </tr>
                 {/if}
                 {if $calendar.customcategories eq 'y'}
                     <tr class="category">
-                        <th>{tr}Classification:{/tr}</th>
-                        <td>{if $calitem.categoryName neq ''}{$calitem.categoryName|escape}{else}<em class="text-secondary">{tr}No classification added to this event{/tr}</em>{/if}</td>
+                        <th class="px-0 py-1">{tr}Classification:{/tr}</th>
+                        <td class="px-0 py-1">{if $calitem.categoryName neq ''}{$calitem.categoryName|escape}{else}<em class="text-secondary">{tr}No classification added to this event{/tr}</em>{/if}</td>
                     </tr>
                 {/if}
                 {if $calendar.customlocations eq 'y'}
                     <tr class="location">
-                        <th>{tr}Location:{/tr}</th>
-                        <td>{if $calitem.locationName neq ''}{$calitem.locationName|escape}{else}<em class="text-secondary">{tr}No location added to this event{/tr}</em>{/if}</td>
+                        <th class="px-0 py-1">{tr}Location:{/tr}</th>
+                        <td class="px-0 py-1">{if $calitem.locationName neq ''}{$calitem.locationName|escape}{else}<em class="text-secondary">{tr}No location added to this event{/tr}</em>{/if}</td>
                     </tr>
                 {/if}
                 {if $calendar.customurl eq 'y'}
                     <tr class="url">
-                        <th>{tr}Custom url:{/tr}</th>
-                        <td>
-                            {if $calitem.customurl neq ''}
-                                <a class="url" href="{$calitem.url}">
+                        <th class="px-0 py-1">{tr}Custom url:{/tr}</th>
+                        <td class="px-0 py-1">
+                            {if $calitem.url neq ''}
+                                <a class="url" href="{$calitem.url}" target="_blank" rel="noopener noreferrer">
                                     {$calitem.url|escape}
                                 </a>
                             {else}
@@ -265,14 +309,14 @@
                 {/if}
                 {if $calendar.customlanguages eq 'y'}
                     <tr class="language">
-                        <th>{tr}Language:{/tr}</th>
-                        <td>{if $calitem.lang neq ''}{$calitem.lang|langname}{else}<em class="text-secondary">{tr}No language added to this event{/tr}</em>{/if}</td>
+                        <th class="px-0 py-1">{tr}Language:{/tr}</th>
+                        <td class="px-0 py-1">{if $calitem.lang neq ''}{$calitem.lang|langname}{else}<em class="text-secondary">{tr}No language added to this event{/tr}</em>{/if}</td>
                     </tr>
                 {/if}
                 {if $calendar.customparticipants eq 'y'}
                     <tr class="organizers">
-                        <th>{tr}Organizers:{/tr}</th>
-                        <td>
+                        <th class="px-0 py-1">{tr}Organizers:{/tr}</th>
+                        <td class="px-0 py-1">
                             {if ! empty($calitem.organizers) && ($calitem.organizers|@count)}
                                 <ul>
                                 {foreach $calitem.organizers as $organizer}
@@ -286,17 +330,17 @@
                     </tr>
                     <tr class="participants">  
                         {$participating = false}
-                        <th>{tr}Participants:{/tr}</th>
-                        <td>
+                        <th class="px-0 py-1">{tr}Participants:{/tr}</th>
+                        <td class="px-0 py-1">
                             <p>
-                                {assign var="emailString" value=""}
+                                {$emailString=""}
                                 {if $calitem.participants|@count}
                                     <ul>
                                     {foreach $calitem.participants as $person}
                                         {if $emailString}
-                                            {assign var="emailString" value="{$emailString}, {$person.email}"}
+                                            {$emailString="{$emailString}, {$person.email}"}
                                         {else}
-                                            {assign var="emailString" value=$person.email}
+                                            {$emailString=$person.email}
                                         {/if}
                                         <li>
                                             {$person.username|userlink}
@@ -305,6 +349,8 @@
                                         {if $person.username eq $user}{$participating = true}{/if}
                                     {/foreach}
                                     </ul>
+                                {elseif $calitem.hiddenParticipants}
+                                    <em class="text-secondary">{tr}Participants list has been hidden at organizer's request{/tr}</em>
                                 {else}
                                     <em class="text-secondary">{tr}No participants{/tr}</em>
                                 {/if}
@@ -331,9 +377,30 @@
             </table>
         </div>
     </div>
+
+    {* File Attachments Section *}
+    {if $prefs.feature_file_galleries eq 'y' && !empty($calitem.attachments)}
+        <div class="card mt-3 mb-3">
+            <div class="card-header">
+                <h5 class="mb-0">{icon name='paperclip'} {tr}Attachments{/tr}</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    {foreach from=$calitem.attachments item=file}
+                        <li class="mb-2 d-flex align-items-center">
+                            {$file.fileId|sefurl:'file'|iconify:$file.filetype:$file.fileId:1}
+                            <a href="{$file.fileId|sefurl:'file'}" class="ms-2" data-box="box">{$file.filename|escape}</a>
+                            <span class="text-muted small ms-2">({$file.filesize|kbsize})</span>
+                        </li>
+                    {/foreach}
+                </ul>
+            </div>
+        </div>
+    {/if}
+
     {if not $preview}
         {permission name='change_events' type='calendaritem' object=$calitem.calitemId}
-            <a href="{service controller='calendar' action='edit_item' calitemId=$calitem.calitemId|escape}" class="btn btn-primary edit-calendar-item-btn">
+            <a href="{service controller='calendar' action='edit_item' calitemId=$calitem.calitemId|escape}" class="btn btn-primary edit-calendar-item-btn mt-1">
                 {tr}Edit{/tr}
             </a>
         {/permission}

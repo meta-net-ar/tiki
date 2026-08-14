@@ -1,10 +1,14 @@
-{if not empty($item.children)}
-    <li class="sm-nav-item nav-item{if $item.selected|default:null} active{/if} {$item.class|escape} {if $module_params.megamenu eq 'y' and $module_params.megamenu_static eq 'y' }static{/if}">
-        <a href="{$item.sefurl|escape}" class="sm-nav-link nav-link sm-sub-toggler">
+{if $item.type eq '-' or ($item.type eq 's' and empty($item.name))}
+    <li class="sm-nav-item nav-item" role="separator">
+        <hr class="dropdown-divider my-2">
+    </li>
+{elseif not empty($item.children)}
+    <li class="sm-nav-item nav-item{if $item.selected|default:null} active{/if} {$item.class|escape} {if $module_params.megamenu eq 'y' and $module_params.megamenu_static eq 'y'}static{/if}">
+            <a href="{if empty($preview_type) and !empty($item.sefurl)}{$item.sefurl|escape}{else}#sm_menu_{$item.optionId|escape}{/if}" class="sm-nav-link nav-link sm-sub-toggler" data-bs-toggle="collapse" aria-expanded="false">
             {if $menu_info.use_items_icons eq "y" && $item.icon}
                 <span class="me-2">{icon name=$item.icon}</span>
             {/if}
-            <span class="mwnu-item-label me-auto">{tr}{$item.name}{/tr}</span>
+            <span class="menu-item-label me-auto">{tr}{$item.name}{/tr}</span>&nbsp;<small>{icon name="caret-down"}</small>
         </a>
         {if $item.sectionLevel eq 0 and $module_params.megamenu eq 'y'}
             <ul class="sm-sub sm-sub--mega">
@@ -23,7 +27,7 @@
                 </li>
             </ul>
         {else}
-            <ul class="sm-sub dropdown-menu">
+            <ul id="sm_menu_{$item.optionId|escape}" class="sm-sub dropdown-menu collapse">
                 {foreach from=$item.children item=sub}
                     {include file='bootstrap_smartmenu_children.tpl' item=$sub sub=true}
                 {/foreach}
@@ -31,12 +35,12 @@
         {/if}
     </li>
 {else}
-    <li class="sm-nav-item nav-item{$item.class|escape}{if $item.selected|default:null} active{/if}">
+    <li class="sm-nav-item nav-item {$item.class|escape}{if $item.selected|default:null} active{/if}">
         <a class="sm-nav-link nav-link" href="{$item.sefurl|escape}">
             {if $menu_info.use_items_icons eq "y" && $item.icon}
                 <span class="me-2">{icon name=$item.icon}</span>
             {/if}
-            <span class="mwnu-item-label me-auto">{tr}{$item.name}{/tr}</span>
+            <span class="menu-item-label me-auto">{tr}{$item.name}{/tr}</span>
         </a>
     </li>
 {/if}

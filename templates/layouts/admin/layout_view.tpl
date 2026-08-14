@@ -11,33 +11,32 @@
 {if $prefs.feature_ajax eq 'y'}
     {include file='tiki-ajax_header.tpl'}
 {/if}
-        <a class="btn btn-info btn-lg skipnav" href="#col1">{tr}Skip to main content{/tr}</a>
+        <a class="btn btn-info btn-lg skipnav" href="#col1" role="button">{tr}Skip to main content{/tr}</a>
         <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std">
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
-            <div class="row">
-                <header class="page-header w-100 navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant}" id="page-header" role=banner>
-                {modulelist zone=top class="top_modules navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent  tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}'}
-               </header>
-            </div>
+        <header class="page-header w-100 navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant}" id="page-header" role=banner>
+            {modulelist zone=top class="top_modules navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent navbar-{$navbar_color_variant} tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}'}
+        </header>
     {/if}
             <div class="row row-middle" id="row-middle">
         {modulelist zone=topbar class="topbar_modules topbar navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-topbar-nav-{$navbar_color_variant} w-100 mb-sm" heading_text='{tr}Navigation and related functionality and content{/tr}'}
                 <div class="page-content-top-margin"  style="height: var(--tiki-page-content-top-margin)"></div>
                 <div class="col col1 col-md-12 pb-4" id="col1">
                     <div id="feedback" role="alert">
-                    {feedback}
+                        {feedback}
                     </div>
-                {block name=quicknav}{/block}
-                {block name=title}{/block}
-                {block name=navigation}{/block}
+                    {queued_tasks_banner}
+                    {block name=quicknav}{/block}
+                    {block name=title}{/block}
+                    {block name=navigation}{/block}
                     <main>
                         <div class="admin-wrapper highlightable">
                             <aside class="admin-nav">
-            {include file='admin/include_anchors.tpl'}
+                                {include file='admin/include_anchors.tpl'}
                             </aside>
                             <div class="admin-content w-100 mx-3-lg">
-            {include file="admin/admin_navbar.tpl"}
-            {block name=content}{/block}
+                                {include file="admin/admin_navbar.tpl"}
+                                {block name=content}{/block}
                             </div>
                         </div>
                     </main>

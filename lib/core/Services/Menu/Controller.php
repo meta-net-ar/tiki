@@ -4,6 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 class Services_Menu_Controller
 {
     /** @var  MenuLib */
@@ -229,7 +230,7 @@ class Services_Menu_Controller
         //get preference information
         $feature_prefs = [];
         foreach ($prefs as $k => $v) {  // attempt to filter out non-feature prefs (still finds 133!)
-            if (strpos($k, 'feature') !== false && preg_match_all('/_/m', $k, $m) === 1) {
+            if (str_contains($k, 'feature') && preg_match_all('/_/m', $k, $m) === 1) {
                 $feature_prefs[] = $k;
             }
         }
@@ -246,7 +247,9 @@ class Services_Menu_Controller
             }
 
             $name = $input->name->text();
-            if (! $name) {
+            $type = $input->type->text();
+
+            if (! $name && $type !== '-') {
                 throw new Services_Exception_MissingValue('name');
             }
 
@@ -257,14 +260,13 @@ class Services_Menu_Controller
                 $oldOptions = $this->menulib->list_menu_options($menuId);
                 //Get position from current menu
                 if ($oldOptions) {
-                    $position = (int)$oldOptions['cant'] + 1;
+                    $position = (int)$oldOptions['count'] + 1;
                 } else {
                     $position = 1;
                 }
             }
 
             $url = $input->url->text();
-            $type = $input->type->text();
             $section = $input->section->text();
             $perm = $input->perm->text();
             $groupname = $input->asArray('groupname');

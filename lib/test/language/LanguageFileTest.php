@@ -4,7 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once(__DIR__ . '/../../language/File.php');
 
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
@@ -60,7 +59,6 @@ class LanguageFileTest extends TikiTestCase
     {
         $reflectionClass = new ReflectionClass($this->obj);
         $property = $reflectionClass->getProperty('contentLoaded');
-        $property->setAccessible(true);
 
         $this->obj->parse();
         $this->assertTrue($property->getValue($this->obj));
@@ -119,10 +117,8 @@ class LanguageFileTest extends TikiTestCase
 
         $reflectionClass = new ReflectionClass($obj);
         $contentProperty = $reflectionClass->getProperty('content');
-        $contentProperty->setAccessible(true);
         $contentProperty->setValue($obj, $content);
         $contentLoadedProperty = $reflectionClass->getProperty('contentLoaded');
-        $contentLoadedProperty->setAccessible(true);
         $contentLoadedProperty->setValue($obj, true);
 
         $this->assertEquals($expectedResult, $obj->getStats());

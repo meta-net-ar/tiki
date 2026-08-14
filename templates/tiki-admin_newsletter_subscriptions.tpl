@@ -1,9 +1,9 @@
-{assign var=nlId_urlencoded value=$nlId|urlencode}
+{$nlId_urlencoded=$nlId|urlencode}
 {title url="tiki-admin_newsletter_subscriptions.php?nlId=$nlId_urlencoded"}{tr}Admin newsletter subscriptions{/tr}{/title}
 
 <div class="t_navbar btn-group mb-4">
     {button href="tiki-newsletters.php" class="btn btn-info" _icon_name="list" _text="{tr}List{/tr}"}
-    {assign var="nlid_encod" value=$nlId|urlencode}
+    {$nlid_encod=$nlId|urlencode}
     {button href="tiki-admin_newsletters.php?nlId=$nlid_encod" class="btn btn-primary" _icon_name="edit" _text="{tr}Edit{/tr}"}
     {button href="tiki-admin_newsletters.php" class="btn btn-primary" _icon_name="cog" _text="{tr}Admin{/tr}"}
     {button href="tiki-send_newsletters.php?nlId=$nlid_encod" class="btn btn-primary" _icon_name="envelope" _text="{tr}Send{/tr}"}
@@ -230,7 +230,7 @@
 
         </form>
 
-        {pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$count_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
     {/tab}
 
     {tab name="{tr}Add subscribers{/tr}"}
@@ -240,18 +240,18 @@
             {ticket}
             <input type="hidden" name="nlId" value="{$nlId|escape}">
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Email{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="add_sub_email">{tr}Email{/tr}</label>
                 <div class="col-sm-9">
-                    <textarea cols="70" rows="6" wrap="soft" name="email" class="form-control"></textarea>
+                    <textarea cols="70" rows="6" wrap="soft" name="email" class="form-control" id="add_sub_email"></textarea>
                     <div class="small-hint">
                         {tr}You can add several email addresses by separating them with commas.{/tr}
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}User{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="add_sub_user">{tr}User{/tr}</label>
                 <div class="col-sm-9">
-                    <select name="subuser" class="form-control">
+                    <select name="subuser" id="add_sub_user" class="form-control">
                         <option value="" selected>---</option>
                         {foreach key=id item=one from=$users}
                             <option value="{$one|escape}">{$one|escape}</option>
@@ -260,31 +260,31 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 form-check-label">{tr}Add email{/tr}</label>
+                <label class="col-sm-3 form-check-label" for="add_email">{tr}Add email{/tr}</label>
                 <div class="col-sm-3">
                     <div class="form-check">
-                        <input type="radio" name="addemail" value="y" class="form-check-input">
+                        <input type="radio" class="form-check-input" name="addemail" id="add_email" value="y" class="form-check-input">
                     </div>
                 </div>
-                <label class="col-sm-3 form-check-label">{tr}Add user{/tr}</label>
+                <label class="col-sm-3 form-check-label" for="add_user">{tr}Add user{/tr}</label>
                 <div class="col-sm-3">
                     <div class="form-check">
-                        <input type="radio" name="addemail" value="n" checked="checked" class="form-check-input">
+                        <input type="radio" name="addemail" id="add_user" value="n" checked="checked" class="form-check-input">
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 form-check-label">{tr}All users{/tr}</label>
+                <label class="col-sm-3 form-check-label" for="add_all">{tr}All users{/tr}</label>
                 <div class="col-sm-9">
                     <div class="form-check">
-                        <input type="checkbox" name="addall" class="form-check-input">
+                        <input type="checkbox" name="addall" id="add_all" class="form-check-input">
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Users from group{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="add_group">{tr}Users from group{/tr}</label>
                 <div class="col-sm-9">
-                    <select name="group" class="form-control">
+                    <select name="group" id="add_group" class="form-control">
                         <option value="" selected>---</option>
                         {section name=x loop=$groups}
                             <option value="{$groups[x]|escape}">{$groups[x]|escape}</option>
@@ -297,10 +297,10 @@
             </div>
             {if $nl_info.validateAddr eq "y"}
             <div class="mb-3 row">
-                <label class="col-sm-3 form-check-label">{tr}Don't send confirmation email{/tr}</label>
+                <label class="col-sm-3 form-check-label" for="add_confirm_email">{tr}Don't send confirmation email{/tr}</label>
                 <div class="col-sm-9">
                     <div class="form-check">
-                        <input type="checkbox" name="confirmEmail" checked="checked" class="form-check-input">
+                        <input type="checkbox" name="confirmEmail" id="add_confirm_email" checked="checked" class="form-check-input">
                         <div class="small-hint">
                             {tr}The user email will be refreshed at each newsletter sending{/tr}
                         </div>
@@ -322,9 +322,9 @@
                 {ticket}
                 <input type="hidden" name="nlId" value="{$nlId|escape}">
                 <div class="mb-3 row">
-                    <label class="col-sm-3 col-form-label">{tr}File:{/tr}</label>
+                    <label class="col-sm-3 col-form-label" for="batch_file_input">{tr}File:{/tr}</label>
                     <div class="col-sm-9">
-                        <input type="file" accept=".txt" name="batch_subscription" class="form-control">
+                        <input type="file" accept=".txt" name="batch_subscription" id="batch_file_input" class="form-control">
                         <div class="small-hint">
                             {tr}.txt file, one email per line{/tr}
                         </div>
@@ -352,9 +352,9 @@
                 {ticket}
                 <input type="hidden" name="nlId" value="{$nlId|escape}">
                 <div class="mb-3 row">
-                    <label class="col-sm-3 col-form-label">Wiki page</label>
+                    <label class="col-sm-3 col-form-label" for="import_wiki_page_name">Wiki page</label>
                     <div class="col-sm-9">
-                        <input type="text" name="wikiPageName" value="" size="60" class="form-control">
+                        <input type="text" name="wikiPageName" id="import_wiki_page_name" value="" size="60" class="form-control">
                         <div class="small-hint">
                             {tr}Wiki page, one email per line{/tr}
                         </div>
@@ -362,10 +362,10 @@
                 </div>
                 {if $nl_info.validateAddr eq "y"}
                 <div class="mb-3 row">
-                    <label class="col-sm-3 form-check-label">{tr}Don't send confirmation emails{/tr}</label>
+                    <label class="col-sm-3 form-check-label" for="import_wiki_confirm_email">{tr}Don't send confirmation emails{/tr}</label>
                     <div class="col-sm-9">
                         <div class="form-check">
-                            <input type="checkbox" name="confirmEmail" checked="checked" class="form-check-input">
+                            <input type="checkbox" name="confirmEmail" id="import_wiki_confirm_email" checked="checked" class="form-check-input">
                         </div>
                     </div>
                 </div>
@@ -382,9 +382,9 @@
                 {ticket}
                 <input type="hidden" name="nlId" value="{$nlId|escape}">
                 <div class="mb-3 row">
-                    <label class="col-sm-3 col-form-label">{tr}Tracker:{/tr}</label>
+                    <label class="col-sm-3 col-form-label" for="email_from_tracker">{tr}Tracker:{/tr}</label>
                     <div class="col-sm-9">
-                        <select name="tracker" class="form-control">
+                        <select name="tracker" id="email_from_tracker" class="form-control">
                             <option value="" selected>---</option>
                             {section name=tracker loop=$listTrackers}
                                 <option value="{$listTrackers[tracker].trackerId|escape}">{$listTrackers[tracker].name|escape}</option>
@@ -393,10 +393,10 @@
                     </div>
                 </div>
                 <div class="mb-3 row">
-                    <label class="col-sm-3 form-check-label">{tr}Don't send confirmation emails{/tr}</label>
+                    <label class="col-sm-3 form-check-label" for="import_tracker_confirm_email">{tr}Don't send confirmation emails{/tr}</label>
                     <div class="col-sm-9">
                         <div class="form-check">
-                            <input type="checkbox" name="confirmEmail" checked="checked" class="form-check-input">
+                            <input type="checkbox" name="confirmEmail" id="import_tracker_confirm_email" checked="checked" class="form-check-input">
                         </div>
                     </div>
                 </div>
@@ -414,9 +414,9 @@
             {ticket}
             <input type="hidden" name="nlId" value="{$nlId|escape}">
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Group{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="subscribe_group">{tr}Group{/tr}</label>
                 <div class="col-sm-9">
-                    <select name="group" class="form-control">
+                    <select name="group" class="form-control" id="subscribe_group">
                         <option value="" selected>---</option>
                         {section name=x loop=$groups}
                             <option value="{$groups[x]|escape}">{$groups[x]|escape}</option>
@@ -425,10 +425,10 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 form-check-label">{tr}Including group inheritance{/tr}</label>
+                <label class="col-sm-3 form-check-label" for="include_groups">{tr}Including group inheritance{/tr}</label>
                 <div class="col-sm-9">
                     <div class="form-check">
-                        <input type="checkbox" name="include_groups" value="y" class="form-check-input">
+                        <input type="checkbox" name="include_groups" id="include_groups" value="y" class="form-check-input">
                         <div class="small-hint">
                             {tr}Including group, group users and emails will be refreshed at each newsletter sending{/tr}
                         </div>
@@ -448,9 +448,9 @@
             {ticket}
             <input type="hidden" name="nlId" value="{$nlId|escape}">
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Newsletter:{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="included">{tr}Newsletter:{/tr}</label>
                 <div class="col-sm-9">
-                    <select name="included" class="form-control">
+                    <select name="included" id="included" class="form-control">
                         <option value="" selected>---</option>
                         {section name=x loop=$newsletters}
                             {if $nlId ne $newsletters[x].nlId}
@@ -473,9 +473,9 @@
             {ticket}
             <input type="hidden" name="nlId" value="{$nlId|escape}">
             <div class="mb-3 row">
-                <label class="col-sm-3 col-form-label">{tr}Wiki page{/tr}</label>
+                <label class="col-sm-3 col-form-label" for="use_wiki_page_name">{tr}Wiki page{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" name="wikiPageName" value="" size="60" class="form-control">
+                    <input type="text" name="wikiPageName" id="use_wiki_page_name" value="" size="60" class="form-control">
                     <div class="small-hint">
                         {tr}Emails on a wiki page which will be added at each newsletter sending, one email per line{/tr}
                     </div>
@@ -483,18 +483,18 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 form-check-label">{tr}Don't send confirmation emails{/tr}</label>
+                <label class="col-sm-3 form-check-label" for="no_confirm_email">{tr}Don't send confirmation emails{/tr}</label>
                 <div class="col-sm-9">
                     <div class="form-check">
-                        <input type="checkbox" name="noConfirmEmail" checked="checked" class="form-check-input">
+                        <input type="checkbox" name="noConfirmEmail" id="no_confirm_email" checked="checked" class="form-check-input">
                     </div>
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-3 form-check-label">{tr}Don't subscribe emails{/tr}</label>
+                <label class="col-sm-3 form-check-label" for="no_subscribe_email">{tr}Don't subscribe emails{/tr}</label>
                 <div class="col-sm-9">
                     <div class="form-check">
-                        <input type="checkbox" name="noSubscribeEmail" checked="checked" class="form-check-input">
+                        <input type="checkbox" name="noSubscribeEmail" id="no_subscribe_email" checked="checked" class="form-check-input">
                     </div>
                 </div>
             </div>

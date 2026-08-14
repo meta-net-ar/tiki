@@ -21,6 +21,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Command\HelpCommand;
 use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Tiki\Cache\CacheLib;
 use Tiki\Package\ComposerCli;
 
 /**
@@ -42,13 +43,7 @@ class VCSUpdateCommand extends Command
     protected function configure()
     {
         $this
-            ->setHelp('Updates Tiki repository to latest version and performs necessary tasks in Tiki for a smooth update. Suitable for both development and production.')
-            ->addOption(
-                'no-secdb',
-                's',
-                InputOption::VALUE_NONE,
-                'Skip updating the secdb database.'
-            )
+            ->setHelp(tra('Updates Tiki repository to latest version and performs necessary tasks in Tiki for a smooth update. Suitable for both development and production.'))
             ->addOption(
                 'no-reindex',
                 'r',
@@ -59,50 +54,50 @@ class VCSUpdateCommand extends Command
                 'no-db',
                 'd',
                 InputOption::VALUE_NONE,
-                'Make no changes to the database. (Dependencies and privilege checks only. Logging disabled.)'
+                tra('Make no changes to the database. (Dependencies and privilege checks only. Logging disabled.)')
             )
             ->addOption(
                 'no-generate',
                 'G',
                 InputOption::VALUE_NONE,
-                "Don't re-generate the caches. Can take a long time on a large site."
+                tra("Don't re-generate the caches. Can take a long time on a large site.")
             )
             ->addOption(
                 'conflict',
                 'c',
                 InputOption::VALUE_REQUIRED,
-                'What would you like to do if a vcs conflict is found? SVN Options:abort, postpone, mine-conflict, theirs-conflict; Git Options: abort, ours, theirs',
+                tra('What would you like to do if a vcs conflict is found? Options: abort, ours, theirs'),
                 'abort'
             )
             ->addOption(
                 'email',
                 'e',
                 InputOption::VALUE_REQUIRED,
-                'Email address to send a message to if errors are encountered.'
+                tra('Email address to send a message to if errors are encountered.')
             )
             ->addOption(
                 'lag',
                 'l',
                 InputOption::VALUE_REQUIRED,
-                'Time delay commits by X number of days. Useful for avoiding newly introduced bugs in automated updates.'
+                tra('Time delay commits by X number of days. Useful for avoiding newly introduced bugs in automated updates.')
             )
             ->addOption(
                 'user',
                 'u',
                 InputOption::VALUE_REQUIRED,
-                'User account to run setup.sh with (for file permissions setting).'
+                tra('User account to run setup.sh with (for file permissions setting).')
             )
             ->addOption(
                 'group',
                 'g',
                 InputOption::VALUE_REQUIRED,
-                'User group to run setup.sh with (for file permissions setting).'
+                tra('User group to run setup.sh with (for file permissions setting).')
             )
             ->addOption(
                 'no-https',
                 null,
                 InputOption::VALUE_NONE,
-                'Run composer without https.'
+                tra('Run composer without https.')
             );
     }
 
@@ -169,27 +164,13 @@ class VCSUpdateCommand extends Command
     }
 
     /**
-     * Get SVN revision
+     * Identify the upstream branch of your current local branch/tags in a human-readable format
      *
-     * @param OutputInterface $output
-     * @return String
+     * @return string
      */
-    protected function getSvnRevision(OutputInterface $output)
-    {
-        $raw = $this->execCommand('svn info 2>&1');
-        preg_match('/Revision: (\d+)/', $raw, $revision);
-        if ($revision) {
-            $revision = $revision[1];
-        } else {
-            $revision = ' unknown';
-        }
-
-        return $revision;
-    }
-
     protected function getGitFollowUpBranch()
     {
-        $raw = $this->execCommand('git rev-parse --abbrev-ref @{upstream}');
+        $raw = $this->execCommand('git rev-parse --abbrev-ref @{upstream} 2>/dev/null || git describe --tags --exact-match');
 
         $upstreamBranch = trim($raw);
 
@@ -199,11 +180,12 @@ class VCSUpdateCommand extends Command
     /**
      * Get GIT revision
      *
-     * @param string $branch
-     * @param int $before A timestamp value
-     * @return String
+     * @param string|null $branch branch name to point to
+     * @param int         $before A timestamp value
+     *
+     * @return string|null
      */
-    protected function getGitRevision(string|null $branch = null, int $before = 0)
+    protected function getGitRevision(string|null $branch = null, int $before = 0): ?string
     {
         $command = 'git log -n 1 --pretty=format:"%H"';
 
@@ -221,16 +203,6 @@ class VCSUpdateCommand extends Command
         $hash = $this->execCommand($command);
 
         return ! empty($hash) ? trim($hash) : null;
-    }
-
-    /**
-     * @param $rev
-     * @param $svnConflict
-     * @return string
-     */
-    protected function svnUpdate($rev, $svnConflict)
-    {
-        return $this->execCommand("svn update --revision $rev --accept $svnConflict 2>&1");
     }
 
     /**
@@ -299,8 +271,6 @@ class VCSUpdateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $logger = $this->logger;
-        $errors = false;
-        $isSvn = false;
         $isGit = false;
         $rev = 'HEAD';
         $email = $input->getOption('email');
@@ -312,28 +282,17 @@ class VCSUpdateCommand extends Command
         if (is_dir('.git')) {
             $isGit = true;
         }
-        if (is_dir('.svn')) {
-            $isSvn = true;
-        }
 
-        if (! $isSvn && ! $isGit) {
-            $logger->critical('Only SVN and GIT are supported at the moment.');
+        if (! $isGit) {
+            $logger->critical(tra('Only GIT is supported at the moment.'));
             return Command::FAILURE;
         }
 
-        if ($isSvn && ! in_array($conflict, ['abort', 'postpone', 'mine-conflict', 'theirs-conflict'])) {
+        if (! in_array($conflict, ['abort', 'ours', 'theirs'])) {
             $help = new HelpCommand();
             $help->setCommand($this);
             $help->run($input, $output);
-            $logger->notice('Invalid option for --conflict, see usage above.');
-            return Command::INVALID;
-        }
-
-        if ($isGit && ! in_array($conflict, ['abort', 'ours', 'theirs'])) {
-            $help = new HelpCommand();
-            $help->setCommand($this);
-            $help->run($input, $output);
-            $logger->notice('Invalid option for --strategy-option, see usage above.');
+            $logger->notice(tra('Invalid option for --strategy-option, see usage above.'));
             return Command::INVALID;
         }
 
@@ -343,22 +302,19 @@ class VCSUpdateCommand extends Command
                 $help = new HelpCommand();
                 $help->setCommand($this);
                 $help->run($input, $output);
-                $logger->notice('Invalid option for --lag, must be a positive integer.');
+                $logger->notice(tra('Invalid option for --lag, must be a positive integer.'));
                 return Command::INVALID;
             }
 
             // current time minus number of days specified through lag
             $timestamp = time() - $lag * 60 * 60 * 24;
-            $rev = date('{"Y-m-d H:i"}', $timestamp);
 
-            if ($isGit) {
-                $upstreamBranch = $this->getGitFollowUpBranch();
-                $rev = $this->getGitRevision($upstreamBranch, $timestamp);
+            $upstreamBranch = $this->getGitFollowUpBranch();
+            $rev = $this->getGitRevision($upstreamBranch, $timestamp);
 
-                if (! $rev) {
-                    $logger->error('Failed to determine the commit hash to checkout before ' . date('Y-m-d H:i', $timestamp));
-                    return Command::FAILURE;
-                }
+            if (! $rev) {
+                $logger->error(tra('Failed to determine the commit hash to checkout before ') . date('Y-m-d H:i', $timestamp));
+                return Command::FAILURE;
             }
         }
 
@@ -373,14 +329,14 @@ class VCSUpdateCommand extends Command
         }
 
         $action = 'VCS update';
-        $prefix = $isSvn ? 'r' : '';
+        $prefix = '';
 
         // die gracefully if shell_exec is not enabled;
         if (! is_callable('shell_exec')) {
             if (! $noDb) {
-                $logslib->add_action($action, 'Automatic update failed. Could not execute shell_exec()', 'system');
+                $logslib->add_action($action, tra('Automatic update failed. Could not execute shell_exec()'), 'system');
             }
-            $logger->critical('Automatic update failed. Could not execute shell_exec()');
+            $logger->critical(tra('Automatic update failed. Could not execute shell_exec()'));
             return Command::FAILURE;
         }
 
@@ -390,9 +346,6 @@ class VCSUpdateCommand extends Command
         if ($noDb) {
             $max -= 5;
         } else {
-            if ($input->getOption('no-secdb')) {
-                $max--;
-            }
             if ($input->getOption('no-reindex')) {
                 $max--;
             }
@@ -416,109 +369,26 @@ class VCSUpdateCommand extends Command
         $progress->setMessage('Pre-update checks');
         $progress->start();
 
-        if ($isGit) {
-            $startRev = $this->getGitRevision();
-        } else {
-            $startRev = $this->getSvnRevision($output);
-        }
+        $startRev = $this->getGitRevision();
 
         if ($noHttps) {
             $this->revertComposerHttp();
         }
 
-        // Set this before, so if 'abort' is used, it can be changed to a valid option later
-        // start svn conflict checks
-        if ($isSvn && $conflict === 'abort') {
-            $raw = $this->execCommand("svn merge --dry-run -r BASE:$rev . 2>&1");
-
-            if (strpos($raw, 'E155035:')) {
-                $output->writeln('');
-                $progress->setMessage('Working copy currently conflicted.');
-                $output->writeln('');
-                $progress->setMessage('Update Aborted.');
-                if ($email) {
-                    mail($email, 'Svn Up Aborted', wordwrap('Working copy currently conflicted. Update Aborted. ' . __FILE__, 70, "\r\n"));
-                }
-                if (! $noDb) {
-                    $logslib->add_action($action, "Working copy currently conflicted. Update Aborted. r$startRev", 'system');
-                }
-                if ($noHttps) {
-                    // Revert composer https changes
-                    $this->executeComposerHttp();
-                }
-
-                $progress->advance();
-                die("\n");
-            }
-
-            //  Check if working from from mixed revision, this happens when a commit is made and causes merges to fail.
-            if (strpos($raw, 'E195020:')) {
-                $output->writeln('');
-                $progress->setMessage('Updating mixed revision working copy to single reversion');
-                preg_match('/\[\d*:(\d*)]/', $raw, $mixedRev);
-                $mixedRev = $mixedRev[1];
-
-                // Now that we know the upper revision number, svn up to it.
-                $errors = ['', 'Text conflicts'];
-                $raw = $this->execCommand('svn update --accept postpone --revision ' . $mixedRev . ' 2>&1');
-                $this->OutputErrors($logger, $raw, 'Problem with svn up, check for conflicts.', $errors, ! $noDb);
-                if ($logger->hasErrored()) {
-                    $output->writeln('');
-                    $progress->setMessage('Preexisting local conflicts exist.');
-                    $output->writeln('');
-                    $progress->setMessage('Update Aborted.');
-                    if ($email) {
-                        echo mail($email, 'Svn Up Aborted', wordwrap('Preexisting local conflicts exist. Update Aborted. ' . __FILE__, 70, "\r\n"));
-                    }
-                    if (! $noDb) {
-                        $logslib->add_action($action, "Preexisting local conflicts exist. Update Aborted. r$startRev", 'system');
-                    }
-                    if ($noHttps) {
-                        // Revert composer https changes
-                        $this->executeComposerHttp();
-                    }
-                    $progress->advance();
-                    die("\n"); // If custom mixed revision merges were made with local changes, this could happen.... (very unlikely)
-                }
-                // now re-check for conflicts
-                $raw = $this->execCommand("svn merge --dry-run -r BASE:$rev .  2>&1");
-            }
-            if (strpos($raw, "\nC    ") !== false) {
-                $output->writeln('');
-                $progress->setMessage('Conflicts exist between working copy and repository.');
-                $output->writeln('');
-                $progress->setMessage('Update Aborted.');
-                if ($email) {
-                    echo mail($email, 'Svn Up Aborted', wordwrap('Conflicts exist between working copy and repository. Update Aborted. ' . __FILE__, 70, "\r\n"));
-                }
-                if (! $noDb) {
-                    $logslib->add_action($action, "Conflicts exist between working copy and repository. Update Aborted. r$startRev", 'system');
-                }
-                if ($noHttps) {
-                    // Revert composer https changes
-                    $this->executeComposerHttp();
-                }
-                $progress->advance();
-                die("\n");
-            }
-            // we need a valid option, even though it wil never be used.
-            $conflict = 'postpone';
-        }
-
-        if ($isGit && $conflict === 'abort') {
-            // Git does not support dry-run
+        if ($conflict === 'abort') {
+            // GIT does not support dry-run
             $raw = $this->gitUpdate($rev, $conflict, false);
 
             if (preg_match('/(Automatic merge failed|Aborting$|error:|fatal:)/', $raw)) {
                 $output->writeln('');
-                $progress->setMessage('Working copy currently conflicted.');
+                $progress->setMessage(tra('Working copy currently conflicted.'));
                 $output->writeln('');
-                $progress->setMessage('Update Aborted.');
+                $progress->setMessage(tra('Update Aborted.'));
                 if ($email) {
-                    mail($email, 'Git update aborted', wordwrap('Working copy currently conflicted. Update Aborted. ' . __FILE__, 70, "\r\n"));
+                    mail($email, tra('GIT update aborted'), wordwrap(tra('Working copy currently conflicted. Update Aborted. ') . __FILE__, 70, "\r\n"));
                 }
                 if (! $noDb) {
-                    $logslib->add_action($action, "Working copy currently conflicted. Update Aborted. $startRev", 'system');
+                    $logslib->add_action($action, tra("Working copy currently conflicted. Update Aborted. $startRev"), 'system');
                 }
                 if ($noHttps) {
                     // Revert composer https changes
@@ -534,40 +404,32 @@ class VCSUpdateCommand extends Command
             }
         }
 
-        $update = $isGit ? 'GIT' : 'SVN';
+        $update = 'GIT';
         $output->writeln('');
         $progress->setMessage('Updating ' . $update);
         $progress->advance();
 
-        if ($isGit) {
-            $errors = ['','Automatic merge failed'];
-            $commitHash = $rev ?: '';
-            $gitUpdate = $this->gitUpdate($rev, $conflict);
-            $this->OutputErrors($logger, $gitUpdate, 'Problem with git merge, check for conflicts.', $errors, ! $noDb);
-            if ($logger->hasErrored()) {
-                return Command::INVALID;
-            }
-            $endRev = $this->getGitRevision();
-            $this->execCommand('git gc 2>&1');
-        } else {
-            $errors = ['','Text conflicts'];
-            $svnUpdate = $this->svnUpdate($rev, $conflict);
-            $this->OutputErrors($logger, $svnUpdate, 'Problem with svn up, check for conflicts.', $errors, ! $noDb);
-            $endRev = $this->getSvnRevision($output);
-            $raw = $this->execCommand('svn cleanup  2>&1');
+        $errors = ['', tra('Automatic merge failed')];
+        $commitHash = $rev ?: '';
+        $gitUpdate = $this->gitUpdate($rev, $conflict);
+        $this->OutputErrors($logger, $gitUpdate, tra('Problem with GIT merge, check for conflicts.'), $errors, ! $noDb);
+        if ($logger->hasErrored()) {
+            return Command::INVALID;
         }
+        $endRev = $this->getGitRevision();
+        $this->execCommand('git gc 2>&1');
 
         if (! $noDb) {
-            $cacheLib = new \Cachelib();
+            $cacheLib = new CacheLib();
             $output->writeln('');
-            $progress->setMessage('Clearing all caches');
+            $progress->setMessage(tra('Clearing all caches'));
             $progress->advance();
             $cacheLib->empty_cache();
         }
         $output->writeln('');
-        $progress->setMessage('Updating dependencies & setting file permissions');
+        $progress->setMessage(tra('Updating dependencies & setting file permissions'));
         $progress->advance();
-        $errors = ['', 'Please provide an existing command', 'you are behind a proxy', 'Composer failed', 'Wrong PHP version'];
+        $errors = ['', tra('Please provide an existing command'), tra('you are behind a proxy'), tra('Composer failed'), tra('Wrong PHP version')];
 
         $setupParams = '';
         if ($input->getOption('user')) {
@@ -591,19 +453,6 @@ class VCSUpdateCommand extends Command
         $this->OutputErrors($logger, $raw, 'Problem running setup.sh', $errors, ! $input->getOption('no-db'));
 
         if (! $noDb) {
-            // generate a secdb database so when database:update is run, it also gets updated.
-            if (! $input->getOption('no-secdb')) {
-                $output->writeln('');
-                $progress->setMessage('Updating secdb');
-                $progress->advance();
-
-                $errors = ['is not writable', ''];
-                $command = 'php doc/devtools/release.php --only-secdb --no-check-vcs';
-                $command .= $isGit ? ' --use-git' : '';
-                $raw = $this->execCommand($command);
-                $this->OutputErrors($logger, $raw, 'Problem updating secdb', $errors);
-            }
-
             // note: running database update also clears the cache
             $output->writeln('');
             $progress->setMessage('Updating database');
@@ -673,8 +522,9 @@ class VCSUpdateCommand extends Command
     }
 
     /**
-     * @param string command
-     * @return string|null
+     * @param string $command
+     *
+     * @return string
      */
     protected function execCommand(string $command): string
     {

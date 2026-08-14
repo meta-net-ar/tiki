@@ -116,16 +116,16 @@ function wikiplugin_map_info()
                 'name' => tra('Tileset layers'),
                 'description' => tra('Tilesets to use for background layers, comma separated. Tileset groups can be added separated by a tilde character (requires Open Layers v3+, default is the geo_tilesets preference)'),
                 'since' => '20.1',
-                'default' => "86, 134, 200",
+                'default' => '',
                 'filter' => 'text',
                 'advanced' => true,
             ],
             'cluster' => [
                 'required' => false,
                 'name' => tra('Cluster Distance'),
-                'description' => tra('Distance between features before they are "clustered", 0 (off) to 100. (requires Open Layers v3+, default is 0)'),
+                'description' => tra('Distance in pixels between features before they are "clustered", 0 (off) to 100. (default is 25)'),
                 'since' => '20.0',
-                'default' => 0,
+                'default' => '0',
                 'filter' => 'digits',
                 'advanced' => true,
             ],
@@ -161,65 +161,82 @@ function wikiplugin_map_info()
                 'filter' => 'text',
                 'advanced' => true,
             ],
+            'clusterExcludeField' => [
+                'required' => false,
+                'name' => tra('Name of field to exclude from clustering'),
+                'description' => tra('Some features like borders and rivers should not be clustered. Add the permanent name of a checkbox field to exclude some items.'),
+                'since' => '30.1',
+                'default' => "",
+                'filter' => 'text',
+                'advanced' => true,
+            ],
+            'clusterIncludeField' => [
+                'required' => false,
+                'name' => tra('Name of field to include in clustering'),
+                'description' => tra('If not set then include by default, otherwise do not include unless the value is "y". Add the permanent name of a checkbox field to include some items.'),
+                'since' => '30.1',
+                'default' => "",
+                'filter' => 'text',
+                'advanced' => true,
+            ],
         ],
     ];
 }
 
 function wikiplugin_map($data, $params)
 {
-    $smarty = TikiLib::lib('smarty');
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_map_info());
 
     $width = '100%';
-    if (isset($params['width'])) {
+    if (! is_null($params['width'])) {
         $width = (int)$params['width'] . 'px';
     }
 
     $height = '100%';
-    if (isset($params['height'])) {
+    if (! is_null($params['height'])) {
         $height = (int)$params['height'] . 'px';
     }
 
-    if (! isset($params['controls'])) {
-        $params['controls'] = wp_map_default_controls();
-    }
-
-    if (! is_array($params['controls'])) {
-        $params['controls'] = explode(',', $params['controls']);
-    }
-
-    if (! isset($params['popupstyle'])) {
-        $params['popupstyle'] = 'bubble';
-    }
 
     $popupStyle = smarty_modifier_escape($params['popupstyle']);
 
-    if (! empty($params['tooltips']) && $params['tooltips'] === 'y') {
+    if ($params['tooltips'] === 'y') {
         $tooltips = ' data-tooltips="1"';
     } else {
         $tooltips = '';
     }
 
     if (isset($params['cluster'])) {
-        $cluster = (int) $params['cluster'];
+        $cluster = ' data-cluster="' . $params['cluster'] . '"';
     } else {
-        $cluster = 0;
+        $cluster = '';
     }
-    if (isset($params['clusterHover'])) {
+    if ($params['clusterHover']) {
         $clusterHover = ' data-clusterhover="' . $params['clusterHover'] . '"';
     } else {
-        $clusterHover = ' data-clusterhover="features"';
+        $clusterHover = '';
     }
-    if (isset($params['clusterFillColor'])) {
+    if ($params['clusterFillColor']) {
         $clusterFillColor = ' data-clusterfillcolor="' . $params['clusterFillColor'] . '"';
     } else {
         $clusterFillColor = '';
     }
-    if (isset($params['clusterTextColor'])) {
+    if ($params['clusterTextColor']) {
         $clusterTextColor = ' data-clustertextcolor="' . $params['clusterTextColor'] . '"';
     } else {
         $clusterTextColor = '';
     }
-    if (isset($params['tilesets'])) {
+    if ($params['clusterExcludeField']) {
+        $clusterExcludeField = ' data-clusterexcludefield="' . $params['clusterExcludeField'] . '"';
+    } else {
+        $clusterExcludeField = '';
+    }
+    if ($params['clusterIncludeField']) {
+        $clusterIncludeField = ' data-clusterincludefield="' . $params['clusterIncludeField'] . '"';
+    } else {
+        $clusterIncludeField = '';
+    }
+    if ($params['tilesets']) {
         $tilesets = ' data-tilesets="' . $params['tilesets'] . '"';
     } else {
         $tilesets = '';
@@ -238,17 +255,12 @@ function wikiplugin_map($data, $params)
         $center = $geolib->get_default_center();
     }
 
-    TikiLib::lib('header')
-        ->add_cssfile(OL_PATH . '/ol.css')
-        ->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js")
-        ->add_jsfile(OL_PATH . '/dist/ol.js')
-        ->add_cssfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.css')
-        ->add_jsfile(OL_LAYERSWITCHER_DIST_PATH . '/ol-layerswitcher.js')
-    ;
+    TikiLib::lib('header')->add_map();
+
     $scope = smarty_modifier_escape(wp_map_getscope($params));
 
     $output = "<div class=\"map-container\" data-marker-filter=\"$scope\" data-map-controls=\"$controls\" data-popup-style=\"$popupStyle\"" .
-        " data-cluster=\"$cluster\" style=\"width: $width; height: $height;\" $center $tooltips $clusterFillColor $clusterTextColor $tilesets $clusterHover>";
+        " style=\"width: $width; height: $height;\" $center $tooltips $cluster $clusterFillColor $clusterTextColor $tilesets $clusterHover $clusterExcludeField $clusterIncludeField>";
 
     $argumentParser = new WikiParser_PluginArgumentParser();
     $matches = WikiParser_PluginMatcher::match($data);
@@ -270,7 +282,7 @@ function wikiplugin_map($data, $params)
 function wp_map_getscope($params)
 {
     $scope = 'center';
-    if (isset($params['scope'])) {
+    if ($params['scope']) {
         $scope = $params['scope'];
     }
 
@@ -315,6 +327,7 @@ function wp_map_plugin_searchlayer($body, $args)
     $load_delay = $args->load_delay->int();
     $popup_width = $args->popup_width->text();  // plain numeric xx for pixels or xx% for percentage (only on dialog popups)
     $popup_height = $args->popup_height->text();
+    $popup_tpl = $args->popup_tpl->text();
 
     $args->replaceFilter('fields', 'word');
     $fields = $args->asArray('fields', ',');
@@ -326,7 +339,7 @@ function wp_map_plugin_searchlayer($body, $args)
     unset($args['fields']);
     unset($args['sort_mode']);
     unset($args['load_delay']);
-    unset($args['popup_width'], $args['popup_height']);
+    unset($args['popup_width'], $args['popup_height'], $args['popup_tpl']);
 
     $args->setDefaultFilter('text');
 
@@ -345,6 +358,9 @@ function wp_map_plugin_searchlayer($body, $args)
 
     $fieldList = '';
     if (! empty($fields)) {
+        $fields = array_map(function ($field) {
+            return str_replace('tracker_field_', '', $field);
+        }, $fields);
         $fieldList = '<input type="hidden" name="fields" value="' . smarty_modifier_escape(implode(',', $fields)) . '"/>';
     }
 
@@ -360,11 +376,12 @@ function wp_map_plugin_searchlayer($body, $args)
     } else {
         $popup_config = '';
     }
+    $popup_fields = implode(',', $fields);
 
     $escapedLayer = smarty_modifier_escape($layer);
     $escapedSuffix = smarty_modifier_escape($suffix);
     return <<<OUT
-<form method="post" action="tiki-searchindex.php" class="search-box onload" style="display: none" data-result-refresh="$refresh" data-result-layer="$escapedLayer" data-result-suffix="$escapedSuffix" data-load-delay="$load_delay"{$popup_config}>
+<form method="post" action="tiki-searchindex.php" class="search-box onload" style="display: none" data-result-refresh="$refresh" data-result-layer="$escapedLayer" data-result-suffix="$escapedSuffix" data-load-delay="$load_delay" data-popup-fields="$popup_fields" data-popup-tpl="$popup_tpl"{$popup_config}>
     <p>$maxRecords$sort_mode$fieldList$filters<input type="submit" class="btn btn-primary btn-sm" /></p>
 
 </form>
@@ -373,14 +390,28 @@ OUT;
 
 function wp_map_plugin_colorpicker($body, $args)
 {
-    $headerlib = TikiLib::lib('header');
-    static $counter = 0;
-
     $args->replaceFilter('colors', 'word');
     $colors = array_map('wp_map_color_filter', $args->asArray('colors', ','));
 
-    // Need re-implementing for OpenLayers3+
-    return '';
+    // Filter out empty values
+    $colors = array_filter($colors);
+
+    if (empty($colors)) {
+        // Default color palette if none specified
+        $colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF', '#FFA500', '#800080'];
+    }
+
+    $colorsJson = json_encode(array_values($colors));
+    $title = tra('Color Picker');
+
+    // The colorpicker container stores configuration; JS uses the map container's ID for modal uniqueness
+    return <<<OUT
+<div class="map-colorpicker-container" 
+     data-colorpicker-colors='$colorsJson' 
+     data-colorpicker-title="$title"
+     style="display: none;">
+</div>
+OUT;
 }
 
 function wp_map_color_filter($color)

@@ -163,14 +163,14 @@ class Tiki_Hm_Site_Config_File extends Hm_Site_Config_File
         if (isset($_SESSION[$session_prefix]['user_data']['tiki_enable_oauth2_over_imap_setting']) && $_SESSION[$session_prefix]['user_data']['tiki_enable_oauth2_over_imap_setting'] == 1) {
             $this->set('oauth2.ini', $oauth2);
             if (isset($_SESSION[$session_prefix]['user_data']['tiki_enable_gmail_contacts_module_setting']) && $_SESSION[$session_prefix]['user_data']['tiki_enable_gmail_contacts_module_setting'] == 1) {
-                array_push($this->config['modules'], 'gmail_contacts');
+                $this->config['modules'][] = 'gmail_contacts';
                 $gmail_contact = [
                     'load_gmail_contacts' => [
                         '0' => 'gmail_contacts',
                         '1' => 1
                     ]
                 ];
-                array_push($this->config['handler_modules']['contacts'], $gmail_contact);
+                $this->config['handler_modules']['contacts'][] = $gmail_contact;
             } else {
                 unset($this->config['modules']['gmail_contacts']);
                 unset($this->config['handler_modules']['contacts']['load_gmail_contacts']);

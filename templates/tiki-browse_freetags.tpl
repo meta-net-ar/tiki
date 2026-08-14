@@ -1,5 +1,6 @@
 {title admpage=freetags}{tr}Browse Tags{/tr}{/title}
 
+<div class="styling-element">
 {autocomplete element="#tagBox" type="tag" options="multiple: true, multipleSeparator: ' ';"}
 <form action="tiki-browse_freetags.php" method="get" name="my_form" class="freetagsearch">
     <div class="mb-3 row">
@@ -10,7 +11,7 @@
                 </div>
                 <input type="text" id="tagBox" class="form-control" name="tag" value="{$tagString|escape}">
                 <div class="input-group-append input-group-append">
-                    <input type="submit" class="btn btn-primary tips" value="{tr}Go{/tr}">
+                    <input type="submit" class="btn btn-primary tips" value="{tr}Search{/tr}">
                 </div>
             </div>
         </div>
@@ -97,7 +98,7 @@
                     {capture name=tagurl}{if (strstr($popular_tag.tag, ' '))}"{$popular_tag.tag}"{else}{$popular_tag.tag}{/if}{/capture}
                     <a class="freetag_{$popular_tag.size}{if $tag eq $popular_tag.tag|escape} selectedtag{/if}" 
                         href="tiki-browse_freetags.php?tag={$smarty.capture.tagurl|escape:'url'}{if $broaden eq 'y'}&amp;broaden=y{/if}" 
-                        onclick="javascript:addTag('{$popular_tag.tag|escape:'javascript'}');return false;" 
+                        onclick="javascript:addTag('{$popular_tag.tag|escape:'javascript'|escape:'htmlall'}');return false;"
                         ondblclick="location.href=this.href;"
                         {if !empty($popular_tag.color)} style="color:{$popular_tag.color}"{/if}>
                         {$popular_tag.tag|escape}
@@ -107,7 +108,7 @@
             <div class="freetagsort card-footer">
                 <div class="text-center">
                     {if empty($maxPopular)}
-                        {assign var=maxPopular value=50+$prefs.freetags_browse_amount_tags_in_cloud}
+                        {$maxPopular=50+$prefs.freetags_browse_amount_tags_in_cloud}
                     {/if}
                     <a class='more' href="{$smarty.server.SCRIPT_NAME}?{query maxPopular=$maxPopular tagString=$tagString}">{tr}More Popular Tags{/tr}</a>
                 </div>
@@ -120,70 +121,70 @@
             </div>
         </div>
     {/if}
-    {assign var=cpt value=0}
+    {$cpt=0}
     {capture name="browse"}
         {if $type eq $objectType}
-            {assign var=thisclass value='active'}
+            {$thisclass='active'}
         {else}
-            {assign var=thisclass value=''}
+            {$thisclass=''}
         {/if}
         {if $broaden eq ''}
-            {assign var=thisbroaden value="&amp;broaden=$broaden"}
+            {$thisbroaden="&amp;broaden=$broaden"}
         {else}
-            {assign var=thisbroaden value=''}
-            {assign var=broaden value="&amp;broaden=$broaden"}
+            {$thisbroaden=''}
+            {$broaden="&amp;broaden=$broaden"}
         {/if}
         <div class="btn-group btn-toolbar mb-4">
             {button _text="{tr}All{/tr}" _class=$thisclass href="tiki-browse_freetags.php?tag=$tagString$broaden$thisbroaden&amp;type="}
             {foreach item=objectType from=$objects_with_freetags}
                 {foreach item=sect key=key from=$sections_enabled}
                     {if isset($sect.objectType) and $sect.objectType eq $objectType and $objectType neq 'blog post'}
-                        {assign var=feature_label value=$objectType|ucwords}
+                        {$feature_label=$objectType|ucwords}
                         {if $type eq $objectType}
-                            {assign var=thisclass value='active'}
+                            {$thisclass='active'}
                         {else}
-                            {assign var=thisclass value=''}
+                            {$thisclass=''}
                         {/if}
                         {if $broaden eq ''}
-                            {assign var=thisbroaden value="&amp;broaden=$broaden"}
+                            {$thisbroaden="&amp;broaden=$broaden"}
                         {else}
-                            {assign var=thisbroaden value=''}
-                            {assign var=broaden value="&amp;broaden=$broaden"}
+                            {$thisbroaden=''}
+                            {$broaden="&amp;broaden=$broaden"}
                         {/if}
-                        {assign var=thistype value=$objectType|escape:'url'}
+                        {$thistype=$objectType|escape:'url'}
                         {capture name="fl"}{tr}{$feature_label}{/tr}{/capture}
                         {button _text=$smarty.capture.fl _class=$thisclass href="tiki-browse_freetags.php?tag=$tagString$broaden$thisbroaden&amp;type=$thistype"}
-                        {assign var=cpt value=$cpt+1}
+                        {$cpt=$cpt+1}
                     {/if}
                     {if isset($sect.itemObjectType) and $sect.itemObjectType eq $objectType}
                         {if $objectType eq 'tracker %d'}
-                            {assign var=feature_label value='Tracker Item'}
-                            {assign var=objectType value='trackerItem'}
+                            {$feature_label='Tracker Item'}
+                            {$objectType='trackerItem'}
                         {else}
-                            {assign var=feature_label value=$objectType|ucwords}
+                            {$feature_label=$objectType|ucwords}
                         {/if}
                         {if $type eq $objectType}
-                            {assign var=thisclass value='active'}
+                            {$thisclass='active'}
                         {else}
-                            {assign var=thisclass value=''}
+                            {$thisclass=''}
                         {/if}
                         {if $broaden eq ''}
-                            {assign var=thisbroaden value="&amp;broaden=$broaden"}
+                            {$thisbroaden="&amp;broaden=$broaden"}
                         {else}
-                            {assign var=thisbroaden value=''}
-                            {assign var=broaden value="&amp;broaden=$broaden"}
+                            {$thisbroaden=''}
+                            {$broaden="&amp;broaden=$broaden"}
                         {/if}
-                        {assign var=thistype value=$objectType|escape:'url'}
+                        {$thistype=$objectType|escape:'url'}
                         {capture name="fl"}{tr}{$feature_label}{/tr}{/capture}
                         {button _text=$smarty.capture.fl _class=$thisclass href="tiki-browse_freetags.php?tag=$tagString$broaden$thisbroaden&amp;type=$thistype"}
-                        {assign var=cpt value=$cpt+1}
+                        {$cpt=$cpt+1}
                     {/if}
                 {/foreach}
             {/foreach}
         </div>
         <div class="d-flex flex-row flex-wrap align-items-center mb-4 row">
             <div class="input-group col-sm-6">
-                <input type="text" name="find" value="{$find|escape}" class="form-control form-control-sm" placeholder="{tr}Find{/tr}...">
+                <input type="text" name="find" value="{$find|escape}" class="form-control form-control-sm" placeholder="{tr}Search{/tr}...">
                 <input type="submit" class="btn btn-info btn-sm" value="{tr}Filter{/tr}">
             </div>
             <input type="hidden" name="old_type" value="{$type|escape}">
@@ -210,9 +211,9 @@
 
 <div class="freetagresult">
     {if $tagString}
-        <h4>{tr}Results{/tr} <span class="badge bg-secondary">{$cantobjects}</span></h4>
+        <h4>{tr}Results{/tr} <span class="badge bg-secondary">{$objects_count}</span></h4>
     {/if}
-    {if $cantobjects > 0}
+    {if $objects_count > 0}
         <table class="table table-hover">
             <tbody>
                 {section name=ix loop=$objects}
@@ -244,6 +245,7 @@
                 {/section}
             </tbody>
         </table>
-        {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
     {/if}
+</div>
 </div>

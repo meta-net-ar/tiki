@@ -160,14 +160,32 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         }
     }
 
-    protected function mapCalendarObjectUriToItem($objectUri)
+    protected function mapCalendarObjectUriToItem($objectUri, $calendarId = null)
     {
         $calendarlib = TikiLib::lib('calendar');
         if (preg_match('#calendar-object-(r?)(.*)$#', $objectUri, $m)) {
             if ($m[1]) {
                 $item = new \CalRecurrence($m[2]);
             } else {
-                $item = $calendarlib->get_item($m[2]);
+                // Prefer URI resolution, but when a calendar context is known, pick
+                // the candidate that belongs to that calendar to avoid URI/id collisions.
+                $itemByUri = $calendarlib->get_item_by_uri($objectUri);
+                $itemById = null;
+                if (ctype_digit((string)$m[2])) {
+                    $itemById = $calendarlib->get_item((int)$m[2]);
+                }
+
+                if ($calendarId !== null) {
+                    if (is_array($itemByUri) && (int)$itemByUri['calendarId'] === (int)$calendarId) {
+                        $item = $itemByUri;
+                    } elseif (is_array($itemById) && (int)$itemById['calendarId'] === (int)$calendarId) {
+                        $item = $itemById;
+                    } else {
+                        $item = $itemByUri ?: $itemById;
+                    }
+                } else {
+                    $item = $itemByUri ?: $itemById;
+                }
             }
         } else {
             $item = $calendarlib->get_item_by_uri($objectUri);
@@ -176,6 +194,17 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
             throw new DAV\Exception\NotFound('Objecturi not found.');
         }
         return $item;
+    }
+
+    protected function recurrenceBelongsToCalendar($recurrenceId, $calendarId)
+    {
+        $rec = new \CalRecurrence($recurrenceId);
+        if ((int)$rec->getCalendarId() !== (int)$calendarId || ! $rec->getFirstItemId()) {
+            return false;
+        }
+
+        $firstItem = TikiLib::lib('calendar')->get_item($rec->getFirstItemId());
+        return is_array($firstItem) && (int)$firstItem['calendarId'] === (int)$calendarId;
     }
 
     protected function getCalendarUri($calendarId)
@@ -408,19 +437,23 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         $this->ensureCalendarAccess($calendarId, $instanceId, null, 'view_calendar', 'read');
 
         $objects = TikiLib::lib('calendar')->get_events($calendarId);
-        $filtered = Perms::filter([ 'type' => 'event' ], 'object', $objects, [ 'object' => 'calitemId' ], 'view_events');
 
         $result = [];
         $recurrences = [];
-        foreach ($filtered as $row) {
-            if ($row['recurrenceId']) {
+        foreach ($objects as $row) {
+            $rowForExport = $row;
+            if ($row['recurrenceId'] && $this->recurrenceBelongsToCalendar($row['recurrenceId'], $calendarId)) {
                 $recurrences[] = $row['recurrenceId'];
                 continue;
+            } elseif ($row['recurrenceId']) {
+                // Stale cross-calendar links should be exported as standalone events.
+                $rowForExport['recurrenceId'] = null;
+                $rowForExport['recurrenceStart'] = null;
             }
-            $calendardata = $this->constructCalendarData($row);
+            $calendardata = $this->constructCalendarData($rowForExport);
             $result[] = [
                 'id'           => $row['calitemId'],
-                'uri'          => $this->getCalendarObjectUri($row),
+                'uri'          => $this->getCalendarObjectUri($rowForExport),
                 'lastmodified' => (int)$row['lastModif'],
                 'etag'         => '"' . md5($calendardata) . '"',
                 'size'         => strlen($calendardata),  // TODO: add to Tiki: calendardata
@@ -468,7 +501,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
 
         $this->ensureCalendarAccess($calendarId, $instanceId, null, 'view_calendar', 'read');
 
-        $row = $this->mapCalendarObjectUriToItem($objectUri);
+        $row = $this->mapCalendarObjectUriToItem($objectUri, $calendarId);
         if (! is_array($row)) {
             $rec = $row;
             $row = ['calitemId' => $rec->getFirstItemId(), 'calendarId' => $rec->getCalendarId(), 'lastModif' => $rec->getLastModif()];
@@ -476,7 +509,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
             $rec = null;
         }
 
-        $perms = Perms::get('event', $row['calitemId']);
+        $perms = Perms::get('calendaritem', $row['calitemId']);
         if (! $perms->view_events) {
             throw new DAV\Exception\Forbidden(tra('Permission denied') . ": " . 'tiki_p_view_events');
         }
@@ -529,7 +562,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
                 return str_replace("calendar-object-", "", $uri);
             }, $chunk);
             $objects = TikiLib::lib('calendar')->get_events($calendarId, $itemIdsOrUris);
-            $filtered = Perms::filter([ 'type' => 'event' ], 'object', $objects, [ 'object' => 'calitemId' ], 'view_events');
+            $filtered = Perms::filter([ 'type' => 'calendaritem' ], 'object', $objects, [ 'object' => 'calitemId' ], 'view_events');
             $recurrences = [];
             foreach ($filtered as $row) {
                 if ($row['recurrenceId']) {
@@ -590,6 +623,18 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         if (! is_array($calendarId)) {
             throw new \InvalidArgumentException('The value passed to $calendarId is expected to be an array with a calendarId and an instanceId');
         }
+
+        // changing calendars makes caldav server not able to find the event, so it
+        // tries to recreate it (thus duplicate). Detect this here and force update.
+        try {
+            $existing = $this->mapCalendarObjectUriToItem($objectUri);
+            if ($existing) {
+                return $this->updateCalendarObject($calendarId, $objectUri, $calendarData);
+            }
+        } catch (DAV\Exception\NotFound $e) {
+            // URI doesn't map to any existing item => proceed with creation
+        }
+
         list($calendarId, $instanceId) = $calendarId;
 
         $this->ensureCalendarAccess($calendarId, $instanceId, null, 'add_events', 'write');
@@ -663,7 +708,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         }
         list($calendarId, $instanceId) = $calendarId;
 
-        $item = $this->mapCalendarObjectUriToItem($objectUri);
+        $item = $this->mapCalendarObjectUriToItem($objectUri, $calendarId);
         if (! is_array($item)) {
             $rec = $item;
             $item = ['calitemId' => $rec->getFirstItemId()];
@@ -691,6 +736,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
                 $rec = $data['rec'];
             }
             $data['calitemId'] = $item['calitemId'];
+
             $rec->updateDetails($data);
             $rec->setUser($userToSet);
             $rec->save($data['updateManuallyChangedEvents'] ?? true);
@@ -720,7 +766,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         }
         list($calendarId, $instanceId) = $calendarId;
 
-        $item = $this->mapCalendarObjectUriToItem($objectUri);
+        $item = $this->mapCalendarObjectUriToItem($objectUri, $calendarId);
         if (! is_array($item)) {
             $rec = $item;
             $item = ['calitemId' => $rec->getFirstItemId()];
@@ -923,7 +969,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         }
 
         $objects = TikiLib::lib('calendar')->get_events($calendarId, [], $componentType, $start, $end);
-        $filtered = Perms::filter([ 'type' => 'event' ], 'object', $objects, [ 'object' => 'calitemId' ], 'view_events');
+        $filtered = Perms::filter([ 'type' => 'calendaritem' ], 'object', $objects, [ 'object' => 'calitemId' ], 'view_events');
 
         if ($requirePostFilter) {
             foreach ($filtered as $key => $row) {
@@ -977,7 +1023,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
         $user = PrincipalBackend::mapUriToUser($principalUri);
         $row = TikiLib::lib('calendar')->find_by_uid($user, $uid);
         if ($row) {
-            $perms = Perms::get('event', $row['calitemId']);
+            $perms = Perms::get('calendaritem', $row['calitemId']);
             if ($perms->view_events) {
                 if ($row['recurrenceId']) {
                     $rec = new \CalRecurrence($row['recurrenceId']);
@@ -1404,7 +1450,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
                     );
                     $data = [
                         'access' => $sharee->access,
-                        'share_name' => isset($sharee->properties['{DAV:}displayname']) ? $sharee->properties['{DAV:}displayname'] : null,
+                        'share_name' => $sharee->properties['{DAV:}displayname'] ?? null,
                         'share_invite_status' => $sharee->inviteStatus ?: $oldSharee->inviteStatus,
                     ];
                     $calendarlib->update_calendar_instance($calendarId, $share_href, $data);
@@ -1425,7 +1471,7 @@ class CalDAVBackend extends CalDAV\Backend\AbstractBackend implements
                 'timezone' => $calendar['timezone'] ?? '',
                 'transparent' => 1,
                 'share_href' => $sharee->href,
-                'share_name' => isset($sharee->properties['{DAV:}displayname']) ? $sharee->properties['{DAV:}displayname'] : null,
+                'share_name' => $sharee->properties['{DAV:}displayname'] ?? null,
                 'share_invite_status' => $sharee->inviteStatus ?: \Sabre\DAV\Sharing\Plugin::INVITE_NORESPONSE,
             ];
             $calendarlib->create_calendar_instance($data);

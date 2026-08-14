@@ -4,6 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
 class Services_Cypht_Controller
 {
     public function action_ajax($input)
@@ -34,6 +35,8 @@ class Services_Cypht_Controller
                 $logslib->add_log('cypht', $msg);
             }
         }
+
+        Feedback::sendHeaders();
 
         // either html or already json encoded, so skip broker/accesslib output and do it here
         echo $dispatcher->session->dedup_page_links($dispatcher->output);

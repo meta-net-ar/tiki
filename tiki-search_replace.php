@@ -13,16 +13,16 @@ $inputConfiguration = [
     [ 'staticKeyFilters'          => [
                 'searchtext'      => 'xss',             //post
                 'replacetext'     => 'xss',             //post
-                'maxRecords'      => 'digits',          //post
-                'offset'          => 'digits',          //post
-                'paddingLength'   => 'digits',          //post
-                'categId'         => 'digits',          //post
+                'maxRecords'      => 'int',             //post
+                'offset'          => 'int',             //post
+                'paddingLength'   => 'int',               //post
+                'categId'         => 'int',             //post
                 'casesensitive'   => 'bool',            //post
                 'replace'         => 'bool',            //post
                 'search'          => 'bool',            //post
     ],
     'staticKeyFiltersForArrays'   => [
-        'checked'                 => 'digits',          //post
+        'checked'                 => 'int',             //post
     ],
     ]
 ];
@@ -39,17 +39,11 @@ $searchtext = '';
 $replacetext = '';
 if (! empty($_REQUEST['replacetext'])) {
     $replacetext = $_REQUEST['replacetext'];
-} else {
-    $replacetext = '';
 }
 if (! empty($_REQUEST['searchtext'])) {
     $searchtext = $_REQUEST['searchtext'];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign('offset', $offset);
 
 if (! empty($_REQUEST['categId'])) {
@@ -64,11 +58,7 @@ if ($prefs['feature_categories'] == 'y') {
     $categories = $categlib->getCategories(null, true, false);
     $smarty->assign('categories', $categories);
 }
-if (isset($_REQUEST["maxRecords"])) {
-    $maxRecords = $_REQUEST["maxRecords"];
-} else {
-    $maxRecords = 10;
-}
+$maxRecords = $_REQUEST["maxRecords"] ?? 10;
 $smarty->assign('maxRecords', $maxRecords);
 
 if (! isset($_REQUEST["paddingLength"])) {
@@ -127,7 +117,7 @@ if (isset($_REQUEST['search']) && $searchtext) {
             $r["searchreplace"][] = ($r["page_id"] . ":" . $r["version"] . ":" . $curpos);
         }
     }
-    $smarty->assign('cant', $results['cant']);
+    $smarty->assign('count', $results['count']);
     $smarty->assign('results', $results['data']);
 }
 

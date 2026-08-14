@@ -25,12 +25,11 @@ function wikiplugin_vote_info()
                 'profile_reference' => 'tracker',
             ],
             'fields' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Fields'),
                 'description' => tra('Colon-separated list of field IDs to be displayed. If not set all the fields that
                     can be used (except IP, user, system, private fields) are used. Example:') . ' <code>2:4:5</code>',
                 'since' => '2.0',
-                'default' => '',
                 'separator' => ':',
                 'profile_reference' => 'tracker_field',
                 'parent' => 'input[name="params[trackerId]"]',
@@ -157,29 +156,23 @@ function wikiplugin_vote_info()
 
 function wikiplugin_vote($data, $params)
 {
-    global $user, $prefs, $tiki_p_admin_trackers, $tiki_p_view_trackers;
+    global $user, $prefs;
     $trklib = TikiLib::lib('trk');
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_vote_info());
     extract($params, EXTR_SKIP);
 
-    if ($prefs['feature_trackers'] != 'y' || ! isset($trackerId) || ! ($tracker = $trklib->get_tracker($trackerId))) {
+    if ($prefs['feature_trackers'] != 'y' || empty($trackerId) || ! ($tracker = $trklib->get_tracker($trackerId))) {
         return $smarty->fetch("wiki-plugins/error_tracker.tpl");
     }
 
     $smarty->assign_by_ref('tracker', $tracker);
+    $smarty->assign('float', $float);
+    $alreadyVoted = $trklib->get_user_item($trackerId, ['oneUserItem' => 'y']);
+    $smarty->assign('has_already_voted', $alreadyVoted ? 'y' : 'n');
 
-    if (isset($float)) {
-        $smarty->assign('float', $float);
-    } else {
-        $smarty->assign('float', '');
-    }
-    if ($trklib->get_user_item($trackerId, ['oneUserItem' => 'y'])) {
-        $smarty->assign('has_already_voted', 'y');
-    } else {
-        $smarty->assign('has_already_voted', 'n');
-    }
-    if (empty($fields)) {
+    if (is_null($fields)) {
         $fields = $trklib->list_tracker_fields($trackerId);
         $ff = [];
         foreach ($fields['data'] as $field) {
@@ -191,7 +184,7 @@ function wikiplugin_vote($data, $params)
             $params['fields'] = $ff;
         }
     }
-    if (isset($show_creator) && $show_creator == 'y') {
+    if ($show_creator == 'y') {
         $tracker = $trklib->get_tracker($trackerId);
         $smarty->assign_by_ref('tracker_creator', $tracker['user']);
     }
@@ -207,35 +200,31 @@ function wikiplugin_vote($data, $params)
         } else {
             $smarty->assign('p_create_tracker_items', 'y');// to have different vote in the same page
             include_once('lib/wiki-plugins/wikiplugin_tracker.php');
-            $vote = wikiplugin_tracker($data, $params);
+            $vote = TikiLib::lib('parser')->invokePlugin('tracker', $data, $params);
             $smarty->assign_by_ref('vote', $vote);
         }
     } else {
         $smarty->assign('p_create_tracker_items', 'n');
     }
-    if (isset($show_toggle) && $show_toggle == 'n') {
+    if ($show_toggle == 'n') {
         $smarty->assign('show_toggle', 'n');
     }
-    if (! isset($show_stat) || $show_stat == 'y') {
-        $show_stat = 'y';
-        if (isset($show_stat_only_after) && $show_stat_only_after == 'y') {
-            if (! isset($options)) {
-                $options = $trklib->get_tracker_options($trackerId);
-                if (! empty($options['start']) || ! empty($options['end'])) {
-                    $smarty->assign_by_ref('options', $options);
-                }
-            }
-            if (! empty($options['end']) && $tikilib->now < $options['end']) {
-                $show_stat = 'n';
+    if ($show_stat == 'y' && $show_stat_only_after == 'y') {
+        if (! isset($options)) {
+            $options = $trklib->get_tracker_options($trackerId);
+            if (! empty($options['start']) || ! empty($options['end'])) {
+                $smarty->assign_by_ref('options', $options);
             }
         }
-        if ($show_stat == 'y') {
-            include_once('lib/wiki-plugins/wikiplugin_trackerstat.php');
-            $stat = wikiplugin_trackerstat($data, $params);
-            $smarty->assign_by_ref('stat', $stat);
-        } else {
-            $smarty->assign('stat', '');
+        if (! empty($options['end']) && $tikilib->now < $options['end']) {
+            $show_stat = 'n';
         }
+    }
+
+    if ($show_stat == 'y') {
+        include_once('lib/wiki-plugins/wikiplugin_trackerstat.php');
+        $stat = TikiLib::lib('parser')->invokePlugin('trackerstat', $data, $params);
+        $smarty->assign_by_ref('stat', $stat);
     } else {
         $smarty->assign('stat', '');
     }

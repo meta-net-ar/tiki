@@ -20,7 +20,6 @@ function wikiplugin_networkcondition_info()
                 'name' => tra('IPv4 List'),
                 'description' => tra("Comma-separated list of IPv4 addresses to match against the visitor's address."),
                 'since' => '11.0',
-                'default' => '',
                 'filter' => 'text',
                 'separator' => ',',
 
@@ -35,11 +34,10 @@ function wikiplugin_networkcondition($data, $params)
 
     $ip = $tikilib->get_ip_address();
 
-    if (! empty($params['ipv4list'])) {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_networkcondition_info());
+
+    if (! is_null($params['ipv4list'])) {
         $list = $params['ipv4list'];
-        if (! is_array($list)) {
-            $list = explode(',', $params['ipv4list']);
-        }
 
         if (! in_array($ip, $list)) {
             return '';

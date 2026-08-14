@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\MailIn;
 
+use Language;
 use TikiLib;
 use TikiMail;
 use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
@@ -120,7 +121,6 @@ class Account
         } elseif ($perms->admin) {
             return $this->adminAllowed;
         } else {
-            $userlib = TikiLib::lib('user');
             return $perms->send_mailin;
         }
     }
@@ -161,8 +161,7 @@ class Account
 
     public function sendFailureResponse(Source\Message $message, $condition)
     {
-        global $prefs;
-        $l = $prefs['language'];
+        $l = Language::getCurrentLanguage();
 
         $mail = $this->getReplyMail($message);
         $pre = tra('Mail-in auto-reply', $l) . "\n\n";
@@ -262,9 +261,6 @@ class Account
 
     public function check()
     {
-        global $prefs;
-
-        $logs = TikiLib::lib('logs');
         $messages = $this->source->getMessages();
 
         foreach ($messages as $message) {

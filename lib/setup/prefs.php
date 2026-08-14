@@ -174,10 +174,10 @@ function get_default_prefs()
                 style, fontname, fontsize, outdent, indent /
             ',
             'toolbar_global_comments' => '
-                bold, italic, underline, strike , - , link, smiley | help
+                bold, italic, underline, strike , - , link, smiley, filerecording | help
             ',
-            'toolbar_trackeritem_comments' => '
-                bold, italic, underline, strike , - , link, smiley, linkfile | help
+            'toolbar_trackers_comments' => '
+                bold, italic, underline, strike , - , link, smiley, linkfile, filerecording | help
             ',
             'toolbar_sheet' => 'addrow, addrowbefore, addrowmulti, deleterow,-, addcolumn, addcolumnbefore, addcolumnmulti, deletecolumn,-,
                                 sheetgetrange, sheetrefresh, -, sheetfind | sheetclose, sheetsave, help/
@@ -200,6 +200,7 @@ function get_default_prefs()
             'shoutbox_autolink' => 'n',
             'show_comzone' => 'n',
             'use_proxy' => 'n',
+            'use_rss_proxy' => 'n',
             'webserverauth' => 'n',
 
             'feature_intertiki_imported_groups' => '',
@@ -209,8 +210,6 @@ function get_default_prefs()
             // SefUrl
             'feature_sefurl_paths' => [''], //empty string needed to keep preference from setting unexpectedly
             'feature_sefurl_routes' => 'n',
-
-            'feature_lastup' => 'y',
 
             'terminology_profile_installed' => 'n',
 
@@ -235,11 +234,9 @@ function get_default_prefs()
 
     $_SESSION['tmpDir'] = $prefs['tmpDir'];
 
-    $prefs['feature_lastup'] = 'y';
-
     // Be sure we have a default value for user prefs
     foreach ($prefs as $p => $v) {
-        if (substr($p, 0, 12) == 'users_prefs_') {
+        if (str_starts_with($p, 'users_prefs_')) {
             $prefs[substr($p, 12)] = $v;
         }
     }
@@ -251,11 +248,16 @@ function get_default_prefs()
 
 function initialize_prefs($force = false)
 {
-    global $prefs, $user_overrider_prefs, $in_installer, $section, $systemConfiguration;
+    global $prefs, $user_overrider_prefs, $in_installer, $systemConfiguration;
 
 
     if (! $force && (defined('TIKI_IN_INSTALLER') || defined('TIKI_IN_TEST'))) {
         $prefs = get_default_prefs();
+        foreach ($user_overrider_prefs as $uop) {
+            if (isset($prefs[$uop])) {
+                $prefs['site_' . $uop] = $prefs[$uop];
+            }
+        }
         return;
     }
     $cachelib = TikiLib::lib('cache');

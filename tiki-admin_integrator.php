@@ -12,13 +12,14 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
              'repID'               => 'int',          //post
-             'name'                => 'alpha',        //post
-             'start'               => 'alpha',        //post
-             'cssfile'             => 'alpha',        //post
+             'name'                => 'text',         //post
+             'path'                => 'text',         //post
+             'start'               => 'text',         //post
+             'cssfile'             => 'text',         //post
              'expiration'          => 'int',          //post
              'description'         => 'xss',          //post
-             'vis'                 => 'bool',         //post
-             'cacheable'           => 'bool',         //post
+             'vis'                 => 'alpha',        //post
+             'cacheable'           => 'alpha',        //post
              'action'              => 'striptags',    //post
              'save'                => 'striptags',    //post
         ],
@@ -26,18 +27,21 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 require_once('lib/integrator/integrator.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 // If Integrator is ON, check permissions...
 $access->check_feature('feature_integrator');
 $access->check_permission(['tiki_p_admin_integrator']);
 
 // Setup local variables from request or set default values
-$repID = isset($_REQUEST['repID']) ? $_REQUEST['repID'] : 0;
-$name = isset($_REQUEST['name']) ? $_REQUEST['name'] : '';
-$path = isset($_REQUEST['path']) ? $_REQUEST['path'] : '';
-$start = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
-$cssfile = isset($_REQUEST['cssfile']) ? $_REQUEST['cssfile'] : '';
+$repID = $_REQUEST['repID'] ?? 0;
+$name = $_REQUEST['name'] ?? '';
+$path = $_REQUEST['path'] ?? '';
+$start = $_REQUEST['start'] ?? '';
+$cssfile = $_REQUEST['cssfile'] ?? '';
 $expiration = ! empty($_REQUEST['expiration']) ? $_REQUEST['expiration'] : 0;
-$description = isset($_REQUEST['description']) ? $_REQUEST['description'] : '';
+$description = $_REQUEST['description'] ?? '';
 $vis = isset($_REQUEST['vis']) ? ($_REQUEST['vis'] == 'on' ? 'y' : 'n') : 'n';
 $cacheable = isset($_REQUEST['cacheable']) ? ($_REQUEST['cacheable'] == 'on' ? 'y' : 'n') : 'n';
 
@@ -90,7 +94,6 @@ if (isset($_REQUEST['action'])) {
 
         default:
             Feedback::errorAndDie(tra('Requested action is not supported on repository'), \Laminas\Http\Response::STATUS_CODE_500);
-            break;
     }
 }
 

@@ -1,0 +1,73 @@
+parameters:
+  paths:
+    - .
+  bootstrapFiles:
+    - vendor_bundled/vendor/autoload.php
+  scanDirectories:
+    #- vendor
+    #- vendor_custom
+  scanFiles:
+    # The following allows analysing our custom phpcs sniffs properly (They are devtools, we don't want them in main composer.json config)
+    # Not necessary anymore was added to autoload-dev in composer.json.
+    #- vendor_bundled/vendor/squizlabs/php_codesniffer/src/Files/File.php
+  excludePaths:
+    - vendor_bundled
+    - vendor
+    - vendor_custom
+    - */vendor/*
+    - temp
+
+    # TODO, restore those paths, but too complicated for now
+    - lib/core/Tiki/Command/SieveFiltersCommand.php
+    - lib/test
+
+    # Depends on code decompressed in the source tree, so isn't always there
+
+    # Cypth related
+    # There is really no reason to exclude cypht anymore, as jason-munro/cypht is in composer.json by default.  But lib/cypht/integration/classes.php uses nested requires which seem to confuse phpstan. - benoitg - 2026-01-25
+    - lib/cypht
+    - lib/core/Services/Cypht/Controller.php
+    - lib/core/Search/Index/Cypht.php
+    - lib/wiki-plugins/wikiplugin_cypht.php
+    - modules/mod-func-webmail_unread_messages.php
+    - lib/core/Tiki/Command/Webmail*
+    - tiki-webmail.php
+    # TikiManager related
+    - lib/core/Services/Manager
+
+    # Depends on code installed through tiki packages, not composer
+
+    - lib/core/IDS #Depends on enygma/expose
+    - lib/core/Tiki/Faker.php #Depends on fakerphp/faker
+    - lib/core/Tiki/TrackerFaker.php #Depends on fakerphp/faker
+
+
+    # DEPRECATED code
+    - lib/core/Tiki/Composer # Depends on composer/composer, but that hasn't been installed in ages.  It's clearly not functional.  Not sure if it's useful - benoitg- 2025-12-23
+    - lib/core/TikiDb/MasterSlaveDispatch.php #Apparently not upgraded as TikiDb evolved - benoitg- 2025-12-23
+    - lib/Sheet
+    - lib/wiki-plugins/wikiplugin_sheet.php
+    - lib/core/Tiki/Profile/InstallHandler/Sheet.php
+    - tiki-export_sheet.php
+
+    # DEPRECATED tests
+    - tiki_tests
+    - lib/test/AcceptanceTests
+
+    # lang/ takes too long to process
+    - lang
+
+  tmpDir: temp/ci/phpstan_cache
+
+  #Permanent error configuration
+  ignoreErrors:
+    # Conditionally included config files
+    -
+      message: '#"db/local.php" is not a file or it does not exist.#'
+      reportUnmatched: false
+    -
+      message: '#"lib/test/local.php" is not a file or it does not exist.#'
+      reportUnmatched: false
+
+
+

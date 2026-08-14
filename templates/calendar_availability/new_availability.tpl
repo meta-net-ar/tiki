@@ -5,7 +5,7 @@
         <div class="mb-3 row">
             <label class="col-form-label col-sm-3">{tr}UID{/tr}</label>
             <div class="col-sm-9">
-                {$uid} <a href="#" class="btn btn-sm btn-danger availability-remove">{icon name=delete _menu_text='n' _menu_icon='y' alt="{tr}Delete{/tr}"}</a>
+                {$uid} <a href="#" class="btn btn-sm btn-danger availability-remove" role="button">{icon name=delete _menu_text='n' _menu_icon='y' alt="{tr}Delete{/tr}"}</a>
             </div>
         </div>
         <div class="mb-3 row">

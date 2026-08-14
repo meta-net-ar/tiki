@@ -1,0 +1,81 @@
+~tc~This page is for theme thumbnail screenshots, which will be reduced to 750h x 600w or 300h x 240w, depending on the file size (kb). I'm thinking below the navbar and a side column containing a menu and theme-switch module, maybe, then a row with an image and a column of text, like a div.lead, that includes various text styles, followed by some page element samples: buttons, etc., that don't take up too much vertical space. The idea is a rather conventional page but also demonstrating page elements since its purpose is a preview of the theme appearance. Can it use the img plugin that fetches a different image each time the page loads? (That is a thing, right?). ~/tc~
+{DIV(class="row mb-5 color-mode-content")}{DIV(class="col-sm-4")}{img randomGalleryId=4}{DIV}{DIV(class="col-sm-8")}{DIV(class="lead")}Lorem ipsum dolor sit amet consectetur adipiscing elit, urna consequat felis vehicula class ultricies mollis dictumst, ((Sample link)) aenean non a in donec nulla. {DIV}
+
+Phasellus ante pellentesque erat cum risus consequat imperdiet aliquam, integer plac  erat et turpis mi eros nec lobortis taciti, vehicula nisl litora tellus ligula porttitor metus.
+
+Vivamus integer non suscipit taciti mus etiam at primis tempor sagittis sit, euismod libero facilisi aptent elementum felis blandit cursus gravida sociis erat ante, eleifend lectus nullam dapibus netus feugiat curae curabitur est ad.
+{HTML()}<button type="button" class="btn btn-primary">Primary</button>
+<button type="button" class="btn btn-secondary">Secondary</button>
+<button type="button" class="btn btn-success">Success</button>
+<button type="button" class="btn btn-danger">Danger</button>
+<button type="button" class="btn btn-warning">Warning</button>
+<button type="button" class="btn btn-info">Info</button>
+<button type="button" class="btn btn-light">Light</button>
+<button type="button" class="btn btn-dark">Dark</button>
+<button type="button" class="btn btn-link">Link</button>{HTML}{DIV}{DIV}
+
+{DIV(class="row mb-5 color-mode-content")}{DIV(class="col-sm-6")}{DIV(class="color-mode-content")}
+!! Table
+|| Massa curae | Fringilla porttitor | Quam sollicitudin
+Leo ligula euismod dictumst | Orci penatibus mauris eros etiam | Praesent erat volutpat posuere hac
+Litora laoreet amet lacinia erat adipiscing | Suspendisse faucibus rhoncus non, maecenas aliquet | Pharetra aenean ut tempus ultricies nulla
+Faucibus vel accumsan dictum | Suspendisse etiam risus |Maecenas praesent adipiscing || {DIV}{DIV}{DIV(class="col-sm-6")}{DIV(class="color-mode-content")}
+!! Accordion
+{HTML()}<div class="accordion" id="accordionExample">
+    <div class="accordion-item">
+        <h4 class="accordion-header" id="headingOne">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                Accordion Item #1
+            </button>
+        </h4>
+        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <strong>This is the first item's accordion body.</strong> It is hidden by default, until the collapse plugin adds
+                the appropriate classes that we use to style each element. These classes control the overall appearance, as well
+                as the showing and hiding via CSS transitions. Just about any HTML can go within the <code>.accordion-body</code>,
+                though the transition does limit overflow.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h4 class="accordion-header" id="headingTwo">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                Accordion Item #2
+            </button>
+        </h4>
+        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds
+                the appropriate classes that we use to style each element. These classes control the overall appearance, as well
+                as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our
+                default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>,
+                though the transition does limit overflow.
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h4 class="accordion-header" id="headingThree">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                Accordion Item #3
+            </button>
+        </h4>
+        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+                <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds
+                the appropriate classes that we use to style each element. These classes control the overall appearance, as well
+                as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our
+                default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>,
+                though the transition does limit overflow.
+            </div>
+        </div>
+    </div>
+</div>{HTML}{DIV}{DIV}{DIV}
+{DIV(class="color-mode-content")}
+!! Form sample
+{include page="Model form"}{DIV}
+{HTML()}<div class="color-mode-content">{HTML}
+!! Cards/modules
+    {DIV(class="row")}{DIV(class="col-sm-5")}{module module="last_modif_pages" rows="4"}{DIV}{DIV(class="col-sm-7")}
+    {DIV(class="card")}{DIV(class="row g-0")}{DIV(class="col-sm-5")}{img fileId=161}{DIV}{DIV(class="col-sm-7")}{DIV(class="card-body")}{HTML()}<h5 class="card-title">Still on course</h5>
+    <p class="card-text">A significant image from Tiki's history, fetched from a file gallery using PluginImg.</p>
+    <a href="#" class="btn btn-primary">Set sail</a>{HTML}{DIV}{DIV}{DIV}{DIV}{DIV}{DIV}

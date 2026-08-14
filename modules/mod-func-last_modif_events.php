@@ -42,9 +42,9 @@ function module_last_modif_events($mod_reference, $module_params)
     $smarty = TikiLib::lib('smarty');
     $calendarlib = TikiLib::lib('calendar');
 
-    $events = $calendarlib->last_modif_events($mod_reference["rows"], isset($module_params["calendarId"]) ? $module_params["calendarId"] : 0);
+    $events = $calendarlib->last_modif_events($mod_reference["rows"], $module_params["calendarId"] ?? 0);
 
     $smarty->assign('modLastEvents', $events);
-    $smarty->assign('maxlen', isset($module_params["maxlen"]) ? $module_params["maxlen"] : 0);
-    $smarty->assign('nodate', isset($module_params["nodate"]) ? $module_params["nodate"] : 'n');
+    $smarty->assign('maxlen', $module_params["maxlen"] ?? 0);
+    $smarty->assign('nodate', $module_params["nodate"] ?? 'n');
 }

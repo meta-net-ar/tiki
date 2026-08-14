@@ -365,7 +365,10 @@ class TikiAccessLib extends TikiLib
         $key = str_pad(substr($key, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES), SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES);
         $nonce = random_bytes(SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
 
-        return base64_encode($nonce . sodium_crypto_aead_xchacha20poly1305_ietf_encrypt($value, '', $nonce, $key));
+        # Perform url-safe base64 encoding.
+        $encoded = base64_encode($nonce . sodium_crypto_aead_xchacha20poly1305_ietf_encrypt($value, '', $nonce, $key));
+        $urlsafe = str_replace(['+', '/', '='], ['-', '_', ''], $encoded);
+        return $urlsafe;
     }
 
     /**
@@ -377,7 +380,15 @@ class TikiAccessLib extends TikiLib
     {
         $key = TikiLib::lib('tiki')->get_site_hash();
         $key = str_pad(substr($key, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES), SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES);
+
+        # Perform url-safe base64 decoding.
+        $value = str_replace(['-', '_'], ['+', '/'], $value);
+        $mod4 = strlen($value) % 4;
+        if ($mod4) {
+            $value .= substr('====', $mod4);
+        }
         $value = base64_decode($value);
+
         $nonce = substr($value, 0, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
         $cipherText = substr($value, SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES);
 
@@ -411,8 +422,7 @@ class TikiAccessLib extends TikiLib
         $cipherTicket = $this->encryptCsrfTicket($this->ticket);
 
         // you can set even if is the same value
-        $session_params = session_get_cookie_params();
-        setcookie(session_name() . '_CSRF', $cipherTicket, 0, $session_params['path'], $session_params['domain'], $session_params['secure'], true);
+        setcookie_obeySetCookieParams(session_name() . '_CSRF', $cipherTicket);
     }
 
 
@@ -600,12 +610,12 @@ class TikiAccessLib extends TikiLib
         }
         //identify server host + port
         $base = parse_url($base_url);
-        $baseHost = isset($base['host']) ? $base['host'] : '';
+        $baseHost = $base['host'] ?? '';
         $basePort = isset($base['port']) ? ':' . $base['port'] : '';
         $this->base = $baseHost . $basePort;
         //identify requesting host + port
         $origin = parse_url($this->origin);
-        $originHost = isset($origin['host']) ? $origin['host'] : '';
+        $originHost = $origin['host'] ?? '';
         $originPort = isset($origin['port']) ? ':' . $origin['port'] : '';
         $this->origin = $originHost . $originPort;
         //perform compare
@@ -668,7 +678,7 @@ class TikiAccessLib extends TikiLib
             $this->ticket = false;
         }
         //just in case url decoding is needed
-        if (strpos($this->ticket, '%') !== false) {
+        if (str_contains($this->ticket, '%')) {
             $this->ticket = urldecode($this->ticket);
         }
 
@@ -676,7 +686,11 @@ class TikiAccessLib extends TikiLib
 
         global $prefs;
 
-        if ($this->ticket && ($prefs['site_short_lived_csrf_tokens'] ?? 'n') !== 'y' && ($this->ticket === (isset($_SESSION['CSRF_TOKEN']) ? $_SESSION['CSRF_TOKEN'] : $this->retrieveTicketFromCookie()))) {
+        if (
+            $this->ticket &&
+            ($prefs['site_short_lived_csrf_tokens'] ?? 'n') !== 'y' &&
+            ($this->ticket === ($_SESSION['CSRF_TOKEN'] ?? $this->retrieveTicketFromCookie()))
+        ) {
             $this->ticketMatch = true;
         } elseif ($this->ticket && ! empty($_SESSION['tickets'][$this->ticket])) {
             //check that request ticket matches server ticket
@@ -742,11 +756,11 @@ class TikiAccessLib extends TikiLib
         if ($error !== 'none') {
             global $user;
 
-            $crsfErrorId = 'CRSF' . md5(uniqId($user));
-            $this->userMsg = tr('Your attempt was blocked as a suspected malicious operation. If you are a real person and this is an incorrect report, please report to the site administrators with the following code: ') . $crsfErrorId;
+            $csrfErrorId = 'CSRF' . md5(uniqId($user));
+            $this->userMsg = tr('Your attempt was blocked as a suspected malicious operation. If you are a real person and this is an incorrect report, please report to the site administrators with the following code: ') . $csrfErrorId;
             //log message
             $this->csrfPhpErrorLog($this->logMsg);
-            $this->csrfSystemLog($crsfErrorId);
+            $this->csrfSystemLog($csrfErrorId);
 
             //user feedback
             switch ($error) {
@@ -879,7 +893,7 @@ class TikiAccessLib extends TikiLib
     private function csrfPhpErrorLog($msg)
     {
         global $prefs;
-        error_log(PHP_EOL
+        error_log(PHP_EOL // @phpstan-ignore disallowedFunctions.errorLog (access violation reporting)
             . '**** ' . tr('Start CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****' . PHP_EOL
             . '  ' . $msg . PHP_EOL
             . '  site_security_timeout' . tr('preference:') . $prefs['site_security_timeout']
@@ -891,10 +905,12 @@ class TikiAccessLib extends TikiLib
             . (isset($_SERVER['REQUEST_METHOD']) ? '  REQUEST_METHOD: ' . $_SERVER['REQUEST_METHOD'] : '') . PHP_EOL);
         $get = count($_GET) ? json_encode($_GET, JSON_PRETTY_PRINT) : tr('empty');
         $post = count($_POST) ? json_encode($_POST, JSON_PRETTY_PRINT) : tr('empty');
-        error_log(PHP_EOL
+        error_log( // @phpstan-ignore disallowedFunctions.errorLog (access violation reporting)
+            PHP_EOL
             . '  $_GET: ' . $get . PHP_EOL
             . '  $_POST: ' . $post . PHP_EOL
-            . '**** ' . tr('End CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****');
+            . '**** ' . tr('End CSRF error from') . $_SERVER['SERVER_NAME'] . ' *****'
+        );
     }
 
 
@@ -979,7 +995,13 @@ class TikiAccessLib extends TikiLib
                 && $tikiroot . $prefs['tikiIndex'] != $_SERVER['PHP_SELF']
                 && ( $page != $userlib->get_user_default_homepage($user) || $page === '' )
         ) {
-            $this->redirect($prefs['tikiIndex']);
+            // Append ?challenge=1 for auth errors so the login page can emit 401.
+            $redirectTarget = $prefs['tikiIndex'];
+            if (in_array($errortype, ['401', '403']) && ! $user) {
+                $separator = str_contains($redirectTarget, '?') ? '&' : '?';
+                $redirectTarget .= $separator . 'challenge=1';
+            }
+            $this->redirect($redirectTarget);
         }
 
         $detail = [
@@ -1035,26 +1057,11 @@ class TikiAccessLib extends TikiLib
             $smarty->assign('errortype', \Laminas\Http\Response::STATUS_CODE_409);
             $smarty->display('error-ajax.tpl');
         } else {
-            if (
-                ($errortype == 401 || $errortype == 403) &&
-                        empty($user) &&
-                        ($prefs['permission_denied_login_box'] == 'y' || ! empty($prefs['permission_denied_url']))
-            ) {
-                if (empty($_SESSION['loginfrom'])) {
-                    $_SESSION['loginfrom'] = $_SERVER['REQUEST_URI'];
-                }
-                if ($prefs['login_autologin'] == 'y' && $prefs['login_autologin_redirectlogin'] == 'y' && ! empty($prefs['login_autologin_redirectlogin_url'])) {
-                    $this->redirect($prefs['login_autologin_redirectlogin_url']);
-                }
-            }
-
             $smarty->assign('errortitle', $detail['errortitle']);
-            $smarty->assign('msg', $detail['message']);
-            $smarty->assign('errortype', $detail['code']);
             if (isset($detail['page'])) {
                 $smarty->assign('page', $page);
             }
-            $smarty->display("error.tpl");
+            Feedback::errorAndDie($detail['message'], $errortype);
         }
         die;
     }
@@ -1202,7 +1209,12 @@ class TikiAccessLib extends TikiLib
      * @param int $code         HTTP code
      * @param string $msgtype   Type of message which determines styling (e.g., success, error, warning, etc.)
      */
-    public function redirect($url = '', $msg = '', $code = 302, $msgtype = '')
+    /**
+     * @param bool $allowExternal  Pass true only when the URL originates from a trusted source
+     *                             (admin-configured preference, inter-tiki setup, OAuth flow, etc.).
+     *                             Never pass true for URLs that are user-supplied at request time.
+     */
+    public function redirect($url = '', $msg = '', $code = 302, $msgtype = '', bool $allowExternal = false)
     {
         global $prefs;
 
@@ -1210,14 +1222,30 @@ class TikiAccessLib extends TikiLib
             return;
         }
 
-        // TODO: Validate URL
+        // Validate URL: reject absolute URLs pointing to a different host to prevent open redirects.
+        // $allowExternal must be explicitly set to true by callers that have already validated or
+        // trust the URL source (e.g. admin prefs, inter-tiki, OAuth). User-supplied URLs must
+        // always go through this check.
+        if (! $allowExternal && $url !== '') {
+            $parsed = parse_url($url);
+            if (! empty($parsed['host'])) {
+                $allowedHost = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+                // Strip port from allowed host for comparison
+                $allowedHost = strtolower(explode(':', $allowedHost)[0]);
+                $targetHost  = strtolower($parsed['host']);
+                if ($targetHost !== $allowedHost) {
+                    // Off-site redirect — fall back to the configured home page
+                    $url = $prefs['tikiIndex'];
+                }
+            }
+        }
         if ($url == '') {
             $url = $prefs['tikiIndex'];
         }
 
         if (trim($msg)) {
             $session = session_id();
-            if (empty($session)) {
+            if (empty($session) && empty($_SESSION['loginfrom'])) {
                 // Can happen if session_silent is enabled. But does any instance enable session_silent?
                 // Removing this case would allow removing the $msg parameters and just have callers using Feedback::add() before calling redirect(). Chealer 2017-08-16
                 $start = strpos($url, '?') ? '&' : '?';
@@ -1365,15 +1393,15 @@ class TikiAccessLib extends TikiLib
         foreach ($accept as $type) {
             $known = null;
 
-            if (strpos($type, $t = 'application/json') !== false) {
+            if (str_contains($type, $t = 'application/json')) {
                 $known = 'json';
-            } elseif (strpos($type, $t = 'text/javascript') !== false) {
+            } elseif (str_contains($type, $t = 'text/javascript')) {
                 $known = 'json';
-            } elseif (strpos($type, $t = 'text/x-yaml') !== false) {
+            } elseif (str_contains($type, $t = 'text/x-yaml')) {
                 $known = 'yaml';
-            } elseif (strpos($type, $t = 'application/rss+xml') !== false) {
+            } elseif (str_contains($type, $t = 'application/rss+xml')) {
                 $known = 'rss';
-            } elseif (strpos($type, $t = 'application/atom+xml') !== false) {
+            } elseif (str_contains($type, $t = 'application/atom+xml')) {
                 $known = 'atom';
             }
 
@@ -1528,7 +1556,7 @@ class TikiAccessLib extends TikiLib
     {
         global $tikipath, $base_url_http, $base_url_https;
         // if the directory is within the Tiki root, then remove the prefixed Tiki root
-        if (0 === strpos($filename, $tikipath)) {
+        if (str_starts_with($filename, $tikipath)) {
             $filename = substr($filename, strlen($tikipath));
         }
 
@@ -1574,6 +1602,7 @@ class TikiAccessLib extends TikiLib
                 $title = $prefs['site_busy_title'];
                 $error = $prefs['site_busy_msg'];
                 $prefs['site_closed'] = 'y';    // tell the rest of tiki we're closed
+                header('Retry-After: ' . $prefs['load_retry_after']);
 
                 break;
             case 'maintenance':
@@ -1649,10 +1678,10 @@ class TikiAccessLib extends TikiLib
     /**
      * Save CSRF error to system log
      *
-     * @param string $crsfErrorId
+     * @param string $csrfErrorId
      * @return null
      */
-    private function csrfSystemLog($crsfErrorId)
+    private function csrfSystemLog($csrfErrorId)
     {
         global $prefs, $user;
 
@@ -1660,7 +1689,7 @@ class TikiAccessLib extends TikiLib
         $logslib = TikiLib::lib('logs');
 
         $redactPass = function (&$item, $key) {
-            if (strpos($key, 'pass') !== false) {
+            if (str_contains($key, 'pass')) {
                 $item = '** ' . tr('redacted') . ' **';
             }
         };
@@ -1674,7 +1703,7 @@ class TikiAccessLib extends TikiLib
             array_walk($post, $redactPass);
         }
 
-        $logCrsf = [
+        $logCsrf = [
             'serverName' => $_SERVER['SERVER_NAME'],
             'userMessage' => $this->userMsg,
             'internalMessage' => $this->logMsg,
@@ -1682,13 +1711,13 @@ class TikiAccessLib extends TikiLib
             'siteSecurityTimeout' => tr('preference:') . ' ' . $prefs['site_security_timeout'] . tr('seconds') . ' (' . $prefs['site_security_timeout'] / 60 . ' minutes)',
             'scriptName' => $_SERVER['SCRIPT_NAME'],
             'requestURI' => $_SERVER['REQUEST_URI'],
-            'httpOrigin' => isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : null,
+            'httpOrigin' => $_SERVER['HTTP_ORIGIN'] ?? null,
             'httpReferer' => $_SERVER['HTTP_REFERER'],
             'requestMethod' => $_SERVER['REQUEST_METHOD'],
             'queryString' => $_SERVER['QUERY_STRING'] ?? tr('empty'),
             'get' => $get,
             'post' => $post
         ];
-        $logslib->add_action('CRSF Error', 'system', 'system', $crsfErrorId, '', '', '', '', '', '', $logCrsf);
+        $logslib->add_action('CSRF Error', 'system', 'system', $csrfErrorId, '', '', '', '', '', '', $logCsrf);
     }
 }

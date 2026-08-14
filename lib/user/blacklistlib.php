@@ -96,7 +96,7 @@ class blacklistLib extends TikiLib
 
     /**
      * Find the number of indexed passwords currently stored
-     *@$result TikiDb_Pdo_Result
+     *@$result Tiki\TikiDb\PdoResult
      *
      * @return int
      */
@@ -339,9 +339,9 @@ LIMIT 1;';
     public function genIndexedBlacks($returnFormatted = true)
     {
 
-        $blacklist_options = array_diff(scandir(__DIR__ . '/../pass_blacklists'), ['..', '.', 'index.php', '.htaccess', '.svn', '.DS_Store', 'readme.txt']);
+        $blacklist_options = array_diff(scandir(__DIR__ . '/../pass_blacklists'), ['..', '.', 'index.php', '.htaccess', '.DS_Store', 'readme.txt']);
         if (is_dir('storage/pass_blacklists')) {
-            $blacklist_options = array_merge($blacklist_options, array_diff(scandir(__DIR__ . '/../../storage/pass_blacklists'), ['..', '.', 'index.php', '.htaccess', '.svn', '.DS_Store', 'readme.txt']));
+            $blacklist_options = array_merge($blacklist_options, array_diff(scandir(__DIR__ . '/../../storage/pass_blacklists'), ['..', '.', 'index.php', '.htaccess', '.DS_Store', 'readme.txt']));
         }
         sort($blacklist_options);
 

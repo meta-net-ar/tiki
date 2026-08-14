@@ -8,8 +8,8 @@ $inputConfiguration = [
     [
         'staticKeyFilters'         => [
         'clear'                    => 'bool',              //post
-        'sort_mode'                => 'word',             //post
-        'offset'                   => 'digits',            //post
+        'sort_mode'                => 'alnumdash',         //get
+        'offset'                   => 'int',               //get
         'find'                     => 'string',            //post
         ],
     ],
@@ -17,6 +17,10 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 $searchstatslib = TikiLib::lib('searchstats');
 //get_strings tra('Search Stats')
+
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 
 $access->check_feature('feature_search_stats');
 $access->check_permission('tiki_p_admin');
@@ -30,21 +34,13 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $searchstatslib->list_search_stats($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $channels["cant"]);
+$smarty->assign_by_ref('pages_count', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 // Display the template
 $smarty->assign('mid', 'tiki-search_stats.tpl');

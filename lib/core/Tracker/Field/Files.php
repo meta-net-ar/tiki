@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\File\PDFHelper;
+use Tiki\Lib\Auth\Tokens;
 use Tiki\Package\ComposerManager;
 
 class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \Tracker\Field\ExportableInterface
@@ -163,6 +164,21 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                         'filter' => 'int',
                         'profile_reference' => 'file_gallery',
                     ],
+                    'fileGalleryPerTrackerItem' => [
+                        'name' => tr('File Gallery per Tracker Item'),
+                        'description' => tr('Create a sub-gallery for each tracker item.'),
+                        'filter' => 'alpha',
+                        'default' => 'n',
+                        'options' => [
+                            'n' => tr('No'),
+                            'y' => tr('Yes'),
+                        ],
+                    ],
+                    'fileGalleryPerTrackerItemName' => [
+                        'name' => tr('File Gallery per Tracker Item'),
+                        'description' => tr('Pattern of the name of sub-gallery to be created. Default value is "Field %fieldId% item %itemId%" where %fieldId% is the fieldId and %itemId% is the itemId. The gallery names will then be, for example "Events Photos item: 42".'),
+                        'filter' => 'text',
+                    ],
                     'indexGeometry' => [
                         'name' => tr('Index As Map Layer'),
                         'description' => tr('Index the files in a specific format for use in map searchlayers to display trails and features.'),
@@ -214,7 +230,30 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                             'n' => tr('No'),
                             'y' => tr('Yes'),
                         ],
-                    ]
+                    ],
+                    'liveRecord' => [
+                        'name' => tr('Live Record'),
+                        'description' => tr('Use the browser to record a video, an audio or a screen capture.'),
+                        'filter' => 'alpha',
+                        'default' => 'n',
+                        'options' => [
+                            'n' => tr('No'),
+                            'audio' => tr('Audio only'),
+                            'screen' => tr('Screen only'),
+                            'screenandaudio' => tr('Screen and audio'),
+                            'cameraandaudio' => tr('Camera and audio'),
+                        ],
+                    ],
+                    'changeFileNameOnUpload' => [
+                        'name' => tr('Change file name'),
+                        'description' => tr('Change file name on uploaded files. Upload In Modal required.'),
+                        'filter' => 'alpha',
+                        'default' => 'n',
+                        'options' => [
+                            'n' => tr('No'),
+                            'y' => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -227,7 +266,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
 
     public function getFieldData(array $requestData = []): array
     {
-        global $prefs;
+        global $prefs, $user;
         $filegallib = TikiLib::lib('filegal');
 
         $galleryId = (int) $this->getOption('galleryId');
@@ -298,11 +337,18 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             Feedback::error(tr('Files field: Gallery #%0 not found', $galleryId));
             return [];
         }
+
+        //If fileGalleryPerTrackerItem is set to yes
+        if ($this->trackerField->getOption('fileGalleryPerTrackerItem')) {
+            //Check permissions related to a specific gallery object
+            $perms = Perms::get('file gallery', $galleryId);
+            $canCreateGallery = $perms->create_file_galleries;
+        }
+
         if ($prefs['feature_use_fgal_for_user_files'] !== 'y' || $galinfo['type'] !== 'user') {
             $perms = Perms::get('file gallery', $galleryId);
             $canUpload = $perms->upload_files;
         } else {
-            global $user;
             $perms = TikiLib::lib('tiki')->get_local_perms($user, $galleryId, 'file gallery', $galinfo, false);     //get_perm_object($galleryId, 'file gallery', $galinfo);
             $canUpload = $perms['tiki_p_upload_files'] === 'y';
         }
@@ -330,6 +376,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
         return [
             'galleryId' => $galleryId,
             'canUpload' => $canUpload,
+            'canCreateGallery' => $canCreateGallery,
             'limit' => $count,
             'excessBehavior' => $excessBehavior,
             'files' => $fileInfo,
@@ -343,6 +390,8 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             'gallerySearch' => $gallery_list,
             'requireTitle' => $this->getOption('requireTitle'),
             'directoryPattern' => $directoryPattern,
+            'fileGalleryPerTrackerItem' => $this->trackerField->getOption('fileGalleryPerTrackerItem'),
+
         ];
     }
 
@@ -395,6 +444,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
         return $this->renderTemplate('trackerinput/files.tpl', $context, [
             'replaceFile' => 'y' == $this->getOption('replace', 'n'),
             'addDecriptionOnUpload' => $this->getOption('addDecriptionOnUpload') === 'y' ? 1 : 0,
+            'changeFileNameOnUpload' => $this->trackerField->getOption('changeFileNameOnUpload') === 'y' ? 1 : 0,
         ]);
     }
 
@@ -403,7 +453,6 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
         global $prefs;
         global $mimetypes;
         global $tikipath;
-
 
         include('lib/mime/mimetypes.php');
         $galleryId = (int)$this->getOption('galleryId');
@@ -472,16 +521,16 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                         $params['rel'] = 'box[' . $this->getInsertId() . ']';
                     }
                     include_once('lib/wiki-plugins/wikiplugin_img.php');
-                    $ret = wikiplugin_img('', $params);
+                    $ret = TikiLib::lib('parser')->invokePlugin('img', '', $params);
                     $ret = WikiPlugin_Helper::resultString($ret);
                 } elseif ($this->getOption('displayMode') == 'vimeo') { // Vimeo videos stored as filegal REMOTEs
                     include_once('lib/wiki-plugins/wikiplugin_vimeo.php');
-                    $ret = wikiplugin_vimeo('', $params);
+                    $ret = TikiLib::lib('parser')->invokePlugin('vimeo', '', $params);
                 } elseif ($this->getOption('displayMode') == 'moodlescorm') {
                     include_once('lib/wiki-plugins/wikiplugin_playscorm.php');
                     foreach ($this->getConfiguration('files') as $fileId => $file) {
                         $params['fileId'] = $fileId;
-                        $ret .= wikiplugin_playscorm('', $params);
+                        $ret .= TikiLib::lib('parser')->invokePlugin('playscorm', '', $params);
                     }
                 } elseif ($this->getOption('displayMode') == 'googleviewer') {
                     if ($prefs['auth_token_access'] != 'y') {
@@ -501,8 +550,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                             } else {
                                 $fileurl = urlencode($base_url . "tiki-download_file.php?fileId=" . $fileId);
                             }
-                            require_once 'lib/auth/tokens.php';
-                            $tokenlib = AuthTokens::build($prefs);
+                            $tokenlib = Tokens::build($prefs);
                             if ($prefs['feature_sefurl'] === 'y') {
                                 $token = $tokenlib->createToken(
                                     $tikiroot . "dl" . $fileId,
@@ -548,13 +596,19 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
 
                 foreach ($this->getConfiguration('files') as $fileId => $file) {
                     $ret .= '<li>';
+                    $skipName = false;
                     if ($prefs['vimeo_upload'] == 'y' && $this->getOption('displayMode') == 'vimeo') {
                         $ret .= smarty_function_icon(['name' => 'vimeo'], $smarty->getEmptyInternalTemplate());
+                    } elseif (str_starts_with($file['filetype'], 'audio/')) {
+                        $ret .= smarty_function_inline_audio_player(['fileId' => $fileId, 'type' => $file['filetype']], $smarty->getEmptyInternalTemplate());
+                        $skipName = true;
                     } else {
                         $ret .= smarty_modifier_iconify('tiki-download_file.php?fileId=' . $fileId, $file['filetype'], $fileId, 2);
                     }
 
-                    $ret .= smarty_function_object_link(['type' => 'file', 'id' => $fileId, 'title' => $file['name']], $smarty->getEmptyInternalTemplate());
+                    if (! $skipName) {
+                        $ret .= smarty_function_object_link(['type' => 'file', 'id' => $fileId, 'title' => $file['name'], 'class' => 'label'], $smarty->getEmptyInternalTemplate());
+                    }
 
                     $globalperms = Perms::get([ 'type' => 'file gallery', 'object' => $galleryId ]);
 
@@ -602,7 +656,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                             'trigger' => 'click'
                         ], $smarty->getEmptyInternalTemplate());
                         $icon = smarty_function_icon(['name' => 'wrench'], $smarty->getEmptyInternalTemplate());
-                        $ret .= " <a class='fgalname tips' title='" . tr('Actions') . "'href='#' $popup>$icon</a>";
+                        $ret .= " <a class='fgalname tips label' title='" . tr('Actions') . "'href='#' $popup>$icon</a>";
                     }
 
                     $ret .= '</li>';
@@ -611,6 +665,25 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             }
         }
         return $ret;
+    }
+
+    /**
+     * Render the field as plain text
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $value = $this->getValue();
+        if (empty($value)) {
+            return '';
+        }
+        $fileIds = array_filter(explode(',', $value));
+        $fileInfo = $this->getFileInfo($fileIds);
+        return implode(', ', array_map(function ($file) {
+            return $file['name'];
+        }, $fileInfo));
     }
 
     private function isMimeType(array $mimes, string $fileType, array $extensions): bool
@@ -625,10 +698,14 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
 
     public function handleSave($value, $oldValue)
     {
+        global $prefs, $user;
+        $filegallib = TikiLib::lib('filegal');
+        $relationlib = TikiLib::lib('relation');
+        $utilities = new Services_File_Utilities();
         $excessBehavior = $this->getOption('excessBehavior');
         $count = (int) $this->getOption('count');
 
-        $fileIds = array_filter(explode(',', $value));
+        $fileIds = array_filter(explode(',', (string) $value));
 
         if ($count) {
             if ($excessBehavior === 'split') {
@@ -641,8 +718,56 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
             }
         }
 
-        $new = array_diff($fileIds, explode(',', $oldValue));
-        $remove = array_diff(explode(',', $oldValue), $fileIds);
+        $new = array_diff($fileIds, explode(',', (string) $oldValue));
+        $remove = array_diff(explode(',', (string) $oldValue), $fileIds);
+        //If the option to create sub-galleries and move files is enabled
+        if (! empty($value) && $this->trackerField->getOption('fileGalleryPerTrackerItem') === 'y') {
+            //Create new gallery and move all uploaded files
+            $fieldId = $this->getConfiguration('fieldId');
+            $itemId = $this->getItemId();
+            $galleryName = 'Field ' . $fieldId . ' Item ' . $itemId; //By default the pattern of gallery to be created: Field [FIELD_ID] Item [ITEM_ID]
+            if (! empty($this->trackerField->getOption('fileGalleryPerTrackerItemName'))) {
+                $galleryName = $this->trackerField->getOption('fileGalleryPerTrackerItemName');
+                $galleryName = preg_replace(['/%fieldId%/', '/%itemId%/'], [$fieldId, $itemId], $galleryName, 1);
+            }
+
+            $parentId = (int) $this->trackerField->getOption('galleryId');
+            //If there is no gallery choosen we'll take 'File Galleries' as gallery where the new one will be added
+            if ($parentId == 0) {
+                $parentId = $prefs['fgal_root_id'];
+            }
+
+            // Get relations between the current item and the sub-galleries
+            $relations = $relationlib->get_relations_from('trackeritem', $itemId, 'tiki.filegallery.attach');
+            foreach ($relations as $relation) {
+                if ($relation['fieldId'] === $fieldId) {
+                    $galleryId = (int) $relation['itemId'];
+                    break;
+                }
+            }
+
+            // Create a sub-gallery if none exists for the current Field
+            if (empty($galleryId)) {
+                if ($parentId == $prefs['fgal_root_id']) {
+                    $galleryId = $filegallib->replace_file_gallery(['name' => $galleryName, 'user' => $user]);
+                } else {
+                    $galleryId = $filegallib->duplicate_file_gallery($parentId, $galleryName, '', $parentId);
+                }
+                // Copy any direct permissions of the parent gallery
+                $utilities->copyParentPermissions($parentId, $galleryId);
+                // Add relation between the item and the new sub-gallery
+                $relationlib->add_relation('tiki.filegallery.attach', 'trackeritem', $itemId, 'file gallery', $galleryId, false, $fieldId);
+            }
+
+            $gal_info = $filegallib->get_file_gallery($galleryId);
+
+            if (! empty($gal_info)) {
+                //Move all files to the dedicated gallery
+                $filegallib->moveFilesToNewGallery($fileIds, $gal_info['galleryId']);
+            } else {
+                throw new Exception(tr('Gallery ID %0 not found', $galleryId));
+            }
+        }
 
         $itemId = $this->getItemId();
 
@@ -902,12 +1027,12 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                 }
             }
             $out = $out2;
-        } elseif (strstr($sortOrder, 'name')) {
+        } elseif (str_contains($sortOrder, 'name')) {
             $sep = strrpos($sortOrder, '_');
             $field = substr($sortOrder, 0, $sep);
             $dir = substr($sortOrder, $sep + 1);
             $sortArray = array_map(function ($file) use ($field) {
-                return isset($file[$field]) ? $file[$field] : '';
+                return $file[$field] ?? '';
             }, $out);
             natsort($sortArray);
             if ($dir == 'desc') {
@@ -1002,40 +1127,32 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
     public function getProvidedFields(): array
     {
         $baseKey = $this->getBaseKey();
-        if ($this->getOption('indexGeometry') && $this->getValue()) {
-            return ['geo_located', 'geo_file', 'geo_file_format', $baseKey];
-        } else {
-            $fields = [
-                $baseKey,
-                "{$baseKey}_text",
-                "{$baseKey}_names",
-                "{$baseKey}_filenames",
-                "{$baseKey}_filetypes",
-            ];
-            return $fields;
-        }
+        $fields = [
+            $baseKey,
+            "{$baseKey}_text",
+            "{$baseKey}_names",
+            "{$baseKey}_filenames",
+            "{$baseKey}_filetypes",
+            'geo_located',
+            'geo_file',
+            'geo_file_format',
+        ];
+        return $fields;
     }
 
     public function getProvidedFieldTypes(): array
     {
         $baseKey = $this->getBaseKey();
-        if ($this->getOption('indexGeometry') && $this->getValue()) {
-            return [
-                'geo_located' => 'identifier',
-                'geo_file' => 'identifier',
-                'geo_file_format' => 'identifier',
-                $baseKey => 'identifier'
-            ];
-        } else {
-            $baseKey = $this->getBaseKey();
-            return [
-                $baseKey => 'sortable',
-                "{$baseKey}_text" => 'sortable',
-                "{$baseKey}_names" => 'multivalue',
-                "{$baseKey}_filenames" => 'multivalue',
-                "{$baseKey}_filetypes" => 'multivalue',
-            ];
-        }
+        return [
+            $baseKey => 'sortable',
+            "{$baseKey}_text" => 'sortable',
+            "{$baseKey}_names" => 'multivalue',
+            "{$baseKey}_filenames" => 'multivalue',
+            "{$baseKey}_filetypes" => 'multivalue',
+            'geo_located' => 'identifier',
+            'geo_file' => 'identifier',
+            'geo_file_format' => 'identifier',
+        ];
     }
 
     public function getGlobalFields(): array
@@ -1096,7 +1213,7 @@ class Tracker_Field_Files extends \Tracker\Field\AbstractItemField implements \T
                 $fileIds = [];
                 $urls = explode("\n", $value);
                 foreach ($urls as $url) {
-                    if (substr($url, 0, strlen($base_url)) === $base_url && preg_match('/(\d+)$/', $url, $m)) {
+                    if (str_starts_with($url, $base_url) && preg_match('/(\d+)$/', $url, $m)) {
                         $fileIds[] = $m[1];
                     } else {
                         $file_info = $filegallib->get_info_from_url($url);

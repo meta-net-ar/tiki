@@ -8,17 +8,21 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'blogs';
 $inputConfiguration = [
     [
         'staticKeyFilters'       => [
         'remove'                 => 'word',               //post
         'sort_mode'              => 'word',               //get
         'offset'                 => 'int',                //get
+        'find'                   => 'string',             //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+use Tiki\SortModeValidator;
+$section = Sections::SECTION_BLOGS;
+Sections::setCurrentSection($section);
 $bloglib = TikiLib::lib('blog');
 //get_strings tra('List Blog Posts')
 if ($prefs['feature_categories'] == 'y') {
@@ -40,26 +44,17 @@ if (isset($_REQUEST["remove"]) && $access->checkCsrf()) {
 // for the information as the number of
 // days to get in the log 1,3,4,etc
 // it will default to 1 recovering information for today
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = $prefs['blog_list_order'];
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? $prefs['blog_list_order'],
+    ['tiki_blogs', 'tiki_blog_posts']
+) ?: 'created_desc';
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 // Get a list of last changes to the Wiki database
 $listpages = $bloglib->list_blogs($offset, $maxRecords, $sort_mode, $find);
@@ -72,7 +67,7 @@ for ($i = 0; $i < $temp_max; $i++) {
     $listpages["data"][$i]["individual_tiki_p_create_blogs"] = $blogperms->create_blogs ? 'y' : 'n';
 }
 $smarty->assign_by_ref('listpages', $listpages["data"]);
-$smarty->assign_by_ref('cant', $listpages["cant"]);
+$smarty->assign_by_ref('count', $listpages["count"]);
 include_once('tiki-section_options.php');
 // Display the template
 $smarty->assign('mid', 'tiki-list_blogs.tpl');

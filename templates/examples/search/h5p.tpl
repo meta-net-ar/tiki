@@ -11,8 +11,8 @@ Example wiki syntax (using the tracker from https://profiles.tiki.org/Tracker_as
   {sort mode="tracker_field_trac_as_cal_start_date_nasc"}
   {OUTPUT(template="templates/examples/search/h5p.tpl")}
     {settings type="timeline" param="date" fileId="3720"}
-    {column label="headline" field="title"}
-    {column label="text" field="tracker_field_trac_as_cal_location"}
+    {column label="{tr}headline{/tr}" field="title"}
+    {column label="{tr}text{/tr}" field="tracker_field_trac_as_cal_location"}
     {column label="startDate" field="startDate"}
     {column label="endDate" field="endDate"}
 {OUTPUT}

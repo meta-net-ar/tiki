@@ -1,1 +1,1 @@
-{tr}Go to your friendship network to accept or refuse this {$prefs.mail_template_custom_text}request{/tr} : {$server_name}
+{tr _0=$prefs.mail_template_custom_text}Go to your friendship network to accept or refuse this %0request{/tr} : {$server_name}

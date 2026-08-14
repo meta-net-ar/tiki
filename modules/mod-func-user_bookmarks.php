@@ -51,7 +51,7 @@ function module_user_bookmarks($mod_reference, $module_params)
         $ownurl = $tikilib->httpPrefix() . $_SERVER["REQUEST_URI"];
 
         // Now build urls
-        if (strstr($ownurl, '?')) {
+        if (str_contains($ownurl, '?')) {
             $modb_sep = '&amp;';
         } else {
             $modb_sep = '?';
@@ -71,7 +71,7 @@ function module_user_bookmarks($mod_reference, $module_params)
             $name = $_REQUEST["modb_name"];
             if (empty($name)) {
                 // Check if we are bookmarking a wiki-page
-                if (strstr($_SERVER["REQUEST_URI"], 'tiki-index')) {
+                if (str_contains($_SERVER["REQUEST_URI"], 'tiki-index')) {
                     // Get the page
                     if (isset($setup_query_data["page"])) {
                         $name = $setup_query_data["page"];
@@ -81,7 +81,7 @@ function module_user_bookmarks($mod_reference, $module_params)
                 }
 
                 // Check if we are bookmarking an article
-                if (strstr($_SERVER["REQUEST_URI"], 'tiki-read_article')) {
+                if (str_contains($_SERVER["REQUEST_URI"], 'tiki-read_article')) {
                     $artlib = TikiLib::lib('art');
                     $info = $artlib->get_article($setup_query_data["articleId"]);
 
@@ -89,7 +89,7 @@ function module_user_bookmarks($mod_reference, $module_params)
                 }
 
                 // Check if we are bookmarking a file gallery
-                if (strstr($_SERVER["REQUEST_URI"], 'tiki-list_file_gallery')) {
+                if (str_contains($_SERVER["REQUEST_URI"], 'tiki-list_file_gallery')) {
                     $filegallib = TikiLib::lib('filegal');
                     $info = $filegallib->get_file_gallery($setup_query_data["galleryId"]);
 
@@ -97,19 +97,19 @@ function module_user_bookmarks($mod_reference, $module_params)
                 }
 
                 // Check if we are bookmarking a forum
-                if (strstr($_SERVER["REQUEST_URI"], 'tiki-view_forum')) {
+                if (str_contains($_SERVER["REQUEST_URI"], 'tiki-view_forum')) {
                     $info = TikiLib::lib('comments')->get_forum($setup_query_data["forumId"]);
                     $name = $info["name"];
                 }
 
                 // Check if we are bookmarking a faq
-                if (strstr($_SERVER["REQUEST_URI"], 'tiki-view_faq')) {
+                if (str_contains($_SERVER["REQUEST_URI"], 'tiki-view_faq')) {
                     $info = TikiLib::lib('faq')->get_faq($setup_query_data["faqId"]);
                     $name = $info["title"];
                 }
 
                 // Check if we are bookmarking a weblog
-                if (strstr($_SERVER["REQUEST_URI"], 'tiki-view_blog')) {
+                if (str_contains($_SERVER["REQUEST_URI"], 'tiki-view_blog')) {
                     $bloglib = TikiLib::lib('blog');
                     $info = $bloglib->get_blog($setup_query_data["blogId"]);
 

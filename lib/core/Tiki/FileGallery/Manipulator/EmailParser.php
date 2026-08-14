@@ -22,14 +22,15 @@ class EmailParser extends Manipulator
         $message_content = $file->getContents();
         try {
             $message = \ZBateson\MailMimeParser\Message::from($message_content, false);
-        } catch (\Exception\RuntimeException $e) {
-            Feedback::error(tr('Failed parsing file %0 as an email.', $file->fileId) . '<br />' . $e->getMessage());
+        } catch (\RuntimeException $e) {
+            \Feedback::error(tr('Failed parsing file %0 as an email.', $file->fileId) . '<br />' . $e->getMessage());
             return false;
         }
 
         $result = [
             'source_id' => $message->getHeaderValue('X-Tiki-Source'),
             'message_id' => $message->getHeaderValue('Message-ID'),
+            'auto_move_reply' => $message->getHeaderValue('X-Auto-Move-Reply'),
             'subject' => $message->getHeaderValue('Subject'),
             'body' => $message->getContent(),
             'from' => $this->getRawAddress($message->getHeader('From')),

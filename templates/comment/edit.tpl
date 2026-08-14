@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -17,18 +17,18 @@
                 {if $prefs.comments_notitle neq 'y'}
                     <div class="mb-3 row">
                         <label for="comment-title" class="clearfix comment-title">{tr}Title{/tr}</label>
-                        <input type="text" id="comment-title" name="title" value="{$comment.title|escape}" class="form-control" placeholder="Comment title"/>
+                        <input type="text" id="comment-title" name="title" value="{$comment.title|escape}" class="form-control" placeholder="{tr}Comment title{/tr}" maxlength="{$MAX_COMMENT_TITLE_LENGTH}">
                     </div>
                 {/if}
                 {capture name=rows}{if $type eq 'forum'}{$prefs.default_rows_textarea_forum}{else}{$prefs.default_rows_textarea_comment}{/if}{/capture}
-                {textarea codemirror='true' name=data comments="y" section=$type objectId=$objectId _wysiwyg="n" rows=$smarty.capture.rows _preview=$prefs.ajax_edit_previews}{$comment.data}{/textarea}
+                {textarea codemirror='true' name=data comments="y" maxlength="{$MAX_COMMENT_DATA_LENGTH}" section=$type objectId=$objectId _wysiwyg="n" rows=$smarty.capture.rows _preview=$prefs.ajax_edit_previews}{$comment.data}{/textarea}
                 </div>
                 <div class="card-footer">
                     {if empty($comment.version)}
                         <div class="mb-3 comment-post">
                             <input type="submit" class="clearfix comment-editclass btn btn-primary" value="{tr}Save{/tr}"/>
                             <div class="btn btn-link">
-                                <a href="#" onclick="$(this).closest('.comment-container').reload(); $(this).closest('.ui-dialog').remove(); return false;">{tr}Cancel{/tr}</a>
+                                <a href="#" onclick="$(this).closest('.comment-container').reload(); $(this).closest('.ui-dialog').remove(); return false;" role="button">{tr}Cancel{/tr}</a>
                             </div>
                         </div>
                     {else}
@@ -36,8 +36,14 @@
                             <div class="card bg-body-tertiary">
                                 <div class="card-body">
                                     {foreach $diffInfo as $info}
-                                        <label>{$info.fieldName}</label> {*{$info.value} => {$info.new}<br>*}
-                                        {trackeroutput fieldId=$info.fieldId list_mode='y' history=y process=y oldValue=$info.value value=$info.new diff_style='sidediff'}
+                                        {if $info.fieldId eq HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE}
+                                            <label>{tr}Status{/tr}</label>: {$info.value} -> {$info.new}
+                                        {elseif !empty($info.isDeletedField)}
+                                            <label>{$info.fieldName}</label>: {$info.value|escape}{if empty($info.newValueUnavailable)} -> {$info.new|escape}{/if}
+                                        {else}
+                                            <label>{$info.fieldName}</label> {*{$info.value} => {$info.new}<br>*}
+                                            {trackeroutput fieldId=$info.fieldId list_mode='y' history=y process=y oldValue=$info.value value=$info.new diff_style='sidediff'}
+                                        {/if}
                                     {/foreach}
                                 </div>
                             </div>
@@ -46,7 +52,7 @@
                             <input type="hidden" name="version" value="{$comment.version|escape}"/>
                             <input type="submit" class="comment-post btn btn-primary" value="{tr}Post{/tr}"/>
                             <div class="btn btn-link">
-                                <a href="#" onclick="$(this).closest('.comment-container').reload(); $(this).closest('.ui-dialog').remove(); return false;">{tr}Cancel{/tr}</a>
+                                <a href="#" onclick="$(this).closest('.comment-container').reload(); $(this).closest('.ui-dialog').remove(); return false;" role="button">{tr}Cancel{/tr}</a>
                             </div>
                         </div>
                     {/if}

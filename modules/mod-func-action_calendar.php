@@ -41,6 +41,8 @@ function module_action_calendar($mod_reference, &$module_params)
         $group_by = 'day';
 
         include('tiki-calendar_setup.php');
+        $moduleCalendarFocusdate = isset($focusdate) ? TikiLib::date_format('%Y-%m-%d', $focusdate) : date('Y-m-d');
+        $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
 
         $viewTikiCals = $tikicalendarlib->getTikiItems(false);
         if (isset($module_params['items'])) {

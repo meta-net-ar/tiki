@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Auth\Tokens;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                    => [
@@ -17,12 +20,13 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
-require_once('lib/auth/tokens.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $access->check_feature('auth_token_access');
 $access->check_permission('tiki_p_admin');
 
-$tokenlib = AuthTokens::build($prefs);
+$tokenlib = Tokens::build($prefs);
 global $base_url;
 $action = '';
 $tokenId = 0;
@@ -41,7 +45,7 @@ if ($action == 'delete' && $tokenId > 0) {
 }
 
 if ($action == 'add') {
-    $url = filter_input(INPUT_POST, 'entry', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $url = filter_input(INPUT_POST, 'entry', FILTER_SANITIZE_URL);
     $entry = parse_url($url, PHP_URL_PATH);
     $groups = $_POST['groups'];
     $sanitizedGroups = array_map(function ($group) {
@@ -51,12 +55,7 @@ if ($action == 'add') {
     $query = parse_url($url, PHP_URL_QUERY);
 
     if (! empty($query)) {
-        $query = explode('&', $query);
-
-        foreach ($query as $element) {
-            list($key, $value) = explode('=', $element);
-            $parameters[$key] = $value;
-        }
+        parse_str($query, $parameters); // Automatically handles arrays and key-value pairs
     }
 
     $arguments = [];

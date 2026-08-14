@@ -2,11 +2,11 @@
 
 {/if}
 {if $new_topic}
-{tr}A new message was posted to {$prefs.mail_template_custom_text}forum:{/tr} {$mail_forum}
+{tr _0=$prefs.mail_template_custom_text}A new message was posted to %0forum:{/tr} {$mail_forum}
 
 {tr}New topic:{/tr} {$mail_topic}
 {tr}Author:{/tr} {if $mail_author}"{$mail_author|username}"
-{else}{tr}An anonymous {$prefs.mail_template_custom_text}user{/tr}{/if}
+{else}{tr _0=$prefs.mail_template_custom_text}An anonymous %0user{/tr}{/if}
 {tr}Title:{/tr} {$mail_title}
 {tr}Date:{/tr} {$mail_date|tiki_short_datetime:"":"n"}
 {mailurl}{$topicId|sefurl:"forum post"}{if $threadId}#threadId={$threadId}{/if}{/mailurl}

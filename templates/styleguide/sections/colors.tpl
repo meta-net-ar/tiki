@@ -46,11 +46,11 @@
     </div>
 
     <p>{tr}Sample Text{/tr}</p>
-    <p>In mauris integer etiam aliquet integer duis rhoncus <a href="#">ultricies cras</a> in habitasse ac sociis
-        porttitor placerat ac porttitor, in ac. A, tristique <a href="#">dapibus mauris</a>, vut et porta? Enim, porta
-        penatibus, augue egestas aliquam eu velit placerat, sociis hac et, pulvinar <a href="#">tincidunt amet</a> ut
+    <p>In mauris integer etiam aliquet integer duis rhoncus <a href="#" role="button">ultricies cras</a> in habitasse ac sociis
+        porttitor placerat ac porttitor, in ac. A, tristique <a href="#" role="button">dapibus mauris</a>, vut et porta? Enim, porta
+        penatibus, augue egestas aliquam eu velit placerat, sociis hac et, pulvinar <a href="#" role="button">tincidunt amet</a> ut
         turpis dapibus. Dolor. Lundium rhoncus elementum vel. Tempor sit nisi aliquam ut augue tincidunt tincidunt cum
-        <a href="#">egestas massa</a>, nunc etiam ac scelerisque auctor sed sed facilisis!
+        <a href="#" role="button">egestas massa</a>, nunc etiam ac scelerisque auctor sed sed facilisis!
     </p>
 </div>
 

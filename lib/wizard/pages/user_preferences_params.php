@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 require_once('lib/wizard/wizard.php');
 $userprefslib = TikiLib::lib('userprefs');
 
@@ -52,7 +55,6 @@ class UserWizardPreferencesParams extends Wizard
         $userwatch = $user;
 
         $smarty->assign('userwatch', $userwatch);
-        $smarty->assign('show_mouseover_user_info', isset($prefs['show_mouseover_user_info']) ? $prefs['show_mouseover_user_info'] : $prefs['feature_community_mouseover']);
 
         $mailCharsets = ['utf-8', 'iso-8859-1'];
         $smarty->assign_by_ref('mailCharsets', $mailCharsets);
@@ -94,10 +96,8 @@ class UserWizardPreferencesParams extends Wizard
         $smarty->assign('display_12hr_clock', $display_12hr_clock);
         $userinfo = $userlib->get_user_info($userwatch);
         $smarty->assign_by_ref('userinfo', $userinfo);
-        $llist = [];
         $llist = $tikilib->list_themes();
         $smarty->assign_by_ref('styles', $llist);
-        $languages = [];
         $langLib = TikiLib::lib('language');
         $languages = $langLib->list_languages();
         $smarty->assign_by_ref('languages', $languages);
@@ -230,14 +230,7 @@ class UserWizardPreferencesParams extends Wizard
         } else {
             $tikilib->set_user_preference($userwatch, 'diff_versions', 'n');
         }
-        if ($prefs['feature_community_mouseover'] == 'y') {
-            if (isset($_REQUEST['show_mouseover_user_info']) && $_REQUEST['show_mouseover_user_info'] == 'on') {
-                $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'y');
-            } else {
-                $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'n');
-            }
-        }
-        $email_isPublic = isset($_REQUEST['email_isPublic']) ? $_REQUEST['email_isPublic'] : 'n';
+        $email_isPublic = $_REQUEST['email_isPublic'] ?? 'n';
         $tikilib->set_user_preference($userwatch, 'email is public', $email_isPublic);
         $tikilib->set_user_preference($userwatch, 'mailCharset', $_REQUEST['mailCharset']);
         //// Custom fields

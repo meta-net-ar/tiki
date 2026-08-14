@@ -12,12 +12,15 @@ $inputConfiguration = [
     [
         'staticKeyFilters'            => [
             'mailin_autocheckFreq'    => 'int',  //post
-            'mailin_autocheck'        => 'bool', //post
+            'mailin_autocheck'        => 'alpha', //post
+            'set_auto'                => 'alpha', //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
-//check if feature is on
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_mailin');
 $access->check_permission(['tiki_p_admin_mailin']);
 
@@ -42,7 +45,7 @@ if (isset($_REQUEST['mailin_autocheck'])) {
                 $prefs['mailin_autocheckFreq']
             ));
         } else {
-            Feedback::warning(sprintf(tra('Automatic Mail-in accounts checking disabled')));
+            Feedback::warning(tra('Automatic Mail-in accounts checking disabled'));
         }
     }
 }
@@ -53,20 +56,15 @@ $trklib = TikiLib::lib('trk');
 
 $smarty->assign('mailin_types', $mailinlib->list_available_types());
 // check package availability
-$checkPackage = $mailinlib->checkPackage();
-if ($checkPackage == 'y') {
-    $headerlib->add_cssfile('vendor_bundled/vendor/philippemarcmeyer/fieldslinker/fieldsLinker.css');
-    $headerlib->add_jsfile('vendor_bundled/vendor/philippemarcmeyer/fieldslinker/fieldsLinker.js', true);
-    $headerlib->add_css('#original {width: 100%;}');
-} else {
-    $message = $errorMessageToAppend;
-    $message .= tr('To use Fieldslinker Tiki needs the philippemarcmeyer/fieldslinker package. If you do not have permission to install this package, ask the site administrator.');
-    Feedback::warning(sprintf(tra($message)));
-}
+
+$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/fieldslinker/dist/fieldsLinker.css');
+$headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/fieldslinker/dist/fieldsLinker.js', true);
+$headerlib->add_css('#original {width: 100%;}');
 
 $smarty->assign('mailin_types', $mailinlib->list_available_types());
-$smarty->assign('checkPackage', $checkPackage);
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
-$smarty->display('tiki-admin_mailin.tpl');
+
+$smarty->assign('mid', 'tiki-admin_mailin.tpl');
+$smarty->display('tiki.tpl');

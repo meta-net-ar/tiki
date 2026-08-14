@@ -24,7 +24,7 @@ class PackageClearCacheCommand extends Command
     protected function configure()
     {
         $this
-            ->setHelp('This command allows you to clear the composer cache.');
+            ->setHelp(tra('This command allows you to clear the composer cache.'));
     }
 
     /**

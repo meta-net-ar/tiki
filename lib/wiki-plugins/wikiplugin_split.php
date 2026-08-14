@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 function wikiplugin_split_info()
 {
     return [
@@ -52,7 +55,6 @@ function wikiplugin_split_info()
                 'since' => '1',
                 'seprator' => '|',
                 'filter' => 'text',
-                'default' => '',
             ],
             'first' => [
                 'required' => false,
@@ -112,8 +114,8 @@ function wikiplugin_split_rollback($data, $hashes)
  */
 function wikiplugin_split($data, $params, $pos)
 {
-    global $tikilib, $tiki_p_admin_wiki, $tiki_p_admin, $section;
-    global $replacement;
+    global $tikilib, $tiki_p_admin_wiki, $tiki_p_admin;
+    $section = Sections::getCurrentSection();
     preg_match_all('/{(SPLIT|CODE|HTML|FADE|JQ|JS|MOUSEOVER|VERSIONS).+{\1}/ismU', $data, $matches);
     $hashes = [];
     foreach ($matches[0] as $match) {
@@ -127,15 +129,14 @@ function wikiplugin_split($data, $params, $pos)
 
     // Remove first <ENTER> if exists...
     // it may be here if present after {SPLIT()} in original text
-    if (substr($data, 0, 2) == "\r\n") {
+    if (str_starts_with($data, "\r\n")) {
         $data2 = substr($data, 2);
     } else {
         $data2 = $data;
     }
 
     extract($params, EXTR_SKIP);
-    $fixedsize = (! isset($fixedsize) || $fixedsize == 'y' || $fixedsize == 1 ? true : false);
-    $joincols  = (! isset($joincols)  || $joincols == 'y' || $joincols == 1 ? true : false);
+    $fixedsize = $fixedsize == 'y' || $fixedsize == 1;
     // Split data by rows and cells
 
     $smarty = TikiLib::lib('smarty');
@@ -158,53 +159,41 @@ function wikiplugin_split($data, $params, $pos)
     }
 
     $percent = false;
-    if (isset($colsize)) {
-        $tdsize = explode("|", $colsize);
-        $tdtotal = 0;
+    if (! is_null($colsize)) {
+        $tdsize = is_array($colsize) ? $colsize : explode('|', $colsize);
         for ($i = 0; $i < $maxcols; $i++) {
             if (! isset($tdsize[$i])) {
                 $tdsize[$i] = 0;
             } else {
                 $tdsize[$i] = trim($tdsize[$i]);
-                if (strstr($tdsize[$i], '%')) {
+                if (str_contains($tdsize[$i], '%')) {
                     $percent = true;
                 }
             }
-            $tdtotal += (float)$tdsize[$i];
-        }
-        $tdtotaltd = floor($tdtotal / 100 * 100);
-        if ($tdtotaltd == 100) { // avoir IE to do to far
-            $class = 'class="table split"';
-        } else {
-            $class = 'class="split" width="' . $tdtotaltd . '%"';
         }
     } elseif ($fixedsize) {
         $columnSize = floor(100 / $maxcols);
-        $class = 'class="table split"';
         $percent = true;
-    }
-    if (! isset($edit)) {
-        $edit = 'n';
     }
     $result = "<div class='table-responsive'><div><table class='table" . ($percent ? " normalnoborder" : "") . ( ! empty($customclass) ? " $customclass" : "") . "'>";
 
-    // Attention: Dont forget to remove leading empty line in section ...
+    // Attention: Don't forget to remove leading empty line in section ...
     //            it should remain from previous '---' line...
     // Attention: original text must be placed between \n's!!!
-    if (! isset($first) || $first != 'col') {
+    if ($first != 'col') {
         foreach ($rows as $r) {
             $result .= "<tr>";
             $idx = 1;
             foreach ($r as $i) {
                 // Remove first <ENTER> if exists
-                if (substr($i, 0, 2) == "\r\n") {
+                if (str_starts_with($i, "\r\n")) {
                     $i = substr($i, 2);
                 }
                 // Generate colspan for last element if needed
                 $colspan = ((count($r) == $idx) && (($maxcols - $idx) > 0) ? ' colspan="' . ($maxcols - $idx + 1) . '"' : '');
                 $idx++;
                 // Add cell to table
-                if (isset($colsize)) {
+                if (! is_null($colsize)) {
                     $width = ' width="' . $tdsize[$idx - 2] . '"';
                 } elseif ($fixedsize) {
                     $width = ' width="' . $columnSize . '%" ';
@@ -243,11 +232,11 @@ function wikiplugin_split($data, $params, $pos)
         foreach ($rows as $r) {
             $result .= '<td ' . (($fixedsize && isset($tdsize)) ? ' width="' . $tdsize[$idx] . (strstr($tdsize[$idx], '%') ? '' : '%') . '"' : '') . '>';
             foreach ($r as $i) {
-                if (substr($i, 0, 2) == "\r\n") {
+                if (str_starts_with($i, "\r\n")) {
                     $i = substr($i, 2);
                     $ind += 2;
                 }
-                if ($edit == 'y' && $perm && $section == 'wiki page') {
+                if ($edit == 'y' && $perm && Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE)) {
                     $result .= '<div class="split"><div style="float:right">';
                     $result .= "$pos-$icell-" . htmlspecialchars(substr($data, $pos, 10));
                     $result .= '<a href="tiki-editpage.php?page=' . $object . '&amp;pos=' . $pos . '&amp;cell=' . $icell . '">'
@@ -280,8 +269,6 @@ function wikiplugin_split_cell($data, $pos, $cell)
 {
     $start = $pos;
     $end = $pos;
-    $no_parsed = '~np~|~pp~|\\<pre\\>|\\<PRE\\>';
-    $no_parsed_end = '';
     $match = '@@@+|----*|\{SPLIT\}|\{SPLIT\(|~np~|~pp~|\\<pre\\>|\\<PRE\\>';
     while (true) {
         if (! preg_match("#($match)#m", substr($data, $pos), $matches)) {
@@ -292,7 +279,7 @@ function wikiplugin_split_cell($data, $pos, $cell)
         } else {
             $end = $pos + strpos(substr($data, $pos), $matches[1]);
             $start_next_tag = $end + strlen($matches[1]);
-            if (substr($matches[1], 0, 3) == '@@@' || $matches[1] == '---') {
+            if (str_starts_with($matches[1], '@@@') || $matches[1] == '---') {
                 if (! $cell) {
                     break;
                 }

@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -13,7 +13,7 @@
         </div>
     </div>
     <div class="mb-3 row">
-        <label for="priority" class="col-md-3 col-form-label">Priority</label>
+        <label for="priority" class="col-md-3 col-form-label">{tr}Priority{/tr}</label>
         <div class="col-md-9">
             <select name="priority" class="form-select">
                 {foreach $priorities as $key => $info}
@@ -25,7 +25,7 @@
     <div class="mb-3 row">
         <label for="label" class="col-md-3 col-form-label">{tr}Description{/tr}</label>
         <div class="col-md-9">
-            <textarea class="form-control" name="description" rows="5" data-codemirror="true" data-syntax="tiki">{$description|escape}</textarea>
+            {textarea _simple='y' _toolbars='n' _wysiwyg='n' name='description' id='description' codemirror='true' rows='5' class='form-control'}{$description|escape}{/textarea}
         </div>
     </div>
     <div class="mb-3 submit">

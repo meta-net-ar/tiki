@@ -38,7 +38,6 @@ function wikiplugin_archivebuilder($data, $params)
         $files = [];
 
         $handlers = [
-            'tracker-attachments' => 'wikiplugin_archivebuilder_trackeratt',
             'tracker-files' => 'wikiplugin_archivebuilder_trackerfiles',
             'page-as-pdf' => 'wikiplugin_archivebuilder_pagetopdf',
         ];
@@ -83,7 +82,7 @@ function wikiplugin_archivebuilder($data, $params)
         $label = tra('Download archive');
 
         $urlParts = parse_url($_SERVER['REQUEST_URI']);
-        $path = isset($urlParts['path']) ? $urlParts['path'] : '/';
+        $path = $urlParts['path'] ?? '/';
         if (isset($urlParts['query'])) {
             parse_str($urlParts['query'], $archiveParams);
         } else {
@@ -107,35 +106,6 @@ function wikiplugin_archivebuilder($data, $params)
     }
 }
 
-function wikiplugin_archivebuilder_trackeratt($basepath, $trackerItem)
-{
-    $trklib = TikiLib::lib('trk');
-    $data = $trklib->get_tracker_item($trackerItem);
-
-    $item = Tracker_Item::fromInfo($data);
-
-    if (! $item->canView()) {
-        return [];
-    }
-
-    $basepath = rtrim($basepath, '/') . '/';
-    if ($basepath == '/') {
-        $basepath = '';
-    }
-
-    $attachments = [];
-
-    $files = $trklib->list_item_attachments($trackerItem, 0, -1, 'attId_asc');
-    foreach ($files['data'] as $file) {
-        $name = $basepath . $file['filename'];
-        $complete = $trklib->get_item_attachment($file['attId']);
-
-        $attachments[$name] = wikiplugin_archivebuilder_tracker_get_attbody($complete);
-    }
-
-    return $attachments;
-}
-
 function wikiplugin_archivebuilder_trackerfiles($basepath, $trackerItem)
 {
     $trklib = TikiLib::lib('trk');
@@ -154,10 +124,9 @@ function wikiplugin_archivebuilder_trackerfiles($basepath, $trackerItem)
 
     $attachments = [];
 
-    /** @var FileGalLib $fileGal */
-    $fileGal = TikiLib::lib('filegal');
+
     /** @var Tracker_Definition $definition */
-    $definition = $fields = $item->getDefinition();
+    $definition = $item->getDefinition();
     $fields = $definition->getFields();
     foreach ($fields as $field) {
         if ($field['type'] == 'FG') {

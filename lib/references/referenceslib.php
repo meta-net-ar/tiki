@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -15,9 +15,9 @@ class ReferencesLib extends TikiLib
     public function list_references($page)
     {
         $query = 'select * from `tiki_page_references` WHERE `page_id`=? ORDER BY `biblio_code`';
-        $query_cant = 'select count(*) from `tiki_page_references` WHERE `page_id`=?';
+        $query_count = 'select count(*) from `tiki_page_references` WHERE `page_id`=?';
         $result = $this->query($query, [$page]);
-        $cant = $this->getOne($query_cant, [$page]);
+        $count = $this->getOne($query_count, [$page]);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -29,7 +29,7 @@ class ReferencesLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
 
         return $retval;
     }
@@ -37,9 +37,9 @@ class ReferencesLib extends TikiLib
     public function list_assoc_references($page)
     {
         $query = 'select * from `tiki_page_references` WHERE `page_id`=? ORDER BY `biblio_code`';
-        $query_cant = 'select count(*) from `tiki_page_references` WHERE `page_id`=?';
+        $query_count = 'select count(*) from `tiki_page_references` WHERE `page_id`=?';
         $result = $this->query($query, [$page]);
-        $cant = $this->getOne($query_cant, [$page]);
+        $count = $this->getOne($query_count, [$page]);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -48,7 +48,7 @@ class ReferencesLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
 
         return $retval;
     }
@@ -56,9 +56,9 @@ class ReferencesLib extends TikiLib
     public function get_references_from_biblio($code)
     {
         $query = 'select * from `tiki_page_references` WHERE `biblio_code`=?';
-        $query_cant = 'select count(*) from `tiki_page_references` WHERE `biblio_code`=?';
+        $query_count = 'select count(*) from `tiki_page_references` WHERE `biblio_code`=?';
         $result = $this->query($query, [$code]);
-        $cant = $this->getOne($query_cant, [$code]);
+        $count = $this->getOne($query_count, [$code]);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -67,7 +67,7 @@ class ReferencesLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
 
         return $retval;
     }
@@ -114,7 +114,6 @@ class ReferencesLib extends TikiLib
         }
         $biblios = substr($biblios, 0, strlen($biblios) - 1);
 
-        $codes = "'first'" . ',' . 'second';
         $query = "select * from `tiki_page_references` WHERE `biblio_code` IN ($biblios) AND `page_id`=?";
         $result = $this->query($query, [$page]);
 
@@ -169,10 +168,10 @@ class ReferencesLib extends TikiLib
             $query .= 'LIMIT ' . (int)$offset . ', ' . (int)$maxRecords;
         }
 
-        $query_cant = 'select count(*) from `tiki_page_references` WHERE `page_id` IS NULL ' . $filter;
+        $query_count = 'select count(*) from `tiki_page_references` WHERE `page_id` IS NULL ' . $filter;
 
         $result = $this->query($query, $queryArg);
-        $cant = $this->getOne($query_cant, $queryArg);
+        $count = $this->getOne($query_count, $queryArg);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -181,7 +180,7 @@ class ReferencesLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
 
         return $retval;
     }

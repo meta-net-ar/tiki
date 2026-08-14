@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'blogs';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -22,8 +21,8 @@ $inputConfiguration = [
         'publish_Month'            => 'digits',            //post
         'publish_Day'              => 'digits',            //post
         'publish_Year'             => 'digits',            //post
-        'cancel'                   => 'bool',              //post
-        'referer'                  => 'word',              //post
+        'cancel'                   => 'alpha',             //post
+        'referer'                  => 'url',               //post
         'lang'                     => 'lang',              //post
         'data'                     => 'none',              //post
         'mode_normal'              => 'bool',              //post
@@ -32,22 +31,25 @@ $inputConfiguration = [
         'preview'                  => 'bool',              //post
         'excerpt'                  => 'text',              //post
         'freetag_string'           => 'text',              //post
-        'save'                     => 'bool',              //post
+        'save'                     => 'alpha',             //post
         'contributions'            => 'text',              //post
         'title'                    => 'string',            //post
-        'geolocation'              => 'word',              //post
+        'geolocation'              => 'text',              //post
         ],
     ],
 ];
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_BLOGS;
+Sections::setCurrentSection($section);
 $categlib = TikiLib::lib('categ');
 $bloglib = TikiLib::lib('blog');
 $editlib = TikiLib::lib('edit');
 
 $access->check_feature('feature_blogs');
 
-$blogId = isset($_REQUEST['blogId']) ? $_REQUEST['blogId'] : 0;
+$blogId = $_REQUEST['blogId'] ?? 0;
 
 // Now check which blogs the user has permission to post (if any)
 if ($tiki_p_blog_admin == 'y') {
@@ -71,7 +73,7 @@ if ($blogId > 0) {
     $smarty->assign_by_ref('blog_data', $blog_data);
 }
 
-$postId = isset($_REQUEST["postId"]) ? $_REQUEST["postId"] : 0;
+$postId = $_REQUEST["postId"] ?? 0;
 
 if ($postId > 0) {
     $data = $bloglib->get_post($_REQUEST["postId"]);
@@ -90,6 +92,7 @@ if ($postId > 0) {
 
 $smarty->assign('blogId', $blogId);
 $smarty->assign('postId', $postId);
+$smarty->assign('MAX_BLOG_POST_TITLE_LENGTH', BlogLib::MAX_BLOG_POST_TITLE_LENGTH);
 
 //Use 12- or 24-hour clock for $publishDate time selector based on admin and user preferences
 $userprefslib = TikiLib::lib('userprefs');
@@ -204,10 +207,10 @@ if (isset($_POST["preview"])) {
     $post_info['parsed_data'] = $parsed_data;
 
     $post_info['title'] = $_POST['title'];
-    $post_info['excerpt'] = isset($_POST['excerpt']) ? $_POST['excerpt'] : '';
-    $post_info['user'] = isset($data) ? $data['user'] : $user;
+    $post_info['excerpt'] = $_POST['excerpt'] ?? '';
+    $post_info['user'] = $data['user'] ?? $user;
     $post_info['created'] = $publishDate;
-    $post_info['avatar'] = isset($data) ? $data['avatar'] : '';
+    $post_info['avatar'] = $data['avatar'] ?? '';
     $post_info['postId'] = $postId;
 
     if ($prefs['feature_freetags'] == 'y' && isset($_POST['freetag_string'])) {
@@ -229,23 +232,31 @@ if (isset($_POST['save']) && $prefs['feature_contribution'] == 'y' && $prefs['fe
 }
 
 if (isset($_POST['save']) && ! $contribution_needed && $access->checkCsrf()) {
+    if (isset($_POST["title"])) {
+        $validateTitleFieldLength = Feedback::validateFieldLength("Name", $_POST["title"], BlogLib::MAX_BLOG_POST_TITLE_LENGTH);
+        if (! $validateTitleFieldLength) {
+            $smarty->assign('mid', 'tiki-blog_post.tpl');
+            $smarty->display("tiki.tpl");
+            die;
+        }
+    }
     $smarty->assign('individual', 'n');
 
     // TODO ImageGalleryRemoval23.x replace with a file gallery version
     //$edit_data = $imagegallib->capture_images($edit_data);
     $edit_data = $tikilib->convertAbsoluteLinksToRelative($edit_data);
 
-    $title = isset($_POST['title']) ? $_POST['title'] : '';
+    $title = $_POST['title'] ?? '';
 
     if ($postId > 0) {
-        $bloglib->update_post($postId, $_POST["blogId"], $edit_data, $_POST['excerpt'] ?? '', $data["user"], $title, isset($_POST['contributions']) ? $_POST['contributions'] : '', $blogpriv, $publishDate, $is_wysiwyg);
+        $bloglib->update_post($postId, $_POST["blogId"], $edit_data, $_POST['excerpt'] ?? '', $data["user"], $title, $_POST['contributions'] ?? '', $blogpriv, $publishDate, $is_wysiwyg);
     } else {
         if ($blog_data['always_owner'] == 'y') {
             $author = $blog_data['user'];
         } else {
             $author = $user;
         }
-        $postId = $bloglib->blog_post($_POST["blogId"], $edit_data, $_POST['excerpt'] ?? '', $author, $title, isset($_POST['contributions']) ? $_POST['contributions'] : '', $blogpriv, $publishDate, $is_wysiwyg);
+        $postId = $bloglib->blog_post($_POST["blogId"], $edit_data, $_POST['excerpt'] ?? '', $author, $title, $_POST['contributions'] ?? '', $blogpriv, $publishDate, $is_wysiwyg);
         $smarty->assign('postId', $postId);
     }
 

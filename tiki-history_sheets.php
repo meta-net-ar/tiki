@@ -64,7 +64,7 @@ $historyTimestamps[0] = $history[$sheetIndexes[0]]['stamp'] ?? null;
 $historyTimestamps[1] = $history[$sheetIndexes[1]]['stamp'] ?? null;
 
 $smarty->assign_by_ref('sheetIndexes', $sheetIndexes);
-$smarty->assign('ver_cant', count($history));
+$smarty->assign('ver_count', count($history));
 $smarty->assign('grid_content', $sheetlib->diff_sheets_as_html($_REQUEST["sheetId"], $historyTimestamps));
 
 $cookietab = 1;

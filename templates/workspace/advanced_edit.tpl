@@ -1,12 +1,12 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="navigation"}
     <div class="navbar">
-        <a class="btn btn-primary" href="{service controller=workspace action=list_templates}" title="{tr}List{/tr}">
+        <a class="btn btn-primary" role="button" href="{service controller=workspace action=list_templates}" title="{tr}List{/tr}">
             {icon name="list"} {tr}Workspace Templates{/tr}
         </a>
     </div>
@@ -30,7 +30,7 @@
         </div>
         <div class="mb-3 row">
             <div class="col-sm-12">
-                {textarea syntax='tiki' codemirror='true'}{$definition}{/textarea}
+                {textarea _syntax='tiki' codemirror='true'}{$definition}{/textarea}
             </div>
         </div>
         <div class="submit text-center">

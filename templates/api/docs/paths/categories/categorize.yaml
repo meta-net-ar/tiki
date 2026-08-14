@@ -6,10 +6,15 @@ post:
       application/x-www-form-urlencoded:
         schema:
           type: object
+          required:
+            - categIds
+            - objects
           properties:
-            categId:
-              type: integer
-              description: The ID of the category to categorize the objects under
+            categIds[]:
+              type: array
+              description: Category identifiers. An array of category IDs to categorize the objects under
+              items:
+                type: integer
             objects[]:
               $ref: schemas-TikiObjects.yaml
   responses:
@@ -18,15 +23,9 @@ post:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              categId:
-                type: integer
-              objects:
-                type: array
-              count:
-                type: string
-                description: Number of objects residing in the category or 'unchanged' if action didn't perform any updates
+            oneOf:
+              - $ref: schemas-CategorizeSingleCateg.yaml
+              - $ref: schemas-CategorizeMultiCateg.yaml
     '403':
       description: forbidden
       content:

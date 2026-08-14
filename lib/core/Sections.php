@@ -5,12 +5,116 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+/**
+ * Tiki\Sections - Section Configuration & Object Detection
+ *
+ * Defines all application sections and their metadata for permissions,
+ * toolbars, and object type mapping. Provides automatic object detection
+ * from request parameters.
+ *
+ * USAGE:
+ * - Access section metadata: $sections = Sections::getSections()
+ * - Detect current object: $object = Sections::currentObject($_REQUEST)
+ * - Use constants ex:
+ *   $section = Sections::SECTION_WIKI;
+ *
+ * Each section defines required features, request parameters, and object types
+ * for proper permission checking and UI behavior.
+ */
+
 namespace Tiki;
 
 use TikiLib;
 
 class Sections
 {
+    public const SECTION_WIKI_PAGE = 'wiki page';
+    public const SECTION_BLOGS = 'blogs';
+    public const SECTION_FILE_GALLERIES = 'file_galleries';
+    public const SECTION_FORUMS = 'forums';
+    public const SECTION_FORUM = 'forum';
+    public const SECTION_CMS = 'cms';
+    public const SECTION_TRACKERS = 'trackers';
+    public const SECTION_MY_TIKI = 'mytiki';
+    public const SECTION_USER_MESSAGES = 'user_messages';
+    public const SECTION_WEBMAIL = 'webmail';
+    public const SECTION_CONTACTS = 'contacts';
+    public const SECTION_FAQS = 'faqs';
+    public const SECTION_QUIZZES = 'quizzes';
+    public const SECTION_POLL = 'poll';
+    public const SECTION_SURVEYS = 'surveys';
+    public const SECTION_FEATURED_LINKS = 'featured_links';
+    public const SECTION_DIRECTORY = 'directory';
+    public const SECTION_CALENDAR = 'calendar';
+    public const SECTION_CATEGORIES = 'categories';
+    public const SECTION_HTML_PAGES = 'html_pages';
+    public const SECTION_NEWSLETTERS = 'newsletters';
+    public const SECTION_VALIDATE_EMAIL = 'validate email';
+    public const SECTION_WIKI = 'wiki';
+    public const SECTION_ADMIN = 'admin';
+    public const SECTION_DOCS = 'docs';
+    public const SECTION_FREETAGS = 'freetags';
+    public const SECTION_GLOBAL = 'global';
+    public const SECTION_LIVESUPPORT = 'livesupport';
+    public const SECTION_SEARCH = 'search';
+    public const SECTION_SHARE = 'share';
+    public const SECTION_SHEET = 'sheet';
+    public const SECTION_CHAT = 'chat';
+    public const SECTION_ADMIN_LAYOUT = 'admin layout';
+    // 'admin layout' section is special as it is used for the admin/management pages that should behave as control panels in the Unified Admin Backend UI (if there is a need to exclude an admin page from that layout, do NOT assign it to this one)
+
+    private static $currentSection;
+
+    /**
+     * Callbacks triggered when the current section changes
+     * @var array
+     */
+    private static $sectionChangeCallbacks = [];
+
+    /**
+     * Returns all defined sections.
+     *
+     * @return array
+     */
+    public static function getAllSections(): array
+    {
+        return [
+            self::SECTION_WIKI_PAGE,
+            self::SECTION_BLOGS,
+            self::SECTION_FILE_GALLERIES,
+            self::SECTION_FORUMS,
+            self::SECTION_FORUM,
+            self::SECTION_CMS,
+            self::SECTION_TRACKERS,
+            self::SECTION_MY_TIKI,
+            self::SECTION_USER_MESSAGES,
+            self::SECTION_WEBMAIL,
+            self::SECTION_CONTACTS,
+            self::SECTION_FAQS,
+            self::SECTION_QUIZZES,
+            self::SECTION_POLL,
+            self::SECTION_SURVEYS,
+            self::SECTION_FEATURED_LINKS,
+            self::SECTION_DIRECTORY,
+            self::SECTION_CALENDAR,
+            self::SECTION_CATEGORIES,
+            self::SECTION_HTML_PAGES,
+            self::SECTION_NEWSLETTERS,
+            self::SECTION_VALIDATE_EMAIL,
+            self::SECTION_WIKI,
+            self::SECTION_ADMIN,
+            self::SECTION_DOCS,
+            self::SECTION_FREETAGS,
+            self::SECTION_GLOBAL,
+            self::SECTION_LIVESUPPORT,
+            self::SECTION_SEARCH,
+            self::SECTION_SHARE,
+            self::SECTION_SHEET,
+            self::SECTION_CHAT,
+            self::SECTION_ADMIN_LAYOUT,
+        ];
+    }
+
     protected static $sections = [
         // tra('Wiki Page') -- tra() comments are there for get_strings.php
         'wiki page' => [
@@ -161,6 +265,62 @@ class Sections
         ],
     ];
 
+    public static function setCurrentSection(string $section): void
+    {
+        global $prefs;
+
+        if (! in_array($section, self::getAllSections(), true)) {
+            throw new \InvalidArgumentException("Invalid section: $section");
+        }
+
+        if ($prefs['theme_unified_admin_backend'] !== 'y' && $section === self::SECTION_ADMIN_LAYOUT) {
+            // Trigger SECTION_ADMIN instead of SECTION_ADMIN_LAYOUT when UAB is disabled
+            $section = self::SECTION_ADMIN;
+            self::$currentSection = $section;
+            self::triggerSectionChangeCallbacks($section);
+        }
+
+        if (self::$currentSection !== $section) {
+            // Trigger callbacks when section changes
+            self::$currentSection = $section;
+            self::triggerSectionChangeCallbacks($section);
+        }
+    }
+
+    public static function getCurrentSection(): ?string
+    {
+        return self::$currentSection;
+    }
+
+    public static function isCurrentSection(string $section): bool
+    {
+        return self::$currentSection === $section;
+    }
+
+    /**
+     * Register a callback to be triggered when the section changes
+     *
+     * @param callable $callback Function to call when section changes. Receives section name as parameter.
+     * @return void
+     */
+    public static function onSectionChange(callable $callback): void
+    {
+        self::$sectionChangeCallbacks[] = $callback;
+    }
+
+    /**
+     * Triggers all registered callbacks when the section changes
+     *
+     * @param string $section The new section
+     * @return void
+     */
+    private static function triggerSectionChangeCallbacks(string $section): void
+    {
+        foreach (self::$sectionChangeCallbacks as $callback) {
+            call_user_func($callback, $section);
+        }
+    }
+
     /**
      * Retrieves the list of sections
      *
@@ -180,20 +340,22 @@ class Sections
      */
     public static function currentObject($request = null)
     {
-        global $section, $cat_type, $cat_objid, $postId, $prefs;
+        global $cat_type, $cat_objid, $postId, $prefs;
+        // PHP 8.5 deprecates null as an array offset; normalize to ''.
+        $section = self::getCurrentSection() ?? '';
 
         if (! is_array($request)) {
             $request = $_REQUEST; // use the global request object
         }
 
-        if ($section == 'blogs' && ! empty($postId)) { // blog post check the category on the blog - but freetags are on blog post
+        if (self::isCurrentSection(self::SECTION_BLOGS) && ! empty($postId)) { // blog post check the category on the blog - but freetags are on blog post
             return [
                 'type' => 'blog post',
                 'object' => $postId,
             ];
         }
 
-        if ($section == 'forums' && ! empty($request['comments_parentId'])) {
+        if (self::isCurrentSection(self::SECTION_FORUMS) && ! empty($request['comments_parentId'])) {
             return [
                 'type' => 'forum post',
                 'object' => $request['comments_parentId'],
@@ -202,12 +364,16 @@ class Sections
 
         // Pretty tracker pages return the tracker item object instead of the parent wiki page object
         // We expose the parent wiki page type and objectId for the benefit of modules, plugins or smarty functions which may want to access the parent page categories and permissions
-        if ($section == 'wiki page' && isset($request['itemId'])) {
+        if (self::isCurrentSection(self::SECTION_WIKI_PAGE) && isset($request['itemId'])) {
+            $parentObject = $cat_objid;
+            if (empty($parentObject) && ! empty($request['page'])) {
+                $parentObject = $request['page'];
+            }
             return [
                 'type' => 'trackeritem',
                 'object' => (int)$request['itemId'],
                 'parentType' => $cat_type,
-                'parentObject' => $cat_objid,
+                'parentObject' => $parentObject,
             ];
         }
 
@@ -218,7 +384,7 @@ class Sections
             ];
         }
 
-        if ($section == 'trackers' && ! empty($request['itemId'])) {
+        if (self::isCurrentSection(self::SECTION_TRACKERS) && ! empty($request['itemId'])) {
             return [
                 'type' => 'trackeritem',
                 'object' => $request['itemId'],
@@ -243,6 +409,13 @@ class Sections
                     $k = $request[$info['key']];
                     // when using wiki_url_scheme the page request var is the page slug, not the page/object name
                     if ($prefs['wiki_url_scheme'] !== 'urlencode' && $info['objectType'] === 'wiki page') {
+                        global $jitRequest;
+                        if ($prefs["feature_sefurl_tracker_prefixalias"] == 'y') {
+                            $referencedPages = TikiLib::lib('wiki')->get_pages_by_alias($k);
+                            if ($referencedPages) {
+                                $k = $referencedPages[0];
+                            }
+                        }
                         $k = TikiLib::lib('wiki')->get_page_by_slug($k);
                     }
                 }

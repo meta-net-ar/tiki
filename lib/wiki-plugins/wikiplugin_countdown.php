@@ -22,7 +22,6 @@ function wikiplugin_countdown_info()
                 'description' => tra('Target date and time. Multiple formats accepted.'),
                 'since' => '1',
                 'filter' => 'datetime',
-                'default' => '',
             ],
             'show' => [
                 'required' => false,
@@ -146,10 +145,7 @@ function wikiplugin_countdown_info()
 function wikiplugin_countdown($data, $params)
 {
     extract($params, EXTR_SKIP);
-    //must have an enddate
-    if (! isset($enddate)) {
-        return '<strong>' . tra('Countdown: Missing "enddate" parameter for plugin') . '</strong><br />';
-    }
+
     //set now date and time
     global $tikilib;
     $tz = $tikilib->get_display_timezone();
@@ -212,12 +208,12 @@ function wikiplugin_countdown($data, $params)
         $show_minutes = false;
         $show_seconds = false;
     } else {
-        $show_years = (strpos($show, 'y') === false) ? false : true;
-        $show_months = (strpos($show, 'o') === false) ? false : true;
-        $show_days = strpos($show, 'd') === false ? false : true;
-        $show_hours = strpos($show, 'h') === false ? false : true;
-        $show_minutes = strpos($show, 'm') === false ? false : true;
-        $show_seconds = strpos($show, 's') === false ? false : true;
+        $show_years = str_contains($show, 'y');
+        $show_months = str_contains($show, 'o');
+        $show_days = str_contains($show, 'd');
+        $show_hours = str_contains($show, 'h');
+        $show_minutes = str_contains($show, 'm');
+        $show_seconds = str_contains($show, 's');
     }
 
     if ($show_days) {
@@ -228,9 +224,8 @@ function wikiplugin_countdown($data, $params)
         }
         if (
             (($timediff < 0 && $diff['invert'] == 1) || ($timediff > 0 && $diff['invert'] == 0))
-            && isset($caldays) && $caldays == 'y' && $show_hours === false
+            && $caldays == 'y' && $show_hours === false
         ) {
-            $int = is_int($days);
             $diff['caldays'] = $days + 1;
         } else {
             $diff['caldays'] = $days;
@@ -240,7 +235,7 @@ function wikiplugin_countdown($data, $params)
     //create the countdown string
     $ret = '';
     $word = '';
-    if ($diff['invert'] == 1 || (isset($since) && $since == 'y')) {
+    if ($diff['invert'] == 1 || $since == 'y') {
     //either before the event or if countdown also shown after the event
         //calculate total time in hours, minutes or seconds
         $diff['months'] = abs(($diff['y'] * 12) + $diff['o']);
@@ -432,9 +427,9 @@ function wikiplugin_countdown($data, $params)
         }
     //if after the event and no countdown shown
     } elseif (! empty($data)) {
-        if (empty($text) || strpos($text, '|') === false) {
+        if (empty($text) || ! str_contains($text, '|')) {
             $word = tra('is over');
-        } elseif (strpos($text, '|') !== false) {
+        } elseif (str_contains($text, '|')) {
             $custom = explode('|', $text);
             //$custom[4] = text to display after event occurs when no countdown is shown because since set to n
             $word = ! empty($custom[4]) ? $custom[4] : '';

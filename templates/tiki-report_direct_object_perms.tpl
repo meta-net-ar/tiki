@@ -5,7 +5,7 @@
     <tr>
         <th>Pagename</th>
     </tr>
-    {foreach from=$pagesWithDirectPerms item=pageName }
+    {foreach from=$pagesWithDirectPerms item=pageName}
         <tr>
             <td><a href="tiki-index.php?page={$pageName}">{$pageName}</a></td>
         </tr>

@@ -52,14 +52,14 @@
             {/if}
             {if !$ts.enabled}
                 {include file='find.tpl' find_show_num_rows='y'}
-                {if $cant_pages > $maxRecords or !empty($initial) or !empty($find)}
+                {if $pages_count > $maxRecords or !empty($initial) or !empty($find)}
                     {initials_filter_links}
                 {/if}
             {/if}
             <form id="checkform1" method="post">
             <div class="{if $js}table-responsive {/if}ts-wrapperdiv"> {* table-responsive class cuts off css drop-down menus *}
         {/if}
-            <table id="{$ts.tableid}" class="table normal table-striped table-hover" data-count="{$cant_pages|escape}">
+            <table id="{$ts.tableid}" class="table normal table-striped table-hover" data-count="{$pages_count|escape}">
                 <thead>
                 <tr>
                     <th id="checkbox">{select_all checkbox_names='checked[]' tablesorter="{$ts.enabled}"}</th>
@@ -115,7 +115,17 @@
 
                         {if $prefs.useGroupHome eq 'y'}
                             <td class="text">
-                                <a class="link" href="{$users[user].groupHome|sefurl}" title="{tr}Group Homepage{/tr}">{tr}{$users[user].groupHome}{/tr}</a>
+                                {if !empty($users[user].groupHome)}
+                                    <a class="link" href="{$users[user].groupHome|sefurl}" title="{tr}Group Homepage{/tr}">{tr}{$users[user].groupHome}{/tr}</a>
+                                {else}
+                                    <span class="text-muted">
+                                        {tr}Group homepage is not defined{/tr}.
+                                        <a class="btn btn-link p-0 align-baseline"
+                                            href="tiki-admingroups.php?group={$users[user].groupName|escape:"url"}{if $prefs.feature_tabs ne 'y'}#tab2{/if}">
+                                            {tr}Configure{/tr}
+                                        </a>
+                                    </span>
+                                {/if}
                             </td>
                         {/if}
 
@@ -129,7 +139,7 @@
                                     </a>
                                 </action>
                                 <action>
-                                    {permission_link mode=text group=$users[user].groupName count=$users[user].permcant}
+                                    {permission_link mode=text group=$users[user].groupName count=$users[user].permcount}
                                 </action>
                                 {if $users[user].groupName ne 'Anonymous' and $users[user].groupName ne 'Registered' and $users[user].groupName ne 'Admins'}
                                     <action>
@@ -149,7 +159,7 @@
                 </div>
                     <div class="input-group col-sm-8">
                         <label for="submit_mult" class="col-form-label sr-only">{tr}Select action to perform with checked{/tr}</label>
-                            <select name="action" class="form-select">
+                            <select name="action" id="submit_mult" class="form-select">
                                 <option value="no_action" selected disabled>{tr}Select action to perform with checked{/tr}...</option>
                                 <option value="remove_groups">{tr}Remove{/tr}</option>
                             </select>
@@ -164,16 +174,16 @@
                     </div>
             </form>
             {if !$ts.enabled}
-                {pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+                {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
             {/if}
         {/if}
     {/tab}
 
     {if $groupname}
-        {assign var=tabaddeditgroup_admgrp value="{tr}Edit{/tr}"}
+        {$tabaddeditgroup_admgrp="{tr}Edit{/tr}"}
         {$gname = "<i>{$groupname|escape}</i>"}
     {else}
-        {assign var=tabaddeditgroup_admgrp value="{tr}Create group{/tr}"}
+        {$tabaddeditgroup_admgrp="{tr}Create group{/tr}"}
         {$gname = ""}
     {/if}
 
@@ -193,7 +203,7 @@
                             {$title = "{$groupname}:{tr}Group IS being monitored. Click icon to STOP monitoring.{/tr}"}
                             {$iconname = 'stop-watching'}
                         {/if}
-                        <button type="submit" class="tips btn btn-link" title="{$title}">
+                        <button type="submit" class="tips btn btn-link" title="{$title}" aria-label="{$title}">
                             {icon name="{$iconname}"}
                         </button>
                     </form>
@@ -238,7 +248,7 @@
                             {/foreach}
                         </select>
                         <div class="form-text">
-                            <p>{tr}Permissions will be inherited from these groups.{/tr} {if $prefs.jquery_select2 neq 'y'}{tr}Use Ctrl+Click to select multiple options{/tr}</p>{/if}
+                            <p>{tr}Permissions will be inherited from these groups.{/tr} {if $prefs.elementplus_select neq 'y'}{tr}Use Ctrl+Click to select multiple options{/tr}</p>{/if}
                         </div>
                         {if $indirectly_inherited_groups|@count > 0}
                             <p>{tr}Indirectly included groups:{/tr}</p>
@@ -314,14 +324,14 @@
                             <select name="groupstracker" id="groupstracker" class="form-select">
                                 <option value="0">{tr}choose a group tracker ...{/tr}</option>
                                 {foreach key=tid item=tit from=$trackers}
-                                    <option value="{$tid}"{if isset($grouptrackerid) && $tid eq $grouptrackerid} {assign var="ggr" value="$tit"}selected="selected"{/if}>{$tit|escape}</option>
+                                    <option value="{$tid}"{if isset($grouptrackerid) && $tid eq $grouptrackerid} {$ggr="$tit"}selected="selected"{/if}>{$tit|escape}</option>
                                 {/foreach}
                             </select>
                             <div class="form-text">
                                 {tr}Choose a group tracker which can be used to add user registration fields or allow group permissions on a tracker. The tracker must have one user selector field that is set to auto-assign.{/tr}
                             </div>
                             {if isset($grouptrackerid)}
-                                <div id="groupfielddiv"{if empty($grouptrackerid) and $prefs.jquery_select2 neq 'y'} style="display: none;"{/if}>
+                                <div id="groupfielddiv"{if empty($grouptrackerid) and $prefs.elementplus_select neq 'y'} style="display: none;"{/if}>
                                     <select name="groupfield" class="form-select">
                                         <option value="0">{tr}choose a field ...{/tr}</option>
                                         {if isset($groupFields)}
@@ -350,15 +360,15 @@
                             <select name="userstracker" id="userstracker" class="form-select">
                                 <option value="0">{tr}choose a user tracker ...{/tr}</option>
                                 {foreach key=tid item=tit from=$trackers}
-                                    <option value="{$tid}"{if isset($userstrackerid) && $tid eq $userstrackerid} {assign var="ugr" value="$tit"}selected="selected"{/if}>{$tit|escape}</option>
+                                    <option value="{$tid}"{if isset($userstrackerid) && $tid eq $userstrackerid} {$ugr="$tit"}selected="selected"{/if}>{$tit|escape}</option>
                                 {/foreach}
                             </select>
                             <div class="form-text">
                                 {tr}Choose a user tracker to provide fields for a new user to complete upon registration. The tracker must have one user selector field that is set to auto-assign.{/tr}
                             </div>
                             {if (isset($userstrackerid))}
-                                <div id="usersfielddiv"{if empty($userstrackerid) and $prefs.jquery_select2 neq 'y'} style="display: none;"{/if}>
-                                    <label>{tr}Select user field{/tr}</label> <select name="usersfield" class="form-select">
+                                <div id="usersfielddiv"{if empty($userstrackerid) and $prefs.elementplus_select neq 'y'} style="display: none;"{/if}>
+                                    <label for="users_field">{tr}Select user field{/tr}</label> <select name="usersfield" id="users_field" class="form-select">
                                         {if !empty($usersFields)}
                                             <option value="0">{tr}Choose a field ...{/tr}</option>
                                             {section name=ix loop=$usersFields}
@@ -397,9 +407,6 @@
                         }
                         $($showid).show();
                         $('#registerfields').show();
-                        if (jqueryTiki.select2) {
-                            $fields.trigger("change.select2");
-                        }
                     }
                 });
             } else {
@@ -421,20 +428,29 @@
                             <label class="col-form-label col-md-3">{tr}User Wizard Fields{/tr}</label>
                             <div class="col-md-9">
                                 {tr}By default, the same fields as in registration are used.{/tr} {tr _0="tiki-admin.php?page=login"}You can choose in the
-                                <a href="%0">Login admin
-                                    panel</a> to show different fields in User Wizard than the ones asked at Registration Time{/tr}
-                                .</td>
+                                <a href="%0">Login admin panel</a> to show different fields in User Wizard than the ones asked at Registration Time{/tr}
                             </div>
                         </div>
                     {/if}
                 {/if}
                 {if $prefs.userTracker == 'y' || $prefs.useGroupTheme == 'y'}
-                    <div id="registerfields" class="mb-3 row"{if empty($userstrackerid) && empty($grouptrackerid) && $prefs.jquery_select2 != 'y'} style="display: none;"{/if}>
+                    <div id="registerfields" class="mb-3 row"{if empty($userstrackerid) && empty($grouptrackerid) && $prefs.elementplus_select != 'y'} style="display: none;"{/if}>
                         <label for="registrationUserFieldIds" class="col-form-label col-md-3">{tr}Group or User Tracker Registration Fields{/tr}</label>
                         <div class="col-md-9">
-                            <input type="text" class="form-control" name="registrationUsersFieldIds" value="{$registrationUsersFieldIds|escape}">
+                            <input type="text" class="form-control" name="registrationUsersFieldIds" id="registrationUserFieldIds" value="{$registrationUsersFieldIds|escape}">
                             <div class="form-text">
                                 <p>{tr}If either a group information tracker or user registration tracker has been selected above, enter colon-separated field ID numbers for the tracker fields in the above tracker to include on the registration form for a new user to complete.{/tr}</p>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
+                {if $prefs.twoFactorAuth eq 'y'}
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-md-3">{tr}2FA Grace Period{/tr}</label>
+                        <div class="col-md-9">
+                            <input type="number" class="form-control" name="twoFactorAuthGracePeriod" value="{$twoFactorAuthGracePeriod|escape}">
+                            <div class="form-text">
+                                {tr}Number of days to allow users in this group to access the site without 2FA before forcing them to set it up.{/tr}
                             </div>
                         </div>
                     </div>
@@ -454,11 +470,12 @@
                     <div class="mb-3 row">
                         <label class="col-form-label col-md-3">{tr}Membership expiry{/tr}</label>
                         <div class="col-md-9">
-                            <label>{tr}Anniversary{/tr}</label>
-                        <input type="text" name="anniversary" class="form-control" value="{if is_array($group_info)}{$group_info.anniversary|escape}{else}{/if}">
+                            <label for="anniversaryId">{tr}Anniversary{/tr}</label>
+                            <input type="text" name="anniversary" id="anniversaryId" class="form-control" value="{if is_array($group_info)}{$group_info.anniversary|escape}{else}{/if}">
                             <div class="form-text">{tr}Use MMDD to specify an annual date as of which all users will be unassigned from the group, or DD to specify a monthly date.{/tr}</div>
-                            <label>{tr}Or{/tr}</label><br> <label>{tr}Number of Days{/tr}</label>
-                        <input type="text" class="form-control" name="expireAfter" value="{if is_array($group_info)}{$group_info.expireAfter|escape}{else}{/if}">
+                            <label>{tr}Or{/tr}</label><br>
+                            <label>{tr}Number of Days{/tr}</label>
+                            <input type="text" class="form-control" name="expireAfter" value="{if is_array($group_info)}{$group_info.expireAfter|escape}{else}{/if}">
                             <div class="form-text">
                                 {tr}Number of days after which all users will be unassigned from the group.{/tr}
                             </div>
@@ -467,7 +484,7 @@
                     <div class="mb-3 row">
                         <label for="prorateInterval" class="col-form-label col-md-3">{tr}Pro-rata Membership{/tr}</label>
                         <div class="col-md-9">
-                            <select name="prorateInterval" class="form-select">
+                            <select name="prorateInterval" id="prorateInterval" class="form-select">
                                 <option value="day" {if is_array($group_info) && $group_info.prorateInterval eq 'day'}selected="selected"{/if}>{tr}Day{/tr}</option>
                                 <option value="month" {if is_array($group_info) && $group_info.prorateInterval eq 'month'}selected="selected"{/if}>{tr}Month{/tr}</option>
                                 <option value="year" {if is_array($group_info) && $group_info.prorateInterval eq 'year'}selected="selected"{/if}>{tr}Year{/tr}</option>
@@ -479,9 +496,9 @@
                     </div>
                 {/if}
                 <div class="mb-3 row">
-                    <label class="col-form-label col-md-3">{tr}Email Pattern{/tr}</label>
+                    <label class="col-form-label col-md-3" for="email_pattern">{tr}Email Pattern{/tr}</label>
                     <div class="col-md-9">
-                        <input class="form-control" type="text" size="40" name="emailPattern" value="{if is_array($group_info)}{$group_info.emailPattern|escape}{else}{/if}">
+                        <input class="form-control" type="text" size="40" name="emailPattern" id="email_pattern" value="{if is_array($group_info)}{$group_info.emailPattern|escape}{else}{/if}">
                         <div class="form-text">
                             <p>{tr}Users are automatically assigned at registration in the group if their emails match the pattern.{/tr}</p>
                             <p>{tr}Example:{/tr} /@(tw.org$)|(tw\.com$)/</p>
@@ -555,7 +572,7 @@
                     <div class="mb-3 row">
                         <div class="col-md-9 offset-md-3">
                             {if !empty($grouptrackerid) and $groupitemid}
-                                {tr}Group tracker item : {$groupitemid}{/tr}
+                                {tr _0=$groupitemid}Group tracker item : %0{/tr}
                                 {button href="tiki-view_tracker_item.php?trackerId=$grouptrackerid&amp;itemId=$groupitemid&amp;show=mod" _text="{tr}Edit Item{/tr}"}
                             {elseif !empty($grouptrackerid)}
                                 {if $groupfieldid}
@@ -575,7 +592,7 @@
 {/if}
 
 {if $groupname}
-    {assign var=tabgroup_memberstabgroup value="{tr}Members{/tr}"}
+    {$tabgroup_memberstabgroup="{tr}Members{/tr}"}
     {$gname = "{$groupname|escape}"}
 
     {tab name="<span class='d-block'><span class='badge bg-secondary'>{$membersCount}</span>{$tabgroup_memberstabgroup}</span>{$gname}"}
@@ -660,7 +677,7 @@
                     </form>
                     </div>
                     {if !$ts.enabled}
-                        {pagination_links cant=$membersCount step=$prefs.maxRecords offset=$membersOffset offset_arg='membersOffset'}{/pagination_links}
+                        {pagination_links count=$membersCount step=$prefs.maxRecords offset=$membersOffset offset_arg='membersOffset'}{/pagination_links}
                     {/if}
                 {/if}
             {else}
@@ -676,7 +693,7 @@
                             <div class="form-group">
                                 <select name="user[]" multiple="multiple" size="10" class="{*custom-select*} form-select"  style="width: 100%; display: block;">
                                     {foreach from=$userslist item=iuser}
-                                        <option>{$iuser|escape}</option>
+                                        <option value="{$iuser|escape}">{$iuser|escape}</option>
                                     {/foreach}
                                 </select>
                             </div>
@@ -689,6 +706,7 @@
                                     form="addorban"
                                     formaction="{service controller=group action=add_user anchor='#contenttabs_admingroups-3'}"
                                     title=":{tr}Add to group{/tr}"
+                                    aria-label="{tr}Add to group{/tr}"
                                     onclick="confirmPopup(event, true)"
                                 >
                                     {icon name=add size=2}
@@ -701,6 +719,7 @@
                                     form="addorban"
                                     formaction="{service controller=group action=ban_user anchor='#contenttabs_admingroups-4'}"
                                     title=":{tr}Ban from group{/tr}"
+                                    aria-label="{tr}Ban from group{/tr}"
                                     onclick="confirmPopup(event, true)"
                                 >
                                     {icon name=ban iclass="alert-danger" size=2}
@@ -714,11 +733,11 @@
         {/tab}
 
     {if $tiki_p_admin eq 'y'}
-        {assign var="tabgroup_bannedtabgroup" value="{tr}Users banned from{/tr}"}
-        {assign var="gname" value="{$groupname|escape}"}
+        {$tabgroup_bannedtabgroup="{tr}Users banned from{/tr}"}
+        {$gname="{$groupname|escape}"}
 
-        {assign var="tabgroup_bannedtabgroup" value="{tr}Users banned from{/tr}"}
-        {assign var="gname" value="{$groupname|escape}"}
+        {$tabgroup_bannedtabgroup="{tr}Users banned from{/tr}"}
+        {$gname="{$groupname|escape}"}
 
         {tab name="<span class='d-block'><span class='badge bg-secondary'>{$bannedCount} </span>{$tabgroup_bannedtabgroup}</span>{$gname}"}
 
@@ -785,7 +804,7 @@
 
 {if $tiki_p_admin eq 'y'}
     {if $groupname}
-        {assign var=tabgroup_importexporttabgroup value="{tr}Import/export{/tr}"}
+        {$tabgroup_importexporttabgroup="{tr}Import/export{/tr}"}
         {$gname = "{$groupname|escape}"}
 
         {tab name="<span class='d-block'>{$tabgroup_importexporttabgroup}</span>{$gname}"}
@@ -799,9 +818,9 @@
 
                     <h2>{tr}Export group users (CSV file){/tr}</h2>                <br>
                     <div class="mb-3 row">
-                        <label class="col-sm-3 col-form-label">{tr}Charset encoding{/tr}</label>
+                        <label class="col-sm-3 col-form-label" for="encoding">{tr}Charset encoding{/tr}</label>
                         <div class="col-sm-7">
-                            <select name="encoding" class="form-select">
+                            <select name="encoding" id="encoding" class="form-select">
                                 <option value="UTF-8" selected="selected">{tr}UTF-8{/tr}</option>
                                 <option value="ISO-8859-1">{tr}ISO-8859-1{/tr}</option>
                             </select>
@@ -838,13 +857,14 @@
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label">
                             {tr}CSV File{/tr}
-                            <a title="{tr}Help{/tr}" {popup text='user<br>user1<br>user2'}>{icon name='help'}</a> </label>
+                            <a title="{tr}Help{/tr}" {popup text='user<br>user1<br>user2'}>{icon name='help'}</a>
+                        </label>
                         <div class="col-sm-7">
-                        <input name="csvlist" type="file" accept=".csv" class="form-control">
+                            <input name="csvlist" type="file" accept=".csv" class="form-control">
                             <div class="form-text">
                                 {tr}Imported users must already exist. To create users and assign them to groups, go to
-                                    <a href="tiki-adminusers.php">admin->users</a>
-                                    .{/tr}
+                                    <a href="tiki-adminusers.php">admin->users</a> .
+                                {/tr}
                             </div>
                         </div>
                     </div>

@@ -10,17 +10,19 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
 
+use Tiki\Lib\DateCalc;
+
 global $tikiroot;
 
 /***
  * @var int $trunc
- * @var \Smarty_Tiki    $smarty
+ * @var \Tiki\Smarty\SmartyTiki  $smarty
  * @var \TikiLib    $tikilib
  *
  *
  */
 
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) != false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -142,7 +144,7 @@ $calendarGroupByItem = $_SESSION['CalendarGroupByItem'];
 $firstDayofWeek = $calendarlib->firstDayofWeek();
 
 $strRef = tra("%H:%M %Z");
-if (strstr($strRef, "%h") || strstr($strRef, "%g")) {
+if (str_contains($strRef, "%h") || str_contains($strRef, "%g")) {
     $timeFormat12_24 = "12";
 } else {
     $timeFormat12_24 = "24";
@@ -248,7 +250,7 @@ if (
 
             // $tikilib->make_time() used with timezones doesn't support day = 0
             // This supposes that $viewstart's day == 1, as defined above
-            $viewstart_d = Date_Calc::daysInMonth($viewstart_m, $viewstart_y) - ( $TmpWeekday - 1 );
+            $viewstart_d = DateCalc::daysInMonth($viewstart_m, $viewstart_y) - ( $TmpWeekday - 1 );
 
             $viewstart = $tikilib->make_time(0, 0, 0, $viewstart_m, $viewstart_d, $viewstart_y);
         }
@@ -267,7 +269,8 @@ if (
     } elseif ($calendarViewMode['casedefault'] == 'semester') {
         $viewend = $tikilib->make_time(0, 0, 0, $focus_month + 6, $df, $focus_year);
     } elseif ($calendarViewMode['casedefault'] == 'year') {
-        $viewend = $tikilib->make_time(0, 0, 0, 1, $df, $focus_year + 1);
+        $viewend_month = ($viewlist == 'list' && $prefs['calendar_list_begins_focus'] == 'y') ? $focus_month : 1;
+        $viewend = $tikilib->make_time(0, 0, 0, $viewend_month, $df, $focus_year + 1);
     } else {
         $viewend = $tikilib->make_time(0, 0, 0, $focus_month + 1, 0, $focus_year);
     }
@@ -323,7 +326,7 @@ if (
 
     // then back up to the preceding Sunday;
     // $viewstart -= $wd * $d;
-    if ($wd > 0 and $viewlist != 'list') {
+    if ($wd > 0 && ($viewlist != 'list' || $prefs['calendar_list_begins_focus'] != 'y')) {
         $viewstart_d = TikiLib::date_format("%d", $viewstart);
         $viewstart_m = TikiLib::date_format("%m", $viewstart);
         $viewstart_y = TikiLib::date_format("%Y", $viewstart);
@@ -340,7 +343,7 @@ if (
 
             // $tikilib->make_time() used with timezones doesn't support day = 0
             // This supposes that $viewstart's day == 1, as defined above
-            $viewstart_d = Date_Calc::daysInMonth($viewstart_m, $viewstart_y) - ( $wd - $viewstart_d );
+            $viewstart_d = DateCalc::daysInMonth($viewstart_m, $viewstart_y) - ( $wd - $viewstart_d );
         } else {
             $viewstart_d -= $wd;
         }
@@ -416,6 +419,18 @@ if (! function_exists('correct_start_day')) {
 
 global $minHourOfDay, $maxHourOfDay;
 
+$formatHourOfDay = static function ($value, string $fallback): string {
+    if ($value === null || $value === '') {
+        return $fallback;
+    }
+
+    if (is_numeric($value)) {
+        return sprintf('%02d:00:00', (int)$value);
+    }
+
+    return (string)$value;
+};
+
 $slotDuration = '00:' . str_pad($prefs['calendar_timespan'], 2, '0', STR_PAD_LEFT);
 switch ($prefs['calendar_view_mode']) {
     case 'week':
@@ -432,19 +447,19 @@ switch ($prefs['calendar_view_mode']) {
 }
 
 $smarty->assign(
-    'fullCalendarParams',
+    'eventCalendarParams',
     [
         'firstDayofWeek'   => $firstDayofWeek,
         'display_timezone' => $prefs['display_timezone'],
-        'language'         => $prefs['language'],
-        'minHourOfDay'     => $minHourOfDay,
-        'maxHourOfDay'     => $maxHourOfDay,
+        'language'         => Language::getCurrentLanguage(),
+        'minHourOfDay'     => $formatHourOfDay($minHourOfDay, "00:00:00"),
+        'maxHourOfDay'     => $formatHourOfDay($maxHourOfDay, "24:00:00"),
         'slotDuration'     => $slotDuration,
         'initialView'      => $initialView,
         'initialDate'      => "$focus_year-$focus_month-$focus_day",
+        'calendarListBeginsFocus' => $prefs['calendar_list_begins_focus'] === 'y',
     ]
 );
-
 
 if (empty($myurl)) {
     $myurl = 'tiki-calendar.php';

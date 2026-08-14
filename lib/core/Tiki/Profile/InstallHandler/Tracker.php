@@ -58,7 +58,6 @@ class Tiki_Profile_InstallHandler_Tracker extends Tiki_Profile_InstallHandler
             'show_comments' => 'showComments',
             'show_last_comment' => 'showLastComment',
             'save_and_comment' => 'saveAndComment',
-            'allow_attachments' => 'useAttachments',
             'restrict_start' => 'start',
             'restrict_end' => 'end',
             'hide_list_empty_fields' => 'doNotShowEmptyField',
@@ -222,9 +221,9 @@ class Tiki_Profile_InstallHandler_Tracker extends Tiki_Profile_InstallHandler
                 }
 
                 if ($value != $default) {
-                    if (strstr($optionKey, 'allow_')) {
+                    if (str_contains($optionKey, 'allow_')) {
                         $allow[] = str_replace('allow_', '', $optionKey);
-                    } elseif (strstr($optionKey, 'show_')) {
+                    } elseif (str_contains($optionKey, 'show_')) {
                         $show[] = str_replace('show_', '', $optionKey);
                     } elseif (isset($conversions[$optionKey]) && method_exists($conversions[$optionKey], 'reverse')) {
                         $data[$optionKey] = $conversions[$optionKey]->reverse($value);
@@ -331,7 +330,7 @@ class Tiki_Profile_InstallHandler_Tracker extends Tiki_Profile_InstallHandler
             $trackerOptions = $trklib->get_trackers_options($trackerId);
             $currentOptions = [];
             if (! empty($trackerOptions)) {
-                foreach ($trackerOptions as $key => $value) {
+                foreach ($trackerOptions as $value) {
                     if (! empty($value['name']) && ! empty($value['value'])) {
                         $currentOptions[$value['name']] = $value['value'];
                     }

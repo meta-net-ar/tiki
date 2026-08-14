@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Cache\NoCache;
+
 /**
  * @group integration
  *
@@ -11,6 +14,46 @@
 
 class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
 {
+    private $originalCacheImpl;
+    private $originalIconset;
+    private TestHelpers $testhelpers;
+
+    protected function setUp(): void
+    {
+        global $iconset;
+
+        $this->originalIconset = $iconset;
+
+        // Mock iconset
+        $iconset = new class {
+            public function getHtml($name, $params = [])
+            {
+                return "$name-icon-mock ";
+            }
+        };
+
+        $cachelib = TikiLib::lib('cache');
+        // Prevent caching of icons during tests to avoid stale values from previous tests interfering with assertions
+        $this->originalCacheImpl = $cachelib->replaceImplementation(new NoCache());
+
+        $this->testhelpers = new TestHelpers();
+        $this->testhelpers->simulateTikiScriptContext();
+
+        $this->testhelpers->createPage('foo', 0, ''); // Create 'foo' page to be used in link tests
+    }
+
+    protected function tearDown(): void
+    {
+        global $iconset;
+
+        $iconset = $this->originalIconset;
+
+        TikiLib::lib('cache')->replaceImplementation($this->originalCacheImpl);
+
+        $this->testhelpers->removeAllVersions('foo');
+        $this->testhelpers->stopSimulatingTikiScriptContext();
+    }
+
     /**
      * @covers       ParserLib::parse_data
      * @dataProvider provider
@@ -26,8 +69,37 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
         $prefs['feature_wiki_paragraph_formatting'] = 'n';
         $prefs['pass_chr_special'] = 'n';
         $prefs['wiki_heading_links'] = 'n';
-        $prefs['feature_jquery'] = 'y';
+        $prefs['feature_wiki_show_int_link_title'] = 'y';
         $this->assertEquals($output, TikiLib::lib('parser')->parse_data($input, $options));
+    }
+
+    /**
+     * @covers ParserLib::parse_data
+     */
+    public function testNestedNoParseBlocksProtectPluginHtml(): void
+    {
+        global $prefs;
+        $prefs['feature_wiki_paragraph_formatting'] = 'y';
+
+        $input = '~np~<div class="outer">
+<span>~np~Warning~/np~</span>
+
+<div class="edit-zone">
+    <textarea name="body"></textarea>
+</div>
+
+
+<input type="hidden" name="wysiwyg" value="n" />
+</div>~/np~';
+
+        $output = TikiLib::lib('parser')->parse_data($input, ['is_html' => true]);
+
+        $this->assertStringContainsString('<span>Warning</span>', $output);
+        $this->assertStringContainsString('<textarea name="body"></textarea>', $output);
+        $this->assertStringContainsString('<input type="hidden" name="wysiwyg" value="n" />', $output);
+        $this->assertStringNotContainsString('~np~', $output);
+        $this->assertStringNotContainsString('~/np~', $output);
+        $this->assertStringNotContainsString('<br /><br /><input type="hidden" name="wysiwyg"', $output);
     }
 
     public static function provider(): array
@@ -80,8 +152,8 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
             ['--foo--', "<strike>foo</strike><br />"],  // strike out
             ['-- foo --', "-- foo --<br />"],   // not parsed
 
-            ['[foo]', '<a class="wiki"   href="foo" rel="">foo</a><br />'], // link
-            ['[foo|bar]', '<a class="wiki"   href="foo" rel="">bar</a><br />'], // link
+            ['[foo]', '<a class="wiki tips"  data-bs-content="foo" data-bs-toggle="tooltip" href="foo" rel="">foo</a><br />'], // link
+            ['[foo|bar]', '<a class="wiki tips"  data-bs-content="foo" data-bs-toggle="tooltip" href="foo" rel="">bar</a><br />'], // link
 
             ['[[foo', '[foo<br />'], // Square brackets
             ['[[foo]]', '[[foo]]<br />'], // Square brackets
@@ -105,6 +177,36 @@ class TikiLib_WikiParserTest extends PHPUnit\Framework\TestCase
             ["# foo\n# bar\n", "<ol><li> foo\n</li><li> bar\n</li></ol><br />"],    // Numbered list
             ["# foo1\n## foo11\n##foo12\n# bar1\n", "<ol><li> foo1\n<ol><li> foo11\n</li><li>foo12\n</li></ol></li><li> bar1\n</li></ol><br />"],   // Nested Numbered list
             ["# foo\n+ Continuation1\n+Continuation2\n# bar\n", "<ol><li> foo\n<br /> Continuation1\n<br />Continuation2\n</li><li> bar\n</li></ol><br />"], // Numbered list with continuation
+
+            // --- TESTS FOR COLLAPSIBLE LISTS ---
+
+            // Test 1: Basic collapsible list, shown by default (+)
+            [
+                "*+ Collapsible List Item",
+                '<ul><li><a id="flipperidHomePage1" class="link" href="javascript:flipWithSign(\'idHomePage1\')">[-]</a> Collapsible List Item<ul id="idHomePage1" style="display:block;"></ul></li></ul><br />',
+                ['page' => 'HomePage']
+            ],
+
+            // Test 2: Basic collapsible list, hidden by default (-)
+            [
+                "*- Collapsible List Item",
+                '<ul><li><a id="flipperidHomePage1" class="link" href="javascript:flipWithSign(\'idHomePage1\')">[+]</a> Collapsible List Item<ul id="idHomePage1" style="display:none;"></ul></li></ul><br />',
+                ['page' => 'HomePage']
+            ],
+
+            // Test 3: Nested collapsible list with children
+            [
+                "*+ Parent\n**- Child\n*** Grandchild",
+                '<ul><li><a id="flipperidHomePage1" class="link" href="javascript:flipWithSign(\'idHomePage1\')">[-]</a> Parent<ul id="idHomePage1" style="display:block;">' . "\n" . '<li><a id="flipperidHomePage2" class="link" href="javascript:flipWithSign(\'idHomePage2\')">[+]</a> Child<ul id="idHomePage2" style="display:none;">' . "\n" . '<li> Grandchild</li></ul></li></ul></li></ul><br />',
+                ['page' => 'HomePage']
+            ],
+
+            // Test 4: Ensure blank lines do not break a nested list
+            [
+                "*+ Parent\n\n** Child",
+                '<ul><li><a id="flipperidHomePage1" class="link" href="javascript:flipWithSign(\'idHomePage1\')">[-]</a> Parent<ul id="idHomePage1" style="display:block;">' . "\n\n" . '<li> Child</li></ul></li></ul><br />',
+                ['page' => 'HomePage']
+            ],
 
             ["||r1c1|r1c2\nr2c1|r2c2||", '<table class="wikitable table table-striped table-hover"><tr><td class="wikicell" >r1c1</td><td class="wikicell" >r1c2</td></tr><tr><td class="wikicell" >r2c1</td><td class="wikicell" >r2c2</td></tr></table><br />'],
             ["~pp~foo~/pp~", "<pre>foo</pre><br />"],

@@ -36,6 +36,6 @@ class BootstrapModal extends Base
         }
         $params['modal'] = 1;
         $href = smarty_function_service($params, $template);
-        return "$href\" data-tiki-bs-toggle=\"modal\" data-bs-backdrop=\"static\" data-bs-target=\".footer-modal.fade:not(.show):first$size\"";
+        return "$href\" data-tiki-bs-toggle=\"modal\" data-bs-backdrop=\"static\" data-bs-target=\".footer-modal.fade:not(.show):first$size";
     }
 }

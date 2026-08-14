@@ -2,7 +2,7 @@
 
 {include file='tiki-tests_menubar.tpl'}
 
-{pagination_links cant=$files_number offset=$offset step=$files_per_page}{/pagination_links}
+{pagination_links count=$files_number offset=$offset step=$files_per_page}{/pagination_links}
 
 <div class="table-responsive">
 <table class="table">
@@ -24,4 +24,4 @@
 </table>
 </div>
 
-{pagination_links cant=$files_number offset=$offset step=$files_per_page}{/pagination_links}
+{pagination_links count=$files_number offset=$offset step=$files_per_page}{/pagination_links}

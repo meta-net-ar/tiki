@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) != false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -26,7 +26,9 @@ if ($prefs['feature_wysiwyg'] == 'y') {
         } elseif (isset($_REQUEST['mode_normal']) && $_REQUEST['mode_normal'] == 'y') {
             $_SESSION['wysiwyg'] = 'n';
         } elseif (isset($_REQUEST['wysiwyg'])) {
-            if (! in_array($_REQUEST['wysiwyg'], ['y', 'n'])) {
+            if (is_bool($_REQUEST['wysiwyg'])) {
+                $_REQUEST['wysiwyg'] = $_REQUEST['wysiwyg'] ? 'y' : 'n';
+            } elseif (! in_array($_REQUEST['wysiwyg'], ['y', 'n'], true)) {
                 throw new Exception('Invalid wysiwyg parameter');
             }
             $_SESSION['wysiwyg'] = $_REQUEST['wysiwyg'];

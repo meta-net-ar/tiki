@@ -1,0 +1,78 @@
+// Brite 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
+
+// Enable SCSS color functions and import default variable values
+@use "sass:color";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated), required before import of variables.scss.
+@import "../../default/scss/_variables.scss"; // Bootstrap variable declarations
+@import "../../../node_modules/bootswatch/dist/brite/_variables.scss"; // Bootswatch theme variables file
+
+//
+// Color system
+$lime:    #a2e436 !default;
+
+$primary:       $lime !default;
+$secondary:     $gray-300; // $white !default;
+$success:       $green !default;
+$info:          $cyan !default;
+$warning:       $yellow !default;
+$danger:        $red !default;
+$light:         $gray-200 !default;
+$dark:          $black !default;
+
+
+// Options
+// Body
+$body-color:                $gray-900; // !default;
+
+// Links
+$link-decoration: underline; // default
+$link-shade-percentage:                   20%; //  !default;
+$link-font-weight: 500;
+
+// Components
+$border-color:                $black; // $gray-300 !default;
+
+// Typography
+$blockquote-footer-color:     $gray-700; //$gray-600 !default;
+
+// Form validation
+$form-feedback-valid-color:         #257E47; // $success !default;
+$form-feedback-invalid-color:       #E60F0F; // $danger !default;
+
+// Navs (copied from Bootstrap variables.scss to enable responsive color to links not in bg-dark or bg-light)
+$nav-link-color:                    var(--#{$prefix}link-color); // default
+$nav-link-hover-color:              var(--#{$prefix}link-hover-color); // default
+$nav-link-font-size:                1.0rem; // Override the 1.2rem size specified by _bootswatch.scss (too large especially in vertical menus).
+
+// Navbar
+$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65); // !default;  ---- base_files/tiki-selectors.scss:328 was causing conflict without this explicitly declared here
+$navbar-light-hover-color:          rgba(var(--#{$prefix}emphasis-color-rgb), .8); // !default;
+$navbar-light-active-color:         rgba(var(--#{$prefix}emphasis-color-rgb), 1); // !default;
+$navbar-light-disabled-color:       rgba(var(--#{$prefix}emphasis-color-rgb), .3); // !default;
+$navbar-light-icon-color:           rgba($body-color, .75); // !default;
+$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-icon-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>"); // !default;
+$navbar-light-toggler-border-color: rgba(var(--#{$prefix}emphasis-color-rgb), .15); // !default;
+$navbar-light-brand-color:          $navbar-light-active-color; // !default;
+$navbar-light-brand-hover-color:    $navbar-light-active-color; // !default;
+
+// Dropdowns
+// Pagination
+$pagination-color:                  var(--#{$prefix}link-color); // !default;
+
+// Accordion
+// Alerts
+// Progress bars
+// Breadcrumbs
+$breadcrumb-divider-color:          var(--#{$prefix}secondary-color); // !default;
+$breadcrumb-active-color:           var(--#{$prefix}secondary-color); // !default;
+
+// Code
+$code-color:                        $pink; // !default;
+
+//--------------------------- Tiki SCSS variables
+
+// Bootswatch overrides
+
+//$web-font-path: none; // Override value in vendor file

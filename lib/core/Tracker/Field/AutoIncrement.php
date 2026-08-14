@@ -63,6 +63,16 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
                             1 => tr('Yes'),
                         ],
                     ],
+                    'overridable' => [
+                        'name' => tr('Overridable'),
+                        'description' => tr('Allow the value to be overridden by the user. Use with caution.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                    ],
                 ],
             ],
         ];
@@ -71,7 +81,7 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
     public function getFieldData(array $requestData = []): array
     {
         $ins_id = $this->getInsertId();
-        $value = isset($requestData[$ins_id]) ? $requestData[$ins_id] : $this->getValue();
+        $value = $requestData[$ins_id] ?? $this->getValue();
 
         return ['value' => $value];
     }
@@ -116,8 +126,11 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
         $value = false;
         if ($this->getOption('itemId') == 'itemId') {
             $value = $this->getItemId();
-        } elseif (is_null($oldValue)) {
-            $value = TikiLib::lib('trk')->get_maximum_value($this->getConfiguration('fieldId'));
+        } elseif (is_null($oldValue) || ($this->getOption('overridable') && ! $value)) {
+            $value = $this->syncFromSource();
+            if ($value === false) {
+                $value = TikiLib::lib('trk')->get_maximum_value($this->getConfiguration('fieldId'));
+            }
             if (! $value) {
                 $value = $this->getOption('start', 1);
             } else {
@@ -132,6 +145,74 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
         return [
             'value' => $value,
         ];
+    }
+
+    /**
+     * Overrides the default client-side validation behavior.
+     * An auto-increment field's value is generated on the server, so it should
+     * never be considered mandatory by client-side JavaScript validation.
+     *
+     * @return bool Always returns false.
+     */
+    public function isClientSideMandatory(): bool
+    {
+        return false;
+    }
+
+    /**
+     * After the item is saved, check for duplicate auto-increment values that
+     * can occur when concurrent processes both read the same maximum value
+     * before either has persisted its result. If a duplicate is found,
+     * re-read the current maximum and assign a new unique value.
+     */
+    public function postSaveHook($value)
+    {
+        // itemId mode uses the actual DB item ID — duplicates are impossible
+        if ($this->getOption('itemId') == 'itemId') {
+            return;
+        }
+
+        $itemId = $this->getItemId();
+        $fieldId = $this->getConfiguration('fieldId');
+
+        if (! $itemId || $value === false || $value === null || $value === '') {
+            return;
+        }
+
+        // prevent deduplication when an odbc tabular is used as remote value might interfere
+        try {
+            $definition = $this->getTrackerDefinition();
+            $tabulars = $definition->getSynchronizedTabulars('odbc');
+            if (! empty($tabulars)) {
+                return;
+            }
+        } catch (Exception $e) {
+            return;
+        }
+
+        global $prefs;
+        $trklib = TikiLib::lib('trk');
+        $table = TikiDb::get()->table('tiki_tracker_item_fields');
+
+        $maxRetries = 3;
+        for ($i = 0; $i < $maxRetries; $i++) {
+            $duplicateCount = $table->fetchCount([
+                'fieldId' => (int)$fieldId,
+                'value' => (string)$value,
+            ]);
+
+            if ($duplicateCount <= 1) {
+                break;
+            }
+
+            $maxValue = $trklib->get_maximum_value($fieldId);
+            if ($prefs['tracker_autoincrement_resettable'] == 'y') {
+                $value = max($maxValue + 1, $this->getOption('start', 1));
+            } else {
+                $value = $maxValue + 1;
+            }
+            $trklib->modify_field($itemId, $fieldId, $value);
+        }
     }
 
     public function getTabularSchema()
@@ -158,10 +239,10 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
                 return $prepend . $value . $append;
             })
             ->setParseIntoTransform(function (&$info, $value) use ($permName, $prepend, $append) {
-                if (substr($value, 0, strlen($prepend)) === $prepend) {
+                if (str_starts_with($value, $prepend)) {
                     $value = substr($value, strlen($prepend));
                 }
-                if (substr($value, 0 - strlen($append)) === $append) {
+                if (str_ends_with($value, $append)) {
                     $value = substr($value, 0, 0 - strlen($append));
                 }
                 $info['fields'][$permName] = $value;
@@ -287,6 +368,30 @@ class Tracker_Field_AutoIncrement extends \Tracker\Field\AbstractItemField imple
             if ($count) {
                 Feedback::warning(tr('Note: %0 auto-increment item values updated', $count));
             }
+        }
+    }
+
+    private function syncFromSource()
+    {
+        try {
+            $definition = $this->getTrackerDefinition();
+            $tabulars = $definition->getSynchronizedTabulars('odbc');
+            if (empty($tabulars)) {
+                return false;
+            }
+            foreach ($tabulars as $tabular) {
+                $schema = TikiLib::lib('tabular')->getSchema($definition, $tabular);
+                foreach ($schema->getColumns() as $column) {
+                    if ($column->getField() === $this->getConfiguration('permName')) {
+                        $odbc_manager = new Tracker\Tabular\ODBCManager($tabular['odbc_config']);
+                        return $odbc_manager->nextValue($column->getRemoteField()) - 1;
+                    }
+                }
+            }
+            return false;
+        } catch (Exception $e) {
+            Feedback::error($e->getMessage());
+            return false;
         }
     }
 }

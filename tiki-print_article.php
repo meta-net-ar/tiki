@@ -8,10 +8,18 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+/**
+ * TIKI_PRINTING is always true when tiki-print.php is used.
+ * TIKI_PRINTING_PDF is true only for PDF exports (?display=pdf).
+ * TIKI_PRINTING_PDF => TIKI_PRINTING, but not the reverse.
+ */
+define('TIKI_PRINTING', true);
+define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] === 'pdf');
+define('TIKI_DISPLAY_CONTAINS_PDF', isset($_GET['display']) && str_contains($_GET['display'], 'pdf'));
+
 use Tiki\Lib\Image\Image;
 use Tiki\Wiki\WikiPaginationUtils;
-
-$section = 'cms';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -25,6 +33,9 @@ $inputConfiguration = [
 ];
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
 
 $access->check_feature('feature_cms_print');
@@ -241,7 +252,7 @@ $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 
 
 // Allow PDF export by installing a Mod that define an appropriate function
-if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
+if (TIKI_PRINTING_PDF) {
     require_once 'lib/pdflib.php';
     $page = $article_data["title"];
     $smarty->assign('print_page', 'n');
@@ -271,7 +282,6 @@ if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
         header("Content-Type: application/pdf");
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . $length);
-        TikiLib::lib('header')->setXRobotsTag($robots);
         echo $pdf;
     }
 } else {

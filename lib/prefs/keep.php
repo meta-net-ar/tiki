@@ -12,6 +12,7 @@ function prefs_keep_list()
             'description' => tra('Do not delete versions younger than this number of days.'),
             'type' => 'text',
             'size' => '5',
+            'help' => 'Wiki-Features',
             'units' => tra('days'),
             'default' => 1,
             'keywords' => 'wiki history',

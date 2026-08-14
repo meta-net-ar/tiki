@@ -44,12 +44,12 @@ class PaymentLib extends TikiDb_Bridge
 
     private function setTable($field)
     {
-        return isset($this->fieldmap[$field]['table']) ? $this->fieldmap[$field]['table'] : '';
+        return $this->fieldmap[$field]['table'] ?? '';
     }
 
     private function setField($field)
     {
-        return isset($this->fieldmap[$field]['field']) ? $this->fieldmap[$field]['field'] : $field;
+        return $this->fieldmap[$field]['field'] ?? $field;
     }
 
     private function fieldTableArray()
@@ -95,7 +95,7 @@ class PaymentLib extends TikiDb_Bridge
         $all = $this->fetchAll($data, $bindvars, $max, $offset);
 
         return [
-            'cant' => $this->getOne($count, $bindvars),
+            'count' => $this->getOne($count, $bindvars),
             'data' => Perms::filter(
                 [ 'type' => 'payment' ],
                 'object',
@@ -158,7 +158,7 @@ class PaymentLib extends TikiDb_Bridge
         }
 
         return [
-            'cant' => $this->getOne($count, $bindvars),
+            'count' => $this->getOne($count, $bindvars),
             'data' => Perms::filter(
                 [ 'type' => 'payment' ],
                 'object',
@@ -257,14 +257,11 @@ class PaymentLib extends TikiDb_Bridge
                     'tiki-payment.php',
                     [
                         'invoice' => $info['paymentRequestId'],
-                        'TOKEN' => wikiplugin_getaccesstoken(
-                            '',
-                            [
-                                'entry' => 'tiki-payment.php',
-                                'keys' => ['invoice'],
-                                'values' => [$info['paymentRequestId']]
-                            ]
-                        ),
+                        'TOKEN' => TikiLib::lib('parser')->invokePlugin('getaccesstoken', '', [
+                            'entry' => 'tiki-payment.php',
+                            'keys' => ['invoice'],
+                            'values' => [$info['paymentRequestId']]
+                        ]),
                     ]
                 );
             }
@@ -536,7 +533,7 @@ class PaymentLib extends TikiDb_Bridge
                 $sort = explode(',', $sort);
             }
             foreach ($sort as $s) {
-                if (strpos($s, '.') === false) {
+                if (! str_contains($s, '.')) {
                     $dir = strrchr($s, '_');
                     $sfield = substr($s, 0, strlen($s) - strlen($dir));
                     $stable = $this->setTable($sfield);

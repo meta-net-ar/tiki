@@ -6,11 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_mail_list()
 {
+    $generalPreferencesHelp = 'General-Preferences';
+
     return [
         'mail_crlf' => [
             'name' => tra('Email newline character(s)'),
             'description' => tra('End-of-line (EOL) character used in outgoing emails'),
             'type' => 'list',
+            'help' => $generalPreferencesHelp,
             'options' => [
                 'CRLF' => tra('CRLF (standard)'),
                 'LF' => tra('LF (some Unix MTA)'),
@@ -22,12 +25,14 @@ function prefs_mail_list()
             'description' => tra('Text string used to customise mail templates and added as a pref reference in the appropriate mail tpl files'),
             'type' => 'text',
             'default' => '',
+            'help' => $generalPreferencesHelp,
         ],
         'mail_apply_css' => [
             'name' => tra('Apply site styles to HTML emails'),
             'description' => tra('Add site CSS to all HTML formatted emails'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => $generalPreferencesHelp,
         ],
     ];
 }

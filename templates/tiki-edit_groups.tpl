@@ -29,7 +29,7 @@
                         <action>
 
                             {if $groups[group].groupName neq 'Anonymous' and $groups[group].groupName neq 'Registered' and $groups[group].groupName neq 'Admins'}
-                                <a href="#" class="edit_group_a" data-id="{$groups[group].id}" data-name="{$groups[group].groupName}" data-description="{$groups[group].groupDesc}">
+                                <a href="#" class="edit_group_a" data-id="{$groups[group].id}" data-name="{$groups[group].groupName}" data-description="{$groups[group].groupDesc}" role="button">
                                     {icon name="edit" _menu_text='y' _menu_icon='y' alt="{tr}Edit{/tr}"}
                                 </a>
                             {/if}

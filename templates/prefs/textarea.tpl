@@ -4,9 +4,21 @@
             {include file="prefs/shared-help-icon.tpl"}
         </label>
         <div class="col">
-            <textarea name="{$p.preference|escape}" id="{$p.id|escape}" {if $syntax} data-syntax="{$syntax|escape}" data-codemirror="{$codemirror|escape}" {/if} class="form-control" {if !empty($p.size)} rows="{$p.size|escape}"{/if} {$p.params}>
-                {$p.value|escape}
-            </textarea>
+            {textarea
+                _simple="y"
+                _toolbars="n"
+                _wysiwyg="n"
+                name="{$p.preference|escape}"
+                id="{$p.id|escape}"
+                _syntax="{$syntax|escape|default:''}"
+                codemirror="{$codemirror|escape|default:'false'}"
+                class="form-control"
+                rows="{$p.size|escape|default:null}"
+                disabled="{if $p.parameters.disabled|default:''}disabled{else}{/if}"
+            }
+                {* No |escape here: _wysiwyg="n" forces wiki_edit.tpl which already applies |escape on $textareadata. Adding it here would cause double-escaping. *}
+                {$p.value}
+            {/textarea}
             {include file="prefs/shared-form-text.tpl"}
         </div>
         <div class="tikihelp-reset-wrapper col-sm-2">

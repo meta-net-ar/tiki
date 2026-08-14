@@ -2,7 +2,6 @@
 <html lang="{if !empty($pageLang)}{$pageLang}{else}{$prefs.language}{/if}"{if Language::isRTL()} dir="rtl"{/if}{if !empty($page_id)} id="page_{$page_id}"{/if}>
 <head>
     {include file='header.tpl'}
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body{html_body_attributes}>
 {$cookie_consent_html}
@@ -13,15 +12,23 @@
     {include file='tiki-ajax_header.tpl'}
 {/if}
 
+{block name=module_header}{/block}
 {if $section !== 'admin'}
     {include file='tiki-maintenance_banner.tpl'}
 {/if}
-<a class="btn btn-info btn-lg skipnav" href="#col1">{tr}Skip to main content{/tr}</a>
-<div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std">
+<a class="btn btn-info btn-lg skipnav" href="#col1" role="button">{tr}Skip to main content{/tr}</a>
+<div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std d-flex min-vh-100 flex-column my-0">
     {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
         <div class="row">
-            <header class="page-header w-100 navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant}" id="page-header" role=banner>
-                {modulelist zone=top class="top_modules navbar-{$navbar_color_variant}-parent bg-{$navbar_color_variant}-parent  tiki-top-nav-{$navbar_color_variant}" heading_text='{tr}Site identity, navigation, etc.{/tr}'}
+            {******************************************************************* SITE HEADER STRUCTURE******************************************************************}
+            <header class="site-header" id="site-header" role="banner">
+                <nav class="{block name=navClasses}navbar w-100 navbar-{$navbar_color_variant} bg-{$navbar_color_variant} tiki-main-navbar{/block}"
+                     id="main-navbar"
+                     role="navigation"
+                     aria-label="{tr}Main navigation{/tr}">
+
+                    {modulelist zone=top class="top_modules bg-{$navbar_color_variant}-parent tiki-top-nav-{$navbar_color_variant} container-fluid" heading_text='{tr}Site identity, navigation, etc.{/tr}' role=banner}
+                </nav>
             </header>
         </div>
     {/if}
@@ -39,6 +46,7 @@
                 <div id="feedback" role="alert">
                     {feedback}
                 </div>
+                {queued_tasks_banner}
                 {block name=quicknav}{/block}
                 {block name=title}{/block}
                 {block name=navigation}{/block}
@@ -53,13 +61,14 @@
         <div class="d-flex w-100 flex-row row flex-wrap gx-4">
             <div class="col col1 col-md-12 col-lg-9 {if $prefs.feature_fixed_width neq 'y'}col-xl-10{/if} pb-4" id="col1">
                 <div id="col1top-outer-wrapper" class="col1top-outer-wrapper d-flex justify-content-between">
-                    <div class="col1top-inner-wrapper flex-grow-1 mx-2">
+                    <div class="col1top-inner-wrapper flex-grow-1 ">
                     {if $prefs.module_zones_pagetop eq 'fixed' or ($prefs.module_zones_pagetop ne 'n' && ! zone_is_empty('pagetop'))}
                         {modulelist zone=pagetop heading_text='{tr}Related content{/tr}' role=complementary}
                     {/if}
                     <div id="feedback" role="alert">
                         {feedback}
                     </div>
+                        {queued_tasks_banner}
                     {block name=quicknav}{/block}
                     </div>
                     <div class="d-none d-lg-flex">
@@ -81,6 +90,9 @@
                 {/if}
             </div>
             <div class="col col3 col-12 col-md-6 col-lg-3 {if $prefs.feature_fixed_width neq 'y'}col-xl-2{/if}" id="col3">
+                {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                    {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='right'}
+                {/if}
                 {modulelist zone=right class="right-aside" heading_text='{tr}More content and functionality (right side){/tr}' role=complementary}
             </div>
         </div>
@@ -95,13 +107,14 @@
                             </div>
                         {/if}
                     </div>
-                    <div class="col1top-inner-wrapper flex-grow-1 mx-2">
+                    <div class="col1top-inner-wrapper flex-grow-1 ">
                         {if $prefs.module_zones_pagetop eq 'fixed' or ($prefs.module_zones_pagetop ne 'n' && ! zone_is_empty('pagetop'))}
                             {modulelist zone=pagetop heading_text='{tr}Related content{/tr}' role=complementary}
                         {/if}
                         <div id="feedback" role="alert">
                             {feedback}
                         </div>
+                        {queued_tasks_banner}
                         {block name=quicknav}{/block}
                     </div>
                 </div>
@@ -115,6 +128,9 @@
                 {/if}
             </div>
             <div class="col col2 col-12 col-md-6 col-lg-3 {if $prefs.feature_fixed_width neq 'y'}col-xl-2{/if} order-sm-2 order-md-2 order-lg-1" id="col2">
+                {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                    {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='left'}
+                {/if}
                 {modulelist zone=left class="left-aside" heading_text='{tr}More content and functionality (left side){/tr}' role=complementary}
             </div>
         {else}
@@ -128,13 +144,14 @@
                             </div>
                         {/if}
                     </div>
-                    <div class="col1top-inner-wrapper flex-grow-1 mx-2">
+                    <div class="col1top-inner-wrapper flex-grow-1 ">
                         {if $prefs.module_zones_pagetop eq 'fixed' or ($prefs.module_zones_pagetop ne 'n' && ! zone_is_empty('pagetop'))}
                             {modulelist zone=pagetop heading_text='{tr}Related content{/tr}' role=complementary}
                         {/if}
                         <div id="feedback" role="alert">
                             {feedback}
                         </div>
+                        {queued_tasks_banner}
                         {block name=quicknav}{/block}
                     </div>
                     <div class="d-none d-lg-block">
@@ -156,16 +173,22 @@
                 {/if}
             </div>
             <div class="col col2 col-12 col-md-6 col-lg-2 order-md-2 order-lg-1" id="col2">
+                {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                    {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='left'}
+                {/if}
                 {modulelist zone=left class="left-aside" heading_text='{tr}More content and functionality (left side){/tr}' role=complementary}
-            </div>
+             </div>
             <div class="col col3 col-12 col-md-6 col-lg-2 order-md-3" id="col3">
+                {if $prefs.module_sidebar_toggle_small_screen eq 'y'}
+                    {include file="modules/mod-side_col_toggle_small_screen.tpl" zone='right'}
+                {/if}
                 {modulelist zone=right class="right-aside" heading_text='{tr}More content and functionality (right side){/tr}' role=complementary}
             </div>
         {/if}
     </div>
 
 {if !isset($smarty.session.fullscreen) || $smarty.session.fullscreen ne 'y'}
-    <footer class="row footer main-footer" id="footer">
+    <footer class="row footer main-footer mt-auto" id="footer">
         <div class="footer_liner w-100">
             {modulelist zone=bottom class='bottom_modules p-3 mx-0' heading_text='{tr}Site information, links, etc.{/tr}' role=contentinfo}
         </div>

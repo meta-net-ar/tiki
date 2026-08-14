@@ -25,7 +25,7 @@
                 </div>
                 <div class="mb-3 text-center">
                     <div class="col-md-12 col-sm-12 col-xs-12">
-                        <input type="submit" class="submit btn btn-primary btn-sm" name="action0" value="Send" onclick="needToConfirm=false">
+                        <input type="submit" class="submit btn btn-primary btn-sm" role="button" name="action0" value="Send" onclick="needToConfirm=false">
                     </div>
                 </div>
             </div>

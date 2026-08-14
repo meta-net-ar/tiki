@@ -7,7 +7,7 @@
 {block name="navigation"}
     <div class="mb-3 row">
         {permission name=admin_trackers}
-            <a class="btn btn-link" href="{service controller=tabular action=manage}">{icon name=list} {tr}Manage{/tr}</a>
+            <a class="btn btn-link" href="{service controller=tabular action=manage}" role="button">{icon name=list} {tr}Manage{/tr}</a>
         {/permission}
     </div>
 {/block}
@@ -17,20 +17,20 @@
         <div class="mb-3 row">
             <label class="col-form-label col-sm-3" for="name">{tr}Name{/tr}</label>
             <div class="col-sm-9">
-                <input class="form-control" type="text" name="name" id="name" required>
+                <input class="form-control" type="text" name="name" id="name" value="{$format.name|escape}" required>
             </div>
         </div>
         <div class="mb-3 row">
-            <label class="col-form-label col-sm-3" for="trackerId">{tr}Tracker{/tr}</label>
+            <label class="col-form-label col-sm-3" for="trackerId">{tr}Tracker{/tr} <span class="text-danger"> *</span></label>
             <div class="col-sm-9">
-                {object_selector _class="form-control" type="tracker" _simplename="trackerId" _simpleid="trackerId"}
+                {object_selector _class="form-control" type="tracker" _simplename="trackerId" _simpleid="trackerId" _simplevalue=$format.trackerId}
             </div>
         </div>
         <div class="row mb-4">
             <label class="form-check-label col-sm-3" for="prefill">{tr}Initialize this format with the current tracker fields{/tr}</label>
             <div class="col-sm-9">
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="prefill" id="prefill">
+                    <input class="form-check-input" type="checkbox" name="prefill" id="prefill" {if !empty($format.prefill)}checked{/if}>
                 </div>
             </div>
         </div>

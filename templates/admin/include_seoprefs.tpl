@@ -1,13 +1,35 @@
 {remarksbox type="tip" title="{tr}Tip{/tr}"}
     {tr}To better use this tool, please consult{/tr}<a class='alert-link' target='tikihelp' href='http://doc.tiki.org/SEO-preferences'> SEO preferences</a> {tr} on Tiki's documentation site{/tr}
 {/remarksbox}
-{ticket}
+
 
     {tabset}
         {tab name="{tr}Sitemap{/tr}"}
             {title help="Sitemap" admpage="general&cookietab=3&highlight=sitemap_enable"}{tr}Sitemap{/tr}{/title}
+        <form action="tiki-admin.php?page=seoprefs" method="post" class="admin">
+            {ticket}
+            <input type="hidden" name="modulesetup" />
 
+            {if $prefs.sitemap_enable eq 'y'}
+                <div class="adminoptionbox clearfix mb-4">
+                    <fieldset class="mb-3 w-100">
+                        <legend class="h4 pt-4">{tr}Generation Settings{/tr}</legend>
+                        {preference name=sitemap_method}
+
+                        <legend class="h4 pt-4">{tr}Splitting Options{/tr}</legend>
+                        {preference name=sitemap_split}
+                    </fieldset>
+                </div>
+            {/if}
+
+            {include file='admin/include_apply_bottom.tpl'}
+        </form>
+
+        {if $prefs.sitemap_method eq 'manual'}
+        <div class="py-2">
             {button href="tiki-admin.php?page=seoprefs&rebuild=1" _icon_name="sitemap" class="btn btn-primary" _text="{tr}Rebuild sitemap{/tr}"}
+        </div>
+        {/if}
 
             <br/>
             {remarksbox type="info" title="{tr}Submit the Sitemap{/tr}" close="n"}
@@ -20,16 +42,22 @@
                 {tr}The URL that you will need to use for submitting the sitemap will be available after you rebuild the sitemap.{/tr}
             {/if}
             {/remarksbox}
-            {remarksbox type="info" title="{tr}Automate Sitemap generation{/tr}" close="n"}
-                <p>
-                    {tr}You can automate the sitemap generation by using the scheduler functionality:
-                        <a href="https://doc.tiki.org/Scheduler" class="alert-link">https://doc.tiki.org/Scheduler</a>
-                    {/tr}
-                </p>
-                <p>
-                    {tr}Or you can use directly the command line:{/tr} <code>php console.php sitemap:generate {$base_url}</code>
-                </p>
-            {/remarksbox}
+
+            {if $prefs.sitemap_enable eq 'y'}
+                {remarksbox type="info" title="{tr}Automation Status{/tr}" close="n"}
+                    {if $prefs.sitemap_method eq 'auto'}
+                        <p>{tr}Sitemap generation is set to <strong>automatic</strong>. New content will trigger automatic regeneration.{/tr}</p>
+                    {else}
+                        <p>{tr}Sitemap generation is set to <strong>manual</strong>. Use the rebuild button above or configure a scheduler after content changes.{/tr}</p>
+                        <p>{tr}You can automate using the <a href="https://doc.tiki.org/Scheduler" class="alert-link">Scheduler</a> or command line:{/tr} <code>php console.php sitemap:generate {$base_url}</code></p>
+                    {/if}
+                {/remarksbox}
+            {else}
+                {remarksbox type="info" title="{tr}Automate Sitemap generation{/tr}" close="n"}
+                    <p>{tr}You can automate the sitemap generation by using the scheduler functionality:{/tr} <a href="https://doc.tiki.org/Scheduler" class="alert-link">{tr}Scheduler{/tr}</a></p>
+                    <p>{tr}Or you can use directly the command line:{/tr} <code>php console.php sitemap:generate {$base_url}</code></p>
+                {/remarksbox}
+            {/if}
 
 
         {/tab}

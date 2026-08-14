@@ -102,9 +102,9 @@ class Tiki_Profile_InstallHandler_ActivityStreamRule extends Tiki_Profile_Instal
         //       ...
         $string = preg_replace_callback('/\((?<OP>(?:not-)?equals) args\.(?<KEY>[^\s]+)\s(?<ID>[\d]+)\)/', function ($matches) use ($writer) {
             $key = $matches['KEY'];
-            if (substr($key, -2) == 'Id') {
+            if (str_ends_with($key, 'Id')) {
                 $key = substr($key, 0, -2);
-            } elseif (substr($key, -3) == '_id') {
+            } elseif (str_ends_with($key, '_id')) {
                 $key = substr($key, 0, -3);
             }
 

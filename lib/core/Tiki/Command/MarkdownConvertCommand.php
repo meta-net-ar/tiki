@@ -26,42 +26,42 @@ class MarkdownConvertCommand extends Command
     {
         $this
             ->setHelp(
-                'Use this command to convert Tiki wiki syntax stored in one or more pages to Markdown or vice-versa.'
+                tra('Use this command to convert Tiki wiki syntax stored in one or more pages to Markdown or vice-versa.')
             )
             ->addOption(
                 'page',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'The page name to check. Leave empty to attempt conversion of all available pages',
+                tra('The page name to check. Leave empty to attempt conversion of all available pages')
             )
             ->addOption(
                 'markdown',
                 null,
                 InputOption::VALUE_NONE,
-                'Convert to Markdown syntax'
+                tra('Convert to Markdown syntax')
             )
             ->addOption(
                 'tiki',
                 null,
                 InputOption::VALUE_NONE,
-                'Convert to Tiki wiki syntax'
+                tra('Convert to Tiki wiki syntax')
             )
             ->addOption(
                 'save',
                 null,
                 InputOption::VALUE_NONE,
-                'Save converted content back to the database. Important: this will overwrite your existing content, proceed with caution!'
+                tra('Save converted content back to the database. Important: this will overwrite your existing content, proceed with caution!')
             )
             ->addOption(
                 'contents',
                 null,
                 InputOption::VALUE_NONE,
-                'Convert contents of specified pages to the target syntax'
+                tra('Convert contents of specified pages to the target syntax')
             )
             ->addArgument(
                 'exclude',
                 InputArgument::IS_ARRAY,
-                'Pages to exclude when converting all pages'
+                tra('Pages to exclude when converting all pages')
             );
     }
 

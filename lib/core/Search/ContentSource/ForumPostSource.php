@@ -125,21 +125,21 @@ class Search_ContentSource_ForumPostSource implements Search_ContentSource_Inter
 
         $comment = $commentslib->get_lastPost($threadId);
 
-        $lastModification = isset($comment['commentDate']) ? $comment['commentDate'] : 0;
-        $content = isset($comment['data']) ? $comment['data'] : '';
+        $lastModification = $comment['commentDate'] ?? 0;
+        $content = $comment['data'] ?? '';
         $snippet = TikiLib::lib('tiki')->get_snippet($content);
-        $author = [isset($comment['userName']) ? $comment['userName'] : ''];
+        $author = [$comment['userName'] ?? ''];
 
         $commentslib->extras_enabled(true);
 
         $data = [
-            'lastpost_title' => $typeFactory->sortable(isset($comment['title']) ? $comment['title'] : ''),
+            'lastpost_title' => $typeFactory->sortable($comment['title'] ?? ''),
             'lastpost_modification_date' => $typeFactory->timestamp($lastModification),
             'lastpost_contributors' => $typeFactory->multivalue(array_unique($author)),
             'lastpost_post_content' => $typeFactory->wikitext($content),
             'lastpost_post_snippet' => $typeFactory->plaintext($snippet),
-            'lastpost_hits' => $typeFactory->numeric(isset($comment['hits']) ? $comment['hits'] : 0),
-            'lastpost_thread_id' => $typeFactory->identifier(isset($comment['thread_id']) ? $comment['thread_id'] : 0),
+            'lastpost_hits' => $typeFactory->numeric($comment['hits'] ?? 0),
+            'lastpost_thread_id' => $typeFactory->identifier($comment['thread_id'] ?? 0),
         ];
 
         return $data;

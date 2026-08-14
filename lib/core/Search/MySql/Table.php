@@ -37,6 +37,7 @@ class Search_MySql_Table extends TikiDb_Table
     private $schemaBuffer;
     private $dataBuffer;
     private $tfTranslator;
+    private $fullTextTablesToAnalyze = [];
 
     private $max_columns_per_table = -1;
 
@@ -62,11 +63,16 @@ class Search_MySql_Table extends TikiDb_Table
 
     public function drop()
     {
+        $stopwordTableName = $this->tableName . '_stopwords';
+        $escapedStopwordTable = $this->escapeIdentifier($stopwordTableName);
+        $this->db->query("DROP TABLE IF EXISTS $escapedStopwordTable", options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
+
         $tables = $this->indexTables();
         foreach ($tables as $table) {
             $table = $this->escapeIdentifier($table);
-            $this->db->query("DROP TABLE IF EXISTS $table", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
+            $this->db->query("DROP TABLE IF EXISTS $table", options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
         }
+
         $this->definition = false;
         $this->exists = false;
 
@@ -210,7 +216,7 @@ class Search_MySql_Table extends TikiDb_Table
     {
         $tables = $this->indexTables();
         $join = $this->getIndexTablesSqlJoins();
-        if ($result = $this->fetchAll([$this->count()], $conditions, 1, 0, null, $join, options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP])) {
+        if ($result = $this->fetchAll([$this->count()], $conditions, 1, 0, null, $join, options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP])) {
             $result = reset($result);
             if ($result) {
                 return reset($result);
@@ -244,7 +250,7 @@ class Search_MySql_Table extends TikiDb_Table
     {
         $available_fields = TikiLib::lib('unifiedsearch')->getAvailableFields();
         $join = $this->getIndexTablesSqlJoins();
-        $resultset = $this->query($selectFields, $conditions, $numrows, $offset, $orderClause, $join, options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
+        $resultset = $this->query($selectFields, $conditions, $numrows, $offset, $orderClause, $join, options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
         $hasCustomSelect = ! (isset($selectFields[0]) && ($selectFields[0] instanceof TikiDb_Expr) && $selectFields[0]->getQueryPart(null) === '*');
         $result = [];
         while ($row = $resultset->fetchRow()) {
@@ -275,15 +281,19 @@ class Search_MySql_Table extends TikiDb_Table
 
     public function deleteMultipleIndex(array $conditions)
     {
+        if (! $this->exists()) {
+            return;
+        }
+
         $tables = $this->indexTables();
-        $matches = $this->fetchAll(['id'], $conditions, options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
+        $matches = $this->fetchAll(['id'], $conditions, options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
         foreach ($matches as $row) {
             $conditions = ['id' => $row['id']];
             foreach ($tables as $table) {
                 $bindvars = [];
                 $query = "DELETE FROM {$this->escapeIdentifier($table)}";
                 $query .= $this->buildConditions($conditions, $bindvars);
-                $this->db->queryException($query, $bindvars, options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
+                $this->db->queryException($query, $bindvars, options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]);
             }
         }
     }
@@ -297,10 +307,14 @@ class Search_MySql_Table extends TikiDb_Table
                 $tableName = $this->tableName;
             }
             $tables = [$tableName];
-            $result = $this->db->fetchAll("SHOW TABLES LIKE '" . $tableName . "_%'", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
-            foreach ($result as $row) {
-                $tables[] = array_shift($row);
-            }
+            $result = $this->db->fetchAll("SHOW TABLES LIKE '" . $tableName . "_%'", options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
+
+            $partitions = array_filter(
+                array_map(fn($row) => array_shift($row), $result),
+                fn($table) => preg_match('/_[0-9]+$/', $table)
+            );
+
+            $tables = array_merge($tables, $partitions);
         }
         return $tables;
     }
@@ -322,7 +336,7 @@ class Search_MySql_Table extends TikiDb_Table
 
         $tables = $this->indexTables();
         foreach ($tables as $table) {
-            $result = $this->db->fetchAll("DESC {$this->escapeIdentifier($table)}", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
+            $result = $this->db->fetchAll("DESC {$this->escapeIdentifier($table)}", options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
             foreach ($result as $row) {
                 $this->definition[$this->tfTranslator->normalize($row['Field'])] = [
                     'table' => $table,
@@ -331,7 +345,7 @@ class Search_MySql_Table extends TikiDb_Table
                 $this->tableFields[$table][] = $this->tfTranslator->normalize($row['Field']);
             }
 
-            $result = $this->db->fetchAll("SHOW INDEXES FROM {$this->escapeIdentifier($table)}", options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
+            $result = $this->db->fetchAll("SHOW INDEXES FROM {$this->escapeIdentifier($table)}", options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_READ_LOG_GROUP]);
             foreach ($result as $row) {
                 $this->indexes[$this->tfTranslator->normalize($row['Key_name'])] = [
                     'table' => $table,
@@ -351,10 +365,11 @@ class Search_MySql_Table extends TikiDb_Table
                 PRIMARY KEY(`id`),
                 INDEX (`object_type`, `object_id`(160))
             ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC",
-            options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]
+            options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]
         );
         $this->exists = true;
 
+        $this->setupStopwordTable();
         $this->emptyBuffer();
     }
 
@@ -366,7 +381,7 @@ class Search_MySql_Table extends TikiDb_Table
                 `id` INT NOT NULL AUTO_INCREMENT,
                 PRIMARY KEY(`id`)
             ) ENGINE=InnoDB ROW_FORMAT=DYNAMIC",
-            options: [TikiDB::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]
+            options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]
         );
     }
 
@@ -416,25 +431,77 @@ class Search_MySql_Table extends TikiDb_Table
         $this->schemaBuffer->push("ADD INDEX $escapedIndex ($escapedField)");
     }
 
+    /**
+    * Creates and populates a custom stopword table for the current index.
+    * This allows Tiki to control InnoDB's stopword list directly during index creation.
+    * This method is called right before a FULLTEXT index is added.
+    *
+    * @return string The name of the created stopword table.
+    */
+    private function setupStopwordTable(): string
+    {
+        global $prefs;
+
+        $stopwordTableName = $this->tableName . '_stopwords';
+
+        $this->db->query("DROP TABLE IF EXISTS `{$stopwordTableName}`");
+        $this->db->query("CREATE TABLE `{$stopwordTableName}` (value VARCHAR(30)) ENGINE=INNODB");
+        $stopwords = $prefs['unified_stopwords'] ?? [];
+        if (! empty($stopwords)) {
+            $stopwordTable = $this->db->table($stopwordTableName, false);
+            foreach ($stopwords as $word) {
+                $stopwordTable->insert(['value' => $word]);
+            }
+        }
+
+        return $stopwordTableName;
+    }
+
+    /**
+     * Encode Tiki-supported identifiers for InnoDB's filename character set.
+     *
+     * Tiki-created database names are limited to ASCII letters, digits, dollar
+     * signs, underscores, and hyphens. MySQL preserves letters, digits, and
+     * underscores in filenames, so only the remaining two characters require
+     * encoding. Search index names use a subset of the same character set.
+     */
+    private static function encodeInnoDBIdentifier(string $identifier): string
+    {
+        return strtr($identifier, [
+            '$' => '@0024',
+            '-' => '@002d',
+        ]);
+    }
+
     private function addFullText($fieldName)
     {
+        $stopwordTableName = $this->setupStopwordTable();
+        $dbName = $this->db->getOne("SELECT DATABASE()");
+        $innodbStopwordTableName = sprintf(
+            '%s/%s',
+            self::encodeInnoDBIdentifier($dbName),
+            self::encodeInnoDBIdentifier($stopwordTableName)
+        );
+        $this->db->query("SET SESSION innodb_ft_user_stopword_table = ?", [$innodbStopwordTableName]);
+
         $table = $this->escapeIdentifier($this->definition[$fieldName]['table']);
         $this->schemaBuffer->setPrefix("ALTER TABLE $table ");
 
         $indexName = $fieldName . '_fulltext';
-        $table = $this->escapeIdentifier($this->tableName);
         $escapedIndex = $this->escapeIdentifier($this->tfTranslator->shortenize($indexName));
         $escapedField = $this->escapeIdentifier($this->tfTranslator->shortenize($fieldName));
 
         $this->schemaBuffer->push("ADD FULLTEXT INDEX $escapedIndex ($escapedField)");
         // InnoDB presently supports one FULLTEXT index creation at a time
         $this->schemaBuffer->flush();
+        $this->fullTextTablesToAnalyze[$this->definition[$fieldName]['table']] = true;
     }
 
     private function emptyBuffer()
     {
         $this->schemaBuffer->clear();
         $this->dataBuffer->clear();
+        $this->fullTextTablesToAnalyze = [];
     }
 
     private function addToBuffer($table, $keySet, $valueSet)
@@ -449,6 +516,26 @@ class Search_MySql_Table extends TikiDb_Table
     {
         $this->schemaBuffer->flush();
         $this->dataBuffer->flush();
+
+        /*
+         * Tiki creates FULLTEXT indexes lazily, after the search table has been populated.
+         * On affected MySQL and MariaDB versions, adding another FULLTEXT index can make an
+         * existing MATCH() return an invalid relevance value. Using that value in Tiki's
+         * weighted score calculation then fails with "DOUBLE value is out of range"
+         * (error 1690, SQLSTATE 22003).
+         *
+         * MySQL tracks this trigger and error in https://bugs.mysql.com/bug.php?id=118535.
+         * ANALYZE TABLE is a tested workaround for Tiki's MySQL/MariaDB backend, not a
+         * permanent upstream fix.
+         */
+        foreach (array_keys($this->fullTextTablesToAnalyze) as $table) {
+            $table = $this->escapeIdentifier($table);
+            $this->db->query(
+                "ANALYZE TABLE $table",
+                options: [TikiDb::QUERY_OPTION_LOG_GROUP => self::UNIFIED_MYSQL_WRITE_LOG_GROUP]
+            );
+        }
+        $this->fullTextTablesToAnalyze = [];
     }
 
     private function calculateMaxColumnsPerTable()

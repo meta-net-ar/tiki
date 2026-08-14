@@ -58,15 +58,7 @@ function wikiplugin_wysiwyg_info()
 
 function wikiplugin_wysiwyg($data, $params)
 {
-    // TODO refactor: defaults for plugins?
-    $defaults = [];
-    $plugininfo = wikiplugin_wysiwyg_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
-    global $tiki_p_edit, $page, $prefs, $user;
+    global $page, $prefs, $user;
     static $execution = 0;
 
     global $wikiplugin_included_page;
@@ -88,6 +80,7 @@ function wikiplugin_wysiwyg($data, $params)
         $params['_wysiwyg'] = 'y';
         $params['is_html'] = $contentIsHTML;
         $params['_is_html'] = $contentIsHTML;    // needed for toolbars
+        $params['area_id'] = $exec_key;
         //$params['comments'] = true;
 
         if ($prefs['namespace_enabled'] == 'y' && $prefs['namespace_force_links'] == 'y') {
@@ -111,7 +104,7 @@ function wikiplugin_wysiwyg($data, $params)
         ['lang' => $lang, 'filePath' => $langFilePath] = TikiLib::lib('wysiwyg')->getEditorLang();
 
         TikiLib::lib('header')->add_js_module(<<<JS
-            import('@jquery-tiki/plugins/wysiwyg').then((module) => {
+            import('@wysiwyg/plugin').then((module) => {
                 module.default('{$exec_key}', JSON.parse('{$tools}'), '{$sourcepage}', {
                     lang: '{$lang}',
                     langFilePath: '{$langFilePath}',

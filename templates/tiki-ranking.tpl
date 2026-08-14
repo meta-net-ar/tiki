@@ -6,6 +6,7 @@
                     <option value="{$allrankings[ix].value|escape}" {if $which eq $allrankings[ix].value}selected="selected"{/if}>{$allrankings[ix].name}</option>
                 {/section}
             </select>
+            <br>
             <select name="limit" class="form-select me-3 mb-4">
                 <option value="10" {if $limit eq 10}selected="selected"{/if}>{tr}Top 10{/tr}</option>
                 <option value="20" {if $limit eq 20}selected="selected"{/if}>{tr}Top 20{/tr}</option>
@@ -15,7 +16,7 @@
         </div>
 
         {if $categIdstr}<input type="hidden" name="categId" value="{$categIdstr}">{/if}
-        <input type="submit" class="btn btn-primary mb-4" name="selrank" value="{tr}View{/tr}">
+        <input type="submit" class="btn btn-primary mb-4 ms-4" name="selrank" value="{tr}View{/tr}">
     </form>
 
 {section name=ix loop=$rankings}

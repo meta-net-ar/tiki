@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 /**
  * @return array
  */
@@ -23,7 +26,8 @@ function module_freetag_info()
  */
 function module_freetag($mod_reference, $module_params)
 {
-    global $sections, $section;
+    global $sections;
+    $section = Sections::getCurrentSection();
     $smarty = TikiLib::lib('smarty');
     $modlib = TikiLib::lib('mod');
 

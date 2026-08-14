@@ -1,6 +1,6 @@
 {title help="UserList"}{tr}User List{/tr}{/title}
 
-{$cant_users} {if !$find}{tr}users registered{/tr}{else} {tr}Users{/tr} {tr}like{/tr} "{$find}"{/if}
+{$users_count} {if !$find}{tr}users registered{/tr}{else} {tr}Users{/tr} {tr}like{/tr} "{$find}"{/if}
 
 {include file='find.tpl' autocomplete="username"}
 
@@ -30,11 +30,7 @@
             {/if}
             {if $prefs.feature_community_list_country eq 'y'}
                 <td class="text">
-                    {if $listuserscountry[changes] == "None" || $listuserscountry[changes] == "Other" || $listuserscountry[changes] == ""}
-                        {html_image file='img/flags/Other.png' hspace='4' vspace='1' alt="{tr}Flag{/tr}" title="{tr}Flag{/tr}"}
-                    {else}
-                        {html_image file="img/flags/{$listuserscountry[changes]}.png" hspace='4' vspace='1' alt="{tr}Flag{/tr}" title="{tr}Flag{/tr}"}&nbsp;{tr}{$listuserscountry[changes]}{/tr}
-                    {/if}&nbsp;
+                    {$listuserscountry[changes]|countryflagwithlabel}&nbsp;{tr}{$listuserscountry[changes]}{/tr}&nbsp;
                 </td>
             {/if}
             {if $prefs.feature_community_list_distance eq 'y'}
@@ -46,4 +42,4 @@
     {/section}
 </table>
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

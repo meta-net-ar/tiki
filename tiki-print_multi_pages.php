@@ -8,6 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+// TIKI_PRINTING_PDF is true only for PDF exports (?display=pdf).
+define('TIKI_PRINTING_PDF', isset($_REQUEST['display']) && $_REQUEST['display'] === 'pdf');
+
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -53,7 +57,7 @@ if (isset($_REQUEST["print"]) || isset($_REQUEST["display"])) {
             Feedback::errorAndDie(tra("You do not have permission to view this page."), \Laminas\Http\Response::STATUS_CODE_401);
         }
         // check if user can print or export pdf
-        if (isset($_REQUEST["display"]) && $_REQUEST["display"] == 'pdf') {
+        if (TIKI_PRINTING_PDF) {
             if (! $tikilib->user_has_perm_on_object($user, $page, 'wiki page', 'tiki_p_export_pdf')) {
                 Feedback::errorAndDie(tra("You do not have permission to export to pdf this page."), \Laminas\Http\Response::STATUS_CODE_401);
             }
@@ -117,7 +121,7 @@ if (isset($_REQUEST['display'])) {
     $smarty->assign('display', $_REQUEST['display']);
 }
 // Allow PDF export by installing a Mod that define an appropriate function
-if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
+if (TIKI_PRINTING_PDF) {
     require_once 'lib/pdflib.php';
     $generator = new PdfGenerator();
     $pdf = $pdfname = '';
@@ -141,12 +145,11 @@ if (isset($_REQUEST['display']) && $_REQUEST['display'] == 'pdf') {
         header("Content-Type: application/pdf");
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . strlen($pdf));
-        TikiLib::lib('header')->setXRobotsTag($robots);
         echo $pdf;
     } else {
         Feedback::error($generator->error);
         $tab = '';
-        if (strpos($_SERVER['HTTP_REFERER'], 'tiki-print_pages.php') !== false && ! empty($printpages)) {
+        if (str_contains($_SERVER['HTTP_REFERER'], 'tiki-print_pages.php') && ! empty($printpages)) {
             $tab = '#contenttabs_print_pages-2';
         }
         $access->redirect($_SERVER['HTTP_REFERER'] . $tab);

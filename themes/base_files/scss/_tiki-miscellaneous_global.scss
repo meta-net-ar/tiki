@@ -1,4 +1,54 @@
+// Default values for necessary Bootstrap and Tiki CSS variables in case themes don't provide them
+:root {
+    --tiki-page-content-top-margin: 1.25rem; // Equivalent to 20px that was hard-coded in Tiki at one time
+    --tiki-anchor-offset: 33vh;
+}
+
+// Prevent anchor targets from being covered by fixed/sticky headers,
+// including empty inline anchors created by the ANAME plugin.
+html {
+    scroll-padding-top: var(--tiki-anchor-offset);
+}
+
+.navbar-brand {
+    --bs-navbar-brand-padding-y: 0.31225rem; // Value based on typical navbar brand font size, etc.
+}
+
 //****** Misc. Global Classes (layout and style) ****/
+
+// Accessibility: Honor prefers-reduced-motion setting
+// This disables non-essential animations and transitions when users have requested reduced motion
+@media screen and (prefers-reduced-motion: reduce) {
+  * {
+    // Disable all transitions
+    transition-duration: 0.001s !important;
+    transition-delay: 0s !important;
+    
+    // Disable all animations
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    
+    // Disable scroll behavior
+    scroll-behavior: auto !important;
+  }
+  
+  // Specific elements that might have animations
+  .sliding-panel-admin-bar,
+  .dropdown-menu,
+  .collapse,
+  .fade,
+  .modal,
+  .carousel-item,
+  .progress-bar,
+  .accordion-button,
+  .nav-link,
+  .btn,
+  .alert {
+    transition: none !important;
+    animation: none !important;
+  }
+}
 
 // Extra-small button, initially for the side column toggle icons
 .btn-xs { padding: 0 .25rem !important; }
@@ -159,8 +209,9 @@ form[name=editpageform] .mb-3 .tab-content .alert-warning {
     margin: 0;
     //    border: 1px solid $alert-info-border;
     width: 100%;
-    top: 0;
-    left: 0;
+    // background-color: #333;
+    // top: 0;
+    // left: 0;
     z-index: 1100;
 }
 
@@ -236,7 +287,7 @@ body.fullscreen {
 }
 
 #errors {
-    z-index: 1023;
+    z-index: 2;
 }
 
 // Misc. Global Classes (layout and style)
@@ -379,11 +430,6 @@ span.btn-link {
     display: none;
 }
 
-// ColorBox
-// #cboxTitle {
-//     background-color: $body-bg;
-// }
-//
 // #captchaImg {
 //     border: 1px solid $panel-default-border;
 // }
@@ -412,7 +458,7 @@ span.btn-link {
     margin-right: 2px;
 }
 
-.include-icon .form-select, .include-icon .select2-container--bootstrap-5 {
+.include-icon .form-select {
     width: calc(100% - #{$btn-padding-x}*2 - 20px) !important;
     display: inline-block;
     margin-right: 2px;
@@ -422,8 +468,15 @@ span.btn-link {
     --bs-btn-padding-y: 0;
 }
 
+// Make the links clickable in stretched-link elements (e.g., in PluginListExecute simple list)
+.stretched-link a {
+    position: relative;
+    z-index: 2;
+}
+
 //date picker dropdowns
-select.form-control.date {
+// date class renamed to date-time-selector-field to avoid conflict with jQuery validation date class
+select.form-control.date-time-selector-field {
     width: auto;
     display: inline;
 }
@@ -564,19 +617,30 @@ div.categbar {
     padding: 0.25rem 1.5rem;
 }
 
-// Auto unique-numbered ordered lists (for ordered lists wrapped in class="uol" wrapper (or when enabled globally) to generate unique "chapter like" numbering X.Y.Z)
-.uol {
-    margin-left: 2rem;
-}
-.uol ol:not(.media-list), ol.uol {
-    counter-reset: item;
-}
-.uol ol:not(.media-list) > li { display: block; } // negative text-indent here simulates the common ol rendering indentation
-.uol ol:not(.media-list) > li:before { content: counters(item, ".") ".\0000a0"; counter-increment: item; margin-left: -3rem; } // \0000a0 is nbsp Unicode escaped
-.uol ol:not(.media-list) > li ol > li:before { content: counters(item, ".") "\0000a0"; counter-increment: item } // here we remove the last dot (looks better?)
+// Default style for unwrapped <ol> - ol class exceptions (should not have numbering applied) expanded from media-list to all in order to include breadcrumbs and similar cases.
+ol:not([class]):not(.uol):not(.nouol ol):not(.uol ol), li > ol:not([class]):not(.uol):not(.nouol ol):not(.uol ol) { list-style: none; counter-reset: item; padding-left: 0; }
+ol:not([class]):not(.uol):not(.nouol ol):not(.uol ol) li { position: relative; display: block; counter-increment: item; padding-left: 3rem; }
+ol:not([class]):not(.uol):not(.nouol ol):not(.uol ol) li::before { content: counters(item, ".") ".\0000a0"; position: absolute; left: 0; width: 2.5rem; text-align: right; }
+ol:not([class]):not(.uol):not(.nouol ol):not(.uol ol) > li ol > li::before { content: counters(item, ".") "\0000a0"; }
 
-.nouol ol > li { display: list-item; text-indent: 0 }
-.nouol ol > li:before, .nouol ol > li ol > li:before { content: "" }
+// Auto unique-numbered ordered lists (for ordered lists wrapped in class="uol" wrapper (or when enabled globally) to generate unique "chapter like" numbering X.Y.Z)
+.uol { counter-reset: item; }
+.uol ol, ol.uol { list-style: none; padding-left: 0; }
+.uol ol:not([class]) > li { position: relative; display: block; counter-increment: item; padding-left: 3rem; }
+.uol ol:not([class]) > li::before { content: counters(item, ".") ".\0000a0"; position: absolute; left: 0; width: 2.5rem; text-align: right; }
+.uol ol:not([class]) > li ol > li:before { content: counters(item, ".") "\0000a0"; }
+.uol li > ol { counter-reset: item; }
+
+// Style for .nouol
+.nouol { counter-reset: none !important; }
+.nouol ol { list-style: none; padding-left: 0; }
+.nouol ol > li { position: relative; padding-left: 3rem; }
+.nouol ol > li::before { content: counter(item, decimal) ".\0000a0"; counter-increment: item; position: absolute; left: 0; width: 2.5rem; text-align: right; }
+.nouol ol { counter-reset: item; }
+
+// Align the ul list with other lists
+ul:not([class]) { list-style: disc outside; padding-left: 3rem; }
+ul:not([class]) > li { text-indent: 0; }
 
 // default styling for <blockquote> element (#7093)
 
@@ -585,11 +649,8 @@ blockquote {
         margin: .8rem 0;
 }
 
-// Improve horizontal spacing of breadcrumb icons and separators
-.breadcrumb-item { padding-right: 0.5rem;}
-.breadcrumb .tips { padding-right: 0.5rem;}
 
-// Enable Smartmenus dropdown-menu to display above fixed-top header
+// Enable Smartmenus dropdown-menu to display above sticky-top header
 ul.sm-vertical,
 ul.sm-horizontal {
     .dropdown-menu {
@@ -657,7 +718,6 @@ ul.sm-horizontal {
 
 .codelisting_container {
     max-width: 990px;
-    z-index: 1;
     position: relative;
 }
 .code {
@@ -672,6 +732,7 @@ ul.sm-horizontal {
     right: 20px;
     top: 10px;
     font-size: 80%;
+    z-index: 1;
 }
 .icon_copy_code:hover {
     color: black;
@@ -837,4 +898,32 @@ ul.sm-horizontal {
     [data-mobile-tooltip].show-tooltip::after {
         display: block;
     }
+}
+.wiki-help-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    width: 100%;
+}
+.help-item {
+    padding: 0.75rem;
+    background-color: var(--bs-secondary-bg);
+    color: var(--bs-body-color);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 0.25rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    word-wrap: break-word;
+}
+.help-item table,
+.help-item pre,
+.help-item code {
+    max-width: 100%;
+    overflow-x: auto;
+    display: block;
+}
+
+// Moved from _tiki-blogs.scss because it's also used in wiki and directory, etc.
+.description {
+    font-size: .95em;
+    font-style: italic;
 }

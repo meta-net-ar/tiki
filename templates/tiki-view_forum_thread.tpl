@@ -20,26 +20,32 @@
     {remarksbox type=warning title="{tr}The post has been reported and will be reviewed by a moderator.{/tr}"}{/remarksbox}
 {/if}
 <br>
-<div id="thread-breadcrumb" class="breadcrumb d-flex justify-content-between mb-4">
-    <div>
-    <a class="link" href="{if $prefs.feature_sefurl eq 'y'}forums{else}tiki-forums.php{/if}">
-        {tr}Forums{/tr}
-    </a>
-    {$prefs.site_crumb_seper}
-    <a class="link" href="{$forumId|sefurl:'forum'}">
-        {$forum_info.name|escape}
-    </a>{if isset($thread_info.topic.threadId) and $thread_info.topic.threadId}
-        {$prefs.site_crumb_seper}
-        <a class="link" href="{$thread_info.topic.threadId|sefurl:'forumthread'}{if !empty($smarty.request.topics_offset)}&amp;topics_offset={$smarty.request.topics_offset}{/if}{$topics_sort_mode_param}{$topics_threshold_param}{$topics_find_param}">
-            {$thread_info.topic.title}
-        </a>
-    {/if}
-    {$prefs.site_crumb_seper}
-    {$thread_info.title|escape}
+<div id="thread-breadcrumb" class="mb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb"{if $prefs.site_crumb_seper} style="--bs-breadcrumb-divider: '{$prefs.site_crumb_seper|escape:'quotes'}'"{/if}>
+            <li class="breadcrumb-item">
+                <a href="{if $prefs.feature_sefurl eq 'y'}forums{else}tiki-forums.php{/if}">{tr}Forums{/tr}</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{$forumId|sefurl:'forum'}">{$forum_info.name|escape}</a>
+            </li>
+            {if isset($thread_info.topic.threadId) and $thread_info.topic.threadId}
+                <li class="breadcrumb-item">
+                    <a href="{$thread_info.topic.threadId|sefurl:'forumthread'}{if !empty($smarty.request.topics_offset)}&amp;topics_offset={$smarty.request.topics_offset}{/if}{$topics_sort_mode_param}{$topics_threshold_param}{$topics_find_param}">
+                        {$thread_info.topic.title|forummaskemail|escape}
+                    </a>
+                </li>
+            {/if}
+            <li class="breadcrumb-item active" aria-current="page">
+                {$thread_info.title|forummaskemail|escape}
+            </li>
+        </ol>
+    </nav>
+</div>
     <div>
         {if empty($thread_info.topic.threadId)}
             <span>
-                {if ($prev_topic and $prev_topic ne $comments_parentId) or $next_topic}{if $prev_topic and $prev_topic ne $comments_parentId}<a href="tiki-view_forum_thread.php?comments_parentId={$prev_topic}&amp;topics_offset={$topics_prev_offset}{$topics_sort_mode_param}{$topics_threshold_param}{$topics_find_param}{$comments_per_page_param}{$thread_style_param}{$thread_sort_mode_param}{$comments_threshold_param}" class="link">{icon name="angle-left"}{tr}Previous topic{/tr}</a>{if $next_topic} | {/if}{/if}
+                {if ($prev_topic and $prev_topic ne $comments_parentId) or $next_topic}{if $prev_topic and $prev_topic ne $comments_parentId}<a href="tiki-view_forum_thread.php?comments_parentId={$prev_topic}&amp;topics_offset={$topics_prev_offset}{$topics_sort_mode_param}{$topics_threshold_param}{$topics_find_param}{$comments_per_page_param}{$thread_style_param}{$thread_sort_mode_param}{$comments_threshold_param}" class="link">{icon name="angle-left"} {tr}Previous topic{/tr}</a>{if $next_topic} | {/if}{/if}
                 {if $next_topic}<a href="tiki-view_forum_thread.php?comments_parentId={$next_topic}&amp;topics_offset={$topics_next_offset}{$topics_sort_mode_param}{$topics_threshold_param}{$topics_find_param}{$comments_per_page_param}{$thread_style_param}{$thread_sort_mode_param}{$comments_threshold_param}" class="link">{tr}Next topic{/tr} {icon name="angle-right"}</a>{/if}{/if}
             </span>
         {else}
@@ -48,13 +54,12 @@
             </span>
         {/if}
     </div>
-    </div>
-    <div class="text-end">
-{block name=thread_actions}
+<div class="text-end">
+    {block name=thread_actions}
 &nbsp;
         <div class="btn-group">
             {if ! $js}<ul><li>{/if}
-            <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" title="{tr}Forum actions{/tr}">
+            <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" title="{tr}Forum actions{/tr}" role="button">
                 {icon name="menu-extra"}
             </a>
             <div class="dropdown-menu dropdown-menu-end">
@@ -82,7 +87,7 @@
                 {if $prefs.sefurl_short_url eq 'y'}
                     <a class="dropdown-item" id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();">
                         {icon name="link"} {tr}Get a short URL{/tr}
-                        {assign var="hasPageAction" value="1"}
+                        {$hasPageAction="1"}
                     </a>
                 {/if}
                 {if $prefs.feature_forum_topics_archiving eq 'y' && $tiki_p_admin_forum eq 'y'}
@@ -119,15 +124,13 @@
             </div>
             {if ! $js}</li></ul>{/if}
         </div>
-    </div>
-    </div>
-{/block}
-
+    {/block}
+</div>
 
 {if $openpost eq 'y'}
-    {assign var="postclass" value="forumpostopen"}
+    {$postclass="forumpostopen"}
 {else}
-    {assign var="postclass" value="forumpost"}
+    {$postclass="forumpost"}
 {/if}
 
 <section class="top_post">
@@ -234,5 +237,5 @@
             {/foreach}
         </table>
     </div>
-    {pagination_links cant=$atts.cant offset=$atts.offset offset_arg='fa_offset' step=$atts.maxRecords _anchor='attachments'}{/pagination_links}
+    {pagination_links count=$atts.count offset=$atts.offset offset_arg='fa_offset' step=$atts.maxRecords _anchor='attachments'}{/pagination_links}
 {/if}

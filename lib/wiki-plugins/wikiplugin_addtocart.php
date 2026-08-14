@@ -4,11 +4,14 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Auth\Tokens;
+
 function wikiplugin_addtocart_info()
 {
     return [
         'name' => tra('Add to cart'),
-        'documentation' => tra('PluginAddToCart'),
+        'documentation' => 'PluginAddToCart',
         'description' => tra('Add a product to the shopping cart.'),
         'prefs' => [ 'wikiplugin_addtocart', 'payment_feature' ],
         'filter' => 'wikicontent',
@@ -195,7 +198,6 @@ function wikiplugin_addtocart_info()
 function wikiplugin_addtocart($data, $params)
 {
     global $cartuserlist, $globalperms;
-
     $smarty = TikiLib::lib('smarty');
     $userlib = TikiLib::lib('user');
     $headerlib = TikiLib::lib('header');
@@ -204,16 +206,28 @@ function wikiplugin_addtocart($data, $params)
     if (! session_id()) {
         session_start();
     }
-    if (! isset($params['code'], $params['description'], $params['price'])) {
-        return WikiParser_PluginOutput::argumentError(array_diff([ 'code', 'description', 'price'], array_keys($params)));
+
+    $invalidDataType = [];
+    $invalidDataType[] = is_numeric($params['code']) ? null : 'code';
+    $invalidDataType[] = is_numeric($params['price']) ? null : 'price';
+    $invalidDataType = array_filter($invalidDataType);
+    if (! empty($invalidDataType)) {
+        return WikiParser_PluginOutput::userError(tra(
+            'Invalid data type for parameter(s): %0. Expected numeric value.',
+            '',
+            false,
+            [implode(', ', $invalidDataType)]
+        ));
     }
 
-    $plugininfo = wikiplugin_addtocart_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
+    $missing = [];
+    $missing[] = empty($params['code']) ? 'code' : null;
+    $missing[] = empty($params['description']) ? 'description' : null;
+    $missing = array_filter($missing);
+
+    if (! empty($missing)) {
+        return WikiParser_PluginOutput::argumentError($missing);
     }
-    $params = array_merge($default, $params);
 
     // once forceanon is set it will have to affect the whole shopping cart otherwise it will be inconsistent
     if ($params['forceanon'] == 'y') {
@@ -286,8 +300,7 @@ function wikiplugin_addtocart($data, $params)
                     if (! $user || $params['forceanon'] == 'y' && ! Perms::get('payment', $invoice)->manual_payment) {
                         // token access needs to be an optional feature
                         // and needs to depend on auth_token_access pref
-                        require_once 'lib/auth/tokens.php';
-                        $tokenlib = AuthTokens::build($prefs);
+                        $tokenlib = Tokens::build($prefs);
                         $tokenpaymenturl = $tokenlib->includeToken($paymenturl, ['Temporary Shopper','Anonymous']);
                     }
                     if ($globalperms->payment_admin || Perms::get('payment', $invoice)->manual_payment || empty($tokenpaymenturl)) {

@@ -17,18 +17,15 @@ include_once('lib/notepad/notepadlib.php');
 $access->check_feature('feature_notepad');
 $access->check_user($user);
 $access->check_permission('tiki_p_notepad');
+
 if (! isset($_REQUEST["noteId"])) {
     Feedback::errorAndDie(tra("No note indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
+$disposition = isset($_REQUEST["save"]) ? "attachment" : "inline";
 
-if (isset($_REQUEST["save"])) {
-    $disposition = "attachment";
-} else {
-    $disposition = "inline";
-}
 $info = $notepadlib->get_note($user, $_REQUEST["noteId"]);
+
 header("Content-type: text/plain");
 header("Content-Disposition: $disposition; filename=note_" . urlencode($user) . '_' . $_REQUEST["noteId"] . ".txt;");
 echo $info['data'];

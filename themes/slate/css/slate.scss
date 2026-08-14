@@ -1,3 +1,22 @@
+@charset "UTF-8";
+/*!
+ * Bootswatch Slate theme adapted by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2002-2025 The Tiki Community as described in copyright.txt
+ * Licensed under MIT
+*/
+/*!
+ * Bootswatch v5.3.3 (https://bootswatch.com)
+ * Theme: slate
+ * Copyright 2012-2024 Thomas Park
+ * Licensed under MIT
+ * Based on Bootstrap
+*/
+/*!
+ * Bootstrap  v5.3.3 (https://getbootstrap.com/)
+ * Copyright 2011-2024 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
+
 /* Bootswatch theme adapted by the Tiki Community for Tiki Wiki CMS Groupware */
 /* Original Bootswatch information:
  * bootswatch v5.3.3
@@ -27,19 +46,16 @@
 
 @import "../scss/css-variables"; // 13. Imported after default CSS variables to override them.
 
+
+// ----------------------------- Overrides and adjustments ----------------------------- //
+
 //Theme variables aren't overriding default values for these.
-body {
-  color: #aaa;
-  background: #272b30;
-}
+//body {
+//  color: #aaa;
+//  background: #272b30;
+//}
 
 body.fullscreen { background: var(--#{$prefix}body-bg); }
-
-// Increase navbar height to reinstate Bootswatch style
-//.topbar_modules > * {
-//    margin-top: .5rem;
-//    margin-bottom: .5rem;
-//}
 
 // Bootstrap variable overrides seem to have to be here to be effective.
 // Override Bootstrap CSS variable for valid CSS calc in mod-logo (0 must have a unit).
@@ -50,4 +66,32 @@ body.fullscreen { background: var(--#{$prefix}body-bg); }
 }
 .card-body .navbar {
     border: none;
+}
+
+//.alert-light, .tiki .alert.alert-light .alert-link { color: #FFFFFF; }
+.btn-outline-secondary { --bs-btn-color: #93999F; }
+.btn-outline-success { --bs-btn-color: #55BE55; }
+.btn-outline-danger { --bs-btn-color: #EF706C; }
+.btn-outline-warning { --bs-btn-color: #E28503; }
+.btn-outline-info { --bs-btn-color: #289FC3; }
+.btn-outline-light { --bs-btn-color: #DBDBDB; }
+.btn-outline-dark { --bs-btn-color: #999EA8; }
+.list-group-item-light { color: #FFFFFF; }
+.text-muted { color: #A0A6AB; }
+.list-group-item-light { --bs-list-group-bg: #414141; --bs-list-group-color: #1f1f1f; }
+.list-group-item-light { color: #1f1f1f; }
+
+.blockquote-footer { color: #A0A6AB; }
+.btn.btn-link { color: #fff; }
+
+.navbar-brand {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.alert-primary {
+    --bs-alert-color: #fff;
+    --bs-alert-bg: #757575;
+    --bs-alert-border-color: #fff; // #084298;
+    --bs-alert-link-color: #595858;
 }

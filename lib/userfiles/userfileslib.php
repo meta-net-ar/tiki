@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -43,7 +43,7 @@ class UserFilesLib extends TikiLib
     {
         $query = "insert into `tiki_userfiles`(`user`,`name`,`filename`,`filetype`,`filesize`,`data`,`created`,`hits`,`path`)
     values(?,?,?,?,?,?,?,?,?)";
-        $this->query($query, [$user,$name,$filename,$filetype,(int) $filesize,$data,(int) $this->now,0,$path]);
+        $this->query($query, [$user,$name,$filename,$filetype,(int) $filesize,$data,$this->now,0,$path]);
     }
 
     /**
@@ -68,9 +68,9 @@ class UserFilesLib extends TikiLib
         }
 
         $query = "select `fileId`,`user`,`name`,`filename`,`filetype`,`filesize`,`created`,`hits` from `tiki_userfiles` where `user`=? $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_userfiles` where `user`=? $mid";
+        $query_count = "select count(*) from `tiki_userfiles` where `user`=? $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -79,7 +79,7 @@ class UserFilesLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 

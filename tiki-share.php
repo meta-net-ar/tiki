@@ -10,8 +10,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // To include a link in your tpl do
 //<a href="tiki-share.php?url={$smarty.server.REQUEST_URI|escape:'url'}">{tr}Share this page{/tr}</a>
+use Tiki\Lib\Auth\Tokens;
 
-$section = 'share';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -19,19 +19,22 @@ $inputConfiguration = [
             'do_email'                             => 'bool',                //post
             'do_tweet'                             => 'bool',                //post
             'do_fb'                                => 'bool',                //post
-            'fblike'                               => 'digits',              //post
-            'priority'                             => 'digits',              //post
+            'fblike'                               => 'int',                 //post
+            'priority'                             => 'int',                 //post
             'do_message'                           => 'bool',                //post
-            'forumId'                              => 'digits',              //post
+            'forumId'                              => 'int',                 //post
             'url'                                  => 'url',                 //post
-            'shorturl'                             => 'bool',                //post
+            'shorturl'                             => 'url',                 //post
             'subject'                              => 'string',              //post
             'send'                                 => 'bool',                //post
             'comment'                              => 'text',                //post
-            'share_token_notification'             => 'string',              //post
+            'share_token_notification'             => 'alpha',               //post
+            'msg_share_token_notification'         => 'alpha',               //post
             'share_access_rights'                  => 'bool',                //post
             'share_access'                         => 'bool',                //post
+            'msg_share_access'                     => 'bool',                //post
             'how_much_time_access'                 => 'int',                 //post
+            'msg_how_much_time_access'             => 'int',                 //post
             'addresses'                            => 'email',               //post
             'name'                                 => 'string',              //post
             'email'                                => 'email',               //post
@@ -41,10 +44,15 @@ $inputConfiguration = [
             'replyto_hash'                         => 'string',              //post
             'body'                                 => 'xss',                 //post
             'forum_password'                       => 'password',            //post
+            'tweet'                                => 'text',                //post
+            'back_url'                             => 'url',                 //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_SHARE;
+Sections::setCurrentSection($section);
 if (empty($_REQUEST['report'])) {
     $access->check_feature('feature_share');
     $access->check_permission('tiki_p_share');
@@ -57,7 +65,7 @@ if (empty($_REQUEST['report'])) {
 
 // email related:
 
-$smarty->assign('do_email', (isset($_REQUEST['do_email']) ? $_REQUEST['do_email'] : true));
+$smarty->assign('do_email', ($_REQUEST['do_email'] ?? true));
 if (empty($_REQUEST['report']) || $_REQUEST['report'] != 'y') {
     // twitter/facebook related
     if (isset($prefs['feature_socialnetworks']) and $prefs['feature_socialnetworks'] == 'y') {
@@ -70,9 +78,9 @@ if (empty($_REQUEST['report']) || $_REQUEST['report'] != 'y') {
         $smarty->assign('twitter', ($twitter_token != ''));
         $facebook_token = $tikilib->get_user_preference($user, 'facebook_token', '');
         $smarty->assign('facebook', ($facebook_token != ''));
-        $smarty->assign('do_tweet', (isset($_REQUEST['do_tweet']) ? $_REQUEST['do_tweet'] : true));
-        $smarty->assign('do_fb', (isset($_REQUEST['do_fb']) ? $_REQUEST['do_fb'] : true));
-        $smarty->assign('fblike', (isset($_REQUEST['fblike']) ? $_REQUEST['fblike'] : 1));
+        $smarty->assign('do_tweet', ($_REQUEST['do_tweet'] ?? true));
+        $smarty->assign('do_fb', ($_REQUEST['do_fb'] ?? true));
+        $smarty->assign('fblike', ($_REQUEST['fblike'] ?? 1));
     } else {
         $smarty->assign('twitterRegistered', false);
         $smarty->assign('twitter', false);
@@ -84,8 +92,8 @@ if (empty($_REQUEST['report']) || $_REQUEST['report'] != 'y') {
     if (isset($prefs['feature_messages']) and $prefs['feature_messages'] == 'y') {
         $logslib = TikiLib::lib('logs');
 
-        $smarty->assign('priority', (isset($_REQUEST['priority']) ? $_REQUEST['priority'] : 3));
-        $smarty->assign('do_message', (isset($_REQUEST['do_message']) ? $_REQUEST['do_message'] : true));
+        $smarty->assign('priority', ($_REQUEST['priority'] ?? 3));
+        $smarty->assign('do_message', ($_REQUEST['do_message'] ?? true));
         $send_msg = ($tiki_p_messages == 'y');
 
         if ($prefs['allowmsg_is_optional'] == 'y') {
@@ -111,7 +119,7 @@ if (empty($_REQUEST['report']) || $_REQUEST['report'] != 'y') {
                 $forums[] = $channels['data'][$i];
             }
         }
-        $smarty->assign('forumId', (isset($_REQUEST['forumId']) ? $_REQUEST['forumId'] : 0));
+        $smarty->assign('forumId', ($_REQUEST['forumId'] ?? 0));
     } else {
         $forums = [];
     }
@@ -120,7 +128,7 @@ if (empty($_REQUEST['report']) || $_REQUEST['report'] != 'y') {
 } else {
     $report = 'y';
 }
-$smarty->assign('report', isset($_REQUEST['report']) ? $_REQUEST['report'] : '');
+$smarty->assign('report', $_REQUEST['report'] ?? '');
 
 $errors = [];
 $ok = true;
@@ -140,7 +148,7 @@ if (empty($_REQUEST['url'])) {
 
 $_REQUEST['url'] = urldecode($_REQUEST['url']);
 
-if (strstr($_REQUEST['url'], 'tiki-share.php')) {
+if (str_contains($_REQUEST['url'], 'tiki-share.php')) {
     $_REQUEST['url'] = preg_replace('/.*tiki-share.php\?url=/', '', $_REQUEST['url']);
     header('location: tiki-share.php?url=' . $_REQUEST['url']);
 }
@@ -172,7 +180,7 @@ if ($report != 'y') {
 $smarty->assign('url', $_REQUEST['url']);
 $smarty->assign('prefix', $tikilib->httpPrefix(true));
 $smarty->assign_by_ref('url_for_friend', $url_for_friend);
-$smarty->assign('back_url', isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '');
+$smarty->assign('back_url', $_SERVER['HTTP_REFERER'] ?? '');
 
 if (! empty($_REQUEST['subject'])) {
     $subject = $_REQUEST['subject'];
@@ -197,8 +205,16 @@ if (isset($_REQUEST['send'])) {
         $smarty->assign('share_token_notification', $_REQUEST['share_token_notification']);
     }
 
+    if (! empty($_REQUEST['msg_share_token_notification'])) {
+        $smarty->assign('msg_share_token_notification', $_REQUEST['msg_share_token_notification']);
+    }
+
     if (! empty($_REQUEST['share_access_rights'])) {
         $smarty->assign('share_access_rights', $_REQUEST['share_access_rights']);
+    }
+
+    if (! empty($_REQUEST['msg_share_access'])) {
+        $smarty->assign('msg_share_access', $_REQUEST['msg_share_access']);
     }
 
     if (! empty($_REQUEST['how_much_time_access'])) {
@@ -217,16 +233,17 @@ if (isset($_REQUEST['send'])) {
             $_REQUEST['addresses'] = $email;
             $_REQUEST['do_email'] = 1;
         }
+
         if (isset($_REQUEST['do_email']) and $_REQUEST['do_email'] == 1) {
             // Fix for multi adresses with autocomplete funtionnality
-            if (substr($_REQUEST['addresses'], -2) == ', ') {
+            if (str_ends_with($_REQUEST['addresses'], ', ')) {
                 $_REQUEST['addresses'] = substr($_REQUEST['addresses'], 0, -2);
             }
             // Call checkAddresses with error = false to avoid double error reporting
 
+
             $adresses = checkAddresses($_REQUEST['addresses'], false);
 
-            require_once 'lib/auth/tokens.php';
             if (
                 $prefs['share_can_choose_how_much_time_access']
                 && isset($_REQUEST['how_much_time_access'])
@@ -236,20 +253,26 @@ if (isset($_REQUEST['send'])) {
                 $prefs['auth_token_access_maxhits'] = $_REQUEST['how_much_time_access'];
 
                 /* To upload, you need 2 token: one to see the page and another */
-                if (strpos($_REQUEST['url'], 'tiki-upload_file')) {
+                if (str_contains($_REQUEST['url'], 'tiki-upload_file')) {
                     $prefs['auth_token_access_maxhits'] = $prefs['auth_token_access_maxhits'] * 2 + 1;
                 }
             }
 
             $share_access_rights = isset($_POST['share_access']);
+            $tokenlib = TikiLib::lib('authtokens')::build($prefs);
             if (isset($_REQUEST['share_token_notification']) && $_REQUEST['share_token_notification'] == 'y') {
-                // list all users to give an unique token for notification
-                $tokenlib = AuthTokens::build($prefs);
+                // list all users to give a unique token for notification or access cancellation ability for each user
 
                 if (is_array($adresses)) {
                     $contactlib = TikiLib::lib('contact');
                     foreach ($adresses as $adresse) {
-                        $tokenlist[] = $tokenlib->includeToken($url_for_friend, $share_access_rights ? $globalperms->getGroups() : ['Anonymous'], $adresse);
+                        $data = [
+                            'sender' => $_REQUEST['email'],
+                            'userto' => $adresse,
+                            'destination' => 'email',
+                        ];
+
+                        $tokenlist[] = $tokenlib->includeToken($url_for_friend, $share_access_rights ? $globalperms->getGroups() : ['Anonymous'], $adresse, 0, 0, false, 'guest', null, $data);
                         // if preference share_contact_add_non_existant_contact the add auomaticly to contact
                         if ($prefs['share_contact_add_non_existant_contact'] == 'y' && $prefs['feature_contacts'] == 'y') {
                             // check if email exist for at least one contact in
@@ -263,9 +286,7 @@ if (isset($_REQUEST['send'])) {
 
                 if (is_array($tokenlist)) {
                     foreach ($tokenlist as $i => $data) {
-                        $query = parse_url($data);
-                        parse_str($query['query'], $query_vars);
-                        $detailtoken = $tokenlib->getToken($query_vars['TOKEN']);
+                        $detailtoken = $tokenlib->getTokenFromUrl($data);
                         // Delete old user watch if it's necessary => avoid bad mails
                         $tikilib->remove_user_watch_object('auth_token_called', $detailtoken['tokenId'], 'security');
                         $tikilib->add_user_watch($user, 'auth_token_called', $detailtoken['tokenId'], 'security', tra('Token called'), $data);
@@ -273,8 +294,13 @@ if (isset($_REQUEST['send'])) {
                 }
             } else {
                 if ($share_access_rights) {
-                    $tokenlib = AuthTokens::build($prefs);
-                    $url_for_friend = $tokenlib->includeToken($url_for_friend, $globalperms->getGroups(), $_REQUEST['addresses']);
+                    $data = [
+                        'sender' => $user,
+                        'userto' => $_REQUEST['addresses'],
+                        'destination' => 'email',
+                    ];
+
+                    $url_for_friend = $tokenlib->includeToken($url_for_friend, $globalperms->getGroups(), $_REQUEST['addresses'], 0, 0, false, 'guest', null, $data);
                     $smarty->assign('share_access', true);
                 }
                 $tokenlist[0] = $url_for_friend;
@@ -326,7 +352,63 @@ if (isset($_REQUEST['send'])) {
             } // do_fb
 
             if (isset($_REQUEST['do_message']) and $_REQUEST['do_message'] == 1) {
-                $messageSent = sendMessage($_REQUEST['messageto'], $subject);
+                if ($prefs['share_can_choose_how_much_time_access'] && isset($_REQUEST['msg_how_much_time_access']) && is_numeric($_REQUEST['msg_how_much_time_access']) && $_REQUEST['msg_how_much_time_access'] >= 1) {
+                    $prefs['auth_token_access_maxhits'] = $_REQUEST['msg_how_much_time_access'];
+
+                    /* To upload, you need 2 tokens: one to see the page and another */
+                    if (str_contains($_REQUEST['url'], 'tiki-upload_file')) {
+                        $prefs['auth_token_access_maxhits'] = $prefs['auth_token_access_maxhits'] * 2 + 1;
+                    }
+                }
+
+                $tokenlib = TikiLib::lib('authtokens')::build($prefs);
+                $recipients = $_REQUEST['messageto'];
+                $arr_to = parseUsernameList($recipients);
+                $tokenlist = [];
+
+                // Determine share-access rights and notification flag
+                $msg_share_access_rights = isset($_POST['msg_share_access']);
+                if (isset($_REQUEST['msg_share_token_notification']) && $_REQUEST['msg_share_token_notification'] == 'y') {
+                    $userlib = TikiLib::lib('user');
+
+                    foreach ($arr_to as $usr_to) {
+                        $user_details = $userlib->get_user_details($usr_to);
+                        $user_email = $user_details['info']['email'] ?? '';
+                        $data = [
+                            'sender' => $user,
+                            'userto' => $usr_to,
+                            'destination' => 'message',
+                        ];
+
+                        $tokenlist[] = $tokenlib->includeToken($url_for_friend, $msg_share_access_rights ? $globalperms->getGroups() : ['Anonymous'], $user_email, 0, 0, false, 'guest', null, $data);
+                    }
+
+                    foreach ($tokenlist as $i => $data) {
+                        $detailtoken = $tokenlib->getTokenFromUrl($data);
+                        $tikilib->remove_user_watch_object('auth_token_called', $detailtoken['tokenId'], 'security');
+                        $tikilib->add_user_watch($user, 'auth_token_called', $detailtoken['tokenId'], 'security', tra('Token called'), $data);
+                    }
+                } else {
+                    if ($msg_share_access_rights) {
+                        $data = [
+                            'sender' => $user,
+                            'userto' => $recipients,
+                            'destination' => 'message',
+                        ];
+
+                        $url_for_friend = $tokenlib->includeToken($url_for_friend, $globalperms->getGroups(), '', 0, 0, false, 'guest', null, $data);
+                        $smarty->assign('msg_share_access', true);
+                    }
+                    $tokenlist[0] = $url_for_friend;
+                }
+
+                $smarty->assign_by_ref('user', $user);
+
+                if (! empty($recipients)) {
+                    $smarty->assign('users', $recipients);
+                }
+
+                $messageSent = sendMessage($recipients, $subject, $tokenlist);
                 $smarty->assign('messageSent', $messageSent);
                 $ok = $ok || $messageSent;
                 if ($messageSent) {
@@ -344,9 +426,6 @@ if (isset($_REQUEST['send'])) {
         } //report != y
 
         $smarty->assign('errortype', 'no_redirect_login');
-        /*if ($ok && $report == 'y') {
-            $access->redirect($_REQUEST['url'], tra('Your link was sent.'));
-        }*/
         $smarty->assign('sent', true);
         $smarty->assign('back_url', $_REQUEST['back_url']);
 
@@ -383,7 +462,6 @@ $smarty->display('tiki.tpl');
 function checkAddresses($recipients, $error = true)
 {
     global $errors, $prefs, $user;
-    $userlib = TikiLib::lib('user');
     $registrationlib = TikiLib::lib('registration');
     $logslib = TikiLib::lib('logs');
 
@@ -392,8 +470,6 @@ function checkAddresses($recipients, $error = true)
     if (! is_array($recipients)) {
         $recipients = preg_split('/(,|;)/', $recipients);
     }
-
-    $ok = true;
 
     foreach ($recipients as &$recipient) {
         $recipient = trim($recipient);
@@ -427,7 +503,7 @@ function checkAddresses($recipients, $error = true)
  * @internal param string $url_for_friend URL to share
  * @return bool                        true on success / false if the supplied parameters were incorrect/missing or an error occurred sending the mail
  */
-function sendMail($sender, $recipients, $subject, $tokenlist = [])
+function sendMail($sender, $recipients, $subject, $tokenlist = []): bool
 {
     global $errors, $prefs, $user;
     $userlib = TikiLib::lib('user');
@@ -497,13 +573,15 @@ function sendMail($sender, $recipients, $subject, $tokenlist = [])
     return $ok;
 }
 
-/**
+ /**
  * sends a message via the internal messaging to a list of recipients
  * @param string|array  $recipients comma-separated list (or array) of recipients
  * @param string        $subject    subject of the message
- * @return bool                     true on success/sent to all users successfully
+ * @param array         $tokenlist
+ * @return bool         true on success/sent to all users successfully
  */
-function sendMessage($recipients, $subject)
+
+function sendMessage($recipients, $subject, $tokenlist = [])
 {
     global $errors, $prefs, $user;
     $messulib = TikiLib::lib('message');
@@ -513,15 +591,8 @@ function sendMessage($recipients, $subject)
     $logslib = TikiLib::lib('logs');
 
     $ok = true;
-    if (! is_array($recipients)) {
-        $arr_to = preg_split('/\s*(?<!\\\)[;,]\s*/', $recipients);
-    } else {
-        $arr_to = $recipients;
-    }
-    if ($prefs['user_selector_realnames_messu'] == 'y') {
-        $groups = '';
-        $arr_to = $userlib->find_best_user($arr_to, $groups, 'login');
-    }
+
+    $arr_to = parseUsernameList($recipients);
 
     $users = [];
 
@@ -550,9 +621,17 @@ function sendMessage($recipients, $subject)
     }
 
     $users = array_unique($users);
-    $txt = $smarty->fetch('mail/share.tpl');
 
-    foreach ($users as $a_user) {
+    foreach ($users as $i => $a_user) {
+        if (count($tokenlist) > 1) {
+            $url_for_friend = $tokenlist[$i];
+        } else {
+            $url_for_friend = $tokenlist[0];        // only one token if not "subscribing"
+        }
+
+        $smarty->assign('url_for_friend', $url_for_friend);
+        $txt = $smarty->fetch('mail/share.tpl');
+
         $messulib->post_message(
             $a_user,
             $user,
@@ -561,7 +640,7 @@ function sendMessage($recipients, $subject)
             $subject,
             $txt,
             $_REQUEST['priority'],
-            isset($_REQUEST['replyto_hash']) ? $_REQUEST['replyto_hash'] : ''
+            $_REQUEST['replyto_hash'] ?? ''
         );
 
         TikiLib::events()->trigger(
@@ -583,7 +662,7 @@ function sendMessage($recipients, $subject)
         $subject,
         $txt,
         $_REQUEST['priority'],
-        isset($_REQUEST['replyto_hash']) ? $_REQUEST['replyto_hash'] : ''
+        $_REQUEST['replyto_hash'] ?? ''
     );
 
     // Assign users e-mail was sent to a SMARTY variable to be displayed:
@@ -591,7 +670,7 @@ function sendMessage($recipients, $subject)
     $smarty->assign('messageSentTo', $users_string);
 
     if ($prefs['feature_actionlog'] == 'y') {
-        $logslib->add_action('Posted', '', 'message', 'add=' . strlen($_REQUEST['body']));
+        $logslib->add_action('Posted', '', 'message', 'add=' . strlen($_REQUEST['body'] ?? ''));
     }
 
     return $ok;
@@ -604,10 +683,8 @@ function sendMessage($recipients, $subject)
  */
 function postForum($forumId, $subject)
 {
-    global $errors, $prefs, $user;
+    global $errors;
     global $feedbacks;
-    $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $commentslib = TikiLib::lib('comments');
 
@@ -645,4 +722,33 @@ function postForum($forumId, $subject)
 
     $smarty->assign('feedbacks', $feedbacks);
     return $threadId;
+}
+
+/**
+ * Parses a username list and returns an array of usernames.
+ *
+ * @param mixed $userList The username list to parse. It can be either a string or an array.
+ * @return array The array of usernames.
+ */
+function parseUsernameList($userList): array
+{
+    global $prefs;
+    $arr_to = [];
+    $userlib = TikiLib::lib('user');
+
+    if (! is_array($userList)) {
+        $arr_to = preg_split('/\s*(?<!\\\)[;,]\s*/', $userList);
+    } else {
+        $arr_to = $userList;
+    }
+
+    if ($prefs['user_selector_realnames_messu'] == 'y') {
+        $groups = '';
+        $arr_to = $userlib->find_best_user($arr_to, $groups, 'login');
+    }
+
+    // Remove empty values
+    $arr_to = array_filter($arr_to);
+
+    return $arr_to;
 }

@@ -12,7 +12,7 @@
             <input type="hidden" name="url" value="{$homepageUrl}">
             <input type="hidden" name="wizard_step" value="{$wizard_step}">
             <input type="hidden" name="itemId" value="{$itemId}">
-            <input type="submit" class="btn btn-primary" name="continue" value="{if isset($lastWizardPage)}{tr}Finish{/tr}{elseif isset($firstWizardPage)}{tr}Start{/tr}{else}{if $isEditable eq true}{tr}Save and Continue{/tr}{else}{tr}Next{/tr}{/if}{/if}" />
+            <input type="submit" class="btn btn-primary" name="continue" value="{if isset($lastWizardPage)}{tr}Finish_C(imperative){/tr}{elseif isset($firstWizardPage)}{tr}Start_C(imperative){/tr}{else}{if $isEditable eq true}{tr}Save and Continue{/tr}{else}{tr}Next{/tr}{/if}{/if}" />
         </td>
     </tr>
     <tr>
@@ -20,8 +20,8 @@
         </td>
         <td style="text-align:left">
             {if !isset($showWizardPageTitle) or $showWizardPageTitle neq 'y'}
-                <h1 class="adminWizardPageTitle">{$pageTitle}</h1>
-                {assign var="showWizardPageTitle" value="y" scope="root"}
+                <h1 class="adminWizardPageTitle text-center">{$pageTitle}</h1>
+                {$showWizardPageTitle="y" scope="root"}
             {/if}
         </td>
         <td style="text-align:right">

@@ -20,7 +20,6 @@ function wikiplugin_author_info()
                 'name' => tra('Username'),
                 'description' => tra('Username of the author of the text.'),
                 'since' => '6.0',
-                'default' => '',
                 'filter' => 'username',
             ],
             'deleted_by' => [
@@ -28,7 +27,6 @@ function wikiplugin_author_info()
                 'name' => tra('Deleted by User'),
                 'description' => tra('Username of the person who deleted the text.'),
                 'since' => '6.0',
-                'default' => '',
                 'filter' => 'username',
             ],
             'visible'   => [
@@ -62,8 +60,6 @@ function wikiplugin_author_info()
 function wikiplugin_author($data, $params)
 {
     $headerlib = TikiLib::lib('header');
-    $tikilib = TikiLib::lib('tiki');
-    $smarty = TikiLib::lib('smarty');
 
     global $authors;
 
@@ -71,14 +67,8 @@ function wikiplugin_author($data, $params)
     static $id = 0;
 
     $blocktags = '/(<+\/?address.*?>|<+\/?blockcode.*?>|<+\/?blockquote.*?>|<+\/?div.*?>|<+\/?h1.*?>|<+\/?h2.*?>|<+\/?h3.*?>|<+\/?h4.*?>|<+\/?h5.*?>|<+\/?h6.*?>|<+\/?hr.*?>|<+\/?h.*?>|<+\/?li.*?>|<+\/?ol.*?>|<+\/?pre.*?>|<+\/?p.*?>|<+\/?section.*?>|<+\/?table.*?>|<+\/?td.*?>|<+\/?th.*?>|<+\/?tr.*?>|<+\/?ul.*?>)/';
-    $default = ['popup' => 0];
-    $params = array_merge($default, $params);
     if (! is_array($authors)) {
         $authors = [];
-    }
-    if (empty($params['author'])) {
-        Feedback::error(tra('The author parameter is missing'));
-        return;
     }
     if (empty($params['visible'])) {
         $params['visible'] = 0;
@@ -111,7 +101,7 @@ function wikiplugin_author($data, $params)
                 }
                 if ($params['visible'] == 1) {
                     $html .= 'class="' . $authors[$author]['style'];
-                    if (isset($params['deleted_by'])) {
+                    if (! is_null($params['deleted_by'])) {
                         $html .= ' deleted';
                     }
                     $html .= '"';
@@ -127,15 +117,24 @@ function wikiplugin_author($data, $params)
 
                 if ($params['popup'] == 1) {
                     //Mouseover for detailed info
-                    $js = "\$('#author$id-link').on('mouseover', function(event) {
-                        \$('#author$id').css('left', event.pageX).css('top', event.pageY);
-                        showJQ('#author$id', '', '');
-                        1000
-                    });";
-                    $js .= "\$('#author$id-link').on('mouseout', function(event) { setTimeout(function() {hideJQ('#author$id', '', '')}, 1000); });";
-                    $headerlib->add_jq_onready($js);
+                    $jsConfig = json_encode([
+                        'anchorId' => "author$id-link",
+                        'popupId' => "author$id",
+                        'isSticky' => false,
+                        'closeDelayMs' => 0,
+                        'hideDelayMs' => 1000,
+                        // Cursor delta (not absolute page coordinate).
+                        'offsetX' => 0,
+                        'offsetY' => 0,
+                        'effect' => '',
+                        'speed' => 'normal',
+                    ]);
+                    $headerlib->add_js_module(
+                        'import { initMouseoverPlugin } from "@jquery-tiki/wikiplugin-mouseover";'
+                        . "initMouseoverPlugin($jsConfig);"
+                    );
                     $html .= "<span id=\"author$id\" class=\"plugin-mouseover\" style=\"width: 200px; height: 80px; padding: 2px \">" .
-                        tra('Author') . ": $author" . (isset($params['deleted_by']) ? "<br />" . tra('deleted by') . ': ' . $params['deleted_by'] : '') . "</span>";
+                        tra('Author') . ": $author" . (! is_null($params['deleted_by']) ? "<br />" . tra('deleted by') . ': ' . $params['deleted_by'] : '') . "</span>";
                 }
                 $id++;
             } // content is not a block tag

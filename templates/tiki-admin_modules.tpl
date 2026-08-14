@@ -1,6 +1,5 @@
 {strip}
 {title help="Modules" admpage="module"}{tr}Admin Modules{/tr}{/title}
-
 <div class="t_navbar mb-4">
     <form action="tiki-admin_modules.php" method="post" style="display: inline">
         {ticket}
@@ -17,7 +16,6 @@
     {if $tiki_p_edit_menu eq 'y'}
         {button href="tiki-admin_menus.php" _icon_name="menu" _type="link" _text="{tr}Admin Menus{/tr}"}
     {/if}
-    {button href="./" _icon_name="disable" _type="link" _text="{tr}Exit Modules{/tr}"}
 </div>
 
 {if !empty($missing_params)}
@@ -56,7 +54,7 @@
         {/if}
         <h2>{tr}Assigned Modules{/tr}</h2>
         <div class="mb-4">
-            {button edit_assign=0 cookietab=2 _auto_args="edit_assign,cookietab" _text="{tr}Add module{/tr}"}
+            {button edit_assign=0 cookietab=2 href="#assign" _auto_args="edit_assign,cookietab" _text="{tr}Assign new module{/tr}"}
         </div>
 
         <div id="assigned_modules">
@@ -82,66 +80,69 @@
                                     </tr>
                                     {if isset($assigned_modules[$zone_initial])}
                                     {foreach $assigned_modules[$zone_initial] as $module}
-                                        <tr>
-                                            <td>{$module.name|escape}</td>
-                                            <td>{$module.ord}</td>
-                                            <td>{$module.cache_time}</td>
-                                            <td>{$module.rows}</td>
-                                            <td class="small">{$module.params_presentable}</td>
-                                            <td class="small">{$module.module_groups}</td>
-                                            <td>
-                                                {actions}
-                                                    {strip}
-                                                        <action>
-                                                            <form href="tiki-admin_modules.php" method="post">
-                                                                {ticket}
-                                                                <button
-                                                                    type="submit"
-                                                                    name="modup"
-                                                                    value="{$module.moduleId}"
-                                                                    class="btn btn-link link-list"
-                                                                    {if $module@first} disabled="disabled"{/if}
-                                                                >
-                                                                    {icon name="up"} {tr}Move up{/tr}
-                                                                </button>
-                                                            </form>
-                                                        </action>
-                                                        <action>
-                                                            <form href="tiki-admin_modules.php" method="post">
-                                                                {ticket}
-                                                                <button
-                                                                    type="submit"
-                                                                    name="moddown"
-                                                                    value="{$module.moduleId}"
-                                                                    class="btn btn-link link-list"
-                                                                    {if $module@last} disabled="disabled" class="disabled"{/if}
-                                                                >
-                                                                    {icon name="down"} {tr}Move down{/tr}
-                                                                </button>
-                                                            </form>
-                                                        </action>
-                                                        <action>
-                                                            <a href="tiki-admin_modules.php?edit_assign={$module.moduleId}&cookietab=2#content_admin_modules1-2">
-                                                                {icon name='edit' _menu_text='y' _menu_icon='y' alt="{tr}Edit{/tr}"}
-                                                            </a>
-                                                        </action>
-                                                        <action>
-                                                            <form href="tiki-admin_modules.php" method="post">
-                                                                {ticket}
-                                                                <button
-                                                                    type="submit"
-                                                                    name="unassign_module_id"
-                                                                    value="{$module.moduleId}"
-                                                                    class="btn btn-link link-list"
-                                                                >
-                                                                    {icon name="remove"} {tr}Unassign{/tr}
-                                                                </button>
-                                                            </form>
-                                                        </action>
-                                                    {/strip}
-                                                {/actions}
-                                            </td>
-                                        </tr>
+                                        {assign var="pref_module_name" value="module_"|cat:($module.name|regex_replace:"/[^a-z0-9]/":"_")}
+                                        {if isset($prefs[$pref_module_name]) && $prefs[$pref_module_name] eq 'y'}
+                                            <tr>
+                                                <td>{$module.name|escape}</td>
+                                                <td>{$module.ord}</td>
+                                                <td>{$module.cache_time}</td>
+                                                <td>{$module.rows}</td>
+                                                <td class="small">{$module.params_presentable}</td>
+                                                <td class="small">{$module.module_groups}</td>
+                                                <td>
+                                                    {actions}
+                                                        {strip}
+                                                            <action>
+                                                                <form action="tiki-admin_modules.php" method="post">
+                                                                    {ticket}
+                                                                    <button
+                                                                        type="submit"
+                                                                        name="modup"
+                                                                        value="{$module.moduleId}"
+                                                                        class="btn btn-link link-list"
+                                                                        {if $module@first} disabled="disabled"{/if}
+                                                                    >
+                                                                        {icon name="up"} {tr}Move up{/tr}
+                                                                    </button>
+                                                                </form>
+                                                            </action>
+                                                            <action>
+                                                                <form action="tiki-admin_modules.php" method="post">
+                                                                    {ticket}
+                                                                    <button
+                                                                        type="submit"
+                                                                        name="moddown"
+                                                                        value="{$module.moduleId}"
+                                                                        class="btn btn-link link-list"
+                                                                        {if $module@last} disabled="disabled"{/if}
+                                                                    >
+                                                                        {icon name="down"} {tr}Move down{/tr}
+                                                                    </button>
+                                                                </form>
+                                                            </action>
+                                                            <action>
+                                                                <a href="tiki-admin_modules.php?edit_assign={$module.moduleId}&cookietab=2#content_admin_modules1-2">
+                                                                    {icon name='edit' _menu_text='y' _menu_icon='y' alt="{tr}Edit{/tr}"}
+                                                                </a>
+                                                            </action>
+                                                            <action>
+                                                                <form action="tiki-admin_modules.php" method="post">
+                                                                    {ticket}
+                                                                    <button
+                                                                        type="submit"
+                                                                        name="unassign_module_id"
+                                                                        value="{$module.moduleId}"
+                                                                        class="btn btn-link link-list"
+                                                                    >
+                                                                        {icon name="remove"} {tr}Unassign{/tr}
+                                                                    </button>
+                                                                </form>
+                                                            </action>
+                                                        {/strip}
+                                                    {/actions}
+                                                </td>
+                                            </tr>
+                                        {/if}
                                     {foreachelse}
                                         {norecords _colspan=7}
                                     {/foreach}
@@ -159,11 +160,9 @@
         </form>
     {/tab}
     {if isset($smarty.request.edit_assign) or $preview eq "y"}
-        {tab name="{tr}Edit module{/tr}"}
+        {tab name="{tr}Configure new module{/tr}"}
             <a id="assign"></a>
-            {if $assign_name eq ''}
-                <h2>{tr}Assign new module{/tr}</h2>
-            {else}
+            {if $assign_name neq ''}
                 <h2>{tr}Edit this assigned module:{/tr} {$assign_name}</h2>
             {/if}
 
@@ -247,7 +246,7 @@
             </table>
         </div>
         <br>
-        {pagination_links cant=$maximum step=$maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$maximum step=$maxRecords offset=$offset}{/pagination_links}
         {if $um_name eq ''}
             <h2>{tr}Create new custom module{/tr}</h2>
         {else}
@@ -284,7 +283,7 @@
                 </div>
             </div>
             <h3>{tr}Objects that can be included{/tr}</h3>
-            {pagination_links cant=$maximum step=$maxRecords offset=$offset}{/pagination_links}
+            {pagination_links count=$maximum step=$maxRecords offset=$offset}{/pagination_links}
             {if $prefs.feature_polls eq "y"}
                 <div class="tiki-form-group row">
                     <label class="col-sm-2 col-form-label" for='list_polls'>{tr}Polls{/tr}</label>
@@ -371,7 +370,7 @@
                 <label class="col-sm-2 col-form-label" for='um_data'>{tr}Contents{/tr}</label>
                 <div class="col-sm-10">
                     <a id="editcreate"></a>
-                    {textarea name='um_data' id='um_data' _class='form-control' _toolbars='y' _previewConfirmExit='n' _simple="y" syntax='smarty'}{$um_data}{/textarea}
+                    {textarea name='um_data' id='um_data' _class='form-control' _toolbars='y' _previewConfirmExit='n' _simple="y" _syntax='smarty'}{$um_data}{/textarea}
                 </div>
             </div>
             <div class="tiki-form-group row">
@@ -393,19 +392,22 @@
                         <label for="module_list_show_all" class="form-check-label">{tr}Show all modules{/tr}</label>
                     </div>
                 </div>
-                <ul id="module_list">
+                <ul id="module_list" class="p-0">
                     {foreach key=name item=info from=$all_modules_info}
-                        <li class="{if !empty($info.enabled)}enabled{else}disabled{/if} clearfix">
-                            <input type="hidden" value="{$name}">
-                            <div class="q1 tips"
-                                    title="{$info.name} &lt;em&gt;({$name})&lt;/em&gt;|{$info.description}
-                                    {if not $info.enabled}&lt;br /&gt;&lt;small&gt;&lt;em&gt;({tr}Requires{/tr} {$info.prefs|join:' &amp; '})&lt;/em&gt;&lt;/small&gt;{/if}">
-                                {icon name="module"} <strong>{$info.name}</strong> <em>{$name}</em>
-                            </div>
-                            <div class="description q23">
-                                {$info.description}
-                            </div>
-                        </li>
+                        {assign var="pref_module_name" value="module_"|cat:($module.name|regex_replace:"/[^a-z0-9]/":"_")}
+                        {if isset($prefs['module_'|cat:$name]) && $prefs['module_'|cat:$name] eq 'y'}
+                            <li class="{if !empty($info.enabled)}enabled{else}disabled{/if} clearfix">
+                                <input type="hidden" value="{$name}">
+                                <div class="q1 tips"
+                                        title="{$info.name} &lt;em&gt;({$name})&lt;/em&gt;|{$info.description}
+                                        {if not $info.enabled}&lt;br /&gt;&lt;small&gt;&lt;em&gt;({tr}Requires{/tr} {$info.prefs|join:' &amp; '})&lt;/em&gt;&lt;/small&gt;{/if}">
+                                    {icon name="module"} <strong>{$info.name}</strong> <em>{$name}</em>
+                                </div>
+                                <div class="description q23">
+                                    {$info.description}
+                                </div>
+                            </li>
+                        {/if}
                     {/foreach}
                 </ul>
             </div>

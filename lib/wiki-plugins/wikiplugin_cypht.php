@@ -248,18 +248,12 @@ function wikiplugin_cypht_info()
 
 function wikiplugin_cypht($data, $params)
 {
-    global $tikipath, $tikiroot, $user, $page, $logslib, $prefs;
+    global $tikipath, $user, $page, $logslib;
     $headerlib = TikiLib::lib('header');
     $tikilib = TikiLib::lib('tiki');
 
     if (defined('APP_PATH')) {
         return tr("Cypht already started.");
-    }
-
-    if (TikiLib::lib('wiki')->get_page_by_slug($_GET['page']) == $page && $prefs['feature_sefurl'] !== 'y') {
-        TikiLib::lib('access')->redirect('tiki-index.php?page_id=' . $tikilib->get_page_id_from_name($page));
-    } elseif ($prefs['feature_sefurl'] === 'y' && ! empty($_GET['page_id'])) {
-        TikiLib::lib('access')->redirect(TikiLib::lib('wiki')->sefurl($page));
     }
 
     static $called = false;
@@ -278,22 +272,6 @@ function wikiplugin_cypht($data, $params)
 
     if (empty($params['smtp_port'])) {
         $params['smtp_port'] = 587;
-    }
-
-    if (empty($params['smtp_tls'])) {
-        $params['smtp_tls'] = 'y';
-    }
-
-    if (empty($params['smtp_no_auth'])) {
-        $params['smtp_no_auth'] = 'n';
-    }
-
-    if (empty($params['use_global_settings'])) {
-        $params['use_global_settings'] = 'n';
-    }
-
-    if (empty($params['groupmail'])) {
-        $params['groupmail'] = 'n';
     }
 
     if ($params['groupmail'] == 'y') {
@@ -363,6 +341,9 @@ function wikiplugin_cypht($data, $params)
         .inline-cypht { position: relative; }
     ");
 
+    // Ensure Bootstrap icons CSS is loaded for Cypht
+    $headerlib->add_cssfile(BOOTSTRAP_ICONS_FONT_PATH . '/bootstrap-icons.css');
+
     /* get configuration */
     $config = new Tiki_Hm_Site_Config_File([], $session_prefix, $settings_per_page);
     $environment->define_default_constants($config);
@@ -381,9 +362,17 @@ function wikiplugin_cypht($data, $params)
             $_SESSION[$session_prefix]['user_data']['imap_servers'] = [];
         }
         $found = false;
-        foreach ($_SESSION[$session_prefix]['user_data']['imap_servers'] as $server) {
+        $updated = false;
+        foreach ($_SESSION[$session_prefix]['user_data']['imap_servers'] as $id => $server) {
             if ($server['server'] == $attributes['server'] && $server['tls'] == $attributes['tls'] && $server['port'] == $attributes['port'] && $server['user'] == $attributes['user']) {
                 $found = true;
+
+                if (array_diff($server, $attributes)) {
+                    TikiLib::lib('cache')->invalidate('imap_folders_imap_' . $id . '_');
+                    $_SESSION[$session_prefix]['user_data']['imap_servers'][$id] = array_merge($server, $attributes);
+                    $updated = true;
+                }
+
                 break;
             }
         }
@@ -392,6 +381,10 @@ function wikiplugin_cypht($data, $params)
                 $id = uniqid();
             } while (isset($_SESSION[$session_prefix]['user_data']['imap_servers'][$id]));
             $_SESSION[$session_prefix]['user_data']['imap_servers'][$id] = $attributes;
+        }
+
+        if ($updated) {
+            $headerlib->add_js("Hm_Folders.update_folder_list(true);");
         }
     }
 
@@ -427,7 +420,7 @@ function wikiplugin_cypht($data, $params)
     }
 
     /* process the request */
-    $dispatcher = new Hm_Dispatch($config);
+    $dispatcher = new Tiki_Hm_Dispatch($config, $_GET['page'] == $page);
 
     if (! empty($_SESSION[$session_prefix]['user_data']['debug_mode_setting'])) {
         $msgs = Hm_Debug::get();
@@ -436,7 +429,7 @@ function wikiplugin_cypht($data, $params)
         }
     }
 
-    $headerlib->add_js_module('import "@jquery-tiki/plugins/cypht";');
+    $headerlib->add_js_module('import "@jquery-tiki/cypht";');
 
     return '<div class="inline-cypht">'
         . '<input type="hidden" id="hm_page_key" value="' . Hm_Request_Key::generate() . '" />'

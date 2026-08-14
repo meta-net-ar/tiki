@@ -39,12 +39,12 @@ function module_last_tracker_comments($mod_reference, $module_params)
 {
     global $prefs;
     $smarty = TikiLib::lib('smarty');
-    $trackerId = isset($module_params["trackerId"]) ? $module_params["trackerId"] : 0;
+    $trackerId = $module_params["trackerId"] ?? 0;
 
-    $itemId = isset($module_params["itemId"]) ? $module_params["itemId"] : 0;
+    $itemId = $module_params["itemId"] ?? 0;
 
     $trklib = TikiLib::lib('trk');
 
     $ranking = $trklib->list_last_comments($trackerId, $itemId, 0, $mod_reference["rows"]);
-    $smarty->assign('modLastModifComments', isset($ranking['data']) ? $ranking["data"] : []);
+    $smarty->assign('modLastModifComments', $ranking["data"] ?? []);
 }

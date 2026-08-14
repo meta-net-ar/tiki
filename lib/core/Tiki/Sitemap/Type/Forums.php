@@ -18,8 +18,10 @@ class Forums extends AbstractType
     /**
      * Generate Sitemap
      */
-    public function generate()
+    public function generate(bool $auto = false, ?array $context = null)
     {
+        global $prefs;
+
         if (! $this->checkFeatureAndPermissions('feature_forums')) {
             return;
         }

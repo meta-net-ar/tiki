@@ -32,7 +32,7 @@
             {if !$ts.enabled}
                 <form method="get" action="tiki-adminusers.php">
                     <div class="mb-3 row">
-                        <label class="col-form-label col-sm-5" for="find">{tr}Find{/tr}</label>
+                        <label class="col-form-label col-sm-5" for="find">{tr}Search{/tr}</label>
                         <div class="col-sm-7">
                             <input type="text" class="form-control form-control-sm" id="find" name="find" value="{$find|escape}">
                         </div>
@@ -45,7 +45,7 @@
                     </div>
                     <div class="mb-3 row">
                         <div class="col-sm-7 offset-sm-5">
-                            <a href="#" onclick="$('#search').toggle()" class="link">
+                            <a href="#" onclick="$('#search').toggle()" class="link" role="button">
                                 {icon name='add' alt="{tr}more{/tr}"}&nbsp;{tr}More Criteria{/tr}
                             </a>
                         </div>
@@ -96,12 +96,12 @@
                     <div class="mb-3 row">
                         <div class="col-sm-7 offset-sm-5">
                             <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
-                            <input type="submit" class="btn btn-primary btn-sm" value="{tr}Find{/tr}" name="search">
+                            <input type="submit" class="btn btn-primary btn-sm" value="{tr}Search{/tr}" name="search">
                         </div>
                     </div>
                 </form>
             {/if}
-            {if ($cant > $numrows or !empty($initial)) && !$ts.enabled}
+            {if ($count > $numrows or !empty($initial)) && !$ts.enabled}
                 {initials_filter_links}
             {/if}
             <form name="checkform" id="checkform" method="post">
@@ -109,7 +109,7 @@
                     <div class="{if $js}table-responsive{/if} user-table ts-wrapperdiv">
         {/if}
                         {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
-                        <table id="{$ts.tableid}" class="table normal table-striped table-hover" data-count="{$cant|escape}">
+                        <table id="{$ts.tableid}" class="table normal table-striped table-hover" data-count="{$count|escape}">
                             {* Note: th element ids here need to match those at /lib/core/Table/Settings/TikiAdminusers.php
                             for tablesorter to work properly *}
                             {if !$ts.ajax}
@@ -150,6 +150,9 @@
                                                     title="{$username}:{tr}Edit account settings{/tr}" {if $users[user].itemId}data-itemid="{$users[user].itemId}"{/if}>
                                                         {$users[user].user|escape}
                                                 </a>
+                                                {if $users[user].waiting eq 'l'}
+                                                    {icon name='lock' title="|{tr}Locked account{/tr}" class='tips text-warning'}
+                                                {/if}
                                                 {if $prefs.user_show_realnames eq 'y' and $smarty.capture.username ne $users[user].user}
                                                     <div class="subcomment">
                                                         {$smarty.capture.username|escape}
@@ -181,6 +184,10 @@
                                                 {if $users[user].waiting eq 'a'}
                                                     <br>
                                                     {tr}Need to validate user{/tr}
+                                                {/if}
+                                                {if $users[user].waiting eq 'l'}
+                                                    <br>
+                                                    <span class="text-warning">{icon name="lock"} {tr}Account locked{/tr}</span>
                                                 {/if}
                                             </td>
                                             <td class="text">
@@ -240,10 +247,9 @@
                                                                 </a>
                                                             </action>
                                                         {/if}
-                                                        {if $users[user].user eq $user or $users[user].user_information neq 'private' or $tiki_p_admin eq 'y'}
+                                                        {if $users[user].user eq $user or $tiki_p_admin eq 'y'}
                                                             <action>
-                                                                <a href="tiki-user_information.php?userId={$users[user].userId}"{if $users[user].user_information eq 'private'}
-                                                                    style="opacity:0.5;"{/if}
+                                                                <a href="tiki-user_information.php?userId={$users[user].userId}"
                                                                 >
                                                                     {icon name="help" _menu_text='y' _menu_icon='y' alt="{tr}User information{/tr}"}
                                                                 </a>
@@ -316,6 +322,7 @@
                                                         {/if}
                                                     {/strip}
                                                 {/actions}
+                                            </td>
                                         </tr>
                                     {/if}
                                 {sectionelse}
@@ -359,6 +366,12 @@
                                 <option value="default_groups">
                                     {tr}Set default groups{/tr}
                                 </option>
+                                <option value="lock_users">
+                                    {tr}Lock accounts{/tr}
+                                </option>
+                                <option value="unlock_users">
+                                    {tr}Unlock accounts{/tr}
+                                </option>
                                 {if $prefs.feature_wiki == 'y'}
                                     <option value="email_wikipage">
                                         {tr}Send wiki page content by email{/tr}
@@ -390,7 +403,7 @@
 
 
         {if !$ts.enabled}
-            {pagination_links cant=$cant step=$numrows offset=$offset}{/pagination_links}
+            {pagination_links count=$count step=$numrows offset=$offset}{/pagination_links}
         {/if}
     {/if}
         {/tab}
@@ -401,7 +414,7 @@
         {if isset($userinfo.userId) && $userinfo.userId}
             {capture assign=add_edit_user_tablabel}{tr}Edit user{/tr} <i>{$userinfo.login|escape}</i>{/capture}
         {else}
-            {assign var=add_edit_user_tablabel value="{tr}Add a New User{/tr}"}
+            {$add_edit_user_tablabel="{tr}Add a New User{/tr}"}
         {/if}
 
         {tab name="{$add_edit_user_tablabel}"}
@@ -409,26 +422,33 @@
                 {remarksbox type="warning" title="{tr}Warning: User Encryption is Active{/tr}"}
                 {tr}The feature User Encryption stores encrypted user information, such as password used to connect to external systems.
                     If the password is changed, it will destroy the user's decryption key, and make the data unreadable.
-                    The user will be forced to re-enter the passwords and other data that may be encrypted.{/tr}</a>.
+                    The user will be forced to re-enter the passwords and other data that may be encrypted.{/tr}
                 {/remarksbox}
             {/if}
             {if isset($userinfo.userId) && $userinfo.userId}
                 <h2>{tr}Edit user{/tr} {$userinfo.login|escape}</h2>
-                {assign var=thisloginescaped value=$userinfo.login|escape:'url'}
+                {$thisloginescaped=$userinfo.login|escape:'url'}
                 {if $userinfo.login ne 'admin' and $userinfo.editable}
                     {button href="tiki-assignuser.php?assign_user=$thisloginescaped" _text="{tr}Assign user to Groups{/tr}" _icon_name='group'}
                 {/if}
                 {if $userinfo.waiting eq 'a'}
-                    {$thispassescaped = $userinfo.valid|escape:'url'}
+                    {$thispassescaped = $userinfo.valid|escape:'attr'}
                     {if empty($thispassescaped)}{$thispassescaped = 0}{/if}
-                    {button href='tiki-login_validate.php?user='|cat:$thisloginescaped|cat:'&pass='|cat:$thispassescaped _text="{tr}Validate user{/tr}" _icon_name='ok'}
+                    <form action="tiki-login_validate.php" method="post" class="d-inline">
+                        {ticket}
+                        <input type="hidden" name="user" value="{$userinfo.login|escape:'attr'}">
+                        <input type="hidden" name="pass" value="{$thispassescaped}">
+                        <button type="submit" class="btn btn-link">
+                            {icon name="ok"} {tr}Validate user{/tr}
+                        </button>
+                    </form>
                 {/if}
             {else}
                 <h2>{tr}Add a New User{/tr}</h2>
             {/if}
             {if $prefs.feature_intertiki eq 'y' and not empty($prefs.feature_intertiki_mymaster)}
                 {remarksbox type="info" title="{tr}Intertiki Enabled{/tr}"}
-                {tr _0=$prefs.feature_intertiki_mymaster|escape}This Tiki is an Intertiki Client so user information must be edited on the Intertiki Master "%0"{/tr}</a>.
+                {tr _0=$prefs.feature_intertiki_mymaster|escape}This Tiki is an Intertiki Client so user information must be edited on the Intertiki Master "%0"{/tr}
                 {/remarksbox}
             {elseif $userinfo.editable}
                 <form action="tiki-adminusers.php" method="post" enctype="multipart/form-data" name="RegForm" autocomplete="off">
@@ -483,7 +503,7 @@
                             <div class="col-sm-7 col-md-6">
                                 <input type="password" class="form-control" placeholder="{tr}Password{/tr}" name="pass" id="pass1" autocomplete="new-password">
                                 <div style="margin-left:5px;">
-                                    <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none' } <span id="mypassword_text_inner"></span></div>
+                                    <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
                                     <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
                                 </div>
                                 <div style="margin-top:5px">
@@ -497,10 +517,10 @@
                                 <input type="password" class="form-control" name="passAgain" id="pass2" placeholder="{tr}Password{/tr}" autocomplete="new-password">
                                 <div id="mypassword2_text">
                                     <div id="match" style="display:none">
-                                        {icon name='ok' istyle='color:#0ca908'} {tr}Passwords match{/tr}
+                                        {icon name='ok' style='color:#0ca908'} {tr}Passwords match{/tr}
                                     </div>
                                     <div id="nomatch" style="display:none">
-                                        {icon name='error' istyle='color:#ff0000'} {tr}Passwords do not match{/tr}
+                                        {icon name='error' style='color:#ff0000'} {tr}Passwords do not match{/tr}
                                     </div>
                                 </div>
                             </div>
@@ -521,7 +541,7 @@
                                     <div class="form-check">
                                         <label class="form-check-label">
                                             <input class="form-check-input" type="checkbox" name="pass_first_login"
-                                                {if isset($userinfo.pass_confirm) && $userinfo.pass_confirm eq '0' or not empty($smarty.request.pass_first_login) or $prefs.user_must_change_password_set_default_on eq 'y'}
+                                                {if (isset($userinfo.pass_confirm) && $userinfo.pass_confirm eq '0') or (not empty($smarty.request.pass_first_login)) or ($prefs.user_must_change_password_set_default_on eq 'y')}
                                                     checked="checked"
                                                 {/if}>
                                             {tr}User must change password at next login{/tr}
@@ -533,7 +553,7 @@
                     {/if}
                     {if $prefs.login_is_email neq 'y'}
                         <div class="mb-3 row">
-                            <label class="col-sm-3 col-md-2 col-form-label" for="pass1">{tr}Email{/tr}</label>
+                            <label class="col-sm-3 col-md-2 col-form-label" for="email">{tr}Email{/tr}</label>
                             <div class="col-sm-7 col-md-6">
                                 <input type="text" class="form-control" id="email" name="email" size="30" value="{$userinfo.email|escape}">
                             </div>
@@ -565,7 +585,7 @@
                                 <div class="form-check">
                                     <label class="form-check-label">
                                         <input class="form-check-input" type="checkbox" name="insert_user_tracker_item"
-                                               {if not empty($smarty.request.insert_user_tracker_item or $prefs.user_add_tracker_item_set_default_on eq 'y')}checked="checked"{/if}>
+                                               {if (not empty($smarty.request.insert_user_tracker_item)) or $prefs.user_add_tracker_item_set_default_on eq 'y'}checked="checked"{/if}>
                                         {tr}Add a user tracker item for this user{/tr}
                                     </label>
                                 </div>
@@ -595,6 +615,36 @@
                                 {/if}
                             </div>
                         </div>
+                    {/if}
+
+                    {if $prefs.twoFactorAuth eq 'y'}
+                        <div class="mb-3 row">
+                            <label class="col-sm-3 col-md-2 col-form-label" for="force2FA">{tr}2FA{/tr}</label>
+                            <div class="form-check form-switch col-sm-7 col-md-6">
+                                <input class="form-check-input" type="checkbox" role="switch" id="force2FA" data-user="{$userinfo.login}" {if $force2FA}checked{/if}>
+                                <small class="form-text text-muted">{tr}Enable/Disable Two Factor Authentication for this user.{/tr}</small>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col-sm-3 col-md-2"></div>
+                            <div class="col-sm-7 col-md-6">
+                                <button type="button" class="btn btn-secondary w-100" id="reset2FA" {if not $userinfo.twoFactorSecret}disabled{/if} data-user="{$userinfo.login}">{tr}Reset 2FA{/tr}</button>
+                                <small class="form-text text-muted">{tr}This will require the user to reset up 2FA the next time they log in.{/tr}</small>
+                            </div>
+                        </div>
+
+                        {if $force2FA}
+                            <div class="mb-3 row">
+                                <label class="col-form-label col-md-2">{tr}2FA Grace Period{/tr}</label>
+                                <div class="col-md-6">
+                                    <input type="number" class="form-control" name="twoFactorAuthGracePeriod" value="{$userinfo.twoFactorAuthGracePeriod|escape}">
+                                    <div class="form-text">
+                                        {tr}Number of days to allow this user to access the site without 2FA before forcing them to set it up.{/tr}
+                                    </div>
+                                </div>
+                            </div>
+                        {/if}
+
                     {/if}
 
                     <div class="mb-3 row">
@@ -693,11 +743,11 @@
                     <label class="col-md-3 col-form-label">{tr}Existing Users{/tr}</label>
                     <div class="col-md-9">
                         <label>
-                            <input type="radio" name="overwrite" value="y">
+                            <input type="radio" class="form-check-input" name="overwrite" value="y">
                             {tr}Overwrite{/tr}
                         </label>
                         <label>
-                            <input type="radio" name="overwrite" value="n" checked>
+                            <input type="radio" class="form-check-input" name="overwrite" value="n" checked>
                             {tr}Don't overwrite{/tr}
                         </label>
                     </div>

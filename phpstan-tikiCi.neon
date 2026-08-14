@@ -1,0 +1,54 @@
+# Tiki Help: 
+# The config in this file is for tiki CI to run.  Most instructions and comments are in the main phpstan.neon file:
+#
+# bin/phpstan --configuration=phpstan-tikiCi.neon
+
+includes:
+  - phpstan-tikiPaths.neon
+  - vendor_bundled/vendor/spaze/phpstan-disallowed-calls/extension.neon
+
+parameters:
+  #customRulesetUsed: true
+  level: 0
+  ignoreErrors:
+  # TODO: phpstan level 0 tests representing Real bugs or phpstan misconfiguration for sure
+    -
+      identifier: requireOnce.fileNotFound
+    -
+      identifier: require.fileNotFound
+    -
+      identifier: regexp.pattern
+    -
+      identifier: arguments.count
+    -
+      identifier: unset.offset 
+  # TODO: phpstan level 0 tests representing Likely bugs...
+    -
+      identifier: unset.variable
+    -
+      identifier: array.duplicateKey
+    -
+      identifier: function.void
+    -
+      identifier: return.missing
+    -
+      identifier: method.void
+    -
+      identifier: variable.undefined
+  # TODO: phpstan level 0 tests that represents things that Maybe that still work, but in this day and age...
+    -
+      identifier: method.staticCall
+
+  disallowedFunctionCalls:
+    -
+      function: 'print_r()'
+      message: 'Remove debug output or capture with print_r($var, true)'
+      errorIdentifier: 'disallowedFunctions.printR'
+    -
+      function: 'var_dump()'
+      message: 'Remove debug code before committing'
+      errorIdentifier: 'disallowedFunctions.varDump'
+    -
+      function: 'error_log()'
+      message: 'Use a proper logger instead of error_log()'
+      errorIdentifier: 'disallowedFunctions.errorLog'

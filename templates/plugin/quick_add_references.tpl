@@ -1,6 +1,6 @@
 {if $type eq 'addreference' && !empty($prefs.feature_library_references) && $prefs.feature_library_references eq 'y'}
     {* if click new button, user is able to add new reference in current page. *}
-    <div><a class="btn btn-secondary" id="plugin_addreference_button">Add Reference</a></div>
+    <div><a class="btn btn-secondary" id="plugin_addreference_button" role="button">Add Reference</a></div>
     <div id="add_reference_block" style="display:none;">
         <div>
             <div class="mb-3 row">
@@ -84,8 +84,8 @@
             </div>
             <div class="mb-3 row">
                 <div class="offset-sm-2 col-sm-10">
-                    <a class="wikiaction btn btn-primary" title="{tr}Add{/tr}" id="add_reference_submit">{tr}Add{/tr}</a>
-                    <a class="wikiaction btn btn-warning" title="{tr}Cancel{/tr}" onclick="$('#add_reference_block').css('display','none'); return false;">{tr}Cancel{/tr}</a>
+                    <a class="wikiaction btn btn-primary" title="{tr}Add{/tr}" id="add_reference_submit" role="button">{tr}Add{/tr}</a>
+                    <a class="wikiaction btn btn-warning" title="{tr}Cancel{/tr}" onclick="$('#add_reference_block').css('display','none'); return false;" role="button">{tr}Cancel{/tr}</a>
                     <span id="a_status" style="margin: 0 0 0 10px;"></span>
                 </div>
             </div>

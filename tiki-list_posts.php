@@ -15,7 +15,7 @@ $inputConfiguration = [
         'remove_x'                 => 'int',              //get
         'sort_mode'                => 'word',             //get
         'offset'                   => 'int',              //get
-        'find'                     => 'word',             //post
+        'find'                     => 'string',           //post
         'blogId'                   => 'int',              //get
         ],
         'staticKeyFiltersForArrays' => [
@@ -24,6 +24,7 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\SortModeValidator;
 $bloglib = TikiLib::lib('blog');
 $access->check_feature('feature_blogs');
 $access->check_permission('tiki_p_blog_admin');
@@ -41,25 +42,15 @@ if (isset($_REQUEST['checked']) && $access->checkCsrf()) {
     }
 }
 
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'created_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'created_desc',
+    ['tiki_blog_posts']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 if (isset($_REQUEST['blogId'])) {
     $blogId = $_REQUEST['blogId'];
@@ -71,7 +62,7 @@ if (isset($_REQUEST['blogId'])) {
 }
 
 $posts = $bloglib->list_posts($offset, $maxRecords, $sort_mode, $find, $blogId);
-$smarty->assign_by_ref('cant', $posts["cant"]);
+$smarty->assign_by_ref('count', $posts["count"]);
 $smarty->assign_by_ref('posts', $posts["data"]);
 
 // Display the template

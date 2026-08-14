@@ -24,7 +24,7 @@ class ActivityStreamRule extends ObjectWriter
             ->addArgument(
                 'rule',
                 InputArgument::REQUIRED,
-                'Rule ID'
+                tra('Rule ID')
             );
 
         parent::configure();
@@ -39,7 +39,7 @@ class ActivityStreamRule extends ObjectWriter
         if (\Tiki_Profile_InstallHandler_ActivityStreamRule::export($writer, $rule)) {
             $writer->save();
         } else {
-            $output->writeln("<error>Rule not found: $rule</error>");
+            $output->writeln("<error>'" . tra('Rule not found: %rule%', ['%rule%' => $rule]) . "'</error>");
             return Command::FAILURE;
         }
         return Command::SUCCESS;

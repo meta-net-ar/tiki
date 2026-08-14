@@ -1,15 +1,15 @@
-el-select, el-autocomplete {
+el-select, el-autocomplete, el-input {
   width: 100%;
 }
 
-.input-group el-select, .input-group el-autocomplete {
+.input-group el-select, .input-group el-autocomplete, .input-group el-input {
   position: relative;
   flex: 1 1 auto;
   width: 1%;
   min-width: 0;
 }
 
-.input-group el-select ~ .btn, .input-group el-autocomplete ~ .btn  {
+.input-group el-select ~ .btn, .input-group el-autocomplete ~ .btn, .input-group el-input ~ .btn {
   @extend .btn-sm;
   margin-left: 0.5rem !important;
   border-top-left-radius: var(--bs-btn-border-radius) !important;
@@ -18,4 +18,8 @@ el-select, el-autocomplete {
 
 el-autocomplete ~ .search_mod_magnifier {
   margin-top: unset !important;
+}
+
+.el-message {
+  z-index: 9999 !important;
 }

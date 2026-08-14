@@ -38,7 +38,7 @@ class WYSIWYGLib
 
         $params = [
             '_wysiwyg'     => 'y',
-            'area_id'      => 'page-data',
+            'area_id'      => false,
             'comments'     => '',
             '_is_html'      => 'y',  // temporary element id
             'switcheditor' => 'n',
@@ -54,7 +54,7 @@ class WYSIWYGLib
         ['lang' => $lang, 'filePath' => $langFilePath] = $this->getEditorLang();
 
         $headerlib->add_js_module(<<<JS
-            import('@jquery-tiki/wysiwyg').then((module) => {
+            import('@wysiwyg/summernote').then((module) => {
                 module.loadLanguage('{$langFilePath}', () => {
                     module.inlineEdit(JSON.parse(`{$tools}`), '{$lang}', '{$pageName}');
                 });
@@ -69,7 +69,7 @@ class WYSIWYGLib
             $lang = 'en-US';
         } else {
             $parts = explode('-', $lang);
-            $lang = $parts[0] . '-' . strtoupper(isset($parts[1]) ? $parts[1] : $parts[0]);
+            $lang = $parts[0] . '-' . strtoupper($parts[1] ?? $parts[0]);
         }
 
         $langFilePath = NODE_PUBLIC_DIST_PATH . '/summernote/dist/lang/summernote-' . $lang . '.min.js';
@@ -79,24 +79,99 @@ class WYSIWYGLib
 
     public function setUpEditor($dom_id, $params = [])
     {
+        global $prefs, $user;
         $headerlib = TikiLib::lib('header');
         $smarty = TikiLib::lib('smarty');
 
-
-
-        $tools = json_encode(smarty_function_toolbars($params, $smarty->getEmptyInternalTemplate()), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS);
-        $tools = addslashes($tools); // Escape special characters for JavaScript
+        if ($params['_toolbars'] !== 'n') {
+            $tools = json_encode(smarty_function_toolbars($params, $smarty->getEmptyInternalTemplate()), JSON_UNESCAPED_UNICODE | JSON_HEX_APOS);
+            $tools = addslashes($tools); // Escape special characters for JavaScript
+        } else {
+            $tools = json_encode([]);
+        }
 
         ['lang' => $lang, 'filePath' => $langFilePath] = $this->getEditorLang();
 
-        $headerlib->add_js_module(<<<JS
-            const loadingIndicator = $($.IMPORT_LOADER_MARKUP);
-            $('#{$dom_id}').after(loadingIndicator);
+        // Prepare language check options from prefs with effective language fallback chain
+        $lcEnabled = $prefs['feature_language_check'] === 'y' ? 'true' : 'false';
+        $lcDebounce = (int) $prefs['language_check_debounce_ms'];
+        $lcAutoBool = $prefs['language_check_auto_detect'] === 'y';
+        $lcAuto = $lcAutoBool ? 'true' : 'false';
 
-            import('@jquery-tiki/wysiwyg').then((module) => {
+        // Determine effective language for validation
+        $contentLang = isset($params['lang']) && $params['lang'] ? $params['lang'] : '';
+        if (! $contentLang && ! empty($params['objectId']) && ! empty($params['section']) && $params['section'] === 'wiki page') {
+            $info = TikiLib::lib('tiki')->get_page_info($params['objectId']);
+            if (! empty($info['lang'])) {
+                $contentLang = $info['lang'];
+            }
+        }
+        if ($contentLang) {
+            $effectiveLanguage = $contentLang;
+        } else {
+            $effectiveLanguage = Language::getCurrentLanguage();
+        }
+
+        // Always check if language is supported by LanguageTool (regardless of auto-detect setting)
+        $isLanguageSupported = false;
+        try {
+            $ltUrl = Services_LanguageCheck_Controller::getLanguageToolUrl($prefs);
+            $client = TikiLib::lib('tiki')->get_http_client();
+            $client->setUri(rtrim($ltUrl, '/') . '/v2/languages');
+            $client->setMethod(Laminas\Http\Request::METHOD_GET);
+            $client->setOptions(['timeout' => 5]);
+            $response = $client->send();
+            if ($response->isSuccess()) {
+                $data = json_decode($response->getBody(), true);
+                if (is_array($data)) {
+                    $supportedCodes = [];
+                    foreach ($data as $langInfo) {
+                        $code = $langInfo['code'] ?? ($langInfo['longCode'] ?? null);
+                        if ($code) {
+                            $supportedCodes[] = strtolower($code);
+                            // Also check short code (e.g., 'en' matches 'en-US')
+                            $shortCode = explode('-', $code)[0];
+                            if ($shortCode) {
+                                $supportedCodes[] = strtolower($shortCode);
+                            }
+                        }
+                    }
+                    $effectiveLangLower = strtolower($effectiveLanguage);
+                    $effectiveLangShort = strtolower(explode('-', $effectiveLanguage)[0]);
+                    $isLanguageSupported = in_array($effectiveLangLower, $supportedCodes) || in_array($effectiveLangShort, $supportedCodes);
+                }
+            }
+        } catch (Exception $e) {
+            $isLanguageSupported = false;
+        }
+
+        $lcDefault = json_encode($effectiveLanguage);
+        $lcIsSupported = $isLanguageSupported ? 'true' : 'false';
+
+        $loadingIndicatorVar = 'loadingIndicator' . $dom_id;
+        $enableSummernoteLC = ($prefs['feature_language_check'] === 'y') ? 'true' : 'false';
+        $headerlib->add_js_module(<<<JS
+            const $loadingIndicatorVar = $($.IMPORT_LOADER_MARKUP);
+            $('#{$dom_id}').after($loadingIndicatorVar);
+            $.editorSection = "{$params['section']}";
+
+            import('@wysiwyg/summernote').then((module) => {
                 module.loadLanguage('{$langFilePath}', () => {
-                    loadingIndicator.remove();
-                    module.default('{$dom_id}', JSON.parse(`{$tools}`), '{$lang}');
+                    $loadingIndicatorVar.remove();
+                    const options = {lang: '{$lang}'};
+                    if ($.editorSection === 'wiki page') {
+                        options.height = 600;
+                    }
+                    if ({$enableSummernoteLC}) {
+                        options.languageCheck = {
+                            enabled: {$lcEnabled},
+                            debounceMs: {$lcDebounce},
+                            autoDetect: {$lcAuto},
+                            defaultLanguage: {$lcDefault},
+                            isLanguageSupported: {$lcIsSupported}
+                        };
+                    }
+                    module.default('{$dom_id}', JSON.parse(`{$tools}`), options);
                 });
             });
         JS);
@@ -131,7 +206,7 @@ class WYSIWYGLib
                 continue;
             }
 
-            if (strpos($pluginMarkup, ' ') === false) {
+            if (! str_contains($pluginMarkup, ' ')) {
                 // custom blocks without spaces seem to trigger an error in toast rendering code, so add a "harlmess" space if we don't find one
                 $pluginMarkup = str_replace('}', ' }', $pluginMarkup);
             }
@@ -145,7 +220,7 @@ class WYSIWYGLib
             } else {
                 $endNewLine = '';
             }
-            $mdCustomBlock = "$startNewLine\$\$tiki\n$pluginMarkup\n\$\$$endNewLine";
+            $mdCustomBlock = "{$startNewLine}\$\$tiki\n{$pluginMarkup}\n\$\${$endNewLine}";
             $newContent .= $mdCustomBlock;
 
             $position = $match->getEnd();
@@ -175,13 +250,13 @@ class WYSIWYGLib
         $languageCode = $this->languageMapISO($prefs['language']);
         if ($languageCode) {
             $options['language'] = $languageCode;
-            $headerlib->add_jsfile_external(
-                'https://uicdn.toast.com/editor/latest/i18n/' . strtolower($languageCode) . '.js'
+            $headerlib->add_jsfile(
+                NODE_PUBLIC_DIST_PATH . "/@toast-ui/editor/dist/i18n/" . strtolower($languageCode) . '.js'
             );
         }
 
         if (! empty($params['_toolbars'])  && $params['_toolbars'] === 'y') {
-            /** @var Smarty_Tiki $smarty */
+            /** @var \Tiki\Smarty\SmartyTiki $smarty */
             $smarty = TikiLib::lib('smarty');
             $toolbarParams = [
                 'syntax' => 'markdown',
@@ -200,10 +275,11 @@ class WYSIWYGLib
         $jsonOptions = preg_replace(['/"%~/', '/~%"/'], '', $jsonOptions);
 
         $headerlib
-            //->add_jsfile('vendor_bundled/vendor/npm-asset/toast-ui--editor/dist/toastui-editor.js', true)
-            //->add_cssfile('vendor_bundled/vendor/npm-asset/toast-ui--editor/dist/toastui-editor.css')
-            //->add_cssfile('https://uicdn.toast.com/editor/latest/toastui-editor.min.css')
-            ->add_jq_onready("tikiToastEditor($jsonOptions);");
+        ->add_js_module("import tikiToastEditor from '@tiki-toast-ui/editor-index';
+            $(document).ready(function() {
+                tikiToastEditor($jsonOptions);
+            })
+        ");
 
         return [];
     }
@@ -272,7 +348,7 @@ class WYSIWYGLib
             //'vi' => 'vi',         // Vietnamese
         ];
 
-        return isset($langMap[$lang]) ? $langMap[$lang] : '';
+        return $langMap[$lang] ?? '';
     }
 
     private function processSpecialHeadings($content)

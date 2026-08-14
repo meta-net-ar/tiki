@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'file_galleries';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -26,6 +25,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FILE_GALLERIES;
+Sections::setCurrentSection($section);
 $filegallib = TikiLib::lib('filegal');
 
 $access->check_feature('feature_file_galleries');
@@ -49,7 +51,7 @@ if (! empty($_REQUEST['remove'])) {
     if (! ($removeInfo = $filegallib->get_file_info($_REQUEST['remove']))) {
         Feedback::errorAndDie(tra("Incorrect param"), \Laminas\Http\Response::STATUS_CODE_400);
     }
-    if (! ($tiki_p_admin_file_galleries == 'y' || ($user && ($user == $gal_info['user'] || $user == $removeInfo['user'])))) {
+    if (! $filegallib->userCanRemoveFile($removeInfo)) {
         Feedback::errorAndDie(tra("You do not have permission to remove files from this gallery"), \Laminas\Http\Response::STATUS_CODE_401);
     }
     $access->checkCsrf(($removeInfo['archiveId'] ? tra('Remove archive: ') : tra('Remove file gallery: ')) . (! empty($removeInfo['name']) ? $removeInfo['name'] . ' - ' : '') . $removeInfo['filename']);
@@ -61,6 +63,10 @@ if (isset($_REQUEST['fgal_actions'])) {
         foreach (array_values($_REQUEST['file']) as $fileId) {
             if (! ($removeInfo = $filegallib->get_file_info($fileId))) {
                 Feedback::errorAndDie(tra("Incorrect param"), \Laminas\Http\Response::STATUS_CODE_400);
+            }
+
+            if (! $filegallib->userCanRemoveFile($removeInfo)) {
+                continue;
             }
             $filegallib->remove_file($removeInfo, $gal_info);
         }
@@ -120,7 +126,7 @@ $files = $filegallib->get_archives($_REQUEST['fileId'], $_REQUEST['offset'], $_R
 $file = [$fileInfo];
 $smarty->assign_by_ref('files', $files['data']);
 $smarty->assign_by_ref('file', $file);
-$smarty->assign_by_ref('cant', $files['cant']);
+$smarty->assign_by_ref('count', $files['count']);
 $smarty->assign_by_ref('file_info', $fileInfo);
 
 $gal_info = array_merge($filegallib->default_file_gallery(), $gal_info);

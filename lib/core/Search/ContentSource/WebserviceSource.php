@@ -91,7 +91,7 @@ class Search_ContentSource_WebserviceSource implements Search_ContentSource_Inte
      */
     public function getDocument($templateName, Search_Type_Factory_Interface $typeFactory): array|false
     {
-        if (strpos($templateName, ':') !== false) { // multi-index template from getDocuments
+        if (str_contains($templateName, ':')) { // multi-index template from getDocuments
             list ($templateName, $index) = explode(':', $templateName);
             $serviceName = $this->tiki_webservice_template->fetchOne('service', ['template' => $templateName]);
         } else {

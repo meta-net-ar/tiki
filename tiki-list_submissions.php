@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'cms';
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -16,7 +15,7 @@ $inputConfiguration = [
         'approve'                  => 'int',                 //post
         'submit_mult'              => 'string',              //post
         'maxRecords'               => 'int',                 //post
-        'sort_mode'                => 'word',                //get
+        'sort_mode'                => 'alnumdash',           //get
         'offset'                   => 'int',                 //get
         'find'                     => 'string',              //post
         'topic'                    => 'word',                //post
@@ -29,6 +28,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
 $access->check_feature('feature_submissions');
 $access->check_permission('tiki_p_submit_article');
@@ -86,11 +88,7 @@ if (! empty($_REQUEST['maxRecords'])) {
 } else {
     $maxRecords = $prefs['maxRecords'];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 if (($tiki_p_admin == 'y') || ($tiki_p_admin_cms == 'y')) {
     $pdate = '';
@@ -103,11 +101,7 @@ if (($tiki_p_admin == 'y') || ($tiki_p_admin_cms == 'y')) {
 } else {
     $pdate = $tikilib->now;
 }
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 if (! isset($_REQUEST['topic'])) {
     $_REQUEST['topic'] = '';
@@ -131,7 +125,7 @@ if ($prefs['feature_multilingual'] == 'y') {
 }
 
 $listpages = $artlib->list_submissions($offset, $maxRecords, $sort_mode, $find, $pdate, $_REQUEST['type'], $_REQUEST['topic'], $_REQUEST['lang']);
-$smarty->assign_by_ref('cant_pages', $listpages["cant"]);
+$smarty->assign_by_ref('pages_count', $listpages["count"]);
 include_once('tiki-section_options.php');
 $smarty->assign_by_ref('listpages', $listpages["data"]);
 

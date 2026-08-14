@@ -57,13 +57,13 @@ class JsTransferList extends Base
         $headerlib->add_js_module("import '@vue-widgets/el-transfer';");
 
         $headerlib->add_js_module(<<<JS
-            import('@jquery-tiki/ui-utils').then(({ handleTransferList }) => {
+            import('@tiki/ui-utils').then(({ handleTransferList }) => {
                 handleTransferList('{$id}', '{$params['fieldName']}');
             });
         JS);
 
         return "
-        <el-transfer language=" . json_encode($language) . " data='" . json_encode($params["data"]) . "' id='{$id}' field-name='{$params['fieldName']}' filterable=" . json_encode((bool) $params["filterable"]) . " default-value='" . json_encode($params["defaultSelected"]) . "' source-list-title=" . json_encode(tr($params["sourceListTitle"])) . " target-list-title=" . json_encode(tr($params["targetListTitle"])) . " filter-placeholder=" . json_encode(tr($params["filterPlaceholder"])) . " ordering=" . json_encode((bool) $params["ordering"]) . " min-items='$minItems' max-items='$maxItems' helper-text='{$params['validationMessage']}' >
+        <el-transfer language=" . json_encode($language) . " data='" . json_encode($params["data"]) . "' id='{$id}' field-name='{$params['fieldName']}' filterable=" . json_encode((bool) $params["filterable"]) . " default-value='" . json_encode($params["defaultSelected"]) . "' source-list-title=" . json_encode(tr($params["sourceListTitle"])) . " target-list-title=" . json_encode(tr($params["targetListTitle"])) . " filter-placeholder=" . json_encode(tr($params["filterPlaceholder"])) . " ordering=" . json_encode((bool) $params["ordering"]) . " min-items='$minItems' max-items='$maxItems' helper-text='{$params['validationMessage']}' show-edit='{$params['showEdit']}'>
         </el-transfer>";
     }
 }

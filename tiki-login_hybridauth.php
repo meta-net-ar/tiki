@@ -6,8 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //author : aris002@yahoo.co.uk
 
-
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
@@ -16,17 +14,18 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
-//require_once('lib/prefs/socnets.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 
-require_once('lib/socnets/Util.php');
-use TikiLib\Socnets\Util\Util;
-require_once('lib/socnets/LLOG.php');
+global $prefs;
 
-//$access->check_feature('feature_socialnetworks');
-//$access->check_permission('tiki_p_socialnetworks', tra('Social networks'));
+$access = TikiLib::lib('access');
+$access->check_feature('feature_socialnetworks');
+$access->check_feature('hybridauth_login_enabled');
 
-require_once('lib/socnets/TikiHybrid.php');
-use TikiLib\Socnets\TikiHybrid\TikiHybrid;
+use Tiki\Lib\Socnets\Util;
+use Tiki\Lib\Socnets\TikiHybrid;
 
 $auto_query_args = [];
 
@@ -36,8 +35,6 @@ $providerName = '';
 $adapter = null;
 $tikihybridi = null;
 Util::logclear();
-
-
 
 try {
     $storage = new Session();
@@ -53,7 +50,7 @@ try {
         $storage->set('provider', $provider);
         $tikihybridi = new TikiHybrid($provider);
 
-        LLOG('login GET provider=', $provider);
+        Util::log2('login GET provider=', $provider);
 
         //header('Location: tiki-index.php');
         //die;
@@ -63,7 +60,7 @@ try {
     // Event 2: Provider returns via CALLBACK
     //
     if ($provider = $storage->get('provider')) {
-        LLOG('Provider returns via CALLBACK storage provider:', $provider);
+        Util::log2('Provider returns via CALLBACK storage provider:', $provider);
         $tikihybridi->adapter->authenticate();
 
         $storage->set('provider', null);
@@ -72,25 +69,13 @@ try {
         $tikihybridi->adapter->disconnect();
         $tikihybridi = null;
     }
-
-
-    LLOG('aris002 COMMON END  /////////////////////////');
 } catch (Throwable $e) {
-    error_log($e->getMessage());
-    echo $e->getMessage();
-    Feedback::error('TikiHybrid provider error: ' . $e->getMessage());
+    Feedback::error(tr('Social network authentication failed. Please try again or contact the site administrator.'));
+
+    TikiLib::lib('errortracking')->captureException($e);
+    header('Location: tiki-index.php');
+    exit;
 }
 
-/*
-//Do we still need this for tiki.tpl?
-if ($user) {
-    $token = $tikilib->get_user_preference($user, 'socnets_' . $providerId . '_token', '');
-    Feedback::warning("User exists");
-    $smarty->assign('socnets_' . $providerName, ($token != ''));
-}
-*/
-//LLOG('writing adapter =null');
-
-// disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 $smarty->display("tiki.tpl");

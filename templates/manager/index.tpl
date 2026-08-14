@@ -9,7 +9,7 @@
 {/block}
 
 {block name="content"}
-    <h2>Instances</h2>
+    <h2>{tr}Instances{/tr}</h2>
     <div class="table-responsive">
         <table class="table">
             <tr>
@@ -32,7 +32,7 @@
                     <td>{$instance->revision}</td>
                     <td><a href="{$instance->weburl}" title="Visit website" target="_blank">{$instance->weburl}</a></td>
                     <td>{$instance->contact|escape}</td>
-                    <td>{if $instance->app != null }{tr}False{/tr}{else}{tr}True{/tr}{/if}</td>
+                    <td>{if $instance->app != null}{tr}False{/tr}{else}{tr}True{/tr}{/if}</td>
                     <td class="action">
                         {actions}{strip}
                             <action>
@@ -80,7 +80,9 @@
                                 </a>
                             </action>
                             <action>
-                                <a href="{service controller=manager action=delete instanceId=$instance->id}">
+                                <a href="{service controller=manager action=delete instanceId=$instance->id}"
+                                    aria-label="{tr}Delete{/tr}"
+                                    onclick="confirmPopup('{tr}Are you sure you want to delete this instance?{/tr}', '{ticket mode=get}');">
                                     {icon name=times _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
                                 </a>
                             </action>

@@ -25,7 +25,6 @@ function wikiplugin_button_info()
                     %1 in it', '<code>((Page Name))</code>', '<code>{{itemId}}</code>'),
                 'since' => '6.1',
                 'filter' => 'url',
-                'default' => '',
                 'safe' => true,
             ],
             '_text' => [
@@ -43,7 +42,6 @@ function wikiplugin_button_info()
                 'description' => tra('Enter an iconset name to show an icon in the button'),
                 'since' => '14.0',
                 'filter' => 'text',
-                'default' => '',
                 'safe' => true,
             ],
             '_type' => [
@@ -52,7 +50,7 @@ function wikiplugin_button_info()
                 'description' => tra('Use a type to style the button. By default btn-primary will be applied.'),
                 'since' => '13.0',
                 'filter' => 'text',
-                'default' => '',
+                'default' => 'primary',
                 'safe' => true,
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -229,9 +227,7 @@ function wikiplugin_button($data, $params)
 {
     $parserlib = TikiLib::lib('parser');
     $smarty = TikiLib::lib('smarty');
-    if (empty($params['href'])) {
-        return tra('Incorrect param');
-    }
+
     $path = 'lib/smarty_tiki/function.button.php';
     if (! file_exists($path)) {
         return tra('lib/smarty_tiki/function.button.php is missing or unreadable');

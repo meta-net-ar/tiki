@@ -1,9 +1,9 @@
 {if !isset($tpl_module_title)}
     {if isset($data.info.title)}
         {capture name=title}{tr}{$data.info.title|escape:"html"}{/tr}{/capture}
-        {assign var=tpl_module_title value=$smarty.capture.title}
+        {$tpl_module_title=$smarty.capture.title}
     {else}
-        {assign var=tpl_module_title value="{tr}Videos on YouTube{/tr}"}
+        {$tpl_module_title="{tr}Videos on YouTube{/tr}"}
     {/if}
 {/if}
 {tikimodule error="{if isset($module_params.error)}{$module_params.error}{/if}" title="$tpl_module_title" name="youtube"

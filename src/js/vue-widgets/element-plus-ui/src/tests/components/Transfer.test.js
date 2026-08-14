@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/vue";
-import { afterEach, describe, expect, test, vi } from "vitest";
-import Transfer, { DATA_TEST_ID, DRAG_HANDLER_CLASS } from "../../components/Transfer/Transfer.vue";
-import { ElAlert, ElTransfer } from "element-plus";
+import { afterEach, beforeAll, describe, expect, test, vi } from "vitest";
+import Transfer, { DATA_TEST_ID } from "../../components/Transfer/Transfer.vue";
+import { ElAlert, ElButton, ElTransfer } from "element-plus";
 import { h } from "vue";
 import Sortable from "sortablejs";
 import ConfigWrapper from "../../components/ConfigWrapper.vue";
@@ -10,8 +10,15 @@ vi.mock("element-plus", async (importOriginal) => {
     const actual = await importOriginal();
     return {
         ...actual,
-        ElTransfer: vi.fn(),
-        ElAlert: vi.fn(),
+        ElTransfer: vi.fn((props, { slots }) =>
+            h(
+                "div",
+                { ...props },
+                props.modelValue.map((key) => slots.default({ option: { key } }))
+            )
+        ),
+        ElAlert: vi.fn((props, ctx) => null),
+        ElButton: vi.fn((props, ctx) => h("button", props)),
     };
 });
 
@@ -48,6 +55,10 @@ describe("Transfer", () => {
         vi.resetModules();
     });
 
+    beforeAll(() => {
+        window.tr = (str) => "translated: " + str;
+    });
+
     test("renders correctly with given props", async () => {
         render(Transfer, { props });
 
@@ -63,6 +74,9 @@ describe("Transfer", () => {
         // its options should be the selected values
         assertSelectElementToHaveOptions(selectElement, props.defaultValue);
 
+        // options should not render the edit button as showEdit is not set
+        expect(screen.queryByTestId(DATA_TEST_ID.EDIT_ITEM_BUTTON)).not.to.exist;
+
         // el-transfer should be rendered with correct props
         const elTransferData = Object.entries(props.data).map(([key, value]) => ({ key, label: value }));
         expect(ElTransfer).toHaveBeenCalledWith(
@@ -72,7 +86,7 @@ describe("Transfer", () => {
                 "filter-placeholder": props.filterPlaceholder,
                 titles: [props.sourceListTitle, props.targetListTitle],
             }),
-            null
+            expect.any(Object)
         );
 
         expect(ConfigWrapper).toHaveBeenCalledWith(
@@ -129,7 +143,7 @@ describe("Transfer", () => {
             expect.objectContaining({
                 type: type,
             }),
-            null
+            expect.any(Object)
         );
 
         expect(consoleErrorSpy).not.toHaveBeenCalled();
@@ -147,11 +161,7 @@ describe("Transfer", () => {
     ])(
         "renders the alert element with the correct message in all variations of the props: minItems, maxItems, and helperText",
         (givenProps, expectedMessage) => {
-            ElAlert = {
-                setup(props, { slots }) {
-                    return () => h("div", props, slots.default());
-                },
-            };
+            vi.mocked(ElAlert).mockImplementationOnce((props, ctx) => h("div", props, ctx.slots.default()));
 
             render(Transfer, { props: { ...props, ...givenProps } });
 
@@ -164,19 +174,63 @@ describe("Transfer", () => {
         }
     );
 
+    test("renders an edit button on each item in the target list when showEdit prop is true", () => {
+        render(Transfer, { props: { ...props, showEdit: "true" } });
+
+        const editButtons = screen.getAllByTestId(DATA_TEST_ID.EDIT_ITEM_BUTTON);
+        expect(editButtons).to.have.length(props.defaultValue.length);
+
+        editButtons.forEach(() => {
+            expect(ElButton).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    type: "primary",
+                    text: true,
+                    icon: expect.objectContaining({ name: "Edit" }),
+                    onClick: expect.any(Function),
+                }),
+                expect.any(Object)
+            );
+        });
+
+        expect(consoleErrorSpy).not.toHaveBeenCalled();
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
+    });
+
+    test("should correctly handle click event on the 'edit' button for an item in the target list", async () => {
+        const emit = vi.fn();
+
+        render(Transfer, { props: { ...props, showEdit: "true", _emit: emit } });
+        const editButtons = screen.getAllByTestId(DATA_TEST_ID.EDIT_ITEM_BUTTON);
+
+        await Promise.all(editButtons.map((editButton) => fireEvent.click(editButton)));
+
+        props.defaultValue.forEach((key) => {
+            expect(emit).toHaveBeenCalledWith("edit", { value: key });
+        });
+    });
+
     test("should correctly initialize SortableJS when ordering prop is true", async () => {
-        ElTransfer = {
-            setup() {
-                return () =>
-                    h("div", {}, [h("div", { class: "el-transfer-panel__list" }, "list"), h("div", { class: "el-transfer-panel__list" }, "list 2")]);
-            },
-        };
+        vi.mocked(ElTransfer).mockImplementationOnce(() =>
+            h("div", {}, [h("div", { class: "el-transfer-panel__list" }, "list"), h("div", { class: "el-transfer-panel__list" }, "list 2")])
+        );
         render(Transfer, { props: { ...props, ordering: true } });
 
         expect(Sortable).toHaveBeenCalledWith(
             screen.getByText("list 2"),
             expect.objectContaining({
-                handle: "." + DRAG_HANDLER_CLASS,
+                sorting: true,
+                group: props.fieldName,
+                onAdd: expect.any(Function),
+                onUpdate: expect.any(Function),
+            })
+        );
+
+        expect(Sortable).toHaveBeenCalledWith(
+            screen.getByText("list"),
+            expect.objectContaining({
+                sorting: false,
+                group: props.fieldName,
+                onAdd: expect.any(Function),
             })
         );
 
@@ -184,16 +238,139 @@ describe("Transfer", () => {
         expect(consoleWarnSpy).not.toHaveBeenCalled();
     });
 
+    test("should correctly reorder items with SortableJS when ordering prop is true", async () => {
+        vi.mocked(ElTransfer).mockImplementationOnce(() =>
+            h("div", {}, [
+                h("div", { class: "el-transfer-panel__list" }, "list 1"),
+                h("div", { class: "el-transfer-panel__list" }, [
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "a" }, "Item A"))
+                    ),
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
+                    ),
+                ]),
+            ])
+        );
+
+        const emitValueChange = vi.fn();
+        props.emitValueChange = emitValueChange;
+
+        render(Transfer, { props: { ...props, ordering: true } });
+
+        const sortableList = screen.getByText("list 1").nextElementSibling;
+        const orderedChildren = Array.from(sortableList.children).reverse();
+        sortableList.replaceChildren(...orderedChildren);
+
+        Sortable.mock.calls[0][1].onUpdate();
+
+        expect(emitValueChange).toHaveBeenCalledWith({ value: ["b", "a"] });
+    });
+
+    test("should not reorder items with SortableJS when ordering prop is false", async () => {
+        vi.mocked(ElTransfer).mockImplementationOnce(() =>
+            h("div", {}, [
+                h("div", { class: "el-transfer-panel__list" }, "list 1"),
+                h("div", { class: "el-transfer-panel__list" }, [
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "a" }, "Item A"))
+                    ),
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
+                    ),
+                ]),
+            ])
+        );
+
+        const emitValueChange = vi.fn();
+        props.emitValueChange = emitValueChange;
+
+        render(Transfer, { props: { ...props, ordering: false } });
+
+        const sortableList = screen.getByText("list 1").nextElementSibling;
+        const orderedChildren = Array.from(sortableList.children).reverse();
+        sortableList.replaceChildren(...orderedChildren);
+
+        Sortable.mock.calls[0][1].onUpdate();
+
+        expect(emitValueChange).not.toHaveBeenCalled();
+    });
+
+    test("should correctly transfer items  via SortableJS from source to target list", async () => {
+        vi.mocked(ElTransfer).mockImplementationOnce(() =>
+            h("div", {}, [
+                h("div", { class: "el-transfer-panel__list" }, [
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item", "data-testid": "item-c" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "c" }, "Item C"))
+                    ),
+                ]),
+                h("div", { class: "el-transfer-panel__list" }, "list 2"),
+            ])
+        );
+
+        const emitValueChange = vi.fn();
+        props.emitValueChange = emitValueChange;
+
+        render(Transfer, { props });
+
+        const item = screen.getByTestId("item-c");
+        const itemRemoveMock = vi.fn();
+        item.remove = itemRemoveMock;
+
+        Sortable.mock.calls[0][1].onAdd({ item });
+
+        expect(emitValueChange).toHaveBeenCalledWith({ value: ["a", "b", "c"] });
+        expect(itemRemoveMock).toHaveBeenCalled();
+    });
+
+    test("should correctly transfer items via SortableJS from target to source list", async () => {
+        vi.mocked(ElTransfer).mockImplementationOnce(() =>
+            h("div", {}, [
+                h("div", { class: "el-transfer-panel__list" }, "list 1"),
+                h("div", { class: "el-transfer-panel__list" }, [
+                    h(
+                        "div",
+                        { class: "el-transfer-panel__item", "data-testid": "item-b" },
+                        h("div", { class: "el-checkbox__label" }, h("span", { "data-key": "b" }, "Item B"))
+                    ),
+                ]),
+            ])
+        );
+
+        const emitValueChange = vi.fn();
+        props.emitValueChange = emitValueChange;
+
+        render(Transfer, { props });
+
+        const item = screen.getByTestId("item-b");
+        const itemRemoveMock = vi.fn();
+        item.remove = itemRemoveMock;
+
+        Sortable.mock.calls[1][1].onAdd({ item });
+
+        expect(emitValueChange).toHaveBeenCalledWith({ value: ["a"] });
+        expect(itemRemoveMock).toHaveBeenCalled();
+    });
+
     test("should keep hidden select in sync with el-transfer and call the given emitValueChange prop when the value changes", async () => {
         props.emitValueChange = vi.fn();
-        ElTransfer = {
-            props: ["data", "filterable", "filter-placeholder", "titles"],
-            emits: ["update:modelValue", "change"],
-            setup(props, { emit }) {
-                const handleClick = () => emit("change", ["c"]);
-                return () => h("div", {}, h("button", { onClick: handleClick }, "Transfer Item"));
-            },
-        };
+        vi.mocked(ElTransfer).mockImplementationOnce((_, ctx) => {
+            const handleClick = () => {
+                ctx.emit("update:modelValue", ["c"]);
+                ctx.emit("change", ["c"]);
+            };
+            return h("div", {}, h("button", { onClick: handleClick }, "Transfer Item"));
+        });
 
         render(Transfer, { props });
 
@@ -221,7 +398,7 @@ function assertElTransferToBeCalledWith(props) {
             "filter-placeholder": props.filterPlaceholder,
             titles: [props.sourceListTitle, props.targetListTitle],
         }),
-        null
+        expect.any(Object)
     );
 }
 

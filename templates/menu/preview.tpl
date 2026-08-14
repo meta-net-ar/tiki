@@ -1,6 +1,6 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 {block name="title"}
-    {title}{$menuInfo.title|escape}{/title}
+    {title}{$menuInfo.title}{/title}
 {/block}
 
 {block name="content"}
@@ -9,7 +9,7 @@
     {ldelim}menu id={$menuId} type={$preview_type} css={$preview_css} bootstrap={$preview_bootstrap}{rdelim}</pre>{* <pre> cannot have extra spaces for indenting *}
     <div class="card">
         <div class="card-header">
-            <h3 class="card-title">{$menuInfo.name|escape}</h3>
+            <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{$menuInfo.name|escape}</h3>
         </div>
         <div class="card-body clearfix">
             {if $preview_type eq 'horiz'}

@@ -111,7 +111,7 @@ AwsSDK:
   licenceUrl: "https://github.com/aws/aws-sdk-php/blob/master/LICENSE"
   name: aws/aws-sdk-php
   requiredBy:
-    - "zend_mail_smtp_server"
+    - "mailer_smtp_server"
     - "Amazon SES mail sender"
     - "S3 storage for direct mapping file gallery"
   requiredVersion: ^3.208
@@ -131,6 +131,8 @@ MathJax:
     - "wikiplugin_equation"
   requiredVersion: ^2.7
 MediaAlchemyst:
+  actions:
+    - remove
   licence: MIT
   licenceUrl: "https://github.com/alchemy-fr/Media-Alchemyst/blob/master/LICENSE"
   name: media-alchemyst/media-alchemyst
@@ -138,6 +140,17 @@ MediaAlchemyst:
     - wikiplugin_preview
     - ocr_enable
   requiredVersion: ^0.5.4
+  state: replaced
+  replacedBy:
+    - tikiwiki/media-alchemyst
+TikiWikiMediaAlchemyst:
+  licence: MIT
+  licenceUrl: "https://gitlab.com/tikiwiki/libraries/forks/Media-Alchemyst/blob/master/LICENSE"
+  name: tikiwiki/media-alchemyst
+  requiredBy:
+    - wikiplugin_preview
+    - ocr_enable
+  requiredVersion: ^4.2
 PDFjsViewer:
   licence: Apache-2.0
   licenceUrl: "https://github.com/oci-labs/pdfjs-dist-viewer-min/blob/main/LICENSE"
@@ -146,7 +159,7 @@ PDFjsViewer:
   requiredBy:
     - fgal_pdfjs_feature
     - fgal_convert_documents_pdf
-  requiredVersion: ^2.1.266
+  requiredVersion: ^3.11.174
 WebODF:
   licence: AGPL
   licenceUrl: "https://github.com/kogmbh/webodf.js_release/blob/master/AGPL-3.0.txt"

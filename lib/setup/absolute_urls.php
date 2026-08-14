@@ -8,6 +8,8 @@ if (basename($_SERVER['SCRIPT_NAME']) === basename(__FILE__)) {
     die('This script may only be included.');
 }
 
+use Tiki\Sections;
+
 global $https_mode, $url_scheme, $url_host, $url_port, $url_path, $base_host, $base_url, $base_url_http, $base_url_https, $tikiroot;
 
 // $_SERVER['HTTP_HOST'] 172.20.20.20:8080  // reverse proxy
@@ -42,8 +44,8 @@ global $https_mode, $url_scheme, $url_host, $url_port, $url_path, $base_host, $b
  */
 
 // set defaults
-$prefs['http_port'] = isset($prefs['http_port']) ? (int) $prefs['http_port'] : 80;
-$prefs['https_port'] = isset($prefs['https_port']) ? (int) $prefs['https_port'] : 443;
+$prefs['http_port'] = (int) ($prefs['http_port'] ?? 80);
+$prefs['https_port'] = (int) ($prefs['https_port'] ?? 443);
 $https_mode = false;
 $reverse_proxy = false;
 // Check if behind a reverse-proxy / ssl-offloader / frontend-proxy / load-balancer which rewrites ports / protocol
@@ -90,7 +92,7 @@ if (! $reverse_proxy) {
 
 
     // when doing a database update via console.php $_SERVER['SERVER_PORT'] is not set. So define a default to avoid notice.
-    $_SERVER['SERVER_PORT'] = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : 80;
+    $_SERVER['SERVER_PORT'] = $_SERVER['SERVER_PORT'] ?? 80;
     // adjust in case the current port is not 80 or 443
     if ($https_mode) {
         $prefs['https_port'] = (int) $_SERVER['SERVER_PORT'];
@@ -145,23 +147,25 @@ if (! empty($_SERVER['REQUEST_URI']) && strpos(substr($_SERVER['REQUEST_URI'], s
     $base_uri = $base_host; // maybe better than nothing
 }
 
-if (strpos($base_uri, $tikiroot . 'route.php') !== false && ! empty($inclusion)) {
+if (str_contains($base_uri, $tikiroot . 'route.php') && ! empty($inclusion)) {
     $base_uri = $base_url . $inclusion;
     if (! empty($_GET)) {
         $base_uri .= '?' . http_build_query($_GET, '', '&');
     }
-    global $section, $sections;
-    include_once('tiki-sefurl.php');
-    if (isset($sections[$section]['objectType'])) {
-        $objectType = $sections[$section]['objectType'];
-    } else {
-        $objectType = $section;
-    }
-    if ($objectType === 'wiki page') {
-        $objectType = 'wiki';
-    }
+    global $sections;
 
-    $base_uri = TikiLib::tikiUrlOpt(filter_out_sefurl($base_uri, $objectType));
+    Sections::onSectionChange(function ($section) use ($sections, &$base_uri) {
+        if (isset($sections[$section]['objectType'])) {
+            $objectType = $sections[$section]['objectType'];
+        } else {
+            $objectType = null;
+        }
+        if ($objectType === Sections::SECTION_WIKI_PAGE) {
+            $objectType = Sections::SECTION_WIKI;
+        }
+        include_once('tiki-sefurl.php');
+        $base_uri = TikiLib::tikiUrlOpt(filter_out_sefurl($base_uri, $objectType));
+    });
 }
 
 // SSL options

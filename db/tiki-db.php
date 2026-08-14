@@ -5,17 +5,32 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
 
-use Laminas\Config\Config;
+use Tiki\Config\Config;
+use Tiki\Config\Ini;
 use Tiki\Command\ConsoleSetupException;
 use Tiki\Installer\Installer;
 use Tiki\TikiInit;
 
 require_once('lib/init/initlib.php');
+
+$fail = static function (string $msg, int $code = 1001): void {
+    if (defined('TIKI_CONSOLE')) {
+        throw new ConsoleSetupException($msg, $code);
+    }
+    if (PHP_SAPI === 'cli') {
+        fwrite(STDERR, $msg . PHP_EOL);
+        exit(1);
+    }
+    header('HTTP/1.0 503 Service Unavailable', true, 503);
+    header('Retry-After: 300');
+    echo $msg;
+    exit(1);
+};
 
 // Define lang and load translation functions
 if (! empty($_REQUEST['lang'])) {
@@ -26,7 +41,7 @@ if (! empty($_REQUEST['lang'])) {
 include_once('lib/init/tra.php');
 
 $local_php = TikiInit::getCredentialsFile();
-global $default_api_tiki, $api_tiki, $dbversion_tiki, $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $tikidomain, $tikidomainslash, $dbfail_url;
+global $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $tikidomain, $tikidomainslash, $dbfail_url;
 $re = false;
 if (file_exists($local_php)) {
     $re = include($local_php);
@@ -38,8 +53,6 @@ if (! isset($client_charset)) {
 }
 
 $credentials = [
-    'api_tiki' => empty($api_tiki) ? $default_api_tiki : $api_tiki,
-    'api_tiki_forced' => ! empty($api_tiki),
     'primary' => false,
     'shadow' => false,
 ];
@@ -55,7 +68,7 @@ if ($parts = TikiInit::getEnvironmentCredentials()) {
             'pass' => $shadow_pass,
             'dbs' => $shadow_dbs,
             'charset' => $client_charset,
-            'socket' => isset($socket_tiki) ? $socket_tiki : null,
+            'socket' => $socket_tiki ?? null,
         ];
     }
 
@@ -74,60 +87,43 @@ if ($parts = TikiInit::getEnvironmentCredentials()) {
 unset($host_map, $host_tiki, $user_tiki, $pass_tiki, $dbs_tiki, $shadow_user, $shadow_pass, $shadow_host, $shadow_dbs);
 
 global $systemConfiguration;
-$systemConfiguration = new Config(
-    [
-        'preference' => [],
-        'rules' => [],
-    ],
-    ['readOnly' => false]
-);
-if (isset($_SERVER['TIKI_INI_FILE'])) {
-    if (! is_readable($_SERVER['TIKI_INI_FILE'])) {
-        $error = $_SERVER['TIKI_INI_FILE'] . ' could not be read' . PHP_EOL ;
-        if (defined('TIKI_CONSOLE')) {
-            throw new ConsoleSetupException($error, 1001);
-        }
-        echo $error;
-        exit(1);
-    }
+$systemConfiguration = new Config(['preference' => [], 'rules' => []], true);
 
-    $configReader = new Tiki_Config_Ini();
-    $configReader->setFilterSection(isset($_SERVER['TIKI_INI_IDENTIFIER']) ? $_SERVER['TIKI_INI_IDENTIFIER'] : null);
-    $configData = $configReader->fromFile($_SERVER['TIKI_INI_FILE']);
-    $systemConfiguration = $systemConfiguration->merge(new Laminas\Config\Config($configData));
+if (! empty($_SERVER['TIKI_INI_FILE']) && is_readable($_SERVER['TIKI_INI_FILE'])) {
+    try {
+        $envIni = new Ini();
+        $envData = $envIni->fromFile($_SERVER['TIKI_INI_FILE'], $_SERVER['TIKI_INI_IDENTIFIER'] ?? null);
+        $systemConfiguration->mergeAddOnly($envData);
+    } catch (\Throwable $e) {
+        $fail('Failed to load ' . $_SERVER['TIKI_INI_FILE'] . ': ' . $e->getMessage());
+    }
+} elseif (! empty($_SERVER['TIKI_INI_FILE']) && ! is_readable($_SERVER['TIKI_INI_FILE'])) {
+    $fail($_SERVER['TIKI_INI_FILE'] . ' could not be read');
 }
-if (isset($system_configuration_file)) {
-    if (! is_readable($system_configuration_file)) {
-        $error = $system_configuration_file . ' could not be read' . PHP_EOL ;
-        if (defined('TIKI_CONSOLE')) {
-            throw new ConsoleSetupException($error, 1001);
+
+// Normalize to array: support both legacy $system_configuration_file (string)
+// and the newer $system_configuration_files (array of file paths).
+// When using the array form, files listed later override keys from earlier files.
+if (isset($system_configuration_files)) {
+    if (! is_array($system_configuration_files)) {
+        $fail('$system_configuration_files must be an array.');
+    }
+} else {
+    $system_configuration_files = ! empty($system_configuration_file) ? [$system_configuration_file] : [];
+}
+
+foreach ($system_configuration_files as $configFile) {
+    if (! empty($configFile) && is_readable($configFile)) {
+        try {
+            $ini = new Ini();
+            $baseData = $ini->fromFile($configFile, $system_configuration_identifier ?? null);
+            $systemConfiguration->merge($baseData);
+        } catch (\Throwable $e) {
+            $fail('Failed to load ' . $configFile . ': ' . $e->getMessage());
         }
-        echo $error;
-        exit(1);
+    } elseif (! empty($configFile) && ! is_readable($configFile)) {
+        $fail($configFile . ' could not be read');
     }
-    if (! isset($system_configuration_identifier)) {
-        $system_configuration_identifier = null;
-    }
-    $configReader = new Tiki_Config_Ini();
-    $configReader->setFilterSection($system_configuration_identifier);
-
-    if (preg_match('/\.ini.php$/', $system_configuration_file)) {
-        $retrieveIniContent = function ($system_configuration_file) {
-            ob_start();
-            include($system_configuration_file);
-            $system_configuration_file_content = ob_get_contents();
-            ob_end_clean();
-
-            return $system_configuration_file_content;
-        };
-
-        $system_configuration_content = $retrieveIniContent($system_configuration_file);
-        $configData = $configReader->fromString($system_configuration_content);
-    } else {
-        $configData = $configReader->fromFile($system_configuration_file);
-    }
-
-    $systemConfiguration = $systemConfiguration->merge(new Config($configData));
 }
 
 if ($re === false) {
@@ -154,10 +150,6 @@ if ($re === false) {
     return;
 }
 
-if ($dbversion_tiki == '1.10') {
-    $dbversion_tiki = '2.0';
-}
-
 /**
  *
  */
@@ -171,7 +163,6 @@ class TikiDbLegacyErrorHandler implements TikiDb_ErrorHandler
      */
     public function handle(TikiDb $db, $query, $values, $result) // {{{
     {
-        global $prefs;
         $smarty = TikiLib::lib('smarty');
         $msg = $db->getErrorMessage();
         $q = $query;
@@ -212,6 +203,7 @@ class TikiDbLegacyErrorHandler implements TikiDb_ErrorHandler
         if (defined('TIKI_CONSOLE')) {
             throw new ConsoleSetupException($msg, 1001);
         }
+        http_response_code(500);
         $smarty->display('database-connection-error.tpl');
         $this->log($msg . ' - ' . $q);
 
@@ -224,12 +216,11 @@ class TikiDbLegacyErrorHandler implements TikiDb_ErrorHandler
     {
         global $user, $tikilib;
         $query = 'insert into `tiki_actionlog` (`objectType`,`action`,`object`,`user`,`ip`,`lastModif`, `comment`, `client`) values (?,?,?,?,?,?,?,?)';
-        $result = $tikilib->query($query, ['system', 'db error', 'system', $user, $tikilib->get_ip_address(), $tikilib->now, $msg, substr($_SERVER['HTTP_USER_AGENT'], 0, 200)]);
+        $tikilib->query($query, ['system', 'db error', 'system', $user, $tikilib->get_ip_address(), $tikilib->now, $msg, substr($_SERVER['HTTP_USER_AGENT'], 0, 200)]);
     }
 }
 
 $initializer = new TikiDb_Initializer();
-$initializer->setPreferredConnector($credentials['api_tiki']);
 $initializer->setInitializeCallback(
     function ($db) {
         global $db_table_prefix, $common_users_table_prefix;

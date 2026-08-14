@@ -61,12 +61,12 @@ class EventHandler
 
     protected function isDirectFgal($args)
     {
-        if (! isset($args['info']) || $args['info']['type'] != 'direct') {
+        if (! isset($args['info']['type']) || $args['info']['type'] !== 'direct') {
             return false;
         }
         if (! empty($args['info']['direct'])) {
             $config = json_decode($args['info']['direct'], true);
-            if ($config['adapter'] != 'inherit') {
+            if (! isset($config['adapter']) || $config['adapter'] !== 'inherit') {
                 return false;
             }
         }

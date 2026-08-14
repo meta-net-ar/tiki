@@ -7,6 +7,7 @@
             {include file='admin/include_apply_top.tpl'}
         </div>
     </div>
+    <div class="styling-element">
     <fieldset id="Comments">
         <legend class="h3">{tr}Site-wide features{/tr}</legend>
         <div class="admin featurelist">
@@ -16,16 +17,12 @@
             {preference name=feature_comments_post_as_anonymous}
             {preference name=comments_vote}
             {preference name=comments_archive}
+            {preference name=comments_resolved_threads}
             {preference name=comments_allow_correction}
             <div class="adminoptionboxchild" id="comments_allow_correction_childcontainer">
                 {preference name=comments_correction_timeout}
             </div>
-            {preference name=comments_akismet_filter}
             {preference name=tracker_show_comments_below}
-            <div class="adminoptionboxchild" id="comments_akismet_filter_childcontainer">
-                {preference name=comments_akismet_apikey}
-                {preference name=comments_akismet_check_users}
-            </div>
         </div>
     </fieldset>
     <fieldset>
@@ -75,5 +72,6 @@
         {preference name=feature_faq_comments}
         {preference name=wikiplugin_trackercomments}
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

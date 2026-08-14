@@ -47,7 +47,7 @@
         <div class="mb-3 row">
             <label for="add_tran_sw" class="col-md-4 col-form-label">{tr}Add a translation{/tr}</label>
             <div class="col-md-8">
-                <input id="add_tran_sw" class="translation_action" type="radio" name="action" value="add_tran_sw"{if $action eq 'add_tran_sw'} checked{/if}>
+                <input id="add_tran_sw" class="translation_action form-check-input" type="radio" name="action" value="add_tran_sw"{if $action eq 'add_tran_sw'} checked{/if}>
             </div>
         </div>
     </div>
@@ -55,7 +55,7 @@
         <div class="mb-3 row">
             <label for="edit_rec_sw" class="col-md-4 col-form-label">{tr}Untranslated strings{/tr}</label>
             <div class="col-md-8">
-                <input id="edit_rec_sw" class="translation_action" type="radio" name="action" value="edit_rec_sw"{if $action eq 'edit_rec_sw'} checked{/if}>
+                <input id="edit_rec_sw" class="translation_action form-check-input" type="radio" name="action" value="edit_rec_sw"{if $action eq 'edit_rec_sw'} checked{/if}>
                 {if $prefs.record_untranslated eq 'y'}
                 <div class="adminoptionboxchild form-check">
                     <label class="form-check-label"><input id="only_db_untranslated" class="form-check-input translation_action" type="checkbox" name="only_db_untranslated"{if $only_db_untranslated eq 'y'} checked{/if}>{tr}Show only database stored untranslated strings{/tr}</label>
@@ -68,7 +68,7 @@
         <div class="mb-3 row">
             <label for="edit_tran_sw" class="col-md-4 col-form-label">{tr}Edit translations{/tr}</label>
             <div class="col-md-8">
-                <input id="edit_tran_sw" class="translation_action" type="radio" name="action" value="edit_tran_sw"{if $action eq 'edit_tran_sw'} checked{/if}>
+                <input id="edit_tran_sw" class="translation_action form-check-input" type="radio" name="action" value="edit_tran_sw"{if $action eq 'edit_tran_sw'} checked{/if}>
                 <div class="adminoptionboxchild form-check">
                     <label class="form-check-label"><input id="only_db_translations" class="translation_action form-check-input" type="checkbox" name="only_db_translations"{if $only_db_translations eq 'y'} checked{/if}>{tr}Show only database stored translations{/tr}</label>
                 </div>
@@ -188,7 +188,7 @@
                                         </div>
                                     {/if}
 
-                                    {assign var=itemIndex value=$smarty.foreach.translations.index}
+                                    {$itemIndex=$smarty.foreach.translations.index}
                                     {if isset($item.originalTranslation)}
                                         <div class="mb-3 mx-sm-1">
                                             {button _flip_id="diff_$itemIndex" _flip_hide_text="n" _text="{tr}Compare{/tr}" _title=":{tr}Compare the original translation with the database translation{/tr}" _class="btn btn-primary btn-sm tips"}
@@ -229,7 +229,7 @@
             </div>
 
             <div class="card-footer text-center">
-                {pagination_links cant=$total step=$maxRecords offset=$offset _ajax='n'}{strip}
+                {pagination_links count=$total step=$maxRecords offset=$offset _ajax='n'}{strip}
                 tiki-edit_languages.php?edit_language={$edit_language}&action={$action}&maxRecords={$maxRecords}&only_db_translations={$only_db_translations}&only_db_untranslated={$only_db_untranslated}{if isset($find)}&find={$find}{/if}
                 {/strip}{/pagination_links}
             </div>

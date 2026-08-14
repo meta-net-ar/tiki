@@ -15,6 +15,7 @@ function prefs_poll_list()
             'size' => '5',
             'filter' => 'digits',
             'default' => 10,
+            'help' => 'Comments',
         ],
         'poll_comments_default_ordering' => [
             'name' => tra('Display order'),
@@ -26,6 +27,7 @@ function prefs_poll_list()
                 'points_desc' => tra('Points'),
             ],
             'default' => 'points_desc',
+            'help' => 'Comments',
         ],
         'poll_list_categories' => [
             'name' => tra('Show categories'),
@@ -35,24 +37,28 @@ function prefs_poll_list()
                 'feature_categories',
             ],
             'default' => 'n',
+            'help' => 'Category',
         ],
         'poll_list_objects' => [
             'name' => tra('Show objects'),
             'description' => tra('List wiki pages or other site objects that the poll is attached to.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Polls-tab',
         ],
         'poll_multiple_per_object' => [
             'name' => tra('Multiple polls per object'),
             'description' => tra('When used with the rating features, allow multiple polls to be attached to a single object.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Polls-tab',
         ],
         'poll_surveys_textarea_hidetoolbar' => [
             'name' => tra('Disable textarea toolbar'),
             'description' => tra('Don\'t display the toolbar on text inputs in surveys.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Survey-tab',
         ],
         'poll_percent_decimals' => [
             'name' => tra('Precision of survey results calculation'),
@@ -62,6 +68,7 @@ function prefs_poll_list()
             'filter' => 'digits',
             'units' => tra('decimal places'),
             'default' => 2,
+            'help' => 'Polls-tab',
         ],
     ];
 }

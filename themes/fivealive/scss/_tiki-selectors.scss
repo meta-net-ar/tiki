@@ -1,41 +1,46 @@
-// This file is for additional LESS rules beyond what are in variables.scss.
+// FiveAlive theme for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
 // Image path example:
-$imagePath: "../images/";
+//$imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 // }
 
-.dropdown-item.btn-link.text-danger {
-    background: lighten($danger, 40%) !important; //lighten($danger, 70%);
-    border-radius: 0 !important;
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
 
-    &:hover {
-        background: lighten($danger, 30%) !important;
-    }
-}
+@use "sass:color";
 
-html {
+$imagePath: "../images/";
+
+// Color system
+// Body
+.layout_basic,
+.layout_basic.fullscreen,
+.navbar-collapse.collapse.in {
     background-color: #414141;
-}
-
-.header_outer,
-.layout_basic .top_modules {
-    /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#136d9f+0,28a7de+100 */
-    background: #136d9f; /* Old browsers */
-    background: -moz-linear-gradient(left, #136d9f 0%, #28a7de 100%); /* FF3.6-15 */
-    background: -webkit-linear-gradient(left, #136d9f 0%, #28a7de 100%); /* Chrome10-25,Safari5.1-6 */
-    background: linear-gradient(to right, #136d9f 0%, #28a7de 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#136d9f', endColorstr='#28a7de', GradientType=1); /* IE6-9 */
-
-    color: #000000;
 }
 
 #fullscreenbutton a {
     color: #000000;
 }
 
-.navbar-collapse {
-    border: none;
+.layout_basic .container.container-std {
+    background: var(--bs-body-bg);
+}
+
+.header_outer,
+.layout_basic .top_modules {
+    // Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#136d9f+0,28a7de+100
+    background: linear-gradient(to right, #136d9f 0%, #28a7de 100%);
+    color: #000000;
 }
 
 .layout_classic .top_modules.bg-dark-parent {
@@ -63,6 +68,7 @@ html {
         margin-top: 0.5rem;
     }
 }
+
 .layout_classic #topbar_modules .module .navbar.bg-dark, .layout_classic #topbar_modules .module .navbar.bg-light {
     margin-top: 5px;
 }
@@ -84,10 +90,6 @@ html {
     -webkit-transition: all 0.6s ease-in-out;
 }
 
-//.navbar-static-top {
-//  z-index: 999;
-//}
-
 .topbar .navbar-nav > li > a {
     text-transform: uppercase;
     font-weight: bold;
@@ -96,7 +98,6 @@ html {
 .nav-justified .navbar-nav {
     width: 100%;
 }
-
 
 .page-header {
     h1,
@@ -116,111 +117,133 @@ html {
     }
 }
 
-.dropdown-menu {
-    text-transform: none;
+// Page footer
+.main-footer {
+    min-height: 60px;
+    background: black;
+    padding: 1px 0 2px 0;
 }
 
-.dropdown-menu {
-    background-color: $dropdown-bg; //#005064;
-    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
-}
-
-.dropdown-item a,
-.dropdown-item .btn.btn-link {
-    color: $dropdown-link-color;
-
-    &:hover,
-    &:focus {
-        color: $dropdown-link-hover-color;
-    }
-
-    &:active,
-    &.active {
-        color: $dropdown-link-active-color;
-    }
-
-    &.disabled,
-    &:disabled {
-        color: $dropdown-link-disabled-color;
-    }
-
-    .dropdown-header {
-        color: $dropdown-header-color;
-    }
-
-    .dropdown-divider {
-        background: $dropdown-divider-bg;
-    }
-}
-
-
+// Links
+// Components
+// Typography
 h1 {
     font-size: 50px;
 }
 
-
-//.col2,
-//.col3 {
-//    .card,
-//    .card-header,
-//    .card-footer {
-//        background: none;
-//        background-color: transparent;
-//        border: none;
-//    }
-//}
-
-// Page footer
-.main-footer {
-    min-height: 60px;
-    margin-top: 50px;
-    background: #414141;
-    color: #ffffff;
-}
-
-#footer {
-    background: #000000;
-    color: $footer-color; // #696969;
-    padding: 1px 0 2px 0;
-}
-
-.footer {
-    border-top: 1px solid $footer-border-color; //#ebdc14;
-    border-bottom: 1px solid $footer-border-color; // #ebdc14;
-}
-
-.footer_liner {
-    .card,
-    .card-header,
-    .card-footer {
-        background: transparent;
-        border-color: transparent;
-    }
-
-    h3.card-header {
-        color: #ffffff;
-        border-bottom: 1px dotted $footer-border-color;
-    }
-
-    //#ebdc14;
-    legend,
-    a,
-    a:visited {
-        color: $footer-link-color;
-    }
-
-    // #a9a9a9;
-}
-
-
+// Tables
+// Buttons
+// Forms
 label a:hover {
     text-decoration: none;
 }
 
-.bg-dark {
-    background-color: $bg-dark !important;
-}
-
+// Navs
 .nav-tabs .nav-item {
     margin-right: 1px;
 }
+
+// Navbar
+.navbar-collapse {
+    border: none;
+}
+
+// Dropdowns
+//.dropdown-menu {
+//    text-transform: none;
+//    background-color: $dropdown-bg; //#005064;
+//    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
+//}
+
+//.dropdown-item a,
+//.dropdown-item .btn.btn-link {
+//    color: $dropdown-link-color;
+//
+//    &:hover,
+//    &:focus {
+//        color: $dropdown-link-hover-color;
+//    }
+//
+//    &:active,
+//    &.active {
+//        color: $dropdown-link-active-color;
+//    }
+//
+//    &.disabled,
+//    &:disabled {
+//        color: $dropdown-link-disabled-color;
+//    }
+//
+//    .dropdown-header {
+//        color: $dropdown-header-color;
+//    }
+//
+//    .dropdown-divider {
+//        background: $dropdown-divider-bg;
+//    }
+//}
+//
+//.dropdown-item.btn-link.text-danger {
+//    background: color.adjust($danger, $lightness: 40%, $space: hsl) !important; //lighten($danger, 70%);
+//    border-radius: 0 !important;
+//
+//    &:hover {
+//        background: color.adjust($danger, $lightness: 30%, $space: hsl) !important;
+//    }
+//}
+
+// Pagination
+// Cards
+.card.module {
+    border: none;
+    --bs-card-border-color: transparent !important;
+}
+
+// This should probably be in base_files/tiki-selectors
+.card.module > h3.card-title {
+    color: var(--bs-body-color);
+    margin: 0 1rem;
+    position: relative;
+}
+
+// Accordion
+// Badges
+// Alerts
+// Progress bars
+// List group
+// Figures
+// Breadcrumbs
+// Code
+// Tiki-specific
+
+//.bottom_modules {
+//    .card-body { color: #dee2e6; background: #262626; }
+//}
+
+// Dark page footer
+:root .bottom_modules,
+[data-bs-theme="light"] .bottom_modules,
+[data-bs-theme="dark"] .bottom_modules {
+    color: #dee2e6;
+    .card {
+        color: #dee2e6;
+        background: #000;
+    }
+    .tiki-card-header-title {
+        color: #333 !important;
+    }
+    .card-body {
+        color: #dee2e6;
+        background: #262626;
+    }
+
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link {
+        color: #1ea6be;
+    }
+
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover {
+        color: #8BB9FE;
+    }
+}
+
+// External libraries

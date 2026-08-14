@@ -88,6 +88,16 @@ class Search_Action_Sequence
         }
     }
 
+    public function requiresConfirm()
+    {
+        foreach ($this->steps as $step) {
+            if ($step->requiresConfirm()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function getSteps()
     {
         return $this->steps;

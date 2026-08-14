@@ -40,7 +40,7 @@
  */
 
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -81,6 +81,8 @@ class FreetagLib extends ObjectLib
     public $max_cloud_text_size = 7;
 
     public $multilingual = false;
+
+    private bool $currentObjectTagRequestHandled = false;
 
 
     /**
@@ -150,14 +152,14 @@ class FreetagLib extends ObjectLib
         }
 
         $query = 'SELECT DISTINCT o.*';
-        $query_cant = 'SELECT COUNT(*)';
+        $query_count = 'SELECT COUNT(*)';
 
         $query_end = ' FROM `tiki_objects` o, `tiki_freetagged_objects` fto, `tiki_freetags` t'
                                 . ' WHERE fto.`tagId` = t.`tagId` AND o.`objectId` = fto.`objectId` AND `tag` = ? ' . $mid
                                 . ' ORDER BY o.' . $this->convertSortMode($sort_mode);
 
         $query      .= $query_end;
-        $query_cant .= $query_end;
+        $query_count .= $query_end;
 
         $result = $this->query($query, $bindvals, $maxRecords, $offset);
 
@@ -166,9 +168,9 @@ class FreetagLib extends ObjectLib
             $ret[] = $row;
         }
 
-        $cant = $this->getOne($query_cant, $bindvals);
+        $count = $this->getOne($query_count, $bindvals);
 
-        return ['data' => $ret, 'cant' => $cant];
+        return ['data' => $ret, 'count' => $count];
     }
 
     /**
@@ -203,7 +205,7 @@ class FreetagLib extends ObjectLib
         }
 
         if (count($tagArray) == 0) {
-            return ['data' => [], 'cant' => 0];
+            return ['data' => [], 'count' => 0];
         }
 
         $bindvals = $tagArray;
@@ -266,7 +268,7 @@ class FreetagLib extends ObjectLib
                 }
                 $tag_sql .= ')';
             } else {
-                return ['data' => [], 'cant' => 0];
+                return ['data' => [], 'count' => 0];
             }
         }
 
@@ -292,7 +294,7 @@ class FreetagLib extends ObjectLib
         // counting only the distinct tags. It should also work for an individual user.
 
         $query = 'SELECT DISTINCT o.*';
-        $query_cant = 'SELECT COUNT(DISTINCT o.`objectId`)';
+        $query_count = 'SELECT COUNT(DISTINCT o.`objectId`)';
 
         $query_end = ' FROM `tiki_objects` o, `tiki_freetagged_objects` fto, `tiki_freetags` t'
                                 . ' WHERE fto.`tagId` = t.`tagId` AND o.`objectId` = fto.`objectId`'
@@ -304,10 +306,10 @@ class FreetagLib extends ObjectLib
         // Not a neat fix the o. prefix is ugly.    So changed default order instead.
 
         $query .= $query_end;
-        $query_cant .= $query_end;
+        $query_count .= $query_end;
 
         $result = $this->query($query, $bindvals, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvals);
+        $count = $this->getOne($query_count, $bindvals);
 
         $ret = [];
         $permMap = TikiLib::lib('object')->map_object_type_to_permission();
@@ -353,10 +355,10 @@ class FreetagLib extends ObjectLib
                 }
                 $ret[] = $row;
             } else {
-                --$cant;
+                --$count;
             }
         }
-        return ['data' => $ret, 'cant' => $cant];
+        return ['data' => $ret, 'count' => $count];
     }
 
     /**
@@ -391,7 +393,7 @@ class FreetagLib extends ObjectLib
         }
 
         $query = 'SELECT DISTINCT o.* ';
-        $query_cant = 'SELECT COUNT(*) ';
+        $query_count = 'SELECT COUNT(*) ';
 
         $query_end = ' FROM `tiki_freetagged_objects` fto, `tiki_freetags` t, `tiki_objects` o'
                                 . ' WHERE t.`tagId` = ? AND fto.`tagId` = t.`tagId`'
@@ -400,7 +402,7 @@ class FreetagLib extends ObjectLib
                                 ;
 
         $query .= $query_end;
-        $query_cant .= $query_end;
+        $query_count .= $query_end;
 
         $result = $this->query($query, $bindvals, $maxRecords, $offset);
 
@@ -409,9 +411,9 @@ class FreetagLib extends ObjectLib
             $ret[] = $row;
         }
 
-        $cant = $this->getOne($query_cant, $bindvals);
+        $count = $this->getOne($query_count, $bindvals);
 
-        return ['data' => $ret, 'cant' => $cant];
+        return ['data' => $ret, 'count' => $count];
     }
 
     /**
@@ -437,13 +439,13 @@ class FreetagLib extends ObjectLib
      */
     public function get_tags_on_object($itemId, $type, $offset = 0, $maxRecords = -1, $user = null)
     {
-        if (! isset($itemId) || ! isset($type) || empty($itemId) || empty($type) || is_array($itemId) || ! is_string($type)) {
+        if (empty($itemId) || empty($type) || is_array($itemId) || ! is_string($type)) {
             return false;
         }
 
         $bindvals = [$itemId, $type];
 
-        if (isset($user) && (! empty($user))) {
+        if ((! empty($user))) {
             $mid = 'AND `user` = ?';
             $bindvals[] = $user;
         } else {
@@ -463,13 +465,84 @@ class FreetagLib extends ObjectLib
         $result = $this->query($query, $bindvals, $maxRecords, $offset);
 
         $ret = [];
-        $cant = 0;
+        $count = 0;
         while ($row = $result->fetchRow()) {
             $ret[] = $row;
-            $cant++;
+            $count++;
         }
 
-        return ['data' => $ret, 'cant' => $cant];
+        return ['data' => $ret, 'count' => $count];
+    }
+
+    /**
+     * Process add/remove tag requests for the current section object.
+     */
+    public function handleCurrentObjectTagRequest(): void
+    {
+        global $captchalib, $prefs, $smarty, $tiki_p_admin, $tiki_p_freetags_tag, $tiki_p_unassign_freetags, $tikilib, $user, $userlib;
+
+        if ($this->currentObjectTagRequestHandled) {
+            return;
+        }
+
+        $hasAddRequest = $tiki_p_freetags_tag === 'y' && trim($_POST['addtags'] ?? '') !== '';
+        $hasDeleteRequest = ($tiki_p_admin === 'y' || $tiki_p_unassign_freetags === 'y') && isset($_REQUEST['delTag']);
+        if (! $hasAddRequest && ! $hasDeleteRequest) {
+            return;
+        }
+
+        $object = \Tiki\Sections::currentObject();
+        if (! $object) {
+            return;
+        }
+        $this->currentObjectTagRequestHandled = true;
+
+        if ($hasAddRequest) {
+            if (empty($user)) {
+                $userid = 0;
+            } else {
+                $userid = $userlib->get_user_id($user);
+            }
+
+            if (empty($user) && $prefs['feature_antibot'] === 'y' && ! $captchalib->validate()) {
+                $smarty->assign('freetag_error', $captchalib->getErrors());
+                $smarty->assign_by_ref('freetag_msg', $_POST['addtags']);
+            } else {
+                $this->tag_object($userid, $object['object'], $object['type'], $_POST['addtags']);
+                $tikilib->refresh_index($object['type'], $object['object']);
+            }
+        }
+
+        if ($hasDeleteRequest) {
+            $this->delete_object_tag($object['object'], $object['type'], $_REQUEST['delTag']);
+            $tikilib->refresh_index($object['type'], $object['object']);
+
+            $url = $tikilib->httpPrefix() . preg_replace('/[?&]delTag=' . preg_quote(urlencode($_REQUEST['delTag']), '/') . '/', '', $_SERVER['REQUEST_URI']);
+            TikiLib::lib('access')->redirect($url);
+        }
+    }
+
+    /**
+     * Assign tags for the current object to Smarty as $tags.
+     *
+     * @throws UnexpectedValueException If the current section is not set yet.
+     */
+    public function assignCurrentObjectTagsToSmarty(): void
+    {
+        $section = \Tiki\Sections::getCurrentSection();
+        if (empty($section)) {
+            throw new \UnexpectedValueException('Current section is not set.');
+        }
+
+        $object = \Tiki\Sections::currentObject();
+        if (! $object) {
+            return;
+        }
+
+        $objectTags = $this->get_tags_on_object($object['object'], $object['type']);
+        $tags = $objectTags ? $objectTags['data'] : [];
+
+        TikiLib::lib('smarty')->assign('tags', $tags);
     }
 
     /**
@@ -577,9 +650,7 @@ class FreetagLib extends ObjectLib
                 $bindvals = [$normalized_tag, $tag];
                 $this->query($query, $bindvals);
             }
-
-            $query = 'SELECT MAX(`tagId`) FROM `tiki_freetags` WHERE `tag`=? AND `raw_tag`=?';
-            $tagId = $this->getOne($query, array_slice($bindvals, 0, 2));
+            $tagId = $this->lastInsertId();
         }
 
         if (! ($tagId > 0)) {
@@ -609,8 +680,7 @@ class FreetagLib extends ObjectLib
     public function safe_tag($user, $itemId, $type, $tag, $lang = null)
     {
         if (
-            ! isset($itemId) || ! isset($type) || ! isset($tag) ||
-                empty($itemId) || empty($type) || empty($tag)
+            empty($itemId) || empty($type) || empty($tag)
         ) {
             throw new Exception('Missing safe_tag argument.');
         }
@@ -1084,11 +1154,9 @@ class FreetagLib extends ObjectLib
 
     public function get_tag_suggestion($exclude = '', $max = 10, $lang = null)
     {
-        global $prefs;
-        if (! $lang && ! empty($prefs['language'])) {
-            $lang = $prefs['language'];
+        if (! $lang) {
+            $lang = Language::getCurrentLanguage();
         }
-
         $query = 'SELECT t.* FROM `tiki_freetags` t, `tiki_freetagged_objects` o'
                         . ' WHERE t.`tagId` = o.`tagId`'
                         . ' AND (`lang` = ? or `lang` IS null)'
@@ -1652,7 +1720,7 @@ class FreetagLib extends ObjectLib
             $tags['data'][]['tag'] = $this->normalize_tag($tag);
         }
 
-        $tags['cant'] = count($tags['data']);
+        $tags['count'] = count($tags['data']);
 
         return $tags;
     }

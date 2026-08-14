@@ -177,7 +177,7 @@ class Button extends Base
             $url_args = [];
             if (! empty($params['href'])) {
                 // Handle anchors
-                if (strpos($params['href'], '#')) {
+                if (str_contains($params['href'], '#')) {
                     list($params['href'], $params['_anchor']) = explode('#', $params['href'], 2);
                 }
 
@@ -196,11 +196,20 @@ class Button extends Base
             if (! isset($params['_text'])) { // avoid NOTICE (E_NOTICE): Undefined index
                 $params['_text'] = '';
             }
+
+            $originalType = $params['_type'] ?? null;
+
             $html = $smartyBlockSelfLinkHandler->handle(
                 $params,
                 $params['_text'],
                 $template
             );
+
+            if ($originalType !== null) {
+                $params['_type'] = $originalType;
+            } else {
+                unset($params['_type']);
+            }
 
             $url = str_replace('+', ' ', str_replace('&amp;', '&', urldecode($_SERVER['REQUEST_URI'])));
             $encoded_html = htmlentities($html);
@@ -228,9 +237,9 @@ class Button extends Base
             );
         }
 
-        $type = isset($params['_type']) ? $params['_type'] : 'primary';
+        $type = $params['_type'] ?? 'primary';
 
-        $html = preg_replace('/<a /', '<a class="btn btn-' . $type . ' ' . $class . '" target="' . $target . '" data-role="button" data-inline="true" ' . $id . ' ', $html);
+        $html = preg_replace('/<a /', '<a class="btn btn-' . $type . ' ' . $class . '" target="' . $target . '" role="button" data-role="button" data-inline="true" ' . $id . ' ', $html);
 
         return $html;
     }

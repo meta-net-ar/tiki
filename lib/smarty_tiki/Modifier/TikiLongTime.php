@@ -12,7 +12,7 @@ class TikiLongTime
     public function handle($string)
     {
         global $prefs;
-        $smarty = \TikiLib::lib('smarty');
+        \TikiLib::lib('smarty'); //Load SmartyLib for side effects
         return smarty_modifier_tiki_date_format($string, $prefs['long_time_format']);
     }
 }

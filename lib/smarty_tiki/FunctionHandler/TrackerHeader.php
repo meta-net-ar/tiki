@@ -21,9 +21,8 @@ class TrackerHeader extends Base
 {
     public function handle($params, Template $template)
     {
-        global $prefs;
         $headerlib = \TikiLib::lib('header');
-        $output = $js = '';
+        $output = '';
         static $trackerheaderStack = [];
         static $iTrackerHeader = 0;
         $last = count($trackerheaderStack);
@@ -40,7 +39,7 @@ class TrackerHeader extends Base
             --$last;
         }
         if (! empty($title)) { // new header
-            array_push($trackerheaderStack, $level);
+            $trackerheaderStack[] = $level;
             $output .= "<!--PUSH" . count($trackerheaderStack) . " -->";
             $id = "trackerHeader_$iTrackerHeader";
             $div_id = "block_$id";
@@ -67,7 +66,6 @@ class TrackerHeader extends Base
             $output .= " id=\"$div_id\">";
             ++$iTrackerHeader;
         } else {
-            $last = 0;
             $trackerheaderStack = [];
         }
         if (! empty($inTable)) {

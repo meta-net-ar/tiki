@@ -1,0 +1,36 @@
+---
+type: object
+properties:
+  articleId:
+    type: integer
+  title:
+    type: string
+  heading:
+    type: string
+  body:
+    type: string
+  content:
+    type: string
+    description: Alias of the full readable text (heading + body), useful for content ingestion
+  lang:
+    type: string
+  url:
+    type: string
+    description: Public permalink to the article read page
+  lastModif:
+    type: integer
+  topicId:
+    type: integer
+    nullable: true
+  topicName:
+    type: string
+    nullable: true
+  authorName:
+    type: string
+    nullable: true
+  publishDate:
+    type: integer
+    nullable: true
+  type:
+    type: string
+    nullable: true

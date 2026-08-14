@@ -52,22 +52,14 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign('where', $where);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $items = $lsadminlib->list_support_requests($offset, $maxRecords, $sort_mode, $find, $where);
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 $smarty->assign('users', $lsadminlib->get_all_tiki_users());
 $smarty->assign('operators', $lsadminlib->get_all_operators());

@@ -39,6 +39,6 @@
     </div>
     {*Pagination *}
     {if !empty($events) && $usePagination ne 'n'}
-        {pagination_links cant=$cant step=$maxEvents offset=$offset}{/pagination_links}
+        {pagination_links count=$count step=$maxEvents offset=$offset}{/pagination_links}
     {/if}
 {/if}

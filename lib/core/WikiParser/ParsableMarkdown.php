@@ -18,9 +18,8 @@ use League\CommonMark\MarkdownConverter;
 use League\CommonMark\Node\Node;
 use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
-use League\CommonMark\Block\Element\FencedCode;
-use League\CommonMark\Block\Renderer\FencedCodeRenderer;
 use Tiki\WikiParser\Markdown\Extension as TikiExtension;
+use Tiki\WikiParser\Markdown\ZoteroCitationExtension;
 
 class WikiParser_ParsableMarkdown extends ParserLib
 {
@@ -52,6 +51,9 @@ class WikiParser_ParsableMarkdown extends ParserLib
         $environment->addExtension(new FootnoteExtension());
         $environment->addExtension(new TikiExtension());
 
+        if (($prefs['zotero_pandoc_enabled'] ?? 'n') === 'y') {
+            $environment->addExtension(new ZoteroCitationExtension());
+        }
         if ($this->option['autotoc']) {
             $environment->addExtension(new HeadingPermalinkExtension());
         }
@@ -59,21 +61,6 @@ class WikiParser_ParsableMarkdown extends ParserLib
         if ($prefs['markdown_gfm'] === 'y') {
             $environment->addExtension(new GithubFlavoredMarkdownExtension());
         }
-
-        // add default class to code blocks -> <pre class="codelisting">
-        $environment->addRenderer(
-            FencedCode::class,
-            new class implements NodeRendererInterface {
-                public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-                {
-                    $htmlEl = (new FencedCodeRenderer())->render($node, $childRenderer);
-                    $class = $htmlEl->getAttribute('class') ?: 'codelisting';
-                    $htmlEl->setAttribute('class', $class);
-                    return $htmlEl;
-                }
-            },
-            10
-        );
 
         // add default class to table -> <table class="wikitable table table-striped table-hover">
         $environment->addRenderer(
@@ -97,11 +84,40 @@ class WikiParser_ParsableMarkdown extends ParserLib
             $data = $this->autolinks($data);
         }
 
+        /**
+         * extract Markdown code blocks to be processed later
+         * This regex matches code blocks that:
+         * - start with a fence of 3 or more backticks or tildes, also allows up to three spaces before opening,
+         * - language identifier (info string) is optional on the opening line and can contain anything,
+         * - end with a matching fence of the same character as at start,
+         * - allows up to three spaces before both opening and closing fences.
+         *
+         * Note: the first capturing group contains the opening fence itself.
+         * The fenced block content is matched by the middle non-capturing part
+         * and is preserved through the full match.
+         *
+         * Reference: https://spec.commonmark.org/0.31.2/#fenced-code-blocks
+         * */
+        $pattern = '/^(?: {0,3})([`~])\1{2,}([^`\r\n]*)?\r?\n(?:[\s\S]*?)(?:\r?\n(?: {0,3})\1{1,})/m';
+        preg_match_all($pattern, $data, $matches);
+        $list_code = [];
+        foreach ($matches[0] as $match) {
+            $hash = '§' . md5(uniqid()) . '§';
+            $data = str_replace($match, $hash, $data);
+            $list_code[] = [
+                'value' => $match,
+                'hash' => $hash
+            ];
+        }
         // wiki page links and external links are handled in Tiki-syntax to allow sister sites and other semantic linking
         $data = $this->parse_data_wikilinks($data, false, $this->option['wysiwyg']);
         $data = $this->parse_data_externallinks($data, false);
         $data = preg_replace(';~hc~(.*?)~/hc~;s', '<!-- $1 -->', $data);
 
+        // restore code blocks
+        foreach ($list_code as $code) {
+            $data = str_replace($code['hash'], $code['value'], $data);
+        }
         // converter/parser expects UTF-8, try to cleanup invalid characters
         $data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 

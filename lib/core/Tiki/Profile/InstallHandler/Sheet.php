@@ -4,6 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Sheet\Sheet;
+use Tiki\Lib\Sheet\DatabaseHandler;
+use Tiki\Lib\Sheet\HTMLTableHandler;
+
 class Tiki_Profile_InstallHandler_Sheet extends Tiki_Profile_InstallHandler
 {
     public function getData()
@@ -33,7 +38,6 @@ class Tiki_Profile_InstallHandler_Sheet extends Tiki_Profile_InstallHandler
         if ($this->canInstall()) {
             global $user;
             $sheetlib = TikiLib::lib('sheet');
-            require_once('lib/sheet/grid.php');
 
             //here we convert the array to that of what is acceptable to the sheet lib
             $parentSheetId = 0;
@@ -69,7 +73,7 @@ class Tiki_Profile_InstallHandler_Sheet extends Tiki_Profile_InstallHandler
                         $formula = "";
                         $rawValue = $rows[$r][$c];
 
-                        if (substr($rawValue, 0, 1) == "=") {
+                        if (str_starts_with($rawValue, "=")) {
                             $formula = $rawValue;
                         } else {
                             $value = $rawValue;
@@ -90,10 +94,10 @@ class Tiki_Profile_InstallHandler_Sheet extends Tiki_Profile_InstallHandler
                 $id = $sheetlib->replace_sheet(0, $title, "", $user, $parentSheetId);
                 $parentSheetId = ($parentSheetId ? $parentSheetId : $id);
 
-                $grid = new TikiSheet($id);
-                $handler = new TikiSheetHTMLTableHandler($sheets[$sheetI]);
+                $grid = new Sheet($id);
+                $handler = new HTMLTableHandler($sheets[$sheetI]);
                 $res = $grid->import($handler);
-                $handler = new TikiSheetDatabaseHandler($id);
+                $handler = new DatabaseHandler($id);
                 $grid->export($handler);
             }
 

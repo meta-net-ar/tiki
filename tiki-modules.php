@@ -24,6 +24,7 @@ global $prefs, $user;
 
 clearstatcache();
 $modules = $modlib->get_modules_for_user($user);
+$smarty->assign('modlib', $modlib);
 
 if (Perms::get()->admin) {
     $smarty->assign('module_pref_errors', $modlib->pref_errors);
@@ -34,8 +35,7 @@ $show_columns = array_fill_keys(array_keys($modules), 'n');
 $modnames = [];
 foreach ($modules as $zone => & $moduleList) {
     if (
-        $prefs['feature_fullscreen'] != 'y' || empty($_SESSION['fullscreen']) || $_SESSION['fullscreen'] != 'y' ||
-            strpos($zone, 'page') === 0
+        $prefs['feature_fullscreen'] != 'y' || empty($_SESSION['fullscreen']) || $_SESSION['fullscreen'] != 'y' || str_starts_with($zone, 'page')
     ) { // pagetop and pagebottom zones appear in fullscreen
         foreach ($moduleList as & $mod_reference) {
             $show_columns[$zone] = 'y';
@@ -71,3 +71,4 @@ $module_nodecorations = ['decorations' => 'n'];
 $module_isflippable = ['flip' => 'y'];
 $smarty->assign('module_nodecorations', $module_nodecorations);
 $smarty->assign('module_isflippable', $module_isflippable);
+$smarty->assign('all_modules', $modlib->get_all_modules());

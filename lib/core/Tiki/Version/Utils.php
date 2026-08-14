@@ -38,11 +38,6 @@ class Tiki_Version_Utils
             }
         );
 
-        return array_map(
-            function ($upgrade) {
-                return $upgrade->getMessage();
-            },
-            $upgrades
-        );
+        return $upgrades;
     }
 }

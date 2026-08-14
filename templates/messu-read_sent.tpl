@@ -36,12 +36,12 @@
                     <input type="hidden" name="action" value="isFlagged">
                     {if $msg.isFlagged eq 'y'}
                         <input type="hidden" name="actionval" value="n">
-                        <button type="submit" class="btn btn-link">
+                        <button type="submit" class="btn btn-link" aria-label="{tr}Flagged: Click to unflag{/tr}">
                             <i class="fas fa-flag tips" aria-hidden="true" title="{tr}Flagged: Click to unflag{/tr}"></i>
                         </button>
                     {else}
                         <input type="hidden" name="actionval" value="y">
-                        <button type="submit" class="btn btn-link">
+                        <button type="submit" class="btn btn-link" aria-label="{tr}Not Flagged: Click to flag{/tr}">
                             <i class="far fa-flag tips" aria-hidden="true" title="{tr}Not flagged: Click to flag{/tr}"></i>
                         </button>
                     {/if}

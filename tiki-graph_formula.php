@@ -8,10 +8,12 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\GraphEngine\GDGRenderer;
+use Tiki\Lib\GraphEngine\MultilineGraphic;
+use Tiki\Lib\GraphEngine\PDFLibGRenderer;
+
 require_once('tiki-setup.php');
-require_once('lib/graph-engine/graph.multiline.php');
-require_once('lib/graph-engine/gd.php');
-require_once('lib/graph-engine/pdflib.php');
 
 // List of valid functions
 $valid = [
@@ -99,10 +101,10 @@ if (
 
 switch ($_GET['t']) {
     case 'png':
-        $renderer = new GD_GRenderer($_GET['w'], $_GET['h']);
+        $renderer = new GDGRenderer($_GET['w'], $_GET['h']);
         break;
     case 'pdf':
-        $renderer = new PDFLib_GRenderer($_GET['p'], $_GET['o']);
+        $renderer = new PDFLibGRenderer($_GET['p'], $_GET['o']);
         break;
     default:
         die;

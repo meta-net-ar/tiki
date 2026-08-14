@@ -27,29 +27,32 @@ function wikiplugin_ganttchart_info()
             'order' => [
                 'name' => tr('Order Field'),
                 'description' => tr('Permanent name of the field to use for row number order'),
-                'required' => true,
+                'required' => false,
                 'filter' => 'word',
+                'default' => '',
                 'since' => 19,
             ],
             'level' => [
                 'name' => tr('Level Field'),
                 'description' => tr('Permanent name of the field to use for row level'),
-                'required' => true,
+                'required' => false,
                 'filter' => 'word',
+                'default' => '',
                 'since' => 19,
             ],
             'status' => [
                 'name' => tr('Status Field'),
                 'description' => tr('Permanent name of the field to use for row status'),
-                'required' => true,
+                'required' => false,
                 'filter' => 'word',
                 'since' => 19,
             ],
             'depends' => [
                 'name' => tr('Dependency Field'),
                 'description' => tr('Permanent name of the field to use for row dependency'),
-                'required' => true,
+                'required' => false,
                 'filter' => 'word',
+                'default' => '',
                 'since' => 19,
             ],
             'progress' => [
@@ -57,12 +60,13 @@ function wikiplugin_ganttchart_info()
                 'description' => tr('Permanent name of the field to use for row progress, values between 0-100'),
                 'required' => false,
                 'filter' => 'word',
+                'default' => '',
                 'since' => 19,
             ],
             'name' => [
                 'name' => tr('Name Field'),
                 'description' => tr('Permanent name of the field to use for row name'),
-                'required' => true,
+                'required' => false,
                 'filter' => 'word',
                 'since' => 19,
             ],
@@ -83,12 +87,12 @@ function wikiplugin_ganttchart_info()
             'begin' => [
                 'name' => tr('Begin Date Field'),
                 'description' => tr('Permanent name of the field to use for event beginning'),
-                'required' => true,
+                'required' => false,
             ],
             'end' => [
                 'name' => tr('End Date Field'),
                 'description' => tr('Permanent name of the field to use for event ending'),
-                'required' => true,
+                'required' => false,
                 'since' => 19,
             ],
             'resourceId' => [
@@ -191,11 +195,11 @@ function wikiplugin_ganttchart($data, $params)
     $access = TikiLib::lib('access');
     $access->setTicket();
     $trackerId = $params['trackerId'];
-    $order = ! empty($params['order']) ? $params['order'] : '';
-    $levelParam = ! empty($params['level']) ? $params['level'] : '';
+    $order = $params['order'];
+    $levelParam = $params['level'];
     $status = $params['status'];
-    $depends = ! empty($params['depends']) ? $params['depends'] : '';
-    $progress = ! empty($params['progress']) ? $params['progress'] : '';
+    $depends = $params['depends'];
+    $progress = $params['progress'];
     $name = $params['name'];
     $description = $params['description'];
     $code = $params['code'];
@@ -257,7 +261,7 @@ function wikiplugin_ganttchart($data, $params)
     $users = $userlib->list_all_users();
 
     //fetch user to show in select
-    foreach ($users as $key => $value) {
+    foreach ($users as $value) {
         $allResources[] = [
             'id' => $value,
             'name' => $value,
@@ -295,7 +299,7 @@ function wikiplugin_ganttchart($data, $params)
                 $allLevel[$fieldItem['itemId']] = 0;
             }
             if ($levelParam == $fieldItem['permName'] && ! empty($fieldItem['value'])) {
-                $level = isset($allLevel[$fieldItem['value']]) ? $allLevel[$fieldItem['value']] : 0;
+                $level = $allLevel[$fieldItem['value']] ?? 0;
                 $level++;
                 $allLevel[$fieldItem['itemId']] = $level;
                 $listHasChildren[$fieldItem['value']] = true;
@@ -578,9 +582,9 @@ function save($info, $params, $allResources, $allRoles, $notifications = false)
     if (! empty($info) && $access->checkCsrf()) {
         $trackerId = ! empty($info['trackerId']) ? $info['trackerId'] : 0;
         $trackerItemId = ! empty($info['trackerItemId']) ? $info['trackerItemId'] : 0;
-        $info['resourceId'] = isset($info['resourceId']) ? $info['resourceId'] : '';
-        $info['roleId'] = isset($info['roleId']) ? $info['roleId'] : '';
-        $info['effort'] = isset($info['effort']) ? $info['effort'] : '';
+        $info['resourceId'] = $info['resourceId'] ?? '';
+        $info['roleId'] = $info['roleId'] ?? '';
+        $info['effort'] = $info['effort'] ?? '';
 
         if ($trackerId != $params['trackerId']) {
             Feedback::error(tr('You are trying to update a tracker that is not used by this gantt chart'));
@@ -687,7 +691,7 @@ function duplicate(array $info, array $params, array $trackerData, string $level
 
         // CHECK IF CHOSEN GANTT ID EXISTS
         $items = $trackerlib->list_items($trackerId, 0, -1, '', '', [$trackerField['fieldId']], '', '', '', [$ganttId]);
-        if ($items['cant']) {
+        if ($items['count']) {
             Feedback::error(tr('Gantt ID already exists'));
             $error = true;
         }
@@ -808,7 +812,7 @@ function transformDependenciesIdsToIndex($ganttValues, $itemIds)
             foreach ($depends as $itemId) {
                 $itemData = explode(':', $itemId);
                 $itemId = $itemData[0];
-                $itemDays = isset($itemData[1]) ? $itemData[1] : false;
+                $itemDays = $itemData[1] ?? false;
                 $index = array_search($itemId, $itemIds);
                 if ($index) {
                     $index = $index + 1;
@@ -839,8 +843,8 @@ function transformDependenciesIndexToIds($depends, $tasks)
         foreach ($indexes as $value) {
             $itemData = explode(':', $value);
             $index = $itemData[0];
-            $index = isset($tasks[$index - 1]['id']) ? $tasks[$index - 1]['id'] : false;
-            $itemDays = isset($itemData[1]) ? $itemData[1] : false;
+            $index = $tasks[$index - 1]['id'] ?? false;
+            $itemDays = $itemData[1] ?? false;
             if ($index && $itemDays) {
                 $index = $index . ':' . $itemDays;
             }
@@ -881,7 +885,7 @@ function updateTasks($info, $params, $allResources, $allRoles)
         $transaction->commit();
 
         $order = 1;
-        foreach ($info['tasks'] as $key => $task) {
+        foreach ($info['tasks'] as $task) {
             // mapping gantt task to tracker items
             $task['trackerId'] = $info['trackerId'];
             $task['trackerItemId'] = $task['id'];

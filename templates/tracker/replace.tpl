@@ -1,21 +1,23 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
 
 <form method="post" action="{service controller=tracker action=replace}">
     {accordion}
-        {accordion_group title="{tr}General{/tr}"}
+        {accordion_group title="{tr}General{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label for="name">{tr}Name{/tr}</label>
-                <input class="form-control" type="text" name="name" id="name" value="{$info.name|escape}" required="required">
+                <input class="form-control" type="text" name="name" id="name" value="{$info.name|escape}" maxlength="{$MAX_TRACKER_NAME_LENGTH}" required="required">
             </div>
             <div class="mb-3 mx-0">
                 <label for="description">{tr}Description{/tr}</label>
-                <textarea class="form-control" name="description" id="description" cols="40">{$info.description|escape}</textarea>
+                {* if the _syntax param is empty, {textarea} will work out the best one, "none" forces a plain <textarea> to be created *}
+                {$descriptionSyntax = $info.descriptionIsParsed eq 'y' ? '' : 'none'}
+                {textarea class="form-control" name="description" id="description" cols="40" _syntax=$descriptionSyntax}{$info.description|escape}{/textarea}
             </div>
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="descriptionIsParsed" id="descriptionIsParsed" {if $info.descriptionIsParsed eq 'y'}checked="checked"{/if} value="1">
@@ -33,18 +35,22 @@
                 <input class="form-control" type="text" name="permName" id="permName" value="{$info.permName|escape}">
                 {tr}Required for Advanced Shopping Cart and some other tracker features, do not change this unless you are sure.{/tr}
             </div>
-            {jq}$("#name").on("change", function() {
-    if ($("#name").val()) {
-        if (! $("#fieldPrefix").val()) {
-            $("#fieldPrefix").val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
-        }
-        if (! $("#permName").val()) {
-            $("#permName").val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
-        }
-    }
-});{/jq}
+            {jq}
+                $("#name").on("change", function() {
+                    if ($("#name").val()) {
+                        const prefix = $("#fieldPrefix")
+                        if (! prefix.val()) {
+                            prefix.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
+                        }
+                        const permName = $("#permName")
+                        if (! permName.val()) {
+                            permName.val($("#name").val().replace(/s$/, "").replace(/\W/g, "").toLowerCase());
+                        }
+                    }
+                });
+            {/jq}
         {/accordion_group}
-        {accordion_group title="{tr}Features{/tr}"}
+        {accordion_group title="{tr}Features{/tr}" accordion_pos=$accordion_pos}
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="allowOffline" value="1"
                     {if $info.allowOffline eq 'y'} checked="checked"{/if}>
@@ -77,7 +83,7 @@
                     {tr}Allow comments{/tr}
                 </label>
             </div>
-            <div class="form-check depends" data-on="useComments"
+            <div class="form-check depends" data-on="useComments">
                 <input type="checkbox" class="form-check-input" name="showComments" id="showComments" value="1"
                         {if $info.showComments eq 'y'} checked="checked"{/if}>
                 <label class="form-check-label" for="showComments">
@@ -99,33 +105,56 @@
                     {tr}Save and Comment{/tr}
                 </label>
             </div>
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" name="useAttachments" id="useAttachments" value="1"
-                        {if $info.useAttachments eq 'y'} checked="checked"{/if}>
-                <label class="form-check-label" for="useAttachments">
-                    {tr}Allow attachments (Deprecated. Will be removed after Tiki 29.x. Use files field instead.){/tr}
-                </label>
-            </div>
-            <div class="form-check depends" data-on="useAttachments">
-                <input type="checkbox" class="form-check-input" name="showAttachments" id="showAttachments" value="1"
-                        {if $info.showAttachments eq 'y'} checked="checked"{/if}>
-                <label class="form-check-label" for="showAttachments">
-                    {tr}Display attachments in listing{/tr}
-                </label>
-            </div>
-            <fieldset class="depends sortable" data-on="useAttachments" data-selector="div.checkbox">
-                <legend>{tr}Attachment attributes (sortable){/tr}</legend>
-                {foreach from=$attachmentAttributes key=name item=att}
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" name="orderAttachments[]" id="orderAttachments[]" value="{$name|escape}" {if !empty($att.selected)} checked="checked"{/if}>
-                        <label class="form-check-label" for="orderAttachments[]">
-                            {$att.label|escape}
-                        </label>
-                    </div>
-                {/foreach}
-            </fieldset>
+            {if $prefs.ajax_inline_edit eq 'y'}
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" name="allowInlineEditing" id="allowInlineEditing" value="1"
+                        {if $info.allowInlineEditing eq 'y' or (empty($info.allowInlineEditing) and $prefs.ajax_inline_edit_trackerlist eq 'y')} checked="checked"{/if}>
+                    <label class="form-check-label" for="allowInlineEditing">
+                        {tr}Allow inline editing{/tr}
+                    </label>
+                </div>
+            {/if}
         {/accordion_group}
-        {accordion_group title="{tr}Display{/tr}"}
+        {accordion_group title="{tr}Duplication{/tr}" accordion_pos=$accordion_pos}
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="enableDuplicate" id="enableDuplicate" value="1"
+                    {if $info.enableDuplicate eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="enableDuplicate">
+                    {tr}Enable Duplicate Action{/tr}
+                </label>
+            </div>
+            <div class="mb-3 mx-0 depends" data-on="enableDuplicate">
+                <label class="form-label">{tr}Field Duplication Rules{/tr}</label>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>{tr}Field{/tr}</th>
+                                <th>{tr}Action{/tr}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {foreach from=$fields item=field}
+                                <tr>
+                                    <td>{$field.name|escape}</td>
+                                    <td>
+                                        <select name="duplicateRules[{$field.fieldId}]" class="form-select">
+                                            <option value="copy" {if empty($info.val_duplicateRules[$field.fieldId]) or $info.val_duplicateRules[$field.fieldId] eq 'copy'}selected{/if}>{tr}Copy{/tr}</option>
+                                            <option value="clear" {if $info.val_duplicateRules[$field.fieldId] eq 'clear'}selected{/if}>{tr}Clear/Empty{/tr}</option>
+                                            <option value="default" {if $info.val_duplicateRules[$field.fieldId] eq 'default'}selected{/if}>{tr}Set to Default{/tr}</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-text">
+                    {tr}Define how each field should be handled when duplicating an item.{/tr}
+                </div>
+            </div>
+        {/accordion_group}
+        {accordion_group title="{tr}Display{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label class="col-form-label" for="logo">{tr}Logo{/tr}</label>
                 <input class="form-control" type="text" name="logo" id="logo" value="{$info.logo|escape}">
@@ -229,8 +258,15 @@
                 <label for="showPopup">{tr}List detail popup{/tr}</label>
                 {object_selector_multi type=trackerfield tracker_id=$info.trackerId _simplevalue=$info.showPopup _separator="," _simplename="showPopup"}
             </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" name="allowChooseFieldsToDisplay" value="1"
+                    {if $info.allowChooseFieldsToDisplay eq 'y'} checked="checked"{/if}>
+                <label class="form-check-label" for="allowChooseFieldsToDisplay">
+                    {tr}Allow user to choose fields to display{/tr}
+                </label>
+            </div>
         {/accordion_group}
-    {accordion_group title="{tr}Section Format{/tr}"}
+    {accordion_group title="{tr}Section Format{/tr}" accordion_pos=$accordion_pos}
                 <div class="mb-3 mx-0">
                     <label for="sectionFormat">{tr}Section format{/tr}</label>
                     <select name="sectionFormat" id="sectionFormat" class="form-select">
@@ -270,8 +306,11 @@
                         {tr}wiki:pageName for a wiki page or tpl:tplName for a template{/tr}
                     </div>
                 </div>
+                <div class="form-text">
+                    <p>{tr _0="<code>{ldelim}DIV(class=&quot;tracker-field-group&quot;){rdelim}...{ldelim}DIV{rdelim}</code>"}When using field rules in a configured wiki template, wrap each label and field in the field rules parent selector. Example: %0{/tr}</p>
+                </div>
     {/accordion_group}
-        {accordion_group title="{tr}Status{/tr}"}
+        {accordion_group title="{tr}Status{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label for="newItemStatus">{tr}New item status{/tr}</label>
                 <select name="newItemStatus" id="newItemStatus" class="form-select">
@@ -323,7 +362,7 @@
 
             </div>
         {/accordion_group}
-        {accordion_group title="{tr}Notifications{/tr}"}
+        {accordion_group title="{tr}Notifications{/tr}" accordion_pos=$accordion_pos}
             <div class="mb-3 mx-0">
                 <label for="outboundEmail">{tr}Copy activity to email{/tr}</label>
                 <input name="outboundEmail" id="outboundEmail" value="{$info.outboundEmail|escape}" class="email_multi form-control" size="60">
@@ -383,7 +422,7 @@
                 </div>
             {/if}
         {/accordion_group}
-        {accordion_group title="{tr}Permissions{/tr}"}
+        {accordion_group title="{tr}Permissions{/tr}" accordion_pos=$accordion_pos}
             <div class="form-check">
                 <input type="checkbox" class="form-check-input" name="userCanSeeOwn" id="userCanSeeOwn" value="1"
                                            {if $info.userCanSeeOwn eq 'y'}checked="checked"{/if}>
@@ -508,7 +547,7 @@
             </fieldset>
         {/accordion_group}
         {if $prefs.feature_categories eq 'y'}
-            {accordion_group title="{tr}Categories{/tr}"}
+            {accordion_group title="{tr}Categories{/tr}" accordion_pos=$accordion_pos}
                 <div class="mb-3 mx-0">
                     {include file='categorize.tpl' notable=y auto=y}
                 </div>
@@ -570,14 +609,15 @@
             {/accordion_group}
         {/if}
         {if $prefs.tracker_tabular_enabled eq 'y' and $remoteTabulars}
-            {accordion_group title="{tr}Remote synchronization{/tr}"}
+            {accordion_group title="{tr}Remote synchronization{/tr}" accordion_pos=$accordion_pos}
                 <div class="mb-3 mx-0">
-                    <label for="tabularSync">{tr}Choose import-export format{/tr}</label>
-                    <select name="tabularSync" id="tabularSync" class="form-control">
+                    <label for="tabularSync">{tr}Choose import-export format(s){/tr}</label>
+                    <select name="tabularSync" id="tabularSync" class="form-control" multiple="multiple">
                         <option value="">{tr}None{/tr}</option>
+                        {assign var="tabularSyncArray" value=","|explode:$info.tabularSync}
                         {foreach item=tabular from=$remoteTabulars}
                             <option value="{$tabular.tabularId|escape}"
-                                {if $tabular.tabularId eq $info.tabularSync} selected="selected"{/if}>
+                                {if in_array($tabular.tabularId, $tabularSyncArray)} selected="selected"{/if}>
                                 {$tabular.name|escape}
                             </option>
                         {/foreach}
@@ -602,9 +642,18 @@
                         </a>
                     </label>
                     <div style="width: 100%">
-                        {if empty($info.tabularSyncLastImport)}{assign var="tabularSyncLastImport" value="0"}{else}{assign var="tabularSyncLastImport" value=$info.tabularSyncLastImport}{/if}
+                        {if empty($info.tabularSyncLastImport)}{$tabularSyncLastImport="0"}{else}{$tabularSyncLastImport=$info.tabularSyncLastImport}{/if}
                         {jscalendar date=$tabularSyncLastImport fieldname="tabularSyncLastImport" showtime='y' timezone=$displayTimezone}
                     </div>
+                </div>
+                <div class="mb-3 form-check depends" data-on="tabularSyncModifiedField">
+                    <input type="checkbox" class="form-check-input" name="tabularSyncLastImportSkipUpdate" id="tabularSyncLastImportSkipUpdate" value="1" {if !empty($info.tabularSyncLastImportSkipUpdate) && $info.tabularSyncLastImportSkipUpdate eq 'y'} checked="checked"{/if}>
+                    <label for="tabularSyncLastImportSkipUpdate">
+                        {tr}Skip last import time update{/tr}
+                        <a class="tikihelp text-info" title="{tr}Choice:{/tr} {tr}By default, last import time gets reset every time an import happens. Check this option if you want the last import time to be static and kept what is entered above.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
                 </div>
             {/accordion_group}
         {/if}

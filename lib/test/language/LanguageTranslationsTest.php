@@ -4,7 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-require_once __DIR__ . '/../../language/LanguageTranslations.php';
+
+use Tiki\Cache\CacheLib;
 
 /**
  * Test class for LanguageTranslations.
@@ -197,7 +198,7 @@ class LanguageTranslationsTest extends TikiTestCase
 
     public function testGetFileUntranslated(): void
     {
-        $cachelib = $this->getMockBuilder('Cachelib')->onlyMethods(['getSerialized', 'cacheItem'])->getMock();
+        $cachelib = $this->getMockBuilder(CacheLib::class)->onlyMethods(['getSerialized', 'cacheItem'])->getMock();
         $cachelib->expects($this->once())->method('getSerialized')->with('untranslatedStrings.test_language.1234', 'untranslatedStrings')->willReturn(null);
         $cachelib->expects($this->once())->method('cacheItem');
 

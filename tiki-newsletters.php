@@ -8,23 +8,27 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'newsletters';
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
-        'unsubscribe'          => 'bool',        //post
-        'confirm_subscription' => 'bool',        //post
+        'unsubscribe'          => 'word',        //post
+        'confirm_subscription' => 'word',        //post
         'nlId'                 => 'int',         //post
         'subscribe'            => 'bool',        //post
         'email'                => 'email',       //post
-        'sort_mode'            => 'string',      //get
+        'sort_mode'            => 'alnumdash',   //get
         'offset'               => 'int',         //get
         'noshowlist'           => 'bool',        //post
         'find'                 => 'string',      //post
+        'info'                 => 'int',         //get
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+use Tiki\SortModeValidator;
+$section = Sections::SECTION_NEWSLETTERS;
+Sections::setCurrentSection($section);
 global $nllib;
 include_once('lib/newsletters/nllib.php');
 $access->check_feature('feature_newsletters');
@@ -122,17 +126,11 @@ if (isset($_REQUEST["info"])) {
     $smarty->assign('nl_info', $nl_info);
     $smarty->assign('subscribe', 'y');
 }
-// List newsletters
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'created_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'created_desc',
+    ['tiki_newsletters','tiki_sent_newsletters']
+);
+$offset = $_REQUEST["offset"] ?? 0;
 if (isset($_REQUEST["noshowlist"])) {
     $showlist = 'n';
 } else {
@@ -145,17 +143,12 @@ if (isset($_REQUEST["noshowlist"])) {
 }
 $smarty->assign('showlist', $showlist);
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $nllib->list_newsletters($offset, $maxRecords, $sort_mode, $find, '', ["tiki_p_subscribe_newsletters", "tiki_p_admin_newsletters", "tiki_p_send_newsletters"]);
-$smarty->assign_by_ref('cant', $channels['cant']);
+$smarty->assign_by_ref('count', $channels['count']);
 $smarty->assign_by_ref('channels', $channels["data"]);
-$section = 'newsletters';
 include_once('tiki-section_options.php');
 // Display the template
 $smarty->assign('mid', 'tiki-newsletters.tpl');

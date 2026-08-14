@@ -8,8 +8,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'user_messages';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_USER_MESSAGES;
+Sections::setCurrentSection($section);
 $messulib = TikiLib::lib('message');
 $access->check_user($user);
 $access->check_feature('feature_messages');
@@ -97,16 +99,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$offset = $_REQUEST["offset"] ?? 0;
+ $find = $_REQUEST["find"] ?? '';
+
 $smarty->assign_by_ref('flag', $_REQUEST['flag']);
 $smarty->assign_by_ref('priority', $_REQUEST['priority']);
 $smarty->assign_by_ref('flagval', $_REQUEST['flagval']);
@@ -115,7 +110,7 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 $smarty->assign('find', $find);
 // What are we paginating: items
 $items = $messulib->list_user_messages($user, $offset, $maxRecords, $sort_mode, $find, $_REQUEST["flag"], $_REQUEST["flagval"], $_REQUEST['priority'], 'sent');
-$smarty->assign_by_ref('cant_pages', $items["cant"]);
+$smarty->assign_by_ref('pages_count', $items["count"]);
 $smarty->assign_by_ref('items', $items["data"]);
 $cellsize = 200;
 $percentage = 1;

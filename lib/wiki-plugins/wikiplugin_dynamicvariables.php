@@ -56,12 +56,9 @@ function wikiplugin_dynamicvariables($data, $params)
     global $prefs;
     $tikilib = TikiLib::lib('tiki');
 
-    $layout = isset($params['layout']) ? $params['layout'] : '';
-    $linesep = isset($params['linesep']) ? $params['linesep'] : '';
+    $layout = $params['layout'];
+    $linesep = $params['linesep'];
 
-    if (! isset($linesep)) {
-        $linesep = '<br>';
-    }
     if (! isset($max)) {
         $numRows = -1;
     } else {
@@ -75,7 +72,7 @@ function wikiplugin_dynamicvariables($data, $params)
     $post = '';
     $oparens = '(';
     $cparens = ')';
-    if (isset($layout) && $layout == 'table') {
+    if ($layout == 'table') {
         $pre = '<table class=\'table table-striped table-hover\' id=\'' . $tikilib->now . '\'><tr>'
             . '<th>' . tra('Parsed result') . '</th>'
             . '<th>' . tra('Syntax') . '</th>'

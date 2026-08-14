@@ -9,6 +9,10 @@
         },
         {
             "type": "vcs",
+            "url": "https://github.com/cypht-org/php-sieve-manager"
+        },
+        {
+            "type": "vcs",
             "url": "https://gitlab.com/tikiwiki/libraries/ZendService_Akismet"
         },
         {
@@ -2131,6 +2135,8 @@
         "league/commonmark": ">=1.5",
         "league/commonmark-extras": "^1.2.0",
         "league/event": "^2.1",
+        "league/oauth1-client": "1.10.1",
+        "league/oauth2-client": "^2.6",
         "league/flysystem": ">=2.0.0-beta.3",
         "league/html-to-markdown": "^5.1",
         "league/oauth2-server": "^7.3||^8.0",
@@ -2179,7 +2185,7 @@
         "npm-asset/ol": "^8.1",
         "npm-asset/ol-layerswitcher": "^4.1",
         "npm-asset/pdfjs-dist": ">=2.0.487",
-        "npm-asset/pdfjs-dist-viewer-min": "^2.1.266",
+        "npm-asset/pdfjs-dist-viewer-min": "^3.11.174 || ^2.1.266",
         "npm-asset/popper.js": ">=1.14.3",
         "npm-asset/prefixfree": ">=1.0.10",
         "npm-asset/recordrtc": ">=5.6.1",
@@ -2277,6 +2283,7 @@
         "sebastian/version": ">=1.0.6",
         "sensiolabs/security-checker": "^5.0",
         "sentry/sdk": "^3.1",
+        "sentry/sentry": "^3.1||^4.10",
         "setasign/fpdi": ">=2.3.3|2.1.0",
         "simile_timeline/simile_timeline": ">=2.3.0",
         "slm/mail": "^4.2",
@@ -2316,6 +2323,7 @@
         "symfony/process": ">=3.2.6",
         "symfony/routing": ">=3.2.6",
         "symfony/yaml": ">=3.1.3",
+        "tecnickcom/tc-lib-barcode": "^2.3",
         "teqneers/shamir": "dev-master||1.1.0||^2.0.0",
         "thibautselingue/local-php-security-checker-installer": "^1.0.4",
         "thomaspark/bootswatch": "~5.1",

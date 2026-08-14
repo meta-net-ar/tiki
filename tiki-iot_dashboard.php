@@ -47,6 +47,7 @@ function addDependencies($mode = 'edit')
     // As of now importing from the tiki-iot/* workspace does not work, vite does ignore them
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/gridstack/dist/gridstack.min.css');
     $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/gridstack/dist/gridstack-extra.min.css');
+    $headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/bootstrap-toast-utility.js');
     $headerlib->add_cssfile('./lib/iot/theme/initial.css');
     if ($mode == "view") {
         $headerlib->add_js_module('import "@tiki-iot/tiki-iot-dashboard";'); //only has side effects

@@ -4,9 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'calendar';
 require_once('tiki-setup.php');
 include_once('lib/minical/minicallib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CALENDAR;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_minical');
 $access->check_user($user);
 $access->check_permission('tiki_p_minical');
@@ -133,17 +135,9 @@ if ($_REQUEST['view'] == 'list') {
     } else {
         $sort_mode = $_REQUEST["sort_mode"];
     }
-    if (! isset($_REQUEST["offset"])) {
-        $offset = 0;
-    } else {
-        $offset = $_REQUEST["offset"];
-    }
+    $offset = $_REQUEST["offset"] ?? 0;
     $smarty->assign_by_ref('offset', $offset);
-    if (isset($_REQUEST["find"])) {
-        $find = $_REQUEST["find"];
-    } else {
-        $find = '';
-    }
+    $find = $_REQUEST["find"] ?? '';
     $smarty->assign('find', $find);
     $smarty->assign_by_ref('sort_mode', $sort_mode);
     if (isset($_SESSION['thedate'])) {
@@ -152,7 +146,7 @@ if ($_REQUEST['view'] == 'list') {
         $pdate = date("U");
     }
     $channels = $minicallib->minical_list_events($user, $offset, $maxRecords, $sort_mode, $find);
-    $smarty->assign_by_ref('cant_pages', $channels["cant"]);
+    $smarty->assign_by_ref('pages_count', $channels["count"]);
     $smarty->assign('channels', $channels["data"]);
 }
 $upcoming = $minicallib->minical_list_events_from_date($user, 0, $minical_upcoming, 'start_asc', '', $pdate_h);

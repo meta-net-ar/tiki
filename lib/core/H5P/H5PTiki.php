@@ -144,7 +144,7 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         return [
             'name'       => 'Tiki',
             'version'    => $TWV->version,
-            'h5pVersion' => '1.0.0', // TODO: Use variable? (\H5PLib not loaded)
+            'h5pVersion' => '1.0.0', // TODO: Use variable? (\Tiki\Lib\Filegals\H5PLib not loaded)
         ];
     }
 
@@ -188,7 +188,6 @@ class H5P_H5PTiki implements H5PFrameworkInterface
         }
 
         $response = curl_exec($handle);
-        curl_close($handle);
 
         if (! $response) {
             $error = curl_error($handle);
@@ -687,12 +686,12 @@ class H5P_H5PTiki implements H5PFrameworkInterface
             [
                 'updated_at' => date("Y-m-d H:i:s", TikiLib::lib('tiki')->now),
                 'title'      => $title,
-                'parameters' => isset($content['params']) ? $content['params'] : '',
+                'parameters' => $content['params'] ?? '',
                 'embed_type' => 'div', // TODO: Determine from library?
                 'library_id' => $content['library']['libraryId'],
                 'filtered'   => '',
                 'slug'       => '',
-                'disable'    => isset($content['disable']) ? $content['disable'] : 0,
+                'disable'    => $content['disable'] ?? 0,
                 'file_id'    => $contentMainId,
             ]
         );
@@ -1303,7 +1302,7 @@ hcl.`drop_css` AS dropCss, hcl.`dependency_type` AS dependencyType
 
         $prefName = 'h5p_' . $name;
 
-        return isset($prefs[$prefName]) ? $prefs[$prefName] : $default;
+        return $prefs[$prefName] ?? $default;
     }
 
     /**
@@ -1454,7 +1453,7 @@ hcl.`drop_css` AS dropCss, hcl.`dependency_type` AS dependencyType
     public function saveCachedAssets($key, $libraries)
     {
         foreach ($libraries as $library) {
-            $libraryId = isset($library['id']) ? $library['id'] : $library['libraryId'];
+            $libraryId = $library['id'] ?? $library['libraryId'];
 
             if (! $this->tiki_h5p_libraries_cachedassets->fetchCount(['library_id' => $libraryId])) {
                 $this->tiki_h5p_libraries_cachedassets->insert(
@@ -1634,11 +1633,11 @@ GROUP BY l.`name`, l.`major_version`, l.`minor_version`');
                     'is_recommended'    => $ct->isRecommended === true ? 1 : 0,
                     'popularity'        => $ct->popularity,
                     'screenshots'       => json_encode($ct->screenshots),
-                    'license'           => json_encode(isset($ct->license) ? $ct->license : []),
+                    'license'           => json_encode($ct->license ?? []),
                     'example'           => $ct->example,
-                    'tutorial'          => isset($ct->tutorial) ? $ct->tutorial : '',
-                    'keywords'          => json_encode(isset($ct->keywords) ? $ct->keywords : []),
-                    'categories'        => json_encode(isset($ct->categories) ? $ct->categories : []),
+                    'tutorial'          => $ct->tutorial ?? '',
+                    'keywords'          => json_encode($ct->keywords ?? []),
+                    'categories'        => json_encode($ct->categories ?? []),
                     'owner'             => $ct->owner,
                 ]
             );
@@ -1749,5 +1748,10 @@ AND (`major_version` > ? OR (`major_version` = ? AND `minor_version` > ?)) LIMIT
     public function setContentHubMetadataChecked($time, $lang = 'en')
     {
         // TODO: Implement setContentHubMetadataChecked() method.
+    }
+
+    public function resetHubOrganizationData()
+    {
+        // TODO: implement if/when Tiki uses H5P Hub org data
     }
 }

@@ -15,12 +15,14 @@ function prefs_default_list()
         $cals = [];
     }
 
+    $forumAdminHelp = 'Forum-Admin';
 
     return [
         'default_mail_charset' => [
             'name' => tra('Default character set for sending mail'),
             'description' => tra('Specify the character encoding used by Tiki when sending mail notifications.'),
             'type' => 'list',
+            'help' => 'Mail-notifications',
             'options' => [
                 'utf-8' => tra('utf-8'),
                 'iso-8859-1' => tra('iso-8859-1'),
@@ -29,13 +31,17 @@ function prefs_default_list()
         ],
         'default_map' => [
             'name' => tra('default mapfile'),
+            'description' => tra('Default MapServer map file for the MAP plugin (only if you use MapServer).'),
             'type' => 'text',
             'size' => '50',
+            'help' => 'Maps',
             'default' => '',
         ],
         'default_wiki_diff_style' => [
             'name' => tra('Default diff style'),
+            'description' => tra('How differences between wiki page versions are shown when viewing history or comparing revisions.'),
             'type' => 'list',
+            'help' => 'Wiki-Features',
             'options' => [
                 'old' => tra('Only with last version'),
                 'htmldiff' => tra('HTML diff'),
@@ -54,7 +60,9 @@ function prefs_default_list()
         ],
         'default_rows_textarea_wiki' => [
             'name' => tra('Wiki'),
+            'description' => tra('Size (height) of the wiki text area.'),
             'type' => 'text',
+            'help' => 'Wiki-Page-Editor',
             'size' => '3',
             'units' => tra('rows'),
             'filter' => 'digits',
@@ -63,6 +71,7 @@ function prefs_default_list()
         'default_rows_textarea_comment' => [
             'name' => tra('Comment box'),
             'type' => 'text',
+            'help' => 'Comments',
             'description' => tr('Size (height) of the comment text area.'),
             'size' => '3',
             'units' => tra('rows'),
@@ -71,7 +80,9 @@ function prefs_default_list()
         ],
         'default_rows_textarea_forum'       => [
             'name' => tra('Forum'),
+            'description' => tra('Size (height) of the forum text area.'),
             'type' => 'text',
+            'help' => $forumAdminHelp,
             'size' => '3',
             'units' => tra('rows'),
             'filter' => 'digits',
@@ -80,6 +91,8 @@ function prefs_default_list()
         'default_rows_textarea_forumthread' => [
             'name' => tra('Forum reply'),
             'type' => 'text',
+            'description' => tra('Size (height) of the forum reply text area.'),
+            'help' => $forumAdminHelp,
             'size' => '3',
             'units' => tra('rows'),
             'filter' => 'digits',
@@ -87,7 +100,9 @@ function prefs_default_list()
         ],
         'default_calendars'                 => [
             'name' => tra('Select default calendars to display'),
+            'description' => tra('Calendars shown by default.'),
             'type' => 'multicheckbox',
+            'help' => 'Calendar',
             'options' => $cals,
             'default' => [],
         ],

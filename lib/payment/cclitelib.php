@@ -83,7 +83,7 @@ class CCLiteLib extends TikiDb_Bridge
 
     public function get_invoice($ipn_data)
     {
-        return isset($ipn_data['invoice']) ? $ipn_data['invoice'] : 0;
+        return $ipn_data['invoice'] ?? 0;
     }
 
     public function get_amount($ipn_data)
@@ -280,7 +280,6 @@ class CCLiteLib extends TikiDb_Bridge
 
         curl_setopt($ch, CURLOPT_URL, $REST_url);
         $result = curl_exec($ch);
-        curl_close($ch);
         return strip_tags($result);
     }
 
@@ -323,13 +322,12 @@ class CCLiteLib extends TikiDb_Bridge
 //          curl_setopt($ch, CURLOPT_VERBOSE, true);
 
             $logon = curl_exec($ch);
-            curl_close($ch);
 
             $results = [];  // for response & cookies on success
             $err_msg = '';      // error message on failure
 
             if ($logon) {
-                // e.g. login failed for jonny_tiki at c2c1:  <a href="http://c2c.ourproject.org/cgi-bin/cclite.cgi">Try again?</a>
+                // e.g. login failed for jonny_tiki at c2c1:  <a href="http://example.org/cgi-bin/cclite.cgi">Try again?</a>
                 if (preg_match('/^(login failed for ' . $username . '.*' . $registry . '[^<]*)/mi', $logon, $results)) {    // no user there?
                     $email = $userlib->get_user_email($username);
                     if ($email) {   // required
@@ -343,7 +341,7 @@ class CCLiteLib extends TikiDb_Bridge
                     }
                 }
 
-                // e.g. test_user at test_reg is not active: confirm or contact the administrator <a href="http://c2c.ourproject.org/cgi-bin/cclite.cgi">Try again?</a>
+                // e.g. test_user at test_reg is not active: confirm or contact the administrator <a href="http://example.org/cgi-bin/cclite.cgi">Try again?</a>
                 // check for other errors & remove cclite link
                 if (preg_match('/^(.*?' . $username . '.*' . $registry . '[^<]*)/mi', $logon, $results)) {
                     $err_msg = trim($results[0]);

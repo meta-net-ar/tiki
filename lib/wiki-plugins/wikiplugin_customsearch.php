@@ -8,6 +8,7 @@ function wikiplugin_customsearch_info()
 {
     return [
         'name' => tra('Custom Search'),
+        'validate' => ['wiki', 'tpl'],
         'documentation' => 'PluginCustomSearch',
         'description' => tra('Create a custom search form for searching or listing items on the site'),
         'prefs' => ['wikiplugin_customsearch', 'wikiplugin_list', 'feature_search'],
@@ -24,7 +25,6 @@ function wikiplugin_customsearch_info()
                 'description' => tra('Wiki page where the search form is found'),
                 'since' => '8.0',
                 'filter' => 'pagename',
-                'default' => '',
                 'profile_reference' => 'wiki_page',
             ],
             'tpl' => [
@@ -41,7 +41,6 @@ function wikiplugin_customsearch_info()
                     criteria entered by users'),
                 'since' => '8.0',
                 'filter' => 'alnum',
-                'default' => 0,
             ],
             'autosearchdelay' => [
                 'required' => false,
@@ -81,7 +80,6 @@ function wikiplugin_customsearch_info()
                 'description' => tra('The wiki page on which custom JavaScript is to be executed on return of Ajax results'),
                 'since' => '8.0',
                 'filter' => 'pagename',
-                'default' => '',
             ],
             'destdiv' => [
                 'required' => false,
@@ -133,7 +131,7 @@ function wikiplugin_customsearch_info()
             'trimlinefeeds' => [
                 'required' => false,
                 'name' => tra('Trim Linefeeds'),
-                'description' => tra('Remove the linefeeds added after each input which casues the wiki parser to add extra paragraphs.'),
+                'description' => tra('Remove the linefeeds added after each input which causes the wiki parser to add extra paragraphs.'),
                 'since' => '14.1',
                 'options' => [
                     ['text' => tra(''), 'value' => ''],
@@ -191,15 +189,15 @@ function wikiplugin_customsearch($data, $params)
     global $prefs;
     static $instance_id = null;
 
-    if (empty($params['wiki']) && empty($params['tpl'])) {
+    if (is_null($params['wiki']) && empty($params['tpl'])) {
         $params['tpl'] = 'templates/search_customsearch/default_form.tpl';
-    } elseif (! empty($params['wiki']) && ! TikiLib::lib('tiki')->page_exists($params['wiki'])) {
+    } elseif (! is_null($params['wiki']) && ! TikiLib::lib('tiki')->page_exists($params['wiki'])) {
         $link = new WikiParser_OutputLink();
         $link->setIdentifier($params['wiki']);
         return tra('Template page not found') . ' ' . $link->getHtml();
     }
 
-    if (isset($params['id'])) {
+    if (! is_null($params['id'])) {
         $id = TikiLib::remove_non_word_characters_and_accents($params['id']);
     } else {
         if ($instance_id === null) {
@@ -209,24 +207,12 @@ function wikiplugin_customsearch($data, $params)
         }
         $id = (string) $instance_id;
     }
-    if (isset($params['recalllastsearch']) && $params['recalllastsearch'] == 1 && (! isset($_REQUEST['forgetlastsearch']) || $_REQUEST['forgetlastsearch'] != 'y')) {
+    if ($params['recalllastsearch'] == 1 && (! isset($_REQUEST['forgetlastsearch']) || $_REQUEST['forgetlastsearch'] != 'y')) {
         $recalllastsearch = 1;
     } else {
         $recalllastsearch = 0;
     }
-
-    $defaults = [];
-    $plugininfo = wikiplugin_customsearch_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults["$key"] = $param['default'] ?? null;
-    }
-    $params = array_merge($defaults, $params);
-
-    if (! isset($_REQUEST["offset"])) {
-        $offset = 0;
-    } else {
-        $offset = (int) $_REQUEST["offset"];
-    }
+    $offset = (int) ($_REQUEST["offset"] ?? 0);
     if (isset($_REQUEST['maxRecords'])) {
         $maxRecords = (int) $_REQUEST['maxRecords'];
     } elseif ($recalllastsearch && ! empty($_SESSION["customsearch_$id"]['maxRecords'])) {
@@ -246,7 +232,7 @@ function wikiplugin_customsearch($data, $params)
     $definitionKey = md5($data);
     $matches = WikiParser_PluginMatcher::match($data);
     $query = new Search_Query();
-    if (! isset($params['searchable_only']) || $params['searchable_only'] == 1) {
+    if ($params['searchable_only'] == 1) {
         $query->filterIdentifier('y', 'searchable');
     }
     $builder = new Search_Query_WikiBuilder($query);
@@ -293,7 +279,7 @@ function wikiplugin_customsearch($data, $params)
         'customsearch'
     );
 
-    if (! empty($params['wiki'])) {
+    if (! is_null($params['wiki'])) {
         $wikitpl = "tplwiki:" . $params['wiki'];
     } else {
         $wikitpl = $params['tpl'];
@@ -320,11 +306,14 @@ function wikiplugin_customsearch($data, $params)
         $offset = (int) $_SESSION["customsearch_$id"]["offset"];
     }
 
+    $autosearchdelay = ! empty($params['autosearchdelay']) ? max(0, (int) $params['autosearchdelay']) : 0;
+    $loadDelay = $autosearchdelay > 0 ? 0 : 1000;
+
     $options = [
         'searchfadetext' => tr('Loading...'),
         'searchfadediv' => $params['searchfadediv'],
         'results' => empty($params['destdiv']) ? "#customsearch_{$id}_results" : "#{$params['destdiv']}",
-        'autosearchdelay' => ! empty($params['autosearchdelay']) ? max(1500, (int) $params['autosearchdelay']) : 0,
+        'autosearchdelay' => $autosearchdelay,
         'searchonload' => (int) $params['searchonload'],
         'requireinput' => (bool) $params['requireinput'],
         'origrequireinput' => (bool) $params['requireinput'],
@@ -361,7 +350,7 @@ var customsearch$id = {
     },
     auto: function () {
     },
-    _executor: delayedExecutor(1000, function (cs) {
+    _executor: delayedExecutor($loadDelay, function (cs) {
         var selector = '#' + cs.options.searchfadediv;
         if (cs.options.searchfadediv.length <= 1 && $(selector).length === 0) {
             selector = '#customsearch_' + cs.id;
@@ -483,7 +472,7 @@ window.customsearch_$id = customsearch$id;
         } elseif ($recalllastsearch && isset($_SESSION["customsearch_$id"][$fieldid])) {
             $default = $_SESSION["customsearch_$id"][$fieldid];
         } elseif (! empty($arguments['_default'])) {
-            if (strpos($arguments['_default'], ',') !== false) {
+            if (str_contains($arguments['_default'], ',')) {
                 $default = explode(',', $arguments['_default']);
             } else {
                 $default = $arguments['_default'];
@@ -526,7 +515,7 @@ window.customsearch_$id = customsearch$id;
     }
 
     $callbackScript = null;
-    if (! empty($params['callbackscript']) && TikiLib::lib('tiki')->page_exists($params['callbackscript'])) {
+    if (! is_null($params['callbackscript']) && TikiLib::lib('tiki')->page_exists($params['callbackscript'])) {
         $callbackscript_tpl = "wiki:" . $params['callbackscript'];
         $callbackScript = TikiLib::lib('smarty')->fetch($callbackscript_tpl);
     }
@@ -571,6 +560,22 @@ customsearch$id._load = function (receive, params) {
     if (typeof params !== undefined) {
         $.extend(datamap, params);
     }
+    if (datamap.download) {
+        let form = $('<form method=\"post\" action=\"'+$.service('search_customsearch', 'customsearch')+'\"></form>');
+        $.param(datamap).split('&').forEach(function(pair) {
+            let parts = pair.split('=');
+            let name = decodeURIComponent(parts[0]);
+            let value = decodeURIComponent(parts[1] || '');
+            form.append($('<input>').attr({
+                type: 'hidden',
+                name: name,
+                value: value
+            }));
+        });
+        form.appendTo('body').submit();
+        return;
+    }
+
     $.ajax({
         type: 'POST',
         url: $.service('search_customsearch', 'customsearch'),
@@ -599,6 +604,11 @@ customsearch$id.maxRecords = $maxRecords;
 customsearch$id.store_query ='';
 customsearch$id.init();
 $iconinsert;
+$(document).on('submit', '#listexecute-download-wpcs-$id, #listexecute-download-top-wpcs-$id', function(e) {
+    e.preventDefault();
+    customsearch$id._load(null, {download: true});
+    return false;
+});
 $(document).trigger('formSearchReady');
 ";
 
@@ -676,7 +686,7 @@ $(document).trigger('formSearchReady');
         TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/customsearch.js');
     }
 
-    if (! empty($params['wiki'])) {
+    if (! is_null($params['wiki'])) {
         if (TikiLib::lib('parser')->option['is_markdown']) {
             $out = removeNp($out);
         }
@@ -722,7 +732,7 @@ function cs_design_setbasic($element, $fieldid, $fieldname, $arguments)
     $element->setAttribute('id', $fieldid);
     $element->setAttribute('name', $fieldname);
     foreach ($arguments as $k => $v) {
-        if (substr($k, 0, 1) != '_') {
+        if (! str_starts_with($k, '_')) {
             $element->setAttribute($k, $v);
         }
     }
@@ -740,7 +750,7 @@ function cs_design_input($id, $fieldname, $fieldid, $arguments, $default, &$scri
     $script .= "
 (function (id, config, fieldname) {
     var field = $('#' + id);
-    field.on('change', function() {
+    var updateFilter = function () {
 
         var partial = '';
         var value = $(this).val();
@@ -773,10 +783,16 @@ function cs_design_input($id, $fieldname, $fieldid, $arguments, $default, &$scri
 
         customsearch$id.add($(this).attr('id'), filter);
         customsearch$id.offset = 0;
-    });
+    };
+
+    field.on('change', updateFilter);
+
+    if (field.is(':text, input[type=search], input[type=email], input[type=url], input[type=tel], input[type=number], input[type=password]')) {
+        field.on('input', updateFilter);
+    }
 
     if (config['default'] || $(field).attr('type') === 'hidden') {
-        field.trigger('change');
+        field.change();
     }
 })('$fieldid', " . json_encode($arguments) . ", " . json_encode($fieldname) . ");
 ";
@@ -1152,7 +1168,7 @@ function cs_design_daterange($id, $fieldname, $fieldid, $arguments, $default, &$
             if (empty($_gap)) {
                 $_gap = 365 * 24 * 3600;
             }
-            $params['date'] = $params['enddate'] - $gap;
+            $params['date'] = $params['enddate'] - $_gap;
         }
     } elseif (empty($params['enddate'])) {
         $params['enddate'] = $startEmpty ? '' : TikiLib::lib('tiki')->now + 365 * 24 * 3600;
@@ -1161,20 +1177,20 @@ function cs_design_daterange($id, $fieldname, $fieldid, $arguments, $default, &$
     $picker = '<div class="row col-sm-6">' . smarty_function_jscalendar($params, $smarty->getEmptyInternalTemplate()) . '</div>';
 
     $script .= "
-$('input[name=\"$from_fieldname\"],input[name=\"$to_fieldname\"]').on('change', function() {
-    updateDateRange_$fieldid();
-});
-function updateDateRange_$fieldid() {
-    const from = $('input[name=\"$from_fieldname\"]').val();
-    const to = $('input[name=\"$to_fieldname\"]').val();
-    const val = (from && to) ? from + ',' + to : '';
-    customsearch$id.add('$fieldid', {
-        config: " . json_encode($arguments) . ",
-        name: 'daterange',
-        value: val
+    $(document).on('change', 'input[name=\"$from_fieldname\"],input[name=\"$to_fieldname\"]', function() {
+        updateDateRange_$fieldid();
     });
-}
-updateDateRange_$fieldid();
+    function updateDateRange_$fieldid() {
+        const from = $('input[name=\"$from_fieldname\"]').val();
+        const to = $('input[name=\"$to_fieldname\"]').val();
+        const val = (from && to) ? from + ',' + to : '';
+        customsearch$id.add('$fieldid', {
+            config: " . json_encode($arguments) . ",
+            name: 'daterange',
+            value: val
+        });
+    }
+    updateDateRange_$fieldid();
 ";
     return $picker;
 }

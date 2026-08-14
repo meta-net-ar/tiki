@@ -62,8 +62,6 @@ mysql_command="mysql $db_user $db_passwd $db_host"
 pushd "$TIKI_PATH || exit" || exit
 echo "Clear cache"
 php console.php -n cache:clear
-echo "Update checkout"
-bash doc/devtools/svnup.sh
 echo "Fix permission"
 bash setup.sh mixed
 echo "Drop and recreate database"

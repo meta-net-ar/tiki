@@ -42,7 +42,7 @@
                                 <td class="text">{$channels[user].firstName}</td>
                                 <td class="text">{$channels[user].lastName}</td>
                                 <td class="email">
-                                    <a class="link" href="#" onclick="var em = window.opener.document.getElementById('{$element}').value; if (em != '') window.opener.document.getElementById('{$element}').value = window.opener.document.getElementById('{$element}').value + ', {$channels[user].email}'; if (em == '') window.opener.document.getElementById('{$element}').value = window.opener.document.getElementById('{$element}').value + '{$channels[user].email}';">{* TODO: optimize the Javascript code *}
+                                    <a class="link" href="#" role="button" onclick="var em = window.opener.document.getElementById('{$element}').value; if (em != '') window.opener.document.getElementById('{$element}').value = window.opener.document.getElementById('{$element}').value + ', {$channels[user].email}'; if (em == '') window.opener.document.getElementById('{$element}').value = window.opener.document.getElementById('{$element}').value + '{$channels[user].email}';">{* TODO: optimize the Javascript code *}
                                         {$channels[user].email}
                                     </a>
                                     [&nbsp;&nbsp;
@@ -55,7 +55,7 @@
                                         <input type="hidden" name="find" value="{$find}">
                                         <input type="hidden" name="initial" value="{$setInitial}">
                                         <input type="hidden" name="remove" value="{$channels[user].contactId}">
-                                        <button id="deleteButton" type="button" onClick="show_alert(this.form);" class="btn btn-link px-0 pt-0 pb-0" title=":{tr}Delete{/tr}">
+                                        <button id="deleteButton" type="button" onClick="show_alert(this.form);" class="btn btn-link px-0 pt-0 pb-0" title=":{tr}Delete{/tr}" aria-label="{tr}Delete{/tr}">
                                             {icon name='delete'}
                                         </button>
                                     </form>
@@ -80,7 +80,7 @@
                         </a>
                         ]&nbsp;
                     {/if}
-                    {tr}Page:{/tr} {$actual_page}/{if $cant_pages > 0}{$cant_pages}{else}1{/if}
+                    {tr}Page:{/tr} {$actual_page}/{if $pages_count > 0}{$pages_count}{else}1{/if}
                     {if $next_offset >= 0}
                         &nbsp;[
                         <a class="prevnext" href="tiki-webmail_contacts.php?element={$element}&amp;section=contacts&amp;find={$find}&amp;offset={$next_offset}&amp;sort_mode={$sort_mode}">
@@ -89,8 +89,8 @@
                     {/if}
                     {if $prefs.direct_pagination eq 'y'}
                         <br>
-                        {section loop=$cant_pages name=foo}
-                            {assign var=selector_offset value=$smarty.section.foo.index|times:$prefs.maxRecords}
+                        {section loop=$pages_count name=foo}
+                            {$selector_offset=$smarty.section.foo.index|times:$prefs.maxRecords}
                             <a class="prevnext" href="tiki-webmail_contacts.php?element={$element}&amp;section=contacts&amp;find={$find}&amp;offset={$selector_offset}&amp;sort_mode={$sort_mode}">
                                 {$smarty.section.foo.index_next}
                             </a>&nbsp;

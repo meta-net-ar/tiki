@@ -8,12 +8,15 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
 use Tiki\Package\VendorHelper;
+use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 $inputConfiguration = [
     [
         'staticKeyFilters'             => [
-        'find_other'                   => 'word',              //post
+        'find_other'                   => 'int',               //post
         'galleryId'                    => 'int',               //get
         'parentId'                     => 'int',               //post
         'view'                         => 'word',              //get
@@ -39,7 +42,7 @@ $inputConfiguration = [
         'sortdirection'                => 'word',              //post
         'fname'                        => 'word',              //post
         'fdescription'                 => 'xss',               //post
-        'data'                         => 'none',              //get
+        'data'                         => 'string',            //get
         'quota'                        => 'int',               //post
         'name'                         => 'string',            //post
         'description'                  => 'xss',               //post
@@ -92,7 +95,7 @@ $inputConfiguration = [
         'find_lastDownload'            => 'word',              //post
         'find_lastDownload_unit'       => 'word',              //post
         'find_fileType'                => 'word',              //post
-        'allowedMimeTypes'             => 'bool',              //get
+        'allowedMimeTypes'             => 'word',              //get
         'find'                         => 'string',            //post
         'categId'                      => 'int',               //get
         'find_orphans'                 => 'word',              //get
@@ -106,20 +109,24 @@ $inputConfiguration = [
         'watch_object'                 => 'word',              //get
         'galleryName'                  => 'word',              //get
         'fgal_actions'                 => 'word',              //get
+        'detach'                        => 'bool',              //get
+        'duplicate'                     => 'bool',              //post
+        'watch_action'                  => 'word',              //get
         ],
         'staticKeyFiltersForArrays' => [
             'cat_categories' => 'digits',
-            'direct'         => 'digits',
+            // Direct mapping contains adapter/path/credentials, so a digits-only
+            // filter would corrupt values like "local" or "/tmp/data".
+            'direct'         => 'text',
             'ocr_lang'       => 'text',
         ],
     ],
 ];
 
-
-
-
-$section = 'file_galleries';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FILE_GALLERIES;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_file_galleries');
 $filegallib = TikiLib::lib('filegal');
 $statslib = TikiLib::lib('stats');
@@ -233,6 +240,10 @@ if (
     Feedback::errorPage(['mes' => tr('You do not have permission to view this gallery'), 'errortype' => 401]);
 }
 
+if ($prefs['fgal_show_modtimedate']) {
+    $gal_info['show_modtimedate'] = $prefs['fgal_show_modtimedate'];
+}
+
 // Init smarty variables to blank values
 $smarty->assign('fname', '');
 $smarty->assign('fdescription', '');
@@ -241,10 +252,7 @@ $smarty->assign('maxRows', $maxRecords);
 $smarty->assign('edited', 'n');
 $smarty->assign('edit_mode', 'n');
 $smarty->assign('dup_mode', 'n');
-$smarty->assign(
-    'parentId',
-    isset($_REQUEST['parentId']) ? (int)$_REQUEST['parentId'] : (isset($gal_info['parentId']) ? $gal_info['parentId'] : -1)
-);
+$smarty->assign('parentId', (int)($_REQUEST['parentId'] ?? ($gal_info['parentId'] ?? -1)));
 $smarty->assign('creator', $user);
 $smarty->assign('sortorder', 'name');
 $smarty->assign('sortdirection', 'asc');
@@ -320,11 +328,13 @@ if (isset($_REQUEST['movesel']) && $access->checkCsrf()) {
 
 if (isset($_REQUEST['fgal_actions'])) {
     if ($_REQUEST['fgal_actions'] === 'delsel_x') {
-        $access->check_permission_either(['admin_file_galleries', 'remove_files']);
         if (isset($_REQUEST['file']) && $access->checkCsrf(true)) {
             $failedFiles = $totalFiles = count($_REQUEST['file']);
             foreach (array_values($_REQUEST['file']) as $file) {
                 if ($info = $filegallib->get_file_info($file)) {
+                    if (! $filegallib->userCanRemoveFile($info)) {
+                        continue;
+                    }
                     $result = $filegallib->remove_file($info, $gal_info);
                     if ($result && $result->numRows()) {
                         $failedFiles--;
@@ -417,7 +427,7 @@ if (isset($_REQUEST['fgal_actions'])) {
         } else {
             foreach (array_values($_REQUEST['file']) as $file) {
                 $result = $filegallib->metadataAction($file, 'refresh');
-                if ($result && $result->numRows()) {
+                if ($result !== false) {
                     $failedFiles--;
                 }
             }
@@ -472,7 +482,6 @@ if (isset($_REQUEST['fgal_actions'])) {
         $smarty->assign_by_ref('groups', $groups['data']);
     }
 }
-
 
 if (isset($_REQUEST['permsel']) && isset($_REQUEST['subgal']) && $access->checkCsrf()) {
     $access->check_permission('assign_perm_file_gallery');
@@ -590,7 +599,7 @@ if (
     && $access->checkCsrf(true)
 ) {
     $result = $filegallib->metadataAction($_REQUEST['fileId'], 'refresh');
-    if ($result && $result->numRows()) {
+    if ($result !== false) {
         Feedback::success(tr('Metadata refreshed'));
     } else {
         Feedback::error(tr('Metadata not refreshed'));
@@ -612,6 +621,11 @@ $smarty->assign('url', $tikilib->httpPrefix() . parse_url($_SERVER['REQUEST_URI'
 if (isset($_REQUEST['edit_mode']) and $_REQUEST['edit_mode']) {
     $smarty->assign('edit_mode', 'y');
     $smarty->assign('edited', 'y');
+
+    $prefslib = TikiLib::lib('prefs');
+    $displayNamePrefInfo = $prefslib->getPreference('fgal_filename_to_display_name');
+    $smarty->assign('displayNameGenerationOptions', $displayNamePrefInfo['options']);
+
     if ($prefs['feature_categories'] == 'y') {
         $cat_type = 'file gallery';
         $cat_objid = $galleryId;
@@ -619,7 +633,7 @@ if (isset($_REQUEST['edit_mode']) and $_REQUEST['edit_mode']) {
     }
 
     if ($prefs['feature_groupalert'] == 'y') {
-        $smarty->assign('groupforAlert', isset($_REQUEST['groupforAlert']) ? $_REQUEST['groupforAlert'] : '');
+        $smarty->assign('groupforAlert', $_REQUEST['groupforAlert'] ?? '');
         $all_groups = $userlib->list_all_groups();
         $groupselected = $groupalertlib->GetGroup('file gallery', $galleryId);
         if (is_array($all_groups)) {
@@ -762,16 +776,16 @@ if (isset($_REQUEST['edit']) && $access->checkCsrf()) {
         $$t = (isset($_REQUEST[$t]) && $_REQUEST[$t] == 'on') ? 'y' : 'n';
         $smarty->assign($t, $$t);
     }
-    $_REQUEST['archives'] = isset($_REQUEST['archives']) ? $_REQUEST['archives'] : 0;
-    $_REQUEST['user'] = isset($_REQUEST['user']) ? $_REQUEST['user'] : (isset($gal_info['user']) ? $gal_info['user'] : $user);
-    $_REQUEST['sortorder'] = isset($_REQUEST['sortorder']) ? $_REQUEST['sortorder'] : 'created';
+    $_REQUEST['archives'] = $_REQUEST['archives'] ?? 0;
+    $_REQUEST['user'] = $_REQUEST['user'] ?? ($gal_info['user'] ?? $user);
+    $_REQUEST['sortorder'] = $_REQUEST['sortorder'] ?? 'created';
     $_REQUEST['sortdirection'] = isset($_REQUEST['sortdirection']) && $_REQUEST['sortdirection'] == 'asc' ? 'asc' : 'desc';
     if (isset($_REQUEST['fileId'])) {
         $infoOverride = $filegallib->get_file_info($_REQUEST['fileId']);
 
-        $_REQUEST['fname'] = (isset($_REQUEST['fname']) ? $_REQUEST['fname'] : $infoOverride['name']);
-        $_REQUEST['fdescription'] = (isset($_REQUEST['fdescription']) ? $_REQUEST['fdescription'] : $infoOverride['description']);
-        $info['data'] = (isset($_REQUEST['data']) ? $_REQUEST['data'] : $info['data']);
+        $_REQUEST['fname'] = ($_REQUEST['fname'] ?? $infoOverride['name']);
+        $_REQUEST['fdescription'] = ($_REQUEST['fdescription'] ?? $infoOverride['description']);
+        $info['data'] = ($_REQUEST['data'] ?? $info['data']);
 
         $file = Tiki\FileGallery\File::id($_REQUEST['fileId']);
         $file->setParam('description', $_REQUEST['fdescription']);
@@ -811,6 +825,7 @@ if (isset($_REQUEST['edit']) && $access->checkCsrf()) {
         $gal_info = [
             'galleryId' => $galleryId,
             'name' => $_REQUEST['name'],
+            'display_name_generation' => empty($_REQUEST['display_name_generation']) ? null : $_REQUEST['display_name_generation'],
             'description' => $_REQUEST['description'],
             'user' => $_REQUEST['user'],
             'maxRows' => $_REQUEST['maxRows'],
@@ -952,7 +967,7 @@ if (! empty($_REQUEST['duplicate']) && ! empty($_REQUEST['name']) && ! empty($ga
         $newGalleryId = $filegallib->duplicate_file_gallery(
             $galleryId,
             $_REQUEST['name'],
-            isset($_REQUEST['description']) ? $_REQUEST['description'] : ''
+            $_REQUEST['description'] ?? ''
         );
 
         if (isset($_REQUEST['dupCateg']) && $_REQUEST['dupCateg'] == 'on' && $prefs['feature_categories'] == 'y') {
@@ -961,7 +976,7 @@ if (! empty($_REQUEST['duplicate']) && ! empty($_REQUEST['name']) && ! empty($ga
             $catObjectId = $categlib->add_categorized_object(
                 'file gallery',
                 $newGalleryId,
-                (isset($_REQUEST['description']) ? $_REQUEST['description'] : ''),
+                ($_REQUEST['description'] ?? ''),
                 $_REQUEST['name'],
                 'tiki-list_file_gallery.php?galleryId=' . $newGalleryId
             );
@@ -1066,8 +1081,13 @@ if (empty($_REQUEST['sort_mode'])) {
         $_REQUEST['sort_mode'] = $gal_info['sort_mode'];
     }
 }
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'name_asc',
+    ['tiki_files', 'tiki_file_galleries'],
+    $filegallib->pure_aliases
+);
 
-$smarty->assign_by_ref('sort_mode', $_REQUEST['sort_mode']);
+$smarty->assign('sort_mode', $sort_mode);
 
 $find = [];
 if (! isset($_REQUEST['find_creator'])) {
@@ -1082,7 +1102,7 @@ if (! empty($_REQUEST['find_lastModif']) && ! empty($_REQUEST['find_lastModif_un
 if (! empty($_REQUEST['find_lastDownload']) && ! empty($_REQUEST['find_lastDownload_unit'])) {
     $find['lastDownload'] = $tikilib->now - ($_REQUEST['find_lastDownload'] * $_REQUEST['find_lastDownload_unit']);
 }
-if (! empty($_REQUEST['find_fileType']) && ! empty($_REQUEST['find_fileType'])) {
+if (! empty($_REQUEST['find_fileType'])) {
     include_once('lib/mime/mimetypes.php');
     global $mimetypes;
     $find['fileType'] = $mimetypes[$_REQUEST['find_fileType']];
@@ -1127,7 +1147,7 @@ if ($prefs['feature_categories'] == 'y') {
     }
 
     // load categories for find
-    if ($prefs['feature_categories'] == 'y' && ! isset($_REQUEST['edit_mode'])) {
+    if (! isset($_REQUEST['edit_mode'])) {
         $categlib = TikiLib::lib('categ');
         $categories = $categlib->getCategories();
         $smarty->assign_by_ref('categories', $categories);
@@ -1151,7 +1171,7 @@ if (isset($_GET['slideshow'])) {
     $files = $filegallib->get_files(
         0,
         -1,
-        $_REQUEST['sort_mode'],
+        $sort_mode,
         $_REQUEST['find'],
         $galleryId,
         false,
@@ -1169,7 +1189,24 @@ if (isset($_GET['slideshow'])) {
         $find
     );
     $smarty->assign('offset', $_REQUEST['offset'] ?? 0);
-    $smarty->assign('cant', $files['cant']);
+    $smarty->assign('count', $files['count']);
+
+    if ($prefs['feature_categories'] == 'y') {
+        $categlib = TikiLib::lib('categ');
+        foreach ($files['data'] as &$file) {
+            $file['categs'] = $categlib->get_object_categories('file', $file['fileId']);
+            if (is_array($file['categs'])) {
+                $file['categs'] = array_map(function ($c) {
+                    return $c['name'];
+                }, $file['categs']);
+            } else {
+                $file['categs'] = [];
+            }
+            $file['categs'] = implode(', ', $file['categs']);
+        }
+        unset($file);
+    }
+
     $smarty->assign_by_ref('files', $files['data']);
 
     $smarty->assign('show_find', 'n');
@@ -1194,8 +1231,7 @@ if (isset($_GET['slideshow'])) {
         } else {
             $syntax = '';
         }
-        $with_archive = (isset($gal_info['archives']) && $gal_info['archives'] == '-1') ? false : true;
-
+        $with_archive = ! ((isset($gal_info['archives']) && $gal_info['archives'] == '-1'));
         if ($view == 'page' && isset($_REQUEST['fileId'])) {
             try {
                 $file = $filegallib->get_file_additional($fileId);
@@ -1204,7 +1240,7 @@ if (isset($_GET['slideshow'])) {
             } catch (Exception $e) {
                 Feedback::errorPage(['mes' => tr('File %0 not found', $fileId), 'errortype' => 404]);
             }
-            $smarty->assign('cant', 1);
+            $smarty->assign('count', 1);
             if ($prefs['ocr_enable'] === 'y') {
                 $info = $filegallib->get_file_info($fileId);
                 if ($info['ocr_state'] === '1') {
@@ -1221,7 +1257,7 @@ if (isset($_GET['slideshow'])) {
             $files = $filegallib->get_files(
                 $_REQUEST['offset'],
                 $_REQUEST['maxRecords'],
-                $_REQUEST['sort_mode'],
+                $sort_mode,
                 $_REQUEST['find'],
                 $galleryId,
                 $with_archive,
@@ -1239,14 +1275,17 @@ if (isset($_GET['slideshow'])) {
                 $find,
                 $syntax
             );
-            $smarty->assign('cant', $files['cant']);
+            $smarty->assign('count', $files['count']);
             if ($view == 'page') {
                 $file = $files['data'][0] ?? null;
             }
         }
         if ($view == 'page') {
-            $smarty->assign('maxWidth', isset($_REQUEST['maxWidth']) ? $_REQUEST['maxWidth'] : '300px');
-            //need to convert fileId to an offset to bring up a specific file for page view
+            $maxWidth = (int)($_REQUEST['maxWidth'] ?? 300);
+            if ($maxWidth <= 0) {
+                $maxWidth = 300;
+            }
+            $smarty->assign('maxWidth', $maxWidth);
             $smarty->assign('maxRecords', 1);
             $smarty->assign(
                 'metarray',
@@ -1259,6 +1298,30 @@ if (isset($_GET['slideshow'])) {
                 include_once 'lib/jquery_tiki/elfinder/tikiElFinder.php';
                 \tikiElFinder::loadJSCSS();
             }
+            if ($prefs['feature_categories'] == 'y') {
+                $categlib = TikiLib::lib('categ');
+
+                foreach ($files['data'] as &$file) {
+                    if (empty($file['categories']) || ! is_array($file['categories'])) {
+                        $file['categories'] = [];
+
+                        $cats = [];
+                        if (! empty($file['isgal']) && $file['isgal'] == 1) {
+                            $cats = $categlib->get_object_categories('file gallery', $file['id']);
+                        } elseif (! empty($file['fileId'])) {
+                            $cats = $categlib->get_object_categories('file', $file['fileId']);
+                        }
+
+                        foreach ($cats as $catId) {
+                            $file['categories'][] = [
+                                'categId' => $catId,
+                                'name'    => $categlib->get_category_name($catId),
+                            ];
+                        }
+                    }
+                }
+            }
+
             $smarty->assign_by_ref('files', $files['data']);
 
             $subs = 0;
@@ -1267,7 +1330,7 @@ if (isset($_GET['slideshow'])) {
                     $subs = $subs + $f['isgal'];
                 }
             }
-            $smarty->assign('filescount', $files['cant'] - $subs);
+            $smarty->assign('filescount', $files['count'] - $subs);
         }
     }
     $smarty->assign('mid', 'tiki-list_file_gallery.tpl');
@@ -1278,7 +1341,7 @@ $smarty->assign('thumbnail_size', $prefs['fgal_thumb_max_size']);
 
 if (isset($_REQUEST['show_details'])) {
     $show_details = $_REQUEST['show_details'] === 'y' ? 'y' : 'n';
-    setCookieSection('show_details', $show_details);
+    CookieConsentLib::tikiSetCookie('show_details', $show_details, CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL, 0);
 } else {
     $show_details = getCookie('show_details', null, 'n');
 }
@@ -1320,7 +1383,7 @@ if ($prefs['feature_user_watches'] == 'y') {
                     $_REQUEST['watch_event'],
                     $_REQUEST['watch_object'],
                     'File Gallery',
-                    (isset($_REQUEST['galleryName']) ? $_REQUEST['galleryName'] : ''),
+                    ($_REQUEST['galleryName'] ?? ''),
                     "tiki-list_file_gallery.php?galleryId=$galleryId"
                 );
                 if ($result) {

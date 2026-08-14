@@ -9,18 +9,18 @@
     {tabset}
         {permission name=payment_view}
             {tab name="{tr}Outstanding{/tr}"}
-                {if $overdue.cant > 0 || $outstanding.data|@count > 0 || $authorized.data|@count > 0}
-                    {if $overdue.cant > 0}
+                {if $overdue.count > 0 || $outstanding.data|@count > 0 || $authorized.data|@count > 0}
+                    {if $overdue.count > 0}
                         <h4>{tr}Overdue{/tr}</h4>
                         {include file='tiki-payment-list.tpl' payments=$overdue cancel=1 table_id='pmt_overdue'}
                     {/if}
 
-                    {if $outstanding.cant > 0}
+                    {if $outstanding.count > 0}
                         <h4>{tr}Outstanding{/tr}</h4>
                         {include file='tiki-payment-list.tpl' payments=$outstanding cancel=1 table_id='pmt_outstanding'}
                     {/if}
 
-                    {if $authorized.cant > 0}
+                    {if $authorized.count > 0}
                         <h4>{tr}Authorized{/tr}</h4>
                         {include file='tiki-payment-list.tpl' payments=$authorized cancel=1 table_id='pmt_authorized'}
                     {/if}
@@ -29,14 +29,14 @@
                 {/if}
             {/tab}
             {tab name="{tr}Past{/tr}"}
-                {if $past.cant > 0}
+                {if $past.count > 0}
                     {include file='tiki-payment-list-past.tpl' payments=$past table_id='pmt_past'}
                 {else}
                     <br><em>{tr}No paid payments found{/tr}</em>
                 {/if}
             {/tab}
             {tab name="{tr}Cancelled{/tr}"}
-                {if $canceled.cant > 0}
+                {if $canceled.count > 0}
                     {include file='tiki-payment-list.tpl' payments=$canceled table_id='pmt_canceled'}
                 {else}
                     <br>{tr}<em>No cancelled payments found</em>{/tr}

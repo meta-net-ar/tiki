@@ -117,7 +117,7 @@ class Executor
                             return $val;
                         }
                     };
-                    if (substr($type, 0, 6) === 'parent') {
+                    if (str_starts_with($type, 'parent')) {
                         $record = $this->record;
                         $subtype = substr($type, 7);
                         while (substr($subtype, 0, 6) === 'parent') {
@@ -182,6 +182,9 @@ class Executor
                 }
             }
         }
+
+        TikiLib::lib('parser')->parse_wiki_argvariable($body);
+
         return $body;
     }
 
@@ -213,7 +216,7 @@ class Executor
         foreach ($this->formatterPlugins as $name => $plugin) {
             $sf->addSubFormatter($name, $plugin);
         }
-        $formatted = $sf->getPopulatedList($result, true);
+        $formatted = $sf->getPopulatedList($result, true, $this->record->limitPreloaded());
 
         foreach ($formatted as $entry) {
             foreach ($this->reverseMapping as $i => $mappings) {
@@ -259,6 +262,16 @@ class Executor
                             }
                         }
                     }
+                }
+            }
+            // add to a single parent record when no match mapping is set (useful for retrieving records in an aggregate random parent record)
+            if (empty($this->reverseMapping) && count($this->data) == 1 && isset($this->data[0])) {
+                if ($this->record->isMultiple()) {
+                    $arr = $this->data[0][$key] ?? [];
+                    $arr[] = $entry;
+                    $this->data[0][$key] = $arr;
+                } else {
+                    $this->data[0][$key] = $entry;
                 }
             }
         }

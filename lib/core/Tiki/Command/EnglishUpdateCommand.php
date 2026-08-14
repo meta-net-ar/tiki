@@ -55,18 +55,6 @@ class EnglishUpdateCommand extends Command
                 'e',
                 InputOption::VALUE_REQUIRED,
                 'Email address to send a message to if untranslated strings are found. Must be used in conjunction with "audit".'
-            )
-            ->addOption(
-                'diff-command',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Set a shell command to return the diff (ex. in case of a based git repository) override svn default diff. Options revision and lag will be ignored.'
-            )
-            ->addOption(
-                'git',
-                null,
-                InputOption::VALUE_NONE,
-                'Set this if diff-command is based on git'
             );
     }
 
@@ -88,15 +76,6 @@ class EnglishUpdateCommand extends Command
      * @var array
      */
     private $languages;
-    /**
-     *
-     * Seperates svn diff output into changes made in PHP and TPL files
-     *
-     * @param $content string raw svn diff output
-     * @param string $diff git or svn depending on the version control used to generate the diff.
-     *
-     * @return array with [0] containing PHP and [1] containing TPL strings
-     */
 
     /**
      * Run git diff command
@@ -125,7 +104,7 @@ class EnglishUpdateCommand extends Command
     }
 
 
-    private function separatePhpTpl($content, $diff = 'svn')
+    private function separatePhpTpl($content, $diff = '')
     {
 
         if ($diff === 'git') {
@@ -333,15 +312,10 @@ class EnglishUpdateCommand extends Command
             $output->writeln(' --email, only available when running in --audit mode.');
             return Command::INVALID;
         }
-        $scm = null;
 
-        if (empty($scm)) {//detect if is svn or git repo
-            if (file_exists(TIKI_PATH . DIRECTORY_SEPARATOR . '.git')) {
-                $scm = 'git';
-            } else {
-                $output->writeln('<error>SCM not found in this tiki installation</error>');
-                return Command::FAILURE;
-            }
+        if (! file_exists(TIKI_PATH . DIRECTORY_SEPARATOR . '.git')) {
+            $output->writeln('<error>SCM not found in this tiki installation</error>');
+            return Command::FAILURE;
         }
 
         $lag = $input->getOption('lag');
@@ -423,7 +397,7 @@ class EnglishUpdateCommand extends Command
         $progress->advance();
 
         if ($output->getVerbosity() >= OutputInterface::VERBOSITY_VERY_VERBOSE) {
-            $output->writeln("\n\n<info>Strings Being Updated</info>\n");
+            $output->writeln("\n\n<info>" . tra('Strings Being Updated') . "</info>\n");
             foreach ($diffs as $diff) {
                 $output->writeln('* ' . $diff['-']);
                 $output->writeln('* ' . $diff['+'] . "\n");
@@ -459,7 +433,7 @@ class EnglishUpdateCommand extends Command
                         // if the original string is in the language file
                         if (preg_match('/^"' . preg_quote($entry['-'], '/') . '[' . implode('', Language::PUNCTUATIONS) . ']?".*/m', $file, $match)) {
                             // if the replacement string does not already exist
-                            if (! strpos($file, "\n\"" . $entry['+'] . '"')) {
+                            if (! str_contains($file, "\n\"" . $entry['+'] . '"')) {
                                 // then replace the original string with an exact copy and a 'updated' copy on the next line
                                 $replace = preg_replace('/"' . preg_quote($entry['-'], '/') . '[' . implode('', Language::PUNCTUATIONS) . ']?"/', '"' . $entry['+'] . '"', $match[0], 1);
                                 $file = str_replace($match[0], $match[0] . "\n" . $replace, $file);
@@ -477,7 +451,7 @@ class EnglishUpdateCommand extends Command
                         if ($langNow == 'en') {
                             if (preg_match('/^\/\/ "' . preg_quote($entry['-'], '/') . '[' . implode('', Language::PUNCTUATIONS) . ']?".*/m', $file, $match)) {
                                 // if the replacement string does not already exist
-                                if (! strpos($file, "\n\"" . $entry['+'] . '"')) {
+                                if (! str_contains($file, "\n\"" . $entry['+'] . '"')) {
                                     // then replace the original string with an exact copy and a 'updated' copy on the next line
                                     $replace = preg_replace('/\/\/ "' . preg_quote($entry['-'], '/') . '[' . implode('', Language::PUNCTUATIONS) . ']?"/', '"' . $entry['+'] . '"', $match[0], 1);
                                     $file = str_replace($match[0], $match[0] . "\n" . $replace, $file);
@@ -493,24 +467,24 @@ class EnglishUpdateCommand extends Command
                         }
                     }
                     if (isset($lang[$langNow])) {
-                        $progress->setMessage($langNow . "\tStrings to update");
+                        $progress->setMessage($langNow . "\ttra(Strings to update)");
                         $progress->advance();
                         if (! $input->getOption('audit')) {
                             file_put_contents($directory . '/language.php', $file);
                         }
                     } else {
-                        $progress->setMessage($langNow . "\tNo changes to make");
+                        $progress->setMessage($langNow . "\t" . tra("No changes to make"));
                         $progress->advance();
                     }
                 } else {
-                    $progress->setMessage($langNow . "\tSkipping <info>language.php not writable</info>");
+                    $progress->setMessage(tra("%0\t%1 %2", $langNow, tra("Skipping"), "<info>" . tra("language.php not writable") . "</info>"));
                     $progress->advance();
                 }
             }
         }
         $skippedMessage = '';
         if ($this->duplicates) {
-            $skippedMessage = ' Skipped ' . $this->duplicates . ' duplicate strings.';
+            $skippedMessage = tra('Skipped %0 duplicate strings.', $this->duplicates);
         }
 
         if ($input->getOption('audit')) {
@@ -524,7 +498,7 @@ class EnglishUpdateCommand extends Command
         if ($input->getOption('audit')) {
             if (count($string)) {
                 $syncMessage = "\n";
-                $output->writeln("\n\n<info>Updated Strings not found in Language Files</info>");
+                $output->writeln("\n\n<info>" . tra('Updated Strings not found in Language Files') . "</info>");
                 foreach ($diffs as $key => $entry) {
                     if (isset($string[$key])) {
                         $syncMessage .= '* ' . $entry['-'] . "\n";
@@ -532,23 +506,23 @@ class EnglishUpdateCommand extends Command
                 }
                 $output->writeln($syncMessage);
                 if ($input->getOption('email')) {
-                    mail($input->getOption('email'), 'Updated Strings not found in Language Files', wordwrap(TIKI_PATH . "\n" . $syncMessage, 70, "\r\n"));
+                    mail($input->getOption('email'), tra('Updated Strings not found in Language Files'), wordwrap(TIKI_PATH . "\n" . $syncMessage, 70, "\r\n"));
                 }
                 exit(1);
             }
-            $output->writeln("\n\n<info>English and Translations are in Sync</info>\n");
+            $output->writeln("\n\n<info>" . tra('English and Translations are in Sync') . "</info>\n");
             // if were not in audit mode
         } else {
             if (count($string) < $this->stringCount) {
-                $output->writeln("\n\n<info>Strings Not Translated</info>");
+                $output->writeln("\n\n<info>" . tra('Strings Not Translated') . "</info>");
                 foreach ($diffs as $key => $entry) {
                     if (! isset($string[$key]) && ! isset($skipped[$key])) {
                         $output->writeln('* ' . $entry['-']);
                     }
                 }
             }
-            $output->writeln("\n\nOptionally run php get_strings.php to remove any unused translation strings.");
-            $output->writeln("Verify before committing.\n");
+            $output->writeln("\n\n" . tra("Optionally run %0 to remove any unused translation strings.\n", 'php get_strings.php'));
+            $output->writeln(tra("Verify before committing.\n"));
         }
         return Command::SUCCESS;
     }

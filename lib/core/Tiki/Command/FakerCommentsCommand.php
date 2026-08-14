@@ -17,7 +17,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Faker\Factory as FakerFactory;
 use TikiLib;
-use Tiki\Faker as TikiFaker;
 
 /**
  * Enabled the usage of Faker as a way to load random data to trackers
@@ -49,49 +48,49 @@ class FakerCommentsCommand extends Command
                 'items',
                 'i',
                 InputOption::VALUE_OPTIONAL,
-                'Number of comments (items) to generate',
+                tra('Number of comments (items) to generate'),
                 100
             )
             ->addOption(
                 'replies',
                 'r',
                 InputOption::VALUE_OPTIONAL,
-                'Percentage of comments as replies',
+                tra('Percentage of comments as replies'),
                 40
             )
             ->addOption(
                 'anonymous',
                 'a',
                 InputOption::VALUE_OPTIONAL,
-                'Percentage of anonymous posts if permitted',
+                tra('Percentage of anonymous posts if permitted'),
                 20
             )
             ->addOption(
                 'minstart',
                 's',
                 InputOption::VALUE_OPTIONAL,
-                'Earliest start date for first comment',
+                tra('Earliest start date for first comment'),
                 '-1 year'
             )
             ->addOption(
                 'maxstart',
                 'e',
                 InputOption::VALUE_OPTIONAL,
-                'Latest start date for first comment',
+                tra('Latest start date for first comment'),
                 '-11 months'
             )
             ->addOption(
                 'mingap',
                 '',
                 InputOption::VALUE_OPTIONAL,
-                'Shortest gap between comments',
+                tra('Shortest gap between comments'),
                 '10 minutes'
             )
             ->addOption(
                 'maxgap',
                 'g',
                 InputOption::VALUE_OPTIONAL,
-                'Longest gap between comments',
+                tra('Longest gap between comments'),
                 '5 days'
             );
     }
@@ -144,7 +143,7 @@ class FakerCommentsCommand extends Command
         $maxGap = $input->getOption('maxgap');
 
         $faker = FakerFactory::create();
-        $tikiFaker = new TikiFaker($faker);
+        $tikiFaker = new \Tiki\Faker($faker); // @phpstan-ignore new.noConstructor (depends on fakerphp/faker installed only through packages)
         $faker->addProvider($tikiFaker);
 
         $startDate = $faker->dateTimeBetween($minStart, $maxStart);
@@ -213,7 +212,7 @@ class FakerCommentsCommand extends Command
                 }
                 $commentDateUnix = $commentDateTime->format('U');
                 if ($prefs['comments_notitle'] === 'y') {
-                    $commentData['title'] = 'Untitled ' . $tikilib->get_long_datetime($commentDateUnix);
+                    $commentData['title'] = 'Untitled';
                 }
 
                 try {

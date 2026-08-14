@@ -25,7 +25,7 @@ if (! isset($argv[1])) {
 
 $tikiPath = $argv[1];
 
-if (substr($tikiPath, -1) != '/') {
+if (! str_ends_with($tikiPath, '/')) {
     $tikiPath .= '/';
 }
 

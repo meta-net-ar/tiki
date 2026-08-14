@@ -103,8 +103,8 @@ class WikiParser_Parsable extends ParserLib
         }
 
         // if we removed the syntax plugin then clean up the leftover linefeed
-        if ($found && (strpos($data, "\r\n") === 0 || strpos($data, "\n") === 0)) {
-            $data = substr($data, strpos($data, "\r\n") === 0 ? 2 : 1);
+        if ($found && (str_starts_with($data, "\r\n") || str_starts_with($data, "\n"))) {
+            $data = substr($data, str_starts_with($data, "\r\n") ? 2 : 1);
         }
 
         return $return;
@@ -143,19 +143,19 @@ class WikiParser_Parsable extends ParserLib
             $pluginskiplist = [];
         }
 
-        $is_html = (isset($this->option['is_html']) ? $this->option['is_html'] : false);
+        $is_html = ($this->option['is_html'] ?? false);
         $data = $this->protectSpecialChars($data, $is_html);
 
         $matches = WikiParser_PluginMatcher::match($data);
         $argumentParser = new WikiParser_PluginArgumentParser();
 
         foreach ($matches as $match) {
-            if ($this->option['parseimgonly'] && $this->getName() != 'img') {
+            if ($this->option['parseimgonly'] && $match->getName() != 'img') {
                 continue;
             }
 
             //note parent plugin in case of plugins nested in an include - to suppress plugin edit icons below
-            $plugin_parent = isset($plugin_name) ? $plugin_name : false;
+            $plugin_parent = $plugin_name ?? false;
             $plugin_name = $match->getName();
 
             if (! empty($this->option['indexing'])) {
@@ -164,7 +164,7 @@ class WikiParser_Parsable extends ParserLib
                     // {literal} smarty blocks or {display} and other LIST-plugin syntax gets removed if we don't make it searchable by default
                     $isSearchableByDefault = true;
                 } else {
-                    $isSearchableByDefault = isset($info['searchable_by_default']) ? $info['searchable_by_default'] : false;
+                    $isSearchableByDefault = $info['searchable_by_default'] ?? false;
                 }
                 //We are in an indexing context, check if plugins should be indexed, and strip them out if not
 
@@ -435,9 +435,9 @@ if ( \$('#$id') ) {
         global $prefs;
 
         if ($this->option['is_markdown'] && $prefs['markdown_enabled'] === 'y') {
-            $parsable = new WikiParser_ParsableMarkdown($data);
+            $parsable = new WikiParser_ParsableMarkdown();
         } else {
-            $parsable = new WikiParser_ParsableWiki($data);
+            $parsable = new WikiParser_ParsableWiki();
         }
         $parsable->setOptions($this->option);
         return $parsable->wikiParse($data, $noparsed);
@@ -450,14 +450,14 @@ if ( \$('#$id') ) {
         if (! empty($option)) {
             $this->setOptions($option);
         }
-
-        $this->parse_wiki_argvariable($data);
-        foreach ($args as &$arg) {
-            $this->parse_wiki_argvariable($arg);
-        }
-
         $data = $this->unprotectSpecialChars($data, true);                  // We want to give plugins original
         $args = preg_replace(['/^&quot;/', '/&quot;$/'], '', $args);        // Similarly remove the encoded " chars from the args
+
+        $this->parse_wiki_argvariable($data);
+        foreach ($args as $key => $arg) {
+            $this->parse_wiki_argvariable($arg);
+            $args[$key] = $arg;
+        }
 
         $outputFormat = 'wiki';
         if (isset($this->option['context_format'])) {
@@ -483,7 +483,7 @@ if ( \$('#$id') ) {
                 $_REQUEST['tr_offset1'] = 0;
             }
             foreach ($args as $arg) {
-                if (substr($arg, 0, 4) == '{$f_') {
+                if (str_starts_with($arg, '{$f_')) {
                     return $name . ': ' . tr(
                         'Pretty tracker reference "%0" could not be replaced in plugin "%1".',
                         str_replace(['{','}'], '', $arg),
@@ -496,7 +496,7 @@ if ( \$('#$id') ) {
         $func_name = 'wikiplugin_' . $name;
 
         $plugins_parsing_data = ['accordion', 'benchmark', 'button', 'code', 'fade', 'footnote', 'gdgraph', 'html', 'markdown', 'pdfpage', 'quote',
-                                'registermemberpayment', 'rr_info', 'shorten', 'slideshowslide', 'swiper', 'tabs', 'tour', 'tracker', 'param', 'trackerquerytemplate', 'split', 'wantedpages', 'fluidgrid', 'sort'];
+                                'registermemberpayment', 'rr_info', 'shorten', 'slideshowslide', 'swiper', 'teleprompter', 'tabs', 'tour', 'tracker', 'param', 'trackerquerytemplate', 'split', 'wantedpages', 'fluidgrid', 'sort'];
         if (($this->option['is_markdown'] ?? false) && ! in_array($name, $plugins_parsing_data)) {
             if ($name == 'fancytable') {
                 $data = str_replace('~|~', '{ftlongseparator}', $data);
@@ -514,8 +514,14 @@ if ( \$('#$id') ) {
             }
         }
 
-        if (! $validationPerformed && ! ($this->option['wysiwyg'] ?? false)) {
+        if (! $validationPerformed) {
+            $originalData = $data;
             $this->plugin_apply_filters($name, $data, $args);
+
+            // If validation failed and plugin_apply_filters set $data to WikiParser_PluginOutput::userError message, return it immediately
+            if ($data !== $originalData && strpos($data, tra('Plugin argument(s) missing or invalid:')) !== false) {
+                return $data;
+            }
         }
 
         $result = '';
@@ -562,14 +568,6 @@ if ( \$('#$id') ) {
             }
         } elseif (WikiPlugin_Negotiator_Wiki_Alias::findImplementation($name, $data, $args)) {
             $result = $this->pluginExecute($name, $data, $args, $offset, $validationPerformed);
-        }
-
-        if (! empty(ParserLib::$pluginCache)) {
-            $meta = $this->plugin_info($name, $args);
-            $fingerprint = $this->plugin_fingerprint($name, $meta, $data, $args);
-            if (isset(ParserLib::$pluginCache[$fingerprint])) {
-                ParserLib::$pluginCache[$fingerprint] = str_replace(['~np~', '~/np~'], '', $result);
-            }
         }
 
         return $result;

@@ -5,13 +5,12 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
 
-use Laminas\Mail\Exception\ExceptionInterface as ZendMailException;
-use SlmMail\Exception\ExceptionInterface as SlmMailException;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class Messu extends TikiLib
 {
@@ -20,10 +19,6 @@ class Messu extends TikiLib
      */
     public function save_sent_message($user, $from, $to, $cc, $subject, $body, $priority, $replyto_hash = '')
     {
-        global $prefs;
-        $userlib = TikiLib::lib('user');
-        $smarty = TikiLib::lib('smarty');
-
         $subject = strip_tags($subject);
         $body = strip_tags($body, '<a><b><img><i>');
         // Prevent duplicates
@@ -51,7 +46,7 @@ class Messu extends TikiLib
                 $cc,
                 $subject,
                 $body,
-                (int) $this->now,
+                $this->now,
                 'n',
                 'n',
                 'n',
@@ -113,7 +108,7 @@ class Messu extends TikiLib
                 $cc,
                 $subject,
                 $body,
-                (int) $this->now,
+                $this->now,
                 'n',
                 'n',
                 'n',
@@ -177,10 +172,10 @@ class Messu extends TikiLib
                         }
                     }
 
-                    if (! $mail->send([$email], 'mail')) {
+                    if (! $mail->send([$email])) {
                         return false; //TODO echo $mail->errors;
                     }
-                } catch (ZendMailException | SlmMailException $e) {
+                } catch (TransportExceptionInterface | \Throwable $e) {
                     Feedback::error($e->getMessage());
                     return false;
                 }
@@ -242,9 +237,9 @@ class Messu extends TikiLib
 
         $query = 'select * from `messu_' . $dbsource . "` where `user`=? $mid order by " .
                         $this->convertSortMode($sort_mode) . ',' . $this->convertSortMode('msgId_desc');
-        $query_cant = 'select count(*) from `messu_' . $dbsource . "` where `user`=? $mid";
+        $query_count = 'select count(*) from `messu_' . $dbsource . "` where `user`=? $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -259,7 +254,7 @@ class Messu extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
         return $retval;
     }
 
@@ -274,16 +269,16 @@ class Messu extends TikiLib
         }
 
         $bindvars = [$user];
-        $query_cant = 'select count(*) from `messu_' . $dbsource . '` where `user`=?';
+        $query_count = 'select count(*) from `messu_' . $dbsource . '` where `user`=?';
         if ($unreadOnly == true) {
-            $query_cant .= ' and `isRead`="n"';
+            $query_count .= ' and `isRead`="n"';
         }
         if (! empty($newSince)) {
-            $query_cant .= ' and `date` >= ?';
+            $query_count .= ' and `date` >= ?';
             $bindvars[] = $newSince;
         }
-        $cant = $this->getOne($query_cant, $bindvars);
-        return $cant;
+        $count = $this->getOne($query_count, $bindvars);
+        return $count;
     }
 
     /**

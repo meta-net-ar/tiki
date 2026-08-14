@@ -11,6 +11,59 @@ class Services_PDF_Controller
         Services_Exception_Disabled::check('feature_wiki_print');
     }
 
+    public function action_get_pdf($input)
+    {
+        global $prefs;
+
+        // edit permission is needed to convert arbitrary text to PDF
+        if ($input->page->pagename()) {
+            $perms = Perms::get('wiki page', $input->page->pagename());
+        } else {
+            $perms = Perms::get();
+        }
+        if (! $perms->edit) {
+            throw new Services_Exception_Denied();
+        }
+
+        $contents = $input->contents->html();
+        $filename = $input->filename->text();
+
+        $pdfsettings = $input->pdfsettings->json();
+        if ($pdfsettings) {
+            $pdfsettings = json_decode($pdfsettings, true);
+        }
+        if ($pdfsettings) {
+            $allowed_keys = [];
+            foreach ($prefs as $key => $_) {
+                if (str_starts_with($key, 'print_pdf_mpdf_')) {
+                    $allowed_keys[] = str_replace('print_pdf_mpdf_', '', $key);
+                }
+            }
+            $pdfsettings = array_intersect_key($pdfsettings, array_flip($allowed_keys));
+            $contents = "<pdfsettings " . implode('', array_map(function ($key) use ($pdfsettings) {
+                return $key . '="' . htmlspecialchars($pdfsettings[$key]) . '" ';
+            }, array_keys($pdfsettings))) . "></pdfsettings>" . $contents;
+        }
+
+        if (empty($filename)) {
+            $filename = 'contents.pdf';
+        }
+
+        require_once 'lib/pdflib.php';
+        $generator = new PdfGenerator();
+        if (! empty($generator->error)) {
+            Feedback::error($generator->error);
+            return "";
+        } else {
+            $pdf = $generator->getPdf('tiki-print.php', [], $contents);
+            header('Content-Type: application/pdf');
+            header('Content-Disposition: attachment; filename="' . $filename . '"');
+            header('Content-Length: ' . strlen($pdf));
+            echo $pdf;
+            exit;
+        }
+    }
+
     //function added to hold current state of fancy table / sorted table for pdf and print version. So when user generates pdf he gets his sorted data not default data in table.
     public function action_storeTable($input)
     {

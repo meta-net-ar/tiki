@@ -13,6 +13,7 @@ use PDOException;
 class PdoClient
 {
     protected const QUERY_RETRIES = 1;
+    protected const CONNECT_SLEEP_RETRY_SECONDS = 20;
 
     protected $dsn;
     protected $port;
@@ -158,7 +159,7 @@ class PdoClient
 
     public function parseDistributedIndexDefinition($name)
     {
-        if (strstr($name, ':')) {
+        if (str_contains($name, ':')) {
             $parts = explode(':', $name);
             $host = trim($parts[0]);
             if (count($parts) > 2) {
@@ -194,6 +195,10 @@ class PdoClient
 
     public function possibleFacetFields($table)
     {
+        static $cache = [];
+        if (isset($cache[$table])) {
+            return $cache[$table];
+        }
         if ($table == self::distributedIndexName()) {
             $stmt = $this->query("DESC $table");
             $result = $stmt->fetchAll();
@@ -219,7 +224,8 @@ class PdoClient
             }
         }
         if (count($fields) == 1) {
-            return array_keys(array_shift($fields));
+            $cache[$table] = array_keys(array_shift($fields));
+            return $cache[$table];
         }
         $common = [];
         $result = array_shift($fields);
@@ -234,13 +240,14 @@ class PdoClient
                 if ($opts['types'] != $tableFields[$field]['types']) {
                     continue 2;
                 }
-                if (strstr($table, ':') && ($field == 'deep_categories' || $field == 'categories')) {
+                if (str_contains($table, ':') && ($field == 'deep_categories' || $field == 'categories')) {
                     continue 2;
                 }
             }
             $common[] = $field;
         }
-        return $common;
+        $cache[$table] = $common;
+        return $cache[$table];
     }
 
     public function deleteIndex($index)
@@ -323,10 +330,10 @@ class PdoClient
             $values .= ', ' . implode(', ', $array_values);
         }
         if ($this->dataBuffer) {
-            $this->dataBuffer->setPrefix("INSERT INTO $index ($keys) VALUES ");
+            $this->dataBuffer->setPrefix("REPLACE INTO $index ($keys) VALUES ");
             $this->dataBuffer->push('(' . $values . ')');
         } else {
-            $this->prepareAndExecuteWithRetry("INSERT INTO $index ($keys) VALUES (" . $values . ")");
+            $this->prepareAndExecuteWithRetry("REPLACE INTO $index ($keys) VALUES (" . $values . ")");
         }
     }
 
@@ -377,6 +384,26 @@ class PdoClient
         return $stmt->fetchAll();
     }
 
+    public function count($table, $condition, $retry = true)
+    {
+        $stmt = null;
+        try {
+            $stmt = $this->query("SELECT COUNT(*) FROM $table WHERE $condition option not_terms_only_allowed=1,cutoff=0,expand_keywords=1");
+            return intval($stmt->fetchColumn());
+        } catch (PDOException $e) {
+            if ($retry && strstr($e->getMessage(), 'unknown local table')) {
+                if ($stmt) {
+                    $stmt->closeCursor();
+                }
+                // federated index tables might have been rebuilt and distributed one not updated properly -> refresh and retry
+                \TikiLib::lib('federatedsearch')->recreateDistributedIndex($this);
+                return $this->count($table, $condition, false);
+            } else {
+                throw $e;
+            }
+        }
+    }
+
     /**
      * Fetches results from the index along with any facets data that come as subsequent row sets.
      * Builds the query and fetches the results in 2 parts to reduce memory footprint and performance impact for big indices (say 1000+ fields):
@@ -403,18 +430,30 @@ class PdoClient
             'total' => 0,
         ];
         if ($selectFields) {
-            $sql = 'SELECT ' . implode(', ', $selectFields);
+            $fields = array_map(function ($field) use ($indexFields) {
+                if (in_array($field, $indexFields)) {
+                    return $field;
+                } elseif (str_starts_with($field, 'tracker_field_')) {
+                    return 'tracker_fields_json.' . preg_replace('/^tracker_field_/', '', $field) . ' as ' . $field;
+                } else {
+                    return null;
+                }
+            }, $selectFields);
+            $fields = array_unique(array_filter($fields));
+            $sql = 'SELECT ' . implode(', ', $fields);
         } else {
-            $sql = 'SELECT object_type, object_id' . (in_array('tracker_id', $indexFields) ? ', tracker_id' : '');
+            $sql = 'SELECT *';
         }
         foreach ($selectExpressions as $key => $expr) {
             $sql .= ", $expr as $key";
         }
         $sql .= " FROM $table WHERE $condition";
         if ($order) {
-            $sql .= " ORDER BY $order";
+            $sql .= " ORDER BY $order, id asc";
+        } else {
+            $sql .= " ORDER BY weight() desc, id asc";
         }
-        $sql .= " LIMIT $resultStart, $resultCount option not_terms_only_allowed=1,cutoff=0";
+        $sql .= " LIMIT $resultStart, $resultCount option not_terms_only_allowed=1,cutoff=0,expand_keywords=1";
         if ($resultStart + $resultCount > 1000) {
             $sql .= ',max_matches=' . ($resultStart + $resultCount);
         }
@@ -423,23 +462,8 @@ class PdoClient
         }
         $stmt = null;
         try {
-            $subselects = [];
-            $original_order = [];
-            $i = 0;
             $stmt = $this->query($sql);
-            if ($selectFields) {
-                $result['rows'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            } else {
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    if ($row['object_type'] == 'trackeritem') {
-                        $type = 'trackeritem' . $row['tracker_id'];
-                    } else {
-                        $type = $row['object_type'];
-                    }
-                    $subselects[$type][] = $row['object_id'];
-                    $original_order[$row['object_type'] . $row['object_id']] = $i++;
-                }
-            }
+            $result['rows'] = $stmt->fetchAll(PDO::FETCH_ASSOC);
             while ($stmt->nextRowset()) {
                 $result['facets'][] = $stmt->fetchAll();
             }
@@ -459,29 +483,35 @@ class PdoClient
                     $result['total'] = intval($row['Value']);
                 }
             }
-            if (! $selectFields) {
-                $available_fields = \TikiLib::lib('unifiedsearch')->getAvailableFields();
-                foreach ($subselects as $type => $object_ids) {
-                    $fields = $available_fields['object_types'][$type] ?? [];
-                    $fields = array_map(function ($f) {
-                        return strtolower($f);
-                    }, $fields);
-                    if (str_starts_with($type, 'trackeritem')) {
-                        $type = 'trackeritem';
+            foreach ($result['rows'] as &$row) {
+                if (isset($row['tracker_fields_json']) && ! empty($row['tracker_fields_json'])) {
+                    $jsonFields = json_decode($row['tracker_fields_json'], true);
+                    if (is_array($jsonFields)) {
+                        foreach ($jsonFields as $jsonFieldName => $jsonValue) {
+                            $row['tracker_field_' . $jsonFieldName] = $jsonValue;
+                        }
                     }
-                    $sql = "SELECT " . ($fields ? implode(',', $fields) : '*') . " FROM $table WHERE object_type = '$type' AND object_id IN (" . implode(',', array_fill(0, count($object_ids), '?')) . ")";
-                    //Without a LIMIT clause, Manticore Search only returns the top 20 matched documents in the result set by default.
-                    $sql .= " LIMIT 0, $resultCount ";
-                    $stmt = $this->prepareAndExecute($sql, $object_ids);
-                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        $result['rows'][$original_order[$row['object_type'] . $row['object_id']]] = $row;
+                    unset($row['tracker_fields_json']);
+                } elseif ($selectFields) {
+                    foreach ($row as $rowField => $rowValue) {
+                        foreach ($selectFields as $selectField) {
+                            if ($rowField == $selectField) {
+                                break;
+                            }
+                            if ($rowField != $selectField && $rowField == strtolower($selectField)) {
+                                unset($row[$rowField]);
+                                $row[$selectField] = $rowValue;
+                                break;
+                            }
+                        }
                     }
                 }
-                ksort($result['rows']);
             }
+            unset($row);
+
             return $result;
         } catch (PDOException $e) {
-            if ($retry && strstr($e->getMessage(), 'unknown local table')) {
+            if ($retry && str_contains($e->getMessage(), 'unknown local table')) {
                 if ($stmt) {
                     $stmt->closeCursor();
                 }
@@ -525,7 +555,7 @@ class PdoClient
         fwrite($this->log, $query . ";\n");
     }
 
-    protected function connect()
+    protected function connect($retry = false)
     {
         $dsn = rtrim($this->dsn, '/');
         $parsed = parse_url($dsn);
@@ -539,11 +569,17 @@ class PdoClient
         $dsn = "mysql:host=" . $parsed['host'] . ";port=" . $this->port;
 
         try {
-            $this->pdo = new PDO($dsn);
+            $this->pdo = new PDO($dsn, null, null, [PDO::ATTR_PERSISTENT => true]);
             $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            throw new Exception(tr("Error connecting to Manticore service: %0", $e->getMessage()));
+            if (str_contains($e->getMessage(), "Connection refused") && $retry) {
+                // deals with Manticore restarts during rebuilds - e.g. due to memory limits
+                sleep(self::CONNECT_SLEEP_RETRY_SECONDS);
+                $this->connect();
+            } else {
+                throw new Exception(tr("Error connecting to Manticore service: %0", $e->getMessage()));
+            }
         }
     }
 
@@ -552,8 +588,8 @@ class PdoClient
         try {
             $stmt->execute($params);
         } catch (PDOException $e) {
-            if (strstr($e->getMessage(), "server has gone away")) {
-                $this->connect();
+            if (str_contains($e->getMessage(), "server has gone away")) {
+                $this->connect(true);
                 if ($tries < self::QUERY_RETRIES) {
                     $this->executeWithRetry($stmt, $params, $tries + 1);
                 }
@@ -563,10 +599,18 @@ class PdoClient
         }
     }
 
-    protected function query($sql)
+    protected function query($sql, $tries = 0)
     {
         $this->debug($sql);
-        return $this->pdo->query($sql);
+        try {
+            return $this->pdo->query($sql);
+        } catch (PDOException $e) {
+            if (strstr($e->getMessage(), "server has gone away") && $tries < self::QUERY_RETRIES) {
+                $this->connect(true);
+                return $this->query($sql, $tries + 1);
+            }
+            throw $e;
+        }
     }
 
     protected function prepareAndExecute($sql, $params = [])

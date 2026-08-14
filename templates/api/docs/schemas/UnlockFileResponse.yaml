@@ -1,0 +1,14 @@
+---
+description: Response from unlocking a file in a gallery.
+type: object
+required:
+  - title
+  - count
+  - unlocked
+properties:
+  title:
+    type: string
+  count:
+    type: integer
+  unlocked:
+    type: array

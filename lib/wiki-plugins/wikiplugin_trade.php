@@ -6,8 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_trade_info()
 {
-    global $prefs;
-
     return [
         'name' => tra('Trade'),
         'documentation' => 'PluginTrade',
@@ -108,9 +106,6 @@ function wikiplugin_trade($data, $params, $offset)
     global $cclitelib;
     require_once 'lib/payment/cclitelib.php';
     static $iPluginTrade = 0;
-
-    $default = [ 'inputtitle' => '', 'wanted' => 'n', 'action' => tra('Continue'), 'registry' => '', 'currency' => '' ];
-    $params = array_merge($default, $params);
 
     if (empty($params['registry'])) {
         $params['registry'] = $cclitelib->get_registry();

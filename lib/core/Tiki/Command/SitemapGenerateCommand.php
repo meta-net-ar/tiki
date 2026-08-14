@@ -25,7 +25,7 @@ class SitemapGenerateCommand extends Command
             ->addArgument(
                 'url',
                 InputArgument::REQUIRED,
-                'URL of the website. Example http://www.example.com'
+                tra('URL of the website. Example') . ' http://www.example.com'
             );
     }
 

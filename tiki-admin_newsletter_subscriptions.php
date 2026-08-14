@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'            => [
@@ -19,38 +22,40 @@ $inputConfiguration = [
              'included'               => 'int',            //post
              'action'                 => 'alnumdash',          //post
              'valid'                  => 'int',            //post
-             'addgroup'               => 'bool',           //post
-             'addincluded'            => 'bool',           //post
-             'addemail'               => 'bool',           //post
-             'addall'                 => 'bool',           //post
-             'confirmEmail'           => 'bool',           //post
-             'add'                    => 'bool',           //post
-             'addbatch'               => 'bool',           //post
+             'addgroup'               => 'alpha',          //post
+             'addincluded'            => 'alpha',          //post
+             'addemail'               => 'alpha',          //post
+             'addall'                 => 'alpha',          //post
+             'confirmEmail'           => 'alpha',          //post
+             'add'                    => 'alpha',          //post
+             'addbatch'               => 'alpha',          //post
              'wikiPageName'           => 'pagename',       //post
-             'importPage'             => 'bool',           //post
+             'importPage'             => 'alpha',          //post
              'tracker'                => 'string',         //post
-             'addTracker'             => 'bool',           //post
-             'include_groups'         => 'bool',           //post
+             'addTracker'             => 'alpha',          //post
+             'include_groups'         => 'alpha',          //post
              'page'                   => 'pagename',       //post
-             'sort_mode'              => 'string',         //get
-             'sort_mode_g'            => 'string',         //get
-             'offset'                 => 'string',         //get
-             'offset_g'               => 'string',         //get
+             'sort_mode'              => 'alnumdash',      //get
+             'sort_mode_g'            => 'alnumdash',      //get
+             'offset'                 => 'int',            //get
+             'offset_g'               => 'int',            //get
              'find'                   => 'string',         //get
              'find_g'                 => 'string',         //get
-             'noConfirmEmail'         => 'bool',           //post
-             'noSubscribeEmail'       => 'bool',           //post
-             'addPage'                => 'bool',           //post
-             'export'                => 'bool',            //post
+             'noConfirmEmail'         => 'alpha',          //post
+             'noSubscribeEmail'       => 'alpha',          //post
+             'addPage'                => 'alpha',          //post
+             'export'                 => 'alpha',          //post
         ],
         'staticKeyFiltersForArrays' => [
-            'checked'                => 'string',            //post
+             'checked'               => 'text',            //post
         ],
     ],
 ];
-$section = 'newsletters';
 require_once('tiki-setup.php');
 include_once('lib/newsletters/nllib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_NEWSLETTERS;
+Sections::setCurrentSection($section);
 $auto_query_args = [
     'sort_mode',
     'offset',
@@ -64,7 +69,7 @@ $auto_query_args = [
 $access->check_feature('feature_newsletters');
 
 $nlId = 0;
-$offset = 0;
+
 
 if (! isset($_REQUEST["nlId"])) {
     Feedback::errorAndDie(tr('No newsletter indicated'), \Laminas\Http\Response::STATUS_CODE_409);
@@ -156,7 +161,7 @@ if (isset($_REQUEST["addemail"]) && $_REQUEST["addemail"] == "y") {
         $errorCount = 0;
 if (isset($_REQUEST["add"]) && $access->checkCsrf()) {
     if (isset($_REQUEST["email"]) && $_REQUEST["email"] != "") {
-        if (strpos($_REQUEST["email"], ',')) {
+        if (str_contains($_REQUEST["email"], ',')) {
                     $emails = explode(',', $_REQUEST["email"]);
             foreach ($emails as $e) {
                 if ($userlib->user_exists(trim($e))) {
@@ -332,22 +337,18 @@ if (isset($_REQUEST['export'])) {
             die;
 }
 
-if (! isset($_REQUEST["sort_mode"])) {
-            $sort_mode = 'subscribed_desc';
-} else {
-            $sort_mode = $_REQUEST["sort_mode"];
-}
-
-if (isset($_REQUEST["offset"])) {
-            $offset = $_REQUEST["offset"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'subscribed_desc',
+    ['tiki_newsletter_subscriptions']
+);
+$offset = $_REQUEST["offset"] ?? 0;
 
         $find = $_REQUEST["find"] ?? '';
 
         $smarty->assign('find', $find);
         $smarty->assign_by_ref('sort_mode', $sort_mode);
         $channels = $nllib->list_newsletter_subscriptions($nlId, $offset, $maxRecords, $sort_mode, $find);
-        $smarty->assign_by_ref('cant_pages', $channels["cant"]);
+        $smarty->assign_by_ref('count_pages', $channels["count"]);
         $smarty->assign_by_ref('channels', $channels["data"]);
         $sort_mode_g = (isset($_REQUEST["sort_mode_g"])) ? $_REQUEST["sort_mode_g"] : 'groupName_asc';
         $smarty->assign_by_ref('sort_mode_g', $sort_mode_g);
@@ -356,11 +357,11 @@ if (isset($_REQUEST["offset"])) {
         $find_g = (isset($_REQUEST["find_g"])) ? $_REQUEST["find_g"] : '';
         $smarty->assign('find_g', $find_g);
         $groups_g = $nllib->list_newsletter_groups($nlId, $offset_g, $maxRecords, $sort_mode_g, $find_g);
-        $cant_pages_g = ceil($groups_g["cant"] / $maxRecords);
-        $smarty->assign_by_ref('cant_pages_g', $cant_pages_g);
+        $count_pages_g = ceil($groups_g["count"] / $maxRecords);
+        $smarty->assign_by_ref('count_pages_g', $count_pages_g);
         $smarty->assign('actual_page_g', 1 + ($offset_g / $maxRecords));
 
-if ($groups_g["cant"] > ($offset_g + $maxRecords)) {
+if ($groups_g["count"] > ($offset_g + $maxRecords)) {
             $smarty->assign('next_offset_g', $offset_g + $maxRecords);
 } else {
             $smarty->assign('next_offset_g', -1);
@@ -373,13 +374,13 @@ if ($offset_g > 0) {
 }
 
         $smarty->assign_by_ref('groups_g', $groups_g["data"]);
-        $smarty->assign("nb_groups", $groups_g["cant"]);
+        $smarty->assign("nb_groups", $groups_g["count"]);
         $included_n = $nllib->list_newsletter_included($nlId, 0, -1);
         $smarty->assign('included_n', $included_n);
         $smarty->assign('nb_included', count($included_n));
         $pages = $nllib->list_newsletter_pages($nlId, 0, -1);
         $smarty->assign('pages', $pages['data']);
-        $smarty->assign('nb_pages', $pages['cant']);
+        $smarty->assign('nb_pages', $pages['count']);
 
         $groups = $userlib->list_all_groups();
         $smarty->assign_by_ref('groups', $groups);

@@ -13,15 +13,15 @@
     {title help="Articles" admpage="articles"}{tr}Submit article{/tr}{/title}
 {/if}
 
-<div class="t_navbar">
+<div class="t_navbar mb-3">
     {button href="tiki-list_submissions.php" _icon_name="list" _class="btn-info" _text="{tr}List submissions{/tr}"}
 </div>
 
 {remarksbox type="tip" title="{tr}Tip{/tr}"}
-    {tr}Use {$wikiPageSeparator} to separate pages in a multi-page post{/tr}
+    {tr _0=$wikiPageSeparator}Use %0 to separate pages in a multi-page post{/tr}
 {/remarksbox}
 
-<form enctype="multipart/form-data" method="post" action=" " id="editpageform">
+<form class="styling-element" enctype="multipart/form-data" method="post" action=" " id="editpageform" novalidate>
     {ticket}
     <input type="hidden" name="subId" value="{$subId|escape}">
     <input type="hidden" name="previewId" value="{$previewId|escape}">
@@ -112,41 +112,28 @@
         <label class="col-sm-3 col-form-label">{tr}Author rating{/tr}</label>
         <div class="col-sm-7">
             <select name='rating' class="form-control">
-                <option value="10" {if $rating eq 10}selected="selected"{/if}>10</option>
-                <option value="9.5" {if $rating eq "9.5"}selected="selected"{/if}>9.5</option>
-                <option value="9" {if $rating eq 9}selected="selected"{/if}>9</option>
-                <option value="8.5" {if $rating eq "8.5"}selected="selected"{/if}>8.5</option>
-                <option value="8" {if $rating eq 8}selected="selected"{/if}>8</option>
-                <option value="7.5" {if $rating eq "7.5"}selected="selected"{/if}>7.5</option>
-                <option value="7" {if $rating eq 7}selected="selected"{/if}>7</option>
-                <option value="6.5" {if $rating eq "6.5"}selected="selected"{/if}>6.5</option>
-                <option value="6" {if $rating eq 6}selected="selected"{/if}>6</option>
-                <option value="5.5" {if $rating eq "5.5"}selected="selected"{/if}>5.5</option>
-                <option value="5" {if $rating eq 5}selected="selected"{/if}>5</option>
-                <option value="4.5" {if $rating eq "4.5"}selected="selected"{/if}>4.5</option>
-                <option value="4" {if $rating eq 4}selected="selected"{/if}>4</option>
-                <option value="3.5" {if $rating eq "3.5"}selected="selected"{/if}>3.5</option>
-                <option value="3" {if $rating eq 3}selected="selected"{/if}>3</option>
-                <option value="2.5" {if $rating eq "2.5"}selected="selected"{/if}>2.5</option>
-                <option value="2" {if $rating eq 2}selected="selected"{/if}>2</option>
-                <option value="1.5" {if $rating eq "1.5"}selected="selected"{/if}>1.5</option>
-                <option value="1" {if $rating eq 1}selected="selected"{/if}>1</option>
-                <option value="0.5" {if $rating eq "0.5"}selected="selected"{/if}>0.5</option>
-                <option value="0" {if $rating eq "0"}selected="selected"{/if}>0</option>
+                {$ratings=[10, 9.5, 9, 8.5, 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5, 0]}
+                {foreach from=$ratings item=val}
+                    <option value="{$val}" {if $rating == $val}selected="selected"{/if}>{$val}</option>
+                {/foreach}
             </select>
+
         </div>
     </div>
     <div class="mb-3 row" id='show_image_1' {if $types.$type.show_image eq 'y'}style="display:;"{else}style="display:none;"{/if}>
         <label class="col-sm-3 col-form-label">{tr}Own Image{/tr}</label>
         <div class="col-sm-7">
             <input type="hidden" name="MAX_FILE_SIZE" value="1000000">
-            <input name="userfile1" type="file" onchange="document.getElementById('useImage').checked = true; document.getElementById('image_alt').setAttribute('required', 'required');">
+            <input class="form-control" name="userfile1" id="userfile1" type="file" onchange="document.getElementById('useImage').checked = true;">
         </div>
     </div>
-    <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" for="image_alt">{tr}Image alternative text{/tr}</label>
-        <div class="col-sm-7">
+    <div class="mb-3">
+        <label class="col-md-4 col-form-label" for="image_alt">{tr}Image alternative text{/tr}</label>
+        <div class="col-md-8">
             <input type="text" class="form-control" name="image_alt" id="image_alt" value="{$image_alt|escape}" {if $hasImage eq 'y'} required{/if}>
+            <div class="invalid-feedback">
+                {tr}Please enter an alternative text when using your own image.{/tr}
+            </div>
         </div>
     </div>
     {if $hasImage eq 'y'}
@@ -182,21 +169,21 @@
             <input type="checkbox" name="isfloat" {if $isfloat eq 'y'}checked='checked'{/if}>
         </div>
     </div>
-    <div class="mb-3 row" d='show_image_4' {if $types.$type.show_image eq 'y'}style="display:;"{else}style="display:none;"{/if}>
+    <div class="mb-3 row" id='show_image_4' {if $types.$type.show_image eq 'y'}style="display:;"{else}style="display:none;"{/if}>
         <label class="col-sm-3 col-form-label">{tr}Own image size x{/tr} *</label>
         <div class="col-sm-7">
-            <input type="text" name="image_x" value="{$image_x|escape}" class="form-control">
-            <div class="form-text">
-                {tr}pixels{/tr}
+            <div class="input-group">
+                <input type="number" name="image_x" value="{$image_x|escape}" class="form-control">
+                <span class="input-group-text">{tr}pixels{/tr}</span>
             </div>
         </div>
     </div>
     <div class="mb-3 row" id='show_image_5' {if $types.$type.show_image eq 'y'}style="display:;"{else}style="display:none;"{/if}>
         <label class="col-sm-3 col-form-label">{tr}Own image size y{/tr} *</label>
         <div class="col-sm-7">
-            <input type="text" name="image_y" value="{$image_y|escape}" class="form-control">
-            <div class="form-text">
-                {tr}pixels{/tr}
+            <div class="input-group">
+                <input type="number" name="image_y" value="{$image_y|escape}" class="form-control">
+                <span class="input-group-text">{tr}pixels{/tr}</span>
             </div>
         </div>
     </div>
@@ -221,7 +208,6 @@
     {/if}
 
     {include file='categorize.tpl'}
-
     <div class="mb-3 row">
         <label class="col-sm-3 col-form-label">{tr}Heading{/tr}</label>
         <div class="col-sm-7">
@@ -274,20 +260,20 @@
                 <br>
                 {if !empty($userEmail) and $userEmail ne $prefs.sender_email}
                     {tr}From:{/tr} {$userEmail|escape}
-                    <input type="radio" name="from" value="{$userEmail|escape}"{if empty($from) or $from eq $userEmail} checked="checked"{/if}>
+                    <input type="radio" class="form-check-input" name="from" value="{$userEmail|escape}"{if empty($from) or $from eq $userEmail} checked="checked"{/if}>
                     {$prefs.sender_email|escape}
-                    <input type="radio" name="from" value="{$prefs.sender_email|escape}"{if $from eq $prefs.sender_email} checked="checked"{/if}>
+                    <input type="radio" class="form-check-input" name="from" value="{$prefs.sender_email|escape}"{if $from eq $prefs.sender_email} checked="checked"{/if}>
                 {/if}
             </div>
         </div>
     {/if}
 
-    {include file='freetag.tpl'}
+    {include file='freetag.tpl' labelColClass="col-md-3" inputColClass="col-md-7"}
 
     {if isset($all_attributes)}
         {foreach from=$all_attributes item=att key=attname}
-        {assign var='attid' value=$att.itemId|replace:'.':'_'}
-        {assign var='attfullname' value=$att.itemId}
+        {$attid=$att.itemId|replace:'.':'_'}
+        {$attfullname=$att.itemId}
         <div class="mb-3 row" id={$attid} {if $types.$type.$attid eq 'y'}style="display:;"{else}style="display:none;"{/if}>
             <label class="col-sm-3 col-form-label">{$attname|escape}</label>
             <div class="col-sm-7">
@@ -298,33 +284,32 @@
     {/if}
 
 
-    <div align="center">
-        {if $prefs.feature_antibot eq 'y'}<br><div align="center">{include file='antibot.tpl' antibot_table='y'}</div><br>{/if}
+    <div>
+        {if $prefs.feature_antibot eq 'y'}<br><div>{include file='antibot.tpl' antibot_table='y'}</div><br>{/if}
         <input type="submit" class="wikiaction btn btn-primary" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false;">
         <input type="submit" class="wikiaction btn btn-primary" name="submitarticle" value="{tr}Submit Article{/tr}" onclick="needToConfirm=false;">
         {if $tiki_p_autoapprove_submission eq 'y'}
             <input type="submit" class="wikiaction btn btn-primary" name="save" value="{tr}Auto-Approve Article{/tr}" onclick="needToConfirm=false;">
         {/if}
     </div>
-{if $smarty.session.wysiwyg neq 'y'}
-    {jq}
-$("#editpageform").on("submit", function(evt) {
-    var isHtml = false;
-    if (this.saving && !$("input[name=allowhtml]:checked").length) {
-        $("textarea", this).each(function(){
-            if ($(this).val().match(/<([A-Z][A-Z0-9]*)\b[^>]*>(.*?)<\/\1>/i)) {
-                isHtml = true;
-            }
-        });
-        if (isHtml) {
-            this.saving = false;
-            return confirm(tr('You appear to be using HTML in your article but have not selected "Allow full HTML".\nThis will result in HTML tags being removed.\nDo you want to save your edits anyway?'));
-        }
-    }
-    return true;
-}).attr('saving', false);
-    {/jq}
-{/if}
+    {if $smarty.session.wysiwyg neq 'y'}
+        {jq}
+            $("#editpageform").on("submit", function(evt) {
+                var isHtml = false;
+                if (this.saving && !$("input[name=allowhtml]:checked").length) {
+                    $("textarea", this).each(function(){
+                        if ($(this).val().match(/<([A-Z][A-Z0-9]*)\b[^>]*>(.*?)<\/\1>/i)) {
+                            isHtml = true;
+                        }
+                    });
+                    if (isHtml) {
+                        this.saving = false;
+                        return confirm(tr('You appear to be using HTML in your article but have not selected "Allow full HTML".\nThis will result in HTML tags being removed.\nDo you want to save your edits anyway?'));
+                    }
+                }
+                return true;
+            }).attr('saving', false);
+        {/jq}
+    {/if}
 </form>
-
 <br>

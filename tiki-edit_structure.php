@@ -18,16 +18,16 @@ $inputConfiguration = [
             'begin'                       => 'bool',           //post
             'rremove'                     => 'int',            //get
             'page'                        => 'pagename',       //post
-            'page_ref_id'                 => 'digits',         //post
+            'page_ref_id'                 => 'int',         //post
             'sremove'                     => 'int',            //get
-            'watch_action'                => 'string',         //post
-            'watch_object'                => 'digits',         //post
+            'watch_action'                => 'alpha',         //post
+            'watch_object'                => 'int',         //post
             'create'                      => 'bool',           //post
-            'pageAlias'                   => 'string',         //post
+            'pageAlias'                   => 'text',         //post
             'after_ref_id'                => 'int',            //post
-            'name'                        => 'string',         //post
-            'move_node'                   => 'string',         //post
-            'find_objects'                => 'string',         //post
+            'name'                        => 'pagename',         //post
+            'move_node'                   => 'int',         //post
+            'find_objects'                => 'striptags',         //post
             'recategorize'                => 'bool',           //post
             'cat_categorize'              => 'bool',           //post
             'cat_override'                => 'bool',           //post
@@ -35,8 +35,8 @@ $inputConfiguration = [
             'offset'                      => 'int',            //get
         ],
         'staticKeyFiltersForArrays' => [
-            'name2'                 => 'string',        //post
-            'cat_categories'        => 'string',        //post
+            'name2'                 => 'pagename',        //post
+            'cat_categories'        => 'int',        //post
         ],
     ],
 ];
@@ -100,6 +100,12 @@ $alert_to_remove_extra_cats = [];
 
 // needed here for filtering later in the search results
 $subtree = $structlib->get_subtree($structure_info["page_ref_id"]);
+$structure_page_names = [];
+foreach ($subtree as $sub) {
+    if (! empty($sub['pageName']) && ! ($sub['last'] == true && $sub['first'] == false)) {
+        $structure_page_names[$sub['pageName']] = true;
+    }
+}
 
 // start security hardened section
 if ($editable === 'y') {
@@ -198,11 +204,7 @@ if ($editable === 'y') {
             $structlib->demote_node($_REQUEST["page_ref_id"]);
         }
     }
-    if (isset($_REQUEST["find_objects"])) {
-        $find_objects = $_REQUEST["find_objects"];
-    } else {
-        $find_objects = '';
-    }
+    $find_objects = $_REQUEST["find_objects"] ?? '';
     $smarty->assign('find_objects', $find_objects);
 
     $filter = [];
@@ -213,17 +215,16 @@ if ($editable === 'y') {
         $smarty->assign('find_categId', '');
     }
 
-    if (! isset($_REQUEST["offset"])) {
-        $offset = 0;
-    } else {
-        $offset = $_REQUEST["offset"];
-    }
+    $offset = $_REQUEST["offset"] ?? 0;
     $smarty->assign_by_ref('offset', $offset);
+
+    $maxRecords = $prefs['maxRecords'];
+    $smarty->assign('maxRecords', $maxRecords);
 
     // Get all wiki pages for the dropdown menu
     $listpages = $tikilib->list_pages(
         $offset,
-        $prefs['maxRecords'],
+        $maxRecords,
         'pageName_asc',
         $find_objects,
         '',
@@ -234,19 +235,19 @@ if ($editable === 'y') {
         $filter
     );
 
-    if ($prefs['page_n_times_in_a_structure'] === 'n') {
-        // pages can appear only once in a structure so filter them out
-        $listpages['data'] = array_filter($listpages['data'], function ($item) use ($subtree) {
-            foreach ($subtree as $sub) {
-                if ($item['pageName'] === $sub['pageName']) {
-                    return false;
-                }
-            }
-            return true;
-        });
-    }
+    // Filter out pages already in the structure
+    $filtered_data = array_filter($listpages['data'], function ($item) use ($structure_page_names) {
+        return ! isset($structure_page_names[$item['pageName']]);
+    });
+    $listpages['data'] = array_values($filtered_data);
 
     $smarty->assign_by_ref('listpages', $listpages);
+} else {
+    $offset = $_REQUEST["offset"] ?? 0;
+    $smarty->assign_by_ref('offset', $offset);
+    $maxRecords = $prefs['maxRecords'];
+    $smarty->assign('maxRecords', $maxRecords);
+    $smarty->assign('listpages', ['data' => [], 'count' => 0]);
 } // end of security hardening
 
 $page_info = $structlib->s_get_page_info($_REQUEST["page_ref_id"]);
@@ -329,7 +330,7 @@ if (isset($_REQUEST["recategorize"]) && $prefs['feature_wiki_categorize_structur
                 }
             } else {
                 // page that is added is categorized
-                if (! isset($_REQUEST["cat_categories"]) || ! isset($_REQUEST["cat_categorize"]) || isset($_REQUEST["cat_categorize"]) && $_REQUEST["cat_categorize"] != 'on') {
+                if (! isset($_REQUEST["cat_categories"]) || ! isset($_REQUEST["cat_categorize"]) || $_REQUEST["cat_categorize"] != 'on') {
                     if ($_REQUEST["cat_override"] == "on") {
                         $categlib->uncategorize_object($cat_type, $cat_objid);
                     } else {
@@ -386,13 +387,17 @@ if ($prefs['feature_wiki_categorize_structure'] == 'y' && $all_editable == 'y') 
 include_once('tiki-section_options.php');
 
 $headerlib->add_js_module('import "@jquery-tiki/tiki-edit_structure";');
+$headerlib->add_js_config(
+    'jqueryTiki.structurePageNames = ' . json_encode(array_keys($structure_page_names)),
+    100
+);
 $structlib = TikiLib::lib('struct');
 
 $structure_id = $structure_info['structure_id'];
 if (! $structure_id) {
     $structure_id = $structure_info['page_ref_id'];
 }
-$smarty->assign('nodelist', $structlib->get_toc($structure_id, 'asc', false, false, '', 'admin', $page_info['page_ref_id'], 0, 0, 'struct', ''));
+$smarty->assign('nodelist', $structlib->get_toc((int) $_REQUEST['page_ref_id'], 'asc', false, false, '', 'admin', $page_info['page_ref_id'], 0, 0, 'struct', ''));
             // $page_ref_id,$order='asc',$showdesc=false,$numbering=true,$numberPrefix='',$type='plain',$page='',$maxdepth=0,$mindepth=0, $structurePageName=''
 $smarty->assign('structure_id', $structure_id);
 // disallow robots to index page:

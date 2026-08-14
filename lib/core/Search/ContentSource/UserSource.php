@@ -77,7 +77,7 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
         if (isset($detail['preferences']['user_style'])) {
             $user_style = $detail['preferences']['user_style'];
         } else {
-            $user_style = isset($prefs['site_style']) ? $prefs['site_style'] : "" ;
+            $user_style = $prefs['site_style'] ?? "";
         }
 
         $user_language = $this->tiki->get_language($objectId);
@@ -128,8 +128,6 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
     {
         if ($this->visibility == 'all') {
             return true;
-        } elseif (isset($detail['preferences']['user_information'])) {
-            return $detail['preferences']['user_information'] == 'public';
         } else {
             return false;
         }
@@ -279,7 +277,7 @@ class Search_ContentSource_UserSource implements Search_ContentSource_Interface
                 'tracker_item_status' => $typeFactory->identifier($item['status'] ?? false),
             ]);
 
-            foreach (Search_ContentSource_TrackerItemSource::getIndexableHandlers($definition, $item) as $baseKey => $handler) {
+            foreach (Search_ContentSource_TrackerItemSource::getIndexableHandlers($definition, $item) as $handler) {
                 $data = array_merge($data, $handler->getDocumentPart($typeFactory));
             }
         }

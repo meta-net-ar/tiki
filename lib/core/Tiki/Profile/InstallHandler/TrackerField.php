@@ -47,6 +47,7 @@ class Tiki_Profile_InstallHandler_TrackerField extends Tiki_Profile_InstallHandl
             'rules' => '',
             'encryptionKeyId' => null,
             'excludeFromNotification' => false,
+            'excludeFromTrackerItemLastModificationDate' => 'n',
             'visibleInViewMode' => 'y',
             'visibleInEditMode' => 'y',
             'visibleInHistoryMode' => 'y',
@@ -142,6 +143,7 @@ class Tiki_Profile_InstallHandler_TrackerField extends Tiki_Profile_InstallHandl
             'rules' => 'rules',
             'encryptionKeyId' => 'encryptionKeyId',
             'excludeFromNotification' => 'excludeFromNotification',
+            'excludeFromTrackerItemLastModificationDate' => 'excludeFromTrackerItemLastModificationDate',
             'visibleInViewMode' => 'visibleInViewMode',
             'visibleInEditMode' => 'visibleInEditMode',
             'visibleInHistoryMode' => 'visibleInHistoryMode',
@@ -230,7 +232,8 @@ class Tiki_Profile_InstallHandler_TrackerField extends Tiki_Profile_InstallHandl
             $data['excludeFromNotification'],
             $data['visibleInViewMode'],
             $data['visibleInEditMode'],
-            $data['visibleInHistoryMode']
+            $data['visibleInHistoryMode'],
+            $data['excludeFromTrackerItemLastModificationDate']
         );
     }
 

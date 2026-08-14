@@ -14,10 +14,10 @@ $inputConfiguration = [
             'contentId'                   => 'int',            //post
             'remove'                      => 'int',            //post
             'save'                        => 'bool',           //post
-            'content_type'                => 'string',         //post
-            'page_name'                   => 'pagemame',       //post
+            'content_type'                => 'word',         //post
+            'page_name'                   => 'pagename',       //post
             'data'                        => 'none',           //post
-            'Time_Meridian'               => 'int',            //post
+            'Time_Meridian'               => 'alpha',            //post
             'Time_Hour'                   => 'int',            //post
             'Time_Minute'                 => 'int',            //post
             'Date_Month'                  => 'int',            //post
@@ -25,9 +25,9 @@ $inputConfiguration = [
             'Date_Year'                   => 'int',            //post
             'pId'                         => 'int',            //post
             'edit'                        => 'int',            //post
-            'sort_mode'                   => 'alpha',          //get
+            'sort_mode'                   => 'alnumdash',          //get
             'offset'                      => 'int',            //get
-            'find'                        => 'alpha',          //post
+            'find'                        => 'striptags',          //post
         ],
     ],
 ];
@@ -115,25 +115,14 @@ if (! isset($_REQUEST["sort_mode"])) {
 
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
-
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
-
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 
 // Get a list of last changes to the Wiki database
 $listpages = $dcslib->list_programmed_content($_REQUEST["contentId"], $offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant', $listpages["cant"]);
+$smarty->assign_by_ref('count', $listpages["count"]);
 $smarty->assign_by_ref('listpages', $listpages["data"]);
 
 // disallow robots to index page:

@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Lib\TikiDate;
 use Tiki\SabreDav\CaldavClient;
 
 /**
@@ -248,7 +249,7 @@ RRULE:$rrule
 END:VAVAILABILITY
 END:VCALENDAR");
         $rec = Tiki\SabreDav\Utilities::mapRRuleToRecurrence($calendar->VAVAILABILITY);
-        $rec->setStartPeriod(\TikiDate::getStartDay($calendar->VAVAILABILITY->DTSTART->getDateTime()->getTimeStamp()));
+        $rec->setStartPeriod(TikiDate::getStartDay($calendar->VAVAILABILITY->DTSTART->getDateTime()->getTimeStamp()));
         return [
             'title' => 'Specify Recurrence Rule',
             'recurrence' => $rec->toArray(),

@@ -1,38 +1,38 @@
 <div id="tikimanager_container_{$id}">
     {if in_array('create', $available_actions)}
-    <a class="btn btn-light m-1" href="{bootstrap_modal controller=manager action=create}">{icon name=create} {tr}New Instance{/tr}</a>
+    <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=create}">{icon name=create} {tr}New Instance{/tr}</a>
     {/if}
     {if in_array('info', $available_actions)}
-    <a class="btn btn-light m-1" href="{bootstrap_modal controller=manager action=info}">{icon name=info} {tr}Info{/tr}</a>
+    <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=info}">{icon name=info} {tr}Info{/tr}</a>
     {/if}
     {if in_array('check', $available_actions)}
-    <a class="btn btn-light m-1" href="{bootstrap_modal controller=manager action=requirements}">{icon name=check} {tr}Check Requirements{/tr}</a>
+    <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=requirements}">{icon name=check} {tr}Check Requirements{/tr}</a>
     {/if}
     {if in_array('tiki_versions', $available_actions)}
-    <a class="btn btn-light m-1" href="{bootstrap_modal controller=manager action=tiki_versions}">{icon name=list} {tr}Tiki Versions{/tr}</a>
+    <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=tiki_versions}">{icon name=list} {tr}Tiki Versions{/tr}</a>
     {/if}
     {if in_array('test_send_email', $available_actions)}
-    <a class="btn btn-light m-1" href="{bootstrap_modal controller=manager action=test_send_email}">{icon name=envelope} {tr}Test Send Email{/tr}</a>
+    <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=test_send_email}">{icon name=envelope} {tr}Test Send Email{/tr}</a>
     {/if}
     {if in_array('setup_clone', $available_actions)}
-    <a class="btn btn-light m-1" href="{bootstrap_modal controller=manager action=setup_clone}">{icon name=copy} {tr}Setup instance to clone{/tr}</a>
+    <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=setup_clone}">{icon name=copy} {tr}Setup instance to clone{/tr}</a>
     {/if}
     {if in_array('setup_watch', $available_actions)}
-    <a class="btn btn-light m-1" href="{bootstrap_modal controller=manager action=setup_watch}">{icon name="clock-o"} {tr}Setup Watch{/tr}</a>
+    <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=setup_watch}">{icon name="clock-o"} {tr}Setup Watch{/tr}</a>
     {/if}
     {if in_array('manager_backup', $available_actions)}
-    <a class="btn btn-light m-1" href="{bootstrap_modal controller=manager action=manager_backup}">{icon name=download} {tr}Setup Backup{/tr}</a>
+    <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=manager_backup}">{icon name=download} {tr}Setup Backup{/tr}</a>
     {/if}
 
     {if in_array('clear_cache', $available_actions)}
-        <a class="btn btn-light m-1" href="{bootstrap_modal controller=manager action=clear_cache}" title="{tr}Clear Tiki Manager cache. This can be useful for testing and debugging during development, or if your server is short on disk space and you need a temporary relief.{/tr}">
+        <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=clear_cache}" title="{tr}Clear Tiki Manager cache. This can be useful for testing and debugging during development, or if your server is short on disk space and you need a temporary relief.{/tr}">
             {icon name=trash} {tr}Clear Cache{/tr}
         </a>
     {/if}
     {if in_array('manager_update', $available_actions)}
-    <a class="btn btn-light m-1" href="{bootstrap_modal controller=manager action=manager_update}">{icon name=import} {tr}Setup Update{/tr}</a>
+    <a class="btn btn-light m-1" role="button" href="{bootstrap_modal controller=manager action=manager_update}">{icon name=import} {tr}Setup Update{/tr}</a>
     {/if}
-    <h2>Instances</h2>
+    <h2>{tr}Instances{/tr}</h2>
     <div class="table-responsive">
         <table class="table">
             <tr>
@@ -55,7 +55,7 @@
                 <td>{$instance->revision}</td>
                 <td><a href="{$instance->weburl}" title="Visit website" target="_blank">{$instance->weburl}</a></td>
                 <td>{$instance->contact|escape}</td>
-                <td>{if $instance->app != null }{tr}False{/tr}{else}{tr}True{/tr}{/if}</td>
+                <td>{if $instance->app != null}{tr}False{/tr}{else}{tr}True{/tr}{/if}</td>
                 <td class="action">
                     {actions}{strip}
                         {if in_array('access', $available_actions)}

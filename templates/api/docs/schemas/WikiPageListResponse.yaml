@@ -1,0 +1,13 @@
+---
+description: Paginated list of wiki pages (GET /wiki).
+type: object
+required:
+  - data
+  - count
+properties:
+  data:
+    type: array
+    items:
+      $ref: schemas-WikiPageListEntry.yaml
+  count:
+    type: integer

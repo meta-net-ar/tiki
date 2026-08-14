@@ -36,9 +36,9 @@ $inputConfiguration = [
         'created'                  => 'bool',              //post
         'remove'                   => 'int',               //get
         'save'                     => 'bool',              //post
-        'sort_mode'                => 'word',              //get
+        'sort_mode'                => 'alnumdash',         //get
         'offset'                   => 'digits',            //get
-        'find'                     => 'word',              //post
+        'find'                     => 'text',              //get
         ],
     ],
 ];
@@ -180,22 +180,14 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $commlib->list_received_articles($offset, $maxRecords, $sort_mode, $find);
 $smarty->assign_by_ref('channels', $channels["data"]);
-$smarty->assign_by_ref('cant', $channels["cant"]);
+$smarty->assign_by_ref('count', $channels["count"]);
 $topics = $artlib->list_topics();
 $smarty->assign_by_ref('topics', $topics);
 $types = $artlib->list_types();

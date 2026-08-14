@@ -8,7 +8,7 @@ function wikiplugin_getaccesstoken_info()
 {
     return [
         'name' => tra('Get Security Token'),
-        'documentation' => tra('PluginGetAccessToken'),
+        'documentation' => 'PluginGetAccessToken',
         'description' => tra('Display a link on a secure page using an access token'),
         'prefs' => [ 'auth_token_access', 'wikiplugin_getaccesstoken' ],
         'inline' => true,
@@ -23,7 +23,6 @@ function wikiplugin_getaccesstoken_info()
                 'description' => tra('The path or part of the path that the token is for'),
                 'since' => '7.0',
                 'filter' => 'text',
-                'default' => ''
             ],
             'keys' => [
                 'required' => false,
@@ -31,7 +30,6 @@ function wikiplugin_getaccesstoken_info()
                 'description' => tra('Query string parameter keys that the token is for, separated by a colon (:)'),
                 'since' => '7.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ':'
             ],
             'values' => [
@@ -40,7 +38,6 @@ function wikiplugin_getaccesstoken_info()
                 'description' => tra('Query string parameter values that the token is for, separated by a colon (:)'),
                 'since' => '7.0',
                 'filter' => 'text',
-                'default' => '',
                 'separator' => ':'
             ],
         ],
@@ -50,17 +47,18 @@ function wikiplugin_getaccesstoken_info()
 function wikiplugin_getaccesstoken($data, $params)
 {
     global $tikilib;
-    if (! isset($params['entry'])) {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_getaccesstoken_info());
+    if (empty($params['entry'])) {
         return '';
     } else {
         $entry = $params['entry'];
     }
-    if (! isset($params['keys'])) {
+    if (is_null($params['keys'])) {
         $keys = [];
     } else {
         $keys = $params['keys'];
     }
-    if (! isset($params['keys'])) {
+    if (is_null($params['values'])) {
         $values = [];
     } else {
         $values = $params['values'];

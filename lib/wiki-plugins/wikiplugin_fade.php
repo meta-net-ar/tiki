@@ -97,13 +97,7 @@ function wikiplugin_fade_info()
 function wikiplugin_fade($body, $params)
 {
     static $id = 0;
-    //set defaults
-    $plugininfo = wikiplugin_fade_info();
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
-    //apply user parameter settings
-    $params = array_merge($default, $params);
+
     //validate speed parameters
     $params['show_speed'] = validate_speed($params['show_speed']);
     $params['hide_speed'] = validate_speed($params['hide_speed']);
@@ -156,7 +150,7 @@ function wikiplugin_fade($body, $params)
 
         $headerlib->add_jq_onready($jq);
 
-        return "<div id='" . $unique_outer . "' class='card" . ( isset($params['class']) ? ' ' . $params['class'] : '' ) . "'>"
+        return "<div id='" . $unique_outer . "' class='card " . ($params['class']) . "'>"
                 . "<div class='card-header'>"
                   . "<a data-bs-toggle='collapse' class='d-block' href='#" . $unique_inner . "'>" . htmlspecialchars($params['label']) . "<span class='icon icon-menu-extra fas fa-chevron-down fa-fw' style='float:right'></span>" . "</a>"
                 . "</div>"
@@ -182,7 +176,7 @@ function wikiplugin_fade($body, $params)
                 });';
         $headerlib->add_jq_onready($jq);
     //wrapping in an extra div makes animation smoother
-        return ( isset($params['class']) ? "<div class='" . $params['class'] . "'>" : "<div>" )
+        return (($params['class']) ? "<div class='" . $params['class'] . "'>" : "<div>" )
             . "\r\t" . '<span class="' . $span_class . '">' . "\r\t\t"
         . '<a id="' . $unique_link . '" class=' . $a_class_hidden . '>' . "\r\t\t\t" . htmlspecialchars($params['label']) . "\r\t\t"
         . '</a>' . "\r\t" . '</span>' . "\r\t" . '<div id="' . $unique . '" class="' . $div_class . '">' . "\r\t\t\t"

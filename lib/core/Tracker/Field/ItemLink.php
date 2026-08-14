@@ -72,6 +72,21 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                         ],
                         'legacy_index' => 14,
                     ],
+                    'lazyload' => [
+                        'name' => tr('Lazy Load'),
+                        'description' => tr('Load the list of items based on the user query.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                        'depends' => [
+                            'field' => 'displayFieldsListType',
+                            'value' => 'dropdown',
+                            'pref' => 'elementplus_select'
+                        ],
+                    ],
                     'displayFieldsList' => [
                         'name' => tr('Multiple Fields'),
                         'description' => tr('Display the values from multiple fields instead of a single one.'),
@@ -142,6 +157,19 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                         'depends' => [
                             'field' => 'displayFieldsListType',
                             'value' => 'transfer'
+                        ],
+                    ],
+                    'displayFieldsListSort' => [
+                        'name' => tr('Default Sort Order'),
+                        'description' => tr('Sort the items in the dropdown list.'),
+                        'filter' => 'alpha',
+                        'options' => [
+                            'itemId' => tr('Item ID'),
+                            'formatted' => tr('Formatted Value'),
+                        ],
+                        'depends' => [
+                            'field' => 'displayFieldsListType',
+                            'value' => 'dropdown'
                         ],
                     ],
                     'trackerListOptions' => [
@@ -256,6 +284,16 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                         ],
                         'legacy_index' => 12,
                     ],
+                    'forceObjectSelector' => [
+                        'name' => tr('Force object selector'),
+                        'description' => tr('Override the automatic widget selection. 1 forces the object selector (search panel with checkboxes for multi-select). 2 forces the dropdown. 0 lets the system decide (default behavior).'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('System default'),
+                            1 => tr('Yes'),
+                            2 => tr('No'),
+                        ],
+                    ],
                     'indexRemote' => [
                         'name' => tr('Index remote fields'),
                         'description' => tr('Index one or multiple fields from the master tracker along with the child, separated by |'),
@@ -283,14 +321,14 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                         'legacy_index' => 14,
                     ],
                     'duplicateCascade' => [
-                        'name' => tr('Duplicate cascade action'),
-                        'description' => tr('Duplicate (Duplicate tracker items feature) an item in the master/parent tracker (Tracker to link to) silently creates a slave/child item in this tracker (yes by default).'),
+                        'name' => tr('Cascade duplicate action'),
+                        'description' => tr('Duplicate (Duplicate tracker items feature) an item in the master/parent tracker (Tracker to link to) silently creates a slave/child item in this tracker (No by default).'),
                         'filter' => 'int',
                         'options' => [
                             0 => tr('No'),
                             1 => tr('Yes'),
                         ],
-                        'default' => '1',
+                        'default' => '0',
                         'depends' => [
                             'pref' => 'tracker_clone_item',
                         ],
@@ -316,8 +354,16 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             'value' => $value,
         ];
 
-        if ($this->canHaveMultipleValues() && ! is_array($data['value'])) {
-            $data['value'] = explode(',', $data['value']);
+        if ($this->canHaveMultipleValues()) {
+            if (isset($requestData[$string_id])) {
+                $parts = is_array($data['value']) ? array_values($data['value']) : preg_split('/[\s,]+/', $data['value'], -1, PREG_SPLIT_NO_EMPTY);
+                if (array_filter($parts, fn($v) => str_starts_with($v, 'trackeritem:'))) {
+                    $parts = array_values(array_filter(array_map(fn($v) => preg_replace('/^trackeritem:/', '', trim($v)), $parts)));
+                }
+                $data['value'] = $parts;
+            } elseif (! is_array($data['value'])) {
+                $data['value'] = explode(',', $data['value']);
+            }
         }
 
         return $data;
@@ -325,7 +371,10 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
     public function addValue($value)
     {
-        $existing = explode(',', $this->getValue());
+        $existing = $this->getValue();
+        if (! is_array($existing)) {
+            $existing = explode(',', $existing);
+        }
         if (! in_array($value, $existing)) {
             $existing[] = $value;
         }
@@ -334,7 +383,10 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
     public function removeValue($value)
     {
-        $existing = explode(',', $this->getValue());
+        $existing = $this->getValue();
+        if (! is_array($existing)) {
+            $existing = explode(',', $existing);
+        }
         $existing = array_filter($existing, function ($v) use ($value) {
             return $v != $value;
         });
@@ -349,6 +401,15 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             return false;
         }
 
+        $force = (int) $this->trackerField->getOption('forceObjectSelector');
+        if ($force === 1) {
+            return true;
+        }
+        if ($force === 2) {
+            return false;
+        }
+
+        // Default: preserve existing behaviour — multiselect stays on dropdown
         if ($this->canHaveMultipleValues()) {
             return false;
         }
@@ -393,20 +454,33 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             $sort = TikiLib::lib('trk')->get_default_sort_order($trackerId, true, true);
 
             $template = $this->renderTemplate('trackerinput/itemlink_selector.tpl', $context, [
-                'placeholder' => $placeholder,
-                'status' => $status,
-                'selector_value' => $value,
-                'selector_id' => 'item' . $this->getItemId() . $this->getInsertId(),
-                'format' => $format,
-                'createTrackerItems' => $trackerPerms->create_tracker_items,
-                'sort' => $sort,
+                'placeholder'          => $placeholder,
+                'status'               => $status,
+                'selector_value'       => $value,
+                'selector_id'          => 'item' . $this->getItemId() . $this->getInsertId(),
+                'format'               => $format,
+                'createTrackerItems'   => $trackerPerms->create_tracker_items,
+                'sort'                 => $sort,
+                'selectMultipleValues' => (bool) $this->trackerField->getOption('selectMultipleValues'),
             ]);
 
             return $template;
         }
 
+        if ($this->trackerField->getOption('lazyload')) {
+            $list = [];
+            foreach ($this->getValue() as $value) {
+                if ($value) {
+                    $list[$value] = $this->getItemLabel($value);
+                }
+            }
+        } else {
+            $list = $this->getPossibleItemValues();
+        }
+
         $data = [
-            'list' => $this->getPossibleItemValues(),
+            'list' => $list,
+            'listFields' => implode(',', $this->trackerField->getOption('displayFieldsList')),
             'displayFieldsListType' => $this->trackerField->getOption('displayFieldsListType'),
             'createTrackerItems' => $trackerPerms->create_tracker_items,
         ];
@@ -706,7 +780,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
 
         $indexRemote = array_filter($this->trackerField->getOption('indexRemote', []));
 
-        if (count($indexRemote) && is_numeric($value)) {
+        if (count($indexRemote) && is_numeric($value) && $value > 0) {
             $trklib = TikiLib::lib('trk');
             $trackerId = $this->trackerField->getOption('trackerId');
             $item = $trklib->get_tracker_item($value);
@@ -729,7 +803,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $handler = $factory->getHandler($field, $item);
 
                 foreach ($handler->getDocumentPart($typeFactory) as $key => $field) {
-                    if (strpos($key, 'tracker_field') === 0) {
+                    if (str_starts_with($key, 'tracker_field')) {
                         $key = $baseKey . substr($key, strlen('tracker_field'));
                         $out[$key] = $field;
                     }
@@ -919,6 +993,9 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                     $this->trackerField->getOption('displayFieldsListFormat')
                 );
                 $list = $this->handleDuplicates($list);
+                if ($this->getOption('displayFieldsListSort') == 'formatted') {
+                    natsort($list);
+                }
             }
         } else {
             $list = TikiLib::lib('trk')->get_all_items(
@@ -1120,6 +1197,18 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
         return ($this->trackerField->getOption('cascade') & $flag) > 0;
     }
 
+    public static function syncDuplicateCascadeDefaultForUpgrade(array $options): array
+    {
+        if (array_key_exists('duplicateCascade', $options)) {
+            return $options;
+        }
+
+        $cascadeAll = self::CASCADE_CATEG | self::CASCADE_STATUS | self::CASCADE_DELETE;
+        $options['duplicateCascade'] = isset($options['cascade']) && (int) $options['cascade'] === $cascadeAll ? 1 : 0;
+
+        return $options;
+    }
+
     public function watchCompare($old, $new)
     {
         if ($this->canHaveMultipleValues()) {
@@ -1275,7 +1364,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $getParseIntoTransformFunction = function ($separator) use ($permName, $invertField) {
                     return function (&$info, $value) use ($separator, $permName, $invertField) {
                         $itemIds = [];
-                        foreach (explode($separator, $value) as $val) {
+                        foreach (explode($separator, (string) $value) as $val) {
                             if ($id = $invertField->get($val)) {
                                 $itemIds[] = $id;
                             }
@@ -1364,13 +1453,13 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
             $remoteSchema = null;
             $definition = Tracker_Definition::get($this->trackerField->getOption('trackerId'));
             if ($definition) {
-                $tabular = null;
-                $tabularId = $definition->getConfiguration('tabularSync');
-                if ($tabularId) {
-                    $tabular = TikiLib::lib('tabular')->getInfo($tabularId);
-                }
-                if ($tabular) {
-                    $remoteSchema = TikiLib::lib('tabular')->getSchema($definition, $tabular);
+                try {
+                    $tabulars = $definition->getSynchronizedTabulars();
+                    if ($tabulars) {
+                        $remoteSchema = TikiLib::lib('tabular')->getSchema($definition, $tabulars[0]);
+                    }
+                } catch (Exception $e) {
+                    Feedback::error($e->getMessage());
                 }
             }
 
@@ -1399,7 +1488,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                                 }
                             }
                             $items = TikiLib::lib('trk')->list_items($remoteSchema->getDefinition()->getConfiguration('trackerId'), 0, 1, '', '', array_keys($remoteItem), '', '', '', array_values($remoteItem), '', null, true, true);
-                            if ($items['cant'] > 0) {
+                            if ($items['count'] > 0) {
                                 $info['fields'][$permName] = $items['data'][0]['itemId'];
                             } else {
                                 $remoteInfo = [
@@ -1447,6 +1536,7 @@ class Tracker_Field_ItemLink extends \Tracker\Field\AbstractItemField implements
                 $value = $control->getValue();
 
                 if ($value) {
+                    $value = str_replace('trackeritem:', '', $value);
                     if ($multivalue) {
                         $query->filterMultivalue((string) $value, $baseKey);
                     } else {

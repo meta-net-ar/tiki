@@ -25,6 +25,10 @@ class Service extends Base
             unset($params['_params']);
         }
 
+        if (isset($params['external']) && $params['external']) {
+            \TikiLib::setExternalContext(true);
+        }
+
         $url = $servicelib->getUrl($params);
         return smarty_modifier_escape($url);
     }

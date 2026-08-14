@@ -4,7 +4,7 @@ Silk icon set 1.3
 
 _________________________________________
 Mark James
-http://www.famfamfam.com/lab/icons/silk/
+http://web.archive.org/web/20130524021703/http://www.famfamfam.com/lab/icons/silk/
 _________________________________________
 
 This work is licensed under a

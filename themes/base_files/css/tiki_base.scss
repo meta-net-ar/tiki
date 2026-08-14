@@ -2,6 +2,7 @@
     This Tiki Wiki CMS Groupware file contains global design
     and layout properties. */
 @import "../../../node_modules/bootstrap/scss/functions";
+@import "../../../node_modules/bootstrap/scss/mixins";
 
 @import "../../default/scss/_variables.scss";
 
@@ -51,56 +52,3 @@
 @import "../scss/_tiki-show_database_query_log.scss";
 //@import "../scss/_pivot-tiki.scss";
 //@import "../scss/_conversejs-tiki.scss";
-//@import "../scss/_tiki-selectors.scss";
-
-// Sticky tables
-.tiki .table-sticky {
-    overflow: visible !important;
-}
-.tiki .table-sticky thead {
-    position: -webkit-sticky;
-    /* for Safari */
-    position: sticky;
-    top: 0;
-    z-index: 2;
-}
-.tiki .table-sticky tbody th {
-    position: sticky;
-    position: -webkit-sticky;
-    width: 100px;
-    min-width: 100px;
-    max-width: 100px;
-    left: 0px;
-    z-index: 1;
-}
-// Icon to toggle table formatting for small devices
-.toggle-table-wrap .btn {
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 600;
-    font-size: 1.25rem;
-}
-
-//Cypth select2
-.form-floating {
-    .select2-container--bootstrap-5 {
-        width: 100% !important;
-        .select2-selection {
-            min-height: calc($form-floating-height + .3rem) !important;
-            padding: $form-floating-padding-y $form-floating-padding-x !important;
-            width: 100% !important;
-            > .select2-selection__rendered {
-                margin-top: .4rem !important;
-            }
-        }
-        .floating-select-label { z-index: 1000; }
-    }
-    .form-select {
-        width: 100% !important;
-    }
-}
-
-li.highlight {
-    background-color: var(--bs-secondary-bg-subtle);
-    transition: all 0.3s ease;
-}
-/* End of file */

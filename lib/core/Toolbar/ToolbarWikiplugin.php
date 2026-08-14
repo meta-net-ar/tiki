@@ -12,7 +12,7 @@ class ToolbarWikiplugin extends ToolbarUtilityItem
     {
         $parserlib = TikiLib::lib('parser');
 
-        if (substr($name, 0, 11) == 'wikiplugin_') {
+        if (str_starts_with($name, 'wikiplugin_')) {
             $name = substr($name, 11);
             if ($info = $parserlib->plugin_info($name)) {
                 $tag = new self();

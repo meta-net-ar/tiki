@@ -37,7 +37,7 @@ class Accordion extends Base
             return;
         } else {
             return <<<CONTENT
-<div class="accordian" id="$accordion_current_group">
+<div class="accordion" id="$accordion_current_group">
 $content
 </div>
 CONTENT;

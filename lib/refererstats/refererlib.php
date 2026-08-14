@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -20,6 +20,7 @@ class RefererLib extends TikiLib
         $query = "delete from tiki_referer_stats";
 
         $result = $this->query($query);
+        return ($result && $result->numRows() > 0);
     }
 
     /**
@@ -41,9 +42,9 @@ class RefererLib extends TikiLib
 
         $query = "select * from `tiki_referer_stats` $mid order by " . $this->convertSortMode($sort_mode);
         ;
-        $query_cant = "select count(*) from `tiki_referer_stats` $mid";
+        $query_count = "select count(*) from `tiki_referer_stats` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -52,7 +53,7 @@ class RefererLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 }

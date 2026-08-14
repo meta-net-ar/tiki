@@ -5,11 +5,12 @@
 {/block}
 
 {block name="navigation"}
-    {assign var='title' value="{tr}Admin Tracker:{/tr} "|cat:$tracker_info.name|escape}
+    {$title="{tr}Admin Tracker:{/tr} "|cat:$tracker_info.name|escape}
     <div class="t_navbar mb-4">
         <div class="btn-group">
             <a href="{service controller=tracker action=add_field trackerId=$trackerId}" class="btn btn-primary add-field">{icon name="create"} {tr}Add Field{/tr}</a>
             <a href="{bootstrap_modal controller=tracker action=import_fields trackerId=$trackerId}" class="btn btn-primary">{icon name="import"} {tr}Import Fields{/tr}</a>
+            <a href="{service controller=tracker action=config_history trackerId=$trackerId}" class="btn btn-outline-info">{icon name="history"} {tr}Config History{/tr}</a>
         </div>
         {include file="tracker_actions.tpl"}
     </div>
@@ -17,7 +18,8 @@
 
 {block name="content"}
     <form class="form save-fields" method="post" action="{service controller=tracker action=save_fields}">
-        <table id="fields" class="table table-responsive table-condensed table-hover">
+    <div class="table-responsive">
+        <table id="fields" class="table table-condensed table-hover">
             <thead>
                 <tr>
                     <th>{select_all checkbox_names="fields[]"}</th>
@@ -59,6 +61,7 @@
             <tbody>
             </tbody>
         </table>
+        </div>
         <div class="mb-3 row">
             <div class="input-group col-sm-6">
                 <select name="action" class="form-control">
@@ -68,7 +71,7 @@
                 </select>
                 <input type="hidden" name="trackerId" value="{$trackerId|escape}">
                 <input type="hidden" name="confirm" value="0">
-                <button type="submit" class="btn btn-primary" name="submit">{tr}Go{/tr}</button>
+                <button type="submit" class="btn btn-primary" name="submit">{tr}Search{/tr}</button>
             </div>
         </div>
     </form>
@@ -76,15 +79,38 @@
     {jq}
         var trackerId = {{$trackerId|escape}};
         $('.save-fields').on("submit", function () {
-            var form = this, confirmed = false
+            var form = this;
+            var action = $(form.action).val();
 
-            if ($(form.action).val() === 'remove_fields' && validateForm()) {
-                confirmed = confirm(tr('Do you really want to delete the selected fields?'));
-                $(form.confirm).val(confirmed ? '1' : '0');
-
-                if (! confirmed) {
-                    return false;
+            // Internal helper to perform the Ajax submission logic
+            var executeAjax = function () {
+                $.ajax($(form).attr('action'), {
+                    type: 'POST',
+                    data: $(form).serialize(),
+                    dataType: 'json',
+                    success: function () {
+                        $container.tracker_load_fields(trackerId);
+                        if (action === 'remove_fields') {
+                            $.fn.resetFieldsCache();
+                            feedback(tr('Fields successfully removed.'), 'success');
+                        } else if (action === 'save_fields') {
+                            feedback(tr('Fields successfully saved.'), 'success');
+                        }
+                    }
+                });
+            };
+            if (action === 'remove_fields') {
+                if (validateForm()) {
+                    $(form).confirmationDialog({
+                        title: tr('Delete Fields'),
+                        message: tr('Do you really want to delete the selected fields?'),
+                        success: function() {
+                            $(form.confirm).val('1');
+                            executeAjax();
+                        }
+                    });
                 }
+                return false;
             }
 
             if ($(form.action).val() === 'export_fields') {
@@ -99,17 +125,7 @@
                 return false;
 
             } else {
-                $.ajax($(form).attr('action'), {
-                    type: 'POST',
-                    data: $(form).serialize(),
-                    dataType: 'json',
-                    success: function () {
-                        $container.tracker_load_fields(trackerId);
-                        if ($(form.action).val() === 'remove_fields') {
-                            $.fn.resetFieldsCache();
-                        }
-                    }
-                });
+                executeAjax();
             }
             return false;
         });
@@ -224,7 +240,7 @@
 
             // If no checkbox is checked, show an alert and prevent submission
             if (!isChecked) {
-                alert(tr("Please select at least one element."));
+                feedback(tr("Please select at least one element."), "error");
                 return false;
             }
 

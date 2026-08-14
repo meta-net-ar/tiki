@@ -1,4 +1,4 @@
-<form action="tiki-admin.php?page=freetags" method="post">
+<form action="tiki-admin.php?page=freetags" method="post" class="admin">
     {ticket}
     <div class="t_navbar mb-4 clearfix">
         <a role="link" class="btn btn-link tips" href="tiki-browse_freetags.php" title="{tr}Tags listing{/tr}">
@@ -14,6 +14,7 @@
         </button>
         {include file='admin/include_apply_top.tpl'}
     </div>
+    <div class="styling-element">
     <fieldset>
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_freetags visible="always"}
@@ -68,5 +69,6 @@
         {preference name=freetags_preload_random_search}
         <span class="form-text col-md-8 offset-md-4">{tr}When arriving on <a href="tiki-browse_freetags.php">tag search page</a>{/tr}.</span>
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

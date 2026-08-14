@@ -39,7 +39,7 @@ function saveStatus($in_vals = [])
 
 $monitor_filename = $prefs['tmpDir'] . '/tracker_' . $_REQUEST['trackerId'] . '_monitor.json';
 
-if (isset($_REQUEST['trackerId']) && isset($_REQUEST['xuser'])) {
+if (isset($_REQUEST['xuser'])) {
     if (is_file($monitor_filename)) {
         $stat_array = unserialize(file_get_contents($monitor_filename));
     } else {
@@ -49,7 +49,6 @@ if (isset($_REQUEST['trackerId']) && isset($_REQUEST['xuser'])) {
 
     $stat_array = unserialize(file_get_contents($monitor_filename));
 
-    //$stat_array = file($monitor_filename);
     $json_data = [];
     foreach ($stat_array as $k => $v) {
         if ($k == 'user' && $v != $user) {

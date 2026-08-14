@@ -185,7 +185,7 @@ function wikiplugin_pdfpage_info()
 function wikiplugin_pdfpage($data, $params)
 {
     $data = TikiLib::lib('parser')->parse_data($data, ['is_html' => true, 'parse_wiki' => true]);
-    if (isset($_GET['display']) && strstr($_GET['display'], 'pdf') == '') {
+    if (! defined('TIKI_DISPLAY_CONTAINS_PDF') || ! TIKI_DISPLAY_CONTAINS_PDF) {
         return $data;
     }
     //included globals to check mpdf selection as pdf generation engine

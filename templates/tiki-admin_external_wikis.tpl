@@ -1,19 +1,19 @@
 {title help="External Wikis"}{tr}Admin External Wikis{/tr}{/title}
 
 <h2>{tr}Create/Edit External Wiki{/tr}</h2>
-<form action="tiki-admin_external_wikis.php" method="post">
+<form action="tiki-admin_external_wikis.php" method="post" class="styling-element">
     {ticket}
     <input type="hidden" name="extwikiId" value="{$extwikiId|escape}">
     <div class="mb-3 row">
-        <label for="name" class="col-sm-3 col-form-label">{tr}Name{/tr}</label>
+        <label for="name" class="col-sm-3 col-form-label">{tr}Name{/tr}<span class="text-danger"> *</span></label>
         <div class="col-sm-9">
-            <input type="text" maxlength="255" class="form-control" name="name" value="{$info.name|escape}">
+            <input type="text" maxlength="255" class="form-control" name="name" id="name" value="{$info.name|escape}" required>
         </div>
     </div>
     <div class="mb-3 row">
-        <label for="extwiki" class="col-sm-3 col-form-label">{tr}URL{/tr}</label>
+        <label for="extwiki" class="col-sm-3 col-form-label">{tr}URL{/tr}<span class="text-danger"> *</span></label>
         <div class="col-sm-9">
-            <input type="text" maxlength="255" class="form-control" name="extwiki" id="extwiki" value="{$info.extwiki|escape}">
+            <input type="text" maxlength="255" class="form-control" name="extwiki" id="extwiki" value="{$info.extwiki|escape}" required>
             <p class="form-text">{tr}URL (use $page to be replaced by the page name in the URL example: http://www.example.com/tiki-index.php?page=$page):{/tr}</p>
         </div>
     </div>
@@ -37,7 +37,7 @@
 </form>
 
 <h2>{tr}External Wiki{/tr}</h2>
-<div class="{if $js}table-responsive{/if}"> {* table-responsive class cuts off css drop-down menus *}
+<div class="{if $js}table-responsive{/if} styling-element"> {* table-responsive class cuts off css drop-down menus *}
     <table class="table table-striped table-hover">
         <tr>
             <th>
@@ -84,4 +84,4 @@
     </table>
 </div>
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

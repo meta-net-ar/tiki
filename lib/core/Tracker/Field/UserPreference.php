@@ -4,13 +4,16 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 /**
  * Handler class for User preference
  *
  * Letter key: ~p~
  *
  */
-class Tracker_Field_UserPreference extends \Tracker\Field\AbstractItemField
+class Tracker_Field_UserPreference extends \Tracker\Field\AbstractItemField implements \Tracker\Field\ExportableInterface
 {
     public static function getManagedTypesInfo(): array
     {
@@ -69,7 +72,6 @@ class Tracker_Field_UserPreference extends \Tracker\Field\AbstractItemField
             $value = $requestData[$ins_id];
         } else {
             $userlib = TikiLib::lib('user');
-            $trklib = TikiLib::lib('trk');
 
             $value = '';
             $itemId = $this->getItemId();
@@ -128,5 +130,24 @@ class Tracker_Field_UserPreference extends \Tracker\Field\AbstractItemField
         return [
             $baseKey => $typeFactory->plaintext($this->renderInnerOutput()),
         ];
+    }
+
+    public function getTabularSchema()
+    {
+        $schema = new Tracker\Tabular\Schema($this->getTrackerDefinition());
+
+        $permName = $this->getConfiguration('permName');
+        $name = $this->getConfiguration('name');
+
+        $schema->addNew($permName, 'default')
+            ->setLabel($name)
+            ->setRenderTransform(function ($value) {
+                return $value;
+            })
+            ->setParseIntoTransform(function (&$info, $value) use ($permName) {
+                $info['fields'][$permName] = $value;
+            });
+
+        return $schema;
     }
 }

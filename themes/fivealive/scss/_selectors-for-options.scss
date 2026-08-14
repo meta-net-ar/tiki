@@ -1,74 +1,56 @@
 // This file contains CSS (SCSS) that theme options have in common, mostly color variations from the parent theme.
-// The file _variables-for-options.scss is used with this file. Theme options import these files and apply their variable definitions.
 
 $imagePath: "../images/";
 // body {
 //    background-image: url('#{$imagePath}bg.jpg');
 
-// Fivealive value wasn't inherited
-//h1,h2,h3,h4,h5,h6 {
-///    font-weight: 700;
-//}
-
-// This is reduced from the amount in tiki_base.css - maybe that needs to be changed, too.
-body.layout_social.tiki.navbar-padding {
-    padding-top: 2.72rem;
-    padding-bottom: 0;
+.page-header {
+    background: var(--tiki-fivealive-theme-bg);
 }
-//.middle_outer {
-//  -webkit-box-shadow: inset 0 54px 0 0 $topbar-dark-bg;
-//  -moz-box-shadow: inset 0 54px 0 0 $topbar-dark-bg;
-//  box-shadow: inset 0 54px 0 0 $topbar-dark-bg;
-//}
 
-.bg-dark {
-    background-color: $topbar-dark-bg !important;
-    color: $navbar-dark-color;
-    .btn-outline-info {
-        color: $bg-dark-info;
+.postbody-title,
+.card-header,
+.card-footer {
+    background: var(--tiki-fivealive-theme-bg);
+    color: var(--tiki-fivealive-theme-color);
+    a {
+        color: var(--tiki-fivealive-theme-link-color);
+        &:hover {
+            color: var(--tiki-fivealive-theme-link-hover-color);
+        }
     }
+    --bs-heading-color: var(--tiki-fivealive-theme-color);
 }
 
-.btn-outline-dark {
-    color: $dark;
-    outline-color: $dark;
+// Body
+.layout_basic,
+layout_basic.fullscreen,
+.navbar-collapse.collapse.in {
+    background-color: #414141;
 }
 
-//.sitelogo {
-//    padding: 30px;
-//}
+#fullscreenbutton a {
+    color: #000000;
+}
 
-//a,
-//.btn-link,
-//.page-link {
-//    color: $link-color;
-//}
-//
-//a:hover,
-//.btn-link:hover,
-//a:focus,
-//.btn-link:focus {
-//    color: $link-hover-color;
-//}
-
-//.nav-tabs .nav-link {
-//    color: $input-color;
-//    background-color: $input-bg;
-//    border-color: $input-border-top-color $input-border-left-color #ffffff;
-//}
+.layout_basic .container.container-std {
+    background: var(--bs-body-bg);
+}
 
 // Copied from base_files/scss/_tiki-selectors.scss (which these child themes don't import)
+
+.tiki .popover {
+    z-index: $zindex-popover; // 1070
+}
+
 .tiki .wiki.external + .icon-link-external, // wikitext
 .tiki .wiki.external .icon-link-external,
 .editable-inline .icon { // Tracker inline editing
     color: var(--#{$prefix}link-color); // $link-color;
 }
 
-
-hr {
-    border-top: 1px solid $hr-color;
-}
-
+// Typography
+// Tables
 .table th,
 .table td {
     border-top: 1px solid $table-border-color;
@@ -82,10 +64,6 @@ hr {
     border-top: 2px solid $table-border-color;
 }
 
-.table .table {
-    background-color: #ffffff;
-}
-
 .table .table-bordered {
     border: 1px solid $table-border-color;
 }
@@ -95,231 +73,18 @@ hr {
     border: 1px solid $table-border-color;
 }
 
-.table .table-striped > tbody > tr:nth-child(odd) > td,
-.table .table-striped > tbody > tr:nth-child(odd) > th {
-    background-color: $table-accent-bg;
+// Forms
+.form-check-input:checked {
+    background-color: $info; // #0d6efd;
+    border-color: $info; // #0d6efd;
 }
 
-.table .table-hover > tbody > tr:hover > td,
-.table .table-hover > tbody > tr:hover > th {
-    background-color: $table-hover-bg;
+.form-range::-webkit-slider-thumb {
+    background-color: $info;
 }
-
-.form-control {
-    color: $input-color;
-    background-color: $input-bg;
-    background-image: none;
-    border: 1px solid $input-border-color;
-}
-
-//.navbar-dark a,
-//.navbar-dark .navbar-brand,
-//.dropdown-item,
-//.dropdown-item a,
-//.dropdown-menu .tikihelp {
-//    color: $navbar-dark-color;
-//}
-//
-//.navbar-dark a:hover,
-//.navbar-dark .navbar-brand:hover,
-//.navbar-dark .navbar-brand:focus {
-//    color: $navbar-dark-hover-color;
-//    background-color: transparent;
-//}
-//
-//.navbar-dark a:hover,
-//.navbar-dark a:focus {
-//    color: $navbar-dark-hover-color;
-////    background-color: $bg-dark-link-hover-bg;
-//}
-//
-//.navbar-dark .active a,
-//.navbar-dark .active a:hover,
-//.navbar-dark .active a:focus {
-//    color: $navbar-dark-active-color;
-//    //  background-color: #063065;
-//}
-//
-//.navbar-dark .disabled a,
-//.navbar-dark .disabled a:hover,
-//.navbar-dark .disabled a:focus {
-//    color: $navbar-dark-disabled-color;
-//    background-color: transparent;
-//}
-//
-//.navbar-dark .navbar-toggle {
-//    border-color: #dddddd;
-//}
-//
-//.navbar-dark .navbar-toggle:hover,
-//.navbar-dark .navbar-toggle:focus {
-//    background-color: #dddddd;
-//}
-//
-//.navbar-dark .navbar-toggle .icon-bar {
-//    background-color: #888888;
-//}
-//
-//.navbar-dark .navbar-collapse,
-//.navbar-dark .navbar-form {
-//    border-color: transparent;
-//}
-//nav:not(.topbar_modules,.top_modules) {
-//    &.navbar-dark .open > a,
-//    &.navbar-dark .open > a:hover,
-//    &.navbar-dark .open > a:focus {
-//    //  background-color: #14899e;
-//    color: $navbar-dark-color;
-//    }
-//}
-
-//.navbar-dark .navbar-link:hover {
-//    color: #f9f9f9;
-//}
-//
-//.navbar .navbar {
-//    background: transparent !important;
-//}
-
-//.dropdown-menu {
-//    background-color: $dropdown-bg; //#005064;
-//    border: 1px solid $dropdown-border-color; // rgba(0, 0, 0, 0.15);
-//}
-
-//.tiki .dropdown-item,
-//.tiki .dropdown-item a,
-//.tiki .dropdown-item .btn.btn-link {
-//    color: $dropdown-link-color;
-//    &:hover,
-//    &:focus {
-//        color: $dropdown-link-hover-color;
-//        background: $dropdown-link-hover-bg;
-//    }
-//    &:active,
-//    &.active {
-//        color: $dropdown-link-hover-color;
-//        background: $dropdown-link-active-bg;
-//    }
-//    &.disabled,
-//    &:disabled {
-//        color: $dropdown-link-disabled-color;
-//    }
-//    .dropdown-header {
-//        color: $dropdown-header-color;
-//    }
-//    .dropdown-divider {
-//        background: $dropdown-divider-bg;
-//    }
-//}
-//
-//.nav-pills > li.active > a,
-////.nav-pills > li.active > a:hover,
-//.nav-pills > li.active > a:focus {
-//    color: #ffffff;
-//    background-color: $nav-pills-link-active-bg; //#0b8a98;
-//}
-
-// Pagination
-.pagination > li > a:hover,
-.pagination > li > span:hover,
-.pagination > li > a:focus,
-.pagination > li > span:focus {
-    color: $pagination-hover-color; //#18a3bb;
-    background-color: $pagination-hover-bg; //#eeeeee;
-    border-color: $pagination-hover-border-color; //#dddddd;
-}
-
-.pagination > .active > a,
-.pagination > .active > span,
-.pagination > .active > a:hover,
-.pagination > .active > span:hover,
-.pagination > .active > a:focus,
-.pagination > .active > span:focus {
-    color: #ffffff;
-    background-color: $pagination-active-bg; //#0b8a98;
-    border-color: $pagination-active-border-color; //#0b8a98;
-}
-
-.pagination > .disabled > span,
-.pagination > .disabled > span:hover,
-.pagination > .disabled > span:focus,
-.pagination > .disabled > a,
-.pagination > .disabled > a:hover,
-.pagination > .disabled > a:focus {
-    color: $pagination-disabled-color; //#999999;
-    background-color: $pagination-disabled-bg; //#ffffff;
-    border-color: $pagination-disabled-border-color; //#dddddd;
-}
-
-// Cards
-.card-header {
-    background: $tiki-top-bg;
-}
-
-header.page-header {
-    margin-top: 0;
-    margin-bottom: 0;
-    border-bottom: none;
-}
-
-header.page-header a:not(.dropdown-item),
-header.page-header a.btn-link {
-    color: $page-header-link-color; // This needs to be a variable because Kiwi uses black: $page-header-link-color.
-}
-
-.form-control, select,
-input[type="text"],
-input[type="password"],
-input[type="file"],
-input[type="email"],
-input[type="search"],
-input[type="number"],
-input#login-pass,
-textarea,
-.adminoptionbox option {
-    color: $input-color;
-    background-color: $input-bg; //#ddf8f9;
-    // border-color: $input-border-top-color $input-border-right-color $input-border-bottom-color $input-border-left-color; //#b4f3fb #ffffff #ffffff #b4f3fb;
-}
-
-//input[type="checkbox"].preffilter-toggle-round:checked + label::before {
-//    background: darken($input-bg, 8%);
-//}
-
-
-#footer {
-    background: black;
-    color: #f4f4f4;
-    padding: 1px 0 2px 0;
-    width: 100%;
-}
-
-.footer {
-    border-top: 1px solid $footer-accent-color; //#19a5be;
-    border-bottom: 1px solid $footer-accent-color; //#19a5be;
-}
-
-.footer_liner {
-    .card {
-        background-color: transparent;
-        border: none;
-    }
-    .card-header {
-        color: #ffffff;
-        border-bottom: 1px dotted $footer-accent-color; //#19a5be;
-    }
-    legend,
-    a:not(.btn),
-    a:not(.btn):visited {
-        color: #a9a9a9; //$footer-accent-color; //#19a5be;
-    }
-}
-
 
 .nav-tabs .nav-link {
-    color: $nav-tabs-link-color; //#ffffff;
-    background-color: $nav-tabs-link-bg; // #0c8a99;
-    border-color: #dee2e6 #dee2e6 #ffffff;
+    border-color: rgba(222, 226, 230, 0.48) rgba(222, 226, 230, 0.48) rgba(255, 255, 255, 0.48);
 }
 
 .nav-tabs .nav-link.active,
@@ -329,22 +94,29 @@ textarea,
 }
 
 .flipmodtitle.close {
-    color: $card-title-color;//#fff;
+    color: $card-cap-color;//#fff;
 }
 
 .card-header {
-    color: $card-title-color;
+    color: $card-cap-color;
+    background: var(--tiki-fivealive-theme-bg);
 }
+
+.page-item.disabled,
+.list-group-item.disabled {
+    color: $text-muted !important;
+}
+
 
 .blog-postbody-title {
     padding: 10px;
-    color: $card-title-color; // #fff;
+//    color: $card-title-color; // #fff;
     h2.card-title {
         font-size: 1.6rem;
     }
-    a {
-        color: $card-title-color; //#fff;
-    }
+//    a {
+//        color: $card-title-color; //#fff;
+//   }
 }
 
 @media (max-width: 768px) {
@@ -354,12 +126,7 @@ textarea,
 }
 
 .postbody-title .card-title {
-    color: $postbody-title-card-title-color;
-}
-
-header.header .sitetitle,
-header.header .sitesubtitle {
-    text-shadow: none;
+    color: $tiki-postbody-title-card-title-color;
 }
 
 .searchresults blockquote em,
@@ -367,10 +134,6 @@ header.header .sitesubtitle {
     background: #f2dede;
     color: #a94442;
     border-color: #ebccd1;
-}
-.topbar .navbar-nav > li > a,
-.topbar .navbar > li > a {
-    color: #ffffff;
 }
 
 // /* Auto TOC */
@@ -385,58 +148,54 @@ header.header .sitesubtitle {
     border-left-color: $secondary !important;
 }
 
-//.autotoc > .nav {
-//    background: $autotoc-nav-bg; //#005064;
-//}
-
-//.autotoc * {
-//    color: $autotoc-color; //#ffffff;
-//}
-
-//#autotoc .nav > li > a:hover,
-//#autotoc .nav .nav > li > a:hover,
-//#autotoc .nav > li > a:focus {
-//    color: $autotoc-nav-li-link-hover-color; //#f2f2f2;
-//    background: $autotoc-nav-li-link-hover-bg; //#2e1f39;
-//}
-
-//#autotoc .nav {
-//    > li {
-//        .active, &.open > a {
-//            color: $autotoc-nav-li-link-hover-color;
-//            background: $autotoc-nav-li-link-hover-bg;
-//        }
-//    }
-//}
-
-//#autotoc .nav .dropdown-item {
-//    color: $autotoc-color;}
-
-//#col2 .card-title,
-//#col3 .card-title,
-//a.flipmoduletitle,
-//#col2 .card-secondary > .card-header a,
-//#col3 .card-secondary > .card-header a {
-//    color: $side-column-heading-color; //#169FB6;
-//}
-
-footer#footer {
-    .footer_liner {
-        border-top: 1px solid $footer_liner-border-color;
-        border-bottom: 1px solid $footer_liner-border-color;
-        .card-header {
-            border-bottom: 1px dotted $footer_liner-card-inner-border;
-        }
+// Pagination
+:root {
+    .page-link.active, .active > .page-link {
+        --bs-pagination-active-bg: #{$secondary};
+        --bs-pagination-active-border-color: #{$secondary};
+    }
+    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+        --bs-nav-pills-link-active-bg: #{$secondary};
     }
 }
 
-.btn-dark {
-    color: $light;
-    background: $dark;
-    border-color: $dark;
+// Cards
+.col2,
+.col3 {
+    .card-header {
+        border-bottom: 1px solid $card-border-color;
+    }
 }
 
 .page-item.disabled,
 .list-group-item.disabled {
     color: $text-muted !important;
+}
+
+.tiki .main-footer {
+    padding: 1px 0 2px 0;
+    background: #000000;
+}
+
+.footer_liner {
+    .card-header {
+        border-width: 0 0 1px 0;
+    }
+}
+
+// Dark page footer
+:root .bottom_modules,
+[data-bs-theme="light"] .bottom_modules,
+[data-bs-theme="dark"] .bottom_modules {
+    //    color: #dee2e6;
+    .tiki-card-header-title { color: $tiki-dark-footer-card-header-title-color; }
+    .card-header { background: $tiki-dark-footer-card-header-bg; }
+    //.card, .card-header { border-color: $tiki-dark-footer-card-border-color; }
+    .card { color: #dee2e6; background: #262626; }
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item), .btn-link { color: $tiki-dark-footer-link-color; }
+    a:not(.nav-link:not(.dropdown-toggle), .dropdown-item):hover, .btn-link:hover { color: $tiki-dark-footer-link-hover-color; }
+}
+
+[data-bs-theme=dark].bottom_modules {
+    color: $body-color-dark;
 }

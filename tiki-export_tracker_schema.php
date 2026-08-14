@@ -27,7 +27,7 @@ if (! is_array($requestedTrackerIds)) {
 
 $skipAttributes = ! empty($_REQUEST["skipAttributes"]) ?? false;
 $skipRelations = ! empty($_REQUEST["skipRelations"]) ?? false;
-$includePermNames = empty($_REQUEST["includePermNames"]) ? false : true;
+$includePermNames = ! empty($_REQUEST["includePermNames"]);
 
 $skipAttributesChecked = $skipAttributes ? 'checked' : '';
 $skipRelationsChecked = $skipRelations ? 'checked' : '';
@@ -60,19 +60,13 @@ if (! $requestedTrackerIds) {
     //Remove the last &
     $urlParameterStringToGoBackToListOfTrackers = substr_replace($urlParameterStringToGoBackToListOfTrackers, "", -1);
 }
-
-$headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . "/svg-pan-zoom/dist/svg-pan-zoom.min.js");
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-export_tracker_schema.js');
 
 $smarty = TikiLib::lib('smarty');
 require_once("export-tracker_schema.php");
 $mermaidText = exportMermaidER($title, $entities, $relationships, $skipAttributes, $includePermNames);
-$mermaidOutput = renderMermaid($mermaidText);
-if (isset($_REQUEST['export'])) {
-    $export = $_REQUEST['export'];
-} else {
-    $export = 'svgFormat';
-}
+$mermaidOutput = handleMermaid($mermaidText);
+$export = $_REQUEST['export'] ?? 'svgFormat';
 
 $mermaidText = exportMermaidER($title, $entities, $relationships, $skipAttributes, $includePermNames, true);
 $smarty->assign('export', $export);

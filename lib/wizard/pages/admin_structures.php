@@ -22,7 +22,7 @@ class AdminWizardStructures extends Wizard
     public function isVisible()
     {
         global  $prefs;
-        return isset($prefs['feature_wiki_structure']) && $prefs['feature_wiki_structure'] === 'y' ? true : false;
+        return isset($prefs['feature_wiki_structure']) && $prefs['feature_wiki_structure'] === 'y';
     }
 
     public function onSetupPage($homepageUrl)
@@ -36,7 +36,7 @@ class AdminWizardStructures extends Wizard
             return false;
         }
 
-        $isCategories = isset($prefs['feature_categories']) && $prefs['feature_categories'] === 'y' ? true : false;
+        $isCategories = isset($prefs['feature_categories']) && $prefs['feature_categories'] === 'y';
         $smarty->assign('isCategories', $isCategories);
 
         return true;

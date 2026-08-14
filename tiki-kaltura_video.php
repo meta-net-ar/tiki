@@ -11,8 +11,8 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-        'mixId'                           => 'int',               //post
-        'mediaId'                         => 'int',               //post
+        'mixId'                           => 'word',              //post
+        'mediaId'                         => 'word',              //post
         'action'                          => 'word',              //post
         'name'                            => 'word',              //post
         'description'                     => 'xss',               //post
@@ -135,7 +135,6 @@ try {
 
             case 'default':
                 Feedback::errorAndDie(tra('Incorrect param'), \Laminas\Http\Response::STATUS_CODE_409);
-                exit;
         }
     } else {
         if (isset($videoId[0])) {

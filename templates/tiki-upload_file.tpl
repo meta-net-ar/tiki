@@ -1,30 +1,30 @@
 {if !empty($filegals_manager) and !isset($smarty.request.simpleMode)}
-    {assign var=simpleMode value='y'}
+    {$simpleMode='y'}
 {else}
-    {assign var=simpleMode value='n'}
+    {$simpleMode='n'}
 {/if}
 {title help="File Galleries" admpage="fgal"}{if $editFileId}{tr}Edit File:{/tr} {$fileInfo.filename}{else}{tr}Upload File{/tr}{/if}{/title}
 {if !empty($galleryId) or (isset($galleries) and count($galleries) > 0 and $tiki_p_list_file_galleries eq 'y') or (isset($uploads) and count($uploads) > 0)}
     <div class="t_navbar mb-4">
         {if !empty($galleryId) and !isset($insertion_syntax)}
-            {assign var=btnHref value="tiki-list_file_gallery.php"}
+            {$btnHref="tiki-list_file_gallery.php"}
             {if isset($allowedMimeTypes)}
-                {assign var=btnHref value=$btnHref|cat:"?allowedMimeTypes="|cat:$allowedMimeTypes}
+                {$btnHref=$btnHref|cat:"?allowedMimeTypes="|cat:$allowedMimeTypes}
             {/if}
             {button galleryId="$galleryId" href=$btnHref class="btn btn-primary" _text="{tr}Browse Gallery{/tr}"}
         {/if}
         {if isset($galleries) and count($galleries) > 0 and $tiki_p_list_file_galleries eq 'y'}
             {if !empty($filegals_manager)}
-                {assign var=fgmanager value=$filegals_manager|escape}
-                {assign var=btnHref value="tiki-list_file_gallery.php?filegals_manager=$fgmanager"}
+                {$fgmanager=$filegals_manager|escape}
+                {$btnHref="tiki-list_file_gallery.php?filegals_manager=$fgmanager"}
                 {if isset($allowedMimeTypes)}
-                    {assign var=btnHref value=$btnHref|cat:"&allowedMimeTypes="|cat:$allowedMimeTypes}
+                    {$btnHref=$btnHref|cat:"&allowedMimeTypes="|cat:$allowedMimeTypes}
                 {/if}
                 {button href=$btnHref|escape class="btn btn-info" _text="{tr}List Galleries{/tr}"}
             {else}
-                {assign var=btnHref value="tiki-list_file_gallery.php"}
+                {$btnHref="tiki-list_file_gallery.php"}
                 {if isset($allowedMimeTypes)}
-                    {assign var=btnHref value=$btnHref|cat:"?allowedMimeTypes="|cat:$allowedMimeTypes}
+                    {$btnHref=$btnHref|cat:"?allowedMimeTypes="|cat:$allowedMimeTypes}
                 {/if}
                 {button href=$btnHref class="btn btn-info" _text="{tr}List Galleries{/tr}"}
             {/if}
@@ -64,7 +64,7 @@
                     </td>
                     <td>
                         {if !empty($filegals_manager)}
-                            <a href="#" onclick="window.opener.insertAt('{$filegals_manager}','{$files[changes].wiki_syntax|escape}');checkClose();return false;" title="{tr}Click here to use the file{/tr}">{$uploads[ix].name} ({$uploads[ix].size|kbsize})</a>
+                            <a href="#" onclick="window.opener.insertAt('{$filegals_manager}','{$files[changes].wiki_syntax|escape}');checkClose();return false;" title="{tr}Click here to use the file{/tr}" role="button">{$uploads[ix].name} ({$uploads[ix].size|kbsize})</a>
                         {else}
                             <b>{$uploads[ix].name} ({$uploads[ix].size|kbsize})</b>
                         {/if}
@@ -229,7 +229,7 @@
                     <label for="image_max_size_x" class="col-sm-4 text-end">{tr}Maximum width of images{/tr}</label>
                     <div class="col-sm-8">
                         <div class="input-group col-sm-4">
-                            <input type="text" name="image_max_size_x" id="image_max_size_x"
+                            <input type="number" name="image_max_size_x" id="image_max_size_x"
                                    value="{if isset($gal_info["image_max_size_x"])}{$gal_info["image_max_size_x"]}{else}0{/if}"
                                    class="form-control text-end">
                             <span class="input-group-text"> {tr}pixel{/tr}</span>
@@ -242,7 +242,7 @@
                     <label for="image_max_size_y" class="col-sm-4 text-end">{tr}Maximum height of images in gallery{/tr}</label>
                     <div class="col-sm-8">
                         <div class="input-group col-sm-4">
-                            <input type="text" name="image_max_size_y" id="image_max_size_y"  value="{if isset($gal_info["image_max_size_y"])}{$gal_info["image_max_size_y"]}{else}0{/if}"  class="form-control text-end">
+                            <input type="number" name="image_max_size_y" id="image_max_size_y"  value="{if isset($gal_info["image_max_size_y"])}{$gal_info["image_max_size_y"]}{else}0{/if}"  class="form-control text-end">
                             <span class="input-group-text"> {tr}pixel{/tr}</span>
                         </div>
                         <span class="form-text">{tr}If an image is higher than this, it will be resized. Attention: In this case, the original image will be lost. (0=unlimited){/tr}</span>
@@ -265,7 +265,7 @@
                         <div class="mb-3 row">
                             <label for="deleteAfter" class="col-md-4 col-form-label">{tr}File can be deleted after{/tr}</label>
                             <div class="col-md-8">
-                                {if $editFileId}
+                                {if $editFileId or $prefs.elementplus_upload eq 'y'}
                                     {html_select_duration prefix='deleteAfter' id="deleteAfter" default_value=$fileInfo.deleteAfter}
                                 {else}
                                     {html_select_duration prefix='deleteAfter[]' id="deleteAfter" default_unit=week}
@@ -348,7 +348,7 @@
                             <label for="filetype" class="col-md-4 col-form-label">{tr}File Type{/tr}</label>
                             <div class="col-md-8">
                                 <select id="filetype" class="form-select" name="filetype[]">
-                                    {if $fileInfo.filetype ne '' }
+                                    {if $fileInfo.filetype ne ''}
                                         <option value="{$fileInfo.filetype|escape}" selected="selected">{$fileInfo.filetype|truncate:60|escape}</option>
                                     {/if}
                                     <option value="" > {tr}No type{/tr} </option>
@@ -403,7 +403,7 @@
                         <div class="mb-3 row">
                             <label for="comment" class="col-md-4 form-label">{tr}Comment{/tr}</label>
                             <div class="col-md-8">
-                                <input type="text" id="comment" name="comment[]" value="" size="40">
+                                <input type="text" id="comment" name="comment[]" value="" size="40" class="form-control">
                             </div>
                         </div>
                     {/if}
@@ -417,9 +417,9 @@
                 {/if}
                 <input type="hidden" name="galleryId[]" value="{$galleryId}">
             {/if}
-            {if $prefs.elementplus_upload eq 'y'}
+            {if $prefs.elementplus_upload eq 'y' && ! $editFileId}
                 <div class="mb-3 row">
-                    <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{$gal_info.image_max_size_x}" max-height="{$gal_info.image_max_size_y}" />
+                    <tiki-el-file-gal-uploader id="uploader" accept="{$allowedMimeTypes}" max-size="{$max_upload_size}" max-files="{$max_file_uploads}" max-width="{if isset($gal_info.image_max_size_x)}{$gal_info.image_max_size_x}{/if}" max-height="{if isset($gal_info.image_max_size_y)}{$gal_info.image_max_size_y}{/if}" />
                 </div>
             {/if}
             {if !$editFileId}
@@ -472,7 +472,7 @@
     </div>
     {if !empty($fileInfo.lockedby) and $user ne $fileInfo.lockedby}
         {icon name="lock"}
-        <span class="attention">{tr}The file has been locked by {$fileInfo.lockedby}{/tr}</span>
+        <span class="attention">{tr _0=$fileInfo.lockedby}The file has been locked by %0{/tr}</span>
     {/if}
 </div>
 {if not empty($metarray) and $metarray|count gt 0}

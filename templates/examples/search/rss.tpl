@@ -9,11 +9,11 @@ Example wiki syntax
   {filter field="tracker_id" exact="1"}
   {OUTPUT(template="templates/examples/search/rss.tpl")}
     {settings title="test rss" description="from plugin list" link="https://example.com" pubDate="{{lastModif}}"}
-    {item label="title" field="title"}
-    {item label="description" field="productsDescription"}
+    {item label="{tr}title{/tr}" field="title"}
+    {item label="{tr}description{/tr}" field="productsDescription"}
     {item label="pubDate" field="pubDate"}
     {item label="guid" field="guid"}
-    {item label="link" field="guid"}
+    {item label="{tr}link{/tr}" field="guid"}
 {OUTPUT}
   {FORMAT(name="pubDate")}{display name="date" format="datetime" dateFormat="%c"}{FORMAT}
   {FORMAT(name="guid")}https://example.com/product-{display  name="object_id"}{FORMAT}

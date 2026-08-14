@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_calendar_items` ADD COLUMN `hideParticipants` TINYINT(1) DEFAULT '0';

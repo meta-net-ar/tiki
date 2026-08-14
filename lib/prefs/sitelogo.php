@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_sitelogo_list()
 {
+    $generalLayoutOptionsHelp = 'General-Layout-Options';
+
     return [
         'sitelogo_src' => [
             'name' => tra('Logo source (image path)'),
@@ -14,6 +16,7 @@ function prefs_sitelogo_list()
             'default' => 'img/tiki/Tiki_WCG.png',
             'tags' => ['basic'],
             'fgal_picker' => 'y',
+            'help' => $generalLayoutOptionsHelp,
         ],
         // sitelogo_bgcolor pref removed 10/2022
         'sitelogo_title' => [
@@ -23,6 +26,7 @@ function prefs_sitelogo_list()
             'size' => '50',
             'default' => 'Tiki-powered site',
             'tags' => ['basic'],
+            'help' => $generalLayoutOptionsHelp,
         ],
         'sitelogo_alt' => [
             'name' => tra('HTML "alt" tag description'),
@@ -32,6 +36,7 @@ function prefs_sitelogo_list()
             'default' => 'Site Logo',
             'tags' => ['basic'],
             'hint' => tr('Used by text browsers, screen readers, etc.'),
+            'help' => $generalLayoutOptionsHelp,
         ],
         'sitelogo_icon' => [
             'name' => tra('Admin navbar icon'),
@@ -40,6 +45,7 @@ function prefs_sitelogo_list()
             'type' => 'text',
             'default' => 'img/tiki/tikilogo_icon.png',
             'tags' => ['basic'],
+            'help' => 'Look-and-Feel-Theme',
         ],
         'sitelogo_upload_icon' => [
             'name' => tra('Site logo upload icon'),
@@ -47,6 +53,7 @@ function prefs_sitelogo_list()
             'type' => 'flag',
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $generalLayoutOptionsHelp,
         ],
     ];
 }

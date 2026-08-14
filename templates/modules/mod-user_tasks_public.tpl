@@ -1,5 +1,5 @@
 {if isset($public_tasks)}
-    {if !isset($tpl_module_title)}{assign var=tpl_module_title value="<a href='tiki-user_tasks.php'>{tr}Public Tasks{/tr}</a>"}{/if}
+    {if !isset($tpl_module_title)}{$tpl_module_title="<a href='tiki-user_tasks.php'>{tr}Public Tasks{/tr}</a>"}{/if}
     {tikimodule error=$module_params.error title=$tpl_module_title name="user_tasks_public" flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
         <div class="table-responsive">
             <table class="table">
@@ -16,14 +16,14 @@
                                     </option>
                                 {/section}
                             </select>
-                            <input type="submit" class="wikiaction btn btn-info btn-sm" name="modTasksSearch" value="{tr}Go{/tr}" />
+                            <input type="submit" class="wikiaction btn btn-info btn-sm" name="modTasksSearch" value="{tr}Search{/tr}" />
                         </form>
                     </td>
                 </tr>
                 {section name=iix loop=$public_tasks}
                     <tr>
                         <td class="prio{$public_tasks[iix].priority}">
-                            {if isset($modTasks[ix].percentage)}({$public_tasks[iix].percentage}%) {/if}{$public_tasks[iix].taskId|tasklink:linkmodule}
+                            {if isset($public_tasks[iix].percentage)}({$public_tasks[iix].percentage}%) {/if}{$public_tasks[iix].taskId|tasklink:linkmodule}
                             <br>{$public_tasks[iix].user|username}
                         </td>
                     </tr>

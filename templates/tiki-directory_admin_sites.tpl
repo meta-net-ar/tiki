@@ -113,7 +113,7 @@
                 <td class="text">{$items[user].name|escape}</td>
                 <td class="text"><a href="{$items[user].url}" target="_new">{$items[user].url}</a></td>
                 {if $prefs.directory_country_flag eq 'y'}
-                    <td class="text"><img src='img/flags/{$items[user].country}.png' alt='{$items[user].country}'> </td>
+                    <td class="text">{$items[user].country|countryflagwithlabel}</td>
                 {/if}
                 <td class="text text-center">{$items[user].hits}</td>
                 <td class="text text-center">{if $items[user].isValid eq 'y'} Yes {else} No {/if}</td>
@@ -132,7 +132,7 @@
                                     <input type="hidden" name="offset" value="{$offset}">
                                     <input type="hidden" name="sort_mode" value="{$sort_mode}">
                                     <input type="hidden" name="remove" value="{$items[user].siteId}">
-                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" title=":{tr}Delete{/tr}" onclick="confirmPopup('{tr _0=$items[user].name}Are you sure you want to delete %0?{/tr}')">
+                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0" title=":{tr}Delete{/tr}" onclick="confirmPopup('{tr _0=$items[user].name}Are you sure you want to delete %0?{/tr}')" aria-label="{tr}Delete{/tr}">
                                         {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                     </button>
                                 </form>
@@ -143,9 +143,9 @@
             </tr>
             <tr>
                 <td>&nbsp;</td>
-                <td class="text" colspan="6"><i> {tr}Directory Categories:{/tr}{assign var=fsfs value=1}
+                <td class="text" colspan="6"><i> {tr}Directory Categories:{/tr}{$fsfs=1}
                     {section name=ii loop=$items[user].cats}
-                        {if $fsfs}{assign var=fsfs value=0}{else}, {/if}
+                        {if $fsfs}{$fsfs=0}{else}, {/if}
                         {$items[user].cats[ii].path|escape}
                     {/section} </i>
                 </td>
@@ -181,4 +181,4 @@
     });
 
 {/jq}
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

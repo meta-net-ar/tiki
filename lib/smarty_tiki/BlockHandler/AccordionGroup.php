@@ -44,11 +44,16 @@ class AccordionGroup extends Base
         $title = smarty_modifier_escape($params['title']);
         $id = $accordion_current_group . '-' . ++$accordion_position;
 
-        $first = ($accordion_position == 1) ? 'show' : '';
-        $expanded = ($accordion_position == 1) ? 'true' : 'false';
+        if (! empty($params['accordion_pos'])) {
+            $first = ($accordion_position == $params['accordion_pos']) ? 'show' : '';
+            $expanded = ($accordion_position == $params['accordion_pos']) ? 'true' : 'false';
+        } else {
+            $first = ($accordion_position == 1) ? 'show' : '';
+            $expanded = ($accordion_position == 1) ? 'true' : 'false';
+        }
 
         return <<<CONTENT
-    <div class="card card-accordian">
+    <div class="card card-accordion">
         <div class="card-header">
             <h4 class="card-title">
                 <a class="accordion-toggle" data-bs-toggle="collapse" href="#$id" aria-expanded="$expanded" aria-controls="$id">

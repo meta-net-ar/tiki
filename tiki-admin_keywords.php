@@ -9,10 +9,13 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 
 /***
  * @var \TikiAccessLib  $access
- * @var \Smarty_Tiki    $smarty
+ * @var \Tiki\Smarty\SmartyTiki  $smarty
  *
  */
 
@@ -23,7 +26,7 @@ $access->check_permission('tiki_p_admin_wiki');
  * @param        $page
  * @param string $keywords
  *
- * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+ * @return Tiki\TikiDb\PdoResult
  * @throws Exception
  */
 function set_keywords($page, $keywords = "")
@@ -76,7 +79,7 @@ function get_all_keywords($limit = 0, $offset = 0, $page = "")
 
     $ret = [
         'pages' => $tikilib->fetchAll("SELECT `keywords`, `pageName` as page " . $query, $bindvars, $limit, $offset),
-        'cant' => $tikilib->getOne('SELECT COUNT(*) ' . $query, $bindvars),
+        'count' => $tikilib->getOne('SELECT COUNT(*) ' . $query, $bindvars),
     ];
 
     return $ret;
@@ -88,16 +91,17 @@ $limit = $prefs['maxRecords'];
 //Check for offset, see if it's a multiple of the limit
 //This is done to stop arbitrary offsets being entered
 
-$offset = isset($_REQUEST['offset']) ? (int)$_REQUEST['offset'] : 0;
+$offset = (int)($_REQUEST['offset'] ?? 0);
+
 
 if (
-    (isset($_REQUEST['save_keywords']) && isset($_REQUEST['new_keywords']) && isset($_REQUEST['page']) && $access->checkCsrf())
-    || (isset($_REQUEST['remove_keywords']) && isset($_REQUEST['page']) && $access->checkCsrf(true))
+    isset($_REQUEST['page']) && ((isset($_REQUEST['save_keywords']) && isset($_REQUEST['new_keywords']) && $access->checkCsrf())
+    || (isset($_REQUEST['remove_keywords']) && $access->checkCsrf(true)))
 ) {
     //Set page and new_keywords var for both remove_keywords and
     //save_keywords actions at the same time
-    ( isset($_REQUEST['page']) ) ? $page = $_REQUEST['page'] : $page = $_REQUEST['page'];
-    ( isset($_REQUEST['new_keywords']) ) ? $new_keywords = $_REQUEST['new_keywords'] : $new_keywords = "";
+    $page = $_REQUEST['page'];
+    $new_keywords = $_REQUEST['new_keywords'] ?? '';
 
     $result = set_keywords($page, $new_keywords);
 
@@ -111,7 +115,7 @@ if (
     }
 }
 
-if (isset($_REQUEST['page'], $_REQUEST['remove_keywords']) && ! $_REQUEST['remove_keywords']) {
+if (! empty($_REQUEST['page']) && isset($_REQUEST['remove_keywords']) && ! $_REQUEST['remove_keywords']) {
     $page_keywords = get_keywords($_REQUEST['page']);
 
     $smarty->assign('edit_keywords', $page_keywords['keywords']);
@@ -122,18 +126,18 @@ if (isset($_REQUEST['page'], $_REQUEST['remove_keywords']) && ! $_REQUEST['remov
 if (isset($_REQUEST['q'], $_REQUEST['remove_keywords'], $_REQUEST['save_keywords']) && ! $_REQUEST['remove_keywords'] && ! $_REQUEST['save_keywords']) {
     $existing_keywords = get_all_keywords($limit, $offset, $_REQUEST['q']);
     $smarty->assign('search_on', 'y');
-    $smarty->assign('search_cant', $existing_keywords['cant']);
+    $smarty->assign('search_count', $existing_keywords['count']);
 }
 
-if (! isset($existing_keywords['cant'])) {
+if (! isset($existing_keywords['count'])) {
     $existing_keywords = get_all_keywords($limit, $offset);
 }
 
-if ($existing_keywords['cant'] > 0) {
+if ($existing_keywords['count'] > 0) {
     $smarty->assign('existing_keywords', $existing_keywords['pages']);
 
-    $pages_cant = ceil($existing_keywords['cant'] / $limit);
-    $smarty->assign('pages_cant', $pages_cant);
+    $pages_count = ceil($existing_keywords['count'] / $limit);
+    $smarty->assign('pages_count', $pages_count);
     $smarty->assign('offset', $offset);
 }
 

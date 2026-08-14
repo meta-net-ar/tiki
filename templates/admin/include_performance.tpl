@@ -21,7 +21,6 @@
             {preference name=tiki_cdn}
             {preference name=tiki_cdn_ssl}
             {preference name=tiki_cdn_check}
-            {preference name=tiki_prefix_css}
             {preference name=tiki_minify_css}
             <div class="adminoptionboxchild" id="tiki_minify_css_childcontainer">
                 {preference name=tiki_minify_css_single_file}
@@ -37,9 +36,10 @@
                 {/if}
             </div>
             {preference name=tiki_cachecontrol_session}
+            {preference name=tiki_cachecontrol_maxage}
             {preference name=smarty_compilation}
             {preference name=users_serve_avatar_static}
-            {preference name=allowImageLazyLoad }
+            {preference name=allowImageLazyLoad}
 
             <fieldset>
                 <legend class="h3">{tr}PHP settings{/tr}</legend>
@@ -228,7 +228,6 @@
             {preference name=allocate_time_print_pdf}
             {preference name='allocate_memory_unified_rebuild'}
             {preference name='allocate_time_unified_rebuild'}
-            {preference name='allocate_time_secdb_check'}
         {/tab}
 
     {/tabset}

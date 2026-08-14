@@ -23,7 +23,6 @@ function wikiplugin_checkreferer_info()
                 'since' => '14.0',
                 'separator' => ',',
                 'filter' => 'text',
-                'default' => '',
             ],
         ],
     ];
@@ -31,6 +30,8 @@ function wikiplugin_checkreferer_info()
 
 function wikiplugin_checkreferer($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_checkreferer_info());
+
     $referer = parse_url($_SERVER['HTTP_REFERER']);
     $parts = explode('{ELSE}', $data);
 

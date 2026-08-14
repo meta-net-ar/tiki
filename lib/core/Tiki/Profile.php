@@ -94,7 +94,7 @@ class Tiki_Profile
 
     public static function getProfileKeyfor($domain, $profile)
     {
-        if (strpos($domain, '://') === false) {
+        if (! str_contains($domain, '://')) {
             if (\Tiki\Package\ExtensionManager::isExtensionEnabled($domain)) {
                 $path = Tiki\Package\ExtensionManager::get($domain)->getPath();
                 $domain = "file://" . $path . '/profiles';
@@ -146,7 +146,7 @@ class Tiki_Profile
     {
         global $tikilib;
 
-        if (strpos($object['domain'], '://') === false) {
+        if (! str_contains($object['domain'], '://')) {
             if (is_dir($object['domain'])) {
                 $object['domain'] = "file://" . $object['domain'];
             } else {
@@ -198,7 +198,7 @@ class Tiki_Profile
 
     public static function fromNames($domain, $profile)
     {
-        if (strpos($domain, '://') === false) {
+        if (! str_contains($domain, '://')) {
             if (is_dir($domain)) {
                 $domain = "file://$domain";
             } else {
@@ -208,7 +208,7 @@ class Tiki_Profile
 
         if ($domain == 'tiki://local') {
             return self::fromDb($profile);
-        } elseif (strpos($domain, 'file://') === 0) {
+        } elseif (str_starts_with($domain, 'file://')) {
             $path = substr($domain, strlen('file://'));
 
             return self::fromFile($path, $profile);
@@ -267,7 +267,7 @@ class Tiki_Profile
 
         // Make paths to the local install relative
         $tikiRoot = realpath(__DIR__ . '/../../../') . '/';
-        if (strpos($path, $tikiRoot) === 0) {
+        if (str_starts_with($path, $tikiRoot)) {
             $path = substr($path, strlen($tikiRoot));
         }
 
@@ -355,8 +355,6 @@ class Tiki_Profile
     {
         $this->pageContent = $content;
 
-        $pos = 0;
-
         $this->data = [];
 
         $matches = WikiParser_PluginMatcher::match($content);
@@ -418,10 +416,10 @@ class Tiki_Profile
                     $this->traverseForExternals($value);
                 }
             }
-        } elseif (0 === strpos($data, 'wikicontent:')) {
+        } elseif (str_starts_with($data, 'wikicontent:')) {
             $pageName = substr($data, strlen('wikicontent:'));
             $data = $this->getPageContent($pageName);
-        } elseif (0 === strpos($data, 'wikiparsed:')) {
+        } elseif (str_starts_with($data, 'wikiparsed:')) {
             $pageName = substr($data, strlen('wikiparsed:'));
             $data = $this->getPageParsed($pageName);
         }
@@ -465,7 +463,7 @@ class Tiki_Profile
                 if (is_numeric($key)) {
                     $old[] = $value;
                 } else {
-                    $old[$key] = $this->mergeData(isset($old[$key]) ? $old[$key] : null, $value);
+                    $old[$key] = $this->mergeData($old[$key] ?? null, $value);
                 }
             }
 
@@ -781,7 +779,7 @@ class Tiki_Profile
             $permissions = Tiki_Profile::convertLists($data, [ 'allow' => 'y', 'deny' => 'n' ], 'tiki_p_');
             $permissions = Tiki_Profile::convertYesNo($permissions);
             foreach (array_keys($permissions) as $key) {
-                if (strpos($key, 'tiki_p_') !== 0) {
+                if (! str_starts_with($key, 'tiki_p_')) {
                     unset($permissions[$key]);
                 }
             }
@@ -810,6 +808,7 @@ class Tiki_Profile
                 'prorate_interval' => ! empty($groupInfo['prorateInterval']) ? $groupInfo['prorateInterval'] : '',
                 'include' => [],
                 'autojoin' => 'n',
+                'twoFactorAuthGracePeriod' => null,
             ];
             foreach ($defaultInfo as $key => $value) {
                 if (array_key_exists($key, $data)) {
@@ -833,7 +832,7 @@ class Tiki_Profile
                     $perms = Tiki_Profile::convertYesNo($perms);
 
                     foreach (array_keys($perms) as $key) {
-                        if (strpos($key, 'tiki_p_') !== 0) {
+                        if (! str_starts_with($key, 'tiki_p_')) {
                             unset($perms[$key]);
                         }
                     }
@@ -937,7 +936,7 @@ class Tiki_Profile
 
         $key = self::getProfileKeyfor($this->domain, self::withPrefix($this->profile));
         foreach (array_keys(self::$known) as $obj) {
-            if (strpos($obj, $key) === 0) {
+            if (str_starts_with($obj, $key)) {
                 unset(self::$known[$obj]);
             }
         }
@@ -990,15 +989,14 @@ class Tiki_Profile
     public function getPath()
     {
         $domain = $this->domain;
-        $profile = $this->profile;
-        if (strpos($domain, '://') === false) {
+        if (! str_contains($domain, '://')) {
             if (is_dir($domain)) {
                 $domain = "file://" . $domain;
             } else {
                 $domain = "http://" . $domain;
             }
         }
-        if (substr($domain, 0, 7) == "file://") {
+        if (str_starts_with($domain, "file://")) {
             return TIKI_PATH . '/' . substr($domain, 7);
         } else {
             return $domain;

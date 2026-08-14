@@ -22,7 +22,6 @@ class Reports_Send_EmailBuilder_TrackerFileAttachment extends Reports_Send_Email
         $itemId = $change['data']['itemId'];
 
         $trklib = TikiLib::lib('trk');
-        $tracker = $trklib->get_tracker($trackerId);
         $mainFieldValue = $trklib->get_isMain_value($trackerId, $itemId);
 
         if ($mainFieldValue) {

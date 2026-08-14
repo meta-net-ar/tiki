@@ -18,7 +18,7 @@ $access->check_permission('tiki_p_admin');
 if (! isset($_REQUEST["ruser"])) {
     Feedback::errorAndDie(tra("No user indicated"), \Laminas\Http\Response::STATUS_CODE_409);
 }
-if (! user_exists($_REQUEST["ruser"])) {
+if (! TikiLib::lib('user')->user_exists($_REQUEST["ruser"])) {
     Feedback::errorAndDie(tra("Non-existent user"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 $smarty->assign_by_ref('ruser', $_REQUEST["ruser"]);

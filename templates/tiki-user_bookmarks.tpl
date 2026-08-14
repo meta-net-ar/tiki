@@ -14,7 +14,7 @@
     {section name=ix loop=$folders}
         <tr>
             <td class="text"><a class="tips" title=":{tr}Folder in{/tr}" href="tiki-user_bookmarks.php?parentId={$folders[ix].folderId}">
-                {icon name='file-archive' }</a>&nbsp;{$folders[ix].name|escape} ({$folders[ix].urls})
+                {icon name='file-archive'}</a>&nbsp;{$folders[ix].name|escape} ({$folders[ix].urls})
             </td>
             <td class="action">
                 <a class="tips" title=":{tr}Edit{/tr}" href="tiki-user_bookmarks.php?parentId={$parentId}&amp;editfolder={$folders[ix].folderId}">
@@ -23,7 +23,7 @@
                 <form action="tiki-user_bookmarks.php" method="post" >
                     {ticket}
                     <input type="hidden" name="removefolder" value={$folders[ix].folderId}>
-                    <button type="submit" title=":{tr}Remove folder{/tr}" name="parentId" value={$parentId} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
+                    <button type="submit" title=":{tr}Remove folder{/tr}" aria-label="{tr}Remove folder{/tr}" name="parentId" value={$parentId} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
                         {icon name='remove'}
                     </button>
                 </form>
@@ -63,7 +63,7 @@
                     <form action="tiki-user_bookmarks.php" method="post" >
                         {ticket}
                         <input type="hidden" name="refreshurl" value={$urls[ix].urlId}>
-                        <button type="submit" title=":{tr}Refresh cache{/tr}" name="parentId" value={$parentId} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
+                        <button type="submit" title=":{tr}Refresh cache{/tr}" aria-label="{tr}Refresh cache{/tr}" name="parentId" value={$parentId} class="tips btn btn-link btn-sm px-0 pt-0 pb-0">
                         {icon name='refresh'}
                         </button>
                     </form>

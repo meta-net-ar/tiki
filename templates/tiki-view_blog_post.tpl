@@ -1,9 +1,10 @@
+{include file='token_view_actions.tpl'}
 {if strlen($blog_data.post_heading) > 0 and $prefs.feature_blog_heading eq 'y'}
     {eval var=$blog_data.post_heading}
 {else}
     {include file='blog_post_heading.tpl'}
 {/if}
-<article class="card blogpost post post_single">
+<article class="card blogpost post post_single border-0">
     {include file='blog_wrapper.tpl' blog_post_context='view_blog_post'}
 </article>
 {include file='blog_post_related_content.tpl'}
@@ -11,7 +12,7 @@
         && ($tiki_p_read_comments == 'y'
             || $tiki_p_post_comments == 'y'
             || $tiki_p_edit_comments == 'y')}
-    <div id="comment-container" data-bs-target="{service controller=comment action=list type="blog post" objectId=$postId}"></div>
+    <div id="comment-container" class="my-3 mx-0" data-bs-target="{service controller=comment action=list type="blog post" objectId=$postId}"></div>
     {jq}
         var id = '#comment-container';
         $(id).comment_load($(id).data('bs-target'));

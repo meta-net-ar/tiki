@@ -6,16 +6,10 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_metatag_list()
 {
+    $metaElementsHelp = 'Meta-Elements';
+    $geotaggingHelp = 'https://en.wikipedia.org/wiki/Geotagging';
+
     return [
-        'metatag_keywords' => [
-            'name' => tra('Keywords'),
-            'description' => tra('A list of keywords (separated by commas) that describe this website.'),
-            'type' => 'textarea',
-            'size' => '4',
-            'default' => '',
-            'tags' => ['basic'],
-            'translatable' => true,
-        ],
         'metatag_freetags' => [
             'name' => tra('Include tags'),
             'description' => tra('If the Tags feature is enabled, the tags for each page with tags set will be used as meta keywords. This allows individual pages at the site to have different meta tags.'),
@@ -24,11 +18,13 @@ function prefs_metatag_list()
                 'feature_freetags',
             ],
             'default' => 'n',
+            'help' => $metaElementsHelp,
         ],
         'metatag_threadtitle' => [
             'name' => tra('Use thread title instead'),
             'description' => tra('Use the forum thread title in the meta title tag.'),
             'type' => 'flag',
+            'help' => $metaElementsHelp,
             'dependencies' => [
                 'feature_forums',
             ],
@@ -42,33 +38,28 @@ function prefs_metatag_list()
             'default' => '',
             'tags' => ['basic'],
             'translatable' => true,
+            'help' => $metaElementsHelp,
         ],
         'metatag_pagedesc' => [
             'name' => tra('Page description'),
             'description' => tra('Use each page description as the title meta tag for that page.'),
             'type' => 'flag',
             'default' => 'n',
+            'help' => $metaElementsHelp,
         ],
         'metatag_robotscustom' => [
             'name' => tra('Custom Meta robots'),
             'description' => tra('Add the ability to set custom meta robots on each wiki page that will override the global meta robots value.'),
             'type' => 'flag',
             'default' => 'n',
-        ],
-        'metatag_author' => [
-            'name' => tra('Author'),
-            'description' => tra('The author of this website. Typically this is the Admin or Webmaster.'),
-            'type' => 'text',
-            'size' => '50',
-            'default' => '',
-            'tags' => ['basic'],
+            'help' => $metaElementsHelp,
         ],
         'metatag_geoposition' => [
             'name' => tra('geo.position'),
             'description' => tra('The latitude and longitude of the physical location of the site. For example "38.898748, -77.037684".'),
             'type' => 'text',
             'size' => '50',
-            'help' => 'http://geotags.com/geo/geotags2.html',
+            'help' => $geotaggingHelp,
             'default' => '',
         ],
         'metatag_georegion' => [
@@ -81,9 +72,10 @@ function prefs_metatag_list()
         ],
         'metatag_geoplacename' => [
             'name' => tra('geo.placename'),
-            'description' => tra('A free-text description of your location.'),
+            'description' => tra('The name of the city, town, or place associated with your location. For example, "New York".'),
             'type' => 'text',
             'size' => '50',
+            'help' => $geotaggingHelp,
             'default' => '',
         ],
         'metatag_robots' => [
@@ -95,14 +87,27 @@ function prefs_metatag_list()
             'size' => '50',
             'default' => '',
         ],
-        'metatag_revisitafter' => [
-            'name' => tra('Revisit after'),
-            'description' => tra('Specify how often (in days) Web robots should visit your site.'),
-            'type' => 'text',
-            'unit' => tr('days'),
-            'size' => '50',
-            'default' => '',
-            'tags' => ['experimental'],
+        'metatag_robots_txt_apply_directives' => [
+            'name' => tra('Apply robots directives from robots.txt'),
+            'description' => tra('When enabled, Tiki will automatically apply robots meta directives (such as noindex, nofollow, etc.) as both meta tags and X-Robots-Tag HTTP headers to pages that match Disallow rules in robots.txt. This helps prevent search engines from indexing pages that crawlers are told not to visit. Works with SEF URLs - blocking /tiki-index.php will NOT block SEF URLs like /HomePage.'),
+            'type' => 'flag',
+            'help' => 'Robots-Exclusion-Protocol',
+            'default' => 'y',
+            'tags' => ['basic'],
         ],
+        'metatag_nositelinkssearchbox' => [
+            'name' => tra('Meta no site links searchbox'),
+            'description' => tra('The sitelinks search box will be disabled as part of the normal Googlebot crawling.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'help' => $metaElementsHelp,
+        ], // TODO: Update help page for this preference
+        'metatag_google_notranslate' => [
+            'name' => tra('Google No Translate'),
+            'description' => tra('If google finds that websites content is in different language than users language then to provide better content for users google often offers a link to translate content in to native language.'),
+            'type' => 'flag',
+            'default' => 'n',
+            'help' => $metaElementsHelp,
+        ]
     ];
 }

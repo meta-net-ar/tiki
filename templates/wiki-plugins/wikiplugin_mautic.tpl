@@ -4,10 +4,10 @@
             <h2>{tr}Contacts{/tr}</h2>
             <div>
                 {if in_array('create', $available_actions)}
-                    <a type="button" class="btn btn-primary" href="#">{icon name=create} {tr}New Contact{/tr}</a>
+                    <a role="button" class="btn btn-primary" href="#">{icon name=create} {tr}New Contact{/tr}</a>
                 {/if}
                 {if in_array('sync', $available_actions)}
-                    <a type="button" class="btn btn-primary" href="#">{icon name=sync} {tr}Sync data{/tr}</a>
+                    <a role="button" class="btn btn-primary" href="#">{icon name=sync} {tr}Sync data{/tr}</a>
                 {/if}
             </div>
         </div>
@@ -34,7 +34,7 @@
                         {actions}{strip}
                             {if in_array('info', $available_actions)}
                                 <action>
-                                    <a href="#">
+                                    <a href="#" role="button">
                                         {icon name=eye _menu_text='y' _menu_icon='y' alt="{tr}Info{/tr}"}
                                     </a>
                                 </action>

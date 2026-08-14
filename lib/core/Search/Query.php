@@ -6,6 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 class Search_Query implements Search_Query_Interface
 {
+    /**
+     * Every addObject() call adds one clause to a single boolean query, and Lucene refuses
+     * boolean queries holding more than maxClauseCount clauses (1024 by default). Callers
+     * looking up an arbitrary number of objects must split the lookup in batches of at most
+     * this many objects.
+     */
+    public const MAX_OBJECTS_PER_QUERY = 500;
+
     private $objectList;
     private $expr;
     private $sortOrder;
@@ -14,6 +22,7 @@ class Search_Query implements Search_Query_Interface
     private $weightCalculator = null;
     private $identifierFields = null;
     private $selectionFields = null;
+    private $countOnly = false;
 
     private $postFilter;
     private $processDidYouMean = false;
@@ -71,6 +80,16 @@ class Search_Query implements Search_Query_Interface
         return $this->cyphtSearch;
     }
 
+    public function setCountOnly($countOnly = true)
+    {
+        $this->countOnly = (bool) $countOnly;
+    }
+
+    public function isCountOnly()
+    {
+        return $this->countOnly;
+    }
+
     public function addObject($type, $objectId)
     {
         if (is_null($this->objectList)) {
@@ -98,6 +117,38 @@ class Search_Query implements Search_Query_Interface
     public function filterIdentifier($query, $field)
     {
         $this->addPart(new Search_Expr_Token($query), 'identifier', $field);
+    }
+
+    /**
+     * Match one or more exact values on an identifier field.
+     * Multiple values are separated by " OR " in $query.
+     */
+    public function filterMultiIdentifier($query, $field)
+    {
+        $values = array_filter(array_map('trim', preg_split('/\s+OR\s+/', $query)), 'strlen');
+
+        if (count($values) <= 1) {
+            $this->filterIdentifier(reset($values) ?: $query, $field);
+        } else {
+            $tokens = array_map(function ($v) {
+                return new Search_Expr_Token($v);
+            }, $values);
+            $this->addPart(new Search_Expr_Or($tokens), 'identifier', $field);
+        }
+    }
+
+    public function filterNotIdentifier($query, $field)
+    {
+        if (is_array($query)) {
+            $tokens = [];
+            foreach ($query as $q) {
+                $tokens[] = new Search_Expr_Token($q);
+            }
+            $part = new Search_Expr_Or($tokens);
+        } else {
+            $part = new Search_Expr_Token($query);
+        }
+        $this->addPart(new Search_Expr_Not($part), 'identifier', $field);
     }
 
     public function filterType($types)
@@ -398,7 +449,7 @@ class Search_Query implements Search_Query_Interface
             } else {
                 $resultset = $index->find($this, $this->start, $this->count, $multisearchId, $resultFromMultisearch);
             }
-        } catch (Search_Elastic_SortException $e) {
+        } catch (Search_Elastic_SortException) {
             //on sort exception, try again without the sort field
             $this->sortOrder = null;
             $resultset = $index->find($this, $this->start, $this->count);
@@ -432,7 +483,7 @@ class Search_Query implements Search_Query_Interface
 
         foreach ($this->foreignQueries as $indexName => $query) {
             $resultset->applyTransform(function ($entry) use ($query, $indexName) {
-                if (isset($entry['_index']) && ($entry['_index'] == $indexName || strstr($entry['_index'], $indexName))) {
+                if (isset($entry['_index']) && ($entry['_index'] == $indexName || str_contains($entry['_index'], $indexName))) {
                     foreach ($query->transformations as $trans) {
                         if (is_callable($trans)) {
                             $entry = $trans($entry);
@@ -445,7 +496,17 @@ class Search_Query implements Search_Query_Interface
         }
 
         $resultset = $this->processReturnOnlyResultsFromList($resultset);
-
+        // Add the list of date fields to the result set
+        foreach ($resultset as $entry) {
+            $tabDateField = [];
+            foreach ($entry as $column => $value) {
+                if ($index->isDateField($column)) {
+                    $tabDateField[] = $column;
+                }
+            }
+            $resultset->setDateFields($tabDateField);
+            break;
+        }
         return $resultset;
     }
 

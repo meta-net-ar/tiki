@@ -47,7 +47,6 @@ function wikiplugin_ftp_info()
                 'description' => tra('Label for the FTP download button'),
                 'since' => '3.0',
                 'filter' => 'text',
-                'default' => ''
             ],
             'ftpMode' => [
                 'required' => false,
@@ -79,7 +78,7 @@ function wikiplugin_ftp($data, $params)
             ftp_close($conn_id);
             return tra('Connection failed');
         }
-        if (! ($login_result = ftp_login($conn_id, $user, $password))) {
+        if (! (ftp_login($conn_id, $user, $password))) {
             ftp_close($conn_id);
             return tra('Incorrect param');
         }
@@ -108,7 +107,7 @@ function wikiplugin_ftp($data, $params)
         echo "$content";
         die;
     } else {
-        if (isset($title)) {
+        if (! is_null($title)) {
             $smarty->assign('ftptitle', $title);
         }
         $smarty->assign_by_ref('file', $data);

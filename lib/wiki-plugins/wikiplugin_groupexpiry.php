@@ -15,7 +15,7 @@ function wikiplugin_groupexpiry_info()
         'introduced' => 7,
         'params' => [
             'group' => [
-                'required' => true,
+                'required' => false,
                 'name' => tra('Group Name'),
                 'description' => tra('The name of an existing group on the site'),
                 'since' => '7.0',

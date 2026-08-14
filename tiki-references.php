@@ -16,17 +16,17 @@ $inputConfiguration = [
         'referenceId'              => 'int',               //post
         'ref_auto_biblio_code'     => 'bool',              //post
         'ref_biblio_code'          => 'string',            //post
-        'ref_author'               => 'word',              //post
+        'ref_author'               => 'text',              //post
         'ref_title'                => 'string',            //post
-        'ref_part'                 => 'alpha',             //post
-        'ref_uri'                  => 'alpha',             //post
-        'ref_code'                 => 'alpha',             //post
-        'ref_publisher'            => 'alpha',             //post
-        'ref_location'             => 'alpha',             //post
+        'ref_part'                 => 'text',              //post
+        'ref_uri'                  => 'url',               //post
+        'ref_code'                 => 'alnumdash',         //post
+        'ref_publisher'            => 'text',              //post
+        'ref_location'             => 'text',              //post
         'ref_year'                 => 'digits',            //post
-        'ref_style'                => 'word',              //post
+        'ref_style'                => 'text',              //post
         'ref_template'             => 'digits',            //post
-        'find'                     => 'alpha',             //post
+        'find'                     => 'string',             //post
         'maxRecords'               => 'int',               //post
         'offset'                   => 'digits',            //get
         'addreference'             => 'bool',              //post
@@ -56,7 +56,7 @@ $msg = "";
 $page_id = TikiLib::lib('tiki')->get_page_id_from_name($page);
 $action = $getInput($_REQUEST, 'action');
 $ref_id = $getInput($_REQUEST, 'referenceId');
-$ref_auto_biblio_code = empty($_REQUEST['ref_auto_biblio_code']) ? 'off' : $_REQUEST['ref_auto_biblio_code'];
+$ref_auto_biblio_code = empty($_REQUEST['ref_auto_biblio_code']) ? 'off' : 'on';
 $ref_biblio_code = $getInput($_REQUEST, 'ref_biblio_code');
 $ref_author = $getInput($_REQUEST, 'ref_author');
 $ref_title = $getInput($_REQUEST, 'ref_title');
@@ -106,7 +106,7 @@ if (isset($_REQUEST['addreference'])) {
         $record = array_shift($record['data']);
         $record['success'] = true;
         $record['id'] = $record['ref_id'];
-        if ($_REQUEST['response'] == 'json') {
+        if (isset($_REQUEST['response']) && $_REQUEST['response'] == 'json') {
             echo json_encode($record);
             return;
         }
@@ -115,7 +115,7 @@ if (isset($_REQUEST['addreference'])) {
         foreach ($errors as $error) {
             $msg .= tra($error);
         }
-        if ($_REQUEST['response'] == 'json') {
+        if (isset($_REQUEST['response']) && $_REQUEST['response'] == 'json') {
             echo json_encode([
                 'success' => false,
                 'msg' => $msg
@@ -215,7 +215,7 @@ if (isset($_REQUEST['action']) && isset($ref_id)) {
 
 $references = $referenceslib->list_lib_references($find, $maxRecords, $offset);
 $smarty->assign('references', $references['data']);
-$smarty->assign('cant', $references['cant']);
+$smarty->assign('count', $references['count']);
 if (! empty($ref_id)) {
     $currentlibreference = $referenceslib->get_reference_from_id($ref_id);
     if (isset($currentlibreference['data']) && isset($currentlibreference['data'][0]) && $currentlibreference['data'][0]['page_id'] == null) {

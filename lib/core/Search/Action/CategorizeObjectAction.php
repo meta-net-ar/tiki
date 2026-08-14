@@ -126,4 +126,9 @@ class Search_Action_CategorizeObjectAction implements Search_Action_Action
     {
         return ! empty($data->operation->text());
     }
+
+    public function requiresConfirm()
+    {
+        return false;
+    }
 }

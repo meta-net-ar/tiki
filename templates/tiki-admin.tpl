@@ -1,3 +1,5 @@
+{assign var=sharedAdminLayout value=($prefs.theme_unified_admin_backend eq 'y' && (($prefs.site_layout_admin|default:$prefs.site_layout) eq 'admin'))}
+{if !$sharedAdminLayout}
 <div class="admin-wrapper highlightable{* {if $prefs.theme_unified_admin_backend eq 'y'} overflow-auto{/if} *}">
     {if $prefs.theme_unified_admin_backend eq 'y'}
         <aside class="admin-nav">
@@ -13,11 +15,11 @@
                     <div class="d-flex flex-row justify-content-between was-toggle-unified-admin-panel">
                         <div class="pe-4">
                             {if $prefs.theme_unified_admin_backend eq 'y'}
-                                {tr}You are currently using the <strong>Unified Admin Backend</strong>.{/tr} <a class="alert-link" target="_blank" href="https://doc.tiki.org/VideoTutorial-2750-%20%20New%20Unified%20Admin%20Backend%20in%20Tiki">{tr}Learn more.{/tr}</a><br/>
+                                {tr}You are currently using the <strong>Unified Admin Backend</strong>.{/tr} <a class="alert-link" target="_blank" href="https://doc.tiki.org/Look-and-Feel-Theme">{tr}Learn more.{/tr}</a><br/>
                                 <span class="d-none d-sm-block">{tr}Toggle the switch to change the administration interface to the legacy control panels.{/tr}</span>
                             {else}
                                 <span>{tr}A new modern layout for admin UI is available.{/tr}</span>
-                                <a target="_blank" href="https://doc.tiki.org/VideoTutorial-2750-%20%20New%20Unified%20Admin%20Backend%20in%20Tiki">{tr}Learn more.{/tr}</a><br/>
+                                <a target="_blank" href="https://doc.tiki.org/Look-and-Feel-Theme">{tr}Learn more.{/tr}</a><br/>
                                 <span class="d-none d-sm-block">{tr}Toggle the switch to change the administration interface to the Unified Admin Backend.{/tr}</span>
                             {/if}
                         </div>
@@ -34,6 +36,7 @@
             </form>
         {/if} *}
         {include file="admin/admin_navbar.tpl"}
+{/if}
         {if $prefs.sender_email eq ''}
             {remarksbox type=warning title="{tr}Warning{/tr}" close="y"}
                 {tr _0='<a href="tiki-admin.php?page=general&highlight=sender_email" class="alert-link">' _1="</a>"}Your sender email is not set. You can set it %0in the general admin panel%1.{/tr}
@@ -52,8 +55,35 @@
                 {breadcrumbs type="pagetitle" loc="page" crumbs=$crumbs}
             {/if}
             *}
+            {if ! empty($tiki_version)}
+                {remarksbox type="info" title="{tr}Tiki version{/tr}"}
+                    <div class="adminoptionbox">
+                        <strong>{tr}Tiki version: {/tr}</strong> {$tiki_version}{if !empty($db_engine_type)} ({$db_engine_type}){/if}
+                    </div>
+                    {if ! empty($git_details)}
+                        <div class="adminoptionbox">
+                            <strong>{tr}Git Information:{/tr}</strong> {$git_details.branch}: <a target="_blank" class="wiki external" href="https://gitlab.com/tikiwiki/tiki/-/commit/{$git_details.commit.hash}"><cite>{$git_details.commit.hash|substring:0:8}</cite></a>{icon name='link-external'} {tr}from{/tr} {$git_details.committer.date|tiki_short_datetime}
+                        </div>
+                    {/if}
+                {/remarksbox}
+            {/if}
+            {if $mailer_queue_requires_update}
+                {remarksbox type="error" title="{tr}Email Queue Problem{/tr}"}
+                    <p>{tr}There are messages in the email queue that exceeded the number of retries and will not be retried anymore.{/tr}</p>
+                    <p>{tr}You can manage the queue.{/tr}
+                        {tr _0='<a class="alert-link" href="tiki-admin_email_queue.php">' _1="</a>"}%0Manage the queue.%1{/tr}
+                    </p>
+                {/remarksbox}
+            {/if}
+            {if $unsupported_mail_queue_entries}
+                {remarksbox type="danger" title="{tr}Unsupported Email Queue Entries{/tr}"}
+                    <p>{tr _0=$unsupported_mail_queue_entries}There are %0 queued messages that use an old unsupported mail format and cannot be processed by the current queue system.{/tr}</p>
+                    <p>{tr}Please delete the unsupported entries from the mail queue administration page.{/tr}</p>
+                    <p>{tr _0='<a class="alert-link" href="tiki-admin_email_queue.php">' _1="</a>"}%0Manage the queue.%1{/tr}</p>
+                {/remarksbox}
+            {/if}
             {if $ProblemsLoadingCacheSubSystem}
-                {remarksbox type="warning" title="{tr _0=$ProblemsLoadingCacheSubSystem}%0 did not load properly{/tr}"}
+                {remarksbox type="danger" title="{tr _0=$ProblemsLoadingCacheSubSystem}%0 did not load properly{/tr}"}
                 {tr _0=$ProblemsLoadingCacheSubSystem}Tiki is configured to use <strong>%0 cache system</strong>, however, it was not loaded properly. Check if the extension has been properly loaded.{/tr}<br />
                 {/remarksbox}
             {/if}
@@ -61,7 +91,7 @@
                 {remarksbox type="error" title="{tr}Database Version Problem{/tr}"}
                     {tr _0='<a class="alert-link" href="tiki-install.php">' _1="</a>"}Your database requires an update to match the current Tiki version. Please proceed to %0the installer%1. Using Tiki with an incorrect database version usually provokes errors{/tr}
                     {tr}If you have shell (SSH) access, you can also use the following, on the command line, from the root of your Tiki installation:{/tr}
-                    <kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:update</kbd>
+                    {tr _0="<kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:update</kbd>" _1="<kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} database:patch patch_name</kbd>"}%0 or apply the missing patches one by one with %1 in version order.{/tr}
                     <p class="mt-3"> {tr _0='<a class="alert-link" href="tiki-check.php">' _1="</a>"}Please note that the Tiki schema does not support downgrading the database. It can only perform upgrades. For more info, you may check the database status by opening the %0tiki-check page%1.{/tr}</p>
                     <div class="h6 mt-3">
                         <a class="collapse-toggle alert-link" data-bs-toggle="collapse" href="#missingpatches">
@@ -75,6 +105,63 @@
                             {/foreach}
                         </ul>
                     </div>
+                {/remarksbox}
+            {/if}
+
+            {if ! empty($scheduler_failure_logs)}
+                {remarksbox type="error" title="{tr}Scheduler tasks failure logs{/tr}"}
+                    <p>
+                    {if ! empty($prefs.scheduledTasksReport) && $prefs.scheduledTasksReport === 'last_number_of_hours'}
+                        {tr _0=$prefs.scheduledTasksReportHours}Nº of tasks failure in last %0 hours:{/tr}
+                        {if ! empty($scheduler_total_count)}
+                            <strong>{$scheduler_failure_count} / {$scheduler_total_count}</strong> ({tr}failures / total executions{/tr})
+                        {else}
+                            <strong>{count($scheduler_failure_logs)}</strong>
+                        {/if}
+                    {else}
+                        {tr}Nº of tasks failure during last execution:{/tr}
+                        <strong>{count($scheduler_failure_logs)}</strong>
+                    {/if}
+                    </p>
+
+                    <strong>{tr}Scheduler tasks with errors:{/tr}</strong>
+                    <ul>
+                        {foreach from=$scheduler_failure_logs item=item}
+                            <li>{$item['name']}</li>
+                        {/foreach}
+                    </ul>
+
+                    <p>
+                        <a target="_blank" href="tiki-admin_schedulers.php">
+                            {tr}View Scheduler Details{/tr}
+                        </a>
+                    </p>
+                {/remarksbox}
+            {/if}
+
+            {if $htaccess_global_warning}
+                {remarksbox type="warning" title="{tr}.htaccess differs from the bundled _htaccess{/tr}"}
+                    <p class="mb-2">
+                        {tr}Your active <code>.htaccess</code> does not match the reference <code>_htaccess</code> shipped with Tiki.{/tr}
+                    </p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a class="btn btn-outline-secondary btn-sm" href="{$htaccessDocsUrl|escape}" target="_blank" rel="noopener">
+                            {tr}How to fix{/tr}
+                        </a>
+                        <a class="btn btn-outline-primary btn-sm" href="tiki-admin_security.php#content" rel="noopener">
+                            {tr}See details in Security panel{/tr}
+                        </a>
+                    </div>
+                    <details class="small mt-2">
+                        <summary>{tr}Technical details{/tr}</summary>
+                        <ul class="list-unstyled mb-0">
+                            <li>{tr}Reference hash:{/tr} <code>{$htaccess_global_warning.reference_hash|escape}</code></li>
+                            <li>{tr}Active hash:{/tr} <code>{$htaccess_global_warning.hash|escape}</code></li>
+                            {if !empty($htaccess_global_warning.details.symlink_target)}
+                                <li>{tr}Symlink target:{/tr} <code>{$htaccess_global_warning.details.symlink_target|escape}</code></li>
+                            {/if}
+                        </ul>
+                    </details>
                 {/remarksbox}
             {/if}
 
@@ -111,6 +198,9 @@
                 {/remarksbox}
             {/if}
 
+            {if ! empty($unusedIndices)}
+                {include file="search/search_unused_indices.tpl"}
+            {/if}
             {if $search_index_outdated}
                 {remarksbox type="error" title="{tr}Search Index outdated{/tr}"}
                 {tr}The search index might be outdated. It is recommended to rebuild the search index.{/tr}
@@ -130,7 +220,7 @@
 
             {if !$isSchedulerRunConfigured}
                 {remarksbox type="warning" title="{tr}The Scheduler does not seem to have been executed recently.{/tr}"}
-                    {tr}In most Tiki installations it is useful to have the scheduler configured to execute tasks in the background{/tr}
+                    {tr}In most Tiki installations it is useful to have the scheduler configured to execute tasks in the background.{/tr}
                     {tr}Find out more about the Scheduler at{/tr}
                     <a href="https://doc.tiki.org/Scheduler" class="link" target="_blank">
                         https://doc.tiki.org/Scheduler
@@ -144,7 +234,7 @@
                         {tr}Please proceed to <a class="alert-link" href="{bootstrap_modal controller=search action=rebuild}">{tr}rebuild Index{/tr}</a>.{/tr}
                         {tr}If you have shell (SSH) access, you can also use the following, on the command line, from the root of your Tiki installation:{/tr}
                         <kbd>php console.php{if not empty($tikidomain)} --site={$tikidomain|replace:'/':''}{/if} index:rebuild</kbd>
-                    {else if $prefs.unified_elastic_mysql_search_fallback eq 'n'}
+                    {elseif $prefs.unified_elastic_mysql_search_fallback eq 'n'}
                         {tr}The main search engine is not working properly and the fallback is also not set.</br>
                             Search engine results might not be properly displayed.{/tr}
                     {/if}
@@ -185,16 +275,37 @@
             {/if}
         </div>
 
-        {if $upgrade_messages|count}
-            {if $upgrade_messages|count eq 1}
+        {* Error box box for critical "unsupported" messages. *}
+        {if $upgrade_errors|count}
+            {remarksbox type="error" title="{tr}Upgrade Required{/tr}" icon="announce"}
+                {foreach from=$upgrade_errors item=um}
+                    <p>{$um|safe_html}</p>
+                {/foreach}
+            {/remarksbox}
+        {/if}
+
+        {* Warning box for "approaching EoL" messages. *}
+        {if $upgrade_warnings|count}
+            {remarksbox type="warning" title="{tr}Upgrade Recommended{/tr}" icon="announce"}
+                {foreach from=$upgrade_warnings item=um}
+                    <p>{$um|safe_html}</p>
+                {/foreach}
+            {/remarksbox}
+        {/if}
+
+        {* Note box for informational "upgrade available" messages. *}
+        {if $upgrade_notes|count}
+            {if not $is_stable}
+                {$title="{tr}Stable version available{/tr}"}
+            {elseif $upgrade_notes|count eq 1}
                 {$title="{tr}Upgrade Available{/tr}"}
             {else}
                 {$title="{tr}Upgrades Available{/tr}"}
             {/if}
             {remarksbox type="note" title=$title icon="announce"}
-                {foreach from=$upgrade_messages item=um}
-                    <p>{$um|escape}</p>
-                {/foreach}
+            {foreach from=$upgrade_notes item=um}
+                <p>{$um|safe_html}</p>
+            {/foreach}
             {/remarksbox}
         {/if}
 
@@ -226,5 +337,7 @@
             {/if}
             {include file="admin/include_$include.tpl"}
         {/if}
+{if !$sharedAdminLayout}
+        </div>
     </div>
-</div>
+{/if}

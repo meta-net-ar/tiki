@@ -48,6 +48,7 @@ class Tracker_Field_Rating extends \Tracker\Field\AbstractItemField
             '*' => [
                 'name' => tr('Stars (deprecated)'),
                 'description' => tr('Display a star rating'),
+                'help' => 'Stars-Field',
                 'readonly' => true,
                 'deprecated' => true,
                 'prefs' => ['trackerfield_stars'],
@@ -66,6 +67,7 @@ class Tracker_Field_Rating extends \Tracker\Field\AbstractItemField
             's' => [
                 'name' => tr('Stars (system - deprecated)'),
                 'description' => tr('Display a star rating'),
+                'help' => 'Stars-Field',
                 'readonly' => true,
                 'deprecated' => true,
                 'prefs' => ['trackerfield_starsystem'],
@@ -171,8 +173,6 @@ class Tracker_Field_Rating extends \Tracker\Field\AbstractItemField
 
     private function getBaseFieldData()
     {
-        global $user;
-
         $mode = $this->getOption('mode', 'stars');
 
         $options_array = $this->getOption('option', [1, 2, 3, 4, 5]);

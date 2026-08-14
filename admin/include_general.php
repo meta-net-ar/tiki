@@ -19,7 +19,7 @@ if (! empty($_POST['testMail']) && $access->checkCsrf()) {
     if (! $mail->send([$_REQUEST['testMail']])) {
         $msg = tra('Unable to send mail');
         if ($tiki_p_admin == 'y') {
-            $mailerrors = print_r($mail->errors, true);
+            $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string for display, never prints)
             $msg .= '<br>' . htmlentities($mailerrors, ENT_COMPAT);
         }
         Feedback::warning($msg);

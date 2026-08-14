@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_scorm_list()
 {
+    $scormHelp = 'SCORM';
+
     return [
         'scorm_enabled' => [
             'name' => tra('SCORM support'),
@@ -16,6 +18,7 @@ function prefs_scorm_list()
             ],
             'type' => 'flag',
             'default' => 'n',
+            'help' => $scormHelp,
         ],
         'scorm_tracker' => [
             'name' => tra('SCORM Tracker'),
@@ -25,6 +28,7 @@ function prefs_scorm_list()
             'default' => 0,
             'size' => 5,
             'profile_reference' => 'tracker',
+            'help' => $scormHelp,
         ],
     ];
 }

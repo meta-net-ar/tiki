@@ -7,9 +7,11 @@ post:
         schema:
           type: object
           properties:
-            categId:
-              type: integer
-              description: The ID of the category to uncategorize the objects from
+            categIds[]:
+              type: array
+              description: Category identifiers. An array of category IDs to uncategorize the objects from
+              items:
+                type: integer
             objects[]:
               $ref: schemas-TikiObjects.yaml
   responses:
@@ -21,12 +23,24 @@ post:
             type: object
             properties:
               categId:
-                type: integer
+                type: string
+                description: Category ID (may be returned as a string).
               objects:
                 type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                    id:
+                      type: string
+                    catObjectId:
+                      type: string
               count:
-                type: string
-                description: Number of objects remaining in the category or 'unchanged' if action didn't perform any updates
+                oneOf:
+                  - type: integer
+                  - type: string
+                description: Number of objects remaining in the category, or 'unchanged' when no update was performed.
     '403':
       description: forbidden
       content:

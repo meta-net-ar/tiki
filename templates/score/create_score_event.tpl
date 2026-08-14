@@ -29,7 +29,7 @@
             <input type="text" placeholder="{tr}Pt. value{/tr}" size="10" name="events[{$eventType}][{$rowCount}][score]" value="" />
         </td>
         <td class="text-end">
-            <a class="delete-row" href="#">{icon name=delete title="Delete"}</a>
+            <a class="delete-row" href="#" role="button">{icon name=delete title="Delete"}</a>
         </td>
     </tr>
     <tr class="advanced-row">

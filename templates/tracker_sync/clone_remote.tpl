@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -30,7 +30,7 @@
             {/if}
             <div class="submit text-center">
                 {if !$modal}
-                    <a href="tiki-list_trackers.php" class="btn btn-link">{tr}Cancel{/tr}</a>
+                    <a href="tiki-list_trackers.php" class="btn btn-link" role="button">{tr}Cancel{/tr}</a>
                 {/if}
                 {if $tracker_list}
                     <input type="submit" class="btn btn-primary" value="{tr}Clone{/tr}">

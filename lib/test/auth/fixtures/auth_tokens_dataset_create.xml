@@ -10,8 +10,10 @@
         <field name="maxhits">10</field>
         <field name="token">823bde97a717c55b2cfbf9fbd6c81816</field>
         <field name="entry">tiki-index.php</field>
+        <field name="user" xsi:nil="true"/>
         <field name="email"></field>
         <field name="parameters">[]</field>
+        <field name="data" xsi:nil="true"/>
         <field name="groups">[&quot;Admins&quot;,&quot;Registered&quot;]</field>
         <field name="createUser">n</field>
         <field name="userPrefix">_token</field>
@@ -24,8 +26,10 @@
         <field name="maxhits">10</field>
         <field name="token">91bba2f998b48fce0146016809886127</field>
         <field name="entry">tiki-index.php</field>
+        <field name="user" xsi:nil="true"/>
         <field name="email"></field>
         <field name="parameters">[]</field>
+        <field name="data" xsi:nil="true"/>
         <field name="groups">[&quot;Admins&quot;,&quot;Registered&quot;]</field>
         <field name="createUser">n</field>
         <field name="userPrefix">_token</field>
@@ -38,8 +42,10 @@
         <field name="maxhits">10</field>
         <field name="token">e2990f7983b7b6c46b3987536aa38d32</field>
         <field name="entry">tiki-index.php</field>
+        <field name="user" xsi:nil="true"/>
         <field name="email"></field>
         <field name="parameters">[]</field>
+        <field name="data" xsi:nil="true"/>
         <field name="groups">[&quot;Admins&quot;,&quot;Registered&quot;]</field>
         <field name="createUser">n</field>
         <field name="userPrefix">_token</field>
@@ -52,8 +58,10 @@
         <field name="maxhits">1</field>
         <field name="token">0ae3b4b86286ab68f5a66fb8c49da163</field>
         <field name="entry">tiki-index.php</field>
+        <field name="user">admin</field>
         <field name="email"></field>
         <field name="parameters">{&quot;page&quot;:&quot;HomePage&quot;}</field>
+        <field name="data">{&quot;destination&quot;:&quot;message&quot;}</field>
         <field name="groups">[&quot;Registered&quot;]</field>
         <field name="createUser">n</field>
         <field name="userPrefix"></field>

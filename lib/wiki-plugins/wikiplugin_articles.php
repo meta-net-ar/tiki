@@ -7,6 +7,24 @@
 function wikiplugin_articles_info()
 {
     global $prefs;
+
+    // Get topics and types for dropdown options
+    $artlib = TikiLib::lib('art');
+    $topics = $artlib->list_topics();
+    $types = $artlib->list_types_byname();
+
+    // Convert topics to options format
+    $topicOptions = [];
+    foreach ($topics as $topicId => $topic) {
+        $topicOptions[] = ['text' => $topic['name'], 'value' => $topicId];
+    }
+
+    // Convert types to options format
+    $typeOptions = [];
+    foreach ($types as $typeName => $type) {
+        $typeOptions[] = ['text' => $typeName, 'value' => $typeName];
+    }
+
     return [
         'name' => tra('Article List'),
         'documentation' => 'PluginArticles',
@@ -37,41 +55,35 @@ function wikiplugin_articles_info()
                 'since' => '1',
                 'default' => $prefs['maxRecords'],
             ],
-            'topic' => [
-                'required' => false,
-                'name' => tra('Topic Name Filter'),
-                'description' => tra('Filter the list of articles by topic. Example: ') . '<code>[!]topic+topic+topic</code>',
-                'filter' => 'text',
-                'since' => '1',
-                'default' => '',
-            ],
             'topicId' => [
                 'required' => false,
-                'name' => tra('Topic ID Filter'),
-                'description' => tra('Filter the list of articles by topic ID. Example: ') . '<code>[!]topicId+topicId+topicId</code>',
-                'filter' => 'text',
+                'name' => tra('Topic Filter'),
+                'description' => tra('Filter articles by topic. You can select multiple topics from the dropdown. Use negation (e.g., !topic1+topic2) to exclude articles from specific topics.'),
+                'filter' => 'striptags',
                 'accepted' => tra('Valid topic IDs'),
-                'default' => '',
                 'profile_reference' => 'article_topic',
                 'since' => '2.0',
+                'options' => $topicOptions,
+                'separator' => '+',
+                'select_multiple' => 'y',
             ],
             'type' => [
                 'required' => false,
                 'name' => tra('Type Filter'),
                 'description' => tra('Filter the list of articles by types. Example: ') . '<code>[!]type+type+type</code>',
-                'filter' => 'text',
+                'filter' => 'striptags',
                 'since' => '1',
                 'accepted' => tra('Valid article types'),
-                'default' => '',
                 'profile_reference' => 'article_type',
+                'options' => $typeOptions,
+                'separator' => '+',
+                'select_multiple' => 'y',
             ],
             'categId' => [
                 'required' => false,
-                'name' => tra('Category ID'),
-                'description' => tra('List of category IDs, separated by "%0". Only articles in all these categories are
-                    listed', '<code>|</code>'),
+                'name' => tra('Category Filter'),
+                'description' => tra('Filter articles by category. You can select multiple categories from the dropdown. Only articles in all selected categories will be listed.'),
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'category',
                 'since' => '1',
                 'separator' => '|',
@@ -86,22 +98,34 @@ function wikiplugin_articles_info()
             ],
             'sort' => [
                 'required' => false,
-                'name' => tra('Sort order'),
-                'description' => tr('The column and order of the sort in %0columnName_asc%1 or %0columnName_desc%1 format.
-                    Defaults to %0publishDate_desc%1 (other column examples are %0title%1, %0lang%1, %0articleId%1,
-                    %0authorName%1 & %0topicName%1). Use "random" to have random items.', '<code>', '</code>'),
-                'filter' => 'word',
+                'name' => tra('Sort Order'),
+                'description' => tra('Choose how to sort the articles. Default is by publication date (newest first).'),'filter' => 'word',
                 'default' => 'publishDate_desc',
                 'since' => '2.0',
-                'accepted' => tra('random or column names to add _asc _desc to: ')
-                    . 'created, author, title, publishDate, articleId, topline, subtitle, lang, linkto, authorName, topicId, topicName, state, size, heading, body, isfloat, useImage, image_name, image_caption, image_alt, image_type, image_size, image_x, image_y, image_data, list_image_x, list_image_y, nbreads, votes, points, type, rating, ispublished'],
+                'options' => [
+                    ['text' => tra('Publication Date (Newest First)'), 'value' => 'publishDate_desc'],
+                    ['text' => tra('Publication Date (Oldest First)'), 'value' => 'publishDate_asc'],
+                    ['text' => tra('Title (A-Z)'), 'value' => 'title_asc'],
+                    ['text' => tra('Title (Z-A)'), 'value' => 'title_desc'],
+                    ['text' => tra('Author Name (A-Z)'), 'value' => 'authorName_asc'],
+                    ['text' => tra('Author Name (Z-A)'), 'value' => 'authorName_desc'],
+                    ['text' => tra('Article ID (Lowest First)'), 'value' => 'articleId_asc'],
+                    ['text' => tra('Article ID (Highest First)'), 'value' => 'articleId_desc'],
+                    ['text' => tra('Topic Name (A-Z)'), 'value' => 'topicName_asc'],
+                    ['text' => tra('Topic Name (Z-A)'), 'value' => 'topicName_desc'],
+                    ['text' => tra('Creation Date (Newest First)'), 'value' => 'created_desc'],
+                    ['text' => tra('Creation Date (Oldest First)'), 'value' => 'created_asc'],
+                    ['text' => tra('Language (A-Z)'), 'value' => 'lang_asc'],
+                    ['text' => tra('Language (Z-A)'), 'value' => 'lang_desc'],
+                    ['text' => tra('Random Order'), 'value' => 'random'],
+                ],
+            ],
             'order' => [
                 'required' => false,
                 'name' => tra('Specific order'),
                 'description' => tra('List of ArticleId that must appear in this order if present'),
                 'filter' => 'digits',
                 'separator' => '|',
-                'default' => '',
                 'since' => '9.0',
             ],
             'articleId' => [
@@ -110,7 +134,6 @@ function wikiplugin_articles_info()
                 'description' => tr('List of article IDs to display, separated by "%0"', '<code>|</code>'),
                 'filter' => 'digits',
                 'separator' => '|',
-                'default' => '',
                 'profile_reference' => 'article',
                 'since' => '9.0',
             ],
@@ -120,7 +143,6 @@ function wikiplugin_articles_info()
                 'description' => tra('List of article IDs to not display, separated by "%0"', '<code>|</code>'),
                 'filter' => 'digits',
                 'separator' => '|',
-                'default' => '',
                 'profile_reference' => 'article',
                 'since' => '5.0',
             ],
@@ -197,7 +219,6 @@ function wikiplugin_articles_info()
                     "Start Date" and "End Date" are ignored.'),
                 'filter' => 'digits',
                 'since' => '1',
-                'default' => '',
             ],
             'periodUnit' => [
                 'required' => false,
@@ -281,7 +302,6 @@ function wikiplugin_articles_info()
                 'filter' => 'alpha',
                 'separator' => '|',
                 'since' => '1',
-                'default' => '',
             ],
             'useLinktoURL' => [
                 'required' => false,
@@ -302,14 +322,24 @@ function wikiplugin_articles_info()
 
 function wikiplugin_articles($data, $params)
 {
-    global $prefs, $tiki_p_read_article, $tiki_p_articles_read_heading, $pageLang;
+    global $prefs, $pageLang;
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
     $artlib = TikiLib::lib('art');
-    $default = ['max' => $prefs['maxRecords'], 'start' => 0, 'usePagination' => 'n', 'topicId' => '', 'topic' => '', 'sort' => 'publishDate_desc', 'type' => '', 'lang' => '', 'quiet' => 'n', 'categId' => '', 'largefirstimage' => 'n', 'urlparam' => '', 'actions' => 'n', 'translationOrphan' => '', 'headerLinks' => 'n', 'showtable' => 'n', 'useLinktoURL' => 'n'];
-    $auto_args = ['lang', 'topicId', 'topic', 'sort', 'type', 'lang', 'categId'];
-    $params = array_merge($default, $params);
 
+    if (! isset($params['topic'])) {
+        $params['topic'] = '';
+    }
+    if (! isset($params['headerLinks'])) {
+        $params['headerLinks'] = 'n';
+    }
+    if (! isset($params['showtable'])) {
+        $params['showtable'] = 'n';
+    }
+
+    $auto_args = ['lang', 'topicId', 'topic', 'sort', 'type', 'lang', 'categId'];
+
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_articles_info());
     extract($params, EXTR_SKIP);
     $filter = [];
     if ($prefs['feature_articles'] != 'y') {
@@ -319,13 +349,8 @@ function wikiplugin_articles($data, $params)
 
     $urlnext = '';
     if ($usePagination == 'y') {
-        //Set offset when pagniation is used
-        if (! isset($_REQUEST["offset"])) {
-            $start = 0;
-        } else {
-            $start = $_REQUEST["offset"];
-        }
-
+        //Set offset when pagination is used
+        $start = $_REQUEST["offset"] ?? 0;
         foreach ($auto_args as $arg) {
             if (! empty($$arg)) {
                 $paramsnext[$arg] = $$arg;
@@ -340,71 +365,61 @@ function wikiplugin_articles($data, $params)
     $smarty->assign_by_ref('urlnext', $urlnext);
     $smarty->assign_by_ref('useLinktoURL', $useLinktoURL);
 
-    if (! isset($containerClass)) {
-        $containerClass = 'wikiplugin_articles';
-    }
     $smarty->assign('container_class', $containerClass);
 
     $dateStartTS = 0;
     $dateEndTS = 0;
 
     // if a period of time is set, date start and end are ignored
-    if (isset($periodQuantity)) {
-        switch ($periodUnit) {
-            case 'hour':
-                $periodUnit = 3600;
-                break;
-            case 'day':
-                $periodUnit = 86400;
-                break;
-            case 'week':
-                $periodUnit = 604800;
-                break;
-            case 'month':
-                $periodUnit = 2628000;
-                break;
-            default:
-                break;
-        }
+    if (! is_null($periodQuantity)) {
+        $periodQuantity = match ($periodQuantity) {
+            'hour' => 3600,
+            'day' => 86400,
+            'week' => 604800,
+            'month' => 2628000,
+        };
 
         if (is_int($periodUnit)) {
             $dateStartTS = $tikilib->now - ($periodQuantity * $periodUnit);
             $dateEndTS = $tikilib->now;
         }
     } else {
-        if (isset($dateStart)) {
-            $dateStartTS = strtotime($dateStart);
-        }
-
-        if (isset($dateEnd)) {
-            $dateEndTS = strtotime($dateEnd);
-        }
+        $dateStartTS = strtotime($dateStart);
+        $dateEndTS = strtotime($dateEnd);
     }
 
-    if (isset($fullbody) && $fullbody == 'y') {
-        $smarty->assign('fullbody', 'y');
-    } else {
-        $smarty->assign('fullbody', 'n');
-        $fullbody = 'n';
-    }
+    $smarty->assign('fullbody', $fullbody);
     $smarty->assign('largefirstimage', $largefirstimage);
-    if (! isset($overrideDates)) {
-        $overrideDates = 'n';
-    }
 
-    if (! empty($translationOrphan)) {
+    if (! is_null($translationOrphan)) {
         $filter['translationOrphan'] = $translationOrphan;
     }
-    if (! empty($articleId)) {
+    if (! is_null($articleId)) {
         $filter['articleId'] = $articleId;
     }
-    if (! empty($notArticleId)) {
+    if (! is_null($notArticleId)) {
         $filter['notArticleId'] = $notArticleId;
+    }
+
+    if (! is_null($topicId)) {
+        if (is_array($topicId)) {
+            $separator = $pluginInfo['params']['topicId']['separator'] ?? '+';
+            $topicId = implode($separator, $topicId);
+        }
+        $filter['topicId'] = $topicId;
+    }
+
+    if (! is_null($type)) {
+        if (is_array($type)) {
+            $separator = $pluginInfo['params']['type']['separator'] ?? '+';
+            $type = implode($separator, $type);
+        }
+        $filter['type'] = $type;
     }
 
     if (! is_array($categId) || count($categId) == 0) {
         $categIds = '';
-    } elseif (is_array($categId) && count($categId) == 1) {
+    } elseif (count($categId) == 1) {
         // For performance reasons, if there is only one value, the SQL query should not return IN () as it does with arrays
         // So we send a single value instead of a single-value array
         $categIds = $categId[0];
@@ -414,7 +429,7 @@ function wikiplugin_articles($data, $params)
     }
 
     $listpages = $artlib->list_articles($start, $max, $sort, '', $dateStartTS, $dateEndTS, 'admin', $type, $topicId, 'y', $topic, $categIds, '', '', $lang, '', '', ($overrideDates == 'y'), 'y', $filter);
-    if ($prefs['feature_multilingual'] == 'y' && empty($translationOrphan)) {
+    if ($prefs['feature_multilingual'] == 'y' && is_null($translationOrphan)) {
         $multilinguallib = TikiLib::lib('multilingual');
         $listpages['data'] = $multilinguallib->selectLangList('article', $listpages['data'], $pageLang);
         foreach ($listpages['data'] as &$article) {
@@ -448,21 +463,13 @@ function wikiplugin_articles($data, $params)
         $comments_prefix_var = 'article:';
         $comments_object_var = $listpages["data"][$i]["articleId"];
         $comments_objectId = $comments_prefix_var . $comments_object_var;
-        $listpages["data"][$i]["comments_cant"] = TikiLib::lib('comments')->count_comments($comments_objectId);
-        //print_r($listpages["data"][$i]['title']);
+        $listpages["data"][$i]["comments_count"] = TikiLib::lib('comments')->count_comments($comments_objectId);
     }
 
     $topics = $artlib->list_topics();
     $smarty->assign_by_ref('topics', $topics);
 
-    if (empty($topicId)) {
-        $topicId = '';
-    }
-    if (empty($type)) {
-        $type = '';
-    }
-
-    if (! empty($topic) && ! strstr($topic, '!') && ! strstr($topic, '+')) {
+    if (! empty($topic) && ! str_contains($topic, '!') && ! str_contains($topic, '+')) {
         $smarty->assign_by_ref('topic', $topic);
     } elseif (! empty($topicId) &&  is_numeric($topicId)) {
         $smarty->assign_by_ref('topicId', $topicId);
@@ -477,7 +484,7 @@ function wikiplugin_articles($data, $params)
     } elseif (empty($topicId)) {
         $smarty->assign_by_ref('topicId', $topicId);
     }
-    if (! empty($type) && ! strstr($type, '!') && ! strstr($type, '+')) {
+    if (! empty($type) && ! str_contains($type, '!') && ! str_contains($type, '+')) {
         $smarty->assign_by_ref('type', $type);
     } elseif (empty($type)) {
         $smarty->assign_by_ref('type', $type);
@@ -486,9 +493,9 @@ function wikiplugin_articles($data, $params)
     if ($usePagination == 'y') {
         $smarty->assign('maxArticles', $max);
         $smarty->assign_by_ref('offset', $start);
-        $smarty->assign_by_ref('cant', $listpages['cant']);
+        $smarty->assign_by_ref('count', $listpages['count']);
     }
-    if (! empty($order)) {
+    if (! is_null($order)) {
         foreach ($listpages['data'] as $i => $article) {
             $memo[$article['articleId']] = $i;
         }
@@ -497,7 +504,7 @@ function wikiplugin_articles($data, $params)
                 $list[] = $listpages['data'][$memo[$articleId]];
             }
         }
-        foreach ($listpages['data'] as $i => $article) {
+        foreach ($listpages['data'] as $article) {
             if (! in_array($article['articleId'], $order)) {
                 $list[] = $article;
             }
@@ -510,10 +517,9 @@ function wikiplugin_articles($data, $params)
     $smarty->assign_by_ref('actions', $actions);
     $smarty->assign('headerLinks', $headerLinks);
 
-    if (isset($titleonly) && $titleonly == 'y') {
+    if ($titleonly == 'y') {
         return "~np~ " . $smarty->fetch('tiki-view_articles-titleonly.tpl') . " ~/np~";
     } else {
         return "~np~ " . $smarty->fetch('tiki-view_articles.tpl') . " ~/np~";
     }
-    //return str_replace("\n","",$smarty->fetch('tiki-view_articles.tpl')); // this considers the hour in the header like a link
 }

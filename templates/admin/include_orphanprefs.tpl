@@ -9,12 +9,12 @@
     <table class="table table-striped table-hover normal" id="wpfancytableOrphanPrefs" role="grid" aria-describedby="wpfancytableOrphanPrefs_pager_info" style="width: auto; min-width: auto;">
         <thead>
             <tr role="row" class="tablesorter-headerRow">
-                <th style="user-select: none;" data-column="0" class="tablesorter-header tablesorter-headerAsc" tabindex="0" scope="col" role="columnheader" aria-disabled="false" aria-controls="wpfancytableOrphanPrefs" unselectable="on" aria-sort="ascending" aria-label="Preferences: Ascending sort applied, activate to apply a descending sort">
-                    <div class="tablesorter-header-inner">Preferences <i class="tablesorter-icon"></i></div>
+                <th style="user-select: none;" data-column="0" class="tablesorter-header tablesorter-headerAsc" tabindex="0" scope="col" role="columnheader" aria-disabled="false" aria-controls="wpfancytableOrphanPrefs" unselectable="on" aria-sort="ascending" aria-label="{tr}Preferences: Ascending sort applied, activate to apply a descending sort{/tr}">
+                    <div class="tablesorter-header-inner">{tr}Preferences{/tr} <i class="tablesorter-icon"></i></div>
                 </th>
 
-                <th style="user-select: none;" data-column="1" class="tablesorter-header tablesorter-headerAsc" tabindex="0" scope="col" role="columnheader" aria-disabled="false" aria-controls="wpfancytableOrphanPrefs" unselectable="on" aria-sort="ascending" aria-label="Values: Ascending sort applied, activate to apply a descending sort">
-                    <div class="tablesorter-header-inner">Values <i class="tablesorter-icon"></i></div>
+                <th style="user-select: none;" data-column="1" class="tablesorter-header tablesorter-headerAsc" tabindex="0" scope="col" role="columnheader" aria-disabled="false" aria-controls="wpfancytableOrphanPrefs" unselectable="on" aria-sort="ascending" aria-label="{tr}Values: Ascending sort applied, activate to apply a descending sort{/tr}">
+                    <div class="tablesorter-header-inner">{tr}Values{/tr} <i class="tablesorter-icon"></i></div>
                 </th>
 
                 <th style="user-select: none;" data-column="2" class="filter-false tablesorter-header tablesorter-headerUnSorted" tabindex="0" scope="col" role="columnheader" aria-disabled="false" aria-controls="wpfancytableOrphanPrefs" unselectable="on" aria-sort="none" aria-label=": No sort applied, activate to apply an ascending sort">

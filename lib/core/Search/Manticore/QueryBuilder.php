@@ -52,6 +52,20 @@ class QueryBuilder
             $query = $subq;
         }
 
+        // rewrite potentially big (col = val1 OR col = val2 OR ...) to col IN (val1, val2, ...)
+        if (preg_match('/\(\s*([a-zA-Z0-9_]+)\s*=\s*\'[^\']+\'(?:\s+OR\s+\1\s*=\s*\'[^\']+\')+\s*\)/i', $query, $match)) {
+            $column = $match[1];
+            preg_match_all("/=\s*'([^']+)'/", $match[0], $valueMatches);
+            $values = $valueMatches[1];
+            $quotedValues = array_map(fn($v) => "'$v'", $values);
+            $output = sprintf(
+                "%s IN (%s)",
+                $column,
+                implode(', ', $quotedValues)
+            );
+            $query = str_replace($match[0], $output, $query);
+        }
+
         return [
             'query' => $query,
             'select' => $this->select,
@@ -69,9 +83,14 @@ class QueryBuilder
         $fields = $this->getFields($node);
 
         if ($node instanceof Token && count($fields) == 1 && $this->getQuoted($node) === $this->pdo_client->quote('')) {
+            $isJsonField = ($this->index && $this->index->isFieldInJson($node->getField()));
             $field = $this->getField($node);
+            if ($isJsonField) {
+                $value = $this->getQuoted($node);
+                return "($field = $value OR $field IS NULL)";
+            }
             Index::addSearchedField($node->getField(), 'others');
-            $mapping = $this->index ? $this->index->getFieldMapping($field) : new stdClass();
+            $mapping = $this->index ? $this->index->getFieldMapping($field) : new \stdClass();
             if (isset($mapping['types']) && (in_array('multi', $mapping['types']) || in_array('mva', $mapping['types']))) {
                 $key = 'tf_' . uniqid();
                 $this->select[$key] = 'LENGTH(' . $field . ')';
@@ -195,6 +214,10 @@ class QueryBuilder
                 $query = str_replace(' >= ', ' < ', $query);
                 $query = preg_replace('/(?<!NOT) BETWEEN /', ' NOT BETWEEN ', $query);
                 $query = preg_replace('/ANY\(([^)]+)\) IN /', 'ALL(\1) NOT IN ', $query);
+                $query = preg_replace('/IS NULL/', 'IS NOT NULL', $query);
+                if (preg_match("/([^\( ]+) <> '.+'/", $query, $m)) {
+                    $query = str_replace($m[0], '(' . $m[0] . " OR $m[1] IS NULL)", $query);
+                }
                 return $query;
             }, $childNodes);
             return reset($inverted);
@@ -203,19 +226,31 @@ class QueryBuilder
         } elseif ($node instanceof Initial) {
             $field = $this->getField($node);
             Index::addSearchedField($node->getField(), 'others');
-            $value = $this->getQuoted($node, '^');
-            return "REGEX($field, $value)";
+            $value = $this->quoteRegex($node, '(?i)^');
+            $key = 'tf_' . uniqid();
+            $this->select[$key] = "REGEX(TO_STRING({$field}), $value)";
+            return "$key = 1";
         } elseif ($node instanceof Range) {
             $field = $this->getField($node);
             Index::addSearchedField($node->getField(), 'others');
             $raw = $this->getRaw($node->getToken('from'));
             if ($raw === "" || is_null($raw)) {
                 $to = $this->getQuoted($node->getToken('to'));
-                return "$field <= $to";
+                $key = 'tf_' . uniqid();
+                if (is_numeric($to)) {
+                    $field = 'double(' . $field . ')';
+                }
+                $this->select[$key] = "$field <= $to";
+                return "$key = 1";
             } else {
                 $from = $this->getQuoted($node->getToken('from'));
                 $to = $this->getQuoted($node->getToken('to'));
-                return "$field BETWEEN $from AND $to";
+                $key = 'tf_' . uniqid();
+                if (is_numeric($from) && is_numeric($to)) {
+                    $field = 'double(' . $field . ')';
+                }
+                $this->select[$key] = "($field >= $from AND $field <= $to)";
+                return "$key = 1";
             }
         } elseif ($node instanceof Distance) {
             $field = $this->getField($node);
@@ -230,9 +265,44 @@ class QueryBuilder
 
     private function handleToken($node)
     {
+        $isJsonField = ($this->index && $this->index->isFieldInJson($node->getField()));
         $field = $this->getField($node);
+        if ($isJsonField) {
+            $terms = $this->getQuoted($node);
+            if (is_array($terms)) {
+                $key = 'tf_' . uniqid();
+                $terms = implode(',', array_filter(array_map(function ($v) {
+                    if (is_scalar($v)) {
+                        return $this->pdo_client->quote(strval($v));
+                    } else {
+                        return null;
+                    }
+                }, $terms)));
+                if (empty($terms)) {
+                    $this->select[$key] = "LENGTH($field)";
+                } else {
+                    $this->select[$key] = "$field in ($terms)";
+                }
+                return "$key = 1";
+            }
+            if (str_ends_with($field, '_ts')) {
+                $value = $this->getQuoted($node);
+                return "{$field} = $value";
+            } elseif ($node->getType() == 'identifier') {
+                $raw = $this->getRaw($node);
+                $value = $this->pdo_client->quote(strval($raw));
+                $key = 'tf_' . uniqid();
+                $this->select[$key] = "TO_STRING({$field}) = $value";
+                return "$key = 1";
+            } else {
+                $value = $this->quoteRegex($node, '(?i)');
+                $key = 'tf_' . uniqid();
+                $this->select[$key] = "REGEX(TO_STRING({$field}), $value)";
+                return "$key = 1";
+            }
+        }
         Index::addSearchedField($node->getField(), 'others');
-        $mapping = $this->index ? $this->index->getFieldMapping($node->getField()) : new stdClass();
+        $mapping = $this->index ? $this->index->getFieldMapping($node->getField()) : new \stdClass();
         if (isset($mapping['types']) && (in_array('multi', $mapping['types']) || in_array('mva', $mapping['types']))) {
             $terms = $this->getRaw($node, 'multivalue');
             return 'ANY(' . $field . ')' . ' IN (' . implode(',', $terms) . ')';
@@ -240,17 +310,18 @@ class QueryBuilder
             $value = $this->getQuoted($node);
             return "{$field} = $value";
         } else {
-            $value = $this->getQuoted($node);
-            if (is_array($value)) {
+            $rawValue = $this->getRaw($node);
+            if (is_array($rawValue)) {
                 return '(' . implode(' OR ', array_filter(array_map(function ($v) use ($field) {
                     if (is_scalar($v)) {
-                        $v = $this->pdo_client->quote(strval($v));
+                        $v = $this->pdo_client->quote('(?i)' . $this->wildcardToRe2(strval($v)));
                     } else {
                         return null;
                     }
                     return "REGEX({$field}, $v)";
-                }, $value))) . ')';
+                }, $rawValue))) . ')';
             } else {
+                $value = $this->quoteRegex($node, '(?i)');
                 return "REGEX({$field}, $value)";
             }
         }
@@ -272,7 +343,11 @@ class QueryBuilder
 
     protected function getField($node)
     {
-        $field = strtolower($node->getField());
+        $field = $node->getField();
+        if ($this->index && $this->index->isFieldInJson($field)) {
+            return $this->index->getJsonPathForField($field);
+        }
+        $field = strtolower($field);
         $this->index->ensureHasField($field);
         return $field;
     }
@@ -283,9 +358,14 @@ class QueryBuilder
         $node->walk(
             function ($node) use (&$fullText) {
                 if ($fullText && method_exists($node, 'getField')) {
-                    $mapping = $this->index ? $this->index->getFieldMapping($node->getField()) : [];
-                    if (! isset($mapping['options']) || ! in_array('indexed', $mapping['options'])) {
+                    $field = $node->getField();
+                    if ($this->index && $this->index->isFieldInJson($field)) {
                         $fullText = false;
+                    } else {
+                        $mapping = $this->index ? $this->index->getFieldMapping($field) : [];
+                        if (! isset($mapping['options']) || ! in_array('indexed', $mapping['options'])) {
+                            $fullText = false;
+                        }
                     }
                 }
                 if (method_exists($node, 'getType') && $node->getType() == 'identifier') {
@@ -299,8 +379,12 @@ class QueryBuilder
 
     private function getQuoted($node, $prefix = '')
     {
+        $isJsonField = ($this->index && $this->index->isFieldInJson($node->getField()));
+        if ($isJsonField) {
+            return $this->getQuotedInJsonContext($node, $prefix);
+        }
         $raw = $this->getRaw($node);
-        $mapping = $this->index ? $this->index->getFieldMapping($node->getField()) : new stdClass();
+        $mapping = $this->index ? $this->index->getFieldMapping($node->getField()) : new \stdClass();
         if ($mapping && array_intersect(['float', 'timestamp'], $mapping['types'])) {
             return floatval($raw);
         } elseif (is_string($raw) || ($mapping && in_array('string', $mapping['types']))) {
@@ -308,6 +392,20 @@ class QueryBuilder
         } else {
             return $raw;
         }
+    }
+
+    private function quoteRegex($node, $prefix)
+    {
+        return $this->pdo_client->quote($prefix . $this->wildcardToRe2(strval($this->getRaw($node))));
+    }
+
+    private function wildcardToRe2($value)
+    {
+        if ($value === '') {
+            return $value;
+        }
+        $escaped = preg_quote($value, '/');
+        return str_replace('\\*', '.*', $escaped);
     }
 
     private function getRaw($node, $forceType = null)
@@ -319,6 +417,19 @@ class QueryBuilder
         return $value->getValue();
     }
 
+    private function getQuotedInJsonContext($node, $prefix = '')
+    {
+        $value = $node->getValue($this->factory);
+        $value = Index::convertJsonTypeValue($value);
+        if (is_numeric($value) && empty($prefix)) {
+            return floatval($value);
+        } elseif (is_string($value) || ! empty($prefix)) {
+            return $this->pdo_client->quote($prefix . strval($value));
+        } else {
+            return $value;
+        }
+    }
+
     public function escapeQueryString($qs)
     {
         // these special chars need double slash escape
@@ -326,7 +437,7 @@ class QueryBuilder
             $qs = str_replace($special, '\\' . $special, $qs);
         }
         // minus at the beginning means exclude term search - leave it unescaped
-        if (substr($qs, 0, 3) === '\\\\-') {
+        if (str_starts_with($qs, '\\\\-')) {
             $qs = '-' . substr($qs, 3);
         }
         // single quotes require only one slash escape

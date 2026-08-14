@@ -137,7 +137,7 @@ This is the documentation for subdirectories, with hyperlinks to their respectiv
     * Only if we have js without the tests alongside, which will likely not be the case
   * **php/**
     * Alternative would be phpunit/, if we are not going to have the tests beside the code, may as well split them by tooling.
-    * <= [lib/test/](lib/test/README.md)* split out, mostly in unit/ Naming mostly from <https://docs.phpunit.de/en/10.0/>
+    * <= [lib/test/](lib/test/README.md)* split out, mostly in unit/ Naming mostly from <https://docs.phpunit.de/>
     * **unit/** Most current tests
 * **themes/**
   * Themes have conflicting requirements

@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -69,7 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     if (! empty($_POST['alias_delete']) && $access->checkCsrf()) {
         // TODO add confirmation
-        WikiPlugin_Negotiator_Wiki_Alias::delete($_POST['alias_delete']);
+        $pluginAliasName = $_POST['alias_delete'];
+        WikiPlugin_Negotiator_Wiki_Alias::delete($pluginAliasName);
+        $successMsg = tr('Plugin alias %0 successfully deleted', htmlspecialchars($pluginAliasName));
+        Feedback::success($successMsg);
         $pluginsAlias = WikiPlugin_Negotiator_Wiki_Alias::getList();
     }
     if (
@@ -78,6 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         && (getCookie('admin_textarea', 'tabs') == '#contentadmin_textarea-plugin_alias')
     ) {
         // tab=3 is plugins alias tab (TODO improve)
+        $isUpdate = isset($pluginsAlias[$_POST['plugin_alias']]);
         $info = [
             'implementation' => $_POST['implementation'],
             'description' => [
@@ -176,6 +180,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             unlink($file);
         }
 
+        if ($isUpdate) {
+            $successMsg = tr('Plugin alias %0 successfully updated', htmlspecialchars($_POST['plugin_alias']));
+        } else {
+            $successMsg = tr('Plugin alias %0 successfully created', htmlspecialchars($_POST['plugin_alias']));
+        }
+        Feedback::success($successMsg);
+
         $pluginsAlias = WikiPlugin_Negotiator_Wiki_Alias::getList();
     }
 }
@@ -244,6 +255,12 @@ if (
     $smarty->assign('plugin_admin', $emptyPluginInfo);
 }
 $smarty->assign('plugins_alias', $pluginsAlias);
+// allow plugin aliases of other aliases
+$pluginAliasNames = array_keys($pluginsAlias);
+if (! empty($_REQUEST['plugin_alias'])) {
+    unset($pluginAliasNames[array_search($_REQUEST['plugin_alias'], $pluginAliasNames)]);
+}
+$pluginsReal = array_merge($pluginsReal, ['--'], $pluginAliasNames);
 $smarty->assign('plugins_real', $pluginsReal);
 
 if (isset($_REQUEST['disabled']) && $tiki_p_admin == 'y') {

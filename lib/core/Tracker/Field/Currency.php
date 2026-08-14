@@ -131,7 +131,7 @@ class Tracker_Field_Currency extends \Tracker\Field\AbstractItemField implements
 
         return [
             'value' => $amount . $currency,
-            'amount' => $amount,
+            'amount' => floatval($amount),
             'currency' => $currency,
             'date' => $date,
         ];

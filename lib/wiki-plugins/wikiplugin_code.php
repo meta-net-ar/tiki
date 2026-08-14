@@ -75,7 +75,7 @@ function wikiplugin_code_info()
             'colors' => [
                 'required' => false,
                 'name' => tra('Colors'),
-                'description' => tra('Any supported language listed at http://codemirror.net/mode  Pref feature_syntax_highlighter must be true for this to have any effect'),
+                'description' => tra('Any supported language listed at https://codemirror.net/mode/  Pref feature_syntax_highlighter must be true for this to have any effect'),
                 'since' => '17',
                 'filter' => 'text',
                 'options' => $colors,
@@ -139,8 +139,6 @@ function wikiplugin_code($data, $params)
     static $code_count;
 
     $defaults = [
-        'wrap' => '1',
-        'mediawiki' => '0',
         'ishtml' => false
     ];
 
@@ -162,7 +160,7 @@ function wikiplugin_code($data, $params)
 
     $out = $code;
 
-    if (isset($colors)) {
+    if (! is_null($colors)) {
         if ($colors == '1') {
             // remove old geshi setting as it upsets codemirror
             unset($colors);
@@ -174,28 +172,34 @@ function wikiplugin_code($data, $params)
     }
 
     // respect wrap parameter when Codemirror is off and line wrap when Codemirror is on to avoid broken view while JavaScript loads.
-    if ((isset($prefs['feature_syntax_highlighter']) && $prefs['feature_syntax_highlighter'] == 'y') || $wrap == 1) {
+    if ($prefs['feature_syntax_highlighter'] == 'y' || $wrap == 1) {
         $pre_style = 'white-space:pre-wrap;'
 
             // If needed, break words
             . ' overflow-wrap: break-word;' // CSS 3 working draft
             . ' word-wrap: break-word;'; // Original proprietary Microsoft name
 
-        if (! isset($theme) && isset($prefs['feature_syntax_highlighter_theme'])) {
+        if (is_null($theme)) {
             $theme = $prefs['feature_syntax_highlighter_theme'];
         }
     }
 
+    if ($prefs['feature_syntax_highlighter'] == 'y') {
+        //add codemirror stuff
+        require_once("lib/codemirror_tiki/tiki_codemirror.php");
+        addCodemirror();
+    }
 
 
-    $out = (isset($caption) ? '<div class="codecaption">' . $caption . '</div>' : "" )
+
+    $out = (! is_null($caption) ? '<div class="codecaption">' . $caption . '</div>' : "" )
         . '<div class="codelisting_container">'
         . '<div class="icon_copy_code far fa-clipboard" tabindex="0" ' . $data_clipboard_target . '><span class="copy_code_tooltiptext">Copy to clipboard</span></div>'
         . '<pre class="codelisting" '
-        . (isset($theme) ? ' data-theme="' . $theme . '" ' : '')
-        . (isset($colors) ? ' data-syntax="' . $colors . '" ' : '')
-        . (isset($ln) ? ' data-line-numbers="' . $ln . '" ' : '')
-        . (isset($wrap) ? ' data-wrap="' . $wrap . '" ' : '')
+        . (! is_null($theme) ? ' data-theme="' . $theme . '" ' : '')
+        . (! is_null($colors) ? ' data-syntax="' . $colors . '" ' : '')
+        . (! is_null($ln) ? ' data-line-numbers="' . $ln . '" ' : '')
+        . (($wrap) ? ' data-wrap="' . $wrap . '" ' : '')
         . ' dir="' . ( (isset($rtl) && $rtl == 1) ? 'rtl' : 'ltr') . '" '
         . (isset($pre_style) ? ' style="' . $pre_style . '"' : '')
         . $boxid . '>'

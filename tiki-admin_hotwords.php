@@ -17,11 +17,15 @@ $inputConfiguration = [
              'remove'      => 'string',       //post
              'sort_mode'   => 'text',         //get
              'offset'      => 'int',          //get
+             'find'        => 'text',         //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
 include_once('lib/hotwords/hotwordlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_hotwords');
 $access->check_permission('tiki_p_admin');
 
@@ -54,20 +58,12 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $words = $hotwordlib->list_hotwords($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $words["cant"]);
+$smarty->assign_by_ref('pages_count', $words["count"]);
 // Get users (list of users)
 $smarty->assign_by_ref('words', $words["data"]);
 // disallow robots to index page:

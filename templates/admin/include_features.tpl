@@ -59,7 +59,10 @@
                 <div class="admin clearfix mb-3 featurelist">
                     {preference name=feature_stats}
                     {preference name=feature_actionlog}
+                    {preference name=feature_version_checks}
+                    {preference name=feature_eol_date_notifier}
                     {preference name=feature_scheduler}
+                    {preference name=feature_queued_tasks}
                     {preference name=feature_banners}
                     {preference name=feature_contribution}
                     {preference name=feature_copyright}
@@ -115,7 +118,6 @@
                         <fieldset>
                             <legend class="h3"><h4 class="showhide_heading" id="Payment_and_accounting">{tr}Payment and accounting{/tr} <a href="#Payment_and_accounting" class="heading-link" aria-label="{tr}Payment and accounting{/tr}"><span class="icon icon-link fas fa-link "></span></a></h4></legend>
                             {preference name=feature_credits}
-                            {preference name=feature_accounting}
                             {preference name=payment_feature}
                         </fieldset>
                     </div>
@@ -129,6 +131,10 @@
                         </fieldset>
                     </div>
                     {preference name=feature_docs}
+                    {preference name=cryptpad_feature}
+                    <div class="adminoptionboxchild" id="cryptpad_feature_childcontainer">
+                        {preference name=cryptpad_base_url}
+                    </div>
                     {preference name=feature_slideshow}
                     {preference name=feature_slideshow_pdfexport}
                     {preference name=feature_faqs}
@@ -160,6 +166,13 @@
                         {preference name=zotero_group_id}
                         {preference name=zotero_style}
                     </div>
+                    {preference name=zotero_pandoc_enabled}
+                    <div class="adminoptionboxchild" id="zotero_pandoc_enabled_childcontainer">
+                        {preference name=zotero_pandoc_library}
+                        {preference name=zotero_pandoc_style}
+                        {preference name=zotero_pandoc_path}
+                        {preference name=zotero_pandoc_csl_archive_url}
+                    </div>
                     {preference name=webmonetization_enabled}
                     <div class="adminoptionboxchild" id="webmonetization_enabled_childcontainer">
                         {preference name=webmonetization_default_payment_pointer}
@@ -189,12 +202,7 @@
                 </div>
             </fieldset>
             <fieldset class="mb-3 w-100 clearfix featurelist">
-                <legend class="h3"><h4 class="showhide_heading" id="Icons_and_Profile_Pictures">{tr}Icons and Profile Pictures{/tr} <a href="#Icons_and_Profile_Pictures" class="heading-link" aria-label="{tr}Icons and Profile Pictures{/tr}"><span class="icon icon-link fas fa-link "></span></a></h4></legend>
-            </fieldset>
-            <fieldset class="mb-3 w-100 clearfix featurelist">
                 <legend class="h3"><h4 class="showhide_heading" id="jQuery_plugins_and_add-ons"> {tr}jQuery plugins and add-ons{/tr}  <a href="#jQuery_plugins_and_add" class="heading-link" aria-label="{tr}jQuery {/tr}">{icon name="link"}</a></h4></legend>
-                {preference name=feature_jquery_autocomplete}
-                {preference name=feature_jquery_reflection}
                 <div class="adminoptionbox">
                     {preference name=jquery_smartmenus_enable}
                     <div class="adminoptionboxchild" id="jquery_smartmenus_enable_childcontainer">
@@ -207,12 +215,6 @@
                 {preference name=feature_jquery_ui}
                 {preference name=feature_jquery_validation}
                 {preference name=feature_jquery_zoom}
-                <div class="adminoptionbox">
-                    {preference name=jquery_select2}
-                    <div class="adminoptionboxchild">
-                        {preference name=jquery_select2_sortable label="{tr}Select2 sortable multiselect{/tr}"}
-                    </div>
-                </div>
                 {preference name=jquery_fitvidjs}
                 <div class="adminoptionboxchild" id="jquery_fitvidjs_childcontainer">
                     {preference name=jquery_fitvidjs_additional_domains}
@@ -220,7 +222,6 @@
                 {preference name=jquery_timeago}
                 {preference name=jquery_jqdoublescroll}
                 {preference name=allowImageLazyLoad}
-                {preference name=tiki_prefix_css}
                 <div class="adminoptionboxchild">
                     <fieldset>
                         <legend class="h3"><h4 class="showhide_heading" id="Experimental">{tr}Experimental{/tr} <a href="#Experimental" class="heading-link" aria-label="{tr}Experimental{/tr}"><span class="icon icon-link fas fa-link "></span></a></h4></legend>

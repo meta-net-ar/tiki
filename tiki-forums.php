@@ -8,7 +8,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'forums';
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -20,6 +20,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FORUMS;
+Sections::setCurrentSection($section);
 //get_strings tra('List Forums')
 $auto_query_args = ['sort_mode', 'offset', 'find', 'mode'];
 
@@ -33,20 +36,9 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
-
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 
 $smarty->assign('find', $find);
 
@@ -73,7 +65,7 @@ for ($i = 0; $i < $temp_max; $i++) {
 }
 
 $smarty->assign_by_ref('channels', $channels["data"]);
-$smarty->assign('cant', $channels["cant"]);
+$smarty->assign('count', $channels["count"]);
 include_once('tiki-section_options.php');
 
 //add tablesorter sorting and filtering
@@ -84,7 +76,7 @@ if ($ts['enabled'] && ! $ts['ajax']) {
         'TikiForums',
         [
             'id' => $ts['tableid'],
-            'total' => $channels["cant"],
+            'total' => $channels["count"],
         ]
     );
 }

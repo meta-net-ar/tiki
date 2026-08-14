@@ -1,10 +1,10 @@
 {if $field.excessBehavior === 'split'}
-    {assign var=actual_limit value=100}
+    {$actual_limit=100}
 {else}
-    {assign var=actual_limit value=$field.limit|default:100}
+    {$actual_limit=$field.limit|default:100}
 {/if}
 <div id="display_f{$field.fieldId|escape}" class="files-field display_f{$field.fieldId|escape} uninitialized {if !empty($data.replaceFile)}replace{/if}" data-galleryid="{$field.galleryId|escape}" data-firstfile="{$field.firstfile|escape}" data-filter="{$field.filter|escape}" data-limit="{$field.limit|escape}" data-item-id="{$item.itemId|escape}" data-field-id="{$field.fieldId|escape}" data-namefilter="{$field.namefilter|escape}" data-namefilter-error="{$field.namefilterError|escape}">
-    {if !empty($field.canUpload)}
+    {if (! empty($field.canUpload) && $field.fileGalleryPerTrackerItem !== 'y') || (! empty($field.canUpload) && $field.fileGalleryPerTrackerItem === 'y' && $field.canCreateGallery)}
         {if !empty($field.limit)}
             {remarksbox _type=info title="{tr}Attached files limitation{/tr}"}
                 {tr _0=$field.limit}The amount of files that can be attached to this item is limited to <strong>%0</strong>.{/tr}
@@ -62,7 +62,7 @@
             {wikiplugin _name='vimeo' fromFieldId=$field.fieldId|escape fromItemId=$item.itemId|escape galleryId=$field.galleryId|escape}{/wikiplugin}
         {else}
             {if $field.options_map.uploadInModal neq 'n'}
-                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload trackerId=$field.trackerId requireTitle=$field.requireTitle directoryPattern=$field.directoryPattern}" class="btn btn-primary upload-files">
+                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$field.galleryId limit=$actual_limit type=$field.filter image_max_size_x=$field.image_x image_max_size_y=$field.image_y addDecriptionOnUpload=$data.addDecriptionOnUpload changeFileNameOnUpload=$data.changeFileNameOnUpload trackerId=$field.trackerId requireTitle=$field.requireTitle directoryPattern=$field.directoryPattern}" class="btn btn-primary upload-files" role="button">
                     {if $actual_limit !== 1}{tr}Upload Files{/tr}{else}{tr}Upload File{/tr}{/if}
                 </a>
             {else}
@@ -75,8 +75,33 @@
             {if $prefs.fgal_elfinder_feature eq 'y'}
                 {button href='tiki-list_file_gallery.php' _text="{tr}Browse files{/tr}" _onclick=$context.onclick title="{tr}Browse files{/tr}"}
             {else}
-                <a href="{service controller=file action=browse galleryId=$context.galleryId limit=$actual_limit type=$field.filter image_x=$field.image_x image_y=$field.image_y}" class="btn btn-primary browse-files">{tr}Browse Files{/tr}</a>
+                <a href="{service controller=file action=browse galleryId=$context.galleryId limit=$actual_limit type=$field.filter image_x=$field.image_x image_y=$field.image_y}" class="btn btn-primary browse-files" role="button">{tr}Browse Files{/tr}</a>
             {/if}
+        {/if}
+        {if $field.options_map.liveRecord neq 'n'}
+            {$liveRecord=$field.options_map.liveRecord}
+            {if $liveRecord eq 'audio'}
+                {$recordLabel="{tr}Record an audio{/tr}"}
+                {$recordIcon="microphone"}
+            {elseif $liveRecord eq 'screen'}
+                {$recordLabel="{tr}Record the screen{/tr}"}
+                {$recordIcon="desktop"}
+            {elseif $liveRecord eq 'screenandaudio'}
+                {$recordLabel="{tr}Record the screen with audio{/tr}"}
+                {$recordIcon="desktop"}
+            {elseif $liveRecord eq 'camera'}
+                {$recordLabel="{tr}Record the camera{/tr}"}
+                {$recordIcon="camera"}
+            {elseif $liveRecord eq 'cameraandaudio'}
+                {$recordLabel="{tr}Record the camera with audio{/tr}"}
+                {$recordIcon="camera"}
+            {/if}
+            <button class="btn btn-secondary start-recording" data-tracker-files="true" data-type="{$liveRecord}" data-gallery-id="{$field.galleryId}" data-field-id="{$field.fieldId}">{icon name=$recordIcon} {$recordLabel}</button>
+            <button class="btn btn-secondary stop-recording d-none">{icon name="stop"} {tr}Stop recording{/tr}</button>
+            <span class="recording-timer" id="recording-timer-{$field.fieldId}">00:00</span>
+            <div id="waveform-canvas-{$field.fieldId}" class="waveform-container">
+                <canvas id="wave-canvas-{$field.fieldId}" class="w-100 h-100"></canvas>
+            </div>
         {/if}
         {if $prefs.fgal_upload_from_source eq 'y' and $field.canUpload}
             <fieldset>
@@ -100,10 +125,77 @@
             </fieldset>
         {/if}
     {else}
-            {remarksbox type="error" close="n" title="{tr}You do not have permission to upload files to this gallery.{/tr}" }
-            {/remarksbox}
+        {if !isset($show_modal_preview)}
+            {if empty($field.canUpload)}
+                {remarksbox type="error" close="n" title="{tr}You do not have permission to upload files to this gallery.{/tr}"}
+                {/remarksbox}
+            {else}
+                {remarksbox type="error" close="n" title="{tr}You do not have permission to create galleries in this gallery.{/tr}"}
+                {/remarksbox}
+            {/if}
+        {/if}
     {/if}
 </div>
+
+{* Modal preview for recordings *}
+{if isset($show_modal_preview)}
+    <div id="record-preview" class="record-preview">
+        <div class="bg-white rounded-4 p-4 shadow-lg preview-card{if !$isAudio} video-mode{/if}">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <div class="{if $isAudio}audio-icon{else}video-icon{/if} d-flex align-items-center justify-content-center flex-shrink-0" style="width: 48px; height: 48px;">
+                    {if $isAudio}
+                        {icon name='music'}
+                    {else}
+                        {icon name='video'}
+                    {/if}
+                </div>
+                <div class="flex-grow-1">
+                    <h4 class="mb-1 fs-5 fw-semibold text-dark">{if $isAudio}{tr}Audio Recording{/tr}{else}{tr}Video Recording{/tr}{/if}</h4>
+                    <p class="mb-0 text-muted small">{tr}Review your recording before uploading{/tr}</p>
+                </div>
+            </div>
+            
+            {if $isAudio}
+                <audio 
+                    src="{$media_url|escape}" 
+                    class="w-100 rounded-2 my-4"
+                    controls
+                    autoplay
+                    controlsList="nodownload"
+                    playsinline
+                ></audio>
+            {else}
+                <video 
+                    src="{$media_url|escape}"
+                    class="w-100 rounded-2 bg-dark my-4" 
+                    controls 
+                    autoplay
+                    playsinline
+                    crossorigin="anonymous"
+                ></video>
+            {/if}
+            
+            <div class="d-flex gap-3 mt-4">
+                <button 
+                    id="btn-upload-now" 
+                    class="btn btn-primary flex-fill d-flex align-items-center justify-content-center gap-2 fw-medium rounded-2"
+                    style="min-height: 48px;"
+                >
+                    {icon name='upload'}
+                    <span>{tr}Upload{/tr}</span>
+                </button>
+                <button 
+                    id="close-preview" 
+                    class="btn btn-outline-secondary flex-fill d-flex align-items-center justify-content-center gap-2 fw-medium rounded-2"
+                    style="min-height: 48px;"
+                >
+                    {icon name='remove'}
+                    <span>{tr}Cancel{/tr}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+{/if}
 
 {if !empty($field.canUpload)}
     {jq}
@@ -136,7 +228,7 @@
                 $field.input_csv('add', ',', fileId);
 
                 li.prepend($.fileTypeIcon(fileId, { type: type, name: name }));
-                li.append($('<div class="file-actions d-inline-block"><div class="d-inline-block"><a href="#" class="file-move-to-tracker-icon text-danger" data-action="copy" title="{tr}Copy to another tracker{/tr}">{{icon name='copy'}}</a></div><a class="file-hard-delete-icon text-danger" title="{tr}Remove from tracker item and delete permanently from file gallery.{/tr}">{{icon name='trash'}}</a><a class="file-delete-icon text-danger" title="{tr}Remove from tracker item but keep in file gallery.{/tr}">{{icon name='delete'}}</a></div>'));
+                li.append($('<div class="file-actions d-inline-block"><div class="d-inline-block"><a href="#" role="button" class="file-move-to-tracker-icon text-danger" data-action="copy" title="{tr}Copy to another tracker{/tr}">{{icon name='copy'}}</a></div><a class="file-hard-delete-icon text-danger" title="{tr}Remove from tracker item and delete permanently from file gallery.{/tr}">{{icon name='trash'}}</a><a class="file-delete-icon text-danger" title="{tr}Remove from tracker item but keep in file gallery.{/tr}">{{icon name='delete'}}</a></div>'));
 
                 if (replaceFile && $self.data('firstfile') > 0) {
                     li.prev('li').remove();
@@ -150,6 +242,8 @@
 
                 toggleWarning();
             }
+
+            window[`addFile_${$self.data('field-id')}`] = addFile;
 
             function checkFile(fileName, $form) {
                 if (! $self.data('namefilter')) {
@@ -344,19 +438,23 @@
                 }
             });
 
-            window.handleFinderFile = function (files, elfinder) {
-                var hashes = [];
-                for (var i = 0; i < files.length; i++) {
-                    let file = files[i];
-                    if (typeof file === "string") {
-                        var m = file.match(/target=([^&]*)/);
-                        if (!m || m.length < 2) {
-                            return false;    // error?
+            window.handleFinderFile = function (value, elfinder) {
+                const hashes = [];
+                if (Array.isArray(value)) {
+                    for (var i = 0; i < value.length; i++) {
+                        let file = value[i];
+                        if (typeof file === "string") {
+                            var m = file.match(/target=([^&]*)/);
+                            if (!m || m.length < 2) {
+                                return false;    // error?
+                            }
+                            hashes.push(m[1]);
+                        } else {
+                            hashes.push(file.hash);
                         }
-                        hashes.push(m[1]);
-                    } else {
-                        hashes.push(file.hash);
                     }
+                } else {
+                    hashes.push(value.hash);
                 }
 
                 $.ajax({
@@ -382,7 +480,7 @@
                     error: function (jqxhr) {
                     },
                     complete: function () {
-                        bootstrap.Modal.getInstance($(window).data("elFinderDialog")).hide();
+                        $.closeModal();
                         $(window).data("elFinderDialog", null);
                         return false;
                     }

@@ -12,7 +12,7 @@
     {function registerFieldDependency}
         <script type="module">
             {literal}
-                import {registerFieldDependency} from '@jquery-tiki/plugin-edit';
+                import registerFieldDependency from '@tiki/plugin-base/registerFieldDependency';
             {/literal}
             registerFieldDependency("{{$dependantFieldId}}", "{{$dependencyField}}", "{{$dependencyValue}}");
         </script>
@@ -105,15 +105,15 @@
                         {if $param.select_multiple eq "y"}multiple{/if}
                         data-separator="{$param.separator|default:'|'}">
                         {if !isset($pluginArgs[$paramName]) && $param.select_multiple neq "y"}
-                            <option value="" selected="selected">Please select an option</option>
+                            <option disabled hidden>{tr}Please select an option:{/tr}</option>
                         {/if}
                         {foreach $param.options as $option}
                             <option value="{$option.value|escape}" 
                                 {if $param.select_multiple eq "y"}
                                     {if isset($pluginArgs[$paramName]) && in_array($option.value, $pluginArgs[$paramName]|explode:($param.separator|default:','))}selected{/if}
                                 {else}
-                                    {if (isset($pluginArgs[$paramName]) and $pluginArgs[$paramName] eq $option.value) or (!isset($pluginArgs[$paramName]) and $param.default eq $option.value)}
-                                    selected="selected"{/if}
+                                    {if (isset($pluginArgs[$paramName]) and $pluginArgs[$paramName] eq $option.value)}
+                                    selected{/if}
                                 {/if}>
                                 {$option.text|escape}
                             </option>
@@ -162,12 +162,12 @@
                 <div class="col-sm-9">
                     <textarea name="content" id="content" class="form-control" rows="12">{$bodyContent|escape}</textarea>
                     {if is_array($info.body)}
-                        {assign var="bodyDescription" value=$info.body.description}
+                        {$bodyDescription=$info.body.description}
                         {if $info.body.depends}
                             {registerFieldDependency dependantFieldId="content" dependencyField=$info.body.depends.field dependencyValue=$info.body.depends.value}
                         {/if}
                     {else}
-                        {assign var="bodyDescription" value=$info.body}
+                        {$bodyDescription=$info.body}
                     {/if}
                     <div class="description">{$bodyDescription}</div>
                 </div>

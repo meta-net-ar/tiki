@@ -26,7 +26,7 @@
     padding-right: 1.5em;
     margin-bottom: 1em;
     font-size: 0.9em;
-    img, span { margin-right: 6px; }
+    & > img, > span, > button { margin-right: 6px; }
 }
 
 @media (min-width: 768px) {
@@ -39,6 +39,60 @@
 
 .tracker-item-files {
     padding-left: 15px;
+    
+    li {
+        display: flex !important;
+        align-items: center;
+        gap: 0.5rem;
+    }
+}
+
+.play-audio.loading {
+    position: relative;
+}
+
+.play-audio.loading::after {
+    content: '';
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--bs-primary);
+    animation: spin 1s ease-out infinite;
+}
+
+.audio-timer {
+    width: 0%;
+    position: relative;
+    transition: width 0.5s ease;
+    margin-left: -0.5rem;
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+
+    .end-line {
+        width: 100%;
+        height: 5px;
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+    }
+}
+
+.audio-timer.show {
+    width: 50%;
+    margin-left: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 #tracker_selector {
@@ -54,7 +108,7 @@
     margin-top: -15px;
 }
 
-.card-accordian {
+.card-accordion {
     > .card-header {
         padding: 0;
         h4.card-title {
@@ -143,6 +197,11 @@
     }
 }
 
+.form-switch .form-check-input.tracker-notify-switch {
+  margin-left: 0;
+  margin-right: 0.5em;
+}
+
 // vue.js field conditions defs
 
 .tracker-rules .actions .ui-predicate__row:first-child,
@@ -151,3 +210,113 @@
     display: none;
 }
 
+/* 
+ * Multi-line text truncation using old -webkit- properties for broader browser compatibility.
+ * Only -webkit-box, -webkit-line-clamp, -webkit-box-orient, and overflow are required.
+ * This approach is used intentionally for better support across browsers as of 2025.
+ * See: https://css-tricks.com/almanac/properties/l/line-clamp/ for more details.
+ */
+
+.truncate-text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+    line-height: 1.8em;
+    max-height: 3.6em;
+    white-space: normal;
+  }
+
+  .truncate-text a {
+    display: inline;
+  } 
+
+// BigBlueButton Tracker Field Styles
+.bbb-recordings-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.bbb-recording-item {
+  transition: all 0.2s ease-in-out;
+  
+  &.border-primary {
+    border-color: #007bff !important;
+  }
+  
+  .form-check-label {
+    font-weight: 500;
+    cursor: pointer;
+    
+    &:hover {
+      color: #007bff;
+    }
+  }
+  
+  .btn {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  }
+}
+
+.bbb-recordings-display {
+  margin-top: 0.5rem;
+}
+
+.bbb-recording-display-item {
+  h6 {
+    color: #495057;
+    margin-bottom: 0.75rem;
+    
+    i {
+      color: #007bff;
+    }
+  }
+  
+  .btn {
+    transition: all 0.2s ease-in-out;
+    
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .bbb-recordings-container {
+    max-height: 300px;
+  }
+  
+  .bbb-recording-item,
+  .bbb-recording-display-item {
+    padding: 0.75rem !important;
+  }
+  
+  .bbb-recording-display-item .btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    text-align: center;
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .bbb-recording-display-item h6 {
+    color: #e2e8f0;
+  }
+}
+
+el-select {
+  --tiki-input-placeholder-color: var(--bs-secondary-color, #6c757d) !important;
+  --el-text-color-placeholder: var(--bs-secondary-color, #6c757d) !important;
+  --el-input-text-color: var(--bs-secondary-color, #6c757d) !important;
+}

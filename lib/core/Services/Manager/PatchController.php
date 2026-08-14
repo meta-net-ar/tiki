@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -22,8 +22,8 @@ class Services_Manager_PatchController
     public function action_index($input)
     {
         $instanceId = $input->instanceId->int();
-        if ($instance = TikiManager\Application\Instance::getInstance($instanceId)) {
-            $patches = TikiManager\Application\Patch::getPatches($instanceId);
+        if ($instance = TikiManager\Application\Instance::getInstance($instanceId)) {   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
+            $patches = TikiManager\Application\Patch::getPatches($instanceId);   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
             return [
                 'title' => tr('Tiki Manager Instance Patches'),
                 'instance' => $instance,
@@ -47,8 +47,8 @@ class Services_Manager_PatchController
     public function action_apply($input)
     {
         $instanceId = $input->instanceId->int();
-        if ($instance = TikiManager\Application\Instance::getInstance($instanceId)) {
-            $cmd = new TikiManager\Command\ApplyPatchCommand();
+        if ($instance = TikiManager\Application\Instance::getInstance($instanceId)) {   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
+            $cmd = new TikiManager\Command\ApplyPatchCommand();   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $inputCommand = new ArrayInput(array_merge([
                     'command' => $cmd->getName(),

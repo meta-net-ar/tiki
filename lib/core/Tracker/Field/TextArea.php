@@ -97,7 +97,32 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
                         ],
                         'legacy_index' => 7,
                     ],
-
+                    'previewtabs' => [
+                        'name' => tr('Preview Tabs'),
+                        'description' => tr('Enable edit and preview tabs for this field.'),
+                        'default' => 'n',
+                        'filter' => 'alpha',
+                        'options' => [
+                            'n' => tr('No'),
+                            'y' => tr('Yes'),
+                        ],
+                        'legacy_index' => 9,
+                    ],
+                    'labelasplaceholder' => [
+                        'name' => tr('Use label as placeholder'),
+                        'description' => tr('Display the field name as a placeholder in the input field instead of separate label.'),
+                        'deprecated' => false,
+                        'filter' => 'int',
+                        'default' => 0,
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'depends' => [
+                            'field' => 'wysiwyg',
+                            'value' => 'n',
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -298,7 +323,7 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
                 if (isset($extra['text'])) {
                     $value = $extra['text'];
                 } elseif ($lang && isset($value[$lang])) {
-                    $value = $lang;
+                    $value = $value[$lang];
                 }
 
                 return $value;
@@ -354,6 +379,12 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
                 ->addQuerySource('text', "{$baseKey}_{$lang}_raw")
                 ->setRenderTransform($plain($lang))
                 ;
+            $schema->addNew($permName, 'wiki-html')
+                ->setLabel(tr('%0 (%1)', $name, $lang))
+                ->setReadOnly(true)
+                ->addIncompatibility($permName, 'current')
+                ->addQuerySource('text', "{$baseKey}_{$lang}_raw")
+                ->setRenderTransform($render($lang));
 
             foreach ($prefs['available_languages'] as $lang) {
                 $schema->addNew($permName, $lang)
@@ -375,6 +406,17 @@ class Tracker_Field_TextArea extends Tracker_Field_Text
                         $info['fields'][$permName][$lang] = $value;
                     })
                     ;
+
+                $schema->addNew($permName, "$lang-wiki-html")
+                    ->setLabel(tr('%0 (%1)', $name, $lang))
+                    ->addQuerySource('text', "{$baseKey}_{$lang}_raw")
+                    ->addIncompatibility($permName, 'current')
+                    ->addIncompatibility($permName, 'current-raw')
+                    ->addIncompatibility($permName, $lang)
+                    ->setRenderTransform($render($lang))
+                    ->setParseIntoTransform(function (&$info, $value) use ($permName, $lang) {
+                        $info['fields'][$permName][$lang] = TikiLib::lib('edit')->parseToWiki($value);
+                    });
             }
         }
 

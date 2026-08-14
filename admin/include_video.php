@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -18,7 +18,7 @@ if ($prefs['feature_kaltura'] === 'y') {
 
     if ($kalturaadminlib->getSessionKey()) {
         // make sure service url ends in a slash
-        if (substr($prefs['kaltura_kServiceUrl'], -1) != '/') {
+        if (! str_ends_with($prefs['kaltura_kServiceUrl'], '/')) {
             $prefs['kaltura_kServiceUrl'] = $prefs['kaltura_kServiceUrl'] . '/';
             TikiLib::lib('tiki')->set_preference('kaltura_kServiceUrl', $prefs['kaltura_kServiceUrl']);
         }
@@ -40,5 +40,29 @@ if ($prefs['feature_kaltura'] === 'y') {
     $kcwText = "<div class='adminoptionbox error'>" . tr("Kaltura feature disabled") . "</div>";
     $kplayerlist = "<div class='adminoptionbox error'>" . tr("Kaltura feature disabled") . "</div>";
 }
+
+$peertubeText = "";
+if ($prefs['feature_peertube'] === 'y') {
+    $peertubelib = TikiLib::lib('peertubeuser');
+
+    if (substr($prefs['peertube_service_url'], -1) != '/') {
+        $prefs['peertube_service_url'] = $prefs['peertube_service_url'] . '/';
+        TikiLib::lib('tiki')->set_preference('peertube_service_url', $prefs['peertube_service_url']);
+    }
+    $result = $peertubelib->testConnection();
+
+    if ($result === true) {
+        $peertubeText = "<div class='adminoptionbox'>" . tr(
+            "PeerTube instance is reachable. However, to ensure the credentials are valid, please visit <a href='%0'>the video list</a>.",
+            'tiki-list_peertube_entries.php'
+        ) . "</div>";
+    } else {
+        $peertubeText = "<div class='adminoptionbox error'>" . $result . "</div>";
+    }
+} else {
+    $peertubeText = "<div class='adminoptionbox error'>" . tr("PeerTube feature disabled") . "</div>";
+}
+
 $smarty->assign('kcwText', $kcwText);
 $smarty->assign('kplayerlist', $kplayerlist);
+$smarty->assign('peertubeText', $peertubeText);

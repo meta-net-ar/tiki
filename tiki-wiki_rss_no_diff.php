@@ -33,7 +33,7 @@ if ($res) {
 
 $feed = "wiki";
 $uniqueid = $feed;
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output["data"] == "EMPTY") {
     $title = $prefs['feed_wiki_title'];
@@ -78,8 +78,7 @@ if ($output["data"] == "EMPTY") {
         //  $prev_page_p = TikiLib::lib('parser')->parse_data($prev_page[$descId], array('print'=>true));
 
         // do a diff between both pages
-        //  require_once('lib/diff/difflib.php');
-        //  $diff = diff2($prev_page_p , $curr_page_p, "unidiff");
+        //  $diff = \Tiki\Lib\Diff\DiffUtils::diff2($prev_page_p , $curr_page_p, "unidiff");
 
 
         //  foreach ($diff as $part) {
@@ -109,5 +108,4 @@ if ($output["data"] == "EMPTY") {
     $output = $rsslib->generate_feed($feed, $uniqueid, '', $changes, $readrepl, $param, $id, $title, $titleId, $desc, $descId, $dateId, $authorId);
 }
 header("Content-type: " . $output["content-type"]);
-TikiLib::lib('header')->setXRobotsTag($robots);
 print $output["data"];

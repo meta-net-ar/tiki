@@ -21,7 +21,6 @@ function wikiplugin_votings_info()
                 'description' => tra('Object key that is used to record votes'),
                 'since' => '8.0',
                 'filter' => 'text',
-                'default' => '',
             ],
             'returnval' => [
                 'required' => false,
@@ -37,11 +36,8 @@ function wikiplugin_votings_info()
 function wikiplugin_votings($data, $params)
 {
     global $user;
-    if (! isset($params['objectkey'])) {
-        return '';
-    } else {
-        $key = $params['objectkey'];
-    }
+
+    $key = $params['objectkey'];
     $smarty = TikiLib::lib('smarty');
     $votings = TikiDb::get()->table('tiki_user_votings');
 

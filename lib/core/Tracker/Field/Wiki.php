@@ -41,6 +41,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                         'profile_reference' => 'tracker_field',
                         'parent' => 'input[name=trackerId]',
                         'parentkey' => 'tracker_id',
+                        'required' => true,
                     ],
                     'namespace' => [
                         'name' => tr('Namespace for Wiki Page'),
@@ -121,6 +122,16 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
                     'wysiwyg' => [
                         'name' => tr('Use WYSIWYG'),
                         'description' => tr('Use a rich text editor instead of inputting plain text.'),
+                        'default' => 'n',
+                        'filter' => 'alpha',
+                        'options' => [
+                            'n' => tr('No'),
+                            'y' => tr('Yes'),
+                        ],
+                    ],
+                    'previewtabs' => [
+                        'name' => tr('Preview Tabs'),
+                        'description' => tr('Enable edit and preview tabs for this field.'),
                         'default' => 'n',
                         'filter' => 'alpha',
                         'options' => [
@@ -212,15 +223,16 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         $page_name = $this->getValue();
         $insForPagenameField = 'ins_' . $this->getOption('fieldIdForPagename');
 
-        if (! $page_name) {
+        if (! $page_name || (isset($requestData['action']) && $requestData['action'] === 'clone_item')) {
             if (! empty($requestData[$insForPagenameField])) {
                 $page_name = $requestData[$insForPagenameField];    // from tabular import replace
-                $itemId = isset($requestData['itemId']) ? $requestData['itemId'] : 0;
+                $itemId = $requestData['itemId'] ?? 0;
             } elseif (! empty($requestData['itemId'])) {
                 $itemData = $this->getItemData();                   // calculated field types like auto-increment need rendering
                 $definition = $this->getTrackerDefinition();
                 $factory = $definition->getFieldFactory();
-                $field_info = $definition->getField($this->getOption('fieldIdForPagename'));
+                $pagenameFieldId = $this->getOption('fieldIdForPagename');
+                $field_info = $pagenameFieldId ? $definition->getField($pagenameFieldId) : null;
                 if ($field_info) {
                     $handler = $factory->getHandler($field_info, $itemData);
                     $page_name = $handler->renderOutput(['list_mode' => 'csv']);
@@ -235,7 +247,7 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
         }
 
         $tikilib = TikiLib::lib('tiki');
-        $newPageData = $requestData[$ins_id];
+        $newPageData = $requestData[$ins_id] ?? null;
         if ($page_name) {
             // There is already a wiki pagename set (the value of the field is the wiki page name)
             if ($tikilib->page_exists($page_name)) {
@@ -360,6 +372,17 @@ class Tracker_Field_Wiki extends Tracker_Field_Text implements \Tracker\Field\Ex
     public function renderOutput($context = [])
     {
         return $this->attemptParse($this->getConfiguration('page_data'));
+    }
+
+    /**
+     * Render the field value as plain text.
+     * @param mixed $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $data = $this->getFieldData();
+        return $this->attemptParse($data['page_data']);
     }
 
     public function getDocumentPart(Search_Type_Factory_Interface $typeFactory)

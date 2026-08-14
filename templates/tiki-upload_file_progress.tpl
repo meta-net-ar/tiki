@@ -1,13 +1,13 @@
 {if !empty($filegals_manager) and !isset($smarty.request.simpleMode)}
-    {assign var=simpleMode value='y'}
+    {$simpleMode='y'}
 {else}
-    {assign var=simpleMode value='n'}
+    {$simpleMode='n'}
 {/if}
 {if !empty($filegals_manager)}
-    {assign var=seturl value=$fileId|sefurl:display}
+    {$seturl=$fileId|sefurl:display}
     {capture name=alink assign=alink}href="#" onclick="window.opener.insertAt('{$filegals_manager}','{$syntax|escape}');checkClose();return false;" title="{tr}Click here to use the file{/tr}" class="tips"{/capture}
 {else}
-    {assign var=alink value=''}
+    {$alink=''}
 {/if}
 <div class="d-flex">
     {if $view neq 'page'}

@@ -1,0 +1,124 @@
+// Superhero for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
+//$imagePath: "../images/";
+// body {
+//    background-image: url('#{$imagePath}bg.jpg');
+// }
+
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
+body.fullscreen { background: $body-bg; }
+
+// Links
+a.linkmodule {
+    color: #BBD9F7;
+}
+
+// Components
+// Typography
+.text-muted {
+    color: #FCFCFCBF;
+}
+
+// Tables
+.table-light > :not(caption) > * > * ,
+.table-light {
+    --bs-table-bg: #65788B;
+}
+
+// Buttons
+.btn-outline-primary { --bs-btn-color: #E66B19; --bs-btn-border-color: #E66B19; }
+.btn-outline-secondary { --bs-btn-color: #dee2e6; }
+.btn-outline-success { --bs-btn-color: #46A046; --bs-btn-border-color: ; }
+.btn-outline-danger { --bs-btn-color: #DD6864; --bs-btn-border-color: #DD6864; }
+.btn-outline-warning { --bs-btn-color: #C79500; --bs-btn-border-color: #C79500; }
+.btn-outline-info { --bs-btn-color: #29A2C7; --bs-btn-border-color: #29A2C7; }
+.btn-outline-light { --bs-btn-color: #f6f6f6; --bs-btn-border-color: #f6f6f6; }
+.btn-outline-dark { --bs-btn-color: #26491BE; --bs-btn-border-color: #26491BE; }
+.list-group-item-dark { color: #3D4248; }
+
+// Forms
+// Navs
+.nav:not(.navbar) > .nav-link { color: $link-color; }
+
+// Navbar
+    // This is added here because the normal variable method didn't work - g_c-l
+.navbar-light.bg-light {
+    .nav-link {
+        --bs-nav-link-color: rgba(0, 0, 0, 0.65) !important;
+    }
+}
+
+// Dropdowns
+// Pagination
+// Cards
+.card a:not(.btn:not(.btn-link)),
+.cardlink,
+.breadcrumb-item a {
+    color: #BAD8F7;
+}
+
+// Accordion
+// Badges
+.badge.text-bg-light,
+.btn-light {
+    background-color: #65788B;
+}
+
+// Alerts
+.alert-light {
+    --bs-alert-color: #fff;
+    background-color: #737373;
+}
+
+// Progress bars
+// List group
+.list-group-item-dark { color: #A4ACB2; background-color: #16171D; }
+.list-group-item-primary { color: #ddd; background-color: #65542A; }
+.list-group-item-secondary { color: #ddd; background-color: #4B4F63; }
+.list-group-item-success { color: #ddd; background-color: #395B39; }
+.list-group-item-danger { color: #ddd; background-color: #AC2A2A; }
+.list-group-item-warning { color: #ddd; background-color: #6A4C2F; }
+.list-group-item-info { color: #ddd; background-color: #34636F; }
+.list-group-item-light { color: #424D4D; background-color: #FEFBF1; }
+
+// Figures
+// Breadcrumbs
+// Code
+.code {
+    --tiki-code-bg: #546873;
+}
+
+// Tiki-specific
+.tiki_trackers {
+    .icon-status-open, .icon-status-pending, .icon-status-closed {
+        filter: drop-shadow(0px 0px 1px black);
+    }
+}
+
+// Dark mode
+// External libraries
+    // override for some cypht background colors
+.tiki {
+    .inline-cypht {
+        .list_controls {
+            background: transparent;
+        }
+    }
+    &.mobile.tiki-cypht {
+        .content_title {
+            &, .list_controls { background: $card-bg; }
+        }
+    }
+}

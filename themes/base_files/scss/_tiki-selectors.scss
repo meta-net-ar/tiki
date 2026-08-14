@@ -17,6 +17,11 @@ $imagePathToImgDir: "../../../img/";
 //    background: $navbar-dark-bg;
 //}
 
+:root {
+    --tiki-input-bg: #{$input-bg};
+    --tiki-input-color: #{$input-color};
+}
+
 
 //.layout_social,
 //.layout_social_modules {
@@ -36,17 +41,65 @@ $imagePathToImgDir: "../../../img/";
     }
 //}
 
-// h3 heading in modules
-.module h3.card-title { font-size: $tiki-module-h3-card-title-font-size; }
+.record-preview {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    background: #000;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.6);
+    color: white;
+    text-align: center;
+}
 
-//fullcalendar.js
+.waveform-container {
+    width: 100%;
+    height: 80px;
+    display: none;
+    margin-top: 10px;
+}
+
+.recording-timer {
+    margin-left: 10px;
+    font-weight: bold;
+    display: none
+}
+
+//// h3 heading in modules
+//.module h3.card-title { font-size: $tiki-module-h3-card-title-font-size; }
+
+//eventcalendar.js
 a.ec-event:hover {
     color: $tooltip-color;
 }
 
-// Full Calendar table header needs to have color mode compatible body bg color
+// Event Calendar table header needs to have color mode compatible body bg color
 .ec-media-screen {
     --fc-page-bg-color: var(--bs-body-bg);
+}
+
+.ec-button:not(:disabled):hover, .ec-button.ec-active,
+.ec-active, .ec-prev, .ec-next {
+    background-color: var(--bs-secondary) !important;
+    color: color-contrast($secondary) !important;
+}
+
+button.ec-today:not(:disabled),
+.ec-today .ec-day-head {
+    background-color: var(--bs-secondary) !important;
+    color: color-contrast($secondary) !important;
+}
+
+button.ec-today:disabled,
+button.ec-today[disabled] {
+    background-color: rgba(var(--bs-secondary-rgb), 0.35) !important;
+    color: rgba(var(--bs-body-color-rgb), 0.65) !important;
+    border-color: rgba(var(--bs-secondary-rgb), 0.35) !important;
+    box-shadow: none;
+    opacity: 1;
 }
 
 // tiki-categories.less - tiki-jquery.js - Doesn't show up in a search Apr 21 2024
@@ -204,17 +257,9 @@ table.treetable.objectperms td.removed {
     background: transparent url('#{$imagePathToImgDir}loading-light.gif') no-repeat 50% 50%;
 }
 
-// cookie consent style
-#cookie_consent_div {
-    padding: $alert-padding-x $alert-padding-y;
-    border: 1px solid darken($info, 10%);
-    color: $white;
-    background-color: $info;
-}
-
 #cookie_consent_div.banner {
     padding: $alert-padding-x $alert-padding-y;
-    border: 1px solid $info;
+    // border: 1px solid $info;
 }
 
 #cookie_consent_div .description a {
@@ -238,7 +283,7 @@ body.fullscreen {
 }
 
 #debugconsole {
-    background: rgba(lighten($body-bg, 30%), 0.9); // Todo - what's the way to specify backgrounds?
+    background: rgba(color.adjust($body-bg, $lightness: 30%, $space: hsl), 0.9); // Todo - what's the way to specify backgrounds?
     //The following 4 uses of $navbar-light-color used to be rgba($navbar-light-color, 0.9), which doesn't compile (mix of native css rgba and sass, which doesn't compile.  The problem is in the declarations of navbar-light-color, but there are 4 per themes, and I didn't want to touch that many just for the debug console.  Replacing rgba values by proper color.adjust is a wider discussion.  In the meantime if someone wants to restore transparency in the debug console, it'S own color will have to be assigned.  benoitg - 2023-11-08;
     color: $navbar-light-color;
     border: 2px solid $navbar-light-color;
@@ -262,11 +307,6 @@ input:-webkit-autofill {
     background-color: $input-bg !important; /* needs important because Chrome has it already important */
     background-image: none !important;
     color: $input-color !important; /* the Google guys forgot the number-one rule... when they specify background they should specify forgeround color too ;) */
-}
-
-// ColorBox
-#cboxTitle {
-    background-color: var(--bs-body-bg);
 }
 
 #captchaImg {
@@ -508,10 +548,14 @@ a.toolbar,
 li.toolbar,
 .textarea-toolbar a.toolbar {
     /* each tool button */
-    border: none;
     background: transparent;
     color: var(--bs-body-color);
-    text-shadow: 1px 1px 4px rgba(0,0,0,.2);
+//    text-shadow: 1px 1px 4px rgba(0,0,0,.2);
+}
+
+a.toolbar,
+.textarea-toolbar a.toolbar {
+    border: none;
 }
 
 a.toolbar:hover,
@@ -535,6 +579,11 @@ li.toolbar:active {
 #intertrans-indicator {
     background-color: $tiki-intertrans_background;
     color: $success;
+    position: fixed !important;
+    bottom: 10px !important;         
+    width: 100% !important;       
+    z-index: 99999 !important;    /* on top of modals */
+    
 }
 
 #intertrans-form {
@@ -549,6 +598,10 @@ li.toolbar:active {
 
 ul.all_languages > li {
     border: 1px solid $success;
+}
+
+.tiki .popover {
+    z-index: $zindex-popover;
 }
 
 // /* mouseover plugin */
@@ -580,51 +633,51 @@ ul.all_languages > li {
 }
 
 .author4 {
-    color: adjust-hue($success, 50);
+    color: color.adjust($success, $hue: 50, $space: hsl);
 }
 
 .author5 {
-    color: adjust-hue($info, 70);
+    color: color.adjust($info, $hue: 70, $space: hsl);
 }
 
 .author6 {
-    color: adjust-hue($warning, 50);
+    color: color.adjust($warning, $hue: 50, $space: hsl);
 }
 
 .author7 {
-    color: adjust-hue($danger, 50);
+    color: color.adjust($danger, $hue: 50, $space: hsl);
 }
 
 .author8 {
-    color: adjust-hue($success, 100);
+    color: color.adjust($success, $hue: 100, $space: hsl);
 }
 
 .author9 {
-    color: adjust-hue($info, 100);
+    color: color.adjust($info, $hue: 100, $space: hsl);
 }
 
 .author10 {
-    color: adjust-hue($warning, 100);
+    color: color.adjust($warning, $hue: 100, $space: hsl);
 }
 
 .author11 {
-    color: adjust-hue($danger, 100);
+    color: color.adjust($danger, $hue: 100, $space: hsl);
 }
 
 .author12 {
-    color: adjust-hue($success, 170);
+    color: color.adjust($success, $hue: 170, $space: hsl);
 }
 
 .author13 {
-    color: adjust-hue($info, 140);
+    color: color.adjust($info, $hue: 140, $space: hsl);
 }
 
 .author14 {
-    color: adjust-hue($warning, 160);
+    color: color.adjust($warning, $hue: 160, $space: hsl);
 }
 
 .author15 {
-    color: adjust-hue($danger, 160);
+    color: color.adjust($danger, $hue: 160, $space: hsl);
 }
 
 .structuremenu .menuSection {
@@ -676,20 +729,24 @@ ul.all_languages > li {
 }
 
 .editable-inline {
+    padding: 2px;
     padding-right: 20px;
     display: inline-block;
+    border: solid 2px transparent;
+
     .icon {
         font-size: small;
         margin-left: 0.4rem;
+        display: inline;
+    }
+
+    .popover {
+        z-index: 9;
     }
 }
 
 .editable-inline.loaded {
-    width: 100%;
     background: $popover-bg;
-    padding: 6px;
-    border: 1px solid #eee;
-    border-radius: 4px;
     z-index: 2;
 }
 
@@ -700,12 +757,11 @@ ul.all_languages > li {
 }
 
 .editable-inline.modified {
-    border: solid 2px $danger;
-    padding: 2px;
+    border-color: $danger;
 }
 
 .editable-inline.unsaved {
-    border: solid 2px $danger;
+    border-color: $danger;
 }
 
 // .admintoclevel .actions input {
@@ -792,59 +848,59 @@ ul.all_languages > li {
 
 // /* TOC */
 .toc {
-    border-top: 1px dotted $gray-300;
-    border-bottom: 1px dotted $gray-300;
+    border-top: 1px dotted var(--bs-border-color); //$gray-300;
+    border-bottom: 1px dotted var(--bs-border-color); //$gray-300;
 }
 
 // /* Wiki diff styles */
 .diff td {
-    border: 1px solid $gray-700;
+    border: 1px solid var(--bs-border-color); // $gray-700;
 }
 
 .diff div {
-    border-top: 1px solid $gray-300;
+    border-top: 1px solid var(--bs-border-color); // $gray-300;
 }
 
 .diffadded {
-    background: $success;
-    --bs-table-bg: #{$success}; // These need to be specified to override :root --bs-table-bg .
-    color: lighten($success,50%);
+    background: var(--bs-success-bg-subtle); // $success;
+    --bs-table-bg: var(--bs-success-bg-subtle); //#{$success}; // These need to be specified to override :root --bs-table-bg .
+//    color: color.adjust($success,$lightness: 50%, $space: hsl);
     word-break: break-word;
 }
 
 .diffdeleted {
-    background: $danger;
-    --bs-table-bg: #{$danger};
-    color: lighten($danger,50%);
+    background: var(--bs-danger-bg-subtle); // $danger;
+    --bs-table-bg: var(--bs-danger-bg-subtle); //#{$danger};
+//    color: color.adjust($danger,$lightness: 50%, $space: hsl);
     word-break: break-word;
 }
 
 .diffadded a,
 .diffadded a:hover {
-    color: lighten($success,100%);
+    color: color.adjust($success,$lightness: 100%, $space: hsl);
 }
 
 .diffdeleted a,
 .diffdeleted a:hover {
-    color: lighten($danger,100%);
+    color: color.adjust($danger,$lightness: 100%, $space: hsl);
 }
 
 .diffinldel {
-    background: $warning;
+    background: var(--bs-warning-bg-subtle); //$warning;
 }
 
 .diffbody {
-    background: $gray-200;
-    --bs-table-bg: #{$gray-200};
-    color: $gray-700;
+    background: var(--bs-secondary-bg); // $gray-200;
+    --bs-table-bg: var(--bs-secondary-bg); //#{$gray-200};
+    color: var(--bs-secondary-color); // $gray-700;
 }
 
 .diffchar {
-    color: lighten($danger, 50%);
+    color: var(--bs-danger); // color.adjust($danger, $lightness: 50%, $space: hsl);
 }
 
 .diffadded .diffchar {
-    color: lighten($success, 50%);
+    color: var(--bs-success); // color.adjust($success, $lightness: 50%, $space: hsl);
 }
 
 // diff email converts <ins> and <del> to spans for better rendering
@@ -857,7 +913,7 @@ span.diffchar.deleted {
 }
 
 .highlight_word {
-    font-size: bold;
+    font-weight: bold;
 }
 
 //.searchresults blockquote em.hlt1,
@@ -892,7 +948,7 @@ span.diffchar.deleted {
 //.searchresults blockquote em.hlt10,
 .highlight_word_4 {
    color: $white;
-   background: adjust-hue($danger, 20);
+   background: color.adjust($danger, $hue: 20, $space: hsl);
 }
 
 /* Structures drill-down menu */
@@ -1057,10 +1113,10 @@ input[type="checkbox"].preffilter-toggle-round + label:after {
 // Method based on https://codepen.io/davidhalford/pen/wlDxL
 input[type="checkbox"].preffilter-toggle-round:checked + label:before {
     background-color: $success;
-    border-color: darken($primary, 10%);
+    border-color: color.adjust($primary, $lightness: -10%, $space: hsl);
     $n: $success;
-    $color-brightness: round((red($n) * 299) + (green($n) * 587) + (blue($n) * 114) / 1000);
-    $light-color: round((red(#ffffff) * 299) + (green(#ffffff) * 587) + (blue(#ffffff) * 114) / 1000);
+    $color-brightness: round((color.channel($n, 'red', $space: rgb) * 299) + (color.channel($n, 'green', $space: rgb) * 587) + (color.channel($n, 'blue', $space: rgb) * 114) / 1000);
+    $light-color: round((color.channel(#ffffff, 'red', $space: rgb) * 299) + (color.channel(#ffffff, 'green', $space: rgb) * 587) + (color.channel(#ffffff, 'blue', $space: rgb) * 114) / 1000);
 
     @if abs($color-brightness) < calc($light-color/2){
         color: white;
@@ -1208,9 +1264,10 @@ blockquote {
     position: relative;
 }
 
-.sm-navbar:not(.sm-navbar--dropdowns-only).sm-navbar {
-    --sm-collapsible-navbar-bg: var(--bs-dropdown-bg);
-}
+// Not sure the reason for this rule but the navbar background color should be set by L&F option, not the dropdown bg color. Reverts MR6966.
+//.sm-navbar:not(.sm-navbar--dropdowns-only).sm-navbar {
+//    --sm-collapsible-navbar-bg: var(--bs-dropdown-bg);
+//}
 
 .sm-sub-toggler::after {
     --sm-sub-toggler-icon-size: 0.7rem;
@@ -1321,21 +1378,21 @@ blockquote {
         bottom: 0;
     }
 }
-
-@media (min-width: 768px) {
-    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-link {
-        /*     grid-area: link / link / link / link-split-toggler;
-             border-radius: var(--sm-dropdowns-nav-link-border-radius);
-             padding: var(--sm-dropdowns-nav-link-padding-y) var(--sm-dropdowns-nav-link-padding-x);
-             background: var(--sm-dropdowns-nav-link-bg);
-             color: var(--sm-dropdowns-nav-link-color);
-             font-family: var(--sm-font-family);
-             font-size: var(--sm-font-size);
-             font-weight: var(--sm-dropdowns-nav-link-font-weight);
-             line-height: var(--sm-line-height);
-             text-decoration: none; */
-    }
-}
+// Do not use empty rule sets - g_c-l
+//@media (min-width: 768px) {
+//    .sm-navbar:not(.sm-navbar--collapsible-only) .sm-nav-link {
+//        /*     grid-area: link / link / link / link-split-toggler;
+//             border-radius: var(--sm-dropdowns-nav-link-border-radius);
+//             padding: var(--sm-dropdowns-nav-link-padding-y) var(--sm-dropdowns-nav-link-padding-x);
+//             background: var(--sm-dropdowns-nav-link-bg);
+//             color: var(--sm-dropdowns-nav-link-color);
+//             font-family: var(--sm-font-family);
+//             font-size: var(--sm-font-size);
+//             font-weight: var(--sm-dropdowns-nav-link-font-weight);
+//             line-height: var(--sm-line-height);
+//             text-decoration: none; */
+//    }
+//}
 
 
 [data-bs-theme=dark] .sm-navbar {
@@ -1353,4 +1410,34 @@ blockquote {
 
 :root {
     --tiki-navbar-dark-color: #{$navbar-dark-color}; // The Bootstrap variable wasn't being defined.
+}
+
+// Remove the margin of lists that directly follow a paragraph
+p + ul, p + ol {
+    margin-top: var(--tiki-list-top-margin);  
+    margin-bottom: var(--tiki-list-bottom-margin);
+}
+
+li.highlight {
+    background-color: var(--bs-secondary-bg-subtle);
+    transition: all 0.3s ease;
+}
+
+.password-container {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+
+    input {
+        padding-right: 30px;
+    }
+
+    i {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        visibility: hidden; /* Hidden by default */
+    }
 }

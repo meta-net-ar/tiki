@@ -14,14 +14,6 @@
     {/remarksbox}
 {/if}
 
-{if isset($composer_installed_errors)}
-    {remarksbox type="warning" title="{tr}Composer errors{/tr}"}
-
-    {tr}Composer returned some errors:{/tr}<br />
-        <pre>{$composer_installed_errors}</pre>
-    {/remarksbox}
-{/if}
-
 {if not empty($composer_environment_warning)}
     {remarksbox type="warning" title="{tr}Issues with composer environment{/tr}"}
 
@@ -100,6 +92,7 @@
                             {if $entry.state == 'replaced'}
                                 <a class="tips text-warning"
                                 href="#"
+                                role="button"
                                 style="text-decoration: none;"
                                 data-bs-toggle="popover"
                                 data-bs-container="body"
@@ -112,6 +105,7 @@
                             {elseif $entry.state == 'deprecated'}
                                 <a class="tips text-warning"
                                 href="#"
+                                role="button"
                                 style="text-decoration: none;"
                                 data-bs-toggle="popover"
                                 data-bs-container="body"
@@ -124,6 +118,7 @@
                             {else}
                                 <a class="tips"
                                 href="#"
+                                role="button"
                                 style="text-decoration: none;"
                                 data-bs-toggle="popover"
                                 data-bs-container="body"
@@ -240,12 +235,13 @@
                     <th width="200">{tr}Action{/tr}</th>
                 </tr>
                 {foreach item=entry from=$composer_packages_available}
-                    <tr>
+                    <tr class="{if $entry.name == $package_highlight}table-warning{/if}">
                         <td>
                         {$entry.name}
                         {if $entry.state == 'replaced'}
                                 <a class="tips text-warning"
                                 href="#"
+                                role="button"
                                 style="text-decoration: none;"
                                 data-bs-toggle="popover"
                                 data-bs-container="body"
@@ -268,7 +264,7 @@
                                 <button class="btn btn-primary" name="auto-install-package" value="{$entry.key}">{tr}Install{/tr}</button>
                             </form>
                             {/if}
-                            <button type="button" data-bs-toggle="collapse" data-package-name="{$entry.name}" data-collapse-key="collapse-{$entry.key}" href="#collapse-{$entry.key}" role="button" aria-expanded="false" aria-controls="collapse-{$entry.name}" class="btn btn-light collapse-package-detail">{tr}Info{/tr}</button>
+                            <button type="button" data-bs-toggle="collapse" data-package-name="{$entry.name}" data-collapse-key="collapse-{$entry.key}" href="#collapse-{$entry.key}" aria-expanded="false" aria-controls="collapse-{$entry.name}" class="btn btn-light collapse-package-detail">{tr}Info{/tr}</button>
                         </td>
                     </tr>
                     <tr class="collapse border bg-body-tertiary" id="collapse-{$entry.key}">
@@ -352,7 +348,7 @@
                         <th>{tr}Version Required{/tr}</th>
                         <th>{tr}Status{/tr}
                         <th>{tr}Version Installed{/tr}</th>
-                        <th>Actions</th>
+                        <th>{tr}Actions{/tr}</th>
                     </tr>
                     {foreach item=packages key=folderName from=$composer_custom_packages_installed}
                         <tr><td colspan="5" style="font-weight: bold;">{$folderName}</td></tr>
@@ -462,11 +458,11 @@
         {if isset($diagnostic_composer_location) || $diagnostic_composer_output || $composer_management_success || $composer_management_error}
             <br />
             <h4>{tr}Results{/tr}</h4>
-            {if isset($diagnostic_composer_location) }
-                <p><strong>Composer:</strong> {if $diagnostic_composer_location}{tr}{$diagnostic_composer_location}{/tr}{else}{tr}Composer not found{/tr}{/if}</p>
+            {if isset($diagnostic_composer_location)}
+                <p><strong>{if $diagnostic_composer_location}{tr _0=$diagnostic_composer_location}Composer: %0{/tr}{else}{tr}Composer not found{/tr}{/if}</strong></p>
             {/if}
             {if $diagnostic_composer_output}
-                <p><strong>Composer diagnose output</strong></p>
+                <p><strong>{tr}Composer diagnose output{/tr}</strong></p>
                 <pre>{$diagnostic_composer_output}</pre>
             {/if}
 

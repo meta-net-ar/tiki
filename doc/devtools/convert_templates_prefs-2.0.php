@@ -13,65 +13,36 @@ require_once('tiki-setup.php');
  * php convert_templates_prefs-2.0.php
  */
 
+
 /* customize this to the directory you want to convert */
 $dirtoscan = 'templates';
-
-/*****************/
-
-/* defines functions scandir and file_out_contents if running PHP<5 */
-if (! function_exists('scandir')) {
-    /**
-     * @param $dir
-     * @return array
-     */
-    function scandir($dir)
-    {
-        $dh = opendir($dir);
-        while (false !== ($filename = readdir($dh))) {
-            $files[] = $filename;
-        }
-        sort($files);
-
-        return $files;
-    }
-}
-
-if (! function_exists('file_put_contents')) {
-    /**
-     * @param $filename
-     * @param $data
-     * @return bool|int
-     */
-    function file_put_contents($filename, $data)
-    {
-        $f = @fopen($filename, 'w');
-        if (! $f) {
-            return false;
-        } else {
-            $bytes = fwrite($f, $data);
-            fclose($f);
-            return $bytes;
-        }
-    }
-}
 
 $src = [];
 $dst = [];
 
-foreach (array_keys($prefs) as $k => $v) {
-    $src[$k] = '$' . $v;
-    $dst[$k] = '$prefs.' . $v;
+foreach (array_keys($prefs) as $v) {
+    $src[] = '$' . $v;
+    $dst[] = '$prefs.' . $v;
 }
 
-$elems = scandir($dirtoscan);
+try {
+    $iterator = new FilesystemIterator($dirtoscan, FilesystemIterator::SKIP_DOTS);
+} catch (Exception $e) {
+    die("Could not open directory: $dirtoscan\n");
+}
 
-foreach ($elems as $filename) {
-    if (preg_match('/.tpl$/', $filename)) {
+foreach ($iterator as $fileInfo) {
+    $filename = $fileInfo->getFilename();
+
+    if ($fileInfo->isFile() && str_ends_with($filename, '.tpl')) {
         echo "$filename... ";
-        $content_src = file_get_contents($dirtoscan . '/' . $filename);
+
+        $path = $fileInfo->getPathname();
+        $content_src = file_get_contents($path);
         $content_dst = str_replace($src, $dst, $content_src);
+
         if ($content_dst != $content_src) {
-            file_put_contents($dirtoscan . '/' . $filename, $content_dst);
+            file_put_contents($path, $content_dst);
             echo " modified\n";
         } else {
             echo " no\n";

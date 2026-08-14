@@ -6,6 +6,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_smarty_list()
 {
+    $generalSecurityHelp = 'General-Security';
+    $miscellaneousHelp = 'Miscellaneous';
+
     return [
         'smarty_notice_reporting' => [
             'name' => tra('Include Smarty notices in the PHP error report'),
@@ -13,6 +16,7 @@ function prefs_smarty_list()
             'type' => 'flag',
             'description' => tr('Tiki will display <a href="https://www.smarty.net">Smarty</a> notices with the PHP error messages.'),
             'default' => 'n',
+            'help' => 'General-Preferences',
         ],
         'smarty_security' => [
             'name' => tra('Smarty security'),
@@ -21,6 +25,7 @@ function prefs_smarty_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => 'y',
+            'help' => $generalSecurityHelp,
         ],
         'smarty_security_allowed_tags' => [
             'name' => tr('Allowed Smarty tags'),
@@ -35,6 +40,7 @@ function prefs_smarty_list()
             'dependencies' => [
                 'smarty_security',
             ],
+            'help' => $generalSecurityHelp,
         ],
         'smarty_security_disabled_tags' => [
             'name' => tr('Disabled Smarty tags'),
@@ -49,6 +55,7 @@ function prefs_smarty_list()
             'dependencies' => [
                 'smarty_security',
             ],
+            'help' => $generalSecurityHelp,
         ],
         'smarty_security_allowed_modifiers' => [
             'name' => tr('Allowed Smarty modifiers'),
@@ -63,12 +70,27 @@ function prefs_smarty_list()
             'dependencies' => [
                 'smarty_security',
             ],
+            'help' => $generalSecurityHelp,
         ],
         'smarty_security_disabled_modifiers' => [
             'name' => tr('Disabled Smarty modifiers'),
             'description' => tr("This is a list of disabled modifier plugins. It's the list of (registered / autoloaded) modifiers that may not be accessible to the template.
                                 If empty, no restriction by disabled_modifiers. This may be needed for custom templates."),
             'warning' => tr('There may be security implications. Make sure you know what you are doing.'),
+            'hint' => tr('Use "," to separate values'),
+            'type' => 'text',
+            'separator' => ',',
+            'perspective' => false,
+            'default' => '',
+            'dependencies' => [
+                'smarty_security',
+            ],
+            'help' => $generalSecurityHelp,
+        ],
+        'smarty_security_allowed_builtin_php_functions' => [
+            'name' => tr('Allowed Smarty built-in PHP functions'),
+            'description' => tr("This is the list of allowed built-in PHP functions to be used as smarty modifiers. Smarty 5+ disabled the use of PHP functions as smarty modifiers. Use this preference to allow specific built-in functions not available in the currently exposed modifiers list that you need to use in your templates."),
+            'warning' => tr('There may be security implications. Make sure you know what you are doing. Try to keep this list as short as possible.'),
             'hint' => tr('Use "," to separate values'),
             'type' => 'text',
             'separator' => ',',
@@ -89,6 +111,7 @@ function prefs_smarty_list()
             'dependencies' => [
                 'smarty_security',
             ],
+            'help' => $generalSecurityHelp,
         ],
         'smarty_compilation' => [
             'name' => tra('Smarty compilation'),
@@ -100,6 +123,7 @@ function prefs_smarty_list()
                 'always' => tra('Always (development, slow)'),
             ],
             'default' => 'modified',
+            'help' => $miscellaneousHelp,
         ],
         'smarty_cache_perms' => [
             'name' => tra('Smarty cache permissions'),
@@ -111,6 +135,14 @@ function prefs_smarty_list()
             ],
             'default' => 0644,
             'keywords' => 'file perms templates',
+            'help' => $miscellaneousHelp,
+        ],
+        'smarty_enable_string_eval' => [
+            'name' => tra('Smarty enable string or eval template'),
+            'description' => tra('Enables the use of string or eval template when activated by Administrators.'),
+            'type' => 'text',
+            'default' => 'n',
+            // TODO: add to documentation
         ],
     ];
 }

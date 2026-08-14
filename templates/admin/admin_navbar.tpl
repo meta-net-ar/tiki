@@ -1,10 +1,10 @@
 <nav class="navbar-expand-md navbar-{$prefs.theme_navbar_color_variant_admin} bg-{$prefs.theme_navbar_color_variant_admin} tiki-topbar-nav-{$prefs.theme_navbar_color_variant_admin} tiki-admin-top-nav-{$prefs.theme_navbar_color_variant_admin} admin-navbar mb-4 border-0 shadow-none" role="navigation">
     {if $prefs.theme_unified_admin_backend eq 'y'}
-        <a class="navbar-brand" href="./" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{tr}Back to the home page{/tr}">
+        <a class="navbar-brand px-2" href="./" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{tr}Return to home page{/tr}">
             {if $prefs.sitelogo_icon && $prefs.sitelogo_icon neq 'img/tiki/tikilogo_icon.png'}
                 <img src="{$prefs.sitelogo_icon}" alt="{if !empty($prefs.sitelogo_alt)}{$prefs.sitelogo_alt|escape}{else}{tr}Site logo{/tr}{/if}">
             {else}
-                <img src="img/tiki/tiki-icon-flat-{if $navbar_color_variant eq 'light'}black{else}white{/if}.svg" alt="{if !empty($prefs.sitelogo_alt)}{$prefs.sitelogo_alt|escape}{else}{tr}Tiki icon{/tr}{/if}" height="24">
+                <img src="img/tiki/tiki-icon-flat-{if $navbar_color_variant eq 'light'}black{else}white{/if}.svg" alt="{if !empty($prefs.sitelogo_alt)}{$prefs.sitelogo_alt|escape}{else}{tr}Tiki icon{/tr}{/if}">
             {/if}
         </a>
     {/if}
@@ -17,7 +17,7 @@
                 <form method="post" class="d-flex align-items-center me-3">
                     <ul class="nav navbar-nav filter-menu mb-0">
                         <li class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" title="{tr}Settings{/tr}">
+                            <a href="#" role="button" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" title="{tr}Settings{/tr}">
                                 {icon name="filter"} {tr}Preference Filters{/tr}
                             </a>
                             <ul class="dropdown-menu {if $prefs.theme_navbar_color_variant_admin eq 'dark'} dropdown-menu-dark{/if} border" role="menu">
@@ -75,10 +75,10 @@
                         <ul class="navbar-nav flex-row d-md-flex me-4">
                             <li class="nav-item">
                                 <form method="post" class="d-flex ms-auto">
-                                    <div class="input-group">
+                                    <div class="input-group search-prefs-container">
                                         <input type="hidden" name="filters">
                                         <input type="text" name="lm_criteria" value="{$lm_criteria|escape}" class="form-control form-control-sm" placeholder="{tr}Search preferences{/tr}...">
-                                        <button type="submit" class="btn btn-info btn-sm"{if $indexNeedsRebuilding} class="tips" title="{tr}Configuration search{/tr}|{tr}Note: The search index needs rebuilding, this will take a few minutes.{/tr}"{/if}>{icon name="search"}</button>
+                                        <button type="submit" class="btn btn-info btn-sm{if $indexNeedsRebuilding} tips{/if}" {if $indexNeedsRebuilding}title="{tr}Configuration search{/tr}|{tr}Note: The search index needs rebuilding, this will take a few minutes.{/tr}"{/if} aria-label="{tr}Search{/tr}">{icon name="search"}</button>
                                     </div>
                                 </form>
                             </li>
@@ -93,9 +93,9 @@
     {/if}
 </nav>
 
-{if $lm_searchresults}
+{if $lm_searchresults && $lm_criteria}
     <div class="alert alert-secondary alert-dismissible pe-3" id="pref_searchresults">
-        <button type="button" class="btn-close mt-3" aria-hidden="true" data-bs-dismiss="alert"></button>
+        <button type="button" class="btn-close mt-3" aria-hidden="true" data-bs-dismiss="alert" aria-label="{tr}Close{/tr}"></button>
             <h3 class="alert-heading">{tr}Preference Search Results{/tr}</h3>
         <form method="post" href="tiki-admin.php" class="px-4">
             <div class="pref_search_results">
@@ -110,7 +110,7 @@
             {ticket}
         </form>
     </div>
-{elseif $lm_criteria}
+{elseif $lm_criteria ne ''}
     {remarksbox type="note" title="{tr}No results{/tr}" icon="magnifier"}
         {tr}No preferences were found for your search query.{/tr}<br>
         {tr _0='<a class="alert-link" href="tiki-admin.php?prefrebuild">' _1='</a>'}Not what you expected? Try %0rebuilding%1 the preferences search index.{/tr}

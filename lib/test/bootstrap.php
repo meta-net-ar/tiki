@@ -4,12 +4,19 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Laminas\Config\Config;
+
+if (PHP_SAPI !== 'cli') {
+    die("This script must be run from the command line.\n");
+}
+
+use Tiki\Config\Config;
 use Tiki\Installer\Installer;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 const TIKI_IN_TEST = 1;
 
 define('TIKI_PATH', dirname(dirname(__DIR__)) . '/');
+
 chdir(TIKI_PATH);
 
 ini_set('display_errors', 'on');
@@ -17,7 +24,7 @@ error_reporting(E_ALL ^ E_DEPRECATED);
 
 require_once 'vendor_bundled/vendor/autoload.php';
 
-global $local_php, $api_tiki, $style_base;
+global $local_php, $style_base;
 $local_php = __DIR__ . '/local.php';
 
 if (! is_file($local_php)) {
@@ -25,20 +32,11 @@ if (! is_file($local_php)) {
         "\nSee lib/test/local.php.dist for further instructions\n\n");
 }
 
-$api_tiki = 'adodb';
 require_once($local_php);
 
 $style_base = 'skeleton';
 
-// Force autoloading
-if (! class_exists('ADOConnection')) {
-    die('AdoDb not found.');
-}
-
-$ADODB_FETCH_MODE = ADODB_FETCH_ASSOC;
-
 $initializer = new TikiDb_Initializer();
-$initializer->setPreferredConnector($api_tiki);
 $db = $initializer->getConnection(
     [
         'host' => $host_tiki,
@@ -63,29 +61,24 @@ $tikilib = new TikiLib();
 require_once 'lib/init/initlib.php';
 $installer = Installer::getInstance();
 
+$output = new ConsoleOutput();
+
 if (! $installer->tableExists('tiki_preferences')) {
-    echo "Installing Tiki database...\n";
+    $output->writeln("Installing Tiki database...");
     $installer->cleanInstall();
 } elseif ($installer->requiresUpdate()) {
-    echo "Updating Tiki database...\n";
+    $output->writeln("Updating Tiki database...");
     $installer->update();
     if (count($installer->queries['failed'])) {
         foreach ($installer->queries['failed'] as $key => $error) {
             [$query, $message, $patch] = $error;
 
-            echo "Error $key in $patch\n\t$query\n\t$message\n\n";
+            $output->write("Error $key in $patch\n\t$query\n\t$message\n\n");
         }
-        echo 'Exiting, fix database issues and try again.';
+        $output->writeln('Exiting, fix database issues and try again.');
         exit(1);
     }
 }
-
-// These values are set on console.php
-// which is not executed by unit tests
-const DB_RUNNING = true;
-const DB_STATUS = true;
-const DB_TIKI_SETUP = true;
-const DB_SYNCHRONAL = true;
 
 $smarty = TikiLib::lib('smarty');
 $cachelib = TikiLib::lib('cache');
@@ -103,15 +96,10 @@ $_SESSION = [
 
 require_once(__DIR__ . '/TikiTestCase.php');
 require_once(__DIR__ . '/TestableTikiLib.php');
+require_once(__DIR__ . '/api/ApiTestCase.php');
 
 global $systemConfiguration;
-$systemConfiguration = new Config(
-    [
-        'preference' => [],
-        'rules' => [],
-    ],
-    ['readOnly' => false]
-);
+$systemConfiguration = new Config(['preference' => [], 'rules' => []], true);
 
 global $user_overrider_prefs, $prefs, $tikipath;
 $user_overrider_prefs = [];
@@ -119,7 +107,7 @@ $prefs['language'] = 'en';
 $tikipath = dirname(__DIR__, 2) . '/';
 require_once 'lib/setup/prefs.php';
 $prefs['site_language'] = 'en';
-$prefs['zend_mail_handler'] = 'file';
+$prefs['mailer_handler'] = 'file';
 $prefs['feature_typo_quotes'] = 'n';
 $prefs['feature_typo_approximative_quotes'] = 'n';
 $prefs['feature_typo_dashes_and_ellipses'] = 'n';

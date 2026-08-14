@@ -10,10 +10,13 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to err & die if called directly.
 //smarty is not there - we need setup
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
+
+require_once('tiki-setup.php');
+use Tiki\Sections;
 
 // Fill the display configuration array
 $fgal_listing_conf = [
@@ -29,7 +32,7 @@ $fgal_listing_conf = [
     'author' => ['name' => tra('Creator')],  //this used to be Author but updated Nov2010
     'last_user' => ['name' => tra('Last modified by')], //this used to be 'Last editor' but updated Nov2010
     'comment' => ['name' => tra('Comment')],
-    'files' => ['name' => tra('Files')],
+    'files' => ['name' => tra('Files'), 'description' => tra('Number of files contained in a sub-gallery (not applicable to individual files)')],
     'hits' => ['name' => tra('Hits')],
     'lastDownload' => ['name' => tra('Last download')],
     'lockedby' => ['name' => tra('Locked by'), 'icon' => 'lock'],
@@ -40,7 +43,9 @@ $fgal_listing_conf = [
     'source' => ['name' => tra('Source')],
 ];
 
-if (isset($section) && $section == 'admin') {
+$section = Sections::getCurrentSection();
+
+if (isset($section) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))) {
     foreach ($fgal_listing_conf as $k => $v) {
         $fgal_listing_conf_admin[$k . '_admin'] = $v;
     }
@@ -76,7 +81,7 @@ if (isset($gal_info) && isset($gal_info['galleryId']) && isset($gal_info['lockab
 $smarty = TikiLib::lib('smarty');
 $smarty->assign_by_ref('fgal_listing_conf', $fgal_listing_conf);
 
-if (isset($section) && $section == 'admin') {
+if (isset($section) && (Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))) {
     foreach ($fgal_listing_conf_admin as $k => $v) {
         if (isset($prefs['fgal_list_' . $k])) {
             $fgal_listing_conf_admin[$k]['value'] = $prefs['fgal_list_' . $k];
@@ -93,11 +98,7 @@ $fgal_options = [
 ];
 
 if (! array_key_exists('view', get_defined_vars())) {
-    if (isset($_REQUEST['view'])) {
-        $view = $_REQUEST['view'];
-    } else {
-        $view = null;
-    }
+    $view = $_REQUEST['view'] ?? null;
 }
 if ($view == 'admin') {
     $fgal_options['show_explorer']['value'] = 'n';
@@ -116,10 +117,10 @@ if ($view == 'admin') {
 
         if (isset($_REQUEST['edit_mode'])) {
             // We are in the edit file gallery page
-            $fgal_options[$k_gal]['value'] = isset($gal_info[$k_gal]) ? $gal_info[$k_gal] : null;
+            $fgal_options[$k_gal]['value'] = $gal_info[$k_gal] ?? null;
         } else {
             // normal gallery view
-            $fgal_options[$k_gal]['value'] = (isset($gal_info) && isset($gal_info[$k_gal])) ? $gal_info[$k_gal] : (isset($prefs[$k_prefs]) ? $prefs[$k_prefs] : null);
+            $fgal_options[$k_gal]['value'] = (isset($gal_info) && isset($gal_info[$k_gal])) ? $gal_info[$k_gal] : ($prefs[$k_prefs] ?? null);
         }
     }
 }

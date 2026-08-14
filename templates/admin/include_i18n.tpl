@@ -29,6 +29,7 @@
             {include file='admin/include_apply_top.tpl'}
         {/if}
     </div>
+    <div class="styling-element">
     {preference name=language}
     {preference name=language_admin}
     {preference name=wiki_page_regex}
@@ -89,6 +90,7 @@
         <div class="adminoptionboxchild" id="feature_lang_nonswitchingpages_childcontainer">
             {preference name=feature_lang_nonswitchingpages_names}
         </div>
+    </div>
     </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

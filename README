@@ -1,48 +1,78 @@
 Tiki Wiki CMS Groupware
-Version 25.1
+=======================
 
 Started in 2002, Tiki Wiki CMS Groupware is a web application combining
 the features of a wiki, a content management system (CMS) and groupware.
-It is the Free/Libre and Open Source (FLOSS) web application with the most built-in features, https://tiki.org/Features.
+It is the Free/Libre and Open Source (FLOSS) web application with the most built-in [features](https://tiki.org/Features).
+
+Project Website
+---------------
+
+https://tiki.org
+
+Features
+--------
+
+Tiki provides a wide range of built-in features, including:
+
+- Wiki / Web Pages
+- Trackers (Database component of Tiki)
+- File Galleries
+- Forums
+- Blogs
+- Articles
+- Calendar and Event Listings
+- And many more...
+
+Full feature list:
+https://tiki.org/Features
 
 CONTRIBUTING
+------------
+Tiki is driven by the contributions of an active community of developers and
+translators who participate in its development.
+You can be the next contributor to the Tiki source code or documentation by
 
-* Tiki is driven by the contributions of an active community of developers and
-  translators who participate in its development.
-  You can be the next contributor to the Tiki source code or documentation.
-  Please check the Wishlist, https://dev.tiki.org/Wishlist,
-  for bugs or feature requests you can start developing or create new ones if you don't find them listed.
+- Reporting bugs
+- Improving documentation
+- Translating
+- Submitting patches
+- Proposing new features
 
+
+Please check the Wishlist, https://dev.tiki.org/Wishlist, to check current and planned features.
 
 DOCUMENTATION
+-------------
+You have access to a diverse source of support through documentation, forum, events, etc.
 
-* You have access to a diverse source of support through documentation, forum, events, etc.
+- Official documentation is available at:
+https://doc.tiki.org
 
-* The documentation for 25.1 version is ever evolving at http://doc.tiki.org.
-  You're encouraged to contribute.
+- Installation guide:
+There is a file INSTALL in this directory with notes on how to setup and configure Tiki
+https://doc.tiki.org/Installation
 
-* It is highly recommended that you refer to the online documentation:
-* http://doc.tiki.org/Installation for a setup guide
+- Upgrade guide:
+Read the online instructions if you want to upgrade your Tiki from a previous release
+You can visit https://doc.tiki.org/Upgrade for the latest install help
 
-* Notes about this release are accessible from http://doc.tiki.org/Tiki25
-* Tiki has an active Gitter community, join us at https://gitter.im/tiki-org/community.
 
-INSTALLATION
+Community
+---------
 
-* There is a file INSTALL in this directory with notes on how to setup and
-  configure Tiki. Again, see http://doc.tiki.org/Installation for the latest install help.
+Join the community discussions:
 
-UPGRADES
-
-* Read the online instructions if you want to upgrade your Tiki from a previous release http://doc.tiki.org/Upgrade
+- Forums: https://tiki.org/forums
+- Chat: https://gitter.im/tiki-org/community
+- Events and meetings: https://tiki.org/Events
 
 COPYRIGHT
+---------
 
-Copyright (c) 2002-2023, Luis Argerich, Garland Foster, Eduardo Polidor, et. al.
+Copyright (c) 2002-2026, Luis Argerich, Garland Foster, Eduardo Polidor, et. al.
 Tiki was started under the name tikiwiki by Luis Argerich, Garland Foster, Eduardo Polidor, et. al.
 All Rights Reserved. See copyright.txt for details and a complete list of authors.
 Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 ... Have fun!
-
-Note to Tiki developers: update this text through release.php.

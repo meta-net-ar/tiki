@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -31,7 +31,6 @@ class WizardLib extends TikiLib
      */
     public function onLogin($user, $homePageUrl, $force = false)
     {
-        global $base_url;
         $userlib = TikiLib::lib('user');
 
         // Check the user status
@@ -136,7 +135,7 @@ class WizardLib extends TikiLib
             if ($isUserStep) {
                 $stepNr = (int)$_GET['stepNr'];
             } else {
-                $stepNr = isset($_POST['wizard_step']) ? (int)$_POST['wizard_step'] : 0;
+                $stepNr = (int)($_POST['wizard_step'] ?? 0);
             }
 
             $stepBack = false;

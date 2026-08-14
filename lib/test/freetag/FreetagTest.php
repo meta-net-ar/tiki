@@ -4,7 +4,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$freetaglib = TikiLib::lib('freetag');
 
 class FreetagTest extends TikiTestCase
 {
@@ -12,7 +11,7 @@ class FreetagTest extends TikiTestCase
 
     protected function setUp(): void
     {
-        $this->lib = new FreetagLib();
+        $this->lib = TikiLib::lib('freetag');
     }
 
     public function testDumbParseTagsShouldReturnEmptyArray(): void
@@ -32,7 +31,7 @@ class FreetagTest extends TikiTestCase
                     2 => ['tag' => 'third'],
                     3 => ['tag' => 'another multiple word tag']
                     ],
-                'cant' => 4,
+                'count' => 4,
                 ];
 
         $tagString = 'first "multiple word tag" third "another Multiple Word tag"';

@@ -12,9 +12,15 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
-        'approveone'               => 'bool',            //get
-        'clearone'                 => 'bool',            //get
+        'approveone'               => 'alnumdash',       //get
+        'clearone'                 => 'alnumdash',       //get
         'refresh'                  => 'bool',            //get
+        'offset'                   => 'digits',          //get
+        'submit_mult'              => 'word',            //post
+        'approveall'               => 'bool',            //post
+        ],
+        'staticKeyFiltersForArrays' => [
+            'clear'                 => 'alnumdash',      //post
         ],
     ],
 ];
@@ -57,6 +63,12 @@ if (isset($_POST['approveall'])) {
     $parserlib->approve_all_pending_plugins();
 }
 
-$smarty->assign('plugin_list', $parserlib->list_plugins_pending_approval());
+$offset = $_REQUEST["offset"] ?? 0;
+
+$plugins = $parserlib->list_plugins_pending_approval($prefs['maxRecords'], $offset);
+
+$smarty->assign('plugin_list', $plugins['data']);
+$smarty->assign_by_ref('count_pages', $plugins["count"]);
+$smarty->assign_by_ref('offset', $offset);
 $smarty->assign('mid', 'tiki-plugins.tpl');
 $smarty->display("tiki.tpl");

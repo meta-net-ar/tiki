@@ -46,7 +46,6 @@ foreach ($elems as $filename) {
             }
         }
         if (count($gmatchs)) {
-            //var_dump($matchs);
             echo "$filename: " . implode(', ', $gmatchs) . "\n";
         }
     }

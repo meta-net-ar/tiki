@@ -9,7 +9,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
-TikiLib::lib('header')->setXRobotsTag($robots);
 $rsslib = TikiLib::lib('rss');
 if ($prefs['feed_directories'] != 'y') {
     $errmsg = tra("rss feed disabled");
@@ -35,7 +34,7 @@ if ($res) {
 }
 $feed = "directories";
 $uniqueid = $feed;
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 if ($output["data"] == "EMPTY") {
     $title = $prefs['feed_directories_title'];
     $desc = $prefs['feed_directories_desc'];

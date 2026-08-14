@@ -63,7 +63,7 @@ class Tracker_Field_Heading extends \Tracker\Field\AbstractItemField implements 
     public function renderOutput($context = [])
     {
         if (isset($context['list_mode']) && $context['list_mode'] === 'csv') {
-            return;
+            return "";
         }
         global $prefs;
         $headerlib = TikiLib::lib('header');
@@ -74,7 +74,7 @@ class Tracker_Field_Heading extends \Tracker\Field\AbstractItemField implements 
             $level = 3;
         }
         $toggle = $this->getOption('toggle');
-        $inTable = isset($context['inTable']) ? $context['inTable'] : '';
+        $inTable = $context['inTable'] ?? '';
         $name = htmlspecialchars(tra($this->getConfiguration('name')));
         //to distinguish header description display on tiki-view_tracker.php versus when plugin tracker is used
         $desclass = isset($context['pluginTracker']) && $context['pluginTracker'] == 'y' ?
@@ -132,6 +132,11 @@ class Tracker_Field_Heading extends \Tracker\Field\AbstractItemField implements 
             . $data_toggle . ' style="display:none;"></span>';
 
         return $html;
+    }
+
+    public function renderText($context = [])
+    {
+        return tra($this->getConfiguration('name'));
     }
 
     public function importRemote($value)

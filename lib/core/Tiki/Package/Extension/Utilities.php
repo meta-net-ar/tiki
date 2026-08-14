@@ -14,7 +14,7 @@ class Utilities extends TikiDb_Bridge
     public function isInstalled($folder)
     {
         $installed = array_keys(ExtensionManager::getInstalled());
-        if (strpos($folder, '/') !== false && strpos($folder, '_') === false) {
+        if (str_contains($folder, '/') && ! str_contains($folder, '_')) {
             $package = $folder;
         } else {
             $package = str_replace('_', '/', $folder);
@@ -28,7 +28,7 @@ class Utilities extends TikiDb_Bridge
 
     public function getObjectId($folder, $ref, $profile = '', $domain = '')
     {
-        if (strpos($folder, '/') !== false && strpos($folder, '_') === false) {
+        if (str_contains($folder, '/') && ! str_contains($folder, '_')) {
             $folder = str_replace('/', '_', $folder);
         }
         if (empty($domain)) {

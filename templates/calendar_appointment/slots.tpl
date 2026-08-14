@@ -35,7 +35,7 @@
         </div>
     </div>
     {if $target_user eq $user && ! $embed}
-    <p>{tr}You can embed this widget in external sites using the following code:{/tr} <a href="#" onclick="$(this).parent().next().show(); return false">show</a></p>
+    <p>{tr}You can embed this widget in external sites using the following code:{/tr} <a href="#" onclick="$(this).parent().next().show(); return false" role="button">show</a></p>
     <textarea name="embed" class="form-control" style="display: none">&lt;iframe src="{mailurl}{service controller=calendar_appointment action=slots user=$target_user uid=$uid embed=1}{/mailurl}" style="width: 100%; height: 400px; border: 0px;"&gt;&lt;/iframe&gt;</textarea>
     {/if}
 {/block}

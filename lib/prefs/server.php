@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
+
 function prefs_server_list($partial = false)
 {
 
@@ -11,8 +14,6 @@ function prefs_server_list($partial = false)
     // Generating it is extremely costly in terms of memory.
     if (class_exists('DateTimeZone')) {
         $timezones = DateTimeZone::listIdentifiers();
-    } elseif (class_exists('DateTime')) {
-        $timezones = array_keys(DateTime::getTimeZoneList());
     } else {
         $timezones = TikiDate::getTimeZoneList();
         $timezones = array_keys($timezones);
@@ -30,6 +31,7 @@ function prefs_server_list($partial = false)
             'options' => array_combine($timezones, $timezones),
             'default' => isset($tikidate) ? $tikidate->getTimezoneId() : 'UTC',
             'tags' => ['basic'],
+            'help' => 'Date-and-Time',
         ],
         'server_domain' => [
             'name' => tra('Server domain name'),
@@ -39,6 +41,7 @@ function prefs_server_list($partial = false)
             'type' => 'text',
             'default' => '',
             'public' => true,
+            'help' => 'General-Preferences',
         ],
     ];
 }

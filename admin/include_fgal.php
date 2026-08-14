@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -14,16 +14,26 @@ $filegallib = TikiLib::lib('filegal');
 
 if (isset($_REQUEST['fgal_use_dir'])) {
     // Check for last character being a / or a \
-    if (substr($_REQUEST["fgal_use_dir"], -1) != "\\" && substr($_REQUEST["fgal_use_dir"], -1) != "/" && $_REQUEST["fgal_use_dir"] != "") {
+    if (! str_ends_with($_REQUEST["fgal_use_dir"], "\\") && ! str_ends_with($_REQUEST["fgal_use_dir"], "/") && $_REQUEST["fgal_use_dir"] != "") {
         $_REQUEST["fgal_use_dir"] .= "/";
     }
     $filegallib->setupDirectory($_REQUEST["fgal_use_dir"]);
 }
 // Check for last character being a / or a \
-if (isset($_REQUEST["fgal_podcast_dir"]) && substr($_REQUEST["fgal_podcast_dir"], -1) != "\\" && substr($_REQUEST["fgal_podcast_dir"], -1) != "/" && $_REQUEST["fgal_podcast_dir"] != "") {
+if (
+    isset($_REQUEST["fgal_podcast_dir"]) &&
+    ! str_ends_with($_REQUEST["fgal_podcast_dir"], "\\") &&
+    ! str_ends_with($_REQUEST["fgal_podcast_dir"], "/") &&
+    $_REQUEST["fgal_podcast_dir"] != ""
+) {
     $_REQUEST["fgal_podcast_dir"] .= "/";
 }
-if (isset($_REQUEST["fgal_batch_dir"]) && substr($_REQUEST["fgal_batch_dir"], -1) != "\\" && substr($_REQUEST["fgal_batch_dir"], -1) != "/" && $_REQUEST["fgal_batch_dir"] != "") {
+if (
+    isset($_REQUEST["fgal_batch_dir"]) &&
+    ! str_ends_with($_REQUEST["fgal_batch_dir"], "\\") &&
+    ! str_ends_with($_REQUEST["fgal_batch_dir"], "/") &&
+    $_REQUEST["fgal_batch_dir"] != ""
+) {
     $_REQUEST["fgal_batch_dir"] .= "/";
 }
 simple_set_value("fgal_use_dir");
@@ -120,7 +130,7 @@ $ocr->setMimeTypes();
 foreach ($usedTypes as $type) {
     if (! $filegallib->get_parse_app($type, true) && ! in_array($type, $ocr->ocrMime)) {
         $missingHandlers[] = $type;
-        if (strpos($type, '/vnd.ms-') !== false) {
+        if (str_contains($type, '/vnd.ms-')) {
             $vnd_ms_files_exist = true;
         }
     }

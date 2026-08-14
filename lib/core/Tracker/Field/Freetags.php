@@ -18,6 +18,7 @@ class Tracker_Field_Freetags extends \Tracker\Field\AbstractItemField implements
             'F' => [
                 'name' => tr('Tags'),
                 'description' => tr('Allow tags to be shown or added for tracker items.'),
+                'help' => 'Tags',
                 'prefs' => ['trackerfield_freetags', 'feature_freetags'],
                 'tags' => ['advanced'],
                 'default' => 'y',
@@ -102,7 +103,7 @@ class Tracker_Field_Freetags extends \Tracker\Field\AbstractItemField implements
             $tags[] = $value;
         }
         return implode(' ', array_map(function ($t) {
-            return strstr($t, ' ') ? '"' . $t . '"' : $t;
+            return str_contains($t, ' ') ? '"' . $t . '"' : $t;
         }, $tags));
     }
 
@@ -114,7 +115,7 @@ class Tracker_Field_Freetags extends \Tracker\Field\AbstractItemField implements
             return $t != $value;
         });
         return implode(' ', array_map(function ($t) {
-            return strstr($t, ' ') ? '"' . $t . '"' : $t;
+            return str_contains($t, ' ') ? '"' . $t . '"' : $t;
         }, $tags));
     }
 

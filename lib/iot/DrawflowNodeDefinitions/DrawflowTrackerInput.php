@@ -40,7 +40,7 @@ class DrawflowTrackerInput implements DrawflowActionInterface
 
     public function getTemplate(array $config): string
     {
-        $inputs = "<select df-{$this->node_df_identifier} class='text-center noselect2'>";
+        $inputs = "<select df-{$this->node_df_identifier} class='text-center'>";
         $inputs .= '<option selected>' . tra('Please select a value') . '</option>';
         foreach ($config['tracker_fields'] as $key => $input_vals) {
             $inputs .= "<option value='{$input_vals['value']}'>{$input_vals['label']}</option>";

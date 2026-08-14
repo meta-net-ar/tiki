@@ -102,48 +102,33 @@ class Menu extends Base
 
             // Unification with structure menus - adds sectionLevel
             if (empty($menu_info['structure']) and ! empty($channels['data'])) {
-                $channels['data'] = $this->addSectionLevelsToMenuData($channels['data']);
+                $channels['data'] = self::addSectionLevelsToMenuData($channels['data']);
             }
 
             if (! empty($channels['data'])) {
-                // Builds Menus nested tree of options
+                $formattedCategGroups = array_reduce(
+                    $categGroups,
+                    function ($accumulatedGroups, $item) {
+                        return $accumulatedGroups + $item;
+                    },
+                    []
+                );
+                $forStructure = [];
                 foreach ($channels['data'] as $element) {
                     $attribute = \TikiLib::lib('attribute')->get_attribute('menu', $element["optionId"], 'tiki.menu.templatedgroupid');
-                    if ($attribute && $catName = $categGroups[$attribute]) {
-                        $element["name"] = str_replace("--groupname--", $catName, $element["name"]);
-                        $element["url"] = str_replace("--groupname--", $catName, $element["name"]);
-                        $element["sefurl"] = str_replace("--groupname--", $catName, $element["sefurl"]);
-                        $element["canonic"] = str_replace("--groupname--", $catName, $element["canonic"]);
-                    } elseif ($attribute && ! $categGroups[$attribute]) {
-                        continue;
-                    }
-
-                    if ($element['type'] !== '-') {
-                        $level = $element['sectionLevel'];
-                        // Creates new branch at level 0
-                        if ($level === 0) {
-                            array_push($structured, $element);
+                    if ($attribute) {
+                        if (! array_key_exists($attribute, $formattedCategGroups) || empty($formattedCategGroups[$attribute])) {
                             continue;
                         }
-
-                        // Always selects last branch at level 0
-                        $branch = &$structured[count($structured) - 1];
-
-                        // Selects nested part of the branch at element level
-                        for ($i = 0; $i < $level - 1; $i++) {
-                            if ($branch['children']) {
-                                $branch = &$branch['children'][count($branch['children']) - 1];
-                            }
-                        }
-
-                        // Pushes the element at the end of selected element children.
-                        if (! empty($branch['children'])) {
-                            array_push($branch['children'], $element);
-                        } else {
-                            $branch['children'] = [$element];
-                        }
+                        $catName = $formattedCategGroups[$attribute];
+                        $element["name"] = str_replace("--groupname--", $catName, $element["name"]);
+                        $element["url"] = str_replace("--groupname--", $catName, $element["url"]);
+                        $element["sefurl"] = str_replace("--groupname--", $catName, $element["sefurl"]);
+                        $element["canonic"] = str_replace("--groupname--", $catName, $element["canonic"]);
                     }
+                    $forStructure[] = $element;
                 }
+                $structured = self::buildStructuredBootstrapMenu($forStructure);
             }
 
             $smarty->assign('list', $structured);
@@ -188,7 +173,7 @@ class Menu extends Base
         $tikilib = TikiLib::lib('tiki');
         $menulib = TikiLib::lib('menu');
         $cachelib = TikiLib::lib('cache');
-        $cacheName = isset($prefs['mylevel']) ? $prefs['mylevel'] : 0;
+        $cacheName = $prefs['mylevel'] ?? 0;
         $cacheName .= '_' . $prefs['language'] . '_' . md5(implode("\n", $tikilib->get_user_groups($user)));
 
         extract($params, EXTR_SKIP);
@@ -220,16 +205,16 @@ class Menu extends Base
             $menu_info = ['type' => 'd', 'menuId' => $structureId, 'structure' => 'y'];
         } elseif (! empty($id)) {
             $menu_info = $menulib->get_menu($id);
-            $channels = $menulib->list_menu_options($id, 0, -1, 'position_asc', '', '', isset($prefs['mylevel']) ? $prefs['mylevel'] : 0);
+            $channels = $menulib->list_menu_options($id, 0, -1, 'position_asc', '', '', $prefs['mylevel'] ?? 0);
             $channels = $menulib->sort_menu_options($channels);
         } else {
             return '<span class="alert-warning">menu function: Menu or Structure ID not set</span>';
         }
-        if (strpos($_SERVER['SCRIPT_NAME'], 'tiki-register') === false) {
+        if (! str_contains($_SERVER['SCRIPT_NAME'], 'tiki-register')) {
             $cachelib->cacheItem($cacheName, serialize([$menu_info, $channels]), $cacheType);
         }
         if (! isset($setSelected) || $setSelected !== 'n') {
-            $channels = $menulib->setSelected($channels, isset($sectionLevel) ? $sectionLevel : '', isset($toLevel) ? $toLevel : '', $params);
+            $channels = $menulib->setSelected($channels, $sectionLevel ?? '', $toLevel ?? '', $params);
         }
 
         foreach ($channels['data'] as &$item) {
@@ -242,27 +227,96 @@ class Menu extends Base
         return [$menu_info, $channels];
     }
 
+    /**
+     * @param list<array<string,mixed>> $data
+     * @return list<array<string,mixed>>
+     */
     public static function addSectionLevelsToMenuData($data)
     {
-        $sectionLevel = 0;
-        $prev_type = null;
-        $new_data = array_map(function ($menu_item) use (&$sectionLevel, &$prev_type) {
-            if ($menu_item['type'] === 's') {
-                $sectionLevel = 0;
-            } elseif (($prev_type === 's' || is_numeric($prev_type)) && $menu_item['type'] === 'o') {
-                $sectionLevel++;
-            } elseif ($menu_item['type'] === '-') {
-                if ($sectionLevel - 1 >= 0) {
-                    $sectionLevel--;
+        $optionLevel = 0;
+        $out = [];
+        foreach ($data as $menu_item) {
+            $t = $menu_item['type'];
+            if (is_numeric($t)) {
+                $optionLevel = (int) $t;
+            } elseif ($t === '-') {
+                $optionLevel--;
+                if ($optionLevel < 0) {
+                    $optionLevel = 0;
                 }
-            } elseif (is_numeric($menu_item['type'])) {
-                $sectionLevel = (int)$menu_item['type'];
+            } elseif ($t === 'r' || $t === 's') {
+                $optionLevel = 0;
             }
-            $prev_type = $menu_item['type'];
-            $menu_item['sectionLevel'] = $sectionLevel;
+            $menu_item['sectionLevel'] = $optionLevel;
+            $out[] = $menu_item;
+            if ($t !== '-' && $t !== 'o') {
+                $optionLevel++;
+            }
+        }
 
-            return $menu_item;
-        }, $data);
-        return $new_data;
+        return $out;
+    }
+
+    /**
+     * @param list<array<string,mixed>> $withLevels
+     * @return list<array<string,mixed>>
+     */
+    public static function buildStructuredBootstrapMenu(array $withLevels): array
+    {
+        $roots = [];
+        /** @var list<array<string,mixed>> $stack */
+        $stack = [];
+
+        foreach ($withLevels as $element) {
+            if (($element['type'] ?? '') === '-') {
+                $d = (int) ($element['sectionLevel'] ?? 0);
+                while (count($stack) > $d) {
+                    array_pop($stack);
+                }
+                if ($d <= 0 || count($stack) === 0) {
+                    $roots[] = $element;
+                } else {
+                    $parent = &$stack[$d - 1];
+                    if (! isset($parent['children'])) {
+                        $parent['children'] = [];
+                    }
+                    $parent['children'][] = $element;
+                }
+                continue;
+            }
+
+            $d = (int) ($element['sectionLevel'] ?? 0);
+            while (count($stack) > $d) {
+                array_pop($stack);
+            }
+
+            $node = $element;
+            if (! isset($node['children'])) {
+                $node['children'] = [];
+            }
+
+            if ($d === 0) {
+                $roots[] = $node;
+                $r = count($roots) - 1;
+                $stack = [&$roots[$r]];
+                continue;
+            }
+
+            if ($d > 0 && isset($stack[$d - 1])) {
+                $parent = &$stack[$d - 1];
+                if (! isset($parent['children'])) {
+                    $parent['children'] = [];
+                }
+                $parent['children'][] = $node;
+                $lastIdx = count($parent['children']) - 1;
+                $stack[$d] = &$parent['children'][$lastIdx];
+            } else {
+                $roots[] = $node;
+                $r = count($roots) - 1;
+                $stack = [&$roots[$r]];
+            }
+        }
+
+        return $roots;
     }
 }

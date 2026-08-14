@@ -16,6 +16,11 @@ post:
           schema:
             type: object
             properties:
+              title:
+                type: string
+              stat:
+                type: string
+                nullable: true
               queue_count:
                 type: integer
               batch:

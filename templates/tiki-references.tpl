@@ -1,7 +1,7 @@
 {title help="References" admpage="wiki" url="tiki-references.php"}{tr}References{/tr}{/title}
 <div class="t_navbar mb-4">
     {if isset($referenceinfo.ref_id)}
-        {button href="?add=1" class="btn btn-primary" _text="{tr}Add a new library reference{/tr}"}
+        {button href="?add=1#contenttabs_admin_references-2" class="btn btn-primary" _text="{tr}Add a new library reference{/tr}"}
     {/if}
 </div>
 {tabset name='tabs_admin_references'}
@@ -12,7 +12,7 @@
         <h2>{tr}References{/tr}</h2>
         <form method="get" class="small" action="tiki-references.php">
             <div class="tiki-form-group row">
-                <label class="col-form-label col-sm-4" for="find">{tr}Find{/tr}</label>
+                <label class="col-form-label col-sm-4" for="find">{tr}Search{/tr}</label>
                 <div class="col-sm-8">
                     <input type="text" class="form-control form-control-sm" id="find" name="find" value="{$find|escape}">
                 </div>
@@ -25,7 +25,7 @@
             </div>
             <div class="tiki-form-group row">
                 <div class="col-sm-8 offset-sm-4">
-                    <input type="submit" class="btn btn-primary btn-sm" value="{tr}Find{/tr}" name="search">
+                    <input type="submit" class="btn btn-primary btn-sm" value="{tr}Search{/tr}" name="search">
                 </div>
             </div>
         </form>
@@ -94,7 +94,7 @@
                 </table>
             </div>
         </div>
-    {pagination_links cant=$cant step=$maxRecords offset=$offset}
+    {pagination_links count=$count step=$maxRecords offset=$offset}
         tiki-references.php?find={$find}&maxRecords={$maxRecords}
     {/pagination_links}
     {/tab}
@@ -134,67 +134,67 @@
         <div class="tiki-form-group row" id="ref_biblio_code_block" {if empty($referenceinfo.biblio_code)}style="display: none;"{/if}>
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_biblio_code">{tr}Biblio Code{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_biblio_code' class="form-control" name='ref_biblio_code' value="{$referenceinfo.biblio_code|escape}">
+                <input type="text" id='ref_biblio_code' class="form-control" name='ref_biblio_code' value="{$referenceinfo.biblio_code|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_author">{tr}Author{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_author' class="form-control" name='ref_author' value="{$referenceinfo.author|escape}">
+                <input type="text" id='ref_author' class="form-control" name='ref_author' value="{$referenceinfo.author|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Title{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_title' class="form-control" name='ref_title' value="{$referenceinfo.title|escape}">
+                <input type="text" id='ref_title' class="form-control" name='ref_title' value="{$referenceinfo.title|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Year{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_year' class="form-control" name='ref_year' value="{$referenceinfo.year|escape}">
+                <input type="text" id='ref_year' class="form-control" name='ref_year' value="{$referenceinfo.year|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Part{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_part' class="form-control" name='ref_part' value="{$referenceinfo.part|escape}">
+                <input type="text" id='ref_part' class="form-control" name='ref_part' value="{$referenceinfo.part|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}URI{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_uri' class="form-control" name='ref_uri' value="{$referenceinfo.uri|escape}">
+                <input type="text" id='ref_uri' class="form-control" name='ref_uri' value="{$referenceinfo.uri|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Code{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_code' class="form-control" name='ref_code' value="{$referenceinfo.code|escape}">
+                <input type="text" id='ref_code' class="form-control" name='ref_code' value="{$referenceinfo.code|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Publisher{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_publisher' class="form-control" name='ref_publisher' value="{$referenceinfo.publisher|escape}">
+                <input type="text" id='ref_publisher' class="form-control" name='ref_publisher' value="{$referenceinfo.publisher|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Location{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_location' class="form-control" name='ref_location' value="{$referenceinfo.location|escape}">
+                <input type="text" id='ref_location' class="form-control" name='ref_location' value="{$referenceinfo.location|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Style{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_style' class="form-control" name='ref_style' value="{$referenceinfo.style|escape}">
+                <input type="text" id='ref_style' class="form-control" name='ref_style' value="{$referenceinfo.style|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">
             <label class="col-sm-3 col-md-2 col-form-label" for="ref_title">{tr}Template{/tr}</label>
             <div class="col-sm-7 col-md-6">
-                <input type="text" id='ref_template' class="form-control" name='ref_template' value="{$referenceinfo.template|escape}">
+                <input type="text" id='ref_template' class="form-control" name='ref_template' value="{$referenceinfo.template|default:''|escape}">
             </div>
         </div>
         <div class="tiki-form-group row">

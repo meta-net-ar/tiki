@@ -14,7 +14,6 @@ function upgrade_20160627_remove_more_unwanted_files_tiki($installer)
         'vendor/player/mp3/template_default/compileTemplateDefault.bat',
         'vendor/blueimp/javascript-load-image/js/demo.js',
         'vendor/blueimp/javascript-load-image/css/demo.css',
-        'vendor/Sam152/Javascript-Equal-Height-Responsive-Rows/demo.html',
         'vendor/jquery/jtrack/demo.html',
         'vendor_extra/elfinder/elfinder.html',
         'vendor/blueimp/jquery-file-upload/css/demo-ie8.css',

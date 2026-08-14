@@ -129,7 +129,15 @@ function module_users_list($mod_reference, $module_params)
         $sort_mode = $module_params['sort_mode'];
     }
 
-    $users = $userlib->get_users(0, $mod_reference['rows'], $sort_mode, '', ! empty($module_params['initial']) ? $module_params['initial'] : '', isset($module_params['groups']) ? true : false, $group);
+    $users = $userlib->get_users(
+        0,
+        $mod_reference['rows'],
+        $sort_mode,
+        '',
+        $module_params['initial'] ?? '',
+        isset($module_params['groups']),
+        $group
+    );
     if (isset($_REQUEST["realName"]) && ($prefs['auth_ldap_nameattr'] == '' || $prefs['auth_method'] != 'ldap')) {
         $tikilib->set_user_preference($userwatch, 'realName', $_REQUEST["realName"]);
         if ($prefs['user_show_realnames'] == 'y') {
@@ -138,19 +146,13 @@ function module_users_list($mod_reference, $module_params)
         }
     }
 
-    for ($i = 0; $i < $users['cant']; ++$i) {
+    for ($i = 0; $i < $users['count']; ++$i) {
         $my_user = $users['data'][$i]['user'];
         if (isset($module_params['realName']) && $module_params['realName'] == 'y') {
             $users['data'][$i]['realName'] = $tikilib->get_user_preference($my_user, 'realName', '');
         }
         if (isset($module_params['avatar']) && $module_params['avatar'] == 'y') {
             $users['data'][$i]['avatar'] = $tikilib->get_user_avatar($my_user);
-        }
-        if (
-            (isset($module_params['realName']) && $module_params['realName'] == 'y')
-            || (isset($module_params['login']) && $module_params['login'] == 'y')
-        ) {
-            $users['data'][$i]['info_public'] = $tikilib->get_user_preference($my_user, 'user_information', 'public') != 'private' ? 'y' : 'n';
         }
         if (isset($module_params['userPage']) && $module_params['userPage'] == 'y') {
             global $feature_wiki_userpage;

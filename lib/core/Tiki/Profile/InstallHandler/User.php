@@ -78,13 +78,13 @@ class Tiki_Profile_InstallHandler_User extends Tiki_Profile_InstallHandler
 
             if (! $userlib->user_exists($user['name'])) {
                 // if pass parameter has not been set use the name parameter as the password as well
-                $pass = isset($user['pass']) ? $user['pass'] : $user['name'];
+                $pass = $user['pass'] ?? $user['name'];
                 // for the special case where pass has been set to 'generate' then generate a random password
                 if ($pass == 'generate') {
                     $pass = $tikilib->genPass();
                     $retpass = true;
                 }
-                $email = isset($user['email']) ? $user['email'] : '';
+                $email = $user['email'] ?? '';
                 if (empty($email) && $prefs['login_is_email'] === 'y') {
                     $email = $user['name'];
                 }

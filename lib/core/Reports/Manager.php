@@ -64,7 +64,7 @@ class Reports_Manager
      * changes cache for this user.
      *
      * @param string $user user name
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function delete($user)
     {
@@ -78,7 +78,7 @@ class Reports_Manager
      * @param string $view
      * @param string $type
      * @param int $always_email
-     * @return int|TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return int|Tiki\TikiDb\PdoResult
      */
     public function save($user, $interval, $view, $type, $always_email)
     {

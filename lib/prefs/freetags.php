@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_freetags_list()
 {
+    $tagsHelp = 'Tags';
+    $freetagsGeneralSettingsHelp = 'Freetags-General-Settings';
 
     $freetags_sort_orders = [
         'name_asc' => tra('Name') . ' ' . tra('ascending'),
@@ -29,72 +31,81 @@ function prefs_freetags_list()
     ];
 
     return  [
-            'freetags_multilingual' => [
+        'freetags_multilingual' => [
             'name' => tra('Multilingual tags'),
             'description' => tra('Permits translation management of tags'),
-            'help' => 'Tags',
+            'help' => $tagsHelp,
             'type' => 'flag',
             'dependencies' => [
                 'feature_multilingual',
                 'feature_freetags',
             ],
             'default' => 'n',
-            ],
-            'freetags_sort_mode' => [
+        ],
+        'freetags_sort_mode' => [
             'name' => tra('Ordering of tagged objects'),
             'description' => tra('Default sort mode for tagged items'),
             'type' => 'list',
             'options' => $freetags_sort_orders,
+            'help' => $freetagsGeneralSettingsHelp,
             'default' => 'name_asc',
-            ],
-            'freetags_browse_show_cloud' => [
+        ],
+        'freetags_browse_show_cloud' => [
             'name' => tra('Show tag cloud'),
             'description' => tra('Show the full tag cloud in the list-tags screen.'),
             'type' => 'flag',
+            'help' => $freetagsGeneralSettingsHelp,
             'default' => 'y',
-            ],
-            'freetags_browse_amount_tags_in_cloud' => [
+        ],
+        'freetags_browse_amount_tags_in_cloud' => [
             'name' => tra('Maximum number of tags in cloud'),
+            'description' => tra('Maximum number of tags displayed in the tag cloud.'),
             'type' => 'text',
             'size' => '5',
             'filter' => 'digits',
+            'help' => $freetagsGeneralSettingsHelp,
             'units' => tra('tags'),
             'default' => '100',
-            ],
-            'freetags_show_middle' => [
+        ],
+        'freetags_show_middle' => [
             'name' => tra('Show tags in middle column'),
             'description' => tra('On pages that have content tagged, this option enables the display of the tags at the top of those pages. Tags can be set, among other places, in the properties tab when editing a wiki page..'),
             'type' => 'flag',
+            'help' => $freetagsGeneralSettingsHelp,
             'default' => 'y',
-            ],
-            'freetags_preload_random_search' => [
+        ],
+        'freetags_preload_random_search' => [
             'name' => tra('Preload random tag'),
             'description' => tra('A random tag will be selected on the tag search page (if no tag is pre-selected)..'),
             'type' => 'flag',
+            'help' => $freetagsGeneralSettingsHelp,
             'default' => 'y',
-            ],
-            'freetags_browse_amount_tags_suggestion' => [
+        ],
+        'freetags_browse_amount_tags_suggestion' => [
             'name' => tra('Tag Suggestions'),
             'description' => tra('Number of tags to show in tag suggestions'),
             'type' => 'text',
+            'help' => $freetagsGeneralSettingsHelp,
             'size' => '4',
             'filter' => 'digits',
             'units' => tra('tags'),
             'default' => '10',
-            ],
-            'freetags_normalized_valid_chars' => [
+        ],
+        'freetags_normalized_valid_chars' => [
             'name' => tra('Valid characters pattern'),
             'description' => tra('Click on the links below to set or clear a pattern to limit characters accepted in tags. '),
+            'help' => $freetagsGeneralSettingsHelp,
             'type' => 'text',
             'size' => '30',
             'hint' => tra('Useful to eliminate characters such as “,” which users can enter by mistake instead of a space.'),
             'default' => '',
-            ],
-            'freetags_lowercase_only' => [
+        ],
+        'freetags_lowercase_only' => [
             'name' => tra('Lowercase tags only'),
             'description' => tra('Convert uppercase characters in tags to lowercase, if this is a preferred style for making tags more user-friendly..'),
             'type' => 'flag',
+            'help' => $freetagsGeneralSettingsHelp,
             'default' => 'y',
-            ],
+        ],
     ];
 }

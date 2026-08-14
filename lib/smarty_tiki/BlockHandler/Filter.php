@@ -44,7 +44,7 @@ class Filter extends Base
         $smarty->assign('filter_type', $filter->type->wordspace() ? $filter->type->wordspace() : $prefs['search_default_where']);
         $smarty->assign('filter_types', $types);
 
-        $sort_mode = isset($_REQUEST['sort_mode']) ? $_REQUEST['sort_mode'] : 'score_ndesc';
+        $sort_mode = $_REQUEST['sort_mode'] ?? 'score_ndesc';
         $sort_modes = [
             'score_ndesc' => tra('Relevance'),
             'object_type_asc' => tra('Type'),
@@ -58,48 +58,26 @@ class Filter extends Base
         // Categories
         if ($prefs['feature_categories'] == 'y' && $prefs['search_show_category_filter'] == 'y') {
             $smarty->assign('filter_deep', $filter->offsetExists('deep'));
-            $smarty->assign('filter_categories', $filter->categories->wordspace());
-            $smarty->assign('filter_categmap', json_encode(\TikiDb::get()->fetchMap('SELECT categId, name FROM tiki_categories')));
+            $smarty->assign('filter_categories', explode(' ', $filter->categories->wordspace() ?? ''));
 
-            // Generate the category tree {{{
             $categlib = \TikiLib::lib('categ');
-            require_once 'lib/tree/BrowseTreeMaker.php';
             $ctall = $categlib->getCategories();
 
             if ($prefs['unified_excluded_categories'] === 'y') {        // remove those excluded categs
                 $ctall = array_diff_key($ctall, array_flip($prefs['unified_excluded_categories']));
             }
 
-            $tree_nodes = [];
-            foreach ($ctall as $c) {
-                $name = htmlentities($c['name'], ENT_QUOTES, 'UTF-8');
-
-                $body = <<<BODY
-<label>
-    <input type="checkbox" value="{$c['categId']}"/>
-    {$name}
-</label>
-BODY;
-
-                $tree_nodes[] = [
-                    'id' => $c['categId'],
-                    'parent' => $c['parentId'],
-                    'data' => $body,
-                ];
-            }
-
-            $tm = new \BrowseTreeMaker('categ');
-            $res = $tm->make_tree(0, $tree_nodes);
-            $smarty->assign('filter_category_picker', $res);
-            // }}}
+            $smarty->assign('categories', $ctall);
         }
 
         if ($prefs['feature_freetags'] == 'y' && $prefs['search_show_tag_filter'] == 'y') {
             $freetaglib = \TikiLib::lib('freetag');
 
-            $smarty->assign('filter_tags', $filter->tags->wordspace());
-            $smarty->assign('filter_tagmap', json_encode(\TikiDb::get()->fetchMap('SELECT tagId, tag FROM tiki_freetags')));
-            $smarty->assign('filter_tags_picker', (string) $freetaglib->get_cloud());
+            $tags_string = $filter->tags->wordspace();
+            $filter_tags = $tags_string === null ? [] : explode(' ', $tags_string);
+
+            $smarty->assign('filter_tags', $filter_tags);
+            $smarty->assign('tags', \TikiDb::get()->fetchAll('SELECT tagId, tag FROM tiki_freetags'));
         }
 
         // Language

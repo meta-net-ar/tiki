@@ -19,11 +19,14 @@
         </a>
     {/if}
 </div>
+{remarksbox type="tip" title="{tr}Tip{/tr}" close="y"}
+    {tr _0='<strong>' _1='</strong>'}To add a visual separator, click %0Create menu option%1, set %0Type%1 to %0separator%1, then save your menu.{/tr}
+{/remarksbox}
 
 {tabset name="admin_menu_options"}
 {tab name="{tr}Manage menu{/tr} {$editable_menu_info.name}"}
     <div>
-        <h2>{tr}Menu options{/tr} <span class="badge bg-secondary">{$cant_pages}</span></h2>
+        <h2>{tr}Menu options{/tr} <span class="badge bg-secondary">{$pages_count}</span></h2>
         {include file='tiki-admin_menu_options_insert_component.tpl'}
         <form method="get" action="tiki-admin_menu_options.php">
             {ticket}
@@ -69,7 +72,7 @@
                                             {/if}
 
                                             {if $prefs.feature_userlevels eq 'y' and not empty($option.userlevel)}
-                                                {assign var=it value=$option.userlevel}
+                                                {$it=$option.userlevel}
                                                 <dt>{tr}User Level:{/tr}</dt>
                                                 <dd>{$prefs.userlevels.$it}</dd>
                                             {/if}
@@ -100,7 +103,13 @@
                                 <div class="label-group">
                                     <div class="input-group input-group-sm">
                                         <span class="input-group-text">{icon name='sort'}</span>
-                                        <input type="text" class="field-label form-control" value="{$option.name|escape}" placeholder="{tr}Label{/tr}">
+                                        {if $option.type eq '-' or ($option.type eq 's' and empty($option.name))}
+                                            <div class="form-control d-flex align-items-center bg-body-tertiary py-2">
+                                                <hr class="dropdown-divider my-0 w-100">
+                                            </div>
+                                        {else}
+                                            <input type="text" class="field-label form-control" value="{$option.name|escape}" placeholder="{tr}Label{/tr}">
+                                        {/if}
                                         <span class="tips input-group-text option-edit" title="|{tr}Check this if the option is an alternative to the previous one.{/tr}">
                                                 <input type="checkbox" class="samepos"{if $option.position eq $prevpos} checked="checked"{/if}>
                                             {$prevpos = $option.position}
@@ -119,7 +128,7 @@
                                         <a href="{bootstrap_modal controller=menu action=edit_option menuId=$menuId optionId=$option.optionId}" class="tips input-group-text option-edit confirm" title="|{tr}Details{/tr}">
                                                 {icon name='edit' _menu_icon='y' alt="{tr}Details{/tr}"}
                                             </a>
-                                            <a href="#" class="tips input-group-text text-danger option-remove" title="|{tr}Remove Option{/tr}">
+                                            <a href="#" class="tips input-group-text text-danger option-remove" title="|{tr}Remove Option{/tr}" role="button">
                                                 {icon name='remove' _menu_icon='y' alt="{tr}Remove{/tr}"}
                                             </a>
                                     </div>

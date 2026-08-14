@@ -23,7 +23,7 @@ class Hm_Handler_tracker_message_list_type extends Hm_Handler_Module
     public function process()
     {
         $path = $this->request->get['list_path'];
-        if (! strstr($path, 'tracker_folder_')) {
+        if (! str_contains($path, 'tracker_folder_')) {
             return;
         }
         $title = ['Tracker Folder'];
@@ -54,7 +54,6 @@ class Hm_Handler_check_path_redirect extends Hm_Handler_Module
     public $request;
     public function process()
     {
-        global $smarty;
         $path = $this->request->get['list_path'];
         if (preg_match("/tracker_folder_(\d+)_(\d+)/", $path, $m)) {
             $url = smarty_modifier_sefurl($m[1], 'trackeritem');
@@ -72,7 +71,6 @@ class Hm_Handler_check_path_redirect_after_sent extends Hm_Handler_Module
     public $request;
     public function process()
     {
-        global $smarty;
         if (! $this->get('msg_sent')) {
             return;
         }
@@ -93,8 +91,6 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
     public $session;
     public function process()
     {
-        global $smarty;
-
         list($success, $form) = $this->process_form(['tracker_field_id', 'tracker_item_id', 'imap_msg_ids', 'list_path', 'folder']);
         if (! $success) {
             return;
@@ -108,27 +104,21 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
         if (preg_match("/^imap_(\w+)_(.+)/", $form['list_path'], $matches)) {
             $imap_server_id = $matches[1];
             $folder = hex2bin($matches[2]);
-            $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
-            $imap = Hm_IMAP_List::connect($imap_server_id, $cache);
-            if (! $imap->authed()) {
-                Hm_Msgs::add('ERRCould not authenticate with mail server');
+            $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
+            if (! $mailbox->authed()) {
+                Hm_Msgs::add(tr('Could not authenticate with mail server'), 'danger');
                 return;
             }
-            if (! $imap->select_folder($folder)) {
-                Hm_Msgs::add('ERRMailbox not found');
-                return;
-            }
-
 
             foreach ($msg_ids as $msg_id) {
-                list($msgs[], $headers_array[]) = get_message_data($imap, $folder, $msg_id);
+                list($msgs[], $headers_array[]) = get_message_data($mailbox, $folder, $msg_id);
             }
 
-            bind_tracker_item_update_event($imap, $form, $msg_ids);
+            bind_tracker_item_update_event($mailbox, $folder, $form, $msg_ids);
         } elseif (preg_match("/^tracker_folder_/", $form['list_path'], $matches)) {
             $email = tiki_parse_message($form['list_path'], $msg_ids[0]);
             if (! $email) {
-                Hm_Msgs::add('ERRMessage could not be loaded');
+                Hm_Msgs::add(tr('Message could not be loaded'), 'danger');
                 return;
             }
             if (isset($form['folder']) && $form['folder'] != 'archive') {
@@ -168,7 +158,7 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
                     ]);
                 }
             }, ['email' => $email]);
-        } elseif (in_array($form['list_path'], ['sent', 'unread', 'combined_inbox', 'flagged'])) {
+        } elseif (in_array($form['list_path'], ['sent', 'unread', 'combined_inbox', 'flagged', 'search'])) {
             $imaps = [];
             $ids = [];
             foreach ($msg_ids as $msg_id) {
@@ -177,31 +167,26 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
                 $folder = hex2bin($full_path[3]);
 
                 if (! in_array($imap_server_id, array_keys($imaps))) {
-                    $cache = Hm_IMAP_List::get_cache($this->cache, $imap_server_id);
-                    $imap_data = Hm_IMAP_List::connect($imap_server_id, $cache);
+                    $mailbox = Hm_IMAP_List::get_connected_mailbox($imap_server_id, $this->cache);
 
-                    if (! $imap_data->authed()) {
+                    if (! $mailbox->authed()) {
                         $errors++;
                         continue;
                     }
 
-                    $imaps[$imap_server_id] = $imap_data;
+                    $imaps[$imap_server_id] = $mailbox;
                 }
 
-                $imap = $imaps[$imap_server_id];
-                if (! $imap->select_folder($folder)) {
-                    $errors++;
-                    continue;
-                }
+                $mailbox = $imaps[$imap_server_id];
 
-                list($msgs[], $headers_array[]) = get_message_data($imap, $folder, $full_path[2]);
+                list($msgs[], $headers_array[]) = get_message_data($mailbox, $folder, $full_path[2]);
                 $ids[] = $full_path[2];
             }
             if (count($ids)) {
-                bind_tracker_item_update_event($imap, $form, $ids);
+                bind_tracker_item_update_event($mailbox, $folder, $form, $ids);
             }
         } else {
-            Hm_Msgs::add('ERRMessage from this source could not be moved');
+            Hm_Msgs::add(tr('Message from this source could not be moved'), 'danger');
             return;
         }
 
@@ -209,28 +194,33 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
         $item = $trk->get_item_info($form['tracker_item_id']);
 
         if (! $item) {
-            Hm_Msgs::add('ERRTracker item not found');
+            Hm_Msgs::add(tr('Tracker item not found'), 'danger');
             return;
         }
 
         $field = $trk->get_field_info($form['tracker_field_id']);
         if (! $field) {
-            Hm_Msgs::add('ERRTracker field not found');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
 
         $new_values = [];
         foreach ($msgs as $key => $msg) {
             $headers = $headers_array[$key];
-            if ($this->session->get('page_id')) {
-                $msg = "X-Tiki-Source: " . $this->session->get('page_id') . "\r\n" . $msg;
+            $content = '';
+            if (isset($this->request->post['auto_move']) && $this->request->post['auto_move']) {
+                $content .= "X-Auto-Move-Reply: 1\r\n";
             }
+            if ($this->session->get('page_id')) {
+                $content .= "X-Tiki-Source: " . $this->session->get('page_id') . "\r\n";
+            }
+            $content .= $msg;
 
             $new_values[] = [
                 'name' => ! empty($headers['Message-ID']) ? $headers['Message-ID'] : $headers['Subject'],
-                'size' => strlen($msg),
+                'size' => strlen($content),
                 'type' => 'message/rfc822',
-                'content' => $msg
+                'content' => $content
             ];
         }
 
@@ -245,12 +235,43 @@ class Hm_Handler_move_to_tracker extends Hm_Handler_Module
 
         $total_msg_ids = count($msg_ids);
         if ($errors > 0 && $errors < $total_msg_ids) {
-            Hm_Msgs::add('Some messages moved');
+            Hm_Msgs::add(tr('Some messages moved'));
         } elseif ($total_msg_ids == $errors) {
-            Hm_Msgs::add('ERRUnable to move/copy selected messages');
+            Hm_Msgs::add(tr('Unable to move/copy selected messages'), 'danger');
             return;
         } else {
-            Hm_Msgs::add('Messages moved');
+            Hm_Msgs::add(tr('Messages moved'));
+        }
+    }
+}
+
+class Hm_Handler_auto_move_reply_to_tracker extends Hm_Handler_Module
+{
+    public function process()
+    {
+        if (! array_key_exists('in_reply_to', $this->request->post) || ! $this->request->post['in_reply_to']) {
+            return;
+        }
+
+        $inReplyTo = $this->request->post['in_reply_to'];
+        $items = find_relevant_tracker_items($inReplyTo, 'message_ids');
+        $item = reset($items);
+
+        if (! $item) {
+            return;
+        }
+
+        $trackerDefinition = Tracker_Definition::get($item['parent_id']);
+        $itemdata = Tracker_Item::fromId($item['object_id'])->getData();
+        $emailFieldHandler = $trackerDefinition->getFieldFactory()->getHandler($trackerDefinition->getField($item['field_id']), $itemdata);
+        $values = $emailFieldHandler->getFieldData();
+
+        if (in_array($inReplyTo, $values['autoMoveReplies'])) {
+            $this->out('auto_move', true);
+            $this->out('item_id', $item['object_id']);
+            $this->out('field_id', $item['field_id']);
+        } else {
+            $this->out('auto_move', false);
         }
     }
 }
@@ -269,7 +290,7 @@ class Hm_Handler_tiki_mark_as_answered extends Hm_Handler_Module
         }
 
         $path = $this->request->post['compose_msg_path'];
-        if (! strstr($path, 'tracker_folder_')) {
+        if (! str_contains($path, 'tracker_folder_')) {
             return;
         }
 
@@ -294,7 +315,7 @@ class Hm_Handler_tiki_presave_sent extends Hm_Handler_Module
         }
 
         $path = $this->request->post['compose_msg_path'];
-        if (strstr($path, 'tracker_folder_')) {
+        if (str_contains($path, 'tracker_folder_')) {
             $this->out('save_sent_server', false);
         }
     }
@@ -317,7 +338,7 @@ class Hm_Handler_tiki_save_sent extends Hm_Handler_Module
         $headers = $mime->get_headers();
 
         $path = $this->request->post['compose_msg_path'];
-        if (! strstr($path, 'tracker_folder_')) {
+        if (! str_contains($path, 'tracker_folder_')) {
             return;
         }
         $path = str_replace('tracker_folder_', '', $path);
@@ -326,12 +347,12 @@ class Hm_Handler_tiki_save_sent extends Hm_Handler_Module
         $trk = TikiLib::lib('trk');
         $item = $trk->get_item_info($itemId);
         if (! $item) {
-            Hm_Msgs::add('ERRTracker item not found');
+            Hm_Msgs::add(tr('Tracker item not found'), 'danger');
             return;
         }
         $field = $trk->get_field_info($fieldId);
         if (! $field) {
-            Hm_Msgs::add('ERRTracker field not found');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
         $field['value'] = [
@@ -348,6 +369,55 @@ class Hm_Handler_tiki_save_sent extends Hm_Handler_Module
         ]);
     }
 }
+
+/**
+ * Delete a draft message from EmailFolder field when successfully sent
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_tiki_delete_draft extends Hm_Handler_Module
+{
+    public $request;
+    public function process()
+    {
+        if (! $this->get('msg_sent')) {
+            return;
+        }
+
+        $path = $this->request->post['compose_msg_path'];
+        if (! str_contains($path, 'tracker_folder_')) {
+            return;
+        }
+
+        $draftId = $this->request->post['draft_id'];
+        if (! $draftId) {
+            return;
+        }
+
+        $path = str_replace('tracker_folder_', '', $path);
+        list ($itemId, $fieldId) = explode('_', $path);
+
+        $trk = TikiLib::lib('trk');
+        $item = $trk->get_item_info($itemId);
+        if (! $item) {
+            Hm_Msgs::add(tr('Could not delete the saved draft. (Tracker item was not found)'), 'danger');
+            return;
+        }
+        $field = $trk->get_field_info($fieldId);
+        if (! $field) {
+            Hm_Msgs::add(tr('Could not delete the saved draft. (Tracker field not found)'), 'danger');
+            return;
+        }
+        $field['value'] = [
+            'folder' => 'draft',
+            'delete' => $draftId,
+            'skip_trash' => true
+        ];
+        $trk->replace_item($item['trackerId'], $item['itemId'], [
+            'data' => [$field]
+        ]);
+    }
+}
+
 /**
  * Prevent saving a draft message to IMAP if it originated from a tracker
  * @subpackage tiki/handler
@@ -360,7 +430,30 @@ class Hm_Handler_tiki_presave_draft extends Hm_Handler_Module
             return;
         }
         $path = $this->request->get['list_path'];
-        if (strstr($path, 'tracker_folder_')) {
+        if (str_contains($path, 'tracker_folder_')) {
+            $path = str_replace('tracker_folder_', '', $path);
+            list ($itemId, $fieldId) = explode('_', $path);
+
+            $trk = TikiLib::lib('trk');
+
+            $item = $trk->get_item_info($itemId);
+            if (! $item) {
+                Hm_Msgs::add(tr('Could not save draft to tracker item because the item was not found. id: ') . $itemId, 'warning');
+                return;
+            }
+
+            $field = $trk->get_field_info($fieldId);
+            if (! $field) {
+                Hm_Msgs::add(tr('Could not save draft to tracker item because the field was not found.'), 'warning');
+                return;
+            }
+
+            $fieldHandler = Tracker_Definition::get($item['trackerId'])->getFieldFactory()->getHandler($field);
+
+            if (! $fieldHandler->getTrackerFieldInstance()->getOption('useFolders')) {
+                Hm_Msgs::add(tr('Could not save draft to tracker item because folders are not configured for the current field.'), 'warning');
+                return;
+            }
             $this->out('save_draft_to_imap', false);
         }
     }
@@ -380,7 +473,7 @@ class Hm_Handler_tiki_save_draft extends Hm_Handler_Module
         }
 
         $path = $this->request->get['list_path'];
-        if (! strstr($path, 'tracker_folder_')) {
+        if (! str_contains($path, 'tracker_folder_')) {
             return;
         }
         $path = str_replace('tracker_folder_', '', $path);
@@ -389,16 +482,22 @@ class Hm_Handler_tiki_save_draft extends Hm_Handler_Module
         $trk = TikiLib::lib('trk');
         $item = $trk->get_item_info($itemId);
         if (! $item) {
-            Hm_Msgs::add('ERRTracker item not found');
+            Hm_Msgs::add(tr('Tracker item not found'), 'danger');
             return;
         }
         $field = $trk->get_field_info($fieldId);
         if (! $field) {
-            Hm_Msgs::add('ERRTracker field not found');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
 
-        $fileId = $this->request->get['draft_id'];
+        $fieldHandler = Tracker_Definition::get($item['trackerId'])->getFieldFactory()->getHandler($field);
+        if (! $fieldHandler->getTrackerFieldInstance()->getOption('useFolders')) {
+            Hm_Msgs::add(tr('Configure folders for this tracker field to save drafts'), 'danger');
+            return;
+        }
+
+        $fileId = $this->request->post['draft_id'];
 
         $headers = $mime->get_headers();
         $msg = "Flags: \Draft\r\n" . $mime->get_mime_msg();
@@ -421,12 +520,19 @@ class Hm_Handler_tiki_save_draft extends Hm_Handler_Module
             'folder' => 'draft',
             $action => $fileValue
         ];
+
+        TikiLib::events()->bind('tiki.trackeritem.update', function ($args) use ($fieldId) {
+            $drafts = json_decode($args['values'][$fieldId])->draft;
+            $currentDraft = end($drafts);
+            $this->out('draft_id', $currentDraft);
+        });
+
         $trk->replace_item($item['trackerId'], $item['itemId'], [
             'data' => [$field]
         ]);
 
         if ($this->request->post['draft_notice']) {
-            Hm_Msgs::add('Draft saved');
+            Hm_Msgs::add(tr('Draft saved'));
         }
     }
 }
@@ -437,7 +543,7 @@ class Hm_Handler_tiki_compose_from_draft extends Hm_Handler_Module
     {
         $draftId = $this->request->get['draft_id'] ?? '';
         $path = $this->request->get['list_path'] ?? '';
-        if (! strstr($path, 'tracker_folder_') || ! $draftId) {
+        if (! str_contains($path, 'tracker_folder_') || ! $draftId) {
             return;
         }
 
@@ -448,7 +554,7 @@ class Hm_Handler_tiki_compose_from_draft extends Hm_Handler_Module
         $field = $trk->get_field_info($fieldId);
 
         if (! $field) {
-            Hm_Msgs::add('ERRTracker field not found');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
 
@@ -479,7 +585,7 @@ class Hm_Handler_tiki_archive_replied extends Hm_Handler_Module
         }
 
         $path = $this->request->post['compose_msg_path'];
-        if (! strstr($path, 'tracker_folder_')) {
+        if (! str_contains($path, 'tracker_folder_')) {
             return;
         }
         $msg_uid = $this->request->post['compose_msg_uid'];
@@ -496,13 +602,13 @@ class Hm_Handler_tiki_archive_replied extends Hm_Handler_Module
         $trk = TikiLib::lib('trk');
         $item = $trk->get_item_info($itemId);
         if (! $item) {
-            Hm_Msgs::add('ERRTracker item not found');
+            Hm_Msgs::add(tr('Tracker item not found'), 'danger');
             return;
         }
 
         $field = $trk->get_field_info($fieldId);
         if (! $field) {
-            Hm_Msgs::add('ERRTracker field not found');
+            Hm_Msgs::add(tr('Tracker field not found'), 'danger');
             return;
         }
 
@@ -536,13 +642,13 @@ class Hm_Handler_tiki_delete_message extends Hm_Handler_Module
             $trk = TikiLib::lib('trk');
             $item = $trk->get_item_info($itemId);
             if (! $item) {
-                Hm_Msgs::add('ERRTracker item not found');
+                Hm_Msgs::add(tr('Tracker item not found'), 'danger');
                 $this->out('delete_error', true);
                 return;
             }
             $field = $trk->get_field_info($fieldId);
             if (! $field) {
-                Hm_Msgs::add('ERRTracker field not found');
+                Hm_Msgs::add(tr('Tracker field not found'), 'danger');
                 $this->out('delete_error', true);
                 return;
             }
@@ -552,7 +658,7 @@ class Hm_Handler_tiki_delete_message extends Hm_Handler_Module
             $trk->replace_item($item['trackerId'], $item['itemId'], [
                 'data' => [$field]
             ]);
-            Hm_Msgs::add('Message deleted');
+            Hm_Msgs::add(tr('Message deleted'));
             $this->out('delete_error', false);
         }
     }
@@ -579,13 +685,13 @@ class Hm_Handler_tiki_archive_message extends Hm_Handler_Module
             $trk = TikiLib::lib('trk');
             $item = $trk->get_item_info($itemId);
             if (! $item) {
-                Hm_Msgs::add('ERRTracker item not found');
+                Hm_Msgs::add(tr('Tracker item not found'), 'danger');
                 $this->out('archive_error', true);
                 return;
             }
             $field = $trk->get_field_info($fieldId);
             if (! $field) {
-                Hm_Msgs::add('ERRTracker field not found');
+                Hm_Msgs::add(tr('Tracker field not found'), 'danger');
                 $this->out('archive_error', true);
                 return;
             }
@@ -595,7 +701,7 @@ class Hm_Handler_tiki_archive_message extends Hm_Handler_Module
             $trk->replace_item($item['trackerId'], $item['itemId'], [
                 'data' => [$field]
             ]);
-            Hm_Msgs::add('Message archived');
+            Hm_Msgs::add(tr('Message archived'));
             $this->out('archive_error', false);
         }
     }
@@ -665,8 +771,17 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
             return;
         }
 
+        // Only process tracker-stored messages; skip regular IMAP messages
+        $list_path = $this->request->post['list_path'] ?? '';
+        if (strpos($list_path, 'tracker_folder_') !== 0) {
+            return;
+        }
+
+        $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
+        $this->out('images_whitelist', explode(',', $this->user_config->get('images_whitelist_setting')));
+
         $this->out('msg_text_uid', $form['imap_msg_uid']);
-        $this->out('msg_list_path', $this->request->post['list_path']);
+        $this->out('msg_list_path', $list_path);
         $part_num = false;
         if (isset($this->request->post['imap_msg_part']) && preg_match("/[0-9\.]+/", $this->request->post['imap_msg_part'])) {
             $part_num = $this->request->post['imap_msg_part'];
@@ -676,7 +791,7 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
         }
         $this->out('header_allow_images', $this->config->get('allow_external_image_sources'));
 
-        $email = tiki_parse_message($this->request->post['list_path'], $form['imap_msg_uid']);
+        $email = tiki_parse_message($list_path, $form['imap_msg_uid']);
         if (! $email) {
             return;
         }
@@ -694,7 +809,6 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
             }
         }
         $msg_struct = tiki_mime_part_to_bodystructure($message);
-        $msg_struct_current = [];
 
         if ($part_num !== false) {
             $part = tiki_get_mime_part($message, $part_num);
@@ -744,6 +858,24 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
             $this->out('msg_next_subject', $email['next']['subject']);
         }
         $this->out('show_archive', $email['show_archive']);
+
+        if (preg_match("/tracker_folder_(\d+)_(\d+)/", $this->request->post['list_path'], $m)) {
+            $trklib = TikiLib::lib('trk');
+            $uid = $this->request->get['uid'];
+            $value = $trklib->get_item_value(null, $m[1], $m[2]);
+            $value = json_decode($value, true);
+
+            foreach ($value as $folder => $emailIds) {
+                if (in_array($uid, $emailIds)) {
+                    $this->out('msg_current_folder', $folder);
+                    break;
+                }
+            }
+
+            if ($email['is_tiki_tracker_trash_folder']) {
+                $this->out('show_restore', true);
+            }
+        }
 
         clear_existing_reply_details($this->session);
         if ($part_num == 0) {
@@ -807,7 +939,7 @@ class Hm_Handler_tiki_download_message extends Hm_Handler_Module
                 echo $part->getContent();
                 Hm_Functions::cease();
             }
-            Hm_Msgs::add('ERRAn Error occurred trying to download the message');
+            Hm_Msgs::add(tr('An Error occurred trying to download the message'), 'danger');
         }
     }
 }
@@ -838,11 +970,11 @@ class Hm_Handler_tiki_process_move extends Hm_Handler_Module
                 }
             }
             if ($moved == 0) {
-                Hm_Msgs::add('ERRUnable to move/copy selected messages');
+                Hm_Msgs::add(tr('Unable to move/copy selected messages'), 'danger');
             } elseif ($form['imap_move_action'] == 'move') {
-                Hm_Msgs::add($moved == 1 ? 'Message moved' : $moved . ' messages moved');
+                Hm_Msgs::add($moved == 1 ? tr('Message moved') : $moved . ' ' . tr('messages moved'));
             } else {
-                Hm_Msgs::add($moved == 1 ? 'Message copied' : $moved . ' messages copied');
+                Hm_Msgs::add($moved == 1 ? tr('Message copied') : $moved . ' ' . tr('messages copied'));
             }
             $this->out('move_count', $moved);
         }
@@ -885,12 +1017,12 @@ class Hm_Handler_tiki_process_imap_unread extends Hm_Handler_Module
                 }
                 $actions = [];
                 foreach ($config['sieve_scripts'][$mailbox['name']] as $name => $script) {
-                    if (strstr($name, 'cyphtfilter')) {
+                    if (str_contains($name, 'cyphtfilter')) {
                         $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[1]);
                         $conditions = json_decode(base64_decode($base64_obj), true);
                         $base64_obj = str_replace("# ", "", preg_split('#\r?\n#', $script, 0)[2]);
                         $actions = json_decode(base64_decode($base64_obj), true);
-                        $operator = strstr($script, 'allof') ? 'ALLOF' : 'ANYOF';
+                        $operator = str_contains($script, 'allof') ? 'ALLOF' : 'ANYOF';
                         $filters[] = compact('conditions', 'actions', 'operator');
                     }
                 }
@@ -909,19 +1041,17 @@ class Hm_Handler_tiki_process_imap_unread extends Hm_Handler_Module
                 foreach ($unreadMessages as $key => $msg) {
                     if ($msg['server_id'] == $idx) {
                         // Delete the message
-                        $cache = Hm_IMAP_List::get_cache($this->cache, $msg['server_id']);
-                        $imap = Hm_IMAP_List::connect($msg['server_id'], $cache);
-
-                        if ($imap->authed()) {
+                        $mailbox = Hm_IMAP_List::get_connected_mailbox($msg['server_id'], $this->cache);
+                        if ($mailbox->authed()) {
                             foreach ($filters as $filter) {
-                                $filterData = Tiki_Hm_Functions::processFilter($filter, $imap, $msg);
+                                $filterData = Tiki_Hm_Functions::processFilter($filter, $mailbox, $msg);
                                 if ($filterData['pass']) {
                                     $tempFolder = 'Tiki-Sieve-Rules-To-Be-Applied';
-                                    if (! count($imap->get_mailbox_status($tempFolder))) {
-                                        $imap->create_mailbox($tempFolder);
+                                    if (! count($mailbox->folder_exists($tempFolder))) {
+                                        $mailbox->create_folder($tempFolder);
                                     }
                                     // Move the message to temp folder
-                                    $imap->message_action('MOVE', [$msg['uid']], $tempFolder);
+                                    $mailbox->message_action($tempFolder, 'MOVE', [$msg['uid']], $tempFolder);
                                 }
                             }
                         }
@@ -933,6 +1063,54 @@ class Hm_Handler_tiki_process_imap_unread extends Hm_Handler_Module
     }
 }
 
+
+class Hm_Handler_tiki_restore_message extends Hm_Handler_Module
+{
+    /**
+     * Restore message from archive or trash to inbox folder
+     */
+    public function process()
+    {
+        list($success, $form) = $this->process_form(['imap_msg_uid', 'list_path']);
+        if ($success) {
+            // Remove archive and deleted flags to restore to inbox
+            tiki_flag_message($form['imap_msg_uid'], 'remove', 'archive');
+            tiki_flag_message($form['imap_msg_uid'], 'remove', 'deleted');
+
+            $path = str_replace('tracker_folder_', '', $form['list_path']);
+            list ($itemId, $fieldId) = explode('_', $path);
+
+            $trk = TikiLib::lib('trk');
+            $item = $trk->get_item_info($itemId);
+            if (! $item) {
+                Hm_Msgs::add('Tracker item not found', 'danger');
+                $this->out('restore_error', true);
+                return;
+            }
+
+            $field = $trk->get_field_info($fieldId);
+            if (! $field) {
+                Hm_Msgs::add('Tracker field not found', 'danger');
+                $this->out('restore_error', true);
+                return;
+            }
+
+            // Move message back to inbox by updating the field value
+            $field['value'] = [
+                'restore' => $form['imap_msg_uid']
+            ];
+
+            $trk->replace_item($item['trackerId'], $item['itemId'], [
+                'data' => [$field]
+            ]);
+
+            Hm_Msgs::add('Message restored to inbox');
+            $this->out('restore_error', false);
+        }
+    }
+}
+
+
 /**
  * Add Move to trackers button
  * @subpackage tiki/output
@@ -942,10 +1120,7 @@ class Hm_Output_add_move_to_trackers extends Hm_Output_Module
     protected function output()
     {
         $res = tiki_move_to_tracker_dropdown($this, 'Trackers', 'Move to Tracker', 'move_to_trackers', true);
-        $res = ! empty($res) ? '| ' . $res : '';
-        $headers = $this->get('msg_headers');
-        $headers = preg_replace("#<a class=\"archive_link[^>]*>.*?</a>#", "\\0 " . $res, $headers);
-        $this->out('msg_headers', $headers, false);
+        $this->concat('extra_header_buttons', $res);
     }
 }
 
@@ -954,10 +1129,20 @@ class Hm_Output_tiki_get_create_item_trackers_output extends Hm_Output_Module
     public function output()
     {
         $res = tiki_move_to_tracker_dropdown($this, 'Create item', 'Select Tracker', 'item_to_trackers', true);
-        $res = ! empty($res) ? '| ' . $res : '';
-        $headers = $this->get('msg_headers');
-        $headers = preg_replace("#<a class=\"archive_link[^>]*>.*?</a>#", "\\0 " . $res, $headers);
-        $this->out('msg_headers', $headers, false);
+        $this->concat('extra_header_buttons', $res);
+    }
+}
+
+/**
+ * Add Restore Message button in tracker folders
+ * @subpackage tiki/output
+ */
+class Hm_Output_add_restore_message extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $res = tiki_restore_message($this);
+        $this->concat('extra_header_buttons', $res);
     }
 }
 
@@ -1078,6 +1263,96 @@ class Hm_Output_pass_redirect_url extends Hm_Output_Module
 }
 
 /**
+ * Pass tracker target params from GET request into output
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_pass_tracker_target_params extends Hm_Handler_Module
+{
+    public function process()
+    {
+        $item_id = intval($this->request->get['target_tracker_item_id'] ?? 0);
+        $field_id = intval($this->request->get['target_tracker_field_id'] ?? 0);
+        $folder = isset($this->request->get['target_tracker_folder'])
+            ? $this->request->get['target_tracker_folder']
+            : 'inbox';
+
+        $this->out('target_tracker_item_id', $item_id);
+        $this->out('target_tracker_field_id', $field_id);
+        $this->out('target_tracker_folder', $folder);
+    }
+}
+
+/**
+ * Add tracker target params as hidden inputs to the search form
+ * @subpackage tiki/output
+ */
+class Hm_Output_search_form_tracker_target_inputs extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $target_tracker_item_id = $this->get('target_tracker_item_id');
+        $target_tracker_field_id = $this->get('target_tracker_field_id');
+        $target_tracker_folder = $this->get('target_tracker_folder');
+
+        if (! ($target_tracker_item_id && $target_tracker_field_id)) {
+            return;
+        }
+
+        return '<input type="hidden" name="target_tracker_item_id" value="' . $target_tracker_item_id . '" />'
+            . '<input type="hidden" name="target_tracker_field_id" value="' . $target_tracker_field_id . '" />'
+            . '<input type="hidden" name="target_tracker_folder" value="' . $this->html_safe($target_tracker_folder) . '" />';
+    }
+}
+
+/**
+ * Append tracker target params to saved search folder URLs
+ * Runs after Hm_Output_search_folders to inject tracker context into saved search links
+ * @subpackage tiki/output
+ */
+class Hm_Output_append_tracker_params_to_searches extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $target_tracker_item_id = $this->get('target_tracker_item_id', false);
+        $target_tracker_field_id = $this->get('target_tracker_field_id', false);
+        $target_tracker_folder = $this->get('target_tracker_folder', 'inbox');
+
+        if (! ($target_tracker_item_id && $target_tracker_field_id)) {
+            return;
+        }
+
+        $folder_sources = $this->get('folder_sources', []);
+        if (! is_array($folder_sources) || empty($folder_sources)) {
+            return;
+        }
+
+        foreach ($folder_sources as $key => &$source) {
+            if (is_array($source) && count($source) >= 2 && $source[0] === 'search_folders') {
+                $html = $source[1];
+
+                $param_string = '&target_tracker_item_id=' . $target_tracker_item_id
+                    . '&target_tracker_field_id=' . $target_tracker_field_id
+                    . '&target_tracker_folder=' . urlencode($target_tracker_folder);
+
+                // Replace href patterns in search links
+                // Match: href="?page=search..."
+                $html = preg_replace_callback(
+                    '/(href=")([^"]*page=search[^"]*)(")/i',
+                    function ($matches) use ($param_string) {
+                        return $matches[1] . $matches[2] . $param_string . $matches[3];
+                    },
+                    $html
+                );
+
+                $source[1] = $html;
+            }
+        }
+
+        $this->out('folder_sources', $folder_sources);
+    }
+}
+
+/**
  * @subpackage smtp/handler
  */
 class Hm_Handler_tiki_load_smtp_is_imap_forward extends Hm_Handler_Module
@@ -1112,6 +1387,180 @@ class Hm_Handler_tiki_load_smtp_is_imap_forward extends Hm_Handler_Module
                 $attached_files[$this->request->get['uid']][] = $new_attachment;
             }
             $this->session->set('uploaded_files', $attached_files);
+        }
+    }
+}
+
+
+/**
+ * Process input from the max per source setting for the Junk page in the settings page
+ * @subpackage core/handler
+ */
+class Hm_Handler_process_trackers_setting extends Hm_Handler_Module
+{
+    /**
+     * Allowed values are greater than zero and less than MAX_PER_SOURCE
+     */
+    public function process()
+    {
+        process_site_setting('trackers_per_source', $this, 'max_source_setting_callback', DEFAULT_PER_SOURCE);
+        process_site_setting('trackers_since', $this, 'since_setting_callback');
+    }
+}
+
+/**
+ * Starts the Trash section on the settings page
+ * @subpackage core/output
+ */
+class Hm_Output_start_trackers_settings extends Hm_Output_Module
+{
+    /**
+     * Settings in this section control the trackers view
+     */
+    protected function output()
+    {
+        return '<tr><td data-target=".trackers_setting" colspan="2" class="settings_subtitle cursor-pointer">' .
+            '<i class="bi bi-database fs-5 me-2"></i>' .
+            $this->trans('Trackers') . '</td></tr>';
+    }
+}
+
+/**
+ * Option for the maximum number of messages per source for the Trackers page
+ * @subpackage core/output
+ */
+class Hm_Output_trackers_source_max_setting extends Hm_Output_Module
+{
+    /**
+     * Processed by Hm_Handler_process_trackers_source_max_setting
+     */
+    protected function output()
+    {
+        $sources = DEFAULT_PER_SOURCE;
+        $settings = $this->get('user_settings', []);
+        $reset = '';
+        if (array_key_exists('trackers_per_source', $settings)) {
+            $sources = $settings['trackers_per_source'];
+        }
+        if ($sources != 20) {
+            $reset = '<span class="tooltip_restore" restore_aria_label="Restore default value"><i class="bi bi-arrow-counterclockwise refresh_list reset_default_value_input"></i></span>';
+        }
+        return '<tr class="trackers_setting"><td><label for="trackers_per_source">' .
+            $this->trans('Max messages per source') . '</label></td>' .
+            '<td><input type="text" class="form-control form-control-sm w-auto" size="2" id="trackers_per_source" name="trackers_per_source" value="' . $this->html_safe($sources) . '" data-default-value="' . DEFAULT_PER_SOURCE . '" />' . $reset . '</td></tr>';
+    }
+}
+
+/**
+ * Option for the "since" date range for the Trackers page
+ * @subpackage core/output
+ */
+class Hm_Output_trackers_since_setting extends Hm_Output_Module
+{
+    /**
+     * Processed by Hm_Handler_process_trackers_since_setting
+     */
+    protected function output()
+    {
+        $since = DEFAULT_SINCE;
+        $settings = $this->get('user_settings', []);
+        if (array_key_exists('trackers_since', $settings) && $settings['trackers_since']) {
+            $since = $settings['trackers_since'];
+        }
+        return '<tr class="trackers_setting"><td><label for="trackers_since">' .
+            $this->trans('Show trackers messages since') . '</label></td>' .
+            '<td>' . message_since_dropdown($since, 'trackers_since', $this) . '</td></tr>';
+    }
+}
+
+/**
+ * Add trackers link to main menu
+ * @subpackage tiki/handler
+ */
+class Hm_Output_combined_trackers_link extends Hm_Output_Module
+{
+    protected function output()
+    {
+        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="?page=message_list&list_path=trackers">';
+        if (! $this->get('hide_folder_icons')) {
+            $res .= '<i class="bi bi-database account_icon"></i> ';
+        }
+        $res .= $this->trans('Trackers') . '</a></li>';
+
+        if ($this->format == 'HTML5') {
+            return $res;
+        }
+        $this->concat('formatted_folder_list', $res);
+    }
+}
+
+/**
+ * Load IMAP servers for message list page
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_load_trackers_data_sources extends Hm_Handler_Module
+{
+    public $user_config;
+    /**
+     * Used by trackers view
+     */
+    public function process()
+    {
+        if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'trackers') {
+            $limit = $this->user_config->get('trackers_per_source_setting', DEFAULT_PER_SOURCE);
+            $since = $this->user_config->get('trackers_since_setting', DEFAULT_SINCE);
+
+            $this->out('data_sources', [['hook' => 'ajax_tiki_trackers', 'type' => 'custom', 'params' => []]]);
+            $this->out('list_path', 'trackers');
+            $this->out('mailbox_list_title', ['All Tracker items emails']);
+            $this->out('message_list_since', $since);
+            $this->out('per_source_limit', $limit);
+        }
+    }
+}
+
+/**
+ * Fetch messages for the Groupmail page
+ * @subpackage tiki/handler
+ */
+class Hm_Handler_trackers_fetch_messages extends Hm_Handler_Module
+{
+    public $user_config;
+    public $request;
+    public $session;
+    public $config;
+    /**
+     * Returns all messages for trackers
+     */
+    public function process()
+    {
+        if (array_key_exists('list_path', $this->request->get) && $this->request->get['list_path'] == 'trackers') {
+            $limit = $this->user_config->get('trackers_per_source_setting', DEFAULT_PER_SOURCE);
+            $since = $this->user_config->get('trackers_since_setting', DEFAULT_SINCE);
+            $keyword = $this->request->get['keyword'] ?? '';
+
+            $msg_list = tiki_fetch_tracker_messages('inbox', $limit, $since, $keyword);
+
+            $this->out('trackers_message_list_data', $msg_list);
+        }
+    }
+}
+
+/**
+ * Format message headers for the trackers page
+ * @subpackage imap/output
+ */
+class Hm_Output_filter_trackers_data extends Hm_Output_Module
+{
+    /**
+     * Build ajax response for the trackers message list
+     */
+    protected function output()
+    {
+        if ($this->get('trackers_message_list_data')) {
+            prepare_tracker_message_list($this->get('trackers_message_list_data'), $this, $this->get('list_path'));
+        } else {
+            $this->out('formatted_message_list', []);
         }
     }
 }

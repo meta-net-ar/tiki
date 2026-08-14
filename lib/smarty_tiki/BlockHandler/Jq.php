@@ -49,11 +49,6 @@ class Jq extends Base
         if ($repeat || empty($content)) {
             return '';
         }
-
-        global $prefs;
-        if ($prefs['feature_jquery'] !== 'y') {
-            return $params['nojquery'] ?? tr('<!-- jq smarty plugin inactive: feature_jquery off -->');
-        }
         /** @var \headerlib $headerlib */
         $headerlib = \TikiLib::lib('header');
 

@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -59,18 +59,18 @@ class Table_Code_Abstract
             self::$id = $settings['id'] . '-div';
             self::$tid = 'table#' . $settings['id'];
             //overall sort on unless sort type set to false
-            self::$sorts = isset($settings['sorts']['type']) && $settings['sorts']['type'] === false ? false : true;
+            self::$sorts = ! (isset($settings['sorts']['type']) && $settings['sorts']['type'] === false);
             self::$sortcol = isset(self::$s['columns']) && count(array_column(self::$s['columns'], 'sort')) > 0;
             //filter, group, pager and ajax off unless type is set and is not false
-            self::$filters = empty($settings['filters']['type']) ? false : true;
+            self::$filters = ! empty($settings['filters']['type']);
             self::$filtercol = isset(self::$s['columns']) && count(array_column(self::$s['columns'], 'filter')) > 0;
-            self::$math = empty($settings['math']) ? false : true;
+            self::$math = ! empty($settings['math']);
             //whether to use array index to identify columns or a selector (id, class, etc.)
             //generally index used for plugins where columns are set by user and selectors are used with tables with
             //smarty templates to keep from recreating tpl logic that determines which columns are shown
             self::$usecolselector = ! isset(self::$s['usecolselector']) || self::$s['usecolselector'] !== false;
-            self::$pager = empty($settings['pager']['type']) ? false : true;
-            self::$output = empty($settings['output']) ? false : true;
+            self::$pager = ! empty($settings['pager']['type']);
+            self::$output = ! empty($settings['output']);
             global $prefs;
             self::$ajax = $settings['ajax']['type'] === true && $prefs['feature_ajax'] === 'y';
             self::$group = self::$sorts && isset($settings['sorts']['group']) && $settings['sorts']['group'] === true;

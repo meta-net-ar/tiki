@@ -40,6 +40,8 @@ class SelectorItem implements \ArrayAccess
                 return $this->object;
             case 'title':
                 return $this->getTitle();
+            default:
+                return null;
         }
     }
 

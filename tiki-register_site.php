@@ -7,8 +7,8 @@
 require_once('tiki-setup.php');
 $access->check_permission('tiki_p_admin');
 include_once('lib/directory/dirlib.php');
-$tmp1 = isset($_SERVER["SERVER_NAME"]) ? $_SERVER["SERVER_NAME"] : "";
-$tmp2 = isset($_SERVER["PHP_SELF"]) ? $_SERVER["PHP_SELF"] : "";
+$tmp1 = $_SERVER["SERVER_NAME"] ?? "";
+$tmp2 = $_SERVER["PHP_SELF"] ?? "";
 // concat all, remove the // between server and path and then
 // remove the name of the script itself:
 $url = $tmp1 . dirname($tmp2);

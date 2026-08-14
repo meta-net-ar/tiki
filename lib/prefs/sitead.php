@@ -16,6 +16,7 @@ function prefs_sitead_list()
             ],
             'hint' => tra('Activate must be turned on for Publish to take effect.'),
             'default' => 'n',
+            'help' => 'Banners',
         ],
     ];
 }

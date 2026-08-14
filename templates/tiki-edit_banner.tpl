@@ -24,7 +24,7 @@
             <div class="mb-3 row">
                 <label class="col-sm-4 col-form-label" for="maxImpressions">{tr}Maximum impressions{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxImpressions" id="maxImpressions" value="{$maxImpressions|escape}" maxlength="7" class="form-control">
+                    <input type="number" name="maxImpressions" id="maxImpressions" value="{$maxImpressions|escape}" maxlength="7" class="form-control">
                     <div class="form-text">
                         {tr}-1 for unlimited{/tr}
                     </div>
@@ -33,7 +33,7 @@
             <div class="mb-3 row">
                 <label class="col-sm-4 col-form-label" for="maxUserImpressions">{tr}Maximum number of impressions for a user{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxUserImpressions" id="maxUserImpressions" value="{$maxUserImpressions|escape}" maxlength="7" class="form-control">
+                    <input type="number" name="maxUserImpressions" id="maxUserImpressions" value="{$maxUserImpressions|escape}" maxlength="7" class="form-control">
                     <div class="form-text">
                         {tr}-1 for unlimited{/tr}
                     </div>
@@ -42,7 +42,7 @@
             <div class="mb-3 row">
                 <label class="col-sm-4 col-form-label" for="maxClicks">{tr}Maximum clicks{/tr}</label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxClicks" id="maxClicks" value="{$maxClicks|escape}" maxlength="7" class="form-control">
+                    <input type="number" name="maxClicks" id="maxClicks" value="{$maxClicks|escape}" maxlength="7" class="form-control">
                     <div class="form-text">
                         {tr}-1 for unlimited{/tr}
                     </div>
@@ -216,7 +216,7 @@
                 {/if}
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label"><input type="radio" name="use" value="useFixedURL" {if $use eq 'useFixedURL'}checked="checked"{/if} onclick="toggleBannerContent('useFixedURL')"> {tr}Use Image from URL{/tr}</label>
+                <label class="col-sm-4 col-form-label"><input type="radio" class="form-check-input" name="use" value="useFixedURL" {if $use eq 'useFixedURL'}checked="checked"{/if} onclick="toggleBannerContent('useFixedURL')"> {tr}Use Image from URL{/tr}</label>
                 <div class="col-sm-7" id="fixedURLContent">
                     <input type="text" name="fixedURLData" value="{$fixedURLData|escape}" class="form-control" {if $use neq 'useFixedURL'}disabled="disabled"{/if} required>
                     <div class="form-text">
@@ -225,7 +225,7 @@
                 </div>
             </div>
             <div class="mb-3 row">
-                <label class="col-sm-4 col-form-label"><input type="radio" name="use" value="useText" {if $use eq 'useText'}checked="checked"{/if} onclick="toggleBannerContent('useText')"> {tr}Use Text{/tr}</label>
+                <label class="col-sm-4 col-form-label"><input type="radio" class="form-check-input" name="use" value="useText" {if $use eq 'useText'}checked="checked"{/if} onclick="toggleBannerContent('useText')"> {tr}Use Text{/tr}</label>
                 <div class="col-sm-7" id="textContent">
                     <textarea class="form-control" rows="5" name="textData" {if $use neq 'useText'}disabled="disabled"{/if} required>{$textData|escape}</textarea>
                 </div>
@@ -285,8 +285,8 @@
                                 <form action="tiki-edit_banner.php" method="post">
                                     {ticket}
                                     <input type="hidden" name="removeZone" value="{$zones[ix].zone}">
-                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0 tips" title=":{tr}Remove{/tr}" onclick="confirmPopup('{tr}Do you want to delete this zone{/tr} ?')">
-                                        {icon name='remove' _menu_icon='y' }
+                                    <button type="submit" class="btn btn-link px-0 pt-0 pb-0 tips" title=":{tr}Remove{/tr}" onclick="confirmPopup('{tr}Do you want to delete this zone{/tr} ?')" aria-label="{tr}Remove{/tr}">
+                                        {icon name='remove' _menu_icon='y'}
                                     </button>
                                 </form>
                             </td>

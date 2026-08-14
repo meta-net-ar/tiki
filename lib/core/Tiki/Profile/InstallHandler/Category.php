@@ -105,10 +105,10 @@ class Tiki_Profile_InstallHandler_Category extends Tiki_Profile_InstallHandler
         if (isset($categId) && ! $all) {
             $listCategories = [];
             $listCategories[] = $categlib->get_category($categId);
-            $error = isset($listCategories[0]) ? false : true;
+            $error = ! isset($listCategories[0]);
         } else {
             $listCategories = $categlib->getCategories();
-            $error = isset($listCategories[1]) ? false : true;
+            $error = ! isset($listCategories[1]);
         }
 
         if ($error) {

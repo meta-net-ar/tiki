@@ -11,7 +11,6 @@ class Validators
 
     public function __construct()
     {
-        global $prefs;
         $this->available = $this->get_all_validators();
     }
 
@@ -52,10 +51,9 @@ class Validators
         return $validators;
     }
 
-    public function generateTrackerValidateJS($tracker_definition, $custom_rules = '', $custom_messages = '', $custom_handlers = '')
+    public function generateTrackerValidateJS($tracker_definition, $custom_rules = '', $custom_messages = '', $custom_handlers = '', $requiredFields = [])
     {
         global $prefs;
-
         $fields_data = $tracker_definition->getFields();
         $factory = new Tracker_Field_Factory($tracker_definition);
 
@@ -76,13 +74,17 @@ class Validators
                         return $("#' . $field_name . '").val()!="";
                     },},';
             }
-            if ($field_value['validation'] || $field_value['isMandatory'] == 'y') {
+
+            $isMandatory = self::isFieldMandatory($field_value, $requiredFields);
+            $hasValidation = ! empty($field_value['validation']);
+
+            if ($hasValidation ||  $isMandatory) {
                 if ($field_value['isMultilingual'] == 'y') {
                     $validationjs .= '"' . $field_name . "[" . end($prefs["available_languages"]) . "]\"" . " : { ";
                 } else {
                     $validationjs .= '"' . $field_name . '"' . ': { ';
                 }
-                if ($field_value['isMandatory'] == 'y') {
+                if ($isMandatory && $handler->isClientSideMandatory()) {
                     if ($field_value['type'] == 'D') {
                         $validationjs .= 'required_in_group: [1, ".group_' . $field_name . '", "other"], ';
                     } elseif ($field_value['type'] == 'A') {
@@ -100,7 +102,8 @@ class Validators
                             $validationjs .= $field_name . 'Hour: {required_in_group: [' . $date_ins_num . ', "select[name^=\'' . $field_name . '\']"]}, ' .
                                 $field_name . 'Minute: {required_in_group: [' . $date_ins_num . ', "select[name^=\'' . $field_name . '\']"], ';
                         }
-                    } else {
+                    } elseif (! in_array($field_value['type'], ['q', 'GF'])) {
+                        // exclude AutoIncrement and GeographicFeature type fields as they are read-only in the default edit form
                         if ($field_value['isMultilingual'] == 'y') {
                             $required_script = "required: function(e) { ";
                             $condition = "";
@@ -142,8 +145,8 @@ class Validators
                         const input = $("[name=\'' . $field_name . '\']");
                         if(input.is(":checkbox")) {
                             return $("[name=\'' . $field_name . '\']:checked").map(function() { return this.value; }).get().join(",");
-                        } 
-                        return $("[name=\'' . $field_name . '\']").val(); 
+                        }
+                        return $("[name=\'' . $field_name . '\']").val();
                     }';
                     $validationjs .= '';
                     $validationjs .= '} } ';
@@ -167,11 +170,15 @@ class Validators
                     $validationjs .= $field_name . '_currency: "' . tra('This field is required') . '",';
                 }
             }
-            if ($field_value['validationMessage'] && $field_value['isMandatory'] == 'y') {
+
+            $isMandatory = self::isFieldMandatory($field_value, $requiredFields);
+            $hasValidationMessage = ! empty($field_value['validationMessage']);
+
+            if ($isMandatory && $hasValidationMessage) {
                 $validationjs .= '"' . $field_name . '" : { ';
-                $validationjs .= 'required: "' . tra($field_value['validationMessage']) . '" ';
+                $validationjs .= 'required: "' . self::getValidationMessage($field_value) . '" ';
                 $validationjs .= '}, ';
-            } elseif ($field_value['isMandatory'] == 'y') {
+            } elseif ($isMandatory) {
                 if ($field_value['isMultilingual'] == 'y') {
                     $validationjs .= '"' . $field_name . "[" . end($prefs["available_languages"]) . "]\"" . " : { ";
                     $validationjs .= 'required: "' . tra('The mandatory field ' . $field_value['name'] . ' must contain at least one language value') . '" ';
@@ -199,7 +206,7 @@ invalidHandler: function(event, validator) {
         if (!$container.length) {
             $container = $("html");
             $scroller = $("body");
-            offset = $(".fixed-top").outerHeight() || 0;
+            offset = $("#page-header.sticky-top").outerHeight() || 0;
         }
         var containerScrollTop = $scroller.scrollTop(),
             $firstError = $(validator.errorList[0].element),
@@ -217,11 +224,7 @@ invalidHandler: function(event, validator) {
         $container.animate({
             scrollTop: containerScrollTop + $scrollElement.offset().top - offset - ($(window).height() / 2)
         }, 1000, function () {
-            if ($firstError.is("select") && jqueryTiki.select2) {
-                $firstError.select2("focus");
-            } else {
-                $firstError.trigger("focus");
-            }
+            $firstError.trigger("focus");
         });
     }
 }
@@ -230,5 +233,19 @@ invalidHandler: function(event, validator) {
             $validationjs .= ",\n$custom_handlers";
         }
         return $validationjs;
+    }
+
+    public function isFieldMandatory($field_value, $requiredFields)
+    {
+        return ($field_value['isMandatory'] == 'y')
+            || (isset($requiredFields) && in_array($field_value['fieldId'], $requiredFields));
+    }
+
+    public function getValidationMessage($field_value)
+    {
+        if (! empty($field_value['validationMessage'])) {
+            return tra($field_value['validationMessage']);
+        }
+        return tra('This field is required');
     }
 }

@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\Exceptions\BigBlueButton\ServerSaltKeyException;
+use Tiki\Exceptions\BigBlueButton\SharedSecretKeyException;
 
 function wikiplugin_bigbluebutton_info()
 {
@@ -21,8 +21,8 @@ function wikiplugin_bigbluebutton_info()
             'name' => [
                 'required' => true,
                 'name' => tra('Meeting'),
-                'description' => tr('MeetingID for BigBlueButton. This is a 5 digit number, starting with a 7.
-                    Ex.: %0 or %1.', '<code>77777</code>', '<code>71111</code>'),
+                'description' => tr('MeetingID for BigBlueButton. This is a unique identifier for the meeting.
+                    Ex.: %0 or %1.', '<code>room77777</code>', '<code>meet71111</code>'),
                 'since' => '5.0',
                 'filter' => 'text',
                 'default' => '',
@@ -103,7 +103,7 @@ function wikiplugin_bigbluebutton_info()
 function wikiplugin_bigbluebutton($data, $params)
 {
     try {
-        global $prefs, $user;
+        global $prefs, $headerlib;
 
         if (empty($prefs['bigbluebutton_server_location'])) {
             return WikiParser_PluginOutput::error(tr('Warning'), tr('BigBlueButton server location is not defined'));
@@ -124,19 +124,20 @@ function wikiplugin_bigbluebutton($data, $params)
             ],
         ];
 
-        $pluginInfo = wikiplugin_bigbluebutton_info();
-        foreach ($pluginInfo['params'] as $key => $param) {
-            if (isset($param['default']) && ! isset($params[$key])) {
-                $params[$key] = $param['default'];
-            }
+        if (empty($meeting)) {
+            throw new InvalidArgumentException(tr("You must provide at least a meeting ID using the 'name' parameter. (ex.: room7777)"));
         }
+
         $smarty->assign('bbb_params', Tiki_Security::get()->encode($params));
+        $smarty->assign('meetId', $meeting);
+        if ($prefs['bigbluebutton_use_iframe'] === 'y') {
+            $headerlib->add_js_module("import { setupBBBMeetingInIframe } from '@tiki/plugins/bigbluebutton'; setupBBBMeetingInIframe(" . json_encode($meeting) . ");");
+        }
 
         if (! $bigbluebuttonlib->roomExists($meeting)) {
             if (! isset($_POST['bbb']) || $_POST['bbb'] != $meeting || ! $perms->bigbluebutton_create) {
                 if (
                     $perms->bigbluebutton_view_rec
-                        && isset($params['showrecording'])
                         && $params['showrecording'] != 'n'
                 ) {
                     $smarty->assign('bbb_recordings', $bigbluebuttonlib->getRecordings($meeting));
@@ -154,6 +155,12 @@ function wikiplugin_bigbluebutton($data, $params)
         }
 
         if ($perms->bigbluebutton_join) {
+            $meetingInfo = $bigbluebuttonlib->getMeetingMetadata($meeting);
+
+            if ($meetingInfo) {
+                $smarty->assign('bbb_meeting_is_public', $meetingInfo['ispublic']);
+            }
+
             if ($params['showattendees'] != 'n') {
                 $smarty->assign('bbb_attendees', $bigbluebuttonlib->getAttendees($meeting));
                 $smarty->assign('bbb_show_attendees', true);
@@ -166,9 +173,12 @@ function wikiplugin_bigbluebutton($data, $params)
 
         // Won't display anything if recordings were not loaded
         return $smarty->fetch('wiki-plugins/wikiplugin_bigbluebutton_view_recordings.tpl');
-    } catch (ServerSaltKeyException $e) {
+    } catch (SharedSecretKeyException $e) {
         return WikiParser_PluginOutput::internalError($e->getMessage());
+    } catch (InvalidArgumentException $e) {
+        // Input or missing parameter errors
+        return WikiParser_PluginOutput::error(tr('Invalid parameter'), $e->getMessage());
     } catch (Exception $e) {
-        return WikiParser_PluginOutput::internalError(tr('BigBlueButton is misconfigured or inaccessible.'));
+        return WikiParser_PluginOutput::internalError(tr('BigBlueButton is misconfigured or inaccessible: %0', $e->getMessage()));
     }
 }

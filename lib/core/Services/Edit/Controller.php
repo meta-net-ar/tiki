@@ -4,6 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\core\Toolbar\ToolbarItem;
+use Tiki\Lib\Diff\DiffUtils;
+use Tiki\Sections;
+
 /**
  * Class Services_Edit_Controller
  *
@@ -37,9 +42,9 @@ class Services_Edit_Controller
 
     public function action_tohtml($input)
     {
-        $wysiwyg = $input->allowhtml->int() ? true : false;
-        $htmlEditor = $input->htmleditor->int() ? true : false;
-        $res = TikiLib::lib('edit')->parseToWysiwyg($input->data->none(), false, $wysiwyg, ['wysiwyg' => $wysiwyg, 'html_editor' => $htmlEditor]);
+        $htmlEditor = (bool)$input->htmleditor->int();
+        $isHtml = $input->allowhtml->int() ? true : $htmlEditor;
+        $res = TikiLib::lib('edit')->parseToWysiwyg($input->data->none(), true, $isHtml, ['wysiwyg' => $isHtml, 'html_editor' => $htmlEditor]);
 
         return [
             'data' => $res,
@@ -151,7 +156,7 @@ class Services_Edit_Controller
                         }
                         $info['data'] = substr($info['data'], $real_start, $real_len);
                     }
-                    require_once('lib/diff/difflib.php');
+
                     if ($info['is_html'] == 1) {
                         $diffold = $tikilib->htmldecode($info['data']);
                     } else {
@@ -166,7 +171,7 @@ class Services_Edit_Controller
                         $diffnew = $parserlib->parse_data($diffnew, $options);
                         $diffold = $parserlib->parse_data($diffold, $options);
                     }
-                    $data = diff2($diffold, $diffnew, $diffstyle);
+                    $data = DiffUtils::diff2($diffold, $diffnew, $diffstyle);
                     $smarty->assign_by_ref('diffdata', $data);
 
                     $smarty->assign('translation_mode', 'y');   // disables the headings etc
@@ -264,19 +269,11 @@ $(window).on("load", function(){
             ];
         }
 
-        if ($input->markdown->int()) {
+        if ($input->markdown_wysiwyg->int() || $input->markdown->int()) {
             $help_sections[] = [
                 'id' => 'wiki-help',
-                'title' => tr('Mardown Syntax Help'),
+                'title' => tr('Markdown Syntax Help'),
                 'content' => $smarty->fetch('tiki-edit_help_markdown.tpl'),
-            ];
-        }
-
-        if ($input->markdown_wysiwyg->int()) {
-            $help_sections[] = [
-                'id' => 'wiki-help',
-                'title' => tr('Mardown Syntax Help'),
-                'content' => $smarty->fetch('tiki-edit_help_markdown_wysiwyg.tpl'),
             ];
         }
 
@@ -319,11 +316,66 @@ $(window).on("load", function(){
 
     public function action_editor_settings($input)
     {
+        TikiLib::lib('header')->add_js_module('import handleSettings from "@jquery-tiki/tiki-editor_settings"; handleSettings();');
         return [
             'title' => tr('Editor Settings'),
             'domId' => $input->domId->word(),
             'type' => $input->type->word(),
             'syntax' => $input->syntax->word(),
+        ];
+    }
+
+    /**
+     * While the editor settings form is submitted,
+     * parsed the data and convert to ma
+     * and save it back to the textarea
+     *
+     * @param $input
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function actionPostEditorSettings($input)
+    {
+        global $tikilib;
+        $editor = $input->editor->word();
+        $syntax = $input->syntax->word() ?: 'tiki';
+        $data = $input->data->none();
+        $page_name = $input->page->pagename();
+        $converted = $data;
+        // check if the data is html and convert it to wiki
+        if ($input->is_html->word() === 'y') {
+            $converted = TikiLib::lib('edit')->parseToWiki($data);
+        }
+
+        $page_infos = $tikilib->get_page_info($page_name);
+        $wikiParserParsable = new WikiParser_Parsable($converted);
+        $syntaxPluginResult = $wikiParserParsable->guess_syntax($page_infos['data']);
+        $source_syntax = $syntaxPluginResult['syntax'];
+
+        if ($source_syntax !== $syntax) {
+            if (! str_starts_with('{syntax type=', $data)) {
+                $converted = '{syntax type="' . $source_syntax . '" editor="' . $editor . '"} ' . $converted;
+            }
+
+            $converted = TikiLib::lib('edit')->convertWikiSyntax(
+                $converted,
+                $syntax,
+                $page_name
+            );
+        }
+
+        if ($syntax === 'tiki' && $editor === 'wysiwyg') {
+            $converted = TikiLib::lib('edit')->parseToWysiwyg($converted, true, false, ['wysiwyg' => true, 'html_editor' => true]);
+        }
+
+        return [
+            'wysiwyg' => $input->editor->word() === 'wysiwyg' ? 'y' : 'n',
+            'syntax' => $syntax,
+            'content' => $converted,
+            'domId' => $input->domId->word(),
+            'type' => $input->editor->word(),
+            'domName' => $input->domName->raw(),
         ];
     }
 
@@ -364,7 +416,7 @@ $(window).on("load", function(){
             $converted = TikiLib::lib('edit')->convertWikiSyntax(
                 $converted,
                 $input->syntax->word(),
-                $input->page->word()
+                $input->page->pagename()
             );
         } catch (Exception $e) {
             Feedback::error($e->getMessage());
@@ -449,6 +501,82 @@ $(window).on("load", function(){
 
         return [
             'state' => $state
+        ];
+    }
+
+    public function actionListWysiwygHTMLTools(JitFilter $input)
+    {
+        global $tikilib;
+
+        $section = $input->section->wordspace();
+        Sections::setCurrentSection($section);
+
+
+        $global = $tikilib->get_preference('toolbar_global');
+        $sectionToolbar = preg_split('/,|\||\//', $tikilib->get_preference('toolbar_' . $section, $global));
+        $sectionToolbar = array_map('trim', $sectionToolbar);
+
+        $list = ToolbarItem::getList();
+        $active = [];
+        $tools = [];
+        $plugins = [];
+
+        foreach ($list as $name) {
+            $tag = ToolbarItem::getTag($name, true, true);
+            if (! $tag || ! $tag->getWysiwygToken()) {
+                continue;
+            }
+
+            $tool = [
+                'name' => $name,
+                'token' => $tag->getWysiwygToken(),
+                'label' => $tag->getLabel(),
+                'icon' => htmlentities($tag->getIconHtml()),
+            ];
+
+            if (in_array($name, $sectionToolbar)) {
+                $active[] = $tool;
+            } elseif (str_contains($name, 'wikiplugin_')) {
+                $plugins[] = $tool;
+            } else {
+                $tools[] = $tool;
+            }
+        }
+
+        return [
+            'tools' => $tools,
+            'plugins' => $plugins,
+            'active' => $active,
+        ];
+    }
+
+    public function actionSaveTools(JitFilter $input)
+    {
+        global $tikilib;
+
+        $smarty = TikiLib::lib('smarty');
+
+        $section = $input->section->wordspace();
+        Sections::setCurrentSection($section);
+        $tools = $input->tools->raw();
+
+        $prefName = 'toolbar_' . $section;
+        $result = $tikilib->set_preference($prefName, $tools);
+
+        if (! $result) {
+            throw new Services_Exception(tr('Failed to save toolbar settings'));
+        }
+
+        $tikilib->set_preference($prefName . 'modified', 'y');
+
+        $newTools = smarty_function_toolbars([
+            '_wysiwyg' => 'y',
+            '_is_html' => 'y',
+            'section' => $section,
+        ], $smarty->getEmptyInternalTemplate());
+
+        return [
+            'toolbar' => $newTools,
         ];
     }
 }

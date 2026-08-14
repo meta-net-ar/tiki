@@ -7,14 +7,14 @@
     {ticket}
     <input type="hidden" name="modulesetup" />
 
-    <div class="row">
-        <div class="mb-3 col-lg-12 clearfix">
+    <div class="t_navbar mb-4 clearfix">
             <a role="button" class="btn btn-link" href="tiki-admin_modules.php" title="{tr}List{/tr}">
                 {icon name="list"} {tr}Modules{/tr}
             </a>
             {include file='admin/include_apply_top.tpl'}
-        </div>
     </div>
+
+    <div class="styling-element">
 
     <fieldset id="Modules">
         <legend class="h3">{tr}{$crumbs[$crumb]->description}{/tr}{help crumb=$crumbs[$crumb]}</legend>
@@ -39,6 +39,15 @@
                 <hr>
                 {preference name=module_file}
                 {preference name=module_zone_available_extra}
+                {preference name=module_sidebar_toggle_small_screen}
+            </fieldset>
+        </div>
+        <div class="adminoptionbox">
+            <fieldset>
+                <legend class="h3">{tr}Enable/Disable Modules{/tr}</legend>
+                {foreach from=$all_modules item=name}
+                    {preference name="module_{$name|regex_replace:'/[^a-zA-Z0-9]/':'_'}"}
+                {/foreach}
             </fieldset>
         </div>
 
@@ -47,4 +56,5 @@
         {/remarksbox}
     </fieldset>
     {include file='admin/include_apply_bottom.tpl'}
+    </div>
 </form>

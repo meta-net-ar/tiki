@@ -37,7 +37,7 @@ function wikiplugin_addfreetag($data, $params)
     global $user;
     $object = current_object();
 
-    if (isset($params['object']) && false !== strpos($params['object'], ':')) {
+    if (isset($params['object']) && str_contains($params['object'], ':')) {
         list($object['type'], $object['object']) = explode(':', $params['object'], 2);
     } elseif (empty($object)) {
         return '';
@@ -70,7 +70,7 @@ function wikiplugin_addfreetag($data, $params)
                 $currenttags = TikiLib::lib('freetag')->get_tags_on_object($object['object'], 'trackeritem');
                 $taglist = '';
                 foreach ($currenttags['data'] as $tag) {
-                    if (strstr($tag['tag'], ' ')) {
+                    if (str_contains($tag['tag'], ' ')) {
                         $taglist .= '"' . $tag['tag'] . '" ';
                     } else {
                         $taglist .= $tag['tag'] . ' ';

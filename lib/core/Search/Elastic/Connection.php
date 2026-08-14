@@ -128,7 +128,7 @@ class Search_Elastic_Connection
         } catch (Exception $e) {
             $message = $e->getMessage();
 
-            if (strpos($message, '[_status]') === false && strpos($message, 'no such index') === false) {   // another error
+            if (! str_contains($message, '[_status]') && ! str_contains($message, 'no such index')) {   // another error
                 Feedback::error($message . ' for index ' . $index);
                 return null;
             }
@@ -288,7 +288,7 @@ class Search_Elastic_Connection
             if (isset($info->aliases->$alias)) {
                 $active[] = $indexName;
                 $toRemove[] = $indexName;
-            } elseif (0 === strpos($indexName, $alias . '_') && $indexName != $targetIndex) {
+            } elseif (str_starts_with($indexName, $alias . '_') && $indexName != $targetIndex) {
                 $toRemove[] = $indexName;
             }
         }
@@ -326,7 +326,7 @@ class Search_Elastic_Connection
         }
         foreach ($current as $indexName => $info) {
             $hasAlias = isset($info->aliases) && count((array) $info->aliases) > 0;
-            if (0 === strpos($indexName, $aliasName . '_') && ! $hasAlias) {
+            if (str_starts_with($indexName, $aliasName . '_') && ! $hasAlias) {
                 // Matching name, no alias, means currently rebuilding
                 return true;
             }
@@ -580,6 +580,8 @@ class Search_Elastic_Connection
                 $message = $message->reason;
             } elseif (is_object($message) && ! empty($message->root_cause) && ! empty($message->root_cause[0]->reason)) {
                 $message = $message->root_cause[0]->reason;
+            } elseif (is_object($message) && ! empty($message->caused_by) && ! empty($message->caused_by->reason)) {
+                $message = $message->caused_by->reason;
             } elseif (is_object($message) && ! empty($message->failed_shards) && ! empty($message->failed_shards[0]->reason)) {
                 if (is_object($message->failed_shards[0]->reason)) {
                     $message = $message->failed_shards[0]->reason->reason;
@@ -613,7 +615,7 @@ class Search_Elastic_Connection
     private function getClient($path)
     {
         $full = "{$this->dsn}$path";
-        if (substr($path, -8) === '_refresh') {
+        if (str_ends_with($path, '_refresh')) {
             $options = ['timeout' => 300];
         } else {
             $options = null;

@@ -50,6 +50,19 @@ class Tracker_Field_GroupSelector extends \Tracker\Field\AbstractItemField imple
                         'filter' => 'text',
                         'legacy_index' => 1,
                     ],
+                    'groupIdRecursive' => [
+                        'name' => tr('Group Filter Recursive'),
+                        'description' => tr('Recursively show included groups.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                        'depends' => [
+                            'field' => 'groupId'
+                        ],
+                    ],
                     'userGroups' => [
                         'name' => tr('User Groups'),
                         'description' => tr('Show groups user belongs to instead of the ones user has permission to see.'),
@@ -105,7 +118,7 @@ class Tracker_Field_GroupSelector extends \Tracker\Field\AbstractItemField imple
 
         $ins_id = $this->getInsertId();
 
-        $data = [];
+        $data = ['list' => []];
         $defGroup = $group;
         $userGroups = $usersLib->get_user_groups_inclusion($user);
         $perms = Perms::get('tracker', $this->getConfiguration('trackerId'));
@@ -119,11 +132,24 @@ class Tracker_Field_GroupSelector extends \Tracker\Field\AbstractItemField imple
                 $data['list'] = $usersLib->list_all_groups_with_permission();
             }
         } else {
+            $group_info = [];
             if (ctype_digit($groupId)) {
                 $group_info = $usersLib->get_groupId_info($groupId);
-                $data['list'] = $usersLib->get_including_groups($group_info['groupName']);
             } elseif ($usersLib->group_exists($groupId)) {
-                $data['list'] = $usersLib->get_including_groups($groupId);
+                $group_info = $usersLib->get_group_info($groupId);
+            }
+            if ($group_info) {
+                $includedContainerGroups = $usersLib->get_included_container_groups($usersLib->get_user_default_group($user));
+                $templatedGroup = array_shift($includedContainerGroups);
+                if ($templatedGroup && $templatedGroup['id'] == $group_info['id']) {
+                    $clientGroups = $usersLib->get_including_groups($templatedGroup['groupName']);
+                    foreach (array_intersect(array_keys($userGroups), $clientGroups) as $userGroup) {
+                        $data['list'] = $usersLib->get_including_groups($userGroup);
+                        break;
+                    }
+                } else {
+                    $data['list'] = $usersLib->get_including_groups($group_info['groupName'], $this->getOption('groupIdRecursive') ? 'y' : 'n');
+                }
             }
         }
 
@@ -131,7 +157,10 @@ class Tracker_Field_GroupSelector extends \Tracker\Field\AbstractItemField imple
         if (! in_array($defGroup, $data['list'])) {
             // find the one in the list this user is in
             $includedGroups = array_intersect(array_keys($userGroups), $data['list']);
-            if (empty($includedGroups) && ! $perms->admin_trackers) {
+            if (! $user) {
+                // Handle anonymous users: allow default group assignment silently
+                $defGroup = $group;
+            } elseif (empty($includedGroups) && ! $perms->admin_trackers) {
                 // user not in any of the required groups, use the global default $group and warn
                 $defGroup = $group;
                 Feedback::warning(tr('User not in any of the required groups for GroupSelector field'));
@@ -336,7 +365,7 @@ class Tracker_Field_GroupSelector extends \Tracker\Field\AbstractItemField imple
         if (! isset($cache[$fieldId])) {
             $userGroups = TikiLib::lib('user')->get_groups();
         }
-        $cache[$fieldId] = $userGroups['cant'] > 0 ? $userGroups['data'] : [];
+        $cache[$fieldId] = $userGroups['count'] > 0 ? $userGroups['data'] : [];
 
         return $cache[$fieldId];
     }
@@ -367,7 +396,7 @@ class Tracker_Field_GroupSelector extends \Tracker\Field\AbstractItemField imple
             ->addQuerySource('itemId', 'object_id')
             ->addQuerySource('usergroup_name', 'title')
             ->setRenderTransform(function ($value, $extra) use ($sourceUserGroups, $invertGroupName, $invertGroupId) {
-                $extraUsergroupName = isset($extra['usergroup_name']) ? $extra['usergroup_name'] : '';
+                $extraUsergroupName = $extra['usergroup_name'] ?? '';
                 if (
                     ! empty($value)
                     &&  isset($invertGroupName[$value])
@@ -380,8 +409,8 @@ class Tracker_Field_GroupSelector extends \Tracker\Field\AbstractItemField imple
                     return $value;
                 }
 
-                $itemId = isset($extra['itemId']) ? $extra['itemId'] : null;
-                $invertKey = isset($invertGroupName[$extraUsergroupName]) ? $invertGroupName[$extraUsergroupName] : null;
+                $itemId = $extra['itemId'] ?? null;
+                $invertKey = $invertGroupName[$extraUsergroupName] ?? null;
                 if (! isset($invertKey) && ! isset($itemId)) {
                     return '#invalid';
                 }
@@ -395,7 +424,7 @@ class Tracker_Field_GroupSelector extends \Tracker\Field\AbstractItemField imple
                     }, $trackerItem));
 
                     if (isset($trackerItemInvert[$value]) && is_numeric($trackerItemInvert[$value])) {
-                        $invertKey = isset($invertGroupName[$value]) ? $invertGroupName[$value] : null;
+                        $invertKey = $invertGroupName[$value] ?? null;
                     }
                 }
 

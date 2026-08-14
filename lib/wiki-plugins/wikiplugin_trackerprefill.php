@@ -20,7 +20,6 @@ function wikiplugin_trackerprefill_info()
                 'description' => tra('Tracker page name'),
                 'since' => '2.0',
                 'filter' => 'pagename',
-                'default' => '',
                 'profile_reference' => 'wiki_page',
             ],
             'label' => [
@@ -49,7 +48,6 @@ function wikiplugin_trackerprefill_info()
                 'description' => tra('Field ID for the first field'),
                 'since' => '2.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'tracker_field',
             ],
             'value1' => [
@@ -58,7 +56,6 @@ function wikiplugin_trackerprefill_info()
                 'description' => tra('Content that should be used to prefill the field.'),
                 'since' => '2.0',
                 'filter' => 'striptags',
-                'default' => '',
             ],
             'field2' => [
                 'required' => false,
@@ -187,23 +184,9 @@ function wikiplugin_trackerprefill($data, $params)
 {
     $smarty = TikiLib::lib('smarty');
 
-    if (! isset($params['page'])) {
-        Feedback::error(tr('The %0 parameter is missing', 'page'));
-        return;
-    }
-    if (! isset($params['field1'])) {
-        Feedback::error(tr('The %0 parameter is missing', 'field1'));
-        return;
-    }
-    if (! isset($params['value1'])) {
-        Feedback::error(tr('The %0 parameter is missing', 'value1'));
-        return;
-    }
-
-
     $prefills = [];
     foreach ($params as $param => $value) {
-        if (strstr($param, 'field')) {
+        if (str_contains($param, 'field')) {
             $id = substr($param, strlen('field'));
             $f['fieldId'] = $value;
             $f['value'] = $params["value$id"];

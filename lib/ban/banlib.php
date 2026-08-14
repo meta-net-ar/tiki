@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -69,7 +69,7 @@ class BanLib extends TikiLib
 
     /**
      * @param $banId
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return TikiDb_Pdo_Result
      */
     public function remove_rule($banId)
     {
@@ -100,9 +100,9 @@ class BanLib extends TikiLib
         }
 
         $query = "select * from `tiki_banning` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_banning` $mid";
+        $query_count = "select count(*) from `tiki_banning` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -121,7 +121,7 @@ class BanLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         $query = "select `banId` from `tiki_banning` where `use_dates`=? and `date_to` < FROM_UNIXTIME(?)";
         $result = $this->query($query, ['y', $this->now]);
 
@@ -265,7 +265,7 @@ class BanLib extends TikiLib
      * @param $use_dates
      * @param $message
      * @param $sections
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return TikiDb_Pdo_Result
      */
     public function replace_rule($banId, $mode, $title, $ip1, $ip2, $ip3, $ip4, $user, $date_from, $date_to, $use_dates, $message, $sections, $attempt = 0)
     {
@@ -291,18 +291,26 @@ class BanLib extends TikiLib
             $query = "insert into `tiki_banning`(`mode`,`title`,`ip1`,`ip2`,`ip3`,`ip4`,`user`,`date_from`,`date_to`,`use_dates`,`message`,`attempts`,`created`) " .
                 "values(?,?,?,?,?,?,?,FROM_UNIXTIME(?),FROM_UNIXTIME(?),?,?,?,?)";
             $resultInsert = $this->query($query, [$mode, $title, $ip1, $ip2, $ip3, $ip4, $user, $date_from, $date_to, $use_dates, $message, $attempt, $this->now]);
-            $banId = $this->getOne("select max(`banId`) from `tiki_banning` where `created`=?", [$this->now]);
+            $banId = $this->lastInsertId();
         }
 
         $oldSections = TikiDb::get()->table('tiki_banning_sections')->fetchColumn('section', ['banId' => $banId]);
         $query = "delete from `tiki_banning_sections` where `banId`=?";
         $this->query($query, [$banId]);
+        if (! empty($sections)) {
+            $values = [];
+            $bindvars = [];
 
-        foreach ($sections as $section) {
-            $query = "insert into `tiki_banning_sections`(`banId`,`section`) values(?,?)";
+            foreach ($sections as $section) {
+                $values[] = "(?, ?)";
+                $bindvars[] = (int) $banId;
+                $bindvars[] = $section;
+            }
 
-            $resultSections = $this->query($query, [$banId, $section]);
+            $query = "INSERT INTO `tiki_banning_sections` (`banId`, `section`) VALUES " . implode(', ', $values);
+            $this->query($query, $bindvars);
         }
+
         $newSections = TikiDb::get()->table('tiki_banning_sections')->fetchColumn('section', ['banId' => $banId]);
 
         if (isset($resultInsert)) {

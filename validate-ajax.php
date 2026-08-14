@@ -10,7 +10,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
 
-if ($prefs['feature_jquery'] != 'y' || $prefs['feature_jquery_validation'] != 'y') {
+if ($prefs['feature_jquery_validation'] != 'y') {
     echo '{}';
     exit;
 }

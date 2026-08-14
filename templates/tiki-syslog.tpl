@@ -1,9 +1,7 @@
 {title help="System Log"}{tr}Tiki Logs{/tr}{/title}
 
 <div class="t_navbar mb-4">
-    {if $api_tiki == 'adodb'}
-        <a href="tiki-sqllog.php" class="btn btn-link" title="{tr}Log SQL{/tr}">{icon name="pencil"} {tr}Log SQL{/tr}</a>
-    {/if}
+    <a href="tiki-sqllog.php" class="btn btn-link" title="{tr}Log SQL{/tr}">{icon name="pencil"} {tr}Log SQL{/tr}</a>
     {if $prefs.feature_actionlog == 'y'}
         <a href="tiki-admin_actionlog.php#Report" class="btn btn-link" title="{tr}Export through Action Log{/tr}">{icon name="upload"} {tr}Export through Action Log{/tr}</a>
     {/if}
@@ -15,7 +13,10 @@
     <div class="mb-3 row">
         <label class="col-sm-3 col-form-label" for="months">{tr}Clean logs older than{/tr}</label>
         <div class="col-sm-8 d-flex flex-row flex-wrap align-items-center m-1">
-            <input type="text" name="months" class="form-control me-4"> {tr}months{/tr}
+        <div class="d-flex align-items-center">
+            <input type="number" name="months" min="1" step="1" required class="form-control me-2" placeholder="{tr}Enter number of months{/tr}">
+            <span class="ms-2">{tr}months{/tr}</span>
+        </div>
             <input type="submit" class="btn btn-primary btn-sm ms-4 mt-1" value="{tr}Clean{/tr}" name="clean">
         </div>
     </div>
@@ -23,7 +24,7 @@
 
 {include file='find.tpl'}
 
-{pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
 
 <div class="table-responsive syslog-table">
     <table class="table">
@@ -33,6 +34,7 @@
             <th>{self_link _sort_arg="sort_mode" _sort_field="lastModif"}{tr}Time{/tr}{/self_link}</th>
             <th>{self_link _sort_arg="sort_mode" _sort_field="user"}{tr}User{/tr}{/self_link}</th>
             <th>{self_link _sort_arg="sort_mode" _sort_field="comment"}{tr}Message{/tr}{/self_link}</th>
+            <th>{self_link _sort_arg="sort_mode" _sort_field="object"}{tr}Object{/tr}{/self_link}</th>
             <th>{self_link _sort_arg="sort_mode" _sort_field="ip"}{tr}IP{/tr}{/self_link}</th>
             <th>{self_link _sort_arg="sort_mode" _sort_field="client"}{tr}Client{/tr}{/self_link}</th>
             <th>Actions</th>
@@ -45,6 +47,7 @@
                 <td class="date"><span title="{$list[ix].lastModif|tiki_long_datetime}">{$list[ix].lastModif|tiki_date_format:"%Y-%m-%d %H:%M:%S"}</span></td>
                 <td class="username">{$list[ix].user|userlink}</td>
                 <td class="text"><textarea class="form-control" readonly="readonly">{$list[ix].comment|escape:'html'}</textarea></td>
+                <td class="text">{$list[ix].object|escape:"html"}</td>
                 <td class="text">{$list[ix].ip|escape:"html"}</td>
                 <td class="text"><span title="{$list[ix].client|escape:'html'}">{$list[ix].client|truncate:30:"..."|escape:'html'}</span></td>
                 <td class="text">
@@ -76,4 +79,4 @@
     </table>
 </div>
 
-{pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}

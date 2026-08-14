@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_redis_list()
 {
+    $redisHelp = 'Redis';
+
     return [
         'redis_enabled' => [
             'name' => tra('Redis'),
@@ -14,6 +16,7 @@ function prefs_redis_list()
             'hint' => tra('Requires PHP Redis.'),
             'extensions' => [ 'redis' ],
             'default' => 'n',
+            'help' => $redisHelp,
         ],
         'redis_host' => [
             'name' => tra('Redis Host'),
@@ -22,6 +25,7 @@ function prefs_redis_list()
             'filter' => 'striptags',
             'default' => '',
             'extensions' => [ 'redis' ],
+            'help' => $redisHelp,
         ],
         'redis_port' => [
             'name' => tra('Redis Port'),
@@ -31,6 +35,7 @@ function prefs_redis_list()
             'filter' => 'digits',
             'default' => '6379',
             'extensions' => [ 'redis' ],
+            'help' => $redisHelp,
         ],
         'redis_timeout' => [
             'name' => tra('Redis connection timeout'),
@@ -41,6 +46,7 @@ function prefs_redis_list()
             'units' => tra('seconds'),
             'default' => 3,
             'extensions' => [ 'redis' ],
+            'help' => $redisHelp,
         ],
         'redis_prefix' => [
             'name' => tra('Redis Prefix'),
@@ -51,6 +57,7 @@ function prefs_redis_list()
             'type' => 'text',
             'default' => '',
             'extensions' => [ 'redis' ],
+            'help' => $redisHelp,
         ],
         'redis_expiry' => [
             'name' => tra('Redis cache expiry'),
@@ -61,6 +68,8 @@ function prefs_redis_list()
             'units' => tra('seconds'),
             'default' => 0,
             'extensions' => [ 'redis' ],
+            'help' => $redisHelp,
         ],
     ];
 }
+// TODO: add redis link's documentation

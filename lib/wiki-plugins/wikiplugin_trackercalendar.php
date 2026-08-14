@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\TikiDate;
 use Tiki\Package\VendorHelper;
 
 function wikiplugin_trackercalendar_info()
@@ -14,13 +16,6 @@ function wikiplugin_trackercalendar_info()
         'name' => tr('Tracker Calendar'),
         'description' => tr('Create and display a calendar using tracker data'),
         'prefs' => ['wikiplugin_trackercalendar'],
-        'packages_required' => [
-            'npm-asset/fullcalendar-scheduler' =>
-                VendorHelper::getAvailableVendorPath(
-                    'fullcalendarscheduler',
-                    'npm-asset/fullcalendar-scheduler/main.min.js'
-                )
-        ],
         'format' => 'html',
         'iconname' => 'calendar',
         'introduced' => 10,
@@ -53,7 +48,7 @@ function wikiplugin_trackercalendar_info()
                 'name' => tr('Title Field'),
                 'description' => tr('Permanent name of the field to use for event title'),
                 'since' => '29.0',
-                'required' => false,
+                'required' => true,
                 'filter' => 'word',
             ],
             'description' => [
@@ -236,19 +231,6 @@ function wikiplugin_trackercalendar_info()
                     ['text' => tra('No'), 'value' => 'n']
                 ]
             ],
-            'ryear' => [
-                'required' => false,
-                'name' => tra('Resources by Years'),
-                'description' => tra('Display the option to change the view to resources by years'),
-                'since' => '20.1',
-                'filter' => 'alpha',
-                'default' => 'n',
-                'options' => [
-                    ['text' => '', 'value' => ''],
-                    ['text' => tra('Yes'), 'value' => 'y'],
-                    ['text' => tra('No'), 'value' => 'n']
-                ]
-            ],
             'rmonth' => [
                 'required' => false,
                 'name' => tra('Resources by Months'),
@@ -421,11 +403,8 @@ function wikiplugin_trackercalendar($data, $params)
     static $id = 0;
     $headerlib = TikiLib::lib('header');
 
-    // Disable fullcalendar's force events to be one-line tall
     $headerlib->add_css('.ec-day-grid > .ec-content, .ec-timeline > .ec-content { white-space: normal; }');
 
-    //$headerlib->add_cssfile($vendorPath . '/npm-asset/fullcalendar-scheduler/main.css');
-    // Disable fullcalendar's force events to be one-line tall
     $headerlib->add_css('.ec-day-grid > .ec-content { white-space: normal; }');
     $headerlib->add_js_module('import "@jquery-tiki/wikiplugin-trackercalendar";');
 
@@ -443,14 +422,6 @@ function wikiplugin_trackercalendar($data, $params)
     if (! $beginField || ! $endField) {
         return WikiParser_PluginOutput::userError(tr('Fields not found.'));
     }
-
-    //set defaults
-    $plugininfo = wikiplugin_trackercalendar_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'] ?? null;
-    }
-    $params = array_merge($defaults, $params);
 
     $views = [];
     if ($params['amonth'] === 'y') {
@@ -479,10 +450,6 @@ function wikiplugin_trackercalendar($data, $params)
     if ($resourceField = $jit->resource->word()) {
         $field = $definition->getFieldFromPermName($resourceField);
         $resources = wikiplugin_trackercalendar_get_resources($field);
-
-        if ($params['ryear'] === 'y') {
-            $views[] = 'resourceTimelineYear';
-        }
         if ($params['rmonth'] === 'y') {
             $views[] = 'resourceTimelineMonth';
         }
@@ -505,7 +472,7 @@ function wikiplugin_trackercalendar($data, $params)
         'timelineYear' => 'resourceTimelineYear',
         'timelineMonth' => 'resourceTimelineMonth',
         'timelineWeek' => 'resourceTimelineWeek',
-        'resourceWeek' => 'resourceTimelineWeek', // Old value on fullcalendar resources
+        'resourceWeek' => 'resourceTimelineWeek',
         'timelineDay' => 'resourceTimelineDay'
     ];
 
@@ -589,7 +556,6 @@ function wikiplugin_trackercalendar($data, $params)
             'utcOffset' => TikiDate::tzServerOffset(TikiLib::lib('tiki')->get_display_timezone()) / 60, // In minutes
             'maxEvents' => $maxEvents,
             'display_timezone' => $prefs['display_timezone'],
-            'premiumLicense' => $prefs['calendar_fc_premium_license'],
             'labelResDay' => tr('resource day'),
             'labelResWeek' => tr('resource week'),
             'labelResMonth' => tr('resource month'),

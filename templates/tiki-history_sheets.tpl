@@ -43,7 +43,7 @@
                             <tr>
                                 {section name=date loop=$grid_content}
                                     <td class="sheet_sibling" style="width: 50%;">
-                                        {pagination_links cant=$ver_cant itemname="{tr}Sheet{/tr}" offset_arg="idx_{$smarty.section.date.index}" offset=$sheetIndexes[$smarty.section.date.index] show_numbers=n}{/pagination_links}
+                                        {pagination_links count=$ver_count itemname="{tr}Sheet{/tr}" offset_arg="idx_{$smarty.section.date.index}" offset=$sheetIndexes[$smarty.section.date.index] show_numbers=n}{/pagination_links}
                                     </td>
                                 {/section}
                             </tr>
@@ -77,7 +77,7 @@
                                                 <input type="hidden" name="readdate" value="{$history[$sheetIndexes[$smarty.section.date.index]].stamp}">
                                                 <input type="hidden" name="parse" value="rollback">
                                                 <input type="hidden" name="class" value="rollback_button">
-                                                <button type="submit" class="btn btn-primary" onclick="confirmPopup('{tr}Are you sure you want to roll back this spreadsheet?{/tr}')">
+                                                <button type="submit" class="btn btn-primary" onclick="confirmPopup('{tr}Are you sure you want to roll back this spreadsheet?{/tr}')" aria-label="{tr}Roll back{/tr}">
                                                     {icon _menu_text='y' _menu_icon='n' alt="{tr}Roll back{/tr}"}
                                                 </button>
                                             </form>
@@ -117,9 +117,9 @@
                                 <a href="tiki-view_sheets.php?sheetId={$sheetId}&readdate={$history[revision_date].stamp}&parse=rollback" title="{tr}Roll back spreadsheet{/tr}">{tr}Roll back{/tr}</a>
                             </td>
                             <td style="vertical-align: middle; text-align: center;">
-                                <input type="radio" name="idx_0" class="compareSheet1" value="{$smarty.section.revision_date.index}" onclick="$.sheet.compareSheetClick($('input.compareSheet1'), $('input.compareSheet2'));"></td>
+                                <input type="radio" name="idx_0" class="compareSheet1 form-check-input" value="{$smarty.section.revision_date.index}" onclick="$.sheet.compareSheetClick($('input.compareSheet1'), $('input.compareSheet2'));"></td>
                             <td style="vertical-align: middle; text-align: center;">
-                                <input type="radio" name="idx_1" class="compareSheet2" value="{$smarty.section.revision_date.index}" onclick="$.sheet.compareSheetClick($('input.compareSheet1'), $('input.compareSheet2'));"></td>
+                                <input type="radio" name="idx_1" class="compareSheet2 form-check-input" value="{$smarty.section.revision_date.index}" onclick="$.sheet.compareSheetClick($('input.compareSheet1'), $('input.compareSheet2'));"></td>
                         </tr>
                     {/section}
                 </table>

@@ -14,7 +14,7 @@ use Tracker\Tabular\Schema;
  *
  * TODO: validate parameters (several required)
  */
-class Tracker_Field_DynamicList extends \Tracker\Field\AbstractItemField implements \Tracker\Field\ExportableInterface, \Tracker\Field\EnumerableInterface
+class Tracker_Field_DynamicList extends \Tracker\Field\AbstractItemField implements \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, \Tracker\Field\EnumerableInterface
 {
     public static function getTrackerFieldClass(): string
     {
@@ -331,10 +331,10 @@ $("body").on("change", "input[name=\'' . $filterFieldHereName . '\'], select[nam
                     });
                 }
             }
+                
+            // tell the document we are ready
+            $(document).trigger("ready.dynamic_list", [$ddl]);
 
-            if (jqueryTiki.select2) {
-                $ddl.trigger("change.select2");
-            }
             $ddl.trigger("change");
             $ddl.parent().tikiModal();
         } // callback
@@ -610,7 +610,79 @@ $("input[name=\'' . $filterFieldHereName . '\'], select[name=\'' . $filterFieldH
                 $info['fields'][$permName] = $value;
             });
 
+        $schema->addNew($permName, 'id-raw')
+            ->setLabel($name)
+            ->setRenderTransform(function ($value) {
+                return $value;
+            })
+            ->setParseIntoTransform(function (&$info, $value) use ($permName) {
+                $info['fields'][$permName] = $value;
+            });
+
         return $schema;
+    }
+
+    public function getFilterCollection()
+    {
+        $collection = new Tracker\Filter\Collection($this->getTrackerDefinition());
+        $permName = $this->getConfiguration('permName');
+        $name = $this->getConfiguration('name');
+        $baseKey = $this->getBaseKey();
+        $multivalue = $this->canHaveMultipleValues();
+
+        $collection->addNew($permName, 'selector')
+            ->setLabel($name)
+            ->setControl(new Tracker\Filter\Control\ObjectSelector("tf_{$permName}_os", [
+                'type' => 'trackeritem',
+                'tracker_status' => implode(' OR ', str_split($this->trackerField->getOption('statusThere', 'opc'), 1)),
+                'tracker_id' => $this->trackerField->getOption('trackerId'),
+                '_placeholder' => tr(TikiLib::lib('object')->get_title('tracker', $this->trackerField->getOption('trackerId'))),
+            ]))
+            ->setApplyCondition(function ($control, Search_Query $query) use ($baseKey, $multivalue) {
+                $value = $control->getValue();
+
+                if ($value) {
+                    if ($multivalue) {
+                        $query->filterMultivalue((string) $value, $baseKey);
+                    } else {
+                        $query->filterIdentifier((string) $value, $baseKey);
+                    }
+                }
+            });
+
+        $collection->addNew($permName, 'multiselect')
+            ->setLabel($name)
+            ->setControl(new Tracker\Filter\Control\ObjectSelector(
+                "tf_{$permName}_ms",
+                [
+                    'type' => 'trackeritem',
+                    'tracker_status' => implode(' OR ', str_split($this->trackerField->getOption('statusThere', 'opc'), 1)),
+                    'tracker_id' => $this->trackerField->getOption('trackerId'),
+                    '_placeholder' => tr(TikiLib::lib('object')->get_title('tracker', $this->trackerField->getOption('trackerId'))),
+                ],
+                true
+            ))  // for multi
+            ->setApplyCondition(function ($control, Search_Query $query) use ($permName, $baseKey, $multivalue) {
+                $value = $control->getValue();
+
+                if ($value) {
+                    $value = array_map(function ($v) {
+                        return str_replace('trackeritem:', '', $v);
+                    }, $value);
+                    if ($multivalue) {
+                        $sub = $query->getSubQuery("ms_$permName");
+                        foreach ($value as $v) {
+                            if ($v) {
+                                $sub->filterMultivalue((string) $v, $baseKey);
+                            }
+                        }
+                    } else {
+                        $query->filterMultivalue(implode(' OR ', $value), $baseKey);
+                    }
+                }
+            });
+
+        return $collection;
     }
 
     private function getItemIds()

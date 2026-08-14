@@ -178,9 +178,9 @@ function wikiplugin_datachannel($data, $params)
         $channels = array_filter(array_map('trim', explode(',', $params['channel'])));
     }
 
-    $datachannelWithTemplate = empty($params['template']) ? false : true;
+    $datachannelWithTemplate = ! empty($params['template']);
 
-    if (isset($params['price']) && $params['price'] == 0) {
+    if ($params['price'] == 0) {
         // Convert things like 0.00 to empty
         unset($params['price']);
     }
@@ -190,9 +190,6 @@ function wikiplugin_datachannel($data, $params)
     $lines = array_map('trim', $lines);
     $lines = array_filter($lines);
     $js = '';
-    if (! isset($params['array_values'])) {
-        $params['array_values'] = 'n';
-    }
 
     foreach ($lines as $line) {
         $parts = explode(',', $line, 2);
@@ -203,7 +200,7 @@ function wikiplugin_datachannel($data, $params)
         }
 
         if (count($parts) == 2) {
-            if (strpos($parts[1], 'external') === 0) {  // e.g. "fieldid,external=fieldname"
+            if (str_starts_with($parts[1], 'external')) {  // e.g. "fieldid,external=fieldname"
                 $moreparts = explode('=', $parts[1], 2);
                 $moreparts = array_map('trim', $moreparts);
                 if (count($moreparts) < 2) {
@@ -229,7 +226,7 @@ function wikiplugin_datachannel($data, $params)
                     }
                 }
                 $inputfields[ $parts[0] ] = 'external';
-            } elseif (strpos($parts[1], 'hidden') === 0) {
+            } elseif (str_starts_with($parts[1], 'hidden')) {
                 $moreparts = explode('=', $parts[1], 2);
                 $moreparts = array_map('trim', $moreparts);
                 $fields[ $parts[0] ] = $moreparts[1];
@@ -356,13 +353,12 @@ function wikiplugin_datachannel($data, $params)
                     // i guess the idea is to be able to restrict the settable prefs to only harmless ones for security
 
                     $installer->setUserData($userInput);
-                    if (! empty($params['debug']) && $params['debug'] === 'y') {
+                    if ($params['debug'] === 'y') {
                         $installer->setDebug();
                     }
 
                     $installer->disablePrefixDependencies();
 
-                    $params['emptyCache'] = isset($params['emptyCache']) ? $params['emptyCache'] : 'all';
                     $success = $installer->install($profile, $params['emptyCache']) && $success;
                     foreach ($profile->getLoadedObjects() as $object) {
                         $arguments["%{$object->getRef()}%"] = $object->getValue();
@@ -380,13 +376,13 @@ function wikiplugin_datachannel($data, $params)
             }
 
             if (empty($params['debug']) || $params['debug'] != 'y') {
-                if (isset($params['quietReturn']) && $params['quietReturn'] == 'y') {
+                if ($params['quietReturn'] == 'y') {
                     return true;
                 } elseif (! empty($installer) && ! empty($profile) && $target = $profile->getInstructionPage()) {
                     $profilefeedback = $installer->getFeedback();
 
                     foreach ($profilefeedback as $feedback) {
-                        if (strpos($feedback, tra('An error occurred: ')) === 0) {
+                        if (str_starts_with($feedback, tra('An error occurred: '))) {
                             Feedback::error($feedback);
                         }
                     }

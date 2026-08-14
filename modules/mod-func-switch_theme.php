@@ -5,7 +5,11 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+
+use Tiki\Lib\Theme\ThemeLib;
+use Tiki\Sections;
+
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -29,7 +33,7 @@ function module_switch_theme_info()
  */
 function module_switch_theme($mod_reference, &$module_params)
 {
-    global $prefs, $section, $group_theme, $tc_theme, $tc_theme_option;
+    global $prefs, $group_theme, $tc_theme, $tc_theme_option;
     $smarty = TikiLib::lib('smarty');
     $themelib = TikiLib::lib('theme');
 
@@ -47,7 +51,7 @@ function module_switch_theme($mod_reference, &$module_params)
     if (
         ! empty($tc_theme) ||
         ! empty($group_theme) ||
-        (($section === 'admin' || empty($section)) && ! empty($prefs['theme_admin'])) ||
+        ((Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT)) && ! empty($prefs['theme_admin'])) ||
         ! empty($css_theme)
     ) {
         $info_title = tra('Not allowed here') . ':' .
@@ -57,7 +61,7 @@ function module_switch_theme($mod_reference, &$module_params)
             $info_title .= ' (' . tra('Edit CSS') . ')';
         } elseif (! empty($tc_theme)) {
             $info_title .= ' (' . tra('Theme Control') . ')';
-        } elseif (($section === 'admin' || empty($section)) && ! empty($prefs['theme_admin'])) {
+        } elseif ((Sections::isCurrentSection(Sections::SECTION_ADMIN) || Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT)) && ! empty($prefs['theme_admin'])) {
             $info_title .= ' (' . tra('Admin Theme') . ')';
         } elseif ($group_theme) {
             $info_title .= ' (' . tra('Group theme') . ')';

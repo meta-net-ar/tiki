@@ -5,7 +5,8 @@
 {/block}
 
 {block name="content"}
-    <form action="{service controller='calendar' action='edit_item'}" method="post" class="edit-event-form">
+
+    <form action="{service controller='calendar' action='edit_item'}" method="post" class="edit-event-form" data-should-parse-editor-data="false">
         <div class="form-contents">
             <div class="preview d-none">
                 <button type="button" class="btn-close" style="position:absolute;right:2rem;top:2rem;z-index:1;" aria-label="{tr}Close{/tr}"></button>
@@ -19,7 +20,7 @@
                 {/if}
             </div>
             <input type="hidden" name="calitem[user]" value="{$calitem.user|escape}">
-            <input type="hidden" name="return_url" value="tiki-calendar.php">
+            <input type="hidden" id="return_url" name="return_url" value="{$calitem.returnURL}">
             {if $calitemId}
                 <input type="hidden" name="calitemId" value="{$calitemId|escape}">
             {/if}
@@ -31,15 +32,14 @@
             {if $prefs.calendar_addtogooglecal == 'y'}
                 {wikiplugin _name="addtogooglecal" calitemid=$calitemId}{/wikiplugin}
             {/if}
-            {if $prefilled}
+            {if $hideCalendarSelector}
             <input type="hidden" name="calitem[calendarId]" value="{$calitem.calendarId}">
             {else}
             <div class="mb-3 row">
                 <label for="calid" class="col-form-label col-sm-3">{tr}Calendar{/tr}</label>
                 <div class="col-sm-9">
                     <input name="calendarchanged" type="hidden">
-                    <select name="calitem[calendarId]" id="calid" class="form-control" required
-                            onchange="$(this).parents('.edit-event-form').tikiModal(tr('Loading...')); needToConfirm=false; $('input[name=calendarchanged]').val(1); $('input[name=saveitem]').trigger('click');">
+                    <select name="calitem[calendarId]" id="calid" class="form-control" required>
                         {foreach $calendars as $aCalendar}
                             {$calstyle = ''}
                             {if not empty($aCalendar.custombgcolor)}
@@ -78,36 +78,30 @@
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Title{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" required>
+                    <input type="text" name="calitem[name]" value="{$calitem.name|escape}" size="32" class="form-control" maxlength="{$MAX_CALENDAR_EVENT_TITLE_LENGTH}" required>
                 </div>
             </div>
+            {if !empty($trackerItems)}
+                <div class="mb-3 row">
+                    <label class="col-form-label col-sm-3">{tr}Related tracker items{/tr}</label>
+                    <div class="col-sm-9 mb-0 pt-2">
+                        <ul>
+                            {foreach from=$trackerItems item=trackerItem}
+                                <li>{object_link type="trackeritem" id=$trackerItem}</li>
+                            {/foreach}
+                        </ul>
+                    </div>
+                </div>
+            {/if}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Created by{/tr}</label>
                 <div class="col-sm-9">
-                    <div class="summary" style="margin-bottom: 0; padding-top: 7px;">
+                    <div class="summary mb-0 pt-2">
                         {$calitem.user|escape}
                     </div>
 
                 </div>
             </div>
-            {if $prefilled}
-            <input type="hidden" name="calitem[end_or_duration]" value="end" id="end_or_duration">
-            <input type="hidden" name="calitem[start]" value="{$calitem.start}">
-            <input type="hidden" name="calitem[end]" value="{$calitem.end}">
-            <input type="hidden" name="exact_start_end" value="1">
-            <div class="row mt-md-3 mb-3 date">
-                <label class="col-form-label col-sm-3">{tr}Start{/tr}</label>
-                <div class="col-sm-7 start">
-                    {$calitem.start|tiki_short_datetime} {$displayTimezone}
-                </div>
-            </div>
-            <div class="row mt-md-3 mb-3 date">
-                <label class="col-form-label col-sm-3">{tr}End{/tr}</label>
-                <div class="col-sm-7 end">
-                    {$calitem.end|tiki_short_datetime} {$displayTimezone}
-                </div>
-            </div>
-            {else}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Recurrence{/tr}</label>
                 <div class="col-sm-9">
@@ -165,9 +159,9 @@
                 <label class="col-form-label col-sm-3">{tr}Start - End{/tr}</label>
                 <div class="col-sm-7 start">
                     {if $calitem.allday}
-                        {assign var="showtime" value="n"}
+                        {$showtime="n"}
                     {else}
-                        {assign var="showtime" value="y"}
+                        {$showtime="y"}
                     {/if}
                     {jscalendar id="event-datetime" date=$calitem.start enddate=$calitem.end fieldname="calitem[start]" showtime=$showtime endfieldname="calitem[end]" showtimezone="n" timezone=$displayTimezone}
                 </div>
@@ -183,8 +177,10 @@
                 $('#allday').on('change', function() {
                     if ($(this).is(':checked')) {
                         $('#event-datetime').attr('type', 'daterange');
+                        $('#event-datetime').attr('format', 'YYYY-MM-DD');
                     } else {
                         $('#event-datetime').attr('type', 'datetimerange');
+                        $('#event-datetime').attr('format', 'YYYY-MM-DD HH:mm');
                     }
                 });
                 {/jq}
@@ -197,12 +193,11 @@
                     </span>
                 {/if}
             </div>
-            {/if}
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-3">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
                         {strip}
-                            {textarea name="calitem[description]" id="editwiki" cols=40 rows=10 _preview=$prefs.ajax_edit_previews}
+                            {textarea name="calitem[description]" maxlength="{$MAX_CALENDAR_EVENT_DESCRIPTION_LENGTH}" id="editwiki" cols=40 rows=10 _preview=$prefs.ajax_edit_previews}
                             {$calitem.description}
                             {/textarea}
                         {/strip}
@@ -213,9 +208,9 @@
                     <label class="col-form-label col-sm-3">{tr}Status{/tr}</label>
                     <div class="col-sm-9">
                         {if (! empty($calitem))}
-                            {assign var="selected" value="{$calitem.status}"}
+                            {$selected="{$calitem.status}"}
                         {else}
-                            {assign var="selected" value="{$calendar.defaulteventstatus}"}
+                            {$selected="{$calendar.defaulteventstatus}"}
                         {/if}
                         {html_options class="form-control" name='calitem[status]' output=$calendar.eventstatusoutput values=$calendar.eventstatus selected=$selected}
                     </div>
@@ -287,7 +282,7 @@
                 <div class="mb-3 row">
                     <label class="col-form-label col-sm-3">{tr}URL{/tr}</label>
                     <div class="col-sm-9">
-                        <input type="text" name="calitem[url]" value="{$calitem.url}" size="32" class="form-control url">
+                        <input type="url" name="calitem[url]" value="{$calitem.url}" size="32" class="form-control url">
                     </div>
                 </div>
                 {* / .mb-3.row *}
@@ -307,27 +302,38 @@
                     </div>
                 </div> {* / .mb-3.row *}
             {/if}
-            {if !empty($groupforalert) && $showeachuser eq 'y'}
-                <div class="mb-3 row">
-                    <label class="col-form-label col-sm-3" for="listtoalert">{tr}Choose users to alert{/tr}</label>
-                    <div class="col-sm-9">
-                        {section name=idx loop=$listusertoalert}
-                            {if $showeachuser eq 'n'}
-                                <input type="hidden" name="listtoalert[]" value="{$listusertoalert[idx].user}">
-                            {else}
-                                <input type="checkbox" class="form-check-input" id="listtoalert" name="listtoalert[]" value="{$listusertoalert[idx].user}">
-                                {$listusertoalert[idx].user}
-                            {/if}
-                        {/section}
+            {if ! empty($groupforalert)}
+                {if $showeachuser eq 'y'}
+                    <div class="mb-3 row">
+                        <label class="col-form-label col-sm-3" for="listtoalert">{tr}Choose users to alert{/tr}</label>
+                        <div class="col-sm-9">
+                            {section name=idx loop=$listusertoalert}
+                                {if $showeachuser eq 'n'}
+                                    <input type="hidden" name="listtoalert[]" value="{$listusertoalert[idx].user}">
+                                {else}
+                                    <input type="checkbox" class="form-check-input" id="listtoalert" name="listtoalert[]" value="{$listusertoalert[idx].user}">
+                                    {$listusertoalert[idx].user}
+                                {/if}
+                            {/section}
+                        </div>
+                    </div>
+                    {* / .mb-3.row *}
+                {/if}
+                <div class="mb-3 row clearfix">
+                    <label class="col-form-label col-sm-3">{tr}Send reminder notifications{/tr}</label>
+                    <div class="col-sm-2">
+                        <input type="checkbox" class="form-check-input" name="calitem[sendReminder]" id="sendReminder" value="1" {if ! isset($calitem.sendReminder) or $calitem.sendReminder}checked{/if}>
                     </div>
                 </div>
-                {* / .mb-3.row *}
+                {* / .mb-3 *}
+            {else}
+                <input type="hidden" name="calitem[sendReminder]" value="{if $calitem.calitemId}{$calitem.sendReminder}{else}1{/if}">
             {/if}
             {if $calendar.customparticipants eq 'y'}
                 <div class="mb-3 row" id="calorg">
                     <label class="col-form-label col-sm-3">{tr}Organized by{/tr}</label>
                     <div class="col-sm-9">
-                        {user_selector name='calitem[organizers]' select=$calitem.organizers multiple='true' allowNone='y' editable='y' realnames = 'n'}
+                        {user_selector name='calitem[organizers][]' select=$calitem.organizers multiple='true' allowNone='y' editable='y' realnames = 'n'}
                     </div>
                 </div> {* / .mb-3.row *}
             {/if}
@@ -336,14 +342,14 @@
                     <label class="col-form-label col-sm-3">{tr}Participants{/tr}</label>
                     <div class="col-sm-9">
                         {if isset($calitem.participants)}
-                            {user_selector name='participants' select=$calitem.selected_participants multiple='true' allowNone='y' editable='y' realnames='n'}
+                            {user_selector name='participants[]' select=$calitem.selected_participants multiple='true' allowNone='y' editable='y' realnames='n'}
                             <br>
                             <div class="row">
                                 <div class="col-sm-9">
-                                    <input type="text" name="add_participant_email" id="add_participant_email" value="" placeholder="or invite by email address..." class="form-control">
+                                    <input type="text" name="add_participant_email" id="add_participant_email" value="" placeholder="{tr}or invite by email address...{/tr}" class="form-control">
                                 </div>
                                 <div class="col-sm-3">
-                                    <input type="button" class="btn btn-primary btn-sm" value="Add" id="invite_emails">
+                                    <input type="button" class="btn btn-primary btn-sm" value="{tr}Add{/tr}" id="invite_emails">
                                 </div>
                             </div>
                             <br>
@@ -359,7 +365,7 @@
                                     <tr class="d-none" id="participant-template-row">
                                         <td class="username"></td>
                                         <td>
-                                            <select class="form-control noselect2" name="calitem[participant_partstat]">
+                                            <select class="form-control" name="calitem[participant_partstat]">
                                                 <option value="NEEDS-ACTION">{tr}NEEDS-ACTION{/tr}</option>
                                                 <option value="ACCEPTED">{tr}ACCEPTED{/tr}</option>
                                                 <option value="TENTATIVE">{tr}TENTATIVE{/tr}</option>
@@ -367,7 +373,7 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <select class="form-control noselect2" name="calitem[participant_roles]">
+                                            <select class="form-control" name="calitem[participant_roles]">
                                                 <option value="0">{tr}Chair{/tr}</option>
                                                 <option value="1">{tr}Required participant{/tr}</option>
                                                 <option value="2">{tr}Optional participant{/tr}</option>
@@ -383,10 +389,10 @@
                                             <td>{$ppl.username|userlink}</td>
                                             <td>
                                                 <select name="calitem[participant_partstat][{$ppl.username}]" class="form-control">
-                                                    <option value="NEEDS-ACTION">NEEDS-ACTION</option>
-                                                    <option value="ACCEPTED" {if $ppl.partstat eq 'ACCEPTED'}selected{/if}>ACCEPTED</option>
-                                                    <option value="TENTATIVE" {if $ppl.partstat eq 'TENTATIVE'}selected{/if}>TENTATIVE</option>
-                                                    <option value="DECLINED" {if $ppl.partstat eq 'DECLINED'}selected{/if}>DECLINED</option>
+                                                    <option value="NEEDS-ACTION">{tr}NEEDS-ACTION{/tr}</option>
+                                                    <option value="ACCEPTED" {if $ppl.partstat eq 'ACCEPTED'}selected{/if}>{tr}ACCEPTED{/tr}</option>
+                                                    <option value="TENTATIVE" {if $ppl.partstat eq 'TENTATIVE'}selected{/if}>{tr}TENTATIVE{/tr}</option>
+                                                    <option value="DECLINED" {if $ppl.partstat eq 'DECLINED'}selected{/if}>{tr}DECLINED{/tr}</option>
                                                 </select>
                                             </td>
                                             <td>
@@ -400,16 +406,22 @@
                                             <td class="w-25">
                                                 <input type="text" name="calitem[participant_comment][{$ppl.username}]" value="{$ppl.comment|escape}" class="form-control">
                                             <td>
-                                                <a href="#" class="delete-participant"><span class="icon icon-remove fas fa-times"></span></a>
+                                                <a href="#" class="delete-participant" role="button"><span class="icon icon-remove fas fa-times"></span></a>
                                             </td>
                                         </tr>
                                     {/foreach}
                                 </table>
                             </div>
-                            <div><a href="#" class="btn btn-secondary btn-sm availability-check">{tr}Check availability{/tr}</a></div>
+                            <div><a href="#" class="btn btn-secondary btn-sm availability-check" role="button">{tr}Check availability{/tr}</a></div>
                             <br/>
-                            <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="calitem[process_itip]" value="1" checked>
-                            Send calendar invitations and event updates via email
+                            <div>
+                                <input type="checkbox" class="form-check-input" aria-label="{tr}Select{/tr}" name="calitem[process_itip]" value="1" checked>
+                                {tr}Send calendar invitations and event updates via email{/tr}
+                            </div>
+                            <div>
+                                <input type="checkbox" class="form-check-input" name="calitem[hideParticipants]" aria-label="{tr}Hide participants list from others{/tr}" {if $calitem.hideParticipants}checked="checked"{/if}/>
+                                {tr}Hide participants list from others{/tr}
+                            </div>
                         {/if}
                     </div>
                 </div> {* / .mb-3.row *}
@@ -433,6 +445,196 @@
                     </div>
                 </div>
             {/if}
+            {if $prefs.feature_file_galleries eq 'y'}
+                <div class="mb-3 row" id="calattach">
+                    <label class="col-form-label col-sm-3">{tr}Attachments{/tr}</label>
+                    <div class="col-sm-9">
+                        <div class="files-field calendar-attachments-field uninitialized" data-galleryid="{$attachmentsGalleryId|escape}">
+                            <input type="hidden" name="calitem[attachments]" class="input" value="{if !empty($calitem.attachments)}{foreach $calitem.attachments as $file}{$file.fileId}{if !$file@last},{/if}{/foreach}{/if}">
+                            <ol class="current-list list-unstyled mb-3">
+                                {if !empty($calitem.attachments)}
+                                    {foreach $calitem.attachments as $file}
+                                        <li data-file-id="{$file.fileId}" class="m-1">
+                                            {$file.fileId|sefurl:'file'|iconify:$file.filetype:$file.fileId:1}
+                                            <a href="{$file.fileId|sefurl:'file'}" data-box="box">{$file.filename|escape}</a>
+                                            <span class="text-muted small ms-1">({$file.filesize|kbsize})</span>
+                                            <a href="#" class="file-delete-icon text-danger ms-2" title="{tr}Remove attachment{/tr}">
+                                                {icon name='delete'}
+                                            </a>
+                                        </li>
+                                    {/foreach}
+                                {/if}
+                            </ol>
+                            {if $canUploadAttachments}
+                                <a href="{service controller=file action=uploader uploadInModal=1 galleryId=$attachmentsGalleryId limit=100}" 
+                                   class="btn btn-primary upload-files me-2" role="button">
+                                    {icon name='upload'} {tr}Upload Files{/tr}
+                                </a>
+                            {/if}
+
+                            {if $prefs.fgal_tracker_existing_search eq 'y'}
+                                {if $prefs.fgal_elfinder_feature eq 'y'}
+                                    <a href="tiki-list_file_gallery.php" 
+                                       class="btn btn-secondary browse-files-elfinder" 
+                                       role="button"
+                                       data-gallery-id="{$attachmentsGalleryId|escape}"
+                                       data-ticket="{ticket mode=get}">
+                                        {icon name='folder-open'} {tr}Browse Files{/tr}
+                                    </a>
+                                {else}
+                                    <a href="{service controller=file action=browse galleryId=$attachmentsGalleryId limit=100}" 
+                                       class="btn btn-secondary browse-files" role="button">
+                                        {icon name='folder-open'} {tr}Browse Files{/tr}
+                                    </a>
+                                {/if}
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+                {jq}
+
+                $('.files-field.calendar-attachments-field.uninitialized').removeClass('uninitialized').each(function () {
+                    var $self = $(this);
+                    var $files = $('.current-list', this);
+                    var $field = $('.input', this);
+                    var galleryId = $self.data('galleryid');
+
+                    function addFile(fileId, type, name, size) {
+                        fileId = String(fileId);
+                        // Check if already exists
+                        if ($files.find('[data-file-id="' + fileId + '"]').length) {
+                            return;
+                        }
+
+                        var li = $('<li class="m-1">').appendTo($files);
+                        li.attr('data-file-id', fileId);
+                        li.append($.fileTypeIcon(fileId, { type: type, name: name }));
+                        li.append($('<a href="tiki-download_file.php?fileId=' + fileId + '" data-box="box">').text(name));
+                        // Show file size if available, otherwise show nothing
+                        if (size) {
+                            li.append($('<span class="text-muted small ms-1">').text('(' + formatFileSize(size) + ')'));
+                        }
+                        li.append($('<a href="#" class="file-delete-icon text-danger ms-2" title="' + tr('Remove attachment') + '">').html('{{icon name="delete"}}'));
+
+                        $field.input_csv('add', ',', fileId);
+                        $field.trigger("change");
+                    }
+
+                    // Helper function to format file size
+                    function formatFileSize(bytes) {
+                        if (bytes === 0) return '0 B';
+                        var k = 1024;
+                        var sizes = ['B', 'KB', 'MB', 'GB'];
+                        var i = Math.floor(Math.log(bytes) / Math.log(k));
+                        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+                    }
+
+                    // Store addFile function globally for elFinder callback
+                    window.calendarAttachmentsAddFile = addFile;
+
+                    // Handle upload modal
+                    $self.find('.btn.upload-files').clickModal({
+                        success: function (data) {
+                            $.each(data.files, function (k, file) {
+                                addFile(file.fileId, file.type, file.label || file.name, file.size);
+                            });
+                            $.closeModal();
+                        }
+                    });
+
+                    // Handle browse files modal (non-elFinder)
+                    $self.find('.btn.browse-files').on('click', function () {
+                        if (! $(this).data('initial-href')) {
+                            $(this).data('initial-href', $(this).attr('href'));
+                        }
+                        // Before the dialog handler triggers, replace the href with one including current files
+                        $(this).attr('href', $(this).data('initial-href') + '&file=' + $field.val());
+                    });
+                    $self.find('.btn.browse-files').clickModal({
+                        size: 'modal-lg',
+                        success: function (data) {
+                            $.each(data.files, function (k, file) {
+                                addFile(file.fileId, file.type, file.name, file.size);
+                            });
+                            $.closeModal();
+                        }
+                    });
+
+                    // Delete file handler
+                    $files.parent().on('click', '.file-delete-icon', function (e) {
+                        e.preventDefault();
+                        var fileId = $(e.target).closest('li').data('file-id');
+                        if (fileId) {
+                            $field.input_csv('delete', ',', fileId);
+                            $(e.target).closest('li').remove();
+                            $field.trigger("change");
+                        }
+                        return false;
+                    });
+
+                    // Handle elFinder browse button
+                    $self.find('.browse-files-elfinder').on('click', function(e) {
+                        e.preventDefault();
+                        var browseGalleryId = $(this).data('gallery-id') || galleryId;
+                        var ticket = $(this).data('ticket');
+
+                        return openElFinderDialog(this, {
+                            defaultGalleryId: browseGalleryId,
+                            deepGallerySearch: 1,
+                            defaultVolumeId: browseGalleryId,
+                            ticket: ticket,
+                            getFileCallback: function(file, elfinder) {
+                                window.handleCalendarFinderFile(file, elfinder);
+                            },
+                            eventOrigin: this
+                        });
+                    });
+                });
+
+                // Handler for elFinder file selection
+                window.handleCalendarFinderFile = function(value, elfinder) {
+                    var hashes = [];
+                    if (Array.isArray(value)) {
+                        for (var i = 0; i < value.length; i++) {
+                            var file = value[i];
+                            if (typeof file === "string") {
+                                var m = file.match(/target=([^&]*)/);
+                                if (m && m.length >= 2) {
+                                    hashes.push(m[1]);
+                                }
+                            } else if (file.hash) {
+                                hashes.push(file.hash);
+                            }
+                        }
+                    } else if (value && value.hash) {
+                        hashes.push(value.hash);
+                    }
+
+                    if (hashes.length === 0) return;
+
+                    $.ajax({
+                        type: 'GET',
+                        url: $.service('file_finder', 'finder'),
+                        dataType: 'json',
+                        data: {
+                            cmd: "tikiFileFromHash",
+                            hash: hashes
+                        },
+                        success: function (data) {
+                            for (var i = 0; i < data.length; i++) {
+                                if (window.calendarAttachmentsAddFile) {
+                                    window.calendarAttachmentsAddFile(data[i].fileId, data[i].filetype, data[i].name, data[i].filesize);
+                                }
+                            }
+                        },
+                        complete: function () {
+                            $.closeModal();
+                            $(window).data("elFinderDialog", null);
+                        }
+                    });
+                };
+                {/jq}
+            {/if}
             {if !$user and $prefs.feature_antibot eq 'y'}
                 {include file='antibot.tpl'}
             {/if}
@@ -440,18 +642,14 @@
         </div> {* /.form-contents *}
         <div class="submit">
             <input type="hidden" id="act" name="act" value="">
-            <input type="submit" class="btn btn-secondary" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false">
-            <input type="submit" class="btn btn-primary {if $prefilled}need-participant{/if}" name="saveitem" value="{tr}Save{/tr}" onclick="needToConfirm=false">
-            {if $tiki_p_add_events eq 'y' and empty($saveas) and not empty($calitemId)}
-                <input type="submit" class="btn btn-secondary" name="saveas" data-alt_controller="calendar" data-alt_action="copy_item"
-                       onclick="needToConfirm=false" value="{tr}Copy to a new event{/tr}">
-            {/if}
+            <input type="submit" class="btn btn-secondary cleanable-false" name="preview" value="{tr}Preview{/tr}" onclick="needToConfirm=false">
+            <input type="submit" class="btn btn-primary cleanable-false {if $requireParticipant}need-participant{/if}" name="saveitem" value="{tr}Save{/tr}" onclick="needToConfirm=false">
             {if $calitemId && ! $recurrence.id}
                 <input type="submit" name="delete" data-alt_controller="calendar" data-alt_action="delete_item"
-                       class="btn btn-danger" onclick="needToConfirm=false;" value="{tr}Delete event{/tr}">
+                       class="btn btn-danger cleanable-false" onclick="needToConfirm=false;" data-bs-dismiss="modal" value="{tr}Delete event{/tr}">
             {/if}
             {if $recurrence.id}
-                <div class="dropdown">
+                <div class="dropdown" data-cb-close-all="true">
                     <button class="btn btn-danger dropdown-toggle" type="button" id="deleteMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                         {tr}Delete event(s){/tr}
                     </button>

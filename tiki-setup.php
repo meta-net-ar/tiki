@@ -15,6 +15,8 @@
 use Tiki\Maintenance\Maintenance;
 use Tiki\Package\VendorHelper;
 use Tiki\Profiling\Timer;
+use Tiki\Captcha\CaptchaTypeResolver;
+use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 //Be careful, composer autoloading isn't available until tiki-setup_base.php is required further down
 
@@ -26,7 +28,7 @@ global $prefs, $tikilib;
 
 ini_set('session.cookie_httponly', 1);
 
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -66,6 +68,18 @@ $tiki_timer = new Timer();
 $tiki_timer->start();
 
 require_once('tiki-setup_base.php'); //Starting here composer autoloading is available
+
+if (! empty($user) && isset($_SESSION['login_time'])) {
+    $userInfo = $userlib->get_user_info($user);
+
+    if (! empty($userInfo['pass_confirm']) && $_SESSION['login_time'] < $userInfo['pass_confirm']) {
+        TikiLib::lib('login')->logout();
+        if (! defined('TIKI_CONSOLE') && PHP_SAPI !== 'cli') {
+            header('Location:tiki-login_scr.php');
+        }
+        exit;
+    }
+}
 
 if (version_compare(PHP_VERSION, TIKI_MIN_PHP_VERSION, '<')) {
     if (PHP_SAPI !== 'cli') {                   // if not running a command line version of php, show requirements
@@ -127,24 +141,42 @@ $twoFactorSecret = $userlib->get_2_factor_secret($user);
 $force2FA = $userlib->forceTwoFactorAuth($user);
 //Check if 2FA is required for a user and if it not yet enabled
 if ($prefs['twoFactorAuth'] == 'y' && empty($twoFactorSecret) && $force2FA && ! empty($user)) {
-    $accesslib = TikiLib::lib('access');
-    //URL to send user who has not yet enabled 2FA
-    $accessibleUrl = $base_url . 'tiki-user_preferences.php';
-    $pageUrl = $url_scheme . "://" . $host . $requestUri;
-    //Do not redirect the user if it is a logout action
-    if ($accessibleUrl !== $pageUrl && $pageUrl !== $base_url . 'tiki-logout.php') {
-        header('location: tiki-user_preferences.php');
-        exit();
+    $gracePeriod = $userlib->get2FAGracePeriod($user);
+    $userGracePeriodStart = $userlib->get2FAGracePeriodStart($user);
+
+    if (! $userGracePeriodStart) {
+        if ($gracePeriod > 0) {
+            $userGracePeriodStart = $userlib->reset2FAGracePeriodStart($user);
+        } else {
+            $userGracePeriodStart = 0;
+        }
+    }
+
+    $userGracePeriodShouldEnd = $userGracePeriodStart + ($gracePeriod * 24 * 3600);
+
+    if ($userGracePeriodShouldEnd < time()) {
+        $accesslib = TikiLib::lib('access');
+        //URL to send user who has not yet enabled 2FA
+        $accessibleUrl = $base_url . 'tiki-user_preferences.php';
+        $pageUrl = $url_scheme . "://" . $host . $requestUri;
+        //Do not redirect the user if it is a logout action
+        if ($accessibleUrl !== $pageUrl && $pageUrl !== $base_url . 'tiki-logout.php') {
+            header('location: tiki-user_preferences.php');
+            exit();
+        }
+    } else {
+        $daysLeft = ceil(($userGracePeriodShouldEnd - time()) / (24 * 3600));
+        Feedback::warning(tra(strtr('You must enable Two-Factor Authentication within the next %days% day(s) to continue using your account. Please update your <a href="%url%">user preferences</a>.', ['%days%' => $daysLeft, '%url%' => 'tiki-user_preferences.php'])));
     }
 }
 
-if ($prefs['tiki_domain_prefix'] == 'strip' && substr($host, 0, 4) == 'www.') {
+if ($prefs['tiki_domain_prefix'] == 'strip' && str_starts_with($host, 'www.')) {
     $domain_map[$host] = substr($host, 4);
-} elseif ($prefs['tiki_domain_prefix'] == 'force' && substr($host, 0, 4) != 'www.') {
+} elseif ($prefs['tiki_domain_prefix'] == 'force' && ! str_starts_with($host, 'www.')) {
     $domain_map[$host] = 'www.' . $host;
 }
 
-if (strpos($prefs['tiki_domain_redirects'], ',') !== false) {
+if (str_contains($prefs['tiki_domain_redirects'], ',')) {
     foreach (explode("\n", $prefs['tiki_domain_redirects']) as $row) {
         list($old, $new) = array_map('trim', explode(',', $row, 2));
         $domain_map[$old] = $new;
@@ -175,7 +207,28 @@ if ($prefs['login_multiple_forbidden'] == 'y') {
 
 require_once('lib/setup/cookies.php');
 require_once('lib/setup/user_prefs.php');
-require_once('lib/setup/language.php');
+require_once('lib/core/Sections.php');
+use Tiki\Sections;
+// Initialize language settings after section is set and autoloader is available
+Language::setSectionLanguage();
+
+// Register callback to update language when section changes
+// This ensures that when admin files call Sections::setCurrentSection(),
+// the language is automatically updated (e.g., admin section gets admin language)
+Sections::onSectionChange(function ($section) {
+    Language::setSectionLanguage();
+});
+
+Sections::onSectionChange(function ($section) use ($prefs) {
+    if (($prefs['feature_freetags'] ?? 'n') !== 'y') {
+        return;
+    }
+
+    $freetaglib = TikiLib::lib('freetag');
+    $freetaglib->handleCurrentObjectTagRequest();
+    $freetaglib->assignCurrentObjectTagsToSmarty();
+});
+
 require_once('lib/setup/wiki.php');
 
 $user_groups = $userlib->get_user_groups($user);
@@ -211,11 +264,11 @@ if ($color_mode_table_exists) {
     $prefs['color_modes_names'] = [];
 }
 
+require_once('lib/setup/theme.php');
+
 if (! TIKI_API) {
     require_once('lib/setup/javascript.php');
 }
-
-require_once('lib/setup/theme.php');
 
 /* Cookie consent setup, has to be after the JS decision and wiki setup */
 if (! TIKI_API) {
@@ -223,45 +276,48 @@ if (! TIKI_API) {
     if (
         $prefs['cookie_consent_feature'] === 'y' &&
         (
-            strpos($_SERVER['PHP_SELF'], 'tiki-cookie-jar.php') === false && http_response_code() !== false ||
+            ! str_contains($_SERVER['PHP_SELF'], 'tiki-cookie-jar.php') && http_response_code() !== false ||
             $jitRequest->offsetExists('cookie_consent')
         )
     ) {
-        if (! empty($_REQUEST['cookie_consent_checkbox']) || $prefs['site_closed'] === 'y') {
-            // js disabled
-            setCookieSection($prefs['cookie_consent_name'], 'y');   // set both real cookie and tiki_cookie_jar
-            $feature_no_cookie = false;
-            setCookieSection($prefs['cookie_consent_name'], 'y');
+        $cookie_consent_name = CookieConsentLib::COOKIE_CONSENT_NAME;
+        if (
+            ! empty($_REQUEST[$cookie_consent_name]) ||
+            $prefs['site_closed'] === 'y'
+        ) {
+            // js disabled, so we need to set the cookies server-side
+            // DRY, this appears to be the default value of initializeConsentPreferences why do we have another copy here?  benoitg - 2026-03-25
+            $consent = [
+                'consentGiven' => true,
+                'categories' => [
+                    'essential' => true,
+                    'analytics' => false,
+                    'marketing' => false,
+                    'functional' => false,
+                ],
+            ];
+            CookieConsentLib::setConsentPreferences($consent);
+            $feature_no_cookie = false;  //This isn't a global here, so this set will have no effect! - benoitg - 2026-03-25
         }
-        $cookie_consent = getCookie($prefs['cookie_consent_name']);
-        if (empty($cookie_consent) || $jitRequest->offsetExists('cookie_consent')) {
-            $prefs['cookie_consent_mode'] = '';
+        // Retrieve the full consent object
+        $consent_preferences = CookieConsentLib::initializeConsentPreferences();
+
+        /*
+        I don't understand why CookieConsentLib doesn't deal with this at init.
+        Especially since it's not clearing the cookies for a category if one withdraws consent from
+        tiki-user_preferences.php, so tiki essentially lies in that situation -  benoitg - 2026-03-25
+        */
+        if (! $consent_preferences['consentGiven'] || $jitRequest->offsetExists('cookie_consent')) {
             if (! $jitRequest->offsetExists('cookie_consent')) {
-                $headerlib->add_js('jqueryTiki.no_cookie = true; jqueryTiki.cookie_consent_alert = "' . addslashes($prefs['cookie_consent_alert']) . '";');
                 foreach ($_COOKIE as $k => $v) {
-                    if (strpos($k, session_name()) === false) {
+                    if (! str_contains($k, session_name())) {
                         setcookie($k, '', time() - 3600);        // unset any previously existing cookies except the session and js detect
                     }
                 }
             }
+            // Get cookie categories
+            $smarty->assign('cookie_categories', CookieConsentLib::getRequestedCookieCategories());
             $cookie_consent_html = $smarty->fetch('cookie_consent.tpl');
-        } else {
-            // check if it was a client-side cookie and turn into a server-side one to get longer than 7 days expiry
-            if ($cookie_consent !== 'y') {
-                setcookie($prefs['cookie_consent_name'], 'y', intval($cookie_consent / 1000));
-            }
-            $feature_no_cookie = false;
-
-            if ($prefs['cookie_consent_analytics'] === 'y') {
-                $analytics = getCookie($prefs['cookie_consent_name'] . '_analytics');
-                if (is_numeric($analytics)) {   // has been set server-side, so user is opting in to analytics
-                    setcookie($prefs['cookie_consent_name'] . '_analytics', 'y', intval($analytics / 1000));
-                    $feature_no_cookie_analytics = false;
-                } elseif (empty($analytics)) {
-                    setcookie($prefs['cookie_consent_name'] . '_analytics', 'n', 24 * 60 * 60 * $prefs['cookie_consent_expires']);
-                    $feature_no_cookie_analytics = true;
-                }
-            }
         }
     }
     $smarty->assign('cookie_consent_html', $cookie_consent_html);
@@ -290,7 +346,7 @@ if ($prefs['feature_sefurl'] == 'y' && ! defined('TIKI_CONSOLE')) {
     if ($prefs['tikiIndex'] == 'tiki-index.php' && $prefs['wikiHomePage']) {
         $wikilib = TikiLib::lib('wiki');
         $prefs['tikiIndex'] = $wikilib->sefurl($userlib->best_multilingual_page($prefs['wikiHomePage']));
-    } elseif (substr($prefs['tikiIndex'], 0, strlen('tiki-view_blog.php')) == 'tiki-view_blog.php') {
+    } elseif (str_starts_with($prefs['tikiIndex'], 'tiki-view_blog.php')) {
         include_once('tiki-sefurl.php');
         $prefs['tikiIndex'] = filter_out_sefurl($prefs['tikiIndex'], 'blog');
     }
@@ -332,9 +388,6 @@ if ($prefs['feature_integrator'] == 'y') {
 if (isset($_REQUEST['comzone'])) {
     require_once('lib/setup/comments_zone.php');
 }
-if ($prefs['feature_lastup'] == 'y') {
-    require_once('lib/setup/last_update.php');
-}
 if (! empty($_SESSION['interactive_translation_mode']) && ($_SESSION['interactive_translation_mode'] == 'on')) {
     $cachelib->empty_cache('templates_c');
 }
@@ -343,10 +396,6 @@ if ($prefs['feature_freetags'] == 'y') {
 }
 if ($prefs['feature_categories'] == 'y') {
     require_once('lib/setup/categories.php');
-    if ($prefs['feature_areas'] == 'y' &&  $prefs['categories_used_in_tpl'] == 'y') {
-        $areaslib = TikiLib::lib('areas');
-        $areaslib->HandleObjectCategories($objectCategoryIdsNoJail);
-    }
 }
 if ($prefs['feature_userlevels'] == 'y') {
     require_once('lib/setup/userlevels.php');
@@ -389,19 +438,37 @@ if ($prefs['pwa_feature'] == 'y') { //pwa test propose, pages to cache
     $smarty->assign('pagespwa', json_encode($pages));
 }
 
-if ($prefs['metatag_robotscustom'] == 'y') {
-    if (empty($object)) {
+
+Sections::onSectionChange(function ($section) use ($prefs, $headerlib, $smarty) {
+    $customRobots = null;
+    if ($prefs['metatag_robotscustom'] == 'y') {
         $object = current_object();
+        if ($object && $object['type'] == 'wiki page') {
+            $wikilib = TikiLib::lib('wiki');
+            $customRobots = $wikilib->getPageMetatagRobotscustom($object['object']);
+            if (! empty($customRobots)) {
+                $smarty->assign('metatag_robotscustom', $customRobots);
+                $headerlib->setXRobotsTag($customRobots);
+            }
+        }
     }
-    if ($object && $object['type'] == 'wiki page') {
-        $wikilib = TikiLib::lib('wiki');
-        $smarty->assign('metatag_robotscustom', $wikilib->getPageMetatagRobotscustom($object['object']));
+
+    // Apply robots directives from robots.txt as meta tags and X-Robots-Tag header.
+    if (($prefs['metatag_robots_txt_apply_directives'] ?? 'n') === 'y') {
+        $robotsFromTxt = $headerlib->getRobots();
+        if (! empty($robotsFromTxt)) {
+            $smarty->assign('metatag_robots', $robotsFromTxt);
+            if (empty($customRobots)) {
+                $headerlib->setXRobotsTag($robotsFromTxt);
+            }
+        }
     }
-}
+});
 
 if ($prefs['feature_antibot'] == 'y' && empty($user)) {
-    if ($prefs['recaptcha_enabled'] === 'y') {
-        if ($prefs['recaptcha_version'] == '2') {
+    $captchaType = CaptchaTypeResolver::getConfiguredType($prefs);
+    if (in_array($captchaType, ['recaptcha', 'recaptcha20', 'recaptcha30'])) {
+        if ($captchaType == 'recaptcha20') {
             if (! empty($prefs['language'])) {
                 $headerlib->add_jsfile_cdn("$url_scheme://www.google.com/recaptcha/api.js?hl=" . $prefs['language']);
             } else {
@@ -431,7 +498,7 @@ if (! empty($prefs['feature_canonical_domain'])) {
     $base_url_canonical = $base_url_canonical_default;
 }
 // Since it's easier to be error-resistant than train users, ensure base_url_canonical ends with '/'
-if (substr($base_url_canonical, -1) != '/') {
+if (! str_ends_with($base_url_canonical, '/')) {
     $base_url_canonical .= '/';
 }
 
@@ -463,7 +530,6 @@ $smarty->assign('stay_in_ssl_mode', $stay_in_ssl_mode);
 $smarty->assign('tiki_version', $TWV->version);
 $smarty->assign('tiki_branch', $TWV->branch);
 $smarty->assign('tiki_star', $TWV->getStar());
-$smarty->assign('tiki_uses_svn', $TWV->svn);
 $smarty->assign('symbols', TikiLib::symbols());
 
 $maintenance = new Maintenance();
@@ -517,18 +583,33 @@ if (isset($prefs['fgal_elfinder_feature']) && $prefs['fgal_elfinder_feature'] ==
 }
 
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-jquery.js');
+
+if ($prefs['error_tracking_enabled_js'] == 'y' && ! empty($prefs['error_tracking_dsn'])) {
+    // Sentry configuration passed to ES module
+    $sentryConfig = json_encode([
+        'dsn' => $prefs['error_tracking_dsn'],
+        'sampleRate' => isset($prefs['error_tracking_sample_rate']) && is_numeric($prefs['error_tracking_sample_rate'])
+            ? (float) $prefs['error_tracking_sample_rate']
+            : 1,
+        'tracingEnabled' => ($prefs['error_tracking_tracing_enabled_js'] ?? 'n') === 'y',
+        'tracesSampleRate' => isset($prefs['error_tracking_traces_sample_rate']) && is_numeric($prefs['error_tracking_traces_sample_rate'])
+            ? (float) $prefs['error_tracking_traces_sample_rate']
+            : 0.1,
+    ]);
+
+    // Sentry initialization via ES module
+    // Loaded with priority -10 to ensure it initializes before other modules
+    $headerlib->add_js_module("import { initSentry } from '@tiki-modules/sentryBrowser'; initSentry($sentryConfig);", -10);
+}
+
+//This is applied globally so all menus can open upward when space is limited.
+//Since menus appear in many places in Tiki, we can’t handle them individually, so we load it once on page load to make it available site-wide.
+//templates/menu/clone.tpl
+//templates/menu/preview.tpl
+//templates/menu/quicklinks.tpl
+//templates/tiki-view_sheets_menu.tpl
+$headerlib->add_jsfile(JS_ASSETS_PATH . '/jquery-tiki/tiki-menu.js');
 $headerlib->add_jsfile('lib/tiki-js.js'); //This depends on tiki-jquery.js in at least one place, so must load after - benoitg - 2023-11-21
-
-if (isset($_REQUEST['geo_zoomlevel_to_found_location'])) {
-    $zoomToFoundLocation = $_REQUEST['geo_zoomlevel_to_found_location'];
-} else {
-    $zoomToFoundLocation = isset($prefs['geo_zoomlevel_to_found_location']) ? $prefs['geo_zoomlevel_to_found_location'] : 'street';
-}
-$headerlib->add_js('var zoomToFoundLocation = "' . addslashes($zoomToFoundLocation) . '";');    // Set the zoom option after searching for a location
-
-if ($prefs['geo_enabled'] === 'y') {
-    $headerlib->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/tiki-maps-ol3.js");
-}
 
 if ($prefs['feature_jquery_zoom'] === 'y') {
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/jquery-zoom/jquery.zoom.js')
@@ -551,25 +632,21 @@ if ($prefs['feature_jquery_zoom'] === 'y') {
 }
 ');
 }
-
+// Load CodeMirror CSS early.
+// Adding it from Smarty/Ajax is too late and breaks the editor.
+// Therefore, we load these CSS files during setup (tiki-setup.php / early stage)
+// to ensure they are present in the <head> before any rendering occurs.
 if ($prefs['feature_syntax_highlighter'] == 'y') {
-    //add codemirror stuff
-    $headerlib
-        ->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
-        ->add_jsfile_dependency(CODEMIRROR_DIST_PATH . '/lib/codemirror.js')
-        ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/search/searchcursor.js')
-        ->add_jsfile(CODEMIRROR_DIST_PATH . '/addon/mode/overlay.js')
-    //add tiki stuff
-        ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css')
-        ->add_jsfile('lib/codemirror_tiki/codemirror_tiki.js');
-
-    require_once("lib/codemirror_tiki/tiki_codemirror.php");
-    createCodemirrorModes();
+    $headerlib->add_cssfile(CODEMIRROR_DIST_PATH . '/lib/codemirror.css')
+        ->add_cssfile('themes/base_files/feature_css/codemirror_tiki.css');
 }
-
 if ($prefs['feature_ajax'] === 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-confirm.js');
     $headerlib->add_jsfile('lib/ajax/autosave.js'); // Note that this file is needed even if ajax_autosave is off otherwise wysiwyg won't load.
+}
+
+if ($prefs['cookie_consent_feature'] == 'y') {
+    $headerlib->add_js_module('import "@jquery-tiki/tiki-cookie-handler";');
 }
 
 // $url_scheme is 'http' or 'https' depending on request type condsidering already a reverse proxy
@@ -605,23 +682,6 @@ if (typeof $.fn.button.noConflict === "function") {
     //      $headerlib->add_cssfile('vendor_bundled/vendor/jquery/jquery-ui-themes/themes/' . $prefs['feature_jquery_ui_theme'] . '/jquery-ui.css');
     //  }
     }
-
-    if ($prefs['feature_jquery_autocomplete'] == 'y') {
-        $headerlib->add_css(
-            '.ui-autocomplete-loading { background: white url("img/spinner.gif") right center no-repeat; }'
-        );
-    }
-    $headerlib->add_jsfile('vendor_bundled/vendor/jquery/jquery-timepicker-addon/dist/jquery-ui-timepicker-addon.js');
-    $headerlib->add_cssfile('vendor_bundled/vendor/jquery/jquery-timepicker-addon/dist/jquery-ui-timepicker-addon.css');
-}
-if ($prefs['jquery_select2'] == 'y') {
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . "/select2/dist/select2.min.js");
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/select2/dist/select2.min.css");
-    if (Language::isRTL()) {
-        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.rtl.min.css');
-    } else {
-        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/select2-bootstrap-5-theme/dist/select2-bootstrap-5-theme.min.css');
-    }
 }
 if ($prefs['jquery_fitvidjs'] == 'y') {
     $customSelectors = \Tiki\Lib\FitVidJs\FitVidJs::getCustomSelector();
@@ -629,25 +689,43 @@ if ($prefs['jquery_fitvidjs'] == 'y') {
         ->add_jq_onready("fitvids('article', $customSelectors);");
 }
 if ($prefs['jquery_smartmenus_enable'] == 'y') {
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/smartmenus/dist/css/smartmenus-only-layout.css');
-    $headerlib->add_js_module('import SmartMenus from "smartmenus";
-        const nav = document.querySelectorAll("nav");
-        let collapsible_behavior = jqueryTiki.smartmenus_collapsible_behavior == "default" ? false : true;
-        let noMouseoverBehavior = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseover";
-        let hideOnClick = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseout";
+    Sections::onSectionChange(function ($section) use ($headerlib) {
+        $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/smartmenus/dist/css/smartmenus-only-layout.css', 10);
+        $headerlib->add_js_module(
+            'import SmartMenus from "smartmenus";
+const nav = document.querySelectorAll("nav");
+let collapsible_behavior = jqueryTiki.smartmenus_collapsible_behavior == "default" ? false : true;
+let noMouseoverBehavior = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseover";
+let hideOnClick = jqueryTiki.smartmenus_open_close_click ? "click" : "mouseout";
 
-        for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
-            if (nav[indexCurrentNav].querySelector("div.collapse") !== null) {
-                nav[indexCurrentNav].classList.add("sm-navbar");
-                nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
-                const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
+for (let indexCurrentNav = 0; indexCurrentNav < nav.length; indexCurrentNav++) {
+    if (nav[indexCurrentNav].querySelector("div.collapse") !== null) {
+        nav[indexCurrentNav].classList.add("sm-navbar");
+        nav[indexCurrentNav].querySelector("div.collapse").classList.add("sm-collapse");
+        const navigation = new SmartMenus(nav[indexCurrentNav], {collapsibleBehaviorAccordion: collapsible_behavior, dropdownsShowTrigger: noMouseoverBehavior, dropdownsHideTrigger: hideOnClick, dropdownsHideTimeout: 250, dropdownsShowTimeout: 200});
+        
+        // Enable navigation on parent menu items with children
+        // SmartMenus uses .sm-sub-toggler class for parent items, which by default only toggle submenus
+        // This handler allows navigation when parent items have valid hrefs (not just "#" or empty)
+        // Note: Relies on SmartMenus internal class that may change in future versions
+        nav[indexCurrentNav].addEventListener("click", function(e) {
+            const link = e.target.closest("a.sm-sub-toggler");
+            if (link && nav[indexCurrentNav].contains(link)) {
+                const href = link.getAttribute("href");
+                if (0 && href && href !== "#" && href !== "") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.location.href = href;
+                }
             }
-        }
-    ');
+        });
+    }
 }
-if ($prefs['feature_jquery_reflection'] == 'y') {
-    $headerlib->add_jsfile('vendor_bundled/vendor/jquery-plugins/reflection-jquery/js/reflection.js');
+'
+        );
+    });
 }
+
 if ($prefs['feature_jquery_tablesorter'] == 'y') {
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/jquery.tablesorter.combined.js');
     $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/tablesorter/dist/js/parsers/parser-input-select.min.js');
@@ -663,22 +741,61 @@ if ($prefs['feature_jquery_tablesorter'] == 'y') {
 }
 
 if ($prefs['feature_jquery_tagcanvas'] == 'y') {
-    $headerlib->add_jsfile('vendor_bundled/vendor/jquery-plugins/tagcanvas/jquery.tagcanvas.js');
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/jquery-tagcanvas/jquery.tagcanvas.min.js');
 }
 
 if ($prefs['feature_shadowbox'] == 'y') {
-    $headerlib->add_jsfile(JS_ASSETS_PATH . '/vendor_dist/jquery-colorbox/jquery.colorbox-min.js');
-    $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/jquery-colorbox/' . $prefs['jquery_colorbox_theme'] . '/colorbox.css');
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/glightbox/dist/css/glightbox.min.css');
+    $headerlib->add_css('
+.gcounter {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+    font-size: 14px;
+    color: white;
+    z-index: 9999;
+}
+.gcontainer .ginner-container {
+    max-width: 90vw;
+    max-height: 90vh;
+}
+.gnext.disabled, 
+.gprev.disabled{
+    display: none !important;
+}
+');
+    $localPlyrCSS = NODE_PUBLIC_DIST_PATH . '/plyr/dist/plyr.css';
+    $localPlyrJS = NODE_PUBLIC_DIST_PATH . '/plyr/dist/plyr.min.js';
+    $headerlib->add_js_module(<<<JS
+    import initGlightbox from "@tiki-glightbox";
+    window.applyGlightbox = initGlightbox({
+         plyr: {
+            css: "$localPlyrCSS",
+            js: "$localPlyrJS"
+        }
+    });
+    JS);
 }
 
 if ($prefs['jquery_timeago'] === 'y') {
-    $headerlib->add_jsfile('vendor_bundled/vendor/rmm5t/jquery-timeago/jquery.timeago.js');
-    $language_short = substr($prefs['language'], 0, 2);
-    $timeago_locale = "vendor_bundled/vendor/rmm5t/jquery-timeago/locales/jquery.timeago.{$language_short}.js";
-    if (is_readable($timeago_locale)) {
-        $headerlib->add_jsfile($timeago_locale);    // TODO handle zh-CN and zh-TW
+    $language = Language::getCurrentLanguage();
+    $locale_file = '';
+
+    $full_locale_path = NODE_PUBLIC_DIST_PATH . "/timeago/dist/locales/jquery.timeago.{$language}.js";
+
+    $language_short = substr($language, 0, 2);
+    $short_locale_path = NODE_PUBLIC_DIST_PATH . "/timeago/dist/locales/jquery.timeago.{$language_short}.js";
+
+    $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . '/timeago/dist/jquery.timeago.js');
+
+    if (is_readable($full_locale_path)) {
+        $headerlib->add_jsfile($full_locale_path);
+    } elseif (is_readable($short_locale_path)) {
+        $headerlib->add_jsfile($short_locale_path);
     }
-    $headerlib->add_jq_onready('$("time.timeago").timeago(); jQuery.timeago.settings.allowFuture = true;');
+
+    $headerlib->add_jsfile(JS_ASSETS_PATH . "/jquery-tiki/timeago.js");
+    $headerlib->add_cssfile('themes/base_files/feature_css/timeago.css');
 }
 
 if ($prefs['jquery_jqdoublescroll'] == 'y') {
@@ -692,34 +809,30 @@ if ($prefs['feature_jquery_validation'] == 'y') {
     $headerlib->add_jsfile('lib/validators/validator_tiki.js');
 }
 
-if ($prefs['tiki_prefix_css'] == 'y') {
-    $headerlib->add_jsfile('vendor_bundled/vendor/npm-asset/prefixfree/prefixfree.js');
-}
-
-// note: jquery.async.js load a copy of jquery
-
-$headerlib->add_jsfile('vendor_bundled/vendor/jquery-plugins/async/jquery.async.js');
+// note: @jquery-tiki/asyncLoop automatically loads a copy of jQuery
+$headerlib->add_js_module('import "@jquery-tiki/asyncLoop";');
 
 $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/jquery.treetable.js');
-$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/jquery.treetable.css');
-
-if ($prefs['feature_equal_height_rows_js'] == 'y') {
-    $headerlib->add_jsfile("vendor_bundled/vendor/Sam152/Javascript-Equal-Height-Responsive-Rows/grids.min.js");
-}
+$headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/jquery-treetable/css/jquery.treetable.css');
 
 //This must always be loaded (early), as it's curently used by any Vue3 module using single-spa to make onDOMElementRemoved() available
 $headerlib->add_jsfile('lib/jquery_tiki/tiki-vue.js');
 
 if (empty($user) && $prefs['feature_antibot'] == 'y') {
     $headerlib->add_jsfile_late('lib/captcha/captchalib.js');
+    if (CaptchaTypeResolver::getConfiguredType($prefs) === 'altcha') {
+        $headerlib->add_js_module('import {Altcha} from "altcha";');
+    }
 }
 
 if (! empty($prefs['header_custom_css'])) {
-    $headerlib->add_css($prefs['header_custom_css']);
+    // Hopsfully temporary clean-up of inline syntax tags for Tiki 30.0
+    $headerlib->add_css($tikilib->removeInlineSyntaxTags($prefs['header_custom_css']));
 }
 
 if (! empty($prefs['header_custom_js'])) {
-    $headerlib->add_js($prefs['header_custom_js']);
+    // Hopefully temporary clean-up of inline syntax tags for Tiki 30.0
+    $headerlib->add_js($tikilib->removeInlineSyntaxTags($prefs['header_custom_js']));
 }
 
 if ($prefs['feature_file_galleries'] == 'y') {
@@ -762,13 +875,7 @@ if ($prefs['xmpp_conversejs_always_load'] === 'y') {
 if ($prefs['markdown_enabled'] === 'y' && $prefs['feature_wysiwyg'] === 'y') {
     $str = $prefs['tiki_minify_javascript'] === 'y' ? '.min' : '';
 
-    $headerlib
-        //->add_jsfile('vendor_bundled/vendor/npm-asset/toast-ui--editor/dist/toastui-editor.js', true)
-        //->add_cssfile('vendor_bundled/vendor/npm-asset/toast-ui--editor/dist/toastui-editor.css')
-        ->add_jsfile_external("https://uicdn.toast.com/editor/latest/toastui-editor-all$str.js", ($prefs['tiki_minify_javascript'] === 'y'))
-        ->add_jsfile('lib/toastui_tiki/tiki-toastui.js')
-        ->add_jsfile('lib/toastui_tiki/tiki-plugin.js')
-        ->add_cssfile("https://uicdn.toast.com/editor/latest/toastui-editor$str.css");
+    $headerlib ->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@toast-ui/editor/dist/toastui-editor.css");
 }
 
 if ($prefs['workspace_ui'] == 'y') {
@@ -808,27 +915,29 @@ if ($prefs['feature_tasks'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-tasks.js');
 }
 
-if ($prefs['feature_inline_comments'] === 'y' && $prefs['comments_inline_annotator'] === 'y') {
-    if (empty($object)) {
-        $object = current_object();
-    }
-    $commentController = new Services_Comment_Controller();
+Sections::onSectionChange(function ($section) {
+    global $headerlib, $prefs, $user;
+    if ($prefs['feature_inline_comments'] === 'y' && $prefs['comments_inline_annotator'] === 'y') {
+        if (empty($object)) {
+            $object = current_object();
+        }
+        $commentController = new Services_Comment_Controller();
 
-    if (
-        $object &&
-        $commentController->isEnabled($object['type'], $object['object']) &&
-        $commentController->canView($object['type'], $object['object'])
-    ) {
-        $canPost = $commentController->canPost($object['type'], $object['object']);
-        // spoof a URI from type and id
-        $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
+        if (
+            $object &&
+            $commentController->isEnabled($object['type'], $object['object']) &&
+            $commentController->canView($object['type'], $object['object'])
+        ) {
+            $canPost = $commentController->canPost($object['type'], $object['object']);
+            // spoof a URI from type and id
+            $objectIdentifier = urlencode($object['type']) . ':' . urlencode($object['object']);
 
-        $headerlib
-            ->add_js_module('import moment from "moment"; window.moment = moment;')
-            ->add_jsfile('vendor_bundled/vendor/openannotation/annotator/annotator-full.min.js')
-            ->add_cssfile('vendor_bundled/vendor/openannotation/annotator/annotator.min.css')
-            // language=JavaScript
-            ->add_jq_onready('
+            $headerlib
+                ->add_js_module('import moment from "moment"; window.moment = moment;')
+                ->add_jsfile('vendor_bundled/vendor/openannotation/annotator/annotator-full.min.js')
+                ->add_cssfile('vendor_bundled/vendor/openannotation/annotator/annotator.min.css')
+                // language=JavaScript
+                ->add_jq_onready('
 var annotatorContent = $("#top").annotator({readOnly: ' . ($canPost ? 'false' : 'true') . '});
 annotatorContent.annotator("addPlugin", "Store", {
     prefix: "tiki-ajax_services.php?controller=annotation&action=",
@@ -861,10 +970,10 @@ annotatorContent.annotator("addPlugin", "Permissions", {
         return annotation.permissions[action];
     }
 });');
-        // handling for extra info
-        if ($prefs['comments_inline_annotator_with_info'] === 'y') {
-            $headerlib->add_jq_onready(
-                '// a little glue to show the author name and date
+            // handling for extra info
+            if ($prefs['comments_inline_annotator_with_info'] === 'y') {
+                $headerlib->add_jq_onready(
+                    '// a little glue to show the author name and date
 $(".annotator-outer.annotator-viewer").on("load", function (event, annotations) {
     $(this).find(".annotator-user").text(annotations[0].realName + " - " + annotations[0].commentDate);
 });
@@ -875,10 +984,11 @@ $("#top").on("annotationCreated", function (e, annotation) {
         momentDate.format(jqueryTiki.shortTimeFormat);
     annotation.realName = jqueryTiki.userRealName || jqueryTiki.username;
 });'
-            );
+                );
+            }
         }
     }
-}
+});
 
 $headerlib->add_jsfile('lib/jquery_tiki/pluginedit.js');
 
@@ -917,6 +1027,11 @@ if ($tiki_p_admin == 'y') {
 
 if ($prefs['wikiplugin_addtocart'] == 'y') {
     $headerlib->add_jsfile('lib/payment/cartlib.js');
+}
+
+if (! Sections::getCurrentSection()) {
+    // if nothing else has set the section, set it to global as not all files do
+    Sections::setCurrentSection(Sections::SECTION_GLOBAL);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -967,8 +1082,6 @@ if ($prefs['openpgp_gpg_pgpmimemail'] == 'y') {
 //adding pdf creation javascript, used to integrate plugins like tablesorter, trackerfilter with mpdf.
 if ($prefs['print_pdf_from_url'] != 'none') {
     $headerlib->add_jsfile('lib/jquery_tiki/pdf.js');
-    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . "/html2canvas-pro/dist/html2canvas-pro.min.js", true);
-    $headerlib->add_jsfile('vendor_bundled/vendor/mrrio/jspdf/jspdf.min.js', true);
 }
 
 if (file_exists(TIKI_CUSTOMIZATIONS_SETUP_PHP_FILE)) {
@@ -998,49 +1111,60 @@ if ($prefs['feature_tiki_manager'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-manager.js');
 }
 
-$robots = $headerlib->getRobots();
-if (! empty($robots)) {
-    $smarty->assign('metatag_robots', $robots);
-}
-
 if ($prefs['feature_realtime'] == 'y') {
     $headerlib->add_jsfile('lib/jquery_tiki/tiki-websockets.js');
 }
 
 if ($prefs['feature_calendar'] === 'y') {
-    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/index.css");
-    $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar";');
-    $headerlib->add_js_module('import "@jquery-tiki/fullcalendar_to_pdf";');
+    $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . "/@event-calendar/core/dist/index.css");
+    $headerlib->add_js_module('import "@jquery-tiki/tiki-calendar"; window.moduleCalendar = [];');
+    $headerlib->add_js_module('import "@jquery-tiki/eventcalendar_to_pdf";');
 }
 
 // Using boomerang for performance monitoring
 if ($prefs['tiki_monitor_performance'] == 'y') {
-    $headerlib->add_jsfile_dependency('vendor_bundled/vendor/npm-asset/boomerangjs/boomerang.js');
-    $headerlib->add_jsfile_dependency('vendor_bundled/vendor/npm-asset/boomerangjs/plugins/rt.js');
+    $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/boomerangjs/boomerang.js");
+    $headerlib->add_jsfile_dependency(NODE_PUBLIC_DIST_PATH . "/boomerangjs/plugins/rt.js");
 }
 
 $headerlib->add_js_module('import Sortable from "sortablejs"; window.Sortable = Sortable;');
 
 // Shoelace color picker
+// Why are these in global setup, and unconditional?  color picking is not a frequent user operation - benoitg - 2026-03-09
 $headerlib->add_js_module("import '@shoelace/color-picker';");
 $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/@shoelace-style/shoelace/dist/themes/light.css');
-$headerlib->add_js_module("import { textareaColorpicker } from '@jquery-tiki/ui-utils'; textareaColorpicker();");
+$headerlib->add_js_module("import { textareaColorpicker } from '@tiki/ui-utils'; textareaColorpicker();");
 
 // element-plus-ui
 if ($prefs['feature_elementplus'] == 'y') {
     $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/base.css');
     $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-message.css');
     $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-message-box.css');
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/vendor_dist/element-plus/css/el-popper.css');
+    $headerlib->add_cssfile(JS_ASSETS_PATH . '/element-plus-ui/input-root-css.css');
+    $headerlib->add_js_module("import '@vue-widgets/el-file-input';");
+    $headerlib->add_js_module("import '@vue-widgets/el-input';");
+    $headerlib->add_js_module("import { showMessage } from '@vue-widgets/el-message'; window.showMessage = showMessage;");
     if ($prefs['elementplus_select'] == 'y') {
         $headerlib->add_js_module("import { applySelect } from '@vue-widgets/el-select'; applySelect();");
     }
     if ($prefs['elementplus_autocomplete'] == 'y') {
-        $headerlib->add_js_module("import { autocomplete } from '@jquery-tiki/ui-utils'; window.autocomplete = autocomplete;");
+        $headerlib->add_js_module("import { autocomplete } from '@tiki/ui-utils'; window.autocomplete = autocomplete;");
     }
+} else {
+    $headerlib->add_jq_onready("window.showMessage = function (message) { alert(message); };");
 }
 
 $headerlib->add_js_module('import "@jquery-tiki/constants";');
+$headerlib->add_js_module('import "@jquery-tiki/tiki-password";');
 
 $headerlib->add_cssfile(NODE_PUBLIC_DIST_PATH . '/summernote/dist/summernote-bs5.min.css');
+
+if ($prefs['fgal_use_record_rtc_screen'] == 'y') {
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/moment/min/moment.min.js', true);
+    $headerlib->add_jsfile(NODE_PUBLIC_DIST_PATH . '/recordrtc/RecordRTC.js', true);
+    $headerlib->add_jsfile('lib/jquery_tiki/recordrtc.js', true);
+    $headerlib->add_cssfile('themes/base_files/feature_css/recordrtc.css');
+}
 // use this to distinguish if tiki-setup has completed, e.g. in smarty lib when including tiki-modules and determining if a redirect must be served or not
 define('TIKI_SETUP_FINISHED', true);

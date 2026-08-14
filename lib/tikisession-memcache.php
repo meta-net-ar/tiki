@@ -10,7 +10,7 @@ class MemcacheSession implements SessionHandlerInterface
     private $lib;
 
     /**
-     * Set up the session cache, hijacking handlers from ADODB_Session
+     * Set up the session cache, hijacking handlers from Session
      * presumably already in place.
      */
     public function init()
@@ -50,10 +50,11 @@ class MemcacheSession implements SessionHandlerInterface
 
     public function read($key): string|false
     {
-        $cache_key = $this->buildCacheKey($key);
-
         if ($this->enabled) {
-            return $this->lib->get($cache_key) ?: '';
+            $cache_key = $this->buildCacheKey($key);
+            return $this->lib->get($cache_key) ?: false;
+        } else {
+            return false;
         }
     }
 

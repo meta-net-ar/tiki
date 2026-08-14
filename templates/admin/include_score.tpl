@@ -6,6 +6,8 @@
         {include file='admin/include_apply_top.tpl'}
     </div>
 
+    <div class="styling-element">
+
     <fieldset class="mb-3 w-100">
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_score visible="always"}
@@ -79,8 +81,8 @@
                                 <input type="text" size="10" name="events[{$event['event']}][{$key}][score]" value="{$score->score}">
                             </td>
                             <td class="text-end">
-                                {if $hide_advanced}<a class="advanced" href="#">{icon name='ellipsis-h'}</a>{/if}
-                                <a class="delete-row" href="#">{icon name='delete'}</a>
+                                {if $hide_advanced}<a class="advanced" href="#" role="button">{icon name='ellipsis-h'}</a>{/if}
+                                <a class="delete-row" href="#" role="button">{icon name='delete'}</a>
                             </td>
                         </tr>
                         <tr class="advanced-row {if $hide_advanced eq 1}hide{/if}">
@@ -119,9 +121,12 @@
                     {/foreach}
                 </select>
             </div>
-            <a id="addEventBtn" href="#" class="btn btn-primary">{tr}Add a Scoring Event{/tr}</a>
+            <div class="text-center">
+                <a id="addEventBtn" href="#" class="btn btn-primary" role="button">{tr}Add a Scoring Event{/tr}</a>
+            </div>
         </div>
     </fieldset>
+    </div>
 
     {include file='admin/include_apply_bottom.tpl'}
 </form>

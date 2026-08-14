@@ -11,9 +11,10 @@
 
 use Tiki\Package\VendorHelper;
 
-$section = 'trackers';
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_TRACKERS;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_trackers');
 
 if ($prefs['pwa_feature'] !== 'y') {
@@ -28,7 +29,7 @@ TikiLib::lib('header')->add_js_module('
     import "@vue-mf/root-config";
     import "@vue-mf/tiki-offline";
     import "@vue-widgets/el-date-picker";
-    import handleDatePicker from "@jquery-tiki/ui-utils";
+    import handleDatePicker from "@tiki/ui-utils";
 ');
 
 $smarty->assign('mid', 'tiki-offline.tpl');

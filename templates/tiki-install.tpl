@@ -268,7 +268,7 @@
                             {icon name="error"} {tr}Tiki was not able to detect the GD library.{/tr}
                             {/remarksbox}
                         {/if}
-                        <p>{tr}Tiki uses the GD library to process images for the Image Gallery and CAPTCHA support.{/tr}</p>
+                        <p>{tr}Tiki uses the GD library to process images for the File Gallery and CAPTCHA support.{/tr}</p>
                         <form action="tiki-install.php" method="post" >
                             <div class="mb-3 text-center">
                                 <input type="hidden" name="install_step" value="3">
@@ -305,7 +305,7 @@
                                     <input type="submit" class="btn btn-primary" value=" {tr}Use Existing Connection{/tr} ">
                                 </form>
                                 <hr>
-                                <a href="#" onclick="$('#installer_3_new_db_form').toggle();return false;" class="btn btn-warning">{tr}Modify database connection{/tr}</a>
+                                <a href="#" onclick="$('#installer_3_new_db_form').toggle();return false;" class="btn btn-warning" role="button">{tr}Modify database connection{/tr}</a>
                             </div>
                         {/if}
                         <div id="installer_3_new_db_form"{if $dbcon eq 'y'} style="display:none;"{/if}>
@@ -513,15 +513,38 @@
                                         </div>{* End of db-install *}
                                         {if $tikidb_created}
                                             <div class="col-sm-6">
-                                            <div class="db-upgrade card h-100">
-                                                <div class=" card-body">
-                                                    <h3 class="card-title mb-3">{tr}Upgrade{/tr}</h3>
-                                                    {remarksbox type="info" title="{tr}OK{/tr}" close="n"}{tr}Automatically upgrade your existing database to version{/tr}
-                                                        <strong>{$tiki_version_name}</strong>.
-                                                    {/remarksbox}
-                                                    <p class="text-center"><input type="submit" class="btn btn-primary" name="update" value="{tr}Upgrade{/tr}"></p>
-                                                </div>{* End of db-upgrade *}
-                                            </div>
+                                                <div class="db-upgrade card h-100">
+                                                    <div class=" card-body">
+                                                        <h3 class="card-title mb-3">{tr}Upgrade{/tr}</h3>
+                                                        {remarksbox type="info" title="{tr}OK{/tr}" close="n"}{tr}Automatically upgrade your existing database to version{/tr}
+                                                            <strong>{$tiki_version_name}</strong>.
+                                                        {/remarksbox}
+                                                        {if $unsupported_mail_queue_entries}
+                                                            {remarksbox type="danger" title="{tr}Unsupported Email Queue Entries{/tr}"}
+                                                                <p>{tr _0=$unsupported_mail_queue_entries}There are %0 queued messages that use an old unsupported mail format and cannot be processed by the current queue system. These entries will be removed during upgrade.{/tr}</p>
+                                                                <p>{tr}Please delete or send unsupported mails from the queue administration page before continuing.{/tr}</p>
+                                                            {/remarksbox}
+                                                            <div class="form-check my-3">
+                                                                <input class="form-check-input" type="checkbox" id="unsupported-mail-queue-ack" name="unsupported_mail_queue_ack" value="1">
+                                                                <label class="form-check-label" for="unsupported-mail-queue-ack">{tr}I understand that proceeding with the upgrade will permanently delete unsupported queued mail entries.{/tr}</label>
+                                                            </div>
+                                                        {/if}
+                                                        <p class="text-center"><input type="submit" class="btn {if $unsupported_mail_queue_entries}btn-danger{else}btn-primary{/if}" name="update" id="update-button" {if $unsupported_mail_queue_entries}disabled="disabled" value="{tr}Delete and Upgrade{/tr}" {else}value="{tr}Upgrade{/tr}"{/if}></p>
+                                                        {if $unsupported_mail_queue_entries}
+                                                            <script type="text/javascript">
+                                                            document.addEventListener('DOMContentLoaded', function() {
+                                                                var checkbox = document.getElementById('unsupported-mail-queue-ack');
+                                                                var button = document.getElementById('update-button');
+                                                                if (checkbox && button) {
+                                                                    checkbox.addEventListener('change', function() {
+                                                                        button.disabled = !checkbox.checked;
+                                                                    });
+                                                                }
+                                                            });
+                                                            </script>
+                                                        {/if}
+                                                    </div>{* End of db-upgrade *}
+                                                </div>
                                             </div>
                                             </div>
                                         {/if}
@@ -547,10 +570,15 @@
                     {elseif $install_step eq '5' or ($dbdone ne 'n')}
                     <div class="install-step5">
                         <h1>{if isset($smarty.post.update)}{tr}Review the Upgrade{/tr}{else}{tr}Review the Installation{/tr}{/if}</h1>
+                        {if $unsupported_mail_queue_cleaned}
+                            {remarksbox type=confirm title="{tr}Unsupported Email Queue Cleared{/tr}" close="n"}
+                                <p>{tr _0=$unsupported_mail_queue_cleaned}%0 unsupported queued email entries have been successfully removed during upgrade.{/tr}</p>
+                            {/remarksbox}
+                        {/if}
                         {remarksbox type=confirm title="{if isset($smarty.post.update)}{tr}Upgrade complete{/tr}{else}{tr}Installation complete{/tr}{/if}" close="n"}
                             <p>{tr}Your database has been configured and Tiki is ready to run!{/tr}
-                                {if isset($smarty.post.scratch)}
-                                    {tr}If this is your first install, your admin password is <strong>admin</strong>.{/tr}
+                                {if isset($smarty.post.scratch, $defaultpass)}
+                                    {tr _0="<strong>{$defaultpass}</strong>"}A temporary default password, %0, has been created for the admin account. Please replace it with a password of your choice.{/tr}
                                 {/if}
                                 {tr}You can now log in into Tiki as user <strong>admin</strong> and start configuring the application.{/tr}
                             </p>
@@ -581,7 +609,7 @@
                                     <a href="javascript:sql_failed()">{tr}Display details.{/tr}</a>
                             <div id="sql_failed_log" style="display:none">
                             <p><span class="text-warning">{tr}During an upgrade, it is normal to have SQL failures resulting with <strong>Table already exists</strong> messages.{/tr}</span></p>
-                            {assign var='patch' value=''}
+                            {$patch=''}
                             {foreach from=$installer->queries.failed item=item}
                             {if $patch ne $item[2]}
                             {if $patch ne ''}
@@ -591,7 +619,7 @@
                                 <input type="checkbox" name="validPatches[]" value="{$item[2]|escape}" id="ignore_{$item[2]|escape}">
                                 <label class="col-form-label" for="ignore_{$item[2]|escape}">{$item[2]|escape}</label>
                             </p>
-                            {assign var='patch' value=$item[2]}
+                            {$patch=$item[2]}
                             <textarea rows="6" cols="80">
                                     {/if}
                                 {$item[0]}
@@ -607,6 +635,9 @@
                     <div class="text-center">
                         <input type="hidden" name="install_step" value="6">
                         <input type="hidden" name="install_type" value="{$install_type}">
+                        {if isset($smarty.post.scratch)}
+                            {$default_password_field}
+                        {/if}
                         <input type="submit" class="btn btn-primary" value=" {tr}Continue{/tr} ">
                         {if $multi}<input type="hidden" name="multi" value="{$multi}">{/if}
                         {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
@@ -701,6 +732,16 @@
                                     <div style="padding:5px;clear:both">
                                         <div style="float:left"><input type="checkbox" id="feature_switch_ssl_mode" name="feature_switch_ssl_mode" {if $prefs.feature_switch_ssl_mode eq 'y'}checked="checked"{/if}></div>
                                         <div style="margin-left:20px;"><label for="feature_switch_ssl_mode">{tr}Users can switch between secured or standard mode at login.{/tr}</label></div>
+                                    </div>
+                                </div>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" id="smarty_enable_string_eval" name="smarty_enable_string_eval" value="y"
+                                    {if $prefs.smarty_enable_string_eval eq 'y'}checked="checked"{/if}>
+                                    <label class="form-check-label" for="smarty_enable_string_eval">
+                                     {tr}Enable inline Smarty string and evaluation execution.{/tr}
+                                    </label>
+                                    <div class="form-text text-danger">
+                                        <strong>{tr}Warning:{/tr}</strong> {tr}Allows execution of inline Smarty code in user modules. Only enable if you trust admin users.{/tr}
                                     </div>
                                 </div>
                             </fieldset>
@@ -807,6 +848,9 @@
                             {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
                             <input type="hidden" name="install_step" value="7">
                             <input type="hidden" name="install_type" value="{$install_type}">
+                            {if $install_type eq 'scratch'}
+                                {$default_password_field}
+                            {/if}
                             <input type="hidden" name="general_settings" value="y">
                             <input type="submit" class="btn btn-primary" value="{tr}Continue{/tr}">
                         </div>
@@ -854,6 +898,9 @@
                             {if $lang}<input type="hidden" name="lang" value="{$lang}">{/if}
                             <input type="hidden" name="install_step" value="8">
                             <input type="hidden" name="install_type" value="{$install_type}">
+                            {if $install_type eq 'scratch'}
+                                {$default_password_field}
+                            {/if}
                             <input type="submit" class="btn btn-primary" value="{tr}Continue{/tr}">
                         </div>
                     </form>
@@ -874,8 +921,8 @@
                     {/if}
 
                     <p>
-                        {if $install_type eq 'scratch'}
-                            {tr}If this is your first install, your admin password is <strong>admin</strong>.{/tr}
+                        {if $install_type eq 'scratch' && isset($defaultpass)}
+                            {tr _0="<strong>{$defaultpass}</strong>"}A temporary default password, %0, has been created for the admin account. Please replace it with a password of your choice.{/tr}
                         {/if}
                         {tr}You can now log in into Tiki as user <strong>admin</strong> and start configuring the application.{/tr}
                     </p>
@@ -891,6 +938,9 @@
                                         <input type="hidden" name="multi" value="{$multi|escape}">
                                     {/if}
                                     <input type="hidden" name="install_type" value="{$install_type}">
+                                    {if $install_type eq 'scratch'}
+                                        {$default_password_field}
+                                    {/if}
                                     <input type="hidden" name="install_step" value="9">
                                     <input type="submit" value="{tr}Enter Tiki and Lock Installer{/tr} ({tr}Recommended{/tr})" class="btn btn-primary">
                                 </form>
@@ -902,6 +952,9 @@
                                         <input type="hidden" name="multi" value="{$multi|escape}">
                                     {/if}
                                     <input type="hidden" name="install_type" value="{$install_type}">
+                                    {if $install_type eq 'scratch'}
+                                        {$default_password_field}
+                                    {/if}
                                     <input type="hidden" name="install_step" value="9">
                                     <input type="submit" value="{tr}Enter Tiki Without Locking Installer{/tr}" class="btn btn-warning">
                                     <br><em><span class="text-warning">{icon name="warning"}</span> {tr}Not recommended due to security risk{/tr}.</em>
@@ -981,7 +1034,7 @@
                                 <h3 class="box-title">{tr}MultiTiki Setup{/tr} <a title="{tr}Help{/tr}" href="https://doc.tiki.org/MultiTiki" target="help">{icon name='help'}</h3>
                                 <div class="clearfix box-data">
                                     {if !empty({$multi})}
-                                        <div><a href="#" onclick="$('#multi').trigger('submit');return false;">{tr}Default Installation{/tr}</a></div>
+                                        <div><a href="#" onclick="$('#multi').trigger('submit');return false;" role="button">{tr}Default Installation{/tr}</a></div>
                                         <form method="post" action="tiki-install.php" id="multi">
                                             <input type="hidden" name="install_step" value="0">
                                             <input type="hidden" name="multi" value="">
@@ -993,7 +1046,7 @@
                                             {if $k eq $multi}
                                                 <strong>{$k}</strong>
                                             {else}
-                                                <a href="#" onclick="$('#virt{$i@index}').trigger('submit');return false;" class="linkmodule">{$k}</a>
+                                                <a href="#" onclick="$('#virt{$i@index}').trigger('submit');return false;" class="linkmodule" role="button">{$k}</a>
                                                 <form method="post" action="tiki-install.php" id="virt{$i@index}">
                                                     <input type="hidden" name="multi" value="{$k}">
                                                     <input type="hidden" name="install_step" value="0">

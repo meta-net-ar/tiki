@@ -52,7 +52,7 @@ class Search_Formatter_Plugin_WikiTemplate implements Search_Formatter_Plugin_In
                 $arguments = $parser->parse($match->getArguments());
 
                 if (isset($arguments['name']) && ! isset($fields[$arguments['name']])) {
-                    $fields[$arguments['name']] = isset($arguments['default']) ? $arguments['default'] : null;
+                    $fields[$arguments['name']] = $arguments['default'] ?? null;
                 }
             }
         }
@@ -143,7 +143,7 @@ class Search_Formatter_Plugin_WikiTemplate implements Search_Formatter_Plugin_In
      * Process {calc} plugins
      *
      * @param \Search_Formatter_ValueFormatter $valueFormatter
-     * @param \WikiParser_PluginMatcher_Match $match
+     * @param \Tiki\WikiParser\PluginMatcherMatch $match
      *
      * @return mixed
      */

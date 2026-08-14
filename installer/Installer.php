@@ -15,7 +15,6 @@ use SplObjectStorage;
 use SplObserver;
 use TWVersion;
 use Exception;
-use TikiDb_Pdo_Result;
 
 /**
  * @see Patch
@@ -28,6 +27,8 @@ class Installer extends TikiDb_Bridge implements SplSubject
     public $scripts = [];
     public $executed = [];
 
+    private string $currentPatchName = '';
+
     public $queries = [
         'currentStmt' => '',
         'currentFile' => '',
@@ -35,10 +36,12 @@ class Installer extends TikiDb_Bridge implements SplSubject
         'total' => 0,
         'files' => [], //path of the files executed
         'successful' => [],
-        'failed' => []
+        'failed' => [],
+        'warnings' => []
     ];
 
     public $useInnoDB = true;
+    public $autoRegister = false;
 
     private function __construct()
     {
@@ -117,31 +120,11 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $this->assureDefaultCharSetIsAlignedWithTikiSchema();
         $this->assureInnoDdTableRowFormatIsDynamicOrBetter();
 
-        $TWV = new TWVersion();
-        $dbversion_tiki = $TWV->version;
-
-        // If a Mysql data file exists, use that. Very fast
-        //  If data file is missing or the batch loader is not available, use the single insert method
-        $secdb = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $dbversion_tiki . '_mysql.sql';
-        $secdbData = __DIR__ . '/../' . TIKI_BASE_SQL_SCHEMA_PATH . '/tiki-secdb_' . $dbversion_tiki . '_mysql.data';
-        if (file_exists($secdbData)) {
-            // A MySQL datafile exists
-            $truncateTable = true;
-            $rc = $this->runDataFile($secdbData, 'tiki_secdb', $truncateTable);
-            if ($rc == false) {
-                // The batch loader failed
-                if (file_exists($secdb)) {
-                    // Run single inserts
-                    $this->runFile($secdb, false);
-                }
-            }
-        } elseif (file_exists($secdb)) {
-            // Run single inserts
-            $this->runFile($secdb, false);
-        }
         foreach (Patch::getPatches([Patch::NOT_APPLIED]) as $patchName => $patch) {
             try {
                 $this->installPatch($patchName);
+            } catch (MySQLWarningException $e) {
+                throw $e;
             } catch (Exception $e) {
                 if ($e->getCode() != 2) {
                     throw $e;
@@ -165,6 +148,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
      */
     public function installPatch($patch, $force = false)
     {
+        $this->currentPatchName = (string) $patch;
         if (! $force && isset(Patch::$list[$patch]) && Patch::$list[$patch]->isApplied()) {
             throw new Exception('Patch already applied', 3);
         }
@@ -204,7 +188,8 @@ class Installer extends TikiDb_Bridge implements SplSubject
             } else {
                 try {
                     $status = $this->runFile($schema);
-                } catch (Exception $e) {
+                } catch (MySQLWarningException $e) {
+                    throw $e;
                 }
             }
 
@@ -219,10 +204,12 @@ class Installer extends TikiDb_Bridge implements SplSubject
                 throw new Exception('No such patch', 1);
             }
         } elseif (! $status) {
+            Patch::$list[$patch]->setStatus(Patch::FAILED);
             throw new Exception('Patch application failed', 2);
         } else {
             Patch::$list[$patch]->record();
         }
+        $this->currentPatchName = '';
     }
 
     /**
@@ -264,37 +251,6 @@ class Installer extends TikiDb_Bridge implements SplSubject
     }
 
     /**
-     * Batch insert from a mysql data file
-     *
-     * @param $file             MySQL export file
-     * @param $targetTable      Target table
-     * @param $clearTable=true  Flag saying if the target table should be truncated or not
-     * @return bool
-     */
-    public function runDataFile($file, $targetTable, $clearTable = true)
-    {
-        if (! is_file($file) || ! $command = file_get_contents($file)) {
-            print('Fatal: Cannot open ' . $file);
-            exit(1);
-        }
-
-        if ($clearTable == true) {
-            $statement = 'truncate table ' . $targetTable;
-            $this->query($statement);
-        }
-
-        // LOAD DATA INFILE doesn't like single \ directory separators. Replace with \\
-        $inFile = str_replace('\\', '\\\\', $file);
-
-        $status = true;
-        $statement = 'LOAD DATA INFILE "' . $inFile . '" INTO TABLE ' . $targetTable;
-        if ($this->query($statement) === false) {
-            $status = false;
-        }
-        return $status;
-    }
-
-    /**
      * @param $file
      * @return bool Did running the schema file succeed without error
      */
@@ -306,7 +262,7 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $statements = self::splitSqlStatements($command);
 
         $this->queries['currentFile'] = basename($file);
-        array_push($this->queries['files'], $file);
+        $this->queries['files'][] = $file;
         $this->queries['total'] += count($statements);
 
         $status = true;
@@ -321,9 +277,10 @@ class Installer extends TikiDb_Bridge implements SplSubject
                 if ($throwOnError) {
                     throw new Exception("Failed running query $statement from file $file");
                 }
+            } else {
+                $this->queries['executed'] += 1;
             }
 
-            $this->queries['executed'] += 1;
             $this->queries['currentStmt'] = $statement;
             $this->notify();
         }
@@ -342,19 +299,55 @@ class Installer extends TikiDb_Bridge implements SplSubject
      * @param bool $reporterrors
      * @param string $patch
      * @param bool $countQueries
-     * @return TikiDb_Pdo_Result or false if the query failed
+     * @return Tiki\TikiDb\PdoResult or false if the query failed
      */
     public function query($query = null, $values = null, $numrows = -1, $offset = -1, $reporterrors = true, $patch = '', $countQueries = true)
     {
         $error = '';
         $result = $this->queryError($query, $error, $values);
 
+        if (stripos(trim($query), 'SHOW WARNINGS') === 0) {
+            return $result;
+        }
+
+        $isCI = ! empty($_ENV['TIKI_CATCH_UPDATE_WARNINGS']) || getenv('TIKI_CATCH_UPDATE_WARNINGS');
+        $warnings = [];
+        $warnResult = self::get()->query('SHOW WARNINGS', reporterrors: \TikiDb::ERR_NONE);
+
+        if ($warnResult) {
+            while ($row = $warnResult->fetchRow()) {
+                if ($row['Level'] === 'Warning' || $row['Level'] === 'Error') {
+                    $code = (int) $row['Code'];
+                    // Historical patches are before 2026-04-17. Base schema (empty name) is also historical.
+                    $isHistorical = empty($this->currentPatchName) || substr($this->currentPatchName, 0, 8) < '20260417';
+
+                    if (($code === 1681 || $code === 124) && $isHistorical) {
+                        continue;
+                    }
+
+                    $warnings[] = $row['Level'] . ' ' . $row['Code'] . ': ' . $row['Message'];
+                }
+            }
+        }
+
         if ($result && empty($error)) {
+            if ($isCI && ! empty($warnings)) {
+                throw new MySQLWarningException("MySQL Warning(s) caught during upgrade in query:\n$query\nWarnings:\n" . implode("\n", $warnings));
+            }
+
+            if (! empty($warnings)) {
+                $this->queries['warnings'][] = ['query' => $query, 'warnings' => $warnings];
+            }
+
             if ($countQueries) {
                 $this->queries['successful'][] = $query;
             }
             return $result;
         } else {
+            if ($isCI && ! empty($warnings)) {
+                throw new MySQLWarningException("MySQL Error/Warning(s) caught during upgrade in query:\n$query\nDetails:\n" . implode("\n", $warnings));
+            }
+
             if ($countQueries) {
                 $this->queries['failed'][] = [$query, $error, substr(basename($patch), 0, -4)];
             }
@@ -453,11 +446,11 @@ class Installer extends TikiDb_Bridge implements SplSubject
         $patchesFilesNames = [];
         foreach ($patches as $key => $patch) {
             if (file_exists($patchDir . $key . ".sql")) {
-                array_push($patchesFilesNames, $key . ".sql");
+                $patchesFilesNames[] = $key . ".sql";
             } elseif (file_exists($patchDir . $key . ".yml")) {
-                array_push($patchesFilesNames, $key . ".yml");
+                $patchesFilesNames[] = $key . ".yml";
             } else {
-                array_push($patchesFilesNames, $key . ".php");
+                $patchesFilesNames[] = $key . ".php";
             }
         }
         return $patchesFilesNames;

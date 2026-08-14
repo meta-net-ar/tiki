@@ -9,6 +9,7 @@ include_once dirname(__DIR__) . '/entities/RefreshTokenEntity.php';
 use League\OAuth2\Server\Repositories\RefreshTokenRepositoryInterface;
 use League\OAuth2\Server\Entities\RefreshTokenEntityInterface;
 use League\OAuth2\Server\Exception\UniqueTokenIdentifierConstraintViolationException;
+use Tiki\Lib\Auth\ApiTokenException;
 
 class RefreshTokenRepository implements RefreshTokenRepositoryInterface
 {

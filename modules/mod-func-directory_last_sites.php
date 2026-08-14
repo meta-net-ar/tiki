@@ -52,7 +52,7 @@ function module_directory_last_sites($mod_reference, $module_params)
     global $prefs;
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
-    $module_params['desc'] = isset($module_params['desc']) ? $module_params['desc'] : 'n';
+    $module_params['desc'] = $module_params['desc'] ?? 'n';
     if (isset($module_params['categoryId'])) {
         global $dirlib;
         include_once('lib/directory/dirlib.php');
@@ -62,9 +62,9 @@ function module_directory_last_sites($mod_reference, $module_params)
     }
 
     $smarty->assign('modLastdirSites', $ranking["data"]);
-    $smarty->assign('absurl', isset($module_params["absurl"]) ? $module_params["absurl"] : 'n');
+    $smarty->assign('absurl', $module_params["absurl"] ?? 'n');
 
-    $smarty->assign('desc', isset($module_params['desc']) ? $module_params['desc'] : 'n');
+    $smarty->assign('desc', $module_params['desc'] ?? 'n');
 
     // only allow truncation if showing description
     if ($module_params['desc'] != 'n') {

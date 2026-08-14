@@ -16,7 +16,7 @@
                         <div class="row mb-4">
                             <div class="col-sm-8 offset-sm-4">
                               <input type="hidden" name="register" value="1">
-                              <button class="btn btn-primary registerSubmit submit" name="register" type="submit">{tr}Register{/tr} {*<i class="fa fa-check"></i>*}</button>
+                              <button class="btn btn-primary registerSubmit submit" id="registerSubmit" name="register" type="submit">{tr}Register{/tr} {*<i class="fa fa-check"></i>*}</button>
                             </div>
                         </div>
                     </form>
@@ -26,13 +26,46 @@
         <div class="col-sm-8 offset-sm-4">
             {remarksbox type="note" title="{tr}Note{/tr}"}
                 {if $prefs.feature_wiki_protect_email eq 'y'}
-                    {assign var=sender_email value=$prefs.sender_email|default:"this domain"|escape:'hexentity'}
+                    {$sender_email=$prefs.sender_email|default:"this domain"|escape:'hexentity'}
                 {else}
-                    {assign var=sender_email value=$prefs.sender_email|default:"this domain"|escape}
+                    {$sender_email=$prefs.sender_email|default:"this domain"|escape}
                 {/if}
                 {tr _0="$sender_email"}If you use an email filter, be sure to add %0 to your accepted list{/tr}
             {/remarksbox}
         </div>
+        {jq}
+            $('form[name="RegForm"]').on("submit", async function (event) {
+                event.preventDefault();
+                var $form = $(this);
+
+                if ($form.data('submitting') === true) {
+                    return;
+                }
+
+                function setSubmitting(state) {
+                    $form.data('submitting', state === true);
+                    $form.find('button[type="submit"], .registerSubmit').prop('disabled', state === true).toggleClass('disabled', state === true);
+                }
+
+                var isFormValid = true;
+                if (typeof $form.validate === 'function') {
+                    if (!$form.data('validator')) {
+                        $form.validate();
+                    }
+                    if (!$form.valid()) {
+                        isFormValid = false;
+                    }
+                }
+                
+                if (!isFormValid) {
+                    return;
+                }
+
+                setSubmitting(true);
+
+                this.submit();
+            });
+        {/jq}
     {/if}
 {else}
     {include file='modules/mod-login_box.tpl' nobox='y'}

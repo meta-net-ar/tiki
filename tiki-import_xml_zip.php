@@ -8,7 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'wiki page';
+
+use Tiki\Lib\Wiki\XmlLib;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -18,6 +20,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 
 $access->check_feature('feature_wiki');
 $access->check_permission('tiki_p_admin');
@@ -36,7 +41,6 @@ if (isset($_REQUEST['import'])) {
         $zipFile = '';
     }
     if ($zipFile) {
-        include_once('lib/wiki/xmllib.php');
         $xmllib = new XmlLib();
         $config = [];
         if ($xmllib->import_pages($zipFile, $config)) {
@@ -45,10 +49,9 @@ if (isset($_REQUEST['import'])) {
             $error = $xmllib->get_error();
         }
     }
-    if (isset($success)) {
+    if (! empty($success)) {
         Feedback::success(['mes' => $success]);
-    }
-    if (isset($error)) {
+    } elseif (! empty($error)) {
         Feedback::error(['mes' => $error]);
     }
 }

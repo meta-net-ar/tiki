@@ -5,3 +5,9 @@ $.IMPORT_LOADER_MARKUP = `
         </div>
     </div>
 `;
+
+$.BUTTON_LOADER_MARKUP = `
+    <div class="spinner-border spinner-border-sm" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+`;

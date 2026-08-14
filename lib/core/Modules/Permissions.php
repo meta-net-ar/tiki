@@ -286,13 +286,13 @@ class Permissions
 
         foreach ($objectPaths as $object => $paths) {
             foreach ($paths as $path) {
-                if (strpos($url, $path) !== false) {
+                if (str_contains($url, $path)) {
                     return $object;
                 }
             }
         }
 
-        if (strpos($url, 'tiki-ajax_services.php') !== false && $_REQUEST['controller'] == 'calendar') {
+        if (str_contains($url, 'tiki-ajax_services.php') && $_REQUEST['controller'] == 'calendar') {
             return 'calendar';
         }
 

@@ -6,12 +6,14 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_contact_list()
 {
+    $contactUsHelp = 'Contact-us';
+
     return  [
         'contact_anon' => [
             'name' => tra('Allow anonymous visitors to use the "Contact Us" feature.'),
             'description' => tra('Allow anonymous visitors to use the "Contact Us" feature.'),
             'type' => 'flag',
-            'help' => 'Contact-us',
+            'help' => $contactUsHelp,
             'dependencies' => [
                 'feature_contact',
             ],
@@ -22,7 +24,7 @@ function prefs_contact_list()
             'name' => tra('Display contact priority'),
             'description' => tra('Display contact priority option'),
             'type' => 'flag',
-            'help' => 'Contact-us',
+            'help' => $contactUsHelp,
             'dependencies' => [
                 'feature_contact',
             ],
@@ -33,6 +35,7 @@ function prefs_contact_list()
             'name' => tra('Contact user'),
             'description' => tra('User to contact'),
             'type' => 'text',
+            'help' => $contactUsHelp,
             'size' => 40,
             'dependencies' => [
                 'feature_contact',

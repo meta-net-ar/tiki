@@ -54,11 +54,11 @@
                             </div>
                         </div>
                         <div>
-                            {if $app.iot_bridge_access_token != null }
+                            {if $app.iot_bridge_access_token != null}
                                 <div>
                                     <div class="input-group">
                                         <input type="text" class="form-control" style="min-width: 150px;" value="{$app.iot_bridge_access_token}" id="existing-access-token-{$app.app_uuid}" readonly>
-                                        {if $app.iot_bridge_access_token_expire_at eq null }
+                                        {if $app.iot_bridge_access_token_expire_at eq null}
                                             <button type="button" class="btn btn-success">{tr}No expiration{/tr}</button>
                                         {else}
                                             <button type="button" class="btn btn-primary">{tr}Expires on{/tr} {$app.iot_bridge_access_token_expire_at}</button>
@@ -123,7 +123,7 @@
                                         <div class="mb-3">
                                             <div class="d-flex gap-5 flex-wrap">
                                                 <div>
-                                                    <select class="form-select mb-3 noselect2" name="widget-select">
+                                                    <select class="form-select mb-3" name="widget-select">
                                                         <option selected>{tr}Please select the widget{/tr}</option>
                                                         <option value="sensor-input">{tr}Sensor Input{/tr}</option>
                                                         <option value="led">{tr}Led (IO state){/tr}</option>
@@ -136,7 +136,7 @@
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <select class="form-select mb-3 noselect2" name="data-source-select">
+                                                    <select class="form-select mb-3" name="data-source-select">
                                                         <option selected>{tr}Please select the data source{/tr}</option>
                                                         {foreach from=$app.tracker_fields.data item=field}
                                                             <option value="{$field.permName}">{$field.name}</option>
@@ -148,7 +148,7 @@
                                                     </select>
                                                 </div>
                                                 <div>
-                                                    <select class="form-select mb-3 noselect2" name="widget-icon-select">
+                                                    <select class="form-select mb-3" name="widget-icon-select">
                                                         <option selected>{tr}Please specify the widget icon{/tr}</option>
                                                         {foreach from=$iconset item=data}
                                                             <option value='{icon name=$data.id}'>{$data.id}</option>

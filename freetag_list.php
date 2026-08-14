@@ -26,7 +26,7 @@ if ($prefs['feature_freetags'] == 'y' and $tiki_p_view_freetags == 'y') {
         $taglist = '';
         if (! empty($tags['data'])) {
             foreach ($tags['data'] as $tag) {
-                if (strstr($tag['tag'], ' ')) {
+                if (str_contains($tag['tag'], ' ')) {
                     $taglist .= '"' . $tag['tag'] . '" ';
                 } else {
                     $taglist .= $tag['tag'] . ' ';

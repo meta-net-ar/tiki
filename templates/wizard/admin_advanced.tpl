@@ -14,7 +14,11 @@
             {preference name=workspace_ui}
             <em>{tr}See also{/tr} <a href="https://doc.tiki.org/Workspaces UI" target="_blank">{tr}Workspaces UI in doc.tiki.org{/tr}</a></em>
         </fieldset>
-        <fieldset>
+        <fieldset class="mt-3">
+            <legend>{tr}Search Engines Optimization{/tr}</legend>
+            <div class="admin clearfix featurelist">
+                {preference name=seo_prevent_crawling}
+            </div>
             <legend>{tr}Dependencies{/tr}</legend>
             <div class="admin clearfix featurelist">
                 {preference name=feature_categories}

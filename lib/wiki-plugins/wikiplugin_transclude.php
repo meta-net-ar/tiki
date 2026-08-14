@@ -8,7 +8,7 @@ function wikiplugin_transclude_info()
 {
     return [
         'name' => tra('Transclude'),
-        'documentation' => tra('PluginTransclude'),
+        'documentation' => 'PluginTransclude',
         'description' => tra('Include the content of another page with certain changes'),
         'prefs' => ['wikiplugin_transclude', 'feature_wiki'],
         'extraparams' => true,
@@ -21,7 +21,6 @@ function wikiplugin_transclude_info()
                 'name' => tra('Page Name'),
                 'description' => tra('Name of the wiki page to use as a template for the values.'),
                 'since' => '6.0',
-                'default' => '',
                 'filter' => 'pagename',
                 'profile_reference' => 'wiki_page',
             ],
@@ -48,10 +47,6 @@ class WikiPlugin_Transclude_Replacer
 
 function wikiplugin_transclude($data, $params)
 {
-    if (! isset($params['page'])) {
-        return WikiParser_PluginOutput::argumentError([ 'page' ]);
-    }
-
     $page = $params['page'];
     unset($params['page']);
 
@@ -63,9 +58,9 @@ function wikiplugin_transclude($data, $params)
 
     if ($info = $tikilib->get_page_info($page)) {
         $parts = preg_split('/%%%text%%%/', $info['data']);
-        $data = TikiLib::lib('parser')->parse_data($data, ['objectType' => 'wiki page',
+        $pass = $parts[0] . $data . $parts[1];
+        TikiLib::lib('parser')->parse_data($data, ['objectType' => 'wiki page',
         'objectId' => $page, 'fieldName' => 'data']);
-                $pass = $parts[0] . $data . $parts[1];
         return preg_replace_callback(
             '/%%%([A-z0-9]+)%%%/',
             [ new WikiPlugin_Transclude_Replacer($params), 'callback' ],

@@ -17,9 +17,9 @@
 {if $module_params.more eq 'y'}
     <div class="more">
         {if isset($module_params.categoryId)}
-            {assign var='thisparent' value='?parent='|cat:$module_params.categoryId}
+            {$thisparent='?parent='|cat:$module_params.categoryId}
         {else}
-            {assign var='thisparent' value=''}
+            {$thisparent=''}
         {/if}
         {button class='more' href="tiki-directory_browse.php$thisparent" _text="{tr}More...{/tr}"}
     </div>

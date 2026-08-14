@@ -8,29 +8,34 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'cms';
 //get_strings tra('Articles Home');
 
 $inputConfiguration = [
     [
         'staticKeyFilters'      => [
             'remove'            => 'int',           //post
-            'sort_mode'         => 'word',          //get
-            'offset'            => 'digits',        //get
+            'sort_mode'         => 'alnumdash',     //get
+            'offset'            => 'int',           //get
             'date_min'          => 'digits',        //post
             'date_max'          => 'digits',        //post
-            'min_rating'        => 'string',        //post
-            'max_rating'        => 'string',        //post
-            'type'              => 'string',        //post
-            'topic'             => 'string',        //post
-            'topicName'         => 'string',        //post
+            'min_rating'        => 'digits',        //post
+            'max_rating'        => 'digits',        //post
+            'type'              => 'striptags',        //post
+            'topic'             => 'int',        //post
+            'topicName'         => 'striptags',        //post
             'categId'           => 'int',           //post
             'lang'              => 'lang',          //post
+            'find'              => 'striptags',     //get
+            'watch_action'      => 'alpha',     //get
         ]
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
+$categlib = TikiLib::lib('categ');
 
 if ($prefs['article_use_new_list_articles'] == 'y') {
     include "lists/articles.php";
@@ -66,15 +71,11 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 if (isset($_REQUEST['date_min']) || isset($_REQUEST['date_max'])) {
-    $date_min = isset($_REQUEST['date_min']) ? $_REQUEST['date_min'] : 0;
-    $date_max = isset($_REQUEST['date_max']) ? $_REQUEST['date_max'] : $tikilib->now;
+    $date_min = $_REQUEST['date_min'] ?? 0;
+    $date_max = $_REQUEST['date_max'] ?? $tikilib->now;
 } elseif (isset($_SESSION["thedate"])) {
     $date_min = 0;
     if ($_SESSION["thedate"] < $tikilib->now) {
@@ -92,31 +93,40 @@ if (isset($_REQUEST['date_min']) || isset($_REQUEST['date_max'])) {
 }
 //Keep track of month of last viewed article for article months_links module foldable display
 $_SESSION['cms_last_viewed_month'] = TikiLib::date_format("%Y-%m", $date_max);
-$min_rating = isset($_REQUEST['min_rating']) ? $_REQUEST['min_rating'] : '';
-$max_rating = isset($_REQUEST['max_rating']) ? $_REQUEST['max_rating'] : '';
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$min_rating = $_REQUEST['min_rating'] ?? '';
+$max_rating = $_REQUEST['max_rating'] ?? '';
+$find = $_REQUEST["find"] ?? '';
+
 $smarty->assign_by_ref('find', $find);
-if (isset($_REQUEST["type"])) {
+if (! empty($_REQUEST["type"])) {
     $type = $_REQUEST["type"];
+    if (empty($artlib->get_type($type))) {
+        Feedback::errorAndDie(tra("Invalid article type or it has been deleted."), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 } else {
     $type = '';
 }
-if (isset($_REQUEST["topic"])) {
+if (! empty($_REQUEST["topic"])) {
     $topic = $_REQUEST["topic"];
+    if (empty($artlib->get_topic($topic))) {
+         Feedback::errorAndDie(tra("Invalid article topic or it has been deleted."), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 } else {
     $topic = '';
 }
-if (isset($_REQUEST['topicName'])) {
+if (! empty($_REQUEST['topicName'])) {
     $topicName = $_REQUEST['topicName'];
+    if (empty($artlib->get_topic($topicName))) {
+        Feedback::errorAndDie(tra("Invalid article topic name or it has been deleted."), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 } else {
     $topicName = '';
 }
-if (isset($_REQUEST["categId"])) {
+if (! empty($_REQUEST["categId"])) {
     $categId = $_REQUEST["categId"];
+    if (empty($categlib->get_category($_REQUEST["categId"]))) {
+        Feedback::errorAndDie(tra("Invalid category or it has been deleted."), \Laminas\Http\Response::STATUS_CODE_400);
+    }
 } else {
     $categId = '';
 }
@@ -151,12 +161,12 @@ for ($i = 0; $i < $temp_max; $i++) {
     $comments_prefix_var = 'article:';
     $comments_object_var = $listpages["data"][$i]["articleId"];
     $comments_objectId = $comments_prefix_var . $comments_object_var;
-    $listpages["data"][$i]["comments_cant"] = TikiLib::lib('comments')->count_comments($comments_objectId);
+    $listpages["data"][$i]["comments_count"] = TikiLib::lib('comments')->count_comments($comments_objectId);
     if ($prefs['feature_freetags'] == 'y') { // And get the Tags for the posts
         $listpages["data"][$i]["freetags"] = $freetaglib->get_tags_on_object($listpages["data"][$i]["articleId"], "article");
     }
 }
-if (! empty($topicName) && ! strstr($topicName, '!') && ! strstr($topicName, '+')) {
+if (! empty($topicName) && ! str_contains($topicName, '!') && ! str_contains($topicName, '+')) {
     $smarty->assign_by_ref('topic', $topicName);
 } elseif (! empty($topic) && is_numeric($topic)) {
     if (! empty($listpages['data'][0]['topicName'])) {
@@ -168,13 +178,13 @@ if (! empty($topicName) && ! strstr($topicName, '!') && ! strstr($topicName, '+'
         }
     }
 }
-if (! empty($type) && ! strstr($type, '!') && ! strstr($type, '+')) {
+if (! empty($type) && ! str_contains($type, '!') && ! str_contains($type, '+')) {
     $smarty->assign_by_ref('type', $type);
 }
 $smarty->assign('maxArticles', $prefs['maxArticles']);
 // If there're more records then assign next_offset
 $smarty->assign_by_ref('listpages', $listpages["data"]);
-$smarty->assign_by_ref('cant', $listpages["cant"]);
+$smarty->assign_by_ref('count', $listpages["count"]);
 if ($prefs['feature_user_watches'] == 'y') {
     if ($user && isset($_REQUEST['watch_action'])) {
         $access->checkCsrf();

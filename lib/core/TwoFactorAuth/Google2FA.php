@@ -23,7 +23,7 @@ class Google2FA implements TwoFactorAuthInterface
 
     public function generateCode($user, $isEmail = true)
     {
-        // For Google2FA, code generation is typically done on the client-side
+        // For Google2FA/TOTP2FA, code generation is typically done on the client-side
         return true;
     }
 

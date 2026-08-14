@@ -275,7 +275,7 @@ EOT;
         if ($casperInstance === null) {
             $casperInstance = "casper";
         }
-        if (strpos($script, $casperInstance . '.run') !== false) {
+        if (str_contains($script, $casperInstance . '.run')) {
             return "";
         }
 

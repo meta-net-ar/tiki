@@ -57,7 +57,7 @@ class Services_User_Controller
 
         return [
             'result' => $result['data'],
-            'count' => $result['cant'],
+            'count' => $result['count'],
         ];
     }
 
@@ -90,7 +90,7 @@ class Services_User_Controller
         }
 
         if ($pass !== $passAgain) {
-            throw new Services_Exception(tr('Passwords do not match.'));
+            throw new Services_Exception(tr('Passwords do not match.'), 422);
         }
 
         $regResult = TikiLib::lib('registration')->register_new_user(
@@ -103,6 +103,11 @@ class Services_User_Controller
                 'email' => $email,
             ]
         );
+
+        if (is_array($regResult) && ! empty($regResult)) {
+            $messages = implode(', ', array_column($regResult, 'msg'));
+            throw new Services_Exception($messages, 422);
+        }
 
         if (TIKI_API && empty($regResult)) {
             $regResult = tra('User account created but pending confirmation.');
@@ -144,17 +149,10 @@ class Services_User_Controller
             'shared_groups' => '',
         ];
 
-        if (
-            $prefs['feature_community_mouseover'] == 'y' &&
-            $this->lib->get_user_preference($user, 'show_mouseover_user_info', 'y') == 'y' ||
-            $prefs['feature_friends'] == 'y'
-        ) {
+        if ($other_user) {
             $result['other_user'] = $other_user;
             if (
-                $this->lib->user_exists($other_user) &&
-                ($tikilib->get_user_preference($other_user, 'user_information', 'public') === 'public' ||
-                $user == $other_user ||
-                $prefs['feature_friends'] == 'y')
+                $this->lib->user_exists($other_user) || $prefs['feature_friends'] == 'y'
             ) {
                 $info = $this->lib->get_user_info($other_user);
 
@@ -589,7 +587,7 @@ class Services_User_Controller
                             'fields' => $extraFields
                         ],
                         'modal' => '1',
-                        'userGroups' => str_replace(['\'','&'], ['%39;','%26'], json_encode($userGroups)),
+                        'userGroups' => json_encode($userGroups),
                     ];
                 }
             } else {
@@ -602,7 +600,7 @@ class Services_User_Controller
                     Services_Utilities::modalException($userlib->getAutologinAdminActionError());
                 }
                 $pass = $input->offsetGet('confirmpassword');
-                $user = isset($_SESSION['u_info']['login']) ? $_SESSION['u_info']['login'] : '';
+                $user = $_SESSION['u_info']['login'] ?? '';
                 $ret = $userlib->validate_user($user, $pass);
                 if (! $ret[0]) {
                     Services_Utilities::modalException(tra('Invalid password'));
@@ -904,7 +902,7 @@ class Services_User_Controller
                 if (! $mail->send($this->lib->get_user_email($mail_user))) {
                     $errormsg = tra('Unable to send mail');
                     if (Perms::get()->admin) {
-                        $mailerrors = print_r($mail->errors, true);
+                        $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string, never prints)
                         $errormsg .= $mailerrors;
                     }
                     if (TIKI_API) {
@@ -959,6 +957,15 @@ class Services_User_Controller
             Feedback::error(tra('No user was selected.'));
             return Services_Utilities::closeModal();
         }
+        // ensures the user selected to send a message to exists.
+        if (! $userlib->user_exists($userwatch)) {
+            if (TIKI_API) {
+                throw new Services_Exception_NotFound('The selected user does not exist.');
+            }
+            Feedback::error(tra('The selected user does not exist.'));
+            return Services_Utilities::closeModal();
+        }
+
         //sets default priority for the message to 3 if no priority was given
         if (! empty($input->priority->text())) {
             $priority = $input->priority->text();
@@ -1102,16 +1109,34 @@ class Services_User_Controller
         TikiLib::lib('access')->check_user($user);
         $util = new Services_Utilities();
         if ($util->isConfirmPost()) {
+            if ($input->isAvatar->bool()) {
+                $avatarLibName = $input->avatarLibName->text();
+                $avatarName = $input->avatarName->text();
+                $avatarType = $input->avatarType->text();
+                TikiLib::lib('userprefs')->set_user_avatar($userwatch, $avatarType, $avatarLibName, $avatarName, null, null, null, false);
+                return true;
+            }
             if (empty($_FILES['userfile']['name'])) {
                 $errormsg = tra('You must select an avatar to upload.');
                 throw new Services_Exception($errormsg, 400);
             }
             $name = $_FILES['userfile']['name'];
+            $filegallib = TikiLib::lib('filegal');
+            try {
+                $filegallib->assertUploadedFileIsSafe($_FILES['userfile']['tmp_name'], $_FILES['userfile']['name']);
+            } catch (Exception $e) {
+                throw new Services_Exception($e->getMessage(), 403);
+            }
+
             /**
              * @var $avatarlib AvatarLib
              */
             $avatarlib = TikiLib::lib('avatar');
-            $avatarlib->set_avatar_from_url($_FILES['userfile']['tmp_name'], $userwatch, $name);
+            try {
+                $avatarlib->setAvatarFromFile($_FILES['userfile']['tmp_name'], $userwatch, $name);
+            } catch (Exception $e) {
+                throw new Services_Exception($e->getMessage(), 400);
+            }
             return true;
         } else {
             return [
@@ -1119,6 +1144,124 @@ class Services_User_Controller
                 "userwatch" => $userwatch,
             ];
         }
+    }
+
+    public function actionLocalTimezoneSync($input)
+    {
+        global $user, $tikilib;
+        $access = TikiLib::lib('access');
+        $clientTz = $input->client_timezone->text();
+        $userPreferenceTz = $tikilib->get_user_preference($user, 'display_timezone', '');
+        $action = $input->timezone_action->text();
+
+        if ($action === 'never') {
+            if ($tikilib->set_preference('user_localtimezonesync', 'n')) {
+                $tikilib->set_user_preference($user, 'localtimezonesync', 'n');
+            }
+            $access->redirect($_SERVER['HTTP_REFERER']);
+            return [];
+        }
+
+        if (! $this->isValidTimezone($clientTz)) {
+            Feedback::error(tr("Invalid detected timezone."));
+            $access->redirect($_SERVER['HTTP_REFERER']);
+            return [];
+        }
+
+        // Determine effective timezone deterministically
+        $effectiveTz = '';
+
+        // Temporary session timezone (highest priority)
+        if (! empty($_SESSION['temp_timezone']) && $this->isValidTimezone($_SESSION['temp_timezone'])) {
+            $effectiveTz = $_SESSION['temp_timezone'];
+        } elseif (! empty($userPreferenceTz) && $this->isValidTimezone($userPreferenceTz)) { // User preference
+            $effectiveTz = $userPreferenceTz;
+        } else { // Fallback to detected/system timezone
+            $effectiveTz = $clientTz;
+        }
+
+        if ($action === 'switch') {
+            $tikilib->set_user_preference($user, 'display_timezone', $clientTz);
+
+            unset($_SESSION['temp_timezone']);
+
+            $userPreferenceTz = $clientTz;
+            $effectiveTz = $clientTz;
+        } elseif ($action === 'temporary') {
+            $_SESSION["temp_timezone"] = $clientTz;
+            $effectiveTz = $clientTz;
+        }
+
+        // Determine if the client timezone and effective (user/system) timezone are different.
+        // If they differ by name, we check if they are functionally equivalent
+        // meaning their UTC offsets are the same throughout the year.
+        //
+        // This avoids showing misleading "timezone synchronization" notification when the
+        // timezones are actually the same in behavior but have different names (e.g. "America/Toronto" vs "EST").
+        //
+        // This logic improves UX by not bothering users with unnecessary alerts
+        // when the functional result is the same
+        $different = false;
+        // In detect mode, effective timezone always follows client
+        if (empty($userPreferenceTz)) {
+            $effectiveTz = $clientTz;
+        }
+        // $clientTz is already validated above
+        if (! empty($clientTz)) {
+            if ($clientTz !== $effectiveTz) {
+                $different = true;
+                try {
+                    $tzClient = new DateTimeZone($clientTz);
+                    $tzEffective = new DateTimeZone($effectiveTz);
+                    $year = date('Y');
+                    $functionallySame = true;
+
+                    for ($month = 1; $month <= 12; $month++) {
+                        $dateUTC = new DateTime("$year-$month-15 12:00:00", new DateTimeZone('UTC'));
+                        $offsetClient = $tzClient->getOffset($dateUTC);
+                        $offsetEffective = $tzEffective->getOffset($dateUTC);
+
+                        if ($offsetClient !== $offsetEffective) {
+                            $functionallySame = false;
+                            break;
+                        }
+                    }
+                    if ($functionallySame) {
+                        $different = false;
+                    }
+                } catch (Exception $e) {
+                    Feedback::error("TimezoneSync Error: " . $e->getMessage());
+                    $different = false;
+                }
+            }
+        }
+
+        $result = [
+            'different'      => $different,
+            'preferedTimezone' => $userPreferenceTz,
+            'clientTimezone'   => $clientTz,
+            'effectiveTimezone' => $effectiveTz,
+        ];
+
+        if ($action === 'switch' || $action === 'temporary') {
+            return $this->redirectAndReturn($result);
+        }
+
+        return $result;
+    }
+
+    private function isValidTimezone(string $timezone): bool
+    {
+        return in_array($timezone, DateTimeZone::listIdentifiers(), true);
+    }
+
+    private function redirectAndReturn($data = []): array
+    {
+        $referer = $_SERVER['HTTP_REFERER'] ?? '';
+        if ($referer !== '') {
+            TikiLib::lib('access')->redirect($referer);
+        }
+        return $data;
     }
 
     private function removeUsers(array $users, $page = false, $trackerIds = [], $files = false)
@@ -1249,15 +1392,45 @@ class Services_User_Controller
         }
     }
 
+    /**
+     * Admin user "perform with checked" action to lock selected users
+     *
+     * @param $input JitFilter
+     * @return array
+     * @throws Exception
+     * @throws Services_Exception
+     * @throws Services_Exception_Denied
+     */
+    public function actionLockUsers($input)
+    {
+        // Set the lock parameter and delegate to action_set_user_lock_status
+        $input['lock'] = 'lock';
+        return $this->action_set_user_lock_status($input);
+    }
+
+    /**
+     * Admin user "perform with checked" action to unlock selected users
+     *
+     * @param $input JitFilter
+     * @return array
+     * @throws Exception
+     * @throws Services_Exception
+     * @throws Services_Exception_Denied
+     */
+    public function actionUnlockUsers($input)
+    {
+        // Set the lock parameter and delegate to action_set_user_lock_status
+        $input['lock'] = 'unlock';
+        return $this->action_set_user_lock_status($input);
+    }
+
     private function updateUserLockStatus($users, $newLockStatus)
     {
         global $user;
         foreach ($users as $user_to_lock) {
             if ($user_to_lock != 'admin') {
                 $res = $this->lib->update_user_lock_status($user_to_lock, $newLockStatus);
-                if ($res === true) {
-                    Feedback::success(tr('User %0 lock status successfully updated', $user_to_lock));
-                } else {
+                if ($res !== true) {
                     Feedback::error(tr('An error occurred. User %0 lock status could not be updated', $user_to_lock));
                     Services_Utilities::closeModal();
                     return false;
@@ -1265,5 +1438,64 @@ class Services_User_Controller
             }
         }
         return true;
+    }
+
+    public function actionValidateUser($input)
+    {
+        $username = $input->username->text();
+        $password = $input->password->text();
+        $userlib = TikiLib::lib('user');
+        $ret = $userlib->validate_user($username, $password);
+        return $ret[0];
+    }
+
+    public function action_save_column_prefs($input)
+    {
+        global $user;
+        $columns = $input->prefs->value();
+        $tracker_name = $input->trackerName->value();
+        TikiLib::lib('tiki')->set_user_preference($user, 'trk_items_column_pref', $columns);
+        return tr('Your column preference for tracker "%0" is saved.', $tracker_name);
+    }
+
+    public function actionReset2FA($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
+
+        $user = $input->user->text();
+        if (empty($user)) {
+            throw new Services_Exception(tra('No user was specified'));
+        }
+
+        TikiLib::lib('user')->update_2_factor_secret($user, '');
+        return ['success' => true, 'message' => tra('2FA secret reset successfully')];
+    }
+
+    public function actionToggle2FA($input)
+    {
+        Services_Exception_Denied::checkGlobal('admin_users');
+
+        $user = $input->user->text();
+        if (empty($user)) {
+            throw new Services_Exception(tra('No user was specified'));
+        }
+
+        $tikilib = TikiLib::lib('tiki');
+
+        $usersDisabled2FA = $tikilib->get_preference('twoFactorAuthExcludedUsers', expectArray: true);
+        $usersEnabled2FA = $tikilib->get_preference('twoFactorAuthIncludedUsers', expectArray: true);
+
+        if ($input->enable->bool()) {
+            $usersEnabled2FA = array_unique(array_merge($usersEnabled2FA, [$user]));
+            $usersDisabled2FA = array_diff($usersDisabled2FA, [$user]);
+        } else {
+            $usersDisabled2FA = array_unique(array_merge($usersDisabled2FA, [$user]));
+            $usersEnabled2FA = array_diff($usersEnabled2FA, [$user]);
+        }
+
+        $tikilib->set_preference('twoFactorAuthExcludedUsers', $usersDisabled2FA);
+        $tikilib->set_preference('twoFactorAuthIncludedUsers', $usersEnabled2FA);
+
+        return ['success' => true];
     }
 }

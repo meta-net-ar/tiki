@@ -1,5 +1,5 @@
 {* templates/tiki-preview.tpl start *}
-<div class="wikipreview border-bottom border-4" {if $prefs.ajax_autosave eq "y"}style="display:none;" id="autosave_preview"><div{/if}>
+<div class="wikipreview border-bottom border-4 overflow-y-auto overflow-x-hidden" {if $prefs.ajax_autosave eq "y"}style="display:none;" id="autosave_preview"><div{/if}>
     {if $prefs.ajax_autosave eq "y"}
         <div class="mb-3 float-sm-end text-end">
             <div class="">
@@ -12,7 +12,7 @@
                 <select name="diff_style" id="preview_diff_style" class="form-select">
                     <option value="" {if empty($diff_style)}selected="selected"{/if}>{tr}Preview{/tr}</option>
                      {foreach  $diff_styles.options as $value => $label}
-                     {if $value eq 'htmldiff' or $value eq 'sidediff' }
+                     {if $value eq 'htmldiff' or $value eq 'sidediff'}
                      <option value="{$value}" {if $diff_style == $value} selected="selected"{/if}>{tr}{$label}{/tr}</option>
                      {/if}
                      {/foreach}
@@ -21,7 +21,7 @@
             {jq}
                 $("#preview_diff_style").on("change", function(){
                     ajaxLoadingShow($("#autosave_preview .wikitext"));
-                    setCookie("preview_diff_style", $(this).val(), "preview", "session");
+                    setCookie("preview_diff_style", $(this).val(), "preview", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
                     $.get($.service("edit", "preview"), {
                         editor_id: 'editwiki',
                         autoSaveId: autoSaveId,
@@ -50,7 +50,7 @@
                 }
             }
         }).on('resizeend', function (event) {
-            setCookie("wiki", $('#autosave_preview').height(), "preview", "session");
+            setCookie("wiki", $('#autosave_preview').height(), "preview", "session", window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
         });
     {/jq}
     <h2>{tr}Preview:{/tr} {$page|escape}</h2>

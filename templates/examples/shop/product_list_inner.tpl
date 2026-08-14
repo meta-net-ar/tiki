@@ -21,7 +21,7 @@
                 <meta itemprop="acceptedPaymentMethod" content="http://www.heppnetz.de/ontologies/goodrelations/v1#PayPal">
                 <meta itemprop="availability" content="InStock">
             {else}
-                <em>Awaiting stock</em>
+                <em>{tr}Awaiting stock{/tr}</em>
                 <meta itemprop="availability" content="OutOfStock">
             {/if}
         </li>

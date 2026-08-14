@@ -21,6 +21,7 @@ class Search_Indexer
     private $cacheGlobals = null;
     private $cacheTypes = [];
     private $cacheErrors = [];
+    private $errorTrackingEnabled = true;
     private $stats;
 
     private $contentFilters = [];
@@ -32,8 +33,8 @@ class Search_Indexer
 
     public function __construct(Search_Index_Interface $searchIndex, $logWriter = null)
     {
-        if (! $logWriter instanceof \Laminas\Log\Writer\AbstractWriter) {
-            $logWriter = new Laminas\Log\Writer\Noop();
+        if (! $logWriter instanceof Monolog\Handler\StreamHandler) {
+            $logWriter = new Monolog\Handler\NullHandler();
         } else {
             // writing logs
             set_error_handler(function ($errno, $errstr, $errfile = '', $errline = 0) {
@@ -76,9 +77,8 @@ class Search_Indexer
             }, E_ALL);
         }
 
-        $logWriter->setFormatter(new Laminas\Log\Formatter\Simple());
-        $this->log = new Laminas\Log\Logger();
-        $this->log->addWriter($logWriter);
+        $this->log = new Monolog\Logger('indexer');
+        $this->log->pushHandler($logWriter);
         $this->logWriter = $logWriter;
 
         if (method_exists($searchIndex, 'setIndexer')) {
@@ -119,6 +119,11 @@ class Search_Indexer
         $this->contentFilters[] = $filter;
     }
 
+    public function setErrorTrackingEnabled($errorTrackingEnabled)
+    {
+        $this->errorTrackingEnabled = $errorTrackingEnabled;
+    }
+
     /**
      * Rebuild the entire index.
      *
@@ -140,6 +145,8 @@ class Search_Indexer
         $this->stats['times'] = $contentTypes;
 
         $timer = new Timer();
+
+        Search_ContentSource_TrackerItemSource::cacheRelationFields();
 
         foreach ($this->contentSources as $objectType => $contentSource) {
             if ($progress) {
@@ -213,6 +220,16 @@ class Search_Indexer
         $this->searchIndex->endUpdate();
     }
 
+    public function removeDocument($objectType, $objectId)
+    {
+        $this->log("deleteObject $objectType $objectId");
+
+        $this->searchIndex->invalidateMultiple([[
+            'object_type' => $objectType,
+            'object_id' => $objectId,
+        ]]);
+    }
+
     private function addDocument($objectType, $objectId)
     {
         $this->log("addDocument $objectType $objectId");
@@ -231,20 +248,24 @@ class Search_Indexer
                     $e->getMessage()
                 );
                 Feedback::error($msg);
-                TikiLib::lib('errortracking')->captureException($e);
+                if ($this->errorTrackingEnabled) {
+                    TikiLib::lib('errortracking')->captureException($e);
+                }
             }
             foreach ($this->cacheErrors as $err) {
-                $this->log->err($err['error'] . ': ' . $err['errstr'], [
+                $this->log->error($err['error'] . ': ' . $err['errstr'], [
                     'code' => $err['errno'],
                     'file' => $err['errfile'],
                     'line' => $err['errline'],
                 ]);
-                $e = new ErrorException($err['errstr'], 0, $err['errno'], $err['errfile'], $err['errline']);
-                TikiLib::lib('errortracking')->captureException($e);
+                if ($this->errorTrackingEnabled) {
+                    $e = new ErrorException($err['errstr'], 0, $err['errno'], $err['errfile'], $err['errline']);
+                    TikiLib::lib('errortracking')->captureException($e);
+                }
             }
             $this->cacheErrors = [];
             // log file display feedback messages after each document line to make it easier to track
-            if (! $this->logWriter instanceof Laminas\Log\Writer\Noop) {
+            if (! $this->logWriter instanceof Monolog\Handler\NullHandler) {
                 Feedback::printToLog($this->log);
                 Feedback::clear();
             }
@@ -298,7 +319,7 @@ class Search_Indexer
             }
             if (! is_null($existing)) {
                 foreach ($output['object_types'][$objectType] as $key => $field) {
-                    if (! in_array(strtolower($field), $existing)) {
+                    if (! in_array(strtolower($field), $existing) && (! in_array('tracker_fields_json', $existing) || ! str_starts_with($field, 'tracker_field_'))) {
                         unset($output['object_types'][$objectType][$key]);
                     }
                 }
@@ -307,7 +328,7 @@ class Search_Indexer
         }
         if (! is_null($existing)) {
             foreach ($output['global'] as $key => $field) {
-                if (! in_array(strtolower($field), $existing)) {
+                if (! in_array(strtolower($field), $existing) && (! in_array('tracker_fields_json', $existing) || ! str_starts_with($field, 'tracker_field_'))) {
                     unset($output['global'][$key]);
                 }
             }
@@ -410,7 +431,6 @@ class Search_Indexer
             'object_id' => $typeFactory->identifier($objectId),
             'contents' => $typeFactory->plainmediumtext($this->getGlobalContent($data, $globalFields)),
         ];
-        //var_dump($globalFields);
         $data = array_merge(array_filter($data), $base);
         $data = $this->applyFilters($data);
 

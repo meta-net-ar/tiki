@@ -18,13 +18,11 @@ if ($prefs['feed_file_galleries'] != 'y') {
         require_once('tiki-rss_error.php');
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
-
 $filegallib = TikiLib::lib('filegal');
 
 $feed = "filegals";
 $uniqueid = $feed;
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output["data"] == "EMPTY") {
     $title = $prefs['feed_file_galleries_title'];

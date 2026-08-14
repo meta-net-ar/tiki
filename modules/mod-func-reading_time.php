@@ -81,8 +81,8 @@ function module_reading_time($mod_reference, &$module_params)
     global $prefs, $page;
     $smarty = TikiLib::lib('smarty');
     $tikilib = TikiLib::lib('tiki');
-    $module_params['minTimeThreshold'] = isset($module_params['minTimeThreshold']) ? $module_params['minTimeThreshold'] : 0;
-    $module_params['maxTimeThreshold'] = isset($module_params['maxTimeThreshold']) ? $module_params['maxTimeThreshold'] : 30;
+    $module_params['minTimeThreshold'] = $module_params['minTimeThreshold'] ?? 0;
+    $module_params['maxTimeThreshold'] = $module_params['maxTimeThreshold'] ?? 30;
 
     // Converting 0 to 'none' to avoid a null value to be retuned
     if ($module_params['minTimeThreshold'] == '0') {

@@ -8,22 +8,24 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-use Tiki\Package\VendorHelper;
 
-$section = 'docs';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
             'fileId'                      => 'int',           //post
             'galleryId'                   => 'int',           //post
             'name'                        => 'string',        //post
-            'data'                        => 'none',          //post
+            'data'                        => 'string',        //post
             'description'                 => 'xss',           //post
             'edit'                        => 'bool',          //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Package\VendorHelper;
+use Tiki\Sections;
+$section = Sections::SECTION_DOCS;
+Sections::setCurrentSection($section);
 $filegallib = TikiLib::lib('filegal');
 include_once('lib/mime/mimetypes.php');
 global $mimetypes;
@@ -60,8 +62,12 @@ include_once('tiki-section_options.php');
 
 $gal_info = $filegallib->get_file_gallery($_REQUEST['galleryId']);
 
-$fileType = reset(explode(';', $fileInfo['filetype']));
-$extension = end(explode('.', $fileInfo['filename']));
+$fileTypeParts = explode(';', $fileInfo['filetype']);
+$fileType = reset($fileTypeParts);
+
+$extensionParts = explode('.', $fileInfo['filename']);
+$extension = end($extensionParts);
+
 $supportedExtensions = ['odt', 'ods', 'odp'];
 $supportedTypes = array_map(
     function ($type) use ($mimetypes) {
@@ -92,7 +98,7 @@ $_REQUEST['name'] = htmlspecialchars(str_replace('.odt', '', $_REQUEST['name']))
 //Upload to file gallery
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_REQUEST['data'])) {
     $_REQUEST['galleryId'] = (int)$_REQUEST['galleryId'];
-    $_REQUEST['description'] = htmlspecialchars(isset($_REQUEST['description']) ? $_REQUEST['description'] : $_REQUEST['name']);
+    $_REQUEST['description'] = htmlspecialchars($_REQUEST['description'] ?? $_REQUEST['name']);
 
     //webodf has to send an encoded string so that all browsers can handle the post-back
     $_REQUEST['data'] = base64_decode($_REQUEST['data']);

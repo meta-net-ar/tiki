@@ -5,7 +5,7 @@
         {tr}You need to set <a class="alert-link" href="tiki-admin.php?page=general">Sender Email</a> before creating email notifications{/tr}.
     {/remarksbox}
 {/if}
-
+<div class="styling-element">
 <h2>{tr}Add notification{/tr}</h2>
 <form action="tiki-admin_notifications.php" method="post">
     {ticket}
@@ -43,8 +43,7 @@
                 $("#" + $("select[name='destination']").val() + "row").show();
                 $("input[name='" + $("select[name='destination']").val() + "']").trigger("focus");
                 $("input[name='" + $("select[name='destination']").val() + "']").removeAttr("disabled");
-            }
-            );
+            });
             {/jq}
         </div>
     </div>
@@ -57,7 +56,12 @@
             {autocomplete element='#flogin' type='username'}
         </div>
         <div class="col-sm-3">
-            <a href="#" onclick="document.getElementById('flogin').value='{$user}'; return false;" class="btn btn-link">{tr}Myself{/tr}</a>
+            <a href="#"
+                onclick="var inp = document.getElementById('flogin'); inp.value='{$user|escape:javascript}'; inp.dispatchEvent(new Event('change')); return false;"
+                class="btn btn-link"
+                role="button">
+                {tr}Myself{/tr}
+            </a>
         </div>
     </div>
     <div class="mb-3 row" id="emailrow" style="display:none">
@@ -72,7 +76,7 @@
         </div>
     </div>
     <div class="submit text-center">
-        <input type="submit" class="btn btn-primary" name="add" value="{tr}Add{/tr}"></td>
+        <input type="submit" class="btn btn-primary" name="add" value="{tr}Add{/tr}">
     </div>
 </form>
 <br>
@@ -158,7 +162,7 @@
     {/if}
 </form>
 
-{pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
 
 {if !empty($trackers)}
     <h2>{tr}Trackers Outbound Emails{/tr}</h2>
@@ -166,7 +170,11 @@
         <table class="table">
             {section name=ix loop=$trackers}
                 <tr>
-                    <td><a href="tiki-list_trackers.php?trackerId={$trackers[ix].trackerId}">{$trackers[ix].value|escape}</a></td>
+                    <td>
+                        <a href="{service controller=tracker action=replace trackerId=$trackers[ix].trackerId accordion_pos=6 modal=true}" 
+                        data-bs-toggle="modal" data-backdrop="static" data-bs-target="#bootstrap-modal" 
+                        onclick="$('[data-bs-toggle=popover]').popover('hide');">{$trackers[ix].value|escape}</a>
+                    </td>
                 </tr>
             {/section}
         </table>
@@ -185,3 +193,4 @@
         </table>
     </div>
 {/if}
+</div>

@@ -51,7 +51,7 @@ class IgnoreMethodDeclarationSniff extends AbstractScopeSniff
         }
 
         $methodName = $phpcsFile->getDeclarationName($stackPtr);
-        if ($methodName === null) {
+        if (empty($methodName)) {
             // Ignore closures.
             return;
         }

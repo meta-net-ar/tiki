@@ -18,7 +18,7 @@ use Tiki\TikiInit;
 
 /**
  * Routing method, receives the path portion of the URL relative to tiki root.
- * http://example.com/tiki/hello-world?foo-bar
+ * http://example.org/tiki/hello-world?foo-bar
  * $path is expectedto be hello-world
  */
 function tiki_route($path)
@@ -104,6 +104,13 @@ function tiki_route($path)
 
     tiki_route_attempt_prefix('faq', 'tiki-view_faq.php', 'faqId');
     tiki_route_attempt_prefix('file', 'tiki-list_file_gallery.php', 'galleryId');
+    tiki_route_attempt(
+        '|^filedetails(\d+)-(\d+)$|',
+        'tiki-list_file_gallery.php',
+        function ($parts) {
+            return ['galleryId' => $parts[1], 'fileId' => $parts[2], 'view' => 'page'];
+        }
+    );
     tiki_route_attempt_prefix('forum', 'tiki-view_forum.php', 'forumId');
     tiki_route_attempt('|^forumthread(\d+)(\-.*)?$|', 'tiki-view_forum_thread.php', tiki_route_single(1, 'comments_parentId'));
     tiki_route_attempt_prefix(
@@ -134,12 +141,29 @@ function tiki_route($path)
     tiki_route_attempt_prefix('newsletter', 'tiki-newsletters.php', 'nlId', ['info' => '1']);
     tiki_route_attempt_prefix('nl', 'tiki-newsletters.php', 'nlId', ['info' => '1']);
     tiki_route_attempt_prefix('poll', 'tiki-poll_form.php', 'pollId');
+    tiki_route_attempt_prefix('pollresults', 'tiki-poll_results.php', 'pollId');
     tiki_route_attempt_prefix('quiz', 'tiki-take_quiz.php', 'quizId');
     tiki_route_attempt_prefix('survey', 'tiki-take_survey.php', 'surveyId');
     tiki_route_attempt_prefix('tracker', 'tiki-view_tracker.php', 'trackerId');
     tiki_route_attempt_prefix('trackerfields', 'tiki-admin_tracker_fields.php', 'trackerId');
     tiki_route_attempt_prefix('sheet', 'tiki-view_sheets.php', 'sheetId');
     tiki_route_attempt_prefix('user', 'tiki-user_information.php', 'userId');
+    tiki_route_attempt(
+        '|^profile-(.+)$|',
+        'tiki-user_information.php',
+        function ($parts) {
+            return ['view_user' => urldecode($parts[1])];
+        }
+    );
+
+    tiki_route_attempt(
+        '|^assign-user-(.+)$|',
+        'tiki-assignuser.php',
+        function ($parts) {
+            return ['assign_user' => urldecode($parts[1])];
+        }
+    );
+    tiki_route_attempt_prefix('item', 'tiki-view_tracker_item.php', 'itemId');
     tiki_route_attempt('|^userinfo$|', 'tiki-view_tracker_item.php', function () {
         return ['view' => ' user'];
     });
@@ -173,9 +197,12 @@ function tiki_route($path)
     );
 
     tiki_route_attempt(
-        '|^tiki\-(\w+)\-(\w+)$|',
+        '|^tiki\-(\w*)\-(\w*)$|',
         'tiki-ajax_services.php',
         function ($parts) {
+            if (! $parts[1]) {
+                return [];
+            }
             if ($parts[2] == 'x') {
                 return [
                     'controller' => $parts[1],
@@ -266,7 +293,7 @@ function tiki_route_single($index, $name)
  */
 function tiki_route_attempt_custom_route_redirect()
 {
-    global $path, $inclusion, $prefs, $user_preferences, $tikiroot, $tikipath, $base, $full;
+    global $path, $inclusion, $prefs, $tikiroot, $tikipath, $base, $full;
 
     if ($inclusion || empty($path)) {
         return;
@@ -328,7 +355,7 @@ switch (PHP_SAPI) {
         // Fix $_SERVER['REQUEST_URI', which is ASCII encoded on IIS
         //  Convert the SERVER variable itself, to fix $_SERVER['REQUEST_URI'] access everywhere
         //  route.php comes first in the processing.  Avoid dependencies.
-        if (isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'IIS') !== false) {
+        if (isset($_SERVER['SERVER_SOFTWARE']) && str_contains($_SERVER['SERVER_SOFTWARE'], 'IIS')) {
             if (mb_detect_encoding($_SERVER['REQUEST_URI'], 'UTF-8', true) == false) {
                 $_SERVER['REQUEST_URI'] = mb_convert_encoding($_SERVER['REQUEST_URI'], 'UTF-8', 'ISO-8859-1');
             }
@@ -338,7 +365,7 @@ switch (PHP_SAPI) {
             $full = $_SERVER['SCRIPT_URL'];
         } elseif (isset($_SERVER['REQUEST_URI'])) {
             $full = $_SERVER['REQUEST_URI'];
-            if (strpos($full, '?') !== false) {
+            if (str_contains($full, '?')) {
                 $full = substr($full, 0, strpos($full, '?'));
             }
         } elseif (isset($_SERVER['REDIRECT_URL'])) {
@@ -372,7 +399,7 @@ if ($inclusion) {
     $_SERVER['SCRIPT_NAME'] = $base . basename($inclusion);
     include __DIR__ . '/' . $inclusion;
 } else {
-    error_log("No route found - full:$full query:{$_SERVER['QUERY_STRING']}");
+    error_log("No route found - full:$full query:{$_SERVER['QUERY_STRING']}"); // @phpstan-ignore disallowedFunctions.errorLog (unmatched route warning)
 
     // Route to the "no-route" URL, if found
     require_once('lib/init/initlib.php');

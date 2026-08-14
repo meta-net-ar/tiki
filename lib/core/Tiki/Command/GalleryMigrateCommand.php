@@ -10,6 +10,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use TikiLib;
+use Tiki\Installer\Installer;
 
 /**
  * Allows the migration of images from the Image Gallery (deprecated) to the File Gallery
@@ -20,7 +21,7 @@ class GalleryMigrateCommand extends Command
     {
         $this
             ->setName('gallery:migrate')
-            ->setDescription(tra('Migrate images from the Image Gallery to the File Gallery'));
+            ->setDescription(tra('Migrate images from the Image Gallery (deprecated) to the File Gallery'));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -30,11 +31,18 @@ class GalleryMigrateCommand extends Command
         $logslib = TikiLib::lib('logs');
 
         $fileGalLib = \TikiLib::lib('filegal');
+        $installer = Installer::getInstance();
+
+        if (! $installer->tableExists('tiki_images') && ! $installer->tableExists('zzz_unused_tiki_images')) {
+            $output->writeln('<info>' . tr('This Tiki installation uses File Gallery only.') . '</info>');
+            $output->writeln('<comment>' . tr('Note: The Image Gallery feature was removed in Tiki 24.') . '</comment>');
+            return Command::FAILURE;
+        }
 
         if ($fileGalLib->is_default_gallery_writable()) {
             $containerGalleryId = $fileGalLib->migrateFilesFromImageGalleries();
 
-            if ($containerGalleryId) {
+            if ($containerGalleryId > 0) {
                 $output->writeln('<info>' . tr('All image galleries and files migrated to file gallery #%0', $containerGalleryId) . '</info>');
                 $logslib->add_action(
                     'gallery migrate',
@@ -50,7 +58,7 @@ class GalleryMigrateCommand extends Command
                     );
                 }
             } else {
-                $output->writeln('<error>' . tr('Something went wrong so please check errors output here or php logs') . '</error>');
+                $output->writeln('<info>' . tr('No image files found to migrate.') . '</info>');
             }
         } else {
             $output->writeln('<error>' . tr('No files migrated, default file gallery path is not writable.') . '</error>');

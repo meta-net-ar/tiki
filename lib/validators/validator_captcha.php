@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function validator_captcha($input, $parameter = '', $message = '')
 {
-    global $prefs;
     $captchalib = TikiLib::lib('captcha');
     $_REQUEST['captcha'] = ['input' => $input, 'id' => $parameter];
     if (! $captchalib->validate()) {

@@ -8,16 +8,15 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
         'recreate'             => 'bool',         //post
-        'unassign'             => 'bool',         //post
-        'assign'               => 'bool',         //post
+        'unassign'             => 'int',          //post this is the moduleId to unassign
+        'assign'               => 'alpha',        //post
         'module'               => 'digits',       //post
-        'position'             => 'striptags',    //post
-        'order'                => 'striptags',    //post
+        'position'             => 'alpha',        //post
+        'order'                => 'int',          //post
         'up'                   => 'digits',       //post
         'down'                 => 'digits',       //post
         'left'                 => 'digits',       //post
@@ -26,7 +25,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $access->check_feature(['user_assigned_modules']);
 $access->check_user($user);
 $access->check_permission('tiki_p_configure_modules');

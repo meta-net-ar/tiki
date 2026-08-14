@@ -272,6 +272,20 @@
         </form>
     {/tab}
 
+    {tab name="{tr}Permission Preferences{/tr}"}
+        <form method="post" action="{$smarty.server.SCRIPT_NAME}?{query}">
+        <div>
+            <input type="hidden" name="referer" value="{$referer|escape}">
+
+            {preference name=permission_scope_behavior visible="always"}
+
+            <div class="input_submit_container" style="text-align: center">
+                <input type="submit" class="btn btn-primary btn-sm" name="preference_update" value="{tr}Save{/tr}">
+            </div>
+        </div>
+        </form>
+    {/tab}
+
     {* Quickperms *}
 
     {if $prefs.feature_quick_object_perms eq 'y'}
@@ -306,11 +320,11 @@
                         </td>
                         {foreach item=permgroup from=$quickperms}
                         <td>
-                            <input type="radio" name="perm_{$groups[grp].groupName|escape:url}" value="{$permgroup.name}" {if $groups[grp].groupSumm eq $permgroup.name}checked{/if}>
+                            <input type="radio" class="form-check-input" name="perm_{$groups[grp].groupName|escape:url}" value="{$permgroup.name}" {if $groups[grp].groupSumm eq $permgroup.name}checked{/if}>
                         </td>
                         {/foreach}
                         <td>
-                            <input type="radio" name="perm_{$groups[grp].groupName|escape:url}" value="userdefined" {if $groups[grp].groupSumm eq 'userdefined'}checked{/if} onclick="return false;">
+                            <input type="radio" class="form-check-input" name="perm_{$groups[grp].groupName|escape:url}" value="userdefined" {if $groups[grp].groupSumm eq 'userdefined'}checked{/if} onclick="return false;">
                         </td>
                     </tr>
                 {/if}

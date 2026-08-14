@@ -10,6 +10,11 @@
  *
  */
 
+use Tiki\Lib\Diff\DiffUtils;
+use Tiki\Lib\Diff\TextDiff;
+use Tiki\Lib\Diff\Op\Add;
+use Tiki\Lib\Diff\Op\Change;
+use Tiki\Lib\Diff\Op\Copy;
 use Tiki\WikiParser\Markdown\Converter\DefinitionListConverter;
 use Tiki\WikiParser\Markdown\Converter\StrikeConverter;
 
@@ -81,6 +86,27 @@ class EditLib
         }
 
         return true;
+    }
+
+    /**
+     * Assigns custom tip message to Smarty template variables for display in remarksbox alert
+     *
+     * @param string $customTip The tip content to display in the alert box
+     * @param string $customTipTitle Optional title for the alert box (defaults to 'Tip')
+     * @return void
+     */
+    public function assignCustomTipToSmarty(string $customTip, string $customTipTitle = ''): void
+    {
+        if (trim($customTip) !== '') {
+            $smarty = TikiLib::lib('smarty');
+            $smarty->assign('customTip', $customTip);
+
+            if (trim($customTipTitle) !== '') {
+                $smarty->assign('customTipTitle', $customTipTitle);
+            } else {
+                $smarty->assign('customTipTitle', tr('Tip'));
+            }
+        }
     }
 
     // translation functions
@@ -160,20 +186,10 @@ class EditLib
     private function setTranslationSourceAndTargetVersions()
     {
         global $_REQUEST, $tikilib;
-
-        if (isset($_REQUEST['oldver'])) {
-            $this->oldSourceVersion = $_REQUEST['oldver'];
-        } else {
-            // Note: -1 means a "virtual" empty version.
-            $this->oldsourceVersion = -1;
-        }
-
-        if (isset($_REQUEST['newver'])) {
-            $this->newSourceVersion = $_REQUEST['newver'];
-        } else {
-            // Note: version number of 0 means the most recent version.
-            $this->newSourceVersion = 0;
-        }
+        // Note: -1 means a "virtual" empty version.
+        $this->oldSourceVersion = $_REQUEST['oldver'] ?? -1;
+        // Note: version number of 0 means the most recent version.
+        $this->newSourceVersion = $_REQUEST['newver'] ?? 0;
     }
 
     public function aTranslationWasSavedAs($complete_or_partial)
@@ -924,6 +940,8 @@ class EditLib
         }
         $parserlib = TikiLib::lib('parser');
 
+        $styledTags = [];
+
         for ($i = 0; $i <= $c['contentpos']; $i++) {
             $node = $c[$i];
 
@@ -951,8 +969,47 @@ class EditLib
             } elseif ($node['type'] == 'comment') {
                 $src .= preg_replace('/<!--/', "\n~hc~", preg_replace('/-->/', "~/hc~\n", $node['data']));
             } elseif ($node['type'] == 'tag') {
+                $sameStyledTag = array_filter($styledTags, function ($tag) use ($node) {
+                    return $tag['name'] === $node['data']['name'];
+                });
+
                 if ($node['data']['type'] == 'open') {
                     // Open tag type
+                    $style = $node['pars']['style']['value'] ?? '';
+                    $styleAttrs = array_filter(explode(';', $style), function ($attr) {
+                        return ! empty(trim($attr));
+                    });
+                    // When Tiki syntax can't handle the current style attributes
+                    if (count($styleAttrs)) {
+                        $cssAttrs = array_map(function ($attr) {
+                            return trim(explode(':', $attr)[0]);
+                        }, $styleAttrs);
+                        $tikiStyleAttrs = [
+                            'text-align', 'font-weight', 'font-style', 'text-decoration',
+                            'color', 'background-color', 'background'
+                        ];
+
+                        $givenCssAttrsHandled = array_intersect($tikiStyleAttrs, $cssAttrs);
+                        $cssAttrsNotHandled = array_diff($cssAttrs, $tikiStyleAttrs);
+                        if (count($givenCssAttrsHandled) === count($cssAttrs) && count($cssAttrsNotHandled) === 0) {
+                            $style = '';
+                        }
+                    }
+                    if ($style && ! in_array($node['data']['name'], ['img', 'a'])) {
+                        $tagName = $node['data']['name'];
+                        $src .= '{DIV(type="' . $tagName . '" style="' . $style . '")}' . "\n";
+                        if (empty($sameStyledTag)) {
+                            $styledTags[] = [
+                                'name' => $node['data']['name'],
+                                'sameInnerUnStyledCount' => 0,
+                            ];
+                        }
+                        continue;
+                    } else {
+                        if (count($sameStyledTag)) {
+                            $styledTags[0]['sameInnerUnStyledCount']++;
+                        }
+                    }
 
                     // deal with plugins - could be either span of div so process before the switch statement
                     if (isset($node['pars']['plugin']) && isset($node['pars']['syntax'])) { // handling for tiki plugins
@@ -967,7 +1024,7 @@ class EditLib
                                 if ($more_spans === 0) {
                                     break;
                                 }
-//                          } else if ($c[$j]['data']['name'] == 'br' && $more_spans === 1 && $other_elements === 0) {
+                            } elseif ($c[$j]['data']['name'] == 'br' && $more_spans === 1 && $other_elements === 0) {
                             } elseif ($c[$j]['data']['name'] == $elem_type && $c[$j]['data']['type'] == 'open') {
                                 $more_spans++;
                             } elseif ($c[$j]['data']['type'] == 'open' && $c[$j]['data']['name'] != 'br' && $c[$j]['data']['name'] != 'img' && $c[$j]['data']['name'] != 'input') {
@@ -1187,7 +1244,7 @@ class EditLib
                             // If src attribute present in <img> tag
                             if (isset($node['pars']['src']['value'])) {
                                 // Note what it produce (img) not {img}! Will fix this below...
-                                if (strstr($node['pars']['src']['value'], 'http:')) {
+                                if (str_contains($node['pars']['src']['value'], 'http:')) {
                                     $src .= '{img src="' . $node['pars']['src']['value'] . '"}';
                                 } else {
                                     $src .= '{img src="' . $head_url . $node['pars']['src']['value'] . '"}';
@@ -1207,27 +1264,16 @@ class EditLib
                                 // parse the link
                                 $this->parseLinkTag($node['pars'], $text, $src, $p);
                             }
-
-                            // deactivated by mauriz, will be replaced by the routine above
-                            // If href attribute present in <a> tag
-                            /*
-                            if (isset($c[$i]['pars']['href']['value'])) {
-                                if ( strstr( $c[$i]['pars']['href']['value'], 'http:' )) {
-                                    $src .= '['.$c[$i]['pars']['href']['value'].'|';
-                                } else {
-                                    $src .= '['.$head_url.$c[$i]['pars']['href']['value'].'|';
-                                }
-                                $p['stack'][] = array('tag' => 'a', 'string' => ']');
-                            }
-                            if ( isset($c[$i]['pars']['name']['value'])) {
-                                $src .= '{ANAME()}'.$c[$i]['pars']['name']['value'].'{ANAME}';
-                            }
-                            */
-
-
                             break;
                     }   // end switch on tag name
                 } else {
+                    if (count($sameStyledTag)) {
+                        if ($styledTags[0]['sameInnerUnStyledCount']) {
+                            $styledTags[0]['sameInnerUnStyledCount']--;
+                        } else {
+                            $src .= '{DIV}';
+                        }
+                    }
                     // This is close tag type. Is that smth we r waiting for?
                     switch ($node['data']['name']) {
                         case 'ul':
@@ -1282,20 +1328,20 @@ class EditLib
             }
             // Recursive call on tags with content...
             if (! empty($node['content'])) {
-                if (substr($src, -1) != ' ') {
+                if (! str_ends_with($src, ' ')) {
                     $src .= ' ';
                 }
                 $this->walk_and_parse($node['content'], $src, $p, $head_url);
             }
         }
-        if (substr($src, -2) == "\n\n") {   // seem to always get too many line ends
+        if (str_ends_with($src, "\n\n")) {   // seem to always get too many line ends
             $src = substr($src, 0, -2);
         }
     }
 
     public function startNewLine(&$str)
     {
-        if (strlen($str) && substr($str, -1) != "\n") {
+        if (strlen($str) && ! str_ends_with($str, "\n")) {
             $str .= "\n";
         }
     }
@@ -1311,9 +1357,9 @@ class EditLib
 
     public function parse_html(&$inHtml)
     {
-        include(__DIR__ . '/../htmlparser/htmlparser.inc');
+        require_once(__DIR__ . '/../../src/php/external_lib_sources/htmlparser/htmlparser.php');
         // Read compiled (serialized) grammar
-        $grammarfile = TIKI_PATH . '/lib/htmlparser/htmlgrammar.cmp';
+        $grammarfile = __DIR__ . '/../../src/php/external_lib_sources/htmlparser/htmlgrammar.cmp';
         if (! $fp = @fopen($grammarfile, 'r')) {
             Feedback::errorAndDie(tra("Can't parse HTML data - no grammar file"), \Laminas\Http\Response::STATUS_CODE_409);
         }
@@ -1322,6 +1368,12 @@ class EditLib
 
         // process a few html editor artifacts
         $inHtml = str_replace('<p></p>', '', $inHtml);  // empty p tags are invisible
+
+        // Fix nested quotes in HTML attributes to prevent parser confusion
+        // The legacy HTML parser has issues with nested quotes in attributes like:
+        // style="font-family: -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;""
+        // This preprocessing step converts HTML entities to characters and normalizes nested quotes
+        $inHtml = $this->fixNestedQuotesInAttributes($inHtml);
 
         // create parser object, insert html code and parse it
         $htmlparser = new HtmlParser($inHtml, $grammar, '', 0);
@@ -1444,16 +1496,15 @@ class EditLib
                 $oldData = explode("\n", $oldData);
                 $newData = explode("\n", $newData);
                 $sections = [];
-                require_once('lib/diff/difflib.php');
-                $textDiff = new Text_Diff($oldData, $newData, true);
+                $textDiff = new TextDiff($oldData, $newData, true);
                 if (! $textDiff->isEmpty()) {
                     foreach ($textDiff->edits as $edit) {
-                        if (is_a($edit, 'Text_Diff_Op_add')) { // new content
-                            $sections[] = findMentions($edit->final, 'new');
-                        } elseif (is_a($edit, 'Text_Diff_Op_change')) { // change or new content
-                            $sections[] = findMentionsOnChange($edit);
-                        } elseif (is_a($edit, 'Text_Diff_Op_copy')) { // no diffs on content
-                            $sections[] = findMentions($edit->final, 'old');
+                        if (is_a($edit, Add::class)) { // new content
+                            $sections[] = DiffUtils::findMentions($edit->final, 'new');
+                        } elseif (is_a($edit, Change::class)) { // change or new content
+                            $sections[] = DiffUtils::findMentionsOnChange($edit);
+                        } elseif (is_a($edit, Copy::class)) { // no diffs on content
+                            $sections[] = DiffUtils::findMentions($edit->final, 'old');
                         }
                     }
                 }
@@ -1956,5 +2007,149 @@ class EditLib
         }, $data);
 
         return [$data, $state];
+    }
+
+    /**
+     * Fix nested quotes in HTML attributes that can confuse the HTML parser
+     *
+     * @param string $html The HTML to fix
+     * @return string The fixed HTML
+     */
+    private function fixNestedQuotesInAttributes($html)
+    {
+        $html = $this->fixBrokenStyleAttributes(html_entity_decode($html, ENT_QUOTES, 'UTF-8'));
+
+        $wrappedHtml = '<div>' . $html . '</div>';
+
+        $dom = new DOMDocument();
+        $dom->preserveWhiteSpace = true;
+        $dom->formatOutput = false;
+
+        libxml_use_internal_errors(true);
+
+        if (! $dom->loadHTML('<?xml encoding="UTF-8">' . $wrappedHtml, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD)) {
+            libxml_clear_errors();
+            return false;
+        }
+
+        libxml_clear_errors();
+
+        $xpath = new DOMXPath($dom);
+        $elements = $xpath->query('//*[@style]');
+
+        foreach ($elements as $element) {
+            if ($element instanceof DOMElement) {
+                $style = $element->getAttribute('style');
+                $fixedStyle = $this->fixStyleAttribute($style);
+                $element->setAttribute('style', $fixedStyle);
+            }
+        }
+
+        $wrapper = $dom->getElementsByTagName('div')->item(0);
+        $innerHTML = '';
+
+        if ($wrapper) {
+            foreach ($wrapper->childNodes as $child) {
+                $innerHTML .= $dom->saveHTML($child);
+            }
+        }
+
+        return $innerHTML;
+    }
+
+    private function fixBrokenStyleAttributes($html)
+    {
+        // Find all style attributes that might be broken by nested quotes
+        $html = preg_replace_callback(
+            '/style\s*=\s*"([^"]*(?:\'[^\']*\'[^"]*)*(?:"[^"]*"[^"]*)*[^"]*)"(?:\s+[a-zA-Z-]+(?:\s*=\s*["\'][^"\']*["\'])?)*/',
+            function ($matches) {
+                $styleContent = $matches[1];
+
+                $fixedStyle = $this->fixStyleAttribute($styleContent);
+
+                return 'style="' . $fixedStyle . '"';
+            },
+            $html
+        );
+
+        // Handle broken attributes after style (legacy parser splits them incorrectly)
+        $html = preg_replace_callback(
+            '/style\s*=\s*"([^"]+)"\s+([a-zA-Z][a-zA-Z0-9-]*)\s+([a-zA-Z][a-zA-Z0-9-]*)\s+([a-zA-Z][a-zA-Z0-9-]*)/i',
+            function ($matches) {
+                $style = $matches[1];
+                $attr1 = $matches[2];
+                $attr2 = $matches[3];
+                $attr3 = $matches[4];
+
+                // These are likely broken parts of the font-family declaration
+                // Reconstruct the complete style attribute
+                if (str_contains($style, 'font-family:') && ! str_ends_with($style, ';')) {
+                    $style .= ', ' . $attr1;
+                    if ($attr2) {
+                        $style .= ', ' . $attr2;
+                    }
+                    if ($attr3) {
+                        $style .= ', ' . $attr3;
+                    }
+                    $style .= ';';
+
+                    // Fix quotes in the reconstructed style
+                    $style = $this->fixStyleAttribute($style);
+                }
+
+                return 'style="' . $style . '"';
+            },
+            $html
+        );
+
+        return $html;
+    }
+
+    private function fixStyleAttribute($style)
+    {
+        $style = html_entity_decode($style, ENT_QUOTES, 'UTF-8');
+
+        $style = preg_replace_callback(
+            '/font-family\s*:\s*([^;]+)/i',
+            function ($matches) {
+                $fontFamily = $matches[1];
+
+                $fontFamily = preg_replace('/"([^"]*)"/', "'$1'", $fontFamily);
+
+                // Handle any remaining quoted strings that might be malformed
+                $fontFamily = preg_replace('/([a-zA-Z0-9-]+)\s*,\s*([a-zA-Z0-9-]+)\s*,\s*([a-zA-Z0-9-]+)/', '$1, $2, $3', $fontFamily);
+
+                return 'font-family: ' . trim($fontFamily);
+            },
+            $style
+        );
+
+        // Fix other CSS properties that might have nested quotes
+        $style = preg_replace_callback(
+            '/(content|background-image|cursor|background)\s*:\s*([^;]+)/i',
+            function ($matches) {
+                $property = strtolower($matches[1]);
+                $value = $matches[2];
+
+                // For URL values, keep them quoted but use single quotes
+                if ($property === 'background-image' && str_contains($value, 'url(')) {
+                    $value = preg_replace('/url\s*\(\s*"([^"]*)"\s*\)/', "url('$1')", $value);
+                } else {
+                    // Replace inner double quotes with single quotes for other properties
+                    $value = preg_replace('/"([^"]*)"/', "'$1'", $value);
+                }
+                return $property . ': ' . trim($value);
+            },
+            $style
+        );
+
+        // Clean up any malformed CSS and ensure proper semicolon termination
+        $style = preg_replace('/\s*;\s*;+/', ';', $style); // Remove duplicate semicolons
+        $style = trim($style);
+        if (! empty($style) && substr($style, -1) !== ';') {
+            $style .= ';';
+        }
+
+        return $style;
     }
 }

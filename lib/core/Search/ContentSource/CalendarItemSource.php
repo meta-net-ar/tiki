@@ -73,6 +73,8 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
         }
         $alertEmails = array_unique(array_filter($alertEmails));
 
+        $calendarInfo = $lib->get_calendar($item['calendarId']);
+
         $data = [
             'title' => $typeFactory->sortable($item['name']),
             'language' => $typeFactory->identifier(empty($item['lang']) ? 'unknown' : $item['lang']),
@@ -84,6 +86,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             // Index just participant emails. The value can be a username and not an email if 'login_is_email' pref is enabled.
             'participant_emails' => $typeFactory->multivalue(array_column($item['participants'], 'email')),
             'alert_emails' => $typeFactory->multivalue($alertEmails),
+            'send_reminder' => $typeFactory->numeric($item['sendReminder']),
             'description' => $typeFactory->plaintext($item['description']),
             'date' => $typeFactory->timestamp($item['start'], $allday),
 
@@ -100,6 +103,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             'view_permission' => $typeFactory->identifier('tiki_p_view_events'),
             'parent_object_type' => $typeFactory->identifier('calendar'),
             'parent_object_id' => $typeFactory->identifier($item['calendarId']),
+            'parent_object_title' => $typeFactory->sortable($calendarInfo['name']),
 
             'trackeritems' => $typeFactory->multivalue($trackerItems),
 
@@ -120,6 +124,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             'participants',
             'participant_emails',
             'alert_emails',
+            'send_reminder',
             'description',
 
             'calendar_id',
@@ -151,6 +156,7 @@ class Search_ContentSource_CalendarItemSource implements Search_ContentSource_In
             'participants' => 'nested',
             'participant_emails' => 'multivalue',
             'alert_emails' => 'multivalue',
+            'send_reminder' => 'numeric',
             'description' => 'plaintext',
 
             'calendar_id' => 'identifier',

@@ -19,7 +19,7 @@ $data = [
     'POST' => $_POST,
 ];
 
-$filters = new \Expose\FilterCollection();
+$filters = new \Expose\FilterCollection(); // @phpstan-ignore class.notFound (depends on enygma/expose, installed through packages)
 $filters->load();
 
 if (! empty($prefs['ids_log_to_file'])) {

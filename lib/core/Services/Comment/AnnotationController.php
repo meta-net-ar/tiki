@@ -55,7 +55,7 @@ class Services_Comment_AnnotationController
 
         // annotatejs sends the params in the request payload by default, so we use option emulateJSON
         // but then need to decode the json string here
-        $params = new jitFilter(json_decode($input->json->none(), true));
+        $params = new JitFilter(json_decode($input->json->none(), true));
 
         $text = $params->text->wikicontent();
         $quote = $params->quote->text();
@@ -120,7 +120,7 @@ class Services_Comment_AnnotationController
     public function action_update($input)
     {
         $threadId = $input->threadId->int();
-        $params = new jitFilter(json_decode($input->json->none(), true));
+        $params = new JitFilter(json_decode($input->json->none(), true));
 
         $ranges = $params->asArray('ranges');
         $text = $params->text->wikicontent();
@@ -190,7 +190,7 @@ class Services_Comment_AnnotationController
         $identifier = urldecode($input->uri->url());
         $object = explode(':', $identifier);
 
-        $list = $this->commentController->action_list(new jitFilter([
+        $list = $this->commentController->action_list(new JitFilter([
             'type' => $object[0],
             'objectId' => $object[1],
         ]));
@@ -198,7 +198,7 @@ class Services_Comment_AnnotationController
         $comments = [];
 
         foreach ($list['comments'] as $comment) {
-            if (strpos($comment['data'], ';note:') === 0) {         // only the "inline" ones starting ;note: so far
+            if (str_starts_with($comment['data'], ';note:')) {         // only the "inline" ones starting ;note: so far
                 $data = explode("\n", $comment['data'], 2);
                 $quote = trim(substr($data[0], 6));
                 $text = trim($data[1]);

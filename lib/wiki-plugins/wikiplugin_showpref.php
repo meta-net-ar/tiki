@@ -21,6 +21,7 @@ function wikiplugin_showpref_info()
                 'description' => tra('Name of preference to be displayed.'),
                 'since' => '13.0',
                 'filter' => 'text',
+                'default' => '',
             ],
         ],
     ];
@@ -28,15 +29,15 @@ function wikiplugin_showpref_info()
 
 function wikiplugin_showpref($data, $params)
 {
-    global $prefs;
     $tikilib = TikiLib::lib('tiki');
     global $tikipath;
 
     $name = $params['pref'];
+
     $file = 'global';
     $lib_path = 'lib/prefs';
     $extension_path = '';
-    if (substr($name, 0, 3) == 'tp_') {
+    if (str_starts_with($name, 'tp_')) {
         $midpos = strpos($name, '_', 3);
         if ($midpos) {
             $paths = \Tiki\Package\ExtensionManager::getPaths();

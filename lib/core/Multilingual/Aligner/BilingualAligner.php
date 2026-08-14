@@ -54,18 +54,10 @@ class Multilingual_Aligner_BilingualAligner
             //         print "-- _generate_shortest_path_matrix: extending to next level.\n";
             $this->extend_shortest_path_matrix_by_one_level();
         }
-
-        /*
-             print "-- _generate_shortest_path_matrix: upon exit, \$this->cost_matrix=\n";var_dump($this->cost_matrix);print "\n";
-             foreach (array_keys($this->cost_matrix) as $origin) {
-             print "-- _generate_shortest_path_matrix: \$this->cost_matrix[$origin]=";var_dump($this->cost_matrix[$origin]);print"\n";
-             }
-        */
     }
 
     public function extend_shortest_path_matrix_by_one_level()
     {
-        //      print "-- _extend_shortest_path_matrix_by_one_level: \$this->nodes_at_current_level=\n";var_dump($this->nodes_at_current_level);print "\n";
         $this->nodes_at_next_level = [];
         foreach ($this->nodes_at_current_level as $a_node_to_extend) {
             $this->extend_shortest_path_matrix_from_this_node($a_node_to_extend);
@@ -111,7 +103,7 @@ class Multilingual_Aligner_BilingualAligner
         ) {
             //      print "-- _match_current_l1_and_l2_sentences: adding '$new_node' to list of nodes to expand at next iteration\n";
 
-            array_push($this->nodes_at_next_level, $new_node);
+            $this->nodes_at_next_level[] = $new_node;
 
             // For now, assume same cost for links between nodes.
             $this->cost_matrix[$node_to_extend][$new_node] = 'match_cost';
@@ -120,7 +112,6 @@ class Multilingual_Aligner_BilingualAligner
             $this->cost_matrix[$node_to_extend]['END'] = 'goto_end_cost';
         }
 
-        //      print "-- _match_current_l1_and_l2_sentences: upon exit, \$this->cost_matrix=\n";var_dump($this->cost_matrix);print "\n";
 
         return;
     }
@@ -144,7 +135,7 @@ class Multilingual_Aligner_BilingualAligner
             strcmp($node_to_extend, $new_node) != 0
                 && ! in_array($new_node, $this->nodes_at_next_level)
         ) {
-            array_push($this->nodes_at_next_level, $new_node);
+            $this->nodes_at_next_level[] = $new_node;
 
             // For now, assume same cost for links between nodes.
             $this->cost_matrix[$node_to_extend][$new_node] = 'match_cost';
@@ -181,7 +172,6 @@ class Multilingual_Aligner_BilingualAligner
     {
         //       print "-- _parse_node_ID: \$node_id='$node_id'\n";
         preg_match('/([\-\d]+)([msn])([\d]+)\|([\-\d]+)([msn])([\d]+)/', $node_id, $info);
-        //       print "-- _parse_node_ID: \$info=\n";var_dump($info);print "\n";;
         return [$info[1], $info[2], $info[3], $info[4], $info[5], $info[6]];
     }
 

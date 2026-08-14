@@ -70,7 +70,7 @@
             {/if}
         </label>
         <div class="col-sm-1">
-            <input type="radio" name="mode" value="user" {if $info.mode eq 'user'}checked="checked"{/if}>
+            <input type="radio" class="form-check-input" name="mode" value="user" {if $info.mode eq 'user'}checked="checked"{/if}>
         </div>
         <div class="col-sm-7">
             <input type="text" name="userreg" id="banning-userregex" value="{$info.user|escape}" onfocus="$('input[name=mode]').val(['user']);" class="form-control">
@@ -80,7 +80,7 @@
         <div class="mb-3 row">
             <label class="col-sm-4 col-form-label" for="banning-ipregex">{tr}Multiple IP regex matching{/tr}</label>
             <div class="col-sm-8 alert-warning">
-                <input type="radio" name="mode" value="mass_ban_ip" {if $info.mode eq 'mass_ban_ip'}checked="checked"{/if}>
+                <input type="radio" class="form-check-input" name="mode" value="mass_ban_ip" {if $info.mode eq 'mass_ban_ip'}checked="checked"{/if}>
                 <br>
                 <input type="checkbox" name="checkmultiip" checked="checked" onclick="CheckMultiIP();">
                 <label for="sectionswitch">{tr}Check / Uncheck All{/tr}</label><br>
@@ -97,24 +97,24 @@
         <div class="mb-3 row">
             <label class="col-sm-4 col-form-label" for="banning-ipregex">{tr}IP regex matching{/tr}</label>
             <div class="col-sm-1">
-                <input type="radio" name="mode" value="ip" {if $info.mode eq 'ip'}checked="checked"{/if}>
+                <input type="radio" class="form-check-input" name="mode" value="ip" {if $info.mode eq 'ip'}checked="checked"{/if}>
             </div>
             <div class="col-sm-5">
                 <div class="d-flex flex-row">
                     <div>
-                        <input type="text" name="ip1" id="banning-ipregex" value="{$info.ip1|escape}" onfocus="$('input[name=mode]').val(['ip']);" class="form-control">
+                        <input type="number" name="ip1" id="banning-ipregex" value="{$info.ip1|escape}" onfocus="$('input[name=mode]').val(['ip']);" class="form-control">
                     </div>
                     <div class="px-1">.</div>
                     <div>
-                        <input type="text" name="ip2" value="{$info.ip2|escape}" class="form-control">
+                        <input type="number" name="ip2" value="{$info.ip2|escape}" class="form-control">
                     </div>
                     <div class="px-1">.</div>
                     <div>
-                        <input type="text" name="ip3" value="{$info.ip3|escape}" class="form-control">
+                        <input type="number" name="ip3" value="{$info.ip3|escape}" class="form-control">
                     </div>
                     <div class="px-1">.</div>
                     <div>
-                        <input type="text" name="ip4" value="{$info.ip4|escape}" class="form-control">
+                        <input type="number" name="ip4" value="{$info.ip4|escape}" class="form-control">
                     </div>
                 </div>
             </div>
@@ -193,12 +193,12 @@
  </form>
 
 {if $items}
-    <h2>{tr}Find{/tr}</h2>
+    <h2>{tr}Search{/tr}</h2>
     <form method="post" action="tiki-admin_banning.php">
         {ticket}
         <input type="hidden" name="offset" value="{$offset|escape}">
         <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
-        <label for="banning-find">{tr}Find:{/tr}</label><input type="text" name="find" id="banning-find" value="{$find|escape}">
+        <label for="banning-find">{tr}Search:{/tr}</label><input type="text" name="find" id="banning-find" value="{$find|escape}">
     </form>
 {/if}
 <h2>{tr}Current rules{/tr}</h2>
@@ -271,4 +271,4 @@
     </div>
 </form>
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

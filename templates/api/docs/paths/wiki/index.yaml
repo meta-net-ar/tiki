@@ -58,7 +58,7 @@ get:
         - e.g: `filter[categId]=1&filter[lang]=en`
       schema:
         type: array
-    - name: onlyCant
+    - name: onlyCount
       in: query
       description: |
         Only return number of wiki pages without the actual pages. Possible values are:
@@ -85,14 +85,14 @@ post:
           $ref: schemas-WikiPageRequest.yaml
   responses:
     '200':
-      description: wiki page response
+      description: Created wiki page configuration view.
       content:
         application/json:
           schema:
             type: object
             properties:
               info:
-                type: object
+                $ref: schemas-WikiPageResponse.yaml
     '403':
       description: forbidden
       content:

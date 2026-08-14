@@ -10,6 +10,14 @@ namespace SmartyTiki\FunctionHandler;
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 
+/**
+ * Smarty {preference} special parameters
+ *
+ * @param string $syntax      Sets the language/mode for syntax highlighting.
+ *                            Supported modes include: "php", "javascript", "css", "html", etc.
+ *                            If $syntax is set and the feature_syntax_highlighter preference is enabled, then,
+ *                            codemirror is enabled automatically.
+ */
 class Preference extends Base
 {
     public function handle($params, Template $template)
@@ -25,7 +33,7 @@ class Preference extends Base
         if (isset($params['source'])) {
             $source = $params['source'];
         }
-        $get_pages = isset($params['get_pages']) && $params['get_pages'] != 'n' ? true : false;
+        $get_pages = isset($params['get_pages']) && $params['get_pages'] != 'n';
 
         if ($info = $prefslib->getPreference($params['name'], true, $source, $get_pages)) {
             if (isset($info['hide']) && $info['hide'] === true) {
@@ -47,6 +55,8 @@ class Preference extends Base
                 $info['params'] .= ' autocomplete="new-password" '; // by default preferences of type password should not be autocomplete
             }
 
+            $template_visible_always = isset($params['visible']) && $params['visible'] == 'always';
+
             if ($info['default'] !== $info['value']) {
                 $info['modified'] = true;
                 $params['visible'] = 'always';
@@ -56,6 +66,10 @@ class Preference extends Base
                 // Modified preferences are never hidden, so pretend it's modified when forcing display
                 $info['tags'][] = 'modified';
                 $info['tagstring'] .= ' modified';
+                if ($template_visible_always) {
+                    // Template-forced always-visible: immune to negative filters (experimental, deprecated, etc.)
+                    $info['tagstring'] .= ' always';
+                }
             }
 
             $pages_string = '';
@@ -85,6 +99,17 @@ class Preference extends Base
                 $info['tags'] = [];
             }
 
+            $info['parameters']['disabled'] = false;
+
+            if (! empty($info['mandatory_dependencies'])) {
+                foreach ($info['mandatory_dependencies'] as $dep) {
+                    if (empty($prefs[$dep])) {
+                        $info['parameters']['disabled'] = true;
+                        break;
+                    }
+                }
+            }
+
             $smarty->assign('p', $info);
 
             /* Allows having preference Lisa show only if its parent preference Homer is *un*checked (rather than checked), by setting mode=invert on Homer.
@@ -99,7 +124,7 @@ class Preference extends Base
             $smarty->assign('codemirror');
             $smarty->assign('syntax');
 
-            if (! empty($params['syntax'])) {
+            if (! empty($params['syntax']) && $prefs['feature_syntax_highlighter'] == 'y') {
                 $smarty->assign('codemirror', 'true');
                 $smarty->assign('syntax', $params['syntax']);
             }
@@ -118,7 +143,7 @@ class Preference extends Base
                 'tagstring' => 'modified basic all',
                 'separator' => null,
             ];
-            if (strpos($_SERVER["SCRIPT_NAME"], 'tiki-edit_perspective.php') !== false) {
+            if (str_contains($_SERVER["SCRIPT_NAME"], 'tiki-edit_perspective.php')) {
                 $info['hint'] = tra('Drag this out of the perspective and resave the perspective.');
             }
 

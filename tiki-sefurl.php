@@ -28,7 +28,12 @@ function filter_out_sefurl($tpl_output, $type = null, $title = '', $with_next = 
 {
     global $sefurl_regex_out, $prefs, $base_url, $in_installer;
 
-    if ($prefs['feature_sefurl'] != 'y' || ! empty($in_installer) || empty($tpl_output) || ( preg_match('#^http(|s)://#', $tpl_output) and strpos($tpl_output, $base_url) !== 0 )) {
+    if (
+        $prefs['feature_sefurl'] != 'y'
+        || ! empty($in_installer) || empty($tpl_output)
+        || ( preg_match('#^http(|s)://#', $tpl_output)
+            && ! str_starts_with($tpl_output, $base_url))
+    ) {
         return $tpl_output;
     }
     $cachelib = TikiLib::lib('cache');
@@ -98,7 +103,7 @@ function filter_out_sefurl($tpl_output, $type = null, $title = '', $with_next = 
         }
     }
     if ($type == 'tracker item' || $type == 'trackeritem') {
-        if (preg_match('/itemId=([0-9]+)/', $tpl_output, $matches)) {
+        if (preg_match('/item(?:Id=)?([0-9]+)/', $tpl_output, $matches)) {
             $trklib = TikiLib::lib('trk');
 
             if ($prefs['feature_sefurl_title_trackeritem'] == 'y') {
@@ -110,7 +115,7 @@ function filter_out_sefurl($tpl_output, $type = null, $title = '', $with_next = 
                     $pagealias = $trklib->get_trackeritem_pagealias($matches[1])
             ) {
                 $title = '';
-                $tpl_output = "./tiki-index.php?page=" . $pagealias;
+                $tpl_output = "./tiki-index.php?page={$pagealias}&itemId={$matches[1]}";
             }
         }
     }
@@ -172,7 +177,7 @@ function filter_out_sefurl($tpl_output, $type = null, $title = '', $with_next = 
         }
     }
 
-    if (strpos($tpl_output, '?') === false) {   // historically tiki has coped with malformed short urls with no ?
+    if (! str_contains($tpl_output, '?')) {   // historically tiki has coped with malformed short urls with no ?
         $amppos = strpos($tpl_output, '&');     // route.php requires that we no longer do that
         $eqpos = strpos($tpl_output, '=');
         if ($amppos !== false && ($eqpos === false || $eqpos > $amppos)) {
@@ -185,7 +190,7 @@ function filter_out_sefurl($tpl_output, $type = null, $title = '', $with_next = 
     }
 
     if ($with_next) {
-        if (strpos($tpl_output, '?') === false) {
+        if (! str_contains($tpl_output, '?')) {
             $tpl_output .= '?';
         } else {
             $tpl_output .= '&amp;';

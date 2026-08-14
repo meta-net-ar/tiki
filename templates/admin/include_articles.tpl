@@ -1,5 +1,5 @@
 {remarksbox type="tip" title="{tr}Tip{/tr}"}
-    {tr}Look under "<a href="tiki-admin_rssmodules.php" target="_blank" class="alert-link">External Feeds</a>" on the application menu if you are searching for the <a href="https://doc.tiki.org/Article+generator" target="_blank" class="alert-link">"Article Generator" on RSS feeds</a>{/tr}.
+    {tr}Look under "<a href="tiki-admin_rssmodules.php" target="_blank" class="alert-link">External Feeds</a>" on the application menu if you are searching for the <a href="https://doc.tiki.org/Article-generator" target="_blank" class="alert-link">"Article Generator" on RSS feeds</a>{/tr}.
 {/remarksbox}
 {if !empty($msgs)}
 {/if}
@@ -80,7 +80,7 @@
             </fieldset>
             <fieldset>
                 <legend class="h3">
-                    {tr}Sharing on social networks{/tr}{help url="Social+Networks#Using+ShareThis"}
+                    {tr}Sharing on social networks{/tr}{help url="Social-Networks#Using-ShareThis"}
                 </legend>
                 {preference name=feature_cms_sharethis}
                 <div class="adminoptionboxchild" id="feature_cms_sharethis_childcontainer">

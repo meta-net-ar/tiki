@@ -51,7 +51,7 @@ class Display extends Base
             if ($gr == 'Anonymous') {
                 $anon = true;
             }
-            if (substr($gr, 0, 1) == '-') {
+            if (str_starts_with($gr, '-')) {
                 $nogr = substr($gr, 1);
                 if ((in_array($nogr, $userGroups) && $nogr != 'Registered') or (in_array($nogr, $userGroups) && $nogr == 'Registered' && $anon == true)) {
                     // workaround to display to Anonymous only if Registered excluded (because Registered includes Anonymous always)

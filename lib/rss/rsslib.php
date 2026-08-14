@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Lib\core\RSS\CustomEntryField;
+use Tiki\Lib\core\RSS\Enums\TimeUnit;
 
 class RSSLib extends TikiDb_Bridge
 {
@@ -14,16 +15,59 @@ class RSSLib extends TikiDb_Bridge
     private bool $updateArticles = true;
     private static mixed $cachelib = null;
     private static string $cache_feed_key = 'rss_feed';
-    private static string $cache_meta_Key = 'rss_feed_meta';
+    private static string $cache_meta_key = 'rss_feed_meta';
+    /**
+     * Limit of the name field of the tiki_rss_modules table
+     */
+    public const MAX_EXTERNAL_FEED_NAME_LENGTH = 200;
+
+    /**
+     * The lowest unix timestamp for an empty cache, allowing it to be refreshed as soon as possible.
+     */
+    private const EMPTY_CACHE_UPDATED_AT = 1;
+
+    /**
+     * The default TTL for the feed in case the feed does not specify it.
+     */
+    private const DEFAULT_FEED_TTL = 0;
 
     public function __construct()
     {
-        self::$cachelib = $cachelib ?? TikiLib::lib('cache');
+        self::$cachelib = TikiLib::lib('cache');
         $this->items = $this->table('tiki_rss_items');
-        $this->feeds = $this->table('tiki_rss_feeds');
         $this->modules = $this->table('tiki_rss_modules');
     }
 
+    /**
+     * The life time of a cache, always computed in seconds when given in other units
+     * @param int $time
+     * @param string $unit
+     * @return int
+     */
+    private function cacheLifetime(int $time, TimeUnit $unit = TimeUnit::SECONDS): int
+    {
+        switch ($unit) {
+            case TimeUnit::MINUTES:
+                return $time * 60;
+            case TimeUnit::HOURS:
+                return $time * 3600;
+            case TimeUnit::DAYS:
+                return $time * 86400;
+            case TimeUnit::SECONDS:
+            default:
+                return $time;
+        }
+    }
+
+    private function reportRssCacheRefusal(string $reason): void
+    {
+        TikiLib::lib('errortracking')->captureException(
+            new \RuntimeException('RSS feed refused: cache miss within TTL'),
+            [
+                'rss.reason' => $reason,
+            ]
+        );
+    }
 
     // ------------------------------------
     // functions for rss feeds we syndicate
@@ -67,77 +111,52 @@ class RSSLib extends TikiDb_Bridge
         return $ver;
     }
 
-    /* check for cached rss feed data */
-    public function get_from_cache($uniqueid)
+
+    public function cacheGeneratedFeed($uniqueId, $data)
     {
-        global $tikilib, $user, $prefs;
-
-        $rss_version = $this->get_current_feed_format();
-
-        $output = [];
-        $output["content-type"] = "application/xml";
-        $output["encoding"] = "UTF-8";
-
-        $output["data"] = "EMPTY";
+        global $user, $tikilib;
 
         // caching rss data for anonymous users only
-        if (isset($user) && $user <> "") {
+        if (isset($user) && $user != "") {
+            return;
+        }
+
+        if (empty($data) || $data == "EMPTY") {
+            return;
+        }
+
+        self::$cachelib->cacheItem($uniqueId, serialize([
+            'data' => $data,
+            'lastUpdated' => $tikilib->now,
+        ]));
+    }
+
+    public function getGeneratedFeedFromCache($uniqueId)
+    {
+        global $tikilib, $prefs, $user;
+
+        $output = [
+            'content-type' => 'application/xml',
+            'encoding' => 'UTF-8',
+            'data' => 'EMPTY',
+        ];
+
+        // caching rss data for anonymous users only
+        if (isset($user) && $user != "") {
             return $output;
         }
 
-        $res = $this->feeds->fetchFullRow(['name' => $uniqueid, 'rssVer' => $rss_version]);
-        if (! $res) {
-            // nothing found, then insert empty row for this feed+rss_ver
-            $this->feeds->insert(
-                [
-                    'name' => $uniqueid,
-                    'rssVer' => $rss_version,
-                    'refresh' => (int) $prefs['feed_cache_time'],
-                    'lastUpdated' => 1,
-                    'cache' => '-',
-                ]
-            );
-        } else {
-            // entry found in db:
-            $output["data"] = $res["cache"];
-            // $refresh = $res["refresh"]; // global cache time currently
-            $refresh = $prefs['feed_cache_time']; // global cache time currently
-            $lastUpdated = $res["lastUpdated"];
-            // up to date? if not, then set trigger to reload data:
-            if ($tikilib->now - $lastUpdated >= $refresh) {
-                $output["data"] = "EMPTY";
+        $cacheData = self::$cachelib->getSerialized($uniqueId);
+        if ($cacheData) {
+            $refresh = $this->cacheLifetime($prefs['feed_cache_time'], TimeUnit::SECONDS);
+            if ($tikilib->now - $cacheData['lastUpdated'] < $refresh) {
+                $output['data'] = $cacheData['data'];
+            } else {
+                self::$cachelib->invalidate($uniqueId);
             }
         }
-        $output['content-type'] = 'application/xml';
+
         return $output;
-    }
-
-    /* put to cache */
-    public function put_to_cache($uniqueid, $rss_version, $output)
-    {
-        global $user, $tikilib;
-        // caching rss data for anonymous users only
-        if (isset($user) && $user <> "") {
-            return;
-        }
-        if ($output == "" || $output == "EMPTY") {
-            return;
-        }
-
-        $rss_version = $rss_version ?? $this->get_current_feed_format();
-
-        // update cache with new generated data if data not empty
-
-        $this->feeds->update(
-            [
-                'cache' => $output,
-                'lastUpdated' => $tikilib->now,
-            ],
-            [
-                'name' => $uniqueid,
-                'rssVer' => $rss_version,
-            ]
-        );
     }
 
     /**
@@ -163,9 +182,7 @@ class RSSLib extends TikiDb_Bridge
     public function generate_feed($section, $uniqueid, $feed_version, $changes, $itemurl, $urlparam, $id, $title, $titleId, $desc, $descId, $dateId, $authorId, $fromcache = false)
     {
         global $tiki_p_admin, $prefs;
-        $userlib = TikiLib::lib('user');
         $tikilib = TikiLib::lib('tiki');
-        $smarty = TikiLib::lib('smarty');
 
         // both title and description fields cannot be null
         if (empty($title) || empty($desc)) {
@@ -178,7 +195,6 @@ class RSSLib extends TikiDb_Bridge
             Feedback::errorAndDie($msg, \Laminas\Http\Response::STATUS_CODE_409);
         }
 
-        $feed_format = $this->get_current_feed_format();
         $feed_format_name = $this->get_current_feed_format_name();
 
         if ($prefs['feed_cache_time'] < 1) {
@@ -187,7 +203,7 @@ class RSSLib extends TikiDb_Bridge
 
         // only get cache data if rss cache is enabled
         if ($fromcache) {
-            $output = $this->get_from_cache($uniqueid, $feed_format);
+            $output = $this->getGeneratedFeedFromCache($uniqueid);
             if ($output['data'] != 'EMPTY') {
                 return $output;
             }
@@ -205,8 +221,6 @@ class RSSLib extends TikiDb_Bridge
         } else {
             $feedLink = htmlspecialchars($tikilib->httpPrefix() . $_SERVER["REQUEST_URI"]);
         }
-
-        $img = htmlspecialchars($URLPrefix . $prefs['feed_img']);
 
         $title = htmlspecialchars($title);
         $desc = htmlspecialchars($desc);
@@ -302,7 +316,12 @@ class RSSLib extends TikiDb_Bridge
         }
 
         $data = $feed->export($feed_format_name);
-        $this->put_to_cache($uniqueid, $feed_format, $data);
+
+        if ($feed_format_name == 'rss') {
+            $data = $this->addTTLToGeneratedFeed($data);
+        }
+
+        $this->cacheGeneratedFeed($uniqueid, $data);
 
         $output = [];
         $output["data"] = $data;
@@ -324,7 +343,7 @@ class RSSLib extends TikiDb_Bridge
 
         $author = [];
 
-        if ($userlib->user_exists($login) && $tikilib->get_user_preference($login, 'user_information', 'private') == 'public') {
+        if ($userlib->user_exists($login)) {
             // if realName is not set use $login
             $author['name'] = $tikilib->get_user_preference($login, 'realName', $login);
 
@@ -358,21 +377,20 @@ class RSSLib extends TikiDb_Bridge
 
         $ret = $this->modules->fetchAll($this->modules->all(), $conditions, $maxRecords, $offset, $this->modules->sortMode($sort_mode));
 
-        foreach ($ret as & $res) {
-            $res["minutes"] = $res["refresh"] / 60;
+        foreach ($ret as &$res) {
+            $res["minutes"] = $this->cacheLifetime($res["refresh"], TimeUnit::SECONDS) / 60;
         }
 
         return [
             'data' => $ret,
-            'cant' => $this->modules->fetchCount($conditions),
+            'count' => $this->modules->fetchCount($conditions),
         ];
     }
 
     /* replace rss feed in db */
-    public function replace_rss_module($rssId, $name, $description, $url, $refresh, $showTitle, $showPubDate, $noUpdate = false)
+    public function replace_rss_module($rssId, $name, $description, $url, $refreshMinutes, $showTitle, $showPubDate, $noUpdate = false)
     {
-        //if ($this->rss_module_name_exists($name)) return false; // TODO: Check the name
-        $refresh = 60 * $refresh;
+        $refresh = $this->cacheLifetime($refreshMinutes, TimeUnit::MINUTES);
 
         $data = [
             'name' => $name,
@@ -418,7 +436,7 @@ class RSSLib extends TikiDb_Bridge
      */
     public function refresh_rss_module($rssId)
     {
-        return $this->update_feeds([ $rssId ], true);
+        return $this->update_feeds([$rssId], true);
     }
 
     /**
@@ -439,7 +457,7 @@ class RSSLib extends TikiDb_Bridge
      * @param int $rssId     feed id
      * @param int $olderThan publication date more than than this number of seconds ago
      *
-     * @return TikiDb_Adodb_Result|TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function clear_rss_cache($rssId, $olderThan = 0)
     {
@@ -538,7 +556,7 @@ class RSSLib extends TikiDb_Bridge
     private function update_feed($url, $rssId = null, $actions = null): array
     {
         global $tikilib;
-        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => []];
+        $success = ['feed' => 0, 'articles' => 0, 'feedData' => [], 'siteMeta' => [], 'ttl' => self::DEFAULT_FEED_TTL, 'lastUpdated' => $tikilib->now];
         $filter = $this->createFilter();
         $feed = $this->fetchFeed($url);
         if (! $feed) {
@@ -557,6 +575,10 @@ class RSSLib extends TikiDb_Bridge
         $siteTitle = TikiFilter::get('striptags')->filter($feed->getTitle());
         $siteUrl = TikiFilter::get('url')->filter($feed->getLink());
         $siteLanguage = TikiFilter::get('striptags')->filter($feed->getLanguage());
+
+        $xml = $feed->saveXML();
+        $success['ttl'] = $this->extractTtlFromFeed($xml);
+
         if ($rssId) {
             $this->modules->update(
                 [
@@ -749,7 +771,7 @@ class RSSLib extends TikiDb_Bridge
                         // need to match 0
                         $configuration['rating'] = $settings['rating'];
                     }
-                    $current_priority = isset($settings['priority']) ? $settings['priority'] : 0;
+                    $current_priority = $settings['priority'] ?? 0;
                 }
             }
         }
@@ -758,7 +780,7 @@ class RSSLib extends TikiDb_Bridge
             $publication = $tikilib->now + $configuration['future_publish'] * 60;
         }
 
-        if (strpos($data['content'], trim($data['description'])) === 0 && strlen($data['description']) < 1024) {
+        if (str_starts_with($data['content'], trim($data['description'])) && strlen($data['description']) < 1024) {
             $data['content'] = substr($data['content'], strlen(trim($data['description'])));
         }
         $data['content'] = trim($data['content']) == '' ? $data['content'] : '~np~' . $data['content'] . '~/np~';
@@ -862,7 +884,7 @@ class RSSLib extends TikiDb_Bridge
      * @param $rssId
      * @param $configuration
      *
-     * @return TikiDb_Adodb_Result|TikiDb_Pdo_Result
+     * @return Tiki\TikiDb\PdoResult
      */
     public function set_article_generator($rssId, $configuration)
     {
@@ -1037,14 +1059,19 @@ class RSSLib extends TikiDb_Bridge
 
     private function fetchFeed(string $url)
     {
-        global $tikilib;
+        global $tikilib, $prefs;
         try {
-            $content = $tikilib->httprequest($url);
+            if (isset($prefs['use_rss_proxy']) && $prefs['use_rss_proxy'] == 'y') {
+                $content = $tikilib->httprequest($url, useRssProxy: true);
+            } else {
+                $content = $tikilib->httprequest($url);
+            }
+
             if ($content) {
                 return Laminas\Feed\Reader\Reader::importString($content);
             }
             throw new Laminas\Feed\Exception\RuntimeException('Unreadable feed.');
-        } catch (Laminas\Feed\Exception\ExceptionInterface $e) {
+        } catch (Laminas\Feed\Exception\ExceptionInterface) {
             return null;
         }
     }
@@ -1066,32 +1093,136 @@ class RSSLib extends TikiDb_Bridge
         return $data;
     }
 
+    private static function extractTtlFromFeed($xml): int
+    {
+        $DOM = new DOMDocument();
+        $DOM->loadXML($xml);
+        $xpath = new DOMXPath($DOM);
+
+        $ttlNodes = $xpath->query('//*[local-name()="channel"]/*[local-name()="ttl"]');
+        if ($ttlNodes->length > 0) {
+            return max(0, (int)$ttlNodes->item(0)->nodeValue);
+        }
+        return self::DEFAULT_FEED_TTL;
+    }
+
+    private function addTTLToGeneratedFeed($feedData): string
+    {
+        global $prefs;
+
+        if ((int) $prefs['feed_ttl'] <= self::DEFAULT_FEED_TTL) {
+            return $feedData;
+        }
+
+        $DOM = new DOMDocument();
+        $DOM->loadXML($feedData);
+        $xpath = new DOMXPath($DOM);
+
+        $channelNodes = $xpath->query('//*[local-name()="channel"]');
+        if ($channelNodes->length > 0) {
+            $ttlElement = $DOM->createElement('ttl', $prefs['feed_ttl']);
+            $firstItem = $xpath->query('./*[local-name()="item"]', $channelNodes->item(0))->item(0);
+            $channelNodes->item(0)->insertBefore($ttlElement, $firstItem);
+        }
+        return $DOM->saveXML();
+    }
+
     public function loadRss(array $params): array
     {
         global $tikilib;
 
-        $refresh_time = $tikilib->now - $params['refresh'] * 60;
-        $cache_feed_key = self::$cache_feed_key . md5($params['url']);
-        $cache_meta_key = self::$cache_meta_Key . md5($params['url']);
-        $cache_feed_items = self::$cachelib->getSerialized($cache_feed_key, '', $refresh_time);
-        $cache_meta = self::$cachelib->getSerialized($cache_meta_key, '', $refresh_time);
-
-        if ($cache_feed_items || $cache_meta) {
-            $items = $cache_feed_items;
-            $title = $cache_meta;
-        } else {
-            $result = $this->update_feed($params['url']);
-            $items = $result['feedData'];
-            $title = $result['siteMeta'];
-            self::$cachelib->cacheItem($cache_feed_key, serialize($items));
-            self::$cachelib->cacheItem($cache_meta_key, serialize($title));
+        $url = $params['url'] ?? '';
+        if (! $url) {
+            return ['params' => $params, 'items' => [], 'meta' => null];
         }
+
+        $cache_feed_key = self::$cache_feed_key . md5($url);
+        $cache_meta_key = self::$cache_meta_key . md5($url);
+
+        $cache_feed_result = self::$cachelib->getSerialized($cache_feed_key);
+
+        $result = null;
+        if ($cache_feed_result) {
+            $refresh_time = max($this->cacheLifetime((int)($cache_feed_result['ttl'] ?? self::DEFAULT_FEED_TTL), TimeUnit::MINUTES), $this->cacheLifetime((int)($params['refresh'] ?? 0), TimeUnit::MINUTES));
+            $cache_time = $cache_feed_result['lastUpdated'];
+            $maxTime = $cache_time + $refresh_time;
+            if ($maxTime <= $tikilib->now) {
+                self::$cachelib->invalidate($cache_feed_key);
+                $result = null;
+            } else {
+                $result = $cache_feed_result;
+            }
+        }
+
+        if (! $result) {
+            $last_download_meta = self::$cachelib->getSerialized($cache_meta_key);
+            if ($last_download_meta !== null && $last_download_meta !== false) {
+                if (is_array($last_download_meta)) {
+                    $last_download = (int)($last_download_meta['last_download'] ?? 0);
+                    $min_interval = (int)($last_download_meta['min_interval'] ?? 0);
+                } else {
+                    $last_download = (int)$last_download_meta;
+                    $refresh_seconds = $this->cacheLifetime((int)($params['refresh'] ?? 0), TimeUnit::MINUTES);
+                    $feed_ttl_seconds = $this->cacheLifetime((int)($params['ttl'] ?? self::DEFAULT_FEED_TTL), TimeUnit::MINUTES);
+                    $min_interval = max($feed_ttl_seconds, $refresh_seconds);
+                }
+
+                $elapsed = $tikilib->now - $last_download;
+                if ($min_interval > 0 && $elapsed < $min_interval) {
+                    $this->reportRssCacheRefusal('cache_miss_within_ttl');
+                }
+            }
+
+            $refresh_seconds = $this->cacheLifetime((int)($params['refresh'] ?? 0), TimeUnit::MINUTES);
+            $feed_ttl_seconds = $this->cacheLifetime((int)($params['ttl'] ?? self::DEFAULT_FEED_TTL), TimeUnit::MINUTES);
+            $min_interval = max($feed_ttl_seconds, $refresh_seconds);
+
+            self::$cachelib->cacheItem($cache_meta_key, serialize([
+                'last_download' => $tikilib->now,
+                'min_interval' => $min_interval,
+            ]));
+
+            $result = $this->update_feed($url);
+            self::$cachelib->cacheItem($cache_feed_key, serialize($result));
+
+            $observed_interval = max($this->cacheLifetime((int)($result['ttl'] ?? self::DEFAULT_FEED_TTL), TimeUnit::MINUTES), $refresh_seconds);
+            if ($observed_interval !== $min_interval) {
+                self::$cachelib->cacheItem($cache_meta_key, serialize([
+                    'last_download' => $tikilib->now,
+                    'min_interval' => $observed_interval,
+                ]));
+            }
+        }
+
+        $items = $result['feedData'];
+        $title = $result['siteMeta'];
 
         $params = array_merge($params, [
             'date' => 1,
             'author' => 1,
             'ticker' => 1,
         ]);
+
+        if (! empty($params['sortBy'])) {
+            $sortBy = $params['sortBy'];
+            $sortOrder = ! empty($params['sortOrder']) ? strtoupper($params['sortOrder']) : 'DESC';
+            if (in_array($sortBy, ['title', 'publication_date', 'author'], true)) {
+                usort($items, function ($a, $b) use ($sortBy, $sortOrder) {
+                    $va = $a[$sortBy] ?? null;
+                    $vb = $b[$sortBy] ?? null;
+                    $cmp = $sortBy === 'publication_date' ? ($va <=> $vb) : strcasecmp((string)$va, (string)$vb);
+                    return $sortOrder === 'ASC' ? $cmp : -$cmp;
+                });
+            }
+        }
+
+        if (! empty($params['max'])) {
+            $m = (int)$params['max'];
+            if ($m > 0 && count($items) > $m) {
+                $items = array_slice($items, 0, $m);
+            }
+        }
+
         return ['params' => $params, 'items' => $items, 'meta' => $title];
     }
 }

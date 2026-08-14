@@ -7,7 +7,7 @@
         </a>
     {*    {button href="tiki-admin_shoutbox_words.php" class="btn btn-primary" _text="{tr}Banned Words{/tr}"} *}
     </div>
-
+<div class="styling-element">
     <h2>{tr}Change shoutbox general settings{/tr}</h2>
     <form action="tiki-shoutbox.php" method="post">
         <div class="form-check">
@@ -36,7 +36,7 @@
             <div class="col-md-9">
                 <textarea class="form-control" name="message" id="message">{$message|escape}</textarea>
                 {if $prefs.feature_socialnetworks eq 'y' && $user neq ''}
-                    {if $prefs.socialnetworks_twitter_consumer_key neq ''}
+                    {if $prefs.socialnetworks_twitter_client_id neq ''}
                         <div class="form-check">
                             <label class="form-check-label">
                                 <input class="form-check-input" type="checkbox" name="tweet" id="tweet" value='1'>
@@ -82,7 +82,7 @@
                 <input type="hidden" name="offset" value="{$offset}">
                 <input type="hidden" name="sort_mode" value="{$sort_mode}">
                 <input type="hidden" name="remove" value="{$channels[user].msgId}">
-                <button type="submit" class="btn btn-link px-0 pt-0 tips text-danger" title=":{tr}Remove{/tr}" onclick="confirmPopup()">
+                <button type="submit" class="btn btn-link px-0 pt-0 tips text-danger" title=":{tr}Remove{/tr}" aria-label="{tr}Remove{/tr}" onclick="confirmPopup()">
                     {icon name='remove'}
                 </button>
             </form>
@@ -92,4 +92,5 @@
     </div>
 {/section}
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
+</div>

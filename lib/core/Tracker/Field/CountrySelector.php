@@ -131,6 +131,17 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
                             'value' => 't'
                         ],
                     ],
+                    'labelasplaceholder' => [
+                        'name' => tr('Use label as placeholder'),
+                        'description' => tr('Display the field name as a placeholder in the input field instead of separate label.'),
+                        'deprecated' => false,
+                        'filter' => 'int',
+                        'default' => 0,
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                    ],
                 ],
             ],
         ];
@@ -150,9 +161,7 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
     {
         $ins_id = $this->getInsertId();
 
-        $value = isset($requestData[$ins_id])
-            ? $requestData[$ins_id]
-            : $this->getValue();
+        $value = $requestData[$ins_id] ?? $this->getValue();
 
         if ($this->canHaveMultipleValues() && ! is_array($value)) {
             $value = explode(',', $value);
@@ -188,13 +197,13 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
         }
 
         foreach ($current as $index => $value) {
-            $label = $flags[$value];
+            $label = is_array($flags) ? ($flags[$value] ?? '') : null;
             if ($context['list_mode'] != 'csv') {
                 if ($this->getOption('name_flag') != 1) {
                     $out .= $this->renderImage($value, $label);
                 }
                 if ($this->getOption('name_flag') == 0) {
-                    $out .= ' ';
+                    $out .= ' ';
                 }
             }
             $out .= $label;
@@ -206,10 +215,26 @@ class Tracker_Field_CountrySelector extends \Tracker\Field\AbstractItemField imp
         return $out;
     }
 
+    /**
+     * Return plain text representation of selected countries
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $current = $this->getConfiguration('value');
+
+        if (empty($current)) {
+            return '';
+        }
+
+        return $current;
+    }
+
     private function renderImage($code, $label)
     {
-        $smarty = TikiLib::lib('smarty');
-        return '<img src="img/flags/' . smarty_modifier_escape($code) . '.png" title="' . smarty_modifier_escape($label) . '" alt="' . smarty_modifier_escape($label) . '" />';
+        return \Tiki\CountryFlagHelper::toHtml($code, $label);
     }
 
     public function renderInput($context = [])

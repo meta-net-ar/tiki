@@ -17,7 +17,7 @@ function module_categories_info()
         'params' => [
             'type' => [
                 'name' => tra('Object type filter'),
-                'description' => tra('Object type filter to apply when accessing a linked category. Example values:') . ' wiki page, article, faq, blog, image gallery, image, file gallery, tracker, trackerItem, quiz, poll, survey, sheet',
+                'description' => tra('Object type filter to apply when accessing a linked category. Example values:') . tra('wiki page') . ', ' . tra('article') . ', ' . tra('FAQ') . ', ' . tra('blog') . ', ' . tra('image') . ', ' . tra('file gallery') . ', ' . tra('tracker') . ', ' . tra('tracker item') . ', ' . tra('quiz') . ', ' . tra('poll') . ', ' . tra('survey') . ', ' . tra('sheet'),
                 'filter' => 'striptags',
             ],
             'deep' => [

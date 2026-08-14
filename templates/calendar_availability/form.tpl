@@ -45,7 +45,7 @@
                     <div class="mb-3 row">
                         <label class="col-form-label col-sm-3">{tr}UID{/tr}</label>
                         <div class="col-sm-9">
-                            {$available.uid} <a href="#" class="btn btn-sm btn-danger availability-remove">{icon name=delete _menu_text='n' _menu_icon='y' alt="{tr}Delete{/tr}"}</a>
+                            {$available.uid} <a href="#" class="btn btn-sm btn-danger availability-remove" role="button">{icon name=delete _menu_text='n' _menu_icon='y' alt="{tr}Delete{/tr}"}</a>
                         </div>
                     </div>
                     <div class="mb-3 row">
@@ -89,7 +89,7 @@
                     </div>
                 </div>
             {/foreach}
-            <a href="{service controller=calendar_availability action=new_availability}" class="btn btn-link availability-new">{icon name=create} {tr}New{/tr}</a>
+            <a href="{service controller=calendar_availability action=new_availability}" class="btn btn-link availability-new" role="button">{icon name=create} {tr}New{/tr}</a>
         </div>
     </div>
 </div>

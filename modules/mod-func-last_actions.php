@@ -49,10 +49,10 @@ function module_last_actions($mod_reference, $module_params)
         $actions = $results['data'];
 
         $smarty->assign('modLastActions', $actions);
-        $showuser = isset($module_params["showuser"]) ? $module_params["showuser"] : 'n';
-        $showdate = isset($module_params["showdate"]) ? $module_params["showdate"] : 'n';
+        $showuser = $module_params["showuser"] ?? 'n';
+        $showdate = $module_params["showdate"] ?? 'n';
         $smarty->assign('showuser', $showuser);
         $smarty->assign('showdate', $showdate);
-        $smarty->assign('maxlen', isset($module_params["maxlen"]) ? $module_params["maxlen"] : '30');
+        $smarty->assign('maxlen', $module_params["maxlen"] ?? '30');
     }
 }

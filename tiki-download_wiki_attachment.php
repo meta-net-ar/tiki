@@ -15,7 +15,7 @@ if (! empty($_REQUEST['attId'])) {
     $info = $tikilib->get_wiki_attachment($_REQUEST['attId']);
 }
 if (empty($info)) {
-    Feedback::errorAndDie(tra('Incorrect param') . ' attid', \Laminas\Http\Response::STATUS_CODE_409);
+    Feedback::errorAndDie(tra('Incorrect param') . ' attId', \Laminas\Http\Response::STATUS_CODE_409);
 }
 
 $perms = Perms::get([ 'type' => 'wiki page', 'object' => $info['page'] ]);
@@ -34,11 +34,7 @@ $file = $info["filename"];
 $content = $info["data"];
 
 session_write_close();
-//print("File:$file<br />");
-//die;
 header("Content-type: $type");
-
-TikiLib::lib('header')->setXRobotsTag($robots);
 
 // This used to say "header("Content-Disposition: attachment; filename=\"$file\"");"
 // which made everything try to download instead of the browser picking what to do.

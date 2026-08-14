@@ -11,6 +11,8 @@ use Smarty\FunctionHandler\Base;
 use Smarty\Template;
 use TikiLib;
 use Feedback;
+use Tiki\BruteForce\BruteForce;
+use Tiki\Lib\Registration\Error as RegistrationError;
 
 class UserRegistration extends Base
 {
@@ -22,10 +24,20 @@ class UserRegistration extends Base
         $smarty = TikiLib::lib('smarty');
         $captchalib = TikiLib::lib('captcha');
         $access = TikiLib::lib('access');
+        $tikilib = TikiLib::lib('tiki');
 
-        $captchalib->generate();
+        // Only generate captcha if this is not a form submission
+        if (! isset($_REQUEST['register'])) {
+            $captchalib->generate();
+        }
 
         if ($prefs['allowRegister'] != 'y') {
+            return;
+        }
+
+        // Check if merged_prefs is an error object before using it as an array
+        if (is_a($registrationlib->merged_prefs, RegistrationError::class)) {
+            Feedback::error(['mes' => $registrationlib->merged_prefs->msg]);
             return;
         }
 
@@ -34,9 +46,7 @@ class UserRegistration extends Base
         $smarty->assign('_PROMPT_PASS', sprintf($_VALID, tra("password"), $registrationlib->merged_prefs['min_pass_length'], "0-9,a-z,A-Z"));
         $smarty->assign('min_username_length', $registrationlib->merged_prefs['min_username_length']);
         $smarty->assign('min_pass_length', $registrationlib->merged_prefs['min_pass_length']);
-        if (is_a($registrationlib->merged_prefs, "RegistrationError")) {
-            Feedback::error(['mes' => $registrationlib->merged_prefs->msg]);
-        }
+
         $smarty->assign_by_ref('merged_prefs', $registrationlib->merged_prefs);
         $smarty->assign('allowRegister', 'y');
 
@@ -84,6 +94,21 @@ class UserRegistration extends Base
                 }
             }
 
+            if (($prefs['bruteforce_protection'] ?? 'n') === 'y') {
+                $bruteForce = new BruteForce();
+                if (! $bruteForce->isOperationAllowed('register', ['ip' => $tikilib->get_ip_address()])) {
+                    $nextAllowedTime = $bruteForce->getNextAllowedTime('register', ['ip' => $tikilib->get_ip_address()]);
+                    $waitTime = $nextAllowedTime - time();
+                    if ($waitTime > 60) {
+                        $waitMessage = sprintf(tra('Too many registration attempts. Please try again in %d minutes and %d seconds.'), floor($waitTime / 60), $waitTime % 60);
+                    } else {
+                        $waitMessage = sprintf(tra('Too many registration attempts. Please try again in %d seconds.'), $waitTime);
+                    }
+                    Feedback::error($waitMessage);
+                    return '';
+                }
+            }
+
             $smarty->assign('errortype', 'no_redirect_login');
             //result is empty if fields (including antibot) validate and new user is successfully created
             //no user notification at this stage if user tracker is used
@@ -97,7 +122,7 @@ class UserRegistration extends Base
                     foreach ($result as $r) {
                         Feedback::error(['mes' => $r->msg]);
                     }
-                } elseif (is_a($result, 'RegistrationError')) {
+                } elseif (is_a($result, RegistrationError::class)) {
                     Feedback::error(['mes' => $result->msg]);
                 } elseif (is_string($result) && $registrationlib->merged_prefs['userTracker'] !== 'y') {    // more to do for usertrackers
                     return $result;
@@ -133,12 +158,10 @@ class UserRegistration extends Base
                     $user = $_REQUEST['name'];  // so that one can set user preferences at registration time
                     $_REQUEST['iTRACKER'] = 1;  // only one tracker plugin on registration
                 }
-                if (! is_array($re['registrationUsersFieldIds'])) {
-                    $re['registrationUsersFieldIds'] = explode(':', $re['registrationUsersFieldIds']);
-                }
                 if ($registrationlib->merged_prefs["user_register_prettytracker"] == 'y' && ! empty($registrationlib->merged_prefs["user_register_prettytracker_tpl"])) {
-                    if (substr($registrationlib->merged_prefs["user_register_prettytracker_tpl"], -4) == ".tpl") {
-                        $userTrackerData = wikiplugin_tracker(
+                    if (str_ends_with($registrationlib->merged_prefs["user_register_prettytracker_tpl"], ".tpl")) {
+                        $userTrackerData = TikiLib::lib('parser')->invokePlugin(
+                            'tracker',
                             '',
                             [
                                 'trackerId' => $re['usersTrackerId'],
@@ -157,7 +180,8 @@ class UserRegistration extends Base
                             ]
                         );
                     } else {
-                        $userTrackerData = wikiplugin_tracker(
+                        $userTrackerData = TikiLib::lib('parser')->invokePlugin(
+                            'tracker',
                             '',
                             [
                                 'trackerId' => $re['usersTrackerId'],
@@ -177,7 +201,8 @@ class UserRegistration extends Base
                         );
                     }
                 } else {
-                    $userTrackerData = wikiplugin_tracker(
+                    $userTrackerData = TikiLib::lib('parser')->invokePlugin(
+                        'tracker',
                         '',
                         [
                             'trackerId' => $re['usersTrackerId'],
@@ -211,7 +236,7 @@ class UserRegistration extends Base
                         foreach ($result as $r) {
                             Feedback::error(['mes' => $r->msg]);
                         }
-                    } elseif (is_a($result, 'RegistrationError')) {
+                    } elseif (is_a($result, RegistrationError::class)) {
                         Feedback::error(['mes' => $result->msg]);
                     } else {
                         $user = ''; // reset $user
@@ -227,7 +252,7 @@ class UserRegistration extends Base
                     foreach ($result as $r) {
                         Feedback::error(['mes' => $r->msg]);
                     }
-                } elseif (is_a($result, 'RegistrationError')) {
+                } elseif (is_a($result, RegistrationError::class)) {
                     Feedback::error(['mes' => $result->msg]);
                 } else {
                     $user = ''; // reset $user

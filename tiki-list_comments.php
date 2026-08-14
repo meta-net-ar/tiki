@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\SortModeValidator;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
@@ -16,7 +19,7 @@ $inputConfiguration = [
         'findfilter_approved'      => 'word',            //post
         'sort_mode'                => 'word',            //get
         'offset'                   => 'int',             //get
-        'find'                     => 'word',            //post
+        'find'                     => 'string',            //post
         ],
         'staticKeyFiltersForArrays' => [
             'types'                    => 'string',      //post
@@ -92,6 +95,7 @@ foreach ($sections_enabled as $k => $info) {
 // No need to show types choices if there is only one choice that is already choosed
 if (count($show_types) == 1 && count($selected_types) == 1) {
     $show_types = [];
+    $selected_types = [];
 }
 
 $headers = ['title' => 'Title', 'objectType' => 'Type', 'object' => 'Object', 'userName' => 'Author', 'commentDate' => 'Date', 'data' => 'Comment',];
@@ -101,6 +105,8 @@ if (count($selected_types) == 1) {
     unset($headers['objectType']);
     $headers['object'] = tra(ucwords($selected_types[0]));
 }
+
+$show_types = array_intersect_key($show_types, array_flip($selected_types));
 
 $smarty->assign_by_ref('show_types', $show_types);
 $smarty->assign_by_ref('selected_types', $selected_types);
@@ -232,28 +238,15 @@ if (isset($_REQUEST['checked'])) {
     Feedback::error(tra('Action not performed since no comments were selected'));
 }
 
-if (isset($_REQUEST["sort_mode"])) {
-    $sort_mode = $_REQUEST["sort_mode"];
-     $column_validity = TikiDb::get()->validateSortColumn('tiki_comments', $sort_mode);
-    if (! $column_validity) {
-        $sort_mode = 'commentDate_desc';
-        Feedback::error(tr('Invalid sort mode'));
-    }
-} else {
-    $sort_mode = 'commentDate_desc';
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'commentDate_desc',
+    ['tiki_comments']
+);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (isset($_REQUEST["offset"])) {
-    $offset = $_REQUEST["offset"];
-} else {
-    $offset = 0;
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = strip_tags($_REQUEST["find"]);
-} else {
-    $find = '';
-}
+$find = strip_tags($_REQUEST["find"] ?? '');
+
 $smarty->assign_by_ref('find', $find);
 if (! isset($_REQUEST['findfilter_approved'])) {
     $_REQUEST['findfilter_approved'] = '';
@@ -285,6 +278,6 @@ $smarty->assign_by_ref('comments', $comments['data']);
 $smarty->assign_by_ref('filters', $filters);
 $smarty->assign_by_ref('filter_names', $filter_names);
 $smarty->assign_by_ref('filter_values', $filter_values);
-$smarty->assign_by_ref('cant', $comments['cant']);
+$smarty->assign_by_ref('count', $comments['count']);
 $smarty->assign('mid', 'tiki-list_comments.tpl');
 $smarty->display('tiki.tpl');

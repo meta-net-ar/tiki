@@ -7,6 +7,7 @@
 namespace Tiki\SabreDav\AddressBookType;
 
 use Sabre\CardDAV;
+use Sabre\DAV;
 use TikiLib;
 
 class Factory

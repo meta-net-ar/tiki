@@ -13,22 +13,28 @@
 // with a call to header(), then you will not see the traces
 // If you want to see the traces, set value below to true.
 // WARNING: DO NOT COMMIT WITH TRUE!!!!
+
 $dieInsteadOfForwardingWithHeader = false;
 global $prefs;
-require_once('lib/debug/Tracer.php');
 
 $inputConfiguration = [
     [ 'staticKeyFilters' => [
         'page' => 'pagename',
         'returnto' => 'pagename',
         'watch' => 'digits',
-        'cancel_edit' => 'url'
+        'cancel_edit' => 'url',
+        'current_page_id' => 'int',
+        'add_child' => 'bool',
+        'insert_into_struct' => 'bool',
     ] ],
 ];
-
-$section = "wiki page";
-$section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 require_once('tiki-setup.php');
+
+$section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
+require_once('lib/debug/Tracer.php');
 $wikilib = TikiLib::lib('wiki');
 $structlib = TikiLib::lib('struct');
 $notificationlib = TikiLib::lib('notification');
@@ -42,7 +48,6 @@ function guess_new_page_attributes_from_parent_pages($page, $page_info)
 {
     global $prefs, $need_lang;
     $editlib = TikiLib::lib('edit');
-    $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
 
     if (! $page_info) {
@@ -78,7 +83,7 @@ function guess_new_page_attributes_from_parent_pages($page, $page_info)
                     $need_lang = false;
                 } else {
                     $smarty->assign('languages', $languages);
-                    $smarty->assign('default_lang', $prefs['language']);
+                    $smarty->assign('default_lang', Language::getCurrentLanguage());
                     $need_lang = true;
                     $smarty->assign('_REQUEST', $_REQUEST);
                 }
@@ -121,7 +126,6 @@ function execute_module_translation()
 
 function possibly_set_pagedata_to_pretranslation_of_source_page()
 {
-    global $tracer;
     $multilinguallib = TikiLib::lib('multilingual');
     $smarty = TikiLib::lib('smarty');
     $editlib = TikiLib::lib('edit');
@@ -161,6 +165,18 @@ if (strtolower($_REQUEST["page"]) == 'sandbox' && $prefs['feature_sandbox'] !== 
 }
 
 $page = $_REQUEST["page"];
+if (isset($_GET['quickedit'])) {
+    // Normalize before checking input by replacing prefs[wiki_url_scheme] symbols ("-", "_", and "+") with space.
+    // This ensures page names like "Marc Andre" and "Marc-Andre" are treated as the same,
+    // preventing slug duplication when regenerating.
+    $normalized = preg_replace('/[\s+_-]/', ' ', $page);
+    if ($page_by_slug = $tikilib->getPageBySlug($normalized)) {
+        Feedback::errorAndDie(
+            tr('Cannot create page "%0", A page "%1" with the same slug variation already exists.', $page, '<strong>' . $page_by_slug . '</strong>'),
+            \Laminas\Http\Response::STATUS_CODE_409
+        );
+    }
+}
 
 if (isset($_REQUEST["description"])) {
     $max_pagedescription_length = 201;
@@ -174,7 +190,13 @@ if ($prefs['namespace_enabled'] === 'y') {
     if (isset($_REQUEST['current_page_id'])) {
         $s_page_info = $structlib->s_get_page_info($_REQUEST['current_page_id']);
         $s_suffix = '';
-        if (isset($prefs['namespace_separator']) && ! empty($prefs['namespace_separator']) && strpos($s_page_info['pageName'], $prefs['namespace_separator']) !== false) {
+        if (
+            ! empty($prefs['namespace_separator'])
+            && str_contains(
+                $s_page_info['pageName'],
+                $prefs['namespace_separator']
+            )
+        ) {
             $split = explode($prefs['namespace_separator'], $s_page_info['pageName']);
             $s_suffix = reset($split);
         }
@@ -187,7 +209,7 @@ if (! empty($s_suffix)) {
 if ($prefs['namespace_enabled'] == 'y' && isset($_REQUEST['namespace'])) {
     // Only prepend the namespace separator, if the page is missing a namespace
     $ns = $_REQUEST['namespace'] . $prefs['namespace_separator'];
-    if (strpos($page, $ns, 0) === false) {
+    if (! str_contains($page, $ns)) {
         $page = $ns . $page;
     }
 }
@@ -196,6 +218,65 @@ $smarty->assign('page', $page);
 $info = $tikilib->get_page_info($page);
 $smarty->assign('quickedit', isset($_GET['quickedit']));
 
+if (
+    isset($_REQUEST['insert_into_struct'])
+    && ! empty($_REQUEST['current_page_id'])
+    && ! empty($page)
+    && $tikilib->page_exists($page)
+) {
+    $currentRefId = (int) $_REQUEST['current_page_id'];
+    $currentNodeInfo = $structlib->s_get_page_info($currentRefId);
+    $currentStructureInfo = $structlib->s_get_structure_info($currentRefId);
+
+    if (! empty($currentNodeInfo) && ! empty($currentStructureInfo)) {
+        if (
+            ($tiki_p_edit != 'y' && ! $tikilib->user_has_perm_on_object($user, $currentStructureInfo["pageName"], 'wiki page', 'tiki_p_edit'))
+            || ($tiki_p_edit_structures != 'y' && ! $tikilib->user_has_perm_on_object($user, $currentStructureInfo["pageName"], 'wiki page', 'tiki_p_edit_structures'))
+        ) {
+            Feedback::errorAndDie(tra("You do not have permission to edit this structure."), \Laminas\Http\Response::STATUS_CODE_401);
+        }
+
+        $alreadyInStructure = false;
+        $structurePages = $structlib->s_get_structure_pages($currentStructureInfo['page_ref_id']);
+        foreach ($structurePages as $structurePage) {
+            if (($structurePage['pageName'] ?? '') === $page) {
+                $alreadyInStructure = true;
+                break;
+            }
+        }
+
+        if (! $alreadyInStructure) {
+            $targetParentRefId = $currentRefId;
+            $afterRefId = null;
+
+            if (empty($_REQUEST['add_child'])) {
+                $targetParentRefId = (int) $currentNodeInfo['parent_id'];
+                $afterRefId = $currentRefId;
+            } else {
+                $subpages = $structlib->s_get_pages($currentRefId);
+                $max = count($subpages);
+                if ($max > 0) {
+                    $afterRefId = (int) $subpages[$max - 1]["page_ref_id"];
+                }
+            }
+
+            if ($targetParentRefId > 0) {
+                $structlib->s_create_page($targetParentRefId, $afterRefId, $page, '', $currentStructureInfo['structure_id']);
+                Feedback::success(tr('Page %0 was added to structure %1.', $page, $currentStructureInfo['pageName']));
+            }
+        } else {
+            Feedback::warning(tr('Page %0 is already part of this structure.', $page));
+        }
+
+        $url = smarty_function_sefurl([
+            'page' => $currentNodeInfo['pageName'],
+            'structure' => $currentStructureInfo['pageName'],
+            'page_ref_id' => $currentRefId,
+        ], $smarty->getEmptyInternalTemplate());
+        $access->redirect($url);
+    }
+}
+
 // 2010-01-26: Keep in active until translation refactoring is done.
 if ($editlib->isNewTranslationMode() || $editlib->isUpdateTranslationMode()) {
      $editlib->prepareTranslationData();
@@ -203,7 +284,7 @@ if ($editlib->isNewTranslationMode() || $editlib->isUpdateTranslationMode()) {
 $editlib->make_sure_page_to_be_created_is_not_an_alias($page, $info);
 guess_new_page_attributes_from_parent_pages($page, $info);
 
-if ($translation_mode === 'n' && isset($info['page_id']) ? translationsToThisPageAreInProgress($info['page_id']) : false) {
+if ($translation_mode === 'n' && isset($info['page_id']) && translationsToThisPageAreInProgress($info['page_id'])) {
     $smarty->assign('prompt_for_edit_or_translate', 'y');
     include_once('modules/mod-func-translation.php');
     execute_module_translation();
@@ -291,12 +372,12 @@ if (isset($_REQUEST['cancel_edit'])) {
     } else {
         $url = $wikilib->sefurl($page);
         if (! empty($_REQUEST['page_ref_id'])) {
-            $url .= (strpos($url, '?') === false ? '?' : '&') . 'page_ref_id=' . $_REQUEST['page_ref_id'];
+            $url .= (! str_contains($url, '?') ? '?' : '&') . 'page_ref_id=' . $_REQUEST['page_ref_id'];
         }
     }
 
     if ($prefs['feature_multilingual'] === 'y' && $prefs['feature_best_language'] === 'y' && isset($info['lang']) && $info['lang'] !== $prefs['language']) {
-        $url .= (strpos($url, '?') === false ? '?' : '&') . 'no_bl=y';
+        $url .= (! str_contains($url, '?') ? '?' : '&') . 'no_bl=y';
     }
 
     if ($dieInsteadOfForwardingWithHeader) {
@@ -309,24 +390,8 @@ if (isset($_REQUEST['minor'])) {
     $_REQUEST['save'] = true;
 }
 
-if ($user && $prefs['feature_user_watches'] === 'y') {
-    $isFormSubmit = isset($jitRequest['edit']);
-    if ($tikilib->page_exists($page)) {
-        $currentlyWatching = (bool) $tikilib->user_watches($user, 'wiki_page_changed', $page, 'wiki page');
-        $default = $currentlyWatching;
-    } else {
-        // New pages get default watch checked for authors
-        $currentlyWatching = false;
-        $default = ($prefs['wiki_watch_author'] === 'y');
-    }
-
-    $requestedWatch = isset($_REQUEST['watch']) && $isFormSubmit;
-    $smarty->assign('show_watch', 'y');
-    $smarty->assign('watch_checked', ( ($default && ! $isFormSubmit) || $requestedWatch) ? 'y' : 'n');
-} else {
-    $currentlyWatching = false;
-    $requestedWatch = false;
-    $smarty->assign('show_watch_controls', 'n');
+if (! $tikilib->page_exists($page) && $user && $prefs['feature_user_watches'] === 'y' && $prefs['wiki_watch_author'] === 'y') {
+    $tikilib->add_user_watch($user, 'wiki_page_changed', $page, 'wiki page', $page, $wikilib->sefurl($page));
 }
 
 if (isset($_REQUEST['partial_save'])) {
@@ -350,8 +415,8 @@ if ($prefs['feature_warn_on_edit'] === 'y') {
     $editpageconflict = 'n';
     $beingEdited = 'n';
     $semUser = '';
-    $u = $user ? $user : 'anonymous';
-    if (! empty($page) && ($page !== 'sandbox' || $page === 'sandbox' && $tiki_p_admin === 'y')) {
+    $u = $user ?: 'anonymous';
+    if (! empty($page) && ($page !== 'sandbox' || $tiki_p_admin === 'y')) {
         if (! isset($_REQUEST['save'])) {
             if (
                 $serviceLib->internal('semaphore', 'is_set', ['object_id' => $page]) &&
@@ -430,7 +495,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
     $mimelib = new mime();
     $output = $mimelib->decode($data);
     $parts = [];
-    parse_output($output, $parts, 0);
+    parse_output($output, $parts);
     $last_part = '';
     $last_part_ver = 0;
     usort($parts, 'compare_import_versions');
@@ -449,7 +514,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
             } else {
                 $description = '';
             }
-            $pageLang = isset($part["lang"]) ? $part["lang"] : "";
+            $pageLang = $part["lang"] ?? "";
             $authorid = urldecode($part["author_id"]);
             if (isset($part["hits"])) {
                 $hits = urldecode($part["hits"]);
@@ -525,15 +590,6 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
         }
     }
 
-    // If the watch state is not the same
-    if ($requestedWatch !== $currentlyWatching) {
-        if ($requestedWatch) {
-            $tikilib->add_user_watch($user, 'wiki_page_changed', $page, 'wiki page', $page, $wikilib->sefurl($page));
-        } else {
-            $tikilib->remove_user_watch($user, 'wiki_page_changed', $page, 'wiki page');
-        }
-    }
-
     if (isset($_REQUEST["save"])) {                 // jb tiki 6 - this block of code seems to be redundant and unused - TOKIL
         unset($_REQUEST["save"]);
         if ($page_ref_id) {
@@ -542,7 +598,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
             $url = $wikilib->sefurl($page);
         }
         if ($prefs['feature_best_language'] === 'y') {
-            $url .= (strpos($url, '?') === false ? '?' : '&') . 'no_bl=y';
+            $url .= (! str_contains($url, '?') ? '?' : '&') . 'no_bl=y';
         }
 
 
@@ -550,7 +606,7 @@ if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_na
             $flaggedrevisionlib = TikiLib::lib('flaggedrevision');
 
             if ($flaggedrevisionlib->page_requires_approval($page)) {
-                $url .= (strpos($url, '?') === false ? '?' : '&') . 'latest=1';
+                $url .= (! str_contains($url, '?') ? '?' : '&') . 'latest=1';
             }
         }
         if ($dieInsteadOfForwardingWithHeader) {
@@ -627,7 +683,7 @@ if ($prefs['feature_wiki_attachments'] === 'y' && isset($_REQUEST["attach"]) && 
 
 
 // Suck another page and append to the end of current
-$suck_url = isset($_REQUEST["suck_url"]) ? $_REQUEST["suck_url"] : '';
+$suck_url = $_REQUEST["suck_url"] ?? '';
 
 if (isset($_REQUEST["parsehtml"])) {
     $parsehtml = $_REQUEST["parsehtml"] === 'on' ? 'y' : 'n';
@@ -678,7 +734,7 @@ if (isset($info['wiki_cache'])) {
     $smarty->assign('wiki_cache', $prefs['wiki_cache']);
 }
 
-if (isset($info["flag"]) ? $info["flag"] === 'L' : false && ! $wikilib->is_editable($page, $user, $info)) {
+if (! empty($info["flag"]) && $info["flag"] === 'L' && ! $wikilib->is_editable($page, $user, $info)) {
     Feedback::errorAndDie(tra("The page cannot be edited because it is locked"), \Laminas\Http\Response::STATUS_CODE_403);
 }
 
@@ -686,7 +742,7 @@ $smarty->assign('editable', 'y');
 $smarty->assign('show_page', 'n');
 $smarty->assign('comments_show', 'n');
 
-$smarty->assign_by_ref('data', $info);
+$smarty->assign('data', $info);
 $smarty->assign('footnote', '');
 $smarty->assign('has_footnote', 'n');
 $parserlib = TikiLib::lib('parser');
@@ -712,19 +768,14 @@ if ($prefs['feature_wiki_footnotes'] === 'y') {
         }
     }
 }
-if (isset($_REQUEST["customTip"]) && ! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
-    $smarty->assign('customTip', $_REQUEST['customTip']);
-    if (isset($_REQUEST["customTipTitle"])) {
-        $smarty->assign('customTipTitle', tra($_REQUEST["customTipTitle"]));
-    } else {
-        $smarty->assign('customTipTitle', tra('Tip'));
-    }
+if (! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
+    $editlib->assignCustomTipToSmarty($_REQUEST["customTip"] ?? '', $_REQUEST["customTipTitle"] ?? '');
 }
 if (isset($_REQUEST["wikiHeaderTpl"]) && ! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
     $smarty->assign('wikiHeaderTpl', $smarty->fetch("wiki:{$_REQUEST['wikiHeaderTpl']}"));
 }
 if ((isset($_REQUEST["template_name"]) || isset($_REQUEST["templateId"])) && ! isset($_REQUEST['preview']) && ! isset($_REQUEST['save'])) {
-    $templateLang = isset($_REQUEST['lang']) ? $_REQUEST['lang'] : null;
+    $templateLang = $_REQUEST['lang'] ?? null;
 
     if (isset($_REQUEST["templateId"])) {
         $templateId = $_REQUEST["templateId"];
@@ -837,15 +888,15 @@ if (isset($prefs['feature_references']) && $prefs['feature_references'] === 'y')
             }
 
             $smarty->assign('key_exists', $key_exists);
-            $smarty->assign('referencesCant', $references['cant']);
+            $smarty->assign('referencesCount', $references['count']);
             $smarty->assign('references', $references['data']);
 
-            if ($references['cant'] < 1 && $lib_references['cant'] < 1) {
+            if ($references['count'] < 1 && $lib_references['count'] < 1) {
                 $smarty->assign('display', 'none');
             } else {
                 $smarty->assign('display', 'block');
             }
-            $smarty->assign('libReferencesCant', $lib_references['cant']);
+            $smarty->assign('libReferencesCount', $lib_references['count']);
             $smarty->assign('libReferences', $lib_references['data']);
             $smarty->assign('use_references', $use_references);
             $smarty->assign('edit_references', $edit_references);
@@ -952,8 +1003,7 @@ if (isset($_REQUEST["lang"])) {
 
 $smarty->assign('lang', $pageLang);
 if ($prefs['feature_urgent_translation'] === 'y') {
-    $urgent_allowed = true;
-    $smarty->assign('urgent_allowed', $urgent_allowed);
+    $smarty->assign('urgent_allowed', true);
 }
 if (isset($_REQUEST['translation_critical'])) {
     $smarty->assign('translation_critical', 1);
@@ -1029,11 +1079,11 @@ $smarty->assign_by_ref('parsed', $parsed);
  * @param $parts
  * @param $i
  */
-function parse_output(&$obj, &$parts, $i)
+function parse_output(&$obj, &$parts)
 {
     if (! empty($obj['parts'])) {
         foreach ($obj['parts'] as $index => $part) {
-            parse_output($part, $parts, $index);
+            parse_output($part, $parts);
         }
     } elseif ($obj['type'] === 'application/x-tikiwiki') {
         $aux["body"] = $obj['body'];
@@ -1104,7 +1154,7 @@ if ($prefs['site_layout_per_object'] == 'y') {
     $attributes = $attributelib->get_attributes('wiki page', $page);
     $smarty->assign('object_layout', [
         'available' => TikiLib::lib('theme')::listUserSelectableLayouts(),
-        'current' => isset($attributes['tiki.object.layout']) ? $attributes['tiki.object.layout'] : null,
+        'current' => $attributes['tiki.object.layout'] ?? null,
     ]);
 }
 
@@ -1275,7 +1325,7 @@ if (
                 $description,
                 $minor,
                 $pageLang,
-                isset($_REQUEST['allowhtml']) ? $_REQUEST['allowhtml'] : $is_html,
+                $_REQUEST['allowhtml'] ?? $is_html,
                 $hash,
                 null,
                 $_REQUEST['wysiwyg'],
@@ -1404,15 +1454,6 @@ if (
         }
         /* Local reference handling */
 
-        // If the watch state is not the same
-        if ($requestedWatch !== $currentlyWatching) {
-            if ($requestedWatch) {
-                $tikilib->add_user_watch($user, 'wiki_page_changed', $page, 'wiki page', $page, $wikilib->sefurl($page));
-            } else {
-                $tikilib->remove_user_watch($user, 'wiki_page_changed', $page, 'wiki page');
-            }
-        }
-
         if (! empty($prefs['geo_locate_wiki']) && $prefs['geo_locate_wiki'] == 'y' && ! empty($_REQUEST['geolocation'])) {
             TikiLib::lib('geo')->set_coordinates('wiki page', $page, $_REQUEST['geolocation']);
         }
@@ -1464,14 +1505,14 @@ if (
             $url = $wikilib->sefurl($page);
         }
         if ($prefs['feature_multilingual'] === 'y' && $prefs['feature_best_language'] === 'y' && isset($info['lang']) && $info['lang'] !== $prefs['language']) {
-            $url .= (strpos($url, '?') === false ? '?' : '&') . 'no_bl=y';
+            $url .= (! str_contains($url, '?') ? '?' : '&') . 'no_bl=y';
         }
 
         if ($prefs['flaggedrev_approval'] == 'y' && $tiki_p_wiki_approve == 'y') {
             $flaggedrevisionlib = TikiLib::lib('flaggedrevision');
 
             if ($flaggedrevisionlib->page_requires_approval($page)) {
-                $url .= (strpos($url, '?') === false ? '?' : '&') . 'latest=1';
+                $url .= (! str_contains($url, '?') ? '?' : '&') . 'latest=1';
             }
         }
 
@@ -1592,7 +1633,7 @@ if ($prefs['feature_categories'] === 'y') {
     } else {
         $smarty->assign('categIds', []);
     }
-    if (isset($_SERVER['HTTP_REFERER']) && strstr($_SERVER['HTTP_REFERER'], 'tiki-index.php') && ! $tikilib->page_exists($_REQUEST["page"])) { // default the categs the page you come from for a new page
+    if (isset($_SERVER['HTTP_REFERER']) && str_contains($_SERVER['HTTP_REFERER'], 'tiki-index.php') && ! $tikilib->page_exists($_REQUEST["page"])) { // default the categs the page you come from for a new page
         if (preg_match('/page=([^\&]+)/', $_SERVER['HTTP_REFERER'], $ms)) {
             $p = $ms[1];
         } else {
@@ -1635,10 +1676,48 @@ if ($wikilib->contains_badchars($page) && ! $tikilib->page_exists($page)) {
 }
 
 $smarty->assign('showstructs', []);
-if ($structlib->page_is_in_structure($_REQUEST["page"])) {
-    $structs = $structlib->get_page_structures($_REQUEST["page"]);
-    $smarty->assign('showstructs', $structs);
+$smarty->assign('editableStructures', []);
+$smarty->assign('structuresToAdd', []);
+$smarty->assign('showStructuresTab', false);
+$smarty->assign('pageIsNew', ! $tikilib->page_exists($page));
+$smarty->assign('creationStructureInfo', null);
+if ($prefs['feature_wiki_structure'] === 'y' && strtolower($page) !== 'sandbox' && ! empty($page)) {
+    $showstructs = [];
+    if ($structlib->page_is_in_structure($page)) {
+        $showstructs = $structlib->get_page_structures($page);
+    }
+    $smarty->assign('showstructs', $showstructs);
+
+    if (! $tikilib->page_exists($page) && ! empty($_REQUEST['current_page_id'])) {
+        $creationStructureInfo = $structlib->s_get_structure_info((int) $_REQUEST['current_page_id']);
+        if (! empty($creationStructureInfo)) {
+            $smarty->assign('creationStructureInfo', $creationStructureInfo);
+        }
+    }
+
+    $pageStructureNames = array_fill_keys(array_column($showstructs, 'pageName'), true);
+    $editableStructures = [];
+    if ($tiki_p_edit_structures === 'y') {
+        $structuresList = $structlib->list_structures(0, -1, 'pageName_asc');
+        foreach ($structuresList['data'] ?? [] as $struct) {
+            if (($struct['edit_structure'] ?? 'n') !== 'y') {
+                continue;
+            }
+            $struct['in_structure'] = isset($pageStructureNames[$struct['pageName']]);
+            $editableStructures[] = $struct;
+        }
+    }
+    $smarty->assign('editableStructures', $editableStructures);
+    $smarty->assign(
+        'structuresToAdd',
+        array_values(array_filter($editableStructures, static fn ($struct) => empty($struct['in_structure'])))
+    );
+    $smarty->assign(
+        'showStructuresTab',
+        $tiki_p_edit_structures === 'y' || count($showstructs) > 0
+    );
 }
+
 // Flag for 'page bar' that currently 'Edit' mode active
 // so no need to show comments & attachments, but need
 // to show 'wiki quick help'
@@ -1647,7 +1726,7 @@ if ($prefs['wiki_feature_copyrights'] === 'y' && $tiki_p_edit_copyrights === 'y'
     include_once('lib/copyrights/copyrightslib.php');
     $copyrightslib = new CopyrightsLib();
     $copyrights = $copyrightslib->list_copyrights($_REQUEST["page"]);
-    if ($copyrights['cant']) {
+    if ($copyrights['count']) {
         $smarty->assign_by_ref('copyrights', $copyrights['data']);
     }
 }
@@ -1691,7 +1770,6 @@ if (
             $prefs['feature_wiki_icache'] === 'y' ||
             $prefs['feature_contribution'] === 'y' ||
             $prefs['feature_wiki_structure'] === 'y' ||
-            $prefs['wiki_feature_copyrights'] === 'y' ||
             ($tiki_p_admin_wiki === 'y' && $prefs['wiki_authors_style_by_page'] === 'y')) ||    // end not sandbox
         ($prefs['feature_wiki_description'] === 'y' || $prefs['metatag_pagedesc'] === 'y') ||
         $prefs['feature_wiki_footnotes'] === 'y' ||

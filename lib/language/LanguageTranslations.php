@@ -6,7 +6,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+use Tiki\Lib\Diff\DiffUtils;
+
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -58,12 +60,12 @@ class LanguageTranslations extends TikiDb_Bridge
         if (! is_null($lang)) {
             $this->lang = $lang;
         } else {
-            $this->lang = \I18N\LanguageTranslator::getLanguageFromPrefs();
+            $this->lang = Language::getCurrentLanguage();
         }
 
         $this->filePath = "lang/{$this->lang}/language.php";
         $this->customFilePath = "lang/{$this->lang}/" . LANG_CUSTOM_PHP_BASENAME;
-        $this->translator = \I18N\LanguageTranslator::getInstance($this->lang);
+        $this->translator = \I18n\LanguageTranslator::getInstance($this->lang);
     }
 
     /**
@@ -113,7 +115,7 @@ class LanguageTranslations extends TikiDb_Bridge
         }
 
         // If the translation is not in the database and the new translation is the same as the translation defined by the filesystem, ignore it (do not insert in the database)
-        $noDbTranslator = \I18N\LanguageTranslator::getInstance($this->lang, ['skipDb' => true]);
+        $noDbTranslator = \I18n\LanguageTranslator::getInstance($this->lang, ['skipDb' => true]);
         if ($noDbTranslator->translate($originalStr) == $translatedStr) {
             static $initialDatabaseTranslations = [];
 
@@ -151,10 +153,10 @@ class LanguageTranslations extends TikiDb_Bridge
 
                 $boundVariables = [$translatedStr, 1, $userId, $tikilib->now];
                 if ($generalDefinedByCaller) {
-                    array_push($boundVariables, $general);
+                    $boundVariables[] = $general;
                 }
-                array_push($boundVariables, $originalStr, $this->lang);
-
+                $boundVariables[] = $originalStr;
+                $boundVariables[] = $this->lang;
                 $result = $this->query($query, $boundVariables);
             }
         }
@@ -209,7 +211,7 @@ class LanguageTranslations extends TikiDb_Bridge
                             $langFile[$key] = '"' . $matches[1] . '" => "' . $dbNewStr . "\",\n";
 
                             // count number of new and updated strings
-                            if (strpos($line, '//') === 0) {
+                            if (str_starts_with($line, '//')) {
                                 $stats['new']++;
                             } else {
                                 $stats['modif']++;
@@ -223,6 +225,15 @@ class LanguageTranslations extends TikiDb_Bridge
             // convert every entry in the array $dbTrans (translations that are not present in language.php)
             // to a string in the format '"original string" => "translation"'
             $newTrans = [];
+            // Ensure the previous line has a comma if it doesn't already
+            if ($lastStr > 0) {
+                $prevLine = trim($langFile[$lastStr - 1]);
+                // Check if previous line is a translation entry without a trailing comma
+                if (preg_match('/^".*"\s*=>\s*".*"$/', $prevLine)) {
+                    $langFile[$lastStr - 1] = rtrim($langFile[$lastStr - 1]) . ",\n";
+                }
+            }
+
             foreach ($dbTrans as $orig => $trans) {
                 $newTrans[] = '"' . $orig . '" => "' . $trans . "\",\n";
                 $stats['new']++;
@@ -350,7 +361,6 @@ class LanguageTranslations extends TikiDb_Bridge
             }
 
             if ($originalTranslations && isset($lang[$res['source']]) && $lang[$res['source']]['tran'] != $res['tran']) {
-                require_once('lib/diff/difflib.php');
                 $res['originalTranslation'] = $lang[$res['source']]['tran'];
                 $res['diff'] = $this->_diff($res['originalTranslation'], $res['tran']);
             }
@@ -390,7 +400,6 @@ class LanguageTranslations extends TikiDb_Bridge
             }
 
             if ($originalTranslations && isset($lang[$res['source']]) && $lang[$res['source']]['tran'] != $res['tran']) {
-                require_once('lib/diff/difflib.php');
                 $res['originalTranslation'] = $lang[$res['source']]['tran'];
                 $res['diff'] = $this->_diff($res['originalTranslation'], $res['tran']);
             }
@@ -412,7 +421,7 @@ class LanguageTranslations extends TikiDb_Bridge
      */
     protected function _diff($original, $new)
     {
-        return diff2($original, $new, 'htmldiff');
+        return DiffUtils::diff2($original, $new, 'htmldiff');
     }
 
     /**
@@ -794,10 +803,10 @@ class LanguageTranslations extends TikiDb_Bridge
     }
 
     /**
-     * Return a Cachelib object. Used to be able to
+     * Return a \Tiki\Cache\CacheLib object. Used to be able to
      * mock cachelib por test purposes.
      *
-     * @return Cachelib cachelib object
+     * @return \Tiki\Cache\CacheLib cachelib object
      */
     protected function _getCacheLib()
     {

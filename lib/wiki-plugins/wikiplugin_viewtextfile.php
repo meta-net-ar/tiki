@@ -95,19 +95,6 @@ function wikiplugin_viewtextfile($data, $params)
     $fileId = $params['fileId'];
     $filedetails = [];
 
-    if (! isset($fileId)) {
-        return ("<p>" . tr("Error: Missing file ID. Please provide a valid fileId.") . "</p>");
-    }
-
-    $plugininfo = wikiplugin_viewtextfile_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        if (isset($param['default'])) {
-            $default["$key"] = $param['default'];
-        }
-    }
-    $params = array_merge($default, $params);
-
     $fileinfo = $filegallib->get_file_info($fileId);
 
     if (empty($fileinfo)) {
@@ -117,9 +104,8 @@ function wikiplugin_viewtextfile($data, $params)
     $filedescription = $fileinfo['description'];
     $filename = $fileinfo['filename'];
     $filetype = $fileinfo['filetype'];
-    $filesize = $fileinfo['filesize'];
 
-    // convert the file size to a human readable format
+    // convert the file size to a human-readable format
     $filesize = $filegallib->convertFileSize($fileinfo['filesize']);
 
     if ($filetype != 'text/plain') {
@@ -133,7 +119,7 @@ function wikiplugin_viewtextfile($data, $params)
     $out = [];
 
     foreach ($filecontent_data as $line_num => $line) {
-        if ($line_num >= $params['startline'] && (empty($params['stopline']) || $line_num <= $params['stopline'])) {
+        if ($line_num >= $params['startline'] && (is_null($params['stopline']) || $line_num <= $params['stopline'])) {
             $out[$line_num] = $line;
         }
     }

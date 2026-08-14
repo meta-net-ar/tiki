@@ -14,15 +14,13 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use TikiLib;
 
-require_once(__DIR__ . '/../../wiki-plugins/wikiplugin_redirect.php');
-
 class WikiPluginRedirectTest extends TestCase
 {
     public function testRedirectInPrintMode(): void
     {
         TikiLib::lib('parser')->option['print'] = 'y';
         try {
-            $result = wikiplugin_redirect(["data" => "data to be parsed"], ["url" => "https://dev.tiki.org"]);
+            $result = TikiLib::lib('parser')->invokePlugin('redirect', "data to be parsed", ["url" => "https://dev.tiki.org"]);
             $this->assertEquals("", $result);
         } catch (Exception $e) {
             $this->fail("Unexpected error: " . $e->getMessage());

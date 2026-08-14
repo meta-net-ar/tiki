@@ -21,6 +21,7 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
 $themecontrollib = TikiLib::lib('themecontrol');
 $categlib = TikiLib::lib('categ');
 $themelib = TikiLib::lib('theme');
@@ -29,20 +30,32 @@ $access->check_feature('feature_theme_control', '', 'look');
 $access->check_permission('tiki_p_admin');
 
 $auto_query_args = ['find', 'sort_mode', 'offset', 'theme', 'theme_option', 'section'];
-$smarty->assign('a_section', isset($_REQUEST['section']) ? $_REQUEST['section'] : '');
+$smarty->assign('a_section', $_REQUEST['section'] ?? '');
 
 $themes = $themelib->list_themes_and_options();
 $smarty->assign('themes', $themes);
 
 if (isset($_REQUEST['assign'])) {
     $access->checkCsrf();
-    $themecontrollib->tc_assign_section($_REQUEST['section'], $_REQUEST['theme']);
+    $section = $_REQUEST['section'];
+    Sections::setCurrentSection($section);
+    $themeKey = $_REQUEST['theme'];
+    $themecontrollib->tc_assign_section($section, $themeKey);
+     $themeName = $themes[$themeKey]['name'] ?? $themeKey;
+     Feedback::success(tr("Theme '%0' was successfully assigned to section '%1'.", $themeName, $section));
 }
 if (isset($_REQUEST['delete'])) {
     $access->checkCsrf();
     if (isset($_REQUEST["sec"]) && is_array($_REQUEST["sec"])) {
         foreach (array_keys($_REQUEST["sec"]) as $sec) {
             $themecontrollib->tc_remove_section($sec);
+            $removedSections[] = $sec;
+        }
+        if (! empty($removedSections)) {
+            $sectionList = implode(', ', array_map(function ($name) {
+                return "'$name'";
+            }, $removedSections));
+            Feedback::success(tr("Theme associations were removed for the following sections: %0.", $sectionList));
         }
     } else {
         Feedback::error(tr('No section selected.'));

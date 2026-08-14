@@ -4,13 +4,22 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tracker\Field\AutoSyncableInterface;
+
+const AUTO_ASSIGN_OPTIONS = [
+    'None' => 0,
+    'Creator' => 1,
+    'Modifier' => 2,
+];
+
 /**
  * Handler class for UserSelector
  *
  * Letter key: ~u~
  *
  */
-class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, Search_FacetProvider_Interface, \Tracker\Field\EnumerableInterface
+class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implements \Tracker\Field\SynchronizableInterface, \Tracker\Field\ExportableInterface, \Tracker\Field\FilterableInterface, Search_FacetProvider_Interface, \Tracker\Field\EnumerableInterface, AutoSyncableInterface
 {
     public static function getManagedTypesInfo(): array
     {
@@ -35,11 +44,11 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                         'name' => tr('Auto-Assign'),
                         'description' => tr('Assign the value based on the creator or modifier.'),
                         'filter' => 'int',
-                        'default' => 0,
+                        'default' => AUTO_ASSIGN_OPTIONS['None'],
                         'options' => [
-                            0 => tr('None'),
-                            1 => tr('Creator'),
-                            2 => tr('Modifier'),
+                            AUTO_ASSIGN_OPTIONS['None'] => tr('None'),
+                            AUTO_ASSIGN_OPTIONS['Creator'] => tr('Creator'),
+                            AUTO_ASSIGN_OPTIONS['Modifier'] => tr('Modifier'),
                         ],
                         'legacy_index' => 0,
                     ],
@@ -113,6 +122,21 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                             'field' => 'multiple',
                             'value' => '0',
                             'op' => '!=='
+                        ],
+                    ],
+                    'lazyload' => [
+                        'name' => tr('Lazy Load'),
+                        'description' => tr('Load the list of users based on the user query.'),
+                        'filter' => 'int',
+                        'options' => [
+                            0 => tr('No'),
+                            1 => tr('Yes'),
+                        ],
+                        'default' => 0,
+                        'depends' => [
+                            'field' => 'inputtype',
+                            'value' => 'm',
+                            'pref' => 'elementplus_select'
                         ],
                     ],
                     'filterable' => [
@@ -217,7 +241,7 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
         $autoassign = (int) $this->getOption('autoassign');
 
         if (isset($requestData[$ins_id])) {
-            if ($autoassign == 0 || $this->canChangeValue()) {
+            if ($autoassign == AUTO_ASSIGN_OPTIONS['None'] || $this->canChangeValue()) {
                 $ausers = $requestData[$ins_id];
                 $realnames_check = $prefs['user_selector_realnames_tracker'] == 'y' && $this->getOption('showRealname');
                 $users = TikiLib::lib('user')->extract_users($ausers, $realnames_check);
@@ -229,32 +253,51 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                     $data['value'] = '';
                 }
             } else {
-                if ($autoassign == 2) {
-                    if ($this->getOption('multiple')) {
-                        $data['value'] = TikiLib::lib('trk')->parse_user_field($this->getValue());
-                        if (! in_array($user, $data['value'])) {
-                            $data['value'][] = $user;
-                        }
-                        $data['value'] = TikiLib::lib('tiki')->str_putcsv($data['value']);
-                    } else {
-                        $data['value'] = $user;
-                    }
-                } elseif ($autoassign == 1) {
-                    if (! $this->getItemId() || ($this->getTrackerDefinition()->getConfiguration('userCanTakeOwnership') == 'y' && ! $this->getValue())) {
-                        $data['value'] = $user; // the user appropiate the item
-                    } else {
-                        $data['value'] = $this->getValue();
-                        // unset($data['fieldId']); hmm?
-                    }
-                } else {
-                    $data['value'] = '';
-                }
+                $data['value'] = $this->getAutoAssignValue();
             }
         } else {
             $data['value'] = $this->getValue(false);
         }
 
         return $data;
+    }
+
+    public function getAutoSyncInlineEditFieldData(array $requestData = []): array
+    {
+        if (! isset($requestData['edit']) || $requestData['edit'] != 'inline' || isset($requestData[$this->getInsertId()])) {
+            return [];
+        }
+        return ['value' => $this->getAutoAssignValue()];
+    }
+
+    private function getAutoAssignValue()
+    {
+        global $user;
+        $autoassign = (int) $this->getOption('autoassign');
+
+        $out = '';
+
+        if ($autoassign == AUTO_ASSIGN_OPTIONS['Modifier']) {
+            if ($this->getOption('multiple')) {
+                $out = TikiLib::lib('trk')->parse_user_field($this->getValue());
+                if (! in_array($user, $out)) {
+                    $out[] = $user;
+                }
+                $out = TikiLib::lib('tiki')->str_putcsv($out);
+            } else {
+                $out = $user;
+            }
+        } elseif ($autoassign == AUTO_ASSIGN_OPTIONS['Creator']) {
+            if (! $this->getItemId() || ($this->getTrackerDefinition()->getConfiguration('userCanTakeOwnership') == 'y' && ! $this->getValue())) {
+                $out = $user; // the user appropiate the item
+            } else {
+                $out = $this->getValue();
+            }
+        } else {
+            $out = $this->getValue();
+        }
+
+        return $out;
     }
 
     public function addValue($user)
@@ -332,30 +375,46 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                     return $group['groupName'];
                 }, $groups);
                 $selected_groups = [];
-                $users = $userlib->get_members($groups);
-                foreach ($users as $group => &$usrs) {
-                    if (array_intersect($value, $usrs)) {
-                        $selected_groups[] = $group;
+                $users = [];
+                $templateData = [];
+                if ($this->trackerField->getOption('lazyload')) {
+                    foreach ($value as $v) {
+                        $selected_groups = array_unique(array_merge($selected_groups, $userlib->get_user_groups($v)));
                     }
-                    if ($this->getOption('showRealname')) {
-                        $usrs = array_combine($usrs, array_map('smarty_modifier_username', $usrs));
-                    } else {
-                        $usrs = array_combine($usrs, $usrs);
+                    TikiLib::setExternalContext(true);
+                    $params = [
+                        'groups' => implode(',', $selected_groups),
+                        'listonly' => $this->trackerField->getOption('showRealname') ? 'userrealnames' : 'users',
+                    ];
+                    $templateData['remote_url'] = TikiLib::lib('service')->getUrl('tiki-ajax_services.php?' . http_build_query($params));
+                } else {
+                    $users = $userlib->get_members($groups);
+                    foreach ($users as $group => &$usrs) {
+                        if (array_intersect($value, $usrs)) {
+                            $selected_groups[] = $group;
+                        }
+                        if ($this->getOption('showRealname')) {
+                            $usrs = array_combine($usrs, array_map('smarty_modifier_username', $usrs));
+                        } else {
+                            $usrs = array_combine($usrs, $usrs);
+                        }
                     }
                 }
-                return $this->renderTemplate('trackerinput/userselector_grouped.tpl', $context, [
+                $templateData = array_merge($templateData, [
                     'groups' => $groups,
                     'users' => $users,
                     'selected_users' => $value,
                     'selected_groups' => $selected_groups,
+                    'lazyload' => $this->trackerField->getOption('lazyload'),
                 ]);
+                return $this->renderTemplate('trackerinput/userselector_grouped.tpl', $context, $templateData);
             } else {
                 return smarty_function_user_selector(
                     [
                         'user' => $name,
                         'id'  => (! empty($context['id']) ? $context['id'] : 'user_selector_' . $this->getConfiguration('fieldId')),
                         'select' => $value,
-                        'name' => $this->getInsertId(),
+                        'name' => $this->getHTMLFieldName(),
                         'multiple' => ( $this->getOption('multiple') ? 'true' : 'false' ),
                         'editable' => 'y',
                         'allowNone' => 'y',
@@ -369,7 +428,8 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
                         'targetListTitle' => $this->getOption('targetListTitle'),
                         'ordering' => $this->getOption('ordering'),
                         'cardinalityParam' => $this->getConfiguration('validationParam'),
-                        'validationMessage' => $this->getConfiguration('validationMessage')
+                        'validationMessage' => $this->getConfiguration('validationMessage'),
+                        'lazyload' => $this->getOption('lazyload'),
                     ],
                     $smarty->getEmptyInternalTemplate()
                 );
@@ -626,8 +686,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
             ->setLabel($name)
             ->setPlainReplacement('username')
             ->setRenderTransform(function ($value) {
-                $smarty = TikiLib::lib('smarty');
-
                 if ($value) {
                     return implode(', ', array_map('smarty_modifier_userlink', TikiLib::lib('trk')->parse_user_field($value)));
                 }
@@ -638,8 +696,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
             ->setLabel($name)
             ->setReadOnly(true)
             ->setRenderTransform(function ($value) {
-                $smarty = TikiLib::lib('smarty');
-
                 if ($value) {
                     $value = TikiLib::lib('trk')->parse_user_field($value);
                     foreach ($value as &$v) {
@@ -720,7 +776,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
         if (! isset($localCache[$CACHE_KEY])) {
             $userlib = TikiLib::lib('user');
             $tikilib = TikiLib::lib('tiki');
-            $smarty = TikiLib::lib('smarty');
             $users = [];
 
             $groupIds = $this->getOption('groupIds');
@@ -760,13 +815,6 @@ class Tracker_Field_UserSelector extends \Tracker\Field\AbstractItemField implem
     public function getFilterCollection()
     {
         global $prefs;
-
-        if ($prefs['user_selector_realnames_tracker'] === 'y' && $this->getOption('showRealname')) {
-            $smarty = TikiLib::lib('smarty');
-            $showRealname = true;
-        } else {
-            $showRealname = false;
-        }
 
         $users = $this->getPossibleItemValues();
         asort($users, SORT_NATURAL | SORT_FLAG_CASE);

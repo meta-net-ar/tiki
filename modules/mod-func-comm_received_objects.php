@@ -28,5 +28,5 @@ function module_comm_received_objects($mod_reference, $module_params)
     $smarty = TikiLib::lib('smarty');
     $ranking = $tikilib->list_received_pages(0, -1, 'pageName_asc');
 
-    $smarty->assign('modReceivedPages', $ranking["cant"]);
+    $smarty->assign('modReceivedPages', $ranking["count"]);
 }

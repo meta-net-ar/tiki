@@ -1,0 +1,68 @@
+---
+description: Response from GET /trackers/{trackerId}/items/{itemId}/history.
+type: object
+required:
+  - fieldId
+  - filter
+  - diff_style
+  - offset
+  - history
+  - count
+  - item_info
+  - field_option
+  - metatag_robots
+  - logging
+properties:
+  fieldId:
+    type: integer
+    nullable: true
+  filter:
+    type: array
+  diff_style:
+    type: string
+  offset:
+    type: integer
+    nullable: true
+  history:
+    type: array
+    description: |
+      Chronological list of field changes. The initial creation entry (version=0)
+      omits 'diff', 'rendered_value' and 'rendered_new'; subsequent entries include
+      them, so only the keys guaranteed in every entry are required here.
+    items:
+      type: object
+      required:
+        - version
+        - fieldId
+        - value
+        - user
+        - lastModif
+        - new
+      properties:
+        version:
+          type: integer
+        fieldId:
+          type: integer
+          nullable: true
+        value:
+          type: string
+        user:
+          type: string
+          nullable: true
+        lastModif:
+          type: integer
+        new:
+          type: string
+  count:
+    type: integer
+  item_info:
+    $ref: schemas-TrackerItem.yaml
+  field_option:
+    type: object
+    description: Map of fieldId string to full field definition.
+    additionalProperties:
+      $ref: schemas-TrackerField.yaml
+  metatag_robots:
+    type: string
+  logging:
+    type: integer

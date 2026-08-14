@@ -42,7 +42,7 @@ abstract class Type
 
         foreach ($inputParams as $key => $input) {
             $inputName = $taskName . '_' . $key;
-            $params[$key] = isset($routeParams[$inputName]) ? $routeParams[$inputName] : '';
+            $params[$key] = $routeParams[$inputName] ?? '';
         }
 
         return json_encode($params);

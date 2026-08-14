@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -109,40 +109,43 @@ class BookmarkLib extends TikiLib
 
         $query = "insert into `tiki_user_bookmarks_folders`(`folderId`, `name`,`parentId`,`user`) values(?,?,?,?)";
         $result = $this->query($query, [$maxId + 1,$name,$parentId,$user]);
+        return ($result && $result->numRows() > 0);
     }
 
     public function replace_url($urlId, $folderId, $name, $url, $user)
     {
         if ($urlId) {
             $query = "update `tiki_user_bookmarks_urls` set `user`=?,`lastUpdated`=?,`folderId`=?,`name`=?,`url`=? where `urlId`=?";
-            $bindvars = [$user,(int) $this->now,$folderId,$name,$url,$urlId];
+            $bindvars = [$user, $this->now, $folderId, $name, $url, $urlId];
+            $result = $this->query($query, $bindvars);
+            return  $urlId;
         } else {
-            $query = " insert into `tiki_user_bookmarks_urls`(`name`,`url`,`data`,`lastUpdated`,`folderId`,`user`)
-      values(?,?,?,?,?,?)";
-                  $bindvars = [$name,$url,'',(int) $this->now,$folderId,$user];
+            $query = " insert into `tiki_user_bookmarks_urls`(`name`,`url`,`data`,`lastUpdated`,`folderId`,`user`) values(?,?,?,?,?,?)";
+            $bindvars = [$name, $url, '', $this->now, $folderId, $user];
+            $result = $this->query($query, $bindvars);
+            if ($result && $result->numRows()) {
+                return $this->lastInsertId();
+            }
+            return false;
         }
-
-        $result = $this->query($query, $bindvars);
-        $id = $this->getOne("select max(`urlId`) from `tiki_user_bookmarks_urls` where `url`=? and `lastUpdated`=?", [$url,(int) $this->now]);
-        return $id;
     }
 
     public function refresh_url($urlId)
     {
         $info = $this->get_url($urlId);
 
-        if (strstr($info["url"], 'tiki-') || strstr($info["url"], 'messu-')) {
+        if (str_contains($info["url"], 'tiki-') || str_contains($info["url"], 'messu-')) {
             return false;
         }
 
         $data = @$this->httprequest($info["url"]);
 
         if (! $data) {
-            return;
+            return false;
         }
 
         $query = "update `tiki_user_bookmarks_urls` set `lastUpdated`=?, `data`=? where `urlId`=?";
-        $result = $this->query($query, [(int) $this->now,$data,$urlId]);
+        $result = $this->query($query, [$this->now,$data,$urlId]);
         return true;
     }
 
@@ -160,9 +163,9 @@ class BookmarkLib extends TikiLib
         }
 
         $query = "select * from `tiki_user_bookmarks_urls` where `folderId`=? and `user`=? $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_user_bookmarks_urls` where `folderId`=? and `user`=? $mid";
+        $query_count = "select count(*) from `tiki_user_bookmarks_urls` where `folderId`=? and `user`=? $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -173,7 +176,7 @@ class BookmarkLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -185,9 +188,9 @@ class BookmarkLib extends TikiLib
         $result = $this->query($query, [$folderId,$user]);
 
         while ($res = $result->fetchRow()) {
-            $cant = $this->getOne("select count(*) from `tiki_user_bookmarks_urls` where `folderId`=? and `user`=?", [$res["folderId"],$user]);
+            $count = $this->getOne("select count(*) from `tiki_user_bookmarks_urls` where `folderId`=? and `user`=?", [$res["folderId"],$user]);
 
-            $res["urls"] = $cant;
+            $res["urls"] = $count;
             $ret[] = $res;
         }
 

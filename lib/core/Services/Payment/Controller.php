@@ -28,7 +28,7 @@ class Services_Payment_Controller
         $ret = [];
 
         foreach ($items as $item) {
-            $ret[] = $cartlib->add_to_cart($item['params'], new jitFilter($item));
+            $ret[] = $cartlib->add_to_cart($item['params'], new JitFilter($item));
         }
 
         return $ret;

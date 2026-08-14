@@ -1,3 +1,4 @@
+{include file='token_view_actions.tpl'}
 <div class="t_navbar">
     {if $tiki_p_edit_article eq 'y' or $tiki_p_admin eq 'y' or $tiki_p_admin_cms eq 'y'}
         {button href="tiki-edit_article.php" _type="link" _icon_name="create" _text="{tr}New Article{/tr}"}
@@ -31,7 +32,7 @@
 {if $prefs.feature_article_comments == 'y' &&
         ($tiki_p_read_comments == 'y' || $tiki_p_post_comments == 'y' || $tiki_p_edit_comments == 'y')}
 
-    <div id="comment-container" data-bs-target="{service controller=comment action=list type=article objectId=$articleId}"></div>
+    <div id="comment-container" class="my-3 mx-0" data-bs-target="{service controller=comment action=list type=article objectId=$articleId}"></div>
     {jq}
         var id = '#comment-container';
         $(id).comment_load($(id).data('bs-target'));

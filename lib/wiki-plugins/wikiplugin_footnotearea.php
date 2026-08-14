@@ -20,7 +20,6 @@ function wikiplugin_footnotearea_info()
                 'name' => tra('Class'),
                 'description' => tra('Filter footnotearea by footnote class'),
                 'since' => '17.0',
-                'default' => '',
                 'filter' => 'alnum',
                 'accepted' => tra('Valid CSS class'),
             ],
@@ -50,15 +49,11 @@ function wikiplugin_footnotearea($data, $params, $offset, $context)
     $footnotes = $context->footnotes;
     $smarty = TikiLib::lib('smarty');
 
-    if (isset($params['sameasstyle'])) {
-        $smarty->assign('sameType', $params['sameasstyle']);
-    } else {
-        $smarty->assign('sameType', 'disc');
-    }
+    $smarty->assign('sameType', $params['sameasstyle']);
 
     $html = '';
 
-    if (isset($params['class'])) {                                       // if class was given
+    if (! is_null($params['class'])) {                                       // if class was given
         if (isset($footnotes['lists'][$params['class']])) {        // if the class exists
             $html = genFootnoteArea($footnotes['lists'][$params['class']]);
             unset($footnotes['lists'][$params['class']]['entry']);

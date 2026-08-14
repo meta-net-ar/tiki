@@ -1,96 +1,52 @@
 {if isset($show_calendar_module) and $show_calendar_module eq 'y'}
     {tikimodule error=$module_params.error title=$tpl_module_title name=$name flip=$module_params.flip decorations=$module_params.decorations nobox=$module_params.nobox notitle=$module_params.notitle}
-        {if $viewlist eq 'list'}
-            {include file='tiki-calendar_listmode.tpl'}
-        {else}
-            {include file='tiki-calendar_nav.tpl' ajax='n' module='y'}
-
-            <table class="caltable" style="text-align:center;">
-                <tr>
-                    {section name=dn loop=$daysnames_abr}
-                        <th class="days" style="width:14%">{$daysnames_abr[dn]|ucfirst}</th>
-                    {/section}
-                </tr>
-                {cycle values="odd,even" print=false}
-                {section name=w loop=$cell}
-                    <tr>
-                        {section name=d loop=$daysnames_abr}
-                            {if !empty($cell[w][d].date)}
-                                {assign var=date value=$cell[w][d].date}
-                            {elseif !empty($cell[w][d].day)}
-                                {assign var=date value=$cell[w][d].day}
-                            {/if}
-                            {if isset($date)}
-                                {if in_array($viewmode, array('bimester', 'trimester', 'quarter', 'semester', 'year'))}
-                                    {if in_array($prefs.display_field_order, array('DMY', 'DYM', 'YDM'))}
-                                        {assign var=day_cursor value=$date|tiki_date_format:"%d-%m"}
-                                    {else}
-                                        {assign var=day_cursor value=$date|tiki_date_format:"%m-%d"}
-                                    {/if}
-                                {elseif $viewmode eq 'day' and (!$cell[w][d].focus)}
-                                    {$day_cursor = ''}
-                                {else}
-                                    {assign var=day_cursor value=$date|tiki_date_format:"%d"}
-                                {/if}
-                                {assign var=month_cursor value=$date|tiki_date_format:"%m"}
-                            {/if}
-                            {assign var=day_today value=$smarty.now|tiki_date_format:"%d"}
-                            {assign var=month_today value=$smarty.now|tiki_date_format:"%m"}
-
-                            {if isset($cell[w][d].focus) and $cell[w][d].focus}
-                                {cycle values="odd,even" print=false}
-                            {else}
-                                {cycle values="text-muted" print=false}
-                            {/if}
-                            <td class="{if isset($cell[w][d].day) and $date eq $today}calhighlight calborder{else}{cycle advance=false}{/if}{if isset($cell[w][d].items[0])
-                                and ((isset($cell[w][d].items[0].modifiable) and $cell[w][d].items[0].modifiable eq "y")
-                                || $cell[w][d].items[0].visible eq 'y')} calmodfocus{/if}" style="font-size:0.8em; width=14%">
-                                {if isset($cell[w][d].over)}
-                                    {assign var=over value=$cell[w][d].over}
-                                {elseif isset($cell[w][d].items[0])}
-                                    {assign var=over value=$cell[w][d].items[0].over}{else}{assign var=over value=""}
-                                {/if}
-                                {if isset($cell[w][d].items[0]) and ((isset($cell[w][d].items[0].modifiable)
-                                    and $cell[w][d].items[0].modifiable eq "y") || $cell[w][d].items[0].visible eq 'y')}
-                                    {if empty($calendar_popup) or $calendar_popup eq "y"}
-                                        <a href="{$myurl}?todate={$date}&amp;viewmode={$viewmodelink}" title="{tr}View{/tr}"
-                                            {if (isset($sticky_popup) and $sticky_popup eq 'y') or ($prefs.calendar_sticky_popup eq "y" and $cell[w][d].items[0].calitemId)}
-                                                {popup sticky=true fullhtml="1" text=$over}{else}{popup fullhtml="1" text=$over}
-                                            {/if}
-                                        >
-                                            {if isset($day_cursor)}
-                                                {$day_cursor}
-                                            {/if}
-                                        </a>
-                                    {else}
-                                        {if isset($day_cursor)}
-                                            {$day_cursor}
-                                        {/if}
-                                        {$over}
-                                    {/if}
-                                {elseif $linkall eq 'y'}
-                                    <a href="{$myurl}?todate={$cell[w][d].day}&amp;viewmode={$viewmodelink}">
-                                        {$day_cursor}
-                                    </a>
-                                {else}
-                                    {if isset($day_cursor)}
-                                        {$day_cursor}
-                                    {/if}
-                                {/if}
-                            </td>
-                        {/section}
-                    </tr>
-                {/section}
-            </table>
-        {/if}
         {if $tiki_p_add_events eq 'y' && (empty($module_params.showaction) || $module_params.showaction ne 'n')}
             <br>
             <p>
-                <a class="btn btn-link" href="{bootstrap_modal controller='calendar' action=$prefs.calendar_event_click_action size='modal-lg'}">
+                <a class="btn btn-link" href="{bootstrap_modal controller='calendar' action='edit_item' size='modal-lg' defaultCalendarId=$defaultCalendarId return_url=$returnURL}" role="button">
                     {icon name="add"}
                     {tr}Add Event{/tr}
                 </a>
             </p>
         {/if}
+        {if $viewlist eq 'list'}
+            <div class="calendar-list-compact">
+                {include file='tiki-calendar_nav.tpl' module='y'}
+                {include file='tiki-calendar_listmode.tpl'}
+            </div>
+        {else}
+            <div>
+                {if count($calendars) >= 1 && $viewnavbar eq 'y'}
+                    {include file="checkboxes_calendar_form.tpl" filterCal="filterModuleCal"}
+                    {include file="export_calendar_in_csv_or_ical.tpl" exportCal="exportModuleCal"}
+                {/if}
+                {if $viewlist neq 'list'}
+                    {jq}
+                        var printingParams = {pdf_export: '{{$pdf_export}}', pdf_warning: '{{$pdf_warning}}', pref_print_pdf_from_url: '{{$prefs.print_pdf_from_url}}'};
+                        var associatedWikiPage = {{$associatedWikiPage|json_encode}} || null;
+                        var eventCalendarParams = {{$eventCalendarParams|json_encode}};
+                        var returnUrl = ('{{$returnURL}}');
+                        var uniqueId = ({{$uniqueId|json_encode}}) || null; // In the case user want to display the same calendar with the same parameter more than one time
+                        var moduleCalendarFocusdate = '{{$moduleCalendarFocusdate}}';
+
+                        var dataToBuildUrl = '{{$moduleCalendarIds}}' ? null : {{$urlOfFetchingData|json_encode}};
+                        var divClassContainer = ".calendar-container";
+                        var urlOfFetchingData = $.service("tracker_calendar", "list", $.extend(dataToBuildUrl, dataToBuildUrl));
+                        var linkToFindItemsOfCalendar = dataToBuildUrl ? urlOfFetchingData : 'tiki-ajax_services.php?controller=calendar&action=list_items&calIds=' + '{{$moduleCalendarIds}}'
+                        $('.calendar-container').defineParameterOfMultipleCalendar(eventCalendarParams, printingParams, divClassContainer, moduleCalendarFocusdate, linkToFindItemsOfCalendar, associatedWikiPage, returnUrl);
+                    {/jq}
+                {/if}
+                {if $pdf_export eq 'y' and $pdf_warning eq 'n'}
+                    
+                {/if}
+                <div id="test"></div>
+                {include file="configlinks_calendar.tpl" filterCal="filterModuleCal"}
+                <div class='calendar-container'></div>
+                {if $viewlist eq 'list'}
+                    {$out}
+                {/if}
+            </div>
+        {/if}
+        
     {/tikimodule}
 {/if}

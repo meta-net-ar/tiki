@@ -85,7 +85,6 @@ class Tracker_Definition
         $trklib = TikiLib::lib('trk');
         $trackerInfos = $trklib->list_trackers(0, -1, 'trackerId_asc');
         $definitions = [];
-        //var_dump($trackerInfos['list']);
         foreach ($trackerInfos['list'] as $id => $name) {
             $definition = self::get($id);
             $definitions[] = $definition;
@@ -138,7 +137,7 @@ class Tracker_Definition
 
     public function getConfiguration($key, $default = false)
     {
-        return isset($this->trackerInfo[$key]) ? $this->trackerInfo[$key] : $default;
+        return $this->trackerInfo[$key] ?? $default;
     }
 
     public function isEnabled($key)
@@ -676,5 +675,27 @@ class Tracker_Definition
         }
 
         return $status;
+    }
+
+    public function getSynchronizedTabulars($type = null): array
+    {
+        $tabularIds = explode(',', $this->getConfiguration('tabularSync'));
+        $tabularIds = array_filter($tabularIds);
+        $tabularIds = array_map('intval', $tabularIds);
+        $tabulars = [];
+        foreach ($tabularIds as $tabularId) {
+            $tabular = TikiLib::lib('tabular')->getInfo($tabularId);
+            if (empty($tabular['tabularId'])) {
+                throw new Exception(tr("Tracker remote synchronization configured with a import-export format that does not exist. Tracker: %0, Tabular: %1", $this->getId(), $tabularId));
+            }
+            if ($type == 'odbc' && empty($tabular['odbc_config'])) {
+                continue;
+            }
+            if ($type == 'api' && empty($tabular['api_config'])) {
+                continue;
+            }
+            $tabulars[] = $tabular;
+        }
+        return $tabulars;
     }
 }

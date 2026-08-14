@@ -1,0 +1,9 @@
+RENAME TABLE `tiki_acct_account` TO `zzz_unused_tiki_acct_account`;
+RENAME TABLE `tiki_acct_bankaccount` TO `zzz_unused_tiki_acct_bankaccount`;
+RENAME TABLE `tiki_acct_book` TO `zzz_unused_tiki_acct_book`;
+RENAME TABLE `tiki_acct_item` TO `zzz_unused_tiki_acct_item`;
+RENAME TABLE `tiki_acct_journal` TO `zzz_unused_tiki_acct_journal`;
+RENAME TABLE `tiki_acct_stack` TO `zzz_unused_tiki_acct_stack`;
+RENAME TABLE `tiki_acct_stackitem` TO `zzz_unused_tiki_acct_stackitem`;
+RENAME TABLE `tiki_acct_statement` TO `zzz_unused_tiki_acct_statement`;
+RENAME TABLE `tiki_acct_tax` TO `zzz_unused_tiki_acct_tax`;

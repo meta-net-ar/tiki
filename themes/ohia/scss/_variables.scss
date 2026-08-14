@@ -1,14 +1,18 @@
+@use "sass:color";
+
 // Ohia theme bootstrap-variables.scss.
 // The color palette for this theme is derived from the ohia lehua tree and its enviorment in Hawaii.
 // These are just physical attributes and  no reference is implied regarding the cultural aspects of the tree.
-$sky-light: #3585D0; //#4C95D6;
+$sky-light: #398ad8; //#4C95D6;
+$sky-new: #194E80;
 $sky-deep: #005EA6;
-$cloud: #DEE1E6;
+$cloud: #b9bcc0;
 $wood: #987255;
 $leaf: #80A60F;
-$blossom-red: #F90100;
+$blossom-red: #df1413; // #F90100;
 $blossom-yellow: #CDA353;
 $cooled-lava-dark: #030303; //#2d2d3a; // #28293F ; // #0C0D13; // #28293F was too light for link contrast; last change: reduce saturation for less-blue color
+$cooled-lava-medium: #2C3135;
 $cooled-lava-light: #BEBDB8;
 $sea: #638A93;
 
@@ -20,7 +24,6 @@ $sea: #638A93;
 
 // Color system
 
-// scss-docs-start gray-color-variables
 $white:    #fff;  // default
 $gray-100: #f8f9fa;  // default
 $gray-200: #e9ecef;  // default
@@ -32,10 +35,7 @@ $gray-700: #495057;  // default
 $gray-800: #343a40;  // default
 $gray-900: #212529;  // default
 $black:    $cooled-lava-dark; //#000;  // default
-// scss-docs-end gray-color-variables
 
-// fusv-disable
-// scss-docs-start gray-colors-map
 $grays: (
     "100": $gray-100,
     "200": $gray-200,
@@ -47,10 +47,7 @@ $grays: (
     "800": $gray-800,
     "900": $gray-900
 );  // default
-// scss-docs-end gray-colors-map
-// fusv-enable
 
-// scss-docs-start color-variables
 $blue:    #0d6efd;  // default
 $indigo:  #6610f2;  // default
 $purple:  #6f42c1;  // default
@@ -61,9 +58,7 @@ $yellow:  #ffc107;  // default
 $green:   #198754;  // default
 $teal:    #20c997;  // default
 $cyan:    #0dcaf0;  // default
-// scss-docs-end color-variables
 
-// scss-docs-start colors-map
 $colors: (
     "blue":       $blue,
     "indigo":     $indigo,
@@ -80,50 +75,67 @@ $colors: (
     "gray":       $gray-600,
     "gray-dark":  $gray-800
 );  // default
-// scss-docs-end colors-map
+
 
 $red-300: tint-color($red, 40%);  // default
 $green-300: tint-color($green, 40%);  // default
 
-//$primary: #193c5a; //  #193c5a
-//$success: #aad4ab; //  #3d6c2a
-//$info: #aad0e2; //  #1b6083
-//$warning: #deceb3; //  darken(#f0ad4e, 30%)
-//$danger: #dda8a7;
-
-// scss-docs-start theme-color-variables
 $primary:       $leaf; // #193c5a;
-$secondary:     darken($leaf,15%); // #dddddd;
+$secondary:     #64810c; // darken($leaf,15%); // #dddddd;
 $success:       $sky-deep; // #aad4ab;
 $info:          $sky-light; // #aad0e2;
 $warning:       $blossom-yellow; // #deceb3;
 $danger:        $blossom-red; // #dda8a7;
-$light:         #3585D0; //$sky-light; //$gray-100;
+$light:         $sky-new; // #acafb2; // $cloud; //$gray-100;
 $dark:          $cooled-lava-dark; //#000;
-// scss-docs-end theme-color-variables
 
 $theme-colors: (
     "primary":           $leaf,
-    "secondary":         darken($leaf,15%),
+    "secondary":         color.adjust($leaf,$lightness: -15%, $space: hsl),
     "success":           $sky-deep,
     "info":              $sky-light,
     "warning":           $blossom-yellow,
     "danger":            $blossom-red,
-    "light":             $sky-light,
+    "light":             $sky-new,
     "dark":              $cooled-lava-dark
 );
 
 $body-emphasis-color:       #fff;
+// From scss-docs-start theme-bg-subtle-dark-variables, modified
+$primary-text-emphasis:        tint-color($primary, 40%); // default
+$secondary-text-emphasis:      tint-color($secondary, 40%); // default
+$success-text-emphasis:        tint-color($success, 40%); // default
+$info-text-emphasis:           tint-color($info, 40%); // default
+$warning-text-emphasis:        tint-color($warning, 40%); // default
+$danger-text-emphasis:         tint-color($danger, 40%); // default
+$light-text-emphasis:          $gray-100; // default
+$dark-text-emphasis:           $gray-300; // default
 
+$primary-bg-subtle:            shade-color($primary, 80%); // default
+$secondary-bg-subtle:          shade-color($secondary, 80%); // default
+$success-bg-subtle:            shade-color($success, 80%); // default
+$info-bg-subtle:               shade-color($info, 80%); // default
+$warning-bg-subtle:            shade-color($warning, 80%); // default
+$danger-bg-subtle:             shade-color($danger, 80%); // default
+$light-bg-subtle:              $gray-800; // default
+$dark-bg-subtle:               mix($gray-800, $black); // default
+
+$primary-border-subtle:        shade-color($primary, 40%); // default
+$secondary-border-subtle:      shade-color($secondary, 40%); // default
+$success-border-subtle:        shade-color($success, 40%); // default
+$info-border-subtle:           shade-color($info, 40%); // default
+$warning-border-subtle:        shade-color($warning, 40%); // default
+$danger-border-subtle:         shade-color($danger, 40%); // default
+$light-border-subtle:          $gray-700; // default
+$dark-border-subtle-:           $gray-800; // default
 
 //  Options
-
 // Prefix for :root CSS variables
 
 $variable-prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
 $prefix:                      $variable-prefix;  // default
-
 $enable-dark-mode:            false;
+
 //  Spacing
 
 //  Body
@@ -132,10 +144,8 @@ $body-color: $cloud; // #e9ecef;
 
 $body-secondary-color:      rgba($body-color, .75);  // default
 $body-secondary-bg:         $gray-800;
-
 $body-tertiary-color:       rgba($body-color, .5);  // default
 $body-tertiary-bg:          $gray-700;
-
 $body-emphasis-color:       $white;  // default
 
 //  Links
@@ -149,9 +159,6 @@ $component-active-color: #ffffff;
 $component-active-bg: #030511;
 
 // Typography
-//
-// Font, line-height, and color for body text, headings, and more.
-
 $font-family-sans-serif: Optima, Candara, 'Noto Sans', source-sans-pro, sans-serif; // 'Alegreya Sans', Helvetica, Arial, sans-serif;
 $font-family-serif: Verdana, Geneva, Arial, Helvetica, sans-serif;
 $font-family-monospace: Menlo, Monaco, Consolas, "Courier New", monospace;
@@ -165,34 +172,28 @@ $headings-font-weight: 500;
 $display-font-family: "Alegreya Sans SC", sans-serif;
 //$display-font-style:  null;  // default
 //$display-font-weight: 300;  // default
-
+$blockquote-footer-color:     #778088; // $gray-600 !default;
 $text-muted:                  var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 - darken($body-color, 6%);
+$hr-border: $gray-500;
 
 //  Tables
 $table-color:                 var(--#{$prefix}emphasis-color);  // default
 $table-bg:                    var(--#{$prefix}body-bg);  // default
 $table-accent-bg:             transparent;  // default
-//$table-bg: transparent;
-//$table-bg-accent: #373737;
-//$table-bg-hover: $gray-500;
-//$table-bg-active: $table-bg-hover;
 
 // ** Border color for table and cell borders.
 $table-border-color: #696969;
 
 //  Buttons
-// $btn-default-color: #ffffff;
-// $btn-default-bg: #3676c4;
-// $btn-default-border: #3676c4;
-
 $btn-font-weight: normal;
+$input-btn-font-size:         $font-size-base; // !default;
 
 $btn-primary-color: #fd0006;
 $btn-primary-bg: #2f2f2f;
 $btn-primary-border: #5f5f5f;
 
 $btn-secondary-color: #fd0006;
-$btn-secondary-bg: lighten($btn-primary-bg, 15%);
+$btn-secondary-bg: color.adjust($btn-primary-bg, $lightness: 15%, $space: hsl);
 //  $btn-secondary-border: $btn-primary-border;
 
 $btn-success-color: #ffffff;
@@ -233,7 +234,7 @@ $input-btn-focus-box-shadow:  0 0 0 $input-btn-focus-width $input-btn-focus-colo
 $custom-control-indicator-focus-box-shadow:     0 0 0 1px var(--#{$prefix}body-bg), $input-btn-focus-box-shadow;
 
 // Navs
-$nav-link-color:                    var(--#{$prefix}link-color); //  !default; $leaf;
+$nav-link-color:                     $link-color; //  !default; $leaf; // #161B03;
 $nav-link-hover-color: $link-hover-color;
 
 $nav-tabs-border-color:             $wood;
@@ -244,75 +245,54 @@ $nav-tabs-link-active-color:        $link-hover-color;
 $nav-tabs-link-active-bg:           var(--#{$prefix}body-bg);
 $nav-tabs-link-active-border-color: $wood $wood $nav-tabs-link-active-bg;
 
-
-    // Navbar
-// scss-docs-start navbar-theme-variables
-$navbar-light-color:                $cooled-lava-dark;
-$navbar-light-hover-color:          lighten($cooled-lava-dark, 8%);
-$navbar-light-active-color:         $navbar-light-hover-color;
-$navbar-light-disabled-color:       rgba($black, .3);  // default
-$navbar-light-toggler-icon-bg:      url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-light-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
-$navbar-light-toggler-border-color: rgba($black, .1);  // default
-
-$navbar-light-brand-color: $navbar-light-color;
-$navbar-light-brand-hover-color:darken($navbar-light-color,10%);
-$navbar-light-brand-hover-bg:transparent;
-
-$navbar-dark-color:                 $leaf; // rgba($white, .55);  // default
+// Navbar
+$navbar-dark-color:                 rgba($white, .64);  // default
 $navbar-dark-hover-color:           rgba($white, .75);  // default
 $navbar-dark-active-color:          $white;  // default
 $navbar-dark-disabled-color:        rgba($white, .25);  // default
 $navbar-dark-toggler-icon-bg:       url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='#{$navbar-dark-color}' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/></svg>");  // default
 $navbar-dark-toggler-border-color:  rgba($white, .1);  // default
 
-
-// scss-docs-end navbar-theme-variables
-
-
 // Navbar links
-//$navbar-light-color: #fd0006;
-//$navbar-light-hover-color: #f4f4f4;
-//$navbar-light-hover-bg:transparent;
-//$navbar-light-active-color: #f4f4f4;
+$navbar-light-color: #BDBDBD; // #fd0006;
+$navbar-light-hover-color: #333333;
+$navbar-light-hover-bg:transparent;
+$navbar-light-active-color: #141414;
 ////darken($navbar-light-bg,6.5%);
-//$navbar-light-disabled-color: #cccccc;
-//$navbar-light-disabled-bg:transparent;
-
+$navbar-light-disabled-color: #141414;
+$navbar-light-disabled-bg:transparent;
+$navbar-light-brand-color: $navbar-light-color;
+$navbar-light-brand-hover-color:color.adjust($navbar-light-color,$lightness: -10%, $space: hsl);
+$navbar-light-brand-hover-bg:transparent;
 // Navbar brand label
-
-
 
 // Dropdowns
 //
 // Dropdown menu container and contents.
-
-// scss-docs-start dropdown-variables
 $dropdown-link-color:               $link-color;
-$dropdown-bg:                       darken($body-bg, 5%);
-$dropdown-border-color:             darken($dropdown-bg, 5%);
-
+$dropdown-bg:                       color.adjust($body-bg, $lightness: -5%, $space: hsl);
+$dropdown-border-color:             color.adjust($dropdown-bg, $lightness: -5%, $space: hsl);
 
 // Pagination
-$pagination-color: $link-color;
-$pagination-bg: $gray-300;
-$pagination-border: $gray-500;
-
+$pagination-color: #94BF12;
+$pagination-bg: $gray-800;
+$pagination-border: $gray-700;
 $pagination-hover-color: $link-hover-color;
 //$pagination-hover-bg: $dropdown-link-hover-bg;
 $pagination-hover-border: #dddddd;
 
-$pagination-active-color: #ffffff;
+$pagination-active-color: #000;
 $pagination-active-bg: $primary;
 $pagination-active-border: $primary;
 
-$pagination-disabled-color: $gray-800;
-$pagination-disabled-bg: #ffffff;
+$pagination-disabled-color: $gray-500; //$gray-800;
+$pagination-disabled-bg: $cooled-lava-dark; // = #030303;
 $pagination-disabled-border: #dddddd;
 
 // Jumbotron
 $jumbotron-padding:30px;
 $jumbotron-color:inherit;
-$jumbotron-bg:lighten($body-bg,10%);
+$jumbotron-bg:color.adjust($body-bg,$lightness: 10%, $space: hsl);
 $jumbotron-heading-color:inherit;
 
 // Cards
@@ -321,6 +301,15 @@ $card-bg: transparent;
 //$card-footer-bg:darken(#5e0000,10%);
 //$card-border-color: #333333;
 
+// Accordion
+$accordion-icon-color:         $primary-text-emphasis; // !default;
+$accordion-icon-active-color:  $primary-text-emphasis; // !default;
+
+$accordion-button-icon:         url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-color}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>"); // !default;
+$accordion-button-active-icon:  url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$accordion-icon-active-color}'><path fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708'/></svg>"); // !default;
+
+$accordion-button-active-bg:              var(--#{$prefix}primary-bg-subtle); // !default;
+$accordion-button-active-color:           var(--#{$prefix}primary-text-emphasis); // !default;
 
 // Tooltips
 $tooltip-color: #ffffff;
@@ -331,7 +320,7 @@ $tooltip-arrow-color: $tooltip-bg;
 // Popovers
 $popover-bg: #ffffff;
 $popover-border-color:rgba(0,0,0,.2);
-$popover-header-bg:darken($popover-bg,3%);
+$popover-header-bg:color.adjust($popover-bg,$lightness: -3%, $space: hsl);
 $popover-arrow-color: $popover-bg;
 
 // Badges
@@ -345,7 +334,7 @@ $badge-active-bg: #ffffff;
 $modal-content-color: var(--#{$prefix}body-color);
 $modal-content-bg: var(--#{$prefix}body-bg);
 $modal-content-border-color:rgba(0,0,0,.2);
-$modal-backdrop-bg:darken(#d9534f,30%);
+$modal-backdrop-bg:color.adjust(#d9534f,$lightness: -30%, $space: hsl);
 $modal-header-border-color: #e5e5e5;
 $modal-footer-border-color: $modal-header-border-color;
 
@@ -355,8 +344,8 @@ $modal-footer-border-color: $modal-header-border-color;
 // List group
 $list-group-color:  var(--#{$prefix}body-color);
 $list-group-bg: var(--#{$prefix}body-bg);
-$list-group-disabled-color: darken($body-color, 10%);
-$list-group-disabled-bg: lighten($body-bg, 6%);
+$list-group-disabled-color: color.adjust($body-color, $lightness: -10%, $space: hsl);
+$list-group-disabled-bg: color.adjust($body-bg, $lightness: 6%, $space: hsl);
 $list-group-disabled-text-color: $list-group-disabled-color;
 $list-group-link-color: var(--#{$prefix}body-color);
 $list-group-link-hover-color: $list-group-link-color;
@@ -368,12 +357,8 @@ $thumbnail-border: #dddddd;
 $thumbnail-caption-color: var(--#{$prefix}body-color);
 
 // Figures
-
-// scss-docs-start figure-variables
 //$figure-caption-font-size:          $small-font-size;
-$figure-caption-color:              darken($body-color, 5%);
-// scss-docs-end figure-variables
-
+$figure-caption-color:              color.adjust($body-color, $lightness: -5%, $space: hsl);
 
 // Breadcrumbs
 $breadcrumb-bg: $gray-900;
@@ -398,22 +383,22 @@ $code-bg: #f9f2f4;
 $kbd-color: #ffffff;
 $kbd-bg: #333333;
 $pre-bg: #f5f5f5;
-$pre-color: $gray-800;
+$pre-color: var(--#{$prefix}body-color); // $gray-800;
 $pre-border-color: #cccccc;
 
-// ==Pills
+// Pills
 $pills-active-link-hover-bg: $component-active-bg;
 $nav-pills-active-link-hover-color: $component-active-color;
 
 $text-muted: var(--#{$prefix}secondary-color);  // default // Deprecated in 5.3.0 -- #949494;
-$abbr-border-color: $gray-200;
-$headings-small-color: $gray-200;
-$blockquote-small-color: #969696;
+//$abbr-border-color: $gray-200;
+//$headings-small-color: $gray-200;
+//$blockquote-small-color: #969696;
 
-$blockquote-border-color: #969696;
-$page-header-border-color: #969696;
+//$blockquote-border-color: #969696;
+//$page-header-border-color: #969696;
 
-$hr-border: $gray-500;
+
 
 // - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
 

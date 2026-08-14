@@ -57,6 +57,6 @@ function module_forums_last_posts($mod_reference, $module_params)
     $replyprefix = tra("Re:");
 
     $smarty->assign('modForumsLastPosts', $ranking["data"]);
-    $smarty->assign('date', isset($module_params['date']) ? $module_params['date'] : 'n');
-    $smarty->assign('author', isset($module_params['author']) ? $module_params['author'] : 'n');
+    $smarty->assign('date', $module_params['date'] ?? 'n');
+    $smarty->assign('author', $module_params['author'] ?? 'n');
 }

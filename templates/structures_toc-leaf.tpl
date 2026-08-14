@@ -1,5 +1,5 @@
 {strip}
-    <li class="row {if $toc_type eq 'fancy'}fancy{elseif $toc_type eq 'admin'} admin{/if}toclevel"{if $toc_type eq 'admin'} id="node_{$structure_tree.page_ref_id}" data-id="{$structure_tree.page_ref_id}"{/if}>
+    <li class="row {if $toc_type eq 'fancy'}fancy{elseif $toc_type eq 'admin'} admin{/if}toclevel"{if $toc_type eq 'admin'} id="node_{$structure_tree.page_ref_id}" data-id="{$structure_tree.page_ref_id}" data-page-name="{$structure_tree.pageName|escape}"{/if}>
         <div class="col-sm-12">
             {if $numbering}
                 <span class="prefix">{$structure_tree.prefix}&nbsp;</span>
@@ -35,7 +35,7 @@
             {if $toc_type eq 'admin'}
                 <div class="actions input-group input-group-sm mb-2">
                     {if ! empty($structure_tree.sub) && count($structure_tree.sub)}
-                        <span class="input-group-text flip-children">{icon name='caret-down'}</span>
+                        <span class="input-group-text flip-children">{icon name='caret-right'}</span>
                     {/if}
                     <span class="input-group-text">{icon name='sort'}</span>
                     <input type="text" class="page-alias-input form-control" value="{$structure_tree.page_alias|escape}" placeholder="{tr}Page alias...{/tr}">
@@ -50,7 +50,7 @@
                                     <input type="hidden" name="page_ref_id" value={$structure_tree.page_ref_id}>
                                     <input type="hidden" name="watch_object" value={$structure_tree.page_ref_id}>
                                     <input type="hidden" name="watch_action" value="add">
-                                    <button type="submit" name="page" value={$structure_tree.pageName} data-bs-trigger="hover focus" data-bs-delay="500" data-bs-content="{tr}Monitor the Sub-Structure{/tr}" class="tips input-group-text">
+                                    <button type="submit" name="page" value={$structure_tree.pageName} data-bs-trigger="hover focus" data-bs-delay="500" data-bs-content="{tr}Monitor the Sub-Structure{/tr}" class="tips input-group-text" aria-label="{tr}Monitor the Sub-Structure{/tr}">
                                         {icon name="watch"}
                                     </button>
                                 </form>
@@ -68,9 +68,7 @@
                                     {icon name='lock' alt="{tr}Locked{/tr}" title=$title}
                                 </div>
                             {else}
-                                {self_link _script='tiki-editpage.php' page=$structure_tree.pageName _class='tips input-group-text' _title=':{tr}Edit page{/tr}'}
-                                    {icon name="edit"}
-                                {/self_link}
+                                {button _keepall='y' href='tiki-editpage.php' page=$structure_tree.pageName _class='tips input-group-text' _title=':{tr}Edit page{/tr}' _icon_name='edit'}
                             {/if}
                             {if empty($page)}
                                 {self_link _class="tips input-group-text add_new_child_page" _title=":{tr}Add new child page{/tr}"}

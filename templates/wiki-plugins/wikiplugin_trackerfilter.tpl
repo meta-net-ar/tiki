@@ -64,7 +64,7 @@
                                     {$last = $filter.opts[io].name}
                                 {/section}
                             </select>
-                            {if $filter.format eq 'm' and $prefs.jquery_select2 neq 'y'}{remarksbox type='tip' title="{tr}Tip{/tr}"}{tr}Use Ctrl+Click to select multiple options{/tr}{/remarksbox}{/if}
+                            {if $filter.format eq 'm' and $prefs.elementplus_select neq 'y'}{remarksbox type='tip' title="{tr}Tip{/tr}"}{tr}Use Ctrl+Click to select multiple options{/tr}{/remarksbox}{/if}
     {*------<,> operator *}
                         {elseif $filter.format eq '<' or $filter.format eq '>' or $filter.format eq '<=' or $filter.format eq '>=' or $filter.format eq 'f' or $filter.format eq 'j'}
                             {if $filter.field.type eq 'f' or $filter.field.type eq 'j'}
@@ -95,10 +95,10 @@
                                 {capture name=i_f}f_{$filter.fieldId}{/capture}
                                 {initials_filter_links _initial=$smarty.capture.i_f}
                             {/if}
-                            <input id="f_{$filter.fieldId}" type="text" name="f_{$filter.fieldId}" value="{$filter.selected}" class="form-control">
+                            <input id="f_{$filter.fieldId}" type="text" name="f_{$filter.fieldId}" value="{$filter.selected|escape}" class="form-control">
     {*------sqlsearch *}
                         {elseif $filter.format eq 'sqlsearch'}
-                            <input id="f_{$filter.fieldId}" type="text" name="f_{$filter.fieldId}" value="{$filter.selected}" class="form-control">
+                            <input id="f_{$filter.fieldId}" type="text" name="f_{$filter.fieldId}" value="{$filter.selected|escape}" class="form-control">
                             <a href="{bootstrap_modal controller=tracker action=search_help}">{icon name='help'}</a>
     {*------rating *}
                         {elseif $filter.format eq '*'}
@@ -111,9 +111,9 @@
     {*------relation *}
                         {elseif $filter.format eq 'REL'}
                             <textarea name="f_{$filter.fieldId}" class="d-none">
-                                {$filter.opts.field_selection}
+                                {$filter.opts.field_selection|escape}
                             </textarea>
-                            {object_selector_multi _id="object_filter_{$filter.fieldId}" _name="object_filter_{$filter.fieldId}" _filter=$filter.opts.field_filter _value=$filter.opts.field_selection _format=$filter.opts.field_format }
+                            {object_selector_multi _id="object_filter_{$filter.fieldId}" _name="object_filter_{$filter.fieldId}" _filter=$filter.opts.field_filter _value=$filter.opts.field_selection _format=$filter.opts.field_format}
                             <div class="text-center mt-3 mb-3">{tr}Or{/tr}</div>
                             <select name="other_filter_{$filter.fieldId}" class="form-control">
                                 <option value=''>{tr}-- Choose an option --{/tr}</option>
@@ -133,7 +133,6 @@
                                     $container.find('option:selected').each(function(){
                                         $(this).prop('selected', false);
                                     });
-                                    $container.find('select').trigger("change.select2");
 
                                     var val = $(this).val();
                                     $target = $('[name="f_{{$filter.fieldId}}"]').val(val);
@@ -144,7 +143,6 @@
                                     // Reset other values
                                     var $select = $('select[name="other_filter_{{$filter.fieldId}}"]')
                                     $select.val('');
-                                    $select.trigger("change.select2");
 
                                     var val = $(this).val();
                                     $target = $('[name="f_{{$filter.fieldId}}"]').val(val);

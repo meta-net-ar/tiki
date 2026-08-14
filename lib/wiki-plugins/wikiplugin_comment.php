@@ -23,7 +23,6 @@ function wikiplugin_comment_info()
                 'filter' => 'text',
                 'options' => [
                     ['text' => tr('Tracker Item'), 'value' => 'trackeritem'],
-                    ['text' => tr('Image Gallery'), 'value' => 'image gallery'],
                     ['text' => tr('Image'), 'value' => 'image'],
                     ['text' => tr('File Gallery'), 'value' => 'file gallery'],
                     ['text' => tr('File'), 'value' => 'file'],
@@ -38,15 +37,15 @@ function wikiplugin_comment_info()
                     ['text' => tr('Survey'), 'value' => 'survey'],
                     ['text' => tr('Newsletter'), 'value' => 'newsletter'],
                 ],
-                'default' => tr('wiki page'),
+                'default' => 'wiki page',
             ],
             'objectId' => [
                 'required' => true,
                 'name' => tra('Object ID'),
                 'description' => tra('Object ID'),
                 'since' => '8.0',
-                'filter' => 'digits',
-                'default' => tr('The current wiki page to which you have added the plugin'),
+                'filter' => 'text',
+                'default' => '',
                 'profile_reference' => 'type_in_param',
             ],
         ]
@@ -57,14 +56,8 @@ function wikiplugin_comment($data, $params)
 {
     global $page;
     $smarty = TikiLib::lib('smarty');
-    $params = array_merge(
-        [
-            "objectId" => $page,
-            "objectType" => "wiki page"
-        ],
-        $params
-    );
 
+    $params['objectId'] = trim($params['objectId']) == '' ? $page : $params['objectId'];
     $smarty->assign('wikiplugin_comment_objectId', $params['objectId']);
     $smarty->assign('wikiplugin_comment_objectType', $params['objectType']);
     $ret = $smarty->fetch('wiki-plugins/wikiplugin_comment.tpl');

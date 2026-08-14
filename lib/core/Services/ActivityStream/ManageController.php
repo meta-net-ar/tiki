@@ -21,6 +21,30 @@ class Services_ActivityStream_ManageController
         }
 
         $this->lib = TikiLib::lib('activity');
+
+        global $prefs, $smarty, $headerlib;
+        // This controller is served via tiki-ajax_services.php, so it is not detected by
+        // the usual UAB trigger conditions based on PHP_SELF (lib/setup/theme.php).
+        // Activity Rules is admin-only, so we explicitly force admin section/layout here
+        // to render it consistently with other admin management pages.
+        \Tiki\Sections::setCurrentSection(\Tiki\Sections::SECTION_ADMIN_LAYOUT);
+        $prefs['site_layout_admin'] = 'admin';
+        $prefs['site_layout'] = 'admin';
+
+        // Load admin UI CSS and navigation icons
+        $headerlib->add_cssfile('themes/base_files/css/feature/adminui.css');
+        $smarty->assign('navbar_color_variant', $prefs['theme_navbar_color_variant_admin'] ?? $prefs['theme_navbar_color_variant']);
+
+        include_once 'admin/define_admin_icons.php';
+        global $admin_icons;
+        if (isset($admin_icons)) {
+            foreach ($admin_icons as & $admin_icon) {
+                foreach ($admin_icon['children'] as & $child) {
+                    $child = array_merge(['disabled' => false, 'description' => ''], $child);
+                }
+            }
+            $smarty->assign('admin_icons', $admin_icons);
+        }
     }
 
     /**
@@ -37,10 +61,15 @@ class Services_ActivityStream_ManageController
             $rule['status'] = $status;
         }
 
+        $event_graph = TikiLib::events()->getEventGraph();
+
+        // Build Mermaid mindmap data for event graph visualization
+        $event_graph = $this->buildEventGraphData($event_graph['nodes'], $event_graph['edges']);
+
         return [
             'rules' => $rules,
             'ruleTypes' => $this->getRuleTypes(),
-            'event_graph' => TikiLib::events()->getEventGraph(),
+            'event_graph' => $event_graph,
         ];
     }
 
@@ -58,7 +87,7 @@ class Services_ActivityStream_ManageController
         $removed = false;
         $util = new Services_Utilities();
         if ($util->isConfirmPost()) {
-            /** @var TikiDb_Pdo_Result|TikiDb_Adodb_Result $result */
+            /** @var Tiki\TikiDb\PdoResult */
             $result = $this->lib->deleteRule($id);
             if ($result->numRows()) {
                 if ($result->numRows() == 1) {
@@ -92,7 +121,7 @@ class Services_ActivityStream_ManageController
 
         $util = new Services_Utilities();
         if ($util->isConfirmPost()) {
-            /** @var TikiDb_Pdo_Result|TikiDb_Adodb_Result $result */
+            /** @var Tiki\TikiDb\PdoResult */
             $result = $this->lib->deleteActivity($id);
             if ($result->numRows()) {
                 Feedback::success(tr('Activity (id:' . (string) $id . ') deleted'));
@@ -334,7 +363,7 @@ $customArguments
      * @param $id
      * @param array $data
      * @param $ruleField
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result|integer $id    For a new item, $id will be the ID integer,
+     * @return Tiki\TikiDb\PdoResult|integer $id    For a new item, $id will be the ID integer,
      *                                                                  otherwise a result class
      * @throws Services_Exception_FieldError
      */
@@ -524,6 +553,73 @@ $customArguments
             return 'enabled';
         } else {
             return 'unknown';
+        }
+    }
+
+    /**
+     * Build Event Graph data in Mermaid mindmap syntax for visualization.
+     * The graph is built based on the events and their relationships (edges) where an edge from event A to event B means that event A is a child of event B in the mindmap hierarchy.
+     * Marmaid mindmap syntax: https://mermaid.ai/open-source/syntax/mindmap.html
+     * @param array $nodes
+     * @param array $edges
+     * @return string
+     */
+    private function buildEventGraphData(array $nodes, array $edges): string
+    {
+        // Build parent->children mapping from edges (from -> to means from is child of to)
+        $childrenMap = [];
+        $parents = [];
+
+        foreach ($edges as $edge) {
+            $from = $edge['from'];
+            $to = $edge['to'];
+
+            if (! isset($childrenMap[$to])) {
+                $childrenMap[$to] = [];
+            }
+            $childrenMap[$to][] = $from;
+            $parents[$from] = $to;
+        }
+
+        // Find root nodes (events that have no parent)
+        $rootNodes = [];
+        foreach ($nodes as $node) {
+            if (! isset($parents[$node])) {
+                $rootNodes[] = $node;
+            }
+        }
+
+        $lines = ['mindmap'];
+        $lines[] = '  root((EVENTS))';
+
+        // Process each root node and build the hierarchy
+        foreach ($rootNodes as $rootNode) {
+            $lines[] = '    ((' . $rootNode . '))';
+            $this->addChildrenToEventGraphData($rootNode, $childrenMap, $lines, 3);
+        }
+
+        return implode("\n", $lines);
+    }
+
+    /**
+     * Recursively add children to mindmap structure
+     * @param string $parentNode
+     * @param array $childrenMap
+     * @param array &$lines
+     * @param int $depth
+     */
+    private function addChildrenToEventGraphData(string $parentNode, array $childrenMap, array &$lines, int $depth): void
+    {
+        if (! isset($childrenMap[$parentNode])) {
+            return;
+        }
+
+        $children = $childrenMap[$parentNode];
+
+        foreach ($children as $child) {
+            $indent = str_repeat('  ', $depth);
+            $lines[] = $indent . $child;
+            $this->addChildrenToEventGraphData($child, $childrenMap, $lines, $depth + 1); // Recursively add children of this child
         }
     }
 }

@@ -8,15 +8,23 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\GraphEngine\GDGRenderer;
+use Tiki\Lib\GraphEngine\GridBasedGraphic;
+use Tiki\Lib\GraphEngine\PDFLibGRenderer;
+use Tiki\Lib\GraphEngine\PSGRenderer;
+use Tiki\Lib\Sheet\Sheet;
+use Tiki\Lib\Sheet\DatabaseHandler;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
         'sheetId'                         => 'int',               //get
         'graphic'                         => 'word',              //get
         'renderer'                        => 'word',              //get
-        'title'                           => 'word',              //get
-        'width'                           => 'word',              //get
-        'height'                          => 'word',              //get
+        'title'                           => 'text',              //get
+        'width'                           => 'int',              //get
+        'height'                          => 'int',              //get
         'format'                          => 'word',              //get
         'orientation'                     => 'word',              //get
         'independant'                     => 'bool',              //get
@@ -31,13 +39,6 @@ $inputConfiguration = [
 require_once('tiki-setup.php');
 
 $sheetlib = TikiLib::lib('sheet');
-
-require_once('lib/graph-engine/gd.php');
-require_once('lib/graph-engine/pdflib.php');
-require_once('lib/graph-engine/ps.php');
-require_once('lib/graph-engine/graph.pie.php');
-require_once('lib/graph-engine/graph.bar.php');
-require_once('lib/graph-engine/graph.multiline.php');
 
 /**
  * @param $serie
@@ -109,22 +110,22 @@ if (isset($_REQUEST['title'])) {
 
     switch ($_REQUEST['renderer']) {
         case 'PNG':
-            $renderer = new GD_GRenderer($_REQUEST['width'], $_REQUEST['height'], 'png');
+            $renderer = new GDGRenderer($_REQUEST['width'], $_REQUEST['height'], 'png');
             $ext = 'png';
             break;
 
         case 'JPEG':
-            $renderer = new GD_GRenderer($_REQUEST['width'], $_REQUEST['height'], 'jpg');
+            $renderer = new GDGRenderer($_REQUEST['width'], $_REQUEST['height'], 'jpg');
             $ext = 'jpg';
             break;
 
         case 'PDF':
-            $renderer = new PDFLib_GRenderer($_REQUEST['format'], $_REQUEST['orientation']);
+            $renderer = new PDFLibGRenderer($_REQUEST['format'], $_REQUEST['orientation']);
             $ext = 'pdf';
             break;
 
         case 'PS':
-            $renderer = new PS_GRenderer($_REQUEST['format'], $_REQUEST['orientation']);
+            $renderer = new PSGRenderer($_REQUEST['format'], $_REQUEST['orientation']);
             $ext = 'ps';
             break;
         default:
@@ -137,8 +138,8 @@ if (isset($_REQUEST['title'])) {
         exit;
     }
 
-    $handler = new TikiSheetDatabaseHandler($sheetId);
-    $grid = new TikiSheet($_REQUEST['sheetId']);
+    $handler = new DatabaseHandler($sheetId);
+    $grid = new Sheet();
     $grid->import($handler);
 
     $graph = $_REQUEST['graphic'];
@@ -201,13 +202,13 @@ if (isset($_REQUEST['title'])) {
         $smarty->assign('graph', $graph);
         $smarty->assign('renderer', $_REQUEST['renderer']);
 
-        $handler = new TikiSheetDatabaseHandler($sheetId);
-        $grid = new TikiSheet($_REQUEST['sheetId']);
+        $handler = new DatabaseHandler($sheetId);
+        $grid = new Sheet($_REQUEST['sheetId']);
         $grid->import($handler);
 
         $dataGrid = $grid->getTableHtml(true);
 
-        require_once('lib/sheet/grid.php');
+        require_once('lib/Sheet/grid.php');
         $sheetlib->setup_jquery_sheet();
         $headerlib->add_jq_onready(
             '$("div.tiki_sheet").sheet($.extend($.sheet.tikiOptions, {editable: false}));'
@@ -225,7 +226,7 @@ if (isset($_REQUEST['title'])) {
             $smarty->assign('im_height', $_GET['height']);
         }
 
-        if (is_a($g, 'GridBasedGraphic')) {
+        if (is_a($g, GridBasedGraphic::class)) {
             $smarty->assign('showgridparam', true);
         }
     } else {

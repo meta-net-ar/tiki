@@ -34,6 +34,6 @@ function module_search_wiki_page($mod_reference, $module_params)
     if (isset($request)) {
         $smarty->assign('exact', $request);
     } else {
-        $smarty->assign('exact', isset($module_params['exact']) ? $module_params['exact'] : 'n');
+        $smarty->assign('exact', $module_params['exact'] ?? 'n');
     }
 }

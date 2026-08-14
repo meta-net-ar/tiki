@@ -37,7 +37,7 @@ class WikiParser_PluginOutput
 
     public static function argumentError($missingArguments)
     {
-        $content = tra('Plugin argument(s) missing:');
+        $content = tra('Plugin argument(s) missing or invalid:');
 
         $content .= '<ul>';
 

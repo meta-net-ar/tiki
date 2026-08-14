@@ -1,0 +1,12 @@
+<?php
+
+// (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
+//
+// All Rights Reserved. See copyright.txt for details and a complete list of authors.
+// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+namespace Tiki\Lib\Shipping\Provider;
+
+interface ShippingProviderInterface
+{
+    public function getRates(array $from, array $to, array $packages);
+}

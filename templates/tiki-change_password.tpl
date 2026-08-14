@@ -2,7 +2,7 @@
     {title}{tr}Your account has been validated.{/tr}{/title}
     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}{tr}You have to choose a password to use this account.{/tr}{/remarksbox}
 {else}
-    {assign var='new_user_validation' value='n'}
+    {$new_user_validation='n'}
 {/if}
 <div class="row">
     <div class="col-md-10 offset-md-1">
@@ -17,11 +17,18 @@
                 {if $new_user_validation eq 'y'}
                     <input type="hidden" name="new_user_validation" value="y">
                 {/if}
+                {if !empty($timestamp)}
+                    <input type="hidden" name="apass" value="{$password|escape}">
+                    <input type="hidden" name="timestamp" value="{$timestamp|escape}">
+                {/if}
+                {if !empty($secure_token)}
+                    <input type="hidden" name="token" value="{$secure_token|escape}">
+                {/if}
                 <div class="card-header text-center">
                     {if $new_user_validation neq 'y'}
-                        <h3 class="card-title">{tr}Change password{/tr}</h3>
+                        <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{tr}Change password{/tr}</h3>
                     {else}
-                        <h3 class="card-title">{tr}Set password{/tr}</h3>
+                        <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{tr}Set password{/tr}</h3>
                     {/if}
                 </div>
                 <div class="card-body">
@@ -35,29 +42,29 @@
                         <div class="clearfix">
                             <div class="text" id="divPasswordRules" >
                                 {remarksbox type="info" title="{tr}Attention{/tr}" close="n"}
-                                    {if $prefs.pass_due neq "-1" }
-                                        {if $prefs.pass_due >= 2 }
+                                    {if $prefs.pass_due neq "-1"}
+                                        {if $prefs.pass_due >= 2}
                                             <div class="pass_due">{tr _0=$prefs.pass_due}Password change is forced when password is older than %0 days.{/tr}</div>
                                         {else}
                                             <div class="pass_due">{tr _0=$prefs.pass_due}Password change is forced when password is older than %0 day.{/tr}</tr>
                                         {/if}
                                     {/if}
-                                    {if ( $prefs.auth_method != 'cas' || $user == 'admin' ) && $prefs.min_pass_length gt 0 }
-                                        <div class="min_pass_length">{tr _0=$prefs.min_pass_length }Password should be at least %0 characters long.{/tr}</div>
+                                    {if ( $prefs.auth_method != 'cas' || $user == 'admin' ) && $prefs.min_pass_length gt 0}
+                                        <div class="min_pass_length">{tr _0=$prefs.min_pass_length}Password should be at least %0 characters long.{/tr}</div>
                                     {/if}
-                                    {if $prefs.pass_chr_case eq "y" }
+                                    {if $prefs.pass_chr_case eq "y"}
                                         <div class="pass_chr_case">{tr}Password must contain at least one lowercase alphabetical character like "a" and one uppercase character like "A".{/tr}</div>
                                     {/if}
-                                    {if $prefs.pass_repetition eq "y" }
+                                    {if $prefs.pass_repetition eq "y"}
                                         <div class="pass_repetition">{tr}Password must not contain a consecutive repetition of the same character such as "111" or "aab".{/tr}</div>
                                     {/if}
-                                    {if $prefs.pass_chr_num eq "y" }
+                                    {if $prefs.pass_chr_num eq "y"}
                                         <div class="pass_chr_num">{tr}Password must contain both letters and numbers.{/tr}</div>
                                     {/if}
-                                    {if $prefs.pass_chr_special eq "y" }
+                                    {if $prefs.pass_chr_special eq "y"}
                                         <div class="pass_chr_special">{tr}Password must contain at least one special character like " / $ % ? & * ( ) _ + ...{/tr}</div>
                                     {/if}
-                                    {if $prefs.pass_diff_username eq "y" }
+                                    {if $prefs.pass_diff_username eq "y"}
                                         <div class="pass_diff_username">{tr}The password must be different from the user's log-in name.{/tr}</div>
                                     {/if}
                                 {/remarksbox}
@@ -92,7 +99,7 @@
                         <div class="col-md-8">
                             <input required type="password" class="form-control" placeholder="{tr}New Password{/tr}" name="pass" id="pass1" autocomplete="new-password">
                             <div style="margin-left:5px;">
-                                <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none' } <span id="mypassword_text_inner"></span></div>
+                                <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
                                 <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
                             </div>
                             <div style="margin-top:5px">

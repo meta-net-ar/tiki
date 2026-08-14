@@ -21,7 +21,6 @@ function wikiplugin_survey_info()
                 'description' => tra('Id of the survey set up by the administrator'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'profile_reference' => 'survey',
             ],
             'page' => [
@@ -39,7 +38,6 @@ function wikiplugin_survey_info()
                 'description' => tra('Language for the survey'),
                 'since' => '3.0',
                 'filter' => 'alpha',
-                'default' => '',
             ],
         ],
     ];
@@ -54,9 +52,6 @@ function wikiplugin_survey($data, $params)
     }
 
     $result = '';
-    if (! isset($params['id'])) {
-        return '';
-    }
 
     $survey_info = $srvlib->get_survey($params['id']);
     // Check if user has taken this survey
@@ -64,7 +59,8 @@ function wikiplugin_survey($data, $params)
     if ($tiki_p_admin !== 'y' || $survey_info['restriction'] === 'y') {
         if ($tikilib->user_has_voted($user, 'survey' . $params['id'])) {
             include_once('lib/wiki-plugins/wikiplugin_remarksbox.php');
-            return wikiplugin_remarksbox(
+            return TikiLib::lib('parser')->invokePlugin(
+                'remarksbox',
                 'You cannot take this survey twice',
                 ['type' => 'comment']
             );
@@ -99,7 +95,7 @@ function wikiplugin_survey($data, $params)
     include_once('lib/smarty_tiki/function.query.php');
     $smarty->assign('form_action', smarty_function_query(['_type' => 'absolute_path'], $smarty->getEmptyInternalTemplate()));
 
-    if (! empty($params['lang'])) {
+    if (! is_null($params['lang'])) {
         $result .= $smarty->fetchLang($params['lang'], 'tiki-take_survey.tpl');
     } else {
         $result .= $smarty->fetch('tiki-take_survey.tpl');

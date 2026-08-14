@@ -1,14 +1,13 @@
-// United 5.3.3 -- This is a copy of node_modules/bootswatch/dist/united/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// United 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/united/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/united/_variables.scss"; // Bootswatch theme variables file
 
-//
 // Color system
-//
-
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 $primary:       #D14715; // $orange !default;
 $secondary:     #7F736C; // $gray-500 !default;
@@ -17,8 +16,9 @@ $info:          #128091; // $cyan !default;
 $warning:       #996C0B; // $yellow !default;
 $danger:        #DF3226; // $red !default;
 
-
 // Options
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 $enable-dark-mode:            true;  // default
 $color-mode-type:             data;  // default // `data` or `media-query`
 
@@ -32,8 +32,12 @@ $link-shade-percentage:                   20%;  // default // Bootstrap 5.3
 // Forms
 $input-border-color:                 $gray-400; //    var(--#{$prefix}border-color) !default;
 
-// stylelint-disable-next-line value-keyword-case
+// Navbar
+$navbar-dark-color:                 rgba($white, .85); // !default;
+
+// Typography
 $font-family-sans-serif:      system-ui, sans-serif; // Ubuntu, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
+$blockquote-footer-color: #6D757E;
 
 // Forms
 $input-border-color:                 $gray-400; //    var(--#{$prefix}border-color) !default;

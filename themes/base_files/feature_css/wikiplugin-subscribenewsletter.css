@@ -1,0 +1,43 @@
+.wp-subscribe-inline .input-group {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    align-items: stretch;
+}
+
+.wp-subscribe-inline .wp-subscribe-email-wrap {
+    position: relative;
+    flex: 1 1 auto;
+}
+
+.wp-subscribe-inline .wp-subscribe-email-icon {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 1rem;
+    display: flex;
+    align-items: center;
+    color: var(--secondary, #6c757d);
+    pointer-events: none;
+    z-index: 3;
+}
+
+.wp-subscribe-inline .wp-subscribe-email-wrap #wpEmail {
+    height: 100%;
+    width: 100%;
+    padding-left: 2.75rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.wp-subscribe-inline .input-group-append,
+.wp-subscribe-inline .input-group-append .btn {
+    display: flex;
+    align-items: stretch;
+}
+
+.wp-subscribe-inline .input-group-append .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    margin-left: -1px;
+}

@@ -20,7 +20,7 @@
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}New Features{/tr}</legend>
             <div class="adminoption mb-3 row">
-                <ul><li>{tr}Federation:{/tr} <a class="adminoption" href="tiki-admin_sync.php">{tr}Synchronize Dev{/tr}</a>
+                <ul><li>{tr}Federation:{/tr} <a class="adminoption text-center" href="tiki-admin_sync.php">{tr}Synchronize Dev{/tr}</a>
                     <a href="https://doc.tiki.org/Sync%20Dev-Prod%20Servers" target="tikihelp" class="tikihelp text-info" title="{tr}Tiki19:{/tr}
                         {tr}Use this tool if you have at least two different Tiki instances serving as development, staging or production instances. You can compare differences between Tiki configuration, wiki pages and their contents as well as tracker and field configurations. Especially useful when changes from a development server needs to be applied to production one. This tool will only show differences between instances, you will still have to manually apply the changes to the production one.{/tr}
                         <br/><br/>
@@ -64,7 +64,6 @@
             {preference name=jquery_smartmenus_enable}
             {preference name=jquery_ui_modals_draggable}
             {preference name=jquery_ui_modals_resizable}
-            {preference name=tiki_prefix_css}
         </fieldset>
         <fieldset class="mb-3 w-100 clearfix featurelist">
             <legend>{tr}Other Extended Features{/tr}</legend>
@@ -109,7 +108,7 @@
 
                 {remarksbox type="info" title="{tr}H5P Info{/tr}"}
                 {tr}Service URL to purge unused libraries can be found here. Can be used in a cron task{/tr}<br>
-                    <a href="{service controller='h5p' action='cron' token=$prefs.h5p_cron_token}" class="btn btn-link">
+                    <a href="{service controller='h5p' action='cron' token=$prefs.h5p_cron_token}" role="button" class="btn btn-link">
                         {service controller='h5p' action='cron' token=$prefs.h5p_cron_token}
                     </a>
                 {/remarksbox}

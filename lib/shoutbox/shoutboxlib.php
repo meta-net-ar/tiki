@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -28,9 +28,9 @@ class ShoutboxLib extends TikiLib
         }
 
         $query = "select * from `tiki_shoutbox` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_shoutbox` $mid";
+        $query_count = "select count(*) from `tiki_shoutbox` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -66,7 +66,7 @@ class ShoutboxLib extends TikiLib
         }
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -105,21 +105,21 @@ class ShoutboxLib extends TikiLib
         // Back on track for normal shoutbox posting
 
         $hash = md5($message);  // this checks for the same message already existing
-        $cant = $this->getOne("select count(*) from `tiki_shoutbox` where `hash`=? and `user`=?", [$hash, $user]);
+        $count = $this->getOne("select count(*) from `tiki_shoutbox` where `hash`=? and `user`=?", [$hash, $user]);
 
-        if ($cant) {
+        if ($count) {
             // at least update  the timestamp - can be convenient if message is thanks or hello - we can see the last post
             $query = "update `tiki_shoutbox` set `timestamp`=? where `user`=? and `hash`=?";
-            $bindvars = [(int) $this->now, $user, $hash];
+            $bindvars = [$this->now, $user, $hash];
         } elseif ($msgId) {
             $query = "update `tiki_shoutbox` set `user`=?, `message`=?, `hash`=? where `msgId`=?";
             $bindvars = [$user, $message, $hash, (int) $msgId];
         } else {
             $query = "delete from `tiki_shoutbox` where `user`=? and `timestamp`=? and `hash`=?";
-            $bindvars = [$user, (int) $this->now, $hash];
+            $bindvars = [$user, $this->now, $hash];
             $this->query($query, $bindvars);
             $query = "insert into `tiki_shoutbox`(`message`,`user`,`timestamp`,`hash`) values(?,?,?,?)";
-            $bindvars = [$message, $user, (int) $this->now, $hash];
+            $bindvars = [$message, $user, $this->now, $hash];
         }
 
         $result = $this->query($query, $bindvars);
@@ -170,9 +170,9 @@ class ShoutboxLib extends TikiLib
         }
 
         $query = "select * from `tiki_shoutbox_words` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_shoutbox_words` $mid";
+        $query_count = "select count(*) from `tiki_shoutbox_words` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -181,7 +181,7 @@ class ShoutboxLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 

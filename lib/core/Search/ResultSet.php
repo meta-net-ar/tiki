@@ -19,6 +19,7 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
     public $errorInQuery = '';
     public $didYouMean = '';
 
+    private $date_fields = [];
     public static function create($list): self
     {
         if ($list instanceof self) {
@@ -137,6 +138,14 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
         return $this->offset;
     }
 
+    public function setDateFields($date_fields)
+    {
+        $this->date_fields = $date_fields;
+    }
+    public function getDateFields()
+    {
+        return $this->date_fields;
+    }
     public function count(): int
     {
         return $this->count;
@@ -173,8 +182,6 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
         }
 
         if (! empty($text)) {
-            var_dump($content);
-            die;
             return $this->highlightHelper->filter($text);
         }
         }*/
@@ -239,7 +246,7 @@ class Search_ResultSet extends ArrayObject implements JsonSerializable
         $out = [];
         foreach ($this as $entry) {
             $values = array_map(function ($field) use ($entry) {
-                return isset($entry[$field]) ? $entry[$field] : '';
+                return $entry[$field] ?? '';
             }, $fields);
             $key = implode('', $values);
             if (! isset($out[$key])) {

@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`adminToolbar.helpers > bindToolbarData > should bind data to the existing toolbar buttons 1`] = `
+"
+                    <div class="note-btn-group note-group-0">
+                        <button data-token="color" data-name="Color" aria-label="Color"></button>
+                        <button data-token="font" data-name="Font" aria-label="Font"></button>
+                    </div>
+                    <div class="note-btn-group note-last-1">
+                        <div class="note-btn-group">
+                            <button data-token="style" data-name="Style" aria-label="Style"></button>
+                            <button class="dropdown"></button>
+                        </div>
+                    </div>
+                "
+`;
+
+exports[`adminToolbar.helpers > initializeSortable > should automatically move the non-plugin tool to the #tools container when it is dragged to the #plugins container by the user 1`] = `"<div class="d-flex align-items-center gap-2"><button data-name="color" data-token="color" aria-label="Pick a color" class="btn btn-outline-secondary btn-sm rounded-3">Icon</button><span class="label">Pick a color</span></div>"`;
+
+exports[`adminToolbar.helpers > initializeSortable > should automatically move the plugin tool to the #plugins container when it is dragged to the #tools container by the user 1`] = `"<div class="d-flex align-items-center gap-2"><button data-name="wikiplugin_Color" aria-label="Pick a color" class="btn btn-outline-secondary btn-sm rounded-3">Icon</button><span class="label">Pick a color</span></div>"`;
+
+exports[`adminToolbar.helpers > initializeSortable > should form a new group when the previous empty group has gained a new tool, and instantiate a Sortable object for the new group 1`] = `
+"<div class="note-toolbar">
+                    <div class="note-btn-group btn-group"></div></div>"
+`;
+
+exports[`adminToolbar.helpers > initializeSortable > should unwrap the button element when adding a tool to the actual note-toolbar 1`] = `"<div></div>"`;
+
+exports[`adminToolbar.helpers > initializeSortable > should unwrap the button element when adding a tool to the actual note-toolbar 2`] = `"<button data-name="color" data-token="color" class="note-btn btn btn-outline-secondary btn-sm" aria-label="Pick a color">Icon</button>"`;

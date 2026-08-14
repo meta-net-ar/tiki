@@ -34,7 +34,6 @@ function wikiplugin_rr_info()
                 'name' => tra('echo'),
                 'description' => tra('Show a code block with the R commands to be run before running them (similarly to the echo command)'),
                 'filter' => 'int',
-                'default' => '0',
                 'since' => 'PluginR 0.78',
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -61,7 +60,7 @@ function wikiplugin_rr_info()
                 'required' => false,
                 'name' => tra('Caption'),
                 'description' => tra('Code snippet label.'),
-                'default' => 'R Code',
+                'default' => 'RR Code',
                 'since' => 'PluginR 0.78',
                 'advanced' => true,
             ],
@@ -74,7 +73,6 @@ function wikiplugin_rr_info()
                     ['text' => tra('Yes'), 'value' => '1'],
                     ['text' => tra('No'), 'value' => '0'],
                 ],
-                'default' => '1',
                 'since' => 'PluginR 0.78',
                 'advanced' => true,
             ],
@@ -95,7 +93,6 @@ function wikiplugin_rr_info()
                     ['text' => tra('Yes'), 'value' => '1'],
                     ['text' => tra('No'), 'value' => '0'],
                 ],
-                'default' => '1',
                 'since' => 'PluginR 0.78',
                 'advanced' => true,
             ],
@@ -120,7 +117,6 @@ function wikiplugin_rr_info()
                 'name' => tra('width'),
                 'description' => tra('Width of the graph (Optional). Options: an integer number in pixels (default) or in units specified. If ommitted but height is set, width will be proportional to keep aspect ratio'),
                 'filter' => 'int',
-                'default' => '480',
                 'since' => 'PluginR 0.1',
                 'advanced' => true,
             ],
@@ -129,7 +125,6 @@ function wikiplugin_rr_info()
                 'safe' => true,
                 'name' => tra('height'),
                 'description' => tra('Height of the graph (Optional). Options: an integer number in pixels (default) or in units specified. If ommitted but width is set, height will be proportional to keep aspect ratio'),
-                'default' => '480',
                 'since' => 'PluginR 0.1',
                 'filter' => 'int',
                 'advanced' => true,
@@ -150,7 +145,6 @@ function wikiplugin_rr_info()
                 'name' => tra('pointsize'),
                 'description' => tra('The default pointsize of plotted text, interpreted as big points (1/72 inch) at res dpi (optional). Options: interger number such as 12 or bigger'),
                 'filter' => 'int',
-                'default' => '',
                 'since' => 'PluginR 0.1',
                 'advanced' => true,
             ],
@@ -269,7 +263,6 @@ function wikiplugin_rr_info()
                 'name' => tra('CacheBy'),
                 'description' => tra('Write cached files inside a folder containing the Page id (pageid; default option) or the Page name (pagename)'),
                 'filter' => 'alpha',
-                'default' => 'pageid',
                 'since' => 'PluginR 0.88',
                 'options' => [
                     ['text' => '', 'value' => ''],
@@ -298,7 +291,6 @@ function wikiplugin_rr_info()
                 'name' => tra('attId'),
                 'description' => tra('AttId from a tracker Item attachment. ex: 1. (Optional)'),
                 'filter' => 'int',
-                'default' => '',
                 'since' => 'PluginR 0.1',
                 'advanced' => true,
             ],
@@ -343,7 +335,6 @@ function wikiplugin_rr_info()
                 'name' => tra('Custom output'),
                 'description' => tra('Write your custom png creation R command. Use tikiRRfilename for value of output. RR does not produce an output file.'),
                 'filter' => 'int',
-                'default' => '0',
                 'options' => [
                     ['text' => '', 'value' => ''],
                     ['text' => tra('No'), 'value' => '0'],
@@ -373,27 +364,56 @@ function wikiplugin_rr_info()
 
 function wikiplugin_rr($data, $params)
 {
-    global $smarty, $trklib, $tikilib, $prefs, $dbversion_tiki, $tikidomainslash, $user, $tiki_p_edit;
+    global $trklib, $tikilib, $prefs, $tikidomainslash, $user, $tiki_p_edit;
 
     include_once(TIKI_CONFIG_PATH . '/tiki-db.php'); // to set up multitiki etc if there ($tikidomain)
 
     # Clean the <br /> , <p> and </p> tags added by the Tiki or smarty parsers.
     $data = str_replace(["<br />", "<p>", "</p>"], "", $data);
 
-    if ($dbversion_tiki >= 7.0) {
-        // quick fix for 7.1RC1 - might find a better one soon... (jb).  Thanks jonnyb!
-        if (
-            stripos($data, '&lt;') !== false ||
-                    stripos($data, '&gt;') !== false ||
-                    stripos($data, '&quot;') !== false
-        ) { // add more bad entities here
-            $data = $tikilib->htmldecode($data);
+    // quick fix for 7.1RC1 - might find a better one soon... (jb).  Thanks jonnyb!
+    if (
+        stripos($data, '&lt;') !== false ||
+        stripos($data, '&gt;') !== false ||
+        stripos($data, '&quot;') !== false
+    ) { // add more bad entities here
+        $data = $tikilib->htmldecode($data);
+    }
+
+    // Apply default parameters if not set
+    $pluginInfo = wikiplugin_rr_info();
+    foreach ($pluginInfo['params'] as $paramKey => $paramDefinition) {
+        if (isset($paramDefinition['default']) && ! array_key_exists($paramKey, $params)) {
+            $defaultValue = $paramDefinition['default'];
+
+            // Apply filter if defined
+            if (isset($paramDefinition['filter'])) {
+                switch ($paramDefinition['filter']) {
+                    case 'int':
+                        $defaultValue = (int)$defaultValue;
+                        break;
+                    // Add other filter cases as needed
+                }
+            }
+
+            $params[$paramKey] = $defaultValue;
         }
     }
 
-    if ($params["security"] == 0) {
-        /* do nothing: i.e. don't check for security in the command sent to R*/
-    } else {        /* default: check for security in the commands sent to R*/
+    // Ensure only 0 or 1 are accepted
+    if (! in_array($params['security'], ["0", "1", 0, 1], true)) {
+        return displayRrErrorBox(
+            "error",
+            tra("Invalid 'security' parameter. Only 0 or 1 are allowed."),
+            tra("Set 'security=0' to disable command checking (use with caution), or 'security=1' to enable strict command validation.")
+        );
+    }
+
+    // Ensure 'security' is treated as an integer
+    $securityFlag = (int) $params['security'];
+
+    if ($securityFlag === 1) {
+        /* Security is enabled (1 or default): check R commands for disallowed content */
         $rejected = checkCommands($data);
         if (count($rejected) > 0) {
             return displayRrErrorBox("errors", tra("Blocked commands found: ") . implode(', ', $rejected), tra("Use Plugin RR instead and validate your plugin call, or contact a site admin to have the plugin call validated for you."));
@@ -407,15 +427,6 @@ function wikiplugin_rr($data, $params)
     $trklib = TikiLib::lib('trk');
 
     if (isset($_REQUEST['itemId'])) {
-        $atts = $trklib->list_item_attachments($_REQUEST['itemId'], 0, -1, 'created_desc', '');
-        if (! empty($atts['data'][0]['attId'])) {
-            $params['attId'] = $atts['data'][0]['attId'];
-        }
-        $info = $trklib->get_item_attachment($params["attId"]);
-        $md5data = md5($info['data']);
-    }
-
-    if (isset($_REQUEST['itemId'])) {
         // This fetches the whole row from the mysql tables for that tracker item
         $item_info = $trklib->get_item_info($_REQUEST['itemId']);
         // This $item_info['lastModif'] displays just the lastModification of the item.
@@ -427,12 +438,12 @@ function wikiplugin_rr($data, $params)
         // Moved the hashing after the attId recognition attempt, in order to include the filename (if any) in the hash process
         // so that if a new filename is passed through attId (and/or itemId), a new R script is generated and processed accordingly
         // to avoid the former caching issues when dynamically passing a different attId to the same cached R custom script
-        $sha1 = md5($data . $md5lastModif . $params . $output . $style);
+        $sha1 = md5(json_encode($data) . $md5lastModif . json_encode($params) . json_encode($output) . json_encode($style));
     } else {
-        $sha1 = md5($data . $params . $output . $style);
+        $sha1 = md5(json_encode($data) . json_encode($params) . json_encode($output) . json_encode($style));
     }
 
-    if (isset($params["echo"])) {
+    if (! is_null($params["echo"])) {
         $r_echo = $params["echo"];
         if ($r_echo == "1" or $r_echo == "y" or $r_echo == "yes") {
             $r_echo = 1;
@@ -459,17 +470,8 @@ function wikiplugin_rr($data, $params)
         $rrefresh = "n";
     }
 
-    if (isset($params['cachestrategy'])) {
-        $cachestrategy = $params['cachestrategy'];
-    } else {
-        $cachestrategy = "one";
-    }
-
-    if (isset($params['cacheduration'])) {
-        $cacheduration = $params['cacheduration'];
-    } else {
-        $cacheduration = 0;
-    }
+    $cachestrategy = $params['cachestrategy'];
+    $cacheduration = $params['cacheduration'];
 
     // Only insert user identification in filenames when "per user" caching strategy is chosen
     $userinfilename = userInFilename($user, $cachestrategy);
@@ -486,7 +488,7 @@ function wikiplugin_rr($data, $params)
         $loadandsave = 1;
     }
 
-    if (isset($params["cacheby"])) {
+    if (! is_null($params["cacheby"])) {
         $cacheby = $params["cacheby"];
         if ($cacheby == "name") {
             $cacheby = "pagename";
@@ -560,69 +562,20 @@ function wikiplugin_rr($data, $params)
 
     $r_html = $r_dir . DIRECTORY_SEPARATOR . $userinfilename . $sha1 . ".html";
 
-    if (isset($params["attId"])) {
-        $info = $trklib->get_item_attachment($params["attId"]);
+    $type = $params["type"];
 
-        if ($info['data']) {
-            #$filepath = tempnam( '/tmp', 'r' );
-            $filepath = "/tmp/" . $userinfilename . $sha1;
-            file_put_contents($filepath, $info['data']);
-        } else {
-            $filepath = $prefs['t_use_dir'] . $info['path'];
-        }
-
-        if (empty($info['filetype']) || $info['filetype'] == 'application/x-octetstream' || $info['filetype'] == 'application/octet-stream') {
-            include_once('lib/mime/mimelib.php');
-            if ($dbversion_tiki < 9.0) {
-                    $info['filetype'] = tiki_get_mime($filepath, 'application/octet-stream'); # Old code not working after Tiki9 r42542: http://code.tiki.org/Commit+42542.
-            } else {
-                    $info['filetype'] = TikiLib::lib('mime')->from_path($filepath, 'application/octet-stream'); # New code after Tiki9 r42542: http://code.tiki.org/Commit+42542
-            }
-        }
-
-        $type = $info["filetype"];
-        $file = $info["filename"];
-    } else {
-    }
-
-    if (isset($params["type"])) {
-        $type = $params["type"];
-    }
-
-
-    if (isset($params["attId"]) && ($type == "text/csv" || $type == "text/comma-separated-values")) {
-        $path = $_SERVER["SCRIPT_NAME"];
-        // record filetype, data_file (path and file name), and data (contents) to be displayed, if desired, from R
-        $data = "file_type <- \"$type\"\ndata_file <- \"$filepath\"\ndata <- read.csv(\"$filepath\")\n$data";
-    } elseif (isset($params["attId"]) && $type == "text/plain") {
-        $path = $_SERVER["SCRIPT_NAME"];
-        // record filetype, data_file (path and file name), and data (contents) to be displayed, if desired, from R
-        // read.delim & read.delim2 expect tabs as field separators (read.delim2 uses comma "," as decimal point; whereas read.delim uses point ".")
-        $data = "file_type <- \"$type\"\ndata_file <- \"$filepath\"\ndata <- read.delim2(\"$filepath\")\n$data";
-    } elseif (isset($params["attId"]) && $type == "text/xml") {
-        $path = $_SERVER["SCRIPT_NAME"];
-        // record filetype, data_file (path and file name), and data (contents) to be displayed, if desired, from R
-        $data = "library(XML)\nfile_type <- \"$type\"\ndata_file <- xml(\"$filepath\")\ndata <- xmlTreeParse(data_file,  getDTD = F )\n$data";
-    } elseif (isset($params["attId"]) && $type != "text/csv" && $type != "text/comma-separated-values" && $type != "text/xml" && $type != "text/plain") {
-        $data = "data <- \"This file type is not recognized: $type.<br />Read the <a href=http://doc.tiki.org/PluginR>documentation</a> about the allowed filetypes\"\nfile_type <- \"$type\"\ndata_file <- \"$filepath\"\n$data";
-    } else {
-        // do nothing
-    }
-    if ($dbversion_tiki >= 7.0) {
-        # Clean the <br /> , <p> and </p> tags added by the Tiki or smarty parsers on smarty templates in tiki7
-        $data = str_replace(["<br />", "<p>", "</p>"], "", $data);
-    }
+    # Clean the <br /> , <p> and </p> tags added by the Tiki or smarty parsers on smarty templates in tiki7
+    $data = str_replace(["<br />", "<p>", "</p>"], "", $data);
 
     // Find age of previous cache
     $cache_last_modif = @filemtime($r_html);
-    if ($cache_last_modif == false) {
+    if (! $cache_last_modif) {
         $cache_last_modif_readable = 'No cache';
         $cache_age = 0;
     } else {
         $cache_last_modif_readable = $tikilib->get_long_datetime($cache_last_modif);
         $cache_age = time() - $cache_last_modif;
     }
-    $now = time();
 
     // Check if new run is needed or cached results (from the same plugin r calls) can be shown
     if (file_exists($r_html)) {
@@ -660,7 +613,7 @@ function wikiplugin_rr($data, $params)
         }
 
         // if parse_body is set parse the body content to allow data to be generated from other plugins and strip tags - and if echodebug is set show the body content before parsing
-        if (isset($params["echodebug"]) && $params["echodebug"] == '1' && $params["parse_body"] === 'y') {
+        if ($params["echodebug"] == '1' && $params["parse_body"] === 'y') {
             $ret .= "<div >DEBUG ECHO:body content before parsing<pre>" . htmlspecialchars($data) . "</pre></div>";
         }
 
@@ -690,7 +643,7 @@ function wikiplugin_rr($data, $params)
     $ret .= file_get_contents($fn);
 
     // Allow debug echo which shows the code and other parameters even when the script fails (the most useful case for looking at the code)
-    if (isset($params["echodebug"]) && $params["echodebug"] == '1') {
+    if ($params["echodebug"] == '1') {
         if ($params["parse_body"] === 'y') {
             $ret .= "<div >DEBUG ECHO: parse_body parameter set to y</div>";
         }
@@ -704,7 +657,7 @@ function wikiplugin_rr($data, $params)
     }
 
     // Display age of cache
-    if (isset($params["cacheagedisplay"]) && $params["cacheagedisplay"] == "1") {
+    if ($params["cacheagedisplay"] == "1") {
         $ret .= ' <div class="rcacheage">';
         $ret .= tr('Cache was last modified: %0', $cache_last_modif_readable);
         $ret .= '</div>';
@@ -734,12 +687,7 @@ function wikiplugin_rr($data, $params)
                 $ret .= ' <input type="hidden" name="rrefresh" value="y" >';
             }
         }
-        if ($dbversion_tiki >= 13.0) {
-            $ret .= ' <a href="#" onclick="parentNode.submit();return false;" >' . '<span class="icon fas fa-sync" Title="' . tr("Cached R output from %0. If you click, you will re-run all R scripts in this page", $cache_last_modif_readable) . '"></span></a> </form>';
-        } else {
-            // Maybe this should be an input tag with maybe still the image
-            $ret .= ' <a href="#" onclick="parentNode.submit();return false;" >' . '<img src=img/icons/arrow_refresh.png alt=Refresh Title="' . tr("Cached R output from %0. If you click, you will re-run all R scripts in this page", $cache_last_modif_readable) . '"></a> </form>';
-        }
+        $ret .= ' <a href="#" onclick="parentNode.submit();return false;" >' . '<span class="icon fas fa-sync" Title="' . tr("Cached R output from %0. If you click, you will re-run all R scripts in this page", $cache_last_modif_readable) . '"></span></a> </form>';
     }
 
     // Surround plugin with actual div and class, for styling purpose
@@ -748,20 +696,11 @@ function wikiplugin_rr($data, $params)
     // Check for Tiki version, to apply parsing of content or not (behavior changed in Tiki7, it seems)
     // Right now, the behavior seems the almost the same one on 7+ and <7, but just in case, I leave this version check in place,
     // since some changes are expected sooner or later..., so I leave this as an easy place holder (and proof-of-concept of working version check
-    if ($dbversion_tiki >= 7.0) {
-        if (isset($params["wikisyntax"]) && $params["wikisyntax"] == 1) {
-            return $tikilib->parse_data($ret, ['is_html' => true]); // the is_html parsing options are needed, in tiki7+, it seems, but not in < 7.0
-        } else {        // if wikisyntax != 1 : no parsing of any wiki syntax
-            return $ret;
-        }
-    } else {    // case for Tiki versions earlier than 7.0, where content is parsed by default
-        if (isset($params["wikisyntax"]) && $params["wikisyntax"] == 1) {
-            return $tikilib->parse_data($ret, []);
-            // return $ret;
-        } else {        // if wikisyntax != 1 : no parsing of any wiki syntax
-            return $ret;
-        }
-    } // end of check for Tiki version
+    if ($params["wikisyntax"] == 1) {
+        return $tikilib->parse_data($ret, ['is_html' => true]); // the is_html parsing options are needed, in tiki7+, it seems, but not in < 7.0
+    } else {        // if wikisyntax != 1 : no parsing of any wiki syntax
+        return $ret;
+    }
 }
 
 
@@ -776,68 +715,42 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
     // Generate a graphics
     $prg = ''; # This variable is not being used. ToDo: Remove or reuse for something.
     $err = "\n";
-    $rws = $r_dir . DIRECTORY_SEPARATOR;
     $rst  = $r_dir . DIRECTORY_SEPARATOR . $userinfilename . $sha1 . '.html';
     // Since pluginR 0.7, graphic file type is not hardcoded here into png;
     //  file extensions will be set later for png and svg and/or pdf
     $rgo  = $r_dir . DIRECTORY_SEPARATOR . $userinfilename . $sha1 ;
     $rgo_rel  = $graph_dir . DIRECTORY_SEPARATOR . $userinfilename . $sha1 ;
 
-    if (isset($params["wikisyntax"])) {
-        $wikisyntax = $params["wikisyntax"];
-    } else {
-        $wikisyntax = "0";
-    }
+    $wikisyntax = $params["wikisyntax"];
 
-    if (isset($params["width"])) {
+    if (! is_null($params["width"])) {
         $width = $params["width"];
     } else {
         $width = "";
     }
 
-    if (isset($params["height"])) {
+    if (! is_null($params["height"])) {
         $height = $params["height"];
     } else {
         $height = "";
     }
 
-    if (isset($params["units"])) {
-        $units = $params["units"];
-    } else {
-        $units = "px";
+    $units = $params["units"];
+    $onefile = true;
+    if ($params["onefile"]) {
+        $onefile = $params["onefile"] !== "0";
     }
 
-    if (isset($params["onefile"])) {
-        $onefile = $params["onefile"];
-        if ($onefile = "1") {
-            $onefile = true;
-        }
-        if ($onefile = "0") {
-            $onefile = false;
-        }
-    } else {
-        $onefile = true;
-    }
-
-    if (isset($params["pointsize"])) {
+    if (! is_null($params["pointsize"])) {
         $pointsize = $params["pointsize"];
     } else {
         $pointsize = "";
     }
 
-    if (isset($params["bg"])) {
-        $bg = $params["bg"];
-    } else {
-        $bg = "transparent";
-    }
+    $bg = $params["bg"];
+    $res = $params["res"];
 
-    if (isset($params["res"])) {
-        $res = $params["res"];
-    } else {        // if not specified, use 72 dpi, optimized for screen
-        $res = 72;
-    }
-
-    if (isset($params["wrap"])) {
+    if (! is_null($params["wrap"])) {
         $wrap = $params["wrap"];
         if ($wrap == 1 or $wrap == "y" or $wrap == "yes") {
             $wrap = "1";
@@ -861,19 +774,10 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
         echo $wrap;
     }
 
-    if (isset($params["caption"])) {
-        $caption = $params["caption"];
-    } else {
-        $caption = "RR Code"; // Default value
-    }
+    $caption = $params["caption"];
+    $colors = $params["colors"];
 
-    if (isset($params["colors"])) {
-        $colors = $params["colors"];
-    } else {
-        $colors = "r"; // Default value
-    }
-
-    if (isset($params["ln"])) {
+    if (! is_null($params["ln"])) {
         $ln = $params["ln"];
         if ($ln == "1" or $ln == "y" or $ln == "yes") {
             $ln = 1;
@@ -885,7 +789,7 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
         $ln = 1; // Default value
     }
 
-    if (isset($params["customoutput"])) {
+    if (! is_null($params["customoutput"])) {
         $customoutput = $params["customoutput"];
         if ($customoutput == "1" or $customoutput == "y" or $customoutput == "yes") {
             $customoutput = 1;
@@ -921,7 +825,7 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
             } // Else, case with no caching of r objects (loadandsave=0, therefore no .RData will be loaded at the beginning)
 
             // Check if the user wants to handle the creation of his custom png
-            if (isset($params["customoutput"]) && $params["customoutput"] == "1") {
+            if (! is_null($params["customoutput"]) && $params["customoutput"] == "1") {
                 $image_number = 1;
                 $content .= 'tikiRRfilename <- "' . $rgo . "_$image_number.png" . '"' . "\n";
                 // Add the user input code at the end
@@ -996,7 +900,7 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
     }
     $cont = file_get_contents($rst);
 
-    if (strpos($cont, '<html>') === false) {
+    if (! str_contains($cont, '<html>')) {
         if (! $fd = fopen($rst, 'w')) {
             $runR_errors = ['error' => true, 'type' => 'error', 'title' => 'Can not open cached file' , 'body' => $err];
             return;
@@ -1010,7 +914,7 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
             $cont = str_replace(["<!-- jsHeader -->", "<!-- jsChart -->", "<!-- divChart -->"], '', $cont);
 
             // Optionally, remove extra \n if requested explicitly, to keep the output cleaner with fewer non wanted \n, as in the case with graphs created through calls to googleVis R package
-            if (isset($params["removen"]) && $params["removen"] == "1") {
+            if ($params["removen"] == "1") {
                 // remove spaces at the start and end of new lines
                 $cont = join("\n", array_map("trim", explode("\n", $cont)));
                 // remove empty new lines
@@ -1056,7 +960,7 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
 
                     //respect wrap setting when Codemirror is off and set to wrap when Codemirror is on to avoid broken view while
                     //javascript loads
-                    if ((isset($prefs['feature_syntax_highlighter']) && $prefs['feature_syntax_highlighter'] == 'y') || $wrap == 1) {
+                    if ($prefs['feature_syntax_highlighter'] == 'y' || $wrap == 1) {
                         $pre_style = 'white-space:pre-wrap;'
                         . ' white-space:-moz-pre-wrap !important;'
                         . ' white-space:-pre-wrap;'
@@ -1064,11 +968,17 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
                         . ' word-wrap:break-word;';
                     }
 
+                    if ($prefs['feature_syntax_highlighter'] == 'y') {
+                        //add codemirror stuff
+                        require_once("lib/codemirror_tiki/tiki_codemirror.php");
+                        addCodemirror();
+                    }
+
                     $out = (isset($caption) ? '<div class="codecaption">' . $caption . '</div>' : "" )
                         . '<pre class="codelisting" '
                         . (isset($colors) ? ' data-syntax="' . $colors . '" ' : '')
-                        . (isset($ln) ? ' data-line-numbers="' . $ln . '" ' : '')
-                        . (isset($wrap) ? ' data-wrap="' . $wrap . '" ' : '')
+                        . (! is_null($ln) ? ' data-line-numbers="' . $ln . '" ' : '')
+                        . (! is_null($wrap) ? ' data-wrap="' . $wrap . '" ' : '')
                         . ' dir="' . ( (isset($rtl) && $rtl == 1) ? 'rtl' : 'ltr') . '" '
                         . (isset($pre_style) ? ' style="' . $pre_style . '"' : '')
                         . $boxid . '>'
@@ -1081,7 +991,7 @@ function runR($output, $convert, $sha1, $input, $r_echo, $ws, $params, $user, $r
             # Check if there is anything after "-->" in $cont. Otherwise, do not show the pre tags.
             # Split the content $cont by the splitter "-->", and the 2nd element (#1 since it starts with 0) is the text output, if any
             # if no text output, don't add the pre tags since in Tiki 15+ they display a grey box by default.
-            $textoutput = preg_split("/-->/", $cont);
+            $textoutput = explode("-->", $cont);
             if (! empty($textoutput[1])) {
                 fwrite($fd, $prg . '<pre id="routput' . $r_count . '" name="routput' . $r_count . '" style="' . $pre_style . '"><!-- ' . $cont . '</pre>');
             }
@@ -1215,11 +1125,11 @@ function checkCommands($input)
             'get', 'rgl.init', # Suggested by Carlos J. Gil Bellosta , and Miguel Angel Rodriguez Muinos from list r-help-es
             'call', 'eval',  # added by suggestion of M. Cassin
             'paste',     # added by suggestion of Philippe Grosjean from Numerical Ecology of Aquatic Systems, Mons University, Belgium
-            'ggsave' ];  # from ggplot: http://rgm2.lab.nig.ac.jp/RGM2/R_man-2.9.0/library/ggplot2/man/ggsave-ao.html
+            'ggsave' ];  # from ggplot: https://ggplot2.tidyverse.org/reference/ggsave.html
     $found = [];
 
     foreach ($banned as $suspected) {
-        if (false !== strpos($input, $suspected)) {
+        if (str_contains($input, $suspected)) {
             // okay, we found something forbidden, now we need a regular expression to check if it is a function call like 'name  (', 'name =' or 'name.' !
             // Strictly speaking, this would be pattern '/\b' . preg_quote($suspected,'/') . '([\W]*\(|[\W]*\=|[\W]*\.)/'; but let's also forbid 'name .' until confirmation
             $pattern = '/\b' . preg_quote($suspected, '/') . '([\W]*\(|[\W]*\=|[\W]*\.)/';
@@ -1252,7 +1162,7 @@ function getCommandPath($command, $options = '')
             return $path . $command . $options;
         }
     }
-    $commandPath = `which $command`;
+    $commandPath = shell_exec("which $command");
     if (empty($commandPath)) {
         return false;
     } else {

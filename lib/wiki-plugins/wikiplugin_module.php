@@ -40,8 +40,8 @@ function wikiplugin_module_info()
                 'name' => tra('Module Name'),
                 'description' => tra('Module name as known in Tiki'),
                 'since' => '1',
-                'default' => '',
                 'filter' => 'text',
+                'default' => '',
                 'options' => $modules_options,
             ],
             'notitle' => [
@@ -74,7 +74,6 @@ function wikiplugin_module_info()
                 'name' => tra('Float'),
                 'description' => tra('Align the module to the left or right on the page allowing other elements to align against it'),
                 'since' => '1',
-                'default' => '',
                 'filter' => 'word',
                 'advanced' => true,
                 'options' => [
@@ -339,13 +338,14 @@ function wikiplugin_module($data, $params)
 
     $out = '';
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_module_info());
     extract($params, EXTR_SKIP);
 
-    if (! isset($float)) {
+    if (is_null($float)) {
         $float = 'nofloat';
     }
 
-    if (! isset($max)) {
+    if (! $max) {
         if (! isset($rows)) {
             $max = 10; // default value
         } else {
@@ -353,27 +353,22 @@ function wikiplugin_module($data, $params)
         }
     }
 
-    if (! isset($np)) {
-        $np = '1';
-    }
-
-    if (! isset($module) or ! $module) {
+    if (empty($module)) {
         $out = '<form class="box" id="modulebox">';
 
         $out .= '<br /><select name="choose">';
         $out .= '<option value="">' . tra('Please choose a module') . '</option>';
         $out .= '<option value="" style="background-color:#bebebe;">' . tra('to be used as argument') . '</option>';
         $out .= '<option value="" style="background-color:#bebebe;">{MODULE(module=>name_of_module)}</option>';
-        $handle = opendir('modules');
+        $iterator = new FilesystemIterator('modules', FilesystemIterator::SKIP_DOTS);
 
-        while ($file = readdir($handle)) {
-            if ((substr($file, 0, 4) == "mod-") and (substr($file, -4, 4) == ".php")) {
-                $mod = substr(substr(basename($file), 4), 0, -4);
-
+        foreach ($iterator as $fileInfo) {
+            $filename = $fileInfo->getFilename();
+            if (str_starts_with($filename, 'mod-') && str_ends_with($filename, '.php')) {
+                $mod = substr($fileInfo->getBasename('.php'), 4);
                 $out .= "<option value=\"$mod\">$mod</option>";
             }
         }
-
         $out .= '</select></form>';
     } else {
         $instance++;
@@ -399,7 +394,7 @@ function wikiplugin_module($data, $params)
         $out = $modlib->execute_module($module_reference);
     }
 
-    if (! is_null($out)) {
+    if (! empty($out)) {
         if ($float != 'nofloat') {
             $data = "<div style='float: $float;'>$out</div>";
         } else {
@@ -410,7 +405,7 @@ function wikiplugin_module($data, $params)
         $data = "<div class=\"alert alert-danger\" role=\"alert\"><button type=\"button\" class=\"close\" data-bs-dismiss=\"alert\" aria-label=\"" . tra("Close") . "\"><span aria-hidden=\"true\">&times;</span></button>" . tra("Sorry, no such module") . "<br><b>$module</b></div>" . $data;
     }
 
-    if (isset($module) && $module == 'register') {
+    if ($module == 'register') {
         // module register (maybe others too?) adds ~np~ to plugin output so remove them
         $data = preg_replace('/~[\/]?np~/ms', '', $data);
     }

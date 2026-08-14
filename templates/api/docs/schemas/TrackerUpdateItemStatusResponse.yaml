@@ -1,0 +1,22 @@
+---
+description: Response from POST /trackers/{trackerId}/items/{itemId}/status.
+type: object
+required:
+  - FORWARD
+properties:
+  FORWARD:
+    type: object
+    required:
+      - controller
+      - action
+      - status
+      - redirect
+    properties:
+      controller:
+        type: string
+      action:
+        type: string
+      status:
+        type: string
+      redirect:
+        type: string

@@ -20,6 +20,20 @@ class Services_User_SocialController
         $this->lib = TikiLib::lib('social');
     }
 
+    private function resolveUsername($rawUsername)
+    {
+        $rawUsername = trim($rawUsername);
+
+        if (! $rawUsername) {
+            return '';
+        }
+
+        $userlib = TikiLib::lib('user');
+        $users = $userlib->find_best_user([$rawUsername], '', 'login');
+
+        return ! empty($users[0]) ? $users[0] : $rawUsername;
+    }
+
     public function action_list_friends($input)
     {
         global $user;
@@ -55,7 +69,8 @@ class Services_User_SocialController
     {
         global $user;
 
-        $username = $input->username->email();
+        $username = $this->resolveUsername($input->username->text());
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($username) {
                 if (! $this->lib->addFriend($user, $username)) {
@@ -74,7 +89,8 @@ class Services_User_SocialController
     {
         global $user;
 
-        $username = $input->friend->email();
+        $username = $this->resolveUsername($input->friend->text());
+
         $status = null;
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if ($username) {
@@ -95,7 +111,7 @@ class Services_User_SocialController
         global $user;
 
         $status = null;
-        $username = $input->friend->email();
+        $username = $this->resolveUsername($input->friend->text());
 
         if (! $username) {
             throw new Services_Exception_MissingValue('friend');

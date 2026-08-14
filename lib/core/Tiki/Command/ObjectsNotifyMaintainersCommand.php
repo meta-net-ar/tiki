@@ -12,6 +12,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Mime\Address;
 
 #[AsCommand(
     name: 'objects:notify-maintainers',
@@ -63,16 +64,17 @@ class ObjectsNotifyMaintainersCommand extends Command
                         $mail = tiki_get_admin_mail();
 
                         // TODO: SOME ERROR MESSAGES IF SENDER_EMAIL AND SENDER_NAME NOT DEFINED
-                        $mail->setReplyTo($prefs['sender_email'], $prefs['sender_name']);
-                        $mail->setFrom($prefs['sender_email'], $prefs['sender_name']);
-                        $mail->setSender($prefs['sender_email'], $prefs['sender_name']);
+                        $address = new Address($prefs['sender_email'], $prefs['sender_name']);
+                        $mail->replyTo($address);
+                        $mail->from($address);
+                        $mail->sender($address);
 
                         if (empty($maintainer_info['email'])) {
                             $output->writeln('Object "' . $object_id . '": Email not sent to maintainer ' . $maintainer . ': user email is empty');
                             continue;
                         }
 
-                        $mail->addTo($maintainer_info['email'], $maintainer);
+                        $mail->addTo(new Address($maintainer_info['email'], $maintainer));
 
                         $content = 'Hello ' . $maintainer . ',<BR><BR>';
                         $content .= 'You are the maintainer of <strong>' . $object_id . '</strong> ' . $object_type . '.<BR><BR>';
@@ -80,21 +82,12 @@ class ObjectsNotifyMaintainersCommand extends Command
                         $content .= 'Please visit <strong> ' . $object_id . '</strong>, review and update it.<BR><BR>';
                         $content .= $prefs['email_footer'];
 
-                        $mail->setSubject("Freshness notification");
-
-                        $bodyPart = new \Laminas\Mime\Message();
-                        $bodyMessage = new \Laminas\Mime\Part($content);
-                        $bodyMessage->type = \Laminas\Mime\Mime::TYPE_HTML;
+                        $mail->subject("Freshness notification");
+                        $charset = 'utf-8';
                         if ($prefs['default_mail_charset']) {
-                            $bodyMessage->setCharset($prefs['default_mail_charset']);
+                            $charset = $prefs['default_mail_charset'];
                         }
-
-                        $messageParts = [
-                            $bodyMessage
-                        ];
-
-                        $bodyPart->setParts($messageParts);
-                        $mail->setBody($bodyPart);
+                        $mail->html($content, $charset);
 
                         tiki_send_email($mail);
 

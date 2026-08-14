@@ -1,6 +1,6 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 {block name="content"}
 
@@ -33,17 +33,17 @@
             <input type="checkbox" name="replytome" id="replytome">
             <label for="replytome">
                 {tr}Reply-to my email{/tr}
-                {help url="User-Information" desc="{tr}Reply-to my email:{/tr}{tr}The user will be able to reply to you directly via email.{/tr}"}
+                {help url="#" desc="{tr}Reply-to my email:{/tr}{tr}The user will be able to reply to you directly via email.{/tr}"}
             </label>
             <input type="checkbox" name="bccme" id="bccme">
             <label for="bccme">
                 {tr}Send me a copy{/tr}
-                {help url="User-Information" desc="{tr}Send me a copy:{/tr}{tr}You will be sent a copy of this email.{/tr}"}
+                {help url="#" desc="{tr}Send me a copy:{/tr}{tr}You will be sent a copy of this email.{/tr}"}
             </label>
         </div>
         <div class="submit">
             {if $referer}
-                <a class="btn btn-primary" href="{$referer}">
+                <a class="btn btn-primary" href="{$referer}" role="button">
                     {tr}Back{/tr}
                 </a>
             {/if}

@@ -57,36 +57,36 @@
 <form action="tiki-admin_links.php" method="post">
     {ticket}
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">URL</label>
+        <label class="col-sm-3 col-form-label" for="link_url">URL</label>
         <div class="col-sm-7 offset-sm-1 mb-3">
             {if $editurl eq 'n'}
-                <input type="text" name="url" class="form-control">
+                <input type="text" name="url" id="link_url" class="form-control">
             {else}
                 {$editurl}
-                <input type="hidden" name="url" value="{$editurl|escape}">
+                <input type="hidden" name="url" id="link_url" value="{$editurl|escape}">
                 <input type="hidden" name="editurl" value="{$editurl|escape}">
             {/if}
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">{tr}Title{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="link_title">{tr}Title{/tr}</label>
         <div class="col-sm-7 offset-sm-1 mb-3">
-            <input type="text" name="title" value="{$title|escape}" class="form-control">
+            <input type="text" name="title" id="link_title" value="{$title|escape}" class="form-control">
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">{tr}Position{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="position">{tr}Position{/tr}</label>
         <div class="col-sm-7 offset-sm-1 mb-3">
-            <input type="text" size="3" name="position" value="{$position|escape}" class="form-control">
+            <input type="text" size="3" name="position" id="position" value="{$position|escape}" class="form-control">
             <div class="small-hint">
                 (0 {tr}disables the link{/tr})
             </div>
         </div>
     </div>
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label">{tr}Link type{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="link_type">{tr}Link type{/tr}</label>
         <div class="col-sm-7 offset-sm-1 mb-3">
-            <select name="type" class="form-control">
+            <select name="type" id="link_type" class="form-control">
                 <option value="r" {if $type eq 'r'}selected="selected"{/if}>{tr}replace current page{/tr}</option>
                 <option value="f" {if $type eq 'f'}selected="selected"{/if}>{tr}framed{/tr}</option>
                 <option value="n" {if $type eq 'n'}selected="selected"{/if}>{tr}open new window{/tr}</option>

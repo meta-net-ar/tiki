@@ -30,6 +30,29 @@ if (isset($_SESSION['tiki_cookie_jar'])) {
 
 $smarty->assign_by_ref('cookie', $_COOKIE);
 
+/** This function is meant to replace PHPs low-level https://www.php.net/manual/en/function.setcookie.php function.  It only implements the 3 parameter version.
+ *
+ * the reason it exists is that:
+ *
+ * It is completely silly that setcookie is slightly different from the array returned by session_get_cookie_params.
+ * It is also completely silly that it will not obey smaesite in session_set_cookie_params if you pass lifetime explicitly.  Maybe it disregards other parameters in some forms, I did not check.
+ * benoitg -2025-05-12.
+ *
+ *
+ */
+function setcookie_obeySetCookieParams(string $name, string $value = "", array $options = []): bool
+{
+    $sessionParams = session_get_cookie_params();
+    // Yes, it is completely silly that the options parameter of setcookie is slightly different from the array returned by session_get_cookie_params().
+    $sessionParams['expires'] = $sessionParams['lifetime'];
+    unset($sessionParams['lifetime']);
+    $finalOptions = array_merge($sessionParams, $options);
+    return setcookie($name, $value, $finalOptions);
+}
+/**
+ * This seems to be the mirror function of CookieConsentLib::setCookieSection(), but
+ * I am not 100% sure since CookieConsentLib has it's own setCookie() method - benoitg - 2026-03-26
+ */
 function getCookie($name, $section = null, $default = null)
 {
     global $feature_no_cookie, $jitCookie;
@@ -67,37 +90,6 @@ function getCookie($name, $section = null, $default = null)
             return $cookie;
         } else {
             return $default;
-        }
-    }
-}
-
-function setCookieSection($name, $value, $section = '', $expire = 0, $path = '', $domain = '', $secure = '')
-{
-    global $feature_no_cookie;
-
-    if (TIKI_API) {
-        return;
-    }
-
-    if ($section) {
-        $valSection = getCookie($section);
-        $name2 = '@' . $name . ':';
-        if ($valSection) {
-            if (preg_match('/' . preg_quote($name2) . '/', $valSection)) {
-                $valSection  = preg_replace('/' . preg_quote($name2) . '[^@;]*/', $name2 . $value, $valSection);
-            } else {
-                $valSection = $valSection . $name2 . $value;
-            }
-            setCookieSection($section, $valSection, '', $expire, $path, $domain, $secure);
-        } else {
-            $valSection = $name2 . $value;
-            setCookieSection($section, $valSection, '', $expire, $path, $domain, $secure);
-        }
-    } else {
-        if ($feature_no_cookie) {
-            $_SESSION['tiki_cookie_jar'][$name] = $value;
-        } else {
-            setcookie($name, $value, $expire, $path, $domain, $secure);
         }
     }
 }

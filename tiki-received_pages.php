@@ -19,9 +19,10 @@ $inputConfiguration = [
         'checked'                  => 'bool',              //post
         'prefix'                   => 'word',              //post
         'postfix'                  => 'word',              //post
-        'sort_mode'                => 'word',              //get
+        'sort_mode'                => 'alnumdash',         //get
         'offset'                   => 'digits',            //get
-        'find'                     => 'alpha',             //post
+        'find'                     => 'text',              //get
+        'sort_modes'               => 'alnumdash',         //get
         ],
     ],
 ];
@@ -96,7 +97,7 @@ if (! empty($_REQUEST['checked']) && (! empty($_REQUEST['prefix']) || ! empty($_
         }
     }
     if (empty($errors)) {
-        $commlib->rename_structure_pages($_REQUEST['checked'], isset($_REQUEST['prefix']) ? $_REQUEST['prefix'] : '', isset($_REQUEST['postfix']) ? $_REQUEST['postfix'] : '');
+        $commlib->rename_structure_pages($_REQUEST['checked'], $_REQUEST['prefix'] ?? '', $_REQUEST['postfix'] ?? '');
     }
 }
 if (! isset($_REQUEST["sort_mode"])) {
@@ -104,22 +105,14 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $channels = $tikilib->list_received_pages($offset, $maxRecords, $sort_mode, $find, 'p');
 $smarty->assign_by_ref('channels', $channels["data"]);
-$smarty->assign_by_ref('cant', $channels['cant']);
+$smarty->assign_by_ref('count', $channels['count']);
 if (! isset($_REQUEST['sort_modes'])) {
     $sort_modes = 'receivedDate_desc';
 } else {

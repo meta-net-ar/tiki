@@ -5,10 +5,14 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so it's better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     die;
 }
+
+use SmartyTiki\FunctionHandler\Cookie;
+use Tiki\Lib\CookieConsent\CookieConsentLib;
 
 class Tiki_Soap
 {
@@ -54,11 +58,9 @@ class Tiki_Soap
 
         try {
             // Set (Session) cookies before the call
-            if ($this->allowCookies) {
-                if (is_array($this->cookies)) {
-                    foreach ($this->cookies as $cookieName => $cookieValue) {
-                        $client->setCookie($cookieName, $cookieValue[0]);
-                    }
+            if (is_array($this->cookies)) {
+                foreach ($this->cookies as $cookieName => $cookieValue) {
+                    CookieConsentLib::tikiSetCookie($cookieName, $cookieValue[0], CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);
                 }
             }
 
@@ -66,11 +68,9 @@ class Tiki_Soap
             $result = call_user_func_array([$client, $operation], $soap_params);
 
             // Pick up any new cookies from the server
-            if ($this->allowCookies) {
-                $last_response = $client->getLastResponseHeaders();
-                $soapClt = $client->getSoapClient();
-                $this->cookies = array_merge($soapClt->_cookies, $this->cookies);
-            }
+            $last_response = $client->getLastResponseHeaders();
+            $soapClt = $client->getSoapClient();
+            $this->cookies = array_merge($soapClt->_cookies, $this->cookies);
         } catch (SoapFault $e) {
             trigger_error($e->getMessage());
             return $e->getMessage();

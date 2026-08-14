@@ -47,10 +47,10 @@
             <div class="mb-3 row">
                 <label class="col-sm-3" for="view">{tr}Report length{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="radio" name="view" value="short"{if $report_preferences.view eq "short"} checked="checked"{/if}>
+                    <input type="radio" class="form-check-input" name="view" value="short"{if $report_preferences.view eq "short"} checked="checked"{/if}>
                     {tr}Short report{/tr}
                     <br>
-                    <input type="radio" name="view" value="detailed"{if $report_preferences.view eq "detailed" OR $report_preferences eq false} checked="checked"{/if}>
+                    <input type="radio" class="form-check-input" name="view" value="detailed"{if $report_preferences.view eq "detailed" OR $report_preferences eq false} checked="checked"{/if}>
                     {tr}Detailed report{/tr}
                     <br>
                 </div>
@@ -58,10 +58,10 @@
             <div class="mb-3 row">
                 <label class="col-sm-3" for="type">{tr}Report format{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="radio" name="type" value="html"{if $report_preferences.type eq "html" OR $report_preferences eq false} checked="checked"{/if}>
+                    <input type="radio" class="form-check-input" name="type" value="html"{if $report_preferences.type eq "html" OR $report_preferences eq false} checked="checked"{/if}>
                     {tr}HTML{/tr}
                     <br>
-                    <input type="radio" name="type" value="plain"{if $report_preferences.type eq "plain"} checked="checked"{/if}>
+                    <input type="radio" class="form-check-input" name="type" value="plain"{if $report_preferences.type eq "plain"} checked="checked"{/if}>
                     {tr}Plain text{/tr}
                     <br>
                 </div>

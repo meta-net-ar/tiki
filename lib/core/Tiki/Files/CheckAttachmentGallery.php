@@ -12,7 +12,6 @@ class CheckAttachmentGallery extends AbstractCheckGallery
 {
     /*
      * Holds current attachment type
-     * t    -   Tracker Attachments
      * w    -   Wiki Attachments
      * f    -   Forum Attachments
      */
@@ -79,9 +78,6 @@ class CheckAttachmentGallery extends AbstractCheckGallery
     private function getAttachments()
     {
         switch ($this->type) {
-            case 't':
-                $lib = TikiLib::lib('trk');
-                break;
             case 'w':
                 $lib = TikiLib::lib('wiki');
                 break;
@@ -101,7 +97,7 @@ class CheckAttachmentGallery extends AbstractCheckGallery
     protected function areFilesStoredInDatabase()
     {
         global $prefs;
-        return isset($prefs[$this->type . '_use_db']) ? $prefs[$this->type . '_use_db'] === 'y' : false;
+        return isset($prefs[$this->type . '_use_db']) && $prefs[$this->type . '_use_db'] === 'y';
     }
 
     /**
@@ -112,6 +108,6 @@ class CheckAttachmentGallery extends AbstractCheckGallery
     protected function getPathOnDisk()
     {
         global $prefs;
-        return isset($prefs[$this->type . '_use_dir']) ? $prefs[$this->type . '_use_dir'] : false;
+        return $prefs[$this->type . '_use_dir'] ?? false;
     }
 }

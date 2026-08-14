@@ -1,6 +1,6 @@
-<p>The current values for the {$xmlcount} items from the XML management file are shown in the input fields below.</p>
+<p>{tr _0=$xmlcount}The current values for the %0 items from the XML management file are shown in the input fields below.{/tr}</p>
 
-<p>Change any individual values and click the 'Update' button to submit the revised values and to resave them in the File Gallery XML file.</p>
+<p>{tr}Change any individual values and click the 'Update' button to submit the revised values and to resave them in the File Gallery XML file.{/tr}</p>
 
 <form action="{$smarty.server.SCRIPT_NAME}?{query}" method="post" class="d-flex flex-row flex-wrap align-items-center">
     <hr>
@@ -8,7 +8,7 @@
         <tr>
             {if $xmlnamelist eq 'yes'}<td style="text-align: right;"><b>xml node name</b></td>{/if}
             {if $attused eq 'yes'}<td style="text-align: center;"><b>xml node description</b></td>{/if}
-            <td style="text-align: center;"><b>xml node current/new value</b></td>
+            <td style="text-align: center;"><b>{tr}xml node current/new value{/tr}</b></td>
         </tr>
         {for $item=0 to $xmlcount-1}
             <tr>

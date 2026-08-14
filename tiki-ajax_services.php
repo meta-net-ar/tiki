@@ -16,6 +16,9 @@
 // will be serialized and sent to the browser.
 //
 // Otherwise, the procedural script remains
+
+use Tiki\Lib\Shipping\ShippingLib;
+
 $inputConfiguration = [[
     'staticKeyFilters' => [
         'action' => 'word',         //get
@@ -24,6 +27,8 @@ $inputConfiguration = [[
         'watch' => 'alpha',         //post  templates/comment/post.tpl:58
         'confirmForm' => 'alpha',   // \Services_Utilities::isConfirmPost
         'itemId' => 'int',          // often used in \ParserLib::parse_wiki_argvariable
+        'data' => 'none',           // post JSON payloads (structure save, menu save, etc.)
+        'params' => 'none',         // post JSON payloads (structure save, etc.)
     ],
 ]];
 
@@ -40,7 +45,7 @@ if (isset($_REQUEST['controller'])) {
     $controller = $_REQUEST['controller'];
     $extensionPackage = '';
 
-    if (strpos($_REQUEST['controller'], ".") !== false) {
+    if (str_contains($_REQUEST['controller'], ".")) {
         $parts = explode(".", $_REQUEST['controller']);
         if (count($parts) == 3) {
             $extensionPackage = $parts[0] . "." . $parts[1];
@@ -55,7 +60,7 @@ if (isset($_REQUEST['controller'])) {
 }
 
 if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly')) {
-    $access->check_feature(['feature_jquery_autocomplete', 'elementplus_autocomplete'], '', 'features', true);
+    $access->check_feature('elementplus_autocomplete', '', 'features', true);
 
     $listonly = $jitRequest->listonly->word();
     $query = $jitRequest->q->text();
@@ -88,9 +93,12 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         $access->output_serialized($grs);
     } elseif ($listonly == 'users') {
         $names_array = explode(',', str_replace(';', ',', $query));
-        $last_name = trim(end(array_filter($names_array)));
+        $filterNames = array_filter($names_array);
+        $last_name = trim(end($filterNames));
+        $groups = $jitRequest->groups->text();
+        $groups = $groups ? explode(',', $groups) : [];
 
-        $listusers = $userlib->get_users_names(0, 100, 'login_asc', $last_name);
+        $listusers = $userlib->get_users_names(0, 100, 'login_asc', $last_name, $groups);
 
         $access->output_serialized($listusers);
     } elseif ($listonly == 'usersandcontacts') {
@@ -124,7 +132,8 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
     } elseif ($listonly == 'userrealnames') {
         $names_array = explode(',', str_replace(';', ',', $query));
         $last_name = trim(end($names_array));
-        $groups = '';
+        $groups = $jitRequest->groups->text();
+        $groups = $groups ? explode(',', $groups) : [];
         $listusers = $userlib->get_users_light(0, -1, 'login_asc', $last_name, $groups);
         $done = [];
         $finalusers = [];
@@ -139,13 +148,9 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
                             $finalusers[$oldkey] = $done[$usr];
                         }
                     }
-                    if (stripos($longusr, $last_name) !== false) {
-                        $finalusers[] = $longusr;
-                    }
-                } else {
-                    if (stripos($longusr, $last_name) !== false) {
-                        $finalusers[] = $longusr;
-                    }
+                }
+                if (stripos($longusr, $last_name) !== false) {
+                    $finalusers[] = $longusr;
                 }
                 $done[$usr] = $longusr;
             }
@@ -159,7 +164,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         $access->output_serialized($tags);
     } elseif ($listonly == 'icons') {
         $dir = 'img/icons';
-        $max = isset($_REQUEST['max']) ? $_REQUEST['max'] : 10;
+        $max = $_REQUEST['max'] ?? 10;
         $icons = [];
         $style_dir = $tikilib->get_theme_path($prefs['style'], $prefs['style_option']);
         if ($style_dir && is_dir($style_dir . $dir)) {
@@ -168,8 +173,7 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
         read_icon_dir($dir, $icons, $max, $query);
         $access->output_serialized($icons);
     } elseif ($listonly == 'shipping' && $prefs['shipping_service'] == 'y') {
-        global $shippinglib;
-        require_once 'lib/shipping/shippinglib.php';
+        $shippinglib = new ShippingLib();
 
         $access->output_serialized($shippinglib->getRates($_REQUEST['from'], $_REQUEST['to'], $_REQUEST['packages']));
     } elseif ($listonly == 'trackername') {
@@ -184,14 +188,24 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
     }
 } elseif ($access->is_serializable_request() && isset($_REQUEST['zotero_tags'])) { // Handle Zotero Requests
     $access->check_feature([ 'zotero_enabled' ]);
-    $zoterolib = TikiLib::lib('zotero');
 
-    $references = $zoterolib->get_references($_REQUEST['zotero_tags']);
+    try {
+        $zoterolib = TikiLib::lib('zotero');
+        $references = $zoterolib->get_references($_REQUEST['zotero_tags']);
 
-    if ($references === false) {
-        $access->output_serialized(['type' => 'unauthorized', 'results' => []]);
-    } else {
-        $access->output_serialized(['type' => 'success', 'results' => $references]);
+        if ($references === false) {
+            $oauthlib = TikiLib::lib('oauth');
+            if (! $oauthlib->is_authorized('zotero')) {
+                $access->output_serialized(['type' => 'unauthorized', 'results' => []]);
+            } else {
+                $access->output_serialized(['type' => 'no_results', 'results' => []]);
+            }
+        } else {
+            $access->output_serialized(['type' => 'success', 'results' => $references]);
+        }
+    } catch (Exception $e) {
+        error_log("Zotero error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (Zotero exception reporting)
+        $access->output_serialized(['type' => 'error', 'message' => $e->getMessage(), 'results' => []]);
     }
 } elseif (isset($_REQUEST['geocode']) && $access->is_serializable_request()) {
     $access->output_serialized(TikiLib::lib('geo')->geocode($_REQUEST['geocode']));
@@ -206,15 +220,29 @@ if ($access->is_serializable_request() && $jitRequest->offsetExists('listonly'))
  */
 function read_icon_dir($dir, &$icons, $max, $query)
 {
-    $fp = opendir($dir);
-    while (false !== ($f = readdir($fp))) {
-        preg_match('/^([^\.].*)\..*$/', $f, $m);
+    if (! is_dir($dir)) {
+        return;
+    }
+    $iterator = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+
+    foreach ($iterator as $fileInfo) {
+        if (count($icons) >= $max) {
+            break;
+        }
+
+        $filename = $fileInfo->getFilename();
+        $path = $fileInfo->getPathname();
+
+        // Get name without extension
+        $nameOnly = pathinfo($filename, PATHINFO_FILENAME);
+
         if (
-            count($m) > 0 && count($icons) < $max &&
-                stripos($m[1], $query) !== false &&
-                ! in_array($dir . '/' . $f, $icons)
+            $fileInfo->isFile() &&
+            ! str_starts_with($filename, '.') &&
+            stripos($nameOnly, $query) !== false &&
+            ! in_array($path, $icons)
         ) {
-            $icons[] = $dir . '/' . $f;
+            $icons[] = $path;
         }
     }
 }

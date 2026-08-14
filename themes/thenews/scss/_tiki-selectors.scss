@@ -1,30 +1,48 @@
-// This file contains CSS rules for this theme that aren't covered by Bootstrap, such as additional Tiki theme properties.
-// To do: Use variables for global Tiki properties and customize a Tiki variables file per-theme.
-$imagePath: "../images/";
-// image path use example:
-//  body {
+// TheNews for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
+//$imagePath: "../images/";
+// body {
 //    background-image: url('#{$imagePath}bg.jpg');
-//  }
+// }
 
-//.pagetitle a {
-//  color: $body-color;
-//}
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
 
-$tiki-topmodules-row-sidemargins: 0;
-$tiki-topbar-row-sidemargins: -15px;
-
-//body > .container {
-//    border: 1px solid #aaaaaa;
-//    margin-top: 18px;
-//    margin-bottom: 18px;
-//}
-
+// Color system
+// Body
 .container:not(.in-navbar)  {
-//  background: #fbfbfb;
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
+    border-left: 1px solid var(--tiki-main-border-color); // #ddd;
+    border-right: 1px solid var(--tiki-main-border-color); // #ddd;
 }
 
+body.fullscreen {
+    .container,
+    #col1 {
+        border: none;
+    }
+}
+
+// Links
+// Components
+// Typography
+// Tables
+// Buttons
+.btn-outline-warning {
+    color: #A4660E;
+    border-color: #A4660E;
+}
+
+// Forms
+// Navs
+// Navbar
 .navbar:not(.bg-dark,.bg-light) {
     .nav-link {
         color: var(--bs-body-color);
@@ -58,17 +76,20 @@ $tiki-topbar-row-sidemargins: -15px;
   border-bottom-color: #ff5c1a;
 }
 
-//.middle_outer { Removed because of color mismatch with navbar
-//  box-shadow: inset 0 45px 0 0 #efefef;
-//}
+.navbar-expand-md .navbar-nav .nav-link {
+    padding-right: .75rem;
+    padding-left: .75rem;
+}
 
+// Dropdowns
+// Pagination
+// Cards
 .module .card-header {
 //  background: top left #eae9e0;
   height: .5em;
   text-align: center;
-  margin: 0;
   overflow-y: visible;
-  margin-bottom: 1rem;
+  margin: 0 0 1rem 0;
 }
 
 .module h3.card-title {
@@ -99,37 +120,22 @@ $tiki-topbar-row-sidemargins: -15px;
     padding: 10px 15px 0 10px;
 }
 
-body.fullscreen {
-    .container,
-    #col1 {
-        border: none;
-    }
-}
-
-// // navbars with too many items overflows the container - why is this in the theme file?
-//.navbar-expand .navbar-nav {
-//    flex-wrap: wrap;
-//}
-
-//@include media-breakpoint-up(lg) {
-//    .navbar-expand-lg .navbar-nav {
-//        flex-wrap: wrap;
-//    }
-//}
-
-.navbar-expand-md .navbar-nav .nav-link {
-  padding-right: .75rem;
-  padding-left: .75rem;
-}
-
-// UAB (Admin)
-// Replicate vertical menu text centering in UAB accordion
+// Badges
+// Alerts
+// Progress bars
+// List group
+// Figures
+// Breadcrumbs
+// Code
+//Tiki-specific
+    // UAB (Admin)
+    // Replicate vertical menu text centering in UAB accordion
 button.accordion-button {
     border-left: 1px solid var(--tiki-nav-link-border-left-color);
     border-bottom: 3px solid #09c;
     span.ms-1.narrow-hide {
-    width: 100%;
-    text-align: center; }
+        width: 100%;
+        text-align: center; }
 }
 
 .admin-dashboard {
@@ -143,5 +149,35 @@ button.accordion-button {
     }
 }
 
+// Dark mode
+[data-bs-theme=dark] {
+    .btn-outline-primary {
+        color: #008EFA;
+        border-color: #008EFA;
+    }
+    .btn-outline-secondary {
+        color: #3888FF;
+        border-color: #3888FF;
+    }
+    .btn-outline-success {
+        color: #1D9F63;
+        border-color: #1D9F63;
+    }
+    .btn-outline-danger {
+        color: #E36370;
+        border-color: #E36370;
+    }
+    .btn-outline-warning {
+        color: #C57A11;
+        border-color: #C57A11;
+    }
+    .btn-outline-info {
+        color: #208FE9;
+        border-color: #208FE9;
+    }
+    .blockquote-footer {
+        color: #879097;
+    }
+}
 
-
+// External libraries

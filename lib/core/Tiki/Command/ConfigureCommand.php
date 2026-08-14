@@ -63,10 +63,8 @@ class ConfigureCommand extends Command
         $export_password = var_export($password, true);
         $export_database = var_export($database, true);
         $export_hostname = var_export($hostname, true);
-        $export_version = var_export($version, true);
         $out = <<<LOCALPHP
 <?php
-\$dbversion_tiki=$export_version;
 \$host_tiki=$export_hostname;
 \$user_tiki=$export_username;
 \$pass_tiki=$export_password;
@@ -77,17 +75,21 @@ class ConfigureCommand extends Command
 // \$client_charset='utf8';
 // See http://tiki.org/ReleaseNotes5.0#Known_Issues and http://doc.tiki.org/Understanding+Encoding for more info
 
-// If your php installation does not not have pdo extension
-// \$api_tiki = 'adodb';
+// php installation should have pdo extension (adodb is deprecated in Tiki)
 
 // Want configurations managed at the system level or restrict some preferences? http://doc.tiki.org/System+Configuration
-// \$system_configuration_file = 'db/tiki.ini.php';
-// \$system_configuration_file = '/etc/tiki.ini';
+// Multiple configuration files (files listed later override earlier ones):
+// \$system_configuration_files = ['/etc/tiki/ansible_local.ini', '/etc/tiki/dev_local.ini'];
 // \$system_configuration_identifier = 'example.com';
 
 LOCALPHP;
         $local_php = \Tiki\TikiInit::getCredentialsFile();
-        file_put_contents($local_php, $out);
+        $result = file_put_contents($local_php, $out);
+
+        if ($result === false) {
+            $output->writeln("<error>Failed to write to $local_php</error>");
+            return Command::FAILURE;
+        }
 
         $output->writeln("Wrote $local_php");
         return Command::SUCCESS;

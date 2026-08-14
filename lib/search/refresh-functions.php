@@ -38,6 +38,28 @@ function refresh_index($object_type, $object_id = null, $process = true)
     return true;
 }
 
+function delete_from_index($object_type, $object_id)
+{
+    global $prefs;
+
+    if ($prefs['feature_search'] == 'y' && $prefs['unified_incremental_update'] == 'y' && $object_id) {
+        $unified_type = refresh_index_convert_type($object_type);
+
+        try {
+            $unifiedsearchlib = TikiLib::lib('unifiedsearch');
+            $unifiedsearchlib->deleteObject($unified_type, $object_id);
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+            if (empty($message)) {
+                $message = tra('Try rebuilding or optimizing the index on the search admin page');
+            }
+            Feedback::error(tr('Search index could not be updated: %0', $message));
+        }
+    }
+
+    return true;
+}
+
 /**
  * @param $object_type
  * @return string

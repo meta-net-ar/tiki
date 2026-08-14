@@ -18,12 +18,21 @@ class TrackerWriter
         $schema = $source->getSchema();
         $bulkImport = $schema->useBulkImport();
 
+        $appliedFields = [];
+        if ($schema->getFilterCollection()) {
+            foreach ($schema->getFilterCollection()->getFilters() as $filter) {
+                if ($filter->getControl() && $filter->getControl()->hasValue() && method_exists($filter->getControl(), 'getValue')) {
+                    $appliedFields[$filter->getField()] = $filter->getControl()->getValue();
+                }
+            }
+        }
+
         if ($bulkImport) {
             global $prefs;
             $prefs['categories_cache_refresh_on_object_cat'] = 'n';
         }
 
-        $iterate = function ($callback) use ($source, $schema, $bulkImport) {
+        $iterate = function ($callback) use ($source, $schema, $bulkImport, $appliedFields) {
             $columns = $schema->getColumns();
 
             $tx = \TikiDb::get()->begin();
@@ -36,9 +45,9 @@ class TrackerWriter
             foreach ($source->getEntries() as $line => $entry) {
                 $info = [
                     'itemId' => false,
-                    'fields' => [],
+                    'fields' => $appliedFields,
                     'skip_sync' => $source instanceof \Tracker\Tabular\Source\ODBCSource,
-                    'validate' => $source instanceof \Tracker\Tabular\Source\ODBCSource ? false : true, // ODBC sync needs saving no matter of validation errors
+                    'validate' => ($source instanceof \Tracker\Tabular\Source\ODBCSource || $schema->isSkipValidation()) ? false : true, // ODBC sync needs saving no matter of validation errors
                 ];
 
                 foreach ($columns as $column) {
@@ -113,6 +122,9 @@ class TrackerWriter
                     }
                 }
                 $ids[] = $info['itemId'];
+                if ($schema->isSkipValidation()) {
+                    return [];
+                }
                 return array_map(
                     function ($error) use ($line) {
                         return tr('Line %0:', $line + 1) . ' ' . $error;
@@ -132,7 +144,7 @@ class TrackerWriter
 
         $definition = $schema->getDefinition();
 
-        $iterate(function ($line, $info, $columns) use ($utilities, $definition, $schema) {
+        $result = $iterate(function ($line, $info, $columns) use ($utilities, $definition, $schema) {
             try {
                 if (! isset($info['status'])) {
                     $info['status'] = '';
@@ -184,7 +196,7 @@ class TrackerWriter
             $source->importSuccess();
         }
 
-        return true;
+        return $result;
     }
 
     /**
@@ -199,8 +211,7 @@ class TrackerWriter
 
         $lookup = $this->getItemIdLookup($schema);
 
-        $result = [];
-        foreach ($source->getEntries() as $line => $entry) {
+        foreach ($source->getEntries() as $entry) {
             $info = [
                 'itemId' => false,
                 'fields' => [],

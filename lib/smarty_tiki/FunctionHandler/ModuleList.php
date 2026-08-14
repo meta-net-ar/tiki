@@ -28,10 +28,10 @@ class ModuleList extends Base
         $class = 'modules';
         if (! empty($params['class'])) {
             $class .= ' ' . $params['class'];
-            if (strpos($class, 'navbar') !== false) {
+            if (str_contains($class, 'navbar')) {
                 $tag = 'nav';
             }
-            if (strpos($class, 'aside') !== false) {
+            if (str_contains($class, 'aside')) {
                 $tag = 'aside';
             }
         }
@@ -64,35 +64,60 @@ class ModuleList extends Base
         $content = '';
         $key = $zone . '_modules';
 
+        $legacy_to_new = [
+            'MOBILE'  => ['SHOW_XS'],
+            'TABLET'  => ['SHOW_SM', 'SHOW_MD'],
+            'LAPTOP'  => ['SHOW_LG', 'SHOW_XL'],
+            'DESKTOP' => ['SHOW_XXL'],
+            'PRINT'   => ['SHOW_PRINT'],
+        ];
+
         if (isset($moduleZones[$key]) && is_array($moduleZones[$key])) {
             $content = implode(
                 '',
                 array_map(
-                    function ($module) {
+                    function ($module) use ($legacy_to_new) {
                         $devices = $module["params"]["device"] ?? null;
-                        $moduleContent = (isset($module['data']) ? $module['data'] : '');
+                        $moduleContent = ($module['data'] ?? '');
                         $device_classes = '';
 
                         if (isset($devices) && is_array($devices) && ! empty($devices)) {
                             $device_map = [
-                                'MOBILE' => 'd-xs-none d-sm-block',
-                                'TABLET' => 'd-sm-none d-md-none d-lg-block',
-                                'LAPTOP' => 'd-lg-none d-xl-none d-xxl-block',
-                                'DESKTOP' => 'd-xxl-none',
-                                'PRINT' => 'd-print-none'
+                                'HIDE_ALL'    => 'd-none',
+                                'HIDE_XS'     => 'd-none d-sm-block',
+                                'HIDE_SM'     => 'd-sm-none d-md-block',
+                                'HIDE_MD'     => 'd-md-none d-lg-block',
+                                'HIDE_LG'     => 'd-lg-none d-xl-block',
+                                'HIDE_XL'     => 'd-xl-none d-xxl-block',
+                                'HIDE_XXL'    => 'd-xxl-none',
+                                'SHOW_ALL'    => 'd-block',
+                                'SHOW_XS'     => 'd-block d-sm-none',
+                                'SHOW_SM'     => 'd-none d-sm-block d-md-none',
+                                'SHOW_MD'     => 'd-none d-md-block d-lg-none',
+                                'SHOW_LG'     => 'd-none d-lg-block d-xl-none',
+                                'SHOW_XL'     => 'd-none d-xl-block d-xxl-none',
+                                'SHOW_XXL'    => 'd-none d-xxl-block',
+                                'SHOW_PRINT'  => 'd-none d-print-block',
+                                'SHOW_SCREEN' => 'd-print-none',
                             ];
 
                             $device_classes = [];
 
-                            foreach ($device_map as $device => $class) {
-                                if (! in_array($device, $devices)) {
-                                    $device_classes[] = $class;
+                            foreach ($devices as $device) {
+                                if (isset($legacy_to_new[$device])) {
+                                    foreach ($legacy_to_new[$device] as $new_device) {
+                                        if (isset($device_map[$new_device])) {
+                                            $device_classes[] = $device_map[$new_device];
+                                        }
+                                    }
+                                } elseif (isset($device_map[$device])) {
+                                    $device_classes[] = $device_map[$device];
                                 }
                             }
 
                             $device_classes = implode(' ', $device_classes);
                         } else {
-                            $device_classes = ' d-print-block';
+                            $device_classes = 'd-flex';
                         }
 
                         $moduleContent = preg_replace('/ class="([^"]*\bmodule\b[^"]*)"/', ' class="$1 ' . $device_classes . '"', $moduleContent);

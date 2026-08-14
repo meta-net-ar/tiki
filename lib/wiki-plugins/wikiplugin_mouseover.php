@@ -6,14 +6,12 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_mouseover_info()
 {
-    global $prefs;
     include_once('lib/prefs/jquery.php');
     $jqprefs = prefs_jquery_list();
     $jqfx = [];
     foreach ($jqprefs['jquery_effect']['options'] as $k => $v) {
         $jqfx[] = ['text' => $v, 'value' => $k];
     }
-
 
     return [
         'name' => tra('Mouseover'),
@@ -122,7 +120,6 @@ function wikiplugin_mouseover_info()
                 'description' => tra('CSS class to apply'),
                 'since' => '4.0',
                 'filter' => 'text',
-                'default' => 'plugin-mouseover',
                 'advanced' => true,
             ],
             'bgcolor' => [
@@ -131,7 +128,6 @@ function wikiplugin_mouseover_info()
                 'description' => tra('Background color to apply to the popup'),
                 'since' => '3.0',
                 'filter' => 'text',
-                'default' => '',
                 'advanced' => true,
             ],
             'textcolor' => [
@@ -140,7 +136,6 @@ function wikiplugin_mouseover_info()
                 'description' => tra('Color to apply to the text in the popup'),
                 'since' => '3.0',
                 'filter' => 'text',
-                'default' => '',
                 'advanced' => true,
             ],
             'sticky' => [
@@ -163,7 +158,6 @@ function wikiplugin_mouseover_info()
                 'description' => tra('Padding size in pixels'),
                 'since' => '3.0',
                 'filter' => 'digits',
-                'default' => '',
                 'advanced' => true,
             ],
             'effect' => [
@@ -213,19 +207,16 @@ function wikiplugin_mouseover_info()
 
 function wikiplugin_mouseover($data, $params)
 {
-    $default = ['parse' => 'y', 'parselabel' => 'y'];
-    $params = array_merge($default, $params);
-
-    $width = isset($params['width']) ? (int) $params['width'] : 400;
-    $height = isset($params['height']) ? (int) $params['height'] : 200;
-    $offsetx = isset($params['offsetx']) ? (int) $params['offsetx'] : 5;
-    $offsety = isset($params['offsety']) ? (int) $params['offsety'] : 24;
-    $parse = ! isset($params['parse']) || (strcasecmp($params['parse'], 'n') != 0);
-    $sticky = isset($params['sticky']) && $params['sticky'] == 'y';
-    $padding = isset($params['padding']) ? 'padding: ' . $params['padding'] . 'px;' : '';
-    $effect = ! isset($params['effect']) || $params['effect'] == 'Default' ? '' : strtolower($params['effect']);
-    $speed = ! isset($params['speed']) ? 'normal' : strtolower($params['speed']);
-    $closeDelay = isset($params['closeDelay']) ? (int) $params['closeDelay'] : 0;
+    $width = (int) ($params['width']);
+    $height = (int) ($params['height']);
+    $offsetx = (int) ($params['offsetx']);
+    $offsety = (int) ($params['offsety']);
+    $parse = (strcasecmp($params['parse'], 'n') != 0);
+    $sticky = $params['sticky'] == 'y';
+    $padding = ! is_null($params['padding']) ? 'padding: ' . $params['padding'] . 'px;' : '';
+    $effect = is_null($params['effect']) || $params['effect'] == 'Default' ? '' : strtolower($params['effect']);
+    $speed = strtolower($params['speed'] ?? 'normal');
+    $closeDelay = (int) ($params['closeDelay'] ?? 0);
     $tag = ! empty($params['tag']) ? $params['tag'] : 'a';
 
     if (empty($params['label']) && empty($params['text'])) {
@@ -237,7 +228,7 @@ function wikiplugin_mouseover($data, $params)
     }
 
     $url = '';
-    if (isset($params['url'])) {
+    if ($params['url']) {
         $url = $params['url'];
         $url = htmlentities($url, ENT_QUOTES, 'UTF-8');
     }
@@ -273,32 +264,40 @@ function wikiplugin_mouseover($data, $params)
     $headerlib = TikiLib::lib('header');
     $headerlib->add_css('.plugin-mouseover-anchor:not([href]) { border-bottom: 1px dotted; color: inherit; cursor: help; text-decoration: none; }');
 
-    if ($closeDelay && $sticky) {
-        $closeDelayStr = "setTimeout(function() {hideJQ('#$id', '$effect', '$speed')}, " . ($closeDelay * 1000) . ");";
-    } else {
-        $closeDelayStr = '';
-    }
+    // Plugin parameter exposes only "closeDelay" (seconds). Internally we split timing:
+    // - closeDelayMs: sticky auto-close timer
+    // - hideDelayMs: non-sticky mouseleave debounce to avoid flicker on inline anchors
+    // offsetX/offsetY are cursor deltas, not absolute page coordinates.
+    // Base cursor position is captured at mouseenter (popup init), then updated on mousemove.
+    $closeDelayMs = max(0, $closeDelay * 1000);
+    $hideDelayMs = $closeDelayMs > 0 ? $closeDelayMs : 80;
+    $jsConfig = json_encode([
+        'anchorId' => "$id-link",
+        'popupId' => $id,
+        'isSticky' => $sticky,
+        'closeDelayMs' => $closeDelayMs,
+        'hideDelayMs' => $hideDelayMs,
+        'offsetX' => $offsetx,
+        'offsetY' => $offsety,
+        'effect' => $effect,
+        'speed' => $speed,
+    ]);
+    $headerlib->add_js_module(
+        'import { initMouseoverPlugin } from "@jquery-tiki/wikiplugin-mouseover";'
+        . "initMouseoverPlugin($jsConfig);"
+    );
 
-    $js = "\$('#$id-link').on('mouseover', function(event) {
-    var pos  = $(this).position();
-    $(this).closest('td').css('position', 'relative');
-    \$('#$id').css('position', 'absolute').css('left', pos.left + $offsetx + 'px').css('top', pos.top + $offsety + 'px');
-    showJQ('#$id', '$effect', '$speed'); $closeDelayStr });
-";
-    if ($sticky) {
-        $js .= "\$('#$id').on('click', function(event) { hideJQ('#$id', '$effect', '$speed'); }).css('cursor','pointer');\n";
-    } else {
-        $js .= "\$('#$id-link').on('mouseout', function(event) { setTimeout(function() {hideJQ('#$id', '$effect', '$speed')}, " . ($closeDelay * 1000) . "); });";
-    }
-    $headerlib->add_jq_onready($js);
-
-    $bgcolor   = isset($params['bgcolor']) ? ("background-color: " . $params['bgcolor'] . ';') : '';
-    $textcolor = isset($params['textcolor']) ? ("color:" . $params['textcolor'] . ';') : '';
-    $class     = ! isset($params['class']) ? 'class="plugin-mouseover"' : 'class="plugin-mouseover ' . $params['class'] . '"';
-    $href      = $url ? 'href="' . $url . '"' : '';
+    $bgcolor = ! is_null($params['bgcolor']) ? ("background-color: " . $params['bgcolor'] . ';') : '';
+    $textcolor = ! is_null($params['textcolor']) ? ("color:" . $params['textcolor'] . ';') : '';
+    $class = is_null($params['class']) ? 'class="plugin-mouseover"' : 'class="plugin-mouseover ' . $params['class'] . '"';
+    $href = $url ? 'href="' . $url . '"' : '';
+    // In non-sticky mode the popup must not capture pointer events, or hover can flicker.
+    $pointerEvents = $sticky ? 'auto' : 'none';
 
     $html = "~np~<$tag id=\"$id-link\" $href class=\"plugin-mouseover-anchor\">$label</$tag>" .
-        "<span id=\"$id\" $class style=\"width: {$width}px; " . (isset($params['height']) ? "height: {$height}px; " : "") . "{$bgcolor} {$textcolor} {$padding} \">$text</span>~/np~";
+        "<span id=\"$id\" $class style=\"display: none; position: absolute; width: {$width}px; " .
+        (! empty($params['height']) ? "height: {$height}px; " : "") .
+        "{$bgcolor} {$textcolor} {$padding} pointer-events: {$pointerEvents};\">$text</span>~/np~";
 
     return $html;
 }

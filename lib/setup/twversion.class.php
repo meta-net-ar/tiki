@@ -37,10 +37,6 @@ class TWVersion
      */
     public $star;
     /**
-     * @var string Is this a Subversion version or a package?
-     */
-    public $svn;
-    /**
      * @var string Is this a Git version or a package?
      */
     public $git;
@@ -50,12 +46,9 @@ class TWVersion
         $this->branch   = 'trunk';
 
         // Set everything else, including defaults.
-        $this->version  = '29.0vcs';
+        $this->version  = '31.0vcs';
         $this->star     = 'TBA';
         $this->releases = [];
-
-        // Check for Subversion or not
-        $this->svn  = is_dir('.svn') ? 'y' : 'n';
 
         // Check for Git or not
         $this->git  = is_dir('.git') ? 'y' : 'n';
@@ -127,6 +120,7 @@ class TWVersion
                 37 => 'Alnilam',         // 26.x
                 38 => 'Miaplacidus',     // 27.x
                 39 => 'Castor',          // 28.x
+                40 => 'Bellatrix',       // 29.x
         ];
     }
 
@@ -363,6 +357,7 @@ class TWVersion
                 '21.9',
                 '21.10',
                 '21.11',
+                '21.12',
                 '22.0alpha',
                 '22.0beta',
                 '22.0RC1',
@@ -386,6 +381,13 @@ class TWVersion
                 '24.5',
                 '24.6',
                 '24.7',
+                '24.8',
+                '24.9',
+                '24.10',
+                '24.11',
+                '24.12',
+                '24.13',
+                '24.14',
                 '25.0alpha',
                 '25.0beta',
                 '25.0RC1',
@@ -405,11 +407,32 @@ class TWVersion
                 '27.0RC1',
                 '27.0',
                 '27.1',
+                '27.2',
+                '27.3',
+                '27.4',
+                '27.5',
+                '27.6',
+                '27.7',
                 '28.0alpha',
                 '28.0beta',
                 '28.0RC1',
                 '28.0',
                 '28.1',
+                '28.2',
+                '28.3',
+                '28.4',
+                '28.5',
+                '29.0alpha',
+                '29.0beta',
+                '29.0RC1',
+                '29.0',
+                '29.1',
+                '29.2',
+                '29.3',
+                '30.0alpha',
+                '30.0beta',
+                '30.0RC1',
+                '30.0',
             ];
     }
 
@@ -442,8 +465,6 @@ class TWVersion
             return;
         }
         global $tikilib;
-        $upgrade = 0;
-        $major = 0;
         $velements = explode('.', $this->getBaseVersion());
         // .version contains an ordered list of release numbers, one per line. All minor releases from a same major release are grouped.
         $body = $tikilib->httprequest('tiki.org/' . $this->branch . '.version');
@@ -454,7 +475,7 @@ class TWVersion
             $relements = explode('.', $line);
             if (isset($relements[0]) && is_numeric($relements[0])) { // Avoid issues with empty lines
                 $line = rtrim($line);
-                $count = array_push($this->releases, $line);
+                $this->releases[] = $line;
                 if ($relements[0] == $velements[0]) {
                     $this->latestMinorRelease = $line;
                 } elseif ($relements[0] > $velements[0]) {
@@ -483,5 +504,32 @@ class TWVersion
     {
         $this->pollVersion();
         return $this->latestMinorRelease == $this->version || version_compare($this->version, $this->latestRelease) == 1;
+    }
+
+    /**
+    * Returns an array of End-of-Life data for Tiki versions.
+    * This data is based on the official Tiki Lifecycle page (https://tiki.org/Lifecycle)
+    * and should be updated with new LTS releases.
+    * @return array
+    */
+    public function getLtsEolDates(): array
+    {
+        return [
+            '24' => '2027-03-31',
+            '27' => '2029-02-28',
+            '30' => '2031-03-31',
+        ];
+    }
+
+    /**
+    * Returns an array of approved extended support providers.
+    * @return array
+    */
+    public function getExtendedSupportProviders(): array
+    {
+        return [
+            ['name' => tra('Official Service Providers'), 'url' => 'https://tiki.org/Extended-Security-Maintenance'],
+            // Future providers can be added here
+        ];
     }
 }

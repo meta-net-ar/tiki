@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -10,11 +10,11 @@
         {accordion_group title="{tr}General{/tr}"}
         <div class="mb-3 mx-0">
             <label for="name" class="col-form-label">{tr}Name{/tr}</label>
-            <input type="text" name="name" value="{$field.name|escape}" required="required" class="form-control">
+            <input type="text" name="name" value="{$field.name|escape}" required="required" class="form-control" maxlength="{$MAX_TRACKER_FIELD_NAME_LENGTH}">
         </div>
         <div class="mb-3 mx-0">
             <label name="description" class="col-form-label">{tr}Description{/tr}</label>
-            <textarea name="description" class="form-control">{$field.description|escape}</textarea>
+            {textarea name="description" class="form-control"}{$field.description|escape}{/textarea}
         </div>
         <div class="form-check">
             <input type="checkbox" class="form-check-input" name="description_parse" id="description_parse" value="1"
@@ -40,12 +40,12 @@
                     </div>
                 {/if}
             {/if}
-            {assign var="groupInputCounter" value=0} {*  use to set different id to group's select multiple input *}
+            {$groupInputCounter=0} {*  use to set different id to group's select multiple input *}
             {foreach from=$info.params key=param item=def}
                 <div class="mb-3 mx-0">
                     <label for="option~{$param|escape}" class="col-form-label">{$def.name|escape}</label>
                     {if $def.separator && $def.options && $def.profile_reference == 'group'}
-                        {assign var="groupInputCounter" value=$groupInputCounter+1}
+                        {$groupInputCounter=$groupInputCounter+1}
                         <select id="user_group_selector_{{$field.fieldId}}_{{$groupInputCounter}}" size="{$def.countgrps}" multiple name="option~{$param|escape}[]" class="form-select" style="width: 100%">
                             {foreach from=$def.options["groupName"] key=val item=label}
                                 {if $label != 'Anonymous' && $label != 'Registered'}
@@ -105,9 +105,14 @@
                     <div class="form-text">{$def.description}</div>
                     {if ! $def.selector_type}
                         {if $def.count eq '*'}
-                            <div class="form-text">{tr}Separate multiple with commas.{/tr}</div>
+                            {if $field.type|in_array:["d", "D", "M", "R"]}
+                                <div class="form-text">{tr}Separate multiple options with commas. Repeat an option in the list to set it as the default.{/tr}</div>
+                            {else}
+                                <div class="form-text">{tr}Separate multiple with commas.{/tr}</div>
+                            {/if}
+
                         {elseif $def.separator}
-                            <div class="form-text">{tr}Separate multiple with &quot;{$def.separator}&quot;{/tr}</div>
+                            <div class="form-text">{tr _0=$def.separator}Separate multiple with &quot;%0&quot;{/tr}</div>
                         {/if}
                     {/if}
                     {if !empty($def.depends.field)}
@@ -130,17 +135,6 @@
                     {/jq}
                     {/if}
                 </div>
-                {jq}
-                    if (jqueryTiki.select2) {
-                        var users{{$field.fieldId}} = {{$data.users|json_encode}};
-                        $("#user_group_selector_{{$field.fieldId}}_{{$groupInputCounter}}").select2(); // Ensure Select2 is initialized
-                        $("#user_group_selector_{{$field.fieldId}}_{{$groupInputCounter}}").on("change", function() {
-                            var $group_selector = $("#user_group_selector_{{$field.fieldId}}_{{$groupInputCounter}}");
-                            var group_selected = $group_selector.val();
-                            $group_selector.val(group_selected).trigger("change.select2");
-                        }).trigger("change");
-                    }
-                {/jq}
             {/foreach}
         {/accordion_group}
 
@@ -273,7 +267,7 @@
             {if $prefs.feature_user_encryption eq 'y'}
                 <div class="mb-3 mx-0">
                     <label for="encryption_key_id" class="col-form-label">{tr}Encryption key{/tr}</label>
-                    {help url="Encryption"}
+                    {help url="User-Encryption"}
                     <select name="encryption_key_id" data-original="{$field.encryptionKeyId}" class="confirm-prompt form-select">
                         <option value=""></option>
                         {foreach from=$encryption_keys item=key}
@@ -299,6 +293,16 @@
                 </select>
                 <div class="form-text">
                     {tr}Data and changes to this field are not included in email notifications.{/tr}
+                </div>
+            </div>
+            <div class="mb-3 mx-0">
+                <label for="type" class="col-form-label">{tr}Exclude from tracker item last modification date{/tr}</label>
+                <select name="exclude_from_lastmodif" class="form-select"  data-original="{$field.excludeFromTrackerItemLastModificationDate}">
+                    <option value="0" {if $field.excludeFromTrackerItemLastModificationDate eq 'n'}selected="selected"{/if}>{tr}No{/tr}</option>
+                    <option value="1" {if $field.excludeFromTrackerItemLastModificationDate eq 'y'}selected="selected"{/if}>{tr}Yes{/tr}</option>
+                </select>
+                <div class="form-text">
+                    {tr}When this field is modified, if set to "Yes", it will NOT update the item's last modification date and user.{/tr}
                 </div>
             </div>
             <div class="mb-3 mx-0">
@@ -332,3 +336,23 @@
     </div>
 </form>
 {/block}
+
+{jq}
+    const validationTypeDropdown = $('select[name="validation_type"]');
+    const isPasswordDropdown = $('select[name="option~is_password"]');
+
+    // Automatically set "Display as password" to "Yes" when the user 
+    // selects "Password" as the validation type.
+    validationTypeDropdown.on('change', function() {
+        if ($(this).val() === 'password') {
+            isPasswordDropdown.val('1');
+        }
+    });
+
+    $(document).on("change", "select[name='option~cascade']", function() {
+        const newVal = $(this).val() === '7' ? '1' : '0';
+        const dupNative = document.querySelector("select[name='option~duplicateCascade']");
+        $(dupNative).val(newVal);
+        $(dupNative).trigger("change");
+    });
+{/jq}

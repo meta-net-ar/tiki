@@ -31,6 +31,14 @@ class Scheduler_Task_ConsoleCommandTask extends Scheduler_Task_CommandTask
             $input = new ArgvInput($args);
             $input->setInteractive(false);
 
+            // switch context for the user as the command does not run through console.php which handles this switch
+            // note that automatic switch back to the original user is happening on context object desctruction
+            if ($asUser = $input->getParameterOption('--as-user')) {
+                if (TikiLib::lib('user')->user_exists($asUser)) {
+                    $permissionContext = new Perms_Context($asUser);
+                }
+            }
+
             $statusCode = $command->run($input, $this->output);
 
             $content = $this->output->fetch();
@@ -46,10 +54,10 @@ class Scheduler_Task_ConsoleCommandTask extends Scheduler_Task_CommandTask
 
     private function parseConsoleParams($params)
     {
+        preg_match_all('/(?<=^|\s)([\'"]?)(.+?)(?<!\\\\)\1(?=$|\s)/', (string)$params, $args);
 
-        preg_match_all('/(?<=^|\s)([\'"]?)(.+?)(?<!\\\\)\1(?=$|\s)/', $params, $args);
-
-        return $args[2];
+        $tokens = array_map(static fn ($arg) => trim((string)$arg), $args[2] ?? []);
+        return array_values(array_filter($tokens, static fn ($arg) => $arg !== ''));
     }
 
     public function getParams()

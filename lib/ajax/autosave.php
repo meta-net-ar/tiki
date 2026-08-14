@@ -5,10 +5,12 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
+
+use Tiki\Sections;
 
 class AutoSaveLib
 {
@@ -94,14 +96,15 @@ class AutoSaveLib
 
         // should be page name, but use URI if not?
         if (empty($referer)) {
-            global $section,  $user, $tikilib;
+            global $user, $tikilib;
+
             $referer .= empty($user) ? $tikilib->get_ip_address() : $user;
             $referer .= ':';
-            if ($section == 'wiki page') {
+            if (Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE)) {
                 if (isset($_REQUEST['page'])) {
                     $referer .= 'wiki_page:' . rawurlencode($_REQUEST['page']);
                 }
-            } elseif ($section == 'blogs') {
+            } elseif (Sections::isCurrentSection(Sections::SECTION_BLOGS)) {
                 if (isset($_REQUEST['postId'])) {
                     $referer .= 'blog:' . $_REQUEST['postId'];
                 }

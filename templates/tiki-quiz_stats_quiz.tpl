@@ -71,7 +71,7 @@
                             {ticket}
                             <input type="hidden" name="quizId" value="{$quizId}">
                             <input type="hidden" name="remove" value="{$channels[user].userResultId}">
-                            <button type="submit" class="btn btn-link px-0 pt-0" onclick="confirmPopup()">
+                            <button type="submit" class="btn btn-link px-0 pt-0" onclick="confirmPopup()" aria-label="{tr}Remove{/tr}">
                                 {icon name='remove'}
                             </button>
                         </form>
@@ -83,7 +83,7 @@
     </table>
 </div>
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
 
 {* begin second table *}
 <h2>{tr}Stats for this quiz Questions {/tr}</h2>

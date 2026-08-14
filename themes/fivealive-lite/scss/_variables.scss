@@ -1,312 +1,117 @@
+// Variables for FiveAlive-lite theme, including overrides of Bootstrap SCSS variables as well as any Tiki SCSS variables
+// Contains overriding declarations of Bootstrap variables and possible related value aliases to implement an override.
+// For example, if `$component-active-bg: $primary;` then ``$dropdown-link-active-bg: $component-active-bg;` also needs to be explicitly restated for the theme value to override the Bootstrap default.
+
+// Enable SCSS color functions and import default variable values
+@use "sass:color";
+@import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated), required before import of variables.scss.
+@import "../../default/scss/variables"; // 2. Import directly to allow removal of redundant Bootstrap default declarations in this file.
+
 // - - - - - - - Bootstrap variables (override values in node_modules/bootstrap/scss/_variables.scss - - - - - - //
 
-// Colors
-$white:    #fff !default;
- $gray-100: #f8f9fa !default;
- $gray-200: #e9ecef !default;
- $gray-300: #dee2e6 !default;
- $gray-400: #ced4da !default;
- $gray-500: #adb5bd !default;
- $gray-600: #868e96 !default;
- $gray-700: #495057 !default;
- $gray-800: #343a40 !default;
- $gray-900: #212529 !default;
- $black:    #000 !default;
-// scss-docs-end gray-color-variables
-
-// fusv-disable
-// scss-docs-start gray-colors-map
-$grays: (
-    "100": $gray-100,
-    "200": $gray-200,
-    "300": $gray-300,
-    "400": $gray-400,
-    "500": $gray-500,
-    "600": $gray-600,
-    "700": $gray-700,
-    "800": $gray-800,
-    "900": $gray-900
-) !default;
-// scss-docs-end gray-colors-map
-
-// scss-docs-start color-variables
-$blue:    #0d6efd !default;
-$indigo:  #6610f2 !default;
-$purple:  #6f42c1 !default;
-$pink:    #d63384 !default;
-$red:     #dc3545 !default;
-$orange:  #fd7e14 !default;
-$yellow:  #ffc107 !default;
-$green:   #198754 !default; // Bootstrap 5.3
-$teal:    #20c997 !default;
-$cyan:    #0dcaf0 !default;
-// scss-docs-end color-variables
-
-// scss-docs-start colors-map
-$colors: (
-    "blue":       $blue,
-    "indigo":     $indigo,
-    "purple":     $purple,
-    "pink":       $pink,
-    "red":        $red,
-    "orange":     $orange,
-    "yellow":     $yellow,
-    "green":      $green,
-    "teal":       $teal,
-    "cyan":       $cyan,
-    "black":      $black,
-    "white":      $white,
-    "gray":       $gray-600,
-    "gray-dark":  $gray-800
-) !default;
-// scss-docs-end colors-map
-
-// The contrast ratio to reach against white, to determine if color changes from "light" to "dark". Acceptable values for WCAG 2.0 are 3, 4.5 and 7.
-// See https://www.w3.org/TR/WCAG20/#visual-audio-contrast-contrast
-$min-contrast-ratio:   4.5 !default;
-
-$blue-100: tint-color($blue, 80%) !default;
-$blue-200: tint-color($blue, 60%) !default;
-$blue-300: tint-color($blue, 40%) !default;
-$blue-400: tint-color($blue, 20%) !default;
-$blue-500: $blue !default;
-$blue-600: shade-color($blue, 20%) !default;
-$blue-700: shade-color($blue, 40%) !default;
-$blue-800: shade-color($blue, 60%) !default;
-$blue-900: shade-color($blue, 80%) !default;
-
-$red-100: tint-color($red, 80%) !default;
-$red-200: tint-color($red, 60%) !default;
-$red-300: tint-color($red, 40%) !default;
-$red-400: tint-color($red, 20%) !default;
-$red-500: $red !default;
-$red-600: shade-color($red, 20%) !default;
-$red-700: shade-color($red, 40%) !default;
-$red-800: shade-color($red, 60%) !default;
-$red-900: shade-color($red, 80%) !default;
-
-$green-100: tint-color($green, 80%) !default;
-$green-200: tint-color($green, 60%) !default;
-$green-300: tint-color($green, 40%) !default;
-$green-400: tint-color($green, 20%) !default;
-$green-500: $green !default;
-$green-600: shade-color($green, 20%) !default;
-$green-700: shade-color($green, 40%) !default;
-$green-800: shade-color($green, 60%) !default;
-$green-900: shade-color($green, 80%) !default;
-
-$blues: (
-    "blue-100": $blue-100,
-    "blue-200": $blue-200,
-    "blue-300": $blue-300,
-    "blue-400": $blue-400,
-    "blue-500": $blue-500,
-    "blue-600": $blue-600,
-    "blue-700": $blue-700,
-    "blue-800": $blue-800,
-    "blue-900": $blue-900
-) !default;
-
-$reds: (
-    "red-100": $red-100,
-    "red-200": $red-200,
-    "red-300": $red-300,
-    "red-400": $red-400,
-    "red-500": $red-500,
-    "red-600": $red-600,
-    "red-700": $red-700,
-    "red-800": $red-800,
-    "red-900": $red-900
-) !default;
-
-$primary: #1174a5 !default;
-$success: #56ca75!default;
-$secondary: #8452af !default;
-$info: #4d3a7d !default;
-$warning: #debb27 !default;
-$danger: #df6e1e !default;
-$light: #fff !default;
-$dark: #000 !default;
+// Color system
+$primary: #0c628c;
+$success: #2A8442;
+$secondary: #0a4969;
+$info: #4d3a7d;
+$warning: #897415;
+$danger: #B85B19;
+$light: #fff;
+$dark: #000;
 
 $theme-colors: (
-            "primary":    $primary,
-            "secondary":  $secondary,
-            "success":    $success,
-            "info":       $info,
-            "warning":    $warning,
-            "danger":     $danger,
-            "light":      $light,
-            "dark":       $dark
-) !default;
-
+    "primary":    $primary,
+    "secondary":  $secondary,
+    "success":    $success,
+    "info":       $info,
+    "warning":    $warning,
+    "danger":     $danger,
+    "light":      $light,
+    "dark":       $dark
+);
 
 // Options
-
-// Prefix
-$prefix: bs-;
-
-// Spacing
-
 // Body
-$body-color: $gray-800 !default;
-$body-bg: #fff !default;
+$body-color: $gray-800; // !default
+$body-bg: #fff; // !default
+
+$body-secondary-color:      rgba($body-color, .75); // !default;
+$body-secondary-bg:         $gray-200; // !default;
+
+$body-tertiary-color:       rgba($body-color, .5); // !default;
+$body-tertiary-bg:          $gray-100; // !default;
 
 // Links
-$link-hover-decoration: none !default;
-$link-shade-percentage:                   20% !default; // Bootstrap 5.
+$link-color: #177EAB;
 
 // Components
-$component-active-color:      $white !default; // Bootstrap 5.3
-$component-active-bg:         $primary !default;
 $border-color: $gray-400;
+//$component-active-color:       #ddb9af; // $white;  // default
+$component-active-bg:         #0c628c; // ($primary);  // default
 
 // Typography
 $font-family-sans-serif:  Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif; // Switched to system fonts from Lato, sans-serif !default;
 $font-size-base: 1rem;
 $font-weight-normal: 500;
-$headings-font-family: $font-family-sans-serif !default;
 $headings-font-weight: 500;
-$headings-color:              inherit !default;
-
-$text-muted:                  var(--#{$prefix}secondary-color) !default; // Deprecated in 5.3.0 -- #6F7780;
-$blockquote-footer-color: $text-muted !default;
 
 // Tables
-//$table-border-color: #dddddd;
-
 // Buttons
-//$btn-default-color: #ffffff;
-//$btn-default-bg: #3676c4;
-//$btn-default-border: #3676c4;
-
-//$btn-primary-color: #ffffff;
-//$btn-primary-bg: #3676c4;
-
 // Forms
-//$input-border-color: var(--#{$prefix}border-color) !default; // #dddddd;
-// Dropdowns
-//$dropdown-bg: #1376a8 !default;
-//$dropdown-link-color: $gray-200 !default;
-//$dropdown-link-hover-color: #ffffff !default;
-//$dropdown-link-hover-bg: darken(#1376a8, 10%) !default;
-//$dropdown-link-active-bg: #0e567a !default;
-//$dropdown-header-color: #fff !default;
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
 // Navs
-$nav-tabs-border-color:             $gray-300 !default;
-
-// Navbar
-$navbar-height: 30px !default;
-
-//$navbar-dark-color: #ffffff;
-//$navbar-dark-bg: #1f5daa;
-$navbar-primary-bg: #28aae1 !default;
-$bg-dark: #28aae1 !default;
-
-//$navbar-dark-border: darken($navbar-dark-bg, 6.5%);
+$nav-tabs-border-color:             $gray-300; // !default
 
 // Navbar
 $navbar-dark-color:                 rgba($white, .85); // !default;
-$navbar-dark-hover-color:           rgba($white, .75) !default;
-$navbar-dark-active-color:          $white !default;
-$navbar-dark-disabled-color:        rgba($white, .25) !default;
-
-//$navbar-dark-color: #ffffff !default;
-//$navbar-dark-hover-color: #f9f9f9 !default;
-//$navbar-dark-hover-bg: darken($primary, 6.5%) !default;
-//$navbar-dark-active-color: #ffffff !default;
-//$navbar-dark-active-bg: darken($primary, 6.5%) !default;
-//$navbar-dark-disabled-color: #cccccc !default;
+$navbar-dark-hover-color:           rgba($white, .75); // !default
+$navbar-dark-active-color:          $white; // !default
+$navbar-dark-disabled-color:        rgba($white, .25); // !default
 
 // Dropdowns
-$dropdown-color:                    var(--#{$prefix}body-color) !default;
-$dropdown-bg:                       var(--#{$prefix}body-bg) !default;
-$dropdown-border-color:             var(--#{$prefix}border-color-translucent) !default;
-$dropdown-divider-bg:               $dropdown-border-color !default;
-$dropdown-link-color:               var(--#{$prefix}body-color) !default;
-$dropdown-link-hover-color:         $dropdown-link-color !default;
-$dropdown-link-hover-bg:            var(--#{$prefix}tertiary-bg) !default;
-
-$dropdown-link-active-color:        $component-active-color !default;
-$dropdown-link-active-bg:           $component-active-bg !default;
-
-$dropdown-link-disabled-color:      var(--#{$prefix}tertiary-color) !default;
+$dropdown-link-hover-bg: var(--#{$prefix}tertiary-bg); // !default;
+$dropdown-link-active-bg:           $component-active-bg; // !default;
 
 // Pagination
-// Jumbotron
 // Cards
-$card-header-bg: transparent !default;
-//$card-border-radius: $border-radius-lg;
-$card-text: $body-color !default;
-$card-header-bg: transparent !default;
-//$card-bg: transparent;
-//$card-border-color: transparent;
-//$card-inner-border: transparent;
-$card-spacer-y: 0.5rem !default;
-$card-spacer-x: 1rem !default;
-
 // Tooltips
 // Popovers
-$popover-bg:                        var(--#{$prefix}body-bg) !default;
-$popover-border-color:              var(--#{$prefix}border-color-translucent) !default;
-$popover-header-bg:                 var(--#{$prefix}secondary-bg) !default;
-$popover-header-color:              var(--#{$prefix}body-color); // $headings-color !default;
-$popover-body-color:                var(--#{$prefix}body-color) !default;
-
 // Badges
 // Modals
-//$modal-header-border-color: #386dbb;
-// $modal-content-bg
 // Alerts
 // Progress bars
 // List group
 // Image thumbnails
 // Figures
-$figure-caption-color: $body-color !default;
-
 // Breadcrumbs
-// Carousel
 // Close
 // Code
-$code-color:                      $body-color; //   $pink !default; // Bootstrap 5.3
+$code-color:                      $body-color; // $pink !default; // Bootstrap 5.3
 
-// - - - - - - - - - -  - - - - - - Other variables, if any - - - - - - - - - - - - - - - - - //
+// - - - - - - - - - -  - - - - - - Tiki SCSS variables - - - - - - - - - - - - - - - - - //
 
-// - - - - - - - - - - Tiki selector variables ( for _tiki-selectors.scss ) - - - - - - - - - //
+$imagePath: "../images/"; // This is usually in _tiki-selectors.scss
+$tiki-side-column-border: none; // This is still used. Todo: others below need to be checked.
+$tiki-side-column-card-header-bg: var(--bs-body-bg); // #ffffff !default;
+$tiki-side-column-card-header-color: #1174a5 !default;
+$tiki-side-column-card-header-border-color: #1174a5 !default;
+$tiki-side-column-card-header-border-width: 0 0 1px 0 !default;
+$tiki-header_outer-bg: color.adjust(#28aae1, $lightness: -10%, $space: hsl) !default;
+$tiki-header_container_header-bg: url('#{$imagePath}siteheader.png') -248px 0 no-repeat;
+$tiki-header-color: #ffffff !default;
+$tiki-topbar_container-bg: #28aae1 !default;
+$tiki-topbar-bg: #28a7de !default;
+$tiki-footer-color: #696969 !default;
+$tiki-footer_liner-border-color: #28aae1 !default;
+// $tiki-footer-link-color: #a9a9a9 !default;
+$tiki-navbar-dark-navbar-nav-li-a-bg: #28aae1 !default;
+$tiki-postbody-title-bg: $tiki-header_outer-bg !default;
+$tiki-postbody-title-color: #000000 !default;
+$tiki-side-column-border: none !default;
+$tiki-topbar_container-bg: $tiki-navbar-dark-navbar-nav-li-a-bg !default;
 
-// tiki-selector-variables.scss file, to provide values for "legacy" Tiki CSS selectors (not covered by Bootstrap).
-// These FiveAlive-lite theme option values are used by themes/fivealive-lite/scss/_tiki-selectors.scss
-
-$imagePath: "../images/";
-$side-column-border: none;
-$side-column-card-header-bg: var(--bs-body-bg); // #ffffff !default;
-// #f5399c
-$side-column-card-header-color: #1174a5 !default;
-// #3f1020;
-$side-column-card-header-border-color: #1174a5 !default;
-$side-column-card-header-border-width: 0 0 1px 0 !default;
-$header_outer-bg: darken(#28aae1, 10%) !default;
-// url('#{$imagePath}siteheadertile.png') 0 0 no-repeat;
-$header_container_header-bg: url('#{$imagePath}siteheader.png') -248px 0 no-repeat;
-$header-color: #ffffff !default;
-$topbar_container-bg: #28aae1 !default;
-$topbar-bg: #28a7de !default;
-//$form-control-bg: #ffffff !default; Doesn't work with color modes
-//$form-control-border-colors: #9ae8fa #e3f7fb #e3f7fb #9ae8fa !default;
-$footer-color: #696969 !default;
-$footer-border-color: #28aae1 !default;
-$footer-link-color: #a9a9a9 !default;
-$navbar-dark-navbar-nav-li-a-bg: #28aae1 !default;
-$postbody-title-bg: $header_outer-bg !default;
-$postbody-title-color: #000000 !default;
-// url('#{$imagePath}siteheader.png') no-repeat -480px -200px;
-$brand-primary-of-option: $primary !default;
-$navbar-default-link-bg: $navbar-dark-navbar-nav-li-a-bg !default;
-$side-column-border: none !default;
-$topbar_container-bg: $navbar-dark-navbar-nav-li-a-bg !default;
-$tiki-navbar-fixed-height: 46px !default;
-// .secondary_site_menu .navbar-nav li.dropdown { border-bottom: none;}
-$middle_outer-inset-shadow-bg: $topbar-bg !default;
-
-// Update for Smartmenus
-$dropdown-item: $dropdown-link-color !default;
+// Update for Smartmenus (still needed?)
+$dropdown-item: $dropdown-link-color; // !default

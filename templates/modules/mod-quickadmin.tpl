@@ -2,7 +2,7 @@
     {if $tiki_p_admin == "y"}
         <div id="quickadmin" class="nav justify-content-end flex-nowrap">
             {if $only_shortcuts neq 'y'}
-                <div class="nav-item prefs-history-dropdown">
+                <div class="nav-item dropdown prefs-history-dropdown">
                     {if ! $js}<ul><li>{/if}
                     <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" data-display="dynamic" data-flip="true" href="#" role="button">
                         {icon name="history"}
@@ -36,7 +36,7 @@
                             <form method="post" action="tiki-admin.php" class="d-flex flex-row flex-wrap align-items-center my-2 my-md-0 ms-auto">
                                 <div class="input-group">
                                     <input type="text" name="lm_criteria" value="{if ! empty($smarty.request.lm_criteria)}{$smarty.request.lm_criteria|escape}{/if}" class="form-control form-control-sm" placeholder="Search preferences...">
-                                    <button type="submit" class="btn btn-primary btn-sm">
+                                    <button type="submit" class="btn btn-primary btn-sm" aria-label="{tr}Search{/tr}">
                                         <span class="icon icon-search fas fa-search fa-fw "></span>
                                     </button>
                                 </div>
@@ -59,7 +59,7 @@
                             {icon name="group"} {tr}Groups{/tr}
                         </a>
                         <div class="dropdown-item">
-                            {permission_link mode=text}
+                        {permission_link mode=button_link addclass="d-block text-start"}
                         </div>
                         <a class="dropdown-item" href="tiki-admin_menus.php">
                             {icon name="menu"} {tr}Menus{/tr}
@@ -98,6 +98,11 @@
                         {if $prefs.feature_scheduler eq "y"}
                             <a class="dropdown-item" href="tiki-admin_schedulers.php">
                                 {icon name="calendar"} {tr}Scheduler{/tr}
+                            </a>
+                        {/if}
+                        {if $prefs.feature_queued_tasks eq "y"}
+                            <a class="dropdown-item" href="tiki-admin_queued_tasks.php">
+                                {icon name="clock-o"} {tr}Queued Tasks{/tr}
                             </a>
                         {/if}
                         {if $prefs.feature_sefurl_routes eq "y"}

@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -37,7 +37,7 @@
                             {/if}
                         </td>
                         <td>
-                            <select name="notification~{$option.hash|escape}" class="noselect2 form-select">
+                            <select name="notification~{$option.hash|escape}" class="form-select">
                                 {foreach $priorities as $priority => $info}
                                     <option value="{$priority|escape}" {if $priority eq $option.priority}selected{/if}>{$info.label|escape}</option>
                                 {/foreach}

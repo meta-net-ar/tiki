@@ -4,6 +4,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Sheet\Sheet;
+use Tiki\Lib\Sheet\CSVHandler;
+use Tiki\Lib\Sheet\DatabaseHandler;
+
 function wikiplugin_sheet_info()
 {
     return [
@@ -61,7 +66,6 @@ function wikiplugin_sheet_info()
                     %0100%%1', '<code>', '</code>'),
                 'filter' => 'text',
                 'accepted' => 'Number of pixels followed by \'px\' or percent followed by %).',
-                'default' => 'Page width',
                 'since' => '6.0',
                 'safe' => true
             ],
@@ -71,7 +75,6 @@ function wikiplugin_sheet_info()
                 'description' => tra('Height in pixels or percentage. Default value is complete spreadsheet height.'),
                 'filter' => 'text',
                 'accepted' => 'Number of pixels followed by \'px\' or percent followed by %).',
-                'default' => 'Spreadsheet height',
                 'since' => '5.0',
                 'safe' => true
             ],
@@ -132,20 +135,19 @@ function wikiplugin_sheet_info()
 
 function wikiplugin_sheet($data, $params)
 {
-    global $tiki_p_edit_sheet, $tiki_p_edit, $tiki_p_admin_sheet, $tiki_p_admin, $prefs, $user, $page;
+    global $tiki_p_edit_sheet, $tiki_p_edit, $tiki_p_admin, $user, $page;
     extract($params, EXTR_SKIP);
-    $style = (isset($height)) ? "height: $height !important;" : '';
-    $style .= (isset($width)) ? "width: $width;" : '';
+    $style = (! is_null($height)) ? "height: $height !important;" : '';
+    $style .= (! is_null($width)) ? "width: $width;" : '';
 //  $urlHeight = (isset($height)) ? "&height=$height" : '';
 //  $urlHeight .= (isset($width)) ? "&width=$width" : '';
-    $urlHeight = (isset($height)) ? "&height=100" : ''; // not setting any height or width in the sheet params created for me the literal '...&height=100%&...' or '...&width=100%&...' in the url with a 400 error (bad request). Hardcoding to 100 (instead of 100%) to avoid this error until a better fix is found
-    $urlHeight .= (isset($width)) ? "&width=100" : ''; // not setting any height or width in the sheet params created for me the literal '...&height=100%&...' or '...&width=100%&...' in the url with a 400 error (bad request). Hardcoding to 100 (instead of 100%) to avoid this error until a better fix is found
-    $editable = isset($editable) && $editable == 'n' ? false : true;
-    $subsheets = isset($subsheets) && $subsheets == 'n' ? false : true;
-    $class = (isset($class)) ? " $class" : '';
+    $urlHeight = (! is_null($height)) ? "&height=100" : ''; // not setting any height or width in the sheet params created for me the literal '...&height=100%&...' or '...&width=100%&...' in the url with a 400 error (bad request). Hardcoding to 100 (instead of 100%) to avoid this error until a better fix is found
+    $urlHeight .= (! is_null($width)) ? "&width=100" : ''; // not setting any height or width in the sheet params created for me the literal '...&height=100%&...' or '...&width=100%&...' in the url with a 400 error (bad request). Hardcoding to 100 (instead of 100%) to avoid this error until a better fix is found
+    $editable = ! ($editable == 'n');
+    $subsheets = ! ($subsheets == 'n');
+    $class = ($class != '') ? " $class" : '';
 
     $sheetlib = TikiLib::lib("sheet");
-    $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
 
     static $index = 0;
@@ -167,7 +169,7 @@ function wikiplugin_sheet($data, $params)
                 <form id="$formId" method="post" action="tiki-wikiplugin_edit.php">
                 <div>
                     <input type="hidden" name="page" value="$page"/>
-                    <input type="hidden" name="content" value="$data"/>
+                    <input type="hidden" name="content" value="$content"/>
                     <input type="hidden" name="index" value="$index"/>
                     <input type="hidden" name="type" value="sheet"/>
                     <input type="hidden" name="params[id]" value="$sheetId"/>
@@ -195,7 +197,7 @@ EOF;
         }
     }
 
-    $sheet = new TikiSheet();
+    $sheet = new Sheet();
 
     if (empty($url)) {
         $info;
@@ -213,13 +215,12 @@ EOF;
         }
 
         // Build required objects
-        $db = new TikiSheetDatabaseHandler($id);
-        //$out = new TikiSheetOutputHandler($data);
+        $db = new DatabaseHandler($id);
 
         // Fetch sheet from database
         $sheet->import($db);
     } else {
-        if (! isset($simple)) {
+        if (empty($simple)) {
             $simple = 'y';
         }
     }
@@ -231,27 +232,31 @@ EOF;
     }
 
     // Grab sheet output
-    if (isset($url)) {
-        $file = file_get_contents($url);
+    if (! empty($url)) {
         $pathInfo = pathinfo($url);
         if ($pathInfo['extension'] == 'csv') {
-            $handler = new TikiSheetCSVHandler($url);
-            $grid = new TikiSheet();
+            $handler = new CSVHandler($url);
+            $grid = new Sheet();
             $grid->import($handler);
             $ret = $grid->getTableHtml(true, null, false);
         } else {
             $sheet->parseValues = true;
+            // Validate URL to prevent SSRF
+            $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+            if (! $ssrf->isUrlAllowed($url)) {
+                return tra('Sheet URL is not allowed');
+            }
             $ret = file_get_contents($url);
         }
     } else {
         $ret = ($sheet->getTableHtml($subsheets));
     }
 
-    if (strpos($ret, '<table ') === false) {
+    if (! str_contains($ret, '<table ')) {
         return '~np~' . $ret . '~/np~'; // return a single cell raw
     }
 
-    if (! isset($simple) || $simple != 'y') {
+    if (empty($simple) || $simple != 'y') {
         $headerlib = TikiLib::lib('header');
         $sheetlib->setup_jquery_sheet();
         $headerlib->add_jq_onready(
@@ -269,7 +274,7 @@ EOF;
 
     if ($editable && ($objectperms->edit_sheet  || $objectperms->admin_sheet || $tiki_p_admin == 'y')) {
         //If you've given the sheet a url, you can't edit it, disable if not possible
-        if (! isset($url)) {
+        if (empty($url)) {
             $button_params = ['_text' => tra("Edit Sheet"), '_script' => "tiki-view_sheets.php?sheetId=$id&parse=edit$urlHeight&page=$page", '_class' => "tiki_sheeteditbtn"];
         }
 

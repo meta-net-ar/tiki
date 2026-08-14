@@ -20,7 +20,6 @@ function wikiplugin_addreference_info()
                 'required' => true,
                 'name' => tra('Biblio Code'),
                 'description' => tra('The code to be added as reference.'),
-                'default' => '',
                 'since' => '10.0',
                 'filter' => 'word',
                 'multiple' => true,
@@ -34,6 +33,8 @@ function wikiplugin_addreference($data, $params)
 {
     global $prefs;
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_addreference_info());
+
     if ($prefs['wikiplugin_addreference'] == 'y') {
         /** @var ReferencesLib $referenceslib */
         $referenceslib = TikiLib::lib('references');
@@ -44,7 +45,7 @@ function wikiplugin_addreference($data, $params)
 
         $data = trim($data);
 
-        if (strstr($_SERVER['SCRIPT_NAME'], 'tiki-print.php')) {
+        if (str_contains($_SERVER['SCRIPT_NAME'], 'tiki-print.php')) {
             $page = urldecode($_REQUEST['page']);
             $page_id = TikiLib::lib('tiki')->get_page_id_from_name($page);
             $page_info = TikiLib::lib('tiki')->get_page_info($page);
@@ -58,9 +59,7 @@ function wikiplugin_addreference($data, $params)
         if (empty($params['biblio_code']) || (is_array($params['biblio_code']) && count($params['biblio_code']) == 0)) {
             return;
         }
-        if (! is_array($params['biblio_code'])) {
-            $params['biblio_code'] = [$params['biblio_code']];
-        }
+
         $cleanBiblioCode = [];
         foreach ($params['biblio_code'] as $code) {
             $code = Reference::trimBibliographicCode($code);
@@ -70,15 +69,12 @@ function wikiplugin_addreference($data, $params)
         }
         $params['biblio_code'] = $cleanBiblioCode;
 
-        extract($params, EXTR_SKIP);
-
         $matchedReferences = Reference::extractBibliographicCodesFromText($page_info['data']);
 
-        $temp = [];
         $curr_matches = [];
         $temp = array_unique($matchedReferences);
         $i = 0;
-        foreach ($temp as $k => $v) {
+        foreach ($temp as $v) {
             if (strlen(trim($v)) > 0) {
                 $curr_matches[$i] = $v;
                 $i++;

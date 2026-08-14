@@ -39,47 +39,44 @@ class ListFilter extends Base
         global $prefs, $listfilter_id;
         $headerlib = \TikiLib::lib('header');
 
-        if ($prefs['feature_jquery'] != 'y') {
-            return '';
-        } else {
             extract($params);
-            $childPrefix = isset($childPrefix) ? $childPrefix : 'child-of-';
-            $exclude = isset($exclude) ? $exclude : '';
+            $childPrefix = $childPrefix ?? 'child-of-';
+            $exclude = $exclude ?? '';
 
             $input = ' <div class="form-horizontal my-2"><div class="tiki-form-group form-row"><div class="col"><div class="input-group"><div class="input-group-text" id="filter_label">';
 
-            if (! isset($prefix)) {
-                $input .= smarty_function_icon(['name' => 'search'], $template);
-            } else {
-                $input .= tra($prefix);
-            }
+        if (! isset($prefix)) {
+            $input .= smarty_function_icon(['name' => 'search'], $template);
+        } else {
+            $input .= tra($prefix);
+        }
             $input .= '</div><input type="text" class="form-control listfilter"';
-            if (! isset($id)) {
-                if (isset($listfilter_id)) {
-                    $listfilter_id++;
-                } else {
-                    $listfilter_id = 1;
-                }
+        if (! isset($id)) {
+            if (isset($listfilter_id)) {
+                $listfilter_id++;
+            } else {
+                $listfilter_id = 1;
+            }
                 $id = "listfilter_$listfilter_id";
                 $input .= " id='$id'";
-            } else {
+        } else {
                 $input .= " id='$id'";
-            }
-            $input .= 'aria-labelledby="filter_label"';
-            if (isset($size)) {
-                $input .= " size='$size'";
-            }
-            if (isset($maxlength)) {
+        }
+        $input .= 'aria-labelledby="filter_label"';
+        if (isset($size)) {
+            $input .= " size='$size'";
+        }
+        if (isset($maxlength)) {
                 $input .= " maxlength='$maxlength'";
-            }
+        }
 
             // value from url
-            if (! isset($query)) {
-                $query = 'textFilter';
-            }
-            if (! empty($query) && ! empty($_REQUEST[$query])) {
-                $input .= ' value="' . $_REQUEST[$query] . '"';
-            } elseif (! empty($editorId)) {
+        if (! isset($query)) {
+            $query = 'textFilter';
+        }
+        if (! empty($query) && ! empty($_REQUEST[$query])) {
+            $input .= ' value="' . $_REQUEST[$query] . '"';
+        } elseif (! empty($editorId)) {
                 $parentTabId = (empty($parentTabId) ? "" : $parentTabId);
 
                 $headerlib->add_jq_onready(
@@ -106,16 +103,16 @@ class ListFilter extends Base
                 });
             "
                 );
-            }
+        }
 
             $input .= ">";
             $input .= "<span class='input-group-text' role='button' area-label='Clear filter' onclick=\"\$('#$id').val('').trigger('focus').trigger('keyup');return false;\" title=':"
             . tr('Clear filter') . "' >" . smarty_function_icon(['name' => 'close'], $template) . "</span>";
             $input .= '</div></div></div></div>';
 
-            if (! isset($selectors)) {
-                $selectors = ".$id table tr";
-            }
+        if (! isset($selectors)) {
+            $selectors = ".$id table tr";
+        }
 
             $content = "
 $('#$id').on('keyup', function() {
@@ -132,7 +129,7 @@ $('#$id').on('keyup', function() {
         $(this).show();
     } );
 ";
-            if (! empty($parentSelector)) {
+        if (! empty($parentSelector)) {
                 $content .= "
     \$('$parentSelector').show().each( function() {
         if (\$('{$selectors}[data-tt-parent-id=' + \$(this).data('tt-id') + ']:visible:not(\"$exclude\")').length == 0) {    // excluded things don't count
@@ -140,14 +137,15 @@ $('#$id').on('keyup', function() {
             \$('{$exclude}[data-tt-parent-id=' + \$(this).data('tt-id') + ']').hide();                            // but need hiding if the parent is 'empty'
         } else {
             \$(this).removeClass('collapsed').addClass('expanded');
+            \$('{$exclude}[data-tt-parent-id=' + \$(this).data('tt-id') + ']').show();
         }
     });
 ";
-            }
+        }
             $content .= '
 } );    // end keyup
 ';
-            if (! empty($query) && ! empty($_REQUEST[$query])) {
+        if (! empty($query) && ! empty($_REQUEST[$query])) {
                 $content .= "
 setTimeout(function () {
     if ($('#$id').val() != '') {
@@ -155,10 +153,9 @@ setTimeout(function () {
     }
 }, 1000);
 ";
-            }
+        }
 
             $headerlib->add_jq_onready($content);
             return $input;
-        }
     }
 }

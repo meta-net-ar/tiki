@@ -4,7 +4,7 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -57,7 +57,7 @@ function module_tracker_input_info()
                 'filter' => 'text',
             ],
             'insertmode' => [
-                'name' => tr('Mode change on complete'),
+                'name' => tra('Mode change on complete'),
                 'description' => tr('Target mode to enter after dialog closes'),
                 'filter' => 'text',
                 'default' => '',
@@ -94,12 +94,12 @@ function module_tracker_input($mod_reference, $module_params)
         }
     }
 
-    $textinput = isset($module_params['textinput']) ? $module_params['textinput'] : '';
-    $hiddeninput = isset($module_params['hiddeninput']) ? $module_params['hiddeninput'] : '';
-    $streetview = isset($module_params['streetview']) ? $module_params['streetview'] : '';
+    $textinput = $module_params['textinput'] ?? '';
+    $hiddeninput = $module_params['hiddeninput'] ?? '';
+    $streetview = $module_params['streetview'] ?? '';
     $streetViewField = null ;
-    $success = isset($module_params['success']) ? $module_params['success'] : '';
-    $insertmode = isset($module_params['insertmode']) ? $module_params['insertmode'] : '';
+    $success = $module_params['success'] ?? '';
+    $insertmode = $module_params['insertmode'] ?? '';
 
     if ($streetview && $definition) {
         $streetViewField = $definition->getFieldFromPermName($streetview);
@@ -155,7 +155,7 @@ function module_tracker_input($mod_reference, $module_params)
             'locationMode' => $locationMode,
             'streetview' => $streetview,
             'galleryId' => $galleryId,
-            'submit' => isset($module_params['submit']) ? $module_params['submit'] : tr('Create'),
+            'submit' => $module_params['submit'] ?? tr('Create'),
             'success' => [
                 'operation' => $operation,
                 'argument' => $operationArgument,

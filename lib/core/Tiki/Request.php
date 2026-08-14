@@ -26,7 +26,7 @@ class Tiki_Request
         } elseif (isset($_SERVER['argc'], $_SERVER['argv']) && $_SERVER['argc'] >= 2) {
             // cli
             foreach ($_SERVER['argv'] as $arg) {
-                if (strpos($arg, '=')) {
+                if (str_contains($arg, '=')) {
                     list($key, $value) = explode('=', $arg);
                     $this->setProperty($key, $value);
                 }

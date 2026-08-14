@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -57,18 +57,6 @@ function module_calendar_new_info()
                 'filter' => 'word',
                 'default' => 'y',
             ],
-            'viewmodelink' => [
-                'name' => tra('Viewmode when clicking on a day'),
-                'description' => 'week|day',
-                'filter' => 'word',
-                'default' => 'week',
-            ],
-            'linkall' => [
-                'name' => tra('Put a link on all the days , not only those with event'),
-                'description' => 'y|n',
-                'filter' => 'word',
-                'default' => 'n',
-            ],
             'viewnavbar' => [
                 'name' => tra('View navigation bar'),
                 'description' => 'y|n|partial',
@@ -85,20 +73,19 @@ function module_calendar_new_info()
  */
 function module_calendar_new($mod_reference, $module_params)
 {
-    global $prefs, $user, $tiki_p_admin_calendars;
+    global $prefs, $user, $tiki_p_admin_calendars, $base_uri;
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $calendarlib = TikiLib::lib('calendar');
     $userlib = TikiLib::lib('user');
     global $calendarViewMode, $focusdate;
-    $default = ['viewnavbar' => 'y', 'viewmodelink' => 'week', 'showaction' => 'y', 'linkall' => 'n'];
+    $default = ['viewnavbar' => 'y', 'viewmode' => 'month', 'showaction' => 'y'];
     $module_params = array_merge($default, $module_params);
-    TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
-
-    if (isset($_REQUEST['viewmode'])) {
-        $save_viewmode = $_REQUEST['viewmode'];
-    }
-    if (! empty($module_params['viewmode'])) {
+    $defaultCalendarId = 0;
+    $current_url = $base_uri;
+    if (! empty($_REQUEST['viewmode'])) {
+        $calendarViewMode['casedefault'] = $_REQUEST['viewmode'];
+    } elseif (! empty($module_params['viewmode'])) {
         $calendarViewMode['casedefault'] = $module_params['viewmode'];
     }
 
@@ -116,28 +103,91 @@ function module_calendar_new($mod_reference, $module_params)
         $_REQUEST['todate'] = $tikilib->make_time(0, 0, 0, $focus_month + $module_params['month_delta'], 1, $focus_year);
     }
 
+    switch ($calendarViewMode['casedefault']) {
+        case 'week':
+            $initialView = 'timeGridWeek';
+            break;
+        case 'day':
+            $initialView = 'timeGridDay';
+            break;
+        case 'month':
+            $initialView = 'dayGridMonth';
+            break;
+        default:
+            $initialView = 'dayGridMonth';
+    }
+
     if (! empty($module_params['calIds'])) {
         $calIds = $module_params['calIds'];
         if (! is_array($module_params['calIds'])) {
             $calIds = preg_split('/[\|:\&,]/', $calIds);
         }
-    } elseif (! empty($_SESSION['CalendarViewGroups'])) {
-        $calIds = $_SESSION['CalendarViewGroups'];
+    } elseif (! empty($_SESSION['ModuleCalendarViewGroups'])) {
+        $calIds = $_SESSION['ModuleCalendarViewGroups'];
     } elseif ($prefs['feature_default_calendars'] == 'n') {
         $calendars = $calendarlib->list_calendars();
         $calIds = array_keys($calendars['data']);
     } elseif (! empty($prefs['default_calendars'])) {
-        $calIds = $_SESSION['CalendarViewGroups'] = is_array($prefs['default_calendars']) ? $prefs['default_calendars'] : unserialize($prefs['default_calendars']);
+        $calIds = $_SESSION['ModuleCalendarViewGroups'] = is_array($prefs['default_calendars']) ? $prefs['default_calendars'] : unserialize($prefs['default_calendars']);
     } else {
         $calIds = [];
     }
-
+    $defaultCalendarId = $calIds[0] ?? 0;
+    $moduleCalendarIds = implode(',', $calIds);
 
     $_REQUEST['gbi'] = 'y';
     if (! empty($module_params['viewlist'])) {
         $_REQUEST['viewlistmodule'] = $module_params['viewlist'];
     } else {
         $_REQUEST['viewlistmodule'] = 'table';
+    }
+
+    $rawcals = $calendarlib->list_calendars();
+    if (empty($rawcals['data'])) {
+        Feedback::error(tra("No calendars found"));
+        return;
+    }
+
+    $rawcals['data'] = Perms::filter(
+        ['type' => 'calendar'],
+        'object',
+        $rawcals['data'],
+        [ 'object' => 'calendarId' ],
+        'view_calendar'
+    );
+
+    if (empty($rawcals['data'])) {
+        Feedback::error(tra("You do not have permission to view the calendar"));
+        return;
+    }
+
+    $moduleCalendarFocusdate = date("Y-m-d");
+    $calendarInitialParams = $calendarlib->generalParamsOfCalendar($rawcals['data']);
+    $calendarInitialParams['initialView'] = $initialView;
+
+    if (! empty($calIds)) {
+        $calendarInitialParams['calendars'] = array_intersect_key(
+            $calendarInitialParams['calendars'],
+            array_flip($calIds)
+        );
+    }
+
+    $smarty->assign('eventCalendarParams', $calendarInitialParams);
+    $calendars = $calendarInitialParams['calendars'];
+
+    // set up list of groups
+    if (isset($_REQUEST["calIds"]) and is_array($_REQUEST["calIds"]) and count($_REQUEST["calIds"])) {
+        $_SESSION['ModuleCalendarViewGroups'] = array_intersect($_REQUEST["calIds"], array_keys($calendars));
+    } elseif (isset($_REQUEST["calIds"]) and ! is_array($_REQUEST["calIds"])) {
+        $_SESSION['ModuleCalendarViewGroups'] = array_intersect([$_REQUEST["calIds"]], array_keys($calendars));
+    } elseif (! empty($_REQUEST['allCals'])) {
+        $_SESSION['ModuleCalendarViewGroups'] = array_keys($calendars);
+    } elseif (isset($_REQUEST["refresh"]) and ! isset($_REQUEST["calIds"])) {
+        $_SESSION['ModuleCalendarViewGroups'] = [];
+    }
+
+    if ($calendarInitialParams['canEditAnything']) {
+        TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/tiki-calendar_edit_item.js');
     }
 
     foreach ($calIds as $i => $cal_id) {
@@ -147,7 +197,27 @@ function module_calendar_new($mod_reference, $module_params)
     }
 
     if (! empty($calIds)) {
+        $checkedCalIds = [];
+        $moduleCalendarViewGroups = $_SESSION['ModuleCalendarViewGroups'] ?? null;
+        if (is_array($moduleCalendarViewGroups)) {
+            foreach ($calendars as $calendarId => $calendar) {
+                if (in_array($calendarId, $moduleCalendarViewGroups)) {
+                    $checkedCalIds[] = $calendarId;
+                }
+            }
+            $displayedcals = $moduleCalendarViewGroups;
+            $moduleCalendarIds = implode(',', $moduleCalendarViewGroups);
+        } else {
+            $displayedcals = $calIds;
+            $checkedCalIds = $calIds;
+        }
+        // Select only events from checked calendars in list view
+        if (! empty($checkedCalIds)) {
+            $calIds = $checkedCalIds;
+        }
+
         $tc_infos = $calendarlib->getCalendar($calIds, $viewstart, $viewend, 'day', 'events', true);
+
         if ($_REQUEST['viewlistmodule'] == 'list') {
             foreach ($tc_infos['listevents'] as $i => $e) {
                 $tc_infos['listevents'][$i]['head'] = '';
@@ -159,16 +229,18 @@ function module_calendar_new($mod_reference, $module_params)
             $smarty->assign($tc_key, $tc_val);
         }
 
-        $smarty->assign('name', 'calendar_new');
-
-        $smarty->assign('daformat2', $tikilib->get_long_date_format());
-        $smarty->assign('var', '');
-        $smarty->assign('myurl', 'tiki-calendar.php');
-        $smarty->assign('show_calendar_module', 'y');
-        $smarty->assign_by_ref('viewmodelink', $module_params['viewmodelink']);
-        $smarty->assign_by_ref('linkall', $module_params['linkall']);
+        $smarty->assign('viewnavbar', $module_params['viewnavbar']);
         $smarty->assign('calendarViewMode', $calendarViewMode['casedefault']);
-
+        $smarty->assign('name', 'calendar_new');
+        $smarty->assign('calendars', $calendars);
+        $smarty->assign_by_ref('checkedCalIds', $checkedCalIds);
+        $smarty->assign('displayedcals', $displayedcals);
+        $smarty->assign('moduleCalendarIds', $moduleCalendarIds);
+        $smarty->assign('returnURL', $current_url);
+        $smarty->assign('moduleCalendarFocusdate', $moduleCalendarFocusdate);
+        $smarty->assign('defaultCalendarId', $defaultCalendarId);
+        $smarty->assign('uniqueId', rand());
+        $smarty->assign('show_calendar_module', 'y');
         if (isset($save_todate)) {
             $_REQUEST['todate'] = $save_todate;
         } else {

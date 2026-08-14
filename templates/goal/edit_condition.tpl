@@ -19,11 +19,11 @@
             <label class="col-form-label col-md-3">{tr}Operator{/tr}</label>
             <div class="col-md-9">
                 <label>
-                    <input type="radio" name="operator" value="atLeast" {if $condition.operator neq 'atMost'} checked {/if}>
+                    <input type="radio" class="form-check-input" name="operator" value="atLeast" {if $condition.operator neq 'atMost'} checked {/if}>
                     {tr}At Least{/tr}
                 </label>
                 <label>
-                    <input type="radio" name="operator" value="atMost" {if $condition.operator eq 'atMost'} checked {/if}>
+                    <input type="radio" class="form-check-input" name="operator" value="atMost" {if $condition.operator eq 'atMost'} checked {/if}>
                     {tr}At Most{/tr}
                 </label>
             </div>

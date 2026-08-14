@@ -17,6 +17,7 @@ function prefs_social_list()
                 'follow_approval' => tr('Followers need approval'),
             ],
             'default' => 'follow',
+            'help' => 'Social-Interaction',
         ],
     ];
 }

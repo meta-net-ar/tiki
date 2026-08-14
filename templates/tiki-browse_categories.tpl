@@ -1,10 +1,11 @@
+{include file='token_view_actions.tpl'}
 {title}{if $parentId ne 0}{tr}Category:{/tr} {$p_info.name}{else}{tr}Categories{/tr}{/if}{/title}
 
 {if $parentId and $p_info.description}
-    <div class="description form-text">{$p_info.description|escape|nl2br}</div>
+    <div class="description form-text">{$p_info.description|parse}</div>
 {/if}
 <div class="mb-3 mx-0 t_navbar">
-    {button href="tiki-edit_categories.php" _type="link" _text="{tr}Organize Objects{/tr}" _icon_name="structure" _title="{tr}Organize Objects{/tr}"}
+    {button href="tiki-edit_categories.php" _type="link" _text="{tr}Categorize Objects{/tr}" _icon_name="structure" _title="{tr}Categorize Objects{/tr}"}
     {if $tiki_p_admin_categories eq 'y'}
         {button href="tiki-admin_categories.php?parentId=$parentId" _type="link" _icon_name="settings" _text="{tr}Admin Categories{/tr}" _title="{tr}Admin the Category System{/tr}"}
     {/if}
@@ -91,15 +92,15 @@
 
 <form method="post" action="tiki-browse_categories.php" class="d-flex flex-row flex-wrap align-items-center">
     <div class="mb-3 d-flex mx-0">
-        <label class="col-form-label sr-only" for="find">{tr}Find{/tr}</label>
+        <label class="col-form-label sr-only" for="find">{tr}Search{/tr}</label>
         <div class="input-group">
             <span class="input-group-text">
                 {icon name="search"} {if $parentId ne 0}{$p_info.name|escape} {/if}
             </span>
             <input class="form-control input-sm" type="text" name="find" id="find" value="{$find|escape}">
-            <input type="submit" class="btn btn-info" value="{tr}Find{/tr}" name="search">
+            <input type="submit" class="btn btn-info" value="{tr}Search{/tr}" name="search">
         </div>
-        <span class="form-text" style="display:inline-block; margin: 0;">{help url="#" desc="{tr}Find in:{/tr} <ul><li>{tr}Name{/tr}</li><li>{tr}Description{/tr}</li></ul>"}</span>
+        <span class="form-text" style="display:inline-block; margin: 0;">{help url="#" desc="{tr}Search in:{/tr} <ul><li>{tr}Name{/tr}</li><li>{tr}Description{/tr}</li></ul>"}</span>
     </div>
     <div class="mb-3 d-flex mx-0">
         <div class="form-check">
@@ -132,7 +133,7 @@
     </div>
 {/if}
 
-{if $cant_pages > 0}
+{if $pages_count > 0}
     {tabset name='browse-categories'}
         {tab name="{tr}Categories{/tr}"}
             {if $parentId ne '0'}
@@ -190,7 +191,7 @@
                 </div>
             </div>
 
-            {pagination_links cant=$cant_pages step=$maxRecords offset=$offset}{/pagination_links}
+            {pagination_links count=$pages_count step=$maxRecords offset=$offset}{/pagination_links}
         {/tab}
     {/tabset}
 {else}

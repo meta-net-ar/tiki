@@ -6,22 +6,38 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_layout_list()
 {
+    $generalLayoutOptionsHelp = 'General-Layout-Options';
+
     return [
         'layout_fixed_width' => [
             'name' => tra('Layout width'),
             'description' => tra('The width of the site\'s content area (Bootstrap container div), centered in the browser window.'),
             'type' => 'text',
-            'hint' => tra('The default is 1170px.'),
+            'hint' => tra('The default is to use the Bootstrap responsive default.'),
+            'help' => $generalLayoutOptionsHelp,
             'dependencies' => [
                 'feature_fixed_width',
             ],
             'tags' => ['basic'],
-            'default' => '1170px',
+            'default' => '',
+        ],
+        'layout_fixed_width_header' => [
+            'name' => tra('Layout fixed width header'),
+            'description' => tra('The width of the site\'s header will match the content area width.'),
+            'type' => 'flag',
+            'hint' => tra('The default is to use a full width header.'),
+            'help' => $generalLayoutOptionsHelp,
+            'dependencies' => [
+                'feature_fixed_width',
+            ],
+            'tags' => ['basic'],
+            'default' => 'n',
         ],
         'layout_tabs_optional' => [
             'name' => tra('Tabs optional'),
             'description' => tra('Users can choose not to have tabs. A <b>no tabs</b> button will be displayed.'),
             'type' => 'flag',
+            'help' => 'Miscellaneous',
             'dependencies' => [
                 'feature_tabs',
             ],
@@ -33,6 +49,7 @@ function prefs_layout_list()
             'description' => tra('Either grp_Anonymous or grp_Registered and possibly grp_Admins as well'),
             'type' => 'flag',
             'default' => 'y',
+            'help' => 'Customization',
             'keywords' => 'body class html grp',
         ],
     ];

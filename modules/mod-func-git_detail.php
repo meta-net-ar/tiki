@@ -12,7 +12,7 @@
 function module_git_detail_info()
 {
     return [
-        'name' => tra('Git detail'),
+        'name' => tra('Git information'),
         'description' => tra('Git commit and last update information.'),
         'params' => [],
     ];
@@ -27,23 +27,13 @@ function module_git_detail_info()
  */
 function module_git_detail($mod_reference, $module_params)
 {
-    /** @var Smarty_Tiki $smarty */
+    /** @var \Tiki\Smarty\SmartyTiki $smarty */
     $smarty = TikiLib::lib('smarty');
     /** @var GitLib $gitlib */
     $gitlib = TikiLib::lib('git');
-    $error = '';
-    $content = [];
 
-    try {
-        $content = $gitlib->get_info();
-    } catch (Exception $e) {
-        $error = $e->getMessage();
-    } catch (Error $e) {
-        $error = $e->getMessage();
-    } catch (Throwable $e) {
-        $error = $e->getMessage();
-    }
+    $result = $gitlib->getGitDetails();
 
-    $smarty->assign('error', $error);
-    $smarty->assign('content', $content);
+    $smarty->assign('error', $result['error']);
+    $smarty->assign('content', $result['content']);
 }

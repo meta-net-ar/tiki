@@ -53,8 +53,6 @@ class WebmailUnreadPagesCommand extends Command
 
         require_once $tikipath . '/lib/cypht/integration/Tiki_Hm_Functions.php';
 
-        $cypht = Tiki_Hm_Functions::initCyphtForBackend('servers');
-
         $tikilib = TikiLib::lib('tiki');
         $parserlib = TikiLib::lib('parser');
         $activitylib = TikiLib::lib('activity');
@@ -91,15 +89,9 @@ class WebmailUnreadPagesCommand extends Command
                 // Store last timestamp in plugin body?
 
                 foreach ($body['imap_servers'] as $idx => $mailbox) {
-                    Hm_IMAP_List::add($mailbox, true);
+                    list($msg_count, $msg_list) = Tiki_Hm_Functions::getLastUnreadMessageFromMailbox($idx, $mailbox, $last_timestamp);
 
-                    $output->writeln(tr('Retrieving messages'));
-                    $since = date('j-M-Y', $last_timestamp);
-                    list($status, $msg_list) = merge_imap_search_results([$idx], 'ALL', $cypht['session'], $cypht['cache'], ['INBOX'], 1000, [['SINCE', $since]]);
-
-                    Hm_IMAP_List::del($idx);
-
-                    if (empty($msg_list)) {
+                    if (! $msg_count) {
                         continue;
                     }
 

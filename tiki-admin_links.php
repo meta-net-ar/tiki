@@ -13,17 +13,20 @@ $inputConfiguration = [
         'staticKeyFilters'    => [
             'url'             => 'striptags',  //post
             'generate'        => 'int',        //get
-            'remove'          => 'url',        //post
+            'remove'          => 'url',        //get
             'editurl'         => 'url',        //post
             'title'           => 'striptags',  //post
-            'postion'         => 'int',        //post
+            'position'        => 'int',        //post
             'type'            => 'string',     //post
-            'add'             => 'bool',       //post
+            'add'             => 'alpha',      //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
 include_once('lib/featured_links/flinkslib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_featuredLinks');
 $access->check_permission('tiki_p_admin');
 $smarty->assign('title', '');

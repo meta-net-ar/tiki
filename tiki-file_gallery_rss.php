@@ -41,11 +41,9 @@ if (empty($galleryIds)) {
     require_once('tiki-rss_error.php');
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
-
 $feed = 'filegal';
 $uniqueid = "$feed.id=" . md5(implode('_', $galleryIds));
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output["data"] == "EMPTY") {
     $filegallib = TikiLib::lib('filegal');
@@ -70,10 +68,6 @@ if ($output["data"] == "EMPTY") {
         $titleId = "name";
         $readrepl = $prefs['fgal_podcast_dir'] . "%s";
         $id = "podcast_filename";
-    } else {
-        $id = "fileId";
-        $titleId = "filename";
-        $readrepl = "tiki-download_file.php?$id=%s";
     }
 
     $changes = $filegallib->get_files(0, $prefs['feed_file_gallery_max'], $dateId . '_desc', '', $galleryIds);

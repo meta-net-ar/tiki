@@ -28,11 +28,13 @@
             </fieldset>
 
             {preference name=home_file_gallery}
-            {preference name=fgal_list_description}
             {preference name='fgal_use_db'}
             <div class="adminoptionboxchild fgal_use_db_childcontainer n">
                 <div class="mb-sm-3">
                     {preference name='fgal_preserve_filenames'}
+                </div>
+                <div class="mb-sm-3">
+                    {preference name='fgal_filename_to_display_name'}
                 </div>
                 <div class="mb-sm-3">
                     {preference name='fgal_use_dir'}
@@ -50,7 +52,7 @@
             {preference name='fgal_podcast_dir'}
 
             <fieldset>
-                <legend class="h3">{tr}Features{/tr}{help url="File+Gallery+Config"}</legend>
+                <legend class="h3">{tr}Features{/tr}{help url="File-Gallery-Config"}</legend>
 
                 {preference name='feature_file_galleries_rankings'}
                 {preference name='feature_file_galleries_comments'}
@@ -74,6 +76,7 @@
                     {preference name='fgal_delete_after_email'}
                 </div>
                 {preference name='fgal_keep_fileId'}
+                {preference name='fgal_show_modtimedate'}
                 {preference name='feature_use_fgal_for_user_files'}
                 {preference name='feature_use_fgal_for_wiki_attachments'}
                 {preference name='feature_file_galleries_save_draft'}
@@ -104,10 +107,11 @@
                 {preference name='file_galleries_redirect_from_image_gallery'}
                 {preference name='fgal_convert_documents_pdf'}
                 {preference name='fgal_maximum_image_width_preview'}
+                {preference name='fgal_file_max_archives'}
             </fieldset>
 
             <fieldset>
-                <legend class="h3">{tr}Quota{/tr}{help url="File+Gallery+Config#Quota"}</legend>
+                <legend class="h3">{tr}Quota{/tr}{help url="File-Gallery-Config#Quota"}</legend>
                 {preference name='fgal_quota'}{tr}Used:{/tr} {$usedSize|kbsize}
                 <div class="adminoptionboxchild" id="fgal_quota_childcontainer">
                     {if !empty($prefs.fgal_quota)}
@@ -122,7 +126,7 @@
             </fieldset>
 
             <fieldset>
-                <legend class="h3">{tr}Upload Regex{/tr}{help url="File+Gallery+Config#Filename_must_match:"}</legend>
+                <legend class="h3">{tr}Upload Regex{/tr}{help url="File-Gallery-Config#Filename_must_not_match"}</legend>
                 {preference name='fgal_match_regex'}
                 {preference name='fgal_nmatch_regex'}
             </fieldset>
@@ -131,9 +135,15 @@
                 <legend class="h3"> {tr}Settings for Media Alchemyst{/tr}{help url="Media-Alchemyst"}</legend>
                 {preference name=alchemy_ffmpeg_path}
                 {preference name=alchemy_ffprobe_path}
+                {preference name=alchemy_converter_type}
                 {preference name=alchemy_unoconv_path}
                 {preference name=alchemy_unoconv_timeout}
-                {preference name=alchemy_unoconv_port}
+                {if $prefs.alchemy_converter_type === 'unoconv'}
+                    {preference name=alchemy_unoconv_port}
+                {/if}
+                {if $prefs.alchemy_converter_type === 'unoserver'}
+                    {preference name=alchemy_unoserver_port}
+                {/if}
                 {preference name=alchemy_gs_path}
                 {preference name=alchemy_imagine_driver}
             </fieldset>
@@ -203,6 +213,7 @@
             {preference name='fgal_show_ocr_state'}
             {preference name='fgal_list_id'}
             {preference name='fgal_list_type'}
+            {preference name='fgal_list_description'}
             {preference name='fgal_list_name'}
             {preference name='fgal_list_size'}
             {preference name='fgal_list_created'}
@@ -265,7 +276,7 @@
                 </div>
             <div class="adminoptionbox">
                 <fieldset>
-                    <legend class="h3">{tr}Handlers{/tr}{help url="Search-within-files" desc='{tr}If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.{/tr}'}</legend>
+                    <legend class="h3">{tr}Handlers{/tr}{help url="Search-within-files" desc="{tr}If you want the content of the files which are in the File Gallery to be accessible by a search, and if you have a script that extracts the file content into a text, you can associate the script to the Mime type and the files content will be indexed.{/tr}"}</legend>
                     <div class="adminoptionbox">
                         <div class="adminoptionlabel">{tr}Add custom handlers to make your files &quot;searchable&quot; content{/tr}.
                             <ul>
@@ -353,7 +364,7 @@
                                         {if !$ocrStalled}disabled{/if}
                                         class="btn btn-primary btn-sm"
                                         name="ocrstalledreset"
-                                        value="{tr}Reset {if $ocrStalled}{$ocrStalled} {/if}OCR 'stalled' files{/tr}"
+                                        value="{if $ocrStalled}{tr _0=$ocrStalled}Reset %0 OCR 'stalled' files{/tr}{else}{tr}Reset OCR 'stalled' files{/tr}{/if}"
                                 >
                             {/if}
                         </div>

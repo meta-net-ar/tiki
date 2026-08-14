@@ -10,10 +10,14 @@ $inputConfiguration = [
         'remove'                 => 'word',               //post
         'sort_mode'              => 'word',               //get
         'offset'                 => 'int',                //get
+        'find'                   => 'string',             //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 
 $access->check_feature('feature_banners');
 
@@ -38,17 +42,9 @@ $smarty->assign_by_ref('sort_mode', $sort_mode);
 // If offset is set use it if not then use offset =0
 // use the maxRecords php variable to set the limit
 // if sortMode is not set then use lastModif_desc
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 // Get a list of last changes to the Wiki database
 if ($tiki_p_admin_banners == 'y') {
@@ -57,7 +53,7 @@ if ($tiki_p_admin_banners == 'y') {
     $who = $user;
 }
 $listpages = $bannerlib->list_banners($offset, $maxRecords, $sort_mode, $find, $who);
-$smarty->assign_by_ref('cant_pages', $listpages["cant"]);
+$smarty->assign_by_ref('pages_count', $listpages["count"]);
 $smarty->assign_by_ref('listpages', $listpages["data"]);
 $smarty->assign('mid', 'tiki-list_banners.tpl');
 $smarty->display("tiki.tpl");

@@ -27,18 +27,18 @@ class ProfileForgetCommand extends Command
             ->addArgument(
                 'profile',
                 InputArgument::REQUIRED,
-                'Profile name'
+                tra('Profile name')
             )
             ->addArgument(
                 'repository',
                 InputArgument::OPTIONAL,
-                'Repository',
+                tra('Repository'),
                 'profiles.tiki.org'
             )->addOption(
                 'revert',
                 null,
                 InputOption::VALUE_NONE,
-                'Rollback profile changes'
+                tra('Rollback profile changes')
             );
     }
 
@@ -50,7 +50,7 @@ class ProfileForgetCommand extends Command
         $profile = \Tiki_Profile::fromNames($repository, $profileName);
 
         if (! $profile) {
-            $output->writeln('<error>Profile not found.</error>');
+            $output->writeln('<error>' . tra('Profile not found.') . '</error>');
             return Command::FAILURE;
         }
 
@@ -74,16 +74,16 @@ class ProfileForgetCommand extends Command
                         $installer->revert($profile, $revertInfo);
                     }
                 } else {
-                    $output->writeln('No changes were found in logs to revert.');
+                    $output->writeln(tra('No changes were found in logs to revert.'));
                 }
             }
 
             $installer->forget($profile);
             $transaction->commit();
-            $output->writeln('Profile forgotten.');
+            $output->writeln(tra('Profile forgotten.'));
             $logslib->add_action('profile forget', 'system', 'system', $profileName . ' profile forgotten.');
         } else {
-            $output->writeln('<info>Profile was not installed or did not create any objects.</info>');
+            $output->writeln('<info>' . tra('Profile was not installed or did not create any objects.') . '</info>');
         }
         return Command::SUCCESS;
     }

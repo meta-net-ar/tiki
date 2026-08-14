@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use Tiki\Lib\TikiDate;
 
 /**
  * Smarty {html_select_date} plugin
@@ -57,7 +58,7 @@ class HtmlSelectDate extends Base
         $display_months  = true;
         $display_years   = true;
         $month_format    = "%B";
-        $tikidate = new \TikiDate();
+        $tikidate = new TikiDate();
 
         /* Write months as numbers by default  GL */
         $month_value_format = "%m";
@@ -222,7 +223,7 @@ class HtmlSelectDate extends Base
                 $month_values[$i] = $tikidate->format($month_value_format, true);
             }
 
-            $month_result .= '<select class="form-control date" name=';
+            $month_result .= '<select class="form-control date-time-selector-field" name=';
             if (null !== $field_array) {
                 $month_result .= '"' . $field_array . '[' . $prefix . 'Month]"';
             } else {
@@ -264,7 +265,7 @@ class HtmlSelectDate extends Base
                 $day_values[] = sprintf($day_value_format, $i);
             }
 
-            $day_result .= '<select class="form-control date" name=';
+            $day_result .= '<select class="form-control date-time-selector-field" name=';
             if (null !== $field_array) {
                 $day_result .= '"' . $field_array . '[' . $prefix . 'Day]"';
             } else {
@@ -320,7 +321,7 @@ class HtmlSelectDate extends Base
                     array_unshift($years, $year_empty);
                     array_unshift($yearvals, '');
                 }
-                $year_result .= '<select class="form-control date" name="' . $year_name . '"';
+                $year_result .= '<select class="form-control date-time-selector-field" name="' . $year_name . '"';
                 if (null !== $year_size) {
                     $year_result .= ' size="' . $year_size . '"';
                 }

@@ -5,8 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 use Tiki\Command\ListExecuteCommand;
-
-require_once 'lib/wiki/pluginslib.php';
+use Tiki\Lib\Wiki\PluginsLibUtil;
 
 function wikiplugin_listexecute_info()
 {
@@ -23,26 +22,31 @@ function wikiplugin_listexecute_info()
         'introduced' => 11,
         'tags' => [ 'advanced' ],
         'params' => [
+            'button_label' => [
+                'required' => false,
+                'name' => tra('Button label'),
+                'description' => tr(
+                    'Label for the form submit button. Default is %0.',
+                    '<code>' . tr('Apply') . '</code>'
+                ),
+                'since' => '27.3',
+                'default' => 'Apply'
+            ]
         ],
     ];
 }
 
-function wikiplugin_listexecute($data, $params)
+function wikiplugin_listexecute($data, $params, $offset, $parser)
 {
     global $prefs, $tiki_p_modify_object_categories, $tiki_p_admin_categories;
+
     static $iListExecute = 0;
     $iListExecute++;
-
-    if (isset($_REQUEST['iListExecute'])) {
-        $iListExecute = $_REQUEST['iListExecute'];
-    }
+    $fingerprint = "listexecute-$iListExecute";
 
     $unifiedsearchlib = TikiLib::lib('unifiedsearch');
 
     TikiLib::lib('header')->add_jsfile('lib/jquery_tiki/wikiplugin-listexecute.js', true);
-
-    $meta = TikiLib::lib('parser')->plugin_info('listexecute', $params);
-    $fingerprint = TikiLib::lib('parser')->plugin_fingerprint('listexecute', $meta, $data, $params);
 
     $actions = [];
 
@@ -61,7 +65,8 @@ function wikiplugin_listexecute($data, $params)
             'tracker_item_modify' => 'Search_Action_TrackerItemModify',
             'user_group_modify' => 'Search_Action_UserGroupModify',
             'wiki_approval' => 'Search_Action_WikiApprovalAction',
-            'categorize_object' => 'Search_Action_CategorizeObjectAction'
+            'categorize_object' => 'Search_Action_CategorizeObjectAction',
+            'export_pdf' => 'SearchActionExportPDF',
         ]
     );
 
@@ -85,12 +90,18 @@ function wikiplugin_listexecute($data, $params)
     }
 
     $selectedObjects = $_POST["objects$iListExecute"] ?? [];
+    // the console command can target a single page of results instead of every object found
+    $resultsPage = max(0, (int) ($_POST['list_results_page'] ?? 0));
+    $applyToEveryResult = in_array('ALL', $selectedObjects) && ! $resultsPage;
 
     if (! empty($selectedObjects)) {
         $searchQuery = clone $query;
-        if (in_array('ALL', $selectedObjects)) {
+        if ($applyToEveryResult) {
             // unified search needs a hard limit and we want to apply the action to as many items as possible
             $query->setRange(0, 9999);
+        } elseif (in_array('ALL', $selectedObjects)) {
+            // only the requested page of results, using the pagination size in use on the target page
+            $query->setRange(($resultsPage - 1) * $paginationArguments['max'], $paginationArguments['max']);
         } else {
             // select only the items to apply the action to
             foreach ($selectedObjects as $identifier) {
@@ -145,7 +156,7 @@ function wikiplugin_listexecute($data, $params)
     $builder->setId('wplistexecute-' . $iListExecute);
     $builder->setCount($result->count());
     $builder->setTsOn($tsret['tsOn']);
-    $builder->apply($matches);
+    $builder->apply($matches, $params);
 
     $result->setTsSettings($builder->getTsSettings());
     $result->setTsOn($tsret['tsOn']);
@@ -153,7 +164,7 @@ function wikiplugin_listexecute($data, $params)
     $formatter = $builder->getFormatter();
     $formatter->setCounter($iListExecute);
 
-    if (! $customOutput) {
+    if (! $customOutput) { // default list output when OUTPUT block is not in use
         $plugin = new Search_Formatter_Plugin_SmartyTemplate('templates/wiki-plugins/wikiplugin_listexecute.tpl');
         $plugin->setFields(['report_status' => null]);
 
@@ -161,6 +172,7 @@ function wikiplugin_listexecute($data, $params)
             'actions' => $actions,
             'iListExecute' => $iListExecute,
             'fingerprint' => $fingerprint,
+            'label' => $params['button_label'] ?? '',
         ];
 
         if ($prefs['feature_categories'] == 'y') {
@@ -219,7 +231,7 @@ function wikiplugin_listexecute($data, $params)
     if (isset($_POST['list_action']) && ! empty($selectedObjects)) {
         $action = $_POST['list_action'];
 
-        if ($result->count() > 9999) {
+        if ($applyToEveryResult && $result->count() > 9999) {
             Feedback::error(tr("There are too many search result items to apply %0 action to.", $_POST['list_action']));
         } elseif (isset($actions[$action])) {
             TikiLib::setExternalContext(true);
@@ -280,17 +292,17 @@ function wikiplugin_listexecute($data, $params)
             $result = $searchQuery->search($index);
             $result->setId('wplistexecute-' . $iListExecute);
             $resultBuilder = new Search_ResultSet_WikiBuilder($result);
-            $resultBuilder->apply($matches);
+            $resultBuilder->apply($matches, $params);
             $builder->setCount($result->count());
             // remove any tablesorter header js that will be added twice otherwise
             foreach (TikiLib::lib('header')->jq_onready as &$scripts) {
                 foreach ($scripts as $key => $js) {
-                    if (strstr($js, '$(\'table#wplistexecute-' . $iListExecute . '\').tablesorter(')) {
+                    if (str_contains($js, '$(\'table#wplistexecute-' . $iListExecute . '\').tablesorter(')) {
                         unset($scripts[$key]);
                     }
                 }
             }
-            $builder->apply($matches);
+            $builder->apply($matches, $params);
             $result->setTsSettings($builder->getTsSettings());
             $result->setTsOn($tsret['tsOn']);
             $formatter = $builder->getFormatter();
@@ -300,5 +312,26 @@ function wikiplugin_listexecute($data, $params)
         }
     }
 
-    return $formatter->format($result);
+    $alternateOutput = $formatter->getAlternateOutput();
+    if (! strstr($alternateOutput, "listexecute-$iListExecute")) {
+        // no results found or custom alternatate code supplied, thus missing list execute main form, add it artificially as JS code bind to it
+        $alternateOutput = '~np~
+<form method="post" class="list-executable" id="listexecute-' . $iListExecute . '" data-id="wplistexecute-' . $iListExecute . '">
+    <input type="hidden" name="plugin" value="' . $fingerprint . '">~/np~' . $alternateOutput . '~np~
+</form>~/np~';
+        $formatter->setAlternateOutput($alternateOutput);
+    }
+
+    $formatted = $formatter->format($result);
+
+    $mark_plugins = $parser->option['mark_plugins'];
+    if (empty($mark_plugins && ! empty(TikiLib::lib('parser')->core_options['mark_plugins']))) {
+        $mark_plugins = TikiLib::lib('parser')->core_options['mark_plugins'];
+    }
+
+    if (! empty($mark_plugins) && in_array($fingerprint, $mark_plugins)) {
+        $formatted = "~$fingerprint~" . $formatted . "~/$fingerprint~";
+    }
+
+    return $formatted;
 }

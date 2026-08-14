@@ -16,7 +16,7 @@ function module_groups_emulation_info()
         'params' => [
             'showallgroups' => [
                 'name' => tra('Show All Groups'),
-                'description' => tra('Show All Groups') . '. ' . tra('If set to "n", the list is not shown.'),
+                'description' => tra('Show the list of all system groups and include them in the emulation dropdown.') . ' ' . tra('If set to "n", the list is not shown and groups are excluded from the dropdown. Admin only.'),
                 'filter' => 'alpha',
                 'default' => 'y',
                 'since' => '13.1',
@@ -27,7 +27,7 @@ function module_groups_emulation_info()
             ],
             'showyourgroups' => [
                 'name' => tra('Show Your Groups'),
-                'description' => tra('Show Your Groups') . '. ' . tra('If set to "n", the list is not shown.'),
+                'description' => tra('Show the list of your assigned groups and include them in the emulation dropdown.') . ' ' . tra('If set to "n", the list is not shown and groups are excluded from the dropdown.'),
                 'filter' => 'alpha',
                 'default' => 'y',
                 'since' => '13.1',
@@ -49,16 +49,26 @@ function module_groups_emulation_info()
 function module_groups_emulation($mod_reference, $module_params)
 {
     global $user, $tiki_p_admin;
+
+    // Anonymous users can only emulate anonymous permissions, which is pointless.
+    // Hide the module entirely for non-logged-in users.
+    if (empty($user) || strtolower($user) === 'anonymous') {
+        return false;
+    }
+
     $userlib = TikiLib::lib('user');
     $smarty = TikiLib::lib('smarty');
 
-    $showallgroups = isset($module_params['showallgroups']) ? $module_params['showallgroups'] : 'y';
-    $showyourgroups = isset($module_params['showyourgroups']) ? $module_params['showyourgroups'] : 'y';
+    $showallgroups = $module_params['showallgroups'] ?? 'y';
+    $showyourgroups = $module_params['showyourgroups'] ?? 'y';
 
-    $groups_are_emulated = isset($_SESSION['groups_are_emulated']) ? $_SESSION['groups_are_emulated'] : 'n';
+    $groups_are_emulated = $_SESSION['groups_are_emulated'] ?? 'n';
     $smarty->assign('groups_are_emulated', $groups_are_emulated);
     if (isset($_SESSION['groups_emulated'])) {
         $smarty->assign('groups_emulated', unserialize($_SESSION['groups_emulated']));
+    }
+    if (isset($_SESSION['groups_emulated_requested'])) {
+        $smarty->assign('groups_emulated_requested', unserialize($_SESSION['groups_emulated_requested']));
     }
 
     // Admins can see all existing groups
@@ -73,42 +83,20 @@ function module_groups_emulation($mod_reference, $module_params)
 
     // Extract list of groups of user, including included groups
     $userGroups = $userlib->get_user_groups_inclusion($user);
-    if ($tiki_p_admin == 'y') {
+
+    // Build the choosable groups for the dropdown, respecting params
+    $chooseGroups = [];
+    if ($showallgroups == 'y' && $tiki_p_admin == 'y') {
         $chooseGroups = $allGroups;
-    } else {
+    } elseif ($showyourgroups == 'y') {
         $chooseGroups = $userGroups;
     }
     $chooseGroups["Anonymous"] = "included";
-    if (isset($user)) {
-        $chooseGroups["Registered"] = "included";
-    }
+    $chooseGroups["Registered"] = "included";
 
-    $headerlib = TikiLib::lib("header");
     $moduleId = $mod_reference['moduleId'];
-    if (isset($allGroups) && $showallgroups == 'y') {
-        $headerlib->add_js('$(function() {
-            $("#module_' . $moduleId . ' #mge-all").hide();
-            $("#module_' . $moduleId . ' #mge-all-legend").on("click", function(){
-                $("#module_' . $moduleId . ' #mge-all").fadeToggle();
-            });
-        });');
-    }
-    if ($showyourgroups == 'y') {
-        $headerlib->add_js('$(function() {
-            $("#module_' . $moduleId . ' #mge-mine").hide();
-            $("#module_' . $moduleId . ' #mge-mine-legend").on("click", function(){
-                $("#module_' . $moduleId . ' #mge-mine").fadeToggle();
-            });
-        });');
-    }
-    if ($groups_are_emulated == 'y') {
-        $headerlib->add_js('$(function() {
-            $("#module_' . $moduleId . ' #mge-emulated").hide();
-            $("#module_' . $moduleId . ' #mge-emulated-legend").on("click", function(){
-                $("#module_' . $moduleId . ' #mge-emulated").fadeToggle();
-            });
-        });');
-    }
+    $smarty->assign('moduleId', $moduleId);
+
 
     $smarty->assign_by_ref('userGroups', $userGroups);
     $smarty->assign_by_ref('chooseGroups', $chooseGroups);

@@ -44,7 +44,7 @@ class GlobRecursiveHelper
         $files = glob($startDir . $this->pattern, $this->flags);
         foreach ($files as $key => $fileName) {
             foreach ($this->excludes as $exclude) {
-                if (strpos($fileName, $exclude)) {
+                if (str_contains($fileName, $exclude)) {
                     unset($files[$key]);
                     break;
                 }
@@ -52,13 +52,13 @@ class GlobRecursiveHelper
         }
         foreach (glob($startDir . '*', GLOB_ONLYDIR | GLOB_NOSORT | GLOB_MARK) as $dir) {
             // lets ignore hidden directories (and the .. and . files)
-            if (strpos($dir, '.') === 0 && is_dir($dir)) {
+            if (str_starts_with($dir, '.') && is_dir($dir)) {
                 break;
             }
             /** If the directory has not been excluded from processing */
             $include = true;
             foreach ($this->excludes as $exclude) {
-                if (strpos($dir, $exclude) !== false) {
+                if (str_contains($dir, $exclude)) {
                     $include = false;
                     break;
                 }

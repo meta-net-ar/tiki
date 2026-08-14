@@ -6,6 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 use SteveGrunwell\PHPUnit_Markup_Assertions\MarkupAssertionsTrait;
+use Tiki\Smarty\SmartyTiki;
 
 require_once(__DIR__ . '/../../smarty_tiki/function.toolbars.php');
 
@@ -17,7 +18,7 @@ class FunctionToolbarsTest extends TikiTestCase
 {
     use MarkupAssertionsTrait;
 
-    private Smarty_Tiki $smarty;
+    private SmartyTiki $smarty;
 
     protected function setUp(): void
     {

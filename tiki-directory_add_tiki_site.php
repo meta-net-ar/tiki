@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'directory';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -23,6 +22,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/directory/dirlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_DIRECTORY;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_directory');
 // Set parent category to 2 ("tiki sites")
 $_REQUEST["parent"] = 2;
@@ -43,13 +45,19 @@ if (empty($_REQUEST["name"])) {
 if (empty($_REQUEST["url"])) {
     Feedback::errorAndDie(tra("Must enter a url to add a site"), \Laminas\Http\Response::STATUS_CODE_400);
 }
-if ((substr($_REQUEST["url"], 0, 7) <> 'http://') && (substr($_REQUEST["url"], 0, 8) <> 'https://')) {
+if ((! str_starts_with($_REQUEST["url"], 'http://')) && (! str_starts_with($_REQUEST["url"], 'https://'))) {
     $_REQUEST["url"] = 'http://' . $_REQUEST["url"];
 }
 if ($dirlib->dir_url_exists($_REQUEST['url'])) {
     Feedback::errorAndDie(tra("URL already added to the directory. Duplicate site?"), \Laminas\Http\Response::STATUS_CODE_409);
 }
 if ($prefs['directory_validate_urls'] == 'y') {
+    // Prevent SSRF: validate the submitted URL before the server opens a
+    // connection to check if the site is reachable.
+    $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+    if (! $ssrf->isUrlAllowed($_REQUEST['url'])) {
+        Feedback::errorAndDie(tra("URL is not allowed (targets a private or reserved address)"), \Laminas\Http\Response::STATUS_CODE_400);
+    }
     @$fsh = fopen($_REQUEST['url'], 'r');
     if (! $fsh) {
         Feedback::errorAndDie(tra("URL cannot be accessed: wrong URL or site is offline and cannot be added to the directory"), \Laminas\Http\Response::STATUS_CODE_400);

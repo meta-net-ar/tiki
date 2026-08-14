@@ -7,7 +7,7 @@
 <div class="t_navbar mb-4">
     {button href="tiki-list_blogs.php" _type="link" class="btn btn-link" _icon_name="list" _text="{tr}List Blogs{/tr}"}
     {if $blogId > 0}
-        {assign var=thisblogId value=$blogId|sefurl:blog}
+        {$thisblogId=$blogId|sefurl:blog}
         {button href=$thisblogId class="btn btn-primary" _text="{tr}View Blog{/tr}"}
     {/if}
 </div>
@@ -31,13 +31,13 @@
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="blog-title">{tr}Title{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" maxlength="200" name="title" id="blog-title" class="form-control" value="{$title|escape}" required="required">
+                    <input type="text" maxlength="{$MAX_BLOG_TITLE_LENGTH}" name="title" id="blog-title" class="form-control" value="{$title|escape}" required="required">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="blog-desc">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
-                    <textarea class="wikiedit form-control" name="description" id="blog-desc" rows="10">{$description|escape}</textarea>
+                    <textarea class="wikiedit form-control" maxlength="{$MAX_BLOG_DESCRIPTION_LENGTH}" name="description" id="blog-desc" rows="10">{$description|escape}</textarea>
                 </div>
             </div>
             <div class="mb-3 row">
@@ -95,7 +95,7 @@
                     </div>
                 </div>
             </div>
-            {if $prefs.feature_blog_heading eq 'y' and $tiki_p_edit_templates eq 'y'}
+            {if $prefs.feature_blog_heading eq 'y'}
                 <input type="submit" class="wikiaction btn btn-primary" name="preview" value="{tr}Heading preview{/tr}">
             {/if}
             {include file='categorize.tpl' labelcol='3' inputcol='9'}
@@ -174,7 +174,7 @@
                 </div>
                 <div class="form-text">{tr}Maximum number of related posts to display{/tr}</div>
             </div>
-            {if $prefs.feature_blog_heading eq 'y' and $tiki_p_edit_templates eq 'y'}
+            {if $prefs.feature_blog_heading eq 'y'}
                 <div class="mb-3 row">
                     <label class="col-sm-3 col-form-label" for="blogs-heading">{tr}Blog heading{/tr}</label>
                     <div class="col-sm-9">

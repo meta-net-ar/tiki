@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 namespace Tiki\Standards\TikiIgnore\Helpers;
 
+require_once __DIR__ . DIRECTORY_SEPARATOR . 'SafeIgnoreList.php';
+
 trait IgnoreListTrait
 {
     protected $ignoreSniffList;
@@ -46,8 +48,8 @@ trait IgnoreListTrait
     {
         $line = $tokens[$stackPtr]['line'];
         if (empty($phpcsFile->tokenizer->ignoredLines[$line])) {
-            $phpcsFile->tokenizer->ignoredLines[$line] = [];
+            $phpcsFile->tokenizer->ignoredLines[$line] = SafeIgnoreList::forLine();
         }
-        $phpcsFile->tokenizer->ignoredLines[$line][$sniff] = true;
+        SafeIgnoreList::markIgnored($phpcsFile->tokenizer->ignoredLines[$line], $sniff);
     }
 }

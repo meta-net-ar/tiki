@@ -65,7 +65,7 @@ function module_youtube($mod_reference, $module_params)
             if (isset($module_params['height'])) {
                 $params['height'] = $module_params['height'];
             }
-            $data['xhtml'][$id] = preg_replace('/~np~(.*)~\/np~/', '$1', wikiplugin_youtube('', $params));
+            $data['xhtml'][$id] = preg_replace('/~np~(.*)~\/np~/', '$1', TikiLib::lib('parser')->invokePlugin('youtube', '', $params));
         }
     }
 

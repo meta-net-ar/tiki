@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -257,7 +257,7 @@ function module_share($mod_reference, $module_params)
     }
     $smarty->assign('fb_div_attributes', $fbDivAttr);
 
-    // TODO find a way of matching up tiki lang with https://www.facebook.com/translations/FacebookLocales.xml
+    // TODO find a way of matching up tiki lang with Facebook Locales
 
     if (! empty($module_params['facebook_locale'])) {
         $smarty->assign('fb_locale', $module_params['facebook_locale']);

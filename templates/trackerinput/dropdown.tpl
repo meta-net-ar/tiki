@@ -19,7 +19,7 @@
                 </div>
                 {/foreach}
         {elseif $field.options_map.inputtype eq 'm'}
-            {if $prefs.jquery_select2 neq 'y'}<small>{tr}Hold "Ctrl" in order to select multiple values{/tr}</small><br>{/if}
+            {if $prefs.elementplus_select neq 'y'}<small>{tr}Hold "Ctrl" in order to select multiple values{/tr}</small><br>{/if}
             <select name="{$field.html_name}" multiple="multiple" class="form-select">
                 {foreach $field.possibilities as $value => $label}
                     <option value="{$value|escape}" {if in_array("$value", $field.selected)}selected="selected"{/if}>{$label|escape}</option>
@@ -33,13 +33,13 @@
         {/if}
         <input type="hidden" name="{$field.ins_id}_old" value="{$field.value|escape}">
     {else}
-        <select name="{$field.html_name|escape}" class="form-select{if $field.type eq 'D'} group_{$field.ins_id|escape}{/if}">
-            {if $field.isMandatory ne 'y' || $field.value eq ''}
-                <option value=""></option>
+        <select name="{$field.html_name|escape}" class="form-select{if $field.type eq 'D'} group_{$field.ins_id|escape}{/if}{if !empty($field.options_map.labelasplaceholder)} labelasplaceholder{/if}">
+            {if $field.isMandatory ne 'y' || $field.value eq '' || !empty($field.options_map.labelasplaceholder)}
+                <option value="" {if !empty($field.options_map.labelasplaceholder)}disabled {if $field.value eq ''}selected{/if} hidden{/if}>{if !empty($field.options_map.labelasplaceholder)}{tr}Select{/tr} {$field.name|tra|escape}{/if}</option>
             {/if}
             {foreach $field.possibilities as $value => $label}
                 {if $value !== 0  and ($value eq 'other' or $value eq "{tr}other{/tr}")}
-                    {assign var=otherLabel value={$label|escape}}
+                    {$otherLabel={$label|escape}}
                     {continue}{* TODO: Ignores options which would have "other" as key, which is not documented. Avoids displaying 2 "other" options, since the option needed to be specified manually prior to Tiki 18. *}
                 {/if}
                 <option value="{$value|escape}"
@@ -49,7 +49,7 @@
             {/foreach}
             {if $field.type eq 'D'}
                 {if ! isset($otherLabel)}
-                    {assign var=otherLabel value="{tr}Other{/tr}"}
+                    {$otherLabel="{tr}Other{/tr}"}
                 {/if}
                 <option value="other" style="font-style: italic">
                     {$otherLabel}
@@ -70,7 +70,7 @@
                     $other = $('input[name="other_{{$field.html_name|escape}}"]');
                 {{if !isset($field.possibilities[$field.value]) && $field.value}}
                 if (!$('> [selected]', $select).length) {
-                    $select.val('other').trigger("change.select2");
+                    $select.val('other');
                 }
                 {{/if}}
                 $select.on("change", function() {
@@ -85,7 +85,7 @@
                 $other.on("change", function(){
                     $other.data('tiki_never_visited', '');
                     if ($(this).val()) {
-                        $select.val(tr('other')).trigger("change.select2");
+                        $select.val(tr('other'));
                     }
                 });
                 $other.on("focusout", function(){

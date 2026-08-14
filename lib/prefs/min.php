@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_min_list()
 {
+    $loginGeneralPreferencesHelp = 'Login-General-Preferences';
+
     return [
         'min_username_length' => [
             'name' => tra('Minimum length'),
@@ -15,6 +17,7 @@ function prefs_min_list()
             'filter' => 'digits',
             'units' => tra('characters'),
             'default' => 1,
+            'help' => $loginGeneralPreferencesHelp,
         ],
         'min_pass_length' => [
             'name' => tra('Minimum length'),
@@ -24,6 +27,7 @@ function prefs_min_list()
             'filter' => 'digits',
             'units' => tra('characters'),
             'default' => 5,
+            'help' => $loginGeneralPreferencesHelp,
         ],
     ];
 }

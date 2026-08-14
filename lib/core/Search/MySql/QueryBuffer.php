@@ -51,7 +51,7 @@ class Search_MySql_QueryBuffer
         $result = $this->db->queryError(
             $query,
             $error,
-            options: [TikiDB::QUERY_OPTION_LOG_GROUP => Search_MySql_Table::UNIFIED_MYSQL_WRITE_LOG_GROUP]
+            options: [TikiDb::QUERY_OPTION_LOG_GROUP => Search_MySql_Table::UNIFIED_MYSQL_WRITE_LOG_GROUP]
         );
 
         $this->clear();

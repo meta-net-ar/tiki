@@ -8,7 +8,7 @@ function wikiplugin_adjustinventory_info()
 {
     return [
         'name' => tra('Adjust Inventory'),
-        'documentation' => tra('PluginAdjustInventory'),
+        'documentation' => 'PluginAdjustInventory',
         'description' => tra('Adjust the inventory level of a product'),
         'prefs' => [ 'wikiplugin_adjustinventory', 'payment_feature' ],
         'filter' => 'wikicontent',
@@ -57,12 +57,6 @@ function wikiplugin_adjustinventory_info()
 
 function wikiplugin_adjustinventory($data, $params)
 {
-    if (! isset($params['add'])) {
-        $params['add'] = 'y';
-    }
-    if (! isset($params['subtract'])) {
-        $params['subtract'] = 'y';
-    }
     $smarty = TikiLib::lib('smarty');
     $smarty->assign('code', $params['code']);
     $smarty->assign('add', $params['add']);

@@ -20,7 +20,7 @@ class Email
      * @param null $messageId
      *   The comment message_id
      * @return array
-     *   Return an array with the headers to enable threading or empty array if object not supported.
+     *   Return an array with the headers to enable threading or empty array if object not supported or not found.
      * @throws \Exception
      */
     public static function getEmailThreadHeaders($type, $commentId, $messageId = null)
@@ -40,6 +40,10 @@ class Email
         $commentsLib = \TikiLib::lib('comments');
         $comment = $commentsLib->get_comment($commentId, $messageId);
 
+        if (! $comment) {
+            return [];
+        }
+
         $headers = [];
         $parentInfo = [];
         if ($comment['parentId']) {
@@ -52,7 +56,7 @@ class Email
 
         if ($prefs['forum_notifications_use_new_threads'] === 'n') {
             $headers['In-Reply-To'] = ! empty($parentInfo['Message-Id']) ? $parentInfo['Message-Id'] : null;
-            $headers['References'] = ! empty($parentInfo['References']) ? $parentInfo['References'] . ' ' . $headers['In-Reply-To'] : $hash;
+            $headers['References'] = ! empty($parentInfo['References']) ? $parentInfo['References'] . ',' . $headers['In-Reply-To'] : $hash;
         } else {
             $headers['In-Reply-To'] = $comment['in_reply_to'];
         }
@@ -75,7 +79,7 @@ class Email
      * @return int The number of sent emails
      * @throws \Exception
      */
-    public static function sendSchedulerNotification($subjectTpl, $txtTpl, $scheduler, $usersToNotify = [])
+    public static function sendSchedulerNotification($subjectTpl, $txtTpl, $scheduler, $usersToNotify = [], $customMessage = '')
     {
         global $prefs, $tikipath;
 
@@ -89,6 +93,7 @@ class Email
         $smarty->assign('webroot', $tikipath);
         $smarty->assign('stalledTimeout', $tikilib->get_preference('scheduler_stalled_timeout'));
         $smarty->assign('healingTimeout', $tikilib->get_preference('scheduler_healing_timeout'));
+        $smarty->assign('customMessage', $customMessage);
 
         $defaultLang = $prefs['site_language'];
         $watchList = array_map(function ($user) use ($defaultLang) {

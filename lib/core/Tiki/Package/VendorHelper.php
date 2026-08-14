@@ -34,6 +34,7 @@ class VendorHelper
      */
     public static function getAvailableVendorPath($packageName, $path, $fullPath = true)
     {
+        $path = ltrim($path, '/');
         foreach (self::AVAILABLE_VENDOR_PATHS as $pathPrefix) {
             $pathPrefix = str_replace(self::REPLACEABLE_PACKAGE_NAME_KEYWORD, $packageName, $pathPrefix);
             $filePath = $pathPrefix . $path;

@@ -191,7 +191,8 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
             $selected = array_unique(array_merge($selected, $tracker_categories));
         }
 
-        $categories = $this->getApplicableCategories();
+        // get fresh list of applicable categories as processing more than one item might actually change the list
+        $categories = $this->getApplicableCategories(false);
         $selected = array_intersect($selected, $this->getIds($categories));
 
         if (isset($requestData[$key])) {
@@ -207,7 +208,11 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
             $value = implode(',', $selected);
         }
 
-        $selected_categories = array_filter(explode(',', $value), fn ($c) => in_array($c, $selected));
+        $selected_categories = explode(',', $value);
+
+        if (! empty($selected)) {
+            $selected_categories = array_filter($selected_categories, fn ($c) => in_array($c, $selected));
+        }
 
         $data = [
             'value' => $value,
@@ -298,17 +303,23 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
     {
         $selected_categories = $this->getConfiguration('selected_categories');
         $categories = $this->getConfiguration('list');
+        if (! is_array($selected_categories)) {
+            $selected_categories = [];
+        }
+        if (! is_array($categories)) {
+            $categories = [];
+        }
         $ret = [];
         $rendered = empty($context['list_mode']) || $context['list_mode'] !== 'csv';
         foreach ($selected_categories as $categId) {
             foreach ($categories as $category) {
-                if ($category['categId'] == $categId) {
+                if (isset($category['categId']) && $category['categId'] == $categId) {
                     if ($this->getOption('descendants') == 2) {
                         $str = $category['relativePathString'];
                     } else {
                         $str = $category['name'];
                     }
-                    if (strpos($this->getOption('outputtype'), 'links') !== false && $rendered) {
+                    if (str_contains($this->getOption('outputtype'), 'links') && $rendered) {
                         $deep = $this->getOption('descendants') != 0;
                         $href = smarty_modifier_sefurl($categId, 'category', $deep, '', 'y', $str);
                         if ($deep) {
@@ -321,7 +332,7 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
                 }
             }
         }
-        if (strpos($this->getOption('outputtype'), 'ul') === 0 && $rendered) {
+        if (str_starts_with($this->getOption('outputtype'), 'ul') && $rendered) {
             if (count($ret)) {
                 $out = '<ul class="tracker_field_category">';
                 foreach ($ret as $li) {
@@ -335,6 +346,36 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
         } else {
             return implode("<br/>\n", $ret);
         }
+    }
+
+    /**
+     * Return plain text representation of selected categories
+     *
+     * @param array $context
+     * @return string
+     */
+    public function renderText($context = [])
+    {
+        $data = $this->getFieldData();
+        $selected_categories = $data['selected_categories'];
+        $categories = $data['list'];
+
+        if (! is_array($selected_categories)) {
+            $selected_categories = [];
+        }
+        if (! is_array($categories)) {
+            $categories = [];
+        }
+        $out = [];
+        foreach ($categories as $category) {
+            foreach ($selected_categories as $categId) {
+                if ($category['categId'] == $categId) {
+                    $out[] = $category['name'];
+                }
+            }
+        }
+
+        return implode(', ', $out);
     }
 
     public function handleSave($value, $oldValue)
@@ -374,12 +415,12 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
         return $validIds;
     }
 
-    private function getApplicableCategories()
+    private function getApplicableCategories($use_cache = true)
     {
         static $cache = [];
         $fieldId = $this->getConfiguration('fieldId');
 
-        if (! isset($cache[$fieldId])) {
+        if (! isset($cache[$fieldId]) || ! $use_cache) {
             $parentId = (int) $this->getOption('parentId');
             $descends = $this->getOption('descendants') > 0;
             if ($parentId > 0) {
@@ -823,15 +864,17 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
     {
         if ($args['type'] == 'trackeritem') {
             $itemId = $args['object'];
-            $trackerId = TikiLib::lib('trk')->get_tracker_for_item($itemId);
+            $trklib = TikiLib::lib('trk');
+            $trackerId = $trklib->get_tracker_for_item($itemId);
             $definition = Tracker_Definition::get($trackerId);
             if ($fieldIds = $definition->getCategorizedFields()) {
                 foreach ($fieldIds as $fieldId) {
                     $field = $definition->getField($fieldId);
-                    $handler = TikiLib::lib('trk')->get_field_handler($field);
+                    $handler = $trklib->get_field_handler($field);
                     $data = $handler->getFieldData();
                     $applicable = array_keys($data['list']);
-                    $value = $old_value = explode(",", TikiLib::lib('trk')->get_item_value($trackerId, $itemId, $fieldId));
+                    $itemValue = $trklib->get_item_value($trackerId, $itemId, $fieldId) ?? '';
+                    $value = $old_value = explode(",", $itemValue);
                     foreach ($args['added'] as $added) {
                         if (! in_array($added, $applicable)) {
                             continue;
@@ -850,7 +893,7 @@ class Tracker_Field_Category extends \Tracker\Field\AbstractItemField implements
                     }
                     if ($value != $old_value) {
                         $value = implode(",", $value);
-                        TikiLib::lib('trk')->modify_field($itemId, $fieldId, $value);
+                        $trklib->modify_field($itemId, $fieldId, $value);
                     }
                 }
             }

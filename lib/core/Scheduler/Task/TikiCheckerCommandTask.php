@@ -42,7 +42,7 @@ class Scheduler_Task_TikiCheckerCommandTask extends Scheduler_Task_CommandTask
                             if (! empty($listusers)) {
                                 foreach ($listusers['data'] as $user) {
                                     if (! in_array($user['email'], $recipients)) {
-                                        array_push($recipients, $user['email']);
+                                        $recipients[] = $user['email'];
                                         $subject = ! empty($tikilib->get_preference('browsertitle')) ? tra("Tiki Updates: ") . $tikilib->get_preference('browsertitle') : tra("Tiki Updates");
 
                                         // Send mail
@@ -58,7 +58,7 @@ class Scheduler_Task_TikiCheckerCommandTask extends Scheduler_Task_CommandTask
 
                                         if (! $mail->send([$user['email']])) {
                                             $msg = tra('Unable to send mail');
-                                            $mailerrors = print_r($mail->errors, true);
+                                            $mailerrors = print_r($mail->errors, true); // @phpstan-ignore disallowedFunctions.printR (returns mail errors as string, never prints)
                                             $msg .= '<br>' . $mailerrors;
                                             $this->logger->debug($msg);
                                         } else {

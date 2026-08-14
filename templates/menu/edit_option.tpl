@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 {block name="subtitle"}{/block}
 {block name="content"}
@@ -39,6 +39,7 @@
                         <option value="r" {if $info.type eq 'r'}selected="selected"{/if}>{tr}sorted section level 0{/tr}</option>
                         <option value="-" {if $info.type eq '-'}selected="selected"{/if}>{tr}separator{/tr}</option>
                     </select>
+                    <div class="form-text">{tr _0='<strong>' _1='</strong>'}Choose %0separator%1 to add a visual divider line in a menu or submenu.{/tr}</div>
                 </div>
             </div>
             <div class="mb-3 row">
@@ -59,8 +60,8 @@
                         {/foreach}
                     </select>
                     {if $option_groups|@count ge '2'}
-                        {if $prefs.jquery_select2 neq 'y'}{$ctrlMsg="{tr}Use Ctrl+Click to select multiple options{/tr}<br>"}{/if}
-                        {remarksbox type="tip" title="{tr}Tip{/tr}"}{$ctrlMsg}{tr}Selecting 2 groups means that the option will be seen if the user belongs to the 2 groups. If you want the 2 groups to see the option, create 2 options with one group each.{/tr}
+                        {if $prefs.elementplus_select neq 'y'}{$ctrlMsg="{tr}Use Ctrl+Click to select multiple options{/tr}<br>"}{/if}
+                        {remarksbox type="tip" title="{tr}Tip{/tr}"}{$ctrlMsg}{tr}Selecting multiple groups means that the option will be seen if the user belongs to one of the groups.{/tr}
                             <br>
                         {tr}If the url is ((PageName)), you do not need to put the groups, the option will be displayed only if the page can be displayed.{/tr}{/remarksbox}
                     {/if}

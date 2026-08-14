@@ -10,6 +10,9 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
 include_once('lib/directory/dirlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_DIRECTORY;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_directory');
 $access->check_permission_either(['tiki_p_admin_directory_sites','tiki_p_admin_directory_cats','tiki_p_validate_links']);
 //get_strings tra('Admin Directory')
@@ -26,7 +29,6 @@ $access->check_permission_either(['tiki_p_admin_directory_sites','tiki_p_admin_d
 $stats = $dirlib->dir_stats();
 $smarty->assign_by_ref('stats', $stats);
 // This page should be displayed with Directory section options
-$section = 'directory';
 include_once('tiki-section_options.php');
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');

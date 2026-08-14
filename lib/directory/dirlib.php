@@ -7,7 +7,7 @@
 // \todo extract HTML from here !!
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -106,18 +106,18 @@ class DirLib extends TikiLib
     // Functions to manage categories
     /**
      * @param $parent
-     * @param $cant
+     * @param $size
      * @return array
      */
-    public function get_random_subcats($parent, $cant)
+    public function get_random_subcats($parent, $size)
     {
-        //Return an array of 'cant' random subcategories
+        //Return an array of 'size' random subcategories
         $count = $this->getOne("select count(*) from `tiki_directory_categories` where `parent`=?", [(int)$parent]);
-        if ($count < $cant) {
-            $cant = $count;
+        if ($count < $size) {
+            $size = $count;
         }
         $ret = [];
-        while (count($ret) < $cant) {
+        while (count($ret) < $size) {
             $x = mt_rand(0, $count);
             if (! in_array($x, $ret)) {
                 $ret[] = $x;
@@ -154,9 +154,9 @@ class DirLib extends TikiLib
             $mid = "";
         }
         $query = "select * from `tiki_directory_categories` where `parent`=? $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_directory_categories` where `parent`=? $mid";
+        $query_count = "select count(*) from `tiki_directory_categories` where `parent`=? $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -168,7 +168,7 @@ class DirLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -192,9 +192,9 @@ class DirLib extends TikiLib
             $mid = "";
         }
         $query = "select * from `tiki_directory_categories` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_directory_categories` $mid";
+        $query_count = "select count(*) from `tiki_directory_categories` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -205,7 +205,7 @@ class DirLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -234,9 +234,9 @@ class DirLib extends TikiLib
             $bindvars[] = $isValid;
         }
         $query = "select * from `tiki_directory_sites` tds, `tiki_category_sites` tcs where tds.`siteId`=tcs.`siteId` and tcs.`categId`=? $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_directory_sites` tds, `tiki_category_sites` tcs where tds.`siteId`=tcs.`siteId` and tcs.`categId`=? $mid";
+        $query_count = "select count(*) from `tiki_directory_sites` tds, `tiki_category_sites` tcs where tds.`siteId`=tcs.`siteId` and tcs.`categId`=? $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -246,7 +246,7 @@ class DirLib extends TikiLib
         }
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -269,9 +269,9 @@ class DirLib extends TikiLib
             $mid = "";
         }
         $query = "select * from `tiki_directory_sites` where `isValid`=? $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_directory_sites` where `isValid`=? $mid";
+        $query_count = "select count(*) from `tiki_directory_sites` where `isValid`=? $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -280,7 +280,7 @@ class DirLib extends TikiLib
         }
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -320,9 +320,9 @@ class DirLib extends TikiLib
             $mid = "";
         }
         $query = "select * from `tiki_directory_sites` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_directory_sites` $mid";
+        $query_count = "select count(*) from `tiki_directory_sites` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -331,7 +331,7 @@ class DirLib extends TikiLib
         }
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -354,9 +354,9 @@ class DirLib extends TikiLib
         }
 
         $query = "select * from `tiki_directory_sites` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_directory_sites` $mid";
+        $query_count = "select count(*) from `tiki_directory_sites` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -365,7 +365,7 @@ class DirLib extends TikiLib
         }
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -389,9 +389,9 @@ class DirLib extends TikiLib
             $mid = "";
         }
         $query = "select * from `tiki_directory_categories` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_directory_categories` $mid";
+        $query_count = "select count(*) from `tiki_directory_categories` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -429,9 +429,9 @@ class DirLib extends TikiLib
             $mid = "";
         }
         $query = "select * from `tiki_directory_categories` where `categId`<>? $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_directory_categories` where `categId`<>? $mid";
+        $query_count = "select count(*) from `tiki_directory_categories` where `categId`<>? $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -463,9 +463,9 @@ class DirLib extends TikiLib
         }
 
         $query = "select * from `tiki_directory_categories` where `allowSites`=? $mid ";
-        $query_cant = "select count(*) from `tiki_directory_categories` where `allowSites`=? $mid";
+        $query_count = "select count(*) from `tiki_directory_categories` where `allowSites`=? $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -519,8 +519,8 @@ class DirLib extends TikiLib
             Feedback::success($feedback);
         } else {
             $query = "insert into `tiki_directory_sites`(`name`,`description`,`url`,`country`,`isValid`,`hits`,`created`,`lastModif`) values(?,?,?,?,?,?,?,?)";
-            $this->query($query, [$name,$description,$url,$country,$isValid,0,(int)$this->now,(int)$this->now]);
-            $siteId = $this->getOne("select max(siteId) from `tiki_directory_sites` where `created`=? and `name`=?", [(int)$this->now,$name]);
+            $this->query($query, [$name, $description, $url, $country, $isValid, 0, $this->now, $this->now]);
+            $siteId = $this->lastInsertId();
             $feedback = sprintf(tra('Site directory %s was created.'), $name);
             Feedback::success($feedback);
 
@@ -559,7 +559,7 @@ class DirLib extends TikiLib
         } else {
             $query = "insert into `tiki_directory_categories`(`parent`,`hits`,`name`,`description`,`childrenType`,`viewableChildren`,`allowSites`,`showCount`,`editorGroup`,`sites`) values(?,?,?,?,?,?,?,?,?,?)";
             $this->query($query, [(int)$parent,0,$name,$description,$childrenType,(int)$viewableChildren,$allowSites,$showCount,$editorGroup,0]);
-            $categId = $this->getOne("select max(`categId`) from `tiki_directory_categories` where `name`=?", [$name]);
+            $categId = $this->lastInsertId();
             $feedback = sprintf(tra('Category %s was created.'), $name);
             Feedback::success($feedback);
         }
@@ -663,8 +663,8 @@ class DirLib extends TikiLib
                 $siteId = $res2["siteId"];
                 $query3 = "delete from `tiki_category_sites` where `siteId`=? and `categId`=?";
                 $result3 = $this->query($query3, [(int)$siteId,(int)$categId]);
-                $cant = $this->getOne("select count(*) from `tiki_category_sites` where `siteId`=?", [(int)$siteId]);
-                if (! $cant) {
+                $count = $this->getOne("select count(*) from `tiki_category_sites` where `siteId`=?", [(int)$siteId]);
+                if (! $count) {
                     $this->dir_remove_site($siteId);
                 }
             }
@@ -698,9 +698,9 @@ class DirLib extends TikiLib
     public function dir_list_related_categories($parent, $offset, $maxRecords, $soet_mode, $find)
     {
         $query = "select * from `tiki_related_categories` where `categId`=?";
-        $query_cant = "select count(*) from `tiki_related_categories` where `categId`=?";
+        $query_count = "select count(*) from `tiki_related_categories` where `categId`=?";
         $result = $this->query($query, [(int)$parent], $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, [(int)$parent]);
+        $count = $this->getOne($query_count, [(int)$parent]);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -710,7 +710,7 @@ class DirLib extends TikiLib
         $retval = [];
         usort($ret, 'compare_paths');
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -732,8 +732,8 @@ class DirLib extends TikiLib
      */
     public function dir_url_exists($url)
     {
-        $cant = $this->getOne("select count(*) from `tiki_directory_sites` where `url`=?", [$url]);
-        return $cant;
+        $count = $this->getOne("select count(*) from `tiki_directory_sites` where `url`=?", [$url]);
+        return $count;
     }
 
     /**
@@ -798,7 +798,7 @@ class DirLib extends TikiLib
         $likestr = implode($how, $like);
         $query = "select * from `tiki_directory_sites` where `isValid`=? and $likestr  order by "
             . $this->convertSortMode($sort_mode);
-        $cant = $this->getOne("select count(*) from tiki_directory_sites where `isValid`=? and $likestr", $bindvars);
+        $count = $this->getOne("select count(*) from tiki_directory_sites where `isValid`=? and $likestr", $bindvars);
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
         $ret = [];
         while ($res = $result->fetchRow()) {
@@ -807,7 +807,7 @@ class DirLib extends TikiLib
         }
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -850,7 +850,7 @@ class DirLib extends TikiLib
             `tiki_directory_categories` tdc ";
         $query .= " where tds.`siteId`=tcs.`siteId` and tcs.`categId`=tdc.`categId` and `isValid`=? and tdc.`categId`=?
             and $likestr order by " . $this->convertSortMode($sort_mode);
-        $cant = $this->getOne(
+        $count = $this->getOne(
             "select count(*) from `tiki_directory_sites` tds,`tiki_category_sites` tcs,`tiki_directory_categories` tdc
             where tds.`siteId`=tcs.`siteId` and tcs.`categId`=tdc.`categId` and `isValid`=? and tdc.`categId`=?
             and $likestr",
@@ -864,7 +864,7 @@ class DirLib extends TikiLib
         }
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 }

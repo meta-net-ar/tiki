@@ -8,6 +8,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Lib\Wiki\XmlLib;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
@@ -24,6 +27,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $structlib = TikiLib::lib('struct');
 $categlib = TikiLib::lib('categ');
 include_once("lib/ziplib.php");
@@ -54,25 +60,14 @@ if ($tiki_p_edit_structures == 'y') {
         $access->checkCsrf();
         $structlib->s_remove_page($_REQUEST["rremovex"], true, empty($_REQUEST['page']) ? '' : $_REQUEST['page']);
     }
-    if (isset($_REQUEST['export'])) {
-        $access->checkCsrf(false, true);
-        $structure_info = $structlib->s_get_structure_info($_REQUEST['export']);
-        if ($prefs['feature_wiki_export'] != 'y' || $tiki_p_admin_wiki != 'y' || ! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_view')) {
-            Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
-        }
-        $structlib->s_export_structure($_REQUEST['export']);
-    }
     if (isset($_REQUEST['zip']) && $tiki_p_admin == 'y') {
         $access->checkCsrf(false, true);
-        include_once('lib/wiki/xmllib.php');
         $xmllib = new XmlLib();
         $zipFile = 'dump/xml.zip';
         $config['debug'] = false;
         if ($xmllib->export_pages(null, $_REQUEST['zip'], $zipFile, $config)) {
-            if (! $config['debug']) {
-                header("location: $zipFile");
-                die;
-            }
+            header("location: $zipFile");
+            die;
         } else {
             $smarty->assign('error', $xmllib->get_error());
         }
@@ -83,7 +78,6 @@ if ($tiki_p_edit_structures == 'y') {
         if (! $tikilib->user_has_perm_on_object($user, $structure_info["pageName"], 'wiki page', 'tiki_p_view')) {
             Feedback::errorAndDie(tra('You do not have permission to view this page.'), \Laminas\Http\Response::STATUS_CODE_401);
         }
-        TikiLib::lib('header')->setXRobotsTag($robots);
         header("content-type: text/plain");
         $structlib->s_export_structure_tree($_REQUEST['export_tree']);
         die;
@@ -200,7 +194,7 @@ if ($tiki_p_edit_structures == 'y') {
                         }
                     } elseif ($prefs['feature_wiki_categorize_structure'] == 'y') {
                         // page that is added is categorized
-                        if (! isset($_REQUEST["cat_categories"]) || ! isset($_REQUEST["cat_categorize"]) || isset($_REQUEST["cat_categorize"]) && $_REQUEST["cat_categorize"] != 'on') {
+                        if (! isset($_REQUEST["cat_categories"]) || ! isset($_REQUEST["cat_categorize"]) || $_REQUEST["cat_categorize"] != 'on') {
                             // alert that current pages are categorized
                             $alert_to_remove_cats[] = $cat_name;
                         } else {
@@ -238,23 +232,18 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 // default $maxRecords defined in tiki-setup.php
 if (isset($_REQUEST['maxRecords'])) {
     $maxRecords = $_REQUEST['maxRecords'];
+} else {
+    $maxRecords = $prefs['maxRecords'];
 }
+$smarty->assign('maxRecords', $maxRecords);
 $filter = '';
 if (! empty($_REQUEST['lang'])) {
     $filter['lang'] = $_REQUEST['lang'];
@@ -278,7 +267,7 @@ if ($prefs['feature_multilingual'] == 'y') {
     $smarty->assign_by_ref('languages', $languages);
 }
 $channels = $structlib->list_structures($offset, $maxRecords, $sort_mode, $find, $exact_match, $filter);
-$smarty->assign('cant', $channels["cant"]);
+$smarty->assign('count', $channels["count"]);
 $smarty->assign_by_ref('channels', $channels["data"]);
 include_once('tiki-section_options.php');
 // disallow robots to index page:

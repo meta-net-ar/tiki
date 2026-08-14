@@ -1,7 +1,7 @@
 {* Id *}
-<div class="thumbnailframe" style="width:100%;height:{if $view != 'page'}{$thumbnailcontener_size}px{else}100%{/if}{if $show_infos neq 'y'};margin-bottom:4px{/if}">
+<div class="thumbnailframe styling-element" style="width:100%;height:{if $view != 'page'}{$thumbnailcontener_size}px{else}100%{/if}{if $show_infos neq 'y'};margin-bottom:4px{/if}">
     <div class="thumbimage">
-        <div class="thumbimagesub">{assign var=key_type value=$file.type}
+        <div class="thumbimagesub">{$key_type=$file.type}
             {$imagetypes = 'n'}
             {if $file.isgal eq 1}
                 <a {$link}>
@@ -17,7 +17,7 @@
                 {/if}
                 <a {$link}
                     {if $prefs.feature_shadowbox eq 'y' && empty($filegals_manager)}
-                        {if $imagetypes eq 'y' }
+                        {if $imagetypes eq 'y'}
                                 data-box="box[g]"
                         {elseif $key_type eq 'text/html'}
                                 data-box="shadowbox[gallery];type=iframe"
@@ -45,7 +45,7 @@
                     {if $key_type neq 'image/svg' and $key_type neq 'image/svg+xml'}
                         {if $imagetypes eq 'y' or $prefs.theme_iconset eq 'legacy'}
                             {if $view eq 'page'}
-                                <img src="tiki-download_file.php?fileId={$file.id}&preview" style="width:{$maxWidth};max-width: 100%;">
+                                <img src="tiki-download_file.php?fileId={$file.id}&preview" style="width:{$maxWidth}px;max-width: 100%;">
                             {else}
                                 <img src="{$file.id|sefurl:thumbnail}" style="max-height:{$thumbnailcontener_size}px">
                             {/if}

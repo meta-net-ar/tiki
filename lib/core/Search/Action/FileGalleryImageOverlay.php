@@ -103,7 +103,7 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
         $definition = Tracker_Definition::get($info['trackerId']);
         $fieldDefinition = $definition->getFieldFromPermName($field);
 
-        /** @var FileGalLib $fileGal */
+        /** @var Tiki\Lib\Filegals\FileGalLib $fileGal */
         $fileGal = TikiLib::lib('filegal');
 
         $fileList = $info[$fieldDefinition['fieldId']];
@@ -121,7 +121,7 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
         $newFileList = [];
         foreach (explode(',', $fileList) as $fileId) {
             $file = $fileGal->get_file($fileId);
-            if (substr($file['filetype'], 0, 6) != 'image/') {
+            if (! str_starts_with($file['filetype'], 'image/')) {
                 $newFileList[] = $fileId;
                 continue;
             }
@@ -187,6 +187,11 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
         return false;
     }
 
+    public function requiresConfirm()
+    {
+        return false;
+    }
+
     /**
      * Generate a string based on the template provided
      *
@@ -226,7 +231,7 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
 
         if ($checkMissing) {
             foreach ($values as $key => $value) {
-                if (strpos($template, $key) !== false) {
+                if (str_contains($template, $key)) {
                     if (empty($value)) {
                         $missingTemplateKeys[] = $key;
                     }
@@ -268,7 +273,7 @@ class Search_Action_FileGalleryImageOverlay implements Search_Action_Action
         }
         $exifData = exif_read_data('data://image/jpeg;base64,' . base64_encode($fileData['data']));
 
-        $exif['datetime'] = isset($exifData['DateTimeOriginal']) ? $exifData['DateTimeOriginal'] : '';
+        $exif['datetime'] = $exifData['DateTimeOriginal'] ?? '';
 
         if (isset($exifData['GPSLongitude']) && isset($exifData['GPSLatitude'])) {
             $latitude = $this->gpsCoordinates($exifData["GPSLatitude"], $exifData['GPSLatitudeRef']);

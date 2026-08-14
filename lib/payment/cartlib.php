@@ -5,6 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
+use Tiki\Lib\Auth\Tokens;
 
 class CartLib
 {
@@ -557,8 +558,7 @@ class CartLib
             $shopperurl = 'tiki-index.php?page=' . $prefs['payment_cart_anon_reviewpage'] . '&shopper=' . (int)$cartuser;
             global $tikiroot, $prefs;
             $shopperurl = $this->tikilib->httpPrefix(true) . $tikiroot . $shopperurl;
-            require_once 'lib/auth/tokens.php';
-            $tokenlib = AuthTokens::build($prefs);
+            $tokenlib = Tokens::build($prefs);
             $shopperurl = $tokenlib->includeToken($shopperurl, [$prefs['payment_cart_anon_group'], 'Anonymous']);
 
             if (! empty($_SESSION['shopperinfo']['email'])) {

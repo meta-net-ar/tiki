@@ -60,6 +60,12 @@ class Search_ContentSource_TrackerFieldSource implements Search_ContentSource_In
             'position' => $typeFactory->numeric($field['position']),
             'permName' => $typeFactory->identifier($field['permName']),
 
+            'type' => $typeFactory->identifier($field['type']),
+            'options' => $typeFactory->json($field['options_map']),
+            'is_main' => $typeFactory->identifier($field['isMain']),
+            'is_multilingual' => $typeFactory->identifier($field['isMultilingual']),
+            'is_searchable' => $typeFactory->identifier($field['isSearchable']),
+
             'searchable' => $typeFactory->identifier('n'),
 
             'view_permission' => $typeFactory->identifier('tiki_p_view_trackers'),

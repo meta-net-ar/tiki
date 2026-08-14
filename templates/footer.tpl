@@ -1,6 +1,6 @@
 {* ==> put in this file what is not displayed in the layout (javascript, debug..)*}
 {foreach [1, 2, 3] as $modal}
-    {assign var='modalId' value=($modal eq 1) ? 'bootstrap-modal' : "bootstrap-modal-{$modal}"}
+    {$modalId=($modal == 1) ? 'bootstrap-modal' : "bootstrap-modal-{$modal}"}
     <div id={$modalId} class="modal fade footer-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title-{$modalId}" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -19,15 +19,19 @@
         </div>
     </div>
 {/foreach}
-   
+
 {if $prefs.feature_inline_comments eq 'y' && $tiki_p_post_comments eq 'y'}
-    <a id="note-editor-comment" class="alert alert-info" style="display:none;" href="#">{tr}Add Comment{/tr}</a>
+    <a id="note-editor-comment" class="alert alert-info" style="display:none;" href="#" role="button">{tr}Add Comment{/tr}</a>
 {/if}
 {if isset($force_fill_action)}
     {include file="tiki-tracker_force_fill.tpl"}
 {/if}
+
+{if Perms::get()->admin and isset($modlib)}
+    {assign var=module_pref_errors value=$modlib->pref_errors}
+{/if}
 {if $module_pref_errors|default:null}
-    <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} modules">
+    <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std modules">
         {remarksbox type="warning" title="{tr}Module errors{/tr}"}
             {tr}The following modules could not be loaded{/tr}
             <form method="post" action="tiki-admin.php">
@@ -46,7 +50,7 @@
 {if (! isset($display) or $display eq '')}
     {if $phpErrors}
         {if ($prefs.error_reporting_adminonly eq 'y' and $tiki_p_admin eq 'y') or $prefs.error_reporting_adminonly eq 'n'}
-    <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} errors-wrapper my-3">
+    <div class="container{if isset($smarty.session.fullscreen) && $smarty.session.fullscreen eq 'y'}-fluid{/if} container-std errors-wrapper my-3">
         {button _ajax="n" _id="show-errors-button" _onclick="flip('errors');return false;" _text="{tr}Show PHP error messages{/tr}"}
         <div id="errors" class="alert alert-warning" style="display: {if (isset($smarty.session.tiki_cookie_jar.show_errors) and $smarty.session.tiki_cookie_jar.show_errors eq 'y')}block{else}none{/if};">
             &nbsp;{listfilter selectors='#errors>div.rbox-data'}
@@ -91,8 +95,8 @@
     {* some js to enabled falsely detected js disabled browsers to be rechecked * disabled when in the installer *}
 
 {/if}
-{if !empty($prefs.site_piwik_code)}
-    {wikiplugin _name=piwik code=$prefs.site_piwik_code group_option=$prefs.site_piwik_group_option groups={$prefs.site_piwik_groups|join:','}}{/wikiplugin}
+{if !empty($prefs.site_matomo_code)}
+    {wikiplugin _name=matomo code=$prefs.site_matomo_code group_option=$prefs.site_matomo_group_option groups={$prefs.site_matomo_groups|join:','}}{/wikiplugin}
 {/if}
 {if $prefs.feature_scheduler eq "y" && $prefs.webcron_enabled == 'y' && $prefs.webcron_type != 'url'}
     <script type="text/javascript">

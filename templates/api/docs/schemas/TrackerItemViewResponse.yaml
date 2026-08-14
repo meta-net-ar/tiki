@@ -1,0 +1,33 @@
+---
+description: Response from GET /trackers/{trackerId}/items/{itemId}.
+type: object
+required:
+  - title
+  - format
+  - itemId
+  - trackerId
+  - fields
+  - canModify
+  - item_info
+  - info
+properties:
+  title:
+    type: string
+    nullable: true
+  format:
+    type: string
+    nullable: true
+  itemId:
+    type: integer
+  trackerId:
+    type: integer
+  fields:
+    type: array
+    items:
+      $ref: schemas-TrackerItemField.yaml
+  canModify:
+    type: boolean
+  item_info:
+    $ref: schemas-TrackerItem.yaml
+  info:
+    $ref: schemas-TrackerItem.yaml

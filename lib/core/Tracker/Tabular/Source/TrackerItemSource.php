@@ -7,7 +7,7 @@
 namespace Tracker\Tabular\Source;
 
 use Tracker\Tabular\Schema;
-use Tracker_item;
+use Tracker_Item;
 
 class TrackerItemSource implements SourceInterface
 {

@@ -3,10 +3,10 @@
 
     <div
         {if isset($pagemd5) && $pagemd5}
-            {assign var=cookie_key value="show_attzone$pagemd5"}
+            {$cookie_key="show_attzone$pagemd5"}
             id="attzone{$pagemd5}" class="w-100"
         {else}
-            {assign var=cookie_key value="show_attzone"}
+            {$cookie_key="show_attzone"}
             id="attzone" class="w-100"
         {/if}
         {if (isset($smarty.session.tiki_cookie_jar.$cookie_key) and $smarty.session.tiki_cookie_jar.$cookie_key eq 'y')
@@ -54,11 +54,11 @@
                 {section name=ix loop=$atts}
                     <tr>
                         <td class="id">{$atts[ix].attId}</td>
-                        <td class="text">
+                        <td class="text text-break">
                             {$atts[ix].filename|iconify}
                             <a class="tablename" href="tiki-download_wiki_attachment.php?attId={$atts[ix].attId}&amp;page={$page|escape:"url"}&amp;download=y">{$atts[ix].filename}</a>
                         </td>
-                        <td class="text"><small>{$atts[ix].comment|escape}</small></td>
+                        <td class="text"><small title="{$atts[ix].comment|escape}">{$atts[ix].comment|truncate:200:"...":true|escape}</small></td>
                         <td class="date">
                             <small>{if $atts[ix].user}{$atts[ix].user|userlink}{/if} {$atts[ix].created|tiki_short_datetime}</small>
                         </td>
@@ -115,7 +115,7 @@
                     </div>
 
                     <div class="tiki-form-group row">
-                        <label class="col-sm-2 col-form-label" for="attach-comment">{tr}Comment{/tr}</label>
+                        <label class="col-sm-2 col-form-label" for="attach-comment">{tr}Description{/tr}</label>
                         <div class="col-sm-8">
                             <input class="form-control" type="text" name="attach_comment" maxlength="250" id="attach-comment" placeholder="{tr}File upload comment{/tr}...">
                         </div>

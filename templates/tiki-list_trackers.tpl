@@ -7,22 +7,22 @@
 {block name="navigation"}
     {if $tiki_p_admin_trackers eq 'y'}
         <div class="t_navbar mb-3">{* Class provides 15px bottom margin. *}
-        
+
             <a class="btn btn-link me-2" href="{bootstrap_modal controller=tracker action=replace}">
                 {icon name="create"} {tr}Create{/tr}
             </a>
-            
+
             {if $trackers|count gt 0}
                 <a class="btn btn-link me-2" href="{bootstrap_modal controller=tracker action=duplicate}">
                     {icon name="copy"} {tr}Duplicate{/tr}
                 </a>
             {/if}
             {if $tiki_p_export_tracker eq 'y'}
-                <a href="tiki-export_tracker_schema.php" class="btn btn-link" >
+                <a href="tiki-export_tracker_schema.php" class="btn btn-link">
                     {icon name="diagram"} {tr}ER diagram{/tr}
                 </a>
             {/if}
-            
+
             <button type="button" class="btn btn-link dropdown-toggle" data-bs-toggle="dropdown">
                 {icon name="import"} {tr}Import{/tr}
             </button>
@@ -39,7 +39,7 @@
                     </a>
                 {/if}
             </div>
-            
+
             {if $prefs.tracker_tabular_enabled eq 'y' && $tiki_p_admin_trackers eq 'y'}
                 <a class="btn btn-link" href="{service controller=tabular action=manage}">
                     {icon name="list"} {tr}Manage Import-Export Formats{/tr}
@@ -63,34 +63,38 @@
         {/if}
     {/if}
 
-    <div class="{if $js}table-responsive{/if}"> {*the table-responsive class cuts off dropdown menus *}
+    <div class="{if $js}table-responsive{/if} styling-element"> {*the table-responsive class cuts off dropdown menus *}
         <table class="table table-condensed table-hover table-striped">
             <tr>
-                <th class="id text-center">{self_link _sort_arg='sort_mode' _sort_field='trackerId'}{tr}Id{/tr}{/self_link}</th>
+                <th class="id text-center">{self_link _sort_arg='sort_mode' _sort_field='trackerId'}{tr}Id{/tr}{/self_link}
+                </th>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='name'}{tr}Name{/tr}{/self_link}</th>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='created'}{tr}Created{/tr}{/self_link}</th>
                 <th>{self_link _sort_arg='sort_mode' _sort_field='lastModif'}{tr}Last modified{/tr}{/self_link}</th>
+                {if $tiki_p_admin eq 'y' or $tiki_p_admin_trackers eq 'y'}
+                    <th>{self_link _sort_arg='sort_mode' _sort_field='fieldsCount'}{tr}Fields{/tr}{/self_link}</th>
+                {/if}
                 <th class="text-end">{self_link _sort_arg='sort_mode' _sort_field='items'}{tr}Items{/tr}{/self_link}</th>
+                {if $prefs.tracker_display_categories eq 'y'}
+                    <th>{self_link _sort_arg='sort_mode' _sort_field='items'}{tr}Categories{/tr}{/self_link}</th>
+                {/if}
+                {if $prefs.tracker_display_wiki_only_status eq 'y'}
+                    <th>{self_link _sort_arg='sort_mode' _sort_field='items'}{tr}Wiki Only{/tr}{/self_link}</th>
+                {/if}
                 <td></td> {* Changed from th to td to prevent ARIA empty header error *}
             </tr>
 
             {foreach from=$trackers item=tracker}
                 <tr>
                     <td class="id text-center">
-                        <a
-                            class="tips"
-                            title="{tr}{$tracker.name|escape}:{/tr}{tr}View{/tr}"
-                            href="{$tracker.trackerId|sefurl:'tracker'}"
-                        >
+                        <a class="tips" title="{tr}{$tracker.name|escape}:{/tr}{tr}View{/tr}"
+                            href="{$tracker.trackerId|sefurl:'tracker'}">
                             {$tracker.trackerId|escape}
                         </a>
                     </td>
                     <td class="text">
-                        <a
-                            class="tips"
-                            title="{tr}{$tracker.name|escape}:{/tr}{tr}View{/tr}"
-                            href="{$tracker.trackerId|sefurl:'tracker'}"
-                        >
+                        <a class="tips" title="{tr}{$tracker.name|escape}:{/tr}{tr}View{/tr}"
+                            href="{$tracker.trackerId|sefurl:'tracker'}">
                             {tr}{$tracker.name|escape}{/tr}
                         </a>
                         <div class="description form-text">
@@ -106,158 +110,166 @@
                     </td>
                     <td class="date">{$tracker.created|tiki_short_date}</td>
                     <td class="date">{$tracker.lastModif|tiki_short_datetime}</td>
+                    {if $tiki_p_admin eq 'y' or $tiki_p_admin_trackers eq 'y'}
+                        <td class="integer">
+                            <a class="tips" title="{tr}{$tracker.name|escape}:{/tr}{tr}View fields{/tr}"
+                                href="tiki-admin_tracker_fields.php?trackerId={$tracker.trackerId}">
+                                {$tracker.fieldsCount|escape}
+                            </a>
+                        </td>
+                    {/if}
                     <td class="integer">
-                        <a
-                            class="tips"
-                            title="{tr}{$tracker.name|escape}:{/tr}{tr}View{/tr}"
-                            href="tiki-view_tracker.php?trackerId={$tracker.trackerId}"
-                        >
-
-                                {$tracker.items|escape}
-
+                        <a class="tips" title="{tr}{$tracker.name|escape}:{/tr}{tr}View{/tr}"
+                            href="tiki-view_tracker.php?trackerId={$tracker.trackerId}">
+                            {$tracker.items|escape}
                         </a>
                     </td>
+                    {if $prefs.tracker_display_categories eq 'y'}
+                        <td class="categories">
+                            {if !empty($tracker.category_details)}
+                                <ul class="tracker-category-list list-unstyled mb-0">
+                                    {foreach from=$tracker.category_details item=category}
+                                        <li>
+                                            <a class="tips" href="tiki-browse_categories.php?parentId={$category.id}&deep=off&type=#contentbrowse-categories-2" title="{$category.name|escape}:{tr}View category{/tr}">
+                                                <span class="badge bg-info">{$category.name|escape}</span>
+                                            </a>
+                                        </li>
+                                    {/foreach}
+                                </ul>
+                            {else}
+                                <span class="text-muted">{tr}No categories{/tr}</span>
+                            {/if}
+                        </td>
+                    {/if}
+                    {if $prefs.tracker_display_wiki_only_status eq 'y'}
+                        <td class="text-center">
+                            {if $tracker.wiki_only eq 'y'}
+                                <span class="badge bg-success"
+                                    title="{tr}Non-admin users can only access this tracker through wiki pages{/tr}">{tr}Yes{/tr}</span>
+                            {else}
+                                <span class="text-muted">-</span>
+                            {/if}
+                        </td>
+                    {/if}
                     <td class="action">
                         {actions}
-                            {strip}
-                                {if $tracker.permissions->admin_trackers}
+                        {strip}
+                            {if $tracker.permissions->admin_trackers}
+                                <action>
+                                    <a href="{$tracker.trackerId|sefurl:'trackerfields'}">
+                                        {icon name='th-list' _menu_text='y' _menu_icon='y' alt="{tr}Fields{/tr}"}
+                                    </a>
+                                </action>
+                                <action>
+                                    <a href="{service controller=tracker action=replace trackerId=$tracker.trackerId modal=true}"
+                                        data-bs-toggle="modal" data-backdrop="static" data-bs-target="#bootstrap-modal"
+                                        onclick="$('[data-bs-toggle=popover]').popover('hide');">
+                                        {icon name='settings' _menu_text='y' _menu_icon='y' alt="{tr}Properties{/tr}"}
+                                    </a>
+                                </action>
+                            {/if}
+                            {if $tracker.permissions->export_tracker}
+                                <action>
+                                    <a onclick="$('[data-bs-toggle=popover]').popover('hide');" data-bs-toggle="modal"
+                                        data-backdrop="static" data-bs-target="#bootstrap-modal"
+                                        href="{service controller=tracker action=export trackerId=$tracker.trackerId modal=1}">
+                                        {icon name='export' _menu_text='y' _menu_icon='y' alt="{tr}Export{/tr}"}
+                                    </a>
+                                </action>
+                                <action>
+                                    <a href="tiki-export_tracker_schema.php?trackerIds[]={$tracker.trackerId}">
+                                        {icon name="diagram"} {tr}Show in ER diagram{/tr}
+                                    </a>
+                                </action>
+                            {/if}
+                            {if $tracker.permissions->admin_trackers}
+                                <action>
+                                    <a onclick="$('[data-bs-toggle=popover]').popover('hide');" data-bs-toggle="modal"
+                                        data-backdrop="static" data-bs-target="#bootstrap-modal"
+                                        href="{service controller=tracker action=import_items trackerId=$tracker.trackerId modal=1}">
+                                        {icon name='import' _menu_text='y' _menu_icon='y' alt="{tr}Import{/tr}"}
+                                    </a>
+                                </action>
+                                <action>
+                                    <a onclick="$('[data-bs-toggle=popover]').popover('hide');" data-bs-toggle="modal"
+                                        data-backdrop="static" data-bs-target="#bootstrap-modal"
+                                        href="{service controller=tracker_todo action=view trackerId=$tracker.trackerId modal=1}">
+                                        {icon name='calendar' _menu_text='y' _menu_icon='y' alt="{tr}Events{/tr}"}
+                                    </a>
+                                </action>
+                            {/if}
+                            <action>
+                                <a href="{$tracker.trackerId|sefurl:'tracker'}">
+                                    {icon name='view' _menu_text='y' _menu_icon='y' alt="{tr}View{/tr}"}
+                                </a>
+                            </action>
+                            {if $prefs.feature_group_watches eq 'y' and ( $tiki_p_admin_users eq 'y' or $tiki_p_admin eq 'y' )}
+                                <action>
+                                    <a
+                                        href="tiki-object_watches.php?objectId={$tracker.trackerId}&amp;watch_event=tracker_modified&amp;objectType=tracker&amp;objectName={$tracker.name|escape:"url"}&amp;objectHref={'tiki-view_tracker.php?trackerId='|cat:$tracker.trackerId|escape:"url"}">
+                                        {icon name='watch-group' _menu_text='y' _menu_icon='y' alt="{tr}Group monitor{/tr}"}
+                                    </a>
+                                </action>
+                            {/if}
+                            {if $prefs.feature_user_watches eq 'y' and $tracker.permissions->watch_trackers and $user}
+                                {if !empty($tracker.watched)}
                                     <action>
-                                        <a href="{$tracker.trackerId|sefurl:'trackerfields'}">
-                                            {icon name='th-list' _menu_text='y' _menu_icon='y' alt="{tr}Fields{/tr}"}
-                                        </a>
+                                        <form action="tiki-view_tracker.php" method="post">
+                                            <input type="hidden" name="trackerId" value="{$tracker.trackerId|escape}">
+                                            {ticket}
+                                            <button type="submit" name="watch" value="stop" class="btn btn-link link-list">
+                                                {icon name="stop-watching"} {tr}Stop monitoring{/tr}
+                                            </button>
+                                        </form>
                                     </action>
+                                {else}
                                     <action>
-                                        <a href="{service controller=tracker action=replace trackerId=$tracker.trackerId modal=true}"
-                                            data-bs-toggle="modal"
-                                            data-backdrop="static"
-                                            data-bs-target="#bootstrap-modal"
-                                            onclick="$('[data-bs-toggle=popover]').popover('hide');"
-                                        >
-                                            {icon name='settings' _menu_text='y' _menu_icon='y' alt="{tr}Properties{/tr}"}
-                                        </a>
+                                        <form action="tiki-view_tracker.php" method="post">
+                                            <input type="hidden" name="trackerId" value="{$tracker.trackerId|escape}">
+                                            {ticket}
+                                            <button type="submit" name="watch" value="add" class="btn btn-link link-list">
+                                                {icon name="watch"} {tr}Monitor{/tr}
+                                            </button>
+                                        </form>
                                     </action>
                                 {/if}
-                                {if $tracker.permissions->export_tracker}
+                            {/if}
+                            {if $prefs.feed_tracker eq "y"}
+                                <action>
+                                    <a href="tiki-tracker_rss.php?trackerId={$tracker.trackerId}">
+                                        {icon name='rss' _menu_text='y' _menu_icon='y' alt="{tr}Feed{/tr}"}
+                                    </a>
+                                </action>
+                            {/if}
+                            {if $prefs.feature_search eq 'y'}
+                                <action>
+                                    <a href="tiki-searchindex.php?filter~tracker_id={$tracker.trackerId|escape}">
+                                        {icon name='search' _menu_text='y' _menu_icon='y' alt="{tr}Search{/tr}"}
+                                    </a>
+                                </action>
+                            {/if}
+
+                            {if $tracker.permissions->admin_trackers}
+                                <action>
+                                    {permission_link mode=text type=tracker permType=trackers id=$tracker.trackerId}
+                                </action>
+                                {if $tracker.items > 0}
                                     <action>
-                                        <a onclick="$('[data-bs-toggle=popover]').popover('hide');"
-                                            data-bs-toggle="modal"
-                                            data-backdrop="static"
-                                            data-bs-target="#bootstrap-modal"
-                                            href="{service controller=tracker action=export trackerId=$tracker.trackerId modal=1}"
-                                        >
-                                            {icon name='export' _menu_text='y' _menu_icon='y' alt="{tr}Export{/tr}"}
-                                        </a>
-                                    </action>
-                                    <action>
-                                        <a 
-                                            href="tiki-export_tracker_schema.php?trackerIds[]={$tracker.trackerId}"
-                                        >
-                                            {icon name="diagram"} {tr}Show in ER diagram{/tr}
-                                        </a>
-                                    </action>
-                                {/if}
-                                {if $tracker.permissions->admin_trackers}
-                                    <action>
-                                        <a onclick="$('[data-bs-toggle=popover]').popover('hide');"
-                                            data-bs-toggle="modal"
-                                            data-backdrop="static"
-                                            data-bs-target="#bootstrap-modal"
-                                            href="{service controller=tracker action=import_items trackerId=$tracker.trackerId modal=1}"
-                                        >
-                                            {icon name='import' _menu_text='y' _menu_icon='y' alt="{tr}Import{/tr}"}
-                                        </a>
-                                    </action>
-                                    <action>
-                                        <a onclick="$('[data-bs-toggle=popover]').popover('hide');"
-                                            data-bs-toggle="modal"
-                                            data-backdrop="static"
-                                            data-bs-target="#bootstrap-modal"
-                                            href="{service controller=tracker_todo action=view trackerId=$tracker.trackerId modal=1}"
-                                        >
-                                            {icon name='calendar' _menu_text='y' _menu_icon='y' alt="{tr}Events{/tr}"}
+                                        <a href="{service controller=tracker action=clear trackerId=$tracker.trackerId}"
+                                            class="clear confirm-prompt">
+                                            {icon name='trash' _menu_text='y' _menu_icon='y' alt="{tr}Clear{/tr}"}
                                         </a>
                                     </action>
                                 {/if}
                                 <action>
-                                    <a href="{$tracker.trackerId|sefurl:'tracker'}">
-                                        {icon name='view' _menu_text='y' _menu_icon='y' alt="{tr}View{/tr}"}
+                                    <a onclick="$('[data-bs-toggle=popover]').popover('hide');"
+                                        href="{service controller=tracker action=remove trackerId=$tracker.trackerId}"
+                                        class="remove confirm-prompt">
+                                        {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
                                     </a>
                                 </action>
-                                {if $prefs.feature_group_watches eq 'y' and ( $tiki_p_admin_users eq 'y' or $tiki_p_admin eq 'y' )}
-                                    <action>
-                                        <a href="tiki-object_watches.php?objectId={$tracker.trackerId}&amp;watch_event=tracker_modified&amp;objectType=tracker&amp;objectName={$tracker.name|escape:"url"}&amp;objectHref={'tiki-view_tracker.php?trackerId='|cat:$tracker.trackerId|escape:"url"}">
-                                            {icon name='watch-group' _menu_text='y' _menu_icon='y' alt="{tr}Group monitor{/tr}"}
-                                        </a>
-                                    </action>
-                                {/if}
-                                {if $prefs.feature_user_watches eq 'y' and $tracker.permissions->watch_trackers and $user}
-                                    {if !empty($tracker.watched)}
-                                        <action>
-                                            <form action="tiki-view_tracker.php" method="post">
-                                                <input type="hidden" name="trackerId" value="{$tracker.trackerId|escape}">
-                                                {ticket}
-                                                <button
-                                                        type="submit"
-                                                        name="watch"
-                                                        value="stop"
-                                                        class="btn btn-link link-list"
-                                                >
-                                                    {icon name="stop-watching"} {tr}Stop monitoring{/tr}
-                                                </button>
-                                            </form>
-                                        </action>
-                                    {else}
-                                        <action>
-                                            <form action="tiki-view_tracker.php" method="post">
-                                                <input type="hidden" name="trackerId" value="{$tracker.trackerId|escape}">
-                                                {ticket}
-                                                <button
-                                                        type="submit"
-                                                        name="watch"
-                                                        value="add"
-                                                        class="btn btn-link link-list"
-                                                >
-                                                    {icon name="watch"} {tr}Monitor{/tr}
-                                                </button>
-                                            </form>
-                                        </action>
-                                    {/if}
-                                {/if}
-                                {if $prefs.feed_tracker eq "y"}
-                                    <action>
-                                        <a href="tiki-tracker_rss.php?trackerId={$tracker.trackerId}">
-                                            {icon name='rss' _menu_text='y' _menu_icon='y' alt="{tr}Feed{/tr}"}
-                                        </a>
-                                    </action>
-                                {/if}
-                                {if $prefs.feature_search eq 'y'}
-                                    <action>
-                                        <a href="tiki-searchindex.php?filter~tracker_id={$tracker.trackerId|escape}">
-                                            {icon name='search' _menu_text='y' _menu_icon='y' alt="{tr}Search{/tr}"}
-                                        </a>
-                                    </action>
-                                {/if}
-
-                                {if $tracker.permissions->admin_trackers}
-                                    <action>
-                                        {permission_link mode=text type=tracker permType=trackers id=$tracker.trackerId}
-                                    </action>
-                                    {if $tracker.items > 0}
-                                        <action>
-                                            <a href="{service controller=tracker action=clear trackerId=$tracker.trackerId}" class="clear confirm-prompt">
-                                                {icon name='trash' _menu_text='y' _menu_icon='y' alt="{tr}Clear{/tr}"}
-                                            </a>
-                                        </action>
-                                    {/if}
-                                    <action>
-                                        <a onclick="$('[data-bs-toggle=popover]').popover('hide');" href="{service controller=tracker action=remove trackerId=$tracker.trackerId}"
-                                            class="remove confirm-prompt"
-                                        >
-                                            {icon name='remove' _menu_text='y' _menu_icon='y' alt="{tr}Delete{/tr}"}
-                                        </a>
-                                    </action>
-                                {/if}
-                            {/strip}
+                            {/if}
+                        {/strip}
                         {/actions}
                     </td>
                 </tr>
@@ -270,21 +282,21 @@
             {/foreach}
         </table>
     </div>
-    {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+    {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
 
-{jq}
-$(document).on('click', '.remove.confirm-prompt', $.clickModal({
-        message: "{tr}Do you really remove this tracker?{/tr}",
-        success: function (data) {
-            history.go(0);    // reload
-        }
+    {jq}
+    $(document).on('click', '.remove.confirm-prompt', $.clickModal({
+    message: "{tr}Do you really remove this tracker?{/tr}",
+    success: function (data) {
+    history.go(0); // reload
+    }
     }));
-$(document).on('click', '.clear.confirm-prompt', $.clickModal({
+    $(document).on('click', '.clear.confirm-prompt', $.clickModal({
         message: "{tr}Do you really want to clear all the items from this tracker? (N.B. there is no undo and notifications will not be sent){/tr}",
-        success: function (data) {
-            history.go(0);    // reload
-        }
+    success: function (data) {
+    history.go(0); // reload
+    }
     }));
-{/jq}
+    {/jq}
 
 {/block}

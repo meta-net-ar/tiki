@@ -1,9 +1,20 @@
-// Files for the BookStacked theme for Tiki Wiki CMS Groupware, Bootstrap 5+.
-/* The BookStacked theme for Tiki Wiki CMS Groupware uses color and other design cues from the MIT-licensed BookStack wiki software (https://www.bookstackapp.com/).
+@charset "UTF-8";
+/*!
+ * The BookStacked theme by the Tiki Community for Tiki Wiki CMS Groupware (https://tiki.org)
+ * Copyright 2002-2025 The Tiki Community as described in copyright.txt
+ * Licensed under MIT
+ * The BookStacked theme for Tiki Wiki CMS Groupware uses color and other design cues from the MIT-licensed BookStack wiki software (https://www.bookstackapp.com/).
+ */
+/*!
+ * Bootstrap  v5.3.6 (https://getbootstrap.com/)
+ * Copyright 2011-2025 The Bootstrap Authors
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */
+/*!
  * See https://themes.tiki.org/BookStacked for more information about using this theme, including:
  * - Position side-column content sticky-top or not (wide side-column menu dropdowns may be cut off when content is sticky-top).
  * - Classify wiki pages as "Bookpage" to optimize page content width for reading in large displays.
- */
+*/
 
 @import "../../base_files/scss/_tiki-bootstrap_functions"; // 1. Functions are included first (so colors, etc. can be manipulated).
 

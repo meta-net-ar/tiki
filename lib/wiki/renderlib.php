@@ -142,7 +142,6 @@ class WikiRenderer
         // Need to have showstructs when in more than one struct - for usability reasons
         $structs = $structlib->get_page_structures($this->page);
         $structs_with_perm = [];
-        $children = $structlib->s_get_pages($this->page);
         foreach ($structs as $t_structs) {
             if ($tikilib->user_has_perm_on_object($this->user, $t_structs['pageName'] ?? null, 'wiki page', 'tiki_p_view')) {
                 $structs_with_perm[] = $t_structs;
@@ -203,7 +202,6 @@ class WikiRenderer
             return;
         }
 
-        $tikilib = TikiLib::lib('tiki');
         $multilinguallib = TikiLib::lib('multilingual');
 
         if (! empty($this->info['lang'])) {
@@ -215,12 +213,30 @@ class WikiRenderer
 
             $headerlib = TikiLib::lib('header');
             $links = [];
+
+            $wikilib = TikiLib::lib('wiki');
+            global $base_url;
+            $base = rtrim((string) $base_url, '/');
+
+            $selfHref = $wikilib->sefurl($this->page);
+            if (! preg_match('~^https?://~i', $selfHref)) {
+                $selfHref = $base . '/' . ltrim($selfHref, '/');
+            }
+
+            $links[] = '<link rel="alternate" hreflang="' . htmlspecialchars(strtolower($this->info['lang']), ENT_QUOTES, 'UTF-8') . '" href="' . htmlspecialchars($selfHref, ENT_QUOTES, 'UTF-8') . '">';
+
             foreach ($this->trads as $trad) {
                 if ($trad['lang'] != $this->info['lang']) {
-                    $links[] = '<link rel="alternate" href="tiki-index.php?page=' . $trad['objName'] . '" hreflang="' . $trad['lang'] . '">';
+                    $tradHref = $wikilib->sefurl($trad['objName']);
+                    if (! preg_match('~^https?://~i', $tradHref)) {
+                        $tradHref = $base . '/' . ltrim($tradHref, '/');
+                    }
+                    $links[] = '<link rel="alternate" hreflang="' . htmlspecialchars(strtolower($trad['lang']), ENT_QUOTES, 'UTF-8') . '" href="' . htmlspecialchars($tradHref, ENT_QUOTES, 'UTF-8') . '">';
                 }
             }
-            $headerlib->add_rawhtml(implode("\n", $links) . "\n");
+            if (! empty($links)) {
+                $headerlib->add_rawhtml(implode("\n", $links) . "\n");
+            }
         }
 
         if ($prefs['feature_machine_translation'] == 'y' && $prefs['lang_machine_translate_wiki'] == 'y' && ! empty($this->info['lang'])) {
@@ -252,7 +268,7 @@ class WikiRenderer
 
     private function setupActions()
     {
-        global $prefs, $tiki_p_edit, $tiki_p_remove, $tiki_p_admin_wiki;
+        global $prefs;
         $wikilib = TikiLib::lib('wiki');
 
         // Verify lock status
@@ -299,9 +315,7 @@ class WikiRenderer
 
     private function setupPage()
     {
-        global $prefs, $user;
-        $wikilib = TikiLib::lib('wiki');
-        $tikilib = TikiLib::lib('tiki');
+        global $prefs;
 
         $this->smartyassign('page', $this->page);
         $this->smartyassign('show_page', 'y');
@@ -456,9 +470,9 @@ class WikiRenderer
             if (! empty($galleryId)) {
                 $files = $filegallib->get_files(0, -1, '', '', $galleryId);
             } else {
-                $files = ['data' => [], 'cant' => 0];
+                $files = ['data' => [], 'count' => 0];
             }
-            $this->smartyassign('atts_count', $files['cant']);
+            $this->smartyassign('atts_count', $files['count']);
             return;
         }
 
@@ -470,7 +484,7 @@ class WikiRenderer
 
         $atts = $wikilib->list_wiki_attachments($this->page, 0, -1, $this->sortMode, '');
         $this->smartyassign('atts', $atts["data"]);
-        $this->smartyassign('atts_count', $atts['cant']);
+        $this->smartyassign('atts_count', $atts['count']);
     }
 
     private function setupFootnotes()
@@ -500,7 +514,6 @@ class WikiRenderer
         global $prefs;
         $tikilib = TikiLib::lib('tiki');
         $categlib = TikiLib::lib('categ');
-        $userlib = TikiLib::lib('user');
         if ($prefs['feature_user_watches'] != 'y') {
             return;
         }
@@ -588,7 +601,7 @@ class WikiRenderer
         }
         //global $description;
         $crumbsLocal[] = new Breadcrumb(
-            isset($this->info['prettyName']) ? $this->info['prettyName'] : $crumbpage,
+            $this->info['prettyName'] ?? $crumbpage,
             $this->info['description'],
             TikiLib::lib('wiki')->sefurl($this->page),
             '',

@@ -3,10 +3,8 @@ import vue from "@vitejs/plugin-vue";
 import path from "path";
 import commonConfig from "../../vite.config.mjs";
 import pkg from "./package.json";
-console.log(commonConfig);
 const localConfig = defineConfig((configEnv) => {
     const commonConfigObject = commonConfig(configEnv);
-    console.log(import.meta.env);
     return {
         build: {
             outDir: path.join(commonConfigObject.build.outDir, pkg.name),

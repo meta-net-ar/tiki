@@ -22,7 +22,6 @@ function wikiplugin_redirect_info()
                 'description' => tra('Wiki page name to redirect to.'),
                 'since' => '3.0',
                 'filter' => 'pagename',
-                'default' => '',
                 'profile_reference' => 'wiki_page',
             ],
             'url' => [
@@ -31,7 +30,6 @@ function wikiplugin_redirect_info()
                 'description' => tra('Complete URL, internal or external.'),
                 'since' => '3.0',
                 'filter' => 'url',
-                'default' => '',
             ],
             'perspective' => [
                 'required' => false,
@@ -39,13 +37,12 @@ function wikiplugin_redirect_info()
                 'description' => tra('The ID of a perspective to switch to (requires feature_perspective).'),
                 'since' => '7.1',
                 'filter' => 'int',
-                'default' => '',
                 'profile_reference' => 'perspective',
             ],
             'autologin_remotetiki' => [
                 'required' => false,
                 'name' => tra('Auto login remote Tiki and redirect to page there.'),
-                'description' => tra('Base URL where remote Tiki is located, to auto login to prior to redirection to page there, e.g. https://othertiki.com.'),
+                'description' => tra('Base URL where remote Tiki is located, to auto login to prior to redirection to page there, e.g. https://othertiki.example.org.'),
                 'filter' => 'url',
                 'default' => '',
             ],
@@ -60,15 +57,15 @@ function wikiplugin_redirect($data, $params)
     extract($params, EXTR_SKIP);
     $areturn = '';
 
-    if (! isset($page) && ! isset($url)) {
+    if (is_null($page) && is_null($url)) {
         $areturn = "REDIRECT plugin: No page or url specified!<br />";
     }
 
-    if (isset($page)) {
+    if (! is_null($page)) {
         $location = $page;
-    } elseif (isset($url)) {
+    } elseif (! is_null($url)) {
         $location = $url;
-    } elseif (isset($perspective)) {
+    } elseif (! is_null($perspective)) {
         $location = tra('perspective ') . $perspective;
     } else {
         $location = tra('nowhere');
@@ -96,7 +93,7 @@ function wikiplugin_redirect($data, $params)
             return TikiLib::lib('parser')->parse_data($info['data'], $parserOptions);
         }
     } else {
-        if (isset($perspective)) {
+        if (! is_null($perspective)) {
             global $base_host;
             $access = TikiLib::lib('access');
             $perspectivelib = TikiLib::lib('perspective');
@@ -116,11 +113,11 @@ function wikiplugin_redirect($data, $params)
 
         // Make it possible to edit the plugin in wysiwyg
         // Do not redirect if the page is being edited
-        $isEditMode = (strpos($_SERVER['SCRIPT_NAME'], 'tiki-editpage.php') !== false) || (isset($_REQUEST['controller']) && $_REQUEST['controller'] == 'edit');
-        if ($isEditMode == false) {
+        $isEditMode = (str_contains($_SERVER['SCRIPT_NAME'], 'tiki-editpage.php')) || (isset($_REQUEST['controller']) && $_REQUEST['controller'] == 'edit');
+        if (! $isEditMode) {
             // Auto login to remote Tiki functionality
             if (! empty($autologin_remotetiki)) {
-                if (substr($autologin_remotetiki, -1) == '/') {
+                if (str_ends_with($autologin_remotetiki, '/')) {
                     $autologin_remotetiki = rtrim($autologin_remotetiki, '/');
                 }
                 if (! empty($page)) {
@@ -138,7 +135,7 @@ function wikiplugin_redirect($data, $params)
                 }
             }
 
-            if (isset($page)) {
+            if (! is_null($page)) {
                 $safePage = urlencode($page);
                 // Ensure temporary, non-cached redirect to avoid URL caching issues and SEO impact
                 header("Cache-Control: no-cache, no-store, must-revalidate");
@@ -156,7 +153,7 @@ function wikiplugin_redirect($data, $params)
                     TikiLib::lib('access')->redirect("tiki-index.php?page={$safePage}", '', 301);
                 }
             }
-            if (isset($url)) {
+            if (! is_null($url)) {
                 global $base_url, $url_path;        // try to detect redirect loop to server root
                 if (
                     $url == $base_url ||            // whole site url
@@ -180,7 +177,7 @@ function wikiplugin_redirect($data, $params)
 
 /**
  * This function gets a URL with a token in it so that the user can be redirected that to actually login
- * @param $autologin_remotetiki The remote Tiki base url, e.g. https://remotetiki.com
+ * @param $autologin_remotetiki The remote Tiki base url, e.g. https://remotetiki.example.org
  * @param $redirect_page The pagename of the page on the remote Tiki to redirect to.
  * If not set, user will end up on the default home page on remote Tiki.
  * @return string The URL with the token in it.

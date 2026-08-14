@@ -3,7 +3,7 @@
         <h2>{tr _0=$old.version _1=$new.version}Comparing version %0 with version %1{/tr}</h2>
     {/if}
     {if $curver.version|default:null ne $preview && $object_curver eq 'y'}
-        {self_link _script="tiki-pagehistory.php" page=$page preview=$curver.version|escape:'url' _title="{tr}Go to current version{/tr}"}{tr}Go to current version{/tr}{/self_link}
+        {self_link _noauto="y" _script="tiki-pagehistory.php" page=$page preview=$curver.version|escape:'url' _title="{tr}Preview current version{/tr}"}{tr}Preview current version{/tr}{/self_link}
     {/if}
     <div class="table-responsive">
         <table class="table diff">
@@ -41,24 +41,24 @@
                 {if $smarty.request.oldver_idx + 1 eq $smarty.request.newver_idx or $smarty.request.oldver_idx eq $smarty.request.newver_idx}
                     <td colspan="4">
                         {if isset($show_all_versions) and $show_all_versions eq "n"}
-                            {pagination_links cant=$ver_cant offset=$smarty.request.bothver_idx offset_arg="bothver_idx" itemname="{tr}Session{/tr}" show_numbers="n"}{/pagination_links}
+                            {pagination_links count=$ver_count offset=$smarty.request.bothver_idx offset_arg="bothver_idx" offset_min="1" itemname="{tr}Session{/tr}" show_numbers="n"}{/pagination_links}
                         {else}
-                            {pagination_links cant=$ver_cant offset=$smarty.request.bothver_idx offset_arg="bothver_idx" itemname="{tr}Version{/tr}" show_numbers="n"}{/pagination_links}
+                            {pagination_links count=$ver_count offset=$smarty.request.bothver_idx offset_arg="bothver_idx" offset_min="1" itemname="{tr}Version{/tr}" show_numbers="n"}{/pagination_links}
                         {/if}
                     </td>
                 {else}
                     <td colspan="2">
                         {if isset($show_all_versions) and $show_all_versions eq "n"}
-                            {pagination_links cant=$ver_cant offset=$smarty.request.oldver_idx offset_arg="oldver_idx" itemname="{tr}Old Session{/tr}" show_numbers="n"}{/pagination_links}
+                            {pagination_links count=$ver_count offset=$smarty.request.oldver_idx offset_arg="oldver_idx" itemname="{tr}Old Session{/tr}" show_numbers="n"}{/pagination_links}
                         {else}
-                            {pagination_links cant=$ver_cant offset=$smarty.request.oldver_idx offset_arg="oldver_idx" itemname="{tr}Old Version{/tr}" show_numbers="n"}{/pagination_links}
+                            {pagination_links count=$ver_count offset=$smarty.request.oldver_idx offset_arg="oldver_idx" itemname="{tr}Old Version{/tr}" show_numbers="n"}{/pagination_links}
                         {/if}
                     </td>
                     <td colspan="2">
                         {if isset($show_all_versions) and $show_all_versions eq "n"}
-                            {pagination_links cant=$ver_cant offset=$smarty.request.newver_idx offset_arg="newver_idx" itemname="{tr}New Session{/tr}" show_numbers="n"}{/pagination_links}
+                            {pagination_links count=$ver_count offset=$smarty.request.newver_idx offset_arg="newver_idx" itemname="{tr}New Session{/tr}" show_numbers="n"}{/pagination_links}
                         {else}
-                            {pagination_links cant=$ver_cant offset=$smarty.request.newver_idx offset_arg="newver_idx" itemname="{tr}New Version{/tr}" show_numbers="n"}{/pagination_links}
+                            {pagination_links count=$ver_count offset=$smarty.request.newver_idx offset_arg="newver_idx" itemname="{tr}New Version{/tr}" show_numbers="n"}{/pagination_links}
                         {/if}
                     </td>
                 {/if}
@@ -70,9 +70,9 @@
                         {if $diffdata}
                             {section name=ix loop=$diffdata}
                                 {if $diffdata[ix].type == "diffheader"}
-                                    {assign var="oldd" value=$diffdata[ix].old}
-                                    {assign var="newd" value=$diffdata[ix].new}
-                                    <br><div class="diffheader">@@ {tr}-Lines: {$oldd} changed to +Lines: {$newd}{/tr} @@</div>
+                                    {$oldd=$diffdata[ix].old}
+                                    {$newd=$diffdata[ix].new}
+                                    <br><div class="diffheader">@@ {tr _0=$oldd _1=$newd}-Lines: %0 changed to +Lines: %1{/tr} @@</div>
                                 {elseif $diffdata[ix].type == "diffdeleted"}
                                     <div class="diffdeleted">
                                     {section name=iy loop=$diffdata[ix].data}

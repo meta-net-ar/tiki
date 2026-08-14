@@ -14,7 +14,7 @@
                 value="{if !empty($smarty.post.pass)}{$smarty.post.pass}{/if}"
             >
             <div style="margin-left:5px;">
-                <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none' } <span id="mypassword_text_inner"></span></div>
+                <div id="mypassword_text">{icon name='ok' istyle='display:none'}{icon name='error' istyle='display:none'} <span id="mypassword_text_inner"></span></div>
                 <div id="mypassword_bar" style="font-size: 5px; height: 2px; width: 0px;"></div>
             </div>
             {if $prefs.feature_jquery_validation neq 'y'}

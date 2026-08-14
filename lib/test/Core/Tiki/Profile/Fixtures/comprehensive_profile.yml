@@ -1,0 +1,27 @@
+profile:
+  name: "Comprehensive Test Profile"
+  description: "A comprehensive test profile with multiple handlers"
+
+preferences:
+  feature_wiki: "y"
+  feature_categories: "y"
+  feature_trackers: "y"
+
+objects:
+  - type: category
+    data:
+      name: "TestSampleCategory"
+      description: "Sample category for testing"
+      parent: 0
+
+  - type: tracker
+    data:
+      name: "TestSampleTracker"
+      description: "Sample tracker for testing"
+
+  - type: wiki_page
+    data:
+      name: "TestSampleComprehensivePage"
+      content: "This is a comprehensive test page with categories."
+      description: "Comprehensive sample page"
+      categories: ["TestSampleCategory"]

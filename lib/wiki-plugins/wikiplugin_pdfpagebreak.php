@@ -20,7 +20,7 @@ function wikiplugin_pdfpagebreak_info()
 
 function wikiplugin_pdfpagebreak()
 {
-    if (! empty($_GET['display']) && strstr($_GET['display'], 'pdf') == '') {
+    if (! defined('TIKI_DISPLAY_CONTAINS_PDF') || ! TIKI_DISPLAY_CONTAINS_PDF) {
         return;
     }
     return '<pagebreak></pagebreak>';

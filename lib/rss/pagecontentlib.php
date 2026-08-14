@@ -102,11 +102,11 @@ class PageContentLib
 
         $convert = function ($url) use ($baseUrl, $relativeUrl) {
             // Resolve relative paths
-            if (substr($url, 0, 2) == "//") { // Missing protocol
+            if (str_starts_with($url, "//")) { // Missing protocol
                 // Fine, use current
-            } elseif (substr($url, 0, 1) == "/") { // Path Relative to Base
+            } elseif (str_starts_with($url, "/")) { // Path Relative to Base
                 $url = $baseUrl . $url;
-            } elseif (substr($url, 0, 4) !== "http") { // Path Relative to Dimension
+            } elseif (! str_starts_with($url, "http")) { // Path Relative to Dimension
                 $url = $relativeUrl . $url;
             }
 

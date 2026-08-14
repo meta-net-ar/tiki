@@ -24,7 +24,6 @@ function wikiplugin_metatag_info()
                 'description' => tr('Name attribute of the meta tag'),
                 'since' => '17.0',
                 'filter' => 'text',
-                'default' => '',
             ],
             'content' => [
                 'required' => false,
@@ -43,12 +42,9 @@ function wikiplugin_metatag($data, $params)
     $headerlib = TikiLib::lib('header');
     extract($params, EXTR_SKIP);
 
-    if (isset($name)) {
-        if (! isset($content)) {
-            $content = '';
-        }
+    if (! is_null($name)) {
         $headerlib->add_meta($name, $content);
-    } elseif (strpos($data, '|') !== false) {
+    } elseif (str_contains($data, '|')) {
         // split data by lines (trimed whitespace from start and end)
         $lines = preg_split("/\n/", trim($data));
 

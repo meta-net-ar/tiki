@@ -12,6 +12,7 @@ function prefs_ip_list()
             'description' => tra("Check anonymous votes by user's IP"),
             'type' => 'flag',
             'default' => 'n',
+            'help' => 'Rating',
         ],
     ];
 }

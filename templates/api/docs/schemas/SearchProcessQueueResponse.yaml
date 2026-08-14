@@ -1,0 +1,18 @@
+---
+description: Response from POST /search/process-queue.
+type: object
+required:
+  - title
+  - stat
+  - queue_count
+  - batch
+properties:
+  title:
+    type: string
+  stat:
+    type: string
+    nullable: true
+  queue_count:
+    type: integer
+  batch:
+    type: integer

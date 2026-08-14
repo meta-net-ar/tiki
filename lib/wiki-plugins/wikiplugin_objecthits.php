@@ -20,7 +20,6 @@ function wikiplugin_objecthits_info()
                 'description' => tra('For a wiki page, the page name, for other object types: ID number + ? +
                     object title'),
                 'since' => '1',
-                'default' => '',
                 'filter' => 'text',
                 'profile_reference' => 'type_in_param',
             ],
@@ -56,15 +55,11 @@ function wikiplugin_objecthits_info()
 
 function wikiplugin_objecthits($data, $params)
 {
-    $tikilib = TikiLib::lib('tiki');
-    $default = ['days' => 0, 'since' => '', 'type' => 'wiki'];
-    $params = array_merge($default, $params);
-
     $statslib = TikiLib::lib('stats');
 
     extract($params, EXTR_SKIP);
 
-    if (! isset($object)) {
+    if (is_null($object)) {
         global $page;
         $object = $page;
         $type = "wiki";

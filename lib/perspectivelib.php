@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 /**
  * PerspectiveLib
  *
@@ -75,7 +78,7 @@ class PerspectiveLib
             }
         }
 
-        $currentDomain = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+        $currentDomain = $_SERVER['HTTP_HOST'] ?? '';
         foreach ($this->get_domain_map($prefs) as $domain => $perspective) {
             if ($domain == $currentDomain) {
                 $_SESSION['current_perspective'] = trim($perspective);
@@ -168,9 +171,10 @@ class PerspectiveLib
 
     public function load_perspective_preferences()
     {
-        global $prefs, $section;
+        global $prefs;
+        $section = Sections::getCurrentSection();
 
-        if (! isset($section) || $section != 'admin') {
+        if (! isset($section) || (! Sections::isCurrentSection(Sections::SECTION_ADMIN) && ! Sections::isCurrentSection(Sections::SECTION_ADMIN_LAYOUT))) {
             if ($persp = $this->get_current_perspective($prefs)) {
                 $perspectivePreferences = $this->get_preferences($persp);
                 $prefs = $perspectivePreferences + $prefs;

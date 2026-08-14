@@ -8,6 +8,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\Quizzes\Helper\QuizUtils;
+
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -16,15 +18,15 @@ $inputConfiguration = [
             'question'                    => 'text',           //post
             'remove'                      => 'int',            //post
             'save'                        => 'bool',           //post
-            'questionType'                => 'string',         //post
-            'position'                    => 'string',         //post
+            'questionType'                => 'word',         //post
+            'position'                    => 'int',         //post
             'import'                      => 'bool',           //post
             'input_data'                  => 'text',           //post
             'useQuestion'                 => 'bool',           //post
             'usequestionid'               => 'int',            //post
-            'sort_mode'                   => 'text',          //get
+            'sort_mode'                   => 'alnumdash',          //get
             'offset'                      => 'int',            //get
-            'find'                        => 'alpha',          //post
+            'find'                        => 'striptags',          //post
         ],
     ],
 ];
@@ -102,7 +104,7 @@ if (isset($_REQUEST['save'])) {
 if (isset($_REQUEST['import'])) {
     $access->checkCsrf();
 
-    $questions = TextToQuestions($_REQUEST['input_data']);
+    $questions = QuizUtils::TextToQuestions($_REQUEST['input_data']);
 
     foreach ($questions as $index => $question) {
         $question_text = $question->getQuestion();
@@ -145,11 +147,7 @@ if (! isset($_REQUEST['offset'])) {
 
 $smarty->assign_by_ref('offset', $offset);
 
-if (isset($_REQUEST['find'])) {
-    $find = $_REQUEST['find'];
-} else {
-    $find = '';
-}
+$find = $_REQUEST['find'] ?? '';
 
 $smarty->assign('find', $find);
 
@@ -159,7 +157,7 @@ $channels = $quizlib->list_quiz_questions($_REQUEST['quizId'], $offset, $maxReco
 // $questions = $quizlib->list_all_questions(0, -1, 'position_desc', '');
 // $smarty->assign('questions', $questions["data"]);
 
-$smarty->assign_by_ref('cant_pages', $channels['cant']);
+$smarty->assign_by_ref('pages_count', $channels['count']);
 
 $smarty->assign_by_ref('channels', $channels['data']);
 

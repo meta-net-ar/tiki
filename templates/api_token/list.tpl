@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="content"}
@@ -57,7 +57,7 @@
         </table>
     </div>
     <p>
-        <a class="btn btn-info" href="{bootstrap_modal controller=api_token action=new size='modal-lg'}">
+        <a class="btn btn-info" href="{bootstrap_modal controller=api_token action=new size='modal-lg'}" role="button">
             {icon name="create"} {tr}Create Token{/tr}
         </a>
     </p>

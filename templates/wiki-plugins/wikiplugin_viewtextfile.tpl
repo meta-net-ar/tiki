@@ -17,7 +17,7 @@
                     </table>
                 {/capture}
 
-                <a class="viewtextfile-info-button" href="#" onclick="return false;" title="{tr}Information{/tr}" {popup fullhtml="1" text=$smarty.capture.details|replace:'&amp;':'&' left=true} style="cursor:help">
+                <a class="viewtextfile-info-button" href="#" role="button" onclick="return false;" title="{tr}Information{/tr}" {popup fullhtml="1" text=$smarty.capture.details|replace:'&amp;':'&' left=true} style="cursor:help">
                     {icon name='information' class='' title=''}
                 </a>
             {/if}

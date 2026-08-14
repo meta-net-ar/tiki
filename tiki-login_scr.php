@@ -16,21 +16,27 @@ $section_class = 'tiki_login';  // This will be body class instead of $section
 $inputConfiguration = [
     [
         'staticKeyFilters'     => [
-        'twoFactorForm'        => 'string',         //post
+        'showTwoFactorForm'        => 'string',         //post
         'clearmenucache'       => 'bool',           //post
         'user'                 => 'username',       //post
+        'create2FaCodeNormalLogin' => 'alpha',      //get
+        'tiki_username'        => 'username',       //get
         ],
     ],
 ];
 include_once("tiki-setup.php");
 
-
-//Enable Two-Factor Auth Input
-$twoFactorForm = 'n';
-if (isset($_REQUEST["twoFactorForm"])) {
-    $twoFactorForm = 'y';
+// Emit 401 when reached via an auth challenge (via ?challenge=1 param or session loginfrom).
+if (! $user && (! empty($_GET['challenge']) || ! empty($_SESSION['loginfrom']))) {
+    http_response_code(401);
 }
-$smarty->assign('twoFactorForm', $twoFactorForm);
+
+// Setup Two-Factor Auth form state
+$showTwoFactorForm = $prefs['twoFactorAuth'];
+if (isset($_REQUEST["showTwoFactorForm"])) {
+    $showTwoFactorForm = 'y';
+}
+$smarty->assign('showTwoFactorForm', $showTwoFactorForm);
 
 $create2FaCodeNormalLogin = isset($_REQUEST["create2FaCodeNormalLogin"]) ? 'y' : 'n';
 try {
@@ -39,7 +45,7 @@ try {
         $twoFactorAuth = TwoFactorAuth::getTwoFactorAuth();
         $isTokenGenerated = $twoFactorAuth->generateCode($tikiUserName);
         if ($prefs['twoFactorAuthType'] === TwoFactorAuth::EMAIL_2FA && ! empty($isTokenGenerated)) {
-            $message = tr("2FA token generated successfully and sent to your email");
+            $message = tr("An email containing your authentication code has been sent. Please enter the code to access the website.");
             Feedback::success($message);
         }
     }
@@ -50,7 +56,7 @@ try {
 $smarty->assign('create2FaCodeNormalLogin', $create2FaCodeNormalLogin);
 
 if ($prefs['login_autologin'] == 'y' && $prefs['login_autologin_redirectlogin'] == 'y' && ! empty($prefs['login_autologin_redirectlogin_url'])) {
-    $access->redirect($prefs['login_autologin_redirectlogin_url']);
+    $access->redirect($prefs['login_autologin_redirectlogin_url'], allowExternal: true);
 }
 
 if (isset($_REQUEST['clearmenucache'])) {

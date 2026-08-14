@@ -2,7 +2,7 @@
 
 <div class="t_navbar mb-4">
     {button href="tiki-browse_categories.php?parentId=$parentId" _type="link" _icon_name="view" _text="{tr}Browse Categories{/tr}" _title="{tr}Browse the category system{/tr}"}
-    {button href="tiki-edit_categories.php" _type="link" _text="{tr}Organize Objects{/tr}" _icon_name="structure" _title="{tr}Organize Objects{/tr}"}
+    {button href="tiki-edit_categories.php" _type="link" _text="{tr}Categorize Objects{/tr}" _icon_name="structure" _title="{tr}Categorize Objects{/tr}"}
 </div>
 
 <div class="tree breadcrumb" id="top">
@@ -47,16 +47,16 @@
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="name">{tr}Name{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" class="form-control" name="name" id="name" value="{$categoryName|escape}">
+                    <input type="text" class="form-control" name="name" id="name" value="{$categoryName|escape}" maxlength="{$MAX_CATEGORY_NAME_LENGTH}">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="description">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
-                    <textarea rows="2" class="form-control" name="description" id="description" maxlength=500>{$description|escape}</textarea>
+                    {textarea rows="2" class="form-control" name="description" id="description" maxlength="{$MAX_COMMENT_DESCRIPTION_LENGTH}"}{$description|escape}{/textarea}
                 </div>
             </div>
-            {if isset($role_groups) && count($role_groups) }
+            {if isset($role_groups) && count($role_groups)}
             <div class="mb-3 row">
                 <label class="col-sm-3 col-form-label" for="description">{tr}Group Roles{/tr}</label>
                 <div class="col-sm-9">
@@ -179,7 +179,7 @@
             <h2>{tr}Objects in category:{/tr} {$categ_name|escape}</h2>
             {if $objects}
                 <form method="get" action="tiki-admin_categories.php">
-                    <label>{tr}Find:{/tr}<input type="text" name="find"></label>
+                    <label>{tr}Search:{/tr}<input type="text" name="find"></label>
                     <input type="hidden" name="parentId" value="{$parentId|escape}">
                     <input type="submit" class="btn btn-primary btn-sm" value="{tr}Filter{/tr}" name="search">
                     <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
@@ -232,7 +232,7 @@
                     {if not empty($objects)}
                         <div class="submit text-center p-1">
                             {ticket}
-                            <input type="hidden" name="categId" value="{$parentId|escape}"}>
+                            <input type="hidden" name="categId" value="{$parentId|escape}">
                             <input type="submit" name="uncategorize" value="{tr}Remove checked{/tr}" class="btn btn-danger" onclick="return confirm('{tr}Remove objects from category?{/tr}');">
                         </div>
                     {/if}
@@ -255,7 +255,7 @@ $("#remove_object_form").off("submit").on("submit", function (e) {
                 {/jq}
             </div>
 
-            {pagination_links cant=$cant_objects step=$prefs.maxRecords offset=$offset}{/pagination_links}
+            {pagination_links count=$objects_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
         {/tab}
 
         {tab name="{tr}Add objects{/tr}"}
@@ -323,7 +323,7 @@ $("#add_object_type").on("change", function () {
                 <form method="get" action="tiki-admin_categories.php">
                     <div class="mb-3 row">
                         <label class="col-sm-3 col-form-label" for="find_objects">
-                            {tr}Find{/tr}
+                            {tr}Search{/tr}
                         </label>
                         <div class="col-sm-6 input-group">
                             <input type="text" name="find_objects" id="find_objects" class="form-control">
@@ -335,7 +335,7 @@ $("#add_object_type").on("change", function () {
                     <input type="hidden" name="offset" value="{$offset|escape}">
                     <input type="hidden" name="find" value="{$find|escape}">
                 </form>
-                {pagination_links cant=$maximum step=$maxRecords offset=$offset}{/pagination_links}
+                {pagination_links count=$maximum step=$maxRecords offset=$offset}{/pagination_links}
                 <form action="tiki-admin_categories.php" method="post">
                     {ticket}
                     <input type="hidden" name="parentId" value="{$parentId|escape}">
@@ -568,7 +568,7 @@ $("#add_object_type").on("change", function () {
                         {/if}
                     </fieldset>
                 </form>
-                {pagination_links cant=$maximum step=$maxRecords offset=$offset}{/pagination_links}
+                {pagination_links count=$maximum step=$maxRecords offset=$offset}{/pagination_links}
             {/if}
         {/tab}
 
@@ -598,7 +598,7 @@ spinach,Spinach is a leafy green flowering plant,vegetable
                 </div>
                 <div class="mb-3 row">
                     <div class="col-sm-3 offset-sm-3">
-                        <input type="submit" class="btn btn-secondary" name="import" value="{tr}Upload{/tr}">
+                        <input type="submit" class="btn btn-primary" name="import" value="{tr}Upload{/tr}">
                     </div>
                 </div>
             </form>

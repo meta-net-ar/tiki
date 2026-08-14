@@ -1,5 +1,8 @@
 <?php
 
+if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+    return;
+}
 // use file
 // permissioncheck/permission_granted.bin
 // to enable/disable permission check if shell is not available

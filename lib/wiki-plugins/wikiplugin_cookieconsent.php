@@ -4,27 +4,21 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+
 function wikiplugin_cookieconsent_info()
 {
-    global $prefs;
     return [
         'name' => tra('Cookie Consent'),
         'documentation' => 'PluginCookieConsent',
         'description' => tra('Display content based on whether cookie consent has been granted by the user.'),
         'prefs' => ['wikiplugin_cookieconsent', 'cookie_consent_feature'],
-        'body' => tra('Wiki syntax containing the content that can be hidden or shown.'),
+        'body' => tr('Wiki syntax containing the content that can be hidden or shown. The body may contain %0{ELSE}%1.
+            Text after the marker will be displayed if consent has not been granted.', '<code>', '</code>'),
         'filter' => 'wikicontent',
         'introduced' => 10,
         'iconname' => 'information',
         'params' => [
-            'no_consent_message' => [
-                'required' => false,
-                'name' => tra('No Cookie Message'),
-                'description' => tra('Message displayed if user has not consented to accepting cookies.'),
-                'since' => '10.0',
-                'default' => tra($prefs['cookie_consent_alert']),
-                'filter' => 'text',
-            ],
             'element' => [
                 'required' => false,
                 'name' => tra('Containing Element'),
@@ -50,35 +44,48 @@ function wikiplugin_cookieconsent_info()
                 'default' => 'wp-cookie-consent-required',
                 'filter' => 'text',
             ],
+            'cookie_category_needed' => [
+                'required' => false,
+                'name' => tra('Cookie category needed'),
+                'description' => tra('Category of cookies needed to be consented to for this content to be displayed. Defaults to "Essential"'),
+                'options' => [
+                    ['text' => tra('Essential'), 'value' => CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL],
+                    ['text' => tra('Functional'), 'value' => CookieConsentLib::BUILTIN_COOKIE_CATEGORY_FUNCTIONAL],
+                    ['text' => tra('Analytics'), 'value' => CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ANALYTICS],
+                    ['text' => tra('Marketing'), 'value' => CookieConsentLib::BUILTIN_COOKIE_CATEGORY_MARKETING],
+                ],
+                'since' => '30.0',
+                'default' => CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ESSENTIAL,
+                'filter' => 'text',
+            ],
         ]
     ];
 }
 
 function wikiplugin_cookieconsent($body, $params)
 {
-    global $prefs, $feature_no_cookie_analytics;
+    global $prefs;
 
     if ($prefs['cookie_consent_feature'] !== 'y') {
         return $body;
     }
 
-    //set defaults
-    $plugininfo = wikiplugin_cookieconsent_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
-
     $class = $params['element_class'];
 
-    if ($feature_no_cookie_analytics) {
-        $body = $params['no_consent_message'];
+    $parts = explode('{ELSE}', $body);
+    if (! CookieConsentLib::isCategoryAllowed($params['cookie_category_needed'])) {
+        if (count($parts) > 1) {
+            $body = $parts[1];
+        } else {
+            $body = '';
+        }
         $class .= ($class ? ' ' : '') . $params['no_consent_class'];
+    } else {
+        $body = $parts[0];
     }
 
     $tag1 = $tag2 = '';
-    if ($params['element'] && $params['element'] !== 'none') {
+    if ($params['element'] !== 'none') {
         if ($class) {
             $class = " class=\"{$class}\"";
         }

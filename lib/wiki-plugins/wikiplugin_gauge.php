@@ -23,7 +23,6 @@ function wikiplugin_gauge_info()
                 'description' => tra('Current value to be represented by the gauge'),
                 'since' => '1',
                 'filter' => 'float',
-                'default' => ''
             ],
             'max' => [
                 'required' => false,
@@ -39,7 +38,6 @@ function wikiplugin_gauge_info()
                 'description' => tra('Label displayed on the left side of the gauge.'),
                 'since' => '1',
                 'filter' => 'text',
-                'default' => ''
             ],
             'color' => [
                 'required' => false,
@@ -115,39 +113,6 @@ function wikiplugin_gauge($data, $params)
 {
     extract($params, EXTR_SKIP);
 
-    if (! isset($value)) {
-        return ("<b>missing value parameter for plugin</b><br />");
-    }
-
-    if (! isset($size)) {
-        $size = 150;
-    }
-
-    if (! isset($height)) {
-        $height = 14;
-    }
-
-    if (! isset($bgcolor)) {
-        $bgcolor = '#0000FF';
-    }
-
-    if (! isset($color)) {
-        $color = '#FF0000';
-    }
-
-    if (! isset($perc)) {
-        $perc = false;
-    }
-
-    if (isset($showvalue) && $showvalue == 'false') {
-        $showvalue = false;
-    } else {
-        $showvalue = true;
-    }
-
-    if (! isset($max) or ! $max) {
-        $max = 100;
-    }
     if ($max < $value) {
         //  maximum exceeded then change color
         $color = '#0E0E0E';
@@ -157,13 +122,7 @@ function wikiplugin_gauge($data, $params)
         $maxexceeded = false;
     }
 
-    if (! isset($labelsize)) {
-        $labelsize = 50;
-    }
-
-    if (! isset($label)) {
-        $label_td = '';
-    } else {
+    if (! is_null($label)) {
         $label_td = '<td width="' . $labelsize . '">' . $label . '&nbsp;</td>';
     }
 

@@ -55,7 +55,7 @@ function getHTMLPurifierTikiConfig()
             );
         }
     }
-    $conf = HTMLPurifier_Config::createDefault();
+    $conf = HTMLPurifier_HTML5Config::createDefault();
     $conf->set('Cache.SerializerPath', $directory);
     if ($prefs['feature_wysiwyg'] == 'y' || $prefs['popupLinks'] == 'y') {
         $conf->set('HTML.DefinitionID', 'allow target');

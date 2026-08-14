@@ -8,7 +8,6 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'cms';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
@@ -54,6 +53,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $categlib = TikiLib::lib('categ');
 $artlib = TikiLib::lib('art');
 
@@ -106,11 +108,7 @@ if (! empty($_REQUEST['type'])) {
 }
 
 // We need separate numbering of previews, since we access preview images by this number
-if (isset($_REQUEST['previewId'])) {
-    $previewId = $_REQUEST['previewId'];
-} else {
-    $previewId = mt_rand();
-}
+$previewId = $_REQUEST['previewId'] ?? mt_rand();
 
 $smarty->assign('articleId', $articleId);
 $smarty->assign('previewId', $previewId);
@@ -121,7 +119,7 @@ $smarty->assign(
 
 if (isset($_REQUEST['templateId']) && $_REQUEST['templateId'] > 0) {
     $templateslib = TikiLib::lib('template');
-    $template_data = $templateslib->get_template($_REQUEST['templateId'], $prefs['language']);
+    $template_data = $templateslib->get_template($_REQUEST['templateId'], Language::getCurrentLanguage());
     $_REQUEST['preview'] = 1;
     $_REQUEST['body'] = $template_data['content'];
     if ($templateslib->template_is_in_section($_REQUEST['templateId'], 'wiki_html')) {
@@ -142,7 +140,7 @@ $smarty->assign('subtitle', '');
 $smarty->assign('linkto', '');
 $smarty->assign('image_caption', '');
 $smarty->assign('image_alt', '');
-$smarty->assign('lang', $prefs['language']);
+$smarty->assign('lang', Language::getCurrentLanguage());
 $authorName = $tikilib->get_user_preference($user, 'realName', $user);
 $smarty->assign('authorName', $authorName);
 $smarty->assign('topicId', $topicId);
@@ -167,6 +165,11 @@ $smarty->assign('edit_data', 'n');
 $smarty->assign('emails', '');
 $smarty->assign('userEmail', $userlib->get_user_email($user));
 $smarty->assign('ispublished', '');
+
+$smarty->assign('MAX_ARTICLE_TITLE_LENGTH', ArtLib::MAX_ARTICLE_TITLE_LENGTH);
+$smarty->assign('MAX_ARTICLE_SUBTITLE_LENGTH', ArtLib::MAX_ARTICLE_SUBTITLE_LENGTH);
+$smarty->assign('MAX_ARTICLE_HEADING_LENGTH', ArtLib::MAX_ARTICLE_HEADING_LENGTH);
+$smarty->assign('MAX_ARTICLE_BODY_LENGTH', ArtLib::MAX_ARTICLE_BODY_LENGTH);
 
 // If the articleId is passed then get the article data
 // GGG - You have to check for the actual value of the articleId because it
@@ -268,7 +271,7 @@ if (isset($_REQUEST['ispublished'])) {
 $errors = false;
 if (empty($_REQUEST['emails']) || $prefs['feature_cms_emails'] != 'y') {
     $emails = '';
-} elseif (! empty($_REQUEST['emails'])) {
+} else {
     $emails = explode(',', $_REQUEST['emails']);
     foreach ($emails as $email) {
         if (! validate_email($email, $prefs['validateEmail'])) {
@@ -284,20 +287,12 @@ $topics = $artlib->list_topics();
  */
 $topics = array_values($topics);
 $smarty->assign_by_ref('topics', $topics);
+$smarty->assign('preview', isset($_REQUEST['preview']) ? 1 : 0);
 
-if (isset($_REQUEST['preview'])) {
-    $smarty->assign('preview', 1);
-} else {
-    $smarty->assign('preview', 0);
-}
 
 // If we are in preview mode then preview it!
 if (isset($_REQUEST['preview']) or ! empty($errors)) {
-    if (isset($_REQUEST['publishDate'])) {
-        $publishDate = $_REQUEST['publishDate'];
-    } else {
-        $publishDate = $tikilib->now;
-    }
+    $publishDate = $_REQUEST['publishDate'] ?? $tikilib->now;
 
     $smarty->assign('reads', '0');
     $smarty->assign('edit_data', 'y');
@@ -482,11 +477,7 @@ if (isset($_REQUEST['preview']) or ! empty($errors)) {
 if (isset($_REQUEST['save']) && empty($errors)) {
     $access->checkCsrf();
 
-    if (isset($_REQUEST['publishDate'])) {
-        $publishDate = $_REQUEST['publishDate'];
-    } else {
-        $publishDate = $tikilib->now;
-    }
+    $publishDate = $_REQUEST['publishDate'] ?? $tikilib->now;
 
     if (isset($_REQUEST['allowhtml']) && $_REQUEST['allowhtml'] == 'on' || $_SESSION['wysiwyg'] == 'y') {
         $body = $_REQUEST['body'];
@@ -528,46 +519,49 @@ if (isset($_REQUEST['save']) && empty($errors)) {
         $isfloat = 'n';
     }
 
-    $imgdata = urldecode($_REQUEST['image_data']);
+    $imgdata = '';
+    $imgname = '';
+    $imgtype = '';
+    $imgsize = 0;
+
+    if (isset($_FILES['userfile1']) && is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
+        $filegallib = TikiLib::lib('filegal');
+        try {
+            $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
+        } catch (Exception $e) {
+            Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
+        }
+        $file_name = $_FILES['userfile1']['name'];
+        $file_tmp_name = $_FILES['userfile1']['tmp_name'];
+        $tmp_dest = $prefs['tmpDir'] . '/' . $file_name . '.tmp';
+        if (! move_uploaded_file($file_tmp_name, $tmp_dest)) {
+            Feedback::errorAndDie(tra('Errors detected'), \Laminas\Http\Response::STATUS_CODE_409);
+        }
+        $fp = fopen($tmp_dest, 'rb');
+        if (! $fp && $_FILES['userfile1']['error']) {
+            Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
+        }
+        $imgdata = fread($fp, filesize($tmp_dest));
+        if (! $imgdata && isset($_FILES['userfile1']['error'])) {
+            Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
+        }
+        fclose($fp);
+        if (is_file($tmp_dest)) {
+            @unlink($tmp_dest);
+        }
+        $imgtype = $_FILES['userfile1']['type'];
+        $imgsize = $_FILES['userfile1']['size'];
+        $imgname = $_FILES['userfile1']['name'];
+    } elseif ($articleId) {
+        $existing = $artlib->get_article($articleId);
+        $imgdata = $existing['image_data'];
+        $imgname = $existing['image_name'];
+        $imgtype = $existing['image_type'];
+        $imgsize = $existing['image_size'];
+    }
 
     if (strlen($imgdata) > 0) {
         $hasImage = 'y';
-    }
-
-    $imgname = $_REQUEST['image_name'];
-    $imgtype = $_REQUEST['image_type'];
-    $imgsize = $_REQUEST['image_size'];
-
-    if (isset($_FILES['userfile1'])) {
-        if (is_uploaded_file($_FILES['userfile1']['tmp_name'])) {
-            $filegallib = TikiLib::lib('filegal');
-            try {
-                $filegallib->assertUploadedFileIsSafe($_FILES['userfile1']['tmp_name'], $_FILES['userfile1']['name']);
-            } catch (Exception $e) {
-                Feedback::errorAndDie($e->getMessage(), \Laminas\Http\Response::STATUS_CODE_403);
-            }
-            $file_name = $_FILES['userfile1']['name'];
-            $file_tmp_name = $_FILES['userfile1']['tmp_name'];
-            $tmp_dest = $prefs['tmpDir'] . '/' . $file_name . '.tmp';
-            if (! move_uploaded_file($file_tmp_name, $tmp_dest)) {
-                Feedback::errorAndDie(tra('Errors detected'), \Laminas\Http\Response::STATUS_CODE_409);
-            }
-            $fp = fopen($tmp_dest, 'rb');
-            if (! $fp && $_FILES['userfile1']['error']) {
-                Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
-            }
-            $imgdata = fread($fp, filesize($tmp_dest));
-            if (! $imgdata && isset($_FILES['userfile1']['error'])) {
-                Feedback::error($artlib->uploaded_file_error($_FILES['userfile1']['error']));
-            }
-            fclose($fp);
-            if (is_file($tmp_dest)) {
-                @unlink($tmp_dest);
-            }
-            $imgtype = $_FILES['userfile1']['type'];
-            $imgsize = $_FILES['userfile1']['size'];
-            $imgname = $_FILES['userfile1']['name'];
-        }
     }
 
     // TODO ImageGalleryRemoval23.x replace with a file gallery version
@@ -640,7 +634,6 @@ if (isset($_REQUEST['save']) && empty($errors)) {
             $author = $user;
         }
     }
-
     $_REQUEST['title'] = strip_tags($_REQUEST['title'], '<a><pre><p><img><hr><b><i>');
     $artid = $artlib->replace_article(
         $_REQUEST['title'],
@@ -812,6 +805,9 @@ $smarty->assign_by_ref('plugins', $plugins);
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
 
 $smarty->assign('displayTimezone', TikiLib::lib('tiki')->get_display_timezone());
+
+// Enforce alt-text requirement when “Use Own Image” is enabled
+$headerlib->add_js_module('import "@jquery-tiki/validate-alt-image";');
 
 // Display the Index Template
 $smarty->assign('mid', 'tiki-edit_article.tpl');

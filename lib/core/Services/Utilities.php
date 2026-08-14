@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -123,10 +123,10 @@ class Services_Utilities
         return ! TikiLib::lib('access')->isActionPost() || ! isset($_POST['confirmForm']) || $_POST['confirmForm'] !== 'y';
     }
 
-    public function isActionPost()
+    public function isActionPost($unsetTicket = null)
     {
         $access = TikiLib::lib('access');
-        return $access->isActionPost() && $access->checkCsrf(null, null, null, null, null, 'services');
+        return $access->isActionPost() && $access->checkCsrf(null, null, null, $unsetTicket, null, 'services');
     }
 
     public function setTicket()

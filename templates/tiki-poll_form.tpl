@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h2 class="card-title">{tr}Poll:{/tr}</h2>
+        <h2 class="tiki-card-header-title">{tr}Poll:{/tr}</h2>
     </div>
     <div class="card-body">
         {if $menu_info['active'] == 'x'}

@@ -4,8 +4,16 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\core\Services\Category\CategorizationHelper;
+
 class Services_Category_Controller
 {
+    private $filters = [
+        'objects'          => 'string',
+        'items'           => 'xss',
+        'categIds'              => 'array',
+        'object_action'   => 'string',
+    ];
     public function setUp()
     {
         global $prefs;
@@ -22,6 +30,18 @@ class Services_Category_Controller
     public function getSection()
     {
         return 'categories';
+    }
+
+    /**
+     * Categorize "perform with checked" but with no action selected
+     *
+     * @param $input
+     * @throws Services_Exception
+     * @throws Exception
+     */
+    public function actionNoAction()
+    {
+        Services_Utilities::modalException(tra('No action was selected. Please select an action before clicking OK.'));
     }
 
     public function action_list_categories($input)
@@ -157,127 +177,145 @@ class Services_Category_Controller
 
     public function action_categorize($input)
     {
-        $categId = $input->categId->int();
-        $objects = (array) $input->objects->none();
-
-        $perms = Perms::get('category', $categId);
-
-        if (! $perms->add_objects) {
-            throw new Services_Exception(tr('Permission denied'), 403);
+        if (TIKI_API) { // api/categorize
+            $input['object_action'] = 'categorize';
+            $this->normalizeCategoryIds($input);
         }
-
-        $filteredObjects = $originalObjects = $this->convertObjects($objects);
-        //check if objects exist
-        $objectlib = TikiLib::lib('object');
-        foreach ($filteredObjects as $object) {
-            $type = $object['type'];
-            $id = $object['id'];
-            if (! $objectlib->isValidObject($type, $id)) {
-                throw new Services_Exception(tr('Invalid %0 ID: %1', $type, $id), 403);
-            }
-        }
-
-        $util = new Services_Utilities();
-        if (count($originalObjects) && $util->isActionPost()) {
-            //first determine if objects are already in the category
-            $categlib = TikiLib::lib('categ');
-            $inCategory = [];
-            foreach ($originalObjects as $key => $object) {
-                $objCategories = $categlib->get_object_categories($object['type'], $object['id']);
-                if (in_array($categId, $objCategories)) {
-                    $inCategory[] = $object;
-                    unset($filteredObjects[$key]);
-                }
-            }
-            //provide appropriate feedback for objects already in category
-            if ($inCount = count($inCategory)) {
-                $msg = $inCount === 1 ? tr('No change made for one object already in the category')
-                    : tr('No change made for %0 objects already in the category', $inCount);
-                Feedback::note($msg);
-            }
-            //now add objects to the category
-            if (count($filteredObjects)) {
-                $return = $this->processObjects('doCategorize', $categId, $filteredObjects);
-                $count = isset($return['objects']) ? count($return['objects']) : 0;
-                if ($count) {
-                    $msg = $count === 1 ? tr('One object added to category')
-                        : tr('%0 objects added to category', $count);
-                    Feedback::success($msg);
-                } else {
-                    Feedback::error(tr('No objects added to category'));
-                }
-                return $return;
-            } else {
-                //this code is reached when all objects selected were already in the category
-                return [
-                    'categId'   => $categId,
-                    'objects'   => $objects,
-                    'count'     => 'unchanged'
-                ];
-            }
-        } else {
-            return [
-                'categId' => $categId,
-                'objects' => $objects,
-            ];
-        }
+        return $this->categorize($input);
     }
 
     public function action_uncategorize($input)
     {
-        $categId = $input->categId->digits();
-        $objects = (array) $input->objects->none();
-
-        $perms = Perms::get('category', $categId);
-
-        if (! $perms->remove_objects) {
-            throw new Services_Exception(tr('Permission denied'), 403);
+        if (TIKI_API) { // api/uncategorize
+            $input['object_action'] = 'uncategorize';
+            $this->normalizeCategoryIds($input);
         }
+        return $this->categorize($input);
+    }
 
-        $filteredObjects = $originalObjects = $this->convertObjects($objects);
+    // This function handles both ui and api context requests
+    private function categorize($input)
+    {
         $util = new Services_Utilities();
-        if (count($originalObjects) && $util->isActionPost()) {
-            //first determine if objects are already not in the category
+        $CATEGORIZE = $input['object_action'] == 'categorize';
+        $UNCATEGORIZE = $input['object_action'] == 'uncategorize';
+        $action = $input['object_action'];
+        $categories = $input->asArray('categIds');
+        $convertedCategories = $this->convertCategories($categories);
+
+        if ($util->notConfirmPost() && ! TIKI_API) { // This should be skipped when request is from API
+            // validate action to perform
+            return $this->buildCategorizationUiConfirmation(
+                $input,
+                $action,
+                $convertedCategories
+            );
+        } elseif ($util->checkCsrf()) {
+            $util->setVars($input, $this->filters, 'items');
+            $originalObjects = $this->convertObjects($util->items);
+            if (TIKI_API) {
+                $util->setVars($input, $this->filters, 'objects');
+                $originalObjects = $this->convertObjects($util->items);
+            }
+            $messages = [];
+            $err_messages = [];
+            $oldRequest = TIKI_API && isset($input['categId']); // Legacy support for `categId`
+
+            [$permittedCategories, $unpermittedCategories] = $this->resolveCategoryPermissions($convertedCategories, $action);
+
+            if (empty($permittedCategories)) {
+                throw new Services_Exception(tr('Permission denied'), 403);
+            }
+
+            if (! empty($unpermittedCategories)) {
+                $cat_names = array_map(function ($cat) {
+                    return $cat['name'];
+                }, $unpermittedCategories);
+                $err_messages[] = tr('You are not permitted to perform this action on these categories %0', '<strong>' . implode('<br>', $cat_names) . '</strong>');
+            }
+
+            //check if objects exist
+            $objectlib = TikiLib::lib('object');
+            foreach ($originalObjects as $object) {
+                $type = $object['type'];
+                $id = $object['id'];
+                if (! $objectlib->isValidObject($type, $id)) {
+                    throw new Services_Exception(tr('Invalid %0 ID: %1', $type, $id), 403);
+                }
+            }
             $categlib = TikiLib::lib('categ');
-            $notInCategory = [];
-            foreach ($originalObjects as $key => $object) {
-                $objCategories = $categlib->get_object_categories($object['type'], $object['id']);
-                if (! in_array($categId, $objCategories)) {
-                    $notInCategory[] = $object;
-                    unset($filteredObjects[$key]);
+            $categoryResults = [];
+            foreach ($permittedCategories as $cat) {
+                $filteredObjects = $originalObjects;
+                $categorizedObjects = [];
+                $categId = $cat['id'];
+                $outputCategoryName = $cat['name'];
+                //first determine if objects are already in the category
+                foreach ($originalObjects as $key => $object) {
+                    $alreadyIn = in_array($categId, $categlib->get_object_categories($object['type'], $object['id']));
+                    if (
+                        ($CATEGORIZE && $alreadyIn) ||
+                        ($UNCATEGORIZE && ! $alreadyIn)
+                    ) {
+                        $categorizedObjects[] = $object;
+                        unset($filteredObjects[$key]);
+                    }
                 }
-            }
-            //provide appropriate feedback for objects already not in category
-            if ($notCount = count($notInCategory)) {
-                $msg = $notCount === 1 ? tr('No change made for one object not in the category')
-                    : tr('No change made for %0 objects not in the category', $notCount);
-                Feedback::note($msg);
-            }
-            //now uncategorize objects that are in the category
-            if (count($filteredObjects)) {
-                $return = $this->processObjects('doUncategorize', $categId, $filteredObjects);
-                $count = isset($return['objects']) ? count($return['objects']) : 0;
-                if ($count) {
-                    $msg = $count === 1 ? tr('One object removed from category')
-                        : tr('%0 objects removed from category', $count);
-                    Feedback::success($msg);
+                //provide appropriate feedback for objects already in category
+                if ($categorizedObjectsCount = count($categorizedObjects)) {
+                    $messages[] = CategorizationHelper::unchangedMessage(
+                        $outputCategoryName,
+                        $categorizedObjectsCount,
+                        $action
+                    );
+                }
+                //now add objects to the category
+                if (count($filteredObjects)) {
+                    $funct = 'doCategorize';
+                    if ($UNCATEGORIZE) {
+                        $funct = 'doUncategorize';
+                    }
+                    $return = $this->processObjects($funct, $categId, $filteredObjects);
+                    $categoryResults[] = $return;
+                    $count = isset($return['objects']) ? count($return['objects']) : 0;
+                    if ($count) {
+                        $messages[] = CategorizationHelper::successMessage(
+                            $outputCategoryName,
+                            $count,
+                            $action,
+                        );
+                    } else {
+                        $err_messages[] = CategorizationHelper::emptyResultMessage(
+                            $outputCategoryName,
+                            $action,
+                        );
+                    }
                 } else {
-                    Feedback::error(tr('No objects removed from category'));
+                    //this code is reached when all objects selected were already in the category
+                    $categoryResults[] = [
+                        'categId'   => $categId,
+                        'objects'   => $originalObjects,
+                        'count'     => 'unchanged'
+                    ];
                 }
-                return $return;
-            } else {
-                //this code is reached when all objects selected were already not in the category
-                return [
-                    'categId'   => $categId,
-                    'objects'   => $objects,
-                    'count'     => 'unchanged'
-                ];
             }
-        } else {
-            return [
-                'categId' => $categId,
-                'objects' => $objects,
-            ];
+            if (TIKI_API) {
+                return $this->formatApiResponse(
+                    $categoryResults,
+                    $messages,
+                    $err_messages,
+                    $oldRequest
+                );
+            } else {
+                if (! empty($messages)) {
+                    Feedback::success(implode('<br>', $messages));
+                }
+
+                if (! empty($err_messages)) {
+                    Feedback::error(implode('<br>', $err_messages));
+                }
+                return Services_Utilities::refresh();
+            }
         }
     }
 
@@ -338,7 +376,6 @@ class Services_Category_Controller
 
         $categlib = TikiLib::lib('categ');
         $category = $categlib->get_category((int) $categId);
-
         return [
             'categId' => $categId,
             'count' => $category['objects'],
@@ -379,5 +416,126 @@ class Services_Category_Controller
         }
 
         return $out;
+    }
+
+    private function convertCategories($categories): array
+    {
+        $out = [];
+        foreach ($categories as $category) {
+            if (! TIKI_API) {
+                $cat = explode('-', $category, 2);
+
+                if (count($cat) == 2) {
+                    list($name, $id) = $cat;
+                    $out[] = ['name' => $name, 'id' => $id];
+                }
+            } else {
+                $out[] = ['name' => "categId-" . $category, 'id' => $category];
+            }
+        }
+        return $out;
+    }
+
+    private function formatApiResponse(array $results, array $messages, array $errors, bool $oldRequest)
+    {
+        $response = [];
+
+        if ($oldRequest) {
+            // LEGACY (single categId): Keep it flat for backward compatibility
+            $response = $results[0] ?? $results;
+        } else {
+            // NEW SYSTEM: Always return a 'data' array so it's predictable
+            $response['data'] = $results;
+        }
+
+        if ($messages) {
+            $response['messages'] = $messages;
+        }
+
+        if ($errors) {
+            $response['err_messages'] = $errors;
+        }
+
+        return $response;
+    }
+
+    private function buildCategorizationUiConfirmation($input, string $action, array $categories)
+    {
+        $util = new Services_Utilities();
+
+        $util->setVars($input, $this->filters, 'objects');
+        $objects = $this->convertObjects($util->items);
+
+        if (empty($categories)) {
+            Services_Utilities::modalException(
+                tra('No destination category was selected. Please select at least one.')
+            );
+        }
+
+        if ($util->itemsCount === 0) {
+            Services_Utilities::modalException(
+                tra('No object was selected. Please select one or more objects.')
+            );
+        }
+
+        return [
+            'title' => tra('Please confirm'),
+            'modal' => '1',
+            'confirmAction' => $input->action->word(),
+            'customMsg' => $action === 'categorize'
+                ? tr('Add the following object(s)')
+                : tr('Remove the following object(s)'),
+            'confirmButton' => $action === 'categorize' ? tra('Add') : tra('Remove'),
+            'items' => $util->items,
+            'extra' => ['object_action' => $action],
+            'objects' => array_map(
+                fn ($obj) => strtoupper($obj['type'] . ': ')
+                . smarty_function_object_link(
+                    $obj,
+                    TikiLib::lib('smarty')->getEmptyInternalTemplate()
+                ),
+                $objects
+            ),
+            'categories' => $categories,
+        ];
+    }
+
+    private function resolveCategoryPermissions(array $categories, mixed $action): array
+    {
+        $allowed = [];
+        $denied = [];
+
+        foreach ($categories as $cat) {
+            $perms = Perms::get('category', $cat['id']);
+
+            $hasPermission = ($action === 'categorize' && $perms->add_objects) || ($action === 'uncategorize' && $perms->remove_objects);
+
+            if ($hasPermission) {
+                $allowed[] = $cat;
+            } else {
+                $denied[] = $cat;
+            }
+        }
+
+        return [$allowed, $denied];
+    }
+
+    /**
+     * Legacy support for `categId`. Do not extend.
+     *
+     * Older clients may send `categId` as a scalar. The public API exposes only
+     * `categIds` (array), so legacy input is normalized.
+     *
+     * Used by api/categorize and api/uncategorize.
+     *
+     * @param JitFilter $request
+     *
+     * @return void
+     */
+    private function normalizeCategoryIds(JitFilter &$request): void
+    {
+        if (isset($request['categId']) && ! isset($request['categIds'])) {
+            $request['categIds'] = [(int) $request['categId']];
+        }
     }
 }

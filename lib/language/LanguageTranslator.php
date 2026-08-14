@@ -7,7 +7,8 @@
 
 namespace I18n;
 
-use Language_Exception;
+use Tiki\Lib\Theme\ThemeLib;
+use TikiLib;
 
 require_once('lib/tikilib.php');
 require_once('lib/init/typography.php');
@@ -20,6 +21,8 @@ class LanguageTranslator
     private static array $instances = [];
     private array $interactiveCollectedStrings = [];
     private array $translations = [];
+    /** Translation keys from custom.php files that need HTML escaping */
+    private array $customTranslationKeys = [];
     /** Language code */
     private string $lang;
 
@@ -30,21 +33,6 @@ class LanguageTranslator
             self::$instances[$hash] = new self($lang, $options);
         }
         return self::$instances[$hash];
-    }
-
-    public static function getLanguageFromPrefs()
-    {
-        global $user, $user_preferences;
-        if (isset($user) && isset($user_preferences[$user]['language'])) {
-            $retval = $user_preferences[$user]['language'];
-        } else {
-            global $prefs;
-            $retval = $prefs['language'];
-        }
-        if (! $retval) {
-            throw new Language_Exception("Unable to find a language in preferences.  This isn't supposed to happen");
-        }
-        return $retval;
     }
 
     private function __construct(string $lang, array $options)
@@ -59,12 +47,12 @@ class LanguageTranslator
         }
     }
 
-    public function translate(string $content, array $args = [])
+    public function translate(string $content, array $args = [], bool $escape = false)
     {
-        list($content, $out, $wasTranslated) = $this->traImpl($content, $this->lang, $args);
+        list($content, $out, $wasTranslated) = $this->traImpl($content, $this->lang, $args, $escape);
         $out = typography($out, $this->lang, true);
 
-        $this->populateCollectedTranslations($content, $out, $wasTranslated);
+        $this->populateCollectedTranslations($content, $out, $wasTranslated, $args);
         return $out;
     }
 
@@ -80,6 +68,11 @@ class LanguageTranslator
                 $translations[ $row['source'] ] = $row['tran'];
             }
         }
+        // Database translations are user-provided and should be escaped
+        $this->customTranslationKeys = array_merge(
+            $this->customTranslationKeys,
+            array_keys($translations)
+        );
         $this->translations = array_merge($this->translations, $translations);
     }
 
@@ -119,7 +112,16 @@ class LanguageTranslator
             foreach ($customFileLookupPaths as $customfile) {
                 if (is_file($customfile)) {
                     if (! self::checkFileBOM($customfile)) {
+                        // Track state before loading custom file
+                        $lang_custom = [];
                         require_once($customfile);
+                        // After loading, $lang_custom contains the custom translations
+                        if (isset($lang_custom) && is_array($lang_custom)) {
+                            $this->customTranslationKeys = array_merge(
+                                $this->customTranslationKeys,
+                                array_keys($lang_custom)
+                            );
+                        }
                     }
                 }
             }
@@ -145,7 +147,7 @@ class LanguageTranslator
     {
         //This is just because the class isn't fully migrated, we need to load it as as side effect - benoitg - 2024-04-10
         \TikiLib::lib('theme');
-        $themePath = \ThemeLib::getThemePath(null, null, null, true);
+        $themePath = ThemeLib::getThemePath(null, null, null, true);
         $themeLangFragment = "lang/$this->lang/language.php";
         $themeLangPath = $themePath . '/' . $themeLangFragment;
         if (file_exists($themeLangPath)) {
@@ -160,7 +162,7 @@ class LanguageTranslator
         }
     }
 
-    private function traImpl($content, $lg = '', $args = []): array
+    private function traImpl($content, $lg = '', $args = [], bool $escape = false): array
     {
         global $prefs, $tikilib;
         if (empty($content) && $content !== '0') {
@@ -169,12 +171,16 @@ class LanguageTranslator
 
         $lang = $this->translations;
 
+        // Escape when explicitly requested by the caller (e.g. Smarty/HTML context)
+        // or when the translation originates from custom.php or the database
+        $shouldEscapeContent = $escape || in_array($content, $this->customTranslationKeys);
+
         if ($lg and isset($lang[$content])) {
-            return [$content, $this->argReplace($lang[$content], $args), true];
+            return [$content, $this->argReplace($lang[$content], $args, $escape), true];
         }
 
         if (! is_null($lang) and $lg and $key = array_search($content, $lang)) {
-            return [$key, $this->argReplace($content, $args), true];
+            return [$key, $this->argReplace($content, $args, $escape), true];
         }
 
         // If no translation has been found and if the string ends with a punctuation,
@@ -186,13 +192,13 @@ class LanguageTranslator
         if (in_array($lastCharacter, \Language::PUNCTUATIONS)) { // Should stay synchronized with Language_WriteFile::writeStringsToFile()
             $new_content = substr($content, 0, -1);
             if (isset($lang[$new_content])) {
+                $shouldEscapeContent = $escape || in_array($new_content, $this->customTranslationKeys);
                 return [
                 $content,
                 $this->argReplace(
-                    $lang[$new_content] . ( isset($lang[$lastCharacter])
-                        ? $lang[$lastCharacter]
-                        : $lastCharacter ),
-                    $args
+                    $lang[$new_content] . ($lang[$lastCharacter] ?? $lastCharacter),
+                    $args,
+                    $escape
                 ),
                     true
                 ];
@@ -208,17 +214,27 @@ class LanguageTranslator
             }
         }
 
-        return [$content, $this->argReplace($content, $args), false];
+        return [$content, $this->argReplace($content, $args, $escape), false];
     }
 
-    private function argReplace(string $content, array $args): string
+    private function argReplace(string $content, array $args, bool $shouldEscapeContent = false): string
     {
+        // Escape translation content BEFORE replacing arguments to prevent XSS from custom translations
+        // while preserving HTML that may be in the arguments
+        if ($shouldEscapeContent) {
+            $content = htmlspecialchars($content, ENT_QUOTES, 'UTF-8');
+        }
+
         if (! count($args)) {
             $out = $content;
         } else {
             $needles = [];
             // reverse makes sure %11, %12, etc. are translated
             $replacements = array_reverse($args);
+
+            // Arguments are NOT escaped - it's the calling code's responsibility
+            // This allows valid use cases where arguments contain HTML like links
+
             $keys = array_reverse(array_keys($args));
             foreach ($keys as $num) {
                 $needles[] = "%$num";
@@ -236,10 +252,10 @@ class LanguageTranslator
      * @param $printed
      * @param $isTranslated
      */
-    private function populateCollectedTranslations($original, $printed, $isTranslated)
+    private function populateCollectedTranslations($original, $printed, $isTranslated, $args = [])
     {
         if (self::inInteractiveMode()) {
-            $this->interactiveCollectedStrings[md5($original . '___' . $printed)] = [$original, html_entity_decode($printed), $isTranslated];
+            $this->interactiveCollectedStrings[md5($original . '___' . $printed)] = [$original, html_entity_decode($printed), $isTranslated, $args];
         }
     }
 

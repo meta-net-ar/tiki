@@ -99,8 +99,8 @@ class WikiParser_OutputLink
                 $description,
                 [
                         'href' => call_user_func($this->wikiBuilder, $pageId) . $this->anchor,
-                        'title' => $this->getTitle($info),
-                        'class' => 'wiki wiki_page',
+                        'data-bs-content' => $this->getTitle($info),
+                        'class' => 'wiki wiki_page tips',
                 ]
             );
         } elseif ($this->qualifier === 'alias') {
@@ -128,8 +128,8 @@ class WikiParser_OutputLink
                 $description,
                 [
                     'href' => call_user_func($this->wikiBuilder, $pageId) . $this->anchor,
-                    'title' => $this->getTitle($info),
-                    'class' => 'wiki wiki_page',
+                    'data-bs-content' => $this->getTitle($info),
+                    'class' => 'wiki wiki_page tips',
                 ]
             );
         } else {

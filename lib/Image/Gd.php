@@ -88,8 +88,8 @@ class Gd extends ImageAbstract
                         header('Content-Type: image/png');
                         imagepng($rasterImage);
                         $imageData = ob_get_clean();
-                        imagedestroy($rasterImage);
                         $this->data = imagecreatefromstring($imageData);
+                        $this->format = 'png';
                         $this->loaded = true;
                     } else {
                         ob_end_clean();
@@ -113,6 +113,8 @@ class Gd extends ImageAbstract
                 $svgAttributes = ' width="' . $x . '" height="' . $y . '" viewBox="0 0 ' . $this->width . ' ' . $this->height . '" preserveAspectRatio="xMinYMin meet"';
                 $this->data = preg_replace('/width="' . $this->width . '" height="' . $this->height . '"/', $svgAttributes, $this->data);
             } else {
+                $x = max(1, (int) round($x));
+                $y = max(1, (int) round($y));
                 $t = imagecreatetruecolor($x, $y);
                 // trick #2 to have a transparent background for png instead of black
                 imagesavealpha($t, true);

@@ -98,7 +98,7 @@ class APISource implements SourceInterface
                         $local_fields = $m[1];
                         if (preg_match('#' . str_replace('#', '\\#', $regex) . '#', $remote_value, $m)) {
                             foreach ($local_fields as $num => $local_field) {
-                                if (strstr($local_field, '-')) {
+                                if (str_contains($local_field, '-')) {
                                     list ($local_field, $dependency_field) = explode('-', $local_field);
                                     $local_column = $dependency_column = null;
                                     foreach ($this->schema->getColumns() as $column) {

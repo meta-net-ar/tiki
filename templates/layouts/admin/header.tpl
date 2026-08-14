@@ -2,14 +2,13 @@
 {if $base_uri and ($dir_level gt 0 or $prefs.feature_html_head_base_tag eq 'y')}
     <base href="{$base_uri|escape}">
 {/if}
-{* --- Latest IE Compatibility --- *}
-    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+{* --- Essential meta tags must come first --- *}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="generator" content="Tiki Wiki CMS Groupware - https://tiki.org">
 
-    <meta content="{$base_url_canonical}" name="twitter:domain"> {* may be obsolete when using twitter:card *}
+    <meta name="twitter:domain" content="{$base_url_canonical}"> {* may be obsolete when using twitter:card *}
 {strip}
 {* --- Canonical URL --- *}
     {include file="canonical.tpl"}
@@ -18,20 +17,35 @@
 {* --- We don't need any SEO or socials for the admin interface so we skip the rest of the related meta tags --- *}
 
 {if ($prefs.metatag_robotscustom == 'y' and not empty($metatag_robotscustom))}
+    {* PRIORITY 1: Page-specific custom robots (highest priority, complete override) *}
     <meta name="robots" content="{$metatag_robotscustom|escape}">
 {else}
     {if (isset($prefs.metatag_robots) and $prefs.metatag_robots neq '') and (!isset($metatag_robots) or $metatag_robots eq '')}
+        {* Only global preference is set *}
         <meta name="robots" content="{$prefs.metatag_robots|escape}">
     {/if}
     {if (!isset($prefs.metatag_robots) or $prefs.metatag_robots eq '') and (isset($metatag_robots) and $metatag_robots neq '')}
+        {* Only script-specific is set (from getRobots() or individual PHP files) *}
         <meta name="robots" content="{$metatag_robots|escape}">
     {/if}
     {if (isset($prefs.metatag_robots) and $prefs.metatag_robots neq '') and (isset($metatag_robots) and $metatag_robots neq '')}
-        <meta name="robots" content="{$prefs.metatag_robots|escape}, {$metatag_robots|escape}">
+        {* Both global and script-specific are set *}
+        {* Check for conflicts: if either contains NOINDEX/NOFOLLOW, use only that one to avoid contradictions *}
+        {$metatag_robots_lower = $metatag_robots|lower}
+        {$prefs_robots_lower = $prefs.metatag_robots|lower}
+        {$script_has_restrictive = strpos($metatag_robots_lower, 'noindex') !== false or strpos($metatag_robots_lower, 'nofollow') !== false}
+        {$prefs_has_restrictive = strpos($prefs_robots_lower, 'noindex') !== false or strpos($prefs_robots_lower, 'nofollow') !== false}
+        {if $script_has_restrictive}
+            {* Script-specific has restrictive directive - it takes full priority *}
+            <meta name="robots" content="{$metatag_robots|escape}">
+        {elseif $prefs_has_restrictive}
+            {* Global pref has restrictive directive - it takes priority *}
+            <meta name="robots" content="{$prefs.metatag_robots|escape}">
+        {else}
+            {* No conflict - safe to combine both directives *}
+            <meta name="robots" content="{$prefs.metatag_robots|escape}, {$metatag_robots|escape}">
+        {/if}
     {/if}
-{/if}
-{if $prefs.metatag_revisitafter neq ''}
-    <meta name="revisit-after" content="{$prefs.metatag_revisitafter|escape}">
 {/if}
 
 {capture assign='header_title'}{strip}
@@ -50,7 +64,7 @@
     {/capture}
     {if isset($structure) and $structure eq 'y'} {* get the alias name if item is a wiki page and it is in a structure *}
         {section loop=$structure_path name=ix}
-        {assign var="aliasname" value={$structure_path[ix].page_alias}}
+        {$aliasname={$structure_path[ix].page_alias}}
         {/section}
     {/if}
     {if $prefs.site_title_location eq 'only'}
@@ -98,12 +112,6 @@
 {/strip}{/capture}
 {* --- tiki block --- *}
 <title>{$header_title}</title>
-
-{* --- GlitchTip reporting script should be load before any other JS to capture issues/failures on other JS scripts --- *}
-{if $prefs.error_tracking_enabled_js eq 'y' and  !empty($prefs.error_tracking_dsn)}
-    <script type="text/javascript" src="vendor_bundled/vendor/npm-asset/sentry--browser/build/bundle.min.js"></script>
-    <script type="text/javascript">Sentry.init({ dsn: "{$prefs.error_tracking_dsn}", sampleRate: {if isset($prefs.error_tracking_sample_rate) and is_numeric($prefs.error_tracking_sample_rate)}{$prefs.error_tracking_sample_rate}{else}1{/if}});</script>
-{/if}
 
 {if $headerlib} 
     {$headerlib->output_headers()}

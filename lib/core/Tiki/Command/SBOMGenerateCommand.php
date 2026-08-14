@@ -379,14 +379,14 @@ class SBOMGenerateCommand extends Command
 
     protected function getComposerSubPackages($parentName, $packageInfo, $composerLockData, &$deps = [])
     {
-        if (empty($packageInfo['requires']) || ! isset($packageInfo['requires'])) {
+        if (empty($packageInfo['requires'])) {
             return $deps;
         }
 
         foreach ($packageInfo['requires'] as $package) {
             $name = $package['name'];
             $version = $package['version'];
-            if (substr($name, 0, 4) === 'ext-' || $name === 'php') {
+            if (str_starts_with($name, 'ext-') || $name === 'php') {
                 unset($packageInfo['requires'][$name]);
             } else {
                 $lockedPackage = $composerLockData['packages'][array_search($name, array_column($composerLockData['packages'], 'name'))];
@@ -452,7 +452,7 @@ class SBOMGenerateCommand extends Command
             return ! empty($file);
         });
 
-        if (strpos($packageName, 'npm-asset') !== false) {
+        if (str_contains($packageName, 'npm-asset')) {
             echo $packageName . "\n";
             $tplReferenes = shell_exec('grep -r -e "src=\"vendor_bundled/vendor/' . $packageName . '/.*\"" -e "src=\'vendor_bundled/vendor/' . $packageName . '.*\'" -e "href=\"vendor_bundled/vendor/' . $packageName . '.*\"" -e "href=\'vendor_bundled/vendor/' . $packageName . '.*\'" --exclude-dir={vendor,schema,composer-patches,themes,lang,temp} --include="*.tpl" ./');
             $tplReferenes = array_filter(explode("\n", $tplReferenes), function ($file) {

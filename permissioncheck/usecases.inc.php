@@ -1,5 +1,9 @@
 <?php
 
+if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+    return;
+}
+
 // list of usecases and assumed permissions
 // name of usecase equals name of subdirectory of permissioncheck/
 // $uc_perms_file refers always to check.php in the corresponding subdir

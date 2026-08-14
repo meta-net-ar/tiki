@@ -23,12 +23,12 @@
             <div class="row align-items-end">
                 <div class="mb-3 col-sm">
                     <label class="col-form-label">{tr}Version{/tr}
-                        <input type="text" name="version" value="{if !empty($filter.version)}{$filter.version|escape}{/if}" class="form-control">
+                        <input type="number" name="version" value="{if isset($filter.version)}{$filter.version|escape}{/if}" class="form-control">
                     </label>
                 </div>
                 <div class="mb-3 col-sm">
                     <label class="col-form-label">{tr}Field ID{/tr}
-                        <input type="text" name="fieldId" value="{if !empty($fieldId)}{$fieldId|escape}{/if}" class="form-control">
+                        <input type="number" name="fieldId" value="{if !empty($fieldId)}{$fieldId|escape}{/if}" class="form-control">
                     </label>
                 </div>
                 <div class="mb-3 col-sm">
@@ -75,9 +75,9 @@
             {$last_version = 0}
             {foreach from=$history item=hist}
                 {if $hist.value neq $hist.new or $hist.version == 0}
-                    {assign var='fieldId' value=$hist.fieldId}
-                    {assign var='field_value' value=$field_option[$fieldId]}
-                    {if $field_value.visibleInHistoryMode eq 'y' or $hist.version == 0}
+                    {$fieldId=$hist.fieldId}
+                    {$field_value=$field_option[$fieldId]}
+                    {if is_array($field_value) and ($field_value.visibleInHistoryMode eq 'y' or $hist.version == 0 or $hist.fieldId == HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE)}
                         <tr>
                             <td class="id"><strong>{$hist.version|escape}</strong></td>
                             <td class="date"><strong>{if not empty($hist.lastModif)}{$hist.lastModif|tiki_short_datetime}{/if}</strong></td>
@@ -89,17 +89,20 @@
                                 {if $fieldId eq HISTLIB_INVALID_FIELDID_THAT_MEANS_TRACKER_ITEM_STATUS_CHANGE}_{tr}Status{/tr}_{else}{$field_option[$fieldId].name}{/if}
                             </td>
                             {if empty($diff_style)}
-                                {if !empty($field_value.fieldId)}
-                                    <td class="text">{$field_value.value=$hist.value}{trackeroutput field=$field_value list_mode=csv item=$item_info history=y process=y}</td>
-                                    <td class="text">{$field_value.value=$hist.new}{trackeroutput field=$field_value list_mode=csv item=$item_info history=y process=y}</td>
+                                {if !empty($field_value.fieldId) && $field_value.fieldId > 0 && empty($field_value.isDeletedField)}
+                                    <td class="text">{$hist.rendered_value}</td>
+                                    <td class="text">{$hist.rendered_new}</td>
                                 {else}
                                     <td class="text">{$hist.value|escape}</td>
                                     <td class="text">{$hist.new|escape}</td>
                                 {/if}
                             {else}
                                 <td colspan="2" class="tracker-diff {$diff_style}">
-                                    {$field_value.value=$hist.new}
-                                    {trackeroutput field=$field_value list_mode='y' history=y item=$item_info process=y oldValue=$hist.value diff_style=$diff_style}
+                                    {if !empty($field_value.fieldId) && $field_value.fieldId > 0 && empty($field_value.isDeletedField)}
+                                        {$hist.rendered_diff}
+                                    {else}
+                                        {wikidiff object_type=direct oldver=$hist.value newver=$hist.new diff_style=$diff_style}
+                                    {/if}
                                 </td>
                             {/if}
                         </tr>
@@ -109,6 +112,6 @@
         </table>
     </div>
 
-    {pagination_links cant=$cant offset=$offset step=$prefs.maxRecords}
+    {pagination_links count=$count offset=$offset step=$prefs.maxRecords}
     {/pagination_links}
 {/block}

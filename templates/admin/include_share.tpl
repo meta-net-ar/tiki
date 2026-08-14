@@ -1,4 +1,4 @@
-<form action="tiki-admin.php?page=share" method="post">
+<form action="tiki-admin.php?page=share" method="post" class="styling-element">
     {ticket}
 
     <div class="row">

@@ -148,8 +148,7 @@ class Services_Language_Controller
         if ($input->language->text()) {
             $language = $input->language->text();
         } else {
-            global $prefs;
-            $language = $prefs['language'];
+            $language = Language::getCurrentLanguage();
         }
 
         //get list of languages
@@ -170,31 +169,46 @@ class Services_Language_Controller
             $from = $input->asArray('from');
             $to = $input->asArray('to');
 
+            $submittedData = [];
             $isValid = is_array($from)
                 && is_array($to)
                 && count($from) > 0
                 && count($from) === count($to);
 
             if ($isValid) {
-                $data = [];
-
-                //prepare data
+                //prepare data, filtering out empty rows
                 foreach ($from as $index => $source) {
                     if (! empty($to[$index]) && ! empty($source)) {
-                        $data[ $source ] = $to[ $index ];
+                        $submittedData[ $source ] = $to[ $index ];
                     }
                 }
-
-                //write custom php file content
-                $this->utilities->writeCustomPhpTranslations($language, $data);
-
-                //empty cache
+            }
+            // Get the translations that are currently saved to compare against.
+            $existingTranslations = $this->utilities->getCustomPhpTranslations($language);
+            if ($submittedData == $existingTranslations) {
+                // CASE 1: The user clicked save, but made no changes.
+                if (empty($submittedData)) {
+                    // CASE A: The user submitted an empty form, and nothing was saved before.
+                    Feedback::warning(tr('No valid translations were provided to save.'));
+                } else {
+                    // CASE B: The user clicked "Save" without making any changes to existing data.
+                    Feedback::note(tr('No changes were made.'));
+                }
+            } else {
+                // CASE 2: The data is different (add, modify, OR delete). This is a true success.
+                $this->utilities->writeCustomPhpTranslations($language, $submittedData);
                 $cachelib = TikiLib::lib('cache');
                 $cachelib->empty_cache();
 
-                //TODO add success message
+                Feedback::success(tr('Custom translations saved successfully.'));
 
-                //TODO refresh screen
+                return [
+                    'FORWARD' => [
+                        'controller' => 'language',
+                        'action' => 'manage_custom_translations',
+                        'language' => $language,
+                    ]
+                ];
             }
         }
         //get custom translation content
@@ -291,8 +305,7 @@ class Services_Language_Controller
         if ($input->language->text()) {
             $language = $input->language->text();
         } else {
-            global $prefs;
-            $language = $prefs['language'];
+            $language = Language::getCurrentLanguage();
         }
 
         //define upload types for the uploaded file

@@ -8,6 +8,7 @@ class Tiki_Version_Checker
 {
     private $cycle;
     private $version;
+    private $isSupportedInCycle;
 
     public function setCycle($cycle)
     {
@@ -17,6 +18,7 @@ class Tiki_Version_Checker
     public function setVersion($version)
     {
         $this->version = Tiki_Version_Version::get($version);
+        $this->isSupportedInCycle = false;
     }
 
     public function check($callback)
@@ -24,23 +26,69 @@ class Tiki_Version_Checker
         $upgrades = [];
         $branchupdate = null;
 
-        $content = call_user_func($callback, "http://tiki.org/{$this->cycle}.cycle");
+        // Perform Original EoL and Upgrade Check from .cycle file
+        $content = call_user_func($callback, "https://tiki.org/{$this->cycle}.cycle");
         $versions = $this->getSupportedVersions($content);
+        $supportedInBranch = $this->findSupportedInBranch($versions);
+        $this->isSupportedInCycle = (bool)$supportedInBranch;
+        $latestOverall = $this->getLatestVersion($versions);
 
-        if ($supported = $this->findSupportedInBranch($versions)) {
-            if ($supported->isUpgradeTo($this->version)) {
-                $upgrades[] = new Tiki_Version_Upgrade($this->version, $supported, true);
-                $branchupdate = $supported;
+        if ($supportedInBranch) {
+            if ($supportedInBranch->isStableUpgradeTo($this->version)) {
+                $upgrades[] = new Tiki_Version_Upgrade($this->version, $supportedInBranch, "error");
+                $branchupdate = $supportedInBranch;
+            }
+        }
+        if ($latestOverall && $latestOverall !== $branchupdate) {
+            // If current is unstable OR max is a stable upgrade to current
+            if (! $this->version->isStable() || $latestOverall->isStableUpgradeTo($this->version)) {
+                $fromVersion = $this->isSupportedInCycle ? $supportedInBranch : $this->version;
+                $messageType = ($this->isSupportedInCycle || ! $this->version->isStable()) ? 'note' : 'error';
+
+                $upgrades[] = new Tiki_Version_Upgrade($fromVersion ?: $this->version, $latestOverall, $messageType);
             }
         }
 
-        $max = $this->getLatestVersion($versions);
-
-        if ($max !== $branchupdate && $max->isUpgradeTo($this->version)) {
-            $upgrades[] = new Tiki_Version_Upgrade($supported ?: $this->version, $max, $supported === false);
+        // Enhance with Approaching EoL Date Check (if feature enabled and version is supported)
+        global $prefs, $TWV;
+        if ($this->isSupportedInCycle && ($prefs['feature_eol_date_notifier'] ?? 'n') === 'y') {
+            $eolMessages = $this->checkEolDates($TWV);
+            $upgrades = array_merge($upgrades, $eolMessages);
         }
 
         return $upgrades;
+    }
+
+
+    /**
+    * To check for approaching EoL dates for SUPPORTED versions.
+    * @param TWVersion $versionManager The TWVersion object.
+    * @return array An array of Tiki_Version_Upgrade objects.
+    */
+    private function checkEolDates($versionManager): array
+    {
+        $messages = [];
+        $majorVersion = $this->version->getMajor();
+        $ltsEolDates = $versionManager->getLtsEolDates();
+
+        if (! isset($ltsEolDates[$majorVersion])) {
+            return [];
+        }
+
+        $eolTimestamp = strtotime($ltsEolDates[$majorVersion]);
+
+        if ($eolTimestamp === false) { // Check for invalid date format
+            return [];
+        }
+        $now = time();
+        $sixMonthsThreshold = strtotime('+6 months');
+
+        // If the EoL is in the future AND is less than 6 months away
+        if (($eolTimestamp > $now) && ($eolTimestamp < $sixMonthsThreshold)) {
+            $messages[] = new Tiki_Version_Upgrade($this->version, null, 'warning');
+        }
+
+        return $messages;
     }
 
     private function getSupportedVersions($content)
@@ -64,7 +112,7 @@ class Tiki_Version_Checker
         $max = array_shift($versions);
 
         foreach ($versions as $candidate) {
-            if ($candidate->isUpgradeTo($max)) {
+            if ($candidate->isStableUpgradeTo($max)) {
                 $max = $candidate;
             }
         }

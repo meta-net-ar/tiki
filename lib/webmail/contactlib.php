@@ -82,9 +82,9 @@ class ContactLib extends TikiLib
             $con = trim($con);
 
             $query = "select count(*) from `tiki_webmail_contacts` where `email`=?";
-            $cant = $this->getOne($query, [$con]);
+            $count = $this->getOne($query, [$con]);
 
-            if (! $cant) {
+            if (! $count) {
                 $ret[] = $con;
             }
         }
@@ -114,7 +114,7 @@ class ContactLib extends TikiLib
     public function parse_nicknames($dirs)
     {
         for ($i = 0, $icount_dirs = count($dirs); $i < $icount_dirs; $i++) {
-            if (! strstr($dirs[$i], '@') && ! empty($dirs[$i])) {
+            if (! str_contains($dirs[$i], '@') && ! empty($dirs[$i])) {
                 $query = "select `email` from `tiki_webmail_contacts` where `nickname`=?";
                 $result = $this->query($query, [$dirs[$i]]);
                 if ($result->numRows()) {
@@ -177,14 +177,14 @@ class ContactLib extends TikiLib
             if ($this->is_a_user_contact($contactId, $user, true)) {
                 $query = "update `tiki_webmail_contacts` set `firstName`=?, `lastName`=?, `email`=?, `nickname`=? where `contactId`=?";
                 $bindvars = [$firstName, $lastName, $email, $nickname, (int)$contactId];
-                $result = $this->query($query, $bindvars);
+                $this->query($query, $bindvars);
             } else {
                 return false;
             }
         } else {
-            $contactId = $this->getOne('select max(`contactId`) from `tiki_webmail_contacts`') + 1;
-            $query = "insert into `tiki_webmail_contacts`(`contactId`,`firstName`,`lastName`,`email`,`nickname`,`user`) values(?,?,?,?,?,?)";
-            $result = $this->query($query, [(int)$contactId, $firstName, $lastName, $email, $nickname, $user]);
+            $query = "insert into `tiki_webmail_contacts` (`firstName`,`lastName`,`email`,`nickname`,`user`) values(?,?,?,?,?)";
+            $result = $this->query($query, [$firstName, $lastName, $email, $nickname, $user]);
+            $contactId = $this->lastInsertId();
         }
         if (is_array($groups)) {
             $this->query('delete from `tiki_webmail_contacts_groups` where `contactId`=?', [(int)$contactId]);

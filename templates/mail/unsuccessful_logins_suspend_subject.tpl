@@ -1,1 +1,1 @@
-{tr}{$prefs.mail_template_custom_text}Account suspended{/tr}
+{tr _0=$prefs.mail_template_custom_text}%0Account suspended{/tr}

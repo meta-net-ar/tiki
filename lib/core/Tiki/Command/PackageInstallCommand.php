@@ -34,13 +34,13 @@ class PackageInstallCommand extends Command
             ->addArgument(
                 'package',
                 InputArgument::OPTIONAL,
-                'Package ID'
+                tra('Package ID')
             )
             ->addOption(
                 'install-all',
                 'a',
                 InputOption::VALUE_NONE,
-                'Install all available packages'
+                tra('Install all available packages')
             );
     }
 
@@ -56,22 +56,22 @@ class PackageInstallCommand extends Command
         }
         $progress->setFormatDefinition('custom', ' %current%/%max% [%bar%] -- %message%');
         $progress->setFormat('custom');
-        $progress->setMessage('Starting package installation');
+        $progress->setMessage(tra('Starting package installation'));
         $progress->start();
 
         // now install each package
-        $finishMessage = 'Successfully installed ' . $packageCount . ' packages' ;
+        $finishMessage = tra('Successfully installed %count% packages', ['%count%' => $packageCount]);
         foreach ($availableComposerPackages as $package) {
-            $progress->setmessage('Installing ' . $package['key']);
+            $progress->setmessage(tra('Installing %package%', ['%package%' => $package['key']]));
             $progress->advance();
             $output->writeln(shell_exec('php console.php package:install ' . $package['key'] . '  2>&1'), OutputInterface::VERBOSITY_DEBUG);
             if (! $composerManager->isInstalled($package['name'])) {
                 // we remove failed packages so they won't cause issues installing the others.
                 $composerManager->removePackage($package['key']);
-                $output->write(' <error>failed</error>');
-                $finishMessage = '<error>Completed with errors</error>';
+                $output->write(' <error>' . tra('failed') . '</error>');
+                $finishMessage = '<error>' . tra('Completed with errors') . '</error>';
             } else {
-                $output->write(' <comment>done</comment>');
+                $output->write(' <comment>' . tra('done') . '</comment>');
             }
         }
         $progress->setMessage($finishMessage);
@@ -112,11 +112,11 @@ class PackageInstallCommand extends Command
                 } else {
                     $availablePackagesInfo = PackageCommandHelper::getAvailablePackagesInfo($availableComposerPackages);
 
-                    $output->writeln('Packages Available to Install');
+                    $output->writeln(tra('Packages Available to Install'));
                     PackageCommandHelper::renderAvailablePackagesTable($output, $availablePackagesInfo);
 
                     $helper = $this->getHelper('question');
-                    $question = PackageCommandHelper::getQuestion('Which package do you want to install', null, '?');
+                    $question = PackageCommandHelper::getQuestion(tra('Which package do you want to install'), null, '?');
                     $question->setValidator(function ($answer) use ($availableComposerPackages) {
                         return PackageCommandHelper::validatePackageSelection($answer, $availableComposerPackages);
                     });

@@ -11,5 +11,5 @@
     {/if}
 {/foreach}
 {if $pagination.step ne -1}
-    {pagination_links cant=$pagination.cant step=$pagination.step offset=$pagination.offset}{/pagination_links}
+    {pagination_links count=$pagination.count step=$pagination.step offset=$pagination.offset}{/pagination_links}
 {/if}

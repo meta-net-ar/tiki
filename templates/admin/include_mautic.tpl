@@ -3,6 +3,7 @@
     <div class="t_navbar mb-4 clearfix">
         {include file='admin/include_apply_top.tpl'}
     </div>
+    <div class="styling-element">
     <fieldset>
         <legend class="h3">{tr}Main Settings{/tr}</legend>
         {preference name=site_mautic_url}
@@ -13,5 +14,6 @@
         {preference name=site_mautic_username}
         {preference name=site_mautic_password}
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

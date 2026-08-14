@@ -159,7 +159,7 @@ class CheckSchemaSqlDrop
                 $curQuery = $queries[$i];
                 $nextQuery = $queries[$i + 1];
                 if (
-                    strpos($curQuery, "DROP TABLE IF EXISTS") !== false
+                    str_contains($curQuery, "DROP TABLE IF EXISTS")
                     && substr($nextQuery, 0, 2) === (PHP_EOL . PHP_EOL)
                 ) {
                     $queries[++$i] = substr($nextQuery, 1);

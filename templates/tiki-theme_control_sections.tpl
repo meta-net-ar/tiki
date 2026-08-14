@@ -1,8 +1,9 @@
 {title help="Theme Control"}{tr}Theme Control:{/tr} {tr}Sections{/tr}{/title}
-<div class="t_navbar btn-group">
-    {button href="tiki-theme_control.php" class="btn btn-primary" _text="{tr}Control by Categories{/tr}"}
-    {button href="tiki-theme_control_objects.php" class="btn btn-primary" _text="{tr}Control by Objects{/tr}"}
+<div class="t_navbar btn-group mb-3">
+    {button href="tiki-theme_control.php" _class="btn btn-link" _text="{tr}Control by Categories{/tr}"}
+    {button href="tiki-theme_control_objects.php" _class="btn btn-link" _text="{tr}Control by Objects{/tr}"}
 </div>
+<div class="styling-element">
 <h2 class="my-3">{tr}Assign themes to sections{/tr}</h2>
 <form action="tiki-theme_control_sections.php" method="post" class="row gy-2 gx-3 align-items-center mb-4">
     {ticket}
@@ -63,3 +64,4 @@
         </table>
     </div>
 </form>
+</div>

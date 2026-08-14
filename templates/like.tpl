@@ -1,6 +1,6 @@
 <span class="like_block">
     {if not $count_only}
-        <a class="like_button" data-type="{$type}" data-object="{$object}" href="#">
+        <a class="like_button" data-type="{$type}" data-object="{$object}" href="#" role="button">
             {if $has_relation}
                 <i class="fas fa-thumbs-up fa-lg"></i>
             {else}

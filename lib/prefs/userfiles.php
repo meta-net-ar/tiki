@@ -6,9 +6,12 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_userfiles_list()
 {
+    $userFilesHelp = 'User-Files';
+
     return [
         'userfiles_quota' => [
             'name' => tra('Quota'),
+            'description' => tra('Maximum storage per user for personal files and notepad content, in megabytes. Also applied as the quota on each user file gallery.'),
             'type' => 'text',
             'size' => 5,
             'units' => tra('megabytes'),
@@ -16,6 +19,7 @@ function prefs_userfiles_list()
             'dependencies' => [
                 'feature_userfiles',
             ],
+            'help' => $userFilesHelp,
         ],
         'userfiles_private' => [
             'name' => tra('Private'),
@@ -25,6 +29,7 @@ function prefs_userfiles_list()
             'dependencies' => [
                 'feature_userfiles',
             ],
+            'help' => $userFilesHelp,
         ],
         'userfiles_hidden' => [
             'name' => tra('Hidden'),
@@ -34,6 +39,7 @@ function prefs_userfiles_list()
             'dependencies' => [
                 'feature_userfiles',
             ],
+            'help' => $userFilesHelp,
         ],
-    ];
+    ]; // TODO: update userfiles help page
 }

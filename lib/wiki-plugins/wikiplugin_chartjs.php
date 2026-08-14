@@ -98,7 +98,7 @@ function wikiplugin_chartjs_info()
 
 function wikiplugin_chartjs($data, $params)
 {
-    global $base_url, $jitRequest;
+    global $base_url, $jitRequest, $prefs;
 
     static $instance = 0;
     $instance++;
@@ -110,14 +110,6 @@ function wikiplugin_chartjs($data, $params)
     if (empty($params['id'])) {
         $params['id'] = "tikiChart$instance";
     }
-
-    //set defaults
-    $plugininfo = wikiplugin_chartjs_info();
-    $defaults = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $defaults[$key] = $param['default'];
-    }
-    $params = array_merge($defaults, $params);
 
     if (empty($params['data_highlights'])) {
         $params['data_highlights'] = $params['data_colors'];
@@ -189,13 +181,8 @@ function wikiplugin_chartjs($data, $params)
         return '<div class="tiki-chartjs">' . $canvas . '</div>';
     }
 
-    // PDF export related logic
-    if (HeadlessBrowserFactory::getHeadlessBrowserType() === HeadlessBrowserFactory::CASPERJS) {
-        // casperJS uses PhantomJS that does not support ES6, so no support for modules.
-        // We are going to hardcode a reference to the latest version of chart.js 2.x to allow running
-        // the PDF export of the chart without using JS modules.
-        $html_content = <<<HTML
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.bundle.js"></script>
+    $non_module_html_content = '<script src="' . NODE_PUBLIC_DIST_PATH . '/chartjs-v2/dist/Chart.bundle.min.js"></script>';
+    $non_module_html_content .= <<<HTML
 <div>
     $canvas
 </div>
@@ -203,9 +190,19 @@ function wikiplugin_chartjs($data, $params)
     $script
 </script>
 HTML;
+
+    // PDF export related logic
+    if (HeadlessBrowserFactory::getHeadlessBrowserType() === HeadlessBrowserFactory::CASPERJS) {
+        // casperJS uses PhantomJS that does not support ES6, so no support for modules.
+        // We are going to hardcode a reference to the latest version of chart.js 2.x to allow running
+        // the PDF export of the chart without using JS modules.
+        // @tiki-external-link-ok: Chart.js 2.x via CDN for CasperJS/PhantomJS PDF export
+        $html_content = $non_module_html_content;
     } else {
-        $html_content = generateJsImportmapScripts(true); // generate imports with full URL since we load the html file as file://
-        $html_content .= <<<HTML
+        // If the user is using the default ChartJS path, we can use importmap to load the module
+        if ($prefs['headlessbrowser_chartjs_module'] === 'y') {
+            $html_content = generateJsImportmapScripts(true); // generate imports with full URL since we load the html file as file://
+            $html_content .= <<<HTML
 <div>
     $canvas
 </div>
@@ -216,6 +213,9 @@ HTML;
     $script
 </script>
 HTML;
+        } else {
+            $html_content = $non_module_html_content;
+        }
     }
     $scriptHash = md5($script);
     $cacheKey = 'chart_';
@@ -229,7 +229,8 @@ HTML;
             $htmlFile = writeTempFile($html_content, '', true, 'wikiplugin_chart_', '.html');
             $hash = str_replace('wikiplugin_chart_', '', str_replace('.html', '', basename($htmlFile)));
             $outputPath = TIKI_PATH . DIRECTORY_SEPARATOR . 'temp' . DIRECTORY_SEPARATOR . 'wikiplugin_chart_' . $hash . '.png';
-            $base64 = $headlessBrowser->getUrlAsImage($htmlFile, $outputPath, 'body', $timeout);
+            $htmlFile = realpath($htmlFile);
+            $base64 = $headlessBrowser->getUrlAsImage("file:///$htmlFile", $outputPath, 'body', $timeout);
             $cacheLib->cacheItem($scriptHash, $base64, $cacheKey);
         } else {
             $base64 = $cacheLib->getCached($scriptHash, $cacheKey);
@@ -238,6 +239,17 @@ HTML;
         $logsLib = TikiLib::lib('logs');
         $logsLib->add_log('HeadlessBrowser', $e->getMessage());
         Feedback::error($e->getMessage());
+        return; // Early return to show an error message
+    } finally {
+        // This block will always execute even if an exception is thrown or early return
+        // Clean up temporary files
+        if (! empty($htmlFile) && file_exists($htmlFile)) {
+            unlink($htmlFile);
+        }
+
+        if (! empty($outputPath) && file_exists($outputPath)) {
+            unlink($outputPath);
+        }
     }
 
     $canvas = <<<HTML

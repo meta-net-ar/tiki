@@ -3,7 +3,7 @@
     <div class="panel panel-primary">
         <div class="panel-heading"> <h3 class="panel-title">{$issuer}</h3> </div>
         <div class="panel-body"> <h1>{tr _0='<strong class="code">--</strong>' _1='<span class="time">--</span>'}Code: %0 Expires in: %1 seconds.{/tr}</h1>
-            {if $sourcePerm}<a class="twoFactorAuthShow" href="#">{tr}Show QRCode{/tr}</a>{/if}</div>
+            {if $sourcePerm}<a class="twoFactorAuthShow" href="#" role="button">{tr}Show QRCode{/tr}</a>{/if}</div>
         {if $sourcePerm}
         <div class="col-md-12 card twoFactorAuthCard" style="display: none">
             <div class="card-body">

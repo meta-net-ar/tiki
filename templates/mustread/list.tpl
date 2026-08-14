@@ -17,7 +17,7 @@
                 <th>{tr}Action Req'd{/tr}</th>
                 <th>{tr}Complete{/tr}</th>
             </tr>
-            {foreach $list as $entry}
+            {foreach $listMR as $entry}
                 <tr {if $selection eq $entry.object_id}class="active"{/if}>
                     <td><a href="{service controller=mustread action=list id=$entry.object_id}">{$entry.title|escape}</a></td>
                     <td>{$entry.creation_date|tiki_short_datetime}</td>

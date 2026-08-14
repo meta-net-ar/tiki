@@ -219,7 +219,7 @@ class Perms
      * @param $permission string|array The permission name to validate on each record.
      * @return array What remains of the dataset after filtering.
      */
-    public static function filter(array $baseContext, $bulkKey, array $data, array $contextMap, $permission)
+    public static function filter(array $baseContext, $bulkKey, array $data, array $contextMap, $permission): array
     {
         $cacheKey = md5(serialize($baseContext) . serialize($bulkKey) . serialize($data) . serialize($contextMap) . serialize($permission));
 
@@ -277,7 +277,6 @@ class Perms
 
     public static function mixedFilter(array $baseContext, $discriminator, $bulkKey, $data, $contextMapMap, $permissionMap)
     {
-        //echo '<pre>BASECONTEXT'; print_r($baseContext); echo 'DISCRIMATOR';print_r($discriminator); echo 'BULKEY';print_r($bulkKey); echo 'DATA';print_r($data); echo 'CONTEXTMAPMAP';print_r($contextMapMap); echo 'PERMISSIONMAP';print_r($permissionMap); echo '</pre>';
 
         $perType = [];
 
@@ -337,26 +336,61 @@ class Perms
 
     private function getResolver(array $context)
     {
+        global $prefs;
+
         $toSet = [];
         $finalResolver = false;
 
-        foreach ($this->factories as $factory) {
-            $hash = $factory->getHash($context);
+        if (isset($prefs['permission_scope_behavior']) && $prefs['permission_scope_behavior'] === 'blending') {
+            // blending permission system
+            foreach (array_reverse($this->factories) as $factory) {
+                $hash = $factory->getHash($context);
 
-            // no hash returned by factory means factory does not support that context
-            if (! $hash) {
-                continue;
+                // no hash returned by factory means factory does not support that context
+                if (! $hash) {
+                    continue;
+                }
+
+                // blending mode requires caching by context as previous lookups might interfere
+                // finalResolver because of the merging
+                $hash .= implode('', $context);
+
+                if (isset($this->hashes[$hash])) {
+                    $currentResolver = $this->hashes[$hash];
+                } else {
+                    $currentResolver = $factory->getResolver($context);
+                    $toSet[$hash] = $currentResolver;
+                }
+
+                if ($finalResolver) {
+                    if ($currentResolver) {
+                        $currentResolver->merge($finalResolver);
+                        $finalResolver = $currentResolver;
+                    }
+                } else {
+                    $finalResolver = $currentResolver;
+                }
             }
+        } else {
+            // traditional strict scope based permission system
+            foreach ($this->factories as $factory) {
+                $hash = $factory->getHash($context);
 
-            if (isset($this->hashes[$hash])) {
-                $finalResolver = $this->hashes[$hash];
-            } else {
-                $finalResolver = $factory->getResolver($context);
-                $toSet[$hash] = $finalResolver;
-            }
+                // no hash returned by factory means factory does not support that context
+                if (! $hash) {
+                    continue;
+                }
 
-            if ($finalResolver) {
-                break;
+                if (isset($this->hashes[$hash])) {
+                    $finalResolver = $this->hashes[$hash];
+                } else {
+                    $finalResolver = $factory->getResolver($context);
+                    $toSet[$hash] = $finalResolver;
+                }
+
+                if ($finalResolver) {
+                    break;
+                }
             }
         }
 

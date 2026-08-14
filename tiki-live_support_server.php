@@ -21,7 +21,6 @@
 // response time of this script which is critical.
 
 include "tiki-setup.php";
-TikiLib::lib('header')->setXRobotsTag($robots);
 
 header('Content-Type: text/xml');
 if ($prefs['feature_live_support'] != 'y') {
@@ -49,11 +48,10 @@ if (isset($_REQUEST['set_operator_status'])) {
     $lslib->set_operator_status($_REQUEST['set_operator_status'], $_REQUEST['status']);
 }
 if (isset($_REQUEST['operators_online'])) {
+    header("Content-type: image/png");
     if ($lslib->operators_online()) {
-        header("Content-type: image/png");
         readfile('img/icons/live-support-on.png');
     } else {
-        header("Content-type: image/png");
         readfile('img/icons/live-support-off.png');
     }
 }
@@ -67,7 +65,7 @@ if (isset($_REQUEST['write'])) {
     if ($_REQUEST['role'] == 'observer') {
         $color = 'grey';
     }
-    if (! strstr($_REQUEST['msg'], 'has left')) {
+    if (! str_contains($_REQUEST['msg'], 'has left')) {
         $_REQUEST['msg'] = '<span class="' . $_REQUEST['role'] . '" style="color:' . $color . ';">(' . $_REQUEST['name'] . ')' . ' ' . $_REQUEST['msg'] . '</span>';
     }
     $lslib->put_message($_REQUEST['write'], $_REQUEST['msg'], $_REQUEST['senderId']);

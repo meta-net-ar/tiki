@@ -1,0 +1,17 @@
+{
+  "name": "common-reexported",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependenciesComment":{
+  "jspdf" : "ESM module is not directly usable.  NOTE:  Depends on html2canvas, but remapped to html2canvas-pro in vite.config.js)"
+  },
+  "devDependencies":{
+  "jspdf" : "^4.2.1"
+  }
+}

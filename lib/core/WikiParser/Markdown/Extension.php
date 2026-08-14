@@ -9,6 +9,7 @@ namespace Tiki\WikiParser\Markdown;
 use League\CommonMark\Environment\EnvironmentBuilderInterface;
 use League\CommonMark\Event\DocumentParsedEvent;
 use League\CommonMark\Extension\ExtensionInterface;
+use League\CommonMark\Extension\CommonMark\Node\Block\FencedCode;
 use League\CommonMark\Extension\TaskList\TaskListItemMarker;
 use League\CommonMark\Extension\TaskList\TaskListItemMarkerParser;
 use Tiki\WikiParser\Markdown\Renderer\TaskListItemMarkerRenderer;
@@ -22,6 +23,7 @@ class Extension implements ExtensionInterface
             ->addRenderer(Node\CollapsibleHeading::class, new Renderer\CollapsibleHeadingRenderer(), 0)
             ->addRenderer(Node\CollapsibleLink::class, new Renderer\CollapsibleLinkRenderer(), 0)
             ->addRenderer(Node\CollapsibleContainer::class, new Renderer\CollapsibleContainerRenderer(), 0)
+            ->addRenderer(FencedCode::class, new Renderer\FencedCodeRenderer(), 10)
         ;
         $environment->addEventListener(DocumentParsedEvent::class, new CollapsibleHeadingProcessor(), -100);
 

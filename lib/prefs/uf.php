@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_uf_list()
 {
+    $fileGalleryConfigHelp = 'File-Gallery-Config';
+
     return [
         'uf_use_db' => [
             'name' => tra('Storage'),
@@ -17,6 +19,7 @@ function prefs_uf_list()
             ],
             'default' => 'y',
             'tags' => ['basic'],
+            'help' => $fileGalleryConfigHelp,
         ],
         'uf_use_dir' => [
             'name' => tra('Directory path'),
@@ -25,6 +28,7 @@ function prefs_uf_list()
             'size' => 50,
             'default' => '',
             'tags' => ['basic'],
+            'help' => $fileGalleryConfigHelp,
         ],
     ];
 }

@@ -18,7 +18,7 @@ use Tiki\Package\ExtensionManager as PackageExtensionManager;
 use Symfony\Component\Config\Exception\FileLocatorFileNotFoundException;
 
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -46,7 +46,7 @@ if (file_exists($legacyVendorAutoloaderPath)) {
     // In some cases, the vendor folder may contain the files from the old vendor folder before migrating to
     // vendor_bundled. In these cases eg. when unzipping a Tiki => 17.x on top of an existing Tiki <= 16.x instance,
     // loading the autoload from the vendor folder will cause issues.
-    // We check for some core libraries (ZendFramework, Smarty and Adodb), if they are all present in the
+    // We check for some core libraries (ZendFramework and Smarty), if they are all present in the
     // vendor folder we will consider that there is a old vendor folder, and skip loading the autoload.php unless
     // there is a file called do_not_clean.txt inside the vendor folder (we will only check the file exists)
     if (
@@ -56,7 +56,6 @@ if (file_exists($legacyVendorAutoloaderPath)) {
                 || file_exists($legacyVendorPath . '/bombayworks/zendframework1/library/Zend/Config.php')) //ZF1
             && (file_exists($legacyVendorPath . '/smarty/smarty/libs/Smarty.class.php') //Smarty
                 || file_exists($legacyVendorPath . '/smarty/smarty/distribution/libs/Smarty.class.php')) //Smarty
-            && file_exists($legacyVendorPath . '/adodb/adodb/adodb.inc.php') //Adodb
         )
     ) {
         $autoloader = require_once($legacyVendorAutoloaderPath);
@@ -81,7 +80,7 @@ if (is_dir(__DIR__ . '/../../' . TIKI_VENDOR_CUSTOM_PATH)) {
             $packagePath = $fileInfo->getPathname();
             if (is_dir($packagePath . '/lib/') && $composerJson = json_decode(file_get_contents($packagePath . '/composer.json'), true)) {
                 $packageName = $composerJson['name'] ?? '';
-                if ($packageName && \Tiki\Package\ExtensionManager::isExtension($packageName, $packagePath) && \Tiki\Package\ExtensionManager::isEnabled($packageName)) {
+                if ($packageName && \Tiki\Package\ExtensionManager::isExtension($packageName, $packagePath) && \Tiki\Package\ExtensionManager::isExtensionEnabled($packageName)) {
                     $autoloader->addPsr4(str_replace('/', '\\', $packageName) . '\\', $packagePath . '/lib/');
                 }
             }

@@ -7,7 +7,7 @@
         {button href="tiki-list_file_gallery.php" class="btn btn-primary" _text="{tr}List Galleries{/tr}"}
     {/if}
 
-    {assign var=thisgall value=$gal_info.galleryId}
+    {$thisgall=$gal_info.galleryId}
     {button href="tiki-list_file_gallery.php?galleryId=$thisgall" class="btn btn-primary" _text="{tr}List Gallery{/tr}"}
 
     {if $tiki_p_admin_file_galleries eq 'y' or $user eq $gal_info.user}

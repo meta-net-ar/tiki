@@ -21,7 +21,6 @@ function wikiplugin_miniquiz_info()
                 'name' => tra('Tracker ID'),
                 'description' => tra('Numeric value representing the miniquiz tracker ID'),
                 'since' => '1',
-                'default' => '',
                 'profile_reference' => 'tracker',
             ],
         ],
@@ -34,7 +33,7 @@ function rcmp($a, $b)
 }
 function shuf(&$ar)
 {
-    srand((double) microtime() * 10000000);
+    srand((float) microtime() * 10000000);
     uksort($ar, "rcmp");
 }
 
@@ -43,7 +42,7 @@ function wikiplugin_miniquiz($data, $params)
     global $prefs;
     $trklib = TikiLib::lib('trk');
 
-    if ($prefs['feature_trackers'] != 'y' || ! isset($params['trackerId']) || ! ($tracker = $trklib->get_tracker($params['trackerId']))) {
+    if ($prefs['feature_trackers'] != 'y' || is_null($params['trackerId']) || ! ($tracker = $trklib->get_tracker($params['trackerId']))) {
         $smarty = TikiLib::lib('smarty');
         return $smarty->fetch("wiki-plugins/error_tracker.tpl");
     }
@@ -139,7 +138,7 @@ function wikiplugin_miniquiz($data, $params)
                 shuf($answers);
                 $back .= '<div class="wikitext">';
                 $i = 1;
-                foreach ($answers as $aid => $answer) {
+                foreach ($answers as $answer) {
                     $back .= '<div class="q"><input type="radio" id="answer' . $id . '_' . ++$i . '" name="answer[' . $id . ']" value="' . htmlspecialchars($answer) . '"';
                     if (! empty($item['qresult']) && $item['qresult'] == $answer) {
                         $back .= ' checked="checked"';

@@ -14,6 +14,7 @@
     </div>
 {/if}
 
+<div class="styling-element">
 {* The navigation bar *}
 {include file='tiki-directory_bar.tpl'}
 
@@ -25,7 +26,7 @@
         <div class="d-flex justify-content-center">
             <form action="tiki-directory_search.php" method="post" class="d-flex align-items-center w-70">
                 <input type="hidden" name="parent" value="{$parent|escape}">
-                <label for="how" class="mb-0 mr-2">{tr}Find:{/tr}</label>
+                <label for="how" class="mb-0 mr-2">{tr}Search:{/tr}</label>
                 <div class="mx-2"></div>
                 <select name="how" id="how" class="form-select form-select-sm mx-2">
                     <option value="or">{tr}any{/tr}</option>
@@ -116,7 +117,7 @@
                 </div>
             {section name=ix loop=$items}
                 <div class="dirsite">
-                    {if $prefs.directory_country_flag eq 'y'} <img alt="flag" src="img/flags/{$items[ix].country}.png"> {/if}
+                    {if $prefs.directory_country_flag eq 'y'}{$items[ix].country|countryflagwithlabel}{/if}
                     <a class="dirsitelink" href="tiki-directory_redirect.php?siteId={$items[ix].siteId}" {if $prefs.directory_open_links eq 'n'}target='_blank'{/if}>{$items[ix].name|escape}</a>
                     {if $tiki_p_admin_directory_sites eq 'y'}
                         [<a class="dirsitelink" href="tiki-directory_admin_sites.php?parent={$parent}&amp;siteId={$items[ix].siteId}">{tr}Edit{/tr}</a>]
@@ -125,12 +126,12 @@
                         (<a class="dirsitelink" href="tiki-view_cache.php?url={$items[ix].url}" target="_blank">{tr}Cache{/tr}</a>)
                     {/if}
                     <div class="description form-text">{$items[ix].description}</div>
-                    {assign var=fsfs value=1}
+                    {$fsfs=1}
                     <span class="dirsitecats text-info">
                         {tr}Directory Categories:{/tr}
                         {section name=ii loop=$items[ix].cats}
                             {if $fsfs}
-                                {assign var=fsfs value=0}{else},&nbsp;
+                                {$fsfs=0}{else},&nbsp;
                             {/if}
                             <a class="dirsublink" href="tiki-directory_browse.php?parent={$items[ix].cats[ii].categId}">{$items[ix].cats[ii].path|escape}</a>
                         {/section}
@@ -140,7 +141,7 @@
                 </div>
             {/section}
         </div>
-        {pagination_links cant=$cant_pages step=$prefs.directory_links_per_page offset=$offset}{/pagination_links}
+        {pagination_links count=$pages_count step=$prefs.directory_links_per_page offset=$offset}{/pagination_links}
     {elseif !empty($parent)}
         {tr}No records.{/tr}
     {/if}
@@ -158,3 +159,5 @@
 {/if}
 
 {include file='tiki-directory_footer.tpl'}
+
+</div>

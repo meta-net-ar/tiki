@@ -70,6 +70,7 @@
                                             </action>
                                         {/strip}
                                     {/actions}
+                                </td>
                             </tr>
                         {/section}
                         </tbody>

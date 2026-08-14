@@ -42,7 +42,7 @@
                         {section name=ix loop=$channels[user].sections}
                             {$channels[user].sections[ix]}
                             {if $channels[user].edit}
-                                <a class="tips" title=":{tr}Delete{/tr}" class="link" href="tiki-admin_content_templates.php?removesection={$channels[user].sections[ix]}&amp;rtemplateId={$channels[user].templateId}" onclick="confirmPopup('{tr}Remove section?{/tr}', '{ticket mode=get}')">
+                                <a class="tips link" title=":{tr}Delete{/tr}"  href="tiki-admin_content_templates.php?removesection={$channels[user].sections[ix]}&amp;rtemplateId={$channels[user].templateId}" onclick="confirmPopup('{tr}Remove section?{/tr}', '{ticket mode=get}')">
                                     {icon name='remove' alt="{tr}Remove section{/tr}"}
                                 </a>
                             {/if}
@@ -88,7 +88,7 @@
                 {norecords _colspan=6}
             {/section}
         </table>
-        {pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
 
     {/tab}
     {if $canEdit}
@@ -197,7 +197,7 @@
                 <div class="mb-3 row">
                     <label class="col-sm-3 col-form-label" for="is_html">{tr}HTML{/tr}</label>
                     <div class="col-sm-9">
-                        <input type="checkbox" name="section_wiki_html" id="is_html" class="form=control" {if $info.section_wiki_html eq 'y'}checked="checked"{/if}>
+                        <input type="checkbox" name="section_wiki_html" id="is_html" class="form-control" {if $info.section_wiki_html eq 'y'}checked="checked"{/if}>
                     </div>
                 </div>
                 {if $prefs.lock_content_templates eq 'y'}
@@ -211,7 +211,7 @@
                 <div class="mb-3 row type-cond for-page">
                     <label class="col-sm-3 col-form-label" for="page_name">{tr}Page Name{/tr}</label>
                     <div class="col-sm-9">
-                        <input class="form-control" type="text" name="page_name" id="page_name" value="{$info.page_name}" placeholder="{tr}Find{/tr}...">
+                        <input class="form-control" type="text" name="page_name" id="page_name" value="{$info.page_name}" placeholder="{tr}Search{/tr}...">
                         {autocomplete element='input[name=page_name]' type='pagename'}
                     </div>
                 </div>

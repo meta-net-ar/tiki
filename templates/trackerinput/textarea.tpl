@@ -1,4 +1,10 @@
 {strip}
+    {if $prefs.ajax_edit_previews eq 'y' and $field.options_map.previewtabs eq 'y'}
+        {assign var='tracker_previews' value='y'}
+    {else}
+        {assign var='tracker_previews' value='n'}
+    {/if}
+
     {capture assign='charCount'}
         {if $field.options_map.max}
             <div class="charCount form-text">
@@ -25,14 +31,15 @@
                     {toolbars qtnum=$field.fieldId area_id=$data.element_id section="trackers"}
                 </div>
             {/if}
-            <input type="text" id="{$data.element_id|escape}" name="{$field.ins_id}"{if $field.options_map.width > 0} size="{$field.options_map.width}"{/if}{if $field.options_map.max gt 0} maxlength="{$field.options_map.max}"{/if} value="{$field.value|escape}" onkeyup={$data.keyup} />
+            <input type="text" id="{$data.element_id|escape}" name="{$field.ins_id}"{if $field.options_map.width > 0} size="{$field.options_map.width}"{/if}{if $field.options_map.max gt 0} maxlength="{$field.options_map.max}"{/if} value="{$field.value|escape}"{if $field.options_map.labelasplaceholder} placeholder="{$field.name|escape}"{/if}{if !empty($context.disabled)} disabled{/if} onkeyup={$data.keyup} />
         {else}
             {if $field.options_map.wysiwyg == 'y'}
-                {textarea _class='form-control' id=$data.element_id name=$field.ins_id rows=$data.rows _toolbars=$data.toolbar onkeyup=$data.keyup _wysiwyg='y' section='trackers' switcheditor='n' _preview=$prefs.ajax_edit_previews}
+                {textarea _class='form-control' id=$data.element_id name=$field.ins_id rows=$data.rows _toolbars=$data.toolbar onkeyup=$data.keyup _wysiwyg='y' section='trackers' switcheditor='n' _preview=$tracker_previews}
                     {$field.value}
                 {/textarea}
             {else}
-                {textarea _class='form-control' id=$data.element_id name=$field.ins_id _toolbars=$data.toolbar rows=$data.rows onkeyup=$data.keyup _wysiwyg='n' section="trackers" switcheditor='n' _preview=$prefs.ajax_edit_previews}
+                {assign var='textarea_placeholder' value=($field.options_map.labelasplaceholder ? $field.name : '')}
+                {textarea _class='form-control' id=$data.element_id name=$field.ins_id _toolbars=$data.toolbar rows=$data.rows onkeyup=$data.keyup _wysiwyg='n' section="trackers" switcheditor='n' _preview=$tracker_previews placeholder=$textarea_placeholder disabled=$context.disabled}
                     {$field.value}
                 {/textarea}
             {/if}
@@ -43,7 +50,7 @@
         {foreach name=lg from=$field.lingualvalue item=ling}
             <label for="{$data.element_id|escape}_{$ling.lang}">{$ling.lang|langname}</label>
             {if $field.options_map.wysiwyg == 'y'}
-                {textarea _class='form-control' id="{$data.element_id}_{$ling.lang}" name="{$field.ins_id}[{$ling.lang}]" rows=$data.rows onkeyup=$data.keyup _wysiwyg='y' cols="{if $field.options_map.width gt 1}{$field.options_map.width}{else}50{/if}" section="trackers"  switcheditor='n' _preview=$prefs.ajax_edit_previews}
+                {textarea _class='form-control' id="{$data.element_id}_{$ling.lang}" name="{$field.ins_id}[{$ling.lang}]" rows=$data.rows onkeyup=$data.keyup _wysiwyg='y' cols="{if $field.options_map.width gt 1}{$field.options_map.width}{else}50{/if}" section="trackers"  switcheditor='n' _preview=$tracker_previews}
                     {$ling.value}
                 {/textarea}
             {else}
@@ -52,7 +59,7 @@
                         {toolbars qtnum=$field.id area_id=$data.element_id|cat:'_'|cat:$ling.lang}
                     </div>
                 {/if}
-                <textarea class='form-control' id="{$data.element_id|escape}_{$ling.lang}" name="{$field.ins_id}[{$ling.lang}]" cols="{if $field.options_map.width gt 1}{$field.options_map.width}{else}50{/if}" rows="{if $field.options_map.height gt 1}{$field.options_map.height}{else}6{/if}"{if $field.options_map.wordmax > 0} onkeyup="wordCount({$field.options_map.wordmax}, this, 'cpt_{$field.fieldId}_{$ling.lang}', '{tr}Word Limit Exceeded{/tr}')"{/if}>
+                <textarea class='form-control' id="{$data.element_id|escape}_{$ling.lang}" name="{$field.ins_id}[{$ling.lang}]" cols="{if $field.options_map.width gt 1}{$field.options_map.width}{else}50{/if}" rows="{if $field.options_map.height gt 1}{$field.options_map.height}{else}6{/if}"{if !empty($context.disabled)} disabled{/if}{if $field.options_map.wordmax > 0} onkeyup="wordCount({$field.options_map.wordmax}, this, 'cpt_{$field.fieldId}_{$ling.lang}', '{tr}Word Limit Exceeded{/tr}')"{/if}>
                     {$ling.value|escape}
                 </textarea>
             {/if}

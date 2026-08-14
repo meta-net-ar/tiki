@@ -73,7 +73,7 @@ class SessionAwareApp implements MessageComponentInterface
                 \Laminas\Session\Container::getDefaultManager()->destroy();
             }
             \Laminas\Session\Container::getDefaultManager()->start();
-        } catch (Laminas\Session\Exception\ExceptionInterface $e) {
+        } catch (\Laminas\Session\Exception\ExceptionInterface $e) {
             // Ignore
         } catch (\Laminas\Stdlib\Exception\InvalidArgumentException $e) {
             // Ignore

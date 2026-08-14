@@ -35,7 +35,7 @@ if ($prefs['feature_categories'] == 'y' && isset($cat_type) && isset($cat_objid)
         $cats = $categlib->get_default_categories();
     }
 
-    if ($cat_type == 'wiki page' || $cat_type == 'blog' || $cat_type == 'image gallery' || $cat_type == 'mypage') {
+    if ($cat_type == 'wiki page' || $cat_type == 'blog' || $cat_type == 'mypage') {
         $ext = ($cat_type == 'wiki page') ? 'wiki' : str_replace(' ', '_', $cat_type);
         $pref = 'feature_' . $ext . '_mandatory_category';
         if ($prefs[$pref] > 0) {

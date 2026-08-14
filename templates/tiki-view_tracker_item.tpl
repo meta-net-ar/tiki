@@ -1,4 +1,6 @@
 <div class="highlightable">
+
+    {include file='token_view_actions.tpl'}
     {if !$viewItemPretty.override}
         {title help="trackers"}{$tracker_item_main_value}{/title}
     {/if}
@@ -10,7 +12,7 @@
         <div class="t_navbar mb-4">
             <div class="float-sm-end btn-group">
                 {if ! $js}<ul><li>{/if}
-                <a class="btn btn-link" data-bs-toggle="dropdown" href="#">
+                <a class="btn btn-link" data-bs-toggle="dropdown" href="#" role="button">
                     {icon name='menu-extra'}
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end">
@@ -40,7 +42,7 @@
                         </li>
                     {/if}
 
-                    {if $item_info.logs.cant|default:null and $item_info.canViewHistory}
+                    {if $item_info.logs.count|default:null and $item_info.canViewHistory}
                         <li class="dropdown-item">
                             <a href="tiki-tracker_view_history.php?itemId={$itemId}">
                                 {icon name="history"} {tr}History{/tr}
@@ -91,9 +93,9 @@
                     {/if}
                     {if $prefs.sefurl_short_url eq 'y'}
                         <li class="dropdown-item">
-                            <a id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();">
+                            <a id="short_url_link" href="#" role="button" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();">
                                 {icon name="link"} {tr}Get a short URL{/tr}
-                                {assign var="hasPageAction" value="1"}
+                                {$hasPageAction="1"}
                             </a>
                         </li>
                     {/if}
@@ -104,7 +106,7 @@
                     {/if}
                     {if $prefs.user_favorites eq 'y' and isset($itemId)}
                         <li class="dropdown-item">
-                            {favorite button_classes="favorite-icon" label="{tr}Favorite{/tr}"  type="trackeritem" object=$itemId }
+                            {favorite button_classes="favorite-icon" label="{tr}Favorite{/tr}"  type="trackeritem" object=$itemId}
                         </li>
                     {/if}
                 </ul>
@@ -112,7 +114,7 @@
             </div>
             {if $canModify && $prefs.tracker_legacy_insert neq 'y'}
                 {if not empty($smarty.request.from) and $prefs.pwa_feature ne 'y'}{$from = $smarty.request.from}{else}{$from=''}{/if}
-                <a class="btn btn-primary" href="{bootstrap_modal controller=tracker action=update_item trackerId=$trackerId itemId=$itemId redirect=$from size='modal-lg'}">{icon name="edit"} {tr}Edit{/tr}</a>
+                <a class="btn btn-primary" href="{bootstrap_modal controller=tracker action=update_item trackerId=$trackerId itemId=$itemId redirect=$from size='modal-lg'}" role="button">{icon name="edit"} {tr}Edit{/tr}</a>
             {/if}
 
             {* only include actions bar if no custom view template is assigned *}
@@ -122,7 +124,7 @@
 
             {* show button back only if tpl has been set with vi_tpl or ei_tpl *}
             {if $viewItemPretty.override and !empty($referer)}
-                <a class="btn btn-primary" href="{$referer}" title="{tr}Back{/tr}">{icon name="arrow-circle-left"} {tr}Back{/tr}</a>
+                <a class="btn btn-primary" href="{$referer}" title="{tr}Back{/tr}" role="button">{icon name="arrow-circle-left"} {tr}Back{/tr}</a>
             {/if}
         </div>
 
@@ -137,7 +139,7 @@
 
         {* ------- return/next/previous tab --- *}
         {if $canView}
-            {pagination_links cant=$cant|default:null offset=$offset reloff=$smarty.request.reloff|default:null itemname="{tr}Item{/tr}"}
+            {pagination_links count=$count|default:null offset=$offset reloff=$smarty.request.reloff|default:null itemname="{tr}Item{/tr}"}
                 {* Do not specify an itemId in URL used for pagination, because it will use the specified itemId instead of moving to another item *}
                 {$smarty.server.php_self|default:null}?{query itemId=NULL trackerId=$trackerId}
             {/pagination_links}
@@ -196,13 +198,6 @@
                     $(document).on("ajaxComplete", function(){$(id).tiki_popover();});
                 {/jq}
 
-            {/tab}
-        {/if}
-
-        {* ---------------------------------------- tab with attachments --- *}
-        {if $tracker_info.useAttachments eq 'y' and $tiki_p_tracker_view_attachments eq 'y'}
-            {tab name="{tr}Attachments{/tr} (`$attCount`)" print=n}
-                {include file='attachments_tracker.tpl'}
             {/tab}
         {/if}
 

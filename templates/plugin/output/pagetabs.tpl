@@ -5,4 +5,4 @@
     {/foreach}
 {/tabset}
 
-<script type="module">import loadTabsContent from "@jquery-tiki/plugins/pagetabs";loadTabsContent('pagetabs{$id}');</script>
+<script type="module">import loadTabsContent from "@tiki/plugins/pagetabs";loadTabsContent('pagetabs{$id}');</script>

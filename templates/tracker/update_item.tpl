@@ -1,7 +1,7 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 
 {block name="navigation"}
@@ -28,19 +28,51 @@
                 <input type="hidden" name="redirect" value="{$redirect|escape}">
                 <input type="hidden" name="conflictoverride" value="{$conflictoverride|escape}">
                 <input type="hidden" name="skipRefresh" value="{$skipRefresh|escape}">
-                <input type="submit" class="btn btn-primary" value="{$button_label}" onclick="needToConfirm=false;">
+                <input type="submit" class="btn btn-primary item-submit-btn" value="{$button_label}" onclick="needToConfirm=false;">
             </div>
         </form>
     {else}
         <form method="post" action="{service controller=tracker action=update_item format=$format editItemPretty=$editItemPretty suppressFeedback=$suppressFeedback}" id="updateItemForm{$trackerId|escape}">
             {trackerfields trackerId=$trackerId fields=$fields status=$status itemId=$itemId format=$format editItemPretty=$editItemPretty}
+            {if not empty($notifyWatchers)}
+                <div class="form-check form-switch alert alert-warning mt-5">
+                    <input type="checkbox"
+                        class="form-check-input tracker-notify-switch"
+                        id="notify_watchers"
+                        name="notify_watchers"
+                        value="1"
+                        checked>
+                    <label class="form-check-label" for="notify_watchers">
+                        {tr}Notify users following this item{/tr}
+                    </label>
+                </div>
+                <div class="tracker-notify-watchers">
+                    {accordion}
+                        {* accordion_pos points at a non-existing group so this single group starts collapsed *}
+                        {accordion_group title="{tr}Users to notify{/tr} (`$notifyWatchers|@count`)" accordion_pos=2}
+                            <ul class="list-unstyled mb-0">
+                                {foreach from=$notifyWatchers item=watcher}
+                                    <li>{if not empty($watcher.user)}{$watcher.user|userlink}{else}{$watcher.email|escape}{/if}</li>
+                                {/foreach}
+                            </ul>
+                        {/accordion_group}
+                    {/accordion}
+                </div>
+            {/if}
+            {if not empty($saveAndComment) and $saveAndComment neq 'n'}
+                <div class="form-check form-switch mb-4 mt-5">
+                    <input type="checkbox" class="form-check-input" name="addComment" id="add-comment"/>
+                    <label class="form-check-label" for="add-comment">
+                        {tr}Add a comment{/tr}
+                    </label>
+                </div>
+                <div class="comment-form d-none">
+                    {include file="comment/post_form_content.tpl" type='trackeritem' objectId=$itemId data='' title=$commentTitle}
+                </div>
+            {/if}
             <div class="submit">
                 {if $skip_preview neq 'y'}
                     <input type="button" class="btn btn-secondary previewItemBtn" title="{tr}Preview your changes.{/tr}" name="preview" value="{tr}Preview{/tr}">
-                {/if}
-                {if not empty($saveAndComment) and $saveAndComment neq 'n'}
-                    <input type="hidden" name="saveAndComment" id="saveAndComment" value="">
-                    <input type="submit" class="btn btn-primary" onclick="$('#saveAndComment').val(1);" value="{tr}Save and Comment{/tr}">
                 {/if}
                 {if $save_return eq 'y'}
                     <input type="submit" class="btn btn-primary" name="save_return" value="{tr}Save Returning to Item List{/tr}" onclick="$('input[name=redirect]').val('{$trackerId|sefurl:'tracker'}'); needToConfirm=false">
@@ -53,15 +85,38 @@
                 <input type="hidden" name="redirect" value="{$redirect|escape}">
                 <input type="hidden" name="conflictoverride" value="{$conflictoverride|escape}">
                 <input type="hidden" name="skipRefresh" value="{$skipRefresh|escape}">
-                <input type="submit" class="btn btn-primary" value="{$button_label}" onclick="needToConfirm=false;">
+                <input type="submit" class="btn btn-primary item-submit-btn" value="{$button_label}" onclick="needToConfirm=false;">
                 {if $can_remove and $prefs.tracker_legacy_insert eq 'y'}
-                    <a class="btn btn-danger" href="tiki-view_tracker.php?trackerId={$trackerId|escape}&amp;remove={$itemId|escape}" title="Delete">
+                    <a class="btn btn-danger" href="tiki-view_tracker.php?trackerId={$trackerId|escape}&amp;remove={$itemId|escape}" title="Delete" role="button">
                         {tr}Delete{/tr}
                     </a>
                 {/if}
             </div>
         </form>
-        {* Don't warn on leaving page if the modal is closed without saving *}
-        {jq}$(".modal.fade.show").one("hide.bs.modal", function () {window.needToConfirm=false;});{/jq}
+        {jq}
+            {* Don't warn on leaving page if the modal is closed without saving *}
+            $(".modal.fade.show").one("hide.bs.modal", function () {window.needToConfirm=false;});
+
+            {* Disable the comment editor textarea, so it doesn't interfere with form validation when it's hidden *}
+            $(".comment-form").find("textarea").prop("disabled", true);
+            $("#add-comment").on("change", function() {
+                if ($(this).is(":checked")) {
+                    $(".comment-form").removeClass("d-none");
+                    $(".comment-form").find("textarea").prop("disabled", false);
+                } else {
+                    $(".comment-form").addClass("d-none");
+                    $(".comment-form").find("textarea").prop("disabled", true);
+                }
+            });
+
+            {* Only show the list of users to notify while the notify switch is on *}
+            $("#notify_watchers").on("change", function() {
+                if ($(this).is(":checked")) {
+                    $(".tracker-notify-watchers").removeClass("d-none");
+                } else {
+                    $(".tracker-notify-watchers").addClass("d-none");
+                }
+            });
+        {/jq}
     {/if}
 {/block}

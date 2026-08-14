@@ -1,6 +1,6 @@
 <div class="card">
     <div class="card-header">
-        <h3 class="card-title">{$params.title}</h3>
+        <h3 class="tiki-card-header-title fs-5 pt-0 m-0">{$params.title}</h3>
     </div>
     <div class="card-body">
         <form id='{$params.id}'>
@@ -23,10 +23,10 @@
                                             z-index: 99;
                                         }
                                     </style>
-                                    {assign var="defautDate" value=$smarty.now+86400}
+                                    {$defautDate=$smarty.now+86400}
                                     <div style="display: flex; justify-content: space-around; flex-wrap: wrap;" class="divAddDate">
                                         <span class="inputAddDate">{jscalendar date=$defautDate fieldname="conveneAddDate" showtime='y' showtimezone="n"}</span> 
-                                        <button type="button" class="conveneAddDate btn btn-primary btn-sm" data-field="conveneAddDate">Add Date</button>
+                                        <button type="button" class="conveneAddDate btn btn-primary btn-sm" data-field="conveneAddDate">{tr}Add Date{/tr}</button>
                                     </div>          
                                 {/if}
                             {else}
@@ -38,7 +38,7 @@
                             <td class="align-bottom conveneHeader" data-date="{$date}">
                                 <div class="tips" title="{$dateLabels[$date].gmdate}">{$dateLabels[$date].formatted}</div>
                                 {if $canAdmin and not $locked}
-                                    <button class="conveneDeleteDate icon btn btn-danger btn-sm" data-date="{$date}">
+                                    <button class="conveneDeleteDate icon btn btn-danger btn-sm" data-date="{$date}" aria-label="{tr}Delete{/tr}">
                                         {icon name='delete'}
                                     </button>
                                 {/if}
@@ -52,10 +52,10 @@
                                 <div class='align-items-center d-flex justify-content-between'>
                                     {if $editThisUser}
                                         <div class='btn-group'>
-                                            <button class='conveneUpdateUser icon btn btn-primary btn-sm'>
+                                            <button class='conveneUpdateUser icon btn btn-primary btn-sm' aria-label="{tr}Edit User/Save changes{/tr}">
                                                 {icon name='pencil' iclass='tips' ititle="{tr}Edit User/Save changes{/tr}"}
                                             </button>
-                                            <button data-user='{$voter}' class='conveneDeleteUser icon btn btn-danger btn-sm'>
+                                            <button data-user='{$voter}' class='conveneDeleteUser icon btn btn-danger btn-sm' aria-label="{tr}Remove User{/tr}">
                                                 {icon name='delete' iclass='tips' ititle="{tr}Remove User{/tr}"}
                                             </button>
                                         </div>
@@ -83,14 +83,14 @@
                                     {$icon = 'help'}
                                 {/if}
 
-                                {if $comments[$stamp][$voter] eq ""}
+                                {if empty($comments[$stamp][$voter])}
                                     {$voteComment = "{tr}No Comment{/tr}"}
                                 {else}
                                     {$voteComment = $comments[$stamp][$voter]}
                                 {/if}
                                 <td class='align-middle flex-align-center {$class}'>
-                                    {icon name=$icon size=2 iclass="tips $iconClass" ititle="{tr}Vote value{/tr} $vote:$voteComment "  }
-                                    <input type='hidden' name='dates_{$stamp}_{$voter}' value='{$vote}' class='conveneUserVote' data-voter="{$voter}" data-date="{$stamp}" data-comment="{$comments[$stamp][$voter]}">
+                                    {icon name=$icon size=2 iclass="tips $iconClass" ititle="{tr}Vote value{/tr} $vote:$voteComment "}
+                                    <input type='hidden' name='dates_{$stamp}_{$voter}' value='{$vote}' class='conveneUserVote' data-voter="{$voter}" data-date="{$stamp}" data-comment="{$voteComment}">
                                 </td>
                             {/foreach}
                         </tr>
@@ -100,10 +100,10 @@
                             <div class='align-items-center d-flex justify-content-between'>
                                 {if $canEdit}
                                     <div class='btn-group'>
-                                        <button class='conveneUpdateUser icon btn btn-primary btn-sm'>
+                                        <button class='conveneUpdateUser icon btn btn-primary btn-sm' aria-label="{tr}Edit User/Save changes{/tr}">
                                             {icon name='pencil' iclass='tips' ititle="{tr}Edit User/Save changes{/tr}"}
                                         </button>
-                                        <button data-user='{$voter}' class='conveneDeleteUser icon btn btn-danger btn-sm'>
+                                        <button data-user='{$voter}' class='conveneDeleteUser icon btn btn-danger btn-sm' aria-label="{tr}Remove User{/tr}">
                                             {icon name='delete' iclass='tips' ititle="{tr}Remove User{/tr}"}
                                         </button>
                                     </div>
@@ -141,7 +141,7 @@
                                         &nbsp
                                         {icon name='ok' iclass='alert-success tips' ititle=':{tr}Selected Date{/tr}'}
                                         {if $canAddEvents and count($topVoteStamps) eq 1 and $total gte $params.minvotes}
-                                            <a class='btn btn-success btn-sm mx-1 text-white' href='tiki-ajax_services.php?controller=calendar&action=edit_item&todate={$stamp}&calendarId={$params.calendarid}'>
+                                            <a class='btn btn-success btn-sm mx-1 text-white' role="button" href='tiki-ajax_services.php?controller=calendar&action=edit_item&todate={$stamp}&calendarId={$params.calendarid}'>
                                                 {icon name='calendar' iclass='tips' ititle=':{tr}Add as Calendar Event{/tr}'}
                                             </a>
                                         {/if}

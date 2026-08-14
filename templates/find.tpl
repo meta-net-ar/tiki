@@ -38,8 +38,8 @@
                                                  value="{$filegals_manager|escape}">{/if}
             {query _type='form_input' maxRecords='NULL' type='NULL' types='NULL' find='NULL' topic='NULL' lang='NULL' exact_match='NULL' categId='NULL' cat_categories='NULL' filegals_manager='NULL' save='NULL' offset=0 searchlist='NULL' searchmap='NULL'}
             <div>
-                <input class="form-control" type="text" name="find" id="find" aria-label="{tr}Find{/tr}" value="{$find|escape}"
-                       placeholder="{if empty($whatlabel)}{tr}Find{/tr}...{else}{tr}{$whatlabel}{/tr}{/if}"
+                <input class="form-control" type="text" name="find" id="find" aria-label="{tr}Search{/tr}" value="{$find|escape}"
+                       placeholder="{if empty($whatlabel)}{tr}Search{/tr}...{else}{tr}{$whatlabel}{/tr}{/if}"
                        title="{if ! empty($find_in)}{$find_in|escape}{/if}" data-html="true" data-bs-toggle="focus">
                 {if isset($autocomplete)}
                     {autocomplete element="#find" type="{$autocomplete}"}
@@ -49,12 +49,12 @@
                 {/jq}
             </div>
             {if !empty($find_show_sub) and $find_show_sub eq 'y'}
-                <div class="input-group">
-                    <label class="control-label col-sm-8 findsub" for="find_sub" >
+                <div class="form-group row mt-3">
+                    <label class="control-label col-sm-5 findsub" for="find_sub" >
                         {tr}Search child file galleries{/tr}
                     </label>
-                    <div class="col-sm-4" >
-                        <input type="checkbox" name="find_sub" id="find_sub" {if $find_sub eq 'y'}checked="checked"{/if}/>
+                    <div class="col-sm-7">
+                        <input type="checkbox" name="find_sub" id="find_sub" class="form-check-input" {if $find_sub eq 'y'}checked="checked"{/if}/>
                     </div>
                 </div>
             {/if}
@@ -159,7 +159,7 @@
             </div>
         {/if}
         {if ((isset($find_show_categories) && $find_show_categories eq 'y') or (isset($find_show_categories_multi) && $find_show_categories_multi eq 'y')) and $prefs.feature_categories eq 'y' and !empty($categories)}
-            <div class="mb-3 row mx-0 category_find">
+            <div class="mb-3 row  category_find">
                 {if $find_show_categories_multi eq 'n' || $findSelectedCategoriesNumber <= 1}
                     <label class="col-sm-5 col-form-label" for="findcategory">
                         {tr}Category{/tr}
@@ -241,23 +241,25 @@
         {if !empty($find_durations)}
             {foreach key=key item=duration from=$find_durations}
                 <div class="mb-3 row">
-                    <label class="find_duration col-form-label col-sm-6">
+                    <label class="find_duration col-form-label col-sm-5">
                         {tr}{$duration.label}{/tr}
                     </label>
-                    <div class="col-sm-6">
+                    <div class="col-sm-7">
                         {html_select_duration prefix=$duration.prefix default=$duration.default default_unit=$duration.default_unit}
                     </div>
                 </div>
             {/foreach}
         {/if}
         {if !empty($show_find_orphans) and $show_find_orphans eq 'y'}
-            <div class="mb-3 find-orphans" style="margin-top: -15px;">
-                <div class="form-check offset-sm-3">
-                    <label class="find_orphans col-form-label" style="padding-left: 0; font-weight: bold;" for="find_orphans">
+            <div class="mb-3 find-orphans">
+                <div class="form-group row">
+                    <label for="find_orphans" class="col-sm-5 col-form-label font-weight-bold">
                         {tr}Orphans{/tr}
-                        <input type="checkbox" style="margin-left: 30px;" name="find_orphans" id="find_orphans"
-                            {if isset($find_orphans) and $find_orphans eq 'y'}checked="checked"{/if}>
                     </label>
+                    <div class="col-sm-7">
+                        <input type="checkbox" name="find_orphans" id="find_orphans" class="form-check-input"
+                               {if isset($find_orphans) and $find_orphans eq 'y'}checked="checked"{/if}>
+                    </div>
                 </div>
             </div>
         {/if}
@@ -274,12 +276,12 @@
             </div>
         {/if}
         {if isset($find_show_num_rows) && $find_show_num_rows eq 'y'}
-            <div class="mb-3 row mx-0">
+            <div class="mb-3 row">
                 <label class="col-sm-5 col-form-label" for="findnumrows">
                     {tr}Displayed rows{/tr}
                 </label>
                 <div class="col-sm-7">
-                    <input type="text" name="maxRecords" id="findnumrows" value="{$maxRecords|escape}"
+                    <input type="number" name="maxRecords" id="findnumrows" value="{$maxRecords|escape}"
                            class="form-control">
                 </div>
             </div>
@@ -313,8 +315,8 @@
             </div>
         {/if}
         {if (!isset($map_only) or $map_only ne 'y') or (isset($gmapbuttons) && $gmapbuttons)}
-        <div>
-            <button type="submit" class="btn btn-info" name="search">{tr}Find{/tr}</button>
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-info" name="search">{tr}Search{/tr}</button>
         </div>
         {/if}
     </form>

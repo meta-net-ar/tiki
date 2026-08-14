@@ -35,6 +35,7 @@
             <br>
             {preference name=auth_method}
             {preference name=feature_intertiki}
+            {preference name=auth_webauthn_enabled}
             <fieldset>
                 <legend class="h3">{tr}Registration{/tr} &amp; {tr}Log in{/tr}</legend>
                 {preference name=user_must_change_password_set_default_on}
@@ -66,23 +67,37 @@
                     {preference name=http_referer_registration_check}
                     {preference name=email_detect_disposable}
                     <fieldset>
-                        <legend class="h3">{tr}CAPTCHA{/tr}</legend>
+                        <legend class="h3">{tr}CAPTCHA Options{/tr}</legend>
                         {preference name=feature_antibot}
                         <div class="adminoptionboxchild" id="feature_antibot_childcontainer">
-                            {preference name=captcha_wordLen}
-                            {preference name=captcha_width}
-                            {preference name=captcha_noise}
-                            {preference name=recaptcha_enabled}
-                            <div class="adminoptionboxchild" id="recaptcha_enabled_childcontainer">
-                                {preference name=recaptcha_pubkey}
-                                {preference name=recaptcha_privkey}
-                                {preference name=recaptcha_theme}
-                                {preference name=recaptcha_version}
+                            {preference name=captcha_type}
+                            {remarksbox type="tip" title="{tr}Tip{/tr}" close="n"}
+                                {tr}Use the selector above to choose the active CAPTCHA implementation. The selected CAPTCHA must also be configured in its section below before it can be used. Other CAPTCHA settings remain available but inactive until selected.{/tr}
+                            {/remarksbox}
+                            <div class="adminoptionboxchild">
+                                <h5 class="mt-3">{tr}Classic CAPTCHA{/tr}</h5>
+                                <div class="adminoptionboxchild" id="captcha_wordLen_childcontainer">
+                                    {preference name=captcha_wordLen}
+                                    {preference name=captcha_width}
+                                    {preference name=captcha_noise}
+                                </div>
+                                <h5 class="mt-4">{tr}Custom Questions CAPTCHA{/tr}</h5>
+                                <div class="adminoptionboxchild" id="captcha_questions_childcontainer">
+                                    {preference name=captcha_questions}
+                                </div>
+                                <h5 class="mt-4">{tr}Google reCAPTCHA{/tr}</h5>
+                                <div class="adminoptionboxchild">
+                                    {preference name=recaptcha_pubkey}
+                                    {preference name=recaptcha_privkey}
+                                    {preference name=recaptcha_theme}
+                                    {preference name=recaptcha_version}
+                                </div>
+                                <h5 class="mt-4">{tr}Altcha CAPTCHA{/tr}</h5>
+                                <div class="adminoptionboxchild">
+                                    {preference name=altcha_hmac_key}
+                                </div>
                             </div>
-                            {preference name=captcha_questions_active}
-                            <div class="adminoptionboxchild" id="captcha_questions_active_childcontainer">
-                                {preference name=captcha_questions}
-                            </div>
+                        </div>
                     </fieldset>
                     <legend class="h3">{tr}Group and tracker login settings{/tr}</legend>
                     <div class="adminoptionbox mb-3 row">
@@ -138,6 +153,7 @@
                     </div>
                 </div>
                 {preference name=user_force_avatar_upload}
+                {preference name=user_default_avatar_style}
                 {preference name=tracker_force_fill}
                 <div class="adminoptionboxchild" id="tracker_force_fill_childcontainer">
                     {preference name=tracker_force_tracker_id}
@@ -145,6 +161,7 @@
                     {preference name=tracker_force_tracker_fields}
                 </div>
                 {preference name=groupTracker}
+                {preference name=login_text_below_login_box}
                 <legend class="h3">{tr}Other login settings{/tr}</legend>
                 {preference name=email_due}
                 {preference name=unsuccessful_logins}
@@ -183,15 +200,11 @@
                     <legend class="h3">{tr}Cookie consent{/tr}</legend>
                     {preference name=cookie_consent_feature}
                     <div class="adminoptionboxchild" id="cookie_consent_feature_childcontainer">
-                        {preference name=cookie_consent_name}
                         {preference name=cookie_consent_expires}
                         {preference name=cookie_consent_description}
-                        {preference name=cookie_consent_question}
-                        {preference name=cookie_consent_analytics}
-                        {preference name=cookie_consent_alert}
-                        {preference name=cookie_consent_button}
                         {preference name=cookie_consent_mode}
                         {preference name=cookie_consent_dom_id}
+                        {preference name=cookie_consent_disable_builtin_categories}
                         {preference name=cookie_consent_disable}
                     </div>
                 </fieldset>
@@ -227,8 +240,10 @@
                     {preference name=twoFactorAuthIntervalDays}
                     {preference name=twoFactorAuthType}
                     {preference name=twoFactorAuthEmailTokenLength}
+                    {preference name=twoFactorAuthEmailTokenChars}
                     {preference name=twoFactorAuthEmailTokenTTL}
                     {preference name=twoFactorAuthAllUsers}
+                    {preference name=twoFactorAuthGracePeriod}
                     {preference name=twoFactorAuthIncludedGroup}
                     {preference name=twoFactorAuthIncludedUsers}
                     {preference name=twoFactorAuthExcludedGroup}
@@ -282,7 +297,7 @@
         {tab name="{tr}LDAP{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">LDAP {help url="Login+Authentication+Methods"}</legend>
+                <legend class="h3">LDAP {help url="External-Authentication"}</legend>
                 {if ! $ldap_extension_loaded}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must install PHP extension LDAP{/tr}
@@ -301,7 +316,7 @@
                 {preference name=auth_ldap_permit_tiki_users}
             </fieldset>
             <fieldset>
-                <legend class="h3">{tr}LDAP bind settings{/tr}{help url="LDAP+Authentication"}</legend>
+                <legend class="h3">{tr}LDAP bind settings{/tr}{help url="LDAP-Authentication"}</legend>
                 {preference name=auth_ldap_host}
                 {preference name=auth_ldap_port}
                 {preference name=auth_ldap_debug}
@@ -334,7 +349,7 @@
                 {preference name=auth_ldap_group_external}
             </fieldset>
             <fieldset>
-                <legend class="h3">{tr}LDAP bind settings{/tr}{help url="LDAP+Authentication"}</legend>
+                <legend class="h3">{tr}LDAP bind settings{/tr}{help url="LDAP-Authentication"}</legend>
                 {preference name=auth_ldap_group_host}
                 {preference name=auth_ldap_group_port}
                 {preference name=auth_ldap_group_debug}
@@ -394,7 +409,7 @@
         {tab name="{tr}Shibboleth{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">{tr}Shibboleth{/tr}{help url="AuthShib" desc="{tr}Shibboleth Authentication {/tr}"}</legend>
+                <legend class="h3">{tr}Shibboleth{/tr}{help url="Shibboleth-Authentication" desc="{tr}Shibboleth Authentication {/tr}"}</legend>
                 {if $prefs.auth_method ne 'shib'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to Shibboleth for these changes to take effect{/tr}
@@ -476,7 +491,7 @@
         {tab name="{tr}CAS{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">{tr}CAS (central authentication service){/tr}{help url="CAS+Authentication"}</legend>
+                <legend class="h3">{tr}CAS (central authentication service){/tr}{help url="CAS-Authentication"}</legend>
                 {if $prefs.auth_method ne 'cas'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to CAS for these changes to take effect{/tr}
@@ -502,7 +517,7 @@
         {tab name="{tr}phpBB{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">{tr}phpBB{/tr}{help url="phpBB+Authentication" desc="{tr}phpBB User Database Authentication {/tr}"}</legend>
+                <legend class="h3">{tr}phpBB{/tr}{help url="phpBB-Authentication" desc="{tr}phpBB User Database Authentication {/tr}"}</legend>
                 {if $prefs.auth_method ne 'phpbb'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to phpBB for these changes to take effect{/tr}
@@ -531,7 +546,7 @@
         {tab name="{tr}Web Server{/tr}"}
             <br>
             <fieldset>
-                <legend class="h3">{tr}Web server{/tr}{help url="External+Authentication#Web_Server_HTTP_" desc="{tr}Web Server Authentication {/tr}"}</legend>
+                <legend class="h3">{tr}Web server{/tr}{help url="External-Authentication#Web_Server_HTTP_" desc="{tr}Web Server Authentication {/tr}"}</legend>
                 {if $prefs.auth_method ne 'ws'}
                     {remarksbox type="warning" title="{tr}Warning{/tr}" close="n"}
                         {tr}You must change the Authentication Method to Web Server for these changes to take effect{/tr}
@@ -589,8 +604,8 @@
 
                         <p>{tr}Blacklist Currently Using:{/tr} {$file_using}</p>
                         {if $num_indexed}
-                            <h3>Generate and Save a Password Blacklist{help desc="{tr}Saving places a text file with the generated passwords in your storage/pass_blacklists folder and enables it
-                            as an option for use. Fields default to the password standards set in tiki. You should not have to change these, unless you plan on changing your password
+                            <h3>{tr}Generate and Save a Password Blacklist{/tr}{help desc="{tr}Saving places a text file with the generated passwords in your storage/pass_blacklists folder and enables it
+                            as an option for use. Fields default to the password standards set in Tiki. You should not have to change these, unless you plan on changing your password
                             requirements in the future.{/tr}"}</h3>
                             {tr}Number of passwords (limit):{/tr} <input type="number" name="limit" value="{$limit}" />
                             {help desc="{tr}This sets the number of passwords that your blacklist will use. The words from the begining of of the file will be selected over the lower,

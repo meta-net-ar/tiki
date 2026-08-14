@@ -36,9 +36,9 @@ class Tracker_Field_Factory
                 foreach (glob("$path/[!_]*.php") as $file) {
                     if (
                         $file === "$path/index.php" ||
-                        strstr($file, "Interface") ||
-                        strstr($file, "Abstract") ||
-                        strstr($file, "TrackerField")
+                        str_contains($file, "Interface") ||
+                        str_contains($file, "Abstract") ||
+                        str_contains($file, "TrackerField")
                     ) {
                         continue;
                     }
@@ -156,7 +156,8 @@ class Tracker_Field_Factory
                 return new $class($fieldInfo, $itemData, $this->trackerDefinition);
             }
         } else {
-            throw new Exception("type {$type} is missing in typeMap");
+            Feedback::error(tr('Tracker Field Factory Error: Unknown field type "%0"', $type));
+            return null;
         }
     }
 }

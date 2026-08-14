@@ -78,7 +78,7 @@ class Handler
             $pattern = $name . '.';
             $replacePattern = $rename . '.';
             foreach ($themeFiles as $file) {
-                if (strpos($file, $pattern) !== false) {
+                if (str_contains($file, $pattern)) {
                     $renameFile = str_replace($pattern, $replacePattern, $file);
                     rename($file, $renameFile);
                 }

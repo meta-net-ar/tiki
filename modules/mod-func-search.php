@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -34,7 +34,24 @@ function module_search_info()
             ],
             'use_autocomplete' => [
                 'name' => tra('Use autocomplete'),
-                'description' => tra('If set to "y" input uses autocomplete for pagenames if applicable.') . ' ' . tra('Default:') . ' "y"' . tra(' (use autocomplete)')
+                'description' => tra('If set to "y" input uses autocomplete for specified object types.') . ' ' . tra('Default:') . ' "y"' . tra(' (use autocomplete)')
+            ],
+            'autocomplete_objecttypes' => [
+                'name' => tra('Autocomplete object types'),
+                'description' => tra('List of object types to include in autocomplete suggestions.'),
+                'default' => ['wiki page'],
+                'separator' => ',',
+                'type' => 'select',
+                'set_value_as_array' => true,
+                'options' => array_combine(TikiLib::lib('object')->get_supported_types(), TikiLib::lib('object')->get_supported_types()),
+            ],
+            'autocomplete_exclude_parent_ids' => [
+                'name' => tra('Autocomplete exclude parent'),
+                'description' => tra('List of parent objects to not fetch autocomplete suggestions from. Format used: parent_object_id_field:parent_object_id. Ex.: tracker:12345'),
+                'type' => 'select',
+                'separator' => ',',
+                'set_value_as_array' => true,
+                'options' => [],
             ],
             'advanced_search' => [
                 'name' => tra('Advanced search'),
@@ -183,16 +200,16 @@ function module_search($mod_reference, $smod_params)    // modifies $smod_params
             $smod_params['show_search_button'] = 'n';
             $smod_params['show_go_button'] = 'n';
             $smod_params['show_edit_button'] = 'y';
-            $smod_params['edit_submit'] = isset($smod_params['submit']) ? $smod_params['submit'] : tra("Create/Edit");
+            $smod_params['edit_submit'] = $smod_params['submit'] ?? tra("Create/Edit");
             $smod_params['default_button'] = 'edit';
-            $smod_params['edit_action'] = isset($smod_params['action']) ? $smod_params['action'] : 'tiki-editpage.php';
-            $smod_params['input_size'] = isset($smod_params['size']) ? $smod_params['size'] : 15;
-            $smod_params['search_heading'] = isset($smod_params['mod_quickedit_heading']) ? $smod_params['mod_quickedit_heading'] : $smod_params['search_heading'];
+            $smod_params['edit_action'] = $smod_params['action'] ?? 'tiki-editpage.php';
+            $smod_params['input_size'] = $smod_params['size'] ?? 15;
+            $smod_params['search_heading'] = $smod_params['mod_quickedit_heading'] ?? $smod_params['search_heading'];
             $smod_params['title'] = tra('Quick Edit a Wiki Page');
             break;
 
         case 'search':      // params from old search_box module
-            $smod_params['tiki_search'] = isset($smod_params['tiki']) ? $smod_params['tiki'] : 'n';
+            $smod_params['tiki_search'] = $smod_params['tiki'] ?? 'n';
             $smod_params['show_search_button'] = 'y';
             $smod_params['show_go_button'] = 'n';
             $smod_params['show_edit_button'] = 'n';

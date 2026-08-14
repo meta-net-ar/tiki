@@ -270,7 +270,7 @@ class Calendar_CalRecurrenceTest extends TikiTestCase
                 $result = $rec->compareFieldsOfEvent($evt, $rec);
                 if ($i == 0) {
                     foreach ($result as $key => $field) {
-                        if (substr($field, 0, 1) == '_') {
+                        if (str_starts_with($field, '_')) {
                             unset($result[$key]);
                         }
                     }

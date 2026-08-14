@@ -39,21 +39,13 @@ if (! isset($_REQUEST["sort_mode"])) {
 }
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
-if (! isset($_REQUEST["find"])) {
-    $find = '';
-} else {
-    $find = $_REQUEST["find"];
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $find);
 // Get a list of last changes to the Wiki database
 $listpages = $tikilib->list_cache($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $listpages["cant"]);
+$smarty->assign_by_ref('pages_count', $listpages["count"]);
 $smarty->assign_by_ref('listpages', $listpages["data"]);
 
 // Display the template

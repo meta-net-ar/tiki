@@ -5,10 +5,10 @@
         <div class="panel-heading"> <h3 class="panel-title">{tr}Add new application{/tr}</h3> </div>
         <div class="panel-body">
 
-            <span>Use: </span>
+            <span>{tr}Use:{/tr}</span>
             <div class="btn-group" >
-                <button type="button" class=" camera btn btn-primary">Camera</button>
-                <button type="button" class="send-file btn btn-primary">Send QRCode File</button>
+                <button type="button" class=" camera btn btn-primary">{tr}Camera{/tr}</button>
+                <button type="button" class="send-file btn btn-primary">{tr}Send QRCode File{/tr}</button>
             </div>
             <input type="file" class="file-chooser" accept="image/*" style="display:none;" />
             <br>

@@ -11,11 +11,11 @@
 $inputConfiguration = [
     [
         'staticKeyFilters'          => [
-            'name'                  => 'word',            //post
+            'name'                  => 'text',            //post
             'delete'                => 'bool',            //get
             'url'                   => 'url',             //post
-            'wstype'                => 'word',            //post
-            'operation'             => 'word',            //post
+            'wstype'                => 'alpha',           //post
+            'operation'             => 'text',            //post
             'postbody'              => 'xss',             //post
             'edit'                  => 'bool',            //post
             'parse'                 => 'bool',            //post
@@ -23,7 +23,6 @@ $inputConfiguration = [
             'test'                  => 'bool',            //post
             'deletetemplate'        => 'word',            //post
             'loadtemplate'          => 'word',            //post
-            'add'                   => 'bool',            //post
             'register'              => 'bool',            //post
             'new_name'              => 'word',            //post
             'old_name'              => 'word',            //post
@@ -32,19 +31,21 @@ $inputConfiguration = [
             'nt_engine'             => 'word',            //post
             'nt_output'             => 'word',            //post
             'nt_content'            => 'xss',             //post
+            'create_template'       => 'alpha',           //post
          ],
         'staticKeyFiltersForArrays' => [
-            'params'                => 'word',            //post
+            'params'                => 'text',            //post
+            'add'                   => 'int',             //post
         ],
     ],
 ];
-
 require_once('tiki-setup.php');
-
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_webservices');
 $access->check_permission('tiki_p_admin_webservices');
 
-require_once 'lib/ointegratelib.php';
 require_once 'lib/webservicelib.php';
 
 if (! empty($_REQUEST['name'])) {
@@ -107,7 +108,7 @@ if (
         ]
     );
 
-    $smarty->assign('data', print_r($data, true));
+    $smarty->assign('data', print_r($data, true)); // @phpstan-ignore disallowedFunctions.printR (returns webservice response as string for admin debug display, never prints)
     $smarty->assign('templates', $templates);
     $smarty->assign('response', $response);
     if (isset($_REQUEST['deletetemplate']) && $webservice->getTemplate($_REQUEST['deletetemplate'])) {

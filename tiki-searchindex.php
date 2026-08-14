@@ -23,8 +23,10 @@ $inputConfiguration = [
   ]
 ];
 
-$section = 'search';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_SEARCH;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_search');
 $access->check_permission('tiki_p_search');
 $smarty->assign('headtitle', tr('Search'));
@@ -46,7 +48,7 @@ if (count($filter) || count($postfilter)) {
     if (isset($_REQUEST['save_query'])) {
         $_SESSION['quick_search'][(int) $_REQUEST['save_query']] = $_REQUEST;
     }
-    $offset = isset($_REQUEST['offset']) ? $_REQUEST['offset'] : 0;
+    $offset = $_REQUEST['offset'] ?? 0;
     $maxRecords = empty($_REQUEST['maxRecords']) ? $prefs['maxRecords'] : $_REQUEST['maxRecords'];
 
     if ($access->is_serializable_request(true)) {
@@ -90,7 +92,7 @@ if (count($filter) || count($postfilter)) {
         $access->output_serialized(
             $results,
             [
-                'feedTitle' => tr('%0: Results for "%1"', $prefs['sitetitle'], isset($filter['content']) ? $filter['content'] : ''),
+                'feedTitle' => tr('%0: Results for "%1"', $prefs['sitetitle'], $filter['content'] ?? ''),
                 'feedDescription' => tr('Search Results'),
                 'entryTitleKey' => 'title',
                 'entryUrlKey' => 'url',
@@ -168,6 +170,9 @@ if (count($filter) || count($postfilter)) {
 $smarty->assign('filter', $filter);
 $smarty->assign('postfilter', $postfilter);
 $smarty->assign('facets', $facets);
+$fields = TikiLib::lib('unifiedsearch')->getAvailableFields();
+$fields = array_unique(array_merge(array_values($fields['global']), ...array_values($fields['object_types'])));
+$smarty->assign('filter_fields', $fields);
 
 // disallow robots to index page:
 $smarty->assign('metatag_robots', 'NOINDEX, NOFOLLOW');
@@ -247,7 +252,7 @@ function tiki_searchindex_get_results($filter, $postfilter, $offset, $maxRecords
                     $label = $facet->getLabel();
                     if (key_exists($label, $duplicateLabels)) {
                         // it's almost always tracker fields that are duplicated, so just them for now
-                        if (strpos($name, 'tracker_field_') === 0) {
+                        if (str_starts_with($name, 'tracker_field_')) {
                             $field = TikiLib::lib('trk')->get_tracker_field(substr($name, 14));
                             $definition = \Tracker_Definition::get($field['trackerId']);
                             $facet->setLabel($label . ' (' . $definition->getConfiguration('name') . ')');

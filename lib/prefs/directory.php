@@ -6,28 +6,35 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_directory_list()
 {
+    $directoryHelp = 'Directory';
+
     return [
         'directory_country_flag' => [
             'name' => tra('Show country flag'),
             'description' => tra('Show the country flag'),
             'type' => 'flag',
+            'help' => $directoryHelp,
             'default' => 'y',
         ],
         'directory_cool_sites' => [
             'name' => tra('Enable "popular sites"'),
+            'description' => tra('Show popular sites in the directory.'),
             'type' => 'flag',
+            'help' => $directoryHelp,
             'default' => 'y',
         ],
         'directory_validate_urls' => [
             'name' => tra('Validate URLs'),
             'description' => tra('Should Tiki check the URL?'),
             'type' => 'flag',
+            'help' => $directoryHelp,
             'default' => 'n',
         ],
         'directory_columns' => [
             'name'        => tra('Columns per page'),
             'description' => tra('Number of columns per page when listing directory categories'),
             'type'        => 'list',
+            'help' => $directoryHelp,
             'units'       => tra('columns'),
             'options'     => [
                 '1' => '1',
@@ -43,6 +50,7 @@ function prefs_directory_list()
             'name' => tra('Links per page'),
             'description' => tra('How many links should be displayed per page.'),
             'type' => 'text',
+            'help' => $directoryHelp,
             'units' => tra('links'),
             'default' => 20,
             ],
@@ -50,6 +58,7 @@ function prefs_directory_list()
             'name' => tra('Method to open Directory links'),
             'description' => tra('The linked-to website can be opened in various ways'),
             'type' => 'list',
+            'help' => $directoryHelp,
             'options' => [
                 'r' => tra('Replace the current window'),
                 'n' => tra('Open a new window'),

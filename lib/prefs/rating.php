@@ -6,12 +6,15 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_rating_list()
 {
+    $calculationsHelp = 'Calculations';
+    $ratingHelp = 'Rating';
+
     return [
         'rating_advanced' => [
             'name' => tra('Advanced Rating'),
             'description' => tra('In an advanced rating system, the options and calculation method can be configured.'),
             'type' => 'flag',
-            'help' => 'Advanced-Rating',
+            'help' => $calculationsHelp,
             'default' => 'n',
             'admin' => 'rating',
             'tags' => ['advanced'],
@@ -20,6 +23,7 @@ function prefs_rating_list()
             'name' => tra('Rating recalculation mode'),
             'description' => tra('Determines when and how rating aggregates are recalculated. Depending on the site load, some options may be preferred to others. On large-volume sites, it should be done as a cron job. On vote recalculation, there may be inaccuracies if rating calculation is time-dependent.'),
             'type' => 'list',
+            'help' => $calculationsHelp,
             'options' => [
                 'vote' => tra('Recalculate on vote'),
                 'randomload' => tra('Randomly recalculate oldest ratings (on load)'),
@@ -37,6 +41,7 @@ function prefs_rating_list()
             'size' => 5,
             'filter' => 'digits',
             'default' => '100',
+            'help' => $calculationsHelp,
         ],
         'rating_recalculation_count' => [
             'name' => tra('Recalculation count'),
@@ -46,6 +51,7 @@ function prefs_rating_list()
             'filter' => 'digits',
             'units' => tra('ratings'),
             'default' => '100',
+            'help' => $calculationsHelp,
         ],
         'rating_smileys' => [
             'name' => tr('Smiley Ratings'),
@@ -55,7 +61,8 @@ function prefs_rating_list()
                 '' => tr('Disabled'),
                 'y' => tr('Enabled'),
             ],
-            'default' => ''
+            'default' => '',
+            'help' => $calculationsHelp,
         ],
         'rating_results_detailed' => [
             'name' => tr('Detailed rating results'),
@@ -65,7 +72,8 @@ function prefs_rating_list()
                 '' => tr('Disabled'),
                 'y' => tr('Enabled'),
             ],
-            'default' => ''
+            'default' => '',
+            'help' => $ratingHelp,
         ],
         'rating_options_reversed' => [
             'name' => tr('Reversed Rating Options'),
@@ -75,7 +83,8 @@ function prefs_rating_list()
                 '' => tr('Disabled'),
                 'y' => tr('Enabled'),
             ],
-            'default' => ''
+            'default' => '',
+            'help' => $ratingHelp,
         ],
         'rating_results_detailed_percent' => [
             'name' => tr('Include percentages in the detailed rating results'),
@@ -85,13 +94,15 @@ function prefs_rating_list()
                 '' => tr('Disabled'),
                 'y' => tr('Enabled'),
             ],
-            'default' => ''
+            'default' => '',
+            'help' => $ratingHelp,
         ],
         'rating_default_options' => [
             'name' => tra('Default rating options'),
             'description' => tra('List of options available.'),
             'type' => 'text',
             'default' => "0,1,2,3,4",
+            'help' => $ratingHelp,
         ],
         'rating_allow_multi_votes' => [
             'name' => tra('Multiple votes per user'),
@@ -101,7 +112,8 @@ function prefs_rating_list()
                 '' => tr('Disabled'),
                 'y' => tr('Enabled'),
             ],
-            'default' => ''
+            'default' => '',
+            'help' => $ratingHelp,
         ],
-    ];
+    ]; // TODO: update the documentation for the rating preferences
 }

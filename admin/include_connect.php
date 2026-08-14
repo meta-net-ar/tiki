@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -23,7 +23,7 @@ if (empty($prefs['connect_site_title'])) {
             'connect_site_title' => $prefs['browsertitle'],
             'connect_site_email' => $userlib->get_admin_email(),
             'connect_site_url' => $base_url,
-            'connect_site_keywords' => $prefs['metatag_keywords'],
+            'connect_site_keywords' => $prefs['connect_site_keywords'] ?? '',
             'connect_site_location' => $prefs['gmap_defaultx'] . ',' . $prefs['gmap_defaulty'] . ',' . $prefs['gmap_defaultz'],
         ]
     );

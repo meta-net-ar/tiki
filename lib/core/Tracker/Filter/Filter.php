@@ -114,6 +114,11 @@ class Filter implements \JsonSerializable
         $this->applyCondition = $other->applyCondition;
     }
 
+    public function getAppliedValue()
+    {
+        return $this->control->getQueryArguments();
+    }
+
     public function jsonSerialize(): mixed
     {
         return [
@@ -121,7 +126,7 @@ class Filter implements \JsonSerializable
             'field' => $this->permName,
             'mode' => $this->mode,
             'position' => $this->position,
-            'applied_value' => $this->control->getQueryArguments(),
+            'applied_value' => $this->getAppliedValue(),
         ];
     }
 }

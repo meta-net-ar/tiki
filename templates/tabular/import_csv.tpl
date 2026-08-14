@@ -7,8 +7,8 @@
 {block name="navigation"}
     <div class="navbar d-inline-flex">
         {permission name=admin_trackers}
-            <a class="btn btn-link" href="{service controller=tabular action=create}">{icon name=create} {tr}New{/tr}</a>
-            <a class="btn btn-link" href="{service controller=tabular action=manage}">{icon name=list} {tr}Manage{/tr}</a>
+            <a class="btn btn-link" href="{service controller=tabular action=create}" role="button">{icon name=create} {tr}New{/tr}</a>
+            <a class="btn btn-link" href="{service controller=tabular action=manage}" role="button">{icon name=list} {tr}Manage{/tr}</a>
         {/permission}
     </div>
 {/block}
@@ -47,7 +47,15 @@
             {elseif $format eq 'ical'}
                 {createFileInput format='ical' label='iCal File' fileInputId='icalInputFile' fileAccept='text/calendar'}
             {else}
-                {createFileInput format='csv' label='CSV File' fileInputId='inputFile' fileAccept='text/csv'}
+                {createFileInput format='csv' label='CSV File' fileInputId='inputFile' fileAccept='text/csv, .tsv'}
+                <div class="form-group">
+                    <label for="separator">{tr}Select separator:{/tr}</label>
+                    <select name="separator" class="form-select" aria-label="CSV File delimiter">
+                        <option value="," selected>{tr}Comma{/tr}(,)</option>
+                        <option value=";">{tr}Semicolon{/tr}(;)</option>
+                        <option value="tab">{tr}Tab{/tr}(\t)</option>
+                    </select>
+                </div>
             {/if}     
             <div class="submit">
                 <input class="btn btn-primary" type="submit" value="{tr}Import{/tr}">

@@ -6,21 +6,25 @@
 }
     <div class="fgal_top_bar mb-3">
         {if !empty($tree) && $tiki_p_list_file_galleries != 'n' && $fgal_options.show_explorer.value eq 'y' && $tiki_p_view_fgal_explorer eq 'y'}
-            <div id="fgalexplorer_close" style="float:left; vertical-align:middle; display:{if !isset($smarty.session.tiki_cookie_jar.show_fgalexplorer) or $smarty.session.tiki_cookie_jar.show_fgalexplorer eq 'y'}none{else}inline{/if};">
+            <div id="fgalexplorer_close" class="styling-element" style="float:left; vertical-align:middle; display:{if !isset($smarty.session.tiki_cookie_jar.show_fgalexplorer) or $smarty.session.tiki_cookie_jar.show_fgalexplorer eq 'y'}none{else}inline{/if};">
                 <a href="#"
                     class="tips"
                     title=":{tr}Show Tree{/tr}"
                     aria-label="{tr}Show Tree{/tr}"
-                    onclick="flip('fgalexplorer','');hide('fgalexplorer_close',false);show('fgalexplorer_open',false);return false;">
+                    onclick="flip('fgalexplorer','');hide('fgalexplorer_close',false);show('fgalexplorer_open',false);return false;"
+                    role="button"
+                >
                     {icon name='file-archive'}
                 </a>
             </div>
-            <div id="fgalexplorer_open" style="float:left; vertical-align:middle; display:{if isset($smarty.session.tiki_cookie_jar.show_fgalexplorer) and $smarty.session.tiki_cookie_jar.show_fgalexplorer neq 'y'}none{else}inline{/if};">
+            <div id="fgalexplorer_open" class="styling-element" style="float:left; vertical-align:middle; display:{if isset($smarty.session.tiki_cookie_jar.show_fgalexplorer) and $smarty.session.tiki_cookie_jar.show_fgalexplorer neq 'y'}none{else}inline{/if};">
                 <a href="#"
                     class="tips"
                     title=":{tr}Hide Tree{/tr}"
                     aria-label="{tr}Hide Tree{/tr}"
-                    onclick="flip('fgalexplorer','');hide('fgalexplorer_open',false);show('fgalexplorer_close',false);return false;">
+                    onclick="flip('fgalexplorer','');hide('fgalexplorer_open',false);show('fgalexplorer_close',false);return false;"
+                    role="button"
+                >
                     {icon name='file-archive-open'}
                 </a>
             </div>
@@ -38,9 +42,9 @@
         <div class="col-sm-12 fgallisting explorerDisplayed">
     {/if}
     <div>
-        {if $maxRecords > 20 and $cant > $maxRecords}
+        {if $maxRecords > 20 and $count > $maxRecords}
             <div class="clearboth" style="margin-bottom: 3px;">
-                {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+                {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
             </div>
         {/if}
         <form name="fgalformid" id="fgalform" method="post" action="{if !empty($filegals_manager)}{query _type='relative' filegals_manager=$filegals_manager|escape}{else}{query _type='relative'}{/if}" enctype="multipart/form-data">
@@ -53,18 +57,18 @@
             {if isset($file_info)}<input type="hidden" name="fileId" value="{$file_info.fileId|escape}">{/if}
             {if isset($page)}<input type="hidden" name="page" value="{$page|escape}">{/if}
             {if isset($view)}<input type="hidden" name="view" value="{$view|escape}">{/if}
-            {assign var=nbCols value=0}
-            {assign var=other_columns value=''}
-            {assign var=other_columns_selected value=''}
+            {$nbCols=0}
+            {$other_columns=''}
+            {$other_columns_selected=''}
             {if $view eq 'browse' or $view eq 'page'}
-                {assign var=show_infos value='y'}
+                {$show_infos='y'}
                 {if $view eq 'page'}
                     {include file='fgal_view_page.tpl'}
                 {else}
                     {include file='browse_file_gallery.tpl'}
                 {/if}
             {else}
-                {assign var=show_infos value='n'}
+                {$show_infos='n'}
                 {include file='list_file_gallery_content.tpl'}
             {/if}
             {if (isset($files) && $files
@@ -215,7 +219,7 @@
             {/if}
         </form>
         {reindex_file_pixel id=$reindex_file_id}<br>
-        {pagination_links cant=$cant step=$maxRecords offset=$offset}
+        {pagination_links count=$count step=$maxRecords offset=$offset}
             {if $view eq 'page'}
                 tiki-list_file_gallery.php?galleryId={$galleryId}&maxWidth={$maxWidth}&maxRecords={$maxRecords}&view={$view}
             {/if}

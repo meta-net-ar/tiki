@@ -15,14 +15,14 @@ $inputConfiguration = [
             'removeZone'                  => 'string',        //post
             'save'                        => 'bool',          //post
             'create_zone'                 => 'bool',          //post
-            'fromTimeMeridian'            => 'int',           //post
+            'fromTimeMeridian'            => 'string',        //post
             'fromTimeHour'                => 'digits',        //post
-            'toTimeMeridian'              => 'int',           //post
+            'toTimeMeridian'              => 'string',        //post
             'toTimeHour'                  => 'digits',        //post
-            'fromDate_Month'              => 'string',        //post
+            'fromDate_Month'              => 'int',           //post
             'fromDate_Day'                => 'digits',        //post
             'fromDate_Year'               => 'digits',        //post
-            'toDate_Month'                => 'string',        //post
+            'toDate_Month'                => 'int',           //post
             'toDate_Day'                  => 'digits',        //post
             'toDate_Year'                 => 'digits',        //post
             'fromTimeMinute'              => 'digits',        //post
@@ -173,8 +173,8 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["create_zone"])) {
     }
     $fromDate = mktime(0, 0, 0, $_REQUEST["fromDate_Month"], $_REQUEST["fromDate_Day"], $_REQUEST["fromDate_Year"]);
     $toDate = mktime(0, 0, 0, $_REQUEST["toDate_Month"], $_REQUEST["toDate_Day"], $_REQUEST["toDate_Year"]);
-    $fromTime = '' . $_REQUEST["fromTimeHour"] . $_REQUEST["fromTimeMinute"] . '';
-    $toTime = '' . $_REQUEST["toTimeHour"] . $_REQUEST["toTimeMinute"] . '';
+    $fromTime = '' . $_REQUEST["fromTimeHour"] . $_REQUEST["fromTimeMinute"];
+    $toTime = '' . $_REQUEST["toTimeHour"] . $_REQUEST["toTimeMinute"];
     $smarty->assign('fromDate', $fromDate);
     $smarty->assign('toDate', $toDate);
     $smarty->assign('fromTime', $_REQUEST["fromTimeHour"] . ':' . $_REQUEST["fromTimeMinute"]);
@@ -362,39 +362,34 @@ if (isset($_REQUEST["save"]) || isset($_REQUEST["create_zone"])) {
     }
 
     if (! isset($_REQUEST["create_zone"])) {
-        $bannerId = $bannerlib->replace_banner(
-            $_REQUEST["bannerId"],
-            $_REQUEST["client"],
-            $_REQUEST["url"],
-            '',
-            '',
-            $_REQUEST["use"],
-            $_REQUEST["imageData"],
-            $_REQUEST["imageType"],
-            $_REQUEST["imageName"],
-            $_REQUEST["HTMLData"],
-            $_REQUEST["fixedURLData"],
-            $_REQUEST["textData"],
-            $fromDate,
-            $toDate,
-            $useDates,
-            $Dmon,
-            $Dtue,
-            $Dwed,
-            $Dthu,
-            $Dfri,
-            $Dsat,
-            $Dsun,
-            $fromTime,
-            $toTime,
-            $_REQUEST["maxImpressions"],
-            $_REQUEST["maxClicks"],
-            $_REQUEST["zone"] ?? null,
-            $_REQUEST["maxUserImpressions"],
-            $_REQUEST['onlyInURIs'],
-            $_REQUEST['exceptInURIs']
-        );
+        // 1. Prepare the data payload
+        $bannerProperties = [
+            'client'             => $_REQUEST["client"],
+            'url'                => $_REQUEST["url"],
+            'title'              => $_REQUEST["title"] ?? '',
+            'alt'                => $_REQUEST["alt"] ?? '',
+            'which'              => $_REQUEST["use"],
+            'imageData'          => $_REQUEST["imageData"],
+            'imageType'          => $_REQUEST["imageType"],
+            'imageName'          => $_REQUEST["imageName"],
+            'HTMLData'           => $_REQUEST["HTMLData"],
+            'fixedURLData'       => $_REQUEST["fixedURLData"],
+            'textData'           => $_REQUEST["textData"],
+            'fromDate'           => $fromDate,
+            'toDate'             => $toDate,
+            'useDates'           => $useDates,
+            'mon' => $Dmon, 'tue' => $Dtue, 'wed' => $Dwed, 'thu' => $Dthu, 'fri' => $Dfri, 'sat' => $Dsat, 'sun' => $Dsun,
+            'hourFrom'           => $fromTime,
+            'hourTo'             => $toTime,
+            'maxImpressions'     => $_REQUEST["maxImpressions"],
+            'maxClicks'          => $_REQUEST["maxClicks"],
+            'zone'               => $_REQUEST["zone"],
+            'maxUserImpressions' => $_REQUEST["maxUserImpressions"] ?? 1,
+            'onlyInURIs'         => $_REQUEST['onlyInURIs'] ?? null,
+            'exceptInURIs'       => $_REQUEST['exceptInURIs'] ?? null,
+        ];
 
+        $bannerId = $bannerlib->replace_banner($_REQUEST["bannerId"], $bannerProperties);
         header("location:tiki-list_banners.php");
     }
 }

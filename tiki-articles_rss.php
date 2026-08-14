@@ -9,7 +9,6 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
-TikiLib::lib('header')->setXRobotsTag($robots);
 $rsslib = TikiLib::lib('rss');
 
 $access->check_feature('feature_articles');
@@ -94,7 +93,7 @@ if ($topic and ! $tikilib->user_has_perm_on_object($user, $topic, 'topic', 'tiki
     require_once('tiki-rss_error.php');
 }
 
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output["data"] == "EMPTY") {
     $title = $prefs['feed_articles_title'];

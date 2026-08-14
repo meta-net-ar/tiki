@@ -15,7 +15,7 @@ class Search_Formatter_ValueFormatter_Wikiplugin extends Search_Formatter_ValueF
 
     public function render($name, $value, array $entry)
     {
-        if (substr($name, 0, 11) !== 'wikiplugin_') {
+        if (! str_starts_with($name, 'wikiplugin_')) {
             return $value;
         } else {
             $name = substr($name, 11);

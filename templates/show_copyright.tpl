@@ -13,7 +13,7 @@
             {$smarty.capture.copyright_content}
         {elseif $prefs.article_feature_copyrights eq 'y' and $copyright_context eq 'article'}
             {$smarty.capture.copyright_content}
-        {elseif $prefs.faq_feature_copyrights eq 'y' and $copyright_context eq 'faq' }
+        {elseif $prefs.faq_feature_copyrights eq 'y' and $copyright_context eq 'faq'}
             {$smarty.capture.copyright_content}
         {/if}
     {/if}

@@ -26,6 +26,10 @@ class Toolbars extends Base
             'syntax' => $prefs['markdown_default'],
         ];
         $params = array_merge($default, $params);
+
+        if ($params['syntax'] == 'none') {
+            return '';
+        }
         // filters some tools here depending on section
         $hidden = [];
         $switchableWysiwygSections = ['wiki page', 'blogs', 'newsletters', 'cms', 'webmail'];

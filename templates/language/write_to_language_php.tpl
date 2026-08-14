@@ -1,6 +1,6 @@
 {extends $global_extend_layout|default:'layout_view.tpl'}
 {block name="title"}
-    {title}{$title|escape}{/title}
+    {title}{$title}{/title}
 {/block}
 {block name="content"}
     <form action="{service controller=language action=write_to_language_php}" method="post" class="form">

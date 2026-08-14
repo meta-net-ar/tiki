@@ -10,7 +10,7 @@
             <div class="offcanvas offcanvas-start tiki-admin-aside-nav-{$prefs.theme_navbar_color_variant_admin}" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel" style="top: var(--tiki-admin-top-modules-height); height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;">
                 <div class="offcanvas-header">
                     <h5 class="offcanvas-title nav-link" id="offcanvasNavbarLabel">{tr}Admin menu{/tr}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close" style="background-color: lightgray;"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="{tr}Close{/tr}" style="background-color: lightgray;"></button>
                 </div>
                 <div class="offcanvas-body p-0 w-100">
                     <div class="tiki-admin-aside-nav-{$prefs.theme_navbar_color_variant_admin}" style="height: calc(100vh - var(--tiki-admin-top-modules-height)) !important;">
@@ -78,7 +78,7 @@
                                 <div class="my-1 mx-4">
                                     <form method="post" action="tiki-admin.php" class="d-flex justify-content-center my-md-0 ms-auto">
                                         <input type="hidden" name="filters">
-                                        <div class="input-group">
+                                        <div class="input-group search-prefs-container">
                                             <input type="text" role="search" aria-label="{tr}Search Admin Preferences{/tr}" name="lm_criteria" value="{$lm_criteria|escape}" class="form-control form-control-sm" placeholder="{tr}Search preferences{/tr}...">
                                             <button type="submit" aria-label="{tr}Search{/tr}" class="btn btn-primary btn-sm"{if $indexNeedsRebuilding} class="tips" title="{tr}Configuration search{/tr}|{tr}Note: The search index needs rebuilding, this will take a few minutes.{/tr}"{/if}>{icon name="search"}</button>
                                         </div>
@@ -93,7 +93,7 @@
                                 </div>
                             </div>
 
-                            <h2 class="text-bg-secondary fs-6 py-2 px-3 mb-0">{icon name="sliders-h"} <span class="ms-1 narrow-hide">Configure</span></h2>
+                            <h2 class="text-bg-secondary fs-6 py-2 px-3 mb-0">{icon name="sliders-h"} <span class="ms-1 narrow-hide">{tr}Configure{/tr}</span></h2>
                             {foreach $admin_icons as $section => $secInfo}
                                 <div class="accordion-item tips right" title="{$secInfo.title}|{$secInfo.description}">
                                     <div class="accordion-header" id="flush-heading-{$section}">
@@ -288,7 +288,7 @@
                                             {/if}
                                             {if $prefs.feature_shoutbox eq "y" and $tiki_p_admin_shoutbox eq "y"}
                                                 <a class="dropdown-item" href="tiki-shoutbox.php">
-                                                    {icon name="bullhorn"} <span class="ms-1">{tr}Shoutbox{/tr}</span> </a>
+                                                    {icon name="message"} <span class="ms-1">{tr}Shoutbox{/tr}</span> </a>
                                             {/if}
                                             {if $prefs.payment_feature eq "y"}
                                                 <a class="dropdown-item" href="tiki-admin_credits.php">
@@ -301,7 +301,7 @@
                                             {/if}
                                             {if $prefs.feature_theme_control eq "y" and $tiki_p_admin eq "y"}
                                                 <a class="dropdown-item" href="tiki-theme_control.php">
-                                                    {icon name=""} <span class="ms-1">{tr}Theme Control{/tr}</span> </a>
+                                                    {icon name="images"} <span class="ms-1">{tr}Theme Control{/tr}</span> </a>
                                             {/if}
                                             {if $tiki_p_admin_toolbars eq "y"}
                                                 <a class="dropdown-item" href="tiki-admin_toolbars.php">
@@ -344,14 +344,6 @@
                                             {/if}
                                             <a class="dropdown-item" href="tiki-admin_dsn.php">
                                                 {icon name="key"} <span class="ms-1">{tr}DSN/Content Authentication{/tr}</span> </a>
-                                            {if $prefs.feature_editcss eq "y" and $tiki_p_create_css eq "y"}
-                                                <a class="dropdown-item" href="tiki-edit_css.php">
-                                                    {icon name="edit"} <span class="ms-1">{tr}Edit CSS{/tr}</span> </a>
-                                            {/if}
-                                            {if $prefs.feature_view_tpl eq "y" and $prefs.feature_edit_templates eq "y" and $tiki_p_edit_templates eq "y"}
-                                                <a class="dropdown-item" href="tiki-edit_templates.php">
-                                                    {icon name="edit"} <span class="ms-1">{tr}Edit TPL{/tr}</span> </a>
-                                            {/if}
                                             {if $prefs.cachepages eq "y" and $tiki_p_admin eq "y"}
                                                 <a class="dropdown-item" href="tiki-list_cache.php">
                                                     {icon name="external-link-square-alt"} <span class="ms-1">{tr}External Pages Cache{/tr}</span> </a>
@@ -361,6 +353,8 @@
                                             {if $tiki_p_admin_importer eq "y"}
                                                 <a class="dropdown-item" href="tiki-importer.php">
                                                     {icon name="file-import"} <span class="ms-1">{tr}Importer{/tr}</span> </a>
+                                                <a class="dropdown-item" href="tiki-markdown_import.php">
+                                                    {icon name="file-import"} <span class="ms-1">{tr}Markdown Importer{/tr}</span> </a>
                                             {/if}
                                             {if $prefs.feature_integrator eq "y" and $tiki_p_admin_integrator eq "y"}
                                                 <a class="dropdown-item" href="tiki-admin_integrator.php">
@@ -401,6 +395,10 @@
                                             {if $prefs.feature_scheduler eq "y" and $tiki_p_admin}
                                                 <a class="dropdown-item" href="tiki-admin_schedulers.php">
                                                     {icon name="calendar-check"} <span class="ms-1">{tr}Scheduler{/tr}</span> </a>
+                                            {/if}
+                                            {if $prefs.feature_queued_tasks eq "y"}
+                                                <a class="dropdown-item" href="tiki-admin_queued_tasks.php">
+                                                    {icon name="calendar-check"} <span class="ms-1">{tr}Queued Tasks{/tr}</span> </a>
                                             {/if}
                                             {if $prefs.tiki_monitor_performance eq 'y'}
                                                 <a class="dropdown-item" href="tiki-performance_stats.php">
@@ -491,7 +489,16 @@
                             </div>
                             {* Search Content end*}
 
-                        </div>
+                            {* Collapse Menu Button *}
+                            </div>
+                            <div class="admin-menu-collapser border-top mt-auto">
+                                <a href="#" class="d-block px-4 py-3 fw-semibold text-decoration-none admin-menu-collapse-btn" role="button" aria-label="{tr}Collapse menu{/tr}">
+                                    {icon name="chevron-left" iclass="fa-fw"}
+                                    <span class="ms-1 narrow-hide collapse-text">{tr}Collapse Sidebar{/tr}</span>
+                                    <span class="ms-1 narrow-hide expand-text">{tr}Expand Sidebar{/tr}</span>
+                                </a>
+                            </div>
+
                     </div>
                 </div>
             </div>

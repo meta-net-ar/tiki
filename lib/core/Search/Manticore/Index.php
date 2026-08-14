@@ -32,6 +32,8 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
     private $multisearchIndices;
     private $multisearchStack;
 
+    private $indexedFieldsData = null;
+
     public static $searchedFields = ['fulltext' => [], 'others' => []];
 
     public function __construct(Client $client, PdoClient $pdo_client, $index)
@@ -51,25 +53,10 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
 
     public function __destruct()
     {
-        global $prefs;
-
         if (! $this->dirty) {
             return;
         }
-
-        if (empty($this->index) || strstr($this->index, 'pref_')) {
-            return;
-        }
-
-        $fieldMapping = json_encode($this->fieldMapping);
-        if (empty($prefs['unified_field_mapping']) || $prefs['unified_field_mapping'] != $fieldMapping) {
-            TikiLib::lib('tiki')->set_preference('unified_field_mapping', $fieldMapping);
-        }
-
-        $dateFields = json_encode($this->dateFields);
-        if (empty($prefs['unified_date_fields']) || $prefs['unified_date_fields'] != $dateFields) {
-            TikiLib::lib('tiki')->set_preference('unified_date_fields', $dateFields);
-        }
+        $this->storeFieldMapping();
     }
 
     public function getClient()
@@ -127,20 +114,40 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
 
         $this->generateMapping($objectType, $data);
 
-        $data = array_map(
-            function ($entry) {
-                return $entry->getValue() ?? "";
-            },
-            $data
-        );
+        // Separate tracker fields that should go into JSON
+        $indexedFields = $this->getIndexedFields();
+        $jsonFields = [];
+        $normalData = [];
 
-        foreach ($data as $field => $value) {
-            if (isset($this->providedMappings[$field . '_nsort'])) {
-                $data[$field . '_nsort'] = @floatval($value);
+        foreach ($data as $field => $entry) {
+            if (preg_match('/^tracker_field_/', $field) && ! in_array($field, $indexedFields)) {
+                $jsonFieldName = preg_replace('/^tracker_field_/', '', $field);
+                $jsonFields[$jsonFieldName] = self::convertJsonTypeValue($entry);
+                if ($entry instanceof \Search_Type_Timestamp) {
+                    $jsonFields[$jsonFieldName . '_ts'] = $entry->getValue();
+                }
+            } else {
+                $normalData[$field] = $entry->getValue() ?? "";
+                if (isset($this->providedMappings[$field . '_nsort']) || isset($this->providedMappings[strtolower($field) . '_nsort'])) {
+                    $normalData[$field . '_nsort'] = @floatval($normalData[$field]);
+                }
             }
         }
+        $normalData['tracker_fields_json'] = json_encode($jsonFields);
 
-        return $data;
+        $normalData['id'] = self::generateDocumentId($normalData['object_type'], $normalData['object_id']);
+
+        return $normalData;
+    }
+
+    /**
+     * Generate document ID from unique representation of object_type and object_id.
+     * Used to fix duplicate document insertion bugs using REPLACE INTO.
+     */
+    public static function generateDocumentId(string $objectType, string $objectId): int
+    {
+        $hash = hash('xxh128', "$objectType $objectId", true);
+        return unpack('J', substr($hash, 0, 8))[1] & 0x7FFFFFFFFFFFFFFF;
     }
 
     private function generateMapping($type, $data)
@@ -148,16 +155,28 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         global $prefs;
 
         // extract the difference of the new data only and convert to Manticore types
+        $allNewFields = array_diff_key($data, $this->providedMappingsCorrectName);
+
+        $indexedFields = $this->getIndexedFields();
+        $jsonFields = [];
+        $normalFields = [];
+
+        foreach ($allNewFields as $field => $value) {
+            if (preg_match('/^tracker_field_/', $field) && ! in_array($field, $indexedFields)) {
+                $jsonFields[] = $field;
+            } else {
+                $normalFields[$field] = $value;
+            }
+        }
         $mapping = array_map(
             [$this, 'convertToManticoreType'],
-            array_diff_key($data, $this->providedMappingsCorrectName)
+            $normalFields
         );
 
         // observe 256 full-text fields index limit - convert the rest to string attributes
         if ($this->indexer) {
-            $indexedFields = $this->getIndexedFields();
-            foreach ($mapping as $field => $type) {
-                if ($type['type'] == 'text' && ! in_array($field, $indexedFields)) {
+            foreach ($mapping as $field => $typeDef) {
+                if ($typeDef['type'] == 'text' && ! in_array($field, $indexedFields)) {
                     $mapping[$field] = ['type' => 'string'];
                 }
             }
@@ -166,21 +185,25 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         }
 
         // cache date-only field list
-        foreach ($mapping as $field => $type) {
-            if (! empty($type['dateonly'])) {
+        foreach ($mapping as $field => $typeDef) {
+            if (! empty($typeDef['dateonly'])) {
                 unset($mapping[$field]['dateonly']);
                 $this->dateFields[] = $field;
             }
         }
 
         // add nsort numeric field counterparts to the string attribute fields
-        foreach ($mapping as $field => $type) {
-            if (($type['type'] == 'string' || $type['type'] == 'text') && ! isset($mapping[$field . '_nsort'])) {
+        foreach ($mapping as $field => $typeDef) {
+            if (($typeDef['type'] == 'string' || $typeDef['type'] == 'text') && ! isset($mapping[$field . '_nsort'])) {
                 $mapping[$field . '_nsort'] = ['type' => 'float'];
             }
-            if (($type['type'] == 'timestamp') && ! isset($mapping[$field . '_nsort'])) {
+            if (($typeDef['type'] == 'timestamp') && ! isset($mapping[$field . '_nsort'])) {
                 $mapping[$field . '_nsort'] = ['type' => 'timestamp'];
             }
+        }
+
+        if (! isset($this->providedMappingsCorrectName['tracker_fields_json'])) {
+            $mapping['tracker_fields_json'] = ['type' => 'json'];
         }
 
         // create or update the index
@@ -214,6 +237,12 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             $this->updatePercolateIndex($this->index, $pq_mapping);
         }
 
+        if ($mapping) {
+            // store prefs on each index schema update as doing in __destruct is not reliable - various cases omit storing these prefs
+            // and search results are missing fields later
+            $this->storeFieldMapping();
+        }
+
         $this->dirty = true;
     }
 
@@ -242,7 +271,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             'min_infix_len' => 2,
             'stopwords' => $stopwords_file,
             'morphology' => $prefs['unified_manticore_morphology'] ?? '',
-            // TODO: see what other options to support https://manual.manticoresearch.com/Creating_an_index/Local_indexes/Plain_and_real-time_index_settings#Natural-language-processing-specific-settings
+            // TODO: see what other options to support https://manual.manticoresearch.com/Creating_a_table/NLP_and_tokenization/Low-level_tokenization
         ];
 
         return $settings;
@@ -287,7 +316,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
     {
         global $prefs;
 
-        static $data = null;
+        $data = $this->indexedFieldsData;
 
         if (! is_null($data)) {
             return $data;
@@ -321,6 +350,9 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             if (empty($type)) {
                 continue;
             }
+            if (preg_match('/^tracker_field_/', $name)) {
+                continue;
+            }
             $searchType = $typeFactory->$type('');
             $field = $this->convertToManticoreType($searchType);
             if ($field['type'] == 'text' && count($data) < 256 && ! in_array($name, $data)) {
@@ -336,7 +368,7 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             'converted to string' => $converted,
         ]);
 
-        return $data;
+        return $this->indexedFieldsData = $data;
     }
 
     private function convertToManticoreType($entry)
@@ -380,12 +412,12 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
 
     public function optimize()
     {
+        $this->pdo_client->flush();
         $this->pdo_client->optimize($this->index);
     }
 
     public function endUpdate()
     {
-        $this->pdo_client->flush();
         $this->optimize();
     }
 
@@ -427,6 +459,11 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
             $table = $this->index;
         }
 
+        if ($query->isCountOnly()) {
+            $totalCount = $this->pdo_client->count($table, $condition);
+            return new ResultSet([], $totalCount, $resultStart, $resultCount);
+        }
+
         $builder = new OrderBuilder($this);
         $order = $builder->build($query->getSortOrder());
 
@@ -436,7 +473,11 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
 
         if ($selectFields = $query->getSelectionFields()) {
             $selectFields = array_map(function ($field) {
-                return strtolower($field);
+                if ($this->isFieldInJson($field)) {
+                    return $field;
+                } else {
+                    return strtolower($field);
+                }
             }, $selectFields);
         } else {
             $selectFields = [];
@@ -682,8 +723,19 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         return $this->providedMappings;
     }
 
+    public function isDateField($field)
+    {
+        $mapping = $this->getFieldMapping($field);
+        if (! empty($mapping['types']) && in_array('timestamp', $mapping['types'])) {
+            return true;
+        }
+        return false;
+    }
     public function isTextField($field)
     {
+        if ($this->isFieldInJson($field)) {
+            return true;
+        }
         $mapping = $this->getFieldMapping($field);
         if (! empty($mapping['types']) && in_array('text', $mapping['types'])) {
             return true;
@@ -712,6 +764,11 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
 
         $fields = preg_split('/\s*,\s*/', $field);
         foreach ($fields as $field) {
+            // Check if field is in JSON structure - if so, it's valid
+            if ($this->isFieldInJson($field)) {
+                continue;
+            }
+
             $mapping = $this->getFieldMapping($field);
             if (empty($mapping) && $prefs['search_error_missing_field'] === 'y') {
                 if (preg_match('/^tracker_field_/', $field)) {
@@ -736,11 +793,26 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
      */
     public static function addSearchedField(string $field, string $type)
     {
+        if (preg_match('/^tracker_fields_json/', $field)) {
+            return;
+        }
         if ($type !== 'fulltext') {
             $type = 'others';
         }
         if (! in_array($field, self::$searchedFields[$type])) {
             self::$searchedFields[$type][] = $field;
+        }
+    }
+
+    public static function convertJsonTypeValue($typeValue)
+    {
+        if ($typeValue instanceof \Search_Type_Timestamp) {
+            // json structure of tracker fields stores timestamps as strings like the other search engines
+            $typeValue = new \Search_Type_DateTime($typeValue->getValue(), $typeValue->isDateOnly());
+            return $typeValue->getValue();
+        } else {
+            // getRawValue works for MultivalueInt ones as we don't want to convert to manticore multivalue int type - these are stored in json as plain values
+            return method_exists($typeValue, 'getRawValue') ? $typeValue->getRawValue() : $typeValue->getValue();
         }
     }
 
@@ -794,6 +866,25 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         return $dateFields;
     }
 
+    protected function storeFieldMapping()
+    {
+        global $prefs;
+
+        if (empty($this->index) || str_contains($this->index, 'pref_')) {
+            return;
+        }
+
+        $fieldMapping = json_encode($this->fieldMapping);
+        if (empty($prefs['unified_field_mapping']) || $prefs['unified_field_mapping'] != $fieldMapping) {
+            TikiLib::lib('tiki')->set_preference('unified_field_mapping', $fieldMapping);
+        }
+
+        $dateFields = json_encode($this->dateFields);
+        if (empty($prefs['unified_date_fields']) || $prefs['unified_date_fields'] != $dateFields) {
+            TikiLib::lib('tiki')->set_preference('unified_date_fields', $dateFields);
+        }
+    }
+
     protected function getWords($expr)
     {
         $words = [];
@@ -810,5 +901,37 @@ class Index implements \Search_Index_Interface, \Search_Index_QueryRepository
         );
 
         return $words;
+    }
+
+    /**
+     * Check if a field is stored in the JSON structure (tracker_fields_json)
+     * @param string $field The field name to check
+     * @return bool
+     */
+    public function isFieldInJson($field)
+    {
+        global $prefs;
+
+        if (! preg_match('/^tracker_field_/', $field)) {
+            return false;
+        }
+
+        $indexedFields = $this->getIndexedFields();
+        if (in_array($field, $indexedFields)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Get the JSON path for a tracker field stored in JSON
+     * @param string $field The field name (e.g., tracker_field_123)
+     * @return string The JSON path (e.g., tracker_fields_json.123)
+     */
+    public function getJsonPathForField($field)
+    {
+        $jsonFieldName = preg_replace('/^tracker_field_/', '', $field);
+        return 'tracker_fields_json.' . $jsonFieldName;
     }
 }

@@ -14,13 +14,16 @@ $inputConfiguration = [
              'pollId'                    => 'int',            //post
              'optionId'                  => 'int',            //post
              'remove'                    => 'int',            //post
-             'save'                      => 'bool',           //post
-             'title'                     => 'words',          //post
-             'position'                  => 'words',          //post
+             'save'                      => 'alpha',          //post
+             'title'                     => 'text',           //post
+             'position'                  => 'int',            //post
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_ADMIN_LAYOUT;
+Sections::setCurrentSection($section);
 $polllib = TikiLib::lib('poll');
 $access->check_feature('feature_polls');
 $access->check_permission('tiki_p_admin_polls');

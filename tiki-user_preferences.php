@@ -4,76 +4,89 @@
  * @package tikiwiki
  */
 
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+use Tiki\Lib\Theme\ThemeLib;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-        'userId'                          => 'int',          //post
-        'view_user'                       => 'int',          //post
-        'generate'                        => 'bool',         //post
-        'tfagenerate'                     => 'bool',         //post
-        'new_info'                        => 'bool',         //post
-        'realName'                        => 'striptags',    //post
-        'gender'                          => 'striptags',    //post
-        'country'                         => 'striptags',    //post
-        'location'                        => 'striptags',    //post
-        'homePage'                        => 'pagename',     //post
-        'user_information'                => 'striptags',    //post
-        'new_prefs'                       => 'bool',         //post
-        'mytheme'                         => 'striptags',    //post
-        'userbreadCrumb'                  => 'digits',       //post
-        'language'                        => 'lang',         //post
-        'languageAdmin'                   => 'lang',         //post
-        'read_language'                   => 'lang',         //post
-        'display_timezone'                => 'striptags',    //post
-        'display_12hr_clock'              => 'bool',         //post
-        'diff_versions'                   => 'bool',         //post
-        'show_mouseover_user_info'        => 'bool',         //post
-        'remember_closed_rboxes'          => 'bool',         //post
-        'email_isPublic'                  => 'bool',         //post
-        'mailCharset'                     => 'striptags',    //post
-        'prefName'                        => 'striptags',    //post
-        'mess_maxRecords'                 => 'digits',       //post
-        'mess_archiveAfter'               => 'digits',       //post
-        'mess_sendReadStatus'             => 'bool',         //post
-        'minPrio'                         => 'digits',       //post
-        'allowMsgs'                       => 'bool',         //post
-        'mytiki_pages'                    => 'bool',         //post
-        'mytiki_blogs'                    => 'bool',         //post
-        'mytiki_msgs'                     => 'bool',         //post
-        'mytiki_tasks'                    => 'bool',         //post
-        'mytiki_forum_topics'             => 'bool',         //post
-        'mytiki_forum_replies'            => 'bool',         //post
-        'mytiki_items'                    => 'bool',         //post
-        'tasks_maxRecords'                => 'digits',       //post
-        'xmpp_jid'                        => 'striptags',    //post
-        'xmpp_password'                   => 'striptags',    //post
-        'xmpp_custom_server_http_bind'    => 'striptags',    //post
-        'perspective_preferred'           => 'striptags',    //post
-        'webmonetization_payment_pointer' => 'striptags',    //post
-        'webmonetization_paywall_text'    => 'striptags',    //post
-        'chgadmin'                        => 'bool',         //post
-        'pass'                            => 'password',     //post
-        'email'                           => 'email',        //post
-        'pass1'                           => 'password',     //post
-        'pass2'                           => 'password',     //post
-        'twofactor'                       => 'bool',         //post
-        'tfaSecret'                       => 'striptags',    //post
-        'tfaPin'                          => 'digits',       //post
-        'removetwofactor'                 => 'bool',         //post
-        'deleteaccount'                   => 'bool',         //post
+            'userId'                          => 'int',          //post
+            'view_user'                       => 'username',     //post
+            'generate'                        => 'bool',         //post
+            'tfagenerate'                     => 'bool',         //post
+            'new_info'                        => 'bool',         //post
+            'realName'                        => 'striptags',    //post
+            'gender'                          => 'striptags',    //post
+            'country'                         => 'striptags',    //post
+            'location'                        => 'striptags',    //post
+            'homePage'                        => 'pagename',     //post
+            'new_prefs'                       => 'bool',         //post
+            'mytheme'                         => 'striptags',    //post
+            'userbreadCrumb'                  => 'digits',       //post
+            'language'                        => 'lang',         //post
+            'languageAdmin'                   => 'lang',         //post
+            'read_language'                   => 'lang',         //post
+            'display_timezone'                => 'striptags',    //post
+            'display_12hr_clock'              => 'bool',         //post
+            'diff_versions'                   => 'bool',         //post
+            'remember_closed_rboxes'          => 'bool',         //post
+            'email_isPublic'                  => 'bool',         //post
+            'mailCharset'                     => 'striptags',    //post
+            'prefName'                        => 'striptags',    //post
+            'mess_maxRecords'                 => 'digits',       //post
+            'mess_archiveAfter'               => 'digits',       //post
+            'mess_sendReadStatus'             => 'bool',         //post
+            'minPrio'                         => 'digits',       //post
+            'allowMsgs'                       => 'bool',         //post
+            'mytiki_pages'                    => 'bool',         //post
+            'mytiki_blogs'                    => 'bool',         //post
+            'mytiki_msgs'                     => 'bool',         //post
+            'mytiki_tasks'                    => 'bool',         //post
+            'mytiki_forum_topics'             => 'bool',         //post
+            'mytiki_forum_replies'            => 'bool',         //post
+            'mytiki_items'                    => 'bool',         //post
+            'mytiki_articles'                 => 'bool',         //post
+            'tasks_maxRecords'                => 'digits',       //post
+            'xmpp_jid'                        => 'striptags',    //post
+            'xmpp_custom_server_endpoint'     => 'striptags',    //post
+            'perspective_preferred'           => 'digits',      //post
+            'webmonetization_payment_pointer' => 'striptags',    //post
+            'webmonetization_paywall_text'    => 'striptags',    //post
+            'notify_oneself'                  => 'bool',         //post
+            'switch_user_notification'        => 'bool',         //post
+            'cookie_consent_update'           => 'word',         //post
+            'chgadmin'                        => 'bool',         //post
+            'pass'                            => 'password',     //post
+            'email'                           => 'email',        //post
+            'pass1'                           => 'password',     //post
+            'pass2'                           => 'password',     //post
+            'twofactor'                       => 'bool',         //post
+            'tfaSecret'                       => 'striptags',    //post
+            'tfaPin'                          => 'digits',       //post
+            'removetwofactor'                 => 'bool',         //post
+            'deleteaccount'                   => 'bool',         //post
         ],
     ],
 ];
 
 require_once('tiki-setup.php');
+
+use Tiki\Sections;
+
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $modlib = TikiLib::lib('mod');
 $userprefslib = TikiLib::lib('userprefs');
 $perspectivelib = TikiLib::lib('perspective');
+
+// Get cookie consent user preferences
+$cookieConsentPrefs = CookieConsentLib::getConsentPreferences();
+// Get all the existing cookie categories
+$cookieCategories = CookieConsentLib::getRequestedCookieCategories();
 
 use BaconQrCode\Renderer\Image\SvgImageBackEnd;
 use PragmaRX\Google2FA\Google2FA;
@@ -81,6 +94,8 @@ use BaconQrCode\Renderer\ImageRenderer;
 use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
 use BaconQrCode\Renderer\RendererStyle\RendererStyle;
 use BaconQrCode\Writer;
+use Tiki\Lib\TikiDate;
+use Tiki\TwoFactorAuth\TwoFactorAuth;
 
 // User preferences screen
 if ($prefs['feature_userPreferences'] != 'y' && $prefs['change_password'] != 'y' && $tiki_p_admin_users != 'y') {
@@ -123,10 +138,15 @@ $foo1 = str_replace("tiki-user_preferences", "tiki-editpage", $foo["path"]);
 $foo2 = str_replace("tiki-user_preferences", "tiki-index", $foo["path"]);
 $smarty->assign('url_edit', $tikilib->httpPrefix() . $foo1);
 $smarty->assign('url_visit', $tikilib->httpPrefix() . $foo2);
-$smarty->assign('show_mouseover_user_info', isset($prefs['show_mouseover_user_info']) ? $prefs['show_mouseover_user_info'] : $prefs['feature_community_mouseover']);
+
 
 if ($prefs['feature_perspective'] === 'y') {
     $smarty->assign('perspectives', $perspectivelib->list_perspectives());
+}
+
+if ($prefs['cookie_consent_feature'] === "y") {
+    $smarty->assign('cookieConsentPrefs', $cookieConsentPrefs);
+    $smarty->assign('cookieCategories', $cookieCategories);
 }
 
 // form in first tab "Personal Information"
@@ -160,9 +180,6 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_info"]) && $ac
     if (isset($_POST["homePage"])) {
         $tikilib->set_user_preference($userwatch, 'homePage', $_POST["homePage"]);
     }
-
-    $tikilib->set_user_preference($userwatch, 'user_information', $_POST['user_information']);
-
     TikiLib::events()->trigger(
         'tiki.user.update',
         [
@@ -194,6 +211,31 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
     }
     if (isset($_POST["notify_oneself"])) {
         $tikilib->set_user_preference($userwatch, 'notify_oneself', $_POST["notify_oneself"]);
+    }
+
+    if (isset($_POST["cookie_consent_update"])) {
+        // Initialize the preferences array using the consent action from POST data.
+        $preferences = [
+            'consentGiven' => true,
+            'action' => $_POST['cookie_consent_update'],
+            'categories' => []
+        ];
+        // Loop through all defined cookie categories and set their statuses.
+        foreach ($cookieCategories as $category => $description) {
+            if ($_POST['cookie_consent_update'] === 'declineNonEssential') {
+                // When the user declines unnecessary cookies, disable all non-essential categories.
+                $preferences['categories'][$category] = ($category === 'essential');
+            } else {
+                // For "acceptAll" or "customized" actions, enable the category only if the corresponding POST flag is set.
+                // Always ensure the essential category is true.
+                $preferences['categories'][$category] = ($category === 'essential') ? true : (isset($_POST["cookie_consent_$category"]) && $_POST["cookie_consent_$category"] === "on");
+            }
+        }
+        // Store the complete consent preferences as a single JSON cookie via CookieConsentLib.
+        CookieConsentLib::setConsentPreferences($preferences);
+
+        // Save the preferences in the user's settings as a JSON string.
+        $tikilib->set_user_preference($userwatch, 'cookie_consent_user_pref', json_encode($preferences));
     }
 
     if (isset($_POST["switch_user_notification"])) {
@@ -233,7 +275,13 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
     if (isset($_POST['display_timezone'])) {
         $tikilib->set_user_preference($userwatch, 'display_timezone', $_POST['display_timezone']);
     }
-
+    if (array_key_exists('user_localtimezonesync', $_POST)) {
+        $tikilib->set_user_preference(
+            $userwatch,
+            'user_localtimezonesync',
+            $_POST['user_localtimezonesync'] === 'y' ? 'y' : 'n'
+        );
+    }
     if (isset($_POST['display_12hr_clock']) && $_POST['display_12hr_clock'] == 'on') {
         $tikilib->set_user_preference($userwatch, 'display_12hr_clock', 'y');
         $smarty->assign('display_12hr_clock', 'y');
@@ -248,32 +296,18 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
         $tikilib->set_user_preference($userwatch, 'diff_versions', 'n');
         $smarty->assign('diff_versions', 'n');
     }
-    if ($prefs['feature_community_mouseover'] == 'y') {
-        if (isset($_POST['show_mouseover_user_info']) && $_POST['show_mouseover_user_info'] == 'on') {
-            $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'y');
-            $smarty->assign('show_mouseover_user_info', 'y');
-        } else {
-            $tikilib->set_user_preference($userwatch, 'show_mouseover_user_info', 'n');
-            $smarty->assign('show_mouseover_user_info', 'n');
-        }
-    }
 
     $tikilib->set_user_preference($userwatch, 'remember_closed_rboxes', empty($_POST['remember_closed_rboxes']) ? 'n' : 'y');
 
-    $email_isPublic = isset($_POST['email_isPublic']) ? $_POST['email_isPublic'] : 'n';
+    $email_isPublic = $_POST['email_isPublic'] ?? 'n';
     $tikilib->set_user_preference($userwatch, 'email is public', $email_isPublic);
     $tikilib->set_user_preference($userwatch, 'mailCharset', $_POST['mailCharset']);
     // Custom fields
     foreach ($customfields as $custpref => $prefvalue) {
-        if (isset($_POST[$customfields[$custpref]['prefName']])) {
-            $tikilib->set_user_preference($userwatch, $customfields[$custpref]['prefName'], $_POST[$customfields[$custpref]['prefName']]);
+        $prefName = $prefvalue['prefName'];
+        if (isset($_POST[$prefName])) {
+            $tikilib->set_user_preference($userwatch, $prefName, $_POST[$prefName]);
         }
-    }
-    // Custom fields
-    foreach ($customfields as $custpref => $prefvalue) {
-        // print $customfields[$custpref]['prefName'];
-        // print $_REQUEST[$customfields[$custpref]['prefName']];
-        $tikilib->set_user_preference($userwatch, $customfields[$custpref]['prefName'], $_POST[$customfields[$custpref]['prefName']]);
     }
 
     if (isset($_POST['mess_maxRecords'])) {
@@ -345,13 +379,46 @@ if ($prefs['feature_userPreferences'] == 'y' && isset($_POST["new_prefs"]) && $a
     }
 
     if (isset($_POST['xmpp_jid'])) {
-        $tikilib->set_user_preference($userwatch, 'xmpp_jid', $_POST['xmpp_jid']);
+        $previousXmppJid = $tikilib->get_user_preference($userwatch, 'xmpp_jid', '');
+        $newXmppJid = trim($_POST['xmpp_jid']);
+
+        if ($newXmppJid !== '' && ! TikiLib::lib('xmpp')->isValidJid($newXmppJid)) {
+            Feedback::error(tr('Invalid XMPP address "%0"', $newXmppJid));
+            $newXmppJid = $previousXmppJid;
+        }
+
+        $tikilib->set_user_preference($userwatch, 'xmpp_jid', $newXmppJid);
+
+        if ($previousXmppJid !== $newXmppJid) {
+            try {
+                $xmpplib = TikiLib::lib('xmpp');
+                if (method_exists($xmpplib, 'saveLastSyncedJidForUser')) {
+                    $previousEffectiveJid = strpos($previousXmppJid, '@') !== false
+                        ? $previousXmppJid
+                        : $xmpplib->getLocalJidForLogin($userwatch);
+                    $xmpplib->saveLastSyncedJidForUser($userwatch, $previousEffectiveJid);
+                }
+                if (method_exists($xmpplib, 'markUserXmppSyncNeeded')) {
+                    $xmpplib->markUserXmppSyncNeeded($userwatch);
+                }
+            } catch (\Throwable $e) {
+                TikiLib::lib('logs')->add_log(
+                    'xmpp',
+                    tr(
+                        'Failed updating XMPP sync state for user %0 after preferred JID change from %1 to %2: %3',
+                        $userwatch,
+                        $previousXmppJid ?: tra('(local default)'),
+                        $newXmppJid ?: tra('(local default)'),
+                        $e->getMessage()
+                    ),
+                    $user
+                );
+            }
+        }
     }
-    if (isset($_POST['xmpp_password'])) {
-        $tikilib->set_user_preference($userwatch, 'xmpp_password', $_POST['xmpp_password']);
-    }
-    if (isset($_POST['xmpp_custom_server_http_bind'])) {
-        $tikilib->set_user_preference($userwatch, 'xmpp_custom_server_http_bind', $_POST['xmpp_custom_server_http_bind']);
+    if (isset($_POST['xmpp_custom_server_endpoint'])) {
+        $tikilib->set_user_preference($userwatch, 'xmpp_custom_server_endpoint', $_POST['xmpp_custom_server_endpoint']);
+        $tikilib->set_user_preference($userwatch, 'xmpp_custom_server_http_bind', '');
     }
 
     if (isset($_POST['perspective_preferred']) &&  $perspectivelib->perspective_exists($_POST['perspective_preferred'])) {
@@ -380,7 +447,11 @@ if ($prefs['auth_method'] == 'ldap' && $user == 'admin' && $prefs['ldap_skip_adm
     $change_password = 'y';
     $smarty->assign('change_password', $change_password);
 }
-
+if ($prefs['feature_intertiki'] == 'y' && $prefs['feature_intertiki_server'] == 'n') {
+    $prefs['change_password'] = 'n';
+    $warning = "New password fields are hidden on Intertiki clients.\nTo update your password, please log in directly to the Intertiki server.";
+    $smarty->assign('intertiki_no_password_change_warning', $warning);
+}
 
 $tfaSecret = $userlib->get_2_factor_secret($userwatch);
 if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
@@ -434,12 +505,13 @@ if (isset($_POST['chgadmin']) && $access->checkCsrf()) {
             Feedback::errorAndDie($polerr, \Laminas\Http\Response::STATUS_CODE_400);
         }
         $userlib->change_user_password($userwatch, $_POST["pass1"]);
+        $userlib->update_lastlogin($userwatch);
         if ($prefs['feature_user_encryption'] === 'y') {
             // Notify CryptLib about the login
             $cryptlib = TikiLib::lib('crypt');
             $cryptlib->onChangeUserPassword($_POST["pass"], $_POST["pass1"]);
         }
-        Feedback::success(sprintf(tra('Password has been changed')));
+        Feedback::success(tra('Password has been changed'));
     }
 }
 
@@ -456,13 +528,17 @@ if (
         );
     } else {
         if (empty($_POST['tfaPin'])) {
-            Feedback::error(tr('Field Pin Code is required.'));
+            Feedback::error(tr('Field 2FA Code is required.'));
         } else {
-            Feedback::error(tr('Invalid Pin Code.'));
+            Feedback::error(tr('Invalid 2FA Code.'));
         }
         header('Location: ' . basename(__FILE__) . '?tfagenerate=true');
         die;
     }
+}
+
+if (isset($_POST['twofactor']) && $access->checkCsrf() && $prefs['twoFactorAuthType'] == TwoFactorAuth::EMAIL_2FA) {
+    $tfaSecret = $userlib->update_2_factor_secret($user, 'y');
 }
 
 if (
@@ -474,7 +550,6 @@ if (
     unset($_SESSION['tfaSecret']);
 }
 
-$force2FA = false;
 $twoFactorSecret = $userlib->get_2_factor_secret($userwatch);
 $force2FA = $userlib->forceTwoFactorAuth($userwatch);
 $smarty->assign('force2FA', $force2FA);
@@ -482,7 +557,7 @@ $smarty->assign('twoFactorSecret', $twoFactorSecret);
 
 $userinfo = $userlib->get_user_info($userwatch);
 $generate = isset($_REQUEST['tfagenerate']) || empty($tfaSecret);
-if ($prefs['twoFactorAuth'] == 'y' && $generate) {
+if ($prefs['twoFactorAuth'] == 'y' && $generate && $prefs['twoFactorAuthType'] == TwoFactorAuth::TOTP_2FA) {
     $google2fa = new Google2FA();
     if (empty($_SESSION['tfaSecret']) || $_SESSION['tfaSecret'] == $tfaSecret) {
         $_SESSION['tfaSecret'] = $google2fa->generateSecretKey();
@@ -514,15 +589,51 @@ if ($prefs['twoFactorAuth'] == 'y' && $generate) {
     $smarty->assign('imageType', $imageType);
 }
 
-if (isset($_POST['deleteaccount']) && $tiki_p_delete_account == 'y' && $access->checkCsrf(true)) {
-    $userlib->remove_user($userwatch);
+if (isset($_POST['deleteaccount']) && $access->checkCsrf(true)) {
+    if (! isset($_POST['deleteaccountconfirm'])) {
+        $smarty->assign('msg', tra('Please check the confirmation box to delete the account.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Determine the target user explicitly from the POST form data to prevent
+    // mismatch with $userwatch which is derived from $_REQUEST (GET+POST merged).
+    // Never fall back to $user to avoid accidentally deleting the logged-in admin.
+    if (empty($_POST['view_user'])) {
+        $smarty->assign('msg', tra('Invalid request: no target user specified.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    $deleteUser = $_POST['view_user'];
+    if (empty($userlib->user_exists($deleteUser))) {
+        $smarty->assign('msg', tra('Unknown user'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Non-admin users can only delete their own account
+    if ($deleteUser !== $user && $tiki_p_admin_users !== 'y') {
+        $smarty->assign('msg', tra('You do not have permission to delete other accounts.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    if ($deleteUser === $user && $tiki_p_delete_account !== 'y') {
+        $smarty->assign('msg', tra('You do not have permission to delete your own account.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    // Prevent deletion of the built-in admin account
+    if ($deleteUser === 'admin') {
+        $smarty->assign('msg', tra('The built-in admin account cannot be deleted.'));
+        $smarty->display('error.tpl');
+        die();
+    }
+    $userlib->remove_user($deleteUser);
 
     $unifiedsearchlib = TikiLib::lib('unifiedsearch');
-    $unifiedsearchlib->invalidateObject('user', $userwatch);
+    $unifiedsearchlib->invalidateObject('user', $deleteUser);
 
-    if ($user == $userwatch) {
+    if ($user === $deleteUser) {
         header('Location: tiki-logout.php');
-    } elseif ($tiki_p_admin_users == 'y') {
+    } elseif ($tiki_p_admin_users === 'y') {
         header('Location: tiki-adminusers.php');
     } else {
         header("Location: $base_url");
@@ -608,7 +719,6 @@ $smarty->assign_by_ref('avatar', $avatar);
 $mailCharsets = ['utf-8', 'iso-8859-1'];
 $smarty->assign_by_ref('mailCharsets', $mailCharsets);
 $smarty->assign_by_ref('user_prefs', $user_preferences[$userwatch]);
-$tikilib->get_user_preference($userwatch, 'user_information', 'public');
 $tikilib->get_user_preference($userwatch, 'diff_versions', 'n');
 $usertrackerId = false;
 $useritemId = false;
@@ -625,8 +735,8 @@ $smarty->assign('usertrackerId', $usertrackerId);
 $smarty->assign('useritemId', $useritemId);
 // Custom fields
 foreach ($customfields as $custpref => $prefvalue) {
-    $customfields[$custpref]['value'] = $tikilib->get_user_preference($userwatch, $customfields[$custpref]['prefName'], $customfields[$custpref]['value']);
-    $smarty->assign($customfields[$custpref]['prefName'], $customfields[$custpref]['value']);
+    $prefvalue['value'] = $tikilib->get_user_preference($userwatch, $prefvalue['prefName'], $prefvalue['value']);
+    $smarty->assign($prefvalue['prefName'], $prefvalue['value']);
 }
 if ($prefs['feature_messages'] == 'y' && $tiki_p_messages == 'y') {
     $unread = $tikilib->user_unread_messages($userwatch);
@@ -652,6 +762,9 @@ if ($prefs['feature_wiki'] == 'y' and $prefs['feature_wiki_userpage'] == 'y') {
         $smarty->assign('userPageExists', 'y');
     }
 }
+
+$headerlib->add_jsfile('lib/jquery_tiki/tiki-user_preferences.js');
+
 include_once('tiki-section_options.php');
 $smarty->assign('mid', 'tiki-user_preferences.tpl');
 $smarty->display("tiki.tpl");

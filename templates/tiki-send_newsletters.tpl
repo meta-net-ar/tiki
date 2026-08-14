@@ -56,9 +56,9 @@
 {if $presend eq 'y'}
     <div id="confirmArea">
     {remarksbox type='note' title="{tr}Please Confirm{/tr}"}
-        <b>{tr}This newsletter will be sent to {$subscribers} email addresses.{/tr}</b>
+        <b>{tr _0=$subscribers}This newsletter will be sent to %0 email addresses.{/tr}</b>
         <br>
-        {if $prefs.newsletter_throttle eq 'y'}{tr}Sending will be throttled with a batch size of {$prefs.newsletter_batch_size} and a pause period of {$prefs.newsletter_pause_length} seconds.{/tr}<br>{/if}
+        {if $prefs.newsletter_throttle eq 'y'}{tr _0=$prefs.newsletter_batch_size _1=$prefs.newsletter_pause_length}Sending will be throttled with a batch size of %0 and a pause period of %1 seconds.{/tr}<br>{/if}
         {tr}Reply to:{/tr} {if empty($replyto) AND empty($sendfrom)}{$prefs.sender_email|escape} ({tr}default{/tr})<br>{elseif !empty($replyto) AND !empty($sendfrom)}{$replyto|escape}<br>{elseif !empty($sendfrom)}{$sendfrom|escape}<br>{else}{$replyto|escape}<br>{/if}
         {tr}Send from:{/tr} {if empty($sendfrom)}{$prefs.sender_email|escape} ({tr}default{/tr})<br>{else}{$sendfrom|escape}<br>{/if}
     {/remarksbox}
@@ -138,9 +138,9 @@
 
     <div id="sendingArea" style="display:none">
         <h3>{tr}Sending Newsletter{/tr} ...</h3>
-        <h5> ... {if $prefs.newsletter_throttle eq 'y'}throttled {/if}{tr}sending to {$subscribers} addresses{/tr}</h5>
-        {if $replyto ne ''}<h5> ... {tr}with the 'Reply To' email set to: {$replyto}{/tr}</h5>{/if}
-        {if $sendfrom ne ''}<h5> ... {tr}with the 'Send From' email set to: {$sendfrom}{/tr}</h5>{/if}
+        <h5> ... {if $prefs.newsletter_throttle eq 'y'}throttled {/if}{tr _0=$subscribers}sending to %0 addresses{/tr}</h5>
+        {if $replyto ne ''}<h5> ... {tr _0=$replyto}with the 'Reply To' email set to: %0{/tr}</h5>{/if}
+        {if $sendfrom ne ''}<h5> ... {tr _0=$sendfrom}with the 'Send From' email set to: %0{/tr}</h5>{/if}
         <div id="confirmed"></div>
         <iframe id="resultIframe" name="resultIframe" frameborder="0" style="width: 600px; height: 400px"></iframe>
         {jq}
@@ -367,48 +367,48 @@
             </form>
         {/tab}
 
-        {assign var=name value="{tr _0=$cant_drafts}Drafts (%0){/tr}"}
+        {$name="{tr _0=$count_drafts}Drafts (%0){/tr}"}
         {tab name=$name}
         {* --- tab with drafts --- *}
-            {assign var=channels value=$drafts}
-            {assign var=view_editions value='n'}
-            {assign var=offset value=$dr_offset}
-            {assign var=next_offset value=$dr_next_offset}
-            {assign var=prev_offset value=$dr_prev_offset}
-            {assign var=actual_page value=$dr_actual_page}
-            {assign var=cant_pages value=$dr_cant_pages}
-            {assign var=cur value='dr'}
-            {assign var=bak value='ed'}
-            {assign var=sort_mode value=$dr_sort_mode}
-            {assign var=sort_mode_bak value=$ed_sort_mode}
-            {assign var=offset value=$dr_offset}
-            {assign var=offset_bak value=$ed_offset}
-            {assign var=find value=$dr_find}
-            {assign var=find_bak value=$ed_find}
-            {assign var=tab value=2}
+            {$channels=$drafts}
+            {$view_editions='n'}
+            {$offset=$dr_offset}
+            {$next_offset=$dr_next_offset}
+            {$prev_offset=$dr_prev_offset}
+            {$actual_page=$dr_actual_page}
+            {$pages_count=$dr_count_pages}
+            {$cur='dr'}
+            {$bak='ed'}
+            {$sort_mode=$dr_sort_mode}
+            {$sort_mode_bak=$ed_sort_mode}
+            {$offset=$dr_offset}
+            {$offset_bak=$ed_offset}
+            {$find=$dr_find}
+            {$find_bak=$ed_find}
+            {$tab=2}
             <h2>{$name}</h2>
             {include file='sent_newsletters.tpl'}
         {/tab}
 
-        {assign var=name value="{tr _0=$cant_editions}Sent Editions (%0){/tr}"}
+        {$name="{tr _0=$count_editions}Sent Editions (%0){/tr}"}
         {tab name=$name}
         {* --- tab with editions --- *}
-            {assign var=channels value=$editions}
-            {assign var=view_editions value='y'}
-            {assign var=offset value=$ed_offset}
-            {assign var=next_offset value=$ed_next_offset}
-            {assign var=prev_offset value=$ed_prev_offset}
-            {assign var=actual_page value=$ed_actual_page}
-            {assign var=cant_pages value=$ed_cant_pages}
-            {assign var=cur value='ed'}
-            {assign var=bak value='dr'}
-            {assign var=sort_mode value=$ed_sort_mode}
-            {assign var=sort_mode_bak value=$dr_sort_mode}
-            {assign var=offset value=$ed_offset}
-            {assign var=offset_bak value=$dr_offset}
-            {assign var=find value=$ed_find}
-            {assign var=find_bak value=$dr_find}
-            {assign var=tab value=3}
+            {$channels=$editions}
+            {$view_editions='y'}
+            {$offset=$ed_offset}
+            {$next_offset=$ed_next_offset}
+            {$prev_offset=$ed_prev_offset}
+            {$actual_page=$ed_actual_page}
+            {$pages_count=$ed_count_pages}
+            {$cur='ed'}
+            {$bak='dr'}
+            {$sort_mode=$ed_sort_mode}
+            {$sort_mode_bak=$dr_sort_mode}
+            {$offset=$ed_offset}
+            {$offset_bak=$dr_offset}
+            {$find=$ed_find}
+            {$find_bak=$dr_find}
+            {$tab=3}
             <h2>{$name}</h2>
             {include file='sent_newsletters.tpl'}
         {/tab}

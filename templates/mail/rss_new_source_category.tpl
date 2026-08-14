@@ -1,4 +1,4 @@
-{tr}A new {$prefs.mail_template_custom_text}source category was detected by the RSS article creator at{/tr} {$mail_date|tiki_short_datetime:"":"n"}
+{tr _0=$prefs.mail_template_custom_text}A new %0source category was detected by the RSS article creator at{/tr} {$mail_date|tiki_short_datetime:"":"n"}
 
 {tr}Feed:{/tr} {$title|escape}
 

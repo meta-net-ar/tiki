@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -72,9 +72,9 @@ class UserMenuLib extends TikiLib
         }
 
         $query = "select * from `tiki_user_menus` where `user`=? $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_user_menus` where `user`=? $mid";
+        $query_count = "select count(*) from `tiki_user_menus` where `user`=? $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -83,7 +83,7 @@ class UserMenuLib extends TikiLib
 
         $retval = [];
         $retval['data'] = $ret;
-        $retval['cant'] = $cant;
+        $retval['count'] = $count;
         return $retval;
     }
 
@@ -131,8 +131,7 @@ class UserMenuLib extends TikiLib
             $query = 'insert into `tiki_user_menus`(`user`,`name`,`url`,`position`,`mode`) values(?,?,?,?,?)';
 
             $this->query($query, [$user, $name, $url, $position, $mode]);
-            $Id = $this->getOne('select max(`menuId`) from `tiki_user_menus` where `user`=? and `url`=? and `name`=?', [$user, $url, $name]);
-            return $Id;
+            return $this->lastInsertId();
         }
     }
 

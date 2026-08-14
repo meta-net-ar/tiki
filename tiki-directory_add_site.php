@@ -8,28 +8,32 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'directory';
 $inputConfiguration = [
     [
-        'staticKeyFilters'                => [
-            'parent'                         => 'int',               //post
-            'addtocat'                       => 'int',               //get
-            'siteId'                         => 'int',               //post
-            'save'                           => 'bool',              //post
-            'name'                           => 'string',            //post
-            'url'                            => 'url',               //post
-            'siteCats'                       => 'string',            //post
-            'isValid'                        => 'bool',              //post
-            'description'                    => 'xss',               //post
-            'country'                        => 'string',            //post
-            'sort_mode'                      => 'string',            //get
-            'offset'                         => 'int',               //get
-            'find'                           => 'bool',              //get
+        'staticKeyFilters'            => [
+            'parent'                  => 'int',       // post
+            'addtocat'                => 'int',       // get
+            'siteId'                  => 'int',       // post
+            'save'                    => 'bool',      // post
+            'name'                    => 'striptags', // post
+            'url'                     => 'url',       // post
+            'isValid'                 => 'word',      // post
+            'description'             => 'striptags', // post
+            'country'                 => 'string',    // post
+            'sort_mode'               => 'word',      // get
+            'offset'                  => 'int',       // get
+            'find'                    => 'string',    // get
+        ],
+        'staticKeyFiltersForArrays'   => [
+            'siteCats'                => 'int',       // post
         ],
     ],
 ];
 require_once('tiki-setup.php');
 include_once('lib/directory/dirlib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_DIRECTORY;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_directory');
 $access->check_permission('tiki_p_submit_link');
 //get_strings tra('Submit a new link')
@@ -61,21 +65,22 @@ if (isset($parent_info) && $user) {
 // Now get the path to the parent category
 $path = $dirlib->dir_get_category_path_admin($_REQUEST["parent"]);
 $smarty->assign_by_ref('path', $path);
-// If no site is being edited set it to zero
-$_REQUEST["siteId"] = 0;
-$smarty->assign('siteId', $_REQUEST["siteId"]);
-// If we are editing an existing category then get the category information
-// If not initialize the information to zero
+
+$_REQUEST["siteId"] = $_REQUEST["siteId"] ?? 0;
+$info = [];
 if ($_REQUEST["siteId"]) {
     $info = $dirlib->dir_get_site($_REQUEST["siteId"]);
-} else {
-    $info = [];
+}
+
+if (empty($info)) {
     $info["name"] = '';
     $info["description"] = '';
     $info["url"] = '';
     $info["country"] = 'None';
     $info["isValid"] = 'y';
 }
+
+$smarty->assign('siteId', $_REQUEST["siteId"]);
 $smarty->assign_by_ref('info', $info);
 $smarty->assign('save', 'n');
 // Replace (add or edit) a site
@@ -91,16 +96,23 @@ if (isset($_REQUEST["save"])) {
     if (empty($_REQUEST["url"])) {
         $msg .= tra("Must enter a url to add a site. ");
     } else {
-        if (substr($_REQUEST["url"], 0, 7) <> 'http://' && substr($_REQUEST["url"], 0, 8) <> 'https://') {
+        if (! str_starts_with($_REQUEST["url"], 'http://') && ! str_starts_with($_REQUEST["url"], 'https://')) {
             $_REQUEST["url"] = 'http://' . $_REQUEST["url"];
         }
         if ($dirlib->dir_url_exists($_REQUEST['url'])) {
             $msg .= tra("URL already added to the directory. Duplicate site? ");
         }
         if ($prefs['directory_validate_urls'] == 'y') {
-            @$fsh = fopen($_REQUEST['url'], 'r');
-            if (! $fsh) {
-                $msg .= tra("URL cannot be accessed wrong URL or site is offline and cannot be added to the directory. ");
+            // Prevent SSRF: validate the submitted URL before the server opens a
+            // connection to check if the site is reachable.
+            $ssrf = \Tiki\Security\SsrfLib::fromPrefs();
+            if (! $ssrf->isUrlAllowed($_REQUEST['url'])) {
+                $msg .= tra("URL is not allowed (targets a private or reserved address). ");
+            } else {
+                @$fsh = fopen($_REQUEST['url'], 'r');
+                if (! $fsh) {
+                    $msg .= tra("URL cannot be accessed wrong URL or site is offline and cannot be added to the directory. ");
+                }
             }
         }
     }
@@ -141,16 +153,8 @@ if (! isset($_REQUEST["sort_mode"])) {
 } else {
     $sort_mode = $_REQUEST["sort_mode"];
 }
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$offset = $_REQUEST["offset"] ?? 0;
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign_by_ref('offset', $offset);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $smarty->assign('find', $find);
@@ -160,10 +164,10 @@ if ($all) {
 } else {
     $items = $dirlib->dir_list_sites($_REQUEST["parent"], $offset, $maxRecords, $sort_mode, $find, $isValid = '');
 }
-$cant_pages = ceil($items["cant"] / $maxRecords);
-$smarty->assign_by_ref('cant_pages', $cant_pages);
+$pages_count = ceil($items["count"] / $maxRecords);
+$smarty->assign_by_ref('pages_count', $pages_count);
 $smarty->assign('actual_page', 1 + ($offset / $maxRecords));
-if ($items["cant"] > ($offset + $maxRecords)) {
+if ($items["count"] > ($offset + $maxRecords)) {
     $smarty->assign('next_offset', $offset + $maxRecords);
 } else {
     $smarty->assign('next_offset', -1);

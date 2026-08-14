@@ -6,11 +6,13 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_suite_list()
 {
+    $jitsiHelp = 'Jitsi';
+
     return [
         'suite_jitsi_provision' => [
             'name' => tr('Expose Jitsi provision URL'),
             'description' => tr('Provide connection configuration information for Jitsi users to connect to a community/organization instant messaging server.'),
-            'help' => 'Jitsi',
+            'help' => $jitsiHelp,
             'type' => 'flag',
             'default' => 'n',
         ],
@@ -20,6 +22,7 @@ function prefs_suite_list()
             'type' => 'textarea',
             'size' => 10,
             'default' => '',
+            'help' => $jitsiHelp,
         ],
     ];
 }

@@ -1,4 +1,5 @@
 @use 'element-plus/theme-chalk/el-date-picker.css';
+@use 'element-plus/theme-chalk/el-date-picker-panel.css';
 @use 'element-plus/theme-chalk/el-select.css';
 @use 'element-plus/theme-chalk/el-input.css';
 @use 'element-plus/theme-chalk/el-icon.css';
@@ -15,4 +16,24 @@
 
 .timezone-picker {
     margin-top: 1rem;
+}
+
+.el-picker__popper {
+    --el-datepicker-border-color: var(--bs-border-color);
+}
+
+.el-datepicker,
+.el-picker-panel {
+    --el-bg-color-overlay: var(--bs-tertiary-bg);
+    --el-datepicker-icon-color: var(--bs-link-color);
+    --el-datepicker-inner-border-color: var(--bs-border-color);
+}
+
+.el-time-spinner__item.is-active:not(.is-disabled) {
+    color: var(--bs-highlight-color);
+    background-color: var(--bs-highlight-bg);
+}
+
+.el-time-panel__btn {
+    --el-text-color-primary: var(--bs-body-color);
 }

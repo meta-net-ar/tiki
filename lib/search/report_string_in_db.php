@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -78,10 +78,10 @@ function searchAllDB($search, $searchTable = null)
         $tablesSql = "show tables";
         $tables = $tikilib->fetchAll($tablesSql);
 
-        foreach ($tables as $key => $val) {
+        foreach ($tables as $val) {
             $vals = array_values($val);
             $table = $vals[0];
-            if (substr($table, 0, 6) == 'index_' && substr($table, 0, 10) !== 'index_pref') {
+            if (str_starts_with($table, 'index_') && ! str_starts_with($table, 'index_pref')) {
                 continue;
             }
             $result = array_merge($result, searchInTable($search, $table));
@@ -103,7 +103,7 @@ function searchInTable($searchTerm, $table)
 
     $sql2 = "SHOW COLUMNS FROM `$table`";
     $rs2 = $tikilib->fetchAll($sql2);
-    foreach ($rs2 as $key2 => $val2) {
+    foreach ($rs2 as $val2) {
         $toExclude = [];
         $vals2 = array_values($val2);
         $colum = $vals2[0];
@@ -163,10 +163,10 @@ function tableCount($searchResult)
 
 function isTextType($type)
 {
-    if (strpos($type, 'char') !== false) {
+    if (str_contains($type, 'char')) {
         return true;
     }
-    if (strpos($type, 'text') !== false) {
+    if (str_contains($type, 'text')) {
         return true;
     }
     return false;

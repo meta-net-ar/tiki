@@ -3,7 +3,7 @@
 {remarksbox type="tip" title="{tr}Tip{/tr}"}
     {tr}To use cookie in a text area (Wiki page, etc), a <a class="alert-link" href="tiki-admin_modules.php">module</a> or a template, use {literal}{cookie}{/literal}.{/tr}
 {/remarksbox}
-
+<div class="styling-element">
 <h2>{tr}Create/edit cookies{/tr}</h2>
 <form action="tiki-admin_cookies.php" method="post">
     {ticket}
@@ -23,10 +23,10 @@
 <form enctype="multipart/form-data" action="tiki-admin_cookies.php" method="post">
     {ticket}
     <div class="mb-3 row">
-        <label class="col-sm-3 col-form-label" for="cookie">{tr}Upload from disk{/tr}</label>
+        <label class="col-sm-3 col-form-label" for="userfile1">{tr}Upload from disk{/tr}</label>
         <div class="col-sm-9">
             <input type="hidden" name="MAX_FILE_SIZE" value="1000000000">
-            <input name="userfile1" type="file" accept=".txt" class="form-control">
+            <input name="userfile1" id="userfile1" type="file" accept=".txt" class="form-control">
         </div>
     </div>
     <div class="mb-3 text-center">
@@ -82,5 +82,6 @@
         {/section}
     </table>
 </div>
+</div>
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}

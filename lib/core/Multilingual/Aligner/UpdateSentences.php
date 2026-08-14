@@ -4,10 +4,10 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-include_once __DIR__ . '/../../../diff/Diff.php';
-include_once __DIR__ . '/../../..//diff/difflib.php';
-include_once __DIR__ . '/../../..//diff/Renderer.php';
-include_once __DIR__ . '/../../..//diff/renderer_unified.php';
+
+use Tiki\Lib\Diff\TextDiff;
+use Tiki\Lib\Diff\Renderer\Unified;
+
 include_once __DIR__ . '/SentenceAlignments.php';
 include_once __DIR__ . '/SentenceSegmentor.php';
 include_once __DIR__ . '/MockMTWrapper.php';
@@ -22,8 +22,6 @@ class Multilingual_Aligner_UpdateSentences
     //$translation is 1 in case of source modification(H) and 0 in case of target modification(T"), final_diff is carrying end result
     public function DifferencebetweenOriginalFileandModifiedFile($unchangedSource_array, $changedSource_array, $alignments, $translator, $source_lng, $target_lng, $translation)
     {
-        $changed_diff_unchanged = [];
-        $changedSource_translated = [];
         $changed_diff_unchanged = $this->text_diff($unchangedSource_array, $changedSource_array);
         //both files are samea
         if (count($changed_diff_unchanged) == 0) {
@@ -115,9 +113,9 @@ class Multilingual_Aligner_UpdateSentences
     public function text_diff($unchangedSentence_array, $changedSentence_array)
     {
         $changed_diff_unchanged = [];
-        $diff = new Text_Diff($unchangedSentence_array, $changedSentence_array);
+        $diff = new TextDiff($unchangedSentence_array, $changedSentence_array);
         $context = count($unchangedSentence_array);
-        $renderer = new Text_Diff_Renderer_unified($context);
+        $renderer = new Unified($context);
         $arr = $renderer->render($diff);
         $kk = 0;
         $body = 0;
@@ -169,10 +167,8 @@ class Multilingual_Aligner_UpdateSentences
             $num++;
         }
         $changed_diff_unchanged = array_values($changed_diff_unchanged);
-        $num = 0;
         while (count($changed_diff_unchanged) > 0) {
             $value = $changed_diff_unchanged[0];
-            $num++;
             $key_value = "";
             $target_lng_array = $alignments->getSentenceInOtherLanguage($value, $source_lng, $key_value, $changed_diff_unchanged, $this->array_search_function($value, $changed_diff_unchanged));  //as two or more target sentences are being considered as one string, here instead of string arrays should be returned
             $key_value = $target_lng_array[0];
@@ -201,7 +197,6 @@ class Multilingual_Aligner_UpdateSentences
                         if ($translation != "NULL") {
                             $changedSource_translated[] = "+" . trim($translation);
                         } else {
-                            //$changedSource_translated[]="+"."no translation is available in french for $temp";
                             $changedSource_translated[] = "+" . "$temp";
                         }
                     } else {
@@ -209,7 +204,6 @@ class Multilingual_Aligner_UpdateSentences
                         if ($translation != "NULL") {
                             $changedSource_translated[] = "+" . trim($translation);
                         } else {
-                                //$changedSource_translated[]="+"."no translation is available in french for $value";
                             $changedSource_translated[] = "+" . "$value";
                         }
                     }

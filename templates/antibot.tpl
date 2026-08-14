@@ -27,7 +27,12 @@
         {$captchaclass = 'col-md-12 mb-3'}
     {/if}
     <div class="antibot {if $captchalib->type eq 'recaptcha' || $captchalib->type eq 'recaptcha20'}ml-15{/if}">
-        {if $captchalib->type eq 'recaptcha' || $captchalib->type eq 'recaptcha20' || $captchalib->type eq 'recaptcha30'}
+        {if $captchalib->type eq 'altcha'}
+            <input type="hidden" name="captcha[id]" id="captchaId" value="{$captchalib->generate()->challenge}">
+            <div class="mb-3">
+                {$captchalib->render()}
+            </div>
+        {elseif $captchalib->type eq 'recaptcha' || $captchalib->type eq 'recaptcha20' || $captchalib->type eq 'recaptcha30'}
             <div class="mb-3 {$captchalib->type} clearfix">
                 <div class="{$captchaclass}">
                     {$captchalib->render()}
@@ -43,7 +48,7 @@
                 <div class="{if !empty($inputclass)}{$inputclass}{else}col-md-8 col-sm-9{/if}">
                     <input class="form-control" type="text" maxlength="8" name="captcha[input]" id="antibotcode">
                 </div>
-            </div>
+            </div>   
         {else}
             {* Default captcha *}
             <input type="hidden" name="captcha[id]" id="captchaId" value="{$captchalib->generate()}">

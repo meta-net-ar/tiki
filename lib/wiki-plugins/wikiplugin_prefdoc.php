@@ -129,7 +129,7 @@ class PrefsDoc extends TWVersion
         $this->docTable = '{TABS(name="' . $tabName . '" tabs="Tiki Version ' . implode('|', $this->state->files->{$tabName}) . "\" toggle=\"n\")}";
         $imageArray = [];
         $images = explode('|', $images ?? "");
-        foreach ($images as $key => $image) {
+        foreach ($images as $image) {
             $image = explode(':', $image);
             $imageArray[$image[0]][0] = @$image[1];
             $imageArray[$image[0]][1] = $image[0];
@@ -404,7 +404,7 @@ class PrefsDoc extends TWVersion
         $docFiles = scandir('templates/admin'); // grab all the files that house prefs
         if ($docFiles) {
             foreach ($docFiles as $fileName) {
-                if (substr($fileName, 0, 8) === 'include_') {  // filter out any file thats not a pref file
+                if (str_starts_with($fileName, 'include_')) {  // filter out any file thats not a pref file
                     $FilePrefs = $this->getAdminUIPrefs($fileName);
                     foreach ($FilePrefs as $tabName => $tab) {
                         if (! $this->writeFile($tabName, $tab)) {
@@ -550,7 +550,7 @@ class PrefsDoc extends TWVersion
             // get legend and use it as section name
             $legend_array = [];
             preg_match_all('/{tr}(.*?){\/tr}/s', $fieldset, $legend_array);
-            $legend = isset($legend_array[1][0]) ? $legend_array[1][0] : $index;
+            $legend = $legend_array[1][0] ?? $index;
             $legend = mb_ereg_replace('\W', '', strtolower($legend));
 
             $fieldset_prefs = [];

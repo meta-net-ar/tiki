@@ -63,7 +63,51 @@
 
             <br>
         {/tab}
+        
+        {tab name="{tr}PeerTube{/tr}"}
+            <br> 
+            {if $peertubeText}
+                {remarksbox type="info" title="{tr}PeerTube Configuration Status{/tr}"}
+                    <div class="mb-3">{$peertubeText}</div>
+                {/remarksbox}
+            {/if}
 
+            {button _text="{tr}List Videos{/tr}" href="tiki-list_peertube_entries.php"}
+
+            <div class="row">
+                <div class="mb-3 col-lg-12 clearfix">
+                    {include file='admin/include_apply_top.tpl'}
+                </div>
+            </div>
+            <fieldset>
+                <legend class="h3">{tr}Activate the feature{/tr}</legend>
+                {preference name=feature_peertube visible="always"}
+            </fieldset>
+            <br>
+            <fieldset>
+                <legend class="h3">{tr}Plugin to embed in pages{/tr}</legend>
+                {preference name=wikiplugin_peertube}
+            </fieldset>
+            <br>
+            <fieldset>
+                <legend class="h3">{tr}Enable related tracker field types{/tr}</legend>
+                {preference name=trackerfield_peertube}
+            </fieldset>
+            <br>
+            <fieldset>
+                <legend class="h3">{tr}PeerTube settings{/tr}</legend>
+                {preference name=peertube_service_url}
+                {preference name=peertube_username}
+                {preference name=peertube_password}
+                {* {preference name=peertube_player_id} *}
+            </fieldset>
+            <br>
+            {remarksbox type="info" title="{tr}OAuth Client discovery{/tr}"}
+                {tr}Tiki automatically retrieves the public “local” OAuth client from your PeerTube instance{/tr}
+                /api/v1/oauth-clients/local
+                {tr}No Client ID or Client Secret is required in this interface.{/tr}
+            {/remarksbox}
+        {/tab}
     {/tabset}
     {include file='admin/include_apply_bottom.tpl'}
 </form>

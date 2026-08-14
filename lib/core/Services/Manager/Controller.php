@@ -5,13 +5,18 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
 
 use Symfony\Component\Console\Input\ArrayInput;
+use Tiki\TaskQueue\QueuedTaskBanner;
+use Tiki\TaskQueue\Exception\QueueManagerException;
+use Tiki\TaskQueue\Tasks\CreateInstanceTask;
+use Tiki\TaskQueue\QueueManager;
 use TikiManager\Application\Discovery\LinuxDiscovery;
+use TikiManager\Application\Discovery\MacOSDiscovery;
 use TikiManager\Application\Discovery\WindowsDiscovery;
 use TikiManager\Application\Instance;
 use TikiManager\Application\Tiki\Versions\Fetcher\YamlFetcher;
@@ -408,6 +413,7 @@ class Services_Manager_Controller
      */
     public function action_create($input): array
     {
+        global $prefs;
         $cmd = new CreateInstanceCommand();
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -441,52 +447,98 @@ class Services_Manager_Controller
             }
 
             if ($input->force_option->text() === 'yes') {
-                $input_array["--force"] = null;
+                $input_array["--force"] = true;
             }
 
-            $inputCommand = new ArrayInput($input_array);
-            $lastInstanceId = Instance::getLastInstance()->id;
-
-            if ($input->leavepassword->text() == 'yes' || $input->instance_type->text() == 'blank') {
-                $this->runCommand($cmd, $inputCommand);
-            } else {
-                if ($this->validate_password($input->tikipassword->text())) {
-                    $this->runCommand($cmd, $inputCommand);
-                    $output = $this->manager_output->fetch();
-                    $info = "[OK] Please test your site at " . $input->url->text();
-
-                    if (str_contains($output, $info)) {
-                        $instance = Instance::getLastInstance();
-                        $command = "users:password admin " . $input->tikipassword->text();
-                        $cmd = new ConsoleInstanceCommand();
-                        $inputCmd = new ArrayInput([
-                            'command' => $cmd->getName(),
-                            '-i' => $instance->getId(),
-                            '-c' => $command,
-                        ]);
-                        try {
-                            $this->runCommand($cmd, $inputCmd);
-                        } catch (\Exception $e) {
-                            Feedback::error($e->getMessage());
-                        }
+            if (($prefs['feature_queued_tasks'] ?? 'n') === 'y') {
+                if (empty($input->leavepassword->text()) && $input->instance_type->text() === 'existing-tiki') {
+                    if (! $this->validate_password($input->tikipassword->text())) {
+                        Feedback::error(tr('Invalid password for admin user'));
+                        return [
+                            'title' => tr('Create New Instance Result'),
+                            'info' => '',
+                            'refresh' => true,
+                        ];
                     }
+                }
+
+                $params = [];
+                $params['params'] = $input_array;
+                $params['instance_type'] = $input->instance_type->text();
+                $params['profile'] = $input->profile->text();
+                $params['repository'] = $input->repository->text();
+                $params['leavepassword'] = $input->leavepassword->text();
+                $params['tikipassword'] = $input->tikipassword->text();
+
+                try {
+                    $queueManager = new QueueManager();
+                    $task = new CreateInstanceTask($params);
+                    $queuedTask = $queueManager->queueTask($task);
+                    $taskId = $queuedTask->getId();
+                    if (! empty($taskId)) {
+                        QueuedTaskBanner::note([
+                            'id' => $taskId,
+                            'page' => 'manager_create',
+                            'status' => tr('Pending'),
+                            'mes' => tr("Your instance creation task (#%0) has been queued successfully. You can view the status and output on the <a target='_blank' href='tiki-admin_queued_tasks.php'>Queued Tasks</a> page.", $taskId)
+                        ]);
+                    } else {
+                        Feedback::error(tr("Failed to add Instance creation into queue"));
+                    }
+                } catch (QueueManagerException $e) {
+                    Feedback::error(tr($e->getMessage()));
+                }
+
+                return [
+                    'title' => tr('Create New Instance'),
+                    'refresh' => true,
+                    'info' => '',
+                ];
+            } else {
+                $inputCommand = new ArrayInput($input_array);
+                $lastInstanceId = Instance::getLastInstance()->id;
+
+                if ($input->leavepassword->text() == 'yes' || $input->instance_type->text() == 'blank') {
+                    $this->runCommand($cmd, $inputCommand);
                 } else {
-                    Feedback::error(tr('Invalid password for admin user'));
+                    if ($this->validate_password($input->tikipassword->text())) {
+                        $this->runCommand($cmd, $inputCommand);
+                        $output = $this->manager_output->fetch();
+                        $info = "[OK] Please test your site at " . $input->url->text();
+
+                        if (str_contains($output, $info)) {
+                            $instance = Instance::getLastInstance();
+                            $command = "users:password admin " . $input->tikipassword->text();
+                            $cmd = new ConsoleInstanceCommand();
+                            $inputCmd = new ArrayInput([
+                                'command' => $cmd->getName(),
+                                '-i' => $instance->getId(),
+                                '-c' => $command,
+                            ]);
+                            try {
+                                $this->runCommand($cmd, $inputCmd);
+                            } catch (\Exception $e) {
+                                Feedback::error($e->getMessage());
+                            }
+                        }
+                    } else {
+                        Feedback::error(tr('Invalid password for admin user'));
+                    }
                 }
-            }
-            $newInstanceId = Instance::getLastInstance()->id;
-            if ($lastInstanceId != $newInstanceId) {
-                if ($input->profile->text()) {
-                    $profile = $input->profile->text();
-                    $repository = $input->repository->text();
-                    $this->apply_profile($newInstanceId, $profile, $repository);
+                $newInstanceId = Instance::getLastInstance()->id;
+                if ($lastInstanceId != $newInstanceId) {
+                    if ($input->profile->text()) {
+                        $profile = $input->profile->text();
+                        $repository = $input->repository->text();
+                        $this->apply_profile($newInstanceId, $profile, $repository);
+                    }
                 }
+                return [
+                    'title' => tr('Create New Instance Result'),
+                    'info' => $this->manager_output->fetch(),
+                    'refresh' => true,
+                ];
             }
-            return [
-                'title' => tr('Create New Instance Result'),
-                'info' => $this->manager_output->fetch(),
-                'refresh' => true,
-            ];
         } else {
             /** For form initialization */
             $inputValues = [
@@ -1056,7 +1108,7 @@ class Services_Manager_Controller
         } else {
             /** Form initialization */
             $inputValues = [
-                'vcs' => ['git', 'svn', 'src'],
+                'vcs' => ['git', 'src'],
                 'selected_vcs' => 'git'
             ];
 
@@ -1538,7 +1590,9 @@ class Services_Manager_Controller
             $access->password = $input->password->text();
         }
 
-        if (stristr(PHP_OS, 'WIN')) {
+        if (PHP_OS == 'Darwin') {
+            $discovery = new MacOSDiscovery($instance, $access, ['os' => 'DARWIN']);
+        } elseif (stristr(PHP_OS, 'WIN')) {
             $discovery = new WindowsDiscovery($instance, $access, ['os' => 'WINDOWS']);
         } else {
             $discovery = new LinuxDiscovery($instance, $access, ['os' => 'LINUX']);
@@ -1583,7 +1637,7 @@ class Services_Manager_Controller
                     return true;
                 }
                 foreach ($availableVersions as $version) {
-                    if (substr($branch, 0, strlen($version)) == $version || preg_match("/$version\.\d+/", $branch)) {
+                    if (str_starts_with($branch, $version) || preg_match("/$version\.\d+/", $branch)) {
                         return true;
                     }
                 }

@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Config\Ini;
+
 /**
  *
  */
@@ -31,9 +34,9 @@ class AdminLib extends TikiLib
         }
 
         $query = "select * from `tiki_dsn` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_dsn` $mid";
+        $query_count = "select count(*) from `tiki_dsn` $mid";
         $result = $this->query($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
         $ret = [];
 
         while ($res = $result->fetchRow()) {
@@ -42,7 +45,7 @@ class AdminLib extends TikiLib
 
         $retval = [];
         $retval["data"] = $ret;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -51,7 +54,7 @@ class AdminLib extends TikiLib
      * @param $dsn
      * @param $name
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return TikiDb_Pdo_Result
      */
     public function replace_dsn($dsnId, $dsn, $name)
     {
@@ -73,7 +76,7 @@ class AdminLib extends TikiLib
     /**
      * @param int $dsnId
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return TikiDb_Pdo_Result
      */
     public function remove_dsn($dsnId)
     {
@@ -137,13 +140,13 @@ class AdminLib extends TikiLib
         }
 
         $query = "select * from `tiki_extwiki` $mid order by " . $this->convertSortMode($sort_mode);
-        $query_cant = "select count(*) from `tiki_extwiki` $mid";
+        $query_count = "select count(*) from `tiki_extwiki` $mid";
         $result = $this->fetchAll($query, $bindvars, $maxRecords, $offset);
-        $cant = $this->getOne($query_cant, $bindvars);
+        $count = $this->getOne($query_count, $bindvars);
 
         $retval = [];
         $retval["data"] = $result;
-        $retval["cant"] = $cant;
+        $retval["count"] = $count;
         return $retval;
     }
 
@@ -175,7 +178,7 @@ class AdminLib extends TikiLib
      *
      * @param $extwikiId int Id of the external wiki to be removed
      *
-     * @return TikiDb_Pdo_Result|TikiDb_Adodb_Result
+     * @return TikiDb_Pdo_Result
      */
     public function remove_extwiki($extwikiId)
     {
@@ -231,19 +234,23 @@ class AdminLib extends TikiLib
         if ($tikidomain) {
             $path .= "/$tikidomain";
         }
-        $h = opendir($path);
+        $dir = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
 
-        while (($file = readdir($h)) !== false) {
-            if (is_file("$path/$file") && $file != 'license.txt' && $file != 'index.php' && $file != '.cvsignore' && $file != 'README') {
-                $filename = "$path/$file";
+        foreach ($dir as $fileInfo) {
+            if ($fileInfo->isFile()) {
+                $filename = $fileInfo->getPathname();
+                $baseName = $fileInfo->getBasename();
+
+                $protected = ['license.txt', 'index.php', '.cvsignore', 'README'];
+                if (in_array($baseName, $protected)) {
+                    continue;
+                }
 
                 if (! in_array($filename, $pictures)) {
                     @unlink($filename);
                 }
             }
         }
-
-        closedir($h);
     }
 
     /**
@@ -416,12 +423,10 @@ class AdminLib extends TikiLib
             $pageContents = preg_replace("/tiki-index.php\?page=([^\'\"\$]+)/", "$1.html", $pageContents);
             $pageContents = preg_replace("/tiki-editpage.php\?page=([^\'\"\$]+)/", "", $pageContents);
             //preg_match_all("/tiki-index.php\?page=([^ ]+)/",$dat,$cosas);
-            //print_r($cosas);
 
             $data = "<html>";
             $data .= "<head>";
             $data .= "<title>" . $res["pageName"] . "</title>";
-            // $data .= "<link rel='StyleSheet' href='styles/" . $prefs['style'] . "' type='text/css'>";
             $data .= '</head>';
             $data .= "<body><a class='wiki' href='" .
                 $prefs['wikiHomePage'] .
@@ -437,7 +442,7 @@ class AdminLib extends TikiLib
         $tar->toTar($dumpPath, false);
         unset($tar);
         $logslib = TikiLib::lib('logs');
-        $logslib->add_log('dump', 'wiki file dump created in ' . $dumpPath);
+        $logslib->add_log('dump', tra('wiki file dump created in ') . $dumpPath);
     }
 
     /**
@@ -576,20 +581,24 @@ class AdminLib extends TikiLib
      */
     public function checkSystemConfigurationFile()
     {
-        global $system_configuration_file;
+        global $system_configuration_files;
         $show_warning = false;
 
-        $db_file = TIKI_CONFIG_FILE_PATH;
-        if (file_exists($db_file)) {
-            include($db_file);
+        // Get local.php path including for multitiki
+        $configFilePath = \Tiki\TikiInit::getCredentialsFile();
+        if (file_exists($configFilePath)) {
+            include($configFilePath);
 
-            if (isset($system_configuration_file) && file_exists($system_configuration_file)) {
-                $tikiPath = realpath(TIKI_PATH);
-                $configPath = realpath($system_configuration_file);
-                if (strncmp($tikiPath, $configPath, strlen($tikiPath)) == 0) {
-                    $file_extension = pathinfo($system_configuration_file, PATHINFO_EXTENSION);
-                    if ($file_extension == 'ini') {
-                        $show_warning = true;
+            foreach ($system_configuration_files as $configFile) {
+                if (isset($configFile) && file_exists($configFile)) {
+                    $tikiPath = realpath(TIKI_PATH);
+                    $configPath = realpath($configFile);
+                    if (strncmp($tikiPath, $configPath, strlen($tikiPath)) == 0) {
+                        $file_extension = pathinfo($configFile, PATHINFO_EXTENSION);
+                        if ($file_extension == 'ini') {
+                            $show_warning = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -660,33 +669,43 @@ class AdminLib extends TikiLib
      */
     public function retrieveConfigFileData($retrieve_all_data = false)
     {
-        global $system_configuration_identifier, $system_configuration_file;
+        global $system_configuration_identifier, $system_configuration_files;
 
-        if (! is_readable($system_configuration_file)) {
-            throw new Exception(tr('%0 configuration file could not be read', $system_configuration_file));
+        $mergedConfigData = [];
+
+        foreach ($system_configuration_files as $configFilePath) {
+            if (! is_readable($configFilePath)) {
+                throw new Exception(tr('%0 configuration file could not be read', $configFilePath));
+            }
+
+            $configData = [];
+            $identifier = ($retrieve_all_data || ! isset($system_configuration_identifier))
+                ? null
+                : $system_configuration_identifier;
+
+            $configReader = new Ini();
+            $configReader->setFilterSection($identifier);
+
+            if (preg_match('/\.ini.php$/', $configFilePath)) {
+                $retrieveIniContent = function ($file) {
+                    ob_start();
+                    include($file);
+                    $content = ob_get_contents();
+                    ob_end_clean();
+
+                    return $content;
+                };
+
+                $iniContent = $retrieveIniContent($configFilePath);
+                $configData = $configReader->fromString($iniContent);
+            } else {
+                $configData = $configReader->fromFile($configFilePath);
+            }
+
+            // Merge: later files override earlier files (array_replace_recursive)
+            $mergedConfigData = array_replace_recursive($mergedConfigData, $configData);
         }
-        $configData = [];
-        if ($retrieve_all_data || ! isset($system_configuration_identifier)) {
-            $system_configuration_identifier = null;
-        }
-        $configReader = new Tiki_Config_Ini();
-        $configReader->setFilterSection($system_configuration_identifier);
 
-        if (preg_match('/\.ini.php$/', $system_configuration_file)) {
-            $retrieveIniContent = function ($system_configuration_file) {
-                ob_start();
-                include($system_configuration_file);
-                $system_configuration_file_content = ob_get_contents();
-                ob_end_clean();
-
-                return $system_configuration_file_content;
-            };
-
-            $system_configuration_content = $retrieveIniContent($system_configuration_file);
-            $configData = $configReader->fromString($system_configuration_content);
-        } else {
-            $configData = $configReader->fromFile($system_configuration_file);
-        }
-        return $configData;
+        return $mergedConfigData;
     }
 }

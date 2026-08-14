@@ -7,12 +7,16 @@
 
 function prefs_saml_list()
 {
+    $samlHelp = 'SAML';
+
     return [
         'saml_auth_enabled' => [
             'name' => tra('Enable SAML Auth'),
+            'description' => tra('Enable SAML 2.0 single sign-on and expose SAML as an authentication method option. Set Authentication Method to SAML for users to log in via the identity provider.'),
             'type' => 'flag',
             'perspective' => false,
             'default' => 'n',
+            'help' => $samlHelp,
         ],
         'saml_idp_entityid' => [
             'name' => tra('IdP Entity Id'),
@@ -21,6 +25,7 @@ function prefs_saml_list()
             'size' => 50,
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_idp_sso' => [
             'name' => tra('Single sign-on service URL'),
@@ -29,6 +34,7 @@ function prefs_saml_list()
             'size' => 50,
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_idp_slo' => [
             'name' => tra('Single log-out service URL'),
@@ -37,6 +43,7 @@ function prefs_saml_list()
             'size' => 50,
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_idp_x509cert' => [
             'name' => tra('X.509 certificate'),
@@ -44,6 +51,7 @@ function prefs_saml_list()
             'type' => 'textarea',
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_options_autocreate' => [
             'name' => tra('Create user if not registered in Tiki'),
@@ -51,6 +59,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_options_sync_group' => [
             'name' => tra('Sync user group with IdP data'),
@@ -58,6 +67,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_options_slo' => [
             'name' => tra('Enable Single Logout Service'),
@@ -65,6 +75,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_options_skip_admin' => [
             'name' => tra('Use Tiki authentication for Admin log-in'),
@@ -72,6 +83,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => 'y',
+            'help' => $samlHelp,
         ],
         'saml_option_default_group' => [
             'name' => tra('Default group'),
@@ -80,6 +92,7 @@ function prefs_saml_list()
             'size' => 20,
             'perspective' => false,
             'default' => 'Registered',
+            'help' => $samlHelp,
         ],
         'saml_option_account_matcher' => [
             'name' => tra('Account matcher'),
@@ -91,6 +104,7 @@ function prefs_saml_list()
                 'email' => tra('Email'),
             ],
             'default' => 'email',
+            'help' => $samlHelp,
         ],
         'saml_option_login_link_text' => [
             'name' => tra('Log-in link text'),
@@ -98,6 +112,7 @@ function prefs_saml_list()
             'type' => 'text',
             'perspective' => false,
             'default' => 'Log in through SAML2 IdP',
+            'help' => $samlHelp,
         ],
         'saml_attrmap_username' => [
             'name' => tra('SAML attribute that will be mapped to the Tiki username'),
@@ -106,6 +121,7 @@ function prefs_saml_list()
             'size' => 25,
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_attrmap_mail' => [
             'name' => tra('SAML attribute that will be mapped to the Tiki email'),
@@ -114,6 +130,7 @@ function prefs_saml_list()
             'size' => 25,
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_attrmap_group' => [
             'name' => tra('SAML attribute that will be mapped to the Tiki group'),
@@ -122,6 +139,7 @@ function prefs_saml_list()
             'size' => 25,
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_groupmap_admins' => [
             'name' => tra('Admins'),
@@ -130,6 +148,7 @@ function prefs_saml_list()
             'size' => 25,
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_groupmap_registered' => [
             'name' => tra('Registered'),
@@ -138,6 +157,7 @@ function prefs_saml_list()
             'size' => 25,
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_advanced_debug' => [
             'name' => tra('Debug Mode'),
@@ -145,6 +165,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_advanced_strict' => [
             'name' => tra('Strict Mode'),
@@ -153,6 +174,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_sp_entity_id' => [
             'name' => tra('Service Provider Entity ID'),
@@ -160,12 +182,14 @@ function prefs_saml_list()
             'type' => 'text',
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_advanced_nameidformat' => [
             'name' => tra('Requested NameIDFormat'),
             'description' => tra('Specifies constraints on the name identifier to be used to represent the requested subject.'),
             'type' => 'list',
             'perspective' => false,
+            'help' => $samlHelp,
             'options' => [
                 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified' => tra('urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'),
                 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress' => tra('urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'),
@@ -183,6 +207,7 @@ function prefs_saml_list()
             'description' => tra('Authentication context: unselect all to accept any type, otherwise select the valid contexts.'),
             'type' => 'list',
             'perspective' => false,
+            'help' => $samlHelp,
             'options' => [
                 'urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified' => tra('urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified'),
                 'urn:oasis:names:tc:SAML:2.0:ac:classes:Password' => tra('urn:oasis:names:tc:SAML:2.0:ac:classes:Password'),
@@ -200,12 +225,14 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_nameid_encrypted' => [
             'name' => tra('Encrypt nameID'),
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_authn_request_signed' => [
             'name' => tra('Sign AuthnRequest'),
@@ -213,6 +240,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_logout_request_signed' => [
             'name' => tra('Sign LogoutRequest'),
@@ -220,6 +248,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_logout_response_signed' => [
             'name' => tra('Sign LogoutResponse'),
@@ -227,6 +256,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_metadata_signed' => [
             'name' => tra('Sign Metadata'),
@@ -234,6 +264,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_want_message_signed' => [
             'name' => tra('Reject Unsigned Messages'),
@@ -241,6 +272,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_want_assertion_signed' => [
             'name' => tra('Reject Unsigned Assertions'),
@@ -248,6 +280,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_want_assertion_encrypted' => [
             'name' => tra('Reject Unencrypted Assertions'),
@@ -255,6 +288,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_retrieve_parameters_from_server' => [
             'name' => tra('Retrieve Parameters From Server'),
@@ -262,6 +296,7 @@ function prefs_saml_list()
             'type' => 'flag',
             'perspective' => false,
             'default' => false,
+            'help' => $samlHelp,
         ],
         'saml_advanced_sp_x509cert' => [
             'name' => tra('Service Provider X.509 certificate'),
@@ -269,6 +304,7 @@ function prefs_saml_list()
             'type' => 'textarea',
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_advanced_sp_privatekey' => [
             'name' => tra('Service Provider Private Key'),
@@ -276,12 +312,14 @@ function prefs_saml_list()
             'type' => 'textarea',
             'perspective' => false,
             'default' => '',
+            'help' => $samlHelp,
         ],
         'saml_advanced_sign_algorithm' => [
             'name' => tra('Signature Algorithm'),
             'description' => tra('Algorithm that the toolkit will use on the signing process'),
             'type' => 'list',
             'perspective' => false,
+            'help' => $samlHelp,
             'options' => [
                 'http://www.w3.org/2000/09/xmldsig#rsa-sha1' => tra('http://www.w3.org/2000/09/xmldsig#rsa-sha1'),
                 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256' => tra('http://www.w3.org/2001/04/xmldsig-more#rsa-sha256'),

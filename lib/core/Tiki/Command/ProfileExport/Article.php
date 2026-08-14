@@ -26,24 +26,24 @@ class Article extends ObjectWriter
                 'with-topic',
                 null,
                 InputOption::VALUE_NONE,
-                'Includes article topic'
+                tra('Includes article topic')
             )
             ->addOption(
                 'with-type',
                 null,
                 InputOption::VALUE_NONE,
-                'Includes article type'
+                tra('Includes article type')
             )
             ->addOption(
                 'all',
                 null,
                 InputOption::VALUE_NONE,
-                'Export all articles'
+                tra('Export all articles')
             )
             ->addArgument(
                 'article',
                 InputArgument::OPTIONAL,
-                'Article ID'
+                tra('Article ID')
             );
 
         parent::configure();
@@ -68,7 +68,7 @@ class Article extends ObjectWriter
         if ($result) {
             $writer->save();
         } else {
-            $output->writeln("Article not found: $id");
+            $output->writeln(tra("Article not found: %id%", ['%id%' => $id]));
         }
         return Command::SUCCESS;
     }

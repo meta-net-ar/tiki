@@ -5,10 +5,12 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
+
+use Tiki\Captcha\CaptchaTypeResolver;
 
 if (empty($_REQUEST['registration_choices'])) {
     $_REQUEST['registration_choices'] = [];
@@ -67,8 +69,7 @@ if (! empty($_REQUEST['resync_tracker']) && $access->checkCsrf(true)) {
 
 $smarty->assign('gd_lib_found', function_exists('gd_info') ? 'y' : 'n');
 
-
-if ($prefs['feature_antibot'] === 'y' && $prefs['captcha_questions_active'] !== 'y' && $prefs['recaptcha_enabled'] !== 'y') {
+if ($prefs['feature_antibot'] === 'y' && in_array(CaptchaTypeResolver::getConfiguredType($prefs), ['default', 'dumb'])) {
     // check Zend captcha will work
     $captcha = new Laminas\Captcha\Dumb();
 
@@ -133,7 +134,7 @@ if (isset($_POST['uploadIndex']) && $access->checkCsrf()) {
         $blackL->set_preference('pass_blacklist_file', $blackL->generateBlacklistName(false));
         $blackL->loadBlacklist($filename);
     } else {
-        Feedback::error(tr('Unable to Write Password File to Disk'));
+        Feedback::error(tra('Unable to Write Password File to Disk'));
     }
 } elseif (isset($_POST['deleteIndex']) && $access->checkCsrf(true)) {
     $blackL->deletePassIndex();

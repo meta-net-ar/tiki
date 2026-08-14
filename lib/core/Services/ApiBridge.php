@@ -38,6 +38,21 @@ class Services_ApiBridge
                 }
             }
         }
+        // Merge JSON request body when Content-Type is application/json.
+        // PHP only populates $_POST for form-urlencoded and multipart, not for JSON bodies.
+        // This makes JSON fields available via $input in all API controllers.
+        if (
+            isset($_SERVER['CONTENT_TYPE'])
+            && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false
+        ) {
+            $rawBody = file_get_contents('php://input');
+            if (! empty($rawBody)) {
+                $jsonData = json_decode($rawBody, true);
+                if (is_array($jsonData)) {
+                    $request = array_merge($request, $jsonData);
+                }
+            }
+        }
         $this->jitRequest = new JitFilter($request);
         if ($route['_route'] == 'home') {
             $this->renderDocs();
@@ -175,15 +190,16 @@ class Services_ApiBridge
         $routes->add('wiki-unlock', (new Route('wiki/unlock', ['controller' => 'wiki', 'action' => 'unlock_pages', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('wiki-zip', (new Route('wiki/zip', ['controller' => 'wiki', 'action' => 'zip', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('wiki-versions-delete', (new Route('wiki/page/{page}/delete', ['controller' => 'wiki', 'action' => 'remove_page_versions', 'confirmForm' => 'y']))->setMethods(['POST']));
+        $routes->add('wiki-patch', (new Route('wiki/page/{page}', ['controller' => 'wiki', 'action' => 'patch_page']))->setMethods(['PATCH']));
         $routes->add('galleries', (new Route('galleries', ['controller' => 'file', 'action' => 'list_galleries', 'offset' => 0, 'maxRecords' => -1]))->setMethods(['GET']));
+        $routes->add('galleries-upload', (new Route('galleries/upload', ['controller' => 'file', 'action' => 'upload', 'upload' => 1]))->setMethods(['POST']));
+        $routes->add('galleries-download', (new Route('galleries/{fileId}/download', ['controller' => 'file', 'action' => 'download']))->setMethods(['GET']));
         $routes->add('galleries-create', (new Route('galleries', ['controller' => 'file', 'action' => 'create_update_gallery', 'create' => 1]))->setMethods(['POST']));
         $routes->add('galleries-update', (new Route('galleries/{galleryId}/update', ['controller' => 'file', 'action' => 'create_update_gallery', 'update' => 1]))->setMethods(['POST']));
         $routes->add('galleries-info', (new Route('galleries/{galleryId}', ['controller' => 'file', 'action' => 'info']))->setMethods(['GET']));
         $routes->add('galleries-move', (new Route('galleries/{galleryId}/move', ['controller' => 'file', 'action' => 'move_file_gallery']))->setMethods(['POST']));
         $routes->add('galleries-duplicate', (new Route('galleries/{galleryId}/duplicate', ['controller' => 'file', 'action' => 'duplicate_file_gallery']))->setMethods(['POST']));
         $routes->add('galleries-delete', (new Route('galleries/{id}/delete', ['controller' => 'file', 'action' => 'remove_file_gallery', 'confirmForm' => 'y']))->setMethods(['DELETE']));
-        $routes->add('galleries-upload', (new Route('galleries/upload', ['controller' => 'file', 'action' => 'upload', 'upload' => 1]))->setMethods(['POST']));
-        $routes->add('galleries-download', (new Route('galleries/{fileId}/download', ['controller' => 'file', 'action' => 'download']))->setMethods(['GET']));
         $routes->add('galleries-files', (new Route('galleries/{galleryId}/list_files', ['controller' => 'file', 'action' => 'list_files', 'offset' => -1, 'maxRecords' => -1]))->setMethods(['GET']));
         $routes->add('galleries-files-info', (new Route('galleries/files/{fileId}', ['controller' => 'file', 'action' => 'file_view']))->setMethods(['GET']));
         $routes->add('galleries-files-update', (new Route('galleries/files/{fileId}/update', ['controller' => 'file', 'action' => 'upload', 'update' => 1]))->setMethods(['POST']));
@@ -191,6 +207,10 @@ class Services_ApiBridge
         $routes->add('galleries-files-lock', (new Route('galleries/files/lock', ['controller' => 'file', 'action' => 'lock_files', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('galleries-files-unlock', (new Route('galleries/files/unlock', ['controller' => 'file', 'action' => 'unlock_files', 'confirmForm' => 'y']))->setMethods(['POST']));
         $routes->add('galleries-files-delete', (new Route('galleries/files/{fileId}/delete', ['controller' => 'file', 'action' => 'remove_file', 'confirmForm' => 'y']))->setMethods(['DELETE']));
+        $routes->add('articles', (new Route('articles', ['controller' => 'article', 'action' => 'list_articles', 'offset' => 0, 'maxRecords' => -1]))->setMethods(['GET']));
+        $routes->add('articles-create', (new Route('articles', ['controller' => 'article', 'action' => 'create_article']))->setMethods(['POST']));
+        $routes->add('articles-view', (new Route('articles/{articleId}', ['controller' => 'article', 'action' => 'get_article']))->setMethods(['GET']));
+        $routes->add('articles-update', (new Route('articles/{articleId}', ['controller' => 'article', 'action' => 'update_article']))->setMethods(['POST']));
         return $routes;
     }
 
@@ -208,7 +228,7 @@ class Services_ApiBridge
         $path = $this->jitRequest->path->xss();
         $base = $tikipath . 'templates/api/docs';
         $real = realpath($base . '/' . str_replace('-', '/', $path) . '.yaml');
-        if (empty($path) || ! strstr(dirname($real), $base)) {
+        if (empty($path) || ! str_contains(dirname($real), $base)) {
             $real = $base . '/index.yaml';
         }
         if (is_file($real)) {

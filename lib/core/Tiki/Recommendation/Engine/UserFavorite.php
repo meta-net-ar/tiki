@@ -26,8 +26,6 @@ class UserFavorite implements EngineInterface
         $userfavorite = (string) new \Search_Query_Relation('tiki.user.favorite.invert', 'user', $user);
         $previously = (string) new \Search_Query_Relation('tiki.recommendation.obtained.invert', 'user', $user);
 
-        $context = new \Perms_Context($user);
-
         $query = $this->lib->buildQuery(['searchable' => 'y']);
         $query->setOrder('modification_date_desc');
 

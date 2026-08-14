@@ -1,7 +1,9 @@
 <div{if !empty($field.options_map.labelasplaceholder)} class="input-group"{/if}>
     <input type="text" class="form-control{if !empty($field.options_map.labelasplaceholder)} labelasplaceholder{/if}"
            name="{$field.ins_id}" id="{$field.ins_id}" value="{$field.value|escape}" size="60"
-           {if !empty($field.options_map.labelasplaceholder)}placeholder="{$field.name}"{/if}
+           {if $data.strictValidationEnabled}data-url-wiki-wrapper-validation-input=""
+           data-url-wiki-wrapper-feedback-id="{$field.ins_id}_wikiSyntaxLive"{/if}
+           {if !empty($field.options_map.labelasplaceholder)}placeholder="{$field.name|tra|escape:'htmlattr'}"{/if}
     >
     {if $field.options_map.labelasplaceholder and $field.isMandatory eq 'y'}
         <span class="input-group-text">
@@ -9,3 +11,7 @@
         </span>
     {/if}
 </div>
+<div id="{$field.ins_id}_wikiSyntaxLive"
+     class="form-text text-muted js-url-wiki-syntax-feedback"
+     data-default-info="{$data.wikiSyntaxInfo|escape:'htmlattr'}"
+>{$data.wikiSyntaxInfo|escape}</div>

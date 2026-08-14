@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -44,7 +44,7 @@ class mime
         $headparsed = preg_replace('/' . $crlf . "(\t| )/", ' ', $header);
         $heads = explode($crlf, trim($headparsed));
 
-        if (substr($heads[0], 0, 5) == 'From ') {
+        if (str_starts_with($heads[0], 'From ')) {
             $heads[0] = str_replace('From ', 'x-From: ', $heads[0]);
         }
 
@@ -52,7 +52,7 @@ class mime
             $hdr_name = trim(substr($line, 0, strpos($line, ':')));
             $hdr_value = trim(substr($line, strpos($line, ':') + 1));
 
-            if (substr($hdr_value, 0, 1) == ' ') {
+            if (str_starts_with($hdr_value, ' ')) {
                 $hdr_value = substr($hdr_value, 1);
             }
 
@@ -158,7 +158,7 @@ class mime
                     if (! empty($content_disposition) && $content_disposition['value'] == 'attachment') {
                         $back['attachments'][] = $back['d_parameters'];
                     }
-                    $encoding = isset($content_transfer_encoding) ? $content_transfer_encoding['value'] : '7bit';
+                    $encoding = $content_transfer_encoding['value'] ?? '7bit';
                     $back['body'] = $this->decodeBody($body, $encoding);
                     if (
                         array_key_exists('ctype_parameters', $back)
@@ -241,116 +241,5 @@ class mime
             default:
                 return $input;
         }
-    }
-
-
-
-    /**
-     * @param $decodedMail array    output from \mime::decode
-     * @param $type string          text or html
-     * @return string
-     */
-    public function getPartBody($decodedMail, $type)
-    {
-        $body = '';
-
-        if (! empty($decodedMail['parts'])) {
-            foreach ($decodedMail['parts'] as $part) {
-                if (isset($part['parts'])) {
-                    return $this->getPartBody($part, $type);
-                }
-                if (empty($body) && isset($part[$type])) {
-                    $body = $part[$type];
-                    break;
-                }
-            }
-        } elseif (isset($decodedMail[$type])) {
-            $body = $decodedMail[$type];
-        } elseif ($type === 'text' && isset($decodedMail['body'])) {
-            $body = $decodedMail['body'];
-        }
-        if (is_array($body)) {
-            $body = reset($body);
-        }
-        return $body;
-    }
-
-
-    /** replace MS "smart quotes" with dumb ones
-     * @param $body string
-     * @return string
-     */
-    public function cleanQuotes($body)
-    {
-        $quotes = [        // thanks to http://stackoverflow.com/a/1262210/2459703
-            "\xC2\xAB" => '"', // « (U+00AB) in UTF-8
-            "\xC2\xBB" => '"', // » (U+00BB) in UTF-8
-            "\xE2\x80\x98" => "'", // ‘ (U+2018) in UTF-8
-            "\xE2\x80\x99" => "'", // ’ (U+2019) in UTF-8
-            "\xE2\x80\x9A" => "'", // ‚ (U+201A) in UTF-8
-            "\xE2\x80\x9B" => "'", // ‛ (U+201B) in UTF-8
-            "\xE2\x80\x9C" => '"', // “ (U+201C) in UTF-8
-            "\xE2\x80\x9D" => '"', // ” (U+201D) in UTF-8
-            "\xE2\x80\x9E" => '"', // „ (U+201E) in UTF-8
-            "\xE2\x80\x9F" => '"', // ‟ (U+201F) in UTF-8
-            "\xE2\x80\xB9" => "'", // ‹ (U+2039) in UTF-8
-            "\xE2\x80\xBA" => "'", // › (U+203A) in UTF-8
-        ];
-        $body = strtr($body, $quotes);
-        return $body;
-    }
-
-    /**
-     * @param $output
-     * @return array
-     */
-    public function get_bodies($output)
-    {
-            $bodies = [];   /* BUG: only one body for the moment */
-        if (isset($output['text'][0])) {
-            $body = $output['text'][0];
-        } elseif (isset($output['parts'][0]) && isset($output['parts'][0]['text'][0])) {
-            $body = $output['parts'][0]['text'][0];
-        } elseif (isset($output['parts'][0]) && isset($output['parts'][0]['parts'][0]) && isset($output['parts'][0]['parts'][0]['text'][0])) {
-            $body = $output['parts'][0]['parts'][0]['text'][0];
-        } else {
-            $body = '';
-        }
-            $bodies[] = $body;
-            return $bodies;
-    }
-
-    /**
-     * @param $output
-     * @return array
-     */
-    public function get_attachments($output)
-    {
-        $cnt = 0;
-        $attachments = [];
-
-        if (! isset($output['parts'])) {
-            return $attachments;
-        }
-
-        $att = [];
-
-        for ($it = 0, $itcount_output = count($output['parts']); $it < $itcount_output; $it++) {
-            if (isset($output['parts'][$it]['d_parameters']['filename'])) {
-                $attachmentPart = $output['parts'][$it];
-                $att['part'] = $it;
-                $att['name'] = $attachmentPart['d_parameters']['filename'];
-                if (isset($attachmentPart['ctype_primary'])) {
-                    $att['type'] = $attachmentPart['ctype_primary'] . '/' . $attachmentPart['ctype_secondary'];
-                } else {
-                    $att['type'] = '';
-                }
-                $att['data'] = $attachmentPart['body'];
-                $att['size'] = strlen($att['data']);
-                $attachments[] = $att;
-            }
-        }
-
-        return $attachments;
     }
 }

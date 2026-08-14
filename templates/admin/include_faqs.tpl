@@ -6,6 +6,7 @@
         </a>
         {include file='admin/include_apply_top.tpl'}
     </div>
+    <div class="styling-element">
     <fieldset>
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_faqs visible="always"}
@@ -20,5 +21,6 @@
         </div>
         {preference name=faq_feature_copyrights}
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

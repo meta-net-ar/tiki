@@ -7,6 +7,8 @@
         </div>
     </div>
 
+    <div class="styling-element">
+
     <fieldset>
         <legend class="h3">{tr}Settings{/tr}</legend>
 
@@ -48,6 +50,8 @@
         {preference name=gmap_defaultz}
         {preference name=default_map}
     </fieldset>
+
+    </div>
 
     {include file='admin/include_apply_bottom.tpl'}
 </form>

@@ -7,8 +7,10 @@
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
-// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'wiki page';
+// Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details
+
+use Tiki\SortModeValidator;
+
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 $inputConfiguration = [
     [
@@ -20,46 +22,43 @@ $inputConfiguration = [
         ],
     ],
 ];
+
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI_PAGE;
+Sections::setCurrentSection($section);
 $histlib = TikiLib::lib('hist');
 $auto_query_args = ['sort_mode', 'offset', 'find', 'days'];
 $access->check_feature('feature_wiki');
 $access->check_feature('feature_lastChanges');
 $access->check_permission('tiki_p_view');
-if (! isset($_REQUEST["find"])) {
-    $findwhat = '';
-} else {
-    $findwhat = $_REQUEST["find"];
-}
+$findwhat = $_REQUEST["find"] ?? '';
 $smarty->assign('find', $findwhat);
 if (! isset($_REQUEST["days"])) {
     $days = 1;
 } else {
     $days = $_REQUEST["days"];
 }
-if (! isset($_REQUEST["sort_mode"])) {
-    $sort_mode = 'lastModif_desc';
-} else {
-    $sort_mode = $_REQUEST["sort_mode"];
-}
+$sort_mode = SortModeValidator::validateSortModeOrFeedback(
+    $_REQUEST['sort_mode'] ?? 'lastModif_desc',
+    ['tiki_history', 'tiki_pages', 'tiki_actionlog'],
+    $histlib->pure_aliases
+) ?: 'lastModif_desc';
+
 $smarty->assign_by_ref('days', $days);
 $smarty->assign_by_ref('findwhat', $findwhat);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 // Get a list of last changes to the Wiki database
 $more = 0;
 $lastchanges = $histlib->get_last_changes($days, $offset, $maxRecords, $sort_mode, $findwhat, false);
-$smarty->assign_by_ref('cant_records', $lastchanges["cant"]);
+$smarty->assign_by_ref('records_count', $lastchanges["count"]);
 // If there're more records then assign next_offset
-$cant_pages = ceil($lastchanges["cant"] / $maxRecords);
-$smarty->assign_by_ref('cant_pages', $cant_pages);
+$pages_count = ceil($lastchanges["count"] / $maxRecords);
+$smarty->assign_by_ref('pages_count', $pages_count);
 $smarty->assign('actual_page', 1 + ($offset / $maxRecords));
-if ($lastchanges["cant"] > ($offset + $maxRecords)) {
+if ($lastchanges["count"] > ($offset + $maxRecords)) {
     $smarty->assign('next_offset', $offset + $maxRecords);
 } else {
     $smarty->assign('next_offset', -1);

@@ -3,7 +3,7 @@
     {title actions="{$smarty.capture.blog_actions}"}{$title}{/title}
 {/if}
 {if $blog_data.use_description eq 'y' && $description neq ""}
-    <div class="description form-text">{$description|escape}</div>
+    <div class="description{* form-text*}">{$description|escape}</div> {* form-text class removed as unnecessary IMO - g_c-l *}
 {/if}
 {if $blog_data.use_breadcrumbs eq 'y'}
     <div class="breadcrumb"><a class="link" href="tiki-list_blogs.php">{tr}Blogs{/tr}</a> {$prefs.site_crumb_seper} {$title|escape}</div>
@@ -11,7 +11,7 @@
 
 {* Below is example code if you wish to add more info to the default blog heading
  * remove the line above (starting curly bracket then asterisk) and the last line to enable
-<div class="bloginfo">
+<div class="bloginfo d-block">
 {tr}Created by{/tr} {$creator|userlink} {$created|tiki_short_datetime:on}<br>
 {tr}Last post{/tr} {$lastModif|tiki_short_datetime}<br>
 

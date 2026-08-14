@@ -11,10 +11,13 @@ post:
   requestBody:
     required: true
     content:
-      application/x-www-form-urlencoded:
+      multipart/form-data:
         schema:
           type: object
           properties:
+            data:
+              type: file
+              description: file path to upload. If omitted, the current file will remain unchanged.
             user:
               type: string
               description: The user who uploaded the file
@@ -27,49 +30,13 @@ post:
             description:
               type: string
               description: The description of the file
-      multipart/form-data:
-        schema:
-          type: object
-          required:
-            - data
-          properties:
-            data:
-              type: string
-              description: file path
-            user:
-              type: string
-            title:
-              type: string
-            name:
-              type: string
-            description:
-              type: string
   responses:
     '200':
       description: update file response
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              size:
-                type: integer
-              name:
-                type: string
-              title:
-                type: string
-              description:
-                type: string
-              type:
-                type: string
-              fileId:
-                type: integer
-              galleryId:
-                type: integer
-              md5sum:
-                type: string
-              ticket:
-                type: object
+            $ref: schemas-FileUploadResponse.yaml
     '403':
       description: forbidden
       content:

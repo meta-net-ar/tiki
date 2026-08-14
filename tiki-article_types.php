@@ -15,32 +15,35 @@ $inputConfiguration = [
             'new_type'                    => 'string',              //post
             'remove_type'                 => 'word',                //get
             'update_type'                 => 'bool',                //post
-            'use_ratings'                 => 'bool',                //post
-            'show_pre_publ'               => 'bool',                //post
-            'heading_only'                => 'bool',                //post
-            'allow_comments'              => 'bool',                //post
-            'comment_can_rate_article'    => 'bool',                //post
-            'show_image'                  => 'bool',                //post
-            'show_avatar'                 => 'bool',                //post
-            'show_author'                 => 'bool',                //post
-            'show_pubdate'                => 'bool',                //post
-            'show_reads'                  => 'bool',                //post
-            'show_size'                   => 'bool',                //post
-            'show_topline'                => 'bool',                //post
-            'show_subtitle'               => 'bool',                //post
-            'show_image_caption'          => 'bool',                //post
-            'show_linkto'                 => 'bool',                //post
-            'creator_edit'                => 'bool',                //post
-            'new_attribute'               => 'string',              //post
             'att_remove'                  => 'int',                 //post
+            'att_type'                    => 'text',                //get
         ],
-        'staticKeyFiltersForArrays'       => [
+        'staticKeyFiltersForArrays'                => [
             'type_array'                  => 'string',              //post
+            'use_ratings'                 => 'string',                //post
+            'show_pre_publ'               => 'string',                //post
+            'heading_only'                => 'string',                //post
+            'allow_comments'              => 'string',                //post
+            'comment_can_rate_article'    => 'string',                //post
+            'show_image'                  => 'string',                //post
+            'show_avatar'                 => 'string',                //post
+            'show_author'                 => 'string',                //post
+            'show_pubdate'                => 'string',                //post
+            'show_reads'                  => 'string',                //post
+            'show_size'                   => 'string',                //post
+            'show_topline'                => 'string',                //post
+            'show_subtitle'               => 'string',                //post
+            'show_image_caption'          => 'string',                //post
+            'show_linkto'                 => 'string',                //post
+            'creator_edit'                => 'string',                //post
+            'new_attribute'               => 'string',              //post
         ],
     ]
 ];
-$section = 'cms';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_CMS;
+Sections::setCurrentSection($section);
 $artlib = TikiLib::lib('art');
 $access->check_feature('feature_articles');
 
@@ -48,8 +51,11 @@ $access->check_feature('feature_articles');
 $access->check_permission(['tiki_p_articles_admin_types']);
 
 if (isset($_REQUEST["add_type"])) {
-    if (! empty($_REQUEST["new_type"])) {
+    if (empty($_REQUEST["new_type"])) {
+        Feedback::error(tra('The article type field can not be empty'));
+    } else {
         $artlib->add_type($_REQUEST["new_type"]);
+        Feedback::success(tra('Article type saved successfully'));
     }
 } elseif (isset($_REQUEST["remove_type"])) {
     $access->checkCsrf();
@@ -108,6 +114,8 @@ if (isset($_REQUEST["add_type"])) {
             $ok = $artlib->add_article_type_attribute($this_type, $_REQUEST["new_attribute"][$this_type]);
             if (! $ok) {
                 Feedback::errorAndDie(tra("Failed to add attribute"), \Laminas\Http\Response::STATUS_CODE_409);
+            } else {
+                Feedback::success(tra("Article type attribute updated successfully"));
             }
         }
     }

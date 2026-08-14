@@ -1,4 +1,4 @@
-{if empty($iListExecute)}{assign var=iListExecute value=$id|replace:'wplistexecute-':''}{/if}
+{if empty($iListExecute)}{$iListExecute=$id|replace:'wplistexecute-':''}{/if}
 {if ! empty($downloadable) && ! empty($downloadabletop) && $downloadabletop == 'y'}
     <form method="post" id="listexecute-download-top-{$iListExecute}">
         <input type="hidden" name="download" value="1">
@@ -12,8 +12,6 @@
 {/if}
 {$showFacets = not empty($facets) and isset($tableparams.facets) and $tableparams.facets eq 'y'}
 {if $showFacets}
-{*    <pre>{$facets|var_dump}</pre>*}
-{*    <pre>{$results|var_dump}</pre>*}
     <div class="row">
         <div class="col-sm-2">
             <div class="facets filters" id="filters">
@@ -40,15 +38,13 @@
         {*    close these after the table </div></div>*}
         {if not empty($adddata)}
             {jq}
-                $.applySelect2();
                 $('.facets ul').registerFacet();
             {/jq}
         {/if}
 {/if}
 {if $actions}
-<form method="post" action="#{$id}" class="d-flex flex-row flex-wrap align-items-center list-executable" id="listexecute-{$iListExecute}" data-id="{$id}">
+<form method="post" action="#{$id}" class="d-flex flex-row flex-wrap align-items-center list-executable" id="listexecute-{$iListExecute}" data-id="{$id}" data-count="{$count}"{if $tsOn} data-page-reload="1"{/if}>
 <input type="hidden" name="plugin" value="{$fingerprint}">
-<input type="hidden" name="iListExecute" value="{$iListExecute}">
 {ticket}
 {/if}
 {if not empty($column.field)}
@@ -215,53 +211,56 @@
     });
 {/jq}
 {if $actions}
-    <div class="row w-100 list_execute_actions">
-        <div class="col-sm-1">
-            <input type="submit" class="btn btn-primary btn-sm list_execute_submit" title="{tr}Apply Changes{/tr}" id="submit_form_{$id}" disabled value="{tr}Apply{/tr}">
+    <div class="list_execute_actions mb-2 w-100">
+        <div class="row">
+            <div class="col mb-2">
+                <select name="list_action" class="form-control check_submit_select" id="check_submit_select_{$id}">
+                    <option></option>
+                    {foreach from=$actions item=action}
+                        <option value="{$action->getName()|escape}" data-input='{$action->requiresInput()}' data-inputtype='{$action->inputtype()}'{if $action->getDefault()} selected{/if}>
+                            {$action->getName()|tra|escape}
+                        </option>
+                    {/foreach}
+                </select>
+            </div>
+            <div class="col-auto list_input_container mb-2" id="list_input_container_{$id}" style="display:none"></div>
+            <div class="col-auto mb-2" style="display:none">
+                <input type="text" name="list_input" value="" class="form-control">
+            </div>
+            {*category_tree*}
+            {if $prefs.feature_categories eq 'y' and $tiki_p_modify_object_categories eq 'y' and count($categories) gt 0}
+                <div class="col-sm-12 mb-2 multiselect form-select cat_tree" style="display:none">
+                    {if is_array($categories) and count($categories) gt 0}
+                        {$cat_tree}
+                        <input type="hidden" name="cat_categorize" value="on">
+                        <div class="clearfix">
+                            {if $tiki_p_admin_categories eq 'y'}
+                                <div class="float-sm-end">
+                                    <a class="btn btn-link btn-sm tips" href="tiki-admin_categories.php" title=":{tr}Admin Categories{/tr}" role="button">
+                                        {icon name="cog"} {tr}Categories{/tr}
+                                    </a>
+                                </div>
+                            {/if}
+                            {select_all checkbox_names='cat_categories[]' label="{tr}Select/deselect all categories{/tr}"}
+                        </div> {* end .clear *}
+                    {else}
+                        <div class="clearfix">
+                            {if $tiki_p_admin_categories eq 'y'}
+                                <div class="float-sm-end">
+                                    <a class="btn btn-link" href="tiki-admin_categories.php" title=":{tr}Admin Categories{/tr}" role="button">
+                                        {icon name="cog"} {tr}Categories{/tr}
+                                    </a>
+                                </div>
+                            {/if}
+                        </div> {* end .clear *}
+                        {tr}No categories defined{/tr}
+                    {/if}
+                </div> {* end #multiselect *}
+            {/if}
+            <div class="col-auto align-self-center me-auto mb-2 ms-auto justify-content-center">
+                <input type="submit" class="btn btn-primary btn-sm list_execute_submit" title="{tr}Apply Changes{/tr}" id="submit_form_{$id}" disabled value="{if !empty($label)}{tr}{$label|escape}{/tr}{else}{tr}Apply{/tr}{/if}">
+            </div>
         </div>
-        <div class="col-sm-4">
-            <select name="list_action" class="form-control check_submit_select" id="check_submit_select_{$id}">
-                <option></option>
-                {foreach from=$actions item=action}
-                    <option value="{$action->getName()|escape}" data-input='{$action->requiresInput()}' data-inputtype='{$action->inputtype()}'{if $action->getDefault()} selected{/if}>
-                        {$action->getName()|escape}
-                    </option>
-                {/foreach}
-            </select>
-        </div>
-        <div class="col-sm-4 list_input_container" id="list_input_container_{$id}">
-        </div>
-        <input type="text" name="list_input" value="" class="form-control" style="display:none">
-        {*category_tree*}
-        {if $prefs.feature_categories eq 'y' and $tiki_p_modify_object_categories eq 'y' and count($categories) gt 0}
-            <div class="multiselect form-select cat_tree" style="display:none;">
-                {if is_array($categories) and count($categories) gt 0}
-                    {$cat_tree}
-                    <input type="hidden" name="cat_categorize" value="on">
-                    <div class="clearfix">
-                        {if $tiki_p_admin_categories eq 'y'}
-                            <div class="float-sm-end">
-                                <a class="btn btn-link btn-sm tips" href="tiki-admin_categories.php" title=":{tr}Admin Categories{/tr}">
-                                    {icon name="cog"} {tr}Categories{/tr}
-                                </a>
-                            </div>
-                        {/if}
-                        {select_all checkbox_names='cat_categories[]' label="{tr}Select/deselect all categories{/tr}"}
-                    </div> {* end .clear *}
-                {else}
-                    <div class="clearfix">
-                        {if $tiki_p_admin_categories eq 'y'}
-                            <div class="float-sm-end">
-                                <a class="btn btn-link" href="tiki-admin_categories.php" title=":{tr}Admin Categories{/tr}">
-                                    {icon name="cog"} {tr}Categories{/tr}
-                                </a>
-                            </div>
-                        {/if}
-                    </div> {* end .clear *}
-                    {tr}No categories defined{/tr}
-                {/if}
-            </div> {* end #multiselect *}
-        {/if}
     </div>
 
 </form>

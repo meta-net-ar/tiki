@@ -13,6 +13,48 @@ class Services_RecordRtc_Controller
         Services_Exception_Disabled::check('fgal_use_record_rtc_screen');
     }
 
+    public function action_render_audio_preview($input)
+    {
+        $smarty = TikiLib::lib('smarty');
+        $src = $input->src->url();
+
+        $smarty->assign('media_src', $src);
+        $smarty->assign('show_audio_preview', true);
+
+        return [
+            'html' => $smarty->fetch('modules/mod-recordrtc.tpl')
+        ];
+    }
+
+    public function action_render_video_preview($input)
+    {
+        $smarty = TikiLib::lib('smarty');
+        $src = $input->src->url();
+
+        $smarty->assign('media_src', $src);
+        $smarty->assign('show_video_preview', true);
+
+        return [
+            'html' => $smarty->fetch('modules/mod-recordrtc.tpl')
+        ];
+    }
+
+    public function action_render_modal_preview($input)
+    {
+        $smarty = TikiLib::lib('smarty');
+        $fileType = $input->filetype->word();
+        $mediaUrl = $input->mediaurl->url();
+
+        $smarty->assign('file_type', $fileType);
+        $smarty->assign('media_url', $mediaUrl);
+        $smarty->assign('isAudio', $fileType === 'audio');
+        $smarty->assign('show_modal_preview', true);
+
+        return [
+            'html' => $smarty->fetch('trackerinput/files.tpl')
+        ];
+    }
+
     public function action_upload($input)
     {
         require_once('tiki-setup.php');
@@ -22,7 +64,7 @@ class Services_RecordRtc_Controller
         $videoFilename = $input->videofilename->text();
         $audioFilename = $input->audiofilename->text();
         $ticket = $input->ticket->text();
-        $galleryId = $prefs['fgal_use_record_rtc_screen_gallery_id'] ?: $input->galleryId->text();
+        $galleryId = $input->galleryId->text() ?: $prefs['fgal_use_record_rtc_screen_gallery_id'];
 
         if (empty($audioFilename) && empty($videoFilename)) {
             throw new Services_Exception_NotFound('Empty file name.');
@@ -32,10 +74,12 @@ class Services_RecordRtc_Controller
             $fileName = $audioFilename;
             $tempName = $_FILES['audioblob']['tmp_name'];
             $_FILES['data'] = $_FILES['audioblob'];
+            $_FILES['data']['type'] = 'audio/webm';
         } else {
             $fileName = $videoFilename;
             $tempName = $_FILES['videoblob']['tmp_name'];
             $_FILES['data'] = $_FILES['videoblob'];
+            $_FILES['data']['type'] = 'video/webm';
         }
 
         if (empty($fileName) || empty($tempName)) {
@@ -63,7 +107,6 @@ class Services_RecordRtc_Controller
             return;
         }
         $_FILES['data']['name'] = $fileName;
-        $_FILES['data']['type'] = ($extension == 'webm') ? 'video/webm' : $_FILES['data']['type'];
 
         if ($galleryId) {
             $_FILES['data']['galleryId'] = $galleryId;

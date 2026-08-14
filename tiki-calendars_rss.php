@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 require_once('tiki-setup.php');
-TikiLib::lib('header')->setXRobotsTag($robots);
+require_once('tiki-sefurl.php');
 $rsslib = TikiLib::lib('rss');
 $calendarlib = TikiLib::lib('calendar');
 
@@ -34,9 +34,8 @@ if (isset($_REQUEST["calendarIds"])) {
     $uniqueid = $feed . "." . implode(".", $calendarIds);
 } else {
     $uniqueid = $feed;
-    $calendarIds = [];
 }
-$output = $rsslib->get_from_cache($uniqueid);
+$output = $rsslib->getGeneratedFeedFromCache($uniqueid);
 
 if ($output["data"] == "EMPTY") {
     $title = $prefs['feed_' . $feed . '_title'];
@@ -46,7 +45,6 @@ if ($output["data"] == "EMPTY") {
     $descId = "body";
     $dateId = "start";
     $authorId = "user";
-    $readrepl = "tiki-ajax_services.php?controller=calendar&action=view_item&calitemId=%s";
 
     $rawcals = $calendarlib->list_calendars();
     $rawcals['data'] = Perms::filter([ 'type' => 'calendar' ], 'object', $rawcals['data'], [ 'object' => 'calendarId' ], 'view_calendar');
@@ -74,13 +72,14 @@ if ($output["data"] == "EMPTY") {
          $item["body"] .= "<abbr class=\"dtstart\" title=\"" . $start_d . "\">" . tra("Start:") . " " . smarty_modifier_tiki_long_datetime($item["start"]) . "</abbr>" . "<br />\n";
         $item["body"] .= "<abbr class=\"dtend\" title=\"" . $end_d . "\">" . tra("End:") . " " . smarty_modifier_tiki_long_datetime($item["end"]) . "</abbr>" . "<br />\n";
         $item["body"] .= "<span class=\"description\">" . ($item["description"]) . "</span>" . "</div>";
+        $item["sefurl"] = smarty_modifier_sefurl($item["calitemId"], 'calendaritem');
     }
     unset($item);
 
     $changes = ['data' => $items];
     unset($items);
 
-    $output = $rsslib->generate_feed($feed, $uniqueid, '', $changes, $readrepl, '', $id, $title, $titleId, $desc, $descId, $dateId, $authorId);
+    $output = $rsslib->generate_feed($feed, $uniqueid, '', $changes, '', '', $id, $title, $titleId, $desc, $descId, $dateId, $authorId);
 }
 header("Content-type: " . $output["content-type"]);
 print $output["data"];

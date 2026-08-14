@@ -1,11 +1,15 @@
-// Journal 5.3.0
-// Bootswatch
+// Journal 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/journal/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/journal/_variables.scss"; // Bootswatch theme variables file
 
 //
 // Color system
 //
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 $primary:       #D24141; // $blue !default;
 $secondary:     #757575; // $gray-500 !default;
@@ -17,8 +21,9 @@ $danger:        #B85C00; // $red !default;
 //$dark:          $gray-900;  // default
 
 
-$green-300: tint-color($green, 40%);  // default
-$red-300: tint-color($red, 40%);  // default
+// Options
+// Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
 
 // Body
 $body-color: $gray-800;  // default
@@ -45,8 +50,12 @@ $form-invalid-color: #B85C00;
 // 53 $navbar-light-color:                rgba($black, .7);  // default
 $navbar-light-hover-color:          $black;  // default
 $navbar-light-active-color:         $black;  // default
+$navbar-dark-hover-color:           #18bc9c; // Updated for Tiki
 
 // Pagination
+// Accordion
+$accordion-button-bg:                     var(--#{$prefix}accordion-bg); // !default; ---- No effect
+
 // Code
 $code-color:                      $body-color; //   $pink;  // default // Bootstrap 5.3
 

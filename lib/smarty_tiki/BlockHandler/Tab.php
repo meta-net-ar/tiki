@@ -36,7 +36,7 @@ class Tab extends Base
 {
     public function handle($params, $content, Template $template, &$repeat)
     {
-        global $prefs, $smarty_tabset, $cookietab, $smarty_tabset_i_tab, $smarty_tabset_name;
+        global $prefs, $smarty_tabset, $cookietab, $cookietabTabset, $smarty_tabset_i_tab, $smarty_tabset_name;
         $smarty = \TikiLib::lib('smarty');
         if ($repeat) {
             return '';
@@ -57,7 +57,7 @@ class Tab extends Base
                 }
 
                 $id = $id = "content$name-{$params['key']}";
-                $active = ($smarty_tabset_i_tab == $cookietab) ? 'active' : '';
+                $active = ($smarty_tabset_i_tab == ($cookietabTabset ?? $cookietab)) ? 'active' : '';
                 $def = [
                     'label' => $params['name'],
                     'id' => $id,

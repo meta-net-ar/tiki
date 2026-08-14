@@ -66,14 +66,15 @@ function wikiplugin_groupstat_info()
 
 function wikiplugin_groupstat($data, $params)
 {
-    global $prefs;
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_groupstat_info());
+
     $userlib = TikiLib::lib('user');
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
 
-    if (isset($params['groups'])) {
+    if (! is_null($params['groups'])) {
         $groups = $params['groups'];
-        if (isset($params['percent_of']) && $params['percent_of'] == 'site') {
+        if ($params['percent_of'] == 'site') {
             $total = $userlib->nb_users_in_group();
         } else {
             $query = 'SELECT COUNT(DISTINCT `userId`) FROM `users_usergroups` WHERE `groupName` IN(' . implode(',', array_fill(0, count($groups), '?')) . ')';

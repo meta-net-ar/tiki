@@ -4,24 +4,24 @@
     <span class="formunit">{$prepend|escape}</span>
 {/if}
 {if $currency}
-    {assign var=currency value=$currency}
+    {$currency=$currency}
 {elseif empty($defaultCurrency)}
-    {assign var=currency value='USD'}
+    {$currency='USD'}
 {else}
-    {assign var=currency value=$defaultCurrency}
+    {$currency=$defaultCurrency}
 {/if}
 {if empty($symbol)}
-    {assign var=part1a value='%(!#10n'}
-    {assign var=part1b value='%(#10n'}
+    {$part1a='%(!#10n'}
+    {$part1b='%(#10n'}
 {else}
-    {assign var=part1a value='%(!#10'}
-    {assign var=part1b value='%(#10'}
+    {$part1a='%(!#10'}
+    {$part1b='%(#10'}
 {/if}
 {if (isset($reloff) and $reloff gt 0) and ($allSymbol ne 1)}
-    {assign var=format value=$part1a|cat:$symbol}
+    {$format=$part1a|cat:$symbol}
     {$amount|money_format:$locale:$currency:$format:0}
 {else}
-    {assign var=format value=$part1b|cat:$symbol}
+    {$format=$part1b|cat:$symbol}
     {$amount|money_format:$locale:$currency:$format:1}
 {/if}
 {if $append}
@@ -34,10 +34,10 @@
             <div class="modal-body">
     {foreach from=$conversions key=currency item=amount}
         {if (isset($reloff) and $reloff gt 0) and ($allSymbol ne 1)}
-            {assign var=format value=$part1a|cat:$symbol}
+            {$format=$part1a|cat:$symbol}
             {$amount|money_format:$locale:$currency:$format:0}
         {else}
-            {assign var=format value=$part1b|cat:$symbol}
+            {$format=$part1b|cat:$symbol}
             {$amount|money_format:$locale:$currency:$format:1}
         {/if}
         <br>

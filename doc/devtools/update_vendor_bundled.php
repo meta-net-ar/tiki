@@ -43,28 +43,6 @@ $final_md5 = md5_file($composerLock);
 printf('Getting md5 from %s after composer update...' . PHP_EOL . 'result: %s' . PHP_EOL, $composerLock, $final_md5);
 
 if ($initial_md5 !== $final_md5) {
-    $jsonContent = json_decode(file_get_contents($composerLock));
-
-    if (! empty($jsonContent->packages)) {
-        $errors = [];
-        foreach ($jsonContent->packages as $package) {
-            if (! empty($package->type) && $package->type === "metapackage") {
-                continue; // metapackage is a empty package and does not have dist.url
-            }
-            if (strrpos($package->dist->url, 'https://composer.tiki.org') !== 0) {
-                $errors[] = "Package: " . $package->name . ", dist.url: " . $package->dist->url;
-            }
-        }
-        if (count($errors)) {
-            echo PHP_EOL;
-            foreach ($errors as $error) {
-                echo $error . PHP_EOL;
-            }
-            echo PHP_EOL . "Error: composer.lock might contain packages from unverified sources. Aborting." . PHP_EOL . PHP_EOL;
-            exit(1);
-        }
-    }
-
     printf("Vendor bundled dependencies updated");
 } else {
     printf("Nothing to be done...");

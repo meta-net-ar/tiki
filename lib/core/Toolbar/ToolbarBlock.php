@@ -36,13 +36,13 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
             case 'pagebreak':
                 $label = tra('Page Break');
                 $iconname = 'page-break';
-                $wysiwyg = 'PageBreak';
+                $wysiwyg = '';
                 $syntax = $prefs['wiki_page_separator'];
                 break;
             case 'box':
                 $label = tra('Box');
                 $iconname = 'box';
-                $wysiwyg = 'Box';
+                $wysiwyg = '';
                 $syntax = '^text^';
                 break;
             case 'email':
@@ -73,7 +73,6 @@ class ToolbarBlock extends ToolbarInline // Will change in the future
             case 'toc':
                 $label = tra('Table of contents');
                 $iconname = 'book';
-                $wysiwyg = 'TOC';
                 $syntax = '{maketoc}';
                 break;
             case 'task':

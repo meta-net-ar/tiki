@@ -71,6 +71,6 @@ function module_breadcrumb($mod_reference, $module_params)
 
     $bbreadCrumb = array_slice(array_reverse($fullBreadCrumb), 0, $mod_reference['rows']);
     $smarty->assign('breadCrumb', $bbreadCrumb);
-    $smarty->assign('maxlen', isset($module_params["maxlen"]) ? $module_params["maxlen"] : 0);
-    $smarty->assign('namespaceoption', isset($module_params['show_namespace']) ? $module_params['show_namespace'] : 'y');
+    $smarty->assign('maxlen', $module_params["maxlen"] ?? 0);
+    $smarty->assign('namespaceoption', $module_params['show_namespace'] ?? 'y');
 }

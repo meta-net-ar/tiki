@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -29,14 +29,14 @@ if (isset($_POST['action']) and isset($_POST['attId'])) {
 
 if (isset($_POST['all2db']) && $access->checkCsrf()) {
     $attachments = $wikilib->list_all_attachments();
-    for ($i = 0; $i < $attachments['cant']; $i++) {
+    for ($i = 0; $i < $attachments['count']; $i++) {
         if ($attachments['data'][$i]['path']) {
             $wikilib->file_to_db($prefs['w_use_dir'] . $attachments['data'][$i]['path'], $attachments['data'][$i]['attId']);
         }
     }
 } elseif (isset($_POST['all2file']) && $access->checkCsrf()) {
     $attachments = $wikilib->list_all_attachments();
-    for ($i = 0; $i < $attachments['cant']; $i++) {
+    for ($i = 0; $i < $attachments['count']; $i++) {
         if (! $attachments['data'][$i]['path']) {
             $wikilib->db_to_file($attachments['data'][$i]['filename'], $attachments['data'][$i]['attId']);
         }
@@ -58,7 +58,7 @@ $smarty->assign_by_ref('find', $find);
 $smarty->assign_by_ref('offset', $offset);
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $attachments = $wikilib->list_all_attachments($offset, $maxRecords, $sort_mode, $find);
-$smarty->assign_by_ref('cant_pages', $attachments['cant']);
+$smarty->assign_by_ref('pages_count', $attachments['count']);
 $smarty->assign_by_ref('attachments', $attachments['data']);
 $urlquery['find'] = $find;
 $urlquery['page'] = 'wikiatt';

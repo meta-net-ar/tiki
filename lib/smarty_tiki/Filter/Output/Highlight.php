@@ -10,8 +10,8 @@ namespace SmartyTiki\Filter\Output;
 /**
  * Smarty outfilter highlight
  * -------------------------------------------------------------
- * Purpose:  Adds Google-cache-like highlighting for terms in a
- *           template after its rendered. This can be used
+ * Purpose: Adds Google-cache-like highlighting for terms in a
+ *           template after it's rendered. This can be used
  *           easily integrated with the wiki search functionality
  *           to provide highlighted search terms.
  * -------------------------------------------------------------
@@ -26,7 +26,13 @@ class Highlight implements \Smarty\Filter\FilterInterface
         if (empty($_REQUEST['highlight'])) {
             return $source;
         }
-        if (! preg_match('/<.+\s.*?class="[^"]*\bhighlightable\b[^"]*"/', $source, $m, PREG_OFFSET_CAPTURE)) {   // the main page contents appears without the col1 but with 2 and 3 appended
+
+        // FIX: prevent nested highlight spans when filter runs multiple times on same content
+        if (strpos($source, 'highlight_word') !== false) {
+            return $source;
+        }
+
+        if (! preg_match('/<.+\s.*?class="[^"]*\bhighlightable\b[^"]*"/', $source, $m, PREG_OFFSET_CAPTURE)) {
             return $source;
         }
         $highlight = $_REQUEST['highlight'];
@@ -34,7 +40,6 @@ class Highlight implements \Smarty\Filter\FilterInterface
         if (isset($_REQUEST['boolean']) && ($_REQUEST['boolean'] == 'on' || $_REQUEST['boolean'] == 'y')) {
             $highlight = str_replace(['(', ')', '*', '-', '"', '~', '<', '>'], ' ', $highlight);
         }
-
         if ($prefs['feature_referer_highlight'] == 'y') {
             $refererhi = self::refererhi();
             if (isset($refererhi) && ! empty($refererhi)) {
@@ -45,6 +50,7 @@ class Highlight implements \Smarty\Filter\FilterInterface
                 }
             }
         }
+
         if (! isset($highlight) || empty($highlight)) {
             return $source;
         }
@@ -65,24 +71,26 @@ class Highlight implements \Smarty\Filter\FilterInterface
 
         if (function_exists('mb_eregi')) {
             // UTF8 support enabled
+            // Attempt to split the document into sections; fallback handling is applied below if it doesn't match
             $result = mb_eregi('^(.*<article [^>]*>)(.*)' . $stop_pattern . '$', $source, $matches);
         } else {
             // We do not fallback on the preg_match function, since it is limited by 'pcre.backtrack_limit' which is too low by default (100K)
             //  and this script will not be allowed to change its value on most systems
             //
-            if (( $start = strpos($source, '<article ') ) > 0) {
+            if (($start = strpos($source, '<article ')) > 0) {
                 $matches = [
                     $source,
                     substr($source, 0, $start),
-                    ( $end > $start ? substr($source, $start, $end - $start) : substr($source, $start) ),
-                    ( $end > $start ? substr($source, $end) : '' )
+                    ($end > $start ? substr($source, $start, $end - $start) : substr($source, $start)),
+                    ($end > $start ? substr($source, $end) : ''),
                 ];
                 $result = true;
             }
         }
 
+        // If no split occurred, treat the entire document as the target for processing
         if (! $result) {
-            return $source;
+            $matches = [$source, '', $source, ''];
         }
         if (strlen($matches[2]) > ini_get('pcre.backtrack_limit')) {
             return $source;
@@ -92,14 +100,16 @@ class Highlight implements \Smarty\Filter\FilterInterface
             $matches[3] = '';
         }
 
-        // Avoid highlight parsing in unknown cases where $matches[2] is empty, which will result in an empty page.
+        // Avoid processing when $matches[2] is empty (prevents blank page);
+        // operate on it directly, as using $source would discard highlights on return
         if ($matches[2] != '') {
-            $source = preg_replace_callback(
+            $matches[2] = preg_replace_callback(
                 '~(?:<head>.*</head>                            # head blocks
                 |<div[^>]*nohighlight.*</div><!--nohighlight--> # div with nohightlight
                 |<div[^>]*adminoption.*</div>                   # pref in a popup so double quote breaks it
                 |<script[^>]+>.*</script>                       # script blocks
                 |<a[^>]*onmouseover.*onmouseout[^>]*>           # onmouseover (user popup)
+                |<span\s[^>]*highlight_word[^>]*>[^<]*</span>   # prevent nested highlights
                 |<[^>]*>                                        # all html tags
                 |(' . self::enlightColor($highlight) . '))~xsiU',
                 [self::class, 'enlightColor'],  // Pass the method as callback
@@ -107,15 +117,16 @@ class Highlight implements \Smarty\Filter\FilterInterface
             );
         }
 
-        return $matches[1] . $source . $matches[3];
+        return $matches[1] . $matches[2] . $matches[3];
     }
 
     public static function enlightColor($matches)
     {
         static $colword = [];
-        if (is_string($matches)) { // just to set the color array
-            // Wrap all the highlight words with tags bolding them and changing
-            // their background colors
+
+        // FIX: build regex + color map (UTF-8 safe + stable init)
+        if (is_string($matches)) {
+            $colword = [];
             $i = 0;
             $seaword = $seasep = '';
             $wordArr = preg_split('~%20|\+|\s+~', $matches);

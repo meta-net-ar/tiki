@@ -42,8 +42,9 @@ function wikiplugin_param_info()
             'value' => [
                 'required' => false,
                 'name' => tra('Value'),
-                'description' => tra('Value to test for. If empty then just tests if the named params are set and not
-                    "empty".'),
+                'separator' => '|',
+                'description' => tra('Value to test for. Multiple values can be separated by a pipe | character.' .
+                    'If empty then just tests if the named params are set and not "empty".'),
                 'since' => '13.1',
                 'filter' => 'text',
             ],
@@ -53,6 +54,8 @@ function wikiplugin_param_info()
 
 function wikiplugin_param($data, $params)
 {
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_param_info());
+
     $dataelse = '';
     $test = true;
 
@@ -60,12 +63,12 @@ function wikiplugin_param($data, $params)
     $noparsed = [];
     $parserlib->plugins_remove($data, $noparsed);
 
-    if (strpos($data, '{ELSE}')) {
+    if (str_contains($data, '{ELSE}')) {
         $dataelse = substr($data, strpos($data, '{ELSE}') + 6);
         $data = substr($data, 0, strpos($data, '{ELSE}'));
     }
 
-    if (! isset($params['source']) || empty($params['source'])) {
+    if (empty($params['source'])) {
         $params['source'] = 'request';
     }
 
@@ -73,20 +76,25 @@ function wikiplugin_param($data, $params)
         $value = null;
         switch ($params['source']) {
             case 'get':
-                $value = isset($_GET[$name]) ? $_GET[$name] : null;
+                $value = $_GET[$name] ?? null;
                 break;
             case 'post':
-                $value = isset($_POST[$name]) ? $_POST[$name] : null;
+                $value = $_POST[$name] ?? null;
                 break;
             case 'cookie':
-                $value = isset($_COOKIE[$name]) ? $_COOKIE[$name] : null;
+                $value = $_COOKIE[$name] ?? null;
                 break;
             default:
-                $value = isset($_REQUEST[$name]) ? $_REQUEST[$name] : null;
+                $value = $_REQUEST[$name] ?? null;
                 break;
         }
         if (isset($params['value'])) {
-            if ($value !== $params['value']) {
+            if (is_array($params['value'])) {
+                if (! in_array($value, $params['value'])) {
+                    $test = false;
+                    break;
+                }
+            } elseif ($value !== $params['value']) {
                 $test = false;
                 break;
             }

@@ -11,6 +11,7 @@ class Search_Elastic_BulkOperation
     private $callback;
     private $mapping_type;
     private $buffer = '';
+    private $max_buffer_size = 20 * 1024 * 1024; // 20MB, ES defaults http.max_content_length to 100MB but it is safer to flush more frequently
 
     public function __construct($limit, $callback, $mapping_type)
     {
@@ -80,7 +81,7 @@ class Search_Elastic_BulkOperation
             }
         }
 
-        if ($this->count >= $this->limit) {
+        if ($this->count >= $this->limit || strlen($this->buffer) >= $this->max_buffer_size) {
             $this->flush();
         }
     }

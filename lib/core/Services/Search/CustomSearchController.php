@@ -7,6 +7,7 @@
 // Controller to process requests from the custom search plugin using the list plugin to display results
 // Refactored from customsearch_ajax.php for Tiki
 
+use Tiki\Lib\Wiki\PluginsLibUtil;
 
 class Services_Search_CustomSearchController
 {
@@ -60,7 +61,7 @@ class Services_Search_CustomSearchController
 
         $adddata = json_decode($input->adddata->text(), true);
 
-        $recalllastsearch = $input->recalllastsearch->int() ? true : false;
+        $recalllastsearch = $input->recalllastsearch->int();
 
         $id = $input->searchid->text();
         if (empty($id)) {
@@ -190,7 +191,6 @@ class Services_Search_CustomSearchController
         $facetsBuilder->build($query, $unifiedsearchlib->getFacetProvider());
 
         $index = $unifiedsearchlib->getIndex();
-        require_once 'lib/wiki/pluginslib.php';
         PluginsLibUtil::handleDownload($query, $index, $matches, $input->asArray());
         $resultSet = $query->search($index);
         if (! empty($_SESSION['tikifeedback']) && $_SESSION['tikifeedback'][0]['type'] === 'error') {
@@ -256,7 +256,7 @@ class Services_Search_CustomSearchController
     private function cs_dataappend_content(Search_Query $query, $config, $value)
     {
         if (( isset($config['_textrange']) || isset($config['_daterange']) ) && ( isset($config['_emptyfrom']) || isset($config['_emptyto']) )  && $value <= '') {
-            $value = isset($config['_emptyfrom']) ? $config['_emptyfrom'] : $config['_emptyto'];
+            $value = $config['_emptyfrom'] ?? $config['_emptyto'];
         }
         if ($value > '') {
             if (isset($config['_textrange'])) {
@@ -281,6 +281,8 @@ class Services_Search_CustomSearchController
                 } else {
                     $query->filterContent($config['_value'], $config['_field']);
                 }
+            } elseif ($config['type'] == 'ignore') {
+                return;
             } else {
                 if ($config['type'] == 'select' && ! empty($config['multiple']) && ! empty($config['_operator'])) {
                     $value = str_replace(' ', " {$config['_operator']} ", $value);

@@ -6,7 +6,7 @@
         </span>
     </div>
     <div class="flex-grow-1 ms-3">
-        {icon name="admin_i18n" size=3 iclass="adminWizardIconright"}
+        {icon name="admin_i18n" size=3 iclass="adminWizardIconright float-end ms-2"}
         <h4 class="mt-0 mb-4">{tr}Select the site language{/tr}</h4>
         <fieldset>
             <legend>{tr}Language options{/tr}</legend>

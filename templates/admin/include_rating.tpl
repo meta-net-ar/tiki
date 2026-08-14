@@ -5,7 +5,7 @@
             {include file='admin/include_apply_top.tpl'}
         </div>
     </div>
-
+    <div class="styling-element">
     <fieldset>
         <legend class="h3">{tr}Global configuration{/tr}</legend>
         {preference name=rating_recalculation}
@@ -143,6 +143,7 @@
             </div>
         </fieldset>
     </form>
+</div>
 </div>
 {jq}
     $('form.config').on("submit", function( e ) {

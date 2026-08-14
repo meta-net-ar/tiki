@@ -11,6 +11,7 @@ function prefs_javascript_list()
             'name' => tra('Use CDN for JavaScript'),
             'description' => tra('Obtain jQuery and jQuery UI libraries through a content delivery network (CDN).'),
             'type' => 'list',
+            'help' => 'Content-delivery-network',
             'options' => [
                 'none' => tra('None'),
                 'google' => tra('Google'),

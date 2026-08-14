@@ -26,7 +26,13 @@ function module_pagetop_hero_info()
             'breadcrumbs' => [
                 'required' => false,
                 'name' => tr('Breadcrumbs'),
-                'description' => tr('Allows you to specify the navigation paths to arrive at the current page, Separate items to display with commas'),
+                'description' => tr('Allows you to specify the navigation paths to arrive at the current page. Separate items with commas. Use pipe (|) to specify custom text and URL: "Text|URL".'),
+            ],
+            'breadcrumbs_auto_link' => [
+                'required' => false,
+                'name' => tr('Breadcrumbs auto-link'),
+                'description' => tr('Automatically convert breadcrumb items to links. When enabled, each item becomes a link to itself unless pipe (|) is used to override. (y|n)'),
+                'default' => 'n'
             ],
             'content_position' => [
                 'required' => false,
@@ -70,15 +76,35 @@ function module_pagetop_hero($mod_reference, $module_params)
 
     $pagetitle = '';
     $breadcrumbs = [];
+    $auto_link = isset($module_params["breadcrumbs_auto_link"]) && $module_params["breadcrumbs_auto_link"] == 'y';
+
     if (isset($module_params["usepagename"]) && $module_params["usepagename"] == 'y') {
         $pagetitle = $_REQUEST['page'] ?? '';
-        $breadcrumbs[] = tra("Home");
-        $breadcrumbs[] = $pagetitle;
+        $breadcrumbs[] = ['text' => tra("Home"), 'url' => null];
+        $breadcrumbs[] = ['text' => $pagetitle, 'url' => null];
     } else {
         $pagetitle = $module_params["pagetitle"] ?? '';
         if (! empty($module_params["breadcrumbs"])) {
-            $breadcrumbs = isset($module_params["breadcrumbs"]) ? explode(",", $module_params["breadcrumbs"]) : [];
-            $breadcrumbs[] = $pagetitle;
+            $items = explode(",", $module_params["breadcrumbs"]);
+            foreach ($items as $item) {
+                $item = trim($item);
+                if (strpos($item, '|') !== false) {
+                    // Item has pipe: Text|URL
+                    list($text, $url) = explode('|', $item, 2);
+                    $breadcrumbs[] = ['text' => trim($text), 'url' => trim($url)];
+                } else {
+                    // Item without pipe
+                    if ($auto_link) {
+                        $breadcrumbs[] = ['text' => $item, 'url' => $item];
+                    } else {
+                        $breadcrumbs[] = ['text' => $item, 'url' => null];
+                    }
+                }
+            }
+            // Add page title as last breadcrumb (non-clickable)
+            if (! empty($pagetitle)) {
+                $breadcrumbs[] = ['text' => $pagetitle, 'url' => null];
+            }
         }
     }
 

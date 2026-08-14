@@ -1,0 +1,143 @@
+// This file can be imported by themes to solve the problem of specifying different colors for the top zone and topbar zone,
+// since this isn't possible with the standard Bootstrap navbar-dark and navbar-light variables.
+// Use of this file assumes one color set for the top zone and its parents, and one color set for the topbar zone and its parents,
+// although these can be the same.
+// Admin navbar and anchors (when UAB is off) also can get color information here for themes that include this file.
+// Exceptions can be made as needed with specific CSS.
+
+// Themes using this file should define the variables used in this file as described on https://themes.tiki.org/CSS Variables in Tiki
+
+// Formerly used selectors that were replaced by one selector for each module zone and color choice:
+// Top module zone and parent divs - Light color
+//.layout_basic .page-header.navbar-light-parent.bg-light-parent,        // Single-container layout -- Parent of the top module zone
+//.layout_classic .header_outer.bg-light-parent,                         // Classic Tiki layout -- Parent of the top module zone
+//.tiki-admin .navbar-light-parent,                       // Classic Tiki unified admin backend
+//.tiki-admin .top_modules.navbar-light-parent,
+//.layout_social header.navbar-light-parent.bg-light-parent,             // Classic Bootstrap layout (fixed-top navbar) -- Complete header
+//.layout_social header.navbar.navbar-light.bg-light                     // Classic Bootstrap layout -- Menu itself
+.tiki .tiki-top-nav-light
+{
+    background: var(--tiki-top-bg) !important;
+    // color: var(--tiki-top-color); // The idea for this was text, etc. that isn't a link, but probably anything in these nav zones that isn't a link will have its own CSS rules already.
+    a:not(.navbar-brand,.dropdown-item),
+    .btn.btn-link {
+        color: var(--tiki-top-color);
+        &:hover {
+            color: var(--tiki-top-hover-color);
+            background: var(--tiki-top-hover-bg);
+        }
+    }
+    border: var(--tiki-top-border); // Style and color, for example, solid black
+    border-width: var(--tiki-top-border-width); // For example, 1px, or 0px 0px 4px 0px
+    box-shadow: var(--tiki-top-box-shadow);
+}
+
+// Topbar module zone and parent divs - light color
+//.layout_basic .topbar_modules.navbar-light.bg-light,                  // Topbar, which probably includes another nav menu
+//.layout_classic .topbar-wrapper.bg-light-parent,                              // Classic Tiki layout -- Parent of the topbar module zone
+//.layout_social .topbar-wrapper.navbar-light-parent.bg-light-parent,   // Classic Bootstrap topbar wrapper
+//.admin-content .bg-light                                              // Admin navbar and icons when UAB is off
+.tiki .tiki-topbar-nav-light,
+.admin-content .tiki-nav-light // Legacy admin icons
+{
+    background: var(--tiki-topbar-bg) !important;
+    //color: var(--tiki-topbar-color);
+    a:not(.navbar-brand,.dropdown-item),
+    .btn.btn-link,
+    a.nav-link {
+        color: var(--tiki-topbar-color);
+        &:hover {
+            color: var(--tiki-topbar-hover-color);
+            background: var(--tiki-topbar-hover-bg);
+        }
+    }
+    border: var(--tiki-topbar-border); // Style and color, for example, solid black
+    border-width: var(--tiki-topbar-border-width); // For eaxmple, 1px, or 0px 0px 4px 0px
+    box-shadow: var(--tiki-topbar-box-shadow);
+}
+
+// Top module zone and parent divs - dark color
+//.layout_basic .page-header.navbar-dark-parent.bg-dark-parent,         // Single-container layout -- Parent of the top module zone
+//.layout_classic .header_outer.bg-dark-parent,                         // Classic Tiki layout -- Parent of the top module zone
+//.tiki-admin .navbar-dark-parent,                       // Classic Tiki unified admin backend
+//.tiki-admin .top_modules.navbar-dark-parent,
+//.layout_social header.navbar-light-parent.bg-dark-parent,             // Classic Bootstrap layout (fixed-top navbar) -- Complete header
+//.layout_social header.navbar.navbar-dark.bg-dark                     // Classic Bootstrap layout -- Menu itself
+.tiki .tiki-top-nav-dark
+{
+    background: var(--tiki-top-bg) !important;
+    // color: var(--tiki-top-color);
+    a:not(.navbar-brand,.dropdown-item),
+    .btn.btn-link,
+    a.nav-link  {
+        color: var(--tiki-top-color);
+        &:hover {
+            color: var(--tiki-top-hover-color);
+            background: var(--tiki-top-hover-bg);
+        }
+    }
+    border: var(--tiki-top-border);
+    border-width: var(--tiki-top-border-width);
+    box-shadow: var(--tiki-top-box-shadow);
+}
+
+// Topbar module zone and parent divs - dark color
+//.layout_basic .topbar_modules.bg-dark,                               // Single Container layout -- Topbar, which probably includes another nav menu
+//.layout_classic .topbar-wrapper.bg-dark-parent,                              // Classic Tiki layout -- Parent of the topbar module zone
+//.layout_social .topbar-wrapper.navbar-dark-parent.bg-dark-parent,     // Classic Bootstrap topbar wrapper
+//.admin-content .bg-dark
+.tiki .tiki-topbar-nav-dark,
+.admin-content .tiki-nav-dark // Legacy admin icons
+{
+    background: var(--tiki-topbar-bg) !important;
+    // color: var(--tiki-topbar-dark-color);
+    a:not(.navbar-brand,.dropdown-item),
+    .btn.btn-link,
+    a.nav-link  {
+        color: var(--tiki-topbar-color);
+        &:hover {
+            color: var(--tiki-topbar-hover-color);
+            background: var(--tiki-topbar-hover-bg);
+        }
+    }
+    border: var(--tiki-topbar-border);
+    border-width: var(--tiki-topbar-border-width);
+    box-shadow: var(--tiki-topbar-box-shadow);
+}
+
+// Apply background: transparent to children of uppermost parent to prevent nested gradients
+
+.tiki.layout_basic/*:not(.tiki-admin)*/ {
+    .page-header .top_modules,
+    .page-header .top_modules .navbar,
+    .topbar_modules .navbar {
+        background: transparent !important;
+        --bs-bg-opacity: 0 !important;
+        box-shadow: none;
+        border: none;
+    }
+}
+
+.tiki.layout_classic {
+    .top_modules .navbar,
+    .topbar,
+    .topbar_modules,
+    .topbar_modules .navbar {
+        background: transparent !important;
+        --bs-bg-opacity: 0 !important;
+        box-shadow: none;
+        border: none;
+    }
+}
+
+.layout_social/*:not(.tiki-admin)*/ {
+    header .top_modules,
+    header .top_modules .navbar,
+    .topbar,
+    .topbar .navbar {
+        background: transparent !important;
+        --bs-bg-opacity: 0 !important;
+        box-shadow: none;
+        border: none;
+    }
+}

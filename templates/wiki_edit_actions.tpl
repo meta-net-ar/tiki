@@ -21,15 +21,15 @@
             {/if}
         {/if}
         {if $page|lower ne 'sandbox'}
-            <input type="button" id="cancelEditBtn" class="wikiaction btn btn-link" title="{tr}Cancel the edit (changes will be lost).{/tr}" name="cancel_edit" value="{tr}Cancel Edit{/tr}" onclick="needToConfirm=false;">
+            <input type="button" class="wikiaction btn btn-link cancelEditBtn" title="{tr}Cancel the edit (changes will be lost).{/tr}" name="cancel_edit" value="{tr}Cancel Edit{/tr}" onclick="needToConfirm=false;">
             {jq}
-                $("#cancelEditBtn").on('click', function () {
-                const rootPath = '{{$rootPath}}';
-                const parentForm = $(this).closest('form');
-                const actionUrl = rootPath+parentForm.attr('action');
-                const cancelUrl = new URL(actionUrl);
-                cancelUrl.searchParams.set('cancel_edit', 1);
-                window.location.href = cancelUrl.toString();
+                $(".cancelEditBtn").off('click.cancelEdit').on('click.cancelEdit', function () {
+                    const rootPath = '{{$rootPath}}';
+                    const parentForm = $(this).closest('form');
+                    const actionUrl = rootPath + parentForm.attr('action');
+                    const cancelUrl = new URL(actionUrl);
+                    cancelUrl.searchParams.set('cancel_edit', 1);
+                    window.location.href = cancelUrl.toString();
                 });
             {/jq}
         {/if}

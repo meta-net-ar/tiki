@@ -16,12 +16,19 @@ namespace SmartyTiki\Modifier;
  * Input:    string: string representing a moment
  *           format: strftime() format for output. For standard formats, see modifiers tiki_{long,short}_{date,datetime,time}.
  *           _user: if specified, use this user timezone instead of the current user
+ *           forceTimezone: the time zone to be applied, if you prefer to use a specific timezone.
  * -------------------------------------------------------------
  */
 class TikiDateFormat
 {
-    public function handle($string, $format, $_user = false)
+    /**
+     * @param $string the string representing the date to be formatted.
+     * @param $format the desired date format.
+     * @param $_user if specified, use this user's timezone instead of the current user's, if specified forceTimezone must be false.
+     * @param $forceTimezone the time zone to be applied. Can be a timezone identifier or false, if user is not false forceTimezone must always be false.
+     */
+    public function handle($string, $format, $_user = false, $forceTimezone = false)
     {
-        return \TikiLib::date_format(tra($format), $string, $_user);
+        return \TikiLib::date_format(tra($format), $string, $_user, 5, true, $forceTimezone);
     }
 }

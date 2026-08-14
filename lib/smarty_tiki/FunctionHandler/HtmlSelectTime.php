@@ -9,6 +9,7 @@ namespace SmartyTiki\FunctionHandler;
 
 use Smarty\FunctionHandler\Base;
 use Smarty\Template;
+use Tiki\Lib\TikiDate;
 
 /**
  * Smarty {html_select_time} function handler
@@ -40,7 +41,8 @@ class HtmlSelectTime extends Base
         $minute_interval    = 1;
         $second_interval    = 1;
         $hour_minmax        = '0-23';
-        $tikidate = new \TikiDate();
+        $add_end_minute     = true;
+        $tikidate = new TikiDate();
         /* Should the select boxes be part of an array when returned from PHP?
        e.g. setting it to "birthday", would create "birthday[Hour]",
        "birthday[Minute]", "birthday[Seconds]" & "birthday[Meridian]".
@@ -55,7 +57,7 @@ class HtmlSelectTime extends Base
         $minute_empty = null;
         $second_empty = null;
         $all_empty = null;
-        $class = 'form-control date';
+        $class = 'form-control date-time-selector-field';
 
         extract($params);
         if (! empty($all_empty)) {
@@ -64,12 +66,12 @@ class HtmlSelectTime extends Base
 
         if (! isset($time) or ! $time) {
             $time = $tikilib->now;
-        } elseif (is_string($time) && strpos($time, ':') !== false) {
+        } elseif (is_string($time) && str_contains($time, ':')) {
             $e = explode(':', $time, 3);
             $time = $tikilib->make_time(
-                isset($e[0]) ? $e[0] : 0,
-                isset($e[1]) ? $e[1] : 0,
-                isset($e[2]) ? $e[2] : 0,
+                $e[0] ?? 0,
+                $e[1] ?? 0,
+                $e[2] ?? 0,
                 $tikilib->date_format('%m'),
                 $tikilib->date_format('%d'),
                 $tikilib->date_format('%Y')
@@ -154,7 +156,8 @@ class HtmlSelectTime extends Base
                 $minutes[] = sprintf('%02d', $all_minutes[$i]);
             }
 
-            if ($minute_interval > 1) {
+            // Add 59 minutes option when using intervals > 1, unless explicitly disabled
+            if ($minute_interval > 1 && $add_end_minute) {
                 $minutes[] = 59;
             }
 

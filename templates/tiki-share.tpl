@@ -127,8 +127,8 @@
                             {tr}Recipient(s){/tr}
                         </label>
                         <div class="col-sm-9">
-                            {if $prefs.feature_jquery_autocomplete == 'y'}
-                                {user_selector contact='true' user = '' multiple='true' editable='y' mustmatch='false' group='all' name='addresses' id='addresses' class='form-control' user_selector_threshold=0 style='width:99%'}
+                            {if $prefs.elementplus_select == 'y'}
+                                {user_selector contact='true' lazy=true user = '' multiple='true' editable='y' mustmatch='false' group='all' name='addresses' id='addresses' class='form-control' user_selector_threshold=0 style='width:99%'}
                                 <span class="form-text">
                                     {tr}Separate multiple email addresses with a comma and a space{/tr}
                                 </span>
@@ -217,10 +217,14 @@
                     </td>
                     <td>
                         {if $twitter}
-                            <input type="radio" name="do_tweet" value="1">
-                            {tr}Yes{/tr}
-                            <input type="radio" name="do_tweet" value="0" checked="checked">
-                            {tr}No{/tr}
+                            <label class="col-form-label">
+                                <input type="radio" name="do_tweet" value="1">
+                                {tr}Yes{/tr}
+                            </label>
+                            <label class="col-form-label">
+                                <input type="radio" name="do_tweet" value="0" checked="checked">
+                                {tr}No{/tr}
+                            </label>
                         {else}
                             {remarksbox type="note" title="{tr}Note{/tr}"}
                                 <p><a href="tiki-socialnetworks.php" class="alert-link">{tr}Authorize with Twitter first{/tr}</a></p>
@@ -256,10 +260,14 @@
                     </td>
                     <td>
                         {if $facebook}
-                            <input type="radio" name="do_fb" value="1">
-                            {tr}Yes{/tr}
-                            <input type="radio" name="do_fb" value="0" checked="checked">
-                            {tr}No{/tr}
+                            <label class="col-form-label">
+                                <input type="radio" name="do_fb" value="1">
+                                {tr}Yes{/tr}
+                            </label>
+                            <label class="col-form-label">
+                                <input type="radio" name="do_fb" value="0" checked="checked">
+                                {tr}No{/tr}
+                            </label>
                         {else}
                             {remarksbox type="note" title="{tr}Note{/tr}"}
                                 <p><a href="tiki-socialnetworks.php" class="alert-link">{tr}Authorize with Facebook first{/tr}</a></p>
@@ -329,8 +337,8 @@
                             {tr}User(s){/tr}
                         </label>
                         <div class="col-sm-9">
-                            {if $prefs.feature_jquery_autocomplete == 'y'}
-                                {user_selector user = '' editable='y' multiple='true' name='messageto' style='width:99%' user_selector_threshold=0}
+                            {if $prefs.elementplus_select == 'y'}
+                                {user_selector user = '' lazy=true editable='y' multiple='true' name='messageto' realnames='n' style='width:99%' user_selector_threshold=0}
                             {else}
                                 <input class="form-control" type="text" class="form-control" name="messageto" value="{$messageto|escape}">
                             {/if}
@@ -353,6 +361,49 @@
                             </select>
                         </div>
                     </div>
+                    {if $prefs.auth_token_share eq 'y' and $user!='' and $report !='y'}
+                        <div class="mb-3 row">
+                            <div class="offset-sm-3 col-sm-9">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" class="form-check-input" value="1" name="msg_share_access" id="msg_share_access" {if $msg_share_access}checked="checked" {/if}> {tr}Share access rights{/tr}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
+                    {if $prefs.share_token_notification eq 'y'}
+                        <div class="mb-3 row">
+                            <div class="offset-sm-3 col-sm-9">
+                                <div class="form-check">
+                                    <label class="form-check-label">
+                                        <input type="checkbox" class="form-check-input" value="y" name="msg_share_token_notification" {if $msg_share_token_notification eq 'y'}checked="checked" {/if}> {tr}Receive notifications when the link is accessed{/tr}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    {/if}
+                    {if $prefs.share_can_choose_how_much_time_access eq 'y' && $prefs.auth_token_access eq 'y'}
+                        <div class="mb-3 row">
+                            <label for="msg_how_much_time_access" class="col-form-label col-sm-3">
+                                {tr}Token Access Limit{/tr}
+                            </label>
+                            <div class="col-sm-2">
+                                {if $prefs.share_max_access_time eq -1}
+                                    <input type="text" name="msg_how_much_time_access" value="{$msg_how_much_time_access|default:1}" class="form-control">
+                                {else}
+                                    <select id="msg_how_much_time_access" name="msg_how_much_time_access" class="form-control">
+                                        {section name=msg_share_max_access start=1 loop=$prefs.share_max_access_time+1}
+                                            {html_options values=$smarty.section.msg_share_max_access.index output=$smarty.section.msg_share_max_access.index}
+                                        {/section}
+                                    </select>
+                                {/if}
+                            </div>
+                            <div class="form-text col-sm-9 offset-sm-3">
+                                {tr}How many times recipients can access this page{/tr}
+                            </div>
+                        </div>
+                    {/if}
                 {else}
                     &nbsp;
                 {/if}

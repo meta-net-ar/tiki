@@ -52,7 +52,7 @@
     {/if}
 </form>
 
-{pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
 
 <h2>{tr}Upload file{/tr}</h2>
 <form enctype="multipart/form-data" action="tiki-userfiles.php" method="post">

@@ -51,6 +51,6 @@ class TikiFilter_Alnum extends AbstractLocale
      */
     public function filter($value): string
     {
-        return preg_replace($this->pattern, '', $value);
+        return preg_replace($this->pattern, '', $value ?? '');
     }
 }

@@ -25,6 +25,7 @@ const vueLifecycles = singleSpaVue({
     handleInstance: (app) => {
         app.config.idPrefix = "toolbar-dialogs";
         if (import.meta.env.MODE === "development") {
+            // eslint-disable-next-line no-console
             console.log(import.meta.env);
         }
     },
@@ -34,6 +35,12 @@ const cssLifecycle = singleSpaCss({
     cssUrls: [
         {
             href: "public/generated/js/toolbar-dialogs.css",
+        },
+        {
+            href: "public/generated/js/element-plus-ui/autocomplete-root-css.css",
+        },
+        {
+            href: "public/generated/js/element-plus-ui/input-root-css.css",
         },
     ],
 });

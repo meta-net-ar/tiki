@@ -9,7 +9,7 @@
         </div>
     </div>
 
-
+    <div class="styling-element">
     <fieldset>
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_directory visible="always"}
@@ -24,5 +24,6 @@
         {preference name=directory_country_flag}
         {preference name=directory_open_links}
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

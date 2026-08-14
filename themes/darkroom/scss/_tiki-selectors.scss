@@ -1,29 +1,29 @@
-// Darkroom theme selectors for additional styling.
+// Darkroom for Tiki Bootstrap 5.3
 
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+// Image path example:
 $imagePath: "../images/";
 //body {
 //    background-image: url('#{$imagePath}bg.jpg');
 //}
-$topmodules-row-margin-bottom: 15px;
 
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
+// Color system
+// Body
 body,
 body.fullscreen {
     background-image: url('#{$imagePath}474747_5e5e5e_40.png');
 }
 
 #middle { padding-top: 10px; }
-
-.btn-primary { color: $white; }
-.btn-secondary { color: $secondary; }
-.btn-info { color: $info; }
-.btn-success { color: $success; }
-.btn-warning { color: $warning; }
-.btn-danger { color: $danger; }
-
-.btn-success.disabled, .btn-success:disabled,
-.btn-danger.disabled, .btn-danger:disabled {
-  color: #f8f9fa;
-}
 
 .container:not(.in-navbar) {
     background: #0c0c0c;
@@ -40,42 +40,54 @@ body.layout_social > .container {
     padding-bottom: 10px;
 }
 
+.bg-dark,
+.bg-light {
+    //    background: #818181 !important;
+    background: linear-gradient(to bottom, #818181 0%, #393939 100%);
+}
+
+// Links
+// Components
 // Typography
 .text-danger { color: #E89492 !important; }
 .text-success { color: #6ABE6A !important; }
 
 .blockquote,
-blockquote {
+blockquote,
+.blockquote-footer {
     color: #BABABA;
 }
 
-h3.card-title {
-    color: #9d9d9d;
-    font-size: 24px;
+// Tables
+// Buttons
+.btn-primary { color: $white; }
+.btn-secondary { color: $secondary; }
+.btn-info { color: $info; }
+.btn-success { color: $success; }
+.btn-warning { color: $warning; }
+.btn-danger { color: $danger; }
+
+.btn-success.disabled, .btn-success:disabled,
+.btn-danger.disabled, .btn-danger:disabled {
+  color: #f8f9fa;
 }
 
-.card-body {
-    border: solid #292929;
-    border-width: 0 8px .5rem 8px;
-}
+.btn-link,
+.btn-outline-primary,
+.btn-outline-secondary,
+.btn-outline-info,
+.btn-outline-success,
+.btn-outline-warning,
+.btn-outline-danger,
+.btn-outline-light,
+.btn-outline-dark {background: none !important;}
 
-.module.card { border: none; }
-
-.card-header:not(.text-bg-warning),
-.card.postbody .card-header{ background: #292929; } // Was .card-primary - still ok?
-
-.card-link,
-.linkmodule { color: #BDBDBD; }
-
-//.navbar-fixed-top .container,
-//.bg-light,
-//.topbar,
 .btn,
 .accordion-button,
 .nav-tabs > li > a,
 .input-group-addon,
 
-// jQuery-UI overrides
+    // jQuery-UI overrides
 .tiki .ui-state-default,
 .tiki .ui-widget-content .ui-state-default,
 .tiki .ui-widget-header .ui-state-default,
@@ -89,20 +101,63 @@ h3.card-title {
 .tiki a.ui-button:active,
 .tiki .ui-button:active,
 .tiki .ui-button.ui-state-active:hover {
-//    background: #818181; /* Old browsers */
+    //    background: #818181; /* Old browsers */
     background: linear-gradient(to bottom, #818181 0%, #393939 100%);
-
 }
 
 .btn:hover {
     background: linear-gradient(to top, #818181 0%, #393939 100%);
 }
 
-.bg-dark,
-.bg-light {
-//    background: #818181 !important;
-    background: linear-gradient(to bottom, #818181 0%, #393939 100%);
+// Forms
+input[type="checkbox"] {
+    color: #ffffff !important;
+    background: $table-bg;
 }
+
+    // Forums
+.form-control {
+    background: linear-gradient(180deg, rgba(71,71,71,1) 1%, rgba(99,99,99,1) 18%);
+}
+
+// Navs
+.nav > li > a {
+    padding: .4rem 10px;
+}
+
+:root {
+ //   .page-link.active, .active > .page-link {
+ //       --bs-pagination-active-bg: #{$secondary};
+ //       --bs-pagination-active-border-color: #{$secondary};
+ //   }
+    .nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+        --bs-nav-pills-link-active-bg: #{$dark};
+    }
+}
+
+// Navbar
+// Dropdowns
+.dropdown-item.btn.btn-link.alert.alert-danger.alert-link { color: $red-300; }
+
+// Pagination
+// Cards
+h3.tiki-card-title { // Was h3.card-title
+    color: #9d9d9d;
+    font-size: 24px;
+}
+
+.card:not(.no-decorations) .card-body {
+    border: solid #292929;
+    border-width: 0 8px .5rem 8px;
+}
+
+.module.card { border: none; }
+
+.card-header:not(.text-bg-warning),
+.card.postbody .card-header{ background: #292929; } // Was .card-primary - still ok?
+
+.card-link,
+.linkmodule { color: #BDBDBD; }
 
 .tiki .nav-link.active { border-color: #dee2e6; }
 
@@ -149,38 +204,6 @@ h3.card-title {
     color: #f2f2f2;
 }
 
-//.top_modules {
-//    .navbar-dark,
-//    .navbar-light {
-//        background: transparent !important;
-//        border: none;
-//    }
-//}
-
-.btn-link,
-.btn-outline-primary,
-.btn-outline-secondary,
-.btn-outline-info,
-.btn-outline-success,
-.btn-outline-warning,
-.btn-outline-danger,
-.btn-outline-light,
-.btn-outline-dark {background: none !important;}
-
-//.topbar {
-//    margin-bottom: 1.3rem;
-//}
-
-//#topbar_modules,
-//#top_modules {
-//    .bg-dark,
-//    .bg-light {
-//        background: transparent !important;
-//        border: none;
-//        margin-bottom: 0;
-//    }
-//}
-
 #topbar_modules .mb-3 {
     margin-bottom: 0
 }
@@ -189,53 +212,12 @@ h3.card-title {
     background: none !important;
 }
 
-.nav > li > a {
-    padding: .4rem 10px;
-}
-
-//select {
-//    background: #292929
-//}
-
-.cke_wysiwyg_frame, .cke_wysiwyg_div {
-    background: #292929 !important;
-    color: #ffffff !important;
-}
-
-input[type="checkbox"] {
-    color: #ffffff !important;
-    background: $table-bg;
-}
-
 input.reportBuilderInput,
 .ui-datepicker {
     background: #292929;
 }
 
-// Forums
-.form-control {
-    background: linear-gradient(180deg, rgba(71,71,71,1) 1%, rgba(99,99,99,1) 18%);
-}
-
-.jtrack-form {
-    background: #292929 !important;
-}
-
-a.toolbar {
-    color: $link-color;
-}
-
-// override for some cypht background colors
-body.tiki.tiki-webmail {
-    background-image: url('#{$imagePath}474747_5e5e5e_40.png');
-}
-
-.tiki_trackers {
-    .icon-status-open, .icon-status-pending, .icon-status-closed {
-        filter: drop-shadow(0 0 1px black);
-    }
-}
-
+// Accordion
 // Badges
 .badge {
     &.bg-primary,
@@ -244,4 +226,64 @@ body.tiki.tiki-webmail {
     &.bg-success,
     &.bg-info,
     &.bg-warning { color: #000 !important; }
+}
+
+// Alerts
+.alert-dark {
+    background-color: #34343C;
+}
+
+//.alert-light a { color: #2B2B2B; }
+
+.alert-light {
+    color: #272B35;
+    a {
+        color: #000;
+    }
+}
+
+// Progress bars
+.progress-bar {
+    --bs-progress-bar-bg: #34343C; // #{$info};
+}
+
+// List group
+.list-group-item { background: #4D4D4D; }
+.list-group-item-primary { color: #cccccc; background: #545454; }
+.list-group-item-secondary { color: #303030; background: #999999; }
+.list-group-item-success { color: #575757; background: #B1D8B1; }
+.list-group-item-danger { color: #474747; background: #EAA5A4; }
+.list-group-item-warning { color: #5c5c5c; background: #FCCE92; }
+.list-group-item-info { color: #575757; background: #9CD7E8; }
+.list-group-item-light { color: #575757; background: #CCCDD1; }
+.list-group-item-dark { color: #A6A6A6; background: #333D47; }
+
+// Figures
+// Breadcrumbs
+// Code
+code { background: #586A79 !important; }
+
+// Tiki-specific
+.tiki_trackers {
+    .icon-status-open, .icon-status-pending, .icon-status-closed {
+        filter: drop-shadow(0 0 1px black);
+    }
+}
+
+a.toolbar {
+    color: $link-color;
+}
+
+/* This theme doesn't support dark mode. */
+.module.box-switch_color_mode { display: none; }
+
+
+// External libraries
+    // override for some cypht background colors
+body.tiki.tiki-webmail {
+    background-image: url('#{$imagePath}474747_5e5e5e_40.png');
+}
+
+.jtrack-form {
+    background: #292929 !important;
 }

@@ -8,12 +8,11 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'wiki page';
 $section_class = "tiki_wiki_page manage";   // This will be body class instead of $section
 $inputConfiguration = [
     [
         'staticKeyFilters'         => [
-        'page'                     => 'username',         //get
+        'page'                     => 'pagename',         //get
         'rename'                   => 'bool',             //post
         'confirm'                  => 'bool',             //post
         'badname'                  => 'pagename',             //post
@@ -24,6 +23,9 @@ $inputConfiguration = [
 ];
 
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI;
+Sections::setCurrentSection($section);
 
 $wikilib = TikiLib::lib('wiki');
 
@@ -51,7 +53,7 @@ if ((isset($_REQUEST["rename"]) || isset($_REQUEST["confirm"])) && $access->chec
     // If the new pagename does match userpage prefix then display an error
     $newName = isset($_REQUEST["confirm"]) ? $_REQUEST['badname'] : $_REQUEST['newpage'];
     if (stristr($newName, $prefs['feature_wiki_userpage_prefix']) == $newName) {
-        Feedback::errorAndDie(tra("Cannot rename page because the new name begins with reserved prefix") . ' (' . $prefs['feature_wiki_userpage_prefix'] . ').', \Laminas\Http\Response::STATUS_CODE_4009);
+        Feedback::errorAndDie(tra("Cannot rename page because the new name begins with reserved prefix") . ' (' . $prefs['feature_wiki_userpage_prefix'] . ').', \Laminas\Http\Response::STATUS_CODE_409);
     }
 
     $max_pagename_length = $wikilib->max_pagename_length();
@@ -82,6 +84,9 @@ if ((isset($_REQUEST["rename"]) || isset($_REQUEST["confirm"])) && $access->chec
                     break;
                 case 2:
                     Feedback::error(tr('Page already exists'));
+                    break;
+                case 3:
+                    Feedback::error(tr('Cannot rename page to the same name'));
                     break;
                 default:
                     throw $e;

@@ -34,8 +34,6 @@ function sendStructurePage($params)
 {
     global $commlib, $prefs;
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
-    $structlib = TikiLib::lib('struct');
 
     $site = $params->getParam(0);
     $site = $site->scalarval();
@@ -91,7 +89,6 @@ function sendPage($params)
     // Get the page and store it in received_pages
     global $commlib, $prefs;
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
 
     $pp = $params->getParam(0);
     $site = $pp->scalarval();
@@ -185,7 +182,7 @@ function sendArticle($params)
     if ($username != 'admin' && $prefs['feature_intertiki'] == 'y' && ! empty($prefs['feature_intertiki_mymaster'])) {
         $ok = $userlib->intervalidate($prefs['interlist'][$prefs['feature_intertiki_mymaster']], $username, $password, false);
     } else {
-        list($ok, $username, $error) = $userlib->validate_user($username, $password, '', '');
+        [$ok, $username] = $userlib->validate_user($username, $password, '', '');
     }
     if (! $ok) {
         return new XML_RPC_Response(0, 101, "Invalid username or password");

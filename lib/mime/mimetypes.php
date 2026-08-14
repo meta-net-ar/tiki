@@ -5,7 +5,7 @@
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 //this script may only be included - so its better to die if called directly.
-if (strpos($_SERVER["SCRIPT_NAME"], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER["SCRIPT_NAME"], basename(__FILE__))) {
     header("location: index.php");
     exit;
 }
@@ -491,6 +491,15 @@ $mimetypes = [
     "dotx" => "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
     "xlam" => "application/vnd.ms-excel.addin.macroEnabled.12",
     "xlsb" => "application/vnd.ms-excel.sheet.binary.macroEnabled.12",
+
+    // Additional MIME types for 3D model viewer
+    '3ds'  => 'image/x-3ds',
+    'dae'  => 'model/vnd.collada+xml',
+    'fbx'  => 'application/octet-stream',
+    'gltf' => 'model/gltf+json',
+    'glb'  => 'model/gltf-binary',
+    'stl'  => 'model/stl',
+    'obj'  => 'text/plain',
 
     'vimeo' => 'video/vimeo'
 ];

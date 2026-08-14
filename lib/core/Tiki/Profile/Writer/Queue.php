@@ -76,7 +76,7 @@ class Tiki_Profile_Writer_Queue
                 'remove' => false,
             ];
         } elseif ($data['type'] == 'tracker') {
-            $extra = parse_str($data['detail'], $parts);
+            parse_str($data['detail'], $parts);
             if (isset($parts['fieldId'])) {
                 return [
                     'type' => 'tracker_field',

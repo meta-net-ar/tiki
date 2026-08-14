@@ -22,7 +22,6 @@ function wikiplugin_lang_info()
                 'description' => tr('List of languages for which the block is displayed. Languages use the two letter
                     language codes (ex: en, fr, es, ...). Use %0 to separate multiple languages.', '<code>+</code>'),
                 'since' => '1',
-                'default' => '',
             ],
             'notlang' => [
                 'required' => false,
@@ -30,7 +29,6 @@ function wikiplugin_lang_info()
                 'description' => tr('List of languages for which the block is not displayed. Languages use the two
                     letter language codes (ex: en, fr, es, ...). Use %0 to separate multiple languages.', '<code>+</code>'),
                 'since' => '1',
-                'default' => '',
             ],
         ],
     ];
@@ -40,12 +38,12 @@ function wikiplugin_lang($data, $params)
 {
     global $prefs;
 
-    $reqlang = isset($_REQUEST['lang']) ? $_REQUEST['lang'] : $prefs['language'];
+    $reqlang = $_REQUEST['lang'] ?? Language::getCurrentLanguage();
     extract($params, EXTR_SKIP);
-    if (isset($lang)) {
+    if (! is_null($lang)) {
         return in_array($reqlang, explode('+', $lang)) ? $data : '';
     }
-    if (isset($notlang)) {
+    if (! is_null($notlang)) {
         return in_array($reqlang, explode('+', $notlang)) ? '' : $data;
     }
     return $data;

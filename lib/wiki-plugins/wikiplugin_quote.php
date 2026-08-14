@@ -25,7 +25,6 @@ function wikiplugin_quote_info()
                 'description' => tra('Name of the quoted person.'),
                 'since' => '1',
                 'filter' => 'text',
-                'default' => '',
             ],
             'thread_id' => [
                 'required' => false,
@@ -33,7 +32,6 @@ function wikiplugin_quote_info()
                 'description' => tra('The thread Id of the comment being replied to in forums. Overwrites replyto'),
                 'since' => '15',
                 'filter' => 'text',
-                'default' => '',
             ],
             'source_url' => [
                 'required' => false,
@@ -41,14 +39,12 @@ function wikiplugin_quote_info()
                 'description' => tra('The URL to the source quoted.'),
                 'since' => '16',
                 'filter' => 'text',
-                'default' => '',
             ],
             'date' => [
                 'required' => false,
                 'name' => tra('Date'),
                 'description' => tra('Date when the statement quoted was made') . ' (<code>' . tr('YYYY-MM-DD') . '</code>)',
                 'filter' => 'date',
-                'default' => '',
                 'since' => '16',
             ]
         ],
@@ -63,18 +59,18 @@ function wikiplugin_quote($data, $params)
     $replyto = '';
     $comment_info = '';
 
-    if (isset($params['thread_id']) && $params['thread_id']) {
+    if (! is_null($params['thread_id'])) {
         $comment_info = TikiLib::lib('comments')->get_comment($params['thread_id']);
         if ($comment_info) {
             $replyto = $comment_info['userName'];
         }
-    } elseif (isset($params['replyto']) && $params['replyto']) {
+    } elseif (! is_null($params['replyto']) && $params['replyto']) {
         $replyto = $params['replyto'];
     }
-    if (isset($params['source_url']) && $params['source_url']) {
+    if (! is_null($params['source_url']) && $params['source_url']) {
         $source_url = $params['source_url'];
     }
-    if (isset($params['date']) && $params['date']) {
+    if (! is_null($params['date']) && $params['date']) {
         $date = strtotime($params['date']);
     }
 

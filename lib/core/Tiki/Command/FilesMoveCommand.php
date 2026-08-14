@@ -24,18 +24,18 @@ class FilesMoveCommand extends Command
             ->addArgument(
                 'galleryId',
                 InputArgument::REQUIRED,
-                'Gallery to move files from'
+                tra('Gallery to move files from')
             )
             ->addArgument(
                 'destinationPath',
                 InputArgument::REQUIRED,
-                'Path to move files to'
+                tra('Path to move files to')
             )
             ->addOption(
                 'confirm',
                 null,
                 InputOption::VALUE_NONE,
-                'Confirm the move operation (required)'
+                tra('Confirm the move operation (required)')
             )
         ;
     }
@@ -63,6 +63,18 @@ class FilesMoveCommand extends Command
         $destinationPath = $input->getArgument('destinationPath');
         if (empty($destinationPath)) {
             throw new \Exception(tra('File Move: Destination path required'));
+        }
+
+        $destinationPath = rtrim($destinationPath, '/') . '/';
+
+        if (! is_dir($destinationPath)) {
+            $output->writeln("<error>File Move: Destination path $destinationPath is not a directory</error>");
+            return Command::FAILURE;
+        }
+
+        if (! is_writable($destinationPath)) {
+            $output->writeln("<error>File Move: Destination path $destinationPath is not writable</error>");
+            return Command::FAILURE;
         }
 
         $files = $filegallib->get_files_info_from_gallery_id($galleryId);
@@ -105,10 +117,10 @@ class FilesMoveCommand extends Command
         }
 
         $logslib->add_action(
-            'files move',
+            tra('files move'),
             'system',
             'system',
-            'Moving files from gallery #' . $galleryId . ' to folder' . $destinationPath . ' completed.' . count($files) . ' Files moved.'
+            tra('Moving files from gallery #%0 to folder %1 completed. %2 files moved.', $galleryId, $destinationPath, count($files))
         );
         return Command::SUCCESS;
     }

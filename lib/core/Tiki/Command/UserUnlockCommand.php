@@ -34,7 +34,7 @@ class UserUnlockCommand extends Command
                 'format',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Output format',
+                tra('Output format'),
                 'table'
             );
     }
@@ -58,12 +58,12 @@ class UserUnlockCommand extends Command
                 $row['message'] = 'user not found';
             } elseif (empty($user['valid']) && empty($user['waiting'])) {
                 $row['result'] = 'success';
-                $row['message'] = 'user already unlocked';
+                $row['message'] = tra('user already unlocked');
             } else {
                 $userlib->confirm_user($user['login']);
                 $userlib->set_unsuccessful_logins($user['login'], 0);
                 $row['result'] = 'success';
-                $row['message'] = 'user unlocked and unsuccessful login was reset';
+                $row['message'] = tra('user unlocked and unsuccessful login was reset');
 
                 $logslib->add_action('adminusers', 'system', 'system', 'User ' . $user['login'] . ' unlocked');
             }

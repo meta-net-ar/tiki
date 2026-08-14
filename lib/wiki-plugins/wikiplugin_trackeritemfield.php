@@ -51,7 +51,6 @@ function wikiplugin_trackeritemfield_info()
                 'name' => tra('Fields'),
                 'description' => tra('Colon-separated list of field IDs. Default is all fields'),
                 'since' => '2.0',
-                'default' => '',
                 'filter' => 'text',
                 'separator' => ':',
                 'profile_reference' => 'tracker_field',
@@ -120,19 +119,17 @@ function wikiplugin_trackeritemfield_info()
 
 function wikiplugin_trackeritemfield($data, $params)
 {
-    global $userTracker, $group, $user, $tiki_p_admin_trackers, $prefs;
+    global $userTracker, $group, $user, $prefs;
 
     static $memoItemId = 0;
     static $memoTrackerId = 0;
     static $memoStatus = 0;
-    static $memoUserTracker = false;
     static $memoItemObject = null;
 
     $userlib = TikiLib::lib('user');
-    $tikilib = TikiLib::lib('tiki');
-    $smarty = TikiLib::lib('smarty');
     $trklib = TikiLib::lib('trk');
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_trackeritemfield_info());
     extract($params, EXTR_SKIP);
 
     if (empty($itemId) && ! empty($_REQUEST['itemId'])) {
@@ -230,7 +227,7 @@ function wikiplugin_trackeritemfield($data, $params)
             $dataelse = '';
     }
     if (! empty($status)) {
-        if (! strstr($status, $memoStatus)) {
+        if (! str_contains($status, $memoStatus)) {
             return $dataelse;
         }
     }
@@ -238,7 +235,7 @@ function wikiplugin_trackeritemfield($data, $params)
         return $dataelse;
     } elseif (empty($itemId)) {
         return tra('Incorrect param') . ': itemId';
-    } elseif (isset($fields)) {
+    } elseif (! is_null($fields)) {
         $all_fields = $trklib->list_tracker_fields($trackerId, 0, -1);
         $all_fields = $all_fields['data'];
         if (! empty($fields)) {
@@ -300,11 +297,11 @@ function wikiplugin_trackeritemfield($data, $params)
                 $handler = $trklib->get_field_handler($field, $info);
                 $field = array_merge($field, $handler->getFieldData());     // some fields (such as DropDown and Category need this)
                 $handler = $trklib->get_field_handler($field, $info);
-                if (isset($params['list_mode']) && ! empty($params['list_mode'])) {
+                if (! empty($params['list_mode'])) {
                     $list_mode = $params['list_mode'];
-                    $out = $handler->renderOutput(['list_mode' => $list_mode]);
+                    $out = $handler->renderOutput(['list_mode' => $list_mode, 'showlinks' => 'n']);
                 } else {
-                    $out = $handler->renderOutput(['list_mode' => 'y']);
+                    $out = $handler->renderOutput(['list_mode' => 'y', 'showlinks' => 'n']);
                 }
                 return $out;
             }

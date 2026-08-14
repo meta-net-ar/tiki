@@ -20,7 +20,7 @@
                                 <span class="input-group-text">
                                     {icon name="search"}
                                 </span>
-                                <input type="text" name="find" class="form-control" value="{$find|escape}" placeholder="{tr}Find{/tr}">
+                                <input type="text" name="find" class="form-control" value="{$find|escape}" placeholder="{tr}Search{/tr}">
                                 <input type="hidden" name="sort_mode" value="{$sort_mode|escape}">
                                 <input type="submit" class="btn btn-info" value="{tr}Search by name{/tr}" name="search">
                             </div>
@@ -35,7 +35,7 @@
                                     <span class="input-group-text">
                                          {icon name="search"}
                                      </span>
-                                    <input name="highlight" type="text" class="form-control" placeholder="{tr}Find{/tr}">
+                                    <input name="highlight" type="text" class="form-control" placeholder="{tr}Search{/tr}">
                                     <input type="hidden" name="where" value="forums">
                                     <input type="hidden" name="filter~type" value="forum post">
                                     <input type="submit" class="wikiaction btn btn-info" name="search" value="{tr}Search in content{/tr}">
@@ -55,7 +55,7 @@
                             <span class="input-group-text">
                                 {icon name="search"}
                             </span>
-                            <input name="filter~content" type="text" class="form-control" aria-label="{tr}Find{/tr}" placeholder="{tr}Find{/tr}">
+                            <input name="filter~content" type="text" class="form-control" aria-label="{tr}Search{/tr}" placeholder="{tr}Search{/tr}">
                             <input type="hidden" name="where" value="forums">
                             <input type="hidden" name="filter~type" value="forum post">
                             <input type="submit" class="wikiaction btn btn-info" name="search" value="{tr}Search in content{/tr}">
@@ -66,8 +66,8 @@
         </div>
     {/if}
 {/if}
-<div id="{$ts.tableid}-div" class="{if $js}table-responsive{/if} ts-wrapperdiv" {if !empty($ts.enabled)}style="visibility:hidden;"{/if}> {*the table-responsive class cuts off dropdown menus *}
-    <table id="{$ts.tableid}" class="table table-striped table-hover table-forum normal" data-count="{$cant|escape}">
+<div id="{$ts.tableid}-div" class="{if $js}table-responsive{/if} ts-wrapperdiv styling-element" {if !empty($ts.enabled)}style="visibility:hidden;"{/if}> {*the table-responsive class cuts off dropdown menus *}
+    <table id="{$ts.tableid}" class="table table-striped table-hover table-forum normal m-auto" data-count="{$count|escape}">
         {block name=forumheader}
         <thead>
             <tr>
@@ -104,11 +104,11 @@
         </thead>
         {/block}
         <tbody>
-            {assign var=section_old value=""}
+            {$section_old=""}
             {section name=user loop=$channels}
-                {assign var=section value=$channels[user].section}
+                {$section=$channels[user].section}
                 {if $section ne $section_old}
-                    {assign var=section_old value=$section}
+                    {$section_old=$section}
                     <td class="third info" colspan="{$numbercol}">{tr}{$section|escape}{/tr}</td>
                 {/if}
                 {block name=forumrow}
@@ -152,8 +152,8 @@
                         <td class="text">
                             {if isset($channels[user].lastPost)}
                                 {$channels[user].lastPost|tiki_short_datetime}<br>
-                                {if $prefs.forum_reply_notitle neq 'y'}<small><i>{$channels[user].lastPostData.title|escape}</i>{/if}
-                                {tr}by{/tr} {$channels[user].lastPostData.userName|username}</small>
+                                {if $prefs.forum_reply_notitle neq 'y'}<small><i>{$channels[user].lastPostData.title|forummaskemail|escape}</i>{/if}
+                                {tr}by{/tr} {$channels[user].lastPostData.userName|forummaskemail|username}</small>
                             {/if}
                         </td>
                     {/if}
@@ -194,5 +194,5 @@
     </table>
 </div>
 {if !$ts.enabled}
-    {pagination_links cant=$cant step=$prefs.maxRecords offset=$offset}{/pagination_links}
+    {pagination_links count=$count step=$prefs.maxRecords offset=$offset}{/pagination_links}
 {/if}

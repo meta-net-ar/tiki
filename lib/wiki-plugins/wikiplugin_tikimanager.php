@@ -20,7 +20,6 @@ function wikiplugin_tikimanager_info()
                 'name' => tra('Instance IDs'),
                 'description' => tra('Comma-separated list of instance IDs available to manage. For a full list, use Tiki Manager admin page.'),
                 'since' => '25.0',
-                'default' => '',
                 'separator' => ',',
             ],
             'showactions' => [
@@ -28,7 +27,6 @@ function wikiplugin_tikimanager_info()
                 'name' => tra('Show actions'),
                 'description' => tra('Comma-separated list of actions shown in the interface. If none are listed, all actions will be available by default.'),
                 'since' => '25.0',
-                'default' => '',
                 'separator' => ',',
             ],
             'hideactions' => [
@@ -36,7 +34,6 @@ function wikiplugin_tikimanager_info()
                 'name' => tra('Hide actions'),
                 'description' => tra('Comma-separated list of actions hidden from the interface. If none are listed, all actions will be available by default.'),
                 'since' => '25.0',
-                'default' => '',
                 'separator' => ',',
             ],
         ]
@@ -68,13 +65,14 @@ function wikiplugin_tikimanager($data, $params)
 
     $manager_output = $utilities->getManagerOutput();
 
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_tikimanager_info());
     extract($params, EXTR_SKIP);
 
     $instanceIds ??= [];
     $showactions ??= [];
     $hideactions ??= [];
 
-    $instances = TikiManager\Application\Instance::getInstances(true);
+    $instances = TikiManager\Application\Instance::getInstances(true);   // @phpstan-ignore class.notFound (depends on TikiManager, which isn't installed by default)
     $instances = array_filter($instances, function ($i) use ($instanceIds) {
         return empty($instanceIds) || in_array($i->getId(), $instanceIds);
     });

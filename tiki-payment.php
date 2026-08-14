@@ -132,7 +132,7 @@ if (isset($_GET['tx'])) {
                 && isset($prefs['payment_paypal_pdt_redirect'])
                 && $prefs['payment_paypal_pdt_redirect']
             ) {
-                $access->redirect($prefs['payment_paypal_pdt_redirect'] . '?invoice=' . $invoice);
+                $access->redirect($prefs['payment_paypal_pdt_redirect'] . '?invoice=' . $invoice, allowExternal: true);
             }
         }
     }
@@ -185,8 +185,7 @@ if (isset($_POST['manual_amount'], $_POST['invoice']) && preg_match('/^\d+(\.\d{
             ]
         );
         if (isset($_POST['returnurl'])) {
-            header('Location: ' . $_POST['returnurl']);
-            exit;
+            $access->redirect($_POST['returnurl'], allowExternal: true);
         }
 
         $access->redirect('tiki-payment.php?invoice=' . $_POST['invoice'], tra('Manual payment entered.'));
@@ -206,7 +205,7 @@ if (isset($_POST['request']) && $globalperms->request_payment) {
             $_POST['description'],
             $_POST['amount'],
             (int)$_POST['payable'],
-            isset($_POST['detail']) ? $_POST['detail'] : ''
+            $_POST['detail'] ?? ''
         );
 
         if ($prefs['feature_categories'] == 'y') {
@@ -243,7 +242,7 @@ function fetch_payment_list($type)
     $paymentlib = TikiLib::lib('payment');
     $offsetKey = 'offset_' . $type;
     $method = 'get_' . $type;
-    $offset = isset($_REQUEST[$offsetKey]) ? (int)$_REQUEST[$offsetKey] : 0;
+    $offset = (int)($_REQUEST[$offsetKey] ?? 0);
     $max = ! empty($_REQUEST['numrows']) ? $_REQUEST['numrows'] : (int)$prefs['maxRecords'];
 
     if (! empty($_REQUEST)) {
@@ -310,7 +309,7 @@ function fetch_payment_list($type)
             $tableclass,
             [
                 'id' => 'pmt_' . $type,
-                'total' => $data['cant'],
+                'total' => $data['count'],
                 'ajax' => [
                     'requiredparams' => [
                         'list_type' => $type,

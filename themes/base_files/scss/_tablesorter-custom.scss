@@ -1,3 +1,5 @@
+@use "sass:color";
+
 //Less file for the jQuery tablesorter plugin
 //custom formatting for individual themes
 
@@ -26,13 +28,13 @@ $ts-color: $body-color;  //Won't this owewrite the above?  benoitg - 2023-11-08
 
 // dark icons and colors for light background
 $unsortedDark        : url(data:image/gif;base64,R0lGODlhFQAJAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
-$sortedDark            : darken($ts-bg, 3%);
+$sortedDark            : color.adjust($ts-bg, $lightness: -3%, $space: hsl);
 $sortAscDark        : url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
 $sortDescDark        : url(data:image/gif;base64,R0lGODlhFQAEAIAAACMtMP///yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
 
 // light icons and colors for dark background
 $unsortedLight        : url(data:image/gif;base64,R0lGODlhFQAJAIAAAP///////yH5BAEAAAEALAAAAAAVAAkAAAIXjI+AywnaYnhUMoqt3gZXPmVg94yJVQAAOw==);
-$sortedLight        : lighten($ts-bg, 5%);
+$sortedLight        : color.adjust($ts-bg, $lightness: 5%, $space: hsl);
 $sortAscLight        : url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjI8Bya2wnINUMopZAQA7);
 $sortDescLight        : url(data:image/gif;base64,R0lGODlhFQAEAIAAAP///////yH5BAEAAAEALAAAAAAVAAQAAAINjB+gC+jP2ptn0WskLQA7);
 

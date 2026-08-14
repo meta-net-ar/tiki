@@ -36,6 +36,8 @@
                     {preference name=ajax_inline_edit_trackerlist}
                 </div>
                 {preference name=tracker_adminonlyviewedititem_by_default}
+                {preference name=tracker_display_wiki_only_status}
+                {preference name=tracker_display_categories}
                 {preference name=tracker_report_resize_button}
                 {preference name=tracker_show_comments_below}
                 {preference name=tracker_legacy_insert}
@@ -88,6 +90,7 @@
                 {preference name=tracker_force_mandatory_field}
                 {preference name=tracker_force_tracker_fields}
                 {preference name=user_force_avatar_upload}
+                {preference name=user_default_avatar_style}
             </fieldset>
         {/tab}
 
@@ -195,7 +198,7 @@
             <form action="tiki-admin.php?page=trackers" method="post">
                 {ticket}
                 <input type="text" name="find" value="{$find|escape}">
-                <input type="submit" class="btn btn-primary btn-sm" name="action" value="{tr}Find{/tr}">
+                <input type="submit" class="btn btn-primary btn-sm" name="action" value="{tr}Search{/tr}">
             </form>
         {/if}
 
@@ -255,7 +258,7 @@
             </table>
         </div>
 
-        {pagination_links cant=$cant_pages step=$prefs.maxRecords offset=$offset}{/pagination_links}
+        {pagination_links count=$pages_count step=$prefs.maxRecords offset=$offset}{/pagination_links}
     </div>
     {if $attachments}
         <table>

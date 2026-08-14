@@ -16,7 +16,7 @@ class FilePut implements ActionInterface
 
     public function __construct(array $params)
     {
-        $this->galleryId = isset($params['galleryId']) ? (int)$params['galleryId'] : 0;
+        $this->galleryId = (int)($params['galleryId'] ?? 0);
     }
 
     public function getName()

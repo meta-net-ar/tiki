@@ -41,8 +41,8 @@
                         {/if}
                     </td>
                     <td>
-                        <a class="btn btn-primary btn-sm" href="{bootstrap_modal controller=search_stored action=edit queryId=$q.queryId}">{icon name="edit"} {tr}Edit{/tr}</a>
-                        <a class="btn btn-danger btn-sm" href="{bootstrap_modal controller=search_stored action=delete queryId=$q.queryId}">{icon name="delete"} {tr}Delete{/tr}</a>
+                        <a class="btn btn-primary btn-sm" href="{bootstrap_modal controller=search_stored action=edit queryId=$q.queryId}" role="button">{icon name="edit"} {tr}Edit{/tr}</a>
+                        <a class="btn btn-danger btn-sm" href="{bootstrap_modal controller=search_stored action=delete queryId=$q.queryId}" role="button">{icon name="delete"} {tr}Delete{/tr}</a>
                     </td>
                 </tr>
             {foreachelse}

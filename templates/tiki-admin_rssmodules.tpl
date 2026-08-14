@@ -5,7 +5,7 @@
     <a class="alert-link" href="tiki-admin.php?page=rss">{tr}Click Here{/tr}</a>.
     <hr/>
     {tr}To use feeds in a text area (Wiki page, etc), a <a class="alert-link" href="tiki-admin_modules.php">module</a> or a template, use {literal}{rss id=x}{/literal}, where x is the ID of the feed.{/tr}
-    {tr}To use them to generate articles, use the <a class="alert-link" href="https://doc.tiki.org/Article+generator" target="_blank">Article generator</a> for that specific feed{/tr}.
+    {tr}To use them to generate articles, use the <a class="alert-link" href="https://doc.tiki.org/Article-generator" target="_blank">Article generator</a> for that specific feed{/tr}.
 {/remarksbox}
 
 {if $preview eq 'y'}
@@ -35,13 +35,14 @@
                         value="y"
                         class="btn btn-secondary float-sm-end tips"
                         title=":{tr}Please be patient, this may take a while{/tr}"
+                        aria-label="{tr}Please be patient, this may take a while{/tr}"
                 >
                     {icon name="refresh" _menu_text='y' _menu_icon='y' alt="{tr}Refresh all feeds{/tr}"}
                 </button>
             </form>
         {/if}
         <h2>{tr}External Feeds{/tr}</h2>
-        <div class="table-responsive" align="center">
+        <div class="table-responsive text-center">
             {if $channels or ($find ne '')}
                 {include file='find.tpl'}
             {/if}
@@ -137,15 +138,15 @@
                 {/section}
             </table>
 
-            {pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+            {pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
 
         </div>
     {/tab}
 
     {if $rssId > 0}
-        {assign var="feedEditLabel" value="{tr}Edit Feed{/tr}"}
+        {$feedEditLabel="{tr}Edit Feed{/tr}"}
     {else}
-        {assign var="feedEditLabel" value="{tr}Create Feed{/tr}"}
+        {$feedEditLabel="{tr}Create Feed{/tr}"}
     {/if}
     {tab name=$feedEditLabel}
         <h2>{$feedEditLabel}
@@ -159,27 +160,27 @@
             {ticket}
             <input type="hidden" name="rssId" value="{$rssId|escape}">
             <div class="mb-3 row">
-                <label for="name" class="col-form-label col-sm-3">{tr}Name{/tr}</label>
+                <label for="feed_name" class="col-form-label col-sm-3">{tr}Name{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="text" name="name" value="{$name|escape}" class="form-control">
+                    <input type="text" maxlength="{$MAX_EXTERNAL_FEED_NAME_LENGTH}" name="name" id="feed_name" value="{$name|escape}" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="url" class="col-form-label col-sm-3">{tr}URL{/tr}</label>
                 <div class="col-sm-9">
-                    <input type="url" name="url" value="{$url|escape}" class="form-control">
+                    <input type="url" name="url" id="url" value="{$url|escape}" class="form-control">
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="description" class="col-form-label col-sm-3">{tr}Description{/tr}</label>
                 <div class="col-sm-9">
-                    <textarea name="description" rows="4" class="form-control">{$description|escape}</textarea>
+                    <textarea name="description" id="description" rows="4" class="form-control">{$description|escape}</textarea>
                 </div>
             </div>
             <div class="mb-3 row">
                 <label for="refreshMinutes" class="col-form-label col-sm-3">{tr}Refresh rate{/tr}</label>
                 <div class="col-sm-9">
-                    <select class="form-select" name="refreshMinutes">
+                    <select class="form-select" name="refreshMinutes" id="refreshMinutes">
                         {foreach [1, 5, 10, 15, 20, 30, 45, 60, 90, 120, 360, 720, 1440] as $min}
                             <option value="{$min|escape}" {if $refreshSeconds eq ($min*60)}selected="selected"{/if}>{($min*60)|duration}</option>
                         {/foreach}
@@ -219,7 +220,7 @@
             <h2>{tr _0='"'|cat:$articleConfig.feed_name|cat:'"'|escape}Article Generator for %0{/tr}</h2>
             {remarksbox type="tip" title="{tr}Tips{/tr}"}
                     {tr}Once you have defined the settings below, each new item in this rss feed will generate a new article{/tr}.
-                    <a target="tikihelp" href="https://doc.tiki.org/Article+generator" class="tikihelp alert-link" style="float:none" title="{tr}Article Generator:{/tr}
+                    <a target="tikihelp" href="https://doc.tiki.org/Article-generator" class="tikihelp alert-link" style="float:none" title="{tr}Article Generator:{/tr}
                         {tr}Documentation{/tr}">
                         {icon name="help"}
                     </a>

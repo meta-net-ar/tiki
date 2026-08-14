@@ -22,7 +22,7 @@ class ProfilesWizardUsefulAdminConfs extends Wizard
 
     public function onSetupPage($homepageUrl)
     {
-        global $prefs, $TWV;
+        global $TWV;
         // Run the parent first
         parent::onSetupPage($homepageUrl);
 

@@ -12,6 +12,7 @@ class Tracker_Field_Language extends \Tracker\Field\AbstractItemField implements
             'LANG' => [
                 'name' => tr('Language'),
                 'description' => tr('Assign a language to the tracker item to enable multilingual trackers.'),
+                'help' => 'Language-Tracker-Field',
                 'prefs' => ['trackerfield_language', 'feature_multilingual'],
                 'tags' => ['advanced'],
                 'default' => 'y',
@@ -74,9 +75,16 @@ class Tracker_Field_Language extends \Tracker\Field\AbstractItemField implements
             'trackeroutput/language.tpl',
             $context,
             [
-                'label' => isset($languages[$selected]) ? $languages[$selected] : tr('None'),
+                'label' => $languages[$selected] ?? tr('None'),
             ]
         );
+    }
+
+    public function renderText($context = [])
+    {
+        $selected = $this->getConfiguration('value');
+        $languages = $this->getLanguages();
+        return $languages[$selected] ?? tr('None');
     }
 
     public function handleSave($value, $oldValue)
@@ -92,8 +100,8 @@ class Tracker_Field_Language extends \Tracker\Field\AbstractItemField implements
         $fieldId = $definition->getLanguageField();
 
         if ($fieldId) {
-            $old = isset($args['old_values'][$fieldId]) ? $args['old_values'][$fieldId] : null;
-            $new = isset($args['values'][$fieldId]) ? $args['values'][$fieldId] : null;
+            $old = $args['old_values'][$fieldId] ?? null;
+            $new = $args['values'][$fieldId] ?? null;
 
             if ($old != $new) {
                 $multilinguallib = TikiLib::lib('multilingual');

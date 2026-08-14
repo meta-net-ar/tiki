@@ -2,7 +2,7 @@
 
     <form class="form" method="post" action="tiki-listpages.php">
         <div class="mb-3 row mx-0">
-            <label class="col-sm-2 col-form-label" for="name">{tr}Find term:{/tr}</label>
+            <label class="col-sm-2 col-form-label" for="name">{tr}Search term:{/tr}</label>
             {if $term_root_category_id != ''}
                 <input type="hidden" name="categId" value="{$term_root_category_id}"/>
                 <input type="hidden" name="create_page_with_search_category" value="y"/>
@@ -27,7 +27,7 @@
         </div>
         <div class="mb-3 row mx-0">
             <div class="col-sm-2 offset-sm-2">
-                <input type="submit" class="wikiaction btn btn-info btn-sm" name="search" value="{tr}Go{/tr}"/>
+                <input type="submit" class="wikiaction btn btn-info btn-sm" name="search" value="{tr}Search{/tr}"/>
             </div>
             <div class="col-sm-8">
                 <div class="form-text">{tr}If not found, you will be given a chance to create it.{/tr}</div>

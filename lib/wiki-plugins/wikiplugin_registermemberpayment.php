@@ -28,7 +28,7 @@ function wikiplugin_registermemberpayment_info()
                         Example:') . " <code>name:value;name:value;value;value;</code>",
                     'since' => '9.1',
                     'filter' => 'text',
-                    'default' => 'Number of periods:',
+                    'default' => tr('Number of periods:'),
                 ],
             ]
         )
@@ -48,16 +48,16 @@ function wikiplugin_registermemberpayment($data, $params, $offset)
         return tr('Insufficient Privileges');
     }
 
-    if (empty($user) && isset($_REQUEST['wp_member_users']) == true) {
+    if (empty($user) && isset($_REQUEST['wp_member_users'])) {
         $user = end(explode('|', $_REQUEST['wp_member_users']));
         $_SESSION['forceanon'] = 'y';
         $_REQUEST['price'] = $_POST['price'] = $_GET['price'] = $params['price'];
     }
 
-    $periodslabel = (isset($params['periodslabel']) ? tr($params['periodslabel']) : 'Number of periods:');
+    $periodslabel = $params['periodslabel'];
     $fixedperiodsDDL = '';
 
-    $fixedperiods = explode(';', isset($params['fixedperiods']) ? $params['fixedperiods'] : '');
+    $fixedperiods = explode(';', $params['fixedperiods'] ?? '');
     foreach ($fixedperiods as $fixedperiod) {
         if (! empty($fixedperiod)) {
             $fixedperiod = explode(':', $fixedperiod);
@@ -79,7 +79,7 @@ function wikiplugin_registermemberpayment($data, $params, $offset)
     if ($_SERVER['REQUEST_METHOD'] != 'POST') {
         if (isset($_POST['msg'])) {
             $_POST['msg'] = addslashes(htmlspecialchars($_POST['msg']));
-            $headerlib->add_jq_onready("$.notify('" . $_POST['msg'] . "')");
+            $headerlib->add_jq_onready("showMessage('" . $_POST['msg'] . "')");
         }
 
         if (empty($user)) {
@@ -158,15 +158,15 @@ reg
 
                                 reg.trigger('continueToPurchase');
                             } else { //registered
-                                $.notify(data.result);
-                                $.notify(tr('You will be redirected in 5 seconds'));
+                                showMessage(data.result, 'success');
+                                showMessage(tr('You will be redirected in 5 seconds'));
                                 setTimeout(function() {
                                     document.location = 'tiki-index.php';
                                 }, 5000);
                             }
                         } else { //errors
                             $.each(data.result, function(i) {
-                                $.notify(data.result[i].msg);
+                                showMessage(data.result[i].msg, 'error');
                             });
                         }
                     });

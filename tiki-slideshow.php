@@ -12,8 +12,10 @@ use Tiki\File\SlideshowHelper;
 use Tiki\Wiki\WikiPaginationUtils;
 
 global $pdfStyles, $prefs, $tiki_p_view;
-$section = 'wiki page';
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_WIKI;
+Sections::setCurrentSection($section);
 $tikilib = TikiLib::lib('tiki');
 $structlib = TikiLib::lib('struct');
 $wikilib = TikiLib::lib('wiki');
@@ -65,11 +67,7 @@ if (! ($info = $tikilib->page_exists($page))) {
     die;
 }
 
-if (isset($_REQUEST['theme'])) {
-    $theme = $_REQUEST['theme'];
-} else {
-    $theme = "black";
-}
+$theme = $_REQUEST['theme'] ?? "black";
 
 // Now check permissions to access this page
 $tikilib->get_perm_object($page, 'wiki page', $info);
@@ -88,15 +86,13 @@ if (! in_array($page, $_SESSION["breadCrumb"])) {
     if (count($_SESSION["breadCrumb"]) > $prefs['userbreadCrumb']) {
         array_shift($_SESSION["breadCrumb"]);
     }
-
-    array_push($_SESSION["breadCrumb"], $page);
 } else {
     // If the page is in the array move to the last position
     $pos = array_search($page, $_SESSION["breadCrumb"]);
 
     unset($_SESSION["breadCrumb"][$pos]);
-    array_push($_SESSION["breadCrumb"], $page);
 }
+$_SESSION["breadCrumb"][] = $page;
 
 // Now increment page hits since we are visiting this page
 $tikilib->add_hit($page);
@@ -136,11 +132,18 @@ if (! empty($slidePluginData)) {
 
 $pdata = formatContent($pdata, $tagsArr, $slidePluginHeadingLevelSlideSeparator);
 
+$revealJsThemesPath = REVEALJS_DIST_PATH . '/theme/';
+$revealJsCssFile = REVEALJS_DIST_PATH . '/reveal.css';
+$revealJsJsFile = REVEALJS_DIST_PATH . '/reveal.js';
+$revealThemeFile = $revealJsThemesPath . $theme . '.css';
+$params['base_path'] = REVEALJS_DIST_PATH;
+
 if (isset($_REQUEST['pdf'])) {
     $access->check_feature("feature_slideshow_pdfexport");
     set_time_limit(777);
 
     $_POST["html"] = urldecode($_POST["html"] ?? '');
+    $referer = array_key_exists('HTTP_REFERER', $_SERVER) ? $_SERVER['HTTP_REFERER'] : 'tiki-index.php';
 
     if (isset($_POST["html"])) {
         $generator = new PdfGenerator(PdfGenerator::MPDF);
@@ -157,7 +160,7 @@ if (isset($_REQUEST['pdf'])) {
                 str_replace(
                     'tiki-slideshow.php?',
                     'tiki-index.php?',
-                    $_SERVER['HTTP_REFERER']
+                    $referer
                 )
             );
         }
@@ -177,61 +180,51 @@ if (isset($_REQUEST['pdf'])) {
         // initialize background image
         $imgBackgroundCSS = '';
 
-        //checking if to export slideshow
-        if (isset($_REQUEST['printslides'])) {
-            $customCSS
-                = "<style type='text/css'>img{max-height:300px;width:auto;} body{font-size:1em} h1{font-size:1.5em;text-transform:none !important;}  section{height:300px;border:1px solid #000;margin-bottom:1%;padding:1%;}</style> ";
-            $pdata = $customCSS . '<pdfsettings printFriendly="y" header="off" footer="off"></pdfsettings>' . $pdata;
-        } else {
-            $doc = new DOMDocument();
-            libxml_use_internal_errors(true);
-            $doc->loadHTML('<html lang="en"><head><meta charset="UTF-8"></head><body>' . $pdata . '</body></html>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-            libxml_clear_errors();
+        $doc = new DOMDocument();
+        libxml_use_internal_errors(true);
+        $doc->loadHTML('<html lang="en"><head><meta charset="UTF-8"></head><body>' . $pdata . '</body></html>', LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        libxml_clear_errors();
 
-            $sections = $doc->getElementsByTagName('section');
+        $sections = $doc->getElementsByTagName('section');
 
-            foreach ($sections as $key => $section) {
-                // Remove saveHTML call
-                $color = $section->getAttribute('data-background-color');
-                $imgBackground = $section->getAttribute('data-background-image');
+        foreach ($sections as $key => $section) {
+            // Remove saveHTML call
+            $color = $section->getAttribute('data-background-color');
+            $imgBackground = $section->getAttribute('data-background-image');
 
-                if (! empty($imgBackground)) {
-                    $class = $section->getAttribute('class');
-                    $section->setAttribute("class", 'section_bg_image_' . $key . ' ' . $class);
+            if (! empty($imgBackground)) {
+                $class = $section->getAttribute('class');
+                $section->setAttribute("class", 'section_bg_image_' . $key . ' ' . $class);
 
-                    $imgBackgroundCSS .= ' .section_bg_image_' . $key . '{
-                        background-image: url("' . $imgBackground . '");
-                        background-position: top left;
-                        background-repeat: no-repeat;
-                        background-image-resize: 4;
-                        background-image-resolution: from-image;
-                    }';
-                }
-
-                if (! empty($color)) {
-                    $style = $section->getAttribute('style');
-                    $section->setAttribute("style", "background-color:" . $color . ";" . $style);
-                }
+                $imgBackgroundCSS .= ' .section_bg_image_' . $key . '{
+                    background-image: url("' . $imgBackground . '");
+                    background-position: top left;
+                    background-repeat: no-repeat;
+                    background-image-resize: 4;
+                    background-image-resolution: from-image;
+                }';
             }
 
-            $pdata = $doc->saveHTML();
-
-            //getting css
-            $customCSS = file_get_contents(
-                REVEALJS_DIST_PATH . '/reveal.css'
-            );
-            $customCSS .= file_get_contents(
-                REVEALJS_DIST_PATH . '/' . 'theme/' . $theme . '.css'
-            );
-
-            $customCSS .= '.reveal section{width:100%; height:100%;text-align:center;margin:auto;} section{text-align:center;margin: auto;width:100%;} .ss-heading{line-height:2.5em,padding-bottom:20px;} ' . $imgBackgroundCSS;
-            $pdata = '<pdfsettings header="off" footer="off" margin_top="0" margin_bottom="0" margin_left="0" margin_right="0" printfriendly="n"></pdfsettings><div class="reveal">' . $pdata . '</div>';
-            $pdata = str_replace(
-                "</section><section",
-                "</section><pagebreak /><section",
-                $pdata . '<style>' . str_replace([".reveal {","vertical-align: baseline;"], [".reveal,.reveal table{ ","vertical-align:top;"], $customCSS) . ' div.reveal, .reveal li{font-size:1.3em;font-weight:normal;line-height:1.5;height:auto !important; } img{max-height:400px;}  .reveal h1 {font-size: 2.8em; text-transform:none !important;} .reveal li ul li {font-size: 0.95em !important;margin: 0em !important;}</style>'
-            ) . $pdfStyles;
+            if (! empty($color)) {
+                $style = $section->getAttribute('style');
+                $section->setAttribute("style", "background-color:" . $color . ";" . $style);
+            }
         }
+
+        $pdata = $doc->saveHTML();
+
+        //getting css
+        $customCSS = file_get_contents($revealJsCssFile);
+        $customCSS .= file_get_contents($revealThemeFile);
+
+        $customCSS .= '.reveal section{width:100%; height:100%;text-align:center;margin:auto;} section{text-align:center;margin: auto;width:100%;} .ss-heading{line-height:2.5em,padding-bottom:20px;} ' . $imgBackgroundCSS;
+        $pdata = '<pdfsettings header="off" footer="off" margin_top="0" margin_bottom="0" margin_left="0" margin_right="0" printfriendly="n"></pdfsettings><div class="reveal">' . $pdata . '</div>';
+        $pdata = str_replace(
+            "</section><section",
+            "</section><pagebreak /><section",
+            $pdata . '<style>' . str_replace([".reveal {","vertical-align: baseline;"], [".reveal,.reveal table{ ","vertical-align:top;"], $customCSS) . ' div.reveal, .reveal li{font-size:1.3em;font-weight:normal;line-height:1.5;height:auto !important; } img{max-height:400px;}  .reveal h1 {font-size: 2.8em; text-transform:none !important;} .reveal li ul li {font-size: 0.95em !important;margin: 0em !important;}</style>'
+        ) . $pdfStyles;
+
 
         $pdf = $generator->getPdf(
             $filename,
@@ -245,7 +238,6 @@ if (isset($_REQUEST['pdf'])) {
         header("Content-Type: application/pdf");
         header("Content-Transfer-Encoding: binary");
         header('Content-Length: ' . $length);
-        TikiLib::lib('header')->setXRobotsTag($robots);
         echo $pdf;
         exit(0);
     }
@@ -253,6 +245,7 @@ if (isset($_REQUEST['pdf'])) {
 }
 $smarty->assign('pages', $pages);
 $smarty->assign_by_ref('parsed', $pdata);
+$smarty->assign_by_ref('version', $info["version"]);
 $smarty->assign_by_ref('lastModif', $info["lastModif"]);
 
 if (empty($info["user"])) {
@@ -263,25 +256,13 @@ $smarty->assign_by_ref('lastUser', $info["user"]);
 
 include_once('tiki-section_options.php');
 
-
-$headerlib->add_jsfile(
-    REVEALJS_DIST_PATH . '/reveal.js'
-);
-$headerlib->add_cssfile(
-    REVEALJS_DIST_PATH . '/reveal.css'
-);
-$headerlib->add_cssfile(
-    REVEALJS_DIST_PATH . '/' . 'theme/' . $theme
-                . '.css'
-);
+$headerlib->add_jsfile($revealJsJsFile);
+$headerlib->add_cssfile($revealJsCssFile);
+$headerlib->add_cssfile($revealThemeFile);
 
 $headerlib->add_css(<<<CSS
     .reveal span {
         font-weight: bold;
-    }
-
-    .reveal #ss-options span.select2-selection__choice__value {
-        font-family: "Source Sans Pro", Helvetica, sans-serif;
     }
 
     .reveal .controls {
@@ -456,7 +437,32 @@ $headerlib->add_jq_onready(<<<JS
             }
         </style>
     `);
+JS);
 
+if (isset($_REQUEST['print-pdf']) && $_REQUEST['print-pdf'] == 1) {
+    $smarty->assign('printpdf', 'y');
+    $headerlib->add_jq_onready(<<<JS
+    Reveal.initialize({ 
+        width: 960,
+        height: 700,
+        slideNumber: false,
+        controls: false,
+        progress: false,
+        center: true,
+        embedded: true,
+        pdfSeparateFragments: false,
+        // disableLayout: true,
+        showNotes: "separate-page", 
+    });
+    Reveal.addEventListener('ready', () => {
+        setTimeout(() => {
+          window.print();
+        }, 1000); // longer delay for heavy assets
+    });
+JS);
+} else {
+    $headerlib->add_jq_onready(
+        <<<JS
     var extraElements=["#page-bar",".icon_edit_section",".icon-link-external",".editplugin","#show-errors-button",".wikitext",".icon_edit_section","#toc","footer",".heading-link"];
 
     jQuery.each( extraElements, function( i, val ) {
@@ -536,7 +542,7 @@ $headerlib->add_jq_onready(<<<JS
 
         $( "#showtheme" ).on("change", function() {
             var selectedCSS=$("#showtheme" ).val();
-            $("#themeCSS").attr("href","' . REVEALJS_DIST_PATH . '/theme/"+selectedCSS+".css");
+            $("#themeCSS").attr("href","$revealJsThemesPath"+selectedCSS+".css");
         });
         $( "#showtransition" ).on("change", function() {
             var selectedTransition=$("#showtransition" ).val();
@@ -586,8 +592,8 @@ $headerlib->add_jq_onready(<<<JS
              }
         });
 JS
-);
-
+    );
+}
 $params = [];
 
 foreach ($_GET as $key => $value) {
@@ -708,8 +714,7 @@ function formatContent($content, $tagArr, $slidePluginHeadingLevelSlideSeparator
         foreach ($headingsTags as $slide) {
             if ($firstSlide == 0) {
                 //checking if first slide has pluginSlideShowSlide instance, then concat with main text, otherwise ignore
-                $sectionCheck = strpos($slide, '<sslide');
-                if ($sectionCheck == true) {
+                if (str_contains($slide, '<sslide')) {
                     $slideContent .= str_replace("sslide", "section", $slide);
                 } else {
                     $slideContent .= slideshow_section($slide, $headingStart, $slideStart, $slideEnd, $slidePluginHeadingLevelSlideSeparator);

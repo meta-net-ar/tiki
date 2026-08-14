@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function validator_pagename($input, $parameter = '', $message = '')
 {
-    global $tikilib, $prefs;
+    global $tikilib;
     if ($parameter == 'not') {
         if ($tikilib->page_exists($input)) {
             return tra("Page already exists");

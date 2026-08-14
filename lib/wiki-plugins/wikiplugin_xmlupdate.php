@@ -6,7 +6,6 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function wikiplugin_xmlupdate_info()
 {
-    global $prefs;
     $info = [
         'name' => tra('XMLupdate'),
         'documentation' => 'PluginXMLupdate',
@@ -51,25 +50,12 @@ function wikiplugin_xmlupdate_info()
 
 function wikiplugin_xmlupdate($data, $params)
 {
-    global $tikilib, $prefs, $user, $info;
-    $filegallib = TikiLib::lib('filegal');
+    global $prefs;
     $smarty = TikiLib::lib('smarty');
     // check that File Galleries have been set for use
     if ($prefs['feature_file_galleries'] != 'y') {
         return ("<span class='error'>Error: sorry you need to have File Galleries enabled to use the XMLUPDATE plugin</span>");
     }
-    // check a fileId has been set
-    if (! isset($params['fileId'])) {
-        return ("<span class='error'>Error: fileId# for the XML file is not set</span>");
-    }
-
-    // set default params
-    $plugininfo = wikiplugin_xmlupdate_info();
-    $default = [];
-    foreach ($plugininfo['params'] as $key => $param) {
-        $default["$key"] = $param['default'];
-    }
-    $params = array_merge($default, $params);
 
     // get the full path address for the fileId from the File Gallery info and the pref for the File Gallery directory folder
     $fileId = $params['fileId'];
@@ -99,7 +85,7 @@ function wikiplugin_xmlupdate($data, $params)
 
     $smarty->assign('attused', 'no');
     // check if an attribute label has been used in the XML file
-    if (isset($params['attribute'])) {
+    if (! empty($params['attribute'])) {
         $attlabel = $params['attribute'];
 
         // convert the xmldata array to get to the attributes only - not sure why this works!

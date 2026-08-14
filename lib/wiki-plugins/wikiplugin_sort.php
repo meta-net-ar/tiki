@@ -58,7 +58,7 @@ function wikiplugin_sort_info()
 
 function mb_natcasesort(string $lang, array &$array): bool
 {
-    if ($lang == false) {
+    if (! $lang) {
         $tikilib  = TikiLib::lib('tiki');
         $loginlib = TikiLib::lib('login');
 
@@ -80,7 +80,6 @@ function wikiplugin_sort($data, $params)
 {
     extract($params, EXTR_SKIP);
 
-    $sort = (isset($sort)) ? $sort : "asc";
     $lines = preg_split("/\n+/", $data, -1, PREG_SPLIT_NO_EMPTY); // separate lines into array
 
     if ($sort == "asc") {
@@ -105,6 +104,5 @@ function wikiplugin_sort($data, $params)
         $data = implode("\n", $lines);
     }
 
-    $data = trim($data);
-    return $data;
+    return trim($data);
 }

@@ -4,9 +4,6 @@
         {if $prefs.feature_theme_control eq y}
             {button _text="{tr}Theme Control{/tr}" href="tiki-theme_control.php" _class="btn-sm btn-link tikihelp" _icon_name="file-image-o"}
         {/if}
-        {if $prefs.feature_editcss eq 'y' and $tiki_p_create_css eq 'y'}
-            {button _text="{tr}Edit CSS{/tr}" _class="btn-sm" href="tiki-edit_css.php"}
-        {/if}
         {include file='admin/include_apply_top.tpl'}
     </div>
     {tabset name="admin_look"}
@@ -55,7 +52,7 @@
                     <div class="col-sm-8">
                         <div class="form-check">
                             <input id="dummy_pref-25" class="form-check-input" type="checkbox" name="dummy_feature_fixed_width" {if $prefs.feature_fixed_width eq 'y'} checked="checked"{/if} >
-                            <a class="tikihelp text-info" title="Fixed width:Restrict the width of the site content area, in contrast to a liquid (full-width) layout." >
+                            <a class="tikihelp text-info" title="Fixed width : Restrict the width of the site content area, in contrast to a liquid (full-width) layout." >
                                 <span class="icon icon-information fas fa-info-circle "></span>
                             </a>
                         </div>
@@ -96,6 +93,7 @@
                 {* TODO I don't see where this is used in in admin/include_look.php *}
                 <input type="submit" class="btn btn-primary btn-sm" name="changestyle" value="{tr}Go{/tr}">
             {/if}
+            {preference name=theme_model3dviewer_default_background}
             <div class="adminoptionbox">
                 {if $prefs.feature_jquery_ui eq 'y'}
                     {preference name=feature_jquery_ui_theme}
@@ -129,15 +127,17 @@
             {preference name=feature_fixed_width}
             <div class="adminoptionboxchild" id="feature_fixed_width_childcontainer">
                 {preference name=layout_fixed_width}
+                {preference name=layout_fixed_width_header}
             </div>
             {preference name=site_layout}
             {preference name=site_layout_per_object}
-            {preference name=theme_navbar_fixed_topbar_offset}
             {preference name=theme_header_and_address_bar_color}
             {preference name=theme_default_color_mode}
 
-            <legend class="h3">{tr}Admin pages layout{/tr}</legend>
-            {preference name=site_layout_admin}
+            {if $prefs.theme_unified_admin_backend neq 'y'}
+                <legend class="h3">{tr}Admin pages layout{/tr}</legend>
+                {preference name=site_layout_admin}
+            {/if}
 
             <hr>
 
@@ -172,6 +172,7 @@
                     <br>
                     {preference name=module_file}
                     {preference name=module_zone_available_extra}
+                    {preference name=module_sidebar_toggle_small_screen}
                 </fieldset>
             </div>
             <hr>
@@ -255,12 +256,8 @@
                 <div class="admin featurelist">
                     {preference name=feature_shadowbox}
                     {preference name=allowImageLazyLoad}
-                    <div class="adminoptionboxchild" id="feature_shadowbox_childcontainer">
-                        {preference name=jquery_colorbox_theme}
-                    </div>
                     {preference name=feature_jscalendar}
                     {preference name=wiki_heading_links}
-                    {preference name=feature_equal_height_rows_js}
                     {preference name=feature_conditional_formatting}
                     {preference name=feature_draggable_modals}
                     {preference name=feature_resizable_modals}
@@ -331,7 +328,7 @@
                         <input type="hidden" name="operation" value="create"/>
                         <input type="hidden" name="id" value=""/>
                         <div class="mb-3">
-                            <label class="form-label" for="color-mode">Color mode name</label>
+                            <label class="form-label" for="color-mode">{tr}Color mode name{/tr}</label>
                             <input
                                 type="text"
                                 value=""
@@ -342,7 +339,7 @@
                                 />
                         </div>
                         <div class="mb-3">
-                            <label class="form-label" for="mode-icon">Mode icon name</label>
+                            <label class="form-label" for="mode-icon">{tr}Mode icon name{/tr}</label>
                             <input
                                 type="text"
                                 value=""
@@ -359,22 +356,22 @@
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-body-bg" onclick="toggle_css_variable(this,'--bs-body-bg')">--bs-body-bg</span>
                             </div>
 
-                            <span class="fw-bolder">Emphasis</span>
+                            <span class="fw-bolder">{tr}Emphasis{/tr}</span>
                             <div class="d-flex flex-wrap gap-2">
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-emphasis-color" onclick="toggle_css_variable(this,'--bs-emphasis-color')">--bs-emphasis-color</span>
                             </div>
 
-                            <span class="fw-bolder">Secondary</span>
+                            <span class="fw-bolder">{tr}Secondary{/tr}</span>
                             <div class="d-flex flex-wrap gap-2">
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-secondary-bg" onclick="toggle_css_variable(this,'--bs-secondary-bg')">--bs-secondary-bg</span>
                             </div>
 
-                            <span class="fw-bolder">Tertiary</span>
+                            <span class="fw-bolder">{tr}Tertiary{/tr}</span>
                             <div class="d-flex flex-wrap gap-2">
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-tertiary-bg" onclick="toggle_css_variable(this,'--bs-tertiary-bg')">--bs-tertiary-bg</span>
                             </div>
 
-                            <span class="fw-bolder">Text Emphasis</span>
+                            <span class="fw-bolder">{tr}Text Emphasis{/tr}</span>
                             <div class="d-flex flex-wrap gap-2">
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-primary-text-emphasis" onclick="toggle_css_variable(this,'--bs-primary-text-emphasis')">--bs-primary-text-emphasis</span>
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-secondary-text-emphasis" onclick="toggle_css_variable(this,'--bs-secondary-text-emphasis')">--bs-secondary-text-emphasis</span>
@@ -386,7 +383,7 @@
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-dark-text-emphasis" onclick="toggle_css_variable(this,'--bs-dark-text-emphasis')">--bs-dark-text-emphasis</span>
                             </div>
 
-                            <span class="fw-bolder">Background Subtle</span>
+                            <span class="fw-bolder">{tr}Background Subtle{/tr}</span>
                             <div class="d-flex flex-wrap gap-2">
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-primary-bg-subtle" onclick="toggle_css_variable(this,'--bs-primary-bg-subtle')">--bs-primary-bg-subtle</span>
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-secondary-bg-subtle" onclick="toggle_css_variable(this,'--bs-secondary-bg-subtle')">--bs-secondary-bg-subtle</span>
@@ -398,7 +395,7 @@
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-dark-bg-subtle" onclick="toggle_css_variable(this,'--bs-dark-bg-subtle')">--bs-dark-bg-subtle</span>
                             </div>
 
-                            <span class="fw-bolder">Border Subtle</span>
+                            <span class="fw-bolder">{tr}Border Subtle{/tr}</span>
                             <div class="d-flex flex-wrap gap-2">
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-primary-border-subtle" onclick="toggle_css_variable(this,'--bs-primary-border-subtle')">--bs-primary-border-subtle</span>
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-secondary-border-subtle" onclick="toggle_css_variable(this,'--bs-secondary-border-subtle')">--bs-secondary-border-subtle</span>
@@ -424,7 +421,7 @@
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-topbar-border" onclick="toggle_css_variable(this,'--tiki-topbar-border')">--tiki-topbar-border</span>
                             </div>
 
-                            <span class="fw-bolder">Site Title</span>
+                            <span class="fw-bolder">{tr}Site Title{/tr}</span>
                             <div class="d-flex flex-wrap gap-2">
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-site-title-color" onclick="toggle_css_variable(this,'--tiki-site-title-color')">--tiki-site-title-color</span>
                             </div>
@@ -444,7 +441,7 @@
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--tiki-admin-dropdown-link-hover-bg" onclick="toggle_css_variable(this,'--tiki-admin-dropdown-link-hover-bg')">--tiki-admin-dropdown-link-hover-bg</span>
                             </div>
 
-                            <span class="fw-bolder">Other</span>
+                            <span class="fw-bolder">{tr}Other{/tr}</span>
                             <div class="d-flex flex-wrap gap-2">
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-heading-color" onclick="toggle_css_variable(this,'--bs-heading-color')">--bs-heading-color</span>
                                 <span style="cursor:pointer;" class="badge rounded-pill text-bg-primary" data-badge-for="--bs-link-color" onclick="toggle_css_variable(this,'--bs-link-color')">--bs-link-color</span>
@@ -487,7 +484,7 @@
                         {tr}Custom color modes{/tr}
                     </p>
                     <div>
-                        {foreach $custom_modes item=mode}
+                        {foreach from=$custom_modes item=mode}
                             <div class="input-group mb-3 w-100" data-mode-name='{$mode.name}' data-mode-icon='{$mode.icon}'>
                                 <code class="d-none">{$mode.css_variables}</code>
                                 <button class="btn btn-primary rounded" style="cursor:default" type="button">{icon name=$mode.icon} {$mode.name} <span style="cursor: pointer;" onclick="edit_custom_mode(this,'{$mode.id}','{$mode.name}','{$mode.icon}')">{icon name='edit'}</span> <span style="cursor: pointer;" class="text-danger" onclick="delete_custom_mode(this,'{$mode.id}','{$mode.name}')">{icon name='trash'}</span></button>
@@ -512,19 +509,6 @@
             <fieldset>
                 <legend class="h3">{tr}Editing{/tr}</legend>
                 {preference name=theme_customizer}
-                {preference name=feature_editcss}
-                {preference name=feature_view_tpl}
-                {if $prefs.feature_view_tpl eq 'y'}
-                    <div class="adminoptionboxchild">
-                        {button href="tiki-edit_templates.php" _text="{tr}View Templates{/tr}"}
-                    </div>
-                {/if}
-                {preference name=feature_edit_templates}
-                {if $prefs.feature_edit_templates eq 'y'}
-                    <div class="adminoptionboxchild">
-                        {button href="tiki-edit_templates.php" _text="{tr}Edit Templates{/tr}"}
-                    </div>
-                {/if}
             </fieldset>
             <hr>
         {/tab}

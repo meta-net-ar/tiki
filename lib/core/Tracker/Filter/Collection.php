@@ -40,6 +40,24 @@ class Collection
                 return $item['label'];
             }, $types);
 
+            if ($mode === 'multiselect' || $mode === 'checkboxes') {
+                $controlClass = $mode === 'checkboxes' ? Control\InlineCheckboxes::class : Control\MultiSelect::class;
+                $controlField = $mode === 'checkboxes' ? 'tfc_status' : 'tfms_status';
+                $filter = new Filter($fieldName, $mode);
+                $filter->setLabel(tr('Status'))
+                    ->setControl(new $controlClass($controlField, $possibilities))
+                    ->setApplyCondition(function ($control, Search_Query $query) {
+                        $values = $control->getValues();
+                        if (! empty($values)) {
+                            $sub = $query->getSubQuery("tfms_status");
+                            foreach ($values as $v) {
+                                $sub->filterIdentifier((string) $v, 'tracker_status');
+                            }
+                        }
+                    });
+                return $filter;
+            }
+
             $filter = new Filter($fieldName, 'default');
             $filter->setLabel(tr('Status'))
                 ->setControl(new Control\DropDown("tracker_status_dd", $possibilities))

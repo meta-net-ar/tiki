@@ -4,6 +4,8 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+use Tiki\Lib\CookieConsent\CookieConsentLib;
+
 function wikiplugin_googleanalytics_info()
 {
     return [
@@ -43,7 +45,7 @@ function wikiplugin_googleanalytics_info()
 
 function wikiplugin_googleanalytics($data, $params)
 {
-    global $feature_no_cookie_analytics, $prefs;  // set according to cookie_consent_feature pref in tiki-setup.php
+    global $prefs;
 
     $showCode = WikiPlugin_Helper::showAnalyticsCode($params);
     if (! $showCode) {
@@ -53,13 +55,13 @@ function wikiplugin_googleanalytics($data, $params)
     if (empty($params['account'])) {
         return tra('Missing parameter');
     }
-    if ($feature_no_cookie_analytics) {
-        return '';
+    if (! CookieConsentLib::isCategoryAllowed(CookieConsentLib::BUILTIN_COOKIE_CATEGORY_ANALYTICS)) {
+        return;
     }
     $account = htmlspecialchars($params['account'], ENT_QUOTES);
 
     // Maintain retro-compatibility with old preference
-    if (substr($account, 0, 3) !== "UA-" && substr($account, 0, 2) !== "G-") {
+    if (! str_starts_with($account, "UA-") && ! str_starts_with($account, "G-")) {
         $account = "UA-" . $account;
     }
 
@@ -77,6 +79,7 @@ ga('send', 'pageview');
 </script>
 HTML;
     } else {
+        // @tiki-external-link-ok: Google Analytics plugin - loading external tracking script is the core feature (user explicitly enables this)
         $ret = <<<HTML
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=$account"></script>

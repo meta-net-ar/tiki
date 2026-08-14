@@ -1,4 +1,6 @@
 {if !$ts.ajax}
+
+    {include file='token_view_actions.tpl'}
     {block name=title}
         {title help="forums" admpage="forums" url=$forum_info.forumId|sefurl:'forum'}{$forum_info.name}{/title}
     {/block}
@@ -8,7 +10,7 @@
     {/if}
 
     <div class="t_navbar mb-4">
-        {assign var=thisforum_info value=$forum_info.forumId}
+        {$thisforum_info=$forum_info.forumId}
         {if ($tiki_p_forum_post_topic eq 'y' and ($prefs.feature_wiki_discuss ne 'y' or $prefs.$forumId ne $prefs.wiki_forum_id)) or $tiki_p_admin_forum eq 'y'}
             {if !isset($comments_threadId) or $comments_threadId eq 0}
                 {button href="tiki-view_forum.php?openpost=1&amp;forumId=$thisforum_info&amp;comments_threadId=0&amp;comments_threshold=$comments_threshold&amp;comments_offset=$comments_offset&amp;thread_sort_mode=$thread_sort_mode&amp;comments_per_page=$comments_per_page" _onclick='$("#forumpost").show();return false;' _icon_name="create" _type="primary" class="btn btn-primary" _text="{tr}New Topic{/tr}"}
@@ -28,7 +30,7 @@
 
         <div class="btn-group float-sm-end">
             {if ! $js}<ul><li>{/if}
-            <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" title="{tr}Forum actions{/tr}">
+            <a class="btn btn-info btn-sm dropdown-toggle" data-bs-toggle="dropdown" href="#" title="{tr}Forum actions{/tr}" role="button">
                 {icon name="menu-extra"}
             </a>
             <div class="dropdown-menu dropdown-menu-end">
@@ -115,7 +117,7 @@
                 {if $prefs.sefurl_short_url eq 'y'}
                     <a class="dropdown-item" id="short_url_link" href="#" onclick="(function() { $(document.activeElement).attr('href', 'tiki-short_url.php?url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title)); })();">
                             {icon name="link"} {tr}Get a short URL{/tr}
-                            {assign var="hasPageAction" value="1"}
+                            {$hasPageAction="1"}
                         </a>
                 {/if}
             </div>
@@ -131,17 +133,23 @@
             </div>
         {/if}
     </div>
-    <div class="breadcrumb">
-        <a class="link" href="{if $prefs.feature_sefurl eq 'y'}forums{else}tiki-forums.php{/if}">{tr}Forums{/tr}</a>
-        {$prefs.site_crumb_seper}
-        {foreach from=$parents item=parent}
-            {if isset($parent.name)}
-                <a class="link" href="{$parent.forumId|sefurl:'forum'}">{$parent.name|escape}</a>
-                {$prefs.site_crumb_seper}
-            {/if}
-        {/foreach}
-        <a class="link" href="{$forumId|sefurl:'forum'}">{$forum_info.name|escape}</a>
-    </div>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb"{if $prefs.site_crumb_seper} style="--bs-breadcrumb-divider: '{$prefs.site_crumb_seper|escape:'quotes'}'"{/if}>
+            <li class="breadcrumb-item">
+                <a class="link" href="{if $prefs.feature_sefurl eq 'y'}forums{else}tiki-forums.php{/if}">{tr}Forums{/tr}</a>
+            </li>
+            {foreach from=$parents item=parent}
+                {if isset($parent.name)}
+                    <li class="breadcrumb-item">
+                        <a class="link" href="{$parent.forumId|sefurl:'forum'}">{$parent.name|escape}</a>
+                    </li>
+                {/if}
+            {/foreach}
+            <li class="breadcrumb-item active" aria-current="page">
+                {$forum_info.name|escape}
+            </li>
+        </ol>
+    </nav>
 
     {if $tiki_p_forum_post_topic eq 'y'}
         {if $comment_preview eq 'y'}
@@ -200,7 +208,7 @@
                             </div>
                         </div>
                     {/if}
-                    {if $tiki_p_admin_forum eq 'y'}
+                    {if $tiki_p_forum_post_topic eq 'y'}
                         <div class="mb-3 row">
                             <label class="col-sm-2 col-form-label" for="comment_topictype">{tr}Type{/tr}</label>
                             <div class="col-sm-10">
@@ -366,10 +374,10 @@
                         <div class="mb-3 row">
                             <div class="col-sm-2 col-form-label">{tr}Watch for replies{/tr}</div>
                             <div class="col-sm-10">
-                                <input type="radio" name="set_thread_watch" value="y" id="thread_watch_yes" checked="checked">
+                                <input type="radio" class="form-check-input" name="set_thread_watch" value="y" id="thread_watch_yes" checked="checked">
                                 <label for="thread_watch_yes">{tr}Send me an email when someone replies to my topic{/tr}</label>
                                 <br>
-                                <input type="radio" name="set_thread_watch" value="n" id="thread_watch_no">
+                                <input type="radio" class="form-check-input" name="set_thread_watch" value="n" id="thread_watch_no">
                                 <label for="thread_watch_no">{tr}Don't send me any emails{/tr}</label>
                             </div>
                         </div>
@@ -391,13 +399,16 @@
                             {/if}
                             <input type="submit" class="btn btn-primary btn-sm" name="comments_postComment" value="{tr}Post{/tr}"
                                     {if empty($user)}
-                                        onclick="setCookie('anonymous_name',document.getElementById('anonymous_name').value);needToConfirm=false;"
+                                         onclick="setCookie('anonymous_name', document.getElementById('anonymous_name').value, '', 'session', window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);needToConfirm=false;"
                                     {else}
                                         onclick="needToConfirm=false;"
                                     {/if}
                             >
                             {if $prefs.ajax_edit_previews eq 'n'}
-                                <input type="submit" class="btn btn-secondary btn-sm" name="comments_previewComment" value="{tr}Preview{/tr}" {if empty($user)}onclick="setCookie('anonymous_name',document.getElementById('anonymous_name').value);needToConfirm=false;"{/if}>
+                                <input type="submit" class="btn btn-secondary btn-sm" name="comments_previewComment" value="{tr}Preview{/tr}"
+                                {if empty($user)}
+                                    onclick="setCookie('anonymous_name', document.getElementById('anonymous_name').value, '', 'session', window.tikiCookieConstants.BUILTIN_COOKIE_CATEGORY_FUNCTIONAL);needToConfirm=false;"
+                                {/if}>
                             {/if}
                             <input type="submit" class="btn btn-link btn-sm" name="comments_postCancel" value="{tr}Cancel{/tr}" {if $comment_preview neq 'y'}onclick="hide('forumpost');window.location='#header';return false;"{/if}>
                         </div>
@@ -418,10 +429,10 @@
                         <span class="input-group-text">
                             {icon name="search"}
                         </span>
-                        <input name="highlight" id="findinforums" type="text" class="form-control" placeholder="{tr}Find{/tr}..." aria-label={tr}Find{/tr}>
+                        <input name="highlight" id="findinforums" type="text" class="form-control" placeholder="{tr}Search{/tr}..." aria-label={tr}Search{/tr}>
                         <input type="hidden" name="where" value="forums">
                         <input type="hidden" name="forumId" value="{$forum_info.forumId}">
-                        <input type="submit" class="wikiaction btn btn-primary" name="search" value="{tr}Find{/tr}">
+                        <input type="submit" class="wikiaction btn btn-primary" name="search" value="{tr}Search{/tr}">
                     </div>
                 </div>
             </form>
@@ -436,7 +447,7 @@
             {tr}Sub Forums{/tr}
         </div>
     </div>
-    <table id="{$ts.tableid}" class="table table-striped table-hover table-forum normal" data-count="{$cant|escape}">
+    <table id="{$ts.tableid}" class="table table-striped table-hover table-forum normal" data-count="{$count|escape}">
         {block name=forumheader}
             <thead>
             <tr>
@@ -473,11 +484,11 @@
             </thead>
         {/block}
         <tbody>
-        {assign var=section_old value=""}
+        {$section_old=""}
         {section name=user loop=$channels}
-            {assign var=section value=$channels[user].section}
+            {$section=$channels[user].section}
             {if $section ne $section_old}
-                {assign var=section_old value=$section}
+                {$section_old=$section}
                 <td class="third info" colspan="{$numbercol}">{tr}{$section|escape}{/tr}</td>
             {/if}
             {block name=forumrow}
@@ -521,8 +532,8 @@
                         <td class="text">
                             {if isset($channels[user].lastPost)}
                                 {$channels[user].lastPost|tiki_short_datetime}<br>
-                                {if $prefs.forum_reply_notitle neq 'y'}<small><i>{$channels[user].lastPostData.title|escape}</i>{/if}
-                                {tr}by{/tr} {$channels[user].lastPostData.userName|username}</small>
+                                {if $prefs.forum_reply_notitle neq 'y'}<small><i>{$channels[user].lastPostData.title|forummaskemail|escape}</i>{/if}
+                                {tr}by{/tr} {$channels[user].lastPostData.userName|forummaskemail|username}</small>
                             {/if}
                         </td>
                     {/if}
@@ -618,7 +629,7 @@
                         <button
                             type="submit"
                             form="view_forum"
-                            formaction="{bootstrap_modal controller=forum action=unlock_topic}" 
+                            formaction="{bootstrap_modal controller=forum action=unlock_topic}"
                             title=":{tr}Unlock{/tr}"
                             class="btn btn-primary btn-sm tips"
                             aria-label="{tr}Unlock{/tr}"
@@ -641,10 +652,10 @@
                 </div>
                 <div class="float-sm-end">
                     {if $reported > 0}
-                        <a class="btn btn-primary btn-sm tips" href="tiki-forums_reported.php?forumId={$forumId}" title=":{tr}Reported messages{/tr}">{tr}Reported{/tr} <span class="badge bg-secondary">{$reported}<span></a>
+                        <a class="btn btn-primary btn-sm tips" href="tiki-forums_reported.php?forumId={$forumId}" title=":{tr}Reported messages{/tr}" role="button">{tr}Reported{/tr} <span class="badge bg-secondary">{$reported}<span></a>
                     {/if}
                     {if $queued > 0}
-                        <a class="btn btn-primary btn-sm tips" href="tiki-forum_queue.php?forumId={$forumId}" title=":{tr}Queued messages{/tr}">{tr}Queued{/tr} <span class="badge bg-secondary">{$queued}</span></a>
+                        <a class="btn btn-primary btn-sm tips" href="tiki-forum_queue.php?forumId={$forumId}" title=":{tr}Queued messages{/tr}" role="button">{tr}Queued{/tr} <span class="badge bg-secondary">{$queued}</span></a>
                     {/if}
                 </div>
             </div>
@@ -657,7 +668,7 @@
     <input type="hidden" name="forumId" value="{$forumId|escape}">
     {* Use css menus as fallback for item dropdown action menu if javascript is not being used *}
     <div id="{$ts.tableid}-div" class="{if $js}table-responsive{/if} ts-wrapperdiv" {if !empty($ts.enabled)}style="visibility:hidden;"{/if}>
-        <table id="{$ts.tableid}" class="table normal table-striped table-hover table-forum" data-count="{$comments_cant|escape}">
+        <table id="{$ts.tableid}" class="table normal table-striped table-hover table-forum" data-count="{$comments_count|escape}">
             {block name=forumheader}
             <thead>
                 <tr>
@@ -727,9 +738,9 @@
             <tbody>
                 {section name=ix loop=$comments_coms}
                     {if $userinfo && $comments_coms[ix].lastPost > $userinfo.lastLogin}
-                        {assign var="newtopic" value="_new"}
+                        {$newtopic="_new"}
                     {else}
-                        {assign var="newtopic" value=""}
+                        {$newtopic=""}
                     {/if}
                     {block name=forumrow}
                     <tr>
@@ -740,8 +751,8 @@
                         {/if}
                         <td class="icon">
                             {if $newtopic neq ''}
-                                {assign var=nticon value=$newtopic}
-                                {assign var=ntalt value="-{tr}New{/tr}"}
+                                {$nticon=$newtopic}
+                                {$ntalt="-{tr}New{/tr}"}
                             {/if}
                             {if $comments_coms[ix].type eq 'n'}
                                 {tr}Normal{/tr}
@@ -765,7 +776,7 @@
                         </td>
                         {if $forum_info.topic_smileys eq 'y'}
                             <td class="icon">
-                                {if isset($comments_coms[ix].smiley) && strlen($comments_coms[ix].smiley) > 0} 
+                                {if isset($comments_coms[ix].smiley) && strlen($comments_coms[ix].smiley) > 0}
                                     <img src='img/smiles/{$comments_coms[ix].smiley}'>
                                 {else}
                                     &nbsp;{$comments_coms[ix].smiley}
@@ -776,14 +787,14 @@
                         <td class="text">
                             {if $prefs.feature_sefurl === 'y'}{$sep = '?'}{else}{$sep = '&amp;'}{/if}
                             <a {if $comments_coms[ix].is_marked}class="forumnameread"{else}class="forumname"{/if} href="{$comments_coms[ix].threadId|sefurl:'forumthread'}{$sep}topics_offset={math equation="x + y" x=$comments_offset y=$smarty.section.ix.index}{if $comments_threshold}&amp;topics_threshold={$comments_threshold}{/if}{if $thread_sort_mode ne $forum_info.topicOrdering}&amp;topics_sort_mode={$thread_sort_mode}{/if}{if isset($topics_find) and $topics_find}&amp;topics_find={$comments_find}{/if}">
-                                {$comments_coms[ix].title|escape}
+                                {$comments_coms[ix].title|forummaskemail|escape}
                             </a>
                             {if $forum_info.topic_summary eq 'y'}
                                 <div class="subcomment">
                                     {if $comments_coms[ix].summary|count_characters > 0}
-                                        {$comments_coms[ix].summary|truncate:240:"...":true|escape}
+                                        {$comments_coms[ix].summary|forummaskemail|truncate:240:"...":true|escape}
                                     {else}
-                                        {$comments_coms[ix].data|truncate:100:"...":true|escape}
+                                        {$comments_coms[ix].data|forummaskemail|truncate:100:"...":true|escape}
                                     {/if}
                                 </div>
                             {/if}
@@ -795,9 +806,9 @@
                             <td class="integer"><span class="badge bg-secondary">{$comments_coms[ix].hits}</span></td>
                         {/if}
                         {if $forum_info.vote_threads eq 'y' and ($tiki_p_ratings_view_results eq 'y' or $tiki_p_admin eq 'y')}
-                            <td class="integer">{rating_result_avg type=comment id=$comments_coms[ix].threadId }&nbsp;&nbsp;&nbsp;</td>
+                            <td class="integer">{rating_result_avg type=comment id=$comments_coms[ix].threadId}&nbsp;&nbsp;&nbsp;</td>
                             {if $prefs.rating_results_detailed eq 'y'}
-                                <td class="text">{rating_result type=comment id=$comments_coms[ix].threadId }</td>
+                                <td class="text">{rating_result type=comment id=$comments_coms[ix].threadId}</td>
                             {/if}
                         {/if}
                         {if $forum_info.topics_list_pts eq 'y'}
@@ -806,34 +817,34 @@
                         {if $forum_info.topics_list_lastpost eq 'y'}
                             <td class="text">
                                 {if $forum_info.topics_list_lastpost_avatar eq 'y' and $prefs.feature_userPreferences eq 'y'}
-                                    <div style="float:left;padding-right:2px">{$comments_coms[ix].lastPostData.userName|avatarize}</div>
+                                    <div style="float:left;padding-right:2px">{$comments_coms[ix].lastPostData.userName|forummaskemail|avatarize}</div>
                                 {/if}
                                 <div style="float:left;">
                                     {$comments_coms[ix].lastPost|tiki_short_datetime} {* date_format:"%b %d [%H:%M]" *}
                                     {if $comments_coms[ix].replies}
                                         <br>
-                                        <small>{if $forum_info.topics_list_lastpost_title eq 'y'}<i>{$comments_coms[ix].lastPostData.title|escape}</i> {/if}{tr}by{/tr} {$comments_coms[ix].lastPostData.userName|userlink}</small>
+                                        <small>{if $forum_info.topics_list_lastpost_title eq 'y'}<i>{$comments_coms[ix].lastPostData.title|forummaskemail|escape}</i> {/if}{tr}by{/tr} {$comments_coms[ix].lastPostData.userName|forummaskemail|userlink}</small>
                                     {/if}
                                 </div>
                             </td>
                         {elseif $forum_info.topics_list_lastpost_avatar eq 'y' and $prefs.feature_userPreferences eq 'y'}
                             <td class="text">
-                                {$comments_coms[ix].lastPostData.userName|avatarize}
+                                {$comments_coms[ix].lastPostData.userName|forummaskemail|avatarize}
                             </td>
                         {/if}
                         {if $forum_info.topics_list_author eq 'y'}
                             <td class="text">
                                 {if $forum_info.topics_list_author_avatar eq 'y' and $prefs.feature_userPreferences eq 'y'}
                                     <div style="float:left;padding-right:2px">
-                                        {$comments_coms[ix].userName|avatarize}
+                                        {$comments_coms[ix].userName|forummaskemail|avatarize}
                                     </div>
                                 {/if}
                                 <div style="float:left">
-                                    {$comments_coms[ix].userName|userlink}</td>
+                                    {$comments_coms[ix].userName|forummaskemail|userlink}</td>
                                 </div>
                         {elseif $forum_info.topics_list_author_avatar eq 'y' and $prefs.feature_userPreferences eq 'y'}
                             <td class="text">
-                                {$comments_coms[ix].userName|avatarize}
+                                {$comments_coms[ix].userName|forummaskemail|avatarize}
                             </td>
                         {/if}
 
@@ -906,7 +917,7 @@
 </form>
 {if !$ts.ajax}
     {if !$ts.enabled}
-        {pagination_links cant=$comments_cant step=$comments_per_page offset=$comments_offset offset_arg='comments_offset'}{/pagination_links}
+        {pagination_links count=$comments_count step=$comments_per_page offset=$comments_offset offset_arg='comments_offset'}{/pagination_links}
     {/if}
     {if $forum_info.forum_last_n > 0 && count($last_comments)}
         {* Last n titles *}
@@ -919,9 +930,9 @@
                 <tr>
                     <td>
                         {if $last_comments[ix].parentId eq 0}
-                            {assign var="idt" value=$last_comments[ix].threadId}
+                            {$idt=$last_comments[ix].threadId}
                         {else}
-                            {assign var="idt" value=$last_comments[ix].parentId}
+                            {$idt=$last_comments[ix].parentId}
                         {/if}
                         <a class="forumname" href="tiki-view_forum_thread.php?comments_parentId={$idt}&amp;topics_threshold={$comments_threshold}&amp;topics_offset={math equation="x + y" x=$comments_offset y=$smarty.section.ix.index}&amp;topics_sort_mode={$thread_sort_mode}&amp;topics_find={$comments_find}&amp;forumId={$forum_info.forumId}">{$last_comments[ix].title|escape}</a>
                     </td>
@@ -936,7 +947,7 @@
         <div class="col-md-8" styles="padding-top:15px">
             <div class="card" id="filter-panel">
                 <div class="card-header filter-card-header">
-                    <h4 class="card-title">
+                    <h4 class="tiki-card-header-title">
                         <a data-bs-toggle="collapse" href="#filterCollapse" class="collapsed">
                             {tr}Filter Posts{/tr} {icon name="angle-down"}
                         </a>

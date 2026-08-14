@@ -16,8 +16,6 @@ if (! isset($_REQUEST['trackerId'])) {
     Feedback::errorAndDie(tra('No tracker indicated'), \Laminas\Http\Response::STATUS_CODE_400);
 }
 
-TikiLib::lib('header')->setXRobotsTag($robots);
-
 $trklib = TikiLib::lib('trk');
 @ini_set('max_execution_time', 0);
 
@@ -78,7 +76,7 @@ $filterFields = [];
 $values = [];
 $exactValues = [];
 foreach ($_REQUEST as $key => $val) {
-    if (substr($key, 0, 2) == 'f_' && ! empty($val) && (! is_array($val) || ! empty($val[0]))) {
+    if (str_starts_with($key, 'f_') && ! empty($val) && (! is_array($val) || ! empty($val[0]))) {
         $fieldId = substr($key, 2);
         $filterFields[] = $fieldId;
         if (isset($_REQUEST["x_$fieldId"]) && $_REQUEST["x_$fieldId"] == 't') {
@@ -252,13 +250,6 @@ if (empty($_REQUEST['itemId'])) {
             fwrite($fp, $data);
         } else {
             echo $data;
-        }
-        if ($tracker_info['useAttachments'] == 'y' && ! empty($_REQUEST['zip'])) {
-            foreach ($items['data'] as $v) {
-                if (! $trklib->export_attachment($v['itemId'], $archive)) {
-                    Feedback::errorAndDie(tra('Problem zip'), \Laminas\Http\Response::STATUS_CODE_409);
-                }
-            }
         }
     }
 } else {

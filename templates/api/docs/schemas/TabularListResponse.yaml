@@ -1,0 +1,24 @@
+---
+description: List of tabular formats (GET /tabulars).
+type: object
+required:
+  - title
+  - formatList
+properties:
+  title:
+    type: string
+  formatList:
+    type: array
+    items:
+      type: object
+      required:
+        - tabularId
+        - name
+        - trackerId
+      properties:
+        tabularId:
+          type: integer
+        name:
+          type: string
+        trackerId:
+          type: integer

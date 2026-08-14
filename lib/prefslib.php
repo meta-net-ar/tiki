@@ -9,13 +9,18 @@ use Tiki\Package\ComposerManager;
 class PreferencesLib
 {
     private const DEFAULT_HIDDEN_PREFERENCES = [
-        'feature_editcss',
-        'feature_edit_templates',
         'feature_purifier',
         'smarty_security_dirs',
+        'smarty_security_allowed_tags',
+        'smarty_security_disabled_tags',
+        'smarty_security_allowed_modifiers',
+        'smarty_security_disabled_modifiers',
+        'smarty_security_allowed_builtin_php_functions',
         'tiki_allow_trust_input',
         'feature_create_webhelp',
         'scheduler_shell_command',
+        'smarty_enable_string_eval',
+        'wikiplugin_fileaccess_allowed_paths',
     ];
 
     private $data = [];
@@ -50,7 +55,6 @@ class PreferencesLib
 
         $translatablePreferences = [
             'browsertitle',
-            'metatag_keywords',
             'metatag_description',
         ];
 
@@ -103,6 +107,22 @@ class PreferencesLib
         return '';
     }
 
+    /**
+     * Clearly this was meant as the main accessor for preferences information (would be more adequately called getPreferenceInfo).
+     * It is the only place I could find that lists all the possible values
+     * for the keys contained in the preference definition (although it doesn't document them)
+     *
+     * I do not know why (historically) a true refactoring from the global $pref variable was
+     * never started.
+     *
+     * There is a TikiLib::get_preference() to directly return the value, but it has questionable fallbacks, and is independent of this code:
+     * It does not read the type, so can't be relied upon unless you know in advance it returns an array.
+     * @param [type] $name
+     * @param boolean $deps Process dependencies (does not currently enforce them, just returns information)
+     * @param ?array $source Is set, will look for the preference value in this variable instead of the global $pref array.
+     * @param boolean $get_pages If true, will return the result of $this->getPreferenceLocations($name) in the 'pages' key.
+     * @return false on failure or an array of information on the preference.  That actual value is in the 'value' key.
+     */
     public function getPreference($name, $deps = true, $source = null, $get_pages = false)
     {
         global $prefs, $systemConfiguration;
@@ -113,12 +133,13 @@ class PreferencesLib
             return false;
         }
         $defaults = [
-            'type' => '',
+            'type' => '', //Possible values appear to be 'flag', 'list' as in selection from a list as opposed to array, 'multilist' (as in array), 'text', 'textarea', 'password', 'multicheckbox', 'group'
             'helpurl' => '',
             'help' => '',
             'adminurl' => 'tiki-admin.php?lm_criteria=' . urlencode($name) . '&amp;exact',
             'dependencies' => [],
             'conflicts' => [],
+            'notices' => [],
             'packages_required' => [],
             'extensions' => [],
             'dbfeatures' => [],
@@ -149,14 +170,26 @@ class PreferencesLib
             $source = $prefs;
         }
 
-        $value = isset($source[$name]) ? $source[$name] : null;
-        if (
-            ! empty($value) &&
-            is_string($value) &&
-            (strlen($value) > 1 && $value[1] == ':' && strpos($value, '{') !== false) &&
-            false !== $unserialized = @unserialize($value)
-        ) {
-            $value = $unserialized;
+        //Determine the effective value
+        if (array_key_exists($name, $source)) { //Cannot use isset here, null can be a valid value for a pref
+            $value = $source[$name];
+            if (
+                ! empty($value) &&
+                is_string($value) &&
+                (strlen($value) > 1 && $value[1] == ':' && str_contains($value, '{')) &&
+                false !== $unserialized = @unserialize($value)
+            ) {
+                $value = $unserialized;
+            }
+        } elseif (array_key_exists('default', $data[$name])) { //Here again, null may be a valid default value
+            $value = $data[$name]['default'];
+        } else {
+            /*  Note:  This is still incomplete, 'default' isn't mandatory.
+                'multilist' and 'multicheckbox' should return arrays.
+                The different string types should return an empty string (because that seems to be the current semantics of the pref system)
+                Once again, in a stable branch, so I don't want to do such a large change of behaviour right now - benoitg - 2026-03-26
+                */
+            $value = null;
         }
 
         $info['preference'] = $name;
@@ -180,7 +213,7 @@ class PreferencesLib
 
         $info['notes'] = [];
 
-        $info['raw'] = isset($source[$name]) ? $source[$name] : null;
+        $info['raw'] = $source[$name] ?? null;
         $info['id'] = 'pref-' . ++$id;
 
         if (! empty($info['help']) && isset($prefs['feature_help']) && $prefs['feature_help'] == 'y') {
@@ -202,8 +235,8 @@ class PreferencesLib
                 $info['dependencies'] = $this->getDependencies($info['dependencies']);
             }
             if (isset($info['conflicts'])) {
-                $info['conflicts'] = $this->getConflicts($info['conflicts']);
-                if (count($info['conflicts']['active']) && $info['value'] != 'y') {
+                $info['conflicts'] = $this->getConflicts($info['conflicts'], $info);
+                if (count($info['conflicts']['active']) && $info['type'] === 'flag' && $info['value'] != 'y') {
                     $info['available'] = false;
                 }
             }
@@ -239,6 +272,10 @@ class PreferencesLib
             if (is_string($info['default'])) {
                 $info['modified'] = str_replace("\r\n", "\n", $info['value'] ?? '') != $info['default'];
             } else {
+                /* This is from https://gitlab.com/tikiwiki/tiki/-/merge_requests/2666
+                   It is wrong.  Now any preference with non-string values will not be compared at all.
+                   But I'm currently working on a branch, so I cannot fix this immediately - benoitg - 2026-03-26
+                   */
                 $info['modified'] = false;
             }
         }
@@ -452,7 +489,9 @@ class PreferencesLib
             'unified_date_fields',
             'unified_total_fields',
             'unified_field_count',
-            'unified_last_rebuild',
+            'unified_last_rebuild_mysql',
+            'unified_last_rebuild_elastic',
+            'unified_last_rebuild_manticore',
             'mailin_autocheckLast',
             'toolbar_admin',
             'toolbar_adminmodified',
@@ -640,17 +679,20 @@ class PreferencesLib
 
     public function applyChanges($handled, $data, $limitation = null)
     {
-        global $user_overrider_prefs;
+        global $user_overrider_prefs, $systemConfiguration;
         $tikilib = TikiLib::lib('tiki');
 
         if (is_array($limitation)) {
             $handled = array_intersect($handled, $limitation);
         }
 
-        $resets = isset($data['lm_reset']) ? (array) $data['lm_reset'] : [];
+        $resets = (array) ($data['lm_reset'] ?? []);
 
         $changes = [];
         foreach ($handled as $pref) {
+            if (isset($systemConfiguration->preference->$pref)) {
+                continue;
+            }
             if (in_array($pref, $resets)) {
                 $tikilib->delete_preference($pref);
                 $changes[$pref] = ['type' => 'reset'];
@@ -725,11 +767,11 @@ class PreferencesLib
         if (in_array($name, $this->system_modified)) {
             return null;
         }
-        if (substr($name, 0, 3) == 'tp_') {
+        if (str_starts_with($name, 'tp_')) {
             $midpos = strpos($name, '__', 3);
             $pos = strpos($name, '__', $midpos + 2);
             $file = substr($name, 0, $pos);
-        } elseif (substr($name, 0, 7) == 'themes_') {
+        } elseif (str_starts_with($name, 'themes_')) {
             $pos = strpos($name, '_', 7 + 1);
             $file = substr($name, 0, $pos);
         } elseif (false !== $pos = strpos($name, '_')) {
@@ -764,7 +806,7 @@ class PreferencesLib
     private function realLoad($file, $partial)
     {
         $inc_file = __DIR__ . "/prefs/{$file}.php";
-        if (substr($file, 0, 3) == "tp_") {
+        if (str_starts_with($file, "tp_")) {
             $paths = \Tiki\Package\ExtensionManager::getPaths();
             $package = str_replace('__', '/', substr($file, 3));
             $inc_file = $paths[$package] . "/prefs/{$file}.php";
@@ -772,7 +814,7 @@ class PreferencesLib
         if (preg_match('/^themes_(.*)$/', $file, $matches)) {
             $themeName = $matches[1];
             $themePath = TikiLib::lib('theme')->get_theme_path($themeName);
-            $inc_file = $themePath . "prefs/{$file}.php";
+            $inc_file = $themePath . "/prefs/{$file}.php";
         }
         if (file_exists($inc_file) && $file !== "index") {
             require_once $inc_file;
@@ -793,9 +835,9 @@ class PreferencesLib
         foreach ((array) $dependencies as $key => $dep) {
             $info = $this->getPreference($dep, false);
             if ($info) {
-                $name = isset($info['name']) ? $info['name'] : '';
-                $type = isset($info['type']) ? $info['type'] : '';
-                $link = isset($info['adminurl']) ? $info['adminurl'] : '';
+                $name = $info['name'] ?? '';
+                $type = $info['type'] ?? '';
+                $link = $info['adminurl'] ?? '';
                 $out[] = [
                     'name' => $dep,
                     'label' => $name,
@@ -821,30 +863,54 @@ class PreferencesLib
         return $out;
     }
 
-    private function getConflicts($conflicts)
+    private function getConflicts($conflicts, $subject)
     {
         $active = [];
         $inactive = [];
 
-        foreach ((array) $conflicts as $pref) {
-            $info = $this->getPreference($pref, false);
-            if (! $info) {
-                continue;
-            }
-            $name = isset($info['name']) ? $info['name'] : '';
-            $link = isset($info['adminurl']) ? $info['adminurl'] : '';
-            if ($info['value'] == 'y') {
-                $active[] = [
-                    'name' => $pref,
-                    'label' => $name,
-                    'link' => $link,
-                ];
+        foreach ((array) $conflicts as $key => $details) {
+            if (is_array($details)) {
+                $info = $this->getPreference($details['preference'], false);
+                if (! $info) {
+                    continue;
+                }
+                $name = $info['name'] ?? '';
+                $link = $info['adminurl'] ?? '';
+                if ($subject['value'] === $key && $info['value'] === $details['value']) {
+                    $active[] = [
+                        'name' => $details['preference'],
+                        'label' => $name,
+                        'link' => $link,
+                        'message' => $details['message'],
+                    ];
+                } else {
+                    $inactive[] = [
+                        'name' => $details['preference'],
+                        'label' => $name,
+                        'link' => $link,
+                        'message' => $details['message'],
+                    ];
+                }
             } else {
-                $inactive[] = [
-                    'name' => $pref,
-                    'label' => $name,
-                    'link' => $link,
-                ];
+                $info = $this->getPreference($details, false);
+                if (! $info) {
+                    continue;
+                }
+                $name = $info['name'] ?? '';
+                $link = $info['adminurl'] ?? '';
+                if ($info['value'] == 'y') {
+                    $active[] = [
+                        'name' => $key,
+                        'label' => $name,
+                        'link' => $link,
+                    ];
+                } else {
+                    $inactive[] = [
+                        'name' => $key,
+                        'label' => $name,
+                        'link' => $link,
+                    ];
+                }
             }
         }
 
@@ -968,11 +1034,15 @@ class PreferencesLib
             }
         }
 
-        if (strpos($name, 'wikiplugin_') === 0 || strpos($name, 'wikiplugininline_') === 0) {
+        if (str_starts_with($name, 'wikiplugin_') || str_starts_with($name, 'wikiplugininline_')) {
             $pages[] = ['textarea', 2]; // plugins are included in textarea admin dynamically
         }
-        if (strpos($name, 'trackerfield_') === 0) {
+        if (str_starts_with($name, 'trackerfield_')) {
             $pages[] = ['trackers', 3]; // trackerfields are also included in tracker admin dynamically
+        }
+        if (str_starts_with($name, 'socnets_')) {
+            $pages[] = ['socialnetworks', 4]; // socnets preferences are used in social networks admin panels
+            $pages[] = ['socnets', 4];
         }
 
         return $pages;
@@ -986,13 +1056,11 @@ class PreferencesLib
         $file = TEMP_CACHE_PATH . '/preference-usage-index';
         if (! file_exists($file)) {
             $prefs_usage_array = [];
-            $fp = opendir(TEMPLATES_ADMIN_PATH . '/');
-
-            while (false !== ($f = readdir($fp))) {
-                preg_match('/^include_(.*)\.tpl$/', $f, $m);
-                if (count($m) > 0) {
+            $iterator = new FilesystemIterator(TEMPLATES_ADMIN_PATH, FilesystemIterator::SKIP_DOTS);
+            foreach ($iterator as $fileInfo) {
+                if (preg_match('/^include_(.*)\.tpl$/', $fileInfo->getFilename(), $m)) {
                     $page = $m[1];
-                    $filePath = TEMPLATES_ADMIN_PATH . '/' . $f;
+                    $filePath = $fileInfo->getPathname();
                     $c = file_get_contents($filePath);
 
                     // Replace {include file='admin/template.tpl'} with the content of the file
@@ -1000,24 +1068,16 @@ class PreferencesLib
                         '/\{include file=[\'"]([^\'"]+)[\'"]\}/i',
                         function ($matches) {
                             $includeFile = TEMPLATES_ADMIN_PATH . '/' . ltrim($matches[1], 'admin/');
-                            if (file_exists($includeFile)) {
-                                return file_get_contents($includeFile);
-                            }
-                            return '';
+                            return file_exists($includeFile) ? file_get_contents($includeFile) : '';
                         },
                         $c
                     );
 
-                    preg_match_all('/{preference.*name=[\'"]?(\w*)[\'"]?.*}/i', $c, $m2, PREG_OFFSET_CAPTURE);
-                    if (count($m2[1]) > 0) {
-                        // count number of tabs in front of each found pref
-                        foreach ($m2[1] as & $found) {
+                    if (preg_match_all('/{preference.*name=[\'"]?(\w*)[\'"]?.*}/i', $c, $m2, PREG_OFFSET_CAPTURE)) {
+                        foreach ($m2[1] as &$found) {
                             $tabs = preg_match_all('/{\/tab}/i', substr($c, 0, $found[1]), $m3);
-                            if ($tabs === false) {
-                                $tabs = 0;
-                            } else {
-                                $tabs++;
-                            }
+                            $tabs = ($tabs === false) ? 0 : $tabs + 1;
+
                             if ($prefs['site_layout'] !== 'classic' && $page === 'look' && $tabs > 2) {
                                 $tabs--;    // hidden tab #3 for shadow layers
                             }
@@ -1027,6 +1087,7 @@ class PreferencesLib
                     }
                 }
             }
+
             file_put_contents($file, serialize($prefs_usage_array));
         } else {
             $prefs_usage_array = unserialize(file_get_contents($file));
@@ -1042,8 +1103,8 @@ class PreferencesLib
             // also index the parts of the pref name individually, e.g. wikiplugin_plugin_name as wikiplugin plugin name
             str_replace('_', ' ', $info['preference']),
             $info['name'],
-            isset($info['description']) ? $info['description'] : '',
-            isset($info['keywords']) ? $info['keywords'] : '',
+            $info['description'] ?? '',
+            $info['keywords'] ?? '',
         ];
 
         if (isset($info['options'])) {
@@ -1170,7 +1231,7 @@ class PreferencesLib
     private function _getListValue($info, $data)
     {
         $name = $info['preference'];
-        $value = isset($data[$name]) ? $data[$name] : null;
+        $value = $data[$name] ?? null;
 
         $options = $info['options'];
 
@@ -1185,7 +1246,7 @@ class PreferencesLib
     private function _getMultilistValue($info, $data)
     {
         $name = $info['preference'];
-        $value = isset($data[$name]) ? (array) $data[$name] : [];
+        $value = (array) ($data[$name] ?? []);
 
         $options = $info['options'];
         $options = array_keys($options);
@@ -1196,7 +1257,7 @@ class PreferencesLib
     private function _getRadioValue($info, $data)
     {
         $name = $info['preference'];
-        $value = isset($data[$name]) ? $data[$name] : null;
+        $value = $data[$name] ?? null;
 
         $options = $info['options'];
         $options = array_keys($options);
@@ -1300,6 +1361,7 @@ class PreferencesLib
                 if (isset($info['default'])) {
                     $defaults[$name] = $info['default'];
                 } else {
+                    //This isn't checking types and will be wildly incorrect for array types. And currently other functions are defaulting to null - benoitg - 2026-03-26
                     $defaults[$name] = '';
                 }
             }
@@ -1319,7 +1381,7 @@ class PreferencesLib
         }
         foreach (TikiLib::lib('theme')->get_available_themes() as $theme => $label) {
             $themePath = TikiLib::lib('theme')->get_theme_path($theme);
-            foreach (glob($themePath . 'prefs/*.php') as $file) {
+            foreach (glob($themePath . '/prefs/*.php') as $file) {
                 if (basename($file) === "index.php") {
                     continue;
                 }
@@ -1500,7 +1562,7 @@ class PreferencesLib
         global $prefs;
         $ret = [];
         foreach (array_keys($prefs) as $prefName) {
-            if (substr($prefName, 0, 3) == 'tp_') {
+            if (str_starts_with($prefName, 'tp_')) {
                 $ret[] = $prefName;
             }
         }
@@ -1518,7 +1580,7 @@ class PreferencesLib
         global $prefs;
         $ret = [];
         foreach (array_keys($prefs) as $prefName) {
-            if (substr($prefName, 0, 7) == 'themes_') {
+            if (str_starts_with($prefName, 'themes_')) {
                 $ret[] = $prefName;
             }
         }

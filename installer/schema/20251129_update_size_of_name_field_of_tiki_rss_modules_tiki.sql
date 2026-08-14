@@ -1,0 +1,1 @@
+ALTER TABLE `tiki_rss_modules` MODIFY `name` VARCHAR(200) NOT NULL DEFAULT '';

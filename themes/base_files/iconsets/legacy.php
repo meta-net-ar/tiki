@@ -6,7 +6,7 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 
 // This script may only be included - so its better to die if called directly.
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
@@ -696,7 +696,6 @@ function iconset_legacy()
                 'id' => 'share_link',
             ],
             //sharethis in defaults
-            //skype in defaults
             'smile' => [
                 'prepend' => 'img/smiles/',
                 'id' => 'icon_smile',
@@ -900,7 +899,6 @@ function iconset_legacy()
             'plugin',
             'quotes',
             'sharethis',
-            'skype',
             'star',
             'table',
             'user',

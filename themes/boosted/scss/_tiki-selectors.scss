@@ -1,17 +1,26 @@
-// This file is for additional SCSS rules beyond what are in _variables.scss.
+// Orange Boosted for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
 
 // Image path example:
 $imagePath: "../images/";
 // body {
-//	background-image: url('#{$imagePath}bg.jpg');
+//    background-image: url('#{$imagePath}bg.jpg');
 // }
 
-// The headings below that are commented are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
-// In the case of CSS selectors that are grouped to share common CSS properties, the category appropriate for most of the selectors is used.
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
 
-// -------------------- Color system -------------------- //
-// -------------------- Body (large elements -------------------- //
-// -------------------- Links -------------------- //
+// Color system
+// Body
+// Links
+// Components
+// Typography
 h1,
 h2,
 h3,
@@ -22,11 +31,8 @@ h5 {
     }
 }
 
-// -------------------- Paragraphs -------------------- //
-// -------------------- Components -------------------- //
-// -------------------- Typography -------------------- //
-// -------------------- Tables -------------------- //
-// -------------------- Buttons -------------------- //
+// Tables
+// Buttons
 .btn-outline-primary {  // For WCAG 2 compliance
     color: #BD5800;
     border-color: #BD5800;
@@ -40,7 +46,7 @@ h5 {
     border-color: #8F7200;
 }
 
-// -------------------- Forms -------------------- //
+// Forms
 .form-switch {
     padding-left: 1.25rem; // Overrides 4rem padding
 }
@@ -49,23 +55,21 @@ form label {
     font-weight: $form-label-font-weight; // In original, only applied to class form-label, which Tiki doesn't use consistently
 }
 
-// -------------------- Form validation -------------------- //
-// -------------------- Navs -------------------- //
-// -------------------- Navbar -------------------- //
-// -------------------- Dropdowns -------------------- //
+// Navs
+// Navbar
 // Dropdowns
 .dropdown-menu.dropdown-menu-dark a.dropdown-item {
     background: black;
     color: white !important;
 }
-// -------------------- Pagination -------------------- //
-// -------------------- Jumbotron -------------------- //
-// -------------------- Cards -------------------- //
-// -------------------- Tooltips -------------------- //
-// -------------------- Popovers -------------------- //
-// -------------------- Toasts -------------------- //
-// -------------------- Badges -------------------- //
-// -------------------- Modals -------------------- //
+
+// Pagination
+// Cards
+.card.module.no-decorations h3.card-title {
+    color: var(--bs-body-color);
+}
+
+// Modals
 .modal-header {
     padding: 1rem;
     .btn-close {
@@ -73,22 +77,13 @@ form label {
     }
 }
 
-// -------------------- Alerts -------------------- //
-// -------------------- Progress bars -------------------- //
-// -------------------- List group -------------------- //
-// -------------------- Image thumbnails -------------------- //
-// -------------------- Figures -------------------- //
-// -------------------- Breadcrumbs -------------------- //
-// -------------------- Carousel -------------------- //
-// -------------------- Spinners -------------------- //
-// -------------------- Close -------------------- //
-// -------------------- Code -------------------- //
-// -------------------- Utilities -------------------- //
-// -------------------- Printing -------------------- //
+// Alerts
+// Progress bars
+// List group
+// Figures
+// Breadcrumbs
+// Code
 
-// -------------------- Etc -------------------- //
+// Tiki-specific
 
-// -------------------- Tiki-specific -------------------- //
-
-// -------------------- External libraries -------------------- //
-
+// External libraries

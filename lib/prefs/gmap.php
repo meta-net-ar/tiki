@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_gmap_list()
 {
+    $mapsConfigHelp = 'Maps-Config';
+
     return [
         'gmap_key' => [
             'name' => tra('Google Maps API Key'),
@@ -18,21 +20,27 @@ function prefs_gmap_list()
         ],
         'gmap_defaultx' => [
             'name' => tra('Default x for map center'),
+            'description' => tra('Default longitude for the center point of maps when no location is specified.'),
             'type' => 'text',
+            'help' => $mapsConfigHelp,
             'size' => 20,
             'filter' => 'striptags',
             'default' => '0',
         ],
         'gmap_defaulty' => [
             'name' => tra('Default y for map center'),
+            'description' => tra('Default latitude for the center point of maps when no location is specified.'),
             'type' => 'text',
+            'help' => $mapsConfigHelp,
             'size' => 20,
             'filter' => 'striptags',
             'default' => '0',
         ],
         'gmap_defaultz' => [
             'name' => tra('Default zoom level'),
+            'description' => tra('Default zoom level for maps when no location is specified.'),
             'type' => 'list',
+            'help' => $mapsConfigHelp,
             'options' => [
                 1 => tra('whole earth'),
                 2 => 2,
@@ -58,6 +66,7 @@ function prefs_gmap_list()
         'gmap_article_list' => [
             'name' => tra('Show map mode buttons in articles list'),
             'type' => 'flag',
+            'help' => $mapsConfigHelp,
             'dependencies' => [
                 'geo_locate_article',
             ],
@@ -65,7 +74,9 @@ function prefs_gmap_list()
         ],
         'gmap_page_list' => [
             'name' => tra('Show map mode buttons in page list'),
+            'description' => tra('Show map and list view toggle buttons on the wiki page list to display geolocated pages on a map.'),
             'type' => 'flag',
+            'help' => $mapsConfigHelp,
             'dependencies' => [
                 'geo_locate_wiki',
             ],

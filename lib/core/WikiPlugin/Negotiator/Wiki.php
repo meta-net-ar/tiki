@@ -4,6 +4,9 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
+
+use Tiki\Sections;
+
 class WikiPlugin_Negotiator_Wiki
 {
     public $name;
@@ -258,7 +261,6 @@ class WikiPlugin_Negotiator_Wiki
                 break;
             }
         }
-        //var_dump($pluginPhpFilePath, $exists);
         return $exists ? $pluginPhpFilePath : null;
     }
 
@@ -363,10 +365,11 @@ class WikiPlugin_Negotiator_Wiki
 
     public function isEditable()
     {
-        global $tiki_p_edit, $prefs, $section;
+        global $tiki_p_edit, $prefs;
+        $section = Sections::getCurrentSection();
 
         return (
-            $section == 'wiki page' &&
+            Sections::isCurrentSection(Sections::SECTION_WIKI_PAGE) &&
             isset($this->info) &&
             $tiki_p_edit == 'y' &&
             $prefs['wiki_edit_plugin'] == 'y' &&
@@ -470,7 +473,7 @@ class WikiPlugin_Negotiator_Wiki
 
     private function fingerprint()
     {
-        $validate = (isset($this->info['validate']) ? $this->info['validate'] : '');
+        $validate = ($this->info['validate'] ?? '');
 
         if ($validate == 'all' || $validate == 'body') {
             $validateBody = str_replace('<x>', '', $this->body);    // de-sanitize plugin body to make fingerprint consistant with 5.x
@@ -569,7 +572,7 @@ class WikiPlugin_Negotiator_Wiki
     {
         global $tikilib;
 
-        $default = TikiFilter::get(isset($this->info['defaultfilter']) ? $this->info['defaultfilter'] : 'xss');
+        $default = TikiFilter::get($this->info['defaultfilter'] ?? 'xss');
 
         // Apply filters on the body
         $filter = isset($this->info['filter']) ? TikiFilter::get($this->info['filter']) : $default;
@@ -707,7 +710,7 @@ class WikiPlugin_Negotiator_Wiki
             foreach (self::$pluginsAwaitingExecution as &$pluginDetails) {
                 $this->setDetails($pluginDetails);
 
-                if (self::$currentParserLevel == $level && strstr($input, $this->key)) {
+                if (self::$currentParserLevel == $level && str_contains($input, $this->key)) {
                     $this->parser->plugin[$this->key] = $this->body;
 
                     $result = $this->parser->parsePlugin($this->execute());

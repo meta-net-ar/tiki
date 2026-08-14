@@ -38,9 +38,9 @@ function module_directory_top_sites($mod_reference, $module_params)
     $tikilib = TikiLib::lib('tiki');
     $smarty = TikiLib::lib('smarty');
     $ranking = $tikilib->dir_list_all_valid_sites2(0, $mod_reference["rows"], 'hits_desc', '');
-    $module_params['desc'] = isset($module_params['desc']) ? $module_params['desc'] : 'n';
+    $module_params['desc'] = $module_params['desc'] ?? 'n';
 
-    $smarty->assign('desc', isset($module_params['desc']) ? $module_params['desc'] : 'n');
+    $smarty->assign('desc', $module_params['desc'] ?? 'n');
 
     // only allow truncation if showing description
     if ($module_params['desc'] != 'n') {

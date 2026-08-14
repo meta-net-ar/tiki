@@ -7,14 +7,8 @@
 body:not(.fixed_width) .container {
     padding-left: calc($grid-gutter-width / 2);
     padding-right: calc($grid-gutter-width / 2);
-    width: auto;
+    width: 100%;
     max-width: 100%;
-}
-
-// position: fixed-top is being overridden by position:relative for some reason
-.tiki .navbar.fixed-top,
-.tiki header.fixed-top {
-    position: fixed;
 }
 
 @media(max-width:768px) {
@@ -135,6 +129,14 @@ body.fullscreen.tiki.navbar-padding {
 //    word-wrap: normal;
 //    word-break: normal;
 }
+@media (max-width: 768px) {
+    .tiki.tiki-list_file_gallery .popover,
+    .tiki.tiki_file_galleries .popover,
+    .tiki.tiki_trackers .popover,
+    .tiki .wikiplugin-trackerlist .popover {
+        max-width: 90vw;
+    }
+}
 
 .tiki.tiki_wiki_page .popover {
     max-width: 50vw;
@@ -142,11 +144,12 @@ body.fullscreen.tiki.navbar-padding {
 
 .tiki .popover {
     p:last-child { margin-bottom: 0; }
+    z-index: 999999;
 }
 
 .tiki .popover {
     max-width: $popover-max-width + 25px;
-    z-index: 1;
+    z-index: $zindex-popover;
     .popover-body .table {
         margin-bottom: 0;
         td { word-break: break-word; }
@@ -197,6 +200,9 @@ body.fullscreen.tiki.navbar-padding {
     white-space: nowrap;
 }
 
+.admin-icon{
+    color: var(--tiki-top-color)
+}
 
 //.layout_social,                   Selectors no longer match the HTML - g_c-l.
 //.layout_social_modules {
@@ -292,6 +298,20 @@ body.fullscreen.tiki.navbar-padding {
     .side-col-toggle-container { display: none; }
 }
 
+@media (max-width: 992px) {
+    .hide_zone_left #col2 #left_modules,
+    .hide_zone_right #col3 #right_modules {
+      display: none;
+    }
+    #col2 .side-col-toggle-small-screen,
+    #col3 .side-col-toggle-small-screen {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .side-col-toggle-small-screen {
+        background-image: linear-gradient(to bottom,  transparent, rgba(150,150,150,.25) calc(50% - 1px), var(--bs-border-color) calc(50%), transparent calc(50% + 1px));
+    }
+}
 @media (min-width: 992px) {
     .hide_zone_left #col2, // When hidden we simply do not display the columns
     .hide_zone_right #col3 {
@@ -432,6 +452,29 @@ body.fullscreen.tiki.navbar-padding {
     margin-bottom: 0;
 }
 
+.btn-tinted-primary {
+    --bs-btn-color: var(--bs-primary);
+    --bs-btn-bg: rgba(var(--bs-primary-rgb), 0.08);
+    --bs-btn-border-color: transparent;
+
+    --bs-btn-hover-color: var(--bs-primary);
+    --bs-btn-hover-bg: rgba(var(--bs-primary-rgb), 0.15);
+    --bs-btn-hover-border-color: transparent;
+
+    --bs-btn-active-color: var(--bs-primary);
+    --bs-btn-active-bg: rgba(var(--bs-primary-rgb), 0.20);
+    --bs-btn-active-border-color: transparent;
+
+    --bs-btn-focus-shadow-rgb: var(--bs-primary-rgb);
+
+    color: var(--bs-btn-color) !important;
+
+    &:focus,
+    &:active {
+        box-shadow: none !important;
+    }
+}
+
 @media screen and (max-width: 480px) {
     .tiki #conversejs.converse-embedded {
         margin: 0;
@@ -447,8 +490,11 @@ body.fullscreen.tiki.navbar-padding {
     .tiki.tiki_wiki_page .popover { max-width: 75%; }
 }
 
-// Override the default Bootstrap separator.
-.breadcrumb-item + .breadcrumb-item::before { content: none !important; }
+// Use Bootstrap's default separator mechanism driven by the CSS variable.
+// Individual templates can set --bs-breadcrumb-divider (e.g., via user pref site_crumb_seper).
+.breadcrumb-item + .breadcrumb-item::before {
+  content: var(--bs-breadcrumb-divider, "/");
+}
 
 // Restore pre-Bootstrap 5 top and bottom padding on vertical menu items
 .navbar-nav.me-auto.bs-vertical .nav-link,
@@ -460,4 +506,21 @@ body.fullscreen.tiki.navbar-padding {
 // !important is needed here (after setting enable-important-utilities variable to false). g_c-l
 .flex-column {
     flex-direction: column !important;
+}
+
+// These classes are used in templates and should resist being overridden.
+.p-0 {
+    padding: 0 !important;
+}
+
+.m-0 {
+    margin: 0 !important;
+}
+
+.border-0 {
+    border: 0 !important;
+}
+
+.shadow-none {
+    box-shadow: none !important;
 }

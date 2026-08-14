@@ -1,45 +1,64 @@
-// This file is for additional SCSS rules beyond what are in _bootstrap-variables.scss.
+// The DarkShine theme for Tiki Bootstrap 5.3
+
+// Tiki selectors to implement styles not covered by standard Bootstrap rules, including
+// * SCSS code
+// * CSS selectors and values
+// * Overrides and extensions of vendor (Bootswatch, etc.) styles
+// * Color mode rules
+
+@use "sass:color";
+
 // Image path example:
 $imagePath: "../images/";
 
+// The headings below in comments are from Bootstrap variables.scss to help organize relevant Tiki CSS selectors.
+// These are the sections that most often have additional Tiki selectors.
+// Some may be grouped if they share common CSS properties, and the category appropriate for most of the selectors is used.
+
 // Color system
 // Options
-// Gradient
-// Spacing
-// Position
 // Body
 body,
 body.fullscreen,
-.layout_social header.navbar.navbar-dark.bg-dark,
-.layout_social header.navbar.navbar-light.bg-light {
-    background: #90140c url('#{$imagePath}stripes.png') repeat-x 50% 0 !important;
+.layout_social header.navbar.bg-dark,
+.layout_social header.navbar.bg-light,
+.layout_basic header .navbar.bg-dark,
+.layout_basic header .navbar.bg-light {
+    background: var(--tiki-darkshine-diagonals-bg);
+}
+
+div.page-content-top-margin {
+    --tiki-page-content-top-margin: 0px;
 }
 
 .layout_classic #middle,
 .layout_basic .row-middle,
-.layout_social .middle.container,
 .tiki-admin .row-middle {
-//    background: #f3f3f3;
+    //    background: #f3f3f3;
     border: solid 15px #600;
-    border-top: none;
+//    border-top: none;
+}
+.layout_social .topbar_modules {
+    border: solid #600;
+    border-width: 15px 15px 3px 15px;
 }
 
-.top_modules {
-    justify-content: center !important;
+.layout_social .middle.container {
+    border: solid #600;
+    border-width: 0px 15px 15px 15px;
+}
+
+.col1, .col2, .col3 {
+    padding-top: var(--tiki-page-content-top-margin);
 }
 
 #bottom_modules {
-//    background: #000000;
+    background: #2e3035;
+    color: #999999;
     border: solid #600;
     border-width: 0 15px;
 }
 
-//.col1,
-//#autosave_preview,
-//#autotoc > ul,
-//.col2 .module,
-//.col3 .module,
-//.bottom_modules .module,
 .row-middle,
 .bottom_modules {
     background: var(--bs-body-bg);
@@ -51,20 +70,9 @@ body.fullscreen,
     padding-top: 15px;
 }
 
-// Utilities maps
 // Links
-// Paragraphs
-// Grid breakpoints
-// Grid containers
-// Grid columns
-// Container padding
 // Components
 // Typography
-//blockquote,
-//.blockquote {
-//    color: #525252;
-//}
-
 // Tables
 //.table .table {
 //    background: #f3f3f3;
@@ -74,7 +82,6 @@ body.fullscreen,
 //    color: #e5e5e5;
 //}
 
-// Buttons + Forms
 // Buttons
 .btn-primary,
 .accordion-button {
@@ -140,18 +147,19 @@ body.fullscreen,
 
 .btn-warning {
     background: #fdfd80;
-    background: linear-gradient(to bottom, #fdfd80 0%, #ffff2d 100%);
+    background: linear-gradient(to bottom, #fdfd80 0%, #e5e518 100%);
     border: 1px solid #d0d024;
 }
 
 .btn-warning:hover {
     background: #ffff2b;
     background: linear-gradient(to bottom, #ffff2b 0%, #fdfd7e 100%);
+    color: #292929;
 }
 
 .btn-primary,
     //.btn-secondary,
-//.btn-danger,
+    //.btn-danger,
     //.btn-info,
     //.btn-success,
 .btn-warning,
@@ -166,7 +174,8 @@ body.fullscreen,
 
 .btn-secondary,
 .btn-info,
-.btn-success {
+.btn-success,
+.btn-warning {
     text-shadow: #000 -1px -1px 1px;
 
     &:hover {
@@ -177,9 +186,16 @@ body.fullscreen,
 
 // Forms
 // Form validation
-// Z-index master list
+.valid-feedback { color: #177D4D; }
+.invalid-feedback { color: #D42537; }
+
 // Navs
 // Navbar
+
+.col2 .navbar {
+    background: none;
+}
+
 // Fixed-top colors
 //.navbar.bg-light.fixed-top, // layout_default -- commmented on by g_c-l aug 2022 because it uses values instead of variables
 //.navbar.bg-dark.fixed-top {
@@ -189,57 +205,17 @@ body.fullscreen,
 //    .navbar-brand,
 //    .nav-link,
 //    button.dropdown-toggle {
-   //     color: #fff;
- //   }
+//     color: #fff;
+//   }
 //}
 
-.navbar.bg-light.fixed-top > li:hover,
-.navbar.bg-dark.fixed-top > li:hover,
-.navbar.bg-light.fixed-top > li:active,
-.navbar.bg-dark.fixed-top > li:active,
-.navbar.bg-dark.fixed-top .nav-link:hover,
-.navbar.bg-light.fixed-top .nav-link:active,
-.fixed-top .navbar-light .navbar-brand,
-.navbar.bg-light.fixed-top .nav-link:hover,
-.navbar.bg-light.fixed-top .nav-link:active,
-.navbar.bg-light.fixed-top button.dropdown-toggle:hover,
-.navbar.bg-light.fixed-top button.dropdown-toggle:active {
-    color: #fff;
-    text-decoration: none;
-    background: #555;
-    background: linear-gradient(to bottom, #555555 0%, #4f4f4f 5%, #4c4b4b 13%, #3d3d3d 55%, #2e2e2e 58%, #121212 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#555555', endColorstr='#121212', GradientType=0);
-}
+// header.sticky-top .navbar.bg-light .navbar-nav > .nav-item:hover, etc. rules removed because they are overridden by CSS variable values in _css-variables.scss.
+
 
 .top_modules.bg-light,
 .top_modules.bg-dark {
     background: transparent !important;
 }
-
-// This is the original CSS but of course doesn't all work in layout_social. To avoid breakage, properties should probably be defined per-site.
-//.sitetitle:not(.adminoptionbox) {
-//    background: url('#{$imagePath}title_background.jpg') no-repeat transparent;
-//    color: #FE9B27;
-//    cursor: default;
-//    text-transform: uppercase;
-//    font: 2.5em/1.8em "Trebuchet MS", "Georgia", "Lucidia Grande";
-//    height: 101px;
-//    letter-spacing: 8px;
-//    margin-top: 66px;
-//    text-align: center;
- //   //  width: 410px;
-//}
-//
-//.sitetitle:not(.adminoptionbox),
-//.sitetitle a,
-//.sitesubtitle:not(.adminoptionbox) {
-//    color: #fe9b27;
-//}
-
-//h2.sitesubtitle {
-//    font-size: 20px;
-//    margin-top: 0;
-//}
 
 .top_modules div:not(.card) .btn-link,
 #fullscreenbutton a,
@@ -248,6 +224,7 @@ body.fullscreen,
 .layout_basic .top_modules button.dropdown-toggle {
     color: #FEA239; // #fe9b27; Lightened for WCAG contrast compliance
 }
+
 .tiki.layout_classic .topbar,
 .tiki.layout_basic .topbar,
 .tiki.layout_social .topbar {
@@ -255,18 +232,20 @@ body.fullscreen,
     padding-right: 0;
 }
 
-.tiki.layout_classic .topbar_modules,
+.tiki.layout_classic #topbar .topbar_modules, // #topbar added to strengthen selector and override _tiki-pagetop_colors.scss rule
 .tiki.layout_basic .topbar_modules,
-.tiki.layout_social .topbar_modules {
-    background: #000 url('#{$imagePath}stripes_small.gif') repeat-x /*0 -8px*/ !important;
-    border: solid 15px #600000 !important;
-    border-bottom: 1px solid #916047 !important;
+.tiki.layout_social:not(.uab.tiki_admin) .topbar_modules {
+    background: #000 url('#{$imagePath}stripes_small.gif') repeat-x !important;
+//    border: solid 15px #600000 !important;
+//    border-bottom: 1px solid #916047 !important;
+
     .navbar-nav .nav-item {
         color: #000 !important;
+
         &:hover,
         &:focus,
         &.active {
-            color: lighten(#000,10%) !important;
+            color: color.adjust(#000,$lightness: 10%, $space: hsl) !important;
         }
     }
 
@@ -298,17 +277,19 @@ body.fullscreen,
 .tiki.layout_basic .topbar_modules {
     border-left: none !important;
     border-right: none !important;
+    border-bottom: 3px solid #600 !important; // #916047 !important;
 }
 
 
 .tiki.layout_classic .topbar_modules,
-.layout_basic  #topbar.topbar_modules.bg-dark .module.box-menu a.nav-link,
+.layout_basic #topbar.topbar_modules.bg-dark .module.box-menu a.nav-link,
 .layout_social .topbar-wrapper.navbar-dark-parent.bg-dark-parent #topbar .module.box-menu a.nav-link {
     color: #000 !important;
+
     &:hover,
     &:focus,
     &.active {
-        color: lighten(#000,10%) !important;
+        color: color.adjust(#000,$lightness: 10%, $space: hsl) !important;
     }
 }
 
@@ -334,169 +315,191 @@ body.fullscreen,
 }
 
 //orange_gradient_background
-#pagetop_modules:has(*),
+#pagetop_modules:has(.module),
 .orange_gradient_background {
     background: #fec782;
     background: linear-gradient(to bottom, #fec782 0%, #fe9e27 0%, #fe9226 31%, #fe7723 75%, #fe6e22 100%, #783c1c 100%);
     padding: 15px;
-
-    .card {
-        border: 3px solid #fff;
-        border-radius: 0px;
-        margin: 15px;
-    }
 }
 
-#pagetop_modules {
-    margin-left: -15px;
-    margin-right: -15px;
+#pagetop_modules > .module {
+    border: 3px solid #fff;
+    border-radius: 0;
+    margin: 15px;
+    padding: 0 !important;
+}
+
+#pagetop_modules > div .alert,
+#pagetop_modules > div > * {
+    border-radius: 0 !important;
+    margin: 0 !important;
+}
+
+.col1top-inner-wrapper.flex-grow-1.mx-2 {
+    margin-left: 0;
+    margin-right: 0;
 }
 
 // Legacy admin anchors, light mode
 .tiki .admin-content {
     .tiki-topbar-nav-dark,
     .adminanchors.card {
-        background: linear-gradient(to bottom, #040404 0%, #060606 2%, #121212 55%, #0f0f0f 57%, #030303 59%, #000000 61%, #000000 100%) !important;
-    }
-
-    // Dropdowns
-    // Pagination
-    // Placeholders
-    // Cards
-    .card-title {
-        color: var(--bs-heading-color);
-        font: 1.8rem arial, verdana, helvetica, sans-serif;
-    }
-
-    .bg-danger,
-    .bg-warning,
-    .bg-primary,
-    .bg-secondary,
-    .bg-success,
-    .bg-info {
-        .card-title {
-            color: #fff;
-        }
-    }
-
-    #col2 .card,
-    #col3 .card,
-    #col2 .card-header,
-    #col3 .card-header {
-        border: none;
-        background: transparent;
-    }
-
-    .main-footer {
-        .footer_liner.w-100 {
-            padding-left: 0 !important;
-            padding-right: 0 !important;
-        }
-
-        .card {
-            border: none;
-            background: transparent;
-            -webkit-box-shadow: none;
-            box-shadow: none;
-        }
-
-        .card-header {
-            background: transparent;
-            border-color: transparent;
-        }
-    }
-    .footer_liner.w-100 {
-        padding: 0 !important;
-    }
-    // Accordion
-    .accordion-button {
-        color: #000;
-    }
-
-    // Popovers
-    .popover-body .table .table,
-    .popover-body .table-hover {
-        background: #ffffff;
-    }
-
-    // Toasts
-    // Badges
-    // Modals
-    // Alerts
-    .alert-light {
-        color: #57575C;
-    }
-
-    // Progress bars
-    .progress-bar {
-        .bg-info,
-        .bg-warning {
-            color: #fff;
-        }
-    }
-
-    // List group
-    .list-group-item-light {
-        color: #707275;
-    }
-
-    // Image thumbnails
-    // Figures
-    // Breadcrumbs
-    // Carousel
-    // Spinners
-    // Close
-    // Offcanvas
-    // Code
-
-
-    .main-footer,
-    footer.footer {
-        color: lighten(#9d9d9d, 15%);
-
-        a {
-            color: #9d9d9d;
-
-            &:hover,
-            &:focus {
-                color: lighten(#9d9d9d, 15%);
-            }
-        }
-
-        h1, h2, h3, h4, h5 {
-            color: #9D9D1B;
-        }
-    }
-
-    // /* Autosave Preview handle */
-    #autosave_preview {
-        background: #f3f3f3;
-        color: $body-color;
-    }
-
-    // Other
-
-    // override for converseJS chatbox background colors
-    .tiki #conversejs, .tiki #conversejs.converse-embedded {
-        #controlbox {
-            .box-flyout {
-                background-color: #f3f3f3;
-            }
-        }
-
-        .chatbox {
-            .box-flyout {
-                background-color: #f3f3f3;
-            }
-        }
-    }
-
-    // override for some cypht background colors
-    body.tiki.tiki-webmail {
-        background: #90140c url('#{$imagePath}stripes.png') repeat-x 50% 0;
+        background: var(--tiki-darkroom-navbar-bg);
     }
 }
 
-.col2 .navbar {
-    background: none;
+// Dropdowns
+// Pagination
+// Placeholders
+// Cards
+.card-title {
+    color: var(--bs-heading-color);
+    font: 1.8rem arial, verdana, helvetica, sans-serif;
+}
+
+.module .card-body {
+    --bs-card-spacer-y: 0px;
+}
+
+.bg-danger,
+.bg-warning,
+.bg-primary,
+.bg-secondary,
+.bg-success,
+.bg-info {
+    .card-title {
+        color: #fff;
+    }
+}
+
+#col2 .card,
+#col3 .card,
+#col2 .card-header,
+#col3 .card-header {
+    border: none;
+    background: transparent;
+}
+
+.main-footer {
+    .footer_liner.w-100 {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .card {
+        border: none;
+        background: transparent;
+        -webkit-box-shadow: none;
+        box-shadow: none;
+    }
+
+    .card-header {
+        background: transparent;
+        border-color: transparent;
+    }
+}
+
+.footer_liner.w-100 {
+    padding: 0 !important;
+}
+
+.main-footer,
+footer.footer {
+    color: color.adjust(#9d9d9d, $lightness: 15%, $space: hsl);
+
+    a {
+        color: #9d9d9d;
+
+        &:hover,
+        &:focus {
+            color: color.adjust(#9d9d9d, $lightness: 15%, $space: hsl);
+        }
+    }
+
+    h1, h2, h3, h4, h5 {
+        color: #9D9D1B;
+    }
+}
+
+// Accordion
+.accordion-button {
+    color: #000;
+}
+
+// Popovers
+.popover-body .table .table,
+.popover-body .table-hover {
+    background: #ffffff;
+}
+
+// Badges
+// Alerts
+.alert-light {
+    color: #57575C;
+}
+
+// Progress bars
+.progress-bar {
+    .bg-info,
+    .bg-warning {
+        color: #fff;
+    }
+}
+
+// List group
+.list-group-item-light {
+    color: #707275;
+}
+
+
+// Figures
+// Breadcrumbs
+// Code
+
+// /* Autosave Preview handle */
+#autosave_preview {
+    background: #f3f3f3;
+    color: $body-color;
+}
+
+// External libraries
+    // override for converseJS chatbox background colors
+.tiki #conversejs, .tiki #conversejs.converse-embedded {
+    #controlbox {
+        .box-flyout {
+            background-color: #f3f3f3;
+        }
+    }
+
+    .chatbox {
+        .box-flyout {
+            background-color: #f3f3f3;
+        }
+    }
+}
+
+    // override for some cypht background colors
+body.tiki.tiki-webmail {
+    background: #90140c url('#{$imagePath}stripes.png') repeat-x 50% 0;
+}
+
+// Dark mode
+[data-bs-theme=dark] {
+    .list-group-item-light { color: #A1A2A5; }
+    .alert.alert-light { color: #A3A3A8; }
+
+    .btn.btn-outline-primary { color: #F75802; border-color: #F75802; }
+    .btn.btn-outline-secondary { color: #D57201; border-color: #D57201; }
+    .btn.btn-outline-success { color: #22A037; border-color: #22A037; }
+    .btn.btn-outline-danger { color: #DD6864; border-color: #DD6864; }
+    .btn.btn-outline-warning { color: #909018; border-color: #909018; }
+    .btn.btn-outline-info { color: #008EFA; border-color: #008EFA; }
+    .btn.btn-outline-dark { color: #8C8C8C; border-color: #8C8C8C; }
+
+    .blockquote-footer { color: #828EA1; }
+
+    .nav-tabs .nav-link,
+    .nav-tabs .nav-link.active {
+        color:  #600000;
+    }
 }

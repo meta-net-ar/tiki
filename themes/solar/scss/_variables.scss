@@ -1,11 +1,13 @@
-// Solar 5.3.3 -- This file contains variables to replace or add to those in node_modules/bootswatch/dist/sketchy/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Solar 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/solar/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/solar/_variables.scss"; // Bootswatch theme variables file
 
 // Color system
-//
-
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 $primary:       #946F00; // $blue !default;
 $secondary:     #677979; // $gray-600 !default;
@@ -16,47 +18,71 @@ $info:          #227AB9; // $cyan !default;
 //$light:         $gray-100 !default;
 //$dark:          $gray-800 !default;
 
-$green-300: tint-color($green, 40%) !default;
-$red-300: tint-color($red, 40%) !default;
-
-// Prefix for :root CSS variables
-$variable-prefix:             bs- !default; // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix !default;
+// Options
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
+$enable-dark-mode:            false;
 
 // Body
+$body-color:                #aaa;  // default
+$body-secondary-color:      rgba($body-color, .99);  // default
+$body-secondary-bg: #0b4250;
+$body-tertiary-color:       rgba($body-color, .65);  // default
+$body-tertiary-bg:          #063541;
+$body-emphasis-color:       #c5c5c5;
+
 // Links
 $link-color:                #289F97; //$success !default;
-$link-hover-color:          $link-color !default;
-$link-shade-percentage:                   20% !default;
+$link-hover-color:          $link-color; // !default;
+$link-shade-percentage:                   20%; // !default;
 
 // Components
+$component-active-color:      $white;  // default
+$component-active-bg:         $primary;  // default
+
 // Fonts
 $font-family-sans-serif:      Seravek, 'Gill Sans Nova', Ubuntu, Calibri, 'DejaVu Sans', source-sans-pro, sans-serif;  // "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !default;
 $font-size-base:              1.1rem;
+$mark-bg: #3A1B0D;
+$text-muted: #ACB6B9BF;
+
 
 // Tables
-$table-color:                 var(--#{$prefix}body-color) !default;
+$table-color:                 var(--#{$prefix}body-color); // !default;
 $table-dark-color:            var(--#{$prefix}body-bg);
 
 // Forms
-$input-bg:                              #a9bdbd;
+$input-color:                           #a9bdbd; // #073642; // Added for Element Plus
+//$input-bg:                              #a9bdbd;
 $input-disabled-bg:                     #657b83;
 $input-group-addon-color:               #8B9C9C;
-
-// Dropdowns
-$dropdown-divider-bg:               var(--#{$prefix}body-bg);
-$dropdown-link-color:               var(--#{$prefix}body-color);
-$dropdown-link-hover-bg:            var(--#{$prefix}body-bg);
+$form-check-input-checked-color:          $component-active-color; // !default; NECESSARY
+$form-check-input-checked-bg-color:       $component-active-bg; // !default; NECESSARY
+$form-range-thumb-bg:                      $component-active-bg; // !default; NECESSARY
 
 // Navs
 $nav-tabs-link-active-bg:           var(--#{$prefix}body-bg);
 
 // Navbars
 $navbar-light-color:                rgba($black, .9);
-$navbar-light-active-color:         rgba($black, .7) !default;
+$navbar-light-active-color:         rgba($black, .7); // !default;
+$navbar-dark-color: #fff;
+
+// Dropdowns
+$dropdown-divider-bg:               var(--#{$prefix}body-bg);
+$dropdown-link-color:               var(--#{$prefix}body-color);
+$dropdown-link-hover-bg:            var(--#{$prefix}body-bg);
+$dropdown-link-active-bg:           $component-active-bg; //  !default;
+
+$dropdown-dark-bg:                  #164b58; // Lightened for better contrast vs accordion buttons in admin sidebar
 
 // Pagination
 // Cards
+// Accordion
+$accordion-button-bg: #607171;
+$accordion-button-active-color: #0F0F0F;
+$accordion-button-active-bg: #946F00;
+
 // Popovers
 $popover-border-color:              var(--#{$prefix}body-bg);
 
@@ -67,11 +93,14 @@ $modal-header-border-color:         var(--#{$prefix}body-bg);
 
 // Progress bars
 // List group
+// Figures
+$figure-caption-color: #ACB6B9BF;
+
 // Breadcrumbs
 // Close
 // Code
 $code-color:                      $body-color; //   $pink !default;
-$pre-color:                         inherit !default;
+$pre-color:                         inherit; // !default;
 
 //--------------------------- Tiki SCSS variables
 

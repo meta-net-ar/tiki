@@ -84,38 +84,38 @@
 {literal}
     <div id="gantEditorTemplates" style="display:none;">
         <div class="__template__" type="GANTBUTTONS">
-        {*
+        <!--
         <div class="ganttButtonBar noprint">
             <div class="buttons">
-                <button onclick="$('#workSpace').trigger('undo.gantt');return false;" class="button textual icon requireCanWrite" title="undo"><span class="teamworkIcon">&#39;</span></button>
-                <button onclick="$('#workSpace').trigger('redo.gantt');return false;" class="button textual icon requireCanWrite" title="redo"><span class="teamworkIcon">&middot;</span></button>
+                <button onclick="$('#workSpace').trigger('undo.gantt');return false;" class="button textual icon requireCanWrite" title="undo" aria-label="{tr}undo{/tr}"><span class="teamworkIcon">&#39;</span></button>
+                <button onclick="$('#workSpace').trigger('redo.gantt');return false;" class="button textual icon requireCanWrite" title="redo" aria-label="{tr}redo{/tr}"><span class="teamworkIcon">&middot;</span></button>
                 <span class="ganttButtonSeparator requireCanWrite requireCanAdd"></span>
-                <button onclick="$('#workSpace').trigger('addAboveCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanAdd" title="insert above"><span class="teamworkIcon">l</span></button>
-                <button onclick="$('#workSpace').trigger('addBelowCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanAdd" title="insert below"><span class="teamworkIcon">X</span></button>
+                <button onclick="$('#workSpace').trigger('addAboveCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanAdd" title="insert above" aria-label="{tr}insert above{/tr}"><span class="teamworkIcon">l</span></button>
+                <button onclick="$('#workSpace').trigger('addBelowCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanAdd" title="insert below" aria-label="{tr}insert below{/tr}"><span class="teamworkIcon">X</span></button>
                 <span class="ganttButtonSeparator requireCanWrite requireCanInOutdent"></span>
-                <button onclick="$('#workSpace').trigger('outdentCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanInOutdent" title="un-indent task"><span class="teamworkIcon">.</span></button>
-                <button onclick="$('#workSpace').trigger('indentCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanInOutdent" title="indent task"><span class="teamworkIcon">:</span></button>
+                <button onclick="$('#workSpace').trigger('outdentCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanInOutdent" title="un-indent task" aria-label="{tr}un-indent task{/tr}"><span class="teamworkIcon">.</span></button>
+                <button onclick="$('#workSpace').trigger('indentCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanInOutdent" title="indent task" aria-label="{tr}indent task{/tr}"><span class="teamworkIcon">:</span></button>
                 <span class="ganttButtonSeparator requireCanWrite requireCanMoveUpDown"></span>
-                <button onclick="$('#workSpace').trigger('moveUpCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanMoveUpDown" title="move up"><span class="teamworkIcon">k</span></button>
-                <button onclick="$('#workSpace').trigger('moveDownCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanMoveUpDown" title="move down"><span class="teamworkIcon">j</span></button>
+                <button onclick="$('#workSpace').trigger('moveUpCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanMoveUpDown" title="move up" aria-label="{tr}move up{/tr}"><span class="teamworkIcon">k</span></button>
+                <button onclick="$('#workSpace').trigger('moveDownCurrentTask.gantt');return false;" class="button textual icon requireCanWrite requireCanMoveUpDown" title="move down" aria-label="{tr}move down{/tr}"><span class="teamworkIcon">j</span></button>
                 <span class="ganttButtonSeparator requireCanDelete"></span>
-                <button onclick="$('#workSpace').trigger('deleteFocused.gantt');return false;" class="button textual icon delete requireCanWrite" title="Delete"><span class="teamworkIcon">&cent;</span></button>
+                <button onclick="$('#workSpace').trigger('deleteFocused.gantt');return false;" class="button textual icon delete requireCanWrite" title="Delete" aria-label="{tr}Delete{/tr}"><span class="teamworkIcon">&cent;</span></button>
                 <span class="ganttButtonSeparator"></span>
                 <button onclick="$('#workSpace').trigger('expandAll.gantt');return false;" class="button textual icon " title="EXPAND_ALL"><span class="teamworkIcon">6</span></button>
                 <button onclick="$('#workSpace').trigger('collapseAll.gantt'); return false;" class="button textual icon " title="COLLAPSE_ALL"><span class="teamworkIcon">5</span></button>
                 <span class="ganttButtonSeparator"></span>
-                <button onclick="$('#workSpace').trigger('zoomMinus.gantt'); return false;" class="button textual icon " title="zoom out"><span class="teamworkIcon">)</span></button>
-                <button onclick="$('#workSpace').trigger('zoomPlus.gantt');return false;" class="button textual icon " title="zoom in"><span class="teamworkIcon">(</span></button>
+                <button onclick="$('#workSpace').trigger('zoomMinus.gantt'); return false;" class="button textual icon " title="zoom out" aria-label="{tr}zoom out{/tr}"><span class="teamworkIcon">)</span></button>
+                <button onclick="$('#workSpace').trigger('zoomPlus.gantt');return false;" class="button textual icon " title="zoom in" aria-label="{tr}zoom in{/tr}"><span class="teamworkIcon">(</span></button>
                 <span class="ganttButtonSeparator"></span>
-                <button onclick="print_chart();return false;" class="button textual icon " title="Print"><span class="teamworkIcon">p</span></button>
+                <button onclick="print_chart();return false;" class="button textual icon " title="Print" aria-label="{tr}Print{/tr}"><span class="teamworkIcon">p</span></button>
                 <span class="ganttButtonSeparator"></span>
-                <button onclick="ge.gantt.showCriticalPath=!ge.gantt.showCriticalPath; ge.redraw();return false;" class="button textual icon requireCanSeeCriticalPath" title="CRITICAL_PATH"><span class="teamworkIcon">&pound;</span></button>
+                <button onclick="ge.gantt.showCriticalPath=!ge.gantt.showCriticalPath; ge.redraw();return false;" class="button textual icon requireCanSeeCriticalPath" title="CRITICAL_PATH" aria-label="CRITICAL_PATH"><span class="teamworkIcon">&pound;</span></button>
                 <span class="ganttButtonSeparator requireCanSeeCriticalPath"></span>
                 <button onclick="ge.splitter.resize(.1);return false;" class="button textual icon" ><span class="teamworkIcon">F</span></button>
                 <button onclick="ge.splitter.resize(50);return false;" class="button textual icon" ><span class="teamworkIcon">O</span></button>
                 <button onclick="ge.splitter.resize(100);return false;" class="button textual icon"><span class="teamworkIcon">R</span></button>
                 <span class="ganttButtonSeparator"></span>
-                <button onclick="$('#workSpace').trigger('fullScreen.gantt');return false;" class="button textual icon" title="fullscreen" id="fullscrbtn"><span class="teamworkIcon">@</span></button>
+                <button onclick="$('#workSpace').trigger('fullScreen.gantt');return false;" class="button textual icon" title="fullscreen" aria-label="{tr}fullscreen{/tr}" id="fullscrbtn"><span class="teamworkIcon">@</span></button>
                 <button onclick="ge.element.toggleClass('colorByStatus' );return false;" class="button textual icon"><span class="teamworkIcon">&sect;</span></button>
                 {/literal}{if $ganttIdField}{literal}<button onclick="duplicateGantt();" class="btn btn-outline-primary" title="{tr}Duplicate{/tr}">{tr}Duplicate{/tr}</button>{/literal}{/if}{literal}
                 <button onclick="saveGanttOnServer();" id="ganttSaveProject" class="btn btn-primary requireWrite" title="{tr}Save{/tr}">{tr}Save{/tr}</button>
@@ -123,11 +123,11 @@
                 <span id="ganttLoading">{icon name="spinner" iclass="fa-spin" _menu_text='y' _menu_icon='y' ititle="{tr}Loading{/tr}" alt="{tr}Loading{/tr}"}</span>
             </div>
         </div>
-        *}
+        -->
         </div>
 {/literal}
         <div class="__template__" type="TASKSEDITHEAD">
-            {*
+            <!--
             <table class="gdfTable" cellspacing="0" cellpadding="0">
                 <thead>
                 <tr style="height:40px">
@@ -146,11 +146,11 @@
                 </tr>
                 </thead>
             </table>
-            *}
+            -->
         </div>
 {literal}
         <div class="__template__" type="TASKROW">
-            {*
+            <!--
             <tr taskId="(#=obj.id#)" class="taskEditRow (#=obj.isParent()?'isParent':''#) (#=obj.collapsed?'collapsed':''#)" level="(#=level#)">
                 <th class="gdfCell edit text-right" style="cursor:pointer;"><span class="taskRowIndex">(#=obj.getRow()+1#)</span> <span class="teamworkIcon" style="font-size:12px;" >e</span></th>
                 <td class="gdfCell noClip text-center"><div class="taskStatus cvcColorSquare" status="(#=obj.status#)"></div></td>
@@ -168,11 +168,11 @@
                 <td class="gdfCell requireCanSeeDep"><input type="text" name="depends" autocomplete="off" value="(#=obj.depends#)" (#=obj.hasExternalDep?"readonly":""#)></td>
                 <td class="gdfCell taskAssigs">(#=obj.getAssigsString()#)</td>
             </tr>
-            *}
+            -->
         </div>
 {/literal}
         <div class="__template__" type="TASKEMPTYROW">
-            {*
+            <!--
             <tr class="taskEditRow emptyRow" >
                 <th class="gdfCell" align="right"></th>
                 <td class="gdfCell noClip" align="center"></td>
@@ -187,11 +187,11 @@
                 <td class="gdfCell requireCanSeeDep"></td>
                 <td class="gdfCell"></td>
             </tr>
-            *}
+            -->
         </div>
 {literal}
         <div class="__template__" type="TASKBAR">
-            {*
+            <!--
             <div class="taskBox taskBoxDiv" taskId="(#=obj.id#)" >
                 <div class="layout (#=obj.hasExternalDep?'extDep':''#)">
                     <div class="taskStatus" status="(#=obj.status#)"></div>
@@ -201,11 +201,11 @@
                     <div class="milestone end (#=obj.endIsMilestone?'active':''#)" ></div>
                 </div>
             </div>
-            *}
+            -->
         </div>
 {/literal}
         <div class="__template__" type="CHANGE_STATUS">
-            {*
+            <!--
             <div class="taskStatusBox">
                 <div class="taskStatus cvcColorSquare" status="STATUS_ACTIVE" title="{tr}active{/tr}"></div>
                 <div class="taskStatus cvcColorSquare" status="STATUS_DONE" title="{tr}completed{/tr}"></div>
@@ -213,11 +213,11 @@
                 <div class="taskStatus cvcColorSquare" status="STATUS_SUSPENDED" title="{tr}suspended{/tr}"></div>
                 <div class="taskStatus cvcColorSquare" status="STATUS_UNDEFINED" title="{tr}undefined{/tr}"></div>
             </div>
-            *}
+            -->
         </div>
 {literal}
         <div class="__template__" type="TASK_EDITOR">
-            {*
+            <!--
             <div class="ganttTaskEditor">
                 <h2 class="taskData">{/literal}{tr}Task editor{/tr}{literal}</h2>
                 <form method="post">
@@ -251,7 +251,7 @@
                             </td>
                             <td nowrap="" >
                                 <label for="duration" class="form-label">{/literal}{tr}Days{/tr}{literal}</label><br>
-                                <input type="text" name="duration" id="duration" size="4" class="formElements validated durationdays form-control" title="Duration is in working days." autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DURATIONDAYS">&nbsp;
+                                <input type="text" name="duration" id="duration" size="4" class="formElements validated durationdays form-control" title="{tr}Duration is in working days.{/tr}" autocomplete="off" maxlength="255" value="" oldvalue="1" entrytype="DURATIONDAYS">&nbsp;
                             </td>
                         </tr>
                         <tr>
@@ -298,22 +298,22 @@
                     </div>
                 </form>
             </div>
-            *}
+            -->
         </div>
 
         <div class="__template__" type="ASSIGNMENT_ROW">
-            {*
+            <!--
             <tr taskId="(#=obj.task.id#)" assId="(#=obj.assig.id#)" class="assigEditRow" >
                 <td ><select name="resourceId" class="formElements"></select></td>
                 <td ><select type="select" name="roleId" class="formElements"></select></td>
                 <td ><input type="text" name="effort" value="(#=getMillisInHoursMinutes(obj.assig.effort)#)" size="5" class="formElements"></td>
                 <td align="center"><span class="teamworkIcon delAssig del" style="cursor: pointer">d</span></td>
             </tr>
-            *}
+            -->
         </div>
 {/literal}
         <div class="__template__" type="RESOURCE_EDITOR">
-            {*
+            <!--
             <div class="resourceEditor" style="padding: 5px;">
                 <h2></h2>
                 <table  cellspacing="1" cellpadding="0" width="100%" id="resourcesTable">
@@ -324,20 +324,20 @@
                 </table>
                 <div style="text-align: right; padding-top: 20px"><button id="resSaveButton" class="button big">{tr}Save{/tr}</button></div>
             </div>
-            *}
+            -->
         </div>
 {literal}
         <div class="__template__" type="RESOURCE_ROW">
-            {*
+            <!--
             <tr resId="(#=obj.id#)" class="resRow">
                 <td><input type="text" name="name" value="(#=obj.name#)" style="width:100%;" class="formElements"></td>
                 <td align="center"><span class="teamworkIcon delRes del" style="cursor: pointer">d</span></td>
             </tr>
-            *}
+            -->
         </div>
 
         <div class="__template__" type="GANTT_DUPLICATOR">
-            {*
+            <!--
             <div class="ganttDuplicator">
                 <h2 class="taskData">{/literal}{tr}Gantt Duplicator{/tr}{literal}</h2>
                 <form method="post">
@@ -367,7 +367,7 @@
                     </div>
                 </form>
             </div>
-            *}
+            -->
         </div>
     </div>
 {/literal}

@@ -1,7 +1,7 @@
 {title url="tiki-edit_structure.php?page_ref_id=$page_ref_id"}{tr}Structure:{/tr} {$structure_name}{/title}
 
 <div class="t_navbar mb-4">
-    {button href="tiki-admin_structures.php" _text="{tr}Structures{/tr}"}
+    {button _class="btn btn-link" href="tiki-admin_structures.php" _text="{tr}Structures{/tr}"}
 </div>
 
 {if $remove eq 'y'}
@@ -72,7 +72,7 @@
         {/foreach}
     {/remarksbox}
 {/if}
-
+<div class="styling-element">
 <div class="admintoclevel" id="topnode_{$page_ref_id}">
     <h2>{tr}Structure Layout{/tr}</h2>
     {if $editable eq 'y'}
@@ -113,7 +113,7 @@
                             <input type="hidden" name="page_ref_id" value={$page_ref_id}>
                             <input type="hidden" name="watch_object" value={$page_ref_id}>
                             <input type="hidden" name="watch_action" value="add">
-                            <button type="submit" name="page" value={$structure_name} data-bs-trigger="hover focus" data-bs-delay="500" data-bs-content="{tr}Monitor the structure{/tr}" class="tips btn btn-link btn-sm">
+                            <button type="submit" name="page" value={$structure_name} data-bs-trigger="hover focus" data-bs-delay="500" data-bs-content="{tr}Monitor the structure{/tr}" class="tips btn btn-link btn-sm"  aria-label="{tr}Monitor the structure{/tr}">
                                 {icon name="watch"}
                             </button>
                         </form>
@@ -128,9 +128,11 @@
                         {capture assign=title}{tr _0=$page_info.user}locked by %0{/tr}{/capture}
                         {icon name='lock' alt="{tr}Locked{/tr}" title=$title}
                     {else}
-                        {self_link _script='tiki-editpage.php' page=$structure_name _class='tips btn btn-link btn-sm' _title=':{tr}Edit page{/tr}'}
-                            {icon name="edit"}
-                        {/self_link}
+                        {if !empty($structure_name)}
+                            {button _keepall='y' href='tiki-editpage.php' page=$structure_name _class='tips btn btn-link btn-sm' _title=':{tr}Edit page{/tr}' _icon_name='edit'}
+                        {elseif !empty($pageName)}
+                            {button _keepall='y' href='tiki-editpage.php' page=$pageName _class='tips btn btn-link btn-sm' _title=':{tr}Edit page{/tr}' _icon_name='edit'}
+                        {/if}
                     {/if}
                     {if empty($page)}
                         {self_link _class="tips btn btn-link btn-sm add_new_child_page" _title=":{tr}Add new child page{/tr}"}
@@ -149,13 +151,22 @@
         {if $structure_id eq $page_ref_id}</strong>{/if}
     {/self_link}
 </div>
-{button _text="{tr}Save{/tr}" _style="display:none;" _class="save_structure" _type="primary" _ajax="n" _auto_args="save_structure,page_ref_id"}
+<div class="save-structure-wrapper sticky-top bg-body py-2 border-bottom" style="display:none;">
+    {button _text="{tr}Save{/tr}" _style="display:none;" _class="save_structure" _type="primary" _ajax="n" _auto_args="save_structure,page_ref_id"}
+</div>
 <div class="structure-container">
     {$nodelist}
 </div>
-{button _text="{tr}Save{/tr}" _style="display:none;" _class="save_structure" _type="primary" _ajax="n" _auto_args="save_structure,page_ref_id"}
+<div class="save-structure-wrapper text-center mt-2" style="display:none;">
+    {button _text="{tr}Save{/tr}" _style="display:none;" _class="save_structure" _type="primary" _ajax="n" _auto_args="save_structure,page_ref_id"}
+</div>
 
 {if $editable == 'y'}
+    {remarksbox type="tip" title="{tr}Quick help{/tr}"}
+        {tr}To add an existing page, search in "Add pages", drag the page into the structure, then click Save.{/tr}
+        <br>
+        {tr}Alternative: on any structure page, use "Type to search ... / Add Page / Child".{/tr}
+    {/remarksbox}
     <form action="tiki-edit_structure.php" method="get">
         <div class="card">
             <div class="card-header">
@@ -165,9 +176,9 @@
                 <div>
                     <input type="hidden" name="page_ref_id" value="{$page_ref_id}">
                     <div class="tiki-form-group row">
-                        <label class="sr-only" for="find_objects">{tr}Find{/tr}</label>
+                        <label class="sr-only" for="find_objects">{tr}Search{/tr}</label>
                         <div class="input-group">
-                            <input type="text" name="find_objects" id="find_objects" value="{$find_objects|escape}" class="form-control form-control-sm" placeholder="{tr}Find{/tr}...">
+                            <input type="text" name="find_objects" id="find_objects" value="{$find_objects|escape}" class="form-control form-control-sm" placeholder="{tr}Search{/tr}...">
                             <input type="submit" class="btn btn-primary btn-sm" value="{tr}Filter{/tr}" name="search_objects">
                             {autocomplete element='#find_objects' type='pagename'}
                         </div>
@@ -184,13 +195,19 @@
                     {/if}
                 </div>
                 <ul id="page_list_container" class="list-group">
-                    {foreach $listpages.data as $aPage}
-                        <li class="list-group-item" data-page-name="{$aPage.pageName|escape}">
-                            {$aPage.pageName|escape}
-                        </li>
-                    {/foreach}
+                    {if !empty($listpages.data)}
+                        {foreach $listpages.data as $aPage}
+                            <li class="list-group-item" data-page-name="{$aPage.pageName|escape}">
+                                {$aPage.pageName|escape}
+                            </li>
+                        {/foreach}
+                    {else}
+                        <li class="list-group-item">{tr}No pages found{/tr}</li>
+                    {/if}
                 </ul>
-                {pagination_links cant=$listpages.cant step=$maxRecords offset=$offset}{/pagination_links}
+                {if !empty($listpages.count) && $listpages.count > 0 && !empty($maxRecords) && $maxRecords > 0 && $listpages.count > $maxRecords}
+                    {pagination_links count=$listpages.count step=$maxRecords offset=$offset}{/pagination_links}
+                {/if}
             </div>
         </div>
     </form>
@@ -229,9 +246,9 @@
                 </select>
             </div>
             <label class="float-start" for="begin1">{tr}at the beginning{/tr}</label>
-            <div class="float-start"><input type="radio" id="begin1" name="begin" value="1" checked="checked" {if $structures|@count eq '1'} disabled="disabled"{/if}></div>
+            <div class="float-start"><input type="radio" class="form-check-input" id="begin1" name="begin" value="1" checked="checked" {if $structures|@count eq '1'} disabled="disabled"{/if}></div>
             <label class="float-start" for="begin2">{tr}at the end{/tr}</label>
-            <div class="float-start"><input type="radio" id="begin2" name="begin" value="0" {if $structures|@count eq '1'}disabled="disabled"{/if}></div>
+            <div class="float-start"><input type="radio" class="form-check-input" id="begin2" name="begin" value="0" {if $structures|@count eq '1'}disabled="disabled"{/if}></div>
             <hr>
             <div class="float-start input_submit_container submit">
                 <input type="submit" class="btn btn-primary" name="move_to" value="{tr}Move{/tr}" {if $structures|@count eq '1'} disabled="disabled"{/if}>
@@ -258,3 +275,4 @@
         </form>
     </div>
 {/if}{* end of if structure editable *}
+</div>

@@ -61,7 +61,7 @@ class Services_Edit_PluginController
         $results = TikiLib::lib('prefs')->getMatchingPreferences($query, $filters, 500, $sort);
 
         foreach ($results as $result) {
-            if (strpos($result, 'wikiplugin_') === 0) {
+            if (str_starts_with($result, 'wikiplugin_')) {
                 $key = strtoupper(substr($result, 11));
                 $arr = array_filter($this->pluginList, function ($plugin) use ($key) {
                     return $plugin['name'] === $key;
@@ -221,8 +221,8 @@ class Services_Edit_PluginController
                     } else {
                         $param['parent'] = null;
                     }
-                    $param['parentkey'] = isset($param['parentkey']) ? $param['parentkey'] : null;
-                    $param['sort_order'] = isset($param['sort_order']) ? $param['sort_order'] : null;
+                    $param['parentkey'] = $param['parentkey'] ?? null;
+                    $param['sort_order'] = $param['sort_order'] ?? null;
                 } else {
                     $param['selector_type'] = null;
                 }
@@ -237,7 +237,7 @@ class Services_Edit_PluginController
 
             foreach ($extraParams as $extraParam => $val) {
                 // skip buttons parameters as obviously at this stage they will be plugged as extra parameters
-                if (strpos($extraParam, 'buttons') === 0) {
+                if (str_starts_with($extraParam, 'buttons')) {
                     continue;
                 }
                 $info['params'][$extraParam] = [
@@ -270,7 +270,7 @@ class Services_Edit_PluginController
                     $pluginArgs['module'] = $selectedMod;
                 }
                 $file = 'modules/mod-func-' . $pluginArgs['module'] . '.php';
-                if ($file = TikiLib::lib('tiki')->safeFileExistsInPath($file)) {
+                if ($file = TikiLib::lib('tiki')->safeFileExistsInPath($file, 'modules/')) {
                     include_once($file);
                     $info_func = "module_{$pluginArgs['module']}_info";
                     if (function_exists($info_func)) {
@@ -317,7 +317,7 @@ class Services_Edit_PluginController
                 'pageName' => $page,
                 'pluginArgs' => $pluginArgs,
                 'pluginArgsJSON' => json_encode($pluginArgs),
-                'bodyContent' => $bodyContent,
+                'bodyContent' => TikiLib::lib("parser")->unprotectSpecialChars(html_entity_decode($bodyContent), true),
                 'edit_icon' => $edit_icon,
                 'selectedMod' => $selectedMod,
                 'isMarkdown' => $isMarkdown,
@@ -377,7 +377,7 @@ class Services_Edit_PluginController
      * @param JitFilter $input
      * @return array
      * @throws Services_Exception
-     * @throws Services_Exception_BadRequest
+     * @throws ServicesExceptionBadRequest
      * @throws Services_Exception_Denied
      */
     public function action_convert_trackerlist($input)
@@ -409,7 +409,7 @@ class Services_Edit_PluginController
 
         $info = $tikilib->get_page_info($page);
         if (! $info) {
-            throw new Services_Exception_BadRequest(tr('Page "%0" not found', $page));
+            throw new ServicesExceptionBadRequest(tr('Page "%0" not found', $page));
         }
 
         $perms = $tikilib->get_perm_object($page, 'wiki page', $info, false);
@@ -540,7 +540,7 @@ class Services_Edit_PluginController
         $lastMatchEnd = 0;
         $hasParent = $parent && in_array(strtolower($parent['name']), ['output', 'format']);
 
-        /** @var WikiParser_PluginMatcher_Match $match */
+        /** @var \Tiki\WikiParser\PluginMatcherMatch $match */
         foreach ($matches as $match) {
             $name = $match->getName();
 

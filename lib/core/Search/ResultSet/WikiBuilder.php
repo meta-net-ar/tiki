@@ -28,15 +28,15 @@ class Search_ResultSet_WikiBuilder
             if ($name == 'group') {
                 $arguments = $argumentParser->parse($match->getArguments());
 
-                $field = isset($arguments['field']) ? $arguments['field'] : 'aggregate';
-                $collect = isset($arguments['collect']) ? explode(',', $arguments['collect']) : ['user'];
+                $field = $arguments['field'] ?? 'aggregate';
+                $collect = explode(',', $arguments['collect'] ?? 'user');
                 $this->result->groupBy($field, $collect);
             }
             if ($name == 'aggregate') {
                 $arguments = $argumentParser->parse($match->getArguments());
 
-                $fields = isset($arguments['fields']) ? explode(',', $arguments['fields']) : [];
-                $totals = isset($arguments['totals']) ? explode(',', $arguments['totals']) : [];
+                $fields = explode(',', $arguments['fields'] ?? '');
+                $totals = explode(',', $arguments['totals'] ?? '');
                 $this->result->aggregate($fields, $totals);
             }
         }

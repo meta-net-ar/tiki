@@ -10,8 +10,8 @@ $inputConfiguration = [
         'nlId'                 => 'int',        //post
         'remove'               => 'int',        //get
         'error'                => 'string',     //post
-        'deleteError'          => 'bool',       //post
-        'ed_sort_mode'         => 'string',     //get
+        'deleteError'          => 'int',        //get
+        'ed_sort_mode'         => 'alnumdash',  //get
         'ed_offset'            => 'digits',     //get
         'ed_find'              => 'string',     //post
         'editionId'            => 'int',        //get
@@ -20,6 +20,9 @@ $inputConfiguration = [
 ];
 require_once('tiki-setup.php');
 include_once('lib/newsletters/nllib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_NEWSLETTERS;
+Sections::setCurrentSection($section);
 $access->check_feature('feature_newsletters');
 if (! empty($_REQUEST['nlId'])) {
     $smarty->assign('nlId', $_REQUEST["nlId"]);
@@ -46,7 +49,7 @@ if (! empty($_REQUEST['error'])) {
     $smarty->assign_by_ref('edition_info', $edition_info);
 }
 if (! empty($_REQUEST['deleteError'])) {
-    $edition_errors = $nllib->remove_edition_errors($_REQUEST['deleteError']);
+    $nllib->remove_edition_errors($_REQUEST['deleteError']);
 }
 if (! isset($_REQUEST["ed_sort_mode"])) {
     $ed_sort_mode = 'sent_desc';
@@ -59,11 +62,7 @@ if (! isset($_REQUEST["ed_offset"])) {
     $ed_offset = $_REQUEST["ed_offset"];
 }
 $smarty->assign_by_ref('ed_offset', $ed_offset);
-if (isset($_REQUEST["ed_find"])) {
-    $ed_find = $_REQUEST["ed_find"];
-} else {
-    $ed_find = '';
-}
+$ed_find = $_REQUEST["ed_find"] ?? '';
 $smarty->assign('ed_find', $ed_find);
 $smarty->assign_by_ref('ed_sort_mode', $ed_sort_mode);
 if (isset($_REQUEST["nlId"])) {
@@ -71,10 +70,10 @@ if (isset($_REQUEST["nlId"])) {
 } else {
     $channels = $nllib->list_editions(0, $ed_offset, $maxRecords, $ed_sort_mode, $ed_find, false, 'tiki_p_view_newsletter');
 }
-$cant_pages = ceil($channels["cant"] / $maxRecords);
-$smarty->assign_by_ref('cant_pages', $cant_pages);
+$pages_count = ceil($channels["count"] / $maxRecords);
+$smarty->assign_by_ref('pages_count', $pages_count);
 $smarty->assign('actual_page', 1 + ($ed_offset / $maxRecords));
-if ($channels["cant"] > ($ed_offset + $maxRecords)) {
+if ($channels["count"] > ($ed_offset + $maxRecords)) {
     $smarty->assign('next_offset', $ed_offset + $maxRecords);
 } else {
     $smarty->assign('next_offset', -1);
@@ -97,7 +96,6 @@ if (isset($_REQUEST['editionId'])) {
         }
     }
 }
-$section = 'newsletters';
 include_once('tiki-section_options.php');
 // Display the template
 $smarty->assign('mid', 'tiki-newsletter_archives.tpl');

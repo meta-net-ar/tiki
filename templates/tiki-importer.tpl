@@ -16,7 +16,7 @@
     {/remarksbox}
 
     <br>
-    <form method="post" name="chooseSoftware" action="tiki-importer.php" class="d-flex flex-row flex-wrap align-items-center">
+    <form method="post" name="chooseSoftware" action="tiki-importer.php" class="d-flex flex-row flex-wrap align-items-center styling-element">
         <label for="importerClassName" class="me-2">{tr}Select the software to import from:{/tr}</label>
         <select name="importerClassName" id="importerClassName" class="form-control me-2">
             <option value="">{tr}Select...{/tr}</option>
@@ -27,10 +27,12 @@
         <input type="submit" class="btn btn-primary" value="{tr}OK{/tr}">
     </form>
     <br>
-    <a href="tiki-import_xml_zip.php">Import wiki pages in an XML Zip file from another Tiki</a>
+    <a href="tiki-import_xml_zip.php">{tr}Import wiki pages in an XML Zip file from another Tiki{/tr}</a>
+    <br>
+    <a href="tiki-markdown_import.php">{tr}Import markdown files and convert to wiki pages{/tr}</a>
 
 {elseif isset($softwareSpecificOptions)}
-    <h2>Options:</h2>
+    <h2>{tr}Options:{/tr}</h2>
     <form method="post" enctype="multipart/form-data" action="tiki-importer.php" onsubmit="return confirm('{tr}WARNING: make sure to have a backup before running the script. If you do not have a backup this is the last chance to cancel the importer by clicking on the cancel button.{/tr}');";>
         {ticket}    
         <input type="hidden" name="importerClassName" value="{$importerClassName}">
@@ -82,15 +84,15 @@
     {if !empty($importErrors)}
         <br>
         <p><b>{tr}Errors:{/tr}</b></p>
-        <textarea rows="15" cols="100" codemirror="false">{$importErrors}</textarea>
+        <textarea rows="15" cols="100">{$importErrors}</textarea>
     {/if}
     <br><br>
     <p><b>{tr}Importer log:{/tr}</b></p>
-    <textarea rows="15" cols="100" codemirror="false">{$importLog}</textarea>
+    <textarea rows="15" cols="100">{$importLog}</textarea>
 
     {if isset($wordpressUrls)}
         <br><br>
         <p><b>{tr}Suggested .htaccess rules:{/tr}</b></p>
-        <textarea rows="15" cols="100" codemirror="false">{$wordpressUrls}</textarea>
+        <textarea rows="15" cols="100">{$wordpressUrls}</textarea>
     {/if}
 {/if}

@@ -56,7 +56,6 @@ function wikiplugin_mautic_info()
 function wikiplugin_mautic($data, $params)
 {
     global $prefs;
-    $form = '';
     $ret = '';
 
     if ($prefs['site_mautic_enable'] !== 'y') {
@@ -66,6 +65,8 @@ function wikiplugin_mautic($data, $params)
     if ($prefs['site_mautic_url'] === '') {
         return tra('You must configure Mautic URL before using this plugin');
     }
+
+    $params = WikiPlugin_Helper::applySeparators($params, wikiplugin_mautic_info());
 
     if (empty($params['type'])) {
         return tra('Type parameter is required');
@@ -117,7 +118,7 @@ HTML;
         $api = new MauticApi();
         $contactApi = $api->newApi('contacts', $auth, $apiUrl);
 
-        $contacts = $contactApi->getList($search = '', $start = 0, $limit = 130, $orderBy = '', $orderByDir = 'ASC', $publishedOnly = false, $minimal = false);
+        $contacts = $contactApi->getList('', 0, 130);
         $allContacts = $contacts[$contactApi->listName()];
         $contacts = [];
 
@@ -133,9 +134,6 @@ HTML;
             }
         }
 
-        if (! isset($params['available_actions'])) {
-            $params['available_actions'] = explode(',', default_available_actions());
-        }
         $available_actions = $params['available_actions'];
         $smarty->assign('type', $params['type']);
         $smarty->assign('contacts', $contacts);

@@ -9,6 +9,8 @@ use Tracker\Field\AbstractItemField;
 
 class Tracker_Item
 {
+    public const LAST_MODIF = 'lastModif';
+    public const LAST_MODIF_BY = 'lastModifBy';
     public const PERM_NAME_MAX_ALLOWED_SIZE = 50;
 
     /**
@@ -495,7 +497,7 @@ class Tracker_Item
     {
         $deleteFiles = [];
         foreach ($input as $k => $v) {
-            if (substr($k, 0, 4) == 'del_') {
+            if (str_starts_with($k, 'del_')) {
                 $key = substr($k, 4);
                 if ($this->canModifyField($key)) {
                     $deleteFiles[$key] = $v;
@@ -533,7 +535,14 @@ class Tracker_Item
                 // getFieldData expects the value to be in $input['ins_xx']
                 $input[$field['ins_id']] = $input['fields'][$field['permName']];
             }
-            return array_merge($field, $handler->getFieldData($input));
+
+            $out = array_merge($field, $handler->getFieldData($input));
+
+            if (method_exists($handler, 'getAutoSyncInlineEditFieldData')) {
+                $out = array_merge($out, $handler->getAutoSyncInlineEditFieldData($input));
+            }
+
+            return $out;
         }
     }
 
@@ -597,7 +606,7 @@ class Tracker_Item
      */
     public function getPerm($permName)
     {
-        return isset($this->perms->$permName) ? $this->perms->$permName : null;
+        return $this->perms->$permName ?? null;
     }
 
     public function getPerms()
@@ -612,7 +621,7 @@ class Tracker_Item
 
     public function getViewPermission()
     {
-        $status = isset($this->info['status']) ? $this->info['status'] : 'o';
+        $status = $this->info['status'] ?? 'o';
 
         if ($status == 'c') {
             return 'view_trackers_closed';
@@ -653,7 +662,7 @@ class Tracker_Item
                 $data = $handler->getFieldData();
 
                 $permName = $field['permName'];
-                $out[$permName] = isset($data['value']) ? $data['value'] : null;
+                $out[$permName] = $data['value'] ?? null;
             }
         }
 
@@ -720,7 +729,7 @@ class Tracker_Item
         }
         foreach ($data as $permName => $value) {
             $field = $this->definition->getField($permName);
-            if ($field && ($field['type'] == 'l' || $field['type'] == 'REL')) {
+            if ($field && ($field['type'] == 'l' || $field['type'] == 'REL') && (empty($value) || is_string($value))) {
                 $handler = $this->definition->getFieldFactory()->getHandler($field, $fieldData);
                 $data[$permName] = $handler->getItemValues();
             }

@@ -1,11 +1,13 @@
-// Slate 5.3.3 -- This is a copy of node_modules/bootswatch/dist/slate/_variables.scss with
-// Tiki CSS variables added and color values updated to better comply with WCAG guidelines.
+// Slate 5.3.7
+// Color values may be updated to better comply with WCAG color contrast guidelines, and other changes for Tiki.
+// "default" below means the Bootswatch theme default.
 
-@import "../../../node_modules/bootswatch/dist/slate/_variables.scss";
+@use "sass:color";
+@import "../../../node_modules/bootswatch/dist/slate/_variables.scss"; // Bootswatch theme variables file
 
-//
 // Color system
-//
+$green-300: tint-color($green, 40%);  // default -- Compiling needs this to be declared
+$red-300: tint-color($red, 40%);  // default -- Compiling needs this to be declared
 
 //$primary:       $gray-800;  // default
 $secondary:     #6E757C; // $gray-600;  // default
@@ -13,28 +15,32 @@ $success:       #328532; // $green;  // default
 $info:          #20809D; // $cyan;  // default
 $warning:       #AB6503; // $yellow;  // default
 $danger:        #E6251E; // $red;  // default
-$light:         #757575; // $gray-500; // $gray-200;  // default Darkened for WCAG compliance with #fff foreground cp;pr
+$light:         #354050; // rgb(233, 236, 239); // #757575; // $gray-500; // $gray-200;  // default Darkened for WCAG compliance with #aaa body color.
 //$dark:          $gray-900;  // default
 
-// Prefix for :root CSS variables
-$variable-prefix:             bs-;  // default // Deprecated in v5.2.0 for the shorter `$prefix`
-$prefix:                      $variable-prefix;  // default
+// Options
+    // Prefix
+$prefix: bs-; // default -- Compiling needs this to be declared
+$enable-dark-mode:            false;
 
 // Body
 $body-color:                #aaa;  // default
-$body-secondary-color:      rgba($body-color, .75);  // default
+$body-secondary-color:      rgba($body-color, .99);  // default
 $body-secondary-bg:         $gray-800;
-$body-tertiary-color:       rgba($body-color, .5);  // default
+$body-tertiary-color:       rgba($body-color, .65);  // default
 $body-tertiary-bg:          $gray-700;
 
 // Links
-//$link-color: #9EA0A3;
+$link-color: #fff; // #9EA0A3;
 $link-decoration: underline;
 
-// Fonts
+// Typography
+$mark-bg: #503301;
+
 // Tables
 // Buttons
 // Forms
+$form-text-color: #BFBFBFBF;
 $input-bg:                              var(--#{$prefix}body-bg);  // default // $white;  // default
 $input-disabled-bg:                     #ccc;  // default
 
@@ -45,39 +51,39 @@ $input-group-addon-color: #CCCCCC;
 $form-valid-color: #3FA63F;
 $form-invalid-color: #EE6863;
 
-// Dropdowns
-$dropdown-link-color:               var(--#{$prefix}body-color);
-$dropdown-link-hover-bg:            var(--#{$prefix}body-bg);
-
 // Navs
 $nav-link-color:                    var(--#{$prefix}link-color);  // default
 
 // Navbar
 $navbar-padding-y:                  .1px;
-$navbar-dark-hover-color:           $white;  // default
+$navbar-light-color:                rgba(var(--#{$prefix}emphasis-color-rgb), .65); // !default;
+
 $navbar-light-hover-color:          $gray-800;  // default
 $navbar-light-active-color:         $gray-800;  // default
+$navbar-dark-hover-color:           $white;  // default
+$navbar-brand-padding-y:            0; // not being respected
 
+// Dropdowns
+$dropdown-link-color:               var(--#{$prefix}body-color);
+$dropdown-link-hover-bg:            var(--#{$prefix}body-bg);
 
 // Pagination
 // Cards
 $card-cap-bg: #3B3F45;
 
 // Popovers
+// Badges
 // Toasts
 // Modals
 // Progress bars
 // List group
+// Figures
+$figure-caption-color: #AAAAAAD4;
+
 // Breadcrumbs
+// Close
 // Code
 
 //--------------------------- Tiki SCSS variables
 
 //--------------------------- Additional CSS
-
-// Increase height to compensate this theme's extra padding
-.tiki .select2-container--bootstrap-5 .select2-selection {
-    min-height: calc(2.2em + 0.75rem + 2px);
-    border-radius: 0 !important;
-}
-

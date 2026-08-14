@@ -15,6 +15,7 @@ class Record
     private $key;
     private $multiple;
     private $required;
+    private $limitPreloaded;
     private $body;
     /** Array of Record */
     private array $sublists = [];
@@ -28,6 +29,7 @@ class Record
         $this->key = $key;
         $this->multiple = false;
         $this->required = false;
+        $this->limitPreloaded = false;
         $this->parser = $parser;
         $this->parent = null;
     }
@@ -88,6 +90,16 @@ class Record
         $this->required = $required;
     }
 
+    public function limitPreloaded()
+    {
+        return $this->limitPreloaded;
+    }
+
+    public function setLimitPreloaded($limitPreloaded)
+    {
+        $this->limitPreloaded = $limitPreloaded;
+    }
+
     /**
      * Return a list of filter fields used in sublist blocks
      */
@@ -110,7 +122,7 @@ class Record
     {
         $fields = [];
         foreach ($this->getFilters() as $filter) {
-            foreach ($filter['arguments'] as $name => $value) {
+            foreach ($filter['arguments'] as $value) {
                 $look_for = [];
                 if ($parent) {
                     $look_for[] = 'parent';

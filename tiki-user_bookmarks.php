@@ -8,24 +8,29 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'   => [
-        'parentId'           => 'int',               //post
+        'parentId'           => 'int',               //get
         'editfolder'         => 'int',               //get
         'editurl'            => 'int',               //get
         'addfolder'          => 'bool',              //post
-        'foldername'         => 'word',              //post
+        'foldername'         => 'text',              //post
         'removefolder'       => 'int',               //get
-        'addurl'             => 'bool',              //post
-        'urlname'            => 'word',              //post
+        'addurl'             => 'alpha',             //post
+        'urlname'            => 'text',              //post
+        'urlurl'             => 'text',              //post
+        'refreshurl'         => 'int',               //get/post
         'removeurl'          => 'int',               //get
         ],
     ],
 ];
+
 require_once('tiki-setup.php');
 include_once('lib/bookmarks/bookmarklib.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 
 $access->check_feature('feature_user_bookmarks', '', 'community');
 $access->check_user($user);

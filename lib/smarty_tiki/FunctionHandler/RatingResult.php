@@ -42,6 +42,6 @@ class RatingResult extends Base
             return smarty_function_rating_result_avg($params, $smarty->getEmptyInternalTemplate());
         }
 
-        return "<table class='ratingDeliberationResultTable' style='width:100%;'><tr>" . $tableBody . "</tr></table>";
+        return "<table class='ratingDeliberationResultTable w-100 mt-2'><tr>" . $tableBody . "</tr></table>";
     }
 }

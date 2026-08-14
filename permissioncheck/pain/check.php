@@ -1,7 +1,7 @@
 <?php
 
 $check_if_model_works = false;
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) == false) {
+if (! str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     //echo 'This model works';
     $check_if_model_works = true;
     return $check_if_model_works;

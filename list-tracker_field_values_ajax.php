@@ -13,7 +13,7 @@ $trklib = TikiLib::lib('trk');
 $err = false;
 
 if (
-    $prefs['feature_trackers'] !== 'y' || $prefs['feature_jquery'] !== 'y' || $prefs['feature_jquery_autocomplete'] !== 'y' ||
+    $prefs['feature_trackers'] !== 'y' || $prefs['elementplus_autocomplete'] !== 'y' ||
                 empty($_REQUEST['fieldId'])
 ) {
     $err = true;
@@ -43,7 +43,7 @@ if (! $err) {   // errors
     $vals = $trklib->list_tracker_field_values($_REQUEST['trackerId'], $_REQUEST['fieldId'], 'opc', 'y', $_REQUEST['lang']);
     if (! empty($_REQUEST['q'])) {
         foreach ($vals as &$val) {
-            if (strpos(strtolower($val), strtolower($_REQUEST['q'])) !== false) {
+            if (str_contains(strtolower($val), strtolower($_REQUEST['q']))) {
                 $values[] = $val;
             }
         }

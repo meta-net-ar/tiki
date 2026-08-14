@@ -7,6 +7,6 @@
 
 function smarty_function_breadcrumbs($params, \Smarty\Template $template)
 {
-    $smartyFunctionBreadcrumbsHandler = new \smartytiki\FunctionHandler\Breadcrumbs();
+    $smartyFunctionBreadcrumbsHandler = new \SmartyTiki\FunctionHandler\Breadcrumbs();
     return $smartyFunctionBreadcrumbsHandler->handle($params, $template);
 }

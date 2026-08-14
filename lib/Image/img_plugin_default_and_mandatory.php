@@ -14,11 +14,13 @@ whether mobile mode is set, etc.*/
 
 //////////////////////////////////////////////////Function for processing default and mandatory parameters//////////////////////////////////////
 //function calls are just below function
+use Tiki\Sections;
+
 if (! function_exists('apply_default_and_mandatory')) {
     function apply_default_and_mandatory($imgdata, $default)
     {
         $smarty = TikiLib::lib('smarty');
-        global $section;
+        $section = Sections::getCurrentSection();
         $imgdata[$default] = trim($imgdata[$default]) . ';'; // trim whitespace and ensure at least one semicolon
         $img_conditions_array = explode(';', $imgdata[$default]); // conditions separated by semicolons
         if (! empty($img_conditions_array)) {
@@ -62,7 +64,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                                     break;
                                                 case 'section_cms_article':
                                                     if (! empty($section)) {
-                                                        if ($section == 'cms') {
+                                                        if (Sections::isCurrentSection(Sections::SECTION_CMS)) {
                                                             if (! empty($smarty)) {
                                                                 $image_article_type = $smarty->getTemplateVars('type');
                                                                 if (! empty($image_article_type)) {
@@ -76,7 +78,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                                     break;
                                                 case 'section_cms_review':
                                                     if (! empty($section)) {
-                                                        if ($section == 'cms') {
+                                                        if (Sections::isCurrentSection(Sections::SECTION_CMS)) {
                                                             if (! empty($smarty)) {
                                                                 $image_article_type = $smarty->getTemplateVars('type');
                                                                 if (! empty($image_article_type)) {
@@ -90,7 +92,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                                     break;
                                                 case 'section_cms_event':
                                                     if (! empty($section)) {
-                                                        if ($section == 'cms') {
+                                                        if (Sections::isCurrentSection(Sections::SECTION_CMS)) {
                                                             if (! empty($smarty)) {
                                                                 $image_article_type = $smarty->getTemplateVars('type');
                                                                 if (! empty($image_article_type)) {
@@ -104,7 +106,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                                     break;
                                                 case 'section_cms_classified':
                                                     if (! empty($section)) {
-                                                        if ($section == 'cms') {
+                                                        if (Sections::isCurrentSection(Sections::SECTION_CMS)) {
                                                             if (! empty($smarty)) {
                                                                 $image_article_type = $smarty->getTemplateVars('type');
                                                                 if (! empty($image_article_type)) {
@@ -121,7 +123,7 @@ if (! function_exists('apply_default_and_mandatory')) {
                                             if ($img_condition_status != true) {
                                                 // if match not found yet, examine more specific conditions
                                                 if (! empty($section)) {    // if we have a section name
-                                                    if (substr($img_condition_name, 0, 8) == 'section_') {
+                                                    if (str_starts_with($img_condition_name, 'section_')) {
                                                         if (strlen($img_condition_name) > 8) {
                                                             $img_condition_part = substr($img_condition, 8); // get part after "section_"
                                                             $img_condition_part = strtolower($img_condition_part);

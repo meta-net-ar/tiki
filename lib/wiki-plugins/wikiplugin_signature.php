@@ -83,7 +83,7 @@ function wikiplugin_signature($data, $params)
 
     if (! $editPerm) {
         // Checking permission from plugin
-        $editPerm = $parserlib->check_permission_from_plugin_params($params) == 'y' ? true : false;
+        $editPerm = $parserlib->check_permission_from_plugin_params($params) == 'y';
     }
 
     $headerlib = TikiLib::lib('header');

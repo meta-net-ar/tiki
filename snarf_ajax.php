@@ -15,4 +15,4 @@ if ($prefs['wikiplugin_snarf'] != 'y') {
     echo tra('Feature disabled');
     die;
 }
-echo wikiplugin_snarf('', $_REQUEST);
+echo TikiLib::lib('parser')->invokePlugin('snarf', '', $_REQUEST);

@@ -8,14 +8,13 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'mytiki';
 $inputConfiguration = [
     [
         'staticKeyFilters'           => [
         'prefs'                      => 'bool',              //post
-        'user_contacts_default_view' => 'bool',              //post
+        'user_contacts_default_view' => 'alpha',              //post
         'ext_remove'                 => 'int',               //get
-        'ext_add'                    => 'word',              //post
+        'ext_add'                    => 'striptags',            //post
         'ext_show'                   => 'int',               //get
         'ext_hide'                   => 'int',               //get
         'ext_public'                 => 'int',               //get
@@ -26,6 +25,9 @@ $inputConfiguration = [
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_MY_TIKI;
+Sections::setCurrentSection($section);
 $contactlib = TikiLib::lib('contact');
 
 $access->check_feature('feature_contacts', '', 'community');
@@ -40,14 +42,24 @@ if (isset($_REQUEST['prefs'])) {
 }
 $smarty->assign('user_contacts_default_view', $tikilib->get_user_preference($user, 'user_contacts_default_view'));
 if (isset($_REQUEST['ext_remove'])) {
+    $ext = $contactlib->get_ext($_REQUEST['ext_remove']);
     $contactlib->remove_ext($user, $_REQUEST['ext_remove']);
     $cookietab = 2;
+    Feedback::success(tr('Field %0 was successfully removed.', $ext['fieldname']));
 }
 if (isset($_REQUEST['ext_add'])) {
-    $contactlib->add_ext($user, $_REQUEST['ext_add']);
     $cookietab = 2;
-    $feedback = sprintf(tra('Field %s was added.'), $_REQUEST['ext_add']);
-    Feedback::success($feedback);
+    $rawField = trim($_REQUEST['ext_add']);
+    if ($rawField === '') {
+        Feedback::error(tra('Field name cannot be empty.'));
+    } elseif (mb_strlen($rawField) > 100) {
+        Feedback::error(tra('Field name is too long. Please use 100 characters or less.'));
+    } elseif ($contactlib->get_ext_by_name($user, $rawField)) {
+        Feedback::error(sprintf(tra('Field name %s already exists.'), $rawField));
+    } else {
+        $contactlib->add_ext($user, $rawField);
+        Feedback::success(sprintf(tra('Field %s was added.'), $rawField));
+    }
 }
 if (isset($_REQUEST['ext_show'])) {
     $contactlib->modify_ext($user, $_REQUEST['ext_show'], ['show' => 'y']);
@@ -65,7 +77,8 @@ if (isset($_REQUEST['ext_private'])) {
     $contactlib->modify_ext($user, $_REQUEST['ext_private'], ['flagsPublic' => 'n']);
     $cookietab = 2;
 }
-$exts = & $contactlib->get_ext_list($user);
+$extList = $contactlib->get_ext_list($user);
+$exts = &$extList;
 $nb_exts = count($exts);
 // consistancy check
 foreach ($exts as $k => $ext) {

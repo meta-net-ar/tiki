@@ -7,53 +7,54 @@
 // this script may only be included - so its better to die if called directly.
 use Tiki\Lib\Logs\LogsLib;
 
-if (strpos($_SERVER['SCRIPT_NAME'], basename(__FILE__)) !== false) {
+if (str_contains($_SERVER['SCRIPT_NAME'], basename(__FILE__))) {
     header('location: index.php');
     exit;
 }
 
 /**
- * This class bundles several social networks functions (twitter, facebook ...)
- * @author cdrwhite
- * @since 6.0
- */
+* This class bundles several social networks functions (twitter, facebook ...)
+* @author cdrwhite
+* @since 6.0
+*/
 class SocialNetworksLib extends LogsLib
 {
     /**
-     * Latest Facebook API version for accessing graph.facebook.com
-     * Documentation says it's best to specify the version, otherwise the oldest version is used
-     * Will need to be updated whenever the API version is updated
-     *
-     * @var string
-     */
-    private $graphVersion = 'v9.0';
+    * Latest Facebook API version for accessing graph.facebook.com
+    * Documentation says it's best to specify the version, otherwise the oldest version is used
+    * Will need to be updated whenever the API version is updated
+    *
+    * @var string
+    */
+    private $graphVersion = 'v18.0';
 
     /**
-     * @var array   options for Twitter Zend functions
-     */
+    * @var array   options for Twitter Zend functions
+    */
+    // @tiki-external-link-ok: Twitter OAuth base URL, requires authentication
     public $options = [
             'callbackUrl'    => '',
-            'siteUrl'        => 'http://twitter.com/oauth',
+            'siteUrl'        => 'https://api.twitter.com/oauth',
             'consumerKey'    => '',
             'consumerSecret' => '',
     ];
 
     /**
-     * retrieves the URL for the current page
-     *
-     * @return string   URL for the current page
-     */
+    * retrieves the URL for the current page
+    *
+    * @return string   URL for the current page
+    */
     public function getURL()
     {
         $url = 'http';
         $port = '';
         if (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') {
             $url .= 's';
-            if ($_SERVER['SERVER_PORT'] != 443 and strpos($_SERVER['HTTP_HOST'], ':') == 0) {
+            if ($_SERVER['SERVER_PORT'] != 443 && str_starts_with($_SERVER['HTTP_HOST'], ':')) {
                 $port = ':' . $_SERVER['SERVER_PORT'];
             }
         } else {
-            if ($_SERVER['SERVER_PORT'] != 80 and strpos($_SERVER['HTTP_HOST'], ':') == 0) {
+            if ($_SERVER['SERVER_PORT'] != 80 && str_starts_with($_SERVER['HTTP_HOST'], ':')) {
                 $port = ':' . $_SERVER['SERVER_PORT'];
             }
         }
@@ -62,19 +63,19 @@ class SocialNetworksLib extends LogsLib
     }
 
     /**
-     * Checks if the site is registered with twitter (consumer key and secret are set)
-     *
-     * @return bool true, if this site is registered with twitter as an application
-     */
+    * Checks if the site is registered with twitter (consumer key and secret are set)
+    *
+    * @return bool true, if this site is registered with twitter as an application
+    */
     public function twitterRegistered()
     {
         global $prefs;
-        return ($prefs['socialnetworks_twitter_consumer_key'] != '' and $prefs['socialnetworks_twitter_consumer_secret'] != '');
+        return ! empty($prefs['socialnetworks_twitter_client_id']) && ! empty($prefs['socialnetworks_twitter_client_secret']);
     }
 
     /**
-     * If this site is registered with twitter, it redirects to twitter to ask for a request token
-     */
+    * If this site is registered with twitter, it redirects to twitter to ask for a request token
+    */
     public function getTwitterRequestToken()
     {
         global $prefs;
@@ -83,61 +84,48 @@ class SocialNetworksLib extends LogsLib
             return false;
         }
 
-        $this->options['callbackUrl'] = $this->getURL();
-        $this->options['siteUrl'] = 'https://api.twitter.com/oauth';
-        $this->options['consumerKey'] = $prefs['socialnetworks_twitter_consumer_key'];
-        $this->options['consumerSecret'] = $prefs['socialnetworks_twitter_consumer_secret'];
-
+        $oauthlib = TikiLib::lib('oauth');
         try {
-            $consumer = new Laminas\OAuth\Consumer($this->options);
-            $httpClient = TikiLib::lib('tiki')->get_http_client();
-            $consumer->setHttpClient($httpClient);
-            $token = $consumer->getRequestToken();
-            $_SESSION['TWITTER_REQUEST_TOKEN'] = serialize($token);
-            $consumer->redirect();
-        } catch (Laminas\OAuth\Exception\ExceptionInterface $e) {
+            return $oauthlib->request_token('twitter');
+        } catch (\Exception $e) {
+            error_log("Twitter OAuth error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (Twitter OAuth exception reporting)
             return false;
         }
     }
 
     /**
-     * When the user confirms the request token, twitter redirects back to our site providing us with a request token.
-     * This function receives a permanent access token for the given user and stores it in his preferences
-     *
-     * @param string $user  user Id of the user to store the access token for
-     *
-     * @return bool         true on success
-     */
+    * When the user confirms the request token, twitter redirects back to our site providing us with a request token.
+    * This function receives a permanent access token for the given user and stores it in his preferences
+    *
+    * @param string $user  user Id of the user to store the access token for
+    *
+    * @return bool         true on success
+    */
     public function getTwitterAccessToken($user)
     {
-        global $prefs;
-
-        if (
-            $prefs['socialnetworks_twitter_consumer_key'] == ''
-            or $prefs['socialnetworks_twitter_consumer_secret'] == ''
-            or ! isset($_SESSION['TWITTER_REQUEST_TOKEN'])
-        ) {
+        if (! isset($_GET['code']) || ! isset($_SESSION['OAUTH_STATE_twitter'])) {
             return false;
         }
 
-        $this->options['callbackUrl'] = $this->getURL();
-        $this->options['consumerKey'] = $prefs['socialnetworks_twitter_consumer_key'];
-        $this->options['consumerSecret'] = $prefs['socialnetworks_twitter_consumer_secret'];
+        $oauthlib = TikiLib::lib('oauth');
 
-        $consumer = new Laminas\OAuth\Consumer($this->options);
-        $httpClient = TikiLib::lib('tiki')->get_http_client();
-        $consumer->setHttpClient($httpClient);
-        $token = $consumer->getAccessToken($_GET, unserialize($_SESSION['TWITTER_REQUEST_TOKEN']));
-        unset($_SESSION['TWITTER_REQUEST_TOKEN']);
-        $this->set_user_preference($user, 'twitter_token', serialize($token));
-        return true;
+        try {
+            if ($oauthlib->request_access('twitter')) {
+                $token = $oauthlib->retrieve_token('twitter');
+                $this->set_user_preference($user, 'twitter_token', serialize($token));
+                return true;
+            }
+        } catch (\Exception $e) {
+            error_log("Twitter OAuth error: " . $e->getMessage()); // @phpstan-ignore disallowedFunctions.errorLog (Twitter OAuth exception reporting)
+        }
+        return false;
     }
 
     /**
-     * Checks if the site is registered with facebook (application id , api key and secret are set)
-     *
-     * @return bool true, if this site is registered with facebook as an application
-     */
+    * Checks if the site is registered with facebook (application id , api key and secret are set)
+    *
+    * @return bool true, if this site is registered with facebook as an application
+    */
     public function facebookRegistered()
     {
         global $prefs;
@@ -145,8 +133,8 @@ class SocialNetworksLib extends LogsLib
     }
 
     /**
-     * if this site is registered with facebook, it redirects to facebook to ask for a request token
-     */
+    * if this site is registered with facebook, it redirects to facebook to ask for a request token
+    */
     public function getFacebookRequestToken()
     {
         global $prefs;
@@ -172,7 +160,7 @@ class SocialNetworksLib extends LogsLib
         }
         $scope = implode(',', $scopes);
         $url = $this->getURL();
-        if (strpos($url, '?') != 0) {
+        if (! str_starts_with($url, '?')) {
             $url = preg_replace('/\?.*/', '', $url);
         }
         $url = urlencode($url . '?request_facebook');
@@ -182,13 +170,12 @@ class SocialNetworksLib extends LogsLib
         die();
     }
 
-
     /**
-     * Request access token
-     *
-     * @return bool|string|null
-     * @throws Exception
-     */
+    * Request access token
+    *
+    * @return bool|string|null
+    * @throws Exception
+    */
     public function getFacebookAccessToken()
     {
         global $prefs;
@@ -207,7 +194,7 @@ class SocialNetworksLib extends LogsLib
         );
         $decodedBody = json_decode($responseBody);
 
-        if (isset($decodedBody->access_token) || substr($responseBody, 0, 13) == 'access_token=') {
+        if (isset($decodedBody->access_token) || str_starts_with($responseBody, 'access_token=')) {
             if (isset($decodedBody->access_token)) {
                 $access_token = $decodedBody->access_token;
             } else {
@@ -240,18 +227,15 @@ class SocialNetworksLib extends LogsLib
         }
 
         $resp = $this->facebookGraph('', 'me', ['fields' => implode(',', $fields),'access_token' => $access_token], false, 'GET');
-        $fb_profile = json_decode($resp);
-
-        return $fb_profile;
+        return json_decode($resp);
     }
 
-
     /**
-     * Facebook pre-login
-     *
-     * @return bool
-     * @throws Exception
-     */
+    * Facebook pre-login
+    *
+    * @return bool
+    * @throws Exception
+    */
     public function facebookLoginPre()
     {
         global $prefs, $user;
@@ -276,9 +260,9 @@ class SocialNetworksLib extends LogsLib
     }
 
     /**
-    *
-    * This is where real login happens
-    */
+     *
+     * This is where real login happens
+     */
     public function facebookLogin($access_token, $fb_profile)
     {
         global $prefs, $user;
@@ -319,10 +303,10 @@ class SocialNetworksLib extends LogsLib
 
 
     /**
-     * Creates a new user from facebook profile
-     *
-     * @returns $user it created
-     */
+    * Creates a new user from facebook profile
+    *
+    * @returns $user it created
+    */
     public function facebookCreateUser($access_token, $fb_profile)
     {
         global $prefs, $user;
@@ -372,17 +356,21 @@ class SocialNetworksLib extends LogsLib
         if ($prefs['feature_userPreferences'] == 'y') {
             $fb_avatar = json_decode($this->facebookGraph('', 'me/picture', ['type' => 'square', 'width' => '480', 'redirect' => '0','access_token' => $access_token], false, 'GET'));
             $avatarlib = TikiLib::lib('avatar');
-            $avatarlib->set_avatar_from_url($fb_avatar->data->url, $user);
+            try {
+                $avatarlib->set_avatar_from_url($fb_avatar->data->url, $user);
+            } catch (Exception $e) {
+                Feedback::error($e->getMessage());
+            }
         }
 
         return $user;
     }
 
     /**
-     * Checks if the site is registered with linkedIn (client id  and secret are set)
-     *
-     * @return bool true, if this site is registered with linkedIn as an application
-     */
+    * Checks if the site is registered with linkedIn (client id  and secret are set)
+    *
+    * @return bool true, if this site is registered with linkedIn as an application
+    */
     public function linkedInRegistered()
     {
         global $prefs;
@@ -407,7 +395,7 @@ class SocialNetworksLib extends LogsLib
         $_SESSION['LINKEDIN_REQ_STATE'] = $state;
 
         $url = $this->getURL();
-        if (strpos($url, '?') != 0) {
+        if (! str_starts_with($url, '?')) {
             $url = preg_replace('/\?.*/', '', $url);
         }
         $_SESSION['LINKEDIN_CALLBACK_URL'] = $url;
@@ -477,7 +465,6 @@ class SocialNetworksLib extends LogsLib
         $linkedin_info = json_decode($result);
 
         if (isset($linkedin_info->serviceErrorCode)) {
-            curl_close($curl);
             Feedback::errorAndDie(tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
         }
 
@@ -497,12 +484,9 @@ class SocialNetworksLib extends LogsLib
             $linkedin_email = json_decode($result);
 
             if (isset($linkedin_email->serviceErrorCode)) {
-                curl_close($curl);
                 Feedback::errorAndDie(tra('We were unable to log you in using your LinkedIn account. Please contact the administrator.'), \Laminas\Http\Response::STATUS_CODE_500);
             }
         }
-
-        curl_close($curl);
 
         $linkedin_locale = $linkedin_info->firstName->preferredLocale->language;
         if (! empty($linkedin_info->firstName->preferredLocale->country)) {
@@ -570,7 +554,11 @@ class SocialNetworksLib extends LogsLib
                     }
                     if ($displayImage) {
                         $avatarlib = TikiLib::lib('avatar');
-                        $avatarlib->set_avatar_from_url($displayImage, $user);
+                        try {
+                            $avatarlib->set_avatar_from_url($displayImage, $user);
+                        } catch (Exception $e) {
+                            Feedback::error($e->getMessage());
+                        }
                     }
                 }
             } else {
@@ -593,122 +581,127 @@ class SocialNetworksLib extends LogsLib
     }
 
     /**
-     * Sends a tweet via Twitter
-     *
-     * @param string    $message    Message to send
-     * @param string    $user       UserId of the user to send the message for
-     * @param bool      $cutMessage Should the message be cut if it is longer than 140 characters,
-     *                              if set to false, an error will be returned if the message is longer than 140 characters
-     *
-     * @return int  -1 if the user did not authorize the site with twitter,
-     *                          -2, if the message is longer than 140 characters,
-     *                          a negative number corresponding to the HTTP response codes from twitter
-     *                          (http://dev.twitter.com/pages/streaming_api_response_codes)
-     *                              or a positive tweet id of the message
-     */
+    * Sends a tweet via Twitter
+    *
+    * @param string    $message    Message to send
+    * @param string    $user       UserId of the user to send the message for
+    * @param bool      $cutMessage Should the message be cut if it is longer than 140 characters,
+    *                              if set to false, an error will be returned if the message is longer than 140 characters
+    *
+    * @return int  -1 if the user did not authorize the site with twitter,
+    *                          -2, if the message is longer than 140 characters,
+                          a negative number corresponding to the HTTP response codes from Twitter
+                          (see X Developer Platform documentation)
+    *                              or a positive tweet id of the message
+    */
     public function tweet($message, $user, $cutMessage = false)
     {
         global $prefs;
         $token = $this->get_user_preference($user, 'twitter_token', '');
-        if ($token == '') {
+        if (! $token) {
             $this->add_log('tweet', 'user not registered with twitter');
             return -1;
         }
         if ($cutMessage) {
-            $message = substr($message, 0, 140);
+            $message = substr($message, 0, 280);
         } else {
-            if (strlen($message) > 140) {
+            if (strlen($message) > 280) {
                 $this->add_log('tweet', 'message too long');
                 return -2;
             }
         }
         $token = unserialize($token);
+        $accessToken = is_object($token) && method_exists($token, 'getToken') ? $token->getToken() : null;
 
-        $this->options['callbackUrl'] = $this->getURL();
-        $this->options['consumerKey'] = $prefs['socialnetworks_twitter_consumer_key'];
-        $this->options['consumerSecret'] = $prefs['socialnetworks_twitter_consumer_secret'];
-        $httpClient = TikiLib::lib('tiki')->get_http_client();
-        $twitter = new ZendService\Twitter\Twitter(
-            [
-                'oauthOptions' => [
-                    'consumerKey' => $prefs['socialnetworks_twitter_consumer_key'],
-                    'consumerSecret' => $prefs['socialnetworks_twitter_consumer_secret'],
-                ],
-                'accessToken' => $token
-            ],
-            null,
-            $httpClient
-        );
-
-        try {
-            $response = $twitter->statuses->update($message);
-        } catch (ZendService\Twitter\Exception\ExceptionInterface $e) {
-            $this->add_log('tweet', 'twitter error ' . $e->getMessage());
-            return -($e->getCode());
+        if (! $accessToken) {
+            $this->add_log('tweet', 'invalid access token');
+            return -3;
         }
 
-        if (! $response->isSuccess()) {
-            $errors = $response->getErrors();
-            $this->add_log('tweet', 'twitter response: ' . $errors[0]->message . ' - Code: ' . $errors[0]->code);
-            return -$errors['code'];
-        } else {
-            $id = $response->toValue();
-            return $id->id_str;
+        $this->options['callbackUrl'] = $this->getURL();
+        $this->options['consumerKey'] = $prefs['socialnetworks_twitter_client_id'];
+        $this->options['consumerSecret'] = $prefs['socialnetworks_twitter_client_secret'];
+        $httpClient = TikiLib::lib('tiki')->get_http_client('https://api.twitter.com/2/tweets');
+        $httpClient->setHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ]);
+        $httpClient->setMethod('POST');
+        $httpClient->setRawBody(json_encode(['text' => $message]));
+
+        try {
+            $response = $httpClient->send();
+            if (! $response->isSuccess()) {
+                $this->add_log('tweet', 'Twitter response failed: ' . $response->getBody());
+                return -4;
+            }
+
+            $json = json_decode($response->getBody(), true);
+            return $json['data']['id'] ?? 1;
+        } catch (Exception $e) {
+            $this->add_log('tweet', 'twitter error ' . $e->getMessage());
+            return -5;
         }
     }
 
     /**
-     * Deletes a tweet with the given tweet id
-     *
-     * @param int       $id     Id of the tweet to delete
-     * @param string    $user       UserId of the user who sent the tweet
-     *
-     * @return bool                 true on success
-     */
+    * Deletes a tweet with the given tweet id
+    *
+    * @param int       $id     Id of the tweet to delete
+    * @param string    $user       UserId of the user who sent the tweet
+    *
+    * @return bool                 true on success
+    */
     public function destroyTweet($id, $user)
     {
         global $prefs;
         $token = $this->get_user_preference($user, 'twitter_token', '');
-        if ($token == '') {
+        if (! $token) {
             return false;
         }
         $token = unserialize($token);
-        $this->options['callbackUrl'] = $this->getURL();
-        $this->options['consumerKey'] = $prefs['socialnetworks_twitter_consumer_key'];
-        $this->options['consumerSecret'] = $prefs['socialnetworks_twitter_consumer_secret'];
-        $httpClient = TikiLib::lib('tiki')->get_http_client();
-        $twitter = new ZendService\Twitter\Twitter(
-            [
-                'oauthOptions' => [
-                    'consumerKey' => $prefs['socialnetworks_twitter_consumer_key'],
-                    'consumerSecret' => $prefs['socialnetworks_twitter_consumer_secret'],
-                ],
-                'accessToken' => $token
-            ],
-            null,
-            $httpClient
-        );
-        try {
-            $response = $twitter->statuses->destroy($id);
-        } catch (ZendService\Twitter\Exception\ExceptionInterface $e) {
+            $accessToken = is_object($token) && method_exists($token, 'getToken') ? $token->getToken() : null;
+
+        if (! $accessToken) {
+            $this->add_log('destroyTweet', 'invalid or missing access token');
             return false;
         }
-        return true;
+
+        $url = "https://api.twitter.com/2/tweets/{$id}";
+
+        $client = TikiLib::lib('tiki')->get_http_client($url);
+        $client->setMethod('DELETE');
+        $client->setHeaders([
+            'Authorization' => 'Bearer ' . $accessToken,
+            'Content-Type' => 'application/json',
+        ]);
+        try {
+            $response = $client->send();
+            if (! $response->isSuccess()) {
+                $this->add_log('destroyTweet', 'Twitter response error: ' . $response->getBody());
+                return false;
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            $this->add_log('destroyTweet', 'exception: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**
-     * Talking to Facebook via the graph api at "https://graph.facebook.com/" using fsockopen
-     *
-     * @param    string $user     userId of the user to send the request for
-     * @param    string $action   directory/file part of the graph api URL
-     * @param    array  $params   parameters for the api call, each entry is one element submitted in the request
-     * @param    bool   $addtoken should the access token be added to the parameters if the calling function did not pass this parameter
-     *
-     * @param string    $method
-     *
-     * @return    string                body of the response page (json encoded object)
-     * @throws Exception
-     */
+    * Talking to Facebook via the graph api at "https://graph.facebook.com/" using fsockopen
+    *
+    * @param    string $user     userId of the user to send the request for
+    * @param    string $action   directory/file part of the graph api URL
+    * @param    array  $params   parameters for the api call, each entry is one element submitted in the request
+    * @param    bool   $addtoken should the access token be added to the parameters if the calling function did not pass this parameter
+    *
+    * @param string    $method
+    *
+    * @return    string                body of the response page (json encoded object)
+    * @throws Exception
+    */
     public function facebookGraph($user, $action, $params, $addtoken = true, $method = 'POST')
     {
         if (! $this->facebookRegistered()) {
@@ -744,18 +737,18 @@ class SocialNetworksLib extends LogsLib
     }
 
     /**
-     *
-     * publish a message (status or link with more options) on facebook
-     *
-     * @param string    $user       userId of the user to send for
-     * @param string    $message    message/main text to send
-     * @param string    $url        optional URL to pass along
-     * @param string    $text       optional text to show for the URL
-     * @param string    $caption    optional caption of the message accompanying the url
-     * @param string    $privacy    currently unused as I did not find the docu on how to use the privacy settings
-     *
-     * @return  string|bool         false on error, object Id of the message on success
-     */
+    *
+    * publish a message (status or link with more options) on facebook
+    *
+    * @param string    $user       userId of the user to send for
+    * @param string    $message    message/main text to send
+    * @param string    $url        optional URL to pass along
+    * @param string    $text       optional text to show for the URL
+    * @param string    $caption    optional caption of the message accompanying the url
+    * @param string    $privacy    currently unused as I did not find the docu on how to use the privacy settings
+    *
+    * @return  string|bool         false on error, object Id of the message on success
+    */
     public function facebookWallPublish($user, $message, $url = '', $text = '', $caption = '', $privacy = '')
     {
         $params = [];
@@ -781,13 +774,13 @@ class SocialNetworksLib extends LogsLib
     }
 
     /**
-     * like an object on facebook
-     *
-     * @param string    $user       userId of the user to send for
-     * @param string    $facebookId id of the object to like
-     *
-     * @return  string|bool         false on error, object Id of the message on success
-     */
+    * like an object on facebook
+    *
+    * @param string    $user       userId of the user to send for
+    * @param string    $facebookId id of the object to like
+    *
+    * @return  string|bool         false on error, object Id of the message on success
+    */
     public function facebookLike($user, $id)
     {
         $params = [];
@@ -796,14 +789,14 @@ class SocialNetworksLib extends LogsLib
     }
 
     /**
-     * Talking to bit.ly api at "http://api.bit.ly/" using Zend
-     *
-     * @param   string  $user       userId of the user to send the request for
-     * @param   string  $action     directory/file part of the api URL
-     * @param   array   $params     parameters for the api call, each entry is one element submitted in the request
-     *
-     * @return  string              body of the response page (json encoded object)
-     */
+    * Talking to bit.ly api at "http://api.bit.ly/" using Zend
+    *
+    * @param   string  $user       userId of the user to send the request for
+    * @param   string  $action     directory/file part of the api URL
+    * @param   array   $params     parameters for the api call, each entry is one element submitted in the request
+    *
+    * @return  string              body of the response page (json encoded object)
+    */
     public function bitlyApi($user, $action, $params)
     {
         global $prefs;
@@ -841,11 +834,11 @@ class SocialNetworksLib extends LogsLib
     }
 
     /**
-     * Asks bit.ly to shorten an url for us
-     *
-     * @param $user
-     * @param $url
-     */
+    * Asks bit.ly to shorten an url for us
+    *
+    * @param $user
+    * @param $url
+    */
     public function bitlyShorten($user, $url)
     {
         $query = 'SELECT * FROM `tiki_url_shortener` WHERE `longurl_hash`=MD5(?)';
@@ -882,63 +875,68 @@ class SocialNetworksLib extends LogsLib
     }
 
     /**
-     * Get Timeline off Twitter
-     * @param  string   $user       Tiki username to get timeline for
-     * @param  string   $timelineType   Timeline to get: public/friends/search - Default: public
-     * @param  string   $search     Search string
-     * @return string|int           -1 if the user did not authorize the site with twitter, a negative number corresponding to the HTTP response codes from twitter (https://dev.twitter.com/docs/streaming-api/response-codes) or the requested timeline (json encoded object)
-     */
+    * Get Timeline off Twitter
+    * @param  string   $user       Tiki username to get timeline for
+    * @param  string   $timelineType   Timeline to get: public/friends/search - Default: public
+    * @param  string   $search     Search string
+    * @return string|int           Returns an array of tweets on success, or an internal error code:
+    *                              -1 = User not authorized
+    *                              -2 = Invalid or missing token
+    *                              -3 = Twitter API responded with error
+    *                              -4 = HTTP client exception
+    *
+    * Note: These codes are maintained for internal logic and compatibility,
+    * but Twitter/X no longer uses or documents numerical error codes like those found at
+    * https://developer.x.com/en/docs/twitter-api (deprecated).
+    */
     public function getTwitterTimeline($user, $timelineType = 'public', $search = 'tikiwiki')
     {
         global $prefs;
         $token = $this->get_user_preference($user, 'twitter_token', '');
-        if ($token == '') {
+        if (! $token) {
             $this->add_log('tweet', 'user not registered with twitter');
             return -1;
         }
-
         $token = unserialize($token);
+        $accessToken = is_object($token) && method_exists($token, 'getToken') ? $token->getToken() : null;
 
-        $httpClient = TikiLib::lib('tiki')->get_http_client();
-        $twitter = new ZendService\Twitter\Twitter(
-            [
-                'oauthOptions' => [
-                    'consumerKey' => $prefs['socialnetworks_twitter_consumer_key'],
-                    'consumerSecret' => $prefs['socialnetworks_twitter_consumer_secret'],
-                ],
-                'accessToken' => $token
-            ],
-            null,
-            $httpClient
-        );
 
-        if ($timelineType == 'friends') {
-            $response = $twitter->statuses->homeTimeline();
-        } elseif ($timelineType == 'search') {
-            $response = $twitter->search->tweets($search, ['include_entities' => true]);
-        } else {
-            $response = $twitter->statuses->userTimeline();
+        if (! $accessToken) {
+            $this->add_log('tweet', 'invalid access token');
+            return -2;
         }
 
-        if (! $response->isSuccess()) {
-            $errors = $response->getErrors();
-            $this->add_log('tweet', 'twitter response: ' . $errors[0]->message . ' - Code: ' . $errors[0]->code);
-            return -$errors['code'];
-        } else {
-            return $response->toValue();
+        $url = $timelineType === 'search'
+            ? 'https://api.twitter.com/2/tweets/search/recent?query=' . urlencode($search)
+            : 'https://api.twitter.com/2/users/me/tweets';
+        $httpClient = TikiLib::lib('tiki')->get_http_client($url);
+        $httpClient->setHeaders(['Authorization' => 'Bearer ' . $accessToken]);
+
+
+        try {
+            $response = $httpClient->send();
+            if (! $response->isSuccess()) {
+                $this->add_log('tweet', 'Twitter response error: ' . $response->getBody());
+                return -3;
+            }
+
+            return json_decode($response->getBody(), true);
+        } catch (\Exception $e) {
+            $this->add_log('tweet', 'exception: ' . $e->getMessage());
+            return -4;
         }
     }
 
     /**
-     *
-     * get the public Facebook timeline of a user
-     *
-     * @param string $user     Tiki username to get facebook wall for
-     * @param bool   $addtoken should the access token be added to the parameters if the calling function did not pass this parameter
-     *
-     * @return        string|bool    false on error, JSON encoded Facebook response on success
-     * @throws Exception
-     */
+    *
+    * get the public Facebook timeline of a user
+    *
+    * @param string $user     Tiki username to get facebook wall for
+    * @param bool   $addtoken should the access token be added to the parameters if the calling function did not pass this parameter
+    *
+    * @return        string|bool    false on error, JSON encoded Facebook response on success
+    * @throws Exception
+    */
     public function facebookGetWall($user, $addtoken = true)
     {
         if (! $this->facebookRegistered()) {
@@ -1002,4 +1000,4 @@ class SocialNetworksLib extends LogsLib
 
 global $socialnetworkslib;
 
-$socialnetworkslib = new socialNetworksLib();
+$socialnetworkslib = new SocialNetworksLib();

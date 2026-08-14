@@ -4,13 +4,18 @@
  * @package tikiwiki
  */
 
+use Tiki\Lib\Sheet\Sheet;
+use Tiki\Lib\Sheet\DatabaseHandler;
+
 // (c) Copyright by authors of the Tiki Wiki CMS Groupware Project
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'sheet';
 require_once('tiki-setup.php');
-require_once('lib/sheet/grid.php');
+require_once('lib/Sheet/grid.php');
+use Tiki\Sections;
+$section = Sections::SECTION_SHEET;
+Sections::setCurrentSection($section);
 $sheetlib = TikiLib::lib('sheet');
 $auto_query_args = [
     'sheetId',
@@ -47,7 +52,7 @@ $smarty->assign('page_mode', 'form');
 $smarty->assign('sheetId', $_REQUEST['sheetId']);
 
 // Process the insertion or modification of a gallery here
-$grid = new TikiSheet();
+$grid = new Sheet();
 
 $history = $sheetlib->sheet_history($_REQUEST['sheetId']);
 $smarty->assign_by_ref('history', $history);
@@ -55,11 +60,11 @@ $smarty->assign_by_ref('history', $history);
 if (isset($_REQUEST['encoding'])) {
     $smarty->assign('page_mode', 'submit');
 
-    $handler = new TikiSheetDatabaseHandler($_REQUEST['sheetId'], $_REQUEST['readdate']);
+    $handler = new DatabaseHandler($_REQUEST['sheetId'], $_REQUEST['readdate']);
     $grid->import($handler);
 
     $handler = $_REQUEST['handler'];
-    $handlers_ = new TikiSheet();
+    $handlers_ = new Sheet();
 
     if (! in_array($handler, $handlers_->getHandlerList())) {
         Feedback::errorAndDie(tra("Handler is not allowed."), \Laminas\Http\Response::STATUS_CODE_401);
@@ -68,7 +73,6 @@ if (isset($_REQUEST['encoding'])) {
     $handler = new $handler("php://stdout", 'UTF-8', $_REQUEST['encoding']);
     $grid->export($handler);
 
-    TikiLib::lib('header')->setXRobotsTag($robots);
     header("Content-type: text/comma-separated-values");
     header("Content-Disposition: attachment; filename=export.csv");
     header("Expires: 0");
@@ -80,7 +84,7 @@ if (isset($_REQUEST['encoding'])) {
 } else {
     $list = [];
 
-    $handlers_ = new TikiSheet();
+    $handlers_ = new Sheet();
     $handlers = $handlers_->getHandlerList();
 
     foreach ($handlers as $key => $handler) {

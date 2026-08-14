@@ -7,8 +7,7 @@
         :name="field.html_name"
         class="form-select"
         :class="[field.type == 'D' ? `group_${field.ins_id}` : '']"
-        :multiple="field.type == 'M' ? 'multiple' : null"
-        v-select2>
+        :multiple="field.type == 'M' ? 'multiple' : null">
         <option value="" v-if="field.isMandatory != 'y' || !model"></option>
         <option v-for="(label, value) in field.possibilities" :value="value">
             {{label}}

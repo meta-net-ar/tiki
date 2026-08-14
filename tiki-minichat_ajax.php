@@ -49,10 +49,10 @@ function initchannelssession($chans)
         $_SESSION['minichat_channels'][] = $channel;
     }
 }
-if (isset($_REQUEST['msg'])) {
-    $msg = $_REQUEST['msg'];
+if (isset($_REQUEST['msg_chat'])) {
+    $msg = $_REQUEST['msg_chat'];
     $msg = strtr($msg, "\n\r\t", "   ");
-    $msgon = isset($_REQUEST['msgon']) ? $_REQUEST['msgon'] : null;
+    $msgon = $_REQUEST['msgon'] ?? null;
     if (empty($msg)) {
         $msgon = null;
     }
@@ -60,7 +60,7 @@ if (isset($_REQUEST['msg'])) {
     $msg = '';
     $msgon = null;
 }
-if (substr($msg, 0, 1) == '/') {
+if (str_starts_with($msg, '/')) {
     $words = explode(' ', $msg);
     switch ($words[0]) {
         case '/join':
@@ -69,7 +69,7 @@ if (substr($msg, 0, 1) == '/') {
             if (! isset($_SESSION['minichat_channels'])) {
                 initchannelssession($chans);
             }
-            $k = array_search($words[1], $_SESSION['minichat_channels']);
+            $k = in_array($words[1], $_SESSION['minichat_channels']);
             if ($k === false) {
                 $_SESSION['minichat_channels'][] = $words[1];
             }
@@ -83,7 +83,7 @@ foreach ($chans as $chan) {
     $closed = false;
     if (($msgon == $channel) && (! is_null($channel))) {
         $time = time();
-        if (substr($msg, 0, 1) == '/') {
+        if (str_starts_with($msg, '/')) {
             $words = explode(' ', $msg);
             switch ($words[0]) {
                 case '/part':
@@ -124,41 +124,67 @@ foreach ($chans as $chan) {
     }
     if ($lastid == 0) {
         $result = $tikilib->query("SELECT * FROM tiki_minichat WHERE channel=? ORDER by id desc LIMIT 100", [$channel]);
-        $msgtotal = "";
+        // collect rows, reverse to chronological order (oldest first)
+        $rows = [];
         while ($row = $result->fetchRow()) {
-            if (! $lastid) {
-                $lastid = $row['id'];
-                echo "minichat_updatelastid('$channel', $lastid);\n";
-            }
-            # if timestamp corresponds to previous days than current, show date with display_order according to the global preference
-            # daytmes = day from the time stamp of the message; daytnow = current day;
+            $rows[] = $row;
+        }
+        $rows = array_reverse($rows);
+
+        $msgtotal = "";
+        $prev_user = null;
+        foreach ($rows as $row) {
+            // compute time display (same logic as before)
             $daytmes = date("d/m/y", $row['ts']);
             $daytnow = date("d/m/y");
             if ($daytmes == $daytnow) {
                 $t = date("H:i", $row['ts']);
             } else {
-                if ($prefs['display_field_order'] == 'DMY') {
-                    $t = date("d/m/y H:i", $row['ts']);
-                } elseif ($prefs['display_field_order'] == 'DYM') {
-                    $t = date("d/y/m H:i", $row['ts']);
-                } elseif ($prefs['display_field_order'] == 'MDY') {
-                    $t = date("m/d/y H:i", $row['ts']);
-                } elseif ($prefs['display_field_order'] == 'MYD') {
-                    $t = date("m/y/d H:i", $row['ts']);
-                } elseif ($prefs['display_field_order'] == 'YDM') {
-                    $t = date("y/d/m H:i", $row['ts']);
-                } elseif ($prefs['display_field_order'] == 'YMD') {
-                    $t = date("y/m/d H:i", $row['ts']);
-                } else {
-                    $t = date("H:i", $row['ts']);
-                }
+                $formats = [
+                    'DMY' => "d/m/y H:i",
+                    'DYM' => "d/y/m H:i",
+                    'MDY' => "m/d/y H:i",
+                    'MYD' => "m/y/d H:i",
+                    'YDM' => "y/d/m H:i",
+                    'YMD' => "y/m/d H:i",
+                ];
+                $format = $formats[$prefs['display_field_order']] ?? "H:i";
+                $t = date($format, $row['ts']);
             }
-    //TODO: improve matching and replace with better smileys + use global lib
-            $msgtotal = "<span class='minichat_ts'>[$t]</span>&nbsp;<span class='minichat_nick'>&lt;" . ($row['nick'] == '' ? "<em>" . tra('Anonymous') . "</em>" : str_replace('"', '\"', smarty_modifier_userlink($row['user']))) . "&gt;</span> <span class='minichat_msg'>" . htmlentities($row['msg'], ENT_QUOTES, 'UTF-8') . "</span><br>" . $msgtotal;
+
+            $nick_html = ($row['nick'] == '' ? "<em>" . tra('Anonymous') . "</em>" : smarty_modifier_userlink($row['user']));
+            $msg_html = htmlentities($row['msg'], ENT_QUOTES, 'UTF-8');
+            $side_class = ($row['user'] == $user) ? 'mine' : 'other';
+
+            $show_header = ($prev_user !== $row['user']);
+
+            $align_class = ($side_class === 'mine') ? 'justify-content-end' : 'justify-content-start';
+            $card_classes = ($side_class === 'mine') ? 'bg-info-subtle text-info-emphasis' : 'bg-light-subtle text-body';
+
+
+            $bubble = "<div class='d-flex mb-2 {$align_class}'>";
+            $bubble .= "<div class='{$card_classes}' style='max-width:70%'>";
+            $bubble .= "<div class='p-2'>";
+            if ($show_header) {
+                $bubble .= "<div class='fw-bold small'>" . $nick_html . "</div>";
+            }
+            $bubble .= "<div class='card-text'>{$msg_html}</div>";
+            $bubble .= "<div class='text-end'><small class='text-muted'>{$t}</small></div>";
+            $bubble .= "</div></div></div>";
+
+            $msgtotal .= $bubble; // append to keep chronological order top->bottom
+            $prev_user = $row['user'];
+        }
+
+        // update lastid with the newest message id (last element in $rows)
+        if (! empty($rows)) {
+            $newlast = $rows[count($rows) - 1]['id'];
+            $lastid = (int)$newlast;
+            echo "minichat_updatelastid(" . json_encode($channel) . ", $lastid);\n";
         }
         $editlib = TikiLib::lib('edit');
         $msgtotal = $editlib->convertSmileysToUnicode($msgtotal);
-        echo "document.getElementById('minichatdiv_'+minichat_getchanid('$channel')).innerHTML=\"$msgtotal\";\n";
+        echo "document.getElementById('minichatdiv_'+minichat_getchanid(" . json_encode($channel) . ")).innerHTML=" . json_encode($msgtotal) . ";\n";
         echo "document.getElementById('minichat').scrollTop=99999;\n";
     }
 }

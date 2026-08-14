@@ -22,6 +22,7 @@ class Services_Comment_Controller
     public function action_list($input)
     {
         global $prefs;
+        $access = TikiLib::lib('access');
 
         $type = $input->type->alphaspace();
         if ($type === 'wiki page') {
@@ -31,17 +32,29 @@ class Services_Comment_Controller
         }
 
         $objectlib = TikiLib::lib('object');
-        if ($objectId !== $input->objectId->none() || ! $objectlib->isValidObject($type, $objectId)) {
-            $objectId = $input->objectId->xss();
-            throw new Services_Exception(tr('Invalid %0 ID: %1', $type, $objectId), 403);
-        }
-
-        if (! $this->isEnabled($type, $objectId)) {
-            throw new Services_Exception(tr('Comments not allowed on this page.'), 403);
-        }
-
-        if (! $this->canView($type, $objectId)) {
-            throw new Services_Exception(tr('Permission denied.'), 403);
+        try {
+            if ($objectId != $input->objectId->none() || ! $objectlib->isValidObject($type, $objectId)) {
+                $objectId = $input->objectId->xss();
+                throw new Services_Exception(tr('Invalid %0 ID: %1', $type, $objectId), 403);
+            }
+            if (! $this->isEnabled($type, $objectId)) {
+                throw new Services_Exception(tr('Comments not allowed on this page.'), 403);
+            }
+            if (! $this->canView($type, $objectId)) {
+                throw new Services_Exception(tr('You do not have permission to view comments.'), 403);
+            }
+        } catch (Services_Exception $e) {
+            if ($access->is_xml_http_request()) {
+                http_response_code($e->getCode() ?: 403);
+                header('Content-Type: application/json; charset=utf-8');
+                echo json_encode([
+                    'status' => 'error',
+                    'code' => $e->getCode() ?: 403,
+                    'message' => $e->getMessage()
+                ]);
+                exit;
+            }
+            throw $e;
         }
 
         $commentslib = TikiLib::lib('comments');
@@ -60,7 +73,7 @@ class Services_Comment_Controller
             'type'              => $type,
             'objectId'          => $objectId,
             'parentId'          => 0,
-            'cant'              => $comments['cant'],
+            'count'              => $comments['count'],
             'offset'            => $offset,
             'maxRecords'        => $maxRecords,
             'sortMode'          => $sortMode,
@@ -69,6 +82,7 @@ class Services_Comment_Controller
             'allow_lock'        => $this->canLock($type, $objectId),
             'allow_unlock'      => $this->canUnlock($type, $objectId),
             'allow_archive'     => $this->canArchive($type, $objectId),
+            'allow_resolve'     => $this->canResolve($type, $objectId),
             'allow_moderate'    => $this->canModerate($type, $objectId),
             'allow_vote'        => $this->canVote($type, $objectId),
         ];
@@ -81,11 +95,16 @@ class Services_Comment_Controller
                         \$.service('comment', 'list'),
                         {type:'$type', objectId:'$objectId', offset: comment_offset},
                         function () {
-                            \$('html, body').animate({
-                                    scrollTop: \$commentContainer.offset().top
-                                }, 2000, function () {
-                                    \$commentContainer.tikiModal();
-                                });
+                            if (comment_offset == 0) {
+                                /* If we want to load the first page, we have to go up. */
+                                \$('html, body').animate({
+                                        scrollTop: \$commentContainer.offset().top
+                                    }, 2000, function () {
+                                        \$commentContainer.tikiModal();
+                                    });
+                            } else {
+                                \$commentContainer.tikiModal();
+                            }
                         }
                     );
                 return false;";
@@ -100,6 +119,7 @@ class Services_Comment_Controller
     public function action_post($input)
     {
         global $prefs, $user;
+        $smarty = TikiLib::lib('smarty');
 
         $type = $input->type->text();
         $objectId = $input->objectId->pagename();
@@ -124,6 +144,8 @@ class Services_Comment_Controller
         }
 
         $commentslib = TikiLib::lib('comments');
+        $smarty->assign('MAX_COMMENT_TITLE_LENGTH', Comments::MAX_COMMENT_TITLE_LENGTH);
+        $smarty->assign('MAX_COMMENT_DATA_LENGTH', Comments::MAX_COMMENT_DATA_LENGTH);
         if ($parentId && $prefs['feature_comments_locking'] == 'y') {
             $parent = $commentslib->get_comment($parentId);
 
@@ -133,12 +155,19 @@ class Services_Comment_Controller
         }
 
         $errors = [];
-
-        $title = trim($input->title->xss());
+        $titleRaw = $input->title->xss();
         $data = trim($input->data->wikicontent());
+
+        if ($prefs['comments_notitle'] == 'y') {
+            $title = 'Untitled';
+        } else {
+            // If title is not set, use an empty string
+            $title = $titleRaw !== null ? $titleRaw : "";
+        }
 
         $tikilib = TikiLib::lib('tiki');
         $data = $tikilib->convertAbsoluteLinksToRelative($data);
+        $title = trim($title);
 
         $watch = $input->watch->text();
         $contributions = [];
@@ -169,11 +198,15 @@ class Services_Comment_Controller
             if ($prefs['comments_notitle'] != 'y' && empty($title)) {
                 $errors['title'] = tr('Title is empty');
             }
-
+            if (! Feedback::validateFieldLength("Title", $title, Comments::MAX_COMMENT_TITLE_LENGTH)) {
+                $errors['title'] = tr("You have exceeded the number of characters allowed (%0 max) for the %1 field", Comments::MAX_COMMENT_TITLE_LENGTH, "Title");
+            }
             if (empty($data)) {
                 $errors['data'] = tr('Content is empty');
             }
-
+            if (! Feedback::validateFieldLength("Data", $data, Comments::MAX_COMMENT_DATA_LENGTH)) {
+                $errors['data'] = tr("You have exceeded the number of characters allowed (%0 max) for the %1 field", Comments::MAX_COMMENT_DATA_LENGTH, "Data");
+            }
             if (empty($user) && $prefs['feature_antibot'] == 'y') {
                 $captchalib = TikiLib::lib('captcha');
 
@@ -181,11 +214,6 @@ class Services_Comment_Controller
                     $errors[] = $captchalib->getErrors();
                 }
             }
-
-            if ($prefs['comments_notitle'] == 'y') {
-                $title = 'Untitled ' . TikiLib::lib('tiki')->get_long_datetime(TikiLib::lib('tikidate')->getTime());
-            }
-
 
             if (count($errors) === 0) {
                 $message_id = ''; // By ref
@@ -196,7 +224,7 @@ class Services_Comment_Controller
                     $title,
                     $data,
                     $message_id,
-                    isset($parent['message_id']) ? $parent['message_id'] : '',
+                    $parent['message_id'] ?? '',
                     'n',
                     '',
                     '',
@@ -209,6 +237,13 @@ class Services_Comment_Controller
                     $version
                 );
                 if ($threadId) {
+                    $related_files = $input->related_files->raw() ?? [];
+                    foreach ($related_files as $fileId) {
+                        TikiLib::lib('relation')->add_relation('tiki.comment.recording', 'comment', $threadId, 'file', $fileId, false);
+                    }
+
+                    $watch_event = null;
+
                     switch ($type) {
                         case 'wiki page':
                             $watch_event = 'wiki_comment_changes';
@@ -248,8 +283,12 @@ class Services_Comment_Controller
                             $notification_url = '';
                             break;
                     }
-                    Feedback::showWatchers($watch_event, $objectId, 'thread_comment_replied');
-                    Feedback::sendHeaders();
+                    if ($watch_event) {
+                        Feedback::showWatchers($watch_event, $objectId, 'thread_comment_replied');
+                        if (! defined('TIKI_API') || ! TIKI_API) {
+                            Feedback::sendHeaders();
+                        }
+                    }
 
                     // Set watch if requested
                     if ($prefs['feature_user_watches'] == 'y' && $watch == 'y') {
@@ -307,7 +346,7 @@ class Services_Comment_Controller
                     }
 
                     $access = TikiLib::lib('access');
-                    if ($return_url && ! $access->is_xml_http_request()) {
+                    if ($return_url && ! $access->is_xml_http_request() && ! TIKI_API) {
                         $access->redirect($return_url, tr('Your comment was posted.'));
                     }
 
@@ -344,6 +383,10 @@ class Services_Comment_Controller
     public function action_edit($input)
     {
         $threadId = $input->threadId->int();
+        $smarty = TikiLib::lib('smarty');
+        $commentslib = TikiLib::lib('comments');
+        $smarty->assign('MAX_COMMENT_TITLE_LENGTH', Comments::MAX_COMMENT_TITLE_LENGTH);
+        $smarty->assign('MAX_COMMENT_DATA_LENGTH', Comments::MAX_COMMENT_DATA_LENGTH);
 
         if (! $comment = $this->getCommentInfo($threadId)) {
             throw new Services_Exception_NotFound();
@@ -362,14 +405,21 @@ class Services_Comment_Controller
 
             $tikilib = TikiLib::lib('tiki');
             $data = $tikilib->convertAbsoluteLinksToRelative($data);
-
+            if (! Feedback::validateFieldLength("Title", $title, Comments::MAX_COMMENT_TITLE_LENGTH)) {
+                $errors['title'] = tr("Number of characters allowed exceeded");
+            }
             if (empty($data)) {
                 $errors['data'] = tr('Content is empty');
             }
+            if (! Feedback::validateFieldLength("Data", $data, Comments::MAX_COMMENT_DATA_LENGTH)) {
+                $errors['data'] = tr("Number of characters allowed exceeded");
+            }
 
             if (count($errors) === 0) {
-                $commentslib = TikiLib::lib('comments');
                 $commentslib->update_comment($threadId, $title, $comment['comment_rating'], $data);
+
+                // get updated comment info
+                $comment = $this->getCommentInfo($threadId);
 
                 return [
                     'threadId' => $threadId,
@@ -420,7 +470,7 @@ class Services_Comment_Controller
                 $status = 'DONE';
             }
         } else {
-            $status = 'DONE'; // Already gone
+            throw new Services_Exception_NotFound();
         }
 
 
@@ -523,7 +573,11 @@ class Services_Comment_Controller
         $type = $comment['objectType'];
         $object = $comment['object'];
 
-        if ($comment['approved'] == 'y') {
+        if ($comment['approved'] == 'r' && $do == 'reject') {
+            throw new Services_Exception(tr('Comment already rejected.'), 403);
+        }
+
+        if ($comment['approved'] == 'y' && $do == 'approve') {
             throw new Services_Exception(tr('Comment already approved.'), 403);
         }
 
@@ -570,6 +624,14 @@ class Services_Comment_Controller
         $type = $comment['objectType'];
         $object = $comment['object'];
 
+        if ($comment['archived'] == 'y' && $do == 'archive') {
+            throw new Services_Exception(tr('Comment already archived.'), 403);
+        }
+
+        if ($comment['archived'] == 'n' && $do == 'unarchive') {
+            throw new Services_Exception(tr('Comment already unarchived.'), 403);
+        }
+
         if (! $this->canArchive($type, $object)) {
             throw new Services_Exception(tr('Permission denied.'), 403);
         }
@@ -583,6 +645,39 @@ class Services_Comment_Controller
             } else {
                 $commentslib->unarchive_thread($threadId);
             }
+        }
+
+        return [
+            'threadId' => $threadId,
+            'type' => $type,
+            'objectId' => $object,
+            'status' => $status,
+            'do' => $do,
+        ];
+    }
+
+    public function action_resolve($input)
+    {
+        $threadId = $input->threadId->int();
+        $do = $input->do->alpha();
+        if (! $comment = $this->getCommentInfo($threadId)) {
+            throw new Services_Exception(tr('Comment not found.'), 404);
+        }
+
+        $type = $comment['objectType'];
+        $object = $comment['object'];
+
+        if (! $this->canResolve($type, $object)) {
+            throw new Services_Exception(tr('Permission denied.'), 403);
+        }
+
+        $status = 'DONE';
+        $commentslib = TikiLib::lib('comments');
+
+        if ($do == 'resolve') {
+            $commentslib->resolveThread($threadId);
+        } else {
+            $commentslib->unresolveThread($threadId);
         }
 
         return [
@@ -783,6 +878,19 @@ class Services_Comment_Controller
         return $perms->admin_comments;
     }
 
+    private function canResolve($type, $objectId)
+    {
+        global $prefs;
+
+        if ($prefs['comments_resolved_threads'] != 'y') {
+            return false;
+        }
+
+        $perms = $this->getApplicablePermissions($type, $objectId);
+
+        return $perms->admin_comments;
+    }
+
     private function canRemove($type, $objectId)
     {
         $perms = $this->getApplicablePermissions($type, $objectId);
@@ -900,13 +1008,7 @@ class Services_Comment_Controller
                 ['version' => $version]
             );
 
-            $diffInfo = [];
-
-            foreach ($history['data'] as $info) {
-                $field_info = $trackerLib->get_field_info($info['fieldId']);
-                $info['fieldName'] = $field_info['name'];
-                $diffInfo[] = $info;
-            }
+            $diffInfo = $history['data'];
         }
         // add some specific js to set up comment post form in a modal dialog
         // so it can refresh the page after the post

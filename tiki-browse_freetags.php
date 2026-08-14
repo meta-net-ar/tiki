@@ -8,27 +8,30 @@
 //
 // All Rights Reserved. See copyright.txt for details and a complete list of authors.
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
-$section = 'freetags';
 $inputConfiguration = [
     [
         'staticKeyFilters'                => [
-            'del'                         => 'int',      //get
-            'itemit'                      => 'int',      //post
-            'typeit'                      => 'word',     //post
-            'tag'                         => 'word',     //post
-            'sort_mode'                   => 'int',      //post
-            'find'                        => 'string',   //post
-            'type'                        => 'word',     //post
-            'old_type'                    => 'word',     //post
-            'user_only'                   => 'bool',     //post
-            'broaden'                     => 'bool',     //post
-            'maxPopular'                  => 'int',      //get
-            'tsort_mode'                  => 'word',     //get
-            'objectId'                    => 'int',      //get
+            'del'                         => 'int',           //get
+            'itemit'                      => 'int',           //post
+            'typeit'                      => 'wordspace',     //post
+            'tag'                         => 'string',        //post
+            'sort_mode'                   => 'word',          //post
+            'find'                        => 'string',        //post
+            'type'                        => 'wordspace',     //post
+            'old_type'                    => 'wordspace',     //post
+            'user_only'                   => 'word',          //post
+            'broaden'                     => 'bool',          //post
+            'maxPopular'                  => 'int',           //get
+            'tsort_mode'                  => 'word',          //get
+            'objectId'                    => 'int',           //get
+            'offset'                      => 'int',           //get
         ],
     ],
 ];
 require_once('tiki-setup.php');
+use Tiki\Sections;
+$section = Sections::SECTION_FREETAGS;
+Sections::setCurrentSection($section);
 $freetaglib = TikiLib::lib('freetag');
 $access->check_feature('feature_freetags');
 $access->check_permission('tiki_p_view_freetags');
@@ -49,7 +52,7 @@ if (! isset($_REQUEST['tag']) && $prefs['freetags_preload_random_search'] == 'y'
     $tag = $freetaglib->get_tag_suggestion('', 1);
     if (! empty($tag[0])) {
         $_REQUEST['tag'] = $tag[0];
-        if (strstr($tag[0], ' ')) {
+        if (str_contains($tag[0], ' ')) {
             $_REQUEST['tag'] = '"' . $_REQUEST['tag'] . '"';
         }
     }
@@ -60,21 +63,13 @@ if (! isset($_REQUEST["sort_mode"])) {
     $sort_mode = $_REQUEST["sort_mode"];
 }
 $query_sort_mode = str_replace('created', 'o.`created`', $sort_mode);
-if (isset($_REQUEST["find"])) {
-    $find = $_REQUEST["find"];
-} else {
-    $find = '';
-}
+$find = $_REQUEST["find"] ?? '';
 $smarty->assign_by_ref('sort_mode', $sort_mode);
 $smarty->assign_by_ref('find', $find);
-if (! isset($_REQUEST["offset"])) {
-    $offset = 0;
-} else {
-    $offset = $_REQUEST["offset"];
-}
+$offset = $_REQUEST["offset"] ?? 0;
 $smarty->assign_by_ref('offset', $offset);
 if (! isset($_REQUEST["type"])) {
-    $type = isset($_REQUEST['old_type']) ? $_REQUEST['old_type'] : '';
+    $type = $_REQUEST['old_type'] ?? '';
 } else {
     $type = $_REQUEST["type"];
 }
@@ -95,7 +90,7 @@ $smarty->assign('broaden', $broaden);
 $tagArray = $freetaglib->parse_tag((isset($_REQUEST['tag'])) ? $_REQUEST['tag'] : '');
 $tagString = '';
 foreach ($tagArray as $t_ar) {
-    if (strstr($t_ar, ' ')) {
+    if (str_contains($t_ar, ' ')) {
         $tagString .= '"' . $t_ar . '" ';
     } else {
         $tagString .= $t_ar . ' ';
@@ -154,9 +149,9 @@ if ($broaden == 'y') {
 $objects = $freetaglib->get_objects_with_tag_combo($tagArray, $type, $view_user, $offset, $maxRecords, $query_sort_mode, $find, $broaden, $objectId);
 
 $smarty->assign_by_ref('objects', $objects["data"]);
-$smarty->assign('cantobjects', count($objects['data']));
-$cant = $objects['cant'];
-$smarty->assign('cant', $objects['cant']);
+$smarty->assign('objects_count', count($objects['data']));
+$count = $objects['count'];
+$smarty->assign('count', $objects['count']);
 
 include_once('tiki-section_options.php');
 
@@ -169,7 +164,6 @@ $smarty->assign(
         'directory',
         'faq',
         'file gallery',
-        'image gallery',
         'image',
         'poll',
         'quiz',

@@ -6,6 +6,7 @@
         </a>
         {include file='admin/include_apply_top.tpl'}
     </div>
+    <div class="styling-element">
     <fieldset id="Calendar">
         <legend class="h3">{tr}Activate the feature{/tr}</legend>
         {preference name=feature_calendar visible="always"}
@@ -18,7 +19,7 @@
         {preference name=wikiplugin_addtogooglecal}
     </fieldset>
     <fieldset>
-        <legend class="h3">{tr}General settings{/tr}{help url="Calendar+Admin"}</legend>
+        <legend class="h3">{tr}General settings{/tr}{help url="Calendar-Admin"}</legend>
         {preference name=feature_default_calendars}
         <div class="adminoptionboxchild" id="feature_default_calendars_childcontainer">
             {preference name=default_calendars}
@@ -46,8 +47,10 @@
         {preference name=calendar_view_days}
         {preference name=calendar_description_is_html}
         {preference name=calendar_watch_editor}
-        {preference name=calendar_fc_premium_license}
+        {preference name=calendar_attachments_galleryId}
         {preference name=calendar_holidays}
+        {preference name=calendar_pdf_export_layout}
     </fieldset>
+    </div>
     {include file='admin/include_apply_bottom.tpl'}
 </form>

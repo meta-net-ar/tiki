@@ -10,7 +10,7 @@
 
 {block name="content"}
     <div class="table-responsive">
-        <form class="edit-tabular" method="post" action="{service controller=tabular action=edit tabularId=$tabularId}">
+        <form id="edit-tabular" class="edit-tabular" method="post" action="{service controller=tabular action=edit tabularId=$tabularId}">
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-2">{tr}Name{/tr}</label>
                 <div class="col-sm-10">
@@ -71,6 +71,17 @@
                     </label>
                     <div class="col-sm-9">
                         <textarea class="form-control" type="text" name="odbc[value_mappings]">{if $odbc_config.value_mappings}{$odbc_config.value_mappings|json_encode}{/if}</textarea>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label class="col-form-label col-sm-2 offset-sm-1">
+                        {tr}Join Other Tables{/tr}
+                        <a class="tikihelp text-info" title="{tr}Join Other Tables:{/tr} {tr}Specify SQL join conditions to use to include other tables and their data in the result set. JSON format: { table: { remote_field_name: local_field_name}, ...}{/tr}">
+                            {icon name=information}
+                        </a>
+                    </label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control" type="text" name="odbc[join_tables]">{if $odbc_config.join_tables}{$odbc_config.join_tables|json_encode}{/if}</textarea>
                     </div>
                 </div>
                 <div class="mb-3 row">
@@ -451,7 +462,7 @@
                                     <td><input class="unique-key form-check-input" type="checkbox"></td>
                                     <td><input class="read-only form-check-input" type="checkbox"></td>
                                     <td><input class="export-only form-check-input" type="checkbox"></td>
-                                    <td class="text-end"><button class="remove btn-sm btn-outline-warning">{icon name=remove}</button></td>
+                                    <td class="text-end"><button class="remove btn btn-sm btn-outline-warning" aria-label="{tr}Remove{/tr}">{icon name=remove}</button></td>
                                 </tr>
                                 {foreach $schema->getColumns() as $column}
                                     <tr>
@@ -474,10 +485,13 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <a href="{service controller=tabular action=select trackerId=$trackerId modal=true permName=$column->getField()
-                                                    columnIndex=$column@index mode=$column->getMode()}"
-                                                    class="btn btn-sm btn-secondary add-field tips"
-                                                    title="{tr}Field{/tr} {$column->getField()|escape}|{tr}Mode:{/tr} {$column->getMode()|escape}">
+                                            <a
+                                                href="{service controller=tabular action=select trackerId=$trackerId modal=true permName=$column->getField()
+                                                columnIndex=$column@index mode=$column->getMode()}"
+                                                class="btn btn-sm btn-secondary add-field tips"
+                                                title="{tr}Field{/tr} {$column->getField()|escape}|{tr}Mode:{/tr} {$column->getMode()|escape}"
+                                                role="button"
+                                            >
                                                 <span class="field d-none">{$column->getField()|escape}</span>:
                                                 <span class="mode">{$column->getMode()|escape}</span>
                                             </a>
@@ -493,11 +507,16 @@
                                         <td><input class="unique-key form-check-input" type="checkbox" {if $column->isUniqueKey()} checked {/if}></td>
                                         <td><input class="read-only form-check-input" type="checkbox" {if $column->isReadOnly()} checked {/if}></td>
                                         <td><input class="export-only form-check-input" type="checkbox" {if $column->isExportOnly()} checked {/if}></td>
-                                        <td class="text-end"><button class="remove btn-sm btn-outline-warning">{icon name=remove}</button></td>
+                                        <td class="text-end"><button class="remove btn-sm btn-outline-warning" aria-label="{tr}Remove{/tr}">{icon name=remove}</button></td>
                                     </tr>
                                 {/foreach}
                             </tbody>
                             <tfoot>
+                                <tr class="mt-3">
+                                    <td class="d-none" id="tr-save-fields">
+                                        <input type="submit" id="btn-save-fields" class="btn btn-primary d-none" value="{tr}Save fields{/tr}" onclick="$(window).off('beforeunload');return true;" form="edit-tabular">
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td>
                                         <select class="selection form-select">
@@ -508,7 +527,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <a href="{service controller=tabular action=select trackerId=$trackerId modal=true}" class="btn btn-secondary add-field from-select">{tr}Select Mode{/tr}</a>
+                                        <a href="{service controller=tabular action=select trackerId=$trackerId modal=true}" class="btn btn-secondary add-field from-select" role="button">{tr}Select Mode{/tr}</a>
                                         <textarea name="fields" class="d-none">{$schema->getFormatDescriptor()|json_encode}</textarea>
                                     </td>
                                     <td colspan="6">
@@ -532,11 +551,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-3 row submit">
-                <div class="col-sm-10 offset-sm-2">
-                    <input type="submit" class="btn btn-primary" value="{tr}Update{/tr}" onclick="$(window).off('beforeunload');return true;">
-                </div>
-            </div>
+            
             <div class="mb-3 row">
                 <label class="col-form-label col-sm-2">{tr}Filters{/tr}</label>
                 <div class="col-sm-10">
@@ -571,10 +586,10 @@
                                     </td>
                                     <td><span class="field">Field Name</span>:<span class="mode">Mode</span></td>
                                     <td>{tr}save first{/tr}</td>
-                                    <td class="text-end"><button class="remove btn-sm btn-outline-warning">{icon name=remove}</button></td>
+                                    <td class="text-end"><button class="remove btn-sm btn-outline-warning" aria-label="{tr}Remove{/tr}">{icon name=remove}</button></td>
                                 </tr>
                                 {foreach $filterCollection->getFilters() as $idx => $filter}
-                                    <tr>
+                                    <tr data-applied_value="{$filter->getAppliedValue()|json_encode|escape}">
                                         <td>
                                             <div class="input-group input-group-sm">
                                                 <span class="input-group-text">{icon name=sort}</span>
@@ -593,12 +608,17 @@
                                             </div>
                                         </td>
                                         <td><span class="field">{$filter->getField()|escape}</span>:<span class="mode">{$filter->getMode()|escape}</td>
-                                        <td><a href="{service controller=tabular action=choose_applied_value tabularId=$tabularId filterIndex=$idx}" class="btn btn-secondary choose-applied-value">{tr}: choose{/tr}</a></td>
-                                        <td class="text-end"><button class="remove btn-sm btn-outline-warning">{icon name=remove}</button></td>
+                                        <td><a href="{service controller=tabular action=choose_applied_value tabularId=$tabularId filterIndex=$idx}" class="btn btn-secondary choose-applied-value" role="button">{tr}: choose{/tr}</a></td>
+                                        <td class="text-end"><button class="remove btn-sm btn-outline-warning" aria-label="{tr}Remove{/tr}">{icon name=remove}</button></td>
                                     </tr>
                                 {/foreach}
                             </tbody>
                             <tfoot>
+                                <tr>
+                                    <td colspan="3">
+                                        <textarea name="filters" class="d-none w-100 my-2">{$filterCollection->getFilterDescriptor()|json_encode}</textarea>
+                                    </td>
+                                </tr>
                                 <tr>
                                     <td>
                                         <select class="selection form-select">
@@ -609,7 +629,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        <a href="{service controller=tabular action=select_filter trackerId=$trackerId}" class="btn btn-secondary add-filter">{tr}Select Mode{/tr}</a>
+                                        <a href="{service controller=tabular action=select_filter trackerId=$trackerId}" class="btn btn-secondary add-filter" role="button">{tr}Select Mode{/tr}</a>
                                         <textarea name="filters" class="d-none">{$filterCollection->getFilterDescriptor()|json_encode}</textarea>
                                     </td>
                                     <td colspan="2">&nbsp;</td>
@@ -622,11 +642,7 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-3 row submit">
-                <div class="col-sm-10 offset-sm-2">
-                    <input type="submit" class="btn btn-primary" value="{tr}Update{/tr}" onclick="$(window).off('beforeunload');return true;">
-                </div>
-            </div>
+
             <fieldset class="row mb-3">
                 <legend class="col-form-label col-sm-2 pt-0">{tr}Options{/tr}</legend>
                 <div class="col-sm-5">
@@ -648,6 +664,13 @@
                         <input type="checkbox" class="form-check-input" name="config[ignore_blanks]" id="config-ignore_blanks" value="1" {if $config['ignore_blanks']} checked {/if}>
                         <label class="form-check-label" for="config-ignore_blanks">{tr}Ignore blanks{/tr}</label>
                         <a class="tikihelp text-info" title="{tr}Ignore blanks:{/tr} {tr}Ignore blank values when import is updating existing items. Only non-blank values will be updated this way.{/tr}">
+                            {icon name=information}
+                        </a>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" name="config[skip_validation]" value="1" {if $config['skip_validation']} checked {/if}>
+                        <label class="form-check-label">{tr}Skip Validation{/tr}</label>
+                        <a class="tikihelp text-info" title="{tr}Skip Validation:{/tr} {tr}Tracker items that are created during import won't be validated against their rules like mandatory field checks. Use with caution.{/tr}">
                             {icon name=information}
                         </a>
                     </div>

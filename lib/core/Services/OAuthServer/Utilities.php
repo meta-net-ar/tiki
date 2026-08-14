@@ -12,7 +12,7 @@ class Services_OAuthServer_Utilities
 {
     public function tiki2Psr7Request($tikireq)
     {
-        $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
+        $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
         $headers = getallheaders();
 
         $uri = ServerRequest::getUriFromGlobals();

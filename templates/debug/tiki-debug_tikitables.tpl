@@ -2,7 +2,7 @@
 
 {if count($command_result) > 0} {* Can it be == 0 ?? *}
     <table id="tikitables">
-        <caption>Tables in Tiki DB</caption>
+        <caption>{tr}Tables in Tiki DB{/tr}</caption>
         {section name=i loop=$command_result}
             {* make row new start *}
             {if ($smarty.section.i.index % 3) == 0}

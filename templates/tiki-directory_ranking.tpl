@@ -1,5 +1,5 @@
 {title url="tiki-directory_ranking.php?sort_mode=$sort_mode"}{tr}Directory ranking{/tr}{/title}
-
+<div class="styling-element">
 {* Display the title using parent *}
 {include file='tiki-directory_bar.tpl'}
 <br>
@@ -22,15 +22,15 @@
             <td class="text"><a class="link" href="tiki-directory_redirect.php?siteId={$items[user].siteId}" {if $prefs.directory_open_links eq 'n'}target='_blank'{/if}>{$items[user].name}</a></td>
             <td class="text">{$items[user].url}</td>
             {if $prefs.directory_country_flag eq 'y'}
-                <td class="icon"><img src='img/flags/{$items[user].country}.png' alt='{$items[user].country}'></td>
+                <td class="icon">{$items[user].country|countryflagwithlabel}</td>
             {/if}
             <td class="integer">{$items[user].hits}</td>
         </tr>
         <tr>
             <td>&nbsp;</td>
-            <td class="text" colspan="4"><i>{tr}Directory Categories:{/tr}{assign var=fsfs value=1}
+            <td class="text" colspan="4"><i>{tr}Directory Categories:{/tr}{$fsfs=1}
                 {section name=ii loop=$items[user].cats}
-                {if $fsfs}{assign var=fsfs value=0}{else}, {/if}
+                {if $fsfs}{$fsfs=0}{else}, {/if}
                 {$items[user].cats[ii].path}
                 {/section}</i>
             </td>
@@ -40,4 +40,5 @@
         {/section}
     </table>
 </div>
-{pagination_links cant=$cant step=$maxRecords offset=$offset}{/pagination_links}
+{pagination_links count=$count step=$maxRecords offset=$offset}{/pagination_links}
+</div>

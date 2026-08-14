@@ -45,7 +45,7 @@ if ($prefs['user_assigned_modules'] != 'y' && $check_req) {
 if (! $user && $check_req) {
     Feedback::errorPage(tr('You must log in to use this feature'));
 }
-$request_uri = $url = isset($_SERVER["REQUEST_URI"]) ? $_SERVER['REQUEST_URI'] : '';
+$request_uri = $url = $_SERVER['REQUEST_URI'] ?? '';
 $access = TikiLib::lib('access');
 foreach ($actions as $action => $settings) {
     if (isset($_REQUEST[$action]) && $access->checkCsrf()) {
@@ -55,7 +55,7 @@ foreach ($actions as $action => $settings) {
         }
         $method = $settings['method'];
         $result = $usermoduleslib->$method($_REQUEST[$action], $user);
-        /** @var TikiDb_Pdo_Result|TikiDb_Adodb_Result $result */
+        /** @var Tiki\TikiDb\PdoResult $result */
         if ($result && $result->numRows()) {
             Feedback::success($settings['success']);
         } else {
@@ -76,4 +76,4 @@ if (defined('TIKI_SETUP_FINISHED') && TIKI_SETUP_FINISHED) {
 }
 
 $smarty->assign('current_location', $url);
-$smarty->assign('mpchar', (strpos($url, '?') ? '&' : '?'));
+$smarty->assign('mpchar', (str_contains($url, '?') ? '&' : '?'));

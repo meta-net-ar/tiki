@@ -6,6 +6,8 @@
 // Licensed under the GNU LESSER GENERAL PUBLIC LICENSE. See license.txt for details.
 function prefs_profile_list()
 {
+    $profilesAdvancedHelp = 'Profiles-Advanced';
+
     return [
         'profile_sources' => [
             'name' => tra('Repository URLs'),
@@ -14,6 +16,7 @@ function prefs_profile_list()
             'size' => 5,
             'hint' => tra('Enter multiple repository URLs, one per line.'),
             'default' => 'http://profiles.tiki.org/profiles',
+            'help' => 'https://profiles.tiki.org/Custom-Repository',
         ],
         'profile_channels' => [
             'name' => tra('Data channels'),
@@ -21,7 +24,7 @@ function prefs_profile_list()
             'type' => 'textarea',
             'size' => 5,
             'hint' => tra('Data channels create a named pipe to run profiles from user space. One channel per line. Each line is comma delimited and contains __channel name, domain, profile, allowed groups, (optional) $profilerequest:input$ matches to groups__.'),
-            'help' => 'http://profiles.tiki.org/Data+Channels',
+            'help' => 'http://profiles.tiki.org/Data-Channels',
             'warning' => tra('There are security considerations related to using data channels. Make sure the profile page is controlled by administrators only.'),
             'default' => '',
         ],
@@ -31,6 +34,7 @@ function prefs_profile_list()
             'type' => 'flag',
             'warning' => tra('Make sure you review the profiles you install.'),
             'default' => 'n',
+            'help' => $profilesAdvancedHelp,
         ],
         'profile_autoapprove_wikiplugins' => [
             'name' => tra('Automatically approve wiki-plugins on pages installed by profiles'),
@@ -39,6 +43,7 @@ function prefs_profile_list()
             'type' => 'flag',
             'default' => 'n',
             'tags' => ['advanced'],
+            'help' => $profilesAdvancedHelp,
         ],
     ];
 }
