@@ -737,9 +737,11 @@ function format_tracker_message_list($msg_list, $output_module, $parent_list = f
         }
 
         // Build message URL
-        $url = '?page=message&uid=' . $msg['fileId'] . '&list_path=' .
-                sprintf('tracker_folder_%s_%s', $msg['itemId'], $msg['fieldId']) .
-                '&list_parent=' . sprintf('tracker_%s', $msg['trackerId']);
+        $url = $output_module->build_page_url('message', [
+            'uid' => $msg['fileId'],
+            'list_path' => sprintf('tracker_folder_%s_%s', $msg['itemId'], $msg['fieldId']),
+            'list_parent' => sprintf('tracker_%s', $msg['trackerId']),
+        ]);
 
         if ($list_page) {
             $url .= '&list_page=' . $output_module->html_safe($list_page);

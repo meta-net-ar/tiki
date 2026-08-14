@@ -850,11 +850,11 @@ class Hm_Handler_tiki_message_content extends Hm_Handler_Module
         $this->out('msg_download_args', sprintf("page=message&amp;uid=%s&amp;list_path=%s&amp;tiki_download_message=1", $form['imap_msg_uid'], $this->request->post['list_path']));
         $this->out('msg_show_args', sprintf("page=message&amp;uid=%s&amp;list_path=%s&amp;tiki_show_message=1", $form['imap_msg_uid'], $this->request->post['list_path']));
         if ($email['prev']) {
-            $this->out('msg_prev_link', sprintf("?page=message&amp;uid=%s&amp;list_path=tracker_folder_%s_%s&list_parent=tracker_%s", $email['prev']['fileId'], $email['prev']['itemId'], $email['prev']['fieldId'], $email['prev']['trackerId']));
+            $this->out('msg_prev_link', $this->build_page_url('message', ['uid' => $email['prev']['fileId'], 'list_path' => sprintf("tracker_folder_%s_%s", $email['prev']['itemId'], $email['prev']['fieldId']), 'list_parent' => sprintf("tracker_%s", $email['prev']['trackerId'])]));
             $this->out('msg_prev_subject', $email['prev']['subject']);
         }
         if ($email['next']) {
-            $this->out('msg_next_link', sprintf("?page=message&amp;uid=%s&amp;list_path=tracker_folder_%s_%s&list_parent=tracker_%s", $email['next']['fileId'], $email['next']['itemId'], $email['next']['fieldId'], $email['next']['trackerId']));
+            $this->out('msg_next_link', $this->build_page_url('message', ['uid' => $email['next']['fileId'], 'list_path' => sprintf("tracker_folder_%s_%s", $email['next']['itemId'], $email['next']['fieldId']), 'list_parent' => sprintf("tracker_%s", $email['next']['trackerId'])]));
             $this->out('msg_next_subject', $email['next']['subject']);
         }
         $this->out('show_archive', $email['show_archive']);
@@ -1481,7 +1481,7 @@ class Hm_Output_combined_trackers_link extends Hm_Output_Module
 {
     protected function output()
     {
-        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="?page=message_list&list_path=trackers">';
+        $res = '<li class="menu_combined_trackers"><a class="unread_link" href="' . $this->build_page_url('message_list', ['list_path' => 'trackers']) . '">';
         if (! $this->get('hide_folder_icons')) {
             $res .= '<i class="bi bi-database account_icon"></i> ';
         }
