@@ -2567,16 +2567,16 @@
         },
         {
             "name": "jason-munro/cypht",
-            "version": "v2.12.0",
+            "version": "v2.12.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/cypht-org/cypht.git",
-                "reference": "39b97616525dd67611daa53d0f9a07aacaee47a9"
+                "reference": "62181a825b18746ae5a67a7389c3b7a1ec76d3cd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/39b97616525dd67611daa53d0f9a07aacaee47a9",
-                "reference": "39b97616525dd67611daa53d0f9a07aacaee47a9",
+                "url": "https://api.github.com/repos/cypht-org/cypht/zipball/62181a825b18746ae5a67a7389c3b7a1ec76d3cd",
+                "reference": "62181a825b18746ae5a67a7389c3b7a1ec76d3cd",
                 "shasum": ""
             },
             "require": {
@@ -2653,7 +2653,7 @@
                 "source": "https://github.com/cypht-org/cypht/",
                 "wiki": "https://github.com/cypht-org/cypht/wiki"
             },
-            "time": "2026-07-25T22:31:45+00:00"
+            "time": "2026-08-14T00:36:01+00:00"
         },
         {
             "name": "jean85/pretty-package-versions",
@@ -18197,8 +18197,8 @@
         "candy-chat/xmpp-prebind-php": 20,
         "garethp/php-ews": 20,
         "npm-asset/select2": 5,
-        "rubix/extras": 10,
-        "phpcompatibility/php-compatibility": 15
+        "phpcompatibility/php-compatibility": 15,
+        "rubix/extras": 10
     },
     "prefer-stable": false,
     "prefer-lowest": false,
@@ -18215,12 +18215,12 @@
         "ext-openssl": "*",
         "ext-zip": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "platform-overrides": {
         "php": "8.1",
         "ext-ldap": "0",
         "ext-soap": "0",
         "ext-sockets": "0"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
