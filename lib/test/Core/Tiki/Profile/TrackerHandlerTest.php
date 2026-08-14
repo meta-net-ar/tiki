@@ -102,6 +102,45 @@ class TrackerHandlerTest extends AbstractProfilesTestCase
     }
 
     /**
+     * Tracker profiles shared with older releases may still request the
+     * tracker Attachments tab, which has been removed in the current release.
+     */
+    public function testTrackerHandlerAcceptsRemovedAttachmentsOption()
+    {
+        $uniqueTracker = 'LegacyAttachmentsTracker_' . uniqid() . '_' . mt_rand(1000, 9999);
+
+        $profileYaml = [
+            'profile' => [
+                'name' => 'Legacy Tracker Attachments Profile',
+                'description' => 'Test profile compatibility with earlier releases',
+            ],
+            'objects' => [
+                'tracker' => [
+                    $uniqueTracker => [
+                        'name' => $uniqueTracker,
+                        'description' => 'Tracker with the removed attachments option',
+                        'allow' => ['comments', 'attachments'],
+                    ],
+                ],
+            ],
+        ];
+
+        $profile = Tiki_Profile::fromString(
+            $this->createProfileContent($profileYaml),
+            'LegacyTrackerAttachmentsProfile_' . uniqid()
+        );
+
+        $this->assertTrue($this->installer->install($profile, 'all'));
+        $this->assertTrackerExists($uniqueTracker);
+
+        $trklib = TikiLib::lib('trk');
+        $trackerId = $trklib->get_tracker_by_name($uniqueTracker);
+        $this->assertArrayNotHasKey('useAttachments', $trklib->get_tracker_options($trackerId));
+
+        $this->cleanupTracker($uniqueTracker);
+    }
+
+    /**
      * Test loading Tracker profile from disk
      *
      * Validates that tracker profiles can be loaded from disk files

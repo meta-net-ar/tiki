@@ -18,6 +18,10 @@ class Tiki_Profile_InstallHandler_Tracker extends Tiki_Profile_InstallHandler
 
         $data = Tiki_Profile::convertYesNo($data);
 
+        // Tracker attachments were removed, but profiles shared with older
+        // Tiki releases may still use this shorthand option.
+        unset($data['allow_attachments']);
+
         return $this->data = $data;
     }
 
