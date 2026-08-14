@@ -64,9 +64,6 @@ class PatchCypht
         $php_binary = preg_replace("/(?<!\\\) /", '\ ', PHP_BINARY);
         $cypthFolder = $fixDS('jason-munro/cypht');
         $genScript = $fixDS('scripts/config_gen.php');
-        $contents = file_get_contents($vendors . $cypthFolder . DIRECTORY_SEPARATOR . $genScript);
-        $contents = preg_replace('/define.*?VENDOR_PATH.*?;/', "define('VENDOR_PATH', '$vendors');", $contents);
-        file_put_contents($vendors . $cypthFolder . DIRECTORY_SEPARATOR . $genScript, $contents);
         $output = shell_exec("cd {$vendors}{$cypthFolder} && {$php_binary} {$genScript}");
 
         if (! is_string($output)  || ! str_contains($output, 'dynamic.php file written')) {
