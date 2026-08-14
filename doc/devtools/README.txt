@@ -13,11 +13,3 @@ Main tools
 * ggg-trace.php
   made by George G. Geller
   For tracing and debugging php code -- output a text file.
-
-
-Helper tools
-============
-
-* findstyledef.sh, findstyledef.pl
-  made by ohertel
-  Provide a report on CSS classes referenced in tpl and php files
