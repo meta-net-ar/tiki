@@ -1,0 +1,118 @@
+.profile-picture-page {
+	--profile-border: var(--bs-border-color, #dee2e6);
+	--profile-muted: var(--bs-secondary-color, #6c757d);
+	max-width: 980px;
+}
+
+.profile-picture-page__grid {
+	display: grid;
+	grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+	gap: 1.5rem;
+	align-items: start;
+}
+
+.profile-picture-page__panel {
+	border: 1px solid var(--profile-border);
+	border-radius: 8px;
+	padding: 1.25rem;
+	background: var(--bs-body-bg, #fff);
+}
+
+.profile-picture-page__panel--preview {
+	text-align: center;
+}
+
+.profile-picture-page__preview {
+	display: flex;
+	min-height: 190px;
+	align-items: center;
+	justify-content: center;
+	margin: 0.5rem 0 1.25rem;
+	padding: 1rem;
+	border-radius: 8px;
+	background: var(--bs-tertiary-bg, #f8f9fa);
+}
+
+.profile-picture-page__preview img,
+.profile-picture-page__preview svg {
+	max-width: 100%;
+	max-height: 220px;
+	object-fit: contain;
+	border-radius: 8px;
+}
+
+.profile-picture-page__empty {
+	color: var(--profile-muted);
+}
+
+.profile-picture-page__actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.5rem;
+}
+
+.profile-picture-page__upload .tiki-form-group {
+	margin-bottom: 1rem;
+}
+
+.profile-picture-page__upload input[type="file"] {
+	width: 100%;
+}
+
+.profile-picture-page__upload .form-text {
+	color: var(--profile-muted);
+}
+
+.profile-picture-page__library {
+	margin-top: 1.5rem;
+}
+
+.profile-picture-page__library-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+	gap: 0.75rem;
+	margin-top: 1rem;
+}
+
+.profile-picture-page__library-grid a {
+	display: flex;
+	aspect-ratio: 1;
+	align-items: center;
+	justify-content: center;
+	padding: 0.5rem;
+	border: 1px solid var(--profile-border);
+	border-radius: 8px;
+}
+
+.profile-picture-page__library-grid img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.profile-picture-page__carousel {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	margin: 1rem 0;
+}
+
+.profile-picture-page__carousel img {
+	width: 122px;
+	height: 122px;
+	object-fit: contain;
+}
+
+.profile-picture-page__carousel-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0.5rem;
+}
+
+@media (max-width: 700px) {
+	.profile-picture-page__grid {
+		grid-template-columns: 1fr;
+	}
+}
