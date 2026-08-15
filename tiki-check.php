@@ -43,9 +43,6 @@ define('FITNESS_STATUS_UNSAFE', 'unsafe');
 define('FITNESS_STATUS_UNKNOWN', 'unknown');
 define('FITNESS_STATUS_RISKY', 'risky');
 
-// TODO : Create sane 3rd mode for Monitoring Software like Nagios, Icinga, Shinken
-// * needs authentication, if not standalone
-$nagios = isset($_REQUEST['nagios']);
 $locked = file_exists('tiki-check.php.lock');
 $font = 'lib/captcha/DejaVuSansMono.ttf';
 
@@ -4504,7 +4501,7 @@ END;
     }
 }
 
-if ($standalone && ! $nagios) {
+if ($standalone) {
     $render .= '<style type="text/css">td, th { border: 1px solid #000000; vertical-align: baseline; padding: .5em; }</style>';
     $render .= '<h2>Server compatibility</h2>';
 
@@ -4666,67 +4663,6 @@ if ($standalone && ! $nagios) {
     }
 
     createPage('Tiki Server Compatibility', $render);
-} elseif ($nagios) {
-//  0    OK
-//  1    WARNING
-//  2    CRITICAL
-//  3    UNKNOWN
-    $monitoring_info = array( 'state' => 0,
-             'message' => '');
-
-    function update_overall_status($check_group, $check_group_name)
-    {
-        global $monitoring_info;
-        $state = 0;
-        $message = '';
-
-        foreach ($check_group as $property => $values) {
-            if (! isset($values['ack']) || $values['ack'] != true) {
-                switch ($values['fitness_status']) {
-                    case FITNESS_STATUS_UNSURE:
-                        $state = max($state, 1);
-                        $message .= "$property" . "->unsure, ";
-                        break;
-                    case FITNESS_STATUS_RISKY:
-                        $state = max($state, 1);
-                        $message .= "$property" . "->risky, ";
-                        break;
-                    case FITNESS_STATUS_BAD:
-                        $state = max($state, 2);
-                        $message .= "$property" . "->BAD, ";
-                        break;
-                    case FITNESS_STATUS_INFO:
-                        $state = max($state, 3);
-                        $message .= "$property" . "->info, ";
-                        break;
-                    case FITNESS_STATUS_GOOD:
-                    case FITNESS_STATUS_SAFE:
-                        break;
-                }
-            }
-        }
-        $monitoring_info['state'] = max($monitoring_info['state'], $state);
-        if ($state != 0) {
-            $monitoring_info['message'] .= $check_group_name . ": " . trim($message, ' ,') . " -- ";
-        }
-    }
-
-    // Might not be set, i.e. in standalone mode
-    if ($mysql_properties) {
-        update_overall_status($mysql_properties, "MySQL");
-    }
-    update_overall_status($server_properties, "Server");
-    if ($apache_properties) {
-        update_overall_status($apache_properties, "Apache");
-    }
-    if ($iis_properties) {
-        update_overall_status($iis_properties, "IIS");
-    }
-    update_overall_status($php_properties, "PHP");
-    update_overall_status($security, "PHP Security");
-    update_overall_status($tiki_security, "Tiki Security");
-    $return = json_encode($monitoring_info);
-    echo $return;
 } else {    // not stand-alone
     if (isset($_REQUEST['acknowledge']) || empty($last_state)) {
         $tiki_check_status = array();

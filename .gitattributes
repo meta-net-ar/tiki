@@ -83,7 +83,6 @@ doc/devtools/backup.php -text
 doc/devtools/backupdb.sh -text
 doc/devtools/buildincrement.php -text
 doc/devtools/check_filegal_dir.php -text
-doc/devtools/check_tiki-new.php -text
 doc/devtools/check_tiki.php -text
 doc/devtools/cleanwatch.sh -text
 doc/devtools/clear_actionlog.bash -text
@@ -1483,7 +1482,6 @@ doc/devtools/backup.php -text
 doc/devtools/backupdb.sh -text
 doc/devtools/buildincrement.php -text
 doc/devtools/check_filegal_dir.php -text
-doc/devtools/check_tiki-new.php -text
 doc/devtools/check_tiki.php -text
 doc/devtools/cleanwatch.sh -text
 doc/devtools/clear_actionlog.bash -text
