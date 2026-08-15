@@ -23,6 +23,11 @@ use Tiki\Search\SearchIndexRebuilder;
 )]
 class IndexRebuildCommand extends Command
 {
+    private const EXIT_OK = 0;
+    private const EXIT_INTEGRITY_ERRORS = 1;
+    private const EXIT_SKIPPED_ERRORS = 2;
+    private const EXIT_CATASTROPHIC = 3;
+
     protected function configure()
     {
         $this
@@ -142,91 +147,285 @@ class IndexRebuildCommand extends Command
         $searchIndexRebuilder = new SearchIndexRebuilder();
         $result = $searchIndexRebuilder->rebuildIndex($log, false, $progress, $skipErrorTracking);
 
-        \Feedback::printToConsole($output, $cron);
-
         $queries_after = $num_queries;
 
-        if ($result) {
-            $error = isset($result['default']['error']);
-            if ($error) {
-                $output->writeln("\n<error>" . $result['default']['error_message'] . "</error>");
-                \TikiLib::lib('logs')->add_action('rebuild indexes', 'Search index rebuild failed.', 'system');
-            }
-            if (! $cron) {
-                if ($progress) {
-                    $output->writeln('');
-                }
-                if (! $error) {
-                    $unifiedsearchlib->formatStats($result, function ($line) use ($output) {
-                        $output->writeln($line);
-                    });
-                    $output->writeln('Rebuilding index done');
-
-                    list($engine, $version, $index) = $unifiedsearchlib->getCurrentEngineDetails();
-                    $output->writeln('Index: ' . $index);
-                }
-
-                if ($fallbackEngineDetails = \TikiLib::lib('unifiedsearch')->getFallbackEngineDetails()) {
-                    list($engine, $engineName, $version, $index) = $fallbackEngineDetails;
-                    $io->section("\nFallback unified search");
-
-                    if (empty($result['fallback'])) {
-                        $output->writeln('<error>Fallback index was not rebuilt</error>');
-                    } else {
-                        $fallbackEngineMessage = 'Engine: ' . $engineName;
-                        if (! empty($version)) {
-                            $fallbackEngineMessage .= ', version ' . $version;
-                        }
-                        $output->writeln($fallbackEngineMessage);
-                        $output->writeln('Index: ' . $index);
-                    }
-                }
-
-                if (isset($unusedIndices['indices']) && count($unusedIndices['indices'])) {
-                    $io->section("\nUnused Indexes Detected");
-                    $io->listing($unusedIndices['indices']);
-                    $io->note("If you don't need them (for debugging), run the following command:");
-                    $io->writeln("<info>php console.php index:cleanup</info> (Delete unused indexes)");
-                    $io->writeln("<comment> --dry-run </comment> List unused indexes without deleting");
-                    $io->writeln("<comment> --all </comment> Delete all indexes, ignoring prefix");
-                    $io->writeln("<comment> --all --dry-run </comment> List all indexes without deleting");
-                    $io->writeln("<comment> -i <index_name> </comment> Remove a specific index");
-                } elseif (isset($unusedIndices['error'])) {
-                    $io->error($unusedIndices['error']);
-                }
-
-                $executionTime = $timer->stop();
-                if ($executionTime < 60) {
-                    $seconds = floor($executionTime);
-                    $executionTime = $seconds . ' ' . ($seconds == 1 ? 'sec' : 'secs');
-                } elseif ($executionTime < 3600) {
-                    $minutes = floor($executionTime / 60);
-                    $executionTime = $minutes . ' ' . ($minutes == 1 ? 'min' : 'mins');
-                } else {
-                    $hours = round($executionTime / 3600, 1);
-                    $executionTime = $hours . ' ' . ($hours == 1 ? 'hr' : 'hrs');
-                }
-
-                if ($log && is_array($currentEngine) && count($currentEngine)) {
-                    list($engine) = $currentEngine;
-                    $logToFile = new \Monolog\Handler\StreamHandler($unifiedsearchlib->getLogFilename($log, strtolower($engine)), \Monolog\Logger::INFO);
-                    $loggerInstance = new \Monolog\Logger('index_rebuild');
-                    $loggerInstance->pushHandler($logToFile);
-                    $loggerInstance->info("Execution time: " . $executionTime);
-                }
-
-                $io->section("\nExecution Statistics");
-                $output->writeln('Execution time: ' . $executionTime);
-                $output->writeln('Current Memory usage: ' . FormatterHelper::formatMemory(memory_get_usage()));
-                $output->writeln('Memory peak usage before indexing: ' . FormatterHelper::formatMemory($memory_peak_usage_before));
-                $output->writeln('Memory peak usage after indexing: ' . FormatterHelper::formatMemory(memory_get_peak_usage()));
-                $output->writeln('Number of queries: ' . ($queries_after - $num_queries_before));
-            }
-            return $error ? Command::FAILURE : Command::SUCCESS;
-        } else {
+        if (! $result) {
             $output->writeln("\n<error>Search index rebuild failed. Last messages shown above.</error>");
             \TikiLib::lib('logs')->add_action('rebuild indexes', 'Search index rebuild failed.', 'system');
-            return Command::FAILURE;
+            return self::EXIT_CATASTROPHIC;
         }
+        $defaultError = ! empty($result['default']['error']);
+
+        // Classify failures from rebuild stats so ops can automate retries/escalation by exit code.
+        $classifiedErrors = $this->extractClassifiedErrors($result);
+        $integrityErrors = $classifiedErrors['integrity'];
+        $skippedErrors = $classifiedErrors['skipped'];
+        $catastrophicErrors = $classifiedErrors['catastrophic'];
+
+        // Also classify direct Feedback errors (some tracker field handlers report issues this way).
+        $feedbackClassified = $this->extractClassifiedFeedbackErrors();
+        $integrityErrors = array_values(array_unique(array_merge($integrityErrors, $feedbackClassified['integrity'])));
+        $skippedErrors = array_values(array_unique(array_merge($skippedErrors, $feedbackClassified['skipped'])));
+        $catastrophicErrors = array_values(array_unique(array_merge($catastrophicErrors, $feedbackClassified['catastrophic'])));
+
+        \Feedback::printToConsole($output, $cron);
+
+        if ($defaultError) {
+            $output->writeln("\n<error>" . ($result['default']['error_message'] ?? 'Search index rebuild failed.') . "</error>");
+            \TikiLib::lib('logs')->add_action('rebuild indexes', 'Search index rebuild failed.', 'system');
+        }
+        if (! $cron) {
+            if ($progress) {
+                $output->writeln('');
+            }
+            if (! $defaultError) {
+                $unifiedsearchlib->formatStats($result, function ($line) use ($output) {
+                    $output->writeln($line);
+                });
+                $output->writeln('Rebuilding index done');
+
+                list($engine, $version, $index) = $unifiedsearchlib->getCurrentEngineDetails();
+                $output->writeln('Index: ' . $index);
+            }
+
+            if ($fallbackEngineDetails = \TikiLib::lib('unifiedsearch')->getFallbackEngineDetails()) {
+                list($engine, $engineName, $version, $index) = $fallbackEngineDetails;
+                $io->section("\nFallback unified search");
+
+                if (empty($result['fallback'])) {
+                    $output->writeln('<error>Fallback index was not rebuilt</error>');
+                } else {
+                    $fallbackEngineMessage = 'Engine: ' . $engineName;
+                    if (! empty($version)) {
+                        $fallbackEngineMessage .= ', version ' . $version;
+                    }
+                    $output->writeln($fallbackEngineMessage);
+                    $output->writeln('Index: ' . $index);
+                }
+            }
+
+            if (isset($unusedIndices['indices']) && count($unusedIndices['indices'])) {
+                $io->section("\nUnused Indexes Detected");
+                $io->listing($unusedIndices['indices']);
+                $io->note("If you don't need them (for debugging), run the following command:");
+                $io->writeln("<info>php console.php index:cleanup</info> (Delete unused indexes)");
+                $io->writeln("<comment> --dry-run </comment> List unused indexes without deleting");
+                $io->writeln("<comment> --all </comment> Delete all indexes, ignoring prefix");
+                $io->writeln("<comment> --all --dry-run </comment> List all indexes without deleting");
+                $io->writeln("<comment> -i <index_name> </comment> Remove a specific index");
+            } elseif (isset($unusedIndices['error'])) {
+                $io->error($unusedIndices['error']);
+            }
+
+            $executionTime = $timer->stop();
+            if ($executionTime < 60) {
+                $seconds = floor($executionTime);
+                $executionTime = $seconds . ' ' . ($seconds == 1 ? 'sec' : 'secs');
+            } elseif ($executionTime < 3600) {
+                $minutes = floor($executionTime / 60);
+                $executionTime = $minutes . ' ' . ($minutes == 1 ? 'min' : 'mins');
+            } else {
+                $hours = round($executionTime / 3600, 1);
+                $executionTime = $hours . ' ' . ($hours == 1 ? 'hr' : 'hrs');
+            }
+
+            if ($log && is_array($currentEngine) && count($currentEngine)) {
+                list($engine) = $currentEngine;
+                $logToFile = new \Monolog\Handler\StreamHandler($unifiedsearchlib->getLogFilename($log, strtolower($engine)), \Monolog\Logger::INFO);
+                $loggerInstance = new \Monolog\Logger('index_rebuild');
+                $loggerInstance->pushHandler($logToFile);
+                $loggerInstance->info("Execution time: " . $executionTime);
+            }
+
+            $io->section("\nExecution Statistics");
+            $output->writeln('Execution time: ' . $executionTime);
+            $output->writeln('Current Memory usage: ' . FormatterHelper::formatMemory(memory_get_usage()));
+            $output->writeln('Memory peak usage before indexing: ' . FormatterHelper::formatMemory($memory_peak_usage_before));
+            $output->writeln('Memory peak usage after indexing: ' . FormatterHelper::formatMemory(memory_get_peak_usage()));
+            $output->writeln('Number of queries: ' . ($queries_after - $num_queries_before));
+
+            $this->renderFailureSummary($output, $integrityErrors, $skippedErrors, $catastrophicErrors);
+        }
+
+        return $this->resolveExitCode($integrityErrors, $skippedErrors, $catastrophicErrors);
+    }
+
+    private function resolveExitCode(array $integrityErrors, array $skippedErrors, array $catastrophicErrors): int
+    {
+        if (! empty($catastrophicErrors)) {
+            return self::EXIT_CATASTROPHIC;
+        }
+
+        if (! empty($skippedErrors)) {
+            return self::EXIT_SKIPPED_ERRORS;
+        }
+
+        if (! empty($integrityErrors)) {
+            return self::EXIT_INTEGRITY_ERRORS;
+        }
+
+        return self::EXIT_OK;
+    }
+
+    private function renderFailureSummary(OutputInterface $output, array $integrityErrors, array $skippedErrors, array $catastrophicErrors): void
+    {
+        if (empty($integrityErrors) && empty($skippedErrors) && empty($catastrophicErrors)) {
+            return;
+        }
+
+        $output->writeln("\n<comment>Index rebuild failure summary</comment>");
+        $output->writeln(' - Integrity/non-indexable: ' . count($integrityErrors));
+        $output->writeln(' - Skipped/unknown: ' . count($skippedErrors));
+        $output->writeln(' - Catastrophic: ' . count($catastrophicErrors));
+
+        if (! empty($integrityErrors)) {
+            $output->writeln("\n<comment>Integrity/non-indexable elements</comment>");
+            foreach ($integrityErrors as $line) {
+                $output->writeln(' - ' . $line);
+            }
+        }
+
+        if (! empty($skippedErrors)) {
+            $output->writeln("\n<comment>Skipped elements (unknown errors)</comment>");
+            foreach ($skippedErrors as $line) {
+                $output->writeln(' - ' . $line);
+            }
+        }
+
+        if (! empty($catastrophicErrors)) {
+            $output->writeln("\n<error>Catastrophic failures</error>");
+            foreach ($catastrophicErrors as $line) {
+                $output->writeln(' - ' . $line);
+            }
+        }
+    }
+
+    private function extractClassifiedErrors(array $result): array
+    {
+        $integrityErrors = [];
+        $skippedErrors = [];
+        $catastrophicErrors = [];
+
+        foreach (['default', 'fallback'] as $scope) {
+            if (! isset($result[$scope]) || ! is_array($result[$scope])) {
+                continue;
+            }
+
+            $bucket = $result[$scope];
+
+            foreach (['integrity_errors', 'non_indexable', 'not_indexable'] as $key) {
+                if (! empty($bucket[$key]) && is_array($bucket[$key])) {
+                    $integrityErrors = array_merge($integrityErrors, $this->normalizeErrorLines($bucket[$key]));
+                }
+            }
+
+            foreach (['skipped', 'skipped_errors', 'item_errors', 'errors'] as $key) {
+                if (! empty($bucket[$key]) && is_array($bucket[$key])) {
+                    $skippedErrors = array_merge($skippedErrors, $this->normalizeErrorLines($bucket[$key]));
+                }
+            }
+
+            if (! empty($bucket['error']) && ! empty($bucket['error_message'])) {
+                $catastrophicErrors[] = $bucket['error_message'];
+            }
+        }
+
+        return [
+            'integrity' => array_values(array_unique($integrityErrors)),
+            'skipped' => array_values(array_unique($skippedErrors)),
+            'catastrophic' => array_values(array_unique($catastrophicErrors)),
+        ];
+    }
+
+    private function normalizeErrorLines(array $entries): array
+    {
+        $base = \TikiLib::lib('tiki')->tikiUrl();
+        $lines = [];
+
+        foreach ($entries as $entry) {
+            if (is_string($entry)) {
+                $lines[] = $entry;
+                continue;
+            }
+
+            if (! is_array($entry)) {
+                continue;
+            }
+
+            $label = $entry['label'] ?? $entry['object'] ?? $entry['id'] ?? 'unknown';
+            $message = $entry['message'] ?? $entry['error'] ?? 'unknown error';
+            $url = $entry['url'] ?? $entry['href'] ?? null;
+
+            if ($url && strpos($url, 'http') !== 0) {
+                $url = rtrim($base, '/') . '/' . ltrim((string)$url, '/');
+            }
+
+            if ($url) {
+                $lines[] = $label . ' - ' . $message . ' - ' . $url;
+            } else {
+                $lines[] = $label . ' - ' . $message;
+            }
+        }
+
+        return $lines;
+    }
+
+    private function extractClassifiedFeedbackErrors(): array
+    {
+        $classified = [
+            'integrity' => [],
+            'skipped' => [],
+            'catastrophic' => [],
+        ];
+
+        if (empty($_SESSION['tikifeedback']) || ! is_array($_SESSION['tikifeedback'])) {
+            return $classified;
+        }
+
+        foreach ($_SESSION['tikifeedback'] as $feedback) {
+            if (! is_array($feedback)) {
+                continue;
+            }
+
+            $type = $feedback['type'] ?? 'error';
+            if ($type !== 'error' && $type !== 'warning') {
+                continue;
+            }
+
+            $messages = $feedback['mes'] ?? [];
+            if (! is_array($messages)) {
+                $messages = [$messages];
+            }
+
+            foreach ($messages as $message) {
+                if (! is_string($message) || $message === '') {
+                    continue;
+                }
+
+                $plain = trim(str_replace('<br />', ' ', strip_tags($message)));
+                if ($plain === '') {
+                    continue;
+                }
+
+                if (
+                    preg_match('/field:\s*Gallery\s*#\d+\s+not\s+found/i', $plain)
+                    || stripos($plain, 'data integrity error') !== false
+                    || stripos($plain, 'ItemLink data integrity error') !== false
+                    || stripos($plain, 'ItemsList data integrity error') !== false
+                ) {
+                    $classified['integrity'][] = $plain;
+                } elseif (stripos($plain, 'Indexing failed while processing') !== false) {
+                    $classified['skipped'][] = $plain;
+                } elseif (stripos($plain, 'search index could not be rebuilt') !== false) {
+                    $classified['catastrophic'][] = $plain;
+                }
+            }
+        }
+
+        $classified['integrity'] = array_values(array_unique($classified['integrity']));
+        $classified['skipped'] = array_values(array_unique($classified['skipped']));
+        $classified['catastrophic'] = array_values(array_unique($classified['catastrophic']));
+
+        return $classified;
     }
 }

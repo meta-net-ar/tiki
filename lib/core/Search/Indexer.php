@@ -143,6 +143,8 @@ class Search_Indexer
         $this->stats = [];
         $this->stats['counts'] = $contentTypes;
         $this->stats['times'] = $contentTypes;
+        $this->stats['integrity_errors'] = [];
+        $this->stats['skipped_errors'] = [];
 
         $timer = new Timer();
 
@@ -236,6 +238,8 @@ class Search_Indexer
 
         $data = $this->getDocuments($objectType, $objectId);
         foreach ($data as $entry) {
+            $entryUrl = $this->resolveDocumentUrl($entry);
+
             try {
                 $this->searchIndex->addDocument($entry);
             } catch (\Search\Manticore\FatalException $e) {
@@ -248,6 +252,8 @@ class Search_Indexer
                     $e->getMessage()
                 );
                 Feedback::error($msg);
+                $this->stats['skipped_errors'][] = $this->buildErrorEntry($objectType, $objectId, $e->getMessage(), $entryUrl);
+
                 if ($this->errorTrackingEnabled) {
                     TikiLib::lib('errortracking')->captureException($e);
                 }
@@ -262,6 +268,9 @@ class Search_Indexer
                     $e = new ErrorException($err['errstr'], 0, $err['errno'], $err['errfile'], $err['errline']);
                     TikiLib::lib('errortracking')->captureException($e);
                 }
+                if (stripos($err['errstr'], 'integrity') !== false) {
+                    $this->stats['integrity_errors'][] = $this->buildErrorEntry($objectType, $objectId, $err['errstr'], $entryUrl);
+                }
             }
             $this->cacheErrors = [];
             // log file display feedback messages after each document line to make it easier to track
@@ -272,6 +281,36 @@ class Search_Indexer
         }
 
         return count($data);
+    }
+
+    private function buildErrorEntry(string $objectType, $objectId, string $message, ?string $url = null): array
+    {
+        return [
+            'label' => $objectType . ':' . $objectId,
+            'object' => $objectType,
+            'id' => (string) $objectId,
+            'message' => $message,
+            'url' => $url,
+        ];
+    }
+
+    private function resolveDocumentUrl(array $entry): ?string
+    {
+        if (! isset($entry['url'])) {
+            return null;
+        }
+
+        $url = $entry['url'];
+
+        if (is_object($url) && method_exists($url, 'getValue')) {
+            $url = $url->getValue();
+        }
+
+        if (! is_string($url) || $url === '') {
+            return null;
+        }
+
+        return $url;
     }
 
 
