@@ -3,7 +3,9 @@ export default function (textarea) {
     return function (event) {
         const dropdown = document.getElementById("user-mentions-dropdown");
         if (dropdown) {
-            handleArrowNavigation(event, dropdown);
+            if (handleArrowNavigation(event, dropdown)) {
+                return; // Stop further processing if navigation was handled to prevent unwanted dropdown refreshes.
+            }
         }
 
         if (!window.jqueryTiki.user_mention_enabled) {
@@ -106,22 +108,22 @@ function handleArrowNavigation(event, dropdown) {
         event.preventDefault();
         activeItem?.classList.remove("active");
         items[(activeIndex + 1) % items.length]?.classList.add("active");
-        return;
+        return true;
     }
     if (event.key === "ArrowUp") {
         event.preventDefault();
         activeItem?.classList.remove("active");
         items[(activeIndex - 1 + items.length) % items.length]?.classList.add("active");
-        return;
+        return true;
     }
-    if (event.key === "Enter" && activeItem) {
+    if (["Enter", "Tab"].includes(event.key) && activeItem) {
         event.preventDefault();
         activeItem.click();
-        return;
+        return true;
     }
     if (event.key === "Escape") {
         event.preventDefault();
         dropdown.remove();
-        return;
+        return true;
     }
 }
